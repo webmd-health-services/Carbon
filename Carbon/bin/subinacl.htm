@@ -1,0 +1,1692 @@
+<html>
+
+<head>
+<meta http-equiv="Content-Language" content="en-us">
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+<title>Subinacl.exe</title>
+</head>
+
+<body>
+
+<table class="header" width="100%" id="table1">
+	<tr>
+		<td class="toolheader">
+		<h1><font face="Verdana" size="5">Subinacl.exe</font></h1>
+		</td>
+	</tr>
+	<tr>
+		<td class="toolheader"><font face="Verdana"><span class="webonly"><nobr>
+		<span class="indicator"><a href="#Overview">Overview</a></span> | 
+		<a href="#Remarks">Remarks</a> | <a href="#Syntax">Syntax</a> |
+		<a href="#Examples">Examples</a> | 
+		<a href="#Related_Tools">Related Tools</a></nobr></span></font></td>
+	</tr>
+</table>
+<div id="firstpar">
+	<hr class="tools"></div>
+<h2><font face="Verdana" size="4"><a name="Overview">Overview</a></font><hr class="tools"></h2>
+<p><font face="Verdana" size="2">SubInACL is a command-line tool that enables 
+administrators to obtain security information about files, registry keys, and 
+services, and transfer this information from user to user, from local or global 
+group to group, and from domain to domain.</font></p>
+<p><font face="Verdana" size="2">For example, if a user has moved from one 
+domain (DomainA) to another (DomainB), the administrator can replace 
+DomainA\User with DomainB\User in the security information for the user's files. 
+This gives the user access to the same files from the new domain.</font></p>
+<p><font face="Verdana" size="2">SubInACL enables administrators to do the 
+following:</font></p>
+<ul>
+	<li><font face="Verdana" size="2">Display security information associated 
+	with files, registry keys, or services. This information includes owner, 
+	group, permission access control list (ACL), discretionary ACL (DACL), and 
+	system ACL (SACL). </font></li>
+	<li><font face="Verdana" size="2">Change the owner of an object. </font>
+	</li>
+	<li><font face="Verdana" size="2">Replace the security information for one 
+	identifier (account, group, well-known security identifier (SID)) with that 
+	of another identifier. </font></li>
+	<li><font face="Verdana" size="2">Migrate security information about 
+	objects. This is useful if you have reorganized a network's domains and need 
+	to migrate the security information for files from one domain to another.</font></li>
+</ul>
+<p><u><b><font face="Verdana" size="2">Corresponding 
+Operating System Features</font></b></u></p>
+<div class="expand" style="DISPLAY: block">
+	<font face="Verdana" size="2">The operating system provides no GUI functionality that 
+	corresponds to this tool.</font></div>
+<p><u><b><font face="Verdana" size="2">Concepts</font></b></u></p>
+<div class="expand" style="DISPLAY: block">
+	<font face="Verdana" size="2">For an introduction to security descriptors and the 
+	role they play in access control, see
+	<b>Understanding access control</b> in Help and Support Center for Windows 
+	Server&nbsp;2003.</font></div>
+<p><u><b><font face="Verdana" size="2">System Requirements</font></b></u></p>
+<div class="expand" style="DISPLAY: block">
+	<font face="Verdana" size="2">The following are the system requirements for SubInACL:</font><ul>
+		<li><font face="Verdana" size="2">Windows&nbsp;XP Professional or Windows Server&nbsp;2003 
+		operating system </font></li>
+	</ul>
+	<p><font face="Verdana" size="2">This tool is designed for use by administrators. 
+	Some actions may fail or generate error messages if the user does not have 
+	the following privileges:</font></p>
+	<ul>
+		<li><font face="Verdana" size="2">SeBackupPrivilege (Back Up Files and 
+		Directories) </font></li>
+		<li><font face="Verdana" size="2">SeChangeNotifyPrivilege (Bypass Traverse 
+		Checking) </font></li>
+		<li><font face="Verdana" size="2">SeRestorePrivilege (Restore Files and 
+		Directories) </font></li>
+		<li><font face="Verdana" size="2">SeSecurityPrivilege (Manage Auditing and 
+		Security Log) </font></li>
+		<li><font face="Verdana" size="2">SeTakeOwnershipPrivilege (Take Ownership of 
+		Files or Other Objects) </font></li>
+		<li><font face="Verdana" size="2">SeTcbPrivilege (Act As Part of the Operating 
+		System)</font></li>
+	</ul>
+</div>
+<h3><u><font face="Verdana" size="2">File Required</font></u></h3>
+<ul>
+	<li><font face="Verdana" size="2">Subinacl.exe </font></li>
+</ul>
+&nbsp;<p><b><font face="Verdana" size="4"><a name="Remarks">Remarks</a></font></b>
+<hr class="tools">
+<h3><font face="Verdana" size="2"><u>Comparing 
+SubInACL to the find Tool in UNIX</u></font></h3>
+<div class="expand" style="DISPLAY: block">
+	<font face="Verdana" size="2">The syntax of SubInACL is analogous to that of the <b>
+	find</b> tool in UNIX. For each object, SubInACL:</font><ul>
+		<li><font face="Verdana" size="2">Retrieves the security descriptor of the <i>
+		ObjectName</i> object. For more information, see 
+		<a href="#Using_SIDs_in_SubInACL">Using 
+		SIDs in SubInACL</a>. </font></li>
+		<li><font face="Verdana" size="2">Applies one or more actions, which are executed 
+		in the order in which they appear on the command line. </font></li>
+	</ul>
+	<p><font face="Verdana" size="2">If the security descriptor has been modified and the
+	<b>/testmode</b> switch has not been specified, the changes are applied to 
+	the object. You can specify as many actions as you need. You must specify at 
+	least three characters for each action. The syntax is not case-sensitive.</font></div>
+<h3><font face="Verdana" size="2"><u>Editing 
+in SubInACL</u></font></h3>
+<div class="expand" style="DISPLAY: block">
+	<font face="Verdana" size="2">SubInACL allows you to modify each part of a security 
+	descriptor:</font><ul>
+		<li><font face="Verdana" size="2">Owner </font></li>
+		<li><font face="Verdana" size="2">Primary group </font></li>
+		<li><font face="Verdana" size="2">System access control list (ACL) and access 
+		control entries (ACEs) (referred to by SubInACL as audit ACL and AACE, 
+		respectively) </font></li>
+		<li><font face="Verdana" size="2">Discretionary ACL and ACEs (referred to by 
+		SubInACL as permission ACL and PACE, respectively) </font></li>
+	</ul>
+</div>
+<h3>
+<font face="Verdana" size="2"><u><a name="Using_SIDs_in_SubInACL">Using 
+SIDs in SubInACL</a></u></font></h3>
+<div class="expand" style="DISPLAY: block">
+	<font face="Verdana" size="2">The security descriptor references a user group by 
+	using a security identifier (SID). An SID can be expressed in one of the 
+	following forms:</font><ul>
+		<li><font face="Verdana" size="2">DomainName\Account (for example, 
+		DOM\Administrators) </font></li>
+		<li><font face="Verdana" size="2">StandaloneServer\Group </font></li>
+		<li><font face="Verdana" size="2">Account </font></li>
+		<li><font face="Verdana" size="2">s-1-x-x-x-x-x-x<br>
+		Where x is expressed in decimal (for example, 
+		S-1-5-21-56248481-1302087933-1644394174-1001).</font><p>
+		<b>
+		<font face="Verdana" size="2">
+		Caution</font></b><ul>
+			<li><font face="Verdana" size="2">No check is done to verify the existence of 
+			a given SID. </font></li>
+		</ul>
+		</li>
+	</ul>
+	<p><font face="Verdana" size="2">SubInACL maintains a local cache of SIDs to minimize 
+	&quot;SID-to-human name&quot; translation costs for the network.</font></div>
+<h3>
+<font face="Verdana" size="2"><u><a name="Using_PACEs_in_SubInACL">Using 
+PACEs in SubInACL</a></u></font></h3>
+<div class="expand" style="DISPLAY: block">
+	<font face="Verdana" size="2">The following permission ACEs (PACEs) are used with the
+	<b>/grant</b> and <b>/deny</b> parameters.</font><p style="MARGIN-LEFT: 1.5em">
+	<span class="space" style="WIDTH: 0px"></span><b><font face="Verdana" size="2">
+	File 
+	PACEs</font></b></p>
+	<div class="expand" style="MARGIN-LEFT: 1.5em">
+		<font face="Verdana" size="2">The following PACEs are valid for file objects:</font><table width="60%" id="table2">
+			<tr>
+				<th bgcolor="#DDDDDD"><font face="Verdana" size="2">PACE</font></th>
+				<th bgcolor="#DDDDDD"><font face="Verdana" size="2">Description</font></th>
+			</tr>
+			<tr>
+				<td align="middle" bgcolor="#EEEEEE">
+				<font face="Verdana" size="2"><b>F</b></font></td>
+				<td bgcolor="#EEEEEE"><font face="Verdana" size="2">Full Control</font></td>
+			</tr>
+			<tr>
+				<td align="middle" bgcolor="#EEEEEE">
+				<font face="Verdana" size="2"><b>C</b></font></td>
+				<td bgcolor="#EEEEEE"><font face="Verdana" size="2">Change</font></td>
+			</tr>
+			<tr>
+				<td align="middle" bgcolor="#EEEEEE">
+				<font face="Verdana" size="2"><b>R</b></font></td>
+				<td bgcolor="#EEEEEE"><font face="Verdana" size="2">Read</font></td>
+			</tr>
+			<tr>
+				<td align="middle" bgcolor="#EEEEEE">
+				<font face="Verdana" size="2"><b>P</b></font></td>
+				<td bgcolor="#EEEEEE"><font face="Verdana" size="2">Change Permissions</font></td>
+			</tr>
+			<tr>
+				<td align="middle" bgcolor="#EEEEEE">
+				<font face="Verdana" size="2"><b>O</b></font></td>
+				<td bgcolor="#EEEEEE"><font face="Verdana" size="2">Take Ownership</font></td>
+			</tr>
+			<tr>
+				<td align="middle" bgcolor="#EEEEEE">
+				<font face="Verdana" size="2"><b>X</b></font></td>
+				<td bgcolor="#EEEEEE"><font face="Verdana" size="2">eXecute</font></td>
+			</tr>
+			<tr>
+				<td align="middle" bgcolor="#EEEEEE">
+				<font face="Verdana" size="2"><b>E</b></font></td>
+				<td bgcolor="#EEEEEE"><font face="Verdana" size="2">Read eXecute</font></td>
+			</tr>
+			<tr>
+				<td align="middle" bgcolor="#EEEEEE">
+				<font face="Verdana" size="2"><b>W</b></font></td>
+				<td bgcolor="#EEEEEE"><font face="Verdana" size="2">Write</font></td>
+			</tr>
+			<tr>
+				<td align="middle" bgcolor="#EEEEEE">
+				<font face="Verdana" size="2"><b>D</b></font></td>
+				<td bgcolor="#EEEEEE"><font face="Verdana" size="2">Delete</font></td>
+			</tr>
+		</table>
+	</div>
+	<p style="MARGIN-LEFT: 1.5em">
+	<span class="space" style="WIDTH: 0px"></span><b>
+	<font face="Verdana" size="2">Cluster 
+	Share PACEs</font></b></p>
+	<div class="expand" style="MARGIN-LEFT: 1.5em">
+		<font face="Verdana" size="2">The following PACEs are valid for cluster share 
+		objects:</font><table width="60%" id="table3">
+			<tr>
+				<th bgcolor="#DDDDDD"><font face="Verdana" size="2">PACE</font></th>
+				<th bgcolor="#DDDDDD"><font face="Verdana" size="2">Description</font></th>
+			</tr>
+			<tr>
+				<td align="middle" bgcolor="#EEEEEE"><font face="Verdana" size="2"><b>F</b></font></td>
+				<td bgcolor="#EEEEEE"><font face="Verdana" size="2">Full Control</font></td>
+			</tr>
+			<tr>
+				<td align="middle" bgcolor="#EEEEEE"><font face="Verdana" size="2"><b>R</b></font></td>
+				<td bgcolor="#EEEEEE"><font face="Verdana" size="2">Read</font></td>
+			</tr>
+			<tr>
+				<td align="middle" bgcolor="#EEEEEE"><font face="Verdana" size="2"><b>C</b></font></td>
+				<td bgcolor="#EEEEEE"><font face="Verdana" size="2">Change</font></td>
+			</tr>
+		</table>
+	</div>
+	<p style="MARGIN-LEFT: 1.5em">
+	<span class="space" style="WIDTH: 0px"></span><b><font face="Verdana" size="2">Printer 
+	PACEs</font></b></p>
+	<div class="expand" style="MARGIN-LEFT: 1.5em">
+		<font face="Verdana" size="2">The following PACEs are valid for printer objects:</font><table width="60%" id="table4">
+			<tr>
+				<th bgcolor="#DDDDDD"><font face="Verdana" size="2">PACE</font></th>
+				<th bgcolor="#DDDDDD"><font face="Verdana" size="2">Description</font></th>
+			</tr>
+			<tr>
+				<td align="middle" bgcolor="#EEEEEE"><font face="Verdana" size="2"><b>F</b></font></td>
+				<td bgcolor="#EEEEEE"><font face="Verdana" size="2">Full Control</font></td>
+			</tr>
+			<tr>
+				<td align="middle" bgcolor="#EEEEEE"><font face="Verdana" size="2"><b>M</b></font></td>
+				<td bgcolor="#EEEEEE"><font face="Verdana" size="2">Manage Documents</font></td>
+			</tr>
+			<tr>
+				<td align="middle" bgcolor="#EEEEEE"><font face="Verdana" size="2"><b>P</b></font></td>
+				<td bgcolor="#EEEEEE"><font face="Verdana" size="2">Print</font></td>
+			</tr>
+		</table>
+	</div>
+	<p style="MARGIN-LEFT: 1.5em">
+	<span class="space" style="WIDTH: 0px"></span><b><font face="Verdana" size="2">Registry 
+	PACEs</font></b></p>
+	<div class="expand" style="MARGIN-LEFT: 1.5em">
+		<font face="Verdana" size="2">The following PACEs are valid for registry key and 
+		registry subkey objects:</font><table width="60%" id="table5">
+			<tr>
+				<th bgcolor="#DDDDDD"><font face="Verdana" size="2">PACE</font></th>
+				<th bgcolor="#DDDDDD"><font face="Verdana" size="2">Description</font></th>
+			</tr>
+			<tr>
+				<td align="middle" bgcolor="#EEEEEE"><font face="Verdana" size="2"><b>F</b></font></td>
+				<td bgcolor="#EEEEEE"><font face="Verdana" size="2">Full Control</font></td>
+			</tr>
+			<tr>
+				<td align="middle" bgcolor="#EEEEEE"><font face="Verdana" size="2"><b>R</b></font></td>
+				<td bgcolor="#EEEEEE"><font face="Verdana" size="2">Read</font></td>
+			</tr>
+			<tr>
+				<td align="middle" bgcolor="#EEEEEE"><font face="Verdana" size="2"><b>A</b></font></td>
+				<td bgcolor="#EEEEEE"><font face="Verdana" size="2">ReAd Control</font></td>
+			</tr>
+			<tr>
+				<td align="middle" bgcolor="#EEEEEE"><font face="Verdana" size="2"><b>Q</b></font></td>
+				<td bgcolor="#EEEEEE"><font face="Verdana" size="2">Query Value</font></td>
+			</tr>
+			<tr>
+				<td align="middle" bgcolor="#EEEEEE"><font face="Verdana" size="2"><b>S</b></font></td>
+				<td bgcolor="#EEEEEE"><font face="Verdana" size="2">Set Value</font></td>
+			</tr>
+			<tr>
+				<td align="middle" bgcolor="#EEEEEE"><font face="Verdana" size="2"><b>C</b></font></td>
+				<td bgcolor="#EEEEEE"><font face="Verdana" size="2">Create SubKey</font></td>
+			</tr>
+			<tr>
+				<td align="middle" bgcolor="#EEEEEE"><font face="Verdana" size="2"><b>E</b></font></td>
+				<td bgcolor="#EEEEEE"><font face="Verdana" size="2">Enumerate Subkeys</font></td>
+			</tr>
+			<tr>
+				<td align="middle" bgcolor="#EEEEEE"><font face="Verdana" size="2"><b>Y</b></font></td>
+				<td bgcolor="#EEEEEE"><font face="Verdana" size="2">NotifY</font></td>
+			</tr>
+			<tr>
+				<td align="middle" bgcolor="#EEEEEE"><font face="Verdana" size="2"><b>L</b></font></td>
+				<td bgcolor="#EEEEEE"><font face="Verdana" size="2">Create Link</font></td>
+			</tr>
+			<tr>
+				<td align="middle" bgcolor="#EEEEEE"><font face="Verdana" size="2"><b>D</b></font></td>
+				<td bgcolor="#EEEEEE"><font face="Verdana" size="2">Delete</font></td>
+			</tr>
+			<tr>
+				<td align="middle" bgcolor="#EEEEEE"><font face="Verdana" size="2"><b>W</b></font></td>
+				<td bgcolor="#EEEEEE"><font face="Verdana" size="2">Write DAC</font></td>
+			</tr>
+			<tr>
+				<td align="middle" bgcolor="#EEEEEE"><font face="Verdana" size="2"><b>O</b></font></td>
+				<td bgcolor="#EEEEEE"><font face="Verdana" size="2">Write Owner</font></td>
+			</tr>
+		</table>
+	</div>
+	<p style="MARGIN-LEFT: 1.5em">
+	<span class="space" style="WIDTH: 0px"></span><b><font face="Verdana" size="2">Services 
+	PACEs</font></b></p>
+	<div class="expand" style="MARGIN-LEFT: 1.5em">
+		<font face="Verdana" size="2">The following PACEs are valid for services:</font><table width="60%" id="table6">
+			<tr>
+				<th bgcolor="#DDDDDD"><font face="Verdana" size="2">PACE</font></th>
+				<th bgcolor="#DDDDDD"><font face="Verdana" size="2">Description</font></th>
+			</tr>
+			<tr>
+				<td align="middle" bgcolor="#EEEEEE"><font face="Verdana" size="2"><b>F</b></font></td>
+				<td bgcolor="#EEEEEE"><font face="Verdana" size="2">Full Control</font></td>
+			</tr>
+			<tr>
+				<td align="middle" bgcolor="#EEEEEE"><font face="Verdana" size="2"><b>R</b></font></td>
+				<td bgcolor="#EEEEEE"><font face="Verdana" size="2">Generic Read</font></td>
+			</tr>
+			<tr>
+				<td align="middle" bgcolor="#EEEEEE"><font face="Verdana" size="2"><b>W</b></font></td>
+				<td bgcolor="#EEEEEE"><font face="Verdana" size="2">Generic Write</font></td>
+			</tr>
+			<tr>
+				<td align="middle" bgcolor="#EEEEEE"><font face="Verdana" size="2"><b>X</b></font></td>
+				<td bgcolor="#EEEEEE"><font face="Verdana" size="2">Generic eXecute</font></td>
+			</tr>
+			<tr>
+				<td align="middle" bgcolor="#EEEEEE"><font face="Verdana" size="2"><b>L</b></font></td>
+				<td bgcolor="#EEEEEE"><font face="Verdana" size="2">Read controL</font></td>
+			</tr>
+			<tr>
+				<td align="middle" bgcolor="#EEEEEE"><font face="Verdana" size="2"><b>Q</b></font></td>
+				<td bgcolor="#EEEEEE"><font face="Verdana" size="2">Query Service Configuration</font></td>
+			</tr>
+			<tr>
+				<td align="middle" bgcolor="#EEEEEE"><font face="Verdana" size="2"><b>S</b></font></td>
+				<td bgcolor="#EEEEEE"><font face="Verdana" size="2">Query Service Status</font></td>
+			</tr>
+			<tr>
+				<td align="middle" bgcolor="#EEEEEE"><font face="Verdana" size="2"><b>E</b></font></td>
+				<td bgcolor="#EEEEEE"><font face="Verdana" size="2">Enumerate Dependent Services</font></td>
+			</tr>
+			<tr>
+				<td align="middle" bgcolor="#EEEEEE"><font face="Verdana" size="2"><b>C</b></font></td>
+				<td bgcolor="#EEEEEE"><font face="Verdana" size="2">Service Change Configuration</font></td>
+			</tr>
+			<tr>
+				<td align="middle" bgcolor="#EEEEEE"><font face="Verdana" size="2"><b>T</b></font></td>
+				<td bgcolor="#EEEEEE"><font face="Verdana" size="2">Start Service</font></td>
+			</tr>
+			<tr>
+				<td align="middle" bgcolor="#EEEEEE"><font face="Verdana" size="2"><b>O</b></font></td>
+				<td bgcolor="#EEEEEE"><font face="Verdana" size="2">Stop Service</font></td>
+			</tr>
+			<tr>
+				<td align="middle" bgcolor="#EEEEEE"><font face="Verdana" size="2"><b>P</b></font></td>
+				<td bgcolor="#EEEEEE"><font face="Verdana" size="2">Pause/Continue Service</font></td>
+			</tr>
+			<tr>
+				<td align="middle" bgcolor="#EEEEEE"><font face="Verdana" size="2"><b>I</b></font></td>
+				<td bgcolor="#EEEEEE"><font face="Verdana" size="2">Interrogate Service </font></td>
+			</tr>
+			<tr>
+				<td align="middle" bgcolor="#EEEEEE"><font face="Verdana" size="2"><b>U</b></font></td>
+				<td bgcolor="#EEEEEE"><font face="Verdana" size="2">Service User-Defined Control Commands</font></td>
+			</tr>
+		</table>
+	</div>
+	<p style="MARGIN-LEFT: 1.5em">
+	<span class="space" style="WIDTH: 0px"></span><b><font face="Verdana" size="2">Share 
+	PACEs</font></b></p>
+	<div class="expand" style="MARGIN-LEFT: 1.5em">
+		<font face="Verdana" size="2">The following PACEs are valid for share objects:</font><table width="60%" id="table7">
+			<tr>
+				<th bgcolor="#DDDDDD"><font face="Verdana" size="2">PACE</font></th>
+				<th bgcolor="#DDDDDD"><font face="Verdana" size="2">Description</font></th>
+			</tr>
+			<tr>
+				<td align="middle" bgcolor="#EEEEEE"><font face="Verdana" size="2"><b>F</b></font></td>
+				<td bgcolor="#EEEEEE"><font face="Verdana" size="2">Full Control</font></td>
+			</tr>
+			<tr>
+				<td align="middle" bgcolor="#EEEEEE"><font face="Verdana" size="2"><b>R</b></font></td>
+				<td bgcolor="#EEEEEE"><font face="Verdana" size="2">Read</font></td>
+			</tr>
+			<tr>
+				<td align="middle" bgcolor="#EEEEEE"><font face="Verdana" size="2"><b>C</b></font></td>
+				<td bgcolor="#EEEEEE"><font face="Verdana" size="2">Change</font></td>
+			</tr>
+		</table>
+	</div>
+	<p style="MARGIN-LEFT: 1.5em">
+	<span class="space" style="WIDTH: 0px"></span><b><font face="Verdana" size="2">Metabase 
+	PACEs</font></b></p>
+	<div class="expand" style="MARGIN-LEFT: 1.5em">
+		<font face="Verdana" size="2">The following PACEs are valid for metabase objects:</font><table width="60%" id="table8">
+			<tr>
+				<th bgcolor="#DDDDDD"><font face="Verdana" size="2">PACE</font></th>
+				<th bgcolor="#DDDDDD"><font face="Verdana" size="2">Description</font></th>
+			</tr>
+			<tr>
+				<td align="middle" bgcolor="#EEEEEE"><font face="Verdana" size="2"><b>F</b></font></td>
+				<td bgcolor="#EEEEEE"><font face="Verdana" size="2">Full Control</font></td>
+			</tr>
+			<tr>
+				<td align="middle" bgcolor="#EEEEEE"><font face="Verdana" size="2"><b>R</b></font></td>
+				<td bgcolor="#EEEEEE"><font face="Verdana" size="2">Read - MD_ACR_READ</font></td>
+			</tr>
+			<tr>
+				<td align="middle" bgcolor="#EEEEEE"><font face="Verdana" size="2"><b>W</b></font></td>
+				<td bgcolor="#EEEEEE"><font face="Verdana" size="2">Write - MD_ACR_WRITE</font></td>
+			</tr>
+			<tr>
+				<td align="middle" bgcolor="#EEEEEE"><font face="Verdana" size="2"><b>I</b></font></td>
+				<td bgcolor="#EEEEEE"><font face="Verdana" size="2">Restricted Write - 
+				MD_ACR_RESTRICTED_WRITE</font></td>
+			</tr>
+			<tr>
+				<td align="middle" bgcolor="#EEEEEE"><font face="Verdana" size="2"><b>U</b></font></td>
+				<td bgcolor="#EEEEEE"><font face="Verdana" size="2">Unsecure Props Read - 
+				MD_ACR_UNSECURE_PROPS_READ</font></td>
+			</tr>
+			<tr>
+				<td align="middle" bgcolor="#EEEEEE"><font face="Verdana" size="2"><b>E</b></font></td>
+				<td bgcolor="#EEEEEE"><font face="Verdana" size="2">Enum Keys - MD_ACR_ENUM_KEYS</font></td>
+			</tr>
+			<tr>
+				<td align="middle" bgcolor="#EEEEEE"><font face="Verdana" size="2"><b>D</b></font></td>
+				<td bgcolor="#EEEEEE"><font face="Verdana" size="2">Write DAC - MD_ACR_WRITE_DAC</font></td>
+			</tr>
+		</table>
+	</div>
+	<p style="MARGIN-LEFT: 1.5em">
+	<span class="space" style="WIDTH: 0px"></span><b><font face="Verdana" size="2">Process 
+	PACEs</font></b></p>
+	<div class="expand" style="MARGIN-LEFT: 1.5em">
+		<font face="Verdana" size="2">The following PACEs are valid for process objects:</font><table width="60%" id="table9">
+			<tr>
+				<th bgcolor="#DDDDDD"><font face="Verdana" size="2">PACE</font></th>
+				<th bgcolor="#DDDDDD"><font face="Verdana" size="2">Description</font></th>
+			</tr>
+			<tr>
+				<td align="middle" bgcolor="#EEEEEE"><font face="Verdana" size="2"><b>F</b></font></td>
+				<td bgcolor="#EEEEEE"><font face="Verdana" size="2">Full Control</font></td>
+			</tr>
+			<tr>
+				<td align="middle" bgcolor="#EEEEEE"><font face="Verdana" size="2"><b>R</b></font></td>
+				<td bgcolor="#EEEEEE"><font face="Verdana" size="2">Read</font></td>
+			</tr>
+			<tr>
+				<td align="middle" bgcolor="#EEEEEE"><font face="Verdana" size="2"><b>W</b></font></td>
+				<td bgcolor="#EEEEEE"><font face="Verdana" size="2">Write</font></td>
+			</tr>
+			<tr>
+				<td align="middle" bgcolor="#EEEEEE"><font face="Verdana" size="2"><b>E</b></font></td>
+				<td bgcolor="#EEEEEE"><font face="Verdana" size="2">Execute</font></td>
+			</tr>
+		</table>
+	</div>
+	<p style="MARGIN-LEFT: 1.5em">
+	<span class="space" style="WIDTH: 0px"></span><b><font face="Verdana" size="2">SAM 
+	Object PACEs</font></b></p>
+	<div class="expand" style="MARGIN-LEFT: 1.5em">
+		<font face="Verdana" size="2">The following PACEs are valid for Security Accounts 
+		Manager (SAM) objects:</font><table width="60%" id="table10">
+			<tr>
+				<th bgcolor="#DDDDDD"><font face="Verdana" size="2">PACE</font></th>
+				<th bgcolor="#DDDDDD"><font face="Verdana" size="2">Description</font></th>
+			</tr>
+			<tr>
+				<td align="middle" bgcolor="#EEEEEE"><font face="Verdana" size="2"><b>F</b></font></td>
+				<td bgcolor="#EEEEEE"><font face="Verdana" size="2">Full Control</font></td>
+			</tr>
+			<tr>
+				<td align="middle" bgcolor="#EEEEEE"><font face="Verdana" size="2"><b>R</b></font></td>
+				<td bgcolor="#EEEEEE"><font face="Verdana" size="2">Read</font></td>
+			</tr>
+			<tr>
+				<td align="middle" bgcolor="#EEEEEE"><font face="Verdana" size="2"><b>W</b></font></td>
+				<td bgcolor="#EEEEEE"><font face="Verdana" size="2">Write</font></td>
+			</tr>
+			<tr>
+				<td align="middle" bgcolor="#EEEEEE"><font face="Verdana" size="2"><b>E</b></font></td>
+				<td bgcolor="#EEEEEE"><font face="Verdana" size="2">Execute</font></td>
+			</tr>
+		</table>
+	</div>
+</div>
+<h3>
+<u>
+<font face="Verdana" size="2">Minimizing 
+Bandwidth Usage</font></u></h3>
+<div class="expand" style="DISPLAY: block">
+	<ul>
+		<li><font face="Verdana" size="2">To minimize network bandwidth used when 
+		SubInACL resolves SIDs, place multiple commands that involve the same 
+		SIDs in the same command file. When SubInACL resolves a SID, it caches 
+		the result to improve its performance and to minimize network traffic. 
+		When a SubInACL command finishes, the cache is cleared. Therefore, if 
+		you issue four commands and each one requires SubInACL to resolve the 
+		same set of SIDs, SubInACL will resolve each of those SIDs four times. 
+		However, if you place those four commands in the same command file, 
+		SubInACL resolves each SID only once. </font></li>
+	</ul>
+</div>
+<font face="Verdana">&nbsp;
+
+</font>
+<p><b><font face="Verdana" size="4"><a name="Syntax">Syntax</a></font></b>
+<hr class="tools"></p>
+
+<p><font face="Verdana" size="2">The syntax descriptions below are grouped by 
+how you use SubInACL: getting Help about its features, using it interactively in 
+a console window, or using it within its own scripting environment.</font></p>
+<h3><u>
+<font face="Verdana" size="2">Syntax for Getting Help</font></u></h3>
+<div class="expand" style="DISPLAY: block">
+	<div style="background-color: #DDDDDD">
+	<p class="syntax">
+	<nobr><font face="Webdings" size="2" style="background-color: #FFFFFF">
+	4</font></nobr><font face="Verdana" size="2"><b>subinacl</b>
+	<nobr><b>/help</b> [<b>/full</b> | <i>Keyword</i>]</nobr></font></p>
+	</div>
+	<h3><font face="Verdana" size="2">Parameters</font></h3>
+	<dl>
+		<dt><font face="Verdana" size="2"><b>/full</b> </font></dt>
+		<dd><font face="Verdana" size="2">Displays all of the information about SubInACL.
+		</font></dd>
+	</dl>
+	<dl>
+		<dt><font face="Verdana" size="2"><i>Keyword</i> </font></dt>
+		<dl style="MARGIN-LEFT: 1.5em">
+			<dt><font face="Verdana" size="2">[ <b>/noverbose</b> | <b>/verbose</b> | <b>
+			/verbose=1</b> | <b>/verbose=2</b> | <b>/testmode</b> | <b>/notestmode</b> 
+			| <b>/file</b> | <b>/subdirectories</b> | <b>/onlyfile</b> | <b>
+			/share</b> | <b>/clustershare</b> | <b>/keyreg</b> | <b>/subkeyreg</b> 
+			| <b>/service</b> | <b>/printer</b> | <b>/kernelobject</b> | <b>/metabase</b> 
+			| <b>/display</b> | <b>/setowner</b> | <b>/replace</b> | <b>/changedomain</b> 
+			| <b>/migratetodomain</b> | <b>/findsid</b> | <b>/suppresssid</b> |
+			<b>/confirm</b> | <b>/perm</b> | <b>/audit</b> | <b>/ifchangecontinue</b> 
+			| <b>/cleandeletedsidsfrom</b> | <b>/accesscheck</b> | <b>/setprimarygroup</b> 
+			| <b>/grant</b> | <b>/deny</b> | <b>/revoke</b> ] </font></dt>
+			<dd><font face="Verdana" size="2">Displays information about the specified 
+			option, <i>object_type,</i> or action. </font></dd>
+			<dt><font face="Verdana" size="2"><b>/option</b> </font></dt>
+			<dd><font face="Verdana" size="2">Displays information about all SubInACL 
+			options. </font></dd>
+			<dt><font face="Verdana" size="2"><b>/action</b> </font></dt>
+			<dd><font face="Verdana" size="2">Displays information about all SubInACL 
+			actions. </font></dd>
+			<dt><font face="Verdana" size="2"><i>/object_type</i> </font></dt>
+			<dd><font face="Verdana" size="2">Displays information about all SubInACL <i>
+			object_types</i>. </font></dd>
+			<dt><font face="Verdana" size="2"><b>features</b> </font></dt>
+			<dd><font face="Verdana" size="2">Displays information about the feature set.
+			</font></dd>
+			<dt><font face="Verdana" size="2"><b>usage</b> </font></dt>
+			<dd><font face="Verdana" size="2">Displays a summary of SubInACL syntax.
+			</font></dd>
+			<dt><font face="Verdana" size="2"><b>syntax</b> </font></dt>
+			<dd><font face="Verdana" size="2">Displays an conceptual overview of the 
+			SubInACL syntax. </font></dd>
+			<dt><font face="Verdana" size="2"><b>sids</b> </font></dt>
+			<dd><font face="Verdana" size="2">Displays information about how SIDs are 
+			expressed, and how SubInACL attempts to translate SIDs. </font></dd>
+			<dt><font face="Verdana" size="2"><b>view_mode</b> </font></dt>
+			<dd><font face="Verdana" size="2">Displays information about using SubInACL 
+			to view security information. </font></dd>
+			<dt><font face="Verdana" size="2"><b>test_mode</b> </font></dt>
+			<dd><font face="Verdana" size="2">Displays information about using a testing 
+			mode to ensure that a SubInACL command is correct. </font></dd>
+			<dt><font face="Verdana" size="2"><i>object_type</i> </font></dt>
+			<dd><font face="Verdana" size="2">Displays information about the types of 
+			object that SubInACL can work with. </font></dd>
+			<dt><font face="Verdana" size="2"><b>domain_migration</b> </font></dt>
+			<dd><font face="Verdana" size="2">Displays information about moving a user 
+			from one domain to another. </font></dd>
+			<dt><font face="Verdana" size="2"><b>server_migration</b> </font></dt>
+			<dd><font face="Verdana" size="2">Displays information about moving the file 
+			system of a server from one domain to another. </font></dd>
+			<dt><font face="Verdana" size="2"><b>editing_features</b> </font></dt>
+			<dd><font face="Verdana" size="2">Displays information about features of 
+			SubInACL that edit security descriptors. </font></dd>
+		</dl>
+	</dl>
+	<p><font face="Verdana" size="2">For more information, see <b>
+	<a href="#help">/help</a></b> under Option Syntax Examples on the Examples page.</font></div>
+<h3>
+<u>
+<font face="Verdana" size="2">Syntax 
+for Using SubInACL in a Console Window</font></u></h3>
+<div class="expand" style="DISPLAY: block">
+	<div style="background-color: #DDDDDD">
+	<p class="syntax">
+	<nobr><font face="Webdings" size="2" style="background-color: #FFFFFF">
+	4</font></nobr><font face="Verdana" size="2"><b>subinacl</b>
+	<nobr>[/<i>Option</i>] /<i>object_type</i> <i>object_name</i> [[/<i>Action</i>[=<i>Parameter</i>]..]</nobr></font></p>
+	</div>
+	<h3><font face="Verdana" size="2">Parameters</font></h3>
+	<dl>
+		<dt><font face="Verdana" size="2">/<i>Option</i> can be any of the following:</font></dt>
+		<dl style="MARGIN-LEFT: 1.5em">
+			<dt><font face="Verdana" size="2"><b>/outputlog=</b><i>FileName</i>
+			</font></dt>
+			<dd><font face="Verdana" size="2">Redirects the output of the command to the 
+			specified file. The output will include errors unless the <b>/errorlog</b> option is used, in which case errors are sent to the 
+			error log file and all other output is sent to the output log file.
+			</font></dd>
+			<dt><font face="Verdana" size="2"><b>/errorlog=</b><i>FileName</i>
+			</font></dt>
+			<dd><font face="Verdana" size="2">Redirects all errors to the specified file.
+			</font></dd>
+			<dt><font face="Verdana" size="2"><b>/alternatesamserver=</b><i>ServerName</i>
+			</font></dt>
+			<dd><font face="Verdana" size="2">Specifies the server that SubInACL will use 
+			to look up SIDs, if its first attempt fails. This is useful during 
+			some server and domain migrations. </font></dd>
+			<dt><font face="Verdana" size="2"><b>/offlinesam=</b><i>FileName</i>
+			</font></dt>
+			<dd><font face="Verdana" size="2">Specifies a text file that matches user 
+			names to their SIDs, and directs SubInACL to look up SIDs in this 
+			file instead of on the server on which the object is located. This 
+			is useful if the domain is unaccessible or no longer exists. </font>
+			</dd>
+			<dt><font face="Verdana" size="2"><b>/stringreplaceonoutput=</b><i>String1</i><b>=</b><i>String2</i>
+			</font></dt>
+			<dd><font face="Verdana" size="2">Causes SubInACL to replace all occurrences 
+			of <i>String1</i> in its output with <i>String2</i>. </font></dd>
+			<dt><font face="Verdana" size="2"><b>/expandenvironmentsymbols</b>
+			</font></dt>
+			<dd><font face="Verdana" size="2">Allows SubInACL to use environment 
+			variables, such as %username%. This is the default value, and the 
+			opposite of <b>/noexpandenvironmentvariables</b>. </font></dd>
+			<dt><font face="Verdana" size="2"><b>/noexpandenvironmentsymbols</b>
+			</font></dt>
+			<dd><font face="Verdana" size="2">Prevents SubInACL from using environment 
+			variables. This is useful when SubInACL operates on command files.
+			</font></dd>
+			<dt><font face="Verdana" size="2"><b>/statistic</b> </font></dt>
+			<dd><font face="Verdana" size="2">Displays statistics when processing is 
+			finished. This is the default value. </font></dd>
+			<dt><font face="Verdana" size="2"><b>/nostatistic</b> </font></dt>
+			<dd><font face="Verdana" size="2">Suppresses the display of statistics when 
+			processing is finished. </font></dd>
+			<dt><font face="Verdana" size="2"><b>/dumpcachedsids=</b><i>FileName</i>
+			</font></dt>
+			<dd><font face="Verdana" size="2">After you run SubInACL, you can dump the 
+			contents of the local cache SIDs to a file. This file can be used 
+			for future SubInACL execution (see <b>/offlinesam</b>) to speed up 
+			the SIDs resolution process. </font></dd>
+			<dt><font face="Verdana" size="2"><b>/separator=<i>character</i></b>
+			</font></dt>
+			<dd><font face="Verdana" size="2">Specifies a character for SubInACL to use 
+			in place of the equal sign (=) when it interprets a command. This 
+			allows you to specify a string that contains an equal sign within a 
+			SubInACL command. </font></dd>
+			<dt><font face="Verdana" size="2"><b>/noverbose</b> </font></dt>
+			<dd><font face="Verdana" size="2">Causes SubInACL to produce shortened output 
+			that is easier for people to read. The output of a SubInACL command 
+			in <b>/noverbose</b> mode can be saved in a command file and 
+			replayed later. </font></dd>
+			<dt><font face="Verdana" size="2"><b>/verbose</b> </font></dt>
+			<dd><font face="Verdana" size="2">Causes SubInACL to produce detailed output. 
+			This is the default level of detail. </font></dd>
+			<dt><font face="Verdana" size="2"><b>/verbose=1</b> </font></dt>
+			<dd><font face="Verdana" size="2">This display mode is identical to 
+			<b>/verbose</b> mode. </font></dd>
+			<dt><font face="Verdana" size="2"><b>/verbose=2</b> </font></dt>
+			<dd><font face="Verdana" size="2">This display mode is identical to 
+			<b>/verbose</b> mode. </font></dd>
+			<dt><font face="Verdana" size="2"><b>/testmode</b> </font></dt>
+			<dd><font face="Verdana" size="2">Runs SubInACL in testing mode so that 
+			changes will not be applied to the specified object's security 
+			descriptor. </font></dd>
+			<dt><font face="Verdana" size="2"><b>/notestmode</b> </font></dt>
+			<dd><font face="Verdana" size="2">Runs SubInACL in update mode, so that any 
+			changes defined by a SubInACL command will be applied. This is the 
+			default value.</font></dd>
+		</dl>
+		<dt>&nbsp;</dt>		
+		<dt><font face="Verdana" size="2">/<i>object_type</i> can be any of the 
+		following: </font></dt>
+		<dl style="MARGIN-LEFT: 1.5em">
+			<dt><font face="Verdana" size="2"><b>/file</b> [<b>=directoriesonly | 
+			=filesonly</b>] </font></dt>
+			<dd><font face="Verdana" size="2">Specifies that <i>object_name</i> is a file 
+			object. When the <b>/file</b> parameter is specified, <i>object_name</i> 
+			can identify files by using the Universal Naming Convention (UNC) 
+			format or by using a local drive letter and path. <i>object_name</i> 
+			can contain the * wildcard character. </font>
+			<p class="note"><b><font face="Verdana" size="2">
+			Note</font></b><ul>
+				<li><font face="Verdana" size="2">SubInACL is not supported on 
+				distributed file system (DFS) volumes. </font></li>
+			</ul>&nbsp;</dd>
+			<dt><font face="Verdana" size="2"><b>/subdirectories</b> | <b>/subdirec</b> [<b>=directoriesonly 
+			| =filesonly</b>] </font></dt>
+			<dd><font face="Verdana" size="2">Specifies that <i>object_name</i> is a 
+			folder (directory) and that SubInACL will use all the files in it 
+			and in all its subfolders. When either the <b>/subdirectories</b> or
+			<b>/subdirec</b> parameter is specified, <i>object_name</i> can 
+			identify files by using the UNC format or by using a local drive 
+			letter and path. <i>object_name</i> can include the * wildcard 
+			character. </font></dd>
+			<dt><font face="Verdana" size="2"><b>/onlyfile</b> </font></dt>
+			<dd><font face="Verdana" size="2">Opens a file without using the <b>FindFilexxx</b> mechanism. Valid values for 
+			<i>object_name</i> when 
+			the <b>/onlyfile</b> parameter is specified are named pipes or 
+			mailslots. </font></dd>
+			<dt><font face="Verdana" size="2"><b>/samobject</b> </font></dt>
+			<dd><font face="Verdana" size="2">Specifies that <i>object_name</i> is a 
+			Security Accounts Manager (SAM) object, such as a user, local group, 
+			or global group. </font></dd>
+			<dt><font face="Verdana" size="2"><b>/share</b> </font></dt>
+			<dd><font face="Verdana" size="2">Specifies that <i>object_name</i> is a 
+			network file share. </font></dd>
+			<dt><font face="Verdana" size="2"><b>/clustershare</b> </font></dt>
+			<dd><font face="Verdana" size="2">Specifies that <i>object_name</i> is a 
+			cluster file share. </font></dd>
+			<dt><font face="Verdana" size="2"><b>/keyreg</b> </font></dt>
+			<dd><font face="Verdana" size="2">Specifies that <i>object_name</i> is a 
+			registry key. </font></dd>
+			<dt><font face="Verdana" size="2"><b>/subkeyreg</b> </font></dt>
+			<dd><font face="Verdana" size="2">Specifies that <i>object_name</i> is a 
+			registry subkey. </font></dd>
+			<dt><font face="Verdana" size="2"><b>/service</b> </font></dt>
+			<dd><font face="Verdana" size="2">Specifies that <i>object_name</i> is a 
+			service. </font></dd>
+			<dt><font face="Verdana" size="2"><b>/process</b> </font></dt>
+			<dd><font face="Verdana" size="2">Specifies that <i>object_name</i> is a 
+			process. </font></dd>
+			<dt><font face="Verdana" size="2"><b>/printer</b> </font></dt>
+			<dd><font face="Verdana" size="2">Specifies that <i>object_name</i> is a 
+			printer. </font></dd>
+			<dt><font face="Verdana" size="2"><b>/kernelobject</b> </font></dt>
+			<dd><font face="Verdana" size="2">Specifies that <i>object_name</i> is a 
+			kernel object. Valid values for <i>object_name</i> can include 
+			mutexes, sections, or event objects. </font></dd>
+			<dt><font face="Verdana" size="2"><b>/metabase</b> </font></dt>
+			<dd><font face="Verdana" size="2">Specifies that <i>object_name</i> is an 
+			AdminACL metabase property of the Microsoft Internet Information 
+			Services (IIS) metabase. </font>
+			<p class="note"><b><font face="Verdana" size="2">
+			Notes</font></b><ul>
+				<li><font face="Verdana" size="2">This <i>object_type</i> can be used 
+				only with the following metabase paths: </font>
+				<ul>
+					<li><font face="Verdana" size="2">\LM\MSFTPSVC </font></li>
+					<li><font face="Verdana" size="2">\LM\MSFTPSVC/n </font>
+					</li>
+					<li><font face="Verdana" size="2">\LM\W3SVC </font></li>
+				</ul></li>
+				<li><font face="Verdana" size="2">This <i>object_type</i> does 
+				not support enumeration </font></li>
+			</ul></dd>
+		</dl>
+		<dt>&nbsp;</dt>
+		<dt><font face="Verdana" size="2"><i>object_name</i> </font></dt>
+		<dd><font face="Verdana" size="2">Specifies the name of the object. For examples, 
+		see specific <i>object_type</i> descriptions. </font></dd>
+		<dt>&nbsp;</dt>
+		<dt><font face="Verdana" size="2">/<i>Action</i> can be any of the following:
+		</font></dt>
+		<dl style="MARGIN-LEFT: 1.5em">
+			<dt><font face="Verdana" size="2"><b>/display</b> [<b>=dacl</b> | <b>=sacl</b> 
+			| <b>=owner</b> | <b>=primarygroup</b> | <b>=sdsize</b> | <b>=sddl</b>]
+			</font></dt>
+			<dd><font face="Verdana" size="2">Displays the security descriptor for the 
+			specified object. This is the default action. The optional 
+			parameters allow you to specify which parts of the security 
+			descriptor SubInACL should search. When used in conjunction with <b>/noverbose</b>, 
+			<b>/display</b> reapplies the security descriptor to 
+			the specified object. </font></dd>
+			<dt><font face="Verdana" size="2"><b>/setowner</b> </font></dt>
+			<dd><font face="Verdana" size="2">Changes the owner of the object. Using 
+			<b>/owner=SID</b> or <b>/setowner=SID owner = DomainName\Administrators</b> 
+			will retrieve the Administrators SID on the server where the object 
+			is located. </font></dd>
+			<dt><font face="Verdana" size="2"><b>/owner</b>=<i>Owner</i> </font>
+			</dt>
+			<dd><font face="Verdana" size="2">Changes the owner of the specified object.
+			<i>Owner</i> is a valid SID that can be expressed in four different 
+			formats. For more information, see
+			<a href="#Using_SIDs_in_SubInACL">Using SIDs in SubInACL</a> on the Remarks page. 
+			</font></dd>
+			<dt><font face="Verdana" size="2"><b>/replace</b>=[<i>DomainName</i>\]<i>OldAccount</i>=[<i>DomainName</i>\]<i>NewAccount</i>
+			</font></dt>
+			<dd><font face="Verdana" size="2">Replaces all access control entries (ACEs) 
+			(audit ACEs and permissions ACEs) in the specified object. </font>
+			</dd>
+			<dt><font face="Verdana" size="2"><b>/accountmigration=</b><i>DomainName\OldAccount=DomainName\NewAccount</i>
+			</font></dt>
+			<dd><font face="Verdana" size="2">Replaces the owner or primary group if one 
+			of them is <i>DomainName</i>\<i>OldAccount</i>. For example: 
+			/accountmigration=DOM_MARKETING\ChairMan=NEWDOM\NewChairMan will 
+			duplicate all ACEs containing DOM_MARKETING\ChairMan with 
+			NewChairMan SID retrieves from NEWDOM domain. For more information, 
+			see the <b>/replace</b> action. </font>
+			<p class="caution"><b><font face="Verdana" size="2">
+			Caution</font></b><ul>
+				<li><font face="Verdana" size="2">If <i>DomainName</i>\<i>NewAccount</i> 
+				has an ACE already, ACE replacement is skipped. </font></li>
+			</ul></dd>
+			<dt>&nbsp;</dt>
+			<dt><font face="Verdana" size="2"><b>/changedomain</b>=<i>OldDomainName</i>=<i>NewDomainName</i>
+			</font></dt>
+			<dd><font face="Verdana" size="2">Replaces all ACEs with an SID from 
+			<i>OldDomainName</i> with the equivalent SID found in <i>NewDomainName</i>.
+			</font></dd>
+			<dt><font face="Verdana" size="2"><b>/migratetodomain</b>=<i>SourceDomain</i>=<i>DestinationDomain</i>
+			</font></dt>
+			<dd><font face="Verdana" size="2">Adds ACEs found in <i>SourceDomain</i> for 
+			the specified object to <i>DestinationDomain</i>, while preserving 
+			the ACEs in <i>SourceDomain</i>. </font></dd>
+			<dt><font face="Verdana" size="2"><b>/findsid</b>=<i>DomainName</i>\<i>Account</i>[<b>=stop</b> 
+			| <b>=continue</b>] </font></dt>
+			<dd><font face="Verdana" size="2">Displays the <i>object_name</i> containing 
+			a reference to <i>DomainName</i>\<i>Account</i> in the security 
+			descriptor. If <b>=stop</b> is specified and the <i>Account</i> is 
+			found, the next parameters will be skipped and changes will not be 
+			applied. If <b>=stop</b> is specified and the <i>Account</i> is not 
+			found, the next parameters will be executed. If <b>=continue</b> is 
+			specified and the <i>Account</i> is found, the next parameters will 
+			be executed. If <b>=continue</b> is specified and the <i>Account</i> 
+			is not found, the next parameters will be skipped and changes will 
+			not be applied. </font></dd>
+			<dt><font face="Verdana" size="2"><b>/suppresssid=</b>[<i>DomainName</i>\]<i>Account</i>
+			</font></dt>
+			<dd><font face="Verdana" size="2">Suppresses (deletes) all ACEs containing 
+			the [<i>DomainName</i>\]<i>Account</i>. If the object's owner is [<i>DomainName</i>\]<i>Account</i>, 
+			the owner is set to Everyone's SID. </font></dd>
+			<dt><font face="Verdana" size="2"><b>/confirm</b> </font></dt>
+			<dd><font face="Verdana" size="2">If placed inside a set of actions, prompts 
+			the user before processing the next action. </font></dd>
+			<dt><font face="Verdana" size="2"><b>/perm</b> </font></dt>
+			<dd><font face="Verdana" size="2">Suppresses all existing PACEs. 
+			</font></dd>
+			<dt><font face="Verdana" size="2"><b>/audit</b> </font></dt>
+			<dd><font face="Verdana" size="2">Suppresses all existing AACEs. 
+			</font></dd>
+			<dt><font face="Verdana" size="2"><b>/ifchangecontinue</b> </font>
+			</dt>
+			<dd><font face="Verdana" size="2">Continues to process the next actions only 
+			if changes have been made by the previous actions. </font></dd>
+			<dt><font face="Verdana" size="2"><b>/cleandeletedsidsfrom=</b><i>DomainName</i> 
+			[<b>=dacl</b> | <b>=sacl</b> | <b>=owner</b> | <b>=primarygroup</b> 
+			| <b>=sdsize</b>] </font></dt>
+			<dd><font face="Verdana" size="2">Deletes all ACEs containing deleted (not 
+			valid) SIDs from <i>DomainName</i>. The optional parameters allow 
+			you to specify certain parts of the security descriptor in which to 
+			search for invalid SIDs. </font></dd>
+			<dt><font face="Verdana" size="2"><b>/testmode</b> </font></dt>
+			<dd><font face="Verdana" size="2">Prevents changes from being applied to the 
+			object. This allows you to test the modifications that SubInACL will 
+			make. </font></dd>
+			<dt><font face="Verdana" size="2"><b>/accesscheck</b>=[<i>DomainName</i>\]<i>UserName</i>
+			</font></dt>
+			<dd><font face="Verdana" size="2">Displays the access granted to the [<i>DomainName</i>\]<i>UserName</i>. 
+			This option requires the SeTcbName privilege (Act As Part of the 
+			Operating System), and cannot be used with remote objects. </font>
+			</dd>
+			<dt><font face="Verdana" size="2"><b>/setprimarygroup</b>=[<i>DomainName</i>\]<i>Group</i>
+			</font></dt>
+			<dd><font face="Verdana" size="2">Changes the primary group. </font>
+			</dd>
+			<dt><font face="Verdana" size="2"><b>/grant</b>=[<i>DomainName</i>\]<i>UserName</i>[<b>=</b><i>Access</i>]
+			</font></dt>
+			<dd><font face="Verdana" size="2">Adds a PACE for <i>UserName</i>. Valid 
+			values for <i>Access</i> depend on the type of object specified in
+			<i>object_name</i>. Valid PACEs are listed in
+			<a href="#Using_PACEs_in_SubInACL">Using PACEs in SubInACL</a> on the Remarks page. If 
+			<i>Access</i> is 
+			not specified, Full Control access is granted. </font></dd>
+			<dt><font face="Verdana" size="2"><b>/deny</b>=[<i>DomainName</i>\]<i>UserName</i>[<b>=</b><i>Access</i>]
+			</font></dt>
+			<dd><font face="Verdana" size="2">Adds a denied PACE for the specified user 
+			or group. Valid values for <i>Access</i> depend on the type of 
+			object specified in <i>object_name</i>. Valid PACEs are listed in
+			<a href="#Using_PACEs_in_SubInACL">Using PACEs in SubInACL</a> on the Remarks page. If 
+			<i>Access</i> is 
+			not specified, all accesses are denied. </font></dd>
+			<dt><font face="Verdana" size="2"><b>/sgrant=</b>[<i>DomainName</i>\]<i>UserName</i>[=<i>Access</i>]
+			</font></dt>
+			<dd><font face="Verdana" size="2">Adds a successful AACE for the specified 
+			user. If <i>Access</i> is not specified, Full Control access is 
+			granted. Valid permission ACEs are listed in
+			<a href="#Using_PACEs_in_SubInACL">Using PACEs in SubInACL</a> on the Remarks page. 
+			</font></dd>
+			<dt><font face="Verdana" size="2"><b>/sdeny=</b>[<i>DomainName</i>\]<i>UserName</i>[=<i>Access</i>]
+			</font></dt>
+			<dd><font face="Verdana" size="2">Adds a failed AACE for the specified user. 
+			If <i>Access</i> is not specified, all accesses are denied. Valid 
+			PACEs are listed in
+			<a href="#Using_PACEs_in_SubInACL">Using PACEs in SubInACL</a> on the Remarks page. 
+			</font></dd>
+			<dt><font face="Verdana" size="2"><b>/revoke</b>=[<i>DomainName</i>\]<i>UserName</i>
+			</font></dt>
+			<dd><font face="Verdana" size="2">Denies all PACEs for the specified user or 
+			group. </font></dd>
+			<dt><font face="Verdana" size="2"><b>/compactsecuritydescriptor</b>
+			</font></dt>
+			<dd><font face="Verdana" size="2">Compresses security descriptors by removing 
+			unused entries. </font></dd>
+			<dt><font face="Verdana" size="2"><b>/pathexclude=</b><i>Pattern</i>
+			</font></dt>
+			<dd><font face="Verdana" size="2">Excludes all containers matching the 
+			description of <i>Pattern</i>, and all the objects within those 
+			paths. The * wildcard character can be used within <i>Pattern</i> to 
+			represent any number of any characters. </font></dd>
+			<dt><font face="Verdana" size="2"><b>/objectexclude=</b><i>Pattern</i>
+			</font></dt>
+			<dd><font face="Verdana" size="2">Excludes all objects with names that match
+			<i>Pattern</i>. The * wildcard character can be used within <i>Pattern</i> to represent any number of any characters. 
+			</font></dd>
+		</dl>
+		<dt>&nbsp;</dt>
+		<dt><font face="Verdana" size="2"><i>Parameter</i> </font></dt>
+		<dd><font face="Verdana" size="2">The parameter of <i>/Action</i>, if required.
+		</font></dd>
+	</dl></div>
+<h3>
+<u><font face="Verdana" size="2">Syntax 
+for Using SubInACL Within Its Own Scripting Environment</font></u></h3>
+<div class="expand" style="DISPLAY: block">
+	<div style="background-color: #DDDDDD">
+	<p class="syntax">
+	<nobr><font face="Webdings" size="2" style="background-color: #FFFFFF">
+	4</font></nobr><font face="Verdana" size="2"><b>subinacl</b>
+	<nobr>[/<i>Option</i> ..] <b>/playfile</b> <i>FileName</i></nobr></font></p>
+	</div>
+	<h3><font face="Verdana" size="2">Parameters</font></h3>
+	<dl>
+		<dt><font face="Verdana" size="2">/<i>Option</i> </font></dt>
+		<dd><font face="Verdana" size="2">Any of the SubInACL options defined above.
+		</font></dd>
+		<dt><font face="Verdana" size="2"><i>FileName</i> </font></dt>
+		<dd><font face="Verdana" size="2">The name of the SubInACL command file (script 
+		file). You can create the file manually, or by issuing a SubInACL 
+		command that uses the <b>/noverbose</b> and <b>/display</b> options.
+		</font>
+		<p><font face="Verdana" size="2">The syntax of the <b>/playfile</b> command file is 
+		the same as the syntax of SubInACL when used in a console window, except 
+		that: </font>
+		<ul>
+			<li><font face="Verdana" size="2">/<i>Option</i> is not used. </font>
+			</li>
+			<li><font face="Verdana" size="2">Each /<i>object_type</i> is preceded by a 
+			plus symbol (+) rather than a slash (/). </font></li>
+			<li><font face="Verdana" size="2">Each /<i>object_type</i> and <i>object_name</i> 
+			pair appear together, on the same line. </font></li>
+			<li><font face="Verdana" size="2">Each action appears on its own line, 
+			followed by any applicable parameters. </font></li>
+		</ul>
+		<p><font face="Verdana" size="2">For more information, see
+		<b><a id="specLoc" href="#playfile">/playfile</a></b> under Action Syntax Examples on the Examples page.</font></dd>
+	</dl></div>&nbsp;<p><b><font size="4" face="Verdana"><a name="Examples">Examples</a></font></b><hr class="tools"></p>
+
+<h3>
+<u><font face="Verdana" size="2">Scenario 
+Examples</font></u></h3>
+<div class="expand" style="DISPLAY: block">
+	<font face="Verdana" size="2"><b>Scenario Example 1</b></font><p>
+	<font face="Verdana" size="2">The task in this example is to adjust the files on 
+	\\Server\Share after you move User1 from OldDomain to NewDomain. Type the 
+	following at the command line:</font></p>
+	<p><code><b><font face="Verdana" size="2">subinacl /subdirec \\server\share\*.* 
+	/replace=OLDDOMAIN\USER1=NEWDOMAIN\User1</font></b></code></p>
+	<p><font face="Verdana" size="2">Press ENTER.</font></p>
+	<p class="note"><font face="Verdana" size="2">
+	&nbsp;&nbsp;&nbsp; <b>Note</b></font></p>
+	<ul>
+		<li><font face="Verdana" size="2">The two domains must have a trust relationship.
+		</font></li>
+	</ul>
+	<p><font face="Verdana" size="2"><b>Scenario Example 2</b></font></p>
+	<p><font face="Verdana" size="2">The task in this example is to migrate a backup 
+	domain controller (BDC) named MigrControl with all its files to NewDomain, 
+	and migrate users from OldDomain to NewDomain.</font></p>
+	<ol><font face="Verdana" size="2">
+		<li><font face="Verdana" size="2">Reinstall MigrControl as a primary domain 
+		controller (PDC) of NewDomain, and do not erase the files. </font></li>
+		<li><font face="Verdana" size="2">Create the users on NewDomain. </font></li>
+		<li><font face="Verdana" size="2">Create a trust relationship with OldDomain.
+		</font></li>
+		<li><font size="2" face="Verdana">To migrate the files, type the following at the 
+		command line: <br>
+		</font><font size="2"><code><b><font face="Verdana">subinacl /noverbose /subdirectories 
+		x:\*.* /changedomain=OLDDOMAIN=NEWDOMAIN</font></b></code></font><font size="2" face="Verdana">
+		</font></li>
+		<li><font face="Verdana" size="2">Press ENTER. </font></li>
+		<li><font size="2" face="Verdana">To verify the changes, type the following at 
+		the command line: <br>
+		</font><font size="2"><code><b><font face="Verdana">subinacl /noverbose /subdirectories 
+		x:\*.*</font></b></code></font><font size="2" face="Verdana"> </font></li>
+		<li><font face="Verdana" size="2">Press ENTER. </font></li>
+	</font></ol>
+	<p><font face="Verdana" size="2"><b>Scenario Example 3</b></font></p>
+	<p><font face="Verdana" size="2">The task in this example is to move a stand-alone 
+	server and its users to NewDomain.</font></p>
+	<ol><font face="Verdana" size="2">
+		<li><font face="Verdana" size="2">Move the server to NewDomain. </font></li>
+		<li><font face="Verdana" size="2">Create the users in NewDomain. </font></li>
+		<li><font size="2" face="Verdana">Type the following at the command line: <br>
+		</font><font size="2"><code><b><font face="Verdana">subinacl /noverbose /subdirectories 
+		\\SERVER\SHARE /changedomain=SERVER=NEWDOMAIN</font></b></code></font><font size="2" face="Verdana">
+		</font></li>
+		<li><font face="Verdana" size="2">Press ENTER. </font></li>
+	</font></ol>
+	<p><font face="Verdana" size="2"><b>Scenario Example 4</b></font></p>
+	<p><font face="Verdana" size="2">The task in this example is to replace &quot;Jim&quot; with 
+	&quot;Kim&quot; in each .txt file in the C:\Temp folder, display the security 
+	descriptor for each such file, and apply any changes. Type the following at 
+	the command line:</font></p>
+	<p><code><b><font face="Verdana" size="2">subinacl /file c:\temp\*.txt 
+	/replace=Jim=Kim/display</font></b></code></p>
+	<p><font face="Verdana" size="2">Press ENTER.</font></div>
+<h3>
+<u><font face="Verdana" size="2">Option 
+Syntax Examples</font></u></h3>
+<div class="expand" style="DISPLAY: block">
+	<font face="Verdana" size="2"><b>/<a name="help">help</a></b></font>
+	<ul>
+		<li><font face="Verdana" size="2">The task in this example is to display Help 
+		about the topic of domain migration. Type the following at the command 
+		line: </font>
+		<p><code><b><font face="Verdana" size="2">subinacl /help domain_migration</font></b></code></p>
+		<p><font face="Verdana" size="2">Press ENTER.</font></li>
+	</ul>
+	<ul>
+		<li><font face="Verdana" size="2">The task in this example is to display Help 
+		about the <b>/setowner</b> action. Type the following at the command 
+		line: </font>
+		<p><code><b><font face="Verdana" size="2">subinacl /help /setowner</font></b></code></p>
+		<p><font face="Verdana" size="2">Press ENTER.</font></li>
+	</ul>
+	<p><font face="Verdana" size="2"><b>/<a name="outputlog">outputlog</a></b></font></p>
+	<ul>
+		<li><font face="Verdana" size="2">The task in this example is to obtain security 
+		information about the file C:\Test.txt and record all output of the 
+		command (including errors) in the file C:\Alloutput.txt. Type the 
+		following at the command line: </font>
+		<p><code><b><font face="Verdana" size="2">subinacl /outputlog=C:\ALLOUTPUT.TXT 
+		/file C:\TEST.TXT /display</font></b></code></p>
+		<p><font face="Verdana" size="2">Press ENTER.</font></li>
+	</ul>
+	<p><font face="Verdana" size="2"><b>/<a name="errorlog">errorlog</a></b></font></p>
+	<ul>
+		<li><font face="Verdana" size="2">The task in this example is to obtain security 
+		information about the file C:\Test.txt, record all errors generated by 
+		the command in the file C:\Errorlog.txt, and record all other output in 
+		the file C:\Nonerrors.txt. Type the following at the command line:
+		</font>
+		<p><code><b><font face="Verdana" size="2">subinacl /outputlog=c:\NONERRORS.TXT 
+		/errorlog=C:\ERRORLOG.TXT /file C:\TEST.TXT /display</font></b></code></p>
+		<p><font face="Verdana" size="2">Press ENTER.</font></li>
+	</ul>
+	<p><font face="Verdana" size="2"><b>/<a name="alternatesamserver">alternatesamserver</a></b></font></p>
+	<ul>
+		<li><font face="Verdana" size="2">The task in this example is to display the 
+		security settings of the file C:\Test.txt and use the server \\Server1 
+		to resolve SIDs if SubInACL is unable to resolve them on the server 
+		where the file is located. Type the following at the command line:
+		</font>
+		<p><code><b><font face="Verdana" size="2">subinacl /alternatesamserver=\\server1 
+		/file C:\TEST.TXT /display</font></b></code></p>
+		<p><font face="Verdana" size="2">Press ENTER.</font></li>
+	</ul>
+	<p><font face="Verdana" size="2"><b>/<a name="offlinesam">offlinesam</a></b></font></p>
+	<ul>
+		<li><font face="Verdana" size="2">The task in this example is to migrate the 
+		security settings of the files on a server from one domain to another. 
+		This example assumes that you have access to the source domain and know 
+		you will not have access to it during the migration. </font>
+		<ol><font face="Verdana" size="2">
+			<li><font face="Verdana" size="2">Store a record of user names and their 
+			corresponding SIDs from the source domain in a text file named 
+			C:\Samfile.txt. Use the following format: </font>
+			<ul>
+				<li><font face="Verdana" size="2">_cachefileonly_=s-1-9-cacheonly </font>
+				</li>
+				<li><font face="Verdana" size="2">[<i>Domain\UserName</i> | <i>
+				Server\UserName</i>]=<i>SID</i> </font></li>
+			</ul>
+			</li>
+			<li><font size="2" face="Verdana">Type the following at the command line:<br>
+			</font><font size="2"><code><b><font face="Verdana">subinacl 
+			/offlinesam=C:\SAMFILE.TXT /subdirect \\SERVER\SHARE\*.* 
+			/migratedomain=SOURCEDOMAIN=DESTDOMAIN</font></b></code></font><font size="2" face="Verdana">
+			</font></li>
+			<li><font face="Verdana" size="2">Press ENTER. </font></li>
+		</font></ol>
+		</li>
+	</ul>
+	<p><font face="Verdana" size="2"><b>/<a name="stringreplaceonoutput">stringreplaceonoutput</a></b></font></p>
+	<ul>
+		<li><font face="Verdana" size="2">The task in this example is to move the files 
+		from the E: drive of \\Server1 to the E: drive of \\Server2. </font>
+		<ol><font face="Verdana" size="2">
+			<li><font size="2" face="Verdana">To record the security settings of the 
+			files on the E: drive of \\Server1 in the file C:\Commandfile.txt, 
+			but replace references to \\Server1 with \\Server2, type the 
+			following at the command line:<br>
+			</font><font size="2"><code><b><font face="Verdana">subinacl 
+			/outputlog=c:\commandfile.txt 
+			/stringreplaceonoutput=\\server1=\\server2 /subdirectories E:\*.* 
+			/noverbose /display</font></b></code></font><font size="2" face="Verdana">
+			</font>
+			</li>
+			<li><font face="Verdana" size="2">Press ENTER. </font></li>
+			<li><font face="Verdana" size="2">Copy all files from the E: drive of 
+			\\Server1 to the E: drive of \\Server2. </font></li>
+			<li><font face="Verdana" size="2">Copy Commandfile.txt to the C: drive of 
+			\\Server2. </font></li>
+			<li><font size="2" face="Verdana">To reapply the security settings to the 
+			files on the E: drive of \\Server2, type the following at the 
+			command line:<br>
+			</font><code><b><font size="2" face="Verdana">subinacl /playfile 
+			c:\commandfile.txt </font></b></code></li>
+			<li><font face="Verdana" size="2">Press ENTER. </font></li>
+		</font></ol>
+		</li>
+	</ul>
+	<p><font face="Verdana" size="2"><b>/<a name="noexpandenvironmentsymbols">noexpandenvironmentsymbols</a></b></font></p>
+	<ul>
+		<li><font face="Verdana" size="2">The task in this example is to prevent SubInACL 
+		from interpreting any strings as environment variables. Type the 
+		following at the command line: </font>
+		<p><code><b><font size="2" face="Verdana">subinacl /noexpandenvironmentsymbols /<i>object_type</i>
+		<i>object_name</i> /</font><i><font size="2" face="Verdana">action</font></i></b></code></p>
+		<p><font face="Verdana" size="2">Press ENTER.</font></li>
+	</ul>
+	<p><font face="Verdana" size="2"><b>/<a name="separator">separator</a></b></font></p>
+	<ul>
+		<li><font face="Verdana" size="2">The task in this example is to temporarily 
+		define the tilde (~) as the separator character so that options such as
+		<b>/stringreplaceonoutput</b> can manipulate strings that contain the 
+		default separator character (=). Type the following at the command line:
+		</font>
+		<p><code><b><font face="Verdana" size="2">subinacl /separator=~ 
+		/stringreplaceonoutput~=europe\~=southerneurope /file *.* /noverbose 
+		/display</font></b></code></p>
+		<p><font face="Verdana" size="2">Press ENTER.</font></li>
+	</ul>
+	<p><font face="Verdana" size="2"><b>/<a name="noverbose">noverbose</a></b></font></p>
+	<ul>
+		<li><font face="Verdana" size="2">The task in this example is to display a 
+		summary of the security settings of the file C:\Test.txt. Type the 
+		following at the command line: </font>
+		<p><code><b><font face="Verdana" size="2">subinacl /noverbose /file c:\test.txt</font></b></code></p>
+		<p><font face="Verdana" size="2">Press ENTER.</font></li>
+	</ul>
+	<ul>
+		<li><font face="Verdana" size="2">The task in this example is to save the 
+		security settings of all files on the C: drive to the file D:\Filesettings.txt, 
+		so that they can be reapplied if necessary by using the <b>/playfile</b> 
+		and <b>/display</b> actions. Type the following at the command line:
+		</font>
+		<p><code><b><font face="Verdana" size="2">subinacl /noverbose 
+		/outputlog=D:\FILESETTINGS.TXT /subdirectories C:\*.* /display</font></b></code></p>
+		<p><font face="Verdana" size="2">Press ENTER.</font></li>
+	</ul>
+	<p><font face="Verdana" size="2"><b>/<a name="verbose">verbose</a></b></font></p>
+	<ul>
+		<li><font face="Verdana" size="2">The task in this example is to display the full 
+		details of the security settings of the file C:\Test.txt. Type the 
+		following at the command line: </font>
+		<p><code><b><font face="Verdana" size="2">subinacl /verbose /file C:\TEST.TXT</font></b></code></p>
+		<p><font face="Verdana" size="2">Press ENTER.</font></li>
+	</ul>
+	<p><font face="Verdana" size="2"><b>/<a name="testmode">testmode</a></b></font></p>
+	<ul>
+		<li><font face="Verdana" size="2">The task in this example is to test a command 
+		and verify that you have used the correct syntax, without applying 
+		changes. You want to change the name of the domain in all security 
+		descriptors of all files in the subdirectories of Share1 on \\Server1 
+		from DomA to DomB; however, you want to test the command first. Type the 
+		following at the command line: </font>
+		<p><code><b><font face="Verdana" size="2">subInacl /subdirec \\SERVER1\SHARE1\*.* 
+		/changedomain=DOMA=DOMB /ifchangecontinue /noverbose /display /testmode</font></b></code></p>
+		<p><font face="Verdana" size="2">Press ENTER.</font></li>
+	</ul>
+</div>
+<h3>
+<u><font face="Verdana" size="2">Object 
+Syntax Examples</font></u></h3>
+<div class="expand" style="DISPLAY: block">
+	<font face="Verdana" size="2"><b>/<a name="file">file</a></b></font><ul>
+		<li><font face="Verdana" size="2">The task in this example is to display the 
+		security settings of all .obj files in the current folder. Type the 
+		following at the command line: </font>
+		<p><code><b><font face="Verdana" size="2">subinacl /file *.obj /display</font></b></code></p>
+		<p><font face="Verdana" size="2">Press ENTER.</font></li>
+	</ul>
+	<ul>
+		<li><font face="Verdana" size="2">The task in this example is to display the 
+		security settings of all .obj files in the C:\Temp folder. Type the 
+		following at the command line: </font>
+		<p><code><b><font face="Verdana" size="2">subinacl /file C:\TEMP\*.obj /display</font></b></code></p>
+		<p><font face="Verdana" size="2">Press ENTER.</font></li>
+	</ul>
+	<ul>
+		<li><font face="Verdana" size="2">The task in this example is to display the 
+		security settings of all .exe files in the folder that is shared as 
+		\\Server1\Share1. Type the following at the command line: </font>
+		<p><code><b><font face="Verdana" size="2">subinacl /file \\server1\share1\*.exe 
+		/display</font></b></code></p>
+		<p><font face="Verdana" size="2">Press ENTER.</font></li>
+	</ul>
+	<ul>
+		<li><font face="Verdana" size="2">The task in this example is to display the 
+		security settings of the folder that is shared as \\Server1\Share1 
+		(rather than acting on the files within that folder). Type the following 
+		at the command line: </font>
+		<p><code><b><font face="Verdana" size="2">subinacl /file=directoriesonly 
+		\\server1\share1 /display</font></b></code></p>
+		<p><font face="Verdana" size="2">Press ENTER.</font></li>
+	</ul>
+	<ul>
+		<li><font face="Verdana" size="2">The task in this example is to display the 
+		security settings of all files in the folder that is shared as 
+		\\Server1\Share1, and not on folders or subfolders. Type the following 
+		at the command line: </font>
+		<p><code><b><font face="Verdana" size="2">subinacl /file=filesonly 
+		\\server1\share1 /display</font></b></code></p>
+		<p><font face="Verdana" size="2">Press ENTER.</font></li>
+	</ul>
+	<p><font face="Verdana" size="2"><b>/<a name="subdirectory">subdirectory</a></b></font></p>
+	<ul>
+		<li><font face="Verdana" size="2">The task in this example is to display the 
+		security settings of all .obj files in the C:\Temp folder and all its 
+		subfolders. Type the following at the command line: </font>
+		<p><code><b><font face="Verdana" size="2">subinacl /subdirectory C:\TEMP\*.obj 
+		/display</font></b></code></p>
+		<p><font face="Verdana" size="2">Press ENTER.</font></li>
+	</ul>
+	<ul>
+		<li><font face="Verdana" size="2">The task in this example is to display the 
+		security settings of all .obj files in the C:\Temp\Test folder and all 
+		its subfolders. Type the following at the command line: </font>
+		<p><code><b><font face="Verdana" size="2">subinacl /subdirectory 
+		C:\TEMP\TEST\*.OBJ /display</font></b></code></p>
+		<p><font face="Verdana" size="2">Press ENTER.</font></li>
+	</ul>
+	<ul>
+		<li><font face="Verdana" size="2">The task in this example is to display the 
+		security settings of folders only, and not files. Type the following at 
+		the command line: </font>
+		<p><code><b><font face="Verdana" size="2">subinacl /subdirectory=directoriesonly 
+		C:\*.* /display</font></b></code></p>
+		<p><font face="Verdana" size="2">Press ENTER.</font></li>
+	</ul>
+	<p><font face="Verdana" size="2"><b>/<a name="onlyfile">onlyfile</a></b></font></p>
+	<ul>
+		<li><font face="Verdana" size="2">The task in this example is to display the 
+		security settings of the named pipe PipeName. Type the following at the 
+		command line: </font>
+		<p><code><b><font face="Verdana" size="2">subinacl /onlyfile \\.\pipe\PipeName 
+		/display</font></b></code></p>
+		<p><font face="Verdana" size="2">Press ENTER.</font></li>
+	</ul>
+	<p><font face="Verdana" size="2"><b>/<a name="samobject">samobject</a></b></font></p>
+	<ul>
+		<li><font face="Verdana" size="2">The task in this example is to display the 
+		security settings of the local group Group1 on the Server1 server. Type 
+		the following at the command line: </font>
+		<p><code><b><font face="Verdana" size="2">subinacl /samobject \\SERVER1\GROUP1 
+		/display</font></b></code></p>
+		<p><font face="Verdana" size="2">Press ENTER.</font></li>
+	</ul>
+	<ul>
+		<li><font face="Verdana" size="2">The task in this example is to display the 
+		security settings of local users defined on the Server1 server. Type the 
+		following at the command line: </font>
+		<p><code><b><font face="Verdana" size="2">subinacl /samobject \\SERVER1\*users* 
+		/display</font></b></code></p>
+		<p><font face="Verdana" size="2">Press ENTER.</font></li>
+	</ul>
+	<ul>
+		<li><font face="Verdana" size="2">The task in this example is to display the 
+		security settings of local groups defined on the Server1 server. Type 
+		the following at the command line: </font>
+		<p><code><b><font face="Verdana" size="2">subinacl /samobject \\SERVER1\*groups* 
+		/display</font></b></code></p>
+		<p><font face="Verdana" size="2">Press ENTER.</font></li>
+	</ul>
+	<ul>
+		<li><font face="Verdana" size="2">The task in this example is to grant the power 
+		user named Poweruser1 full control over the TestGroup local group, which 
+		was created by another power user. Type the following at the command 
+		line: </font>
+		<p><code><b><font face="Verdana" size="2">subinacl /samobject \\SERVER1\TESTGROUP 
+		/grant=poweruser1=f</font></b></code></p>
+		<p><font face="Verdana" size="2">Press ENTER.</font></li>
+	</ul>
+	<p><font face="Verdana" size="2"><b>/<a name="share">share</a></b></font></p>
+	<ul>
+		<li><font face="Verdana" size="2">The task in this example is to display the 
+		security settings of the network file share named \\Server1\Share1. Type 
+		the following at the command line: </font>
+		<p><code><b><font face="Verdana" size="2">subinacl /share \\SERVER1\SHARE1 /share</font></b></code></p>
+		<p><font face="Verdana" size="2">Press ENTER.</font></li>
+	</ul>
+	<p><font face="Verdana" size="2"><b>/<a name="clustershare">clustershare</a></b></font></p>
+	<ul>
+		<li><font face="Verdana" size="2">The task in this example is to specify that 
+		SubInACL act on the cluster share named \\Cluster1\Share1. Type the 
+		following at the command line: </font>
+		<p><code><b><font face="Verdana" size="2">subinacl /clustershare 
+		\\CLUSTER1\SHARE1 /display</font></b></code></p>
+		<p><font face="Verdana" size="2">Press ENTER.</font></li>
+	</ul>
+	<p><font face="Verdana" size="2"><b>/<a name="keyreg">keyreg</a></b></font></p>
+	<ul>
+		<li><font face="Verdana" size="2">The task in this example is to display the 
+		security settings of the registry keys located on the server \\Server1, 
+		at the location HKEY_LOCAL_MACHINE\SOFTWARE. Type the following at the 
+		command line: </font>
+		<p><code><b><font face="Verdana" size="2">subinacl /keyreg 
+		\\SERVER1\HKEY_LOCAL_MACHINE\SOFTWARE /display</font></b></code></p>
+		<p><font face="Verdana" size="2">Press ENTER.</font></li>
+	</ul>
+	<p><font face="Verdana" size="2"><b>/<a name="subkeyreg">subkeyreg</a></b></font></p>
+	<ul>
+		<li><font face="Verdana" size="2">The task in this example is to display the 
+		security settings of the registry keys and subkeys located on the server 
+		\\Server1, at the location HKEY_LOCAL_MACHINE\SOFTWARE. Type the 
+		following at the command line: </font>
+		<p><code><b><font face="Verdana" size="2">subinacl /subkeyreg 
+		\\SERVER1\HKEY_LOCAL_MACHINE\SOFTWARE /display</font></b></code></p>
+		<p><font face="Verdana" size="2">Press ENTER.</font></li>
+	</ul>
+	<p><font face="Verdana" size="2"><b>/<a name="service">service</a></b></font></p>
+	<ul>
+		<li><font face="Verdana" size="2">The task in this example is to display the 
+		security settings of the Messenger service on the local computer. Type 
+		the following at the command line: </font>
+		<p><code><b><font face="Verdana" size="2">subinacl /service Messenger /display</font></b></code></p>
+		<p><font face="Verdana" size="2">Press ENTER.</font></li>
+	</ul>
+	<ul>
+		<li><font face="Verdana" size="2">The task in this example is to display the 
+		security settings of the Messenger service on \\Server1. Type the 
+		following at the command line: </font>
+		<p><code><b><font face="Verdana" size="2">subinacl /service \\SERVER1\MESSENGER 
+		/display</font></b></code></p>
+		<p><font face="Verdana" size="2">Press ENTER.</font></li>
+	</ul>
+	<p><font face="Verdana" size="2"><b>/<a name="printer">printer</a></b></font></p>
+	<ul>
+		<li><font face="Verdana" size="2">The task in this example is to display the 
+		security settings of the printer shared as \\Server1\Printer1. Type the 
+		following at the command line: </font>
+		<p><code><b><font face="Verdana" size="2">subinacl /printer \\SERVER1\PRINTER1 
+		/display</font></b></code></p>
+		<p><font face="Verdana" size="2">Press ENTER.</font></li>
+	</ul>
+	<p><font face="Verdana" size="2"><b>/<a name="kernelobject">kernelobject</a></b></font></p>
+	<ul>
+		<li><font face="Verdana" size="2">The task in this example is to display the 
+		security settings of the mutex named _outlook_mutex_. Type the following 
+		at the command line: </font>
+		<p><code><b><font face="Verdana" size="2">subinacl /kernelobject _outlook_mutex_ 
+		/display</font></b></code></p>
+		<p><font face="Verdana" size="2">Press ENTER.</font></li>
+	</ul>
+	<p><font face="Verdana" size="2"><b>/<a name="process">process</a></b></font></p>
+	<ul>
+		<li><font face="Verdana" size="2">The task in this example is to display the 
+		security settings of Notepad. Type the following at the command line:
+		</font>
+		<p><code><b><font face="Verdana" size="2">subinacl /process notepad.* /display</font></b></code></p>
+		<p><font face="Verdana" size="2">Press ENTER.</font></li>
+	</ul>
+	<ul>
+		<li><font face="Verdana" size="2">The task in this example is to display the 
+		security settings of the process that has process identifier (PID) 1234. 
+		Type the following at the command line: </font>
+		<p><code><b><font face="Verdana" size="2">subinacl /process 1234 /display</font></b></code></p>
+		<p><font face="Verdana" size="2">Press ENTER.</font></li>
+	</ul>
+	<p><font face="Verdana" size="2"><b>/<a name="metabase">metabase</a></b></font></p>
+	<ul>
+		<li><font face="Verdana" size="2">The task in this example is to grant 
+		administrators full control over the properties at \LM\W3SVC on the 
+		server \\Server1. Type the following at the command line: </font>
+		<p><code><b><font face="Verdana" size="2">subinacl /metabase \\SERVER1\LM\W3SVC 
+		/grant=administrators=f</font></b></code></p>
+		<p><font face="Verdana" size="2">Press ENTER.</font></li>
+	</ul>
+</div>
+<h3>
+<u><font face="Verdana" size="2">Action 
+Syntax Examples</font></u></h3>
+<div class="expand" style="DISPLAY: block">
+	<font face="Verdana" size="2"><b>/<a name="display">display</a></b></font><ul>
+		<li><font face="Verdana" size="2">The task in this example is to display the 
+		security settings of the files on the C: drive. Type the following at 
+		the command line: </font>
+		<p><code><b><font face="Verdana" size="2">subinacl /file C:\*.* /display</font></b></code></p>
+		<p><font face="Verdana" size="2">Press ENTER.</font></li>
+	</ul>
+	<ul>
+		<li><font face="Verdana" size="2">The task in this example is to save the 
+		security settings of the files on the C: drive to the file 
+		D:\Securitysettings.txt. Type the following at the command line: </font>
+		<p><code><b><font face="Verdana" size="2">subinacl /file 
+		/outputlog=D:\SECURITYSETTINGS.TXT C:\*.* /display /noverbose</font></b></code></p>
+		<p><font face="Verdana" size="2">Press ENTER.</font></li>
+	</ul>
+	<p><font face="Verdana" size="2"><b>/<a name="owner">owner</a></b></font></p>
+	<ul>
+		<li><font face="Verdana" size="2">The task in this example is to set 
+		Domain1\User1 to be the owner of the file C:\Test.txt. Type the 
+		following at the command line: </font>
+		<p><code><b><font face="Verdana" size="2">subinacl /file C:\TEST.TXT 
+		/owner=DOMAIN1\USER1</font></b></code></p>
+		<p><font face="Verdana" size="2">Press ENTER.</font></li>
+	</ul>
+	<p><font face="Verdana" size="2"><b>/<a name="replace">replace</a></b></font></p>
+	<ul>
+		<li><font face="Verdana" size="2">The task in this example is to replace 
+		Domain1\User1 with Domain2\User2 throughout the ACEs of all files on the 
+		C: drive. Type the following at the command line: </font>
+		<p><code><b><font face="Verdana" size="2">subinacl /file C:\*.* 
+		/replace=DOMAIN1\USER1=DOMAIN2\USER2</font></b></code></p>
+		<p><font face="Verdana" size="2">Press ENTER.</font></li>
+	</ul>
+	<p><font face="Verdana" size="2"><b>/<a name="changedomain">changedomain</a></b></font></p>
+	<ul>
+		<li><font face="Verdana" size="2">The task in this example is to replace all ACEs 
+		that have an SID from Domain1 with the SID of the same user from 
+		Domain2, for all files on the C: drive. Type the following at the 
+		command line: </font>
+		<p><code><b><font face="Verdana" size="2">subinacl /subdirectory C:\*.* 
+		/changedomain=domain1=domain2</font></b></code></p>
+		<p><font face="Verdana" size="2">Press ENTER.</font></li>
+	</ul>
+	<ul>
+		<li><font face="Verdana" size="2">The task in this example is to replace all ACEs 
+		that have the SID of User1 from Domain1 with the SID of User2 from 
+		Domain2, for all files on the C: drive. Use a mapping file. </font>
+		<ol><font face="Verdana" size="2">
+			<li><font face="Verdana" size="2">Create a mapping file containing only the 
+			line &quot;USER1=USER2&quot; and save this file as Mapfile.txt. </font></li>
+			<li><font face="Verdana" size="2">Type the following at the command prompt:<br>
+&nbsp;</font><p><code><b><font face="Verdana" size="2">subinacl /subdirectory C:\*.* 
+			/changedomain=domain1=domain2=MAPFILE.TXT</font></b></code></li>
+			<li><font face="Verdana" size="2">Press ENTER. </font></li>
+		</font></ol>
+		</li>
+	</ul>
+	<p><font face="Verdana" size="2"><b>/<a name="migratetodomain">migratetodomain</a></b></font></p>
+	<ul>
+		<li><font face="Verdana" size="2">The task in this example is to leave intact 
+		each ACE on every file on the C: drive that has an SID from Domain1, and 
+		create a new ACE with the same user from Domain2. Type the following at 
+		the command line: </font>
+		<p><code><b><font face="Verdana" size="2">subinacl /subdirectory C:\*.* 
+		/changedomain=domain1=domain2</font></b></code></p>
+		<p><font face="Verdana" size="2">Press ENTER.</font></li>
+	</ul>
+	<ul>
+		<li><font face="Verdana" size="2">The task in this example is to create a new ACE 
+		with the SID of Domain2\User2 for each ACE on every file on the C: drive 
+		that has an SID from Domain1\User1. Use a mapping file: </font>
+		<ol><font face="Verdana" size="2">
+			<li><font face="Verdana" size="2">Create a mapping file containing only the 
+			line <b>USER1=USER2</b> and save this file as Mapfile.txt. </font>
+			</li>
+			<li><font size="2" face="Verdana">Type the following at the command line:<br>
+			</font><font size="2"><code><b><font face="Verdana">subinacl /subdirectory C:\*.* 
+			/changedomain=domain1=domain2=mapfile.txt</font></b></code></font><font size="2" face="Verdana">
+			</font></li>
+			<li><font face="Verdana" size="2">Press ENTER. </font></li>
+		</font></ol>
+		</li>
+	</ul>
+	<p><font face="Verdana" size="2"><b>/<a name="findsid">findsid</a></b></font></p>
+	<ul>
+		<li><font face="Verdana" size="2">The task in this example is to display the 
+		names of files on the C: drive that have security descriptors that 
+		reference the SID of Domain1\User1. Type the following at the command 
+		line: </font>
+		<p><code><b><font face="Verdana" size="2">subinacl /subdirectory C:\*.* 
+		/findsid=DOMAIN1\USER1</font></b></code></p>
+		<p><font face="Verdana" size="2">Press ENTER.</font></li>
+		<li><font face="Verdana" size="2">The task in this example is to display the 
+		names of files on the C: drive that have security descriptors that 
+		reference the SID of Domain1\User1, and—if any are found—not to execute 
+		any other parameters and not to apply changes. Type the following at the 
+		command line: </font>
+		<p><code><b><font face="Verdana" size="2">subinacl /subdirectory C:\*.* 
+		/findsid=DOMAIN1\USER1=stop</font></b></code></p>
+		<p><font face="Verdana" size="2">Press ENTER.</font></li>
+	</ul>
+	<p><font face="Verdana" size="2"><b>/<a name="suppresssid">suppresssid</a></b></font></p>
+	<ul>
+		<li><font face="Verdana" size="2">The task in this example is to remove all ACEs 
+		that reference Domain1\User1 from the file C:\Test.txt. Type the 
+		following at the command line: </font>
+		<p><code><b><font face="Verdana" size="2">subinacl /file C:\TEST.TXT 
+		/suppresssid=DOMAIN1\USER1</font></b></code></p>
+		<p><font face="Verdana" size="2">Press ENTER.</font></li>
+	</ul>
+	<p><font face="Verdana" size="2"><b>/<a name="confirm">confirm</a></b></font></p>
+	<ul>
+		<li><font face="Verdana" size="2">The task in this example is to begin cleaning 
+		up deleted SIDs from Domain1, searching only the DACL and SACL parts of 
+		the security descriptors of each file, and prompting the user to 
+		continue after deleting the first ACE that contains an invalid SID. Type 
+		the following at the command line: </font>
+		<p><code><b><font face="Verdana" size="2">subinacl /file *.* 
+		/cleandeletedsidsfrom=domain1=dacl /cleandeletedsidsfrom=domain1=sacl 
+		/ifchangcontinue /confirm</font></b></code></p>
+		<p><font face="Verdana" size="2">Press ENTER.</font></li>
+	</ul>
+	<p><font face="Verdana" size="2"><b>/<a name="perm">perm</a></b></font></p>
+	<ul>
+		<li><font face="Verdana" size="2">The task in this example is to suppress all 
+		existing permission ACEs (PACEs) on the file C:\Test.txt. Type the 
+		following at the command line: </font>
+		<p><code><b><font face="Verdana" size="2">subinacl /file C:\TEST.TXT /perm</font></b></code></p>
+		<p><font face="Verdana" size="2">Press ENTER.</font></li>
+	</ul>
+	<p><font face="Verdana" size="2"><b>/<a name="audit">audit</a></b></font></p>
+	<ul>
+		<li><font face="Verdana" size="2">The task in this example is to suppress all 
+		existing auditing ACEs (AACEs) on the file C:\Test.txt. Type the 
+		following at the command line: </font>
+		<p><code><b><font face="Verdana" size="2">subinacl /file C:\TEST.TXT /audit</font></b></code></p>
+		<p><font face="Verdana" size="2">Press ENTER.</font></li>
+	</ul>
+	<p><font face="Verdana" size="2"><b>/<a name="accesscheck">accesscheck</a></b></font></p>
+	<ul>
+		<li><font face="Verdana" size="2">The task in this example is to display the 
+		access granted to Domain1\User1 on the file C:\Test.txt. Type the 
+		following at the command line: </font>
+		<p><code><b><font face="Verdana" size="2">subinacl /file C:\TEST.TXT 
+		/accesscheck=domain1\user1</font></b></code></p>
+		<p><font face="Verdana" size="2">Press ENTER.</font></li>
+	</ul>
+	<p><font face="Verdana" size="2"><b>/<a name="setprimarygroup">setprimarygroup</a></b></font></p>
+	<ul>
+		<li><font face="Verdana" size="2">The task in this example is to set the primary 
+		group of C:\Test.txt to be Domain1\Group1. Type the following at the 
+		command line: </font>
+		<p><code><b><font face="Verdana" size="2">subinacl /file C:\TEST.TXT 
+		/setprimarygroup=domain1\group1</font></b></code></p>
+		<p><font face="Verdana" size="2">Press ENTER.</font></li>
+	</ul>
+	<p><font face="Verdana" size="2"><b>/<a name="grant">grant</a></b></font></p>
+	<ul>
+		<li><font face="Verdana" size="2">The task in this example is to grant 
+		Domain1\User1 the PACE of Take Ownership on the file C:\Test.txt. Type 
+		the following at the command line: </font>
+		<p><code><b><font face="Verdana" size="2">subinacl /file C:\TEST.TXT 
+		/grant=domain1\user1=o</font></b></code></p>
+		<p><font face="Verdana" size="2">Press ENTER.</font></li>
+	</ul>
+	<ul>
+		<li><font face="Verdana" size="2">The task in this example is to grant 
+		Domain1\User1 the PACEs of Execute and Take Ownership on the file 
+		C:\Test.txt. Type the following at the command line: </font>
+		<p><code><b><font face="Verdana" size="2">subinacl /file C:\TEST.TXT 
+		/grant=domain1\user1=xo</font></b></code></p>
+		<p><font face="Verdana" size="2">Press ENTER.</font></li>
+	</ul>
+	<p><font face="Verdana" size="2"><b>/<a name="deny">deny</a></b></font></p>
+	<ul>
+		<li><font face="Verdana" size="2">The task in this example is to deny 
+		Domain1\User1 the PACE of Take Ownership on the file C:\Test.txt. Type 
+		the following at the command line: </font>
+		<p><code><b><font face="Verdana" size="2">subinacl /file C:\TEST.TXT 
+		/deny=domain1\user1=o</font></b></code></p>
+		<p><font face="Verdana" size="2">Press ENTER.</font></li>
+	</ul>
+	<ul>
+		<li><font face="Verdana" size="2">The task in this example is to deny 
+		Domain1\User1 the PACEs of Execute and Take Ownership on the file 
+		C:\Test.txt. Type the following at the command line: </font>
+		<p><code><b><font face="Verdana" size="2">subinacl /file C:\TEST.TXT 
+		/deny=domain1\user1=xo</font></b></code></p>
+		<p><font face="Verdana" size="2">Press ENTER.</font></li>
+	</ul>
+	<p><font face="Verdana" size="2"><b>/<a name="revoke">revoke</a></b></font></p>
+	<ul>
+		<li><font face="Verdana" size="2">The task in this example is to revoke all PACEs 
+		for Domain1\User1 on the file C:\Test.txt. Type the following at the 
+		command line: </font>
+		<p><code><b><font face="Verdana" size="2">subinacl /file C:\TEST.TXT 
+		/revoke=domain1\user1</font></b></code></p>
+		<p><font face="Verdana" size="2">Press ENTER.</font></li>
+	</ul>
+	<p><font face="Verdana" size="2"><b>/<a name="compactsecuritydescriptor">compactsecuritydescriptor</a></b></font></p>
+	<ul>
+		<li><font face="Verdana" size="2">The task in this example is to compact the size 
+		of security descriptors created by a disk utility. You used the <b>
+		/display=sdsize</b> action to examine the sizes of these security 
+		descriptors, and determined that the utility created large security 
+		descriptors that included very little data. You want to compact these 
+		security descriptors on disk. Type the following at the command line:
+		</font>
+		<p><code><b><font face="Verdana" size="2">subinacl /subdirectories C:\*.* 
+		/compactsecuritydescriptor</font></b></code></p>
+		<p><font face="Verdana" size="2">Press ENTER.</font></li>
+	</ul>
+	<p><font face="Verdana" size="2"><b>/<a name="pathexclude">pathexclude</a></b></font></p>
+	<ul>
+		<li><font face="Verdana" size="2">The task in this example is to prevent a 
+		SubInACL command from displaying information about any folder that has a 
+		name that begins with &quot;TESTING&quot;. Type the following at the command line:
+		</font>
+		<p><code><b><font face="Verdana" size="2">subinacl /file C:\*.* /display 
+		/pathexclude=TESTING*</font></b></code></p>
+		<p><font face="Verdana" size="2">Press ENTER.</font></li>
+	</ul>
+	<p><font face="Verdana" size="2"><b>/<a name="objectexclude">objectexclude</a></b></font></p>
+	<ul>
+		<li><font face="Verdana" size="2">The task in this example is to prevent a 
+		SubInACL command from displaying information about any file with an .asp 
+		extension. Type the following at the command line: </font>
+		<p><code><b><font face="Verdana" size="2">subinacl /file *.* /display 
+		/objectexclude=*.asp</font></b></code></p>
+		<p><font face="Verdana" size="2">Press ENTER.</font></li>
+	</ul>
+	<p><font face="Verdana" size="2"><b><a name="playfile">/playfile</a></b></font></p>
+	<ul>
+		<li><font face="Verdana" size="2">The task in this example is to grant everyone 
+		Read permission on the file C:\Test1.txt, and both Read and Write 
+		permission on the file C:\Test2.txt. You could type the following 
+		SubInACL commands at the command line:
+&nbsp;</font><b><code><p><font face="Verdana" size="2">subinacl /file C:\TEST1.TXT 
+		/grant=everyone=r /noverbose /display<br>
+		subinacl /file C:\TEST2.TXT /grant=everyone=rw /noverbose /display</font></p>
+		</code></b>
+		<p><font face="Verdana" size="2">To perform the same action with a command file 
+		(a playfile), do the following:<br></font><ol><font face="Verdana" size="2">
+			<li><font face="Verdana" size="2">Create a text file named Commandfile.txt 
+			that contains only these lines:
+&nbsp;</font><b><code><p><font face="Verdana" size="2">+file C:\TEST1.TXT<br>
+			/grant=everyone=r<br>
+			/noverbose<br>
+			/display<br>
+			+file C:\TEST2.TXT<br>
+			/grant=everyone=rw<br>
+			/noverbose<br>
+			/display<br></font></code></b></li>
+			<li><font face="Verdana" size="2">Type the following at the command line:
+			</font>
+			<p><code><b><font face="Verdana" size="2">subinacl /playfile COMMANDFILE.TXT</font></b></code></p>
+			<p><font face="Verdana" size="2">Press ENTER.<br></font></li>
+		</font></ol>
+		</li>
+		<li><font face="Verdana" size="2">The task in this example is to save the 
+		security settings of all files on the C: drive to the file D:\Subinaclsave.txt 
+		by using a format that the <b>/playfile</b> command can replay. Type the 
+		following at the command line: </font>
+		<p><code><b><font face="Verdana" size="2">subinacl /noverbose 
+		/outputlog=D:\subinaclsave.txt /subdirectories c:\*.* /display</font></b></code></p>
+		<p><font face="Verdana" size="2">Press ENTER.</font></p>
+		<p><font face="Verdana" size="2">To reapply the saved settings, type the 
+		following at the command line:</font></p>
+		<p><code><b><font face="Verdana" size="2">subinacl /playfile D:\subinaclsave.txt</font></b></code></p>
+		<p><font face="Verdana" size="2">Press ENTER.</font></li>
+	</ul>
+</div>
+&nbsp;<p><b><font face="Verdana" size="4"><a name="Related_Tools">Related Tools</a></font></b><hr class="tools"></p>
+<p><font face="Verdana" size="2">Tools related to Subinacl.exe include:</font></p>
+<ul>
+	<li><font face="Verdana" size="2">Permcopy.exe: Share Permissions Copy</font></li>
+	<li><font face="Verdana" size="2">Perms.exe:&nbsp; User File Permissiong</font></li>
+	<li><font face="Verdana" size="2">Showacls.exe: Show ACLs</font></li>
+</ul>
+
+</body>
+
+</html>

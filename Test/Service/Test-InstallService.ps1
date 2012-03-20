@@ -1,0 +1,154 @@
+
+$servicePath = Join-Path $TestDir NoOpService.exe
+$serviceName = ''
+$serviceAcct = 'CarbonInstallSvcTstAcct'
+$servicePassword = [Guid]::NewGuid().ToString().Substring(0,14)
+
+function Setup
+{
+    $serviceName = 'CarbonTestService' + ([Guid]::NewGuid().ToString())
+    Import-Module (Join-Path $TestDir ..\..\Carbon) -Force
+    Install-User -Username $serviceAcct -Password $servicePassword -Description "Account for testing the Carbon Install-Service function."
+
+}
+
+function TearDown
+{
+    Remove-Service $serviceName
+    Remove-User $serviceAcct
+    Remove-Module Carbon
+}
+
+function Test-ShouldInstallService
+{
+    Install-Service -Name $serviceName -Path $servicePath
+    $service = Assert-ServiceInstalled 
+    Assert-Equal 'Running' $service.Status
+    Assert-Equal $serviceName $service.Name
+    Assert-Equal $serviceName $service.DisplayName
+    Assert-Equal 'Automatic' $service.StartMode
+    Assert-Equal 'NT AUTHORITY\NetworkService' $service.UserName
+}
+
+function Test-ShouldUpdateServiceProperties
+{
+    Install-Service -Name $serviceName -Path $servicePath
+    $service = Assert-ServiceInstalled
+    
+    $tempDir = New-TempDir
+    $newServicePath = Join-Path $TempDir NoOpService.exe
+    Copy-Item $servicePath $newServicePath
+    Install-Service -Name $serviceName -Path $newServicePath -StartupType 'Manual' -Username $serviceAcct -Password $servicePassword
+    $service = Assert-ServiceInstalled
+    Assert-Equal 'Manual' $service.StartMode
+    Assert-Equal ".\$serviceAcct" $service.UserName
+    Assert-Equal 'Running' $service.Status
+    Assert-HasFullControl "$($env:ComputerName)\$serviceAcct" $newServicePath
+}
+
+function Test-ShouldSupportWhatIf
+{
+    Install-Service -Name $serviceName -Path $servicePath -WhatIf
+    $service = Get-Service $serviceName -ErrorAction SilentlyContinue
+    Assert-Null $service
+}
+
+function Test-ShouldSetStartupType
+{
+    Install-Service -Name $serviceName -Path $servicePath -StartupType 'Manual'
+    $service = Assert-ServiceInstalled
+    Assert-Equal 'Manual' $service.StartMode
+}
+
+function Test-ShouldSetCustomAccount
+{
+    Install-Service -Name $serviceName -Path $servicePath -UserName $serviceAcct -Password $servicePassword
+    $service = Assert-ServiceInstalled
+    Assert-Equal ".\$($serviceAcct)" $service.UserName
+    $service = Get-Service $serviceName
+    Assert-Equal 'Running' $service.Status
+}
+
+function Test-ShouldSetFailureActions
+{
+    Install-Service -Name $serviceName -Path $servicePath
+    $service = Assert-ServiceInstalled
+    $failureActionBytes = (Get-ItemProperty "hklm:\System\ControlSet001\services\$serviceName\" -Name FailureActions).FailureActions
+    $failureAction = [Convert]::ToBase64String( $failureActionBytes )
+    Assert-Equal "AAAAAAAAAAAAAAAAAwAAABQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=" $failureAction
+    
+    Install-Service -Name $serviceName -Path $servicePath -ResetFailureCount 1 -OnFirstFailure Restart -OnSecondFailure Restart -OnThirdFailure Reboot -RestartDelay 18000 -RebootDelay 30000
+    $failureActionBytes = (Get-ItemProperty "hklm:\System\ControlSet001\services\$serviceName\" -Name FailureActions).FailureActions
+    $updatedFailureAction = [Convert]::ToBase64String( $failureActionBytes )
+
+    # First four bytes are reset failure count period.  
+    Assert-Equal $failureActionBytes[0] 1 # The reset failure count
+
+    Assert-Equal 1 $failureActionBytes[20] # Restart on first failure
+    # Bytes 24-27 are the delay in milliseconds
+    $delay = [int]$failureActionBytes[24]
+    $delay = $delay -bor ([int]$failureActionBytes[25] * 256)
+    Assert-Equal 18000 $delay 
+
+    Assert-Equal 1 $failureActionBytes[28] # Restart on second failure
+    # Bytes 32-35 are the delay in milliseconds
+    $delay = [int]$failureActionBytes[32]
+    $delay = $delay -bor ([int]$failureActionBytes[33] * 256)
+    Assert-Equal 18000 $delay 
+
+    Assert-Equal 2 $failureActionBytes[36] # Reboot on third failure
+    # Bytes 40-43 are the delay in milliseconds
+    $delay = [int]$failureActionBytes[40]
+    $delay = $delay -bor ([int]$failureActionBytes[41] * 256)
+    Assert-Equal 30000 $delay 
+
+    Assert-NotEqual $updatedFailureAction $failureAction
+}
+
+function Test-ShouldSetDependencies
+{
+    $firstService = (Get-Service)[0]
+    $secondService = (Get-Service)[1]
+    Install-Service -Name $serviceName -Path $servicePath -Dependencies $firstService.Name,$secondService.Name
+    $dependencies = & (Join-Path $env:SystemRoot system32\sc.exe) enumdepend $firstService.Name
+    Assert-ContainsLike $dependencies "SERVICE_NAME: $serviceName"
+    $dependencies = & (Join-Path $env:SystemRoot system32\sc.exe) enumdepend $secondService.Name
+    Assert-ContainsLike $dependencies "SERVICE_NAME: $serviceName"
+}
+
+function Test-ShouldTestDependenciesExist
+{
+    $failed = $false
+    try
+    {
+        Install-Service -Name $serviceName -Path $servicePath -Dependencies IAmAServiceThatDoesNotExist
+    }
+    catch
+    {
+        $failed = $true
+    }
+    Assert-True $failed "Didn't fail when given a non-existent dependent service."
+}
+
+
+function Assert-ServiceInstalled
+{
+    $service = Get-Service $serviceName
+    Assert-NotNull $service
+    return $service
+}
+
+function Assert-HasFullControl($Identity, $Path)
+{
+    $acl = Get-Acl $Path
+    foreach( $rule in $acl.Access )
+    {
+        if( $rule.IdentityREference -eq $Identity -and $rule.FileSystemRights -eq 'FullControl' )
+        {
+            return
+        }
+    }
+    
+    Fail "'$Identity' didn't have full control to '$Path'."
+            
+}

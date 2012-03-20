@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Types>
+    <Type>
+        <Name>System.Diagnostics.Process</Name>
+        <Members>
+            <ScriptProperty>
+                <Name>ParentProcessID</Name>
+                <GetScriptBlock>
+                    (Get-WmiObject Win32_Process -f "ProcessID='$($_.Id)'").ParentProcessID
+                </GetScriptBlock>
+            </ScriptProperty>
+        </Members>
+    </Type>
+    <Type>
+        <Name>System.ServiceProcess.ServiceController</Name>
+        <Members>
+            <ScriptProperty>
+                <Name>StartMode</Name>
+                <GetScriptBlock>
+                    $startMode = (Get-WmiObject -Query "Select StartMode From Win32_Service Where Name='$($this.ServiceName)'").StartMode
+                    if( $startMode -eq 'Auto' )
+                    {
+                        $startMode = 'Automatic'
+                    }
+                    [System.ServiceProcess.ServiceStartMode]$startMode
+                </GetScriptBlock>
+            </ScriptProperty>
+            <ScriptProperty>
+                <Name>UserName</Name>
+                <GetScriptBlock>
+                    (Get-WmiObject -Query "Select StartName From Win32_Service Where Name='$($this.ServiceName)'").StartName
+                </GetScriptBlock>
+            </ScriptProperty>
+        </Members>
+    </Type>
+</Types>
