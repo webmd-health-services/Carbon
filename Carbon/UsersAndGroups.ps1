@@ -79,7 +79,17 @@ function Find-UserOrGroup
         $Name
     )
 
+    $shortName = $Name
     $container = [adsi] "WinNT://$($env:ComputerName),computer"
+    if( $Name.Contains("\") )
+    {
+        $parts = $Name -split '\',2,'SimpleMatch'
+        $domain = $parts[0]
+        $shortName = $parts[1]
+        
+        $domainController = Get-ADDomainController -Domain $domain
+        $container = [adsi] ('WinNT://{0}' -f $domainController)
+    }
 
     if( -not $container )
     {
@@ -89,7 +99,7 @@ function Find-UserOrGroup
     
     try
     {
-        return $container.Children.Find($adName, "User")
+        return $container.Children.Find($shortName, "User")
     }
     catch
     {
@@ -100,7 +110,7 @@ function Find-UserOrGroup
     {
         try
         {
-            return $container.Children.Find($adName, "Group")
+            return $container.Children.Find($shortName, "Group")
         }
         catch
         {
