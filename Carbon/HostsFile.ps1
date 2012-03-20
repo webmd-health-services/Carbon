@@ -85,7 +85,7 @@ function Set-HostsEntry
        throw "Could not find hosts file at: $Path"
     }
      
-    $lines = Get-Content -Path $Path
+    $lines = @( Get-Content -Path $Path )
     $outLines = New-Object System.Collections.ArrayList
     $found = $false
      

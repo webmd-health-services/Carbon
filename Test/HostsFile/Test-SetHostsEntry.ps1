@@ -10,6 +10,7 @@ function Setup
 function TearDown
 {
     Set-Content -Path (Get-PathToHostsFile) -Value $originalHostsFile
+    Remove-Module Carbon
 }
 
 function Test-ShouldUpdateExistingHostsEntry
@@ -68,6 +69,16 @@ function Test-ShouldSupportWhatIf
     Set-HostsEntry -IPAddress '127.0.0.1' -Hostname 'example.com' -WhatIf
     
     Assert-HostsFileContains '127.0.0.1       localhost'
+}
+
+function Test-ShouldSetEntryInEmptyHostsFile
+{
+    Remove-Item (Get-PathToHostsFile)
+    New-Item -Path (Get-PathToHostsFile) -ItemType File
+    
+    Set-HostsEntry -IPAddress '127.0.0.1' -Hostname 'example.com'
+    
+    Assert-HostsFileContains '127.0.0.1       example.com'
 }
 
 function Assert-HostsFileContains($Line)
