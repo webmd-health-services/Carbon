@@ -1,4 +1,39 @@
 
+Add-Type -AssemblyName System.DirectoryServices.AccountManagement
+
+function Get-ADDomainController
+{
+    <#
+    .SYNOPSIS
+    Gets the domain controller of the current computer's domain, or for specific domain.
+    #>
+    [CmdletBinding()]
+    param(
+        [string]
+        # The domain whose domain controller to get.  If not given, gets the current computer's domain controller.
+        $Domain
+    )
+    
+    if( $Domain )
+    {
+        try
+        {
+            $principalContext = New-Object DirectoryServices.AccountManagement.PrincipalContext Domain,$Domain
+            return $principalContext.ConnectedServer
+        }
+        catch
+        {
+            Write-Error "Unable to find domain controller for domain '$Domain'."
+            return $null
+        }
+    }
+    else
+    {
+        $root = New-Object DirectoryServices.DirectoryEntry "LDAP://RootDSE"
+        return  $root.Properties["dnsHostName"][0].ToString();
+    }
+}
+
 function Find-ADUser
 {
     <#
