@@ -164,3 +164,30 @@ function Set-EnvironmentVariable
     }
     
 }
+
+
+function Test-OSIs32Bit
+{
+    <#
+    .SYNOPSIS
+    Tests if the current operating system is 32-bit.
+    #>
+    [CmdletBinding()]
+    param(
+    )
+    
+    return -not (Test-OSIs64Bit)
+}
+
+function Test-OSIs64Bit
+{
+    <#
+    .SYNOPSIS
+    Tests if the current operating system is 64-bit.
+    #>
+    [CmdletBinding()]
+    param(
+    )
+    
+    return (Test-Path env:"ProgramFiles(x86)")
+}
