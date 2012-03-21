@@ -2,7 +2,6 @@
 $serviceBaseName = 'CarbonGrantControlServiceTest'
 $serviceName = $serviceBaseName
 $servicePath = Join-Path $TestDir NoOpService.exe
-$subInAclPath = Join-Path $TestDir ..\..\bin\subinacl.exe -Resolve
 
 $user = 'CarbonGrantCntrlSvcUsr'
 $password = [Guid]::NewGuid().ToString().Substring(0,14)
