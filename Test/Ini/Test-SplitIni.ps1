@@ -32,7 +32,6 @@ option2 = value7
 
 [section5]
 option1=value8
-
 "@
     
     $iniContent > $iniPath

@@ -268,7 +268,14 @@ function Split-Ini
         }
     }
     
-    if( -not $PassThru )
+    if( $PassThru )
+    {
+        if( $lastSetting )
+        {
+            $lastSetting
+        }
+    }
+    else
     {
         return $settings
     }
