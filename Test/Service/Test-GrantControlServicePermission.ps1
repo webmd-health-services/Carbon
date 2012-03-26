@@ -3,7 +3,7 @@ $serviceBaseName = 'CarbonGrantControlServiceTest'
 $serviceName = $serviceBaseName
 $servicePath = Join-Path $TestDir NoOpService.exe
 
-$user = 'CarbonGrantCntrlSvcUsr'
+$user = 'CrbnGrantCntrlSvcUsr'
 $password = [Guid]::NewGuid().ToString().Substring(0,14)
 $userPermStartPattern = "/pace =$($env:ComputerName)\$user*"
     

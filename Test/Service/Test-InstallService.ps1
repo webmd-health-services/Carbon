@@ -1,7 +1,7 @@
 
 $servicePath = Join-Path $TestDir NoOpService.exe
 $serviceName = ''
-$serviceAcct = 'CarbonInstallSvcTstAcct'
+$serviceAcct = 'CrbnInstllSvcTstAcct'
 $servicePassword = [Guid]::NewGuid().ToString().Substring(0,14)
 
 function Setup
