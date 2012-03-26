@@ -1,19 +1,25 @@
 
-$username = 'CarbonComputerInstllUsr'
+$username = 'CarbonInstallUser'
 $password = [Guid]::NewGuid().ToString().Substring(0,14)
 
 function Setup
 {
     Import-Module (Join-Path $TestDir ..\..\Carbon) -Force
+    Remove-TestUser
 }
 
 function TearDown
+{
+    Remove-TestUser
+    Remove-Module Carbon
+}
+
+function Remove-TestUser
 {
     if( Test-User -Username $username )
     {
         Remove-User -Username $username
     }
-    Remove-Module Carbon
 }
 
 function Test-ShouldCreateNewUser
