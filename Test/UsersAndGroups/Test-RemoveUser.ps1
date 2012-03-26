@@ -1,5 +1,5 @@
 
-$username = 'CarbonComputerTstRmvUsr'
+$username = 'CarbonRemoveUser'
 $password = [Guid]::NewGuid().ToString().Substring(0,14)
 
 function Setup
