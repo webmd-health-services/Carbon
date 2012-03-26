@@ -22,18 +22,18 @@ function Test-GetPathRelativeToWithExplicitPath
 
 function Test-GetPathRelativeToFromPipeline
 {
-    $to = [System.IO.Path]::GetFullPath( (Join-Path $TestDir '..\..\FileSystem.ps1') )
+    $to = [System.IO.Path]::GetFullPath( (Join-Path $TestDir '..\..\Carbon\FileSystem.ps1') )
     
     $relativePath = Get-Item $to | Get-PathRelativeTo $TestDir
-    Assert-Equal '..\..\FileSystem.ps1' $relativePath
+    Assert-Equal '..\..\Carbon\FileSystem.ps1' $relativePath
 }
 
 function Test-GetsPathFromFilePath
 {
-    $to = [System.IO.Path]::GetFullPath( (Join-Path $TestDir '..\..\FileSystem.ps1') )
+    $to = [System.IO.Path]::GetFullPath( (Join-Path $TestDir '..\..\Carbon\FileSystem.ps1') )
     
     $relativePath = Get-Item $to | Get-PathRelativeTo $TestScript 'File'
-    Assert-Equal '..\..\FileSystem.ps1' $relativePath
+    Assert-Equal '..\..\Carbon\FileSystem.ps1' $relativePath
 }
 
 function Test-GetsRelativePathForMultiplePaths
