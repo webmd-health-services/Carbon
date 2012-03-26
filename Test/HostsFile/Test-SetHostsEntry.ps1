@@ -1,16 +1,55 @@
 
 $originalHostsFile = ''
+$customHostsFile = ''
 
 function Setup
 {
+    $customHostsFile = Join-Path $env:temp ([IO.Path]::GetRandomFileName())
+    @"
+# Copyright (c) 1993-1999 Microsoft Corp.
+#
+# This is a sample HOSTS file used by Microsoft TCP/IP for Windows.
+#
+# This file contains the mappings of IP addresses to host names. Each
+# entry should be kept on an individual line. The IP address should
+# be placed in the first column followed by the corresponding host name.
+# The IP address and the host name should be separated by at least one
+# space.
+#
+# Additionally, comments (such as these) may be inserted on individual
+# lines or following the machine name denoted by a '#' symbol.
+#
+# For example:
+#
+#      102.54.94.97     rhino.acme.com          # source server
+#       38.25.63.10     x.acme.com              # x client host
+
+127.0.0.1       localhost
+"@ | Out-File -FilePath $customHostsfile -Encoding OEM
+
     Import-Module (Join-Path $TestDir ..\..\Carbon -Resolve) -Force
-    $originalHostsfile = Get-Content (Get-PathToHostsFile)
 }
 
 function TearDown
 {
-    Set-Content -Path (Get-PathToHostsFile) -Value $originalHostsFile
+    Remove-Item $customHostsFile
     Remove-Module Carbon
+}
+
+function Test-ShouldOperateOnSystemHostsFileByDefault
+{
+    $originalHostsfile = Get-Content (Get-PathToHostsFile)
+
+    try
+    {
+        Set-HostsEntry -IPAddress '5.6.7.8' -HostName 'example.com' -Description 'Customizing example.com'
+    
+        Assert-HostsFileContains -Line "5.6.7.8         example.com`t# Customizing example.com"  -Path (Get-PathToHostsFile)
+    }
+    finally
+    {
+        Set-Content -Path (Get-PathToHostsFile) -Value $originalHostsFile
+    }
 }
 
 function Test-ShouldUpdateExistingHostsEntry
@@ -20,7 +59,7 @@ function Test-ShouldUpdateExistingHostsEntry
     
     Assert-HostsFileContains -Line $hostsEntry
     
-    Set-HostsEntry -IPAddress '5.6.7.8' -HostName 'example.com' -Description 'Customizing example.com'
+    Set-HostsEntry -IPAddress '5.6.7.8' -HostName 'example.com' -Description 'Customizing example.com' -Path $customHostsFile
     
     Assert-HostsFileContains -Line "5.6.7.8         example.com`t# Customizing example.com"  
 }
@@ -31,7 +70,7 @@ function Test-ShouldAddNewHostsEntry
     $hostname = 'shouldaddnewhostsentry.example.com'
     $description = 'testing if new hosts entries get added'
     
-    Set-HostsEntry -IPAddress $ip -Hostname $hostname -Description $description
+    Set-HostsEntry -IPAddress $ip -Hostname $hostname -Description $description -Path $customHostsFile
     
     Assert-HostsFileContains -Line "$ip $hostname`t# $description"
 }
@@ -43,7 +82,7 @@ function Test-ShouldRemoveComment
     
     "$ip $hostname  # this comment should get removed" | Out-HostsFile
     
-    Set-HostsEntry -IPAddress $ip -HostName $hostname
+    Set-HostsEntry -IPAddress $ip -HostName $hostname -Path $customHostsFile
    
     Assert-HostsFileContains -Line "$ip         $hostname"
 }
@@ -56,7 +95,7 @@ function Test-ShouldCommentOutDuplicates
     $line = "$ip $hostname"
     ($line,$line) | Out-HostsFile
     
-    Set-HostsEntry -IPAddress $ip -HostName $hostname
+    Set-HostsEntry -IPAddress $ip -HostName $hostname -Path $customHostsFile
     
     Assert-HostsFileContains -Line "$ip         $hostname"
     Assert-HostsFileContains -Line "#$ip $hostname"
@@ -64,26 +103,35 @@ function Test-ShouldCommentOutDuplicates
 
 function Test-ShouldSupportWhatIf
 {
-    Reset-HostsFile
+    Reset-HostsFile -Path $customHostsFile
     
-    Set-HostsEntry -IPAddress '127.0.0.1' -Hostname 'example.com' -WhatIf
+    Set-HostsEntry -IPAddress '127.0.0.1' -Hostname 'example.com' -WhatIf -Path $customHostsFile
     
     Assert-HostsFileContains '127.0.0.1       localhost'
 }
 
 function Test-ShouldSetEntryInEmptyHostsFile
 {
-    Remove-Item (Get-PathToHostsFile)
-    New-Item -Path (Get-PathToHostsFile) -ItemType File
+    Remove-Item $customHostsFile
+    New-Item -Path $customHostsFile -ItemType File
     
-    Set-HostsEntry -IPAddress '127.0.0.1' -Hostname 'example.com'
+    Set-HostsEntry -IPAddress '127.0.0.1' -Hostname 'example.com' -Path $customHostsFile
     
     Assert-HostsFileContains '127.0.0.1       example.com'
 }
 
-function Assert-HostsFileContains($Line)
+function Test-ShouldHandleMissingHostsFile
 {
-    $hostsFile = Get-Content (Get-PathToHostsFile)
+    Remove-Item $customHostsFile
+    
+    Set-HostsEntry -IPAddress '127.0.0.1' -Hostname 'example.com' -Path $customHostsFile
+    
+    Assert-HostsFileContains '127.0.0.1       example.com'
+}
+
+function Assert-HostsFileContains($Line, $Path = $customHostsFile)
+{
+    $hostsFile = Get-Content $Path
     Assert-Contains $hostsFile $Line "Hosts file"
 }
 
@@ -91,6 +139,6 @@ filter Out-HostsFile
 {
     process
     {
-        $_ | Out-File (Get-PathToHostsFile) -Append -Encoding ASCII
+        $_ | Out-File $customHostsFile -Append -Encoding OEM
     }
 }

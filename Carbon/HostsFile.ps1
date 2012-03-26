@@ -23,10 +23,11 @@ function Reset-HostsFile
  
     if(-not (Test-Path $Path) )
     {
-       throw "Could not find hosts file '$Path'."
+       Write-Warning "Creating hosts file '$Path'."
+       New-Item $Path -ItemType File
     }
     
-    $lines = Get-Content -Path $Path
+    $lines = @( Get-Content -Path $Path )
     $outLines = New-Object System.Collections.ArrayList
     foreach($line in $lines)
     {
@@ -37,16 +38,16 @@ function Reset-HostsFile
         }
         else
         {
-            [void] $outlines.Add("127.0.0.1       localhost")
             break
         }
     }
     
+    [void] $outlines.Add("127.0.0.1       localhost")
     
     if( $pscmdlet.ShouldProcess( $Path, "Reset-HostsFile" ) )
     {
         Write-Host "Clearing all hosts entries from '$Path'."
-        Set-Content -Path $Path -Value $outlines
+        $outlines | Out-File -FilePath $Path -Encoding OEM
     }
             
      
@@ -82,7 +83,8 @@ function Set-HostsEntry
     
     if(-not (Test-Path $Path))
     {
-       throw "Could not find hosts file at: $Path"
+        Write-Warning "Creating hosts file at: $Path"
+        New-Item $Path -ItemType File
     }
      
     $lines = @( Get-Content -Path $Path )
@@ -142,10 +144,10 @@ function Set-HostsEntry
        $outline = $lineformat -f $IPAddress, $HostName, $tail
        [void] $outlines.Add($outline)
     }
-   
+    
     if( $pscmdlet.ShouldProcess( $Path, "set hosts entry $HostName to point to $IPAddress" ) )
     {
-        Set-Content -Path $Path -Value $outlines
+        $outlines | Out-File -FilePath $Path -Encoding OEM
     }
      
 }
