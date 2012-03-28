@@ -40,7 +40,7 @@ function Test-ShouldCreateNewUser
     $description = "Test user for testing the Carbon Install-User function."
     Install-User -Username $username -Password $password -Description $description
     Assert-True (Test-User -Username $username)
-    $user = Get-User -Username $Username
+    $user = Get-WmiLocalUserAccount -Username $Username
     Assert-NotNull $user
     Assert-Equal $description $user.Description
     Assert-False $user.PasswordExpires 
@@ -49,12 +49,12 @@ function Test-ShouldCreateNewUser
 function Test-ShouldUpdateExistingUsersProperties
 {
     Install-User -Username $username -Password $password -Description "Original description"
-    $originalUser = Get-User -Username $username
+    $originalUser = Get-WmiLocalUserAccount -Username $username
     Assert-NotNull $originalUser
     
     $newDescription = "New description"
     Install-User -Username $username -Password ([Guid]::NewGuid().ToString().Substring(0,14)) -Description $newDescription
-    $newUser = Get-User -Username $username
+    $newUser = Get-WmiLocalUserAccount -Username $username
     Assert-NotNull $newUser
     Assert-Equal $originalUser.SID $newUser.SID
     Assert-Equal $newDescription $newUser.Description
@@ -63,6 +63,6 @@ function Test-ShouldUpdateExistingUsersProperties
 function Test-ShouldSupportWhatIf
 {
     Install-User -Username $username -Password $password -WhatIf
-    $user = Get-User -Username $username
+    $user = Get-WmiLocalUserAccount -Username $username
     Assert-Null $user
 }

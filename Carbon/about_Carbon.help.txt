@@ -212,6 +212,7 @@ FUNCTIONS
 	 USERS AND GROUPS
 	     Mange LOCAL users and groups
 	       * Add-GroupMembers
+		   * Get-WmiLocalUserAccount
 	       * Install-Group
 	       * Install-User
 	       * Remove-User

@@ -115,6 +115,23 @@ function Add-GroupMembers
     }
 }
 
+function Get-WmiLocalUserAccount
+{
+    <#
+    .SYNOPSIS
+    Gets the given user account.
+    #>
+    [CmdletBinding(SupportsShouldProcess=$true)]
+    param(
+        [Parameter(Mandatory=$true)]
+        [ValidateLength(0,20)]
+        [string]
+        $Username
+    )
+    
+    return Get-WmiObject Win32_UserAccount -Filter "Domain='$($env:ComputerName)' and Name='$Username'"
+}
+
 function Install-Group
 {
     <#
@@ -193,7 +210,7 @@ function Install-User
         
         if( -not $userExists )
         {
-            $user = Get-WmiObject Win32_UserAccount -Filter "Domain='$($env:ComputerName)' and Name='$Username'"
+            $user = Get-WmiLocalUserAccount -Username $Username
             $user.PasswordExpires = $false
             $user.Put()
         }
