@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Add-MembersToGroup
+function Add-GroupMembers
 {
     <#
     .SYNOPSIS
@@ -30,6 +30,54 @@ function Add-MembersToGroup
         # The users/groups to add to a group.
         $Members
     )
+
+	function Find-UserOrGroup
+	{
+		[CmdletBinding()]
+		param(
+			# The user or group name
+			$Name
+		)
+
+		$shortName = $Name
+		$container = [adsi] "WinNT://$($env:ComputerName),computer"
+		if( $Name.Contains("\") )
+		{
+			$parts = $Name -split '\',2,'SimpleMatch'
+			$domain = $parts[0]
+			$shortName = $parts[1]
+			
+			$domainController = Get-ADDomainController -Domain $domain
+			$container = [adsi] ('WinNT://{0}' -f $domainController)
+		}
+
+		if( -not $container )
+		{
+			Write-Error "Unable to find container for '$Name'."
+			return $null
+		}
+		
+		try
+		{
+			return $container.Children.Find($shortName, "User")
+		}
+		catch
+		{
+			$entry = $null
+		}
+		
+		if( $entry -eq $null )
+		{
+			try
+			{
+				return $container.Children.Find($shortName, "Group")
+			}
+			catch
+			{
+				return $null
+			}
+		}
+	}
     
     $Builtins = @{ 'NetworkService' = $true }
     
@@ -63,71 +111,6 @@ function Add-MembersToGroup
                 Write-Host "Adding $($adMember.Name) to group $Name."
                 [void] $group.Add( $adMember.Path )
             }
-        }
-    }
-}
-
-function Get-User
-{
-    <#
-    .SYNOPSIS
-    Gets the given user account.
-    #>
-    [CmdletBinding(SupportsShouldProcess=$true)]
-    param(
-        [Parameter(Mandatory=$true)]
-        [ValidateLength(0,20)]
-        [string]
-        $Username
-    )
-    
-    return Get-WmiObject Win32_UserAccount -Filter "Domain='$($env:ComputerName)' and Name='$Username'"
-}
-
-function Find-UserOrGroup
-{
-    [CmdletBinding()]
-    param(
-        # The user or group name
-        $Name
-    )
-
-    $shortName = $Name
-    $container = [adsi] "WinNT://$($env:ComputerName),computer"
-    if( $Name.Contains("\") )
-    {
-        $parts = $Name -split '\',2,'SimpleMatch'
-        $domain = $parts[0]
-        $shortName = $parts[1]
-        
-        $domainController = Get-ADDomainController -Domain $domain
-        $container = [adsi] ('WinNT://{0}' -f $domainController)
-    }
-
-    if( -not $container )
-    {
-        Write-Error "Unable to find container for '$Name'."
-        return $null
-    }
-    
-    try
-    {
-        return $container.Children.Find($shortName, "User")
-    }
-    catch
-    {
-        $entry = $null
-    }
-    
-    if( $entry -eq $null )
-    {
-        try
-        {
-            return $container.Children.Find($shortName, "Group")
-        }
-        catch
-        {
-            return $null
         }
     }
 }
@@ -167,7 +150,7 @@ function Install-Group
     
     if( $Members )
     {
-        Add-MembersToGroup -Name $Name -Members $Members
+        Add-GroupMembers -Name $Name -Members $Members
     }
 }
 
@@ -210,7 +193,7 @@ function Install-User
         
         if( -not $userExists )
         {
-            $user = Get-User -Username $Username
+            $user = Get-WmiObject Win32_UserAccount -Filter "Domain='$($env:ComputerName)' and Name='$Username'"
             $user.PasswordExpires = $false
             $user.Put()
         }

@@ -48,7 +48,7 @@ function Get-LocalUsers
 
 function Invoke-AddMembersToGroup($Members = @())
 {
-    Add-MembersToGroup -Name $GroupName -Member $Members
+    Add-GroupMembers -Name $GroupName -Member $Members
     Assert-MembersInGroup -Member $Members
 }
 
@@ -89,7 +89,7 @@ function Test-ShouldAddMultipleMembers
 
 function Test-ShouldSupportShouldProcess
 {
-    Add-MembersToGroup -Name $GroupName -Members 'WBMD\WHS - Lifecycle Services' -WhatIf
+    Add-GroupMembers -Name $GroupName -Members 'WBMD\WHS - Lifecycle Services' -WhatIf
     $details = net localgroup $GroupName
     foreach( $line in $details )
     {
@@ -99,9 +99,14 @@ function Test-ShouldSupportShouldProcess
 
 function Test-ShouldAddNetworkService
 {
-    Add-MembersToGroup -Name $GroupName -Members 'NetworkService'
+    Add-GroupMembers -Name $GroupName -Members 'NetworkService'
     $details = net localgroup $GroupName
     Assert-ContainsLike $details 'NT AUTHORITY\Network Service'
+}
+
+function Test-ShouldNotAddNonExistentMember
+{
+    
 }
 
 function Assert-MembersInGroup($Members)
