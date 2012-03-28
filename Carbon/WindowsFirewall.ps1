@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Assert-WindowsFirewallConfigurable
+function Assert-FirewallConfigurable
 {
     if( (Get-Service 'Windows Firewall').Status -ne 'Running' ) 
     {
@@ -27,7 +27,7 @@ function Disable-FirewallStatefulFtp
     [CmdletBinding(SupportsShouldProcess=$true)]
     param()
     
-    if( -not (Assert-WindowsFirewallConfigurable) )
+    if( -not (Assert-FirewallConfigurable) )
     {
         return
     }
@@ -44,7 +44,7 @@ function Enable-FirewallStatefulFtp
     [CmdletBinding(SupportsShouldProcess=$true)]
     param()
     
-    if( -not (Assert-WindowsFirewallConfigurable) )
+    if( -not (Assert-FirewallConfigurable) )
     {
         return
     }
@@ -85,7 +85,7 @@ function Get-FirewallRules
     #>
     param()
     
-    if( -not (Assert-WindowsFirewallConfigurable) )
+    if( -not (Assert-FirewallConfigurable) )
     {
         return
     }
@@ -132,7 +132,7 @@ function Test-FirewallStatefulFtp
     [CmdletBinding()]
     param()
     
-    if( -not (Assert-WindowsFirewallConfigurable) )
+    if( -not (Assert-FirewallConfigurable) )
     {
         return
     }
