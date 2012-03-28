@@ -48,7 +48,7 @@ function Test-ShouldGrantControlServicePermission
         }
     }
     
-    Grant-ControlServicePermission -ServiceName $serviceName -Identity $user
+    Grant-ServiceControlPermission -ServiceName $serviceName -Identity $user
     Assert-LastProcessSucceeded
     
     $currentPerms = Invoke-SubInAcl /service $serviceName /display
@@ -71,7 +71,7 @@ function Test-ShouldGrantControlServicePermission
 
 function Test-ShouldSupportWhatIf
 {
-    Grant-ControlServicePermission -ServiceName $serviceName -Identity $user -WhatIf
+    Grant-ServiceControlPermission -ServiceName $serviceName -Identity $user -WhatIf
     
     $currentPerms = Invoke-SubInAcl /service $serviceName /display
     foreach( $line in $currentPerms )
