@@ -51,7 +51,9 @@ function Test-AllFilesShouldHaveLicense
     
     $expectedNotice = $noticeLines -join "`n"
     $filesToSkip = @{
-        'Set-LicenseNotice.ps1' = $True;
+        'Set-LicenseNotice.ps1' = $true;
+        'about_Carbon.help.txt' = $true;
+        'Carbon.types.ps1xml' = $true;
     }
     
     $filesMissingLicense = New-Object Collections.Generic.List[string]
