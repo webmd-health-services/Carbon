@@ -53,7 +53,7 @@ function Disable-IEEnhancedSecurityConfiguration
     
 }
 
-function Enable-ActivationPermissionsForIE
+function Enable-IEActivationPermissions
 {
     $sddlForIe =   "O:BAG:BAD:(A;;CCDCSW;;;SY)(A;;CCDCLCSWRP;;;BA)(A;;CCDCSW;;;IU)(A;;CCDCLCSWRP;;;S-1-5-21-762517215-2652837481-3023104750-5681)"
     $binarySD = ([wmiclass]"Win32_SecurityDescriptorHelper").SDDLToBinarySD($sddlForIE)
