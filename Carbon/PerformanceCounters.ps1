@@ -82,25 +82,6 @@ function Install-PerformanceCounter
     }
 }
 
-function Uninstall-PerformanceCounterCategory
-{
-    [CmdletBinding(SupportsShouldProcess=$true)]
-    param(
-        [Parameter(Mandatory=$true)]
-        [string]
-        # The performance counter's category name.
-        $CategoryName
-    )
-    
-    if( (Test-PerformanceCounterCategory -CategoryName $CategoryName) )
-    {
-        if( $pscmdlet.ShouldProcess( $CategoryName, 'uninstall performance counter category' ) )
-        {
-            [Diagnostics.PerformanceCounterCategory]::Delete( $CategoryName )
-        }
-    }
-}
-
 function Test-PerformanceCounter
 {
     [CmdletBinding()]
@@ -137,4 +118,21 @@ function Test-PerformanceCounterCategory
     return [Diagnostics.PerformanceCounterCategory]::Exists( $CategoryName )
 }
 
-
+function Uninstall-PerformanceCounterCategory
+{
+    [CmdletBinding(SupportsShouldProcess=$true)]
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]
+        # The performance counter's category name.
+        $CategoryName
+    )
+    
+    if( (Test-PerformanceCounterCategory -CategoryName $CategoryName) )
+    {
+        if( $pscmdlet.ShouldProcess( $CategoryName, 'uninstall performance counter category' ) )
+        {
+            [Diagnostics.PerformanceCounterCategory]::Delete( $CategoryName )
+        }
+    }
+}
