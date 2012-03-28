@@ -19,21 +19,21 @@ DESCRIPTION
       * Shares
       * Windows features/components
       * And much more!
-	  
-	 All functions are designed to be idempotent: you should be able to run the same function with the same arguments and get the same result, without any failures.  You'll notice Carbon uses the Install and Set PowerShell verb a lot, instead of New/Update.  It wants to be clear that it handles cases where something new needs to be created and that same thing may already exist and needs to get updates.
-	 
-	 Carbon uses semantic versioning for its version numbering (see http://semver.org/).  Carbon version numbers take the form X.Y.Z: X is the major version, Y is the minor version, and Z is the patch version.  The patch version is incremented when backwards-compatible bug fixes are made.  You should feel comforable rolling out a new patch version quickly, with limited testing.  The minor version is incremented when new, backwards-compatible changes are introduced, or existing functions are deprecated.  You'll probably want to review the changelog and test those bits that changed since your last release.  The major version is incremented when backwards-incompatible changes are made.  In this case, you'll need to do thorough testing, and upgrade your scripts to use new functionality.
-	 
-	 Only PowerShell approvated verbs are used in function names.  Our canonical source for verbs and their meaning comes from Appendix J: Standard PowerShell Verbs from "PowerShell Cookbook, Second Edition" by Lee Holmes.  Additionally, these verbs have the following meaning in Carbon:
-	   
-	   * Assert: Test a condition, writing an error or failing if it isn't met (e.g Assert-AdminPrivileges).
-	   * Format: Escape (e.g. Format-ADSpecialCharacters).
-	   * Install: Create if it doesn't exist.  If it does exist, reset it to a given state.  (E.g. Install-User, Install-IisWebsite, etc.)
-	   * Invoke: Run an external command line application (e.g. Invoke-AppCmd, Invoke-WindowsInstaller).
-	   * Split: Parse (e.g. Split-Ini)
-	   * Test: Check a condition or for existence (e.g. Test-IisWebsite, Test-SslCertificateBinding, Test-PathIsJunction).
-	   
-	 As much as possible, Carbon uses existing Windows command line utilties that ship by default with Windows 2008 and Windows 7.  No additional features/components are necessare to use Carbon.  When command line tools aren't available, Carbon uses .NET.  If .NET doesn't expose needed APIs, it uses P/Invoke to talk to the Win32 APIs.
+      
+     All functions are designed to be idempotent: you should be able to run the same function with the same arguments and get the same result, without any failures.  You'll notice Carbon uses the Install and Set PowerShell verb a lot, instead of New/Update.  It wants to be clear that it handles cases where something new needs to be created and that same thing may already exist and needs to get updates.
+     
+     Carbon uses semantic versioning for its version numbering (see http://semver.org/).  Carbon version numbers take the form X.Y.Z: X is the major version, Y is the minor version, and Z is the patch version.  The patch version is incremented when backwards-compatible bug fixes are made.  You should feel comforable rolling out a new patch version quickly, with limited testing.  The minor version is incremented when new, backwards-compatible changes are introduced, or existing functions are deprecated.  You'll probably want to review the changelog and test those bits that changed since your last release.  The major version is incremented when backwards-incompatible changes are made.  In this case, you'll need to do thorough testing, and upgrade your scripts to use new functionality.
+     
+     Only PowerShell approvated verbs are used in function names.  Our canonical source for verbs and their meaning comes from Appendix J: Standard PowerShell Verbs from "PowerShell Cookbook, Second Edition" by Lee Holmes.  Additionally, these verbs have the following meaning in Carbon:
+       
+       * Assert: Test a condition, writing an error or failing if it isn't met (e.g Assert-AdminPrivileges).
+       * Format: Escape (e.g. Format-ADSpecialCharacters).
+       * Install: Create if it doesn't exist.  If it does exist, reset it to a given state.  (E.g. Install-User, Install-IisWebsite, etc.)
+       * Invoke: Run an external command line application (e.g. Invoke-AppCmd, Invoke-WindowsInstaller).
+       * Split: Parse (e.g. Split-Ini)
+       * Test: Check a condition or for existence (e.g. Test-IisWebsite, Test-SslCertificateBinding, Test-PathIsJunction).
+       
+     As much as possible, Carbon uses existing Windows command line utilties that ship by default with Windows 2008 and Windows 7.  No additional features/components are necessare to use Carbon.  When command line tools aren't available, Carbon uses .NET.  If .NET doesn't expose needed APIs, it uses P/Invoke to talk to the Win32 APIs.
 
 SYSTEM REQUIREMENTS
     Windows 2008 (x64) and Windows 7 (x64).
@@ -56,226 +56,226 @@ INSTALLATION
       * %USERPROFILE%\Documents\WindowsPowerShell\Modules\Carbon
       
 USAGE
-	If you've installed Carbon into a standard PowerShell module directory (see above), importing it is easy:
-	
-	    > Import-Module Carbon
-		
+    If you've installed Carbon into a standard PowerShell module directory (see above), importing it is easy:
+    
+        > Import-Module Carbon
+        
     If you've got it installed somewhere else, maybe your application's version control repository, you'll need to know the path to where it is:
-	
-	    > Import-Module Carbon
-		
-	If importing Carbon in a script, we recommend always using relative paths.  You can get the directory in which the current script is executing, and using that to get the path to Carbon, like this:
-	
-	    $PSScriptRoot = Split-Path -Parent $MyInvocation.MyCommand.Definition
-		Import-Module (Join-Path $PSScriptRoot ..\Tools\Carbon -Resolve)
+    
+        > Import-Module Carbon
+        
+    If importing Carbon in a script, we recommend always using relative paths.  You can get the directory in which the current script is executing, and using that to get the path to Carbon, like this:
+    
+        $PSScriptRoot = Split-Path -Parent $MyInvocation.MyCommand.Definition
+        Import-Module (Join-Path $PSScriptRoot ..\Tools\Carbon -Resolve)
 
 FUNCTIONS
     The following functions are available, organized by topic:
     
-	ACTIVE DIRECTORY
-	    Functions for working with Active Directory.
-	      * Get-ADDomainController
-	      * Get-ADUser
+    ACTIVE DIRECTORY
+        Functions for working with Active Directory.
+          * Get-ADDomainController
+          * Get-ADUser
           * Format-ADSpecialCharacters
-	
-	CERTIFICATES
-	    Functions for working with certificates (including SSL certificates) and Windows's certificate stores, 
-	       * Get-Certificate
-	       * Get-CertificateStore
-	       * Get-SslCertificateBinding
-	       * Get-SslCertificateBindings
-	       * Install-Certificate
-	       * Remove-Certificate
-	       * Remove-SslCertificateBinding
-	       * Set-SslCertificateBinding
-	       * Test-SslCertificateBinding
-	   
-	 COMPUTER
-	     Miscelleanouse functions for configuring getting information about the local computer.
-	       * Disable-IEEnhancedSecurityConfiguration
-	       * Enable-IEActiviationPermissions
-	       * Invoke-WindowsInstaller
-	       * Remove-EnvironmentVariable
-	       * Set-EnvironmentVariable
-	       * Test-OSIs32Bit
-	       * Test-OSIs64Bit
-	   
-	 CRYPTOGRAPHY
-	     Cryptographic functions.
-	       * Protect-String
-	       * Unprotect-String
-	   
-	 .NET
-	     Configure .NET.
-	       * Set-DotNetAppSetting
-	       * Set-DotNetConnectionString
-	   
-	 FILE SYSTEM
-	     Functions for getting information about and managing items on the local computer's file system.
-	       * Get-FullPath
-	       * Get-PathCanonicalCase
-	       * Get-PathRelativeTo
-	       * New-Junction
-	       * New-TempDir
-	       * Remove-Junction
-	       * Test-PathIsJunction
-	   
-	 HOSTS FILE
-	     Management functions for the local computer's hosts file.
-	       * Get-PathToHostsFile
-	       * Reset-HostsFile
-	       * Set-HostsEntry
-	   
-	 IIS
-	     Configure websites, app pools, virtual directories, and applications.
-	       * Add-IisDefaultDocument
-	       * Get-IisHttpRedirect
-	       * Get-IisVersion
-	       * Get-IisWebsite
-	       * Install-IisApplication
-	       * Install-IisAppPool
-	       * Install-IisVirtualDirectory
-	       * Install-IisWebsite
-	       * Invoke-AppCmd
-	       * Remove-IisWebsite
-	       * Set-IisAnonymousAuthentication
-	       * Set-IisBasicAuthentication
-	       * Set-IisDirectoryBrowsing
-	       * Set-IisHttpRedirect
-	       * Set-IisSslFlags
-	       * Set-IisWebsiteSslCertificate
-	       * Set-IisWindowsAuthentication
-	       * Test-IisAppPoolExists
-	       * Unlock-IisBasicAuthentication
-	 
-	 INI FILES
-	     Work with generic INI files.
-	       * Set-IniEntry
-	       * Split-Ini
-	 
-	 MERCURIAL
-	     Configure Mercurial.
+    
+    CERTIFICATES
+        Functions for working with certificates (including SSL certificates) and Windows's certificate stores, 
+           * Get-Certificate
+           * Get-CertificateStore
+           * Get-SslCertificateBinding
+           * Get-SslCertificateBindings
+           * Install-Certificate
+           * Remove-Certificate
+           * Remove-SslCertificateBinding
+           * Set-SslCertificateBinding
+           * Test-SslCertificateBinding
+       
+     COMPUTER
+         Miscelleanouse functions for configuring getting information about the local computer.
+           * Disable-IEEnhancedSecurityConfiguration
+           * Enable-IEActiviationPermissions
+           * Invoke-WindowsInstaller
+           * Remove-EnvironmentVariable
+           * Set-EnvironmentVariable
+           * Test-OSIs32Bit
+           * Test-OSIs64Bit
+       
+     CRYPTOGRAPHY
+         Cryptographic functions.
+           * Protect-String
+           * Unprotect-String
+       
+     .NET
+         Configure .NET.
+           * Set-DotNetAppSetting
+           * Set-DotNetConnectionString
+       
+     FILE SYSTEM
+         Functions for getting information about and managing items on the local computer's file system.
+           * Get-FullPath
+           * Get-PathCanonicalCase
+           * Get-PathRelativeTo
+           * New-Junction
+           * New-TempDir
+           * Remove-Junction
+           * Test-PathIsJunction
+       
+     HOSTS FILE
+         Management functions for the local computer's hosts file.
+           * Get-PathToHostsFile
+           * Reset-HostsFile
+           * Set-HostsEntry
+       
+     IIS
+         Configure websites, app pools, virtual directories, and applications.
+           * Add-IisDefaultDocument
+           * Get-IisHttpRedirect
+           * Get-IisVersion
+           * Get-IisWebsite
+           * Install-IisApplication
+           * Install-IisAppPool
+           * Install-IisVirtualDirectory
+           * Install-IisWebsite
+           * Invoke-AppCmd
+           * Remove-IisWebsite
+           * Set-IisAnonymousAuthentication
+           * Set-IisBasicAuthentication
+           * Set-IisDirectoryBrowsing
+           * Set-IisHttpRedirect
+           * Set-IisSslFlags
+           * Set-IisWebsiteSslCertificate
+           * Set-IisWindowsAuthentication
+           * Test-IisAppPoolExists
+           * Unlock-IisBasicAuthentication
+     
+     INI FILES
+         Work with generic INI files.
+           * Set-IniEntry
+           * Split-Ini
+     
+     MERCURIAL
+         Configure Mercurial.
            * Set-HgDefaultPushUrl
-	   
-	 MSMQ
-	     Work with MSMQ message queues.
-	       * Get-MsmqMessageQueue
-	       * Get-MsmqMessageQueuePath
-	       * Grant-MsmqMessageQueuePermissions
-	       * Install-Msmq
-	       * Install-MsmqMessageQueue
-	       * Remove-MsmqMessageQueue
-	       * Test-MsmqMessageQueue
-	 
-	 PERFORMANCE COUNTERS
-	     Manage Windows performance counters.
-	       * Get-PerformanceCounters
-	       * Install-PerformanceCounter
-	       * Test-PerformanceCounter
-	       * Test-PerformanceCounterCategory
-	       * Uninstall-PerformanceCounter
-	   
-	 POWERSHELL
-	     Helpful functions for working with PowerShell.
-	       * Complete-Jobs
-	       * Get-PowerShellPath
-	       * Invoke-PowerShell
-	       * Test-PowerShellIs32Bit
-	       * Test-PowerShellIs64Bit
-	 
-	 POWERSHELL REMOTING
-	     Functions to make PowerShell remoting a little easier.
-	       * Add-TrustedHosts
-	       * Get-TrustedHosts
-	       * Set-TrustedHosts
-	   
-	 SECURITY
-	     Security related functions.
-	       * Assert-AdminPrivileges
-	       * Convert-SecureStringToString
-	       * Grant-Permissions
-	       * New-Credential
-	       * Test-AdminPrivileges
-	   
-	 SERVICES
-	     Windows service functions.
-	       * Grant-ServiceControlPermission
-	       * Install-Service
-	       * Invoke-SubInAcl
-	       * Remove-Service
-	       * Restart-RemoteService
-	   
-	 SHARES
-	     Functions for file shares.
-	       * Install-Share
-	 
-	 USERS AND GROUPS
-	     Mange LOCAL users and groups
-	       * Add-GroupMembers
-		   * Get-WmiLocalUserAccount
-	       * Install-Group
-	       * Install-User
-	       * Remove-User
-	       * Test-User
-	   
-	 WINDOWS FEATURES
-	     These functions help manage Windows features/components.  They ONLY work on Windows 2008 and 7.
-	       * Install-WindowsFeatureIis
-		   * Install-WindowsFeatureMsmq
-		   * Install-WindowsFeatures
-		   * Test-WindowsFeature
-		   * Uninstall-WindowsFeature
-	 
-	 WINDOWS FIREWALL
-	     Configures the Windows firewall.
-		   * Assert-FirewallConfigurable
-		   * Disable-FirewallStatefulFtp
-		   * Enable-FirewallStatefulFtp
-		   * Get-FirewallRules
-		   * Test-FirewallStatefulFtp
+       
+     MSMQ
+         Work with MSMQ message queues.
+           * Get-MsmqMessageQueue
+           * Get-MsmqMessageQueuePath
+           * Grant-MsmqMessageQueuePermissions
+           * Install-Msmq
+           * Install-MsmqMessageQueue
+           * Remove-MsmqMessageQueue
+           * Test-MsmqMessageQueue
+     
+     PERFORMANCE COUNTERS
+         Manage Windows performance counters.
+           * Get-PerformanceCounters
+           * Install-PerformanceCounter
+           * Test-PerformanceCounter
+           * Test-PerformanceCounterCategory
+           * Uninstall-PerformanceCounter
+       
+     POWERSHELL
+         Helpful functions for working with PowerShell.
+           * Complete-Jobs
+           * Get-PowerShellPath
+           * Invoke-PowerShell
+           * Test-PowerShellIs32Bit
+           * Test-PowerShellIs64Bit
+     
+     POWERSHELL REMOTING
+         Functions to make PowerShell remoting a little easier.
+           * Add-TrustedHosts
+           * Get-TrustedHosts
+           * Set-TrustedHosts
+       
+     SECURITY
+         Security related functions.
+           * Assert-AdminPrivileges
+           * Convert-SecureStringToString
+           * Grant-Permissions
+           * New-Credential
+           * Test-AdminPrivileges
+       
+     SERVICES
+         Windows service functions.
+           * Grant-ServiceControlPermission
+           * Install-Service
+           * Invoke-SubInAcl
+           * Remove-Service
+           * Restart-RemoteService
+       
+     SHARES
+         Functions for file shares.
+           * Install-Share
+     
+     USERS AND GROUPS
+         Mange LOCAL users and groups
+           * Add-GroupMembers
+           * Get-WmiLocalUserAccount
+           * Install-Group
+           * Install-User
+           * Remove-User
+           * Test-User
+       
+     WINDOWS FEATURES
+         These functions help manage Windows features/components.  They ONLY work on Windows 2008 and 7.
+           * Install-WindowsFeatureIis
+           * Install-WindowsFeatureMsmq
+           * Install-WindowsFeatures
+           * Test-WindowsFeature
+           * Uninstall-WindowsFeature
+     
+     WINDOWS FIREWALL
+         Configures the Windows firewall.
+           * Assert-FirewallConfigurable
+           * Disable-FirewallStatefulFtp
+           * Enable-FirewallStatefulFtp
+           * Get-FirewallRules
+           * Test-FirewallStatefulFtp
 
 TYPES
     Carbon augments the following .NET objects with some helpful properties:
-	  * Diagnostics.Process: ParentProcessID, the process ID of a process's parent (i.e. the process which started a process)
-	  * ServiceProcess.ServiceController: StartMode, the ServiceProcess.ServiceStartModel value for a service.
-	  * ServiceProcess.ServiceController: UserName, the name of the account a service runs as.
+      * Diagnostics.Process: ParentProcessID, the process ID of a process's parent (i.e. the process which started a process)
+      * ServiceProcess.ServiceController: StartMode, the ServiceProcess.ServiceStartModel value for a service.
+      * ServiceProcess.ServiceController: UserName, the name of the account a service runs as.
 
 DEVELOPMENT/CONTRIBUTING
-	We welcome your feedback and contributions!  
-	
-	Carbon covers a lot of areas.  Functions that work with common things are grouped into .ps1 files in the module's root directory, e.g. ActiveDirectory, IIS, Security, etc.  All functions in a file should be ordered alphabetically.
-	
-	We belive in Test-Driven Development (TDD)!  If you don't, you won't be happy contributing.  Anything you want to submit back to the project must have good tests.  If not, it will take longer to accept your contribution, because we'll have to take time to write tests.  TDD enables us to release new versions of Carbon as soon changes are committed, pushed, and the tests pass.  If the code is ready and works, we want to release it.  No waiting!
-	
-	Pest is our testing framework.  It uses NUnit-inspired assertions, e.g. Assert-True, Assert-Equal, etc.  See http://bitbucket.org/splatteredbits/pest for more information.
-	
-	Tests should always clean-up after themselves and strive to leave an operating system in the exact state it was in before the test fixture ran.  
-	
-	Unfortunately, we only have the resources to run our tests on a 64-bit Windows 2008 computer.  Any donations to the project would be used to purchase licenses and hosting for running our tests on 32-bit and 64-bit versions of Windows 7, Windows 2008, and Windows 2008 R2 (and maybe even Windows 8 and Windows "8" Server someday).
-	
-	STYLE GUIDE
-	
-	    We use spaces for indenting.  Each level of indent (i.e. "tab") should be four spaces.
-	
-	    Use camel-casing for all function names, including abbreviations three letters or longer, e.g. Install-Msmq, Install-IisWebsite.  Capitalize all letters in one or two letter abbreviations, e.g. Test-PSIs32Bit.
-		
-		All function parameter and module variables names must be capitalized, e.g. $Path, $Name, etc.  All variable names internal to functions should be lowercased, e.g. $result, $csprojXml.
-		
-		Variables that contain a path should end in path, e.g. $csprojPath, $websitePath.
-		
-		Use the following parameter names whenever possible:
-		  * $ComputerName: for a server/computer host name
-		  * $Name: for the name of something.
-		  * $Path: for one or more paths
-		  
-		Use a prefix for all functions that manage a common area of Windows, e.g. Iis for all IIS-related functions, Msmq for MSMQ-related functions, etc.
-		
-		All functions must have synopsis, description, and example documentation.
-	
+    We welcome your feedback and contributions!  
+    
+    Carbon covers a lot of areas.  Functions that work with common things are grouped into .ps1 files in the module's root directory, e.g. ActiveDirectory, IIS, Security, etc.  All functions in a file should be ordered alphabetically.
+    
+    We belive in Test-Driven Development (TDD)!  If you don't, you won't be happy contributing.  Anything you want to submit back to the project must have good tests.  If not, it will take longer to accept your contribution, because we'll have to take time to write tests.  TDD enables us to release new versions of Carbon as soon changes are committed, pushed, and the tests pass.  If the code is ready and works, we want to release it.  No waiting!
+    
+    Pest is our testing framework.  It uses NUnit-inspired assertions, e.g. Assert-True, Assert-Equal, etc.  See http://bitbucket.org/splatteredbits/pest for more information.
+    
+    Tests should always clean-up after themselves and strive to leave an operating system in the exact state it was in before the test fixture ran.  
+    
+    Unfortunately, we only have the resources to run our tests on a 64-bit Windows 2008 computer.  Any donations to the project would be used to purchase licenses and hosting for running our tests on 32-bit and 64-bit versions of Windows 7, Windows 2008, and Windows 2008 R2 (and maybe even Windows 8 and Windows "8" Server someday).
+    
+    STYLE GUIDE
+    
+        We use spaces for indenting.  Each level of indent (i.e. "tab") should be four spaces.
+    
+        Use camel-casing for all function names, including abbreviations three letters or longer, e.g. Install-Msmq, Install-IisWebsite.  Capitalize all letters in one or two letter abbreviations, e.g. Test-PSIs32Bit.
+        
+        All function parameter and module variables names must be capitalized, e.g. $Path, $Name, etc.  All variable names internal to functions should be lowercased, e.g. $result, $csprojXml.
+        
+        Variables that contain a path should end in path, e.g. $csprojPath, $websitePath.
+        
+        Use the following parameter names whenever possible:
+          * $ComputerName: for a server/computer host name
+          * $Name: for the name of something.
+          * $Path: for one or more paths
+          
+        Use a prefix for all functions that manage a common area of Windows, e.g. Iis for all IIS-related functions, Msmq for MSMQ-related functions, etc.
+        
+        All functions must have synopsis, description, and example documentation.
+    
 RELATED LINKS:
     Carbon's website: https://bitbucket.org/splatteredbits/carbon
-	
-	Developer's Website: http://pshdo.com
-	
-	Pest: https://bitbucket.org/splatteredbits/pest
-	
+    
+    Developer's Website: http://pshdo.com
+    
+    Pest: https://bitbucket.org/splatteredbits/pest
+    
