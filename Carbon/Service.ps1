@@ -14,7 +14,7 @@
 
 Add-Type -AssemblyName System.ServiceProcess
 
-function Grant-ControlServicePermission
+function Grant-ServiceControlPermission
 {
     <#
     .SYNOPSIS
@@ -318,88 +318,5 @@ function Restart-RemoteService
     else
     {
         Write-Error "Unable to restart remote service because I could not get a reference to service $name on machine: $computerName"
-    }
-    
+    }  
  }
-
-
-function Restart-RemoteService_SC
-{
- <#
-    .SYNOPSIS
-    Restarts a service on a remote machine using the SC command instead of PSH
-    #>
-    [CmdletBinding(SupportsShouldProcess=$true)]
-    param(
-        [Parameter(Mandatory=$true)]
-        [string]
-        # The service name
-        $Name,
-        [Parameter(Mandatory=$true)]
-        [string]
-        # The name of the remote machine
-        $ComputerName
-        
-    )
-    Stop-Service_SC $Name $ComputerName
-    Start-Service_SC $Name $ComputerName
-}
- 
-function Invoke-SC($command, $serviceName, $computerName)
-{
-	$scOutput = C:\Windows\system32\sc.exe "\\$computerName" $command $serviceName
-}
-
-function Get-ServiceStatus_SC($serviceName, $computerName)
-{
-	$service = Get-Service -name $serviceName -ComputerName $computerName -ErrorAction SilentlyContinue
-	$status = if( $service -eq $null ) { $null } else { $service.Status }
-	return $status
-}
-
-function Start-Service_SC($serviceName, $computerName)
-{
-	Write-Host "Starting service $serviceName on computer $computerName" -NoNewline
-	
-	$status = Get-ServiceStatus_SC $serviceName $computerName
-	if( $status -ne 'Running' -and $status -ne 'StartPending' )
-	{
-		Invoke-SC 'Start' $serviceName $computerName
-	}
-
-	Wait-ServiceState_SC 'Running' $serviceName $computerName
-}
-
-function Stop-Service_SC($serviceName, $computerName)
-{
-	Write-Host "Stopping service $serviceName on computer $computerName" -NoNewline
-
-	$status = Get-ServiceStatus_SC $serviceName $computerName
-	if( $status -ne 'Stopped' -and $status -ne 'StopPending' )
-	{
-		Invoke-SC 'Stop' $serviceName $computerName
-	}
-
-	Wait-ServiceState_SC 'Stopped' $serviceName $computerName
-}
-
-function Wait-ServiceState_SC($state, $serviceName, $computerName)
-{
-	$status = ''
-	$tryCount = 0
-	do
-	{
-		Start-Sleep 1
-		$status = Get-ServiceStatus_SC $serviceName $computerName
-		Write-Host "." -NoNewline
-		$tryCount++
-	}
-	until( $tryCount -gt 10 -or $status -eq $state )
-	
-	if( $tryCount -gt 10 )
-	{
-		Write-Host $status -NoNewline
-	}
-
-	Write-Host ""
-}
