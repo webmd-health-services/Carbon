@@ -16,9 +16,29 @@ function Get-Certificate
 {
     <#
     .SYNOPSIS
-    Finds a certificate.
-    .RETURN
-    The X509Certificate2 certificates that were found, or $null.
+    Gets a certificate from a file on the file system or from a Windows 
+    certificate store by thumbprint or friendly name.
+    
+    .EXAMPLE
+    > Get-Certificate -Path C:\Certificates\certificate.cer -Password MySuperSecurePassword
+    
+    Gets an X509Certificate2 object representing the certificate.cer file.
+    
+    .EXAMPLE
+    > Get-Certificate -Thumbprint a909502dd82ae41433e6f83886b00d4277a32a7b -StoreName My -StoreLocation LocalMachine
+    
+    Gets an X509Certificate2 object for the certificate in the Personal store 
+    with a specific thumbprint under the Local Machine.
+    
+    .EXAMPLE
+    > Get-Certificate -FriendlyName 'Development Certificate' -StoreLocation CurrentUser -StoreName TrustedPeople
+    
+    Gets the X509Certificate2 whose friendly name is Development Certificate 
+    from the Current User's Trusted People certificate store.
+    
+    .OUTPUTS
+    System.Security.Cryptography.x509Certificates.X509Certificate2. The 
+    X509Certificate2 certificates that were found, or $null.
     #>
     [CmdletBinding(DefaultParameterSetName='ByFriendlyName')]
     param(
@@ -28,7 +48,6 @@ function Get-Certificate
         $Path,
         
         [Parameter(ParameterSetName='ByPath')]
-        [string]
         # The password to the certificate.  Can be plaintext or a SecureString.
         $Password,
         

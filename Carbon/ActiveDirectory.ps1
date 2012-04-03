@@ -18,12 +18,34 @@ function Get-ADDomainController
 {
     <#
     .SYNOPSIS
-    Gets the domain controller of the current computer's domain, or for specific domain.
+    Gets the domain controller of the current computer's domain, or for a 
+    specific domain.
+    
+    .DESCRIPTION
+    When working with Active Directory, it's important to have the hostname of 
+    the domain controller you need to work with.  This function will find the 
+    domain controller for the domain of the current computer or the domain 
+    controller for a given domain.
+    
+    .OUTPUTS
+    System.String. The hostname for the domain controller.  If the domain 
+    controller is not found, $null is returned.
+    
+    .EXAMPLE
+    > Get-ADDomainController
+    Returns the domain controller for the current computer's domain.  
+    Approximately equivialent to the hostname given in the LOGONSERVER 
+    environment variable.
+    
+    .EXAMPLE
+    > Get-ADDomainController -Domain MYDOMAIN
+    Returns the domain controller for the MYDOMAIN domain.
     #>
     [CmdletBinding()]
     param(
         [string]
-        # The domain whose domain controller to get.  If not given, gets the current computer's domain controller.
+        # The domain whose domain controller to get.  If not given, gets the 
+        # current computer's domain controller.
         $Domain
     )
     
@@ -52,6 +74,17 @@ function Find-ADUser
     <#
     .SYNOPSIS
     Finds a user in Active Directory.
+    
+    .OUTPUTS
+    System.DirectoryServices.DirectoryEntry.  The directory entry object of the
+    user's account in Active Directory or $null if the user isn't found.
+    
+    .EXAMPLE
+    > Find-ADUser -DomainUrl LDAP://dc.example.com:389 -sAMAccountName $env:USERNAME
+    
+    Finds the AD user whose Windows username (sAMAccountName) is equal to the 
+    currently logged on user's username.
+    
     .LINK
     http://msdn.microsoft.com/en-us/library/aa746475.aspx
     #>
@@ -59,12 +92,13 @@ function Find-ADUser
     param(
         [Parameter(Mandatory=$true)]
         [string]
-        # The LDAP URL to the domain controller to contact.  
+        # The LDAP URL to the domain controller to contact.
         $DomainUrl,
         
         [Parameter(Mandatory=$true,ParameterSetName='BysAMAccountName')]
         [string]
-        # Search by a user's sAMAcountName.
+        # Search by a user's sAMAcountName (i.e. Windows username).  Special
+        # characters are escaped.
         $sAMAccountName
     )
    
@@ -89,6 +123,15 @@ function Format-ADSpecialCharacters
     <#
     .SYNOPSIS
     Escapes Active Directory special characters from a string.
+    
+    .OUTPUT
+    System.String.  The input string with any Active Directory-sensitive 
+    characters escaped.
+    
+    .DESCRIPTION
+    There are special characters in Active Directory queries/searches.  This
+    function escapes them so they aren't treated as AD commands/characters.
+    
     .LINK
     http://msdn.microsoft.com/en-us/library/aa746475.aspx#special_characters
     #>
@@ -96,7 +139,7 @@ function Format-ADSpecialCharacters
     param(
         [Parameter(Mandatory=$true)]
         [string]
-        # The string to escape
+        # The string to escape.
         $String
     )
     
