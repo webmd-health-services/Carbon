@@ -25,5 +25,5 @@ function TearDown
 function Test-ShouldDetect64BitProcess
 {
     $expectedResult = ( $env:PROCESSOR_ARCHITECTURE -eq 'AMD64' )
-    Assert-Equal $expectedResult (Test-ProcessIs64Bit)
+    Assert-Equal $expectedResult (Test-PowerShellIs64Bit)
 }

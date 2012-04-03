@@ -25,5 +25,5 @@ function TearDown
 function Test-ShouldDetect32BitProcess
 {
     $expectedResult = ( $env:PROCESSOR_ARCHITECTURE -eq 'x86' )
-    Assert-Equal $expectedResult (Test-ProcessIs32Bit)
+    Assert-Equal $expectedResult (Test-PowerShellIs32Bit)
 }
