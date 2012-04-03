@@ -60,8 +60,22 @@ function Test-ShouldTurnOnDirectoryBrowsing
     Set-IisDirectoryBrowsing -SiteName $SiteName -Directory $VDirName
     Assert-LastProcessSucceeded 'Failed to enable directory browsing.'
     Assert-FileDoesNotExist $WebConfig 'Changes not committed to apphost config level.'
-    $output = Read-Url "http://localhost:$Port/$VDirName"
-    Assert-ContainsLike $output 'NewWebsite.html' "Didn't get directory list."
+    $numTries = 0
+    $maxTries = 10
+    $foundDirectoryListing = $false
+    do
+    {
+        $output = Read-Url "http://localhost:$Port/$VDirName"
+        if( $output -like '*NewWebsite.html*' )
+        {
+            $foundDirectoryListing = $true
+            break
+        }
+        $numTries += 1
+        Start-Sleep -Milliseconds 100
+    }
+    while( $numTries -lt $maxTries )
+    Assert-True $foundDirectoryListing "Didn't get directory list."
 }
 
 function Assert-VirtualDirectoryRunning($vdir)
@@ -74,7 +88,7 @@ function Read-Url($Url)
 {
     $browser = New-Object Net.WebClient
     $numTries = 0
-    $maxTries = 5
+    $maxTries = 10
     do
     {
         try
