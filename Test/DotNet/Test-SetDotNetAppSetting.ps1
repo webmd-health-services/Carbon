@@ -45,47 +45,65 @@ function Remove-AppSetting
         }
     }
     
-    Invoke-PowerShell -Command $command -Args $appSettingName -x86
+    Invoke-PowerShell -Command $command -Args $appSettingName -x86 
     Invoke-PowerShell -Command $command -Args $appSettingName 
+    Invoke-PowerShell -Command $command -Args $appSettingName -x86 -Runtime 'v4.0'
+    Invoke-PowerShell -Command $command -Args $appSettingName -Runtime 'v4.0'
 }
 
-function Test-ShouldSetAppSetting64
+function Test-ShouldUpdateMachineConfigDotNet2x64
 {
-    Set-DotNetAppSetting -Name $appSettingName -Value $appSettingValue -Framework64
-    Assert-AppSetting -Name $appSettingName -Value $appSettingValue -Framework64
-    Assert-AppSetting -Name $appSettingName -Value $null -Framework
-}
-
-
-function Test-ShouldSetAppSetting32
-{
-    Set-DotNetAppSetting -Name $appSettingName -Value $appSettingValue -Framework
-    Assert-AppSetting -Name $appSettingName -Value $appSettingValue -Framework
-    Assert-AppSetting -Name $appSettingName -Value $null -Framework64
+    Set-DotNetAppSetting -Name $appSettingName -Value $appSettingValue -Framework64 -Clr2
+    Assert-AppSetting -Name $appSettingName -Value $appSettingValue -Framework64 -Clr2
+    Assert-AppSetting -Name $appSettingName -Value $null -Framework -Clr2
 }
 
 
-function Test-ShouldSetAppSettingBoth
+function Test-ShouldUpdateMachineConfigDotNet2x86
 {
-    Set-DotNetAppSetting -Name $appSettingName -Value $appSettingValue -Framework -Framework64
-    Assert-AppSetting -Name $appSettingName -Value $appSettingValue -Framework  -Framework64
+    Set-DotNetAppSetting -Name $appSettingName -Value $appSettingValue -Framework -Clr2
+    Assert-AppSetting -Name $appSettingName -Value $appSettingValue -Framework -Clr2
+    Assert-AppSetting -Name $appSettingName -Value $null -Framework64 -Clr2
+}
+
+function Test-ShouldUpdateMachineConfigDotNet4x64
+{
+    Set-DotNetAppSetting -Name $appSettingName -Value $appSettingValue -Framework64 -Clr4
+    Assert-AppSetting -Name $appSettingName -Value $appSettingValue -Framework64 -Clr4
+    Assert-AppSetting -Name $appSettingName -Value $null -Framework -Clr4
+}
+
+function Test-ShouldUpdateMachineConfigDotNet4x86
+{
+    Set-DotNetAppSetting -Name $appSettingName -Value $appSettingValue -Framework -Clr4
+    Assert-AppSetting -Name $appSettingName -Value $appSettingValue -Framework -Clr4
+    Assert-AppSetting -Name $appSettingName -Value $null -Framework64 -Clr4
 }
 
 function Test-ShouldUpdateAppSetting
 {
-    Set-DotNetAppSetting -Name $appSettingName -Value $appSettingValue -Framework -Framework64
-    Set-DotNetAppSetting -Name $appSettingName -Value $appSettingNewValue -Framework -Framework64
-    Assert-AppSetting -Name $appSettingName -Value $appSettingNewValue -Framework  -Framework64
+    Set-DotNetAppSetting -Name $appSettingName -Value $appSettingValue -Framework -Framework64 -Clr2
+    Set-DotNetAppSetting -Name $appSettingName -Value $appSettingNewValue -Framework -Framework64 -Clr2
+    Assert-AppSetting -Name $appSettingName -Value $appSettingNewValue -Framework  -Framework64 -Clr2
 }
 
 function Test-ShouldRequireAFrameworkFlag
 {
     $error.Clear()
-    Set-DotNetAppSetting -Name $appSettingName -Value $appSettingValue -ErrorACtion SilentlyContinue
+    Set-DotNetAppSetting -Name $appSettingName -Value $appSettingValue -Clr2 -ErrorACtion SilentlyContinue
     Assert-Equal 1 $error.Count
+    Assert-Like $error[0].Exception 'You must supply either or both of the Framework and Framework64 switches.'
 }
 
-function Assert-AppSetting($Name, $value, [Switch]$Framework, [Switch]$Framework64)
+function Test-ShouldRequireAClrSwitch
+{
+    $error.Clear()
+    Set-DotNetAppSetting -Name $appSettingName -Value $appSettingValue -Framework -ErrorAction SilentlyContinue
+    Assert-Equal 1 $error.Count
+    Assert-Like $error[0].Exception 'You must supply either or both of the Clr2 and Clr4 switches.'
+}
+
+function Assert-AppSetting($Name, $value, [Switch]$Framework, [Switch]$Framework64, [Switch]$Clr2, [Switch]$Clr4)
 {
     $command = {
         param(
@@ -108,15 +126,38 @@ function Assert-AppSetting($Name, $value, [Switch]$Framework, [Switch]$Framework
         }
     }
     
-    if( $Framework64 )
+    $runtimes = @()
+    if( $Clr2 )
     {
-        $actualValue = Invoke-PowerShell -Command $command -Args $Name
-        Assert-Equal $Value $actualValue
+        $runtimes += 'v2.0'
+    }
+    if( $Clr4 )
+    {
+        $runtimes += 'v4.0'
     }
     
-    if( $Framework )
+    if( $runtimes.Length -eq 0 )
     {
-        $actualValue = Invoke-PowerShell -Command $command -Args $Name -x86
-        Assert-Equal $Value $actualValue
+        throw "Must supply either or both the Clr2 and Clr2 switches."
+    }
+    
+    $runtimes | ForEach-Object {
+        $params = @{
+            Command = $command
+            Args = $Name
+            Runtime = $_
+        }
+        
+        if( $Framework64 )
+        {
+            $actualValue = Invoke-PowerShell @params
+            Assert-Equal $Value $actualValue ".NET $_ x64"
+        }
+        
+        if( $Framework )
+        {
+            $actualValue = Invoke-PowerShell @params -x86
+            Assert-Equal $Value $actualValue ".NET $_ x86"
+        }
     }
 }

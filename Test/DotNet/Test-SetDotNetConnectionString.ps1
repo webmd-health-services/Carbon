@@ -47,43 +47,58 @@ function Remove-ConnectionStrings
     
     Invoke-PowerShell -Command $command -Args $connectionStringName -x86
     Invoke-PowerShell -Command $command -Args $connectionStringName 
+    Invoke-PowerShell -Command $command -Args $connectionStringName -x86 -Runtime v4.0
+    Invoke-PowerShell -Command $command -Args $connectionStringName -Runtime v4.0
 }
 
-function Test-ShouldAddConnectionString64
+function Test-ShouldUpdateDotNet2x86MachineConfig
 {
-    Set-DotNetConnectionString -Name $connectionStringName -Value $connectionStringValue -Framework64
-    Assert-ConnectionString -Name $connectionStringName -Value $connectionStringValue -Framework64
-    Assert-ConnectionString -Name $connectionStringName -Value $null -Framework
+    Set-DotNetConnectionString -Name $connectionStringName -Value $connectionStringValue -Framework -Clr2
+    Assert-ConnectionString -Name $connectionStringName -Value $connectionStringValue -Framework -Clr2
 }
 
-function Test-ShouldAddConnectionString32
+function Test-ShouldUpdateDotNet2x64MachineConfig
 {
-    Set-DotNetConnectionString -Name $connectionStringName -Value $connectionStringValue -Framework
-    Assert-ConnectionString -Name $connectionStringName -Value $connectionStringValue -Framework
-    Assert-ConnectionString -Name $connectionStringName -Value $null -Framework64   
+    Set-DotNetConnectionString -Name $connectionStringName -Value $connectionStringValue -Framework64 -Clr2
+    Assert-ConnectionString -Name $connectionStringName -Value $connectionStringValue -Framework64 -Clr2
 }
 
-function Test-ShouldAddConnectionStringBoth
+function Test-ShouldUpdateDotNet4x86MachineConfig
 {
-    Set-DotNetConnectionString -Name $connectionStringName -Value $connectionStringValue -Framework -Framework64
-    Assert-ConnectionString -Name $connectionStringName -Value $connectionStringValue -Framework -Framework64
+    Set-DotNetConnectionString -Name $connectionStringName -Value $connectionStringValue -Framework -Clr4
+    Assert-ConnectionString -Name $connectionStringName -Value $connectionStringValue -Framework -Clr4
+}
+
+function Test-ShouldUpdateDotNet4x64MachineConfig
+{
+    Set-DotNetConnectionString -Name $connectionStringName -Value $connectionStringValue -Framework64 -Clr4
+    Assert-ConnectionString -Name $connectionStringName -Value $connectionStringValue -Framework64 -Clr4
 }
 
 function Test-ShouldUpdateConnectionString
 {
-    Set-DotNetConnectionString -Name $connectionStringName -Value $connectionStringValue -Framework -Framework64
-    Set-DotNetConnectionString -Name $connectionStringName -Value $connectionStringNewValue -Framework -Framework64
-    Assert-ConnectionString -Name $connectionStringName -Value $connectionStringNewValue -Framework -Framework64
+    Set-DotNetConnectionString -Name $connectionStringName -Value $connectionStringValue -Framework -Clr2
+    Set-DotNetConnectionString -Name $connectionStringName -Value $connectionStringNewValue -Framework -Clr2
+    Assert-ConnectionString -Name $connectionStringName -Value $connectionStringNewValue -Framework -Clr2 
 }
 
 function Test-ShouldRequireAFrameworkFlag
 {
     $error.Clear()
-    Set-DotNetConnectionString -Name $connectionStringName -Value $connectionStringValue -ErrorACtion SilentlyContinue
+    Set-DotNetConnectionString -Name $connectionStringName -Value $connectionStringValue -Clr2 -ErrorACtion SilentlyContinue
     Assert-Equal 1 $error.Count
+    Assert-Like $error[0].Exception 'You must supply either or both of the Framework and Framework64 switches.'
 }
 
-function Assert-ConnectionString($Name, $value, [Switch]$Framework, [Switch]$Framework64)
+function Test-ShouldRequireAClrFlag
+{
+    $error.Clear()
+    Set-DotNetConnectionString -Name $connectionStringName -Value $connectionStringValue -Framework -ErrorACtion SilentlyContinue
+    Assert-Equal 1 $error.Count
+    Assert-Like $error[0].Exception 'You must supply either or both of the Clr2 and Clr4 switches.'    
+}
+
+function Assert-ConnectionString($Name, $value, [Switch]$Framework, [Switch]$Framework64, [Switch]$Clr2, [Switch]$Clr4)
 {
     $command = {
         param(
@@ -106,15 +121,38 @@ function Assert-ConnectionString($Name, $value, [Switch]$Framework, [Switch]$Fra
         }
     }
     
-    if( $Framework64 )
+    $runtimes = @()
+    if( $Clr2 )
     {
-        $actualValue = Invoke-PowerShell -Command $command -Args $Name
-        Assert-Equal $Value $actualValue
+        $runtimes += 'v2.0'
+    }
+    if( $Clr4 )
+    {
+        $runtimes += 'v4.0'
     }
     
-    if( $Framework )
+    if( $runtimes.Length -eq 0 )
     {
-        $actualValue = Invoke-PowerShell -Command $command -Args $Name -x86
-        Assert-Equal $Value $actualValue
+        throw "Must supply either or both the Clr2 and Clr2 switches."
+    }
+    
+    $runtimes | ForEach-Object {
+        $params = @{
+            Command = $command
+            Args = $Name
+            Runtime = $_
+        }
+
+        if( $Framework64 )
+        {
+            $actualValue = Invoke-PowerShell @params
+            Assert-Equal $Value $actualValue
+        }
+        
+        if( $Framework )
+        {
+            $actualValue = Invoke-PowerShell @params -x86
+            Assert-Equal $Value $actualValue
+        }
     }
 }
