@@ -45,3 +45,24 @@ function Test-ShouldInvokePowerShellx86
     $result = Invoke-PowerShell -Command $command -x86
     Assert-Equal 'x86' $result
 }
+
+function Test-ShouldRunPowerShellUnderCLR2
+{
+    $command = {
+        $PSVersionTable.CLRVersion
+    }
+    
+    $result = Invoke-PowerShell -Command $command
+    Assert-Equal 2 $result.Major
+}
+
+function Test-ShouldRunPowerShellUnderCLR4
+{
+    $command = {
+        $PSVersionTable.CLRVersion
+    }
+    
+    $result = Invoke-PowerShell -Command $command -Runtime v4.0
+    Assert-Equal 4 $result.Major
+    Assert-Null ([Environment]::GetEnvironmentVariable('COMPLUS_ApplicationMigrationRuntimeActivationConfigPath'))
+}

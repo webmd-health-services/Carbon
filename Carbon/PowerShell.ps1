@@ -123,6 +123,25 @@ function Invoke-PowerShell
     <#
     .SYNOPSIS
     Invokes a script block in a separate powershell.exe process.
+    
+    .DESCRIPTION
+    The invoked PowerShell process can run under the .NET 4.0 CLR (using v4.0 as the value to the Runtime parameter) and under 32-bit PowerShell (by passing the x86 switch).
+    
+    
+    .EXAMPLE
+    > Invoke-PowerShell -Command { $PSVersionTable }
+    
+    Runs a separate PowerShell process, returning the $PSVersionTable from that process.
+    
+    .EXAMPLE
+    > Invoke-PowerShell -Command { $PSVersionTable } -x86
+    
+    Runs a 32-bit PowerShell process, return the $PSVersionTable from that process.
+    
+    .EXAMPLE
+    > Invoke-PowerShell -Command { $PSVersionTable } -Runtime v4.0
+    
+    Runs a separate PowerShell process under the v4.0 .NET CLR, returning the $PSVersionTable from that process.  Should return a CLRVersion of 4.0.
     #>
     [CmdletBinding()]
     param(
@@ -137,8 +156,31 @@ function Invoke-PowerShell
         
         [Switch]
         # Run the x86 (32-bit) version of PowerShell.
-        $x86
+        $x86,
+        
+        [string]
+        [ValidateSet('v2.0','v4.0')]
+        # The CLR to use.  Must be one of v2.0 or v4.0.  Defualt is v2.0.
+        $Runtime = 'v2.0'
     )
+    
+    $comPlusAppConfigEnvVarName = 'COMPLUS_ApplicationMigrationRuntimeActivationConfigPath'
+    $activationConfigDir = Join-Path $env:TEMP ([IO.Path]::GetRandomFileName())
+    $activationConfigPath = Join-Path $activationConfigDir powershell.exe.activation_config
+    $originalCOMAppConfigEnvVar = [Environment]::GetEnvironmentVariable( $comPlusAppConfigEnvVarName )
+    if( $Runtime -eq 'v4.0' )
+    {
+        $null = New-Item -Path $activationConfigDir -ItemType Directory
+        @"
+<?xml version="1.0" encoding="utf-8" ?>
+<configuration>
+  <startup useLegacyV2RuntimeActivationPolicy="true">
+    <supportedRuntime version="v4.0"/>
+  </startup>
+</configuration>
+"@ | Out-File -FilePath $activationConfigPath -Encoding OEM
+        Set-EnvironmentVariable -Name $comPlusAppConfigEnvVarName -Value $activationConfigDir -Scope Process
+    }
     
     $params = @{ }
     if( $x86 )
@@ -146,7 +188,25 @@ function Invoke-PowerShell
         $params.x86 = $true
     }
     
-    & (Get-PowerShellPath @params) -NoProfile -NoLogo -Command $command -Args $Args
+    try
+    {
+        & (Get-PowerShellPath @params) -NoProfile -NoLogo -Command $command -Args $Args
+    }
+    finally
+    {
+        if( $Runtime -eq 'v4.0' )
+        {
+            Remove-Item -Path $activationConfigDir -Recurse -Force
+            if( $originalCOMAppConfigEnvVar )
+            {
+                Set-EnvironmentVariable -Name $comPlusAppConfigEnvVarName -Value $originalCOMAppConfigEnvVar -Scope Process
+            }
+            else
+            {
+                Remove-EnvironmentVariable -Name $comPlusAppConfigEnvVarName -Scope Process
+            }
+        }
+    }
 }
 
 function Test-PowerShellIs32Bit
