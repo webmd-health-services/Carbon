@@ -1,4 +1,4 @@
-# 0.2.0
+# 0.2.0 (4 April 2012)
  
 ## Enhancements
   * fix issue #3: Added -Runtime switch to Invoke-PowerShell function for running PowerShell under .NET 2.0 or 4.0.  Valid values are 'v2.0' (for .NET 2) and 'v4.0' (for .NET 4).
