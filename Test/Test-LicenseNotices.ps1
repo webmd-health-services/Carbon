@@ -23,7 +23,7 @@ function TearDown
 function Test-AllFilesShouldHaveLicense
 {
     $projectRoot = Join-Path $TestDir .. -Resolve
-    $licenseFilePath = Join-Path $projectRoot LICENSE -Resolve
+    $licenseFilePath = Join-Path $projectRoot LICENSE.txt -Resolve
     
     $noticeLines = New-Object Collections.Generic.List[string]
     $foundNotice = $false
