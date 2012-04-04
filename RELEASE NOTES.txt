@@ -1,11 +1,11 @@
-# 0.2.0 ()
+# 0.2.0
  
 ## Enhancements
-  * Added -Runtime switch to Invoke-PowerShell function for running PowerShell under .NET 2.0 or 4.0.  Valid values are 'v2.0' (for .NET 2) and 'v4.0' (for .NET 4).
+  * fix issue #3: Added -Runtime switch to Invoke-PowerShell function for running PowerShell under .NET 2.0 or 4.0.  Valid values are 'v2.0' (for .NET 2) and 'v4.0' (for .NET 4).
   * **BREAKING CHANGE:** Added -Clr2 and -Clr4 switches to Set-DotNetAppSetting and Set-DotNetConnectionString functions for modifying the .NET 2 and/or 4 machine.config files.  One or both of these parameters is required.
     
 ## Bug fixes
-  * Improved documentation for Get-ADDomainController, Get-ADUser, Format-ADSpecialCharacters, Get-Certificate, and Invoke-PowerShell functions.
+  * Improved documentation for Get-ADDomainController, Get-ADUser, Format-ADSpecialCharacters, Get-Certificate, Invoke-PowerShell, Set-DotNetAppSetting, and Set-DotNetConnectionString functions.
   * fix issue #2: Get-PowerShellPath Returns Wrong Value on x86 Systems
    
 
