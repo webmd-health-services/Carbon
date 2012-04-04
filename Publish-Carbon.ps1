@@ -25,9 +25,22 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 $PSScriptRoot = Split-Path -Parent $MyInvocation.MyCommand.Definition
 
-$version = [Version] (Get-Content (Join-Path $PSScriptRoot Version.txt -Resolve))
+$licenseFileName = 'LICENSE.txt'
 
-Copy-Item (Join-Path $PSScriptRoot LICENSE -Resolve) (Join-Path $PSScriptRoot Carbon\ -Resolve)
+$releaseNotesFileName = 'RELEASE NOTES.txt'
+$releaseNotesPath = Join-Path $PSScriptRoot $releaseNotesFileName -Resolve
+$releaseNotes = Get-Content $releaseNotesPath
+
+if( $releaseNotes[0] -notmatch "^\# (\d+\.\d+\.\d+)\s*" )
+{
+    Write-Error "Missing version from release notes file.  The first line must contain the version about to be released."
+    exit
+}
+$version = [Version]$matches[1]
+$releaseNotes[0] = "# $version ($((Get-Date).ToString("d MMMM yyyy")))"
+$releaseNotes | Out-File -FilePath $releaseNotesPath -Encoding OEM
+
+Copy-Item (Join-Path $PSScriptRoot LICENSE.txt -Resolve) (Join-Path $PSScriptRoot Carbon\ -Resolve)
 
 $carbonZipFileName = "Carbon-$version.zip"
 $zipAppPath = Join-Path $PSScriptRoot Tools\7-Zip\7za.exe -Resolve
@@ -39,10 +52,16 @@ try
     {
         Remove-Item $carbonZipFileName
     }
+
     & $zipAppPath a $carbonZipFileName .\Carbon
+    & $zipAppPath a $carbonZipFileName $licenseFileName
+    & $zipAppPath a $carbonZipFileName $releaseNotesFileName
+    
+    hg commit -m "Adding release date for version $version to $releaseNotesFileName." $releaseNotesFileName
+    hg tag $version
 }
 finally
 {
-    Remove-Item (Join-Path $PSScriptRoot Carbon\LICENSE)
+    Remove-Item (Join-Path $PSScriptRoot Carbon\$licenseFileName)
     Pop-Location
 }
