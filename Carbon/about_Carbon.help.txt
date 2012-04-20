@@ -239,6 +239,8 @@ TYPES
       * Diagnostics.Process: ParentProcessID, the process ID of a process's parent (i.e. the process which started a process)
       * ServiceProcess.ServiceController: StartMode, the ServiceProcess.ServiceStartModel value for a service.
       * ServiceProcess.ServiceController: UserName, the name of the account a service runs as.
+      * IO.DirectoryInfo: IsJunction, a boolean indicating if the directory is a junction/reparse point.
+      * IO.DirectoryInfo: TargetPath, if the directory is a junction/reparse point, the path of the junction's target (i.e. where it points to).  Otherwise, null.
 
 DEVELOPMENT/CONTRIBUTING
     We welcome your feedback and contributions!  

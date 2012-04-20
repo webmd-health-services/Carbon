@@ -1,3 +1,7 @@
+# 0.2.1
+  * Added IsJunction property to DirectoryInfo objects.  Returns true if a directory is a junction/reparse point.
+  * Added TargetPath property to DirectoryInfo objects.  If the directory is a junction/reparse points, returns the path to the junction's target.  Otherwise, $null.  Requires fsutil.exe, which started shipping with Windows XP.
+
 # 0.2.0 (4 April 2012)
  
 ## Enhancements
