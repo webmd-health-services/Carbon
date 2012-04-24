@@ -54,7 +54,7 @@
             <ScriptProperty>
                 <Name>IsJunction</Name>
                 <GetScriptBlock>
-                    $this.Attributes -band [IO.FileAttributes]::ReparsePoint
+                    (($this.Attributes -band [IO.FileAttributes]::ReparsePoint) -eq [IO.FileAttributes]::ReparsePoint)
                 </GetScriptBlock>
             </ScriptProperty>
             <ScriptProperty>
@@ -65,25 +65,7 @@
                         return
                     }
                     
-                    if( -not (Get-Command fsutil.exe) )
-                    {
-                        Write-Error 'Unable to find junction target path.  fsutil.exe not found.'
-                        return
-                    }
-                    
-                    $targetPath = fsutil.exe reparsepoint query $this.FullName | ForEach-Object {
-                        if( $_ -match '^Print Name:\s+(.*)$' )
-                        {
-                            return $matches[1]
-                        }
-                    }
-                    
-                    if( $targetPath )
-                    {
-                        return $targetPath
-                    }
-                    
-                    Write-Error 'Unable to find target path.'
+                    [Carbon.IO.JunctionPoint]::GetTarget( $this.FullName )
                 </GetScriptBlock>
             </ScriptProperty>
         </Members>

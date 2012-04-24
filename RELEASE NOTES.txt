@@ -1,6 +1,8 @@
 # 0.2.1
   * Added IsJunction property to DirectoryInfo objects.  Returns true if a directory is a junction/reparse point.
-  * Added TargetPath property to DirectoryInfo objects.  If the directory is a junction/reparse points, returns the path to the junction's target.  Otherwise, $null.  Requires fsutil.exe, which started shipping with Windows XP.
+  * Created a Carbon assembly for compiled code.  Moved P/Invoke functions from FileSystem.ps1 into assembly.  This is a backwards compatible change.
+  * Created a Carbon.IO.JunctionPoint helper class for creating/removing/getting junction/reparse points.  Updated New-Junction and Remove-Junction to use the new helper class.
+  * Added TargetPath property to DirectoryInfo objects.  If the directory is a junction/reparse points, returns the path to the junction's target.  Otherwise, $null.
 
 # 0.2.0 (4 April 2012)
  
