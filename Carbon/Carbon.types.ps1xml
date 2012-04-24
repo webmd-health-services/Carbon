@@ -48,4 +48,44 @@
             </ScriptProperty>
         </Members>
     </Type>
+    <Type>
+        <Name>System.IO.DirectoryInfo</Name>
+        <Members>
+            <ScriptProperty>
+                <Name>IsJunction</Name>
+                <GetScriptBlock>
+                    $this.Attributes -band [IO.FileAttributes]::ReparsePoint
+                </GetScriptBlock>
+            </ScriptProperty>
+            <ScriptProperty>
+                <Name>TargetPath</Name>
+                <GetScriptBlock>
+                    if( -not $this.IsJunction )
+                    {
+                        return
+                    }
+                    
+                    if( -not (Get-Command fsutil.exe) )
+                    {
+                        Write-Error 'Unable to find junction target path.  fsutil.exe not found.'
+                        return
+                    }
+                    
+                    $targetPath = fsutil.exe reparsepoint query $this.FullName | ForEach-Object {
+                        if( $_ -match '^Print Name:\s+(.*)$' )
+                        {
+                            return $matches[1]
+                        }
+                    }
+                    
+                    if( $targetPath )
+                    {
+                        return $targetPath
+                    }
+                    
+                    Write-Error 'Unable to find target path.'
+                </GetScriptBlock>
+            </ScriptProperty>
+        </Members>
+    </Type>
 </Types>
