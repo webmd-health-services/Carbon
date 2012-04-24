@@ -103,6 +103,7 @@ function New-Junction
     }
     else
     {
+        Write-Host "Creating junction $Link <=> $Target"
         [Carbon.IO.JunctionPoint]::Create( $Link, $Target, $false )
         if( Test-Path $Link -PathType Container ) 
         { 
