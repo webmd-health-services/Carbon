@@ -1,9 +1,76 @@
 <html>
 <head>
 	<title>Carbon: PowerShell DevOps module for configuring and setting up Windows computers</title>
-	<link href="styles.css" rel="text/css" type="stylesheet" />
+	<link href="styles.css" type="text/css" rel="stylesheet" />
 </head>
 <body>
-	<h1>Get-Carbon</h1>
+	<h1>Carbon</h1>
+	<p>    Carbon is a DevOps PowerShell module for automating the configuration of Windows 2008 and 7 computers. Carbon can configure and manage:</p>
+	<ul><li>Local users and groups
+	</li><li>IIS websites, virtual directories, and applications
+	</li><li>Certificates
+	</li><li>.NET connection strings and app settings
+	</li><li>Junctions
+	</li><li>File system permissions
+	</li><li>Hosts file
+	</li><li>INI files
+	</li><li>Performance counters
+	</li><li>Services
+	</li><li>Shares
+	</li><li>Windows features/components
+	</li><li>And much more!
+	</li></ul>
+
+	<h1 id="!system-requirements">System Requirements</h1>
+	<p>    Windows 2008 (x64) and Windows 7 (x64).</p>
+
+	<h1 id="!installation">Installation</h1>
+	<p><a href="https://bitbucket.org/splatteredbits/carbon/downloads">Download the latest release.</a></p>
+	<p>Unzip the Carbon module anywhere on your file system.  Import the module by running:</p>
+
+	<pre>
+		&gt; Import-Module Path\To\Carbon\Directory
+	</pre>
+
+	<p>Replace <kbd>Path\To\Carbon\Directory</kbd> with the actual path where you unzipped Carbon.</p>
+	<p>If you don't want to worry about remembering/finding the path to Carbon, put the Carbon directory into one of the following directories:</p>
+	<ul><li>$PSHOME\Modules
+	</li><li>%USERPROFILE%\Documents\WindowsPowerShell\Modules
+	</li></ul>
+
+	<h1 id="!usage">Usage</h1>
+	<p>    If you've installed Carbon into a standard PowerShell module directory (see above), importing it is easy:</p>
+	<pre>
+		&gt; Import-Module Carbon
+	</pre>
+
+	<p>If you've got it installed somewhere else, maybe your application's version control repository, you'll need to know the path to where it is:</p>
+	
+	<pre>
+		&gt; Import-Module .\Tools\Carbon
+	</pre>
+
+	<p>If importing Carbon in a script, we recommend always using relative paths.  You can get the directory in which the current script is executing, and using that to get the path to Carbon, like this:</p>
+	<pre>
+		&gt; $PSScriptRoot = Split-Path -Parent $MyInvocation.MyCommand.Definition
+		&gt; Import-Module (Join-Path $PSScriptRoot ..\Tools\Carbon -Resolve)
+	</pre>
+
+	<p>For more usage information, see the Carbon help topic:</p>
+
+	<pre>
+		&gt; help Carbon
+	</pre>
+
+
+	<p>To get a list of all commands imported by Carbon,</p>
+
+	<pre>
+		&gt; Get-Command | Where-Object { $_.ModuleName -eq 'Carbon' }
+	</pre>
+
+	<div class="Footer">
+		Copyright &copy; 2012 <a href="http://splatteredbits.com">Aaron Jensen</a>.  All rights reserved.
+	</div>
 </body>
 </html>
