@@ -127,7 +127,25 @@ function Get-SslCertificateBinding
 {
     <#
    .SYNOPSIS
-   Gets an SSL certificate binding.
+   Gets the SSL certificate binding for an IP/port combination.
+   
+   .DESCRIPTION
+   Windows binds SSL certificates to an IP addresses/port combination.  This function gets the binding for a specific IP/port, or $null if one doesn't exist.
+   
+   .EXAMPLE
+   > Get-SslCertificateBinding -IPPort 42.37.80.47:443
+   
+   Gets the SSL certificate bound to 42.37.80.47, port 443.
+   
+   .EXAMPLE
+   > Get-SslCertificateBinding -IPPort 0.0.0.0:443
+   
+   Gets the default SSL certificate bound to ALL the computer's IP addresses on port 443.  The object returns will have the following properties:
+
+     * IPPort - the IP address/port the SSL certificate is bound to
+     * ApplicationID - the user-generated GUID representing the application using the SSL certificate
+     * CertificateHash - the certificate's thumbprint
+   
    #>
    [CmdletBinding()]
    param(
@@ -147,7 +165,22 @@ function Get-SslCertificateBindings
 {
     <#
     .SYNOPSIS
-    Gets all the SSL certificate bindings.
+    Gets all the SSL certificate bindings on this computer.
+    
+    .DESCRIPTION
+    Parses the output of
+       
+       > netsh http show sslcert
+       
+    and returns an object for each binding with the following properties:
+    
+     * IPPort - the IP address/port the SSL certificate is bound to
+     * ApplicationID - the user-generated GUID representing the application using the SSL certificate
+     * CertificateHash - the certificate's thumbprint
+
+    .EXAMPLE
+    > Get-SslCertificateBindings 
+    
     #>
     [CmdletBinding()]
     param(
@@ -198,8 +231,17 @@ function Install-Certificate
     <#
     .SYNOPSIS
     Installs a certificate in a given store.
-    .RETURNS
-    An X509Certificate2 object representing the newly installed certificate.
+    
+    .DESCRIPTION
+    Uses the .NET certificates API to add a certificate to a store for the machine or current user.  The user performing the action must have permission to modify the store or the installation will fail.
+    
+    .OUTPUTS
+    System.Security.Cryptogrpahy.X509Certificates.X509Certificate2. An X509Certificate2 object representing the newly installed certificate.
+    
+    .EXAMPLE
+    > Install-Certificate -Path C:\Users\me\certificate.cer -StoreLocation LocalMachine -StoreName My -Exportable -Password My5up3r53cur3P@55w0rd
+    
+    Installs the certificate (which is protected by a password) at C:\Users\me\certificate.cer into the local machine's Personal store.  The certificate is marked exportable.
     #>
     [CmdletBinding(SupportsShouldProcess=$true)]
     param(
@@ -210,12 +252,16 @@ function Install-Certificate
         
         [Parameter(Mandatory=$true)]
         [Security.Cryptography.X509Certificates.StoreLocation]
-        # The location of the certificate's store.
+        # The location of the certificate's store.  To see a list of acceptable values, run:
+        #
+        #   > [Enum]::GetValues([Security.Cryptography.X509Certificates.StoreLocation])
         $StoreLocation,
         
         [Parameter(Mandatory=$true)]
         [Security.Cryptography.X509Certificates.StoreName]
-        # The name of the certificate's store.
+        # The name of the certificate's store.  To see a list of acceptable values run:
+        #
+        #  > [Enum]::GetValues([Security.Cryptography.X509Certificates.StoreName])
         $StoreName,
         
         [Switch]
@@ -223,8 +269,7 @@ function Install-Certificate
         $Exportable,
         
         [Parameter()]
-        [string]
-        # The password for the certificate.  Can be a string or a SecureString.
+        # The password for the certificate.  Can be a string or a System.Security.SecureString.
         $Password
     )
     
@@ -251,6 +296,24 @@ function Install-Certificate
 
 function Remove-Certificate
 {
+    <#
+    .SYNOPSIS
+    Removes a certificate from a store for the user or machine account.
+    
+    .DESCRIPTION
+    Uses .NET's certificates API to remove a certificate from a given store for the machine or current user.  Use the thumbprint or friendly name to identify which certificate to remove.  The thumbprint is unique to each certificate.  Friendly names are not guaranteed to be unique.  The user performing the removal must have permission on the store where the certificate is located.
+
+    .EXAMPLE
+    > Remove-Certificate -Thumbprint 570895470234023dsaaefdbcgbefa -StoreLocation CurrentUser -StoreName My
+    
+    Removes the 570895470234023dsaaefdbcgbefa certificate from the current user's Personal certificate store.
+    
+    .EXAMPLE
+    > $cert = Get-Certificate -FriendlyName 'Carbon Testing Certificate' -StoreLocation LocalMachine -StoreName Root
+    > Remove-Certificate -Certificate $cert -StoreLocation LocalMachine -StoreName Root
+    
+    Removes the certificate with friendly name 'Carbon Testing Certificate' from the local machine's Trusted Root Certification Authorities store.
+    #>
     [CmdletBinding(SupportsShouldProcess=$true)]
     param(
         [Parameter(Mandatory=$true,ParameterSetName='ByThumbprint')]
@@ -295,6 +358,19 @@ function Remove-SslCertificateBinding
     <#
     .SYNOPSIS
     Removes an SSL certificate binding.
+    
+    .DESCRIPTION
+    Uses the netsh command line application to remove an SSL certificate binding for an IP/port combination.  If the binding doesn't exist, nothing is changed.
+    
+    .EXAMPLE
+    > Remove-SslCertificateBinding -IPPort 45.72.89.57:443
+    
+    Removes the SSL certificate bound to IP 45.72.89.57 on port 443.
+    
+    .EXAMPLE
+    > Remove-SslCertificateBinding -IPPort 0.0.0.0:443
+    
+    Removes the default SSL certificate from port 443.  The default certificate is bound to all IP addresses.
     #>
     [CmdletBinding(SupportsShouldProcess=$true)]
     param(
@@ -324,6 +400,20 @@ function Set-SslCertificateBinding
     <#
     .SYNOPSIS
     Sets an SSL certificate binding for a given IP/port.
+    
+    .DESCRIPTION
+    Uses the netsh command line application to set the certificate for an IP address and port.  If a binding already exists for the IP/port, it is removed, and the new binding is created.  No validation is performed on the thumbprint.
+    
+    .EXAMPLE
+    > Set-SslCertificateBinding -IPPort 43.27.89.54:443 -ApplicationID 88d1f8da-aeb5-40a2-a5e5-0e6107825df7 -Thumbprint 478907345890734590743
+    
+    Configures the computer to use the 478907345890734590743 certificate on IP 43.27.89.54, port 443.
+    
+    .EXAMPLE
+    
+    > Set-SslCertificateBinding -IPPort 0.0.0.0:443 -ApplicationID 88d1f8da-aeb5-40a2-a5e5-0e6107825df7 -Thumbprint 478907345890734590743
+    
+    Configures the compute to use the 478907345890734590743 certificate as the default certificate on all IP addresses, port 443.
     #>
     [CmdletBinding(SupportsShouldProcess=$true)]
     param(
@@ -367,6 +457,19 @@ function Test-SslCertificateBinding
     <#
     .SYNOPSIS
     Tests if an SSL certificate binding exists.
+	
+	.DESCRIPTION
+	SSL certificates are bound to IP addresses and ports.  This function tests if one exists on a given IP/port.
+	
+	.EXAMPLE
+	Test-SslCertificateBinding 0.0.0.0:443
+	
+	Tests if there is a default SSL certificate bound to all a machine's IP addresses on port 443.
+	
+	.EXAMPLE
+	Test-SslCertificateBinding 10.0.1.1:443
+	
+	Tests if there is an SSL certificate bound to IP address 10.0.1.1 on port 443.
     #>
     param(
         [Parameter(Mandatory=$true)]
