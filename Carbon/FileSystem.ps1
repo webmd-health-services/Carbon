@@ -12,31 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-$carbonWin32MemberDefinition = @'
-[DllImport("kernel32.dll", SetLastError=true, CharSet=CharSet.Auto)]
-public static extern uint GetLongPathName(
-    string shortPath, 
-    StringBuilder sb, 
-    int buffer);
-
-[DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError=true)]
-public static extern uint GetShortPathName(
-   string lpszLongPath,
-   StringBuilder lpszShortPath,
-   uint cchBuffer);
-
-[DllImport("shlwapi.dll", CharSet=CharSet.Auto)]
-public static extern bool PathRelativePathTo(
-     [Out] StringBuilder pszPath,
-     [In] string pszFrom,
-     [In] FileAttributes dwAttrFrom,
-     [In] string pszTo,
-     [In] FileAttributes dwAttrTo
-);
-'@
-Add-Type -MemberDefinition $carbonWin32MemberDefinition -Name 'Win32' -Namespace 'Carbon' -UsingNamespace System.Text,System.IO
-
-
 function Get-FullPath($relativePath)
 {
     if( -not ( [System.IO.Path]::IsPathRooted($relativePath) ) )
@@ -128,8 +103,9 @@ function New-Junction
     }
     else
     {
-        cmd.exe /c mklink /J $Link $Target | Write-Host
-        if( $LastExitCode -eq 0 ) 
+        Write-Host "Creating junction $Link <=> $Target"
+        [Carbon.IO.JunctionPoint]::Create( $Link, $Target, $false )
+        if( Test-Path $Link -PathType Container ) 
         { 
             Get-Item $Link 
         } 
@@ -157,7 +133,7 @@ function Remove-Junction
         if( $pscmdlet.ShouldProcess($Path, "remove junction") )
         {
             Write-Host "Removing junction $Path."
-            cmd.exe /c rmdir $Path
+            [Carbon.IO.JunctionPoint]::Delete( $Path )
         }
     }
     else
@@ -176,8 +152,7 @@ function Test-PathIsJunction
     
     if( Test-Path $Path -PathType Container )
     {
-        $item = Get-Item $Path
-        return $item.Attributes -like '*ReparsePoint*'
+        return (Get-Item $Path).IsJunction
     }
     return $false
 }

@@ -38,14 +38,15 @@ function Invoke-RemoveJunction($junction)
 function Test-ShouldRemoveJunction
 {
     Invoke-RemoveJunction $JunctionPath
-    Assert-LastProcessSucceeded 'Failed to delete junction.'
     Assert-DirectoryDoesNotExist $JunctionPath 'Failed to delete junction.'
+    Assert-DirectoryExists $TestDir
 }
 
 function Test-ShouldDoNothingIfJunctionActuallyADirectory
 {
     $realDir = Join-Path $env:Temp ([IO.Path]::GetRandomFileName())
     New-Item $realDir -ItemType 'Directory'
+    $error.Clear()
     Invoke-RemoveJunction $realDir 2> $null
     Assert-DirectoryExists $realDir 'Real directory was removed.'
     Assert-Equal 1 $error.Count "Didn't write out any errors."
@@ -55,6 +56,7 @@ function Test-ShouldDoNothingIfJunctionActuallyADirectory
 function Test-ShouldDoNothingIfJunctionActuallyAFile
 {
     $path = [IO.Path]::GetTempFileName()
+    $error.Clear()
     Invoke-RemoveJunction $path 2> $null
     Assert-FileExists $path 'File was deleted'
     Assert-Equal 1 $error.Count "Didn't write out any errors."
