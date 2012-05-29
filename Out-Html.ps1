@@ -5,129 +5,174 @@
 #
 # Modify the invocation line at the bottom of the script if you want to document 
 # fewer command, subsets or snapins
-# Open default.htm to view in frameset or index.htm for index page with links.
+# Open default.html to view in frameset or index.html for index page with links.
 ################################################################################
 # Created By: Vegard Hamar
 ################################################################################
 
-param($outputDir = "./help")
+[CmdletBinding()]
+param(
+    [string]
+    # The path where the help should be put.
+    $OutputDir = "./help"
+)
 
-function FixString {
-	param($in = "")
-	if ($in -eq $null) {
-		$in = ""
-	}
-	return $in.Replace("&", "&amp;").Replace("<", "&lt;").Replace(">", "&gt;")
+#Set-StrictMode -Version Latest
+$PSScriptRoot = Split-Path $MyInvocation.MyCommand.Definition
+
+if( (Get-Module Carbon) )
+{
+    Remove-Module Carbon
+}
+Import-Module (Join-Path $PSScriptRoot Carbon)
+
+Add-Type -AssemblyName System.Web
+
+filter Format-ForHtml 
+{
+    if( $_ )
+    {
+        [Web.HttpUtility]::HtmlEncode($_)
+    }
 }
 
-function Out-HTML {
-	param($commands = $null, $outputDir = "./help")
+filter Out-HtmlString
+{
+    $_ | 
+        Out-String -Width ([Int32]::MaxValue) | 
+        ForEach-Object { $_.Trim() } | 
+        Format-ForHtml
+}
 
-	$commandsHelp = $commands | sort-object modulename, name | get-help -full
 
-	#create an output directory
-	if ( -not (Test-Path $outputDir)) {
-		md $outputDir | Out-Null
-	}
+filter Convert-HelpToHtml 
+{
+	param(
+        [Parameter(Mandatory=$true,ValueFromPipeline=$true)]
+        # The command to document.
+        $CommandHelp,
+        
+        [Parameter(Mandatory=$true)]
+        [string]
+        # The menu to show on every page.
+        $Menu
+    )
 
-	#Generate frame page
-	$indexFileName = $outputDir + "/index.htm"
-	
-	#Generate frameset
-@'
-<html>
-	<head>
-		<title>PowerShell Help</title>
-	</head>
-	<frameset cols="250,*">
-		<frame src="./index.htm" />
-		<frame src="" name="display"/>
-	</frameset>
-</html>
-'@ | Out-File "$outputDir/default.htm"
-
-	#Generate index
-@'
-<html>
-	<head>
-		<title>PowerShell Help</title>
-	</head>
-	<body>
-'@  | out-file $indexFileName
-
-	$SnapIn = ""
-	foreach ($c in $commandsHelp) {
-		if ($SnapIn -ne $c.modulename) {
-			"<a href='#" + $c.modulename + "'>* " + $c.modulename.Replace(".", " ") + "</a></br>"   | out-file $indexFileName -Append
-			$SnapIn = $c.modulename
-		}
-	}
-
-	$SnapIn = ""
-	foreach ($c in $commandsHelp) {
-		if ($SnapIn -ne $c.modulename) {
-			"<h3><a name='$($c.modulename)'>" +$c.modulename.Replace(".", " ") + "</a></h3>" | Out-File $indexFileName -Append
-			$SnapIn = $c.modulename
-		}
-		"<a href='" + $c.name + ".htm' target='display'>* $($c.Name)</a></br>"   | out-file $indexFileName -Append
-	}
-
-	#Generate all single help files
-	$outputText = $null
-	foreach ($c in $commandsHelp) {
-		$fileName = ( $outputDir + "/" + $c.Name + ".htm" )
-
-@"
-<html>
-	<head>
-		<title>$($c.Name)</title>
-	</head>
-	<body>
-		<h1>$($c.Name)</h1>
-		<div>$($c.synopsis)</div>
-
-		<h2> Syntax </h2>
-		<code>$(FixString($c.syntax | out-string  -width 2000).Trim())</code>  
-
-		<h2> Detailed Description </h2>
-		<div>$(FixString($c.Description  | out-string  -width 2000))</div>
-
-		<h2> Related Commands </h2>
-		<div>
-"@ | out-file $fileName 
-		foreach ($relatedLink in $c.relatedLinks.navigationLink) {
-			if($relatedLink.linkText -ne $null -and $relatedLink.linkText.StartsWith("about") -eq $false){
-				"			* <a href='$($relatedLink.linkText).htm'>$($relatedLink.linkText)</a><br/>" | out-file $fileName -Append         
-			}
-		}
-	  
-@"
-		</div>
+    $name = $CommandHelp.Name #| Format-ForHtml
+    $synopsis = $CommandHelp.Synopsis #| Format-ForHtml
+    $syntax = $CommandHelp.Syntax | Out-HtmlString
+    $description = $CommandHelp.Description #| Format-ForHtml
+    $relatedCommands = $CommandHelp.RelatedLinks | Out-HtmlString
+    if( $relatedCommands )
+    {
+        $relatedCommands = @"
+        <h2>Related Commands</h2>
+        {0}
+"@ -f ($relatedCommands -join '<br>')
+    }
+    
+    $parameters = $CommandHelp.Parameters.Parameter |
+        ForEach-Object {
+            @"
+			<tr valign='top'>
+				<td>{0}</td>
+				<td>{1}</td>
+				<td>{2}</td>
+				<td>{3}</td>
+				<td>{4}</td>
+                <td>{5}</td>
+			</tr>
+"@ -f $_.Name,$_.type.name,($_.Description | Out-HtmlString),$_.Required,$_.PipelineInput,$_.DefaultValue
+        }
+        
+    if( $parameters )
+    {
+        $parameters = @"
 		<h2> Parameters </h2>
 		<table border='1'>
 			<tr>
 				<th>Name</th>
+                <th>Type</th>
 				<th>Description</th>
 				<th>Required?</th>
 				<th>Pipeline Input</th>
 				<th>Default Value</th>
 			</tr>
-"@   | out-file $fileName -Append
+            {0}
+        </table>
+"@ -f ($parameters -join "`n")
+    }
 
-		$paramNum = 0
-		foreach ($param in $c.parameters.parameter ) {
+    $inputTypes = $CommandHelp.inputTypes | Out-HtmlString
+    if( $inputTypes )
+    {
+        $inputTypes = @"
+        <h2>Input Type</h2>
+        <div>{0}</div>
+"@ -f $inputTuypes
+    }
+    
+    $returnValues = $commandHelp.returnValues | Out-HtmlString
+    if( $returnValues )
+    {
+        $returnValues = @"
+        <h2>Return Values</h2>
+        <div>{0}</div>
+"@ -f $returnValues
+    }
+    
+    $notes = $CommandHelp.AlertSet | Out-HtmlString
+    if( $notes )
+    {
+        $notes = @"
+        <h2>Notes</h2>
+        <div>{0}</div>
+"@ -f $notes
+    }
+    
+    $examples = $CommandHelp.Examples.example |
+        Where-Object { $_ } |
+        ForEach-Object {
+            @"
+            <h2>{0}</h2>
+            <pre><code>{1}</code></pre>
+            <p>{2}</p>
+"@ -f $_.title.Trim(('-',' ')),($_.code | Out-HtmlString),(($_.remarks | Out-HtmlString) -join '</p><p>')
+        }
+    
 @"
-			<tr valign='top'>
-				<td>$($param.Name)&nbsp;</td>
-				<td>$(FixString(($param.Description  | out-string  -width 2000).Trim()))&nbsp;</td>
-				<td>$(FixString($param.Required))&nbsp;</td>
-				<td>$(FixString($param.PipelineInput))&nbsp;</td>
-				<td>$(FixString($param.DefaultValue))&nbsp;</td>
-			</tr>
-"@  | out-file $fileName -Append
-		}
-		"		</table>}"  | out-file $fileName -Append
-   
+<html>
+	<head>
+		<title>$name</title>
+	</head>
+	<body>
+        $Menu
+        
+		<h1>$name</h1>
+		<div>$synopsis</div>
+
+		<h2>Syntax</h2>
+        <pre><code>
+$syntax
+        </code></pre>
+
+		<h2>Description</h2>
+		<div>$description</div>
+
+        $relatedCommands
+
+        $parameters
+        
+        $inputTypes
+        
+        $returnValues
+        
+        $notes
+        
+        $examples
+"@ | Out-File -FilePath (Join-Path $OutputDir ("{0}.html" -f $CommandHelp.Name)) -Encoding OEM
+
+<#
 		# Input Type
 		if (($c.inputTypes | Out-String ).Trim().Length -gt 0) {
 @"
@@ -172,15 +217,86 @@ function Out-HTML {
 	</body>
 </html>
 "@ | out-file $indexFileName -Append
+#>
 }
 
-if( (Get-Module Carbon) )
+filter Get-Functions
 {
-    Remove-Module Carbon
+    param(
+        [Parameter(Mandatory=$true,ValueFromPipeline=$true)]
+        # The file to parse for functions
+        $Path
+    )
+    
+    Write-Verbose "Loading script '$Path'."
+    $scriptContent = Get-Content "$Path"
+    if( -not $scriptContent )
+    {
+        return @()
+    }
+
+    $errors = [Management.Automation.PSParseError[]] @()
+    $tokens = [System.Management.Automation.PsParser]::Tokenize( $scriptContent, [ref] $errors )
+    if( $errors -ne $null -and $errors.Count -gt 0 )
+    {
+        Write-Error "Found $($errors.count) error(s) parsing '$Path'."
+        return
+    }
+    
+    Write-Verbose "Found $($tokens.Count) tokens in '$Path'."
+    
+    for( $idx = 0; $idx -lt $tokens.Count; ++$idx )
+    {
+        $token = $tokens[$idx]
+        if( $token.Type -eq 'Keyword'-and ($token.Content -eq 'Function' -or $token.Content -eq 'Filter') )
+        {
+            $atFunction = $true
+        }
+        
+        if( $atFunction -and $token.Type -eq 'CommandArgument' -and $token.Content -ne '' )
+        {
+            Write-Verbose "Found function '$($token.Content).'"
+            $token.Content
+            $atFunction = $false
+        }
+    }
 }
 
-$PSScriptRoot = Split-Path $MyInvocation.MyCommand.Definition
 
-Import-MOdule (Join-Path $PSScriptRoot Carbon)
+if( (Test-Path $OutputDir -PathType Container) )
+{
+    Remove-Item -Path $OutputDir -Recurse -Force
+}
 
-Out-HTML ( get-command | where {$_.modulename -eq 'Carbon'}) $outputDir
+$commands = Get-Command | Where-Object { $_.ModuleName -eq 'Carbon'} | Sort-Object Name 
+
+$categories = New-Object 'Collections.Generic.SortedList[string,object]'
+Get-ChildItem (Join-Path $PSScriptRoot Carbon\*.ps1) | 
+    Sort-Object BaseName |
+    ForEach-Object { 
+        $currentFile = $_.BaseName
+        $categories[$currentFile] = New-Object 'Collections.ArrayList'
+        $_ | Get-Functions | Sort-Object | ForEach-Object { 
+            [void] $categories[$currentFile].Add($_) 
+        }
+    }
+$categories    
+
+$menuBuilder = New-Object Text.StringBuilder
+[void] $menuBuilder.AppendLine( '<div id="CommandMenuContainer" style="float:left;">' )
+[void] $menuBuilder.AppendLine( "`t<ul id=""CategoryMenu"">" )
+$categories.Keys | ForEach-Object {
+    [void] $menuBuilder.AppendFormat( '{0}{0}<li class="Category">{1}</li>{2}', "`t",$_,"`n" )
+    [void] $menuBuilder.AppendFormat( "`t`t<ul class=""CommandMenu"">`n" )
+    $categories[$_] | ForEach-Object {
+        [void] $menuBuilder.AppendFormat( '{0}{0}{0}<li><a href="{1}.html">{1}</a></li>{2}', "`t",$_,"`n" )
+    }
+    [void] $menuBuilder.AppendFormat( "`t`t</ul>`n" )
+}
+[void] $menuBuilder.AppendLine( "`t</ul>" )
+[void] $menuBuilder.AppendLine( '</div>' )
+
+New-Item $outputDir -ItemType Directory -Force 
+
+$commands | Get-Help -Full | Convert-HelpToHtml -Menu $menuBuilder.ToString()
+
