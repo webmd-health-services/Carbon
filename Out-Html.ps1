@@ -219,6 +219,7 @@ filter Convert-HelpToHtml
         }
     
 @"
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
     <title>$name</title>
@@ -327,6 +328,7 @@ if( -not (Test-Path $OutputDir -PathType Container) )
 }
 
 @"
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
     <title>Carbon PowerShell Module Documentation</title>
