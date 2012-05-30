@@ -17,6 +17,7 @@ body
 h1, h2, h3, h4, h5, h6
 {
 	font-family: Cambria, Georgia, serif;
+	clear:both;
 }
 
 kbd
@@ -51,4 +52,23 @@ div.Footer
 	border-top: 1px solid black;
 	padding-top: 1em;
 	padding-bottom: 3em;
+}
+
+ul#SiteNav
+{
+	font-size: 10pt;
+	margin:0;
+	margin-bottom: 0pt;
+	padding:0;
+	height: 14pt;
+}
+
+ul#SiteNav li
+{
+	list-style-type: none;
+	float:left;
+	display:block;
+	margin:0;
+	margin-right: 1em;
+	padding:0;
 }
