@@ -67,15 +67,13 @@ filter Convert-HelpToHtml
 
     $name = $CommandHelp.Name #| Format-ForHtml
     $synopsis = $CommandHelp.Synopsis #| Format-ForHtml
-    $syntax = $CommandHelp.Syntax | Out-HtmlString | Format-ForHtml
+    $syntax = $CommandHelp.Syntax | Out-HtmlString | Format-ForHtml | ForEach-Object { $_ -split "`n" }
     if( $syntax )
     {
         $syntax = @"
     <h2>Syntax</h2>
-    <pre class="Syntax"><code>
-$syntax
-    </code></pre>
-"@      
+    <pre class="Syntax"><code>{0}</code></pre>
+"@ -f ($syntax -join "</code></pre>`n<pre class=""Syntax""><code>")
     }
     
     $description = $CommandHelp.Description | Out-HtmlString | Convert-MarkdownToHtml
@@ -224,6 +222,7 @@ $syntax
 <html>
 <head>
     <title>$name</title>
+	<link href="styles.css" type="text/css" rel="stylesheet" />
 </head>
 <body>
     $Menu
@@ -293,11 +292,7 @@ filter Get-Functions
     }
 }
 
-
-if( (Test-Path $OutputDir -PathType Container) )
-{
-    Remove-Item -Path $OutputDir -Recurse -Force
-}
+Get-ChildItem $OutputDir *.html | Remove-Item
 
 $commands = Get-Command | Where-Object { $_.ModuleName -eq 'Carbon'} | Sort-Object Name 
 
@@ -311,7 +306,6 @@ Get-ChildItem (Join-Path $PSScriptRoot Carbon\*.ps1) |
             [void] $categories[$currentFile].Add($_) 
         }
     }
-$categories    
 
 $menuBuilder = New-Object Text.StringBuilder
 [void] $menuBuilder.AppendLine( '<div id="CommandMenuContainer" style="float:left;">' )
@@ -327,12 +321,16 @@ $categories.Keys | ForEach-Object {
 [void] $menuBuilder.AppendLine( "`t</ul>" )
 [void] $menuBuilder.AppendLine( '</div>' )
 
-New-Item $outputDir -ItemType Directory -Force 
+if( -not (Test-Path $OutputDir -PathType Container) )
+{
+    New-Item $outputDir -ItemType Directory -Force 
+}
 
 @"
 <html>
 <head>
     <title>Carbon PowerShell Module Documentation</title>
+	<link href="styles.css" type="text/css" rel="stylesheet" />
 </head>
 <body>
     {0}
@@ -342,7 +340,7 @@ New-Item $outputDir -ItemType Directory -Force
 
 
 $commands | 
-    #Where-Object { $_.Name -eq 'Test-User' } | 
+    #Where-Object { $_.Name -eq 'Get-Certificate' } | 
     Get-Help -Full | 
     Convert-HelpToHtml -Menu $menuBuilder.ToString()
 

@@ -1,6 +1,7 @@
 <html>
 <head>
     <title>Get-Certificate</title>
+	<link href="styles.css" type="text/css" rel="stylesheet" />
 </head>
 <body>
     <div id="CommandMenuContainer" style="float:left;">
@@ -180,11 +181,9 @@
 certificate store by thumbprint or friendly name.</div>
 
         <h2>Syntax</h2>
-    <pre class="Syntax"><code>
-Get-Certificate -FriendlyName &lt;String&gt; -StoreLocation {CurrentUser | LocalMachine} -StoreName {AddressBook | AuthRoot | CertificateAuthority | Disallowed | My | Root | TrustedPeople | TrustedPublisher} [&lt;CommonParameters&gt;]
-Get-Certificate -Path &lt;String&gt; [-Password &lt;Object&gt;] [&lt;CommonParameters&gt;]
-Get-Certificate -Thumbprint &lt;String&gt; -StoreLocation {CurrentUser | LocalMachine} -StoreName {AddressBook | AuthRoot | CertificateAuthority | Disallowed | My | Root | TrustedPeople | TrustedPublisher} [&lt;CommonParameters&gt;]
-    </code></pre>
+    <pre class="Syntax"><code>Get-Certificate -FriendlyName &lt;String&gt; -StoreLocation {CurrentUser | LocalMachine} -StoreName {AddressBook | AuthRoot | CertificateAuthority | Disallowed | My | Root | TrustedPeople | TrustedPublisher} [&lt;CommonParameters&gt;]</code></pre>
+<pre class="Syntax"><code>Get-Certificate -Path &lt;String&gt; [-Password &lt;Object&gt;] [&lt;CommonParameters&gt;]</code></pre>
+<pre class="Syntax"><code>Get-Certificate -Thumbprint &lt;String&gt; -StoreLocation {CurrentUser | LocalMachine} -StoreName {AddressBook | AuthRoot | CertificateAuthority | Disallowed | My | Root | TrustedPeople | TrustedPublisher} [&lt;CommonParameters&gt;]</code></pre>
     
     
     
