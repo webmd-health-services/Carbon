@@ -1,9 +1,9 @@
 <html>
-	<head>
-		<title>Get-FirewallRules</title>
-	</head>
-	<body>
-        <div id="CommandMenuContainer" style="float:left;">
+<head>
+    <title>Get-FirewallRules</title>
+</head>
+<body>
+    <div id="CommandMenuContainer" style="float:left;">
 	<ul id="CategoryMenu">
 		<li class="Category">ActiveDirectory</li>
 		<ul class="CommandMenu">
@@ -136,7 +136,6 @@
 		</ul>
 		<li class="Category">Service</li>
 		<ul class="CommandMenu">
-			<li><a href="ConvertTo-FailureActionArg.html">ConvertTo-FailureActionArg</a></li>
 			<li><a href="Grant-ServiceControlPermission.html">Grant-ServiceControlPermission</a></li>
 			<li><a href="Install-Service.html">Install-Service</a></li>
 			<li><a href="Invoke-SubInAcl.html">Invoke-SubInAcl</a></li>
@@ -150,7 +149,6 @@
 		<li class="Category">UsersAndGroups</li>
 		<ul class="CommandMenu">
 			<li><a href="Add-GroupMembers.html">Add-GroupMembers</a></li>
-			<li><a href="Find-UserOrGroup.html">Find-UserOrGroup</a></li>
 			<li><a href="Get-WmiLocalUserAccount.html">Get-WmiLocalUserAccount</a></li>
 			<li><a href="Install-Group.html">Install-Group</a></li>
 			<li><a href="Install-User.html">Install-User</a></li>
@@ -176,44 +174,53 @@
 	</ul>
 </div>
 
-        
-		<h1>Get-FirewallRules</h1>
-		<div>Returns the computer's list of firewall rules.</div>
 
-		<h2>Syntax</h2>
-        <pre><code>
+    <h1>Get-FirewallRules</h1>
+    <div>Returns the computer's list of firewall rules.</div>
+
+        <h2>Syntax</h2>
+    <pre class="Syntax"><code>
 Get-FirewallRules [&lt;CommonParameters&gt;]
-        </code></pre>
+    </code></pre>
+    
+        <h2>Description</h2>
+    <div class="Description">
+        <p>Sends objects down the pipeline for each of the firewall's rules. Each 
+object contains the following properties:</p>
 
-		<h2>Description</h2>
-		<div></div>
+<ul>
+<li>Name</li>
+<li>Enabled</li>
+<li>Direction</li>
+<li>Profiles</li>
+<li>Grouping</li>
+<li>LocalIP</li>
+<li>RemoteIP</li>
+<li>Protocol</li>
+<li>LocalPort</li>
+<li>RemotePort</li>
+<li>EdgeTraversal</li>
+<li>Action</li>
+</ul>
 
-        
+<p>This data is parsed from the output of:</p>
 
-        		<h2> Parameters </h2>
-		<table border='1'>
-			<tr>
-				<th>Name</th>
-                <th>Type</th>
-				<th>Description</th>
-				<th>Required?</th>
-				<th>Pipeline Input</th>
-				<th>Default Value</th>
-			</tr>
-            			<tr valign='top'>
-				<td></td>
-				<td></td>
-				<td></td>
-				<td></td>
-				<td></td>
-                <td></td>
-			</tr>
-        </table>
+<blockquote>
+  <p>netsh advfirewall firewall show rule name=all.</p>
+</blockquote>
+
+    </div>
+    
+    
+
+    
         
+    
         
+    
         
+    
         
-        
-        
-        
-        
+    
+</body>
+</html>   

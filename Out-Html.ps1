@@ -27,6 +27,9 @@ if( (Get-Module Carbon) )
 Import-Module (Join-Path $PSScriptRoot Carbon)
 
 Add-Type -AssemblyName System.Web
+Add-Type -Path (Join-Path $PSSCriptRoot Tools\MarkdownSharp\MarkdownSharp.dll)
+$markdown = New-Object MarkdownSharp.Markdown
+$markdown.AutoHyperlink = $true
 
 filter Format-ForHtml 
 {
@@ -40,8 +43,12 @@ filter Out-HtmlString
 {
     $_ | 
         Out-String -Width ([Int32]::MaxValue) | 
-        ForEach-Object { $_.Trim() } | 
-        Format-ForHtml
+        ForEach-Object { $_.Trim() } 
+}
+
+filter Convert-MarkdownToHtml
+{
+    $markdown.Transform( $_ )
 }
 
 
@@ -60,19 +67,77 @@ filter Convert-HelpToHtml
 
     $name = $CommandHelp.Name #| Format-ForHtml
     $synopsis = $CommandHelp.Synopsis #| Format-ForHtml
-    $syntax = $CommandHelp.Syntax | Out-HtmlString
-    $description = $CommandHelp.Description #| Format-ForHtml
-    $relatedCommands = $CommandHelp.RelatedLinks | Out-HtmlString
+    $syntax = $CommandHelp.Syntax | Out-HtmlString | Format-ForHtml
+    if( $syntax )
+    {
+        $syntax = @"
+    <h2>Syntax</h2>
+    <pre class="Syntax"><code>
+$syntax
+    </code></pre>
+"@      
+    }
+    
+    $description = $CommandHelp.Description | Out-HtmlString | Convert-MarkdownToHtml
+    if( $description )
+    {
+        $description = @"
+    <h2>Description</h2>
+    <div class="Description">
+        $description
+    </div>
+"@
+    }
+    
+    $relatedCommands = $CommandHelp.RelatedLinks |
+        Out-String -Width ([Int32]::MaxValue) |
+        ForEach-Object { $_ -split "`n" } |
+        ForEach-Object { $_.Trim() } |
+        Where-Object { $_ } |
+        ForEach-Object {
+            if( $_ -match '^https?\:\/\/' )
+            {
+                "[{0}]({1})" -f $_,$_
+            }
+            else
+            {
+                "[{0}]({0}.html)" -f $_
+            }
+        }
+    
     if( $relatedCommands )
     {
+        $relatedCommands = @( $relatedCommands )
+        if( $relatedCommands.Length -gt 0 )
+        {
+            $relatedCommands = " * {0}" -f ($relatedCommands -join "`n * ")
+        }
         $relatedCommands = @"
         <h2>Related Commands</h2>
         {0}
-"@ -f ($relatedCommands -join '<br>')
+"@ -f ($relatedCommands | Convert-MarkdownToHtml)
     }
     
+    $hasCommonParameters = $false
     $parameters = $CommandHelp.Parameters.Parameter |
+        Where-Object { $_ } | 
         ForEach-Object {
+        $commonParameterNames = @{
+                                'Verbose' = $true;
+                                'Debug' = $true;
+                                'WarningAction' = $true;
+                                'WarningVariable' = $true;
+                                'ErrorAction' = $true;
+                                'ErrorVariable' = $true;
+                                'OutVariable' = $true;
+                                'OutBuffer' = $true;
+                                'WhatIf' = $true;
+                                'Confirm' = $true;
+                             }
+            if( $commonParameterNames.ContainsKey( $_.name ) )
+            {
+                $hasCommonParameters = $true
+            }
             @"
 			<tr valign='top'>
 				<td>{0}</td>
@@ -87,6 +152,20 @@ filter Convert-HelpToHtml
         
     if( $parameters )
     {
+        $commonParameters = ''
+        if( $hasCommonParameters )
+        {
+            $commonParameters = @"
+                <tr valign="top">
+                <td><a href="http://technet.microsoft.com/en-us/library/dd315352.aspx">CommonParameters</a></td>
+                <td></td>
+                <td>This cmdlet supports common parameters.  For more information type <br> <code>Get-Help about_CommonParameters</code>.</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                </tr>
+"@
+        }
         $parameters = @"
 		<h2> Parameters </h2>
 		<table border='1'>
@@ -99,8 +178,9 @@ filter Convert-HelpToHtml
 				<th>Default Value</th>
 			</tr>
             {0}
+            {1}
         </table>
-"@ -f ($parameters -join "`n")
+"@ -f ($parameters -join "`n"),$commonParameters
     }
 
     $inputTypes = $CommandHelp.inputTypes | Out-HtmlString
@@ -137,87 +217,38 @@ filter Convert-HelpToHtml
             <h2>{0}</h2>
             <pre><code>{1}</code></pre>
             <p>{2}</p>
-"@ -f $_.title.Trim(('-',' ')),($_.code | Out-HtmlString),(($_.remarks | Out-HtmlString) -join '</p><p>')
+"@ -f $_.title.Trim(('-',' ')),($_.code | Out-HtmlString),(($_.remarks | Out-HtmlString | Convert-MarkdownToHtml) -join '</p><p>')
         }
     
 @"
 <html>
-	<head>
-		<title>$name</title>
-	</head>
-	<body>
-        $Menu
-        
-		<h1>$name</h1>
-		<div>$synopsis</div>
+<head>
+    <title>$name</title>
+</head>
+<body>
+    $Menu
 
-		<h2>Syntax</h2>
-        <pre><code>
-$syntax
-        </code></pre>
+    <h1>$name</h1>
+    <div>$synopsis</div>
 
-		<h2>Description</h2>
-		<div>$description</div>
+    $syntax
+    
+    $description
+    
+    $relatedCommands
 
-        $relatedCommands
-
-        $parameters
+    $parameters
         
-        $inputTypes
+    $inputTypes
         
-        $returnValues
+    $returnValues
         
-        $notes
+    $notes
         
-        $examples
+    $examples
+</body>
+</html>   
 "@ | Out-File -FilePath (Join-Path $OutputDir ("{0}.html" -f $CommandHelp.Name)) -Encoding OEM
-
-<#
-		# Input Type
-		if (($c.inputTypes | Out-String ).Trim().Length -gt 0) {
-@"
-		<h2> Input Type </h2>
-		<div>$(FixString($c.inputTypes  | out-string  -width 2000).Trim())</div>
-"@  | out-file $fileName -Append
-		}
-   
-		# Return Type
-		if (($c.returnValues | Out-String ).Trim().Length -gt 0) {
-@"
-		<h2> Return Values </h2>
-		<div>$(FixString($c.returnValues  | out-string  -width 2000).Trim())</div>
-"@  | out-file $fileName -Append
-		}
-          
-		# Notes
-		if (($c.alertSet | Out-String).Trim().Length -gt 0) {
-@"
-		<h2> Notes </h2>
-			"<div>$(FixString($c.alertSet  | out-string -Width 2000).Trim())</div>
-"@  | out-file $fileName -Append
-		}
-   
-		# Examples
-		if (($c.examples | Out-String).Trim().Length -gt 0) {
-			"		<h2> Examples </h2>"  | out-file $fileName -Append      
-			foreach ($example in $c.examples.example) {
-@"
-		<h3> $(FixString($example.title.Trim(('-',' '))))</h3>
-				<pre>$(FixString($example.code | out-string ).Trim())</pre>
-				<div>$(FixString($example.remarks | out-string -Width 2000).Trim())</div>
-"@  | out-file $fileName -Append
-			}
-		}
-@"
-	</body>
-</html>
-"@ | out-file $fileName -Append
-	}
-@"
-	</body>
-</html>
-"@ | out-file $indexFileName -Append
-#>
 }
 
 filter Get-Functions
@@ -276,7 +307,7 @@ Get-ChildItem (Join-Path $PSScriptRoot Carbon\*.ps1) |
     ForEach-Object { 
         $currentFile = $_.BaseName
         $categories[$currentFile] = New-Object 'Collections.ArrayList'
-        $_ | Get-Functions | Sort-Object | ForEach-Object { 
+        $_ | Get-Functions | Where-Object { Test-Path "function:$_" } | Sort-Object | ForEach-Object { 
             [void] $categories[$currentFile].Add($_) 
         }
     }
@@ -298,5 +329,20 @@ $categories.Keys | ForEach-Object {
 
 New-Item $outputDir -ItemType Directory -Force 
 
-$commands | Get-Help -Full | Convert-HelpToHtml -Menu $menuBuilder.ToString()
+@"
+<html>
+<head>
+    <title>Carbon PowerShell Module Documentation</title>
+</head>
+<body>
+    {0}
+</body>
+</html>
+"@ -f $menuBuilder.ToString() | Out-File -FilePath (Join-Path $outputDir index.html) -Encoding OEM
+
+
+$commands | 
+    #Where-Object { $_.Name -eq 'Test-User' } | 
+    Get-Help -Full | 
+    Convert-HelpToHtml -Menu $menuBuilder.ToString()
 

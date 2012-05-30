@@ -66,6 +66,11 @@ function Get-IisHttpRedirect
 
 function Get-IisVersion
 {
+    <#
+    .SYNOPSIS
+    Gets the version of IIS.
+    #>
+    param()
     $props = Get-ItemProperty hklm:\Software\Microsoft\InetStp
     return $props.MajorVersion.ToString() + "." + $props.MinorVersion.ToString()
 }
@@ -422,6 +427,10 @@ function Remove-IisWebsite
 
 function Set-IisAnonymousAuthentication
 {
+    <#
+    .SYNOPSIS
+    Enables or disables anonymous authentication for all or part of a website.
+    #>
     [CmdletBinding(SupportsShouldProcess=$true)]
     param(
         [Parameter(Mandatory=$true)]

@@ -1,9 +1,9 @@
 <html>
-	<head>
-		<title>Unprotect-String</title>
-	</head>
-	<body>
-        <div id="CommandMenuContainer" style="float:left;">
+<head>
+    <title>Unprotect-String</title>
+</head>
+<body>
+    <div id="CommandMenuContainer" style="float:left;">
 	<ul id="CategoryMenu">
 		<li class="Category">ActiveDirectory</li>
 		<ul class="CommandMenu">
@@ -136,7 +136,6 @@
 		</ul>
 		<li class="Category">Service</li>
 		<ul class="CommandMenu">
-			<li><a href="ConvertTo-FailureActionArg.html">ConvertTo-FailureActionArg</a></li>
 			<li><a href="Grant-ServiceControlPermission.html">Grant-ServiceControlPermission</a></li>
 			<li><a href="Install-Service.html">Install-Service</a></li>
 			<li><a href="Invoke-SubInAcl.html">Invoke-SubInAcl</a></li>
@@ -150,7 +149,6 @@
 		<li class="Category">UsersAndGroups</li>
 		<ul class="CommandMenu">
 			<li><a href="Add-GroupMembers.html">Add-GroupMembers</a></li>
-			<li><a href="Find-UserOrGroup.html">Find-UserOrGroup</a></li>
 			<li><a href="Get-WmiLocalUserAccount.html">Get-WmiLocalUserAccount</a></li>
 			<li><a href="Install-Group.html">Install-Group</a></li>
 			<li><a href="Install-User.html">Install-User</a></li>
@@ -176,22 +174,29 @@
 	</ul>
 </div>
 
-        
-		<h1>Unprotect-String</h1>
-		<div>Decrypts a string using the Data Protection API (DPAPI).</div>
 
-		<h2>Syntax</h2>
-        <pre><code>
+    <h1>Unprotect-String</h1>
+    <div>Decrypts a string using the Data Protection API (DPAPI).</div>
+
+        <h2>Syntax</h2>
+    <pre class="Syntax"><code>
 Unprotect-String [-ProtectedString] &lt;Object&gt; [&lt;CommonParameters&gt;]
-        </code></pre>
+    </code></pre>
+    
+        <h2>Description</h2>
+    <div class="Description">
+        <p>Decrypts a string with the Data Protection API (DPAPI).  The string must have also been encrypted with the DPAPI.  The same scope must be used to
+decrypt the string as was used to encrypt it.</p>
 
-		<h2>Description</h2>
-		<div></div>
+    </div>
+    
+            <h2>Related Commands</h2>
+        <ul>
+<li><a href="Protect-String.html">Protect-String</a></li>
+</ul>
 
-                <h2>Related Commands</h2>
-        Protect-String
 
-        		<h2> Parameters </h2>
+    		<h2> Parameters </h2>
 		<table border='1'>
 			<tr>
 				<th>Name</th>
@@ -209,23 +214,29 @@ Unprotect-String [-ProtectedString] &lt;Object&gt; [&lt;CommonParameters&gt;]
 				<td>true (ByValue)</td>
                 <td></td>
 			</tr>
+            
         </table>
         
+    
         
+    
         
+    
         
-        
-        
-        
-                    <h2>EXAMPLE 1</h2>
+                <h2>EXAMPLE 1</h2>
             <pre><code>$encryptedPassword = Protect-String -String 'MySuperSecretPassword'</code></pre>
-            <p>PS&gt; $password = Unprotect-String -ProtectedString  $encryptedPassword
+            <p><p>PS> $password = Unprotect-String -ProtectedString  $encryptedPassword</p>
 
-Decrypts a protected string which was encrypted at the current user or default scopes.</p>             <h2>EXAMPLE 2</h2>
+<p>Decrypts a protected string which was encrypted at the current user or default scopes.</p>
+</p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 2</h2>
             <pre><code>$encryptedPassword = Protect-String -String 'MySuperSecretPassword' -Scope LocalMachine</code></pre>
-            <p>PS&gt; $cipherText = Unprotect-String -ProtectedString $encryptedPassword -Scope LocalMachine
+            <p><p>PS> $cipherText = Unprotect-String -ProtectedString $encryptedPassword -Scope LocalMachine</p>
 
-Encrypts the given string and stores the value in $cipherText.  Because the string was encrypted at the LocalMachine scope, the string must be 
-decrypted at the same scope.</p>             <h2>EXAMPLE 3</h2>
+<p>Encrypts the given string and stores the value in $cipherText.  Because the string was encrypted at the LocalMachine scope, the string must be 
+decrypted at the same scope.</p>
+</p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 3</h2>
             <pre><code>Protect-String -String 'NotSoSecretSecret' | Unprotect-String</code></pre>
-            <p>Demonstrates how Unprotect-String takes input from the pipeline.  Adds 'NotSoSecretSecret' to the pipeline.</p>
+            <p><p>Demonstrates how Unprotect-String takes input from the pipeline.  Adds 'NotSoSecretSecret' to the pipeline.</p>
+</p><p></p><p></p><p></p><p></p>
+</body>
+</html>   

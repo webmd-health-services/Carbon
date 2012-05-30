@@ -1,9 +1,9 @@
 <html>
-	<head>
-		<title>Invoke-PowerShell</title>
-	</head>
-	<body>
-        <div id="CommandMenuContainer" style="float:left;">
+<head>
+    <title>Invoke-PowerShell</title>
+</head>
+<body>
+    <div id="CommandMenuContainer" style="float:left;">
 	<ul id="CategoryMenu">
 		<li class="Category">ActiveDirectory</li>
 		<ul class="CommandMenu">
@@ -136,7 +136,6 @@
 		</ul>
 		<li class="Category">Service</li>
 		<ul class="CommandMenu">
-			<li><a href="ConvertTo-FailureActionArg.html">ConvertTo-FailureActionArg</a></li>
 			<li><a href="Grant-ServiceControlPermission.html">Grant-ServiceControlPermission</a></li>
 			<li><a href="Install-Service.html">Install-Service</a></li>
 			<li><a href="Invoke-SubInAcl.html">Invoke-SubInAcl</a></li>
@@ -150,7 +149,6 @@
 		<li class="Category">UsersAndGroups</li>
 		<ul class="CommandMenu">
 			<li><a href="Add-GroupMembers.html">Add-GroupMembers</a></li>
-			<li><a href="Find-UserOrGroup.html">Find-UserOrGroup</a></li>
 			<li><a href="Get-WmiLocalUserAccount.html">Get-WmiLocalUserAccount</a></li>
 			<li><a href="Install-Group.html">Install-Group</a></li>
 			<li><a href="Install-User.html">Install-User</a></li>
@@ -176,21 +174,24 @@
 	</ul>
 </div>
 
-        
-		<h1>Invoke-PowerShell</h1>
-		<div>Invokes a script block in a separate powershell.exe process.</div>
 
-		<h2>Syntax</h2>
-        <pre><code>
+    <h1>Invoke-PowerShell</h1>
+    <div>Invokes a script block in a separate powershell.exe process.</div>
+
+        <h2>Syntax</h2>
+    <pre class="Syntax"><code>
 Invoke-PowerShell [-Command] &lt;ScriptBlock&gt; [[-Args] &lt;Object[]&gt;] [-x86] [[-Runtime] &lt;String&gt;] [&lt;CommonParameters&gt;]
-        </code></pre>
+    </code></pre>
+    
+        <h2>Description</h2>
+    <div class="Description">
+        <p>The invoked PowerShell process can run under the .NET 4.0 CLR (using v4.0 as the value to the Runtime parameter) and under 32-bit PowerShell (by passing the x86 switch).</p>
 
-		<h2>Description</h2>
-		<div></div>
+    </div>
+    
+    
 
-        
-
-        		<h2> Parameters </h2>
+    		<h2> Parameters </h2>
 		<table border='1'>
 			<tr>
 				<th>Name</th>
@@ -232,18 +233,24 @@ Invoke-PowerShell [-Command] &lt;ScriptBlock&gt; [[-Args] &lt;Object[]&gt;] [-x8
 				<td>false</td>
                 <td></td>
 			</tr>
+            
         </table>
         
+    
         
+    
         
+    
         
-        
-        
-        
-                    <h2>EXAMPLE 1</h2>
+                <h2>EXAMPLE 1</h2>
             <pre><code>Invoke-PowerShell -Command { $PSVersionTable }</code></pre>
-            <p>Runs a separate PowerShell process, returning the $PSVersionTable from that process.</p>             <h2>EXAMPLE 2</h2>
+            <p><p>Runs a separate PowerShell process, returning the $PSVersionTable from that process.</p>
+</p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 2</h2>
             <pre><code>Invoke-PowerShell -Command { $PSVersionTable } -x86</code></pre>
-            <p>Runs a 32-bit PowerShell process, return the $PSVersionTable from that process.</p>             <h2>EXAMPLE 3</h2>
+            <p><p>Runs a 32-bit PowerShell process, return the $PSVersionTable from that process.</p>
+</p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 3</h2>
             <pre><code>Invoke-PowerShell -Command { $PSVersionTable } -Runtime v4.0</code></pre>
-            <p>Runs a separate PowerShell process under the v4.0 .NET CLR, returning the $PSVersionTable from that process.  Should return a CLRVersion of 4.0.</p>
+            <p><p>Runs a separate PowerShell process under the v4.0 .NET CLR, returning the $PSVersionTable from that process.  Should return a CLRVersion of 4.0.</p>
+</p><p></p><p></p><p></p><p></p>
+</body>
+</html>   

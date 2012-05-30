@@ -1,9 +1,9 @@
 <html>
-	<head>
-		<title>Get-Certificate</title>
-	</head>
-	<body>
-        <div id="CommandMenuContainer" style="float:left;">
+<head>
+    <title>Get-Certificate</title>
+</head>
+<body>
+    <div id="CommandMenuContainer" style="float:left;">
 	<ul id="CategoryMenu">
 		<li class="Category">ActiveDirectory</li>
 		<ul class="CommandMenu">
@@ -136,7 +136,6 @@
 		</ul>
 		<li class="Category">Service</li>
 		<ul class="CommandMenu">
-			<li><a href="ConvertTo-FailureActionArg.html">ConvertTo-FailureActionArg</a></li>
 			<li><a href="Grant-ServiceControlPermission.html">Grant-ServiceControlPermission</a></li>
 			<li><a href="Install-Service.html">Install-Service</a></li>
 			<li><a href="Invoke-SubInAcl.html">Invoke-SubInAcl</a></li>
@@ -150,7 +149,6 @@
 		<li class="Category">UsersAndGroups</li>
 		<ul class="CommandMenu">
 			<li><a href="Add-GroupMembers.html">Add-GroupMembers</a></li>
-			<li><a href="Find-UserOrGroup.html">Find-UserOrGroup</a></li>
 			<li><a href="Get-WmiLocalUserAccount.html">Get-WmiLocalUserAccount</a></li>
 			<li><a href="Install-Group.html">Install-Group</a></li>
 			<li><a href="Install-User.html">Install-User</a></li>
@@ -176,24 +174,23 @@
 	</ul>
 </div>
 
-        
-		<h1>Get-Certificate</h1>
-		<div>Gets a certificate from a file on the file system or from a Windows 
+
+    <h1>Get-Certificate</h1>
+    <div>Gets a certificate from a file on the file system or from a Windows 
 certificate store by thumbprint or friendly name.</div>
 
-		<h2>Syntax</h2>
-        <pre><code>
+        <h2>Syntax</h2>
+    <pre class="Syntax"><code>
 Get-Certificate -FriendlyName &lt;String&gt; -StoreLocation {CurrentUser | LocalMachine} -StoreName {AddressBook | AuthRoot | CertificateAuthority | Disallowed | My | Root | TrustedPeople | TrustedPublisher} [&lt;CommonParameters&gt;]
 Get-Certificate -Path &lt;String&gt; [-Password &lt;Object&gt;] [&lt;CommonParameters&gt;]
 Get-Certificate -Thumbprint &lt;String&gt; -StoreLocation {CurrentUser | LocalMachine} -StoreName {AddressBook | AuthRoot | CertificateAuthority | Disallowed | My | Root | TrustedPeople | TrustedPublisher} [&lt;CommonParameters&gt;]
-        </code></pre>
+    </code></pre>
+    
+    
+    
+    
 
-		<h2>Description</h2>
-		<div></div>
-
-        
-
-        		<h2> Parameters </h2>
+    		<h2> Parameters </h2>
 		<table border='1'>
 			<tr>
 				<th>Name</th>
@@ -251,22 +248,28 @@ Get-Certificate -Thumbprint &lt;String&gt; -StoreLocation {CurrentUser | LocalMa
 				<td>false</td>
                 <td></td>
 			</tr>
+            
         </table>
         
+    
         
-        
-                <h2>Return Values</h2>
+            <h2>Return Values</h2>
         <div>System.Security.Cryptography.x509Certificates.X509Certificate2. The 
 X509Certificate2 certificates that were found, or $null.</div>
         
+    
         
-        
-                    <h2>EXAMPLE 1</h2>
+                <h2>EXAMPLE 1</h2>
             <pre><code>Get-Certificate -Path C:\Certificates\certificate.cer -Password MySuperSecurePassword</code></pre>
-            <p>Gets an X509Certificate2 object representing the certificate.cer file.</p>             <h2>EXAMPLE 2</h2>
+            <p><p>Gets an X509Certificate2 object representing the certificate.cer file.</p>
+</p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 2</h2>
             <pre><code>Get-Certificate -Thumbprint a909502dd82ae41433e6f83886b00d4277a32a7b -StoreName My -StoreLocation LocalMachine</code></pre>
-            <p>Gets an X509Certificate2 object for the certificate in the Personal store 
-with a specific thumbprint under the Local Machine.</p>             <h2>EXAMPLE 3</h2>
+            <p><p>Gets an X509Certificate2 object for the certificate in the Personal store 
+with a specific thumbprint under the Local Machine.</p>
+</p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 3</h2>
             <pre><code>Get-Certificate -FriendlyName 'Development Certificate' -StoreLocation CurrentUser -StoreName TrustedPeople</code></pre>
-            <p>Gets the X509Certificate2 whose friendly name is Development Certificate 
+            <p><p>Gets the X509Certificate2 whose friendly name is Development Certificate 
 from the Current User's Trusted People certificate store.</p>
+</p><p></p><p></p><p></p><p></p>
+</body>
+</html>   

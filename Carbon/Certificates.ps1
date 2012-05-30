@@ -170,7 +170,7 @@ function Get-SslCertificateBindings
     .DESCRIPTION
     Parses the output of
        
-       > netsh http show sslcert
+        > netsh http show sslcert
        
     and returns an object for each binding with the following properties:
     

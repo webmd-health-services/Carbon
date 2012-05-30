@@ -1,9 +1,9 @@
 <html>
-	<head>
-		<title>Find-ADUser</title>
-	</head>
-	<body>
-        <div id="CommandMenuContainer" style="float:left;">
+<head>
+    <title>Find-ADUser</title>
+</head>
+<body>
+    <div id="CommandMenuContainer" style="float:left;">
 	<ul id="CategoryMenu">
 		<li class="Category">ActiveDirectory</li>
 		<ul class="CommandMenu">
@@ -136,7 +136,6 @@
 		</ul>
 		<li class="Category">Service</li>
 		<ul class="CommandMenu">
-			<li><a href="ConvertTo-FailureActionArg.html">ConvertTo-FailureActionArg</a></li>
 			<li><a href="Grant-ServiceControlPermission.html">Grant-ServiceControlPermission</a></li>
 			<li><a href="Install-Service.html">Install-Service</a></li>
 			<li><a href="Invoke-SubInAcl.html">Invoke-SubInAcl</a></li>
@@ -150,7 +149,6 @@
 		<li class="Category">UsersAndGroups</li>
 		<ul class="CommandMenu">
 			<li><a href="Add-GroupMembers.html">Add-GroupMembers</a></li>
-			<li><a href="Find-UserOrGroup.html">Find-UserOrGroup</a></li>
 			<li><a href="Get-WmiLocalUserAccount.html">Get-WmiLocalUserAccount</a></li>
 			<li><a href="Install-Group.html">Install-Group</a></li>
 			<li><a href="Install-User.html">Install-User</a></li>
@@ -176,22 +174,24 @@
 	</ul>
 </div>
 
-        
-		<h1>Find-ADUser</h1>
-		<div>Finds a user in Active Directory.</div>
 
-		<h2>Syntax</h2>
-        <pre><code>
+    <h1>Find-ADUser</h1>
+    <div>Finds a user in Active Directory.</div>
+
+        <h2>Syntax</h2>
+    <pre class="Syntax"><code>
 Find-ADUser -DomainUrl &lt;String&gt; -sAMAccountName &lt;String&gt; [&lt;CommonParameters&gt;]
-        </code></pre>
+    </code></pre>
+    
+    
+    
+            <h2>Related Commands</h2>
+        <ul>
+<li><a href="http://msdn.microsoft.com/en-us/library/aa746475.aspx">http://msdn.microsoft.com/en-us/library/aa746475.aspx</a></li>
+</ul>
 
-		<h2>Description</h2>
-		<div></div>
 
-                <h2>Related Commands</h2>
-        http://msdn.microsoft.com/en-us/library/aa746475.aspx
-
-        		<h2> Parameters </h2>
+    		<h2> Parameters </h2>
 		<table border='1'>
 			<tr>
 				<th>Name</th>
@@ -218,17 +218,21 @@ characters are escaped.</td>
 				<td>false</td>
                 <td></td>
 			</tr>
+            
         </table>
         
+    
         
-        
-                <h2>Return Values</h2>
+            <h2>Return Values</h2>
         <div>System.DirectoryServices.DirectoryEntry.  The directory entry object of the
 user's account in Active Directory or $null if the user isn't found.</div>
         
+    
         
-        
-                    <h2>EXAMPLE 1</h2>
+                <h2>EXAMPLE 1</h2>
             <pre><code>Find-ADUser -DomainUrl LDAP://dc.example.com:389 -sAMAccountName $env:USERNAME</code></pre>
-            <p>Finds the AD user whose Windows username (sAMAccountName) is equal to the 
+            <p><p>Finds the AD user whose Windows username (sAMAccountName) is equal to the 
 currently logged on user's username.</p>
+</p><p></p><p></p><p></p><p></p>
+</body>
+</html>   

@@ -20,10 +20,11 @@ function Set-DotNetAppSetting
     
     .DESCRIPTION
     The app setting can be set in up to four different machine.config files:
-      * .NET 2.0 32-bit (switches -Clr2 -Framework)
-      * .NET 2.0 64-bit (switches -Clr2 -Framework64)
-      * .NET 4.0 32-bit (switches -Clr4 -Framework)
-      * .NET 4.0 64-bit (switches -Clr4 -Framework64)
+    
+     * .NET 2.0 32-bit (switches -Clr2 -Framework)
+     * .NET 2.0 64-bit (switches -Clr2 -Framework64)
+     * .NET 4.0 32-bit (switches -Clr4 -Framework)
+     * .NET 4.0 64-bit (switches -Clr4 -Framework64)
       
     Any combination of Framework and Clr switch can be used, but you MUST supply one of each.
     
@@ -31,6 +32,7 @@ function Set-DotNetAppSetting
     > Set-DotNetAppSetting -Name ExampleUrl -Value example.com -Framework -Framework64 -Clr2 -Clr4
     
     Sets the ExampleUrl app setting in the following machine.config files:
+    
      * %SYSTEMROOT%\Microsoft.NET\Framework\v2.0.50727\CONFIG\machine.config
      * %SYSTEMROOT%\Microsoft.NET\Framework64\v2.0.50727\CONFIG\machine.config
      * %SYSTEMROOT%\Microsoft.NET\Framework\v4.0.30319\CONFIG\machine.config
@@ -40,6 +42,7 @@ function Set-DotNetAppSetting
     > Set-DotNetAppSetting -Name ExampleUrl -Value example.com -Framework64 -Clr4
     
     Sets the ExampleUrl app setting in the following machine.config file:
+    
      * %SYSTEMROOT%\Microsoft.NET\Framework64\v4.0.30319\CONFIG\machine.config
     #>
     [CmdletBinding(SupportsShouldProcess=$true, DefaultParameterSetName='All')]
@@ -139,10 +142,11 @@ function Set-DotNetConnectionString
 
     .DESCRIPTION
     The connection string setting can be set in up to four different machine.config files:
-      * .NET 2.0 32-bit (switches -Clr2 -Framework)
-      * .NET 2.0 64-bit (switches -Clr2 -Framework64)
-      * .NET 4.0 32-bit (switches -Clr4 -Framework)
-      * .NET 4.0 64-bit (switches -Clr4 -Framework64)
+     
+     * .NET 2.0 32-bit (switches -Clr2 -Framework)
+     * .NET 2.0 64-bit (switches -Clr2 -Framework64)
+     * .NET 4.0 32-bit (switches -Clr4 -Framework)
+     * .NET 4.0 64-bit (switches -Clr4 -Framework64)
       
     Any combination of Framework and Clr switch can be used, but you MUST supply one of each.
 
@@ -150,6 +154,7 @@ function Set-DotNetConnectionString
     > Set-DotNetConnectionString -Name DevDB -Value "data source=.\DevDB;Integrated Security=SSPI;" -Framework -Framework64 -Clr2 -Clr4
     
     Sets the DevDB connection string in the following machine.config files:
+     
      * %SYSTEMROOT%\Microsoft.NET\Framework\v2.0.50727\CONFIG\machine.config
      * %SYSTEMROOT%\Microsoft.NET\Framework64\v2.0.50727\CONFIG\machine.config
      * %SYSTEMROOT%\Microsoft.NET\Framework\v4.0.30319\CONFIG\machine.config
@@ -159,6 +164,7 @@ function Set-DotNetConnectionString
     > Set-DotNetAppSetting -Name DevDB -Value "data source=.\DevDB;Integrated Security=SSPI;" -Framework64 -Clr4
     
     Sets the DevDB connection string in the following machine.config file:
+     
      * %SYSTEMROOT%\Microsoft.NET\Framework64\v4.0.30319\CONFIG\machine.config
     #>
     [CmdletBinding(SupportsShouldProcess=$true)]

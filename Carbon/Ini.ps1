@@ -127,13 +127,13 @@ function Split-Ini
     A configuration file consists of sections, led by a "[section]" header
     and followed by "name = value" entries:
 
-      [spam]
-      eggs=ham
-      green=
-         eggs
+        [spam]
+        eggs=ham
+        green=
+           eggs
          
-      [stars]
-      sneetches = belly
+        [stars]
+        sneetches = belly
          
     This file will be returned as a hash like this:
     
@@ -166,29 +166,29 @@ function Split-Ini
     Configuration keys can be set multiple times, in which case Split-Ini
     will use the value that was configured last. As an example:
 
-      [spam]
-      eggs=large
-      ham=serrano
-      eggs=small
+        [spam]
+        eggs=large
+        ham=serrano
+        eggs=small
 
     This would set the configuration key named "eggs" to "small".
 
     It is also possible to define a section multiple times. For example:
 
-      [foo]
-      eggs=large
-      ham=serrano
-      eggs=small
+        [foo]
+        eggs=large
+        ham=serrano
+        eggs=small
 
-      [bar]
-      eggs=ham
-      green=
-         eggs
+        [bar]
+        eggs=ham
+        green=
+           eggs
 
-      [foo]
-      ham=prosciutto
-      eggs=medium
-      bread=toasted
+        [foo]
+        ham=prosciutto
+        eggs=medium
+        bread=toasted
 
     This would set the "eggs", "ham", and "bread" configuration keys of the
     "foo" section to "medium", "prosciutto", and "toasted", respectively. As

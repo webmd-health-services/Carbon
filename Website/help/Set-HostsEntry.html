@@ -1,9 +1,9 @@
 <html>
-	<head>
-		<title>Set-HostsEntry</title>
-	</head>
-	<body>
-        <div id="CommandMenuContainer" style="float:left;">
+<head>
+    <title>Set-HostsEntry</title>
+</head>
+<body>
+    <div id="CommandMenuContainer" style="float:left;">
 	<ul id="CategoryMenu">
 		<li class="Category">ActiveDirectory</li>
 		<ul class="CommandMenu">
@@ -136,7 +136,6 @@
 		</ul>
 		<li class="Category">Service</li>
 		<ul class="CommandMenu">
-			<li><a href="ConvertTo-FailureActionArg.html">ConvertTo-FailureActionArg</a></li>
 			<li><a href="Grant-ServiceControlPermission.html">Grant-ServiceControlPermission</a></li>
 			<li><a href="Install-Service.html">Install-Service</a></li>
 			<li><a href="Invoke-SubInAcl.html">Invoke-SubInAcl</a></li>
@@ -150,7 +149,6 @@
 		<li class="Category">UsersAndGroups</li>
 		<ul class="CommandMenu">
 			<li><a href="Add-GroupMembers.html">Add-GroupMembers</a></li>
-			<li><a href="Find-UserOrGroup.html">Find-UserOrGroup</a></li>
 			<li><a href="Get-WmiLocalUserAccount.html">Get-WmiLocalUserAccount</a></li>
 			<li><a href="Install-Group.html">Install-Group</a></li>
 			<li><a href="Install-User.html">Install-User</a></li>
@@ -176,22 +174,20 @@
 	</ul>
 </div>
 
-        
-		<h1>Set-HostsEntry</h1>
-		<div>Set-HostsEntry [-IPAddress] <Object> [-HostName] <Object> [[-Description] <String>] [[-Path] <String>] [-Verbose] [-Debug] [-ErrorAction <ActionPreference>] [-WarningAction <ActionPreference>] [-ErrorVariable <String>] [-WarningVariable <String>] [-OutVariable <String>] [-OutBuffer <Int32>] [-WhatIf] [-Confirm]
-</div>
 
-		<h2>Syntax</h2>
-        <pre><code>
+    <h1>Set-HostsEntry</h1>
+    <div>Sets a hosts entry in a hosts file.</div>
 
-        </code></pre>
+        <h2>Syntax</h2>
+    <pre class="Syntax"><code>
+Set-HostsEntry [-IPAddress] &lt;Object&gt; [-HostName] &lt;Object&gt; [[-Description] &lt;String&gt;] [[-Path] &lt;String&gt;] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]
+    </code></pre>
+    
+    
+    
+    
 
-		<h2>Description</h2>
-		<div></div>
-
-        
-
-        		<h2> Parameters </h2>
+    		<h2> Parameters </h2>
 		<table border='1'>
 			<tr>
 				<th>Name</th>
@@ -202,19 +198,69 @@
 				<th>Default Value</th>
 			</tr>
             			<tr valign='top'>
-				<td></td>
-				<td></td>
-				<td></td>
-				<td></td>
-				<td></td>
+				<td>IPAddress</td>
+				<td>Object</td>
+				<td>The IP address for the hosts entry.</td>
+				<td>true</td>
+				<td>false</td>
                 <td></td>
 			</tr>
+			<tr valign='top'>
+				<td>HostName</td>
+				<td>Object</td>
+				<td>The hostname for the hosts entry.</td>
+				<td>true</td>
+				<td>false</td>
+                <td></td>
+			</tr>
+			<tr valign='top'>
+				<td>Description</td>
+				<td>String</td>
+				<td>An optional description of the hosts entry.</td>
+				<td>false</td>
+				<td>false</td>
+                <td></td>
+			</tr>
+			<tr valign='top'>
+				<td>Path</td>
+				<td>String</td>
+				<td>The path to the hosts file where the entry should be set. Defaults to the local computer's hosts file.</td>
+				<td>false</td>
+				<td>false</td>
+                <td></td>
+			</tr>
+			<tr valign='top'>
+				<td>WhatIf</td>
+				<td>SwitchParameter</td>
+				<td></td>
+				<td>false</td>
+				<td>false</td>
+                <td></td>
+			</tr>
+			<tr valign='top'>
+				<td>Confirm</td>
+				<td>SwitchParameter</td>
+				<td></td>
+				<td>false</td>
+				<td>false</td>
+                <td></td>
+			</tr>
+                            <tr valign="top">
+                <td><a href="http://technet.microsoft.com/en-us/library/dd315352.aspx">CommonParameters</a></td>
+                <td></td>
+                <td>This cmdlet supports common parameters.  For more information type <br> <code>Get-Help about_CommonParameters</code>.</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                </tr>
         </table>
         
+    
         
+    
         
+    
         
-        
-        
-        
-        
+    
+</body>
+</html>   

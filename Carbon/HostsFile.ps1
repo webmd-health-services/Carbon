@@ -69,6 +69,7 @@ function Reset-HostsFile
 function Set-HostsEntry
 {
     <#
+    .SYNOPSIS
     Sets a hosts entry in a hosts file.
     #>
     [CmdletBinding(SupportsShouldProcess=$true)]

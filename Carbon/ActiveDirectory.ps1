@@ -124,13 +124,13 @@ function Format-ADSpecialCharacters
     .SYNOPSIS
     Escapes Active Directory special characters from a string.
     
-    .OUTPUT
-    System.String.  The input string with any Active Directory-sensitive 
-    characters escaped.
-    
     .DESCRIPTION
     There are special characters in Active Directory queries/searches.  This
     function escapes them so they aren't treated as AD commands/characters.
+    
+    .OUTPUTS
+    System.String.  The input string with any Active Directory-sensitive 
+    characters escaped.
     
     .LINK
     http://msdn.microsoft.com/en-us/library/aa746475.aspx#special_characters

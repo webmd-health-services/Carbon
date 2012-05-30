@@ -1,9 +1,9 @@
 <html>
-	<head>
-		<title>Split-Ini</title>
-	</head>
-	<body>
-        <div id="CommandMenuContainer" style="float:left;">
+<head>
+    <title>Split-Ini</title>
+</head>
+<body>
+    <div id="CommandMenuContainer" style="float:left;">
 	<ul id="CategoryMenu">
 		<li class="Category">ActiveDirectory</li>
 		<ul class="CommandMenu">
@@ -136,7 +136,6 @@
 		</ul>
 		<li class="Category">Service</li>
 		<ul class="CommandMenu">
-			<li><a href="ConvertTo-FailureActionArg.html">ConvertTo-FailureActionArg</a></li>
 			<li><a href="Grant-ServiceControlPermission.html">Grant-ServiceControlPermission</a></li>
 			<li><a href="Install-Service.html">Install-Service</a></li>
 			<li><a href="Invoke-SubInAcl.html">Invoke-SubInAcl</a></li>
@@ -150,7 +149,6 @@
 		<li class="Category">UsersAndGroups</li>
 		<ul class="CommandMenu">
 			<li><a href="Add-GroupMembers.html">Add-GroupMembers</a></li>
-			<li><a href="Find-UserOrGroup.html">Find-UserOrGroup</a></li>
 			<li><a href="Get-WmiLocalUserAccount.html">Get-WmiLocalUserAccount</a></li>
 			<li><a href="Install-Group.html">Install-Group</a></li>
 			<li><a href="Install-User.html">Install-User</a></li>
@@ -176,21 +174,97 @@
 	</ul>
 </div>
 
-        
-		<h1>Split-Ini</h1>
-		<div>Reads an ini file and returns its contents as a hashtable.</div>
 
-		<h2>Syntax</h2>
-        <pre><code>
+    <h1>Split-Ini</h1>
+    <div>Reads an ini file and returns its contents as a hashtable.</div>
+
+        <h2>Syntax</h2>
+    <pre class="Syntax"><code>
 Split-Ini -Path &lt;String&gt; [-PassThru] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]
-        </code></pre>
+    </code></pre>
+    
+        <h2>Description</h2>
+    <div class="Description">
+        <p>A configuration file consists of sections, led by a "[section]" header
+and followed by "name = value" entries:</p>
 
-		<h2>Description</h2>
-		<div></div>
+<pre><code>[spam]
+eggs=ham
+green=
+   eggs
 
-        
+[stars]
+sneetches = belly
+</code></pre>
 
-        		<h2> Parameters </h2>
+<p>This file will be returned as a hash like this:</p>
+
+<pre><code>@{
+    spam.eggs =  @{
+                    Section = 'spam';
+                    Name = 'eggs';
+                    Value = 'ham';
+                    LineNumber = 1;
+                  };
+    spam.green = @{
+                    Section = 'spam';
+                    Name = 'green';
+                    Value = "`neggs";
+                    LineNumber = 2;
+                  };
+    stars.sneetches = @{
+                            Section = 'stars';
+                            Name = 'sneetches';
+                            Value = 'belly'
+                            LineNumber = 6;
+                       }
+}
+</code></pre>
+
+<p>Each line contains one entry. If the lines that follow are indented, they
+are treated as continuations of that entry. Leading whitespace is removed
+from values. Empty lines are skipped. Lines beginning with "#" or ";" are
+ignored and may be used to provide comments.</p>
+
+<p>Configuration keys can be set multiple times, in which case Split-Ini
+will use the value that was configured last. As an example:</p>
+
+<pre><code>[spam]
+eggs=large
+ham=serrano
+eggs=small
+</code></pre>
+
+<p>This would set the configuration key named "eggs" to "small".</p>
+
+<p>It is also possible to define a section multiple times. For example:</p>
+
+<pre><code>[foo]
+eggs=large
+ham=serrano
+eggs=small
+
+[bar]
+eggs=ham
+green=
+   eggs
+
+[foo]
+ham=prosciutto
+eggs=medium
+bread=toasted
+</code></pre>
+
+<p>This would set the "eggs", "ham", and "bread" configuration keys of the
+"foo" section to "medium", "prosciutto", and "toasted", respectively. As
+you can see there only thing that matters is the last value that was set
+for each of the configuration keys.</p>
+
+    </div>
+    
+    
+
+    		<h2> Parameters </h2>
 		<table border='1'>
 			<tr>
 				<th>Name</th>
@@ -232,12 +306,22 @@ Split-Ini -Path &lt;String&gt; [-PassThru] [-WhatIf] [-Confirm] [&lt;CommonParam
 				<td>false</td>
                 <td></td>
 			</tr>
+                            <tr valign="top">
+                <td><a href="http://technet.microsoft.com/en-us/library/dd315352.aspx">CommonParameters</a></td>
+                <td></td>
+                <td>This cmdlet supports common parameters.  For more information type <br> <code>Get-Help about_CommonParameters</code>.</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                </tr>
         </table>
         
+    
         
+    
         
+    
         
-        
-        
-        
-        
+    
+</body>
+</html>   
