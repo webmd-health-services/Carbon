@@ -204,7 +204,8 @@
             			<tr valign='top'>
 				<td>Path</td>
 				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
-				<td>The path to the certificate file.</td>
+				<td>The path to the certificate file.
+</td>
 				<td>true</td>
 				<td>false</td>
                 <td></td>
@@ -214,7 +215,10 @@
 				<td><a href="http://msdn.microsoft.com/en-us/library/system.security.cryptography.x509certificates.storelocation.aspx">StoreLocation</a></td>
 				<td>The location of the certificate's store.  To see a list of acceptable values, run:
 
-  > [Enum]::GetValues([Security.Cryptography.X509Certificates.StoreLocation])</td>
+<blockquote>
+  [Enum]::GetValues([Security.Cryptography.X509Certificates.StoreLocation])
+</blockquote>
+</td>
 				<td>true</td>
 				<td>false</td>
                 <td></td>
@@ -224,7 +228,10 @@
 				<td><a href="http://msdn.microsoft.com/en-us/library/system.security.cryptography.x509certificates.storename.aspx">StoreName</a></td>
 				<td>The name of the certificate's store.  To see a list of acceptable values run:
 
- > [Enum]::GetValues([Security.Cryptography.X509Certificates.StoreName])</td>
+<blockquote>
+  [Enum]::GetValues([Security.Cryptography.X509Certificates.StoreName])
+</blockquote>
+</td>
 				<td>true</td>
 				<td>false</td>
                 <td></td>
@@ -232,7 +239,8 @@
 			<tr valign='top'>
 				<td>Exportable</td>
 				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
-				<td>Mark the private key as exportable.</td>
+				<td>Mark the private key as exportable.
+</td>
 				<td>false</td>
 				<td>false</td>
                 <td></td>
@@ -240,7 +248,8 @@
 			<tr valign='top'>
 				<td>Password</td>
 				<td><a href="http://msdn.microsoft.com/en-us/library/system.object.aspx">Object</a></td>
-				<td>The password for the certificate.  Can be a string or a System.Security.SecureString.</td>
+				<td>The password for the certificate.  Can be a string or a System.Security.SecureString.
+</td>
 				<td>false</td>
 				<td>false</td>
                 <td></td>
@@ -274,7 +283,8 @@
     
         
             <h2>Return Values</h2>
-        <div><a href="http://msdn.microsoft.com/en-us/library/system.security.cryptography.x509certificates.x509certificate2.aspx">System.Security.Cryptography.X509Certificates.X509Certificate2</a>. An X509Certificate2 object representing the newly installed certificate.</div>
+        <p><a href="http://msdn.microsoft.com/en-us/library/system.security.cryptography.x509certificates.x509certificate2.aspx">System.Security.Cryptography.X509Certificates.X509Certificate2</a>. An X509Certificate2 object representing the newly installed certificate.</p>
+
         
     
         

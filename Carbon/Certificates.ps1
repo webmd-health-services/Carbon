@@ -38,7 +38,7 @@ function Get-Certificate
     
     .OUTPUTS
     System.Security.Cryptography.x509Certificates.X509Certificate2. The 
-    X509Certificate2 certificates that were found, or $null.
+    X509Certificate2 certificates that were found, or `$null`.
     #>
     [CmdletBinding(DefaultParameterSetName='ByFriendlyName')]
     param(
@@ -48,7 +48,7 @@ function Get-Certificate
         $Path,
         
         [Parameter(ParameterSetName='ByPath')]
-        # The password to the certificate.  Can be plaintext or a SecureString.
+        # The password to the certificate.  Can be plaintext or a [SecureString](http://msdn.microsoft.com/en-us/library/system.securestring.aspx).
         $Password,
         
         [Parameter(Mandatory=$true,ParameterSetName='ByThumbprint')]

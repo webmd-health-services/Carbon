@@ -26,10 +26,14 @@ kbd
 	font-size: 11pt;
 }
 
-pre
+code
 {
 	font-family: Consolas, Monaco, monospace;
 	font-size: 11pt;
+}
+
+pre
+{
 	background-color: lightgrey;
 	background-color: navy;
 	color: white;

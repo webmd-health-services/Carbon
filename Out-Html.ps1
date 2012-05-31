@@ -167,6 +167,10 @@ filter Convert-HelpToHtml
             {
                 $typeLink = '<a href="http://msdn.microsoft.com/en-us/library/{0}.aspx">{1}</a>' -f $typeFullName.ToLower(),$typeDisplayName
             }
+            $paramDescription = $_.Description | 
+                            Out-HtmlString | 
+                            Convert-MarkdownToHtml | 
+                            ForEach-Object { $_.Replace('<p>','').Replace('</p>','') }
             @"
 			<tr valign='top'>
 				<td>{0}</td>
@@ -176,7 +180,7 @@ filter Convert-HelpToHtml
 				<td>{4}</td>
                 <td>{5}</td>
 			</tr>
-"@ -f $_.Name,$typeLink,($_.Description | Out-HtmlString),$_.Required,$_.PipelineInput,$_.DefaultValue
+"@ -f $_.Name,$typeLink,$paramDescription,$_.Required,$_.PipelineInput,$_.DefaultValue
         }
         
     if( $parameters )
@@ -231,15 +235,16 @@ filter Convert-HelpToHtml
             {
                 Write-Warning ("Type {0} not found." -f $matches[1])
             }
-            $returnValues = '<a href="http://msdn.microsoft.com/en-us/library/{0}.aspx">{1}</a>. {2}' -f $type.FullName.ToLower(),$type.FullName,$matches[2]
+            $returnValues = '[{0}](http://msdn.microsoft.com/en-us/library/{1}.aspx). {2}' -f $type.FullName,$type.FullName.ToLower(),$matches[2]
         }
         else
         {
             Write-Warning "Unable to find type name in $returnValues."
         }
+        $returnValues = $returnValues | Convert-MarkdownToHtml
         $returnValues = @"
         <h2>Return Values</h2>
-        <div>{0}</div>
+        {0}
 "@ -f $returnValues
     }
     
@@ -386,7 +391,6 @@ if( -not (Test-Path $OutputDir -PathType Container) )
 
 
 $commands | 
-    #Where-Object { $_.Name -eq 'Find-ADUser' } | 
+    #Where-Object { $_.Name -eq 'Get-Certificate' } | 
     Get-Help -Full | 
     Convert-HelpToHtml -Menu $menuBuilder.ToString()
-

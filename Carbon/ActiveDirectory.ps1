@@ -77,7 +77,7 @@ function Find-ADUser
     
     .OUTPUTS
     System.DirectoryServices.DirectoryEntry.  The directory entry object of the
-    user's account in Active Directory or $null if the user isn't found.
+    user's account in Active Directory or `$null` if the user isn't found.
     
     .EXAMPLE
     > Find-ADUser -DomainUrl LDAP://dc.example.com:389 -sAMAccountName $env:USERNAME
