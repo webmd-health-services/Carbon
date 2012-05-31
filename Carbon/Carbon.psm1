@@ -14,10 +14,12 @@
 
 $CarbonBinDir = Join-Path $PSScriptRoot bin -Resolve
 
-Get-Item (Join-Path $PSScriptRoot *.ps1) | ForEach-Object {
-    Write-Verbose "Importing sub-module $(Split-Path -Leaf $_)."
-    . $_
-}
+Get-Item (Join-Path $PSScriptRoot *.ps1) | 
+    Where-Object { $_ -notlike '*-*.ps1' } |
+    ForEach-Object {
+        Write-Verbose "Importing sub-module $(Split-Path -Leaf $_)."
+        . $_
+    }
 
 $CarbonImported = $true
 
