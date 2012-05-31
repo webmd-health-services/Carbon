@@ -1,8 +1,11 @@
+# 0.2.2
+ * Created Import-Carbon script to help users properly import Carbon.
+ 
 # 0.2.1 (28 April 2012)
-  * Added IsJunction property to DirectoryInfo objects.  Returns true if a directory is a junction/reparse point.
-  * Created a Carbon assembly for compiled code.  Moved P/Invoke functions from FileSystem.ps1 into assembly.  This is a backwards compatible change.
-  * Created a Carbon.IO.JunctionPoint helper class for creating/removing/getting junction/reparse points.  Updated New-Junction and Remove-Junction to use the new helper class.
-  * Added TargetPath property to DirectoryInfo objects.  If the directory is a junction/reparse points, returns the path to the junction's target.  Otherwise, $null.
+ * Added IsJunction property to DirectoryInfo objects.  Returns true if a directory is a junction/reparse point.
+ * Created a Carbon assembly for compiled code.  Moved P/Invoke functions from FileSystem.ps1 into assembly.  This is a backwards compatible change.
+ * Created a Carbon.IO.JunctionPoint helper class for creating/removing/getting junction/reparse points.  Updated New-Junction and Remove-Junction to use the new helper class.
+ * Added TargetPath property to DirectoryInfo objects.  If the directory is a junction/reparse points, returns the path to the junction's target.  Otherwise, $null.
 
 # 0.2.0 (4 April 2012)
  
