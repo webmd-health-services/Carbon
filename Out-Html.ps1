@@ -31,6 +31,20 @@ Add-Type -Path (Join-Path $PSSCriptRoot Tools\MarkdownSharp\MarkdownSharp.dll)
 $markdown = New-Object MarkdownSharp.Markdown
 $markdown.AutoHyperlink = $true
 
+$loadedTypes = @{ }
+[AppDomain]::CurrentDomain.GetAssemblies() | 
+    ForEach-Object { $_.GetTypes() } | 
+    ForEach-Object { 
+        if( $loadedTypes.ContainsKey( $_.Name ) )
+        {
+            Write-Verbose ("Found multiple {0} types." -f $_.Name)
+        }
+        else
+        {
+            $loadedTypes[$_.Name] = $_.FullName
+        }
+    }
+
 filter Format-ForHtml 
 {
     if( $_ )
@@ -136,6 +150,23 @@ filter Convert-HelpToHtml
             {
                 $hasCommonParameters = $true
             }
+            
+            $typeDisplayName = $_.type.name
+            $typeName = $typeDisplayName
+            if( $typeName.EndsWith('[]') )
+            {
+                $typeName = $typeName -replace '\[\]',''
+            }
+            $typeFullName = $loadedTypes[$typeName]
+            $typeLink = $typeDisplayName
+            if( -not $typeFullName )
+            {
+                Write-Warning ("Type {0} not found." -f $_.type.name)
+            }
+            else
+            {
+                $typeLink = '<a href="http://msdn.microsoft.com/en-us/library/{0}.aspx">{1}</a>' -f $typeFullName.ToLower(),$typeDisplayName
+            }
             @"
 			<tr valign='top'>
 				<td>{0}</td>
@@ -145,7 +176,7 @@ filter Convert-HelpToHtml
 				<td>{4}</td>
                 <td>{5}</td>
 			</tr>
-"@ -f $_.Name,$_.type.name,($_.Description | Out-HtmlString),$_.Required,$_.PipelineInput,$_.DefaultValue
+"@ -f $_.Name,$typeLink,($_.Description | Out-HtmlString),$_.Required,$_.PipelineInput,$_.DefaultValue
         }
         
     if( $parameters )
@@ -190,9 +221,22 @@ filter Convert-HelpToHtml
 "@ -f $inputTuypes
     }
     
-    $returnValues = $commandHelp.returnValues | Out-HtmlString
+    $returnValues = ($commandHelp.returnValues | Out-HtmlString) -replace "`n",' '
     if( $returnValues )
     {
+        if( $returnValues -match '^(.*?)\.\s+(.*)$' )
+        {
+            $type = [Type]$matches[1]
+            if( -not $type )
+            {
+                Write-Warning ("Type {0} not found." -f $matches[1])
+            }
+            $returnValues = '<a href="http://msdn.microsoft.com/en-us/library/{0}.aspx">{1}</a>. {2}' -f $type.FullName.ToLower(),$type.FullName,$matches[2]
+        }
+        else
+        {
+            Write-Warning "Unable to find type name in $returnValues."
+        }
         $returnValues = @"
         <h2>Return Values</h2>
         <div>{0}</div>
@@ -342,7 +386,7 @@ if( -not (Test-Path $OutputDir -PathType Container) )
 
 
 $commands | 
-    #Where-Object { $_.Name -eq 'Get-Certificate' } | 
+    #Where-Object { $_.Name -eq 'Find-ADUser' } | 
     Get-Help -Full | 
     Convert-HelpToHtml -Menu $menuBuilder.ToString()
 

@@ -236,7 +236,7 @@ function Install-Certificate
     Uses the .NET certificates API to add a certificate to a store for the machine or current user.  The user performing the action must have permission to modify the store or the installation will fail.
     
     .OUTPUTS
-    System.Security.Cryptogrpahy.X509Certificates.X509Certificate2. An X509Certificate2 object representing the newly installed certificate.
+    System.Security.Cryptography.X509Certificates.X509Certificate2. An X509Certificate2 object representing the newly installed certificate.
     
     .EXAMPLE
     > Install-Certificate -Path C:\Users\me\certificate.cer -StoreLocation LocalMachine -StoreName My -Exportable -Password My5up3r53cur3P@55w0rd
