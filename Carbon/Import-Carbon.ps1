@@ -37,10 +37,13 @@ if( (Get-Module Carbon) )
 elseif( Test-Path "variable:CarbonImported" )
 {
     $var = Get-Variable 'CarbonImported'
-    $varModule = Get-Module $var.Module
     if( -not $Quiet )
     {
-        Write-Warning ("Carbon already present as nested module in {0} module ({1})." -f $var.Module, $varModule.ModuleBase)    
+        Get-Module $var.Module | 
+            ForEach-Object {
+                $message = "Carbon already present as nested module in {0} module ({1})." -f $var.Module, $_.ModuleBase
+                Write-Warning $message
+            }
     }
     return
 }
