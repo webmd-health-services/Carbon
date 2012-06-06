@@ -104,6 +104,41 @@ function Test-ShouldAddNetworkService
     Assert-ContainsLike $details 'NT AUTHORITY\Network Service'
 }
 
+function Test-ShouldDetectIfNetworkServiceAlreadyMemberOfGroup
+{
+    Add-GroupMembers -Name $GroupName -Members 'NetworkService'
+    Add-GroupMembers -Name $GroupName -Members 'NetworkService'
+    Assert-LastProcessSucceeded
+}
+
+function Test-ShouldAddAdministrators
+{
+    Add-GroupMembers -Name $GroupName -Members 'Administrators'
+    $details = net localgroup $GroupName
+    Assert-ContainsLike $details 'Administrators'
+}
+
+function Test-ShouldDetectIfAdministratorsAlreadyMemberOfGroup
+{
+    Add-GroupMembers -Name $GroupName -Members 'Administrators'
+    Add-GroupMembers -Name $GroupName -Members 'Administrators'
+    Assert-LastProcessSucceeded
+}
+
+function Test-ShouldAddAnonymousLogon
+{
+    Add-GroupMembers -Name $GroupName -Members 'ANONYMOUS LOGON'
+    $details = net localgroup $GroupName
+    Assert-ContainsLike $details 'NT AUTHORITY\ANONYMOUS LOGON'
+}
+
+function Test-ShouldDetectIfAnonymousLogonAlreadyMemberOfGroup
+{
+    Add-GroupMembers -Name $GroupName -Members 'ANONYMOUS LOGON'
+    Add-GroupMembers -Name $GroupName -Members 'ANONYMOUS LOGON'
+    Assert-LastProcessSucceeded
+}
+
 function Test-ShouldNotAddNonExistentMember
 {
     

@@ -79,7 +79,11 @@ function Add-GroupMembers
 		}
 	}
     
-    $Builtins = @{ 'NetworkService' = $true }
+    $Builtins = @{ 
+                    'NetworkService' = 'NT AUTHORITY\NETWORK SERVICE'; 
+                    'Administrators' = 'Administrators'; 
+                    'ANONYMOUS LOGON' = 'NT AUTHORITY\ANONYMOUS LOGON'; 
+                 }
     
     $group = Find-UserOrGroup $Name
     if( $group -eq $null )
@@ -95,19 +99,29 @@ function Add-GroupMembers
             continue
         }
         
-        if( $pscmdlet.ShouldProcess( $Name, "add member $member" ) )
+        if( $Builtins.ContainsKey( $member ) )
         {
-            if( $Builtins.ContainsKey( $member ) )
+            $canonicalMemberName = $Builtins[$member]
+            if( $currentMembers -contains $canonicalMemberName )
             {
+                continue
+            }
+            if( $pscmdlet.ShouldProcess( $Name, "add built-in member $member" ) )
+            {
+                Write-Host "Adding $member to group $Name."
                 net localgroup $Name $member /add
             }
-            else
+        }
+        else
+        {
+            $adMember = Find-UserOrGroup -Name $member
+            if( -not $adMember )
             {
-                $adMember = Find-UserOrGroup -Name $member
-                if( -not $adMember )
-                {
-                    throw "Unable to find user '$member'."
-                }
+                throw "Unable to find user '$member'."
+            }
+            
+            if( $pscmdlet.ShouldProcess( $Name, "add member $member" ) )
+            {
                 Write-Host "Adding $($adMember.Name) to group $Name."
                 [void] $group.Add( $adMember.Path )
             }
