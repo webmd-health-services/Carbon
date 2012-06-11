@@ -162,6 +162,10 @@ function Install-Service
             Write-Host "Granting user '$Username' the log on as a service right."
             $ntRightsPath = Join-Path $CarbonBinDir ntrights.exe -Resolve
             & $ntRightsPath +r SeServiceLogonRight -u $Username
+            if( $LastExitCode )
+            {
+                Write-Error "Failed to grant '$Username' the logon as a service right."
+            }
         }
 
         Grant-Permissions -Identity $Username -Permissions FullControl -Path $Path
