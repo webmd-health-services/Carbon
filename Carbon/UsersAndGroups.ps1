@@ -40,15 +40,15 @@ function Add-GroupMembers
 		)
 
 		$shortName = $Name
-		$container = [adsi] "WinNT://$($env:ComputerName),computer"
+        $containerName = $env:ComputerName
+		$container = [adsi] "WinNT://$containerName,computer"
 		if( $Name.Contains("\") )
 		{
-			$parts = $Name -split '\',2,'SimpleMatch'
-			$domain = $parts[0]
-			$shortName = $parts[1]
+			$domain,$shortName = $Name -split '\',2,'SimpleMatch'
 			
 			$domainController = Get-ADDomainController -Domain $domain
 			$container = [adsi] ('WinNT://{0}' -f $domainController)
+            $containerName = $domain
 		}
 
 		if( -not $container )
@@ -59,24 +59,23 @@ function Add-GroupMembers
 		
 		try
 		{
-			return $container.Children.Find($shortName, "User")
+			$user = $container.Children.Find($shortName, "User")
+            return [adsi]"WinNT://$containerName/$shortName"
 		}
 		catch
 		{
-			$entry = $null
 		}
 		
-		if( $entry -eq $null )
+		try
 		{
-			try
-			{
-				return $container.Children.Find($shortName, "Group")
-			}
-			catch
-			{
-				return $null
-			}
+			$group = $container.Children.Find($shortName, "Group")
+            return [adsi]"WinNT://$containerName/$shortName,group"
 		}
+		catch
+		{
+		}
+        
+        return $null
 	}
     
     $Builtins = @{ 
@@ -117,7 +116,8 @@ function Add-GroupMembers
             $adMember = Find-UserOrGroup -Name $member
             if( -not $adMember )
             {
-                throw "Unable to find user '$member'."
+                Write-Error "Unable to find user '$member'."
+                continue
             }
             
             if( $pscmdlet.ShouldProcess( $Name, "add member $member" ) )
