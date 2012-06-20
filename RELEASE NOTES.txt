@@ -1,4 +1,4 @@
-# 0.2.2
+# 0.2.2 (19 June 2012)
 
 ## Enhancements
  * Created Import-Carbon script to help users properly import Carbon.
