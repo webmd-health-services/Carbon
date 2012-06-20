@@ -51,6 +51,8 @@ function Test-AllFilesShouldHaveLicense
     
     $expectedNotice = $noticeLines -join "`n"
     $filesToSkip = @{
+        'Install-Website.ps1' = $true;
+        'Import-Carbon.ps1' = $true;
         'Set-LicenseNotice.ps1' = $true;
         'Publish-Carbon.ps1' = $true;
         'about_Carbon.help.txt' = $true;
