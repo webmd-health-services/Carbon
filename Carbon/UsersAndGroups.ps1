@@ -40,7 +40,7 @@ function Add-GroupMembers
 		)
 
 		$shortName = $Name
-        $containerName = $env:ComputerName
+		$containerName = $env:ComputerName
 		$container = [adsi] "WinNT://$containerName,computer"
 		if( $Name.Contains("\") )
 		{
@@ -48,7 +48,7 @@ function Add-GroupMembers
 			
 			$domainController = Get-ADDomainController -Domain $domain
 			$container = [adsi] ('WinNT://{0}' -f $domainController)
-            $containerName = $domain
+			$containerName = $domain
 		}
 
 		if( -not $container )
@@ -60,7 +60,7 @@ function Add-GroupMembers
 		try
 		{
 			$user = $container.Children.Find($shortName, "User")
-            return [adsi]"WinNT://$containerName/$shortName"
+			return [adsi]"WinNT://$containerName/$shortName"
 		}
 		catch
 		{
@@ -69,13 +69,13 @@ function Add-GroupMembers
 		try
 		{
 			$group = $container.Children.Find($shortName, "Group")
-            return [adsi]"WinNT://$containerName/$shortName,group"
+			return [adsi]"WinNT://$containerName/$shortName,group"
 		}
 		catch
 		{
 		}
-        
-        return $null
+		
+		return $null
 	}
     
     $Builtins = @{ 
