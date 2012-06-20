@@ -37,18 +37,14 @@ Will run all Test-*.ps1 scripts under the .\MyModule directory.
 
 [CmdletBinding(DefaultParameterSetName='SingleScript')]
 param(
-    [Parameter(Position=0,ParameterSetName='SingleScript', Mandatory=$true)]
-    # The script to run.
-    $Script,
-    
-    [Parameter(ParameterSetName='SingleScript')]
-    # The individual test in the script to run.  Defaults to all tests.
-    $Test = $null,
-    
-    [Parameter(ParameterSetName='MultipleScripts',Mandatory=$true)]
+    [Parameter(Mandatory=$true,Position=0)]
     [string[]]
     # The paths to search for tests.  All files matching Test-*.ps1 will be run.
-    $Path
+    $Path,
+    
+    [string]
+    # The individual test in the script to run.  Defaults to all tests.
+    $Test = $null    
 )
 
 $ErrorActionPreference = 'Stop'
@@ -93,6 +89,7 @@ function Get-FunctionsInFile($testScript)
     Write-Verbose "Found $($tokens.Count) tokens in '$testScript'."
     
     $functions = New-Object System.Collections.ArrayList
+    $atFunction = $false
     for( $idx = 0; $idx -lt $tokens.Count; ++$idx )
     {
         $token = $tokens[$idx]
@@ -185,7 +182,7 @@ function Invoke-Test($function)
     }
 }
 
-$testScripts = if( $Script -eq $null) { Get-ChildItem $Path Test-*.ps1 -Recurse } else { @( (Get-Item $Script) ) }
+$testScripts = @( Get-ChildItem $Path Test-*.ps1 -Recurse )
 if( $testScripts -eq $null )
 {
     $testScripts = @()

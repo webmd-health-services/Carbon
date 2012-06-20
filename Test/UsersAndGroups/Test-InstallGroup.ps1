@@ -71,7 +71,7 @@ function Test-ShouldNotRecreateIfGroupAlreadyExists
     $group2 = Get-Group
     
     Assert-Equal 'Description 2' $group2.Description 'Description not changed/updated.'
-    Assert-Equal $group1.SSID $group2.SSID 'A new group was created!'
+    Assert-Equal $group1.SID $group2.SID 'A new group was created!'
     
 }
 
