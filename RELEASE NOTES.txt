@@ -2,10 +2,11 @@
 
 ## Enhancements
  * Created Import-Carbon script to help users properly import Carbon.
-
+ 
 ## Bug fixes
  * Add-GroupMembers fails to add Administrators and ANONYMOUS LOGON built-in accounts.
  * Add-GroupMembers fails when adding built-in accounts multiple times.
+ * Add-GroupMembers fails to add domain user to a local group.
  
 # 0.2.1 (28 April 2012)
  * Added IsJunction property to DirectoryInfo objects.  Returns true if a directory is a junction/reparse point.
