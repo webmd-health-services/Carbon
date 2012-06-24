@@ -21,10 +21,7 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 $PSScriptRoot = Split-Path -Parent $MyInvocation.MyCommand.Definition
 
-if( -not (Get-Module Carbon) )
-{
-    Import-Module (Join-Path $PSScriptRoot Carbon -Resolve)
-}
+& (Join-Path $PSScriptRoot Carbon\Import-Carbon.ps1 -Resolve)
 
 $websitePath = Join-Path $PSScriptRoot Website -Resolve
 Install-IisWebsite -Name 'get-carbon.org' -Path $websitePath -Bindings 'http/*:80:'
