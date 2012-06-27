@@ -18,6 +18,16 @@ function Add-IisDefaultDocument
     <#
     .SYNOPSIS
     Adds a default document name to a website.
+    
+    .DESCRIPTION
+    If you need a custom default document for your website, this function will add it.  The `FileName` argument should be a filename IIS should use for a default document, e.g. home.html.
+    
+    If the website already has `FileName` in its list of default documents, this function silently returns.
+    
+    .EXAMPLE
+    Add-IisDefaultDocument -SiteName MySite -FileName home.html
+    
+    Adds `home.html` to the list of default documents for the MySite website.
     #>
     [CmdletBinding()]
     param(

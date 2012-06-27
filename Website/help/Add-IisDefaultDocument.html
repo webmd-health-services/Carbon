@@ -192,7 +192,13 @@
         <h2>Syntax</h2>
     <pre class="Syntax"><code>Add-IisDefaultDocument [-SiteName] &lt;String&gt; [-FileName] &lt;String&gt; [&lt;CommonParameters&gt;]</code></pre>
     
-    
+        <h2>Description</h2>
+    <div class="Description">
+        <p>If you need a custom default document for your website, this function will add it.  The <code>FileName</code> argument should be a filename IIS should use for a default document, e.g. home.html.</p>
+
+<p>If the website already has <code>FileName</code> in its list of default documents, this function silently returns.</p>
+
+    </div>
     
     
 
@@ -233,6 +239,9 @@
         
     
         
-    
+                <h2>EXAMPLE 1</h2>
+            <pre><code>Add-IisDefaultDocument -SiteName MySite -FileName home.html</code></pre>
+            <p><p>Adds <code>home.html</code> to the list of default documents for the MySite website.</p>
+</p><p></p><p></p><p></p><p></p>
 </body>
 </html>   
