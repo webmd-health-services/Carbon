@@ -14,6 +14,18 @@
 
 function New-Junction
 {
+    <#
+    .SYNOPSIS
+    Creates a new junction.
+    
+    .DESCRIPTION
+    Creates a junction given by `-Link` which points to the path given by `-Target`.  If something already exists at `Link`, an error is written.  
+    
+    .EXAMPLE
+    New-Junction -Link 'C:\Windows\system32Link' -Target 'C:\Windows\system32'
+    
+    Creates the `C:\Windows\system32Link` directory, which points to `C:\Windows\system32`.
+    #>
     param(
         [Parameter(Mandatory=$true)]
         [Alias("Junction")]
