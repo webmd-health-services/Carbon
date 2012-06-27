@@ -49,7 +49,13 @@ function Invoke-WindowsInstaller
     
     if( -not (Test-Path $Path -PathType Leaf) )
     {
-        Write-Error "Installer '$Path' doesn't exist."
+        Write-Error "Installer '$Path' not found."
+        return
+    }
+    
+    if( $Path -notlike '*.msi' )
+    {
+        Write-Error "Installer '$Path' not an MSI package: filename must end in .msi."
         return
     }
     
