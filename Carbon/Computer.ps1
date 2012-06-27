@@ -73,7 +73,7 @@ function Invoke-WindowsInstaller
             $msiProcess.WaitForExit()
             if( $msiProcess.ExitCode -ne $null -and $msiProcess.ExitCode -ne 0 )
             {
-                Write-Error "Installation failed (msiexec returned '$LastExitCode')."
+                Write-Error ("Installation failed (msiexec returned '{0}')." -f $msiProcess.ExitCode)
             }
         }
     }
