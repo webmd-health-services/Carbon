@@ -21,8 +21,7 @@ filter Protect-String
     Encrypts a string using the Data Protection API (DPAPI).
     
     .DESCRIPTION
-    Encrypts a string with the Data Protection API (DPAPI).  Encryption can be performed at the user or machine level, so that only the current or user or any
-    user on the current machine can decrypt the string.
+    Encrypts a string with the Data Protection API (DPAPI).  Encryption can be performed at the user or machine level.  If encrypted at the User scope, only the user who encrypted the data can decrypt it.  If encrypted at the machine scope, any user on the machine can decrypt it.
     
     .EXAMPLE
     Protect-String -String 'TheStringIWantToEncrypt' | Out-File MySecret.txt
@@ -38,14 +37,18 @@ filter Protect-String
     
     .LINK
     Unprotect-String
+    
+    .LINK
+    http://msdn.microsoft.com/en-us/library/system.security.cryptography.protecteddata.aspx
     #>
     [CmdletBinding()]
     param(
         [Parameter(Mandatory = $true, Position=0, ValueFromPipeline = $true)]
+        [string]
         # The text to encrypt.
         $String,
         
-        # The scope at which the encryption is performed.
+        # The scope at which the encryption is performed.  Default is `CurrentUser`.
         [Security.Cryptography.DataProtectionScope]
         $Scope = 'CurrentUser'
     )
@@ -62,18 +65,17 @@ filter Unprotect-String
     Decrypts a string using the Data Protection API (DPAPI).
     
     .DESCRIPTION
-    Decrypts a string with the Data Protection API (DPAPI).  The string must have also been encrypted with the DPAPI.  The same scope must be used to
-    decrypt the string as was used to encrypt it.
+    Decrypts a string with the Data Protection API (DPAPI).  The string must have also been encrypted with the DPAPI and the same scope used to decrypt as was used to encrypt.
     
     .EXAMPLE
     PS> $encryptedPassword = Protect-String -String 'MySuperSecretPassword'
-    PS> $password = Unprotect-String -ProtectedString  $encryptedPassword
+        PS> $password = Unprotect-String -ProtectedString  $encryptedPassword
     
     Decrypts a protected string which was encrypted at the current user or default scopes.
     
     .EXAMPLE
     PS> $encryptedPassword = Protect-String -String 'MySuperSecretPassword' -Scope LocalMachine
-    PS> $cipherText = Unprotect-String -ProtectedString $encryptedPassword -Scope LocalMachine
+        PS> $cipherText = Unprotect-String -ProtectedString $encryptedPassword -Scope LocalMachine
     
     Encrypts the given string and stores the value in $cipherText.  Because the string was encrypted at the LocalMachine scope, the string must be 
     decrypted at the same scope.
@@ -83,13 +85,16 @@ filter Unprotect-String
     
     Demonstrates how Unprotect-String takes input from the pipeline.  Adds 'NotSoSecretSecret' to the pipeline.
     
-    
     .LINK
     Protect-String
+
+    .LINK
+    http://msdn.microsoft.com/en-us/library/system.security.cryptography.protecteddata.aspx
     #>
     [CmdletBinding()]
     param(
         [Parameter(Mandatory = $true, Position=0, ValueFromPipeline = $true)]
+        [string]
         # The text to encrypt.
         $ProtectedString
     )

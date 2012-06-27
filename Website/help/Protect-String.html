@@ -187,18 +187,18 @@
     <div>Encrypts a string using the Data Protection API (DPAPI).</div>
 
         <h2>Syntax</h2>
-    <pre class="Syntax"><code>Protect-String [-String] &lt;Object&gt; [-Scope {CurrentUser | LocalMachine}] [&lt;CommonParameters&gt;]</code></pre>
+    <pre class="Syntax"><code>Protect-String [-String] &lt;String&gt; [-Scope {CurrentUser | LocalMachine}] [&lt;CommonParameters&gt;]</code></pre>
     
         <h2>Description</h2>
     <div class="Description">
-        <p>Encrypts a string with the Data Protection API (DPAPI).  Encryption can be performed at the user or machine level, so that only the current or user or any
-user on the current machine can decrypt the string.</p>
+        <p>Encrypts a string with the Data Protection API (DPAPI).  Encryption can be performed at the user or machine level.  If encrypted at the User scope, only the user who encrypted the data can decrypt it.  If encrypted at the machine scope, any user on the machine can decrypt it.</p>
 
     </div>
     
             <h2>Related Commands</h2>
         <ul>
 <li><a href="Unprotect-String.html">Unprotect-String</a></li>
+<li><a href="http://msdn.microsoft.com/en-us/library/system.security.cryptography.protecteddata.aspx">http://msdn.microsoft.com/en-us/library/system.security.cryptography.protecteddata.aspx</a></li>
 </ul>
 
 
@@ -214,7 +214,7 @@ user on the current machine can decrypt the string.</p>
 			</tr>
             			<tr valign='top'>
 				<td>String</td>
-				<td><a href="http://msdn.microsoft.com/en-us/library/system.object.aspx">Object</a></td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
 				<td>The text to encrypt.
 </td>
 				<td>true</td>
@@ -224,7 +224,7 @@ user on the current machine can decrypt the string.</p>
 			<tr valign='top'>
 				<td>Scope</td>
 				<td><a href="http://msdn.microsoft.com/en-us/library/system.security.cryptography.dataprotectionscope.aspx">DataProtectionScope</a></td>
-				<td>The scope at which the encryption is performed.
+				<td>The scope at which the encryption is performed.  Default is <code>CurrentUser</code>.
 </td>
 				<td>false</td>
 				<td>false</td>

@@ -187,18 +187,18 @@
     <div>Decrypts a string using the Data Protection API (DPAPI).</div>
 
         <h2>Syntax</h2>
-    <pre class="Syntax"><code>Unprotect-String [-ProtectedString] &lt;Object&gt; [&lt;CommonParameters&gt;]</code></pre>
+    <pre class="Syntax"><code>Unprotect-String [-ProtectedString] &lt;String&gt; [&lt;CommonParameters&gt;]</code></pre>
     
         <h2>Description</h2>
     <div class="Description">
-        <p>Decrypts a string with the Data Protection API (DPAPI).  The string must have also been encrypted with the DPAPI.  The same scope must be used to
-decrypt the string as was used to encrypt it.</p>
+        <p>Decrypts a string with the Data Protection API (DPAPI).  The string must have also been encrypted with the DPAPI and the same scope used to decrypt as was used to encrypt.</p>
 
     </div>
     
             <h2>Related Commands</h2>
         <ul>
 <li><a href="Protect-String.html">Protect-String</a></li>
+<li><a href="http://msdn.microsoft.com/en-us/library/system.security.cryptography.protecteddata.aspx">http://msdn.microsoft.com/en-us/library/system.security.cryptography.protecteddata.aspx</a></li>
 </ul>
 
 
@@ -214,7 +214,7 @@ decrypt the string as was used to encrypt it.</p>
 			</tr>
             			<tr valign='top'>
 				<td>ProtectedString</td>
-				<td><a href="http://msdn.microsoft.com/en-us/library/system.object.aspx">Object</a></td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
 				<td>The text to encrypt.
 </td>
 				<td>true</td>
