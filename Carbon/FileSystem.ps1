@@ -116,6 +116,30 @@ function Remove-Junction
 
 function Test-PathIsJunction
 {
+    <#
+    .SYNOPSIS
+    Tests if a path is a junction.
+    
+    .DESCRIPTION
+    Tests if path is the path to a junction.  If `Path` doesn't exist, returns false.
+    
+    The alternate way of doing this is to use the `IsJunction` extension method on `DirectoryInfo` objects, which are returned by the `Get-Item` and `Get-ChildItem` cmdlets.
+    
+    .EXAMPLE
+    Test-PathIsJunction -Path C:\I\Am\A\Junction
+    
+    Returns `True`.
+    
+    .EXAMPLE
+    Test-PathIsJunction -Path C:\I\Am\Not\A\Junction
+    
+    Returns `False`.
+    
+    .EXAMPLE
+    Get-ChildItem * | Where-Object { $_.PsIsContainer -and $_.IsJunction }
+    
+    Demonstrates an alternative way of testing for junctions.  Uses Carbon's `IsJunction` extension method on the `DirectoryInfo` type to check if any directories under the current directory are junctions.
+    #>
     param(
         [string]
         # The path to check

@@ -187,16 +187,42 @@
 
 
     <h1>Test-PathIsJunction</h1>
-    <div>Test-PathIsJunction [[-Path] <String>]
-</div>
+    <div>Tests if a path is a junction.</div>
 
+        <h2>Syntax</h2>
+    <pre class="Syntax"><code>Test-PathIsJunction [[-Path] &lt;String&gt;] [&lt;CommonParameters&gt;]</code></pre>
     
-    
-    
+        <h2>Description</h2>
+    <div class="Description">
+        <p>Tests if path is the path to a junction.  If <code>Path</code> doesn't exist, returns false.</p>
+
+<p>The alternate way of doing this is to use the <code>IsJunction</code> extension method on <code>DirectoryInfo</code> objects, which are returned by the <code>Get-Item</code> and <code>Get-ChildItem</code> cmdlets.</p>
+
+    </div>
     
     
 
-    
+    		<h2> Parameters </h2>
+		<table border='1'>
+			<tr>
+				<th>Name</th>
+                <th>Type</th>
+				<th>Description</th>
+				<th>Required?</th>
+				<th>Pipeline Input</th>
+				<th>Default Value</th>
+			</tr>
+            			<tr valign='top'>
+				<td>Path</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+				<td>The path to check
+</td>
+				<td>false</td>
+				<td>false</td>
+                <td></td>
+			</tr>
+            
+        </table>
         
     
         
@@ -204,6 +230,15 @@
         
     
         
-    
+                <h2>EXAMPLE 1</h2>
+            <pre><code>Test-PathIsJunction -Path C:\I\Am\A\Junction</code></pre>
+            <p><p>Returns <code>True</code>.</p>
+</p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 2</h2>
+            <pre><code>Test-PathIsJunction -Path C:\I\Am\Not\A\Junction</code></pre>
+            <p><p>Returns <code>False</code>.</p>
+</p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 3</h2>
+            <pre><code>Get-ChildItem * | Where-Object { $_.PsIsContainer -and $_.IsJunction }</code></pre>
+            <p><p>Demonstrates an alternative way of testing for junctions.  Uses Carbon's <code>IsJunction</code> extension method on the <code>DirectoryInfo</code> type to check if any directories under the current directory are junctions.</p>
+</p><p></p><p></p><p></p><p></p>
 </body>
 </html>   
