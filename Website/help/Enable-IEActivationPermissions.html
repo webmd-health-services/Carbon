@@ -178,16 +178,26 @@
 
 
     <h1>Enable-IEActivationPermissions</h1>
-    <div>Enable-IEActivationPermissions 
-</div>
+    <div>Grants all users permission to start/launch Internet Explorer.</div>
+
+        <h2>Syntax</h2>
+    <pre class="Syntax"><code>Enable-IEActivationPermissions [&lt;CommonParameters&gt;]</code></pre>
+    
+        <h2>Description</h2>
+    <div class="Description">
+        <p>By default, unprivileged users can't launch/start Internet Explorer. This prevents those users from using Internet Explorer to run automated, browser-based tests.  This function modifies Windows so that all users can launch Internet Explorer.</p>
+
+<p>You may also need to call Disable-IEEnhancedSecurityConfiguration, so that Internet Explorer is allowed to visit all websites.</p>
+
+    </div>
+    
+            <h2>Related Commands</h2>
+        <ul>
+<li><a href="Disable-IEEnhancedSecurityConfiguration.html">Disable-IEEnhancedSecurityConfiguration</a></li>
+</ul>
+
 
     
-    
-    
-    
-    
-
-    
         
     
         
@@ -195,6 +205,8 @@
         
     
         
-    
+                <h2>EXAMPLE 1</h2>
+            <pre><code>Enable-IEActivationPermissions</code></pre>
+            <p></p><p></p><p></p><p></p><p></p>
 </body>
 </html>   

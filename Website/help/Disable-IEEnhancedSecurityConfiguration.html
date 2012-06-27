@@ -178,15 +178,25 @@
 
 
     <h1>Disable-IEEnhancedSecurityConfiguration</h1>
-    <div>Disables the Internet Explorer Enhanced Security Configuration. 
-This is neccessary to run QUnit tests.</div>
+    <div>Disables Internet Explorer's Enhanced Security Configuration.</div>
 
         <h2>Syntax</h2>
     <pre class="Syntax"><code>Disable-IEEnhancedSecurityConfiguration [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
     
+        <h2>Description</h2>
+    <div class="Description">
+        <p>By default, Windows locks down Internet Explorer so that users can't visit certain sites.  This function disables that enhanced security.  This is necessary if you have automated processes that need to run and interact with Internet Explorer.</p>
+
+<p>You may also need to call Enable-IEActivationPermissions, so that processes have permission to start Internet Explorer.</p>
+
+    </div>
     
-    
-    
+            <h2>Related Commands</h2>
+        <ul>
+<li><a href="http://technet.microsoft.com/en-us/library/dd883248(v=WS.10).aspx">http://technet.microsoft.com/en-us/library/dd883248(v=WS.10).aspx</a></li>
+<li><a href="Enable-IEActivationPermissions.html">Enable-IEActivationPermissions</a></li>
+</ul>
+
 
     		<h2> Parameters </h2>
 		<table border='1'>
@@ -230,6 +240,8 @@ This is neccessary to run QUnit tests.</div>
         
     
         
-    
+                <h2>EXAMPLE 1</h2>
+            <pre><code>Disable-IEEnhancedSecurityConfiguration</code></pre>
+            <p></p><p></p><p></p><p></p><p></p>
 </body>
 </html>   

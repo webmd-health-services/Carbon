@@ -16,8 +16,18 @@ function Disable-IEEnhancedSecurityConfiguration
 {
  	<#
     .SYNOPSIS
-    Disables the Internet Explorer Enhanced Security Configuration. 
-	This is neccessary to run QUnit tests.
+    Disables Internet Explorer's Enhanced Security Configuration. 
+    .DESCRIPTION
+    By default, Windows locks down Internet Explorer so that users can't visit certain sites.  This function disables that enhanced security.  This is necessary if you have automated processes that need to run and interact with Internet Explorer.
+    
+    You may also need to call Enable-IEActivationPermissions, so that processes have permission to start Internet Explorer.
+    
+    .EXAMPLE
+    Disable-IEEnhancedSecurityConfiguration
+    .LINK
+    http://technet.microsoft.com/en-us/library/dd883248(v=WS.10).aspx
+    .LINK
+    Enable-IEActivationPermissions
     #>
     [CmdletBinding(SupportsShouldProcess=$true)]
  	param()
@@ -48,13 +58,30 @@ function Disable-IEEnhancedSecurityConfiguration
         Rundll32 iesetup.dll, IEHardenLMSettings
         Rundll32 iesetup.dll, IEHardenUser
         Rundll32 iesetup.dll, IEHardenAdmin 
-        
     }
-    
 }
 
 function Enable-IEActivationPermissions
 {
+    <#
+    .SYNOPSIS
+    Grants all users permission to start/launch Internet Explorer.
+    
+    .DESCRIPTION
+    By default, unprivileged users can't launch/start Internet Explorer. This prevents those users from using Internet Explorer to run automated, browser-based tests.  This function modifies Windows so that all users can launch Internet Explorer.
+    
+    You may also need to call Disable-IEEnhancedSecurityConfiguration, so that Internet Explorer is allowed to visit all websites.
+    
+    .EXAMPLE
+    Enable-IEActivationPermissions
+
+    .LINK
+    Disable-IEEnhancedSecurityConfiguration
+    #>
+    [CmdletBinding()]
+    param(
+    )
+    
     $sddlForIe =   "O:BAG:BAD:(A;;CCDCSW;;;SY)(A;;CCDCLCSWRP;;;BA)(A;;CCDCSW;;;IU)(A;;CCDCLCSWRP;;;S-1-5-21-762517215-2652837481-3023104750-5681)"
     $binarySD = ([wmiclass]"Win32_SecurityDescriptorHelper").SDDLToBinarySD($sddlForIE)
     $ieRegPath = "hkcr:\AppID\{0002DF01-0000-0000-C000-000000000046}"
