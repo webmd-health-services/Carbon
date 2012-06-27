@@ -94,15 +94,51 @@ function Get-PathCanonicalCase
 
 function Get-PathRelativeTo
 {
+    <#
+    .SYNOPSIS
+    Converts a path to a relative path from a given source.
+    
+    .DESCRIPTION
+    The .NET framework doesn't expose an API for getting a relative path to an item.  This function uses Win32 APIs to call [PathRelativePathTo](http://msdn.microsoft.com/en-us/library/windows/desktop/bb773740.aspx).
+    
+    Neither the `From` or `To` paths need to exist.
+    
+    .EXAMPLE
+    Get-PathRelativeTo -From 'C:\Windows\system32' -To 'C:\Program Files'
+    
+    Returns `..\..\Program Files`.
+    
+    .EXAMPLE
+    Get-ChildItem * | Get-PathRelativeTo -From 'C:\Windows\system32'
+    
+    Returns the relative path from the `C:\Windows\system32` directory to the current directory.
+    
+    .EXAMPLE
+    Get-PathRelativeTo -From 'C:\I\do\not\exist' -To 'C:\I\do\not\exist\either'
+    
+    Returns `.\either`.
+    
+    .EXAMPLE
+    Get-PathRelativeTo -From 'C:\I\do\not\exist' -FromType 'File' -To 'C:\I\do\not\exist\either'
+    
+    Treats `C:\I\do\not\exist` as a file, so returns a relative path of `.\exist\either`.
+    
+    .LINK
+    http://msdn.microsoft.com/en-us/library/windows/desktop/bb773740.aspx
+    #>
     param(
         [Parameter(Mandatory=$true,Position=0)]
+        # The source where from where the relative path will be calculated.  Can be a string or an file system object.
         $From,
         
         [Parameter(Position=1)]
         [ValidateSet('Directory', 'File')]
+        [string]
+        # Whether the from/source path is a file or a directory.  The default is a directory.
         $FromType = 'Directory',
         
         [Parameter(ValueFromPipeline=$true)]
+        # The path to convert to a relative path.  It will be relative to the value of the From parameter.
         $To
     )
     

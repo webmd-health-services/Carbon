@@ -184,16 +184,64 @@
 
 
     <h1>Get-PathRelativeTo</h1>
-    <div>Get-PathRelativeTo [-From] <Object> [[-FromType] <Object>] [-To <Object>] [-Verbose] [-Debug] [-ErrorAction <ActionPreference>] [-WarningAction <ActionPreference>] [-ErrorVariable <String>] [-WarningVariable <String>] [-OutVariable <String>] [-OutBuffer <Int32>]
-</div>
+    <div>Converts a path to a relative path from a given source.</div>
 
+        <h2>Syntax</h2>
+    <pre class="Syntax"><code>Get-PathRelativeTo [-From] &lt;Object&gt; [[-FromType] &lt;String&gt;] [-To &lt;Object&gt;] [&lt;CommonParameters&gt;]</code></pre>
     
-    
-    
-    
-    
+        <h2>Description</h2>
+    <div class="Description">
+        <p>The .NET framework doesn't expose an API for getting a relative path to an item.  This function uses Win32 APIs to call <a href="http://msdn.microsoft.com/en-us/library/windows/desktop/bb773740.aspx">PathRelativePathTo</a>.</p>
 
+<p>Neither the <code>From</code> or <code>To</code> paths need to exist.</p>
+
+    </div>
     
+            <h2>Related Commands</h2>
+        <ul>
+<li><a href="http://msdn.microsoft.com/en-us/library/windows/desktop/bb773740.aspx">http://msdn.microsoft.com/en-us/library/windows/desktop/bb773740.aspx</a></li>
+</ul>
+
+
+    		<h2> Parameters </h2>
+		<table border='1'>
+			<tr>
+				<th>Name</th>
+                <th>Type</th>
+				<th>Description</th>
+				<th>Required?</th>
+				<th>Pipeline Input</th>
+				<th>Default Value</th>
+			</tr>
+            			<tr valign='top'>
+				<td>From</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.object.aspx">Object</a></td>
+				<td>The source where from where the relative path will be calculated.  Can be a string or an file system object.
+</td>
+				<td>true</td>
+				<td>false</td>
+                <td></td>
+			</tr>
+			<tr valign='top'>
+				<td>FromType</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+				<td>Whether the from/source path is a file or a directory.  The default is a directory.
+</td>
+				<td>false</td>
+				<td>false</td>
+                <td></td>
+			</tr>
+			<tr valign='top'>
+				<td>To</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.object.aspx">Object</a></td>
+				<td>The path to convert to a relative path.  It will be relative to the value of the From parameter.
+</td>
+				<td>false</td>
+				<td>true (ByValue)</td>
+                <td></td>
+			</tr>
+            
+        </table>
         
     
         
@@ -201,6 +249,18 @@
         
     
         
-    
+                <h2>EXAMPLE 1</h2>
+            <pre><code>Get-PathRelativeTo -From 'C:\Windows\system32' -To 'C:\Program Files'</code></pre>
+            <p><p>Returns <code>..\..\Program Files</code>.</p>
+</p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 2</h2>
+            <pre><code>Get-ChildItem * | Get-PathRelativeTo -From 'C:\Windows\system32'</code></pre>
+            <p><p>Returns the relative path from the <code>C:\Windows\system32</code> directory to the current directory.</p>
+</p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 3</h2>
+            <pre><code>Get-PathRelativeTo -From 'C:\I\do\not\exist' -To 'C:\I\do\not\exist\either'</code></pre>
+            <p><p>Returns <code>.\either</code>.</p>
+</p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 4</h2>
+            <pre><code>Get-PathRelativeTo -From 'C:\I\do\not\exist' -FromType 'File' -To 'C:\I\do\not\exist\either'</code></pre>
+            <p><p>Treats <code>C:\I\do\not\exist</code> as a file, so returns a relative path of <code>.\exist\either</code>.</p>
+</p><p></p><p></p><p></p><p></p>
 </body>
 </html>   
