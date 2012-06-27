@@ -187,16 +187,24 @@
 
 
     <h1>New-TempDir</h1>
-    <div>New-TempDir 
-</div>
+    <div>Creates a new temporary directory with a random name.</div>
+
+        <h2>Syntax</h2>
+    <pre class="Syntax"><code>New-TempDir [&lt;CommonParameters&gt;]</code></pre>
+    
+        <h2>Description</h2>
+    <div class="Description">
+        <p>A new temporary directory is created in the current users temporary directory.  The directory's name is created using the <code>Path</code> class's <a href="http://msdn.microsoft.com/en-us/library/system.io.path.getrandomfilename.aspx">GetRandomFileName method</a>.</p>
+
+    </div>
+    
+            <h2>Related Commands</h2>
+        <ul>
+<li><a href="http://msdn.microsoft.com/en-us/library/system.io.path.getrandomfilename.aspx">http://msdn.microsoft.com/en-us/library/system.io.path.getrandomfilename.aspx</a></li>
+</ul>
+
 
     
-    
-    
-    
-    
-
-    
         
     
         
@@ -204,6 +212,9 @@
         
     
         
-    
+                <h2>EXAMPLE 1</h2>
+            <pre><code>New-TempDir</code></pre>
+            <p><p>Returns the path to a temporary directory with a random name.</p>
+</p><p></p><p></p><p></p><p></p>
 </body>
 </html>   

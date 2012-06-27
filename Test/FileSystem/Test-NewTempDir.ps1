@@ -27,4 +27,5 @@ function Test-NewTempDir
 {
     $tmpDir = New-TempDir 
     Assert-DirectoryExists $tmpDir
+    Assert-True $tmpDir.Name.StartsWith('carbon.')
 }

@@ -56,8 +56,23 @@ function New-Junction
 
 function New-TempDir
 {
-    $tmpPath = [System.IO.Path]::GetTempPath()
-    $newTmpDirName = [System.IO.Path]::GetRandomFileName()
+    <#
+    .SYNOPSIS
+    Creates a new temporary directory with a random name.
+    
+    .DESCRIPTION
+    A new temporary directory is created in the current users temporary directory.  The directory's name is created using the `Path` class's [GetRandomFileName method](http://msdn.microsoft.com/en-us/library/system.io.path.getrandomfilename.aspx).
+    
+    .LINK
+    http://msdn.microsoft.com/en-us/library/system.io.path.getrandomfilename.aspx
+    
+    .EXAMPLE
+    New-TempDir
+
+    Returns the path to a temporary directory with a random name.    
+    #>
+    $tmpPath = [IO.Path]::GetTempPath()
+    $newTmpDirName = [IO.Path]::GetRandomFileName()
     New-Item (Join-Path $tmpPath $newTmpDirName) -Type directory
 }
 
