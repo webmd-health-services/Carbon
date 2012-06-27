@@ -27,7 +27,6 @@
 		</ul>
 		<li class="Category">Computer</li>
 		<ul class="CommandMenu">
-			<li><a href="Invoke-WindowsInstaller.html">Invoke-WindowsInstaller</a></li>
 			<li><a href="Remove-EnvironmentVariable.html">Remove-EnvironmentVariable</a></li>
 			<li><a href="Set-EnvironmentVariable.html">Set-EnvironmentVariable</a></li>
 			<li><a href="Test-OSIs32Bit.html">Test-OSIs32Bit</a></li>
@@ -98,6 +97,10 @@
 		<li class="Category">Mercurial</li>
 		<ul class="CommandMenu">
 			<li><a href="Set-HgrcDefaultPushUrl.html">Set-HgrcDefaultPushUrl</a></li>
+		</ul>
+		<li class="Category">MSI</li>
+		<ul class="CommandMenu">
+			<li><a href="Invoke-WindowsInstaller.html">Invoke-WindowsInstaller</a></li>
 		</ul>
 		<li class="Category">MSMQ</li>
 		<ul class="CommandMenu">
@@ -184,13 +187,16 @@
     <div>Runs an MSI installer.</div>
 
         <h2>Syntax</h2>
-    <pre class="Syntax"><code>Invoke-WindowsInstaller [-Path] &lt;Object&gt; [-Quiet] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
+    <pre class="Syntax"><code>Invoke-WindowsInstaller [-Path] &lt;String&gt; [-Quiet] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
     
         <h2>Description</h2>
     <div class="Description">
-        <p>There are two problems running an MSI (for MicroSoft Installer):
- * The installer runs asynchronously, which means running/invoking it returns immediately, with no notification about whether it succeeded or failed.
- * A UI is shown.</p>
+        <p>There are two problems running an MSI (for MicroSoft Installer):</p>
+
+<ul>
+<li>The installer runs asynchronously, which means running/invoking it returns immediately, with no notification about whether it succeeded or failed.</li>
+<li>A UI is shown.</li>
+</ul>
 
 <p>This function will run an MSI installer and wait for the MSI to finish.  If the install process returns a non-zero exit code, an error will be written.</p>
 
@@ -212,7 +218,7 @@
 			</tr>
             			<tr valign='top'>
 				<td>Path</td>
-				<td><a href="http://msdn.microsoft.com/en-us/library/system.object.aspx">Object</a></td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
 				<td>The installer to run.
 </td>
 				<td>true</td>
