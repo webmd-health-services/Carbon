@@ -103,8 +103,18 @@ function Get-IisVersion
     <#
     .SYNOPSIS
     Gets the version of IIS.
+    
+    .DESCRIPTION
+    Reads the version of IIS from the registry, and returns it as a `Major.Minor` formatted string.
+    
+    .EXAMPLE
+    Get-IisVersion
+    
+    Returns `7.0` on Windows 2008, and `7.5` on Windows 7 and Windows 2008 R2.
     #>
-    param()
+    [CmdletBinding()]
+    param(
+    )
     $props = Get-ItemProperty hklm:\Software\Microsoft\InetStp
     return $props.MajorVersion.ToString() + "." + $props.MinorVersion.ToString()
 }
