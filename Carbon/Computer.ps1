@@ -17,14 +17,40 @@ function Remove-EnvironmentVariable
     <#
     .SYNOPSIS
     Removes an environment variable.
+    
+    .DESCRIPTION
+    Uses the .NET [Environment class](http://msdn.microsoft.com/en-us/library/z8te35sa) to remove an environment variable from the Process, User, or Machine scopes.
+    
+    The `-Scope` parameter should be a value from the [EnvironmentVariableTarget enumeration](http://msdn.microsoft.com/en-us/library/system.environmentvariabletarget.aspx), which is currently:
+    
+     * `Process`
+     * `User`
+     * `Machine`
+     
+    You can see the values by running:
+    
+         [Enum]::GetValues([EnvironmentVariableTarget])
+    
+    .EXAMPLE
+    Remove-EnvironmentVariable -Name 'MyEnvironmentVariable' -Scope Process
+    
+    Removes the `MyEnvironmentVariable` from the process scope.
+    
+    .LINK
+    http://msdn.microsoft.com/en-us/library/z8te35sa
+    
+    .LINK
+    http://msdn.microsoft.com/en-us/library/system.environmentvariabletarget.aspx
     #>
     [CmdletBinding(SupportsShouldProcess=$true)]
     param(
         [Parameter(Mandatory=$true)]
-        # The environment variable to remove
+        [string]
+        # The environment variable to remove.
         $Name,
+        
         [Parameter(Mandatory=$true)]
-        # The target where the variable should be removed.
+        # The scope where the variable should be removed.  Should be one of Process, User, or Machine.
         [EnvironmentVariableTarget]
         $Scope
     )

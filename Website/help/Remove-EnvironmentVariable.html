@@ -187,11 +187,33 @@
     <div>Removes an environment variable.</div>
 
         <h2>Syntax</h2>
-    <pre class="Syntax"><code>Remove-EnvironmentVariable [-Name] &lt;Object&gt; [-Scope] {Process | User | Machine} [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
+    <pre class="Syntax"><code>Remove-EnvironmentVariable [-Name] &lt;String&gt; [-Scope] {Process | User | Machine} [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
     
+        <h2>Description</h2>
+    <div class="Description">
+        <p>Uses the .NET <a href="http://msdn.microsoft.com/en-us/library/z8te35sa">Environment class</a> to remove an environment variable from the Process, User, or Machine scopes.</p>
+
+<p>The <code>-Scope</code> parameter should be a value from the <a href="http://msdn.microsoft.com/en-us/library/system.environmentvariabletarget.aspx">EnvironmentVariableTarget enumeration</a>, which is currently:</p>
+
+<ul>
+<li><code>Process</code></li>
+<li><code>User</code></li>
+<li><code>Machine</code></li>
+</ul>
+
+<p>You can see the values by running:</p>
+
+<pre><code> [Enum]::GetValues([EnvironmentVariableTarget])
+</code></pre>
+
+    </div>
     
-    
-    
+            <h2>Related Commands</h2>
+        <ul>
+<li><a href="http://msdn.microsoft.com/en-us/library/z8te35sa">http://msdn.microsoft.com/en-us/library/z8te35sa</a></li>
+<li><a href="http://msdn.microsoft.com/en-us/library/system.environmentvariabletarget.aspx">http://msdn.microsoft.com/en-us/library/system.environmentvariabletarget.aspx</a></li>
+</ul>
+
 
     		<h2> Parameters </h2>
 		<table border='1'>
@@ -205,8 +227,8 @@
 			</tr>
             			<tr valign='top'>
 				<td>Name</td>
-				<td><a href="http://msdn.microsoft.com/en-us/library/system.object.aspx">Object</a></td>
-				<td>The environment variable to remove
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+				<td>The environment variable to remove.
 </td>
 				<td>true</td>
 				<td>false</td>
@@ -252,6 +274,9 @@
         
     
         
-    
+                <h2>EXAMPLE 1</h2>
+            <pre><code>Remove-EnvironmentVariable -Name 'MyEnvironmentVariable' -Scope Process</code></pre>
+            <p><p>Removes the <code>MyEnvironmentVariable</code> from the process scope.</p>
+</p><p></p><p></p><p></p><p></p>
 </body>
 </html>   
