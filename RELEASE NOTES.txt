@@ -1,3 +1,24 @@
+# 0.2.3
+
+## Enhancements
+ * Improved documentation for:
+  * Disable-IEEnhancedSecurityConfiguration
+  * Enable-IEActivationPermissions
+  * Get-FullPath
+  * Invoke-WindowsInstaller
+  * Protect-String
+  * Remove-EnvironmentVariable
+  * Set-DotNetAppSetting
+  * Set-DotNetConnectionString
+  * Set-EnvironmentVariable
+  * Test-OSIs32Bit
+  * Test-OSIs64Bit
+  * Unprotect-String
+
+## Bug fixes
+ * Invoke-WindowsInstaller doesn't validate that installer path ends in '.msi'.
+ * Invoke-WindowsInstaller not showing correct exit code when installation fails.
+
 # 0.2.2 (19 June 2012)
 
 ## Enhancements
