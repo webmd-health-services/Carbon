@@ -131,6 +131,14 @@ function Test-OSIs32Bit
     <#
     .SYNOPSIS
     Tests if the current operating system is 32-bit.
+    
+    .DESCRIPTION
+    Regardless of the bitness of the currently running process, returns `True` if the current OS is a 32-bit OS.
+    
+    .EXAMPLE
+    Test-OSIs32Bit
+    
+    Returns `True` if the current operating system is 32-bit, and `False` otherwise.
     #>
     [CmdletBinding()]
     param(
@@ -144,6 +152,14 @@ function Test-OSIs64Bit
     <#
     .SYNOPSIS
     Tests if the current operating system is 64-bit.
+
+    .DESCRIPTION
+    Regardless of the bitness of the currently running process, returns `True` if the current OS is a 64-bit OS.
+    
+    .EXAMPLE
+    Test-OSIs64Bit
+    
+    Returns `True` if the current operating system is 64-bit, and `False` otherwise.
     #>
     [CmdletBinding()]
     param(
