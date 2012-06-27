@@ -187,11 +187,35 @@
     <div>Creates or sets an environment variable.</div>
 
         <h2>Syntax</h2>
-    <pre class="Syntax"><code>Set-EnvironmentVariable [-Name] &lt;Object&gt; [-Value] &lt;Object&gt; [-Scope] {Process | User | Machine} [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
+    <pre class="Syntax"><code>Set-EnvironmentVariable [-Name] &lt;String&gt; [-Value] &lt;String&gt; [-Scope] {Process | User | Machine} [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
     
+        <h2>Description</h2>
+    <div class="Description">
+        <p>Uses the .NET <a href="http://msdn.microsoft.com/en-us/library/z8te35sa">Environment class</a> to create or set an environment variable in the Process, User, or Machine scopes.</p>
+
+<p>The <code>-Scope</code> parameter should be a value from the <a href="http://msdn.microsoft.com/en-us/library/system.environmentvariabletarget.aspx">EnvironmentVariableTarget enumeration</a>, which is currently:</p>
+
+<ul>
+<li><code>Process</code></li>
+<li><code>User</code></li>
+<li><code>Machine</code></li>
+</ul>
+
+<p>You can see the values by running:</p>
+
+<pre><code> [Enum]::GetValues([EnvironmentVariableTarget])
+</code></pre>
+
+<p>Changes to environment variables in the User and Machine scope are not picked up by running processes.  Any running processes that use this environment variable should be restarted.</p>
+
+    </div>
     
-    
-    
+            <h2>Related Commands</h2>
+        <ul>
+<li><a href="http://msdn.microsoft.com/en-us/library/z8te35sa">http://msdn.microsoft.com/en-us/library/z8te35sa</a></li>
+<li><a href="http://msdn.microsoft.com/en-us/library/system.environmentvariabletarget.aspx">http://msdn.microsoft.com/en-us/library/system.environmentvariabletarget.aspx</a></li>
+</ul>
+
 
     		<h2> Parameters </h2>
 		<table border='1'>
@@ -205,7 +229,7 @@
 			</tr>
             			<tr valign='top'>
 				<td>Name</td>
-				<td><a href="http://msdn.microsoft.com/en-us/library/system.object.aspx">Object</a></td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
 				<td>The name of environment variable to add/set.
 </td>
 				<td>true</td>
@@ -214,7 +238,7 @@
 			</tr>
 			<tr valign='top'>
 				<td>Value</td>
-				<td><a href="http://msdn.microsoft.com/en-us/library/system.object.aspx">Object</a></td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
 				<td>The environment variable's value.
 </td>
 				<td>true</td>
@@ -261,6 +285,12 @@
         
     
         
-    
+                <h2>EXAMPLE 1</h2>
+            <pre><code>Set-EnvironmentVariable -Name 'MyEnvironmentVariable' -Value 'Value1' -Scope Process</code></pre>
+            <p><p>Creates the <code>MyEnvironmentVariable</code> with an initial value of <code>Value1</code> in the process scope, i.e. the variable is only accessible in the current process.</p>
+</p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 2</h2>
+            <pre><code>Set-EnvironmentVariable -Name 'MyEnvironmentVariable' -Value 'Value1' -Scope Machine</code></pre>
+            <p><p>Creates the <code>MyEnvironmentVariable</code> with an initial value of <code>Value1</code> in the machine scope, i.e. the variable is accessible in all newly launched processes.</p>
+</p><p></p><p></p><p></p><p></p>
 </body>
 </html>   

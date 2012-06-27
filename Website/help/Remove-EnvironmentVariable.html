@@ -206,6 +206,8 @@
 <pre><code> [Enum]::GetValues([EnvironmentVariableTarget])
 </code></pre>
 
+<p>Changes to environment variables in the User and Machine scope are not picked up by running processes.  Any running processes that use this environment variable should be restarted.</p>
+
     </div>
     
             <h2>Related Commands</h2>

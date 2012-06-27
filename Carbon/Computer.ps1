@@ -30,6 +30,8 @@ function Remove-EnvironmentVariable
     You can see the values by running:
     
          [Enum]::GetValues([EnvironmentVariableTarget])
+         
+    Changes to environment variables in the User and Machine scope are not picked up by running processes.  Any running processes that use this environment variable should be restarted.
     
     .EXAMPLE
     Remove-EnvironmentVariable -Name 'MyEnvironmentVariable' -Scope Process
@@ -66,14 +68,47 @@ function Set-EnvironmentVariable
     <#
     .SYNOPSIS
     Creates or sets an environment variable.
+    
+    .DESCRIPTION
+    Uses the .NET [Environment class](http://msdn.microsoft.com/en-us/library/z8te35sa) to create or set an environment variable in the Process, User, or Machine scopes.
+    
+    The `-Scope` parameter should be a value from the [EnvironmentVariableTarget enumeration](http://msdn.microsoft.com/en-us/library/system.environmentvariabletarget.aspx), which is currently:
+    
+     * `Process`
+     * `User`
+     * `Machine`
+     
+    You can see the values by running:
+    
+         [Enum]::GetValues([EnvironmentVariableTarget])
+    
+    Changes to environment variables in the User and Machine scope are not picked up by running processes.  Any running processes that use this environment variable should be restarted.
+    
+    .EXAMPLE
+    Set-EnvironmentVariable -Name 'MyEnvironmentVariable' -Value 'Value1' -Scope Process
+    
+    Creates the `MyEnvironmentVariable` with an initial value of `Value1` in the process scope, i.e. the variable is only accessible in the current process.
+    
+    .EXAMPLE
+    Set-EnvironmentVariable -Name 'MyEnvironmentVariable' -Value 'Value1' -Scope Machine
+    
+    Creates the `MyEnvironmentVariable` with an initial value of `Value1` in the machine scope, i.e. the variable is accessible in all newly launched processes.
+    
+    .LINK
+    http://msdn.microsoft.com/en-us/library/z8te35sa
+    
+    .LINK
+    http://msdn.microsoft.com/en-us/library/system.environmentvariabletarget.aspx
     #>
     [CmdletBinding(SupportsShouldProcess=$true)]
     param(
         [Parameter(Mandatory=$true)]
+        [string]
         # The name of environment variable to add/set.
         $Name,
         
         [Parameter(Mandatory=$true)]
+        [string]
         # The environment variable's value.
         $Value,
         
