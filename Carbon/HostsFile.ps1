@@ -103,15 +103,52 @@ function Set-HostsEntry
     <#
     .SYNOPSIS
     Sets a hosts entry in a hosts file.
+    
+    .DESCRIPTION
+    Sets the IP address for a given hostname.  If the hostname doesn't exist in the hosts file, appends a new entry to the end.  If the hostname does exist, its IP address gets updated.  If you supply a description, it is appended to the line as a comment.
+    
+    If any duplicate hosts entries are found, they are commented out; Windows uses the first duplicate entry.
+    
+    This function scans the entire hosts file.  If you have a large hosts file, and are updating multiple entries, this function will be slow.
+    
+    You can operate on a custom hosts file, too.  Pass its path with the `Path` parameter.
+    
+    .EXAMPLE
+    Set-HostsEntry -IPAddress 10.2.3.4 -HostName 'myserver' -Description "myserver's IP address"
+    
+    If your hosts file contains the following:
+    
+        127.0.0.1  localhost
+        
+    After running this command, it will contain the following:
+    
+        127.0.0.1        localhost
+        10.2.3.4         myserver	# myserver's IP address
+
+    .EXAMPLE        
+    Set-HostsEntry -IPAddress 10.5.6.7 -HostName 'myserver'
+    
+    If your hosts file contains the following:
+    
+        127.0.0.1        localhost
+        10.2.3.4         myserver	# myserver's IP address
+    
+    After running this command, it will contain the following:
+    
+        127.0.0.1        localhost
+        10.5.6.7         myserver
+    
     #>
     [CmdletBinding(SupportsShouldProcess=$true)]
     param(
         [Parameter(Mandatory=$true)]
         [ValidatePattern('\A(?:\b(?:(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.){3}(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\b)\Z')]
+        [string]
         # The IP address for the hosts entry.
         $IPAddress,
 
         [Parameter(Mandatory=$true)]
+        [string]
         # The hostname for the hosts entry.
         $HostName,
 
