@@ -184,16 +184,40 @@
 
 
     <h1>Get-PathCanonicalCase</h1>
-    <div>Get-PathCanonicalCase [-Path] <String> [-Verbose] [-Debug] [-ErrorAction <ActionPreference>] [-WarningAction <ActionPreference>] [-ErrorVariable <String>] [-WarningVariable <String>] [-OutVariable <String>] [-OutBuffer <Int32>]
-</div>
+    <div>Returns the real, canonical case of a path.</div>
 
+        <h2>Syntax</h2>
+    <pre class="Syntax"><code>Get-PathCanonicalCase [-Path] &lt;String&gt; [&lt;CommonParameters&gt;]</code></pre>
     
-    
-    
+        <h2>Description</h2>
+    <div class="Description">
+        <p>The .NET and Windows path/file system APIs respect and preserve the case of paths passed to them.  This function will return the actual case of a path on the file system, regardless of the case of the string passed in.</p>
+
+    </div>
     
     
 
-    
+    		<h2> Parameters </h2>
+		<table border='1'>
+			<tr>
+				<th>Name</th>
+                <th>Type</th>
+				<th>Description</th>
+				<th>Required?</th>
+				<th>Pipeline Input</th>
+				<th>Default Value</th>
+			</tr>
+            			<tr valign='top'>
+				<td>Path</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+				<td>The path whose real, canonical case should be returned.
+</td>
+				<td>true</td>
+				<td>false</td>
+                <td></td>
+			</tr>
+            
+        </table>
         
     
         
@@ -201,6 +225,12 @@
         
     
         
-    
+                <h2>EXAMPLE 1</h2>
+            <pre><code>Get-PathCanonicalCase -Path "C:\WINDOWS\SYSTEM32"</code></pre>
+            <p><p>Returns <code>C:\Windows\system32</code>.</p>
+</p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 2</h2>
+            <pre><code>Get-PathCanonicalCase -Path 'c:\projects\carbon'</code></pre>
+            <p><p>Returns <code>C:\Projects\Carbon</code>.</p>
+</p><p></p><p></p><p></p><p></p>
 </body>
 </html>   

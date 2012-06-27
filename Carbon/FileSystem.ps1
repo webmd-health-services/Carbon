@@ -50,11 +50,30 @@ function Get-FullPath
 
 function Get-PathCanonicalCase
 {
+    <#
+    .SYNOPSIS
+    Returns the real, canonical case of a path.
+    
+    .DESCRIPTION
+    The .NET and Windows path/file system APIs respect and preserve the case of paths passed to them.  This function will return the actual case of a path on the file system, regardless of the case of the string passed in.
+    
+    If the path doesn't an exist, an error is written and nothing is returned.
+    
+    .EXAMPLE
+    Get-PathCanonicalCase -Path "C:\WINDOWS\SYSTEM32"
+    
+    Returns `C:\Windows\system32`.
+    
+    .EXAMPLE
+    Get-PathCanonicalCase -Path 'c:\projects\carbon' 
+    
+    Returns `C:\Projects\Carbon`.
+    #>
     [CmdletBinding()]
     param(
         [Parameter(Mandatory=$true)]
         [string]
-        # Gets the real case of a path
+        # The path whose real, canonical case should be returned.
         $Path
     )
     
