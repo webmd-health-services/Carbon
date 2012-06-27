@@ -33,25 +33,27 @@ function Set-DotNetAppSetting
     
     Sets the ExampleUrl app setting in the following machine.config files:
     
-     * %SYSTEMROOT%\Microsoft.NET\Framework\v2.0.50727\CONFIG\machine.config
-     * %SYSTEMROOT%\Microsoft.NET\Framework64\v2.0.50727\CONFIG\machine.config
-     * %SYSTEMROOT%\Microsoft.NET\Framework\v4.0.30319\CONFIG\machine.config
-     * %SYSTEMROOT%\Microsoft.NET\Framework64\v4.0.30319\CONFIG\machine.config
+     * `%SYSTEMROOT%\Microsoft.NET\Framework\v2.0.50727\CONFIG\machine.config`
+     * `%SYSTEMROOT%\Microsoft.NET\Framework64\v2.0.50727\CONFIG\machine.config`
+     * `%SYSTEMROOT%\Microsoft.NET\Framework\v4.0.30319\CONFIG\machine.config`
+     * `%SYSTEMROOT%\Microsoft.NET\Framework64\v4.0.30319\CONFIG\machine.config`
 
     .EXAMPLE
     > Set-DotNetAppSetting -Name ExampleUrl -Value example.com -Framework64 -Clr4
     
     Sets the ExampleUrl app setting in the following machine.config file:
     
-     * %SYSTEMROOT%\Microsoft.NET\Framework64\v4.0.30319\CONFIG\machine.config
+     * `%SYSTEMROOT%\Microsoft.NET\Framework64\v4.0.30319\CONFIG\machine.config`
     #>
     [CmdletBinding(SupportsShouldProcess=$true, DefaultParameterSetName='All')]
     param(
         [Parameter(Mandatory=$true)]
+        [string]
         # The name of the app setting to be set
         $Name,
 
         [Parameter(Mandatory=$true)]
+        [string]
         # The valie of the app setting to be set.
         $Value,
         
@@ -155,25 +157,27 @@ function Set-DotNetConnectionString
     
     Sets the DevDB connection string in the following machine.config files:
      
-     * %SYSTEMROOT%\Microsoft.NET\Framework\v2.0.50727\CONFIG\machine.config
-     * %SYSTEMROOT%\Microsoft.NET\Framework64\v2.0.50727\CONFIG\machine.config
-     * %SYSTEMROOT%\Microsoft.NET\Framework\v4.0.30319\CONFIG\machine.config
-     * %SYSTEMROOT%\Microsoft.NET\Framework64\v4.0.30319\CONFIG\machine.config
+     * `%SYSTEMROOT%\Microsoft.NET\Framework\v2.0.50727\CONFIG\machine.config`
+     * `%SYSTEMROOT%\Microsoft.NET\Framework64\v2.0.50727\CONFIG\machine.config`
+     * `%SYSTEMROOT%\Microsoft.NET\Framework\v4.0.30319\CONFIG\machine.config`
+     * `%SYSTEMROOT%\Microsoft.NET\Framework64\v4.0.30319\CONFIG\machine.config`
 
     .EXAMPLE
-    > Set-DotNetAppSetting -Name DevDB -Value "data source=.\DevDB;Integrated Security=SSPI;" -Framework64 -Clr4
+    > Set-DotNetConnectionString -Name DevDB -Value "data source=.\DevDB;Integrated Security=SSPI;" -Framework64 -Clr4
     
     Sets the DevDB connection string in the following machine.config file:
      
-     * %SYSTEMROOT%\Microsoft.NET\Framework64\v4.0.30319\CONFIG\machine.config
+     * `%SYSTEMROOT%\Microsoft.NET\Framework64\v4.0.30319\CONFIG\machine.config`
     #>
     [CmdletBinding(SupportsShouldProcess=$true)]
     param(
         [Parameter(Mandatory=$true)]
+        [string]
         # The name of the .net connection string to be set
         $Name,
 
         [Parameter(Mandatory=$true)]
+        [string]
         # The connection string to be set.
         $Value,
         

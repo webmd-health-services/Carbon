@@ -187,7 +187,7 @@
     <div>Sets a named connection string in the .NET machine.config file</div>
 
         <h2>Syntax</h2>
-    <pre class="Syntax"><code>Set-DotNetConnectionString [-Name] &lt;Object&gt; [-Value] &lt;Object&gt; [-Framework] [-Framework64] [-Clr2] [-Clr4] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
+    <pre class="Syntax"><code>Set-DotNetConnectionString [-Name] &lt;String&gt; [-Value] &lt;String&gt; [-Framework] [-Framework64] [-Clr2] [-Clr4] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
     
         <h2>Description</h2>
     <div class="Description">
@@ -218,7 +218,7 @@
 			</tr>
             			<tr valign='top'>
 				<td>Name</td>
-				<td><a href="http://msdn.microsoft.com/en-us/library/system.object.aspx">Object</a></td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
 				<td>The name of the .net connection string to be set
 </td>
 				<td>true</td>
@@ -227,7 +227,7 @@
 			</tr>
 			<tr valign='top'>
 				<td>Value</td>
-				<td><a href="http://msdn.microsoft.com/en-us/library/system.object.aspx">Object</a></td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
 				<td>The connection string to be set.
 </td>
 				<td>true</td>
@@ -307,17 +307,17 @@
             <p><p>Sets the DevDB connection string in the following machine.config files:</p>
 
 <ul>
-<li>%SYSTEMROOT%\Microsoft.NET\Framework\v2.0.50727\CONFIG\machine.config</li>
-<li>%SYSTEMROOT%\Microsoft.NET\Framework64\v2.0.50727\CONFIG\machine.config</li>
-<li>%SYSTEMROOT%\Microsoft.NET\Framework\v4.0.30319\CONFIG\machine.config</li>
-<li>%SYSTEMROOT%\Microsoft.NET\Framework64\v4.0.30319\CONFIG\machine.config</li>
+<li><code>%SYSTEMROOT%\Microsoft.NET\Framework\v2.0.50727\CONFIG\machine.config</code></li>
+<li><code>%SYSTEMROOT%\Microsoft.NET\Framework64\v2.0.50727\CONFIG\machine.config</code></li>
+<li><code>%SYSTEMROOT%\Microsoft.NET\Framework\v4.0.30319\CONFIG\machine.config</code></li>
+<li><code>%SYSTEMROOT%\Microsoft.NET\Framework64\v4.0.30319\CONFIG\machine.config</code></li>
 </ul>
 </p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 2</h2>
-            <pre><code>Set-DotNetAppSetting -Name DevDB -Value "data source=.\DevDB;Integrated Security=SSPI;" -Framework64 -Clr4</code></pre>
+            <pre><code>Set-DotNetConnectionString -Name DevDB -Value "data source=.\DevDB;Integrated Security=SSPI;" -Framework64 -Clr4</code></pre>
             <p><p>Sets the DevDB connection string in the following machine.config file:</p>
 
 <ul>
-<li>%SYSTEMROOT%\Microsoft.NET\Framework64\v4.0.30319\CONFIG\machine.config</li>
+<li><code>%SYSTEMROOT%\Microsoft.NET\Framework64\v4.0.30319\CONFIG\machine.config</code></li>
 </ul>
 </p><p></p><p></p><p></p><p></p>
 </body>
