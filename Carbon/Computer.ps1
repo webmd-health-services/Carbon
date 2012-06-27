@@ -14,6 +14,28 @@
 
 function Invoke-WindowsInstaller
 {
+    <#
+    .SYNOPSIS
+    Runs an MSI installer.
+
+    .DESCRIPTION
+    There are two problems running an MSI (for MicroSoft Installer):
+     * The installer runs asynchronously, which means running/invoking it returns immediately, with no notification about whether it succeeded or failed.
+     * A UI is shown.
+    
+    This function will run an MSI installer and wait for the MSI to finish.  If the install process returns a non-zero exit code, an error will be written.
+    
+    You can optionally run the installer in quiet mode.  This hides any installer UI and installs the package with the default options.
+    
+    .EXAMPLE
+    Invoke-WindowsInstaller -Path Path\to\installer.msi
+    
+    Runs installer.msi, and waits untils for the installer to finish.  If the installer has a UI, it is shown to the user.
+    
+    .EXAMPLE
+    Invoke-WindowsInstaller -Path Path\to\installer.msi -Quiet
+    Runs installer.msi without showing its UI (i.e. performs a silent install using the package's default options).
+    #>
     [CmdletBinding(SupportsShouldProcess=$true)]
     param(
         [Parameter(Mandatory=$true)]
@@ -44,7 +66,8 @@ function Invoke-WindowsInstaller
     {
         Write-Host "Installing '$Path'."
         msiexec.exe /i $Path /quiet
-        $msiProcess = Get-Process -Name msiexec -ErrorAction SilentlyContinue | Where-Object { $_.Id -ne $msiServerPid }
+        $msiProcess = Get-Process -Name msiexec -ErrorAction SilentlyContinue | `
+                        Where-Object { $_.Id -ne $msiServerPid }
         if( $msiProcess )
         {
             $msiProcess.WaitForExit()

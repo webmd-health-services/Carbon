@@ -181,16 +181,78 @@
 
 
     <h1>Invoke-WindowsInstaller</h1>
-    <div>Invoke-WindowsInstaller [-Path] <Object> [-Quiet] [-Verbose] [-Debug] [-ErrorAction <ActionPreference>] [-WarningAction <ActionPreference>] [-ErrorVariable <String>] [-WarningVariable <String>] [-OutVariable <String>] [-OutBuffer <Int32>] [-WhatIf] [-Confirm]
-</div>
+    <div>Runs an MSI installer.</div>
 
+        <h2>Syntax</h2>
+    <pre class="Syntax"><code>Invoke-WindowsInstaller [-Path] &lt;Object&gt; [-Quiet] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
     
-    
-    
+        <h2>Description</h2>
+    <div class="Description">
+        <p>There are two problems running an MSI (for MicroSoft Installer):
+ * The installer runs asynchronously, which means running/invoking it returns immediately, with no notification about whether it succeeded or failed.
+ * A UI is shown.</p>
+
+<p>This function will run an MSI installer and wait for the MSI to finish.  If the install process returns a non-zero exit code, an error will be written.</p>
+
+<p>You can optionally run the installer in quiet mode.  This hides any installer UI and installs the package with the default options.</p>
+
+    </div>
     
     
 
-    
+    		<h2> Parameters </h2>
+		<table border='1'>
+			<tr>
+				<th>Name</th>
+                <th>Type</th>
+				<th>Description</th>
+				<th>Required?</th>
+				<th>Pipeline Input</th>
+				<th>Default Value</th>
+			</tr>
+            			<tr valign='top'>
+				<td>Path</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.object.aspx">Object</a></td>
+				<td>The installer to run.
+</td>
+				<td>true</td>
+				<td>false</td>
+                <td></td>
+			</tr>
+			<tr valign='top'>
+				<td>Quiet</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+				<td>Runs the installer in quiet mode.
+</td>
+				<td>false</td>
+				<td>false</td>
+                <td></td>
+			</tr>
+			<tr valign='top'>
+				<td>WhatIf</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+				<td></td>
+				<td>false</td>
+				<td>false</td>
+                <td></td>
+			</tr>
+			<tr valign='top'>
+				<td>Confirm</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+				<td></td>
+				<td>false</td>
+				<td>false</td>
+                <td></td>
+			</tr>
+                            <tr valign="top">
+                <td><a href="http://technet.microsoft.com/en-us/library/dd315352.aspx">CommonParameters</a></td>
+                <td></td>
+                <td>This cmdlet supports common parameters.  For more information type <br> <code>Get-Help about_CommonParameters</code>.</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                </tr>
+        </table>
         
     
         
@@ -198,6 +260,12 @@
         
     
         
-    
+                <h2>EXAMPLE 1</h2>
+            <pre><code>Invoke-WindowsInstaller -Path Path\to\installer.msi</code></pre>
+            <p><p>Runs installer.msi, and waits untils for the installer to finish.  If the installer has a UI, it is shown to the user.</p>
+</p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 2</h2>
+            <pre><code>Invoke-WindowsInstaller -Path Path\to\installer.msi -Quiet</code></pre>
+            <p><p>Runs installer.msi without showing its UI (i.e. performs a silent install using the package's default options).</p>
+</p><p></p><p></p><p></p><p></p>
 </body>
 </html>   
