@@ -78,10 +78,25 @@ function New-TempDir
 
 function Remove-Junction
 {
+    <#
+    .SYNOPSIS
+    Removes a junction.
+    
+    .DESCRIPTION
+    Safely removes a junction without removing the junction's target.  If you try to remove something that isn't a junction, an error will be written.  Use `Test-PathIsJunction` or the `IsJunction` extended method on `DirectoryInfo` object.
+    
+    .EXAMPLE
+    Remove-Junction -Path 'C:\I\Am\A\Junction'
+    
+    Removes the `C:\I\Am\A\Junction`
+    
+    .LINK
+    Test-PathIsJunction
+    #>
     [CmdletBinding(SupportsShouldProcess=$true)]
     param(
         [string]
-        # The path to the junction to remove
+        # The path to the junction to remove.
         $Path
     )
     

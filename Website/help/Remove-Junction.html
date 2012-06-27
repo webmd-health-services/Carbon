@@ -187,16 +187,67 @@
 
 
     <h1>Remove-Junction</h1>
-    <div>Remove-Junction [[-Path] <String>] [-Verbose] [-Debug] [-ErrorAction <ActionPreference>] [-WarningAction <ActionPreference>] [-ErrorVariable <String>] [-WarningVariable <String>] [-OutVariable <String>] [-OutBuffer <Int32>] [-WhatIf] [-Confirm]
-</div>
+    <div>Removes a junction.</div>
 
+        <h2>Syntax</h2>
+    <pre class="Syntax"><code>Remove-Junction [[-Path] &lt;String&gt;] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
     
-    
-    
-    
-    
+        <h2>Description</h2>
+    <div class="Description">
+        <p>Safely removes a junction without removing the junction's target.  If you try to remove something that isn't a junction, an error will be written.  Use <code>Test-PathIsJunction</code> or the <code>IsJunction</code> extended method on <code>DirectoryInfo</code> object.</p>
 
+    </div>
     
+            <h2>Related Commands</h2>
+        <ul>
+<li><a href="Test-PathIsJunction.html">Test-PathIsJunction</a></li>
+</ul>
+
+
+    		<h2> Parameters </h2>
+		<table border='1'>
+			<tr>
+				<th>Name</th>
+                <th>Type</th>
+				<th>Description</th>
+				<th>Required?</th>
+				<th>Pipeline Input</th>
+				<th>Default Value</th>
+			</tr>
+            			<tr valign='top'>
+				<td>Path</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+				<td>The path to the junction to remove.
+</td>
+				<td>false</td>
+				<td>false</td>
+                <td></td>
+			</tr>
+			<tr valign='top'>
+				<td>WhatIf</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+				<td></td>
+				<td>false</td>
+				<td>false</td>
+                <td></td>
+			</tr>
+			<tr valign='top'>
+				<td>Confirm</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+				<td></td>
+				<td>false</td>
+				<td>false</td>
+                <td></td>
+			</tr>
+                            <tr valign="top">
+                <td><a href="http://technet.microsoft.com/en-us/library/dd315352.aspx">CommonParameters</a></td>
+                <td></td>
+                <td>This cmdlet supports common parameters.  For more information type <br> <code>Get-Help about_CommonParameters</code>.</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                </tr>
+        </table>
         
     
         
@@ -204,6 +255,9 @@
         
     
         
-    
+                <h2>EXAMPLE 1</h2>
+            <pre><code>Remove-Junction -Path 'C:\I\Am\A\Junction'</code></pre>
+            <p><p>Removes the <code>C:\I\Am\A\Junction</code></p>
+</p><p></p><p></p><p></p><p></p>
 </body>
 </html>   
