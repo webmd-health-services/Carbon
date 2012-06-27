@@ -184,16 +184,42 @@
 
 
     <h1>Get-FullPath</h1>
-    <div>Get-FullPath [[-relativePath] <Object>]
-</div>
+    <div>Converts a relative path to an absolute path.</div>
 
+        <h2>Syntax</h2>
+    <pre class="Syntax"><code>Get-FullPath [-RelativePath] &lt;String&gt; [&lt;CommonParameters&gt;]</code></pre>
     
-    
-    
+        <h2>Description</h2>
+    <div class="Description">
+        <p>Unlike <code>Resolve-Path</code>, this function does not check whether the path exists.  It just converts relative paths to absolute paths.</p>
+
+<p>You can't pass truly relative paths to this function.  You can only pass rooted paths, i.e. the path must have a drive at the beginning.</p>
+
+    </div>
     
     
 
-    
+    		<h2> Parameters </h2>
+		<table border='1'>
+			<tr>
+				<th>Name</th>
+                <th>Type</th>
+				<th>Description</th>
+				<th>Required?</th>
+				<th>Pipeline Input</th>
+				<th>Default Value</th>
+			</tr>
+            			<tr valign='top'>
+				<td>RelativePath</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+				<td>The path to resolve.  Must be rooted, i.e. have a drive at the beginning.
+</td>
+				<td>true</td>
+				<td>false</td>
+                <td></td>
+			</tr>
+            
+        </table>
         
     
         
@@ -201,6 +227,12 @@
         
     
         
-    
+                <h2>EXAMPLE 1</h2>
+            <pre><code>Get-FullPath -RelativePath 'C:\Projects\Carbon\Test\..\Carbon\FileSystem.ps1'</code></pre>
+            <p><p>Returns <code>C:\Projects\Carbon\Carbon\FileSystem.ps1</code>.</p>
+</p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 2</h2>
+            <pre><code>Get-FullPath -RelativePath 'C:\Projects\Carbon\..\I\Do\Not\Exist'</code></pre>
+            <p><p>Returns <code>C:\Projects\I\Do\Not\Exist</code>.</p>
+</p><p></p><p></p><p></p><p></p>
 </body>
 </html>   
