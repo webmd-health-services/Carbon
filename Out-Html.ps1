@@ -358,10 +358,12 @@ filter Get-Functions
 
 Get-ChildItem $OutputDir *.html | Remove-Item
 
-$commands = Get-Command | Where-Object { $_.ModuleName -eq 'Carbon'} | Sort-Object Name 
+$commands = Get-Command | 
+                Where-Object { $_.ModuleName -eq 'Carbon' -and $_.Name } | 
+                Sort-Object Name 
 
 $categories = New-Object 'Collections.Generic.SortedList[string,object]'
-Get-ChildItem (Join-Path $PSScriptRoot Carbon\*.ps1) | 
+Get-ChildItem (Join-Path $PSScriptRoot Carbon\*.ps1) -Exclude Import-Carbon.ps1 | 
     Sort-Object BaseName |
     ForEach-Object { 
         $currentFile = $_.BaseName
