@@ -17,6 +17,14 @@ function Get-PathToHostsFile
     <#
     .SYNOPSIS
     Gets the path to this computer's hosts file.
+    
+    .DESCRIPTION
+    This is a convenience method so you don't have to have the path to the hosts file hard-coded in your scripts.
+    
+    .EXAMPLE
+    Get-PathToHostsFile
+    
+    Returns `C:\Windows\system32\drivers\etc\hosts`.  Uses the environment variable to find the root to the Windows directory.
     #>
     return Join-Path $env:windir system32\drivers\etc\hosts
 }
@@ -26,6 +34,30 @@ function Reset-HostsFile
     <#
     .SYNOPSIS
     Removes all custom host entries from this computer's hosts file.
+    
+    .DESCRIPTION
+    Sometimes you want to start over.  This method removes all hosts entries from your hosts file after the default localhost entry.
+    
+    By default, the current computer's hosts file is reset.  You can operate on a custom hosts file by passing its path to the `Path` argument.
+    
+    .EXAMPLE
+    Reset-HostsFile
+    
+    If your hosts file contains something like this:
+    
+        127.0.0.1        localhost
+        10.1.2.3         myserver
+        10.5.6.7         myserver2
+        
+    After calling `Reset-HostsFile`, your hosts will contain:
+    
+        127.0.0.1        localhost
+      
+    
+    .EXAMPLE
+    Reset-HostsFile -Path my\custom\hosts
+    
+    Resets the hosts file at `my\custom\hosts`.
     #>
     [CmdletBinding(SupportsShouldProcess=$true)]
     param(

@@ -192,7 +192,13 @@
         <h2>Syntax</h2>
     <pre class="Syntax"><code>Reset-HostsFile [[-Path] &lt;String&gt;] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
     
-    
+        <h2>Description</h2>
+    <div class="Description">
+        <p>Sometimes you want to start over.  This method removes all hosts entries from your hosts file after the default localhost entry.</p>
+
+<p>By default, the current computer's hosts file is reset.  You can operate on a custom hosts file by passing its path to the <code>Path</code> argument.</p>
+
+    </div>
     
     
 
@@ -247,6 +253,22 @@
         
     
         
-    
+                <h2>EXAMPLE 1</h2>
+            <pre><code>Reset-HostsFile</code></pre>
+            <p><p>If your hosts file contains something like this:</p>
+
+<pre><code>127.0.0.1        localhost
+10.1.2.3         myserver
+10.5.6.7         myserver2
+</code></pre>
+
+<p>After calling <code>Reset-HostsFile</code>, your hosts will contain:</p>
+
+<pre><code>127.0.0.1        localhost
+</code></pre>
+</p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 2</h2>
+            <pre><code>Reset-HostsFile -Path my\custom\hosts</code></pre>
+            <p><p>Resets the hosts file at <code>my\custom\hosts</code>.</p>
+</p><p></p><p></p><p></p><p></p>
 </body>
 </html>   
