@@ -187,16 +187,57 @@
 
 
     <h1>Get-IisHttpRedirect</h1>
-    <div>Get-IisHttpRedirect [-SiteName] <Object> [[-Path] <Object>] [-Verbose] [-Debug] [-ErrorAction <ActionPreference>] [-WarningAction <ActionPreference>] [-ErrorVariable <String>] [-WarningVariable <String>] [-OutVariable <String>] [-OutBuffer <Int32>] [-WhatIf] [-Confirm]
-</div>
+    <div>Gets the HTTP redirect settings for a website or virtual directory/application under a website.</div>
 
+        <h2>Syntax</h2>
+    <pre class="Syntax"><code>Get-IisHttpRedirect [-SiteName] &lt;String&gt; [[-Path] &lt;String&gt;] [&lt;CommonParameters&gt;]</code></pre>
     
-    
-    
+        <h2>Description</h2>
+    <div class="Description">
+        <p>The settings are returned as a hashtable with the following properties:</p>
+
+<ul>
+<li>Enabled - <code>True</code> if the redirect is enabled, <code>False</code> otherwise.</li>
+<li>Destination - The URL where requests are directed to.</li>
+<li>StatusCode - The HTTP status code sent to the browser for the redirect.</li>
+<li>ExactDescription - <code>True</code> if redirects are to an exact destination, not relative to the destination.  Whatever that means.</li>
+<li>ChildOnly - <code>True</code> if redirects are only to content in the destination directory (not subdirectories).</li>
+</ul>
+
+    </div>
     
     
 
-    
+    		<h2> Parameters </h2>
+		<table border='1'>
+			<tr>
+				<th>Name</th>
+                <th>Type</th>
+				<th>Description</th>
+				<th>Required?</th>
+				<th>Pipeline Input</th>
+				<th>Default Value</th>
+			</tr>
+            			<tr valign='top'>
+				<td>SiteName</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+				<td>The site's whose HTTP redirect settings will be retrieved.
+</td>
+				<td>true</td>
+				<td>false</td>
+                <td></td>
+			</tr>
+			<tr valign='top'>
+				<td>Path</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+				<td>The optional path to a sub-directory under <code>SiteName</code> whose settings to return.
+</td>
+				<td>false</td>
+				<td>false</td>
+                <td></td>
+			</tr>
+            
+        </table>
         
     
         
@@ -204,6 +245,12 @@
         
     
         
-    
+                <h2>EXAMPLE 1</h2>
+            <pre><code>Get-IisHttpRedirect -SiteName ExampleWebsite</code></pre>
+            <p><p>Gets the redirect settings for ExampleWebsite.</p>
+</p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 2</h2>
+            <pre><code>Get-IisHttpRedirect -SiteName ExampleWebsite -Path MyVirtualDirectory</code></pre>
+            <p><p>Gets the redirect settings for the MyVirtualDirectory virtual directory under ExampleWebsite.</p>
+</p><p></p><p></p><p></p><p></p>
 </body>
 </html>   

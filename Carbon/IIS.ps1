@@ -52,14 +52,38 @@ function Add-IisDefaultDocument
 
 function Get-IisHttpRedirect
 {
-    [CmdletBinding(SupportsShouldProcess=$true)]
+    <#
+    .SYNOPSIS
+    Gets the HTTP redirect settings for a website or virtual directory/application under a website.
+    
+    .DESCRIPTION
+    The settings are returned as a hashtable with the following properties:
+    
+     * Enabled - `True` if the redirect is enabled, `False` otherwise.
+     * Destination - The URL where requests are directed to.
+     * StatusCode - The HTTP status code sent to the browser for the redirect.
+     * ExactDescription - `True` if redirects are to an exact destination, not relative to the destination.  Whatever that means.
+     * ChildOnly - `True` if redirects are only to content in the destination directory (not subdirectories).
+     
+    .EXAMPLE
+    Get-IisHttpRedirect -SiteName ExampleWebsite 
+    
+    Gets the redirect settings for ExampleWebsite.
+    
+    .EXAMPLE
+    Get-IisHttpRedirect -SiteName ExampleWebsite -Path MyVirtualDirectory
+    
+    Gets the redirect settings for the MyVirtualDirectory virtual directory under ExampleWebsite.
+    #>
+    [CmdletBinding()]
     param(
         [Parameter(Mandatory=$true)]
-        # The site's whose HTTP redirect settings will be retrieved
+        [string]
+        # The site's whose HTTP redirect settings will be retrieved.
         $SiteName,
         
-        [Parameter()]
-        # The optional path whose settings will be retrieved
+        [string]
+        # The optional path to a sub-directory under `SiteName` whose settings to return.
         $Path = ''
     )
     
