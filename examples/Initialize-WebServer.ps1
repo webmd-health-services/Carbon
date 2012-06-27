@@ -17,12 +17,18 @@ $deploymentWritersGroupName = 'DeploymentWriters'
 $deploymnetReadersGroupName = 'DeploymentReaders'
 $ccnetServiceUser = 'example.com\CCServiceUser'
 
-Install-Group -Name $deploymentWritersGroupName -Description 'Users allowed to write to the deployment share.' -Members $ccnetServiceUser
-Install-Group -Name $deploymnetReadersGroupName -Description 'Users allowed to read the deployment share.' -Members 'Everyone'
+Install-Group -Name $deploymentWritersGroupName `
+              -Description 'Users allowed to write to the deployment share.' `
+              -Members $ccnetServiceUser
+Install-Group -Name $deploymnetReadersGroupName `
+              -Description 'Users allowed to read the deployment share.' `
+              -Members 'Everyone'
 
 $websitePath = '\Path\to\website\directory'
-Grant-Permissions -Path $websitePath -Permissions FullControl -Identity $deploymentWritersGroupName
-Grant-Permissions -Path $websitePath -Permissions Read -Identity $deploymnetReadersGroupName
+Grant-Permissions -Path $websitePath -Permissions FullControl `
+                  -Identity $deploymentWritersGroupName
+Grant-Permissions -Path $websitePath -Permissions Read `
+                  -Identity $deploymnetReadersGroupName
 
 $deployShareName = 'Deploy'
 Install-Share -Name $deployShareName `
@@ -33,11 +39,13 @@ Install-Share -Name $deployShareName `
 
 $sslCertPath = 'Path\to\SSL\certificate.cer'
 $cert = Install-Certificate -Path $sslCertPath -StoreLocation LocalMachine -StoreName My
-Set-SslCertificateBinding -IPPort '0.0.0.0:80' -ApplicationID ([Guid]::NewGuid()) -Thumbprint $cert.Thumbprint
+Set-SslCertificateBinding -IPPort '0.0.0.0:80' -ApplicationID ([Guid]::NewGuid()) `
+                          -Thumbprint $cert.Thumbprint
 
 $appPoolName = 'ExampleAppPool'
 Install-IisAppPool -Name $appPoolName -ServiceAccount NetworkService
-Install-IisWebsite -Path $websitePath -Name 'example1.get-carbon.org' -Bindings ('http/*:80','https/*:443') -AppPoolName $appPoolName
+Install-IisWebsite -Path $websitePath -Name 'example1.get-carbon.org' `
+                   -Bindings ('http/*:80','https/*:443') -AppPoolName $appPoolName
 
 Set-DotNetConnectionString -Name 'example1DB' `
                            -Value 'Data Source=db.example1.get-carbon.org; Initial Catalog=example1DB; Integrated Security=SSPI;' `
