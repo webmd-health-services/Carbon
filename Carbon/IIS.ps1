@@ -370,20 +370,36 @@ function Install-IisVirtualDirectory
 {
     <#
     .SYNOPSIS
-    Creates a new virtual directory.
+    Installs a virtual directory.
+
+    .DESCRIPTION
+    This function creates a virtual directory under website `SiteName` at `/Name`, serving files out of `Path`.  If a virtual directory called `Name` already exists, it is deleted first, and a new virtual directory is created.
+
+    .EXAMPLE
+    Install-IisVirtualDirectory -SiteName 'Peanuts' -Name 'DogHouse' -Path C:\Peanuts\Doghouse
+
+    Creates a /DogHouse virtual directory, which serves files from the C:\Peanuts\Doghouse directory.  If the Peanuts website responds to hostname `peanuts.com`, the virtual directory is accessible at `peanuts.com/DogHouse`.
+
+    .EXAMPLE
+    Install-IisVirtualDirectory -SiteName 'Peanuts' -Name 'Brown/Snoopy/DogHouse' -Path C:\Peanuts\DogHouse
+
+    Creates a DogHouse virtual directory under the `Peanuts` website at `/Brown/Snoopy/DogHouse` serving files out of the `C:\Peanuts\DogHouse` directory.  If the Peanuts website responds to hostname `peanuts.com`, the virtual directory is accessible at `peanuts.com/Brown/Snoopy/DogHouse`.
     #>
     [CmdletBinding()]
     param(
+        [Parameter(Mandatory=$true)]
         [string]
         # The site where the virtual directory should be created.
         $SiteName,
         
+        [Parameter(Mandatory=$true)]
         [string]
-        # The name of the virtual directory.
+        # The name of the virtual directory.  This can contain multiple directory segments for virtual directories not at the root of the website, e.g. First/Second/VirtualDirectory.
         $Name,
         
+        [Parameter(Mandatory=$true)]
         [string]
-        # The path to the virtual directory
+        # The file system path to the virtual directory.
         $Path
     )
     
