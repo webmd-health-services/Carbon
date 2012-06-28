@@ -187,16 +187,96 @@
 
 
     <h1>Set-IisWindowsAuthentication</h1>
-    <div>Set-IisWindowsAuthentication [-SiteName] <Object> [[-Path] <Object>] [-Disabled] [-UseKernelMode] [-Verbose] [-Debug] [-ErrorAction <ActionPreference>] [-WarningAction <ActionPreference>] [-ErrorVariable <String>] [-WarningVariable <String>] [-OutVariable <String>] [-OutBuffer <Int32>] [-WhatIf] [-Confirm]
-</div>
+    <div>Enables or disables Windows authentication for all or part of a website.</div>
 
+        <h2>Syntax</h2>
+    <pre class="Syntax"><code>Set-IisWindowsAuthentication [-SiteName] &lt;String&gt; [[-Path] &lt;String&gt;] [-Disabled] [-UseKernelMode] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
     
-    
-    
-    
-    
+        <h2>Description</h2>
+    <div class="Description">
+        <p>By default, enables Windows authentication on a website.  You can enable Windows authentication at a specific path under a website by passing the virtual path (<em>not</em> the physical path) to that directory.</p>
 
+<p>To disable Windows authentication, set the <code>Disabled</code> flag.</p>
+
+    </div>
     
+            <h2>Related Commands</h2>
+        <ul>
+<li><a href="http://blogs.msdn.com/b/webtopics/archive/2009/01/19/service-principal-name-spn-checklist-for-kerberos-authentication-with-iis-7-0.aspx">http://blogs.msdn.com/b/webtopics/archive/2009/01/19/service-principal-name-spn-checklist-for-kerberos-authentication-with-iis-7-0.aspx</a></li>
+</ul>
+
+
+    		<h2> Parameters </h2>
+		<table border='1'>
+			<tr>
+				<th>Name</th>
+                <th>Type</th>
+				<th>Description</th>
+				<th>Required?</th>
+				<th>Pipeline Input</th>
+				<th>Default Value</th>
+			</tr>
+            			<tr valign='top'>
+				<td>SiteName</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+				<td>The site where Windows authentication should be set.
+</td>
+				<td>true</td>
+				<td>false</td>
+                <td></td>
+			</tr>
+			<tr valign='top'>
+				<td>Path</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+				<td>The optional path where Windows authentication should be set.
+</td>
+				<td>false</td>
+				<td>false</td>
+                <td></td>
+			</tr>
+			<tr valign='top'>
+				<td>Disabled</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+				<td>Disable Windows authentication.  Otherwise, it is enabled.
+</td>
+				<td>false</td>
+				<td>false</td>
+                <td></td>
+			</tr>
+			<tr valign='top'>
+				<td>UseKernelMode</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+				<td>Turn on kernel mode.  Default is false.  <a href="http://blogs.msdn.com/b/webtopics/archive/2009/01/19/service-principal-name-spn-checklist-for-kerberos-authentication-with-iis-7-0.aspx">More information about Kerndel Mode authentication.</a>
+</td>
+				<td>false</td>
+				<td>false</td>
+                <td></td>
+			</tr>
+			<tr valign='top'>
+				<td>WhatIf</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+				<td></td>
+				<td>false</td>
+				<td>false</td>
+                <td></td>
+			</tr>
+			<tr valign='top'>
+				<td>Confirm</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+				<td></td>
+				<td>false</td>
+				<td>false</td>
+                <td></td>
+			</tr>
+                            <tr valign="top">
+                <td><a href="http://technet.microsoft.com/en-us/library/dd315352.aspx">CommonParameters</a></td>
+                <td></td>
+                <td>This cmdlet supports common parameters.  For more information type <br> <code>Get-Help about_CommonParameters</code>.</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                </tr>
+        </table>
         
     
         
@@ -204,6 +284,18 @@
         
     
         
-    
+                <h2>EXAMPLE 1</h2>
+            <pre><code>Set-IisWindowsAuthentication -SiteName Peanuts</code></pre>
+            <p><p>Turns on Windows authentication for the <code>Peanuts</code> website.</p>
+</p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 2</h2>
+            <pre><code>Set-IisWindowsAuthentication -SiteName Peanuts Snoopy/DogHouse</code></pre>
+            <p><p>Turns on Windows authentication for the <code>Snoopy/DogHouse</code> directory under the <code>Peanuts</code> website.</p>
+</p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 3</h2>
+            <pre><code>Set-IisWindowsAuthentication -SiteName Peanuts -Disabled</code></pre>
+            <p><p>Turns off Windows authentication for the <code>Peanuts</code> website.</p>
+</p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 4</h2>
+            <pre><code>Set-IisWindowsAuthentication -SiteName Peanuts -UseKernelMode</code></pre>
+            <p><p>Turns on Windows authentication for the <code>Peanuts</code> website.</p>
+</p><p></p><p></p><p></p><p></p>
 </body>
 </html>   
