@@ -108,11 +108,31 @@ function Get-MsmqMessageQueuePath
     return $path
 }
 
-function Grant-MSMQMessageQueuePermissions
+function Grant-MsmqMessageQueuePermissions
 {
     <#
     .SYNOPSIS
     Grants a user permissions on an MSMQ message queue.
+
+    .DESCRIPTION
+    If you want users to be able to access your queue, you need to grant them access.  This function will do that.
+
+    The rights you can assign are specified using values from the [MessageQueueAccessRights enumeration](http://msdn.microsoft.com/en-us/library/system.messaging.messagequeueaccessrights.aspx).  
+
+    If your queue is private, make sure you set the `Private` switch.
+
+    .LINK
+    http://msdn.microsoft.com/en-us/library/system.messaging.messagequeueaccessrights.aspx
+
+    .EXAMPLE
+    Grant-MsmqMessageQueuePermissions -Name MovieQueue -Username REGAL\Employees -AccessRights FullControl
+
+    Grants Regal Cinema employees full control over the MovieQueue.
+
+    .EXAMPLE
+    Grant-MsmqMessageQueuePermissions -Name MovieQueue -Private -Username REGAL\Critics -AccessRights WriteMessage    
+
+    Grants all of Regal's approved movie critics permission to write to the private critic's `MovieQueue`.  Lucky!
     #>
     [CmdletBinding(SupportsShouldProcess=$true)]
     param(

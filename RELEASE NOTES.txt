@@ -13,6 +13,7 @@
   * Set-HgrcDefaultPushUrl
   * Get-MsmqMessageQueue
   * Get-MsmqMessageQueuePath
+  * Grant-MsmqMessageQueuePermissions
 * Improved whitespace handling in HTML documentation
 
 
