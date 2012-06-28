@@ -692,10 +692,24 @@ function Set-IisDirectoryBrowsing
 {
     <#
     .SYNOPSIS
-    Turns on directory browsing under a virtual directory.
+    Enables directory browsing under all or part of a website.
+
+    .DESCRIPTION
+    Enables directory browsing (i.e. showing the contents of a directory by requesting that directory in a web browser) for a website.  To enable directory browsing on a directory under the website, pass the virtual path to that directory as the value to the `Directory` parameter.
+
+    .EXAMPLE
+    Set-IisDirectoryBrowsing -SiteName Peanuts
+
+    Enables directory browsing on the `Peanuts` website.
+
+    .EXAMPLE
+    Set-IisDirectoryBrowsing -SiteName Peanuts -Directory Snoopy/DogHouse
+
+    Enables directory browsing on the `/Snoopy/DogHouse` directory under the `Peanuts` website.
     #>
     [CmdletBinding()]
     param(
+        [Parameter(Mandatory=$true)]
         [string]
         # The name of the site where the virtual directory is located.
         $SiteName,
