@@ -194,13 +194,25 @@
     
         <h2>Description</h2>
     <div class="Description">
-        <p>A configuration file consists of sections, led by a "[section]" header
-and followed by "name = value" entries.  This function creates or updates
-an entry in an INI file.</p>
+        <p>A configuration file consists of sections, led by a <code>[section]</code> header and followed by <code>name = value</code> entries.  This function creates or updates an entry in an INI file.  Something like this:</p>
+
+<pre><code>[ui]
+username = Regina Spektor &lt;regina@reginaspektor.com&gt;
+
+[extensions]
+share = 
+extdiff =
+</code></pre>
+
+<p>Names are not allowed to contains the equal sign, <code>=</code>.  Values can contain any character.  The INI file is parsed using <code>Split-Ini</code>.  <a href="Split-Ini.html">See its documentation for more examples.</a></p>
 
     </div>
     
-    
+            <h2>Related Commands</h2>
+        <ul>
+<li><a href="Split-Ini.html">Split-Ini</a></li>
+</ul>
+
 
     		<h2> Parameters </h2>
 		<table border='1'>
@@ -280,6 +292,30 @@ an entry in an INI file.</p>
         
     
         
-    
+                <h2>EXAMPLE 1</h2>
+            <pre><code>Set-IniEntry -Path C:\Users\rspektor\mercurial.ini -Section extensions -Name share -Value ''</code></pre>
+            <p><p>If the <code>C:\Users\rspektor\mercurial.ini</code> file is empty, adds the following to it:</p>
+
+<pre><code>[extensions]
+share =
+</code></pre>
+</p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 2</h2>
+            <pre><code>Set-IniEntry -Path C:\Users\rspektor\music.ini -Name genres -Value 'alternative,rock'</code></pre>
+            <p><p>If the <code>music.ini</code> file is empty, adds the following to it:</p>
+
+<pre><code>genres = alternative,rock
+</code></pre>
+</p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 3</h2>
+            <pre><code>Set-IniEntry -Path C:\Users\rspektor\music.ini -Name genres -Value 'alternative,rock,world'</code></pre>
+            <p><p>If the <code>music.ini</code> file contains the following:</p>
+
+<pre><code>genres = r&amp;b
+</code></pre>
+
+<p>After running this command, <code>music.ini</code> will look like this:</p>
+
+<pre><code>genres = alternative,rock,world
+</code></pre>
+</p><p></p><p></p><p></p><p></p>
 </body>
 </html>   

@@ -17,11 +17,48 @@ function Set-IniEntry
     <#
     .SYNOPSIS
     Sets an entry in an INI file.
+
     .DESCRIPTION
+    A configuration file consists of sections, led by a `[section]` header and followed by `name = value` entries.  This function creates or updates an entry in an INI file.  Something like this:
+
+        [ui]
+        username = Regina Spektor <regina@reginaspektor.com>
+
+        [extensions]
+        share = 
+        extdiff =
+
+    Names are not allowed to contains the equal sign, `=`.  Values can contain any character.  The INI file is parsed using `Split-Ini`.  [See its documentation for more examples.](Split-Ini.html)
+
+    .LINK
+    Split-Ini
+
+    .EXAMPLE
+    Set-IniEntry -Path C:\Users\rspektor\mercurial.ini -Section extensions -Name share -Value ''
+
+    If the `C:\Users\rspektor\mercurial.ini` file is empty, adds the following to it:
+
+        [extensions]
+        share =
     
-    A configuration file consists of sections, led by a "[section]" header
-    and followed by "name = value" entries.  This function creates or updates
-    an entry in an INI file.
+    .EXAMPLE
+    Set-IniEntry -Path C:\Users\rspektor\music.ini -Name genres -Value 'alternative,rock'
+
+    If the `music.ini` file is empty, adds the following to it:
+
+        genres = alternative,rock
+
+    .EXAMPLE
+    Set-IniEntry -Path C:\Users\rspektor\music.ini -Name genres -Value 'alternative,rock,world'
+
+    If the `music.ini` file contains the following:
+
+        genres = r&b
+
+    After running this command, `music.ini` will look like this:
+
+        genres = alternative,rock,world
+
     #>
     [CmdletBinding(SupportsShouldProcess=$true)]
     param(
@@ -79,7 +116,10 @@ function Set-IniEntry
     }
     else
     {
-        $lastItemInSection = $settings.Values | Where-Object { $_.Section -eq $Section } | Sort-Object -Property LineNumber | Select-Object -Last 1
+        $lastItemInSection = $settings.Values | `
+                                Where-Object { $_.Section -eq $Section } | `
+                                Sort-Object -Property LineNumber | `
+                                Select-Object -Last 1
         
         $newLine = "$Name = $Value"
         Write-Host "Creating INI entry '$key' in '$Path'."
