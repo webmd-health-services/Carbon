@@ -301,8 +301,25 @@ function Install-MsmqMessageQueue
     }
 }
 
-function Remove-MSMQMessageQueue
+function Remove-MsmqMessageQueue
 {
+    <#
+    .SYNOPSIS
+    Removes an MSMQ queue.
+
+    .DESCRIPTION
+    Removes/deletes an existing MSMQ queue by name.  If a queue with that name doesn't exist, nothing happens.
+
+    .EXAMPLE
+    Remove-MsmqMessageQueue -Name MovieQueue
+
+    Removes the public `MovieQueue` queue.
+
+    .EXAMPLE
+    Remove-MsmqMessageQueue -Name MovieCriticsQueue -Private
+
+    Removes the private `MovieCriticsQueue` queue.
+    #>
     [CmdletBinding(SupportsShouldProcess=$true)]
     param(
         [Parameter(Mandatory=$true)]
@@ -317,7 +334,7 @@ function Remove-MSMQMessageQueue
     
     $commonArgs = @{ 'Name' = $Name ; 'Private' = $Private }
     
-    if( -not (Test-MSMQMessageQueue @commonArgs) )
+    if( -not (Test-MsmqMessageQueue @commonArgs) )
     {
         return
     }
@@ -326,14 +343,14 @@ function Remove-MSMQMessageQueue
     {
         try
         {
-            [Messaging.MessageQueue]::Delete( (Get-MSMQMessageQueuePath @commonArgs) )
+            [Messaging.MessageQueue]::Delete( (Get-MsmqMessageQueuePath @commonArgs) )
         }
         catch
         {
             Write-Error $_
             return
         }
-        while( Test-MSMQMessageQueue @commonArgs )
+        while( Test-MsmqMessageQueue @commonArgs )
         {
             Start-Sleep -Milliseconds 100
         }
