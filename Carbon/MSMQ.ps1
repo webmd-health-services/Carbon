@@ -230,9 +230,28 @@ function Install-Msmq
     }
 }
 
-function Install-MSMQMessageQueue
+function Install-MsmqMessageQueue
 {
-    [CmdletBinding(SupportsShouldProcess=$true)]
+    <#
+    .SYNOPSIS
+    Installs an MSMQ queue.
+
+    .DESCRIPTION
+    Creates a new queue with name `Name`.  If a queue with that name already exists, it is deleted, and a new queue is created. 
+
+    If the queue needs to be private, pass the `Private` switch.  If it needs to be transactional, set the `Transactional` switch.
+    
+    .EXAMPLE
+    Install-MsmqMessageQueue -Name MovieQueue
+
+    Installs a public, non-transactional `MovieQueue`.
+
+    .EXAMPLE
+    Install-MsmqMessageQueue -Name CriticsQueue -Private -Transactional
+
+    Installs a private, transactional `CriticsQueue` queue.
+    #>
+    [CmdletBinding()]
     param(
         [Parameter(Mandatory=$true)]
         [string]
@@ -240,22 +259,22 @@ function Install-MSMQMessageQueue
         $Name,
         
         [Switch]
-        # Is the queue private?
+        # Makes a private queue.
         $Private,
         
         [Switch]
-        # Is the queue transactional?
+        # Makes a transactional queue.
         $Transactional
     )
     
     $queueArgs = @{ Name = $Name ; Private = $Private }
-    $path = Get-MSMQMessageQueuePath @queueArgs 
+    $path = Get-MsmqMessageQueuePath @queueArgs 
     
     $logMessage = "MSMQ message queue '$Name'."
-    if( Test-MSMQMessageQueue @queueArgs )
+    if( Test-MsmqMessageQueue @queueArgs )
     {
         Write-Host "Re-creating $logMessage"
-        Remove-MSMQMessageQueue @queueArgs
+        Remove-MsmqMessageQueue @queueArgs
     }
     else
     {
@@ -276,7 +295,7 @@ function Install-MSMQMessageQueue
     }
     while( $true )
     
-    while( -not (Test-MSMQMessageQueue @queueArgs) )
+    while( -not (Test-MsmqMessageQueue @queueArgs) )
     {
         Start-Sleep -Milliseconds 100
     }

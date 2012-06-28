@@ -15,6 +15,7 @@
   * Get-MsmqMessageQueuePath
   * Grant-MsmqMessageQueuePermissions
   * Install-Msmq
+  * Install-MsmqMessageQueue
 * Improved whitespace handling in HTML documentation
 
 
