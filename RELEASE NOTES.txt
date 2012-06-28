@@ -1,3 +1,20 @@
+# 0.2.5
+
+## Enhancements
+ * Improved documentation for:
+  * Test-IisAppPool
+  * Test-IisWebsiteExists
+  * Unlock-IisBasicAuthentication
+  * Unlock-IisCgi
+  * Unlock-IisConfigSection
+  * Import-Carbon.ps1
+  * Set-IniEntry
+  * Split-Ini
+  * Set-HgrcDefaultPushUrl
+  * Get-MsmqMessageQueue
+* Improved whitespace handling in HTML documentation
+
+
 # 0.2.4
 
 ## Enhancements
