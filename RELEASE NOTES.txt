@@ -20,6 +20,7 @@
   * [Test-MsmqMessageQueue](http://get-carbon.org/help/Test-MsmqMessageQueue.html)
   * [Get-PerformanceCounters](http://get-carbon.org/help/Get-PerformanceCounters.html)
   * [Install-PerformanceCounter](http://get-carbon.org/help/Install-PerformanceCounter.html)
+  * [Test-PerformanceCounter](http://get-carbon.org/help/Test-PerformanceCounter.html)
 * Improved whitespace in HTML documentation code samples.
 
 

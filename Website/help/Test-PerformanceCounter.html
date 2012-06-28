@@ -187,16 +187,49 @@
 
 
     <h1>Test-PerformanceCounter</h1>
-    <div>Test-PerformanceCounter [-CategoryName] <String> [-Name] <String> [-Verbose] [-Debug] [-ErrorAction <ActionPreference>] [-WarningAction <ActionPreference>] [-ErrorVariable <String>] [-WarningVariable <String>] [-OutVariable <String>] [-OutBuffer <Int32>]
-</div>
+    <div>Tests if a performance counter exists.</div>
 
+        <h2>Syntax</h2>
+    <pre class="Syntax"><code>Test-PerformanceCounter [-CategoryName] &lt;String&gt; [-Name] &lt;String&gt; [&lt;CommonParameters&gt;]</code></pre>
     
-    
-    
+        <h2>Description</h2>
+    <div class="Description">
+        <p>Returns <code>True</code> if counter <code>Name</code> exists in category <code>CategoryName</code>.  <code>False</code> if it does not exist or the category doesn't exist.</p>
+
+    </div>
     
     
 
-    
+    		<h2> Parameters </h2>
+		<table border='1'>
+			<tr>
+				<th>Name</th>
+                <th>Type</th>
+				<th>Description</th>
+				<th>Required?</th>
+				<th>Pipeline Input</th>
+				<th>Default Value</th>
+			</tr>
+            			<tr valign='top'>
+				<td>CategoryName</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+				<td>The category's name where the performance counter exists.  Or might exist.  As the case may be.
+</td>
+				<td>true</td>
+				<td>false</td>
+                <td></td>
+			</tr>
+			<tr valign='top'>
+				<td>Name</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+				<td>The performance counter's name.
+</td>
+				<td>true</td>
+				<td>false</td>
+                <td></td>
+			</tr>
+            
+        </table>
         
     
         
@@ -204,6 +237,9 @@
         
     
         
-    
+                <h2>EXAMPLE 1</h2>
+            <pre><code>Test-PerformanceCounter -CategoryName 'ToyotaCamry' -Name 'MilesPerGallon'</code></pre>
+            <p><p>Returns <code>True</code> if the <code>ToyotaCamry</code> performance counter category has a <code>MilesPerGallon</code> counter.  <code>False</code> if the counter doesn't exist.</p>
+</p><p></p><p></p><p></p><p></p>
 </body>
 </html>   
