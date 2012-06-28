@@ -23,6 +23,7 @@
   * [Test-PerformanceCounter](http://get-carbon.org/help/Test-PerformanceCounter.html)
   * [Test-PerformanceCounterCategory](http://get-carbon.org/help/Test-PerformanceCounterCategory.html)
   * [Uninstall-PerformanceCounterCategory](http://get-carbon.org/help/Uninstall-PerformanceCounterCategory.html)
+  * [Complete-Jobs](http://get-carbon.org/help/Complete-Jobs.html)
 * Improved whitespace in HTML documentation code samples.
 
 

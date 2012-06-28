@@ -187,23 +187,68 @@
 
 
     <h1>Complete-Jobs</h1>
-    <div>Complete-Jobs [-Jobs] <Job[]> [[-IntervalSeconds] <Int32>] [-Verbose] [-Debug] [-ErrorAction <ActionPreference>] [-WarningAction <ActionPreference>] [-ErrorVariable <String>] [-WarningVariable <String>] [-OutVariable <String>] [-OutBuffer <Int32>]
-</div>
+    <div>Waits for a set of PowerShell jobs to complete, receives each job as it finishes, and returns the number of jobs that didn't complete successfully.</div>
 
+        <h2>Syntax</h2>
+    <pre class="Syntax"><code>Complete-Jobs [-Jobs] &lt;Job[]&gt; [[-IntervalSeconds] &lt;Int32&gt;] [&lt;CommonParameters&gt;]</code></pre>
     
-    
-    
+        <h2>Description</h2>
+    <div class="Description">
+        <p>Job management in PowerShell is a pain.  At a minimum, you have to wait for each job to complete, then receive its output.  This function manages all that for you.  It iterates over a list/array of jobs, as each job finishes, it receives its output and removes it.  If a job is blocked or stopped it receives and removes those jobs.  When its all done, it returns the number of jobs that failed, were blocked, or stopped.</p>
+
+<p>By default, it sleeps for one second between status checks.  You can increase this interval using the <code>IntervalSeconds</code> parameter.</p>
+
+<p>This function never times out.</p>
+
+    </div>
     
     
 
-    
+    		<h2> Parameters </h2>
+		<table border='1'>
+			<tr>
+				<th>Name</th>
+                <th>Type</th>
+				<th>Description</th>
+				<th>Required?</th>
+				<th>Pipeline Input</th>
+				<th>Default Value</th>
+			</tr>
+            			<tr valign='top'>
+				<td>Jobs</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.job.aspx">Job[]</a></td>
+				<td>The jobs to complete.
+</td>
+				<td>true</td>
+				<td>false</td>
+                <td></td>
+			</tr>
+			<tr valign='top'>
+				<td>IntervalSeconds</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.int32.aspx">Int32</a></td>
+				<td>The number of seconds to sleep between job status checks.  Default is 1 second.
+</td>
+				<td>false</td>
+				<td>false</td>
+                <td></td>
+			</tr>
+            
+        </table>
         
     
         
-    
+            <h2>Return Values</h2>
+        <p><a href="http://msdn.microsoft.com/en-us/library/system.int32.aspx">System.Int32</a>. </p>
+
         
     
         
-    
+                <h2>EXAMPLE 1</h2>
+            <pre><code>Complete-Jobs -Jobs $jobs</code></pre>
+            <p><p>Sits and waits for all the jobs in <code>$jobs</code> to finish, block, or stop and returns the number that didn't succeed.  It waits one second between status checks.</p>
+</p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 2</h2>
+            <pre><code>Complete-Jobs -Jobs $jobs -IntervalSeconds 60</code></pre>
+            <p><p>Waits for all the jobs in <code>$jobs</code> to finish, waiting 60 seconds between status checks.</p>
+</p><p></p><p></p><p></p><p></p>
 </body>
 </html>   
