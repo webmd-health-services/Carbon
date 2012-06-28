@@ -187,12 +187,16 @@
 
 
     <h1>Unlock-IisCgi</h1>
-    <div>Unlocks the system.webServer/cgi section in the IIS server configuration.</div>
+    <div>Unlocks CGI IIS configuration so that websites can configure their own CGI settings.</div>
 
         <h2>Syntax</h2>
     <pre class="Syntax"><code>Unlock-IisCgi [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
     
-    
+        <h2>Description</h2>
+    <div class="Description">
+        <p>By default, IIS locks the CGI section so that no websites can enable or configure it.  This function unlocks CGI configuration so that websites can configure their own CGI settings.  Specifically, it unlocks the <code>system.webServer/cgi</code> IIS configuration section.</p>
+
+    </div>
     
     
 
@@ -238,6 +242,9 @@
         
     
         
-    
+                <h2>EXAMPLE 1</h2>
+            <pre><code>Unlock-IisCgi</code></pre>
+            <p><p>Unlocks the CGI IIS configuration section so that websites can configure their own CGI settings.</p>
+</p><p></p><p></p><p></p><p></p>
 </body>
 </html>   

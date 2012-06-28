@@ -1106,7 +1106,15 @@ function Unlock-IisCgi
 {
     <#
     .SYNOPSIS
-    Unlocks the system.webServer/cgi section in the IIS server configuration.
+    Unlocks CGI IIS configuration so that websites can configure their own CGI settings.
+
+    .DESCRIPTION
+    By default, IIS locks the CGI section so that no websites can enable or configure it.  This function unlocks CGI configuration so that websites can configure their own CGI settings.  Specifically, it unlocks the `system.webServer/cgi` IIS configuration section.
+
+    .EXAMPLE
+    Unlock-IisCgi
+
+    Unlocks the CGI IIS configuration section so that websites can configure their own CGI settings.
     #>
     [CmdletBinding(SupportsShouldProcess=$true)]
     param(
