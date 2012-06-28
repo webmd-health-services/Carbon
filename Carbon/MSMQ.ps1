@@ -15,13 +15,31 @@
 Add-Type -AssemblyName System.ServiceProcess
 Add-Type -AssemblyName System.Messaging
 
-function Get-MSMQMessageQueue
+function Get-MsmqMessageQueue
 {
     <#
     .SYNOPSIS
-    Gets the MSMQ message queue by the given name, or $null if one doesn't exist.
+    Gets the MSMQ message queue by the given name
+
+    .DESCRIPTION 
+    Returns a [MessageQueue](http://msdn.microsoft.com/en-us/library/system.messaging.messagequeue.aspx) object for the Message Queue with name `Name`.  If one doesn't exist, returns `$null`.
+
+    Because MSMQ handles private queues differently than public queues, you must explicitly tell `Get-MsmqMessageQueue` the queue you want to get is private by using the `Private` switch.
+
+    .OUTPUTS
+    System.Messaging.MessageQueue.
+
+    .EXAMPLE
+    Get-MsmqMessageQueue -Name LunchQueue
+
+    Returns the [MessageQueue](http://msdn.microsoft.com/en-us/library/system.messaging.messagequeue.aspx) object for the queue named LunchQueue.  It's probably pretty full!
+
+    .EXAMPLE
+    Get-MsmqMessageQueue -Name TeacherLunchQueue -Private
+
+    Returns the [MessageQueue](http://msdn.microsoft.com/en-us/library/system.messaging.messagequeue.aspx) object for the teacher's private LunchQueue.  They must be medical professors.
     #>
-    [CmdletBinding(SupportsShouldProcess=$true)]
+    [CmdletBinding()]
     param(
         [Parameter(Mandatory=$true)]
         [string]
