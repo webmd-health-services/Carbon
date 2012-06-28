@@ -187,16 +187,122 @@
 
 
     <h1>Set-IisSslFlags</h1>
-    <div>Set-IisSslFlags [-SiteName] <Object> [[-Path] <Object>] [-RequireSsl] [-AcceptClientCertificates] [-RequireClientCertificates] [-Enable128BitSsl] [-Verbose] [-Debug] [-ErrorAction <ActionPreference>] [-WarningAction <ActionPreference>] [-ErrorVariable <String>] [-WarningVariable <String>] [-OutVariable <String>] [-OutBuffer <Int32>] [-WhatIf] [-Confirm]
-</div>
+    <div>Sets how a website or part of a website should handle and use SSL.</div>
 
+        <h2>Syntax</h2>
+    <pre class="Syntax"><code>Set-IisSslFlags [-SiteName] &lt;String&gt; [[-Path] &lt;String&gt;] [-RequireSsl] [-AcceptClientCertificates] [-RequireClientCertificates] [-Enable128BitSsl] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
     
-    
-    
-    
-    
+        <h2>Description</h2>
+    <div class="Description">
+        <p>This function allows you to configure the following SSL-related settings:</p>
 
+<ul>
+<li>Requiring SSL (the <code>RequireSsl</code> switch)</li>
+<li>Ignoring/accepting/requiring client certificates (the <code>AccepClientCertificates</code> and <code>RequireClientCertificates</code> switches).</li>
+<li>Requiring 128-bit SSL (the <code>Enable128BitSsl</code> switch).</li>
+</ul>
+
+<p>By default, this function will make SSL optional, set the ignore client certificates flag, and not require 128-bit SSL.</p>
+
+<p>Changing any SSL settings will do you no good if the website doesn't have an SSL binding or doesn't have an SSL certificate.  The configuration will most likely succeed, but won't work in a browser.  So sad.</p>
+
+    </div>
     
+            <h2>Related Commands</h2>
+        <ul>
+<li><a href="Set-IisWebsiteSslCertificate.html">Set-IisWebsiteSslCertificate</a></li>
+</ul>
+
+
+    		<h2> Parameters </h2>
+		<table border='1'>
+			<tr>
+				<th>Name</th>
+                <th>Type</th>
+				<th>Description</th>
+				<th>Required?</th>
+				<th>Pipeline Input</th>
+				<th>Default Value</th>
+			</tr>
+            			<tr valign='top'>
+				<td>SiteName</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+				<td>The website whose SSL flags should be modifed.
+</td>
+				<td>true</td>
+				<td>false</td>
+                <td></td>
+			</tr>
+			<tr valign='top'>
+				<td>Path</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+				<td>The path to the folder/virtual directory/application under the website whose SSL flags should be set.
+</td>
+				<td>false</td>
+				<td>false</td>
+                <td></td>
+			</tr>
+			<tr valign='top'>
+				<td>RequireSsl</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+				<td>Should SSL be required?
+</td>
+				<td>false</td>
+				<td>false</td>
+                <td></td>
+			</tr>
+			<tr valign='top'>
+				<td>AcceptClientCertificates</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+				<td>Should client certificates be accepted?
+</td>
+				<td>false</td>
+				<td>false</td>
+                <td></td>
+			</tr>
+			<tr valign='top'>
+				<td>RequireClientCertificates</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+				<td>Should client certificates be required?
+</td>
+				<td>false</td>
+				<td>false</td>
+                <td></td>
+			</tr>
+			<tr valign='top'>
+				<td>Enable128BitSsl</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+				<td>Requires 128-bit SSL.
+</td>
+				<td>false</td>
+				<td>false</td>
+                <td></td>
+			</tr>
+			<tr valign='top'>
+				<td>WhatIf</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+				<td></td>
+				<td>false</td>
+				<td>false</td>
+                <td></td>
+			</tr>
+			<tr valign='top'>
+				<td>Confirm</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+				<td></td>
+				<td>false</td>
+				<td>false</td>
+                <td></td>
+			</tr>
+                            <tr valign="top">
+                <td><a href="http://technet.microsoft.com/en-us/library/dd315352.aspx">CommonParameters</a></td>
+                <td></td>
+                <td>This cmdlet supports common parameters.  For more information type <br> <code>Get-Help about_CommonParameters</code>.</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                </tr>
+        </table>
         
     
         
@@ -204,6 +310,18 @@
         
     
         
-    
+                <h2>EXAMPLE 1</h2>
+            <pre><code>Set-IisSslFlags -Site Peanuts</code></pre>
+            <p><p>Resets the <code>Peanuts</code> website's SSL flags to defaults, i.e. makes SSL optional, ignores client certificates, and makes 128-bit SSL optional.</p>
+</p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 2</h2>
+            <pre><code>Set-IisSslFlags -Site Peanuts -Path Snoopy/DogHouse -RequireSsl</code></pre>
+            <p><p>Configures the <code>/Snoopy/DogHouse</code> directory in the <code>Peanuts</code> site to require SSL.  It also turns off any client certificate settings and makes 128-bit SSL optional.</p>
+</p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 3</h2>
+            <pre><code>Set-IisFlags -Site Peanuts -AcceptClientCertificates</code></pre>
+            <p><p>Configures the <code>Peanuts</code> website to accept client certificates, makes SSL optional, and makes 128-bit SSL optional.</p>
+</p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 4</h2>
+            <pre><code>Set-IisFlags -Site Peanuts -Enable128BitSsl</code></pre>
+            <p><p>Configures the <code>Peanuts</code> website to require 128-bit SSL, makes SSL optional, and ignores client certificates.</p>
+</p><p></p><p></p><p></p><p></p>
 </body>
 </html>   

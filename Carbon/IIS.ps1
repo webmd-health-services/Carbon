@@ -796,13 +796,52 @@ function Set-IisHttpRedirect
 
 function Set-IisSslFlags
 {
+    <#
+    .SYNOPSIS
+    Sets how a website or part of a website should handle and use SSL.
+
+    .DESCRIPTION
+    This function allows you to configure the following SSL-related settings:
+
+     * Requiring SSL (the `RequireSsl` switch)
+     * Ignoring/accepting/requiring client certificates (the `AccepClientCertificates` and `RequireClientCertificates` switches).
+     * Requiring 128-bit SSL (the `Enable128BitSsl` switch).
+
+    By default, this function will make SSL optional, set the ignore client certificates flag, and not require 128-bit SSL.
+
+    Changing any SSL settings will do you no good if the website doesn't have an SSL binding or doesn't have an SSL certificate.  The configuration will most likely succeed, but won't work in a browser.  So sad.
+
+    .EXAMPLE
+    Set-IisSslFlags -Site Peanuts
+
+    Resets the `Peanuts` website's SSL flags to defaults, i.e. makes SSL optional, ignores client certificates, and makes 128-bit SSL optional.
+
+    .EXAMPLE
+    Set-IisSslFlags -Site Peanuts -Path Snoopy/DogHouse -RequireSsl
+    
+    Configures the `/Snoopy/DogHouse` directory in the `Peanuts` site to require SSL.  It also turns off any client certificate settings and makes 128-bit SSL optional.
+
+    .EXAMPLE
+    Set-IisFlags -Site Peanuts -AcceptClientCertificates
+
+    Configures the `Peanuts` website to accept client certificates, makes SSL optional, and makes 128-bit SSL optional.
+
+    .EXAMPLE
+    Set-IisFlags -Site Peanuts -Enable128BitSsl
+
+    Configures the `Peanuts` website to require 128-bit SSL, makes SSL optional, and ignores client certificates.
+
+    .LINK
+    Set-IisWebsiteSslCertificate
+    #>
     [CmdletBinding(SupportsShouldProcess=$true)]
     param(
         [Parameter(Mandatory=$true)]
+        [string]
         # The website whose SSL flags should be modifed.
         $SiteName,
         
-        [Parameter()]
+        [string]
         # The path to the folder/virtual directory/application under the website whose SSL flags should be set.
         $Path = '',
         
@@ -819,7 +858,7 @@ function Set-IisSslFlags
         $RequireClientCertificates,
         
         [Switch]
-        # Should 128-bit SSL be supported?
+        # Requires 128-bit SSL.
         $Enable128BitSsl
     )
     
