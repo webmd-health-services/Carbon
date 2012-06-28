@@ -1079,7 +1079,15 @@ function Unlock-IisBasicAuthentication
 {
     <#
     .SYNOPSIS
-    Unlocks the system.webServer/security/authentication/windowsAuthentication section in the IIS server configuration.
+    Unlocks basic authentication IIS configuration so that sites can enable/disable basic authentication.
+
+    .DESCRIPTION
+    By default, IIS locks the basic authentication configuration, so that no sites can enable it.  This function unlocks it so Windows authentication can be enabled.  Specifically, it unlocks the `system.webServer/security/authentication/basicAuthentication` IIS configuration section.
+
+    .EXAMPLE
+    Unlock-IisBasicAuthentication
+
+    Unlocks basic authentication configuration so that websites can enable, configure and use basic authentication.
     #>
     [CmdletBinding(SupportsShouldProcess=$true)]
     param(
@@ -1140,7 +1148,15 @@ function Unlock-IisWindowsAuthentication
 {
     <#
     .SYNOPSIS
-    Unlocks the system.webServer/security/authentication/windowsAuthentication section in the IIS server configuration.
+    Unlocks Windows authentication IIS configuration so that sites can enable/disable Windows authentication.
+
+    .DESCRIPTION
+    By default, IIS locks the Windows authentication configuration, so that no sites can enable it.  This function unlocks it so Windows authentication can be enabled.  Specifically, it unlocks the `system.webServer/security/authentication/windowsAuthentication` IIS configuration section.
+
+    .EXAMPLE
+    Unlock-IisWindowsAuthentication
+
+    Unlocks Windows authentication configuration so that websites can enable, configure and use Windows authentication.
     #>
     [CmdletBinding(SupportsShouldProcess=$true)]
     param(
