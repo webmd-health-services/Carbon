@@ -187,12 +187,16 @@
 
 
     <h1>Invoke-AppCmd</h1>
-    <div>Invokes appcmd.exe.</div>
+    <div>Invokes appcmd.exe, the IIS command line configuration utility.</div>
 
         <h2>Syntax</h2>
     <pre class="Syntax"><code>Invoke-AppCmd [[-AppCmdArgs] &lt;Object&gt;] [&lt;CommonParameters&gt;]</code></pre>
     
-    
+        <h2>Description</h2>
+    <div class="Description">
+        <p>Runs appcmd.exe, passing all the arguments that get passed to <code>Invoke-AppCmd</code>.</p>
+
+    </div>
     
     
 
@@ -224,6 +228,9 @@
         
     
         
-    
+                <h2>EXAMPLE 1</h2>
+            <pre><code>Invoke-AppCmd list site Peanuts</code></pre>
+            <p><p>Runs <code>appcmd.exe list site Peanuts</code>, which will list the configuration for the Peanuts website.</p>
+</p><p></p><p></p><p></p><p></p>
 </body>
 </html>   

@@ -522,7 +522,15 @@ function Invoke-AppCmd
 {
     <#
     .SYNOPSIS
-    Invokes appcmd.exe.
+    Invokes appcmd.exe, the IIS command line configuration utility.
+
+    .DESCRIPTION
+    Runs appcmd.exe, passing all the arguments that get passed to `Invoke-AppCmd`.
+
+    .EXAMPLE
+    Invoke-AppCmd list site Peanuts
+
+    Runs `appcmd.exe list site Peanuts`, which will list the configuration for the Peanuts website.
     #>
     [CmdletBinding()]
     param(
