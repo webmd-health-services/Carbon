@@ -17,6 +17,7 @@
   * Install-Msmq
   * Install-MsmqMessageQueue
   * [Remove-MsmqMessageQueue](http://get-carbon.org/help/Remove-MsmqMessageQueue.html)
+  * [Test-MsmqMessageQueue](http://get-carbon.org/help/Test-MsmqMessageQueue.html)
 * Improved whitespace handling in HTML documentation
 
 

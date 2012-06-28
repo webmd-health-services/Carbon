@@ -53,9 +53,9 @@ function Get-MsmqMessageQueue
    
     $privateArg = @{ Private = $Private }
     
-    if( Test-MSMQMessageQueue -Name $Name @privateArg )
+    if( Test-MsmqMessageQueue -Name $Name @privateArg )
     {
-        $path = Get-MSMQMessageQueuePath -Name $Name @privateArg 
+        $path = Get-MsmqMessageQueuePath -Name $Name @privateArg 
         New-Object -TypeName Messaging.MessageQueue -ArgumentList ($path)
     }
     else
@@ -157,7 +157,7 @@ function Grant-MsmqMessageQueuePermissions
     )
     
     $queueArgs = @{ Name = $Name ; Private = $Private }
-    $queue = Get-MSMQMessageQueue @queueArgs
+    $queue = Get-MsmqMessageQueue @queueArgs
     if( -not $queue )
     {
         throw "Queue '$Name' doesn't exist."
@@ -357,13 +357,29 @@ function Remove-MsmqMessageQueue
     }
 }
 
-function Test-MSMQMessageQueue
+function Test-MsmqMessageQueue
 {
     <#
     .SYNOPSIS
     Tests if an MSMQ message queue exists.
+
+    .DESCRIPTION
+    Returns `True` if a message queue with name `Name` exists.  `False` otherwise.
+
+    .OUTPUTS
+    System.Boolean.
+
+    .EXAMPLE
+    Test-MsmqMessageQueue -Name 'MovieQueue'
+
+    Returns `True` if public queue `MovieQueue` exists, `False` otherwise.
+
+    .EXAMPLE
+    Test-MsmqMessageQueue -Name 'MovieCriticsQueue' -Private
+
+    Returns `True` if private queue `MovieCriticsQueue` exists, `False` otherwise.
     #>
-    [CmdletBinding(SupportsShouldProcess=$true)]
+    [CmdletBinding()]
     param(
         [Parameter(Mandatory=$true)]
         [string]
@@ -371,12 +387,12 @@ function Test-MSMQMessageQueue
         $Name,
         
         [Switch]
-        # Is the queue private?
+        # If the queue is private, this switch must be set.
         $Private
     )
     
     $queueArgs = @{ Name = $Name ; Private = $Private }
-    $path = Get-MSMQMessageQueuePath @queueArgs 
+    $path = Get-MsmqMessageQueuePath @queueArgs 
     return ( [Messaging.MessageQueue]::Exists( $path ) )
 }
 
