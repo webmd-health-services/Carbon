@@ -4,6 +4,16 @@ Imports the Carbon module.
 
 .DESCRIPTION
 Imports the Carbon module.  If the Carbon module is already loaded, it will remove it and then reloaded.  If Carbon is present as a sub-module of Carbon, Carbon can't be re-loaded so a warning is output instead.  To hide the warning, use the `-Quiet` parameter.
+
+.EXAMPLE
+Import-Carbon.ps1
+
+Imports the Carbon module, re-loading it if its already loaded.
+
+.EXAMPLE
+Import-Carbon.ps1 -Quiet
+
+Imports the Carbon module, hiding any warnings about Carbon being loaded as a sub-module.
 #>
 
 # Copyright 2012 Aaron Jensen
