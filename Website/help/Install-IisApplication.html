@@ -192,7 +192,11 @@
         <h2>Syntax</h2>
     <pre class="Syntax"><code>Install-IisApplication [-SiteName] &lt;String&gt; [-Name] &lt;String&gt; [-Path] &lt;String&gt; [[-AppPoolName] &lt;String&gt;] [&lt;CommonParameters&gt;]</code></pre>
     
-    
+        <h2>Description</h2>
+    <div class="Description">
+        <p>Creates a new application at <code>Name</code> under website <code>SiteName</code> running the code found on the file system under <code>Path</code>, i.e. if SiteName is is <code>example.com</code>, the application is accessible at <code>example.com/Name</code>.  If an application already exists at that path, it is removed first.  The application can run under a custom application pool using the optional <code>AppPoolName</code> parameter.  If no app pool is specified, the application runs under the same app pool as the website it runs under.</p>
+
+    </div>
     
     
 
@@ -251,6 +255,12 @@
         
     
         
-    
+                <h2>EXAMPLE 1</h2>
+            <pre><code>Install-IisApplication -SiteName Peanuts -Name CharlieBrown -Path C:\Path\To\CharlieBrown -AppPoolName CharlieBrownPool</code></pre>
+            <p><p>Creates an application at <code>Peanuts/CharlieBrown</code> which runs from <code>Path/To/CharlieBrown</code>.  The application runs under the <code>CharlieBrownPool</code>.</p>
+</p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 2</h2>
+            <pre><code>Install-IisApplication -SiteName Peanuts -Name Snoopy -Path C:\Path\To\Snoopy</code></pre>
+            <p><p>Create an application at Peanuts/Snoopy, which runs from C:\Path\To\Snoopy.  It uses the same application as the Peanuts website.</p>
+</p><p></p><p></p><p></p><p></p>
 </body>
 </html>   

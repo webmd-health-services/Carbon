@@ -192,6 +192,19 @@ function Install-IisApplication
     <#
     .SYNOPSIS
     Creates a new application under a website.
+    
+    .DESCRIPTION
+    Creates a new application at `Name` under website `SiteName` running the code found on the file system under `Path`, i.e. if SiteName is is `example.com`, the application is accessible at `example.com/Name`.  If an application already exists at that path, it is removed first.  The application can run under a custom application pool using the optional `AppPoolName` parameter.  If no app pool is specified, the application runs under the same app pool as the website it runs under.
+    
+    .EXAMPLE
+    Install-IisApplication -SiteName Peanuts -Name CharlieBrown -Path C:\Path\To\CharlieBrown -AppPoolName CharlieBrownPool
+    
+    Creates an application at `Peanuts/CharlieBrown` which runs from `Path/To/CharlieBrown`.  The application runs under the `CharlieBrownPool`.
+    
+    .EXAMPLE
+    Install-IisApplication -SiteName Peanuts -Name Snoopy -Path C:\Path\To\Snoopy
+    
+    Create an application at Peanuts/Snoopy, which runs from C:\Path\To\Snoopy.  It uses the same application as the Peanuts website.
     #>
     [CmdletBinding()]
     param(
@@ -210,7 +223,6 @@ function Install-IisApplication
         # The path to the application.
         $Path,
         
-        [Parameter()]
         [string]
         # The app pool for the application.
         $AppPoolName
