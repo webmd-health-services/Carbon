@@ -1045,9 +1045,22 @@ function Test-IisAppPoolExists
 
 function Test-IisWebsiteExists
 {
+    <#
+    .SYNOPSIS
+    Tests if a website exists.
+
+    .DESCRIPTION
+    Returns `True` if a website with name `Name` exists.  `False` if it doesn't.
+
+    .EXAMPLE
+    Test-IisWebsiteExists -Name 'Peanuts'
+
+    Returns `True` if the `Peanuts` website exists.  `False` if it doesn't.
+    #>
     param(
         [Parameter(Mandatory=$true)]
-        # The website whose existence should be tested
+        [string]
+        # The name of the website whose existence to check.
         $Name
     )
     
