@@ -190,9 +190,15 @@
     <div>Enables or disables anonymous authentication for all or part of a website.</div>
 
         <h2>Syntax</h2>
-    <pre class="Syntax"><code>Set-IisAnonymousAuthentication [-SiteName] &lt;Object&gt; [[-Path] &lt;Object&gt;] [-Disabled] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
+    <pre class="Syntax"><code>Set-IisAnonymousAuthentication [-SiteName] &lt;String&gt; [[-Path] &lt;String&gt;] [-Disabled] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
     
-    
+        <h2>Description</h2>
+    <div class="Description">
+        <p>By default, enables anonymous authentication on a website.  You can enable anonymous authentication at a specific path under a website by passing the virtual path (i.e. <em>not</em> the physical path) to that directory.</p>
+
+<p>To disable anonymouse authentication, set the <code>Disabled</code> flag.</p>
+
+    </div>
     
     
 
@@ -208,7 +214,7 @@
 			</tr>
             			<tr valign='top'>
 				<td>SiteName</td>
-				<td><a href="http://msdn.microsoft.com/en-us/library/system.object.aspx">Object</a></td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
 				<td>The site where anonymous authentication should be set.
 </td>
 				<td>true</td>
@@ -217,7 +223,7 @@
 			</tr>
 			<tr valign='top'>
 				<td>Path</td>
-				<td><a href="http://msdn.microsoft.com/en-us/library/system.object.aspx">Object</a></td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
 				<td>The optional path where anonymous authentication should be set.
 </td>
 				<td>false</td>
@@ -265,6 +271,15 @@
         
     
         
-    
+                <h2>EXAMPLE 1</h2>
+            <pre><code>Set-IisAnonymousAuthentication -SiteName Peanuts</code></pre>
+            <p><p>Turns on anonymous authentication for the <code>Peanuts</code> website.</p>
+</p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 2</h2>
+            <pre><code>Set-IisAnonymouseAuthentication -SiteName Peanuts Snoopy/DogHouse</code></pre>
+            <p><p>Turns on anonymous authentication for the <code>Snoopy/DogHouse</code> directory under the <code>Peanuts</code> website.</p>
+</p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 3</h2>
+            <pre><code>Set-IisAnonymousAuthentication -SiteName Peanuts -Disabled</code></pre>
+            <p><p>Turns off anonymous authentication for the <code>Peanuts</code> website.</p>
+</p><p></p><p></p><p></p><p></p>
 </body>
 </html>   

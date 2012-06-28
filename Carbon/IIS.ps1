@@ -585,14 +585,35 @@ function Set-IisAnonymousAuthentication
     <#
     .SYNOPSIS
     Enables or disables anonymous authentication for all or part of a website.
+
+    .DESCRIPTION
+    By default, enables anonymous authentication on a website.  You can enable anonymous authentication at a specific path under a website by passing the virtual path (i.e. *not* the physical path) to that directory.
+
+    To disable anonymouse authentication, set the `Disabled` flag.
+
+    .EXAMPLE
+    Set-IisAnonymousAuthentication -SiteName Peanuts
+
+    Turns on anonymous authentication for the `Peanuts` website.
+
+    .EXAMPLE
+    Set-IisAnonymouseAuthentication -SiteName Peanuts Snoopy/DogHouse
+
+    Turns on anonymous authentication for the `Snoopy/DogHouse` directory under the `Peanuts` website.
+
+    .EXAMPLE
+    Set-IisAnonymousAuthentication -SiteName Peanuts -Disabled
+
+    Turns off anonymous authentication for the `Peanuts` website.
     #>
     [CmdletBinding(SupportsShouldProcess=$true)]
     param(
         [Parameter(Mandatory=$true)]
+        [string]
         # The site where anonymous authentication should be set.
         $SiteName,
         
-        [Parameter()]
+        [string]
         # The optional path where anonymous authentication should be set.
         $Path = '',
         
