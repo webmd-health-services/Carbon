@@ -124,8 +124,22 @@ function Get-IisWebsite
     <#
     .SYNOPSIS
     Gets details about a website.
+    
     .DESCRIPTION
-    Returns a PsObject containing the name, ID, bindings, and state of a website.
+    Returns an object containing the name, ID, bindings, and state of a website:
+    
+     * Bindings - An array of objects for each of the website's bindings.  Each object contains:
+      * Protocol - The protocol of the binding, e.g. http, https.
+      * IPAddress - The IP address the site is listening to, or * for all IP addresses.
+      * Port - The port the site is listening on.
+     * Name - The site's name.
+     * ID - The site's ID.
+     * State - The site's state, e.g. started, stopped, etc.
+     
+     .EXAMPLE
+     Get-IisWebsite -SiteName 'WebsiteName'
+     
+     Returns the details for the site named `WebsiteName`.
     #>
     [CmdletBinding()]
     param(

@@ -194,7 +194,19 @@
     
         <h2>Description</h2>
     <div class="Description">
-        <p>Returns a PsObject containing the name, ID, bindings, and state of a website.</p>
+        <p>Returns an object containing the name, ID, bindings, and state of a website:</p>
+
+<ul>
+<li>Bindings - An array of objects for each of the website's bindings.  Each object contains:
+<ul>
+<li>Protocol - The protocol of the binding, e.g. http, https.</li>
+<li>IPAddress - The IP address the site is listening to, or * for all IP addresses.</li>
+<li>Port - The port the site is listening on.</li>
+</ul></li>
+<li>Name - The site's name.</li>
+<li>ID - The site's ID.</li>
+<li>State - The site's state, e.g. started, stopped, etc.</li>
+</ul>
 
     </div>
     
@@ -228,6 +240,9 @@
         
     
         
-    
+                <h2>EXAMPLE 1</h2>
+            <pre><code>Get-IisWebsite -SiteName 'WebsiteName'</code></pre>
+            <p><p>Returns the details for the site named <code>WebsiteName</code>.</p>
+</p><p></p><p></p><p></p><p></p>
 </body>
 </html>   
