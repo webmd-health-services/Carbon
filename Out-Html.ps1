@@ -41,6 +41,7 @@ if( (Get-Module Carbon) )
 Import-Module (Join-Path $PSScriptRoot Carbon)
 
 Add-Type -AssemblyName System.Web
+Add-Type -AssemblyName System.Messaging
 Add-Type -Path (Join-Path $PSSCriptRoot Tools\MarkdownSharp\MarkdownSharp.dll)
 $markdown = New-Object MarkdownSharp.Markdown
 $markdown.AutoHyperlink = $true
@@ -242,7 +243,7 @@ filter Convert-HelpToHtml
     $returnValues = ($commandHelp.returnValues | Out-HtmlString) -replace "`n",' '
     if( $returnValues )
     {
-        if( $returnValues -match '^(.*?)\.\s+(.*)$' )
+        if( $returnValues -match '^(.*?)\.(\s+(.*))?$' )
         {
             $type = [Type]$matches[1]
             if( -not $type )
@@ -253,7 +254,7 @@ filter Convert-HelpToHtml
         }
         else
         {
-            Write-Warning "Unable to find type name in $returnValues."
+            Write-Warning "Unable to find type name in $returnValues.  Return value full type name should end with a period."
         }
         $returnValues = $returnValues | Convert-MarkdownToHtml
         $returnValues = @"
