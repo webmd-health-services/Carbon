@@ -187,12 +187,36 @@
 
 
     <h1>Install-IisWebsite</h1>
-    <div>Creates a new website.</div>
+    <div>Installs a website.</div>
 
         <h2>Syntax</h2>
     <pre class="Syntax"><code>Install-IisWebsite [-Name] &lt;String&gt; [-Path] &lt;String&gt; [[-Bindings] &lt;String[]&gt;] [-AppPoolName &lt;String&gt;] [&lt;CommonParameters&gt;]</code></pre>
     
-    
+        <h2>Description</h2>
+    <div class="Description">
+        <p>Installs a website named <code>Name</code>, serving files out of the file system from <code>Path</code>.  If no app pool name is given (via the <code>AppPoolName</code> parameter), IIS will pick one for you, usually the <code>DefaultAppPool</code>.  If a site with name <code>Name</code> already exists, it is deleted, and a new site is created.</p>
+
+<p>By default, the site listens on all IP addresses on port 80.  Set custom bindings with the <code>Bindings</code> argument.  Multiple bindings are allowed.  Each binding must be in this format (in BNF):</p>
+
+<pre><code>&lt;PROTOCOL&gt; '/' &lt;IP_ADDRESS&gt; ':' &lt;PORT&gt; [ ':' &lt;HOSTNAME&gt; ]
+</code></pre>
+
+<ul>
+<li><code>PROTOCOL</code> is one of <code>http</code> or <code>https</code>.</li>
+<li><code>IP_ADDRESS</code> is a literal IP address, or <code>*</code> for all of the computer's IP addresses.  This function does not validate if <code>IPADDRESS</code> is actually in use on the computer.</li>
+<li><code>PORT</code> is the port to listen on.</li>
+<li><code>HOSTNAME</code> is the website's hostname, for name-based hosting.  If no hostname is being used, leave off the last <code>: HOSTNAME</code> part.</li>
+</ul>
+
+<p>Valid bindings are:</p>
+
+<ul>
+<li>http/*:80</li>
+<li>https/10.2.3.4:443</li>
+<li>http/*:80:example.com</li>
+</ul>
+
+    </div>
     
     
 
@@ -227,10 +251,13 @@
 			<tr valign='top'>
 				<td>Bindings</td>
 				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String[]</a></td>
-				<td>The site's network bindings.  Default is http/*:80.  Bindings should be specified in 
-protocol/IPAddress:Port:Hostname format.  Protocol should be http or https.  Use * for
-IPAddress to bind to all IP addresses.  Leave hostname blank for non-namedto respond  and/or hostnames.  The final 
-:Hostname part is optional.
+				<td>The site's network bindings.  Default is http/*:80.  Bindings should be specified in protocol/IPAddress:Port:Hostname format.  
+
+<ul>
+<li>Protocol should be http or https. </li>
+<li>IPAddress can be a literal IP address or <code>*</code>, which means all of the computer's IP addresses.  This function does not validate if <code>IPAddress</code> is actually in use on this computer.</li>
+<li>Leave hostname blank for non-named websites.</li>
+</ul>
 </td>
 				<td>false</td>
 				<td>false</td>
@@ -239,7 +266,8 @@ IPAddress to bind to all IP addresses.  Leave hostname blank for non-namedto res
 			<tr valign='top'>
 				<td>AppPoolName</td>
 				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
-				<td></td>
+				<td>The name of the app pool under which the website runs.  The app pool must exist.  If not provided, IIS picks one for you.  No whammy, no whammy!
+</td>
 				<td>false</td>
 				<td>false</td>
                 <td></td>
@@ -254,8 +282,14 @@ IPAddress to bind to all IP addresses.  Leave hostname blank for non-namedto res
     
         
                 <h2>EXAMPLE 1</h2>
-            <pre><code>Install-IisWebsite -Name 'MyNewWebsite' -Path C:\Build\Websites\MyWebsite</code></pre>
-            <p><p>Creates a website named 'MyNewWebsite', whose root directory points to C:\Build\Websites\MyWebsite.</p>
+            <pre><code>Install-IisWebsite -Name 'Peanuts' -Path C:\Peanuts.com</code></pre>
+            <p><p>Creates a website named <code>Peanuts</code> serving files out of the <code>C:\Peanuts.com</code> directory.  The website listens on all the computer's IP addresses on port 80.</p>
+</p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 2</h2>
+            <pre><code>Install-IisWebsite -Name 'Peanuts' -Path C:\Peanuts.com -Bindings 'http/*:80:peanuts.com'</code></pre>
+            <p><p>Creates a website named <code>Peanuts</code> which uses name-based hosting to respond to all requests to any of the machine's IP addresses for the <code>peanuts.com</code> domain.</p>
+</p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 3</h2>
+            <pre><code>Install-IisWebsite -Name 'Peanuts' -Path C:\Peanuts.com -AppPoolName 'PeanutsAppPool'</code></pre>
+            <p><p>Creates a website named <code>Peanuts</code> that runs under the <code>PeanutsAppPool</code> app pool</p>
 </p><p></p><p></p><p></p><p></p>
 </body>
 </html>   
