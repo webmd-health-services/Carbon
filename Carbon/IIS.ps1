@@ -587,7 +587,7 @@ function Set-IisAnonymousAuthentication
     Enables or disables anonymous authentication for all or part of a website.
 
     .DESCRIPTION
-    By default, enables anonymous authentication on a website.  You can enable anonymous authentication at a specific path under a website by passing the virtual path (i.e. *not* the physical path) to that directory.
+    By default, enables anonymous authentication on a website.  You can enable anonymous authentication at a specific path under a website by passing the virtual path (*not* the physical path) to that directory.
 
     To disable anonymouse authentication, set the `Disabled` flag.
 
@@ -636,14 +636,39 @@ function Set-IisAnonymousAuthentication
 
 function Set-IisBasicAuthentication
 {
+    <#
+    .SYNOPSIS
+    Enables or disables basic authentication for all or part of a website.
+
+    .DESCRIPTION
+    By default, enables basic authentication on a website.  You can enable basic authentication at a specific path under a website by passing the virtual path (*not* the physical path) to that directory.
+
+    To disable basic authentication, set the `Disabled` flag.
+
+    .EXAMPLE
+    Set-IisBasicAuthentication -SiteName Peanuts
+
+    Turns on basic authentication for the `Peanuts` website.
+
+    .EXAMPLE
+    Set-IisBasicAuthentication -SiteName Peanuts Snoopy/DogHouse
+
+    Turns on basic authentication for the `Snoopy/DogHouse` directory under the `Peanuts` website.
+
+    .EXAMPLE
+    Set-IisBasicAuthentication -SiteName Peanuts -Disabled
+
+    Turns off basic authentication for the `Peanuts` website.
+    #>
     [CmdletBinding(SupportsShouldProcess=$true)]
     param(
         [Parameter(Mandatory=$true)]
+        [string]
         # The site where basic authentication should be set.
         $SiteName,
         
-        [Parameter()]
-        # The optional path where basic authentication should be set.
+        [string]
+        # The optional virtual path (*not* a physical path) where basic authentication should be set.
         $Path = '',
         
         [Switch]
