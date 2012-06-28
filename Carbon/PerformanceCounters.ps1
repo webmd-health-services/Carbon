@@ -171,11 +171,23 @@ function Test-PerformanceCounterCategory
 
 function Uninstall-PerformanceCounterCategory
 {
+    <#
+    .SYNOPSIS
+    Removes an entire performance counter category.
+
+    .DESCRIPTION
+    Removes, with extreme prejudice, the performance counter category `CategoryName`.  All its performance counters are also deleted.  If the performance counter category doesn't exist, nothing happens.  I hope you have good backups!  
+
+    .EXAMPLE
+    Uninstall-PerformanceCounterCategory -CategoryName 'ToyotaCamry'
+
+    Removes the `ToyotaCamry` performance counter category and all its performance counters.  So sad!
+    #>
     [CmdletBinding(SupportsShouldProcess=$true)]
     param(
         [Parameter(Mandatory=$true)]
         [string]
-        # The performance counter's category name.
+        # The performance counter's category name that should be deleted.
         $CategoryName
     )
     
