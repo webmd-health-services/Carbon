@@ -50,6 +50,18 @@ function Get-PerformanceCounters
 
 function Install-PerformanceCounter
 {
+    <#
+    .SYNOPSIS
+    Installs a performance counter.
+
+    .DESCRIPTION
+    Creates a new performance counter with a specific name, description, and type under a given category.  The counter's category is re-created: its current counters are retrieved, the category is removed, a the category is re-created.  Unfortunately, we haven't been able to find any .NET APIs that allow us to delete and create an existing counter.
+
+    .EXAMPLE
+    Install-PerformanceCounter -CategoryName ToyotaCamry -Name MilesPerGallon -Description 'The miles per gallon fuel efficiency.' -Type NumberOfItems32
+
+    Creates a new miles per gallon performance counter for the ToyotaCamry category.
+    #>
     [CmdletBinding(SupportsShouldProcess=$true)]
     param(
         [Parameter(Mandatory=$true)]
