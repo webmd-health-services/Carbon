@@ -12,6 +12,7 @@
   * Split-Ini
   * Set-HgrcDefaultPushUrl
   * Get-MsmqMessageQueue
+  * Get-MsmqMessageQueuePath
 * Improved whitespace handling in HTML documentation
 
 

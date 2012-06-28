@@ -64,11 +64,29 @@ function Get-MsmqMessageQueue
     }
 }
 
-function Get-MSMQMessageQueuePath
+function Get-MsmqMessageQueuePath
 {
     <#
     .SYNOPSIS
     Gets the path to an MSMQ message queue.
+
+    .DESCRIPTION
+    The MSMQ APIs expect paths when identifying a queue.  This function converts a queue name into its path so that logic isn't spread across all your scripts.  
+
+    Private queue paths are constructed differently.  If you need to get the path to a private MSMQ, use the `Private` switch.
+
+    .OUTPUTS
+    System.String.
+
+    .EXAMPLE
+    Get-MsmqMessageQueuePath -Name MovieQueue
+
+    Returns the path to the `MovieQueue` queue.
+
+    .EXAMPLE
+    Get-MsmqMessageQueuePath -Name MovieQueue -Private
+
+    Returns the path to the private `MovieQueue`.  Must be for the critics.  Early access for the win!
     #>
     [CmdletBinding(SupportsShouldProcess=$true)]
     param(
