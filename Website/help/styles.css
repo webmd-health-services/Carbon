@@ -37,6 +37,11 @@ ul.CommandMenu
 	list-style-type: disc;
 }
 
+pre code 
+{
+	white-space: pre-wrap;
+}
+
 pre.Syntax
 {
 	margin-bottom: 1em;
