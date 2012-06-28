@@ -14,6 +14,21 @@
 
 function Get-PerformanceCounters
 {
+    <#
+    .SYNOPSIS
+    Gets the performance counters for a category.
+
+    .DESCRIPTION
+    Returns [PerformanceCounterCategory]() objects for the given category name.  If not counters exist for the category exits, an empty array is returned.
+
+    .OUTPUTS
+    System.Diagnostics.PerformanceCounterCategory.
+
+    .EXAMPLE
+    Get-PerformanceCounters -CategoryName Processor
+
+    Gets all the `Processor` performance counters.
+    #>
     [CmdletBinding()]
     param(
         [Parameter(Mandatory=$true)]

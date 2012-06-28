@@ -2,23 +2,24 @@
 
 ## Enhancements
  * Improved documentation for:
-  * Test-IisAppPool
-  * Test-IisWebsiteExists
-  * Unlock-IisBasicAuthentication
-  * Unlock-IisCgi
-  * Unlock-IisConfigSection
+  * [Test-IisAppPool](http://get-carbon.org/help/Test-IisAppPool.html)
+  * [Test-IisWebsiteExists](http://get-carbon.org/help/Test-IisWebsiteExists.html)
+  * [Unlock-IisBasicAuthentication](http://get-carbon.org/help/Unlock-IisBasicAuthentication.html)
+  * [Unlock-IisCgi](http://get-carbon.org/help/Unlock-IisCgi.html)
+  * [Unlock-IisConfigSection](http://get-carbon.org/help/Unlock-IisConfigSection.html)
   * Import-Carbon.ps1
-  * Set-IniEntry
-  * Split-Ini
-  * Set-HgrcDefaultPushUrl
-  * Get-MsmqMessageQueue
-  * Get-MsmqMessageQueuePath
-  * Grant-MsmqMessageQueuePermissions
-  * Install-Msmq
-  * Install-MsmqMessageQueue
+  * [Set-IniEntry](http://get-carbon.org/help/Set-IniEntry.html)
+  * [Split-Ini](http://get-carbon.org/help/Split-Ini.html)
+  * [Set-HgrcDefaultPushUrl](http://get-carbon.org/help/Set-HgrcDefaultPushUrl.html)
+  * [Get-MsmqMessageQueue](http://get-carbon.org/help/Get-MsmqMessageQueue.html)
+  * [Get-MsmqMessageQueuePath](http://get-carbon.org/help/Get-MsmqMessageQueuePath.html)
+  * [Grant-MsmqMessageQueuePermissions](http://get-carbon.org/help/Grant-MsmqMessageQueuePermissions.html)
+  * [Install-Msmq](http://get-carbon.org/help/Install-Msmq.html)
+  * [Install-MsmqMessageQueue](http://get-carbon.org/help/Install-MsmqMessageQueue.html)
   * [Remove-MsmqMessageQueue](http://get-carbon.org/help/Remove-MsmqMessageQueue.html)
   * [Test-MsmqMessageQueue](http://get-carbon.org/help/Test-MsmqMessageQueue.html)
-* Improved whitespace handling in HTML documentation
+  * [Get-PerformanceCounters](http://get-carbon.org/help/Get-PerformanceCounters.html)
+* Improved whitespace in HTML documentation code samples.
 
 
 # 0.2.4 (28 June 2012)

@@ -187,23 +187,52 @@
 
 
     <h1>Get-PerformanceCounters</h1>
-    <div>Get-PerformanceCounters [-CategoryName] <String> [-Verbose] [-Debug] [-ErrorAction <ActionPreference>] [-WarningAction <ActionPreference>] [-ErrorVariable <String>] [-WarningVariable <String>] [-OutVariable <String>] [-OutBuffer <Int32>]
-</div>
+    <div>Gets the performance counters for a category.</div>
 
+        <h2>Syntax</h2>
+    <pre class="Syntax"><code>Get-PerformanceCounters [-CategoryName] &lt;String&gt; [&lt;CommonParameters&gt;]</code></pre>
     
-    
-    
+        <h2>Description</h2>
+    <div class="Description">
+        <p>Returns <a href="">PerformanceCounterCategory</a> objects for the given category name.  If not counters exist for the category exits, an empty array is returned.</p>
+
+    </div>
     
     
 
-    
+    		<h2> Parameters </h2>
+		<table border='1'>
+			<tr>
+				<th>Name</th>
+                <th>Type</th>
+				<th>Description</th>
+				<th>Required?</th>
+				<th>Pipeline Input</th>
+				<th>Default Value</th>
+			</tr>
+            			<tr valign='top'>
+				<td>CategoryName</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+				<td>The category's name whose performance counters will be returned.
+</td>
+				<td>true</td>
+				<td>false</td>
+                <td></td>
+			</tr>
+            
+        </table>
         
     
         
-    
+            <h2>Return Values</h2>
+        <p><a href="http://msdn.microsoft.com/en-us/library/system.diagnostics.performancecountercategory.aspx">System.Diagnostics.PerformanceCounterCategory</a>. </p>
+
         
     
         
-    
+                <h2>EXAMPLE 1</h2>
+            <pre><code>Get-PerformanceCounters -CategoryName Processor</code></pre>
+            <p><p>Gets all the <code>Processor</code> performance counters.</p>
+</p><p></p><p></p><p></p><p></p>
 </body>
 </html>   
