@@ -234,6 +234,80 @@ function Split-Ini
     "foo" section to "medium", "prosciutto", and "toasted", respectively. As
     you can see there only thing that matters is the last value that was set
     for each of the configuration keys.
+
+    .EXAMPLE
+    Split-Ini -Path C:\Users\rspektor\mercurial.ini 
+
+    Given this INI file:
+
+        [ui]
+        username = Regina Spektor <regina@reginaspektor.com>
+
+        [extensions]
+        share = 
+        extdiff =
+
+    `Split-Ini` returns the following hashtable:
+
+        @{
+            ui.username = @{
+                                FullName = 'ui.username';
+                                Section = "ui";
+                                Name = "username";
+                                Value = "Regina Spektor <regina@reginaspektor.com>";
+                                LineNumber = 1;
+                            };
+            extensions.share = @{
+                                    FullName = 'extensions.share';
+                                    Section = "extensions";
+                                    Name = "share"
+                                    Value = "";
+                                    LineNumber = 4;
+                                };
+            extensions.extdiff = @{
+                                       FullName = 'extensions.extdiff';
+                                       Section = "extensions";
+                                       Name = "extdiff";
+                                       Value = "";
+                                       LineNumber = 5;
+                                  };
+        }
+
+    .EXAMPLE
+    Split-Ini -Path C:\Users\rspektor\mercurial.ini -PassThru
+
+    Given this INI file:
+
+        [ui]
+        username = Regina Spektor <regina@reginaspektor.com>
+
+        [extensions]
+        share = 
+        extdiff =
+
+    `Split-Ini` returns the following hashtables to the pipeline:
+
+        @{
+            FullName = 'ui.username';
+            Section = "ui";
+            Name = "username";
+            Value = "Regina Spektor <regina@reginaspektor.com>";
+            LineNumber = 1;
+        }
+        @{
+            FullName = 'extensions.share';
+            Section = "extensions";
+            Name = "share"
+            Value = "";
+            LineNumber = 4;
+        }
+        @{
+           FullName = 'extensions.extdiff';
+           Section = "extensions";
+           Name = "extdiff";
+           Value = "";
+           LineNumber = 5;
+        }
     #>
     [CmdletBinding(SupportsShouldProcess=$true)]
     param(

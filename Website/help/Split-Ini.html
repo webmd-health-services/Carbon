@@ -333,6 +333,80 @@ for each of the configuration keys.</p>
         
     
         
-    
+                <h2>EXAMPLE 1</h2>
+            <pre><code>Split-Ini -Path C:\Users\rspektor\mercurial.ini</code></pre>
+            <p><p>Given this INI file:</p>
+
+<pre><code>[ui]
+username = Regina Spektor &lt;regina@reginaspektor.com&gt;
+
+[extensions]
+share = 
+extdiff =
+</code></pre>
+
+<p><code>Split-Ini</code> returns the following hashtable:</p>
+
+<pre><code>@{
+    ui.username = @{
+                        FullName = 'ui.username';
+                        Section = "ui";
+                        Name = "username";
+                        Value = "Regina Spektor &lt;regina@reginaspektor.com&gt;";
+                        LineNumber = 1;
+                    };
+    extensions.share = @{
+                            FullName = 'extensions.share';
+                            Section = "extensions";
+                            Name = "share"
+                            Value = "";
+                            LineNumber = 4;
+                        };
+    extensions.extdiff = @{
+                               FullName = 'extensions.extdiff';
+                               Section = "extensions";
+                               Name = "extdiff";
+                               Value = "";
+                               LineNumber = 5;
+                          };
+}
+</code></pre>
+</p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 2</h2>
+            <pre><code>Split-Ini -Path C:\Users\rspektor\mercurial.ini -PassThru</code></pre>
+            <p><p>Given this INI file:</p>
+
+<pre><code>[ui]
+username = Regina Spektor &lt;regina@reginaspektor.com&gt;
+
+[extensions]
+share = 
+extdiff =
+</code></pre>
+
+<p><code>Split-Ini</code> returns the following hashtables to the pipeline:</p>
+
+<pre><code>@{
+    FullName = 'ui.username';
+    Section = "ui";
+    Name = "username";
+    Value = "Regina Spektor &lt;regina@reginaspektor.com&gt;";
+    LineNumber = 1;
+}
+@{
+    FullName = 'extensions.share';
+    Section = "extensions";
+    Name = "share"
+    Value = "";
+    LineNumber = 4;
+}
+@{
+   FullName = 'extensions.extdiff';
+   Section = "extensions";
+   Name = "extdiff";
+   Value = "";
+   LineNumber = 5;
+}
+</code></pre>
+</p><p></p><p></p><p></p><p></p>
 </body>
 </html>   
