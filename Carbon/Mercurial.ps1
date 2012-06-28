@@ -16,7 +16,17 @@ function Set-HgrcDefaultPushUrl
 {
     <#
     .SYNOPSIS
-    Updates the default-push entry in a repository's hgrc file.
+    OBSOLETE.  Use Set-IniEntry instead.
+
+    .DESCRIPTION
+    We've replaced this function with the more generic `Set-IniEntry`.  Call it like so:
+
+        Set-IniEntry -Path (Join-Path $RepoPath .hg\hgrc -Resolve) -Section paths -Name 'default-push' -Value $DefaultPushUrl
+
+    EXAMPLE
+    Set-IniEntry -Path (Join-Path $RepoPath .hg\hgrc -Resolve) -Section paths -Name 'default-push' -Value $DefaultPushUrl
+
+    This example shows how to use `Set-IniEntry` instead of `Set-HgrcDefaultPushUrl`.
     #>
     [CmdletBinding(SupportsShouldProcess=$true)]
     param(
