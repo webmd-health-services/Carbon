@@ -322,7 +322,6 @@ function Install-IisAppPool
         $UserName,
         
         [Parameter(ParameterSetName='AsSpecificUser',Mandatory=$true)]
-        [string]
         # The password for the user account.  Can be a string or a SecureString.
         $Password
     )
