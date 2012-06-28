@@ -187,16 +187,112 @@
 
 
     <h1>Set-IisHttpRedirect</h1>
-    <div>Set-IisHttpRedirect [-SiteName] <Object> [[-Path] <Object>] [-Destination] <String> [[-StatusCode] <String>] [-ExactDestination] [-ChildOnly] [-Verbose] [-Debug] [-ErrorAction <ActionPreference>] [-WarningAction <ActionPreference>] [-ErrorVariable <String>] [-WarningVariable <String>] [-OutVariable <String>] [-OutBuffer <Int32>] [-WhatIf] [-Confirm]
-</div>
+    <div>Turns on HTTP redirect for all or part of a website.</div>
 
+        <h2>Syntax</h2>
+    <pre class="Syntax"><code>Set-IisHttpRedirect [-SiteName] &lt;String&gt; [[-Path] &lt;String&gt;] [-Destination] &lt;String&gt; [[-StatusCode] &lt;String&gt;] [-ExactDestination] [-ChildOnly] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
     
-    
-    
-    
-    
+        <h2>Description</h2>
+    <div class="Description">
+        <p>Configures all or part of a website to redirect all requests to another website/URL.  By default, it operates on a specific website.  To configure a directory under a website, set <code>Path</code> to the virtual path of that directory.</p>
 
+    </div>
     
+            <h2>Related Commands</h2>
+        <ul>
+<li><a href="http://technet.microsoft.com/en-us/library/cc732969(v=WS.10).aspx">http://technet.microsoft.com/en-us/library/cc732969(v=WS.10).aspx</a></li>
+</ul>
+
+
+    		<h2> Parameters </h2>
+		<table border='1'>
+			<tr>
+				<th>Name</th>
+                <th>Type</th>
+				<th>Description</th>
+				<th>Required?</th>
+				<th>Pipeline Input</th>
+				<th>Default Value</th>
+			</tr>
+            			<tr valign='top'>
+				<td>SiteName</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+				<td>The site where the redirection should be setup.
+</td>
+				<td>true</td>
+				<td>false</td>
+                <td></td>
+			</tr>
+			<tr valign='top'>
+				<td>Path</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+				<td>The optional path where redirection should be setup.
+</td>
+				<td>false</td>
+				<td>false</td>
+                <td></td>
+			</tr>
+			<tr valign='top'>
+				<td>Destination</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+				<td>The destination to redirect to.
+</td>
+				<td>true</td>
+				<td>false</td>
+                <td></td>
+			</tr>
+			<tr valign='top'>
+				<td>StatusCode</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+				<td>The HTTP status code to use.  Default is <code>Found</code>.  Should be one of <code>Found</code> (HTTP 302), <code>Permanent</code> (HTTP 301), or <code>Temporary</code> (HTTP 307).
+</td>
+				<td>false</td>
+				<td>false</td>
+                <td></td>
+			</tr>
+			<tr valign='top'>
+				<td>ExactDestination</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+				<td>Redirect all requests to exact destination (instead of relative to destination).  I have no idea what this means.  <a href="http://technet.microsoft.com/en-us/library/cc732969(v=WS.10).aspx">Maybe TechNet can help.</a>
+</td>
+				<td>false</td>
+				<td>false</td>
+                <td></td>
+			</tr>
+			<tr valign='top'>
+				<td>ChildOnly</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+				<td>Only redirect requests to content in site and/or path, but nothing below it.  I have no idea what this means.  <a href="http://technet.microsoft.com/en-us/library/cc732969(v=WS.10).aspx">Maybe TechNet can help.</a>
+</td>
+				<td>false</td>
+				<td>false</td>
+                <td></td>
+			</tr>
+			<tr valign='top'>
+				<td>WhatIf</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+				<td></td>
+				<td>false</td>
+				<td>false</td>
+                <td></td>
+			</tr>
+			<tr valign='top'>
+				<td>Confirm</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+				<td></td>
+				<td>false</td>
+				<td>false</td>
+                <td></td>
+			</tr>
+                            <tr valign="top">
+                <td><a href="http://technet.microsoft.com/en-us/library/dd315352.aspx">CommonParameters</a></td>
+                <td></td>
+                <td>This cmdlet supports common parameters.  For more information type <br> <code>Get-Help about_CommonParameters</code>.</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                </tr>
+        </table>
         
     
         
@@ -204,6 +300,15 @@
         
     
         
-    
+                <h2>EXAMPLE 1</h2>
+            <pre><code>Set-IisHttpRedirect -SiteName Peanuts -Destination 'http://new.peanuts.com'</code></pre>
+            <p><p>Redirects all requests to the <code>Peanuts</code> website to <code>http://new.peanuts.com</code>.</p>
+</p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 2</h2>
+            <pre><code>Set-IisHttpRedirect -SiteName Peanuts -Path Snoopy/DogHouse -Destination 'http://new.peanuts.com'</code></pre>
+            <p><p>Redirects all requests to the <code>/Snoopy/DogHouse</code> path on the <code>Peanuts</code> website to <code>http://new.peanuts.com</code>.</p>
+</p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 3</h2>
+            <pre><code>Set-IisHttpRedirect -SiteName Peanuts -Destination 'http://new.peanuts.com' -StatusCode 'Temporary'</code></pre>
+            <p><p>Redirects all requests to the <code>Peanuts</code> website to <code>http://new.peanuts.com</code> with a temporary HTTP status code.  You can also specify <code>Found</code> (HTTP 302), or <code>Permanent</code> (HTTP 301).</p>
+</p><p></p><p></p><p></p><p></p>
 </body>
 </html>   
