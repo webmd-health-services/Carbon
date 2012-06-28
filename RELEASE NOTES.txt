@@ -1,3 +1,33 @@
+# 0.2.4
+
+## Enhancements
+ * Improved documentation for:
+  * Get-PathCanonicalCase
+  * Get-PathRelativeTo
+  * New-Junction
+  * New-TempDir
+  * Remove-Junction
+  * Test-PathIsJunction
+  * Reset-HostsFile
+  * Set-HostsEntry
+  * Add-IisDefaultDocument
+  * Get-IisHttpRedirect
+  * Get-IisVersion
+  * Get-IisWebsite
+  * Install-IisApplication
+  * Install-IisAppPool
+  * Install-IisVirtualDirectory
+  * Install-IisWebsite
+  * Invoke-AppCmd
+  * Remove-IisWebsite
+  * Set-IisAnonymousAuthentication
+  * Set-IisBasicAuthentication
+  * Set-IisDirectoryBrowsing
+  * Set-IisHttpRedirect
+  * Set-IisSslFlags
+  * Set-IisWebsiteSslCertifiate
+  * Set-IisWindowsAuthentication
+
 # 0.2.3 (27 June 2012)
 
 ## Enhancements
