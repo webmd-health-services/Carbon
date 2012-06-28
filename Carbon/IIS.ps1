@@ -894,6 +894,14 @@ function Set-IisWebsiteSslCertificate
     <#
     .SYNOPSIS
     Sets a website's SSL certificate.
+
+    .DESCRIPTION
+    SSL won't work on a website if an SSL certificate hasn't been bound to all the IP addresses it's listening on.  This function binds a certificate to all a website's IP addresses.  Make sure you call this method *after* you create a website's bindings.  Any previous SSL bindings on those IP addresses are deleted.
+
+    .EXAMPLE
+    Set-IisWebsiteSslCertificate -SiteName Peanuts -Thumbprint 'a909502dd82ae41433e6f83886b00d4277a32a7b' -ApplicationID $PeanutsAppID
+
+    Binds the certificate whose thumbprint is `a909502dd82ae41433e6f83886b00d4277a32a7b` to the `Peanuts` website.  It's a good idea to re-use the same GUID for each distinct application.
     #>
     [CmdletBinding(SupportsShouldProcess=$true)]
     param(

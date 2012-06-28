@@ -192,7 +192,11 @@
         <h2>Syntax</h2>
     <pre class="Syntax"><code>Set-IisWebsiteSslCertificate [-SiteName] &lt;String&gt; [-Thumbprint] &lt;String&gt; [-ApplicationID] &lt;Guid&gt; [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
     
-    
+        <h2>Description</h2>
+    <div class="Description">
+        <p>SSL won't work on a website if an SSL certificate hasn't been bound to all the IP addresses it's listening on.  This function binds a certificate to all a website's IP addresses.  Make sure you call this method <em>after</em> you create a website's bindings.  Any previous SSL bindings on those IP addresses are deleted.</p>
+
+    </div>
     
     
 
@@ -265,6 +269,9 @@
         
     
         
-    
+                <h2>EXAMPLE 1</h2>
+            <pre><code>Set-IisWebsiteSslCertificate -SiteName Peanuts -Thumbprint 'a909502dd82ae41433e6f83886b00d4277a32a7b' -ApplicationID $PeanutsAppID</code></pre>
+            <p><p>Binds the certificate whose thumbprint is <code>a909502dd82ae41433e6f83886b00d4277a32a7b</code> to the <code>Peanuts</code> website.  It's a good idea to re-use the same GUID for each distinct application.</p>
+</p><p></p><p></p><p></p><p></p>
 </body>
 </html>   
