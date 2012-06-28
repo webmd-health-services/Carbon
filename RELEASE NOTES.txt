@@ -21,6 +21,7 @@
   * [Get-PerformanceCounters](http://get-carbon.org/help/Get-PerformanceCounters.html)
   * [Install-PerformanceCounter](http://get-carbon.org/help/Install-PerformanceCounter.html)
   * [Test-PerformanceCounter](http://get-carbon.org/help/Test-PerformanceCounter.html)
+  * [Test-PerformanceCounterCategory](http://get-carbon.org/help/Test-PerformanceCounterCategory.html)
 * Improved whitespace in HTML documentation code samples.
 
 

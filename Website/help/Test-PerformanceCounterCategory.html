@@ -187,16 +187,40 @@
 
 
     <h1>Test-PerformanceCounterCategory</h1>
-    <div>Test-PerformanceCounterCategory [-CategoryName] <String> [-Verbose] [-Debug] [-ErrorAction <ActionPreference>] [-WarningAction <ActionPreference>] [-ErrorVariable <String>] [-WarningVariable <String>] [-OutVariable <String>] [-OutBuffer <Int32>]
-</div>
+    <div>Tests if a performance counter category exists.</div>
 
+        <h2>Syntax</h2>
+    <pre class="Syntax"><code>Test-PerformanceCounterCategory [-CategoryName] &lt;String&gt; [&lt;CommonParameters&gt;]</code></pre>
     
-    
-    
+        <h2>Description</h2>
+    <div class="Description">
+        <p>Returns <code>True</code> if category <code>CategoryName</code> exists.  <code>False</code> if it does not exist.</p>
+
+    </div>
     
     
 
-    
+    		<h2> Parameters </h2>
+		<table border='1'>
+			<tr>
+				<th>Name</th>
+                <th>Type</th>
+				<th>Description</th>
+				<th>Required?</th>
+				<th>Pipeline Input</th>
+				<th>Default Value</th>
+			</tr>
+            			<tr valign='top'>
+				<td>CategoryName</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+				<td>The name of the cateogry whose existence to check.
+</td>
+				<td>true</td>
+				<td>false</td>
+                <td></td>
+			</tr>
+            
+        </table>
         
     
         
@@ -204,6 +228,9 @@
         
     
         
-    
+                <h2>EXAMPLE 1</h2>
+            <pre><code>Test-PerformanceCounterCategory -CategoryName 'ToyotaCamry'</code></pre>
+            <p><p>Returns <code>True</code> if the <code>ToyotaCamry</code> performance counter category exists.  <code>False</code> if the category doesn't exist.</p>
+</p><p></p><p></p><p></p><p></p>
 </body>
 </html>   

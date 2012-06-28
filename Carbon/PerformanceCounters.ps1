@@ -146,11 +146,23 @@ function Test-PerformanceCounter
 
 function Test-PerformanceCounterCategory
 {
+    <#
+    .SYNOPSIS
+    Tests if a performance counter category exists.
+
+    .DESCRIPTION
+    Returns `True` if category `CategoryName` exists.  `False` if it does not exist.
+
+    .EXAMPLE
+    Test-PerformanceCounterCategory -CategoryName 'ToyotaCamry'
+
+    Returns `True` if the `ToyotaCamry` performance counter category exists.  `False` if the category doesn't exist.
+    #>
     [CmdletBinding()]
     param(
         [Parameter(Mandatory=$true)]
         [string]
-        # The category's name whose performance counters will be returned.
+        # The name of the cateogry whose existence to check.
         $CategoryName
     )
     
