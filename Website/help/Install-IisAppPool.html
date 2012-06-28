@@ -190,12 +190,24 @@
     <div>Creates a new app pool.</div>
 
         <h2>Syntax</h2>
-    <pre class="Syntax"><code>Install-IisAppPool -Name &lt;Object&gt; [-ManagedRuntimeVersion &lt;String&gt;] [-IdleTimeout &lt;Int32&gt;] [-ClassicPipelineMode] [-Enable32BitApps] [-ServiceAccount &lt;String&gt;] [&lt;CommonParameters&gt;]</code></pre>
-<pre class="Syntax"><code>Install-IisAppPool -Name &lt;Object&gt; [-ManagedRuntimeVersion &lt;String&gt;] [-IdleTimeout &lt;Int32&gt;] [-ClassicPipelineMode] [-Enable32BitApps] -UserName &lt;String&gt; -Password &lt;Object&gt; [&lt;CommonParameters&gt;]</code></pre>
+    <pre class="Syntax"><code>Install-IisAppPool -Name &lt;String&gt; [-ManagedRuntimeVersion &lt;String&gt;] [-IdleTimeout &lt;Int32&gt;] [-ClassicPipelineMode] [-Enable32BitApps] [-ServiceAccount &lt;String&gt;] [&lt;CommonParameters&gt;]</code></pre>
+<pre class="Syntax"><code>Install-IisAppPool -Name &lt;String&gt; [-ManagedRuntimeVersion &lt;String&gt;] [-IdleTimeout &lt;Int32&gt;] [-ClassicPipelineMode] [-Enable32BitApps] -UserName &lt;String&gt; -Password &lt;String&gt; [&lt;CommonParameters&gt;]</code></pre>
     
         <h2>Description</h2>
     <div class="Description">
-        <p>By default, this function will create an application pool running the latest version of .NET, with an integrated pipeline, as the NetworkService account.</p>
+        <p>You can control which version of .NET is used to run an app pool with the <code>ManagedRuntimeVersion</code> parameter: versions <code>v1.0</code>, <code>v1.1</code>, <code>v2.0</code>, and <code>v4.0</code> are supported.</p>
+
+<p>To run an application pool using the classic pipeline mode, set the <code>ClassicPipelineMode</code> switch.</p>
+
+<p>To run an app pool using the 32-bit version of the .NET framework, set the <code>Enable32BitApps</code> switch.</p>
+
+<p>An app pool can run as several built-in service accounts, by passing one of them as the value of the <code>ServiceAccount</code> parameter: <code>NetworkService</code>, <code>LocalService</code>, <code>LocalSystem</code>, and <code>ApplicationPoolIdentity</code>.  Specifying <code>ApplicationPoolIdentity</code> causes IIS to create and use a custom local account with the name of the app pool.  See <a href="http://learn.iis.net/page.aspx/624/application-pool-identities/">Application Pool Identities</a> for more information.</p>
+
+<p>To run the app pool as a specific user, pass the username and password for the account to the <code>Username</code> and <code>Password</code> parameters, respectively.</p>
+
+<p>If an existing app pool exists with name <code>Name</code>, it's settings are modified.  The app pool isn't deleted.  (You can't delete an app pool if there are any websites using it, that's why.)</p>
+
+<p>By default, this function will create an application pool running the latest version of .NET, with an integrated pipeline, as the NetworkService account.</p>
 
     </div>
     
@@ -213,7 +225,7 @@
 			</tr>
             			<tr valign='top'>
 				<td>Name</td>
-				<td><a href="http://msdn.microsoft.com/en-us/library/system.object.aspx">Object</a></td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
 				<td>The app pool's name.
 </td>
 				<td>true</td>
@@ -223,7 +235,7 @@
 			<tr valign='top'>
 				<td>ManagedRuntimeVersion</td>
 				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
-				<td>The managed runtime version to use.  Default is 'v4.0'.
+				<td>The managed .NET runtime version to use.  Default is 'v4.0'.  Valid values are <code>v1.0</code>, <code>v1.1</code>, <code>v2.0</code>, or <code>v4.0</code>.
 </td>
 				<td>false</td>
 				<td>false</td>
@@ -241,7 +253,7 @@
 			<tr valign='top'>
 				<td>ClassicPipelineMode</td>
 				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
-				<td>Use the classic pipeline mode
+				<td>Use the classic pipeline mode, i.e. don't use an integrated pipeline.
 </td>
 				<td>false</td>
 				<td>false</td>
@@ -250,7 +262,7 @@
 			<tr valign='top'>
 				<td>Enable32BitApps</td>
 				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
-				<td>Enable 32-bit applications
+				<td>Enable 32-bit applications.
 </td>
 				<td>false</td>
 				<td>false</td>
@@ -259,7 +271,7 @@
 			<tr valign='top'>
 				<td>ServiceAccount</td>
 				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
-				<td>Run the app pool under a local service account.
+				<td>Run the app pool under the given local service account.  Valid values are <code>NetworkService</code>, <code>LocalService</code>, <code>LocalSystem</code>, and <code>ApplicationPoolIdentity</code>.  Specifying <code>ApplicationPoolIdentity</code> causes IIS to create a custom local user account for the app pool's identity.
 </td>
 				<td>false</td>
 				<td>false</td>
@@ -276,7 +288,7 @@
 			</tr>
 			<tr valign='top'>
 				<td>Password</td>
-				<td><a href="http://msdn.microsoft.com/en-us/library/system.object.aspx">Object</a></td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
 				<td>The password for the user account.  Can be a string or a SecureString.
 </td>
 				<td>true</td>
@@ -292,6 +304,15 @@
         
     
         
-    
+                <h2>EXAMPLE 1</h2>
+            <pre><code>Install-IisAppPool -Name Cyberdyne -ServiceAccount NetworkService</code></pre>
+            <p><p>Creates a new Cyberdyne application pool, running as NetworkService, using .NET 4.0 and an integrated pipeline.  If the Cyberdyne app pool already exists, it is modified to run as NetworkService, to use .NET 4.0 and to use an integrated pipeline.</p>
+</p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 2</h2>
+            <pre><code>Install-IisAppPool -Name Cyberdyne -ServiceAccount NetworkService -Enable32BitApps -ClassicPipelineMode</code></pre>
+            <p><p>Creates or sets the Cyberdyne app pool to run as NetworkService, in 32-bit mode (i.e. 32-bit applications are enabled), using the classic IIS request pipeline.</p>
+</p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 3</h2>
+            <pre><code>Install-IisAppPool -Name Cyberdyne -Username 'PEANUTS\charliebrown' -Password '5noopyrulez'</code></pre>
+            <p><p>Creates or sets the Cyberdyne app pool to run as the <code>PEANUTS\charliebrown</code> domain account, under .NET 4.0, with an integrated pipeline.</p>
+</p><p></p><p></p><p></p><p></p>
 </body>
 </html>   

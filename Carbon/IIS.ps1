@@ -256,39 +256,64 @@ function Install-IisAppPool
     Creates a new app pool.
     
     .DESCRIPTION
-    
+    You can control which version of .NET is used to run an app pool with the `ManagedRuntimeVersion` parameter: versions `v1.0`, `v1.1`, `v2.0`, and `v4.0` are supported.
+
+    To run an application pool using the classic pipeline mode, set the `ClassicPipelineMode` switch.
+
+    To run an app pool using the 32-bit version of the .NET framework, set the `Enable32BitApps` switch.
+
+    An app pool can run as several built-in service accounts, by passing one of them as the value of the `ServiceAccount` parameter: `NetworkService`, `LocalService`, `LocalSystem`, and `ApplicationPoolIdentity`.  Specifying `ApplicationPoolIdentity` causes IIS to create and use a custom local account with the name of the app pool.  See [Application Pool Identities](http://learn.iis.net/page.aspx/624/application-pool-identities/) for more information.
+
+    To run the app pool as a specific user, pass the username and password for the account to the `Username` and `Password` parameters, respectively.
+
+    If an existing app pool exists with name `Name`, it's settings are modified.  The app pool isn't deleted.  (You can't delete an app pool if there are any websites using it, that's why.)
+
     By default, this function will create an application pool running the latest version of .NET, with an integrated pipeline, as the NetworkService account.
+
+    .EXAMPLE
+    Install-IisAppPool -Name Cyberdyne -ServiceAccount NetworkService
+
+    Creates a new Cyberdyne application pool, running as NetworkService, using .NET 4.0 and an integrated pipeline.  If the Cyberdyne app pool already exists, it is modified to run as NetworkService, to use .NET 4.0 and to use an integrated pipeline.
+
+    .EXAMPLE
+    Install-IisAppPool -Name Cyberdyne -ServiceAccount NetworkService -Enable32BitApps -ClassicPipelineMode
+
+    Creates or sets the Cyberdyne app pool to run as NetworkService, in 32-bit mode (i.e. 32-bit applications are enabled), using the classic IIS request pipeline.
+
+    .EXAMPLE
+    Install-IisAppPool -Name Cyberdyne -Username 'PEANUTS\charliebrown' -Password '5noopyrulez'
+
+    Creates or sets the Cyberdyne app pool to run as the `PEANUTS\charliebrown` domain account, under .NET 4.0, with an integrated pipeline.
     #>
     [CmdletBinding(DefaultParameterSetName='AsServiceAccount')]
     param(
         [Parameter(Mandatory=$true)]
+        [string]
         # The app pool's name.
         $Name,
         
-        [Parameter()]
         [string]
         [ValidateSet('v1.0','v1.1','v2.0','v4.0')]
-        # The managed runtime version to use.  Default is 'v4.0'.
+        # The managed .NET runtime version to use.  Default is 'v4.0'.  Valid values are `v1.0`, `v1.1`, `v2.0`, or `v4.0`.
         $ManagedRuntimeVersion = 'v4.0',
         
-        [Parameter()]
         [int]
         [ValidateScript({$_ -gt 0})]
         #Idle Timeout value in minutes. Default is 0.
         $IdleTimeout = 0,
         
         [Switch]
-        # Use the classic pipeline mode
+        # Use the classic pipeline mode, i.e. don't use an integrated pipeline.
         $ClassicPipelineMode,
         
         [Switch]
-        # Enable 32-bit applications
+        # Enable 32-bit applications.
         $Enable32BitApps,
         
         [Parameter(ParameterSetName='AsServiceAccount')]
         [string]
         [ValidateSet('NetworkService','LocalService','LocalSystem','ApplicationPoolIdentity')]
-        # Run the app pool under a local service account.
+        # Run the app pool under the given local service account.  Valid values are `NetworkService`, `LocalService`, `LocalSystem`, and `ApplicationPoolIdentity`.  Specifying `ApplicationPoolIdentity` causes IIS to create a custom local user account for the app pool's identity.
         $ServiceAccount,
         
         [Parameter(ParameterSetName='AsSpecificUser',Mandatory=$true)]
@@ -297,6 +322,7 @@ function Install-IisAppPool
         $UserName,
         
         [Parameter(ParameterSetName='AsSpecificUser',Mandatory=$true)]
+        [string]
         # The password for the user account.  Can be a string or a SecureString.
         $Password
     )
