@@ -552,14 +552,18 @@ function Remove-IisWebsite
     <#
     .SYNOPSIS
     Removes a website
+
+    .DESCRIPTION
+    Pretty simple: removes the website named `Name`.  If no website with that name exists, nothing happens.
+
     .EXAMPLE
     Remove-IisWebsite -Name 'MyWebsite'
-    Removes MyWebsite
-    .EXAMPLE
-    Remove-IisWebsite 'MyWebsite'
-    Removes MyWebsite
+    
+    Removes MyWebsite.
+
     .EXAMPLE
     Remove-IisWebsite 1
+
     Removes the website whose ID is 1.
     #>
     [CmdletBinding()]

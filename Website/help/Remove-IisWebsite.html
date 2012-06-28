@@ -192,7 +192,11 @@
         <h2>Syntax</h2>
     <pre class="Syntax"><code>Remove-IisWebsite [-Name] &lt;String&gt; [&lt;CommonParameters&gt;]</code></pre>
     
-    
+        <h2>Description</h2>
+    <div class="Description">
+        <p>Pretty simple: removes the website named <code>Name</code>.  If no website with that name exists, nothing happens.</p>
+
+    </div>
     
     
 
@@ -226,11 +230,8 @@
         
                 <h2>EXAMPLE 1</h2>
             <pre><code>Remove-IisWebsite -Name 'MyWebsite'</code></pre>
-            <p><p>Removes MyWebsite</p>
+            <p><p>Removes MyWebsite.</p>
 </p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 2</h2>
-            <pre><code>Remove-IisWebsite 'MyWebsite'</code></pre>
-            <p><p>Removes MyWebsite</p>
-</p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 3</h2>
             <pre><code>Remove-IisWebsite 1</code></pre>
             <p><p>Removes the website whose ID is 1.</p>
 </p><p></p><p></p><p></p><p></p>
