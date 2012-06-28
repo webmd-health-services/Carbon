@@ -1015,6 +1015,14 @@ function Test-IisAppPoolExists
     <# 
     .SYNOPSIS
     Checks if an app pool exists.
+
+    .DESCRIPTION 
+    Returns `True` if an app pool with `Name` exists.  `False` if it doesn't exist.
+
+    .EXAMPLE
+    Test-IisAppPoolExists -Name Peanuts
+
+    Returns `True` if the Peanuts app pool exists, `False` if it doesn't.
     #>
     [CmdletBinding()]
     param(

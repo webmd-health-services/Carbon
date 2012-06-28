@@ -191,7 +191,7 @@
 
         <h2>Syntax</h2>
     <pre class="Syntax"><code>Install-IisAppPool -Name &lt;String&gt; [-ManagedRuntimeVersion &lt;String&gt;] [-IdleTimeout &lt;Int32&gt;] [-ClassicPipelineMode] [-Enable32BitApps] [-ServiceAccount &lt;String&gt;] [&lt;CommonParameters&gt;]</code></pre>
-<pre class="Syntax"><code>Install-IisAppPool -Name &lt;String&gt; [-ManagedRuntimeVersion &lt;String&gt;] [-IdleTimeout &lt;Int32&gt;] [-ClassicPipelineMode] [-Enable32BitApps] -UserName &lt;String&gt; -Password &lt;String&gt; [&lt;CommonParameters&gt;]</code></pre>
+<pre class="Syntax"><code>Install-IisAppPool -Name &lt;String&gt; [-ManagedRuntimeVersion &lt;String&gt;] [-IdleTimeout &lt;Int32&gt;] [-ClassicPipelineMode] [-Enable32BitApps] -UserName &lt;String&gt; -Password &lt;Object&gt; [&lt;CommonParameters&gt;]</code></pre>
     
         <h2>Description</h2>
     <div class="Description">
@@ -288,7 +288,7 @@
 			</tr>
 			<tr valign='top'>
 				<td>Password</td>
-				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.object.aspx">Object</a></td>
 				<td>The password for the user account.  Can be a string or a SecureString.
 </td>
 				<td>true</td>
