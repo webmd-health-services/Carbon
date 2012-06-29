@@ -255,11 +255,29 @@ function Invoke-SubInAcl
 {
     <#
     .SYNOPSIS
-    Invokes the SubInAcl console application, and parses its output so it displays correctly.
+    **INTERNAL.**  Invokes the SubInAcl console application, and parses its output so it displays correctly.  **This is an internal function is will be removed in a future release.**
+
+    .DESCRIPTION
+    **NOTE: This function will be removed in a future release.  It is internal, and should not be used.**
+
+    Subinacl.exe outputs text for the classic Windows console.  This output doesn't work in PowerShell: it looks like there is a space between every character.  In fact, there are `null` bytes between each character.  Hopefully, somebody will be able to explain this to me someday.  Until then, this function runs `subinacl.exe` and parses its output to remove these extra `null` bytes.
+
+    All parameters passed to `Invoke-SubInAcl` are passed to the actual `subinacl.exe` program unchanged.
+
+    .EXAMPLE
+    Invoke-SubInAcl /help
+
+    Shows the SubInAcl help documentation.
+
+    .EXAMPLE
+    Invoke-SubInAcl /service `"CCService`" /GRANT=`"$Identity`"=STOE
+
+    Grants `$Identity` permissions to control the `CCService`.  Note escaped quotes around some of the arguments to `subinacl.exe`.  You may or may not need to follow this pattern.  It's been too long since we wrote that code to remember.  We were PowerShell noobies back then.
     #>
     [CmdletBinding()]
     param(
         [Parameter(Mandatory=$true,ValueFromRemainingArguments=$true)]
+        [string[]]
         $Parameters
     )
     

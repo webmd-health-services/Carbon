@@ -187,13 +187,21 @@
 
 
     <h1>Invoke-SubInAcl</h1>
-    <div><p>Invokes the SubInAcl console application, and parses its output so it displays correctly.</p>
+    <div><p><strong>INTERNAL.</strong>  Invokes the SubInAcl console application, and parses its output so it displays correctly.  <strong>This is an internal function is will be removed in a future release.</strong></p>
 </div>
 
         <h2>Syntax</h2>
-    <pre class="Syntax"><code>Invoke-SubInAcl [-Parameters] &lt;Object&gt; [&lt;CommonParameters&gt;]</code></pre>
+    <pre class="Syntax"><code>Invoke-SubInAcl [-Parameters] &lt;String[]&gt; [&lt;CommonParameters&gt;]</code></pre>
     
-    
+        <h2>Description</h2>
+    <div class="Description">
+        <p><strong>NOTE: This function will be removed in a future release.  It is internal, and should not be used.</strong></p>
+
+<p>Subinacl.exe outputs text for the classic Windows console.  This output doesn't work in PowerShell: it looks like there is a space between every character.  In fact, there are <code>null</code> bytes between each character.  Hopefully, somebody will be able to explain this to me someday.  Until then, this function runs <code>subinacl.exe</code> and parses its output to remove these extra <code>null</code> bytes.</p>
+
+<p>All parameters passed to <code>Invoke-SubInAcl</code> are passed to the actual <code>subinacl.exe</code> program unchanged.</p>
+
+    </div>
     
     
 
@@ -209,7 +217,7 @@
 			</tr>
             			<tr valign='top'>
 				<td>Parameters</td>
-				<td><a href="http://msdn.microsoft.com/en-us/library/system.object.aspx">Object</a></td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String[]</a></td>
 				<td></td>
 				<td>true</td>
 				<td>false</td>
@@ -224,6 +232,12 @@
         
     
         
-    
+                <h2>EXAMPLE 1</h2>
+            <pre><code>Invoke-SubInAcl /help</code></pre>
+            <p><p>Shows the SubInAcl help documentation.</p>
+</p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 2</h2>
+            <pre><code>Invoke-SubInAcl /service `"CCService`" /GRANT=`"$Identity`"=STOE</code></pre>
+            <p><p>Grants <code>$Identity</code> permissions to control the <code>CCService</code>.  Note escaped quotes around some of the arguments to <code>subinacl.exe</code>.  You may or may not need to follow this pattern.  It's been too long since we wrote that code to remember.  We were PowerShell noobies back then.</p>
+</p><p></p><p></p><p></p><p></p>
 </body>
 </html>   
