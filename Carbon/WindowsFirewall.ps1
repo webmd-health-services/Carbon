@@ -135,6 +135,11 @@ function Get-FirewallRules
     
         netsh advfirewall firewall show rule name=all.
 
+    If the firewall isn't configurable, writes an error and returns without returning any objects.
+
+    .LINK
+    Assert-FirewallConfigurable
+
     .EXAMPLE
     Get-FirewallRules
 
@@ -213,6 +218,26 @@ function Get-FirewallRules
 
 function Test-FirewallStatefulFtp
 {
+    <#
+    .SYNOPSIS
+    Tests if the firewall's `StatefulFtp` setting is enabled.
+
+    .DESCRIPTION
+    Returns `True` if the firewall's `StatefulFtp` setting is enabled, `False` otherwise.
+
+    If the firewall isn't configurable, writes an error and returns nothing, which will probably be interpreted by your script as `False`.  Can't help you there.  At least you'll get an error message.
+
+    .OUTPUTS
+    System.Boolean.
+
+    .LINK
+    Assert-FirewallConfigurable
+
+    .EXAMPLE
+    Test-FirewallStatefulFtp
+    
+    Returns `True` if the firewall's `StatefulFtp` setting is enabled, `False` otherwise.
+    #>
     [CmdletBinding()]
     param()
     
