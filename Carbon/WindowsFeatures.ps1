@@ -136,22 +136,22 @@ else
 
             servermanagercmd.exe -q  
 
-        On Windows7 (and maybe Windows Server 2008 R2), run:
+        On Windows7, run:
 
-            Get-WmiObject -Class Win32_OptionalFeature
+            Get-WmiObject -Class Win32_OptionalFeature | Select-Object Name
 
         This function should be considered an internal, private function.  It would be best to use one of the feature-specifc `Install-WindowsFeature*` 
         functions.  These are designed to be Windows-version agnostic.
 
         .EXAMPLE
-        Install-WindowsFeatures -Features MSMQ-SERVER
+        Install-WindowsFeatures -Features MSMQ-Server
 
         Installs MSMQ.
 
         .EXAMPLE
         Install-WindowsFeatures -Features IIS-WebServer
 
-        Installs IIS on Windows 7/Server 2008 R2.
+        Installs IIS on Windows 7.
 
         .EXAMPLE
         Install-WindowsFeatures -Features Web-WebServer
@@ -162,7 +162,7 @@ else
         param(
             [Parameter(Mandatory=$true)]
             [string[]]
-            # The components to enable/install.  Feature names are case-sensitive.  If on Windows 2008, run `servermanagercmd.exe -q` for a list.  On Windows 7/Server 2008 R2, run `Get-WmiObject -Class Win32_OptionalFeature`.
+            # The components to enable/install.  Feature names are case-sensitive.  If on Windows 2008, run `servermanagercmd.exe -q` for a list.  On Windows 7, run `Get-WmiObject -Class Win32_OptionalFeature | Select-Object Name`.
             $Features
         )
         
@@ -207,12 +207,38 @@ else
         <#
         .SYNOPSIS
         Tests if an optional Windows component is installed.
+
+        .DESCRIPTION
+        The names of the features are different on different versions of Windows.  You can get a list by running the following commands.
+
+        On Windows 2008:
+
+            serveramanagercmd.exe -q
+
+        One Windows 7:
+
+            Get-WmiObject -Class Win32_OptionalFeature | Select-Object Name
+
+        .EXAMPLE
+        Test-WindowsFeature -Name MSMQ-Server
+
+        Tests if MSMQ is installed.
+
+        .EXAMPLE
+        Test-WindowsFeature -Name IIS-WebServer
+
+        Tests if IIS is installed on Windows 7.
+
+        .EXAMPLE
+        Test-WindowsFeature -Name Web-WebServer
+
+        Tests if IIS is installed on Windows Server 2008.
         #>
         [CmdletBinding(SupportsShouldProcess=$true)]
         param(
             [Parameter(Mandatory=$true)]
             [string]
-            # The 
+            # The name of the feature to test.  Feature names are case-sensitive and are different between different versions of Windows.  For a list, on Windows 2008, run `serveramanagercmd.exe -q`; on Windows 7, run `Get-WmiObject -Class Win32_OptionalFeature | Select-Object Name`.
             $Name
         )
         

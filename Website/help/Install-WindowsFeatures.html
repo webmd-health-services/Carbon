@@ -202,9 +202,9 @@
 <pre><code>servermanagercmd.exe -q  
 </code></pre>
 
-<p>On Windows7 (and maybe Windows Server 2008 R2), run:</p>
+<p>On Windows7, run:</p>
 
-<pre><code>Get-WmiObject -Class Win32_OptionalFeature
+<pre><code>Get-WmiObject -Class Win32_OptionalFeature | Select-Object Name
 </code></pre>
 
 <p>This function should be considered an internal, private function.  It would be best to use one of the feature-specifc <code>Install-WindowsFeature*</code> 
@@ -227,7 +227,7 @@ functions.  These are designed to be Windows-version agnostic.</p>
             			<tr valign='top'>
 				<td>Features</td>
 				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String[]</a></td>
-				<td>The components to enable/install.  Feature names are case-sensitive.  If on Windows 2008, run <code>servermanagercmd.exe -q</code> for a list.  On Windows 7/Server 2008 R2, run <code>Get-WmiObject -Class Win32_OptionalFeature</code>.
+				<td>The components to enable/install.  Feature names are case-sensitive.  If on Windows 2008, run <code>servermanagercmd.exe -q</code> for a list.  On Windows 7, run <code>Get-WmiObject -Class Win32_OptionalFeature | Select-Object Name</code>.
 </td>
 				<td>true</td>
 				<td>false</td>
@@ -266,11 +266,11 @@ functions.  These are designed to be Windows-version agnostic.</p>
     
         
                 <h2>EXAMPLE 1</h2>
-            <pre><code>Install-WindowsFeatures -Features MSMQ-SERVER</code></pre>
-            <p><p>Installs MSMQ .</p>
+            <pre><code>Install-WindowsFeatures -Features MSMQ-Server</code></pre>
+            <p><p>Installs MSMQ.</p>
 </p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 2</h2>
             <pre><code>Install-WindowsFeatures -Features IIS-WebServer</code></pre>
-            <p><p>Installs IIS on Windows 7/Server 2008 R2.</p>
+            <p><p>Installs IIS on Windows 7.</p>
 </p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 3</h2>
             <pre><code>Install-WindowsFeatures -Features Web-WebServer</code></pre>
             <p><p>Installs IIS on Windows 2008.</p>
