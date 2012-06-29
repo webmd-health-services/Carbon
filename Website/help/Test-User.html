@@ -187,13 +187,17 @@
 
 
     <h1>Test-User</h1>
-    <div><p>Checks if a user account exists.</p>
+    <div><p>Checks if a <em>local</em> user account exists.</p>
 </div>
 
         <h2>Syntax</h2>
-    <pre class="Syntax"><code>Test-User [-Username] &lt;String&gt; [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
+    <pre class="Syntax"><code>Test-User [-Username] &lt;String&gt; [&lt;CommonParameters&gt;]</code></pre>
     
-    
+        <h2>Description</h2>
+    <div class="Description">
+        <p>Uses WMI to check if a <em>local</em> user account exists.  Returns <code>True</code> if the <em>local</em> account exists, or <code>False</code> if it doesn't.</p>
+
+    </div>
     
     
 
@@ -210,36 +214,13 @@
             			<tr valign='top'>
 				<td>Username</td>
 				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
-				<td>The username of the account to check
+				<td>The username of the <em>local</em> account to check
 </td>
 				<td>true</td>
 				<td>false</td>
                 <td></td>
 			</tr>
-			<tr valign='top'>
-				<td>WhatIf</td>
-				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
-				<td></td>
-				<td>false</td>
-				<td>false</td>
-                <td></td>
-			</tr>
-			<tr valign='top'>
-				<td>Confirm</td>
-				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
-				<td></td>
-				<td>false</td>
-				<td>false</td>
-                <td></td>
-			</tr>
-                            <tr valign="top">
-                <td><a href="http://technet.microsoft.com/en-us/library/dd315352.aspx">CommonParameters</a></td>
-                <td></td>
-                <td>This cmdlet supports common parameters.  For more information type <br> <code>Get-Help about_CommonParameters</code>.</td>
-                <td></td>
-                <td></td>
-                <td></td>
-                </tr>
+            
         </table>
         
     
@@ -248,6 +229,9 @@
         
     
         
-    
+                <h2>EXAMPLE 1</h2>
+            <pre><code>Test-User -Username HSolo</code></pre>
+            <p><p>Checks if the HSolo <em>local</em> account exists.  Returns <code>True</code> if it does, <code>False</code> if it doesn't or its encased in carbonite.</p>
+</p><p></p><p></p><p></p><p></p>
 </body>
 </html>   

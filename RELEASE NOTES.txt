@@ -13,6 +13,7 @@
   * [Install-Group](http://get-carbon.org/help/Install-Group.html)
   * [Install-User](http://get-carbon.org/help/Install-User.html)
   * [Remove-User](http://get-carbon.org/help/Remove-User.html)
+  * [Test-User](http://get-carbon.org/help/Test-User.html)
   
 # 0.2.5 (29 June 2012)
 

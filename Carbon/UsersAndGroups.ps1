@@ -318,14 +318,22 @@ function Test-User
 {
     <#
     .SYNOPSIS
-    Checks if a user account exists.
+    Checks if a *local* user account exists.
+
+    .DESCRIPTION
+    Uses WMI to check if a *local* user account exists.  Returns `True` if the *local* account exists, or `False` if it doesn't.
+
+    .EXAMPLE
+    Test-User -Username HSolo
+
+    Checks if the HSolo *local* account exists.  Returns `True` if it does, `False` if it doesn't or its encased in carbonite.
     #>
-    [CmdletBinding(SupportsShouldProcess=$true)]
+    [CmdletBinding()]
     param(
         [Parameter(Mandatory=$true)]
         [ValidateLength(1,20)]
         [string]
-        # The username of the account to check
+        # The username of the *local* account to check
         $Username
     )
 
