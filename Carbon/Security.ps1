@@ -202,7 +202,17 @@ function Test-AdminPrivileges
 {
     <#
     .SYNOPSIS
-    Checks that you're running as an administrator, and returns $true if you are, $false otherwise.
+    Checks if the current user is an administrator or has administrative privileges.
+
+    .DESCRIPTION
+    Many tools, cmdlets, and APIs require administative privileges.  Use this function to check.  Returns `True` if the current user has administrative privileges, or `False` if he doesn't.  Or she.  Or it.  
+
+    This function handles UAC and computers where UAC is disabled.
+
+    .EXAMPLE
+    Test-AdminPrivileges
+
+    Returns `True` if the current user has administrative privileges, or `False` if the user doesn't.
     #>
     [CmdletBinding()]
     param(
