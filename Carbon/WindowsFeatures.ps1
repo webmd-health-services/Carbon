@@ -31,7 +31,22 @@ else
     {
         <#
         .SYNOPSIS
-        Installs IIS.
+        Installs IIS if it isn't already installed.
+
+        .DESCRIPTION
+        This function installs IIS and, optionally, the IIS HTTP redirection feature.  If a feature is already installed, nothing happens.
+
+        **NOTE: This function is only available on operating systems that have `servermanagercmd.exe` *or* `ocsetup.exe` and WMI support for the Win32_OptionalFeature class.**
+
+        .EXAMPLE
+        Install-WindowsFeatureIis
+
+        Installs IIS if it isn't already installed.
+
+        .EXAMPLE
+        Install-WindowsFeatureIis
+
+        Installs IIS and its HTTP redirection feature, if they aren't already installed.
         #>
         [CmdletBinding(SupportsShouldProcess=$true)]
         param(

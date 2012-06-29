@@ -187,13 +187,19 @@
 
 
     <h1>Install-WindowsFeatureIis</h1>
-    <div><p>Installs IIS.</p>
+    <div><p>Installs IIS if it isn't already installed.</p>
 </div>
 
         <h2>Syntax</h2>
     <pre class="Syntax"><code>Install-WindowsFeatureIis [-HttpRedirection] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
     
-    
+        <h2>Description</h2>
+    <div class="Description">
+        <p>This function installs IIS and, optionally, the IIS HTTP redirection feature.  If a feature is already installed, nothing happens.</p>
+
+<p><strong>NOTE: This function is only available on operating systems that have <code>servermanagercmd.exe</code> <em>or</em> <code>ocsetup.exe</code> and WMI support for the Win32_OptionalFeature class.</strong></p>
+
+    </div>
     
     
 
@@ -248,6 +254,12 @@
         
     
         
-    
+                <h2>EXAMPLE 1</h2>
+            <pre><code>Install-WindowsFeatureIis</code></pre>
+            <p><p>Installs IIS if it isn't already installed.</p>
+</p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 2</h2>
+            <pre><code>Install-WindowsFeatureIis</code></pre>
+            <p><p>Installs IIS and its HTTP redirection feature, if they aren't already installed.</p>
+</p><p></p><p></p><p></p><p></p>
 </body>
 </html>   
