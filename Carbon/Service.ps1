@@ -345,19 +345,39 @@ function Restart-RemoteService
 {
  <#
     .SYNOPSIS
-    Restarts a service on a remote machine
+    Restarts a service on a remote machine.
+
+    .DESCRIPTION
+    One of the annoying features of PowerShell is that the `Stop-Service`, `Start-Service` and `Restart-Service` cmdlets don't have `ComputerName` parameters to start/stop/restart a service on a remote computer.  You have to use `Get-Service` to get the remote service:
+
+        $service = Get-Service -Name DeathStar -ComputerName Yavin
+        $service.Stop()
+        $service.Start()
+
+        # or (and no, you can't pipe the service directly to `Restart-Service`)
+        Get-Service -Name DeathStar -ComputerName Yavin | 
+            ForEach-Object { Restart-Service -InputObject $_ }
+    
+    This function does all this unnecessary work for you.
+
+    You'll get an error if you attempt to restart a non-existent service.
+
+    .EXAMPLE
+    Restart-RemoteService -Name DeathStar -ComputerName Yavin
+
+    Restarts the `DeathStar` service on Yavin.  If the DeathStar service doesn't exist, you'll get an error.
     #>
     [CmdletBinding(SupportsShouldProcess=$true)]
     param(
         [Parameter(Mandatory=$true)]
         [string]
-        # The service name
+        # The service name to restart.
         $Name,
+
         [Parameter(Mandatory=$true)]
         [string]
-        # The name of the remote machine
+        # The name of the computer where the service lives.
         $ComputerName
-        
     )
     
     $service = Get-Service -Name $name -ComputerName $computerName
@@ -367,9 +387,7 @@ function Restart-RemoteService
         {
             $service.Stop()
             $service.Start()
-        
         }
-    
     }
     else
     {
