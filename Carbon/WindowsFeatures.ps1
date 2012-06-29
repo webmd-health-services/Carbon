@@ -48,7 +48,7 @@ else
 
         Installs IIS and its HTTP redirection feature, if they aren't already installed.
         #>
-        [CmdletBinding(SupportsShouldProcess=$true)]
+        [CmdletBinding()]
         param(
             [Switch]
             # Install IIS's HTTP redirection feature.
@@ -73,7 +73,26 @@ else
 
     function Install-WindowsFeatureMsmq
     {
-        [CmdletBinding(SupportsShouldProcess=$true)]
+        <#
+        .SYNOPSIS
+        Installs MSMQ and, optionally, some of its sub-features, if they aren't already installed.
+
+        .DESCRIPTION
+        This function installs MSMQ and, optionally, MSMQ's HTTP support and Active Directory integration.  If any of the selected features are already installed, they are not re-installed; nothing happens.
+
+        **NOTE: This function is only available on operating systems that have `servermanagercmd.exe` *or* `ocsetup.exe` and WMI support for the Win32_OptionalFeature class.**
+
+        .EXAMPLE
+        Install-WindowsFeatureMsmq
+
+        Installs MSMQ, if it isn't already installed.
+
+        .EXAMPLE
+        Install-WindowsFeatureMsmq -HttpSupport -ActiveDirectoryIntegration
+
+        Installs MSMQ and its HTTP support and Active Directory integration features, if they aren't already installed.
+        #>
+        [CmdletBinding()]
         param(
             [Switch]
             # Enable HTTP Support

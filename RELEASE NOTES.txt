@@ -15,6 +15,7 @@
   * [Remove-User](http://get-carbon.org/help/Remove-User.html)
   * [Test-User](http://get-carbon.org/help/Test-User.html)
   * [Install-WindowsFeatureIis](http://get-carbon.org/help/Install-WindowsFeatureIis.html)
+  * [Install-WindowsFeatureMsmq](http://get-carbon.org/help/Install-WindowsFeatureMsmq.html)
   
 # 0.2.5 (29 June 2012)
 

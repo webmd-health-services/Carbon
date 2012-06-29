@@ -187,16 +187,52 @@
 
 
     <h1>Install-WindowsFeatureMsmq</h1>
-    <div><p>Install-WindowsFeatureMsmq [-HttpSupport] [-ActiveDirectoryIntegration] [-Verbose] [-Debug] [-ErrorAction <ActionPreference>] [-WarningAction <ActionPreference>] [-ErrorVariable <String>] [-WarningVariable <String>] [-OutVariable <String>] [-OutBuffer <Int32>] [-WhatIf] [-Confirm]</p>
+    <div><p>Installs MSMQ and, optionally, some of its sub-features, if they aren't already installed.</p>
 </div>
 
+        <h2>Syntax</h2>
+    <pre class="Syntax"><code>Install-WindowsFeatureMsmq [-HttpSupport] [-ActiveDirectoryIntegration] [&lt;CommonParameters&gt;]</code></pre>
     
-    
-    
+        <h2>Description</h2>
+    <div class="Description">
+        <p>This function installs MSMQ and, optionally, MSMQ's HTTP support and Active Directory integration.  If any of the selected features are already installed, they are not re-installed; nothing happens.</p>
+
+<p><strong>NOTE: This function is only available on operating systems that have <code>servermanagercmd.exe</code> <em>or</em> <code>ocsetup.exe</code> and WMI support for the Win32_OptionalFeature class.</strong></p>
+
+    </div>
     
     
 
-    
+    		<h2> Parameters </h2>
+		<table border='1'>
+			<tr>
+				<th>Name</th>
+                <th>Type</th>
+				<th>Description</th>
+				<th>Required?</th>
+				<th>Pipeline Input</th>
+				<th>Default Value</th>
+			</tr>
+            			<tr valign='top'>
+				<td>HttpSupport</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+				<td>Enable HTTP Support
+</td>
+				<td>false</td>
+				<td>false</td>
+                <td></td>
+			</tr>
+			<tr valign='top'>
+				<td>ActiveDirectoryIntegration</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+				<td>Enable Active Directory Integrations
+</td>
+				<td>false</td>
+				<td>false</td>
+                <td></td>
+			</tr>
+            
+        </table>
         
     
         
@@ -204,6 +240,12 @@
         
     
         
-    
+                <h2>EXAMPLE 1</h2>
+            <pre><code>Install-WindowsFeatureMsmq</code></pre>
+            <p><p>Installs MSMQ, if it isn't already installed.</p>
+</p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 2</h2>
+            <pre><code>Install-WindowsFeatureMsmq -HttpSupport -ActiveDirectoryIntegration</code></pre>
+            <p><p>Installs MSMQ and its HTTP support and Active Directory integration features, if they aren't already installed.</p>
+</p><p></p><p></p><p></p><p></p>
 </body>
 </html>   
