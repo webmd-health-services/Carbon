@@ -17,6 +17,19 @@ function Add-TrustedHosts
     <#
     .SYNOPSIS
     Adds an item to the computer's list of trusted hosts.
+
+    .DESCRIPTION
+    Adds an entry to this computer's list of trusted hosts.  If the item already exists, nothing happens.
+
+    PowerShell Remoting needs to be turned on for this function to work.
+
+    .LINK
+    Enable-PSRemoting
+
+    .EXAMPLE
+    Add-TrustedHosts -Entries example.com
+
+    Adds `example.com` to the list of this computer's trusted hosts.  If `example.com` is already on the list of trusted hosts, nothing happens.
     #>
     [CmdletBinding(SupportsShouldProcess=$true)]
     param(

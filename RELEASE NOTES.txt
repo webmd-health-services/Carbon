@@ -28,6 +28,7 @@
   * [Invoke-PowerShell](http://get-carbon.org/help/Invoke-PowerShell.html)
   * [Test-PowerShellIs32Bit](http://get-carbon.org/help/Test-PowerShellIs32Bit.html)
   * [Test-PowerShellIs64Bit](http://get-carbon.org/help/Test-PowerShellIs64Bit.html)
+  * [Add-TrustedHosts](http://get-carbon.org/help/Add-TrustedHosts.html)
 * Improved whitespace in HTML documentation code samples.
 
 
