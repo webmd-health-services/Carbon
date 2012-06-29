@@ -11,6 +11,7 @@
   * [Add-GroupMembers](http://get-carbon.org/help/Add-GroupMembers.html)
   * [Get-WmiLocalUserAccount](http://get-carbon.org/help/Get-WmiLocalUserAccount.html)
   * [Install-Group](http://get-carbon.org/help/Install-Group.html)
+  * [Install-User](http://get-carbon.org/help/Install-User.html)
   
 # 0.2.5 (29 June 2012)
 

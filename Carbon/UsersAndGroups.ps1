@@ -226,6 +226,18 @@ function Install-Group
 
 function Install-User
 {
+    <#
+    .SYNOPSIS
+    Installs a *local* user account.
+
+    .DESCRIPTION
+    Creates a new *local* user account, or, if the account already exists, updates its password and description.  In both cases, the users password is set to never expire.  This should probably be a parameter.  Send us a patch! 
+
+    .EXAMPLE
+    Install-User -Username LSkywalker -Password "whydidn'tyoutellme" -Description "Luke Skywalker's account."
+
+    Creates a new `LSkywalker` user account with the given password and description.  Luke's password is set ot never expire.  
+    #>
     [CmdletBinding(SupportsShouldProcess=$true)]
     param(
         [Parameter(Mandatory=$true)]
