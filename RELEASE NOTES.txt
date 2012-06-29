@@ -19,6 +19,7 @@
   * [Install-WindowsFeatures](http://get-carbon.org/help/Install-WindowsFeatures.html)
   * [Test-WindowsFeature](http://get-carbon.org/help/Test-WindowsFeature.html)
   * [Uninstall-WindowsFeatures](http://get-carbon.org/help/Uninstall-WindowsFeatures.html)
+  * [Assert-FirewallConfigurable](http://get-carbon.org/help/Assert-FirewallConfigurable.html)
 
 # 0.2.5 (29 June 2012)
 
