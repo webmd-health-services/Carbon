@@ -5,6 +5,7 @@
   * [Grant-ServiceControlPermission](http://get-carbon.org/help/Grant-ServiceControlPermission.html)
   * [Install-Service](http://get-carbon.org/help/Install-Service.html)
   * [Invoke-SubInAcl](http://get-carbon.org/help/Invoke-SubInAcl.html)
+  * [Remove-Service](http://get-carbon.org/help/Remove-Service.html)
   
 # 0.2.5 (29 June 2012)
 
