@@ -193,7 +193,11 @@
         <h2>Syntax</h2>
     <pre class="Syntax"><code>Grant-ServiceControlPermission [-ServiceName] &lt;String&gt; [-Identity] &lt;String&gt; [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
     
-    
+        <h2>Description</h2>
+    <div class="Description">
+        <p>Users/groups that aren't administrators need to granted permission to control (e.g. start, stop) a service.  This function uses Microsoft's <code>subinacl.exe</code> program to grant those permissions.</p>
+
+    </div>
     
     
 
@@ -257,6 +261,9 @@
         
     
         
-    
+                <h2>EXAMPLE 1</h2>
+            <pre><code>Grant-ServiceControlPermission -ServiceName CCService -Identity INITRODE\Builders</code></pre>
+            <p><p>Grants the INITRODE\Builders group permission to control the CruiseControl.NET service.</p>
+</p><p></p><p></p><p></p><p></p>
 </body>
 </html>   

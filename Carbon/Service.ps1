@@ -19,6 +19,14 @@ function Grant-ServiceControlPermission
     <#
     .SYNOPSIS
     Grants a user/group permission to control a service.
+
+    .DESCRIPTION
+    Users/groups that aren't administrators need to granted permission to control (e.g. start, stop) a service.  This function uses Microsoft's `subinacl.exe` program to grant those permissions.  
+
+    .EXAMPLE
+    Grant-ServiceControlPermission -ServiceName CCService -Identity INITRODE\Builders
+
+    Grants the INITRODE\Builders group permission to control the CruiseControl.NET service.
     #>
     [CmdletBinding(SupportsShouldProcess=$true)]
     param(
