@@ -29,6 +29,8 @@
   * [Get-Certificate](http://get-carbon.org/help/Get-Certificate.html)
   * [Get-CertificateStore](http://get-carbon.org/help/Get-CertificateStore.html)
   * [Set-HgrcDefaultPushUrl](http://get-carbon.org/help/Set-HgrcDefaultPushUrl.html)
+ * Help files and example scripts now included in Carbon download package.
+ * Added test to help ensure all functions have proper documentation.
 
 # 0.2.5 (29 June 2012)
 
