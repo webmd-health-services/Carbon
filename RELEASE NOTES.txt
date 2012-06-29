@@ -3,6 +3,7 @@
 ## Enhancements
  * Improved documentation for:
   * [Grant-ServiceControlPermission](http://get-carbon.org/help/Grant-ServiceControlPermission.html)
+  * [Install-Service](http://get-carbon.org/help/Install-Service.html)
   
 # 0.2.5 (29 June 2012)
 

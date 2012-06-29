@@ -187,14 +187,20 @@
 
 
     <h1>Install-Service</h1>
-    <div><p>Installs a Windows service, uninstalling if it doesn't already exist.</p>
+    <div><p>Installs a Windows service.</p>
 </div>
 
         <h2>Syntax</h2>
-    <pre class="Syntax"><code>Install-Service -Name &lt;Object&gt; -Path &lt;Object&gt; [-StartupType {Automatic | Manual | Disabled}] [-OnFirstFailure &lt;Object&gt;] [-OnSecondFailure &lt;Object&gt;] [-OnThirdFailure &lt;Object&gt;] [-ResetFailureCount &lt;Int32&gt;] [-RestartDelay &lt;Int32&gt;] [-RebootDelay &lt;Int32&gt;] [-Dependencies &lt;String[]&gt;] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
-<pre class="Syntax"><code>Install-Service -Name &lt;Object&gt; -Path &lt;Object&gt; [-StartupType {Automatic | Manual | Disabled}] [-OnFirstFailure &lt;Object&gt;] [-OnSecondFailure &lt;Object&gt;] [-OnThirdFailure &lt;Object&gt;] [-ResetFailureCount &lt;Int32&gt;] [-RestartDelay &lt;Int32&gt;] [-RebootDelay &lt;Int32&gt;] [-Dependencies &lt;String[]&gt;] -Username &lt;String&gt; -Password &lt;String&gt; [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
+    <pre class="Syntax"><code>Install-Service -Name &lt;String&gt; -Path &lt;String&gt; [-StartupType {Automatic | Manual | Disabled}] [-OnFirstFailure &lt;String&gt;] [-OnSecondFailure &lt;String&gt;] [-OnThirdFailure &lt;String&gt;] [-ResetFailureCount &lt;Int32&gt;] [-RestartDelay &lt;Int32&gt;] [-RebootDelay &lt;Int32&gt;] [-Dependencies &lt;String[]&gt;] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
+<pre class="Syntax"><code>Install-Service -Name &lt;String&gt; -Path &lt;String&gt; [-StartupType {Automatic | Manual | Disabled}] [-OnFirstFailure &lt;String&gt;] [-OnSecondFailure &lt;String&gt;] [-OnThirdFailure &lt;String&gt;] [-ResetFailureCount &lt;Int32&gt;] [-RestartDelay &lt;Int32&gt;] [-RebootDelay &lt;Int32&gt;] [-Dependencies &lt;String[]&gt;] -Username &lt;String&gt; -Password &lt;String&gt; [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
     
-    
+        <h2>Description</h2>
+    <div class="Description">
+        <p>Installs a Windows service.  If a service with the given name already exists, it is left in place, and the its configuration is updated to match the parameters passed in.  In order to configure it, the service is stopped, configured, then started.  By default, the service is installed to run as <code>NetworkService</code>.  Set the <code>Username</code> and <code>Password</code> arguments to run as a different account.  This user will be granted the logon as a service right.</p>
+
+<p>The minimum required information to install a service is its name and path.  By default the servide will run as <code>NetworkService</code> and will start automatically.  Review the parameter list for additional configuraiton options and their defaults.  Normally, we would list them here, but there's like 300 of them and we really don't have the time.  I'm so mean, I'm not even going to give you <em>examples</em> of all the different options.  Feel free to send in your own.</p>
+
+    </div>
     
     
 
@@ -210,7 +216,7 @@
 			</tr>
             			<tr valign='top'>
 				<td>Name</td>
-				<td><a href="http://msdn.microsoft.com/en-us/library/system.object.aspx">Object</a></td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
 				<td>The name of the service.
 </td>
 				<td>true</td>
@@ -219,7 +225,7 @@
 			</tr>
 			<tr valign='top'>
 				<td>Path</td>
-				<td><a href="http://msdn.microsoft.com/en-us/library/system.object.aspx">Object</a></td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
 				<td>The path to the service.
 </td>
 				<td>true</td>
@@ -237,7 +243,7 @@
 			</tr>
 			<tr valign='top'>
 				<td>OnFirstFailure</td>
-				<td><a href="http://msdn.microsoft.com/en-us/library/system.object.aspx">Object</a></td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
 				<td>What to do on the service's first failure.  Default is to take no action.
 </td>
 				<td>false</td>
@@ -246,7 +252,7 @@
 			</tr>
 			<tr valign='top'>
 				<td>OnSecondFailure</td>
-				<td><a href="http://msdn.microsoft.com/en-us/library/system.object.aspx">Object</a></td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
 				<td>What to do on the service's second failure. Default is to take no action.
 </td>
 				<td>false</td>
@@ -255,7 +261,7 @@
 			</tr>
 			<tr valign='top'>
 				<td>OnThirdFailure</td>
-				<td><a href="http://msdn.microsoft.com/en-us/library/system.object.aspx">Object</a></td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
 				<td>What to do on the service' third failure.  Default is to take no action.
 </td>
 				<td>false</td>
@@ -348,6 +354,15 @@
         
     
         
-    
+                <h2>EXAMPLE 1</h2>
+            <pre><code>Install-Service -Name DeathStar -Path C:\ALongTimeAgo\InAGalaxyFarFarAway\DeathStar.exe</code></pre>
+            <p><p>Installs the Death Star service, which runs the service executable at <code>C:\ALongTimeAgo\InAGalaxyFarFarAway\DeathStar.exe</code>.  The service runs as <code>NetworkService</code> and will start automatically.</p>
+</p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 2</h2>
+            <pre><code>Install-Service -Name DetahStart -Path C:\ALongTimeAgo\InAGalaxyFarFarAway\DeathStar.exe -StartupType Manual</code></pre>
+            <p><p>Install the Death Star service to startup manually.  You certainly don't want the thing roaming the galaxy, destroying thing willy-nilly, do you?</p>
+</p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 3</h2>
+            <pre><code>Install-Service -Name DetahStart -Path C:\ALongTimeAgo\InAGalaxyFarFarAway\DeathStar.exe -Username EMPIRE\wtarkin -Password 5irewh3nready</code></pre>
+            <p><p>Installs the Death Star service to run as Grand Moff Tarkin, who is given the log on as a service right.</p>
+</p><p></p><p></p><p></p><p></p>
 </body>
 </html>   

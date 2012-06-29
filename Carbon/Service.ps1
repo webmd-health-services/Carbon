@@ -52,15 +52,37 @@ function Install-Service
 {
     <#
     .SYNOPSIS
-    Installs a Windows service, uninstalling if it doesn't already exist.
+    Installs a Windows service.
+
+    .DESCRIPTION
+    Installs a Windows service.  If a service with the given name already exists, it is left in place, and the its configuration is updated to match the parameters passed in.  In order to configure it, the service is stopped, configured, then started.  By default, the service is installed to run as `NetworkService`.  Set the `Username` and `Password` arguments to run as a different account.  This user will be granted the logon as a service right.
+
+    The minimum required information to install a service is its name and path.  By default the servide will run as `NetworkService` and will start automatically.  Review the parameter list for additional configuraiton options and their defaults.  Normally, we would list them here, but there's like 300 of them and we really don't have the time.  I'm so mean, I'm not even going to give you *examples* of all the different options.  Feel free to send in your own.
+
+    .EXAMPLE
+    Install-Service -Name DeathStar -Path C:\ALongTimeAgo\InAGalaxyFarFarAway\DeathStar.exe
+
+    Installs the Death Star service, which runs the service executable at `C:\ALongTimeAgo\InAGalaxyFarFarAway\DeathStar.exe`.  The service runs as `NetworkService` and will start automatically.
+
+    .EXAMPLE
+    Install-Service -Name DetahStart -Path C:\ALongTimeAgo\InAGalaxyFarFarAway\DeathStar.exe -StartupType Manual
+
+    Install the Death Star service to startup manually.  You certainly don't want the thing roaming the galaxy, destroying thing willy-nilly, do you?
+
+    .EXAMPLE
+    Install-Service -Name DetahStart -Path C:\ALongTimeAgo\InAGalaxyFarFarAway\DeathStar.exe -Username EMPIRE\wtarkin -Password 5irewh3nready
+
+    Installs the Death Star service to run as Grand Moff Tarkin, who is given the log on as a service right.
     #>
     [CmdletBinding(SupportsShouldProcess=$true,DefaultParameterSetName='NetworkServiceAccount')]
     param(
         [Parameter(Mandatory=$true)]
+        [string]
         # The name of the service.
         $Name,
         
         [Parameter(Mandatory=$true)]
+        [string]
         # The path to the service.
         $Path,
         
@@ -69,37 +91,33 @@ function Install-Service
         # The startup type: automatic, manual, or disabled.  Default is automatic.
         $StartupType = [ServiceProcess.ServiceStartMode]::Automatic,
         
-        [Parameter()]
+        [string]
         [ValidateSet("Reboot","Restart","TakeNoAction")]
         # What to do on the service's first failure.  Default is to take no action.
         $OnFirstFailure = 'TakeNoAction',
         
-        [Parameter()]
+        [string]
         [ValidateSet("Reboot","Restart","TakeNoAction")]
         # What to do on the service's second failure. Default is to take no action.
         $OnSecondFailure = 'TakeNoAction',
         
-        [Parameter()]
+        [string]
         [ValidateSet("Reboot","Restart","TakeNoAction")]
         # What to do on the service' third failure.  Default is to take no action.
         $OnThirdFailure = 'TakeNoAction',
         
-        [Parameter()]
         [int]
         # How many seconds after which the failure count is reset to 0.
         $ResetFailureCount = 0,
         
-        [Parameter()]
         [int]
         # How many milliseconds to wait before restarting the service.  Default is 60,0000, or 1 minute.
         $RestartDelay = 60000,
         
-        [Parameter()]
         [int]
         # How many milliseconds to wait before handling the second failure.  Default is 60,000 or 1 minute.
         $RebootDelay = 60000,
         
-        [Parameter()]
         [string[]]
         # What other services does this service depend on?
         $Dependencies = @(),
