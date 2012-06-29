@@ -264,13 +264,41 @@ else
     {
         <#
         .SYNOPSIS
-        Uninstalls an optional Windows component. 
+        Uninstalls optional Windows components/features.
+
+        .DESCRIPTION
+        The names of the features are different on different versions of Windows.  For a list, run the following commands:
+
+        On Windows 2008:
+
+            serveramanagercmd.exe -q
+
+        One Windows 7:
+
+            Get-WmiObject -Class Win32_OptionalFeature | Select-Object Name
+
+        Feature names are case-sensitive.  If a feature is already uninstalled, nothing happens.
+
+        .EXAMPLE
+        Uninstall-WindowsFeatures -Features MSMQ-Server
+
+        Uninstalls MSMQ.
+
+        .EXAMPLE
+        Uninstall-WindowsFeatures -Features IIS-WebServer
+
+        Uninstalls IIS on Windows 7.
+
+        .EXAMPLE
+        Uninstall-WindowsFeatures -Features Web-WebServer
+
+        Uninstalls IIS on Windows 2008.
         #>
         [CmdletBinding(SupportsShouldProcess=$true)]
         param(
             [Parameter(Mandatory=$true)]
             [string[]]
-            # The components to uninstall/disable.  See http://technet.microsoft.com/en-us/library/cc722041(WS.10).aspx for a somewhat-complete list.
+            # The names of the components to uninstall/disable.  Feature names are case-sensitive.  The names are different between Windows versions.  For a list, on Windows 2008, run `serveramanagercmd.exe -q`; on Windows 7, run `Get-WmiObject -Class Win32_OptionalFeature | Select-Object Name`.
             $Features
         )
         

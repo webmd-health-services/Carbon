@@ -18,6 +18,7 @@
   * [Install-WindowsFeatureMsmq](http://get-carbon.org/help/Install-WindowsFeatureMsmq.html)
   * [Install-WindowsFeatures](http://get-carbon.org/help/Install-WindowsFeatures.html)
   * [Test-WindowsFeature](http://get-carbon.org/help/Test-WindowsFeature.html)
+  * [Uninstall-WindowsFeatures](http://get-carbon.org/help/Uninstall-WindowsFeatures.html)
 
 # 0.2.5 (29 June 2012)
 
