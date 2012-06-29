@@ -187,13 +187,19 @@
 
 
     <h1>Install-Share</h1>
-    <div><p>Creates a share, replacing the existing share (if any).</p>
+    <div><p>Creates a share, replacing any existing share with the same name.</p>
 </div>
 
         <h2>Syntax</h2>
     <pre class="Syntax"><code>Install-Share [-Name] &lt;String&gt; [-Path] &lt;String&gt; [[-Description] &lt;String&gt;] [[-Permissions] &lt;String[]&gt;] [&lt;CommonParameters&gt;]</code></pre>
     
-    
+        <h2>Description</h2>
+    <div class="Description">
+        <p>Creates a new Windows SMB share, or replaces an existing share with the same name.  Optionally grants permissions on that share.  Unfortunately, there isn't a way in Carbon to set permissions on a share after it is created.  Send us the code!</p>
+
+<p>Permissions don't apply to the file system.  They only apply to the share.  Use <code>Grant-Permissions</code> to grant file system permissions.</p>
+
+    </div>
     
     
 
@@ -252,6 +258,9 @@
         
     
         
-    
+                <h2>EXAMPLE 1</h2>
+            <pre><code>Install-Share -Name TopSecretDocuments -Path C:\TopSecret -Description 'Share for our top secret documents.' -Permissions "Everyone,Read","Analysts,FULL"</code></pre>
+            <p><p>Shares the C:\TopSecret directory as <code>TopSecretDocuments</code> and grants <code>Everyone</code> read access and <code>Analysts</code> full control.</p>
+</p><p></p><p></p><p></p><p></p>
 </body>
 </html>   

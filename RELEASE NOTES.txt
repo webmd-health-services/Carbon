@@ -7,6 +7,7 @@
   * [Invoke-SubInAcl](http://get-carbon.org/help/Invoke-SubInAcl.html)
   * [Remove-Service](http://get-carbon.org/help/Remove-Service.html)
   * [Restart-RemoteService](http://get-carbon.org/help/Restart-RemoteService.html)
+  * [Install-Share](http://get-carbon.org/help/Install-Share.html)
   
 # 0.2.5 (29 June 2012)
 
