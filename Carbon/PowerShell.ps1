@@ -249,7 +249,18 @@ function Test-PowerShellIs32Bit
 {
     <#
     .SYNOPSIS
-    Tests if the current powershell process is 32-bit.
+    Tests if the current PowerShell process is 32-bit.
+
+    .DESCRIPTION
+    Returns `True` if the currently executing PowerShell process is 32-bit/x86, `False` if it is 64-bit/x64.
+
+    .OUTPUTS
+    System.Boolean.
+
+    .EXAMPLE
+    Test-PowerShellIs32Bit
+
+    Returns `True` if PowerShell is 32-bit/x86, `False` if it is 64-bit/x64.
     #>
     [CmdletBinding()]
     param(
