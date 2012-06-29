@@ -20,6 +20,7 @@
   * [Test-WindowsFeature](http://get-carbon.org/help/Test-WindowsFeature.html)
   * [Uninstall-WindowsFeatures](http://get-carbon.org/help/Uninstall-WindowsFeatures.html)
   * [Assert-FirewallConfigurable](http://get-carbon.org/help/Assert-FirewallConfigurable.html)
+  * [Disable-FirewallStatefulFtp](http://get-carbon.org/help/Disable-FirewallStatefulFtp.html)
 
 # 0.2.5 (29 June 2012)
 

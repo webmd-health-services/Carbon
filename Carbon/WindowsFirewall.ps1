@@ -42,6 +42,23 @@ function Assert-FirewallConfigurable
 
 function Disable-FirewallStatefulFtp
 {
+    <#
+    .SYNOPSIS
+    Disables the `StatefulFtp` Windows firewall setting.
+
+    .DESCRIPTION
+    Uses the `netsh` command to disable the `StatefulFtp` Windows firewall setting.
+
+    If the firewall isn't configurable, writes an error and returns without making any changes.
+
+    .LINK
+    Assert-FirewallConfigurable
+
+    .EXAMPLE
+    Disable-FirewallStatefulFtp
+    
+    Disables the `StatefulFtp` Windows firewall setting.
+    #>
     [CmdletBinding(SupportsShouldProcess=$true)]
     param()
     
