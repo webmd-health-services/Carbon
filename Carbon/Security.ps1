@@ -71,11 +71,38 @@ function Grant-Permissions
 {
     <#
     .SYNOPSIS
-    Grants permission on a file/directory or registry key.
+    Grants permission on a file, directory or registry key.
+
+    .DESCRIPTION
+    Granting access to a file system entry or registry key requires a lot of steps.  This method reduces it to one call.  Very helpful.
+
+    It has the advantage that it will set permissions on a file system object or a registry.  If `Path` is absolute, the correct provider (file system or registry) is used.  If `Path` is relative, the provider of the current location will be used.
+
+    The `Permissions` attribute can be a list of [FileSystemRights](http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.filesystemrights.aspx) or [RegistryRights](http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.registryrights.aspx).
+
+    This command will show you the values for the `FileSystemRights`:
+
+        [Enum]::GetValues([Security.AccessControl.FileSystemRights])
+
+    This command will show you the values for the `RegistryRights`:
+
+        [Enum]::GetValues([Security.AccessControl.RegistryRights])
+
     .LINK
     http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.filesystemrights.aspx
+
     .LINK
     http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.registryrights.aspx
+
+    .EXAMPLE
+    Grant-Permissions -Identity ENTERPRISE\Engineers -Permissions FullControl -Path C:\EngineRoom
+
+    Grants the Enterprise's engineering group full control on the engine room.  Very important if you want to get anywhere.
+
+    .EXAMPLE
+    Grant-Permissions -Identity ENTERPRISE\Interns -Permissions ReadKey,QueryValues,EnumerateSubKeys -Path rklm:\system\WarpDrive
+
+    Grants the Enterprise's interns access to read about the warp drive.  They need to learn someday, but at least they can't change anything.
     #>
     [CmdletBinding(SupportsShouldProcess=$true)]
     param(
@@ -86,9 +113,7 @@ function Grant-Permissions
         
         [Parameter(Mandatory=$true)]
         [string[]]
-        # The permission: e.g. FullControl, Read, etc.  For file system items, use values from
-        # System.Security.AccessControl.FileSystemRights.  For registry items, use values from
-        # System.Security.AccessControl.RegistryRights.
+        # The permission: e.g. FullControl, Read, etc.  For file system items, use values from [System.Security.AccessControl.FileSystemRights](http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.filesystemrights.aspx).  For registry items, use values from [System.Security.AccessControl.RegistryRights](http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.registryrights.aspx).
         $Permissions,
         
         [Parameter(Mandatory=$true)]
