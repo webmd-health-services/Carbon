@@ -31,6 +31,7 @@
   * [Add-TrustedHosts](http://get-carbon.org/help/Add-TrustedHosts.html)
   * [Get-TrustedHosts](http://get-carbon.org/help/Get-TrustedHosts.html)
   * [Set-TrustedHosts](http://get-carbon.org/help/Set-TrustedHosts.html)
+  * [Assert-AdminPrivileges](http://get-carbon.org/help/Assert-AdminPrivileges.html)
 * Improved whitespace in HTML documentation code samples.
 
 

@@ -16,7 +16,18 @@ function Assert-AdminPrivileges
 {
     <#
     .SYNOPSIS
-    Checks that you're running as an administrator, and throws an error if you aren't.
+    Throws an exception if the user doesn't have administrator privileges.
+
+    .DESCRIPTION
+    Many scripts and functions require the user to be running as an administrator.  This function checks if the user is running as an administrator or with administrator privileges and **throws an exception** if the user doesn't.  
+
+    .LINK
+    Test-AdminPrivileges
+
+    .EXAMPLE
+    Assert-AdminPrivileges
+
+    Throws an exception if the user doesn't have administrator privileges.
     #>
     [CmdletBinding()]
     param(
