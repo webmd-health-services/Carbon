@@ -34,6 +34,7 @@
   * [Assert-AdminPrivileges](http://get-carbon.org/help/Assert-AdminPrivileges.html)
   * [Convert-SecureStringToString](http://get-carbon.org/help/Convert-SecureStringToString.html)
   * [Grant-Permissions](http://get-carbon.org/help/Grant-Permissions.html)
+  * [New-Credential](http://get-carbon.org/help/New-Credential.html)
 * Improved whitespace in HTML documentation code samples.
 
 

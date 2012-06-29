@@ -170,13 +170,25 @@ function New-Credential
 {
     <#
     .SYNOPSIS
-    Creates a new PsCredential object from a given username and password.
+    Creates a new `PSCredential` object from a given username and password.
+
+    .DESCRIPTION
+    Many PowerShell commands require a `PSCredential` object instead of username/password.  This function will create one for you.
+
+    .OUTPUTS
+    System.Management.Automation.PSCredential.
+
+    .EXAMPLE
+    New-Credential -User ENTERPRISE\picard -Password 'earlgrey'
+
+    Creates a new credential object for Captain Picard.
     #>
     param(
         [Parameter(Mandatory=$true)]
         [string]
         # The username.
         $User, 
+
         [Parameter(Mandatory=$true)]
         [string]
         # The password.
