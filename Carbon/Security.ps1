@@ -43,7 +43,18 @@ function Convert-SecureStringToString
 {
     <#
     .SYNOPSIS
-    Converts a secure string into a plaintext string.
+    Converts a secure string into a plain text string.
+
+    .DESCRIPTION
+    Sometimes you just need to convert a secure string into a plain text string.  This function does it for you.  Yay!  Once you do, however, the cat is out of the bag and your password will be *all over memory* and, perhaps, the file system.
+
+    .OUTPUTS
+    System.String.
+
+    .EXAMPLE
+    Convert-SecureStringToString -SecureString $mySuperSecretPasswordIAmAboutToExposeToEveryone
+
+    Returns the plain text/decrypted value of the secure string.
     #>
     param(
         [Parameter(Mandatory=$true)]
