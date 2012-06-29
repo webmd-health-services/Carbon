@@ -194,7 +194,7 @@
     
         <h2>Description</h2>
     <div class="Description">
-        <p>The invoked PowerShell process can run under the .NET 4.0 CLR (using v4.0 as the value to the Runtime parameter) and under 32-bit PowerShell (by passing the x86 switch).</p>
+        <p>The invoked PowerShell process can run under the .NET 4.0 CLR (using <code>v4.0</code> as the value to the Runtime parameter) and under 32-bit PowerShell (using the <code>x86</code> switch).</p>
 
     </div>
     
@@ -240,7 +240,7 @@
 			<tr valign='top'>
 				<td>Runtime</td>
 				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
-				<td>The CLR to use.  Must be one of v2.0 or v4.0.  Defualt is v2.0.
+				<td>The CLR to use.  Must be one of v2.0 or v4.0.  Default is v2.0.
 </td>
 				<td>false</td>
 				<td>false</td>
@@ -263,7 +263,7 @@
             <p><p>Runs a 32-bit PowerShell process, return the $PSVersionTable from that process.</p>
 </p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 3</h2>
             <pre><code>Invoke-PowerShell -Command { $PSVersionTable } -Runtime v4.0</code></pre>
-            <p><p>Runs a separate PowerShell process under the v4.0 .NET CLR, returning the $PSVersionTable from that process.  Should return a CLRVersion of 4.0.</p>
+            <p><p>Runs a separate PowerShell process under the v4.0 .NET CLR, returning the $PSVersionTable from that process.  Should return a CLRVersion of <code>4.0</code>.</p>
 </p><p></p><p></p><p></p><p></p>
 </body>
 </html>   

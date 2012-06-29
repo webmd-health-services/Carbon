@@ -162,23 +162,22 @@ function Invoke-PowerShell
     Invokes a script block in a separate powershell.exe process.
     
     .DESCRIPTION
-    The invoked PowerShell process can run under the .NET 4.0 CLR (using v4.0 as the value to the Runtime parameter) and under 32-bit PowerShell (by passing the x86 switch).
-    
+    The invoked PowerShell process can run under the .NET 4.0 CLR (using `v4.0` as the value to the Runtime parameter) and under 32-bit PowerShell (using the `x86` switch).
     
     .EXAMPLE
-    > Invoke-PowerShell -Command { $PSVersionTable }
+    Invoke-PowerShell -Command { $PSVersionTable }
     
     Runs a separate PowerShell process, returning the $PSVersionTable from that process.
     
     .EXAMPLE
-    > Invoke-PowerShell -Command { $PSVersionTable } -x86
+    Invoke-PowerShell -Command { $PSVersionTable } -x86
     
     Runs a 32-bit PowerShell process, return the $PSVersionTable from that process.
     
     .EXAMPLE
-    > Invoke-PowerShell -Command { $PSVersionTable } -Runtime v4.0
+    Invoke-PowerShell -Command { $PSVersionTable } -Runtime v4.0
     
-    Runs a separate PowerShell process under the v4.0 .NET CLR, returning the $PSVersionTable from that process.  Should return a CLRVersion of 4.0.
+    Runs a separate PowerShell process under the v4.0 .NET CLR, returning the $PSVersionTable from that process.  Should return a CLRVersion of `4.0`.
     #>
     [CmdletBinding()]
     param(
@@ -197,7 +196,7 @@ function Invoke-PowerShell
         
         [string]
         [ValidateSet('v2.0','v4.0')]
-        # The CLR to use.  Must be one of v2.0 or v4.0.  Defualt is v2.0.
+        # The CLR to use.  Must be one of v2.0 or v4.0.  Default is v2.0.
         $Runtime = 'v2.0'
     )
     
