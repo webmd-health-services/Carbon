@@ -16,7 +16,24 @@ function Add-GroupMembers
 {
     <#
     .SYNOPSIS
-    Adds a users or groups to a  group.
+    Adds a users or groups to a *local* group.
+
+    .DESCRIPTION
+    You would think it's pretty easy and straight-forward to add users/groups to a local group, but you would be wrong.  The quick solution is to use `net localgroup`, but that won't accept user/group names longer than 24 characters.  This means you have to use the .NET Directory Services APIs.  How do you reliably add both users *and* groups?  What if those users are in a domain?  What if they're in another domain?  What about built-in users?  Fortunately, you're brain hasn't exploded.
+
+    So, this function adds users and groups to a *local* group.
+
+    If the members are already part of the group, nothing happens.
+
+    .EXAMPLE
+    Add-GroupMembers -Name Administrators -Members EMPIRE\DarthVader,EMPIRE\EmperorPalpatine,REBELS\LSkywalker
+
+    Adds Darth Vader, Emperor Palpatine and Luke Skywalker to the local administrators group.
+
+    .EXAMPLE
+    Add-GroupMembers -Name TieFighters -Members NetworkService
+
+    Adds the local NetworkService account to the local TieFighters group.
     #>
     [CmdletBinding(SupportsShouldProcess=$true)]
     param(

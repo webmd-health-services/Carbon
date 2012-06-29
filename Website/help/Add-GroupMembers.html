@@ -187,13 +187,21 @@
 
 
     <h1>Add-GroupMembers</h1>
-    <div><p>Adds a users or groups to a  group.</p>
+    <div><p>Adds a users or groups to a <em>local</em> group.</p>
 </div>
 
         <h2>Syntax</h2>
     <pre class="Syntax"><code>Add-GroupMembers [-Name] &lt;String&gt; [-Members] &lt;String[]&gt; [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
     
-    
+        <h2>Description</h2>
+    <div class="Description">
+        <p>You would think it's pretty easy and straight-forward to add users/groups to a local group, but you would be wrong.  The quick solution is to use <code>net localgroup</code>, but that won't accept user/group names longer than 24 characters.  This means you have to use the .NET Directory Services APIs.  How do you reliably add both users <em>and</em> groups?  What if those users are in a domain?  What if they're in another domain?  What about built-in users?  Fortunately, you're brain hasn't exploded.</p>
+
+<p>So, this function adds users and groups to a <em>local</em> group.</p>
+
+<p>If the members are already part of the group, nothing happens.</p>
+
+    </div>
     
     
 
@@ -257,6 +265,12 @@
         
     
         
-    
+                <h2>EXAMPLE 1</h2>
+            <pre><code>Add-GroupMembers -Name Administrators -Members EMPIRE\DarthVader,EMPIRE\EmperorPalpatine,REBELS\LSkywalker</code></pre>
+            <p><p>Adds Darth Vader, Emperor Palpatine and Luke Skywalker to the local administrators group.</p>
+</p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 2</h2>
+            <pre><code>Add-GroupMembers -Name TieFighters -Members NetworkService</code></pre>
+            <p><p>Adds the local NetworkService account to the local TieFighters group.</p>
+</p><p></p><p></p><p></p><p></p>
 </body>
 </html>   

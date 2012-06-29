@@ -8,6 +8,7 @@
   * [Remove-Service](http://get-carbon.org/help/Remove-Service.html)
   * [Restart-RemoteService](http://get-carbon.org/help/Restart-RemoteService.html)
   * [Install-Share](http://get-carbon.org/help/Install-Share.html)
+  * [Add-GroupMembers](http://get-carbon.org/help/Add-GroupMembers.html)
   
 # 0.2.5 (29 June 2012)
 
