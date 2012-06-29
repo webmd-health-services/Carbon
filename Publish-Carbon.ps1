@@ -78,6 +78,7 @@ try
 
         & $zipAppPath a $carbonZipFileName .\Carbon
         & $zipAppPath a $carbonZipFileName .\Website
+        & $zipAppPath a $carbonZipFileName .\Examples
         & $zipAppPath a $carbonZipFileName $licenseFileName
         & $zipAppPath a $carbonZipFileName $releaseNotesFileName
     }
