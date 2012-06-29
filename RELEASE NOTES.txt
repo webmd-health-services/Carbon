@@ -22,6 +22,7 @@
   * [Assert-FirewallConfigurable](http://get-carbon.org/help/Assert-FirewallConfigurable.html)
   * [Disable-FirewallStatefulFtp](http://get-carbon.org/help/Disable-FirewallStatefulFtp.html)
   * [Enable-FirewallStatefulFtp](http://get-carbon.org/help/Enable-FirewallStatefulFtp.html)
+  * [Get-FirewallRules](http://get-carbon.org/help/Get-FirewallRules.html)
 
 # 0.2.5 (29 June 2012)
 

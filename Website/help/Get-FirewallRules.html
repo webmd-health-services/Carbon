@@ -215,9 +215,8 @@ object contains the following properties:</p>
 
 <p>This data is parsed from the output of:</p>
 
-<blockquote>
-  <p>netsh advfirewall firewall show rule name=all.</p>
-</blockquote>
+<pre><code>netsh advfirewall firewall show rule name=all.
+</code></pre>
 
     </div>
     
@@ -231,6 +230,36 @@ object contains the following properties:</p>
         
     
         
-    
+                <h2>EXAMPLE 1</h2>
+            <pre><code>Get-FirewallRules</code></pre>
+            <p><p>Here's a sample of the output:</p>
+
+<pre><code>EdgeTraversal : Defer to application
+Grouping      : Remote Assistance
+Action        : Allow
+RemotePort    : Any
+RemoteIP      : Any
+LocalIP       : Any
+Name          : Remote Assistance (PNRP-In)
+Direction     : In
+Profiles      : Domain,Private
+LocalPort     : 3540
+Protocol      : UDP
+Enabled       : True
+
+EdgeTraversal : No
+Grouping      : Remote Assistance
+Action        : Allow
+RemotePort    : Any
+RemoteIP      : Any
+LocalIP       : Any
+Name          : Remote Assistance (PNRP-Out)
+Direction     : Out
+Profiles      : Domain,Private
+LocalPort     : Any
+Protocol      : UDP
+Enabled       : True
+</code></pre>
+</p><p></p><p></p><p></p><p></p>
 </body>
 </html>   

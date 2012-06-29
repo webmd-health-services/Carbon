@@ -133,7 +133,39 @@ function Get-FirewallRules
     
     This data is parsed from the output of:
     
-      > netsh advfirewall firewall show rule name=all.
+        netsh advfirewall firewall show rule name=all.
+
+    .EXAMPLE
+    Get-FirewallRules
+
+    Here's a sample of the output:
+
+        EdgeTraversal : Defer to application
+        Grouping      : Remote Assistance
+        Action        : Allow
+        RemotePort    : Any
+        RemoteIP      : Any
+        LocalIP       : Any
+        Name          : Remote Assistance (PNRP-In)
+        Direction     : In
+        Profiles      : Domain,Private
+        LocalPort     : 3540
+        Protocol      : UDP
+        Enabled       : True
+
+        EdgeTraversal : No
+        Grouping      : Remote Assistance
+        Action        : Allow
+        RemotePort    : Any
+        RemoteIP      : Any
+        LocalIP       : Any
+        Name          : Remote Assistance (PNRP-Out)
+        Direction     : Out
+        Profiles      : Domain,Private
+        LocalPort     : Any
+        Protocol      : UDP
+        Enabled       : True
+
     #>
     param()
     
