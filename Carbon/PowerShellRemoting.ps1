@@ -62,6 +62,21 @@ function Get-TrustedHosts
     <#
     .SYNOPSIS
     Returns the current computer's trusted hosts list.
+
+    .DESCRIPTION
+    PowerShell stores its trusted hosts list as a comma-separated list of hostnames in the `WSMan` drive.  That's not very useful.  This function reads that list, splits it, and returns each item.
+
+    .OUTPUTS
+    System.String.
+
+    .EXAMPLE
+    Get-TrustedHosts
+
+    If the trusted hosts lists contains `example.com`, `api.example.com`, and `docs.example.com`, returns the following:
+
+        example.com
+        api.example.com
+        docs.example.com
     #>
     $trustedHosts = (Get-Item WSMan:\localhost\Client\TrustedHosts -Force).Value 
     if( -not $trustedHosts )
