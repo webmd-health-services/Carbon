@@ -16,7 +16,8 @@
   * [Test-User](http://get-carbon.org/help/Test-User.html)
   * [Install-WindowsFeatureIis](http://get-carbon.org/help/Install-WindowsFeatureIis.html)
   * [Install-WindowsFeatureMsmq](http://get-carbon.org/help/Install-WindowsFeatureMsmq.html)
-  
+  * [Install-WindowsFeatures](http://get-carbon.org/help/Install-WindowsFeatures.html)
+
 # 0.2.5 (29 June 2012)
 
 ## Enhancements

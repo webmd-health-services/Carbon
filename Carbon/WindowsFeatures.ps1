@@ -128,18 +128,41 @@ else
         <#
         .SYNOPSIS
         Installs an optional Windows component/feature.
+
         .DESCRIPTION
-        This function will install Windows features.  Note that the name of these features can differ between different versions of Windows.  
-        If on Windows 2008, run `servermanagercmd.exe -q` for a list.  On Windows 7, run `Get-WmiObject -Class Win32_OptionalFeature`.
-        
-        This function should be considered an internal, private function.  It would be best to use one of the feature-specifc Install-WindowsFeature* 
+        This function will install Windows features.  Note that the name of these features can differ between different versions of Windows.
+
+        On Windows 2008, run the following for a list:
+
+            servermanagercmd.exe -q  
+
+        On Windows7 (and maybe Windows Server 2008 R2), run:
+
+            Get-WmiObject -Class Win32_OptionalFeature
+
+        This function should be considered an internal, private function.  It would be best to use one of the feature-specifc `Install-WindowsFeature*` 
         functions.  These are designed to be Windows-version agnostic.
+
+        .EXAMPLE
+        Install-WindowsFeatures -Features MSMQ-SERVER
+
+        Installs MSMQ.
+
+        .EXAMPLE
+        Install-WindowsFeatures -Features IIS-WebServer
+
+        Installs IIS on Windows 7/Server 2008 R2.
+
+        .EXAMPLE
+        Install-WindowsFeatures -Features Web-WebServer
+
+        Installs IIS on Windows 2008.
         #>
         [CmdletBinding(SupportsShouldProcess=$true)]
         param(
             [Parameter(Mandatory=$true)]
             [string[]]
-            # The components to enable/install.  If on Windows 2008, run `servermanagercmd.exe -q` for a list.  On Windows 7, run `Get-WmiObject -Class Win32_OptionalFeature`.
+            # The components to enable/install.  Feature names are case-sensitive.  If on Windows 2008, run `servermanagercmd.exe -q` for a list.  On Windows 7/Server 2008 R2, run `Get-WmiObject -Class Win32_OptionalFeature`.
             $Features
         )
         
