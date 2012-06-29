@@ -19,11 +19,23 @@ Packages and publishes Carbon packages.
 
 [CmdletBinding()]
 param(
+    [Parameter(ParameterSetName='All')]
+    [Switch]
+    $All,
+    
+    [Parameter(ParameterSetName='Some')]
+    [Switch]
+    $Package
 )
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 $PSScriptRoot = Split-Path -Parent $MyInvocation.MyCommand.Definition
+
+if( $pscmdlet.ParameterSetName -eq 'Some' )
+{
+    $All = $false
+}
 
 $licenseFileName = 'LICENSE.txt'
 
@@ -38,9 +50,15 @@ if( $releaseNotes[0] -notmatch "^\# (\d+\.\d+\.\d+)\s*" )
 }
 $version = [Version]$matches[1]
 $releaseNotes[0] = "# $version ($((Get-Date).ToString("d MMMM yyyy")))"
-$releaseNotes | Out-File -FilePath $releaseNotesPath -Encoding OEM
+if( $All )
+{
+    $releaseNotes | Out-File -FilePath $releaseNotesPath -Encoding OEM
+}
 
-Copy-Item (Join-Path $PSScriptRoot LICENSE.txt -Resolve) (Join-Path $PSScriptRoot Carbon\ -Resolve)
+if( $All -or $Package )
+{
+    Copy-Item (Join-Path $PSScriptRoot LICENSE.txt -Resolve) (Join-Path $PSScriptRoot Carbon\ -Resolve)
+}
 
 $carbonZipFileName = "Carbon-$version.zip"
 $zipAppPath = Join-Path $PSScriptRoot Tools\7-Zip\7za.exe -Resolve
@@ -48,17 +66,27 @@ $zipAppPath = Join-Path $PSScriptRoot Tools\7-Zip\7za.exe -Resolve
 Push-Location $PSScriptRoot
 try
 {
-    if( Test-Path $carbonZipFileName -PathType Leaf )
+    if( $All -or $Package )
     {
-        Remove-Item $carbonZipFileName
-    }
+        Write-Host "Updating help."
+        .\Out-Html.ps1 -OutputDir .\Website\help
+        
+        if( Test-Path $carbonZipFileName -PathType Leaf )
+        {
+            Remove-Item $carbonZipFileName
+        }
 
-    & $zipAppPath a $carbonZipFileName .\Carbon
-    & $zipAppPath a $carbonZipFileName $licenseFileName
-    & $zipAppPath a $carbonZipFileName $releaseNotesFileName
-    
-    hg commit -m "Adding release date for version $version to $releaseNotesFileName." $releaseNotesFileName
-    hg tag $version
+        & $zipAppPath a $carbonZipFileName .\Carbon
+        & $zipAppPath a $carbonZipFileName .\Website
+        & $zipAppPath a $carbonZipFileName $licenseFileName
+        & $zipAppPath a $carbonZipFileName $releaseNotesFileName
+    }
+     
+    if( $All )
+    {   
+        hg commit -m "Releasing version $version." $releaseNotesFileName
+        hg tag $version
+    }
 }
 finally
 {

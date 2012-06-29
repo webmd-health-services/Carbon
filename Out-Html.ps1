@@ -31,7 +31,7 @@ param(
     $OutputDir = "./help"
 )
 
-#Set-StrictMode -Version Latest
+Set-StrictMode -Off
 $PSScriptRoot = Split-Path $MyInvocation.MyCommand.Definition
 
 if( (Get-Module Carbon) )
