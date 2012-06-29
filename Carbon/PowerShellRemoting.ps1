@@ -92,11 +92,18 @@ function Set-TrustedHosts
 {
     <#
     .SYNOPSIS
-    Sets the current computer's trusted hosts list.  Overwrites the existing list.
+    Sets the current computer's trusted hosts list.
+
+    .DESCRIPTION
+    Clears the current trusted hosts list, and sets it to contain only the entries given by the `Entries` parameter.
+
+    .EXAMPLE
+    Set-TrustedHosts example.com,api.example.com,docs.example.com
+
+    Sets the trusted hosts list to contain just the values `example.com`, `api.example.com`, and `docs.example.com`.
     #>
-    [CmdletBinding(SupportsShouldProcess=$true)]
+    [CmdletBinding()]
     param(
-        [Parameter()]
         [string[]]
         # An array of trusted host entries.
         $Entries = @()
