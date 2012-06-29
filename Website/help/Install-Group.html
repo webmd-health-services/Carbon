@@ -187,13 +187,17 @@
 
 
     <h1>Install-Group</h1>
-    <div><p>Creates a new local group.</p>
+    <div><p>Creates a new local group, or updates the settings for an existing group.</p>
 </div>
 
         <h2>Syntax</h2>
     <pre class="Syntax"><code>Install-Group [-Name] &lt;String&gt; [[-Description] &lt;String&gt;] [[-Members] &lt;String[]&gt;] [&lt;CommonParameters&gt;]</code></pre>
     
-    
+        <h2>Description</h2>
+    <div class="Description">
+        <p>Creates a new group with a description and default set of members.  If a group with the same name already exists, it updates the group's description and adds the given members to it.</p>
+
+    </div>
     
     
 
@@ -243,6 +247,9 @@
         
     
         
-    
+                <h2>EXAMPLE 1</h2>
+            <pre><code>Install-Group -Name TIEFighters -Description 'Users allowed to be TIE fighter pilots.' -Members EMPIRE\Pilots,EMPIRE\DarthVader</code></pre>
+            <p><p>If the TIE fighters group doesn't exist, it is created with the given description and default members.  If it already exists, its description is updated and the given members are added to it.</p>
+</p><p></p><p></p><p></p><p></p>
 </body>
 </html>   

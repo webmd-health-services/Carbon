@@ -181,7 +181,15 @@ function Install-Group
 {
     <#
     .SYNOPSIS
-    Creates a new local group.
+    Creates a new local group, or updates the settings for an existing group.
+
+    .DESCRIPTION
+    Creates a new group with a description and default set of members.  If a group with the same name already exists, it updates the group's description and adds the given members to it.
+
+    .EXAMPLE
+    Install-Group -Name TIEFighters -Description 'Users allowed to be TIE fighter pilots.' -Members EMPIRE\Pilots,EMPIRE\DarthVader
+
+    If the TIE fighters group doesn't exist, it is created with the given description and default members.  If it already exists, its description is updated and the given members are added to it.
     #>
     param(
         [Parameter(Mandatory=$true)]
