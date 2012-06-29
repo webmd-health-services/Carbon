@@ -95,7 +95,7 @@ filter Convert-HelpToHtml
     )
 
     $name = $CommandHelp.Name #| Format-ForHtml
-    $synopsis = $CommandHelp.Synopsis #| Format-ForHtml
+    $synopsis = $CommandHelp.Synopsis | Convert-MarkdownToHtml
     $syntax = $CommandHelp.Syntax | Out-HtmlString | Format-ForHtml | ForEach-Object { $_ -split "`n" }
     if( $syntax )
     {
