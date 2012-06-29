@@ -19,6 +19,7 @@ function SetUp
 {
     Import-Module (Join-Path $TestDir ..\..\Carbon -Resolve) -Force
     Remove-TestSite
+    Grant-Permissions -Identity Everyone -Permissions ReadAndExecute -Path $TestDir
 }
 
 function TearDown
@@ -69,14 +70,14 @@ function Test-ShouldCreateWebsite
 
 function Test-ShouldCreateWebsiteWithCustomBinding
 {
-    Invoke-NewWebsite -Bindings 'http://*:9876'
+    Invoke-NewWebsite -Bindings 'http/*:9876:'
     Wait-ForWebsiteToBeRunning
     Assert-WebsiteRunning 9876
 }
 
 function Test-ShouldCreateWebsiteWithMultipleBindings
 {
-    Invoke-NewWebsite -Bindings 'http://*:9876','http://*:9877'
+    Invoke-NewWebsite -Bindings 'http/*:9876:','http/*:9877:'
     Wait-ForWebsiteToBeRunning
     Assert-WebsiteRunning 9876
     Assert-WebsiteRunning 9877
@@ -101,7 +102,7 @@ function Test-ShouldAddSiteToCustomAppPool
 
 function Test-ShouldRemoveExistingSite
 {
-    Invoke-NewWebsite -Bindings 'http://*:9876'
+    Invoke-NewWebsite -Bindings 'http/*:9876:'
     $output = Invoke-AppCmd list site `"$SiteName`"
     Assert-Match $output 'http/\*:9876' "Custom binding not set."
     
@@ -130,6 +131,31 @@ function Test-ShouldCreateSiteDirectory
             $null = Remove-Item $websitePath -Force
         }
     }
+}
+
+function Test-ShouldValidateBindings
+{
+    $error.Clear()
+    Install-IisWebsite -Name $SiteName -Path $TestDir -Bindings 'http/*:80' -ErrorAction SilentlyContinue
+    Assert-True ($error.Count -ge 1)
+    Assert-False (Test-IisWebsiteExists -Name $SiteName)
+    Assert-True $error[0].Exception.Message -like '*bindings are invalid*'
+}
+
+function Test-ShouldAllowUrlBindings
+{
+    Install-IisWebsite -Name $SiteName -Path $TestDir -Bindings 'http://*:9876'
+    Assert-True (Test-IisWebsiteExists -Name $SiteName)
+    Assert-WebsiteRunning 9876
+}
+
+function Test-ShouldAllowHttpsBindings
+{
+    Install-IisWebsite -Name $SiteName -Path $TestDir -Bindings 'https/*:9876:','https://*:9443'
+    Assert-True (Test-IisWebsiteExists -Name $SiteName)
+    $bindings = Get-IisWebsite -SiteName $SiteName | Select-Object -ExpandProperty Bindings
+    Assert-Equal 'https' $bindings[0].Protocol
+    Assert-Equal 'https' $bindings[1].Protocol
 }
 
 function Assert-WebsiteRunning($port)

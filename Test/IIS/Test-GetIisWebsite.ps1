@@ -35,7 +35,7 @@ function Test-ShouldReturnNullForNonExistentWebsite
 function Test-ShouldGetWebsiteDetails
 {
     $siteName = 'Carbon-Get-IisWebsite'
-    $bindings = @( 'http/*:8401:', 'https/*:8401:', 'http/1.2.3.4:80', "http/5.6.7.8:80:$siteName" )
+    $bindings = @( 'http/*:8401:', 'https/*:8401:', 'http/1.2.3.4:80:', "http/5.6.7.8:80:$siteName" )
     Install-IisWebsite -Name $siteName -Bindings $bindings -Path $TestDir -AppPoolName $appPoolName
     
     $website = Get-IisWebsite -SiteName $siteName

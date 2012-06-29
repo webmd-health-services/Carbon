@@ -423,17 +423,17 @@ function Install-IisWebsite
 
     By default, the site listens on all IP addresses on port 80.  Set custom bindings with the `Bindings` argument.  Multiple bindings are allowed.  Each binding must be in this format (in BNF):
 
-        <PROTOCOL> '/' <IP_ADDRESS> ':' <PORT> [ ':' <HOSTNAME> ]
+        <PROTOCOL> '/' <IP_ADDRESS> ':' <PORT> ':' [ <HOSTNAME> ]
 
      * `PROTOCOL` is one of `http` or `https`.
      * `IP_ADDRESS` is a literal IP address, or `*` for all of the computer's IP addresses.  This function does not validate if `IPADDRESS` is actually in use on the computer.
      * `PORT` is the port to listen on.
-     * `HOSTNAME` is the website's hostname, for name-based hosting.  If no hostname is being used, leave off the last `: HOSTNAME` part.
+     * `HOSTNAME` is the website's hostname, for name-based hosting.  If no hostname is being used, leave off the `HOSTNAME` part.
 
     Valid bindings are:
 
-     * http/*:80
-     * https/10.2.3.4:443
+     * http/*:80:
+     * https/10.2.3.4:443:
      * http/*:80:example.com
 
     .EXAMPLE
@@ -442,7 +442,7 @@ function Install-IisWebsite
     Creates a website named `Peanuts` serving files out of the `C:\Peanuts.com` directory.  The website listens on all the computer's IP addresses on port 80.
 
     .EXAMPLE
-    Install-IisWebsite -Name 'Peanuts' -Path C:\Peanuts.com -Bindings 'http/*:80:peanuts.com'
+    Install-IisWebsite -Name 'Peanuts' -Path C:\Peanuts.com -Bindings 'http/*:80:peanuts.com:'
 
     Creates a website named `Peanuts` which uses name-based hosting to respond to all requests to any of the machine's IP addresses for the `peanuts.com` domain.
 
@@ -470,7 +470,7 @@ function Install-IisWebsite
         #  * Protocol should be http or https. 
         #  * IPAddress can be a literal IP address or `*`, which means all of the computer's IP addresses.  This function does not validate if `IPAddress` is actually in use on this computer.
         #  * Leave hostname blank for non-named websites.
-        $Bindings = @('http/*:80'),
+        $Bindings = @('http/*:80:'),
         
         [string]
         # The name of the app pool under which the website runs.  The app pool must exist.  If not provided, IIS picks one for you.  No whammy, no whammy!
@@ -486,6 +486,17 @@ function Install-IisWebsite
     if( -not (Test-Path $Path -PathType Container) )
     {
         $null = New-Item $Path -ItemType Directory -Force
+    }
+    
+    $invalidBindings = $Bindings | 
+                           Where-Object { $_ -notmatch '^http(s)?/(\*|[\d\.]+):\d+:(.*)$' } |
+                           Where-Object { $_ -notmatch '^http(s)?://(\*|[\d\.]+):\d+(:.*)?$' }
+    if( $invalidBindings )
+    {
+        $invalidBindings = $invalidBindings -join "`n`t"
+        $errorMsg = "The following bindings are invalid.  The correct format is protocol/IPAddress:Port:Hostname.  IP address can be * for all IP addresses.  Hostname is optional.`n`t{0}" -f $invalidBindings
+        Write-Error $errorMsg
+        return
     }
     
     $bindingsArg = $Bindings -join ','
