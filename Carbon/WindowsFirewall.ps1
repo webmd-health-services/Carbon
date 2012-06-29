@@ -56,7 +56,7 @@ function Disable-FirewallStatefulFtp
 
     .EXAMPLE
     Disable-FirewallStatefulFtp
-    
+
     Disables the `StatefulFtp` Windows firewall setting.
     #>
     [CmdletBinding(SupportsShouldProcess=$true)]
@@ -76,6 +76,23 @@ function Disable-FirewallStatefulFtp
 
 function Enable-FirewallStatefulFtp
 {
+    <#
+    .SYNOPSIS
+    Enables the `StatefulFtp` Windows firewall setting.
+
+    .DESCRIPTION
+    Uses the `netsh` command to enable the `StatefulFtp` Windows firewall setting.
+
+    If the firewall isn't configurable, writes an error and returns without making any changes.
+
+    .LINK
+    Assert-FirewallConfigurable
+
+    .EXAMPLE
+    Enable-FirewallStatefulFtp
+    
+    Enables the `StatefulFtp` Windows firewall setting.
+    #>
     [CmdletBinding(SupportsShouldProcess=$true)]
     param()
     
