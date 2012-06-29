@@ -74,19 +74,20 @@ function Find-ADUser
     <#
     .SYNOPSIS
     Finds a user in Active Directory.
+
+    .DESCRIPTION
+    Searches the Active Directory domain given by `DomainUrl` for a user whose `sAMAccountName` matches the `sAMAccountName` passed in.  Returns the `DirectoryEntry` object for that user.
     
     .OUTPUTS
-    System.DirectoryServices.DirectoryEntry.  The directory entry object of the
-    user's account in Active Directory or `$null` if the user isn't found.
-    
-    .EXAMPLE
-    > Find-ADUser -DomainUrl LDAP://dc.example.com:389 -sAMAccountName $env:USERNAME
-    
-    Finds the AD user whose Windows username (sAMAccountName) is equal to the 
-    currently logged on user's username.
+    System.DirectoryServices.DirectoryEntry.  The directory entry object of the user's account in Active Directory or `$null` if the user isn't found.
     
     .LINK
     http://msdn.microsoft.com/en-us/library/aa746475.aspx
+    
+    .EXAMPLE
+    Find-ADUser -DomainUrl LDAP://dc.example.com:389 -sAMAccountName $env:USERNAME
+    
+    Finds the AD user whose Windows username (sAMAccountName) is equal to thecurrently logged on user's username.
     #>
     [CmdletBinding()]
     param(
@@ -134,6 +135,13 @@ function Format-ADSpecialCharacters
     
     .LINK
     http://msdn.microsoft.com/en-us/library/aa746475.aspx#special_characters
+
+    .EXAMPLE
+    Format-ADSpecialCharacters -String "I have AD special characters (I think)."
+
+    Returns 
+
+        I have AD special characters \28I think\29.
     #>
     [CmdletBinding()]
     param(

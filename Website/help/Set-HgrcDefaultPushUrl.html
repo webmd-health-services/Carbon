@@ -200,11 +200,6 @@
 <pre><code>Set-IniEntry -Path (Join-Path $RepoPath .hg\hgrc -Resolve) -Section paths -Name 'default-push' -Value $DefaultPushUrl
 </code></pre>
 
-<p>EXAMPLE
-Set-IniEntry -Path (Join-Path $RepoPath .hg\hgrc -Resolve) -Section paths -Name 'default-push' -Value $DefaultPushUrl</p>
-
-<p>This example shows how to use <code>Set-IniEntry</code> instead of <code>Set-HgrcDefaultPushUrl</code>.</p>
-
     </div>
     
     
@@ -269,6 +264,9 @@ Set-IniEntry -Path (Join-Path $RepoPath .hg\hgrc -Resolve) -Section paths -Name 
         
     
         
-    
+                <h2>EXAMPLE 1</h2>
+            <pre><code>Set-IniEntry -Path (Join-Path $RepoPath .hg\hgrc -Resolve) -Section paths -Name 'default-push' -Value $DefaultPushUrl</code></pre>
+            <p><p>This example shows how to use <code>Set-IniEntry</code> instead of <code>Set-HgrcDefaultPushUrl</code>.</p>
+</p><p></p><p></p><p></p><p></p>
 </body>
 </html>   

@@ -23,7 +23,7 @@ function Set-HgrcDefaultPushUrl
 
         Set-IniEntry -Path (Join-Path $RepoPath .hg\hgrc -Resolve) -Section paths -Name 'default-push' -Value $DefaultPushUrl
 
-    EXAMPLE
+    .EXAMPLE
     Set-IniEntry -Path (Join-Path $RepoPath .hg\hgrc -Resolve) -Section paths -Name 'default-push' -Value $DefaultPushUrl
 
     This example shows how to use `Set-IniEntry` instead of `Set-HgrcDefaultPushUrl`.

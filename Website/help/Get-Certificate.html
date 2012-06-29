@@ -187,8 +187,7 @@
 
 
     <h1>Get-Certificate</h1>
-    <div><p>Gets a certificate from a file on the file system or from a Windows 
-certificate store by thumbprint or friendly name.</p>
+    <div><p>Gets a certificate from a file on the file system or from a Windows certificate store by thumbprint or friendly name.</p>
 </div>
 
         <h2>Syntax</h2>
@@ -196,7 +195,11 @@ certificate store by thumbprint or friendly name.</p>
 <pre class="Syntax"><code>Get-Certificate -Path &lt;String&gt; [-Password &lt;Object&gt;] [&lt;CommonParameters&gt;]</code></pre>
 <pre class="Syntax"><code>Get-Certificate -Thumbprint &lt;String&gt; -StoreLocation {CurrentUser | LocalMachine} -StoreName {AddressBook | AuthRoot | CertificateAuthority | Disallowed | My | Root | TrustedPeople | TrustedPublisher} [&lt;CommonParameters&gt;]</code></pre>
     
-    
+        <h2>Description</h2>
+    <div class="Description">
+        <p>Certificates can be files or they can be in a Windows certificate store.  This function returns an <code>X509Certificate2</code> object for a script that's a file on the file system or a cert stored in Microsoft's certificate store.  You can get a certificate from a certificate store with its unique thumbprint or its friendly name.  Friendly names are <em>not</em> required to be unique, so you may get multiple certificates when using that search method.</p>
+
+    </div>
     
     
 
@@ -270,8 +273,7 @@ certificate store by thumbprint or friendly name.</p>
     
         
             <h2>Return Values</h2>
-        <p><a href="http://msdn.microsoft.com/en-us/library/system.security.cryptography.x509certificates.x509certificate2.aspx">System.Security.Cryptography.X509Certificates.X509Certificate2</a>.  The 
- X509Certificate2 certificates that were found, or <code>$null</code>.</p>
+        <p><a href="http://msdn.microsoft.com/en-us/library/system.security.cryptography.x509certificates.x509certificate2.aspx">System.Security.Cryptography.X509Certificates.X509Certificate2</a>.  The X509Certificate2 certificates that were found, or <code>$null</code>.</p>
 
         
     
@@ -281,12 +283,10 @@ certificate store by thumbprint or friendly name.</p>
             <p><p>Gets an X509Certificate2 object representing the certificate.cer file.</p>
 </p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 2</h2>
             <pre><code>Get-Certificate -Thumbprint a909502dd82ae41433e6f83886b00d4277a32a7b -StoreName My -StoreLocation LocalMachine</code></pre>
-            <p><p>Gets an X509Certificate2 object for the certificate in the Personal store 
-with a specific thumbprint under the Local Machine.</p>
+            <p><p>Gets an X509Certificate2 object for the certificate in the Personal store with a specific thumbprint under the Local Machine.</p>
 </p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 3</h2>
             <pre><code>Get-Certificate -FriendlyName 'Development Certificate' -StoreLocation CurrentUser -StoreName TrustedPeople</code></pre>
-            <p><p>Gets the X509Certificate2 whose friendly name is Development Certificate 
-from the Current User's Trusted People certificate store.</p>
+            <p><p>Gets the X509Certificate2 whose friendly name is Development Certificate from the Current User's Trusted People certificate store.</p>
 </p><p></p><p></p><p></p><p></p>
 </body>
 </html>   

@@ -193,7 +193,11 @@
         <h2>Syntax</h2>
     <pre class="Syntax"><code>Find-ADUser -DomainUrl &lt;String&gt; -sAMAccountName &lt;String&gt; [&lt;CommonParameters&gt;]</code></pre>
     
-    
+        <h2>Description</h2>
+    <div class="Description">
+        <p>Searches the Active Directory domain given by <code>DomainUrl</code> for a user whose <code>sAMAccountName</code> matches the <code>sAMAccountName</code> passed in.  Returns the <code>DirectoryEntry</code> object for that user.</p>
+
+    </div>
     
             <h2>Related Commands</h2>
         <ul>
@@ -236,16 +240,14 @@ characters are escaped.
     
         
             <h2>Return Values</h2>
-        <p><a href="http://msdn.microsoft.com/en-us/library/system.directoryservices.directoryentry.aspx">System.DirectoryServices.DirectoryEntry</a>.   The directory entry object of the
- user's account in Active Directory or <code>$null</code> if the user isn't found.</p>
+        <p><a href="http://msdn.microsoft.com/en-us/library/system.directoryservices.directoryentry.aspx">System.DirectoryServices.DirectoryEntry</a>.   The directory entry object of the user's account in Active Directory or <code>$null</code> if the user isn't found.</p>
 
         
     
         
                 <h2>EXAMPLE 1</h2>
             <pre><code>Find-ADUser -DomainUrl LDAP://dc.example.com:389 -sAMAccountName $env:USERNAME</code></pre>
-            <p><p>Finds the AD user whose Windows username (sAMAccountName) is equal to the 
-currently logged on user's username.</p>
+            <p><p>Finds the AD user whose Windows username (sAMAccountName) is equal to thecurrently logged on user's username.</p>
 </p><p></p><p></p><p></p><p></p>
 </body>
 </html>   

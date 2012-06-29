@@ -16,29 +16,29 @@ function Get-Certificate
 {
     <#
     .SYNOPSIS
-    Gets a certificate from a file on the file system or from a Windows 
-    certificate store by thumbprint or friendly name.
+    Gets a certificate from a file on the file system or from a Windows certificate store by thumbprint or friendly name.
+
+    .DESCRIPTION
+    Certificates can be files or they can be in a Windows certificate store.  This function returns an `X509Certificate2` object for a script that's a file on the file system or a cert stored in Microsoft's certificate store.  You can get a certificate from a certificate store with its unique thumbprint or its friendly name.  Friendly names are *not* required to be unique, so you may get multiple certificates when using that search method.
     
+    .OUTPUTS
+    System.Security.Cryptography.x509Certificates.X509Certificate2. The X509Certificate2 certificates that were found, or `$null`.
+
     .EXAMPLE
-    > Get-Certificate -Path C:\Certificates\certificate.cer -Password MySuperSecurePassword
+    Get-Certificate -Path C:\Certificates\certificate.cer -Password MySuperSecurePassword
     
     Gets an X509Certificate2 object representing the certificate.cer file.
     
     .EXAMPLE
-    > Get-Certificate -Thumbprint a909502dd82ae41433e6f83886b00d4277a32a7b -StoreName My -StoreLocation LocalMachine
+    Get-Certificate -Thumbprint a909502dd82ae41433e6f83886b00d4277a32a7b -StoreName My -StoreLocation LocalMachine
     
-    Gets an X509Certificate2 object for the certificate in the Personal store 
-    with a specific thumbprint under the Local Machine.
+    Gets an X509Certificate2 object for the certificate in the Personal store with a specific thumbprint under the Local Machine.
     
     .EXAMPLE
-    > Get-Certificate -FriendlyName 'Development Certificate' -StoreLocation CurrentUser -StoreName TrustedPeople
+    Get-Certificate -FriendlyName 'Development Certificate' -StoreLocation CurrentUser -StoreName TrustedPeople
     
-    Gets the X509Certificate2 whose friendly name is Development Certificate 
-    from the Current User's Trusted People certificate store.
+    Gets the X509Certificate2 whose friendly name is Development Certificate from the Current User's Trusted People certificate store.
     
-    .OUTPUTS
-    System.Security.Cryptography.x509Certificates.X509Certificate2. The 
-    X509Certificate2 certificates that were found, or `$null`.
     #>
     [CmdletBinding(DefaultParameterSetName='ByFriendlyName')]
     param(
@@ -106,6 +106,28 @@ function Get-Certificate
 
 function Get-CertificateStore
 {
+    <#
+    .SYNOPSIS
+    Gets an `X509CertificateStore` object for the given location and store name.
+
+    .DESCRIPTION
+    Returns an `X509Store` for a given store location and store name.  The store must exist.  Before being retured, it is opened for writing.  If you don't have permission to write to the store, you'll get an error.
+
+    If you just want to read a store, we recommend using PowerShell's `cert:` drive.
+
+    .OUTPUTS
+    Security.Cryptography.X509Certificates.X509Store.
+
+    .EXAMPLE
+    Get-CertificateStore -StoreLocation LocalMachine -StoreName My
+
+    Get the local computer's Personal certificate store.
+
+    .EXAMPLE
+    Get-CertificateStore -StoreLocation CurrentUser -StoreName Root
+
+    Get the current user's Trusted Root Certification Authorities certificate store.
+    #>
     [CmdletBinding()]
     param(
         [Parameter(Mandatory=$true)]

@@ -24,6 +24,11 @@
   * [Enable-FirewallStatefulFtp](http://get-carbon.org/help/Enable-FirewallStatefulFtp.html)
   * [Get-FirewallRules](http://get-carbon.org/help/Get-FirewallRules.html)
   * [Test-FirewallStatefulFtp](http://get-carbon.org/help/Test-FirewallStatefulFtp.html)
+  * [Find-ADUser](http://get-carbon.org/help/Find-ADUser.html)
+  * [Format-ADSpecialCharacters](http://get-carbon.org/help/Format-ADSpecialCharacters.html)
+  * [Get-Certificate](http://get-carbon.org/help/Get-Certificate.html)
+  * [Get-CertificateStore](http://get-carbon.org/help/Get-CertificateStore.html)
+  * [Set-HgrcDefaultPushUrl](http://get-carbon.org/help/Set-HgrcDefaultPushUrl.html)
 
 # 0.2.5 (29 June 2012)
 
