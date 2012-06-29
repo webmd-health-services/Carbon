@@ -287,6 +287,14 @@ function Remove-User
     <#
     .SYNOPSIS
     Removes a user from the local computer.
+
+    .DESCRIPTION
+    Removes a *local* user account.  If the account doesn't exist, nothing happens.
+
+    .EXAMPLE
+    Remove-User -Username WTarkin
+
+    Removes the `WTarkin` *local* user account.
     #>
     [CmdletBinding(SupportsShouldProcess=$true)]
     param(
