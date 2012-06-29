@@ -126,11 +126,24 @@ function Get-PowershellPath
     <#
     .SYNOPSIS
     Gets the path to powershell.exe.
+
+    .DESCRIPTION
+    Returns the path to the powershell.exe binary for the machine's default architecture (i.e. x86 or x64).  If you're on a x64 machine and want to get the path to x86 PowerShell, set the `x86` switch.
+
+    .EXAMPLE
+    Get-PowerShellPath
+
+    Returns the path to the version of PowerShell that matches the computer's architecture (i.e. x86 or x64).
+
+    .EXAMPLE
+    Get-PowerShellPath -x86
+
+    Returns the path to the x86 version of PowerShell.
     #>
     [CmdletBinding()]
     param(
         [Switch]
-        # Gets the path to 32-bit powershell.
+        # Gets the path to 32-bit PowerShell.
         $x86
     )
     

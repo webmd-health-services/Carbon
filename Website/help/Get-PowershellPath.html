@@ -192,7 +192,11 @@
         <h2>Syntax</h2>
     <pre class="Syntax"><code>Get-PowershellPath [-x86] [&lt;CommonParameters&gt;]</code></pre>
     
-    
+        <h2>Description</h2>
+    <div class="Description">
+        <p>Returns the path to the powershell.exe binary for the machine's default architecture (i.e. x86 or x64).  If you're on a x64 machine and want to get the path to x86 PowerShell, set the <code>x86</code> switch.</p>
+
+    </div>
     
     
 
@@ -209,7 +213,7 @@
             			<tr valign='top'>
 				<td>x86</td>
 				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
-				<td>Gets the path to 32-bit powershell.
+				<td>Gets the path to 32-bit PowerShell.
 </td>
 				<td>false</td>
 				<td>false</td>
@@ -224,6 +228,12 @@
         
     
         
-    
+                <h2>EXAMPLE 1</h2>
+            <pre><code>Get-PowerShellPath</code></pre>
+            <p><p>Returns the path to the version of PowerShell that matches the computer's architecture (i.e. x86 or x64).</p>
+</p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 2</h2>
+            <pre><code>Get-PowerShellPath -x86</code></pre>
+            <p><p>Returns the path to the x86 version of PowerShell.</p>
+</p><p></p><p></p><p></p><p></p>
 </body>
 </html>   
