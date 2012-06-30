@@ -1,4 +1,4 @@
-# 0.2.6 
+# 0.2.6 (30 June 2012)
 
 ## Enhancements
  * Improved documentation for:
