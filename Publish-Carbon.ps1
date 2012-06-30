@@ -85,7 +85,7 @@ try
      
     if( $All )
     {   
-        hg commit -m "Releasing version $version." $releaseNotesFileName
+        hg commit -m "Releasing version $version." $releaseNotesFileName .\Website
         hg tag $version
     }
 }
