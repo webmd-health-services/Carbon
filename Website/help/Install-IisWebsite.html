@@ -199,21 +199,21 @@
 
 <p>By default, the site listens on all IP addresses on port 80.  Set custom bindings with the <code>Bindings</code> argument.  Multiple bindings are allowed.  Each binding must be in this format (in BNF):</p>
 
-<pre><code>&lt;PROTOCOL&gt; '/' &lt;IP_ADDRESS&gt; ':' &lt;PORT&gt; [ ':' &lt;HOSTNAME&gt; ]
+<pre><code>&lt;PROTOCOL&gt; '/' &lt;IP_ADDRESS&gt; ':' &lt;PORT&gt; ':' [ &lt;HOSTNAME&gt; ]
 </code></pre>
 
 <ul>
 <li><code>PROTOCOL</code> is one of <code>http</code> or <code>https</code>.</li>
 <li><code>IP_ADDRESS</code> is a literal IP address, or <code>*</code> for all of the computer's IP addresses.  This function does not validate if <code>IPADDRESS</code> is actually in use on the computer.</li>
 <li><code>PORT</code> is the port to listen on.</li>
-<li><code>HOSTNAME</code> is the website's hostname, for name-based hosting.  If no hostname is being used, leave off the last <code>: HOSTNAME</code> part.</li>
+<li><code>HOSTNAME</code> is the website's hostname, for name-based hosting.  If no hostname is being used, leave off the <code>HOSTNAME</code> part.</li>
 </ul>
 
 <p>Valid bindings are:</p>
 
 <ul>
-<li>http/*:80</li>
-<li>https/10.2.3.4:443</li>
+<li>http/*:80:</li>
+<li>https/10.2.3.4:443:</li>
 <li>http/*:80:example.com</li>
 </ul>
 
@@ -286,7 +286,7 @@
             <pre><code>Install-IisWebsite -Name 'Peanuts' -Path C:\Peanuts.com</code></pre>
             <p><p>Creates a website named <code>Peanuts</code> serving files out of the <code>C:\Peanuts.com</code> directory.  The website listens on all the computer's IP addresses on port 80.</p>
 </p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 2</h2>
-            <pre><code>Install-IisWebsite -Name 'Peanuts' -Path C:\Peanuts.com -Bindings 'http/*:80:peanuts.com'</code></pre>
+            <pre><code>Install-IisWebsite -Name 'Peanuts' -Path C:\Peanuts.com -Bindings 'http/*:80:peanuts.com:'</code></pre>
             <p><p>Creates a website named <code>Peanuts</code> which uses name-based hosting to respond to all requests to any of the machine's IP addresses for the <code>peanuts.com</code> domain.</p>
 </p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 3</h2>
             <pre><code>Install-IisWebsite -Name 'Peanuts' -Path C:\Peanuts.com -AppPoolName 'PeanutsAppPool'</code></pre>
