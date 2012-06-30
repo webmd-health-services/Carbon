@@ -32,6 +32,9 @@
  * Help files and example scripts now included in Carbon download package.
  * Added test to help ensure all functions have proper documentation.
 
+## Bug fixes
+ * [Install-IisWebsite](http://get-carbon.org/help/Install-IisWebsite.html) now validates website bindings
+
 # 0.2.5 (29 June 2012)
 
 ## Enhancements
