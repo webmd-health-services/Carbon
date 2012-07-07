@@ -465,7 +465,7 @@ function Install-IisWebsite
         
         [Parameter(Position=2)]
         [string[]]
-        # The site's network bindings.  Default is `http/*:80:`.  Bindings should be specified in protocol/IPAddress:Port:Hostname format.  
+        # The site's network bindings.  Default is http/*:80.  Bindings should be specified in protocol/IPAddress:Port:Hostname format.  
         #
         #  * Protocol should be http or https. 
         #  * IPAddress can be a literal IP address or `*`, which means all of the computer's IP addresses.  This function does not validate if `IPAddress` is actually in use on this computer.
