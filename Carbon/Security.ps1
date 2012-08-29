@@ -178,8 +178,12 @@ function Grant-Permissions
     {
         $rules = $currentAcl.Access |
                     Where-Object { -not $_.IsInherited }
-        $rules | 
-            ForEach-Object { $currentAcl.RemoveAccessRule( $_ ) }
+        
+        if( $rules )
+        {
+            $rules | 
+                ForEach-Object { $currentAcl.RemoveAccessRule( $_ ) }
+        }
     }
     $currentAcl.SetAccessRule( $accessRule )
     Set-Acl $Path $currentAcl

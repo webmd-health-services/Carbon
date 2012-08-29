@@ -100,6 +100,27 @@ function Test-ShouldClearExistingPermissions
     Assert-Equal 'Everyone' $rules.IdentityReference.Value
 }
 
+function Test-ShouldHandleNoPermissionsToClear
+{
+    $acl = Get-Acl -Path $Path.ToSTring()
+    $rules = $acl.Access | 
+                Where-Object { -not $_.IsInherited }
+    if( $rules )
+    {
+        $rules |
+            ForEach-Object { $acl.REmoveAccessRule( $rule ) }
+        Set-Acl -Path $Path.ToString() -AclObject $acl
+    }
+    
+    $error.Clear()
+    Grant-Permissions -Identity 'Everyone' -Permissions 'Read','Write' -Path $Path.ToSTring() -Clear -ErrorAction SilentlyContinue
+    Assert-Equal 0 $error.Count
+    $acl = Get-Acl -Path $Path.ToString()
+    $rules = $acl.Access | Where-Object { -not $_.IsInherited }
+    Assert-NotNull $rules
+    Assert-Like $rules.IdentityReference.Value 'Everyone'
+}
+
 function Assert-Permissions($identity, $permissions, $path = $Path)
 {
     $providerName = (Get-PSDrive (Split-Path -Qualifier (Resolve-Path $path)).Trim(':')).Provider.Name
