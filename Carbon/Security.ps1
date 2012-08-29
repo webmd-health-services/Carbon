@@ -294,6 +294,7 @@ function Unprotect-AclAccessRules
         $Preserve
     )
     
+    Write-Host "Removing access rule inheritance on '$Path'."
     $acl = Get-Acl -Path $Path
     $acl.SetAccessRuleProtection( $true, $Preserve )
     $acl | Set-Acl -Path $Path
