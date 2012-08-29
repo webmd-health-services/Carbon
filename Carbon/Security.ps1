@@ -237,4 +237,39 @@ function Test-AdminPrivileges
     return $false
 }
 
+function Unprotect-AclAccessRules
+{
+    <#
+    .SYNOPSIS
+    Removes access rule protection on a file or registry path.
+    
+    .DESCRIPTION
+    New items in the registry or file system will usually inherit ACLs from its parent.  This function stops an item from inheriting rules from its, and will optionally preserve the existing inherited rules.  Any existing, non-inherited access rules are left in place.
+    
+    .EXAMPLE
+    Unprotect-AclAccessRules -Path C:\Projects\Carbon
+    
+    Removes all inherited access rules from the `C:\Projects\Carbon` directory.  Non-inherited rules are preserved.
+    
+    .EXAMPLE
+    Unprotect-AclAccessRules -Path hklm:\Software\Carbon -Preserve
+    
+    Stops `HKLM:\Software\Carbon` from inheriting acces rules from its parent, but preserves the existing, inheritied access rules.
+    #>
+    [CmdletBinding(SupportsShouldProcess=$true)]
+    param(
+        [Parameter(Mandatory=$true,ValueFromPipeline=$true,ValueFromPipelineByPropertyName=$true)]
+        [string]
+        # The file system or registry path whose 
+        $Path,
+        
+        [Switch]
+        # Keep the inherited access rules on this item.
+        $Preserve
+    )
+    
+    $acl = Get-Acl -Path $Path
+    $acl.SetAccessRuleProtection( $true, $Preserve )
+    $acl | Set-Acl -Path $Path
+}
 
