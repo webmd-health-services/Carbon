@@ -93,6 +93,9 @@ function Grant-Permissions
 
     .LINK
     http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.registryrights.aspx
+    
+    .LINK
+    Unprotect-AclAccessRules
 
     .EXAMPLE
     Grant-Permissions -Identity ENTERPRISE\Engineers -Permissions FullControl -Path C:\EngineRoom
@@ -103,6 +106,11 @@ function Grant-Permissions
     Grant-Permissions -Identity ENTERPRISE\Interns -Permissions ReadKey,QueryValues,EnumerateSubKeys -Path rklm:\system\WarpDrive
 
     Grants the Enterprise's interns access to read about the warp drive.  They need to learn someday, but at least they can't change anything.
+    
+    .EXAMPLE
+    Grant-Permissions -Identity ENTERPRISE\Engineers -Permissions FullControl -Path C:\EngineRoom -Clear
+    
+    Grants the Enterprise's engineering group full control on the engine room.  Any non-inherited, existing access rules are removed from `C:\EngineRoom`.
     #>
     [CmdletBinding(SupportsShouldProcess=$true)]
     param(
@@ -119,7 +127,11 @@ function Grant-Permissions
         [Parameter(Mandatory=$true)]
         [string]
         # The path on which the permissions should be granted.  Can be a file system or registry path.
-        $Path
+        $Path,
+        
+        [Switch]
+        # Removes all non-inherited permissions on the item.
+        $Clear
     )
     
     $Path = Resolve-Path $Path
@@ -161,7 +173,14 @@ function Grant-Permissions
                              [Security.AccessControl.InheritanceFlags]::ObjectInherit)
     }
     $propagationFlags = [Security.AccessControl.PropagationFlags]::None
-    $accessRule = New-Object "Security.AccessControl.$($providerName)AccessRule" $identity,$rights,$inheritanceFlags,$propagationFlags,"Allow"    
+    $accessRule = New-Object "Security.AccessControl.$($providerName)AccessRule" $identity,$rights,$inheritanceFlags,$propagationFlags,"Allow"
+    if( $Clear )
+    {
+        $rules = $currentAcl.Access |
+                    Where-Object { -not $_.IsInherited }
+        $rules | 
+            ForEach-Object { $currentAcl.RemoveAccessRule( $_ ) }
+    }
     $currentAcl.SetAccessRule( $accessRule )
     Set-Acl $Path $currentAcl
 }
@@ -245,6 +264,9 @@ function Unprotect-AclAccessRules
     
     .DESCRIPTION
     New items in the registry or file system will usually inherit ACLs from its parent.  This function stops an item from inheriting rules from its, and will optionally preserve the existing inherited rules.  Any existing, non-inherited access rules are left in place.
+    
+    .LINK
+    Grant-Permissions
     
     .EXAMPLE
     Unprotect-AclAccessRules -Path C:\Projects\Carbon

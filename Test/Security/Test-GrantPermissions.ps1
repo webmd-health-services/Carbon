@@ -84,7 +84,20 @@ function Test-ShouldFailIfIncorrectPermissions
     }
     
     Assert-True $failed "Didn't fail to set permissions with a bad permission."
+}
+
+function Test-ShouldClearExistingPermissions
+{
+    Invoke-GrantPermissions 'Administrators' 'FullControl'
     
+    Grant-Permissions -Identity 'Everyone' -Permissions 'Read','Write' -Path $Path.ToSTring() -Clear
+    
+    $acl = Get-Acl -Path $Path.ToString()
+    
+    $rules = $acl.Access |
+                Where-Object { -not $_.IsInherited }
+    Assert-NotNull $rules
+    Assert-Equal 'Everyone' $rules.IdentityReference.Value
 }
 
 function Assert-Permissions($identity, $permissions, $path = $Path)
