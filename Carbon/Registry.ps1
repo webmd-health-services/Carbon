@@ -64,6 +64,42 @@ function Install-RegistryKey
     }
 }
 
+function Remove-RegistryKeyValue
+{
+    <#
+    .SYNOPSIS
+    Removes a value from a registry key, if it exists.
+    
+    .DESCRIPTION
+    If the given key doesn't exist, nothing happens.
+    
+    .EXAMPLE
+    Remove-RegistryKeyValue -Path hklm:\Software\Carbon\Test -Name 'InstallPath'
+    
+    Removes the `InstallPath` value from the `hklm:\Software\Carbon\Test` registry key.
+    #>
+    [CmdletBinding(SupportsShouldProcess=$true)]
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]
+        # The path to the registry key where the value should be removed.
+        $Path,
+        
+        [Parameter(Mandatory=$true)]
+        [string]
+        # The name of the value to remove.
+        $Name
+    )
+    
+    if( (Test-RegistryKeyValue -Path $Path -Name $Name) )
+    {
+        if( $pscmdlet.ShouldProcess( ('Item: {0} Property: {1}' -f $Path,$Name), 'Remove Property' ) )
+        {
+            Remove-ItemProperty -Path $Path -Name $Name
+        }
+    }
+}
+
 function Set-RegistryKeyValue
 {
     <#
@@ -186,17 +222,12 @@ function Set-RegistryKeyValue
     
     Install-RegistryKey -Path $Path
     
-    $valueExists = Test-RegistryKeyValue -Path $Path -Name $Name
-    if( $Force -and $valueExists )
+    if( $Force )
     {
-        if( $pscmdlet.ShouldProcess( ('Item: {0} Property: {1}' -f $Path,$Name), 'Remove Property' ) )
-        {
-            Remove-ItemProperty -Path $path -Name $Name
-        }
-        $valueExists = $false
+        Remove-RegistryKeyValue -Path $Path -Name $Name 
     }
     
-    if( $valueExists )
+    if( Test-RegistryKeyValue -Path $Path -Name $Name )
     {
         Set-ItemProperty -Path $Path -Name $Name -Value $value
     }
