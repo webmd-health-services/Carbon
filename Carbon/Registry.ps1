@@ -60,7 +60,7 @@ function Install-RegistryKey
     if( -not (Test-Path -Path $Path -PathType Container) )
     {
         Write-Host "Creating registry key '$Path'."
-        New-Item -Path $Path -ItemType RegistryKey -Force
+        $null = New-Item -Path $Path -ItemType RegistryKey -Force
     }
 }
 
@@ -233,7 +233,7 @@ function Set-RegistryKeyValue
     }
     else
     {
-        New-ItemProperty -Path $Path -Name $Name -Value $value -PropertyType $type
+        $null = New-ItemProperty -Path $Path -Name $Name -Value $value -PropertyType $type
     }
     
     
