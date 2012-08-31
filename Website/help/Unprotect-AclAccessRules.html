@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-    <title>PowerShell - Set-HgrcDefaultPushUrl - Carbon</title>
+    <title>PowerShell - Unprotect-AclAccessRules - Carbon</title>
 	<link href="styles.css" type="text/css" rel="stylesheet" />
 </head>
 <body>
@@ -200,23 +200,24 @@
 </div>
 
 
-    <h1>Set-HgrcDefaultPushUrl</h1>
-    <div><p>OBSOLETE.  Use Set-IniEntry instead.</p>
+    <h1>Unprotect-AclAccessRules</h1>
+    <div><p>Removes access rule protection on a file or registry path.</p>
 </div>
 
         <h2>Syntax</h2>
-    <pre class="Syntax"><code>Set-HgrcDefaultPushUrl [-RepoPath] &lt;String&gt; [-DefaultPushUrl] &lt;String&gt; [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
+    <pre class="Syntax"><code>Unprotect-AclAccessRules [-Path] &lt;String&gt; [-Preserve] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
     
         <h2>Description</h2>
     <div class="Description">
-        <p>We've replaced this function with the more generic <code>Set-IniEntry</code>.  Call it like so:</p>
-
-<pre><code>Set-IniEntry -Path (Join-Path $RepoPath .hg\hgrc -Resolve) -Section paths -Name 'default-push' -Value $DefaultPushUrl
-</code></pre>
+        <p>New items in the registry or file system will usually inherit ACLs from its parent.  This function stops an item from inheriting rules from its, and will optionally preserve the existing inherited rules.  Any existing, non-inherited access rules are left in place.</p>
 
     </div>
     
-    
+            <h2>Related Commands</h2>
+        <ul>
+<li><a href="Grant-Permissions.html">Grant-Permissions</a></li>
+</ul>
+
 
     		<h2> Parameters </h2>
 		<table border='1'>
@@ -229,20 +230,20 @@
 				<th>Default Value</th>
 			</tr>
             			<tr valign='top'>
-				<td>RepoPath</td>
+				<td>Path</td>
 				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
-				<td>The path to the repository whose default-push URL should be updated.
+				<td>The file system or registry path whose
 </td>
 				<td>true</td>
-				<td>false</td>
+				<td>true (ByValue, ByPropertyName)</td>
                 <td></td>
 			</tr>
 			<tr valign='top'>
-				<td>DefaultPushUrl</td>
-				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
-				<td>The value of the default-push URL.
+				<td>Preserve</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+				<td>Keep the inherited access rules on this item.
 </td>
-				<td>true</td>
+				<td>false</td>
 				<td>false</td>
                 <td></td>
 			</tr>
@@ -279,8 +280,11 @@
     
         
                 <h2>EXAMPLE 1</h2>
-            <pre><code>Set-IniEntry -Path (Join-Path $RepoPath .hg\hgrc -Resolve) -Section paths -Name 'default-push' -Value $DefaultPushUrl</code></pre>
-            <p><p>This example shows how to use <code>Set-IniEntry</code> instead of <code>Set-HgrcDefaultPushUrl</code>.</p>
+            <pre><code>Unprotect-AclAccessRules -Path C:\Projects\Carbon</code></pre>
+            <p><p>Removes all inherited access rules from the <code>C:\Projects\Carbon</code> directory.  Non-inherited rules are preserved.</p>
+</p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 2</h2>
+            <pre><code>Unprotect-AclAccessRules -Path hklm:\Software\Carbon -Preserve</code></pre>
+            <p><p>Stops <code>HKLM:\Software\Carbon</code> from inheriting acces rules from its parent, but preserves the existing, inheritied access rules.</p>
 </p><p></p><p></p><p></p><p></p>
 </body>
 </html>   

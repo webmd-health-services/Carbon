@@ -1,11 +1,16 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-    <title>Grant-Permissions</title>
+    <title>PowerShell - Grant-Permissions - Carbon</title>
 	<link href="styles.css" type="text/css" rel="stylesheet" />
 </head>
 <body>
-    <div id="CommandMenuContainer" style="float:left;">
+    	<ul id="SiteNav">
+		<li><a href="http://get-carbon.org">Get-Carbon</a></li>
+		<li><b>-Documentation</b></li>
+		<li><a href="http://pshdo.com">-Blog</a></li>
+	</ul>
+<div id="CommandMenuContainer" style="float:left;">
 	<ul id="CategoryMenu">
 		<li class="Category">ActiveDirectory</li>
 		<ul class="CommandMenu">
@@ -137,6 +142,14 @@
 			<li><a href="Get-TrustedHosts.html">Get-TrustedHosts</a></li>
 			<li><a href="Set-TrustedHosts.html">Set-TrustedHosts</a></li>
 		</ul>
+		<li class="Category">Registry</li>
+		<ul class="CommandMenu">
+			<li><a href="Get-RegistryKeyValue.html">Get-RegistryKeyValue</a></li>
+			<li><a href="Install-RegistryKey.html">Install-RegistryKey</a></li>
+			<li><a href="Remove-RegistryKeyValue.html">Remove-RegistryKeyValue</a></li>
+			<li><a href="Set-RegistryKeyValue.html">Set-RegistryKeyValue</a></li>
+			<li><a href="Test-RegistryKeyValue.html">Test-RegistryKeyValue</a></li>
+		</ul>
 		<li class="Category">Security</li>
 		<ul class="CommandMenu">
 			<li><a href="Assert-AdminPrivileges.html">Assert-AdminPrivileges</a></li>
@@ -144,6 +157,7 @@
 			<li><a href="Grant-Permissions.html">Grant-Permissions</a></li>
 			<li><a href="New-Credential.html">New-Credential</a></li>
 			<li><a href="Test-AdminPrivileges.html">Test-AdminPrivileges</a></li>
+			<li><a href="Unprotect-AclAccessRules.html">Unprotect-AclAccessRules</a></li>
 		</ul>
 		<li class="Category">Service</li>
 		<ul class="CommandMenu">
@@ -191,7 +205,7 @@
 </div>
 
         <h2>Syntax</h2>
-    <pre class="Syntax"><code>Grant-Permissions [-Identity] &lt;String&gt; [-Permissions] &lt;String[]&gt; [-Path] &lt;String&gt; [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
+    <pre class="Syntax"><code>Grant-Permissions [-Identity] &lt;String&gt; [-Permissions] &lt;String[]&gt; [-Path] &lt;String&gt; [-Clear] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
     
         <h2>Description</h2>
     <div class="Description">
@@ -217,6 +231,7 @@
         <ul>
 <li><a href="http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.filesystemrights.aspx">http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.filesystemrights.aspx</a></li>
 <li><a href="http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.registryrights.aspx">http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.registryrights.aspx</a></li>
+<li><a href="Unprotect-AclAccessRules.html">Unprotect-AclAccessRules</a></li>
 </ul>
 
 
@@ -258,6 +273,15 @@
                 <td></td>
 			</tr>
 			<tr valign='top'>
+				<td>Clear</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+				<td>Removes all non-inherited permissions on the item.
+</td>
+				<td>false</td>
+				<td>false</td>
+                <td></td>
+			</tr>
+			<tr valign='top'>
 				<td>WhatIf</td>
 				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
 				<td></td>
@@ -295,6 +319,9 @@
 </p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 2</h2>
             <pre><code>Grant-Permissions -Identity ENTERPRISE\Interns -Permissions ReadKey,QueryValues,EnumerateSubKeys -Path rklm:\system\WarpDrive</code></pre>
             <p><p>Grants the Enterprise's interns access to read about the warp drive.  They need to learn someday, but at least they can't change anything.</p>
+</p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 3</h2>
+            <pre><code>Grant-Permissions -Identity ENTERPRISE\Engineers -Permissions FullControl -Path C:\EngineRoom -Clear</code></pre>
+            <p><p>Grants the Enterprise's engineering group full control on the engine room.  Any non-inherited, existing access rules are removed from <code>C:\EngineRoom</code>.</p>
 </p><p></p><p></p><p></p><p></p>
 </body>
 </html>   

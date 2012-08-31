@@ -286,7 +286,7 @@ filter Convert-HelpToHtml
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-    <title>$name</title>
+    <title>PowerShell - $name - Carbon</title>
 	<link href="styles.css" type="text/css" rel="stylesheet" />
 </head>
 <body>
@@ -375,6 +375,12 @@ Get-ChildItem (Join-Path $PSScriptRoot Carbon\*.ps1) -Exclude Import-Carbon.ps1 
     }
 
 $menuBuilder = New-Object Text.StringBuilder
+[void] $menuBuilder.AppendLine( @"
+	<ul id="SiteNav">
+		<li><a href="http://get-carbon.org">Get-Carbon</a></li>
+		<li><b>-Documentation</b></li>
+		<li><a href="http://pshdo.com">-Blog</a></li>
+	</ul>"@ )
 [void] $menuBuilder.AppendLine( '<div id="CommandMenuContainer" style="float:left;">' )
 [void] $menuBuilder.AppendLine( "`t<ul id=""CategoryMenu"">" )
 $categories.Keys | ForEach-Object {

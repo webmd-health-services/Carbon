@@ -14,7 +14,7 @@ div#CommandMenuContainer
 	width: 20em;
 	position: absolute;
 	left: 0px;
-	margin-top: .5em;
+	top: 1.2em;
 }
 
 ul#CategoryMenu

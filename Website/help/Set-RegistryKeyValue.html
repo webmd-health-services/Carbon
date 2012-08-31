@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-    <title>PowerShell - Set-HgrcDefaultPushUrl - Carbon</title>
+    <title>PowerShell - Set-RegistryKeyValue - Carbon</title>
 	<link href="styles.css" type="text/css" rel="stylesheet" />
 </head>
 <body>
@@ -200,23 +200,29 @@
 </div>
 
 
-    <h1>Set-HgrcDefaultPushUrl</h1>
-    <div><p>OBSOLETE.  Use Set-IniEntry instead.</p>
+    <h1>Set-RegistryKeyValue</h1>
+    <div><p>Sets a value in a registry key.</p>
 </div>
 
         <h2>Syntax</h2>
-    <pre class="Syntax"><code>Set-HgrcDefaultPushUrl [-RepoPath] &lt;String&gt; [-DefaultPushUrl] &lt;String&gt; [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
+    <pre class="Syntax"><code>Set-RegistryKeyValue -Path &lt;String&gt; -Name &lt;String&gt; -String &lt;String&gt; [-Expand] [-Force] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
+<pre class="Syntax"><code>Set-RegistryKeyValue -Path &lt;String&gt; -Name &lt;String&gt; -Binary &lt;Byte[]&gt; [-Force] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
+<pre class="Syntax"><code>Set-RegistryKeyValue -Path &lt;String&gt; -Name &lt;String&gt; -DWord &lt;Int32&gt; [-Force] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
+<pre class="Syntax"><code>Set-RegistryKeyValue -Path &lt;String&gt; -Name &lt;String&gt; -QWord &lt;Int64&gt; [-Force] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
+<pre class="Syntax"><code>Set-RegistryKeyValue -Path &lt;String&gt; -Name &lt;String&gt; -Strings &lt;String[]&gt; [-Force] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
     
         <h2>Description</h2>
     <div class="Description">
-        <p>We've replaced this function with the more generic <code>Set-IniEntry</code>.  Call it like so:</p>
-
-<pre><code>Set-IniEntry -Path (Join-Path $RepoPath .hg\hgrc -Resolve) -Section paths -Name 'default-push' -Value $DefaultPushUrl
-</code></pre>
+        <p>If the key doesn't exist, it is created.  If the value doesn't exist, it is created.</p>
 
     </div>
     
-    
+            <h2>Related Commands</h2>
+        <ul>
+<li><a href="Get-RegistryKeyValue.html">Get-RegistryKeyValue</a></li>
+<li><a href="Test-RegistryKeyValue.html">Test-RegistryKeyValue</a></li>
+</ul>
+
 
     		<h2> Parameters </h2>
 		<table border='1'>
@@ -229,20 +235,83 @@
 				<th>Default Value</th>
 			</tr>
             			<tr valign='top'>
-				<td>RepoPath</td>
+				<td>Path</td>
 				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
-				<td>The path to the repository whose default-push URL should be updated.
+				<td>The path to the registry key where the value should be set.  Will be created if it doesn't exist.
 </td>
 				<td>true</td>
 				<td>false</td>
                 <td></td>
 			</tr>
 			<tr valign='top'>
-				<td>DefaultPushUrl</td>
+				<td>Name</td>
 				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
-				<td>The value of the default-push URL.
+				<td>The name of the value being set.
 </td>
 				<td>true</td>
+				<td>false</td>
+                <td></td>
+			</tr>
+			<tr valign='top'>
+				<td>String</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+				<td>The value's data.  Creates a value for holding string data (i.e. <code>REG_SZ</code>).
+</td>
+				<td>true</td>
+				<td>false</td>
+                <td></td>
+			</tr>
+			<tr valign='top'>
+				<td>Expand</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+				<td>The string should be expanded when retrieved.  Creates a value for holding expanded string data (i.e. <code>REG_EXPAND_SZ</code>).
+</td>
+				<td>false</td>
+				<td>false</td>
+                <td></td>
+			</tr>
+			<tr valign='top'>
+				<td>Binary</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.byte.aspx">Byte[]</a></td>
+				<td>The value's data.  Creates a value for holding binary data (i.e. <code>REG_BINARY</code>).
+</td>
+				<td>true</td>
+				<td>false</td>
+                <td></td>
+			</tr>
+			<tr valign='top'>
+				<td>DWord</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.int32.aspx">Int32</a></td>
+				<td>The value's data.  Creates a value for holding a 32-bit integer (i.e. <code>REG_DWORD</code>).
+</td>
+				<td>true</td>
+				<td>false</td>
+                <td></td>
+			</tr>
+			<tr valign='top'>
+				<td>QWord</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.int64.aspx">Int64</a></td>
+				<td>The value's data.  Creates a value for holding a 64-bit integer (i.e. <code>REG_QWORD</code>).
+</td>
+				<td>true</td>
+				<td>false</td>
+                <td></td>
+			</tr>
+			<tr valign='top'>
+				<td>Strings</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String[]</a></td>
+				<td>The value's data.  Creates a value for holding an array of strings (i.e. <code>REG_MULTI_SZ</code>).
+</td>
+				<td>true</td>
+				<td>false</td>
+                <td></td>
+			</tr>
+			<tr valign='top'>
+				<td>Force</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+				<td>Removes and re-creates the value.  Useful for changing a value's type.
+</td>
+				<td>false</td>
 				<td>false</td>
                 <td></td>
 			</tr>
@@ -279,8 +348,26 @@
     
         
                 <h2>EXAMPLE 1</h2>
-            <pre><code>Set-IniEntry -Path (Join-Path $RepoPath .hg\hgrc -Resolve) -Section paths -Name 'default-push' -Value $DefaultPushUrl</code></pre>
-            <p><p>This example shows how to use <code>Set-IniEntry</code> instead of <code>Set-HgrcDefaultPushUrl</code>.</p>
+            <pre><code>Set-RegistryKeyValue -Path 'hklm:\Software\Carbon\Test -Name Status -String foobar</code></pre>
+            <p><p>Creates the <code>Status</code> string value under the <code>hklm:\Software\Carbon\Test</code> key and sets its value to <code>foobar</code>.</p>
+</p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 2</h2>
+            <pre><code>Set-RegistryKeyValue -Path 'hklm:\Software\Carbon\Test -Name ComputerName -String '%ComputerName%' -Expand</code></pre>
+            <p><p>Creates an expandable string.  When retrieving this value, environment variables will be expanded.</p>
+</p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 3</h2>
+            <pre><code>Set-RegistryKeyValue -Path 'hklm:\Software\Carbon\Test -Name Movies -String ('Signs','Star Wars','Raiders of the Lost Ark')</code></pre>
+            <p><p>Sets a multi-string (i.e. array) value.</p>
+</p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 4</h2>
+            <pre><code>Set-RegistryKeyValue -Path hklm:\Software\Carbon\Test -Name 'SomeBytes' -Binary ([byte[]]@( 1, 2, 3, 4))</code></pre>
+            <p><p>Sets a binary value (i.e. <code>REG_BINARY</code>).</p>
+</p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 5</h2>
+            <pre><code>Set-RegistryKeyValue -Path hklm:\Software\Carbon\Test -Name 'AnInt' -DWord 48043</code></pre>
+            <p><p>Sets a binary value (i.e. <code>REG_DWORD</code>).</p>
+</p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 6</h2>
+            <pre><code>Set-RegistryKeyValue -Path hklm:\Software\Carbon\Test -Name 'AnInt64' -QWord 9223372036854775807</code></pre>
+            <p><p>Sets a binary value (i.e. <code>REG_QWORD</code>).</p>
+</p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 7</h2>
+            <pre><code>Set-RegistryKeyValue -Path hklm:\Software\Carbon\Test -Name 'UsedToBeAStringNowShouldBeDWord' -DWord 1 -Force</code></pre>
+            <p><p>Uses the <code>Force</code> parameter to delete the existing <code>UsedToBeAStringNowShouldBeDWord</code> before re-creating it.  This flag is useful if you need to change the type of a registry value.</p>
 </p><p></p><p></p><p></p><p></p>
 </body>
 </html>   
