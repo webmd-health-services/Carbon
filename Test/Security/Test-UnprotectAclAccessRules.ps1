@@ -20,7 +20,7 @@ function Setup
     & (Join-Path $TestDir ..\..\Carbon\Import-Carbon.ps1 -Resolve)
 	
 	$parentFSPath = New-TempDir
-	Join-Path $parentFSPath 'TestUnprotectAclAccessRules'
+	$childFSPath = Join-Path $parentFSPath 'TestUnprotectAclAccessRules'
 	
     $null = New-Item $childFSPath -ItemType Container
     Grant-Permissions -Identity Everyone -Permissions FullControl -Path $childFSPath
