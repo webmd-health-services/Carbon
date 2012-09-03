@@ -870,7 +870,7 @@ function Enable-IisSsl
         $RequireSsl,
         
         [Switch]
-        # Requires 128-bit SSL.
+        # Requires 128-bit SSL.  Only changes IIS behavior in IIS 7.0.
         $Require128BitSsl,
         
         [Parameter(ParameterSetName='AcceptClientCertificates')]
@@ -880,7 +880,7 @@ function Enable-IisSsl
         
         [Parameter(Mandatory=$true,ParameterSetName='RequireClientCertificates')]
         [Switch]
-        # Should client certificates be required?
+        # Should client certificates be required?  Also requires SSL ('RequireSsl` switch).
         $RequireClientCertificates
     )
     
