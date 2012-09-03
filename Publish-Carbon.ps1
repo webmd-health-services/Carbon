@@ -85,8 +85,11 @@ try
      
     if( $All )
     {   
-        hg commit -m "Releasing version $version." $releaseNotesFileName .\Website
-        hg tag $version
+        hg commit -m "Releasing version $version." --include $releaseNotesFileName --include .\Website
+        if( -not (hg tags | Where-Object { $_ -like "$version*" } ) )
+        {
+            hg tag $version
+        }
     }
 }
 finally
