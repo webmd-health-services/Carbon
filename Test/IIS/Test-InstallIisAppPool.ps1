@@ -136,7 +136,14 @@ function Test-ShouldAcceptSecureStringForAppPoolPassword
     $username = "$($env:computername)\SomeUser"
     Install-IisAppPool -Name $appPoolName -Username $username -Password $securePassword
     Assert-Identity $username $password
-    
+}
+
+function Test-ShouldConvert32BitAppPoolto64Bit
+{
+    Install-IisAppPool -Name $appPoolName -ServiceAccount NetworkService -Enable32BitApps
+    Assert-AppPool32BitEnabled $true
+    Install-IisAppPool -Name $appPoolName -ServiceAccount NetworkService
+    Assert-AppPool32BitEnabled $false    
 }
 
 function Get-AppPoolDetails

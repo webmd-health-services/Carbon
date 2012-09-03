@@ -341,10 +341,7 @@ function Install-IisAppPool
     
     Invoke-AppCmd set config /section:applicationPools /[name=`'$Name`'].processModel.idleTimeout:"$(New-TimeSpan -minutes $IdleTimeout)"
     
-    if( $Enable32BitApps )
-    {
-        Invoke-AppCmd set config /section:applicationPools /[name=`'$name`'].enable32BitAppOnWin64:true
-    }
+    Invoke-AppCmd set config /section:applicationPools /[name=`'$name`'].enable32BitAppOnWin64:$Enable32BitApps
     
     if( $pscmdlet.ParameterSetName -eq 'AsServiceAccount' )
     {

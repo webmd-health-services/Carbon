@@ -5,6 +5,7 @@
 
 ## Bug Fixes
  * Rename [Enable-IisSsl/Set-IisSslFlags's](http://get-carbon.org/help/Set-IisSslFlags.html) `Enable128BitSsl` parameter to `Require128BitSsl`] ([Fix #24 Set-IisSslFlags: Rename the Enable128BitSsl parameter to Require128BitSsl](https://bitbucket.org/splatteredbits/carbon/issue/24/set-iissslflags-rename-the-enable128bitssl)).
+ * [Fix issue #19](https://bitbucket.org/splatteredbits/carbon/issue/19/install-iisapppool-doesnt-change-an): [Install-IisAppPool](http://get-carbon.org/help/Install-IisAppPool.html) doesn't change an existing 32-bit app pool to be a 64-bit app pool.
 
 # 0.2.7 (3 September 2012)
 
