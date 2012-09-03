@@ -59,13 +59,13 @@ function Test-ShouldRequireClientCertificates
 
 function Test-ShouldAllow128BitSsl
 {
-    Set-IISSSLFlags -SiteName $siteName -Enable128BitSsl
+    Set-IISSSLFlags -SiteName $siteName -Require128BitSsl
     Assert-SSLFlags -ExpectedValue 'Ssl128'
 }
 
 function Test-ShouldSetAllFlags
 {
-    Set-IisSslFlags -SiteName $siteName -RequireSsl -AcceptClientCertificates -RequireClientCertificates -Enable128BitSsl
+    Set-IisSslFlags -SiteName $siteName -RequireSsl -AcceptClientCertificates -RequireClientCertificates -Require128BitSsl
     Assert-SslFlags -ExpectedValue 'Ssl, SslNegotiatecert, SslRequireCert, Ssl128'
 }
 

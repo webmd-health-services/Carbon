@@ -1,3 +1,9 @@
+# 0.3.0
+
+## Bug Fixes
+ * Rename [Set-IisSslFlags](http://get-carbon.org/help/Set-IisSslFlags.html) `Enable128BitSsl` parameter to `Require128BitSsl`] ([Fix #24 Set-IisSslFlags: Rename the Enable128BitSsl parameter to Require128BitSsl](https://bitbucket.org/splatteredbits/carbon/issue/24/set-iissslflags-rename-the-enable128bitssl)).
+
+
 # 0.2.7 (3 September 2012)
 
 ## Enhancements

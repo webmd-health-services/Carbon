@@ -815,7 +815,7 @@ function Set-IisSslFlags
 
      * Requiring SSL (the `RequireSsl` switch)
      * Ignoring/accepting/requiring client certificates (the `AccepClientCertificates` and `RequireClientCertificates` switches).
-     * Requiring 128-bit SSL (the `Enable128BitSsl` switch).
+     * Requiring 128-bit SSL (the `Require128BitSsl` switch).
 
     By default, this function will make SSL optional, set the ignore client certificates flag, and not require 128-bit SSL.
 
@@ -837,7 +837,7 @@ function Set-IisSslFlags
     Configures the `Peanuts` website to accept client certificates, makes SSL optional, and makes 128-bit SSL optional.
 
     .EXAMPLE
-    Set-IisFlags -Site Peanuts -Enable128BitSsl
+    Set-IisFlags -Site Peanuts -Require128BitSsl
 
     Configures the `Peanuts` website to require 128-bit SSL, makes SSL optional, and ignores client certificates.
 
@@ -869,7 +869,7 @@ function Set-IisSslFlags
         
         [Switch]
         # Requires 128-bit SSL.
-        $Enable128BitSsl
+        $Require128BitSsl
     )
     
     $flags = @()
@@ -888,7 +888,7 @@ function Set-IisSslFlags
         $flags += 'SslRequireCert'
     }
     
-    if( $Enable128BitSsl )
+    if( $Require128BitSsl )
     {
         $flags += 'Ssl128'
     }
