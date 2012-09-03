@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+$TrustedHostsPath = 'WSMan:\localhost\Client\TrustedHosts'
 function Add-TrustedHosts
 {
     <#
@@ -57,6 +58,38 @@ function Add-TrustedHosts
     }
 }
 
+function Clear-TrustedHosts
+{
+    <#
+    .SYNOPSIS
+    Removes all entries from PowerShell trusted hosts list.
+    
+    .DESCRIPTION
+    The `Add-TrustedHosts` function adds new entries to the trusted hosts list.  `Set-TrustedHosts` sets it to a new list.  This function clears out the trusted hosts list completely.  After you run it, you won't be able to connect to any computers until you add them to the trusted hosts list.
+    
+    .LINK
+    Add-TrustedHosts
+    
+    .LINK
+    Set-TrustedHosts
+
+    .EXAMPLE
+    Clear-TrustedHosts
+    
+    Clears everything from the trusted hosts list.
+    #>
+    [CmdletBinding(SupportsShouldProcess=$true)]
+    param(
+    )
+    
+    if( $pscmdlet.ShouldProcess( 'trusted hosts', 'clear' ) )
+    {
+        Write-Host "Clearing the trusted hosts list."
+        Set-Item $TrustedHostsPath -Value '' -Force
+    }
+
+}
+
 function Get-TrustedHosts
 {
     <#
@@ -78,7 +111,7 @@ function Get-TrustedHosts
         api.example.com
         docs.example.com
     #>
-    $trustedHosts = (Get-Item WSMan:\localhost\Client\TrustedHosts -Force).Value 
+    $trustedHosts = (Get-Item $TrustedHostsPath -Force).Value 
     if( -not $trustedHosts )
     {
         return @()
@@ -96,20 +129,29 @@ function Set-TrustedHosts
 
     .DESCRIPTION
     Clears the current trusted hosts list, and sets it to contain only the entries given by the `Entries` parameter.
+    
+    To clear the trusted hosts list, use `Clear-TrustedHosts`.
+    
+    .LINK
+    Clear-TrustedHosts
 
     .EXAMPLE
     Set-TrustedHosts example.com,api.example.com,docs.example.com
 
     Sets the trusted hosts list to contain just the values `example.com`, `api.example.com`, and `docs.example.com`.
     #>
-    [CmdletBinding()]
+    [CmdletBinding(SupportsShouldProcess=$true)]
     param(
+        [Parameter(Mandatory=$true)]
         [string[]]
         # An array of trusted host entries.
-        $Entries = @()
+        $Entries
     )
     
     $value = $Entries -join ','
-    Set-Item WSMan:\localhost\Client\TrustedHosts -Value $Value -Force
+    if( $pscmdlet.ShouldProcess( 'trusted hosts', 'set' ) )
+    {
+        Set-Item $TrustedHostsPath -Value $Value -Force
+    }
 }
 

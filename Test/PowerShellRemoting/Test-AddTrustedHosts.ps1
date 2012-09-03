@@ -22,12 +22,15 @@ if( Test-AdminPrivileges )
     function Setup
     {
         $originalTrustedHosts = @( Get-TrustedHosts )
-        Set-TrustedHosts
+        Clear-TrustedHosts
     }
 
     function TearDown
     {
-        Set-TrustedHosts -Entries $originalTrustedHosts
+        if( $originalTrustedHosts )
+        {
+            Set-TrustedHosts -Entries $originalTrustedHosts
+        }
     }
 
     function Test-ShouldAddNewHost

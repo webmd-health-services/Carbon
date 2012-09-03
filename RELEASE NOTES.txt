@@ -3,6 +3,7 @@
 ## Enhancements
  * Renamed `Set-IisSslFlags` to `Enable-IisSsl` to better reflect what it does.  Also, created parameter sets around client certificate settings so you can't configure them incorrectly.  ([Fixes #25: Set-IisSslFlags: Create parameter sets to accurately reflect what flags are allowed to be set simultaneously.](https://bitbucket.org/splatteredbits/carbon/issue/25/set-iissslflags-create-parameter-sets-to))
  * Added `WhatIf` support to [Install-MsmqMessageQueue](http://get-carbon.org/help/Install-MsmqMessageQueue.html).
+ * Created new [Clear-TrustedHosts](http://get-carbon.org/help/Clear-TrustedHosts.html) for clearing PowerShell's trusted hosts list.
 
 ## Bug Fixes
  * Rename [Enable-IisSsl/Set-IisSslFlags's](http://get-carbon.org/help/Set-IisSslFlags.html) `Enable128BitSsl` parameter to `Require128BitSsl`] ([Fix #24 Set-IisSslFlags: Rename the Enable128BitSsl parameter to Require128BitSsl](https://bitbucket.org/splatteredbits/carbon/issue/24/set-iissslflags-rename-the-enable128bitssl)).
@@ -10,6 +11,7 @@
  * [Fix issue #33](https://bitbucket.org/splatteredbits/carbon/issue/33/install-msmqmessagequeue-can-wait-forever): [Install-MsmqMessageQueue](http://get-carbon.org/help/Install-MsmqMessageQueue.html): Can wait forever for a queue to get created.  It now waits 10 seconds.  
  * [Fix issue #36](https://bitbucket.org/splatteredbits/carbon/issue/36/get-powershellpath-returns-the-wrong-path): [Get-PowerShellpath](http://get-carbon.org/help/Get-PowershellPath.html) returns the wrong path when running x86 PowerShell on x64 computers.
  * [Fix issue #37](https://bitbucket.org/splatteredbits/carbon/issue/37/invoke-powershell-should-write-an-error): [Invoke-PowerShell](http://get-carbon.org/help/Invoke-PowerShell.html) should write an error when running as x86 on Windows x64 without the x86 flag (i.e. 32-bit PowerShell can't launch a 64-bit PowerShell, so throw an error in that situation).
+ * [Fix issue #38](https://bitbucket.org/splatteredbits/carbon/issue/38/set-trustedhosts-passing-an-empty-value): [Set-TrustedHosts](http://get-carbon.org/help/Set-TrustedHosts.html): passing an empty value for the Entries parameter clears the hosts list.  The `Entries` parameter is now required.  To clear the trusted hosts list, use `Clear-TrustedHosts`.
 
 # 0.2.7 (3 September 2012)
 
