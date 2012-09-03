@@ -1,4 +1,4 @@
-# 0.2.7 
+# 0.2.7 (3 September 2012)
 
 ## Enhancements
  * New functions for working with the registry:
