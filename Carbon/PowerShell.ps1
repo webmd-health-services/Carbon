@@ -147,11 +147,12 @@ function Get-PowershellPath
         $x86
     )
     
-    $powershellPath = Join-Path $PSHome powershell.exe
-    if( $x86 -and (Test-OSIs64Bit))
+    $powershellPath = Join-Path ($PSHome -replace 'SysWOW64','System32') powershell.exe
+    if( $x86 -and (Test-OsIs64Bit) )
     {
-        return $powerShellPath -replace 'System32','SysWOW64'
+        $powerShellPath = $powerShellPath -replace 'System32','SysWow64'
     }
+    
     return $powerShellPath
 }
 
