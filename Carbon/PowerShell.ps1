@@ -163,12 +163,14 @@ function Invoke-PowerShell
     Invokes a script block in a separate powershell.exe process.
     
     .DESCRIPTION
-    The invoked PowerShell process can run under the .NET 4.0 CLR (using `v4.0` as the value to the Runtime parameter) and under 32-bit PowerShell (using the `x86` switch).
+    The invoked PowerShell process can run under the .NET 4.0 CLR (using `v4.0` as the value to the Runtime parameter).
+    
+    This function launches a PowerShell process that matches the architecture of the operating system.  On 64-bit operating systems, you can run under 32-bit PowerShell by specifying the `x86` switch).  If this function runs under a 32-bit version of PowerShell without the `x86` switch, you'll get an error.
     
     .EXAMPLE
     Invoke-PowerShell -Command { $PSVersionTable }
     
-    Runs a separate PowerShell process, returning the $PSVersionTable from that process.
+    Runs a separate PowerShell process which matches the architecture of the operating system, returning the $PSVersionTable from that process.  This will fail under 32-bit PowerShell on a 64-bit operating system.
     
     .EXAMPLE
     Invoke-PowerShell -Command { $PSVersionTable } -x86
@@ -200,6 +202,12 @@ function Invoke-PowerShell
         # The CLR to use.  Must be one of v2.0 or v4.0.  Default is v2.0.
         $Runtime = 'v2.0'
     )
+    
+    if( -not $x86 -and (Test-OsIs64Bit) -and (Test-PowerShellIs32Bit) )
+    {
+        Write-Error "Can't launch 64-bit PowerShell process.  Current PowerShell process is 32-bit, and 32-bit application's can't launch 64-bit processes."
+        return
+    }
     
     $comPlusAppConfigEnvVarName = 'COMPLUS_ApplicationMigrationRuntimeActivationConfigPath'
     $activationConfigDir = Join-Path $env:TEMP ([IO.Path]::GetRandomFileName())

@@ -9,6 +9,7 @@
  * [Fix issue #19](https://bitbucket.org/splatteredbits/carbon/issue/19/install-iisapppool-doesnt-change-an): [Install-IisAppPool](http://get-carbon.org/help/Install-IisAppPool.html) doesn't change an existing 32-bit app pool to be a 64-bit app pool.
  * [Fix issue #33](https://bitbucket.org/splatteredbits/carbon/issue/33/install-msmqmessagequeue-can-wait-forever): [Install-MsmqMessageQueue](http://get-carbon.org/help/Install-MsmqMessageQueue.html): Can wait forever for a queue to get created.  It now waits 10 seconds.  
  * [Fix issue #36](https://bitbucket.org/splatteredbits/carbon/issue/36/get-powershellpath-returns-the-wrong-path): [Get-PowerShellpath](http://get-carbon.org/help/Get-PowershellPath.html) returns the wrong path when running x86 PowerShell on x64 computers.
+ * [Fix issue #37](https://bitbucket.org/splatteredbits/carbon/issue/37/invoke-powershell-should-write-an-error): [Invoke-PowerShell](http://get-carbon.org/help/Invoke-PowerShell.html) should write an error when running as x86 on Windows x64 without the x86 flag (i.e. 32-bit PowerShell can't launch a 64-bit PowerShell, so throw an error in that situation).
 
 # 0.2.7 (3 September 2012)
 

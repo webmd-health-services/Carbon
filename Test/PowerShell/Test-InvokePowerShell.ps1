@@ -66,3 +66,34 @@ function Test-ShouldRunPowerShellUnderCLR4
     Assert-Equal 4 $result.Major
     Assert-Null ([Environment]::GetEnvironmentVariable('COMPLUS_ApplicationMigrationRuntimeActivationConfigPath'))
 }
+
+function Test-ShouldNotRunx86PowerShellWithoutx86Flag
+{
+    if( (Test-OsIs64Bit) -and (Test-PowerShellIs32Bit) )
+    {
+        $error.Clear()
+        $result = Invoke-PowerShell -Command { $PSVersionTable } -ErrorAction SilentlyContinue
+        Assert-Equal 1 $error.Count
+        Assert-Null $result
+    }
+    else
+    {
+        Write-Warning "This test is only valid if running 32-bit PowerShell on a 64-bit operating system."
+    }
+}
+
+
+function Test-ShouldRunx86PowerShellFromx86PowerShell
+{
+    if( (Test-OsIs64Bit) -and (Test-PowerShellIs32Bit) )
+    {
+        $error.Clear()
+        $result = Invoke-PowerShell -Command { $env:ProgramFiles } -x86
+        Assert-Equal 0 $error.Count
+        Assert-True ($result -like '*Program Files (x86)*')
+    }
+    else
+    {
+        Write-Warning "This test is only valid if running 32-bit PowerShell on a 64-bit operating system."
+    }
+}
