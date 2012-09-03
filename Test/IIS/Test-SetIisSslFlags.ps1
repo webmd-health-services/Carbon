@@ -35,51 +35,51 @@ function TearDown
 
 function Test-ShouldResetSslFlags
 {
-    Set-IisSslFlags -SiteName $siteName
+    Enable-IisSsl -SiteName $siteName
     Assert-SslFlags -ExpectedValue 'None'
 }
 
 function Test-ShouldRequireSsl
 {
-    Set-IISSSLFlags -SiteName $siteName -RequireSSL
+    Enable-IisSsl -SiteName $siteName -RequireSSL
     Assert-SSLFlags -ExpectedValue 'Ssl'
 }
 
 function Test-ShouldAcceptClientCertificates
 {
-    Set-IISSSLFlags -SiteName $siteName -AcceptClientCertificates
+    Enable-IisSsl -SiteName $siteName -AcceptClientCertificates
     Assert-SSLFlags -ExpectedValue 'SslNegotiateCert'
 }
 
 function Test-ShouldRequireClientCertificates
 {
-    Set-IISSSLFlags -SiteName $siteName -RequireClientCertificates
+    Enable-IisSsl -SiteName $siteName -RequireSsl -RequireClientCertificates
     Assert-SSLFlags -ExpectedValue 'Ssl, SslRequireCert'
 }
 
 function Test-ShouldAllow128BitSsl
 {
-    Set-IISSSLFlags -SiteName $siteName -Require128BitSsl
+    Enable-IisSsl -SiteName $siteName -Require128BitSsl
     Assert-SSLFlags -ExpectedValue 'Ssl128'
 }
 
 function Test-ShouldSetAllFlags
 {
-    Set-IisSslFlags -SiteName $siteName -RequireSsl -AcceptClientCertificates -RequireClientCertificates -Require128BitSsl
-    Assert-SslFlags -ExpectedValue 'Ssl, SslNegotiatecert, SslRequireCert, Ssl128'
+    Enable-IisSsl -SiteName $siteName -RequireSsl -AcceptClientCertificates -Require128BitSsl
+    Assert-SslFlags -ExpectedValue 'Ssl, SslNegotiatecert, Ssl128'
 }
 
 function Test-ShouldSupportWhatIf
 {
-    Set-IisSslFlags -SiteName $siteName -RequireSsl
+    Enable-IisSsl -SiteName $siteName -RequireSsl
     Assert-SslFlags -ExpectedValue 'Ssl'
-    Set-IisSslFlags -SiteName $siteName -AcceptClientCertificates -WhatIf
+    Enable-IisSsl -SiteName $siteName -AcceptClientCertificates -WhatIf
     Assert-SslFlags -ExpectedValue 'Ssl'
 }
 
 function Test-ShouldSetFlagsOnSubFolder
 {
-    Set-IisSslFlags -SiteName $siteName -Path SubFolder -RequireSsl
+    Enable-IisSsl -SiteName $siteName -Path SubFolder -RequireSsl
     Assert-SslFlags -ExpectedValue 'Ssl' -Path "$SiteName/SubFolder"
     Assert-SslFlags -ExpectedValue 'None'
 }
