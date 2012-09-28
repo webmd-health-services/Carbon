@@ -1,0 +1,687 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	<title>Release Notes - Carbon: PowerShell DevOps module for configuring and setting up Windows computers</title>
+	<link href="styles.css" type="text/css" rel="stylesheet" />
+</head>
+<body>
+	<ul id="SiteNav">
+		<li><a href="/">Get-Carbon</a></li>
+		<li><a href="help/">-Documentation</a></li>
+		<li><b>-ReleaseNotes</b></li>
+		<li><a href="http://pshdo.com">-Blog</a></li>
+	</ul>
+    
+    <h1>0.3.0</h1>
+
+
+<h2>Upgrade Instructions</h2>
+
+
+<p>This release contains backwards-<strong>incompatible</strong> changes to the following functions:</p>
+
+<ul>
+<li><a href="http://get-carbon.org/help/Set-IisSslFlags.html">Set-IisSslFlags</a></li>
+</ul>
+
+<ul>
+<li><a href="http://get-carbon.org/help/Set-TrustedHosts.html">Set-TrustedHosts</a></li>
+</ul>
+
+<ul>
+<li><a href="http://get-carbon.org/help/Invoke-PowerShell.html">Invoke-PowerShell</a></li>
+</ul>
+
+
+<h3>Set-IisSslFlags</h3>
+
+
+<p>This function was renamed to <code>Enable-IisSsl</code>.  The <code>Enable128BitSsl</code> was renamed to <code>Require128BitSsl</code>.  </p>
+
+
+<p>Configuring client certificates is now a little stricter/clearer.  You can no longer specify both <code>AcceptClientCertificates</code> and <code>RequireClientCertificates</code>.  Also, if you specify <code>RequireClientCertificates</code>, you must now also supply the <code>RequireSsl</code> switch (before, setting the <code>RequireClientCertificates</code> switch implicitly set the `RequireSsl switch).</p>
+
+
+<h3>Set-TrustedHosts</h3>
+
+
+<p>Make sure you're not calling <code>Set-TrustedHosts</code> with an empty array/value for the <code>Entries</code> parameter.  The function now throw an error in that situation.  If you need to clear the list of trusted hosts, use <code>Clear-TrustedHosts</code>.</p>
+
+
+<h3>Invoke-PowerShell</h3>
+
+
+<p>If you call <code>Invoke-PowerShell</code> without the <code>x86</code> switch set and PowerShell is 32-bit, you'll get an error.  Under Windows x64, 32-bit PowerShell can't start the 64-bit instance because Windows redirects all access from C:\Windows\system32 to C:\Windows\SysWOW64.  If anyone knows how to get around this, let me know!</p>
+
+
+<h2>Enhancements</h2>
+
+<ul>
+<li>Renamed <code>Set-IisSslFlags</code> to <code>Enable-IisSsl</code> to better reflect what it does.  Also, created parameter sets around client certificate settings so you can't configure them incorrectly.  (<a href="https://bitbucket.org/splatteredbits/carbon/issue/25/set-iissslflags-create-parameter-sets-to">Fixes #25: Set-IisSslFlags: Create parameter sets to accurately reflect what flags are allowed to be set simultaneously.</a>)</li>
+</ul>
+
+<ul>
+<li>Added <code>WhatIf</code> support to <a href="http://get-carbon.org/help/Install-MsmqMessageQueue.html">Install-MsmqMessageQueue</a>.</li>
+</ul>
+
+<ul>
+<li>Created new <a href="http://get-carbon.org/help/Clear-TrustedHosts.html">Clear-TrustedHosts</a> for clearing PowerShell's trusted hosts list.</li>
+</ul>
+
+
+<h2>Bug Fixes</h2>
+
+<ul>
+<li>Rename <a href="http://get-carbon.org/help/Set-IisSslFlags.html">Enable-IisSsl/Set-IisSslFlags's</a> <code>Enable128BitSsl</code> parameter to <code>Require128BitSsl</code>] (<a href="https://bitbucket.org/splatteredbits/carbon/issue/24/set-iissslflags-rename-the-enable128bitssl">Fix #24 Set-IisSslFlags: Rename the Enable128BitSsl parameter to Require128BitSsl</a>).</li>
+</ul>
+
+<ul>
+<li><a href="https://bitbucket.org/splatteredbits/carbon/issue/19/install-iisapppool-doesnt-change-an">Fix issue #19</a>: <a href="http://get-carbon.org/help/Install-IisAppPool.html">Install-IisAppPool</a> doesn't change an existing 32-bit app pool to be a 64-bit app pool.</li>
+</ul>
+
+<ul>
+<li><a href="https://bitbucket.org/splatteredbits/carbon/issue/33/install-msmqmessagequeue-can-wait-forever">Fix issue #33</a>: <a href="http://get-carbon.org/help/Install-MsmqMessageQueue.html">Install-MsmqMessageQueue</a>: Can wait forever for a queue to get created.  It now waits 10 seconds.  </li>
+</ul>
+
+<ul>
+<li><a href="https://bitbucket.org/splatteredbits/carbon/issue/36/get-powershellpath-returns-the-wrong-path">Fix issue #36</a>: <a href="http://get-carbon.org/help/Get-PowershellPath.html">Get-PowerShellpath</a> returns the wrong path when running x86 PowerShell on x64 computers.</li>
+</ul>
+
+<ul>
+<li><a href="https://bitbucket.org/splatteredbits/carbon/issue/37/invoke-powershell-should-write-an-error">Fix issue #37</a>: <a href="http://get-carbon.org/help/Invoke-PowerShell.html">Invoke-PowerShell</a> should write an error when running as x86 on Windows x64 without the x86 flag (i.e. 32-bit PowerShell can't launch a 64-bit PowerShell, so throw an error in that situation).</li>
+</ul>
+
+<ul>
+<li><a href="https://bitbucket.org/splatteredbits/carbon/issue/38/set-trustedhosts-passing-an-empty-value">Fix issue #38</a>: <a href="http://get-carbon.org/help/Set-TrustedHosts.html">Set-TrustedHosts</a>: passing an empty value for the Entries parameter clears the hosts list.  The <code>Entries</code> parameter is now required.  To clear the trusted hosts list, use <code>Clear-TrustedHosts</code>.</li>
+</ul>
+
+
+<h1>0.2.7 (3 September 2012)</h1>
+
+
+<h2>Enhancements</h2>
+
+<ul>
+<li>New functions for working with the registry:</li>
+</ul>
+
+<ul>
+<li><a href="http://get-carbon.org/help/Get-RegistryKeyValue.html">Get-RegistryKeyValue</a>: Get a value from a registry key.</li>
+</ul>
+
+<ul>
+<li><a href="http://get-carbon.org/help/Install-RegistryKey.html">Install-RegistryKey</a>: Create a new registry key.</li>
+</ul>
+
+<ul>
+<li><a href="http://get-carbon.org/help/Remove-RegistryKeyValue.html">Remove-RegistryKeyValue</a>: Remove a value from a registry key.</li>
+</ul>
+
+<ul>
+<li><a href="http://get-carbon.org/help/Set-RegistryKeyValue.html">Set-RegistryKeyValue</a>: Set/create a value in a registry key.</li>
+</ul>
+
+<ul>
+<li><a href="http://get-carbon.org/help/Test-RegistryKeyValue.html">Test-RegistryKeyValue</a>: Test if a value exists in a registry key.</li>
+</ul>
+
+<ul>
+<li><a href="http://get-carbon.org/help/Unprotect-AclAccessRules.html">Unprotect-AclAccessRules</a>: Turns off inherited access rules on an item in the file system or registry.</li>
+</ul>
+
+<ul>
+<li>Added a <code>Clear</code> parameter to the <a href="http://get-carbon.org/help/Grant-Permissions.html">Grant-Permissions</a> function for clearing any non-inherited permissions on a file system/registry item.</li>
+</ul>
+
+<p></p>
+
+<h1>0.2.6 (30 June 2012)</h1>
+
+
+<h2>Enhancements</h2>
+
+<ul>
+<li>Improved documentation for:</li>
+</ul>
+
+<ul>
+<li><a href="http://get-carbon.org/help/Grant-ServiceControlPermission.html">Grant-ServiceControlPermission</a></li>
+</ul>
+
+<ul>
+<li><a href="http://get-carbon.org/help/Install-Service.html">Install-Service</a></li>
+</ul>
+
+<ul>
+<li><a href="http://get-carbon.org/help/Invoke-SubInAcl.html">Invoke-SubInAcl</a></li>
+</ul>
+
+<ul>
+<li><a href="http://get-carbon.org/help/Remove-Service.html">Remove-Service</a></li>
+</ul>
+
+<ul>
+<li><a href="http://get-carbon.org/help/Restart-RemoteService.html">Restart-RemoteService</a></li>
+</ul>
+
+<ul>
+<li><a href="http://get-carbon.org/help/Install-Share.html">Install-Share</a></li>
+</ul>
+
+<ul>
+<li><a href="http://get-carbon.org/help/Add-GroupMembers.html">Add-GroupMembers</a></li>
+</ul>
+
+<ul>
+<li><a href="http://get-carbon.org/help/Get-WmiLocalUserAccount.html">Get-WmiLocalUserAccount</a></li>
+</ul>
+
+<ul>
+<li><a href="http://get-carbon.org/help/Install-Group.html">Install-Group</a></li>
+</ul>
+
+<ul>
+<li><a href="http://get-carbon.org/help/Install-User.html">Install-User</a></li>
+</ul>
+
+<ul>
+<li><a href="http://get-carbon.org/help/Remove-User.html">Remove-User</a></li>
+</ul>
+
+<ul>
+<li><a href="http://get-carbon.org/help/Test-User.html">Test-User</a></li>
+</ul>
+
+<ul>
+<li><a href="http://get-carbon.org/help/Install-WindowsFeatureIis.html">Install-WindowsFeatureIis</a></li>
+</ul>
+
+<ul>
+<li><a href="http://get-carbon.org/help/Install-WindowsFeatureMsmq.html">Install-WindowsFeatureMsmq</a></li>
+</ul>
+
+<ul>
+<li><a href="http://get-carbon.org/help/Install-WindowsFeatures.html">Install-WindowsFeatures</a></li>
+</ul>
+
+<ul>
+<li><a href="http://get-carbon.org/help/Test-WindowsFeature.html">Test-WindowsFeature</a></li>
+</ul>
+
+<ul>
+<li><a href="http://get-carbon.org/help/Uninstall-WindowsFeatures.html">Uninstall-WindowsFeatures</a></li>
+</ul>
+
+<ul>
+<li><a href="http://get-carbon.org/help/Assert-FirewallConfigurable.html">Assert-FirewallConfigurable</a></li>
+</ul>
+
+<ul>
+<li><a href="http://get-carbon.org/help/Disable-FirewallStatefulFtp.html">Disable-FirewallStatefulFtp</a></li>
+</ul>
+
+<ul>
+<li><a href="http://get-carbon.org/help/Enable-FirewallStatefulFtp.html">Enable-FirewallStatefulFtp</a></li>
+</ul>
+
+<ul>
+<li><a href="http://get-carbon.org/help/Get-FirewallRules.html">Get-FirewallRules</a></li>
+</ul>
+
+<ul>
+<li><a href="http://get-carbon.org/help/Test-FirewallStatefulFtp.html">Test-FirewallStatefulFtp</a></li>
+</ul>
+
+<ul>
+<li><a href="http://get-carbon.org/help/Find-ADUser.html">Find-ADUser</a></li>
+</ul>
+
+<ul>
+<li><a href="http://get-carbon.org/help/Format-ADSpecialCharacters.html">Format-ADSpecialCharacters</a></li>
+</ul>
+
+<ul>
+<li><a href="http://get-carbon.org/help/Get-Certificate.html">Get-Certificate</a></li>
+</ul>
+
+<ul>
+<li><a href="http://get-carbon.org/help/Get-CertificateStore.html">Get-CertificateStore</a></li>
+</ul>
+
+<ul>
+<li><a href="http://get-carbon.org/help/Set-HgrcDefaultPushUrl.html">Set-HgrcDefaultPushUrl</a></li>
+</ul>
+
+<ul>
+<li>Help files and example scripts now included in Carbon download package.</li>
+</ul>
+
+<ul>
+<li>Added test to help ensure all functions have proper documentation.</li>
+</ul>
+
+
+<h2>Bug fixes</h2>
+
+<ul>
+<li><a href="http://get-carbon.org/help/Install-IisWebsite.html">Install-IisWebsite</a> now validates website bindings</li>
+</ul>
+
+
+<h1>0.2.5 (29 June 2012)</h1>
+
+
+<h2>Enhancements</h2>
+
+<ul>
+<li>Improved documentation for:</li>
+</ul>
+
+<ul>
+<li><a href="http://get-carbon.org/help/Test-IisAppPool.html">Test-IisAppPool</a></li>
+</ul>
+
+<ul>
+<li><a href="http://get-carbon.org/help/Test-IisWebsiteExists.html">Test-IisWebsiteExists</a></li>
+</ul>
+
+<ul>
+<li><a href="http://get-carbon.org/help/Unlock-IisBasicAuthentication.html">Unlock-IisBasicAuthentication</a></li>
+</ul>
+
+<ul>
+<li><a href="http://get-carbon.org/help/Unlock-IisCgi.html">Unlock-IisCgi</a></li>
+</ul>
+
+<ul>
+<li><a href="http://get-carbon.org/help/Unlock-IisConfigSection.html">Unlock-IisConfigSection</a></li>
+</ul>
+
+<ul>
+<li>Import-Carbon.ps1</li>
+</ul>
+
+<ul>
+<li><a href="http://get-carbon.org/help/Set-IniEntry.html">Set-IniEntry</a></li>
+</ul>
+
+<ul>
+<li><a href="http://get-carbon.org/help/Split-Ini.html">Split-Ini</a></li>
+</ul>
+
+<ul>
+<li><a href="http://get-carbon.org/help/Set-HgrcDefaultPushUrl.html">Set-HgrcDefaultPushUrl</a></li>
+</ul>
+
+<ul>
+<li><a href="http://get-carbon.org/help/Get-MsmqMessageQueue.html">Get-MsmqMessageQueue</a></li>
+</ul>
+
+<ul>
+<li><a href="http://get-carbon.org/help/Get-MsmqMessageQueuePath.html">Get-MsmqMessageQueuePath</a></li>
+</ul>
+
+<ul>
+<li><a href="http://get-carbon.org/help/Grant-MsmqMessageQueuePermissions.html">Grant-MsmqMessageQueuePermissions</a></li>
+</ul>
+
+<ul>
+<li><a href="http://get-carbon.org/help/Install-Msmq.html">Install-Msmq</a></li>
+</ul>
+
+<ul>
+<li><a href="http://get-carbon.org/help/Install-MsmqMessageQueue.html">Install-MsmqMessageQueue</a></li>
+</ul>
+
+<ul>
+<li><a href="http://get-carbon.org/help/Remove-MsmqMessageQueue.html">Remove-MsmqMessageQueue</a></li>
+</ul>
+
+<ul>
+<li><a href="http://get-carbon.org/help/Test-MsmqMessageQueue.html">Test-MsmqMessageQueue</a></li>
+</ul>
+
+<ul>
+<li><a href="http://get-carbon.org/help/Get-PerformanceCounters.html">Get-PerformanceCounters</a></li>
+</ul>
+
+<ul>
+<li><a href="http://get-carbon.org/help/Install-PerformanceCounter.html">Install-PerformanceCounter</a></li>
+</ul>
+
+<ul>
+<li><a href="http://get-carbon.org/help/Test-PerformanceCounter.html">Test-PerformanceCounter</a></li>
+</ul>
+
+<ul>
+<li><a href="http://get-carbon.org/help/Test-PerformanceCounterCategory.html">Test-PerformanceCounterCategory</a></li>
+</ul>
+
+<ul>
+<li><a href="http://get-carbon.org/help/Uninstall-PerformanceCounterCategory.html">Uninstall-PerformanceCounterCategory</a></li>
+</ul>
+
+<ul>
+<li><a href="http://get-carbon.org/help/Complete-Jobs.html">Complete-Jobs</a></li>
+</ul>
+
+<ul>
+<li><a href="http://get-carbon.org/help/Get-PowershellPath.html">Get-PowershellPath</a></li>
+</ul>
+
+<ul>
+<li><a href="http://get-carbon.org/help/Invoke-PowerShell.html">Invoke-PowerShell</a></li>
+</ul>
+
+<ul>
+<li><a href="http://get-carbon.org/help/Test-PowerShellIs32Bit.html">Test-PowerShellIs32Bit</a></li>
+</ul>
+
+<ul>
+<li><a href="http://get-carbon.org/help/Test-PowerShellIs64Bit.html">Test-PowerShellIs64Bit</a></li>
+</ul>
+
+<ul>
+<li><a href="http://get-carbon.org/help/Add-TrustedHosts.html">Add-TrustedHosts</a></li>
+</ul>
+
+<ul>
+<li><a href="http://get-carbon.org/help/Get-TrustedHosts.html">Get-TrustedHosts</a></li>
+</ul>
+
+<ul>
+<li><a href="http://get-carbon.org/help/Set-TrustedHosts.html">Set-TrustedHosts</a></li>
+</ul>
+
+<ul>
+<li><a href="http://get-carbon.org/help/Assert-AdminPrivileges.html">Assert-AdminPrivileges</a></li>
+</ul>
+
+<ul>
+<li><a href="http://get-carbon.org/help/Convert-SecureStringToString.html">Convert-SecureStringToString</a></li>
+</ul>
+
+<ul>
+<li><a href="http://get-carbon.org/help/Grant-Permissions.html">Grant-Permissions</a></li>
+</ul>
+
+<ul>
+<li><a href="http://get-carbon.org/help/New-Credential.html">New-Credential</a></li>
+</ul>
+
+<ul>
+<li><a href="http://get-carbon.org/help/Test-AdminPrivileges.html">Test-AdminPrivileges</a></li>
+</ul>
+
+<ul>
+<li>Improved whitespace in HTML documentation code samples.</li>
+</ul>
+
+
+
+<h1>0.2.4 (28 June 2012)</h1>
+
+
+<h2>Enhancements</h2>
+
+<ul>
+<li>Improved documentation for:</li>
+</ul>
+
+<ul>
+<li>Get-PathCanonicalCase</li>
+</ul>
+
+<ul>
+<li>Get-PathRelativeTo</li>
+</ul>
+
+<ul>
+<li>New-Junction</li>
+</ul>
+
+<ul>
+<li>New-TempDir</li>
+</ul>
+
+<ul>
+<li>Remove-Junction</li>
+</ul>
+
+<ul>
+<li>Test-PathIsJunction</li>
+</ul>
+
+<ul>
+<li>Reset-HostsFile</li>
+</ul>
+
+<ul>
+<li>Set-HostsEntry</li>
+</ul>
+
+<ul>
+<li>Add-IisDefaultDocument</li>
+</ul>
+
+<ul>
+<li>Get-IisHttpRedirect</li>
+</ul>
+
+<ul>
+<li>Get-IisVersion</li>
+</ul>
+
+<ul>
+<li>Get-IisWebsite</li>
+</ul>
+
+<ul>
+<li>Install-IisApplication</li>
+</ul>
+
+<ul>
+<li>Install-IisAppPool</li>
+</ul>
+
+<ul>
+<li>Install-IisVirtualDirectory</li>
+</ul>
+
+<ul>
+<li>Install-IisWebsite</li>
+</ul>
+
+<ul>
+<li>Invoke-AppCmd</li>
+</ul>
+
+<ul>
+<li>Remove-IisWebsite</li>
+</ul>
+
+<ul>
+<li>Set-IisAnonymousAuthentication</li>
+</ul>
+
+<ul>
+<li>Set-IisBasicAuthentication</li>
+</ul>
+
+<ul>
+<li>Set-IisDirectoryBrowsing</li>
+</ul>
+
+<ul>
+<li>Set-IisHttpRedirect</li>
+</ul>
+
+<ul>
+<li>Set-IisSslFlags</li>
+</ul>
+
+<ul>
+<li>Set-IisWebsiteSslCertifiate</li>
+</ul>
+
+<ul>
+<li>Set-IisWindowsAuthentication</li>
+</ul>
+
+
+<h1>0.2.3 (27 June 2012)</h1>
+
+
+<h2>Enhancements</h2>
+
+<ul>
+<li>Improved documentation for:</li>
+</ul>
+
+<ul>
+<li>Disable-IEEnhancedSecurityConfiguration</li>
+</ul>
+
+<ul>
+<li>Enable-IEActivationPermissions</li>
+</ul>
+
+<ul>
+<li>Get-FullPath</li>
+</ul>
+
+<ul>
+<li>Invoke-WindowsInstaller</li>
+</ul>
+
+<ul>
+<li>Protect-String</li>
+</ul>
+
+<ul>
+<li>Remove-EnvironmentVariable</li>
+</ul>
+
+<ul>
+<li>Set-DotNetAppSetting</li>
+</ul>
+
+<ul>
+<li>Set-DotNetConnectionString</li>
+</ul>
+
+<ul>
+<li>Set-EnvironmentVariable</li>
+</ul>
+
+<ul>
+<li>Test-OSIs32Bit</li>
+</ul>
+
+<ul>
+<li>Test-OSIs64Bit</li>
+</ul>
+
+<ul>
+<li>Unprotect-String</li>
+</ul>
+
+
+<h2>Bug fixes</h2>
+
+<ul>
+<li>Invoke-WindowsInstaller doesn't validate that installer path ends in '.msi'.</li>
+</ul>
+
+<ul>
+<li>Invoke-WindowsInstaller not showing correct exit code when installation fails.</li>
+</ul>
+
+
+<h1>0.2.2 (19 June 2012)</h1>
+
+
+<h2>Enhancements</h2>
+
+<ul>
+<li>Created Import-Carbon script to help users properly import Carbon.</li>
+</ul>
+
+<p></p>
+
+<h2>Bug fixes</h2>
+
+<ul>
+<li>Add-GroupMembers fails to add Administrators and ANONYMOUS LOGON built-in accounts.</li>
+</ul>
+
+<ul>
+<li>Add-GroupMembers fails when adding built-in accounts multiple times.</li>
+</ul>
+
+<ul>
+<li>Add-GroupMembers fails to add domain user to a local group.</li>
+</ul>
+
+<p></p>
+
+<h1>0.2.1 (28 April 2012)</h1>
+
+<ul>
+<li>Added IsJunction property to DirectoryInfo objects.  Returns true if a directory is a junction/reparse point.</li>
+</ul>
+
+<ul>
+<li>Created a Carbon assembly for compiled code.  Moved P/Invoke functions from FileSystem.ps1 into assembly.  This is a backwards compatible change.</li>
+</ul>
+
+<ul>
+<li>Created a Carbon.IO.JunctionPoint helper class for creating/removing/getting junction/reparse points.  Updated New-Junction and Remove-Junction to use the new helper class.</li>
+</ul>
+
+<ul>
+<li>Added TargetPath property to DirectoryInfo objects.  If the directory is a junction/reparse points, returns the path to the junction's target.  Otherwise, $null.</li>
+</ul>
+
+
+<h1>0.2.0 (4 April 2012)</h1>
+
+<p></p>
+
+<h2>Enhancements</h2>
+
+<ul>
+<li>fix issue #3: Added -Runtime switch to Invoke-PowerShell function for running PowerShell under .NET 2.0 or 4.0.  Valid values are 'v2.0' (for .NET 2) and 'v4.0' (for .NET 4).</li>
+</ul>
+
+<ul>
+<li><strong>BREAKING CHANGE:</strong> Added -Clr2 and -Clr4 switches to Set-DotNetAppSetting and Set-DotNetConnectionString functions for modifying the .NET 2 and/or 4 machine.config files.  One or both of these parameters is required.</li>
+</ul>
+
+<p></p>
+
+<h2>Bug fixes</h2>
+
+<ul>
+<li>Improved documentation for Get-ADDomainController, Get-ADUser, Format-ADSpecialCharacters, Get-Certificate, Invoke-PowerShell, Set-DotNetAppSetting, and Set-DotNetConnectionString functions.</li>
+</ul>
+
+<ul>
+<li>fix issue #2: Get-PowerShellPath Returns Wrong Value on x86 Systems</li>
+</ul>
+
+<p></p>
+
+
+<h1>0.1.0 (2 April 2012):</h1>
+
+<ul>
+<li>First packaged release.</li>
+</ul>
+
+    
+    <div class="Footer">
+		Copyright &copy; 2012 <a href="http://splatteredbits.com">Aaron Jensen</a>.  All rights reserved.
+	</div>
+</body>
+</html>

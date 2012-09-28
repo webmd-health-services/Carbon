@@ -1,13 +1,14 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-    <title>PowerShell - Set-IisSslFlags - Carbon</title>
+    <title>PowerShell - Enable-IisSsl - Carbon</title>
 	<link href="styles.css" type="text/css" rel="stylesheet" />
 </head>
 <body>
     	<ul id="SiteNav">
 		<li><a href="http://get-carbon.org">Get-Carbon</a></li>
 		<li><b>-Documentation</b></li>
+        <li><a href="http://get-carbon.org">-ReleaseNotes</a></li>
 		<li><a href="http://pshdo.com">-Blog</a></li>
 	</ul>
 <div id="CommandMenuContainer" style="float:left;">
@@ -63,6 +64,7 @@
 		<li class="Category">IIS</li>
 		<ul class="CommandMenu">
 			<li><a href="Add-IisDefaultDocument.html">Add-IisDefaultDocument</a></li>
+			<li><a href="Enable-IisSsl.html">Enable-IisSsl</a></li>
 			<li><a href="Get-IisHttpRedirect.html">Get-IisHttpRedirect</a></li>
 			<li><a href="Get-IisVersion.html">Get-IisVersion</a></li>
 			<li><a href="Get-IisWebsite.html">Get-IisWebsite</a></li>
@@ -76,7 +78,6 @@
 			<li><a href="Set-IisBasicAuthentication.html">Set-IisBasicAuthentication</a></li>
 			<li><a href="Set-IisDirectoryBrowsing.html">Set-IisDirectoryBrowsing</a></li>
 			<li><a href="Set-IisHttpRedirect.html">Set-IisHttpRedirect</a></li>
-			<li><a href="Set-IisSslFlags.html">Set-IisSslFlags</a></li>
 			<li><a href="Set-IisWebsiteSslCertificate.html">Set-IisWebsiteSslCertificate</a></li>
 			<li><a href="Set-IisWindowsAuthentication.html">Set-IisWindowsAuthentication</a></li>
 			<li><a href="Test-IisAppPoolExists.html">Test-IisAppPoolExists</a></li>
@@ -139,6 +140,7 @@
 		<li class="Category">PowerShellRemoting</li>
 		<ul class="CommandMenu">
 			<li><a href="Add-TrustedHosts.html">Add-TrustedHosts</a></li>
+			<li><a href="Clear-TrustedHosts.html">Clear-TrustedHosts</a></li>
 			<li><a href="Get-TrustedHosts.html">Get-TrustedHosts</a></li>
 			<li><a href="Set-TrustedHosts.html">Set-TrustedHosts</a></li>
 		</ul>
@@ -200,26 +202,30 @@
 </div>
 
 
-    <h1>Set-IisSslFlags</h1>
-    <div><p>Sets how a website or part of a website should handle and use SSL.</p>
+    <h1>Enable-IisSsl</h1>
+    <div><p>Turns on and configures SSL for a website or part of a website.</p>
 </div>
 
         <h2>Syntax</h2>
-    <pre class="Syntax"><code>Set-IisSslFlags [-SiteName] &lt;String&gt; [[-Path] &lt;String&gt;] [-RequireSsl] [-AcceptClientCertificates] [-RequireClientCertificates] [-Enable128BitSsl] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
+    <pre class="Syntax"><code>Enable-IisSsl -SiteName &lt;String&gt; [-Path &lt;String&gt;] [-RequireSsl] [-Require128BitSsl] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
+<pre class="Syntax"><code>Enable-IisSsl -SiteName &lt;String&gt; [-Path &lt;String&gt;] -RequireSsl [-Require128BitSsl] -RequireClientCertificates [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
+<pre class="Syntax"><code>Enable-IisSsl -SiteName &lt;String&gt; [-Path &lt;String&gt;] [-RequireSsl] [-Require128BitSsl] [-AcceptClientCertificates] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
     
         <h2>Description</h2>
     <div class="Description">
-        <p>This function allows you to configure the following SSL-related settings:</p>
+        <p>This function enables SSL and optionally the site/directory to: </p>
 
 <ul>
-<li>Requiring SSL (the <code>RequireSsl</code> switch)</li>
-<li>Ignoring/accepting/requiring client certificates (the <code>AccepClientCertificates</code> and <code>RequireClientCertificates</code> switches).</li>
-<li>Requiring 128-bit SSL (the <code>Enable128BitSsl</code> switch).</li>
+<li>Require SSL (the <code>RequireSsl</code> switch)</li>
+<li>Ignore/accept/require client certificates (the <code>AcceptClientCertificates</code> and <code>RequireClientCertificates</code> switches).</li>
+<li>Requiring 128-bit SSL (the <code>Require128BitSsl</code> switch).</li>
 </ul>
 
-<p>By default, this function will make SSL optional, set the ignore client certificates flag, and not require 128-bit SSL.</p>
+<p>By default, this function will enable SSL, make SSL connections optional, ignores client certificates, and not require 128-bit SSL.</p>
 
 <p>Changing any SSL settings will do you no good if the website doesn't have an SSL binding or doesn't have an SSL certificate.  The configuration will most likely succeed, but won't work in a browser.  So sad.</p>
+
+<p>Beginning with IIS 7.5, the <code>Require128BitSsl</code> parameter won't actually change the behavior of a website since <a href="https://forums.iis.net/p/1163908/1947203.aspx">there are no longer 128-bit crypto providers</a> in versions of Windows running IIS 7.5.</p>
 
     </div>
     
@@ -267,6 +273,15 @@
                 <td></td>
 			</tr>
 			<tr valign='top'>
+				<td>Require128BitSsl</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+				<td>Requires 128-bit SSL.  Only changes IIS behavior in IIS 7.0.
+</td>
+				<td>false</td>
+				<td>false</td>
+                <td></td>
+			</tr>
+			<tr valign='top'>
 				<td>AcceptClientCertificates</td>
 				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
 				<td>Should client certificates be accepted?
@@ -278,18 +293,9 @@
 			<tr valign='top'>
 				<td>RequireClientCertificates</td>
 				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
-				<td>Should client certificates be required?
+				<td>Should client certificates be required?  Also requires SSL ('RequireSsl` switch).
 </td>
-				<td>false</td>
-				<td>false</td>
-                <td></td>
-			</tr>
-			<tr valign='top'>
-				<td>Enable128BitSsl</td>
-				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
-				<td>Requires 128-bit SSL.
-</td>
-				<td>false</td>
+				<td>true</td>
 				<td>false</td>
                 <td></td>
 			</tr>
@@ -326,17 +332,20 @@
     
         
                 <h2>EXAMPLE 1</h2>
-            <pre><code>Set-IisSslFlags -Site Peanuts</code></pre>
-            <p><p>Resets the <code>Peanuts</code> website's SSL flags to defaults, i.e. makes SSL optional, ignores client certificates, and makes 128-bit SSL optional.</p>
+            <pre><code>Enable-IisSsl -Site Peanuts</code></pre>
+            <p><p>Enables SSL on the <code>Peanuts</code> website's, making makes SSL connections optional, ignoring client certificates, and making 128-bit SSL optional.</p>
 </p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 2</h2>
-            <pre><code>Set-IisSslFlags -Site Peanuts -Path Snoopy/DogHouse -RequireSsl</code></pre>
+            <pre><code>Enable-IisSsl -Site Peanuts -Path Snoopy/DogHouse -RequireSsl</code></pre>
             <p><p>Configures the <code>/Snoopy/DogHouse</code> directory in the <code>Peanuts</code> site to require SSL.  It also turns off any client certificate settings and makes 128-bit SSL optional.</p>
 </p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 3</h2>
-            <pre><code>Set-IisFlags -Site Peanuts -AcceptClientCertificates</code></pre>
-            <p><p>Configures the <code>Peanuts</code> website to accept client certificates, makes SSL optional, and makes 128-bit SSL optional.</p>
+            <pre><code>Enable-IisSsl -Site Peanuts -AcceptClientCertificates</code></pre>
+            <p><p>Enables SSL on the <code>Peanuts</code> website and configures it to accept client certificates, makes SSL optional, and makes 128-bit SSL optional.</p>
 </p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 4</h2>
-            <pre><code>Set-IisFlags -Site Peanuts -Enable128BitSsl</code></pre>
-            <p><p>Configures the <code>Peanuts</code> website to require 128-bit SSL, makes SSL optional, and ignores client certificates.</p>
+            <pre><code>Enable-IisSsl -Site Peanuts -RequireSsl -RequireClientCertificates</code></pre>
+            <p><p>Enables SSL on the <code>Peanuts</code> website and configures it to require SSL and client certificates.  You can't require client certificates without also requiring SSL.</p>
+</p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 5</h2>
+            <pre><code>Enable-IisSsl -Site Peanuts -Require128BitSsl</code></pre>
+            <p><p>Enables SSL on the <code>Peanuts</code> website and require 128-bit SSL.  Also, makes SSL connections optional and ignores client certificates.</p>
 </p><p></p><p></p><p></p><p></p>
 </body>
 </html>   
