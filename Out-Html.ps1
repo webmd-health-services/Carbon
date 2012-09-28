@@ -419,7 +419,8 @@ $commands |
     Get-Help -Full | 
     Convert-HelpToHtml -Menu $menuBuilder.ToString()
 
-$releaseNotesHtml = Get-Content (Join-Path $PSSCriptRoot 'RELEASE NOTES.txt') |
+$releaseNotesHtml = Get-Content (Join-Path $PSSCriptRoot 'RELEASE NOTES.txt')
+$releaseNotesHtml = $releaseNotesHtml -join "`n" |
                         Convert-MarkdownToHtml
 
 @"
