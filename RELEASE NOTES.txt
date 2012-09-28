@@ -1,5 +1,26 @@
 # 0.3.0
 
+## Upgrade Instructions
+
+This release contains backwards-**incompatible** changes to the following functions:
+ * [Set-IisSslFlags](http://get-carbon.org/help/Set-IisSslFlags.html)
+ * [Set-TrustedHosts](http://get-carbon.org/help/Set-TrustedHosts.html)
+ * [Invoke-PowerShell](http://get-carbon.org/help/Invoke-PowerShell.html)
+
+### Set-IisSslFlags
+
+This function was renamed to `Enable-IisSsl`.  The `Enable128BitSsl` was renamed to `Require128BitSsl`.  
+
+Configuring client certificates is now a little stricter/clearer.  You can no longer specify both `AcceptClientCertificates` and `RequireClientCertificates`.  Also, if you specify `RequireClientCertificates`, you must now also supply the `RequireSsl` switch (before, setting the `RequireClientCertificates` switch implicitly set the `RequireSsl switch).
+
+### Set-TrustedHosts
+
+Make sure you're not calling `Set-TrustedHosts` with an empty array/value for the `Entries` parameter.  The function now throw an error in that situation.  If you need to clear the list of trusted hosts, use `Clear-TrustedHosts`.
+
+### Invoke-PowerShell
+
+If you call `Invoke-PowerShell` without the `x86` switch set and PowerShell is 32-bit, you'll get an error.  Under Windows x64, 32-bit PowerShell can't start the 64-bit instance because Windows redirects all access from C:\Windows\system32 to C:\Windows\SysWOW64.  If anyone knows how to get around this, let me know!
+
 ## Enhancements
  * Renamed `Set-IisSslFlags` to `Enable-IisSsl` to better reflect what it does.  Also, created parameter sets around client certificate settings so you can't configure them incorrectly.  ([Fixes #25: Set-IisSslFlags: Create parameter sets to accurately reflect what flags are allowed to be set simultaneously.](https://bitbucket.org/splatteredbits/carbon/issue/25/set-iissslflags-create-parameter-sets-to))
  * Added `WhatIf` support to [Install-MsmqMessageQueue](http://get-carbon.org/help/Install-MsmqMessageQueue.html).
