@@ -61,21 +61,13 @@ function Invoke-WindowsInstaller
         return
     }
     
-    # There is an MSI service that is continually running.  We need to wait for the installer to finish before continuing,
-    # so we find the msiexec process that *isn't* the service.
-    $msiServerPid = -1
-    $msiServer = (Get-WmiObject Win32_Service -Filter "Name='msiserver'")
-    if( $msiServer )
-    {
-        $msiServerPid = $msiServer.ProcessId
-    }
-    
     if( $pscmdlet.ShouldProcess( $Path, "install" ) )
     {
         Write-Host "Installing '$Path'."
         msiexec.exe /i $Path /quiet
-        $msiProcess = Get-Process -Name msiexec -ErrorAction SilentlyContinue | `
-                        Where-Object { $_.Id -ne $msiServerPid }
+        $msiProcess = Get-Process -Name msiexec -ErrorAction SilentlyContinue | 
+                        Where-Object { $_.ParentProcessId -eq [Diagnostics.Process]::GetCurrentProcess().ID }
+
         if( $msiProcess )
         {
             $msiProcess.WaitForExit()

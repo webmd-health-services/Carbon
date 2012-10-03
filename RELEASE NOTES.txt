@@ -2,6 +2,7 @@
 
 ## Enhancements
  * Improved [Disable-IEEnhancedSecurityConfiguration](http://get-carbon.org/help/Install-IisAppPool.html) and [Enable-IEActivationPermissions](http://get-carbon.org/help/Enable-IEActivationPermissions.html) for enabling Internet Explorer to run headless by non-priveleged users.
+ * Changed the way [Invoke-WindowsInstaller](http://get-carbon.org/help/Invoke-WindowsInstaller.html) waits for MSI to finish installing: instead of searching for any MSI process, it now searches for an MSI process that is a child of the current PowerShell process.
  
 # 0.3.0 (28 September 2012)
 
