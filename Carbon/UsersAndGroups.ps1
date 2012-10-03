@@ -77,7 +77,7 @@ function Add-GroupMembers
 		try
 		{
 			$user = $container.Children.Find($shortName, "User")
-			return [adsi]"WinNT://$containerName/$shortName"
+			return [adsi]$user.Path
 		}
 		catch
 		{
@@ -86,7 +86,7 @@ function Add-GroupMembers
 		try
 		{
 			$group = $container.Children.Find($shortName, "Group")
-			return [adsi]"WinNT://$containerName/$shortName,group"
+			return [adsi]$group.Path
 		}
 		catch
 		{
