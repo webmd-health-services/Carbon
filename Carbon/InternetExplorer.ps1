@@ -14,7 +14,7 @@
 
 function Disable-IEEnhancedSecurityConfiguration
 {
- 	<#
+    <#
     .SYNOPSIS
     Disables Internet Explorer's Enhanced Security Configuration. 
     .DESCRIPTION
@@ -30,34 +30,60 @@ function Disable-IEEnhancedSecurityConfiguration
     Enable-IEActivationPermissions
     #>
     [CmdletBinding(SupportsShouldProcess=$true)]
- 	param()
+    param(
+    )
+    
     $regPathAdmin = "HKLM:SOFTWARE\Microsoft\Active Setup\Installed Components\{A509B1A7-37EF-4b3f-8CFC-4F3A74704073}"
     $regPathUser = "HKLM:SOFTWARE\Microsoft\Active Setup\Installed Components\{A509B1A8-37EF-4b3f-8CFC-4F3A74704073}"
     
+    Write-Host "Disabling Internet Explorer Enhanced Security Configuration."
+    
     if(-not (Test-Path -Path $regPathAdmin))
     {
-        Write-Warning "Could not find the registry path for admins $regPathAdmin). Aborting"
+        Write-Warning "Could not find the registry path for admins ($regPathAdmin). Aborting."
         return
          
-	}
-	
+    }
+
     if(-not (Test-Path -Path $regPathUser))
     {
-        Write-Warning "Could not find the registry path for users ($regPathUser). Aborting"
+        Write-Warning "Could not find the registry path for users ($regPathUser). Aborting."
         return
-         
-	}
-    if( $pscmdlet.ShouldProcess( "Set Registry Information" ) )
+    }
+
+    if( $pscmdlet.ShouldProcess( "Set Registry Information." ) )
     {
+        Write-Verbose "Setting registry information."
         Set-ItemProperty  $regPathAdmin -name "IsInstalled" -value 0 
         Set-ItemProperty  $regPathUser -name "IsInstalled" -value 0
     }
+
     if( $pscmdlet.ShouldProcess("iesetup.dll", "Call dll reg methods" ) )
     {
-    
+        Write-Verbose "Calling DLL methods."
         Rundll32 iesetup.dll, IEHardenLMSettings
         Rundll32 iesetup.dll, IEHardenUser
         Rundll32 iesetup.dll, IEHardenAdmin 
+        
+    }
+
+    if( $pscmdlet.ShouldProcess( "Delete HKCU keys." ) )
+    {
+        Write-Verbose "Deleting HKCU keys."
+        
+        $deleteKey1 = "HKCU:SOFTWARE\Microsoft\Active Setup\Installed Components\{A509B1A7-37EF-4b3f-8CFC-4F3A74704073}"
+        if(Test-Path -Path $deleteKey1)
+        {
+            Write-Host "$deleteKey1"
+            Remove-Item -Path $deleteKey1
+        }
+
+        $deleteKey2 = "HKCU:SOFTWARE\Microsoft\Active Setup\Installed Components\{A509B1A8-37EF-4b3f-8CFC-4F3A74704073}"
+        if(Test-Path -Path $deleteKey2)
+        {
+            Write-Host "$deleteKey2"
+            Remove-Item -Path $deleteKey2
+        }
     }
 }
 
@@ -87,24 +113,33 @@ function Enable-IEActivationPermissions
     $ieRegPath = "hkcr:\AppID\{0002DF01-0000-0000-C000-000000000046}"
     $ieRegPath64 = "hkcr:\Wow6432Node\AppID\{0002DF01-0000-0000-C000-000000000046}"
 
+    Write-Host "Enabling IE Launch and Activation permissions."
+    
     if(-not (Test-Path "HKCR:\AppID"))
     {
         New-PSDrive -Name HKCR -PSProvider Registry -Root HKEY_CLASSES_ROOT
     }
 
-    if(-not (Test-Path $ieRegPath))
+    if(Test-Path $ieRegPath)
+    {
+        Set-ItemProperty $ieRegpath -name "(Default)" -value "Internet Explorer(Ver 1.0)"
+    }
+    else
     {
        New-Item $ieRegPath
-       New-ItemProperty $ieRegpath "(default)" -value "Internet Explorer(Ver 1.0)" -PropertyType Binary
+       New-ItemProperty $ieRegpath "(Default)" -value "Internet Explorer(Ver 1.0)" -PropertyType String
     }
 
-    if(-not (Test-Path $ieRegPath64))
+    if(Test-Path $ieRegPath64)
+    {
+        Set-ItemProperty $ieRegPath64 -name "(Default)" -value "Internet Explorer(Ver 1.0)" 
+    }
+    else
     {
        New-Item $ieRegPath64
-       New-ItemProperty $ieRegPath64 "(default)" -value "Internet Explorer(Ver 1.0)" -PropertyType Binary
+       New-ItemProperty $ieRegPath64 "(default)" -value "Internet Explorer(Ver 1.0)" -PropertyType String
     }
  
     Set-ItemProperty $ieRegPath "LaunchPermission" ([byte[]]$binarySD.binarySD)
     Set-ItemProperty $ieRegPath64 "LaunchPermission" ([byte[]]$binarySD.binarySD)
-
 }
