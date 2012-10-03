@@ -48,102 +48,51 @@ function Add-GroupMembers
         $Members
     )
 
-	function Find-UserOrGroup
-	{
-		[CmdletBinding()]
-		param(
-			# The user or group name
-			$Name
-		)
-
-		$shortName = $Name
-		$containerName = $env:ComputerName
-		$container = [adsi] "WinNT://$containerName,computer"
-		if( $Name.Contains("\") )
-		{
-			$domain,$shortName = $Name -split '\',2,'SimpleMatch'
-			
-			$domainController = Get-ADDomainController -Domain $domain
-			$container = [adsi] ('WinNT://{0}' -f $domainController)
-			$containerName = $domain
-		}
-
-		if( -not $container )
-		{
-			Write-Error "Unable to find container for '$Name'."
-			return $null
-		}
-		
-		try
-		{
-			$user = $container.Children.Find($shortName, "User")
-			return [adsi]$user.Path
-		}
-		catch
-		{
-		}
-		
-		try
-		{
-			$group = $container.Children.Find($shortName, "Group")
-			return [adsi]$group.Path
-		}
-		catch
-		{
-		}
-		
-		return $null
-	}
-    
     $Builtins = @{ 
                     'NetworkService' = 'NT AUTHORITY\NETWORK SERVICE'; 
                     'Administrators' = 'Administrators'; 
                     'ANONYMOUS LOGON' = 'NT AUTHORITY\ANONYMOUS LOGON'; 
                  }
     
-    $group = Find-UserOrGroup $Name
+    $group = [adsi]('WinNT://{0}/{1}' -f $env:ComputerName,$Name)
     if( $group -eq $null )
     {
         throw "Active directory is unable to find local group $group."
     }
 
     $currentMembers = net localgroup `"$Name`"
-    foreach( $member in $Members )
-    {
-        if( $currentMembers -contains $member )
-        {
-            continue
-        }
-        
-        if( $Builtins.ContainsKey( $member ) )
-        {
-            $canonicalMemberName = $Builtins[$member]
-            if( $currentMembers -contains $canonicalMemberName )
+    $Members |
+        Where-Object { $currentMembers -notcontains $_ } |
+        ForEach-Object {
+            $member = $_
+            if( $Builtins.ContainsKey( $member ) )
             {
-                continue
+                $canonicalMemberName = $Builtins[$member]
+                if( $currentMembers -contains $canonicalMemberName )
+                {
+                    continue
+                }
+                if( $pscmdlet.ShouldProcess( $Name, "add built-in member $member" ) )
+                {
+                    Write-Host "Adding $member to group $Name."
+                    net localgroup $Name $member /add
+                }
             }
-            if( $pscmdlet.ShouldProcess( $Name, "add built-in member $member" ) )
+            else
             {
-                Write-Host "Adding $member to group $Name."
-                net localgroup $Name $member /add
-            }
-        }
-        else
-        {
-            $adMember = Find-UserOrGroup -Name $member
-            if( -not $adMember )
-            {
-                Write-Error "Unable to find user '$member'."
-                continue
-            }
-            
-            if( $pscmdlet.ShouldProcess( $Name, "add member $member" ) )
-            {
-                Write-Host "Adding $($adMember.Name) to group $Name."
-                [void] $group.Add( $adMember.Path )
+                $memberPath = 'WinNT://{0}/{1}' -f $env:ComputerName,$member
+                if( $member.Contains("\") )
+                {
+                    $memberPath = 'WinNT://{0}/{1}' -f ($member -split '\\')
+                }
+                
+                if( $pscmdlet.ShouldProcess( $Name, "add member $member" ) )
+                {
+                    Write-Host "Adding $member to group $Name."
+                    [void] $group.Add( $memberPath )
+                }
             }
         }
-    }
 }
 
 function Get-WmiLocalUserAccount
