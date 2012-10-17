@@ -31,7 +31,6 @@ param(
     [Switch]
     # Update the version.
     $UpdateVersion
-
 )
 
 Set-StrictMode -Version Latest
@@ -109,7 +108,7 @@ try
      
     if( $All )
     {   
-        hg commit -m "Releasing version $version." --include $releaseNotesFileName --include .\Website
+        hg commit -m "Releasing version $version." --include $releaseNotesFileName --include .\Website --include Carbon\Carbon.psd1
         if( -not (hg tags | Where-Object { $_ -like "$version*" } ) )
         {
             hg tag $version
