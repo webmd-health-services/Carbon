@@ -25,7 +25,13 @@ param(
     
     [Parameter(ParameterSetName='Some')]
     [Switch]
-    $Package
+    $Package,
+
+    [Parameter(ParameterSetName='Some')]
+    [Switch]
+    # Update the version.
+    $UpdateVersion
+
 )
 
 Set-StrictMode -Version Latest
@@ -43,7 +49,7 @@ $releaseNotesFileName = 'RELEASE NOTES.txt'
 $releaseNotesPath = Join-Path $PSScriptRoot $releaseNotesFileName -Resolve
 $releaseNotes = Get-Content $releaseNotesPath
 
-if( $releaseNotes[0] -notmatch "^\# (\d+\.\d+\.\d+)\s*" )
+if( $releaseNotes[0] -notmatch "^\# (\d+\.\d+\.\d+\.\d+)\s*" )
 {
     Write-Error "Missing version from release notes file.  The first line must contain the version about to be released."
     exit
@@ -53,6 +59,24 @@ $releaseNotes[0] = "# $version ($((Get-Date).ToString("d MMMM yyyy")))"
 if( $All )
 {
     $releaseNotes | Out-File -FilePath $releaseNotesPath -Encoding OEM
+}
+
+if( $All -or $UpdateVersion )
+{
+    $manifestPath = Join-Path $PSScriptRoot Carbon\Carbon.psd1 -Resolve
+    $manifest = Get-Content $manifestPath
+    $manifest |
+        ForEach-Object {
+            if( $_ -like 'ModuleVersion = *' )
+            {
+                'ModuleVersion = ''{0}''' -f $version.ToString()
+            }
+            else
+            {
+                $_
+            }
+        } |
+        Out-File -FilePath $manifestPath -Encoding OEM
 }
 
 if( $All -or $Package )
@@ -94,6 +118,10 @@ try
 }
 finally
 {
-    Remove-Item (Join-Path $PSScriptRoot Carbon\$licenseFileName)
+    $licensePath = Join-Path $PSScriptRoot Carbon\$licenseFileName
+    if( Test-Path $licensePath )
+    {
+        Remove-Item $licensePath
+    }
     Pop-Location
 }
