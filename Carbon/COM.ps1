@@ -73,7 +73,7 @@ function Get-ComDefaultAccessRule
 {
     <#
     .SYNOPSIS
-    Gets the COM access permissions for the current computer.
+    Gets the COM Access permissions for the current computer.
     
     .DESCRIPTION
     COM access permissions are used to allow default access to applications.  Usually, these permissions are viewed and edited by opening dcomcnfg, right-clicking My Computer under Component Services > Computers, choosing Properties, going to the COM Security tab, and clicking `Edit Default...`.  This function does all that, but does it much easier.
@@ -89,12 +89,23 @@ function Get-ComDefaultAccessRule
     Get-ComDefaultAccessRule
     
     Look how easy it is!
-    #>
+
+    .EXAMPLE
+    Get-ComDefaultAccessRule -Identity 'Administrators'
     
+    Gets the COM access rules for the local administrators group.
+    #>
+    [CmdletBinding()]
+    param(
+        [string]
+        # The identity whose access rule to return.  If not set, all access rules are returned.
+        $Identity
+    )
 
     $converter = New-Object Management.ManagementClass 'Win32_SecurityDescriptorHelper'
 
     $bytes = Get-RegistryKeyValue -Path 'hklm:\software\microsoft\ole' -Name 'DefaultAccessPermission'
+    $convertArgs = @{ }
     if( -not $bytes )
     {
         Write-Warning "DCOM Default Access Permission not found. Using reverse-engineered, hard-coded default access permissions."
@@ -102,19 +113,22 @@ function Get-ComDefaultAccessRule
         # If no custom access permissions have been granted, then the DefaultAccessPermission registry value doesn't exist.
         # This is the SDDL for the default permissions used on Windows 2008 and Windows 7.
         $DEFAULT_SDDL = 'O:BAG:BAD:(A;;CCDCLC;;;PS)(A;;CCDC;;;SY)(A;;CCDCLC;;;BA)'
-        ConvertTo-ComAccessRule -SDDL $DEFAULT_SDDL
+        $convertArgs.SDDL = $DEFAULT_SDDL
     }
     else
     {
-        ConvertTo-ComAccessRule -BinarySD $bytes
+        $convertArgs.BinarySD = $bytes
     }
+    
+    ConvertTo-ComAccessRule @convertArgs |
+        Select-ComAccessRule -Identity $Identity
 }
 
 function Get-ComDefaultActivationAccessRule
 {
     <#
     .SYNOPSIS
-    Gets the DCOM launch and activation permissions for the current computer.
+    Gets the COM Launch and Activation permissions for the current computer.
     
     .DESCRIPTION
     DCOM launch and activation permissions are used to allow default access to applications.  Usually, these permissions are viewed and edited by opening dcomcnfg, right-clicking My Computer under Component Services > Computers, choosing Properties, going to the COM Security tab, and clicking `Edit Default...`.  This function does all that, but does it much easier.
@@ -128,14 +142,66 @@ function Get-ComDefaultActivationAccessRule
     Get-ComDefaultActivationAccessRule
     
     Look how easy it is!
+    
+    .EXAMPLE
+    Get-ComDefaultActivationAccessRule -Identity 'Administrators'
+    
+    Gets the COM Launch and Activation access rules for the local administrators group.
     #>
+    [CmdletBinding()]
+    param(
+        [string]
+        # The identity whose access rule to return.  If not set, all access rules are returned.
+        $Identity
+    )
     
     $bytes = Get-RegistryKeyValue -Path 'hklm:\software\microsoft\ole' -Name 'DefaultLaunchPermission'
     if( -not $bytes )
     {
-        Write-Warning "DCOM Default Launch and Activation Permission not found."
+        Write-Warning "COM Default Launch and Activation Permission not found."
         return
     }
-    ConvertTo-ComAccessRule -BinarySD $bytes
+    ConvertTo-ComAccessRule -BinarySD $bytes |
+        Select-ComAccessRule -Identity $Identity
 }
 
+filter Select-ComAccessRule
+{
+    <#
+    .SYNOPSIS
+    Returns COM access rules from a pipeline that match specific criteria.
+    
+    .DESCRIPTION
+    Its sometimes useful to filter a set of COM access rules by certain criteria.
+    
+    If not criteria are given, all access rules are returned.
+    
+    .EXAMPLE
+    Get-ComDefaultActivationAccessRule | Select-ComAccessRule -Identity 'Administators
+    
+    Selects the COM access rule for the local `Administrators` group.
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory=$true,ValueFromPipeline=$true)]
+        [Carbon.Security.ComAccessRule]
+        # The access rule to filter.
+        $InputObject,
+        
+        [string]
+        # Select COM Access Rules that belong to this identity.
+        $Identity
+    )
+    
+    if( $Identity )
+    {
+        $cIdentity = Resolve-IdentityName -Name $Identity
+        if( $InputObject.IdentityReference.Value -eq $cIdentity )
+        {
+            return $InputObject
+        }
+        return
+    }
+    
+    return $InputObject
+}
