@@ -263,6 +263,45 @@ function Remove-User
     }
 }
 
+function Resolve-IdentityName
+{
+    <#
+    .SYNOPSIS
+    Determines the full, NT identity name for a user or group.
+    
+    .DESCRIPTION
+    The common name for an account is not always the canonical name used by the operating system.  For example, the local Administrators group is actually called BUILTIN\Administrators.  This function converts an identity's name into its canonical name.
+    
+    If the name doesn't represent an actual user or group, an error is written and nothing returned.
+    
+    .EXAMPLE
+    Resolve-IdentityName -Identity 'Administrators'
+    
+    Returns `BUILTIN\Administrators`, the canonical name for the local Administrators group.
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]
+        # The name of the identity whose canonical name to return.
+        $Name
+    )
+    
+    $commonParams = @{ }
+    if( $PSBoundParameters.ContainsKey( 'ErrorAction' ) )
+    {
+        $commonParams.ErrorAction = $PSBoundParameters.ErrorAction
+    }
+    
+    $sid = Test-Identity -Name $Name -PassThru @commonParams
+    if( $sid )
+    {
+        $ntAccount = $sid.Translate( [Security.Principal.NTAccount] )
+        return $ntAccount.Value
+    }
+    return $null
+}
+
 function Test-Identity
 {
     <#
