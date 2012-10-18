@@ -42,6 +42,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="IO\JunctionPoint.cs" />
+    <Compile Include="Security\ComAccessRights.cs" />
+    <Compile Include="Security\ComAccessRule.cs" />
     <Compile Include="Win32.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
