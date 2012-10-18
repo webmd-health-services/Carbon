@@ -22,9 +22,9 @@ function TearDown
     Remove-Module Carbon
 }
 
-function Test-ShouldGetComDefaultAccessRule
+function Test-ShouldGetComLaunchAndActivationPermissions
 {
-    $rules = Get-ComDefaultActivationAccessRule
+    $rules = Get-ComLaunchAndActivationPermissions
     Assert-NotNull $rules
     Assert-True ($rules.Count -gt 1)
     $rules | ForEach-Object { 
@@ -39,9 +39,9 @@ function Test-ShouldGetComDefaultAccessRule
 
 function Test-ShouldGetRuleForSpecificUser
 {
-    $rules = Get-ComDefaultActivationAccessRule
+    $rules = Get-ComLaunchAndActivationPermissions
     Assert-GreaterThan $rules.Count 1
-    $rule = Get-ComDefaultActivationAccessRule -Identity $rules[0].IdentityReference.Value
+    $rule = Get-ComLaunchAndActivationPermissions -Identity $rules[0].IdentityReference.Value
     Assert-NotNull $rule
     Assert-Equal $rule.IdentityReference $rules[0].IdentityReference
 }

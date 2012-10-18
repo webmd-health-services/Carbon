@@ -69,11 +69,11 @@ function ConvertTo-ComAccessRule
     
 }
 
-function Get-ComDefaultAccessRule
+function Get-ComAccessPermissions
 {
     <#
     .SYNOPSIS
-    Gets the COM Access permissions for the current computer.
+    Gets the COM access permissions for the current computer.
     
     .DESCRIPTION
     COM access permissions are used to allow default access to applications.  Usually, these permissions are viewed and edited by opening dcomcnfg, right-clicking My Computer under Component Services > Computers, choosing Properties, going to the COM Security tab, and clicking `Edit Default...`.  This function does all that, but does it much easier.
@@ -86,12 +86,12 @@ function Get-ComDefaultAccessRule
     Carbon.Security.ComAccessRule.
      
     .EXAMPLE
-    Get-ComDefaultAccessRule
+    Get-ComAccessPermissions
     
     Look how easy it is!
 
     .EXAMPLE
-    Get-ComDefaultAccessRule -Identity 'Administrators'
+    Get-ComAccessPermissions -Identity 'Administrators'
     
     Gets the COM access rules for the local administrators group.
     #>
@@ -124,7 +124,7 @@ function Get-ComDefaultAccessRule
         Select-ComAccessRule -Identity $Identity
 }
 
-function Get-ComDefaultActivationAccessRule
+function Get-ComLaunchAndActivationPermissions
 {
     <#
     .SYNOPSIS
@@ -139,12 +139,12 @@ function Get-ComDefaultActivationAccessRule
     Carbon.Security.ComAccessRule.
           
     .EXAMPLE
-    Get-ComDefaultActivationAccessRule
+    Get-ComLaunchAndActivationPermissions
     
     Look how easy it is!
     
     .EXAMPLE
-    Get-ComDefaultActivationAccessRule -Identity 'Administrators'
+    Get-ComLaunchAndActivationPermissions -Identity 'Administrators'
     
     Gets the COM Launch and Activation access rules for the local administrators group.
     #>
@@ -177,7 +177,7 @@ filter Select-ComAccessRule
     If not criteria are given, all access rules are returned.
     
     .EXAMPLE
-    Get-ComDefaultActivationAccessRule | Select-ComAccessRule -Identity 'Administators
+    Get-ComLaunchAndActivationPermissions | Select-ComAccessRule -Identity 'Administators
     
     Selects the COM access rule for the local `Administrators` group.
     #>
