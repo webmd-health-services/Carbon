@@ -24,7 +24,7 @@ function TearDown
 
 function Test-ShouldGetComLaunchAndActivationPermissions
 {
-    $rules = Get-ComLaunchAndActivationPermissions
+    $rules = Get-ComLaunchAndActivationPermissions -Scope Default
     Assert-NotNull $rules
     Assert-True ($rules.Count -gt 1)
     $rules | ForEach-Object { 
@@ -39,9 +39,26 @@ function Test-ShouldGetComLaunchAndActivationPermissions
 
 function Test-ShouldGetRuleForSpecificUser
 {
-    $rules = Get-ComLaunchAndActivationPermissions
+    $rules = Get-ComLaunchAndActivationPermissions -Scope Default
     Assert-GreaterThan $rules.Count 1
-    $rule = Get-ComLaunchAndActivationPermissions -Identity $rules[0].IdentityReference.Value
+    $rule = Get-ComLaunchAndActivationPermissions -Scope Default -Identity $rules[0].IdentityReference.Value
     Assert-NotNull $rule
     Assert-Equal $rule.IdentityReference $rules[0].IdentityReference
+}
+
+function Test-ShouldGetSecurityLimits
+{
+    $defaultRules = Get-ComLaunchAndActivationPermissions -Scope Default
+    Assert-NotNull $defaultRules
+    
+    $limitRules = Get-ComLaunchAndActivationPermissions -Scope Limits
+    Assert-NotNull $limitRules
+    
+    if( $defaultRules.Count -eq $limitRules.Count )
+    {
+        for( $idx = 0; $idx -lt $limitRules.Count; $idx++ )
+        {
+            Assert-NotEqual $defaultRules[$idx] $limitRules[$idx]
+        }
+    }    
 }

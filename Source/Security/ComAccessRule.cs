@@ -17,5 +17,19 @@ namespace Carbon.Security
 		}
 
 		public ComAccessRights ComAccessRights { get; private set; }
+
+		public override bool Equals(object obj)
+		{
+			var rule = obj as ComAccessRule;
+
+			if (rule == null)
+			{
+				return false;
+			}
+
+			return rule.ComAccessRights == ComAccessRights && 
+			       rule.IdentityReference == IdentityReference &&
+			       rule.AccessControlType == AccessControlType;
+		}
 	}
 }
