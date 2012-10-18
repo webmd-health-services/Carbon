@@ -22,9 +22,9 @@ function TearDown
     Remove-Module Carbon
 }
 
-function Test-ShouldGetComDefaultAccessRule
+function Test-ShouldGetComAccessPermissions
 {
-    $rules = Get-ComDefaultAccessRule
+    $rules = Get-ComAccessPermissions
     Assert-NotNull $rules
     Assert-GreaterThan $rules.Count 1
     $rules | ForEach-Object { 
@@ -37,11 +37,11 @@ function Test-ShouldGetComDefaultAccessRule
      }
 }
 
-function Test-ShouldGetRuleForSpecificUser
+function Test-ShouldGetPermissionsForSpecificUser
 {
-    $rules = Get-ComDefaultAccessRule
+    $rules = Get-ComAccessPermissions
     Assert-GreaterThan $rules.Count 1
-    $rule = Get-ComDefaultAccessRule -Identity $rules[0].IdentityReference.Value
+    $rule = Get-ComAccessPermissions -Identity $rules[0].IdentityReference.Value
     Assert-NotNull $rule
     Assert-Equal $rule.IdentityReference $rules[0].IdentityReference
 }
