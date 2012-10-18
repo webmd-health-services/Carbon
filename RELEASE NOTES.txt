@@ -6,7 +6,7 @@
  * Simplified how [Add-GroupMembers](http://get-carbon.org/help/Add-GroupMembers.html) adds group members.
  * The version number in the module manifest now gets updated correctly for each release.  You should now be able to tell what version you're running by looking in `Carbon\Carbon.psd1`, or, if Carbon is imported in your console, running `Get-Module Carbon | Select-Object Version`.
  * Created [Get-ComDefaultAccessRule](http://get-carbon.org/help/Get-ComDefaultAccessRule.html) and [Get-ComDefaultActivationAccessRule](http://get-carbon.org/help/Get-ComDefaultActivationAccessRule.html) functions for getting the COM default access and launch/activation permissions, respectively.  These are the permissions you see in Component Services (i.e. dcomcnfg) when you right-click `My Computer`, select `Properties`, click the `COM Security` tab then click the `Edit Default..` button under `Access Permissions` and `Launch and Activation Permissions`, respectively.
-
+ * Created [Test-Identity](http://get-carbon.org/help/Test-Identity.html) function for testing if user or group exists on the local computer or in a domain.
  
 # 0.3.0 (28 September 2012)
 
