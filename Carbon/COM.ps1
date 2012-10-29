@@ -407,7 +407,7 @@ function Grant-ComPermissions
         $accessMask = $accessMask -bor [Carbon.Security.ComAccessRights]::ActivateRemote
     }
     
-    Write-Host ("Granting {0} {1} {2} {3}." -f $Identity,([Carbon.Security.ComAccessRights]$accessMask),$permissionsDesc,$typeDesc)
+    Write-Host ("Granting {0} {1} COM {2} {3}." -f $Identity,([Carbon.Security.ComAccessRights]$accessMask),$permissionsDesc,$typeDesc)
 
     $ace.AccessMask = $accessMask
     $ace.Trustee = $trustee
@@ -488,12 +488,12 @@ function Revoke-ComPermissions
     $comArgs = @{ }
     if( $pscmdlet.ParameterSetName -like 'Default*' )
     {
-        $typeDesc = 'default security'
+        $typeDesc = 'default security permissions'
         $comArgs.Default = $true
     }
     else
     {
-        $typeDesc = 'security limit'
+        $typeDesc = 'security limits'
         $comArgs.Limits = $true
     }
     
@@ -515,7 +515,7 @@ function Revoke-ComPermissions
         return
     }
 
-    Write-Host ("Revoking {0}'s {1} {2} Permissions." -f $Identity,$typeDesc,$permissionsDesc)
+    Write-Host ("Revoking {0}'s COM {1} {2}." -f $Identity,$permissionsDesc,$typeDesc)
     $currentSD = Get-ComSecurityDescriptor @comArgs
 
     $newSd = ([wmiclass]'win32_securitydescriptor').CreateInstance()
