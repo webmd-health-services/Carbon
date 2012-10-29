@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-$useServerManager = ((Get-Command 'servermanagercmd.exe' -ErrorAction SilentlyContinue) -ne $null)
+$useServerManager = ((Get-Command -CommandType 'Application' -Name 'servermanagercmd*.exe' | Where-Object { $_.Name -eq 'servermanagercmd.exe' }) -ne $null)
 $useWmi = $false
 $useOCSetup = $false
 if( -not $useServerManager )

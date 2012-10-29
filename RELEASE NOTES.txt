@@ -9,6 +9,8 @@
  * Created [Select-ComAccessRule](http://get-carbon.org/help/Select-ComAccessRule.html) for filtering `Carbon.Security.ComAccessRule` objects in a pipeline.
  * Created [Test-Identity](http://get-carbon.org/help/Test-Identity.html) function for testing if user or group exists on the local computer or in a domain.
  * Created [Resolve-IdentityName](http://get-carbon.org/help/Resolve-Identity.html) function for determinig a user/group's canonical name.  For example, it converts `Administrators` into `BUILTIN\Administrators`.
+ * Created [Grant-ComPermissions](http://get-carbon.org/help/Grant-ComPermissions.html) for granting COM Access and/or Launch and Activation permissions.
+ * Created [Revoke-ComPermissions](http://get-carbon.org/help/Revoke-ComPermissions.html) for revoking COM Access and/or Launch and ACtivation permissions.
  
 # 0.3.0 (28 September 2012)
 

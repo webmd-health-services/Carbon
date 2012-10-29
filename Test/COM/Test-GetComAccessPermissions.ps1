@@ -24,7 +24,7 @@ function TearDown
 
 function Test-ShouldGetComAccessPermissions
 {
-    $rules = Get-ComAccessPermissions -Scope Default
+    $rules = Get-ComAccessPermissions -Default
     Assert-NotNull $rules
     Assert-GreaterThan $rules.Count 1
     $rules | ForEach-Object { 
@@ -39,19 +39,19 @@ function Test-ShouldGetComAccessPermissions
 
 function Test-ShouldGetPermissionsForSpecificUser
 {
-    $rules = Get-ComAccessPermissions -Scope Default
+    $rules = Get-ComAccessPermissions -Default
     Assert-GreaterThan $rules.Count 1
-    $rule = Get-ComAccessPermissions -Scope Default -Identity $rules[0].IdentityReference.Value
+    $rule = Get-ComAccessPermissions -Default -Identity $rules[0].IdentityReference.Value
     Assert-NotNull $rule
     Assert-Equal $rule.IdentityReference $rules[0].IdentityReference
 }
 
 function Test-ShouldGetSecurityLimits
 {
-    $defaultRules = Get-ComAccessPermissions -Scope Default
+    $defaultRules = Get-ComAccessPermissions -Default
     Assert-NotNull $defaultRules
     
-    $limitRules = Get-ComAccessPermissions -Scope Limits
+    $limitRules = Get-ComAccessPermissions -Limits
     Assert-NotNull $limitRules
     
     if( $defaultRules.Count -eq $limitRules.Count )
