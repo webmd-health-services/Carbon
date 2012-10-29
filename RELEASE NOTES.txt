@@ -1,4 +1,4 @@
-# 0.3.0.1
+# 0.3.1.0
 
 ## Enhancements
  * Improved [Disable-IEEnhancedSecurityConfiguration](http://get-carbon.org/help/Install-IisAppPool.html) and [Enable-IEActivationPermissions](http://get-carbon.org/help/Enable-IEActivationPermissions.html) for enabling Internet Explorer to run headless by non-priveleged users.
