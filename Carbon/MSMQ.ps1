@@ -108,7 +108,7 @@ function Get-MsmqMessageQueuePath
     return $path
 }
 
-function Grant-MsmqMessageQueuePermissions
+function Grant-MSMQMessageQueuePermissions
 {
     <#
     .SYNOPSIS
@@ -394,6 +394,50 @@ function Remove-MsmqMessageQueue
             Start-Sleep -Milliseconds 100
         }
     }
+}
+
+function Reset-MsmqQueueManagerID
+{
+    <#
+    .SYNOPSIS
+    Resets the MSMQ Queue Manager ID.
+    
+    .DESCRIPTION
+    Removes any existing MSMQ Queue Manager ID in the registry and restarts MSMQ so that it will generate a fresh QM ID.
+
+    Each instance of MSMQ should have its own unique Queue Manager ID. If multiple machines have the same Queue Manager ID, destination queues think messages are actually coming from the same computer, and messages are lost/dropped.  If you clone new servers from a template or from old servers, you'll get duplicate Queue Manager IDs.  This function causes MSMQ to reset its Queue Manager ID.
+    
+    .EXAMPLE
+    Reset-MsmqQueueManagerId
+    
+    .LINK
+    http://blogs.msdn.com/b/johnbreakwell/archive/2007/02/06/msmq-prefers-to-be-unique.aspx
+    #>
+    [CmdletBinding()]
+    param(
+    )
+
+    Write-Host "Resetting MSMQ Queue Manager ID."
+    Write-Verbose "Stopping MSMQ."
+    net stop MSMQ /y
+    net stop MQAC /y
+    
+    $QMIdPath = "HKLM:\SOFTWARE\Microsoft\MSMQ\Parameters\MachineCache"
+    $QMIdName = "QMId"
+   	$QMId = Get-RegistryKeyValue -Path $QMIdPath -Name $QMIdName
+   	Write-Verbose "Existing QMId: $QMId"
+   	Remove-RegistryKeyValue -Path $QMIdPath -Name $QMIdName
+    
+    $MSMQSysPrepPath = "HKLM:\SOFTWARE\Microsoft\MSMQ\Parameters"
+    $MSMQSysPrepName = "SysPrep"
+   	Remove-RegistryKeyValue -Path $MSMQSysPrepPath -Name $MSMQSysPrepName
+	Set-RegistryKeyValue -Path $MSMQSysPrepPath -Name $MSMQSysPrepName -DWord 1
+    
+    Write-Verbose "Starting MSMQ"
+    net start MSMQ
+    
+	$QMId = Get-RegistryKeyValue -Path $QMIdPath -Name $QMIdName
+    Write-Verbose "New QMId: $QMId"
 }
 
 function Test-MsmqMessageQueue

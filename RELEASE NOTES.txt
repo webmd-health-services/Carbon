@@ -10,6 +10,9 @@
  * Created [Revoke-ComPermissions](http://get-carbon.org/help/Revoke-ComPermissions.html) for revoking COM Access and/or Launch and ACtivation permissions.
  * Created [Test-Identity](http://get-carbon.org/help/Test-Identity.html) function for testing if user or group exists on the local computer or in a domain.
  * Created [Resolve-IdentityName](http://get-carbon.org/help/Resolve-Identity.html) function for determinig a user/group's canonical name.  For example, it converts `Administrators` into `BUILTIN\Administrators`.
+ * Improved the way the Windows Features functions detect the best way to manage Windows features.  The old way would write an error to the error stream, which bubbled up at weird times and made diagnosing real errors harder.
+ * Added a `Quiet` parameter to [Set-RegistryKeyValue](http://get-carbon.org/help/Set-RegistryKeyValue.html) so that `Write-Host` output is muffled.
+ * Created [Reset-MsmqQueueManagerID](http://get-carbon.org/help/Reset-MsmqQueueManagerID.html) function, which resets MSMQ's Queue Manager ID.
  
 # 0.3.0 (28 September 2012)
 
