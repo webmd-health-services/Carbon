@@ -29,9 +29,6 @@ function Get-ComSecurityDescriptor
     http://msdn.microsoft.com/en-us/library/windows/desktop/aa394402.aspx
     
     .LINK
-    Select-ComAccessRule
-    
-    .LINK
     Get-ComPermissions
     
     .EXAMPLE
@@ -211,7 +208,15 @@ function Get-ComPermissions
     }
     
     Get-ComSecurityDescriptor @comArgs -AsComAccessRule |
-        Select-ComAccessRule -Identity $Identity
+        Where-Object {
+            if( $Identity )
+            {
+                $rIdentity = Resolve-IdentityName -Name $Identity
+                return ( $_.IdentityReference.Value -eq $rIdentity )
+            }
+            
+            return $true
+        }
 }
 
 function Grant-ComPermissions
@@ -528,45 +533,4 @@ function Revoke-ComPermissions
 
     $regValueName = $pscmdlet.ParameterSetName
     Set-RegistryKeyValue -Path $ComRegKeyPath -Name $regValueName -Binary $sdBytes.BinarySD -Quiet
-}
-
-filter Select-ComAccessRule
-{
-    <#
-    .SYNOPSIS
-    Returns COM access rules from a pipeline that match specific criteria.
-    
-    .DESCRIPTION
-    Its sometimes useful to filter a set of COM access rules by certain criteria.
-    
-    If not criteria are given, all access rules are returned.
-    
-    .EXAMPLE
-    Get-ComPermissions | Select-ComAccessRule -Identity 'Administators
-    
-    Selects the COM access rule for the local `Administrators` group.
-    #>
-    [CmdletBinding()]
-    param(
-        [Parameter(Mandatory=$true,ValueFromPipeline=$true)]
-        [Carbon.Security.ComAccessRule]
-        # The access rule to filter.
-        $InputObject,
-        
-        [string]
-        # Select COM Access Rules that belong to this identity.
-        $Identity
-    )
-    
-    if( $Identity )
-    {
-        $cIdentity = Resolve-IdentityName -Name $Identity
-        if( $InputObject.IdentityReference.Value -eq $cIdentity )
-        {
-            return $InputObject
-        }
-        return
-    }
-    
-    return $InputObject
 }
