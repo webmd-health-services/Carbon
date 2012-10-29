@@ -32,10 +32,7 @@ function Get-ComSecurityDescriptor
     Select-ComAccessRule
     
     .LINK
-    Get-ComAccessPermissions
-    
-    .LINK
-    Get-ComLaunchAndActivationPermissions
+    Get-ComPermissions
     
     .EXAMPLE
     Get-ComSecurityDescriptor -Access -Default
@@ -131,16 +128,16 @@ function Get-ComSecurityDescriptor
     }
 }
 
-function Get-ComAccessPermissions
+function Get-ComPermissions
 {
     <#
     .SYNOPSIS
-    Gets the COM access permissions for the current computer.
+    Gets the COM Access or Launch and Activation permissions for the current computer.
     
     .DESCRIPTION
-    COM access permissions are used to allow default access to applications.  Usually, these permissions are viewed and edited by opening dcomcnfg, right-clicking My Computer under Component Services > Computers, choosing Properties, going to the COM Security tab, and clicking `Edit Default...`.  This function does all that, but does it much easier.
+    COM access permissions ared used to "allow default access to application" or "set limits on applications that determine their own permissions".  Launch and Activation permissions are used "who is allowed to launch applications or activate objects" and to "set limits on applications that determine their own permissions."  Usually, these permissions are viewed and edited by opening dcomcnfg, right-clicking My Computer under Component Services > Computers, choosing Properties, going to the COM Security tab, and clicking `Edit Default...` or `Edit Limits...` buttons under the **Access Permissions** or **Launch and Activation Permissions** sections.  This function does all that, but does it much easier, and returns objects you can work with.
     
-    This information is stored in the registry, under `HKLM\Software\Microsoft\Ole`.  The registry value for default security is missing/empty until custom permissions are granted.  If this is the case, this function will return objects that represent the default security, which was lovingly reverse engineered by gnomes.
+    These permissions are stored in the registry, under `HKLM\Software\Microsoft\Ole`.  The default security registry value for Access Permissions is missing/empty until custom permissions are granted.  If this is the case, this function will return objects that represent the default security, which was lovingly reverse engineered by gnomes.
     
     Returns `Carbon.Security.ComAccessRule` objects, which inherit from `[System.Security.AccessControl.AccessRule](http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.accessrule.aspx).
     
@@ -150,41 +147,52 @@ function Get-ComAccessPermissions
     .LINK
     Revoke-ComPermissions
     
-    .LINK
-    Get-ComLaunchAndActivationPermissions
-
     .OUTPUTS
     Carbon.Security.ComAccessRule.
      
     .EXAMPLE
-    Get-ComAccessPermissions -Default
+    Get-ComPermissions -Access -Default
     
     Gets the COM access default security permissions. Look how easy it is!
 
     .EXAMPLE
-    Get-ComAccessPermissions -Identity 'Administrators' -Limits
+    Get-ComPermissions -LaunchAndActivation -Identity 'Administrators' -Limits
     
-    Gets the COM access security limit permissions for the local administrators group. This is equivalent to clicking the `Edit Limits...` button under `Access Permissions` on the COM Security tab of the My Computer Properties window of Component Services snap-in (dcomcnfg).
+    Gets the security limits for COM Launch and Activation permissions for the local administrators group.
     #>
     [CmdletBinding()]
     param(
-        [string]
-        # The identity whose access rule to return.  If not set, all access rules are returned.
-        $Identity,
+        [Parameter(Mandatory=$true,ParameterSetName='DefaultAccessPermission')]
+        [Parameter(Mandatory=$true,ParameterSetName='MachineAccessRestriction')]
+        [Switch]
+        # If set, returns permissions for COM Access permissions.
+        $Access,
         
-        [Parameter(Mandatory=$true,ParameterSetName='DefaultScope')]
+        [Parameter(Mandatory=$true,ParameterSetName='DefaultLaunchPermission')]
+        [Parameter(Mandatory=$true,ParameterSetName='MachineLaunchRestriction')]
+        [Switch]
+        # If set, returns permissions for COM Access permissions.
+        $LaunchAndActivation,
+        
+        [Parameter(Mandatory=$true,ParameterSetName='DefaultAccessPermission')]
+        [Parameter(Mandatory=$true,ParameterSetName='DefaultLaunchPermission')]
         [Switch]
         # Gets default security permissions.
         $Default,
         
-        [Parameter(Mandatory=$true,ParameterSetName='LimitsScope')]
+        [Parameter(Mandatory=$true,ParameterSetName='MachineAccessRestriction')]
+        [Parameter(Mandatory=$true,ParameterSetName='MachineLaunchRestriction')]
         [Switch]
         # Gets security limit permissions.
-        $Limits
+        $Limits,
+        
+        [string]
+        # The identity whose access rule to return.  If not set, all access rules are returned.
+        $Identity        
     )
     
     $comArgs = @{ }
-    if( $pscmdlet.ParameterSetName -eq 'DefaultScope' )
+    if( $pscmdlet.ParameterSetName -like 'Default*' )
     {
         $comArgs.Default = $true
     }
@@ -192,67 +200,17 @@ function Get-ComAccessPermissions
     {
         $comArgs.Limits = $true
     }
-    Get-ComSecurityDescriptor -Access @comArgs -AsComAccessRule |
-        Select-ComAccessRule -Identity $Identity
-}
-
-function Get-ComLaunchAndActivationPermissions
-{
-    <#
-    .SYNOPSIS
-    Gets the COM Launch and Activation permissions for the current computer.
     
-    .DESCRIPTION
-    COM launch and activation permissions are used to allow default access to applications.  Usually, these permissions are viewed and edited by opening dcomcnfg, right-clicking My Computer under Component Services > Computers, choosing Properties, going to the COM Security tab, and clicking the buttons under `Launch and Activation Permissions`.  This function does all that, but does it much easier.
-
-    Returns `Carbon.Security.ComAccessRule` objects, which inherit from `[System.Security.AccessControl.AccessRule](http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.accessrule.aspx).  
-    
-    .LINK
-    Revoke-ComPermissions
-    
-    .LINK
-    Get-ComAccessPermissions
-
-    .OUTPUTS
-    Carbon.Security.ComAccessRule.
-          
-    .EXAMPLE
-    Get-ComLaunchAndActivationPermissions -Default
-    
-    Look how easy it is!  Gets the launch and activation default security.
-    
-    .EXAMPLE
-    Get-ComLaunchAndActivationPermissions -Limits -Identity 'Administrators'
-    
-    Gets the COM Launch and Activation security limits for the local administrators group. This is equivalent to clicking the `Edit Limits...` button under `Launch and Activation Permissions` on the COM Security tab of the My Computer Properties window of Component Services snap-in (dcomcnfg).
-    #>
-    [CmdletBinding()]
-    param(
-        [string]
-        # The identity whose access rule to return.  If not set, all access rules are returned.
-        $Identity,
-
-        [Parameter(Mandatory=$true,ParameterSetName='DefaultScope')]
-        [Switch]
-        # Gets default security permissions.
-        $Default,
-        
-        [Parameter(Mandatory=$true,ParameterSetName='LimitsScope')]
-        [Switch]
-        # Gets security limit permissions.
-        $Limits    
-    )
-    
-    $comArgs = @{ }
-    if( $pscmdlet.ParameterSetName -eq 'DefaultScope' )
+    if( $pscmdlet.ParameterSetName -like '*Access*' )
     {
-        $comArgs.Default = $true
+        $comArgs.Access = $true
     }
     else
     {
-        $comArgs.Limits = $true
+        $comArgs.LaunchAndActivation = $true
     }
-    Get-ComSecurityDescriptor -LaunchAndActivation @comArgs -AsComAccessRule |
+    
+    Get-ComSecurityDescriptor @comArgs -AsComAccessRule |
         Select-ComAccessRule -Identity $Identity
 }
 
@@ -268,14 +226,11 @@ function Grant-ComPermissions
     You must set at least one of the `LocalAccess` or `RemoteAccess` switches.
     
     .LINK
-    Get-ComAccessPermissions
+    Get-ComPermissions
 
     .LINK
     Revoke-ComPermissions
     
-    .LINK
-    Get-ComLaunchAndActivationPermissions
-
     .EXAMPLE
     Grant-ComPermissions -Access -Identity 'Users' -Allow -Default -Local
     
@@ -476,17 +431,11 @@ function Revoke-ComPermissions
     Calling this function is equivalent to opening Component Services (dcomcnfg), right-clicking `My Computer` under Component Services > Computers, choosing `Properties`, going to the `COM Security` tab, and removing an identity from the permissions window that opens after clicking the `Edit Limits...` or `Edit Default...` buttons under `Access Permissions` or `Launch and Activation Permissions` section, 
     
     .LINK
-    Get-ComAccessPermissions
+    Get-ComPermissions
 
     .LINK
     Grant-ComPermissions
     
-    .LINK
-    Get-ComLaunchAndActivationPermissions
-
-    .LINK
-    Grant-ComLaunchAndActivationPermissions
-
     .LINK
     Revoke-ComPermissions
     
@@ -593,7 +542,7 @@ filter Select-ComAccessRule
     If not criteria are given, all access rules are returned.
     
     .EXAMPLE
-    Get-ComLaunchAndActivationPermissions | Select-ComAccessRule -Identity 'Administators
+    Get-ComPermissions | Select-ComAccessRule -Identity 'Administators
     
     Selects the COM access rule for the local `Administrators` group.
     #>

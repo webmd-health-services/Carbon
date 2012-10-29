@@ -5,12 +5,12 @@
  * Changed the way [Invoke-WindowsInstaller](http://get-carbon.org/help/Invoke-WindowsInstaller.html) waits for MSI to finish installing: instead of searching for any MSI process, it now searches for an MSI process that is a child of the current PowerShell process.
  * Simplified how [Add-GroupMembers](http://get-carbon.org/help/Add-GroupMembers.html) adds group members.
  * The version number in the module manifest now gets updated correctly for each release.  You should now be able to tell what version you're running by looking in `Carbon\Carbon.psd1`, or, if Carbon is imported in your console, running `Get-Module Carbon | Select-Object Version`.
- * Created [Get-ComDefaultAccessRule](http://get-carbon.org/help/Get-ComDefaultAccessRule.html) and [Get-ComDefaultActivationAccessRule](http://get-carbon.org/help/Get-ComDefaultActivationAccessRule.html) functions for getting the COM default access and launch/activation permissions, respectively.  These are the permissions you see in Component Services (i.e. dcomcnfg) when you right-click `My Computer`, select `Properties`, click the `COM Security` tab then click the `Edit Default..` button under `Access Permissions` and `Launch and Activation Permissions`, respectively.
+ * Created [Get-ComPermissions](http://get-carbon.org/help/Get-ComPermissions.html) function for getting COM Access or Launch and Activation Permissions.  These are the permissions you see in Component Services (i.e. dcomcnfg) when you right-click `My Computer`, select `Properties`, click the `COM Security` tab then click the `Edit Default..` or `Edit Limits...` buttons under **Access Permissions** or **Launch and Activation Permissions**, respectively.
+ * Created [Grant-ComPermissions](http://get-carbon.org/help/Grant-ComPermissions.html) for granting COM Access and/or Launch and Activation permissions.
+ * Created [Revoke-ComPermissions](http://get-carbon.org/help/Revoke-ComPermissions.html) for revoking COM Access and/or Launch and ACtivation permissions.
  * Created [Select-ComAccessRule](http://get-carbon.org/help/Select-ComAccessRule.html) for filtering `Carbon.Security.ComAccessRule` objects in a pipeline.
  * Created [Test-Identity](http://get-carbon.org/help/Test-Identity.html) function for testing if user or group exists on the local computer or in a domain.
  * Created [Resolve-IdentityName](http://get-carbon.org/help/Resolve-Identity.html) function for determinig a user/group's canonical name.  For example, it converts `Administrators` into `BUILTIN\Administrators`.
- * Created [Grant-ComPermissions](http://get-carbon.org/help/Grant-ComPermissions.html) for granting COM Access and/or Launch and Activation permissions.
- * Created [Revoke-ComPermissions](http://get-carbon.org/help/Revoke-ComPermissions.html) for revoking COM Access and/or Launch and ACtivation permissions.
  
 # 0.3.0 (28 September 2012)
 
