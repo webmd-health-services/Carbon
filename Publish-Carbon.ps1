@@ -92,7 +92,12 @@ try
     if( $All -or $Package )
     {
         Write-Host "Updating help."
+        $helpDirPath = Join-Path $PSScriptRoot Website\help
+        Get-ChildItem $helpDirPath *.html | Remove-Item 
+        
         .\Out-Html.ps1 -OutputDir .\Website\help
+        
+        hg addremove $helpDirPath
         
         if( Test-Path $carbonZipFileName -PathType Leaf )
         {
