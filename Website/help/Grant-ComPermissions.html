@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-    <title>PowerShell - Uninstall-PerformanceCounterCategory - Carbon</title>
+    <title>PowerShell - Grant-ComPermissions - Carbon</title>
 	<link href="styles.css" type="text/css" rel="stylesheet" />
 </head>
 <body>
@@ -212,20 +212,34 @@
 </div>
 
 
-    <h1>Uninstall-PerformanceCounterCategory</h1>
-    <div><p>Removes an entire performance counter category.</p>
+    <h1>Grant-ComPermissions</h1>
+    <div><p>Grants COM access permissions.</p>
 </div>
 
         <h2>Syntax</h2>
-    <pre class="Syntax"><code>Uninstall-PerformanceCounterCategory [-CategoryName] &lt;String&gt; [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
+    <pre class="Syntax"><code>Grant-ComPermissions -Identity &lt;String&gt; -Access -Limits -Deny [-Local] [-Remote] [&lt;CommonParameters&gt;]</code></pre>
+<pre class="Syntax"><code>Grant-ComPermissions -Identity &lt;String&gt; -Access -Default -Deny [-Local] [-Remote] [&lt;CommonParameters&gt;]</code></pre>
+<pre class="Syntax"><code>Grant-ComPermissions -Identity &lt;String&gt; -Access -Limits -Allow [-Local] [-Remote] [&lt;CommonParameters&gt;]</code></pre>
+<pre class="Syntax"><code>Grant-ComPermissions -Identity &lt;String&gt; -Access -Default -Allow [-Local] [-Remote] [&lt;CommonParameters&gt;]</code></pre>
+<pre class="Syntax"><code>Grant-ComPermissions -Identity &lt;String&gt; -LaunchAndActivation -Limits -Deny [-LocalLaunch] [-RemoteLaunch] [-LocalActivation] [-RemoteActivation] [&lt;CommonParameters&gt;]</code></pre>
+<pre class="Syntax"><code>Grant-ComPermissions -Identity &lt;String&gt; -LaunchAndActivation -Default -Deny [-LocalLaunch] [-RemoteLaunch] [-LocalActivation] [-RemoteActivation] [&lt;CommonParameters&gt;]</code></pre>
+<pre class="Syntax"><code>Grant-ComPermissions -Identity &lt;String&gt; -LaunchAndActivation -Limits -Allow [-LocalLaunch] [-RemoteLaunch] [-LocalActivation] [-RemoteActivation] [&lt;CommonParameters&gt;]</code></pre>
+<pre class="Syntax"><code>Grant-ComPermissions -Identity &lt;String&gt; -LaunchAndActivation -Default -Allow [-LocalLaunch] [-RemoteLaunch] [-LocalActivation] [-RemoteActivation] [&lt;CommonParameters&gt;]</code></pre>
     
         <h2>Description</h2>
     <div class="Description">
-        <p>Removes, with extreme prejudice, the performance counter category <code>CategoryName</code>.  All its performance counters are also deleted.  If the performance counter category doesn't exist, nothing happens.  I hope you have good backups!</p>
+        <p>Calling this function is equivalent to opening Component Services (dcomcnfg), right-clicking <code>My Computer</code> under Component Services > Computers, choosing <code>Properties</code>, going to the <code>COM Security</code> tab, and modifying the permission after clicking the <code>Edit Limits...</code> or <code>Edit Default...</code> buttons under the <code>Access Permissions</code> section.</p>
+
+<p>You must set at least one of the <code>LocalAccess</code> or <code>RemoteAccess</code> switches.</p>
 
     </div>
     
-    
+            <h2>Related Commands</h2>
+        <ul>
+<li><a href="Get-ComPermissions.html">Get-ComPermissions</a></li>
+<li><a href="Revoke-ComPermissions.html">Revoke-ComPermissions</a></li>
+</ul>
+
 
     		<h2> Parameters </h2>
 		<table border='1'>
@@ -238,38 +252,122 @@
 				<th>Default Value</th>
 			</tr>
             			<tr valign='top'>
-				<td>CategoryName</td>
+				<td>Identity</td>
 				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
-				<td>The performance counter's category name that should be deleted.
+				<td></td>
+				<td>true</td>
+				<td>false</td>
+                <td></td>
+			</tr>
+			<tr valign='top'>
+				<td>Access</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+				<td>Grants Access Permissions.
 </td>
 				<td>true</td>
 				<td>false</td>
                 <td></td>
 			</tr>
 			<tr valign='top'>
-				<td>WhatIf</td>
+				<td>LaunchAndActivation</td>
 				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
-				<td></td>
+				<td>Grants Launch and Activation Permissions.
+</td>
+				<td>true</td>
+				<td>false</td>
+                <td></td>
+			</tr>
+			<tr valign='top'>
+				<td>Default</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+				<td>Grants default security permissions.
+</td>
+				<td>true</td>
+				<td>false</td>
+                <td></td>
+			</tr>
+			<tr valign='top'>
+				<td>Limits</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+				<td>Grants security limits permissions.
+</td>
+				<td>true</td>
+				<td>false</td>
+                <td></td>
+			</tr>
+			<tr valign='top'>
+				<td>Allow</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+				<td>If set, allows the given permissions.
+</td>
+				<td>true</td>
+				<td>false</td>
+                <td></td>
+			</tr>
+			<tr valign='top'>
+				<td>Deny</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+				<td>If set, denies the given permissions.
+</td>
+				<td>true</td>
+				<td>false</td>
+                <td></td>
+			</tr>
+			<tr valign='top'>
+				<td>Local</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+				<td>If set, grants local access permissions.
+</td>
 				<td>false</td>
 				<td>false</td>
                 <td></td>
 			</tr>
 			<tr valign='top'>
-				<td>Confirm</td>
+				<td>Remote</td>
 				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
-				<td></td>
+				<td>If set, grants remote access permissions.
+</td>
 				<td>false</td>
 				<td>false</td>
                 <td></td>
 			</tr>
-                            <tr valign="top">
-                <td><a href="http://technet.microsoft.com/en-us/library/dd315352.aspx">CommonParameters</a></td>
+			<tr valign='top'>
+				<td>LocalLaunch</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+				<td>If set, grants local access permissions.
+</td>
+				<td>false</td>
+				<td>false</td>
                 <td></td>
-                <td>This cmdlet supports common parameters.  For more information type <br> <code>Get-Help about_CommonParameters</code>.</td>
+			</tr>
+			<tr valign='top'>
+				<td>RemoteLaunch</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+				<td>If set, grants remote access permissions.
+</td>
+				<td>false</td>
+				<td>false</td>
                 <td></td>
+			</tr>
+			<tr valign='top'>
+				<td>LocalActivation</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+				<td>If set, grants local access permissions.
+</td>
+				<td>false</td>
+				<td>false</td>
                 <td></td>
+			</tr>
+			<tr valign='top'>
+				<td>RemoteActivation</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+				<td>If set, grants remote access permissions.
+</td>
+				<td>false</td>
+				<td>false</td>
                 <td></td>
-                </tr>
+			</tr>
+            
         </table>
         
     
@@ -279,8 +377,11 @@
     
         
                 <h2>EXAMPLE 1</h2>
-            <pre><code>Uninstall-PerformanceCounterCategory -CategoryName 'ToyotaCamry'</code></pre>
-            <p><p>Removes the <code>ToyotaCamry</code> performance counter category and all its performance counters.  So sad!</p>
+            <pre><code>Grant-ComPermissions -Access -Identity 'Users' -Allow -Default -Local</code></pre>
+            <p><p>Updates access permission default security to allow the local <code>Users</code> group local access permissions.</p>
+</p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 2</h2>
+            <pre><code>Grant-ComPermissions -LaunchAndActivation -Identity 'Users' -Limits -Deny -Local -Remote</code></pre>
+            <p><p>Updates access permission security limits to deny the local <code>Users</code> group local and remote access permissions.</p>
 </p><p></p><p></p><p></p><p></p>
 </body>
 </html>   

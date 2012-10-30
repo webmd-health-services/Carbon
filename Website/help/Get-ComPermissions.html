@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-    <title>PowerShell - Uninstall-PerformanceCounterCategory - Carbon</title>
+    <title>PowerShell - Get-ComPermissions - Carbon</title>
 	<link href="styles.css" type="text/css" rel="stylesheet" />
 </head>
 <body>
@@ -212,20 +212,32 @@
 </div>
 
 
-    <h1>Uninstall-PerformanceCounterCategory</h1>
-    <div><p>Removes an entire performance counter category.</p>
+    <h1>Get-ComPermissions</h1>
+    <div><p>Gets the COM Access or Launch and Activation permissions for the current computer.</p>
 </div>
 
         <h2>Syntax</h2>
-    <pre class="Syntax"><code>Uninstall-PerformanceCounterCategory [-CategoryName] &lt;String&gt; [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
+    <pre class="Syntax"><code>Get-ComPermissions -Access -Limits [-Identity &lt;String&gt;] [&lt;CommonParameters&gt;]</code></pre>
+<pre class="Syntax"><code>Get-ComPermissions -Access -Default [-Identity &lt;String&gt;] [&lt;CommonParameters&gt;]</code></pre>
+<pre class="Syntax"><code>Get-ComPermissions -LaunchAndActivation -Limits [-Identity &lt;String&gt;] [&lt;CommonParameters&gt;]</code></pre>
+<pre class="Syntax"><code>Get-ComPermissions -LaunchAndActivation -Default [-Identity &lt;String&gt;] [&lt;CommonParameters&gt;]</code></pre>
     
         <h2>Description</h2>
     <div class="Description">
-        <p>Removes, with extreme prejudice, the performance counter category <code>CategoryName</code>.  All its performance counters are also deleted.  If the performance counter category doesn't exist, nothing happens.  I hope you have good backups!</p>
+        <p>COM access permissions ared used to "allow default access to application" or "set limits on applications that determine their own permissions".  Launch and Activation permissions are used "who is allowed to launch applications or activate objects" and to "set limits on applications that determine their own permissions."  Usually, these permissions are viewed and edited by opening dcomcnfg, right-clicking My Computer under Component Services > Computers, choosing Properties, going to the COM Security tab, and clicking <code>Edit Default...</code> or <code>Edit Limits...</code> buttons under the <strong>Access Permissions</strong> or <strong>Launch and Activation Permissions</strong> sections.  This function does all that, but does it much easier, and returns objects you can work with.</p>
+
+<p>These permissions are stored in the registry, under <code>HKLM\Software\Microsoft\Ole</code>.  The default security registry value for Access Permissions is missing/empty until custom permissions are granted.  If this is the case, this function will return objects that represent the default security, which was lovingly reverse engineered by gnomes.</p>
+
+<p>Returns <code>Carbon.Security.ComAccessRule</code> objects, which inherit from `<a href="http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.accessrule.aspx">System.Security.AccessControl.AccessRule</a>.</p>
 
     </div>
     
-    
+            <h2>Related Commands</h2>
+        <ul>
+<li><a href="Grant-ComPermissions.html">Grant-ComPermissions</a></li>
+<li><a href="Revoke-ComPermissions.html">Revoke-ComPermissions</a></li>
+</ul>
+
 
     		<h2> Parameters </h2>
 		<table border='1'>
@@ -238,49 +250,67 @@
 				<th>Default Value</th>
 			</tr>
             			<tr valign='top'>
-				<td>CategoryName</td>
-				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
-				<td>The performance counter's category name that should be deleted.
+				<td>Access</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+				<td>If set, returns permissions for COM Access permissions.
 </td>
 				<td>true</td>
 				<td>false</td>
                 <td></td>
 			</tr>
 			<tr valign='top'>
-				<td>WhatIf</td>
+				<td>LaunchAndActivation</td>
 				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
-				<td></td>
-				<td>false</td>
+				<td>If set, returns permissions for COM Access permissions.
+</td>
+				<td>true</td>
 				<td>false</td>
                 <td></td>
 			</tr>
 			<tr valign='top'>
-				<td>Confirm</td>
+				<td>Default</td>
 				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
-				<td></td>
+				<td>Gets default security permissions.
+</td>
+				<td>true</td>
+				<td>false</td>
+                <td></td>
+			</tr>
+			<tr valign='top'>
+				<td>Limits</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+				<td>Gets security limit permissions.
+</td>
+				<td>true</td>
+				<td>false</td>
+                <td></td>
+			</tr>
+			<tr valign='top'>
+				<td>Identity</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+				<td>The identity whose access rule to return.  If not set, all access rules are returned.
+</td>
 				<td>false</td>
 				<td>false</td>
                 <td></td>
 			</tr>
-                            <tr valign="top">
-                <td><a href="http://technet.microsoft.com/en-us/library/dd315352.aspx">CommonParameters</a></td>
-                <td></td>
-                <td>This cmdlet supports common parameters.  For more information type <br> <code>Get-Help about_CommonParameters</code>.</td>
-                <td></td>
-                <td></td>
-                <td></td>
-                </tr>
+            
         </table>
         
     
         
-    
+            <h2>Return Values</h2>
+        <p><a href="http://msdn.microsoft.com/en-us/library/carbon.security.comaccessrule.aspx">Carbon.Security.ComAccessRule</a>. </p>
+
         
     
         
                 <h2>EXAMPLE 1</h2>
-            <pre><code>Uninstall-PerformanceCounterCategory -CategoryName 'ToyotaCamry'</code></pre>
-            <p><p>Removes the <code>ToyotaCamry</code> performance counter category and all its performance counters.  So sad!</p>
+            <pre><code>Get-ComPermissions -Access -Default</code></pre>
+            <p><p>Gets the COM access default security permissions. Look how easy it is!</p>
+</p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 2</h2>
+            <pre><code>Get-ComPermissions -LaunchAndActivation -Identity 'Administrators' -Limits</code></pre>
+            <p><p>Gets the security limits for COM Launch and Activation permissions for the local administrators group.</p>
 </p><p></p><p></p><p></p><p></p>
 </body>
 </html>   

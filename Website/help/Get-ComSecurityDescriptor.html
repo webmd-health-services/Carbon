@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-    <title>PowerShell - Uninstall-PerformanceCounterCategory - Carbon</title>
+    <title>PowerShell - Get-ComSecurityDescriptor - Carbon</title>
 	<link href="styles.css" type="text/css" rel="stylesheet" />
 </head>
 <body>
@@ -212,20 +212,30 @@
 </div>
 
 
-    <h1>Uninstall-PerformanceCounterCategory</h1>
-    <div><p>Removes an entire performance counter category.</p>
+    <h1>Get-ComSecurityDescriptor</h1>
+    <div><p>Gets a WMI Win32_SecurityDescriptor default security or security limits object for COM Access or Launch and Activation permissions.</p>
 </div>
 
         <h2>Syntax</h2>
-    <pre class="Syntax"><code>Uninstall-PerformanceCounterCategory [-CategoryName] &lt;String&gt; [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
+    <pre class="Syntax"><code>Get-ComSecurityDescriptor -Access -Limits [-AsComAccessRule] [&lt;CommonParameters&gt;]</code></pre>
+<pre class="Syntax"><code>Get-ComSecurityDescriptor -Access -Default [-AsComAccessRule] [&lt;CommonParameters&gt;]</code></pre>
+<pre class="Syntax"><code>Get-ComSecurityDescriptor -LaunchAndActivation -Limits [-AsComAccessRule] [&lt;CommonParameters&gt;]</code></pre>
+<pre class="Syntax"><code>Get-ComSecurityDescriptor -LaunchAndActivation -Default [-AsComAccessRule] [&lt;CommonParameters&gt;]</code></pre>
     
         <h2>Description</h2>
     <div class="Description">
-        <p>Removes, with extreme prejudice, the performance counter category <code>CategoryName</code>.  All its performance counters are also deleted.  If the performance counter category doesn't exist, nothing happens.  I hope you have good backups!</p>
+        <p>There are four available security descriptors.  Default security and security limits for Access Permissions and Launch and Activation Permissions.  This method returns a Win32_SecurityDescriptor for the given area and security type.</p>
+
+<p>The <code>AsComAccessRule</code> parameter will return a <code>Carbon.Security.ComAccessRule</code> object for each of the access control entries in the security descriptor's ACL.</p>
 
     </div>
     
-    
+            <h2>Related Commands</h2>
+        <ul>
+<li><a href="http://msdn.microsoft.com/en-us/library/windows/desktop/aa394402.aspx">http://msdn.microsoft.com/en-us/library/windows/desktop/aa394402.aspx</a></li>
+<li><a href="Get-ComPermissions.html">Get-ComPermissions</a></li>
+</ul>
+
 
     		<h2> Parameters </h2>
 		<table border='1'>
@@ -238,38 +248,51 @@
 				<th>Default Value</th>
 			</tr>
             			<tr valign='top'>
-				<td>CategoryName</td>
-				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
-				<td>The performance counter's category name that should be deleted.
+				<td>Access</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+				<td>Returns a securty descriptor for one of the Access Permissions security types.
 </td>
 				<td>true</td>
 				<td>false</td>
                 <td></td>
 			</tr>
 			<tr valign='top'>
-				<td>WhatIf</td>
+				<td>LaunchAndActivation</td>
 				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
-				<td></td>
-				<td>false</td>
+				<td>Returns a security descriptor for one of the Launch and Activation Permissions security types.
+</td>
+				<td>true</td>
 				<td>false</td>
                 <td></td>
 			</tr>
 			<tr valign='top'>
-				<td>Confirm</td>
+				<td>Default</td>
 				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
-				<td></td>
+				<td>Returns the default security descriptor.
+</td>
+				<td>true</td>
+				<td>false</td>
+                <td></td>
+			</tr>
+			<tr valign='top'>
+				<td>Limits</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+				<td>Returns the security limits descriptor.
+</td>
+				<td>true</td>
+				<td>false</td>
+                <td></td>
+			</tr>
+			<tr valign='top'>
+				<td>AsComAccessRule</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+				<td>Returns <code>Carbon.Security.ComAccessRule</code> objects instead of a security descriptor.
+</td>
 				<td>false</td>
 				<td>false</td>
                 <td></td>
 			</tr>
-                            <tr valign="top">
-                <td><a href="http://technet.microsoft.com/en-us/library/dd315352.aspx">CommonParameters</a></td>
-                <td></td>
-                <td>This cmdlet supports common parameters.  For more information type <br> <code>Get-Help about_CommonParameters</code>.</td>
-                <td></td>
-                <td></td>
-                <td></td>
-                </tr>
+            
         </table>
         
     
@@ -279,8 +302,20 @@
     
         
                 <h2>EXAMPLE 1</h2>
-            <pre><code>Uninstall-PerformanceCounterCategory -CategoryName 'ToyotaCamry'</code></pre>
-            <p><p>Removes the <code>ToyotaCamry</code> performance counter category and all its performance counters.  So sad!</p>
+            <pre><code>Get-ComSecurityDescriptor -Access -Default</code></pre>
+            <p><p>Gets the default security descriptor for COM Access Permissions.</p>
+</p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 2</h2>
+            <pre><code>Get-ComSecurityDescriptor -Access -Limits</code></pre>
+            <p><p>Gets the security limits descriptor for COM Access Permissions.</p>
+</p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 3</h2>
+            <pre><code>Get-ComSecurityDescriptor -LaunchAndActivation -Default</code></pre>
+            <p><p>Gets the default security descriptor for COM Launch and Activation Permissions.</p>
+</p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 4</h2>
+            <pre><code>Get-ComSecurityDescriptor -LaunchAndActivation -Limits</code></pre>
+            <p><p>Gets the security limits descriptor for COM Launch and Activation Permissions.</p>
+</p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 5</h2>
+            <pre><code>Get-ComSecurityDescriptor -Access -Default -AsComAccessRule</code></pre>
+            <p><p>Returns a <code>Carbon.Security.ComAccessRule</code> object for each of the access control entries in the Access Permissions's default security descriptor.</p>
 </p><p></p><p></p><p></p><p></p>
 </body>
 </html>   

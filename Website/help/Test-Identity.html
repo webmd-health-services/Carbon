@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-    <title>PowerShell - Uninstall-PerformanceCounterCategory - Carbon</title>
+    <title>PowerShell - Test-Identity - Carbon</title>
 	<link href="styles.css" type="text/css" rel="stylesheet" />
 </head>
 <body>
@@ -212,16 +212,18 @@
 </div>
 
 
-    <h1>Uninstall-PerformanceCounterCategory</h1>
-    <div><p>Removes an entire performance counter category.</p>
+    <h1>Test-Identity</h1>
+    <div><p>Tests that a name is a valid Windows local or domain user/group.</p>
 </div>
 
         <h2>Syntax</h2>
-    <pre class="Syntax"><code>Uninstall-PerformanceCounterCategory [-CategoryName] &lt;String&gt; [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
+    <pre class="Syntax"><code>Test-Identity [-Name] &lt;String&gt; [-PassThru] [&lt;CommonParameters&gt;]</code></pre>
     
         <h2>Description</h2>
     <div class="Description">
-        <p>Removes, with extreme prejudice, the performance counter category <code>CategoryName</code>.  All its performance counters are also deleted.  If the performance counter category doesn't exist, nothing happens.  I hope you have good backups!</p>
+        <p>Attempts to convert an identity name into a <code>System.Security.Principal.SecurityIdentifer</code> object.  If the conversion succeeds, the name belongs to a valid local or domain user/group.  If conversion fails, the user/group doesn't exist. You can also optionally return the applicable <code>SecurityIdentifier</code> object.</p>
+
+<p>If the identity testing is in another domain, and there is no trust relationship between the current domain the identity's domain, <code>$false</code> will be returned even though the account could exist.</p>
 
     </div>
     
@@ -238,38 +240,24 @@
 				<th>Default Value</th>
 			</tr>
             			<tr valign='top'>
-				<td>CategoryName</td>
+				<td>Name</td>
 				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
-				<td>The performance counter's category name that should be deleted.
+				<td>The name of the identity to test.
 </td>
 				<td>true</td>
 				<td>false</td>
                 <td></td>
 			</tr>
 			<tr valign='top'>
-				<td>WhatIf</td>
+				<td>PassThru</td>
 				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
-				<td></td>
+				<td>Returns a <code>System.Security.Principal.SecurityIdentifier</code> object if the identity exists.
+</td>
 				<td>false</td>
 				<td>false</td>
                 <td></td>
 			</tr>
-			<tr valign='top'>
-				<td>Confirm</td>
-				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
-				<td></td>
-				<td>false</td>
-				<td>false</td>
-                <td></td>
-			</tr>
-                            <tr valign="top">
-                <td><a href="http://technet.microsoft.com/en-us/library/dd315352.aspx">CommonParameters</a></td>
-                <td></td>
-                <td>This cmdlet supports common parameters.  For more information type <br> <code>Get-Help about_CommonParameters</code>.</td>
-                <td></td>
-                <td></td>
-                <td></td>
-                </tr>
+            
         </table>
         
     
@@ -279,8 +267,14 @@
     
         
                 <h2>EXAMPLE 1</h2>
-            <pre><code>Uninstall-PerformanceCounterCategory -CategoryName 'ToyotaCamry'</code></pre>
-            <p><p>Removes the <code>ToyotaCamry</code> performance counter category and all its performance counters.  So sad!</p>
+            <pre><code>Test-Identity -Name 'Administrators</code></pre>
+            <p><p>Tests that a user or group called <code>Administrators</code> exists on the local computer.</p>
+</p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 2</h2>
+            <pre><code>Test-Identity -Name 'CARBON\Testers'</code></pre>
+            <p><p>Tests that a group called <code>Testers</code> exists in the <code>CARBON</code> domain.</p>
+</p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 3</h2>
+            <pre><code>Test-Identity -Name 'Tester' -PassThru</code></pre>
+            <p><p>Tests that a user or group named <code>Tester</code> exists and returns a <code>System.Security.Principal.SecurityIdentifier</code> object if it does.</p>
 </p><p></p><p></p><p></p><p></p>
 </body>
 </html>   

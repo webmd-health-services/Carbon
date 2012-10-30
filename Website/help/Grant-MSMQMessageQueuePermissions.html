@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-    <title>PowerShell - Grant-MsmqMessageQueuePermissions - Carbon</title>
+    <title>PowerShell - Grant-MSMQMessageQueuePermissions - Carbon</title>
 	<link href="styles.css" type="text/css" rel="stylesheet" />
 </head>
 <body>
@@ -30,6 +30,13 @@
 			<li><a href="Remove-SslCertificateBinding.html">Remove-SslCertificateBinding</a></li>
 			<li><a href="Set-SslCertificateBinding.html">Set-SslCertificateBinding</a></li>
 			<li><a href="Test-SslCertificateBinding.html">Test-SslCertificateBinding</a></li>
+		</ul>
+		<li class="Category">COM</li>
+		<ul class="CommandMenu">
+			<li><a href="Get-ComPermissions.html">Get-ComPermissions</a></li>
+			<li><a href="Get-ComSecurityDescriptor.html">Get-ComSecurityDescriptor</a></li>
+			<li><a href="Grant-ComPermissions.html">Grant-ComPermissions</a></li>
+			<li><a href="Revoke-ComPermissions.html">Revoke-ComPermissions</a></li>
 		</ul>
 		<li class="Category">Computer</li>
 		<ul class="CommandMenu">
@@ -109,10 +116,11 @@
 		<ul class="CommandMenu">
 			<li><a href="Get-MsmqMessageQueue.html">Get-MsmqMessageQueue</a></li>
 			<li><a href="Get-MsmqMessageQueuePath.html">Get-MsmqMessageQueuePath</a></li>
-			<li><a href="Grant-MsmqMessageQueuePermissions.html">Grant-MsmqMessageQueuePermissions</a></li>
+			<li><a href="Grant-MSMQMessageQueuePermissions.html">Grant-MSMQMessageQueuePermissions</a></li>
 			<li><a href="Install-Msmq.html">Install-Msmq</a></li>
 			<li><a href="Install-MsmqMessageQueue.html">Install-MsmqMessageQueue</a></li>
 			<li><a href="Remove-MsmqMessageQueue.html">Remove-MsmqMessageQueue</a></li>
+			<li><a href="Reset-MsmqQueueManagerID.html">Reset-MsmqQueueManagerID</a></li>
 			<li><a href="Test-MsmqMessageQueue.html">Test-MsmqMessageQueue</a></li>
 		</ul>
 		<li class="Category">Path</li>
@@ -180,6 +188,8 @@
 			<li><a href="Install-Group.html">Install-Group</a></li>
 			<li><a href="Install-User.html">Install-User</a></li>
 			<li><a href="Remove-User.html">Remove-User</a></li>
+			<li><a href="Resolve-IdentityName.html">Resolve-IdentityName</a></li>
+			<li><a href="Test-Identity.html">Test-Identity</a></li>
 			<li><a href="Test-User.html">Test-User</a></li>
 		</ul>
 		<li class="Category">WindowsFeatures</li>
@@ -202,12 +212,12 @@
 </div>
 
 
-    <h1>Grant-MsmqMessageQueuePermissions</h1>
+    <h1>Grant-MSMQMessageQueuePermissions</h1>
     <div><p>Grants a user permissions on an MSMQ message queue.</p>
 </div>
 
         <h2>Syntax</h2>
-    <pre class="Syntax"><code>Grant-MsmqMessageQueuePermissions [-Name] &lt;String&gt; [-Private] [-Username] &lt;String&gt; [-AccessRights] &lt;MessageQueueAccessRights[]&gt; [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
+    <pre class="Syntax"><code>Grant-MSMQMessageQueuePermissions [-Name] &lt;String&gt; [-Private] [-Username] &lt;String&gt; [-AccessRights] &lt;MessageQueueAccessRights[]&gt; [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
     
         <h2>Description</h2>
     <div class="Description">

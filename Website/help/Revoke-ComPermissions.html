@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-    <title>PowerShell - Uninstall-PerformanceCounterCategory - Carbon</title>
+    <title>PowerShell - Revoke-ComPermissions - Carbon</title>
 	<link href="styles.css" type="text/css" rel="stylesheet" />
 </head>
 <body>
@@ -212,20 +212,29 @@
 </div>
 
 
-    <h1>Uninstall-PerformanceCounterCategory</h1>
-    <div><p>Removes an entire performance counter category.</p>
+    <h1>Revoke-ComPermissions</h1>
+    <div><p>Revokes COM Access or Launch and Activation permissions.</p>
 </div>
 
         <h2>Syntax</h2>
-    <pre class="Syntax"><code>Uninstall-PerformanceCounterCategory [-CategoryName] &lt;String&gt; [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
+    <pre class="Syntax"><code>Revoke-ComPermissions -Identity &lt;String&gt; -Access -Limits [&lt;CommonParameters&gt;]</code></pre>
+<pre class="Syntax"><code>Revoke-ComPermissions -Identity &lt;String&gt; -Access -Default [&lt;CommonParameters&gt;]</code></pre>
+<pre class="Syntax"><code>Revoke-ComPermissions -Identity &lt;String&gt; -LaunchAndActivation -Limits [&lt;CommonParameters&gt;]</code></pre>
+<pre class="Syntax"><code>Revoke-ComPermissions -Identity &lt;String&gt; -LaunchAndActivation -Default [&lt;CommonParameters&gt;]</code></pre>
     
         <h2>Description</h2>
     <div class="Description">
-        <p>Removes, with extreme prejudice, the performance counter category <code>CategoryName</code>.  All its performance counters are also deleted.  If the performance counter category doesn't exist, nothing happens.  I hope you have good backups!</p>
+        <p>Calling this function is equivalent to opening Component Services (dcomcnfg), right-clicking <code>My Computer</code> under Component Services > Computers, choosing <code>Properties</code>, going to the <code>COM Security</code> tab, and removing an identity from the permissions window that opens after clicking the <code>Edit Limits...</code> or <code>Edit Default...</code> buttons under <code>Access Permissions</code> or <code>Launch and Activation Permissions</code> section,</p>
 
     </div>
     
-    
+            <h2>Related Commands</h2>
+        <ul>
+<li><a href="Get-ComPermissions.html">Get-ComPermissions</a></li>
+<li><a href="Grant-ComPermissions.html">Grant-ComPermissions</a></li>
+<li><a href="Revoke-ComPermissions.html">Revoke-ComPermissions</a></li>
+</ul>
+
 
     		<h2> Parameters </h2>
 		<table border='1'>
@@ -238,38 +247,50 @@
 				<th>Default Value</th>
 			</tr>
             			<tr valign='top'>
-				<td>CategoryName</td>
+				<td>Identity</td>
 				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
-				<td>The performance counter's category name that should be deleted.
+				<td></td>
+				<td>true</td>
+				<td>false</td>
+                <td></td>
+			</tr>
+			<tr valign='top'>
+				<td>Access</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+				<td>Revokes Access Permissions.
 </td>
 				<td>true</td>
 				<td>false</td>
                 <td></td>
 			</tr>
 			<tr valign='top'>
-				<td>WhatIf</td>
+				<td>LaunchAndActivation</td>
 				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
-				<td></td>
-				<td>false</td>
+				<td>Revokes Launch and Activation Permissions.
+</td>
+				<td>true</td>
 				<td>false</td>
                 <td></td>
 			</tr>
 			<tr valign='top'>
-				<td>Confirm</td>
+				<td>Default</td>
 				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
-				<td></td>
-				<td>false</td>
+				<td>Revokes default security permissions.
+</td>
+				<td>true</td>
 				<td>false</td>
                 <td></td>
 			</tr>
-                            <tr valign="top">
-                <td><a href="http://technet.microsoft.com/en-us/library/dd315352.aspx">CommonParameters</a></td>
+			<tr valign='top'>
+				<td>Limits</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+				<td>Revokes security limits permissions.
+</td>
+				<td>true</td>
+				<td>false</td>
                 <td></td>
-                <td>This cmdlet supports common parameters.  For more information type <br> <code>Get-Help about_CommonParameters</code>.</td>
-                <td></td>
-                <td></td>
-                <td></td>
-                </tr>
+			</tr>
+            
         </table>
         
     
@@ -279,8 +300,11 @@
     
         
                 <h2>EXAMPLE 1</h2>
-            <pre><code>Uninstall-PerformanceCounterCategory -CategoryName 'ToyotaCamry'</code></pre>
-            <p><p>Removes the <code>ToyotaCamry</code> performance counter category and all its performance counters.  So sad!</p>
+            <pre><code>Revoke-ComPermissions -Access -Identity 'Users' -Default</code></pre>
+            <p><p>Removes all default security COM access permissions for the local <code>Users</code> group.</p>
+</p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 2</h2>
+            <pre><code>Revoke-ComPermissions -LaunchAndActivation -Identity 'Users' -Limits</code></pre>
+            <p><p>Removes all security limit COM access permissions for the local <code>Users</code> group.</p>
 </p><p></p><p></p><p></p><p></p>
 </body>
 </html>   

@@ -31,6 +31,13 @@
 			<li><a href="Set-SslCertificateBinding.html">Set-SslCertificateBinding</a></li>
 			<li><a href="Test-SslCertificateBinding.html">Test-SslCertificateBinding</a></li>
 		</ul>
+		<li class="Category">COM</li>
+		<ul class="CommandMenu">
+			<li><a href="Get-ComPermissions.html">Get-ComPermissions</a></li>
+			<li><a href="Get-ComSecurityDescriptor.html">Get-ComSecurityDescriptor</a></li>
+			<li><a href="Grant-ComPermissions.html">Grant-ComPermissions</a></li>
+			<li><a href="Revoke-ComPermissions.html">Revoke-ComPermissions</a></li>
+		</ul>
 		<li class="Category">Computer</li>
 		<ul class="CommandMenu">
 			<li><a href="Remove-EnvironmentVariable.html">Remove-EnvironmentVariable</a></li>
@@ -109,10 +116,11 @@
 		<ul class="CommandMenu">
 			<li><a href="Get-MsmqMessageQueue.html">Get-MsmqMessageQueue</a></li>
 			<li><a href="Get-MsmqMessageQueuePath.html">Get-MsmqMessageQueuePath</a></li>
-			<li><a href="Grant-MsmqMessageQueuePermissions.html">Grant-MsmqMessageQueuePermissions</a></li>
+			<li><a href="Grant-MSMQMessageQueuePermissions.html">Grant-MSMQMessageQueuePermissions</a></li>
 			<li><a href="Install-Msmq.html">Install-Msmq</a></li>
 			<li><a href="Install-MsmqMessageQueue.html">Install-MsmqMessageQueue</a></li>
 			<li><a href="Remove-MsmqMessageQueue.html">Remove-MsmqMessageQueue</a></li>
+			<li><a href="Reset-MsmqQueueManagerID.html">Reset-MsmqQueueManagerID</a></li>
 			<li><a href="Test-MsmqMessageQueue.html">Test-MsmqMessageQueue</a></li>
 		</ul>
 		<li class="Category">Path</li>
@@ -180,6 +188,8 @@
 			<li><a href="Install-Group.html">Install-Group</a></li>
 			<li><a href="Install-User.html">Install-User</a></li>
 			<li><a href="Remove-User.html">Remove-User</a></li>
+			<li><a href="Resolve-IdentityName.html">Resolve-IdentityName</a></li>
+			<li><a href="Test-Identity.html">Test-Identity</a></li>
 			<li><a href="Test-User.html">Test-User</a></li>
 		</ul>
 		<li class="Category">WindowsFeatures</li>
@@ -207,11 +217,11 @@
 </div>
 
         <h2>Syntax</h2>
-    <pre class="Syntax"><code>Set-RegistryKeyValue -Path &lt;String&gt; -Name &lt;String&gt; -String &lt;String&gt; [-Expand] [-Force] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
-<pre class="Syntax"><code>Set-RegistryKeyValue -Path &lt;String&gt; -Name &lt;String&gt; -Binary &lt;Byte[]&gt; [-Force] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
-<pre class="Syntax"><code>Set-RegistryKeyValue -Path &lt;String&gt; -Name &lt;String&gt; -DWord &lt;Int32&gt; [-Force] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
-<pre class="Syntax"><code>Set-RegistryKeyValue -Path &lt;String&gt; -Name &lt;String&gt; -QWord &lt;Int64&gt; [-Force] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
-<pre class="Syntax"><code>Set-RegistryKeyValue -Path &lt;String&gt; -Name &lt;String&gt; -Strings &lt;String[]&gt; [-Force] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
+    <pre class="Syntax"><code>Set-RegistryKeyValue -Path &lt;String&gt; -Name &lt;String&gt; -String &lt;String&gt; [-Expand] [-Force] [-Quiet] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
+<pre class="Syntax"><code>Set-RegistryKeyValue -Path &lt;String&gt; -Name &lt;String&gt; -Binary &lt;Byte[]&gt; [-Force] [-Quiet] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
+<pre class="Syntax"><code>Set-RegistryKeyValue -Path &lt;String&gt; -Name &lt;String&gt; -DWord &lt;Int32&gt; [-Force] [-Quiet] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
+<pre class="Syntax"><code>Set-RegistryKeyValue -Path &lt;String&gt; -Name &lt;String&gt; -QWord &lt;Int64&gt; [-Force] [-Quiet] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
+<pre class="Syntax"><code>Set-RegistryKeyValue -Path &lt;String&gt; -Name &lt;String&gt; -Strings &lt;String[]&gt; [-Force] [-Quiet] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
     
         <h2>Description</h2>
     <div class="Description">
@@ -312,6 +322,15 @@
 				<td>Force</td>
 				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
 				<td>Removes and re-creates the value.  Useful for changing a value's type.
+</td>
+				<td>false</td>
+				<td>false</td>
+                <td></td>
+			</tr>
+			<tr valign='top'>
+				<td>Quiet</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+				<td>If set, won't write any information about what values are being set.
 </td>
 				<td>false</td>
 				<td>false</td>
