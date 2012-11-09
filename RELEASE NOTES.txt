@@ -1,3 +1,11 @@
+# 0.3.2.0
+
+## Enhancements
+
+ * Created [Get-Privileges](http://get-carbon.org/help/Get-Privileges.html), [Grant-Privilege](http://get-carbon.org/help/Grant-Privilege.html), [Revoke-Privilege](http://get-carbon.org/help/Revoke-Privilege.html), and [Test-Privilege](http://get-carbon.org/help/Test-Privilege.html) for managing an identity's security operation privileges.
+ * [Install-Service](http://get-carbon.org/help/Install-Service.html) now uses [Grant-Privilege](http://get-carbon.org/help/Grant-Privilege.html) to grant custom service identities the `SeServiceLogonRight` privilege. This replaces usage of Microsoft's legacy [ntrights.exe](http://support.microsoft.com/kb/315276), which we probably didn't have permission to distribute.
+ 
+
 # 0.3.1.0 (29 October 2012)
 
 ## Enhancements
