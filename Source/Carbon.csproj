@@ -35,15 +35,19 @@
     <Reference Include="System" />
     <Reference Include="System.Security" />
     <Reference Include="System.Data" />
+    <Reference Include="System.ServiceProcess" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AdvApi32.cs" />
     <Compile Include="IO\JunctionPoint.cs" />
     <Compile Include="Lsa.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Security\ComAccessRights.cs" />
     <Compile Include="Security\ComAccessRule.cs" />
+    <Compile Include="Security\ServiceAccessRights.cs" />
+    <Compile Include="Security\ServiceAccessRule.cs" />
     <Compile Include="Win32.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

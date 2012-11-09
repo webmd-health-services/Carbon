@@ -46,6 +46,7 @@
   <ItemGroup>
     <Compile Include="Lsa\LsaTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="AdvApi32Tests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Source\Carbon.csproj">
