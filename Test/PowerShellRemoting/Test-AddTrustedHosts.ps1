@@ -35,10 +35,10 @@ if( Test-AdminPrivileges )
 
     function Test-ShouldAddNewHost
     {
-        Add-TrustedHosts -Entries example.com
+        Add-TrustedHosts -Entries example.com 
         $trustedHosts = @( Get-TrustedHosts )
         Assert-True ($trustedHosts -contains 'example.com')
-        Assert-Equal ($originalTrustedHosts.Count + 1) $trustedHosts.Count
+        Assert-Equal 1 $trustedHosts.Count
     }
 
     function Test-ShouldAddMultipleHosts
@@ -47,7 +47,7 @@ if( Test-AdminPrivileges )
         $trustedHosts = Get-TrustedHosts
         Assert-True ($trustedHosts -contains 'example.com')
         Assert-True ($trustedHosts -contains 'webmd.com')
-        Assert-Equal ($originalTrustedHosts.Count + 2) $trustedHosts.Count
+        Assert-Equal 2 $trustedHosts.Count
     }
 
     function Test-ShouldNotDuplicateEntries
@@ -56,15 +56,16 @@ if( Test-AdminPrivileges )
         Add-TrustedHosts -Entries example.com
         $trustedHosts = @( Get-TrustedHosts )
         Assert-True ($trustedHosts -contains 'example.com')
-        Assert-Equal ($originalTrustedHosts.Count + 1) $trustedHosts.Count
+        Assert-Equal 1 $trustedHosts.Count
     }
     
     function Test-ShouldSupportWhatIf
     {
+        $preTrustedHosts = @( Get-TrustedHosts )
         Add-TrustedHosts -Entries example.com -WhatIf
         $trustedHosts = @( Get-TrustedHosts )
         Assert-True ($trustedHosts -notcontains 'example.com')
-        Assert-Equal $originalTrustedHosts.Count $trustedHosts.Count
+        Assert-Equal $preTrustedHosts.Count $trustedHosts.Count
         
     }
 }

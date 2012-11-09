@@ -207,7 +207,11 @@ function Set-RegistryKeyValue
         
         [Switch]
         # Removes and re-creates the value.  Useful for changing a value's type.
-        $Force
+        $Force,
+        
+        [Switch]
+        # If set, won't write any information about what values are being set.
+        $Quiet
     )
     
     $value = $null
@@ -228,7 +232,7 @@ function Set-RegistryKeyValue
         'MultiString' { $value = $Strings }
     }
     
-    if( -not $PSBoundParameters.ContainsKey( 'WhatIf' ) )
+    if( -not $PSBoundParameters.ContainsKey( 'WhatIf' ) -and -not $Quiet )
     {
         Write-Host "Setting registry value '$Path@$Name'."
     }

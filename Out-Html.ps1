@@ -379,6 +379,7 @@ $menuBuilder = New-Object Text.StringBuilder
 	<ul id="SiteNav">
 		<li><a href="http://get-carbon.org">Get-Carbon</a></li>
 		<li><b>-Documentation</b></li>
+        <li><a href="http://get-carbon.org">-ReleaseNotes</a></li>
 		<li><a href="http://pshdo.com">-Blog</a></li>
 	</ul>"@ )
 [void] $menuBuilder.AppendLine( '<div id="CommandMenuContainer" style="float:left;">' )
@@ -417,3 +418,32 @@ $commands |
     #Where-Object { $_.Name -eq 'Get-Certificate' } | 
     Get-Help -Full | 
     Convert-HelpToHtml -Menu $menuBuilder.ToString()
+
+$releaseNotesHtml = Get-Content (Join-Path $PSSCriptRoot 'RELEASE NOTES.txt')
+$releaseNotesHtml = $releaseNotesHtml -join "`n" |
+                        Convert-MarkdownToHtml
+
+@"
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	<title>Release Notes - Carbon: PowerShell DevOps module for configuring and setting up Windows computers</title>
+	<link href="styles.css" type="text/css" rel="stylesheet" />
+</head>
+<body>
+	<ul id="SiteNav">
+		<li><a href="/">Get-Carbon</a></li>
+		<li><a href="help/">-Documentation</a></li>
+		<li><b>-ReleaseNotes</b></li>
+		<li><a href="http://pshdo.com">-Blog</a></li>
+	</ul>
+    
+    {0}
+    
+    <div class="Footer">
+		Copyright &copy; 2012 <a href="http://splatteredbits.com">Aaron Jensen</a>.  All rights reserved.
+	</div>
+</body>
+</html>
+"@ -f ($releaseNotesHtml -join "`n") | Out-File -FilePath (Join-Path $PSScriptRoot 'Website\releasenotes.html') -Encoding OEM
+

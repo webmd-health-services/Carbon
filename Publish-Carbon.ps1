@@ -25,7 +25,12 @@ param(
     
     [Parameter(ParameterSetName='Some')]
     [Switch]
-    $Package
+    $Package,
+
+    [Parameter(ParameterSetName='Some')]
+    [Switch]
+    # Update the version.
+    $UpdateVersion
 )
 
 Set-StrictMode -Version Latest
@@ -43,7 +48,7 @@ $releaseNotesFileName = 'RELEASE NOTES.txt'
 $releaseNotesPath = Join-Path $PSScriptRoot $releaseNotesFileName -Resolve
 $releaseNotes = Get-Content $releaseNotesPath
 
-if( $releaseNotes[0] -notmatch "^\# (\d+\.\d+\.\d+)\s*" )
+if( $releaseNotes[0] -notmatch "^\# (\d+\.\d+\.\d+\.\d+)\s*" )
 {
     Write-Error "Missing version from release notes file.  The first line must contain the version about to be released."
     exit
@@ -53,6 +58,24 @@ $releaseNotes[0] = "# $version ($((Get-Date).ToString("d MMMM yyyy")))"
 if( $All )
 {
     $releaseNotes | Out-File -FilePath $releaseNotesPath -Encoding OEM
+}
+
+if( $All -or $UpdateVersion )
+{
+    $manifestPath = Join-Path $PSScriptRoot Carbon\Carbon.psd1 -Resolve
+    $manifest = Get-Content $manifestPath
+    $manifest |
+        ForEach-Object {
+            if( $_ -like 'ModuleVersion = *' )
+            {
+                'ModuleVersion = ''{0}''' -f $version.ToString()
+            }
+            else
+            {
+                $_
+            }
+        } |
+        Out-File -FilePath $manifestPath -Encoding OEM
 }
 
 if( $All -or $Package )
@@ -69,7 +92,12 @@ try
     if( $All -or $Package )
     {
         Write-Host "Updating help."
+        $helpDirPath = Join-Path $PSScriptRoot Website\help
+        Get-ChildItem $helpDirPath *.html | Remove-Item 
+        
         .\Out-Html.ps1 -OutputDir .\Website\help
+        
+        hg addremove $helpDirPath
         
         if( Test-Path $carbonZipFileName -PathType Leaf )
         {
@@ -85,7 +113,7 @@ try
      
     if( $All )
     {   
-        hg commit -m "Releasing version $version." --include $releaseNotesFileName --include .\Website
+        hg commit -m "Releasing version $version." --include $releaseNotesFileName --include .\Website --include Carbon\Carbon.psd1
         if( -not (hg tags | Where-Object { $_ -like "$version*" } ) )
         {
             hg tag $version
@@ -94,6 +122,10 @@ try
 }
 finally
 {
-    Remove-Item (Join-Path $PSScriptRoot Carbon\$licenseFileName)
+    $licensePath = Join-Path $PSScriptRoot Carbon\$licenseFileName
+    if( Test-Path $licensePath )
+    {
+        Remove-Item $licensePath
+    }
     Pop-Location
 }

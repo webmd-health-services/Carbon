@@ -1,4 +1,42 @@
-# 0.3.0
+# 0.3.1.0 (29 October 2012)
+
+## Enhancements
+ * Improved [Disable-IEEnhancedSecurityConfiguration](http://get-carbon.org/help/Install-IisAppPool.html) and [Enable-IEActivationPermissions](http://get-carbon.org/help/Enable-IEActivationPermissions.html) for enabling Internet Explorer to run headless by non-priveleged users.
+ * Changed the way [Invoke-WindowsInstaller](http://get-carbon.org/help/Invoke-WindowsInstaller.html) waits for MSI to finish installing: instead of searching for any MSI process, it now searches for an MSI process that is a child of the current PowerShell process.
+ * Simplified how [Add-GroupMembers](http://get-carbon.org/help/Add-GroupMembers.html) adds group members.
+ * The version number in the module manifest now gets updated correctly for each release.  You should now be able to tell what version you're running by looking in `Carbon\Carbon.psd1`, or, if Carbon is imported in your console, running `Get-Module Carbon | Select-Object Version`.
+ * Created [Get-ComPermissions](http://get-carbon.org/help/Get-ComPermissions.html) function for getting COM Access or Launch and Activation Permissions.  These are the permissions you see in Component Services (i.e. dcomcnfg) when you right-click `My Computer`, select `Properties`, click the `COM Security` tab then click the `Edit Default..` or `Edit Limits...` buttons under **Access Permissions** or **Launch and Activation Permissions**, respectively.
+ * Created [Grant-ComPermissions](http://get-carbon.org/help/Grant-ComPermissions.html) for granting COM Access and/or Launch and Activation permissions.
+ * Created [Revoke-ComPermissions](http://get-carbon.org/help/Revoke-ComPermissions.html) for revoking COM Access and/or Launch and ACtivation permissions.
+ * Created [Test-Identity](http://get-carbon.org/help/Test-Identity.html) function for testing if user or group exists on the local computer or in a domain.
+ * Created [Resolve-IdentityName](http://get-carbon.org/help/Resolve-Identity.html) function for determinig a user/group's canonical name.  For example, it converts `Administrators` into `BUILTIN\Administrators`.
+ * Improved the way the Windows Features functions detect the best way to manage Windows features.  The old way would write an error to the error stream, which bubbled up at weird times and made diagnosing real errors harder.
+ * Added a `Quiet` parameter to [Set-RegistryKeyValue](http://get-carbon.org/help/Set-RegistryKeyValue.html) so that `Write-Host` output is muffled.
+ * Created [Reset-MsmqQueueManagerID](http://get-carbon.org/help/Reset-MsmqQueueManagerID.html) function, which resets MSMQ's Queue Manager ID.
+ 
+# 0.3.0 (28 September 2012)
+
+## Upgrade Instructions
+
+This release contains backwards-**incompatible** changes to the following functions:
+
+ * [Set-IisSslFlags](http://get-carbon.org/help/Set-IisSslFlags.html)
+ * [Set-TrustedHosts](http://get-carbon.org/help/Set-TrustedHosts.html)
+ * [Invoke-PowerShell](http://get-carbon.org/help/Invoke-PowerShell.html)
+
+### Set-IisSslFlags
+
+This function was renamed to `Enable-IisSsl`.  Its `Enable128BitSsl` parameter was renamed to `Require128BitSsl`.  
+
+Configuring client certificates is now a little stricter/clearer.  You can no longer specify both `AcceptClientCertificates` and `RequireClientCertificates`.  Also, if you specify `RequireClientCertificates`, you must now also supply the `RequireSsl` switch (before, setting the `RequireClientCertificates` switch implicitly set the `RequireSsl` switch).
+
+### Set-TrustedHosts
+
+Make sure you're not calling `Set-TrustedHosts` with an empty array/value for the `Entries` parameter.  The function now throw an error in that situation.  If you need to clear the list of trusted hosts, use `Clear-TrustedHosts`.
+
+### Invoke-PowerShell
+
+If you call `Invoke-PowerShell` without the `x86` switch and PowerShell is 32-bit, you'll get an error.  Under Windows x64, 32-bit PowerShell can't start the 64-bit instance because Windows redirects all access from C:\Windows\system32 to C:\Windows\SysWOW64.  If anyone knows how to get around this, let me know!
 
 ## Enhancements
  * Renamed `Set-IisSslFlags` to `Enable-IisSsl` to better reflect what it does.  Also, created parameter sets around client certificate settings so you can't configure them incorrectly.  ([Fixes #25: Set-IisSslFlags: Create parameter sets to accurately reflect what flags are allowed to be set simultaneously.](https://bitbucket.org/splatteredbits/carbon/issue/25/set-iissslflags-create-parameter-sets-to))
@@ -9,9 +47,10 @@
  * Rename [Enable-IisSsl/Set-IisSslFlags's](http://get-carbon.org/help/Set-IisSslFlags.html) `Enable128BitSsl` parameter to `Require128BitSsl`] ([Fix #24 Set-IisSslFlags: Rename the Enable128BitSsl parameter to Require128BitSsl](https://bitbucket.org/splatteredbits/carbon/issue/24/set-iissslflags-rename-the-enable128bitssl)).
  * [Fix issue #19](https://bitbucket.org/splatteredbits/carbon/issue/19/install-iisapppool-doesnt-change-an): [Install-IisAppPool](http://get-carbon.org/help/Install-IisAppPool.html) doesn't change an existing 32-bit app pool to be a 64-bit app pool.
  * [Fix issue #33](https://bitbucket.org/splatteredbits/carbon/issue/33/install-msmqmessagequeue-can-wait-forever): [Install-MsmqMessageQueue](http://get-carbon.org/help/Install-MsmqMessageQueue.html): Can wait forever for a queue to get created.  It now waits 10 seconds.  
- * [Fix issue #36](https://bitbucket.org/splatteredbits/carbon/issue/36/get-powershellpath-returns-the-wrong-path): [Get-PowerShellpath](http://get-carbon.org/help/Get-PowershellPath.html) returns the wrong path when running x86 PowerShell on x64 computers.
+ * [Fix issue #36](https://bitbucket.org/splatteredbits/carbon/issue/36/get-powershellpath-returns-the-wrong-path): [Get-PowerShellPath](http://get-carbon.org/help/Get-PowershellPath.html) returns the wrong path when running x86 PowerShell on x64 computers.
  * [Fix issue #37](https://bitbucket.org/splatteredbits/carbon/issue/37/invoke-powershell-should-write-an-error): [Invoke-PowerShell](http://get-carbon.org/help/Invoke-PowerShell.html) should write an error when running as x86 on Windows x64 without the x86 flag (i.e. 32-bit PowerShell can't launch a 64-bit PowerShell, so throw an error in that situation).
  * [Fix issue #38](https://bitbucket.org/splatteredbits/carbon/issue/38/set-trustedhosts-passing-an-empty-value): [Set-TrustedHosts](http://get-carbon.org/help/Set-TrustedHosts.html): passing an empty value for the Entries parameter clears the hosts list.  The `Entries` parameter is now required.  To clear the trusted hosts list, use `Clear-TrustedHosts`.
+
 
 # 0.2.7 (3 September 2012)
 
