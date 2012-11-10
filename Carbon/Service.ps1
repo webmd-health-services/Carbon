@@ -262,7 +262,7 @@ function Grant-ServiceControlPermission
     if( $pscmdlet.ShouldProcess( $ServiceName, "grant control service permissions to '$Identity'" ) )
     {
         Write-Host "Granting '$Identity' the permissions to control '$ServiceName'."
-        Invoke-SubInAcl /service `"$Servicename`" /GRANT=`"$Identity`"=STOE
+        Grant-ServicePermission -Name $ServiceName -Identity $Identity -QueryStatus -EnumerateDependents -Start -Stop
     }
 }
 
@@ -599,60 +599,6 @@ function Install-Service
         {
             Start-Service -Name $Name
         }
-    }
-}
-
-function Invoke-SubInAcl
-{
-    <#
-    .SYNOPSIS
-    **INTERNAL.**  Invokes the SubInAcl console application, and parses its output so it displays correctly.  **This is an internal function is will be removed in a future release.**
-
-    .DESCRIPTION
-    **NOTE: This function will be removed in a future release.  It is internal, and should not be used.**
-
-    Subinacl.exe outputs text for the classic Windows console.  This output doesn't work in PowerShell: it looks like there is a space between every character.  In fact, there are `null` bytes between each character.  Hopefully, somebody will be able to explain this to me someday.  Until then, this function runs `subinacl.exe` and parses its output to remove these extra `null` bytes.
-
-    All parameters passed to `Invoke-SubInAcl` are passed to the actual `subinacl.exe` program unchanged.
-
-    .EXAMPLE
-    Invoke-SubInAcl /help
-
-    Shows the SubInAcl help documentation.
-
-    .EXAMPLE
-    Invoke-SubInAcl /service `"CCService`" /GRANT=`"$Identity`"=STOE
-
-    Grants `$Identity` permissions to control the `CCService`.  Note escaped quotes around some of the arguments to `subinacl.exe`.  You may or may not need to follow this pattern.  It's been too long since we wrote that code to remember.  We were PowerShell noobies back then.
-    #>
-    [CmdletBinding()]
-    param(
-        [Parameter(Mandatory=$true,ValueFromRemainingArguments=$true)]
-        [string[]]
-        $Parameters
-    )
-    
-    $subInAclPath = Join-Path $CarbonBinDir subinacl.exe -Resolve
-    $output = & $subInAclPath $Parameters
-    $previousLineEmpty = $false
-    $lineEmpty = $true
-    foreach( $line in $output )
-    {
-        $lineEmpty = ( $line -eq "`0" )
-        
-        if( $previousLineEmpty -and $lineEmpty)
-        {
-            Write-Output ""
-            $previousLineEmpty = $false
-            continue
-        }
-        
-        $line = $line -replace "`0",''
-        if( $line )
-        {
-            Write-Output "$line"
-        }
-        $previousLineEmpty = $lineEmpty
     }
 }
 

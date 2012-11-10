@@ -38,47 +38,28 @@ function TearDown
 
 function Test-ShouldGrantControlServicePermission
 {
-
-    $currentPerms = Invoke-SubInAcl /service $serviceName /display
-    foreach( $line in $currentPerms )
-    {
-        if( $line -like $userPermStartPattern )
-        {
-            Fail "User '$user' already has permissions on '$serviceName'."
-        }
-    }
+    $currentPerms = Get-ServicePermissions -Name $serviceName -Identity $user
+    Assert-Null $currentPerms "User '$user' already has permissions on '$serviceName'."
     
     Grant-ServiceControlPermission -ServiceName $serviceName -Identity $user
     Assert-LastProcessSucceeded
     
-    $currentPerms = Invoke-SubInAcl /service $serviceName /display
-    $userGrantedPerms = $false
-    for( $idx = 0; $idx -lt $currentPerms.Length; ++$idx )
-    {
-        $line = $currentPerms[$idx]
-        if( $line -like $userPermStartPattern )
-        {
-            $line = $currentPerms[$idx + 1]
-            Assert-Like $line '*SERVICE_QUERY_STATUS-0x4           SERVICE_ENUMERATE_DEPEND-0x8       SERVICE_START-0x10'
-            $line = $currentPerms[$idx + 2]
-            Assert-LIke $line '*SERVICE_STOP-0x20'
-            $userGrantedPerms = $true
-        }
-    }
-    
-    Assert-True $userGrantedPerms
+    $expectedAccessRights = [Carbon.Security.ServiceAccessRights]::QueryStatus -bor `
+                            [Carbon.Security.ServiceAccessRights]::EnumerateDependents -bor `
+                            [Carbon.Security.ServiceAccessRights]::Start -bor `
+                            [Carbon.Security.ServiceAccessRights]::Stop
+    $currentPerms = Get-ServicePermissions -Name $serviceName -Identity $user
+    Assert-NotNull $currentPerms
+    Assert-Equal $expectedAccessRights $currentPerms.ServiceAccessRights
 }
 
 function Test-ShouldSupportWhatIf
 {
+    $currentPerms = Get-ServicePermissions -Name $serviceName -Identity $user
+    Assert-Null $currentPerms
+    
     Grant-ServiceControlPermission -ServiceName $serviceName -Identity $user -WhatIf
     
-    $currentPerms = Invoke-SubInAcl /service $serviceName /display
-    foreach( $line in $currentPerms )
-    {
-        if( $line -like $userPermStartPattern )
-        {
-            Fail "User '$user' has permissions on '$serviceName'."
-        }
-    }
+    $currentPerms = Get-ServicePermissions -Name $serviceName -Identity $user
+    Assert-Null $currentPerms
 }

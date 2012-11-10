@@ -1,7 +1,8 @@
-# 0.3.2.0
+# 0.4.0.0
 
 ## Upgrade Instructions
  * [Install-Service](http://get-carbon.org/help/Install-Service.html) now only auto-starts a service if its startup type is not set or set to Automatic (the `StartupType` parameter).  If set to Manual or Disabled, the service will no longer be started after installation.
+ * We've stopped distributing Microsoft's `subinacl.exe` program. We didn't have permission to distribute.  Plus its no longer supported. If any of your scripts used `Invoke-SubInAcl`, you'll want to [download `subinacl.exe` yourself](http://www.microsoft.com/en-us/download/details.aspx?id=23510) and copy `Invoke-SubInAcl` before upgrading (you can find it in the Carbon directory in the `Services.ps1` file.
 
 ## Enhancements
 
@@ -15,6 +16,7 @@
  * Created [Revoke-ServicePermission](http://get-carbon.org/help/Revoke-ServicePermission.html) function to revoke all of an identity's permissioms to control a service.
  * Created [Set-ServiceAcl](http://get-carbon.org/help/Set-ServiceAcl.html) function to set a service's discretionary access control list (DACL).
  * Created [Test-Service](http://get-carbon.org/help/Test-Service.html) function to check if a service exists *without* writing an error.
+ * Removed `Invoke-SubInAcl` function and the `subinacl.exe` program.  If you still need `subinacl.exe`, please [download it from Microsoft](http://www.microsoft.com/en-us/download/details.aspx?id=23510).
   
 # Bug fixes
  * [Install-Service](http://get-carbon.org/help/Install-Service.html) no longer tries to start a service if its `StartupType` is set to `Manual` or `Disabled`.
