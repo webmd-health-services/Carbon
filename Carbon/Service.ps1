@@ -14,6 +14,118 @@
 
 Add-Type -AssemblyName System.ServiceProcess
 
+function Assert-Service
+{
+    <#
+    .SYNOPSIS
+    Checks if a service exists, and writes an error if it doesn't.
+    
+    .DESCRIPTION
+    Also returns `True` if the service exists, `False` if it doesn't.
+    
+    .OUTPUT
+    System.Boolean.
+    
+    .LINK
+    Test-Service
+    
+    .EXAMPLE
+    Assert-Service -Name 'Drivetrain'
+    
+    Writes an error if the `Drivetrain` service doesn't exist.
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]
+        # The name of the service.
+        $Name
+    )
+    
+    if( -not (Test-Service $Name) )
+    {
+        Write-Error ('Service {0} not found.' -f $Name)
+        return $false
+    }
+    
+    return $true
+}
+
+function Get-ServiceAcl
+{
+    <#
+    .SYNOPSIS
+    Gets the discretionary access control list (i.e. DACL) for a service.
+    
+    .DESCRIPTION
+    You wanted it, you got it!  You probably want to use `Get-ServicePermissions` instead.  If you want to chagne a service's permissions, use `Grant-ServicePermission` or `Revoke-ServicePermissions`.
+    
+    .LINK
+    Get-ServicePermissions
+    
+    .LINK
+    Grant-ServicePermission
+    
+    .LINK
+    Revoke-ServicePermission
+    
+    .EXAMPLE
+    Get-ServiceAcl -Name Hyperdrive
+    
+    Gets the `Hyperdrive` service's DACL.
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]
+        # The service whose DACL to return.
+        $Name
+    )
+
+    $rawSD = Get-ServiceSecurityDescriptor -Name $Name
+    $rawDacl = $rawSD.DiscretionaryAcl
+    New-Object Security.AccessControl.DiscretionaryAcl $false,$false,$rawDacl
+}
+
+
+function Get-ServiceSecurityDescriptor
+{
+    <#
+    .SYNOPSIS
+    Gets the raw security descriptor for a service.
+    
+    .DESCRIPTION
+    You probably don't want to mess with the raw security descriptor.  Try `Get-ServicePermissions` instead.  Much more useful.
+    
+    .OUTPUT
+    System.Security.AccessControl.RawSecurityDescriptor.
+    
+    .LINK
+    Get-ServicePermissions
+    
+    .LINK
+    Grant-ServicePermissions
+    
+    .LINK
+    Revoke-ServicePermissions
+    
+    .EXAMPLE
+    Get-ServiceSecurityDescriptor -Name 'Hyperdrive'
+    
+    Gets the hyperdrive service's raw security descriptor.
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]
+        # The name of the service whose permissions to return.
+        $Name
+    )
+
+    $sdBytes = [Carbon.AdvApi32]::GetServiceSecurityDescriptor($Name)
+    New-Object Security.AccessControl.RawSecurityDescriptor $sdBytes,0
+}
+
 function Get-ServicePermissions
 {
     <#
@@ -25,25 +137,50 @@ function Get-ServicePermissions
     
      * IdentityReference - The identity of the permission.
      * ServiceAccessRights - The permissions the user has.
+     
+    .OUTPUT
+    Carbon.Security.ServiceAccessRule.
+    
+    .LINK
+    Grant-ServicePermissions
+    
+    .LINK
+    Revoke-ServicePermissions
     
     .EXAMPLE
     Get-ServicePermissions -Name 'Hyperdrive'
     
     Gets the access rules for the `Hyperdrive` service.
+    
+    .EXAMPLE
+    Get-ServicePermissions -Name 'Hyperdrive' -Identity FALCON\HSolo
+    
+    Gets just Han's permissions to control the `Hyperdrive` service.
     #>
     [CmdletBinding()]
     param(
         [Parameter(Mandatory=$true)]
         [string]
         # The name of the service whose permissions to return.
-        $Name
+        $Name,
+        
+        [string]
+        # The specific identity whose permissions to get.
+        $Identity
     )
     
-    $sdBytes = [Carbon.AdvApi32]::GetServiceSecurityDescriptor($Name)
+    $dacl = Get-ServiceAcl -Name $Name
     
-    $rsd = New-Object Security.AccessControl.RawSecurityDescriptor $sdBytes,0
-    $racl = $rsd.DiscretionaryAcl
-    $dacl = New-Object Security.AccessControl.DiscretionaryAcl $false,$false,$racl
+    $rIdentity = $null
+    if( $Identity )
+    {
+        $rIdentity = Resolve-IdentityName -Name $Identity
+        if( -not $rIdentity )
+        {
+            Write-Error ("Identity {0} not found." -f $identity)
+            return
+        }
+    }
 
     $dacl |
         ForEach-Object {
@@ -76,6 +213,13 @@ function Get-ServicePermissions
                 return
             }
             New-Object Carbon.Security.ServiceAccessRule $aceSid,$ace.AccessMask,$ruleType            
+        } |
+        Where-Object { 
+            if( $rIdentity )
+            {
+                return ($_.IdentityReference.Value -eq $rIdentity)
+            }
+            return $_
         }
 }
 
@@ -83,11 +227,20 @@ function Grant-ServiceControlPermission
 {
     <#
     .SYNOPSIS
-    Grants a user/group permission to control a service.
+    Grants a user/group permission to start/stop (i.e. use PowerShell's `*-Service` cmdlets) a service.
 
     .DESCRIPTION
-    Users/groups that aren't administrators need to granted permission to control (e.g. start, stop) a service.  This function uses Microsoft's `subinacl.exe` program to grant those permissions.  
+    By default, only Administrators are allowed to control a service. You may notice that when running the `Stop-Service`, `Start-Service`, or `Restart-Service` cmdlets as a non-Administrator, you get permissions errors. That's because you need to correct permissions.  This function grants just the permissions needed to use PowerShell's `Stop-Service`, `Start-Service`, and `Restart-Service` cmdlets to control a service.
 
+    .LINK
+    Get-ServicePermissions
+    
+    .LINK
+    Grant-ServicePermission
+    
+    .LINKE
+    Revoke-ServicePermission
+    
     .EXAMPLE
     Grant-ServiceControlPermission -ServiceName CCService -Identity INITRODE\Builders
 
@@ -111,6 +264,141 @@ function Grant-ServiceControlPermission
         Write-Host "Granting '$Identity' the permissions to control '$ServiceName'."
         Invoke-SubInAcl /service `"$Servicename`" /GRANT=`"$Identity`"=STOE
     }
+}
+
+function Grant-ServicePermission
+{
+    <#
+    .SYNOPSIS
+    Grants permissions for an identity against a service.
+    
+    .DESCRIPTION
+    By default, only Administators are allowed to manage a service.  Use this function to grant specific identities permissions to manage a specific service.
+    
+    If you just want to grant a user the ability to start/stop/restart a service using PowerShell's `Start-Service`, `Stop-Service`, or `Restart-Service` cmdlets, use the `Grant-ServiceControlPermissions` function instead.
+    
+    Any previous permissions are replaced.
+    
+    .LINK
+    Get-ServicePermissions
+    
+    .LINK
+    Grant-ServiceControlPermissions
+    
+    .EXAMPLE
+    Grant-ServicePermission -Identity FALCON\Chewbacca -Name Hyperdrive -QueryStatus -EnumerateDependents -Start -Stop
+    
+    Grants Chewbacca the permissions to query, enumerate dependents, start, and stop the `Hyperdrive` service.  Coincedentally, these are the permissions that Chewbacca nees to run `Start-Service`, `Stop-Service`, `Restart-Service`, and `Get-Service` cmdlets against the `Hyperdrive` service.
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]
+        # The name of the service to grant permissions to.
+        $Name,
+        
+        [Parameter(Mandatory=$true)]
+        [string]
+        # The identity to grant permissions for.
+        $Identity,
+        
+        [Parameter(Mandatory=$true,ParameterSetName='FullControl')]
+        [Switch]
+        # Grant full control on the service
+        $FullControl,
+        
+        [Parameter(ParameterSetName='PartialControl')]
+        [Switch]
+        # Grants permission to query the service's configuration.
+        $QueryConfig,
+        
+        [Parameter(ParameterSetName='PartialControl')]
+        [Switch]
+        # Grants permission to change the service's permission.
+        $ChangeConfig,
+        
+        [Parameter(ParameterSetName='PartialControl')]
+        [Switch]
+        # Grants permission to query the service's status.
+        $QueryStatus,
+        
+        [Parameter(ParameterSetName='PartialControl')]
+        [Switch]
+        # Grants permissionto enumerate the service's dependent services.
+        $EnumerateDependents,
+        
+        [Parameter(ParameterSetName='PartialControl')]
+        [Switch]
+        # Grants permission to start the service.
+        $Start,
+        
+        [Parameter(ParameterSetName='PartialControl')]
+        [Switch]
+        # Grants permission to stop the service.
+        $Stop,
+        
+        [Parameter(ParameterSetName='PartialControl')]
+        [Switch]
+        # Grants permission to pause/continue the service.
+        $PauseContinue,
+        
+        [Parameter(ParameterSetName='PartialControl')]
+        [Switch]
+        # Grants permission to interrogate the service (i.e. ask it to report its status immediately).
+        $Interrogate,
+        
+        [Parameter(ParameterSetName='PartialControl')]
+        [Switch]
+        # Grants permission to run the service's user-defined control.
+        $UserDefinedControl,
+        
+        [Parameter(ParameterSetName='PartialControl')]
+        [Switch]
+        # Grants permission to delete the service.
+        $Delete,
+        
+        [Parameter(ParameterSetName='PartialControl')]
+        [Switch]
+        # Grants permission to query the service's security descriptor.
+        $ReadControl,
+        
+        [Parameter(ParameterSetName='PartialControl')]
+        [Switch]
+        # Grants permission to set the service's discretionary access list.
+        $WriteDac,
+        
+        [Parameter(ParameterSetName='PartialControl')]
+        [Switch]
+        # Grants permission to modify the group and owner of a service.
+        $WriteOwner
+    )
+
+    $rIdentity = Resolve-IdentityName -Name $Identity
+    if( -not $rIdentity )
+    {
+        return
+    }
+    
+    if( -not (Assert-Service -Name $Name) )
+    {
+        return
+    }
+    
+    $accessRights = [Carbon.Security.ServiceAccessRights]::FullControl
+    if( $pscmdlet.ParameterSetName -eq 'PartialControl' )
+    {
+        $accessRights = 0
+        [Enum]::GetValues( [Carbon.Security.ServiceAccessRights] ) |
+            Where-Object { $PSBoundParameters.ContainsKey( $_ ) } |
+            ForEach-Object { $accessRights = $accessRights -bor [Carbon.Security.ServiceAccessRights]::$_ }
+    }
+    
+    $identitySid = Test-Identity -Name $Identity -PassThru
+
+    $dacl = Get-ServiceAcl -Name $Name
+    $dacl.SetAccess( [Security.AccessControl.AccessControlType]::Allow, $identitySid, $accessRights, 'None', 'None' )
+    
+    Set-ServiceAcl -Name $Name -DACL $dacl
 }
 
 function Install-Service
@@ -307,7 +595,10 @@ function Install-Service
             Write-Error "$sc failed when setting failure actions and returned '$LastExitCode'."
         }
         
-        Start-Service -Name $Name
+        if( $StartupType -eq [ServiceProcess.ServiceStartMode]::Automatic )
+        {
+            Start-Service -Name $Name
+        }
     }
 }
 
@@ -397,7 +688,6 @@ function Remove-Service
             & C:\Windows\system32\sc.exe delete $Name
         }
     }
-
 }
 
 
@@ -453,4 +743,148 @@ function Restart-RemoteService
     {
         Write-Error "Unable to restart remote service because I could not get a reference to service $name on machine: $computerName"
     }  
+ }
+ 
+ function Revoke-ServicePermission
+ {
+    <#
+    .SYNOPSIS
+    Removes all permissions an identity has to manage a service.
+    
+    .DESCRIPTION
+    No permissions are left behind.  This is an all or nothing operation, baby!
+    
+    .LINK
+    Get-ServicePermissions
+    
+    .LINK
+    Grant-ServicePermission
+    
+    .EXAMPLE
+    Revoke-ServicePermission -Name 'Hyperdrive` -Identity 'CLOUDCITY\LCalrissian'
+    
+    Removes all of Lando's permissions to control the `Hyperdrive` service.
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]
+        # The service.
+        $Name,
+        
+        [Parameter(Mandatory=$true)]
+        [string]
+        # The identity whose permissions are being revoked.
+        $Identity
+    )
+    
+    $rIdentity = Resolve-IdentityName -Name $Identity
+    if( -not $rIdentity )
+    {
+        return
+    }
+    
+    if( -not (Assert-Service -Name $Name) )
+    {
+        return
+    }
+    
+    if( (Get-ServicePermissions -Name $Name -Identity $rIdentity) )
+    {
+        Write-Host ("Revoking {0}'s {1} service permissions." -f $rIdentity,$Name)
+        
+        $dacl = Get-ServiceAcl -Name $Name
+        $sid = Test-Identity -Name $rIdentity -PassThru
+        $dacl.Purge( $sid )
+        
+        Set-ServiceAcl -Name $Name -Dacl $dacl
+    }
+ }
+ 
+ function Set-ServiceAcl
+ {
+    <#
+    .SYNOPSIS
+    Sets a service's discretionary access control list (i.e. DACL).
+    
+    .DESCRIPTION
+    The existing DACL is replaced with the new DACL.  No previous permissions are preserved.  That's your job.  You're warned!
+    
+    You probably want `Grant-ServicePermission` or `Revoke-ServicePermission` instead.
+    
+    .LINK
+    Get-ServicePermission
+    
+    .LINK
+    Grant-ServicePermission
+    
+    .LINKE
+    Revoke-ServicePermission
+    
+    .EXAMPLE
+    Set-ServiceDacl -Name 'Hyperdrive' -Dacl $dacl
+    
+    Replaces the DACL on the `Hyperdrive` service.  Yikes!  Sounds like something the Empire would do, though. 
+    #>
+    [CmdletBinding(SupportsShouldProcess=$true)]
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]
+        # The service whose DACL to replace.
+        $Name,
+        
+        [Parameter(Mandatory=$true)]
+        [Security.AccessControl.DiscretionaryAcl]
+        # The service's new DACL.
+        $Dacl
+    )
+    
+    $rawSD = Get-ServiceSecurityDescriptor -Name $Name
+    $daclBytes = New-Object byte[] $Dacl.BinaryLength 
+    $Dacl.GetBinaryForm($daclBytes, 0);
+    $rawSD.DiscretionaryAcl = New-Object Security.AccessControl.RawAcl $daclBytes,0
+    $sdBytes = New-Object byte[] $rawSD.BinaryLength   
+    $rawSD.GetBinaryForm($sdBytes, 0);
+    
+    if( $pscmdlet.ShouldProcess( ("{0} service DACL" -f $Name), "set" ) )
+    {
+        [Carbon.AdvApi32]::SetServiceSecurityDescriptor( $Name, $sdBytes )
+    }
+}
+ 
+ function Test-Service
+ {
+    <#
+    .SYNOPSIS
+    Tests if a service exists, without writing anything out to the error stream.
+    
+    .DESCRIPTION
+    `Get-Service` writes an error when a service doesn't exist.  This function tests if a service exists without writing anyting to the output stream.
+    
+    .OUTPUT
+    System.Boolean.
+    
+    .EXAMPLE
+    Test-Service -Name 'Drive'
+    
+    Returns `true` if the `Drive` service exists.  `False` otherwise.
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]
+        # The name of the service to test.
+        $Name
+    )
+    
+    $service = Get-Service -Name "$Name*" |
+                    Where-Object { $_.Name -eq $Name }
+    if( $service )
+    {
+        return $true
+    }
+    else
+    {
+        return $false
+    }
  }

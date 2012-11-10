@@ -1,10 +1,23 @@
 # 0.3.2.0
 
+## Upgrade Instructions
+ * [Install-Service](http://get-carbon.org/help/Install-Service.html) now only auto-starts a service if its startup type is not set or set to Automatic (the `StartupType` parameter).  If set to Manual or Disabled, the service will no longer be started after installation.
+
 ## Enhancements
 
  * Created [Get-Privileges](http://get-carbon.org/help/Get-Privileges.html), [Grant-Privilege](http://get-carbon.org/help/Grant-Privilege.html), [Revoke-Privilege](http://get-carbon.org/help/Revoke-Privilege.html), and [Test-Privilege](http://get-carbon.org/help/Test-Privilege.html) for managing an identity's security operation privileges.
  * [Install-Service](http://get-carbon.org/help/Install-Service.html) now uses [Grant-Privilege](http://get-carbon.org/help/Grant-Privilege.html) to grant custom service identities the `SeServiceLogonRight` privilege. This replaces usage of Microsoft's legacy [ntrights.exe](http://support.microsoft.com/kb/315276), which we probably didn't have permission to distribute.
- * Created [Get-ServicePermissions](http://get-carbon.org/help/Get-ServicePermissions.html) method for getting the permissions for a service, i.e. what users can control a service.
+ * Created [Get-ServicePermissions](http://get-carbon.org/help/Get-ServicePermissions.html) function for getting the permissions for a service, i.e. what users can control a service.
+ * Created [Assert-Service](http://get-carbon.org/help/Assert-Service.html) function to write an error if a service doesn't exist.
+ * Created [Get-ServiceAcl](http://get-carbon.org/help/Get-ServiceAcl.html) function to get the discretionary access control list (DACL) for a service.
+ * Created [Get-ServiceSecurityDescriptor](http://get-carbon.org/help/Get-ServiceSecurityDescriptor.html) function to get the raw security descriptor for a service.
+ * Created [Grant-ServicePermission](http://get-carbon.org/help/Grant-ServicePermission.html) function to grant service control permissions to an identity.
+ * Created [Revoke-ServicePermission](http://get-carbon.org/help/Revoke-ServicePermission.html) function to revoke all of an identity's permissioms to control a service.
+ * Created [Set-ServiceAcl](http://get-carbon.org/help/Set-ServiceAcl.html) function to set a service's discretionary access control list (DACL).
+ * Created [Test-Service](http://get-carbon.org/help/Test-Service.html) function to check if a service exists *without* writing an error.
+  
+# Bug fixes
+ * [Install-Service](http://get-carbon.org/help/Install-Service.html) no longer tries to start a service if its `StartupType` is set to `Manual` or `Disabled`.
  
 
 # 0.3.1.0 (29 October 2012)

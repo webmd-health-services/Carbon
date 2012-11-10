@@ -50,6 +50,7 @@
     <Compile Include="Security\ServiceAccessRule.cs" />
     <Compile Include="Win32.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Win32ErrorCodes.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
