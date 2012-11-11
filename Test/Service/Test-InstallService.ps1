@@ -55,7 +55,7 @@ function Test-ShouldUpdateServiceProperties
     $service = Assert-ServiceInstalled
     Assert-Equal 'Manual' $service.StartMode
     Assert-Equal ".\$serviceAcct" $service.UserName
-    Assert-Equal 'Running' $service.Status
+    Assert-Equal 'Stopped' $service.Status
     Assert-HasFullControl "$($env:ComputerName)\$serviceAcct" $newServicePath
 }
 
