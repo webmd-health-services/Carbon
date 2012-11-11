@@ -10,7 +10,7 @@ function Get-Privileges
     
     Note: if a computer is not on a domain, this function won't work.
     
-    .OUTPUT
+    .OUTPUTS
     System.String.
     
     .LINK

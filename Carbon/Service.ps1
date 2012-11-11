@@ -23,7 +23,7 @@ function Assert-Service
     .DESCRIPTION
     Also returns `True` if the service exists, `False` if it doesn't.
     
-    .OUTPUT
+    .OUTPUTS
     System.Boolean.
     
     .LINK
@@ -97,7 +97,7 @@ function Get-ServiceSecurityDescriptor
     .DESCRIPTION
     You probably don't want to mess with the raw security descriptor.  Try `Get-ServicePermissions` instead.  Much more useful.
     
-    .OUTPUT
+    .OUTPUTS
     System.Security.AccessControl.RawSecurityDescriptor.
     
     .LINK
@@ -138,7 +138,7 @@ function Get-ServicePermissions
      * IdentityReference - The identity of the permission.
      * ServiceAccessRights - The permissions the user has.
      
-    .OUTPUT
+    .OUTPUTS
     Carbon.Security.ServiceAccessRule.
     
     .LINK
@@ -238,7 +238,7 @@ function Grant-ServiceControlPermission
     .LINK
     Grant-ServicePermission
     
-    .LINKE
+    .LINK
     Revoke-ServicePermission
     
     .EXAMPLE
@@ -764,7 +764,7 @@ function Restart-RemoteService
     .LINK
     Grant-ServicePermission
     
-    .LINKE
+    .LINK
     Revoke-ServicePermission
     
     .EXAMPLE
@@ -807,7 +807,7 @@ function Restart-RemoteService
     .DESCRIPTION
     `Get-Service` writes an error when a service doesn't exist.  This function tests if a service exists without writing anyting to the output stream.
     
-    .OUTPUT
+    .OUTPUTS
     System.Boolean.
     
     .EXAMPLE

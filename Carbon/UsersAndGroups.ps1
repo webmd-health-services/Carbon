@@ -274,7 +274,7 @@ function Resolve-IdentityName
     
     If the name doesn't represent an actual user or group, an error is written and nothing returned.
     
-    .OUTPUT
+    .OUTPUTS
     System.String.
     
     .EXAMPLE
