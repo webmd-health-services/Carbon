@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Get-FullPath
+function ConvertTo-FullPath
 {
     <#
     .SYNOPSIS
@@ -24,12 +24,12 @@ function Get-FullPath
     You can't pass truly relative paths to this function.  You can only pass rooted paths, i.e. the path must have a drive at the beginning.
     
     .EXAMPLE
-    Get-FullPath -RelativePath 'C:\Projects\Carbon\Test\..\Carbon\FileSystem.ps1'
+    ConvertTo-FullPath -Path 'C:\Projects\Carbon\Test\..\Carbon\FileSystem.ps1'
     
     Returns `C:\Projects\Carbon\Carbon\FileSystem.ps1`.
     
     .EXAMPLE
-    Get-FullPath -RelativePath 'C:\Projects\Carbon\..\I\Do\Not\Exist'
+    ConvertTo-FullPath -Path 'C:\Projects\Carbon\..\I\Do\Not\Exist'
     
     Returns `C:\Projects\I\Do\Not\Exist`.
     #>
@@ -38,14 +38,14 @@ function Get-FullPath
         [Parameter(Mandatory=$true)]
         [string]
         # The path to resolve.  Must be rooted, i.e. have a drive at the beginning.
-        $RelativePath
+        $Path
     )
     
-    if( -not ( [System.IO.Path]::IsPathRooted($RelativePath) ) )
+    if( -not ( [System.IO.Path]::IsPathRooted($Path) ) )
     {
-        Write-Warning "Path to resolve is not rooted.  Please pass a rooted path to Get-FullPath.  Path.GetFullPath uses Environment.CurrentDirectory as the path root, which PowerShell doesn't update."
+        Write-Warning "Path to resolve is not rooted. Path.GetFullPath uses Environment.CurrentDirectory as the path root, which isn't set to PowerShell's current directory."
     }
-    return [IO.Path]::GetFullPath($RelativePath)
+    return [IO.Path]::GetFullPath($Path)
 }
 
 function Get-PathCanonicalCase
