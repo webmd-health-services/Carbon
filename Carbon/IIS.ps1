@@ -705,12 +705,12 @@ function Enable-IisDirectoryBrowsing
     Enables directory browsing (i.e. showing the contents of a directory by requesting that directory in a web browser) for a website.  To enable directory browsing on a directory under the website, pass the virtual path to that directory as the value to the `Directory` parameter.
 
     .EXAMPLE
-    Set-IisDirectoryBrowsing -SiteName Peanuts
+    Enable-IisDirectoryBrowsing -SiteName Peanuts
 
     Enables directory browsing on the `Peanuts` website.
 
     .EXAMPLE
-    Set-IisDirectoryBrowsing -SiteName Peanuts -Directory Snoopy/DogHouse
+    Enable-IisDirectoryBrowsing -SiteName Peanuts -Directory Snoopy/DogHouse
 
     Enables directory browsing on the `/Snoopy/DogHouse` directory under the `Peanuts` website.
     #>
