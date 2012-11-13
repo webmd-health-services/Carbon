@@ -242,7 +242,7 @@ function Get-Permissions
                 return $true 
             }
             return (-not $_.IsInherited)
-        }
+        } |
         Where-Object {
             if( $rIdentity )
             {
