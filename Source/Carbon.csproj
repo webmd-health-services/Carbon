@@ -46,6 +46,7 @@
     </Compile>
     <Compile Include="Security\ComAccessRights.cs" />
     <Compile Include="Security\ComAccessRule.cs" />
+    <Compile Include="Security\ContainerInheritanceFlags.cs" />
     <Compile Include="Security\ServiceAccessRights.cs" />
     <Compile Include="Security\ServiceAccessRule.cs" />
     <Compile Include="Win32.cs" />

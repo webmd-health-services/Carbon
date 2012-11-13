@@ -67,6 +67,193 @@ function Convert-SecureStringToString
     return [Runtime.InteropServices.Marshal]::PtrToStringAuto($stringPtr)
 }
 
+function ConvertTo-InheritanceFlags
+{
+    <#
+    .SYNOPSIS
+    Converts a `Carbon.Security.ContainerInheritanceFlags` value to a `System.Security.AccessControl.InheritanceFlags` value.
+    
+    .DESCRIPTION
+    The `Carbon.Security.ContainerInheritanceFlags` enumeration encapsulates oth `System.Security.AccessControl.InheritanceFlags` and `System.Security.AccessControl.PropagationFlags`.  Make sure you also call `ConvertTo-PropagationFlags` to get the propagation value.
+    
+    .OUTPUTS
+    System.Security.AccessControl.InheritanceFlags.
+    
+    .LINK
+    ConvertTo-PropagationFlags
+    
+    .LINK
+    Grant-Permissions
+    
+    .EXAMPLE
+    ConvertTo-InheritanceFlags -ContainerInheritanceFlags ContainerAndSubContainersAndLeaves
+    
+    Returns `InheritanceFlags.ContainerInherit|InheritanceFlags.ObjectInherit`.
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory=$true)]
+        [Carbon.Security.ContainerInheritanceFlags]
+        # The value to convert to an `InheritanceFlags` value.
+        $ContainerInheritanceFlags
+    )
+
+    $Flags = [Security.AccessControl.InheritanceFlags]
+    $map = @{
+        'Container' =                                  $Flags::None;
+        'SubContainers' =                              $Flags::ContainerInherit;
+        'Leaves' =                                     $Flags::ObjectInherit;
+        'ChildContainers' =                            $Flags::ContainerInherit;
+        'ChildLeaves' =                                $Flags::ObjectInherit;
+        'ContainerAndSubContainers' =                  $Flags::ContainerInherit;
+        'ContainerAndLeaves' =                         $Flags::ObjectInherit;
+        'SubContainersAndLeaves' =                    ($Flags::ContainerInherit -bor $Flags::ObjectInherit);
+        'ContainerAndChildContainers' =                $Flags::ContainerInherit;
+        'ContainerAndChildLeaves' =                    $Flags::ObjectInherit;
+        'ContainerAndChildContainersAndChildLeaves' = ($Flags::ContainerInherit -bor $Flags::ObjectInherit);
+        'ContainerAndSubContainersAndLeaves' =        ($Flags::ContainerInherit -bor $Flags::ObjectInherit);
+        'ChildContainersAndChildLeaves' =             ($Flags::ContainerInherit -bor $Flags::ObjectInherit);
+    }
+    $key = $ContainerInheritanceFlags.ToString()
+    if( $map.ContainsKey( $key) )
+    {
+        return $map[$key]
+    }
+    
+    Write-Error ('Unknown Carbon.Security.ContainerInheritanceFlags enumeration value {0}.' -f $ContainerInheritanceFlags) 
+}
+
+function ConvertTo-PropagationFlags
+{
+    <#
+    .SYNOPSIS
+    Converts a `Carbon.Security.ContainerInheritanceFlags` value to a `System.Security.AccessControl.PropagationFlags` value.
+    
+    .DESCRIPTION
+    The `Carbon.Security.ContainerInheritanceFlags` enumeration encapsulates oth `System.Security.AccessControl.PropagationFlags` and `System.Security.AccessControl.InheritanceFlags`.  Make sure you also call `ConvertTo-InheritancewFlags` to get the inheritance value.
+    
+    .OUTPUTS
+    System.Security.AccessControl.PropagationFlags.
+    
+    .LINK
+    ConvertTo-InheritanceFlags
+    
+    .LINK
+    Grant-Permissions
+    
+    .EXAMPLE
+    ConvertTo-PropagationFlags -ContainerInheritanceFlags ContainerAndSubContainersAndLeaves
+    
+    Returns `PropagationFlags.None`.
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory=$true)]
+        [Carbon.Security.ContainerInheritanceFlags]
+        # The value to convert to an `PropagationFlags` value.
+        $ContainerInheritanceFlags
+    )
+
+    $Flags = [Security.AccessControl.PropagationFlags]
+    $map = @{
+        'Container' =                                  $Flags::None;
+        'SubContainers' =                              $Flags::InheritOnly;
+        'Leaves' =                                     $Flags::InheritOnly;
+        'ChildContainers' =                           ($Flags::InheritOnly -bor $Flags::NoPropagateInherit);
+        'ChildLeaves' =                               ($Flags::InheritOnly -bor $Flags::NoPropagateInherit);
+        'ContainerAndSubContainers' =                  $Flags::None;
+        'ContainerAndLeaves' =                         $Flags::None;
+        'SubContainersAndLeaves' =                     $Flags::InheritOnly;
+        'ContainerAndChildContainers' =                $Flags::NoPropagateInherit;
+        'ContainerAndChildLeaves' =                    $Flags::NoPropagateInherit;
+        'ContainerAndChildContainersAndChildLeaves' =  $Flags::NoPropagateInherit;
+        'ContainerAndSubContainersAndLeaves' =         $Flags::None;
+        'ChildContainersAndChildLeaves' =             ($Flags::InheritOnly -bor $Flags::NoPropagateInherit);
+    }
+    $key = $ContainerInheritanceFlags.ToString()
+    if( $map.ContainsKey( $key ) )
+    {
+        return $map[$key]
+    }
+    
+    Write-Error ('Unknown Carbon.Security.ContainerInheritanceFlags enumeration value {0}.' -f $ContainerInheritanceFlags) 
+}
+
+function Get-Permissions
+{
+    <#
+    .SYNOPSIS
+    Gets the permissions (access control rules) for a path.
+    
+    .DESCRIPTION
+    Permissions for a specific identity can also be returned.  Access control entries are for a path's discretionary access control list.
+    
+    To return inherited permissions, use the `Inherited` switch.  Otherwise, only non-inherited (i.e. explicit) permissions are returned.
+    
+    .OUTPUTS
+    System.Security.AccessControl.AccessRule.
+    
+    .EXAMPLE
+    Get-Permissions -Path C:\Windows
+    
+    Returns `System.Security.AccessControl.FileSystemAccessRule` objects for all the non-inherited rules on `C:\windows`.
+    
+    .EXAMPLE
+    Get-Permissions -Path hklm:\Software -Inherited
+    
+    Returns `System.Security.AccessControl.RegistryAccessRule` objects for all the inherited and non-inherited rules on `hklm:\software`.
+    
+    .EXAMPLE
+    Get-Permissions -Path C:\Windows -Idenity Administrators
+    
+    Returns `System.Security.AccessControl.FileSystemAccessRule` objects for all the `Administrators'` rules on `C:\windows`.
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]
+        # The path whose permissions (i.e. access control rules) to return.
+        $Path,
+        
+        [string]
+        # The identity whose permissiosn (i.e. access control rules) to return.
+        $Identity,
+        
+        [Switch]
+        # Return inherited permissions in addition to explicit permissions.
+        $Inherited
+    )
+   
+    $rIdentity = $Identity
+    if( $Identity )
+    {
+        $rIdentity = Resolve-IdentityName -Name $Identity
+        if( -not $rIdentity )
+        {
+            return
+        }
+    }
+    
+    Get-Acl -Path $Path |
+        Select-Object -ExpandProperty Access |
+        Where-Object { 
+            if( $Inherited )
+            {
+                return $true 
+            }
+            return (-not $_.IsInherited)
+        }
+        Where-Object {
+            if( $rIdentity )
+            {
+                return ($_.IdentityReference.Value -eq $rIdentity)
+            }
+            
+            return $true
+        }    
+}
+
+
 function Grant-Permissions
 {
     <#
@@ -87,12 +274,64 @@ function Grant-Permissions
     This command will show you the values for the `RegistryRights`:
 
         [Enum]::GetValues([Security.AccessControl.RegistryRights])
+        
+    When setting permissions on a container (directory/registry key) You can control inheritance and propagation flags using the `ApplyTo` parameter.  There are 13 possible combinations.  Examples work best.  Here is a simple hierarchy:
+
+            C
+           / \
+          CC CL
+         /  \
+        GC  GL
+    
+    C is the **C**ontainer permissions are getting set on
+    CC is a **C**hild **C**ontainer.
+    CL is a **C**hild ** **L**eaf
+    GC is a **G**randchild **C**ontainer and includes all sub-containers below it.
+    GL is a **G**randchild **L**eaf.
+    
+    The `ApplyTo` parameter takes one of the following 13 values and applies permissions to:
+    
+     * **Container** - The container itself and nothing below it.  (No inheritance or propagation flags.)
+     * **SubContainers** - All sub-containers under the container, e.g. CC and GC. (`InheritanceFlags.ContainerInherit` and `PropagationFlags.InheritOnly`)
+     * **Leaves** - All leaves under the container, e.g. CL and GL. (`InheritanceFlags.ObjectInherit` and `PropagationFlags.InheritOnly`)
+     * **ChildContainers** - Just the container's child containers, e.g. CC. (`InheritanceFlags.ContainerInherit` and `PropagationFlags.InheritOnly|PropagationFlags.NoPropagateInherit`)
+     * **ChildLeaves** - Just the container's child leaves, e.g. CL. (`InheritanceFlags.ObjectInherit` and `PropagationFlags.InheritOnly`)
+     * **ContainerAndSubContainers** - The container and all its sub-containers, e.g. C, CC, and GC. (`InheritanceFlags.ContainerInherit`)
+     * **ContainerAndLeaves** - The container and all leaves under it, e.g. C and CL. (`InheritanceFlags.ObjectInherit`)
+     * **SubContainerAndLeaves** - All sub-containers and leaves, but not the container itself, e.g. CC, CL, GC, and GL. (`InheritanceFlags.ContainerInherit|InheritanceFlags.ObjectInherit` and `PropagationFlags.InheritOnly`)
+     * **ContainerAndChildContainers** - The container and all just its child containers, e.g. C and CC. (`InheritanceFlags.ContainerInherit` and `PropagationFlags.
+     * **ContainerAndChildLeaves** - The container and just its child leaves, e.g. C and CL.
+     * **ContainerAndChildContainersAndChildLeaves** - The container and just its child containers/leaves, e.g. C, CC, and CL.
+     * **ContainerAndSubContainersAndLeaves** - Everything, full inheritance/propogation, e.g. C, CC, GC, GL.  **This is the default.**
+     * **ChildContainersAndChildLeaves**  - Just the container's child containers/leaves, e.g. CC and CL.
+
+     The following table maps `ContainerInheritanceFlags` values to the actual `InheritanceFlags` and `PropagationFlags` values used:
+         
+		 **ContainerInheritanceFlags**               **InheritanceFlags**             **PropagationFlags**
+         Container 	                                 None                             None
+         SubContainers                               ContainerInherit                 InheritOnly
+         Leaves                                      ObjectInherit                    InheritOnly
+         ChildContainers                             ContainerInherit                 InheritOnly,NoPropagateInherit
+         ChildLeaves                                 ObjectInherit                    InheritOnly
+         ContainerAndSubContainers                   ContainerInherit                 None
+         ContainerAndLeaves                          ObjectInherit                    None
+         SubContainerAndLeaves                       ContainerInherit,ObjectInherit   InheritOnly
+         ContainerAndChildContainers                 ContainerInherit                 None
+         ContainerAndChildLeaves                     ObjectInherit                    None
+         ContainerAndChildContainersAndChildLeaves   ContainerInherit,ObjectInherit   NoPropagateInherit
+         ContainerAndSubContainersAndLeaves          ContainerInherit,ObjectInherit   None
+         ChildContainersAndChildLeaves               ContainerInherit,ObjectInherit   InheritOnly
+    
+    The above information adpated from [Manage Access to Windows Objects with ACLs and the .NET Framework](http://msdn.microsoft.com/en-us/magazine/cc163885.aspx#S3), published in the November 2004 copy of *MSDN Magazine*.
 
     .LINK
     http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.filesystemrights.aspx
-
+    
     .LINK
     http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.registryrights.aspx
+    
+    .LINK
+    http://msdn.microsoft.com/en-us/magazine/cc163885.aspx#S3    
     
     .LINK
     Unprotect-AclAccessRules
@@ -116,6 +355,11 @@ function Grant-Permissions
     param(
         [Parameter(Mandatory=$true)]
         [string]
+        # The path on which the permissions should be granted.  Can be a file system or registry path.
+        $Path,
+        
+        [Parameter(Mandatory=$true)]
+        [string]
         # The user or group getting the permissions
         $Identity,
         
@@ -124,10 +368,9 @@ function Grant-Permissions
         # The permission: e.g. FullControl, Read, etc.  For file system items, use values from [System.Security.AccessControl.FileSystemRights](http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.filesystemrights.aspx).  For registry items, use values from [System.Security.AccessControl.RegistryRights](http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.registryrights.aspx).
         $Permissions,
         
-        [Parameter(Mandatory=$true)]
-        [string]
-        # The path on which the permissions should be granted.  Can be a file system or registry path.
-        $Path,
+        [Carbon.Security.ContainerInheritanceFlags]
+        # How to apply container permissions.  This controls the inheritance and propagation flags.  Default is full inheritance, e.g. `ContainersAndSubContainersAndLeaves`. This parameter is ignored if `Path` is to a leaf item.
+        $ApplyTo = ([Carbon.Security.ContainerInheritanceFlags]::ContainerAndSubContainersAndLeaves),
         
         [Switch]
         # Removes all non-inherited permissions on the item.
@@ -167,12 +410,20 @@ function Grant-Permissions
     $currentAcl = (Get-Item $Path).GetAccessControl("Access")
     
     $inheritanceFlags = [Security.AccessControl.InheritanceFlags]::None
+    $propagationFlags = [Security.AccessControl.PropagationFlags]::None
     if( Test-Path $Path -PathType Container )
     {
-        $inheritanceFlags = ([Security.AccessControl.InheritanceFlags]::ContainerInherit -bor `
-                             [Security.AccessControl.InheritanceFlags]::ObjectInherit)
+        $inheritanceFlags = ConvertTo-InheritanceFlags -ContainerInheritanceFlags $ApplyTo
+        $propagationFlags = ConvertTo-PropagationFlags -ContainerInheritanceFlags $ApplyTo
     }
-    $propagationFlags = [Security.AccessControl.PropagationFlags]::None
+    else
+    {
+        if( $PSBoundParameters.ContainsKey( 'ApplyTo' ) )
+        {
+            Write-Warning "Can't apply inheritance rules to a leaf. Please omit `ApplyTo` parameter when `Path` is a leaf."
+        }
+    }
+    
     $accessRule = New-Object "Security.AccessControl.$($providerName)AccessRule" $identity,$rights,$inheritanceFlags,$propagationFlags,"Allow"
     if( $Clear )
     {
