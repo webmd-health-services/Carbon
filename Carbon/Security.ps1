@@ -291,15 +291,15 @@ function Grant-Permissions
     
     The `ApplyTo` parameter takes one of the following 13 values and applies permissions to:
     
-     * **Container** - The container itself and nothing below it.  (No inheritance or propagation flags.)
-     * **SubContainers** - All sub-containers under the container, e.g. CC and GC. (`InheritanceFlags.ContainerInherit` and `PropagationFlags.InheritOnly`)
-     * **Leaves** - All leaves under the container, e.g. CL and GL. (`InheritanceFlags.ObjectInherit` and `PropagationFlags.InheritOnly`)
-     * **ChildContainers** - Just the container's child containers, e.g. CC. (`InheritanceFlags.ContainerInherit` and `PropagationFlags.InheritOnly|PropagationFlags.NoPropagateInherit`)
-     * **ChildLeaves** - Just the container's child leaves, e.g. CL. (`InheritanceFlags.ObjectInherit` and `PropagationFlags.InheritOnly`)
-     * **ContainerAndSubContainers** - The container and all its sub-containers, e.g. C, CC, and GC. (`InheritanceFlags.ContainerInherit`)
-     * **ContainerAndLeaves** - The container and all leaves under it, e.g. C and CL. (`InheritanceFlags.ObjectInherit`)
-     * **SubContainerAndLeaves** - All sub-containers and leaves, but not the container itself, e.g. CC, CL, GC, and GL. (`InheritanceFlags.ContainerInherit|InheritanceFlags.ObjectInherit` and `PropagationFlags.InheritOnly`)
-     * **ContainerAndChildContainers** - The container and all just its child containers, e.g. C and CC. (`InheritanceFlags.ContainerInherit` and `PropagationFlags.
+     * **Container** - The container itself and nothing below it.
+     * **SubContainers** - All sub-containers under the container, e.g. CC and GC. 
+     * **Leaves** - All leaves under the container, e.g. CL and GL.
+     * **ChildContainers** - Just the container's child containers, e.g. CC.
+     * **ChildLeaves** - Just the container's child leaves, e.g. CL.
+     * **ContainerAndSubContainers** - The container and all its sub-containers, e.g. C, CC, and GC.
+     * **ContainerAndLeaves** - The container and all leaves under it, e.g. C and CL.
+     * **SubContainerAndLeaves** - All sub-containers and leaves, but not the container itself, e.g. CC, CL, GC, and GL.
+     * **ContainerAndChildContainers** - The container and all just its child containers, e.g. C and CC.
      * **ContainerAndChildLeaves** - The container and just its child leaves, e.g. C and CL.
      * **ContainerAndChildContainersAndChildLeaves** - The container and just its child containers/leaves, e.g. C, CC, and CL.
      * **ContainerAndSubContainersAndLeaves** - Everything, full inheritance/propogation, e.g. C, CC, GC, GL.  **This is the default.**
