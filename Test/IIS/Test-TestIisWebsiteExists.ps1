@@ -24,7 +24,7 @@ function TearDown
 
 function Test-ShouldNotFindNonExistentWebsite
 {
-    $result = Test-IisWebsiteExists 'jsdifljsdflkjsdf'
+    $result = Test-IisWebsite 'jsdifljsdflkjsdf'
     Assert-False $result "Found a non-existent website!"
 }
 
@@ -33,7 +33,7 @@ function Test-ShouldFindExistentWebsite
     Install-IisWebsite -Name 'Test Website Exists' -Path $TestDir
     try
     {
-        $result = Test-IisWebsiteExists 'Test Website Exists'
+        $result = Test-IisWebsite 'Test Website Exists'
         Assert-True $result "Did not find existing website."
     }
     finally

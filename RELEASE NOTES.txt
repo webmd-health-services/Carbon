@@ -4,8 +4,9 @@
  * [Install-Service](http://get-carbon.org/help/Install-Service.html) now only auto-starts a service if its startup type is not set or set to Automatic (the `StartupType` parameter).  If set to Manual or Disabled, the service will no longer be started after installation.
  * We've stopped distributing Microsoft's `subinacl.exe` program. We didn't have permission to distribute.  Plus its no longer supported. If any of your scripts used `Invoke-SubInAcl`, you'll want to [download `subinacl.exe` yourself](http://www.microsoft.com/en-us/download/details.aspx?id=23510) and copy `Invoke-SubInAcl` before upgrading (you can find it in the Carbon directory in the `Services.ps1` file.
  * If you're using `Grant-Permission` without named parameters, the `Path` parameter moved from position 3 to position 1.  Re-order your parameters accordingly.
- * Rename your usages of `Set-IisDirectoryBrowsing` to `Enable-IisDirectoryBrowsing`.  If you use named parameters, rename its `Directory` paremter to `Path`.
+ * Rename usages of `Set-IisDirectoryBrowsing` to `Enable-IisDirectoryBrowsing`.  If you use named parameters, rename its `Directory` paremter to `Path`.
  * Replace usages of `Set-HgrcDefaultPushUrl` with `Set-IniEntry` instead, e.g. `Set-IniEntry -Path 'Path\to\repo\.hg\hgrc' -Section paths -Name 'default.push' -Value 'DefautlPushUrl'
+ * Rename usages of `Test-IisWebsiteExists` with `Test-IisWebsite`.
 
 ## Enhancements
 
@@ -24,8 +25,9 @@
  * Created [ConvertTo-InheritanceFlags](http://get-carbon.org/help/ConvertTo-InheritanceFlags.html) function for converting a `Carbon.Security.ContainerInheritanceFlags` to the necessary/applicable `System.Security.AccessControl.InheritanceFlags`.
  * Created [ConvertTo-PropagationFlags](http://get-carbon.org/help/ConvertTo-PropagationFlags.html) function for converting a `Carbon.Security.ContainerInheritanceFlags` to the necessary/applicable `System.Security.AccessControl.PropagationFlags`.
  * Created [Get-Permissions](http://get-carbon.org/help/Get-Permissions.html) function for getting the non-inherited permissions on a file, directory, registry key, or registry value with the ability to return a specific identity's permissions and/or inherited permissions.
- * Renamed `Set-IisDirectoryBrowsing to [Enable-IisDirectoryBrowsing](http://get-carbon.org/help/Enable-IisDirectoryBrowsing) and renamed its `Directory` parameter to `Path`.
+ * Renamed `Set-IisDirectoryBrowsing` to [Enable-IisDirectoryBrowsing](http://get-carbon.org/help/Enable-IisDirectoryBrowsing) and renamed its `Directory` parameter to `Path`.
  * Removed `Set-HgrcDefaultPushUrl`.  Use [Set-IniEntry](http://get-carbon.org/help/Enable-IisDirectoryBrowsing) instead.
+ * Renamed `Test-IisWebsiteExists` to [Test-IisWebsite](http://get-carbon.org/help/Test-IisWebsite) to adhere to PowerShell naming conventions.
   
 # Bug fixes
  * [Install-Service](http://get-carbon.org/help/Install-Service.html) no longer tries to start a service if its `StartupType` is set to `Manual` or `Disabled`.

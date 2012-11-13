@@ -149,7 +149,7 @@ function Get-IisWebsite
         $SiteName
     )
     
-    if( -not (Test-IisWebsiteExists -Name $SiteName) )
+    if( -not (Test-IisWebsite -Name $SiteName) )
     {
         return $null
     }
@@ -475,7 +475,7 @@ function Install-IisWebsite
         
     )
     
-    if( Test-IisWebsiteExists -Name $Name )
+    if( Test-IisWebsite -Name $Name )
     {
         Remove-IisWebsite -Name $Name
     }
@@ -581,7 +581,7 @@ function Remove-IisWebsite
         $Name
     )
     
-    if( Test-IisWebsiteExists -Name $Name )
+    if( Test-IisWebsite -Name $Name )
     {
         Invoke-AppCmd delete site `"$Name`"
     }
@@ -1063,7 +1063,7 @@ function Test-IisAppPoolExists
     return $false
 }
 
-function Test-IisWebsiteExists
+function Test-IisWebsite
 {
     <#
     .SYNOPSIS
@@ -1073,7 +1073,7 @@ function Test-IisWebsiteExists
     Returns `True` if a website with name `Name` exists.  `False` if it doesn't.
 
     .EXAMPLE
-    Test-IisWebsiteExists -Name 'Peanuts'
+    Test-IisWebsite -Name 'Peanuts'
 
     Returns `True` if the `Peanuts` website exists.  `False` if it doesn't.
     #>

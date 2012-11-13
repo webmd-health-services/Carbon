@@ -29,7 +29,7 @@ function TearDown()
 
 function Remove-TestWebsite
 {
-    if( Test-IisWebsiteExists -Name $SiteName )
+    if( Test-IisWebsite -Name $SiteName )
     {
         Remove-IisWebsite -Name $SiteName
         Assert-LastProcessSucceeded 'Unable to delete test site.'
@@ -59,5 +59,5 @@ function Test-ShouldRemoveSite
 
 function Assert-SiteDoesNotExist($Name)
 {
-    Assert-False (Test-IisWebsiteExists -Name $Name) "Website $Name exists!"
+    Assert-False (Test-IisWebsite -Name $Name) "Website $Name exists!"
 }

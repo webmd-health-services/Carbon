@@ -30,7 +30,7 @@ function TearDown
 
 function Remove-TestSite
 {
-    if( Test-IisWebsiteExists -Name $SiteName )
+    if( Test-IisWebsite -Name $SiteName )
     {
         Remove-IisWebsite -Name $SiteName
         Assert-LastProcessSucceeded 'Unable to delete test site.'
@@ -138,21 +138,21 @@ function Test-ShouldValidateBindings
     $error.Clear()
     Install-IisWebsite -Name $SiteName -Path $TestDir -Bindings 'http/*:80' -ErrorAction SilentlyContinue
     Assert-True ($error.Count -ge 1)
-    Assert-False (Test-IisWebsiteExists -Name $SiteName)
+    Assert-False (Test-IisWebsite -Name $SiteName)
     Assert-True $error[0].Exception.Message -like '*bindings are invalid*'
 }
 
 function Test-ShouldAllowUrlBindings
 {
     Install-IisWebsite -Name $SiteName -Path $TestDir -Bindings 'http://*:9876'
-    Assert-True (Test-IisWebsiteExists -Name $SiteName)
+    Assert-True (Test-IisWebsite -Name $SiteName)
     Assert-WebsiteRunning 9876
 }
 
 function Test-ShouldAllowHttpsBindings
 {
     Install-IisWebsite -Name $SiteName -Path $TestDir -Bindings 'https/*:9876:','https://*:9443'
-    Assert-True (Test-IisWebsiteExists -Name $SiteName)
+    Assert-True (Test-IisWebsite -Name $SiteName)
     $bindings = Get-IisWebsite -SiteName $SiteName | Select-Object -ExpandProperty Bindings
     Assert-Equal 'https' $bindings[0].Protocol
     Assert-Equal 'https' $bindings[1].Protocol
