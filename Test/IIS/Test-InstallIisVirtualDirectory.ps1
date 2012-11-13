@@ -57,7 +57,7 @@ function Test-ShouldDeleteExistingVirtualDirectory
 function Test-ShouldTurnOnDirectoryBrowsing
 {
     Invoke-NewVirtualDirectory
-    Set-IisDirectoryBrowsing -SiteName $SiteName -Directory $VDirName
+    Enable-IisDirectoryBrowsing -SiteName $SiteName -Path $VDirName
     Assert-LastProcessSucceeded 'Failed to enable directory browsing.'
     Assert-FileDoesNotExist $WebConfig 'Changes not committed to apphost config level.'
     $numTries = 0

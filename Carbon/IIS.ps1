@@ -695,7 +695,7 @@ function Set-IisBasicAuthentication
     }
 }
 
-function Set-IisDirectoryBrowsing
+function Enable-IisDirectoryBrowsing
 {
     <#
     .SYNOPSIS
@@ -723,13 +723,13 @@ function Set-IisDirectoryBrowsing
         
         [string]
         # The directory where directory browsing should be enabled.
-        $Directory
+        $Path
     )
     
-    $location = "$SiteName$Directory"
-    if( $Directory -notlike '/*' )
+    $location = "$SiteName$Path"
+    if( $Path -notlike '/*' )
     {
-        $location = "$SiteName/$Directory"
+        $location = "$SiteName/$Path"
     }
     
     Write-Verbose "Enabling directory browsing at location '$location'."
