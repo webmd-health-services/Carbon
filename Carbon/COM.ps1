@@ -305,7 +305,7 @@ function Grant-ComPermissions
         [Parameter(ParameterSetName='DefaultAccessPermissionDeny')]
         [Parameter(ParameterSetName='MachineAccessRestrictionDeny')]
         [Switch]
-        # If set, grants local access permissions.
+        # If set, grants local access permissions.  Only valid if `Access` switch is set.
         $Local,
         
         [Parameter(ParameterSetName='DefaultAccessPermissionAllow')]
@@ -313,7 +313,7 @@ function Grant-ComPermissions
         [Parameter(ParameterSetName='DefaultAccessPermissionDeny')]
         [Parameter(ParameterSetName='MachineAccessRestrictionDeny')]
         [Switch]
-        # If set, grants remote access permissions.
+        # If set, grants remote access permissions.  Only valid if `Access` switch is set.
         $Remote,
 
         [Parameter(ParameterSetName='DefaultLaunchPermissionAllow')]
@@ -321,7 +321,7 @@ function Grant-ComPermissions
         [Parameter(ParameterSetName='DefaultLaunchPermissionDeny')]
         [Parameter(ParameterSetName='MachineLaunchRestrictionDeny')]
         [Switch]
-        # If set, grants local access permissions.
+        # If set, grants local launch permissions.  Only valid if `LaunchAndActivation` switch is set.
         $LocalLaunch,
         
         [Parameter(ParameterSetName='DefaultLaunchPermissionAllow')]
@@ -329,7 +329,7 @@ function Grant-ComPermissions
         [Parameter(ParameterSetName='DefaultLaunchPermissionDeny')]
         [Parameter(ParameterSetName='MachineLaunchRestrictionDeny')]
         [Switch]
-        # If set, grants remote access permissions.
+        # If set, grants remote launch permissions.  Only valid if `LaunchAndActivation` switch is set.
         $RemoteLaunch,
 
         [Parameter(ParameterSetName='DefaultLaunchPermissionAllow')]
@@ -337,7 +337,7 @@ function Grant-ComPermissions
         [Parameter(ParameterSetName='DefaultLaunchPermissionDeny')]
         [Parameter(ParameterSetName='MachineLaunchRestrictionDeny')]
         [Switch]
-        # If set, grants local access permissions.
+        # If set, grants local activation permissions.  Only valid if `LaunchAndActivation` switch is set.
         $LocalActivation,
         
         [Parameter(ParameterSetName='DefaultLaunchPermissionAllow')]
@@ -345,7 +345,7 @@ function Grant-ComPermissions
         [Parameter(ParameterSetName='DefaultLaunchPermissionDeny')]
         [Parameter(ParameterSetName='MachineLaunchRestrictionDeny')]
         [Switch]
-        # If set, grants remote access permissions.
+        # If set, grants remote activation permissions.  Only valid if `LaunchAndActivation` switch is set.
         $RemoteActivation
     )
     
