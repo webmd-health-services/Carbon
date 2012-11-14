@@ -22,7 +22,7 @@ function TearDown
     Remove-Module Carbon
 }
 
-function Test-ShouldBeRunnable
+function Test-ShouldDetectWhenSerivceIsConfigurable
 {
     $firewallSvc = Get-Service -Name 'Windows Firewall'
     Assert-NotNull $firewallSvc
@@ -32,6 +32,21 @@ function Test-ShouldBeRunnable
         $result = Assert-FirewallConfigurable
         Assert-True $result
         Assert-Equal 0 $error.Count
+    }
+    else
+    {
+        Write-Warning "Unable to test if Assert-FirewallConfigurable handles when the firewall is configurable: the firewall service is running."
+    }
+}
+
+function Test-ShouldDetectWhenSerivceIsNotConfigurable
+{
+    $firewallSvc = Get-Service -Name 'Windows Firewall'
+    Assert-NotNull $firewallSvc
+    $error.Clear()
+    if( $firewallSvc.Status -eq 'Running' )
+    {
+        Write-Warning "Unable to test if Assert-FirewallConfigurable handles when the firewall is not configurable: the firewall service is not running."
     }
     else
     {
