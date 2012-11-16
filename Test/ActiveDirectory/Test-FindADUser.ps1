@@ -12,10 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-$domainUrl = "LDAP://dc01l-crp-04.webmdhealth.net:389"
+$domainUrl = ''
 function Setup
 {
     Import-Module (Join-Path $TestDir ..\..\Carbon -Resolve) -Force
+    $domainController = Get-ADDomainController -Domain $env:USERDOMAIN
+    Assert-NotNull $domainController
+    $domainUrl = "LDAP://{0}:389" -f $domainController
 }
 
 function TearDown
@@ -25,9 +28,9 @@ function TearDown
 
 function Test-ShouldFindUser
 {
-    $me = Find-ADUser -DomainUrl $domainUrl -sAMAccountName ajensen
+    $me = Find-ADUser -DomainUrl $domainUrl -sAMAccountName $env:USERNAME
     Assert-NotNull $me
-    Assert-Equal 'Jensen, Aaron' $me.name
+    Assert-Equal $env:USERNAME $me.sAMAccountName
 }
 
 function Test-ShouldEscapeSpecialCharacters
