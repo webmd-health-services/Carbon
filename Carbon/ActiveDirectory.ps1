@@ -76,7 +76,7 @@ function Find-ADUser
     Finds a user in Active Directory.
 
     .DESCRIPTION
-    Searches the Active Directory domain given by `DomainUrl` for a user whose `sAMAccountName` matches the `sAMAccountName` passed in.  Returns the `DirectoryEntry` object for that user.
+    Searches the Active Directory domain given by `DomainUrl` for a user whose `sAMAccountName` matches the `sAMAccountName` passed in.  Returns the `DirectoryEntry` object for that user.  If there are any errors communicating with the domain controller, `$null` is returned.
     
     .OUTPUTS
     System.DirectoryServices.DirectoryEntry.  The directory entry object of the user's account in Active Directory or `$null` if the user isn't found.
@@ -112,11 +112,20 @@ function Find-ADUser
     $filterPropertyValue = Format-ADSpecialCharacters $filterPropertyValue
     
     $searcher.Filter = "(&(objectClass=User) ($filterPropertyName=$filterPropertyValue))"
-    $result = $searcher.FindOne() 
-    if( $result )
+    try
     {
-        $result.GetDirectoryEntry() 
+        $result = $searcher.FindOne() 
+        if( $result )
+        {
+            $result.GetDirectoryEntry() 
+        }
     }
+    catch
+    {
+        Write-Error ("Exception finding user {0} on domain controller {1}: {2}" -f $sAMAccountName,$DomainUrl,$_.Exception.Message)
+        return $null
+    }
+    
 }
 
 function Format-ADSpecialCharacters
