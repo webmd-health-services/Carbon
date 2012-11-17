@@ -506,7 +506,7 @@ function Install-IisWebsite
     
     # Make sure anonymous authentication uses the application pool identity
     Invoke-AppCmd set config `"$Name`" /section:anonymousAuthentication /userName: /commit:apphost
-
+    
     # Now, wait until site is actually running
     $tries = 0
     do

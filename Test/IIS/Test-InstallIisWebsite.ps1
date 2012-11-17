@@ -146,6 +146,7 @@ function Test-ShouldAllowUrlBindings
 {
     Install-IisWebsite -Name $SiteName -Path $TestDir -Bindings 'http://*:9876'
     Assert-True (Test-IisWebsite -Name $SiteName)
+    Wait-ForWebsiteToBeRunning
     Assert-WebsiteRunning 9876
 }
 
@@ -167,6 +168,7 @@ function Assert-WebsiteRunning($port)
 
 function Wait-ForWebsiteToBeRunning
 {
+    Invoke-AppCmd start site /site.name:$SiteName
     $state = ''
     $tryNum = 0
     do
