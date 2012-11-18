@@ -1,11 +1,11 @@
 # 0.4.0.0 (17 November 2012)
 
 ## Upgrade Instructions
- * [Install-Service](http://get-carbon.org/help/Install-Service.html) now only auto-starts a service if its startup type is not set or set to Automatic (the `StartupType` parameter).  If set to Manual or Disabled, the service will no longer be started after installation.
+ * If you install a manual or disabled Windows service with [Install-Service](http://get-carbon.org/help/Install-Service.html), you now have to call `Start-Service` yourself.  `Install-Service` only starts services whose startup type is set to `Automatic` (which is the default).
  * We've stopped distributing Microsoft's `subinacl.exe` program. We didn't have permission to distribute.  Plus its no longer supported. If any of your scripts used `Invoke-SubInAcl`, you'll want to [download `subinacl.exe` yourself](http://www.microsoft.com/en-us/download/details.aspx?id=23510) and copy `Invoke-SubInAcl` before upgrading (you can find it in the Carbon directory in the `Services.ps1` file.
  * If you're using `Grant-Permission` without named parameters, the `Path` parameter moved from position 3 to position 1.  Re-order your parameters accordingly.
  * Rename usages of `Set-IisDirectoryBrowsing` to `Enable-IisDirectoryBrowsing`.  If you use named parameters, rename its `Directory` paremter to `Path`.
- * Replace usages of `Set-HgrcDefaultPushUrl` with `Set-IniEntry` instead, e.g. `Set-IniEntry -Path 'Path\to\repo\.hg\hgrc' -Section paths -Name 'default.push' -Value 'DefautlPushUrl'
+ * Replace usages of `Set-HgrcDefaultPushUrl` with `Set-IniEntry` instead, e.g. `Set-IniEntry -Path 'Path\to\repo\.hg\hgrc' -Section paths -Name 'default.push' -Value 'DefaultPushUrl'`
  * Rename usages of `Test-IisWebsiteExists` with `Test-IisWebsite`.
  * Rename usages of `Get-FullPath` with `ConvertTo-FullPath`.
 
@@ -21,7 +21,7 @@
  * Created [Revoke-ServicePermission](http://get-carbon.org/help/Revoke-ServicePermission.html) function to revoke all of an identity's permissioms to control a service.
  * Created [Set-ServiceAcl](http://get-carbon.org/help/Set-ServiceAcl.html) function to set a service's discretionary access control list (DACL).
  * Created [Test-Service](http://get-carbon.org/help/Test-Service.html) function to check if a service exists *without* writing an error.
- * Removed `Invoke-SubInAcl` function and the `subinacl.exe` program.  If you still need `subinacl.exe`, please [download it from Microsoft](http://www.microsoft.com/en-us/download/details.aspx?id=23510).
+ * Removed `Invoke-SubInAcl` function and the `subinacl.exe` program.  Use the [Grant-ServicePermission](http://get-carbon.org/help/Grant-ServicePermission.html) and [Revoke-ServicePermission](http://get-carbon.org/help/Revoke-ServicePermission.html) functions instead.  If you still need `subinacl.exe`, please [download it from Microsoft](http://www.microsoft.com/en-us/download/details.aspx?id=23510).  
  * [Grant-Permissions](http://get-carbon.org/help/Grant-Permissions.html) now supports controlling inheritance and propagation flags via the `ApplyTo` parameter, which should be a value of the new `Carbon.Security.ContainerInheritanceFlags` enumeration, which encapsualtes all the valid combinations of inheritance/propagation flags.  See the help for `Grant-Permissions` for more information.  Thanks to Jonathan Valdez for the feature request and initial code.
  * Created [ConvertTo-InheritanceFlags](http://get-carbon.org/help/ConvertTo-InheritanceFlags.html) function for converting a `Carbon.Security.ContainerInheritanceFlags` to the necessary/applicable `System.Security.AccessControl.InheritanceFlags`.
  * Created [ConvertTo-PropagationFlags](http://get-carbon.org/help/ConvertTo-PropagationFlags.html) function for converting a `Carbon.Security.ContainerInheritanceFlags` to the necessary/applicable `System.Security.AccessControl.PropagationFlags`.
@@ -29,13 +29,14 @@
  * Renamed `Set-IisDirectoryBrowsing` to [Enable-IisDirectoryBrowsing](http://get-carbon.org/help/Enable-IisDirectoryBrowsing.html) and renamed its `Directory` parameter to `Path`.
  * Removed `Set-HgrcDefaultPushUrl`.  Use [Set-IniEntry](http://get-carbon.org/help/Enable-IisDirectoryBrowsing.html) instead.
  * Renamed `Test-IisWebsiteExists` to [Test-IisWebsite](http://get-carbon.org/help/Test-IisWebsite.html) to adhere to PowerShell naming conventions.
- * Renamed `Get-FullPath` to [ConverTo-FullPath](http://get-carbon.org/help/ConverTo-FullPath.html) to adhere to PowerShell naming conventions.
+ * Renamed `Get-FullPath` to [ConvertTo-FullPath](http://get-carbon.org/help/ConvertTo-FullPath.html) to adhere to PowerShell naming conventions.
   
 # Bug fixes
  * [Install-Service](http://get-carbon.org/help/Install-Service.html) no longer tries to start a service if its `StartupType` is set to `Manual` or `Disabled`.
  * `Path` is now the first parameter to [Grant-Permissions](http://get-carbon.org/help/Grant-Permissions.html) (it was the third) to match PowerShell standards/patterns.
- * [Get-ADUser](http://get-carbon.org/help/Get-ADUser.html) writes an error and returns null instead of throwing an exception.
-
+ * [Find-ADUser](http://get-carbon.org/help/Find-ADUser.html) writes an error and returns null instead of throwing an exception.
+ 
+ 
 # 0.3.1.0 (29 October 2012)
 
 ## Enhancements
