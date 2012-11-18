@@ -34,7 +34,7 @@
 # Bug fixes
  * [Install-Service](http://get-carbon.org/help/Install-Service.html) no longer tries to start a service if its `StartupType` is set to `Manual` or `Disabled`.
  * `Path` is now the first parameter to [Grant-Permissions](http://get-carbon.org/help/Grant-Permissions.html) (it was the third) to match PowerShell standards/patterns.
- 
+ * [Get-ADUser](http://get-carbon.org/help/Get-ADUser.html) writes an error and returns null instead of throwing an exception.
 
 # 0.3.1.0 (29 October 2012)
 
