@@ -280,25 +280,28 @@ GL is a <strong>G</strong>randchild <strong>L</strong>eaf.</p>
 <li><strong>ContainerAndChildLeaves</strong> - The container and just its child leaves, e.g. C and CL.</li>
 <li><strong>ContainerAndChildContainersAndChildLeaves</strong> - The container and just its child containers/leaves, e.g. C, CC, and CL.</li>
 <li><strong>ContainerAndSubContainersAndLeaves</strong> - Everything, full inheritance/propogation, e.g. C, CC, GC, GL.  <strong>This is the default.</strong></li>
-<li><p><strong>ChildContainersAndChildLeaves</strong>  - Just the container's child containers/leaves, e.g. CC and CL.</p>
-
-<p>The following table maps <code>ContainerInheritanceFlags</code> values to the actual <code>InheritanceFlags</code> and <code>PropagationFlags</code> values used:</p></li>
+<li><strong>ChildContainersAndChildLeaves</strong>  - Just the container's child containers/leaves, e.g. CC and CL.</li>
 </ul>
 
-<p><strong>ContainerInheritanceFlags</strong>               <strong>InheritanceFlags</strong>             <strong>PropagationFlags</strong>
-     Container                                      None                             None
-     SubContainers                               ContainerInherit                 InheritOnly
-     Leaves                                      ObjectInherit                    InheritOnly
-     ChildContainers                             ContainerInherit                 InheritOnly,NoPropagateInherit
-     ChildLeaves                                 ObjectInherit                    InheritOnly
-     ContainerAndSubContainers                   ContainerInherit                 None
-     ContainerAndLeaves                          ObjectInherit                    None
-     SubContainerAndLeaves                       ContainerInherit,ObjectInherit   InheritOnly
-     ContainerAndChildContainers                 ContainerInherit                 None
-     ContainerAndChildLeaves                     ObjectInherit                    None
-     ContainerAndChildContainersAndChildLeaves   ContainerInherit,ObjectInherit   NoPropagateInherit
-     ContainerAndSubContainersAndLeaves          ContainerInherit,ObjectInherit   None
-     ChildContainersAndChildLeaves               ContainerInherit,ObjectInherit   InheritOnly</p>
+<p>The following table maps <code>ContainerInheritanceFlags</code> values to the actual <code>InheritanceFlags</code> and <code>PropagationFlags</code> values used:</p>
+
+<pre><code>ContainerInheritanceFlags                   InheritanceFlags                 PropagationFlags
+-------------------------                   ----------------                 ----------------
+Container                                   None                             None
+SubContainers                               ContainerInherit                 InheritOnly
+Leaves                                      ObjectInherit                    InheritOnly
+ChildContainers                             ContainerInherit                 InheritOnly,
+                                                                             NoPropagateInherit
+ChildLeaves                                 ObjectInherit                    InheritOnly
+ContainerAndSubContainers                   ContainerInherit                 None
+ContainerAndLeaves                          ObjectInherit                    None
+SubContainerAndLeaves                       ContainerInherit,ObjectInherit   InheritOnly
+ContainerAndChildContainers                 ContainerInherit                 None
+ContainerAndChildLeaves                     ObjectInherit                    None
+ContainerAndChildContainersAndChildLeaves   ContainerInherit,ObjectInherit   NoPropagateInherit
+ContainerAndSubContainersAndLeaves          ContainerInherit,ObjectInherit   None
+ChildContainersAndChildLeaves               ContainerInherit,ObjectInherit   InheritOnly
+</code></pre>
 
 <p>The above information adpated from <a href="http://msdn.microsoft.com/en-us/magazine/cc163885.aspx#S3">Manage Access to Windows Objects with ACLs and the .NET Framework</a>, published in the November 2004 copy of <em>MSDN Magazine</em>.</p>
 

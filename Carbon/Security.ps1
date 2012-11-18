@@ -305,22 +305,24 @@ function Grant-Permissions
      * **ContainerAndSubContainersAndLeaves** - Everything, full inheritance/propogation, e.g. C, CC, GC, GL.  **This is the default.**
      * **ChildContainersAndChildLeaves**  - Just the container's child containers/leaves, e.g. CC and CL.
 
-     The following table maps `ContainerInheritanceFlags` values to the actual `InheritanceFlags` and `PropagationFlags` values used:
+    The following table maps `ContainerInheritanceFlags` values to the actual `InheritanceFlags` and `PropagationFlags` values used:
          
-		 **ContainerInheritanceFlags**               **InheritanceFlags**             **PropagationFlags**
-         Container 	                                 None                             None
-         SubContainers                               ContainerInherit                 InheritOnly
-         Leaves                                      ObjectInherit                    InheritOnly
-         ChildContainers                             ContainerInherit                 InheritOnly,NoPropagateInherit
-         ChildLeaves                                 ObjectInherit                    InheritOnly
-         ContainerAndSubContainers                   ContainerInherit                 None
-         ContainerAndLeaves                          ObjectInherit                    None
-         SubContainerAndLeaves                       ContainerInherit,ObjectInherit   InheritOnly
-         ContainerAndChildContainers                 ContainerInherit                 None
-         ContainerAndChildLeaves                     ObjectInherit                    None
-         ContainerAndChildContainersAndChildLeaves   ContainerInherit,ObjectInherit   NoPropagateInherit
-         ContainerAndSubContainersAndLeaves          ContainerInherit,ObjectInherit   None
-         ChildContainersAndChildLeaves               ContainerInherit,ObjectInherit   InheritOnly
+        ContainerInheritanceFlags                   InheritanceFlags                 PropagationFlags
+        -------------------------                   ----------------                 ----------------
+        Container                                   None                             None
+        SubContainers                               ContainerInherit                 InheritOnly
+        Leaves                                      ObjectInherit                    InheritOnly
+        ChildContainers                             ContainerInherit                 InheritOnly,
+                                                                                     NoPropagateInherit
+        ChildLeaves                                 ObjectInherit                    InheritOnly
+        ContainerAndSubContainers                   ContainerInherit                 None
+        ContainerAndLeaves                          ObjectInherit                    None
+        SubContainerAndLeaves                       ContainerInherit,ObjectInherit   InheritOnly
+        ContainerAndChildContainers                 ContainerInherit                 None
+        ContainerAndChildLeaves                     ObjectInherit                    None
+        ContainerAndChildContainersAndChildLeaves   ContainerInherit,ObjectInherit   NoPropagateInherit
+        ContainerAndSubContainersAndLeaves          ContainerInherit,ObjectInherit   None
+        ChildContainersAndChildLeaves               ContainerInherit,ObjectInherit   InheritOnly
     
     The above information adpated from [Manage Access to Windows Objects with ACLs and the .NET Framework](http://msdn.microsoft.com/en-us/magazine/cc163885.aspx#S3), published in the November 2004 copy of *MSDN Magazine*.
 
