@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-    <title>PowerShell - Invoke-SubInAcl - Carbon</title>
+    <title>PowerShell - Get-ServiceAcl - Carbon</title>
 	<link href="styles.css" type="text/css" rel="stylesheet" />
 </head>
 <body>
@@ -71,6 +71,7 @@
 		<li class="Category">IIS</li>
 		<ul class="CommandMenu">
 			<li><a href="Add-IisDefaultDocument.html">Add-IisDefaultDocument</a></li>
+			<li><a href="Enable-IisDirectoryBrowsing.html">Enable-IisDirectoryBrowsing</a></li>
 			<li><a href="Enable-IisSsl.html">Enable-IisSsl</a></li>
 			<li><a href="Get-IisHttpRedirect.html">Get-IisHttpRedirect</a></li>
 			<li><a href="Get-IisVersion.html">Get-IisVersion</a></li>
@@ -83,12 +84,11 @@
 			<li><a href="Remove-IisWebsite.html">Remove-IisWebsite</a></li>
 			<li><a href="Set-IisAnonymousAuthentication.html">Set-IisAnonymousAuthentication</a></li>
 			<li><a href="Set-IisBasicAuthentication.html">Set-IisBasicAuthentication</a></li>
-			<li><a href="Set-IisDirectoryBrowsing.html">Set-IisDirectoryBrowsing</a></li>
 			<li><a href="Set-IisHttpRedirect.html">Set-IisHttpRedirect</a></li>
 			<li><a href="Set-IisWebsiteSslCertificate.html">Set-IisWebsiteSslCertificate</a></li>
 			<li><a href="Set-IisWindowsAuthentication.html">Set-IisWindowsAuthentication</a></li>
 			<li><a href="Test-IisAppPoolExists.html">Test-IisAppPoolExists</a></li>
-			<li><a href="Test-IisWebsiteExists.html">Test-IisWebsiteExists</a></li>
+			<li><a href="Test-IisWebsite.html">Test-IisWebsite</a></li>
 			<li><a href="Unlock-IisBasicAuthentication.html">Unlock-IisBasicAuthentication</a></li>
 			<li><a href="Unlock-IisCgi.html">Unlock-IisCgi</a></li>
 			<li><a href="Unlock-IisConfigSection.html">Unlock-IisConfigSection</a></li>
@@ -103,10 +103,6 @@
 		<ul class="CommandMenu">
 			<li><a href="Disable-IEEnhancedSecurityConfiguration.html">Disable-IEEnhancedSecurityConfiguration</a></li>
 			<li><a href="Enable-IEActivationPermissions.html">Enable-IEActivationPermissions</a></li>
-		</ul>
-		<li class="Category">Mercurial</li>
-		<ul class="CommandMenu">
-			<li><a href="Set-HgrcDefaultPushUrl.html">Set-HgrcDefaultPushUrl</a></li>
 		</ul>
 		<li class="Category">MSI</li>
 		<ul class="CommandMenu">
@@ -125,7 +121,7 @@
 		</ul>
 		<li class="Category">Path</li>
 		<ul class="CommandMenu">
-			<li><a href="Get-FullPath.html">Get-FullPath</a></li>
+			<li><a href="ConvertTo-FullPath.html">ConvertTo-FullPath</a></li>
 			<li><a href="Get-PathCanonicalCase.html">Get-PathCanonicalCase</a></li>
 			<li><a href="Get-PathRelativeTo.html">Get-PathRelativeTo</a></li>
 		</ul>
@@ -152,6 +148,13 @@
 			<li><a href="Get-TrustedHosts.html">Get-TrustedHosts</a></li>
 			<li><a href="Set-TrustedHosts.html">Set-TrustedHosts</a></li>
 		</ul>
+		<li class="Category">Privileges</li>
+		<ul class="CommandMenu">
+			<li><a href="Get-Privileges.html">Get-Privileges</a></li>
+			<li><a href="Grant-Privilege.html">Grant-Privilege</a></li>
+			<li><a href="Revoke-Privilege.html">Revoke-Privilege</a></li>
+			<li><a href="Test-Privilege.html">Test-Privilege</a></li>
+		</ul>
 		<li class="Category">Registry</li>
 		<ul class="CommandMenu">
 			<li><a href="Get-RegistryKeyValue.html">Get-RegistryKeyValue</a></li>
@@ -164,6 +167,9 @@
 		<ul class="CommandMenu">
 			<li><a href="Assert-AdminPrivileges.html">Assert-AdminPrivileges</a></li>
 			<li><a href="Convert-SecureStringToString.html">Convert-SecureStringToString</a></li>
+			<li><a href="ConvertTo-InheritanceFlags.html">ConvertTo-InheritanceFlags</a></li>
+			<li><a href="ConvertTo-PropagationFlags.html">ConvertTo-PropagationFlags</a></li>
+			<li><a href="Get-Permissions.html">Get-Permissions</a></li>
 			<li><a href="Grant-Permissions.html">Grant-Permissions</a></li>
 			<li><a href="New-Credential.html">New-Credential</a></li>
 			<li><a href="Test-AdminPrivileges.html">Test-AdminPrivileges</a></li>
@@ -171,11 +177,18 @@
 		</ul>
 		<li class="Category">Service</li>
 		<ul class="CommandMenu">
+			<li><a href="Assert-Service.html">Assert-Service</a></li>
+			<li><a href="Get-ServiceAcl.html">Get-ServiceAcl</a></li>
+			<li><a href="Get-ServicePermissions.html">Get-ServicePermissions</a></li>
+			<li><a href="Get-ServiceSecurityDescriptor.html">Get-ServiceSecurityDescriptor</a></li>
 			<li><a href="Grant-ServiceControlPermission.html">Grant-ServiceControlPermission</a></li>
+			<li><a href="Grant-ServicePermission.html">Grant-ServicePermission</a></li>
 			<li><a href="Install-Service.html">Install-Service</a></li>
-			<li><a href="Invoke-SubInAcl.html">Invoke-SubInAcl</a></li>
 			<li><a href="Remove-Service.html">Remove-Service</a></li>
 			<li><a href="Restart-RemoteService.html">Restart-RemoteService</a></li>
+			<li><a href="Revoke-ServicePermission.html">Revoke-ServicePermission</a></li>
+			<li><a href="Set-ServiceAcl.html">Set-ServiceAcl</a></li>
+			<li><a href="Test-Service.html">Test-Service</a></li>
 		</ul>
 		<li class="Category">Share</li>
 		<ul class="CommandMenu">
@@ -212,24 +225,26 @@
 </div>
 
 
-    <h1>Invoke-SubInAcl</h1>
-    <div><p><strong>INTERNAL.</strong>  Invokes the SubInAcl console application, and parses its output so it displays correctly.  <strong>This is an internal function is will be removed in a future release.</strong></p>
+    <h1>Get-ServiceAcl</h1>
+    <div><p>Gets the discretionary access control list (i.e. DACL) for a service.</p>
 </div>
 
         <h2>Syntax</h2>
-    <pre class="Syntax"><code>Invoke-SubInAcl [-Parameters] &lt;String[]&gt; [&lt;CommonParameters&gt;]</code></pre>
+    <pre class="Syntax"><code>Get-ServiceAcl [-Name] &lt;String&gt; [&lt;CommonParameters&gt;]</code></pre>
     
         <h2>Description</h2>
     <div class="Description">
-        <p><strong>NOTE: This function will be removed in a future release.  It is internal, and should not be used.</strong></p>
-
-<p>Subinacl.exe outputs text for the classic Windows console.  This output doesn't work in PowerShell: it looks like there is a space between every character.  In fact, there are <code>null</code> bytes between each character.  Hopefully, somebody will be able to explain this to me someday.  Until then, this function runs <code>subinacl.exe</code> and parses its output to remove these extra <code>null</code> bytes.</p>
-
-<p>All parameters passed to <code>Invoke-SubInAcl</code> are passed to the actual <code>subinacl.exe</code> program unchanged.</p>
+        <p>You wanted it, you got it!  You probably want to use <code>Get-ServicePermissions</code> instead.  If you want to chagne a service's permissions, use <code>Grant-ServicePermission</code> or <code>Revoke-ServicePermissions</code>.</p>
 
     </div>
     
-    
+            <h2>Related Commands</h2>
+        <ul>
+<li><a href="Get-ServicePermissions.html">Get-ServicePermissions</a></li>
+<li><a href="Grant-ServicePermission.html">Grant-ServicePermission</a></li>
+<li><a href="Revoke-ServicePermission.html">Revoke-ServicePermission</a></li>
+</ul>
+
 
     		<h2> Parameters </h2>
 		<table border='1'>
@@ -242,9 +257,10 @@
 				<th>Default Value</th>
 			</tr>
             			<tr valign='top'>
-				<td>Parameters</td>
-				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String[]</a></td>
-				<td></td>
+				<td>Name</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+				<td>The service whose DACL to return.
+</td>
 				<td>true</td>
 				<td>false</td>
                 <td></td>
@@ -259,11 +275,8 @@
     
         
                 <h2>EXAMPLE 1</h2>
-            <pre><code>Invoke-SubInAcl /help</code></pre>
-            <p><p>Shows the SubInAcl help documentation.</p>
-</p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 2</h2>
-            <pre><code>Invoke-SubInAcl /service `"CCService`" /GRANT=`"$Identity`"=STOE</code></pre>
-            <p><p>Grants <code>$Identity</code> permissions to control the <code>CCService</code>.  Note escaped quotes around some of the arguments to <code>subinacl.exe</code>.  You may or may not need to follow this pattern.  It's been too long since we wrote that code to remember.  We were PowerShell noobies back then.</p>
+            <pre><code>Get-ServiceAcl -Name Hyperdrive</code></pre>
+            <p><p>Gets the <code>Hyperdrive</code> service's DACL.</p>
 </p><p></p><p></p><p></p><p></p>
 </body>
 </html>   

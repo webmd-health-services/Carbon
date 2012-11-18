@@ -1,4 +1,4 @@
-# 0.4.0.0
+# 0.4.0.0 (17 November 2012)
 
 ## Upgrade Instructions
  * [Install-Service](http://get-carbon.org/help/Install-Service.html) now only auto-starts a service if its startup type is not set or set to Automatic (the `StartupType` parameter).  If set to Manual or Disabled, the service will no longer be started after installation.

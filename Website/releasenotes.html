@@ -12,7 +12,53 @@
 		<li><a href="http://pshdo.com">-Blog</a></li>
 	</ul>
     
-    <h1>0.3.1.0 (29 October 2012)</h1>
+    <h1>0.4.0.0 (17 November 2012)</h1>
+
+<h2>Upgrade Instructions</h2>
+
+<ul>
+<li><a href="http://get-carbon.org/help/Install-Service.html">Install-Service</a> now only auto-starts a service if its startup type is not set or set to Automatic (the <code>StartupType</code> parameter).  If set to Manual or Disabled, the service will no longer be started after installation.</li>
+<li>We've stopped distributing Microsoft's <code>subinacl.exe</code> program. We didn't have permission to distribute.  Plus its no longer supported. If any of your scripts used <code>Invoke-SubInAcl</code>, you'll want to <a href="http://www.microsoft.com/en-us/download/details.aspx?id=23510">download <code>subinacl.exe</code> yourself</a> and copy <code>Invoke-SubInAcl</code> before upgrading (you can find it in the Carbon directory in the <code>Services.ps1</code> file.</li>
+<li>If you're using <code>Grant-Permission</code> without named parameters, the <code>Path</code> parameter moved from position 3 to position 1.  Re-order your parameters accordingly.</li>
+<li>Rename usages of <code>Set-IisDirectoryBrowsing</code> to <code>Enable-IisDirectoryBrowsing</code>.  If you use named parameters, rename its <code>Directory</code> paremter to <code>Path</code>.</li>
+<li>Replace usages of <code>Set-HgrcDefaultPushUrl</code> with <code>Set-IniEntry</code> instead, e.g. `Set-IniEntry -Path 'Path\to\repo.hg\hgrc' -Section paths -Name 'default.push' -Value 'DefautlPushUrl'</li>
+<li>Rename usages of <code>Test-IisWebsiteExists</code> with <code>Test-IisWebsite</code>.</li>
+<li>Rename usages of <code>Get-FullPath</code> with <code>ConvertTo-FullPath</code>.</li>
+</ul>
+
+<h2>Enhancements</h2>
+
+<ul>
+<li>Created <a href="http://get-carbon.org/help/Get-Privileges.html">Get-Privileges</a>, <a href="http://get-carbon.org/help/Grant-Privilege.html">Grant-Privilege</a>, <a href="http://get-carbon.org/help/Revoke-Privilege.html">Revoke-Privilege</a>, and <a href="http://get-carbon.org/help/Test-Privilege.html">Test-Privilege</a> for managing an identity's security operation privileges.</li>
+<li><a href="http://get-carbon.org/help/Install-Service.html">Install-Service</a> now uses <a href="http://get-carbon.org/help/Grant-Privilege.html">Grant-Privilege</a> to grant custom service identities the <code>SeServiceLogonRight</code> privilege. This replaces usage of Microsoft's legacy <a href="http://support.microsoft.com/kb/315276">ntrights.exe</a>, which we probably didn't have permission to distribute.</li>
+<li>Created <a href="http://get-carbon.org/help/Get-ServicePermissions.html">Get-ServicePermissions</a> function for getting the permissions for a service, i.e. what users can control a service.</li>
+<li>Created <a href="http://get-carbon.org/help/Assert-Service.html">Assert-Service</a> function to write an error if a service doesn't exist.</li>
+<li>Created <a href="http://get-carbon.org/help/Get-ServiceAcl.html">Get-ServiceAcl</a> function to get the discretionary access control list (DACL) for a service.</li>
+<li>Created <a href="http://get-carbon.org/help/Get-ServiceSecurityDescriptor.html">Get-ServiceSecurityDescriptor</a> function to get the raw security descriptor for a service.</li>
+<li>Created <a href="http://get-carbon.org/help/Grant-ServicePermission.html">Grant-ServicePermission</a> function to grant service control permissions to an identity.</li>
+<li>Created <a href="http://get-carbon.org/help/Revoke-ServicePermission.html">Revoke-ServicePermission</a> function to revoke all of an identity's permissioms to control a service.</li>
+<li>Created <a href="http://get-carbon.org/help/Set-ServiceAcl.html">Set-ServiceAcl</a> function to set a service's discretionary access control list (DACL).</li>
+<li>Created <a href="http://get-carbon.org/help/Test-Service.html">Test-Service</a> function to check if a service exists <em>without</em> writing an error.</li>
+<li>Removed <code>Invoke-SubInAcl</code> function and the <code>subinacl.exe</code> program.  If you still need <code>subinacl.exe</code>, please <a href="http://www.microsoft.com/en-us/download/details.aspx?id=23510">download it from Microsoft</a>.</li>
+<li><a href="http://get-carbon.org/help/Grant-Permissions.html">Grant-Permissions</a> now supports controlling inheritance and propagation flags via the <code>ApplyTo</code> parameter, which should be a value of the new <code>Carbon.Security.ContainerInheritanceFlags</code> enumeration, which encapsualtes all the valid combinations of inheritance/propagation flags.  See the help for <code>Grant-Permissions</code> for more information.  Thanks to Jonathan Valdez for the feature request and initial code.</li>
+<li>Created <a href="http://get-carbon.org/help/ConvertTo-InheritanceFlags.html">ConvertTo-InheritanceFlags</a> function for converting a <code>Carbon.Security.ContainerInheritanceFlags</code> to the necessary/applicable <code>System.Security.AccessControl.InheritanceFlags</code>.</li>
+<li>Created <a href="http://get-carbon.org/help/ConvertTo-PropagationFlags.html">ConvertTo-PropagationFlags</a> function for converting a <code>Carbon.Security.ContainerInheritanceFlags</code> to the necessary/applicable <code>System.Security.AccessControl.PropagationFlags</code>.</li>
+<li>Created <a href="http://get-carbon.org/help/Get-Permissions.html">Get-Permissions</a> function for getting the non-inherited permissions on a file, directory, registry key, or registry value with the ability to return a specific identity's permissions and/or inherited permissions.</li>
+<li>Renamed <code>Set-IisDirectoryBrowsing</code> to <a href="http://get-carbon.org/help/Enable-IisDirectoryBrowsing.html">Enable-IisDirectoryBrowsing</a> and renamed its <code>Directory</code> parameter to <code>Path</code>.</li>
+<li>Removed <code>Set-HgrcDefaultPushUrl</code>.  Use <a href="http://get-carbon.org/help/Enable-IisDirectoryBrowsing.html">Set-IniEntry</a> instead.</li>
+<li>Renamed <code>Test-IisWebsiteExists</code> to <a href="http://get-carbon.org/help/Test-IisWebsite.html">Test-IisWebsite</a> to adhere to PowerShell naming conventions.</li>
+<li>Renamed <code>Get-FullPath</code> to <a href="http://get-carbon.org/help/ConverTo-FullPath.html">ConverTo-FullPath</a> to adhere to PowerShell naming conventions.</li>
+</ul>
+
+<h1>Bug fixes</h1>
+
+<ul>
+<li><a href="http://get-carbon.org/help/Install-Service.html">Install-Service</a> no longer tries to start a service if its <code>StartupType</code> is set to <code>Manual</code> or <code>Disabled</code>.</li>
+<li><code>Path</code> is now the first parameter to <a href="http://get-carbon.org/help/Grant-Permissions.html">Grant-Permissions</a> (it was the third) to match PowerShell standards/patterns.</li>
+<li><a href="http://get-carbon.org/help/Get-ADUser.html">Get-ADUser</a> writes an error and returns null instead of throwing an exception.</li>
+</ul>
+
+<h1>0.3.1.0 (29 October 2012)</h1>
 
 <h2>Enhancements</h2>
 

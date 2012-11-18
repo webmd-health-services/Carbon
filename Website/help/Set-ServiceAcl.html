@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-    <title>PowerShell - Get-FullPath - Carbon</title>
+    <title>PowerShell - Set-ServiceAcl - Carbon</title>
 	<link href="styles.css" type="text/css" rel="stylesheet" />
 </head>
 <body>
@@ -71,6 +71,7 @@
 		<li class="Category">IIS</li>
 		<ul class="CommandMenu">
 			<li><a href="Add-IisDefaultDocument.html">Add-IisDefaultDocument</a></li>
+			<li><a href="Enable-IisDirectoryBrowsing.html">Enable-IisDirectoryBrowsing</a></li>
 			<li><a href="Enable-IisSsl.html">Enable-IisSsl</a></li>
 			<li><a href="Get-IisHttpRedirect.html">Get-IisHttpRedirect</a></li>
 			<li><a href="Get-IisVersion.html">Get-IisVersion</a></li>
@@ -83,12 +84,11 @@
 			<li><a href="Remove-IisWebsite.html">Remove-IisWebsite</a></li>
 			<li><a href="Set-IisAnonymousAuthentication.html">Set-IisAnonymousAuthentication</a></li>
 			<li><a href="Set-IisBasicAuthentication.html">Set-IisBasicAuthentication</a></li>
-			<li><a href="Set-IisDirectoryBrowsing.html">Set-IisDirectoryBrowsing</a></li>
 			<li><a href="Set-IisHttpRedirect.html">Set-IisHttpRedirect</a></li>
 			<li><a href="Set-IisWebsiteSslCertificate.html">Set-IisWebsiteSslCertificate</a></li>
 			<li><a href="Set-IisWindowsAuthentication.html">Set-IisWindowsAuthentication</a></li>
 			<li><a href="Test-IisAppPoolExists.html">Test-IisAppPoolExists</a></li>
-			<li><a href="Test-IisWebsiteExists.html">Test-IisWebsiteExists</a></li>
+			<li><a href="Test-IisWebsite.html">Test-IisWebsite</a></li>
 			<li><a href="Unlock-IisBasicAuthentication.html">Unlock-IisBasicAuthentication</a></li>
 			<li><a href="Unlock-IisCgi.html">Unlock-IisCgi</a></li>
 			<li><a href="Unlock-IisConfigSection.html">Unlock-IisConfigSection</a></li>
@@ -103,10 +103,6 @@
 		<ul class="CommandMenu">
 			<li><a href="Disable-IEEnhancedSecurityConfiguration.html">Disable-IEEnhancedSecurityConfiguration</a></li>
 			<li><a href="Enable-IEActivationPermissions.html">Enable-IEActivationPermissions</a></li>
-		</ul>
-		<li class="Category">Mercurial</li>
-		<ul class="CommandMenu">
-			<li><a href="Set-HgrcDefaultPushUrl.html">Set-HgrcDefaultPushUrl</a></li>
 		</ul>
 		<li class="Category">MSI</li>
 		<ul class="CommandMenu">
@@ -125,7 +121,7 @@
 		</ul>
 		<li class="Category">Path</li>
 		<ul class="CommandMenu">
-			<li><a href="Get-FullPath.html">Get-FullPath</a></li>
+			<li><a href="ConvertTo-FullPath.html">ConvertTo-FullPath</a></li>
 			<li><a href="Get-PathCanonicalCase.html">Get-PathCanonicalCase</a></li>
 			<li><a href="Get-PathRelativeTo.html">Get-PathRelativeTo</a></li>
 		</ul>
@@ -152,6 +148,13 @@
 			<li><a href="Get-TrustedHosts.html">Get-TrustedHosts</a></li>
 			<li><a href="Set-TrustedHosts.html">Set-TrustedHosts</a></li>
 		</ul>
+		<li class="Category">Privileges</li>
+		<ul class="CommandMenu">
+			<li><a href="Get-Privileges.html">Get-Privileges</a></li>
+			<li><a href="Grant-Privilege.html">Grant-Privilege</a></li>
+			<li><a href="Revoke-Privilege.html">Revoke-Privilege</a></li>
+			<li><a href="Test-Privilege.html">Test-Privilege</a></li>
+		</ul>
 		<li class="Category">Registry</li>
 		<ul class="CommandMenu">
 			<li><a href="Get-RegistryKeyValue.html">Get-RegistryKeyValue</a></li>
@@ -164,6 +167,9 @@
 		<ul class="CommandMenu">
 			<li><a href="Assert-AdminPrivileges.html">Assert-AdminPrivileges</a></li>
 			<li><a href="Convert-SecureStringToString.html">Convert-SecureStringToString</a></li>
+			<li><a href="ConvertTo-InheritanceFlags.html">ConvertTo-InheritanceFlags</a></li>
+			<li><a href="ConvertTo-PropagationFlags.html">ConvertTo-PropagationFlags</a></li>
+			<li><a href="Get-Permissions.html">Get-Permissions</a></li>
 			<li><a href="Grant-Permissions.html">Grant-Permissions</a></li>
 			<li><a href="New-Credential.html">New-Credential</a></li>
 			<li><a href="Test-AdminPrivileges.html">Test-AdminPrivileges</a></li>
@@ -171,11 +177,18 @@
 		</ul>
 		<li class="Category">Service</li>
 		<ul class="CommandMenu">
+			<li><a href="Assert-Service.html">Assert-Service</a></li>
+			<li><a href="Get-ServiceAcl.html">Get-ServiceAcl</a></li>
+			<li><a href="Get-ServicePermissions.html">Get-ServicePermissions</a></li>
+			<li><a href="Get-ServiceSecurityDescriptor.html">Get-ServiceSecurityDescriptor</a></li>
 			<li><a href="Grant-ServiceControlPermission.html">Grant-ServiceControlPermission</a></li>
+			<li><a href="Grant-ServicePermission.html">Grant-ServicePermission</a></li>
 			<li><a href="Install-Service.html">Install-Service</a></li>
-			<li><a href="Invoke-SubInAcl.html">Invoke-SubInAcl</a></li>
 			<li><a href="Remove-Service.html">Remove-Service</a></li>
 			<li><a href="Restart-RemoteService.html">Restart-RemoteService</a></li>
+			<li><a href="Revoke-ServicePermission.html">Revoke-ServicePermission</a></li>
+			<li><a href="Set-ServiceAcl.html">Set-ServiceAcl</a></li>
+			<li><a href="Test-Service.html">Test-Service</a></li>
 		</ul>
 		<li class="Category">Share</li>
 		<ul class="CommandMenu">
@@ -212,22 +225,28 @@
 </div>
 
 
-    <h1>Get-FullPath</h1>
-    <div><p>Converts a relative path to an absolute path.</p>
+    <h1>Set-ServiceAcl</h1>
+    <div><p>Sets a service's discretionary access control list (i.e. DACL).</p>
 </div>
 
         <h2>Syntax</h2>
-    <pre class="Syntax"><code>Get-FullPath [-RelativePath] &lt;String&gt; [&lt;CommonParameters&gt;]</code></pre>
+    <pre class="Syntax"><code>Set-ServiceAcl [-Name] &lt;String&gt; [-Dacl] &lt;DiscretionaryAcl&gt; [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
     
         <h2>Description</h2>
     <div class="Description">
-        <p>Unlike <code>Resolve-Path</code>, this function does not check whether the path exists.  It just converts relative paths to absolute paths.</p>
+        <p>The existing DACL is replaced with the new DACL.  No previous permissions are preserved.  That's your job.  You're warned!</p>
 
-<p>You can't pass truly relative paths to this function.  You can only pass rooted paths, i.e. the path must have a drive at the beginning.</p>
+<p>You probably want <code>Grant-ServicePermission</code> or <code>Revoke-ServicePermission</code> instead.</p>
 
     </div>
     
-    
+            <h2>Related Commands</h2>
+        <ul>
+<li><a href="Get-ServicePermission.html">Get-ServicePermission</a></li>
+<li><a href="Grant-ServicePermission.html">Grant-ServicePermission</a></li>
+<li><a href="Revoke-ServicePermission.html">Revoke-ServicePermission</a></li>
+</ul>
+
 
     		<h2> Parameters </h2>
 		<table border='1'>
@@ -240,15 +259,47 @@
 				<th>Default Value</th>
 			</tr>
             			<tr valign='top'>
-				<td>RelativePath</td>
+				<td>Name</td>
 				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
-				<td>The path to resolve.  Must be rooted, i.e. have a drive at the beginning.
+				<td>The service whose DACL to replace.
 </td>
 				<td>true</td>
 				<td>false</td>
                 <td></td>
 			</tr>
-            
+			<tr valign='top'>
+				<td>Dacl</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.discretionaryacl.aspx">DiscretionaryAcl</a></td>
+				<td>The service's new DACL.
+</td>
+				<td>true</td>
+				<td>false</td>
+                <td></td>
+			</tr>
+			<tr valign='top'>
+				<td>WhatIf</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+				<td></td>
+				<td>false</td>
+				<td>false</td>
+                <td></td>
+			</tr>
+			<tr valign='top'>
+				<td>Confirm</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+				<td></td>
+				<td>false</td>
+				<td>false</td>
+                <td></td>
+			</tr>
+                            <tr valign="top">
+                <td><a href="http://technet.microsoft.com/en-us/library/dd315352.aspx">CommonParameters</a></td>
+                <td></td>
+                <td>This cmdlet supports common parameters.  For more information type <br> <code>Get-Help about_CommonParameters</code>.</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                </tr>
         </table>
         
     
@@ -258,11 +309,8 @@
     
         
                 <h2>EXAMPLE 1</h2>
-            <pre><code>Get-FullPath -RelativePath 'C:\Projects\Carbon\Test\..\Carbon\FileSystem.ps1'</code></pre>
-            <p><p>Returns <code>C:\Projects\Carbon\Carbon\FileSystem.ps1</code>.</p>
-</p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 2</h2>
-            <pre><code>Get-FullPath -RelativePath 'C:\Projects\Carbon\..\I\Do\Not\Exist'</code></pre>
-            <p><p>Returns <code>C:\Projects\I\Do\Not\Exist</code>.</p>
+            <pre><code>Set-ServiceDacl -Name 'Hyperdrive' -Dacl $dacl</code></pre>
+            <p><p>Replaces the DACL on the <code>Hyperdrive</code> service.  Yikes!  Sounds like something the Empire would do, though.</p>
 </p><p></p><p></p><p></p><p></p>
 </body>
 </html>   

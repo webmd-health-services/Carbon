@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-    <title>PowerShell - Set-IisDirectoryBrowsing - Carbon</title>
+    <title>PowerShell - Get-Privileges - Carbon</title>
 	<link href="styles.css" type="text/css" rel="stylesheet" />
 </head>
 <body>
@@ -71,6 +71,7 @@
 		<li class="Category">IIS</li>
 		<ul class="CommandMenu">
 			<li><a href="Add-IisDefaultDocument.html">Add-IisDefaultDocument</a></li>
+			<li><a href="Enable-IisDirectoryBrowsing.html">Enable-IisDirectoryBrowsing</a></li>
 			<li><a href="Enable-IisSsl.html">Enable-IisSsl</a></li>
 			<li><a href="Get-IisHttpRedirect.html">Get-IisHttpRedirect</a></li>
 			<li><a href="Get-IisVersion.html">Get-IisVersion</a></li>
@@ -83,12 +84,11 @@
 			<li><a href="Remove-IisWebsite.html">Remove-IisWebsite</a></li>
 			<li><a href="Set-IisAnonymousAuthentication.html">Set-IisAnonymousAuthentication</a></li>
 			<li><a href="Set-IisBasicAuthentication.html">Set-IisBasicAuthentication</a></li>
-			<li><a href="Set-IisDirectoryBrowsing.html">Set-IisDirectoryBrowsing</a></li>
 			<li><a href="Set-IisHttpRedirect.html">Set-IisHttpRedirect</a></li>
 			<li><a href="Set-IisWebsiteSslCertificate.html">Set-IisWebsiteSslCertificate</a></li>
 			<li><a href="Set-IisWindowsAuthentication.html">Set-IisWindowsAuthentication</a></li>
 			<li><a href="Test-IisAppPoolExists.html">Test-IisAppPoolExists</a></li>
-			<li><a href="Test-IisWebsiteExists.html">Test-IisWebsiteExists</a></li>
+			<li><a href="Test-IisWebsite.html">Test-IisWebsite</a></li>
 			<li><a href="Unlock-IisBasicAuthentication.html">Unlock-IisBasicAuthentication</a></li>
 			<li><a href="Unlock-IisCgi.html">Unlock-IisCgi</a></li>
 			<li><a href="Unlock-IisConfigSection.html">Unlock-IisConfigSection</a></li>
@@ -103,10 +103,6 @@
 		<ul class="CommandMenu">
 			<li><a href="Disable-IEEnhancedSecurityConfiguration.html">Disable-IEEnhancedSecurityConfiguration</a></li>
 			<li><a href="Enable-IEActivationPermissions.html">Enable-IEActivationPermissions</a></li>
-		</ul>
-		<li class="Category">Mercurial</li>
-		<ul class="CommandMenu">
-			<li><a href="Set-HgrcDefaultPushUrl.html">Set-HgrcDefaultPushUrl</a></li>
 		</ul>
 		<li class="Category">MSI</li>
 		<ul class="CommandMenu">
@@ -125,7 +121,7 @@
 		</ul>
 		<li class="Category">Path</li>
 		<ul class="CommandMenu">
-			<li><a href="Get-FullPath.html">Get-FullPath</a></li>
+			<li><a href="ConvertTo-FullPath.html">ConvertTo-FullPath</a></li>
 			<li><a href="Get-PathCanonicalCase.html">Get-PathCanonicalCase</a></li>
 			<li><a href="Get-PathRelativeTo.html">Get-PathRelativeTo</a></li>
 		</ul>
@@ -152,6 +148,13 @@
 			<li><a href="Get-TrustedHosts.html">Get-TrustedHosts</a></li>
 			<li><a href="Set-TrustedHosts.html">Set-TrustedHosts</a></li>
 		</ul>
+		<li class="Category">Privileges</li>
+		<ul class="CommandMenu">
+			<li><a href="Get-Privileges.html">Get-Privileges</a></li>
+			<li><a href="Grant-Privilege.html">Grant-Privilege</a></li>
+			<li><a href="Revoke-Privilege.html">Revoke-Privilege</a></li>
+			<li><a href="Test-Privilege.html">Test-Privilege</a></li>
+		</ul>
 		<li class="Category">Registry</li>
 		<ul class="CommandMenu">
 			<li><a href="Get-RegistryKeyValue.html">Get-RegistryKeyValue</a></li>
@@ -164,6 +167,9 @@
 		<ul class="CommandMenu">
 			<li><a href="Assert-AdminPrivileges.html">Assert-AdminPrivileges</a></li>
 			<li><a href="Convert-SecureStringToString.html">Convert-SecureStringToString</a></li>
+			<li><a href="ConvertTo-InheritanceFlags.html">ConvertTo-InheritanceFlags</a></li>
+			<li><a href="ConvertTo-PropagationFlags.html">ConvertTo-PropagationFlags</a></li>
+			<li><a href="Get-Permissions.html">Get-Permissions</a></li>
 			<li><a href="Grant-Permissions.html">Grant-Permissions</a></li>
 			<li><a href="New-Credential.html">New-Credential</a></li>
 			<li><a href="Test-AdminPrivileges.html">Test-AdminPrivileges</a></li>
@@ -171,11 +177,18 @@
 		</ul>
 		<li class="Category">Service</li>
 		<ul class="CommandMenu">
+			<li><a href="Assert-Service.html">Assert-Service</a></li>
+			<li><a href="Get-ServiceAcl.html">Get-ServiceAcl</a></li>
+			<li><a href="Get-ServicePermissions.html">Get-ServicePermissions</a></li>
+			<li><a href="Get-ServiceSecurityDescriptor.html">Get-ServiceSecurityDescriptor</a></li>
 			<li><a href="Grant-ServiceControlPermission.html">Grant-ServiceControlPermission</a></li>
+			<li><a href="Grant-ServicePermission.html">Grant-ServicePermission</a></li>
 			<li><a href="Install-Service.html">Install-Service</a></li>
-			<li><a href="Invoke-SubInAcl.html">Invoke-SubInAcl</a></li>
 			<li><a href="Remove-Service.html">Remove-Service</a></li>
 			<li><a href="Restart-RemoteService.html">Restart-RemoteService</a></li>
+			<li><a href="Revoke-ServicePermission.html">Revoke-ServicePermission</a></li>
+			<li><a href="Set-ServiceAcl.html">Set-ServiceAcl</a></li>
+			<li><a href="Test-Service.html">Test-Service</a></li>
 		</ul>
 		<li class="Category">Share</li>
 		<ul class="CommandMenu">
@@ -212,20 +225,28 @@
 </div>
 
 
-    <h1>Set-IisDirectoryBrowsing</h1>
-    <div><p>Enables directory browsing under all or part of a website.</p>
+    <h1>Get-Privileges</h1>
+    <div><p>Gets the privileges and identity has to perform system operations.</p>
 </div>
 
         <h2>Syntax</h2>
-    <pre class="Syntax"><code>Set-IisDirectoryBrowsing [-SiteName] &lt;String&gt; [[-Directory] &lt;String&gt;] [&lt;CommonParameters&gt;]</code></pre>
+    <pre class="Syntax"><code>Get-Privileges [-Identity] &lt;String&gt; [&lt;CommonParameters&gt;]</code></pre>
     
         <h2>Description</h2>
     <div class="Description">
-        <p>Enables directory browsing (i.e. showing the contents of a directory by requesting that directory in a web browser) for a website.  To enable directory browsing on a directory under the website, pass the virtual path to that directory as the value to the <code>Directory</code> parameter.</p>
+        <p>These privileges are usually managed by Group Policy.</p>
+
+<p>Note: if a computer is not on a domain, this function won't work.</p>
 
     </div>
     
-    
+            <h2>Related Commands</h2>
+        <ul>
+<li><a href="Grant-Privilege.html">Grant-Privilege</a></li>
+<li><a href="Revoke-Prvileges.html">Revoke-Prvileges</a></li>
+<li><a href="Test-Privilege.html">Test-Privilege</a></li>
+</ul>
+
 
     		<h2> Parameters </h2>
 		<table border='1'>
@@ -238,20 +259,11 @@
 				<th>Default Value</th>
 			</tr>
             			<tr valign='top'>
-				<td>SiteName</td>
+				<td>Identity</td>
 				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
-				<td>The name of the site where the virtual directory is located.
+				<td>The identity whose privileges to return.
 </td>
 				<td>true</td>
-				<td>false</td>
-                <td></td>
-			</tr>
-			<tr valign='top'>
-				<td>Directory</td>
-				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
-				<td>The directory where directory browsing should be enabled.
-</td>
-				<td>false</td>
 				<td>false</td>
                 <td></td>
 			</tr>
@@ -260,16 +272,15 @@
         
     
         
-    
+            <h2>Return Values</h2>
+        <p><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">System.String</a>. </p>
+
         
     
         
                 <h2>EXAMPLE 1</h2>
-            <pre><code>Set-IisDirectoryBrowsing -SiteName Peanuts</code></pre>
-            <p><p>Enables directory browsing on the <code>Peanuts</code> website.</p>
-</p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 2</h2>
-            <pre><code>Set-IisDirectoryBrowsing -SiteName Peanuts -Directory Snoopy/DogHouse</code></pre>
-            <p><p>Enables directory browsing on the <code>/Snoopy/DogHouse</code> directory under the <code>Peanuts</code> website.</p>
+            <pre><code>Get-Privileges -Identity TheBeast</code></pre>
+            <p><p>Gets TheBeast's privileges as an array of strings.</p>
 </p><p></p><p></p><p></p><p></p>
 </body>
 </html>   
