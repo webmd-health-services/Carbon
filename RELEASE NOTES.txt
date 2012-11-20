@@ -1,3 +1,8 @@
+# 0.4.0.1
+
+## Bug fixes
+ * [Enable-IisSsl](http://get-carbon.org/help/Reset-MsmqQueueManagerID.html) not setting SSL flags correctly when requiring client certificates.
+
 # 0.4.0.0 (17 November 2012)
 
 ## Upgrade Instructions
@@ -31,7 +36,7 @@
  * Renamed `Test-IisWebsiteExists` to [Test-IisWebsite](http://get-carbon.org/help/Test-IisWebsite.html) to adhere to PowerShell naming conventions.
  * Renamed `Get-FullPath` to [ConvertTo-FullPath](http://get-carbon.org/help/ConvertTo-FullPath.html) to adhere to PowerShell naming conventions.
   
-# Bug fixes
+## Bug fixes
  * [Install-Service](http://get-carbon.org/help/Install-Service.html) no longer tries to start a service if its `StartupType` is set to `Manual` or `Disabled`.
  * `Path` is now the first parameter to [Grant-Permissions](http://get-carbon.org/help/Grant-Permissions.html) (it was the third) to match PowerShell standards/patterns.
  * [Find-ADUser](http://get-carbon.org/help/Find-ADUser.html) writes an error and returns null instead of throwing an exception.

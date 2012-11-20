@@ -887,7 +887,7 @@ function Enable-IisSsl
         $flags += 'Ssl'
     }
     
-    if( $AcceptClientCertificates )
+    if( $AcceptClientCertificates -or $RequireClientCertificates )
     {
         $flags += 'SslNegotiateCert'
     }

@@ -54,7 +54,7 @@ function Test-ShouldAcceptClientCertificates
 function Test-ShouldRequireClientCertificates
 {
     Enable-IisSsl -SiteName $siteName -RequireSsl -RequireClientCertificates
-    Assert-SSLFlags -ExpectedValue 'Ssl, SslRequireCert'
+    Assert-SSLFlags -ExpectedValue 'Ssl, SslNegotiateCert, SslRequireCert'
 }
 
 function Test-ShouldAllow128BitSsl
