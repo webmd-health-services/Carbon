@@ -211,15 +211,15 @@ function Install-Msmq
     $optionalArgs = @{ }
     if( $HttpSupport )
     {
-        $optionalArgs.HttpSupport = $true
+        $optionalArgs.MsmqHttpSupport = $true
     }
     
     if( $ActiveDirectoryIntegration )
     {
-        $optionalArgs.ActiveDirectoryIntegration = $true
+        $optionalArgs.MsmqActiveDirectoryIntegration = $true
     }
     
-    Install-WindowsFeatureMsmq @optionalArgs
+    Install-WindowsFeature -Msmq @optionalArgs
     
     if( $Dtc )
     {

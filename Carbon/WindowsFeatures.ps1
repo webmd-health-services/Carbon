@@ -137,58 +137,6 @@ function Get-WindowsFeature
 
 if( (Assert-WindowsFeatureFunctionsSupported) )
 {
-    function Install-WindowsFeatureMsmq
-    {
-        <#
-        .SYNOPSIS
-        Installs MSMQ and, optionally, some of its sub-features, if they aren't already installed.
-
-        .DESCRIPTION
-        This function installs MSMQ and, optionally, MSMQ's HTTP support and Active Directory integration.  If any of the selected features are already installed, they are not re-installed; nothing happens.
-
-        **NOTE: This function is only available on operating systems that have `servermanagercmd.exe` *or* `ocsetup.exe` and WMI support for the Win32_OptionalFeature class.**
-
-        .EXAMPLE
-        Install-WindowsFeatureMsmq
-
-        Installs MSMQ, if it isn't already installed.
-
-        .EXAMPLE
-        Install-WindowsFeatureMsmq -HttpSupport -ActiveDirectoryIntegration
-
-        Installs MSMQ and its HTTP support and Active Directory integration features, if they aren't already installed.
-        #>
-        [CmdletBinding()]
-        param(
-            [Switch]
-            # Enable HTTP Support
-            $HttpSupport,
-            
-            [Switch]
-            # Enable Active Directory Integrations
-            $ActiveDirectoryIntegration
-        )
-        
-        $featureNames = @{ HttpSupport = 'MSMQ-HTTP-Support' ; ActiveDirectoryIntegration = 'MSMQ-Directory' }
-        if( $useOCSetup )
-        {
-            $featureNames = @{ HttpSupport = 'MSMQ-HTTP' ; ActiveDirectoryIntegration = 'MSMQ-ADIntegration' }
-        }
-        
-        $features = @( 'MSMQ-Server' )
-        if( $HttpSupport )
-        {
-            $features += $featureNames.HttpSupport
-        }
-        
-        if( $ActiveDirectoryIntegration )
-        {
-            $features += $featureNames.ActiveDirectoryIntegration
-        }
-
-        Install-WindowsFeatures -Features $features
-    }
-
     function Install-WindowsFeature
     {
         <#
@@ -208,19 +156,19 @@ if( (Assert-WindowsFeatureFunctionsSupported) )
         Uninstall-WindowsFeature
         
         .EXAMPLE
-        Install-WindowsFeatures -Name MSMQ-Server
+        Install-WindowsFeatures -Name TelnetClient
 
-        Installs MSMQ.
-
-        .EXAMPLE
-        Install-WindowsFeatures -Name IIS-WebServer
-
-        Installs IIS on Windows 7.
+        Installs Telnet.
 
         .EXAMPLE
-        Install-WindowsFeatures -Name Web-WebServer
+        Install-WindowsFeatures -Name TelnetClient,TFTP
 
-        Installs IIS on Windows 2008.
+        Installs Telnet and TFTP
+
+        .EXAMPLE
+        Install-WindowsFeatures -Iis
+
+        Installs IIS.
         #>
         [CmdletBinding(SupportsShouldProcess=$true,DefaultParameterSetName='ByName')]
         param(
@@ -237,20 +185,42 @@ if( (Assert-WindowsFeatureFunctionsSupported) )
             [Parameter(ParameterSetName='ByFlag')]
             [Switch]
             # Installs IIS's HTTP redirection feature.
-            $IisHttpRedirection
+            $IisHttpRedirection,
+            
+            [Parameter(ParameterSetName='ByFlag')]
+            [Switch]
+            # Installs MSMQ.
+            $Msmq,
+            
+            [Parameter(ParameterSetName='ByFlag')]
+            [Switch]
+            # Installs MSMQ HTTP support.
+            $MsmqHttpSupport,
+            
+            [Parameter(ParameterSetName='ByFlag')]
+            [Switch]
+            # Installs MSMQ Active Directory Integration.
+            $MsmqActiveDirectoryIntegration
         )
         
         if( $pscmdlet.ParameterSetName -eq 'ByFlag' )
         {
+
             $featureMap = @{
                                 Iis = 'Web-WebServer';
                                 IisHttpRedirection = 'Web-Http-Redirect';
+                                Msmq = 'MSMQ-Server';
+                                MsmqHttpSupport = 'MSMQ-HTTP-Support';
+                                MsmqActiveDirectoryIntegration = 'MSMQ-Directory';
                            }
             if( $useOCSetup )
             {
                 $featureMap = @{
                                     Iis = 'IIS-WebServer';
                                     IisHttpRedirection = 'IIS-HttpRedirect';
+                                    Msmq = 'MSMQ-Server';
+                                    MsmqHttpSupport = 'MSMQ-HTTP';
+                                    MsmqActiveDirectoryIntegration = 'MSMQ-ADIntegration';
                                }
             }
             
