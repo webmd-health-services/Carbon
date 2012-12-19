@@ -28,7 +28,7 @@ if( -not (Get-Service -Name MSMQ -ErrorAction SilentlyContinue) -and (Get-WmiObj
         if( (Get-MSMQService) )
         {
             Stop-Service $msmqServiceName -Force
-            Uninstall-WindowsFeatures -Components MSMQ-ADIntegration,MSMQ-HTTP,MSMQ-Server,MSMQ-Container
+            Uninstall-WindowsFeature -Name MSMQ-ADIntegration,MSMQ-HTTP,MSMQ-Server,MSMQ-Container
         }
         Remove-Module Carbon
     }

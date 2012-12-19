@@ -25,18 +25,18 @@ elseif( (Get-WmiObject -Class Win32_OptionalFeature -ErrorAction SilentlyContinu
 }
 else
 {
-    Write-Error "Tests for Install-WindowsFeatures not supported on this operating system."
+    Write-Error "Tests for Install-WindowsFeature not supported on this operating system."
 }
 
 function Setup
 {
     & (Join-Path $TestDir ..\..\Carbon\Import-Carbon.ps1 -Resolve)
-    Uninstall-WindowsFeatures -Features $multipleFeatures
+    Uninstall-WindowsFeature -Name $multipleFeatures
 }
 
 function Teardown
 {
-    Uninstall-WindowsFeatures -Features $multipleFeatures
+    Uninstall-WindowsFeature -Name $multipleFeatures
     Remove-Module Carbon
 }
 

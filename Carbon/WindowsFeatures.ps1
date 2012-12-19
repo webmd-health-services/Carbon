@@ -42,6 +42,53 @@ function Assert-WindowsFeatureFunctionsSupported
     return $true
 }
 
+function ConvertTo-WindowsFeatureName
+{
+    <#
+    .SYNOPSIS
+    INTERNAL.  DO NOT USE.  Converts a Carbon-specific, common Windows feature name, into the feature name used on the current computer.
+    
+    .DESCRIPTION
+    Windows feature names change between versions.  This function converts a Carbon-specific name into feature names used on the current computer's version of Windows.
+    
+    .EXAMPLE
+    ConvertTo-WindowsFeatureNames -Name 'Iis','Msmq'
+    
+    Returns `'IIS-WebServer','MSMQ-Server'` if running Windows 7/Windows 2008 R2, or `'Web-WebServer','MSMQ-Server'` if on Windows 2008.
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory=$true)]
+        [string[]]
+        # The Carbon feature names to convert to Windows-specific feature names.
+        $Name
+    )
+    
+    $featureMap = @{
+                        Iis = 'Web-WebServer';
+                        IisHttpRedirection = 'Web-Http-Redirect';
+                        Msmq = 'MSMQ-Server';
+                        MsmqHttpSupport = 'MSMQ-HTTP-Support';
+                        MsmqActiveDirectoryIntegration = 'MSMQ-Directory';
+                   }
+
+    if( $useOCSetup )
+    {
+        $featureMap = @{
+                            Iis = 'IIS-WebServer';
+                            IisHttpRedirection = 'IIS-HttpRedirect';
+                            Msmq = 'MSMQ-Server';
+                            MsmqHttpSupport = 'MSMQ-HTTP';
+                            MsmqActiveDirectoryIntegration = 'MSMQ-ADIntegration';
+                       }
+    }
+    
+    $Name | 
+        Where-Object { $featureMap.ContainsKey( $_ ) } |
+        ForEach-Object { $featureMap[$_] }
+
+}
+
 function Get-WindowsFeature
 {
     <#
@@ -156,17 +203,17 @@ if( (Assert-WindowsFeatureFunctionsSupported) )
         Uninstall-WindowsFeature
         
         .EXAMPLE
-        Install-WindowsFeatures -Name TelnetClient
+        Install-WindowsFeature -Name TelnetClient
 
         Installs Telnet.
 
         .EXAMPLE
-        Install-WindowsFeatures -Name TelnetClient,TFTP
+        Install-WindowsFeature -Name TelnetClient,TFTP
 
         Installs Telnet and TFTP
 
         .EXAMPLE
-        Install-WindowsFeatures -Iis
+        Install-WindowsFeature -Iis
 
         Installs IIS.
         #>
@@ -205,39 +252,18 @@ if( (Assert-WindowsFeatureFunctionsSupported) )
         
         if( $pscmdlet.ParameterSetName -eq 'ByFlag' )
         {
-
-            $featureMap = @{
-                                Iis = 'Web-WebServer';
-                                IisHttpRedirection = 'Web-Http-Redirect';
-                                Msmq = 'MSMQ-Server';
-                                MsmqHttpSupport = 'MSMQ-HTTP-Support';
-                                MsmqActiveDirectoryIntegration = 'MSMQ-Directory';
-                           }
-            if( $useOCSetup )
-            {
-                $featureMap = @{
-                                    Iis = 'IIS-WebServer';
-                                    IisHttpRedirection = 'IIS-HttpRedirect';
-                                    Msmq = 'MSMQ-Server';
-                                    MsmqHttpSupport = 'MSMQ-HTTP';
-                                    MsmqActiveDirectoryIntegration = 'MSMQ-ADIntegration';
-                               }
-            }
-            
-            $Name = $PSBoundParameters.Keys | 
-                        Where-Object { $featureMap.ContainsKey( $_ ) } |
-                        ForEach-Object { $featureMap[$_] }
+            $Name = ConvertTo-WindowsFeatureName -Name $PSBoundParameters.Keys
         }
         
         $componentsToInstall = $Name | 
                                     ForEach-Object {
-                                        if( -not (Test-WindowsFeature -Name $_) )
+                                        if( (Test-WindowsFeature -Name $_) )
                                         {
-                                            Write-Error ('Windows feature {0} not found.' -f $_)
+                                            $_
                                         }
                                         else
                                         {
-                                            $_
+                                            Write-Error ('Windows feature {0} not found.' -f $_)
                                         } 
                                     } |
                                     Where-Object { -not (Test-WindowsFeature -Name $_ -Installed) }
@@ -325,7 +351,7 @@ if( (Assert-WindowsFeatureFunctionsSupported) )
         }
     }
 
-    function Uninstall-WindowsFeatures
+    function Uninstall-WindowsFeature
     {
         <#
         .SYNOPSIS
@@ -346,39 +372,67 @@ if( (Assert-WindowsFeatureFunctionsSupported) )
         Test-WindowsService
 
         .EXAMPLE
-        Uninstall-WindowsFeatures -Features MSMQ-Server
+        Uninstall-WindowsFeature -Name TelnetClient,TFTP
 
-        Uninstalls MSMQ.
-
-        .EXAMPLE
-        Uninstall-WindowsFeatures -Features IIS-WebServer
-
-        Uninstalls IIS on Windows 7.
+        Uninstalls Telnet and TFTP.
 
         .EXAMPLE
-        Uninstall-WindowsFeatures -Features Web-WebServer
+        Uninstall-WindowsFeature -Iis
 
-        Uninstalls IIS on Windows 2008.
+        Uninstalls IIS.
         #>
-        [CmdletBinding(SupportsShouldProcess=$true)]
+        [CmdletBinding(SupportsShouldProcess=$true,DefaultParameterSetName='ByName')]
         param(
-            [Parameter(Mandatory=$true)]
+            [Parameter(Mandatory=$true,ParameterSetName='ByName')]
             [string[]]
             # The names of the components to uninstall/disable.  Feature names are case-sensitive.  To get a list, run `Get-WindowsFeature`.
-            $Features
+            $Name,
+            
+            [Parameter(ParameterSetName='ByFlag')]
+            [Switch]
+            # Uninstalls IIS.
+            $Iis,
+            
+            [Parameter(ParameterSetName='ByFlag')]
+            [Switch]
+            # Uninstalls IIS's HTTP redirection feature.
+            $IisHttpRedirection,
+            
+            [Parameter(ParameterSetName='ByFlag')]
+            [Switch]
+            # Uninstalls MSMQ.
+            $Msmq,
+            
+            [Parameter(ParameterSetName='ByFlag')]
+            [Switch]
+            # Uninstalls MSMQ HTTP support.
+            $MsmqHttpSupport,
+            
+            [Parameter(ParameterSetName='ByFlag')]
+            [Switch]
+            # Uninstalls MSMQ Active Directory Integration.
+            $MsmqActiveDirectoryIntegration
         )
         
-        $featuresToUninstall = @()
-        
-        foreach( $name in $Features )
+        if( $pscmdlet.ParameterSetName -eq 'ByFlag' )
         {
-            if( (Test-WindowsFeature -Name $name -Installed) )
-            {
-                $featuresToUninstall += $name
-            }
+            $Name = ConvertTo-WindowsFeatureName -Name $PSBoundParameters.Keys
         }
         
-        if( $featuresToUninstall.Length -eq 0 )
+        $featuresToUninstall = $Name | 
+                                    ForEach-Object {
+                                        if( (Test-WindowsFeature -Name $_) )
+                                        {
+                                            $_
+                                        }
+                                        else
+                                        {
+                                            Write-Error ('Windows feature ''{0}'' not found.' -f $_)
+                                        }
+                                    } |
+                                    Where-Object { Test-WindowsFeature -Name $_ -Installed }
+        
+        if( -not $featuresToUninstall -or $featuresToUninstall.Length -eq 0 )
         {
             return
         }

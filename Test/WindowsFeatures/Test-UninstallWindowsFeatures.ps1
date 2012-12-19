@@ -25,41 +25,41 @@ elseif( (Get-WmiObject -Class Win32_OptionalFeature -ErrorAction SilentlyContinu
 }
 else
 {
-    Write-Error "Tests for Install-WindowsFeatures not supported on this operating system."
+    Write-Error "Tests for Uninstall-WindowsFeature not supported on this operating system."
 }
 
 
 function Setup
 {
-    Import-Module (Join-Path $TestDir ..\..\Carbon) -Force
-    Install-WindowsFeatures -Features $multipleFeatures
+    & (Join-Path $TestDir ..\..\Carbon\Import-Carbon.ps1 -Resolve)
+    Install-WindowsFeature -Name $multipleFeatures
 }
 
 function Teardown
 {
-    Uninstall-WindowsFeatures -Features $multipleFeatures
+    Uninstall-WindowsFeature -Name $multipleFeatures
     Remove-Module Carbon
 }
 
 function Test-ShouldUninstallFeatures
 {
-    Assert-True (Test-WindowsFeature -Name $singleFeature)
-    Uninstall-WindowsFeatures -Features $singleFeature
-    Assert-False (Test-WindowsFeature -Name $singleFeature)
+    Assert-True (Test-WindowsFeature -Name $singleFeature -Installed)
+    Uninstall-WindowsFeature -Name $singleFeature
+    Assert-False (Test-WindowsFeature -Name $singleFeature -Installed)
 }
 
 function Test-ShouldUninstallMultipleFeatures
 {
-    Assert-True (Test-WindowsFeature -Name $multipleFeatures[0])
-    Assert-True (Test-WindowsFeature -Name $multipleFeatures[1])
-    Uninstall-WindowsFeatures -Features $multipleFeatures
-    Assert-False (Test-WindowsFeature -Name $multipleFeatures[0])
-    Assert-False (Test-WindowsFeature -Name $multipleFeatures[1])
+    Assert-True (Test-WindowsFeature -Name $multipleFeatures[0] -Installed)
+    Assert-True (Test-WindowsFeature -Name $multipleFeatures[1] -Installed)
+    Uninstall-WindowsFeature -Name $multipleFeatures
+    Assert-False (Test-WindowsFeature -Name $multipleFeatures[0] -Installed)
+    Assert-False (Test-WindowsFeature -Name $multipleFeatures[1] -Installed)
 }
 
 function Test-ShouldSupportWhatIf
 {
-    Assert-True (Test-WindowsFeature -Name $singleFeature)
-    Uninstall-WindowsFeatures -Features $singleFeature -WhatIf
-    Assert-True (Test-WindowsFeature -Name $singleFeature)
+    Assert-True (Test-WindowsFeature -Name $singleFeature -Installed)
+    Uninstall-WindowsFeature -Name $singleFeature -WhatIf
+    Assert-True (Test-WindowsFeature -Name $singleFeature -Installed)
 }
