@@ -1,4 +1,4 @@
-# 0.4.0.1
+# 0.4.0.1 (18 December 2012)
 
 ## Bug fixes
  * [Enable-IisSsl](http://get-carbon.org/help/Reset-MsmqQueueManagerID.html) not setting SSL flags correctly when requiring client certificates.
