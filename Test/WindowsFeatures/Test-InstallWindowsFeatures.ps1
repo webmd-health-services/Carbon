@@ -30,7 +30,7 @@ else
 
 function Setup
 {
-    Import-Module (Join-Path $TestDir ..\..\Carbon) -Force
+    & (Join-Path $TestDir ..\..\Carbon\Import-Carbon.ps1 -Resolve)
     Uninstall-WindowsFeatures -Features $multipleFeatures
 }
 
@@ -42,22 +42,22 @@ function Teardown
 
 function Test-ShouldInstallWindowsFeature
 {
-    Assert-False (Test-WindowsFeature -Name $singleFeature)
-    Install-WindowsFeatures -Features $singleFeature
-    Assert-True (Test-WindowsFeature -Name $singleFeature)
+    Assert-False (Test-WindowsFeature -Name $singleFeature -Installed)
+    Install-WindowsFeature -Name $singleFeature
+    Assert-True (Test-WindowsFeature -Name $singleFeature -Installed)
 }
 
 function Test-ShouldInstallMultipleWindowsFeatures
 {
-    Assert-False (Test-WindowsFeature -Name $multipleFeatures[0] )
-    Assert-False (Test-WindowsFeature -Name $multipleFeatures[1] )
-    Install-WindowsFeatures -Features $multipleFeatures
-    Assert-True (Test-WindowsFeature -Name $multipleFeatures[0] )
-    Assert-True (Test-WindowsFeature -Name $multipleFeatures[1] )
+    Assert-False (Test-WindowsFeature -Name $multipleFeatures[0] -Installed)
+    Assert-False (Test-WindowsFeature -Name $multipleFeatures[1] -Installed)
+    Install-WindowsFeature -Name $multipleFeatures
+    Assert-True (Test-WindowsFeature -Name $multipleFeatures[0] -Installed)
+    Assert-True (Test-WindowsFeature -Name $multipleFeatures[1] -Installed)
 }
 
 function Test-ShouldSupportWhatIf
 {
-    Install-WindowsFeatures -Features $singleFeature -WhatIf
-    Assert-False (Test-WindowsFeature -Name $singleFeature)
+    Install-WindowsFeature -Name $singleFeature -WhatIf
+    Assert-False (Test-WindowsFeature -Name $singleFeature -Installed)
 }

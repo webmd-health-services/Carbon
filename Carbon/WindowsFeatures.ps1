@@ -137,50 +137,6 @@ function Get-WindowsFeature
 
 if( (Assert-WindowsFeatureFunctionsSupported) )
 {
-    function Install-WindowsFeatureIis
-    {
-        <#
-        .SYNOPSIS
-        Installs IIS if it isn't already installed.
-
-        .DESCRIPTION
-        This function installs IIS and, optionally, the IIS HTTP redirection feature.  If a feature is already installed, nothing happens.
-
-        **NOTE: This function is only available on operating systems that have `servermanagercmd.exe` *or* `ocsetup.exe` and WMI support for the Win32_OptionalFeature class.**
-
-        .EXAMPLE
-        Install-WindowsFeatureIis
-
-        Installs IIS if it isn't already installed.
-
-        .EXAMPLE
-        Install-WindowsFeatureIis
-
-        Installs IIS and its HTTP redirection feature, if they aren't already installed.
-        #>
-        [CmdletBinding()]
-        param(
-            [Switch]
-            # Install IIS's HTTP redirection feature.
-            $HttpRedirection
-        )
-        
-        $featureNames = @{ HttpRedirection = 'Web-Http-Redirect' }
-        $features = @( 'Web-WebServer' )
-        if( $useOCSetup )
-        {
-            $features = @( 'IIS-WebServer' )
-            $featureNames = @{ HttpRedirection = 'IIS-HttpRedirect' }
-        }
-        
-        if( $HttpRedirection )
-        {
-            $features += $featureNames.HttpRedirection
-        }
-        
-        Install-WindowsFeatures -Features $features
-    }
-
     function Install-WindowsFeatureMsmq
     {
         <#
@@ -233,7 +189,7 @@ if( (Assert-WindowsFeatureFunctionsSupported) )
         Install-WindowsFeatures -Features $features
     }
 
-    function Install-WindowsFeatures
+    function Install-WindowsFeature
     {
         <#
         .SYNOPSIS
@@ -252,39 +208,71 @@ if( (Assert-WindowsFeatureFunctionsSupported) )
         Uninstall-WindowsFeature
         
         .EXAMPLE
-        Install-WindowsFeatures -Features MSMQ-Server
+        Install-WindowsFeatures -Name MSMQ-Server
 
         Installs MSMQ.
 
         .EXAMPLE
-        Install-WindowsFeatures -Features IIS-WebServer
+        Install-WindowsFeatures -Name IIS-WebServer
 
         Installs IIS on Windows 7.
 
         .EXAMPLE
-        Install-WindowsFeatures -Features Web-WebServer
+        Install-WindowsFeatures -Name Web-WebServer
 
         Installs IIS on Windows 2008.
         #>
-        [CmdletBinding(SupportsShouldProcess=$true)]
+        [CmdletBinding(SupportsShouldProcess=$true,DefaultParameterSetName='ByName')]
         param(
-            [Parameter(Mandatory=$true)]
+            [Parameter(Mandatory=$true,ParameterSetName='ByName')]
             [string[]]
             # The components to enable/install.  Feature names are case-sensitive.
-            $Features
+            $Name,
+            
+            [Parameter(ParameterSetName='ByFlag')]
+            [Switch]
+            # Installs IIS.
+            $Iis,
+            
+            [Parameter(ParameterSetName='ByFlag')]
+            [Switch]
+            # Installs IIS's HTTP redirection feature.
+            $IisHttpRedirection
         )
         
-        $componentsToInstall = @()
-        
-        foreach( $name in $Features )
+        if( $pscmdlet.ParameterSetName -eq 'ByFlag' )
         {
-            if( -not (Test-WindowsFeature -Name $name -Installed) )
+            $featureMap = @{
+                                Iis = 'Web-WebServer';
+                                IisHttpRedirection = 'Web-Http-Redirect';
+                           }
+            if( $useOCSetup )
             {
-                $componentsToInstall += $name
+                $featureMap = @{
+                                    Iis = 'IIS-WebServer';
+                                    IisHttpRedirection = 'IIS-HttpRedirect';
+                               }
             }
+            
+            $Name = $PSBoundParameters.Keys | 
+                        Where-Object { $featureMap.ContainsKey( $_ ) } |
+                        ForEach-Object { $featureMap[$_] }
         }
         
-        if( $componentsToInstall.Length -eq 0 )
+        $componentsToInstall = $Name | 
+                                    ForEach-Object {
+                                        if( -not (Test-WindowsFeature -Name $_) )
+                                        {
+                                            Write-Error ('Windows feature {0} not found.' -f $_)
+                                        }
+                                        else
+                                        {
+                                            $_
+                                        } 
+                                    } |
+                                    Where-Object { -not (Test-WindowsFeature -Name $_ -Installed) }
+       
+        if( -not $componentsToInstall -or $componentsToInstall.Length -eq 0 )
         {
             return
         }
@@ -303,7 +291,8 @@ if( (Assert-WindowsFeatureFunctionsSupported) )
                 $ocsetup = Get-Process 'ocsetup' -ErrorAction SilentlyContinue
                 if( -not $ocsetup )
                 {
-                    throw "Unable to find process 'ocsetup'.  It looks like the Windows Optional Component setup program didn't start."
+                    Write-Error "Unable to find process 'ocsetup'.  It looks like the Windows Optional Component setup program didn't start."
+                    return
                 }
                 $ocsetup.WaitForExit()
             }
