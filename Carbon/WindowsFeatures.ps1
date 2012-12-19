@@ -182,279 +182,291 @@ function Get-WindowsFeature
     }        
 }
 
-if( (Assert-WindowsFeatureFunctionsSupported) )
+function Install-WindowsFeature
 {
-    function Install-WindowsFeature
+    <#
+    .SYNOPSIS
+    Installs an optional Windows component/feature.
+
+    .DESCRIPTION
+    This function will install Windows features.  Note that the name of these features can differ between different versions of Windows. Use `Get-WindowsFeature` to get the list of features on your operating system.
+
+    .LINK
+    Get-WindowsFeature
+    
+    .LINK
+    Test-WindowsFeature
+    
+    .LINK
+    Uninstall-WindowsFeature
+    
+    .EXAMPLE
+    Install-WindowsFeature -Name TelnetClient
+
+    Installs Telnet.
+
+    .EXAMPLE
+    Install-WindowsFeature -Name TelnetClient,TFTP
+
+    Installs Telnet and TFTP
+
+    .EXAMPLE
+    Install-WindowsFeature -Iis
+
+    Installs IIS.
+    #>
+    [CmdletBinding(SupportsShouldProcess=$true,DefaultParameterSetName='ByName')]
+    param(
+        [Parameter(Mandatory=$true,ParameterSetName='ByName')]
+        [string[]]
+        # The components to enable/install.  Feature names are case-sensitive.
+        $Name,
+        
+        [Parameter(ParameterSetName='ByFlag')]
+        [Switch]
+        # Installs IIS.
+        $Iis,
+        
+        [Parameter(ParameterSetName='ByFlag')]
+        [Switch]
+        # Installs IIS's HTTP redirection feature.
+        $IisHttpRedirection,
+        
+        [Parameter(ParameterSetName='ByFlag')]
+        [Switch]
+        # Installs MSMQ.
+        $Msmq,
+        
+        [Parameter(ParameterSetName='ByFlag')]
+        [Switch]
+        # Installs MSMQ HTTP support.
+        $MsmqHttpSupport,
+        
+        [Parameter(ParameterSetName='ByFlag')]
+        [Switch]
+        # Installs MSMQ Active Directory Integration.
+        $MsmqActiveDirectoryIntegration
+    )
+    
+    if( -not (Assert-WindowsFeatureFunctionsSupported) )
     {
-        <#
-        .SYNOPSIS
-        Installs an optional Windows component/feature.
-
-        .DESCRIPTION
-        This function will install Windows features.  Note that the name of these features can differ between different versions of Windows. Use `Get-WindowsFeature` to get the list of features on your operating system.
-
-        .LINK
-        Get-WindowsFeature
-        
-        .LINK
-        Test-WindowsFeature
-        
-        .LINK
-        Uninstall-WindowsFeature
-        
-        .EXAMPLE
-        Install-WindowsFeature -Name TelnetClient
-
-        Installs Telnet.
-
-        .EXAMPLE
-        Install-WindowsFeature -Name TelnetClient,TFTP
-
-        Installs Telnet and TFTP
-
-        .EXAMPLE
-        Install-WindowsFeature -Iis
-
-        Installs IIS.
-        #>
-        [CmdletBinding(SupportsShouldProcess=$true,DefaultParameterSetName='ByName')]
-        param(
-            [Parameter(Mandatory=$true,ParameterSetName='ByName')]
-            [string[]]
-            # The components to enable/install.  Feature names are case-sensitive.
-            $Name,
-            
-            [Parameter(ParameterSetName='ByFlag')]
-            [Switch]
-            # Installs IIS.
-            $Iis,
-            
-            [Parameter(ParameterSetName='ByFlag')]
-            [Switch]
-            # Installs IIS's HTTP redirection feature.
-            $IisHttpRedirection,
-            
-            [Parameter(ParameterSetName='ByFlag')]
-            [Switch]
-            # Installs MSMQ.
-            $Msmq,
-            
-            [Parameter(ParameterSetName='ByFlag')]
-            [Switch]
-            # Installs MSMQ HTTP support.
-            $MsmqHttpSupport,
-            
-            [Parameter(ParameterSetName='ByFlag')]
-            [Switch]
-            # Installs MSMQ Active Directory Integration.
-            $MsmqActiveDirectoryIntegration
-        )
-        
-        if( $pscmdlet.ParameterSetName -eq 'ByFlag' )
-        {
-            $Name = ConvertTo-WindowsFeatureName -Name $PSBoundParameters.Keys
-        }
-        
-        $componentsToInstall = $Name | 
-                                    ForEach-Object {
-                                        if( (Test-WindowsFeature -Name $_) )
-                                        {
-                                            $_
-                                        }
-                                        else
-                                        {
-                                            Write-Error ('Windows feature {0} not found.' -f $_)
-                                        } 
-                                    } |
-                                    Where-Object { -not (Test-WindowsFeature -Name $_ -Installed) }
-       
-        if( -not $componentsToInstall -or $componentsToInstall.Length -eq 0 )
-        {
-            return
-        }
-        
-        if( $pscmdlet.ShouldProcess( "Windows feature(s) '$componentsToInstall'", "install" ) )
-        {
-            Write-Host "Installing Windows feature(s): '$componentsToInstall'."
-            if( $useServerManager )
-            {
-                servermanagercmd.exe -install $componentsToInstall
-            }
-            else
-            {
-                $featuresArg = $componentsToInstall -join ';'
-                & ocsetup.exe $featuresArg
-                $ocsetup = Get-Process 'ocsetup' -ErrorAction SilentlyContinue
-                if( -not $ocsetup )
-                {
-                    Write-Error "Unable to find process 'ocsetup'.  It looks like the Windows Optional Component setup program didn't start."
-                    return
-                }
-                $ocsetup.WaitForExit()
-            }
-        }
+        return
     }
-
-    function Test-WindowsFeature
+    
+    if( $pscmdlet.ParameterSetName -eq 'ByFlag' )
     {
-        <#
-        .SYNOPSIS
-        Tests if an optional Windows component exists and, optionally, if it is installed.
-
-        .DESCRIPTION
-        Feature names are different across different versions of Windows.  This function tests if a given feature exists.  You can also test if a feature is installed by setting the `Installed` switch.
-
-        .LINK
-        Get-WindowsFeature
-        
-        .LINK
-        Install-WindowsFeature
-        
-        .LINK
-        Uninstall-WindowsFeature
-        
-        .EXAMPLE
-        Test-WindowsFeature -Name MSMQ-Server
-
-        Tests if the MSMQ-Server feature exists on the current computer.
-
-        .EXAMPLE
-        Test-WindowsFeature -Name IIS-WebServer -Installed
-
-        Tests if the IIS-WebServer features exists and is installed/enabled.
-        #>
-        [CmdletBinding(SupportsShouldProcess=$true)]
-        param(
-            [Parameter(Mandatory=$true)]
-            [string]
-            # The name of the feature to test.  Feature names are case-sensitive and are different between different versions of Windows.  For a list, on Windows 2008, run `serveramanagercmd.exe -q`; on Windows 7, run `Get-WmiObject -Class Win32_OptionalFeature | Select-Object Name`.
-            $Name,
-            
-            [Switch]
-            # Test if the service is installed in addition to if it exists.
-            $Installed
-        )
-        
-        $feature = Get-WindowsFeature -Name $Name 
-        
-        if( $feature )
+        $Name = ConvertTo-WindowsFeatureName -Name $PSBoundParameters.Keys
+    }
+    
+    $componentsToInstall = $Name | 
+                                ForEach-Object {
+                                    if( (Test-WindowsFeature -Name $_) )
+                                    {
+                                        $_
+                                    }
+                                    else
+                                    {
+                                        Write-Error ('Windows feature {0} not found.' -f $_)
+                                    } 
+                                } |
+                                Where-Object { -not (Test-WindowsFeature -Name $_ -Installed) }
+   
+    if( -not $componentsToInstall -or $componentsToInstall.Length -eq 0 )
+    {
+        return
+    }
+    
+    if( $pscmdlet.ShouldProcess( "Windows feature(s) '$componentsToInstall'", "install" ) )
+    {
+        Write-Host "Installing Windows feature(s): '$componentsToInstall'."
+        if( $useServerManager )
         {
-            if( $Installed )
-            {
-                return $feature.Installed
-            }
-            return $true
+            servermanagercmd.exe -install $componentsToInstall
         }
         else
         {
-            return $false
+            $featuresArg = $componentsToInstall -join ';'
+            & ocsetup.exe $featuresArg
+            $ocsetup = Get-Process 'ocsetup' -ErrorAction SilentlyContinue
+            if( -not $ocsetup )
+            {
+                Write-Error "Unable to find process 'ocsetup'.  It looks like the Windows Optional Component setup program didn't start."
+                return
+            }
+            $ocsetup.WaitForExit()
         }
     }
+}
 
-    function Uninstall-WindowsFeature
+function Test-WindowsFeature
+{
+    <#
+    .SYNOPSIS
+    Tests if an optional Windows component exists and, optionally, if it is installed.
+
+    .DESCRIPTION
+    Feature names are different across different versions of Windows.  This function tests if a given feature exists.  You can also test if a feature is installed by setting the `Installed` switch.
+
+    .LINK
+    Get-WindowsFeature
+    
+    .LINK
+    Install-WindowsFeature
+    
+    .LINK
+    Uninstall-WindowsFeature
+    
+    .EXAMPLE
+    Test-WindowsFeature -Name MSMQ-Server
+
+    Tests if the MSMQ-Server feature exists on the current computer.
+
+    .EXAMPLE
+    Test-WindowsFeature -Name IIS-WebServer -Installed
+
+    Tests if the IIS-WebServer features exists and is installed/enabled.
+    #>
+    [CmdletBinding(SupportsShouldProcess=$true)]
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]
+        # The name of the feature to test.  Feature names are case-sensitive and are different between different versions of Windows.  For a list, on Windows 2008, run `serveramanagercmd.exe -q`; on Windows 7, run `Get-WmiObject -Class Win32_OptionalFeature | Select-Object Name`.
+        $Name,
+        
+        [Switch]
+        # Test if the service is installed in addition to if it exists.
+        $Installed
+    )
+    
+    if( -not (Assert-WindowsFeatureFunctionsSupported) )
     {
-        <#
-        .SYNOPSIS
-        Uninstalls optional Windows components/features.
-
-        .DESCRIPTION
-        The names of the features are different on different versions of Windows.  For a list, run `Get-WindowsService`.
-
-        Feature names are case-sensitive.  If a feature is already uninstalled, nothing happens.
-        
-        .LINK
-        Get-WindowsFeature
-        
-        .LINK
-        Install-WindowsService
-        
-        .LINK
-        Test-WindowsService
-
-        .EXAMPLE
-        Uninstall-WindowsFeature -Name TelnetClient,TFTP
-
-        Uninstalls Telnet and TFTP.
-
-        .EXAMPLE
-        Uninstall-WindowsFeature -Iis
-
-        Uninstalls IIS.
-        #>
-        [CmdletBinding(SupportsShouldProcess=$true,DefaultParameterSetName='ByName')]
-        param(
-            [Parameter(Mandatory=$true,ParameterSetName='ByName')]
-            [string[]]
-            # The names of the components to uninstall/disable.  Feature names are case-sensitive.  To get a list, run `Get-WindowsFeature`.
-            $Name,
-            
-            [Parameter(ParameterSetName='ByFlag')]
-            [Switch]
-            # Uninstalls IIS.
-            $Iis,
-            
-            [Parameter(ParameterSetName='ByFlag')]
-            [Switch]
-            # Uninstalls IIS's HTTP redirection feature.
-            $IisHttpRedirection,
-            
-            [Parameter(ParameterSetName='ByFlag')]
-            [Switch]
-            # Uninstalls MSMQ.
-            $Msmq,
-            
-            [Parameter(ParameterSetName='ByFlag')]
-            [Switch]
-            # Uninstalls MSMQ HTTP support.
-            $MsmqHttpSupport,
-            
-            [Parameter(ParameterSetName='ByFlag')]
-            [Switch]
-            # Uninstalls MSMQ Active Directory Integration.
-            $MsmqActiveDirectoryIntegration
-        )
-        
-        if( $pscmdlet.ParameterSetName -eq 'ByFlag' )
+        return
+    }
+    
+    $feature = Get-WindowsFeature -Name $Name 
+    
+    if( $feature )
+    {
+        if( $Installed )
         {
-            $Name = ConvertTo-WindowsFeatureName -Name $PSBoundParameters.Keys
+            return $feature.Installed
         }
+        return $true
+    }
+    else
+    {
+        return $false
+    }
+}
+
+function Uninstall-WindowsFeature
+{
+    <#
+    .SYNOPSIS
+    Uninstalls optional Windows components/features.
+
+    .DESCRIPTION
+    The names of the features are different on different versions of Windows.  For a list, run `Get-WindowsService`.
+
+    Feature names are case-sensitive.  If a feature is already uninstalled, nothing happens.
+    
+    .LINK
+    Get-WindowsFeature
+    
+    .LINK
+    Install-WindowsService
+    
+    .LINK
+    Test-WindowsService
+
+    .EXAMPLE
+    Uninstall-WindowsFeature -Name TelnetClient,TFTP
+
+    Uninstalls Telnet and TFTP.
+
+    .EXAMPLE
+    Uninstall-WindowsFeature -Iis
+
+    Uninstalls IIS.
+    #>
+    [CmdletBinding(SupportsShouldProcess=$true,DefaultParameterSetName='ByName')]
+    param(
+        [Parameter(Mandatory=$true,ParameterSetName='ByName')]
+        [string[]]
+        # The names of the components to uninstall/disable.  Feature names are case-sensitive.  To get a list, run `Get-WindowsFeature`.
+        $Name,
         
-        $featuresToUninstall = $Name | 
-                                    ForEach-Object {
-                                        if( (Test-WindowsFeature -Name $_) )
-                                        {
-                                            $_
-                                        }
-                                        else
-                                        {
-                                            Write-Error ('Windows feature ''{0}'' not found.' -f $_)
-                                        }
-                                    } |
-                                    Where-Object { Test-WindowsFeature -Name $_ -Installed }
+        [Parameter(ParameterSetName='ByFlag')]
+        [Switch]
+        # Uninstalls IIS.
+        $Iis,
         
-        if( -not $featuresToUninstall -or $featuresToUninstall.Length -eq 0 )
+        [Parameter(ParameterSetName='ByFlag')]
+        [Switch]
+        # Uninstalls IIS's HTTP redirection feature.
+        $IisHttpRedirection,
+        
+        [Parameter(ParameterSetName='ByFlag')]
+        [Switch]
+        # Uninstalls MSMQ.
+        $Msmq,
+        
+        [Parameter(ParameterSetName='ByFlag')]
+        [Switch]
+        # Uninstalls MSMQ HTTP support.
+        $MsmqHttpSupport,
+        
+        [Parameter(ParameterSetName='ByFlag')]
+        [Switch]
+        # Uninstalls MSMQ Active Directory Integration.
+        $MsmqActiveDirectoryIntegration
+    )
+    
+    if( -not (Assert-WindowsFeatureFunctionsSupported) )
+    {
+        return
+    }
+    
+    if( $pscmdlet.ParameterSetName -eq 'ByFlag' )
+    {
+        $Name = ConvertTo-WindowsFeatureName -Name $PSBoundParameters.Keys
+    }
+    
+    $featuresToUninstall = $Name | 
+                                ForEach-Object {
+                                    if( (Test-WindowsFeature -Name $_) )
+                                    {
+                                        $_
+                                    }
+                                    else
+                                    {
+                                        Write-Error ('Windows feature ''{0}'' not found.' -f $_)
+                                    }
+                                } |
+                                Where-Object { Test-WindowsFeature -Name $_ -Installed }
+    
+    if( -not $featuresToUninstall -or $featuresToUninstall.Length -eq 0 )
+    {
+        return
+    }
+        
+    if( $pscmdlet.ShouldProcess( "Windows feature(s) '$featuresToUninstall'", "uninstall" ) )
+    {
+        Write-Host "Uninstalling Windows feature(s): '$featuresToUninstall'."
+        if( $useServerManager )
         {
-            return
+            & servermanagercmd.exe -remove $featuresToUninstall
         }
-            
-        if( $pscmdlet.ShouldProcess( "Windows feature(s) '$featuresToUninstall'", "uninstall" ) )
+        else
         {
-            Write-Host "Uninstalling Windows feature(s): '$featuresToUninstall'."
-            if( $useServerManager )
+            $featuresArg = $featuresToUninstall -join ';'
+            & ocsetup.exe $featuresArg /uninstall
+            $ocsetup = Get-Process 'ocsetup' -ErrorAction SilentlyContinue
+            if( -not $ocsetup )
             {
-                & servermanagercmd.exe -remove $featuresToUninstall
+                throw "Unable to find process 'ocsetup'.  It looks like the Windows Optional Component setup program didn't start."
             }
-            else
-            {
-                $featuresArg = $featuresToUninstall -join ';'
-                & ocsetup.exe $featuresArg /uninstall
-                $ocsetup = Get-Process 'ocsetup' -ErrorAction SilentlyContinue
-                if( -not $ocsetup )
-                {
-                    throw "Unable to find process 'ocsetup'.  It looks like the Windows Optional Component setup program didn't start."
-                }
-                $ocsetup.WaitForExit()
-            }
+            $ocsetup.WaitForExit()
         }
     }
 }

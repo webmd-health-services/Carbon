@@ -5,7 +5,7 @@
  * Rename usages of `Install-WindowsFeatures` with [Install-WindowsFeature](http://get-carbon.org/help/Install-WindowsFeature.html).  Also, rename usages of the `Features` parameter to `Name`.
  * Rename usages of `Uninstall-WindowsFeatures` with [Uninstall-WindowsFeature](http://get-carbon.org/help/Install-WindowsFeature.html).  Also, rename usages of the `Features` parameter to `Name`.
  * Replace usages of `Install-WindowsFeatureIis` with `[Install-WindowsFeature](http://get-carbon.org/help/Install-WindowsFeature.html) -Iis`.  You can use the `IisHttpRedirection` switch to install IIS HTTP redirection.
- * Replace usages of `Install-WindowsFeatureMsmq` with `[Install-WindowsFeature](http://get-carbon.org/help/Install-WindowsFeature.html) -Msmq`.  You can use the `MsmqHttpSupport` and `MsmqActiveDirectoryIntegration` 
+ * Replace usages of `Install-WindowsFeatureMsmq` with `[Install-WindowsFeature](http://get-carbon.org/help/Install-WindowsFeature.html) -Msmq`.  You can use the `MsmqHttpSupport` and `MsmqActiveDirectoryIntegration`.
  
 ## Enhancements
  * Created new [Get-WindowsFeature](http://get-carbon.org/help/Get-WindowsFeature.html) function for getting a list of available Windows features.
@@ -17,6 +17,7 @@
  * `Uninstall-WindowsFeatures` renamed to [Uninstall-WindowsFeature](http://get-carbon.org/help/Uninstall-WindowsFeature.html).
  * Renamed [Uninstall-WindowsFeature](http://get-carbon.org/help/Uninstall-WindowsFeature.html)'s `Features` parameter to `Name`.
  * Added `Iis`, `IisHttpRedirection`, `Msmq`, `MsmqHttpSupport`, and `HttpActiveDirectoryIntegration` switches to [Uninstall-WindowsFeature](http://get-carbon.org/help/Uninstall-WindowsFeature.html).
+ * [Install-WindowsFeature](http://get-carbon.org/help/Install-WindowsFeature.html), [Test-WindowsFeature](http://get-carbon.org/help/Test-WindowsFeature.html), and [Uninstall-WindowsFeature](http://get-carbon.org/help/Uninstall-WindowsFeature.html) are now available even if the current operating system doesn't support managing Windows features.  They don't do anything in those situations, but they exist.
 
 # 0.4.0.1 (18 December 2012)
 
