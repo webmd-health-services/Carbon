@@ -42,100 +42,101 @@ function Assert-WindowsFeatureFunctionsSupported
     return $true
 }
 
+function Get-WindowsFeature
+{
+    <#
+    .SYNOPSIS
+    Gets a list of available Windows features, or details on a specific windows feature.
+    
+    .DESCRIPTION
+    Different versions of Windows use different names for installing Windows features.  Use this function to get the list of functions for your operating system.
+    
+    With no arguments, will return a list of all Windows features.  You can use the `Name` parameter to return a specific feature or a list of features that match a wildcard.
+    
+    .OUTPUTS
+    [PsObject].  A generic PsObject with properties DisplayName, Name, and Installed.
+    
+    .LINK
+    Install-WindowsFeature
+    
+    .LINK
+    Test-WindowsFeature
+    
+    .LINK
+    Uninstall-WindowsFeature
+    
+    .EXAMPLE
+    Get-WindowsFeature
+    
+    Returns a list of all available Windows features.
+    
+    .EXAMPLE
+    Get-WindowsFeature -Name MSMQ
+    
+    Returns the MSMQ feature.
+    
+    .EXAMPLE
+    Get-WindowsFeature -Name *msmq*
+    
+    Returns any Windows feature whose name matches the wildcard `*msmq*`.
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter()]
+        [string]
+        # The feature name to return.  Can be a wildcard.
+        $Name
+    )
+    
+    if( -not (Assert-WindowsFeatureFunctionsSupported) )
+    {
+        return
+    }
+    
+    if( $useOCSetup )
+    {
+        Get-WmiObject -Class Win32_OptionalFeature |
+            Where-Object {
+                if( $Name )
+                {
+                    return ($_.Name -like $Name)
+                }
+                else
+                {
+                    return $true
+                }
+            } |
+            ForEach-Object {
+                $properties = @{
+                    Installed = ($_.InstallState -eq 1);
+                    Name = $_.Name;
+                    DisplayName = $_.Caption;
+                }
+                New-Object PsObject -Property $properties
+            }
+    }
+    elseif( $useSetupManager )
+    {
+        servermanagercmd.exe -query | 
+            Where-Object { $_ -like ('*[{0}]*' -f $Name) } |
+            Where-Object { $_ -match '\[(X| )\] ([^[]+) \[(.+)\]' } | 
+            ForEach-Object { 
+                $properties = @{ 
+                    Installed = ($matches[1] -eq 'X'); 
+                    Name = $matches[3]
+                    DisplayName = $matches[2]; 
+                }
+                New-Object PsObject -Property $properties
+           }
+    }
+    else
+    {
+        Write-Error $supportNotFoundErrorMessage
+    }        
+}
 
 if( (Assert-WindowsFeatureFunctionsSupported) )
 {
-
-    function Get-WindowsFeature
-    {
-        <#
-        .SYNOPSIS
-        Gets a list of available Windows features, or details on a specific windows feature.
-        
-        .DESCRIPTION
-        Different versions of Windows use different names for installing Windows features.  Use this function to get the list of functions for your operating system.
-        
-        With no arguments, will return a list of all Windows features.  You can use the `Name` parameter to return a specific feature or a list of features that match a wildcard.
-        
-        .OUTPUTS
-        [PsObject].  A generic PsObject with properties DisplayName, Name, and Installed.
-        
-        .LINK
-        Install-WindowsFeature
-        
-        .LINK
-        Uninstall-WindowsFeature
-        
-        .EXAMPLE
-        Get-WindowsFeature
-        
-        Returns a list of all available Windows features.
-        
-        .EXAMPLE
-        Get-WindowsFeature -Name MSMQ
-        
-        Returns the MSMQ feature.
-        
-        .EXAMPLE
-        Get-WindowsFeature -Name *msmq*
-        
-        Returns any Windows feature whose name matches the wildcard `*msmq*`.
-        #>
-        [CmdletBinding()]
-        param(
-            [Parameter()]
-            [string]
-            # The feature name to return.  Can be a wildcard.
-            $Name
-        )
-        
-        if( -not (Assert-WindowsFeatureFunctionsSupported) )
-        {
-            return
-        }
-        
-        if( $useOCSetup )
-        {
-            Get-WmiObject -Class Win32_OptionalFeature |
-                Where-Object {
-                    if( $Name )
-                    {
-                        return ($_.Name -like $Name)
-                    }
-                    else
-                    {
-                        return $true
-                    }
-                } |
-                ForEach-Object {
-                    $properties = @{
-                        Installed = ($_.InstallState -eq 1);
-                        Name = $_.Name;
-                        DisplayName = $_.Caption;
-                    }
-                    New-Object PsObject -Property $properties
-                }
-        }
-        elseif( $useSetupManager )
-        {
-            servermanagercmd.exe -query | 
-                Where-Object { $_ -like ('*[{0}]*' -f $Name) } |
-                Where-Object { $_ -match '\[(X| )\] ([^[]+) \[(.+)\]' } | 
-                ForEach-Object { 
-                    $properties = @{ 
-                        Installed = ($matches[1] -eq 'X'); 
-                        Name = $matches[3]
-                        DisplayName = $matches[2]; 
-                    }
-                    New-Object PsObject -Property $properties
-               }
-        }
-        else
-        {
-            Write-Error $supportNotFoundErrorMessage
-        }        
-    }
-    
     function Install-WindowsFeatureIis
     {
         <#
@@ -239,19 +240,17 @@ if( (Assert-WindowsFeatureFunctionsSupported) )
         Installs an optional Windows component/feature.
 
         .DESCRIPTION
-        This function will install Windows features.  Note that the name of these features can differ between different versions of Windows.
+        This function will install Windows features.  Note that the name of these features can differ between different versions of Windows. Use `Get-WindowsFeature` to get the list of features on your operating system.
 
-        On Windows 2008, run the following for a list:
-
-            servermanagercmd.exe -q  
-
-        On Windows7, run:
-
-            Get-WmiObject -Class Win32_OptionalFeature | Select-Object Name
-
-        This function should be considered an internal, private function.  It would be best to use one of the feature-specifc `Install-WindowsFeature*` 
-        functions.  These are designed to be Windows-version agnostic.
-
+        .LINK
+        Get-WindowsFeature
+        
+        .LINK
+        Test-WindowsFeature
+        
+        .LINK
+        Uninstall-WindowsFeature
+        
         .EXAMPLE
         Install-WindowsFeatures -Features MSMQ-Server
 
@@ -271,7 +270,7 @@ if( (Assert-WindowsFeatureFunctionsSupported) )
         param(
             [Parameter(Mandatory=$true)]
             [string[]]
-            # The components to enable/install.  Feature names are case-sensitive.  If on Windows 2008, run `servermanagercmd.exe -q` for a list.  On Windows 7, run `Get-WmiObject -Class Win32_OptionalFeature | Select-Object Name`.
+            # The components to enable/install.  Feature names are case-sensitive.
             $Features
         )
         
@@ -374,17 +373,18 @@ if( (Assert-WindowsFeatureFunctionsSupported) )
         Uninstalls optional Windows components/features.
 
         .DESCRIPTION
-        The names of the features are different on different versions of Windows.  For a list, run the following commands:
-
-        On Windows 2008:
-
-            serveramanagercmd.exe -q
-
-        One Windows 7:
-
-            Get-WmiObject -Class Win32_OptionalFeature | Select-Object Name
+        The names of the features are different on different versions of Windows.  For a list, run `Get-WindowsService`.
 
         Feature names are case-sensitive.  If a feature is already uninstalled, nothing happens.
+        
+        .LINK
+        Get-WindowsFeature
+        
+        .LINK
+        Install-WindowsService
+        
+        .LINK
+        Test-WindowsService
 
         .EXAMPLE
         Uninstall-WindowsFeatures -Features MSMQ-Server
@@ -405,7 +405,7 @@ if( (Assert-WindowsFeatureFunctionsSupported) )
         param(
             [Parameter(Mandatory=$true)]
             [string[]]
-            # The names of the components to uninstall/disable.  Feature names are case-sensitive.  The names are different between Windows versions.  For a list, on Windows 2008, run `serveramanagercmd.exe -q`; on Windows 7, run `Get-WmiObject -Class Win32_OptionalFeature | Select-Object Name`.
+            # The names of the components to uninstall/disable.  Feature names are case-sensitive.  To get a list, run `Get-WindowsFeature`.
             $Features
         )
         
