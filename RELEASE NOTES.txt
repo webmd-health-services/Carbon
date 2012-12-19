@@ -1,3 +1,12 @@
+# 0.4.1.0
+
+## Upgrade Instructions
+ * [Test-WindowsFeature](http://get-carbon.org/help/Test-WindowsFeature.html) tests if a Windows feature exists, instead of if it is installed.  To maintain backwards-compatibility, add the new `Installed` switch.
+
+## Enhancements
+ * Created new [Get-WindowsFeature](http://get-carbon.org/help/Get-WindowsFeature.html) function for getting a list of available Windows features.
+ * [Test-WindowsFeature](http://get-carbon.org/help/Test-WindowsFeature.html) now tests if a Windows feature exists, instead of if it is installed.  Added an `Installed` switch to detect if a feature exists *and* if it is installed.
+
 # 0.4.0.1 (18 December 2012)
 
 ## Bug fixes

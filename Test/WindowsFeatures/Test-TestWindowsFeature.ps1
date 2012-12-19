@@ -23,62 +23,31 @@ function TearDown
 }
 
 
-if( (Get-Command servermanagercmd.exe -ErrorAction SilentlyContinue) )
+function Test-ShouldDetectInstalledFeature
 {
-    function Test-ShouldDetectInstalledFeature
-    {
-        $installedFeatures = servermanagercmd.exe -q
-        foreach( $line in $installedFeatures )
-        {
-            if( $line -match 'X\].*\[(.+?)\]$' )
-            {
-                $featureName = $matches[1]
-                Assert-NotEmpty $featureName
-                Assert-True (Test-WindowsFeature -Name $featureName)
-                break
-            }
+    Get-WindowsFeature | 
+        Where-Object { $_.Installed } |
+        ForEach-Object {
+            Assert-True (Test-WindowsFeature -Name $_.Name -Installed)
         }
-    }
-    
-    function Test-ShouldDetectUninstalledFeature
-    {
-        $installedFeatures = servermanagercmd.exe -q
-        foreach( $line in $installedFeatures )
-        {
-            if( $line -match ' \].*\[(.+?)\]$' )
-            {
-                $featureName = $matches[1]
-                Assert-NotEmpty $featureName
-                Assert-False (Test-WindowsFeature -Name $featureName)
-                break
-            }
-        }
-    }
 }
-elseif( (Get-WmiObject -Class Win32_OptionalFeatures -ErrorAction SilentlyContinue) )
-{
-    function Test-ShouldDetectInstalledFeature
-    {
-        $components = Get-WmiObject -Query "select Name,InstallState from Win32_OptionalFeature where InstallState=1"
-        foreach( $component in $components )
-        {
-            $installed = Test-WindowsFeatures -Name $component.Name
-            Assert-True $installed "for component '$($component.Name)'"
-        }
-    }
-    
-    function Test-ShouldDetectUninstalledFeature
-    {
-        $components = Get-WmiObject -Query "select Name,InstallState from Win32_OptionalFeature where InstallState=2"
-        foreach( $component in $components )
-        {
-            $installed = Test-WindowsFeatures -Name $component.Name
-            Assert-False $installed
-        }
-    }
 
-}
-else
+function Test-ShouldDetectUninstalledFeature
 {
-    Write-Error 'Unable to test Test-WindowsFeature on this machine.'
+    Get-WindowsFeature | 
+        Where-Object { -not $_.Installed } |
+        ForEach-Object {
+            Assert-False (Test-WindowsFeature -Name $_.Name -Installed)
+        }
+}
+
+function Test-ShouldDetectFeatures
+{
+    Get-WindowsFeature |
+        ForEach-Object { Assert-True (Test-WindowsFeature -Name $_.Name) }
+}
+
+function Test-ShouldNotDetectFeature
+{
+    Assert-False (Test-WindowsFeature -Name 'IDoNotExist')
 }

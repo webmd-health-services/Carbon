@@ -49,8 +49,8 @@ if( -not (Get-Service -Name MSMQ -ErrorAction SilentlyContinue) -and (Get-WmiObj
         Assert-MSMQNotInstalled
         Install-MSMQ -HttpSupport -ActiveDirectoryIntegration -DTC
         Assert-MSMQInstalled
-        Assert-True (Test-WindowsFeatures MSMQ-ADIntegration)
-        Assert-True (Test-WindowsFeatures MSMQ-HTTP)
+        Assert-True (Test-WindowsFeatures MSMQ-ADIntegration -Installed)
+        Assert-True (Test-WindowsFeatures MSMQ-HTTP -Installed)
         
         $dtcSvc = Get-Service -Name MSDTC
         Assert-Equal 'Automatic' $dtcSvc.StartMode
@@ -68,8 +68,8 @@ if( -not (Get-Service -Name MSMQ -ErrorAction SilentlyContinue) -and (Get-WmiObj
     {
         Assert-FileExists $msmqPath
         Assert-NotNull (Get-MSMQService)
-        Assert-True (Test-WindowsFeatures MSMQ-Container)
-        Assert-True (Test-WindowsFeatures MSMQ-Server)
+        Assert-True (Test-WindowsFeatures MSMQ-Container -Installed)
+        Assert-True (Test-WindowsFeatures MSMQ-Server -Installed)
     }
 
     function Assert-MSMQNotInstalled
