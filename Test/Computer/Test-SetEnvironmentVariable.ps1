@@ -21,44 +21,53 @@ function Setup
 
 function TearDown
 {
-    @( 'Machine', 'User', 'Process' ) | % { Remove-EnvironmentVariable -Name $EnvVarName -Scope $_ }
+    @( 'Computer', 'User', 'Process' ) | 
+        ForEach-Object { 
+            $removeArgs = @{ "For$_" = $true; }
+            Remove-EnvironmentVariable -Name $EnvVarName @removeArgs
+        }
     Remove-Module Carbon
 }
 
 function Set-TestEnvironmentVariable($Scope)
 {
     $value = [Guid]::NewGuid().ToString()
-    Set-EnvironmentVariable -Name $EnvVarName -Value $value -Scope $Scope
+    $setArgs = @{ "For$Scope" = $true }
+    Set-EnvironmentVariable -Name $EnvVarName -Value $value @setArgs
     Assert-TestEnvironmentVariableIs -ExpectedValue $value -Scope $Scope
     return $value
 }
 
-function Test-ShouldSetEnvironmentVariableAtMachineScope
+function Test-ShouldSetEnvironmentVariableAtComputerScope
 {
-    Set-TestEnvironmentVariable -Scope Machine
+    Set-TestEnvironmentVariable -Scope Computer
 }
 
 function Test-ShouldSetEnvironmentVariableAtUserScope
 {
     Set-TestEnvironmentVariable -Scope User
-    Assert-TestEnvironmentVariableIs -ExpectedValue $null -Scope 'Machine'
+    Assert-TestEnvironmentVariableIs -ExpectedValue $null -Scope 'Computer'
 }
 
 function Test-ShouldSetEnvironmentVariableAtProcessScope
 {
     Set-TestEnvironmentVariable -Scope Process
-    Assert-TestEnvironmentVariableIs -ExpectedValue $null -Scope 'Machine'
+    Assert-TestEnvironmentVariableIs -ExpectedValue $null -Scope 'Computer'
     Assert-TestEnvironmentVariableIs -ExpectedValue $null -Scope 'User'
 }
 
 function Test-ShouldNotSetVariableIfWhatIf
 {
-    Set-EnvironmentVariable -Name $EnvVarName -Value 'Doesn''t matter.' -Scope 'Process' -WhatIf
+    Set-EnvironmentVariable -Name $EnvVarName -Value 'Doesn''t matter.' -ForProcess -WhatIf
     Assert-TestEnvironmentVariableIs -ExpectedValue $null -Scope 'Process'
 }
 
 function Assert-TestEnvironmentVariableIs($ExpectedValue, $Scope)
 {
+    if( $Scope -eq 'Computer' )
+    {
+        $Scope = 'Machine'
+    }
     $actualValue = [Environment]::GetEnvironmentVariable($EnvVarName, $Scope)
     Assert-Equal $ExpectedValue $actualValue "Environment variable not set at $Scope scope."
     

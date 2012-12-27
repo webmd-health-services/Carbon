@@ -16,12 +16,16 @@ $EnvVarName = "CarbonRemoveEnvironmentVar"
 
 function Setup
 {
-    Import-Module (Join-Path $TestDir ..\..\Carbon)
+    & (Join-Path $TestDir ..\..\Carbon\Import-Carbon.ps1 -Resolve)
 }
 
 function TearDown
 {
-    @( 'Machine', 'User', 'Process') | % { Remove-EnvironmentVariable -Name $EnvVarName -Scope $_ }
+    @( 'Computer', 'User', 'Process') | 
+        ForEach { 
+            $removeArgs = @{ "For$_" = $true; }
+            Remove-EnvironmentVariable -Name $EnvVarName @removeArgs
+        }
     Remove-Module Carbon
 }
 
@@ -39,7 +43,7 @@ function Set-TestEnvironmentVariable($Scope)
 function Test-ShouldRemoveMachineEnvironmentVar
 {
     Set-TestEnvironmentVariable 'Machine'
-    Remove-EnvironmentVariable -Name $EnvVarName -Scope Machine
+    Remove-EnvironmentVariable -Name $EnvVarName -ForComputer
     Assert-NoTestEnvironmentVariableAt -Scope Machine
 }
 
@@ -49,7 +53,7 @@ function Test-ShouldRemoveUserEnvironmentVar
     
     Assert-NoTestEnvironmentVariableAt -Scope Machine
     
-    Remove-EnvironmentVariable -Name $EnvVarName -Scope User
+    Remove-EnvironmentVariable -Name $EnvVarName -ForUser
 
     Assert-NoTestEnvironmentVariableAt -Scope User
 }
@@ -61,21 +65,21 @@ function Test-ShouldRemoveProcessEnvironmentVar
     Assert-NoTestEnvironmentVariableAt -Scope Machine
     Assert-NoTestEnvironmentVariableAt -Scope User
     
-    Remove-EnvironmentVariable -Name $EnvVarName -Scope Process
+    Remove-EnvironmentVariable -Name $EnvVarName -ForProcess
 
     Assert-NoTestEnvironmentVariableAt -Scope Process
 }
 
 function Test-ShouldRemoveNonExistentEnvironmentVar
 {
-    Remove-EnvironmentVariable -Name "IDoNotExist" -Scope Machine
+    Remove-EnvironmentVariable -Name "IDoNotExist" -ForComputer
 }
 
 function Test-ShouldSupportWhatIf
 {
     $envVarValue = Set-TestEnvironmentVariable -Scope Process
     
-    Remove-EnvironmentVariable -Name $EnvVarName -Scope Process -WhatIf
+    Remove-EnvironmentVariable -Name $EnvVarName -ForProcess -WhatIf
     
     $actualValue = [Environment]::GetEnvironmentVariable($EnvVarName, 'Process') 
     Assert-NotNull $actualValue "WhatIf parameter resulted in environment variable being deleted."
