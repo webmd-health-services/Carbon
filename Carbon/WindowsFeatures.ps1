@@ -29,6 +29,14 @@ function Assert-WindowsFeatureFunctionsSupported
     <#
     .SYNOPSIS
     Asserts if Windows feature functions are supported.  If not, writes a warning and returns false.
+    
+    .DESCRIPTION 
+    This is an internal function which is used to determine if the current operating system has tools installed which Carbon can use to manage Windows features.  On Windows 2008/Vista, the `servermanagercmd.exe` console program is used.  On Windows 2008 R2/7, the `ocsetup.exe` console program is used.
+    
+    .EXAMPLE
+    Assert-WindowsFeatureFunctionsSupported
+    
+    Writes an error and returns `false` if support for managing functions isn't found.
     #>
     [CmdletBinding()]
     param(
