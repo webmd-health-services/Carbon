@@ -60,15 +60,22 @@ function Enable-IisSecurityAuthentication
         [Parameter(Mandatory=$true,ParameterSetName='Basic')]
         [Switch]
         # Enable basic authentication.
-        $Basic
+        $Basic,
+        
+        [Parameter(Mandatory=$true,ParameterSetName='Windows')]
+        [Switch]
+        # Enable Windows authentication.
+        $Windows
     )
     
-    $getArgs = @{ $pscmdlet.ParameterSetName = $true; }
+    $authType = $pscmdlet.ParameterSetName
+    $getArgs = @{ $authType = $true; }
     $authSettings = Get-IisSecurityAuthentication -SiteName $SiteName -Path $Path @getArgs
     $authSettings.SetAttributeValue('enabled', 'true')
     
-    if( $pscmdlet.ShouldProcess( "$SiteName/$Path", ("enable {0}" -f $pscmdlet.ParameterSetName) ) )
+    if( $pscmdlet.ShouldProcess( "$SiteName/$Path", ("enable {0}" -f $authType) ) )
     {
+        Write-Host ('IIS:{0}/{1}: enabling {2} authentication' -f $SiteName,$Path,$authType)
         $authSettings.CommitChanges()
     }
 }

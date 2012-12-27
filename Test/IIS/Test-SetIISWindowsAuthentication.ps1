@@ -18,7 +18,7 @@ $webConfigPath = Join-Path $TestDir web.config
 
 function Setup
 {
-    Import-Module (Join-Path $TestDir ..\..\Carbon) -Force
+    & (Join-Path $TestDir ..\..\Carbon\Import-Carbon.ps1 -Resolve)
     Remove-IisWebsite $siteName
     Install-IisWebsite -Name $siteName -Path $TestDir -Bindings "http://*:$sitePort"
     if( Test-Path $webConfigPath -PathType Leaf )
@@ -35,41 +35,39 @@ function TearDown
 
 function Test-ShouldEnableWindowsAuthentication
 {
-    Set-IISWindowsAuthentication -SiteName $siteName
-    Assert-WindowsAuthentication -Enabled 'true'
+    Set-IisWindowsAuthentication -SiteName $siteName
+    Assert-WindowsAuthentication -KernelMode $true
     Assert-FileDoesNotExist $webConfigPath 
 }
 
 function Test-ShouldEnableKernelMode
 {
-    Set-IISWindowsAuthentication -SiteName $siteName -UseKernelMode
-    Assert-WindowsAuthentication -Enabled 'true' -UseKernelMode 'true'
+    Set-IisWindowsAuthentication -SiteName $siteName
+    Assert-WindowsAuthentication -KernelMode $true
 }
 
-function Test-ShouldEnableWindowsAuthenticationOnSubFolders
+function Test-SetWindowsAuthenticationOnSubFolders
 {
-    Set-IISWindowsAuthentication -SiteName $siteName -Path SubFolder
-    Assert-WindowsAuthentication -Path "$siteName/SubFolder" -Enabled 'true'
+    Set-IisWindowsAuthentication -SiteName $siteName -Path SubFolder
+    Assert-WindowsAuthentication -Path SubFolder -KernelMode $true
 }
 
-function Test-ShouldDisableWindowsAuthentication
+function Test-ShouldDisableKernelMode
 {
-    Set-IISWindowsAuthentication -SiteName $siteName -Disabled
-    Assert-WindowsAuthentication -Enabled 'false'
+    Set-IisWindowsAuthentication -SiteName $siteName -DisableKernelMode
+    Assert-WindowsAuthentication -KernelMode $false
 }
 
 function Test-ShouldSupportWhatIf
 {
-    Set-IISWindowsAuthentication -SiteName $siteName 
-    Assert-WindowsAuthentication -Enabled 'true'
-    Set-IISWindowsAuthentication -SiteName $siteName -Disabled -WhatIf
-    Assert-WindowsAuthentication -Enabled 'true'
+    Set-IisWindowsAuthentication -SiteName $siteName 
+    Assert-WindowsAuthentication -KernelMode $true
+    Set-IisWindowsAuthentication -SiteName $siteName -WhatIf -DisableKernelMode
+    Assert-WindowsAuthentication -KernelMode $true
 }
 
-function Assert-WindowsAuthentication($Path = $siteName, $Enabled, $UseKernelMode = 'false')
+function Assert-WindowsAuthentication($Path = '', [Boolean]$KernelMode)
 {
-    $authSettings = [xml] (Invoke-AppCmd list config $Path '-section:windowsAuthentication')
-    $authNode = $authSettings['system.webServer'].security.authentication.windowsAuthentication
-    Assert-Equal $Enabled $authNode.enabled
-    Assert-Equal $UseKernelMode $authNode.useKernelMode
+    $authSettings = Get-IisSecurityAuthentication -SiteName $SiteName -Path $Path -Windows
+    Assert-Equal ($authSettings.GetAttributeValue( 'useKernelMode' )) $KernelMode
 }

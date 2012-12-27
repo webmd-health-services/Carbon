@@ -16,36 +16,31 @@ function Set-IisWindowsAuthentication
 {
     <#
     .SYNOPSIS
-    Enables or disables Windows authentication for all or part of a website.
+    Configures the settings for Windows authentication.
 
     .DESCRIPTION
-    By default, enables Windows authentication on a website.  You can enable Windows authentication at a specific path under a website by passing the virtual path (*not* the physical path) to that directory.
-
-    To disable Windows authentication, set the `Disabled` flag.
+    By default, configures Windows authentication on a website.  You can configure Windows authentication at a specific path under a website by passing the virtual path (*not* the physical path) to that directory.
+    
+    The changes only take effect if Windows authentication is enabled (see `Enable-IisSecurityAuthentication`).
 
     .LINK
     http://blogs.msdn.com/b/webtopics/archive/2009/01/19/service-principal-name-spn-checklist-for-kerberos-authentication-with-iis-7-0.aspx
+    
+    .LINK
+    Disable-IisSecurityAuthentication
+    
+    .LINK
+    Enable-IisSecurityAuthentication
 
     .EXAMPLE
     Set-IisWindowsAuthentication -SiteName Peanuts
 
-    Turns on Windows authentication for the `Peanuts` website.
+    Configures Windows authentication on the `Peanuts` site to use kernel mode.
 
     .EXAMPLE
-    Set-IisWindowsAuthentication -SiteName Peanuts Snoopy/DogHouse
+    Set-IisWindowsAuthentication -SiteName Peanuts Snoopy/DogHouse -DisableKernelMode
 
-    Turns on Windows authentication for the `Snoopy/DogHouse` directory under the `Peanuts` website.
-
-    .EXAMPLE
-    Set-IisWindowsAuthentication -SiteName Peanuts -Disabled
-
-    Turns off Windows authentication for the `Peanuts` website.
-
-    .EXAMPLE
-    Set-IisWindowsAuthentication -SiteName Peanuts -UseKernelMode
-
-    Turns on Windows authentication for the `Peanuts` website.
-
+    Configures Windows authentication on the `Doghouse` directory of the `Peanuts` site to not use kernel mode.
     #>
     [CmdletBinding(SupportsShouldProcess=$true)]
     param(
@@ -59,29 +54,22 @@ function Set-IisWindowsAuthentication
         $Path = '',
         
         [Switch]
-        # Disable Windows authentication.  Otherwise, it is enabled.
-        $Disabled,
-        
-        [Switch]
         # Turn on kernel mode.  Default is false.  [More information about Kerndel Mode authentication.](http://blogs.msdn.com/b/webtopics/archive/2009/01/19/service-principal-name-spn-checklist-for-kerberos-authentication-with-iis-7-0.aspx)
-        $UseKernelMode
+        $DisableKernelMode
     )
     
-    $enabledArg = 'true'
-    if( $Disabled )
+    $useKernelMode = 'True'
+    if( $DisableKernelMode )
     {
-        $enabledArg = 'false'
+        $useKernelMode = 'False'
     }
     
-    $useKernelModeArg = 'false'
-    if( $UseKernelMode )
-    {
-        $useKernelModeArg = 'true'
-    }
-    
+    $authSettings = Get-IisSecurityAuthentication -SiteName $SiteName -Path $Path -Windows
+    $authSettings.SetAttributeValue( 'useKernelMode', $useKernelMode )
     if( $pscmdlet.ShouldProcess( "$SiteName/$Path", "set Windows authentication" ) )
     {
-        Invoke-AppCmd set config "$SiteName/$Path" '-section:windowsAuthentication' /enabled:$enabledArg /useKernelMode:$useKernelModeArg /commit:apphost
+        Write-Host ('IIS:{0}/{1}: configuring Windows authentication: useKernelMode: {2}' -f $SiteName,$Path,$useKernelMode)
+        $authSettings.CommitChanges()
     }
 }
 

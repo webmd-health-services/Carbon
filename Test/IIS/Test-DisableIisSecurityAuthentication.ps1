@@ -53,6 +53,14 @@ function Test-ShouldDisableBasicAuthentication
     Assert-False (Test-IisSecurityAuthentication -SiteName $siteName -Basic)
 }
 
+function Test-ShouldDisableWindowsAuthentication
+{
+    Enable-IisSecurityAuthentication -SiteName $siteName -Windows
+    Assert-True (Test-IisSecurityAuthentication -SiteName $siteName -Windows)
+    Disable-IisSecurityAuthentication -SiteName $siteName -Windows
+    Assert-False (Test-IisSecurityAuthentication -SiteName $siteName -Windows)
+}
+
 function Test-ShouldDisableEnabledAnonymousAuthentication
 {
     Enable-IisSecurityAuthentication -SiteName $siteName -Anonymous

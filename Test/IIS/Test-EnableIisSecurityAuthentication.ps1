@@ -47,6 +47,13 @@ function Test-ShouldEnableBasicAuthentication
     Assert-FileDoesNotExist $webConfigPath 
 }
 
+function Test-ShouldEnableWindowsAuthentication
+{
+    Enable-IisSecurityAuthentication -SiteName $siteName -Windows
+    Assert-True (Test-IisSecurityAuthentication -SiteName $siteName -Windows)
+    Assert-FileDoesNotExist $webConfigPath 
+}
+
 function Test-ShouldEnableAnonymousAuthenticationOnSubFolders
 {
     Enable-IisSecurityAuthentication -SiteName $siteName -Path SubFolder -Anonymous
