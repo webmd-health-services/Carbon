@@ -8,6 +8,7 @@
  * Replace usages of `Install-WindowsFeatureMsmq` with `[Install-WindowsFeature](http://get-carbon.org/help/Install-WindowsFeature.html) -Msmq`.  You can use the `MsmqHttpSupport` and `MsmqActiveDirectoryIntegration`.
  * Rename usages of `Install-Share` with `[Install-SmbShare](Install-SmbShare](http://get-carbon.org/help/Install-SmbShare.html)`.  Also, replace usages of the old `Permissions` parameter with the new `FullAccess`, `ChangeAccess`, and `ReadAccess` parameters.  Previously, to set share permissions, you passed in specially-formatted values to the `Permission` parameter, e.g. `"MyGroup,FULL","MyOtherGroup,READ"`.  Now, just pass a list of identity name(s) to the `FullAccess`, `ChangeAccess`, or `ReadAccess` parameters to grant those identies full, change, or read access, e.g. `-FullAccess MyGroup -ReadAccess MyOtherGroup`.
  * Replace usages of [Set-EnvironmentVariable](http://get-carbon.org/help/Set-EnvironmentVariable.html)'s and [Remove-EnvironmentVariable](http://get-carbon.org/help/Remove-EnvironmentVariable.html)'s `Scope` parameter with scope-specific switches: `ForProcess`, `ForUser`, or `ForComputer`.  For example, replace `Set-EnvironmentVariable -Name MyVar -Value MyValue -Scope Machine` with `Set-EnvironmentVariable -Name MyVar -Value MyValue -ForComputer`.
+ * Replace usages of [Protect-String](http://get-carbon.org/help/Protect-String.html)'s `Scope` parameteter with the `ForCurrentUser` or `ForLocalComputer` scope-specific switches, e.g. replace `Protect-String -String 'MySooperSecretPassword' -Scope LocalMachine` with `Protect-String -String 'MySooperSecretPassword` -ForLocalComputer`.
  
 ## Enhancements
  * Created new [Get-WindowsFeature](http://get-carbon.org/help/Get-WindowsFeature.html) function for getting a list of available Windows features.
@@ -23,6 +24,8 @@
  * [Install-WindowsFeature](http://get-carbon.org/help/Install-WindowsFeature.html), [Test-WindowsFeature](http://get-carbon.org/help/Test-WindowsFeature.html), and [Uninstall-WindowsFeature](http://get-carbon.org/help/Uninstall-WindowsFeature.html) are not available if the PowerShell v3.0 server manager cmdlets exists (on Windows 8/2012).
  * Replaced the `Permissions` parameter on `[Install-SmbShare](Install-SmbShare](http://get-carbon.org/help/Install-SmbShare.html)` with `FullAccess`, `ChangeAccess`, and `ReadAccess` parameters. Previously, to set share permissions, you passed in specially-formatted values to the `Permission` parameter, e.g. `"MyGroup,FULL","MyOtherGroup,READ"`.  Now, just pass a list of identity name(s) to the `FullAccess`, `ChangeAccess`, or `ReadAccess` parameters to grant those identies full, change, or read access, e.g. `-FullAccess MyGroup -ReadAccess MyOtherGroup`.
  * Replaced the `Scope` parameter on [Set-EnvironmentVariable](http://get-carbon.org/help/Set-EnvironmentVariable.html) and [Remove-EnvironmentVariable](http://get-carbon.org/help/Remove-EnvironmentVariable.html) with scope-specific `ForProcess`, `ForUser`, and `ForComputer` switches.
+ * Replaced [Protect-String](http://get-carbon.org/help/Protect-String.html)'s `Scope` parameteter with the `ForCurrentUser` or `ForLocalComputer` scope-specific switches.
+  
  
 # 0.4.0.1 (18 December 2012)
 

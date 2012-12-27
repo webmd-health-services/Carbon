@@ -21,19 +21,18 @@ filter Protect-String
     Encrypts a string using the Data Protection API (DPAPI).
     
     .DESCRIPTION
-    Encrypts a string with the Data Protection API (DPAPI).  Encryption can be performed at the user or machine level.  If encrypted at the User scope, only the user who encrypted the data can decrypt it.  If encrypted at the machine scope, any user on the machine can decrypt it.
+    Encrypts a string with the Data Protection API (DPAPI).  Encryption can be performed at the user or computer level.  If encrypted at the User level (with the `ForCurrentUser` switch), only the user who encrypted the data can decrypt it.  If encrypted at the computer scope (with the `ForLocalComputer` switch), any user logged onto the computer can decrypt it.
     
     .EXAMPLE
-    Protect-String -String 'TheStringIWantToEncrypt' | Out-File MySecret.txt
+    Protect-String -String 'TheStringIWantToEncrypt' -ForCurrentUser | Out-File MySecret.txt
     
     Encrypts the given string and saves the encrypted string into MySecret.txt.  Only the user who encrypts the string can unencrypt it.
     
     .EXAMPLE
     
-    $cipherText = Protect-String -String "MySuperSecretIdentity" -Scope LocalMachine
+    $cipherText = Protect-String -String "MySuperSecretIdentity" -ForComputer
     
-    Encrypts the given string and stores the value in $cipherText.  Because the encryption scope is set to LocalMachine, any user on the local machine
-    can decrypt $cipherText.
+    Encrypts the given string and stores the value in $cipherText.  Because the encryption scope is set to LocalMachine, any user logged onto the local computer can decrypt $cipherText.
     
     .LINK
     Unprotect-String
@@ -48,13 +47,20 @@ filter Protect-String
         # The text to encrypt.
         $String,
         
-        # The scope at which the encryption is performed.  Default is `CurrentUser`.
-        [Security.Cryptography.DataProtectionScope]
-        $Scope = 'CurrentUser'
+        [Parameter(Mandatory=$true,ParameterSetName='CurrentUser')]
+        # Encrypts for the current user so that only he can decrypt.
+        [Switch]
+        $ForCurrentUser,
+        
+        [Parameter(Mandatory=$true,ParameterSetName='LocalMachine')]
+        # Encrypts for the current computer so that any user logged into the computer can decrypt.
+        [Switch]
+        $ForLocalComputer
     )
     
     $bytes = [Text.Encoding]::UTF8.GetBytes( $String )
-    $encryptedBytes = [Security.Cryptography.ProtectedData]::Protect( $bytes, $null, $Scope )
+    $scope = $pscmdlet.ParameterSetName
+    $encryptedBytes = [Security.Cryptography.ProtectedData]::Protect( $bytes, $null, $scope )
     return [Convert]::ToBase64String( $encryptedBytes )
 }
 
@@ -68,20 +74,20 @@ filter Unprotect-String
     Decrypts a string with the Data Protection API (DPAPI).  The string must have also been encrypted with the DPAPI and the same scope used to decrypt as was used to encrypt.
     
     .EXAMPLE
-    PS> $encryptedPassword = Protect-String -String 'MySuperSecretPassword'
+    PS> $encryptedPassword = Protect-String -String 'MySuperSecretPassword' -ForCurrentUser
         PS> $password = Unprotect-String -ProtectedString  $encryptedPassword
     
     Decrypts a protected string which was encrypted at the current user or default scopes.
     
     .EXAMPLE
-    PS> $encryptedPassword = Protect-String -String 'MySuperSecretPassword' -Scope LocalMachine
-        PS> $cipherText = Unprotect-String -ProtectedString $encryptedPassword -Scope LocalMachine
+    PS> $encryptedPassword = Protect-String -String 'MySuperSecretPassword' -ForLocalComputer
+        PS> $cipherText = Unprotect-String -ProtectedString $encryptedPassword
     
     Encrypts the given string and stores the value in $cipherText.  Because the string was encrypted at the LocalMachine scope, the string must be 
     decrypted at the same scope.
     
     .EXAMPLE
-    Protect-String -String 'NotSoSecretSecret' | Unprotect-String
+    Protect-String -String 'NotSoSecretSecret' -ForCurrentUser | Unprotect-String
     
     Demonstrates how Unprotect-String takes input from the pipeline.  Adds 'NotSoSecretSecret' to the pipeline.
     

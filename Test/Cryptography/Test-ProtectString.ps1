@@ -24,20 +24,20 @@ function TearDown
 
 function Test-ShouldProtectString
 {
-    $cipherText = Protect-String -String 'Hello World!'
+    $cipherText = Protect-String -String 'Hello World!' -ForCurrentUser
     Assert-IsBase64EncodedString( $cipherText )
 }
 
 function Test-ShouldProtectStringWithScope
 {
-    $user = Protect-String -String 'Hello World' 
-    $machine = Protect-String -String 'Hello World' -Scope LocalMachine
+    $user = Protect-String -String 'Hello World' -ForCurrentUser 
+    $machine = Protect-String -String 'Hello World' -ForLocalComputer
     Assert-NotEqual $user $machine 'encrypting at different scopes resulted in the same string'
 }
 
 function Test-ShouldProtectStringsInPipeline
 {
-    $secrets = @('Foo','Fizz','Buzz','Bar') | Protect-String 
+    $secrets = @('Foo','Fizz','Buzz','Bar') | Protect-String -ForCurrentUser
     Assert-Equal 4 $secrets.Length 'Didn''t encrypt all items in the pipeline.'
     foreach( $secret in $secrets )
     {

@@ -20,7 +20,7 @@ function Setup
     Import-Module (Join-Path $TestDir ..\..\Carbon) -Force
 
     $originalText = [Guid]::NewGuid().ToString()
-    $protectedText = Protect-String -String $originalText
+    $protectedText = Protect-String -String $originalText -ForCurrentUser
 }
 
 function TearDown
@@ -37,14 +37,14 @@ function Test-ShouldUnprotectString
 
 function Test-ShouldUnprotectStringFromMachineScope
 {
-    $secret = Protect-String -String 'Hello World' -Scope LocalMachine
+    $secret = Protect-String -String 'Hello World' -ForLocalComputer
     $machine = Unprotect-String -ProtectedString $secret
     Assert-Equal 'Hello World' $machine 'decrypting from local machine scope failed'
 }
 
 function Test-ShouldUnprotectStringFromUserScope
 {
-    $secret = Protect-String -String 'Hello World' -Scope CurrentUser
+    $secret = Protect-String -String 'Hello World' -ForCurrentUser
     $machine = Unprotect-String -ProtectedString $secret
     Assert-Equal 'Hello World' $machine 'decrypting from user scope failed'
 }
@@ -52,7 +52,7 @@ function Test-ShouldUnprotectStringFromUserScope
 
 function Test-ShouldUnrotectStringsInPipeline
 {
-    $secrets = @('Foo','Fizz','Buzz','Bar') | Protect-String | Unprotect-String 
+    $secrets = @('Foo','Fizz','Buzz','Bar') | Protect-String -ForCurrentUser | Unprotect-String 
     Assert-Equal 'Foo' $secrets[0] 'Didn''t decrypt first item in pipeline'
     Assert-Equal 'Fizz' $secrets[1] 'Didn''t decrypt first item in pipeline'
     Assert-Equal 'Buzz' $secrets[2] 'Didn''t decrypt first item in pipeline'
