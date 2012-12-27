@@ -53,7 +53,7 @@ function Resolve-FullPath
     return [IO.Path]::GetFullPath($Path)
 }
 
-function Get-PathCanonicalCase
+function Resolve-PathCase
 {
     <#
     .SYNOPSIS
@@ -65,20 +65,21 @@ function Get-PathCanonicalCase
     If the path doesn't an exist, an error is written and nothing is returned.
     
     .EXAMPLE
-    Get-PathCanonicalCase -Path "C:\WINDOWS\SYSTEM32"
+    Resolve-PathCase -Path "C:\WINDOWS\SYSTEM32"
     
     Returns `C:\Windows\system32`.
     
     .EXAMPLE
-    Get-PathCanonicalCase -Path 'c:\projects\carbon' 
+    Resolve-PathCase -Path 'c:\projects\carbon' 
     
     Returns `C:\Projects\Carbon`.
     #>
     [CmdletBinding()]
     param(
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory=$true,ValueFromPipelineByPropertyName=$true)]
         [string]
         # The path whose real, canonical case should be returned.
+        [Alias('FullName')]
         $Path
     )
     

@@ -1,6 +1,9 @@
 # 0.5.0.0
 
 ## Upgrade Instructions
+
+This release contains many backwards incompatible changes.  Take the following steps to get your scripts to work with this release.  We apologize for this inconvenience.  We are making these changes so we can get ready for the v1.0 release.  One of our goals for v1.0 is to get the functions and their interfaces internally consistent and consistent with PowerShell naming schemes.  Once v1.0 is out the door, backwards-incompatible changes will be phased in as much as possible.
+
  * [Test-WindowsFeature](http://get-carbon.org/help/Test-WindowsFeature.html) tests if a Windows feature exists, instead of if it is installed.  To maintain backwards-compatibility, add the new `Installed` switch.
  * Rename usages of `Install-WindowsFeatures` with [Install-WindowsFeature](http://get-carbon.org/help/Install-WindowsFeature.html).  Also, rename usages of the `Features` parameter to `Name`.
  * Rename usages of `Uninstall-WindowsFeatures` with [Uninstall-WindowsFeature](http://get-carbon.org/help/Install-WindowsFeature.html).  Also, rename usages of the `Features` parameter to `Name`.
@@ -11,6 +14,7 @@
  * Replace usages of [Protect-String](http://get-carbon.org/help/Protect-String.html)'s `Scope` parameteter with the `ForUser` or `ForComputer` scope-specific switches, e.g. replace `Protect-String -String 'MySooperSecretPassword' -Scope LocalMachine` with `Protect-String -String 'MySooperSecretPassword` -ForComputer`.
  * Replace usages of `Get-PathRelativeTo` with `[Resolve-RelativePath](http://get-carbon.org/help/Resolve-RelativePath.html)`.  Also, its interface has completed changed.  Replace usages of the `To` parameter with `Path`, and move it to the first position.  Replace usages of the `From` and `FromType` parameter with the `FromDirectory` or `FromFile` parameters.  For example, `Get-PathRelativeTo -From 'C:\Windows\system32' -To 'C:\Program Files'` would now be `Resolve-RelativePath -Path 'C:\Program Files' -FromDirectory 'C:\Windows\system32'`.
  * Replace usages of `ConvertTo-FullPath` with [Resolve-FullPath](http://get-carbon.org/help/Resolve-FullPath.ps1).
+ * Replace usages of `Get-PathCanonicalCase` with [Resolve-PathCase](http://get-carbon.org/help/Resolve-PathCase.ps1).
  
 ## Enhancements
  * Created new [Get-WindowsFeature](http://get-carbon.org/help/Get-WindowsFeature.html) function for getting a list of available Windows features.
@@ -29,7 +33,8 @@
  * Replaced [Protect-String](http://get-carbon.org/help/Protect-String.html)'s `Scope` parameteter with the `ForUser` or `ForComputer` scope-specific switches.
  * Renamed `Get-PathRelativeTo` to [Resolve-RelativePath](http://get-carbon.org/help/Resolve-RelativePath.html).  Renamed its `To` parameter to `Path`, and moved it to position 0.  Replaced/combined the `From` and `FromType` parameters with `FromDirectory` and `FromFile` parameters.
  * Renamed `ConvertTo-FullPath` to [Resolve-FullPath](http://get-carbon.org/help/Resolve-FullPath.ps1).  Added support for converting unrooted paths using the current location.
- 
+ * Renamed `Get-PathCanonicalCase` with [Resolve-PathCase](http://get-carbon.org/help/Resolve-PathCase.ps1).  Added support for piping in `Get-Item` and `Get-ChildItem` output, e.g. `Get-Item C:\WINDOWS | Resolve-PathCase` returns C:\Windows.
+
 # 0.4.0.1 (18 December 2012)
 
 ## Bug fixes
