@@ -14,7 +14,7 @@
 
 function SetUp()
 {
-    Import-Module (Join-Path $TestDir ..\..\Carbon -Resolve)
+    & (Join-Path $TestDir ..\..\Carbon\Import-Carbon.ps1 -Resolve)
 }
 
 function TearDown()
@@ -22,48 +22,51 @@ function TearDown()
     Remove-Module Carbon
 }
 
-function Test-GetPathRelativeToWithExplicitPath
+function Test-ResolveRelativePathWithExplicitPath
 {
     $fileDir = New-TempDir
     $to = Join-Path $fileDir 'myfile.txt'
     
     $from = [System.IO.Path]::GetTempPath()
     
-    $relativePath = Get-PathRelativeTo $from -To $to
+    $relativePath = Resolve-RelativePath -Path $to -FromDirectory $from
     Assert-Equal ".\$([System.IO.Path]::GetFileName($fileDir))\myfile.txt" $relativePath 
 }
 
-function Test-GetPathRelativeToFromPipeline
+function Test-ResolveRelativePathFromPipeline
 {
     $to = [System.IO.Path]::GetFullPath( (Join-Path $TestDir '..\..\Carbon\FileSystem.ps1') )
     
-    $relativePath = Get-Item $to | Get-PathRelativeTo $TestDir
+    $relativePath = Get-Item $to | Resolve-RelativePath -FromDirectory $TestDir
     Assert-Equal '..\..\Carbon\FileSystem.ps1' $relativePath
 }
 
-function Test-GetsPathFromFilePath
+function Test-ResolvesPathPathFromFilePath
 {
     $to = [System.IO.Path]::GetFullPath( (Join-Path $TestDir '..\..\Carbon\FileSystem.ps1') )
     
-    $relativePath = Get-Item $to | Get-PathRelativeTo $TestScript 'File'
+    $relativePath = Get-Item $to | Resolve-RelativePath -FromFile $TestScript 
     Assert-Equal '..\..\Carbon\FileSystem.ps1' $relativePath
 }
 
-function Test-GetsRelativePathForMultiplePaths
+function Test-ResolvesPathForMultiplePaths
 {
-
-    Get-ChildItem $env:WinDir | Get-PathRelativeTo -From (Join-Path $env:WinDir 'System32') 
+    Get-ChildItem $env:WinDir | 
+        Resolve-RelativePath -FromDirectory (Join-Path $env:WinDir 'System32') |
+        ForEach-Object {
+            Assert-True $_.StartsWith( '..\' )
+        }
 }
 
-function Test-GetsRelativePathFromFile
+function Test-ResolvesPathFromFile
 {
-    $relativePath = Get-PathRelativeTo 'C:\Foo\Foo\Foo.txt' 'File' -To 'C:\Bar\Bar\Bar'
+    $relativePath = Resolve-RelativePath -Path 'C:\Bar\Bar\Bar' -FromFile 'C:\Foo\Foo\Foo.txt'
     Assert-Equal '..\..\Bar\Bar\Bar' $relativePath
 }
 
 function Test-ShouldReturnString
 {
-    $relativePath = Get-PathRelativeTo 'C:\A\B\C' -To 'C:\A\B\D\f.txt'
+    $relativePath = Resolve-RelativePath -Path 'C:\A\B\D\f.txt' -FromDirectory 'C:\A\B\C' 
     Assert-Is $relativePath string
     Assert-Equal '..\D\F.txt' $relativePath
 }

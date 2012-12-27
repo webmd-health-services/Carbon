@@ -92,7 +92,7 @@ function Get-PathCanonicalCase
     return $longBuffer.ToString()
 }
 
-function Get-PathRelativeTo
+function Resolve-RelativePath
 {
     <#
     .SYNOPSIS
@@ -104,61 +104,71 @@ function Get-PathRelativeTo
     Neither the `From` or `To` paths need to exist.
     
     .EXAMPLE
-    Get-PathRelativeTo -From 'C:\Windows\system32' -To 'C:\Program Files'
+    Resolve-RelativePath -Path 'C:\Program Files' -FromDirectory 'C:\Windows\system32' 
     
     Returns `..\..\Program Files`.
     
     .EXAMPLE
-    Get-ChildItem * | Get-PathRelativeTo -From 'C:\Windows\system32'
+    Get-ChildItem * | Resolve-RelativePath -FromDirectory 'C:\Windows\system32'
     
     Returns the relative path from the `C:\Windows\system32` directory to the current directory.
     
     .EXAMPLE
-    Get-PathRelativeTo -From 'C:\I\do\not\exist' -To 'C:\I\do\not\exist\either'
+    Resolve-RelativePath -Path 'C:\I\do\not\exist\either' -FromDirectory 'C:\I\do\not\exist' 
     
     Returns `.\either`.
     
     .EXAMPLE
-    Get-PathRelativeTo -From 'C:\I\do\not\exist' -FromType 'File' -To 'C:\I\do\not\exist\either'
+    Resolve-RelativePath -Path 'C:\I\do\not\exist\either' -FromFile 'C:\I\do\not\exist_file' 
     
-    Treats `C:\I\do\not\exist` as a file, so returns a relative path of `.\exist\either`.
+    Treats `C:\I\do\not\exist_file` as a file, so returns a relative path of `.\exist\either`.
     
     .LINK
     http://msdn.microsoft.com/en-us/library/windows/desktop/bb773740.aspx
     #>
     param(
-        [Parameter(Mandatory=$true,Position=0)]
-        # The source where from where the relative path will be calculated.  Can be a string or an file system object.
-        $From,
-        
-        [Parameter(Position=1)]
-        [ValidateSet('Directory', 'File')]
+        [Parameter(ValueFromPipelineByPropertyName=$true)]
         [string]
-        # Whether the from/source path is a file or a directory.  The default is a directory.
-        $FromType = 'Directory',
-        
-        [Parameter(ValueFromPipeline=$true)]
         # The path to convert to a relative path.  It will be relative to the value of the From parameter.
-        $To
+        [Alias('FullName')]
+        $Path,
+        
+        [Parameter(Mandatory=$true,ParameterSetName='FromDirectory')]
+        [string]
+        # The source directory from which the relative path will be calculated.  Can be a string or an file system object.
+        $FromDirectory,
+        
+        [Parameter(Mandatory=$true,ParameterSetName='FromFile')]
+        [string]
+        # The source directory from which the relative path will be calculated.  Can be a string or an file system object.
+        $FromFile
     )
     
     process
     {
         $relativePath = New-Object System.Text.StringBuilder 260
-        $fromAttr = [System.IO.FileAttributes]::Directory
-        if( $FromType -eq 'File' )
+        switch( $pscmdlet.ParameterSetName )
         {
-            $fromAttr = [System.IO.FileAttributes]::Normal
+            'FromFile'
+            {
+                $fromAttr = [System.IO.FileAttributes]::Normal
+                $fromPath = $FromFile
+            }
+            'FromDirectory'
+            {
+                $fromAttr = [System.IO.FileAttributes]::Directory
+                $fromPath = $FromDirectory
+            }
         }
         
-        $toPath = $To
-        if( $To.FullName )
+        $toPath = $Path
+        if( $Path.FullName )
         {
-            $toPath = $To.FullName
+            $toPath = $Path.FullName
         }
         
         $toAttr = [System.IO.FileAttributes]::Normal
-        $converted = [Carbon.Win32]::PathRelativePathTo( $relativePath, $From, $fromAttr, $toPath, $toAttr )
+        $converted = [Carbon.Win32]::PathRelativePathTo( $relativePath, $fromPath, $fromAttr, $toPath, $toAttr )
         $result = if( $converted ) { $relativePath.ToString() } else { $null }
         return $result
     }
