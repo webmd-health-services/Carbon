@@ -38,7 +38,11 @@ This release contains many backwards incompatible changes.  Take the following s
  * Renamed `Get-PathCanonicalCase` with [Resolve-PathCase](http://get-carbon.org/help/Resolve-PathCase.ps1).  Added support for piping in `Get-Item` and `Get-ChildItem` output, e.g. `Get-Item C:\WINDOWS | Resolve-PathCase` returns C:\Windows.
  * Replaced `Set-IisAnonymousAuthentication` with `[Enable-IisSecurityAuthentication](http://get-carbon.org/help/Enable-IisSecurityAuthentication.ps1)` and `[Disable-IisSecurityAuthentication](http://get-carbon.org/help/Disable-IisSecurityAuthentication.ps1)`.
  * Replaced `Set-IisBasicAuthentication` with `[Enable-IisSecurityAuthentication](http://get-carbon.org/help/Enable-IisSecurityAuthentication.ps1)` and `[Disable-IisSecurityAuthentication](http://get-carbon.org/help/Disable-IisSecurityAuthentication.ps1)`.
-
+ * Created [Get-IisConfigurationSection](http://get-carbon.org/help/Get-IisConfigurationSection.ps1) function for getting a site's (and optional sub-directory's) [Microsoft.Web.Administration.ConfigurationSection](http://msdn.microsoft.com/en-us/library/microsoft.web.administration.configurationsection(v=vs.90).aspx) objects for an arbitrary IIS configuration section.
+ * Created [Get-IisSecurityAuthentication](http://get-carbon.org/help/Get-IisSecurityAuthentication.ps1) function for getting a site's (and optional sub-directory's)  [anonymous, basic, digest, or Windows authentication configuration section](http://msdn.microsoft.com/en-us/library/microsoft.web.administration.configurationsection(v=vs.90).aspx).
+ * Created [Test-IisSecurityAuthentication](http://get-carbon.org/help/Test-IisSecurityAuthentication.ps1) function for testing if anonymous, basic, digest, or Windows authentication is enabled for a website (and optional sub-directory).
+ 
+ 
 # 0.4.0.1 (18 December 2012)
 
 ## Bug fixes
