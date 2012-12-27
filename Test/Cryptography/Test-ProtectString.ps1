@@ -14,7 +14,7 @@
 
 function Setup
 {
-    Import-Module (Join-Path $TestDir ..\..\Carbon -Resolve) -Force
+    & (Join-Path $TestDir ..\..\Carbon\Import-Carbon.ps1 -Resolve)
 }
 
 function TearDown
@@ -24,20 +24,20 @@ function TearDown
 
 function Test-ShouldProtectString
 {
-    $cipherText = Protect-String -String 'Hello World!' -ForCurrentUser
+    $cipherText = Protect-String -String 'Hello World!' -ForUser
     Assert-IsBase64EncodedString( $cipherText )
 }
 
 function Test-ShouldProtectStringWithScope
 {
-    $user = Protect-String -String 'Hello World' -ForCurrentUser 
-    $machine = Protect-String -String 'Hello World' -ForLocalComputer
+    $user = Protect-String -String 'Hello World' -ForUser 
+    $machine = Protect-String -String 'Hello World' -ForComputer
     Assert-NotEqual $user $machine 'encrypting at different scopes resulted in the same string'
 }
 
 function Test-ShouldProtectStringsInPipeline
 {
-    $secrets = @('Foo','Fizz','Buzz','Bar') | Protect-String -ForCurrentUser
+    $secrets = @('Foo','Fizz','Buzz','Bar') | Protect-String -ForUser
     Assert-Equal 4 $secrets.Length 'Didn''t encrypt all items in the pipeline.'
     foreach( $secret in $secrets )
     {

@@ -21,10 +21,10 @@ filter Protect-String
     Encrypts a string using the Data Protection API (DPAPI).
     
     .DESCRIPTION
-    Encrypts a string with the Data Protection API (DPAPI).  Encryption can be performed at the user or computer level.  If encrypted at the User level (with the `ForCurrentUser` switch), only the user who encrypted the data can decrypt it.  If encrypted at the computer scope (with the `ForLocalComputer` switch), any user logged onto the computer can decrypt it.
+    Encrypts a string with the Data Protection API (DPAPI).  Encryption can be performed at the user or computer level.  If encrypted at the User level (with the `ForUser` switch), only the user who encrypted the data can decrypt it.  If encrypted at the computer scope (with the `ForComputer` switch), any user logged onto the computer can decrypt it.
     
     .EXAMPLE
-    Protect-String -String 'TheStringIWantToEncrypt' -ForCurrentUser | Out-File MySecret.txt
+    Protect-String -String 'TheStringIWantToEncrypt' -ForUser | Out-File MySecret.txt
     
     Encrypts the given string and saves the encrypted string into MySecret.txt.  Only the user who encrypts the string can unencrypt it.
     
@@ -50,12 +50,12 @@ filter Protect-String
         [Parameter(Mandatory=$true,ParameterSetName='CurrentUser')]
         # Encrypts for the current user so that only he can decrypt.
         [Switch]
-        $ForCurrentUser,
+        $ForUser,
         
         [Parameter(Mandatory=$true,ParameterSetName='LocalMachine')]
         # Encrypts for the current computer so that any user logged into the computer can decrypt.
         [Switch]
-        $ForLocalComputer
+        $ForComputer
     )
     
     $bytes = [Text.Encoding]::UTF8.GetBytes( $String )
@@ -74,20 +74,20 @@ filter Unprotect-String
     Decrypts a string with the Data Protection API (DPAPI).  The string must have also been encrypted with the DPAPI and the same scope used to decrypt as was used to encrypt.
     
     .EXAMPLE
-    PS> $encryptedPassword = Protect-String -String 'MySuperSecretPassword' -ForCurrentUser
+    PS> $encryptedPassword = Protect-String -String 'MySuperSecretPassword' -ForUser
         PS> $password = Unprotect-String -ProtectedString  $encryptedPassword
     
     Decrypts a protected string which was encrypted at the current user or default scopes.
     
     .EXAMPLE
-    PS> $encryptedPassword = Protect-String -String 'MySuperSecretPassword' -ForLocalComputer
+    PS> $encryptedPassword = Protect-String -String 'MySuperSecretPassword' -ForComputer
         PS> $cipherText = Unprotect-String -ProtectedString $encryptedPassword
     
     Encrypts the given string and stores the value in $cipherText.  Because the string was encrypted at the LocalMachine scope, the string must be 
     decrypted at the same scope.
     
     .EXAMPLE
-    Protect-String -String 'NotSoSecretSecret' -ForCurrentUser | Unprotect-String
+    Protect-String -String 'NotSoSecretSecret' -ForUser | Unprotect-String
     
     Demonstrates how Unprotect-String takes input from the pipeline.  Adds 'NotSoSecretSecret' to the pipeline.
     
