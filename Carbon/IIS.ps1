@@ -12,6 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 Add-Type -AssemblyName "System.Web"
+$microsoftWebAdministrationPath = Join-Path $env:SystemRoot system32\inetsrv\Microsoft.Web.Administration.dll
+if( (Test-Path -Path $microsoftWebAdministrationPath -PathType Leaf) )
+{
+    Add-Type -Path $microsoftWebAdministrationPath
+}
 
 function Add-IisDefaultDocument
 {

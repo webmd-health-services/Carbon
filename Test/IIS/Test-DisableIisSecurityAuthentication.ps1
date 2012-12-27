@@ -35,28 +35,28 @@ function TearDown
 
 function Test-ShouldDisableAnonymousAuthenticationOnVDir
 {
-    Disable-IisAnonymousAuthentication -SiteName $siteName -Path SubFolder
+    Disable-IisSecurityAuthentication -SiteName $siteName -Path SubFolder
     Assert-False (Test-IisSecurityAuthentication -SiteName $siteName -Path SubFolder -Anonymous)
 }
 
 function Test-ShouldDisableAnonymousAuthentication
 {
-    Disable-IisAnonymousAuthentication -SiteName $siteName
+    Disable-IisSecurityAuthentication -SiteName $siteName
     Assert-False (Test-IisSecurityAuthentication -SiteName $siteName -Anonymous)
 }
 
 function Test-ShouldDisableEnabledAnonymousAuthentication
 {
-    Enable-IisAnonymousAuthentication -SiteName $siteName
+    Enable-IisSecurityAuthentication -SiteName $siteName
     Assert-True (Test-IisSecurityAuthentication -SiteName $siteName -Anonymous)
-    Disable-IisAnonymousAuthentication -SiteName $siteName
+    Disable-IisSecurityAuthentication -SiteName $siteName
     Assert-False (Test-IisSecurityAuthentication -SiteName $siteName -Anonymous)
 }
 
 function Test-ShouldSupportWhatIf
 {
-    Enable-IisAnonymousAuthentication -SiteName $siteName 
+    Enable-IisSecurityAuthentication -SiteName $siteName
     Assert-True (Test-IisSecurityAuthentication -SiteName $siteName -Anonymous)
-    Disable-IisAnonymousAuthentication -SiteName $siteName -WhatIf
+    Disable-IisSecurityAuthentication -SiteName $siteName -WhatIf
     Assert-True (Test-IisSecurityAuthentication -SiteName $siteName -Anonymous)
 }

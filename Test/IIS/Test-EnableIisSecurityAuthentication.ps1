@@ -35,27 +35,19 @@ function TearDown
 
 function Test-ShouldEnableAnonymousAuthentication
 {
-    Enable-IisAnonymousAuthentication -SiteName $siteName
-    Assert-AnonymousAuthentication -Enabled 'true'
+    Enable-IisSecurityAuthentication -SiteName $siteName
+    Assert-True (Test-IisSecurityAuthentication -SiteName $siteName -Anonymous)
     Assert-FileDoesNotExist $webConfigPath 
 }
 
 function Test-ShouldEnableAnonymousAuthenticationOnSubFolders
 {
-    Enable-IisAnonymousAuthentication -SiteName $siteName -Path SubFolder
-    Assert-AnonymousAuthentication -Path "$siteName/SubFolder" -Enabled 'true'
+    Enable-IisSecurityAuthentication -SiteName $siteName -Path SubFolder
+    Assert-True (Test-IisSecurityAuthentication -SiteName $siteName -Path SubFolder -Anonymous)
 }
 
 function Test-ShouldSupportWhatIf
 {
-    Enable-IisAnonymousAuthentication $siteName 
-    Assert-AnonymousAuthentication -Enabled 'true'
-}
-
-function Assert-AnonymousAuthentication($Path = $siteName, $Enabled)
-{
-    $authSettings = [xml] (Invoke-AppCmd list config $Path '-section:anonymousAuthentication')
-    $authNode = $authSettings['system.webServer'].security.authentication.anonymousAuthentication
-    Assert-Equal $Enabled $authNode.enabled
-    Assert-Equal '' $authNode.username
+    Enable-IisSecurityAuthentication $siteName
+    Assert-True (Test-IisSecurityAuthentication -SiteName $siteName -Anonymous)
 }

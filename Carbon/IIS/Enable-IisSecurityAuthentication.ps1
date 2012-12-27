@@ -12,25 +12,31 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Enable-IisAnonymousAuthentication
+function Enable-IisSecurityAuthentication
 {
     <#
     .SYNOPSIS
-    Enables anonymous authentication for all or part of a website.
+    Enables anonymous or basic authentication for an entire site or a sub-directory of that site.
 
     .DESCRIPTION
-    By default, enables anonymous authentication on an entire website.  You can enable anonymous authentication at a specific path under a website by passing the virtual path (*not* the physical path) to that directory as the value of the `Path` parameter.
+    By default, enables an authentication type on an entire website.  You can enable an authentication type at a specific path under a website by passing the virtual path (*not* the physical path) to that directory as the value of the `Path` parameter.
 
     .LINK
-    Disable-IisAnonymousAuthentication
+    Disable-IisSecurityAuthentication
+    
+    .LINK
+    Get-IisSecurityAuthentication
+    
+    .LINK
+    Test-IisSecurityAuthentication
     
     .EXAMPLE
-    Enable-IisAnonymousAuthentication -SiteName Peanuts
+    Enable-IisSecurityAuthentication -SiteName Peanuts -Anonymous
 
     Turns on anonymous authentication for the `Peanuts` website.
 
     .EXAMPLE
-    Enable-IisAnonymouseAuthentication -SiteName Peanuts Snoopy/DogHouse
+    Enable-IisSecurityAuthentication -SiteName Peanuts Snoopy/DogHouse -Basic
 
     Turns on anonymous authentication for the `Snoopy/DogHouse` directory under the `Peanuts` website.
 
@@ -49,6 +55,7 @@ function Enable-IisAnonymousAuthentication
     
     $authSettings = Get-IisSecurityAuthentication -SiteName $SiteName -Path $Path -Anonymous
     $authSettings.SetAttributeValue('enabled', 'true')
+    
     if( $pscmdlet.ShouldProcess( "$SiteName/$Path", "enable anonymous authentication" ) )
     {
         $authSettings.CommitChanges()

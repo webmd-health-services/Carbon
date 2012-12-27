@@ -12,28 +12,33 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Disable-IisAnonymousAuthentication
+function Disable-IisSecurityAuthentication
 {
     <#
     .SYNOPSIS
-    Disables anonymous authentication for all or part of a website.
+    Disables anonymous or basic authentication for all or part of a website.
 
     .DESCRIPTION
-    By default, disables anonymous authentication on an entire website.  You can disable anonymous authentication at a specific path under a website by passing the virtual path (*not* the physical path) to that directory as the value of the `Path` parameter.
+    By default, disables an authentication type for an entire website.  You can disable an authentication type at a specific path under a website by passing the virtual path (*not* the physical path) to that directory as the value of the `Path` parameter.
 
     .LINK
-    Enable-IisAnonymousAuthentication
+    Enable-IisSecurityAuthentication
+
+    .LINK
+    Get-IisSecurityAuthentication
+    
+    .LINK
+    Test-IisSecurityAuthentication
+    
+    .EXAMPLE
+    Disable-IisSecurityAuthentication -SiteName Peanuts -Anonymous
+
+    Turns off anonymous authentication for the `Peanuts` website.
 
     .EXAMPLE
-    Disable-IisAnonymousAuthentication -SiteName Peanuts
+    Disable-IisSecurityAuthentication -SiteName Peanuts Snoopy/DogHouse -Basic
 
-    Turns on anonymous authentication for the `Peanuts` website.
-
-    .EXAMPLE
-    Disable-IisAnonymousAuthentication -SiteName Peanuts Snoopy/DogHouse
-
-    Turns off anonymous authentication for the `Snoopy/DogHouse` directory under the `Peanuts` website.
-
+    Turns off basic authentication for the `Snoopy/DogHouse` directory under the `Peanuts` website.
     #>
     [CmdletBinding(SupportsShouldProcess=$true)]
     param(
