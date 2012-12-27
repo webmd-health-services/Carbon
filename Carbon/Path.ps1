@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function ConvertTo-FullPath
+function Resolve-FullPath
 {
     <#
     .SYNOPSIS
@@ -21,17 +21,22 @@ function ConvertTo-FullPath
     .DESCRIPTION
     Unlike `Resolve-Path`, this function does not check whether the path exists.  It just converts relative paths to absolute paths.
     
-    You can't pass truly relative paths to this function.  You can only pass rooted paths, i.e. the path must have a drive at the beginning.
+    Unrooted paths (e.g. `..\..\See\I\Do\Not\Have\A\Root`) are first joined with the current directory (as returned by `Get-Location`).
     
     .EXAMPLE
-    ConvertTo-FullPath -Path 'C:\Projects\Carbon\Test\..\Carbon\FileSystem.ps1'
+    Resolve-FullPath -Path 'C:\Projects\Carbon\Test\..\Carbon\FileSystem.ps1'
     
     Returns `C:\Projects\Carbon\Carbon\FileSystem.ps1`.
     
     .EXAMPLE
-    ConvertTo-FullPath -Path 'C:\Projects\Carbon\..\I\Do\Not\Exist'
+    Resolve-FullPath -Path 'C:\Projects\Carbon\..\I\Do\Not\Exist'
     
     Returns `C:\Projects\I\Do\Not\Exist`.
+    
+    .EXAMPLE
+    Resolve-FullPath -Path ..\..\Foo\..\Bar
+    
+    Because the `Path` isn't rooted, joins `Path` with the current directory (as returned by `Get-Location`), and returns the full path.  If the current directory is `C:\Projects\Carbon`, returns `C:\Bar`.
     #>
     [CmdletBinding()]
     param(
@@ -43,7 +48,7 @@ function ConvertTo-FullPath
     
     if( -not ( [System.IO.Path]::IsPathRooted($Path) ) )
     {
-        Write-Warning "Path to resolve is not rooted. Path.GetFullPath uses Environment.CurrentDirectory as the path root, which isn't set to PowerShell's current directory."
+        $Path = Join-Path (Get-Location) $Path
     }
     return [IO.Path]::GetFullPath($Path)
 }

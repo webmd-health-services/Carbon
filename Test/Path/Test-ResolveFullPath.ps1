@@ -15,7 +15,7 @@
 
 function SetUp()
 {
-    Import-Module (Join-Path $TestDir ..\..\Carbon -Resolve)
+    & (Join-Path $TestDir ..\..\Carbon\Import-Carbon.ps1 -Resolve)
 }
 
 function TearDown()
@@ -25,7 +25,21 @@ function TearDown()
 
 function Test-GetFullPath
 {
-    $fullpath = ConvertTo-FullPath (Join-Path $TestDir '..\Tests' )
+    $fullpath = Resolve-FullPath (Join-Path $TestDir '..\Tests' )
     $expectedFullPath = [System.IO.Path]::GetFullPath( (Join-Path $TestDir '..\Tests') )
     Assert-Equal $expectedFullPath $fullPath "Didn't get full path for '..\Tests'."
+}
+
+function Test-ResolvesRelativePath
+{
+    Push-Location (Join-Path $env:WinDir system32)
+    try
+    {
+        $fullPath = Resolve-FullPath -Path '..\..\Program Files'
+        Assert-Equal $env:ProgramFiles $fullPath
+    }
+    finally
+    {
+        Pop-Location
+    }
 }

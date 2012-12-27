@@ -10,6 +10,7 @@
  * Replace usages of [Set-EnvironmentVariable](http://get-carbon.org/help/Set-EnvironmentVariable.html)'s and [Remove-EnvironmentVariable](http://get-carbon.org/help/Remove-EnvironmentVariable.html)'s `Scope` parameter with scope-specific switches: `ForProcess`, `ForUser`, or `ForComputer`.  For example, replace `Set-EnvironmentVariable -Name MyVar -Value MyValue -Scope Machine` with `Set-EnvironmentVariable -Name MyVar -Value MyValue -ForComputer`.
  * Replace usages of [Protect-String](http://get-carbon.org/help/Protect-String.html)'s `Scope` parameteter with the `ForUser` or `ForComputer` scope-specific switches, e.g. replace `Protect-String -String 'MySooperSecretPassword' -Scope LocalMachine` with `Protect-String -String 'MySooperSecretPassword` -ForComputer`.
  * Replace usages of `Get-PathRelativeTo` with `[Resolve-RelativePath](http://get-carbon.org/help/Resolve-RelativePath.html)`.  Also, its interface has completed changed.  Replace usages of the `To` parameter with `Path`, and move it to the first position.  Replace usages of the `From` and `FromType` parameter with the `FromDirectory` or `FromFile` parameters.  For example, `Get-PathRelativeTo -From 'C:\Windows\system32' -To 'C:\Program Files'` would now be `Resolve-RelativePath -Path 'C:\Program Files' -FromDirectory 'C:\Windows\system32'`.
+ * Replace usages of `ConvertTo-FullPath` with [Resolve-FullPath](http://get-carbon.org/help/Resolve-FullPath.ps1).
  
 ## Enhancements
  * Created new [Get-WindowsFeature](http://get-carbon.org/help/Get-WindowsFeature.html) function for getting a list of available Windows features.
@@ -27,6 +28,7 @@
  * Replaced the `Scope` parameter on [Set-EnvironmentVariable](http://get-carbon.org/help/Set-EnvironmentVariable.html) and [Remove-EnvironmentVariable](http://get-carbon.org/help/Remove-EnvironmentVariable.html) with scope-specific `ForProcess`, `ForUser`, and `ForComputer` switches.
  * Replaced [Protect-String](http://get-carbon.org/help/Protect-String.html)'s `Scope` parameteter with the `ForUser` or `ForComputer` scope-specific switches.
  * Renamed `Get-PathRelativeTo` to [Resolve-RelativePath](http://get-carbon.org/help/Resolve-RelativePath.html).  Renamed its `To` parameter to `Path`, and moved it to position 0.  Replaced/combined the `From` and `FromType` parameters with `FromDirectory` and `FromFile` parameters.
+ * Renamed `ConvertTo-FullPath` to [Resolve-FullPath](http://get-carbon.org/help/Resolve-FullPath.ps1).  Added support for converting unrooted paths using the current location.
  
 # 0.4.0.1 (18 December 2012)
 
