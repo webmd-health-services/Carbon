@@ -162,10 +162,19 @@ function Get-WindowsFeature
                 New-Object PsObject -Property $properties
             }
     }
-    elseif( $useSetupManager )
+    elseif( $useServerManager )
     {
         servermanagercmd.exe -query | 
-            Where-Object { $_ -like ('*[{0}]*' -f $Name) } |
+            Where-Object { 
+                if( $Name )
+                {
+                    return ($_ -match ('\[{0}\]$' -f [Text.RegularExpressions.Regex]::Escape($Name)))
+                }
+                else
+                {
+                    return $true
+                }
+            } |
             Where-Object { $_ -match '\[(X| )\] ([^[]+) \[(.+)\]' } | 
             ForEach-Object { 
                 $properties = @{ 
