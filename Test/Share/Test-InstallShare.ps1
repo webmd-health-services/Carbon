@@ -14,11 +14,18 @@
 
 $ShareName = 'New Share Test'
 $SharePath = $TestDir
+$fullAccessGroup = 'CarbonShareFull'
+$changeAccessGroup = 'CarbonShareChange'
+$readAccessGroup = 'CarbonShareRead'
+$noAccessGroup = 'CarbonShareNone'
 
 function SetUp
 {
-    Import-Module (Join-Path $TestDir ..\..\Carbon -Resolve)
+    & (Join-Path $TestDir ..\..\Carbon\Import-Carbon.ps1 -Resolve)
 
+    Install-Group -Name $fullAccessGroup -Description 'Carbon module group for testing full share permissions.'
+    Install-Group -Name $changeAccessGroup -Description 'Carbon module group for testing change share permissions.'
+    Install-Group -Name $readAccessGroup -Description 'Carbon module group for testing read share permissions.'
     Remove-Share
 }
 
@@ -38,9 +45,12 @@ function Remove-Share
     }
 }
 
-function Invoke-NewShare($Permissions = @(), $Remarks = '')
+function Invoke-NewShare($FullAccess = @(), $ChangeAccess = @(), $ReadAccess = @(), $Remarks = '')
 {
-    Install-Share -Name $ShareName -Path $TestDir -Permissions $Permissions -Description $Remarks
+    Install-SmbShare -Name $ShareName -Path $TestDir -Description $Remarks `
+                     -FullAccess $FullAccess `
+                     -ChangeAccess $ChangeAccess `
+                     -ReadAccess $ReadAccess 
     Assert-ShareCreated
 }
 
@@ -57,14 +67,43 @@ function Test-ShouldCreateShare
 
 function Test-ShouldGrantPermissions
 {
-    Invoke-NewShare -Permissions 'ADMINISTRATORs,FULL'
-    $details = net share """$ShareName"""
-    Assert-ContainsLike $details "BUILTIN\Administrators, FULL" 'Permissions not set on share.'
+    Invoke-NewShare -FullAccess $fullAccessGroup -ChangeAccess $changeAccessGroup -ReadAccess $readAccessGroup
+    $details = net share $ShareName
+    Assert-ContainsLike $details ("{0}, FULL" -f $fullAccessGroup) 'Permissions not set on share.'
+    Assert-ContainsLike $details ("{0}, CHANGE" -f $changeAccessGroup) 'Permissions not set on share.'
+    Assert-ContainsLike $details ("{0}, READ" -f $readAccessGroup) 'Permissions not set on share.'
+}
+
+function Test-ShouldGrantMultipleFullAccessPermissions
+{
+    Install-SmbShare -Name $shareName -Path $TestDir -Description $Remarks -FullAccess $fullAccessGroup,$changeAccessGroup,$readAccessGroup
+    $details = net share $ShareName
+    Assert-ContainsLike $details ("{0}, FULL" -f $fullAccessGroup) 'Permissions not set on share.'
+    Assert-ContainsLike $details ("{0}, FULL" -f $changeAccessGroup) 'Permissions not set on share.'
+    Assert-ContainsLike $details ("{0}, FULL" -f $readAccessGroup) 'Permissions not set on share.'
+}
+
+function Test-ShouldGrantMultipleChangeAccessPermissions
+{
+    Install-SmbShare -Name $shareName -Path $TestDir -Description $Remarks -ChangeAccess $fullAccessGroup,$changeAccessGroup,$readAccessGroup
+    $details = net share $ShareName
+    Assert-ContainsLike $details ("{0}, CHANGE" -f $fullAccessGroup) 'Permissions not set on share.'
+    Assert-ContainsLike $details ("{0}, CHANGE" -f $changeAccessGroup) 'Permissions not set on share.'
+    Assert-ContainsLike $details ("{0}, CHANGE" -f $readAccessGroup) 'Permissions not set on share.'
+}
+
+function Test-ShouldGrantMultipleFullAccessPermissions
+{
+    Install-SmbShare -Name $shareName -Path $TestDir -Description $Remarks -ReadAccess $fullAccessGroup,$changeAccessGroup,$readAccessGroup
+    $details = net share $ShareName
+    Assert-ContainsLike $details ("{0}, READ" -f $fullAccessGroup) 'Permissions not set on share.'
+    Assert-ContainsLike $details ("{0}, READ" -f $changeAccessGroup) 'Permissions not set on share.'
+    Assert-ContainsLike $details ("{0}, READ" -f $readAccessGroup) 'Permissions not set on share.'
 }
 
 function Test-ShouldDeleteThenRecreateShare
 {
-    Invoke-NewShare -Permissions 'Administrators,FULL'
+    Invoke-NewShare -FullAccess 'Administrators'
     
     Invoke-NewShare
     $details = net share """$ShareName"""
@@ -82,7 +121,7 @@ function Test-ShouldSetRemarks
 
 function Test-ShouldHandlePathWithTrailingSlash
 {
-    Install-Share $ShareName -Path "$TestDir\"
+    Install-SmbShare $ShareName -Path "$TestDir\"
     
     Assert-ShareCreated
 }

@@ -6,6 +6,7 @@
  * Rename usages of `Uninstall-WindowsFeatures` with [Uninstall-WindowsFeature](http://get-carbon.org/help/Install-WindowsFeature.html).  Also, rename usages of the `Features` parameter to `Name`.
  * Replace usages of `Install-WindowsFeatureIis` with `[Install-WindowsFeature](http://get-carbon.org/help/Install-WindowsFeature.html) -Iis`.  You can use the `IisHttpRedirection` switch to install IIS HTTP redirection.
  * Replace usages of `Install-WindowsFeatureMsmq` with `[Install-WindowsFeature](http://get-carbon.org/help/Install-WindowsFeature.html) -Msmq`.  You can use the `MsmqHttpSupport` and `MsmqActiveDirectoryIntegration`.
+ * Rename usages of `Install-Share` with `[Install-SmbShare](Install-SmbShare](http://get-carbon.org/help/Install-SmbShare.html)`.  Also, replace usages of the old `Permissions` parameter with the new `FullAccess`, `ChangeAccess`, and `ReadAccess` parameters.  Previously, to set share permissions, you passed in specially-formatted values to the `Permission` parameter, e.g. `"MyGroup,FULL","MyOtherGroup,READ"`.  Now, just pass a list of identity name(s) to the `FullAccess`, `ChangeAccess`, or `ReadAccess` parameters to grant those identies full, change, or read access, e.g. `-FullAccess MyGroup -ReadAccess MyOtherGroup`.
  
 ## Enhancements
  * Created new [Get-WindowsFeature](http://get-carbon.org/help/Get-WindowsFeature.html) function for getting a list of available Windows features.
@@ -19,7 +20,7 @@
  * Added `Iis`, `IisHttpRedirection`, `Msmq`, `MsmqHttpSupport`, and `HttpActiveDirectoryIntegration` switches to [Uninstall-WindowsFeature](http://get-carbon.org/help/Uninstall-WindowsFeature.html).
  * [Install-WindowsFeature](http://get-carbon.org/help/Install-WindowsFeature.html), [Test-WindowsFeature](http://get-carbon.org/help/Test-WindowsFeature.html), and [Uninstall-WindowsFeature](http://get-carbon.org/help/Uninstall-WindowsFeature.html) are now available even if the current operating system doesn't support managing Windows features.  They don't do anything in those situations, but they exist.
  * [Install-WindowsFeature](http://get-carbon.org/help/Install-WindowsFeature.html), [Test-WindowsFeature](http://get-carbon.org/help/Test-WindowsFeature.html), and [Uninstall-WindowsFeature](http://get-carbon.org/help/Uninstall-WindowsFeature.html) are not available if the PowerShell v3.0 server manager cmdlets exists (on Windows 8/2012).
- 
+ * Replaced the `Permissions` parameter on `[Install-SmbShare](Install-SmbShare](http://get-carbon.org/help/Install-SmbShare.html)` with `FullAccess`, `ChangeAccess`, and `ReadAccess` parameters. Previously, to set share permissions, you passed in specially-formatted values to the `Permission` parameter, e.g. `"MyGroup,FULL","MyOtherGroup,READ"`.  Now, just pass a list of identity name(s) to the `FullAccess`, `ChangeAccess`, or `ReadAccess` parameters to grant those identies full, change, or read access, e.g. `-FullAccess MyGroup -ReadAccess MyOtherGroup`.
 
 # 0.4.0.1 (18 December 2012)
 

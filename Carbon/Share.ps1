@@ -11,7 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-function Install-Share
+
+function Install-SmbShare
 {
     <#
     .SYNOPSIS
@@ -44,9 +45,37 @@ function Install-Share
         $Description = '',
         
         [string[]]
-        # The share's permissions. Each item should be of the form: user,[READ | CHANGE | FULL]
-        $Permissions = @()
+        # The identities who have full access to the share.
+        $FullAccess = @(),
+        
+        [string[]]
+        # The identities who have change access to the share.
+        $ChangeAccess = @(),
+        
+        [string[]]
+        # The identities who have read access to the share
+        $ReadAccess = @()
     )
+    
+    function ConvertTo-NetShareGrantArg
+    {
+        param(
+            [string[]]
+            $Name,
+            
+            [string]
+            [ValidateSet('FULL','CHANGE','READ','NONE')]
+            $Access
+        )
+        $Name | ForEach-Object {
+            $perm = ''
+            if( $Access -ne 'NONE' )
+            {
+                $perm = ',{0}' -f $Access
+            }
+            '/GRANT:"{0}{1}"' -f $_,$perm
+        }
+    }
 
     $share = Get-WmiObject Win32_Share -Filter "Name='$Name'"
     if( $share -ne $null )
@@ -55,12 +84,10 @@ function Install-Share
         [void] $share.Delete()
     }
 
-    $PermissionsArg = ''
-    if( $Permissions.Length -gt 0 )
-    {
-        $PermissionsArg = $Permissions -join """ /GRANT:"""
-        $PermissionsArg = """/GRANT:$PermissionsArg"""
-    }
+    $fullAccessArg = ConvertTo-NetShareGrantArg -Name $FullAccess -Access 'FULL'
+    $changeAccessArg = ConvertTo-NetShareGrantArg -Name $ChangeAccess -Access 'CHANGE'
+    $readAccessArg = ConvertTo-NetShareGrantArg -Name $ReadAccess -Access 'READ'
+    $noAccessArg = ConvertTo-NetShareGrantArg -Name $NoAccess -Access 'NONE'
     
-    net share $Name=$($Path.Trim('\')) /REMARK:$Description $PermissionsArg /CACHE:NONE /UNLIMITED
+    net share $Name=$($Path.Trim('\')) /REMARK:$Description $fullAccessArg $changeAccessArg $readAccessArg /CACHE:NONE /UNLIMITED
 }
