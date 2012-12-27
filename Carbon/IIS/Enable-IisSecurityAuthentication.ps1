@@ -50,13 +50,24 @@ function Enable-IisSecurityAuthentication
         
         [string]
         # The optional path where anonymous authentication should be set.
-        $Path = ''
+        $Path = '',
+        
+        [Parameter(Mandatory=$true,ParameterSetName='Anonymous')]
+        [Switch]
+        # Enable anonymouse authentication.
+        $Anonymous,
+        
+        [Parameter(Mandatory=$true,ParameterSetName='Basic')]
+        [Switch]
+        # Enable basic authentication.
+        $Basic
     )
     
-    $authSettings = Get-IisSecurityAuthentication -SiteName $SiteName -Path $Path -Anonymous
+    $getArgs = @{ $pscmdlet.ParameterSetName = $true; }
+    $authSettings = Get-IisSecurityAuthentication -SiteName $SiteName -Path $Path @getArgs
     $authSettings.SetAttributeValue('enabled', 'true')
     
-    if( $pscmdlet.ShouldProcess( "$SiteName/$Path", "enable anonymous authentication" ) )
+    if( $pscmdlet.ShouldProcess( "$SiteName/$Path", ("enable {0}" -f $pscmdlet.ParameterSetName) ) )
     {
         $authSettings.CommitChanges()
     }

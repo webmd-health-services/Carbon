@@ -15,6 +15,8 @@ This release contains many backwards incompatible changes.  Take the following s
  * Replace usages of `Get-PathRelativeTo` with `[Resolve-RelativePath](http://get-carbon.org/help/Resolve-RelativePath.html)`.  Also, its interface has completed changed.  Replace usages of the `To` parameter with `Path`, and move it to the first position.  Replace usages of the `From` and `FromType` parameter with the `FromDirectory` or `FromFile` parameters.  For example, `Get-PathRelativeTo -From 'C:\Windows\system32' -To 'C:\Program Files'` would now be `Resolve-RelativePath -Path 'C:\Program Files' -FromDirectory 'C:\Windows\system32'`.
  * Replace usages of `ConvertTo-FullPath` with [Resolve-FullPath](http://get-carbon.org/help/Resolve-FullPath.ps1).
  * Replace usages of `Get-PathCanonicalCase` with [Resolve-PathCase](http://get-carbon.org/help/Resolve-PathCase.ps1).
+ * Replace usages of `Set-IisAnonymousAuthentication` with `[Enable-IisSecurityAuthentication](http://get-carbon.org/help/Enable-IisSecurityAuthentication.ps1) -Anonymous` and `[Disable-IisSecurityAuthentication](http://get-carbon.org/help/Disable-IisSecurityAuthentication.ps1) -Anonymous`.
+ * Replace usages of `Set-IisBasicAuthentication` with `[Enable-IisSecurityAuthentication](http://get-carbon.org/help/Enable-IisSecurityAuthentication.ps1) -Basic` and `[Disable-IisSecurityAuthentication](http://get-carbon.org/help/Disable-IisSecurityAuthentication.ps1) -Basic`.
  
 ## Enhancements
  * Created new [Get-WindowsFeature](http://get-carbon.org/help/Get-WindowsFeature.html) function for getting a list of available Windows features.
@@ -34,6 +36,8 @@ This release contains many backwards incompatible changes.  Take the following s
  * Renamed `Get-PathRelativeTo` to [Resolve-RelativePath](http://get-carbon.org/help/Resolve-RelativePath.html).  Renamed its `To` parameter to `Path`, and moved it to position 0.  Replaced/combined the `From` and `FromType` parameters with `FromDirectory` and `FromFile` parameters.
  * Renamed `ConvertTo-FullPath` to [Resolve-FullPath](http://get-carbon.org/help/Resolve-FullPath.ps1).  Added support for converting unrooted paths using the current location.
  * Renamed `Get-PathCanonicalCase` with [Resolve-PathCase](http://get-carbon.org/help/Resolve-PathCase.ps1).  Added support for piping in `Get-Item` and `Get-ChildItem` output, e.g. `Get-Item C:\WINDOWS | Resolve-PathCase` returns C:\Windows.
+ * Replaced `Set-IisAnonymousAuthentication` with `[Enable-IisSecurityAuthentication](http://get-carbon.org/help/Enable-IisSecurityAuthentication.ps1)` and `[Disable-IisSecurityAuthentication](http://get-carbon.org/help/Disable-IisSecurityAuthentication.ps1)`.
+ * Replaced `Set-IisBasicAuthentication` with `[Enable-IisSecurityAuthentication](http://get-carbon.org/help/Enable-IisSecurityAuthentication.ps1)` and `[Disable-IisSecurityAuthentication](http://get-carbon.org/help/Disable-IisSecurityAuthentication.ps1)`.
 
 # 0.4.0.1 (18 December 2012)
 
