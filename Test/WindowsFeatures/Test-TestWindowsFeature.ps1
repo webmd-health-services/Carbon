@@ -12,42 +12,49 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Setup
+if( (Get-WmiObject -Class Win32_OptionalFeature -ErrorAction SilentlyContinue) )
 {
-    Import-Module (Join-Path $TestDir ..\..\Carbon -Resolve) -Force
+    function Setup
+    {
+        Import-Module (Join-Path $TestDir ..\..\Carbon -Resolve) -Force
+    }
+
+    function TearDown
+    {
+        Remove-Module Carbon
+    }
+
+
+    function Test-ShouldDetectInstalledFeature
+    {
+        Get-WindowsFeature | 
+            Where-Object { $_.Installed } |
+            ForEach-Object {
+                Assert-True (Test-WindowsFeature -Name $_.Name -Installed)
+            }
+    }
+
+    function Test-ShouldDetectUninstalledFeature
+    {
+        Get-WindowsFeature | 
+            Where-Object { -not $_.Installed } |
+            ForEach-Object {
+                Assert-False (Test-WindowsFeature -Name $_.Name -Installed)
+            }
+    }
+
+    function Test-ShouldDetectFeatures
+    {
+        Get-WindowsFeature |
+            ForEach-Object { Assert-True (Test-WindowsFeature -Name $_.Name) }
+    }
+
+    function Test-ShouldNotDetectFeature
+    {
+        Assert-False (Test-WindowsFeature -Name 'IDoNotExist')
+    }
 }
-
-function TearDown
+else
 {
-    Remove-Module Carbon
-}
-
-
-function Test-ShouldDetectInstalledFeature
-{
-    Get-WindowsFeature | 
-        Where-Object { $_.Installed } |
-        ForEach-Object {
-            Assert-True (Test-WindowsFeature -Name $_.Name -Installed)
-        }
-}
-
-function Test-ShouldDetectUninstalledFeature
-{
-    Get-WindowsFeature | 
-        Where-Object { -not $_.Installed } |
-        ForEach-Object {
-            Assert-False (Test-WindowsFeature -Name $_.Name -Installed)
-        }
-}
-
-function Test-ShouldDetectFeatures
-{
-    Get-WindowsFeature |
-        ForEach-Object { Assert-True (Test-WindowsFeature -Name $_.Name) }
-}
-
-function Test-ShouldNotDetectFeature
-{
-    Assert-False (Test-WindowsFeature -Name 'IDoNotExist')
+    Write-Warning "Tests for Test-WindowsFeature not supported on this operating system."
 }
