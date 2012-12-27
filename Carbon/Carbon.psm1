@@ -14,11 +14,11 @@
 
 $CarbonBinDir = Join-Path $PSScriptRoot bin -Resolve
 
-Get-ChildItem $PSScriptRoot *.ps1 -Recurse  | 
-    Where-Object { $_ -notlike '*-*.ps1' } |
+Get-ChildItem $PSScriptRoot *.ps1 -Recurse | 
+    Where-Object { $_.BaseName -ne 'Import-Carbon' -and $_.Extension -eq '.ps1' } |
     ForEach-Object {
-        Write-Verbose "Importing sub-module $(Split-Path -Leaf $_)."
-        . $_
+        Write-Debug ("Importing sub-module {0}." -f $_.FullName)
+        . $_.FullName
     }
 
 $CarbonImported = $true

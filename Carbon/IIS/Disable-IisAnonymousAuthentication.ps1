@@ -12,27 +12,27 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Enable-IisAnonymousAuthentication
+function Disable-IisAnonymousAuthentication
 {
     <#
     .SYNOPSIS
-    Enables anonymous authentication for all or part of a website.
+    Disables anonymous authentication for all or part of a website.
 
     .DESCRIPTION
-    By default, enables anonymous authentication on an entire website.  You can enable anonymous authentication at a specific path under a website by passing the virtual path (*not* the physical path) to that directory as the value of the `Path` parameter.
+    By default, disables anonymous authentication on an entire website.  You can disable anonymous authentication at a specific path under a website by passing the virtual path (*not* the physical path) to that directory as the value of the `Path` parameter.
 
     .LINK
-    Disable-IisAnonymousAuthentication
-    
+    Enable-IisAnonymousAuthentication
+
     .EXAMPLE
-    Enable-IisAnonymousAuthentication -SiteName Peanuts
+    Disable-IisAnonymousAuthentication -SiteName Peanuts
 
     Turns on anonymous authentication for the `Peanuts` website.
 
     .EXAMPLE
-    Enable-IisAnonymouseAuthentication -SiteName Peanuts Snoopy/DogHouse
+    Disable-IisAnonymousAuthentication -SiteName Peanuts Snoopy/DogHouse
 
-    Turns on anonymous authentication for the `Snoopy/DogHouse` directory under the `Peanuts` website.
+    Turns off anonymous authentication for the `Snoopy/DogHouse` directory under the `Peanuts` website.
 
     #>
     [CmdletBinding(SupportsShouldProcess=$true)]
@@ -48,8 +48,8 @@ function Enable-IisAnonymousAuthentication
     )
     
     $authSettings = Get-IisSecurityAuthentication -SiteName $SiteName -Path $Path -Anonymous
-    $authSettings.SetAttributeValue('enabled', 'true')
-    if( $pscmdlet.ShouldProcess( "$SiteName/$Path", "enable anonymous authentication" ) )
+    $authSettings.SetAttributeValue('enabled', 'False')
+    if( $pscmdlet.ShouldProcess( "$SiteName/$Path", "disable anonymous authentication" ) )
     {
         $authSettings.CommitChanges()
     }

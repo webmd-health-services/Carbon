@@ -33,29 +33,30 @@ function TearDown
     Remove-Module Carbon
 }
 
-function Test-ShouldEnableAnonymousAuthentication
+function Test-ShouldDisableAnonymousAuthenticationOnVDir
 {
-    Enable-IisAnonymousAuthentication -SiteName $siteName
-    Assert-AnonymousAuthentication -Enabled 'true'
-    Assert-FileDoesNotExist $webConfigPath 
+    Disable-IisAnonymousAuthentication -SiteName $siteName -Path SubFolder
+    Assert-False (Test-IisSecurityAuthentication -SiteName $siteName -Path SubFolder -Anonymous)
 }
 
-function Test-ShouldEnableAnonymousAuthenticationOnSubFolders
+function Test-ShouldDisableAnonymousAuthentication
 {
-    Enable-IisAnonymousAuthentication -SiteName $siteName -Path SubFolder
-    Assert-AnonymousAuthentication -Path "$siteName/SubFolder" -Enabled 'true'
+    Disable-IisAnonymousAuthentication -SiteName $siteName
+    Assert-False (Test-IisSecurityAuthentication -SiteName $siteName -Anonymous)
+}
+
+function Test-ShouldDisableEnabledAnonymousAuthentication
+{
+    Enable-IisAnonymousAuthentication -SiteName $siteName
+    Assert-True (Test-IisSecurityAuthentication -SiteName $siteName -Anonymous)
+    Disable-IisAnonymousAuthentication -SiteName $siteName
+    Assert-False (Test-IisSecurityAuthentication -SiteName $siteName -Anonymous)
 }
 
 function Test-ShouldSupportWhatIf
 {
-    Enable-IisAnonymousAuthentication $siteName 
-    Assert-AnonymousAuthentication -Enabled 'true'
-}
-
-function Assert-AnonymousAuthentication($Path = $siteName, $Enabled)
-{
-    $authSettings = [xml] (Invoke-AppCmd list config $Path '-section:anonymousAuthentication')
-    $authNode = $authSettings['system.webServer'].security.authentication.anonymousAuthentication
-    Assert-Equal $Enabled $authNode.enabled
-    Assert-Equal '' $authNode.username
+    Enable-IisAnonymousAuthentication -SiteName $siteName 
+    Assert-True (Test-IisSecurityAuthentication -SiteName $siteName -Anonymous)
+    Disable-IisAnonymousAuthentication -SiteName $siteName -WhatIf
+    Assert-True (Test-IisSecurityAuthentication -SiteName $siteName -Anonymous)
 }

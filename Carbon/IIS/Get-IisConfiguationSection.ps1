@@ -1,0 +1,58 @@
+# Copyright 2012 Aaron Jensen
+# 
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# 
+#     http://www.apache.org/licenses/LICENSE-2.0
+# 
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+function Get-IisConfigurationSection
+{
+    <#
+    .SYNOPSIS
+    Gets a Microsoft.Web.Adminisration configuration section for a given site and path.
+    
+    .DESCRIPTION
+    Uses the Microsoft.Web.Administration API to get a `Microsoft.Web.Administration.ConfigurationSection`.
+    
+    .OUTPUTS
+    Microsoft.Web.Administration.ConfigurationSection.
+    
+    .EXAMPLE
+    Get-IisConfigurationSection -SiteName Peanuts -Path Doghouse -Path 'system.webServer/security/authentication/anonymousAuthentication'
+
+    Returns a configuration section which represents the Peanuts site's Doghouse path's anonymous authentication settings.    
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]
+        # The site where anonymous authentication should be set.
+        $SiteName,
+        
+        [string]
+        # The optional site path whose configuration should be returned.
+        $Path = '',
+        
+        [Parameter(Mandatory=$true)]
+        [string]
+        # The path to the configuration section to return.
+        $SectionPath
+    )
+    
+    $mgr = New-Object Microsoft.Web.Administration.ServerManager
+    $config = $mgr.GetApplicationHostConfiguration()
+    $section = $config.GetSection( $SectionPath, ('{0}/{1}' -f $SiteName,$Path) )
+    if( $section )
+    {
+        $section | 
+            Add-Member -MemberType NoteProperty -Name 'ServerManager' -Value $mgr -PassThru |
+            Add-Member -MemberType ScriptMethod -Name 'CommitChanges' -Value { $this.ServerManager.CommitChanges() } -PassThru
+    }
+}
