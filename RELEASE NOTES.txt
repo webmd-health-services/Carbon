@@ -18,6 +18,8 @@
  * Renamed [Uninstall-WindowsFeature](http://get-carbon.org/help/Uninstall-WindowsFeature.html)'s `Features` parameter to `Name`.
  * Added `Iis`, `IisHttpRedirection`, `Msmq`, `MsmqHttpSupport`, and `HttpActiveDirectoryIntegration` switches to [Uninstall-WindowsFeature](http://get-carbon.org/help/Uninstall-WindowsFeature.html).
  * [Install-WindowsFeature](http://get-carbon.org/help/Install-WindowsFeature.html), [Test-WindowsFeature](http://get-carbon.org/help/Test-WindowsFeature.html), and [Uninstall-WindowsFeature](http://get-carbon.org/help/Uninstall-WindowsFeature.html) are now available even if the current operating system doesn't support managing Windows features.  They don't do anything in those situations, but they exist.
+ * [Install-WindowsFeature](http://get-carbon.org/help/Install-WindowsFeature.html), [Test-WindowsFeature](http://get-carbon.org/help/Test-WindowsFeature.html), and [Uninstall-WindowsFeature](http://get-carbon.org/help/Uninstall-WindowsFeature.html) are not available if the PowerShell v3.0 server manager cmdlets exists (on Windows 8/2012).
+ 
 
 # 0.4.0.1 (18 December 2012)
 
