@@ -19,13 +19,15 @@ function Install-IisAppPool
     Creates a new app pool.
     
     .DESCRIPTION
+    By default, creates a 64-bit app pool running as the `ApplicationPoolIdentity` service account under .NET v4.0 with an integrated pipeline.
+    
     You can control which version of .NET is used to run an app pool with the `ManagedRuntimeVersion` parameter: versions `v1.0`, `v1.1`, `v2.0`, and `v4.0` are supported.
 
     To run an application pool using the classic pipeline mode, set the `ClassicPipelineMode` switch.
 
     To run an app pool using the 32-bit version of the .NET framework, set the `Enable32BitApps` switch.
 
-    An app pool can run as several built-in service accounts, by passing one of them as the value of the `ServiceAccount` parameter: `NetworkService`, `LocalService`, `LocalSystem`, and `ApplicationPoolIdentity`.  Specifying `ApplicationPoolIdentity` causes IIS to create and use a custom local account with the name of the app pool.  See [Application Pool Identities](http://learn.iis.net/page.aspx/624/application-pool-identities/) for more information.
+    An app pool can run as several built-in service accounts, by passing one of them as the value of the `ServiceAccount` parameter: `NetworkService`, `LocalService`, or `LocalSystem`  The default is `ApplicationPoolIdentity`, which causes IIS to create and use a custom local account with the name of the app pool.  See [Application Pool Identities](http://learn.iis.net/page.aspx/624/application-pool-identities/) for more information.
 
     To run the app pool as a specific user, pass the username and password for the account to the `Username` and `Password` parameters, respectively.
 
@@ -33,6 +35,9 @@ function Install-IisAppPool
 
     By default, this function will create an application pool running the latest version of .NET, with an integrated pipeline, as the NetworkService account.
 
+    .LINK
+    http://learn.iis.net/page.aspx/624/application-pool-identities/
+    
     .EXAMPLE
     Install-IisAppPool -Name Cyberdyne -ServiceAccount NetworkService
 
@@ -73,10 +78,9 @@ function Install-IisAppPool
         # Enable 32-bit applications.
         $Enable32BitApps,
         
-        [Parameter(ParameterSetName='AsServiceAccount')]
         [string]
-        [ValidateSet('NetworkService','LocalService','LocalSystem','ApplicationPoolIdentity')]
-        # Run the app pool under the given local service account.  Valid values are `NetworkService`, `LocalService`, `LocalSystem`, and `ApplicationPoolIdentity`.  Specifying `ApplicationPoolIdentity` causes IIS to create a custom local user account for the app pool's identity.
+        [ValidateSet('NetworkService','LocalService','LocalSystem')]
+        # Run the app pool under the given local service account.  Valid values are `NetworkService`, `LocalService`, and `LocalSystem`.  The default is `ApplicationPoolIdentity`, which causes IIS to create a custom local user account for the app pool's identity.  The default is `ApplicationPoolIdentity`.
         $ServiceAccount,
         
         [Parameter(ParameterSetName='AsSpecificUser',Mandatory=$true)]
@@ -106,14 +110,7 @@ function Install-IisAppPool
     
     Invoke-AppCmd set config /section:applicationPools /[name=`'$name`'].enable32BitAppOnWin64:$Enable32BitApps
     
-    if( $pscmdlet.ParameterSetName -eq 'AsServiceAccount' )
-    {
-        if( $ServiceAccount )
-        {
-            Invoke-AppCmd set config /section:applicationPools /[name=`'$Name`'].processModel.identityType:$ServiceAccount
-        }
-    }
-    elseif( $pscmdlet.ParameterSetName -eq 'AsSpecificUser' )
+    if( $pscmdlet.ParameterSetName -eq 'AsSpecificUser' )
     {
         if( $Password -is [Security.SecureString] )
         {
@@ -122,5 +119,16 @@ function Install-IisAppPool
         Invoke-AppCmd set config /section:applicationPools /[name=`'$Name`'].processModel.identityType:SpecificUser `
                                                            /[name=`'$Name`'].processModel.userName:$UserName `
                                                            /[name=`'$Name`'].processModel.password:$Password
+    }
+    else
+    {
+        if( $ServiceAccount )
+        {
+            Invoke-AppCmd set config /section:applicationPools /[name=`'$Name`'].processModel.identityType:$ServiceAccount
+        }
+        else
+        {
+            Invoke-AppCmd clear config /section:applicationPools /[name=`'$Name`'].processModel.identityType
+        }
     }
 }

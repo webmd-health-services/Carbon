@@ -146,6 +146,14 @@ function Test-ShouldConvert32BitAppPoolto64Bit
     Assert-AppPool32BitEnabled $false    
 }
 
+function Test-ShouldSwitchToAppPoolIdentityIfServiceAccountNotGiven
+{
+    Install-IisAppPool -Name $appPoolName -ServiceAccount NetworkService
+    Assert-IdentityType 'NetworkService'
+    Install-IisAppPool -Name $appPoolName
+    Assert-IdentityType (Get-IISDefaultAppPoolIdentity)
+}
+
 function Get-AppPoolDetails
 {
     return Invoke-AppCmd list apppool /name:`"$appPoolname`"

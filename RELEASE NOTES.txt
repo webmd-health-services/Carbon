@@ -70,6 +70,7 @@ This release contains many backwards incompatible changes.  Take the following s
  * Improved [Install-Service](http://get-carbon.org/help/Install-Service.html)'s `WhatIf` support.
  * Renamed `Test-IisAppPoolExists` to [Test-IisAppPool](http://get-carbon.org/help/Uninstall-Service.html).
  * Renamed `Remove-IisWebsite` with [Uninstall-IisWebsite](http://get-carbon.org/help/Uninstall-IisWebsite.html).
+ * [Install-IisAppPool](http://get-carbon.org/help/Install-IisAppPool.html) now always sets the application pool to run as the system's default application pool identity if the `ServiceAccount` parameter isn't given.
  
  
 # 0.4.0.1 (18 December 2012)
