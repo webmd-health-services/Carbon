@@ -56,7 +56,7 @@ function Test-ShouldUpdateServiceProperties
     Assert-Equal 'Manual' $service.StartMode
     Assert-Equal ".\$serviceAcct" $service.UserName
     Assert-Equal 'Stopped' $service.Status
-    Assert-HasFullControl "$($env:ComputerName)\$serviceAcct" $newServicePath
+    Assert-HasPermissionsOnServiceExecutable "$($env:ComputerName)\$serviceAcct" $newServicePath
 }
 
 function Test-ShouldSupportWhatIf
@@ -145,17 +145,14 @@ function Assert-ServiceInstalled
     return $service
 }
 
-function Assert-HasFullControl($Identity, $Path)
+function Assert-HasPermissionsOnServiceExecutable($Identity, $Path)
 {
-    $acl = Get-Acl $Path
-    foreach( $rule in $acl.Access )
-    {
-        if( $rule.IdentityREference -eq $Identity -and $rule.FileSystemRights -eq 'FullControl' )
-        {
-            return
-        }
-    }
-    
-    Fail "'$Identity' didn't have full control to '$Path'."
+    $acl = Get-Acl $Path |
+            Select-Object -ExpandProperty Access |
+            Where-Object { 
+                $_.IdentityReference -eq $Identity -and (($_.FileSystemRights -band [Security.AccessControl.FileSystemRights]::ReadAndExecute) -eq 'ReadAndExecute') 
+            }
+
+    Assert-Null $acl "'$Identity' didn't have full control to '$Path'."
             
 }

@@ -172,7 +172,7 @@ function Install-Service
         }
     }
     
-    Grant-Permissions -Identity $identity -Permissions FullControl -Path $Path
+    Grant-Permissions -Identity $identity -Permissions ReadAndExecute -Path $Path
     
     $service = Get-Service -Name $Name -ErrorAction SilentlyContinue
     
