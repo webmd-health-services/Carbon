@@ -48,7 +48,7 @@ This release contains many backwards incompatible changes.  Take the following s
  * Switched the default behavior of [Set-IisWindowsAuthentication](http://get-carbon.org/help/Set-IisWindowsAuthentication.ps1) to enable kernel mode.  To disable kernel mode, use the `DisableKernelMode` switch.
  * Created [Get-IisConfigurationSection](http://get-carbon.org/help/Get-IisConfigurationSection.ps1) function for returning an arbitrary IIS configuration section using the Microsoft.Web.Administration API.
  * Created [Lock-IisConfigurationSection](http://get-carbon.org/help/Lock-IisConfigurationSection.ps1) function for locking arbitrary global IIS configuration sections.
- 
+ * Created [Test-IisConfigurationSection](http://get-carbon.org/help/Test-IisConfigurationSection.ps1) function for testing if an configuration section is locked or not.
  
 # 0.4.0.1 (18 December 2012)
 

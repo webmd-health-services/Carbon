@@ -50,17 +50,25 @@ function Get-IisConfigurationSection
     
     $mgr = New-Object Microsoft.Web.Administration.ServerManager
     $config = $mgr.GetApplicationHostConfiguration()
-    if( $pscmdlet.ParameterSetName -eq 'ForSite' )
-    {
-        $qualifier = '{0}/{1} ' -f $SiteName,$Path
-        $section = $config.GetSection( $SectionPath, $qualifier )
-    }
-    else
-    {
-        $section = $config.GetSection( $SectionPath )
-        $qualifier = ''
-    }
     
+    $section = $null
+    try
+    {
+        if( $pscmdlet.ParameterSetName -eq 'ForSite' )
+        {
+            $qualifier = '{0}/{1} ' -f $SiteName,$Path
+            $section = $config.GetSection( $SectionPath, $qualifier )
+        }
+        else
+        {
+            $section = $config.GetSection( $SectionPath )
+            $qualifier = ''
+        }
+    }
+    catch
+    {
+    }
+        
     if( $section )
     {
         $section | 
