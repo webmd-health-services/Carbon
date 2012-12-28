@@ -29,18 +29,20 @@ function Get-IisConfigurationSection
 
     Returns a configuration section which represents the Peanuts site's Doghouse path's anonymous authentication settings.    
     #>
-    [CmdletBinding()]
+    [CmdletBinding(DefaultParameterSetName='Global')]
     param(
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory=$true,ParameterSetName='ForSite')]
         [string]
         # The site where anonymous authentication should be set.
         $SiteName,
         
+        [Parameter(ParameterSetName='ForSite')]
         [string]
         # The optional site path whose configuration should be returned.
         $Path = '',
         
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory=$true,ParameterSetName='ForSite')]
+        [Parameter(Mandatory=$true,ParameterSetName='Global')]
         [string]
         # The path to the configuration section to return.
         $SectionPath
@@ -48,11 +50,26 @@ function Get-IisConfigurationSection
     
     $mgr = New-Object Microsoft.Web.Administration.ServerManager
     $config = $mgr.GetApplicationHostConfiguration()
-    $section = $config.GetSection( $SectionPath, ('{0}/{1}' -f $SiteName,$Path) )
+    if( $pscmdlet.ParameterSetName -eq 'ForSite' )
+    {
+        $qualifier = '{0}/{1} ' -f $SiteName,$Path
+        $section = $config.GetSection( $SectionPath, $qualifier )
+    }
+    else
+    {
+        $section = $config.GetSection( $SectionPath )
+        $qualifier = ''
+    }
+    
     if( $section )
     {
         $section | 
             Add-Member -MemberType NoteProperty -Name 'ServerManager' -Value $mgr -PassThru |
             Add-Member -MemberType ScriptMethod -Name 'CommitChanges' -Value { $this.ServerManager.CommitChanges() } -PassThru
+    }
+    else
+    {
+        Write-Error ('IIS:{0}: configuration section {1} not found.' -f $qualifier,$SectionPath)
+        return
     }
 }
