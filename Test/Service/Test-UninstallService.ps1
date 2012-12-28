@@ -37,7 +37,7 @@ function Test-ShouldRemoveService
 {
     $service = Get-Service -Name $serviceName
     Assert-NotNull $service
-    Remove-Service -Name $serviceName
+    Uninstall-Service -Name $serviceName
     $service = Get-Service -Name $serviceName -ErrorAction SilentlyContinue
     Assert-Null $service
 }
@@ -45,13 +45,13 @@ function Test-ShouldRemoveService
 function Test-ShouldNotRemoveNonExistentService
 {
     $error.Clear()
-    Remove-Service -Name "IDoNotExist"
+    Uninstall-Service -Name "IDoNotExist"
     Assert-Null $error
 }
 
 function Test-ShouldSupportWhatIf
 {
-    Remove-Service -Name $serviceName -WhatIf
+    Uninstall-Service -Name $serviceName -WhatIf
     $service = Get-Service -Name $serviceName
     Assert-NotNull $service
 }
