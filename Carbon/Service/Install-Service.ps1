@@ -172,7 +172,10 @@ function Install-Service
         }
     }
     
-    Grant-Permissions -Identity $identity -Permissions ReadAndExecute -Path $Path
+    if( $pscmdlet.ShouldProcess( $Path, ('grant {0} ReadAndExecute permissions' -f $identity) ) )
+    {
+        Grant-Permissions -Identity $identity -Permissions ReadAndExecute -Path $Path
+    }
     
     $service = Get-Service -Name $Name -ErrorAction SilentlyContinue
     
@@ -197,33 +200,41 @@ function Install-Service
         $operation = 'config'
     }
     
+    $dependencyArgName = ''
+    $dependencyArgValue = ''
+    if( $Dependencies )
+    {
+        $dependencyArgName = 'depend='
+        $dependencyArgValue = $Dependencies -join '/'
+    }
+
     if( $pscmdlet.ShouldProcess( "$Name [$Path]", "$operation service" ) )
     {
         Write-Host "Installing service '$Name' at '$Path' to run as '$identity'."
-        $dependencyArgName = ''
-        $dependencyArgValue = ''
-        if( $Dependencies )
-        {
-            $dependencyArgName = 'depend='
-            $dependencyArgValue = $Dependencies -join '/'
-        }
         
         & $sc $operation $Name binPath= $Path start= $startArg obj= $identity $passwordArgName $passwordArgValue $dependencyArgName $dependencyArgValue
         if( $LastExitCode -ne 0 )
         {
-            Write-Error "$sc failed and returned '$LastExitCode'."
+            Write-Error "$sc failed $operation and returned '$LastExitCode'."
         }
-        
-        $firstAction = ConvertTo-FailureActionArg $OnFirstFailure $RestartDelay $RebootDelay
-        $secondAction = ConvertTo-FailureActionArg $OnSecondFailure $RestartDelay $RebootDelay
-        $thirdAction = ConvertTo-FailureActionArg $OnThirdFailure $RestartDelay $RebootDelay
+    }
+    
+    $firstAction = ConvertTo-FailureActionArg $OnFirstFailure $RestartDelay $RebootDelay
+    $secondAction = ConvertTo-FailureActionArg $OnSecondFailure $RestartDelay $RebootDelay
+    $thirdAction = ConvertTo-FailureActionArg $OnThirdFailure $RestartDelay $RebootDelay
+
+    if( $pscmdlet.ShouldProcess( $Name, "setting service failure actions" ) )
+    {
         & $sc failure $Name reset= $ResetFailureCount actions= $firstAction/$secondAction/$thirdAction
         if( $LastExitCode -ne 0 )
         {
             Write-Error "$sc failed when setting failure actions and returned '$LastExitCode'."
         }
+    }
         
-        if( $StartupType -eq [ServiceProcess.ServiceStartMode]::Automatic )
+    if( $StartupType -eq [ServiceProcess.ServiceStartMode]::Automatic )
+    {
+        if( $pscmdlet.ShouldProcess( $Name, 'start service' ) )
         {
             Start-Service -Name $Name
         }

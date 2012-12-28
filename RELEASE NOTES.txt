@@ -65,6 +65,8 @@ This release contains many backwards incompatible changes.  Take the following s
  * Renamed `Remove-Service` to [Uninstall-Service](http://get-carbon.org/help/Uninstall-Service.html).
  * [Install-Service](http://get-carbon.org/help/Install-Service.html) writes errors instead of throwing exceptions.
  * [Install-Service](http://get-carbon.org/help/Install-Service.html) grants `ReadAndExecute` file system permissions on the service executable to the service identity instead of `FullControl`.
+ * Improved [Install-Service](http://get-carbon.org/help/Install-Service.html)'s `WhatIf` support.
+ 
  
 # 0.4.0.1 (18 December 2012)
 
