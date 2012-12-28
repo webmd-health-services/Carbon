@@ -25,6 +25,10 @@ This release contains many backwards incompatible changes.  Take the following s
  * Replace usages of `Unlock-IisWindowsAuthentication` with `Unlock-IisConfigurationSeciton -SectionPath 'system.webServer/security/authentication/windowsAuthentication'`.
  * Replaces usages of `Remove-Service` with [Uninstall-Service](http://get-carbon.org/help/Uninstall-Service.html).
  
+## Bug Fixes
+ * [Install-Service](http://get-carbon.org/help/Install-Service.html) not granting default service identity, Network Service, the correct permissions.
+ * [Install-Service](http://get-carbon.org/help/Install-Service.html) not correctly resolving local identity account names.
+ 
 ## Enhancements
  * Created new [Get-WindowsFeature](http://get-carbon.org/help/Get-WindowsFeature.html) function for getting a list of available Windows features.
  * [Test-WindowsFeature](http://get-carbon.org/help/Test-WindowsFeature.html) now tests if a Windows feature exists, instead of if it is installed.  Added an `Installed` switch to detect if a feature exists *and* if it is installed.
@@ -59,6 +63,8 @@ This release contains many backwards incompatible changes.  Take the following s
  * Removed `Unlock-IisCgi` in favor of `Unlock-IisConfigurationSection -SectionPath 'system.webServer/cgi'`.
  * Removed `Unlock-IisWindowsAuthentication` in favor of `Unlock-IisConfigurationSection -SectionPath 'system.webServer/security/authentication/windowsAuthentication'`.
  * Renamed `Remove-Service` to [Uninstall-Service](http://get-carbon.org/help/Uninstall-Service.html).
+ * [Install-Service](http://get-carbon.org/help/Install-Service.html) writes errors instead of throwing exceptions.
+ 
  
 # 0.4.0.1 (18 December 2012)
 

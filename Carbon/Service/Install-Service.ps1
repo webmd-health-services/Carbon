@@ -113,18 +113,39 @@ function Install-Service
         }
         else
         {
-            throw "Unsupported service failure action '$action'."
+            Write-Error "Service failure action '$action' not found/recognized."
+            return ''
         }
     }
 
+    $missingDependencies = $false
     foreach( $dependency in $Dependencies )
     {
-        if( -not (Get-Service -Name $dependency -ErrorAction SilentlyContinue) )
+        if( -not (Test-Service -Name $dependency) )
         {
-            throw "Unable to install service '$Name': dependent service '$dependency' does not exist."
+            Write-Error ('Dependent service {0} not found.' -f $dependency)
+            $missingDependencies = $true
         }
     }
+    if( $missingDependencies )
+    {
+        return
+    }
 
+    if( $pscmdlet.ParameterSetName -eq 'CustomAccount' )
+    {
+        $identity = Resolve-IdentityName -Name $Username
+        if( -not $identity )
+        {
+            Write-Error ("Service identity '{0}' not found." -f $Username,$Name)
+            return
+        }
+    }
+    else
+    {
+        $identity = "NT AUTHORITY\NetworkService"
+    }
+    
     $sc = Join-Path $env:WinDir system32\sc.exe -Resolve
     
     $startArg = 'auto'
@@ -137,25 +158,21 @@ function Install-Service
         $startArg = 'disabled'
     }
     
-    $account = "NT AUTHORITY\NetworkService"
     $passwordArgName = ''
     $passwordArgValue = ''
     if( $pscmdlet.ParameterSetName -eq 'CustomAccount' )
     {
-        $account = if( $Username.Contains( '\' ) ) { $Username } else { ".\$Username" }
         $passwordArgName = 'password='
         $passwordArgValue = $Password
         
-        # TODO: Convert this to C# code (see the ActiveDirectory task in the MSBuild extension pack.
-        if( $pscmdlet.ShouldProcess( $Username, "grant the log on as a service right" ) )
+        if( $pscmdlet.ShouldProcess( $identity, "grant the log on as a service right" ) )
         {
-            Write-Host "Granting user '$Username' the log on as a service right."
-            Grant-Privilege -Identity $Username -Privilege SeServiceLogonRight
+            Write-Host ("Granting '{0}' the log on as a service right." -f $Identity)
+            Grant-Privilege -Identity $identity -Privilege SeServiceLogonRight
         }
-
-        Grant-Permissions -Identity $Username -Permissions FullControl -Path $Path
-    
     }
+    
+    Grant-Permissions -Identity $identity -Permissions FullControl -Path $Path
     
     $service = Get-Service -Name $Name -ErrorAction SilentlyContinue
     
@@ -182,7 +199,7 @@ function Install-Service
     
     if( $pscmdlet.ShouldProcess( "$Name [$Path]", "$operation service" ) )
     {
-        Write-Host "Installing service '$Name' at '$Path' to run as '$account'."
+        Write-Host "Installing service '$Name' at '$Path' to run as '$identity'."
         $dependencyArgName = ''
         $dependencyArgValue = ''
         if( $Dependencies )
@@ -191,7 +208,7 @@ function Install-Service
             $dependencyArgValue = $Dependencies -join '/'
         }
         
-        & $sc $operation $Name binPath= $Path start= $startArg obj= $account $passwordArgName $passwordArgValue $dependencyArgName $dependencyArgValue
+        & $sc $operation $Name binPath= $Path start= $startArg obj= $identity $passwordArgName $passwordArgValue $dependencyArgName $dependencyArgValue
         if( $LastExitCode -ne 0 )
         {
             Write-Error "$sc failed and returned '$LastExitCode'."

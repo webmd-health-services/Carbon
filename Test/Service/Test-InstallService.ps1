@@ -131,16 +131,10 @@ function Test-ShouldSetDependencies
 
 function Test-ShouldTestDependenciesExist
 {
-    $failed = $false
-    try
-    {
-        Install-Service -Name $serviceName -Path $servicePath -Dependencies IAmAServiceThatDoesNotExist
-    }
-    catch
-    {
-        $failed = $true
-    }
-    Assert-True $failed "Didn't fail when given a non-existent dependent service."
+    $error.Clear()
+    Install-Service -Name $serviceName -Path $servicePath -Dependencies IAmAServiceThatDoesNotExist -ErrorAction SilentlyContinue
+    Assert-Equal 1 $error.Count
+    Assert-False (Test-Service -Name $serviceName)
 }
 
 
