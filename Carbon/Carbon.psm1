@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+Add-Type -AssemblyName System.ServiceProcess
+
 $CarbonBinDir = Join-Path $PSScriptRoot bin -Resolve
 
 Get-ChildItem $PSScriptRoot *.ps1 -Recurse | 
