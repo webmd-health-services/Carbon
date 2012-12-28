@@ -23,6 +23,7 @@ This release contains many backwards incompatible changes.  Take the following s
  * Replace usages of `Unlock-IisBasicAuthentication` with `Unlock-IisConfigurationSeciton -SectionPath 'system.webServer/security/authentication/basicAuthentication'`.
  * Replace usages of `Unlock-IisCgi` with `Unlock-IisConfigurationSeciton -SectionPath 'system.webServer/cgi'`.
  * Replace usages of `Unlock-IisWindowsAuthentication` with `Unlock-IisConfigurationSeciton -SectionPath 'system.webServer/security/authentication/windowsAuthentication'`.
+ * Replaces usages of `Remove-Service` with [Uninstall-Service](http://get-carbon.org/help/Uninstall-Service.html).
  
 ## Enhancements
  * Created new [Get-WindowsFeature](http://get-carbon.org/help/Get-WindowsFeature.html) function for getting a list of available Windows features.
@@ -57,7 +58,7 @@ This release contains many backwards incompatible changes.  Take the following s
  * Removed `Unlock-IisBasicAuthentication` in favor of `Unlock-IisConfigurationSection -SectionPath 'system.webServer/security/authentication/basicAuthentication'`.
  * Removed `Unlock-IisCgi` in favor of `Unlock-IisConfigurationSection -SectionPath 'system.webServer/cgi'`.
  * Removed `Unlock-IisWindowsAuthentication` in favor of `Unlock-IisConfigurationSection -SectionPath 'system.webServer/security/authentication/windowsAuthentication'`.
- 
+ * Renamed `Remove-Service` to [Uninstall-Service](http://get-carbon.org/help/Uninstall-Service.html).
  
 # 0.4.0.1 (18 December 2012)
 

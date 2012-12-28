@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Remove-Service
+function Uninstall-Service
 {
     <#
     .SYNOPSIS
@@ -22,7 +22,7 @@ function Remove-Service
     Removes an existing Windows service.  If the service doesn't exist, nothing happens.  The service is stopped before being deleted, so that the computer doesn't need to be restarted for the removal to complete.  Even then, sometimes it won't go away until a reboot.  I don't get it either.
 
     .EXAMPLE
-    Remove-Service -Name DeathStar
+    Uninstall-Service -Name DeathStar
 
     Removes the Death Star Windows service.  It is destro..., er, stopped first, then destro..., er, deleted.  If only the rebels weren't using Linux!
     #>
