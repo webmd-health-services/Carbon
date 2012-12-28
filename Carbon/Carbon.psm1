@@ -12,6 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# IIS
+Add-Type -AssemblyName "System.Web"
+$microsoftWebAdministrationPath = Join-Path $env:SystemRoot system32\inetsrv\Microsoft.Web.Administration.dll
+if( (Test-Path -Path $microsoftWebAdministrationPath -PathType Leaf) )
+{
+    Add-Type -Path $microsoftWebAdministrationPath
+}
+
+# Services
 Add-Type -AssemblyName System.ServiceProcess
 
 $CarbonBinDir = Join-Path $PSScriptRoot bin -Resolve
