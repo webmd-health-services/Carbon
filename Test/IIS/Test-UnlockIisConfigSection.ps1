@@ -14,14 +14,20 @@
 
 $siteName = 'UnlockIisConfigSection'
 $windowsAuthWasLocked = $false
+$windowsAuthConfigPath = 'system.webServer/security/authentication/windowsAuthentication'
+$cgiConfigPath = 'system.webServer/cgi'
 
 function Setup
 {
-    Import-Module (Join-Path $TestDir ..\..\Carbon -Resolve) -Force
-    Install-IisWebsite -Name $siteName -Path $TestDir
-    $windowsAuthWasLocked = -not (Get-WindowsAuthenticationUnlocked)
-    Invoke-AppCmd lock config /section:windowsAuthentication
-    
+    & (Join-Path $TestDir ..\..\Carbon\Import-Carbon.ps1 -Resolve)
+
+    $windowsAuthWasLocked = Test-IisConfigurationSection -SectionPath $windowsAuthConfigPath -Locked
+    Lock-IisConfigurationSection -SectionPath $windowsAuthConfigPath
+    Assert-True (Test-IisConfigurationSection -SectionPath $windowsAuthConfigPath -Locked)
+
+    $cgiWasLocked = Test-IisConfigurationSection -SectionPath $cgiConfigPath -Locked
+    Lock-IisConfigurationSection -SectionPath $cgiConfigPath
+    Assert-True (Test-IisConfigurationSection -SectionPath $cgiConfigPath -Locked)
 }
 
 function TearDown
@@ -29,7 +35,20 @@ function TearDown
     # Put things back the way we found them.
     if( $windowsAuthWasLocked )
     {
-        Invoke-AppCmd lock config /section:windowsAuthentication
+        Lock-IisConfigurationSection -SectionPath $windowsAuthConfigPath
+    }
+    else
+    {
+        Unlock-IisConfigurationSection -SectionPath $windowsAuthConfigPath
+    }
+    
+    if( $cgiWasLocked )
+    {
+        Lock-IisConfigurationSection -SectionPath $cgiConfigPath
+    }
+    else
+    {
+        Unlock-IisConfigurationSection -SectionPath $cgiConfigPath
     }
     
     $webConfigPath = Join-Path $TestDir web.config
@@ -38,24 +57,25 @@ function TearDown
         Remove-Item $webConfigPath
     }
 
-    Remove-IisWebsite $siteName
     Remove-Module Carbon
 }
 
-function Test-ShouldUnlockConfigSection
+function Test-ShouldUnlockOneConfigurationSection
 {
-    Unlock-IisConfigSection -Name windowsAuthentication
-    Assert-True (Get-WindowsAuthenticationUnlocked)
+    Unlock-IisConfigurationSection -SectionPath $windowsAuthConfigPath
+    Assert-False (Test-IisConfigurationSection -SectionPath $windowsAuthConfigPath -Locked)
+}
+
+function Test-ShouldUnlockMultipleConfigurationSection
+{
+    Unlock-IisConfigurationSection -SectionPath $windowsAuthConfigPath,$cgiConfigPath
+    Assert-False (Test-IisConfigurationSection -SectionPath $windowsAuthConfigPath -Locked)
+    Assert-False (Test-IisConfigurationSection -SectionPath $cgiConfigPath -Locked)
 }
 
 function Test-ShouldSupportWhatIf
 {
-    Unlock-IisConfigSection -Name windowsAuthentication -WhatIf
-    Assert-False (Get-WindowsAuthenticationUnlocked)
-}
-
-function Get-WindowsAuthenticationUnlocked
-{
-    $result = Invoke-AppCmd set config $SiteName /section:windowsAuthentication /enabled:true -ErrorAction SilentlyContinue
-    return ( $LastExitCode -eq 0 )
+    Assert-True (Test-IisConfigurationSection -SectionPath $windowsAuthConfigPath -Locked)
+    Unlock-IisConfigurationSection -SectionPath $windowsAuthConfigPath -WhatIf
+    Assert-True (Test-IisConfigurationSection -SectionPath $windowsAuthConfigPath -Locked)
 }

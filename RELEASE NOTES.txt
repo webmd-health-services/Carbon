@@ -19,7 +19,10 @@ This release contains many backwards incompatible changes.  Take the following s
  * Replace usages of `Set-IisBasicAuthentication` with `[Enable-IisSecurityAuthentication](http://get-carbon.org/help/Enable-IisSecurityAuthentication.ps1) -Basic` and `[Disable-IisSecurityAuthentication](http://get-carbon.org/help/Disable-IisSecurityAuthentication.ps1) -Basic`.
  * Replace usages of `Set-IisWindowsAuthentication` used to enable/disable Windows authentication with `[Enable-IisSecurityAuthentication](http://get-carbon.org/help/Enable-IisSecurityAuthentication.ps1) -Windows` and `[Disable-IisSecurityAuthentication](http://get-carbon.org/help/Disable-IisSecurityAuthentication.ps1) -Windows`, respectively.  [Set-IisWindowsAuthentication](http://get-carbon.org/help/Set-IisWindowsAuthentication.ps1) can still be used to manage the kernel mode authentication.
  * Replace usages of `[Set-IisWindowsAuthentication](http://get-carbon.org/help/Set-IisWindowsAuthentication.ps1) -UseKernelMode` with `Set-IisWindowsAuthentication` (no parameter).  Replace usages of `Set-IisWindowsAuthentication` (no parameters) with `Set-IisWindowsAuthentication -DisableKernelMode`. We've switched the defaults for `Set-IisWindowsAuthentication` to enable kernel mode by default, since this is IIS's default.
-
+ * Replace usages of `Unlock-IisConfigSection` with `Unlock-IisConfigurationSection`.  Remove usages of its `Name` parameter, and replace with the new `SectionPath` parameter, which is the full path to the configuration section to unlock.  Run `appcmd.exe lock config -section:?` for a list.
+ * Replace usages of `Unlock-IisBasicAuthentication` with `Unlock-IisConfigurationSeciton -SectionPath 'system.webServer/security/authentication/basicAuthentication'`.
+ * Replace usages of `Unlock-IisCgi` with `Unlock-IisConfigurationSeciton -SectionPath 'system.webServer/cgi'`.
+ * Replace usages of `Unlock-IisWindowsAuthentication` with `Unlock-IisConfigurationSeciton -SectionPath 'system.webServer/security/authentication/windowsAuthentication'`.
  
 ## Enhancements
  * Created new [Get-WindowsFeature](http://get-carbon.org/help/Get-WindowsFeature.html) function for getting a list of available Windows features.
@@ -48,7 +51,13 @@ This release contains many backwards incompatible changes.  Take the following s
  * Switched the default behavior of [Set-IisWindowsAuthentication](http://get-carbon.org/help/Set-IisWindowsAuthentication.ps1) to enable kernel mode.  To disable kernel mode, use the `DisableKernelMode` switch.
  * Created [Get-IisConfigurationSection](http://get-carbon.org/help/Get-IisConfigurationSection.ps1) function for returning an arbitrary IIS configuration section using the Microsoft.Web.Administration API.
  * Created [Lock-IisConfigurationSection](http://get-carbon.org/help/Lock-IisConfigurationSection.ps1) function for locking arbitrary global IIS configuration sections.
- * Created [Test-IisConfigurationSection](http://get-carbon.org/help/Test-IisConfigurationSection.ps1) function for testing if an configuration section is locked or not.
+ * Created [Test-IisConfigurationSection](http://get-carbon.org/help/Test-IisConfigurationSection.ps1) function for testing if an configuration section exists or is locked or not.
+ * Renamed `Unlock-IisConfigSection` to [Unlock-IisConfigurationSection](http://get-carbon.org/help/Unlock-IisConfigurationSection.html).
+ * Removed [Unlock-IisConfigurationSection](http://get-carbon.org/help/Unlock-IisConfigurationSection.html)'s `Name` parameter and replaced it with `SectionPath`, which takes a list of full path to the configuration section(s) to unlock.
+ * Removed `Unlock-IisBasicAuthentication` in favor of `Unlock-IisConfigurationSection -SectionPath 'system.webServer/security/authentication/basicAuthentication'`.
+ * Removed `Unlock-IisCgi` in favor of `Unlock-IisConfigurationSection -SectionPath 'system.webServer/cgi'`.
+ * Removed `Unlock-IisWindowsAuthentication` in favor of `Unlock-IisConfigurationSection -SectionPath 'system.webServer/security/authentication/windowsAuthentication'`.
+ 
  
 # 0.4.0.1 (18 December 2012)
 
