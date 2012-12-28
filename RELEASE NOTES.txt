@@ -23,7 +23,8 @@ This release contains many backwards incompatible changes.  Take the following s
  * Replace usages of `Unlock-IisBasicAuthentication` with `Unlock-IisConfigurationSeciton -SectionPath 'system.webServer/security/authentication/basicAuthentication'`.
  * Replace usages of `Unlock-IisCgi` with `Unlock-IisConfigurationSeciton -SectionPath 'system.webServer/cgi'`.
  * Replace usages of `Unlock-IisWindowsAuthentication` with `Unlock-IisConfigurationSeciton -SectionPath 'system.webServer/security/authentication/windowsAuthentication'`.
- * Replaces usages of `Remove-Service` with [Uninstall-Service](http://get-carbon.org/help/Uninstall-Service.html).
+ * Replace usages of `Remove-Service` with [Uninstall-Service](http://get-carbon.org/help/Uninstall-Service.html).
+ * Replace usages of `Test-IisAppPoolExists` with [Test-IisAppPool](http://get-carbon.org/help/Uninstall-Service.html).
  
 ## Bug Fixes
  * [Install-Service](http://get-carbon.org/help/Install-Service.html) not granting default service identity, Network Service, the correct permissions.
@@ -66,6 +67,7 @@ This release contains many backwards incompatible changes.  Take the following s
  * [Install-Service](http://get-carbon.org/help/Install-Service.html) writes errors instead of throwing exceptions.
  * [Install-Service](http://get-carbon.org/help/Install-Service.html) grants `ReadAndExecute` file system permissions on the service executable to the service identity instead of `FullControl`.
  * Improved [Install-Service](http://get-carbon.org/help/Install-Service.html)'s `WhatIf` support.
+ * Renamed `Test-IisAppPoolExists` to [Test-IisAppPool](http://get-carbon.org/help/Uninstall-Service.html).
  
  
 # 0.4.0.1 (18 December 2012)

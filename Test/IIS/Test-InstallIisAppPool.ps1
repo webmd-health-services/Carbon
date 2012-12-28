@@ -28,7 +28,7 @@ function TearDown
 
 function Remove-AppPool
 {
-    if( (Test-IisAppPoolExists -Name $appPoolName) )
+    if( (Test-IisAppPool -Name $appPoolName) )
     {
         Invoke-AppCmd delete apppool `"$appPoolName`"
     }
@@ -106,7 +106,7 @@ function Test-ShouldHandleAppPoolThatExists
 
 function Assert-AppPoolExists
 {
-    $exists = Test-IisAppPoolExists -Name $appPoolname
+    $exists = Test-IisAppPool -Name $appPoolname
     Assert-True $exists "App pool '$appPoolName' not created."
 }
 

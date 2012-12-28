@@ -89,7 +89,7 @@ function Install-IisAppPool
         $Password
     )
     
-    if( -not (Test-IisAppPoolExists -Name $Name) )
+    if( -not (Test-IisAppPool -Name $Name) )
     {
         Invoke-AppCmd add apppool /name:`"$Name`" /commit:apphost
     }

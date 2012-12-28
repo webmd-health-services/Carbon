@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Test-IisAppPoolExists
+function Test-IisAppPool
 {
     <# 
     .SYNOPSIS
@@ -22,7 +22,7 @@ function Test-IisAppPoolExists
     Returns `True` if an app pool with `Name` exists.  `False` if it doesn't exist.
 
     .EXAMPLE
-    Test-IisAppPoolExists -Name Peanuts
+    Test-IisAppPool -Name Peanuts
 
     Returns `True` if the Peanuts app pool exists, `False` if it doesn't.
     #>

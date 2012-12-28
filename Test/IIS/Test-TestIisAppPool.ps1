@@ -24,7 +24,7 @@ function TearDown
 
 function Test-ShouldNotFindNonExistentAppPool
 {
-    $exists = Test-IisAppPoolExists -Name 'ANameIMadeUpThatShouldNotExist'
+    $exists = Test-IisAppPool -Name 'ANameIMadeUpThatShouldNotExist'
     Assert-False $exists "A non-existent app pool exists."
 }
 
@@ -40,7 +40,7 @@ function Test-ShouldFindAppPools
         }
         
         $appPoolName = $matches[1]
-        $exists = Test-IisAppPoolExists -Name $appPoolName
+        $exists = Test-IisAppPool -Name $appPoolName
         Assert-True $exists "An existing app pool '$appPoolName' not found."
     }
 }
