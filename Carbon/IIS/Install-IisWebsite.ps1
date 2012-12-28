@@ -35,6 +35,12 @@ function Install-IisWebsite
      * http/*:80:
      * https/10.2.3.4:443:
      * http/*:80:example.com
+    
+    .LINK
+    Get-IisWebsite
+    
+    .LINK
+    Uninstall-IisWebsite
 
     .EXAMPLE
     Install-IisWebsite -Name 'Peanuts' -Path C:\Peanuts.com
@@ -80,7 +86,7 @@ function Install-IisWebsite
     
     if( Test-IisWebsite -Name $Name )
     {
-        Remove-IisWebsite -Name $Name
+        Uninstall-IisWebsite -Name $Name
     }
     
     if( -not (Test-Path $Path -PathType Container) )

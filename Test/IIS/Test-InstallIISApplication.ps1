@@ -22,7 +22,7 @@ $AppPoolName = 'TestApplication'
 
 function SetUp
 {
-    Remove-IisWebsite -Name $SiteName
+    Uninstall-IisWebsite -Name $SiteName
     Install-IisAppPool -Name $AppPoolName
     Install-IisWebsite -Name $SiteName -Path $TestDir -Bindings "http://*:$Port"
     if( TEst-Path $WebConfig )
@@ -33,7 +33,7 @@ function SetUp
 
 function TearDown
 {
-    Remove-IisWebsite -Name $SiteName
+    Uninstall-IisWebsite -Name $SiteName
 }
 
 function Invoke-InstallApplication($Path = $TestDir)

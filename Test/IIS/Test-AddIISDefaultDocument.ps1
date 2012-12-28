@@ -19,7 +19,7 @@ $webConfigPath = Join-Path $TestDir web.config
 function Setup
 {
     Import-Module (Join-Path $TestDir ..\..\Carbon -Resolve) -Force
-    Remove-IisWebsite $siteName
+    Uninstall-IisWebsite $siteName
     Install-IisWebsite -Name $siteName -Path $TestDir -Bindings "http://*:$sitePort"
     if( Test-Path $webConfigPath -PathType Leaf )
     {
@@ -29,7 +29,7 @@ function Setup
 
 function TearDown
 {
-    Remove-IisWebsite $siteName
+    Uninstall-IisWebsite $siteName
     Remove-Module Carbon
 }
 

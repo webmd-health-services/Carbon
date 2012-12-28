@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Remove-IisWebsite
+function Uninstall-IisWebsite
 {
     <#
     .SYNOPSIS
@@ -21,13 +21,19 @@ function Remove-IisWebsite
     .DESCRIPTION
     Pretty simple: removes the website named `Name`.  If no website with that name exists, nothing happens.
 
+    .LINK
+    Get-IisWebsite
+    
+    .LINK
+    Install-IisWebsite
+    
     .EXAMPLE
-    Remove-IisWebsite -Name 'MyWebsite'
+    Uninstall-IisWebsite -Name 'MyWebsite'
     
     Removes MyWebsite.
 
     .EXAMPLE
-    Remove-IisWebsite 1
+    Uninstall-IisWebsite 1
 
     Removes the website whose ID is 1.
     #>

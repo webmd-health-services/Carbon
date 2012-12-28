@@ -21,7 +21,7 @@ function SetUp
 {
     Import-Module (Join-Path $TestDir ..\..\Carbon -Resolve)
 
-    Remove-IisWebsite -Name $SiteName
+    Uninstall-IisWebsite -Name $SiteName
     Install-IisWebsite -Name $SiteName -Path $TestDir -Bindings "http://*:$Port"
     if( Test-Path $WebConfig )
     {
@@ -31,7 +31,7 @@ function SetUp
 
 function TearDown
 {
-    Remove-IisWebsite -Name $SiteName
+    Uninstall-IisWebsite -Name $SiteName
     Remove-Module Carbon
 }
 

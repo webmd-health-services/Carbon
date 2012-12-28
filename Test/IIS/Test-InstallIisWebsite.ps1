@@ -32,7 +32,7 @@ function Remove-TestSite
 {
     if( Test-IisWebsite -Name $SiteName )
     {
-        Remove-IisWebsite -Name $SiteName
+        Uninstall-IisWebsite -Name $SiteName
         Assert-LastProcessSucceeded 'Unable to delete test site.'
     }
 }

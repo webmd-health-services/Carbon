@@ -28,7 +28,7 @@ function Setup
 function TearDown
 {
     Remove-Certificate -Certificate $cert -StoreLocation LocalMachine -StoreName My
-    Remove-IisWebsite -Name $siteName
+    Uninstall-IisWebsite -Name $siteName
     Remove-Module Carbon
 }
 

@@ -38,6 +38,6 @@ function Test-ShouldFindExistentWebsite
     }
     finally
     {
-        Remove-IisWebsite 'Test Website Exists'
+        Uninstall-IisWebsite 'Test Website Exists'
     }
 }

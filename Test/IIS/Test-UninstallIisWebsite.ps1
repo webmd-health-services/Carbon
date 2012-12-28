@@ -31,14 +31,14 @@ function Remove-TestWebsite
 {
     if( Test-IisWebsite -Name $SiteName )
     {
-        Remove-IisWebsite -Name $SiteName
+        Uninstall-IisWebsite -Name $SiteName
         Assert-LastProcessSucceeded 'Unable to delete test site.'
     }
 }
 
 function Invoke-RemoveWebsite($Name = $SiteName)
 {
-    Remove-IisWebsite $Name
+    Uninstall-IisWebsite $Name
     Assert-SiteDoesNotExist $Name
 }
 

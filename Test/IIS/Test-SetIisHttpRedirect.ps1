@@ -28,7 +28,7 @@ function Setup
 
 function TearDown
 {
-    Remove-IisWebsite -Name $SiteName
+    Uninstall-IisWebsite -Name $SiteName
 }
 
 function Test-ShouldRedirectSite
