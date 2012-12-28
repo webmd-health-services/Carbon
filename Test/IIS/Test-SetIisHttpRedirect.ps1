@@ -104,8 +104,8 @@ function Assert-Redirects($Path = '')
         catch
         {
             Write-Verbose "Error downloading '$Url': $_"
-            $numTries++
         }
+        $numTries++
         Start-Sleep -Milliseconds 100
     }
     while( $numTries -lt $maxTries )
