@@ -224,7 +224,7 @@ function Invoke-PowerShell
   </startup>
 </configuration>
 "@ | Out-File -FilePath $activationConfigPath -Encoding OEM
-        Set-EnvironmentVariable -Name $comPlusAppConfigEnvVarName -Value $activationConfigDir -Scope Process
+        Set-EnvironmentVariable -Name $comPlusAppConfigEnvVarName -Value $activationConfigDir -ForProcess
     }
     
     $params = @{ }
@@ -244,11 +244,11 @@ function Invoke-PowerShell
             Remove-Item -Path $activationConfigDir -Recurse -Force
             if( $originalCOMAppConfigEnvVar )
             {
-                Set-EnvironmentVariable -Name $comPlusAppConfigEnvVarName -Value $originalCOMAppConfigEnvVar -Scope Process
+                Set-EnvironmentVariable -Name $comPlusAppConfigEnvVarName -Value $originalCOMAppConfigEnvVar -ForProcess
             }
             else
             {
-                Remove-EnvironmentVariable -Name $comPlusAppConfigEnvVarName -Scope Process
+                Remove-EnvironmentVariable -Name $comPlusAppConfigEnvVarName -ForProcess
             }
         }
     }

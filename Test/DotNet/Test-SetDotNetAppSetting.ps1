@@ -31,6 +31,7 @@ function Remove-AppSetting
 {
     $command = {
         param(
+            [Parameter(Position=0)]
             $Name
         )
         
