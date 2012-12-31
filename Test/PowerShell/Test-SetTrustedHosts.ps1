@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-Import-Module (Join-Path $TestDir ..\..\Carbon -Resolve) -Force
+& (Join-Path $TestDir ..\..\Carbon\Import-Carbon.ps1 -Resolve)
 
 # Only administratos can update trusted hosts.
 if( Test-AdminPrivileges )
@@ -38,7 +38,7 @@ if( Test-AdminPrivileges )
         Set-TrustedHosts 'example.com'
         Assert-Equal 'example.com' (Get-TrustedHosts)
         Set-TrustedHosts 'example.com','sub.example.com'
-        $hosts = Get-TrustedHosts
+        $hosts = @( Get-TrustedHosts )
         Assert-Equal 'example.com' $hosts[0]
         Assert-Equal 'sub.example.com' $hosts[1]
     }

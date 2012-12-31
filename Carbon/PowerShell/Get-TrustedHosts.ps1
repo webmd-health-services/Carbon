@@ -34,10 +34,8 @@ function Get-TrustedHosts
         docs.example.com
     #>
     $trustedHosts = (Get-Item $TrustedHostsPath -Force).Value 
-    if( -not $trustedHosts )
+    if( $trustedHosts )
     {
-        return @()
+        return $trustedHosts -split ','
     }
-    
-    return $trustedHosts -split ','
 }

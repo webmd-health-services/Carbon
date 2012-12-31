@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-Import-Module (Join-Path $TestDir ..\..\Carbon -Resolve) -Force
+& (Join-Path $TestDir ..\..\Carbon\Import-Carbon.ps1 -Resolve)
 
 # Only administratos can update trusted hosts.
 if( Test-AdminPrivileges )
@@ -44,7 +44,7 @@ if( Test-AdminPrivileges )
     function Test-ShouldAddMultipleHosts
     {
         Add-TrustedHosts -Entries example.com,webmd.com
-        $trustedHosts = Get-TrustedHosts
+        $trustedHosts = @( Get-TrustedHosts )
         Assert-True ($trustedHosts -contains 'example.com')
         Assert-True ($trustedHosts -contains 'webmd.com')
         Assert-Equal 2 $trustedHosts.Count
