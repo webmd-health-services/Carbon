@@ -81,6 +81,20 @@ function Test-ShouldReinstallExistingPerformanceCounter
     Assert-Counter $counters[0] $name $newDescription $newType
 }
 
+function Test-ShouldNotInstallIfCounterHasNotChanged
+{
+    $name = 'Test Counter'
+    $description = 'Counter used to test that Carbon installation function works.'
+    $type = 'NumberOfItems32'
+    Install-PerformanceCounter -CategoryName $CategoryName -Name $name -Description $description -Type $type
+    $counters = @( Get-PerformanceCounters -CategoryName $CategoryName )
+    Assert-Counter $counters[0] $name $description $type
+    
+    Install-PerformanceCounter -CategoryName $CategoryName -Name $name -Description $description -Type $type
+    $counters = @( Get-PerformanceCounters -CategoryName $CategoryName )
+    Assert-Counter $counters[0] $name $description $type
+}
+
 function Assert-Counter($Counter, $Name, $Description, $Type)
 {
     Assert-Equal $Name $Counter.CounterName

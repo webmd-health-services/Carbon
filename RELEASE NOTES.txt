@@ -75,6 +75,8 @@ This release contains many backwards incompatible changes.  Take the following s
  * [Install-IisAppPool](http://get-carbon.org/help/Install-IisAppPool.html) now always sets the application pool to run as the system's default application pool identity if the `ServiceAccount` parameter isn't given.
  * [Get-TrustedHosts](http://get-carbon.org/help/Get-TrustedHosts.html) now returns nothing/`null` if there are no trusted hosts.  (It used to return an empty array.) 
  * [Get-PerformanceCounters](http://get-carbon.org/help/Get-TrustedHosts.html) now returns nothing/`null` or a single object instead of an empty/single element array when there are no or one performance counters. 
+ * [Install-PerformanceCounter](http://get-carbon.org/help/Install-PerformanceCounter.html) no longer re-installs a counter if a counter with its name, description, and type already exist.
+ 
  
 # 0.4.0.1 (18 December 2012)
 
