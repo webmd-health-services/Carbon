@@ -27,6 +27,7 @@ This release contains many backwards incompatible changes.  Take the following s
  * Replace usages of `Test-IisAppPoolExists` with [Test-IisAppPool](http://get-carbon.org/help/Uninstall-Service.html).
  * Replace usages of `Remove-IisWebsite` with [Uninstall-IisWebsite](http://get-carbon.org/help/Uninstall-IisWebsite.html).
  * [Get-TrustedHosts](http://get-carbon.org/help/Get-TrustedHosts.html) no longer returns an empty list if there are no trusted hosts.  It now return nothing/`null`.  Update usages accordingly.
+ * Update usages of [Get-PerformanceCounters](http://get-carbon.org/help/Get-TrustedHosts.html) to handle nothing/`null` or a single object output instead of an empty/single element array when there are no or one performance counters.  This function used to always return an array.
  
 ## Bug Fixes
  * [Install-Service](http://get-carbon.org/help/Install-Service.html) not granting default service identity, Network Service, the correct permissions.
@@ -73,7 +74,7 @@ This release contains many backwards incompatible changes.  Take the following s
  * Renamed `Remove-IisWebsite` with [Uninstall-IisWebsite](http://get-carbon.org/help/Uninstall-IisWebsite.html).
  * [Install-IisAppPool](http://get-carbon.org/help/Install-IisAppPool.html) now always sets the application pool to run as the system's default application pool identity if the `ServiceAccount` parameter isn't given.
  * [Get-TrustedHosts](http://get-carbon.org/help/Get-TrustedHosts.html) now returns nothing/`null` if there are no trusted hosts.  (It used to return an empty array.) 
- 
+ * [Get-PerformanceCounters](http://get-carbon.org/help/Get-TrustedHosts.html) now returns nothing/`null` or a single object instead of an empty/single element array when there are no or one performance counters. 
  
 # 0.4.0.1 (18 December 2012)
 

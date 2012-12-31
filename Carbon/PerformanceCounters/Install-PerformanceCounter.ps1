@@ -49,18 +49,13 @@ function Install-PerformanceCounter
         $Type
     )
     
-    $currentCounters = Get-PerformanceCounters -CategoryName $CategoryName
-    
     $counters = New-Object Diagnostics.CounterCreationDataCollection 
-    foreach( $counter in $currentCounters )
-    {
-        if( $counter.CounterName -eq $Name )
-        {
-            continue
+    Get-PerformanceCounters -CategoryName $CategoryName | 
+        Where-Object { $_.CounterName -ne $Name } |
+        ForEach-Object {
+            $creationData = New-Object Diagnostics.CounterCreationData $_.CounterName,$_.CounterHelp,$_.CounterType
+            [void] $counters.Add( $creationData )
         }
-        $creationData = New-Object Diagnostics.CounterCreationData $counter.CounterName,$counter.CounterHelp,$counter.CounterType
-        [void] $counters.Add( $creationData )
-    }
     
     $newCounterData = New-Object Diagnostics.CounterCreationData $Name,$Description,$Type
     [void] $counters.Add( $newCounterData )

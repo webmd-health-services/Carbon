@@ -19,7 +19,7 @@ function Get-PerformanceCounters
     Gets the performance counters for a category.
 
     .DESCRIPTION
-    Returns [PerformanceCounterCategory]() objects for the given category name.  If not counters exist for the category exits, an empty array is returned.
+    Returns `PerformanceCounterCategory` objects for the given category name.  If not counters exist for the category exits, an empty array is returned.
 
     .OUTPUTS
     System.Diagnostics.PerformanceCounterCategory.
@@ -40,10 +40,6 @@ function Get-PerformanceCounters
     if( (Test-PerformanceCounterCategory -CategoryName $CategoryName) )
     {
         $category = New-Object Diagnostics.PerformanceCounterCategory $CategoryName
-        return ,@($category.GetCounters(""))
-    }
-    else
-    {
-        return ,@()
+        return $category.GetCounters("")
     }
 }
