@@ -28,10 +28,7 @@ function TearDown
 
 function Remove-AppPool
 {
-    if( (Test-IisAppPool -Name $appPoolName) )
-    {
-        Invoke-AppCmd delete apppool `"$appPoolName`"
-    }
+    Uninstall-IisAppPool -Name $appPoolName
 }
 
 function Get-IISDefaultAppPoolIdentity
@@ -53,6 +50,9 @@ function Test-ShouldCreateNewAppPool
     Assert-IdentityType (Get-IISDefaultAppPoolIdentity)
     Assert-AppPool32BitEnabled $false
     Assert-IdleTimeout 0
+    $appPool = Get-IisAppPool -Name $appPoolName
+    Assert-NotNull $appPool
+    Assert-Equal ([Microsoft.Web.Administration.ObjectState]::Started) $appPool.state
 }
 
 function Test-ShouldSetManagedRuntimeVersion
@@ -152,6 +152,18 @@ function Test-ShouldSwitchToAppPoolIdentityIfServiceAccountNotGiven
     Assert-IdentityType 'NetworkService'
     Install-IisAppPool -Name $appPoolName
     Assert-IdentityType (Get-IISDefaultAppPoolIdentity)
+}
+
+function Test-ShouldStartStoppedAppPool
+{
+    Install-IisAppPool -Name $appPoolName 
+    $appPool = Get-IisAppPool -Name $appPoolName
+    Assert-NotNull $appPool
+    $appPool.Stop()
+    
+    Install-IisAppPool -Name $appPoolName
+    $appPool = Get-IisAppPool -Name $appPoolName
+    Assert-Equal ([Microsoft.Web.Administration.ObjectState]::Started) $appPool.state
 }
 
 function Get-AppPoolDetails

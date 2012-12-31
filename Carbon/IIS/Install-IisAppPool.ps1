@@ -131,4 +131,10 @@ function Install-IisAppPool
             Invoke-AppCmd clear config /section:applicationPools /[name=`'$Name`'].processModel.identityType
         }
     }
+    
+    $appPool = Get-IisAppPool -Name $Name
+    if($appPool -and $appPool.state -eq [Microsoft.Web.Administration.ObjectState]::Stopped )
+    {
+        $appPool.Start()
+    }
 }
