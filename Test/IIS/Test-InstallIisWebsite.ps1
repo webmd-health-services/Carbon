@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 $SiteName = 'TestNewWebsite'
 
 function SetUp
@@ -94,7 +93,7 @@ function Test-ShouldAddSiteToCustomAppPool
     }
     finally
     {
-        Invoke-AppCmd delete apppool `"$SiteName`"
+        Uninstall-IisAppPool $SiteName
     }
     
     Assert-Equal $SiteName $appPool "Site not assigned to correct app pool."

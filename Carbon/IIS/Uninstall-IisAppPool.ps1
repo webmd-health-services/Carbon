@@ -12,33 +12,36 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Test-IisAppPool
+function Uninstall-IisAppPool
 {
-    <# 
+    <#
     .SYNOPSIS
-    Checks if an app pool exists.
-
-    .DESCRIPTION 
-    Returns `True` if an app pool with `Name` exists.  `False` if it doesn't exist.
-
+    Removes an IIS application pool.
+    
+    .DESCRIPTION
+    If the app pool doesn't exist, nothing happens.
+    
     .EXAMPLE
-    Test-IisAppPool -Name Peanuts
-
-    Returns `True` if the Peanuts app pool exists, `False` if it doesn't.
+    Uninstall-IisAppPool -Name Batcave
+    
+    Removes/uninstalls the `Batcave` app pool.
     #>
-    [CmdletBinding()]
+    [CmdletBinding(SupportsShouldProcess=$true)]
     param(
         [Parameter(Mandatory=$true)]
         [string]
-        # The name of the app pool.
+        # The name of the app pool to remove.
         $Name
     )
     
     $appPool = Get-IisAppPool -Name $Name
     if( $appPool )
     {
-        return $true
+        if( $pscmdlet.ShouldProcess( ('IIS app pool {0}' -f $Name), 'remove' ) )
+        {
+            Write-Host ('Removing {0} IIS app pool.' -f $Name)
+            $appPool.Delete()
+            $appPool.CommitChanges()
+        }
     }
-    
-    return $false
 }

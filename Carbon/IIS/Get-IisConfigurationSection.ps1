@@ -71,9 +71,7 @@ function Get-IisConfigurationSection
         
     if( $section )
     {
-        $section | 
-            Add-Member -MemberType NoteProperty -Name 'ServerManager' -Value $mgr -PassThru |
-            Add-Member -MemberType ScriptMethod -Name 'CommitChanges' -Value { $this.ServerManager.CommitChanges() } -PassThru
+        $section | Add-IisServerManagerMembers -ServerManager $mgr -PassThru
     }
     else
     {
