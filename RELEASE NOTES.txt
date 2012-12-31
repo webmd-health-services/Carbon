@@ -26,6 +26,7 @@ This release contains many backwards incompatible changes.  Take the following s
  * Replace usages of `Remove-Service` with [Uninstall-Service](http://get-carbon.org/help/Uninstall-Service.html).
  * Replace usages of `Test-IisAppPoolExists` with [Test-IisAppPool](http://get-carbon.org/help/Uninstall-Service.html).
  * Replace usages of `Remove-IisWebsite` with [Uninstall-IisWebsite](http://get-carbon.org/help/Uninstall-IisWebsite.html).
+ * [Get-TrustedHosts](http://get-carbon.org/help/Get-TrustedHosts.html) no longer returns an empty list if there are no trusted hosts.  It now return nothing/`null`.  Update usages accordingly.
  
 ## Bug Fixes
  * [Install-Service](http://get-carbon.org/help/Install-Service.html) not granting default service identity, Network Service, the correct permissions.
@@ -71,6 +72,7 @@ This release contains many backwards incompatible changes.  Take the following s
  * Renamed `Test-IisAppPoolExists` to [Test-IisAppPool](http://get-carbon.org/help/Uninstall-Service.html).
  * Renamed `Remove-IisWebsite` with [Uninstall-IisWebsite](http://get-carbon.org/help/Uninstall-IisWebsite.html).
  * [Install-IisAppPool](http://get-carbon.org/help/Install-IisAppPool.html) now always sets the application pool to run as the system's default application pool identity if the `ServiceAccount` parameter isn't given.
+ * [Get-TrustedHosts](http://get-carbon.org/help/Get-TrustedHosts.html) now returns nothing/`null` if there are no trusted hosts.  (It used to return an empty array.) 
  
  
 # 0.4.0.1 (18 December 2012)
