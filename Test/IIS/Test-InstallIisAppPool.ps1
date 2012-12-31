@@ -159,7 +159,11 @@ function Test-ShouldStartStoppedAppPool
     Install-IisAppPool -Name $appPoolName 
     $appPool = Get-IisAppPool -Name $appPoolName
     Assert-NotNull $appPool
-    $appPool.Stop()
+    if( $appPool.state -ne [Microsoft.Web.Administration.ObjectState]::Stopped )
+    { 
+        Start-Sleep -Seconds 1
+        $appPool.Stop()
+    }
     
     Install-IisAppPool -Name $appPoolName
     $appPool = Get-IisAppPool -Name $appPoolName
