@@ -93,6 +93,10 @@ function Test-ShouldNotInstallIfCounterHasNotChanged
     Install-PerformanceCounter -CategoryName $CategoryName -Name $name -Description $description -Type $type
     $counters = @( Get-PerformanceCounters -CategoryName $CategoryName )
     Assert-Counter $counters[0] $name $description $type
+    
+    Install-PerformanceCounter -CategoryName $CategoryName -Name $name -Description $description -Type $type -Force
+    $counters = @( Get-PerformanceCounters -CategoryName $CategoryName )
+    Assert-Counter $counters[0] $name $description $type
 }
 
 function Assert-Counter($Counter, $Name, $Description, $Type)

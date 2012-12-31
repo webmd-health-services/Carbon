@@ -46,7 +46,11 @@ function Install-PerformanceCounter
         [Parameter(Mandatory=$true)]
         [Diagnostics.PerformanceCounterType]
         # The performance counter's type (from the Diagnostics.PerformanceCounterType enumeration).
-        $Type
+        $Type,
+        
+        [Switch]
+        # Re-create the performance counter even if it already exists.
+        $Force
     )
     
     $currentCounters = @( Get-PerformanceCounters -CategoryName $CategoryName )
@@ -58,9 +62,9 @@ function Install-PerformanceCounter
                         $_.CounterType -eq $Type
                     }
                     
-    if( $counter )
+    if( $counter -and -not $Force)
     {
-        return $counter
+        return
     }
     
     $counters = New-Object Diagnostics.CounterCreationDataCollection 
