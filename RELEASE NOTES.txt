@@ -36,6 +36,7 @@ This release contains many backwards incompatible changes.  Take the following s
  * Replace usages of `Set-SslCertificateBinding -IPPort <string>` with `Install-SslCertificateBinding [-IPAddress <IPAddress>] [-Port <UInt16>]`.  The `IPAddress` parameter is only needed if binding to a specific address (i.e. *not* 0.0.0.0).  The `Port` parameter is only needed if it is *not* 443.
  * Replace usages of `Remove-SslCertificateBinding -IPPort <string>` with `Uninstall-SslCertificateBinding [-IPAddress <IPAddress>] [-Port <UInt16>]`.  The `IPAddress` parameter is only needed if binding to a specific address (i.e. *not* 0.0.0.0).  The `Port` parameter is only needed if it is *not* 443.
  * Replace usages of `Remove-Certificate` with `Uninstall-Certificate`.
+ * [Assert-AdminPrivileges](http://get-carbon.org/help/Assert-AdminPrivileges.html) now returns `True` or `False` if the user doesn't have admin privileges. It also no longer throws an exception, but writes an error.  If you want to preserve current behavior where it stops script execution, replace usages with `Assert-AdminPrivileges -ErrorAction Stop`.
  
 ## Bug Fixes
  * [Install-Service](http://get-carbon.org/help/Install-Service.html) not granting default service identity, Network Service, the correct permissions.
@@ -102,6 +103,8 @@ This release contains many backwards incompatible changes.  Take the following s
  * Replaced `IPPort` parameter on [Uninstall-SslCertificateBinding](http://get-carbon.org/help/Uninstall-SslCertificateBinding.html) with separate `IPAddress` and `Port` parameters.  Set `IPAddress` only if you want to remove a binding for a specific IP address (i.e. *not* 0.0.0.0).  Set `Port` if the binding is *not* on port 443.
  * Renamed `Remove-Certificate` to [Uninstall-Certificate](http://get-carbon.org/help/Uninstall-Certificate.html).
  * Replaced all instances where functions were throwing exceptions with `Write-Error`.
+ * [Assert-AdminPrivileges](http://get-carbon.org/help/Assert-AdminPrivileges.html) no longer throws an exception if the user doesn't have administrative privileges.  Instead, it writes an error and returns `False`.  It returns `True` if the user has privileges.
+ 
  
 # 0.4.0.1 (18 December 2012)
 
