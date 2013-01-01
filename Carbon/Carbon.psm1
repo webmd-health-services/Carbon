@@ -20,12 +20,17 @@ if( (Test-Path -Path $microsoftWebAdministrationPath -PathType Leaf) )
     Add-Type -Path $microsoftWebAdministrationPath
 }
 
+# MSMQ
+Add-Type -AssemblyName System.ServiceProcess
+Add-Type -AssemblyName System.Messaging
+
+#PowerShell
+$TrustedHostsPath = 'WSMan:\localhost\Client\TrustedHosts'
+
 # Services
 Add-Type -AssemblyName System.ServiceProcess
 
 $CarbonBinDir = Join-Path $PSScriptRoot bin -Resolve
-
-$TrustedHostsPath = 'WSMan:\localhost\Client\TrustedHosts'
 
 Get-ChildItem $PSScriptRoot *.ps1 -Recurse | 
     Where-Object { $_.BaseName -ne 'Import-Carbon' -and $_.Extension -eq '.ps1' } |
