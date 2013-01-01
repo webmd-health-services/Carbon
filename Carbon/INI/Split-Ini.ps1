@@ -16,7 +16,7 @@ function Split-Ini
 {
     <#
     .SYNOPSIS
-    Reads an INI file and returns its contents as a hashtable.
+    Reads an INI file and returns its contents.
     
     .DESCRIPTION
     A configuration file consists of sections, led by a "[section]" header and followed by "name = value" entries:
@@ -29,33 +29,24 @@ function Split-Ini
         [stars]
         sneetches = belly
          
-    This file will be returned as a hash, where the value is an `Carbon.Ini.IniNode` object:
+    By default, the INI file will be returned as `Carbon.Ini.IniNode` objects for each name/value pair.  For example, given the INI file above, the following will be returned:
     
-        @{
-            spam.eggs =  Carbon.Ini.IniNode (
-                            FullName = 'spam.eggs';
-                            Section = 'spam';
-                            Name = 'eggs';
-                            Value = 'ham';
-                            LineNumber = 1;
-                          );
-            spam.green = Carbon.Ini.IniNode (
-                            FullName = 'spam.green';
-                            Section = 'spam';
-                            Name = 'green';
-                            Value = "`neggs";
-                            LineNumber = 2;
-                          );
-            stars.sneetches = Carbon.Ini.IniNode (
-                                    FullName = 'stars.sneetches';
-                                    Section = 'stars';
-                                    Name = 'sneetches';
-                                    Value = 'belly'
-                                    LineNumber = 6;
-                               )
+        Line FullName        Section Name      Value
+        ---- --------        ------- ----      -----
+           1 spam.eggs       spam    eggs      ham
+           2 spam.green      spam    green     eggs
+           6 stars.sneetches stars   sneetches belly
+    
+    It is sometimes useful to get a hashtable back of the name/values.  The `AsHashtable` switch will return a hashtable where the keys are the full names of the name/value pairs.  For example, given the INI file above, the following hashtable is returned:
+    
+        Name            Value
+        ----            -----
+        spam.eggs       Carbon.Ini.IniNode;
+        spam.green      Carbon.Ini.IniNode;
+        stars.sneetches Carbon.Ini.IniNode;
         }
 
-    Each line contains one entry. If the lines that follow are indented, they are treated as continuations of that entry. Leading whitespace is removed from values. Empty lines are skipped. Lines beginning with "#" or ";" are ignored and may be used to provide comments.
+    Each line of an INI file contains one entry. If the lines that follow are indented, they are treated as continuations of that entry. Leading whitespace is removed from values. Empty lines are skipped. Lines beginning with "#" or ";" are ignored and may be used to provide comments.
 
     Configuration keys can be set multiple times, in which case Split-Ini will use the value that was configured last. As an example:
 
@@ -97,6 +88,26 @@ function Split-Ini
         share = 
         extdiff =
 
+    `Split-Ini` returns the following objects to the pipeline:
+
+        Line FullName           Section    Name     Value
+        ---- --------           -------    ----     -----
+           1 ui.username        ui         username Regina Spektor <regina@reginaspektor.com>
+           4 extensions.share   extensions share    
+           4 extensions.extdiff extensions extdiff  
+
+    .EXAMPLE
+    Split-Ini -Path C:\Users\rspektor\mercurial.ini -AsHashtable
+
+    Given this INI file:
+
+        [ui]
+        username = Regina Spektor <regina@reginaspektor.com>
+
+        [extensions]
+        share = 
+        extdiff =
+
     `Split-Ini` returns the following hashtable:
 
         @{
@@ -122,26 +133,6 @@ function Split-Ini
                                        LineNumber = 5;
                                   )
         }
-
-    .EXAMPLE
-    Split-Ini -Path C:\Users\rspektor\mercurial.ini -PassThru
-
-    Given this INI file:
-
-        [ui]
-        username = Regina Spektor <regina@reginaspektor.com>
-
-        [extensions]
-        share = 
-        extdiff =
-
-    `Split-Ini` returns the following objects to the pipeline:
-
-        Line FullName           Section    Name     Value
-        ---- --------           -------    ----     -----
-           1 ui.username        ui         username Regina Spektor <regina@reginaspektor.com>
-           4 extensions.share   extensions share    
-           4 extensions.extdiff extensions extdiff  
     #>
     [CmdletBinding(SupportsShouldProcess=$true)]
     param(
@@ -152,17 +143,17 @@ function Split-Ini
         
         [Switch]
         # Pass each parsed setting down the pipeline instead of collecting them all into a hashtable.
-        $PassThru
+        $AsHashtable
     )
 
     if( -not (Test-Path $Path -PathType Leaf) )
     {
-        Write-Error "Unable to find INI file at '$Path'."
-        return $null
+        Write-Error ("INI file '{0}' not found." -f $Path)
+        return
     }
     
     $sectionName = ''
-    $lineNum = -1
+    $lineNum = 0
     $lastSetting = $null
     $settings = @{ }
     
@@ -172,7 +163,7 @@ function Split-Ini
         
         if( -not $_ -or $_ -match '^[;#]' )
         {
-            if( $PassThru -and $lastSetting )
+            if( -not $AsHashtable -and $lastSetting )
             {
                 $lastSetting
             }
@@ -182,7 +173,7 @@ function Split-Ini
         
         if( $_ -match '^\[([^\]]+)\]' )
         {
-            if( $PassThru -and $lastSetting )
+            if( -not $AsHashtable -and $lastSetting )
             {
                 $lastSetting
             }
@@ -200,7 +191,7 @@ function Split-Ini
         
         if( $_ -match '^([^=]*) ?= ?(.*)$' )
         {
-            if( $PassThru -and $lastSetting )
+            if( -not $AsHashtable -and $lastSetting )
             {
                 $lastSetting
             }
@@ -218,15 +209,15 @@ function Split-Ini
         }
     }
     
-    if( $PassThru )
+    if( $AsHashtable )
+    {
+        return $settings
+    }
+    else
     {
         if( $lastSetting )
         {
             $lastSetting
         }
-    }
-    else
-    {
-        return $settings
     }
 }

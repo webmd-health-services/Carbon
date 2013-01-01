@@ -56,17 +56,17 @@ function TearDown
     Remove-Module Carbon
 }
 
-function Test-ShouldReadIni
+function Test-ShouldReadIniAsHashtable
 {
-    $ini = Split-Ini -Path $iniPath
+    $ini = Split-Ini -Path $iniPath -AsHashtable
     Assert-NotNull $ini
-    Assert-IniContains -Ini $ini -Section 'section1' -Name 'option1' -Value 'value1' -LineNumber 1
-    Assert-IniContains -Ini $ini -Section 'section1' -Name 'option2' -Value 'value7' -LineNumber 22
-    Assert-IniContains -Ini $ini -Section 'section3' -Name 'option3' -Value "v`na`nl`nu`ne`n3" -LineNumber 7
-    Assert-IniContains -Ini $ini -Section 'section4' -Name 'option4' -Value 'value4 # No comments accepted' -LineNumber 15
-    Assert-IniContains -Ini $ini -Section 'section4' -Name 'option5' -Value 'value5' -LineNumber 18
-    Assert-IniContains -Ini $ini -Section 'section1' -Name 'option6' -Value 'option 6 and other values =' -LineNumber 21
-    Assert-IniContains -Ini $ini -Section 'section5' -Name 'option1' -Value 'value8' -LineNumber 25
+    Assert-IniContains -Ini $ini -Section 'section1' -Name 'option1' -Value 'value1' -LineNumber 2
+    Assert-IniContains -Ini $ini -Section 'section1' -Name 'option2' -Value 'value7' -LineNumber 23
+    Assert-IniContains -Ini $ini -Section 'section3' -Name 'option3' -Value "v`na`nl`nu`ne`n3" -LineNumber 8
+    Assert-IniContains -Ini $ini -Section 'section4' -Name 'option4' -Value 'value4 # No comments accepted' -LineNumber 16
+    Assert-IniContains -Ini $ini -Section 'section4' -Name 'option5' -Value 'value5' -LineNumber 19
+    Assert-IniContains -Ini $ini -Section 'section1' -Name 'option6' -Value 'option 6 and other values =' -LineNumber 22
+    Assert-IniContains -Ini $ini -Section 'section5' -Name 'option1' -Value 'value8' -LineNumber 26
 }
 
 function Test-ShouldFailIfInvalidPath
@@ -77,9 +77,9 @@ function Test-ShouldFailIfInvalidPath
     Assert-Equal 1 $error.Count
 }
 
-function Test-ShouldPassThruItems
+function Test-ShouldReturnObjectForEachValue
 {
-    $ini = Split-Ini -Path $iniPath -PassThru
+    $ini = Split-Ini -Path $iniPath
     Assert-Equal 'System.Object[]' $ini.GetType()
     Assert-Equal 8 $ini.Length
     Assert-Equal 'section1.option1' $ini[0].FullName
@@ -102,11 +102,11 @@ name2=value2
 name3 = value3
 "@ > $iniPath
 
-    $ini = Split-Ini -Path $iniPath
+    $ini = Split-Ini -Path $iniPath -AsHashtable
     Assert-NotNull $ini
-    Assert-IniContains -Ini $ini -Name 'name' -Value 'value' -LineNumber 0
-    Assert-IniContains -Ini $ini -Name 'name2' -Value 'value2' -LineNumber 1
-    Assert-IniContains -Ini $ini -Name 'name3' -Value 'value3' -LineNumber 4
+    Assert-IniContains -Ini $ini -Name 'name' -Value 'value' -LineNumber 1
+    Assert-IniContains -Ini $ini -Name 'name2' -Value 'value2' -LineNumber 2
+    Assert-IniContains -Ini $ini -Name 'name3' -Value 'value3' -LineNumber 5
 }
 
 function Test-ShouldSplitIniWithAndWithoutSections
@@ -120,11 +120,11 @@ name2=value2
 name3 = value3
 "@ > $iniPath
 
-    $ini = Split-Ini -Path $iniPath
+    $ini = Split-Ini -Path $iniPath -AsHashtable
     Assert-NotNull $ini
-    Assert-IniContains -Ini $ini -Name 'name' -Value 'value' -LineNumber 0
-    Assert-IniContains -Ini $ini -Name 'name2' -Value 'value2' -LineNumber 1
-    Assert-IniContains -Ini $ini -Name 'name3' -Value 'value3' -Section 'section' -LineNumber 5
+    Assert-IniContains -Ini $ini -Name 'name' -Value 'value' -LineNumber 1
+    Assert-IniContains -Ini $ini -Name 'name2' -Value 'value2' -LineNumber 2
+    Assert-IniContains -Ini $ini -Name 'name3' -Value 'value3' -Section 'section' -LineNumber 6
 }
 
 function Assert-IniContains
