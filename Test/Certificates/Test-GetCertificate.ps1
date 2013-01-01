@@ -27,7 +27,7 @@ function Setup
 
 function TearDown
 {
-    Remove-Certificate -Certificate $TestCert -storeLocation CurrentUser -StoreName My
+    Uninstall-Certificate -Certificate $TestCert -storeLocation CurrentUser -StoreName My
     Remove-Module Carbon
 }
 

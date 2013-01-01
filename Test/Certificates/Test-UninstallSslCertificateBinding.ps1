@@ -28,7 +28,7 @@ function Setup
 function TearDown
 {
     netsh http delete sslcert ipport=$ipPort
-    Remove-Certificate -Certificate $cert -StoreLocation LocalMachine -StoreName My
+    Uninstall-Certificate -Certificate $cert -StoreLocation LocalMachine -StoreName My
     Remove-Module Carbon
 }
 

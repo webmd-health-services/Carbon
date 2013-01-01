@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Remove-Certificate
+function Uninstall-Certificate
 {
     <#
     .SYNOPSIS
@@ -22,13 +22,13 @@ function Remove-Certificate
     Uses .NET's certificates API to remove a certificate from a given store for the machine or current user.  Use the thumbprint or friendly name to identify which certificate to remove.  The thumbprint is unique to each certificate.  Friendly names are not guaranteed to be unique.  The user performing the removal must have permission on the store where the certificate is located.
 
     .EXAMPLE
-    > Remove-Certificate -Thumbprint 570895470234023dsaaefdbcgbefa -StoreLocation CurrentUser -StoreName My
+    > Uninstall-Certificate -Thumbprint 570895470234023dsaaefdbcgbefa -StoreLocation CurrentUser -StoreName My
     
     Removes the 570895470234023dsaaefdbcgbefa certificate from the current user's Personal certificate store.
     
     .EXAMPLE
     > $cert = Get-Certificate -FriendlyName 'Carbon Testing Certificate' -StoreLocation LocalMachine -StoreName Root
-    > Remove-Certificate -Certificate $cert -StoreLocation LocalMachine -StoreName Root
+    > Uninstall-Certificate -Certificate $cert -StoreLocation LocalMachine -StoreName Root
     
     Removes the certificate with friendly name 'Carbon Testing Certificate' from the local machine's Trusted Root Certification Authorities store.
     #>

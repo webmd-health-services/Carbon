@@ -21,13 +21,13 @@ function Setup
 
     if( (Get-Certificate -Thumbprint $TestCert.Thumbprint -SToreLocation CurrentUser -StoreName My) )
     {
-        Remove-Certificate -Certificate $TestCert -StoreLocation CurrentUser -StoreName My
+        Uninstall-Certificate -Certificate $TestCert -StoreLocation CurrentUser -StoreName My
     }
 }
 
 function TearDown
 {
-    Remove-Certificate -Certificate $TestCert -StoreLocation CurrentUser -StoreName My
+    Uninstall-Certificate -Certificate $TestCert -StoreLocation CurrentUser -StoreName My
     Remove-Module Carbon
 }
 

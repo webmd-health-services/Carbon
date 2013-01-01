@@ -32,21 +32,21 @@ function TearDown
 
 function Test-ShouldRemoveCertificateByCertificate
 {
-    Remove-Certificate -Certificate $TestCert -StoreLocation CurrentUser -StoreName My
+    Uninstall-Certificate -Certificate $TestCert -StoreLocation CurrentUser -StoreName My
     $cert = Get-Certificate -Thumbprint $TestCert.Thumbprint -StoreLocation CurrentUser -StoreName My
     Assert-Null $cert
 }
 
 function Test-ShouldRemoveCertificateByThumbprint
 {
-    Remove-Certificate -Thumbprint $TestCert.Thumbprint -StoreLocation CurrentUser -StoreName My
+    Uninstall-Certificate -Thumbprint $TestCert.Thumbprint -StoreLocation CurrentUser -StoreName My
     $cert = Get-Certificate -Thumbprint $TestCert.Thumbprint -StoreLocation CurrentUser -StoreName My
     Assert-Null $cert
 }
 
 function Test-ShouldSupportWhatIf
 {
-    Remove-Certificate -Thumbprint $TestCert.Thumbprint -StoreLocation CurrentUser -StoreName My -WhatIf
+    Uninstall-Certificate -Thumbprint $TestCert.Thumbprint -StoreLocation CurrentUser -StoreName My -WhatIf
     $cert = Get-Certificate -Thumbprint $TestCert.Thumbprint -StoreLocation CurrentUser -StoreName My
     Assert-NotNull $cert
 }
