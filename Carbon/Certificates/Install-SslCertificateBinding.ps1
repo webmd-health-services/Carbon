@@ -1,0 +1,70 @@
+# Copyright 2012 Aaron Jensen
+# 
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# 
+#     http://www.apache.org/licenses/LICENSE-2.0
+# 
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+function Set-SslCertificateBinding
+{
+    <#
+    .SYNOPSIS
+    Sets an SSL certificate binding for a given IP/port.
+    
+    .DESCRIPTION
+    Uses the netsh command line application to set the certificate for an IP address and port.  If a binding already exists for the IP/port, it is removed, and the new binding is created.  No validation is performed on the thumbprint.
+    
+    .EXAMPLE
+    > Set-SslCertificateBinding -IPPort 43.27.89.54:443 -ApplicationID 88d1f8da-aeb5-40a2-a5e5-0e6107825df7 -Thumbprint 478907345890734590743
+    
+    Configures the computer to use the 478907345890734590743 certificate on IP 43.27.89.54, port 443.
+    
+    .EXAMPLE
+    
+    > Set-SslCertificateBinding -IPPort 0.0.0.0:443 -ApplicationID 88d1f8da-aeb5-40a2-a5e5-0e6107825df7 -Thumbprint 478907345890734590743
+    
+    Configures the compute to use the 478907345890734590743 certificate as the default certificate on all IP addresses, port 443.
+    #>
+    [CmdletBinding(SupportsShouldProcess=$true)]
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]
+        # The IP address and port to bind the SSL certificate to.  Should be in the form IP:port.
+        # Use 0.0.0.0 to bind to all IP addresses.   For example formats, run
+        # 
+        #    >  netsh http delete sslcert /?
+        $IPPort,
+        
+        [Parameter(Mandatory=$true)]
+        [Guid]
+        # A unique ID representing the application using the binding.  Create your own.
+        $ApplicationID,
+        
+        [Parameter(Mandatory=$true)]
+        [string]
+        # The thumbprint of the certificate to use.  The certificate must be installed.
+        $Thumbprint
+    )
+    
+    $commonParams = @{ }
+    
+    if( $pscmdlet.BoundParameters.WhatIf )
+    {
+        $commonParams.WhatIf = $true
+    }
+    
+    Remove-SslCertificateBinding -IPPort $IPPort @commonParams
+    
+    if( $pscmdlet.ShouldProcess( $IPPort, 'creating SSL certificate binding' ) )
+    {
+        Write-Host "Creating SSL certificate binding for $IPPort with certificate $Thumbprint."
+        netsh http add sslcert ipport=$ipPort "certhash=$($Thumbprint)" "appid={$ApplicationID}"
+    }
+}
