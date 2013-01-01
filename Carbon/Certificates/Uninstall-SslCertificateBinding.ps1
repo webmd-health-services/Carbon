@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Remove-SslCertificateBinding
+function Uninstall-SslCertificateBinding
 {
     <#
     .SYNOPSIS
@@ -22,34 +22,35 @@ function Remove-SslCertificateBinding
     Uses the netsh command line application to remove an SSL certificate binding for an IP/port combination.  If the binding doesn't exist, nothing is changed.
     
     .EXAMPLE
-    > Remove-SslCertificateBinding -IPPort 45.72.89.57:443
+    > Uninstall-SslCertificateBinding -IPAddress '45.72.89.57' -Port 443
     
     Removes the SSL certificate bound to IP 45.72.89.57 on port 443.
     
     .EXAMPLE
-    > Remove-SslCertificateBinding -IPPort 0.0.0.0:443
+    > Uninstall-SslCertificateBinding 
     
     Removes the default SSL certificate from port 443.  The default certificate is bound to all IP addresses.
     #>
     [CmdletBinding(SupportsShouldProcess=$true)]
     param(
-        [Parameter(Mandatory=$true)]
-        [string]
-        # The IP address and port to bind the SSL certificate to.  Should be in the form IP:port.
-        # Use 0.0.0.0 for all IP addresses.  For example formats, run
-        # 
-        #    >  netsh http delete sslcert /?
-        $IPPort
+        [IPAddress]
+        # The IP address whose binding to remove.  Default is all IP addresses.
+        $IPAddress = '0.0.0.0',
+        
+        [UInt16]
+        # The port of the binding to remove.  Default is port 443.
+        $Port = 443
     )
     
-    if( -not (Test-SslCertificateBinding -IPPort $IPPort) )
+    if( -not (Test-SslCertificateBinding -IPAddress $IPAddress -Port $Port) )
     {
         return
     }
     
-    if( $pscmdlet.ShouldProcess( $IPPort, "removing SSL certificate binding" ) )
+    $ipPort = '{0}:{1}' -f $IPAddress,$Port
+    if( $pscmdlet.ShouldProcess( $ipPort, "removing SSL certificate binding" ) )
     {
-        Write-Host "Removing SSL certificate binding for $IPPort."
-        netsh http delete sslcert ipport=$IPPort
+        Write-Host "Removing SSL certificate binding for $ipPort."
+        netsh http delete sslcert ipport=$ipPort
     }
 }

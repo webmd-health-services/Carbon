@@ -60,7 +60,7 @@ function Install-SslCertificateBinding
     }
     
     $ipPort = '{0}:{1}' -f $IPAddress,$Port
-    Remove-SslCertificateBinding -IPPort $ipPort @commonParams
+    Uninstall-SslCertificateBinding -IPAddress $IPAddress -Port $Port @commonParams
     
     if( $pscmdlet.ShouldProcess( $IPPort, 'creating SSL certificate binding' ) )
     {

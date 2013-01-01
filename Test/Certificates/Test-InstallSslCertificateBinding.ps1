@@ -31,19 +31,19 @@ function Test-ShouldCreateNewSslCertificateBinding
     $appID = '0e8a659e-8034-4ab1-ab82-dcb0f5e90bfd'
     $ipAddress = '74.32.80.43'
     $port = '3847'
-    $ipPort = '{0}:{1}' -f $ipAddress,$port
     Install-SslCertificateBinding -IPAddress $ipAddress -Port $port -ApplicationID $appID -Thumbprint $cert.Thumbprint
     $binding = Get-SslCertificateBinding -IPAddress $ipAddress -Port $port
     try
     {
         Assert-NotNull $binding
+        $ipPort = '{0}:{1}' -f $ipAddress,$port
         Assert-Equal $ipPort $binding.IPPort
         Assert-Equal $appID $binding.ApplicationID
         Assert-Equal $cert.Thumbprint $binding.CertificateHash
     }
     finally
     {
-        Remove-SslCertificateBinding -IPPort $ipPort
+        Uninstall-SslCertificateBinding -IPAddress $ipAddress -Port $port
     }
 }
 
@@ -53,7 +53,6 @@ function Test-ShouldUpdateExistingSslCertificateBinding
     $newAppID = '353364bb-1ca8-4d6c-a596-be7608d57771'
     $ipAddress = '74.38.209.47'
     $port = '8823'
-    $ipPort = '{0}:{1}' -f $ipAddress,$port
     Install-SslCertificateBinding -IPAddress $ipAddress -Port $port -ApplicationID $appID -Thumbprint $cert.Thumbprint
     Install-SslCertificateBinding -IPAddress $ipAddress -Port $port -ApplicationID $newAppID -Thumbprint $cert.Thumbprint
     $binding = Get-SslCertificateBinding -IPAddress $ipAddress -Port $port
@@ -63,7 +62,7 @@ function Test-ShouldUpdateExistingSslCertificateBinding
     }
     finally
     {
-        Remove-SslCertificateBinding -IPPort $ipPort
+        Uninstall-SslCertificateBinding -IPAddress $ipAddress -Port $port
     }
 }
 
@@ -72,7 +71,6 @@ function Test-ShouldSupportShouldProcess
     $appID = '411b1023-be42-458e-8fe7-a7ab6c908566'
     $ipAddress = '54.72.38.90'
     $port = '4782'
-    $ipPort = '{0}:{1}' -f $ipAddress,$port
     Install-SslCertificateBinding -IPAddress $ipAddress -Port $port -ApplicationID $appID -Thumbprint $cert.Thumbprint -WhatIf
     $binding = Get-SslCertificateBinding -IPAddress $ipAddress -Port $port
     try
@@ -81,7 +79,7 @@ function Test-ShouldSupportShouldProcess
     }
     finally
     {
-        Remove-SslCertificateBinding -IPPort $ipPort
+        Uninstall-SslCertificateBinding -IPAddress $ipAddress -Port $port
     }
 }
 
@@ -91,7 +89,6 @@ function Test-ShouldSupportShouldProcessOnBindingUpdate
     $newAppID = 'db48e0ec-6d8c-4b2c-9486-a2bb33c68b05'
     $ipAddress = '54.237.80.94'
     $port = '7821'
-    $ipPort = '{0}:{1}' -f $ipAddress,$port
     Install-SslCertificateBinding -IPAddress $ipAddress -Port $port -ApplicationID $appID -Thumbprint $cert.Thumbprint
     Install-SslCertificateBinding -IPAddress $ipAddress -Port $port -ApplicationID $newAppID -Thumbprint $cert.Thumbprint -WhatIf
     $binding = Get-SslCertificateBinding -IPAddress $ipAddress -Port $port
@@ -101,6 +98,6 @@ function Test-ShouldSupportShouldProcessOnBindingUpdate
     }
     finally
     {
-        Remove-SslCertificateBinding -IPPort $ipPort
+        Uninstall-SslCertificateBinding -IPAddress $ipAddress -Port $port
     }
 }

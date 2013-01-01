@@ -35,19 +35,19 @@ function TearDown
 function Test-ShouldRemoveNonExistentBinding
 {
     $bindings = @( Get-SslCertificateBinding )
-    Remove-SslCertificateBinding -IPPort '1.2.3.4:8332'
+    Uninstall-SslCertificateBinding -IPAddress '1.2.3.4' -Port '8332'
     $newBindings = @( Get-SslCertificateBinding )
     Assert-Equal $bindings.Length $newBindings.Length
 }
 
 function Test-ShouldNotRemoveCertificateWhatIf
 {
-    Remove-SslCertificateBinding -IPPort $ipPort -WhatIf
+    Uninstall-SslCertificateBinding -IPAddress $ipAddress -Port $port -WhatIf
     Assert-True (Test-SslCertificateBinding -IPAddress $ipAddress -Port $port)
 }
 
 function Test-ShouldRemoveBinding
 {
-    Remove-SslCertificateBinding -IPPort $ipPort 
+    Uninstall-SslCertificateBinding -IPAddress $ipAddress -Port $port
     Assert-False (Test-SslCertificateBinding -IPAddress $ipAddress -Port $port)
 }
