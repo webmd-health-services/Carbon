@@ -7,41 +7,41 @@
 			<TypeName>Carbon.Ini.IniNode</TypeName>
 		</ViewSelectedBy>
 		<TableControl>
-		  <TableHeaders>
-			<TableColumnHeader>
-				<Label>Line</Label>
-				<Width>4</Width>
-				<Alignment>Right</Alignment>
-			</TableColumnHeader>
-			<TableColumnHeader>
-			  <Width>20</Width>
-			</TableColumnHeader>
-			<TableColumnHeader>
-			  <Width>20</Width>
-			</TableColumnHeader>
-			<TableColumnHeader>
-			  <Width>35</Width>
-			</TableColumnHeader>
-		  </TableHeaders>
-		  <TableRowEntries>
-			<TableRowEntry>
-			  <TableColumnItems>
-				<TableColumnItem>
-				  <PropertyName>LineNumber</PropertyName>
-				</TableColumnItem>
-				<TableColumnItem>
-				  <PropertyName>Section</PropertyName>
-				</TableColumnItem>
-				<TableColumnItem>
-				  <PropertyName>Name</PropertyName>
-				</TableColumnItem>
-				<TableColumnItem>
-				  <PropertyName>Value</PropertyName>
-				</TableColumnItem>
-			  </TableColumnItems>
-			</TableRowEntry>
-		  </TableRowEntries>
-		</TableControl>
+			<TableHeaders>
+				<TableColumnHeader>
+					<Label>Line</Label>
+					<Width>4</Width>
+					<Alignment>Right</Alignment>
+				</TableColumnHeader>
+				<TableColumnHeader>
+					<Width>20</Width>
+				</TableColumnHeader>
+				<TableColumnHeader>
+					<Width>20</Width>
+				</TableColumnHeader>
+				<TableColumnHeader>
+					<Width>35</Width>
+				</TableColumnHeader>
+			</TableHeaders>
+			<TableRowEntries>
+				<TableRowEntry>
+					<TableColumnItems>
+						<TableColumnItem>
+							<PropertyName>LineNumber</PropertyName>
+						</TableColumnItem>
+						<TableColumnItem>
+							<PropertyName>Section</PropertyName>
+						</TableColumnItem>
+						<TableColumnItem>
+							<PropertyName>Name</PropertyName>
+						</TableColumnItem>
+						<TableColumnItem>
+							<PropertyName>Value</PropertyName>
+						</TableColumnItem>
+					</TableColumnItems>
+					</TableRowEntry>
+				</TableRowEntries>
+			</TableControl>
 		</View>
 	</ViewDefinitions>
 </Configuration>
