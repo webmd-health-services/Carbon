@@ -15,11 +15,10 @@ function Split-Ini
 {
     <#
     .SYNOPSIS
-    Reads an ini file and returns its contents as a hashtable.
+    Reads an INI file and returns its contents as a hashtable.
     
     .DESCRIPTION
-    A configuration file consists of sections, led by a "[section]" header
-    and followed by "name = value" entries:
+    A configuration file consists of sections, led by a "[section]" header and followed by "name = value" entries:
 
         [spam]
         eggs=ham
@@ -29,36 +28,35 @@ function Split-Ini
         [stars]
         sneetches = belly
          
-    This file will be returned as a hash like this:
+    This file will be returned as a hash, where the value is an `Carbon.Ini.IniNode` object:
     
         @{
-            spam.eggs =  @{
+            spam.eggs =  Carbon.Ini.IniNode (
+                            FullName = 'spam.eggs';
                             Section = 'spam';
                             Name = 'eggs';
                             Value = 'ham';
                             LineNumber = 1;
-                          };
-            spam.green = @{
+                          );
+            spam.green = Carbon.Ini.IniNode (
+                            FullName = 'spam.green';
                             Section = 'spam';
                             Name = 'green';
                             Value = "`neggs";
                             LineNumber = 2;
-                          };
-            stars.sneetches = @{
+                          );
+            stars.sneetches = Carbon.Ini.IniNode (
+                                    FullName = 'stars.sneetches';
                                     Section = 'stars';
                                     Name = 'sneetches';
                                     Value = 'belly'
                                     LineNumber = 6;
-                               }
+                               )
         }
 
-    Each line contains one entry. If the lines that follow are indented, they
-    are treated as continuations of that entry. Leading whitespace is removed
-    from values. Empty lines are skipped. Lines beginning with "#" or ";" are
-    ignored and may be used to provide comments.
+    Each line contains one entry. If the lines that follow are indented, they are treated as continuations of that entry. Leading whitespace is removed from values. Empty lines are skipped. Lines beginning with "#" or ";" are ignored and may be used to provide comments.
 
-    Configuration keys can be set multiple times, in which case Split-Ini
-    will use the value that was configured last. As an example:
+    Configuration keys can be set multiple times, in which case Split-Ini will use the value that was configured last. As an example:
 
         [spam]
         eggs=large
@@ -84,10 +82,7 @@ function Split-Ini
         eggs=medium
         bread=toasted
 
-    This would set the "eggs", "ham", and "bread" configuration keys of the
-    "foo" section to "medium", "prosciutto", and "toasted", respectively. As
-    you can see there only thing that matters is the last value that was set
-    for each of the configuration keys.
+    This would set the "eggs", "ham", and "bread" configuration keys of the "foo" section to "medium", "prosciutto", and "toasted", respectively. As you can see, the only thing that matters is the last value that was set for each of the configuration keys.
 
     .EXAMPLE
     Split-Ini -Path C:\Users\rspektor\mercurial.ini 
@@ -104,27 +99,27 @@ function Split-Ini
     `Split-Ini` returns the following hashtable:
 
         @{
-            ui.username = @{
+            ui.username = Carbon.Ini.IniNode (
                                 FullName = 'ui.username';
                                 Section = "ui";
                                 Name = "username";
                                 Value = "Regina Spektor <regina@reginaspektor.com>";
                                 LineNumber = 1;
-                            };
-            extensions.share = @{
+                            );
+            extensions.share = Carbon.Ini.IniNode (
                                     FullName = 'extensions.share';
                                     Section = "extensions";
                                     Name = "share"
                                     Value = "";
                                     LineNumber = 4;
-                                };
-            extensions.extdiff = @{
+                                )
+            extensions.extdiff = Carbon.Ini.IniNode (
                                        FullName = 'extensions.extdiff';
                                        Section = "extensions";
                                        Name = "extdiff";
                                        Value = "";
                                        LineNumber = 5;
-                                  };
+                                  )
         }
 
     .EXAMPLE
@@ -139,29 +134,13 @@ function Split-Ini
         share = 
         extdiff =
 
-    `Split-Ini` returns the following hashtables to the pipeline:
+    `Split-Ini` returns the following objects to the pipeline:
 
-        @{
-            FullName = 'ui.username';
-            Section = "ui";
-            Name = "username";
-            Value = "Regina Spektor <regina@reginaspektor.com>";
-            LineNumber = 1;
-        }
-        @{
-            FullName = 'extensions.share';
-            Section = "extensions";
-            Name = "share"
-            Value = "";
-            LineNumber = 4;
-        }
-        @{
-           FullName = 'extensions.extdiff';
-           Section = "extensions";
-           Name = "extdiff";
-           Value = "";
-           LineNumber = 5;
-        }
+        Line FullName           Section    Name     Value
+        ---- --------           -------    ----     -----
+           1 ui.username        ui         username Regina Spektor <regina@reginaspektor.com>
+           4 extensions.share   extensions share    
+           4 extensions.extdiff extensions extdiff  
     #>
     [CmdletBinding(SupportsShouldProcess=$true)]
     param(
@@ -231,18 +210,7 @@ function Split-Ini
             $name = $name.Trim()
             $value = $value.TrimStart()
             
-            $fullName = "$name"
-            if( $sectionName )
-            {
-                $fullName = "$sectionName.$name"
-            }
-            $setting =  @{
-                            Section = $sectionName;
-                            Name = $name;
-                            FullName = $fullName
-                            Value = $value;
-                            LineNumber = $lineNum;
-                         }
+            $setting = New-Object Carbon.Ini.IniNode $sectionName,$name,$value,$lineNum
             $settings[$setting.FullName] = $setting
             $lastSetting = $setting
             Write-Verbose "Parsed setting '$($setting.FullName)'"

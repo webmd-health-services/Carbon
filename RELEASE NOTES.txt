@@ -79,6 +79,7 @@ This release contains many backwards incompatible changes.  Take the following s
  * Created function [Get-IisAppPool](http://get-carbon.org/help/Install-PerformanceCounter.html) for getting a `Microsoft.Web.Administration.AppPool` object for an application pool.
  * Created function [Uninstall-IisAppPool](http://get-carbon.org/help/Uninstall-IisAppPool.html) for removing an IIS application pool.
  * [Install-IisAppPool](http://get-carbon.org/help/Install-IisAppPool.html) now starts an IIS application pool if it is stoppped.
+ * [Split-Ini](http://get-carbon.org/help/Split-Ini.html) now returns strongly-typed `Carbon.Ini.IniNode` objects instead of hashtables.
  
  
 # 0.4.0.1 (18 December 2012)
