@@ -12,6 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# Active Directory
+Add-Type -AssemblyName System.DirectoryServices.AccountManagement
+
 # IIS
 Add-Type -AssemblyName "System.Web"
 $microsoftWebAdministrationPath = Join-Path $env:SystemRoot system32\inetsrv\Microsoft.Web.Administration.dll
