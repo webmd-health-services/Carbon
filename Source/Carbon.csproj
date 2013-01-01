@@ -40,6 +40,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AdvApi32.cs" />
+    <Compile Include="Certificates\SslCertificateBinding.cs" />
     <Compile Include="Ini\IniNode.cs" />
     <Compile Include="IO\JunctionPoint.cs" />
     <Compile Include="Lsa.cs">

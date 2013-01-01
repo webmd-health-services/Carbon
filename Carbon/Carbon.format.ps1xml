@@ -43,5 +43,49 @@
 				</TableRowEntries>
 			</TableControl>
 		</View>
+	  <View>
+		<Name>CarbonCertificatesSslCertificateBindingView</Name>
+		<ViewSelectedBy>
+			<TypeName>Carbon.Certificates.SslCertificateBinding</TypeName>
+		</ViewSelectedBy>
+		<TableControl>
+			<TableHeaders>
+				<TableColumnHeader>
+					<Label>IPAddress</Label>
+					<Width>15</Width>
+				</TableColumnHeader>
+				<TableColumnHeader>
+					<Width>5</Width>
+					<Alignment>Right</Alignment>
+				</TableColumnHeader>
+				<TableColumnHeader>
+					<Label>CertificateHash</Label>
+					<Width>40</Width>
+				</TableColumnHeader>
+				<TableColumnHeader>
+					<Label>CertificateStoreName</Label>
+					<Width>20</Width>
+				</TableColumnHeader>
+			</TableHeaders>
+			<TableRowEntries>
+				<TableRowEntry>
+					<TableColumnItems>
+						<TableColumnItem>
+							<PropertyName>IPAddress</PropertyName>
+						</TableColumnItem>
+						<TableColumnItem>
+							<PropertyName>Port</PropertyName>
+						</TableColumnItem>
+						<TableColumnItem>
+							<PropertyName>CertificateHash</PropertyName>
+						</TableColumnItem>
+						<TableColumnItem>
+							<PropertyName>CertificateStoreName</PropertyName>
+						</TableColumnItem>
+					</TableColumnItems>
+					</TableRowEntry>
+				</TableRowEntries>
+			</TableControl>
+		</View>
 	</ViewDefinitions>
 </Configuration>

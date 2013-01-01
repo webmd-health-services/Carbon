@@ -15,101 +15,122 @@
 function Get-SslCertificateBinding
 {
     <#
-   .SYNOPSIS
-   Gets the SSL certificate binding for an IP/port combination.
-   
-   .DESCRIPTION
-   Windows binds SSL certificates to an IP addresses/port combination.  This function gets the binding for a specific IP/port, or $null if one doesn't exist.
-   
-   .EXAMPLE
-   > Get-SslCertificateBinding -IPPort 42.37.80.47:443
-   
-   Gets the SSL certificate bound to 42.37.80.47, port 443.
-   
-   .EXAMPLE
-   > Get-SslCertificateBinding -IPPort 0.0.0.0:443
-   
-   Gets the default SSL certificate bound to ALL the computer's IP addresses on port 443.  The object returns will have the following properties:
-
-     * IPPort - the IP address/port the SSL certificate is bound to
-     * ApplicationID - the user-generated GUID representing the application using the SSL certificate
-     * CertificateHash - the certificate's thumbprint
-   
-   #>
-   [CmdletBinding()]
-   param(
-        [Parameter(Mandatory=$true)]
-        [string]
-        # The IP address and port to bind the SSL certificate to.  Should be in the form IP:port.
-        # Use 0.0.0.0 for all IP addresses.  For example formats, run
-        # 
-        #    >  netsh http delete sslcert /?
-        $IPPort
-   )
-   
-   Get-SslCertificateBindings | Where-Object { $_.IPPort -eq $IPPort }
-}
-
-function Get-SslCertificateBindings
-{
-    <#
     .SYNOPSIS
-    Gets all the SSL certificate bindings on this computer.
-    
+    Gets the SSL certificate bindings on this computer.
+   
     .DESCRIPTION
-    Parses the output of
-       
-        > netsh http show sslcert
-       
-    and returns an object for each binding with the following properties:
+    Windows binds SSL certificates to an IP addresses/port combination.  This function gets all the SSL bindings on this computer, or a binding for a specific IP/port, or $null if one doesn't exist.  The bindings are returned as `Carbon.Certificates.SslCertificateBinding` objects.
     
-     * IPPort - the IP address/port the SSL certificate is bound to
-     * ApplicationID - the user-generated GUID representing the application using the SSL certificate
-     * CertificateHash - the certificate's thumbprint
+    .OUTPUTS
+    Carbon.Certificates.SslCertificateBinding.
 
     .EXAMPLE
-    > Get-SslCertificateBindings 
+    > Get-SslCertificateBinding
     
+    Gets all the SSL certificate bindings on the local computer.
+
+    .EXAMPLE
+    > Get-SslCertificateBinding -IPAddress 42.37.80.47 -Port 443
+   
+    Gets the SSL certificate bound to 42.37.80.47, port 443.
+   
+    .EXAMPLE
+    > Get-SslCertificateBinding -Port 443
+   
+    Gets the default SSL certificate bound to ALL the computer's IP addresses on port 443.
     #>
     [CmdletBinding()]
     param(
+        [IPAddress]
+        # The IP address whose certificate(s) to get.  Should be in the form IP:port. Optional.
+        $IPAddress,
+        
+        [UInt16]
+        # The port whose certificate(s) to get. Optional.
+        $Port
     )
-    
+   
     $binding = $null
-    netsh http show sslcert | Where-Object { $_ -match '^    ' } | ForEach-Object {
-        if( $_ -notmatch '^    (.*)\s+: (.*)$' )
-        {
-            Write-Error "Unable to parse line '$_' from netsh output."
-            continue
-        }
+    $lineNum = 0
+
+    netsh http show sslcert | 
+        ForEach-Object {
         
-        $name = $matches[1].Trim()
-        $name = $name -replace ' ',''
-        if( $name -eq 'IP:port' )
-        {
-            $name = "IPPort"
-            if( $binding )
+            $lineNum += 1
+            
+            if( -not ($_.Trim()) -and $binding )
             {
-                New-Object PsObject -Property $binding
+                $ctorArgs = @(
+                                $binding.IPAddress,
+                                $binding.Port,
+                                $binding['Certificate Hash'],
+                                $binding['Application ID'],
+                                $binding['Certificate Store Name'],
+                                $binding['Verify Client Certificate Revocation'],
+                                $binding['Verify Revocation Using Cached Client Certificate Only'],
+                                $binding['Usage Check'],
+                                $binding['Revocation Freshness Time'],
+                                $binding['URL Retrieval Timeout'],
+                                $binding['Ctl Identifier'],
+                                $binding['Ctl Store Name'],
+                                $binding['DS Mapper Usage'],
+                                $binding['Negotiate Client Certificate']
+                             )
+                New-Object Carbon.Certificates.SslCertificateBinding $ctorArgs
+                $binding = $null
             }
-            $binding = @{ }
-        }
-        $value = $matches[2].Trim()
-        if( $value -eq '(null)' )
+            
+            if( $_ -notmatch '^    (.*)\s+: (.*)$' )
+            {
+                return
+            }
+
+            $name = $matches[1].Trim()
+            $value = $matches[2].Trim()
+
+            if( $name -eq 'IP:port' )
+            {
+                $binding = @{}
+                $name = "IPPort"
+                $thisIP,$thisPort = $value -split ':'
+                $binding['IPAddress'] = $thisIP
+                $binding['Port'] = $thisPort
+                
+            }
+            if( $value -eq '(null)' )
+            {
+                $value = $null
+            }
+            elseif( $value -eq 'Enabled' )
+            {
+                $value = $true
+            }
+            elseif( $value -eq 'Disabled' )
+            {
+                $value = $false
+            }
+            
+            $binding[$name] = $value
+        } | 
+    Where-Object {
+        if( $IPAddress )
         {
-            $value = $null
+            $_.IPAddress -eq $IPAddress
         }
-        
-        if( $name -eq 'ApplicationID' )
+        else
         {
-            $value = [Guid]$value
+            return $true
         }
-        
-        $binding[$name] = $value
+    } |
+    Where-Object {
+        if( $Port )
+        {
+            $_.Port -eq $Port
+        }
+        else
+        {
+            return $true
+        }
     }
     
-    if( $binding )
-    {
-        New-Object PsObject -Property $binding
-    }
 }

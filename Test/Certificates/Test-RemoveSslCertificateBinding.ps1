@@ -13,7 +13,9 @@
 # limitations under the License.
 
 $cert = $null
-$ipPort = '1.2.3.4:8483'
+$ipAddress = '1.2.3.4'
+$port = '8483'
+$ipPort = '{0}:{1}' -f $ipAddress,$port
 $appID = '454f19a6-3ea8-434c-874f-3a860778e4af'
 
 function Setup
@@ -32,20 +34,20 @@ function TearDown
 
 function Test-ShouldRemoveNonExistentBinding
 {
-    $bindings = @( Get-SslCertificateBindings )
+    $bindings = @( Get-SslCertificateBinding )
     Remove-SslCertificateBinding -IPPort '1.2.3.4:8332'
-    $newBindings = @( Get-SslCertificateBindings )
+    $newBindings = @( Get-SslCertificateBinding )
     Assert-Equal $bindings.Length $newBindings.Length
 }
 
 function Test-ShouldNotRemoveCertificateWhatIf
 {
     Remove-SslCertificateBinding -IPPort $ipPort -WhatIf
-    Assert-True (Test-SslCertificateBinding -IPPort $ipPort)
+    Assert-True (Test-SslCertificateBinding -IPAddress $ipAddress -Port $port)
 }
 
 function Test-ShouldRemoveBinding
 {
     Remove-SslCertificateBinding -IPPort $ipPort 
-    Assert-False (Test-SslCertificateBinding -IPPort $ipPort)
+    Assert-False (Test-SslCertificateBinding -IPAddress $ipAddress -Port $port)
 }

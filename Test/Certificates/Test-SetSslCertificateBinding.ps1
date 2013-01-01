@@ -29,9 +29,11 @@ function TearDown
 function Test-ShouldCreateNewSslCertificateBinding
 {
     $appID = '0e8a659e-8034-4ab1-ab82-dcb0f5e90bfd'
-    $ipPort = '74.32.80.43:3847'
+    $ipAddress = '74.32.80.43'
+    $port = '3847'
+    $ipPort = '{0}:{1}' -f $ipAddress,$port
     Set-SslCertificateBinding -IPPort $ipPort -ApplicationID $appID -Thumbprint $cert.Thumbprint
-    $binding = Get-SslCertificateBinding -IPPort $ipPort
+    $binding = Get-SslCertificateBinding -IPAddress $ipAddress -Port $port
     try
     {
         Assert-NotNull $binding
@@ -49,10 +51,12 @@ function Test-ShouldUpdateExistingSslCertificateBinding
 {
     $appID = '40f5bb4b-569b-47a8-a0cb-39ed797ce8ea'
     $newAppID = '353364bb-1ca8-4d6c-a596-be7608d57771'
-    $ipPort = '74.38.209.47:8823'
+    $ipAddress = '74.38.209.47'
+    $port = '8823'
+    $ipPort = '{0}:{1}' -f $ipAddress,$port
     Set-SslCertificateBinding -IPPort $ipPort -ApplicationID $appID -Thumbprint $cert.Thumbprint
     Set-SslCertificateBinding -IPPort $ipPort -ApplicationID $newAppID -Thumbprint $cert.Thumbprint
-    $binding = Get-SslCertificateBinding -IPPort $ipPort
+    $binding = Get-SslCertificateBinding -IPAddress $ipAddress -Port $port
     try
     {
         Assert-Equal $newAppID $binding.ApplicationID
@@ -66,9 +70,11 @@ function Test-ShouldUpdateExistingSslCertificateBinding
 function Test-ShouldSupportShouldProcess
 {
     $appID = '411b1023-be42-458e-8fe7-a7ab6c908566'
-    $ipPort = '54.72.38.90:4782'
+    $ipAddress = '54.72.38.90'
+    $port = '4782'
+    $ipPort = '{0}:{1}' -f $ipAddress,$port
     Set-SslCertificateBinding -IPPort $ipPort -ApplicationID $appID -Thumbprint $cert.Thumbprint -WhatIf
-    $binding = Get-SslCertificateBinding -IPPort $ipPort
+    $binding = Get-SslCertificateBinding -IPAddress $ipAddress -Port $port
     try
     {
         Assert-Null $binding
@@ -83,10 +89,12 @@ function Test-ShouldSupportShouldProcessOnBindingUpdate
 {
     $appID = '411b1023-be42-458e-8fe7-a7ab6c908566'
     $newAppID = 'db48e0ec-6d8c-4b2c-9486-a2bb33c68b05'
-    $ipPort = '54.237.80.94:7821'
+    $ipAddress = '54.237.80.94'
+    $port = '7821'
+    $ipPort = '{0}:{1}' -f $ipAddress,$port
     Set-SslCertificateBinding -IPPort $ipPort -ApplicationID $appID -Thumbprint $cert.Thumbprint
     Set-SslCertificateBinding -IPPort $ipPort -ApplicationID $newAppID -Thumbprint $cert.Thumbprint -WhatIf
-    $binding = Get-SslCertificateBinding -IPPort $ipPort
+    $binding = Get-SslCertificateBinding -IPAddress $ipAddress -Port $port
     try
     {
         Assert-Equal $appID $binding.ApplicationID
