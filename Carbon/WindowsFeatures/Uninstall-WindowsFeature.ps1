@@ -87,7 +87,7 @@ if( $loadWindowsFeatureFunctions )
         
         if( $pscmdlet.ParameterSetName -eq 'ByFlag' )
         {
-            $Name = ConvertTo-WindowsFeatureName -Name $PSBoundParameters.Keys
+            $Name = Resolve-WindowsFeatureName -Name $PSBoundParameters.Keys
         }
         
         $featuresToUninstall = $Name | 

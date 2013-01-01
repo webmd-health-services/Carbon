@@ -15,7 +15,7 @@
 # This function should only be available if the Windows PowerShell v3.0 Server Manager cmdlets aren't already installed.
 if( $loadWindowsFeatureFunctions )
 {
-    function ConvertTo-WindowsFeatureName
+    function Resolve-WindowsFeatureName
     {
         <#
         .SYNOPSIS
@@ -27,7 +27,7 @@ if( $loadWindowsFeatureFunctions )
         **This function is not available on Windows 8/2012.**
         
         .EXAMPLE
-        ConvertTo-WindowsFeatureNames -Name 'Iis','Msmq'
+        Resolve-WindowsFeatureNames -Name 'Iis','Msmq'
         
         Returns `'IIS-WebServer','MSMQ-Server'` if running Windows 7/Windows 2008 R2, or `'Web-WebServer','MSMQ-Server'` if on Windows 2008.
         #>
