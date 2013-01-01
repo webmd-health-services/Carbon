@@ -57,8 +57,7 @@ $supportNotFoundErrorMessage = 'Unable to find support for managing Windows feat
 
 $CarbonBinDir = Join-Path $PSScriptRoot bin -Resolve
 
-Get-ChildItem $PSScriptRoot *.ps1 -Recurse | 
-    Where-Object { $_.BaseName -ne 'Import-Carbon' -and $_.Extension -eq '.ps1' } |
+Get-Item (Join-Path $PSScriptRoot *\*.ps1) | 
     ForEach-Object {
         Write-Debug ("Importing sub-module {0}." -f $_.FullName)
         . $_.FullName
