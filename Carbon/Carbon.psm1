@@ -39,6 +39,22 @@ $TrustedHostsPath = 'WSMan:\localhost\Client\TrustedHosts'
 # Services
 Add-Type -AssemblyName System.ServiceProcess
 
+# Windows Features
+$loadWindowsFeatureFunctions = if( (Get-Command 'Install-WindowsFeature*')  ) { $false } else { $true }
+
+$useServerManager = ((Get-Command -CommandType 'Application' -Name 'servermanagercmd*.exe' | Where-Object { $_.Name -eq 'servermanagercmd.exe' }) -ne $null)
+$useWmi = $false
+$useOCSetup = $false
+if( -not $useServerManager )
+{
+    $useWmi = ((Get-WmiObject -Class Win32_OptionalFeature -ErrorAction SilentlyContinue) -ne $null)
+    $useOCSetup = ((Get-Command 'ocsetup.exe' -ErrorAction SilentlyContinue) -ne $null)
+}
+
+$windowsFeaturesNotSupported = (-not ($useServerManager -or ($useWmi -and $useOCSetup) ))
+$supportNotFoundErrorMessage = 'Unable to find support for managing Windows features.  Couldn''t find servermanagercmd.exe, ocsetup.exe, or WMI support.'
+
+
 $CarbonBinDir = Join-Path $PSScriptRoot bin -Resolve
 
 Get-ChildItem $PSScriptRoot *.ps1 -Recurse | 
