@@ -142,6 +142,14 @@ function Test-ShouldHandleMissingHostsFile
     Assert-HostsFileContains '127.0.0.1       example.com'
 }
 
+function Test-ShouldIgnoreAndCommentInvalidHostsEntry
+{
+    'Invalid Line' | Out-HostsFile
+    Set-HostsEntry -IPAddress '4.3.2.1' -Hostname 'example.com' -Path $customHostsFile
+    Assert-HostsFileContains '4.3.2.1         example.com'
+    Assert-HostsFileContains '# Invalid line'
+}
+
 function Assert-HostsFileContains($Line, $Path = $customHostsFile)
 {
     $hostsFile = Get-Content $Path

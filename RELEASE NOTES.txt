@@ -83,6 +83,7 @@ This release contains many backwards incompatible changes.  Take the following s
  * [Split-Ini](http://get-carbon.org/help/Split-Ini.html) now returns strongly-typed `Carbon.Ini.IniNode` objects instead of hashtables.
  * The line numbers returned by [Split-Ini](http://get-carbon.org/help/Split-Ini.html) start at 1 instead of 0.
  * [Split-Ini](http://get-carbon.org/help/Split-Ini.html) now returns name/value objects by default (the `PassThru` switch is no longer needed for this behaviro).  This makes it more PowerShell-y.  The old behavior of returning a `Hashtable` is available be using the new `AsHashtable` switch.
+ * [Set-HostsEntry](http://get-carbon.org/help/Set-HostsEntry.html) no longer throws an exception if the hosts file contains an invalid line.  Instead, a warning is written and the line is commented out.
  
  
 # 0.4.0.1 (18 December 2012)

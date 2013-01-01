@@ -87,10 +87,12 @@ function Set-HostsEntry
     $lines = @( Get-Content -Path $Path )
     $outLines = New-Object System.Collections.ArrayList
     $found = $false
+    $lineNum = 0
      
     foreach($line in $lines)
     {
-     
+        $lineNum += 1
+        
         if($line.Trim().StartsWith("#") -or ($line.Trim() -eq '') )
         {
             [void] $outlines.Add($line)
@@ -124,7 +126,8 @@ function Set-HostsEntry
         }
         else
         {
-            throw "Found invalid line '$line' in hosts file '$Path'."
+            Write-Warning ("Hosts file {0}: line {1}: invalid entry: {2}" -f $Path,$lineNum,$line)
+            $outlines.Add( ('# {0}' -f $line) )
         }
 
     }

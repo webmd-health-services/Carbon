@@ -52,12 +52,14 @@ function Test-ShouldOperateOnHostsFileByDefault
 {
     $originalHostsfile = Get-Content (Get-PathToHostsFile)
 
+    $firstEntry = '10.1.1.1     one.example.com'
     $commentLine = '# Below are all my custom host entries.'
-    $customEntry = "10.1.1.1     example.com"
+    $secondEntry = "10.1.1.2     two.example.com"
     @"
 
+$firstEntry
 $commentLine
-$customEntry
+$secondEntry
 
 "@ | Out-File -FilePath (Get-PathToHostsFile) -Encoding OEM -Append
 
@@ -65,8 +67,9 @@ $customEntry
     {
         Reset-HostsFile
         $hostsFile = Get-Content -Path (Get-PathToHostsFile)
+        Assert-DoesNotContain $hostsFile $firstEntry
         Assert-DoesNotContain $hostsFile $commentLine
-        Assert-DoesNotContain $hostsFile $customEntry
+        Assert-DoesNotContain $hostsFile $secondEntry
         Assert-Contains $hostsFile '127.0.0.1       localhost'
     }
     finally
