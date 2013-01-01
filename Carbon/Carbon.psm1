@@ -15,6 +15,9 @@
 # Active Directory
 Add-Type -AssemblyName System.DirectoryServices.AccountManagement
 
+# COM
+$ComRegKeyPath = 'hklm:\software\microsoft\ole'
+
 # IIS
 Add-Type -AssemblyName "System.Web"
 $microsoftWebAdministrationPath = Join-Path $env:SystemRoot system32\inetsrv\Microsoft.Web.Administration.dll
