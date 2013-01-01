@@ -32,7 +32,7 @@ function Test-ShouldCreateNewSslCertificateBinding
     $ipAddress = '74.32.80.43'
     $port = '3847'
     $ipPort = '{0}:{1}' -f $ipAddress,$port
-    Set-SslCertificateBinding -IPPort $ipPort -ApplicationID $appID -Thumbprint $cert.Thumbprint
+    Install-SslCertificateBinding -IPAddress $ipAddress -Port $port -ApplicationID $appID -Thumbprint $cert.Thumbprint
     $binding = Get-SslCertificateBinding -IPAddress $ipAddress -Port $port
     try
     {
@@ -54,8 +54,8 @@ function Test-ShouldUpdateExistingSslCertificateBinding
     $ipAddress = '74.38.209.47'
     $port = '8823'
     $ipPort = '{0}:{1}' -f $ipAddress,$port
-    Set-SslCertificateBinding -IPPort $ipPort -ApplicationID $appID -Thumbprint $cert.Thumbprint
-    Set-SslCertificateBinding -IPPort $ipPort -ApplicationID $newAppID -Thumbprint $cert.Thumbprint
+    Install-SslCertificateBinding -IPAddress $ipAddress -Port $port -ApplicationID $appID -Thumbprint $cert.Thumbprint
+    Install-SslCertificateBinding -IPAddress $ipAddress -Port $port -ApplicationID $newAppID -Thumbprint $cert.Thumbprint
     $binding = Get-SslCertificateBinding -IPAddress $ipAddress -Port $port
     try
     {
@@ -73,7 +73,7 @@ function Test-ShouldSupportShouldProcess
     $ipAddress = '54.72.38.90'
     $port = '4782'
     $ipPort = '{0}:{1}' -f $ipAddress,$port
-    Set-SslCertificateBinding -IPPort $ipPort -ApplicationID $appID -Thumbprint $cert.Thumbprint -WhatIf
+    Install-SslCertificateBinding -IPAddress $ipAddress -Port $port -ApplicationID $appID -Thumbprint $cert.Thumbprint -WhatIf
     $binding = Get-SslCertificateBinding -IPAddress $ipAddress -Port $port
     try
     {
@@ -92,8 +92,8 @@ function Test-ShouldSupportShouldProcessOnBindingUpdate
     $ipAddress = '54.237.80.94'
     $port = '7821'
     $ipPort = '{0}:{1}' -f $ipAddress,$port
-    Set-SslCertificateBinding -IPPort $ipPort -ApplicationID $appID -Thumbprint $cert.Thumbprint
-    Set-SslCertificateBinding -IPPort $ipPort -ApplicationID $newAppID -Thumbprint $cert.Thumbprint -WhatIf
+    Install-SslCertificateBinding -IPAddress $ipAddress -Port $port -ApplicationID $appID -Thumbprint $cert.Thumbprint
+    Install-SslCertificateBinding -IPAddress $ipAddress -Port $port -ApplicationID $newAppID -Thumbprint $cert.Thumbprint -WhatIf
     $binding = Get-SslCertificateBinding -IPAddress $ipAddress -Port $port
     try
     {

@@ -52,11 +52,15 @@ function Set-IisWebsiteSslCertificate
     }
     
     $site.Bindings | Where-Object { $_.Protocol -eq 'https' } | ForEach-Object {
-        $ipAddress = $_.IPAddress
-        if( $ipAddress -eq '*' )
+        $installArgs = @{ }
+        if( $_.IPAddress -ne '*' )
         {
-            $ipAddress = '0.0.0.0'
+            $installArgs.IPAddress = $_.IPAddress
         }
-        Set-SslCertificateBinding -IPPort "$IPAddress`:$($_.Port)" -ApplicationID $ApplicationID -Thumbprint $Thumbprint
+        if( $_.Port -ne '*' )
+        {
+            $installArgs.Port = $_.Port
+        }
+        Install-SslCertificateBinding @installArgs -ApplicationID $ApplicationID -Thumbprint $Thumbprint
     }
 }

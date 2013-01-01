@@ -33,6 +33,7 @@ This release contains many backwards incompatible changes.  Take the following s
  * Replace usages of `Get-SslCertificateBindings` with [Get-SslCertificateBinding](http://get-carbon.org/help/Get-SslCertificateBinding.html).
  * Replace usages of `Get-SslCertificateBinding -IPPort <string>` with `Get-SslCertificate [-IPAddress <IPAddress>] [-Port <UInt16>]`.
  * Replace usages of `Test-SslCertificateBinding -IPPort <string>` with `Test-SslCertificate [-IPAddress <IPAddress>] [-Port <UInt16>]`.
+ * Replace usages of `Set-SslCertificateBinding -IPPort <string>` with `Install-SslCertificateBinding [-IPAddress <IPAddress>] [-Port <UInt16>]`.  The `IPAddress` parameter is only needed if binding to a specific address (i.e. *not* 0.0.0.0).  The `Port` parameter is only needed if it is *not* 443.
  
 ## Bug Fixes
  * [Install-Service](http://get-carbon.org/help/Install-Service.html) not granting default service identity, Network Service, the correct permissions.
@@ -93,7 +94,8 @@ This release contains many backwards incompatible changes.  Take the following s
  * [Get-SslCertificateBinding](http://get-carbon.org/help/Get-SslCertificateBinding.html) now returns `Carbon.Certificates.SslCertificateBinding` objects.  All information displayed by the `netsh http show sslcert` command is returned as part of those objects.
  * [Get-SslCertificateBinding](http://get-carbon.org/help/Get-SslCertificateBinding.html) now supports filtering by `IPAddress` and `Port` separately, instead of requiring both.  The old `IPPort` parameter is replaced with `IPAddress` and `Port` parameters.
  * [Test-SslCertificateBinding](http://get-carbon.org/help/Test-SslCertificateBinding.html) now supports testig by `IPAddress` and `Port` separately, instead of requiring both.  The old `IPPort` parameter is replaced with `IPAddress` and `Port` parameters. 
- 
+ * Renamed `Set-SslCertificateBinding` to [Install-SslCertificateBinding](http://get-carbon.org/help/Install-SslCertificateBinding.html).
+ * Replaced `IPPort` parameter on [Install-SslCertificateBinding](http://get-carbon.org/help/Install-SslCertificateBinding.html) with separate `IPAddress` and `Port` parameters.  Set `IPAddress` only if you want to bind to a specific IP address (i.e. *not* 0.0.0.0).  Set `Port` if *not* binding to port 443.
  
 # 0.4.0.1 (18 December 2012)
 

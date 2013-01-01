@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Set-SslCertificateBinding
+function Install-SslCertificateBinding
 {
     <#
     .SYNOPSIS
@@ -22,25 +22,24 @@ function Set-SslCertificateBinding
     Uses the netsh command line application to set the certificate for an IP address and port.  If a binding already exists for the IP/port, it is removed, and the new binding is created.  No validation is performed on the thumbprint.
     
     .EXAMPLE
-    > Set-SslCertificateBinding -IPPort 43.27.89.54:443 -ApplicationID 88d1f8da-aeb5-40a2-a5e5-0e6107825df7 -Thumbprint 478907345890734590743
+    Install-SslCertificateBinding -IPAddress 43.27.89.54 -Port 443 -ApplicationID 88d1f8da-aeb5-40a2-a5e5-0e6107825df7 -Thumbprint 478907345890734590743
     
     Configures the computer to use the 478907345890734590743 certificate on IP 43.27.89.54, port 443.
     
     .EXAMPLE
-    
-    > Set-SslCertificateBinding -IPPort 0.0.0.0:443 -ApplicationID 88d1f8da-aeb5-40a2-a5e5-0e6107825df7 -Thumbprint 478907345890734590743
+    Install-SslCertificateBinding -ApplicationID 88d1f8da-aeb5-40a2-a5e5-0e6107825df7 -Thumbprint 478907345890734590743
     
     Configures the compute to use the 478907345890734590743 certificate as the default certificate on all IP addresses, port 443.
     #>
     [CmdletBinding(SupportsShouldProcess=$true)]
     param(
-        [Parameter(Mandatory=$true)]
-        [string]
-        # The IP address and port to bind the SSL certificate to.  Should be in the form IP:port.
-        # Use 0.0.0.0 to bind to all IP addresses.   For example formats, run
-        # 
-        #    >  netsh http delete sslcert /?
-        $IPPort,
+        [IPAddress]
+        # The IP address for the binding.  Defaults to all IP addresses.
+        $IPAddress = '0.0.0.0',
+        
+        [UInt16]
+        # The port for the binding.  Defaults to 443.
+        $Port = 443,
         
         [Parameter(Mandatory=$true)]
         [Guid]
@@ -60,7 +59,8 @@ function Set-SslCertificateBinding
         $commonParams.WhatIf = $true
     }
     
-    Remove-SslCertificateBinding -IPPort $IPPort @commonParams
+    $ipPort = '{0}:{1}' -f $IPAddress,$Port
+    Remove-SslCertificateBinding -IPPort $ipPort @commonParams
     
     if( $pscmdlet.ShouldProcess( $IPPort, 'creating SSL certificate binding' ) )
     {
