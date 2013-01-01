@@ -132,9 +132,17 @@ function Install-IisAppPool
         }
     }
     
+    # TODO: Pull this out into its own Start-IisAppPool function.  I think.
     $appPool = Get-IisAppPool -Name $Name
     if($appPool -and $appPool.state -eq [Microsoft.Web.Administration.ObjectState]::Stopped )
     {
-        $appPool.Start()
+        try
+        {
+            $appPool.Start()
+        }
+        catch
+        {
+            Write-Error ('Failed to start {0} app pool: {1}' -f $Name,$_.Exception.Message)
+        }
     }
 }
