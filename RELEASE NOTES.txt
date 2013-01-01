@@ -29,6 +29,7 @@ This release contains many backwards incompatible changes.  Take the following s
  * [Get-TrustedHosts](http://get-carbon.org/help/Get-TrustedHosts.html) no longer returns an empty list if there are no trusted hosts.  It now return nothing/`null`.  Update usages accordingly.
  * Update usages of [Get-PerformanceCounters](http://get-carbon.org/help/Get-TrustedHosts.html) to handle nothing/`null` or a single object output instead of an empty/single element array when there are no or one performance counters.  This function used to always return an array.
  * [Split-Ini](http://get-carbon.org/help/Split-Ini.ps1) now returns objects for each INI file by default. Replace usages of `Split-Ini -Path <string>` with `Split-Ini -Path <string> -AsHashtable` to get the old behavior.  Replace usages of `Split-Ini -Path <string> -PassThru` with `Split-Ini -Path <string>`.
+ * Replace usages of `Remove-MsmqMessageQueue` to [Uninstall-MsmqMessageQueue](http://get-carbon.org/help/Uninstall-MsmqMessageQueue.html). 
  
 ## Bug Fixes
  * [Install-Service](http://get-carbon.org/help/Install-Service.html) not granting default service identity, Network Service, the correct permissions.
@@ -84,6 +85,7 @@ This release contains many backwards incompatible changes.  Take the following s
  * The line numbers returned by [Split-Ini](http://get-carbon.org/help/Split-Ini.html) start at 1 instead of 0.
  * [Split-Ini](http://get-carbon.org/help/Split-Ini.html) now returns name/value objects by default (the `PassThru` switch is no longer needed for this behaviro).  This makes it more PowerShell-y.  The old behavior of returning a `Hashtable` is available be using the new `AsHashtable` switch.
  * [Set-HostsEntry](http://get-carbon.org/help/Set-HostsEntry.html) no longer throws an exception if the hosts file contains an invalid line.  Instead, a warning is written and the line is commented out.
+ * `Remove-MsmqMessageQueue` renamed to [Uninstall-MsmqMessageQueue](http://get-carbon.org/help/Uninstall-MsmqMessageQueue.html).
  
  
 # 0.4.0.1 (18 December 2012)

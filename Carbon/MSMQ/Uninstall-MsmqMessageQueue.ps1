@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Remove-MsmqMessageQueue
+function Uninstall-MsmqMessageQueue
 {
     <#
     .SYNOPSIS
@@ -22,12 +22,12 @@ function Remove-MsmqMessageQueue
     Removes/deletes an existing MSMQ queue by name.  If a queue with that name doesn't exist, nothing happens.
 
     .EXAMPLE
-    Remove-MsmqMessageQueue -Name MovieQueue
+    Uninstall-MsmqMessageQueue -Name MovieQueue
 
     Removes the public `MovieQueue` queue.
 
     .EXAMPLE
-    Remove-MsmqMessageQueue -Name MovieCriticsQueue -Private
+    Uninstall-MsmqMessageQueue -Name MovieCriticsQueue -Private
 
     Removes the private `MovieCriticsQueue` queue.
     #>

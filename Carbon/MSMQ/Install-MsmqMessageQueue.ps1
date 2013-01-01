@@ -62,7 +62,7 @@ function Install-MsmqMessageQueue
     if( Test-MsmqMessageQueue @queueArgs )
     {
         Write-Host "Re-creating $logMessage"
-        Remove-MsmqMessageQueue @queueArgs @cmdletArgs
+        Uninstall-MsmqMessageQueue @queueArgs @cmdletArgs
     }
     else
     {
