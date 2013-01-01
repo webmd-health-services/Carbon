@@ -106,7 +106,7 @@ function Complete-Jobs
                 }
                 else
                 {
-                    throw "Found unknown job state $($job.State)."
+                    Write-Error "Found unknown job state $($job.State)."
                 }
             }
             catch

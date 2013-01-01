@@ -101,6 +101,7 @@ This release contains many backwards incompatible changes.  Take the following s
  * Renamed `Remove-SslCertificateBinding` to [Uninstall-SslCertificateBinding](http://get-carbon.org/help/Uninstall-SslCertificateBinding.html).
  * Replaced `IPPort` parameter on [Uninstall-SslCertificateBinding](http://get-carbon.org/help/Uninstall-SslCertificateBinding.html) with separate `IPAddress` and `Port` parameters.  Set `IPAddress` only if you want to remove a binding for a specific IP address (i.e. *not* 0.0.0.0).  Set `Port` if the binding is *not* on port 443.
  * Renamed `Remove-Certificate` to [Uninstall-Certificate](http://get-carbon.org/help/Uninstall-Certificate.html).
+ * Replaced all instances where functions were throwing exceptions with `Write-Error`.
  
 # 0.4.0.1 (18 December 2012)
 

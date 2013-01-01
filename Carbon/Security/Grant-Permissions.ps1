@@ -142,14 +142,16 @@ function Grant-Permissions
     $pathQualifier = Split-Path -Qualifier $Path
     if( -not $pathQualifier )
     {
-        throw "Unable to get qualifier on path $Path."
+        Write-Error "Unable to get qualifier on path $Path. No permissions granted."
+        return
     }
     $pathDrive = Get-PSDrive $pathQualifier.Trim(':')
     $pathProvider = $pathDrive.Provider
     $providerName = $pathProvider.Name
     if( $providerName -ne 'Registry' -and $providerName -ne 'FileSystem' )
     {
-        throw "Unsupported path: '$Path' belongs to the '$providerName' provider."
+        Write-Error "Unsupported path: '$Path' belongs to the '$providerName' provider."
+        return
     }
 
     $rights = 0
@@ -158,7 +160,8 @@ function Grant-Permissions
         $right = ($permission -as "Security.AccessControl.$($providerName)Rights")
         if( -not $right )
         {
-            throw "Invalid $($providerName)Rights: $permission.  Must be one of $([Enum]::GetNames("Security.AccessControl.$($providerName)Rights"))."
+            Write-Error "Invalid $($providerName)Rights: $permission.  Must be one of $([Enum]::GetNames("Security.AccessControl.$($providerName)Rights"))."
+            return
         }
         $rights = $rights -bor $right
     }

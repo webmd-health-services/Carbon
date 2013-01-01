@@ -57,7 +57,8 @@ function Add-GroupMembers
     $group = [adsi]('WinNT://{0}/{1}' -f $env:ComputerName,$Name)
     if( $group -eq $null )
     {
-        throw "Active directory is unable to find local group $group."
+        Write-Error "Active directory is unable to find local group $group."
+        return
     }
 
     $currentMembers = net localgroup `"$Name`"

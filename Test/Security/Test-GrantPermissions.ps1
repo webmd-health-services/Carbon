@@ -80,16 +80,9 @@ function Test-ShouldGrantPermissionsOnRegistryKey
 function Test-ShouldFailIfIncorrectPermissions
 {
     $failed = $false
-    try
-    {
-        Invoke-GrantPermissions 'BUILTIN\Administrators' 'BlahBlahBlah'
-    }
-    catch
-    {
-        $failed = $_ -like 'Invalid FileSystemRights: BlahBlahBlah.  Must be one of ListDirectory*'
-    }
-    
-    Assert-True $failed "Didn't fail to set permissions with a bad permission."
+    $error.Clear()
+    Grant-Permissions -Identity 'BUILTIN\Administrators' -Permission 'BlahBlahBlah' -Path $Path.ToString() -ErrorAction SilentlyContinue
+    Assert-Equal 1 $error.Count
 }
 
 function Test-ShouldClearExistingPermissions

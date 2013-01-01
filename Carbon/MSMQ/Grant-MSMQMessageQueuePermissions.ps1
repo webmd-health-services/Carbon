@@ -64,7 +64,8 @@ function Grant-MSMQMessageQueuePermissions
     $queue = Get-MsmqMessageQueue @queueArgs
     if( -not $queue )
     {
-        throw "Queue '$Name' doesn't exist."
+        Write-Error "MSMQ queue '$Name' not found."
+        return
     }
     
     if( $pscmdlet.ShouldProcess( $Name, "grant '$AccessRights' to '$User'" ) )

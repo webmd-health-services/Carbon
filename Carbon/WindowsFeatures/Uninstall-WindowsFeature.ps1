@@ -122,7 +122,8 @@ if( $loadWindowsFeatureFunctions )
                 $ocsetup = Get-Process 'ocsetup' -ErrorAction SilentlyContinue
                 if( -not $ocsetup )
                 {
-                    throw "Unable to find process 'ocsetup'.  It looks like the Windows Optional Component setup program didn't start."
+                    Write-Error "Unable to find process 'ocsetup'.  It looks like the Windows Optional Component setup program didn't start."
+                    return
                 }
                 $ocsetup.WaitForExit()
             }
