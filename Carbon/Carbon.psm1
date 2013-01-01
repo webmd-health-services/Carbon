@@ -18,6 +18,9 @@ Add-Type -AssemblyName System.DirectoryServices.AccountManagement
 # COM
 $ComRegKeyPath = 'hklm:\software\microsoft\ole'
 
+# Cryptography
+Add-Type -AssemblyName System.Security
+
 # IIS
 Add-Type -AssemblyName "System.Web"
 $microsoftWebAdministrationPath = Join-Path $env:SystemRoot system32\inetsrv\Microsoft.Web.Administration.dll
