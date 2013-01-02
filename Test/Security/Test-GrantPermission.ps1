@@ -207,7 +207,7 @@ function Assert-InheritanceFlags
     )
 
     #Write-Host ('{0}: {1}     {2}' -f $ContainerInheritanceFlags,$InheritanceFlags,$PropagationFlags)
-    $ace = Get-Permissions $containerPath -Identity $user
+    $ace = Get-Permission $containerPath -Identity $user
                 
     Assert-NotNull $ace $ContainerInheritanceFlags
     $expectedRights = [Security.AccessControl.FileSystemRights]::Read -bor [Security.AccessControl.FileSystemRights]::Synchronize
@@ -226,7 +226,7 @@ function Assert-Permissions($identity, $permissions, $path = $Path)
         $rights = $rights -bor ($permission -as "Security.AccessControl.$($providerName)Rights")
     }
     
-    $ace = Get-Permissions -Path $path -Identity $identity
+    $ace = Get-Permission -Path $path -Identity $identity
     Assert-NotNull $ace "Didn't get access control rule for $path."
     
     $expectedInheritanceFlags = [Security.AccessControl.InheritanceFlags]::None

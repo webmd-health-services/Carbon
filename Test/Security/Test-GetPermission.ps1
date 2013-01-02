@@ -43,7 +43,7 @@ function TearDown
 
 function Test-ShouldGetPermissions
 {
-    $perms = Get-Permissions -Path $childPath
+    $perms = Get-Permission -Path $childPath
     Assert-NotNull $perms
     $group1Perms = $perms | Where-Object { $_.IdentityReference.Value -like "*\$group1" }
     Assert-Null $group1Perms
@@ -55,7 +55,7 @@ function Test-ShouldGetPermissions
 
 function Test-ShouldGetInheritedPermissions
 {
-    $perms = Get-Permissions -Path $childPath -Inherited
+    $perms = Get-Permission -Path $childPath -Inherited
     Assert-NotNull $perms
     $group1Perms = $perms | Where-Object { $_.IdentityReference.Value -like "*\$group1" }
     Assert-NotNull $group1Perms
@@ -68,10 +68,10 @@ function Test-ShouldGetInheritedPermissions
 
 function Test-ShouldGetSpecificUserPermissions
 {
-    $perms = Get-Permissions -Path $childPath -Identity $group1
+    $perms = Get-Permission -Path $childPath -Identity $group1
     Assert-Null $perms
     
-    $perms = @( Get-Permissions -Path $childPath -Identity $user )
+    $perms = @( Get-Permission -Path $childPath -Identity $user )
     Assert-NotNull $perms
     Assert-Equal 1 $perms.Length
     Assert-NotNull $perms[0]
@@ -80,14 +80,14 @@ function Test-ShouldGetSpecificUserPermissions
 
 function Test-ShouldGetSpecificUsersInheritedPermissions
 {
-    $perms = Get-Permissions -Path $childPath -Identity $group1 -Inherited
+    $perms = Get-Permission -Path $childPath -Identity $group1 -Inherited
     Assert-NotNull $perms
     Assert-True ($perms -is [Security.AccessControl.FileSystemAccessRule])
 }
 
 function Test-ShouldGetPermissionsOnRegistryKey
 {
-    $perms = Get-Permissions -Path 'hklm:software'
+    $perms = Get-Permission -Path 'hklm:software'
     Assert-NotNull $perms
     $perms | ForEach-Object {
         Assert-True ($_ -is [Security.AccessControl.RegistryAccessRule])
