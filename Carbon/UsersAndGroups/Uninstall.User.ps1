@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Remove-User
+function Uninstall-User
 {
     <#
     .SYNOPSIS
@@ -22,7 +22,7 @@ function Remove-User
     Removes a *local* user account.  If the account doesn't exist, nothing happens.
 
     .EXAMPLE
-    Remove-User -Username WTarkin
+    Uninstall-User -Username WTarkin
 
     Removes the `WTarkin` *local* user account.
     #>

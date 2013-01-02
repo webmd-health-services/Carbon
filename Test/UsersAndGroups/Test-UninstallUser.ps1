@@ -32,19 +32,19 @@ function TearDown
 
 function Test-ShouldRemoveUser
 {
-    Remove-User -Username $username
+    Uninstall-User -Username $username
     Assert-False (Test-User -Username $username)
 }
 
 function Test-ShouldHandleRemovingNonExistentUser
 {
     $error.Clear()
-    Remove-User -Username ([Guid]::NewGuid().ToString().Substring(0,20))
+    Uninstall-User -Username ([Guid]::NewGuid().ToString().Substring(0,20))
     Assert-False $error
 }
 
 function Test-ShouldSupportWhatIf
 {
-    Remove-User -Username $username -WhatIf
+    Uninstall-User -Username $username -WhatIf
     Assert-True (Test-User -Username $username)
 }

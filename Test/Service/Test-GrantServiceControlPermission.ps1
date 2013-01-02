@@ -32,7 +32,7 @@ function Setup
 function TearDown
 {
     Uninstall-Service -Name $serviceName
-    Remove-User -Username $user
+    Uninstall-User -Username $user
     Remove-Module Carbon
 }
 

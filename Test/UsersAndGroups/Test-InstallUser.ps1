@@ -29,10 +29,7 @@ function TearDown
 
 function Remove-TestUser
 {
-    if( Test-User -Username $username )
-    {
-        Remove-User -Username $username
-    }
+    Uninstall-User -Username $username
 }
 
 function Test-ShouldCreateNewUser
