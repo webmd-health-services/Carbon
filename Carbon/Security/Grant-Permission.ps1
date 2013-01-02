@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Grant-Permissions
+function Grant-Permission
 {
     <#
     .SYNOPSIS
@@ -97,17 +97,17 @@ function Grant-Permissions
     Unprotect-AclAccessRules
 
     .EXAMPLE
-    Grant-Permissions -Identity ENTERPRISE\Engineers -Permissions FullControl -Path C:\EngineRoom
+    Grant-Permission -Identity ENTERPRISE\Engineers -Permissions FullControl -Path C:\EngineRoom
 
     Grants the Enterprise's engineering group full control on the engine room.  Very important if you want to get anywhere.
 
     .EXAMPLE
-    Grant-Permissions -Identity ENTERPRISE\Interns -Permissions ReadKey,QueryValues,EnumerateSubKeys -Path rklm:\system\WarpDrive
+    Grant-Permission -Identity ENTERPRISE\Interns -Permissions ReadKey,QueryValues,EnumerateSubKeys -Path rklm:\system\WarpDrive
 
     Grants the Enterprise's interns access to read about the warp drive.  They need to learn someday, but at least they can't change anything.
     
     .EXAMPLE
-    Grant-Permissions -Identity ENTERPRISE\Engineers -Permissions FullControl -Path C:\EngineRoom -Clear
+    Grant-Permission -Identity ENTERPRISE\Engineers -Permissions FullControl -Path C:\EngineRoom -Clear
     
     Grants the Enterprise's engineering group full control on the engine room.  Any non-inherited, existing access rules are removed from `C:\EngineRoom`.
     #>

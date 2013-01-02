@@ -174,7 +174,7 @@ function Install-Service
     
     if( $pscmdlet.ShouldProcess( $Path, ('grant {0} ReadAndExecute permissions' -f $identity) ) )
     {
-        Grant-Permissions -Identity $identity -Permissions ReadAndExecute -Path $Path
+        Grant-Permission -Identity $identity -Permissions ReadAndExecute -Path $Path
     }
     
     $service = Get-Service -Name $Name -ErrorAction SilentlyContinue

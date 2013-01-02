@@ -38,10 +38,10 @@ Install-Group -Name $deploymnetReadersGroupName `
               -Members 'Everyone'
 
 $websitePath = '\Path\to\website\directory'
-Grant-Permissions -Path $websitePath -Permissions FullControl `
-                  -Identity $deploymentWritersGroupName
-Grant-Permissions -Path $websitePath -Permissions Read `
-                  -Identity $deploymnetReadersGroupName
+Grant-Permission -Path $websitePath -Permissions FullControl `
+                 -Identity $deploymentWritersGroupName
+Grant-Permission -Path $websitePath -Permissions Read `
+                 -Identity $deploymnetReadersGroupName
 
 $deployShareName = 'Deploy'
 Install-Share -Name $deployShareName `
