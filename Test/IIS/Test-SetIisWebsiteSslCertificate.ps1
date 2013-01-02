@@ -51,8 +51,8 @@ function Test-ShouldSetWebsiteSslCertificate
     }
     finally
     {
-        Uninstall-SslCertificateBinding -IPAddress $ipAddress -Port $port 
-        Uninstall-SslCertificateBinding -Port $allPort
+        Remove-SslCertificateBinding -IPAddress $ipAddress -Port $port 
+        Remove-SslCertificateBinding -Port $allPort
     } 
 }
 

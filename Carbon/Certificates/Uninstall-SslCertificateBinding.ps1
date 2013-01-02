@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Uninstall-SslCertificateBinding
+function Remove-SslCertificateBinding
 {
     <#
     .SYNOPSIS
@@ -22,12 +22,12 @@ function Uninstall-SslCertificateBinding
     Uses the netsh command line application to remove an SSL certificate binding for an IP/port combination.  If the binding doesn't exist, nothing is changed.
     
     .EXAMPLE
-    > Uninstall-SslCertificateBinding -IPAddress '45.72.89.57' -Port 443
+    > Remove-SslCertificateBinding -IPAddress '45.72.89.57' -Port 443
     
     Removes the SSL certificate bound to IP 45.72.89.57 on port 443.
     
     .EXAMPLE
-    > Uninstall-SslCertificateBinding 
+    > Remove-SslCertificateBinding 
     
     Removes the default SSL certificate from port 443.  The default certificate is bound to all IP addresses.
     #>

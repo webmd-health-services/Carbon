@@ -61,6 +61,6 @@ function Set-IisWebsiteSslCertificate
         {
             $installArgs.Port = $_.Port
         }
-        Install-SslCertificateBinding @installArgs -ApplicationID $ApplicationID -Thumbprint $Thumbprint
+        Set-SslCertificateBinding @installArgs -ApplicationID $ApplicationID -Thumbprint $Thumbprint
     }
 }

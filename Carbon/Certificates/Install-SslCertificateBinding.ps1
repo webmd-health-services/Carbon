@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Install-SslCertificateBinding
+function Set-SslCertificateBinding
 {
     <#
     .SYNOPSIS
@@ -22,12 +22,12 @@ function Install-SslCertificateBinding
     Uses the netsh command line application to set the certificate for an IP address and port.  If a binding already exists for the IP/port, it is removed, and the new binding is created.  No validation is performed on the thumbprint.
     
     .EXAMPLE
-    Install-SslCertificateBinding -IPAddress 43.27.89.54 -Port 443 -ApplicationID 88d1f8da-aeb5-40a2-a5e5-0e6107825df7 -Thumbprint 478907345890734590743
+    Set-SslCertificateBinding -IPAddress 43.27.89.54 -Port 443 -ApplicationID 88d1f8da-aeb5-40a2-a5e5-0e6107825df7 -Thumbprint 478907345890734590743
     
     Configures the computer to use the 478907345890734590743 certificate on IP 43.27.89.54, port 443.
     
     .EXAMPLE
-    Install-SslCertificateBinding -ApplicationID 88d1f8da-aeb5-40a2-a5e5-0e6107825df7 -Thumbprint 478907345890734590743
+    Set-SslCertificateBinding -ApplicationID 88d1f8da-aeb5-40a2-a5e5-0e6107825df7 -Thumbprint 478907345890734590743
     
     Configures the compute to use the 478907345890734590743 certificate as the default certificate on all IP addresses, port 443.
     #>
@@ -60,7 +60,7 @@ function Install-SslCertificateBinding
     }
     
     $ipPort = '{0}:{1}' -f $IPAddress,$Port
-    Uninstall-SslCertificateBinding -IPAddress $IPAddress -Port $Port @commonParams
+    Remove-SslCertificateBinding -IPAddress $IPAddress -Port $Port @commonParams
     
     if( $pscmdlet.ShouldProcess( $IPPort, 'creating SSL certificate binding' ) )
     {
