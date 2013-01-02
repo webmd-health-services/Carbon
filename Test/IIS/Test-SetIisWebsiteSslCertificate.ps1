@@ -28,7 +28,7 @@ function Setup
 
 function TearDown
 {
-    Remove-Certificate -Certificate $cert -StoreLocation LocalMachine -StoreName My
+    Uninstall-Certificate -Certificate $cert -StoreLocation LocalMachine -StoreName My
     Uninstall-IisWebsite -Name $siteName
     Remove-Module Carbon
 }
@@ -51,8 +51,8 @@ function Test-ShouldSetWebsiteSslCertificate
     }
     finally
     {
-        Remove-SslCertificateBinding -IPPort ('{0}:{1}' -f $ipAddress,$port)
-        Remove-SslCertificateBinding -IPPort ('{0}:{1}' -f $ipAddress,$port)
+        Uninstall-SslCertificateBinding -IPAddress $ipAddress -Port $port 
+        Uninstall-SslCertificateBinding -Port $allPort
     } 
 }
 
