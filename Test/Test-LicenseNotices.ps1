@@ -57,6 +57,7 @@ function Test-AllFilesShouldHaveLicense
         'Publish-Carbon.ps1' = $true;
         'about_Carbon.help.txt' = $true;
         'Carbon.types.ps1xml' = $true;
+        'Carbon.format.ps1xml' = $true;
 		'Initialize-BuildServer.ps1' = $true;
 		'Initialize-WebServer.ps1' = $true;
     }
