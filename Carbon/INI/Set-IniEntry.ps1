@@ -93,12 +93,14 @@ function Set-IniEntry
     
     if( Test-Path $Path -PathType Leaf )
     {
-        $settings = Split-Ini -Path $Path
+        $settings = Split-Ini -Path $Path -AsHashtable
         Get-Content -Path $Path | ForEach-Object { [void] $lines.Add( $_ ) }
     }
     
-    $settings.Values | ForEach-Object { $_.Updated = $false ; $_.IsNew = $false }
-    
+    $settings.Values | 
+        Add-Member -MemberType NoteProperty -Name 'Updated' -Value $false -PassThru |
+        Add-Member -MemberType NoteProperty -Name 'IsNew' -Value $false 
+        
     $key = "$Name"
     if( $Section )
     {
@@ -111,7 +113,7 @@ function Set-IniEntry
         if( $setting.Value -cne $Value )
         {
             Write-Host "Updating INI entry '$key' in '$Path'."
-            $lines[$setting.LineNumber] = "$Name = $Value" 
+            $lines[$setting.LineNumber - 1] = "$Name = $Value" 
         }
     }
     else
@@ -125,7 +127,7 @@ function Set-IniEntry
         Write-Host "Creating INI entry '$key' in '$Path'."
         if( $lastItemInSection )
         {
-            $idx = $lastItemInSection.LineNumber + 1
+            $idx = $lastItemInSection.LineNumber
             $lines.Insert( $idx, $newLine )
             if( $lines[$idx + 1] )
             {
