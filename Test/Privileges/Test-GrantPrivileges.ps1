@@ -37,17 +37,17 @@ function Test-ShouldGrantAndRevokePrivileges
     
     Revoke-Privilege -Identity $username -Privilege SeServiceLogonRight
     Assert-False (Test-Privilege -Identity $username -Privilege SeServiceLogonRight)
-    Assert-Null (Get-Privileges -Identity $username | Where-Object { $_ -eq 'SeServiceLogonRight' })
+    Assert-Null (Get-Privilege -Identity $username | Where-Object { $_ -eq 'SeServiceLogonRight' })
     
     Grant-Privilege -Identity $username -Privilege SeServiceLogonRight
     Assert-True (Test-Privilege -Identity $username -Privilege SeServiceLogonRight)
-    Assert-NotNull (Get-Privileges -Identity $username | Where-Object { $_ -eq 'SeServiceLogonRight' })
+    Assert-NotNull (Get-Privilege -Identity $username | Where-Object { $_ -eq 'SeServiceLogonRight' })
     
     Start-Service $serviceName
     
     Revoke-Privilege -Identity $username -Privilege SeServiceLogonRight
     Assert-False (Test-Privilege -Identity $username -Privilege SeServiceLogonRight)
-    Assert-Null (Get-Privileges -Identity $username | Where-Object { $_ -eq 'SeServiceLogonRight' })
+    Assert-Null (Get-Privilege -Identity $username | Where-Object { $_ -eq 'SeServiceLogonRight' })
     
     $error.Clear()
     Start-Service $serviceName -ErrorAction SilentlyContinue
