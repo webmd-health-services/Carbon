@@ -35,18 +35,18 @@ function Test-ResolveRelativePathWithExplicitPath
 
 function Test-ResolveRelativePathFromPipeline
 {
-    $to = [System.IO.Path]::GetFullPath( (Join-Path $TestDir '..\..\Carbon\FileSystem.ps1') )
+    $to = [System.IO.Path]::GetFullPath( (Join-Path $TestDir '..\..\Carbon\Import-Carbon.ps1') )
     
     $relativePath = Get-Item $to | Resolve-RelativePath -FromDirectory $TestDir
-    Assert-Equal '..\..\Carbon\FileSystem.ps1' $relativePath
+    Assert-Equal '..\..\Carbon\Import-Carbon.ps1' $relativePath
 }
 
 function Test-ResolvesPathPathFromFilePath
 {
-    $to = [System.IO.Path]::GetFullPath( (Join-Path $TestDir '..\..\Carbon\FileSystem.ps1') )
+    $to = [System.IO.Path]::GetFullPath( (Join-Path $TestDir '..\..\Carbon\Import-Carbon.ps1') )
     
     $relativePath = Get-Item $to | Resolve-RelativePath -FromFile $TestScript 
-    Assert-Equal '..\..\Carbon\FileSystem.ps1' $relativePath
+    Assert-Equal '..\..\Carbon\Import-Carbon.ps1' $relativePath
 }
 
 function Test-ResolvesPathForMultiplePaths
