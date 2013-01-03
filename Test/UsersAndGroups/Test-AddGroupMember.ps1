@@ -48,7 +48,7 @@ function Get-LocalUsers
 
 function Invoke-AddMembersToGroup($Members = @())
 {
-    Add-GroupMember -Name $GroupName -Member $Members
+    Add-GroupMembers -Name $GroupName -Member $Members
     Assert-MembersInGroup -Member $Members
 }
 
@@ -89,7 +89,7 @@ function Test-ShouldAddMultipleMembers
 
 function Test-ShouldSupportShouldProcess
 {
-    Add-GroupMember -Name $GroupName -Member 'WBMD\WHS - Lifecycle Services' -WhatIf
+    Add-GroupMembers -Name $GroupName -Members 'WBMD\WHS - Lifecycle Services' -WhatIf
     $details = net localgroup $GroupName
     foreach( $line in $details )
     {
@@ -99,43 +99,43 @@ function Test-ShouldSupportShouldProcess
 
 function Test-ShouldAddNetworkService
 {
-    Add-GroupMember -Name $GroupName -Member 'NetworkService'
+    Add-GroupMembers -Name $GroupName -Members 'NetworkService'
     $details = net localgroup $GroupName
     Assert-ContainsLike $details 'NT AUTHORITY\Network Service'
 }
 
 function Test-ShouldDetectIfNetworkServiceAlreadyMemberOfGroup
 {
-    Add-GroupMember -Name $GroupName -Member 'NetworkService'
-    Add-GroupMember -Name $GroupName -Member 'NetworkService'
+    Add-GroupMembers -Name $GroupName -Members 'NetworkService'
+    Add-GroupMembers -Name $GroupName -Members 'NetworkService'
     Assert-LastProcessSucceeded
 }
 
 function Test-ShouldAddAdministrators
 {
-    Add-GroupMember -Name $GroupName -Member 'Administrators'
+    Add-GroupMembers -Name $GroupName -Members 'Administrators'
     $details = net localgroup $GroupName
     Assert-ContainsLike $details 'Administrators'
 }
 
 function Test-ShouldDetectIfAdministratorsAlreadyMemberOfGroup
 {
-    Add-GroupMember -Name $GroupName -Member 'Administrators'
-    Add-GroupMember -Name $GroupName -Member 'Administrators'
+    Add-GroupMembers -Name $GroupName -Members 'Administrators'
+    Add-GroupMembers -Name $GroupName -Members 'Administrators'
     Assert-LastProcessSucceeded
 }
 
 function Test-ShouldAddAnonymousLogon
 {
-    Add-GroupMember -Name $GroupName -Member 'ANONYMOUS LOGON'
+    Add-GroupMembers -Name $GroupName -Members 'ANONYMOUS LOGON'
     $details = net localgroup $GroupName
     Assert-ContainsLike $details 'NT AUTHORITY\ANONYMOUS LOGON'
 }
 
 function Test-ShouldDetectIfAnonymousLogonAlreadyMemberOfGroup
 {
-    Add-GroupMember -Name $GroupName -Member 'ANONYMOUS LOGON'
-    Add-GroupMember -Name $GroupName -Member 'ANONYMOUS LOGON'
+    Add-GroupMembers -Name $GroupName -Members 'ANONYMOUS LOGON'
+    Add-GroupMembers -Name $GroupName -Members 'ANONYMOUS LOGON'
     Assert-LastProcessSucceeded
 }
 

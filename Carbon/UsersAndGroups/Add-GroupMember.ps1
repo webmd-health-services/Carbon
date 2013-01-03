@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Add-GroupMember
+function Add-GroupMembers
 {
     <#
     .SYNOPSIS
@@ -26,12 +26,12 @@ function Add-GroupMember
     If the members are already part of the group, nothing happens.
 
     .EXAMPLE
-    Add-GroupMember -Name Administrators -Member EMPIRE\DarthVader,EMPIRE\EmperorPalpatine,REBELS\LSkywalker
+    Add-GroupMembers -Name Administrators -Members EMPIRE\DarthVader,EMPIRE\EmperorPalpatine,REBELS\LSkywalker
 
     Adds Darth Vader, Emperor Palpatine and Luke Skywalker to the local administrators group.
 
     .EXAMPLE
-    Add-GroupMember -Name TieFighters -Member NetworkService
+    Add-GroupMembers -Name TieFighters -Members NetworkService
 
     Adds the local NetworkService account to the local TieFighters group.
     #>
@@ -44,8 +44,8 @@ function Add-GroupMember
         
         [Parameter(Mandatory=$true)]
         [string[]]
-        # The users/groups to add to the group.
-        $Member
+        # The users/groups to add to a group.
+        $Members
     )
 
     $Builtins = @{ 
@@ -62,34 +62,34 @@ function Add-GroupMember
     }
 
     $currentMembers = net localgroup `"$Name`"
-    $Member |
+    $Members |
         Where-Object { $currentMembers -notcontains $_ } |
         ForEach-Object {
-            $memberToAdd = $_
-            if( $Builtins.ContainsKey( $memberToAdd ) )
+            $member = $_
+            if( $Builtins.ContainsKey( $member ) )
             {
-                $canonicalMemberName = $Builtins[$memberToAdd]
+                $canonicalMemberName = $Builtins[$member]
                 if( $currentMembers -contains $canonicalMemberName )
                 {
                     continue
                 }
-                if( $pscmdlet.ShouldProcess( $Name, "add built-in member $memberToAdd" ) )
+                if( $pscmdlet.ShouldProcess( $Name, "add built-in member $member" ) )
                 {
-                    Write-Host "Adding $memberToAdd to group $Name."
-                    net localgroup $Name $memberToAdd /add
+                    Write-Host "Adding $member to group $Name."
+                    net localgroup $Name $member /add
                 }
             }
             else
             {
-                $memberPath = 'WinNT://{0}/{1}' -f $env:ComputerName,$memberToAdd
-                if( $memberToAdd.Contains("\") )
+                $memberPath = 'WinNT://{0}/{1}' -f $env:ComputerName,$member
+                if( $member.Contains("\") )
                 {
-                    $memberPath = 'WinNT://{0}/{1}' -f ($memberToAdd -split '\\')
+                    $memberPath = 'WinNT://{0}/{1}' -f ($member -split '\\')
                 }
                 
-                if( $pscmdlet.ShouldProcess( $Name, "add member $memberToAdd" ) )
+                if( $pscmdlet.ShouldProcess( $Name, "add member $member" ) )
                 {
-                    Write-Host "Adding $memberToAdd to group $Name."
+                    Write-Host "Adding $member to group $Name."
                     [void] $group.Add( $memberPath )
                 }
             }
