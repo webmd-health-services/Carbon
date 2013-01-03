@@ -52,7 +52,7 @@ function Test-ShouldConvertNetshOutputToSslCertificateBindingObjects
             if( $name -eq 'IP:port' )
             {
                 $ipAddress,$port = $value -split ':'
-                $binding = Get-SslCertificateBinding -IPAddress $ipAddress -Port $port
+                $binding = Get-SslCertificateBindings -IPAddress $ipAddress -Port $port
                 Assert-Equal $value $binding.IPPort
                 Assert-Equal $ipAddress $binding.IPAddress
                 Assert-Equal $port $binding.Port
@@ -123,7 +123,7 @@ function Test-ShouldGetAllBindings
          Measure-Object |
          Select-Object -ExpandProperty Count
 
-    $bindings = @( Get-SslCertificateBinding )
+    $bindings = @( Get-SslCertificateBindings )
     Assert-Equal $numBindings $bindings.Length
 }
 
@@ -137,7 +137,7 @@ function Test-ShouldFilterByIPAddressAndPort
             $ipAddress,$port = $matches[1] -split ':'
             
             $foundOne = $false
-            Get-SslCertificateBinding -IPAddress $ipAddress | 
+            Get-SslCertificateBindings -IPAddress $ipAddress | 
                 ForEach-Object {
                     Assert-NotNull $_
                     Assert-Equal $ipAddress $_.IPAddress
@@ -146,7 +146,7 @@ function Test-ShouldFilterByIPAddressAndPort
             Assert-True $foundOne
 
             $foundOne = $false                        
-            Get-SslCertificateBinding -Port $port |
+            Get-SslCertificateBindings -Port $port |
                 ForEach-Object {
                     Assert-NotNull $_
                     Assert-Equal $port.Trim() $_.Port

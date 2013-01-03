@@ -40,9 +40,9 @@ This release contains many backwards incompatible changes.  Take the following s
    * `Split-Ini -Path <string>` with `Split-Ini -Path <string> -AsHashtable` (hashtable is no longer returned by default)
    * `Split-Ini -Path <string> -PassThru` with `Split-Ini -Path <string>` (per-line objects are now returned by default)
    * `Remove-MsmqMessageQueue` with `Uninstall-MsmqMessageQueue`
-   * `Get-SslCertificateBindings` with `Get-SslCertificateBinding`
-   * `Get-SslCertificateBinding -IPPort '0.0.0.0:443'` with `Get-SslCertificateBinding`
-   * `Get-SslCertificateBinding -IPPort '10.1.1.1:8001` with `Get-SslCertificateBinding -IPAddress '10.1.1.1' -Port 8001`
+   * `Get-SslCertificateBinding` with `Get-SslCertificateBindings`
+   * `Get-SslCertificateBinding -IPPort '0.0.0.0:443'` with `Get-SslCertificateBindings`
+   * `Get-SslCertificateBinding -IPPort '10.1.1.1:8001` with `Get-SslCertificateBindings -IPAddress '10.1.1.1' -Port 8001`
    * `Test-SslCertificateBinding -IPPort '0.0.0.0:443` with `Test-SslCertificateBinding`
    * `Test-SslCertificateBinding -IPPort '10.1.1.1:8001` with `Test-SslCertificateBinding -IPAddress '10.1.1.1' -Port 8001`
    * `Set-SslCertificateBinding -IPPort '0.0.0.0:443` with `Set-SslCertificateBinding`
@@ -110,14 +110,12 @@ This release contains many backwards incompatible changes.  Take the following s
  * [Split-Ini](http://get-carbon.org/help/Split-Ini.html) now returns name/value objects by default (the `PassThru` switch is no longer needed for this behaviro).  This makes it more PowerShell-y.  The old behavior of returning a `Hashtable` is available be using the new `AsHashtable` switch.
  * [Set-HostsEntry](http://get-carbon.org/help/Set-HostsEntry.html) no longer throws an exception if the hosts file contains an invalid line.  Instead, a warning is written and the line is commented out.
  * `Remove-MsmqMessageQueue` renamed to [Uninstall-MsmqMessageQueue](http://get-carbon.org/help/Uninstall-MsmqMessageQueue.html).
- * Moved functionality of `Get-SslCertificateBindings` into [Get-SslCertificateBinding](http://get-carbon.org/help/Get-SslCertificateBinding.html).  Can now filter by `IPAddress` and/or `Port`.
- * [Get-SslCertificateBinding](http://get-carbon.org/help/Get-SslCertificateBinding.html) now returns `Carbon.Certificates.SslCertificateBinding` objects.  All information displayed by the `netsh http show sslcert` command is returned as part of those objects.
- * [Get-SslCertificateBinding](http://get-carbon.org/help/Get-SslCertificateBinding.html) now supports filtering by `IPAddress` and `Port` separately, instead of requiring both.  The old `IPPort` parameter is replaced with `IPAddress` and `Port` parameters.
+ * Moved functionality of `Get-SslCertificateBinding` into [Get-SslCertificateBindings](http://get-carbon.org/help/Get-SslCertificateBindings.html).  Can now filter by `IPAddress` and/or `Port`.
+ * [Get-SslCertificateBindings](http://get-carbon.org/help/Get-SslCertificateBindings.html) now returns `Carbon.Certificates.SslCertificateBinding` objects.  All information displayed by the `netsh http show sslcert` command is returned as part of those objects.
+ * [Get-SslCertificateBindings](http://get-carbon.org/help/Get-SslCertificateBindings.html) now supports filtering by `IPAddress` and `Port` separately, instead of requiring both.  The old `IPPort` parameter is replaced with `IPAddress` and `Port` parameters.
  * [Test-SslCertificateBinding](http://get-carbon.org/help/Test-SslCertificateBinding.html) now supports testig by `IPAddress` and `Port` separately, instead of requiring both.  The old `IPPort` parameter is replaced with `IPAddress` and `Port` parameters. 
- * Renamed `Set-SslCertificateBinding` to [Install-SslCertificateBinding](http://get-carbon.org/help/Install-SslCertificateBinding.html).
- * Replaced `IPPort` parameter on [Install-SslCertificateBinding](http://get-carbon.org/help/Install-SslCertificateBinding.html) with separate `IPAddress` and `Port` parameters.  Set `IPAddress` only if you want to bind to a specific IP address (i.e. *not* 0.0.0.0).  Set `Port` if *not* binding to port 443.
- * Renamed `Remove-SslCertificateBinding` to [Uninstall-SslCertificateBinding](http://get-carbon.org/help/Uninstall-SslCertificateBinding.html).
- * Replaced `IPPort` parameter on [Uninstall-SslCertificateBinding](http://get-carbon.org/help/Uninstall-SslCertificateBinding.html) with separate `IPAddress` and `Port` parameters.  Set `IPAddress` only if you want to remove a binding for a specific IP address (i.e. *not* 0.0.0.0).  Set `Port` if the binding is *not* on port 443.
+ * Replaced `IPPort` parameter on `Get-SslCertificateBinding` with separate `IPAddress` and `Port` parameters on  [Get-SslCertificateBindings](http://get-carbon.org/help/Get-SslCertificateBindings.html).  Set `IPAddress` only if you want to bind to a specific IP address (i.e. *not* 0.0.0.0).  Set `Port` if *not* binding to port 443.
+ * Replaced `IPPort` parameter on [Remove-SslCertificateBinding](http://get-carbon.org/help/Remove-SslCertificateBinding.html) with separate `IPAddress` and `Port` parameters.  Set `IPAddress` only if you want to remove a binding for a specific IP address (i.e. *not* 0.0.0.0).  Set `Port` if the binding is *not* on port 443.
  * Renamed `Remove-Certificate` to [Uninstall-Certificate](http://get-carbon.org/help/Uninstall-Certificate.html).
  * Replaced all instances where functions were throwing exceptions with `Write-Error`.
  * [Assert-AdminPrivileges](http://get-carbon.org/help/Assert-AdminPrivileges.html) no longer throws an exception if the user doesn't have administrative privileges.  Instead, it writes an error and returns `False`.  It returns `True` if the user has privileges.

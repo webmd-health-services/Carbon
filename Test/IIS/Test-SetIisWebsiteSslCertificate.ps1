@@ -38,12 +38,12 @@ function Test-ShouldSetWebsiteSslCertificate
     Set-IisWebsiteSslCertificate -SiteName $siteName -Thumbprint $cert.Thumbprint -ApplicationID $appID
     try
     {
-        $binding = Get-SslCertificateBinding -IPAddress $ipAddress -Port $port
+        $binding = Get-SslCertificateBindings -IPAddress $ipAddress -Port $port
         Assert-NotNull $binding
         Assert-Equal $cert.Thumbprint $binding.CertificateHash
         Assert-Equal $appID $binding.ApplicationID
         
-        $binding = Get-SslCertificateBinding -Port $allPort
+        $binding = Get-SslCertificateBindings -Port $allPort
         Assert-NotNull $binding
         Assert-Equal $cert.Thumbprint $binding.CertificateHash
         Assert-Equal $appID $binding.ApplicationID
@@ -58,17 +58,17 @@ function Test-ShouldSetWebsiteSslCertificate
 
 function Test-ShouldSupportWhatIf
 {
-    $bindings = @( Get-SslCertificateBinding )
+    $bindings = @( Get-SslCertificateBindings )
     Set-IisWebsiteSslCertificate -SiteName $siteName -Thumbprint $cert.Thumbprint -ApplicationID $appID -WhatIf
-    $newBindings = @( Get-SslCertificateBinding )
+    $newBindings = @( Get-SslCertificateBindings )
     Assert-Equal $bindings.Length $newBindings.Length
 }
 
 function Test-ShouldSupportWebsiteWithoutSslBindings
 {
     Install-IisWebsite -Name $siteName -Path $TestDir -Bindings @( 'http/*:80:' )
-    $bindings = @( Get-SslCertificateBinding )
+    $bindings = @( Get-SslCertificateBindings )
     Set-IisWebsiteSslCertificate -SiteName $siteName -Thumbprint $cert.Thumbprint -ApplicationID $appID
-    $newBindings = @( Get-SslCertificateBinding )
+    $newBindings = @( Get-SslCertificateBindings )
     Assert-Equal $bindings.Length $newBindings.Length
 }
