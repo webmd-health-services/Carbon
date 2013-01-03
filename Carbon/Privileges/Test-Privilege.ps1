@@ -39,7 +39,7 @@ function Test-Privilege
         $Privilege
     )
     
-    $matchingPrivilege = Get-Privilege -Identity $Identity |
+    $matchingPrivilege = Get-Privileges -Identity $Identity |
                             Where-Object { $_ -eq $Privilege }
     return ($matchingPrivilege -ne $null)
 }

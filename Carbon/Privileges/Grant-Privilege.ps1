@@ -66,7 +66,7 @@ function Grant-Privilege
     http://msdn.microsoft.com/en-us/library/windows/desktop/aa375728(v=vs.85).aspx
     
     .LINK
-    Get-Privilege
+    Get-Privileges
     
     .LINK
     Revoke-Privilege

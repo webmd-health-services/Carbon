@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Get-Privilege
+function Get-Privileges
 {
     <#
     .SYNOPSIS
@@ -37,7 +37,7 @@ function Get-Privilege
     
     .EXAMPLE
     
-    Get-Privilege -Identity TheBeast
+    Get-Privileges -Identity TheBeast
     
     Gets TheBeast's privileges as an array of strings.
     #>

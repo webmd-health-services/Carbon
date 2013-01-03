@@ -54,7 +54,6 @@ This release contains many backwards incompatible changes.  Take the following s
    * `Remove-User` with `Uninstall-User`
    * `Add-GroupMembers -Members <string[]>` with `Add-GroupMember -Member <string[]>`
    * `Get-Permissions` with `Get-Permission`
-   * `Get-Privileges` with `Get-Privilege`
  * [Get-TrustedHosts](http://get-carbon.org/help/Get-TrustedHosts.html) no longer returns an empty list if there are no trusted hosts.  It now return nothing/`null`.  Update usages accordingly.
  * [Get-PerformanceCounters](http://get-carbon.org/help/Get-TrustedHosts.html) no longer returns an empty list if there are zero counters or a single element list if there is one counter.  It now returns `null` and a single object, respectively.  Update usages accordingly.
  * [Assert-AdminPrivileges](http://get-carbon.org/help/Assert-AdminPrivileges.html) now returns `True` or `False` if the user doesn't have admin privileges. It also no longer throws an exception, but writes an error.  If you want to preserve current behavior where it stops script execution, replace usages with `Assert-AdminPrivileges -ErrorAction Stop`.
@@ -131,7 +130,6 @@ This release contains many backwards incompatible changes.  Take the following s
  * Renamed `Add-GroupMembers` to [Add-GroupMember](http://get-carbon.org/help/Add-GroupMember.html).
  * Renamed [Add-GroupMember](http://get-carbon.org/help/Add-GroupMember.html)'s `Members` parameter to `Member`.
  * Renamed `Get-Permissions` to [Get-Permission](http://get-carbon.org/help/Get-Permissions.html).
- * Renamed `Get-Privileges` to [Get-Privilege](http://get-carbon.org/help/Get-Privilege.html).
  
  
 # 0.4.0.1 (18 December 2012)
