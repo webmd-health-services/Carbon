@@ -50,7 +50,6 @@ This release contains many backwards incompatible changes.  Take the following s
    * `Remove-SslCertificateBinding -IPPort '0.0.0.0:443` with `Remove-SslCertificateBinding`
    * `Remove-SslCertificateBinding -IPPort '10.1.1.1:8001` with `Remove-SslCertificateBinding -IPAddress '10.1.1.1' -Port 8001`
    * `Remove-Certificate` with `Uninstall-Certificate`
-   * `Get-FirewallRules` with `Get-FirewallRule`
    * `Remove-User` with `Uninstall-User`
  * [Get-TrustedHosts](http://get-carbon.org/help/Get-TrustedHosts.html) no longer returns an empty list if there are no trusted hosts.  It now return nothing/`null`.  Update usages accordingly.
  * [Get-PerformanceCounters](http://get-carbon.org/help/Get-TrustedHosts.html) no longer returns an empty list if there are zero counters or a single element list if there is one counter.  It now returns `null` and a single object, respectively.  Update usages accordingly.
@@ -122,8 +121,6 @@ This release contains many backwards incompatible changes.  Take the following s
  * Renamed `Remove-Certificate` to [Uninstall-Certificate](http://get-carbon.org/help/Uninstall-Certificate.html).
  * Replaced all instances where functions were throwing exceptions with `Write-Error`.
  * [Assert-AdminPrivileges](http://get-carbon.org/help/Assert-AdminPrivileges.html) no longer throws an exception if the user doesn't have administrative privileges.  Instead, it writes an error and returns `False`.  It returns `True` if the user has privileges.
- * Renamed `Get-FirewallRules` to [Get-FirewallRule](http://get-carbon.org/help/Get-FirewallRule.html).
- * Renamed `Grant-Permissions` to [Grant-Permission](http://get-carbon.org/help/Grant-Permission.html).
  * Renamed `Remove-User` to [Uninstall-User](http://get-carbon.org/help/Uninstall-User.html).
  
  

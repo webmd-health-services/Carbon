@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Get-FirewallRule
+function Get-FirewallRules
 {
     <#
     .SYNOPSIS
@@ -45,7 +45,7 @@ function Get-FirewallRule
     Assert-FirewallConfigurable
 
     .EXAMPLE
-    Get-FirewallRule
+    Get-FirewallRules
 
     Here's a sample of the output:
 
