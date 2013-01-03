@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Get-Permission
+function Get-Permissions
 {
     <#
     .SYNOPSIS
@@ -27,17 +27,17 @@ function Get-Permission
     System.Security.AccessControl.AccessRule.
     
     .EXAMPLE
-    Get-Permission -Path C:\Windows
+    Get-Permissions -Path C:\Windows
     
     Returns `System.Security.AccessControl.FileSystemAccessRule` objects for all the non-inherited rules on `C:\windows`.
     
     .EXAMPLE
-    Get-Permission -Path hklm:\Software -Inherited
+    Get-Permissions -Path hklm:\Software -Inherited
     
     Returns `System.Security.AccessControl.RegistryAccessRule` objects for all the inherited and non-inherited rules on `hklm:\software`.
     
     .EXAMPLE
-    Get-Permission -Path C:\Windows -Idenity Administrators
+    Get-Permissions -Path C:\Windows -Idenity Administrators
     
     Returns `System.Security.AccessControl.FileSystemAccessRule` objects for all the `Administrators'` rules on `C:\windows`.
     #>
