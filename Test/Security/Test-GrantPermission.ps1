@@ -20,7 +20,7 @@ function Setup
 {
     & (Join-Path $TestDir ..\..\Carbon\Import-Carbon.ps1 -Resolve)
     
-    Install-User -Username $user -Password 'a1b2c3d4!' -Description 'User for Carbon Grant-Permission tests.'
+    Install-User -Username $user -Password 'a1b2c3d4!' -Description 'User for Carbon Grant-Permissions tests.'
     
     $Path = @([IO.Path]::GetTempFileName())[0]
 }
@@ -35,9 +35,9 @@ function TearDown
     Remove-Module Carbon
 }
 
-function Invoke-GrantPermission($Identity, $Permissions)
+function Invoke-GrantPermissions($Identity, $Permissions)
 {
-    Grant-Permission -Identity $Identity -Permission $Permissions -Path $Path.ToString()
+    Grant-Permissions -Identity $Identity -Permission $Permissions -Path $Path.ToString()
 }
 
 function Test-ShouldGrantPermissionOnFile
@@ -45,7 +45,7 @@ function Test-ShouldGrantPermissionOnFile
     $identity = 'BUILTIN\Administrators'
     $permissions = 'Read','Write'
     
-    Invoke-GrantPermission -Identity $identity -Permissions $permissions
+    Invoke-GrantPermissions -Identity $identity -Permissions $permissions
     Assert-Permissions $identity $permissions
 }
 
@@ -57,18 +57,18 @@ function Test-ShouldGrantPermissionOnDirectory
     $permissions = 'Read','Write'
     
     Write-Host $SCRIPT:Dir
-    Invoke-GrantPermission -Identity $identity -Permissions $permissions
+    Invoke-GrantPermissions -Identity $identity -Permissions $permissions
     Assert-Permissions $identity $permissions
 }
 
 function Test-ShouldGrantPermissionsOnRegistryKey
 {
-    $regKey = 'hkcu:\TestGrantPermission'
+    $regKey = 'hkcu:\TestGrantPermissions'
     New-Item $regKey
     
     try
     {
-        Grant-Permission -Identity 'BUILTIN\Administrators' -Permissions 'ReadKey' -Path $regKey
+        Grant-Permissions -Identity 'BUILTIN\Administrators' -Permissions 'ReadKey' -Path $regKey
         Assert-Permissions 'BUILTIN\Administrators' -Permissions 'ReadKey' -Path $regKey
     }
     finally
@@ -81,15 +81,15 @@ function Test-ShouldFailIfIncorrectPermissions
 {
     $failed = $false
     $error.Clear()
-    Grant-Permission -Identity 'BUILTIN\Administrators' -Permission 'BlahBlahBlah' -Path $Path.ToString() -ErrorAction SilentlyContinue
+    Grant-Permissions -Identity 'BUILTIN\Administrators' -Permission 'BlahBlahBlah' -Path $Path.ToString() -ErrorAction SilentlyContinue
     Assert-Equal 1 $error.Count
 }
 
 function Test-ShouldClearExistingPermissions
 {
-    Invoke-GrantPermission 'Administrators' 'FullControl'
+    Invoke-GrantPermissions 'Administrators' 'FullControl'
     
-    Grant-Permission -Identity 'Everyone' -Permissions 'Read','Write' -Path $Path.ToSTring() -Clear
+    Grant-Permissions -Identity 'Everyone' -Permissions 'Read','Write' -Path $Path.ToSTring() -Clear
     
     $acl = Get-Acl -Path $Path.ToString()
     
@@ -112,7 +112,7 @@ function Test-ShouldHandleNoPermissionsToClear
     }
     
     $error.Clear()
-    Grant-Permission -Identity 'Everyone' -Permissions 'Read','Write' -Path $Path.ToSTring() -Clear -ErrorAction SilentlyContinue
+    Grant-Permissions -Identity 'Everyone' -Permissions 'Read','Write' -Path $Path.ToSTring() -Clear -ErrorAction SilentlyContinue
     Assert-Equal 0 $error.Count
     $acl = Get-Acl -Path $Path.ToString()
     $rules = $acl.Access | Where-Object { -not $_.IsInherited }
@@ -159,7 +159,7 @@ function Test-ShouldSetInheritanceFlags
             try
             {
                 $containerInheritanceFlag = $_
-                $containerPath = 'Carbon-Test-GrantPermission-{0}-{1}' -f ($containerInheritanceFlag,[IO.Path]::GetRandomFileName())
+                $containerPath = 'Carbon-Test-GrantPermissions-{0}-{1}' -f ($containerInheritanceFlag,[IO.Path]::GetRandomFileName())
                 $containerPath = Join-Path $env:Temp $containerPath
                 
                 $null = New-Item $containerPath -ItemType Directory
@@ -178,7 +178,7 @@ function Test-ShouldSetInheritanceFlags
 
                 $flags = $map[$containerInheritanceFlag]
                 #Write-Host ('{0}: {1}     {2}' -f $_,$flags.InheritanceFlags,$flags.PropagationFlags)
-                Grant-Permission -Identity $user -Path $containerPath -Permissions Read -ApplyTo $containerInheritanceFlag
+                Grant-Permissions -Identity $user -Path $containerPath -Permissions Read -ApplyTo $containerInheritanceFlag
                 Assert-InheritanceFlags $containerInheritanceFlag $flags.InheritanceFlags $flags.PropagationFlags
             }
             finally
@@ -190,7 +190,7 @@ function Test-ShouldSetInheritanceFlags
 
 function Test-ShouldWriteWarningWhenInheritanceFlagsGivenOnLeaf
 {
-    Grant-Permission -Identity $user -Permissions Read -Path $Path -ApplyTo Container
+    Grant-Permissions -Identity $user -Permissions Read -Path $Path -ApplyTo Container
 }
 
 function Assert-InheritanceFlags

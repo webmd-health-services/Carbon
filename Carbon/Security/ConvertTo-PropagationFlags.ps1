@@ -28,7 +28,7 @@ function ConvertTo-PropagationFlags
     ConvertTo-InheritanceFlags
     
     .LINK
-    Grant-Permission
+    Grant-Permissions
     
     .EXAMPLE
     ConvertTo-PropagationFlags -ContainerInheritanceFlags ContainerAndSubContainersAndLeaves

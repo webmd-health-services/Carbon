@@ -18,7 +18,7 @@ function SetUp
 {
     Import-Module (Join-Path $TestDir ..\..\Carbon -Resolve) -Force
     Remove-TestSite
-    Grant-Permission -Identity Everyone -Permissions ReadAndExecute -Path $TestDir
+    Grant-Permissions -Identity Everyone -Permissions ReadAndExecute -Path $TestDir
 }
 
 function TearDown
