@@ -32,6 +32,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.Web.Administration, Version=7.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\Windows\System32\inetsrv\Microsoft.Web.Administration.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Security" />
     <Reference Include="System.Data" />
@@ -41,6 +45,8 @@
   <ItemGroup>
     <Compile Include="AdvApi32.cs" />
     <Compile Include="Certificates\SslCertificateBinding.cs" />
+    <Compile Include="Iis\HttpRedirectConfigurationSection.cs" />
+    <Compile Include="Iis\HttpResponseStatus.cs" />
     <Compile Include="Ini\IniNode.cs" />
     <Compile Include="IO\JunctionPoint.cs" />
     <Compile Include="Lsa.cs">

@@ -102,5 +102,58 @@
 				</TableRowEntries>
 			</TableControl>
 		</View>
+	  <View>
+		<Name>CarbonIisHttpRedirectConfigurationSection</Name>
+		<ViewSelectedBy>
+			<TypeName>Carbon.Iis.HttpRedirectConfigurationSection</TypeName>
+		</ViewSelectedBy>
+		<TableControl>
+			<TableHeaders>
+				<TableColumnHeader>
+					<Label>Destination</Label>
+					<Width>41</Width>
+				</TableColumnHeader>
+				<TableColumnHeader>
+					<Label>HTTP Status</Label>
+					<Width>14</Width>
+					<Alignment>Right</Alignment>
+				</TableColumnHeader>
+				<TableColumnHeader>
+					<Width>8</Width>
+					<Alignment>Right</Alignment>
+				</TableColumnHeader>
+				<TableColumnHeader>
+					<Width>10</Width>
+					<Alignment>Right</Alignment>
+				</TableColumnHeader>
+				<TableColumnHeader>
+					<Label>Exact?</Label>
+					<Width>7</Width>
+					<Alignment>Right</Alignment>
+				</TableColumnHeader>
+			</TableHeaders>
+			<TableRowEntries>
+				<TableRowEntry>
+					<TableColumnItems>
+						<TableColumnItem>
+							<PropertyName>Destination</PropertyName>
+						</TableColumnItem>
+						<TableColumnItem>
+							<ScriptBlock>"{0} {1}" -f $_.HttpResponseStatus.ToString("d"),$_.HttpResponseStatus</ScriptBlock>
+						</TableColumnItem>
+						<TableColumnItem>
+							<PropertyName>Enabled</PropertyName>
+						</TableColumnItem>
+						<TableColumnItem>
+							<PropertyName>ChildOnly</PropertyName>
+						</TableColumnItem>
+						<TableColumnItem>
+							<PropertyName>ExactDestination</PropertyName>
+						</TableColumnItem>
+					</TableColumnItems>
+					</TableRowEntry>
+				</TableRowEntries>
+			</TableControl>
+		</View>
 	</ViewDefinitions>
 </Configuration>

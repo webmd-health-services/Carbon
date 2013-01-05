@@ -22,6 +22,9 @@ function Set-IisHttpRedirect
     Configures all or part of a website to redirect all requests to another website/URL.  By default, it operates on a specific website.  To configure a directory under a website, set `Path` to the virtual path of that directory.
 
     .LINK
+    http://www.iis.net/configreference/system.webserver/httpredirect#005
+	
+    .LINK
     http://technet.microsoft.com/en-us/library/cc732969(v=WS.10).aspx
 
     .EXAMPLE
@@ -55,10 +58,9 @@ function Set-IisHttpRedirect
         # The destination to redirect to.
         $Destination,
         
-        [ValidateSet('Found','Permanent','Temporary')]
-        [string]
+        [Carbon.Iis.HttpResponseStatus]
         # The HTTP status code to use.  Default is `Found`.  Should be one of `Found` (HTTP 302), `Permanent` (HTTP 301), or `Temporary` (HTTP 307).
-        $StatusCode = 'Found',
+        $HttpResponseStatus = [Carbon.Iis.HttpResponseStatus]::Found,
         
         [Switch]
         # Redirect all requests to exact destination (instead of relative to destination).  I have no idea what this means.  [Maybe TechNet can help.](http://technet.microsoft.com/en-us/library/cc732969(v=WS.10).aspx)
@@ -69,10 +71,15 @@ function Set-IisHttpRedirect
         $ChildOnly
     )
     
-    $statusArg = "/httpResponseStatus:$StatusCode"
-    $exactDestinationArg =  "/exactDestination:$ExactDestination"
-    $childOnlyArg = "/childOnly:$ChildOnly"
-    
-    Write-Host "Updating IIS settings for $SiteName/$Path to redirect to $destination."
-    Invoke-AppCmd set config "$SiteName/$Path" /section:httpRedirect /enabled:true /destination:$destination $statusArg $exactDestinationArg $childOnlyArg /commit:apphost
+    $settings = Get-IisHttpRedirect -SiteName $SiteName -Path $Path
+    $settings.Enabled = $true
+    $settings.Destination = $destination
+    $settings.HttpResponseStatus = $HttpResponseStatus
+    $settings.ExactDestination = $ExactDestination
+    $settings.ChildOnly = $ChildOnly
+    	
+    if( $pscmdlet.ShouldProcess( "$SiteName/$Path", "set HTTP redirect settings" ) )
+    {
+        $settings.CommitChanges()
+    }
 }

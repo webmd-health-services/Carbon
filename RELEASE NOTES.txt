@@ -51,9 +51,11 @@ This release contains many backwards incompatible changes.  Take the following s
    * `Remove-SslCertificateBinding -IPPort '10.1.1.1:8001` with `Remove-SslCertificateBinding -IPAddress '10.1.1.1' -Port 8001`
    * `Remove-Certificate` with `Uninstall-Certificate`
    * `Remove-User` with `Uninstall-User`
+   * `Set-IisHttpRedirect -StatusCode` with `Set-IisHttpRedirect -HttpResponseStatsu`
  * [Get-TrustedHosts](http://get-carbon.org/help/Get-TrustedHosts.html) no longer returns an empty list if there are no trusted hosts.  It now return nothing/`null`.  Update usages accordingly.
  * [Get-PerformanceCounters](http://get-carbon.org/help/Get-TrustedHosts.html) no longer returns an empty list if there are zero counters or a single element list if there is one counter.  It now returns `null` and a single object, respectively.  Update usages accordingly.
  * [Assert-AdminPrivileges](http://get-carbon.org/help/Assert-AdminPrivileges.html) now returns `True` or `False` if the user doesn't have admin privileges. It also no longer throws an exception, but writes an error.  If you want to preserve current behavior where it stops script execution, replace usages with `Assert-AdminPrivileges -ErrorAction Stop`.
+ * Renamed the `StatusCode` property on the object returned by [Get-IisHttpRedirect](http://get-carbon.org/help/Get-IisHttpRedirect.html) to `HttpResponseStatus`.
  
 ## Bug Fixes
  * [Install-Service](http://get-carbon.org/help/Install-Service.html) not granting default service identity, Network Service, the correct permissions.
@@ -120,6 +122,8 @@ This release contains many backwards incompatible changes.  Take the following s
  * Replaced all instances where functions were throwing exceptions with `Write-Error`.
  * [Assert-AdminPrivileges](http://get-carbon.org/help/Assert-AdminPrivileges.html) no longer throws an exception if the user doesn't have administrative privileges.  Instead, it writes an error and returns `False`.  It returns `True` if the user has privileges.
  * Renamed `Remove-User` to [Uninstall-User](http://get-carbon.org/help/Uninstall-User.html).
+ * [Get-IisHttpRedirect](http://get-carbon.org/help/Get-IisHttpRedirect.html) now returns a `Carbon.Iis.HttpRedirectConfigurationSection` object.  The `StatusCode` property on the old object is now named `HttpResponseStatus`.
+ * Renamed the `StatusCode` parameter on [Set-IisHttpRedirect](http://get-carbon.org/help/Set-IisHttpRedirect.html) to `HttpResponseStatus`.
  
  
 # 0.4.0.1 (18 December 2012)

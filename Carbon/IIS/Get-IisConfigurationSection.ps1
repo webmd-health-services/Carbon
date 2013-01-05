@@ -45,7 +45,11 @@ function Get-IisConfigurationSection
         [Parameter(Mandatory=$true,ParameterSetName='Global')]
         [string]
         # The path to the configuration section to return.
-        $SectionPath
+        $SectionPath,
+        
+        [Type]
+        # The type of object to return.  Optional.
+        $Type = [Microsoft.Web.Administration.ConfigurationSection]
     )
     
     $mgr = New-Object Microsoft.Web.Administration.ServerManager
@@ -56,12 +60,12 @@ function Get-IisConfigurationSection
     {
         if( $pscmdlet.ParameterSetName -eq 'ForSite' )
         {
-            $qualifier = '{0}/{1} ' -f $SiteName,$Path
-            $section = $config.GetSection( $SectionPath, $qualifier )
+            $qualifier = '{0}/{1}' -f $SiteName,$Path
+            $section = $config.GetSection( $SectionPath, $Type, $qualifier )
         }
         else
         {
-            $section = $config.GetSection( $SectionPath )
+            $section = $config.GetSection( $SectionPath, $Type )
             $qualifier = ''
         }
     }

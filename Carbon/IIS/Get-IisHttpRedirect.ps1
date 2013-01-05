@@ -19,13 +19,19 @@ function Get-IisHttpRedirect
     Gets the HTTP redirect settings for a website or virtual directory/application under a website.
     
     .DESCRIPTION
-    The settings are returned as a hashtable with the following properties:
+    Returns a `Carbon.Iis.HttpRedirectConfigurationSection` object for the given HTTP redirect settings.  The object contains the following properties:
     
      * Enabled - `True` if the redirect is enabled, `False` otherwise.
      * Destination - The URL where requests are directed to.
-     * StatusCode - The HTTP status code sent to the browser for the redirect.
-     * ExactDescription - `True` if redirects are to an exact destination, not relative to the destination.  Whatever that means.
+     * HttpResponseCode - The HTTP status code sent to the browser for the redirect.
+     * ExactDestination - `True` if redirects are to destination, regardless of the request path.  This will send all requests to `Destination`.
      * ChildOnly - `True` if redirects are only to content in the destination directory (not subdirectories).
+	 
+    .LINK
+    http://www.iis.net/configreference/system.webserver/httpredirect
+     
+    .OUTPUTS
+    Carbon.Iis.HttpRedirectConfigurationSection.
      
     .EXAMPLE
     Get-IisHttpRedirect -SiteName ExampleWebsite 
@@ -49,13 +55,8 @@ function Get-IisHttpRedirect
         $Path = ''
     )
     
-    $settingsDoc = [xml] (Invoke-AppCmd list config "$SiteName/$Path" /section:httpRedirect)
-    $settings = @{ }
-    $httpRedirectElement = $settingsDoc['system.webServer'].httpRedirect
-    $settings.Enabled = ($httpRedirectElement.enabled -eq 'true')
-    $settings.Destination = $httpRedirectElement.destination
-    $settings.StatusCode= $httpRedirectElement.httpResponseStatus
-    $settings.ExactDestination = ($httpRedirectElement.exactDestination -eq 'true')
-    $settings.ChildOnly = ($httpRedirectElement.childOnly -eq 'true')
-    return $settings
+    Get-IisConfigurationSection -SiteName $SiteName `
+                                -Path $Path `
+                                -SectionPath 'system.webServer/httpRedirect' `
+                                -Type ([Carbon.Iis.HttpRedirectConfigurationSection])
 }
