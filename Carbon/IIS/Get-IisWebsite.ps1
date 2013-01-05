@@ -19,20 +19,18 @@ function Get-IisWebsite
     Gets details about a website.
     
     .DESCRIPTION
-    Returns an object containing the name, ID, bindings, and state of a website:
+    Returns a Microsoft.Web.Administration.Site object representing the website.
+     
+    .OUTPUTS
+    Microsoft.Web.Administration.Site.
     
-     * Bindings - An array of objects for each of the website's bindings.  Each object contains:
-      * Protocol - The protocol of the binding, e.g. http, https.
-      * IPAddress - The IP address the site is listening to, or * for all IP addresses.
-      * Port - The port the site is listening on.
-     * Name - The site's name.
-     * ID - The site's ID.
-     * State - The site's state, e.g. started, stopped, etc.
+    .LINK
+    http://msdn.microsoft.com/en-us/library/microsoft.web.administration.site(v=VS.90).aspx
      
-     .EXAMPLE
-     Get-IisWebsite -SiteName 'WebsiteName'
+    .EXAMPLE
+    Get-IisWebsite -SiteName 'WebsiteName'
      
-     Returns the details for the site named `WebsiteName`.
+    Returns the details for the site named `WebsiteName`.
     #>
     [CmdletBinding()]
     param(
@@ -46,36 +44,7 @@ function Get-IisWebsite
     {
         return $null
     }
-    $siteXml = [xml] (Invoke-AppCmd list site $SiteName -xml)
-    $siteXml = $siteXml.appcmd.SITE
     
-    $site = @{ }
-    
-    $bindingsRaw = $siteXml.bindings -split ','
-    $bindings = @()
-    foreach( $bindingRaw in $bindingsRaw )
-    {
-        if( $bindingRaw -notmatch '^(https?)/([^:]*):([^:]*)(:(.*))?$' )
-        {
-            Write-Error "Unable to parse binding '$bindingRaw' for website '$SiteName'."
-            continue
-        }
-        $binding = @{
-                        Protocol = $matches[1];
-                        IPAddress = $matches[2];
-                        Port = $matches[3];
-                    }
-        $binding.HostName = ''
-        if( $matches.Count -ge 5 )
-        {
-            $binding.HostName = $matches[5]
-        }
-        
-        $bindings += New-Object PsObject -Property $binding
-    }
-    $site.Bindings = $bindings
-    $site.Name = $siteXml.'SITE.NAME'
-    $site.ID = $siteXml.'SITE.ID'
-    $site.State = $siteXml.state
-    return New-Object PsObject -Property $site
+    $mgr = New-Object Microsoft.Web.Administration.ServerManager
+    $mgr.Sites[$SiteName]
 }

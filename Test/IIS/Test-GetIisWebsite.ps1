@@ -42,25 +42,25 @@ function Test-ShouldGetWebsiteDetails
     Assert-NotNull $website
     Assert-Equal $siteName $website.Name 'site name not set'
     Assert-True ($website.ID -gt 0) 'site ID not set'
-    Assert-Equal 4 $website.Bindings.Length 'site bindings not set'
+    Assert-Equal 4 $website.Bindings.Count 'site bindings not set'
     Assert-Equal 'http' $website.Bindings[0].Protocol 
-    Assert-Equal '*' $website.Bindings[0].IPAddress
-    Assert-Equal 8401 $website.Bindings[0].Port
-    Assert-Empty $website.Bindings[0].HostName
+    Assert-Equal '0.0.0.0' $website.Bindings[0].Endpoint.Address
+    Assert-Equal 8401 $website.Bindings[0].Endpoint.Port
+    Assert-Empty $website.Bindings[0].Host
     
     Assert-Equal 'https' $website.Bindings[1].Protocol 
-    Assert-Equal '*' $website.Bindings[1].IPAddress
-    Assert-Equal 8401 $website.Bindings[1].Port
-    Assert-Empty $website.Bindings[1].HostName
+    Assert-Equal '0.0.0.0' $website.Bindings[1].Endpoint.Address
+    Assert-Equal 8401 $website.Bindings[1].Endpoint.Port
+    Assert-Empty $website.Bindings[1].Host
     
     Assert-Equal 'http' $website.Bindings[2].Protocol 
-    Assert-Equal '1.2.3.4' $website.Bindings[2].IPAddress
-    Assert-Equal 80 $website.Bindings[2].Port
-    Assert-Empty $website.Bindings[2].HostName
+    Assert-Equal '1.2.3.4' $website.Bindings[2].Endpoint.Address
+    Assert-Equal 80 $website.Bindings[2].Endpoint.Port
+    Assert-Empty $website.Bindings[2].Host
     
     Assert-Equal 'http' $website.Bindings[3].Protocol 
-    Assert-Equal '5.6.7.8' $website.Bindings[3].IPAddress
-    Assert-Equal 80 $website.Bindings[3].Port
-    Assert-Equal $siteName $website.Bindings[3].HostName "bindings[3] host name"
+    Assert-Equal '5.6.7.8' $website.Bindings[3].Endpoint.Address
+    Assert-Equal 80 $website.Bindings[3].Endpoint.Port
+    Assert-Equal $siteName $website.Bindings[3].Host "bindings[3] host name"
      
 }
