@@ -37,7 +37,7 @@ function TearDown
 function Test-ShouldRemoveInheritedAccess
 {
     $previousAcl = Get-Acl $childFSPath
-    Unprotect-AclAccessRules -Path $childFSPath
+    Protect-Acl -Path $childFSPath
     $acl = Get-Acl $childFSPath
     Assert-NotEqual $previousAcl.Access.Count $acl.Access.Count
     Assert-Equal 1 $acl.Access.Count
@@ -48,7 +48,7 @@ function Test-ShouldRemoveInheritedAccess
 function Test-ShouldPreserveInheritedAccessRules
 {
     $previousAcl = Get-Acl $childFSPath
-    Unprotect-AclAccessRules -Path $childFSPath -Preserve
+    Protect-Acl -Path $childFSPath -Preserve
     $acl = Get-Acl $childFSPath
     Assert-Equal $previousAcl.Access.Count $acl.Access.Count
     for( $idx = 0; $idx -lt $acl.Access.Count; $idx++ )
@@ -66,7 +66,7 @@ function Test-ShouldPreserveInheritedAccessRules
 
 function Test-ShouldAcceptPathFromPipelineInput
 {
-    Get-Item $childFSPath | Unprotect-AclAccessRules
+    Get-Item $childFSPath | Protect-Acl
     $acl = Get-Acl $childFSPath
     Assert-Equal 1 $acl.Access.Count
 }

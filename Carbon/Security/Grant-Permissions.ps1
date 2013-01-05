@@ -94,7 +94,7 @@ function Grant-Permissions
     http://msdn.microsoft.com/en-us/magazine/cc163885.aspx#S3    
     
     .LINK
-    Unprotect-AclAccessRules
+    Protect-Acl
 
     .EXAMPLE
     Grant-Permissions -Identity ENTERPRISE\Engineers -Permissions FullControl -Path C:\EngineRoom
