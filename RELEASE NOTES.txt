@@ -2,94 +2,179 @@
 
 ## Upgrade Instructions
 
-This release contains many backwards incompatible changes.  Take the following steps to get your scripts to work with this release.  We apologize for this inconvenience.  We are making these changes so we can get ready for the v1.0 release.  One of our goals for v1.0 is to get the functions and their interfaces internally consistent and consistent with PowerShell naming schemes.  Once v1.0 is out the door, backwards-incompatible changes will be phased in as much as possible.
+This release contains many backwards incompatible changes.  We apologize for this inconvenience.  We are making these changes so we can get ready for the v1.0 release.  One of our goals for v1.0 is to get the functions and their interfaces internally consistent and consistent with PowerShell naming schemes.  Once v1.0 is out the door, backwards-incompatible changes will be phased in as much as possible.
 
- * Replace usages of: 
-   * `Test-WindowsFeature` with `Test-WindowsFeature -Installed`
-   * `Install-WindowsFeatures -Features <string[]>` with `Install-WindowsFeature -Name <string[]>`
-   * `Uninstall-WindowsFeatures -Features <string[]>` with `Uninstall-WindowsFeature -Name <string[]>`
-   * `Install-WindowsFeatureIis` with `Install-WindowsFeature -Iis`
-   * `Install-WindowsFeatureIis -HttpRedirection` with `Install-WindowsFeature -Iis -IisHttpRedirection`
-   * `Install-WindowsFeatureMsmq` with `Install-WindowsFeature -Msmq`
-   * `Install-WindowsFeatureMsmq -HttpSupport` with `Install-WindowsFeature -Msmq -MsmqHttpSupport`
-   * `Install-WindowsFeatureMsmq -ActiveDirectoryIntegration` with `Install-WindowsFeature -MsmqActiveDirectoryIntegration`
-   * `Install-Share -Permissions '"ShareAdmins,FULL"','"ShareWriters,CHANGE"','"ShareReaders,READ"'` with `Install-SmbShare -FullAccess ShareAdmins -ChangeAccess ShareWriters -ReadAccess ShareReaders`.
-   * `Set-EnvironmentVariable -Scope 'Process'` with `Set-EnvironmentVariable -ForProcess`
-   * `Set-EnvironmentVariable -Scope 'User'` with `Set-EnvironmentVariable -ForUser`
-   * `Set-EnvironmentVariable -Scope 'ForComputer'` with `Set-EnvironmentVariable -ForComputer`
-   * `Protect-String -Scope CurrentUser` with `Protect-String -ForUser`
-   * `Protect-String -Scope LocalMachine` with `Protect-String -ForComputer`
-   * `Get-PathRelativeTo -To <string> -From <string>'` with `Resolve-RelativePath -Path <string> -FromDirectory <string>`
-   * `Get-PathRelativeTo -To <string> -From <string> -FromType 'File'` with `Resolve-RelativePath -Path <string> -FromFile <string>`
-   * `ConvertTo-FullPath` with `Resolve-FullPath`
-   * `Get-PathCanonicalCase` with `Resolve-PathCase`
-   * `Set-IisAnonymousAuthentication` with `Enable-IisSecurityAuthentication -Anonymous` 
-   * `Set-IisAnonymousAuthentication -Disabled` with `Disable-IisSecurityAuthentication -Anonymous`
-   * `Set-IisBasicAuthentication` with `Enable-IisSecurityAuthentication -Basic`
-   * `Set-IisBasicAuthentication -Disabled` with `Disable-IisSecurityAuthentication -Basic`
-   * `Set-IisWindowsAuthentication` with `Enable-IisSecurityAuthentication -Windows` and `Set-IisWindowsAuthentication -DisableKernelMode`
-   * `Set-IisWindowsAuthentication -UseKernelMode` with `Set-IisWindowsAuthentication`
-   * `Set-IisWindowsAuthentication -Disabled` with `Disable-IisSecurityAuthentication -Windows`  
-   * `Unlock-IisConfigSection -Name <string>` with `Unlock-IisConfigurationSection -SectionPath <string>` (run `appcmd.exe lock config -section:?` for values to the new `SectionPath` parameter)
-   * `Unlock-IisBasicAuthentication` with `Unlock-IisConfigurationSeciton -SectionPath 'system.webServer/security/authentication/basicAuthentication'`
-   * `Unlock-IisCgi` with `Unlock-IisConfigurationSeciton -SectionPath 'system.webServer/cgi'`
-   * `Unlock-IisWindowsAuthentication` with `Unlock-IisConfigurationSeciton -SectionPath 'system.webServer/security/authentication/windowsAuthentication'`
-   * `Remove-Service` with `Uninstall-Service`
-   * `Test-IisAppPoolExists` with `Test-IisAppPool`
-   * `Remove-IisWebsite` with `Uninstall-IisWebsite`
-   * `Split-Ini -Path <string>` with `Split-Ini -Path <string> -AsHashtable` (hashtable is no longer returned by default)
-   * `Split-Ini -Path <string> -PassThru` with `Split-Ini -Path <string>` (per-line objects are now returned by default)
-   * `Remove-MsmqMessageQueue` with `Uninstall-MsmqMessageQueue`
-   * `Get-SslCertificateBinding` with `Get-SslCertificateBindings`
-   * `Get-SslCertificateBinding -IPPort '0.0.0.0:443'` with `Get-SslCertificateBindings`
-   * `Get-SslCertificateBinding -IPPort '10.1.1.1:8001` with `Get-SslCertificateBindings -IPAddress '10.1.1.1' -Port 8001`
-   * `Test-SslCertificateBinding -IPPort '0.0.0.0:443` with `Test-SslCertificateBinding`
-   * `Test-SslCertificateBinding -IPPort '10.1.1.1:8001` with `Test-SslCertificateBinding -IPAddress '10.1.1.1' -Port 8001`
-   * `Set-SslCertificateBinding -IPPort '0.0.0.0:443` with `Set-SslCertificateBinding`
-   * `Set-SslCertificateBinding -IPort '1.2.3.4:8001' with `Set-SslCertificateBinding -IPAddress '1.2.3.4' -Port 8001
-   * `Remove-SslCertificateBinding -IPPort '0.0.0.0:443` with `Remove-SslCertificateBinding`
-   * `Remove-SslCertificateBinding -IPPort '10.1.1.1:8001` with `Remove-SslCertificateBinding -IPAddress '10.1.1.1' -Port 8001`
-   * `Remove-Certificate` with `Uninstall-Certificate`
-   * `Remove-User` with `Uninstall-User`
-   * `Set-IisHttpRedirect -StatusCode` with `Set-IisHttpRedirect -HttpResponseStatsu`
- * [Get-TrustedHosts](http://get-carbon.org/help/Get-TrustedHosts.html) no longer returns an empty list if there are no trusted hosts.  It now return nothing/`null`.  Update usages accordingly.
- * [Get-PerformanceCounters](http://get-carbon.org/help/Get-PerformanceCounters.html) no longer returns an empty list if there are zero counters or a single element list if there is one counter.  It now returns `null` and a single object, respectively.  Update usages accordingly.
- * [Assert-AdminPrivileges](http://get-carbon.org/help/Assert-AdminPrivileges.html) now returns `True` or `False` if the user doesn't have admin privileges. It also no longer throws an exception, but writes an error.  If you want to preserve current behavior where it stops script execution, replace usages with `Assert-AdminPrivileges -ErrorAction Stop`.
+Take the following steps to get your scripts to work with this release.
+
+### Certificates
+
+Replaces usages of:
+
+ * `Get-SslCertificateBinding` with `Get-SslCertificateBindings`
+ * `Get-SslCertificateBinding -IPPort '0.0.0.0:443'` with `Get-SslCertificateBindings`
+ * `Get-SslCertificateBinding -IPPort '10.1.1.1:8001` with `Get-SslCertificateBindings -IPAddress '10.1.1.1' -Port 8001`
+ * `Test-SslCertificateBinding -IPPort '0.0.0.0:443` with `Test-SslCertificateBinding`
+ * `Test-SslCertificateBinding -IPPort '10.1.1.1:8001` with `Test-SslCertificateBinding -IPAddress '10.1.1.1' -Port 8001`
+ * `Set-SslCertificateBinding -IPPort '0.0.0.0:443` with `Set-SslCertificateBinding`
+ * `Set-SslCertificateBinding -IPort '1.2.3.4:8001' with `Set-SslCertificateBinding -IPAddress '1.2.3.4' -Port 8001
+ * `Remove-SslCertificateBinding -IPPort '0.0.0.0:443` with `Remove-SslCertificateBinding`
+ * `Remove-SslCertificateBinding -IPPort '10.1.1.1:8001` with `Remove-SslCertificateBinding -IPAddress '10.1.1.1' -Port 8001`
+ * `Remove-Certificate` with `Uninstall-Certificate`
+
+### Computer
+
+Replace usages of
+
+ * `Set-EnvironmentVariable -Scope 'Process'` with `Set-EnvironmentVariable -ForProcess`
+ * `Set-EnvironmentVariable -Scope 'User'` with `Set-EnvironmentVariable -ForUser`
+ * `Set-EnvironmentVariable -Scope 'ForComputer'` with `Set-EnvironmentVariable -ForComputer`
+
+### Cryptography
+
+ * `Protect-String -Scope CurrentUser` with `Protect-String -ForUser`
+ * `Protect-String -Scope LocalMachine` with `Protect-String -ForComputer`
+
+### IIS
+
  * Renamed the `StatusCode` property on the object returned by [Get-IisHttpRedirect](http://get-carbon.org/help/Get-IisHttpRedirect.html) to `HttpResponseStatus`.  Update usages accordingly.
  * The `Bindings` property returned by `Get-IisWebsite` is now a collection of `Microsoft.Web.Administration.Binding` objects.  Update usages of `$site.Bindings[$idx].IPAddress` and `$site.Bindings[$idx].Port` to `$site.Bindings[$idx].Endpoint.Address` and `$site.Bindings[$idx].Endpoint.Port`, respectively.
+
+Replace usages of:
+
+ * `Set-IisAnonymousAuthentication` with `Enable-IisSecurityAuthentication -Anonymous` 
+ * `Set-IisAnonymousAuthentication -Disabled` with `Disable-IisSecurityAuthentication -Anonymous`
+ * `Set-IisBasicAuthentication` with `Enable-IisSecurityAuthentication -Basic`
+ * `Set-IisBasicAuthentication -Disabled` with `Disable-IisSecurityAuthentication -Basic`
+ * `Set-IisWindowsAuthentication` with `Enable-IisSecurityAuthentication -Windows` and `Set-IisWindowsAuthentication -DisableKernelMode`
+ * `Set-IisWindowsAuthentication -UseKernelMode` with `Set-IisWindowsAuthentication`
+ * `Set-IisWindowsAuthentication -Disabled` with `Disable-IisSecurityAuthentication -Windows`  
+ * `Unlock-IisConfigSection -Name <string>` with `Unlock-IisConfigurationSection -SectionPath <string>` (run `appcmd.exe lock config -section:?` for values to the new `SectionPath` parameter)
+ * `Unlock-IisBasicAuthentication` with `Unlock-IisConfigurationSeciton -SectionPath 'system.webServer/security/authentication/basicAuthentication'`
+ * `Unlock-IisCgi` with `Unlock-IisConfigurationSeciton -SectionPath 'system.webServer/cgi'`
+ * `Unlock-IisWindowsAuthentication` with `Unlock-IisConfigurationSeciton -SectionPath 'system.webServer/security/authentication/windowsAuthentication'`
+ * `Test-IisAppPoolExists` with `Test-IisAppPool`
+ * `Remove-IisWebsite` with `Uninstall-IisWebsite`
+ * `Set-IisHttpRedirect -StatusCode` with `Set-IisHttpRedirect -HttpResponseStatus`
+
+
+### INI
+
+Replace usages of:
+
+ * `Split-Ini -Path <string>` with `Split-Ini -Path <string> -AsHashtable` (hashtable is no longer returned by default)
+ * `Split-Ini -Path <string> -PassThru` with `Split-Ini -Path <string>` (per-line objects are now returned by default)
+
+### MSMQ
+
+Replace usages of:
+
+ * `Remove-MsmqMessageQueue` with `Uninstall-MsmqMessageQueue`
+
+### Path
+
+Replace usages of
+
+ * `Get-PathRelativeTo -To <string> -From <string>'` with `Resolve-RelativePath -Path <string> -FromDirectory <string>`
+ * `Get-PathRelativeTo -To <string> -From <string> -FromType 'File'` with `Resolve-RelativePath -Path <string> -FromFile <string>`
+ * `ConvertTo-FullPath` with `Resolve-FullPath`
+ * `Get-PathCanonicalCase` with `Resolve-PathCase`
+
+### Performance Counters
+
+ * [Get-PerformanceCounters](http://get-carbon.org/help/Get-PerformanceCounters.html) no longer returns an empty list if there are zero counters or a single element list if there is one counter.  It now returns `null` and a single object, respectively.  Update usages accordingly.
+
+### PowerShell
+
+ * [Get-TrustedHosts](http://get-carbon.org/help/Get-TrustedHosts.html) no longer returns an empty list if there are no trusted hosts.  It now return nothing/`null`.  Update usages accordingly.
+
+### Security
+
+ * [Assert-AdminPrivileges](http://get-carbon.org/help/Assert-AdminPrivileges.html) now returns `True` or `False` if the user doesn't have admin privileges. It also no longer throws an exception, but writes an error.  If you want to preserve current behavior where it stops script execution, replace usages with `Assert-AdminPrivileges -ErrorAction Stop`.
+
+### Service
+
+Replace usages of:
+
+ * `Remove-Service` with `Uninstall-Service`
+
+### Shares
+
+Replace usages of: 
+
+ * `Install-Share -Permissions '"ShareAdmins,FULL"','"ShareWriters,CHANGE"','"ShareReaders,READ"'` with `Install-SmbShare -FullAccess ShareAdmins -ChangeAccess ShareWriters -ReadAccess ShareReaders`.
+   
+### Users and Groups
+
+Replace usages of
+
+ * `Remove-User` with `Uninstall-User`
+
+### Windows Features
+
+Replace usages of: 
+
+ * `Test-WindowsFeature` with `Test-WindowsFeature -Installed`
+ * `Install-WindowsFeatures -Features <string[]>` with `Install-WindowsFeature -Name <string[]>`
+ * `Uninstall-WindowsFeatures -Features <string[]>` with `Uninstall-WindowsFeature -Name <string[]>`
+ * `Install-WindowsFeatureIis` with `Install-WindowsFeature -Iis`
+ * `Install-WindowsFeatureIis -HttpRedirection` with `Install-WindowsFeature -Iis -IisHttpRedirection`
+ * `Install-WindowsFeatureMsmq` with `Install-WindowsFeature -Msmq`
+ * `Install-WindowsFeatureMsmq -HttpSupport` with `Install-WindowsFeature -Msmq -MsmqHttpSupport`
+ * `Install-WindowsFeatureMsmq -ActiveDirectoryIntegration` with `Install-WindowsFeature -MsmqActiveDirectoryIntegration`
  
-## Bug Fixes
- * [Install-Service](http://get-carbon.org/help/Install-Service.html) not granting default service identity, Network Service, the correct permissions.
- * [Install-Service](http://get-carbon.org/help/Install-Service.html) not correctly resolving local identity account names.
- 
-## Enhancements
- * Created new [Get-WindowsFeature](http://get-carbon.org/help/Get-WindowsFeature.html) function for getting a list of available Windows features.
- * [Test-WindowsFeature](http://get-carbon.org/help/Test-WindowsFeature.html) now tests if a Windows feature exists, instead of if it is installed.  Added an `Installed` switch to detect if a feature exists *and* if it is installed.
- * `Install-WindowsFeatures` renamed to [Install-WindowsFeature](http://get-carbon.org/help/Install-WindowsFeature.html).
- * Renamed [Install-WindowsFeature](http://get-carbon.org/help/Install-WindowsFeature.html)'s `Features` parameter to `Name`.
- * Removed `Install-WindowsFeatureIis` and replaced with `Iis` and `IisHttpRedirection` switches on [Install-WindowsFeature](http://get-carbon.org/help/Install-WindowsFeature.html).
- * Removed `Install-WindowsFeatureMsmq` and replaced with `Msmq`, `MsmqHttpSupport`, and `MsmqActiveDirectoryIntegration` switches on [Install-WindowsFeature](http://get-carbon.org/help/Install-WindowsFeature.html).
- * `Uninstall-WindowsFeatures` renamed to [Uninstall-WindowsFeature](http://get-carbon.org/help/Uninstall-WindowsFeature.html).
- * Renamed [Uninstall-WindowsFeature](http://get-carbon.org/help/Uninstall-WindowsFeature.html)'s `Features` parameter to `Name`.
- * Added `Iis`, `IisHttpRedirection`, `Msmq`, `MsmqHttpSupport`, and `HttpActiveDirectoryIntegration` switches to [Uninstall-WindowsFeature](http://get-carbon.org/help/Uninstall-WindowsFeature.html).
- * [Install-WindowsFeature](http://get-carbon.org/help/Install-WindowsFeature.html), [Test-WindowsFeature](http://get-carbon.org/help/Test-WindowsFeature.html), and [Uninstall-WindowsFeature](http://get-carbon.org/help/Uninstall-WindowsFeature.html) are now available even if the current operating system doesn't support managing Windows features.  They don't do anything in those situations, but they exist.
- * [Install-WindowsFeature](http://get-carbon.org/help/Install-WindowsFeature.html), [Test-WindowsFeature](http://get-carbon.org/help/Test-WindowsFeature.html), and [Uninstall-WindowsFeature](http://get-carbon.org/help/Uninstall-WindowsFeature.html) are not available if the PowerShell v3.0 server manager cmdlets exists (on Windows 8/2012).
- * Replaced the `Permissions` parameter on `[Install-SmbShare](http://get-carbon.org/help/Install-SmbShare.html)` with `FullAccess`, `ChangeAccess`, and `ReadAccess` parameters. Previously, to set share permissions, you passed in specially-formatted values to the `Permission` parameter, e.g. `"MyGroup,FULL","MyOtherGroup,READ"`.  Now, just pass a list of identity name(s) to the `FullAccess`, `ChangeAccess`, or `ReadAccess` parameters to grant those identies full, change, or read access, e.g. `-FullAccess MyGroup -ReadAccess MyOtherGroup`.
- * Replaced the `Scope` parameter on [Set-EnvironmentVariable](http://get-carbon.org/help/Set-EnvironmentVariable.html) and [Remove-EnvironmentVariable](http://get-carbon.org/help/Remove-EnvironmentVariable.html) with scope-specific `ForProcess`, `ForUser`, and `ForComputer` switches.
- * Replaced [Protect-String](http://get-carbon.org/help/Protect-String.html)'s `Scope` parameteter with the `ForUser` or `ForComputer` scope-specific switches.
- * Renamed `Get-PathRelativeTo` to [Resolve-RelativePath](http://get-carbon.org/help/Resolve-RelativePath.html).  Renamed its `To` parameter to `Path`, and moved it to position 0.  Replaced/combined the `From` and `FromType` parameters with `FromDirectory` and `FromFile` parameters.
- * Renamed `ConvertTo-FullPath` to [Resolve-FullPath](http://get-carbon.org/help/Resolve-FullPath.html).  Added support for converting unrooted paths using the current location.
- * Renamed `Get-PathCanonicalCase` with [Resolve-PathCase](http://get-carbon.org/help/Resolve-PathCase.html).  Added support for piping in `Get-Item` and `Get-ChildItem` output, e.g. `Get-Item C:\WINDOWS | Resolve-PathCase` returns C:\Windows.
- * Replaced `Set-IisAnonymousAuthentication` with [Enable-IisSecurityAuthentication](http://get-carbon.org/help/Enable-IisSecurityAuthentication.html) and [Disable-IisSecurityAuthentication](http://get-carbon.org/help/Disable-IisSecurityAuthentication.html).
- * Replaced `Set-IisBasicAuthentication` with [Enable-IisSecurityAuthentication](http://get-carbon.org/help/Enable-IisSecurityAuthentication.html) and [Disable-IisSecurityAuthentication](http://get-carbon.org/help/Disable-IisSecurityAuthentication.html).
- * Moved code to enable/disable Windows authentication from [Set-IisWindowsAuthentication](http://get-carbon.org/help/Set-IisWindowsAuthentication.html) to  [Enable-IisSecurityAuthentication](http://get-carbon.org/help/Enable-IisSecurityAuthentication.html) and [Disable-IisSecurityAuthentication](http://get-carbon.org/help/Disable-IisSecurityAuthentication.html).
+## New Features
+
+### IIS
  * Created [Get-IisConfigurationSection](http://get-carbon.org/help/Get-IisConfigurationSection.html) function for getting a site's (and optional sub-directory's) [Microsoft.Web.Administration.ConfigurationSection](http://msdn.microsoft.com/en-us/library/microsoft.web.administration.configurationsection(v=vs.90).aspx) objects for an arbitrary IIS configuration section.
  * Created [Get-IisSecurityAuthentication](http://get-carbon.org/help/Get-IisSecurityAuthentication.html) function for getting a site's (and optional sub-directory's)  [anonymous, basic, digest, or Windows authentication configuration section](http://msdn.microsoft.com/en-us/library/microsoft.web.administration.configurationsection(v=vs.90).aspx).
  * Created [Test-IisSecurityAuthentication](http://get-carbon.org/help/Test-IisSecurityAuthentication.html) function for testing if anonymous, basic, digest, or Windows authentication is enabled for a website (and optional sub-directory).
- * Switched the default behavior of [Set-IisWindowsAuthentication](http://get-carbon.org/help/Set-IisWindowsAuthentication.html) to enable kernel mode.  To disable kernel mode, use the `DisableKernelMode` switch.
  * Created [Get-IisConfigurationSection](http://get-carbon.org/help/Get-IisConfigurationSection.html) function for returning an arbitrary IIS configuration section using the Microsoft.Web.Administration API.
  * Created [Lock-IisConfigurationSection](http://get-carbon.org/help/Lock-IisConfigurationSection.html) function for locking arbitrary global IIS configuration sections.
  * Created [Test-IisConfigurationSection](http://get-carbon.org/help/Test-IisConfigurationSection.html) function for testing if an configuration section exists or is locked or not.
+ * Created function [Get-IisAppPool](http://get-carbon.org/help/Get-IisAppPool.html) for getting a `Microsoft.Web.Administration.AppPool` object for an application pool.
+ * Created function [Uninstall-IisAppPool](http://get-carbon.org/help/Uninstall-IisAppPool.html) for removing an IIS application pool.
+ 
+### Windows Features
+ * Created new [Get-WindowsFeature](http://get-carbon.org/help/Get-WindowsFeature.html) function for getting a list of available Windows features.
+
+
+## Bug Fixes
+
+### Service
+ * [Install-Service](http://get-carbon.org/help/Install-Service.html) not granting default service identity, Network Service, the correct permissions.
+ * [Install-Service](http://get-carbon.org/help/Install-Service.html) not correctly resolving local identity account names.
+ 
+
+## Enhancements
+
+### Certificates
+ * Moved functionality of `Get-SslCertificateBinding` into [Get-SslCertificateBindings](http://get-carbon.org/help/Get-SslCertificateBindings.html).  Can now filter by `IPAddress` and/or `Port`.
+ * [Get-SslCertificateBindings](http://get-carbon.org/help/Get-SslCertificateBindings.html) now returns `Carbon.Certificates.SslCertificateBinding` objects.  All information displayed by the `netsh http show sslcert` command is returned as part of those objects.
+ * [Get-SslCertificateBindings](http://get-carbon.org/help/Get-SslCertificateBindings.html) now supports filtering by `IPAddress` and `Port` separately, instead of requiring both.  The old `IPPort` parameter is replaced with `IPAddress` and `Port` parameters.
+ * [Test-SslCertificateBinding](http://get-carbon.org/help/Test-SslCertificateBinding.html) now supports testig by `IPAddress` and `Port` separately, instead of requiring both.  The old `IPPort` parameter is replaced with `IPAddress` and `Port` parameters. 
+ * Replaced `IPPort` parameter on `Get-SslCertificateBinding` with separate `IPAddress` and `Port` parameters on  [Get-SslCertificateBindings](http://get-carbon.org/help/Get-SslCertificateBindings.html).  Set `IPAddress` only if you want to bind to a specific IP address (i.e. *not* 0.0.0.0).  Set `Port` if *not* binding to port 443.
+ * Replaced `IPPort` parameter on [Remove-SslCertificateBinding](http://get-carbon.org/help/Remove-SslCertificateBinding.html) with separate `IPAddress` and `Port` parameters.  Set `IPAddress` only if you want to remove a binding for a specific IP address (i.e. *not* 0.0.0.0).  Set `Port` if the binding is *not* on port 443.
+ * Renamed `Remove-Certificate` to [Uninstall-Certificate](http://get-carbon.org/help/Uninstall-Certificate.html).
+
+### Computer
+ * Replaced the `Scope` parameter on [Set-EnvironmentVariable](http://get-carbon.org/help/Set-EnvironmentVariable.html) and [Remove-EnvironmentVariable](http://get-carbon.org/help/Remove-EnvironmentVariable.html) with scope-specific `ForProcess`, `ForUser`, and `ForComputer` switches.
+
+### Cryptography
+ * Replaced [Protect-String](http://get-carbon.org/help/Protect-String.html)'s `Scope` parameteter with the `ForUser` or `ForComputer` scope-specific switches.
+
+### Hosts File
+ * [Set-HostsEntry](http://get-carbon.org/help/Set-HostsEntry.html) no longer throws an exception if the hosts file contains an invalid line.  Instead, a warning is written and the line is commented out.
+ 
+### INI
+ * [Split-Ini](http://get-carbon.org/help/Split-Ini.html) now returns strongly-typed `Carbon.Ini.IniNode` objects instead of hashtables.
+ * The line numbers returned by [Split-Ini](http://get-carbon.org/help/Split-Ini.html) start at 1 instead of 0.
+ * [Split-Ini](http://get-carbon.org/help/Split-Ini.html) now returns name/value objects by default (the `PassThru` switch is no longer needed for this behaviro).  This makes it more PowerShell-y.  The old behavior of returning a `Hashtable` is available be using the new `AsHashtable` switch.
+ 
+### IIS
+ * Replaced `Set-IisAnonymousAuthentication` with [Enable-IisSecurityAuthentication](http://get-carbon.org/help/Enable-IisSecurityAuthentication.html) and [Disable-IisSecurityAuthentication](http://get-carbon.org/help/Disable-IisSecurityAuthentication.html).
+ * Replaced `Set-IisBasicAuthentication` with [Enable-IisSecurityAuthentication](http://get-carbon.org/help/Enable-IisSecurityAuthentication.html) and [Disable-IisSecurityAuthentication](http://get-carbon.org/help/Disable-IisSecurityAuthentication.html).
+ * Moved code to enable/disable Windows authentication from [Set-IisWindowsAuthentication](http://get-carbon.org/help/Set-IisWindowsAuthentication.html) to  [Enable-IisSecurityAuthentication](http://get-carbon.org/help/Enable-IisSecurityAuthentication.html) and [Disable-IisSecurityAuthentication](http://get-carbon.org/help/Disable-IisSecurityAuthentication.html).
+ * Switched the default behavior of [Set-IisWindowsAuthentication](http://get-carbon.org/help/Set-IisWindowsAuthentication.html) to enable kernel mode.  To disable kernel mode, use the `DisableKernelMode` switch.
  * Renamed `Unlock-IisConfigSection` to [Unlock-IisConfigurationSection](http://get-carbon.org/help/Unlock-IisConfigurationSection.html).
  * Removed [Unlock-IisConfigurationSection](http://get-carbon.org/help/Unlock-IisConfigurationSection.html)'s `Name` parameter and replaced it with `SectionPath`, which takes a list of full path to the configuration section(s) to unlock.
  * Removed `Unlock-IisBasicAuthentication` in favor of `Unlock-IisConfigurationSection -SectionPath 'system.webServer/security/authentication/basicAuthentication'`.
@@ -102,30 +187,49 @@ This release contains many backwards incompatible changes.  Take the following s
  * Renamed `Test-IisAppPoolExists` to [Test-IisAppPool](http://get-carbon.org/help/Uninstall-Service.html).
  * Renamed `Remove-IisWebsite` with [Uninstall-IisWebsite](http://get-carbon.org/help/Uninstall-IisWebsite.html).
  * [Install-IisAppPool](http://get-carbon.org/help/Install-IisAppPool.html) now always sets the application pool to run as the system's default application pool identity if the `ServiceAccount` parameter isn't given.
- * [Get-TrustedHosts](http://get-carbon.org/help/Get-TrustedHosts.html) now returns nothing/`null` if there are no trusted hosts.  (It used to return an empty array.) 
- * [Get-PerformanceCounters](http://get-carbon.org/help/Get-PerformanceCounters.html) now returns nothing/`null` or a single object instead of an empty/single element array when there are no or one performance counters. 
- * [Install-PerformanceCounter](http://get-carbon.org/help/Install-PerformanceCounter.html) no longer re-installs a counter if a counter with its name, description, and type already exist.
- * Created function [Get-IisAppPool](http://get-carbon.org/help/Get-IisAppPool.html) for getting a `Microsoft.Web.Administration.AppPool` object for an application pool.
- * Created function [Uninstall-IisAppPool](http://get-carbon.org/help/Uninstall-IisAppPool.html) for removing an IIS application pool.
  * [Install-IisAppPool](http://get-carbon.org/help/Install-IisAppPool.html) now starts an IIS application pool if it is stoppped.
- * [Split-Ini](http://get-carbon.org/help/Split-Ini.html) now returns strongly-typed `Carbon.Ini.IniNode` objects instead of hashtables.
- * The line numbers returned by [Split-Ini](http://get-carbon.org/help/Split-Ini.html) start at 1 instead of 0.
- * [Split-Ini](http://get-carbon.org/help/Split-Ini.html) now returns name/value objects by default (the `PassThru` switch is no longer needed for this behaviro).  This makes it more PowerShell-y.  The old behavior of returning a `Hashtable` is available be using the new `AsHashtable` switch.
- * [Set-HostsEntry](http://get-carbon.org/help/Set-HostsEntry.html) no longer throws an exception if the hosts file contains an invalid line.  Instead, a warning is written and the line is commented out.
- * `Remove-MsmqMessageQueue` renamed to [Uninstall-MsmqMessageQueue](http://get-carbon.org/help/Uninstall-MsmqMessageQueue.html).
- * Moved functionality of `Get-SslCertificateBinding` into [Get-SslCertificateBindings](http://get-carbon.org/help/Get-SslCertificateBindings.html).  Can now filter by `IPAddress` and/or `Port`.
- * [Get-SslCertificateBindings](http://get-carbon.org/help/Get-SslCertificateBindings.html) now returns `Carbon.Certificates.SslCertificateBinding` objects.  All information displayed by the `netsh http show sslcert` command is returned as part of those objects.
- * [Get-SslCertificateBindings](http://get-carbon.org/help/Get-SslCertificateBindings.html) now supports filtering by `IPAddress` and `Port` separately, instead of requiring both.  The old `IPPort` parameter is replaced with `IPAddress` and `Port` parameters.
- * [Test-SslCertificateBinding](http://get-carbon.org/help/Test-SslCertificateBinding.html) now supports testig by `IPAddress` and `Port` separately, instead of requiring both.  The old `IPPort` parameter is replaced with `IPAddress` and `Port` parameters. 
- * Replaced `IPPort` parameter on `Get-SslCertificateBinding` with separate `IPAddress` and `Port` parameters on  [Get-SslCertificateBindings](http://get-carbon.org/help/Get-SslCertificateBindings.html).  Set `IPAddress` only if you want to bind to a specific IP address (i.e. *not* 0.0.0.0).  Set `Port` if *not* binding to port 443.
- * Replaced `IPPort` parameter on [Remove-SslCertificateBinding](http://get-carbon.org/help/Remove-SslCertificateBinding.html) with separate `IPAddress` and `Port` parameters.  Set `IPAddress` only if you want to remove a binding for a specific IP address (i.e. *not* 0.0.0.0).  Set `Port` if the binding is *not* on port 443.
- * Renamed `Remove-Certificate` to [Uninstall-Certificate](http://get-carbon.org/help/Uninstall-Certificate.html).
- * Replaced all instances where functions were throwing exceptions with `Write-Error`.
- * [Assert-AdminPrivileges](http://get-carbon.org/help/Assert-AdminPrivileges.html) no longer throws an exception if the user doesn't have administrative privileges.  Instead, it writes an error and returns `False`.  It returns `True` if the user has privileges.
- * Renamed `Remove-User` to [Uninstall-User](http://get-carbon.org/help/Uninstall-User.html).
  * [Get-IisHttpRedirect](http://get-carbon.org/help/Get-IisHttpRedirect.html) now returns a `Carbon.Iis.HttpRedirectConfigurationSection` object.  The `StatusCode` property on the old object is now named `HttpResponseStatus`.
  * Renamed the `StatusCode` parameter on [Set-IisHttpRedirect](http://get-carbon.org/help/Set-IisHttpRedirect.html) to `HttpResponseStatus`.
  * [Get-IisWebsite](http://get-carbon.org/help/Get-IisWebsite.html) now returns a `Microsoft.Web.Administration.Site` object.
+
+### MSMQ
+ * `Remove-MsmqMessageQueue` renamed to [Uninstall-MsmqMessageQueue](http://get-carbon.org/help/Uninstall-MsmqMessageQueue.html).
+
+### Path
+ * Renamed `Get-PathRelativeTo` to [Resolve-RelativePath](http://get-carbon.org/help/Resolve-RelativePath.html).  Renamed its `To` parameter to `Path`, and moved it to position 0.  Replaced/combined the `From` and `FromType` parameters with `FromDirectory` and `FromFile` parameters.
+ * Renamed `ConvertTo-FullPath` to [Resolve-FullPath](http://get-carbon.org/help/Resolve-FullPath.html).  Added support for converting unrooted paths using the current location.
+ * Renamed `Get-PathCanonicalCase` with [Resolve-PathCase](http://get-carbon.org/help/Resolve-PathCase.html).  Added support for piping in `Get-Item` and `Get-ChildItem` output, e.g. `Get-Item C:\WINDOWS | Resolve-PathCase` returns C:\Windows.
+
+### Performance Counters
+ * [Get-PerformanceCounters](http://get-carbon.org/help/Get-PerformanceCounters.html) now returns nothing/`null` or a single object instead of an empty/single element array when there are no or one performance counters. 
+ * [Install-PerformanceCounter](http://get-carbon.org/help/Install-PerformanceCounter.html) no longer re-installs a counter if a counter with its name, description, and type already exist.
+
+### PowerShell
+ * [Get-TrustedHosts](http://get-carbon.org/help/Get-TrustedHosts.html) now returns nothing/`null` if there are no trusted hosts.  (It used to return an empty array.) 
+
+### Security
+ * [Assert-AdminPrivileges](http://get-carbon.org/help/Assert-AdminPrivileges.html) no longer throws an exception if the user doesn't have administrative privileges.  Instead, it writes an error and returns `False`.  It returns `True` if the user has privileges.
+ 
+### Shares
+ * Replaced the `Permissions` parameter on [Install-SmbShare](http://get-carbon.org/help/Install-SmbShare.html) with `FullAccess`, `ChangeAccess`, and `ReadAccess` parameters. Previously, to set share permissions, you passed in specially-formatted values to the `Permission` parameter, e.g. `"MyGroup,FULL","MyOtherGroup,READ"`.  Now, just pass a list of identity name(s) to the `FullAccess`, `ChangeAccess`, or `ReadAccess` parameters to grant those identies full, change, or read access, e.g. `-FullAccess MyGroup -ReadAccess MyOtherGroup`.
+
+### Users and Groups
+ * Renamed `Remove-User` to [Uninstall-User](http://get-carbon.org/help/Uninstall-User.html).
+
+### Windows Features
+ * [Test-WindowsFeature](http://get-carbon.org/help/Test-WindowsFeature.html) now tests if a Windows feature exists, instead of if it is installed.  Added an `Installed` switch to detect if a feature exists *and* if it is installed.
+ * `Install-WindowsFeatures` renamed to [Install-WindowsFeature](http://get-carbon.org/help/Install-WindowsFeature.html).
+ * Renamed [Install-WindowsFeature](http://get-carbon.org/help/Install-WindowsFeature.html)'s `Features` parameter to `Name`.
+ * Removed `Install-WindowsFeatureIis` and replaced with `Iis` and `IisHttpRedirection` switches on [Install-WindowsFeature](http://get-carbon.org/help/Install-WindowsFeature.html).
+ * Removed `Install-WindowsFeatureMsmq` and replaced with `Msmq`, `MsmqHttpSupport`, and `MsmqActiveDirectoryIntegration` switches on [Install-WindowsFeature](http://get-carbon.org/help/Install-WindowsFeature.html).
+ * `Uninstall-WindowsFeatures` renamed to [Uninstall-WindowsFeature](http://get-carbon.org/help/Uninstall-WindowsFeature.html).
+ * Renamed [Uninstall-WindowsFeature](http://get-carbon.org/help/Uninstall-WindowsFeature.html)'s `Features` parameter to `Name`.
+ * Added `Iis`, `IisHttpRedirection`, `Msmq`, `MsmqHttpSupport`, and `HttpActiveDirectoryIntegration` switches to [Uninstall-WindowsFeature](http://get-carbon.org/help/Uninstall-WindowsFeature.html).
+ * [Install-WindowsFeature](http://get-carbon.org/help/Install-WindowsFeature.html), [Test-WindowsFeature](http://get-carbon.org/help/Test-WindowsFeature.html), and [Uninstall-WindowsFeature](http://get-carbon.org/help/Uninstall-WindowsFeature.html) are now available even if the current operating system doesn't support managing Windows features.  They don't do anything in those situations, but they exist.
+ * [Install-WindowsFeature](http://get-carbon.org/help/Install-WindowsFeature.html), [Test-WindowsFeature](http://get-carbon.org/help/Test-WindowsFeature.html), and [Uninstall-WindowsFeature](http://get-carbon.org/help/Uninstall-WindowsFeature.html) are not available if the PowerShell v3.0 server manager cmdlets exists (on Windows 8/2012).
+
+### Miscellaneous
+ * Replaced all instances where functions were throwing exceptions with `Write-Error`.
  * The Carbon assembly is now versioned and signed.
  
  
