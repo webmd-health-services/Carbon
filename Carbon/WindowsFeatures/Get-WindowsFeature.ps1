@@ -29,7 +29,7 @@ if( -not (Get-Command -Name 'Get-WindowsFeature*') )
         **This function is not available on Windows 8/2012.**
         
         .OUTPUTS
-        [PsObject].  A generic PsObject with properties DisplayName, Name, and Installed.
+        PsObject.  A generic PsObject with properties DisplayName, Name, and Installed.
         
         .LINK
         Install-WindowsFeature

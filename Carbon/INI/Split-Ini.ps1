@@ -33,9 +33,9 @@ function Split-Ini
     
         Line FullName        Section Name      Value
         ---- --------        ------- ----      -----
-           1 spam.eggs       spam    eggs      ham
-           2 spam.green      spam    green     eggs
-           6 stars.sneetches stars   sneetches belly
+           2 spam.eggs       spam    eggs      ham
+           3 spam.green      spam    green     eggs
+           7 stars.sneetches stars   sneetches belly
     
     It is sometimes useful to get a hashtable back of the name/values.  The `AsHashtable` switch will return a hashtable where the keys are the full names of the name/value pairs.  For example, given the INI file above, the following hashtable is returned:
     
@@ -92,9 +92,9 @@ function Split-Ini
 
         Line FullName           Section    Name     Value
         ---- --------           -------    ----     -----
-           1 ui.username        ui         username Regina Spektor <regina@reginaspektor.com>
-           4 extensions.share   extensions share    
-           4 extensions.extdiff extensions extdiff  
+           2 ui.username        ui         username Regina Spektor <regina@reginaspektor.com>
+           5 extensions.share   extensions share    
+           6 extensions.extdiff extensions extdiff  
 
     .EXAMPLE
     Split-Ini -Path C:\Users\rspektor\mercurial.ini -AsHashtable
@@ -116,21 +116,21 @@ function Split-Ini
                                 Section = "ui";
                                 Name = "username";
                                 Value = "Regina Spektor <regina@reginaspektor.com>";
-                                LineNumber = 1;
+                                LineNumber = 2;
                             );
             extensions.share = Carbon.Ini.IniNode (
                                     FullName = 'extensions.share';
                                     Section = "extensions";
                                     Name = "share"
                                     Value = "";
-                                    LineNumber = 4;
+                                    LineNumber = 5;
                                 )
             extensions.extdiff = Carbon.Ini.IniNode (
                                        FullName = 'extensions.extdiff';
                                        Section = "extensions";
                                        Name = "extdiff";
                                        Value = "";
-                                       LineNumber = 5;
+                                       LineNumber = 6;
                                   )
         }
     #>
