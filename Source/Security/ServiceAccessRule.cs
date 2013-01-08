@@ -13,7 +13,6 @@ namespace Carbon.Security
 
         public ServiceAccessRights ServiceAccessRights { get; private set; }
 
-        // ReSharper disable CSharpWarnings::CS0659
         public override bool Equals(object obj)
         {
             var rule = obj as ServiceAccessRule;
@@ -27,6 +26,19 @@ namespace Carbon.Security
                    rule.IdentityReference == IdentityReference &&
                    rule.AccessControlType == AccessControlType;
         }
-        // ReSharper restore CSharpWarnings::CS0659
+
+        public override int GetHashCode()
+        {
+            // http://stackoverflow.com/questions/263400/what-is-the-best-algorithm-for-an-overridden-system-object-gethashcode
+            unchecked // Overflow is fine, just wrap
+            {
+                var hash = 17;
+                // Suitable nullity checks etc, of course :)
+                hash = hash * 23 + ServiceAccessRights.GetHashCode();
+                hash = hash * 23 + IdentityReference.GetHashCode();
+                hash = hash * 23 + AccessControlType.GetHashCode();
+                return hash;
+            }
+        }
     }
 }
