@@ -1,0 +1,101 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <title>PowerShell - Resolve-RelativePath - Carbon</title>
+	<link href="styles.css" type="text/css" rel="stylesheet" />
+</head>
+<body>
+    	<ul id="SiteNav">
+		<li><a href="http://get-carbon.org">Get-Carbon</a></li>
+		<li><b>-Documentation</b></li>
+        <li><a href="http://get-carbon.org">-ReleaseNotes</a></li>
+		<li><a href="http://pshdo.com">-Blog</a></li>
+	</ul>
+<div id="CommandMenuContainer" style="float:left;">
+	<ul id="CategoryMenu">
+	</ul>
+</div>
+
+
+    <h1>Resolve-RelativePath</h1>
+    <div><p>Converts a path to a relative path from a given source.</p>
+</div>
+
+        <h2>Syntax</h2>
+    <pre class="Syntax"><code>Resolve-RelativePath [-Path &lt;String&gt;] -FromDirectory &lt;String&gt; [&lt;CommonParameters&gt;]</code></pre>
+<pre class="Syntax"><code>Resolve-RelativePath [-Path &lt;String&gt;] -FromFile &lt;String&gt; [&lt;CommonParameters&gt;]</code></pre>
+    
+        <h2>Description</h2>
+    <div class="Description">
+        <p>The .NET framework doesn't expose an API for getting a relative path to an item.  This function uses Win32 APIs to call <a href="http://msdn.microsoft.com/en-us/library/windows/desktop/bb773740.aspx">PathRelativePathTo</a>.</p>
+
+<p>Neither the <code>From</code> or <code>To</code> paths need to exist.</p>
+
+    </div>
+    
+            <h2>Related Commands</h2>
+        <ul>
+<li><a href="http://msdn.microsoft.com/en-us/library/windows/desktop/bb773740.aspx">http://msdn.microsoft.com/en-us/library/windows/desktop/bb773740.aspx</a></li>
+</ul>
+
+
+    		<h2> Parameters </h2>
+		<table border='1'>
+			<tr>
+				<th>Name</th>
+                <th>Type</th>
+				<th>Description</th>
+				<th>Required?</th>
+				<th>Pipeline Input</th>
+				<th>Default Value</th>
+			</tr>
+            			<tr valign='top'>
+				<td>Path</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+				<td></td>
+				<td>false</td>
+				<td>true (ByPropertyName)</td>
+                <td></td>
+			</tr>
+			<tr valign='top'>
+				<td>FromDirectory</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+				<td>The source directory from which the relative path will be calculated.  Can be a string or an file system object.
+</td>
+				<td>true</td>
+				<td>false</td>
+                <td></td>
+			</tr>
+			<tr valign='top'>
+				<td>FromFile</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+				<td>The source directory from which the relative path will be calculated.  Can be a string or an file system object.
+</td>
+				<td>true</td>
+				<td>false</td>
+                <td></td>
+			</tr>
+            
+        </table>
+        
+    
+        
+    
+        
+    
+        
+                <h2>EXAMPLE 1</h2>
+            <pre><code>Resolve-RelativePath -Path 'C:\Program Files' -FromDirectory 'C:\Windows\system32'</code></pre>
+            <p><p>Returns <code>..\..\Program Files</code>.</p>
+</p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 2</h2>
+            <pre><code>Get-ChildItem * | Resolve-RelativePath -FromDirectory 'C:\Windows\system32'</code></pre>
+            <p><p>Returns the relative path from the <code>C:\Windows\system32</code> directory to the current directory.</p>
+</p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 3</h2>
+            <pre><code>Resolve-RelativePath -Path 'C:\I\do\not\exist\either' -FromDirectory 'C:\I\do\not\exist'</code></pre>
+            <p><p>Returns <code>.\either</code>.</p>
+</p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 4</h2>
+            <pre><code>Resolve-RelativePath -Path 'C:\I\do\not\exist\either' -FromFile 'C:\I\do\not\exist_file'</code></pre>
+            <p><p>Treats <code>C:\I\do\not\exist_file</code> as a file, so returns a relative path of <code>.\exist\either</code>.</p>
+</p><p></p><p></p><p></p><p></p>
+</body>
+</html>   

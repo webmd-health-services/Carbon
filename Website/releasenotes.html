@@ -12,7 +12,7 @@
 		<li><a href="http://pshdo.com">-Blog</a></li>
 	</ul>
     
-    <h1>0.5.0.0</h1>
+    <h1>0.5.0.0 (7 January 2013)</h1>
 
 <h2>Upgrade Instructions</h2>
 
@@ -56,6 +56,11 @@
 
 <h3>IIS</h3>
 
+<ul>
+<li>Renamed the <code>StatusCode</code> property on the object returned by <a href="http://get-carbon.org/help/Get-IisHttpRedirect.html">Get-IisHttpRedirect</a> to <code>HttpResponseStatus</code>.  Update usages accordingly.</li>
+<li>The <code>Bindings</code> property returned by <code>Get-IisWebsite</code> is now a collection of <code>Microsoft.Web.Administration.Binding</code> objects.  Update usages of <code>$site.Bindings[$idx].IPAddress</code> and <code>$site.Bindings[$idx].Port</code> to <code>$site.Bindings[$idx].Endpoint.Address</code> and <code>$site.Bindings[$idx].Endpoint.Port</code>, respectively.</li>
+</ul>
+
 <p>Replace usages of:</p>
 
 <ul>
@@ -72,9 +77,7 @@
 <li><code>Unlock-IisWindowsAuthentication</code> with <code>Unlock-IisConfigurationSeciton -SectionPath 'system.webServer/security/authentication/windowsAuthentication'</code></li>
 <li><code>Test-IisAppPoolExists</code> with <code>Test-IisAppPool</code></li>
 <li><code>Remove-IisWebsite</code> with <code>Uninstall-IisWebsite</code></li>
-<li><p><code>Set-IisHttpRedirect -StatusCode</code> with <code>Set-IisHttpRedirect -HttpResponseStatsu</code></p></li>
-<li><p>Renamed the <code>StatusCode</code> property on the object returned by <a href="http://get-carbon.org/help/Get-IisHttpRedirect.html">Get-IisHttpRedirect</a> to <code>HttpResponseStatus</code>.  Update usages accordingly.</p></li>
-<li>The <code>Bindings</code> property returned by <code>Get-IisWebsite</code> is now a collection of <code>Microsoft.Web.Administration.Binding</code> objects.  Update usages of <code>$site.Bindings[$idx].IPAddress</code> and <code>$site.Bindings[$idx].Port</code> to <code>$site.Bindings[$idx].Endpoint.Address</code> and <code>$site.Bindings[$idx].Endpoint.Port</code>, respectively.</li>
+<li><code>Set-IisHttpRedirect -StatusCode</code> with <code>Set-IisHttpRedirect -HttpResponseStatus</code></li>
 </ul>
 
 <h3>INI</h3>

@@ -1,0 +1,70 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <title>PowerShell - Resolve-WindowsFeatureName - Carbon</title>
+	<link href="styles.css" type="text/css" rel="stylesheet" />
+</head>
+<body>
+    	<ul id="SiteNav">
+		<li><a href="http://get-carbon.org">Get-Carbon</a></li>
+		<li><b>-Documentation</b></li>
+        <li><a href="http://get-carbon.org">-ReleaseNotes</a></li>
+		<li><a href="http://pshdo.com">-Blog</a></li>
+	</ul>
+<div id="CommandMenuContainer" style="float:left;">
+	<ul id="CategoryMenu">
+	</ul>
+</div>
+
+
+    <h1>Resolve-WindowsFeatureName</h1>
+    <div><p>INTERNAL.  DO NOT USE.  Converts a Carbon-specific, common Windows feature name, into the feature name used on the current computer.</p>
+</div>
+
+        <h2>Syntax</h2>
+    <pre class="Syntax"><code>Resolve-WindowsFeatureName [-Name] &lt;String[]&gt; [&lt;CommonParameters&gt;]</code></pre>
+    
+        <h2>Description</h2>
+    <div class="Description">
+        <p>Windows feature names change between versions.  This function converts a Carbon-specific name into feature names used on the current computer's version of Windows.</p>
+
+<p><strong>This function is not available on Windows 8/2012.</strong></p>
+
+    </div>
+    
+    
+
+    		<h2> Parameters </h2>
+		<table border='1'>
+			<tr>
+				<th>Name</th>
+                <th>Type</th>
+				<th>Description</th>
+				<th>Required?</th>
+				<th>Pipeline Input</th>
+				<th>Default Value</th>
+			</tr>
+            			<tr valign='top'>
+				<td>Name</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String[]</a></td>
+				<td>The Carbon feature names to convert to Windows-specific feature names.
+</td>
+				<td>true</td>
+				<td>false</td>
+                <td></td>
+			</tr>
+            
+        </table>
+        
+    
+        
+    
+        
+    
+        
+                <h2>EXAMPLE 1</h2>
+            <pre><code>Resolve-WindowsFeatureNames -Name 'Iis','Msmq'</code></pre>
+            <p><p>Returns <code>'IIS-WebServer','MSMQ-Server'</code> if running Windows 7/Windows 2008 R2, or <code>'Web-WebServer','MSMQ-Server'</code> if on Windows 2008.</p>
+</p><p></p><p></p><p></p><p></p>
+</body>
+</html>   

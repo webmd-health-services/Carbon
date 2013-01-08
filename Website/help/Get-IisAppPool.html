@@ -1,0 +1,77 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <title>PowerShell - Get-IisAppPool - Carbon</title>
+	<link href="styles.css" type="text/css" rel="stylesheet" />
+</head>
+<body>
+    	<ul id="SiteNav">
+		<li><a href="http://get-carbon.org">Get-Carbon</a></li>
+		<li><b>-Documentation</b></li>
+        <li><a href="http://get-carbon.org">-ReleaseNotes</a></li>
+		<li><a href="http://pshdo.com">-Blog</a></li>
+	</ul>
+<div id="CommandMenuContainer" style="float:left;">
+	<ul id="CategoryMenu">
+	</ul>
+</div>
+
+
+    <h1>Get-IisAppPool</h1>
+    <div><p>Gets a <code>Microsoft.Web.Administration.ApplicationPool</code> object for an application pool.</p>
+</div>
+
+        <h2>Syntax</h2>
+    <pre class="Syntax"><code>Get-IisAppPool [-Name] &lt;String&gt; [&lt;CommonParameters&gt;]</code></pre>
+    
+        <h2>Description</h2>
+    <div class="Description">
+        <p>Use the <code>Microsoft.Web.Administration</code> API to get a .NET object for an application pool.</p>
+
+    </div>
+    
+            <h2>Related Commands</h2>
+        <ul>
+<li><a href="http://msdn.microsoft.com/en-us/library/microsoft.web.administration.applicationpool(v=vs.90).aspx">http://msdn.microsoft.com/en-us/library/microsoft.web.administration.applicationpool(v=vs.90).aspx</a></li>
+</ul>
+
+
+    		<h2> Parameters </h2>
+		<table border='1'>
+			<tr>
+				<th>Name</th>
+                <th>Type</th>
+				<th>Description</th>
+				<th>Required?</th>
+				<th>Pipeline Input</th>
+				<th>Default Value</th>
+			</tr>
+            			<tr valign='top'>
+				<td>Name</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+				<td>The name of the application pool to return.
+</td>
+				<td>true</td>
+				<td>false</td>
+                <td></td>
+			</tr>
+            
+        </table>
+        
+    
+        
+            <h2>Return Values</h2>
+        <p><a href="http://msdn.microsoft.com/en-us/library/microsoft.web.administration.applicationpool.aspx">Microsoft.Web.Administration.ApplicationPool</a>. </p>
+
+        
+    
+        
+                <h2>EXAMPLE 1</h2>
+            <pre><code>Get-IisAppPool -Name 'Batcave'</code></pre>
+            <p><p>Gets the <code>Batcave</code> application pool.</p>
+</p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 2</h2>
+            <pre><code>Get-IisAppPool -Name 'Missing!'</code></pre>
+            <p><p>Returns <code>null</code> since, for purposes of this example, there is no <code>Missing~</code> application pool.</p>
+</p><p></p><p></p><p></p><p></p>
+</body>
+</html>   

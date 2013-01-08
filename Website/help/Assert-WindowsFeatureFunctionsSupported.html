@@ -1,0 +1,50 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <title>PowerShell - Assert-WindowsFeatureFunctionsSupported - Carbon</title>
+	<link href="styles.css" type="text/css" rel="stylesheet" />
+</head>
+<body>
+    	<ul id="SiteNav">
+		<li><a href="http://get-carbon.org">Get-Carbon</a></li>
+		<li><b>-Documentation</b></li>
+        <li><a href="http://get-carbon.org">-ReleaseNotes</a></li>
+		<li><a href="http://pshdo.com">-Blog</a></li>
+	</ul>
+<div id="CommandMenuContainer" style="float:left;">
+	<ul id="CategoryMenu">
+	</ul>
+</div>
+
+
+    <h1>Assert-WindowsFeatureFunctionsSupported</h1>
+    <div><p>Asserts if Windows feature functions are supported.  If not, writes a warning and returns false.</p>
+</div>
+
+        <h2>Syntax</h2>
+    <pre class="Syntax"><code>Assert-WindowsFeatureFunctionsSupported [&lt;CommonParameters&gt;]</code></pre>
+    
+        <h2>Description</h2>
+    <div class="Description">
+        <p>This is an internal function which is used to determine if the current operating system has tools installed which Carbon can use to manage Windows features.  On Windows 2008/Vista, the <code>servermanagercmd.exe</code> console program is used.  On Windows 2008 R2/7, the <code>ocsetup.exe</code> console program is used.</p>
+
+<p><strong>This function is not available on Windows 8/2012.</strong></p>
+
+    </div>
+    
+    
+
+    
+        
+    
+        
+    
+        
+    
+        
+                <h2>EXAMPLE 1</h2>
+            <pre><code>Assert-WindowsFeatureFunctionsSupported</code></pre>
+            <p><p>Writes an error and returns <code>false</code> if support for managing functions isn't found.</p>
+</p><p></p><p></p><p></p><p></p>
+</body>
+</html>   
