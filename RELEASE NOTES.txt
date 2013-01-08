@@ -126,6 +126,7 @@ This release contains many backwards incompatible changes.  Take the following s
  * [Get-IisHttpRedirect](http://get-carbon.org/help/Get-IisHttpRedirect.html) now returns a `Carbon.Iis.HttpRedirectConfigurationSection` object.  The `StatusCode` property on the old object is now named `HttpResponseStatus`.
  * Renamed the `StatusCode` parameter on [Set-IisHttpRedirect](http://get-carbon.org/help/Set-IisHttpRedirect.html) to `HttpResponseStatus`.
  * [Get-IisWebsite](http://get-carbon.org/help/Get-IisWebsite.html) now returns a `Microsoft.Web.Administration.Site` object.
+ * The Carbon assembly is now versioned and signed.
  
  
 # 0.4.0.1 (18 December 2012)
