@@ -13,7 +13,7 @@
 # limitations under the License.
 
 # This function should only be available if the Windows PowerShell v3.0 Server Manager cmdlets aren't already installed.
-if( $loadWindowsFeatureFunctions )
+if( -not (Get-Command -Name 'Get-WindowsFeature*') )
 {
     function Get-WindowsFeature
     {

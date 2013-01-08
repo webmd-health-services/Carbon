@@ -40,8 +40,6 @@ $TrustedHostsPath = 'WSMan:\localhost\Client\TrustedHosts'
 Add-Type -AssemblyName System.ServiceProcess
 
 # Windows Features
-$loadWindowsFeatureFunctions = if( (Get-Command 'Install-WindowsFeature*')  ) { $false } else { $true }
-
 $useServerManager = ((Get-Command -CommandType 'Application' -Name 'servermanagercmd*.exe' | Where-Object { $_.Name -eq 'servermanagercmd.exe' }) -ne $null)
 $useWmi = $false
 $useOCSetup = $false
