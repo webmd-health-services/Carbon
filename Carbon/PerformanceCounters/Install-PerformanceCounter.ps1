@@ -53,7 +53,7 @@ function Install-PerformanceCounter
         $Force
     )
     
-    $currentCounters = @( Get-PerformanceCounters -CategoryName $CategoryName )
+    $currentCounters = @( Get-PerformanceCounter -CategoryName $CategoryName )
     
     $counter = $currentCounters | 
                     Where-Object { 

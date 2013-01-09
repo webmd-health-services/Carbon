@@ -27,6 +27,14 @@
 ### Internet Explorer
 
  * Renamed `Enable-IEActivationPermissions` to [Enable-IEActivationPermission](http://get-carbon.org/help/Enable-IEActivationPermission.html), with backwards-compatible alias.
+ 
+### MSMQ
+
+ * Renamed `Grant-MsmqMessageQueuePermissions` to [Grant-MsmqMessageQueuePermission](http://get-carbon.org/help/Grant-MsmqMessageQueuePermission.html), with backwards-compatible alias.
+ 
+### Performance Counters
+
+ * Renamed `Get-PerformanceCounters` to [Get-PerformanceCounter](http://get-carbon.org/help/Get-PerformanceCounter.html), with backwards-compatible alias.
 
  
 # 0.5.0.0 (7 January 2013)

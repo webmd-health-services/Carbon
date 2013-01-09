@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Get-PerformanceCounters
+function Get-PerformanceCounter
 {
     <#
     .SYNOPSIS
@@ -25,7 +25,7 @@ function Get-PerformanceCounters
     System.Diagnostics.PerformanceCounterCategory.
 
     .EXAMPLE
-    Get-PerformanceCounters -CategoryName Processor
+    Get-PerformanceCounter -CategoryName Processor
 
     Gets all the `Processor` performance counters.
     #>
@@ -43,3 +43,5 @@ function Get-PerformanceCounters
         return $category.GetCounters("")
     }
 }
+
+Set-Alias -Name 'Get-PerformanceCounters' -Value 'Get-PerformanceCounter'

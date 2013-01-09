@@ -27,7 +27,7 @@ function Test-ShouldGetPerformanceCounters
     foreach( $category in $categories )
     {
         $countersExpected = @( $category.GetCounters("") )
-        $countersActual = @( Get-PerformanceCounters -CategoryName $category.CategoryName )
+        $countersActual = @( Get-PerformanceCounter -CategoryName $category.CategoryName )
         Assert-Equal $countersExpected.Length $countersActual.Length
     }
     
@@ -35,6 +35,6 @@ function Test-ShouldGetPerformanceCounters
 
 function Test-ShouldGetNoPerformanceCountersForNonExistentCategory
 {
-    $counters = Get-PerformanceCounters -CategoryName 'IDoNotExist'
+    $counters = Get-PerformanceCounter -CategoryName 'IDoNotExist'
     Assert-Null $counters
 }

@@ -34,7 +34,7 @@ function Test-ShouldInstallNewPerformanceCounterWithNewCategory
     Install-PerformanceCounter -CategoryName $CategoryName -Name $name -Description $description -Type $type
     Assert-True (Test-PerformanceCounterCategory -CategoryName $CategoryName) 'Category not auto-created.'
     Assert-True (Test-PerformanceCounter -CategoryName $CategoryName -Name $name)
-    $counters = @( Get-PerformanceCounters -CategoryName $CategoryName )
+    $counters = @( Get-PerformanceCounter -CategoryName $CategoryName )
     Assert-Equal 1 $counters.Length
     Assert-Counter $counters[0] $name $description $type
 }
@@ -51,7 +51,7 @@ function Test-ShouldPreserveExistingCountersWhenInstallingNewCounter
     $type2 = 'NumberOfItems64'
     Install-PerformanceCounter -CategoryName $CategoryName -Name $name2 -Description $description2 -Type $type2
     
-    $counters = @( Get-PerformanceCounters -CategoryName $CategoryName )
+    $counters = @( Get-PerformanceCounter -CategoryName $CategoryName )
     Assert-Equal 2 $counters.Length
     Assert-Counter $counters[0] $name $description $type
     Assert-Counter $counters[1] $name2 $description2 $type2   
@@ -77,7 +77,7 @@ function Test-ShouldReinstallExistingPerformanceCounter
     $newDescription = '[New] ' + $description
     $newType = 'NumberOfItems64'
     Install-PerformanceCounter -CategoryName $CategoryName -Name $name -Description $newDescription -Type $newType
-    $counters = @( Get-PerformanceCounters -CategoryName $CategoryName )
+    $counters = @( Get-PerformanceCounter -CategoryName $CategoryName )
     Assert-Counter $counters[0] $name $newDescription $newType
 }
 
@@ -87,15 +87,15 @@ function Test-ShouldNotInstallIfCounterHasNotChanged
     $description = 'Counter used to test that Carbon installation function works.'
     $type = 'NumberOfItems32'
     Install-PerformanceCounter -CategoryName $CategoryName -Name $name -Description $description -Type $type
-    $counters = @( Get-PerformanceCounters -CategoryName $CategoryName )
+    $counters = @( Get-PerformanceCounter -CategoryName $CategoryName )
     Assert-Counter $counters[0] $name $description $type
     
     Install-PerformanceCounter -CategoryName $CategoryName -Name $name -Description $description -Type $type
-    $counters = @( Get-PerformanceCounters -CategoryName $CategoryName )
+    $counters = @( Get-PerformanceCounter -CategoryName $CategoryName )
     Assert-Counter $counters[0] $name $description $type
     
     Install-PerformanceCounter -CategoryName $CategoryName -Name $name -Description $description -Type $type -Force
-    $counters = @( Get-PerformanceCounters -CategoryName $CategoryName )
+    $counters = @( Get-PerformanceCounter -CategoryName $CategoryName )
     Assert-Counter $counters[0] $name $description $type
 }
 
