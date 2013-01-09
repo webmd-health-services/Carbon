@@ -23,7 +23,7 @@
  
 ### IIS
 
- * Renamed `Add-IisServerManagerMembers` to [Add-IisServerManagerMembers](http://get-carbon.org/help/Add-IisServerManagerMembers.html), with backwards-compatible alias.
+ * Renamed `Add-IisServerManagerMembers` to [Add-IisServerManagerMember](http://get-carbon.org/help/Add-IisServerManagerMember.html), with backwards-compatible alias.
  * Added `StatusCode` alias for [Set-IisHttpRedirect's](http://get-carbon.org/help/Set-IisHttpRedirect.html) `HttpResponseStatus` parameter, for backwards-compatibility with earlier releases.
  * Added `Test-IisAppPoolExists` alias for [Test-IisAppPool](http://get-carbon.org/help/Test-IisAppPool.html), for backwards-compatibility with earlier releases.
  * Added `Remove-IisWebsite` alias for [Uninstall-IisWebsite](http://get-carbon.org/help/Uninstall-IisWebsite.html), for backwards-compatibility with earlier releases.
