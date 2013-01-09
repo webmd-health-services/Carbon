@@ -50,3 +50,5 @@ function Test-AdminPrivilege
 
     return $false
 }
+
+Set-Alias -Name 'Test-AdminPrivileges' -Value 'Test-AdminPrivilege'
