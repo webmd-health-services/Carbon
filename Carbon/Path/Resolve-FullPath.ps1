@@ -52,3 +52,5 @@ function Resolve-FullPath
     }
     return [IO.Path]::GetFullPath($Path)
 }
+
+Set-Alias -Name 'ConvertTo-FullPath' -Value 'Resolve-FullPath'

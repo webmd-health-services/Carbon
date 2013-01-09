@@ -42,3 +42,5 @@ function Test-IisAppPool
     
     return $false
 }
+
+Set-Alias -Name 'Test-IisAppPoolExists' -Value 'Test-IisAppPool'

@@ -70,3 +70,5 @@ function Uninstall-Certificate
     }
     $store.Close()
 }
+
+Set-Alias -Name 'Remove-Certificate' -Value 'Uninstall-Certificate'

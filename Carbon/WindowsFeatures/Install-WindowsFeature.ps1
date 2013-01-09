@@ -55,6 +55,7 @@ if( -not (Get-Command -Name 'Install-WindowsFeature*') )
             [Parameter(Mandatory=$true,ParameterSetName='ByName')]
             [string[]]
             # The components to enable/install.  Feature names are case-sensitive.
+            [Alias('Features')]
             $Name,
             
             [Parameter(ParameterSetName='ByFlag')]
@@ -132,4 +133,6 @@ if( -not (Get-Command -Name 'Install-WindowsFeature*') )
             }
         }
     }
+    
+    Set-Alias -Name 'Install-WindowsFeatures' -Value 'Install-WindowsFeature'
 }

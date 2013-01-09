@@ -50,3 +50,5 @@ function Uninstall-IisWebsite
         Invoke-AppCmd delete site `"$Name`"
     }
 }
+
+Set-Alias -Name 'Remove-IisWebsite' -Value 'Uninstall-IisWebsite'

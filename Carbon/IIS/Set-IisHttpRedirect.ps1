@@ -60,6 +60,7 @@ function Set-IisHttpRedirect
         
         [Carbon.Iis.HttpResponseStatus]
         # The HTTP status code to use.  Default is `Found`.  Should be one of `Found` (HTTP 302), `Permanent` (HTTP 301), or `Temporary` (HTTP 307).
+        [Alias('StatusCode')]
         $HttpResponseStatus = [Carbon.Iis.HttpResponseStatus]::Found,
         
         [Switch]

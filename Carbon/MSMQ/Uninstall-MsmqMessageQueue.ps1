@@ -67,3 +67,5 @@ function Uninstall-MsmqMessageQueue
         }
     }
 }
+
+Set-Alias -Name 'Remove-MsmqMessageQueue' -Value 'Uninstall-MsmqMessageQueue'

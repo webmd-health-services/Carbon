@@ -43,3 +43,5 @@ function Uninstall-User
         }
     }
 }
+
+Set-Alias -Name 'Remove-User' -Value 'Uninstall-User'

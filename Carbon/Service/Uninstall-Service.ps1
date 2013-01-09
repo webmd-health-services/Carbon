@@ -45,3 +45,5 @@ function Uninstall-Service
         }
     }
 }
+
+Set-Alias -Name 'Remove-Service' -Value 'Uninstall-Service'

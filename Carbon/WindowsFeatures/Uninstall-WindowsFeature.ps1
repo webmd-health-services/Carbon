@@ -52,6 +52,7 @@ if( -not (Get-Command -Name 'Uninstall-WindowsFeature*') )
             [Parameter(Mandatory=$true,ParameterSetName='ByName')]
             [string[]]
             # The names of the components to uninstall/disable.  Feature names are case-sensitive.  To get a list, run `Get-WindowsFeature`.
+            [Alias('Features')]
             $Name,
             
             [Parameter(ParameterSetName='ByFlag')]
@@ -129,4 +130,6 @@ if( -not (Get-Command -Name 'Uninstall-WindowsFeature*') )
             }
         }
     }
+
+    Set-Alias -Name 'Uninstall-WindowsFeatures' -Value 'Uninstall-WindowsFeature'
 }

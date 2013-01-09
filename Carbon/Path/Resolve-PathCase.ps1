@@ -56,3 +56,5 @@ function Resolve-PathCase
     
     return $longBuffer.ToString()
 }
+
+Set-Alias -Name 'Get-PathCanonicalCase' -Value 'Resolve-PathCase'
