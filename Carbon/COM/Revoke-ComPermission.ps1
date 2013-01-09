@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Revoke-ComPermissions
+function Revoke-ComPermission
 {
     <#
     .SYNOPSIS
@@ -28,15 +28,15 @@ function Revoke-ComPermissions
     Grant-ComPermission
     
     .LINK
-    Revoke-ComPermissions
+    Revoke-ComPermission
     
     .EXAMPLE
-    Revoke-ComPermissions -Access -Identity 'Users' -Default
+    Revoke-ComPermission -Access -Identity 'Users' -Default
     
     Removes all default security COM access permissions for the local `Users` group.
 
     .EXAMPLE
-    Revoke-ComPermissions -LaunchAndActivation -Identity 'Users' -Limits
+    Revoke-ComPermission -LaunchAndActivation -Identity 'Users' -Limits
     
     Removes all security limit COM access permissions for the local `Users` group.
     #>
@@ -120,3 +120,5 @@ function Revoke-ComPermissions
     $regValueName = $pscmdlet.ParameterSetName
     Set-RegistryKeyValue -Path $ComRegKeyPath -Name $regValueName -Binary $sdBytes.BinarySD -Quiet
 }
+
+Set-Alias -Name 'Revoke-ComPermissions' -Value 'Revoke-ComPermission'

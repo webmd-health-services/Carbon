@@ -29,7 +29,7 @@ function Get-ComPermission
     Grant-ComPermission
 
     .LINK
-    Revoke-ComPermissions
+    Revoke-ComPermission
     
     .OUTPUTS
     Carbon.Security.ComAccessRule.

@@ -29,10 +29,10 @@ function TearDown
 
 function Revoke-TestComPermissions
 {
-    Revoke-ComPermissions -Identity $groupName -Access -Default
-    Revoke-ComPermissions -Identity $groupName -Access -Limits
-    Revoke-ComPermissions -Identity $groupName -LaunchAndActivation -Default
-    Revoke-ComPermissions -Identity $groupName -LaunchAndActivation -Limits
+    Revoke-ComPermission -Identity $groupName -Access -Default
+    Revoke-ComPermission -Identity $groupName -Access -Limits
+    Revoke-ComPermission -Identity $groupName -LaunchAndActivation -Default
+    Revoke-ComPermission -Identity $groupName -LaunchAndActivation -Limits
     Get-ComPermission -Identity $groupName -Access -Default | 
         ForEach-Object { Fail ('{0} has COM Access permissions.' -f $groupName) }
     Get-ComPermission -Identity $groupName -Access -Limits | 

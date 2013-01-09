@@ -27,7 +27,7 @@ function Grant-ComPermission
     Get-ComPermission
 
     .LINK
-    Revoke-ComPermissions
+    Revoke-ComPermission
     
     .EXAMPLE
     Grant-ComPermission -Access -Identity 'Users' -Allow -Default -Local
