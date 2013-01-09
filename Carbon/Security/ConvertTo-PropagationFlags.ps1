@@ -25,7 +25,7 @@ function ConvertTo-PropagationFlags
     System.Security.AccessControl.PropagationFlags.
     
     .LINK
-    ConvertTo-InheritanceFlags
+    ConvertTo-InheritanceFlag
     
     .LINK
     Grant-Permissions

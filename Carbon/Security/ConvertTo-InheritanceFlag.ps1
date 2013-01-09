@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function ConvertTo-InheritanceFlags
+function ConvertTo-InheritanceFlag
 {
     <#
     .SYNOPSIS
@@ -31,7 +31,7 @@ function ConvertTo-InheritanceFlags
     Grant-Permissions
     
     .EXAMPLE
-    ConvertTo-InheritanceFlags -ContainerInheritanceFlags ContainerAndSubContainersAndLeaves
+    ConvertTo-InheritanceFlag -ContainerInheritanceFlag ContainerAndSubContainersAndLeaves
     
     Returns `InheritanceFlags.ContainerInherit|InheritanceFlags.ObjectInherit`.
     #>
@@ -40,7 +40,8 @@ function ConvertTo-InheritanceFlags
         [Parameter(Mandatory=$true)]
         [Carbon.Security.ContainerInheritanceFlags]
         # The value to convert to an `InheritanceFlags` value.
-        $ContainerInheritanceFlags
+		[Alias('ContainerInheritanceFlags')]
+        $ContainerInheritanceFlag
     )
 
     $Flags = [Security.AccessControl.InheritanceFlags]
@@ -59,11 +60,13 @@ function ConvertTo-InheritanceFlags
         'ContainerAndSubContainersAndLeaves' =        ($Flags::ContainerInherit -bor $Flags::ObjectInherit);
         'ChildContainersAndChildLeaves' =             ($Flags::ContainerInherit -bor $Flags::ObjectInherit);
     }
-    $key = $ContainerInheritanceFlags.ToString()
+    $key = $ContainerInheritanceFlag.ToString()
     if( $map.ContainsKey( $key) )
     {
         return $map[$key]
     }
     
-    Write-Error ('Unknown Carbon.Security.ContainerInheritanceFlags enumeration value {0}.' -f $ContainerInheritanceFlags) 
+    Write-Error ('Unknown Carbon.Security.ContainerInheritanceFlags enumeration value {0}.' -f $ContainerInheritanceFlag) 
 }
+
+Set-Alias -Name 'ConvertTo-InheritanceFlags' -Value 'ConvertTo-InheritanceFlag'

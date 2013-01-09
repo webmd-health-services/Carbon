@@ -50,6 +50,8 @@
 ### Security
 
  * Renamed `Assert-AdminPrivileges` to [Assert-AdminPrivilege](http://get-carbon.org/help/Assert-AdminPrivilege.html), with backwards-compatible alias.
+ * Renamed `ConvertTo-InheritanceFlags` to [ConvertTo-InheritanceFlag](http://get-carbon.org/help/ConvertTo-InheritanceFlag.html), with backwards-compatible alias.
+ * Renamed `ConvertTo-InheritanceFlag`'s `ContainerInheritanceFlags` parameter to `ConvertTo-InheritanceFlag`, with backwards-compatible alias.
  
  
 # 0.5.0.0 (7 January 2013)

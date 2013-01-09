@@ -176,7 +176,7 @@ function Grant-Permissions
     $propagationFlags = [Security.AccessControl.PropagationFlags]::None
     if( Test-Path $Path -PathType Container )
     {
-        $inheritanceFlags = ConvertTo-InheritanceFlags -ContainerInheritanceFlags $ApplyTo
+        $inheritanceFlags = ConvertTo-InheritanceFlag -ContainerInheritanceFlag $ApplyTo
         $propagationFlags = ConvertTo-PropagationFlags -ContainerInheritanceFlags $ApplyTo
     }
     else
