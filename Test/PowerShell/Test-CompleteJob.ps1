@@ -91,7 +91,8 @@ function Test-ShouldContinueIfJobFails
         Fail "Complete-Job failed."
     }
     Assert-Equal 1 $numFailed
-    Assert-Null (Get-Job)
+    $job = Get-Job
+    Assert-Null $job
 }
 
 function Test-ShouldPipeOutputToWriteHost

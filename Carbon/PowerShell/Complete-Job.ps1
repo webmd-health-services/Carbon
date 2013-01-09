@@ -59,9 +59,9 @@ function Complete-Job
         Start-Sleep -Seconds $IntervalSeconds
         
         $jobsStillRunning = $false
-        $Job | ForEach-Object {
-
-            $currentJob = Get-Job $_.Id -ErrorAction SilentlyContinue
+        foreach( $pendingJob in $Job )
+        {
+            $currentJob = Get-Job $pendingJob.Id -ErrorAction SilentlyContinue
             if( -not $currentJob )
             {
                 Write-Verbose "Job with ID $($pendingJob.Id) doesn't exist."
