@@ -75,7 +75,7 @@ function Get-IisConfigurationSection
         
     if( $section )
     {
-        $section | Add-IisServerManagerMembers -ServerManager $mgr -PassThru
+        $section | Add-IisServerManagerMember -ServerManager $mgr -PassThru
     }
     else
     {

@@ -48,5 +48,5 @@ function Get-IisAppPool
     $mgr = New-Object Microsoft.Web.Administration.ServerManager
     $mgr.ApplicationPools |
         Where-Object { $_.Name -eq $Name } |
-        Add-IisServerManagerMembers -ServerManager $mgr -PassThru
+        Add-IisServerManagerMember -ServerManager $mgr -PassThru
 }

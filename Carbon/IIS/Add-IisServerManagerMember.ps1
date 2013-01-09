@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-filter Add-IisServerManagerMembers
+filter Add-IisServerManagerMember
 {
     <#
     .SYNOPSIS
@@ -22,7 +22,7 @@ filter Add-IisServerManagerMembers
     This is an internal Carbon function for adding properties/methods to `Microsoft.Web.Administration` objects so that changes to them can be committed/saved.  It adds a `ServerManager` property, which is a reference to the `ServerManager` object which instantiated this object and a CommitChanges method, which calls down to the `ServerManager`'s `CommitChanges` method.
     
     .EXAMPLE
-    $appPool | Add-IisServerManagerMembers -ServerManager $manager -PassThru
+    $appPool | Add-IisServerManagerMember -ServerManager $manager -PassThru
     
     Adds a `ServerManager` property and `CommitChanges` method to `$appPool`.
     #>
@@ -51,3 +51,5 @@ filter Add-IisServerManagerMembers
         return $InputObject
     }
 }
+
+Set-Alias -Name 'Add-IisServerManagerMembers' -Value 'Add-IisServerManagerMember'

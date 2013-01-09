@@ -19,6 +19,10 @@
 ### Firewall
 
  * Renamed `Get-FirewallRules` to [Get-FirewallRule](http://get-carbon.org/help/Get-FirewallRule.html), with backwards-compatible alias.
+ 
+### IIS
+
+ * Renamed `Add-IisServerManagerMembers` to [Add-IisServerManagerMembers](http://get-carbon.org/help/Add-IisServerManagerMembers.html), with backwards-compatible alias.
 
  
 # 0.5.0.0 (7 January 2013)
