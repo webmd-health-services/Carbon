@@ -24,7 +24,7 @@ function Grant-ComPermissions
     You must set at least one of the `LocalAccess` or `RemoteAccess` switches.
     
     .LINK
-    Get-ComPermissions
+    Get-ComPermission
 
     .LINK
     Revoke-ComPermissions

@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Get-ComPermissions
+function Get-ComPermission
 {
     <#
     .SYNOPSIS
@@ -35,12 +35,12 @@ function Get-ComPermissions
     Carbon.Security.ComAccessRule.
      
     .EXAMPLE
-    Get-ComPermissions -Access -Default
+    Get-ComPermission -Access -Default
     
     Gets the COM access default security permissions. Look how easy it is!
 
     .EXAMPLE
-    Get-ComPermissions -LaunchAndActivation -Identity 'Administrators' -Limits
+    Get-ComPermission -LaunchAndActivation -Identity 'Administrators' -Limits
     
     Gets the security limits for COM Launch and Activation permissions for the local administrators group.
     #>
@@ -105,3 +105,5 @@ function Get-ComPermissions
             return $true
         }
 }
+
+Set-Alias -Name 'Get-ComPermissions' -Value 'Get-ComPermission'

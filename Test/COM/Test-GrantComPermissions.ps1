@@ -33,13 +33,13 @@ function Revoke-TestComPermissions
     Revoke-ComPermissions -Identity $groupName -Access -Limits
     Revoke-ComPermissions -Identity $groupName -LaunchAndActivation -Default
     Revoke-ComPermissions -Identity $groupName -LaunchAndActivation -Limits
-    Get-ComPermissions -Identity $groupName -Access -Default | 
+    Get-ComPermission -Identity $groupName -Access -Default | 
         ForEach-Object { Fail ('{0} has COM Access permissions.' -f $groupName) }
-    Get-ComPermissions -Identity $groupName -Access -Limits | 
+    Get-ComPermission -Identity $groupName -Access -Limits | 
         ForEach-Object { Fail ('{0} has COM Access restrictions.' -f $groupName) }
-    Get-ComPermissions -Identity $groupName -LaunchAndActivation -Default | 
+    Get-ComPermission -Identity $groupName -LaunchAndActivation -Default | 
         ForEach-Object { Fail ('{0} has COM Launch and ACtivation permissions.' -f $groupName) }
-    Get-ComPermissions -Identity $groupName -LaunchAndActivation -Limits | 
+    Get-ComPermission -Identity $groupName -LaunchAndActivation -Limits | 
         ForEach-Object { Fail ('{0} has COM Launch and ACtivation restrictions.' -f $groupName) }
 }
 
@@ -72,7 +72,7 @@ function Test-ShouldSetAccessPermissions
             {
                 $getArgs.Limits = $true
             }
-            $accessRule = Get-ComPermissions -Access -Identity $groupName @getArgs
+            $accessRule = Get-ComPermission -Access -Identity $groupName @getArgs
             Assert-NotNull $accessRule
             
             $expectedRights = [Carbon.Security.ComAccessRights]::Execute
@@ -123,7 +123,7 @@ function Test-ShouldSetLaunchAndActivationPermissions
                         $getArgs = @{ }
                         $getArgs.$type = $true
 
-                        $accessRule = Get-ComPermissions -LaunchAndActivation  -Identity $groupName @getArgs
+                        $accessRule = Get-ComPermission -LaunchAndActivation  -Identity $groupName @getArgs
                         Assert-NotNull $accessRule
                         
                         $expectedRights = [Carbon.Security.ComAccessRights]::Execute

@@ -24,7 +24,7 @@ function TearDown
 
 function Test-ShouldGetComAccessPermissions
 {
-    $rules = Get-ComPermissions -Access -Default
+    $rules = Get-ComPermission -Access -Default
     Assert-NotNull $rules
     Assert-GreaterThan $rules.Count 1
     $rules | ForEach-Object { 
@@ -39,19 +39,19 @@ function Test-ShouldGetComAccessPermissions
 
 function Test-ShouldGetPermissionsForSpecificUser
 {
-    $rules = Get-ComPermissions -Access -Default
+    $rules = Get-ComPermission -Access -Default
     Assert-GreaterThan $rules.Count 1
-    $rule = Get-ComPermissions -Access -Default -Identity $rules[0].IdentityReference.Value
+    $rule = Get-ComPermission -Access -Default -Identity $rules[0].IdentityReference.Value
     Assert-NotNull $rule
     Assert-Equal $rule.IdentityReference $rules[0].IdentityReference
 }
 
 function Test-ShouldGetSecurityLimits
 {
-    $defaultRules = Get-ComPermissions -Access -Default
+    $defaultRules = Get-ComPermission -Access -Default
     Assert-NotNull $defaultRules
     
-    $limitRules = Get-ComPermissions -Access -Limits
+    $limitRules = Get-ComPermission -Access -Limits
     Assert-NotNull $limitRules
     
     if( $defaultRules.Count -eq $limitRules.Count )
@@ -65,7 +65,7 @@ function Test-ShouldGetSecurityLimits
 
 function Test-ShouldGetComLaunchAndActivationPermissions
 {
-    $rules = Get-ComPermissions -LaunchAndActivation -Default
+    $rules = Get-ComPermission -LaunchAndActivation -Default
     Assert-NotNull $rules
     Assert-True ($rules.Count -gt 1)
     $rules | ForEach-Object { 
@@ -80,19 +80,19 @@ function Test-ShouldGetComLaunchAndActivationPermissions
 
 function Test-ShouldGetLaunchAndActivationRuleForSpecificUser
 {
-    $rules = Get-ComPermissions -LaunchAndActivation -Default
+    $rules = Get-ComPermission -LaunchAndActivation -Default
     Assert-GreaterThan $rules.Count 1
-    $rule = Get-ComPermissions -LaunchAndActivation -Default -Identity $rules[0].IdentityReference.Value
+    $rule = Get-ComPermission -LaunchAndActivation -Default -Identity $rules[0].IdentityReference.Value
     Assert-NotNull $rule
     Assert-Equal $rule.IdentityReference $rules[0].IdentityReference
 }
 
 function Test-ShouldGetLaunchAndActivationSecurityLimits
 {
-    $defaultRules = Get-ComPermissions -LaunchAndActivation -Default
+    $defaultRules = Get-ComPermission -LaunchAndActivation -Default
     Assert-NotNull $defaultRules
     
-    $limitRules = Get-ComPermissions -LaunchAndActivation -Limits
+    $limitRules = Get-ComPermission -LaunchAndActivation -Limits
     Assert-NotNull $limitRules
     
     if( $defaultRules.Count -eq $limitRules.Count )

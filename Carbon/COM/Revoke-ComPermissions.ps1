@@ -22,7 +22,7 @@ function Revoke-ComPermissions
     Calling this function is equivalent to opening Component Services (dcomcnfg), right-clicking `My Computer` under Component Services > Computers, choosing `Properties`, going to the `COM Security` tab, and removing an identity from the permissions window that opens after clicking the `Edit Limits...` or `Edit Default...` buttons under `Access Permissions` or `Launch and Activation Permissions` section, 
     
     .LINK
-    Get-ComPermissions
+    Get-ComPermission
 
     .LINK
     Grant-ComPermissions

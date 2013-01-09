@@ -10,6 +10,10 @@
 
  * Renamed `Get-SslCertificateBindings` to [Get-SslCertificateBinding](http://get-carbon.org/help/Get-SslCertificateBinding.html), with backwards-compatible alias.
  
+### COM
+
+ * Renamed 'Get-ComPermissions` to [Get-ComPermission](http://get-carbon.org/help/Get-ComPermission.html), with backwards-compatible alias.
+ 
 
 # 0.5.0.0 (7 January 2013)
 
