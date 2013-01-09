@@ -177,7 +177,7 @@ function Grant-Permissions
     if( Test-Path $Path -PathType Container )
     {
         $inheritanceFlags = ConvertTo-InheritanceFlag -ContainerInheritanceFlag $ApplyTo
-        $propagationFlags = ConvertTo-PropagationFlags -ContainerInheritanceFlags $ApplyTo
+        $propagationFlags = ConvertTo-PropagationFlag -ContainerInheritanceFlag $ApplyTo
     }
     else
     {

@@ -19,13 +19,13 @@ function ConvertTo-InheritanceFlag
     Converts a `Carbon.Security.ContainerInheritanceFlags` value to a `System.Security.AccessControl.InheritanceFlags` value.
     
     .DESCRIPTION
-    The `Carbon.Security.ContainerInheritanceFlags` enumeration encapsulates oth `System.Security.AccessControl.InheritanceFlags` and `System.Security.AccessControl.PropagationFlags`.  Make sure you also call `ConvertTo-PropagationFlags` to get the propagation value.
+    The `Carbon.Security.ContainerInheritanceFlags` enumeration encapsulates oth `System.Security.AccessControl.InheritanceFlags` and `System.Security.AccessControl.PropagationFlags`.  Make sure you also call `ConvertTo-PropagationFlag` to get the propagation value.
     
     .OUTPUTS
     System.Security.AccessControl.InheritanceFlags.
     
     .LINK
-    ConvertTo-PropagationFlags
+    ConvertTo-PropagationFlag
     
     .LINK
     Grant-Permissions

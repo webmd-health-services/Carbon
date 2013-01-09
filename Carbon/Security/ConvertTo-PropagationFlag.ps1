@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function ConvertTo-PropagationFlags
+function ConvertTo-PropagationFlag
 {
     <#
     .SYNOPSIS
@@ -31,7 +31,7 @@ function ConvertTo-PropagationFlags
     Grant-Permissions
     
     .EXAMPLE
-    ConvertTo-PropagationFlags -ContainerInheritanceFlags ContainerAndSubContainersAndLeaves
+    ConvertTo-PropagationFlag -ContainerInheritanceFlag ContainerAndSubContainersAndLeaves
     
     Returns `PropagationFlags.None`.
     #>
@@ -40,7 +40,8 @@ function ConvertTo-PropagationFlags
         [Parameter(Mandatory=$true)]
         [Carbon.Security.ContainerInheritanceFlags]
         # The value to convert to an `PropagationFlags` value.
-        $ContainerInheritanceFlags
+		[Alias('ContainerInheritanceFlags')]
+        $ContainerInheritanceFlag
     )
 
     $Flags = [Security.AccessControl.PropagationFlags]
@@ -59,11 +60,13 @@ function ConvertTo-PropagationFlags
         'ContainerAndSubContainersAndLeaves' =         $Flags::None;
         'ChildContainersAndChildLeaves' =             ($Flags::InheritOnly -bor $Flags::NoPropagateInherit);
     }
-    $key = $ContainerInheritanceFlags.ToString()
+    $key = $ContainerInheritanceFlag.ToString()
     if( $map.ContainsKey( $key ) )
     {
         return $map[$key]
     }
     
-    Write-Error ('Unknown Carbon.Security.ContainerInheritanceFlags enumeration value {0}.' -f $ContainerInheritanceFlags) 
+    Write-Error ('Unknown Carbon.Security.ContainerInheritanceFlags enumeration value {0}.' -f $ContainerInheritanceFlag) 
 }
+
+Set-Alias -Name 'ConvertTo-PropagationFlags' -Value 'ConvertTo-PropagationFlag'
