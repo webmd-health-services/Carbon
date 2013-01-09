@@ -25,7 +25,7 @@ function Revoke-ComPermissions
     Get-ComPermission
 
     .LINK
-    Grant-ComPermissions
+    Grant-ComPermission
     
     .LINK
     Revoke-ComPermissions

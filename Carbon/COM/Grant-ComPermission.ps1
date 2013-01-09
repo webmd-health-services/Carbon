@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Grant-ComPermissions
+function Grant-ComPermission
 {
     <#
     .SYNOPSIS
@@ -30,12 +30,12 @@ function Grant-ComPermissions
     Revoke-ComPermissions
     
     .EXAMPLE
-    Grant-ComPermissions -Access -Identity 'Users' -Allow -Default -Local
+    Grant-ComPermission -Access -Identity 'Users' -Allow -Default -Local
     
     Updates access permission default security to allow the local `Users` group local access permissions.
 
     .EXAMPLE
-    Grant-ComPermissions -LaunchAndActivation -Identity 'Users' -Limits -Deny -Local -Remote
+    Grant-ComPermission -LaunchAndActivation -Identity 'Users' -Limits -Deny -Local -Remote
     
     Updates access permission security limits to deny the local `Users` group local and remote access permissions.
     #>
@@ -218,3 +218,5 @@ function Grant-ComPermissions
     $regValueName = $pscmdlet.ParameterSetName -replace '(Allow|Deny)$',''
     Set-RegistryKeyValue -Path $ComRegKeyPath -Name $regValueName -Binary $sdBytes.BinarySD -Quiet
 }
+
+Set-Alias -Name 'Grant-ComPermissions' -Value 'Grant-ComPermission'

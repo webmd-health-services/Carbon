@@ -12,8 +12,8 @@
  
 ### COM
 
- * Renamed 'Get-ComPermissions` to [Get-ComPermission](http://get-carbon.org/help/Get-ComPermission.html), with backwards-compatible alias.
- 
+ * Renamed `Get-ComPermissions` to [Get-ComPermission](http://get-carbon.org/help/Get-ComPermission.html), with backwards-compatible alias.
+ * Renamed `Grant-ComPermissions` to [Grant-ComPermission](http://get-carbon.org/help/Grant-ComPermission.html), with backwards-compatible alias.
 
 # 0.5.0.0 (7 January 2013)
 

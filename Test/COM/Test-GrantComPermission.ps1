@@ -61,7 +61,7 @@ function Test-ShouldSetAccessPermissions
     ) |
         ForEach-Object {
             $grantArgs = $_
-            Grant-ComPermissions -Access -Identity $groupName @grantArgs
+            Grant-ComPermission -Access -Identity $groupName @grantArgs
             
             $getArgs = @{ }
             if( $grantArgs.Default )
@@ -118,7 +118,7 @@ function Test-ShouldSetLaunchAndActivationPermissions
                         $grantArgs.$type = $true
                         $grantArgs.$aceType = $true
 
-                        Grant-ComPermissions -Identity $groupName -LaunchAndActivation @grantArgs
+                        Grant-ComPermission -Identity $groupName -LaunchAndActivation @grantArgs
                         
                         $getArgs = @{ }
                         $getArgs.$type = $true

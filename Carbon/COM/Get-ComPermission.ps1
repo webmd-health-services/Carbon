@@ -26,7 +26,7 @@ function Get-ComPermission
     Returns `Carbon.Security.ComAccessRule` objects, which inherit from `[System.Security.AccessControl.AccessRule](http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.accessrule.aspx).
     
     .LINK
-    Grant-ComPermissions
+    Grant-ComPermission
 
     .LINK
     Revoke-ComPermissions
