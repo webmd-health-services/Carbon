@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Get-Privileges
+function Get-Privilege
 {
     <#
     .SYNOPSIS
@@ -37,7 +37,7 @@ function Get-Privileges
     
     .EXAMPLE
     
-    Get-Privileges -Identity TheBeast
+    Get-Privilege -Identity TheBeast
     
     Gets TheBeast's privileges as an array of strings.
     #>
@@ -51,3 +51,5 @@ function Get-Privileges
     
     [Carbon.Lsa]::GetPrivileges( $Identity )
 }
+
+Set-Alias -Name 'Get-Privileges' -Value 'Get-Privilege'
