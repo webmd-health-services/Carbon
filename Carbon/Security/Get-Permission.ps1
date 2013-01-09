@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Get-Permissions
+function Get-Permission
 {
     <#
     .SYNOPSIS
@@ -27,17 +27,17 @@ function Get-Permissions
     System.Security.AccessControl.AccessRule.
     
     .EXAMPLE
-    Get-Permissions -Path C:\Windows
+    Get-Permission -Path C:\Windows
     
     Returns `System.Security.AccessControl.FileSystemAccessRule` objects for all the non-inherited rules on `C:\windows`.
     
     .EXAMPLE
-    Get-Permissions -Path hklm:\Software -Inherited
+    Get-Permission -Path hklm:\Software -Inherited
     
     Returns `System.Security.AccessControl.RegistryAccessRule` objects for all the inherited and non-inherited rules on `hklm:\software`.
     
     .EXAMPLE
-    Get-Permissions -Path C:\Windows -Idenity Administrators
+    Get-Permission -Path C:\Windows -Idenity Administrators
     
     Returns `System.Security.AccessControl.FileSystemAccessRule` objects for all the `Administrators'` rules on `C:\windows`.
     #>
@@ -85,3 +85,5 @@ function Get-Permissions
             return $true
         }    
 }
+
+Set-Alias -Name 'Get-Permissions' -Value 'Get-Permission'

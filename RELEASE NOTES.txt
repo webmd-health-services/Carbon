@@ -54,6 +54,7 @@
  * Renamed `ConvertTo-InheritanceFlag`'s `ContainerInheritanceFlags` parameter to `ConvertTo-InheritanceFlag`, with backwards-compatible alias.
  * Renamed `ConvertTo-PropagationFlags` to [ConvertTo-PropagationFlag](http://get-carbon.org/help/ConvertTo-PropagationFlag.html), with backwards-compatible alias.
  * Renamed `ConvertTo-PropagationFlag`'s `ContainerInheritanceFlags` parameter to `ConvertTo-InheritanceFlag`, with backwards-compatible alias.
+ * Renamed `Get-Permissions` to [Get-Permission](http://get-carbon.org/help/Get-Permission.html), with backwards-compatible alias.
  
  
 # 0.5.0.0 (7 January 2013)
