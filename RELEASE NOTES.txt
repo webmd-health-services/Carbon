@@ -40,6 +40,7 @@
 
  * Renamed `Add-TrustedHosts` to [Add-TrustedHost](http://get-carbon.org/help/Add-TrustedHost.html), with backwards-compatible alias.
  * Renamed `Add-TrustedHost`'s `Entries` parameter to `Entry`, with backwards-compatible alias.
+ * Renamed `Clear-TrustedHosts` to [Clear-TrustedHost](http://get-carbon.org/help/Clear-TrustedHost.html), with backwards-compatible alias. 
  
  
 # 0.5.0.0 (7 January 2013)

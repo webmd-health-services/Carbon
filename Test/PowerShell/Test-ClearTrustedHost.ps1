@@ -36,7 +36,7 @@ if( Test-AdminPrivileges )
     {
         Set-TrustedHosts 'example.com'
         Assert-Equal 'example.com' (Get-TrustedHosts)
-        Clear-TrustedHosts
+        Clear-TrustedHost
         Assert-Empty (Get-TrustedHosts)
     }
     
@@ -44,7 +44,7 @@ if( Test-AdminPrivileges )
     {
         Set-TrustedHosts 'example.com'
         Assert-Equal 'example.com' (Get-TrustedHosts)
-        Clear-TrustedHosts -WhatIf
+        Clear-TrustedHost -WhatIf
         Assert-Equal 'example.com' (Get-TrustedHosts)
     }
     

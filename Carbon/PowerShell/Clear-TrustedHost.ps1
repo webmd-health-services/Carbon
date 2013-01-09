@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Clear-TrustedHosts
+function Clear-TrustedHost
 {
     <#
     .SYNOPSIS
@@ -28,7 +28,7 @@ function Clear-TrustedHosts
     Set-TrustedHosts
 
     .EXAMPLE
-    Clear-TrustedHosts
+    Clear-TrustedHost
     
     Clears everything from the trusted hosts list.
     #>
@@ -43,3 +43,5 @@ function Clear-TrustedHosts
     }
 
 }
+
+Set-Alias -Name 'Clear-TrustedHosts' -Value 'Clear-TrustedHost'

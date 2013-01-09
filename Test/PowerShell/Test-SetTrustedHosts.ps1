@@ -22,7 +22,7 @@ if( Test-AdminPrivileges )
     function Setup
     {
         $originalTrustedHosts = @( Get-TrustedHosts )
-        Clear-TrustedHosts
+        Clear-TrustedHost
     }
 
     function TearDown

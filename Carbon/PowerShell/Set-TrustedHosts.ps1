@@ -21,10 +21,10 @@ function Set-TrustedHosts
     .DESCRIPTION
     Clears the current trusted hosts list, and sets it to contain only the entries given by the `Entries` parameter.
     
-    To clear the trusted hosts list, use `Clear-TrustedHosts`.
+    To clear the trusted hosts list, use `Clear-TrustedHost`.
     
     .LINK
-    Clear-TrustedHosts
+    Clear-TrustedHost
 
     .EXAMPLE
     Set-TrustedHosts example.com,api.example.com,docs.example.com
