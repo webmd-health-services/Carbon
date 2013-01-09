@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Complete-Jobs
+function Complete-Job
 {
     <#
     .SYNOPSIS
@@ -29,12 +29,12 @@ function Complete-Jobs
     System.Int32.
 
     .EXAMPLE
-    Complete-Jobs -Jobs $jobs
+    Complete-Job -Job $jobs
 
     Sits and waits for all the jobs in `$jobs` to finish, block, or stop and returns the number that didn't succeed.  It waits one second between status checks.
 
     .EXAMPLE
-    Complete-Jobs -Jobs $jobs -IntervalSeconds 60
+    Complete-Job -Job $jobs -IntervalSeconds 60
 
     Waits for all the jobs in `$jobs` to finish, waiting 60 seconds between status checks.
     #>
@@ -43,7 +43,8 @@ function Complete-Jobs
         [Parameter(Mandatory=$true)]
         [Management.Automation.Job[]]
         # The jobs to complete.
-        $Jobs,
+        [Alias('Jobs')]
+        $Job,
         
         [Parameter()]
         [int]
@@ -58,10 +59,10 @@ function Complete-Jobs
         Start-Sleep -Seconds $IntervalSeconds
         
         $jobsStillRunning = $false
-        foreach( $pendingJob in $Jobs )
-        {
-            $job = Get-Job $pendingJob.Id -ErrorAction SilentlyContinue
-            if( -not $job )
+        $Job | ForEach-Object {
+
+            $currentJob = Get-Job $_.Id -ErrorAction SilentlyContinue
+            if( -not $currentJob )
             {
                 Write-Verbose "Job with ID $($pendingJob.Id) doesn't exist."
                 continue
@@ -69,49 +70,49 @@ function Complete-Jobs
             
             try
             {
-                Write-Verbose "Job $($job.Name) is in the $($job.State) state."
+                Write-Verbose "Job $($currentJob.Name) is in the $($currentJob.State) state."
                 
-                $jobHeader = "# $($job.Name): $($job.State)"
-                if( $job.State -eq 'Blocked' -or $job.State -eq 'Stopped')
+                $jobHeader = "# $($currentJob.Name): $($currentJob.State)"
+                if( $currentJob.State -eq 'Blocked' -or $currentJob.State -eq 'Stopped')
                 {
                     Write-Host $jobHeader
 
-                    Write-Verbose "Stopping job $($job.Name)."
-                    Stop-Job -Job $job
+                    Write-Verbose "Stopping job $($currentJob.Name)."
+                    Stop-Job -Job $currentJob
 
-                    Write-Verbose "Receiving job $($job.Name)."
-                    Receive-Job -Job $job -ErrorAction Continue | Write-Host
+                    Write-Verbose "Receiving job $($currentJob.Name)."
+                    Receive-Job -Job $currentJob -ErrorAction Continue | Write-Host
 
-                    Write-Verbose "Removing job $($job.Name)."
-                    Remove-Job -Job $job
+                    Write-Verbose "Removing job $($currentJob.Name)."
+                    Remove-Job -Job $currentJob
                     $numFailed += 1
                 }
-                elseif( $job.State -eq 'Completed' -or $job.State -eq 'Failed' )
+                elseif( $currentJob.State -eq 'Completed' -or $currentJob.State -eq 'Failed' )
                 {
                     Write-Host $jobHeader
 
-                    Write-Verbose "Receiving job $($job.Name)."
-                    Receive-Job -Job $job -ErrorAction Continue | Write-Host
+                    Write-Verbose "Receiving job $($currentJob.Name)."
+                    Receive-Job -Job $currentJob -ErrorAction Continue | Write-Host
 
-                    Write-Verbose "Removing job $($job.Name)."
-                    Remove-Job -Job $job
-                    if( $job.State -eq 'Failed' )
+                    Write-Verbose "Removing job $($currentJob.Name)."
+                    Remove-Job -Job $currentJob
+                    if( $currentJob.State -eq 'Failed' )
                     {
                         $numFailed += 1
                     }
                 }
-                elseif( $job.State -eq 'NotStarted' -or $job.State -eq 'Running' )
+                elseif( $currentJob.State -eq 'NotStarted' -or $currentJob.State -eq 'Running' )
                 {
                     $jobsStillRunning = $true
                 }
                 else
                 {
-                    Write-Error "Found unknown job state $($job.State)."
+                    Write-Error "Found unknown job state $($currentJob.State)."
                 }
             }
             catch
             {
-                Write-Warning "Encountered error handling job $($job.Name)."
+                Write-Warning "Encountered error handling job $($currentJob.Name)."
                 Write-Warning $_
             }
         }
@@ -120,3 +121,5 @@ function Complete-Jobs
      
      return $numFailed
 }
+
+Set-Alias -Name 'Complete-Jobs' -Value 'Complete-Job'
