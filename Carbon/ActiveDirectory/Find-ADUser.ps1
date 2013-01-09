@@ -52,7 +52,7 @@ function Find-ADUser
     $filterPropertyName = 'sAMAccountName'
     $filterPropertyValue = $sAMAccountName
     
-    $filterPropertyValue = Format-ADSpecialCharacters $filterPropertyValue
+    $filterPropertyValue = Format-ADSearchFilterValue $filterPropertyValue
     
     $searcher.Filter = "(&(objectClass=User) ($filterPropertyName=$filterPropertyValue))"
     try
