@@ -15,7 +15,7 @@
 & (Join-Path $TestDir ..\..\Carbon\Import-Carbon.ps1 -Resolve)
 
 # Only administratos can update trusted hosts.
-if( Test-AdminPrivileges )
+if( Test-AdminPrivilege )
 {
     $originalTrustedHosts = $null
 

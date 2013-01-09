@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Test-AdminPrivileges
+function Test-AdminPrivilege
 {
     <#
     .SYNOPSIS
@@ -24,7 +24,7 @@ function Test-AdminPrivileges
     This function handles UAC and computers where UAC is disabled.
 
     .EXAMPLE
-    Test-AdminPrivileges
+    Test-AdminPrivilege
 
     Returns `True` if the current user has administrative privileges, or `False` if the user doesn't.
     #>

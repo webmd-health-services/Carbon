@@ -22,7 +22,7 @@ function Assert-AdminPrivilege
     Many scripts and functions require the user to be running as an administrator.  This function checks if the user is running as an administrator or with administrator privileges and writes an error if the user doesn't.  
 
     .LINK
-    Test-AdminPrivileges
+    Test-AdminPrivilege
 
     .EXAMPLE
     Assert-AdminPrivilege
@@ -33,7 +33,7 @@ function Assert-AdminPrivilege
     param(
     )
     
-    if( -not (Test-AdminPrivileges) )
+    if( -not (Test-AdminPrivilege) )
     {
         Write-Error "You are not currently running with administrative privileges.  Please re-start PowerShell as an administrator (right-click the PowerShell application, and choose ""Run as Administrator"")."
         return $false
