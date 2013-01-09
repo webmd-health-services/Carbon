@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Grant-MSMQMessageQueuePermissions
+function Grant-MSMQMessageQueuePermission
 {
     <#
     .SYNOPSIS
@@ -29,12 +29,12 @@ function Grant-MSMQMessageQueuePermissions
     http://msdn.microsoft.com/en-us/library/system.messaging.messagequeueaccessrights.aspx
 
     .EXAMPLE
-    Grant-MsmqMessageQueuePermissions -Name MovieQueue -Username REGAL\Employees -AccessRights FullControl
+    Grant-MsmqMessageQueuePermission -Name MovieQueue -Username REGAL\Employees -AccessRights FullControl
 
     Grants Regal Cinema employees full control over the MovieQueue.
 
     .EXAMPLE
-    Grant-MsmqMessageQueuePermissions -Name MovieQueue -Private -Username REGAL\Critics -AccessRights WriteMessage    
+    Grant-MsmqMessageQueuePermission -Name MovieQueue -Private -Username REGAL\Critics -AccessRights WriteMessage    
 
     Grants all of Regal's approved movie critics permission to write to the private critic's `MovieQueue`.  Lucky!
     #>
@@ -74,3 +74,5 @@ function Grant-MSMQMessageQueuePermissions
         $queue.SetPermissions( $Username, $AccessRights )
     }
 }
+
+Set-Alias -Name 'Grant-MsmqMessageQueuePermissions' -Value 'Grant-MsmqMessageQueuePermission'
