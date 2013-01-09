@@ -43,6 +43,7 @@
  * Renamed `Clear-TrustedHosts` to [Clear-TrustedHost](http://get-carbon.org/help/Clear-TrustedHost.html), with backwards-compatible alias. 
  * Renamed `Complete-Jobs` to [Complete-Job](http://get-carbon.org/help/Complete-Job.html), with backwards-compatible alias.
  * Renamed `Complete-Job`'s `Jobs` parameter to `Job`, with backwards-compatible alias.
+ * Renamed `Get-TrustedHosts` to [Get-TrustedHost](http://get-carbon.org/help/Get-TrustedHost.html), with backwards-compatible alias.
  
  
 # 0.5.0.0 (7 January 2013)

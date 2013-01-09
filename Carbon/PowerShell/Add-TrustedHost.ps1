@@ -40,7 +40,7 @@ function Add-TrustedHost
         $Entry
     )
     
-    $trustedHosts = @( Get-TrustedHosts )
+    $trustedHosts = @( Get-TrustedHost )
     $newEntries = @()
     
 	$Entry | ForEach-Object {
