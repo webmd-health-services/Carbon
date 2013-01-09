@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Get-ServicePermissions
+function Get-ServicePermission
 {
     <#
     .SYNOPSIS
@@ -34,12 +34,12 @@ function Get-ServicePermissions
     Revoke-ServicePermissions
     
     .EXAMPLE
-    Get-ServicePermissions -Name 'Hyperdrive'
+    Get-ServicePermission -Name 'Hyperdrive'
     
     Gets the access rules for the `Hyperdrive` service.
     
     .EXAMPLE
-    Get-ServicePermissions -Name 'Hyperdrive' -Identity FALCON\HSolo
+    Get-ServicePermission -Name 'Hyperdrive' -Identity FALCON\HSolo
     
     Gets just Han's permissions to control the `Hyperdrive` service.
     #>
@@ -108,3 +108,5 @@ function Get-ServicePermissions
             return $_
         }
 }
+
+Set-Alias -Name 'Get-ServicePermissions' -Value 'Get-ServicePermission'

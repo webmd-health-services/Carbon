@@ -22,7 +22,7 @@ function Revoke-ServicePermission
     No permissions are left behind.  This is an all or nothing operation, baby!
     
     .LINK
-    Get-ServicePermissions
+    Get-ServicePermission
     
     .LINK
     Grant-ServicePermission
@@ -56,7 +56,7 @@ function Revoke-ServicePermission
         return
     }
     
-    if( (Get-ServicePermissions -Name $Name -Identity $rIdentity) )
+    if( (Get-ServicePermission -Name $Name -Identity $rIdentity) )
     {
         Write-Host ("Revoking {0}'s {1} service permissions." -f $rIdentity,$Name)
         

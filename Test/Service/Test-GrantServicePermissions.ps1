@@ -25,7 +25,7 @@ function Setup
     Install-Service -Name $serviceName -Path $servicePath -StartupType Disabled
 
     Revoke-ServicePermission -Name $serviceName -Identity $username
-    $perms = Get-ServicePermissions -Name $serviceName -Identity $username
+    $perms = Get-ServicePermission -Name $serviceName -Identity $username
     Assert-Null $perms
 }
 
@@ -38,7 +38,7 @@ function Test-ShouldGrantFullControl
 {
     
     Grant-ServicePermission -Name $serviceName -Identity $username -FullControl
-    $perm = Get-ServicePermissions -Name $serviceName -Identity $username
+    $perm = Get-ServicePermission -Name $serviceName -Identity $username
     Assert-NotNull $perm
     Assert-Equal ([Carbon.Security.ServiceAccessRights]::FullControl) $perm.ServiceAccessRights
 }
@@ -51,7 +51,7 @@ function Test-ShouldGrantIndividualPermissions
                 $_ = $true;
             }
             Grant-ServicePermission -Name $serviceName -Identity $username @grantArgs
-            $perm = Get-ServicePermissions -Name $serviceName -Identity $username
+            $perm = Get-ServicePermission -Name $serviceName -Identity $username
             Assert-NotNull $perm
             Assert-Equal ([Carbon.Security.ServiceAccessRights]::$_) $perm.ServiceAccessRights
         }
@@ -65,7 +65,7 @@ function Test-ShouldGrantAllPermissions
         ForEach-Object { $grantArgs.$_ = $true }
         
     Grant-ServicePermission -Name $serviceName -Identity $username @grantArgs
-    $perm = Get-ServicePermissions -Name $serviceName -Identity $username
+    $perm = Get-ServicePermission -Name $serviceName -Identity $username
     Assert-NotNull $perm
     Assert-Equal ([Carbon.Security.ServiceAccessRights]::FullControl) $perm.ServiceAccessRights
 }

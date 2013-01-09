@@ -38,7 +38,7 @@ function TearDown
 
 function Test-ShouldGrantControlServicePermission
 {
-    $currentPerms = Get-ServicePermissions -Name $serviceName -Identity $user
+    $currentPerms = Get-ServicePermission -Name $serviceName -Identity $user
     Assert-Null $currentPerms "User '$user' already has permissions on '$serviceName'."
     
     Grant-ServiceControlPermission -ServiceName $serviceName -Identity $user
@@ -48,18 +48,18 @@ function Test-ShouldGrantControlServicePermission
                             [Carbon.Security.ServiceAccessRights]::EnumerateDependents -bor `
                             [Carbon.Security.ServiceAccessRights]::Start -bor `
                             [Carbon.Security.ServiceAccessRights]::Stop
-    $currentPerms = Get-ServicePermissions -Name $serviceName -Identity $user
+    $currentPerms = Get-ServicePermission -Name $serviceName -Identity $user
     Assert-NotNull $currentPerms
     Assert-Equal $expectedAccessRights $currentPerms.ServiceAccessRights
 }
 
 function Test-ShouldSupportWhatIf
 {
-    $currentPerms = Get-ServicePermissions -Name $serviceName -Identity $user
+    $currentPerms = Get-ServicePermission -Name $serviceName -Identity $user
     Assert-Null $currentPerms
     
     Grant-ServiceControlPermission -ServiceName $serviceName -Identity $user -WhatIf
     
-    $currentPerms = Get-ServicePermissions -Name $serviceName -Identity $user
+    $currentPerms = Get-ServicePermission -Name $serviceName -Identity $user
     Assert-Null $currentPerms
 }

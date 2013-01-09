@@ -19,10 +19,10 @@ function Get-ServiceAcl
     Gets the discretionary access control list (i.e. DACL) for a service.
     
     .DESCRIPTION
-    You wanted it, you got it!  You probably want to use `Get-ServicePermissions` instead.  If you want to chagne a service's permissions, use `Grant-ServicePermission` or `Revoke-ServicePermissions`.
+    You wanted it, you got it!  You probably want to use `Get-ServicePermission` instead.  If you want to chagne a service's permissions, use `Grant-ServicePermission` or `Revoke-ServicePermissions`.
     
     .LINK
-    Get-ServicePermissions
+    Get-ServicePermission
     
     .LINK
     Grant-ServicePermission

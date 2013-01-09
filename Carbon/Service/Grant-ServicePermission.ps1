@@ -26,7 +26,7 @@ function Grant-ServicePermission
     Any previous permissions are replaced.
     
     .LINK
-    Get-ServicePermissions
+    Get-ServicePermission
     
     .LINK
     Grant-ServiceControlPermissions

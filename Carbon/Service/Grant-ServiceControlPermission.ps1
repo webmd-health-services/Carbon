@@ -22,7 +22,7 @@ function Grant-ServiceControlPermission
     By default, only Administrators are allowed to control a service. You may notice that when running the `Stop-Service`, `Start-Service`, or `Restart-Service` cmdlets as a non-Administrator, you get permissions errors. That's because you need to correct permissions.  This function grants just the permissions needed to use PowerShell's `Stop-Service`, `Start-Service`, and `Restart-Service` cmdlets to control a service.
 
     .LINK
-    Get-ServicePermissions
+    Get-ServicePermission
     
     .LINK
     Grant-ServicePermission

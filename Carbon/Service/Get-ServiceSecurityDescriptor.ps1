@@ -19,13 +19,13 @@ function Get-ServiceSecurityDescriptor
     Gets the raw security descriptor for a service.
     
     .DESCRIPTION
-    You probably don't want to mess with the raw security descriptor.  Try `Get-ServicePermissions` instead.  Much more useful.
+    You probably don't want to mess with the raw security descriptor.  Try `Get-ServicePermission` instead.  Much more useful.
     
     .OUTPUTS
     System.Security.AccessControl.RawSecurityDescriptor.
     
     .LINK
-    Get-ServicePermissions
+    Get-ServicePermission
     
     .LINK
     Grant-ServicePermissions
