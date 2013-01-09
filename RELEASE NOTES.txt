@@ -59,6 +59,10 @@
  * Renamed `Grant-Permission`'s `Permissions` parameter to `Permission`, with backwards-compatible alias.
  * Renamed `Test-AdminPrivileges` to [Test-AdminPrivilege](http://get-carbon.org/help/Test-AdminPrivilege.html), with backwards-compatible alias.
  
+### Service
+
+ * Renamed `Get-ServicePermissions` to [Get-ServicePermission](http://get-carbon.org/help/Get-ServicePermission.html), with backwards-compatible alias.
+ 
  
 # 0.5.0.0 (7 January 2013)
 
