@@ -20,14 +20,14 @@ function Disable-IEEnhancedSecurityConfiguration
     .DESCRIPTION
     By default, Windows locks down Internet Explorer so that users can't visit certain sites.  This function disables that enhanced security.  This is necessary if you have automated processes that need to run and interact with Internet Explorer.
     
-    You may also need to call Enable-IEActivationPermissions, so that processes have permission to start Internet Explorer.
+    You may also need to call `Enable-IEActivationPermission`, so that processes have permission to start Internet Explorer.
     
     .EXAMPLE
     Disable-IEEnhancedSecurityConfiguration
     .LINK
     http://technet.microsoft.com/en-us/library/dd883248(v=WS.10).aspx
     .LINK
-    Enable-IEActivationPermissions
+    Enable-IEActivationPermission
     #>
     [CmdletBinding(SupportsShouldProcess=$true)]
     param(

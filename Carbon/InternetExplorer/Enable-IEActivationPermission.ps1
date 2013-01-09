@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Enable-IEActivationPermissions
+function Enable-IEActivationPermission
 {
     <#
     .SYNOPSIS
@@ -24,7 +24,7 @@ function Enable-IEActivationPermissions
     You may also need to call Disable-IEEnhancedSecurityConfiguration, so that Internet Explorer is allowed to visit all websites.
     
     .EXAMPLE
-    Enable-IEActivationPermissions
+    Enable-IEActivationPermission
 
     .LINK
     Disable-IEEnhancedSecurityConfiguration
@@ -68,3 +68,5 @@ function Enable-IEActivationPermissions
     Set-ItemProperty $ieRegPath "LaunchPermission" ([byte[]]$binarySD.binarySD)
     Set-ItemProperty $ieRegPath64 "LaunchPermission" ([byte[]]$binarySD.binarySD)
 }
+
+Set-Alias -Name 'Enable-IEActivationPermissions' -Value 'Enable-IEActivationPermission'
