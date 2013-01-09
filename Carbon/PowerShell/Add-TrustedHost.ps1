@@ -53,7 +53,7 @@ function Add-TrustedHost
     
     if( $pscmdlet.ShouldProcess( "trusted hosts", "adding $( ($newEntries -join ',') )" ) )
     {
-        Set-TrustedHosts -Entries $trustedHosts
+        Set-TrustedHost -Entry $trustedHosts
     }
 }
 

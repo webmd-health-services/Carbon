@@ -29,7 +29,7 @@ if( Test-AdminPrivileges )
     {
         if( $originalTrustedHosts )
         {
-            Set-TrustedHosts -Entries $originalTrustedHosts
+            Set-TrustedHost -Entry $originalTrustedHosts
         }
     }
 

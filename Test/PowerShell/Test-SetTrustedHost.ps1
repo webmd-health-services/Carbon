@@ -29,15 +29,15 @@ if( Test-AdminPrivileges )
     {
         if( $originalTrustedHosts )
         {
-            Set-TrustedHosts -Entries $originalTrustedHosts
+            Set-TrustedHost -Entry $originalTrustedHosts
         }
     }
 
     function Test-ShouldSetTrustedHosts
     {
-        Set-TrustedHosts 'example.com'
+        Set-TrustedHost 'example.com'
         Assert-Equal 'example.com' (Get-TrustedHost)
-        Set-TrustedHosts 'example.com','sub.example.com'
+        Set-TrustedHost 'example.com','sub.example.com'
         $hosts = @( Get-TrustedHost )
         Assert-Equal 'example.com' $hosts[0]
         Assert-Equal 'sub.example.com' $hosts[1]
@@ -45,9 +45,9 @@ if( Test-AdminPrivileges )
 
     function Test-ShouldSupportWhatIf
     {
-        Set-TrustedHosts 'example.com'
+        Set-TrustedHost 'example.com'
         Assert-Equal 'example.com' (Get-TrustedHost)
-        Set-TrustedHosts 'badexample.com' -WhatIf
+        Set-TrustedHost 'badexample.com' -WhatIf
         Assert-Equal 'example.com' (Get-TrustedHost)
     }
 }

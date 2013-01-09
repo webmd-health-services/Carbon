@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Set-TrustedHosts
+function Set-TrustedHost
 {
     <#
     .SYNOPSIS
@@ -27,7 +27,7 @@ function Set-TrustedHosts
     Clear-TrustedHost
 
     .EXAMPLE
-    Set-TrustedHosts example.com,api.example.com,docs.example.com
+    Set-TrustedHost -Entry example.com,api.example.com,docs.example.com
 
     Sets the trusted hosts list to contain just the values `example.com`, `api.example.com`, and `docs.example.com`.
     #>
@@ -36,12 +36,15 @@ function Set-TrustedHosts
         [Parameter(Mandatory=$true)]
         [string[]]
         # An array of trusted host entries.
-        $Entries
+		[Alias("Entries")]
+        $Entry
     )
     
-    $value = $Entries -join ','
+    $value = $Entry -join ','
     if( $pscmdlet.ShouldProcess( 'trusted hosts', 'set' ) )
     {
         Set-Item $TrustedHostsPath -Value $Value -Force
     }
 }
+
+Set-Alias -Name 'Set-TrustedHosts' -Value 'Set-TrustedHost'

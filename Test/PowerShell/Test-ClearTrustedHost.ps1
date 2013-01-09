@@ -28,13 +28,13 @@ if( Test-AdminPrivileges )
     {
         if( $originalTrustedHosts )
         {
-            Set-TrustedHosts -Entries $originalTrustedHosts
+            Set-TrustedHost -Entry $originalTrustedHosts
         }
     }
 
     function Test-ShouldRemoveTrustedHosts
     {
-        Set-TrustedHosts 'example.com'
+        Set-TrustedHost 'example.com'
         Assert-Equal 'example.com' (Get-TrustedHost)
         Clear-TrustedHost
         Assert-Empty (Get-TrustedHost)
@@ -42,7 +42,7 @@ if( Test-AdminPrivileges )
     
     function Test-ShouldSupportWhatIf
     {
-        Set-TrustedHosts 'example.com'
+        Set-TrustedHost 'example.com'
         Assert-Equal 'example.com' (Get-TrustedHost)
         Clear-TrustedHost -WhatIf
         Assert-Equal 'example.com' (Get-TrustedHost)
