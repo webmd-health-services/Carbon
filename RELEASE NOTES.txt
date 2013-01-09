@@ -6,6 +6,10 @@
  
  * Renamed `Format-ADSpecialCharacters` to [Format-ADSearchFilterValue](http://get-carbon.org/help/Format-ADSearchFilterValue.html), with backwards-compatible alias.
  
+### Certificates
+
+ * Renamed `Get-SslCertificateBindings` to [Get-SslCertificateBinding](http://get-carbon.org/help/Get-SslCertificateBinding.html), with backwards-compatible alias.
+ 
 
 # 0.5.0.0 (7 January 2013)
 

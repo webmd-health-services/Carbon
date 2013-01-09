@@ -32,7 +32,7 @@ function Test-ShouldCreateNewSslCertificateBinding
     $ipAddress = '74.32.80.43'
     $port = '3847'
     Set-SslCertificateBinding -IPAddress $ipAddress -Port $port -ApplicationID $appID -Thumbprint $cert.Thumbprint
-    $binding = Get-SslCertificateBindings -IPAddress $ipAddress -Port $port
+    $binding = Get-SslCertificateBinding -IPAddress $ipAddress -Port $port
     try
     {
         Assert-NotNull $binding

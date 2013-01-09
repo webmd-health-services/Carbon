@@ -57,7 +57,7 @@ function Test-SslCertificateBinding
         $getArgs.Port = $Port
     }
     
-    $binding = Get-SslCertificateBindings @getArgs
+    $binding = Get-SslCertificateBinding @getArgs
     if( $binding )
     {
         return $True
