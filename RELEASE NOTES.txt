@@ -63,6 +63,11 @@
 
  * Renamed `Get-ServicePermissions` to [Get-ServicePermission](http://get-carbon.org/help/Get-ServicePermission.html), with backwards-compatible alias.
  
+### Users and Groups
+
+ * Renamed `Add-GroupMembers` to [Add-GroupMember](http://get-carbon.org/help/Add-GroupMember.html), with backwards-compatible alias.
+ * Renamed `Add-GroupMember`'s `Members` parameter to `Member`.
+ 
  
 # 0.5.0.0 (7 January 2013)
 

@@ -55,6 +55,6 @@ function Install-Group
     
     if( $Members )
     {
-        Add-GroupMembers -Name $Name -Members $Members
+        Add-GroupMember -Name $Name -Member $Members
     }
 }
