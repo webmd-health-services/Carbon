@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-    <title>PowerShell - Set-TrustedHosts - Carbon</title>
+    <title>PowerShell - Get-ComPermission - Carbon</title>
 	<link href="styles.css" type="text/css" rel="stylesheet" />
 </head>
 <body>
@@ -16,14 +16,14 @@
 		<li class="Category">ActiveDirectory</li>
 		<ul class="CommandMenu">
 			<li><a href="Find-ADUser.html">Find-ADUser</a></li>
-			<li><a href="Format-ADSpecialCharacters.html">Format-ADSpecialCharacters</a></li>
+			<li><a href="Format-ADSearchFilterValue.html">Format-ADSearchFilterValue</a></li>
 			<li><a href="Get-ADDomainController.html">Get-ADDomainController</a></li>
 		</ul>
 		<li class="Category">Certificates</li>
 		<ul class="CommandMenu">
 			<li><a href="Get-Certificate.html">Get-Certificate</a></li>
 			<li><a href="Get-CertificateStore.html">Get-CertificateStore</a></li>
-			<li><a href="Get-SslCertificateBindings.html">Get-SslCertificateBindings</a></li>
+			<li><a href="Get-SslCertificateBinding.html">Get-SslCertificateBinding</a></li>
 			<li><a href="Install-Certificate.html">Install-Certificate</a></li>
 			<li><a href="Remove-SslCertificateBinding.html">Remove-SslCertificateBinding</a></li>
 			<li><a href="Set-SslCertificateBinding.html">Set-SslCertificateBinding</a></li>
@@ -32,10 +32,10 @@
 		</ul>
 		<li class="Category">COM</li>
 		<ul class="CommandMenu">
-			<li><a href="Get-ComPermissions.html">Get-ComPermissions</a></li>
+			<li><a href="Get-ComPermission.html">Get-ComPermission</a></li>
 			<li><a href="Get-ComSecurityDescriptor.html">Get-ComSecurityDescriptor</a></li>
-			<li><a href="Grant-ComPermissions.html">Grant-ComPermissions</a></li>
-			<li><a href="Revoke-ComPermissions.html">Revoke-ComPermissions</a></li>
+			<li><a href="Grant-ComPermission.html">Grant-ComPermission</a></li>
+			<li><a href="Revoke-ComPermission.html">Revoke-ComPermission</a></li>
 		</ul>
 		<li class="Category">Computer</li>
 		<ul class="CommandMenu">
@@ -66,7 +66,7 @@
 			<li><a href="Assert-FirewallConfigurable.html">Assert-FirewallConfigurable</a></li>
 			<li><a href="Disable-FirewallStatefulFtp.html">Disable-FirewallStatefulFtp</a></li>
 			<li><a href="Enable-FirewallStatefulFtp.html">Enable-FirewallStatefulFtp</a></li>
-			<li><a href="Get-FirewallRules.html">Get-FirewallRules</a></li>
+			<li><a href="Get-FirewallRule.html">Get-FirewallRule</a></li>
 			<li><a href="Test-FirewallStatefulFtp.html">Test-FirewallStatefulFtp</a></li>
 		</ul>
 		<li class="Category">HostsFile</li>
@@ -78,7 +78,7 @@
 		<li class="Category">IIS</li>
 		<ul class="CommandMenu">
 			<li><a href="Add-IisDefaultDocument.html">Add-IisDefaultDocument</a></li>
-			<li><a href="Add-IisServerManagerMembers.html">Add-IisServerManagerMembers</a></li>
+			<li><a href="Add-IisServerManagerMember.html">Add-IisServerManagerMember</a></li>
 			<li><a href="Disable-IisSecurityAuthentication.html">Disable-IisSecurityAuthentication</a></li>
 			<li><a href="Enable-IisDirectoryBrowsing.html">Enable-IisDirectoryBrowsing</a></li>
 			<li><a href="Enable-IisSecurityAuthentication.html">Enable-IisSecurityAuthentication</a></li>
@@ -114,7 +114,7 @@
 		<li class="Category">InternetExplorer</li>
 		<ul class="CommandMenu">
 			<li><a href="Disable-IEEnhancedSecurityConfiguration.html">Disable-IEEnhancedSecurityConfiguration</a></li>
-			<li><a href="Enable-IEActivationPermissions.html">Enable-IEActivationPermissions</a></li>
+			<li><a href="Enable-IEActivationPermission.html">Enable-IEActivationPermission</a></li>
 		</ul>
 		<li class="Category">MSI</li>
 		<ul class="CommandMenu">
@@ -124,7 +124,7 @@
 		<ul class="CommandMenu">
 			<li><a href="Get-MsmqMessageQueue.html">Get-MsmqMessageQueue</a></li>
 			<li><a href="Get-MsmqMessageQueuePath.html">Get-MsmqMessageQueuePath</a></li>
-			<li><a href="Grant-MSMQMessageQueuePermissions.html">Grant-MSMQMessageQueuePermissions</a></li>
+			<li><a href="Grant-MsmqMessageQueuePermission.html">Grant-MsmqMessageQueuePermission</a></li>
 			<li><a href="Install-Msmq.html">Install-Msmq</a></li>
 			<li><a href="Install-MsmqMessageQueue.html">Install-MsmqMessageQueue</a></li>
 			<li><a href="Reset-MsmqQueueManagerID.html">Reset-MsmqQueueManagerID</a></li>
@@ -139,7 +139,7 @@
 		</ul>
 		<li class="Category">PerformanceCounters</li>
 		<ul class="CommandMenu">
-			<li><a href="Get-PerformanceCounters.html">Get-PerformanceCounters</a></li>
+			<li><a href="Get-PerformanceCounter.html">Get-PerformanceCounter</a></li>
 			<li><a href="Install-PerformanceCounter.html">Install-PerformanceCounter</a></li>
 			<li><a href="Test-PerformanceCounter.html">Test-PerformanceCounter</a></li>
 			<li><a href="Test-PerformanceCounterCategory.html">Test-PerformanceCounterCategory</a></li>
@@ -147,19 +147,19 @@
 		</ul>
 		<li class="Category">PowerShell</li>
 		<ul class="CommandMenu">
-			<li><a href="Add-TrustedHosts.html">Add-TrustedHosts</a></li>
-			<li><a href="Clear-TrustedHosts.html">Clear-TrustedHosts</a></li>
-			<li><a href="Complete-Jobs.html">Complete-Jobs</a></li>
+			<li><a href="Add-TrustedHost.html">Add-TrustedHost</a></li>
+			<li><a href="Clear-TrustedHost.html">Clear-TrustedHost</a></li>
+			<li><a href="Complete-Job.html">Complete-Job</a></li>
 			<li><a href="Get-PowershellPath.html">Get-PowershellPath</a></li>
-			<li><a href="Get-TrustedHosts.html">Get-TrustedHosts</a></li>
+			<li><a href="Get-TrustedHost.html">Get-TrustedHost</a></li>
 			<li><a href="Invoke-PowerShell.html">Invoke-PowerShell</a></li>
-			<li><a href="Set-TrustedHosts.html">Set-TrustedHosts</a></li>
+			<li><a href="Set-TrustedHost.html">Set-TrustedHost</a></li>
 			<li><a href="Test-PowerShellIs32Bit.html">Test-PowerShellIs32Bit</a></li>
 			<li><a href="Test-PowerShellIs64Bit.html">Test-PowerShellIs64Bit</a></li>
 		</ul>
 		<li class="Category">Privileges</li>
 		<ul class="CommandMenu">
-			<li><a href="Get-Privileges.html">Get-Privileges</a></li>
+			<li><a href="Get-Privilege.html">Get-Privilege</a></li>
 			<li><a href="Grant-Privilege.html">Grant-Privilege</a></li>
 			<li><a href="Revoke-Privilege.html">Revoke-Privilege</a></li>
 			<li><a href="Test-Privilege.html">Test-Privilege</a></li>
@@ -174,21 +174,21 @@
 		</ul>
 		<li class="Category">Security</li>
 		<ul class="CommandMenu">
-			<li><a href="Assert-AdminPrivileges.html">Assert-AdminPrivileges</a></li>
+			<li><a href="Assert-AdminPrivilege.html">Assert-AdminPrivilege</a></li>
 			<li><a href="Convert-SecureStringToString.html">Convert-SecureStringToString</a></li>
-			<li><a href="ConvertTo-InheritanceFlags.html">ConvertTo-InheritanceFlags</a></li>
-			<li><a href="ConvertTo-PropagationFlags.html">ConvertTo-PropagationFlags</a></li>
-			<li><a href="Get-Permissions.html">Get-Permissions</a></li>
-			<li><a href="Grant-Permissions.html">Grant-Permissions</a></li>
+			<li><a href="ConvertTo-InheritanceFlag.html">ConvertTo-InheritanceFlag</a></li>
+			<li><a href="ConvertTo-PropagationFlag.html">ConvertTo-PropagationFlag</a></li>
+			<li><a href="Get-Permission.html">Get-Permission</a></li>
+			<li><a href="Grant-Permission.html">Grant-Permission</a></li>
 			<li><a href="New-Credential.html">New-Credential</a></li>
 			<li><a href="Protect-Acl.html">Protect-Acl</a></li>
-			<li><a href="Test-AdminPrivileges.html">Test-AdminPrivileges</a></li>
+			<li><a href="Test-AdminPrivilege.html">Test-AdminPrivilege</a></li>
 		</ul>
 		<li class="Category">Service</li>
 		<ul class="CommandMenu">
 			<li><a href="Assert-Service.html">Assert-Service</a></li>
 			<li><a href="Get-ServiceAcl.html">Get-ServiceAcl</a></li>
-			<li><a href="Get-ServicePermissions.html">Get-ServicePermissions</a></li>
+			<li><a href="Get-ServicePermission.html">Get-ServicePermission</a></li>
 			<li><a href="Get-ServiceSecurityDescriptor.html">Get-ServiceSecurityDescriptor</a></li>
 			<li><a href="Grant-ServiceControlPermission.html">Grant-ServiceControlPermission</a></li>
 			<li><a href="Grant-ServicePermission.html">Grant-ServicePermission</a></li>
@@ -205,7 +205,7 @@
 		</ul>
 		<li class="Category">UsersAndGroups</li>
 		<ul class="CommandMenu">
-			<li><a href="Add-GroupMembers.html">Add-GroupMembers</a></li>
+			<li><a href="Add-GroupMember.html">Add-GroupMember</a></li>
 			<li><a href="Get-WmiLocalUserAccount.html">Get-WmiLocalUserAccount</a></li>
 			<li><a href="Install-Group.html">Install-Group</a></li>
 			<li><a href="Install-User.html">Install-User</a></li>
@@ -227,24 +227,30 @@
 </div>
 
 
-    <h1>Set-TrustedHosts</h1>
-    <div><p>Sets the current computer's trusted hosts list.</p>
+    <h1>Get-ComPermission</h1>
+    <div><p>Gets the COM Access or Launch and Activation permissions for the current computer.</p>
 </div>
 
         <h2>Syntax</h2>
-    <pre class="Syntax"><code>Set-TrustedHosts [-Entries] &lt;String[]&gt; [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
+    <pre class="Syntax"><code>Get-ComPermission -Access -Limits [-Identity &lt;String&gt;] [&lt;CommonParameters&gt;]</code></pre>
+<pre class="Syntax"><code>Get-ComPermission -Access -Default [-Identity &lt;String&gt;] [&lt;CommonParameters&gt;]</code></pre>
+<pre class="Syntax"><code>Get-ComPermission -LaunchAndActivation -Limits [-Identity &lt;String&gt;] [&lt;CommonParameters&gt;]</code></pre>
+<pre class="Syntax"><code>Get-ComPermission -LaunchAndActivation -Default [-Identity &lt;String&gt;] [&lt;CommonParameters&gt;]</code></pre>
     
         <h2>Description</h2>
     <div class="Description">
-        <p>Clears the current trusted hosts list, and sets it to contain only the entries given by the <code>Entries</code> parameter.</p>
+        <p>COM access permissions ared used to "allow default access to application" or "set limits on applications that determine their own permissions".  Launch and Activation permissions are used "who is allowed to launch applications or activate objects" and to "set limits on applications that determine their own permissions."  Usually, these permissions are viewed and edited by opening dcomcnfg, right-clicking My Computer under Component Services > Computers, choosing Properties, going to the COM Security tab, and clicking <code>Edit Default...</code> or <code>Edit Limits...</code> buttons under the <strong>Access Permissions</strong> or <strong>Launch and Activation Permissions</strong> sections.  This function does all that, but does it much easier, and returns objects you can work with.</p>
 
-<p>To clear the trusted hosts list, use <code>Clear-TrustedHosts</code>.</p>
+<p>These permissions are stored in the registry, under <code>HKLM\Software\Microsoft\Ole</code>.  The default security registry value for Access Permissions is missing/empty until custom permissions are granted.  If this is the case, this function will return objects that represent the default security, which was lovingly reverse engineered by gnomes.</p>
+
+<p>Returns <code>Carbon.Security.ComAccessRule</code> objects, which inherit from `<a href="http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.accessrule.aspx">System.Security.AccessControl.AccessRule</a>.</p>
 
     </div>
     
             <h2>Related Commands</h2>
         <ul>
-<li><a href="Clear-TrustedHosts.html">Clear-TrustedHosts</a></li>
+<li><a href="Grant-ComPermission.html">Grant-ComPermission</a></li>
+<li><a href="Revoke-ComPermission.html">Revoke-ComPermission</a></li>
 </ul>
 
 
@@ -259,49 +265,67 @@
 				<th>Default Value</th>
 			</tr>
             			<tr valign='top'>
-				<td>Entries</td>
-				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String[]</a></td>
-				<td>An array of trusted host entries.
+				<td>Access</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+				<td>If set, returns permissions for COM Access permissions.
 </td>
 				<td>true</td>
 				<td>false</td>
                 <td></td>
 			</tr>
 			<tr valign='top'>
-				<td>WhatIf</td>
+				<td>LaunchAndActivation</td>
 				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
-				<td></td>
-				<td>false</td>
+				<td>If set, returns permissions for COM Access permissions.
+</td>
+				<td>true</td>
 				<td>false</td>
                 <td></td>
 			</tr>
 			<tr valign='top'>
-				<td>Confirm</td>
+				<td>Default</td>
 				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
-				<td></td>
+				<td>Gets default security permissions.
+</td>
+				<td>true</td>
+				<td>false</td>
+                <td></td>
+			</tr>
+			<tr valign='top'>
+				<td>Limits</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+				<td>Gets security limit permissions.
+</td>
+				<td>true</td>
+				<td>false</td>
+                <td></td>
+			</tr>
+			<tr valign='top'>
+				<td>Identity</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+				<td>The identity whose access rule to return.  If not set, all access rules are returned.
+</td>
 				<td>false</td>
 				<td>false</td>
                 <td></td>
 			</tr>
-                            <tr valign="top">
-                <td><a href="http://technet.microsoft.com/en-us/library/dd315352.aspx">CommonParameters</a></td>
-                <td></td>
-                <td>This cmdlet supports common parameters.  For more information type <br> <code>Get-Help about_CommonParameters</code>.</td>
-                <td></td>
-                <td></td>
-                <td></td>
-                </tr>
+            
         </table>
         
     
         
-    
+            <h2>Return Values</h2>
+        <p><a href="http://msdn.microsoft.com/en-us/library/carbon.security.comaccessrule.aspx">Carbon.Security.ComAccessRule</a>. </p>
+
         
     
         
                 <h2>EXAMPLE 1</h2>
-            <pre><code>Set-TrustedHosts example.com,api.example.com,docs.example.com</code></pre>
-            <p><p>Sets the trusted hosts list to contain just the values <code>example.com</code>, <code>api.example.com</code>, and <code>docs.example.com</code>.</p>
+            <pre><code>Get-ComPermission -Access -Default</code></pre>
+            <p><p>Gets the COM access default security permissions. Look how easy it is!</p>
+</p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 2</h2>
+            <pre><code>Get-ComPermission -LaunchAndActivation -Identity 'Administrators' -Limits</code></pre>
+            <p><p>Gets the security limits for COM Launch and Activation permissions for the local administrators group.</p>
 </p><p></p><p></p><p></p><p></p>
 </body>
 </html>   

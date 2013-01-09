@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-    <title>PowerShell - Grant-ComPermissions - Carbon</title>
+    <title>PowerShell - Grant-Permission - Carbon</title>
 	<link href="styles.css" type="text/css" rel="stylesheet" />
 </head>
 <body>
@@ -16,14 +16,14 @@
 		<li class="Category">ActiveDirectory</li>
 		<ul class="CommandMenu">
 			<li><a href="Find-ADUser.html">Find-ADUser</a></li>
-			<li><a href="Format-ADSpecialCharacters.html">Format-ADSpecialCharacters</a></li>
+			<li><a href="Format-ADSearchFilterValue.html">Format-ADSearchFilterValue</a></li>
 			<li><a href="Get-ADDomainController.html">Get-ADDomainController</a></li>
 		</ul>
 		<li class="Category">Certificates</li>
 		<ul class="CommandMenu">
 			<li><a href="Get-Certificate.html">Get-Certificate</a></li>
 			<li><a href="Get-CertificateStore.html">Get-CertificateStore</a></li>
-			<li><a href="Get-SslCertificateBindings.html">Get-SslCertificateBindings</a></li>
+			<li><a href="Get-SslCertificateBinding.html">Get-SslCertificateBinding</a></li>
 			<li><a href="Install-Certificate.html">Install-Certificate</a></li>
 			<li><a href="Remove-SslCertificateBinding.html">Remove-SslCertificateBinding</a></li>
 			<li><a href="Set-SslCertificateBinding.html">Set-SslCertificateBinding</a></li>
@@ -32,10 +32,10 @@
 		</ul>
 		<li class="Category">COM</li>
 		<ul class="CommandMenu">
-			<li><a href="Get-ComPermissions.html">Get-ComPermissions</a></li>
+			<li><a href="Get-ComPermission.html">Get-ComPermission</a></li>
 			<li><a href="Get-ComSecurityDescriptor.html">Get-ComSecurityDescriptor</a></li>
-			<li><a href="Grant-ComPermissions.html">Grant-ComPermissions</a></li>
-			<li><a href="Revoke-ComPermissions.html">Revoke-ComPermissions</a></li>
+			<li><a href="Grant-ComPermission.html">Grant-ComPermission</a></li>
+			<li><a href="Revoke-ComPermission.html">Revoke-ComPermission</a></li>
 		</ul>
 		<li class="Category">Computer</li>
 		<ul class="CommandMenu">
@@ -66,7 +66,7 @@
 			<li><a href="Assert-FirewallConfigurable.html">Assert-FirewallConfigurable</a></li>
 			<li><a href="Disable-FirewallStatefulFtp.html">Disable-FirewallStatefulFtp</a></li>
 			<li><a href="Enable-FirewallStatefulFtp.html">Enable-FirewallStatefulFtp</a></li>
-			<li><a href="Get-FirewallRules.html">Get-FirewallRules</a></li>
+			<li><a href="Get-FirewallRule.html">Get-FirewallRule</a></li>
 			<li><a href="Test-FirewallStatefulFtp.html">Test-FirewallStatefulFtp</a></li>
 		</ul>
 		<li class="Category">HostsFile</li>
@@ -78,7 +78,7 @@
 		<li class="Category">IIS</li>
 		<ul class="CommandMenu">
 			<li><a href="Add-IisDefaultDocument.html">Add-IisDefaultDocument</a></li>
-			<li><a href="Add-IisServerManagerMembers.html">Add-IisServerManagerMembers</a></li>
+			<li><a href="Add-IisServerManagerMember.html">Add-IisServerManagerMember</a></li>
 			<li><a href="Disable-IisSecurityAuthentication.html">Disable-IisSecurityAuthentication</a></li>
 			<li><a href="Enable-IisDirectoryBrowsing.html">Enable-IisDirectoryBrowsing</a></li>
 			<li><a href="Enable-IisSecurityAuthentication.html">Enable-IisSecurityAuthentication</a></li>
@@ -114,7 +114,7 @@
 		<li class="Category">InternetExplorer</li>
 		<ul class="CommandMenu">
 			<li><a href="Disable-IEEnhancedSecurityConfiguration.html">Disable-IEEnhancedSecurityConfiguration</a></li>
-			<li><a href="Enable-IEActivationPermissions.html">Enable-IEActivationPermissions</a></li>
+			<li><a href="Enable-IEActivationPermission.html">Enable-IEActivationPermission</a></li>
 		</ul>
 		<li class="Category">MSI</li>
 		<ul class="CommandMenu">
@@ -124,7 +124,7 @@
 		<ul class="CommandMenu">
 			<li><a href="Get-MsmqMessageQueue.html">Get-MsmqMessageQueue</a></li>
 			<li><a href="Get-MsmqMessageQueuePath.html">Get-MsmqMessageQueuePath</a></li>
-			<li><a href="Grant-MSMQMessageQueuePermissions.html">Grant-MSMQMessageQueuePermissions</a></li>
+			<li><a href="Grant-MsmqMessageQueuePermission.html">Grant-MsmqMessageQueuePermission</a></li>
 			<li><a href="Install-Msmq.html">Install-Msmq</a></li>
 			<li><a href="Install-MsmqMessageQueue.html">Install-MsmqMessageQueue</a></li>
 			<li><a href="Reset-MsmqQueueManagerID.html">Reset-MsmqQueueManagerID</a></li>
@@ -139,7 +139,7 @@
 		</ul>
 		<li class="Category">PerformanceCounters</li>
 		<ul class="CommandMenu">
-			<li><a href="Get-PerformanceCounters.html">Get-PerformanceCounters</a></li>
+			<li><a href="Get-PerformanceCounter.html">Get-PerformanceCounter</a></li>
 			<li><a href="Install-PerformanceCounter.html">Install-PerformanceCounter</a></li>
 			<li><a href="Test-PerformanceCounter.html">Test-PerformanceCounter</a></li>
 			<li><a href="Test-PerformanceCounterCategory.html">Test-PerformanceCounterCategory</a></li>
@@ -147,19 +147,19 @@
 		</ul>
 		<li class="Category">PowerShell</li>
 		<ul class="CommandMenu">
-			<li><a href="Add-TrustedHosts.html">Add-TrustedHosts</a></li>
-			<li><a href="Clear-TrustedHosts.html">Clear-TrustedHosts</a></li>
-			<li><a href="Complete-Jobs.html">Complete-Jobs</a></li>
+			<li><a href="Add-TrustedHost.html">Add-TrustedHost</a></li>
+			<li><a href="Clear-TrustedHost.html">Clear-TrustedHost</a></li>
+			<li><a href="Complete-Job.html">Complete-Job</a></li>
 			<li><a href="Get-PowershellPath.html">Get-PowershellPath</a></li>
-			<li><a href="Get-TrustedHosts.html">Get-TrustedHosts</a></li>
+			<li><a href="Get-TrustedHost.html">Get-TrustedHost</a></li>
 			<li><a href="Invoke-PowerShell.html">Invoke-PowerShell</a></li>
-			<li><a href="Set-TrustedHosts.html">Set-TrustedHosts</a></li>
+			<li><a href="Set-TrustedHost.html">Set-TrustedHost</a></li>
 			<li><a href="Test-PowerShellIs32Bit.html">Test-PowerShellIs32Bit</a></li>
 			<li><a href="Test-PowerShellIs64Bit.html">Test-PowerShellIs64Bit</a></li>
 		</ul>
 		<li class="Category">Privileges</li>
 		<ul class="CommandMenu">
-			<li><a href="Get-Privileges.html">Get-Privileges</a></li>
+			<li><a href="Get-Privilege.html">Get-Privilege</a></li>
 			<li><a href="Grant-Privilege.html">Grant-Privilege</a></li>
 			<li><a href="Revoke-Privilege.html">Revoke-Privilege</a></li>
 			<li><a href="Test-Privilege.html">Test-Privilege</a></li>
@@ -174,21 +174,21 @@
 		</ul>
 		<li class="Category">Security</li>
 		<ul class="CommandMenu">
-			<li><a href="Assert-AdminPrivileges.html">Assert-AdminPrivileges</a></li>
+			<li><a href="Assert-AdminPrivilege.html">Assert-AdminPrivilege</a></li>
 			<li><a href="Convert-SecureStringToString.html">Convert-SecureStringToString</a></li>
-			<li><a href="ConvertTo-InheritanceFlags.html">ConvertTo-InheritanceFlags</a></li>
-			<li><a href="ConvertTo-PropagationFlags.html">ConvertTo-PropagationFlags</a></li>
-			<li><a href="Get-Permissions.html">Get-Permissions</a></li>
-			<li><a href="Grant-Permissions.html">Grant-Permissions</a></li>
+			<li><a href="ConvertTo-InheritanceFlag.html">ConvertTo-InheritanceFlag</a></li>
+			<li><a href="ConvertTo-PropagationFlag.html">ConvertTo-PropagationFlag</a></li>
+			<li><a href="Get-Permission.html">Get-Permission</a></li>
+			<li><a href="Grant-Permission.html">Grant-Permission</a></li>
 			<li><a href="New-Credential.html">New-Credential</a></li>
 			<li><a href="Protect-Acl.html">Protect-Acl</a></li>
-			<li><a href="Test-AdminPrivileges.html">Test-AdminPrivileges</a></li>
+			<li><a href="Test-AdminPrivilege.html">Test-AdminPrivilege</a></li>
 		</ul>
 		<li class="Category">Service</li>
 		<ul class="CommandMenu">
 			<li><a href="Assert-Service.html">Assert-Service</a></li>
 			<li><a href="Get-ServiceAcl.html">Get-ServiceAcl</a></li>
-			<li><a href="Get-ServicePermissions.html">Get-ServicePermissions</a></li>
+			<li><a href="Get-ServicePermission.html">Get-ServicePermission</a></li>
 			<li><a href="Get-ServiceSecurityDescriptor.html">Get-ServiceSecurityDescriptor</a></li>
 			<li><a href="Grant-ServiceControlPermission.html">Grant-ServiceControlPermission</a></li>
 			<li><a href="Grant-ServicePermission.html">Grant-ServicePermission</a></li>
@@ -205,7 +205,7 @@
 		</ul>
 		<li class="Category">UsersAndGroups</li>
 		<ul class="CommandMenu">
-			<li><a href="Add-GroupMembers.html">Add-GroupMembers</a></li>
+			<li><a href="Add-GroupMember.html">Add-GroupMember</a></li>
 			<li><a href="Get-WmiLocalUserAccount.html">Get-WmiLocalUserAccount</a></li>
 			<li><a href="Install-Group.html">Install-Group</a></li>
 			<li><a href="Install-User.html">Install-User</a></li>
@@ -227,32 +227,94 @@
 </div>
 
 
-    <h1>Grant-ComPermissions</h1>
-    <div><p>Grants COM access permissions.</p>
+    <h1>Grant-Permission</h1>
+    <div><p>Grants permission on a file, directory or registry key.</p>
 </div>
 
         <h2>Syntax</h2>
-    <pre class="Syntax"><code>Grant-ComPermissions -Identity &lt;String&gt; -Access -Limits -Deny [-Local] [-Remote] [&lt;CommonParameters&gt;]</code></pre>
-<pre class="Syntax"><code>Grant-ComPermissions -Identity &lt;String&gt; -Access -Default -Deny [-Local] [-Remote] [&lt;CommonParameters&gt;]</code></pre>
-<pre class="Syntax"><code>Grant-ComPermissions -Identity &lt;String&gt; -Access -Limits -Allow [-Local] [-Remote] [&lt;CommonParameters&gt;]</code></pre>
-<pre class="Syntax"><code>Grant-ComPermissions -Identity &lt;String&gt; -Access -Default -Allow [-Local] [-Remote] [&lt;CommonParameters&gt;]</code></pre>
-<pre class="Syntax"><code>Grant-ComPermissions -Identity &lt;String&gt; -LaunchAndActivation -Limits -Deny [-LocalLaunch] [-RemoteLaunch] [-LocalActivation] [-RemoteActivation] [&lt;CommonParameters&gt;]</code></pre>
-<pre class="Syntax"><code>Grant-ComPermissions -Identity &lt;String&gt; -LaunchAndActivation -Default -Deny [-LocalLaunch] [-RemoteLaunch] [-LocalActivation] [-RemoteActivation] [&lt;CommonParameters&gt;]</code></pre>
-<pre class="Syntax"><code>Grant-ComPermissions -Identity &lt;String&gt; -LaunchAndActivation -Limits -Allow [-LocalLaunch] [-RemoteLaunch] [-LocalActivation] [-RemoteActivation] [&lt;CommonParameters&gt;]</code></pre>
-<pre class="Syntax"><code>Grant-ComPermissions -Identity &lt;String&gt; -LaunchAndActivation -Default -Allow [-LocalLaunch] [-RemoteLaunch] [-LocalActivation] [-RemoteActivation] [&lt;CommonParameters&gt;]</code></pre>
+    <pre class="Syntax"><code>Grant-Permission [-Path] &lt;String&gt; [-Identity] &lt;String&gt; [-Permission] &lt;String[]&gt; [[-ApplyTo] {Container | SubContainers | ContainerAndSubContainers | Leaves | ContainerAndLeaves | SubContainersAndLeaves | ContainerAndSubContainersAndLeaves | ChildContainers | ContainerAndChildContainers | ChildLeaves | ContainerAndChildLeaves | ChildContainersAndChildLeaves | ContainerAndChildContainersAndChildLeaves}] [-Clear] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
     
         <h2>Description</h2>
     <div class="Description">
-        <p>Calling this function is equivalent to opening Component Services (dcomcnfg), right-clicking <code>My Computer</code> under Component Services > Computers, choosing <code>Properties</code>, going to the <code>COM Security</code> tab, and modifying the permission after clicking the <code>Edit Limits...</code> or <code>Edit Default...</code> buttons under the <code>Access Permissions</code> section.</p>
+        <p>Granting access to a file system entry or registry key requires a lot of steps.  This method reduces it to one call.  Very helpful.</p>
 
-<p>You must set at least one of the <code>LocalAccess</code> or <code>RemoteAccess</code> switches.</p>
+<p>It has the advantage that it will set permissions on a file system object or a registry.  If <code>Path</code> is absolute, the correct provider (file system or registry) is used.  If <code>Path</code> is relative, the provider of the current location will be used.</p>
+
+<p>The <code>Permissions</code> attribute can be a list of <a href="http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.filesystemrights.aspx">FileSystemRights</a> or <a href="http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.registryrights.aspx">RegistryRights</a>.</p>
+
+<p>This command will show you the values for the <code>FileSystemRights</code>:</p>
+
+<pre><code>[Enum]::GetValues([Security.AccessControl.FileSystemRights])
+</code></pre>
+
+<p>This command will show you the values for the <code>RegistryRights</code>:</p>
+
+<pre><code>[Enum]::GetValues([Security.AccessControl.RegistryRights])
+</code></pre>
+
+<p>When setting permissions on a container (directory/registry key) You can control inheritance and propagation flags using the <code>ApplyTo</code> parameter.  There are 13 possible combinations.  Examples work best.  Here is a simple hierarchy:</p>
+
+<pre><code>    C
+   / \
+  CC CL
+ /  \
+GC  GL
+</code></pre>
+
+<p>C is the <strong>C</strong>ontainer permissions are getting set on
+CC is a <strong>C</strong>hild <strong>C</strong>ontainer.
+CL is a <strong>C</strong>hild ** <strong>L</strong>eaf
+GC is a <strong>G</strong>randchild <strong>C</strong>ontainer and includes all sub-containers below it.
+GL is a <strong>G</strong>randchild <strong>L</strong>eaf.</p>
+
+<p>The <code>ApplyTo</code> parameter takes one of the following 13 values and applies permissions to:</p>
+
+<ul>
+<li><strong>Container</strong> - The container itself and nothing below it.</li>
+<li><strong>SubContainers</strong> - All sub-containers under the container, e.g. CC and GC. </li>
+<li><strong>Leaves</strong> - All leaves under the container, e.g. CL and GL.</li>
+<li><strong>ChildContainers</strong> - Just the container's child containers, e.g. CC.</li>
+<li><strong>ChildLeaves</strong> - Just the container's child leaves, e.g. CL.</li>
+<li><strong>ContainerAndSubContainers</strong> - The container and all its sub-containers, e.g. C, CC, and GC.</li>
+<li><strong>ContainerAndLeaves</strong> - The container and all leaves under it, e.g. C and CL.</li>
+<li><strong>SubContainerAndLeaves</strong> - All sub-containers and leaves, but not the container itself, e.g. CC, CL, GC, and GL.</li>
+<li><strong>ContainerAndChildContainers</strong> - The container and all just its child containers, e.g. C and CC.</li>
+<li><strong>ContainerAndChildLeaves</strong> - The container and just its child leaves, e.g. C and CL.</li>
+<li><strong>ContainerAndChildContainersAndChildLeaves</strong> - The container and just its child containers/leaves, e.g. C, CC, and CL.</li>
+<li><strong>ContainerAndSubContainersAndLeaves</strong> - Everything, full inheritance/propogation, e.g. C, CC, GC, GL.  <strong>This is the default.</strong></li>
+<li><strong>ChildContainersAndChildLeaves</strong>  - Just the container's child containers/leaves, e.g. CC and CL.</li>
+</ul>
+
+<p>The following table maps <code>ContainerInheritanceFlags</code> values to the actual <code>InheritanceFlags</code> and <code>PropagationFlags</code> values used:</p>
+
+<pre><code>ContainerInheritanceFlags                   InheritanceFlags                 PropagationFlags
+-------------------------                   ----------------                 ----------------
+Container                                   None                             None
+SubContainers                               ContainerInherit                 InheritOnly
+Leaves                                      ObjectInherit                    InheritOnly
+ChildContainers                             ContainerInherit                 InheritOnly,
+                                                                             NoPropagateInherit
+ChildLeaves                                 ObjectInherit                    InheritOnly
+ContainerAndSubContainers                   ContainerInherit                 None
+ContainerAndLeaves                          ObjectInherit                    None
+SubContainerAndLeaves                       ContainerInherit,ObjectInherit   InheritOnly
+ContainerAndChildContainers                 ContainerInherit                 None
+ContainerAndChildLeaves                     ObjectInherit                    None
+ContainerAndChildContainersAndChildLeaves   ContainerInherit,ObjectInherit   NoPropagateInherit
+ContainerAndSubContainersAndLeaves          ContainerInherit,ObjectInherit   None
+ChildContainersAndChildLeaves               ContainerInherit,ObjectInherit   InheritOnly
+</code></pre>
+
+<p>The above information adpated from <a href="http://msdn.microsoft.com/en-us/magazine/cc163885.aspx#S3">Manage Access to Windows Objects with ACLs and the .NET Framework</a>, published in the November 2004 copy of <em>MSDN Magazine</em>.</p>
 
     </div>
     
             <h2>Related Commands</h2>
         <ul>
-<li><a href="Get-ComPermissions.html">Get-ComPermissions</a></li>
-<li><a href="Revoke-ComPermissions.html">Revoke-ComPermissions</a></li>
+<li><a href="http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.filesystemrights.aspx">http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.filesystemrights.aspx</a></li>
+<li><a href="http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.registryrights.aspx">http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.registryrights.aspx</a></li>
+<li><a href="http://msdn.microsoft.com/en-us/magazine/cc163885.aspx#S3">http://msdn.microsoft.com/en-us/magazine/cc163885.aspx#S3</a></li>
+<li><a href="Protect-Acl.html">Protect-Acl</a></li>
 </ul>
 
 
@@ -267,122 +329,73 @@
 				<th>Default Value</th>
 			</tr>
             			<tr valign='top'>
+				<td>Path</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+				<td>The path on which the permissions should be granted.  Can be a file system or registry path.
+</td>
+				<td>true</td>
+				<td>false</td>
+                <td></td>
+			</tr>
+			<tr valign='top'>
 				<td>Identity</td>
 				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+				<td>The user or group getting the permissions
+</td>
+				<td>true</td>
+				<td>false</td>
+                <td></td>
+			</tr>
+			<tr valign='top'>
+				<td>Permission</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String[]</a></td>
 				<td></td>
 				<td>true</td>
 				<td>false</td>
                 <td></td>
 			</tr>
 			<tr valign='top'>
-				<td>Access</td>
-				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
-				<td>Grants Access Permissions.
-</td>
-				<td>true</td>
-				<td>false</td>
-                <td></td>
-			</tr>
-			<tr valign='top'>
-				<td>LaunchAndActivation</td>
-				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
-				<td>Grants Launch and Activation Permissions.
-</td>
-				<td>true</td>
-				<td>false</td>
-                <td></td>
-			</tr>
-			<tr valign='top'>
-				<td>Default</td>
-				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
-				<td>Grants default security permissions.
-</td>
-				<td>true</td>
-				<td>false</td>
-                <td></td>
-			</tr>
-			<tr valign='top'>
-				<td>Limits</td>
-				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
-				<td>Grants security limits permissions.
-</td>
-				<td>true</td>
-				<td>false</td>
-                <td></td>
-			</tr>
-			<tr valign='top'>
-				<td>Allow</td>
-				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
-				<td>If set, allows the given permissions.
-</td>
-				<td>true</td>
-				<td>false</td>
-                <td></td>
-			</tr>
-			<tr valign='top'>
-				<td>Deny</td>
-				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
-				<td>If set, denies the given permissions.
-</td>
-				<td>true</td>
-				<td>false</td>
-                <td></td>
-			</tr>
-			<tr valign='top'>
-				<td>Local</td>
-				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
-				<td>If set, grants local access permissions.  Only valid if <code>Access</code> switch is set.
+				<td>ApplyTo</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/carbon.security.containerinheritanceflags.aspx">ContainerInheritanceFlags</a></td>
+				<td>How to apply container permissions.  This controls the inheritance and propagation flags.  Default is full inheritance, e.g. <code>ContainersAndSubContainersAndLeaves</code>. This parameter is ignored if <code>Path</code> is to a leaf item.
 </td>
 				<td>false</td>
 				<td>false</td>
                 <td></td>
 			</tr>
 			<tr valign='top'>
-				<td>Remote</td>
+				<td>Clear</td>
 				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
-				<td>If set, grants remote access permissions.  Only valid if <code>Access</code> switch is set.
+				<td>Removes all non-inherited permissions on the item.
 </td>
 				<td>false</td>
 				<td>false</td>
                 <td></td>
 			</tr>
 			<tr valign='top'>
-				<td>LocalLaunch</td>
+				<td>WhatIf</td>
 				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
-				<td>If set, grants local launch permissions.  Only valid if <code>LaunchAndActivation</code> switch is set.
-</td>
+				<td></td>
 				<td>false</td>
 				<td>false</td>
                 <td></td>
 			</tr>
 			<tr valign='top'>
-				<td>RemoteLaunch</td>
+				<td>Confirm</td>
 				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
-				<td>If set, grants remote launch permissions.  Only valid if <code>LaunchAndActivation</code> switch is set.
-</td>
+				<td></td>
 				<td>false</td>
 				<td>false</td>
                 <td></td>
 			</tr>
-			<tr valign='top'>
-				<td>LocalActivation</td>
-				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
-				<td>If set, grants local activation permissions.  Only valid if <code>LaunchAndActivation</code> switch is set.
-</td>
-				<td>false</td>
-				<td>false</td>
+                            <tr valign="top">
+                <td><a href="http://technet.microsoft.com/en-us/library/dd315352.aspx">CommonParameters</a></td>
                 <td></td>
-			</tr>
-			<tr valign='top'>
-				<td>RemoteActivation</td>
-				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
-				<td>If set, grants remote activation permissions.  Only valid if <code>LaunchAndActivation</code> switch is set.
-</td>
-				<td>false</td>
-				<td>false</td>
+                <td>This cmdlet supports common parameters.  For more information type <br> <code>Get-Help about_CommonParameters</code>.</td>
                 <td></td>
-			</tr>
-            
+                <td></td>
+                <td></td>
+                </tr>
         </table>
         
     
@@ -392,11 +405,14 @@
     
         
                 <h2>EXAMPLE 1</h2>
-            <pre><code>Grant-ComPermissions -Access -Identity 'Users' -Allow -Default -Local</code></pre>
-            <p><p>Updates access permission default security to allow the local <code>Users</code> group local access permissions.</p>
+            <pre><code>Grant-Permission -Identity ENTERPRISE\Engineers -Permission FullControl -Path C:\EngineRoom</code></pre>
+            <p><p>Grants the Enterprise's engineering group full control on the engine room.  Very important if you want to get anywhere.</p>
 </p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 2</h2>
-            <pre><code>Grant-ComPermissions -LaunchAndActivation -Identity 'Users' -Limits -Deny -Local -Remote</code></pre>
-            <p><p>Updates access permission security limits to deny the local <code>Users</code> group local and remote access permissions.</p>
+            <pre><code>Grant-Permission -Identity ENTERPRISE\Interns -Permission ReadKey,QueryValues,EnumerateSubKeys -Path rklm:\system\WarpDrive</code></pre>
+            <p><p>Grants the Enterprise's interns access to read about the warp drive.  They need to learn someday, but at least they can't change anything.</p>
+</p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 3</h2>
+            <pre><code>Grant-Permission -Identity ENTERPRISE\Engineers -Permission FullControl -Path C:\EngineRoom -Clear</code></pre>
+            <p><p>Grants the Enterprise's engineering group full control on the engine room.  Any non-inherited, existing access rules are removed from <code>C:\EngineRoom</code>.</p>
 </p><p></p><p></p><p></p><p></p>
 </body>
 </html>   

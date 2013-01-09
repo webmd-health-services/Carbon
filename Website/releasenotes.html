@@ -12,7 +12,124 @@
 		<li><a href="http://pshdo.com">-Blog</a></li>
 	</ul>
     
-    <h1>0.5.0.0 (7 January 2013)</h1>
+    <h1>0.5.0.1 (9 January 2013)</h1>
+
+<h2>Enhancements</h2>
+
+<h3>Active Directory</h3>
+
+<ul>
+<li>Renamed <code>Format-ADSpecialCharacters</code> to <a href="http://get-carbon.org/help/Format-ADSearchFilterValue.html">Format-ADSearchFilterValue</a>, with backwards-compatible alias.</li>
+</ul>
+
+<h3>Certificates</h3>
+
+<ul>
+<li>Renamed <code>Get-SslCertificateBindings</code> to <a href="http://get-carbon.org/help/Get-SslCertificateBinding.html">Get-SslCertificateBinding</a>, with backwards-compatible alias.</li>
+<li>Added <code>Remove-Certificate</code> alias for <a href="http://get-carbon.org/help/Uninstall-Certificate.html">Uninstall-Certificate</a>, for backwards-compatibility with earlier releases.</li>
+</ul>
+
+<h3>COM</h3>
+
+<ul>
+<li>Renamed <code>Get-ComPermissions</code> to <a href="http://get-carbon.org/help/Get-ComPermission.html">Get-ComPermission</a>, with backwards-compatible alias.</li>
+<li>Renamed <code>Grant-ComPermissions</code> to <a href="http://get-carbon.org/help/Grant-ComPermission.html">Grant-ComPermission</a>, with backwards-compatible alias.</li>
+<li>Renamed <code>Revoke-ComPermissions</code> to <a href="http://get-carbon.org/help/Revoke-ComPermission.html">Revoke-ComPermission</a>, with backwards-compatible alias.</li>
+</ul>
+
+<h3>Firewall</h3>
+
+<ul>
+<li>Renamed <code>Get-FirewallRules</code> to <a href="http://get-carbon.org/help/Get-FirewallRule.html">Get-FirewallRule</a>, with backwards-compatible alias.</li>
+</ul>
+
+<h3>IIS</h3>
+
+<ul>
+<li>Renamed <code>Add-IisServerManagerMembers</code> to <a href="http://get-carbon.org/help/Add-IisServerManagerMembers.html">Add-IisServerManagerMembers</a>, with backwards-compatible alias.</li>
+<li>Added <code>StatusCode</code> alias for <a href="http://get-carbon.org/help/Set-IisHttpRedirect.html">Set-IisHttpRedirect's</a> <code>HttpResponseStatus</code> parameter, for backwards-compatibility with earlier releases.</li>
+<li>Added <code>Test-IisAppPoolExists</code> alias for <a href="http://get-carbon.org/help/Test-IisAppPool.html">Test-IisAppPool</a>, for backwards-compatibility with earlier releases.</li>
+<li>Added <code>Remove-IisWebsite</code> alias for <a href="http://get-carbon.org/help/Uninstall-IisWebsite.html">Uninstall-IisWebsite</a>, for backwards-compatibility with earlier releases.</li>
+</ul>
+
+<h3>Internet Explorer</h3>
+
+<ul>
+<li>Renamed <code>Enable-IEActivationPermissions</code> to <a href="http://get-carbon.org/help/Enable-IEActivationPermission.html">Enable-IEActivationPermission</a>, with backwards-compatible alias.</li>
+</ul>
+
+<h3>MSMQ</h3>
+
+<ul>
+<li>Renamed <code>Grant-MsmqMessageQueuePermissions</code> to <a href="http://get-carbon.org/help/Grant-MsmqMessageQueuePermission.html">Grant-MsmqMessageQueuePermission</a>, with backwards-compatible alias.</li>
+<li>Added <code>Remove-MsmqMessageQueue</code> alias for <a href="http://get-carbon.org/help/Uninstall-MsmqMessageQueue.html">Uninstall-MsmqMessageQueue</a>, for backwards-compatibility with earlier releases.</li>
+</ul>
+
+<h3>Path</h3>
+
+<ul>
+<li>Added <code>ConvertTo-FullPath</code> alias for <a href="http://get-carbon.org/help/Resolve-FullPath.html">Resolve-FullPath</a>, for backwards-compatibility with earlier releases.</li>
+<li>Added <code>Get-PathCanonicalCase</code> alias for <a href="http://get-carbon.org/help/Resolve-PathCase.html">Resolve-PathCase</a>, for backwards-compatibility with earlier releases.</li>
+</ul>
+
+<h3>Performance Counters</h3>
+
+<ul>
+<li>Renamed <code>Get-PerformanceCounters</code> to <a href="http://get-carbon.org/help/Get-PerformanceCounter.html">Get-PerformanceCounter</a>, with backwards-compatible alias.</li>
+</ul>
+
+<h3>PowerShell</h3>
+
+<ul>
+<li>Renamed <code>Add-TrustedHosts</code> to <a href="http://get-carbon.org/help/Add-TrustedHost.html">Add-TrustedHost</a>, with backwards-compatible alias.</li>
+<li>Renamed <code>Add-TrustedHost</code>'s <code>Entries</code> parameter to <code>Entry</code>, with backwards-compatible alias.</li>
+<li>Renamed <code>Clear-TrustedHosts</code> to <a href="http://get-carbon.org/help/Clear-TrustedHost.html">Clear-TrustedHost</a>, with backwards-compatible alias. </li>
+<li>Renamed <code>Complete-Jobs</code> to <a href="http://get-carbon.org/help/Complete-Job.html">Complete-Job</a>, with backwards-compatible alias.</li>
+<li>Renamed <code>Complete-Job</code>'s <code>Jobs</code> parameter to <code>Job</code>, with backwards-compatible alias.</li>
+<li>Renamed <code>Get-TrustedHosts</code> to <a href="http://get-carbon.org/help/Get-TrustedHost.html">Get-TrustedHost</a>, with backwards-compatible alias.</li>
+<li>Renamed <code>Set-TrustedHosts</code> to <a href="http://get-carbon.org/help/Set-TrustedHost.html">Set-TrustedHost</a>, with backwards-compatible alias.</li>
+<li>Renamed <code>Set-TrustedHost</code>'s <code>Entries</code> parameter to <code>Entry</code>, with backwards-compatible alias.</li>
+</ul>
+
+<h3>Security</h3>
+
+<ul>
+<li>Renamed <code>Assert-AdminPrivileges</code> to <a href="http://get-carbon.org/help/Assert-AdminPrivilege.html">Assert-AdminPrivilege</a>, with backwards-compatible alias.</li>
+<li>Renamed <code>ConvertTo-InheritanceFlags</code> to <a href="http://get-carbon.org/help/ConvertTo-InheritanceFlag.html">ConvertTo-InheritanceFlag</a>, with backwards-compatible alias.</li>
+<li>Renamed <code>ConvertTo-InheritanceFlag</code>'s <code>ContainerInheritanceFlags</code> parameter to <code>ConvertTo-InheritanceFlag</code>, with backwards-compatible alias.</li>
+<li>Renamed <code>ConvertTo-PropagationFlags</code> to <a href="http://get-carbon.org/help/ConvertTo-PropagationFlag.html">ConvertTo-PropagationFlag</a>, with backwards-compatible alias.</li>
+<li>Renamed <code>ConvertTo-PropagationFlag</code>'s <code>ContainerInheritanceFlags</code> parameter to <code>ConvertTo-InheritanceFlag</code>, with backwards-compatible alias.</li>
+<li>Renamed <code>Get-Permissions</code> to <a href="http://get-carbon.org/help/Get-Permission.html">Get-Permission</a>, with backwards-compatible alias.</li>
+<li>Renamed <code>Grant-Permissions</code> to <a href="http://get-carbon.org/help/Grant-Permission.html">Grant-Permission</a>, with backwards-compatible alias.</li>
+<li>Renamed <code>Grant-Permission</code>'s <code>Permissions</code> parameter to <code>Permission</code>, with backwards-compatible alias.</li>
+<li>Renamed <code>Test-AdminPrivileges</code> to <a href="http://get-carbon.org/help/Test-AdminPrivilege.html">Test-AdminPrivilege</a>, with backwards-compatible alias.</li>
+</ul>
+
+<h3>Service</h3>
+
+<ul>
+<li>Renamed <code>Get-ServicePermissions</code> to <a href="http://get-carbon.org/help/Get-ServicePermission.html">Get-ServicePermission</a>, with backwards-compatible alias.</li>
+<li>Added <code>Remove-Service</code> alias for <a href="http://get-carbon.org/help/Uninstall-Service.html">Uninstall-Service</a>, for backwards-compatibility with earlier releases.</li>
+</ul>
+
+<h3>Users and Groups</h3>
+
+<ul>
+<li>Renamed <code>Add-GroupMembers</code> to <a href="http://get-carbon.org/help/Add-GroupMember.html">Add-GroupMember</a>, with backwards-compatible alias.</li>
+<li>Renamed <code>Add-GroupMember</code>'s <code>Members</code> parameter to <code>Member</code>.</li>
+<li>Added <code>Remove-User</code> alias for <a href="http://get-carbon.org/help/Uninstall-User.html">Uninstall-User</a>, for backwards-compatibility with earlier releases.</li>
+</ul>
+
+<h3>Windows Features</h3>
+
+<ul>
+<li>Added <code>Install-WindowsFeatures</code> alias for <a href="http://get-carbon.org/help/Install-WindowsFeature.html">Install-WindowsFeature</a>, for backwards-compatibility with earlier releases.</li>
+<li>Added <code>Features</code> alias for  <a href="http://get-carbon.org/help/Install-WindowsFeature.html">Install-WindowsFeature's</a> <code>Name</code> parameter, for backwards-compatibility with earlier releases.</li>
+<li>Added <code>Uninstall-WindowsFeatures</code> alias for <a href="http://get-carbon.org/help/Uninstall-WindowsFeature.html">Uninstall-WindowsFeature</a>, for backwards-compatibility with earlier releases.</li>
+<li>Added <code>Features</code> alias for  <a href="http://get-carbon.org/help/Uninstall-WindowsFeature.html">Uninstall-WindowsFeature's</a> <code>Name</code> parameter, for backwards-compatibility with earlier releases.</li>
+</ul>
+
+<h1>0.5.0.0 (7 January 2013)</h1>
 
 <h2>Upgrade Instructions</h2>
 
@@ -34,7 +151,6 @@
 <li><code>Set-SslCertificateBinding -IPort '1.2.3.4:8001' with</code>Set-SslCertificateBinding -IPAddress '1.2.3.4' -Port 8001</li>
 <li><code>Remove-SslCertificateBinding -IPPort '0.0.0.0:443</code> with <code>Remove-SslCertificateBinding</code></li>
 <li><code>Remove-SslCertificateBinding -IPPort '10.1.1.1:8001</code> with <code>Remove-SslCertificateBinding -IPAddress '10.1.1.1' -Port 8001</code></li>
-<li><code>Remove-Certificate</code> with <code>Uninstall-Certificate</code></li>
 </ul>
 
 <h3>Computer</h3>
@@ -75,9 +191,6 @@
 <li><code>Unlock-IisBasicAuthentication</code> with <code>Unlock-IisConfigurationSeciton -SectionPath 'system.webServer/security/authentication/basicAuthentication'</code></li>
 <li><code>Unlock-IisCgi</code> with <code>Unlock-IisConfigurationSeciton -SectionPath 'system.webServer/cgi'</code></li>
 <li><code>Unlock-IisWindowsAuthentication</code> with <code>Unlock-IisConfigurationSeciton -SectionPath 'system.webServer/security/authentication/windowsAuthentication'</code></li>
-<li><code>Test-IisAppPoolExists</code> with <code>Test-IisAppPool</code></li>
-<li><code>Remove-IisWebsite</code> with <code>Uninstall-IisWebsite</code></li>
-<li><code>Set-IisHttpRedirect -StatusCode</code> with <code>Set-IisHttpRedirect -HttpResponseStatus</code></li>
 </ul>
 
 <h3>INI</h3>
@@ -89,14 +202,6 @@
 <li><code>Split-Ini -Path &lt;string&gt; -PassThru</code> with <code>Split-Ini -Path &lt;string&gt;</code> (per-line objects are now returned by default)</li>
 </ul>
 
-<h3>MSMQ</h3>
-
-<p>Replace usages of:</p>
-
-<ul>
-<li><code>Remove-MsmqMessageQueue</code> with <code>Uninstall-MsmqMessageQueue</code></li>
-</ul>
-
 <h3>Path</h3>
 
 <p>Replace usages of</p>
@@ -104,8 +209,6 @@
 <ul>
 <li><code>Get-PathRelativeTo -To &lt;string&gt; -From &lt;string&gt;'</code> with <code>Resolve-RelativePath -Path &lt;string&gt; -FromDirectory &lt;string&gt;</code></li>
 <li><code>Get-PathRelativeTo -To &lt;string&gt; -From &lt;string&gt; -FromType 'File'</code> with <code>Resolve-RelativePath -Path &lt;string&gt; -FromFile &lt;string&gt;</code></li>
-<li><code>ConvertTo-FullPath</code> with <code>Resolve-FullPath</code></li>
-<li><code>Get-PathCanonicalCase</code> with <code>Resolve-PathCase</code></li>
 </ul>
 
 <h3>Performance Counters</h3>
@@ -126,14 +229,6 @@
 <li><a href="http://get-carbon.org/help/Assert-AdminPrivileges.html">Assert-AdminPrivileges</a> now returns <code>True</code> or <code>False</code> if the user doesn't have admin privileges. It also no longer throws an exception, but writes an error.  If you want to preserve current behavior where it stops script execution, replace usages with <code>Assert-AdminPrivileges -ErrorAction Stop</code>.</li>
 </ul>
 
-<h3>Service</h3>
-
-<p>Replace usages of:</p>
-
-<ul>
-<li><code>Remove-Service</code> with <code>Uninstall-Service</code></li>
-</ul>
-
 <h3>Shares</h3>
 
 <p>Replace usages of: </p>
@@ -142,22 +237,12 @@
 <li><code>Install-Share -Permissions '"ShareAdmins,FULL"','"ShareWriters,CHANGE"','"ShareReaders,READ"'</code> with <code>Install-SmbShare -FullAccess ShareAdmins -ChangeAccess ShareWriters -ReadAccess ShareReaders</code>.</li>
 </ul>
 
-<h3>Users and Groups</h3>
-
-<p>Replace usages of</p>
-
-<ul>
-<li><code>Remove-User</code> with <code>Uninstall-User</code></li>
-</ul>
-
 <h3>Windows Features</h3>
 
 <p>Replace usages of: </p>
 
 <ul>
 <li><code>Test-WindowsFeature</code> with <code>Test-WindowsFeature -Installed</code></li>
-<li><code>Install-WindowsFeatures -Features &lt;string[]&gt;</code> with <code>Install-WindowsFeature -Name &lt;string[]&gt;</code></li>
-<li><code>Uninstall-WindowsFeatures -Features &lt;string[]&gt;</code> with <code>Uninstall-WindowsFeature -Name &lt;string[]&gt;</code></li>
 <li><code>Install-WindowsFeatureIis</code> with <code>Install-WindowsFeature -Iis</code></li>
 <li><code>Install-WindowsFeatureIis -HttpRedirection</code> with <code>Install-WindowsFeature -Iis -IisHttpRedirection</code></li>
 <li><code>Install-WindowsFeatureMsmq</code> with <code>Install-WindowsFeature -Msmq</code></li>
@@ -206,7 +291,7 @@
 <li><a href="http://get-carbon.org/help/Test-SslCertificateBinding.html">Test-SslCertificateBinding</a> now supports testig by <code>IPAddress</code> and <code>Port</code> separately, instead of requiring both.  The old <code>IPPort</code> parameter is replaced with <code>IPAddress</code> and <code>Port</code> parameters. </li>
 <li>Replaced <code>IPPort</code> parameter on <code>Get-SslCertificateBinding</code> with separate <code>IPAddress</code> and <code>Port</code> parameters on  <a href="http://get-carbon.org/help/Get-SslCertificateBindings.html">Get-SslCertificateBindings</a>.  Set <code>IPAddress</code> only if you want to bind to a specific IP address (i.e. <em>not</em> 0.0.0.0).  Set <code>Port</code> if <em>not</em> binding to port 443.</li>
 <li>Replaced <code>IPPort</code> parameter on <a href="http://get-carbon.org/help/Remove-SslCertificateBinding.html">Remove-SslCertificateBinding</a> with separate <code>IPAddress</code> and <code>Port</code> parameters.  Set <code>IPAddress</code> only if you want to remove a binding for a specific IP address (i.e. <em>not</em> 0.0.0.0).  Set <code>Port</code> if the binding is <em>not</em> on port 443.</li>
-<li>Renamed <code>Remove-Certificate</code> to <a href="http://get-carbon.org/help/Uninstall-Certificate.html">Uninstall-Certificate</a>.</li>
+<li>Renamed <code>Remove-Certificate</code> to <a href="http://get-carbon.org/help/Uninstall-Certificate.html">Uninstall-Certificate</a> (added backwards-compatible alias in v0.5.0.1).</li>
 </ul>
 
 <h3>Computer</h3>
@@ -247,31 +332,31 @@
 <li>Removed <code>Unlock-IisBasicAuthentication</code> in favor of <code>Unlock-IisConfigurationSection -SectionPath 'system.webServer/security/authentication/basicAuthentication'</code>.</li>
 <li>Removed <code>Unlock-IisCgi</code> in favor of <code>Unlock-IisConfigurationSection -SectionPath 'system.webServer/cgi'</code>.</li>
 <li>Removed <code>Unlock-IisWindowsAuthentication</code> in favor of <code>Unlock-IisConfigurationSection -SectionPath 'system.webServer/security/authentication/windowsAuthentication'</code>.</li>
-<li>Renamed <code>Remove-Service</code> to <a href="http://get-carbon.org/help/Uninstall-Service.html">Uninstall-Service</a>.</li>
+<li>Renamed <code>Remove-Service</code> to <a href="http://get-carbon.org/help/Uninstall-Service.html">Uninstall-Service</a> (added backwards-compatible alias in v0.5.0.1).</li>
 <li><a href="http://get-carbon.org/help/Install-Service.html">Install-Service</a> writes errors instead of throwing exceptions.</li>
 <li><a href="http://get-carbon.org/help/Install-Service.html">Install-Service</a> grants <code>ReadAndExecute</code> file system permissions on the service executable to the service identity instead of <code>FullControl</code>.</li>
 <li>Improved <a href="http://get-carbon.org/help/Install-Service.html">Install-Service</a>'s <code>WhatIf</code> support.</li>
-<li>Renamed <code>Test-IisAppPoolExists</code> to <a href="http://get-carbon.org/help/Uninstall-Service.html">Test-IisAppPool</a>.</li>
-<li>Renamed <code>Remove-IisWebsite</code> with <a href="http://get-carbon.org/help/Uninstall-IisWebsite.html">Uninstall-IisWebsite</a>.</li>
+<li>Renamed <code>Test-IisAppPoolExists</code> to <a href="http://get-carbon.org/help/Uninstall-Service.html">Test-IisAppPool</a> (added backwards-compatible alias in v0.5.0.1).</li>
+<li>Renamed <code>Remove-IisWebsite</code> with <a href="http://get-carbon.org/help/Uninstall-IisWebsite.html">Uninstall-IisWebsite</a> (added backwards-compatible alias in v0.5.0.1).</li>
 <li><a href="http://get-carbon.org/help/Install-IisAppPool.html">Install-IisAppPool</a> now always sets the application pool to run as the system's default application pool identity if the <code>ServiceAccount</code> parameter isn't given.</li>
 <li><a href="http://get-carbon.org/help/Install-IisAppPool.html">Install-IisAppPool</a> now starts an IIS application pool if it is stoppped.</li>
 <li><a href="http://get-carbon.org/help/Get-IisHttpRedirect.html">Get-IisHttpRedirect</a> now returns a <code>Carbon.Iis.HttpRedirectConfigurationSection</code> object.  The <code>StatusCode</code> property on the old object is now named <code>HttpResponseStatus</code>.</li>
-<li>Renamed the <code>StatusCode</code> parameter on <a href="http://get-carbon.org/help/Set-IisHttpRedirect.html">Set-IisHttpRedirect</a> to <code>HttpResponseStatus</code>.</li>
+<li>Renamed the <code>StatusCode</code> parameter on <a href="http://get-carbon.org/help/Set-IisHttpRedirect.html">Set-IisHttpRedirect</a> to <code>HttpResponseStatus</code> (added backwards-compatible alias in v0.5.0.1).</li>
 <li><a href="http://get-carbon.org/help/Get-IisWebsite.html">Get-IisWebsite</a> now returns a <code>Microsoft.Web.Administration.Site</code> object.</li>
 </ul>
 
 <h3>MSMQ</h3>
 
 <ul>
-<li><code>Remove-MsmqMessageQueue</code> renamed to <a href="http://get-carbon.org/help/Uninstall-MsmqMessageQueue.html">Uninstall-MsmqMessageQueue</a>.</li>
+<li>Renamed <code>Remove-MsmqMessageQueue</code> to <a href="http://get-carbon.org/help/Uninstall-MsmqMessageQueue.html">Uninstall-MsmqMessageQueue</a> (added backwards compatible alias in v0.5.0.1).</li>
 </ul>
 
 <h3>Path</h3>
 
 <ul>
 <li>Renamed <code>Get-PathRelativeTo</code> to <a href="http://get-carbon.org/help/Resolve-RelativePath.html">Resolve-RelativePath</a>.  Renamed its <code>To</code> parameter to <code>Path</code>, and moved it to position 0.  Replaced/combined the <code>From</code> and <code>FromType</code> parameters with <code>FromDirectory</code> and <code>FromFile</code> parameters.</li>
-<li>Renamed <code>ConvertTo-FullPath</code> to <a href="http://get-carbon.org/help/Resolve-FullPath.html">Resolve-FullPath</a>.  Added support for converting unrooted paths using the current location.</li>
-<li>Renamed <code>Get-PathCanonicalCase</code> with <a href="http://get-carbon.org/help/Resolve-PathCase.html">Resolve-PathCase</a>.  Added support for piping in <code>Get-Item</code> and <code>Get-ChildItem</code> output, e.g. <code>Get-Item C:\WINDOWS | Resolve-PathCase</code> returns C:\Windows.</li>
+<li>Renamed <code>ConvertTo-FullPath</code> to <a href="http://get-carbon.org/help/Resolve-FullPath.html">Resolve-FullPath</a> (added backwards-compatible alias in v0.5.0.1).  Added support for converting unrooted paths using the current location.</li>
+<li>Renamed <code>Get-PathCanonicalCase</code> with <a href="http://get-carbon.org/help/Resolve-PathCase.html">Resolve-PathCase</a> (added backwards-compatible alias in v0.5.0.1).  Added support for piping in <code>Get-Item</code> and <code>Get-ChildItem</code> output, e.g. <code>Get-Item C:\WINDOWS | Resolve-PathCase</code> returns C:\Windows.</li>
 </ul>
 
 <h3>Performance Counters</h3>
@@ -302,19 +387,19 @@
 <h3>Users and Groups</h3>
 
 <ul>
-<li>Renamed <code>Remove-User</code> to <a href="http://get-carbon.org/help/Uninstall-User.html">Uninstall-User</a>.</li>
+<li>Renamed <code>Remove-User</code> to <a href="http://get-carbon.org/help/Uninstall-User.html">Uninstall-User</a> (added backwards-compatible alias in v0.5.0.1).</li>
 </ul>
 
 <h3>Windows Features</h3>
 
 <ul>
 <li><a href="http://get-carbon.org/help/Test-WindowsFeature.html">Test-WindowsFeature</a> now tests if a Windows feature exists, instead of if it is installed.  Added an <code>Installed</code> switch to detect if a feature exists <em>and</em> if it is installed.</li>
-<li><code>Install-WindowsFeatures</code> renamed to <a href="http://get-carbon.org/help/Install-WindowsFeature.html">Install-WindowsFeature</a>.</li>
-<li>Renamed <a href="http://get-carbon.org/help/Install-WindowsFeature.html">Install-WindowsFeature</a>'s <code>Features</code> parameter to <code>Name</code>.</li>
+<li>Renamed <code>Install-WindowsFeatures</code> to <a href="http://get-carbon.org/help/Install-WindowsFeature.html">Install-WindowsFeature</a> (added backwards-compatible alias in v0.5.0.1).</li>
+<li>Renamed <a href="http://get-carbon.org/help/Install-WindowsFeature.html">Install-WindowsFeature</a>'s <code>Features</code> parameter to <code>Name</code> (added backwards-compatible alias in v0.5.0.1).</li>
 <li>Removed <code>Install-WindowsFeatureIis</code> and replaced with <code>Iis</code> and <code>IisHttpRedirection</code> switches on <a href="http://get-carbon.org/help/Install-WindowsFeature.html">Install-WindowsFeature</a>.</li>
 <li>Removed <code>Install-WindowsFeatureMsmq</code> and replaced with <code>Msmq</code>, <code>MsmqHttpSupport</code>, and <code>MsmqActiveDirectoryIntegration</code> switches on <a href="http://get-carbon.org/help/Install-WindowsFeature.html">Install-WindowsFeature</a>.</li>
-<li><code>Uninstall-WindowsFeatures</code> renamed to <a href="http://get-carbon.org/help/Uninstall-WindowsFeature.html">Uninstall-WindowsFeature</a>.</li>
-<li>Renamed <a href="http://get-carbon.org/help/Uninstall-WindowsFeature.html">Uninstall-WindowsFeature</a>'s <code>Features</code> parameter to <code>Name</code>.</li>
+<li>Renamed <code>Uninstall-WindowsFeatures</code> to <a href="http://get-carbon.org/help/Uninstall-WindowsFeature.html">Uninstall-WindowsFeature</a> (added backwards-compatible alias in v0.5.0.1).</li>
+<li>Renamed <a href="http://get-carbon.org/help/Uninstall-WindowsFeature.html">Uninstall-WindowsFeature</a>'s <code>Features</code> parameter to <code>Name</code> (added backwards-compatible alias in v0.5.0.1).</li>
 <li>Added <code>Iis</code>, <code>IisHttpRedirection</code>, <code>Msmq</code>, <code>MsmqHttpSupport</code>, and <code>HttpActiveDirectoryIntegration</code> switches to <a href="http://get-carbon.org/help/Uninstall-WindowsFeature.html">Uninstall-WindowsFeature</a>.</li>
 <li><a href="http://get-carbon.org/help/Install-WindowsFeature.html">Install-WindowsFeature</a>, <a href="http://get-carbon.org/help/Test-WindowsFeature.html">Test-WindowsFeature</a>, and <a href="http://get-carbon.org/help/Uninstall-WindowsFeature.html">Uninstall-WindowsFeature</a> are now available even if the current operating system doesn't support managing Windows features.  They don't do anything in those situations, but they exist.</li>
 <li><a href="http://get-carbon.org/help/Install-WindowsFeature.html">Install-WindowsFeature</a>, <a href="http://get-carbon.org/help/Test-WindowsFeature.html">Test-WindowsFeature</a>, and <a href="http://get-carbon.org/help/Uninstall-WindowsFeature.html">Uninstall-WindowsFeature</a> are not available if the PowerShell v3.0 server manager cmdlets exists (on Windows 8/2012).</li>
