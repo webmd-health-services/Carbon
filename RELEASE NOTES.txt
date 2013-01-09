@@ -36,6 +36,11 @@
 
  * Renamed `Get-PerformanceCounters` to [Get-PerformanceCounter](http://get-carbon.org/help/Get-PerformanceCounter.html), with backwards-compatible alias.
 
+### PowerShell
+
+ * Renamed `Add-TrustedHosts` to [Add-TrustedHost](http://get-carbon.org/help/Add-TrustedHost.html), with backwards-compatible alias.
+ * Renamed `Add-TrustedHost`'s `Entries` parameter to `Entry`, with backwards-compatible alias.
+ 
  
 # 0.5.0.0 (7 January 2013)
 

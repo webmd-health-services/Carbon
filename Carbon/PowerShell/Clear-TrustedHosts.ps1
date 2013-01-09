@@ -19,10 +19,10 @@ function Clear-TrustedHosts
     Removes all entries from PowerShell trusted hosts list.
     
     .DESCRIPTION
-    The `Add-TrustedHosts` function adds new entries to the trusted hosts list.  `Set-TrustedHosts` sets it to a new list.  This function clears out the trusted hosts list completely.  After you run it, you won't be able to connect to any computers until you add them to the trusted hosts list.
+    The `Add-TrustedHost` function adds new entries to the trusted hosts list.  `Set-TrustedHosts` sets it to a new list.  This function clears out the trusted hosts list completely.  After you run it, you won't be able to connect to any computers until you add them to the trusted hosts list.
     
     .LINK
-    Add-TrustedHosts
+    Add-TrustedHost
     
     .LINK
     Set-TrustedHosts
