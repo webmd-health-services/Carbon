@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Get-FirewallRules
+function Get-FirewallRule
 {
     <#
     .SYNOPSIS
@@ -45,7 +45,7 @@ function Get-FirewallRules
     Assert-FirewallConfigurable
 
     .EXAMPLE
-    Get-FirewallRules
+    Get-FirewallRule
 
     Here's a sample of the output:
 
@@ -119,3 +119,5 @@ function Get-FirewallRules
         $rule[$name] = $value
     }
 }
+
+Set-Alias -Name 'Get-FirewallRules' -Value 'Get-FirewallRule'

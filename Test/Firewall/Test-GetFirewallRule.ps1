@@ -23,7 +23,7 @@ function TearDown
 
 function Test-ShouldGetFirewallRules
 {
-    $rules = Get-FirewallRules
+    $rules = Get-FirewallRule
     Assert-NotNull $rules
     Assert-GreaterThan $rules.Count 0 
     
