@@ -47,6 +47,10 @@
  * Renamed `Set-TrustedHosts` to [Set-TrustedHost](http://get-carbon.org/help/Set-TrustedHost.html), with backwards-compatible alias.
  * Renamed `Set-TrustedHost`'s `Entries` parameter to `Entry`, with backwards-compatible alias.
  
+### Security
+
+ * Renamed `Assert-AdminPrivileges` to [Assert-AdminPrivilege](http://get-carbon.org/help/Assert-AdminPrivilege.html), with backwards-compatible alias.
+ 
  
 # 0.5.0.0 (7 January 2013)
 

@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Assert-AdminPrivileges
+function Assert-AdminPrivilege
 {
     <#
     .SYNOPSIS
@@ -25,7 +25,7 @@ function Assert-AdminPrivileges
     Test-AdminPrivileges
 
     .EXAMPLE
-    Assert-AdminPrivileges
+    Assert-AdminPrivilege
 
     Writes an error that the user doesn't have administrator privileges.
     #>
@@ -40,3 +40,5 @@ function Assert-AdminPrivileges
     }
     return $true
 }
+
+Set-Alias -Name 'Assert-AdminPrivileges' -Value 'Assert-AdminPrivilege'
