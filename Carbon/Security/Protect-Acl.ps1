@@ -22,7 +22,7 @@ function Protect-Acl
     New items in the registry or file system will usually inherit ACLs from its parent.  This function stops an item from inheriting rules from its, and will optionally preserve the existing inherited rules.  Any existing, non-inherited access rules are left in place.
     
     .LINK
-    Grant-Permissions
+    Grant-Permission
     
     .EXAMPLE
     Protect-Acl -Path C:\Projects\Carbon

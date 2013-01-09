@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Grant-Permissions
+function Grant-Permission
 {
     <#
     .SYNOPSIS
@@ -97,17 +97,17 @@ function Grant-Permissions
     Protect-Acl
 
     .EXAMPLE
-    Grant-Permissions -Identity ENTERPRISE\Engineers -Permissions FullControl -Path C:\EngineRoom
+    Grant-Permission -Identity ENTERPRISE\Engineers -Permission FullControl -Path C:\EngineRoom
 
     Grants the Enterprise's engineering group full control on the engine room.  Very important if you want to get anywhere.
 
     .EXAMPLE
-    Grant-Permissions -Identity ENTERPRISE\Interns -Permissions ReadKey,QueryValues,EnumerateSubKeys -Path rklm:\system\WarpDrive
+    Grant-Permission -Identity ENTERPRISE\Interns -Permission ReadKey,QueryValues,EnumerateSubKeys -Path rklm:\system\WarpDrive
 
     Grants the Enterprise's interns access to read about the warp drive.  They need to learn someday, but at least they can't change anything.
     
     .EXAMPLE
-    Grant-Permissions -Identity ENTERPRISE\Engineers -Permissions FullControl -Path C:\EngineRoom -Clear
+    Grant-Permission -Identity ENTERPRISE\Engineers -Permission FullControl -Path C:\EngineRoom -Clear
     
     Grants the Enterprise's engineering group full control on the engine room.  Any non-inherited, existing access rules are removed from `C:\EngineRoom`.
     #>
@@ -126,7 +126,8 @@ function Grant-Permissions
         [Parameter(Mandatory=$true)]
         [string[]]
         # The permission: e.g. FullControl, Read, etc.  For file system items, use values from [System.Security.AccessControl.FileSystemRights](http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.filesystemrights.aspx).  For registry items, use values from [System.Security.AccessControl.RegistryRights](http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.registryrights.aspx).
-        $Permissions,
+		[Alias('Permissions')]
+        $Permission,
         
         [Carbon.Security.ContainerInheritanceFlags]
         # How to apply container permissions.  This controls the inheritance and propagation flags.  Default is full inheritance, e.g. `ContainersAndSubContainersAndLeaves`. This parameter is ignored if `Path` is to a leaf item.
@@ -155,18 +156,18 @@ function Grant-Permissions
     }
 
     $rights = 0
-    foreach( $permission in $Permissions )
-    {
-        $right = ($permission -as "Security.AccessControl.$($providerName)Rights")
+	$Permission | ForEach-Object {
+
+        $right = ($_ -as "Security.AccessControl.$($providerName)Rights")
         if( -not $right )
         {
-            Write-Error "Invalid $($providerName)Rights: $permission.  Must be one of $([Enum]::GetNames("Security.AccessControl.$($providerName)Rights"))."
+            Write-Error "Invalid $($providerName)Rights: $_.  Must be one of $([Enum]::GetNames("Security.AccessControl.$($providerName)Rights"))."
             return
         }
         $rights = $rights -bor $right
     }
     
-    Write-Host "Granting $Identity $Permissions on $Path."
+    Write-Host "Granting $Identity $Permission on $Path."
     # We don't use Get-Acl because it returns the whole security descriptor, which includes owner information.
     # When passed to Set-Acl, this causes intermittent errors.  So, we just grab the ACL portion of the security descriptor.
     # See http://www.bilalaslam.com/2010/12/14/powershell-workaround-for-the-security-identifier-is-not-allowed-to-be-the-owner-of-this-object-with-set-acl/
@@ -202,3 +203,5 @@ function Grant-Permissions
     $currentAcl.SetAccessRule( $accessRule )
     Set-Acl $Path $currentAcl
 }
+
+Set-Alias -Name 'Grant-Permissions' -Value 'Grant-Permission'

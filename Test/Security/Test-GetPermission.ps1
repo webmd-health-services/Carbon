@@ -29,11 +29,11 @@ function Setup
     $containerPath = Join-Path $env:Temp $containerPath
     
     $null = New-Item $containerPath -ItemType Directory
-    Grant-Permissions -Path $containerPath -Identity $group1 -Permissions Read
+    Grant-Permission -Path $containerPath -Identity $group1 -Permission Read
     
     $childPath = Join-Path $containerPath 'Child1'
     $null = New-Item $childPath -ItemType File
-    Grant-Permissions -Path $childPath -Identity $user -Permissions Read
+    Grant-Permission -Path $childPath -Identity $user -Permission Read
 }
 
 function TearDown

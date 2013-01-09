@@ -21,7 +21,7 @@ function Install-SmbShare
     .DESCRIPTION
     Creates a new Windows SMB share, or replaces an existing share with the same name.  Optionally grants permissions on that share.  Unfortunately, there isn't a way in Carbon to set permissions on a share after it is created.  Send us the code!
 
-    Permissions don't apply to the file system.  They only apply to the share.  Use `Grant-Permissions` to grant file system permissions.
+    Permissions don't apply to the file system.  They only apply to the share.  Use `Grant-Permission` to grant file system permissions.
 
     .EXAMPLE
     Install-Share -Name TopSecretDocuments -Path C:\TopSecret -Description 'Share for our top secret documents.' -Permissions "Everyone,Read","Analysts,FULL"

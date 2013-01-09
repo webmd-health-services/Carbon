@@ -20,7 +20,7 @@ function Setup
 {
     & (Join-Path $TestDir ..\..\Carbon\Import-Carbon.ps1 -Resolve)
     
-    Install-User -Username $user -Password 'a1b2c3d4!' -Description 'User for Carbon Grant-Permissions tests.'
+    Install-User -Username $user -Password 'a1b2c3d4!' -Description 'User for Carbon Grant-Permission tests.'
     
     $Path = @([IO.Path]::GetTempFileName())[0]
 }
@@ -37,7 +37,7 @@ function TearDown
 
 function Invoke-GrantPermissions($Identity, $Permissions)
 {
-    Grant-Permissions -Identity $Identity -Permission $Permissions -Path $Path.ToString()
+    Grant-Permission -Identity $Identity -Permission $Permissions -Path $Path.ToString()
 }
 
 function Test-ShouldGrantPermissionOnFile
@@ -68,7 +68,7 @@ function Test-ShouldGrantPermissionsOnRegistryKey
     
     try
     {
-        Grant-Permissions -Identity 'BUILTIN\Administrators' -Permissions 'ReadKey' -Path $regKey
+        Grant-Permission -Identity 'BUILTIN\Administrators' -Permission 'ReadKey' -Path $regKey
         Assert-Permissions 'BUILTIN\Administrators' -Permissions 'ReadKey' -Path $regKey
     }
     finally
@@ -81,7 +81,7 @@ function Test-ShouldFailIfIncorrectPermissions
 {
     $failed = $false
     $error.Clear()
-    Grant-Permissions -Identity 'BUILTIN\Administrators' -Permission 'BlahBlahBlah' -Path $Path.ToString() -ErrorAction SilentlyContinue
+    Grant-Permission -Identity 'BUILTIN\Administrators' -Permission 'BlahBlahBlah' -Path $Path.ToString() -ErrorAction SilentlyContinue
     Assert-Equal 1 $error.Count
 }
 
@@ -89,7 +89,7 @@ function Test-ShouldClearExistingPermissions
 {
     Invoke-GrantPermissions 'Administrators' 'FullControl'
     
-    Grant-Permissions -Identity 'Everyone' -Permissions 'Read','Write' -Path $Path.ToSTring() -Clear
+    Grant-Permission -Identity 'Everyone' -Permission 'Read','Write' -Path $Path.ToSTring() -Clear
     
     $acl = Get-Acl -Path $Path.ToString()
     
@@ -112,7 +112,7 @@ function Test-ShouldHandleNoPermissionsToClear
     }
     
     $error.Clear()
-    Grant-Permissions -Identity 'Everyone' -Permissions 'Read','Write' -Path $Path.ToSTring() -Clear -ErrorAction SilentlyContinue
+    Grant-Permission -Identity 'Everyone' -Permission 'Read','Write' -Path $Path.ToSTring() -Clear -ErrorAction SilentlyContinue
     Assert-Equal 0 $error.Count
     $acl = Get-Acl -Path $Path.ToString()
     $rules = $acl.Access | Where-Object { -not $_.IsInherited }
@@ -178,7 +178,7 @@ function Test-ShouldSetInheritanceFlags
 
                 $flags = $map[$containerInheritanceFlag]
                 #Write-Host ('{0}: {1}     {2}' -f $_,$flags.InheritanceFlags,$flags.PropagationFlags)
-                Grant-Permissions -Identity $user -Path $containerPath -Permissions Read -ApplyTo $containerInheritanceFlag
+                Grant-Permission -Identity $user -Path $containerPath -Permission Read -ApplyTo $containerInheritanceFlag
                 Assert-InheritanceFlags $containerInheritanceFlag $flags.InheritanceFlags $flags.PropagationFlags
             }
             finally
@@ -190,7 +190,7 @@ function Test-ShouldSetInheritanceFlags
 
 function Test-ShouldWriteWarningWhenInheritanceFlagsGivenOnLeaf
 {
-    Grant-Permissions -Identity $user -Permissions Read -Path $Path -ApplyTo Container
+    Grant-Permission -Identity $user -Permission Read -Path $Path -ApplyTo Container
 }
 
 function Assert-InheritanceFlags

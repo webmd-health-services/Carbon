@@ -25,4 +25,4 @@ $PSScriptRoot = Split-Path -Parent $MyInvocation.MyCommand.Definition
 
 $websitePath = Join-Path $PSScriptRoot Website -Resolve
 Install-IisWebsite -Name 'get-carbon.org' -Path $websitePath -Bindings 'http/*:80:'
-Grant-Permissions -Identity Everyone -Permissions ReadAndExecute -Path $websitePath
+Grant-Permission -Identity Everyone -Permission ReadAndExecute -Path $websitePath

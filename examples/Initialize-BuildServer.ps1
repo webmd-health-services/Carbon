@@ -35,5 +35,5 @@ Install-Service -Name CCService -Path $ccservicePath -Username $ccserviceUser -P
 
 $pathToVersionControlRepository = 'Path\to\version\control\repository'
 $pathToBuildOutput = 'Path\to\build\output'
-Grant-Permissions -Identity $ccserviceUser -Permissions FullControl -Path $pathToVersionControlRepository
-Grant-Permissions -Identity $ccserviceUser -Permissions FullControl -Path $pathToBuildOutput
+Grant-Permission -Identity $ccserviceUser -Permission FullControl -Path $pathToVersionControlRepository
+Grant-Permission -Identity $ccserviceUser -Permission FullControl -Path $pathToBuildOutput

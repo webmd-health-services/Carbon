@@ -23,7 +23,7 @@ function Setup
 	$childFSPath = Join-Path $parentFSPath 'TestUnprotectAclAccessRules'
 	
     $null = New-Item $childFSPath -ItemType Container
-    Grant-Permissions -Identity Everyone -Permissions FullControl -Path $childFSPath
+    Grant-Permission -Identity Everyone -Permission FullControl -Path $childFSPath
 }
 
 function TearDown
