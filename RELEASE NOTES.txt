@@ -73,7 +73,7 @@
  
 ### IIS
 
- * Renamed `Add-IisServerManagerMembers` to [Add-IisServerManagerMember](http://get-carbon.org/help/Add-IisServerManagerMember.html), with backwards-compatible alias.
+ * Renamed `Add-IisServerManagerMembers` to [Add-IisServerManagerMembers](http://get-carbon.org/help/Add-IisServerManagerMembers.html), with backwards-compatible alias.
  * Added `StatusCode` alias for [Set-IisHttpRedirect's](http://get-carbon.org/help/Set-IisHttpRedirect.html) `HttpResponseStatus` parameter, for backwards-compatibility with earlier releases.
  * Added `Test-IisAppPoolExists` alias for [Test-IisAppPool](http://get-carbon.org/help/Test-IisAppPool.html), for backwards-compatibility with earlier releases.
  * Added `Remove-IisWebsite` alias for [Uninstall-IisWebsite](http://get-carbon.org/help/Uninstall-IisWebsite.html), for backwards-compatibility with earlier releases.
@@ -149,9 +149,9 @@ Take the following steps to get your scripts to work with this release.
 
 Replaces usages of:
 
- * `Get-SslCertificateBinding` with `Get-SslCertificateBindings`
- * `Get-SslCertificateBinding -IPPort '0.0.0.0:443'` with `Get-SslCertificateBindings`
- * `Get-SslCertificateBinding -IPPort '10.1.1.1:8001` with `Get-SslCertificateBindings -IPAddress '10.1.1.1' -Port 8001`
+ * `Get-SslCertificateBindings` with `Get-SslCertificateBinding`
+ * `Get-SslCertificateBinding -IPPort '0.0.0.0:443'` with `Get-SslCertificateBinding`
+ * `Get-SslCertificateBinding -IPPort '10.1.1.1:8001` with `Get-SslCertificateBinding -IPAddress '10.1.1.1' -Port 8001`
  * `Test-SslCertificateBinding -IPPort '0.0.0.0:443` with `Test-SslCertificateBinding`
  * `Test-SslCertificateBinding -IPPort '10.1.1.1:8001` with `Test-SslCertificateBinding -IPAddress '10.1.1.1' -Port 8001`
  * `Set-SslCertificateBinding -IPPort '0.0.0.0:443` with `Set-SslCertificateBinding`
@@ -166,6 +166,9 @@ Replace usages of
  * `Set-EnvironmentVariable -Scope 'Process'` with `Set-EnvironmentVariable -ForProcess`
  * `Set-EnvironmentVariable -Scope 'User'` with `Set-EnvironmentVariable -ForUser`
  * `Set-EnvironmentVariable -Scope 'ForComputer'` with `Set-EnvironmentVariable -ForComputer`
+ * `Remove-EnvironmentVariable -Scope 'Process'` with `Remove-EnvironmentVariable -ForProcess`
+ * `Remove-EnvironmentVariable -Scope 'User'` with `Remove-EnvironmentVariable -ForUser`
+ * `Remove-EnvironmentVariable -Scope 'ForComputer'` with `Remove-EnvironmentVariable -ForComputer`
 
 ### Cryptography
 
@@ -187,9 +190,9 @@ Replace usages of:
  * `Set-IisWindowsAuthentication -UseKernelMode` with `Set-IisWindowsAuthentication`
  * `Set-IisWindowsAuthentication -Disabled` with `Disable-IisSecurityAuthentication -Windows`  
  * `Unlock-IisConfigSection -Name <string>` with `Unlock-IisConfigurationSection -SectionPath <string>` (run `appcmd.exe lock config -section:?` for values to the new `SectionPath` parameter)
- * `Unlock-IisBasicAuthentication` with `Unlock-IisConfigurationSeciton -SectionPath 'system.webServer/security/authentication/basicAuthentication'`
- * `Unlock-IisCgi` with `Unlock-IisConfigurationSeciton -SectionPath 'system.webServer/cgi'`
- * `Unlock-IisWindowsAuthentication` with `Unlock-IisConfigurationSeciton -SectionPath 'system.webServer/security/authentication/windowsAuthentication'`
+ * `Unlock-IisBasicAuthentication` with `Unlock-IisConfigurationSection -SectionPath 'system.webServer/security/authentication/basicAuthentication'`
+ * `Unlock-IisCgi` with `Unlock-IisConfigurationSection -SectionPath 'system.webServer/cgi'`
+ * `Unlock-IisWindowsAuthentication` with `Unlock-IisConfigurationSection -SectionPath 'system.webServer/security/authentication/windowsAuthentication'`
 
 
 ### INI
