@@ -19,12 +19,12 @@ function Setup()
     & (Join-Path $TestDir ..\Carbon\Import-Carbon.ps1 -Resolve)
 
     $line = Get-Content -Path (Join-Path $TestDir '..\RELEASE NOTES.txt' -Resolve) -TotalCount 1
-    if( $line -notmatch '(\d+\.\d+\.\d+\.\d+)' )
+    if( $line -notmatch '(\d+)\.(\d+)\.(\d+)' )
     {
         Fail 'Unable to find version number in release notes.'
     }
     
-    $expectedVersion = [Version]$matches[1]
+    $expectedVersion = New-Object Version $matches[1],$matches[2],$matches[3],0
 }
 
 function TearDown()
