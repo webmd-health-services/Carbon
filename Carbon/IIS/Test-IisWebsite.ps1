@@ -43,3 +43,5 @@ function Test-IisWebsite
     }
     return $false
 }
+
+Set-Alias -Name Test-IisWebsiteExists -Value Test-IisWebsite

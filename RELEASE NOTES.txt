@@ -4,6 +4,7 @@
 
  * Added `Unprotect-AclAccessRules` alias for [Protect-Acl](http://get-carbon.org/help/Protect-Acl.html), for backwards-compatibility with earlier releases.
  * Added rename of `Unprotect-AclAccessRules` to [Protect-Acl](http://get-carbon.org/help/Protect-Acl.html) to v0.5.0.0 section of release notes.
+ * Added `Test-IisWebsiteExists` alias for [Test-IisWebsite](http://get-carbon.org/help/Test-IisWebsite.html), for backwards-compatibility with earlier releases.
 
 ## Bug Fixes
 
@@ -329,7 +330,6 @@ Replace usages of:
  * If you're using `Grant-Permission` without named parameters, the `Path` parameter moved from position 3 to position 1.  Re-order your parameters accordingly.
  * Rename usages of `Set-IisDirectoryBrowsing` to `Enable-IisDirectoryBrowsing`.  If you use named parameters, rename its `Directory` paremter to `Path`.
  * Replace usages of `Set-HgrcDefaultPushUrl` with `Set-IniEntry` instead, e.g. `Set-IniEntry -Path 'Path\to\repo\.hg\hgrc' -Section paths -Name 'default.push' -Value 'DefaultPushUrl'`
- * Rename usages of `Test-IisWebsiteExists` with `Test-IisWebsite`.
  * Rename usages of `Get-FullPath` with `ConvertTo-FullPath`.
 
 ## Enhancements
@@ -351,7 +351,7 @@ Replace usages of:
  * Created [Get-Permissions](http://get-carbon.org/help/Get-Permissions.html) function for getting the non-inherited permissions on a file, directory, registry key, or registry value with the ability to return a specific identity's permissions and/or inherited permissions.
  * Renamed `Set-IisDirectoryBrowsing` to [Enable-IisDirectoryBrowsing](http://get-carbon.org/help/Enable-IisDirectoryBrowsing.html) and renamed its `Directory` parameter to `Path`.
  * Removed `Set-HgrcDefaultPushUrl`.  Use [Set-IniEntry](http://get-carbon.org/help/Enable-IisDirectoryBrowsing.html) instead.
- * Renamed `Test-IisWebsiteExists` to [Test-IisWebsite](http://get-carbon.org/help/Test-IisWebsite.html) to adhere to PowerShell naming conventions.
+ * Renamed `Test-IisWebsiteExists` to [Test-IisWebsite](http://get-carbon.org/help/Test-IisWebsite.html) to adhere to PowerShell naming conventions (added backwards-compatible alias in v1.0.0).
  * Renamed `Get-FullPath` to [ConvertTo-FullPath](http://get-carbon.org/help/ConvertTo-FullPath.html) to adhere to PowerShell naming conventions.
   
 ## Bug fixes
