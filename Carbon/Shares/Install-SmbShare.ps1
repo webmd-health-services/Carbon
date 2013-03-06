@@ -73,7 +73,7 @@ function Install-SmbShare
             {
                 $perm = ',{0}' -f $Access
             }
-            '/GRANT:"{0}{1}"' -f $_,$perm
+            '/GRANT:{0}{1}' -f $_,$perm
         }
     }
 

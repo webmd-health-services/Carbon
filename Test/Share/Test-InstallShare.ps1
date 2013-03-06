@@ -14,7 +14,7 @@
 
 $ShareName = 'New Share Test'
 $SharePath = $TestDir
-$fullAccessGroup = 'CarbonShareFull'
+$fullAccessGroup = 'Carbon Share Full'
 $changeAccessGroup = 'CarbonShareChange'
 $readAccessGroup = 'CarbonShareRead'
 $noAccessGroup = 'CarbonShareNone'
@@ -67,6 +67,7 @@ function Test-ShouldCreateShare
 
 function Test-ShouldGrantPermissions
 {
+    Assert-True ($fullAccessGroup -like '* *') 'full access group must contain a space.'
     Invoke-NewShare -FullAccess $fullAccessGroup -ChangeAccess $changeAccessGroup -ReadAccess $readAccessGroup
     $details = net share $ShareName
     Assert-ContainsLike $details ("{0}, FULL" -f $fullAccessGroup) 'Permissions not set on share.'

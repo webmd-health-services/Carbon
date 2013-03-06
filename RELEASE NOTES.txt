@@ -6,6 +6,10 @@
 
  * [Grant-Permission](http://get-carbon.org/help/Grant-Permission.html) returns boolean values to the pipeline when clearing access rules.
  
+### Shares
+
+ * [Install-SmbShare](http://get-carbon.org/help/Install-SmbShare.html) fails if a principal name contains a space.
+ 
  
 # 0.5.0.1 (9 January 2013)
 
