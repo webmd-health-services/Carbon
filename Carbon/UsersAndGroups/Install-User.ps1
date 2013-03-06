@@ -42,7 +42,12 @@ function Install-User
         [Parameter()]
         [string]
         # A description of the user.
-        $Description
+        $Description,
+        
+        [Parameter()]
+        [string]
+        # The full name of the user.
+        $FullName
     )
     
     $userExists = Test-User -Username $username
@@ -59,7 +64,7 @@ function Install-User
     if( $pscmdlet.ShouldProcess( $Username, "$operation local user" ) )
     {
         Write-Host "$logAction local user $Username."
-        net user $Username $Password $addArg /Comment:$Description
+        net user $Username $Password $addArg /Comment:$Description /Fullname:$FullName
         
         if( -not $userExists )
         {

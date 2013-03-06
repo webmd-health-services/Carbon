@@ -34,27 +34,41 @@ function Remove-TestUser
 
 function Test-ShouldCreateNewUser
 {
+    $fullName = 'Carbon Install User'
     $description = "Test user for testing the Carbon Install-User function."
-    Install-User -Username $username -Password $password -Description $description
+    Install-User -Username $username -Password $password -Description $description -FullName $fullName
     Assert-True (Test-User -Username $username)
     $user = Get-WmiLocalUserAccount -Username $Username
     Assert-NotNull $user
     Assert-Equal $description $user.Description
     Assert-False $user.PasswordExpires 
+    Assert-Equal $fullName $user.FullName
 }
 
 function Test-ShouldUpdateExistingUsersProperties
 {
-    Install-User -Username $username -Password $password -Description "Original description"
+    $fullName = 'Carbon Install User'
+    Install-User -Username $username -Password $password -Description "Original description" -FullName $fullName
     $originalUser = Get-WmiLocalUserAccount -Username $username
     Assert-NotNull $originalUser
     
+    $newFullName = 'New {0}' -f $fullName
     $newDescription = "New description"
-    Install-User -Username $username -Password ([Guid]::NewGuid().ToString().Substring(0,14)) -Description $newDescription
+    Install-User -Username $username -Password ([Guid]::NewGuid().ToString().Substring(0,14)) -Description $newDescription -FullName $newFullName
     $newUser = Get-WmiLocalUserAccount -Username $username
     Assert-NotNull $newUser
     Assert-Equal $originalUser.SID $newUser.SID
     Assert-Equal $newDescription $newUser.Description
+    Assert-Equal $newFullName $newUser.FullName
+}
+
+function Test-ShouldAllowOptionalFullName
+{
+    $fullName = 'Carbon Install User'
+    $description = "Test user for testing the Carbon Install-User function."
+    Install-User -Username $username -Password $password -Description $description
+    $user = Get-WmiLocalUserAccount -Username $Username
+    Assert-Empty $user.FullName
 }
 
 function Test-ShouldSupportWhatIf

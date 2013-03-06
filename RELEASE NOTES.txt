@@ -14,6 +14,10 @@
 ### Services
 
  * Renamed [Install-Service](http://get-carbon.org/help/Install-Service.html)'s `Dependencies` parameter to `Dependency` (with backwards-compatible alias), to follow PowerShell naming standards.
+ 
+### Users and Groups
+
+ * [Install-User](http://get-carbon.org/help/Install-User.html): you can now set a user's full name with the optional `FullName` parameter.
 
 ## Bug Fixes
 
