@@ -12,7 +12,76 @@
 		<li><a href="http://pshdo.com">-Blog</a></li>
 	</ul>
     
-    <h1>0.5.0.1 (9 January 2013)</h1>
+    <h1>1.0.0 (6 March 2013)</h1>
+
+<h2>Upgrade Instructions</h2>
+
+<ul>
+<li>Remove the <code>Quiet</code> parameter from calls to the <code>Import-Carbon.ps1</code> script.</li>
+<li>If you're nesting Carbon as a sub-module of another module, <strong><em>STOP</em></strong>.  This causes havoc.  Create an <code>Import-*.ps1</code> script for your module which imports Carbon before importing your own module.  Update your scripts to import your module with your fancy new <code>Import-*.ps1</code> script.  See <a href="http://pshdo.com/archive/2012/6/4/best-practices-for-importing-powershell-modules.html">Best Practices for Importing PowerShell Modules</a> for details.</li>
+</ul>
+
+<h2>Enhancements</h2>
+
+<h3>General</h3>
+
+<ul>
+<li>The <code>Import-Carbon.ps1</code> script no longer checks if Carbon is a sub-module of another module, so the <code>Quiet</code> parameter was removed.  <strong><em>Please don't nest Carbon in your modules!</em></strong>  It will cause havoc.</li>
+<li><code>Import-Carbon.ps1</code> will no longer stop execution if an error occurs during an import (i.e. the <code>$ErrorActionPreference = 'Stop'</code> line was removed).  </li>
+</ul>
+
+<h3>IIS</h3>
+
+<ul>
+<li>Added <code>Test-IisWebsiteExists</code> alias for <a href="http://get-carbon.org/help/Test-IisWebsite.html">Test-IisWebsite</a>, for backwards-compatibility with earlier releases.</li>
+</ul>
+
+<h3>Security</h3>
+
+<ul>
+<li>Added <code>Unprotect-AclAccessRules</code> alias for <a href="http://get-carbon.org/help/Protect-Acl.html">Protect-Acl</a>, for backwards-compatibility with earlier releases.</li>
+<li>Added rename of <code>Unprotect-AclAccessRules</code> to <a href="http://get-carbon.org/help/Protect-Acl.html">Protect-Acl</a> to v0.5.0.0 section of release notes.</li>
+</ul>
+
+<h3>Services</h3>
+
+<ul>
+<li>Renamed <a href="http://get-carbon.org/help/Install-Service.html">Install-Service</a>'s <code>Dependencies</code> parameter to <code>Dependency</code> (with backwards-compatible alias), to follow PowerShell naming standards.</li>
+</ul>
+
+<h3>Users and Groups</h3>
+
+<ul>
+<li><a href="http://get-carbon.org/help/Install-User.html">Install-User</a>: you can now set a user's full name with the optional <code>FullName</code> parameter.</li>
+</ul>
+
+<h2>Bug Fixes</h2>
+
+<h3>Security</h3>
+
+<ul>
+<li><a href="http://get-carbon.org/help/Grant-Permission.html">Grant-Permission</a> returns boolean values to the pipeline when clearing access rules.</li>
+</ul>
+
+<h3>Service</h3>
+
+<ul>
+<li><a href="http://get-carbon.org/help/Install-Service.html">Install-Service</a> fails if <code>Dependency</code> parameter doesn't have a value.  Sometimes.</li>
+</ul>
+
+<h3>Shares</h3>
+
+<ul>
+<li><a href="http://get-carbon.org/help/Install-SmbShare.html">Install-SmbShare</a> fails if a principal name contains a space.</li>
+</ul>
+
+<h3>Users and Groups</h3>
+
+<ul>
+<li><a href="http://get-carbon.org/help/Add-GroupMember.html">Add-GroupMember</a> doesn't handle when the .NET Active Directory throws an exception when adding members to a group, causing script termination.</li>
+</ul>
+
+<h1>0.5.0.1 (9 January 2013)</h1>
 
 <h2>Enhancements</h2>
 
@@ -376,6 +445,7 @@
 
 <ul>
 <li><a href="http://get-carbon.org/help/Assert-AdminPrivileges.html">Assert-AdminPrivileges</a> no longer throws an exception if the user doesn't have administrative privileges.  Instead, it writes an error and returns <code>False</code>.  It returns <code>True</code> if the user has privileges.</li>
+<li>Renamed <code>Unprotect-AclAccessRules</code> to <a href="http://get-carbon.org/help/Protect-Acl.html">Protect-Acl</a> (added backwards-compatible alias in v1.0.0).</li>
 </ul>
 
 <h3>Shares</h3>
@@ -430,7 +500,6 @@
 <li>If you're using <code>Grant-Permission</code> without named parameters, the <code>Path</code> parameter moved from position 3 to position 1.  Re-order your parameters accordingly.</li>
 <li>Rename usages of <code>Set-IisDirectoryBrowsing</code> to <code>Enable-IisDirectoryBrowsing</code>.  If you use named parameters, rename its <code>Directory</code> paremter to <code>Path</code>.</li>
 <li>Replace usages of <code>Set-HgrcDefaultPushUrl</code> with <code>Set-IniEntry</code> instead, e.g. <code>Set-IniEntry -Path 'Path\to\repo\.hg\hgrc' -Section paths -Name 'default.push' -Value 'DefaultPushUrl'</code></li>
-<li>Rename usages of <code>Test-IisWebsiteExists</code> with <code>Test-IisWebsite</code>.</li>
 <li>Rename usages of <code>Get-FullPath</code> with <code>ConvertTo-FullPath</code>.</li>
 </ul>
 
@@ -454,7 +523,7 @@
 <li>Created <a href="http://get-carbon.org/help/Get-Permissions.html">Get-Permissions</a> function for getting the non-inherited permissions on a file, directory, registry key, or registry value with the ability to return a specific identity's permissions and/or inherited permissions.</li>
 <li>Renamed <code>Set-IisDirectoryBrowsing</code> to <a href="http://get-carbon.org/help/Enable-IisDirectoryBrowsing.html">Enable-IisDirectoryBrowsing</a> and renamed its <code>Directory</code> parameter to <code>Path</code>.</li>
 <li>Removed <code>Set-HgrcDefaultPushUrl</code>.  Use <a href="http://get-carbon.org/help/Enable-IisDirectoryBrowsing.html">Set-IniEntry</a> instead.</li>
-<li>Renamed <code>Test-IisWebsiteExists</code> to <a href="http://get-carbon.org/help/Test-IisWebsite.html">Test-IisWebsite</a> to adhere to PowerShell naming conventions.</li>
+<li>Renamed <code>Test-IisWebsiteExists</code> to <a href="http://get-carbon.org/help/Test-IisWebsite.html">Test-IisWebsite</a> to adhere to PowerShell naming conventions (added backwards-compatible alias in v1.0.0).</li>
 <li>Renamed <code>Get-FullPath</code> to <a href="http://get-carbon.org/help/ConvertTo-FullPath.html">ConvertTo-FullPath</a> to adhere to PowerShell naming conventions.</li>
 </ul>
 

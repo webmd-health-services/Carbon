@@ -232,8 +232,8 @@
 </div>
 
         <h2>Syntax</h2>
-    <pre class="Syntax"><code>Install-Service -Name &lt;String&gt; -Path &lt;String&gt; [-StartupType {Automatic | Manual | Disabled}] [-OnFirstFailure &lt;String&gt;] [-OnSecondFailure &lt;String&gt;] [-OnThirdFailure &lt;String&gt;] [-ResetFailureCount &lt;Int32&gt;] [-RestartDelay &lt;Int32&gt;] [-RebootDelay &lt;Int32&gt;] [-Dependencies &lt;String[]&gt;] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
-<pre class="Syntax"><code>Install-Service -Name &lt;String&gt; -Path &lt;String&gt; [-StartupType {Automatic | Manual | Disabled}] [-OnFirstFailure &lt;String&gt;] [-OnSecondFailure &lt;String&gt;] [-OnThirdFailure &lt;String&gt;] [-ResetFailureCount &lt;Int32&gt;] [-RestartDelay &lt;Int32&gt;] [-RebootDelay &lt;Int32&gt;] [-Dependencies &lt;String[]&gt;] -Username &lt;String&gt; -Password &lt;String&gt; [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
+    <pre class="Syntax"><code>Install-Service -Name &lt;String&gt; -Path &lt;String&gt; [-StartupType {Automatic | Manual | Disabled}] [-OnFirstFailure &lt;String&gt;] [-OnSecondFailure &lt;String&gt;] [-OnThirdFailure &lt;String&gt;] [-ResetFailureCount &lt;Int32&gt;] [-RestartDelay &lt;Int32&gt;] [-RebootDelay &lt;Int32&gt;] [-Dependency &lt;String[]&gt;] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
+<pre class="Syntax"><code>Install-Service -Name &lt;String&gt; -Path &lt;String&gt; [-StartupType {Automatic | Manual | Disabled}] [-OnFirstFailure &lt;String&gt;] [-OnSecondFailure &lt;String&gt;] [-OnThirdFailure &lt;String&gt;] [-ResetFailureCount &lt;Int32&gt;] [-RestartDelay &lt;Int32&gt;] [-RebootDelay &lt;Int32&gt;] [-Dependency &lt;String[]&gt;] -Username &lt;String&gt; -Password &lt;String&gt; [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
     
         <h2>Description</h2>
     <div class="Description">
@@ -337,7 +337,7 @@
                 <td></td>
 			</tr>
 			<tr valign='top'>
-				<td>Dependencies</td>
+				<td>Dependency</td>
 				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String[]</a></td>
 				<td>What other services does this service depend on?
 </td>
