@@ -51,3 +51,5 @@ function Protect-Acl
     $acl.SetAccessRuleProtection( $true, $Preserve )
     $acl | Set-Acl -Path $Path
 }
+
+Set-Alias -Name Unprotect-AclAccessRules -Value Protect-Acl
