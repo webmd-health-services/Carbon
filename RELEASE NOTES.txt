@@ -1,6 +1,16 @@
 # 1.0.0
 
+## Upgrade Instructions
+
+ * Remove the `Quiet` parameter from calls to the `Import-Carbon.ps1` script.
+ * If you're nesting Carbon as a sub-module of another module, ***STOP***.  This causes havoc.  Create an `Import-*.ps1` script for your module which imports Carbon before importing your own module.  Update your scripts to import your module with your fancy new `Import-*.ps1` script.  See [Best Practices for Importing PowerShell Modules](http://pshdo.com/archive/2012/6/4/best-practices-for-importing-powershell-modules.html) for details.
+
 ## Enhancements
+
+### General
+
+ * The `Import-Carbon.ps1` script no longer checks if Carbon is a sub-module of another module, so the `Quiet` parameter was removed.  ***Please don't nest Carbon in your modules!***  It will cause havoc.
+ * `Import-Carbon.ps1` will no longer stop execution if an error occurs during an import (i.e. the `$ErrorActionPreference = 'Stop'` line was removed).  
 
 ### IIS
 

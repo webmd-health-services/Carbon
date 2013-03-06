@@ -3,15 +3,12 @@
 Imports the Carbon module.
 
 .DESCRIPTION
-Imports the Carbon module.  If the Carbon module is already loaded, it will remove it and then reloaded.  If Carbon is present as a sub-module of Carbon, Carbon can't be re-loaded so a warning is output instead.  To hide the warning, use the `-Quiet` parameter.
+Imports the Carbon module.  If the Carbon module is already loaded, it will remove it and then reloaded.
 
 .EXAMPLE
 Import-Carbon.ps1
 
 Imports the Carbon module, re-loading it if its already loaded.
-
-.EXAMPLE
-Import-Carbon.ps1 -Quiet
 
 Imports the Carbon module, hiding any warnings about Carbon being loaded as a sub-module.
 #>
@@ -32,30 +29,14 @@ Imports the Carbon module, hiding any warnings about Carbon being loaded as a su
 
 [CmdletBinding()]
 param(
-    [Switch]
-    # Don't show any warnings if Carbon can't be unloaded and re-loaded.
-    $Quiet
 )
+
 Set-StrictMode -Version Latest
-$ErrorActionPreference = 'Stop'
-$PSScriptRoot = Split-Path -Parent $MyInvocation.MyCommand.Definition
+$PSScriptRoot = Split-Path -Parent -Path $MyInvocation.MyCommand.Definition
 
 if( (Get-Module Carbon) )
 {
     Remove-Module Carbon
 }
-elseif( Test-Path "variable:CarbonImported" )
-{
-    $var = Get-Variable 'CarbonImported'
-    if( -not $Quiet )
-    {
-        Get-Module $var.Module | 
-            ForEach-Object {
-                $message = "Carbon already present as nested module in {0} module ({1})." -f $var.Module, $_.ModuleBase
-                Write-Warning $message
-            }
-    }
-    return
-}
 
-Import-Module (Join-Path $PSScriptRoot ..\Carbon -Resolve)
+Import-Module $PSScriptRoot
