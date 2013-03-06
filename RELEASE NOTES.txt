@@ -5,15 +5,12 @@
  * Added `Unprotect-AclAccessRules` alias for [Protect-Acl](http://get-carbon.org/help/Protect-Acl.html), for backwards-compatibility with earlier releases.
  * Added rename of `Unprotect-AclAccessRules` to [Protect-Acl](http://get-carbon.org/help/Protect-Acl.html) to v0.5.0.0 section of release notes.
  * Added `Test-IisWebsiteExists` alias for [Test-IisWebsite](http://get-carbon.org/help/Test-IisWebsite.html), for backwards-compatibility with earlier releases.
+ * Renamed [Install-Service](http://get-carbon.org/help/Install-Service.html)'s `Dependencies` parameter to `Dependency` (with backwards-compatible alias), to follow PowerShell naming standards.
 
 ## Bug Fixes
 
-### Security
-
  * [Grant-Permission](http://get-carbon.org/help/Grant-Permission.html) returns boolean values to the pipeline when clearing access rules.
- 
-### Shares
-
+ * [Install-Service](http://get-carbon.org/help/Install-Service.html) fails if `Dependency` parameter doesn't have a value.  Sometimes.
  * [Install-SmbShare](http://get-carbon.org/help/Install-SmbShare.html) fails if a principal name contains a space.
  
  

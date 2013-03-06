@@ -82,9 +82,10 @@ function Install-Service
         # How many milliseconds to wait before handling the second failure.  Default is 60,000 or 1 minute.
         $RebootDelay = 60000,
         
+        [Alias('Dependencies')]
         [string[]]
         # What other services does this service depend on?
-        $Dependencies = @(),
+        $Dependency,
         
         [Parameter(ParameterSetName='CustomAccount',Mandatory=$true)]
         [string]
@@ -118,20 +119,23 @@ function Install-Service
         }
     }
 
-    $missingDependencies = $false
-    foreach( $dependency in $Dependencies )
+    if( $Dependency )
     {
-        if( -not (Test-Service -Name $dependency) )
+        $missingDependencies = $false
+        $Dependency | 
+            ForEach-Object {
+                if( -not (Test-Service -Name $_) )
+                {
+                    Write-Error ('Dependent service {0} not found.' -f $_)
+                    $missingDependencies = $true
+                }
+            }
+        if( $missingDependencies )
         {
-            Write-Error ('Dependent service {0} not found.' -f $dependency)
-            $missingDependencies = $true
+            return
         }
     }
-    if( $missingDependencies )
-    {
-        return
-    }
-
+    
     if( $pscmdlet.ParameterSetName -eq 'CustomAccount' )
     {
         $identity = Resolve-IdentityName -Name $Username
@@ -202,10 +206,10 @@ function Install-Service
     
     $dependencyArgName = ''
     $dependencyArgValue = ''
-    if( $Dependencies )
+    if( $Dependency )
     {
         $dependencyArgName = 'depend='
-        $dependencyArgValue = $Dependencies -join '/'
+        $dependencyArgValue = $Dependency -join '/'
     }
 
     if( $pscmdlet.ShouldProcess( "$Name [$Path]", "$operation service" ) )
