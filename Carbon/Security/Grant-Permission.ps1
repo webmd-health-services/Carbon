@@ -197,7 +197,7 @@ function Grant-Permission
         if( $rules )
         {
             $rules | 
-                ForEach-Object { $currentAcl.RemoveAccessRule( $_ ) }
+                ForEach-Object { [void] $currentAcl.RemoveAccessRule( $_ ) }
         }
     }
     $currentAcl.SetAccessRule( $accessRule )
