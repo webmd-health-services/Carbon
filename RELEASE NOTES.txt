@@ -2,17 +2,36 @@
 
 ## Enhancements
 
+### IIS
+
+ * Added `Test-IisWebsiteExists` alias for [Test-IisWebsite](http://get-carbon.org/help/Test-IisWebsite.html), for backwards-compatibility with earlier releases.
+
+### Security
+
  * Added `Unprotect-AclAccessRules` alias for [Protect-Acl](http://get-carbon.org/help/Protect-Acl.html), for backwards-compatibility with earlier releases.
  * Added rename of `Unprotect-AclAccessRules` to [Protect-Acl](http://get-carbon.org/help/Protect-Acl.html) to v0.5.0.0 section of release notes.
- * Added `Test-IisWebsiteExists` alias for [Test-IisWebsite](http://get-carbon.org/help/Test-IisWebsite.html), for backwards-compatibility with earlier releases.
+ 
+### Services
+
  * Renamed [Install-Service](http://get-carbon.org/help/Install-Service.html)'s `Dependencies` parameter to `Dependency` (with backwards-compatible alias), to follow PowerShell naming standards.
 
 ## Bug Fixes
 
- * [Add-GroupMember](http://get-carbon.org/help/Add-GroupMember.html) doesn't handle when the .NET Active Directory throws an exception when adding members to a group, causing script termination.
+### Security
+
  * [Grant-Permission](http://get-carbon.org/help/Grant-Permission.html) returns boolean values to the pipeline when clearing access rules.
+ 
+### Service
+
  * [Install-Service](http://get-carbon.org/help/Install-Service.html) fails if `Dependency` parameter doesn't have a value.  Sometimes.
+
+### Shares
+
  * [Install-SmbShare](http://get-carbon.org/help/Install-SmbShare.html) fails if a principal name contains a space.
+
+### Users and Groups
+
+ * [Add-GroupMember](http://get-carbon.org/help/Add-GroupMember.html) doesn't handle when the .NET Active Directory throws an exception when adding members to a group, causing script termination.
  
  
 # 0.5.0.1 (9 January 2013)
