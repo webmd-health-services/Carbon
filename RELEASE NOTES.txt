@@ -9,6 +9,7 @@
 
 ## Bug Fixes
 
+ * [Add-GroupMember](http://get-carbon.org/help/Add-GroupMember.html) doesn't handle when the .NET Active Directory throws an exception when adding members to a group, causing script termination.
  * [Grant-Permission](http://get-carbon.org/help/Grant-Permission.html) returns boolean values to the pipeline when clearing access rules.
  * [Install-Service](http://get-carbon.org/help/Install-Service.html) fails if `Dependency` parameter doesn't have a value.  Sometimes.
  * [Install-SmbShare](http://get-carbon.org/help/Install-SmbShare.html) fails if a principal name contains a space.

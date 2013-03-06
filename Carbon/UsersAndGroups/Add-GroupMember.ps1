@@ -91,7 +91,14 @@ function Add-GroupMember
                 if( $pscmdlet.ShouldProcess( $Name, "add member $currentMember" ) )
                 {
                     Write-Host "Adding $currentMember to group $Name."
-                    [void] $group.Add( $memberPath )
+                    try
+                    {
+                        [void] $group.Add( $memberPath )
+                    }
+                    catch
+                    {
+                        Write-Error ('Failed to add {0} to group {1}: {2}.' -f $currentMember,$Name,$_.Exception.Message)
+                    }
                 }
             }
         }
