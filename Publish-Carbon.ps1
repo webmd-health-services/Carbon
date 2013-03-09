@@ -48,7 +48,7 @@ $releaseNotesFileName = 'RELEASE NOTES.txt'
 $releaseNotesPath = Join-Path $PSScriptRoot $releaseNotesFileName -Resolve
 $releaseNotes = Get-Content $releaseNotesPath
 
-if( $releaseNotes[0] -notmatch "^\# (\d+\.\d+\.\d+\.\d+)\s*" )
+if( $releaseNotes[0] -notmatch "^\# (\d+\.\d+\.\d+)\s*" )
 {
     Write-Error "Missing version from release notes file.  The first line must contain the version about to be released."
     exit
