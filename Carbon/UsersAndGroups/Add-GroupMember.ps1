@@ -62,7 +62,7 @@ function Add-GroupMember
         return
     }
 
-    $currentMembers = net localgroup `"$Name`"
+    $currentMembers = & (Resolve-NetPath) localgroup `"$Name`"
     $Member |
         Where-Object { $currentMembers -notcontains $_ } |
         ForEach-Object {
@@ -77,7 +77,7 @@ function Add-GroupMember
                 if( $pscmdlet.ShouldProcess( $Name, "add built-in member $currentMember" ) )
                 {
                     Write-Host "Adding $currentMember to group $Name."
-                    net localgroup $Name $currentMember /add
+                    & (Resolve-NetPath) localgroup $Name $currentMember /add
                 }
             }
             else

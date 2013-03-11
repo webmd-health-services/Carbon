@@ -35,8 +35,7 @@ function Reset-MsmqQueueManagerID
 
     Write-Host "Resetting MSMQ Queue Manager ID."
     Write-Verbose "Stopping MSMQ."
-    net stop MSMQ /y
-    net stop MQAC /y
+    Stop-Service MSMQ -Force
     
     $QMIdPath = "HKLM:\SOFTWARE\Microsoft\MSMQ\Parameters\MachineCache"
     $QMIdName = "QMId"
@@ -50,7 +49,7 @@ function Reset-MsmqQueueManagerID
 	Set-RegistryKeyValue -Path $MSMQSysPrepPath -Name $MSMQSysPrepName -DWord 1
     
     Write-Verbose "Starting MSMQ"
-    net start MSMQ
+    Start-Service MSMQ
     
 	$QMId = Get-RegistryKeyValue -Path $QMIdPath -Name $QMIdName
     Write-Verbose "New QMId: $QMId"

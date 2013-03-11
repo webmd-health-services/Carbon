@@ -39,7 +39,7 @@ function Uninstall-User
     {
         if( $pscmdlet.ShouldProcess( "$Username", "remove local user" ) )
         {
-            net user $Username /delete
+            & (Resolve-NetPath) user $Username /delete
         }
     }
 }

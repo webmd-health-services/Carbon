@@ -51,7 +51,7 @@ function Install-Group
     } 
     Write-Host "$action local group '$Name'."
     
-    net localgroup `"$Name`" /Comment:"$Description" $addArg
+    & (Resolve-NetPath) localgroup `"$Name`" /Comment:"$Description" $addArg
     
     if( $Members )
     {

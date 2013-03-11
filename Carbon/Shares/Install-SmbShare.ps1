@@ -89,5 +89,5 @@ function Install-SmbShare
     $readAccessArg = ConvertTo-NetShareGrantArg -Name $ReadAccess -Access 'READ'
     $noAccessArg = ConvertTo-NetShareGrantArg -Name $NoAccess -Access 'NONE'
     
-    net share $Name=$($Path.Trim('\')) /REMARK:$Description $fullAccessArg $changeAccessArg $readAccessArg /CACHE:NONE /UNLIMITED
+    & (Resolve-NetPath) share $Name=$($Path.Trim('\')) /REMARK:$Description $fullAccessArg $changeAccessArg $readAccessArg /CACHE:NONE /UNLIMITED
 }
