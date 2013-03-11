@@ -24,7 +24,7 @@ function Get-IisHttpHeader
      * Name: the name of the HTTP header
      * Value: the value of the HTTP header
     
-    .OUTPUT
+    .OUTPUTS
     Carbon.Iis.HttpHeader.
     
     .LINK
