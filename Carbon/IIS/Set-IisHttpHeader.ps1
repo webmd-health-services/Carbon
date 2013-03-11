@@ -74,7 +74,7 @@ function Set-IisHttpHeader
         $addElement = $headers.CreateElement( 'add' )
         $addElement['name'] = $Name
         $addElement['value'] = $Value
-        $headers.Add( $addElement )
+        [void] $headers.Add( $addElement )
     }
     
     if( $pscmdlet.ShouldProcess( ('{0}/{1}' -f $SiteName,$Path), ('{0} HTTP header {1}' -f $action,$Name) ) )

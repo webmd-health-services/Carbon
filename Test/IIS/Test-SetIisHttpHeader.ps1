@@ -33,7 +33,8 @@ function Test-ShouldCreateNewHeader()
     $value = 'Brownies'
     $header = Get-IisHttpHeader -SiteName $siteName -Name $name
     Assert-Null $header
-    Set-IisHttpHeader -SiteName $siteName -Name $name -Value $value
+    $result = Set-IisHttpHeader -SiteName $siteName -Name $name -Value $value
+    Assert-Null $result 'something returned from Set-IisHttpHeader'
     $header = Get-IisHttpHeader -SiteName $siteName -Name $name
     Assert-NotNull $header 'header not created'
     Assert-Equal $name $header.Name
@@ -47,7 +48,8 @@ function Test-ShouldSetExistingHeader()
     Set-IisHttpHeader -SiteName $siteName -Name $name -Value $value
     
     $newValue = 'Blondies'
-    Set-IisHttpHeader -SiteName $siteName -Name $name -Value $newValue
+    $result = Set-IisHttpHeader -SiteName $siteName -Name $name -Value $newValue
+    Assert-Null $result 'something returned from Set-IisHttpHeader'
     
     $header = Get-IisHttpHeader -SiteName $siteName -Name $name
     Assert-NotNull $header 'header not created'

@@ -63,7 +63,7 @@ function Set-IisMimeMap
         $mimeMap = $mimeMapCollection.CreateElement("mimeMap");
         $mimeMap["fileExtension"] = $FileExtension
         $mimeMap["mimeType"] = $MimeType
-        $mimeMapCollection.Add($mimeMap)
+        [void] $mimeMapCollection.Add($mimeMap)
     }
      
     if( $pscmdlet.ShouldProcess( 'IIS web server', ('{0} MIME map {1} -> {2}' -f $action,$FileExtension,$MimeType) ) )

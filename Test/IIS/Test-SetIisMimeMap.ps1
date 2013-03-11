@@ -36,7 +36,8 @@ function Test-ShouldCreateNewMimeMapForServer
     
     try
     {
-        Set-IisMimeMap -FileExtension $fileExtension -MimeType $mimeType
+        $result = Set-IisMimeMap -FileExtension $fileExtension -MimeType $mimeType
+        Assert-Null $result 'objects returned from Set-IisMimeMap'
         
         $mimeMap = Get-IisMimeMap -FileExtension $fileExtension
         Assert-NotNull $mimeMap
@@ -45,7 +46,8 @@ function Test-ShouldCreateNewMimeMapForServer
     }
     finally
     {
-        Remove-IisMimeMap -FileExtension $fileExtension
+        $result = Remove-IisMimeMap -FileExtension $fileExtension
+        Assert-Null $result 'objects returned from Remove-IisMimeMap'
     }
 }
 
@@ -61,7 +63,8 @@ function Test-ShouldUpdateExistingMimeMapForServer
     try
     {
         Set-IisMimeMap -FileExtension $fileExtension -MimeType $mimeType
-        Set-IisMimeMap -FileExtension $fileExtension -MimeType $mimeType2
+        $result = Set-IisMimeMap -FileExtension $fileExtension -MimeType $mimeType2
+        Assert-Null $result 'objects returned from Set-IisMimeMap'
         
         $mimeMap = Get-IisMimeMap -FileExtension $fileExtension
         Assert-NotNull $mimeMap
