@@ -58,7 +58,7 @@ function Get-IisHttpHeader
         
         [string]
         # The name of the HTTP header to return.  Optional.  If not given, all headers are returned.  Wildcards supported.
-        $Name
+        $Name = '*'
     )
 
     $httpProtocol = Get-IisConfigurationSection -SiteName $SiteName `

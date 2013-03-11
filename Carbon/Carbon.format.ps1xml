@@ -155,5 +155,35 @@
 				</TableRowEntries>
 			</TableControl>
 		</View>
+	  <View>
+		<Name>CarbonIisMimeMap</Name>
+		<ViewSelectedBy>
+			<TypeName>Carbon.Iis.MimeMap</TypeName>
+		</ViewSelectedBy>
+		<TableControl>
+			<TableHeaders>
+				<TableColumnHeader>
+					<Label>File Extension</Label>
+					<Width>15</Width>
+				</TableColumnHeader>
+				<TableColumnHeader>
+					<Label>MIME Type</Label>
+					<Width>64</Width>
+				</TableColumnHeader>
+			</TableHeaders>
+			<TableRowEntries>
+				<TableRowEntry>
+					<TableColumnItems>
+						<TableColumnItem>
+							<PropertyName>FileExtension</PropertyName>
+						</TableColumnItem>
+						<TableColumnItem>
+							<PropertyName>MimeType</PropertyName>
+						</TableColumnItem>
+					</TableColumnItems>
+					</TableRowEntry>
+				</TableRowEntries>
+			</TableControl>
+		</View>
 	</ViewDefinitions>
 </Configuration>
