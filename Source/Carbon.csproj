@@ -51,6 +51,7 @@
   <ItemGroup>
     <Compile Include="AdvApi32.cs" />
     <Compile Include="Certificates\SslCertificateBinding.cs" />
+    <Compile Include="Iis\HttpHeader.cs" />
     <Compile Include="Iis\HttpRedirectConfigurationSection.cs" />
     <Compile Include="Iis\HttpResponseStatus.cs" />
     <Compile Include="Ini\IniNode.cs" />

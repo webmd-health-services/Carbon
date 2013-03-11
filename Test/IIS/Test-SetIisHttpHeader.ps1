@@ -1,0 +1,75 @@
+
+$siteName = 'CarbonSetIisHttpHeader'
+$sitePort = 47938
+
+function Setup()
+{
+    & (Join-Path $TestDir ..\..\Carbon\Import-Carbon.ps1 -Resolve)
+    Install-IisWebsite -Name $siteName -Path $TestDir -Binding ('http/*:{0}:*' -f $sitePort)
+}
+
+function Remove()
+{
+    Remove-IisWebsite -Name $siteName
+    Remove-Module Carbon
+}
+
+function Test-ShouldCreateNewHeader()
+{
+    $name = 'X-Carbon-SetIisHttpHeader'
+    $value = 'Brownies'
+    $header = Get-IisHttpHeader -SiteName $siteName -Name $name
+    Assert-Null $header
+    Set-IisHttpHeader -SiteName $siteName -Name $name -Value $value
+    $header = Get-IisHttpHeader -SiteName $siteName -Name $name
+    Assert-NotNull $header 'header not created'
+    Assert-Equal $name $header.Name
+    Assert-Equal $value $header.Value
+}
+
+function Test-ShouldSetExistingHeader()
+{
+    $name = 'X-Carbon-SetIisHttpHeader'
+    $value = 'Brownies'
+    Set-IisHttpHeader -SiteName $siteName -Name $name -Value $value
+    
+    $newValue = 'Blondies'
+    Set-IisHttpHeader -SiteName $siteName -Name $name -Value $newValue
+    
+    $header = Get-IisHttpHeader -SiteName $siteName -Name $name
+    Assert-NotNull $header 'header not created'
+    Assert-Equal $name $header.Name
+    Assert-Equal $newValue $header.Value
+}
+
+function Test-ShouldSetHeaderOnPath
+{
+    $name = 'X-Carbon-SetIisHttpHeader'
+
+    $value = 'Parent'
+    Set-IisHttpHeader -SiteName $siteName -Name $name -Value $value
+    
+    $subValue = 'Child'
+    Set-IisHttpHeader -SiteName $siteName -Path SubFolder -Name $name -Value $subValue
+    
+    $header = Get-IisHttpHeader -SiteName $siteName -Name $name
+    Assert-NotNull $header 'header not created'
+    Assert-Equal $name $header.Name
+    Assert-Equal $value $header.Value
+    
+    $header = Get-IisHttpHeader -SiteName $siteName -Path SubFolder -Name $name
+    Assert-NotNull $header 'header not created'
+    Assert-Equal $name $header.Name
+    Assert-Equal $subValue $header.Value
+}
+
+function Test-ShouldSupportWhatIf()
+{
+    $name = 'X-Carbon-SetIisHttpHeader'
+    $value = 'Brownies'
+    $header = Get-IisHttpHeader -SiteName $siteName -Name $name
+    Assert-Null $header
+    Set-IisHttpHeader -SiteName $siteName -Name $name -Value $value -WhatIf
+    $header = Get-IisHttpHeader -SiteName $siteName -Name $name
+    Assert-Null $header 'HTTP header created'
+}

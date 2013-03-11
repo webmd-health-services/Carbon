@@ -1,3 +1,17 @@
+# 1.0.1
+
+## Enhancements
+
+### General
+
+ * Fixed some typos and ommissions in the v0.5.0.1 and v0.5.0.0 sections of the release notes.
+
+### IIS
+
+ * Created [Get-IisHttpHeader](http://get-carbon.org/help/Get-IisHttpHeader.html) for getting the custom HTTP headers for a website or one of its sub-directories.
+ * Created [Set-IisHttpHeader](http://get-carbon.org/help/Set-IisHttpHeader.html) for creating/setting a custom HTTP header for a website or one of its sub-directories.
+
+ 
 # 1.0.0 (6 March 2013)
 
 ## Upgrade Instructions
