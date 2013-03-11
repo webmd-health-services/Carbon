@@ -54,6 +54,7 @@
     <Compile Include="Iis\HttpHeader.cs" />
     <Compile Include="Iis\HttpRedirectConfigurationSection.cs" />
     <Compile Include="Iis\HttpResponseStatus.cs" />
+    <Compile Include="Iis\MimeMap.cs" />
     <Compile Include="Ini\IniNode.cs" />
     <Compile Include="IO\JunctionPoint.cs" />
     <Compile Include="Lsa.cs">
