@@ -52,6 +52,10 @@
       <Project>{FAC30031-F36B-4A7F-B887-114D0B3DFD7D}</Project>
       <Name>Carbon</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Iis\Carbon.Iis.csproj">
+      <Project>{e327b329-2f5c-4cde-b8f6-40d8bcdd83d8}</Project>
+      <Name>Carbon.Iis</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

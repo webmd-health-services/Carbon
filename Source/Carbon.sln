@@ -1,9 +1,11 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Carbon", "Carbon.csproj", "{FAC30031-F36B-4A7F-B887-114D0B3DFD7D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Carbon.Test", "Test\Carbon.Test.csproj", "{C661482E-C379-4973-B8A4-35F6F04218A7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Carbon.Iis", "Iis\Carbon.Iis.csproj", "{E327B329-2F5C-4CDE-B8F6-40D8BCDD83D8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -19,6 +21,10 @@ Global
 		{C661482E-C379-4973-B8A4-35F6F04218A7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C661482E-C379-4973-B8A4-35F6F04218A7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C661482E-C379-4973-B8A4-35F6F04218A7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E327B329-2F5C-4CDE-B8F6-40D8BCDD83D8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E327B329-2F5C-4CDE-B8F6-40D8BCDD83D8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E327B329-2F5C-4CDE-B8F6-40D8BCDD83D8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E327B329-2F5C-4CDE-B8F6-40D8BCDD83D8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

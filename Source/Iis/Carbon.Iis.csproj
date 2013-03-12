@@ -1,15 +1,14 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>8.0.30703</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{FAC30031-F36B-4A7F-B887-114D0B3DFD7D}</ProjectGuid>
+    <ProjectGuid>{E327B329-2F5C-4CDE-B8F6-40D8BCDD83D8}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Carbon</RootNamespace>
-    <AssemblyName>Carbon</AssemblyName>
+    <RootNamespace>Carbon.Iis</RootNamespace>
+    <AssemblyName>Carbon.Iis</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
@@ -18,15 +17,16 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\Carbon\bin\</OutputPath>
+    <OutputPath>..\..\Carbon\bin\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>..\Carbon\bin\</OutputPath>
+    <OutputPath>..\..\Carbon\bin\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -35,34 +35,33 @@
     <SignAssembly>true</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
-    <AssemblyOriginatorKeyFile>Carbon.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>..\Carbon.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.Web.Administration, Version=7.9.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\Windows\System32\inetsrv\Microsoft.Web.Administration.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
-    <Reference Include="System.Security" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
-    <Reference Include="System.ServiceProcess" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AdvApi32.cs" />
-    <Compile Include="Certificates\SslCertificateBinding.cs" />
-    <Compile Include="Ini\IniNode.cs" />
-    <Compile Include="IO\JunctionPoint.cs" />
-    <Compile Include="Lsa.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Security\ComAccessRights.cs" />
-    <Compile Include="Security\ComAccessRule.cs" />
-    <Compile Include="Security\ContainerInheritanceFlags.cs" />
-    <Compile Include="Security\ServiceAccessRights.cs" />
-    <Compile Include="Security\ServiceAccessRule.cs" />
-    <Compile Include="Win32.cs" />
+    <Compile Include="HttpHeader.cs" />
+    <Compile Include="HttpRedirectConfigurationSection.cs" />
+    <Compile Include="HttpResponseStatus.cs" />
+    <Compile Include="MimeMap.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Win32ErrorCodes.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Carbon.snk" />
+    <ProjectReference Include="..\Carbon.csproj">
+      <Project>{fac30031-f36b-4a7f-b887-114d0b3dfd7d}</Project>
+      <Name>Carbon</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

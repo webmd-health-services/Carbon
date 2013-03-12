@@ -2,9 +2,11 @@ relre:.*\.orig
 glob:Carbon*.zip
 glob:Carbon\bin\*.pdb
 glob:Source\obj
+glob:Source\**\obj
 glob:Source\Test\bin
 glob:Source\Test\obj
 glob:Source\*.suo
 glob:Source\*.user
 glob:Source\_ReSharper*
 glob:Source\Carbon.snk
+glob:Source\**\*.user

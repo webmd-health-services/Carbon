@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+$CarbonBinDir = Join-Path $PSScriptRoot bin -Resolve
+
 # Active Directory
 Add-Type -AssemblyName System.DirectoryServices.AccountManagement
 
@@ -27,6 +29,7 @@ $microsoftWebAdministrationPath = Join-Path $env:SystemRoot system32\inetsrv\Mic
 if( (Test-Path -Path $microsoftWebAdministrationPath -PathType Leaf) )
 {
     Add-Type -Path $microsoftWebAdministrationPath
+    Add-Type -Path (Join-Path $CarbonBinDir Carbon.Iis.dll -Resolve)
 }
 
 # MSMQ
@@ -53,7 +56,6 @@ $windowsFeaturesNotSupported = (-not ($useServerManager -or ($useWmi -and $useOC
 $supportNotFoundErrorMessage = 'Unable to find support for managing Windows features.  Couldn''t find servermanagercmd.exe, ocsetup.exe, or WMI support.'
 
 
-$CarbonBinDir = Join-Path $PSScriptRoot bin -Resolve
 
 Get-Item (Join-Path $PSScriptRoot *\*.ps1) | 
     ForEach-Object {
