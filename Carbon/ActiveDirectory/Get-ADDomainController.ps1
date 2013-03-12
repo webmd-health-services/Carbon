@@ -51,12 +51,18 @@ function Get-ADDomainController
     {
         try
         {
+            Add-Type -AssemblyName System.DirectoryServices.AccountManagement
             $principalContext = New-Object DirectoryServices.AccountManagement.PrincipalContext Domain,$Domain
             return $principalContext.ConnectedServer
         }
         catch
         {
-            Write-Error "Unable to find domain controller for domain '$Domain'."
+            $firstException = $_.Exception
+            while( $firstException.InnerException )
+            {
+                $firstException = $firstException.InnerException
+            }
+            Write-Error ("Unable to find domain controller for domain '{0}': {1}: {2}" -f $Domain,$firstException.GetType().FullName,$firstException.Message)
             return $null
         }
     }
