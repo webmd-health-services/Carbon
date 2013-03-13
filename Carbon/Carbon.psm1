@@ -15,7 +15,6 @@
 $CarbonBinDir = Join-Path $PSScriptRoot bin -Resolve
 
 # Active Directory
-Add-Type -AssemblyName System.DirectoryServices.AccountManagement
 
 # COM
 $ComRegKeyPath = 'hklm:\software\microsoft\ole'
