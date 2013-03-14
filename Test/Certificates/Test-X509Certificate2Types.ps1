@@ -24,13 +24,10 @@ function TearDown
 
 function Test-ShouldCreateIssuedPropertiesOnX509Certificate2
 {
-    Get-ChildItem -Path cert:\CurrentUser -Recurse |
-        Where-Object { -not $_.PsIsContainer } | 
-        ForEach-Object {
-            Assert-NotNull $_.IssuedTo ('IssuedTo on {0}' -f $_.Subject)
-            Assert-NotNull $_.IssuedBy ('IssuedBy on {0}' -f $_.Subject)
-            
-            Assert-Equal ($_.GetNameInfo( 'SimpleName', $true )) $_.IssuedBy
-            Assert-Equal ($_.GetNameInfo( 'SimpleName', $false )) $_.IssuedTo
-        }
+    $cert = Get-Certificate -Path (Join-Path $TEstDir CarbonTestCertificate.cer -Resolve)
+    Assert-NotNull $cert.IssuedTo ('IssuedTo on {0}' -f $cert.Subject)
+    Assert-NotNull $cert.IssuedBy ('IssuedBy on {0}' -f $cert.Subject)
+    
+    Assert-Equal ($cert.GetNameInfo( 'SimpleName', $true )) $cert.IssuedBy
+    Assert-Equal ($cert.GetNameInfo( 'SimpleName', $false )) $cert.IssuedTo
 }
