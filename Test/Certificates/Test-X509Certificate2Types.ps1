@@ -24,7 +24,7 @@ function TearDown
 
 function Test-ShouldCreateIssuedPropertiesOnX509Certificate2
 {
-    Get-ChildItem -Path cert:\ -Recurse |
+    Get-ChildItem -Path cert:\CurrentUser -Recurse |
         Where-Object { -not $_.PsIsContainer } | 
         ForEach-Object {
             Assert-NotNull $_.IssuedTo ('IssuedTo on {0}' -f $_.Subject)
