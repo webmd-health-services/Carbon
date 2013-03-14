@@ -6,6 +6,10 @@
 
  * Fixed some typos and ommissions in the v0.5.0.1 and v0.5.0.0 sections of the release notes.
  
+### Certificates
+
+ * Added `IssuedTo` and `IssuedBy` properties to [X509Certificate2](http://msdn.microsoft.com/en-us/library/ms148409(v=vs.90).aspx) objects.  The values match what the Certificates MMC snap-in displays.
+ 
 ### Computer
 
  * Created [Resolve-NetPath](http://get-carbon.org/help/Resolve-NetPath.html) for getting the path to the Windows `net.exe` command/application.  Updated all functions that call `net.exe` to use this function to resolve its path.  Thanks to Paul Aage Aasheim for discovering that when running login scripts, `net.exe` isn't in the path.

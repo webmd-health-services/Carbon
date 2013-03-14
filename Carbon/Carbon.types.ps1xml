@@ -70,4 +70,21 @@
             </ScriptProperty>
         </Members>
     </Type>
+    <Type>
+        <Name>System.Security.Cryptography.X509Certificates.X509Certificate2</Name>
+        <Members>
+            <ScriptProperty>
+                <Name>IssuedTo</Name>
+                <GetScriptBlock>
+                    $this.GetNameInfo( 'SimpleName', $false )
+                </GetScriptBlock>
+            </ScriptProperty>
+            <ScriptProperty>
+                <Name>IssuedBy</Name>
+                <GetScriptBlock>
+                    $this.GetNameInfo( 'SimpleName', $true )
+                </GetScriptBlock>
+            </ScriptProperty>
+        </Members>
+    </Type>
 </Types>
