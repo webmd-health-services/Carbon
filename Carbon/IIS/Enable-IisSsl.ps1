@@ -30,6 +30,9 @@ function Enable-IisSsl
     Changing any SSL settings will do you no good if the website doesn't have an SSL binding or doesn't have an SSL certificate.  The configuration will most likely succeed, but won't work in a browser.  So sad.
     
     Beginning with IIS 7.5, the `Require128BitSsl` parameter won't actually change the behavior of a website since [there are no longer 128-bit crypto providers](https://forums.iis.net/p/1163908/1947203.aspx) in versions of Windows running IIS 7.5.
+    
+    .LINK
+    http://support.microsoft.com/?id=907274
 
     .EXAMPLE
     Enable-IisSsl -Site Peanuts
