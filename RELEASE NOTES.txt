@@ -9,6 +9,7 @@
 ### Certificates
 
  * Added `IssuedTo` and `IssuedBy` properties to [X509Certificate2](http://msdn.microsoft.com/en-us/library/ms148409(v=vs.90).aspx) objects.  The values match what the Certificates MMC snap-in displays.
+ * Added `DisplayName` property to [X509Store](http://msdn.microsoft.com/en-us/library/d228271e(v=vs.90).aspx) objects, to show the names of the stores as they are displayed in the Certificates MMC snap-in.
  
 ### Computer
 

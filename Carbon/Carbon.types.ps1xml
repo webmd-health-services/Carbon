@@ -87,4 +87,27 @@
             </ScriptProperty>
         </Members>
     </Type>
+    <Type>
+        <Name>System.Security.Cryptography.X509Certificates.X509Store</Name>
+        <Members>
+            <ScriptProperty>
+                <Name>DisplayName</Name>
+                <GetScriptBlock>
+                    switch( $this.Name )
+                    {
+                        'AddressBook' { return 'Other People' }
+                        'AuthRoot' { return 'Third-Party Root Certification Authorities' }
+                        'CA' { return 'Intermediate Certification Authorities' }
+                        'CertificateAuthority' { return 'Intermediate Certification Authorities' }
+                        'Disallowed' { return 'Untrusted Certificates' }
+                        'My' { return 'Personal' }
+                        'Root' { return 'Trusted Root Certification Authorities' }
+                        'TrustedPeople' { return 'Trusted People' }
+                        'TrustedPublisher' { return 'Trusted Publishers' }
+                        default { return $this.Name }
+                    }
+                </GetScriptBlock>
+            </ScriptProperty>
+        </Members>
+    </Type>
 </Types>
