@@ -6,6 +6,9 @@ using System.Xml;
 
 namespace Carbon.Transforms
 {
+    /// <summary>
+    /// https://github.com/appharbor/appharbor-transformtester/blob/master/AppHarbor.TransformTester/Transforms/MergeBefore.cs
+    /// </summary>
     public class MergeBefore : Merge
     {
         protected override void Apply()
