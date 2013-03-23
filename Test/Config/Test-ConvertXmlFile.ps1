@@ -12,15 +12,13 @@ function Setup()
 	$testFileDPath = (Join-Path $TestDir .\Din.xml)
 }
 
-#TODO: add test for various combinations xdt:Locator="XPath(/configuration/connectionStrings/add[@name="MyDB"]"
-
 function TearDown()
 {	
-	#Remove-Item $testFileAPath -EA SilentlyContinue
-	#Remove-Item $xdtFileAPath -EA SilentlyContinue
-    #Remove-Item $testFileBPath -EA SilentlyContinue
-	#Remove-Item (Join-Path $TestDir .\Cout.xml) -EA SilentlyContinue
-    #Remove-Item $testFileDPath -EA SilentlyContinue
+	Remove-Item $testFileAPath -EA SilentlyContinue
+	Remove-Item $xdtFileAPath -EA SilentlyContinue
+    Remove-Item $testFileBPath -EA SilentlyContinue
+	Remove-Item (Join-Path $TestDir .\Cout.xml) -EA SilentlyContinue
+    Remove-Item $testFileDPath -EA SilentlyContinue
         
 	Remove-Module Carbon
 }
@@ -147,6 +145,7 @@ function Test-ShouldConvertXmlFileUsingIdempotencyCheck
 	</connectionStrings>
 </configuration>
 '@
+	$error.clear()
 	
 	# act
 	Convert-XmlFile -Path $testFileBPath -Transform $transform -Destination (Join-Path $TestDir .\Cout.xml)
@@ -154,7 +153,41 @@ function Test-ShouldConvertXmlFileUsingIdempotencyCheck
 	# assert
 	$newContext = get-content (Join-Path $TestDir .\Cout.xml)
 	
+	Assert-True ($error.count -eq 0)
 	Assert-True ($newContext -match '<add name="MyDB" connectionString="some value"/>')
+}
+
+function Test-ShouldFailToConvertXmlFileDueToFailingIdempotencyCheck
+{
+	# arrange
+    $moduleInfo = Get-Module -Name Carbon
+    Assert-NotNull $moduleInfo
+	
+	$testFileBContent = @'
+<?xml version="1.0"?>
+<configuration>
+	<connectionStrings>
+	</connectionStrings>
+</configuration>
+'@
+    $testFileBContent > $testFileBPath
+	
+	$transform = @'
+<?xml version="1.0"?>
+<configuration xmlns:xdt="http://schemas.microsoft.com/XML-Document-Transform">
+	<connectionStrings>
+		<add name="MyDB" connectionString="some value" xdt:Transform="Insert" />
+	</connectionStrings>
+</configuration>
+'@
+	
+	$error.clear()
+	
+	# act
+	Convert-XmlFile -Path $testFileBPath -Transform $transform -Destination (Join-Path $TestDir .\Fout.xml) -EA SilentlyContinue
+	
+	# assert - file not written
+	Assert-True ($error.count -eq 1)
 }
 
 function Test-ShouldConvertXmlFileUsingMerge
