@@ -45,9 +45,16 @@ function Convert-XmlFile
 		Write-Error ("Convert-XmlFile is only available on systems running .Net 4.0 or higher. Please run Enable-DotNet4Access -Console and restart your PowerShell session.")
 		return
 	}
+	try 
+	{
+		Add-Type -Path (Join-Path $PSScriptRoot "bin\Microsoft.Web.XmlTransform.dll")
+		Add-Type -Path (Join-Path $PSScriptRoot "bin\Carbon.Transforms.dll")
+    } 
+	catch [Reflection.ReflectionTypeLoadException] { 
+		Write-Host -foreground yellow "LoadException"
+		$Error | format-list -force
+	}
 	
-	Add-Type -Path (Join-Path $PSScriptRoot "bin\Microsoft.Web.XmlTransform.dll")
-      
 	if(!(Test-Path $Path))
 	{
 		Write-Error ("Path '{0}' not found." -f $Path)
@@ -132,3 +139,5 @@ function Convert-XmlFile
 	$xmlTransform.Dispose()
 	$document.Dispose()   
 }
+
+

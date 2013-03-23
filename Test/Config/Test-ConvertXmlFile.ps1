@@ -173,14 +173,23 @@ function Test-ShouldConvertXmlFileUsingMerge
 	$transform = @'
 <?xml version="1.0"?>
 <configuration xmlns:xdt="http://schemas.microsoft.com/XML-Document-Transform">
-	<connectionStrings xdt:Transform="Merge">
-		
+    <xdt:Import assembly="Carbon.Transforms" namespace="Carbon.Transforms"/>
+	
+	<connectionStrings xdt:Transform="Merge" >
+		<add name="MyDB" xdt:Locator="Match(name)" xdt:Transform="Remove" />
+		<add name="MyDB" connectionString="some value" xdt:Transform="Insert" />
 	</connectionStrings>
+	
+	<one xdt:Transform="Merge">
+		<two xdt:Transform="Merge">
+		</two>
+	</one>
+	
 </configuration>
 '@
 	
 	# act
-	Convert-XmlFile -Path $testFileBPath -Transform $transform -Destination (Join-Path $TestDir .\Cout.xml)# -SkipIdempotencyCheck
+	Convert-XmlFile -Path $testFileBPath -Transform $transform -Destination (Join-Path $TestDir .\Cout.xml)
 	
 	# assert
 	$newContext = get-content (Join-Path $TestDir .\Cout.xml)
