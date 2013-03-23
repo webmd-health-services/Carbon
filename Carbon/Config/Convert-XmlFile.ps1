@@ -113,7 +113,8 @@ function Convert-XmlFile
 		
 			if ($diff)
 			{
-				$documentIdempotent.Save($Destination + ".failed")
+				#potentially write the failed result
+				#$documentIdempotent.Save($Destination + ".failed")
 				Write-Error ("Idempotent check failed. Differences were detected")
 				return
 			}
