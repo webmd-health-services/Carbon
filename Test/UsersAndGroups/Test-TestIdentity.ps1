@@ -51,6 +51,13 @@ function Test-ShouldNotFindMissingLocalUser
     Assert-Equal 1 $error.Count
 }
 
+function Test-ShouldNotFindMissingLocalUserWithComputerForDomain
+{
+    $error.Clear()
+    Assert-False (Test-Identity -Name ('{0}\IDoNotExistIHope' -f $env:COMPUTERNAME))
+    Assert-Equal 1 $error.Count
+}
+
 function Test-ShouldNotFindUserInBadDomain
 {
     $error.Clear()

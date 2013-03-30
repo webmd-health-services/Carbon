@@ -68,7 +68,7 @@ function Test-Identity
         if( $_.Exception -and $_.Exception.InnerException -and $_.Exception.InnerException -is [SystemException] )
         {
             # If a local account doesn't exist, it looks like Translate will start talking to domain controllers.  This may include untrusted domain controllers.
-            if( $Name -like '*\*' )
+            if( $Name -like '*\*' -and $Name -notlike ('{0}\*' -f $env:COMPUTERNAME))
             {
                 Write-Error ("Unable to determine if identity {0} exists.  Usually this happens if the user's domain doesn't exist or there isn't a trust relationship between the current domain and the user's domain." -f $Name)
             }
