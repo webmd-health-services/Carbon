@@ -1,5 +1,10 @@
 # 1.1.0
 
+## Upgrade Instructions
+
+ * On Windows 2008 R2, custom identies that run IIS app pools need the `SeBatchLogonRight`.  [Install-IisAppPool](http://get-carbon.org/help/Install-IisAppPool.html) now grants this privilege on all operating systems.  If this won't work in your environment, you can remove these privileges with [Revoke-Privilege](http://get-carbon.org/help/Revoke-Privilege.html).
+ * If installing an app pool to run as a non-service account (i.e. you supply a value for the `Username` parameter), [Install-IisAppPool](http://get-carbon.org/help/Install-IisAppPool.html) now fails and does not create the app pool if the user doesn't exist.
+
 ## Enhancements
 
 ### General
@@ -22,12 +27,17 @@
  * Created [Get-IisMimeMap](http://get-carbon.org/help/Get-IisMimeMap.html) for getting the file extension to MIME type mappings for the IIS web server.
  * Created [Remove-IisMimeMap](http://get-carbon.org/help/Remove-IisMimeMap.html) for removing a file extension to MIME type mapping for the IIS web server.
  * Created [Set-IisMimeMap](http://get-carbon.org/help/Set-IisMimeMap.html) for creating/setting a file extension to MIME type mapping for the IIS web server.
+ * When creating an app pool that runs under a custom, non-service account, [Install-IisAppPool](http://get-carbon.org/help/Install-IisAppPool.html) grants that user the `SeBatchLogonRight`.
 
 ## Bug Fixes
 
 ### Computer
 
  * [Install-SmbShare](http://get-carbon.org/help/Install-SmbShare.html) can't find `net.exe` when running as part of a Windows logon script.  Thanks to Paul Aage Aasheim for identifying and reporting this bug.  All usages of the `net.exe` application were updated to use the new [Resolve-NetPath](http://get-carbon.org/help/Resolve-NetPath.html) function, which get the path to `net.exe` without assuming it is in the user's `PATH` environment variable.
+ 
+### IIS
+
+ * [Install-IisAppPool](http://get-carbon.org/help/Install-IisAppPool.html) doesn't create the app pool if its user account doesn't exist.
  
 ### Users and Groups
 

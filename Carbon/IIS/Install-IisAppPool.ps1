@@ -29,7 +29,7 @@ function Install-IisAppPool
 
     An app pool can run as several built-in service accounts, by passing one of them as the value of the `ServiceAccount` parameter: `NetworkService`, `LocalService`, or `LocalSystem`  The default is `ApplicationPoolIdentity`, which causes IIS to create and use a custom local account with the name of the app pool.  See [Application Pool Identities](http://learn.iis.net/page.aspx/624/application-pool-identities/) for more information.
 
-    To run the app pool as a specific user, pass the username and password for the account to the `Username` and `Password` parameters, respectively.
+    To run the app pool as a specific user, pass the username and password for the account to the `Username` and `Password` parameters, respectively. This user will be granted the `SeBatchLogonRight` privilege.
 
     If an existing app pool exists with name `Name`, it's settings are modified.  The app pool isn't deleted.  (You can't delete an app pool if there are any websites using it, that's why.)
 
@@ -93,6 +93,12 @@ function Install-IisAppPool
         $Password
     )
     
+    if( $pscmdlet.ParameterSetName -eq 'AsSpecificUser' -and -not (Test-Identity -Name $UserName) )
+    {
+        Write-Error ('Identity {0} not found. {0} IIS app pool not installed.' -f $UserName,$Name)
+        return
+    }
+    
     if( -not (Test-IisAppPool -Name $Name) )
     {
         Invoke-AppCmd add apppool /name:`"$Name`" /commit:apphost
@@ -119,6 +125,9 @@ function Install-IisAppPool
         Invoke-AppCmd set config /section:applicationPools /[name=`'$Name`'].processModel.identityType:SpecificUser `
                                                            /[name=`'$Name`'].processModel.userName:$UserName `
                                                            /[name=`'$Name`'].processModel.password:$Password
+        
+        # On Windows Server 2008 R2, custom app pool users need this privilege.        
+        Grant-Privilege -Identity $UserName -Privilege SeBatchLogonRight
     }
     else
     {

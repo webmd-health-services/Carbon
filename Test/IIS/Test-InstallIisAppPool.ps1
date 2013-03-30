@@ -12,17 +12,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-$appPoolName = 'PSAppPool'
+$appPoolName = 'CarbonInstallIisAppPool'
+$username = 'CarbonInstallIisAppP'
+$password = '!QAZ2wsx'
 
 function Setup
 {
-    Import-Module (Join-Path $TestDir ..\..\Carbon -Resolve)
+    & (Join-Path $TestDir ..\..\Carbon\Import-Carbon.ps1 -Resolve)
     Remove-AppPool
+    Install-User -Username $username -Password $password -Description 'User for testing Carbon''s Install-IisAppPool function.'
+    Revoke-Privilege -Identity $username -Privilege SeBatchLogonRight
 }
 
 function TearDown
 {
     Remove-AppPool
+    Uninstall-User -Username $username
     Remove-Module Carbon
 }
 
@@ -78,10 +83,11 @@ function Test-ShouldSetIdentityAsServiceAccount
 
 function Test-ShouldSetIdentityAsSpecificUser
 {
-    Install-IisAppPool -Name $appPoolName -UserName 'Administrator' -Password 'GoodLuckWithThat'
+    Install-IisAppPool -Name $appPoolName -UserName $username -Password $password
     Assert-AppPoolExists
-    Assert-Identity 'Administrator' 'GoodLuckWithThat'
+    Assert-Identity $username $password
     Assert-IdentityType 'SpecificUser'
+    Assert-Contains (Get-Privilege $username) 'SeBatchLogonRight' 'custom user not granted SeBatchLogonRight'
 }
 
 function Test-ShouldSetIdleTimeout
@@ -131,9 +137,7 @@ function Test-ShouldChangeSettingsOnExistingAppPool
 
 function Test-ShouldAcceptSecureStringForAppPoolPassword
 {
-    $password = "HelloWorld"
     $securePassword = ConvertTo-SecureString -String $password -AsPlainText -Force
-    $username = "$($env:computername)\SomeUser"
     Install-IisAppPool -Name $appPoolName -Username $username -Password $securePassword
     Assert-Identity $username $password
 }
@@ -168,6 +172,14 @@ function Test-ShouldStartStoppedAppPool
     Install-IisAppPool -Name $appPoolName
     $appPool = Get-IisAppPool -Name $appPoolName
     Assert-Equal ([Microsoft.Web.Administration.ObjectState]::Started) $appPool.state
+}
+
+function Test-ShouldFailIfIdentityDoesNotExist
+{
+    $error.Clear()
+    Install-IisAppPool -Name $appPoolName -Username 'IDoNotExist' -Password 'blahblah' -ErrorAction SilentlyContinue
+    Assert-False (Test-IisAppPool -Name $appPoolName)
+    Assert-True ($error.Count -gt 0)
 }
 
 function Get-AppPoolDetails
