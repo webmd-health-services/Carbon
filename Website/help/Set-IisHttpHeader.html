@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-    <title>PowerShell - Set-TrustedHost - Carbon</title>
+    <title>PowerShell - Set-IisHttpHeader - Carbon</title>
 	<link href="styles.css" type="text/css" rel="stylesheet" />
 </head>
 <body>
@@ -233,24 +233,22 @@
 </div>
 
 
-    <h1>Set-TrustedHost</h1>
-    <div><p>Sets the current computer's trusted hosts list.</p>
+    <h1>Set-IisHttpHeader</h1>
+    <div><p>Sets an HTTP header for a website or a directory under a website.</p>
 </div>
 
         <h2>Syntax</h2>
-    <pre class="Syntax"><code>Set-TrustedHost [-Entry] &lt;String[]&gt; [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
+    <pre class="Syntax"><code>Set-IisHttpHeader [-SiteName] &lt;String&gt; [[-Path] &lt;String&gt;] [-Name] &lt;String&gt; [-Value] &lt;String&gt; [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
     
         <h2>Description</h2>
     <div class="Description">
-        <p>Clears the current trusted hosts list, and sets it to contain only the entries given by the <code>Entries</code> parameter.</p>
-
-<p>To clear the trusted hosts list, use <code>Clear-TrustedHost</code>.</p>
+        <p>If the HTTP header doesn't exist, it is created.  If a header exists, its value is replaced.</p>
 
     </div>
     
             <h2>Related Commands</h2>
         <ul>
-<li><a href="Clear-TrustedHost.html">Clear-TrustedHost</a></li>
+<li><a href="Get-IisHttpHeader.html">Get-IisHttpHeader</a></li>
 </ul>
 
 
@@ -265,9 +263,37 @@
 				<th>Default Value</th>
 			</tr>
             			<tr valign='top'>
-				<td>Entry</td>
-				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String[]</a></td>
-				<td></td>
+				<td>SiteName</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+				<td>The name of the website where the HTTP header should be set/created.
+</td>
+				<td>true</td>
+				<td>false</td>
+                <td></td>
+			</tr>
+			<tr valign='top'>
+				<td>Path</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+				<td>The optional path under <code>SiteName</code> where the HTTP header should be set/created.
+</td>
+				<td>false</td>
+				<td>false</td>
+                <td></td>
+			</tr>
+			<tr valign='top'>
+				<td>Name</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+				<td>The name of the HTTP header.
+</td>
+				<td>true</td>
+				<td>false</td>
+                <td></td>
+			</tr>
+			<tr valign='top'>
+				<td>Value</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+				<td>The value of the HTTP header.
+</td>
 				<td>true</td>
 				<td>false</td>
                 <td></td>
@@ -305,8 +331,11 @@
     
         
                 <h2>EXAMPLE 1</h2>
-            <pre><code>Set-TrustedHost -Entry example.com,api.example.com,docs.example.com</code></pre>
-            <p><p>Sets the trusted hosts list to contain just the values <code>example.com</code>, <code>api.example.com</code>, and <code>docs.example.com</code>.</p>
+            <pre><code>Set-IisHttpHeader -SiteName 'SopwithCamel' -Name 'X-Flown-By' -Value 'Snoopy'</code></pre>
+            <p><p>Sets or creates the <code>SopwithCamel</code> website's <code>X-Flown-By</code> HTTP header to the value <code>Snoopy</code>.</p>
+</p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 2</h2>
+            <pre><code>Set-IisHttpHeader -SiteName 'SopwithCamel' -Path 'Engine' -Name 'X-Powered-By' -Value 'Root Beer'</code></pre>
+            <p><p>Sets or creates the <code>SopwithCamel</code> website's <code>Engine</code> sub-directory's <code>X-Powered-By</code> HTTP header to the value <code>Root Beer</code>.</p>
 </p><p></p><p></p><p></p><p></p>
 </body>
 </html>   

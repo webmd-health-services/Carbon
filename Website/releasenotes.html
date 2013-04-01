@@ -12,7 +12,70 @@
 		<li><a href="http://pshdo.com">-Blog</a></li>
 	</ul>
     
-    <h1>1.0.0 (6 March 2013)</h1>
+    <h1>1.1.0 (1 April 2013)</h1>
+
+<h2>Upgrade Instructions</h2>
+
+<ul>
+<li>On Windows 2008 R2, custom identies that run IIS app pools need the <code>SeBatchLogonRight</code>.  <a href="http://get-carbon.org/help/Install-IisAppPool.html">Install-IisAppPool</a> now grants this privilege on all operating systems.  If this won't work in your environment, you can remove these privileges with <a href="http://get-carbon.org/help/Revoke-Privilege.html">Revoke-Privilege</a>.</li>
+</ul>
+
+<h2>Enhancements</h2>
+
+<h3>General</h3>
+
+<ul>
+<li>Fixed some typos and ommissions in the v0.5.0.1 and v0.5.0.0 sections of the release notes.</li>
+<li>Updated <code>Import-Carbon.ps1</code> script to import Carbon regardless of the name of the directory Carbon is installed in.</li>
+</ul>
+
+<h3>Certificates</h3>
+
+<ul>
+<li>Added <code>IssuedTo</code> and <code>IssuedBy</code> properties to <a href="http://msdn.microsoft.com/en-us/library/ms148409(v=vs.90).aspx">X509Certificate2</a> objects.  The values match what the Certificates MMC snap-in displays.</li>
+<li>Added <code>DisplayName</code> property to <a href="http://msdn.microsoft.com/en-us/library/d228271e(v=vs.90).aspx">X509Store</a> objects, to show the names of the stores as they are displayed in the Certificates MMC snap-in.</li>
+</ul>
+
+<h3>Computer</h3>
+
+<ul>
+<li>Created <a href="http://get-carbon.org/help/Resolve-NetPath.html">Resolve-NetPath</a> for getting the path to the Windows <code>net.exe</code> command/application.  Updated all functions that call <code>net.exe</code> to use this function to resolve its path.  Thanks to Paul Aage Aasheim for discovering that when running login scripts, <code>net.exe</code> isn't in the path.</li>
+</ul>
+
+<h3>IIS</h3>
+
+<ul>
+<li>Created <a href="http://get-carbon.org/help/Get-IisHttpHeader.html">Get-IisHttpHeader</a> for getting the custom HTTP headers for a website or one of its sub-directories.</li>
+<li>Created <a href="http://get-carbon.org/help/Set-IisHttpHeader.html">Set-IisHttpHeader</a> for creating/setting a custom HTTP header for a website or one of its sub-directories.</li>
+<li>Created <a href="http://get-carbon.org/help/Get-IisMimeMap.html">Get-IisMimeMap</a> for getting the file extension to MIME type mappings for the IIS web server.</li>
+<li>Created <a href="http://get-carbon.org/help/Remove-IisMimeMap.html">Remove-IisMimeMap</a> for removing a file extension to MIME type mapping for the IIS web server.</li>
+<li>Created <a href="http://get-carbon.org/help/Set-IisMimeMap.html">Set-IisMimeMap</a> for creating/setting a file extension to MIME type mapping for the IIS web server.</li>
+<li>When creating an app pool that runs under a custom, non-service account, <a href="http://get-carbon.org/help/Install-IisAppPool.html">Install-IisAppPool</a> grants that user the <code>SeBatchLogonRight</code>.</li>
+<li><a href="http://get-carbon.org/help/Install-IisAppPool.html">Install-IisAppPool</a> writes an error if its user account doesn't exist (i.e. if the value of the <code>Username</code> parameter doesn't exist).</li>
+</ul>
+
+<h3>Privileges</h3>
+
+<ul>
+<li>Improved exception handling in <a href="http://get-carbon.org/help/Grant-Privilege.html">Grant-Privilege</a> and <a href="http://get-carbon.org/help/Revoke-Privilege.html">Revoke-Privilege</a>.</li>
+<li><a href="http://get-carbon.org/help/Grant-Privilege.html">Grant-Privilege</a> and <a href="http://get-carbon.org/help/Revoke-Privilege.html">Revoke-Privilege</a> now write an error message if an identity doesn't exist.</li>
+</ul>
+
+<h2>Bug Fixes</h2>
+
+<h3>Computer</h3>
+
+<ul>
+<li><a href="http://get-carbon.org/help/Install-SmbShare.html">Install-SmbShare</a> can't find <code>net.exe</code> when running as part of a Windows logon script.  Thanks to Paul Aage Aasheim for identifying and reporting this bug.  All usages of the <code>net.exe</code> application were updated to use the new <a href="http://get-carbon.org/help/Resolve-NetPath.html">Resolve-NetPath</a> function, which get the path to <code>net.exe</code> without assuming it is in the user's <code>PATH</code> environment variable.</li>
+</ul>
+
+<h3>Users and Groups</h3>
+
+<ul>
+<li><a href="http://get-carbon.org/help/Test-Identity.html">Test-Identity</a> no longer writes an error if it can't find a fully-qualified local user, e.g. <code>$env:COMPUTERNAME\Username</code>.</li>
+</ul>
+
+<h1>1.0.0 (6 March 2013)</h1>
 
 <h2>Upgrade Instructions</h2>
 
@@ -115,7 +178,7 @@
 <h3>IIS</h3>
 
 <ul>
-<li>Renamed <code>Add-IisServerManagerMembers</code> to <a href="http://get-carbon.org/help/Add-IisServerManagerMember.html">Add-IisServerManagerMember</a>, with backwards-compatible alias.</li>
+<li>Renamed <code>Add-IisServerManagerMembers</code> to <a href="http://get-carbon.org/help/Add-IisServerManagerMembers.html">Add-IisServerManagerMembers</a>, with backwards-compatible alias.</li>
 <li>Added <code>StatusCode</code> alias for <a href="http://get-carbon.org/help/Set-IisHttpRedirect.html">Set-IisHttpRedirect's</a> <code>HttpResponseStatus</code> parameter, for backwards-compatibility with earlier releases.</li>
 <li>Added <code>Test-IisAppPoolExists</code> alias for <a href="http://get-carbon.org/help/Test-IisAppPool.html">Test-IisAppPool</a>, for backwards-compatibility with earlier releases.</li>
 <li>Added <code>Remove-IisWebsite</code> alias for <a href="http://get-carbon.org/help/Uninstall-IisWebsite.html">Uninstall-IisWebsite</a>, for backwards-compatibility with earlier releases.</li>
@@ -211,9 +274,9 @@
 <p>Replaces usages of:</p>
 
 <ul>
-<li><code>Get-SslCertificateBinding</code> with <code>Get-SslCertificateBindings</code></li>
-<li><code>Get-SslCertificateBinding -IPPort '0.0.0.0:443'</code> with <code>Get-SslCertificateBindings</code></li>
-<li><code>Get-SslCertificateBinding -IPPort '10.1.1.1:8001</code> with <code>Get-SslCertificateBindings -IPAddress '10.1.1.1' -Port 8001</code></li>
+<li><code>Get-SslCertificateBindings</code> with <code>Get-SslCertificateBinding</code></li>
+<li><code>Get-SslCertificateBinding -IPPort '0.0.0.0:443'</code> with <code>Get-SslCertificateBinding</code></li>
+<li><code>Get-SslCertificateBinding -IPPort '10.1.1.1:8001</code> with <code>Get-SslCertificateBinding -IPAddress '10.1.1.1' -Port 8001</code></li>
 <li><code>Test-SslCertificateBinding -IPPort '0.0.0.0:443</code> with <code>Test-SslCertificateBinding</code></li>
 <li><code>Test-SslCertificateBinding -IPPort '10.1.1.1:8001</code> with <code>Test-SslCertificateBinding -IPAddress '10.1.1.1' -Port 8001</code></li>
 <li><code>Set-SslCertificateBinding -IPPort '0.0.0.0:443</code> with <code>Set-SslCertificateBinding</code></li>
@@ -230,6 +293,9 @@
 <li><code>Set-EnvironmentVariable -Scope 'Process'</code> with <code>Set-EnvironmentVariable -ForProcess</code></li>
 <li><code>Set-EnvironmentVariable -Scope 'User'</code> with <code>Set-EnvironmentVariable -ForUser</code></li>
 <li><code>Set-EnvironmentVariable -Scope 'ForComputer'</code> with <code>Set-EnvironmentVariable -ForComputer</code></li>
+<li><code>Remove-EnvironmentVariable -Scope 'Process'</code> with <code>Remove-EnvironmentVariable -ForProcess</code></li>
+<li><code>Remove-EnvironmentVariable -Scope 'User'</code> with <code>Remove-EnvironmentVariable -ForUser</code></li>
+<li><code>Remove-EnvironmentVariable -Scope 'ForComputer'</code> with <code>Remove-EnvironmentVariable -ForComputer</code></li>
 </ul>
 
 <h3>Cryptography</h3>
@@ -257,9 +323,9 @@
 <li><code>Set-IisWindowsAuthentication -UseKernelMode</code> with <code>Set-IisWindowsAuthentication</code></li>
 <li><code>Set-IisWindowsAuthentication -Disabled</code> with <code>Disable-IisSecurityAuthentication -Windows</code>  </li>
 <li><code>Unlock-IisConfigSection -Name &lt;string&gt;</code> with <code>Unlock-IisConfigurationSection -SectionPath &lt;string&gt;</code> (run <code>appcmd.exe lock config -section:?</code> for values to the new <code>SectionPath</code> parameter)</li>
-<li><code>Unlock-IisBasicAuthentication</code> with <code>Unlock-IisConfigurationSeciton -SectionPath 'system.webServer/security/authentication/basicAuthentication'</code></li>
-<li><code>Unlock-IisCgi</code> with <code>Unlock-IisConfigurationSeciton -SectionPath 'system.webServer/cgi'</code></li>
-<li><code>Unlock-IisWindowsAuthentication</code> with <code>Unlock-IisConfigurationSeciton -SectionPath 'system.webServer/security/authentication/windowsAuthentication'</code></li>
+<li><code>Unlock-IisBasicAuthentication</code> with <code>Unlock-IisConfigurationSection -SectionPath 'system.webServer/security/authentication/basicAuthentication'</code></li>
+<li><code>Unlock-IisCgi</code> with <code>Unlock-IisConfigurationSection -SectionPath 'system.webServer/cgi'</code></li>
+<li><code>Unlock-IisWindowsAuthentication</code> with <code>Unlock-IisConfigurationSection -SectionPath 'system.webServer/security/authentication/windowsAuthentication'</code></li>
 </ul>
 
 <h3>INI</h3>

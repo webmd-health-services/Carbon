@@ -40,6 +40,7 @@
 		<li class="Category">Computer</li>
 		<ul class="CommandMenu">
 			<li><a href="Remove-EnvironmentVariable.html">Remove-EnvironmentVariable</a></li>
+			<li><a href="Resolve-NetPath.html">Resolve-NetPath</a></li>
 			<li><a href="Set-EnvironmentVariable.html">Set-EnvironmentVariable</a></li>
 			<li><a href="Test-OSIs32Bit.html">Test-OSIs32Bit</a></li>
 			<li><a href="Test-OSIs64Bit.html">Test-OSIs64Bit</a></li>
@@ -85,7 +86,9 @@
 			<li><a href="Enable-IisSsl.html">Enable-IisSsl</a></li>
 			<li><a href="Get-IisAppPool.html">Get-IisAppPool</a></li>
 			<li><a href="Get-IisConfigurationSection.html">Get-IisConfigurationSection</a></li>
+			<li><a href="Get-IisHttpHeader.html">Get-IisHttpHeader</a></li>
 			<li><a href="Get-IisHttpRedirect.html">Get-IisHttpRedirect</a></li>
+			<li><a href="Get-IisMimeMap.html">Get-IisMimeMap</a></li>
 			<li><a href="Get-IisSecurityAuthentication.html">Get-IisSecurityAuthentication</a></li>
 			<li><a href="Get-IisVersion.html">Get-IisVersion</a></li>
 			<li><a href="Get-IisWebsite.html">Get-IisWebsite</a></li>
@@ -95,7 +98,10 @@
 			<li><a href="Install-IisWebsite.html">Install-IisWebsite</a></li>
 			<li><a href="Invoke-AppCmd.html">Invoke-AppCmd</a></li>
 			<li><a href="Lock-IisConfigurationSection.html">Lock-IisConfigurationSection</a></li>
+			<li><a href="Remove-IisMimeMap.html">Remove-IisMimeMap</a></li>
+			<li><a href="Set-IisHttpHeader.html">Set-IisHttpHeader</a></li>
 			<li><a href="Set-IisHttpRedirect.html">Set-IisHttpRedirect</a></li>
+			<li><a href="Set-IisMimeMap.html">Set-IisMimeMap</a></li>
 			<li><a href="Set-IisWebsiteSslCertificate.html">Set-IisWebsiteSslCertificate</a></li>
 			<li><a href="Set-IisWindowsAuthentication.html">Set-IisWindowsAuthentication</a></li>
 			<li><a href="Test-IisAppPool.html">Test-IisAppPool</a></li>
@@ -247,7 +253,7 @@
 
 <p>An app pool can run as several built-in service accounts, by passing one of them as the value of the <code>ServiceAccount</code> parameter: <code>NetworkService</code>, <code>LocalService</code>, or <code>LocalSystem</code>  The default is <code>ApplicationPoolIdentity</code>, which causes IIS to create and use a custom local account with the name of the app pool.  See <a href="http://learn.iis.net/page.aspx/624/application-pool-identities/">Application Pool Identities</a> for more information.</p>
 
-<p>To run the app pool as a specific user, pass the username and password for the account to the <code>Username</code> and <code>Password</code> parameters, respectively.</p>
+<p>To run the app pool as a specific user, pass the username and password for the account to the <code>Username</code> and <code>Password</code> parameters, respectively. This user will be granted the <code>SeBatchLogonRight</code> privilege.</p>
 
 <p>If an existing app pool exists with name <code>Name</code>, it's settings are modified.  The app pool isn't deleted.  (You can't delete an app pool if there are any websites using it, that's why.)</p>
 

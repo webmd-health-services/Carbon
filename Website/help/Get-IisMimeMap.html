@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-    <title>PowerShell - Set-TrustedHost - Carbon</title>
+    <title>PowerShell - Get-IisMimeMap - Carbon</title>
 	<link href="styles.css" type="text/css" rel="stylesheet" />
 </head>
 <body>
@@ -233,24 +233,28 @@
 </div>
 
 
-    <h1>Set-TrustedHost</h1>
-    <div><p>Sets the current computer's trusted hosts list.</p>
+    <h1>Get-IisMimeMap</h1>
+    <div><p>Gets the file extension to MIME type mappings.</p>
 </div>
 
         <h2>Syntax</h2>
-    <pre class="Syntax"><code>Set-TrustedHost [-Entry] &lt;String[]&gt; [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
+    <pre class="Syntax"><code>Get-IisMimeMap [-FileExtension &lt;String&gt;] [-MimeType &lt;String&gt;] [&lt;CommonParameters&gt;]</code></pre>
+<pre class="Syntax"><code>Get-IisMimeMap -SiteName &lt;String&gt; [-Path &lt;String&gt;] [-FileExtension &lt;String&gt;] [-MimeType &lt;String&gt;] [&lt;CommonParameters&gt;]</code></pre>
     
         <h2>Description</h2>
     <div class="Description">
-        <p>Clears the current trusted hosts list, and sets it to contain only the entries given by the <code>Entries</code> parameter.</p>
+        <p>IIS won't serve static content unless there is an entry for it in the web server or website's MIME map configuration. This function will return all the MIME maps for the current server.  The objects returned are instances of the <code>Carbon.Iis.MimeMap</code> class, and contain the following properties:</p>
 
-<p>To clear the trusted hosts list, use <code>Clear-TrustedHost</code>.</p>
+<ul>
+<li><code>FileExtension</code>: the mapping's file extension</li>
+<li><code>MimeType</code>: the mapping's MIME type</li>
+</ul>
 
     </div>
     
             <h2>Related Commands</h2>
         <ul>
-<li><a href="Clear-TrustedHost.html">Clear-TrustedHost</a></li>
+<li><a href="Set-IisMimeMap.html">Set-IisMimeMap</a></li>
 </ul>
 
 
@@ -265,48 +269,67 @@
 				<th>Default Value</th>
 			</tr>
             			<tr valign='top'>
-				<td>Entry</td>
-				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String[]</a></td>
-				<td></td>
+				<td>SiteName</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+				<td>The website whose MIME mappings to return.  If not given, returns the web server's MIME map.
+</td>
 				<td>true</td>
 				<td>false</td>
                 <td></td>
 			</tr>
 			<tr valign='top'>
-				<td>WhatIf</td>
-				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
-				<td></td>
+				<td>Path</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+				<td>The directory under the website whose MIME mappings to return.  Optional.
+</td>
 				<td>false</td>
 				<td>false</td>
                 <td></td>
 			</tr>
 			<tr valign='top'>
-				<td>Confirm</td>
-				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
-				<td></td>
+				<td>FileExtension</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+				<td>The name of the file extensions to return. Wildcards accepted.
+</td>
 				<td>false</td>
 				<td>false</td>
                 <td></td>
 			</tr>
-                            <tr valign="top">
-                <td><a href="http://technet.microsoft.com/en-us/library/dd315352.aspx">CommonParameters</a></td>
+			<tr valign='top'>
+				<td>MimeType</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+				<td>The name of the MIME type(s) to return.  Wildcards accepted.
+</td>
+				<td>false</td>
+				<td>false</td>
                 <td></td>
-                <td>This cmdlet supports common parameters.  For more information type <br> <code>Get-Help about_CommonParameters</code>.</td>
-                <td></td>
-                <td></td>
-                <td></td>
-                </tr>
+			</tr>
+            
         </table>
         
     
         
-    
+            <h2>Return Values</h2>
+        <p><a href="http://msdn.microsoft.com/en-us/library/carbon.iis.mimemap.aspx">Carbon.Iis.MimeMap</a>. </p>
+
         
     
         
                 <h2>EXAMPLE 1</h2>
-            <pre><code>Set-TrustedHost -Entry example.com,api.example.com,docs.example.com</code></pre>
-            <p><p>Sets the trusted hosts list to contain just the values <code>example.com</code>, <code>api.example.com</code>, and <code>docs.example.com</code>.</p>
+            <pre><code>Get-IisMimeMap</code></pre>
+            <p><p>Gets all the the file extension to MIME type mappings for the web server.</p>
+</p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 2</h2>
+            <pre><code>Get-IisMimeMap -FileExtension .htm*</code></pre>
+            <p><p>Gets all the file extension to MIME type mappings whose file extension matches the <code>.htm*</code> wildcard.</p>
+</p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 3</h2>
+            <pre><code>Get-IisMimeMap -MimeType 'text/*'</code></pre>
+            <p><p>Gets all the file extension to MIME type mappings whose MIME type matches the <code>text/*</code> wildcard.</p>
+</p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 4</h2>
+            <pre><code>Get-IisMimeMap -SiteName DeathStar</code></pre>
+            <p><p>Gets all the file extenstion to MIME type mappings for the <code>DeathStar</code> website.</p>
+</p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 5</h2>
+            <pre><code>Get-IisMimeMap -SiteName DeathStar -Path ExhaustPort</code></pre>
+            <p><p>Gets all the file extension to MIME type mappings for the <code>DeathStar</code>'s <code>ExhausePort</code> directory.</p>
 </p><p></p><p></p><p></p><p></p>
 </body>
 </html>   
