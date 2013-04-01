@@ -91,5 +91,20 @@ function Grant-Privilege
         # The privileges to grant.
         $Privilege
     )
-    [Carbon.Lsa]::GrantPrivileges( $Identity, $Privilege )
+    
+    if( -not (Test-User -Username $Identity) )
+    {
+        Write-Error -Message ('[Carbon] [Grant-Privilege] Identity {0} not found.' -f $Identity) `
+                    -Category ObjectNotFound
+        return
+    }
+    
+    try
+    {
+        [Carbon.Lsa]::GrantPrivileges( $Identity, $Privilege )
+    }
+    catch
+    {
+        Write-Error -Message ('Granting {0} {1} privilege(s) failed.' -f $Identity,($Privilege -join ', ')) 
+    }
 }

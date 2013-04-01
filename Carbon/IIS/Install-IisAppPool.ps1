@@ -95,8 +95,7 @@ function Install-IisAppPool
     
     if( $pscmdlet.ParameterSetName -eq 'AsSpecificUser' -and -not (Test-Identity -Name $UserName) )
     {
-        Write-Error ('Identity {0} not found. {0} IIS app pool not installed.' -f $UserName,$Name)
-        return
+        Write-Error ('Identity {0} not found. {0} IIS websites and applications assigned to this app pool won''t run.' -f $UserName,$Name)
     }
     
     if( -not (Test-IisAppPool -Name $Name) )
@@ -125,8 +124,8 @@ function Install-IisAppPool
         Invoke-AppCmd set config /section:applicationPools /[name=`'$Name`'].processModel.identityType:SpecificUser `
                                                            /[name=`'$Name`'].processModel.userName:$UserName `
                                                            /[name=`'$Name`'].processModel.password:$Password
-        
-        # On Windows Server 2008 R2, custom app pool users need this privilege.        
+
+        # On Windows Server 2008 R2, custom app pool users need this privilege.
         Grant-Privilege -Identity $UserName -Privilege SeBatchLogonRight
     }
     else

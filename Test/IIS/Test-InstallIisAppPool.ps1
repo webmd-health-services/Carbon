@@ -178,8 +178,8 @@ function Test-ShouldFailIfIdentityDoesNotExist
 {
     $error.Clear()
     Install-IisAppPool -Name $appPoolName -Username 'IDoNotExist' -Password 'blahblah' -ErrorAction SilentlyContinue
-    Assert-False (Test-IisAppPool -Name $appPoolName)
-    Assert-True ($error.Count -gt 0)
+    Assert-True (Test-IisAppPool -Name $appPoolName)
+    Assert-True ($error.Count -ge 2)
 }
 
 function Get-AppPoolDetails

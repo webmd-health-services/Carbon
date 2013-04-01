@@ -54,3 +54,11 @@ function Test-ShouldGrantAndRevokePrivileges
     Assert-Equal 0 $error.Count
     
 }
+
+function Test-ShouldWriteAnErrorIfIdentityNotFound
+{
+    $error.Clear()
+    Grant-Privilege -Identity 'IDNOTEXIST' -Privilege SeBatchLogonRight -ErrorAction SilentlyContinue
+    Assert-Equal 1 $error.Count
+    Assert-True ($error[0].Exception.Message -like '*Identity * not found*')
+}

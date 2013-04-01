@@ -92,5 +92,19 @@ function Revoke-Privilege
         $Privilege
     )
     
-    [Carbon.Lsa]::RevokePrivileges($Identity,$Privilege)
+    if( -not (Test-User -Username $Identity) )
+    {
+        Write-Error -Message ('[Carbon] [Revoke-Privilege] Identity {0} not found.' -f $identity) `
+                    -Category ObjectNotFound
+        return
+    }
+    
+    try
+    {
+        [Carbon.Lsa]::RevokePrivileges($Identity,$Privilege)
+    }
+    catch
+    {
+        Write-Error -Message ('Failed to revoke {0} {1} privileges.' -f $Identity,($Privilege -join ', '))
+    }
 }
