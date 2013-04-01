@@ -92,7 +92,7 @@ function Revoke-Privilege
         $Privilege
     )
     
-    if( -not (Test-User -Username $Identity) )
+    if( -not (Test-Identity -Name $Identity) )
     {
         Write-Error -Message ('[Carbon] [Revoke-Privilege] Identity {0} not found.' -f $identity) `
                     -Category ObjectNotFound
