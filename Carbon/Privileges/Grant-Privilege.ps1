@@ -92,7 +92,7 @@ function Grant-Privilege
         $Privilege
     )
     
-    if( -not (Test-Identity -Username $Identity) )
+    if( -not (Test-Identity -Name $Identity) )
     {
         Write-Error -Message ('[Carbon] [Grant-Privilege] Identity {0} not found.' -f $Identity) `
                     -Category ObjectNotFound
