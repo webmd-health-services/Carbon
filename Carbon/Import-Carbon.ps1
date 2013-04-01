@@ -39,4 +39,4 @@ if( (Get-Module Carbon) )
     Remove-Module Carbon
 }
 
-Import-Module $PSScriptRoot
+Import-Module (Join-Path $PSScriptRoot Carbon.psd1 -Resolve) -ErrorAction Stop
