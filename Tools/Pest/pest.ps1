@@ -44,7 +44,11 @@ param(
     
     [string]
     # The individual test in the script to run.  Defaults to all tests.
-    $Test = $null    
+    $Test = $null,
+    
+    [Switch]
+    # Return objects for each test run.
+    $PassThru
 )
 
 $ErrorActionPreference = 'Stop'
@@ -120,9 +124,21 @@ function Resolve-Error ($ErrorRecord=$Error[0])
    }
 }
 
-function Invoke-Test($function)
+function Invoke-Test($fixture, $function)
 {
+    $testProperties = @{ 
+                            Fixture = $fixture; 
+                            Name = $function ; 
+                            Passed = $false; 
+                            Failure = $null;
+                            Exception = $null; 
+                            Duration = $null; 
+                            PipelineOutput = @();
+                        }
+    
+    $testInfo = New-Object PsObject -Property $testProperties
     Set-CurrentTest $function
+    $startedAt = Get-Date
     try
     {
         
@@ -133,17 +149,19 @@ function Invoke-Test($function)
         
         if( Test-Path function:$function )
         {
-            Write-Output "$function"
-            $script:testsRun++
-            . $function | Write-Verbose
+            $testInfo.Passed = $true
+            $output = . $function
+            if( $output )
+            {
+                $testInfo.PipelineOutput = $output
+            }
         }
     }
     catch [Pest.AssertionException]
     {
         $ex = $_.Exception
-        $script:testsFailed++
-        Write-Host "$($ex.Message)`n  at $($ex.PSStackTrace -join "`n  at ")" -ForegroundColor Red
-        continue
+        $testInfo.Passed = $false
+        $testInfo.Failure = "{0}`n  at {1}" -f $ex.Message,($ex.PSStackTrace -join "`n  at ")
     }
     catch
     {
@@ -153,16 +171,14 @@ function Invoke-Test($function)
         }
         else
         {
-            $script:testErrors++
-            for( $idx = 0; $idx -lt $error.Count; ++$idx )
+            $innerException = $_.Exception
+            while( $innerException.InnerException )
             {
-                $err = $error[$idx]
-                #Resolve-Error $err
-                $errInfo = $err.InvocationInfo
-                Write-Host "$($err)`n$($errInfo.PositionMessage.Trim())" -ForegroundColor Red
+                $innerException = $innerException.InnerException
             }
+            $testInfo.Passed = $false
+            $testInfo.Exception = "{0}: {1}{2}" -f $innerException.GetType().FullName,$innerException.Message,$error[0].InvocationInfo.PositionMessage
         }
-        continue
     }
     finally
     {
@@ -180,6 +196,8 @@ function Invoke-Test($function)
             }
         }
     }
+    $testInfo.Duration = (Get-Date) - $startedAt 
+    $testInfo
 }
 
 $testScripts = @( Get-ChildItem $Path Test-*.ps1 -Recurse )
@@ -197,72 +215,98 @@ $TestScript = $null
 $TestDir = $null
 $startedAt = Get-Date
 
-foreach( $testCase in $testScripts )
-{
-    $TestScript = (Resolve-Path $testCase.FullName).Path
-    $TestDir = Split-Path -Parent $testCase.FullName 
-    
-    $testModuleName =  [System.IO.Path]::GetFileNameWithoutExtension($testCase)
-    Write-Output "# $testModuleName #"
-
-    $functions = Get-FunctionsInFile $testCase.FullName
-    
-    if( $functions -contains "Test-$Test" )
-    {
-        $functions = @( "Test-$Test" )
-    }
-    elseif( $functions -contains "Ignore-$Test" )
-    {
-        $functions = @( "Ignore-$Test" )
-    }
-    
-    . $testCase.FullName
-    try
-    {
+$results = $null
+$testScripts | 
+    ForEach-Object {
+        $testCase = $_
+        $TestScript = (Resolve-Path $testCase.FullName).Path
+        $TestDir = Split-Path -Parent $testCase.FullName 
         
-        foreach( $function in $functions )
-        {
+        $testModuleName =  [System.IO.Path]::GetFileNameWithoutExtension($testCase)
 
-            if( $function -like 'Ignore-*' )
+        $functions = Get-FunctionsInFile $testCase.FullName
+        
+        if( $functions -contains "Test-$Test" )
+        {
+            $functions = @( "Test-$Test" )
+        }
+        elseif( $functions -contains "Ignore-$Test" )
+        {
+            $functions = @( "Ignore-$Test" )
+        }
+        
+        . $testCase.FullName
+        try
+        {
+            foreach( $function in $functions )
             {
-                if( $function -ne "Ignore-$Test" )
+
+                if( -not (Test-Path function:$function) )
                 {
-                    Write-Warning "Skipping ignored test '$function'."
-                    $testsIgnored++
                     continue
                 }
+                
+                if( $function -like 'Ignore-*' )
+                {
+                    if( $function -ne "Ignore-$Test" )
+                    {
+                        Write-Warning "Skipping ignored test '$function'."
+                        $testsIgnored++
+                        continue
+                    }
+                }
+                elseif( $function -notlike 'Test-*' )
+                {
+                    continue
+                }
+                
+                Invoke-Test $testModuleName $function
             }
-            elseif( $function -notlike 'Test-*' )
+        }
+        finally
+        {
+            foreach( $function in $functions )
             {
-                continue
+                if( $function -and (Test-Path function:$function) )
+                {
+                    Remove-Item function:\$function
+                }
             }
             
-            Invoke-Test $function
-        }
-    }
-    finally
-    {
-        foreach( $function in $functions )
-        {
-            if( $function -and (Test-Path function:$function) )
-            {
-                Remove-Item function:\$function
+            # if we don't unload any modules loaded by the test, they get cached by PowerShell 
+            # and subsequent runs of the test script won't reload the updated module.
+            Get-Module | % {
+                if( -not $modules.ContainsKey( $_.Name ) )
+                {
+                    Remove-Module $_.Name
+                }
             }
-        }
-        
-        # if we don't unload any modules loaded by the test, they get cached by PowerShell 
-        # and subsequent runs of the test script won't reload the updated module.
-        Get-Module | % {
-            if( -not $modules.ContainsKey( $_.Name ) )
-            {
-                Remove-Module $_.Name
-            }
-        }
-    }        
+        }        
+    } | 
+    Tee-Object -Variable 'results' |
+    Where-Object { -not $PassThru -and -not $_.Passed } |
+    Format-List Fixture,Name,Duration,Failure,Exception
+
+if( $results )
+{
+    $testsRun = @( $results ).Count
+    $failedTests = @( $results | Where-Object { -not $_.Passed } )
+    $testsFailed = $failedTests.Count
+    $testErrors = @( $results | Where-Object { $_.Exception -ne $null } ).Count
+}
+else
+{
+    $testsRun = $testsFailed = $testErrors = 0
+}
+$timeTook = (Get-Date) - $startedAt
+Write-Host "Ran $testsRun test(s) with $testsFailed failure(s), $testErrors error(s), and $testsIgnored ignored in $($timeTook.TotalSeconds) second(s)."
+
+
+if( $PassThru )
+{
+    $results
 }
 
-$timeTook = (Get-Date) - $startedAt
-Write-Output "Ran $testsRun test(s) with $testsFailed failure(s), $testErrors error(s), and $testsIgnored ignored in $($timeTook.TotalSeconds) second(s)."
 $exitCode = (-$testsFailed)
 if( $testErrors -gt 0 )
 {

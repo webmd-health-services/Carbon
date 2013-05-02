@@ -101,12 +101,12 @@ function Assert-Equal($expected, $actual, $message)
             {
                 if( $idx -gt $actual.Length )
                 {
-                    Fail "Strings different, beginning at index $idx:`n$($expected.Substring(0,$idx))`n($actual)`n$message"
+                    Fail ("Strings different, beginning at index {0}:`n{1}`n({2})`n{3}" -f $idx,$expected.Substring(0,$idx),$actual,$message)
                 }
                 
                 if( $expected[$idx] -ne $actual[$idx] )
                 {
-                    Fail "Strings different beginning at index $idx: $idx`n$($expected.Substring(0,$idx))`n$($actual.Substring(0,$idx))`n$message"
+                    Fail ("Strings different beginning at index {0}: {0}`n{1}`n{2}`n{3}" -f $idx,$expected.Substring(0,$idx),$actual.Substring(0,$idx),$message)
                 }
             }
             
@@ -134,13 +134,13 @@ function Assert-CEqual
         {
             if( $idx -gt $actual.Length )
             {
-                Fail "Strings different, beginning at index $idx:`n$($expected.Substring(0,$idx))`n($actual)`n$message"
+                Fail ("Strings different, beginning at index {0}:`n{1}`n({2})`n{3}" -f $idx,$expected.Substring(0,$idx),$actual,$message)
             }
             
             if( $expected[$idx] -cne $actual[$idx] )
             {
                 $actualSnippet = if( ($idx + 1) -gt $actual.Length ) { $Actual } else { $Actual.Substring(0, $idx) }
-                Fail "Strings different beginning at index $idx: $idx`n$($expected.Substring(0,$idx + 1))`n$actualSnippet`n$message"
+                Fail ("Strings different beginning at index {0}: {0}`n{1}`n{2}`n{3}" -f $idx,$expected.Substring(0,$idx + 1),$actualSnippet,$message)
             }
         }
 
@@ -414,14 +414,8 @@ function Set-TestVerbosity($verbosity)
     $Script:VerbosePreference = $verbosity
 }
 
-function New-TempDir
-{
-    <#
-    .SYNOPSIS
-    Creates a new temporary directory.
-    #>
-    $tmpPath = [System.IO.Path]::GetTempPath()
-    $newTmpDirName = [System.IO.Path]::GetRandomFileName()
-    New-Item (Join-Path $tmpPath $newTmpDirName) -Type Directory
-}
 
+Get-Item -Path (Join-Path $PSScriptRoot *-*.ps1) | 
+    ForEach-Object { . $_.FullName }
+
+Export-ModuleMember -Function * -Alias *
