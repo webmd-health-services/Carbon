@@ -24,10 +24,12 @@ function TearDown
 
 function Test-ShouldCompleteJobs
 {
+    $numJobsAtStart = (Get-Job).Count
     $job = Start-Job { Start-Sleep -Milliseconds 1 } -Name "Sleep1Millisecond"
     $numFailed = Complete-Job -Job $job
     Assert-Equal 0 $numFailed
-    Assert-Null (Get-Job)
+    $numJobsNow = (Get-Job).Count
+    Assert-Equal $numJobsAtStart $numJobsNow 'completed job not removed'
 }
 
 function Test-ShouldWaitToCompleteJobs
