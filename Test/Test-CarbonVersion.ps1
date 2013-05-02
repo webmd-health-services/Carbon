@@ -36,7 +36,9 @@ function Test-CarbonModuleVersionIsCorrect
 {
     $moduleInfo = Get-Module -Name Carbon
     Assert-NotNull $moduleInfo
-    Assert-Equal $expectedVersion $moduleInfo.Version 'Carbon module version not correct.'
+    Assert-Equal $expectedVersion.Major $moduleInfo.Version.Major 'Carbon module major version not correct.'
+    Assert-Equal $expectedVersion.Minor $moduleInfo.Version.Minor 'Carbon module minor version not correct.'
+    Assert-Equal $expectedVersion.Build $moduleInfo.Version.Build 'Carbon module build version not correct.'
 }
 
 function Test-CarbonAssemblyVersionIsCorrect
