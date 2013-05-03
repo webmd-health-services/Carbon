@@ -11,6 +11,12 @@
  * [Invoke-PowerShell](http://get-carbon.org/help/Invoke-PowerShell.html) now defaults to running under the current CLR, instead of defaulting to a v2.0 CLR.  This makes upgrading to PowerShell v3.0 easier.
  * [Invoke-PowerShell](http://get-carbon.org/help/Invoke-PowerShell.html) now writes an error and returns if running PowerShell v3.0 and you want to run under a v2.0 CLR.  Unfortunately, PowerShell v3.0 requires .NET 4.0, so you can't run anything on an earlier CLR.
  * New [Enable-PowerShellClr4](http://get-carbon.org/help/Enable-PowerShellClr4.html) function for enabling PowerShell v2 to load and use the .NET 4 framework.  ***THIS SHOULD BE CONSIDERED A FEATURE OF LAST RESORT. YOU'VE BEEN WARNED.*** Use [Invoke-PowerShell](http://get-carbon.org/help/Invoke-PowerShell.html) instead, which doesn't permanently update your system, or, better yet, upgrade to PowerShell 3.  Thanks to Mark Sargent for the contribution.
+
+## Bug Fixes
+
+### General
+
+ * Deleted the obsolete variable `$CarbonImported`.  Carbon no longer exports any of its variables.
  
 
 # 1.1.0 (1 April 2013)

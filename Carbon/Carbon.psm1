@@ -54,14 +54,10 @@ if( -not $useServerManager )
 $windowsFeaturesNotSupported = (-not ($useServerManager -or ($useWmi -and $useOCSetup) ))
 $supportNotFoundErrorMessage = 'Unable to find support for managing Windows features.  Couldn''t find servermanagercmd.exe, ocsetup.exe, or WMI support.'
 
-
-
 Get-Item (Join-Path $PSScriptRoot *\*.ps1) | 
     ForEach-Object {
         Write-Debug ("Importing sub-module {0}." -f $_.FullName)
         . $_.FullName
     }
 
-$CarbonImported = $true
-
-Export-ModuleMember -Function * -Cmdlet * -Variable CarbonImported -Alias *
+Export-ModuleMember -Function * -Cmdlet * -Alias *
