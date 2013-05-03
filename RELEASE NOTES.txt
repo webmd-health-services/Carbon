@@ -1,3 +1,17 @@
+# 1.1.1
+
+## Enhancements
+
+### General
+
+ * Carbon should now work under PowerShell v3.0!
+ 
+### PowerShell
+
+ * [Invoke-PowerShell](http://get-carbon.org/help/Invoke-PowerShell.html) now defaults to running under the current CLR, instead of defaulting to a v2.0 CLR.  This makes upgrading to PowerShell v3.0 easier.
+ * [Invoke-PowerShell](http://get-carbon.org/help/Invoke-PowerShell.html) now writes an error and returns if running PowerShell v3.0 and you want to run under a v2.0 CLR.  Unfortunately, PowerShell v3.0 requires .NET 4.0, so you can't run anything on an earlier CLR.
+ 
+
 # 1.1.0 (1 April 2013)
 
 ## Upgrade Instructions

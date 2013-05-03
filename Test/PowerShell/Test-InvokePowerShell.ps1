@@ -46,14 +46,33 @@ function Test-ShouldInvokePowerShellx86
     Assert-Equal 'x86' $result
 }
 
-function Test-ShouldRunPowerShellUnderCLR2
+if( $PSVersionTable.PSVersion -eq '3.0' )
 {
-    $command = {
-        $PSVersionTable.CLRVersion
-    }
+    function Test-ShouldNotRunPowerShellUnderCLR2
+    {
+        $command = {
+            $PSVersionTable.CLRVersion
+        }
     
-    $result = Invoke-PowerShell -Command $command
-    Assert-Equal 2 $result.Major
+        $error.Clear()
+        $result = Invoke-PowerShell -Command $command -Runtime v2.0 -ErrorAction SilentlyContinue
+        Assert-Equal 1 $error.Count
+        Assert-Null $result
+        Assert-Null ([Environment]::GetEnvironmentVariable('COMPLUS_ApplicationMigrationRuntimeActivationConfigPath'))
+    }
+}
+else
+{
+    function Test-ShouldRunPowerShellUnderCLR2
+    {
+        $command = {
+            $PSVersionTable.CLRVersion
+        }
+    
+        $result = Invoke-PowerShell -Command $command
+        Assert-Equal 2 $result.Major
+        Assert-Null ([Environment]::GetEnvironmentVariable('COMPLUS_ApplicationMigrationRuntimeActivationConfigPath'))
+    }
 }
 
 function Test-ShouldRunPowerShellUnderCLR4
