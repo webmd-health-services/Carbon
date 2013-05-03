@@ -206,7 +206,7 @@ function Test-ShouldConvertXmlFileUsingMerge
 	$transform = @'
 <?xml version="1.0"?>
 <configuration xmlns:xdt="http://schemas.microsoft.com/XML-Document-Transform">
-    <xdt:Import assembly="Carbon.Transforms" namespace="Carbon.Transforms"/>
+    <xdt:Import assembly="Carbon.Xdt" namespace="Carbon.Xdt"/>
 	
 	<connectionStrings xdt:Transform="Merge" >
 		<add name="MyDB" xdt:Locator="Match(name)" xdt:Transform="Remove" />

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Xml;
 
-namespace Carbon.Transforms
+namespace Carbon.Xdt
 {
     /// <summary>
     /// https://github.com/appharbor/appharbor-transformtester/blob/master/AppHarbor.TransformTester/Transforms/MergeBefore.cs

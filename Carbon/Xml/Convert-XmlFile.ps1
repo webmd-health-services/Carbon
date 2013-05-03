@@ -48,7 +48,7 @@ function Convert-XmlFile
 	try 
 	{
 		Add-Type -Path (Join-Path $PSScriptRoot "bin\Microsoft.Web.XmlTransform.dll")
-		Add-Type -Path (Join-Path $PSScriptRoot "bin\Carbon.Transforms.dll")
+		Add-Type -Path (Join-Path $PSScriptRoot "bin\Carbon.Xdt.dll")
     } 
 	catch [Reflection.ReflectionTypeLoadException] { 
 		Write-Host -foreground yellow "LoadException"

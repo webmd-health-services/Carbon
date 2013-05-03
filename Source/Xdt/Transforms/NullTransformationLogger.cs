@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Carbon.Transforms
+namespace Carbon.Xdt
 {
     public class NullTransformationLogger : Microsoft.Web.XmlTransform.IXmlTransformationLogger
     {

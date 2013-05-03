@@ -7,8 +7,8 @@
     <ProjectGuid>{D1D7AE6D-E489-43F2-9716-D0FB0774851A}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Carbon</RootNamespace>
-    <AssemblyName>Carbon.Transforms</AssemblyName>
+    <RootNamespace>Carbon.Xdt</RootNamespace>
+    <AssemblyName>Carbon.Xdt</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile>

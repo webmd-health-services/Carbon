@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 
-namespace Carbon.Transforms
+namespace Carbon.Xdt
 {
     /// <summary>
     /// https://github.com/appharbor/appharbor-transformtester/blob/master/AppHarbor.TransformTester/Transforms/Merge.cs

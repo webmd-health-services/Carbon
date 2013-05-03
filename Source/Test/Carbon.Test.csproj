@@ -60,13 +60,13 @@
       <Project>{FAC30031-F36B-4A7F-B887-114D0B3DFD7D}</Project>
       <Name>Carbon</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Carbon.Transforms\Carbon.Transforms.csproj">
-      <Project>{d1d7ae6d-e489-43f2-9716-d0fb0774851a}</Project>
-      <Name>Carbon.Transforms</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Iis\Carbon.Iis.csproj">
       <Project>{e327b329-2f5c-4cde-b8f6-40d8bcdd83d8}</Project>
       <Name>Carbon.Iis</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Xdt\Carbon.Xdt.csproj">
+      <Project>{d1d7ae6d-e489-43f2-9716-d0fb0774851a}</Project>
+      <Name>Carbon.Xdt</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
