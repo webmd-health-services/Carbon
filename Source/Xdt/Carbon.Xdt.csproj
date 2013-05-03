@@ -47,10 +47,10 @@
     <Compile Include="..\Properties\AssemblyVersion.cs">
       <Link>AssemblyVersion.cs</Link>
     </Compile>
-    <Compile Include="Transforms\Merge.cs" />
+    <Compile Include="Merge.cs" />
+    <Compile Include="MergeBefore.cs" />
+    <Compile Include="NullTransformationLogger.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Transforms\MergeBefore.cs" />
-    <Compile Include="Transforms\NullTransformationLogger.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
