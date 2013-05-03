@@ -50,6 +50,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\Properties\AssemblyVersion.cs">
+      <Link>AssemblyVersion.cs</Link>
+    </Compile>
     <Compile Include="HttpHeader.cs" />
     <Compile Include="HttpRedirectConfigurationSection.cs" />
     <Compile Include="HttpResponseStatus.cs" />

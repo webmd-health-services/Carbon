@@ -34,7 +34,7 @@
   <ItemGroup>
     <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.Web.XmlTransform">
-      <HintPath>..\packages\Microsoft.Web.Xdt.1.0.0-alpha\lib\net40\Microsoft.Web.XmlTransform.dll</HintPath>
+      <HintPath>..\..\Carbon\bin\Microsoft.Web.XmlTransform.dll</HintPath>
     </Reference>
     <Reference Include="nunit.framework">
       <HintPath>..\..\Tools\NUnit\2.6.2\nunit.framework.dll</HintPath>
@@ -47,6 +47,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\Properties\AssemblyVersion.cs">
+      <Link>AssemblyVersion.cs</Link>
+    </Compile>
     <Compile Include="Lsa\LsaTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="AdvApi32Tests.cs" />
@@ -56,6 +59,10 @@
     <ProjectReference Include="..\..\Source\Carbon.csproj">
       <Project>{FAC30031-F36B-4A7F-B887-114D0B3DFD7D}</Project>
       <Name>Carbon</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Carbon.Transforms\Carbon.Transforms.csproj">
+      <Project>{d1d7ae6d-e489-43f2-9716-d0fb0774851a}</Project>
+      <Name>Carbon.Transforms</Name>
     </ProjectReference>
     <ProjectReference Include="..\Iis\Carbon.Iis.csproj">
       <Project>{e327b329-2f5c-4cde-b8f6-40d8bcdd83d8}</Project>
