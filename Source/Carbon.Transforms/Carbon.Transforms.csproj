@@ -1,24 +1,23 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>8.0.30703</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{C661482E-C379-4973-B8A4-35F6F04218A7}</ProjectGuid>
+    <ProjectGuid>{D1D7AE6D-E489-43F2-9716-D0FB0774851A}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Carbon.Test</RootNamespace>
-    <AssemblyName>Carbon.Test</AssemblyName>
+    <RootNamespace>Carbon</RootNamespace>
+    <AssemblyName>Carbon.Transforms</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
+    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
+    <OutputPath>..\..\Carbon\bin\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -32,35 +31,20 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.Web.XmlTransform">
       <HintPath>..\packages\Microsoft.Web.Xdt.1.0.0-alpha\lib\net40\Microsoft.Web.XmlTransform.dll</HintPath>
     </Reference>
-    <Reference Include="nunit.framework">
-      <HintPath>..\..\Tools\NUnit\2.6.2\nunit.framework.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Lsa\LsaTests.cs" />
+    <Compile Include="Transforms\Merge.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="AdvApi32Tests.cs" />
-    <Compile Include="Transforms\TestMerge.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\Source\Carbon.csproj">
-      <Project>{FAC30031-F36B-4A7F-B887-114D0B3DFD7D}</Project>
-      <Name>Carbon</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Iis\Carbon.Iis.csproj">
-      <Project>{e327b329-2f5c-4cde-b8f6-40d8bcdd83d8}</Project>
-      <Name>Carbon.Iis</Name>
-    </ProjectReference>
+    <Compile Include="Transforms\MergeBefore.cs" />
+    <Compile Include="Transforms\NullTransformationLogger.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
