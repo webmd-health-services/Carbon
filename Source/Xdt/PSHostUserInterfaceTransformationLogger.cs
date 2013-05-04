@@ -1,27 +1,21 @@
 ﻿using System;
-using System.Management.Automation.Host;
+using System.Management.Automation;
 using Microsoft.Web.XmlTransform;
 
 namespace Carbon.Xdt
 {
 	public sealed class PSHostUserInterfaceTransformationLogger : IXmlTransformationLogger
 	{
-		private readonly PSHostUserInterface _hostUI;
-		private bool _showVerboseOutput = false;
-		private bool _showWarningOutput = false;
-		private bool _showErrorOutput = false;
+		private readonly ICommandRuntime _commandRuntime;
 
-		public PSHostUserInterfaceTransformationLogger(PSHostUserInterface hostUI, bool showVerboseOutput, bool showWarnings, bool showErrors)
+		public PSHostUserInterfaceTransformationLogger(ICommandRuntime commandRuntime)
 		{
-			if (hostUI == null)
+			if (commandRuntime == null)
 			{
-				throw new ArgumentNullException("hostUI", "PowerShell host user interface object required.");
+				throw new ArgumentNullException("commandRuntime", "PowerShell command runtime object required.");
 			}
-			_hostUI = hostUI;
 
-			_showVerboseOutput = showVerboseOutput;
-			_showWarningOutput = showWarnings;
-			_showErrorOutput = showErrors;
+			_commandRuntime = commandRuntime;
 		}
 
 		public void LogMessage(string message, params object[] messageArgs)
@@ -76,7 +70,7 @@ namespace Carbon.Xdt
 
 		public void LogErrorFromException(Exception ex, string file, int lineNumber, int linePosition)
 		{
-			WriteError(string.Format("{0}: line {1}: position {2}: {3}\nat {4}", file, lineNumber, linePosition, ex.Message, ex.StackTrace));
+			WriteError(string.Format("{0}: line {1}: position {2}: {3}\n{4}", file, lineNumber, linePosition, ex.Message, ex.StackTrace));
 		}
 
 		public void StartSection(string message, params object[] messageArgs)
@@ -101,26 +95,19 @@ namespace Carbon.Xdt
 
 		private void WriteError(string message, params object[] messageArgs)
 		{
-			if (_showErrorOutput)
-			{
-				_hostUI.WriteErrorLine(string.Format(message, messageArgs));
-			}
+			var ex = new XdtTransformationException(string.Format(message, messageArgs));
+			var errorRecord = new ErrorRecord(ex, "", ErrorCategory.NotSpecified, null);
+			_commandRuntime.WriteError(errorRecord);
 		}
 
 		private void WriteVerbose(string message, params object[] messageArgs)
 		{
-			if (_showVerboseOutput)
-			{
-				_hostUI.WriteVerboseLine(string.Format(message, messageArgs));
-			}
+			_commandRuntime.WriteVerbose(string.Format(message, messageArgs));
 		}
 
 		private void WriteWarning(string message, params object[] messageArgs)
 		{
-			if (_showWarningOutput)
-			{
-				_hostUI.WriteWarningLine(string.Format(message, messageArgs));
-			}
+			_commandRuntime.WriteWarning(string.Format(message, messageArgs));
 		}
 
 	}

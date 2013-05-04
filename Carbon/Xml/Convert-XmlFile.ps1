@@ -22,7 +22,7 @@ function Convert-XmlFile
     
     Transforms `web.config` with the given XDT XML to a new file at `\\webserver\wwwroot\web.config`.
     #>
-    [CmdletBinding(SupportsShouldProcess=$true)]
+    [CmdletBinding()]
     param(
         [Parameter(Mandatory=$true)]
         [string]
@@ -66,8 +66,13 @@ function Convert-XmlFile
             return
 	    }
     }
+    
+    $Path = Resolve-FullPath -Path $Path
+    $XdtPath = Resolve-FullPath -Path $XdtPath
+    $Destination = Resolve-FullPath -Path $Destination
     	
     $scriptBlock = {
+        [CmdletBinding()]
         param(
             [Parameter(Position=0)]
             [string]
@@ -93,11 +98,7 @@ function Convert-XmlFile
 	    $document.PreserveWhitespace = $true
 	    $document.Load($Path)
 	
-        $showVerbose = $VerbosePreference -ne 'SilentlyContinue' -and $VerbosePreference -ne 'Ignore'
-        $showWarnings = $WarningPreference -ne 'SilentlyContinue' -and $WarningPreference -ne 'Ignore'
-        $showErrors = $ErrorActionPreference -ne 'SilentlyContinue' -and $ErrorActionPreference -ne 'Ignore'
-
-        $logger = New-Object Carbon.Xdt.PSHostUserInterfaceTransformationLogger $host.UI,$showVerbose,$showWarnings,$showErrors
+        $logger = New-Object Carbon.Xdt.PSHostUserInterfaceTransformationLogger $PSCmdlet.CommandRuntime
         $xmlTransform = New-Object Microsoft.Web.XmlTransform.XmlTransformation $XdtPath,$logger
 	
 	    $success = $xmlTransform.Apply($document)
@@ -113,7 +114,15 @@ function Convert-XmlFile
 
     try
     {
-        Invoke-PowerShell -Command $scriptBlock -Args $CarbonBinDir,$Path,$XdtPath,$Destination -Runtime 'v4.0'
+        $argumentList = $CarbonBinDir,$Path,$XdtPath,$Destination
+        if( $PSVersionTable.PSVersion -ge '3.0' )
+        {
+            Invoke-Command -ScriptBlock $scriptBlock -ArgumentList $argumentList
+        }
+        else
+        {
+            Invoke-PowerShell -Command $scriptBlock -Args $argumentList -Runtime 'v4.0'
+        }
     }
     finally
     {
