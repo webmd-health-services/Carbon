@@ -16,6 +16,11 @@ function Convert-XmlFile
     Convert-XmlFile -Path ".\web.config" -XdtPath ".\web.debug.config" -Destination '\\webserver\wwwroot\web.config'
     
     Transforms `web.config` with the XDT in `web.debug.config` to a new file at `\\webserver\wwwroot\web.config`.
+
+    .EXAMPLE
+    Convert-XmlFile -Path ".\web.config" -XdtXml "<configuration><connectionStrings><add name=""MyConn"" xdt:Transform=""Insert"" /></connectionStrings></configuration>" -Destination '\\webserver\wwwroot\web.config'
+    
+    Transforms `web.config` with the given XDT XML to a new file at `\\webserver\wwwroot\web.config`.
     #>
     [CmdletBinding(SupportsShouldProcess=$true)]
     param(
@@ -24,10 +29,15 @@ function Convert-XmlFile
         # The path of the XML file to convert.
         $Path,
 
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory=$true,ParameterSetName='ByXdtFile')]
         [string]
         # The path to the XDT file.
         $XdtPath,
+
+        [Parameter(Mandatory=$true,ParameterSetName='ByXdtXml')]
+        [xml]
+        # The raw XDT XML to use.
+        $XdtXml,
         
         [Parameter(Mandatory=$true)]
 		[string]
@@ -40,6 +50,13 @@ function Convert-XmlFile
 		Write-Error ("Convert-XmlFile requires .NET 4.0.  Please upgrade to PowerShell v3.")
 		return
 	}
+
+    if( $PSCmdlet.ParameterSetName -eq 'ByXdtXml' )
+    {
+        $XdtPath = 'Carbon_Convert-XmlFile_{0}' -f ([IO.Path]::GetRandomFileName())
+        $XdtPath = Join-Path $env:TEMP $XdtPath
+        $xdtXml.Save( $XdtPath )
+    }
 
 	Add-Type -Path (Join-Path $CarbonBinDir "Microsoft.Web.XmlTransform.dll")
 	Add-Type -Path (Join-Path $CarbonBinDir "Carbon.Xdt.dll")
@@ -76,4 +93,10 @@ function Convert-XmlFile
 	
 	$xmlTransform.Dispose()
 	$document.Dispose()
+
+    if( $PSCmdlet.ParameterSetName -eq 'ByXdtXml' )
+    {
+        Remove-Item -Path $XdtPath
+    }
 }
+

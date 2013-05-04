@@ -107,3 +107,35 @@ function Test-ShouldAllowUsersToLoadCustomTransforms
 	Assert-True ($newContext -match '<two\.two/>')
 	Assert-True ($newContext -match '<three/>')
 }
+
+
+function Test-ShouldAllowRawXdtXml
+{
+	@'
+<?xml version="1.0"?>
+<configuration>
+	<connectionStrings>
+	</connectionStrings>
+</configuration>
+'@ > $xmlFilePath
+	
+	
+	$xdt = @'
+<?xml version="1.0"?>
+<configuration xmlns:xdt="http://schemas.microsoft.com/XML-Document-Transform">
+	<connectionStrings>
+		<add name="MyDB" connectionString="some value" xdt:Transform="Insert" />
+	</connectionStrings>
+</configuration>
+'@ 
+	
+	# act
+	Convert-XmlFile -Path $xmlFilePath -XdtXml $xdt -Destination $resultFilePath
+
+    Assert-FileExists $resultFilePath
+    Assert-Null (Get-ChildItem -Path $env:TEMP -Filter 'Carbon_Convert-XmlFile-*')
+	
+	# assert
+	$newContext = Get-Content $resultFilePath
+	Assert-True ($newContext -match '<add name="MyDB" connectionString="some value"/>')
+}
