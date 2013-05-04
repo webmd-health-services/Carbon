@@ -1,12 +1,8 @@
 ﻿using Microsoft.Web.XmlTransform;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml;
 
-namespace Carbon.Xdt
+namespace Carbon.Test.Xdt
 {
     /// <summary>
     /// https://github.com/appharbor/appharbor-transformtester/blob/master/AppHarbor.TransformTester/Transforms/Merge.cs
