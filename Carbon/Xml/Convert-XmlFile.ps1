@@ -45,21 +45,6 @@ function Convert-XmlFile
         $Destination
     )
     
-	if( $PSVersionTable.CLRVersion -lt '4.0' )
-	{
-		Write-Error ("Convert-XmlFile requires .NET 4.0.  Please upgrade to PowerShell v3.")
-		return
-	}
-
-    if( $PSCmdlet.ParameterSetName -eq 'ByXdtXml' )
-    {
-        $XdtPath = 'Carbon_Convert-XmlFile_{0}' -f ([IO.Path]::GetRandomFileName())
-        $XdtPath = Join-Path $env:TEMP $XdtPath
-        $xdtXml.Save( $XdtPath )
-    }
-
-	Add-Type -Path (Join-Path $CarbonBinDir "Microsoft.Web.XmlTransform.dll")
-	Add-Type -Path (Join-Path $CarbonBinDir "Carbon.Xdt.dll")
 
 	if( -not (Test-Path -Path $Path -PathType Leaf))
 	{
@@ -67,36 +52,75 @@ function Convert-XmlFile
         return
 	}
 	
-	if( -not (Test-Path -Path $XdtPath -PathType Leaf) )
-	{
-		Write-Error ("XdtPath '{0}' not found." -f $XdtPath)
-        return
-	}
-	
-	$document = New-Object Microsoft.Web.XmlTransform.XmlTransformableDocument
-	$document.PreserveWhitespace = $true
-	$document.Load($Path)
-	
-    $showVerbose = $VerbosePreference -ne 'SilentlyContinue' -and $VerbosePreference -ne 'Ignore'
-    $showWarnings = $WarningPreference -ne 'SilentlyContinue' -and $WarningPreference -ne 'Ignore'
-    $showErrors = $ErrorActionPreference -ne 'SilentlyContinue' -and $ErrorActionPreference -ne 'Ignore'
-
-    $logger = New-Object Carbon.Xdt.PSHostUserInterfaceTransformationLogger $host.UI,$showVerbose,$showWarnings,$showErrors
-    $xmlTransform = New-Object Microsoft.Web.XmlTransform.XmlTransformation $XdtPath,$logger
-	
-	$success = $xmlTransform.Apply($document)
-	
-	if($success)
-	{
-    	$document.Save($Destination)
-	}
-	
-	$xmlTransform.Dispose()
-	$document.Dispose()
-
     if( $PSCmdlet.ParameterSetName -eq 'ByXdtXml' )
     {
-        Remove-Item -Path $XdtPath
+        $XdtPath = 'Carbon_Convert-XmlFile_{0}' -f ([IO.Path]::GetRandomFileName())
+        $XdtPath = Join-Path $env:TEMP $XdtPath
+        $xdtXml.Save( $XdtPath )
+    }
+    else
+    {
+	    if( -not (Test-Path -Path $XdtPath -PathType Leaf) )
+	    {
+		    Write-Error ("XdtPath '{0}' not found." -f $XdtPath)
+            return
+	    }
+    }
+    	
+    $scriptBlock = {
+        param(
+            [Parameter(Position=0)]
+            [string]
+            $CarbonBinDir,
+
+            [Parameter(Position=1)]
+            [string]
+            $Path,
+
+            [Parameter(Position=2)]
+            [string]
+            $XdtPath,
+
+            [Parameter(Position=3)]
+		    [string]
+            $Destination
+        )
+
+	    Add-Type -Path (Join-Path $CarbonBinDir "Microsoft.Web.XmlTransform.dll")
+	    Add-Type -Path (Join-Path $CarbonBinDir "Carbon.Xdt.dll")
+
+	    $document = New-Object Microsoft.Web.XmlTransform.XmlTransformableDocument
+	    $document.PreserveWhitespace = $true
+	    $document.Load($Path)
+	
+        $showVerbose = $VerbosePreference -ne 'SilentlyContinue' -and $VerbosePreference -ne 'Ignore'
+        $showWarnings = $WarningPreference -ne 'SilentlyContinue' -and $WarningPreference -ne 'Ignore'
+        $showErrors = $ErrorActionPreference -ne 'SilentlyContinue' -and $ErrorActionPreference -ne 'Ignore'
+
+        $logger = New-Object Carbon.Xdt.PSHostUserInterfaceTransformationLogger $host.UI,$showVerbose,$showWarnings,$showErrors
+        $xmlTransform = New-Object Microsoft.Web.XmlTransform.XmlTransformation $XdtPath,$logger
+	
+	    $success = $xmlTransform.Apply($document)
+	
+	    if($success)
+	    {
+    	    $document.Save($Destination)
+	    }
+	
+	    $xmlTransform.Dispose()
+	    $document.Dispose()
+    }
+
+    try
+    {
+        Invoke-PowerShell -Command $scriptBlock -Args $CarbonBinDir,$Path,$XdtPath,$Destination -Runtime 'v4.0'
+    }
+    finally
+    {
+        if( $PSCmdlet.ParameterSetName -eq 'ByXdtXml' )
+        {
+            Remove-Item -Path $XdtPath
+        }
     }
 }
 
