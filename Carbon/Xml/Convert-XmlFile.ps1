@@ -2,75 +2,57 @@ function Convert-XmlFile
 {
     <#
     .SYNOPSIS
-    Applies a xdt transformation to the xml file provided
+    Transforms an XML document using XDT (XML Document Transformation).
     
-	Convert-XmlFile -Path <string> [-XdtPath <string> | -Transform <string>] [-Destination <string>] [-SkipIdempotencyCheck]
-	
-	
     .DESCRIPTION
-	Xdt transformations allow complex edits to be made to xml files.
-		http://msdn.microsoft.com/en-us/library/dd465326.aspx
+	An XDT file specifies how to change an XML file from a *known* beginning state into a new state.  This is usually helpful when deploying IIS websites.  Usually, the website's default web.config file won't work in different environments, and needs to be changed during deployment to reflect settings needed for the target environment.
+
+    XDT was designed to apply a tranformation against an XML file in a *known* state.  **Do not use this method to transform an XML file in-place.**  There lies madness, and you will never get that square peg into XDT's round whole.
+
+    .LINK
+    http://msdn.microsoft.com/en-us/library/dd465326.aspx
 	
     .EXAMPLE
-    > Convert-XmlFile -Path ".\web.config" -XdtPath ".\web.debug.config"
+    Convert-XmlFile -Path ".\web.config" -XdtPath ".\web.debug.config" -Destination '\\webserver\wwwroot\web.config'
     
-    Applies the Xdt transformation to the web.config and updates the web.config file
-    
+    Transforms `web.config` with the XDT in `web.debug.config` to a new file at `\\webserver\wwwroot\web.config`.
     #>
-    [CmdletBinding(SupportsShouldProcess=$true, DefaultParameterSetName='All')]
+    [CmdletBinding(SupportsShouldProcess=$true)]
     param(
         [Parameter(Mandatory=$true)]
         [string]
-        # The path of the file convert
+        # The path of the XML file to convert.
         $Path,
 
+        [Parameter(Mandatory=$true)]
         [string]
-        # The path to the xdt file to use
+        # The path to the XDT file.
         $XdtPath,
         
+        [Parameter(Mandatory=$true)]
 		[string]
-        # The path to the xdt file to use
-        $Transform,
-        
-		[string]
-        # The destination of the converted file
-        $Destination,
-		
-		[switch]
-		$SkipIdempotencyCheck
+        # The destination XML file's path.
+        $Destination
     )
     
-	if ([Environment]::Version.Major -eq 2)
+	if( $PSVersionTable.CLRVersion -lt '4.0' )
 	{
-		Write-Error ("Convert-XmlFile is only available on systems running .Net 4.0 or higher. Please run Enable-DotNet4Access -Console and restart your PowerShell session.")
+		Write-Error ("Convert-XmlFile requires .NET 4.0.  Please upgrade to PowerShell v3.")
 		return
 	}
-	try 
-	{
-		Add-Type -Path (Join-Path $PSScriptRoot "bin\Microsoft.Web.XmlTransform.dll")
-		Add-Type -Path (Join-Path $PSScriptRoot "bin\Carbon.Xdt.dll")
-    } 
-	catch [Reflection.ReflectionTypeLoadException] { 
-		Write-Host -foreground yellow "LoadException"
-		$Error | format-list -force
-	}
-	
-	if(!(Test-Path $Path))
+
+	Add-Type -Path (Join-Path $CarbonBinDir "Microsoft.Web.XmlTransform.dll")
+	Add-Type -Path (Join-Path $CarbonBinDir "Carbon.Xdt.dll")
+
+	if( -not (Test-Path -Path $Path -PathType Leaf))
 	{
 		Write-Error ("Path '{0}' not found." -f $Path)
         return
 	}
 	
-	if ($Transform)
+	if( -not (Test-Path -Path $XdtPath -PathType Leaf) )
 	{
-		# write transform to temp path
-		$XdtPath = [IO.Path]::GetTempFileName()
-		$Transform > $XdtPath
-	}
-	
-	if($XdtPath -and !(Test-Path $XdtPath))
-	{
-		Write-Error ("XdtPath '{0}' not found." -f $Path)
+		Write-Error ("XdtPath '{0}' not found." -f $XdtPath)
         return
 	}
 	
@@ -78,67 +60,20 @@ function Convert-XmlFile
 	$document.PreserveWhitespace = $true
 	$document.Load($Path)
 	
-	if($XdtPath)
-	{
-		Write-Debug ("Using file transformation - $XsdPath")
-		$xmlTransform = New-Object Microsoft.Web.XmlTransform.XmlTransformation($XdtPath)
-	}
+    $showVerbose = $VerbosePreference -ne 'SilentlyContinue' -and $VerbosePreference -ne 'Ignore'
+    $showWarnings = $WarningPreference -ne 'SilentlyContinue' -and $WarningPreference -ne 'Ignore'
+    $showErrors = $ErrorActionPreference -ne 'SilentlyContinue' -and $ErrorActionPreference -ne 'Ignore'
+
+    $logger = New-Object Carbon.Xdt.PSHostUserInterfaceTransformationLogger $host.UI,$showVerbose,$showWarnings,$showErrors
+    $xmlTransform = New-Object Microsoft.Web.XmlTransform.XmlTransformation $XdtPath,$logger
 	
 	$success = $xmlTransform.Apply($document)
 	
 	if($success)
 	{
-		if (!$SkipIdempotencyCheck)
-		{
-			$documentIdempotent = New-Object Microsoft.Web.XmlTransform.XmlTransformableDocument
-			$documentIdempotent.PreserveWhitespace = $true
-			$documentIdempotent.Load($Path)
-		
-			# check idempotent
-			$idempotentSuccess = $xmlTransform.Apply($documentIdempotent)
-			if (!$idempotentSuccess)
-			{
-				Write-Error ("Idempotent check failed. First transformation")
-				return
-			}
-			
-			$idempotentSuccess = $xmlTransform.Apply($documentIdempotent)
-			if (!$idempotentSuccess)
-			{
-				Write-Error ("Idempotent check failed. Second transformation")
-				return
-			}
-
-			$diff = Compare-Object ($document.SelectNodes("//*") | Select-Object -Expand Name) ($documentIdempotent.SelectNodes("//*") | Select-Object -Expand Name)
-		
-			if ($diff)
-			{
-				#potentially write the failed result
-				#$documentIdempotent.Save($Destination + ".failed")
-				Write-Error ("Idempotent check failed. Differences were detected")
-				return
-			}
-			
-			$documentIdempotent.Dispose()
-		}
-
-		if ($Destination)
-		{
-			$document.Save($Destination)
-		}
-		else
-		{
-			# overwrite
-			$document.Save($Path)
-		}
-	}
-	else
-	{
-		Write-Error ("Transformation failed")
+    	$document.Save($Destination)
 	}
 	
 	$xmlTransform.Dispose()
-	$document.Dispose()   
+	$document.Dispose()
 }
-
-
