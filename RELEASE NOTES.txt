@@ -12,6 +12,11 @@
  * [Invoke-PowerShell](http://get-carbon.org/help/Invoke-PowerShell.html) now writes an error and returns if running PowerShell v3.0 and you want to run under a v2.0 CLR.  Unfortunately, PowerShell v3.0 requires .NET 4.0, so you can't run anything on an earlier CLR.
  * New [Enable-PowerShellClr4](http://get-carbon.org/help/Enable-PowerShellClr4.html) function for enabling PowerShell v2 to load and use the .NET 4 framework.  ***THIS SHOULD BE CONSIDERED A FEATURE OF LAST RESORT. YOU'VE BEEN WARNED.*** Use [Invoke-PowerShell](http://get-carbon.org/help/Invoke-PowerShell.html) instead, which doesn't permanently update your system, or, better yet, upgrade to PowerShell 3.  Thanks to Mark Sargent for the contribution.
 
+### XML
+
+ * New [Convert-XmlFile](http://get-carbon.org/help/Convert-XmlFile.html), for transforming an XML file with Microsoft's XDT (XML Data Transformation) technology.  Thanks to Mark Sargent for the contribution.
+
+ 
 ## Bug Fixes
 
 ### General
