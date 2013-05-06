@@ -104,22 +104,33 @@ function Convert-XmlFile
 	    Add-Type -Path (Join-Path $CarbonBinDir "Microsoft.Web.XmlTransform.dll")
 	    Add-Type -Path (Join-Path $CarbonBinDir "Carbon.Xdt.dll")
 
-	    $document = New-Object Microsoft.Web.XmlTransform.XmlTransformableDocument
-	    $document.PreserveWhitespace = $true
-	    $document.Load($Path)
+        try
+        {
+	        $document = New-Object Microsoft.Web.XmlTransform.XmlTransformableDocument
+	        $document.PreserveWhitespace = $true
+	        $document.Load($Path)
 	
-        $logger = New-Object Carbon.Xdt.PSHostUserInterfaceTransformationLogger $PSCmdlet.CommandRuntime
-        $xmlTransform = New-Object Microsoft.Web.XmlTransform.XmlTransformation $XdtPath,$logger
+            $logger = New-Object Carbon.Xdt.PSHostUserInterfaceTransformationLogger $PSCmdlet.CommandRuntime
+            $xmlTransform = New-Object Microsoft.Web.XmlTransform.XmlTransformation $XdtPath,$logger
 	
-	    $success = $xmlTransform.Apply($document)
+	        $success = $xmlTransform.Apply($document)
 	
-	    if($success)
-	    {
-    	    $document.Save($Destination)
-	    }
-	
-	    $xmlTransform.Dispose()
-	    $document.Dispose()
+	        if($success)
+	        {
+    	        $document.Save($Destination)
+	        }
+        }
+        finally
+        {
+            if( $xmlTransform )
+            {	
+    	        $xmlTransform.Dispose()
+            }
+            if( $document )
+            {
+	            $document.Dispose()
+            }
+        }
     }
 
     try

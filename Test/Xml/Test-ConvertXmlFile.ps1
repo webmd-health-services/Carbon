@@ -27,7 +27,7 @@ function TearDown()
 	Remove-Module Carbon
 }
 
-function Test-ShouldConvertXmlFileUsingFilesAsInputs
+function Set-XmlFile
 {
 	@'
 <?xml version="1.0"?>
@@ -36,8 +36,10 @@ function Test-ShouldConvertXmlFileUsingFilesAsInputs
 	</connectionStrings>
 </configuration>
 '@ > $xmlFilePath
-	
-	
+}
+
+function Set-XdtFile
+{
 	@'
 <?xml version="1.0"?>
 <configuration xmlns:xdt="http://schemas.microsoft.com/XML-Document-Transform">
@@ -46,6 +48,12 @@ function Test-ShouldConvertXmlFileUsingFilesAsInputs
 	</connectionStrings>
 </configuration>
 '@ > $xdtFilePath
+}
+
+function Test-ShouldConvertXmlFileUsingFilesAsInputs
+{
+    Set-XmlFile	
+    Set-XdtFile	
 	
 	# act
 	Convert-XmlFile -Path $xmlFilePath -XdtPath $xdtFilePath -Destination $resultFilePath
@@ -113,14 +121,7 @@ if( $PSVersionTable.PSVersion -ge '4.0' )
 
 function Test-ShouldAllowRawXdtXml
 {
-	@'
-<?xml version="1.0"?>
-<configuration>
-	<connectionStrings>
-	</connectionStrings>
-</configuration>
-'@ > $xmlFilePath
-	
+    Set-XmlFile
 	
 	$xdt = @'
 <?xml version="1.0"?>
@@ -151,4 +152,24 @@ function Test-ShouldGiveAnErrorIfTransformingInPlace
     Assert-Equal 1 $error.Count
     Assert-True ($error[0].ErrorDetails.Message -like '*Path is the same as Destination*')
     Assert-FileDoesNotExist $resultFilePath
+}
+
+function Test-ShouldNotLockFiles
+{
+    Set-XmlFile
+    Set-XdtFile
+
+    Convert-XmlFile -Path $xmlFilePath -XdtPath $xdtFilePath -Destination $resultFilePath
+
+    $error.Clear()
+
+    '' > $xmlFilePath
+    '' > $xdtFilePath
+    '' > $resultFilePath
+
+    Assert-Equal 0 $error.Count
+    Assert-Equal '' (Get-Content -Path $xmlFilePath)
+    Assert-Equal '' (Get-Content -Path $xdtFilePath)
+    Assert-Equal '' (Get-Content -Path $resultFilePath)
+
 }
