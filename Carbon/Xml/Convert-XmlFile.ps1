@@ -54,6 +54,7 @@ function Convert-XmlFile
 	
     if( $PSCmdlet.ParameterSetName -eq 'ByXdtXml' )
     {
+        $xdtPathForInfoMsg = ''
         $XdtPath = 'Carbon_Convert-XmlFile_{0}' -f ([IO.Path]::GetRandomFileName())
         $XdtPath = Join-Path $env:TEMP $XdtPath
         $xdtXml.Save( $XdtPath )
@@ -65,6 +66,7 @@ function Convert-XmlFile
 		    Write-Error ("XdtPath '{0}' not found." -f $XdtPath)
             return
 	    }
+        $xdtPathForInfoMsg = 'with ''{0}'' ' -f $XdtPath
     }
     
     $Path = Resolve-FullPath -Path $Path
@@ -122,6 +124,7 @@ function Convert-XmlFile
 
     try
     {
+        Write-Host ('Transforming ''{0}'' {1}to ''{2}''.' -f $Path,$xdtPathForInfoMsg,$Destination)
         $argumentList = $CarbonBinDir,$Path,$XdtPath,$Destination
         if( $PSVersionTable.PSVersion -ge '3.0' )
         {
