@@ -5,13 +5,37 @@ function Convert-XmlFile
     Transforms an XML document using XDT (XML Document Transformation).
     
     .DESCRIPTION
-	An XDT file specifies how to change an XML file from a *known* beginning state into a new state.  This is usually helpful when deploying IIS websites.  Usually, the website's default web.config file won't work in different environments, and needs to be changed during deployment to reflect settings needed for the target environment.
+    An XDT file specifies how to change an XML file from a *known* beginning state into a new state.  This is usually helpful when deploying IIS websites.  Usually, the website's default web.config file won't work in different environments, and needs to be changed during deployment to reflect settings needed for the target environment.
 
-    XDT was designed to apply a tranformation against an XML file in a *known* state.  **Do not use this method to transform an XML file in-place.**  There lies madness, and you will never get that square peg into XDT's round whole.
-
+    XDT was designed to apply a tranformation against an XML file in a *known* state.  **Do not use this method to transform an XML file in-place.**  There lies madness, and you will never get that square peg into XDT's round hole.  If you *really* want to transform in-place, you're responsible for checking if the source/destination file has already been transformed, and if it hasn't, calling `Convert-XmlFile` to transform to a temporary file, then copying the temporary file onto the source/destination file.
+    
+    You can load custom transformations.  In your XDT XML, use the `xdt:Import` element to import your transformations.  In your XDT file:
+    
+        <?xml version="1.0"?>
+        <root xmlns:xdt="http://schemas.microsoft.com/XML-Document-Transform">
+            <!-- You can also use the "assembly" attribute if the assembly is in the GAC or in your path, otherwise use the "path" parameter.  
+                 All classes in `namespace` that inherit from the XDT `Transform` class are loaded. -->
+            <xdt:Import path="C:\Projects\Carbon\Lib\ExtraTransforms.dll"
+                        namespace="ExtraTransforms" />
+            <!-- ...snip... -->
+        </root>
+        
+    That's it! (Note: Carbon does *not* ship with any extra transformations.)
+    
+    When transforming a file, the XDT framework will write warnings and errors to the PowerShell error and warning stream.  Informational and debug messages are written to the verbose stream (i.e. use the `Verbose` switch to see all the XDT log messages).
+     
     .LINK
     http://msdn.microsoft.com/en-us/library/dd465326.aspx
-	
+    
+    .LINK
+    http://stackoverflow.com/questions/2915329/advanced-tasks-using-web-config-transformation
+    
+    .LINK
+    Set-DotNetConnectionString
+    
+    .LINK
+    Set-DotNetAppSetting
+
     .EXAMPLE
     Convert-XmlFile -Path ".\web.config" -XdtPath ".\web.debug.config" -Destination '\\webserver\wwwroot\web.config'
     
@@ -21,6 +45,11 @@ function Convert-XmlFile
     Convert-XmlFile -Path ".\web.config" -XdtXml "<configuration><connectionStrings><add name=""MyConn"" xdt:Transform=""Insert"" /></connectionStrings></configuration>" -Destination '\\webserver\wwwroot\web.config'
     
     Transforms `web.config` with the given XDT XML to a new file at `\\webserver\wwwroot\web.config`.
+    
+    .EXAMPLE
+    Convert-XmlFile -Path ".\web.config" -XdtPath ".\web.debug.config" -Destination '\\webserver\wwwroot\web.config' -Verbose
+    
+    See that `Verbose` switch? It will show informational/debug messages written by the XDT framework.  Very helpful in debugging what XDT framework is doing.
     #>
     [CmdletBinding(SupportsShouldProcess=$true)]
     param(
@@ -99,38 +128,38 @@ function Convert-XmlFile
             $XdtPath,
 
             [Parameter(Position=3)]
-		    [string]
+            [string]
             $Destination
         )
 
-	    Add-Type -Path (Join-Path $CarbonBinDir "Microsoft.Web.XmlTransform.dll")
-	    Add-Type -Path (Join-Path $CarbonBinDir "Carbon.Xdt.dll")
+        Add-Type -Path (Join-Path $CarbonBinDir "Microsoft.Web.XmlTransform.dll")
+        Add-Type -Path (Join-Path $CarbonBinDir "Carbon.Xdt.dll")
 
         try
         {
-	        $document = New-Object Microsoft.Web.XmlTransform.XmlTransformableDocument
-	        $document.PreserveWhitespace = $true
-	        $document.Load($Path)
-	
+            $document = New-Object Microsoft.Web.XmlTransform.XmlTransformableDocument
+            $document.PreserveWhitespace = $true
+            $document.Load($Path)
+
             $logger = New-Object Carbon.Xdt.PSHostUserInterfaceTransformationLogger $PSCmdlet.CommandRuntime
             $xmlTransform = New-Object Microsoft.Web.XmlTransform.XmlTransformation $XdtPath,$logger
-	
-	        $success = $xmlTransform.Apply($document)
-	
-	        if($success)
-	        {
-    	        $document.Save($Destination)
-	        }
+
+            $success = $xmlTransform.Apply($document)
+
+            if($success)
+            {
+                $document.Save($Destination)
+            }
         }
         finally
         {
             if( $xmlTransform )
             {	
-    	        $xmlTransform.Dispose()
+                $xmlTransform.Dispose()
             }
             if( $document )
             {
-	            $document.Dispose()
+                $document.Dispose()
             }
         }
     }
