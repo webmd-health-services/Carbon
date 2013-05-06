@@ -58,11 +58,7 @@ function Test-ShouldConvertXmlFileUsingFilesAsInputs
 	# act
 	Convert-XmlFile -Path $xmlFilePath -XdtPath $xdtFilePath -Destination $resultFilePath
 
-    Assert-FileExists $resultFilePath
-	
-	# assert
-	$newContext = Get-Content $resultFilePath
-	Assert-True ($newContext -match '<add name="MyDB" connectionString="some value"/>')
+    Assert-XmlTransformed
 }
 
 if( $PSVersionTable.PSVersion -ge '4.0' )
@@ -135,12 +131,10 @@ function Test-ShouldAllowRawXdtXml
 	# act
 	Convert-XmlFile -Path $xmlFilePath -XdtXml $xdt -Destination $resultFilePath
 
-    Assert-FileExists $resultFilePath
     Assert-Null (Get-ChildItem -Path $env:TEMP -Filter 'Carbon_Convert-XmlFile-*')
 	
 	# assert
-	$newContext = Get-Content $resultFilePath
-	Assert-True ($newContext -match '<add name="MyDB" connectionString="some value"/>')
+    Assert-XmlTransformed
 }
 
 function Test-ShouldGiveAnErrorIfTransformingInPlace
@@ -161,6 +155,8 @@ function Test-ShouldNotLockFiles
 
     Convert-XmlFile -Path $xmlFilePath -XdtPath $xdtFilePath -Destination $resultFilePath
 
+    Assert-XmlTransformed
+
     $error.Clear()
 
     '' > $xmlFilePath
@@ -172,4 +168,23 @@ function Test-ShouldNotLockFiles
     Assert-Equal '' (Get-Content -Path $xdtFilePath)
     Assert-Equal '' (Get-Content -Path $resultFilePath)
 
+}
+
+function Test-ShouldSupportShouldProcess
+{
+    Set-XmlFile
+    Set-XdtFile
+
+    Convert-XmlFile -Path $xmlFilePath -XdtPath $xdtFilePath -Destination $resultFilePath -WhatIf
+
+    Assert-FileDoesNotExist $resultFilePath
+}
+
+function Assert-XmlTransformed
+{
+    Assert-FileExists $resultFilePath
+	
+	# assert
+	$newContext = Get-Content $resultFilePath
+	Assert-True ($newContext -match '<add name="MyDB" connectionString="some value"/>')    
 }

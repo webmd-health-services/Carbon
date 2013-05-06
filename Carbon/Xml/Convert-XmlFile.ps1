@@ -22,7 +22,7 @@ function Convert-XmlFile
     
     Transforms `web.config` with the given XDT XML to a new file at `\\webserver\wwwroot\web.config`.
     #>
-    [CmdletBinding()]
+    [CmdletBinding(SupportsShouldProcess=$true)]
     param(
         [Parameter(Mandatory=$true)]
         [string]
@@ -55,6 +55,7 @@ function Convert-XmlFile
     if( $PSCmdlet.ParameterSetName -eq 'ByXdtXml' )
     {
         $xdtPathForInfoMsg = ''
+        $xdtPathForShouldProcess = 'raw XDT XML'
         $XdtPath = 'Carbon_Convert-XmlFile_{0}' -f ([IO.Path]::GetRandomFileName())
         $XdtPath = Join-Path $env:TEMP $XdtPath
         $xdtXml.Save( $XdtPath )
@@ -66,11 +67,12 @@ function Convert-XmlFile
 		    Write-Error ("XdtPath '{0}' not found." -f $XdtPath)
             return
 	    }
+        $XdtPath = Resolve-FullPath -Path $XdtPath
+        $xdtPathForShouldProcess = $XdtPath
         $xdtPathForInfoMsg = 'with ''{0}'' ' -f $XdtPath
     }
     
     $Path = Resolve-FullPath -Path $Path
-    $XdtPath = Resolve-FullPath -Path $XdtPath
     $Destination = Resolve-FullPath -Path $Destination
 
     if( $Path -eq $Destination )
@@ -136,14 +138,18 @@ function Convert-XmlFile
     try
     {
         Write-Host ('Transforming ''{0}'' {1}to ''{2}''.' -f $Path,$xdtPathForInfoMsg,$Destination)
-        $argumentList = $CarbonBinDir,$Path,$XdtPath,$Destination
-        if( $PSVersionTable.PSVersion -ge '3.0' )
+
+        if( $PSCmdlet.ShouldProcess( $Path, ('transform with {0} -> {1}' -f $xdtPathForShouldProcess,$Destination) ) )
         {
-            Invoke-Command -ScriptBlock $scriptBlock -ArgumentList $argumentList
-        }
-        else
-        {
-            Invoke-PowerShell -Command $scriptBlock -Args $argumentList -Runtime 'v4.0'
+            $argumentList = $CarbonBinDir,$Path,$XdtPath,$Destination
+            if( $PSVersionTable.PSVersion -ge '3.0' )
+            {
+                Invoke-Command -ScriptBlock $scriptBlock -ArgumentList $argumentList
+            }
+            else
+            {
+                Invoke-PowerShell -Command $scriptBlock -Args $argumentList -Runtime 'v4.0'
+            }
         }
     }
     finally
