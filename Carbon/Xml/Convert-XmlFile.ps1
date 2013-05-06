@@ -70,6 +70,14 @@ function Convert-XmlFile
     $Path = Resolve-FullPath -Path $Path
     $XdtPath = Resolve-FullPath -Path $XdtPath
     $Destination = Resolve-FullPath -Path $Destination
+
+    if( $Path -eq $Destination )
+    {
+        $errorMsg = 'Can''t transform Path {0} onto Destination {1}: Path is the same as Destination. XDT is designed to transform an XML file from a known starting state to a new XML file. Please supply a new, unique path for the Destination XML file.' -f `
+                        $Path,$Destination
+        Write-Error -Message $errorMsg -Category InvalidOperation -RecommendedAction 'Set Destination parameter to a unique path.'
+        return
+    }
     	
     $scriptBlock = {
         [CmdletBinding()]

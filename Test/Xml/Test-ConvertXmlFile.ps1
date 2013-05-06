@@ -141,3 +141,14 @@ function Test-ShouldAllowRawXdtXml
 	$newContext = Get-Content $resultFilePath
 	Assert-True ($newContext -match '<add name="MyDB" connectionString="some value"/>')
 }
+
+function Test-ShouldGiveAnErrorIfTransformingInPlace
+{
+    $error.Clear()
+    $null = New-Item -Path $xmlFilePath,$xdtFilePath -ItemType File
+    Assert-FileDoesNotExist $resultFilePath
+    Convert-XmlFile -Path $xmlFilePath -XdtPath $xdtFilePath -Destination $xmlFilePath -ErrorAction SilentlyContinue
+    Assert-Equal 1 $error.Count
+    Assert-True ($error[0].ErrorDetails.Message -like '*Path is the same as Destination*')
+    Assert-FileDoesNotExist $resultFilePath
+}
