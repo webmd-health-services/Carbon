@@ -71,7 +71,11 @@ function Convert-XmlFile
         [Parameter(Mandatory=$true)]
 		[string]
         # The destination XML file's path.
-        $Destination
+        $Destination,
+
+        [Switch]
+        # Overwrite the destination file if it exists.
+        $Force
     )
     
 
@@ -106,9 +110,16 @@ function Convert-XmlFile
 
     if( $Path -eq $Destination )
     {
-        $errorMsg = 'Can''t transform Path {0} onto Destination {1}: Path is the same as Destination. XDT is designed to transform an XML file from a known starting state to a new XML file. Please supply a new, unique path for the Destination XML file.' -f `
+        $errorMsg = 'Can''t transform Path {0} onto Destination {1}: Path is the same as Destination. XDT is designed to transform an XML file from a known state to a new XML file. Please supply a new, unique path for the Destination XML file.' -f `
                         $Path,$Destination
         Write-Error -Message $errorMsg -Category InvalidOperation -RecommendedAction 'Set Destination parameter to a unique path.'
+        return
+    }
+
+    if( -not $Force -and (Test-Path -Path $Destination -PathType Leaf) )
+    {
+        $errorMsg = 'Can''t transform ''{0}'': Destination ''{1}'' exists. Use the -Force switch to overwrite.' -f $Path,$Destination
+        Write-Error $errorMsg -Category InvalidOperation -RecommendedAction 'Use the -Force switch to overwrite.'
         return
     }
     	

@@ -175,6 +175,32 @@ function Test-ShouldSupportShouldProcess
     Assert-FileDoesNotExist $resultFilePath
 }
 
+function Test-ShouldFailIfDestinationExists
+{
+    Set-XmlFile
+    Set-XdtFile
+    '' > $resultFilePath
+
+    $error.Clear()
+    Convert-XmlFile -Path $xmlFilePath -XdtPath $xdtFilePath -Destination $resultFilePath -ErrorAction SilentlyContinue
+
+    Assert-Equal 1 $error.Count
+    Assert-True ($error[0].ErrorDetails.Message -like '*Destination ''*'' exists*')
+    Assert-Equal '' (Get-Content -Path $resultFilePath)
+}
+
+function Test-ShouldOverwriteDestination
+{
+    Set-XmlFile
+    Set-XdtFile
+    '' > $resultFilePath
+
+    $error.Clear()
+    Convert-XmlFile -Path $xmlFilePath -XdtPath $xdtFilePath -Destination $resultFilePath -Force
+
+    Assert-Equal 0 $error.Count
+    Assert-XmlTransformed
+}
 function Assert-XmlTransformed
 {
     Assert-FileExists $resultFilePath
