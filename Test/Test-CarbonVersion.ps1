@@ -44,8 +44,9 @@ function Test-CarbonModuleVersionIsCorrect
 function Test-CarbonAssemblyVersionIsCorrect
 {
     Get-ChildItem (Join-Path $TestDir '..\Carbon\bin') Carbon*.dll | ForEach-Object {
-        $assembly = [Reflection.Assembly]::LoadFrom( $_.FullName )
-        Assert-NotNull $assembly
-        Assert-Equal $expectedVersion $assembly.GetName().Version ('{0} assembly version not correct.' -f $_.Name)
+
+        Assert-Equal $expectedVersion $_.VersionInfo.FileVersion ('{0} assembly file version not correct.' -f $_.Name)
+        Assert-Equal $expectedVersion $_.VersionInfo.ProductVersion ('{0} assembly product version not correct.' -f $_.Name)
+
     }
 }
