@@ -10,3 +10,4 @@ glob:Source\*.user
 glob:Source\_ReSharper*
 glob:Source\Carbon.snk
 glob:Source\**\*.user
+glob:*.pdb
