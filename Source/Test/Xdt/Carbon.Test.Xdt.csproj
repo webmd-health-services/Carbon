@@ -5,11 +5,11 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{C661482E-C379-4973-B8A4-35F6F04218A7}</ProjectGuid>
+    <ProjectGuid>{6F3E420E-796A-4E21-93B2-0EE47940DC33}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Carbon.Test</RootNamespace>
-    <AssemblyName>Carbon.Test</AssemblyName>
+    <RootNamespace>Carbon.Test.Xdt</RootNamespace>
+    <AssemblyName>Carbon.Test.Xdt</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
@@ -18,7 +18,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
+    <OutputPath>..\..\..\Test\Xml\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -34,10 +34,8 @@
   <ItemGroup>
     <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.Web.XmlTransform">
-      <HintPath>..\..\Carbon\bin\Microsoft.Web.XmlTransform.dll</HintPath>
-    </Reference>
-    <Reference Include="nunit.framework">
-      <HintPath>..\..\Tools\NUnit\2.6.2\nunit.framework.dll</HintPath>
+      <HintPath>..\..\..\Carbon\bin\Microsoft.Web.XmlTransform.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -47,26 +45,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\Properties\AssemblyVersion.cs">
+    <Compile Include="..\..\Properties\AssemblyVersion.cs">
       <Link>AssemblyVersion.cs</Link>
     </Compile>
-    <Compile Include="Lsa\LsaTests.cs" />
+    <Compile Include="Merge.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="AdvApi32Tests.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\Source\Carbon.csproj">
-      <Project>{FAC30031-F36B-4A7F-B887-114D0B3DFD7D}</Project>
-      <Name>Carbon</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Iis\Carbon.Iis.csproj">
-      <Project>{e327b329-2f5c-4cde-b8f6-40d8bcdd83d8}</Project>
-      <Name>Carbon.Iis</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Xdt\Carbon.Xdt.csproj">
-      <Project>{d1d7ae6d-e489-43f2-9716-d0fb0774851a}</Project>
-      <Name>Carbon.Xdt</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

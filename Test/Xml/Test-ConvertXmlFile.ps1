@@ -76,7 +76,7 @@ function Test-ShouldConvertXmlFileUsingFilesAsInputs
 
 function Test-ShouldAllowUsersToLoadCustomTransforms
 {
-    $carbonTestAssemblyPath = Join-Path $TestDir ..\..\Source\Test\bin\Debug\Carbon.Test.dll -Resolve
+    $carbonTestAssemblyPath = Join-Path $TestDir Carbon.Test.Xdt.dll -Resolve
 
 	@'
 <?xml version="1.0"?>
