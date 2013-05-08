@@ -27,14 +27,18 @@ function Convert-XmlFile
     
         <?xml version="1.0"?>
         <root xmlns:xdt="http://schemas.microsoft.com/XML-Document-Transform">
-            <!-- You can also use the "assembly" attribute if the assembly is in the GAC or in your path, otherwise use the "path" parameter.  
-                 All classes in `namespace` that inherit from the XDT `Transform` class are loaded. -->
+            <!-- You can also use the "assembly" attribute (PowerShell v3 
+                 *only*).  In PowerShell v2, you can only use the `path` 
+                 attribute.
+                 
+                 All classes in `namespace` that inherit from the XDT 
+                 `Transform` class are loaded. -->
             <xdt:Import path="C:\Projects\Carbon\Lib\ExtraTransforms.dll"
                         namespace="ExtraTransforms" />
             <!-- ...snip... -->
         </root>
-        
-    That's it! (Note: Carbon does *not* ship with any extra transformations.)
+   
+    You also have to pass the path to your custom transformation assembly as a value to the `TransformAssemblyPath` parameter. That's it! (Note: Carbon does *not* ship with any extra transformations.)
     
     When transforming a file, the XDT framework will write warnings and errors to the PowerShell error and warning stream.  Informational and debug messages are written to the verbose stream (i.e. use the `Verbose` switch to see all the XDT log messages).
      
@@ -64,6 +68,11 @@ function Convert-XmlFile
     Convert-XmlFile -Path ".\web.config" -XdtPath ".\web.debug.config" -Destination '\\webserver\wwwroot\web.config' -Verbose
     
     See that `Verbose` switch? It will show informational/debug messages written by the XDT framework.  Very helpful in debugging what XDT framework is doing.
+
+    .EXAMPLE
+    Convert-XmlFile -Path ".\web.config" -XdtPath ".\web.debug.config" -Destination '\\webserver\wwwroot\web.config' -TransformAssemblyPath C:\Projects\CustomTransforms.dll
+    
+    Shows how to reference a custom transformation assembly.  It should also be loaded in your XDT file via the `xdt:Import`.
     #>
     [CmdletBinding(SupportsShouldProcess=$true)]
     param(
@@ -86,6 +95,10 @@ function Convert-XmlFile
 		[string]
         # The destination XML file's path.
         $Destination,
+        
+        [string[]]
+        # List of assemblies to load which contain custom transforms.
+        $TransformAssemblyPath = @(),
 
         [Switch]
         # Overwrite the destination file if it exists.
@@ -121,7 +134,18 @@ function Convert-XmlFile
     
     $Path = Resolve-FullPath -Path $Path
     $Destination = Resolve-FullPath -Path $Destination
-
+    $TransformAssemblyPath = $TransformAssemblyPath | ForEach-Object { Resolve-FullPath -path $_ }
+    if( $TransformAssemblyPath )
+    {
+        $badPaths = $TransformAssemblyPath | Where-Object { -not (Test-Path -Path $_ -PathType Leaf) }
+        if( $badPaths )
+        {
+            $errorMsg = "TransformAssemblyPath not found:`n * {0}" -f ($badPaths -join "`n * ")
+            Write-Error -Message $errorMsg -Category ObjectNotFound
+            return
+        }
+    }
+    
     if( $Path -eq $Destination )
     {
         $errorMsg = 'Can''t transform Path {0} onto Destination {1}: Path is the same as Destination. XDT is designed to transform an XML file from a known state to a new XML file. Please supply a new, unique path for the Destination XML file.' -f `
@@ -136,9 +160,9 @@ function Convert-XmlFile
         Write-Error $errorMsg -Category InvalidOperation -RecommendedAction 'Use the -Force switch to overwrite.'
         return
     }
-    	
+    
+    
     $scriptBlock = {
-        [CmdletBinding()]
         param(
             [Parameter(Position=0)]
             [string]
@@ -154,39 +178,66 @@ function Convert-XmlFile
 
             [Parameter(Position=3)]
             [string]
-            $Destination
+            $Destination,
+            
+            [Parameter(Position=4)]
+            [string[]]
+            $TransformAssemblyPath
         )
-
+        
         Add-Type -Path (Join-Path $CarbonBinDir "Microsoft.Web.XmlTransform.dll")
         Add-Type -Path (Join-Path $CarbonBinDir "Carbon.Xdt.dll")
-
-        try
+        if( $TransformAssemblyPath )
         {
-            $document = New-Object Microsoft.Web.XmlTransform.XmlTransformableDocument
-            $document.PreserveWhitespace = $true
-            $document.Load($Path)
+            $TransformAssemblyPath | ForEach-Object { Add-Type -Path $_ }
+        }
+                
+        function Convert-XmlFile
+        {
+            [CmdletBinding()]
+            param(
+                [string]
+                $Path,
 
-            $logger = New-Object Carbon.Xdt.PSHostUserInterfaceTransformationLogger $PSCmdlet.CommandRuntime
-            $xmlTransform = New-Object Microsoft.Web.XmlTransform.XmlTransformation $XdtPath,$logger
+                [string]
+                $XdtPath,
 
-            $success = $xmlTransform.Apply($document)
+                [string]
+                $Destination
+            )
 
-            if($success)
+            try
             {
-                $document.Save($Destination)
+                $document = New-Object Microsoft.Web.XmlTransform.XmlTransformableDocument
+                $document.PreserveWhitespace = $true
+                $document.Load($Path)
+
+                $logger = New-Object Carbon.Xdt.PSHostUserInterfaceTransformationLogger $PSCmdlet.CommandRuntime
+                $xmlTransform = New-Object Microsoft.Web.XmlTransform.XmlTransformation $XdtPath,$logger
+
+                $success = $xmlTransform.Apply($document)
+
+                if($success)
+                {
+                    $document.Save($Destination)
+                }
+            }
+            finally
+            {
+                if( $xmlTransform )
+                {	
+                    $xmlTransform.Dispose()
+                }
+                if( $document )
+                {
+                    $document.Dispose()
+                }
             }
         }
-        finally
-        {
-            if( $xmlTransform )
-            {	
-                $xmlTransform.Dispose()
-            }
-            if( $document )
-            {
-                $document.Dispose()
-            }
-        }
+        
+        $PsBoundParameters.Remove( 'CarbonBinDir' )
+        $PSBoundParameters.Remove( 'TransformAssemblyPath' )
+        Convert-XmlFile @PSBoundParameters
     }
 
     try
@@ -195,8 +246,8 @@ function Convert-XmlFile
 
         if( $PSCmdlet.ShouldProcess( $Path, ('transform with {0} -> {1}' -f $xdtPathForShouldProcess,$Destination) ) )
         {
-            $argumentList = $CarbonBinDir,$Path,$XdtPath,$Destination
-            if( $PSVersionTable.PSVersion -ge '3.0' )
+            $argumentList = $CarbonBinDir,$Path,$XdtPath,$Destination,$TransformAssemblyPath
+            if( $PSVersionTable.CLRVersion.Major -ge 4 )
             {
                 Invoke-Command -ScriptBlock $scriptBlock -ArgumentList $argumentList
             }

@@ -112,7 +112,7 @@ function Test-ShouldAllowUsersToLoadCustomTransforms
 '@ -f $carbonTestAssemblyPath > $xdtFilePath
 	
 	# act
-	Convert-XmlFile -Path $xmlFilePath -XdtPath $xdtFilePath -Destination $resultFilePath 
+	Convert-XmlFile -Path $xmlFilePath -XdtPath $xdtFilePath -Destination $resultFilePath -TransformAssemblyPath @( $carbonTestAssemblyPath )
 	
 	# assert
 	$newContext = (Get-Content $resultFilePath) -join "`n"
@@ -214,6 +214,19 @@ function Test-ShouldOverwriteDestination
     Assert-Equal 0 $error.Count
     Assert-XmlTransformed
 }
+
+function Test-ShouldFailIfTransformAssemblyPathNotFound
+{
+    Set-XmlFile
+    Set-XdtFile
+    
+    $error.Clear()
+    Convert-XmlFile -Path $xmlFilePath -XdtPath $xdtFilePath -Destination $resultFilePath -TransformAssemblyPath 'C:\I\Do\Not\Exist' -ErrorAction SilentlyContinue
+    Assert-FileDoesNotExist $resultFilePath
+    Assert-Equal 1 $error.Count
+    Assert-Like $error[0].Exception.Message '*not found*'
+}
+
 function Assert-XmlTransformed
 {
     Assert-FileExists $resultFilePath
