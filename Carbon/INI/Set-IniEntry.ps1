@@ -33,6 +33,9 @@ function Set-IniEntry
     .LINK
     Split-Ini
 
+    LINK
+    .Remove-IniEntry
+
     .EXAMPLE
     Set-IniEntry -Path C:\Users\rspektor\mercurial.ini -Section extensions -Name share -Value ''
 

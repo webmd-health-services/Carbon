@@ -76,6 +76,12 @@ function Split-Ini
 
     This would set the "eggs", "ham", and "bread" configuration keys of the "foo" section to "medium", "prosciutto", and "toasted", respectively. As you can see, the only thing that matters is the last value that was set for each of the configuration keys.
 
+    .LINK
+    Set-IniEntry
+
+    .LINK
+    Remove-IniEntry
+
     .EXAMPLE
     Split-Ini -Path C:\Users\rspektor\mercurial.ini 
 

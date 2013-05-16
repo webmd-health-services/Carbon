@@ -6,6 +6,10 @@
 
  * Carbon should now work under PowerShell v3.0!
  
+### INI
+
+ * Created [Remove-IniEntry](http://get-carbon.org/help/Remove-IniEntry.html) function for removing entries/settings from an INI file.
+ 
 ### PowerShell
 
  * [Invoke-PowerShell](http://get-carbon.org/help/Invoke-PowerShell.html) now defaults to running under the current CLR, instead of defaulting to a v2.0 CLR.  This makes upgrading to PowerShell v3.0 easier.
