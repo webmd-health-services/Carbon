@@ -6,6 +6,11 @@
 
  * Carbon should now work under PowerShell v3.0!
  
+### File System
+
+ * Created [Enable-NtfsCompression](http://get-carbon.org/help/Enable-NtfsCompression.html) function for enabling NTFS compression on files/directories.
+ * Created [Test-NtfsCompression](http://get-carbon.org/help/Test-NtfsCompression.html) function for testing if NTFS compression is enabled on a file/directory.
+ 
 ### INI
 
  * Created [Remove-IniEntry](http://get-carbon.org/help/Remove-IniEntry.html) function for removing entries/settings from an INI file.
