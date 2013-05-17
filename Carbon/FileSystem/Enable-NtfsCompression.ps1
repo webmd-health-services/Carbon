@@ -16,11 +16,9 @@ function Enable-NtfsCompression
 {
     <#
     .SYNOPSIS
-    Turns on NTFS compression on a path.
+    Turns on NTFS compression on a file/directory.
 
     .DESCRIPTION
-    The path is also compressed, so if you enable NTFS compression on a large directory structure, it could take awhile.
-
     By default, when enabling compression on a directory, only new files/directories created *after* enabling compression will be compressed.  To compress everything, use the `-Recurse` switch.
 
     Uses Windows' `compact.exe` command line utility to compress the file/directory.  To see the output from `compact.exe`, set the `Verbose` switch.
@@ -46,7 +44,7 @@ function Enable-NtfsCompression
 
     Demonstrates that you can pipe the path to compress into `Enable-NtfsCompression`.
     #>
-    [CmdletBinding()]
+    [CmdletBinding(SupportsShouldProcess=$true)]
     param(
         [Parameter(Mandatory=$true,ValueFromPipeline=$true,ValueFromPipelineByPropertyName=$true)]
         [string[]]
@@ -94,12 +92,15 @@ function Enable-NtfsCompression
                 $pathArg = ''
             }
         }
-
-        Write-Host ('Enabling NTFS compression on {0}.' -f $Path)
-        & $compactPath /C $recurseArg $pathArg | Write-Verbose
-        if( $LASTEXITCODE )
+        
+        if( $PSCmdlet.ShouldProcess( $Path, 'enable NTFS compression' ) )
         {
-            Write-Error ('{0} failed with exit code {1}' -f $compactPath,$LASTEXITCODE)
+            Write-Host ('Enabling NTFS compression on {0}.' -f $Path)
+            & $compactPath /C $recurseArg $pathArg | Write-Verbose
+            if( $LASTEXITCODE )
+            {
+                Write-Error ('{0} failed with exit code {1}' -f $compactPath,$LASTEXITCODE)
+            }
         }
     }
 }

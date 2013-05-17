@@ -28,6 +28,10 @@ function Setup
     $grandchildFile = Join-Path $tempDir 'ChildDir\GrandchildFile' -Resolve
     $childFile = Join-Path $tempDir 'ChildFile' -Resolve
     & (Join-Path $TestDir ..\..\Carbon\Import-Carbon.ps1 -Resolve)
+
+    Enable-NtfsCompression $tempDir -Recurse
+
+    Assert-EverythingCompressed
 }
 
 function TearDown
@@ -40,94 +44,86 @@ function TearDown
     Remove-Module Carbon
 }
 
-function Test-ShouldEnableCompressionOnDirectoryOnly
+function Test-ShouldDisableCompressionOnDirectoryOnly
 {
-    Assert-NothingCompressed
-    
-    Enable-NtfsCompression -Path $tempDir
+    Disable-NtfsCompression -Path $tempDir
 
-    Assert-Compressed -Path $tempDir
-    Assert-NotCompressed -Path $childDir
-    Assert-NotCompressed -path $grandchildFile
-    Assert-NotCompressed -Path $childFile
+    Assert-NotCompressed -Path $tempDir
+    Assert-Compressed -Path $childDir
+    Assert-Compressed -path $grandchildFile
+    Assert-Compressed -Path $childFile
 
     $newFile = Join-Path $tempDir 'newfile'
     '' > $newFile
-    Assert-Compressed -Path $newFile
+    Assert-NotCompressed -Path $newFile
 
     $newDir = Join-Path $tempDir 'newDir'
     $null = New-Item -Path $newDir -ItemType Directory
-    Assert-Compressed -Path $newDir
+    Assert-NotCompressed -Path $newDir
 }
 
 function Test-ShouldFailIfPathDoesNotExist
 {
     $Error.Clear()
 
-    Assert-NothingCompressed
-
-    Enable-NtfsCompression -Path 'C:\I\Do\Not\Exist' -ErrorAction SilentlyContinue
+    Disable-NtfsCompression -Path 'C:\I\Do\Not\Exist' -ErrorAction SilentlyContinue
 
     Assert-Equal 1 $Error.Count
     Assert-True ($Error[0].Exception.Message -like '*not found*')
 
-    Assert-NothingCompressed
+    Assert-EverythingCompressed
 }
 
-function Test-ShouldEnableCompressionRecursively
+function Test-ShouldDisableCompressionRecursively
 {
-    Assert-NothingCompressed
-    
-    Enable-NtfsCompression -Path $tempDir -Recurse
+    Disable-NtfsCompression -Path $tempDir -Recurse
 
-    Assert-EverythingCompressed
+    Assert-NothingCompressed
 }
 
 function Test-ShouldSupportPipingItems
 {
-    Assert-NothingCompressed 
+    Get-ChildItem $tempDir | Disable-NtfsCompression
 
-    Get-ChildItem $tempDir | Enable-NtfsCompression
-
-    Assert-NotCompressed $tempDir
-    Assert-Compressed $childDir
-    Assert-NotCompressed $grandchildFile
-    Assert-Compressed $childFile
+    Assert-Compressed $tempDir
+    Assert-NotCompressed $childDir
+    Assert-Compressed $grandchildFile
+    Assert-NotCompressed $childFile
 }
 
 function Test-ShouldSupportPipingStrings
 {
-    ($childFile,$grandchildFile) | Enable-NtfsCompression
+    ($childFile,$grandchildFile) | Disable-NtfsCompression
 
-    Assert-NotCompressed $tempDir
-    Assert-NotCompressed $childDir
-    Assert-Compressed $grandchildFile
-    Assert-Compressed $childFile
+    Assert-Compressed $tempDir
+    Assert-Compressed $childDir
+    Assert-NotCompressed $grandchildFile
+    Assert-NotCompressed $childFile
 }
 
-function Test-ShouldCompressArrayOfItems
+function Test-ShouldDecompressArrayOfItems
 {
-    Enable-NtfsCompression -Path $childFile,$grandchildFile
-    Assert-NotCompressed $tempDir
-    Assert-NotCompressed $childDir
-    Assert-Compressed $grandchildFile
-    Assert-Compressed $childFile
+    Disable-NtfsCompression -Path $childFile,$grandchildFile
+    Assert-Compressed $tempDir
+    Assert-Compressed $childDir
+    Assert-NotCompressed $grandchildFile
+    Assert-NotCompressed $childFile
 }
 
-function Test-ShouldCompressAlreadyCompressedItem
+function Test-ShouldDecompressAlreadyDecompressedItem
 {
-    Enable-NtfsCompression $tempDir -Recurse
-    Assert-EverythingCompressed
+    Disable-NtfsCompression $tempDir -Recurse
+    Assert-NothingCompressed
 
-    Enable-NtfsCompression $tempDir -Recurse
+    Disable-NtfsCompression $tempDir -Recurse
     Assert-LastProcessSucceeded
-    Assert-EverythingCompressed
+    Assert-NothingCompressed
 }
 
 function Test-ShouldSupportWhatIf
 {
-    Enable-NtfsCompression -Path $childFile -WhatIf
-    Assert-NotCompressed $childFile
+    Disable-NtfsCompression -Path $childFile -WhatIf
+    Assert-Compressed $childFile
 }
 
 function Assert-EverythingCompressed

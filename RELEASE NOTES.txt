@@ -8,6 +8,7 @@
  
 ### File System
 
+ * Created [Disable-NtfsCompression](http://get-carbon.org/help/Disable-NtfsCompression.html) function for disabling NTFS compression on files/directories.
  * Created [Enable-NtfsCompression](http://get-carbon.org/help/Enable-NtfsCompression.html) function for enabling NTFS compression on files/directories.
  * Created [Test-NtfsCompression](http://get-carbon.org/help/Test-NtfsCompression.html) function for testing if NTFS compression is enabled on a file/directory.
  
