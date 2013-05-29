@@ -20,12 +20,14 @@ function Get-IisWebsite
     
     .DESCRIPTION
     Returns a Microsoft.Web.Administration.Site object representing the website.
+
+    The object will have a `CommitChanges` script method added which will allow you to commit/persist any changes you make to the underlying IIS object.
      
     .OUTPUTS
     Microsoft.Web.Administration.Site.
     
     .LINK
-    http://msdn.microsoft.com/en-us/library/microsoft.web.administration.site(v=VS.90).aspx
+    http://msdn.microsoft.com/en-us/library/microsoft.web.administration.site.aspx
      
     .EXAMPLE
     Get-IisWebsite -SiteName 'WebsiteName'
@@ -46,5 +48,5 @@ function Get-IisWebsite
     }
     
     $mgr = New-Object Microsoft.Web.Administration.ServerManager
-    $mgr.Sites[$SiteName]
+    $mgr.Sites[$SiteName] | Add-IisServerManagerMember -ServerManager $mgr -PassThru
 }

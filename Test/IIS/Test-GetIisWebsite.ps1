@@ -62,5 +62,7 @@ function Test-ShouldGetWebsiteDetails
     Assert-Equal '5.6.7.8' $website.Bindings[3].Endpoint.Address
     Assert-Equal 80 $website.Bindings[3].Endpoint.Port
     Assert-Equal $siteName $website.Bindings[3].Host "bindings[3] host name"
-     
+
+    Assert-NotNull ($website.ServerManager) 'no server manager property'
+    Assert-NotNull ($website | Get-Member | Where-Object { $_.Name -eq 'CommitChanges' -and $_.MemberType -eq 'ScriptMethod' }) 'no CommitChanges method'
 }
