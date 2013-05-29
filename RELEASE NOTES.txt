@@ -13,7 +13,9 @@
  * Created [Test-NtfsCompression](http://get-carbon.org/help/Test-NtfsCompression.html) function for testing if NTFS compression is enabled on a file/directory.
  
 ### IIS
- * The [site object](http://msdn.microsoft.com/en-us/library/microsoft.web.administration.site.aspx) returned by [Get-IisWebsite](http://get-carbon.org/help/Test-NtfsCompression.html) now as a `CommitChanges` method so you can persist modifications you make to the site.
+ * The [site object](http://msdn.microsoft.com/en-us/library/microsoft.web.administration.site.aspx) returned by [Get-IisWebsite](http://get-carbon.org/help/Get-IisWebsite.html) now as a `CommitChanges` method so you can persist modifications you make to the site.
+ * [Get-IisWebsite](http://get-carbon.org/help/Get-IisWebsite.html) now returns all website's if no `SiteName` is given.
+ * Created [Site-IisWebsiteID](http://get-carbon.org/help/Site-IisWebsiteID.html) function for explicitly setting a website's ID.
  
 ### INI
 

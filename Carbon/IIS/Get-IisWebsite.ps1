@@ -16,18 +16,23 @@ function Get-IisWebsite
 {
     <#
     .SYNOPSIS
-    Gets details about a website.
+    Returns all the websites installed on the local computer, or a specific website.
     
     .DESCRIPTION
-    Returns a Microsoft.Web.Administration.Site object representing the website.
+    Returns a Microsoft.Web.Administration.Site object.
 
-    The object will have a `CommitChanges` script method added which will allow you to commit/persist any changes you make to the underlying IIS object.
+    Each object will have a `CommitChanges` script method added which will allow you to commit/persist any changes to the website's configuration.
      
     .OUTPUTS
     Microsoft.Web.Administration.Site.
     
     .LINK
     http://msdn.microsoft.com/en-us/library/microsoft.web.administration.site.aspx
+
+    .EXAMPLE
+    Get-IisWebsite
+
+    Returns all installed websites.
      
     .EXAMPLE
     Get-IisWebsite -SiteName 'WebsiteName'
@@ -36,17 +41,26 @@ function Get-IisWebsite
     #>
     [CmdletBinding()]
     param(
-        [Parameter(Mandatory=$true)]
         [string]
+        [Alias('Name')]
         # The name of the site to get.
         $SiteName
     )
     
-    if( -not (Test-IisWebsite -Name $SiteName) )
+    if( $SiteName -and -not (Test-IisWebsite -Name $SiteName) )
     {
         return $null
     }
     
     $mgr = New-Object Microsoft.Web.Administration.ServerManager
-    $mgr.Sites[$SiteName] | Add-IisServerManagerMember -ServerManager $mgr -PassThru
-}
+    $mgr.Sites | 
+        Where-Object {
+            if( $SiteName )
+            {
+                $_.Name -eq $SiteName
+            }
+            else
+            {
+                $true
+            }
+        } | Add-IisServerManagerMember -ServerManager $mgr -PassThru}

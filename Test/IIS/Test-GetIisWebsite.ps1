@@ -13,17 +13,21 @@
 # limitations under the License.
 
 $appPoolName = 'Carbon-Get-IisWebsite'
+$siteName = 'Carbon-Get-IisWebsite'
 
 function Setup
 {
     Import-Module (Join-Path $TestDir ..\..\Carbon -Resolve) -Force
     Install-IisAppPool -Name $appPoolName
+    $bindings = @( 'http/*:8401:', 'https/*:8401:', 'http/1.2.3.4:80:', "http/5.6.7.8:80:$siteName" )
+    Install-IisWebsite -Name $siteName -Bindings $bindings -Path $TestDir -AppPoolName $appPoolName
 }
 
 function TearDown
 {
+    Remove-IisWebsite -Name $siteName
     Remove-Module Carbon
-    #Remove-IisAppPool -Name $appPoolName
+
 }
 
 function Test-ShouldReturnNullForNonExistentWebsite
@@ -33,11 +37,7 @@ function Test-ShouldReturnNullForNonExistentWebsite
 }
 
 function Test-ShouldGetWebsiteDetails
-{
-    $siteName = 'Carbon-Get-IisWebsite'
-    $bindings = @( 'http/*:8401:', 'https/*:8401:', 'http/1.2.3.4:80:', "http/5.6.7.8:80:$siteName" )
-    Install-IisWebsite -Name $siteName -Bindings $bindings -Path $TestDir -AppPoolName $appPoolName
-    
+{   
     $website = Get-IisWebsite -SiteName $siteName
     Assert-NotNull $website
     Assert-Equal $siteName $website.Name 'site name not set'
@@ -63,6 +63,33 @@ function Test-ShouldGetWebsiteDetails
     Assert-Equal 80 $website.Bindings[3].Endpoint.Port
     Assert-Equal $siteName $website.Bindings[3].Host "bindings[3] host name"
 
-    Assert-NotNull ($website.ServerManager) 'no server manager property'
-    Assert-NotNull ($website | Get-Member | Where-Object { $_.Name -eq 'CommitChanges' -and $_.MemberType -eq 'ScriptMethod' }) 'no CommitChanges method'
+    Assert-ServerManagerMember -Website $website
+}
+
+function Test-ShouldGetAllWebsites
+{
+    $foundAtLeastOne = $false
+    $foundTestWebsite = $false
+    Get-IisWebsite | ForEach-Object { 
+        $foundAtLeastOne = $true
+
+        Assert-ServerManagerMember -Website $_
+
+        if( $_.Name -eq $siteName )
+        {
+            $foundTestWebsite = $true
+        }
+    }
+
+    Assert-True $foundAtLeastOne
+    Assert-True $foundTestWebsite
+}
+
+function Assert-ServerManagerMember
+{
+    param(
+        $Website
+    )
+    Assert-NotNull ($Website.ServerManager) 'no server manager property'
+    Assert-NotNull ($Website | Get-Member | Where-Object { $_.Name -eq 'CommitChanges' -and $_.MemberType -eq 'ScriptMethod' }) 'no CommitChanges method'
 }
