@@ -6,6 +6,10 @@
 
  * Carbon should now work under PowerShell v3.0!
  
+### .NET
+
+ * Added `ProviderName` parameter to [Set-DotNetConnectionString ](http://get-carbon.org/help/Set-DotNetConnectionString.html) for setting a connection string's `providerName` attribute/value.
+ 
 ### File System
 
  * Created [Disable-NtfsCompression](http://get-carbon.org/help/Disable-NtfsCompression.html) function for disabling NTFS compression on files/directories.

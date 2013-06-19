@@ -41,9 +41,18 @@ function Set-DotNetConnectionString
     .EXAMPLE
     > Set-DotNetConnectionString -Name DevDB -Value "data source=.\DevDB;Integrated Security=SSPI;" -Framework64 -Clr4
     
-    Sets the DevDB connection string in the following machine.config file:
+    Sets the DevDB connection string in the `%SYSTEMROOT%\Microsoft.NET\Framework64\v4.0.30319\CONFIG\machine.config` machine.config file to:
      
-     * `%SYSTEMROOT%\Microsoft.NET\Framework64\v4.0.30319\CONFIG\machine.config`
+        <add name="DevDB" connectionString="data source=.\DevDB;Integrated Security=SSPI;" />
+
+
+    .EXAMPLE
+    Set-DotNetConnectionString -Name Prod -Value "data source=proddb\Prod;Integrated Security=SSPI" -ProviderName 'System.Data.SqlClient' -Framework -Clr2
+
+    Creates the following connection string in the `%SYSTEMROOT%\Microsoft.NET\Framework\v2.0.50727\CONFIG\machine.config` file:
+
+        <add name="Prod" connectionString="data source=proddb\Prod;Integrated Security=SSPI" providerName="System.Data.SqlClient" />
+
     #>
     [CmdletBinding(SupportsShouldProcess=$true)]
     param(
@@ -56,6 +65,10 @@ function Set-DotNetConnectionString
         [string]
         # The connection string to be set.
         $Value,
+
+        [string]
+        # The provider name for the connection string.
+        $ProviderName,
         
         [Switch]
         # Set the connection string in the 32-bit machine.config.
@@ -66,7 +79,7 @@ function Set-DotNetConnectionString
         $Framework64,
         
         [Switch]
-        # Set the app setting in the .NET 2.0 machine.config.
+        # Set the app setting in the .NET 2.0 machine.config.  This flag won't work under PowerShell 3.0.
         $Clr2,
         
         [Switch]
@@ -89,7 +102,8 @@ function Set-DotNetConnectionString
     $command = {
         param(
             $Name,
-            $Value
+            $Value,
+            $ProviderName
         )
         
         Add-Type -AssemblyName System.Configuration
@@ -98,13 +112,17 @@ function Set-DotNetConnectionString
         $connectionStrings = $config.ConnectionStrings.ConnectionStrings
         if( $connectionStrings[$Name] )
         {
-            $connectionStrings[$Name].ConnectionString = $Value
+            $connectionStrings.Remove( $Name )
         }
-        else
+
+        $args = @( $Name, $Value )
+        if( $ProviderName )
         {
-            $connectionString = New-Object Configuration.ConnectionStringSettings $Name,$Value
-            $connectionStrings.Add( $connectionString )
+            $args += $ProviderName
         }
+        $connectionString = New-Object Configuration.ConnectionStringSettings $args
+        $connectionStrings.Add( $connectionString )
+
         $config.Save()
     }
 
@@ -121,10 +139,10 @@ function Set-DotNetConnectionString
     $runtimes | ForEach-Object {
         $params = @{
             Command = $command;
-            Args = $Name,$Value;
+            Args = $Name,$Value,$ProviderName;
             Runtime = $_;
         }
-        
+
         if( $Framework )
         {    
             Invoke-PowerShell @params -x86

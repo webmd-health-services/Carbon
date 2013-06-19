@@ -57,7 +57,7 @@ function Invoke-PowerShell
         
         [string]
         [ValidateSet('v2.0','v4.0')]
-        # The CLR to use.  Must be one of v2.0 or v4.0.  Default is v2.0.
+        # The CLR to use.  Must be one of v2.0 or v4.0.  Default is the current PowerShell runtime.
         $Runtime
     )
     

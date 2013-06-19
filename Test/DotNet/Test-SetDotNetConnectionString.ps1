@@ -14,6 +14,7 @@
 $connectionStringName = "TEST_CONNECTION_STRING_NAME"
 $connectionStringValue = "TEST_CONNECTION_STRING_VALUE"
 $connectionStringNewValue = "TEST_CONNECTION_STRING_NEW_VALUE"
+$providerName = 'Carbon.Set-DotNetConnectionString'
 
 function Setup
 {
@@ -45,8 +46,11 @@ function Remove-ConnectionStrings
         }
     }
     
-    Invoke-PowerShell -Command $command -Args $connectionStringName -x86
-    Invoke-PowerShell -Command $command -Args $connectionStringName 
+    if( $PSVersionTable.PSVersion -le '2.0' )
+    {
+        Invoke-PowerShell -Command $command -Args $connectionStringName -x86 -Runtime v2.0
+        Invoke-PowerShell -Command $command -Args $connectionStringName -Runtime v2.0
+    }
     Invoke-PowerShell -Command $command -Args $connectionStringName -x86 -Runtime v4.0
     Invoke-PowerShell -Command $command -Args $connectionStringName -Runtime v4.0
 }
@@ -82,6 +86,30 @@ function Test-ShouldUpdateConnectionString
     Assert-ConnectionString -Name $connectionStringName -Value $connectionStringNewValue -Framework -Clr2 
 }
 
+function Test-ShouldAddProviderName
+{
+    Set-DotNetConnectionString -Name $connectionStringName -Value $connectionStringValue -ProviderName $providerName -Framework64 -Clr4
+    Assert-ConnectionString -Name $connectionStringName -Value $connectionStringValue -ProviderName $providerName -Framework64 -Clr4
+}
+
+function Test-ShouldClearProviderName
+{
+    Set-DotNetConnectionString -Name $connectionStringName -Value $connectionStringValue -ProviderName $providerName -Framework64 -Clr4
+    Assert-ConnectionString -Name $connectionStringName -Value $connectionStringValue -ProviderName $providerName -Framework64 -Clr4
+    Set-DotNetConnectionString -Name $connectionStringName -Value $connectionStringValue -Framework64 -Clr4
+    Assert-ConnectionString -Name $connectionStringName -Value $connectionStringValue -Framework64 -Clr4
+}
+
+function Test-ShouldUpdateProviderName
+{
+    Set-DotNetConnectionString -Name $connectionStringName -Value $connectionStringValue -ProviderName $providerName -Framework64 -Clr4
+    Assert-ConnectionString -Name $connectionStringName -Value $connectionStringValue -ProviderName $providerName -Framework64 -Clr4
+
+    $newProviderName = '{0}.{0}' -f $providerName
+    Set-DotNetConnectionString -Name $connectionStringName -Value $connectionStringValue -ProviderName $newProviderName -Framework64 -Clr4
+    Assert-ConnectionString -Name $connectionStringName -Value $connectionStringValue -ProviderName $newProviderName -Framework64 -Clr4
+}
+
 function Test-ShouldRequireAFrameworkFlag
 {
     $error.Clear()
@@ -98,8 +126,28 @@ function Test-ShouldRequireAClrFlag
     Assert-Like $error[0].Exception 'You must supply either or both of the Clr2 and Clr4 switches.'    
 }
 
-function Assert-ConnectionString($Name, $value, [Switch]$Framework, [Switch]$Framework64, [Switch]$Clr2, [Switch]$Clr4)
+function Assert-ConnectionString
 {
+    param(
+        $Name, 
+        
+        $value, 
+
+        $ProviderName,
+        
+        [Switch]
+        $Framework, 
+        
+        [Switch]
+        $Framework64, 
+        
+        [Switch]
+        $Clr2, 
+        
+        [Switch]
+        $Clr4
+    )
+
     $command = {
         param(
             $Name
@@ -113,7 +161,7 @@ function Assert-ConnectionString($Name, $value, [Switch]$Framework, [Switch]$Fra
         
         if( $connectionStrings[$Name] )
         {
-            $connectionStrings[$Name].ConnectionString
+            $connectionStrings[$Name]
         }
         else
         {
@@ -136,23 +184,33 @@ function Assert-ConnectionString($Name, $value, [Switch]$Framework, [Switch]$Fra
         throw "Must supply either or both the Clr2 and Clr2 switches."
     }
     
-    $runtimes | ForEach-Object {
-        $params = @{
-            Command = $command
-            Args = $Name
-            Runtime = $_
-        }
+    $runtimes | 
+        ForEach-Object {
+            $params = @{
+                Command = $command
+                Args = $Name
+                Runtime = $_
+            }
 
-        if( $Framework64 )
-        {
-            $actualValue = Invoke-PowerShell @params
-            Assert-Equal $Value $actualValue
+            if( $Framework )
+            {
+                Invoke-PowerShell @params -x86
+            }
+
+            if( $Framework64 )
+            {
+                Invoke-PowerShell @params
+            }
+        } | 
+        ForEach-Object {
+            Assert-Equal $Value $_.ConnectionString
+            if( $ProviderName )
+            {
+                Assert-Equal $ProviderName $_.ProviderName
+            }
+            else
+            {
+                Assert-Empty $_.ProviderName
+            }        
         }
-        
-        if( $Framework )
-        {
-            $actualValue = Invoke-PowerShell @params -x86
-            Assert-Equal $Value $actualValue
-        }
-    }
 }
