@@ -59,12 +59,20 @@ function Set-SslCertificateBinding
         $commonParams.WhatIf = $true
     }
     
-    $ipPort = '{0}:{1}' -f $IPAddress,$Port
+    if( $IPAddress.AddressFamily -eq [Net.Sockets.AddressFamily]::InterNetworkV6 )
+    {
+        $ipPort = '[{0}]:{1}' -f $IPAddress,$Port
+    }
+    else
+    {
+        $ipPort = '{0}:{1}' -f $IPAddress,$Port
+    }
+
     Remove-SslCertificateBinding -IPAddress $IPAddress -Port $Port @commonParams
     
     if( $pscmdlet.ShouldProcess( $IPPort, 'creating SSL certificate binding' ) )
     {
         Write-Host "Creating SSL certificate binding for $IPPort with certificate $Thumbprint."
-        netsh http add sslcert ipport=$ipPort "certhash=$($Thumbprint)" "appid={$ApplicationID}"
+        netsh http add sslcert ipport=$ipPort "certhash=$($Thumbprint)" "appid={$ApplicationID}" 
     }
 }

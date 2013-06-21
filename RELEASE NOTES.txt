@@ -6,6 +6,10 @@
 
  * Carbon should now work under PowerShell v3.0!
  
+### Certificates
+
+ * Added support for IPv6 addresses to [Get-SslCertificateBinding](http://get-carbon.org/help/Get-SslCertificateBinding.html), [Remove-SslCertificateBinding](http://get-carbon.org/help/Remove-SslCertificateBinding.html), and [Set-SslCertificateBinding](http://get-carbon.org/help/Set-SslCertificateBinding.html).
+ 
 ### .NET
 
  * Added `ProviderName` parameter to [Set-DotNetConnectionString ](http://get-carbon.org/help/Set-DotNetConnectionString.html) for setting a connection string's `providerName` attribute/value.
@@ -40,6 +44,11 @@
 ### General
 
  * Deleted the obsolete variable `$CarbonImported`.  Carbon no longer exports any of its variables.
+ 
+### Certificates
+
+ * [Get-SslCertificateBinding](http://get-carbon.org/help/Get-SslCertificateBinding.html) can't parse bindings to IPv6 addresses.
+ 
  
 
 # 1.1.0 (1 April 2013)

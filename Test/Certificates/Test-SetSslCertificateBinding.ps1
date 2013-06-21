@@ -101,3 +101,22 @@ function Test-ShouldSupportShouldProcessOnBindingUpdate
         Remove-SslCertificateBinding -IPAddress $ipAddress -Port $port
     }
 }
+
+
+function Test-ShouldSupportIPv6Address
+{
+    $appID = '9aa262a9-dfb3-49db-b368-9f15bc12168c'
+    $ipAddress = '[::]'
+    $port = '7821'
+    Set-SslCertificateBinding -IPAddress $ipAddress -Port $port -ApplicationID $appID -Thumbprint $cert.Thumbprint
+    $binding = Get-SslCertificateBindings -IPAddress $ipAddress -Port $port
+    try
+    {
+        Assert-NotNull $binding
+        Assert-Equal $appID $binding.ApplicationID
+    }
+    finally
+    {
+        Remove-SslCertificateBinding -IPAddress $ipAddress -Port $port
+    }    
+}

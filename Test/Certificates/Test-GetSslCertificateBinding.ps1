@@ -51,11 +51,18 @@ function Test-ShouldConvertNetshOutputToSslCertificateBindingObjects
             
             if( $name -eq 'IP:port' )
             {
-                $ipAddress,$port = $value -split ':'
-                $binding = Get-SslCertificateBinding -IPAddress $ipAddress -Port $port
-                Assert-Equal $value $binding.IPPort
-                Assert-Equal $ipAddress $binding.IPAddress
-                Assert-Equal $port $binding.Port
+                if( $value -notmatch '^(.*):(\d+)$' )
+                {
+                    Write-Error ('Invalid IP address/port: {0}' -f $value)
+                }
+                else
+                {
+                    $ipAddress = $matches[1]
+                    $port = $matches[2]
+                    $binding = Get-SslCertificateBinding -IPAddress $ipAddress -Port $port
+                    Assert-Equal ([IPAddress]$ipAddress) $binding.IPAddress
+                    Assert-Equal $port $binding.Port
+                }
             }
             elseif( $name -eq 'Certificate Hash' )
             {
@@ -133,14 +140,21 @@ function Test-ShouldFilterByIPAddressAndPort
     $output |
         Where-Object {  $_ -match '^    IP:port\s+: (.*)$' } |
         ForEach-Object {
-        
-            $ipAddress,$port = $matches[1] -split ':'
+
+            $ipPort = $matches[1].Trim()
+            if( $ipPort -notmatch '^(.*):(\d+)$' )
+            {
+                Write-Error ('Invalid IP address/port in netsh output: ''{0}''' -f $ipPort )
+                return
+            }        
+            $ipAddress = $matches[1]
+            $port = $matches[2]
             
             $foundOne = $false
             Get-SslCertificateBinding -IPAddress $ipAddress | 
                 ForEach-Object {
                     Assert-NotNull $_
-                    Assert-Equal $ipAddress $_.IPAddress
+                    Assert-Equal ([IPAddress]$ipAddress) $_.IPAddress
                     $foundOne = $true
                 }
             Assert-True $foundOne
@@ -155,4 +169,21 @@ function Test-ShouldFilterByIPAddressAndPort
             Assert-True $foundOne
             
         }
+}
+
+function Test-ShouldGetIPv6Binding
+{
+    $cert = Install-Certificate (Join-Path $TestDir CarbonTestCertificate.cer -Resolve) -StoreLocation LocalMachine -StoreName My
+    $appID = '12ec3276-0689-42b0-ad39-c1fe23d25721'
+    Set-SslCertificateBinding -IPAddress '[::]' -Port 443 -ApplicationID $appID -Thumbprint $cert.Thumbprint
+
+    try
+    {
+        $binding = Get-SslCertificateBinding -IPAddress '[::]' | Where-Object { $_.ApplicationID -eq $appID }
+        Assert-NotNull $binding
+    }
+    finally
+    {
+        Remove-SslCertificateBinding -IPAddress '[::]' -Port 443
+    }
 }

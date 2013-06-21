@@ -92,10 +92,15 @@ function Get-SslCertificateBinding
             {
                 $binding = @{}
                 $name = "IPPort"
-                $thisIP,$thisPort = $value -split ':'
-                $binding['IPAddress'] = $thisIP
-                $binding['Port'] = $thisPort
-                
+                if( $value -notmatch '^(.*):(\d+)$' )
+                {
+                    Write-Error ('Invalid IP address/port in netsh output: {0}.' -f $value)
+                }
+                else
+                {
+                    $binding['IPAddress'] = $matches[1]
+                    $binding['Port'] = $matches[2]
+                }                
             }
             if( $value -eq '(null)' )
             {

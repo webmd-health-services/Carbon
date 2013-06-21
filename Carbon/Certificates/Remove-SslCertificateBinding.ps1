@@ -47,7 +47,15 @@ function Remove-SslCertificateBinding
         return
     }
     
-    $ipPort = '{0}:{1}' -f $IPAddress,$Port
+    if( $IPAddress.AddressFamily -eq [Net.Sockets.AddressFamily]::InterNetworkV6 )
+    {
+        $ipPort = '[{0}]:{1}' -f $IPAddress,$Port
+    }
+    else
+    {
+        $ipPort = '{0}:{1}' -f $IPAddress,$Port
+    }
+
     if( $pscmdlet.ShouldProcess( $ipPort, "removing SSL certificate binding" ) )
     {
         Write-Host "Removing SSL certificate binding for $ipPort."
