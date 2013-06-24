@@ -22,8 +22,8 @@
  
 ### IIS
  * The [site object](http://msdn.microsoft.com/en-us/library/microsoft.web.administration.site.aspx) returned by [Get-IisWebsite](http://get-carbon.org/help/Get-IisWebsite.html) now as a `CommitChanges` method so you can persist modifications you make to the site.
- * [Get-IisWebsite](http://get-carbon.org/help/Get-IisWebsite.html) now returns all website's if no `SiteName` is given.
- * Created [Site-IisWebsiteID](http://get-carbon.org/help/Site-IisWebsiteID.html) function for explicitly setting a website's ID.
+ * [Get-IisWebsite](http://get-carbon.org/help/Get-IisWebsite.html) now returns all websites if no `SiteName` is given.
+ * Created [Set-IisWebsiteID](http://get-carbon.org/help/Set-IisWebsiteID.html) function for explicitly setting a website's ID.
  
 ### INI
 
@@ -31,7 +31,7 @@
 
 ### Performance Counters
 
- * [Install-PerformanceCounter](http://get-carbon.org/help/Install-PerformanceCounter.html) now supports installing a base performance counter.
+ * [Install-PerformanceCounter](http://get-carbon.org/help/Install-PerformanceCounter.html) now supports installing a base performance counter.  Thanks to Philip Teilmeier for the contribution.
  * [Install-PerformanceCounter](http://get-carbon.org/help/Install-PerformanceCounter.html)'s `Description` parameter is now optional.
  
 ### PowerShell
@@ -56,7 +56,7 @@
 
 ### Performance Counters
 
- * [Install-PerformanceCounter](http://get-carbon.org/help/Install-PerformanceCounter.html) couldn't be used to create counters that used/required a base counter.
+ * [Install-PerformanceCounter](http://get-carbon.org/help/Install-PerformanceCounter.html) couldn't be used to create counters that used/required a base counter. Thanks to Philip Teilmeier for the contribution.
  
 
 # 1.1.0 (1 April 2013)
