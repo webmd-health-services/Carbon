@@ -28,6 +28,11 @@
 ### INI
 
  * Created [Remove-IniEntry](http://get-carbon.org/help/Remove-IniEntry.html) function for removing entries/settings from an INI file.
+
+### Performance Counters
+
+ * [Install-PerformanceCounter](http://get-carbon.org/help/Install-PerformanceCounter.html) now supports installing a base performance counter.
+ * [Install-PerformanceCounter](http://get-carbon.org/help/Install-PerformanceCounter.html)'s `Description` parameter is now optional.
  
 ### PowerShell
 
@@ -48,7 +53,10 @@
 ### Certificates
 
  * [Get-SslCertificateBinding](http://get-carbon.org/help/Get-SslCertificateBinding.html) can't parse bindings to IPv6 addresses.
- 
+
+### Performance Counters
+
+ * [Install-PerformanceCounter](http://get-carbon.org/help/Install-PerformanceCounter.html) couldn't be used to create counters that used/required a base counter.
  
 
 # 1.1.0 (1 April 2013)

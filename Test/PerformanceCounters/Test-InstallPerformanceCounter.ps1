@@ -39,6 +39,16 @@ function Test-ShouldInstallNewPerformanceCounterWithNewCategory
     Assert-Counter $counters[0] $name $description $type
 }
 
+function Test-ShouldInstallCounterWithNoDescription
+{
+    $name = 'Test Counter'
+    $type = 'NumberOfItems32'
+    
+    Install-PerformanceCounter -CategoryName $CategoryName -Name $name -Type $type
+    $counters = @( Get-PerformanceCounter -CategoryName $CategoryName )
+    Assert-Counter $counters[0] $name $null $type
+}
+
 function Test-ShouldPreserveExistingCountersWhenInstallingNewCounter
 {
     $name = 'Test Counter'
@@ -99,10 +109,63 @@ function Test-ShouldNotInstallIfCounterHasNotChanged
     Assert-Counter $counters[0] $name $description $type
 }
 
+function Test-ShouldCreateBaseCounter
+{
+    $name = 'Test Counter'
+    $description = 'Counter used to test that Carbon installation function works.'
+    $type = 'AverageTimer32'
+    
+    $baseName = 'Test Base Counter'
+    $baseDescription = 'Base counter used by Carbon Test Counter'
+    $baseType = 'AverageBase'
+    
+    Install-PerformanceCounter -Category $CategoryName -Name $name -Description $description -Type $type `
+                               -BaseName $baseName -BaseDescription $baseDescription -BaseType $baseType
+    $counters = @( Get-PerformanceCounter -CategoryName $CategoryName )
+    Assert-Counter $counters[0] $name $description $type
+    Assert-Counter $counters[1] $baseName $baseDescription $baseType
+}
+
+function Test-ShouldRecreateBaseCounter
+{
+    $name = 'Test Counter'
+    $description = 'Counter used to test that Carbon installation function works.'
+    $type = 'AverageTimer32'
+    
+    $baseName = 'Test Base Counter'
+    $baseDescription = 'Base counter used by Carbon Test Counter'
+    $baseType = 'AverageBase'
+    
+    Install-PerformanceCounter -Category $CategoryName -Name $name -Description $description -Type $type `
+                               -BaseName $baseName -BaseDescription $baseDescription -BaseType $baseType
+    Install-PerformanceCounter -Category $CategoryName -Name 'Third Counter' -Type NumberOfItems32
+    
+    $counters = @( Get-PerformanceCounter -CategoryName $CategoryName )
+    Assert-Counter $counters[0] $name $description $type
+    Assert-Counter $counters[1] $baseName $baseDescription $baseType
+    Assert-Counter $counters[2] 'Third Counter' $null NumberOfItems32
+    
+    Install-PerformanceCounter -Category $CategoryName -Name $name -Description $description -Type $type `
+                               -BaseName $baseName -BaseDescription $baseDescription -BaseType $baseType `
+                               -Force
+    $counters = @( Get-PerformanceCounter -CategoryName $CategoryName )
+    Assert-Counter $counters[0] 'Third Counter' $null NumberOfItems32
+    Assert-Counter $counters[1] $name $description $type
+    Assert-Counter $counters[2] $baseName $baseDescription $baseType
+    
+}
+
 function Assert-Counter($Counter, $Name, $Description, $Type)
 {
-    Assert-Equal $Name $Counter.CounterName
-    Assert-Equal $Description $Counter.CounterHelp
-    Assert-Equal $Type $Counter.CounterType
+    Assert-Equal $Name $Counter.CounterName 'counter name'
+    if( $Description -eq $null )
+    {
+        Assert-Equal $Name $Counter.CounterHelp 'counter help'
+    }
+    else
+    {
+        Assert-Equal $Description $Counter.CounterHelp 'counter help'
+    }
+    Assert-Equal $Type $Counter.CounterType 'counter type'
 
 }

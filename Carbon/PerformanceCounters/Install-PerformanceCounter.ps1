@@ -20,13 +20,23 @@ function Install-PerformanceCounter
 
     .DESCRIPTION
     Creates a new performance counter with a specific name, description, and type under a given category.  The counter's category is re-created: its current counters are retrieved, the category is removed, a the category is re-created.  Unfortunately, we haven't been able to find any .NET APIs that allow us to delete and create an existing counter.
+    
+    If you're creating a performance counter that relies on an accompanying base counter, use the `BaseName`, `BaseDescription`, and `BaseType` parameters to properly add the base counter.
+    
+    .LINK
+    http://msdn.microsoft.com/en-us/library/system.diagnostics.performancecountertype.aspx
 
     .EXAMPLE
     Install-PerformanceCounter -CategoryName ToyotaCamry -Name MilesPerGallon -Description 'The miles per gallon fuel efficiency.' -Type NumberOfItems32
 
     Creates a new miles per gallon performance counter for the ToyotaCamry category.
+    
+    .EXAMPLE
+    Install-PerformanceCounter -CategoryName "Dispatcher" -Name "Average Dispatch time" -Type AverageTimer32 -BaseName "Average Dispatch Base" -BaseType AverageBase -Force
+    
+    Creates a counter to collect average timings, with a base counter.  Some counters require base counters, which have to be added a specific way to work properly.
     #>
-    [CmdletBinding(SupportsShouldProcess=$true)]
+    [CmdletBinding(SupportsShouldProcess=$true,DefaultParameterSetName='SimpleCounter')]
     param(
         [Parameter(Mandatory=$true)]
         [string]
@@ -38,7 +48,6 @@ function Install-PerformanceCounter
         # The performance counter's name.
         $Name,
         
-        [Parameter(Mandatory=$true)]
         [string]
         # The performance counter's description (i.e. help message).
         $Description,
@@ -48,17 +57,17 @@ function Install-PerformanceCounter
         # The performance counter's type (from the Diagnostics.PerformanceCounterType enumeration).
         $Type,
         
-        [Parameter(Mandatory=$false)]
+        [Parameter(Mandatory=$true,ParameterSetName='WithBaseCounter')]
         [string]
         # The base performance counter's name.
         $BaseName,
         
-        [Parameter(Mandatory=$false)]
+        [Parameter(ParameterSetName='WithBaseCounter')]
         [string]
         # The base performance counter's description (i.e. help message).
         $BaseDescription,
         
-        [Parameter(Mandatory=$false)]
+        [Parameter(Mandatory=$true,ParameterSetName='WithBaseCounter')]
         [Diagnostics.PerformanceCounterType]
         # The base performance counter's type (from the Diagnostics.PerformanceCounterType enumeration).
         $BaseType,
@@ -67,6 +76,8 @@ function Install-PerformanceCounter
         # Re-create the performance counter even if it already exists.
         $Force
     )
+    
+    Set-StrictMode -Version Latest
     
     $currentCounters = @( Get-PerformanceCounter -CategoryName $CategoryName )
     
@@ -82,18 +93,25 @@ function Install-PerformanceCounter
         return
     }
     
-    $baseCounter = $currentCounters | 
-                    Where-Object { 
-                        $_.CounterName -eq $BaseName -and `
-                        $_.CounterHelp -eq $BaseDescription -and `
-                        $_.CounterType -eq $BaseType
-                    }
-                    
-    if( $baseCounter -and -not $Force)
+    if( $PSCmdlet.ParameterSetName -eq 'WithBaseCounter' )
     {
-        return
+        $baseCounter = $currentCounters | 
+                        Where-Object { 
+                            $_.CounterName -eq $BaseName -and `
+                            $_.CounterHelp -eq $BaseDescription -and `
+                            $_.CounterType -eq $BaseType
+                        }
+                        
+        if( $baseCounter -and -not $Force)
+        {
+            return
+        }
     }
-    
+    else
+    {
+        $BaseName = $null
+    }
+        
     $counters = New-Object Diagnostics.CounterCreationDataCollection 
     $currentCounters  | 
         Where-Object { $_.CounterName -ne $Name -and $_.CounterName -ne $BaseName } |
@@ -105,22 +123,21 @@ function Install-PerformanceCounter
     $newCounterData = New-Object Diagnostics.CounterCreationData $Name,$Description,$Type
     [void] $counters.Add( $newCounterData )
     
-    if( $BaseName )
+    $baseMsg = ''
+    if( $PSCmdlet.ParameterSetName -eq 'WithBaseCounter' )
     {
         $newBaseCounterData = New-Object Diagnostics.CounterCreationData $BaseName,$BaseDescription,$BaseType
         [void] $counters.Add( $newBaseCounterData )
+        $baseMsg = ' with base counter ''{0}'' ({1})' -f $BaseName,$BaseType
     }
+    
+    $msg = "Installing '{0}' performance counter '{1}' ({2}){3}." -f $CategoryName,$Name,$Type,$baseMsg
     
     if( $pscmdlet.ShouldProcess( $CategoryName, "install performance counter '$Name'" ) )
     {
         Uninstall-PerformanceCounterCategory -CategoryName $CategoryName
-        Write-Host "Installing performance counter '$Name' in category '$CategoryName'."
-        
-        if( $BaseName )
-        {
-            Write-Host "Installing base performance counter '$BaseName' in category '$CategoryName'."
-        }
-        
+
+        Write-Host $msg        
         [void] [Diagnostics.PerformanceCounterCategory]::Create( $CategoryName, '', $counters )
     }
 }
