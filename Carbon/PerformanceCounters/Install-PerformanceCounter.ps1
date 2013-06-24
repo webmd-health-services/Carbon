@@ -48,6 +48,21 @@ function Install-PerformanceCounter
         # The performance counter's type (from the Diagnostics.PerformanceCounterType enumeration).
         $Type,
         
+        [Parameter(Mandatory=$false)]
+        [string]
+        # The base performance counter's name.
+        $BaseName,
+        
+        [Parameter(Mandatory=$false)]
+        [string]
+        # The base performance counter's description (i.e. help message).
+        $BaseDescription,
+        
+        [Parameter(Mandatory=$false)]
+        [Diagnostics.PerformanceCounterType]
+        # The base performance counter's type (from the Diagnostics.PerformanceCounterType enumeration).
+        $BaseType,
+        
         [Switch]
         # Re-create the performance counter even if it already exists.
         $Force
@@ -61,15 +76,27 @@ function Install-PerformanceCounter
                         $_.CounterHelp -eq $Description -and `
                         $_.CounterType -eq $Type
                     }
-                    
+            
     if( $counter -and -not $Force)
+    {
+        return
+    }
+    
+    $baseCounter = $currentCounters | 
+                    Where-Object { 
+                        $_.CounterName -eq $BaseName -and `
+                        $_.CounterHelp -eq $BaseDescription -and `
+                        $_.CounterType -eq $BaseType
+                    }
+                    
+    if( $baseCounter -and -not $Force)
     {
         return
     }
     
     $counters = New-Object Diagnostics.CounterCreationDataCollection 
     $currentCounters  | 
-        Where-Object { $_.CounterName -ne $Name } |
+        Where-Object { $_.CounterName -ne $Name -and $_.CounterName -ne $BaseName } |
         ForEach-Object {
             $creationData = New-Object Diagnostics.CounterCreationData $_.CounterName,$_.CounterHelp,$_.CounterType
             [void] $counters.Add( $creationData )
@@ -78,10 +105,22 @@ function Install-PerformanceCounter
     $newCounterData = New-Object Diagnostics.CounterCreationData $Name,$Description,$Type
     [void] $counters.Add( $newCounterData )
     
+    if( $BaseName )
+    {
+        $newBaseCounterData = New-Object Diagnostics.CounterCreationData $BaseName,$BaseDescription,$BaseType
+        [void] $counters.Add( $newBaseCounterData )
+    }
+    
     if( $pscmdlet.ShouldProcess( $CategoryName, "install performance counter '$Name'" ) )
     {
         Uninstall-PerformanceCounterCategory -CategoryName $CategoryName
         Write-Host "Installing performance counter '$Name' in category '$CategoryName'."
+        
+        if( $BaseName )
+        {
+            Write-Host "Installing base performance counter '$BaseName' in category '$CategoryName'."
+        }
+        
         [void] [Diagnostics.PerformanceCounterCategory]::Create( $CategoryName, '', $counters )
     }
 }
