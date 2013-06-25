@@ -12,23 +12,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+$username = 'CarbonGrantPrivilege' 
+$password = 'a1b2c3d4#'
+
 function Setup
 {
     & (Join-Path $TestDir ..\..\Carbon\Import-Carbon.ps1 -Resolve)
-    
+    Install-User -Username $username -Password $password -Description 'Account for testing Carbon Grant-Privileges functions.'
 }
 
 function TearDown
 {
+    Uninstall-User -Username $username
     Remove-Module Carbon
 }
 
 function Test-ShouldGrantAndRevokePrivileges
 {
-    $username = 'CarbonGrantPrivilege' 
-    $password = 'a1b2c3d4#'
-    Install-User -Username $username -Password $password -Description 'Account for testing Carbon Grant-Privileges functions.'
-    
     $serviceName = 'CarbonGrantPrivilege' 
     $servicePath = Join-Path $TestDir ..\Service\NoOpService.exe -Resolve
     Install-Service -Name $serviceName -Path $servicePath -StartupType Manual -Username $username -Password $password
@@ -61,4 +61,12 @@ function Test-ShouldWriteAnErrorIfIdentityNotFound
     Grant-Privilege -Identity 'IDNOTEXIST' -Privilege SeBatchLogonRight -ErrorAction SilentlyContinue
     Assert-True ($error.Count -gt 0)
     Assert-True ($error[0].Exception.Message -like '*Identity * not found*')
+}
+
+function Test-ShouldGrantCaseSensitivePermission
+{
+    $Error.Clear()
+    Grant-Privilege -Identity $username -Privilege SESERVICELOGONRIGHT -ErrorAction SilentlyContinue
+    Assert-GreaterThan $Error.Count 1
+    Assert-Like $Error[0].ErrorDetails.Message '*case-sensitive*'
 }

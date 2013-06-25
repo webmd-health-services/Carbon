@@ -19,7 +19,7 @@ function Grant-Privilege
     Grants an identity priveleges to perform system operations.
     
     .DESCRIPTION
-    The most current list of privileges can be found [on Microsoft's website](http://msdn.microsoft.com/en-us/library/windows/desktop/aa375728(v=vs.85).aspx). Here is the most current list, as of November 2012:
+    *Privilege names are **case-sensitive**.* The most current list of privileges can be found [on Microsoft's website](http://msdn.microsoft.com/en-us/library/windows/desktop/aa375728(v=vs.85).aspx). Here is the most current list, as of November 2012:
 
      * SeAuditPrivilege
      * SeBackupPrivilege
@@ -63,7 +63,7 @@ function Grant-Privilege
      * SeUnsolicitedInputPrivilege
 
     .LINK
-    http://msdn.microsoft.com/en-us/library/windows/desktop/aa375728(v=vs.85).aspx
+    http://msdn.microsoft.com/en-us/library/windows/desktop/aa375728.aspx
     
     .LINK
     Get-Privilege
@@ -77,7 +77,7 @@ function Grant-Privilege
     .EXAMPLE
     Grant-Privilege -Identity Batcomputer -Privilege SeServiceLogonRight
     
-    Grants the Batcomputer account the ability to logon as a service.
+    Grants the Batcomputer account the ability to logon as a service. *Privilege names are **case-sensitive**.*
     #>
     [CmdletBinding()]
     param(
@@ -88,7 +88,7 @@ function Grant-Privilege
         
         [Parameter(Mandatory=$true)]
         [string[]]
-        # The privileges to grant.
+        # The privileges to grant. *Privilege names are **case-sensitive**.*
         $Privilege
     )
     
@@ -105,6 +105,31 @@ function Grant-Privilege
     }
     catch
     {
-        Write-Error -Message ('Granting {0} {1} privilege(s) failed.' -f $Identity,($Privilege -join ', ')) 
+        $ex = $_.Exception
+        do
+        {
+            if( $ex -is [ComponentModel.Win32Exception] -and $ex.Message -eq 'No such privilege. Indicates a specified privilege does not exist.' )
+            {
+                $msg = 'Failed to grant {0} {1} privilege(s): {2}  *Privilege names are **case-sensitive**.*' -f `
+                        $Identity,($Privilege -join ','),$ex.Message
+                Write-Error -Message $msg -Exception $ex
+                return
+            }
+            else
+            {
+                $ex = $ex.InnerException
+            }
+        }
+        while( $ex )
+
+        $ex = $_.Exception        
+        Write-Error -Message ('Failed to grant {0} {1} privilege(s): {2}' -f $Identity,($Privilege -join ', '),$ex.Message) `
+                    -Exception $ex
+        
+        while( $ex.InnerException )
+        {
+            $ex = $ex.InnerException
+            Write-Error -Exception $ex
+        }
     }
 }

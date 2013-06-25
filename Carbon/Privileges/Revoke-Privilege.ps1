@@ -19,7 +19,7 @@ function Revoke-Privilege
     Revokes an identity's priveleges to perform system operations.
     
     .DESCRIPTION
-    The most current list of privileges can be found [on Microsoft's website](http://msdn.microsoft.com/en-us/library/windows/desktop/aa375728(v=vs.85).aspx). Here is the most current list, as of November 2012:
+    The most current list of privileges can be found [on Microsoft's website](http://msdn.microsoft.com/en-us/library/windows/desktop/aa375728.aspx). Here is the most current list, as of November 2012:
 
      * SeAuditPrivilege
      * SeBackupPrivilege
@@ -63,7 +63,7 @@ function Revoke-Privilege
      * SeUnsolicitedInputPrivilege
 
     .LINK
-    http://msdn.microsoft.com/en-us/library/windows/desktop/aa375728(v=vs.85).aspx
+    http://msdn.microsoft.com/en-us/library/windows/desktop/aa375728.aspx
     
     .LINK
     Get-Privilege
@@ -92,6 +92,8 @@ function Revoke-Privilege
         $Privilege
     )
     
+    Set-StrictMode -Version Latest
+    
     if( -not (Test-Identity -Name $Identity) )
     {
         Write-Error -Message ('[Carbon] [Revoke-Privilege] Identity {0} not found.' -f $identity) `
@@ -99,12 +101,28 @@ function Revoke-Privilege
         return
     }
     
+    # Convert the privileges from the user into their canonical names.
+    $cPrivileges = Get-Privilege -Identity $Identity |
+                        Where-Object { $Privilege -contains $_ }
+    if( -not $cPrivileges )
+    {
+        return
+    }
+    
     try
     {
-        [Carbon.Lsa]::RevokePrivileges($Identity,$Privilege)
+        [Carbon.Lsa]::RevokePrivileges($Identity,$cPrivileges)
     }
     catch
     {
-        Write-Error -Message ('Failed to revoke {0} {1} privileges.' -f $Identity,($Privilege -join ', '))
+        Write-Error -Message ('Failed to revoke {0}''s {1} privilege(s).' -f $Identity,($cPrivileges -join ', ')) `
+                    -Exception $_.Exception
+
+        $ex = $_.Exception
+        while( $ex.InnerException )
+        {
+            $ex = $ex.InnerException
+            Write-Error -Exception $ex
+        }
     }
 }

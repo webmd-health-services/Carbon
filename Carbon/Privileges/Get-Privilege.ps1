@@ -16,7 +16,7 @@ function Get-Privilege
 {
     <#
     .SYNOPSIS
-    Gets the privileges and identity has to perform system operations.
+    Gets the privileges an identity has to perform system operations.
     
     .DESCRIPTION
     These privileges are usually managed by Group Policy.

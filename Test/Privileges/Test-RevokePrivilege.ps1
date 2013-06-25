@@ -38,3 +38,19 @@ function Test-ShouldNotRevokePrivilegeForNonExistentUser
     Assert-True ($error.Count -gt 0)
     Assert-True ($error[0].Exception.Message -like '*Identity * not found*')
 }
+
+function Test-ShouldNotBeCaseSensitive
+{
+    Revoke-Privilege -Identity $username -Privilege SEBATCHLOGONRIGHT
+    Assert-False (Test-Privilege -Identity $username -Privilege SEBATCHLOGONRIGHT)
+    Assert-False (Test-Privilege -Identity $username -Privilege SeBatchLogonRight)
+}
+
+function Test-ShouldRevokeNonExistentPrivilege
+{
+    $Error.Clear()
+    Assert-False (Test-Privilege -Identity $username -Privilege SeServiceLogonRight)
+    Revoke-Privilege -Identity $username -Privilege SeServiceLogonRight
+    Assert-Equal 0 $Error.Count
+    Assert-False (Test-Privilege -Identity $username -Privilege SeServiceLogonRight)
+}
