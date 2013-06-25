@@ -38,6 +38,12 @@
 
  * [Invoke-PowerShell](http://get-carbon.org/help/Invoke-PowerShell.html) now defaults to running under the current CLR, instead of defaulting to a v2.0 CLR.  This makes upgrading to PowerShell v3.0 easier.
  * [Invoke-PowerShell](http://get-carbon.org/help/Invoke-PowerShell.html) now writes an error and returns if running PowerShell v3.0 and you want to run under a v2.0 CLR.  Unfortunately, PowerShell v3.0 requires .NET 4.0, so you can't run anything on an earlier CLR.
+ 
+### Privileges
+
+ * [Revoke-Privilege](http://get-carbon.org/help/Revoke-Privilege.html) now supports case-insensitive privilege names.
+ * Updated [Grant-Privilege](http://get-carbon.org/help/Grant-Privilege.html) to better handle when passing a privilege name with the wrong case.
+ * Updated [Grant-Privilege](http://get-carbon.org/help/Grant-Privilege.html) documentation to make it clear privilege names are case-sensitive.
 
 ### XML
 
