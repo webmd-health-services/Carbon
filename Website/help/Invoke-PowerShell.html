@@ -57,9 +57,12 @@
 		</ul>
 		<li class="Category">FileSystem</li>
 		<ul class="CommandMenu">
+			<li><a href="Disable-NtfsCompression.html">Disable-NtfsCompression</a></li>
+			<li><a href="Enable-NtfsCompression.html">Enable-NtfsCompression</a></li>
 			<li><a href="New-Junction.html">New-Junction</a></li>
 			<li><a href="New-TempDir.html">New-TempDir</a></li>
 			<li><a href="Remove-Junction.html">Remove-Junction</a></li>
+			<li><a href="Test-NtfsCompression.html">Test-NtfsCompression</a></li>
 			<li><a href="Test-PathIsJunction.html">Test-PathIsJunction</a></li>
 		</ul>
 		<li class="Category">Firewall</li>
@@ -102,6 +105,7 @@
 			<li><a href="Set-IisHttpHeader.html">Set-IisHttpHeader</a></li>
 			<li><a href="Set-IisHttpRedirect.html">Set-IisHttpRedirect</a></li>
 			<li><a href="Set-IisMimeMap.html">Set-IisMimeMap</a></li>
+			<li><a href="Set-IisWebsiteID.html">Set-IisWebsiteID</a></li>
 			<li><a href="Set-IisWebsiteSslCertificate.html">Set-IisWebsiteSslCertificate</a></li>
 			<li><a href="Set-IisWindowsAuthentication.html">Set-IisWindowsAuthentication</a></li>
 			<li><a href="Test-IisAppPool.html">Test-IisAppPool</a></li>
@@ -114,6 +118,7 @@
 		</ul>
 		<li class="Category">INI</li>
 		<ul class="CommandMenu">
+			<li><a href="Remove-IniEntry.html">Remove-IniEntry</a></li>
 			<li><a href="Set-IniEntry.html">Set-IniEntry</a></li>
 			<li><a href="Split-Ini.html">Split-Ini</a></li>
 		</ul>
@@ -229,6 +234,10 @@
 			<li><a href="Test-WindowsFeature.html">Test-WindowsFeature</a></li>
 			<li><a href="Uninstall-WindowsFeature.html">Uninstall-WindowsFeature</a></li>
 		</ul>
+		<li class="Category">Xml</li>
+		<ul class="CommandMenu">
+			<li><a href="Convert-XmlFile.html">Convert-XmlFile</a></li>
+		</ul>
 	</ul>
 </div>
 
@@ -242,7 +251,9 @@
     
         <h2>Description</h2>
     <div class="Description">
-        <p>The invoked PowerShell process can run under the .NET 4.0 CLR (using <code>v4.0</code> as the value to the Runtime parameter).</p>
+        <p>If using PowerShell v2.0, the invoked PowerShell process can run under the .NET 4.0 CLR (using <code>v4.0</code> as the value to the Runtime parameter).</p>
+
+<p>If using PowerShell v4.0, you can <em>only</em> run the invoked PowerShell under a <code>v4.0</code> CLR.  If you supply a <code>v2.0</code> as the value to the <code>Runtime</code> parameter, and you're running PowerShell v3.0, you'll get an error.</p>
 
 <p>This function launches a PowerShell process that matches the architecture of the operating system.  On 64-bit operating systems, you can run under 32-bit PowerShell by specifying the <code>x86</code> switch).  If this function runs under a 32-bit version of PowerShell without the <code>x86</code> switch, you'll get an error.</p>
 
@@ -290,7 +301,7 @@
 			<tr valign='top'>
 				<td>Runtime</td>
 				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
-				<td>The CLR to use.  Must be one of v2.0 or v4.0.  Default is v2.0.
+				<td>The CLR to use.  Must be one of v2.0 or v4.0.  Default is the current PowerShell runtime.
 </td>
 				<td>false</td>
 				<td>false</td>

@@ -57,9 +57,12 @@
 		</ul>
 		<li class="Category">FileSystem</li>
 		<ul class="CommandMenu">
+			<li><a href="Disable-NtfsCompression.html">Disable-NtfsCompression</a></li>
+			<li><a href="Enable-NtfsCompression.html">Enable-NtfsCompression</a></li>
 			<li><a href="New-Junction.html">New-Junction</a></li>
 			<li><a href="New-TempDir.html">New-TempDir</a></li>
 			<li><a href="Remove-Junction.html">Remove-Junction</a></li>
+			<li><a href="Test-NtfsCompression.html">Test-NtfsCompression</a></li>
 			<li><a href="Test-PathIsJunction.html">Test-PathIsJunction</a></li>
 		</ul>
 		<li class="Category">Firewall</li>
@@ -102,6 +105,7 @@
 			<li><a href="Set-IisHttpHeader.html">Set-IisHttpHeader</a></li>
 			<li><a href="Set-IisHttpRedirect.html">Set-IisHttpRedirect</a></li>
 			<li><a href="Set-IisMimeMap.html">Set-IisMimeMap</a></li>
+			<li><a href="Set-IisWebsiteID.html">Set-IisWebsiteID</a></li>
 			<li><a href="Set-IisWebsiteSslCertificate.html">Set-IisWebsiteSslCertificate</a></li>
 			<li><a href="Set-IisWindowsAuthentication.html">Set-IisWindowsAuthentication</a></li>
 			<li><a href="Test-IisAppPool.html">Test-IisAppPool</a></li>
@@ -114,6 +118,7 @@
 		</ul>
 		<li class="Category">INI</li>
 		<ul class="CommandMenu">
+			<li><a href="Remove-IniEntry.html">Remove-IniEntry</a></li>
 			<li><a href="Set-IniEntry.html">Set-IniEntry</a></li>
 			<li><a href="Split-Ini.html">Split-Ini</a></li>
 		</ul>
@@ -229,26 +234,32 @@
 			<li><a href="Test-WindowsFeature.html">Test-WindowsFeature</a></li>
 			<li><a href="Uninstall-WindowsFeature.html">Uninstall-WindowsFeature</a></li>
 		</ul>
+		<li class="Category">Xml</li>
+		<ul class="CommandMenu">
+			<li><a href="Convert-XmlFile.html">Convert-XmlFile</a></li>
+		</ul>
 	</ul>
 </div>
 
 
     <h1>Get-IisWebsite</h1>
-    <div><p>Gets details about a website.</p>
+    <div><p>Returns all the websites installed on the local computer, or a specific website.</p>
 </div>
 
         <h2>Syntax</h2>
-    <pre class="Syntax"><code>Get-IisWebsite [-SiteName] &lt;String&gt; [&lt;CommonParameters&gt;]</code></pre>
+    <pre class="Syntax"><code>Get-IisWebsite [[-SiteName] &lt;String&gt;] [&lt;CommonParameters&gt;]</code></pre>
     
         <h2>Description</h2>
     <div class="Description">
-        <p>Returns a Microsoft.Web.Administration.Site object representing the website.</p>
+        <p>Returns a Microsoft.Web.Administration.Site object.</p>
+
+<p>Each object will have a <code>CommitChanges</code> script method added which will allow you to commit/persist any changes to the website's configuration.</p>
 
     </div>
     
             <h2>Related Commands</h2>
         <ul>
-<li><a href="http://msdn.microsoft.com/en-us/library/microsoft.web.administration.site(v=VS.90).aspx">http://msdn.microsoft.com/en-us/library/microsoft.web.administration.site(v=VS.90).aspx</a></li>
+<li><a href="http://msdn.microsoft.com/en-us/library/microsoft.web.administration.site.aspx">http://msdn.microsoft.com/en-us/library/microsoft.web.administration.site.aspx</a></li>
 </ul>
 
 
@@ -267,7 +278,7 @@
 				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
 				<td>The name of the site to get.
 </td>
-				<td>true</td>
+				<td>false</td>
 				<td>false</td>
                 <td></td>
 			</tr>
@@ -283,6 +294,9 @@
     
         
                 <h2>EXAMPLE 1</h2>
+            <pre><code>Get-IisWebsite</code></pre>
+            <p><p>Returns all installed websites.</p>
+</p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 2</h2>
             <pre><code>Get-IisWebsite -SiteName 'WebsiteName'</code></pre>
             <p><p>Returns the details for the site named <code>WebsiteName</code>.</p>
 </p><p></p><p></p><p></p><p></p>

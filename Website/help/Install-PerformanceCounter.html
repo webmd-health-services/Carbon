@@ -57,9 +57,12 @@
 		</ul>
 		<li class="Category">FileSystem</li>
 		<ul class="CommandMenu">
+			<li><a href="Disable-NtfsCompression.html">Disable-NtfsCompression</a></li>
+			<li><a href="Enable-NtfsCompression.html">Enable-NtfsCompression</a></li>
 			<li><a href="New-Junction.html">New-Junction</a></li>
 			<li><a href="New-TempDir.html">New-TempDir</a></li>
 			<li><a href="Remove-Junction.html">Remove-Junction</a></li>
+			<li><a href="Test-NtfsCompression.html">Test-NtfsCompression</a></li>
 			<li><a href="Test-PathIsJunction.html">Test-PathIsJunction</a></li>
 		</ul>
 		<li class="Category">Firewall</li>
@@ -102,6 +105,7 @@
 			<li><a href="Set-IisHttpHeader.html">Set-IisHttpHeader</a></li>
 			<li><a href="Set-IisHttpRedirect.html">Set-IisHttpRedirect</a></li>
 			<li><a href="Set-IisMimeMap.html">Set-IisMimeMap</a></li>
+			<li><a href="Set-IisWebsiteID.html">Set-IisWebsiteID</a></li>
 			<li><a href="Set-IisWebsiteSslCertificate.html">Set-IisWebsiteSslCertificate</a></li>
 			<li><a href="Set-IisWindowsAuthentication.html">Set-IisWindowsAuthentication</a></li>
 			<li><a href="Test-IisAppPool.html">Test-IisAppPool</a></li>
@@ -114,6 +118,7 @@
 		</ul>
 		<li class="Category">INI</li>
 		<ul class="CommandMenu">
+			<li><a href="Remove-IniEntry.html">Remove-IniEntry</a></li>
 			<li><a href="Set-IniEntry.html">Set-IniEntry</a></li>
 			<li><a href="Split-Ini.html">Split-Ini</a></li>
 		</ul>
@@ -229,6 +234,10 @@
 			<li><a href="Test-WindowsFeature.html">Test-WindowsFeature</a></li>
 			<li><a href="Uninstall-WindowsFeature.html">Uninstall-WindowsFeature</a></li>
 		</ul>
+		<li class="Category">Xml</li>
+		<ul class="CommandMenu">
+			<li><a href="Convert-XmlFile.html">Convert-XmlFile</a></li>
+		</ul>
 	</ul>
 </div>
 
@@ -238,15 +247,22 @@
 </div>
 
         <h2>Syntax</h2>
-    <pre class="Syntax"><code>Install-PerformanceCounter [-CategoryName] &lt;String&gt; [-Name] &lt;String&gt; [-Description] &lt;String&gt; [-Type] {NumberOfItemsHEX32 | NumberOfItemsHEX64 | NumberOfItems32 | NumberOfItems64 | CounterDelta32 | CounterDelta64 | SampleCounter | CountPerTimeInterval32 | CountPerTimeInterval64 | RateOfCountsPerSecond32 | RateOfCountsPerSecond64 | RawFraction | CounterTimer | Timer100Ns | SampleFraction | CounterTimerInverse | Timer100NsInverse | CounterMultiTimer | CounterMultiTimer100Ns | CounterMultiTimerInverse | CounterMultiTimer100NsInverse | AverageTimer32 | ElapsedTime | AverageCount64 | SampleBase | AverageBase | RawBase | CounterMultiBase} [-Force] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
+    <pre class="Syntax"><code>Install-PerformanceCounter -CategoryName &lt;String&gt; -Name &lt;String&gt; [-Description &lt;String&gt;] -Type {NumberOfItemsHEX32 | NumberOfItemsHEX64 | NumberOfItems32 | NumberOfItems64 | CounterDelta32 | CounterDelta64 | SampleCounter | CountPerTimeInterval32 | CountPerTimeInterval64 | RateOfCountsPerSecond32 | RateOfCountsPerSecond64 | RawFraction | CounterTimer | Timer100Ns | SampleFraction | CounterTimerInverse | Timer100NsInverse | CounterMultiTimer | CounterMultiTimer100Ns | CounterMultiTimerInverse | CounterMultiTimer100NsInverse | AverageTimer32 | ElapsedTime | AverageCount64 | SampleBase | AverageBase | RawBase | CounterMultiBase} [-Force] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
+<pre class="Syntax"><code>Install-PerformanceCounter -CategoryName &lt;String&gt; -Name &lt;String&gt; [-Description &lt;String&gt;] -Type {NumberOfItemsHEX32 | NumberOfItemsHEX64 | NumberOfItems32 | NumberOfItems64 | CounterDelta32 | CounterDelta64 | SampleCounter | CountPerTimeInterval32 | CountPerTimeInterval64 | RateOfCountsPerSecond32 | RateOfCountsPerSecond64 | RawFraction | CounterTimer | Timer100Ns | SampleFraction | CounterTimerInverse | Timer100NsInverse | CounterMultiTimer | CounterMultiTimer100Ns | CounterMultiTimerInverse | CounterMultiTimer100NsInverse | AverageTimer32 | ElapsedTime | AverageCount64 | SampleBase | AverageBase | RawBase | CounterMultiBase} -BaseName &lt;String&gt; [-BaseDescription &lt;String&gt;] -BaseType {NumberOfItemsHEX32 | NumberOfItemsHEX64 | NumberOfItems32 | NumberOfItems64 | CounterDelta32 | CounterDelta64 | SampleCounter | CountPerTimeInterval32 | CountPerTimeInterval64 | RateOfCountsPerSecond32 | RateOfCountsPerSecond64 | RawFraction | CounterTimer | Timer100Ns | SampleFraction | CounterTimerInverse | Timer100NsInverse | CounterMultiTimer | CounterMultiTimer100Ns | CounterMultiTimerInverse | CounterMultiTimer100NsInverse | AverageTimer32 | ElapsedTime | AverageCount64 | SampleBase | AverageBase | RawBase | CounterMultiBase} [-Force] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
     
         <h2>Description</h2>
     <div class="Description">
         <p>Creates a new performance counter with a specific name, description, and type under a given category.  The counter's category is re-created: its current counters are retrieved, the category is removed, a the category is re-created.  Unfortunately, we haven't been able to find any .NET APIs that allow us to delete and create an existing counter.</p>
 
+<p>If you're creating a performance counter that relies on an accompanying base counter, use the <code>BaseName</code>, <code>BaseDescription</code>, and <code>BaseType</code> parameters to properly add the base counter.</p>
+
     </div>
     
-    
+            <h2>Related Commands</h2>
+        <ul>
+<li><a href="http://msdn.microsoft.com/en-us/library/system.diagnostics.performancecountertype.aspx">http://msdn.microsoft.com/en-us/library/system.diagnostics.performancecountertype.aspx</a></li>
+</ul>
+
 
     		<h2> Parameters </h2>
 		<table border='1'>
@@ -281,7 +297,7 @@
 				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
 				<td>The performance counter's description (i.e. help message).
 </td>
-				<td>true</td>
+				<td>false</td>
 				<td>false</td>
                 <td></td>
 			</tr>
@@ -289,6 +305,33 @@
 				<td>Type</td>
 				<td><a href="http://msdn.microsoft.com/en-us/library/system.diagnostics.performancecountertype.aspx">PerformanceCounterType</a></td>
 				<td>The performance counter's type (from the Diagnostics.PerformanceCounterType enumeration).
+</td>
+				<td>true</td>
+				<td>false</td>
+                <td></td>
+			</tr>
+			<tr valign='top'>
+				<td>BaseName</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+				<td>The base performance counter's name.
+</td>
+				<td>true</td>
+				<td>false</td>
+                <td></td>
+			</tr>
+			<tr valign='top'>
+				<td>BaseDescription</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+				<td>The base performance counter's description (i.e. help message).
+</td>
+				<td>false</td>
+				<td>false</td>
+                <td></td>
+			</tr>
+			<tr valign='top'>
+				<td>BaseType</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.diagnostics.performancecountertype.aspx">PerformanceCounterType</a></td>
+				<td>The base performance counter's type (from the Diagnostics.PerformanceCounterType enumeration).
 </td>
 				<td>true</td>
 				<td>false</td>
@@ -338,6 +381,9 @@
                 <h2>EXAMPLE 1</h2>
             <pre><code>Install-PerformanceCounter -CategoryName ToyotaCamry -Name MilesPerGallon -Description 'The miles per gallon fuel efficiency.' -Type NumberOfItems32</code></pre>
             <p><p>Creates a new miles per gallon performance counter for the ToyotaCamry category.</p>
+</p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 2</h2>
+            <pre><code>Install-PerformanceCounter -CategoryName "Dispatcher" -Name "Average Dispatch time" -Type AverageTimer32 -BaseName "Average Dispatch Base" -BaseType AverageBase -Force</code></pre>
+            <p><p>Creates a counter to collect average timings, with a base counter.  Some counters require base counters, which have to be added a specific way to work properly.</p>
 </p><p></p><p></p><p></p><p></p>
 </body>
 </html>   

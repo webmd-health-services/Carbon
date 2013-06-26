@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-    <title>PowerShell - Clear-TrustedHost - Carbon</title>
+    <title>PowerShell - Remove-IniEntry - Carbon</title>
 	<link href="styles.css" type="text/css" rel="stylesheet" />
 </head>
 <body>
@@ -242,23 +242,35 @@
 </div>
 
 
-    <h1>Clear-TrustedHost</h1>
-    <div><p>Removes all entries from PowerShell trusted hosts list.</p>
+    <h1>Remove-IniEntry</h1>
+    <div><p>Removes an entry/line/setting from an INI file.</p>
 </div>
 
         <h2>Syntax</h2>
-    <pre class="Syntax"><code>Clear-TrustedHost [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
+    <pre class="Syntax"><code>Remove-IniEntry [-Path] &lt;String&gt; [-Name] &lt;String&gt; [[-Section] &lt;String&gt;] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
     
         <h2>Description</h2>
     <div class="Description">
-        <p>The <code>Add-TrustedHost</code> function adds new entries to the trusted hosts list.  <code>Set-TrustedHost</code> sets it to a new list.  This function clears out the trusted hosts list completely.  After you run it, you won't be able to connect to any computers until you add them to the trusted hosts list.</p>
+        <p>A configuration file consists of sections, led by a <code>[section]</code> header and followed by <code>name = value</code> entries.  This function removes an entry in an INI file.  Something like this:</p>
+
+<pre><code>[ui]
+username = Regina Spektor &lt;regina@reginaspektor.com&gt;
+
+[extensions]
+share = 
+extdiff =
+</code></pre>
+
+<p>Names are not allowed to contains the equal sign, <code>=</code>.  Values can contain any character.  The INI file is parsed using <code>Split-Ini</code>.  <a href="Split-Ini.html">See its documentation for more examples.</a></p>
+
+<p>If the entry doesn't exist, does nothing.</p>
 
     </div>
     
             <h2>Related Commands</h2>
         <ul>
-<li><a href="Add-TrustedHost.html">Add-TrustedHost</a></li>
-<li><a href="Set-TrustedHost.html">Set-TrustedHost</a></li>
+<li><a href="Set-IniEntry.html">Set-IniEntry</a></li>
+<li><a href="Split-Ini.html">Split-Ini</a></li>
 </ul>
 
 
@@ -273,6 +285,33 @@
 				<th>Default Value</th>
 			</tr>
             			<tr valign='top'>
+				<td>Path</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+				<td>The path to the INI file.
+</td>
+				<td>true</td>
+				<td>false</td>
+                <td></td>
+			</tr>
+			<tr valign='top'>
+				<td>Name</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+				<td>The name of the INI entry to remove.
+</td>
+				<td>true</td>
+				<td>false</td>
+                <td></td>
+			</tr>
+			<tr valign='top'>
+				<td>Section</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+				<td>The section of the INI where the entry should be set.
+</td>
+				<td>false</td>
+				<td>false</td>
+                <td></td>
+			</tr>
+			<tr valign='top'>
 				<td>WhatIf</td>
 				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
 				<td></td>
@@ -305,8 +344,8 @@
     
         
                 <h2>EXAMPLE 1</h2>
-            <pre><code>Clear-TrustedHost</code></pre>
-            <p><p>Clears everything from the trusted hosts list.</p>
+            <pre><code>Remove-IniEntry -Path C:\Projects\Carbon\StupidStupid.ini -Section rat -Name tails</code></pre>
+            <p><p>Removes the <code>tails</code> item in the <code>[rat]</code> section of the <code>C:\Projects\Carbon\StupidStupid.ini</code> file.</p>
 </p><p></p><p></p><p></p><p></p>
 </body>
 </html>   

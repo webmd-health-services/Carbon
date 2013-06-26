@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-    <title>PowerShell - Clear-TrustedHost - Carbon</title>
+    <title>PowerShell - Disable-NtfsCompression - Carbon</title>
 	<link href="styles.css" type="text/css" rel="stylesheet" />
 </head>
 <body>
@@ -242,23 +242,25 @@
 </div>
 
 
-    <h1>Clear-TrustedHost</h1>
-    <div><p>Removes all entries from PowerShell trusted hosts list.</p>
+    <h1>Disable-NtfsCompression</h1>
+    <div><p>Turns off NTFS compression on a file/directory.</p>
 </div>
 
         <h2>Syntax</h2>
-    <pre class="Syntax"><code>Clear-TrustedHost [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
+    <pre class="Syntax"><code>Disable-NtfsCompression [-Path] &lt;String[]&gt; [-Recurse] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
     
         <h2>Description</h2>
     <div class="Description">
-        <p>The <code>Add-TrustedHost</code> function adds new entries to the trusted hosts list.  <code>Set-TrustedHost</code> sets it to a new list.  This function clears out the trusted hosts list completely.  After you run it, you won't be able to connect to any computers until you add them to the trusted hosts list.</p>
+        <p>When disabling compression for a directory, any compressed files/directories in that directory will remain compressed.  To decompress everything, use the <code>-Recurse</code> switch.  This could take awhile.</p>
+
+<p>Uses Windows' <code>compact.exe</code> command line utility to compress the file/directory.  To see the output from <code>compact.exe</code>, set the <code>Verbose</code> switch.</p>
 
     </div>
     
             <h2>Related Commands</h2>
         <ul>
-<li><a href="Add-TrustedHost.html">Add-TrustedHost</a></li>
-<li><a href="Set-TrustedHost.html">Set-TrustedHost</a></li>
+<li><a href="Enable-NtfsCompression.html">Enable-NtfsCompression</a></li>
+<li><a href="Test-NtfsCompression.html">Test-NtfsCompression</a></li>
 </ul>
 
 
@@ -273,6 +275,24 @@
 				<th>Default Value</th>
 			</tr>
             			<tr valign='top'>
+				<td>Path</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String[]</a></td>
+				<td>The path where compression should be disabled.
+</td>
+				<td>true</td>
+				<td>true (ByValue, ByPropertyName)</td>
+                <td></td>
+			</tr>
+			<tr valign='top'>
+				<td>Recurse</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+				<td>Disables compression on all sub-directories.
+</td>
+				<td>false</td>
+				<td>false</td>
+                <td></td>
+			</tr>
+			<tr valign='top'>
 				<td>WhatIf</td>
 				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
 				<td></td>
@@ -305,8 +325,14 @@
     
         
                 <h2>EXAMPLE 1</h2>
-            <pre><code>Clear-TrustedHost</code></pre>
-            <p><p>Clears everything from the trusted hosts list.</p>
+            <pre><code>Disable-NtfsCompression -Path C:\Projects\Carbon</code></pre>
+            <p><p>Turns off NTFS compression on and decompresses the <code>C:\Projects\Carbon</code> directory, but not its sub-directories/files.  New files/directories will get compressed.</p>
+</p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 2</h2>
+            <pre><code>Disable-NtfsCompression -Path C:\Projects\Carbon -Recurse</code></pre>
+            <p><p>Turns off NTFS compression on and decompresses the <code>C:\Projects\Carbon</code> directory and all its sub-directories/sub-files.</p>
+</p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 3</h2>
+            <pre><code>Get-ChildItem * | Where-Object { $_.PsIsContainer } | Disable-NtfsCompression</code></pre>
+            <p><p>Demonstrates that you can pipe the path to compress into <code>Disable-NtfsCompression</code>.</p>
 </p><p></p><p></p><p></p><p></p>
 </body>
 </html>   

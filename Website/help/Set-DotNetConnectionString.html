@@ -57,9 +57,12 @@
 		</ul>
 		<li class="Category">FileSystem</li>
 		<ul class="CommandMenu">
+			<li><a href="Disable-NtfsCompression.html">Disable-NtfsCompression</a></li>
+			<li><a href="Enable-NtfsCompression.html">Enable-NtfsCompression</a></li>
 			<li><a href="New-Junction.html">New-Junction</a></li>
 			<li><a href="New-TempDir.html">New-TempDir</a></li>
 			<li><a href="Remove-Junction.html">Remove-Junction</a></li>
+			<li><a href="Test-NtfsCompression.html">Test-NtfsCompression</a></li>
 			<li><a href="Test-PathIsJunction.html">Test-PathIsJunction</a></li>
 		</ul>
 		<li class="Category">Firewall</li>
@@ -102,6 +105,7 @@
 			<li><a href="Set-IisHttpHeader.html">Set-IisHttpHeader</a></li>
 			<li><a href="Set-IisHttpRedirect.html">Set-IisHttpRedirect</a></li>
 			<li><a href="Set-IisMimeMap.html">Set-IisMimeMap</a></li>
+			<li><a href="Set-IisWebsiteID.html">Set-IisWebsiteID</a></li>
 			<li><a href="Set-IisWebsiteSslCertificate.html">Set-IisWebsiteSslCertificate</a></li>
 			<li><a href="Set-IisWindowsAuthentication.html">Set-IisWindowsAuthentication</a></li>
 			<li><a href="Test-IisAppPool.html">Test-IisAppPool</a></li>
@@ -114,6 +118,7 @@
 		</ul>
 		<li class="Category">INI</li>
 		<ul class="CommandMenu">
+			<li><a href="Remove-IniEntry.html">Remove-IniEntry</a></li>
 			<li><a href="Set-IniEntry.html">Set-IniEntry</a></li>
 			<li><a href="Split-Ini.html">Split-Ini</a></li>
 		</ul>
@@ -229,6 +234,10 @@
 			<li><a href="Test-WindowsFeature.html">Test-WindowsFeature</a></li>
 			<li><a href="Uninstall-WindowsFeature.html">Uninstall-WindowsFeature</a></li>
 		</ul>
+		<li class="Category">Xml</li>
+		<ul class="CommandMenu">
+			<li><a href="Convert-XmlFile.html">Convert-XmlFile</a></li>
+		</ul>
 	</ul>
 </div>
 
@@ -238,7 +247,7 @@
 </div>
 
         <h2>Syntax</h2>
-    <pre class="Syntax"><code>Set-DotNetConnectionString [-Name] &lt;String&gt; [-Value] &lt;String&gt; [-Framework] [-Framework64] [-Clr2] [-Clr4] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
+    <pre class="Syntax"><code>Set-DotNetConnectionString [-Name] &lt;String&gt; [-Value] &lt;String&gt; [[-ProviderName] &lt;String&gt;] [-Framework] [-Framework64] [-Clr2] [-Clr4] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
     
         <h2>Description</h2>
     <div class="Description">
@@ -286,6 +295,15 @@
                 <td></td>
 			</tr>
 			<tr valign='top'>
+				<td>ProviderName</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+				<td>The provider name for the connection string.
+</td>
+				<td>false</td>
+				<td>false</td>
+                <td></td>
+			</tr>
+			<tr valign='top'>
 				<td>Framework</td>
 				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
 				<td>Set the connection string in the 32-bit machine.config.
@@ -306,7 +324,7 @@
 			<tr valign='top'>
 				<td>Clr2</td>
 				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
-				<td>Set the app setting in the .NET 2.0 machine.config.
+				<td>Set the app setting in the .NET 2.0 machine.config.  This flag won't work under PowerShell 3.0.
 </td>
 				<td>false</td>
 				<td>false</td>
@@ -365,11 +383,16 @@
 </ul>
 </p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 2</h2>
             <pre><code>Set-DotNetConnectionString -Name DevDB -Value "data source=.\DevDB;Integrated Security=SSPI;" -Framework64 -Clr4</code></pre>
-            <p><p>Sets the DevDB connection string in the following machine.config file:</p>
+            <p><p>Sets the DevDB connection string in the <code>%SYSTEMROOT%\Microsoft.NET\Framework64\v4.0.30319\CONFIG\machine.config</code> machine.config file to:</p>
 
-<ul>
-<li><code>%SYSTEMROOT%\Microsoft.NET\Framework64\v4.0.30319\CONFIG\machine.config</code></li>
-</ul>
+<pre><code>&lt;add name="DevDB" connectionString="data source=.\DevDB;Integrated Security=SSPI;" /&gt;
+</code></pre>
+</p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 3</h2>
+            <pre><code>Set-DotNetConnectionString -Name Prod -Value "data source=proddb\Prod;Integrated Security=SSPI" -ProviderName 'System.Data.SqlClient' -Framework -Clr2</code></pre>
+            <p><p>Creates the following connection string in the <code>%SYSTEMROOT%\Microsoft.NET\Framework\v2.0.50727\CONFIG\machine.config</code> file:</p>
+
+<pre><code>&lt;add name="Prod" connectionString="data source=proddb\Prod;Integrated Security=SSPI" providerName="System.Data.SqlClient" /&gt;
+</code></pre>
 </p><p></p><p></p><p></p><p></p>
 </body>
 </html>   

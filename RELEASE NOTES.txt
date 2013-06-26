@@ -1,4 +1,4 @@
-# 1.2.0
+# 1.2.0 (25 June 2013)
 
 ## Enhancements
 
