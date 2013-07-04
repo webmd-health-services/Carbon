@@ -116,3 +116,51 @@ function Test-ShouldRunx86PowerShellFromx86PowerShell
         Write-Warning "This test is only valid if running 32-bit PowerShell on a 64-bit operating system."
     }
 }
+
+function Test-ShouldRunScript
+{
+    $result = Invoke-PowerShell -FilePath (Join-Path $TestDir Get-PSVersionTable.ps1) -OutputFormat XML
+    Assert-Equal 3 $result.Length
+    Assert-Equal '' $result[0]
+    Assert-NotNull $result[1]
+    Assert-Equal $PSVersionTable.PSVersion $result[1].PSVersion
+    Assert-Equal $PSVersionTAble.CLRVersion $result[1].CLRVersion
+    Assert-NotNull $result[2]
+    Assert-Equal $env:PROCESSOR_ARCHITECTURE $result[2]
+}
+
+function Test-ShouldRunScriptWithArguments
+{
+    $result = Invoke-PowerShell -FilePath (Join-Path $TestDir Get-PSVersionTable.ps1) `
+                                -OutputFormat XML `
+                                -ArgumentList '-Message',"'Hello World'"
+    Assert-Equal 3 $result.Length
+    Assert-Equal 'Hello World' $result[0]
+    Assert-NotNull $result[1]
+    Assert-Equal $PSVersionTable.PSVersion $result[1].PSVersion
+    Assert-Equal $PSVersionTAble.CLRVersion $result[1].CLRVersion
+}
+
+function Test-ShouldRunScriptUnderPowerShell2
+{
+    $result = Invoke-PowerShell -FilePath (Join-Path $TestDir Get-PSVersionTable.ps1) `
+                                -OutputFormat XML `
+                                -x86
+    Assert-Equal 'x86' $result[2]
+}
+
+function Test-ShouldRunUnderClr4
+{
+    $result = Invoke-PowerShell -FilePath (Join-Path $TestDir Get-PSVersionTable.ps1) `
+                                -OutputFormat XML `
+                                -Runtime 'v4.0'
+    Assert-Like $result[1].CLRVersion '4.0.*' 
+}
+
+function Test-ShouldRunUnderClr2
+{
+    $result = Invoke-PowerShell -FilePath (Join-Path $TestDir Get-PSVersionTable.ps1) `
+                                -OutputFormat XML `
+                                -Runtime 'v2.0'
+    Assert-LIke $result[1].CLRVersion '2.0.*'
+}

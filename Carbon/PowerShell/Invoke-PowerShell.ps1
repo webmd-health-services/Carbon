@@ -21,7 +21,7 @@ function Invoke-PowerShell
     .DESCRIPTION
     If using PowerShell v2.0, the invoked PowerShell process can run under the .NET 4.0 CLR (using `v4.0` as the value to the Runtime parameter).
 
-    If using PowerShell v4.0, you can *only* run the invoked PowerShell under a `v4.0` CLR.  If you supply a `v2.0` as the value to the `Runtime` parameter, and you're running PowerShell v3.0, you'll get an error.
+    If using PowerShell v3.0, you can *only* run script blocks under a `v4.0` CLR.  PowerShell converts script blocks to an encoded command, and when running encoded commands, PowerShell doesn't allow the `-Version` parameter for running PowerShell under a different version.  To run code under a .NET 2.0 CLR from PowerShell 3, use the `FilePath` parameter to run a specfic script.
     
     This function launches a PowerShell process that matches the architecture of the operating system.  On 64-bit operating systems, you can run under 32-bit PowerShell by specifying the `x86` switch).  If this function runs under a 32-bit version of PowerShell without the `x86` switch, you'll get an error.
     
@@ -39,17 +39,35 @@ function Invoke-PowerShell
     Invoke-PowerShell -Command { $PSVersionTable } -Runtime v4.0
     
     Runs a separate PowerShell process under the v4.0 .NET CLR, returning the $PSVersionTable from that process.  Should return a CLRVersion of `4.0`.
+    
+    .EXAMPLE
+    Invoke-PowerShell -FilePath C:\Projects\Carbon\bin\Set-DotNetConnectionString.ps1 -ArgumentList '-Name','myConn','-Value',"'data source=.\DevDB;Integrated Security=SSPI;'"
+    
+    Runs the `Set-DotNetConnectionString.ps1` script with `ArgumentList` as arguments/parameters.
+    
+    Note that you have to double-quote any arguments with spaces.  Otherwise, the argument gets interpreted as multiple arguments.
     #>
-    [CmdletBinding()]
+    [CmdletBinding(DefaultParameterSetName='ScriptBlock')]
     param(
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory=$true,ParameterSetName='ScriptBlock')]
+        [Alias('Command')]
         [ScriptBlock]
         # The command to run.
-        $Command,
+        $ScriptBlock,
+        
+        [Parameter(Mandatory=$true,ParameterSetName='FilePath')]
+        [string]
+        # The script to run.
+        $FilePath,
         
         [object[]]
-        # Any arguments to pass to the command.
-        $Args,
+        [Alias('Args')]
+        # Any arguments to pass to the command/scripts.
+        $ArgumentList,
+        
+        [string]
+        # Determines how output from the PowerShel command is formatted
+        $OutputFormat,
         
         [Switch]
         # Run the x86 (32-bit) version of PowerShell.
@@ -74,10 +92,10 @@ function Invoke-PowerShell
         $Runtime = $currentRuntime
     }
 
-    if( $Runtime -eq 'v2.0' -and $PSVersionTable.PSVersion -ge '3.0' )
+    if(  $PSCmdlet.ParameterSetName -eq 'ScriptBlock' -and $Runtime -eq 'v2.0' -and $PSVersionTable.PSVersion -ge '3.0' )
     {
-        Write-Error ('PowerShell v{0} requires at least .NET v{1}.{2}.  You can''t run this version of PowerShell with a {3} CLR.' -f `
-                        $PSVersionTable.PSVersion,$PSVersionTable.CLRVersion.Major,$PSVersionTable.CLRVersion.Minor,$Runtime)
+        Write-Error ('PowerShell v{0} can''t run script blocks under .NET {1}. Please save your script block into a file and re-run Invoke-PowerShell using the `FilePath` parameter.' -f `
+                        $PSVersionTable.PSVersion,$Runtime)
         return
     }
 
@@ -108,11 +126,24 @@ function Invoke-PowerShell
     try
     {
         $psPath = Get-PowerShellPath @params
-        if( $Args -eq $null )
+        if( $ArgumentList -eq $null )
         {
-            $Args = @()
+            $ArgumentList = @()
         }
-        & $psPath -NoProfile -NoLogo -Command $command -Args $Args
+        $powerShellArgs = @( '-NoProfile', '-NoLogo' )
+        if( $OutputFormat )
+        {
+            $powerShellArgs += '-OutputFormat'
+            $powerShellArgs += $OutputFormat
+        }
+        if( $PSCmdlet.ParameterSetName -eq 'ScriptBlock' )
+        {
+            & $psPath $powerShellArgs -Command $ScriptBlock -Args $ArgumentList
+        }
+        else
+        {
+            & $psPath $powerShellArgs -Command $FilePath $ArgumentList
+        }
     }
     finally
     {
