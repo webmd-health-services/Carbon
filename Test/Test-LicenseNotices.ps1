@@ -50,35 +50,35 @@ function Test-AllFilesShouldHaveLicense
     }
     
     $expectedNotice = $noticeLines -join "`n"
-    $filesToSkip = @{
-        'Install-Website.ps1' = $true;
-        'Import-Carbon.ps1' = $true;
-        'Set-LicenseNotice.ps1' = $true;
-        'Publish-Carbon.ps1' = $true;
-        'about_Carbon.help.txt' = $true;
-        'Carbon.types.ps1xml' = $true;
-        'Carbon.format.ps1xml' = $true;
-		'Initialize-BuildServer.ps1' = $true;
-		'Initialize-WebServer.ps1' = $true;
-    }
+    $filesToSkip = @(
+        '*\Install-Website.ps1',
+        '*\Carbon\Import-Carbon.ps1',
+        '*\Set-LicenseNotice.ps1',
+        '*\Publish-Carbon.ps1',
+        '*\Carbon\about_Carbon.help.txt',
+        '*\Carbon\Carbon.types.ps1xml',
+        '*\Carbon\Carbon.format.ps1xml',
+		'*\examples\Initialize-BuildServer.ps1',
+		'*\examples\Initialize-WebServer.ps1',
+        '*\bin\Set-DotNetAppSetting.ps1',
+        '*\bin\Set-DotNetConnectionString.ps1'
+    )
     
     $filesMissingLicense = New-Object Collections.Generic.List[string]
     
-    Get-ChildItem $projectRoot *.ps*1 -Recurse | Where-Object {
-         -not $_.PsIsContainer -and $_.FullName -notmatch '\\(.hg|Tools\\Pest)\\' 
-    } | ForEach-Object {
-        if( $filesToSkip.ContainsKey( $_.Name ) )
-        {
-            return
+    Get-ChildItem $projectRoot *.ps*1 -Recurse | 
+        Where-Object { -not $_.PsIsContainer -and $_.FullName -notmatch '\\(.hg|Tools\\Pest)\\'  } |
+        Where-Object { 
+            $fullName = $_.FullName
+            return (-not ( $filesToSkip | Where-Object { $fullName -like $_ } ) )
+        } | ForEach-Object {
+            $projectFile = (Get-Content $_.FullName) -join "`n"
+            if( -not $projectFile.StartsWith( $expectedNotice ) )
+            {
+                
+                $filesMissingLicense.Add( $_.FullName.Remove( 0, $projectRoot.Length + 1 ) )
+            }
         }
-        
-        $projectFile = (Get-Content $_.FullName) -join "`n"
-        if( -not $projectFile.StartsWith( $expectedNotice ) )
-        {
-            
-            $filesMissingLicense.Add( $_.FullName.Remove( 0, $projectRoot.Length + 1 ) )
-        }
-    }
     
     Assert-Equal 0 $filesMissingLicense.Count "The following files are missing license notices:`n$($filesMissingLicense -join "`n")"
 }
