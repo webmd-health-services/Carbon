@@ -86,14 +86,14 @@ function Test-ShouldRunPowerShellUnderCLR4
     Assert-Null ([Environment]::GetEnvironmentVariable('COMPLUS_ApplicationMigrationRuntimeActivationConfigPath'))
 }
 
-function Test-ShouldNotRunx86PowerShellWithoutx86Flag
+function Test-ShouldRunx64PowerShellFromx86PowerShell
 {
     if( (Test-OsIs64Bit) -and (Test-PowerShellIs32Bit) )
     {
         $error.Clear()
-        $result = Invoke-PowerShell -Command { $PSVersionTable } -ErrorAction SilentlyContinue
-        Assert-Equal 1 $error.Count
-        Assert-Null $result
+        $result = Invoke-PowerShell -Command { $env:PROCESSOR_ARCHITECTURE } -ErrorAction SilentlyContinue
+        Assert-Equal 0 $error.Count
+        Assert-Equal 'AMD64' $result
     }
     else
     {
@@ -126,7 +126,12 @@ function Test-ShouldRunScript
     Assert-Equal $PSVersionTable.PSVersion $result[1].PSVersion
     Assert-Equal $PSVersionTAble.CLRVersion $result[1].CLRVersion
     Assert-NotNull $result[2]
-    Assert-Equal $env:PROCESSOR_ARCHITECTURE $result[2]
+    $architecture = 'AMD64'
+    if( Test-OSIs32Bit )
+    {
+        $architecture = 'x86'
+    }
+    Assert-Equal $architecture $result[2]
 }
 
 function Test-ShouldRunScriptWithArguments

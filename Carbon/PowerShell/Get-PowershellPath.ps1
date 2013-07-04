@@ -20,7 +20,20 @@ function Get-PowershellPath
 
     .DESCRIPTION
     Returns the path to the powershell.exe binary for the machine's default architecture (i.e. x86 or x64).  If you're on a x64 machine and want to get the path to x86 PowerShell, set the `x86` switch.
-
+    
+    Here are the possible combinations of operating system, PowerShell, and desired path architectures, and the path they map to.
+    
+        +-----+-----+------+--------------------------------------------------------------+
+        | OS  | PS  | Path | Result                                                       |
+        +-----+-----+------+--------------------------------------------------------------+
+        | x64 | x64 | x64  | $env:windir\System32\Windows PowerShell\v1.0\powershell.exe  |
+        | x64 | x64 | x86  | $env:windir\SysWOW64\Windows PowerShell\v1.0\powershell.exe  |
+        | x64 | x86 | x64  | $env:windir\sysnative\Windows PowerShell\v1.0\powershell.exe |
+        | x64 | x86 | x86  | $env:windir\SysWOW64\Windows PowerShell\v1.0\powershell.exe  |
+        | x86 | x86 | x64  | $env:windir\System32\Windows PowerShell\v1.0\powershell.exe  |
+        | x86 | x86 | x86  | $env:windir\System32\Windows PowerShell\v1.0\powershell.exe  |
+        +-----+-----+------+--------------------------------------------------------------+
+    
     .EXAMPLE
     Get-PowerShellPath
 
@@ -38,11 +51,31 @@ function Get-PowershellPath
         $x86
     )
     
-    $powershellPath = Join-Path ($PSHome -replace 'SysWOW64','System32') powershell.exe
-    if( $x86 -and (Test-OsIs64Bit) )
+    $psPath = $PSHOME
+    if( Test-OSIs64Bit )
     {
-        $powerShellPath = $powerShellPath -replace 'System32','SysWow64'
+        if( Test-PowerShellIs64Bit )
+        {
+            if( $x86 )
+            {
+                # x64 OS, x64 PS, want x86 path
+                $psPath = $PSHOME -replace 'System32','SysWOW64'
+            }
+        }
+        else
+        {
+            if( -not $x86 )
+            {
+                # x64 OS, x32 PS, want x64 path
+                $psPath = $PSHome -replace 'SysWOW64','sysnative'
+            }
+        }
+    }
+    else
+    {
+        # x86 OS, no SysWOW64, everything is in $PSHOME
+        $psPath = $PSHOME
     }
     
-    return $powerShellPath
+    Join-Path $psPath powershell.exe
 }

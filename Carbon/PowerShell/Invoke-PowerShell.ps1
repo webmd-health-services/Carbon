@@ -23,7 +23,7 @@ function Invoke-PowerShell
 
     If using PowerShell v3.0, you can *only* run script blocks under a `v4.0` CLR.  PowerShell converts script blocks to an encoded command, and when running encoded commands, PowerShell doesn't allow the `-Version` parameter for running PowerShell under a different version.  To run code under a .NET 2.0 CLR from PowerShell 3, use the `FilePath` parameter to run a specfic script.
     
-    This function launches a PowerShell process that matches the architecture of the operating system.  On 64-bit operating systems, you can run under 32-bit PowerShell by specifying the `x86` switch).  If this function runs under a 32-bit version of PowerShell without the `x86` switch, you'll get an error.
+    This function launches a PowerShell process that matches the architecture of the *operating system*.  On 64-bit operating systems, you can run under 32-bit PowerShell by specifying the `x86` switch).
     
     .EXAMPLE
     Invoke-PowerShell -Command { $PSVersionTable }
@@ -70,7 +70,7 @@ function Invoke-PowerShell
         $OutputFormat,
         
         [Switch]
-        # Run the x86 (32-bit) version of PowerShell.
+        # Run the x86 (32-bit) version of PowerShell, otherwise the version which matches the OS architecture is run, *regardless of the architecture of the currently running process*.
         $x86,
         
         [string]
@@ -79,12 +79,6 @@ function Invoke-PowerShell
         $Runtime
     )
     
-    if( -not $x86 -and (Test-OsIs64Bit) -and (Test-PowerShellIs32Bit) )
-    {
-        Write-Error "Can't launch 64-bit PowerShell process.  Current PowerShell process is 32-bit, and 32-bit application's can't launch 64-bit processes."
-        return
-    }
-
     $currentRuntime = 'v{0}.0' -f $PSVersionTable.CLRVersion.Major
 
     if( -not $Runtime )

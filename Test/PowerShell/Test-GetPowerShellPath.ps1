@@ -27,7 +27,7 @@ function Test-ShouldGetPowerShellPath
     $expectedPath = Join-Path $PSHome powershell.exe
     if( (Test-OsIs64Bit) -and (Test-PowerShellIs32Bit) )
     {
-        $expectedPath = $expectedPath -replace 'SysWOW64','System32'
+        $expectedPath = $expectedPath -replace 'SysWOW64','sysnative'
     }
     Assert-Equal $expectedPath (Get-PowerShellPath)
 }
@@ -47,7 +47,7 @@ function Test-ShouldGet64BitPowerShellUnder32BitPowerShell
 {
     if( (Test-OsIs64Bit) -and (Test-PowerShellIs32Bit) )
     {
-        $expectedPath = $PSHome -replace 'SysWOW64','System32'
+        $expectedPath = $PSHome -replace 'SysWOW64','sysnative'
         $expectedPath = Join-Path $expectedPath 'powershell.exe'
         Assert-Equal $expectedPath (Get-PowerShellPath)
     }
