@@ -55,6 +55,7 @@ $windowsFeaturesNotSupported = (-not ($useServerManager -or ($useWmi -and $useOC
 $supportNotFoundErrorMessage = 'Unable to find support for managing Windows features.  Couldn''t find servermanagercmd.exe, ocsetup.exe, or WMI support.'
 
 Get-Item (Join-Path $PSScriptRoot *\*.ps1) | 
+    Where-Object { $_.Directory.Name -ne 'bin' } |
     ForEach-Object {
         Write-Debug ("Importing sub-module {0}." -f $_.FullName)
         . $_.FullName

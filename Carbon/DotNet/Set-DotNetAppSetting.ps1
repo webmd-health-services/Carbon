@@ -86,27 +86,6 @@ function Set-DotNetAppSetting
         return
     }
     
-    $command = {
-        param(
-            $Name,
-            $Value
-        )
-        
-        Add-Type -AssemblyName System.Configuration
-
-        $config = [Configuration.ConfigurationManager]::OpenMachineConfiguration()
-        $appSettings = $config.AppSettings.Settings
-        if( $appSettings[$Name] )
-        {
-            $appSettings[$Name].Value = $Value
-        }
-        else
-        {
-            $appSettings.Add( $Name, $Value )
-        }
-        $config.Save()
-    }
-    
     $runtimes = @()
     if( $Clr2 )
     {
@@ -119,8 +98,11 @@ function Set-DotNetAppSetting
 
     $runtimes | ForEach-Object {
         $params = @{
-            Command = $command;
-            Args = $Name,$Value;
+            FilePath = (Join-Path $CarbonBinDir 'Set-DotNetAppSetting.ps1' -Resolve);
+            ArgumentList = @( 
+                                (ConvertTo-Base64 -Value $Name),
+                                (ConvertTo-Base64 -Value $Value)
+                            );
             Runtime = $_
         }
         

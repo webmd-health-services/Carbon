@@ -99,33 +99,6 @@ function Set-DotNetConnectionString
         return
     }
     
-    $command = {
-        param(
-            $Name,
-            $Value,
-            $ProviderName
-        )
-        
-        Add-Type -AssemblyName System.Configuration
-
-        $config = [Configuration.ConfigurationManager]::OpenMachineConfiguration()
-        $connectionStrings = $config.ConnectionStrings.ConnectionStrings
-        if( $connectionStrings[$Name] )
-        {
-            $connectionStrings.Remove( $Name )
-        }
-
-        $args = @( $Name, $Value )
-        if( $ProviderName )
-        {
-            $args += $ProviderName
-        }
-        $connectionString = New-Object Configuration.ConnectionStringSettings $args
-        $connectionStrings.Add( $connectionString )
-
-        $config.Save()
-    }
-
     $runtimes = @()
     if( $Clr2 )
     {
@@ -138,8 +111,12 @@ function Set-DotNetConnectionString
 
     $runtimes | ForEach-Object {
         $params = @{
-            Command = $command;
-            Args = $Name,$Value,$ProviderName;
+            FilePath = (Join-Path $CarbonBinDir 'Set-DotNetConnectionString.ps1' -Resolve);
+            ArgumentList = @(
+                                (ConvertTo-Base64 -Value $Name),
+                                (ConvertTo-Base64 -Value $Value),
+                                (ConvertTo-Base64 -Value $ProviderName) 
+                            );
             Runtime = $_;
         }
 

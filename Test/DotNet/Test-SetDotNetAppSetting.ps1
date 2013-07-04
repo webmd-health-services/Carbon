@@ -104,6 +104,13 @@ function Test-ShouldRequireAClrSwitch
     Assert-Like $error[0].Exception 'You must supply either or both of the Clr2 and Clr4 switches.'
 }
 
+function Test-ShouldAddAppSettingWithSensitiveCharacters
+{
+    $name = $value = '`1234567890-=qwertyuiop[]\a sdfghjkl;''zxcvbnm,./~!@#$%^&*()_+QWERTYUIOP{}|ASDFGHJKL:"ZXCVBNM<>?'
+    Set-DotNetAppSetting -Name $name -Value $value -Framework64 -Clr4
+    Assert-AppSetting -Name $name -Value $value -Framework64 -Clr4
+}
+
 function Assert-AppSetting($Name, $value, [Switch]$Framework, [Switch]$Framework64, [Switch]$Clr2, [Switch]$Clr4)
 {
     $command = {

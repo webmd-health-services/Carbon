@@ -126,6 +126,13 @@ function Test-ShouldRequireAClrFlag
     Assert-Like $error[0].Exception 'You must supply either or both of the Clr2 and Clr4 switches.'    
 }
 
+function Test-ShouldAddConnectionStringWithSensitiveCharacters
+{
+    $name = $value = $providerName = '`1234567890-=qwertyuiop[]\a sdfghjkl;''zxcvbnm,./~!@#$%^&*()_+QWERTYUIOP{}|ASDFGHJKL:"ZXCVBNM<>?'
+    Set-DotNetConnectionString -Name $name -Value $value -ProviderName $providerName -Framework64 -Clr4
+    Assert-ConnectionString -Name $name -Value $value -ProviderName $providerName -Framework64 -Clr4
+}
+
 function Assert-ConnectionString
 {
     param(
