@@ -4,6 +4,8 @@
 
 ### PowerShell
 
+ * Created new [ConvertTo-Base64](http://get-carbon.org/help/ConvertTo-Base64.html) function for encoding strings in base-64.
+ * Created new [ConvertFrom-Base64](http://get-carbon.org/help/ConvertFrom-Base64.html) function for decoding base-64 strings.
  * [Invoke-PowerShell](http://get-carbon.org/help/Invoke-PowerShell.html) now supports running an external script.
  * Added `OutputFormat` argument to [Invoke-PowerShell](http://get-carbon.org/help/Invoke-PowerShell.html) so your scripts/script blocks can return XML results instead of plain text.
  * Renamed [Invoke-PowerShell](http://get-carbon.org/help/Invoke-PowerShell.html)'s `Args` parameter to `ArgumentList` (with backwards compatibile `Args` alias).
