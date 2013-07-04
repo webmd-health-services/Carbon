@@ -10,6 +10,8 @@
  * Added `OutputFormat` argument to [Invoke-PowerShell](http://get-carbon.org/help/Invoke-PowerShell.html) so your scripts/script blocks can return XML results instead of plain text.
  * Renamed [Invoke-PowerShell](http://get-carbon.org/help/Invoke-PowerShell.html)'s `Args` parameter to `ArgumentList` (with backwards compatibile `Args` alias).
  * Renamed [Invoke-PowerShell](http://get-carbon.org/help/Invoke-PowerShell.html)'s `Command` parameter to `ScriptBlock` (with backwards-compatible `Command` alias).
+ * [Invoke-PowerShell](http://get-carbon.org/help/Invoke-PowerShell.html) now runs 64-bit PowerShell from 32-bit PowerShell.
+ * [Get-PowerShellPath](http://get-carbon.org/help/Invoke-PowerShell.html) now returns path for 64-bit PowerShell when running 32-bit PowerShell.
  
  ## Bug Fixes
  
@@ -17,8 +19,8 @@
 
  * [Set-DotNetAppSetting](http://get-carbon.org/help/Set-DotNetAppSetting.html) and [Set-DotNetConnectionString](http://get-carbon.org/help/Set-DotNetConnectionString.html) weren't able to set .NET 2.0 app settings and connections string when running under PowerShell 3.
  
- 
-# 1.2.0 (25 June 2013)
+
+ # 1.2.0 (25 June 2013)
 
 ## Enhancements
 
