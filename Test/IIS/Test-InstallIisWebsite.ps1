@@ -167,7 +167,7 @@ function Assert-WebsiteRunning($port)
 
 function Wait-ForWebsiteToBeRunning
 {
-    Invoke-AppCmd start site /site.name:$SiteName
+    Invoke-AppCmd start site /site.name:$SiteName -ErrorAction SilentlyContinue
     $state = ''
     $tryNum = 0
     do
