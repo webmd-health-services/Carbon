@@ -47,7 +47,7 @@ function Test-ShouldWaitToCompleteJobs
 function Test-ShouldDetectFailedJobs
 {
     $job = Start-Job { throw "Blarg!" } -Name "Fails"
-    $numFailed = Complete-Job -Job $job 
+    $numFailed = Complete-Job -Job $job -ErrorAction SilentlyContinue
     Assert-Equal 1 $numFailed
     Assert-Null (Get-Job)
 }
@@ -81,12 +81,12 @@ function Test-ShouldOnlyCompletePassedJobs
 
 function Test-ShouldContinueIfJobFails
 {
-    $job1 = Start-Job { throw "Fail!" } -Name "Fails"
+    $job1 = Start-Job { throw "Fail!" } -Name "Fails" 
     $job2 = Start-Job { Start-Sleep -Seconds 3 } -Name "Sleeps3Seconds"
     $numFailed = 0
     try
     {
-        $numFailed = Complete-Job -Job $job1,$job2 
+        $numFailed = Complete-Job -Job $job1,$job2 -ErrorAction SilentlyContinue 
     }
     catch
     {
@@ -109,6 +109,6 @@ function Test-ShouldPipeOutputToWriteHost
         throw  "Fail!"
     }
     
-    $numFailed = Complete-Job -Job $job1,$job2
+    $numFailed = Complete-Job -Job $job1,$job2 -ErrorAction SilentlyContinue
     Assert-Equal 2 $numFailed 
 }
