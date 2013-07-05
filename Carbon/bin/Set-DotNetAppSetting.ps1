@@ -31,7 +31,7 @@ param(
 
 Set-StrictMode -Version Latest
 $PSScriptRoot = Split-Path -Parent -Path $MyInvocation.MyCommand.Definition
-. (Join-Path $PSScriptRoot ..\PowerShell\ConvertFrom-Base64.ps1 -Resolve)
+. (Join-Path $PSScriptRoot ..\Text\ConvertFrom-Base64.ps1 -Resolve)
 
 $Name = $Name | ConvertFrom-Base64
 $Value = $Value | ConvertFrom-Base64
