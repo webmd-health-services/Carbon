@@ -12,7 +12,37 @@
 		<li><a href="http://pshdo.com">-Blog</a></li>
 	</ul>
     
-    <h1>1.2.0 (25 June 2013)</h1>
+    <h1>1.3.0 (8 July 2013)</h1>
+
+<h2>Enhancements</h2>
+
+<h3>PowerShell</h3>
+
+<ul>
+<li><a href="http://get-carbon.org/help/Invoke-PowerShell.html">Invoke-PowerShell</a> now supports running an external script.</li>
+<li>Added <code>OutputFormat</code> argument to <a href="http://get-carbon.org/help/Invoke-PowerShell.html">Invoke-PowerShell</a> so your scripts/script blocks can return XML results instead of plain text.</li>
+<li>Renamed <a href="http://get-carbon.org/help/Invoke-PowerShell.html">Invoke-PowerShell</a>'s <code>Args</code> parameter to <code>ArgumentList</code> (with backwards compatibile <code>Args</code> alias).</li>
+<li>Renamed <a href="http://get-carbon.org/help/Invoke-PowerShell.html">Invoke-PowerShell</a>'s <code>Command</code> parameter to <code>ScriptBlock</code> (with backwards-compatible <code>Command</code> alias).</li>
+<li><a href="http://get-carbon.org/help/Invoke-PowerShell.html">Invoke-PowerShell</a> now runs 64-bit PowerShell from 32-bit PowerShell.</li>
+<li><a href="http://get-carbon.org/help/Invoke-PowerShell.html">Get-PowerShellPath</a> now returns path for 64-bit PowerShell when running 32-bit PowerShell.</li>
+</ul>
+
+<h3>Text</h3>
+
+<ul>
+<li>Created new <a href="http://get-carbon.org/help/ConvertTo-Base64.html">ConvertTo-Base64</a> function for encoding strings in base-64.</li>
+<li>Created new <a href="http://get-carbon.org/help/ConvertFrom-Base64.html">ConvertFrom-Base64</a> function for decoding base-64 strings.</li>
+</ul>
+
+<h2>Bug Fixes</h2>
+
+<h3>.NET</h3>
+
+<ul>
+<li><a href="http://get-carbon.org/help/Set-DotNetAppSetting.html">Set-DotNetAppSetting</a> and <a href="http://get-carbon.org/help/Set-DotNetConnectionString.html">Set-DotNetConnectionString</a> weren't able to set .NET 2.0 app settings and connections string when running under PowerShell 3.</li>
+</ul>
+
+<h1>1.2.0 (25 June 2013)</h1>
 
 <h2>Enhancements</h2>
 
