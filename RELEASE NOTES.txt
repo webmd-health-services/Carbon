@@ -17,14 +17,14 @@
  * Created new [ConvertFrom-Base64](http://get-carbon.org/help/ConvertFrom-Base64.html) function for decoding base-64 strings.
 
  
- ## Bug Fixes
+## Bug Fixes
  
- ### .NET
+### .NET
 
  * [Set-DotNetAppSetting](http://get-carbon.org/help/Set-DotNetAppSetting.html) and [Set-DotNetConnectionString](http://get-carbon.org/help/Set-DotNetConnectionString.html) weren't able to set .NET 2.0 app settings and connections string when running under PowerShell 3.
  
 
- # 1.2.0 (25 June 2013)
+# 1.2.0 (25 June 2013)
 
 ## Enhancements
 
