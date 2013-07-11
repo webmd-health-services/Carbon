@@ -21,6 +21,12 @@ function New-Junction
     .DESCRIPTION
     Creates a junction given by `-Link` which points to the path given by `-Target`.  If something already exists at `Link`, an error is written.  
     
+    .LINK
+    Install-Junction
+
+    .LINK
+    Remove-Junction
+
     .EXAMPLE
     New-Junction -Link 'C:\Windows\system32Link' -Target 'C:\Windows\system32'
     

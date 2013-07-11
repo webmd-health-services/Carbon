@@ -21,6 +21,12 @@ function Remove-Junction
     .DESCRIPTION
     Safely removes a junction without removing the junction's target.  If you try to remove something that isn't a junction, an error will be written.  Use `Test-PathIsJunction` or the `IsJunction` extended method on `DirectoryInfo` object.
     
+    .LINK
+    Install-Junction
+
+    .LINK
+    New-Junction
+
     .EXAMPLE
     Remove-Junction -Path 'C:\I\Am\A\Junction'
     
