@@ -169,3 +169,12 @@ function Test-ShouldRunUnderClr2
                                 -Runtime 'v2.0'
     Assert-LIke $result[1].CLRVersion '2.0.*'
 }
+
+function Test-ShouldUseExecutionPolicy
+{
+    $Error.Clear()
+    $result = Invoke-PowerShell -FilePath (Join-Path $TestDir Get-PsVersionTable.ps1) -ExecutionPolicy Restricted -ErrorAction SilentlyContinue
+    Assert-Null $result
+    Assert-GreaterThan $Error.Count 0
+    Assert-ContainsLike $Error '*disabled*'
+}

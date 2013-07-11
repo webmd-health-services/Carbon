@@ -6,6 +6,11 @@
 
  * Created [Install-Junction](http://get-carbon.org/help/Install-Junction.html) function for creating new and/or updating existing junctions. This is a more idempotent way of creating junctions, as opposed to [New-Junction](http://get-carbon.org/help/New-Junction.html) and [Remove-Junction](http://get-carbon.org/help/Remove-Junction.html) which report errors if a junction already exists or doesn't exist, respectively.
 
+### PowerShell
+
+ * Added `ExecutionPolicy` parameter to [Invoke-PowerShell](http://get-carbon.org/help/Invoke-PowerShell.html) to allow setting a custom exeuction policy when using [Invoke-PowerShell](http://get-carbon.org/help/Invoke-PowerShell.html) to run a script.
+ 
+
 # 1.3.0
 
 ## Enhancements
