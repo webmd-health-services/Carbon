@@ -9,8 +9,14 @@
 ### PowerShell
 
  * Added `ExecutionPolicy` parameter to [Invoke-PowerShell](http://get-carbon.org/help/Invoke-PowerShell.html) to allow setting a custom exeuction policy when using [Invoke-PowerShell](http://get-carbon.org/help/Invoke-PowerShell.html) to run a script.
- 
 
+## Bug Fixes
+
+### .NET
+
+ * [Set-DotNetAppSetting](http://get-carbon.org/help/Set-DotNetAppSetting.html) and [Set-DotNetConnectionString](http://get-carbon.org/help/Set-DotNetConnectionString.html) failed if setting a .NET configuration under an architecture where the PowerShell execution policy doesn't allow running scripts.
+
+ 
 # 1.3.0 (8 July 2013)
 
 ## Enhancements

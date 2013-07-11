@@ -118,6 +118,7 @@ function Set-DotNetConnectionString
                                 (ConvertTo-Base64 -Value $ProviderName) 
                             );
             Runtime = $_;
+            ExecutionPolicy = [Microsoft.PowerShell.ExecutionPolicy]::RemoteSigned;
         }
 
         if( $Framework )

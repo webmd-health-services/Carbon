@@ -103,7 +103,8 @@ function Set-DotNetAppSetting
                                 (ConvertTo-Base64 -Value $Name),
                                 (ConvertTo-Base64 -Value $Value)
                             );
-            Runtime = $_
+            Runtime = $_;
+            ExecutionPolicy = [Microsoft.PowerShell.ExecutionPolicy]::RemoteSigned;
         }
         
         if( $Framework )
