@@ -214,6 +214,11 @@
 		<ul class="CommandMenu">
 			<li><a href="Install-SmbShare.html">Install-SmbShare</a></li>
 		</ul>
+		<li class="Category">Text</li>
+		<ul class="CommandMenu">
+			<li><a href="ConvertFrom-Base64.html">ConvertFrom-Base64</a></li>
+			<li><a href="ConvertTo-Base64.html">ConvertTo-Base64</a></li>
+		</ul>
 		<li class="Category">UsersAndGroups</li>
 		<ul class="CommandMenu">
 			<li><a href="Add-GroupMember.html">Add-GroupMember</a></li>
@@ -252,6 +257,20 @@
         <h2>Description</h2>
     <div class="Description">
         <p>Returns the path to the powershell.exe binary for the machine's default architecture (i.e. x86 or x64).  If you're on a x64 machine and want to get the path to x86 PowerShell, set the <code>x86</code> switch.</p>
+
+<p>Here are the possible combinations of operating system, PowerShell, and desired path architectures, and the path they map to.</p>
+
+<pre><code>+-----+-----+------+--------------------------------------------------------------+
+| OS  | PS  | Path | Result                                                       |
++-----+-----+------+--------------------------------------------------------------+
+| x64 | x64 | x64  | $env:windir\System32\Windows PowerShell\v1.0\powershell.exe  |
+| x64 | x64 | x86  | $env:windir\SysWOW64\Windows PowerShell\v1.0\powershell.exe  |
+| x64 | x86 | x64  | $env:windir\sysnative\Windows PowerShell\v1.0\powershell.exe |
+| x64 | x86 | x86  | $env:windir\SysWOW64\Windows PowerShell\v1.0\powershell.exe  |
+| x86 | x86 | x64  | $env:windir\System32\Windows PowerShell\v1.0\powershell.exe  |
+| x86 | x86 | x86  | $env:windir\System32\Windows PowerShell\v1.0\powershell.exe  |
++-----+-----+------+--------------------------------------------------------------+
+</code></pre>
 
     </div>
     

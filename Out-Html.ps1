@@ -366,6 +366,7 @@ $commands = Get-Command -Module Carbon |
 $categories = New-Object 'Collections.Generic.SortedList[string,object]'
 Get-ChildItem (Join-Path $PSScriptRoot Carbon\*\*.ps1) | 
     Sort-Object BaseName |
+    Where-Object { $_.Directory.Name -ne 'bin' } |
     ForEach-Object { 
         $currentFile = $_.BaseName
         $category = Split-Path -Parent $_.FullName

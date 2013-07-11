@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-    <title>PowerShell - Resolve-IdentityName - Carbon</title>
+    <title>PowerShell - ConvertFrom-Base64 - Carbon</title>
 	<link href="styles.css" type="text/css" rel="stylesheet" />
 </head>
 <body>
@@ -247,22 +247,26 @@
 </div>
 
 
-    <h1>Resolve-IdentityName</h1>
-    <div><p>Determines the full, NT identity name for a user or group.</p>
+    <h1>ConvertFrom-Base64</h1>
+    <div><p>Converts a base-64 encoded string back into its original string.</p>
 </div>
 
         <h2>Syntax</h2>
-    <pre class="Syntax"><code>Resolve-IdentityName [-Name] &lt;String&gt; [&lt;CommonParameters&gt;]</code></pre>
+    <pre class="Syntax"><code>ConvertFrom-Base64 [-Value] &lt;String[]&gt; [[-Encoding] &lt;Encoding&gt;] [&lt;CommonParameters&gt;]</code></pre>
     
         <h2>Description</h2>
     <div class="Description">
-        <p>The common name for an account is not always the canonical name used by the operating system.  For example, the local Administrators group is actually called BUILTIN\Administrators.  This function converts an identity's name into its canonical name.</p>
+        <p>For some reason. .NET makes encoding a string a two-step process. This function makes it a one-step process.</p>
 
-<p>If the name doesn't represent an actual user or group, an error is written and nothing returned.</p>
+<p>You're actually allowed to pass in <code>$null</code> and an empty string.  If you do, you'll get <code>$null</code> and an empty string back.</p>
 
     </div>
     
-    
+            <h2>Related Commands</h2>
+        <ul>
+<li><a href="ConvertTo-Base64.html">ConvertTo-Base64</a></li>
+</ul>
+
 
     		<h2> Parameters </h2>
 		<table border='1'>
@@ -275,11 +279,20 @@
 				<th>Default Value</th>
 			</tr>
             			<tr valign='top'>
-				<td>Name</td>
-				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
-				<td>The name of the identity whose canonical name to return.
+				<td>Value</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String[]</a></td>
+				<td>The base-64 string to convert.
 </td>
 				<td>true</td>
+				<td>true (ByValue)</td>
+                <td></td>
+			</tr>
+			<tr valign='top'>
+				<td>Encoding</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.text.encoding.aspx">Encoding</a></td>
+				<td>The encoding to use.  Default is Unicode.
+</td>
+				<td>false</td>
 				<td>false</td>
                 <td></td>
 			</tr>
@@ -288,15 +301,19 @@
         
     
         
-            <h2>Return Values</h2>
-        <p><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">System.String</a>. </p>
-
+    
         
     
         
                 <h2>EXAMPLE 1</h2>
-            <pre><code>Resolve-IdentityName -Identity 'Administrators'</code></pre>
-            <p><p>Returns <code>BUILTIN\Administrators</code>, the canonical name for the local Administrators group.</p>
+            <pre><code>ConvertFrom-Base64 -Value 'RW5jb2RlIG1lLCBwbGVhc2Uh'</code></pre>
+            <p><p>Decodes <code>RW5jb2RlIG1lLCBwbGVhc2Uh</code> back into its original string.</p>
+</p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 2</h2>
+            <pre><code>ConvertFrom-Base64 -Value 'RW5jb2RlIG1lLCBwbGVhc2Uh' -Encoding ([Text.Encoding]::ASCII)</code></pre>
+            <p><p>Shows how to specify a custom encoding in case your string isn't in Unicode text encoding.</p>
+</p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 3</h2>
+            <pre><code>'RW5jb2RlIG1lIQ==' | ConvertTo-Base64</code></pre>
+            <p><p>Shows how you can pipeline input into <code>ConvertFrom-Base64</code>.</p>
 </p><p></p><p></p><p></p><p></p>
 </body>
 </html>   

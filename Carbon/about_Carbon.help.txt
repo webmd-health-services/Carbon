@@ -42,6 +42,8 @@ SYSTEM REQUIREMENTS
       
 INSTALLATION
     Download the latest release from https://bitbucket.org/splatteredbits/carbon/downloads.
+	
+    Unblock the zip file (right-click the .zip file, choose Properties, click "Unblock", then click "OK".)
     
     Unzip the Carbon module anywhere on your file system.  Import the module by running:
     

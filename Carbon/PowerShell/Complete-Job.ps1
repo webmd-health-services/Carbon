@@ -52,6 +52,13 @@ function Complete-Job
         $IntervalSeconds = 1
     )
     
+    $errorAction = 'Continue'
+    $params = $PSBoundParameters
+    if( $PSBoundParameters.ContainsKey( 'ErrorAction' ) )
+    {
+        $errorAction = $PSBoundParameters.ErrorAction
+    }
+
     trap { Write-Warning "Unhandled error found: $_" }
     $numFailed = 0
     do
@@ -81,7 +88,7 @@ function Complete-Job
                     Stop-Job -Job $currentJob
 
                     Write-Verbose "Receiving job $($currentJob.Name)."
-                    Receive-Job -Job $currentJob -ErrorAction Continue | Write-Host
+                    Receive-Job -Job $currentJob -ErrorAction $errorAction| Write-Host
 
                     Write-Verbose "Removing job $($currentJob.Name)."
                     Remove-Job -Job $currentJob
@@ -92,7 +99,7 @@ function Complete-Job
                     Write-Host $jobHeader
 
                     Write-Verbose "Receiving job $($currentJob.Name)."
-                    Receive-Job -Job $currentJob -ErrorAction Continue | Write-Host
+                    Receive-Job -Job $currentJob -ErrorAction $errorAction | Write-Host
 
                     Write-Verbose "Removing job $($currentJob.Name)."
                     Remove-Job -Job $currentJob
