@@ -48,7 +48,11 @@ param(
     
     [Switch]
     # Return objects for each test run.
-    $PassThru
+    $PassThru,
+    
+    [Switch]
+    # Recurse through directories under `$Path` to find tests.
+    $Recurse
 )
 
 $ErrorActionPreference = 'Stop'
@@ -200,7 +204,13 @@ function Invoke-Test($fixture, $function)
     $testInfo
 }
 
-$testScripts = @( Get-ChildItem $Path Test-*.ps1 -Recurse )
+$getChildItemParams = @{ }
+if( $Recurse )
+{
+    $getChildItemParams.Recurse = $true
+}
+
+$testScripts = @( Get-ChildItem $Path Test-*.ps1 @getChildItemParams )
 if( $testScripts -eq $null )
 {
     $testScripts = @()
