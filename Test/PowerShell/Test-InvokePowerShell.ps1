@@ -174,7 +174,15 @@ function Test-ShouldUseExecutionPolicy
 {
     $Error.Clear()
     $result = Invoke-PowerShell -FilePath (Join-Path $TestDir Get-PsVersionTable.ps1) -ExecutionPolicy Restricted -ErrorAction SilentlyContinue
-    Assert-Null $result
-    Assert-GreaterThan $Error.Count 0
-    Assert-ContainsLike $Error '*disabled*'
+    if( $Host.Name -eq 'ConsoleHost' )
+    {
+        Assert-NotNull $result
+        Assert-Like $result[0] '*running scripts is disabled*'
+    }
+    else
+    {
+        Assert-Null $result
+        Assert-GreaterThan $Error.Count 0
+        Assert-ContainsLike $Error '*disabled*'
+    }
 }
