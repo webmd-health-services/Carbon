@@ -143,10 +143,15 @@ function Invoke-Test($fixture, $function)
     $testInfo = New-Object PsObject -Property $testProperties
     Set-CurrentTest $function
     $startedAt = Get-Date
+    $output = @()
     try
     {
         
-        if( Test-path function:Setup )
+        if( Test-path function:Start-Test )
+        {
+            . Start-Test | Write-Verbose
+        }
+        elseif( Test-Path function:SetUp )
         {
             . SetUp | Write-Verbose
         }
@@ -154,11 +159,7 @@ function Invoke-Test($fixture, $function)
         if( Test-Path function:$function )
         {
             $testInfo.Passed = $true
-            $output = . $function
-            if( $output )
-            {
-                $testInfo.PipelineOutput = $output
-            }
+            . $function | ForEach-Object { $output += $_ }
         }
     }
     catch [Pest.AssertionException]
@@ -186,18 +187,26 @@ function Invoke-Test($fixture, $function)
     }
     finally
     {
-        $error.Clear()
-        if( Test-Path function:TearDown )
+        if( $output )
         {
-            try
+            $testInfo.PipelineOutput = $output
+        }
+        $error.Clear()
+        try
+        {
+            if( Test-Path function:Stop-Test )
+            {
+                . Stop-Test | Write-Verbose
+            }
+            elseif( Test-Path -Path function:TearDown )
             {
                 . TearDown | Write-Verbose
             }
-            catch
-            {
-                Write-Host "An error occured tearing down test '$function': $_" -ForegroundColor Red
-                $error.Clear()
-            }
+        }
+        catch
+        {
+            Write-Host "An error occured tearing down test '$function': $_" -ForegroundColor Red
+            $error.Clear()
         }
     }
     $testInfo.Duration = (Get-Date) - $startedAt 
@@ -248,6 +257,11 @@ $testScripts |
         . $testCase.FullName
         try
         {
+            if( Test-Path -Path function:Start-TestFixture )
+            {
+                . Start-TestFixture | Write-Verbose
+            }
+
             foreach( $function in $functions )
             {
 
@@ -271,6 +285,19 @@ $testScripts |
                 }
                 
                 Invoke-Test $testModuleName $function
+            }
+
+            if( Test-Path -Path function:Stop-TestFixture )
+            {
+                try
+                {
+                    . Stop-TestFixture | Write-Verbose
+                }
+                catch
+                {
+                    Write-Host ("An error occured tearing down test fixture '{0}': {1}" -f $testCase.Name,$_) -ForegroundColor Red
+                    $error.Clear()
+                }                
             }
         }
         finally
