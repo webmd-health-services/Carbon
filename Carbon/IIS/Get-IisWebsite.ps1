@@ -63,4 +63,12 @@ function Get-IisWebsite
             {
                 $true
             }
-        } | Add-IisServerManagerMember -ServerManager $mgr -PassThru}
+        } | Add-IisServerManagerMember -ServerManager $mgr -PassThru |
+        Add-Member -MemberType ScriptProperty -Name PhysicalPath -Value {
+            $this.Applications |
+                Where-Object { $_.Path -eq '/' } |
+                Select-Object -ExpandProperty VirtualDirectories |
+                Where-Object { $_.Path -eq '/' } |
+                Select-Object -ExpandProperty PhysicalPath
+        } -PassThru
+}

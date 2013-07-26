@@ -63,6 +63,13 @@ function Test-ShouldGetWebsiteDetails
     Assert-Equal 80 $website.Bindings[3].Endpoint.Port
     Assert-Equal $siteName $website.Bindings[3].Host "bindings[3] host name"
 
+    $physicalPath = $website.Applications |
+                        Where-Object { $_.Path -eq '/' } |
+                        Select-Object -ExpandProperty VirtualDirectories |
+                        Where-Object { $_.Path -eq '/' } |
+                        Select-Object -ExpandProperty PhysicalPath
+    Assert-Equal $physicalPath $website.PhysicalPath
+
     Assert-ServerManagerMember -Website $website
 }
 

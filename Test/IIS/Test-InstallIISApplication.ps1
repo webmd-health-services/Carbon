@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-Import-Module (Join-Path $TestDir ..\..\Carbon) -Force
+& (Join-Path -Path $TestDir -ChildPath ..\..\Carbon\Import-Carbon.ps1 -Resolve)
 
 $Port = 9878
 $SiteName = 'TestApplication'
@@ -20,7 +20,7 @@ $AppName = 'App'
 $WebConfig = Join-Path $TestDir web.config
 $AppPoolName = 'TestApplication'
 
-function SetUp
+function Start-Test
 {
     Uninstall-IisWebsite -Name $SiteName
     Install-IisAppPool -Name $AppPoolName
@@ -31,7 +31,7 @@ function SetUp
     }
 }
 
-function TearDown
+function Stop-Test
 {
     Uninstall-IisWebsite -Name $SiteName
 }
@@ -49,6 +49,18 @@ function Test-ShouldCreateApplication
     Assert-ApplicationRunning
     $output = Invoke-AppCmd list app "$SiteName/$AppName"
     Assert-Like $output "APP ""$SiteName/$AppName"" (applicationPool:$AppPoolName)"
+}
+
+function Test-ShouldResolveApplicationPhysicalPath
+{
+    Invoke-InstallApplication -Path "$TestDir\..\..\Test\IIS"
+    $website = Get-IisWebsite -SiteName $SiteName 
+    $physicalPath = $website.Applications | 
+                        Where-Object { $_.Path -eq "/$AppName" } |
+                        Select-Object -ExpandProperty VirtualDirectories |
+                        Where-Object { $_.Path -eq "/" } |
+                        Select-Object -ExpandProperty PhysicalPath
+    Assert-Like $TestDir $physicalPath
 }
 
 function Test-ShouldDeleteExistingApplication

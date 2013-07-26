@@ -60,6 +60,7 @@ function Install-IisApplication
         Invoke-AppCmd delete app $appID
     }
     
+    $Path = [IO.Path]::GetFullPath( $Path )
     if( -not (Test-Path $Path -PathType Container) )
     {
         $null = New-Item $Path -ItemType Directory

@@ -14,17 +14,16 @@
 
 $SiteName = 'TestNewWebsite'
 
-function SetUp
+function Start-Test
 {
-    Import-Module (Join-Path $TestDir ..\..\Carbon -Resolve) -Force
+    & (Join-Path -Path $TestDir -ChildPath ..\..\Carbon\Import-Carbon.ps1 -Resolve)
     Remove-TestSite
     Grant-Permission -Identity Everyone -Permission ReadAndExecute -Path $TestDir
 }
 
-function TearDown
+function Stop-Test
 {
     Remove-TestSite
-    Remove-Module Carbon
 }
 
 function Remove-TestSite
@@ -65,6 +64,14 @@ function Test-ShouldCreateWebsite
     $authXml = [xml] (Invoke-AppCmd list config $SiteName /section:anonymousAuthentication)
     $username = $authXml['system.webServer'].security.authentication.anonymousAuthentication.userName
     Assert-Empty $username "Anonymous authentication username not set to application pool's identity."
+}
+
+function Test-ShouldResolveRelativePath
+{
+    Install-IisWebsite -Name $SiteName -Path "$TestDir\..\..\Test\IIS"
+    $site = Get-IisWebsite -SiteName $SiteName
+    Assert-NotNull $site
+    Assert-Equal $TestDir $site.PhysicalPath
 }
 
 function Test-ShouldCreateWebsiteWithCustomBinding

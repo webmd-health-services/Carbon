@@ -17,9 +17,9 @@ $SiteName = 'TestVirtualDirectory'
 $VDirName = 'VDir'
 $WebConfig = Join-Path $TestDir web.config
 
-function SetUp
+function Start-Test
 {
-    Import-Module (Join-Path $TestDir ..\..\Carbon -Resolve)
+    & (Join-Path -Path $TestDir -ChildPath ..\..\Carbon\Import-Carbon.ps1 -Resolve)
 
     Uninstall-IisWebsite -Name $SiteName
     Install-IisWebsite -Name $SiteName -Path $TestDir -Bindings "http://*:$Port"
@@ -29,10 +29,9 @@ function SetUp
     }
 }
 
-function TearDown
+function Stop-Test
 {
     Uninstall-IisWebsite -Name $SiteName
-    Remove-Module Carbon
 }
 
 function Invoke-NewVirtualDirectory($Path = $TestDir)
@@ -45,6 +44,18 @@ function Test-ShouldCreateVirtualDirectory
 {
     Invoke-NewVirtualDirectory
     Assert-VirtualDirectoryRunning
+}
+
+function Test-ShouldResolvePhysicalPath
+{
+    Install-IisVirtualDirectory -SiteName $SiteName -Name $VDirName -Path "$TestDir\..\..\Test\IIS"
+    $physicalPath = Get-IisWebsite -SiteName $SiteName |
+                        Select-Object -ExpandProperty Applications |
+                        Where-Object { $_.Path -eq '/' } |
+                        Select-Object -ExpandProperty VirtualDirectories |
+                        Where-Object { $_.Path -eq "/$VDirName" } |
+                        Select-Object -ExpandProperty PhysicalPath
+    Assert-Equal $TestDir $physicalPath
 }
 
 function Test-ShouldDeleteExistingVirtualDirectory
