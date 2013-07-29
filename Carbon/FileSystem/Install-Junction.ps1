@@ -21,6 +21,8 @@ function Install-Junction
     .DESCRIPTION
     Creates a junction given by `-Link` which points to the path given by `-Target`.  If `Link` exists, deletes it and re-creates it if it doesn't point to `Target`.
     
+    Both `-Link` and `-Target` parameters accept relative paths for values.  Any non-rooted paths are converted to full paths using the current location, i.e. the path returned by `Get-Location`.
+
     .LINK
     New-Junction
 
@@ -31,22 +33,53 @@ function Install-Junction
     Install-Junction -Link 'C:\Windows\system32Link' -Target 'C:\Windows\system32'
     
     Creates the `C:\Windows\system32Link` directory, which points to `C:\Windows\system32`.
+
+    .EXAMPLE
+    Install-Junction -Link C:\Projects\Foobar -Target 'C:\Foo\bar' -Force
+
+    This example demonstrates how to create the target directory if it doesn't exist.  After this example runs, the directory `C:\Foo\bar` and junction `C:\Projects\Foobar` will be created.
     #>
     [CmdletBinding(SupportsShouldProcess=$true)]
     param(
         [Parameter(Mandatory=$true)]
         [Alias("Junction")]
         [string]
-        # The junction to create/update.
+        # The junction to create/update. Relative paths are converted to absolute paths using the current location.
         $Link,
         
         [Parameter(Mandatory=$true)]
         [string]
-        # The target of the junction, i.e. where the junction will point to.d
-        $Target
+        # The target of the junction, i.e. where the junction will point to.  Relative paths are converted to absolute paths using the curent location.
+        $Target,
+
+        [Switch]
+        # Create the target directory if it does not exist.
+        $Force
     )
 
     Set-StrictMode -Version Latest
+
+    $Link = Resolve-FullPath -Path $Link
+    $Target = Resolve-FullPath -Path $Target
+
+    if( Test-Path -Path $Target -PathType Leaf )
+    {
+        Write-Error ('Unable to create junction {0}: target {1} exists and is a file.' -f $Link,$Target)
+        return
+    }
+
+    if( -not (Test-Path -Path $Target -PathType Container) )
+    {
+        if( $Force )
+        {
+            $null = New-Item -Path $Target -ItemType Directory -Force
+        }
+        else
+        {
+            Write-Error ('Unable to create junction {0}: target {1} not found.  Use the `-Force` switch to create target paths that don''t exist.' -f $Link,$Target)
+            return
+        }
+    }
 
     if( Test-Path $Link -PathType Container )
     {

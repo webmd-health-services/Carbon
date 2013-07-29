@@ -15,20 +15,19 @@
 
 $junctionPath = $null
 
-function SetUp
+function Start-Test
 {
     & (Join-Path $TestDir ..\..\Carbon\Import-Carbon.ps1 -Resolve)
-    $junctionPath = Join-Path $env:Temp ([IO.Path]::GetRandomFileName())
+    $junctionPath = Join-Path $env:Temp ('Carbon_Test-InstallJunction_{0}' -f ([IO.Path]::GetRandomFileName()))
     $Error.Clear()
 }
 
-function TearDown
+function Stop-Test
 {
     if( Test-Path -Path $junctionPath -PathType Container )
     {
         Remove-Junction -Path $junctionPath
     }
-    Remove-Module Carbon
 }
 
 function Test-ShouldCreateJunction
@@ -75,6 +74,57 @@ function Test-ShouldSupportWhatIf
     Install-Junction -Link $junctionPath -Target $env:windir
     Install-Junction -Link $junctionPath -Target $TestDir -WhatIf
     Assert-Junction -ExpectedTarget $env:windir
+}
+
+function Test-ShouldFailIfTargetDoesNotExist
+{
+    $target = 'C:\Hello\World\Foo\Bar'
+    Assert-DirectoryDoesNotExist $target
+    $Error.Clear()
+    Install-Junction -Link $junctionPath -Target $target -ErrorAction SilentlyContinue
+    Assert-Equal 1 $Error.Count
+    Assert-Like $Error[0].Exception.Message '*not found*'
+    Assert-DirectoryDoesNotExist $target
+    Assert-DirectoryDoesNotExist $junctionPath
+}
+
+function Test-ShouldFailIfTargetIsAFile
+{
+    $target = Get-ChildItem -Path $TestDir | Select-Object -First 1
+    Assert-NotNull $target
+    $Error.Clear()
+    Install-Junction -Link $junctionPath -Target $target.FullName -ErrorAction SilentlyContinue
+    Assert-Equal 1 $Error.Count
+    Assert-Like $Error[0].Exception.Message '*file*'
+    Assert-DirectoryDoesNotExist $junctionPath
+}
+
+function Test-ShouldCreateTargetIfItDoesNotExist
+{
+    $target = 'Carbon_Test-InstallJunction_{0}' -f [IO.Path]::GetRandomFileName()
+    $target = Join-Path -Path $env:TEMP -ChildPath $target
+    Assert-DirectoryDoesNotExist $target
+    Install-Junction -Link $junctionPath -Target $target -Force
+    Assert-Equal 0 $Error.Count
+    Assert-Junction -ExpectedTarget $target
+}
+
+function Test-ShouldCreateJunctionWithRelativePaths
+{
+    Push-Location $env:TEMP
+    try
+    {
+        $target = '..\Temp'
+        $link = '.\{0}' -f (Split-Path -Leaf -Path $junctionPath)
+
+        Install-Junction -Link $link -Target $target
+
+        Assert-Junction -ExpectedTarget $env:Temp
+    }
+    finally
+    {
+        Pop-Location
+    }
 }
 
 function Assert-Junction
