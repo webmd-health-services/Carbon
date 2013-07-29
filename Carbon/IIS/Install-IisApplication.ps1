@@ -53,23 +53,52 @@ function Install-IisApplication
         $AppPoolName
     )
     
-    $appID = """$SiteName/$Name"""
-    $output = Invoke-AppCmd list app $appID
-    if( $output -like "*$appID*" )
-    {
-        Invoke-AppCmd delete app $appID
-    }
-    
     $Path = [IO.Path]::GetFullPath( $Path )
     if( -not (Test-Path $Path -PathType Container) )
     {
         $null = New-Item $Path -ItemType Directory
     }
-    
-    Invoke-AppCmd add app /site.name:"$SiteName" /path:/$Name /physicalPath:"$Path"
-    
+
+    $appPoolDesc = ''
     if( $AppPoolName )
     {
-        Invoke-AppCmd set app /app.name:"$SiteName/$Name" /applicationPool:`"$AppPoolName`"
+        $appPoolDesc = '; appPool: {0}' -f $AppPoolName
     }
+    
+    $app = Get-IisApplication -SiteName $SiteName -Name $Name
+    if( -not $app )
+    {
+        Write-Host ('IIS:/{0}/{1}: creating application: physicalPath: {2}{3}' -f $SiteName,$Name,$Path,$appPoolDesc)
+        $site = Get-IisWebsite -SiteName $SiteName
+        if( -not $site )
+        {
+            Write-Error ('[IIS] Website ''{0}'' not found.' -f $SiteName)
+            return
+        }
+        $apps = $site.GetCollection()
+        $app = $apps.CreateElement('application') |
+                    Add-IisServerManagerMember -ServerManager $site.ServerManager -PassThru
+        $app['path'] = "/{0}" -f $Name
+        $apps.Add( $app )
+    }
+    else
+    {
+        Write-Host ('IIS:/{0}/{1}: updating application: physicalPath: {2}{3}' -f $SiteName,$Name,$Path,$appPoolDesc)
+    }
+
+    if( $AppPoolName )
+    {
+        $app['applicationPool'] = $AppPoolName
+    }
+    $vdir = $app.VirtualDirectories |
+                Where-Object { $_.Path -eq '/' }
+    if( -not $vdir )
+    {
+        $vdirs = $app.GetCollection()
+        $vdir = $vdirs.CreateElement('virtualDirectory')
+        $vdir['path'] = '/'
+        $vdirs.Add( $vdir )
+    }
+    $vdir['physicalPath'] = $Path
+    $app.CommitChanges()
 }

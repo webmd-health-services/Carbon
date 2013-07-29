@@ -54,13 +54,22 @@ function Test-ShouldCreateApplication
 function Test-ShouldResolveApplicationPhysicalPath
 {
     Invoke-InstallApplication -Path "$TestDir\..\..\Test\IIS"
-    $website = Get-IisWebsite -SiteName $SiteName 
-    $physicalPath = $website.Applications | 
-                        Where-Object { $_.Path -eq "/$AppName" } |
-                        Select-Object -ExpandProperty VirtualDirectories |
-                        Where-Object { $_.Path -eq "/" } |
+    $physicalPath = Get-IisApplication -SiteName $SiteName -Name $AppName | 
                         Select-Object -ExpandProperty PhysicalPath
     Assert-Like $TestDir $physicalPath
+}
+
+function Test-ShouldChangePathOfExistingApplication
+{
+    Invoke-InstallApplication -Path "$TestDir\..\.."
+    $app = Get-IisApplication -SiteName $SiteName -Name $AppName
+    Assert-NotNull $app
+    Assert-Equal ([IO.Path]::GetFullPath( "$TestDir\..\.." )) $app.PhysicalPath
+
+    Invoke-InstallApplication -Path $TestDir
+    $app = Get-IisApplication -SiteName $SiteName -Name $AppName
+    Assert-NotNull $app
+    Assert-Equal $TestDir $app.PhysicalPath
 }
 
 function Test-ShouldDeleteExistingApplication

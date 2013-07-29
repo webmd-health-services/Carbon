@@ -10,12 +10,17 @@
 
  * Objects returned by [Get-IisWebsite](http://get-carbon.org/help/Get-IisWebsite.html) now have a dynamic `PhysicalPath` script property, so you don't have to traverse down into the default application's default virtual directory object to get it.
  * [Install-IisApplication](http://get-carbon.org/help/Install-IisApplication.html), [Install-IisWebsite](http://get-carbon.org/help/Install-IisWebsite.html), and [Install-IisVirtualDirectory](http://get-carbon.org/help/Install-VirtualDirectory.html) now canonicalize physical paths, i.e. they convert any path with a relative part (e.g. '..') to a full path.  It turns out IIS doesn't like paths with relative parts.
+ * Created [Install-IisApplication](http://get-carbon.org/help/Install-IisApplication.html) function to get a `Microsoft.Web.Administration.Application` object for an IIS application.
  
 ### PowerShell
 
  * Added `ExecutionPolicy` parameter to [Invoke-PowerShell](http://get-carbon.org/help/Invoke-PowerShell.html) to allow setting a custom exeuction policy when using [Invoke-PowerShell](http://get-carbon.org/help/Invoke-PowerShell.html) to run a script.
 
 ## Bug Fixes
+
+### IIS
+
+ * [Install-IisApplication](http://get-carbon.org/help/Install-IisApplication.html) not updating/changing physical path on existing website.
 
 ### .NET
 
