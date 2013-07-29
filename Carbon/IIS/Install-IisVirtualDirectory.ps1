@@ -56,6 +56,6 @@ function Install-IisVirtualDirectory
         Invoke-AppCmd delete vdir $vdirID
     }
     
-    $Path = [IO.Path]::GetFullPath( $Path )
+    $Path = Resolve-FullPath -Path $Path
     Invoke-AppCmd add vdir /app.name:"$SiteName/" / /path:/$Name /physicalPath:"$Path"       
 }

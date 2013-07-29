@@ -53,7 +53,7 @@ function Install-IisApplication
         $AppPoolName
     )
     
-    $Path = [IO.Path]::GetFullPath( $Path )
+    $Path = Resolve-FullPath -Path $Path
     if( -not (Test-Path $Path -PathType Container) )
     {
         $null = New-Item $Path -ItemType Directory
