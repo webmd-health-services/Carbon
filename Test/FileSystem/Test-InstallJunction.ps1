@@ -12,13 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
+# To convert C:\Users\schedu~1 to C:\Users\scheduleuser
+$tempDir = [IO.Path]::GetFullPath( $env:TEMP )
 $junctionPath = $null
 
 function Start-Test
 {
     & (Join-Path $TestDir ..\..\Carbon\Import-Carbon.ps1 -Resolve)
-    $junctionPath = Join-Path $env:Temp ('Carbon_Test-InstallJunction_{0}' -f ([IO.Path]::GetRandomFileName()))
+    $junctionPath = Join-Path $tempDir ('Carbon_Test-InstallJunction_{0}' -f ([IO.Path]::GetRandomFileName()))
     $Error.Clear()
 }
 
@@ -102,7 +103,7 @@ function Test-ShouldFailIfTargetIsAFile
 function Test-ShouldCreateTargetIfItDoesNotExist
 {
     $target = 'Carbon_Test-InstallJunction_{0}' -f [IO.Path]::GetRandomFileName()
-    $target = Join-Path -Path $env:TEMP -ChildPath $target
+    $target = Join-Path -Path $tempDir -ChildPath $target
     Assert-DirectoryDoesNotExist $target
     Install-Junction -Link $junctionPath -Target $target -Force
     Assert-Equal 0 $Error.Count
@@ -111,15 +112,15 @@ function Test-ShouldCreateTargetIfItDoesNotExist
 
 function Test-ShouldCreateJunctionWithRelativePaths
 {
-    Push-Location $env:TEMP
+    Push-Location $tempDir
     try
     {
-        $target = '..\Temp'
+        $target = ('..\{0}' -f (Split-Path -Leaf $tempDir))
         $link = '.\{0}' -f (Split-Path -Leaf -Path $junctionPath)
 
         Install-Junction -Link $link -Target $target
 
-        Assert-Junction -ExpectedTarget $env:Temp
+        Assert-Junction -ExpectedTarget $tempDir
     }
     finally
     {
