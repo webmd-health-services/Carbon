@@ -18,7 +18,7 @@ function Get-IisApplication
     .SYNOPSIS
     Gets an IIS application as an `Application` object.
 
-    .DESCRIPTION.
+    .DESCRIPTION
     Uses the `Microsoft.Web.Administration` API to get an IIS application object.  If the application doesn't exist, `$null` is returned.
 
     The objects returned have two dynamic properties and one dynamic methods added.
