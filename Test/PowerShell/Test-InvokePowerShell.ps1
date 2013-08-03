@@ -173,16 +173,15 @@ function Test-ShouldRunUnderClr2
 function Test-ShouldUseExecutionPolicy
 {
     $Error.Clear()
-    $result = Invoke-PowerShell -FilePath (Join-Path $TestDir Get-PsVersionTable.ps1) -ExecutionPolicy Restricted -ErrorAction SilentlyContinue
-    if( $Host.Name -eq 'ConsoleHost' )
+    $result = Invoke-PowerShell -FilePath (Join-Path $TestDir Get-PsVersionTable.ps1) -ExecutionPolicy Restricted -OutputFormat XML -ErrorAction SilentlyContinue
+    Assert-LastProcessFailed
+    if( $result )
     {
-        Assert-NotNull $result
-        Assert-Like $result[0] '*running scripts is disabled*'
+        Assert-Like $result[0] '*disabled*'
     }
-    else
+    # For some reason, when run under CCNet, $Error doesn't get populated.
+    if( $Error )
     {
-        Assert-Null $result
-        Assert-GreaterThan $Error.Count 0
         Assert-ContainsLike $Error '*disabled*'
     }
 }
