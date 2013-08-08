@@ -79,7 +79,7 @@ function Install-IisApplication
         $app = $apps.CreateElement('application') |
                     Add-IisServerManagerMember -ServerManager $site.ServerManager -PassThru
         $app['path'] = "/{0}" -f $Name
-        $apps.Add( $app )
+        $apps.Add( $app ) | Out-Null
     }
     else
     {
@@ -97,7 +97,7 @@ function Install-IisApplication
         $vdirs = $app.GetCollection()
         $vdir = $vdirs.CreateElement('virtualDirectory')
         $vdir['path'] = '/'
-        $vdirs.Add( $vdir )
+        $vdirs.Add( $vdir ) | Out-Null
     }
     $vdir['physicalPath'] = $Path
     $app.CommitChanges()
