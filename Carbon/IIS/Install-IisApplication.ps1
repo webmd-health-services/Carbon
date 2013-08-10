@@ -66,25 +66,25 @@ function Install-IisApplication
     }
     
     $app = Get-IisApplication -SiteName $SiteName -Name $Name
-    if( -not $app )
+    if( $app )
     {
-        Write-Host ('IIS:/{0}/{1}: creating application: physicalPath: {2}{3}' -f $SiteName,$Name,$Path,$appPoolDesc)
-        $site = Get-IisWebsite -SiteName $SiteName
-        if( -not $site )
-        {
-            Write-Error ('[IIS] Website ''{0}'' not found.' -f $SiteName)
-            return
-        }
-        $apps = $site.GetCollection()
-        $app = $apps.CreateElement('application') |
-                    Add-IisServerManagerMember -ServerManager $site.ServerManager -PassThru
-        $app['path'] = "/{0}" -f $Name
-        $apps.Add( $app ) | Out-Null
+        Write-Host ('IIS://{0}/{1}: deleting application' -f $SiteName,$Name)
+        $app.Delete()
+        $app.CommitChanges()
     }
-    else
+
+    Write-Host ('IIS:/{0}/{1}: creating application: physicalPath: {2}{3}' -f $SiteName,$Name,$Path,$appPoolDesc)
+    $site = Get-IisWebsite -SiteName $SiteName
+    if( -not $site )
     {
-        Write-Host ('IIS:/{0}/{1}: updating application: physicalPath: {2}{3}' -f $SiteName,$Name,$Path,$appPoolDesc)
+        Write-Error ('[IIS] Website ''{0}'' not found.' -f $SiteName)
+        return
     }
+    $apps = $site.GetCollection()
+    $app = $apps.CreateElement('application') |
+                Add-IisServerManagerMember -ServerManager $site.ServerManager -PassThru
+    $app['path'] = "/{0}" -f $Name
+    $apps.Add( $app ) | Out-Null
 
     if( $AppPoolName )
     {
