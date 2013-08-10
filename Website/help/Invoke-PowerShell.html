@@ -59,6 +59,7 @@
 		<ul class="CommandMenu">
 			<li><a href="Disable-NtfsCompression.html">Disable-NtfsCompression</a></li>
 			<li><a href="Enable-NtfsCompression.html">Enable-NtfsCompression</a></li>
+			<li><a href="Install-Junction.html">Install-Junction</a></li>
 			<li><a href="New-Junction.html">New-Junction</a></li>
 			<li><a href="New-TempDir.html">New-TempDir</a></li>
 			<li><a href="Remove-Junction.html">Remove-Junction</a></li>
@@ -87,6 +88,7 @@
 			<li><a href="Enable-IisDirectoryBrowsing.html">Enable-IisDirectoryBrowsing</a></li>
 			<li><a href="Enable-IisSecurityAuthentication.html">Enable-IisSecurityAuthentication</a></li>
 			<li><a href="Enable-IisSsl.html">Enable-IisSsl</a></li>
+			<li><a href="Get-IisApplication.html">Get-IisApplication</a></li>
 			<li><a href="Get-IisAppPool.html">Get-IisAppPool</a></li>
 			<li><a href="Get-IisConfigurationSection.html">Get-IisConfigurationSection</a></li>
 			<li><a href="Get-IisHttpHeader.html">Get-IisHttpHeader</a></li>
@@ -253,7 +255,7 @@
 
         <h2>Syntax</h2>
     <pre class="Syntax"><code>Invoke-PowerShell -ScriptBlock &lt;ScriptBlock&gt; [-ArgumentList &lt;Object[]&gt;] [-OutputFormat &lt;String&gt;] [-x86] [-Runtime &lt;String&gt;] [&lt;CommonParameters&gt;]</code></pre>
-<pre class="Syntax"><code>Invoke-PowerShell -FilePath &lt;String&gt; [-ArgumentList &lt;Object[]&gt;] [-OutputFormat &lt;String&gt;] [-x86] [-Runtime &lt;String&gt;] [&lt;CommonParameters&gt;]</code></pre>
+<pre class="Syntax"><code>Invoke-PowerShell -FilePath &lt;String&gt; [-ArgumentList &lt;Object[]&gt;] [-OutputFormat &lt;String&gt;] [-ExecutionPolicy {Unrestricted | RemoteSigned | AllSigned | Restricted | Default | Bypass | Undefined}] [-x86] [-Runtime &lt;String&gt;] [&lt;CommonParameters&gt;]</code></pre>
     
         <h2>Description</h2>
     <div class="Description">
@@ -262,6 +264,8 @@
 <p>If using PowerShell v3.0, you can <em>only</em> run script blocks under a <code>v4.0</code> CLR.  PowerShell converts script blocks to an encoded command, and when running encoded commands, PowerShell doesn't allow the <code>-Version</code> parameter for running PowerShell under a different version.  To run code under a .NET 2.0 CLR from PowerShell 3, use the <code>FilePath</code> parameter to run a specfic script.</p>
 
 <p>This function launches a PowerShell process that matches the architecture of the <em>operating system</em>.  On 64-bit operating systems, you can run under 32-bit PowerShell by specifying the <code>x86</code> switch).</p>
+
+<p>PowerShell's execution policy has to be set seperately in all architectures (i.e. x86 and x64), so you may get an error message about script being disabled.  Use the <code>-ExecutionPolicy</code> parameter to set a temporary execution policy when running a script.</p>
 
     </div>
     
@@ -314,13 +318,22 @@
                 <td></td>
 			</tr>
 			<tr valign='top'>
+				<td>ExecutionPolicy</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/microsoft.powershell.executionpolicy.aspx">ExecutionPolicy</a></td>
+				<td>The execution policy to use when running a script.  By default, execution policies are set to <code>Restricted</code>. If running an architecture of PowerShell whose execution policy isn't set, <code>Invoke-PowerShell</code> will fail.
+</td>
+				<td>false</td>
+				<td>false</td>
+                <td></td>
+			</tr>
+			<tr valign='top'>
 				<td>x86</td>
 				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
 				<td>Run the x86 (32-bit) version of PowerShell, otherwise the version which matches the OS architecture is run, <em>regardless of the architecture of the currently running process</em>.
 </td>
 				<td>false</td>
 				<td>false</td>
-                <td></td>
+                <td>False</td>
 			</tr>
 			<tr valign='top'>
 				<td>Runtime</td>
@@ -354,6 +367,9 @@
             <p><p>Runs the <code>Set-DotNetConnectionString.ps1</code> script with <code>ArgumentList</code> as arguments/parameters.</p>
 
 <p>Note that you have to double-quote any arguments with spaces.  Otherwise, the argument gets interpreted as multiple arguments.</p>
+</p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 5</h2>
+            <pre><code>Invoke-PowerShell -FilePath Get-PsVersionTable.ps1 -x86 -ExecutionPolicy RemoteSigned</code></pre>
+            <p><p>Shows how to run powershell.exe with a custom executin policy, in case the running of scripts is disabled.</p>
 </p><p></p><p></p><p></p><p></p>
 </body>
 </html>   

@@ -59,6 +59,7 @@
 		<ul class="CommandMenu">
 			<li><a href="Disable-NtfsCompression.html">Disable-NtfsCompression</a></li>
 			<li><a href="Enable-NtfsCompression.html">Enable-NtfsCompression</a></li>
+			<li><a href="Install-Junction.html">Install-Junction</a></li>
 			<li><a href="New-Junction.html">New-Junction</a></li>
 			<li><a href="New-TempDir.html">New-TempDir</a></li>
 			<li><a href="Remove-Junction.html">Remove-Junction</a></li>
@@ -87,6 +88,7 @@
 			<li><a href="Enable-IisDirectoryBrowsing.html">Enable-IisDirectoryBrowsing</a></li>
 			<li><a href="Enable-IisSecurityAuthentication.html">Enable-IisSecurityAuthentication</a></li>
 			<li><a href="Enable-IisSsl.html">Enable-IisSsl</a></li>
+			<li><a href="Get-IisApplication.html">Get-IisApplication</a></li>
 			<li><a href="Get-IisAppPool.html">Get-IisAppPool</a></li>
 			<li><a href="Get-IisConfigurationSection.html">Get-IisConfigurationSection</a></li>
 			<li><a href="Get-IisHttpHeader.html">Get-IisHttpHeader</a></li>
@@ -290,18 +292,20 @@
 			<tr valign='top'>
 				<td>ForUser</td>
 				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
-				<td></td>
+				<td>Encrypts for the current user so that only he can decrypt.
+</td>
 				<td>true</td>
 				<td>false</td>
-                <td></td>
+                <td>False</td>
 			</tr>
 			<tr valign='top'>
 				<td>ForComputer</td>
 				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
-				<td></td>
+				<td>Encrypts for the current computer so that any user logged into the computer can decrypt.
+</td>
 				<td>true</td>
 				<td>false</td>
-                <td></td>
+                <td>False</td>
 			</tr>
             
         </table>

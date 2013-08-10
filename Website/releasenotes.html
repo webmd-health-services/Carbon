@@ -12,7 +12,46 @@
 		<li><a href="http://pshdo.com">-Blog</a></li>
 	</ul>
     
-    <h1>1.3.0 (8 July 2013)</h1>
+    <h1>1.4.0 (10 August 2013)</h1>
+
+<h2>Enhancements</h2>
+
+<h3>File System</h3>
+
+<ul>
+<li>Created <a href="http://get-carbon.org/help/Install-Junction.html">Install-Junction</a> function for creating new and/or updating existing junctions. This is a more idempotent way of creating junctions, as opposed to <a href="http://get-carbon.org/help/New-Junction.html">New-Junction</a> and <a href="http://get-carbon.org/help/Remove-Junction.html">Remove-Junction</a> which report errors if a junction already exists or doesn't exist, respectively.</li>
+</ul>
+
+<h3>IIS</h3>
+
+<ul>
+<li>Objects returned by <a href="http://get-carbon.org/help/Get-IisWebsite.html">Get-IisWebsite</a> now have a dynamic <code>PhysicalPath</code> script property, so you don't have to traverse down into the default application's default virtual directory object to get it.</li>
+<li><a href="http://get-carbon.org/help/Install-IisApplication.html">Install-IisApplication</a>, <a href="http://get-carbon.org/help/Install-IisWebsite.html">Install-IisWebsite</a>, and <a href="http://get-carbon.org/help/Install-VirtualDirectory.html">Install-IisVirtualDirectory</a> now canonicalize physical paths, i.e. they convert any path with a relative part (e.g. '..') to a full path.  It turns out IIS doesn't like paths with relative parts.</li>
+<li>Created <a href="http://get-carbon.org/help/Get-IisApplication.html">Get-IisApplication</a> function to get <code>Microsoft.Web.Administration.Application</code> objects for all or specific applications under a website.</li>
+<li><a href="http://get-carbon.org/help/Install-IisApplication.html">Install-IisApplication</a> now uses the <code>Microsoft.Web.Administration</code> API instead of <code>appcmd.exe</code>.</li>
+</ul>
+
+<h3>PowerShell</h3>
+
+<ul>
+<li>Added <code>ExecutionPolicy</code> parameter to <a href="http://get-carbon.org/help/Invoke-PowerShell.html">Invoke-PowerShell</a> to allow setting a custom exeuction policy when using <a href="http://get-carbon.org/help/Invoke-PowerShell.html">Invoke-PowerShell</a> to run a script.</li>
+</ul>
+
+<h2>Bug Fixes</h2>
+
+<h3>IIS</h3>
+
+<ul>
+<li><a href="http://get-carbon.org/help/Install-IisApplication.html">Install-IisApplication</a> not updating/changing physical path on existing application.</li>
+</ul>
+
+<h3>.NET</h3>
+
+<ul>
+<li><a href="http://get-carbon.org/help/Set-DotNetAppSetting.html">Set-DotNetAppSetting</a> and <a href="http://get-carbon.org/help/Set-DotNetConnectionString.html">Set-DotNetConnectionString</a> failed if setting .NET configuration under an architecture where the PowerShell execution policy doesn't allow running scripts.</li>
+</ul>
+
+<h1>1.3.0 (8 July 2013)</h1>
 
 <h2>Enhancements</h2>
 
