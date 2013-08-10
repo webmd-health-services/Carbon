@@ -33,7 +33,12 @@ function Get-IisApplication
     .EXAMPLE
     Get-IisApplication -SiteName 'DeathStar`
 
-    Gets the application running the `DeathStar` website.
+    Gets all the applications running under the `DeathStar` website.
+
+    .EXAMPLE
+    Get-IisApplication -SiteName 'DeathStar' -Name '/'
+
+    Demonstrates how to get the main application for a website: use `/` as the application name.
 
     .EXAMPLE
     Get-IisApplication -SiteName 'DeathStar' -Name 'MainPort/ExhaustPort'
@@ -44,13 +49,13 @@ function Get-IisApplication
     param(
         [Parameter(Mandatory=$true)]
         [string]
-        # The site where the application should be created.
+        # The site where the application is running.
         $SiteName,
         
         [Parameter()]
         [string]
-        # The name of the application.  Default is `/`, or the application running the website given by the `SiteName` parameter.
-        $Name = '/'
+        # The name of the application.  Default is to return all applications running under the website `$SiteName`.
+        $Name
     )
 
     $site = Get-IisWebsite -SiteName $SiteName
@@ -58,8 +63,15 @@ function Get-IisApplication
     {
         return
     }
+
     $site.Applications |
-        Where-Object { $_.Path -eq "/$Name" } | 
+        Where-Object {
+            if( $Name )
+            {
+                return ($_.Path -eq "/$Name")
+            }
+            return $true
+        } | 
         Add-IisServerManagerMember -ServerManager $site.ServerManager -PassThru |
         Add-Member -MemberType ScriptProperty -Name PhysicalPath -Value {
             $this.VirtualDirectories |
