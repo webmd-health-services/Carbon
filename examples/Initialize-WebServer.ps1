@@ -47,7 +47,8 @@ $deployShareName = 'Deploy'
 Install-Share -Name $deployShareName `
               -Path $websitePath `
               -Description 'Share used by build server to deploy website changes.' `
-              -Permissions "$deploymentWritersGroupName,FULL","$deploymentReadersGroupName,READ"
+              -FullAccess $deploymentWritersGroupName `
+              -ReadAccess $deploymnetReadersGroupName
 
 
 $sslCertPath = 'Path\to\SSL\certificate.cer'
