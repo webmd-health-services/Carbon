@@ -45,9 +45,9 @@ function Remove-Share
     }
 }
 
-function Invoke-NewShare($FullAccess = @(), $ChangeAccess = @(), $ReadAccess = @(), $Remarks = '')
+function Invoke-NewShare($Path = $TestDir, $FullAccess = @(), $ChangeAccess = @(), $ReadAccess = @(), $Remarks = '')
 {
-    Install-SmbShare -Name $ShareName -Path $TestDir -Description $Remarks `
+    Install-SmbShare -Name $ShareName -Path $Path -Description $Remarks `
                      -FullAccess $FullAccess `
                      -ChangeAccess $ChangeAccess `
                      -ReadAccess $ReadAccess 
@@ -125,6 +125,16 @@ function Test-ShouldHandlePathWithTrailingSlash
     Install-SmbShare $ShareName -Path "$TestDir\"
     
     Assert-ShareCreated
+}
+
+function Test-ShouldCreateShareDirectory
+{
+    $tempDir = New-TempDir -Prefix 'Carbon_Test-InstallSmbShare'
+    $shareDir = Join-Path -Path $tempDir -ChildPath 'Grandparent\Parent\Child'
+    Assert-DirectoryDoesNotExist $shareDir
+    Invoke-NewShare -Path $shareDir
+    Assert-ShareCreated
+    Assert-DirectoryExists $shareDir
 }
 
 function Assert-ShareCreated

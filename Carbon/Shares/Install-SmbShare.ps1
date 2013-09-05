@@ -88,6 +88,12 @@ function Install-SmbShare
     $changeAccessArg = ConvertTo-NetShareGrantArg -Name $ChangeAccess -Access 'CHANGE'
     $readAccessArg = ConvertTo-NetShareGrantArg -Name $ReadAccess -Access 'READ'
     $noAccessArg = ConvertTo-NetShareGrantArg -Name $NoAccess -Access 'NONE'
+
+    # Create the share's path if it does not exist.
+    if( -not (Test-Path -Path $Path -PathType Container) )
+    {
+        $null = New-Item -Path $Path -ItemType Directory -Force
+    }
     
     & (Resolve-NetPath) share $Name=$($Path.Trim('\')) /REMARK:$Description $fullAccessArg $changeAccessArg $readAccessArg /CACHE:NONE /UNLIMITED
 }
