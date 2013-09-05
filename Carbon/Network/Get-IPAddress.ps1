@@ -81,6 +81,5 @@ function Get-IPAddress
             }
 
             return $false
-
         }
 }
