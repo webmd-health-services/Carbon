@@ -23,6 +23,8 @@ function Set-IisWebsiteID
 
     If another site already exists with that ID, you'll get an error.
 
+    When you change a website's ID, IIS will stop the site, but not start the site after saving the ID change. This function waits until the site's ID is changed, and then will start the website.
+
     .EXAMPLE
     Set-IisWebsiteID -SiteName Holodeck -ID 483
 
@@ -55,13 +57,58 @@ function Set-IisWebsiteID
     }
 
     $website = Get-IisWebsite -SiteName $SiteName
+    $startWhenDone = $false
     if( $website.ID -ne $ID )
     {
         if( $PSCmdlet.ShouldProcess( ('website {0}' -f $SiteName), ('set site ID to {0}' -f $ID) ) )
         {
+            $startWhenDone = ($website.State -eq 'Started')
             Write-Host ('IIS:/{0}: setting site ID: {1} -> {2}' -f $SiteName,$website.ID,$ID)
             $website.ID = $ID
             $website.CommitChanges()
         }
+    }
+
+    if( $PSBoundParameters.ContainsKey('WhatIf') )
+    {
+        return
+    }
+
+    # Make sure the website's ID gets updated
+    $website = $null
+    $maxTries = 100
+    $numTries = 0
+    do
+    {
+        Start-Sleep -Milliseconds 100
+        $website = Get-IisWebsite -SiteName $SiteName
+        $numTries++
+    }
+    while( $numTries -lt $maxTries -and -not $website -and $website.ID -ne $ID )
+
+    if( -not $website -or $website.ID -ne $ID )
+    {
+        Write-Error ('IIS:/{0}: site ID hasn''t changed to {1} after waiting 10 seconds. Please check IIS configuration.' -f $SiteName,$ID)
+    }
+
+    if( -not $startWhenDone )
+    {
+        return
+    }
+
+    # Now, start the website.
+    $numTries = 0
+    do
+    {
+        $null = $website.Start()
+        Start-Sleep -Milliseconds 100
+        $website = Get-IisWebsite -SiteName $SiteName
+        $numTries++
+    }
+    while( $numTries -lt $maxTries -and -not $website -and $website.State -ne 'Started' )
+
+    if( -not $website -or $website.State -ne 'Started' )
+    {
+        Write-Error ('IIS:/{0}: failed to start website after setting ID to {1}' -f $SiteName,$ID)
     }
 }

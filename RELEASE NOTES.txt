@@ -2,6 +2,10 @@
 
 ## Enhancements
 
+### IIS
+
+ * [Set-IisWebsiteID](http://get-carbon.org/help/Set-IisWebsite.html) now attempts to start a website whose ID has changed since IIS stops a website whenever its ID changes.
+
 ### Network
 
  * Added [Get-IPAddress](http://get-carbon.org/help/Get-IPAddress.html) function for getting the IPv4/IPv6 addresses currently in use on the local computer's network interfaces.
