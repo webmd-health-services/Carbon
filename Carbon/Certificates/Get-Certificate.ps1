@@ -76,7 +76,14 @@ function Get-Certificate
     
     if( $pscmdlet.ParameterSetName -eq 'ByPath' )
     {
-        return New-Object Security.Cryptography.X509Certificates.X509Certificate2 $Path,$Password
+        try
+        {
+            return New-Object Security.Cryptography.X509Certificates.X509Certificate2 $Path,$Password
+        }
+        catch
+        {
+            Write-Error ('Failed to create X509Certificate2 object from certificate at ''{0}'': {1}' -f $Path,$_)
+        }
     }
     else
     {
