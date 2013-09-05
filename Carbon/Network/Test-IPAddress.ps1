@@ -20,6 +20,24 @@ function Test-IPAddress
 
     .DESCRIPTION
     Sometimes its useful to know if an IP address is being used on the local computer.  This function does just that.
+
+    .LINK
+    Test-IPAddress
+
+    .EXAMPLE
+    Test-IPAddress -IPAddress '10.1.2.3'
+
+    Returns `true` if the IP address `10.1.2.3` is being used on the local computer.
+
+    .EXAMPLE
+    Test-IPAddress -IPAddress '::1'
+
+    Demonstrates that you can use IPv6 addresses.
+
+    .EXAMPLE
+    Test-IPAddress -IPAddress ([Net.IPAddress]::Parse('10.5.6.7'))
+
+    Demonstrates that you can use real `System.Net.IPAddress` objects.
     #>
     [CmdletBinding()]
     param(
