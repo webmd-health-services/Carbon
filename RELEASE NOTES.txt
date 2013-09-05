@@ -9,6 +9,10 @@
 ### Network
 
  * Added [Get-IPAddress](http://get-carbon.org/help/Get-IPAddress.html) function for getting the IPv4/IPv6 addresses currently in use on the local computer's network interfaces.
+
+### Path
+
+ * Added [Test-UncPath](http://get-carbon.org/help/Test-UncPath.html) function for testing if a path is a UNC or not.
  
 ### Shares
 
