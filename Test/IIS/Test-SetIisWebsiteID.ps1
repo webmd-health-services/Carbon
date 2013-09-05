@@ -26,8 +26,6 @@ function Setup
 function TearDown
 {
     Remove-IisWebsite $siteName
-    #Remove-IisAppPool $appPoolName
-    Remove-Module Carbon
 }
 
 function Test-ShouldChangeID
@@ -40,8 +38,8 @@ function Test-ShouldChangeID
 
     $updatedSite = Get-IisWebsite -SiteName $siteName
     Assert-Equal $newID $updatedSite.ID
+    Assert-Equal 'Started' $updatedSite.State
 }
-
 
 function Test-ShouldDetectDuplicateIDs
 {
@@ -84,4 +82,5 @@ function Test-ShouldSetSameIDOnSameWebsite
     Assert-Equal 0 $Error.Count
     $updatedSite = Get-IisWebsite -SiteName $siteName
     Assert-Equal $currentSite.ID $updatedSite.ID
+    Assert-Equal 'Started' $updatedSite.State
 }
