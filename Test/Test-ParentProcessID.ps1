@@ -27,10 +27,13 @@ function Test-ProcessesHaveParentProcessID
     Get-WmiObject Win32_Process |
         ForEach-Object { $parents[$_.ProcessID] = $_.ParentProcessID }
 
+    $foundSome = $false
     Get-Process | 
-        Where-Object { $parents.ContainsKey( [UInt32]$_.Id ) } |
+        Where-Object { $parents.ContainsKey( [UInt32]$_.Id ) -and $_.ParentProcessID } |
         ForEach-Object {
-            #Assert-IsNotNull $_.ParentProcessID 
-            Assert-Equal $parents[ [UInt32]$_.Id ] $_.ParentProcessID "Process $($_.Name) [$($_.ID)] does not have parent process ID '$($_.ParentPRocessID)'."
+            $foundSome = $true
+            $expectedID = $parents[ [UInt32]$_.Id ]  
+            Assert-Equal $expectedID $_.ParentProcessID "Process $($_.Name) [$($_.ID)] does not have expected parent process ID'."
         }
+    Assert-True $foundSome 'Didn''t find any processes with parent IDs.'
 }
