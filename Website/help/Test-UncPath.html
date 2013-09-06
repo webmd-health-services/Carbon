@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-    <title>PowerShell - Get-TrustedHost - Carbon</title>
+    <title>PowerShell - Test-UncPath - Carbon</title>
 	<link href="styles.css" type="text/css" rel="stylesheet" />
 </head>
 <body>
@@ -255,39 +255,62 @@
 </div>
 
 
-    <h1>Get-TrustedHost</h1>
-    <div><p>Returns the current computer's trusted hosts list.</p>
+    <h1>Test-UncPath</h1>
+    <div><p>Tests if a path is a UNC path.</p>
 </div>
 
         <h2>Syntax</h2>
-    <pre class="Syntax"><code>Get-TrustedHost [&lt;CommonParameters&gt;]</code></pre>
+    <pre class="Syntax"><code>Test-UncPath [-Path] &lt;String&gt; [&lt;CommonParameters&gt;]</code></pre>
     
         <h2>Description</h2>
     <div class="Description">
-        <p>PowerShell stores its trusted hosts list as a comma-separated list of hostnames in the <code>WSMan</code> drive.  That's not very useful.  This function reads that list, splits it, and returns each item.</p>
+        <p>Converts the path to a URI and returns the value of its <code>IsUnc</code> property.</p>
+
+<p>This function does not test if path exists.  Use <code>Test-Path</code> for that.</p>
 
     </div>
     
-    
+            <h2>Related Commands</h2>
+        <ul>
+<li><a href="Test-Path.html">Test-Path</a></li>
+<li><a href="http://blogs.microsoft.co.il/blogs/ScriptFanatic//archive/2010/05/27/quicktip-how-to-validate-a-unc-path.aspx">http://blogs.microsoft.co.il/blogs/ScriptFanatic//archive/2010/05/27/quicktip-how-to-validate-a-unc-path.aspx</a></li>
+</ul>
 
-    
+
+    		<h2> Parameters </h2>
+		<table border='1'>
+			<tr>
+				<th>Name</th>
+                <th>Type</th>
+				<th>Description</th>
+				<th>Required?</th>
+				<th>Pipeline Input</th>
+				<th>Default Value</th>
+			</tr>
+            			<tr valign='top'>
+				<td>Path</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+				<td>The path to test/check.
+</td>
+				<td>true</td>
+				<td>false</td>
+                <td></td>
+			</tr>
+            
+        </table>
         
     
         
-            <h2>Return Values</h2>
-        <p><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">System.String</a>. </p>
-
+    
         
     
         
                 <h2>EXAMPLE 1</h2>
-            <pre><code>Get-TrustedHost</code></pre>
-            <p><p>If the trusted hosts lists contains <code>example.com</code>, <code>api.example.com</code>, and <code>docs.example.com</code>, returns the following:</p>
-
-<pre><code>example.com
-api.example.com
-docs.example.com
-</code></pre>
+            <pre><code>Test-UncPath -Path '\\computer\share'</code></pre>
+            <p><p>Returns <code>true</code> since <code>\\computer\share</code> is a UNC path.  Note that <code>Test-UncPath</code> does not have to exist.</p>
+</p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 2</h2>
+            <pre><code>Test-UncPath -Path 'C:\Windows'</code></pre>
+            <p><p>Returns <code>false</code> since <code>C:\Windows</code> is not a UNC path.</p>
 </p><p></p><p></p><p></p><p></p>
 </body>
 </html>   

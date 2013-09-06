@@ -12,7 +12,56 @@
 		<li><a href="http://pshdo.com">-Blog</a></li>
 	</ul>
     
-    <h1>1.4.0 (10 August 2013)</h1>
+    <h1>1.5.0 (6 September 2013)</h1>
+
+<h2>Enhancements</h2>
+
+<h3>IIS</h3>
+
+<ul>
+<li><a href="http://get-carbon.org/help/Set-IisWebsite.html">Set-IisWebsiteID</a> now attempts to start a website whose ID has changed since IIS stops a website whenever its ID changes.</li>
+</ul>
+
+<h3>Network</h3>
+
+<ul>
+<li>Added <a href="http://get-carbon.org/help/Get-IPAddress.html">Get-IPAddress</a> function for getting the IPv4/IPv6 addresses currently in use on the local computer's network interfaces.</li>
+<li>Added <a href="http://get-carbon.org/help/Test-IPAddress.html">Test-IPAddress</a> function for testing if an IP address is in use on one the local computer's network interfaces.</li>
+</ul>
+
+<h3>Path</h3>
+
+<ul>
+<li>Added <a href="http://get-carbon.org/help/Test-UncPath.html">Test-UncPath</a> function for testing if a path is a UNC or not.</li>
+</ul>
+
+<h3>PowerShell</h3>
+
+<ul>
+<li><a href="http://get-carbon.org/help/Invoke-PowerShell.html">Invoke-PowerShell</a> now runs script blocks in PowerShell 3 under a v2.0 CLR.</li>
+</ul>
+
+<h3>Shares</h3>
+
+<ul>
+<li><a href="http://get-carbon.org/help/Get-IPAddress.html">Install-SmbShare</a> now creates the share's directory if it doesn't exist.</li>
+</ul>
+
+<h2>Bug Fixes</h2>
+
+<h3>Certificates</h3>
+
+<ul>
+<li><a href="http://get-carbon.org/help/Get-Certificate.html">Get-Certificate</a> throws an exception and halts script execution when loading a certificate file with a private key and the user doesn't have permission to write to Windows' MachineKeys directory.</li>
+</ul>
+
+<h3>PowerShell</h3>
+
+<ul>
+<li><a href="http://get-carbon.org/help/Invoke-PowerShell.html">Invoke-PowerShell</a> doesn't run under a v2.0 CLR when using parameters <code>-Runtime 'v2.0'</code>.</li>
+</ul>
+
+<h1>1.4.0 (10 August 2013)</h1>
 
 <h2>Enhancements</h2>
 
