@@ -11,20 +11,20 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 $appSettingName = "TEST_APP_SETTING_NAME"
 $appSettingValue = "TEST_APP_SETTING_VALUE"
 $appSettingNewValue = "TEST_APP_SETTING_VALUE"
 
 function Setup
 {
-    Import-Module (Join-Path $TestDir ..\..\Carbon) -Force
+    & (Join-Path -Path $TestDir -ChildPath ..\..\Carbon\Import-Carbon.ps1 -Resolve)
     Remove-AppSetting
 }
 
 function TearDown
 {
     Remove-AppSetting
-    Remove-Module Carbon
 }
 
 function Remove-AppSetting
@@ -46,8 +46,8 @@ function Remove-AppSetting
         }
     }
     
-    Invoke-PowerShell -Command $command -Args $appSettingName -x86 
-    Invoke-PowerShell -Command $command -Args $appSettingName 
+    Invoke-PowerShell -Command $command -Args $appSettingName -x86 -Runtime 'v2.0'
+    Invoke-PowerShell -Command $command -Args $appSettingName -Runtime 'v2.0'
     Invoke-PowerShell -Command $command -Args $appSettingName -x86 -Runtime 'v4.0'
     Invoke-PowerShell -Command $command -Args $appSettingName -Runtime 'v4.0'
 }
