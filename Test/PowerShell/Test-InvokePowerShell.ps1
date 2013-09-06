@@ -12,14 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+$ps3Installed = $false
+
 function Setup
 {
-    Import-Module (Join-Path $TestDir ..\..\Carbon) -Force
+    & (Join-Path -Path $TestDir -ChildPath ..\..\Carbon\Import-Carbon.ps1 -Resolve)
+    $ps3Installed = Test-Path -Path HKLM:\SOFTWARE\Microsoft\PowerShell\3
 }
 
 function TearDown
 {
-    Remove-Module Carbon
 }
 
 function Test-ShouldInvokePowerShell
@@ -32,7 +34,7 @@ function Test-ShouldInvokePowerShell
         $Argument
     }
     
-    $result = Invoke-PowerShell -Command $command -Args 'Hello World!'
+    $result = Invoke-PowerShell -ScriptBlock $command -Args 'Hello World!'
     Assert-Equal 'Hello world!' $result
 }
 
@@ -42,34 +44,54 @@ function Test-ShouldInvokePowerShellx86
         $env:PROCESSOR_ARCHITECTURE
     }
     
-    $result = Invoke-PowerShell -Command $command -x86
+    $result = Invoke-PowerShell -ScriptBlock $command -x86
     Assert-Equal 'x86' $result
 }
 
-if( $PSVersionTable.PSVersion -eq '3.0' )
+if( Test-Path -Path HKLM:\SOFTWARE\Microsoft\PowerShell\3 )
 {
-    function Test-ShouldNotRunPowerShellUnderCLR2
+    if( $Host.Name -eq 'Windows PowerShell ISE Host' )
     {
-        $command = {
-            $PSVersionTable.CLRVersion
-        }
+        function Test-ShouldNotRunScriptBlockUnderV2ISEClr2
+        {
+            $command = {
+                $PSVersionTable.CLRVersion
+            }
     
-        $error.Clear()
-        $result = Invoke-PowerShell -Command $command -Runtime v2.0 -ErrorAction SilentlyContinue
-        Assert-Equal 1 $error.Count
-        Assert-Null $result
-        Assert-Null ([Environment]::GetEnvironmentVariable('COMPLUS_ApplicationMigrationRuntimeActivationConfigPath'))
+            $error.Clear()
+            $result = Invoke-PowerShell -ScriptBlock $command -Runtime v2.0 -ErrorAction SilentlyContinue
+            Assert-Equal 1 $error.Count
+            Assert-Null $result
+            Assert-Null ([Environment]::GetEnvironmentVariable('COMPLUS_ApplicationMigrationRuntimeActivationConfigPath'))
+        }
+    }
+    else
+    {
+        function Test-ShouldRunScriptBlockUnderV3ConsoleClr2
+        {
+            $command = {
+                $PSVersionTable.CLRVersion
+            }
+    
+            $error.Clear()
+            $result = Invoke-PowerShell -ScriptBlock $command -Runtime v2.0 
+            Assert-Equal 0 $error.Count
+            Assert-NotNull $result
+            Assert-Equal 2 $result.Major
+            Assert-Null ([Environment]::GetEnvironmentVariable('COMPLUS_ApplicationMigrationRuntimeActivationConfigPath'))
+        }
     }
 }
 else
 {
-    function Test-ShouldRunPowerShellUnderCLR2
+    function Test-ShouldRunScriptBlockUnderV2ConsoleClr2
     {
         $command = {
             $PSVersionTable.CLRVersion
         }
     
-        $result = Invoke-PowerShell -Command $command
+        $result = Invoke-PowerShell -ScriptBlock $command
+        $expectedClr = 2
         Assert-Equal 2 $result.Major
         Assert-Null ([Environment]::GetEnvironmentVariable('COMPLUS_ApplicationMigrationRuntimeActivationConfigPath'))
     }
@@ -91,7 +113,7 @@ function Test-ShouldRunx64PowerShellFromx86PowerShell
     if( (Test-OsIs64Bit) -and (Test-PowerShellIs32Bit) )
     {
         $error.Clear()
-        $result = Invoke-PowerShell -Command { $env:PROCESSOR_ARCHITECTURE } -ErrorAction SilentlyContinue
+        $result = Invoke-PowerShell -ScriptBlock { $env:PROCESSOR_ARCHITECTURE } -ErrorAction SilentlyContinue
         Assert-Equal 0 $error.Count
         Assert-Equal 'AMD64' $result
     }
@@ -107,7 +129,7 @@ function Test-ShouldRunx86PowerShellFromx86PowerShell
     if( (Test-OsIs64Bit) -and (Test-PowerShellIs32Bit) )
     {
         $error.Clear()
-        $result = Invoke-PowerShell -Command { $env:ProgramFiles } -x86
+        $result = Invoke-PowerShell -ScriptBlock { $env:ProgramFiles } -x86
         Assert-Equal 0 $error.Count
         Assert-True ($result -like '*Program Files (x86)*')
     }
@@ -119,12 +141,22 @@ function Test-ShouldRunx86PowerShellFromx86PowerShell
 
 function Test-ShouldRunScript
 {
-    $result = Invoke-PowerShell -FilePath (Join-Path $TestDir Get-PSVersionTable.ps1) -OutputFormat XML
+    $result = Invoke-PowerShell -FilePath (Join-Path $TestDir Get-PSVersionTable.ps1) `
+                                -OutputFormat XML `
+                                -ExecutionPolicy RemoteSigned
     Assert-Equal 3 $result.Length
     Assert-Equal '' $result[0]
     Assert-NotNull $result[1]
-    Assert-Equal $PSVersionTable.PSVersion $result[1].PSVersion
-    Assert-Equal $PSVersionTAble.CLRVersion $result[1].CLRVersion
+    if( $ps3Installed )
+    {
+        Assert-Equal 3 $result[1].PSVersion.Major
+        Assert-Equal 4 $result[1].CLRVersion.Major
+    }
+    else
+    {
+        Assert-Equal $PSVersionTable.PSVersion $result[1].PSVersion
+        Assert-Equal $PSVersionTAble.CLRVersion $result[1].CLRVersion
+    }
     Assert-NotNull $result[2]
     $architecture = 'AMD64'
     if( Test-OSIs32Bit )
@@ -138,19 +170,29 @@ function Test-ShouldRunScriptWithArguments
 {
     $result = Invoke-PowerShell -FilePath (Join-Path $TestDir Get-PSVersionTable.ps1) `
                                 -OutputFormat XML `
-                                -ArgumentList '-Message',"'Hello World'"
+                                -ArgumentList '-Message',"'Hello World'" `
+                                -ExecutionPolicy RemoteSigned
     Assert-Equal 3 $result.Length
-    Assert-Equal 'Hello World' $result[0]
+    Assert-Equal "'Hello World'" $result[0]
     Assert-NotNull $result[1]
-    Assert-Equal $PSVersionTable.PSVersion $result[1].PSVersion
-    Assert-Equal $PSVersionTAble.CLRVersion $result[1].CLRVersion
+    if( $ps3Installed )
+    {
+        Assert-Equal 3 $result[1].PSVersion.Major
+        Assert-Equal 4 $result[1].CLRVersion.Major
+    }
+    else
+    {
+        Assert-Equal $PSVersionTable.PSVersion $result[1].PSVersion
+        Assert-Equal $PSVersionTAble.CLRVersion $result[1].CLRVersion
+    }
 }
 
 function Test-ShouldRunScriptUnderPowerShell2
 {
     $result = Invoke-PowerShell -FilePath (Join-Path $TestDir Get-PSVersionTable.ps1) `
                                 -OutputFormat XML `
-                                -x86
+                                -x86 `
+                                -ExecutionPolicy RemoteSigned
     Assert-Equal 'x86' $result[2]
 }
 
@@ -158,7 +200,8 @@ function Test-ShouldRunUnderClr4
 {
     $result = Invoke-PowerShell -FilePath (Join-Path $TestDir Get-PSVersionTable.ps1) `
                                 -OutputFormat XML `
-                                -Runtime 'v4.0'
+                                -Runtime 'v4.0' `
+                                -ExecutionPolicy RemoteSigned
     Assert-Like $result[1].CLRVersion '4.0.*' 
 }
 
@@ -166,19 +209,25 @@ function Test-ShouldRunUnderClr2
 {
     $result = Invoke-PowerShell -FilePath (Join-Path $TestDir Get-PSVersionTable.ps1) `
                                 -OutputFormat XML `
-                                -Runtime 'v2.0'
-    Assert-LIke $result[1].CLRVersion '2.0.*'
+                                -Runtime 'v2.0' `
+                                -ExecutionPolicy RemoteSigned
+    Assert-NotNull $result
+    Assert-Like $result[1].CLRVersion '2.0.*'
 }
 
 function Test-ShouldUseExecutionPolicy
 {
     $Error.Clear()
-    $result = Invoke-PowerShell -FilePath (Join-Path $TestDir Get-PsVersionTable.ps1) -ExecutionPolicy Restricted -OutputFormat XML -ErrorAction SilentlyContinue
-    Assert-LastProcessFailed
+    $result = Invoke-PowerShell -FilePath (Join-Path $TestDir Get-PsVersionTable.ps1) `
+                                -ExecutionPolicy Restricted `
+                                -ErrorAction SilentlyContinue 
+    #Assert-LastProcessFailed
+
     if( $result )
     {
         Assert-Like $result[0] '*disabled*'
     }
+
     # For some reason, when run under CCNet, $Error doesn't get populated.
     if( $Error )
     {

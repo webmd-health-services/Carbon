@@ -15,6 +15,10 @@
 
  * Added [Test-UncPath](http://get-carbon.org/help/Test-UncPath.html) function for testing if a path is a UNC or not.
  
+### PowerShell
+
+ * [Invoke-PowerShell](http://get-carbon.org/help/Invoke-PowerShell.html) now runs script blocks in PowerShell 3 under a v2.0 CLR.
+
 ### Shares
 
  * [Install-SmbShare](http://get-carbon.org/help/Get-IPAddress.html) now creates the share's directory if it doesn't exist.
@@ -24,6 +28,10 @@
 ### Certificates
 
  * [Get-Certificate](http://get-carbon.org/help/Get-Certificate.html) throws an exception and halts script execution when loading a certificate file with a private key and the user doesn't have permission to write to Windows' MachineKeys directory.
+ 
+### PowerShell
+
+ * [Invoke-PowerShell](http://get-carbon.org/help/Invoke-PowerShell.html) doesn't run under a v2.0 CLR when using parameters `-Runtime 'v2.0'`.
  
  
 # 1.4.0 (10 August 2013)
