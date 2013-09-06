@@ -12,20 +12,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
-function SetUp()
+function Start-Test()
 {
-    Import-Module (Join-Path $TestDir ..\Carbon -Resolve)
+    & (Join-Path -Path $TestDir -ChildPath ..\Carbon\Import-Carbon.ps1 -Resolve)
 }
 
-function TearDown()
+function Stop-Test()
 {
-    Remove-Module Carbon
 }
 
 function Test-ProcessesHaveParentProcessID
 {
-    Get-Process | % {
-        Assert-IsNotNull $_.ParentProcessID "Process $($_.Name) does not have a parent."
-    }
+    $parents = @{}
+    Get-WmiObject Win32_Process |
+        ForEach-Object { $parents[$_.ProcessID] = $_.ParentProcessID }
+
+    Get-Process | 
+        Where-Object { $parents.ContainsKey( [UInt32]$_.Id ) } |
+        ForEach-Object {
+            #Assert-IsNotNull $_.ParentProcessID 
+            Assert-Equal $parents[ [UInt32]$_.Id ] $_.ParentProcessID "Process $($_.Name) [$($_.ID)] does not have parent process ID '$($_.ParentPRocessID)'."
+        }
 }

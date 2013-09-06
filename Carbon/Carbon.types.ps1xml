@@ -21,7 +21,9 @@
             <ScriptProperty>
                 <Name>ParentProcessID</Name>
                 <GetScriptBlock>
-                    (Get-WmiObject Win32_Process -f "ProcessID='$($_.Id)'").ParentProcessID
+                    $filter = "ProcessID='{0}'" -f $this.Id
+                    $process = Get-WmiObject Win32_Process -Filter $filter
+                    $process.ParentProcessID
                 </GetScriptBlock>
             </ScriptProperty>
         </Members>
