@@ -100,7 +100,19 @@ function Set-IisWebsiteID
     $numTries = 0
     do
     {
-        $null = $website.Start()
+        # Sometimes, the website is invalid and Start() throws an exception.
+        try
+        {
+            if( $website )
+            {
+                $null = $website.Start()
+            }
+        }
+        catch
+        {
+            $website = $null
+        }
+
         Start-Sleep -Milliseconds 100
         $website = Get-IisWebsite -SiteName $SiteName
         $numTries++
