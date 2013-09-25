@@ -64,7 +64,7 @@ function Install-SmbShare
             $Name,
             
             [string]
-            [ValidateSet('FULL','CHANGE','READ','NONE')]
+            [ValidateSet('FULL','CHANGE','READ')]
             $Access
         )
         $Name | ForEach-Object {
@@ -87,7 +87,6 @@ function Install-SmbShare
     $fullAccessArg = ConvertTo-NetShareGrantArg -Name $FullAccess -Access 'FULL'
     $changeAccessArg = ConvertTo-NetShareGrantArg -Name $ChangeAccess -Access 'CHANGE'
     $readAccessArg = ConvertTo-NetShareGrantArg -Name $ReadAccess -Access 'READ'
-    $noAccessArg = ConvertTo-NetShareGrantArg -Name $NoAccess -Access 'NONE'
 
     # Create the share's path if it does not exist.
     if( -not (Test-Path -Path $Path -PathType Container) )

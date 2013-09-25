@@ -1,3 +1,12 @@
+# 1.5.1
+
+## Bug Fixes
+
+### Shares
+
+ * [Install-SmbShare](http://get-carbon.org/help/Install-SmbShare.html) has an unused variable which uses an undefined variable to create its value.  When running in strict mode, PowerShell writes an error about using the undefined variable.  Removed the unused variable.
+ 
+ 
 # 1.5.0 (6 September 2013)
 
 ## Enhancements
