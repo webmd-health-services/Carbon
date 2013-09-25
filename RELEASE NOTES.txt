@@ -4,7 +4,7 @@
 
 ### IIS
 
- * [Set-IisWebsiteID](http://get-carbon.org/help/Set-IisWebsite.html) now attempts to start a website whose ID has changed since IIS stops a website whenever its ID changes.
+ * [Set-IisWebsiteID](http://get-carbon.org/help/Set-IisWebsiteID.html) now attempts to start a website whose ID has changed, since IIS stops a website whenever its ID changes.
 
 ### Network
 
@@ -21,13 +21,13 @@
 
 ### Shares
 
- * [Install-SmbShare](http://get-carbon.org/help/Get-IPAddress.html) now creates the share's directory if it doesn't exist.
+ * [Install-SmbShare](http://get-carbon.org/help/Install-SmbShare.html) now creates the share's directory if it doesn't exist.
 
 ## Bug Fixes
 
 ### Certificates
 
- * [Get-Certificate](http://get-carbon.org/help/Get-Certificate.html) throws an exception and halts script execution when loading a certificate file with a private key and the user doesn't have permission to write to Windows' MachineKeys directory.
+ * [Get-Certificate](http://get-carbon.org/help/Get-Certificate.html) throws an exception and halts script execution when loading a certificate file with a private key and the user doesn't have permission to write to Windows' MachineKeys directory.  It now writes an error instead.
  
 ### PowerShell
 
