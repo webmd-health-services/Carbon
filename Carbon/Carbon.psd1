@@ -25,7 +25,7 @@
 ModuleToProcess = 'Carbon.psm1'
 
 # Version number of this module.
-ModuleVersion = '1.5.0'
+ModuleVersion = '1.5.1'
 
 # ID used to uniquely identify this module
 GUID = '075d9444-c01b-48c3-889a-0b3490716fa2'
@@ -37,7 +37,7 @@ Author = 'Aaron Jensen'
 CompanyName = ''
 
 # Copyright statement for this module
-Copyright = '(c) 2011 Aaron Jensen. All rights reserved.'
+Copyright = '(c) 2011 - 2013 Aaron Jensen. All rights reserved.'
 
 # Description of the functionality provided by this module
 Description = 'PowerShell Setup Module'
