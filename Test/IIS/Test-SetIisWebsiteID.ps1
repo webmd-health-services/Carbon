@@ -34,7 +34,7 @@ function Test-ShouldChangeID
     Assert-NotNull $currentSite
 
     $newID = $currentSite.ID * 3571
-    Set-IisWebsiteID -SiteName $siteName -ID $newID
+    Set-IisWebsiteID -SiteName $siteName -ID $newID -ErrorAction SilentlyContinue
 
     $updatedSite = Get-IisWebsite -SiteName $siteName
     Assert-Equal $newID $updatedSite.ID
@@ -69,7 +69,7 @@ function Test-ShouldHandleNonExistentWebsite
 function Test-ShouldSupportWhatIf
 {
     $currentSite = Get-IisWebsite -SiteName $siteName
-    Set-IisWebsiteID -SiteName $siteName -ID ($currentSite.ID * 3571) -WhatIf
+    Set-IisWebsiteID -SiteName $siteName -ID ($currentSite.ID * 3571) -WhatIf -ErrorAction SilentlyContinue
     $updatedsite = Get-IisWebsite -SiteName $siteName
     Assert-Equal $currentSite.ID $updatedsite.ID
 }
@@ -78,7 +78,7 @@ function Test-ShouldSetSameIDOnSameWebsite
 {
     $Error.Clear()
     $currentSite = Get-IisWebsite -SiteName $siteName
-    Set-IisWebsiteID -SiteName $siteName -ID $currentSite.ID
+    Set-IisWebsiteID -SiteName $siteName -ID $currentSite.ID -ErrorAction SilentlyContinue
     Assert-Equal 0 $Error.Count
     $updatedSite = Get-IisWebsite -SiteName $siteName
     Assert-Equal $currentSite.ID $updatedSite.ID
