@@ -12,14 +12,30 @@
 		<li><a href="http://pshdo.com">-Blog</a></li>
 	</ul>
     
-    <h1>1.5.0 (6 September 2013)</h1>
+    <h1>1.5.1 (3 October 2013)</h1>
+
+<h2>Bug Fixes</h2>
+
+<h3>IIS</h3>
+
+<ul>
+<li><a href="http://get-carbon.org/help/Set-IisWebsiteID.html">Set-IisWebsiteID</a> wasn't consistently starting a website after changing its ID.</li>
+</ul>
+
+<h3>Shares</h3>
+
+<ul>
+<li><a href="http://get-carbon.org/help/Install-SmbShare.html">Install-SmbShare</a> has an unused variable which uses an undefined variable to create its value.  When running in strict mode, PowerShell writes an error about using the undefined variable.  Removed the unused variable.</li>
+</ul>
+
+<h1>1.5.0 (6 September 2013)</h1>
 
 <h2>Enhancements</h2>
 
 <h3>IIS</h3>
 
 <ul>
-<li><a href="http://get-carbon.org/help/Set-IisWebsite.html">Set-IisWebsiteID</a> now attempts to start a website whose ID has changed since IIS stops a website whenever its ID changes.</li>
+<li><a href="http://get-carbon.org/help/Set-IisWebsiteID.html">Set-IisWebsiteID</a> now attempts to start a website whose ID has changed, since IIS stops a website whenever its ID changes.</li>
 </ul>
 
 <h3>Network</h3>
@@ -44,7 +60,7 @@
 <h3>Shares</h3>
 
 <ul>
-<li><a href="http://get-carbon.org/help/Get-IPAddress.html">Install-SmbShare</a> now creates the share's directory if it doesn't exist.</li>
+<li><a href="http://get-carbon.org/help/Install-SmbShare.html">Install-SmbShare</a> now creates the share's directory if it doesn't exist.</li>
 </ul>
 
 <h2>Bug Fixes</h2>
@@ -52,7 +68,7 @@
 <h3>Certificates</h3>
 
 <ul>
-<li><a href="http://get-carbon.org/help/Get-Certificate.html">Get-Certificate</a> throws an exception and halts script execution when loading a certificate file with a private key and the user doesn't have permission to write to Windows' MachineKeys directory.</li>
+<li><a href="http://get-carbon.org/help/Get-Certificate.html">Get-Certificate</a> throws an exception and halts script execution when loading a certificate file with a private key and the user doesn't have permission to write to Windows' MachineKeys directory.  It now writes an error instead.</li>
 </ul>
 
 <h3>PowerShell</h3>
