@@ -2,6 +2,10 @@
 
 ## Bug Fixes
 
+### IIS
+
+ * [Set-IisWebsiteID](http://get-carbon.org/help/Set-IisWebsiteID.html) wasn't consistently starting a website after changing its ID.
+
 ### Shares
 
  * [Install-SmbShare](http://get-carbon.org/help/Install-SmbShare.html) has an unused variable which uses an undefined variable to create its value.  When running in strict mode, PowerShell writes an error about using the undefined variable.  Removed the unused variable.
