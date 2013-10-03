@@ -143,7 +143,8 @@ function Test-ShouldRunScript
 {
     $result = Invoke-PowerShell -FilePath (Join-Path $TestDir Get-PSVersionTable.ps1) `
                                 -OutputFormat XML `
-                                -ExecutionPolicy RemoteSigned
+                                -ExecutionPolicy RemoteSigned `
+                                -ErrorAction SilentlyContinue 2> $null
     Assert-Equal 3 $result.Length
     Assert-Equal '' $result[0]
     Assert-NotNull $result[1]
@@ -171,7 +172,8 @@ function Test-ShouldRunScriptWithArguments
     $result = Invoke-PowerShell -FilePath (Join-Path $TestDir Get-PSVersionTable.ps1) `
                                 -OutputFormat XML `
                                 -ArgumentList '-Message',"'Hello World'" `
-                                -ExecutionPolicy RemoteSigned
+                                -ExecutionPolicy RemoteSigned `
+                                -ErrorAction SilentlyContinue 2> $null
     Assert-Equal 3 $result.Length
     Assert-Equal "'Hello World'" $result[0]
     Assert-NotNull $result[1]
@@ -192,7 +194,8 @@ function Test-ShouldRunScriptUnderPowerShell2
     $result = Invoke-PowerShell -FilePath (Join-Path $TestDir Get-PSVersionTable.ps1) `
                                 -OutputFormat XML `
                                 -x86 `
-                                -ExecutionPolicy RemoteSigned
+                                -ExecutionPolicy RemoteSigned `
+                                -ErrorAction SilentlyContinue 2> $null
     Assert-Equal 'x86' $result[2]
 }
 
@@ -201,7 +204,8 @@ function Test-ShouldRunUnderClr4
     $result = Invoke-PowerShell -FilePath (Join-Path $TestDir Get-PSVersionTable.ps1) `
                                 -OutputFormat XML `
                                 -Runtime 'v4.0' `
-                                -ExecutionPolicy RemoteSigned
+                                -ExecutionPolicy RemoteSigned `
+                                -ErrorAction SilentlyContinue 2> $null
     Assert-Like $result[1].CLRVersion '4.0.*' 
 }
 
@@ -210,7 +214,8 @@ function Test-ShouldRunUnderClr2
     $result = Invoke-PowerShell -FilePath (Join-Path $TestDir Get-PSVersionTable.ps1) `
                                 -OutputFormat XML `
                                 -Runtime 'v2.0' `
-                                -ExecutionPolicy RemoteSigned
+                                -ExecutionPolicy RemoteSigned `
+                                -ErrorAction SilentlyContinue 2> $null
     Assert-NotNull $result
     Assert-Like $result[1].CLRVersion '2.0.*'
 }
@@ -220,7 +225,7 @@ function Test-ShouldUseExecutionPolicy
     $Error.Clear()
     $result = Invoke-PowerShell -FilePath (Join-Path $TestDir Get-PsVersionTable.ps1) `
                                 -ExecutionPolicy Restricted `
-                                -ErrorAction SilentlyContinue 
+                                -ErrorAction SilentlyContinue 2> $null
     #Assert-LastProcessFailed
 
     if( $result )
