@@ -82,9 +82,13 @@ function Set-IisWebsiteID
     {
         Start-Sleep -Milliseconds 100
         $website = Get-IisWebsite -SiteName $SiteName
+        if( $website -and $website.ID -eq $ID )
+        {
+            break
+        }
         $numTries++
     }
-    while( $numTries -lt $maxTries -and -not $website -and $website.ID -ne $ID )
+    while( $numTries -lt $maxTries )
 
     if( -not $website -or $website.ID -ne $ID )
     {
@@ -115,9 +119,13 @@ function Set-IisWebsiteID
 
         Start-Sleep -Milliseconds 100
         $website = Get-IisWebsite -SiteName $SiteName
+        if( $website -and $website.State -eq 'Started' )
+        {
+            break
+        }
         $numTries++
     }
-    while( $numTries -lt $maxTries -and -not $website -and $website.State -ne 'Started' )
+    while( $numTries -lt $maxTries )
 
     if( -not $website -or $website.State -ne 'Started' )
     {
