@@ -17,15 +17,14 @@ $serviceName = ''
 $serviceAcct = 'CrbnInstllSvcTstAcct'
 $servicePassword = [Guid]::NewGuid().ToString().Substring(0,14)
 
-function Setup
+function Start-Test
 {
     $serviceName = 'CarbonTestService' + ([Guid]::NewGuid().ToString())
-    Import-Module (Join-Path $TestDir ..\..\Carbon) -Force
+    & (Join-Path -Path $TestDir -ChildPath '..\..\Carbon\Import-Carbon.ps1' -Resolve)
     Install-User -Username $serviceAcct -Password $servicePassword -Description "Account for testing the Carbon Install-Service function."
-
 }
 
-function TearDown
+function Stop-Test
 {
     Uninstall-Service $serviceName
     Uninstall-User $serviceAcct
@@ -135,6 +134,27 @@ function Test-ShouldTestDependenciesExist
     Install-Service -Name $serviceName -Path $servicePath -Dependencies IAmAServiceThatDoesNotExist -ErrorAction SilentlyContinue
     Assert-Equal 1 $error.Count
     Assert-False (Test-Service -Name $serviceName)
+}
+
+function Test-ShouldInstallServiceWithRelativePath
+{
+    $parentDir = Split-Path -Parent -Path $TestDir
+    $dirName = Split-Path -Leaf -Path $TestDir
+    $serviceExeName = Split-Path -Leaf -Path $servicePath
+    $path = ".\{0}\{1}" -f $dirName,$serviceExeName
+
+    Push-Location -Path $parentDir
+    try
+    {
+        Install-Service -Name $serviceName -Path $path
+        $service = Assert-ServiceInstalled 
+        $svc = Get-WmiObject -Class 'Win32_Service' -Filter ('Name = "{0}"' -f $serviceName)
+        Assert-Equal $servicePath $svc.PathName
+    }
+    finally
+    {
+        Pop-Location
+    }
 }
 
 

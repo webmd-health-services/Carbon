@@ -5,6 +5,10 @@
 ### File System
 
  * [Remove-Junction](http://get-carbon.org/help/Remove-Junction.html) doesn't delete a junction when given a relative path to the junction.
+ 
+### Services
+
+ * [Install-Service](http://get-carbon.org/help/Install-Service.html) doesn't properly resolve a service's path.
 
 # 1.5.1 (3 October 2013)
 

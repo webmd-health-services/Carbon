@@ -97,6 +97,8 @@ function Install-Service
         # The user's password.
         $Password
     )
+
+    Set-StrictMode -Version 'Latest'
     
     function ConvertTo-FailureActionArg($action, $restartDelay, $rebootDelay)
     {
@@ -117,6 +119,15 @@ function Install-Service
             Write-Error "Service failure action '$action' not found/recognized."
             return ''
         }
+    }
+
+    if( -not (Test-Path -Path $Path -PathType Leaf) )
+    {
+        Write-Warning ('Service ''{0}'' executable ''{1}'' not found.' -f $Name,$Path)
+    }
+    else
+    {
+        $Path = Resolve-Path -Path $Path | Select-Object -ExpandProperty ProviderPath
     }
 
     if( $Dependency )
