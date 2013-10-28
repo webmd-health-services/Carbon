@@ -41,9 +41,12 @@ function Remove-Junction
         # The path to the junction to remove.
         $Path
     )
+
+    Set-StrictMode -Version 'Latest'
     
     if( Test-PathIsJunction $Path  )
     {
+        $Path = Resolve-Path -Path $Path | Select-Object -ExpandProperty ProviderPath
         if( $pscmdlet.ShouldProcess($Path, "remove junction") )
         {
             Write-Host "Removing junction $Path."

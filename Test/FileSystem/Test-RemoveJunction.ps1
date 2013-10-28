@@ -71,3 +71,19 @@ function Test-ShouldSupportWhatIf
     Assert-DirectoryExists $TestDir
 }
 
+function Test-ShouldRemoveJunctionWithRelativePath
+{
+    $parentDir = Split-Path -Parent -Path $JunctionPath
+    $junctionName = Split-Path -Leaf -Path $JunctionPath
+    Push-Location $parentDir
+    try
+    {
+        Remove-Junction -Path ".\$junctionName"
+        Assert-DirectoryDoesNotExist $JunctionPath 'Failed to delete junction with relative path.'
+        Assert-DirectoryExists $TestDir
+    }
+    finally
+    {
+        Pop-Location
+    }
+}
