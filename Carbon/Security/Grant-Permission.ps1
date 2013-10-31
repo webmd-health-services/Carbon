@@ -41,11 +41,11 @@ function Grant-Permission
          /  \
         GC  GL
     
-    C is the **C**ontainer permissions are getting set on
-    CC is a **C**hild **C**ontainer.
-    CL is a **C**hild ** **L**eaf
-    GC is a **G**randchild **C**ontainer and includes all sub-containers below it.
-    GL is a **G**randchild **L**eaf.
+    C is the **C**ontainer permissions are getting set on  
+    CC is a **C**hild **C**ontainer  
+    CL is a **C**hild **L**eaf  
+    GC is a **G**randchild **C**ontainer and includes all sub-containers below it  
+    GL is a **G**randchild **L**eaf  
     
     The `ApplyTo` parameter takes one of the following 13 values and applies permissions to:
     
@@ -139,19 +139,11 @@ function Grant-Permission
     )
     
     $Path = Resolve-Path $Path
-    
-    $pathQualifier = Split-Path -Qualifier $Path
-    if( -not $pathQualifier )
-    {
-        Write-Error "Unable to get qualifier on path $Path. No permissions granted."
-        return
-    }
-    $pathDrive = Get-PSDrive $pathQualifier.Trim(':')
-    $pathProvider = $pathDrive.Provider
-    $providerName = $pathProvider.Name
+
+    $providerName = Get-PathProvider -Path $Path | Select-Object -ExpandProperty 'Name'
     if( $providerName -ne 'Registry' -and $providerName -ne 'FileSystem' )
     {
-        Write-Error "Unsupported path: '$Path' belongs to the '$providerName' provider."
+        Write-Error "Unsupported path: '$Path' belongs to the '$providerName' provider.  Only registry and file system paths are supported."
         return
     }
 
