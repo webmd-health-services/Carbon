@@ -85,7 +85,7 @@ function Test-ShouldFailIfIncorrectPermissions
     $error.Clear()
     $result = Grant-Permission -Identity 'BUILTIN\Administrators' -Permission 'BlahBlahBlah' -Path $Path.ToString() -ErrorAction SilentlyContinue
     Assert-Null $result
-    Assert-Equal 1 $error.Count
+    Assert-Equal 2 $error.Count
 }
 
 function Test-ShouldClearExistingPermissions

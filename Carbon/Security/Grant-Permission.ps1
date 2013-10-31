@@ -147,16 +147,11 @@ function Grant-Permission
         return
     }
 
-    $rights = 0
-	$Permission | ForEach-Object {
-
-        $right = ($_ -as "Security.AccessControl.$($providerName)Rights")
-        if( -not $right )
-        {
-            Write-Error "Invalid $($providerName)Rights: $_.  Must be one of $([Enum]::GetNames("Security.AccessControl.$($providerName)Rights"))."
-            return
-        }
-        $rights = $rights -bor $right
+    $rights = $Permission | ConvertTo-ProviderAccessControlRights -ProviderName $providerName
+    if( -not $rights )
+    {
+        Write-Error ('Unable to grant {0} {1} permissions on {2}: received an unknown permission.' -f $Identity,($Permission -join ','),$Path)
+        return
     }
     
     Write-Host "Granting $Identity $Permission on $Path."
