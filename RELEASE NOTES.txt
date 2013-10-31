@@ -1,14 +1,14 @@
-# 1.5.2
+# 1.6.0
 
 ## Enhancements
 
 ### Path
 
- * Created new [Get-PathProvider](http://get-carbon.org/help/Get-PathProvider.html) function for getting a path's PowerShell provider.
+ * Created [Get-PathProvider](http://get-carbon.org/help/Get-PathProvider.html) function for getting a path's PowerShell provider.
  
 ### Security
 
- * Created [Test-Permission](http://get-carbon.org/help/Test-Permission.html) function for checking if a user/group has a set of permissions and, optionally, a set of inheritance and propagation flags.
+ * Created [Test-Permission](http://get-carbon.org/help/Test-Permission.html) function for checking if a user/group has a set of permissions and, optionally, a set of inheritance and propagation flags on a file, directory, or registry key.
 
 ## Bug Fixes
 
