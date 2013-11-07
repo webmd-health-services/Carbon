@@ -87,7 +87,7 @@ function Test-ShouldGetSpecificUsersInheritedPermissions
 
 function Test-ShouldGetPermissionsOnRegistryKey
 {
-    $perms = Get-Permission -Path 'hklm:software'
+    $perms = Get-Permission -Path 'hkcu:\'
     Assert-NotNull $perms
     $perms | ForEach-Object {
         Assert-True ($_ -is [Security.AccessControl.RegistryAccessRule])
