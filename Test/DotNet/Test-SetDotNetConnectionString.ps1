@@ -46,41 +46,70 @@ function Remove-ConnectionStrings
         }
     }
     
-    if( $PSVersionTable.PSVersion -le '2.0' )
+    if( (Test-DotNet -V2) )
     {
         Invoke-PowerShell -Command $command -Args $connectionStringName -x86 -Runtime v2.0
         Invoke-PowerShell -Command $command -Args $connectionStringName -Runtime v2.0
     }
-    Invoke-PowerShell -Command $command -Args $connectionStringName -x86 -Runtime v4.0
-    Invoke-PowerShell -Command $command -Args $connectionStringName -Runtime v4.0
+
+    if( (Test-DotNet -V4 -Full) )
+    {
+        Invoke-PowerShell -Command $command -Args $connectionStringName -x86 -Runtime v4.0
+        Invoke-PowerShell -Command $command -Args $connectionStringName -Runtime v4.0
+    }
 }
 
 function Test-ShouldUpdateDotNet2x86MachineConfig
 {
+    if( -not (Test-DotNet -V2) )
+    {
+        Fail ('.NET v2 is not installed')
+    }
+
     Set-DotNetConnectionString -Name $connectionStringName -Value $connectionStringValue -Framework -Clr2
     Assert-ConnectionString -Name $connectionStringName -Value $connectionStringValue -Framework -Clr2
 }
 
 function Test-ShouldUpdateDotNet2x64MachineConfig
 {
+    if( -not (Test-DotNet -V2) )
+    {
+        Fail ('.NET v2 is not installed')
+    }
+
     Set-DotNetConnectionString -Name $connectionStringName -Value $connectionStringValue -Framework64 -Clr2
     Assert-ConnectionString -Name $connectionStringName -Value $connectionStringValue -Framework64 -Clr2
 }
 
 function Test-ShouldUpdateDotNet4x86MachineConfig
 {
+    if( -not (Test-DotNet -V4 -Full) )
+    {
+        Fail ('.NET v4 full is not installed')
+    }
+
     Set-DotNetConnectionString -Name $connectionStringName -Value $connectionStringValue -Framework -Clr4
     Assert-ConnectionString -Name $connectionStringName -Value $connectionStringValue -Framework -Clr4
 }
 
 function Test-ShouldUpdateDotNet4x64MachineConfig
 {
+    if( -not (Test-DotNet -V4 -Full) )
+    {
+        Fail ('.NET v4 full is not installed')
+    }
+
     Set-DotNetConnectionString -Name $connectionStringName -Value $connectionStringValue -Framework64 -Clr4
     Assert-ConnectionString -Name $connectionStringName -Value $connectionStringValue -Framework64 -Clr4
 }
 
 function Test-ShouldUpdateConnectionString
 {
+    if( -not (Test-DotNet -V2) )
+    {
+        Fail ('.NET v2 is not installed')
+    }
+
     Set-DotNetConnectionString -Name $connectionStringName -Value $connectionStringValue -Framework -Clr2
     Set-DotNetConnectionString -Name $connectionStringName -Value $connectionStringNewValue -Framework -Clr2
     Assert-ConnectionString -Name $connectionStringName -Value $connectionStringNewValue -Framework -Clr2 
@@ -88,12 +117,22 @@ function Test-ShouldUpdateConnectionString
 
 function Test-ShouldAddProviderName
 {
+    if( -not (Test-DotNet -V4 -Full) )
+    {
+        Fail ('.NET v4 full is not installed')
+    }
+
     Set-DotNetConnectionString -Name $connectionStringName -Value $connectionStringValue -ProviderName $providerName -Framework64 -Clr4
     Assert-ConnectionString -Name $connectionStringName -Value $connectionStringValue -ProviderName $providerName -Framework64 -Clr4
 }
 
 function Test-ShouldClearProviderName
 {
+    if( -not (Test-DotNet -V4 -Full) )
+    {
+        Fail ('.NET v4 full is not installed')
+    }
+
     Set-DotNetConnectionString -Name $connectionStringName -Value $connectionStringValue -ProviderName $providerName -Framework64 -Clr4
     Assert-ConnectionString -Name $connectionStringName -Value $connectionStringValue -ProviderName $providerName -Framework64 -Clr4
     Set-DotNetConnectionString -Name $connectionStringName -Value $connectionStringValue -Framework64 -Clr4
@@ -102,6 +141,11 @@ function Test-ShouldClearProviderName
 
 function Test-ShouldUpdateProviderName
 {
+    if( -not (Test-DotNet -V4 -Full) )
+    {
+        Fail ('.NET v4 full is not installed')
+    }
+
     Set-DotNetConnectionString -Name $connectionStringName -Value $connectionStringValue -ProviderName $providerName -Framework64 -Clr4
     Assert-ConnectionString -Name $connectionStringName -Value $connectionStringValue -ProviderName $providerName -Framework64 -Clr4
 

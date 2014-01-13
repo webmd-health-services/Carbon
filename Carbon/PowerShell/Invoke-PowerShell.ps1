@@ -87,7 +87,7 @@ function Invoke-PowerShell
         
         [string]
         [ValidateSet('v2.0','v4.0')]
-        # The CLR to use.  Must be one of v2.0 or v4.0.  Default is the current PowerShell runtime.
+        # The CLR to use.  Must be one of `v2.0` or `v4.0`.  Default is the current PowerShell runtime.
         $Runtime
     )
     
@@ -97,6 +97,24 @@ function Invoke-PowerShell
     {
         $currentRuntime = 'v4.0'
     }
+
+    # Check that the selected runtime is installed.
+    if( $PSBoundParameters.ContainsKey('Runtime') )
+    {
+        $runtimeInstalled = switch( $Runtime )
+        {
+            'v2.0' { Test-DotNet -V2 }
+            'v4.0' { Test-DotNet -V4 -Full }
+            default { Write-Error ('Unknown runtime value ''{0}''.' -f $Runtime) }
+        }
+
+        if( -not $runtimeInstalled )
+        {
+            Write-Error ('.NET {0} not found.' -f $Runtime)
+            return
+        }
+    }
+
 
     if( -not $Runtime )
     {

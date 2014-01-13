@@ -1,3 +1,15 @@
+# 1.6.1
+
+## Enhancements
+
+### .NET
+
+ * Created [Test-DotNet](http://get-carbon.org/help/Test-DotNet.html) for testing if v2 or v4 of the .NET framework is installed.
+
+### PowerShell
+
+ * Updated [Invoke-PowerShell](http://get-carbon.org/help/Invoke-PowerShell.html) to test if the appropriate .NET framework is installed if the user chooses an explicit runtime to use.
+
 # 1.6.0
 
 ## Enhancements

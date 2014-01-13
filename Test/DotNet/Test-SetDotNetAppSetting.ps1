@@ -46,14 +46,26 @@ function Remove-AppSetting
         }
     }
     
-    Invoke-PowerShell -Command $command -Args $appSettingName -x86 -Runtime 'v2.0'
-    Invoke-PowerShell -Command $command -Args $appSettingName -Runtime 'v2.0'
-    Invoke-PowerShell -Command $command -Args $appSettingName -x86 -Runtime 'v4.0'
-    Invoke-PowerShell -Command $command -Args $appSettingName -Runtime 'v4.0'
+    if( (Test-DotNet -V2) )
+    {
+        Invoke-PowerShell -Command $command -Args $appSettingName -x86 -Runtime 'v2.0'
+        Invoke-PowerShell -Command $command -Args $appSettingName -Runtime 'v2.0'
+    }
+
+    if( (Test-DotNet -V4 -Full) )
+    {
+        Invoke-PowerShell -Command $command -Args $appSettingName -x86 -Runtime 'v4.0'
+        Invoke-PowerShell -Command $command -Args $appSettingName -Runtime 'v4.0'
+    }
 }
 
 function Test-ShouldUpdateMachineConfigDotNet2x64
 {
+    if( -not (Test-DotNet -V2) )
+    {
+        Fail ('.NET v2 is not installed')
+    }
+
     Set-DotNetAppSetting -Name $appSettingName -Value $appSettingValue -Framework64 -Clr2
     Assert-AppSetting -Name $appSettingName -Value $appSettingValue -Framework64 -Clr2
     Assert-AppSetting -Name $appSettingName -Value $null -Framework -Clr2
@@ -62,6 +74,11 @@ function Test-ShouldUpdateMachineConfigDotNet2x64
 
 function Test-ShouldUpdateMachineConfigDotNet2x86
 {
+    if( -not (Test-DotNet -V2) )
+    {
+        Fail ('.NET v2 is not installed')
+    }
+
     Set-DotNetAppSetting -Name $appSettingName -Value $appSettingValue -Framework -Clr2
     Assert-AppSetting -Name $appSettingName -Value $appSettingValue -Framework -Clr2
     Assert-AppSetting -Name $appSettingName -Value $null -Framework64 -Clr2
@@ -69,6 +86,11 @@ function Test-ShouldUpdateMachineConfigDotNet2x86
 
 function Test-ShouldUpdateMachineConfigDotNet4x64
 {
+    if( -not (Test-DotNet -V4 -Full) )
+    {
+        Fail ('.NET v4 full is not installed')
+    }
+
     Set-DotNetAppSetting -Name $appSettingName -Value $appSettingValue -Framework64 -Clr4
     Assert-AppSetting -Name $appSettingName -Value $appSettingValue -Framework64 -Clr4
     Assert-AppSetting -Name $appSettingName -Value $null -Framework -Clr4
@@ -76,6 +98,11 @@ function Test-ShouldUpdateMachineConfigDotNet4x64
 
 function Test-ShouldUpdateMachineConfigDotNet4x86
 {
+    if( -not (Test-DotNet -V4 -Full) )
+    {
+        Fail ('.NET v4 full is not installed')
+    }
+
     Set-DotNetAppSetting -Name $appSettingName -Value $appSettingValue -Framework -Clr4
     Assert-AppSetting -Name $appSettingName -Value $appSettingValue -Framework -Clr4
     Assert-AppSetting -Name $appSettingName -Value $null -Framework64 -Clr4
@@ -83,6 +110,11 @@ function Test-ShouldUpdateMachineConfigDotNet4x86
 
 function Test-ShouldUpdateAppSetting
 {
+    if( -not (Test-DotNet -V2) )
+    {
+        Fail ('.NET v2 is not installed')
+    }
+
     Set-DotNetAppSetting -Name $appSettingName -Value $appSettingValue -Framework -Framework64 -Clr2
     Set-DotNetAppSetting -Name $appSettingName -Value $appSettingNewValue -Framework -Framework64 -Clr2
     Assert-AppSetting -Name $appSettingName -Value $appSettingNewValue -Framework  -Framework64 -Clr2
