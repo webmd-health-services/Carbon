@@ -69,6 +69,7 @@ if( Test-Path -Path HKLM:\SOFTWARE\Microsoft\PowerShell\3 )
     {
         function Test-ShouldRunScriptBlockUnderV3ConsoleClr2
         {
+            Assert-True (Test-DotNet -V2) '.NET v2 isn''t installed'
             $command = {
                 $PSVersionTable.CLRVersion
             }
@@ -148,16 +149,8 @@ function Test-ShouldRunScript
     Assert-Equal 3 $result.Length
     Assert-Equal '' $result[0]
     Assert-NotNull $result[1]
-    if( $ps3Installed )
-    {
-        Assert-Equal 3 $result[1].PSVersion.Major
-        Assert-Equal 4 $result[1].CLRVersion.Major
-    }
-    else
-    {
-        Assert-Equal $PSVersionTable.PSVersion $result[1].PSVersion
-        Assert-Equal $PSVersionTAble.CLRVersion $result[1].CLRVersion
-    }
+    Assert-Equal $PSVersionTable.PSVersion $result[1].PSVersion
+    Assert-Equal $PSVersionTAble.CLRVersion $result[1].CLRVersion
     Assert-NotNull $result[2]
     $architecture = 'AMD64'
     if( Test-OSIs32Bit )
@@ -177,16 +170,8 @@ function Test-ShouldRunScriptWithArguments
     Assert-Equal 3 $result.Length
     Assert-Equal "'Hello World'" $result[0]
     Assert-NotNull $result[1]
-    if( $ps3Installed )
-    {
-        Assert-Equal 3 $result[1].PSVersion.Major
-        Assert-Equal 4 $result[1].CLRVersion.Major
-    }
-    else
-    {
-        Assert-Equal $PSVersionTable.PSVersion $result[1].PSVersion
-        Assert-Equal $PSVersionTAble.CLRVersion $result[1].CLRVersion
-    }
+    Assert-Equal $PSVersionTable.PSVersion $result[1].PSVersion
+    Assert-Equal $PSVersionTAble.CLRVersion $result[1].CLRVersion
 }
 
 function Test-ShouldRunScriptUnderPowerShell2
@@ -211,6 +196,7 @@ function Test-ShouldRunUnderClr4
 
 function Test-ShouldRunUnderClr2
 {
+    Assert-True (Test-DotNet -V2) '.NET v2 is not installed'
     $result = Invoke-PowerShell -FilePath (Join-Path $TestDir Get-PSVersionTable.ps1) `
                                 -OutputFormat XML `
                                 -Runtime 'v2.0' `

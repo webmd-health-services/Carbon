@@ -21,8 +21,8 @@ function Test-WindowsFeature
     .DESCRIPTION
     Feature names are different across different versions of Windows.  This function tests if a given feature exists.  You can also test if a feature is installed by setting the `Installed` switch.
 
-    **This function is not available on Windows 8/2012.**
-    
+    Feature names are case-sensitive and are different between different versions of Windows.  For a list, on Windows 2008, run `serveramanagercmd.exe -q`; on Windows 7, run `Get-WmiObject -Class Win32_OptionalFeature | Select-Object Name`.  On Windows 8/2012, use `Get-WindowsFeature`.
+
     .LINK
     Get-WindowsFeature
     
@@ -46,7 +46,7 @@ function Test-WindowsFeature
     param(
         [Parameter(Mandatory=$true)]
         [string]
-        # The name of the feature to test.  Feature names are case-sensitive and are different between different versions of Windows.  For a list, on Windows 2008, run `serveramanagercmd.exe -q`; on Windows 7, run `Get-WmiObject -Class Win32_OptionalFeature | Select-Object Name`.
+        # The name of the feature to test.  Feature names are case-sensitive and are different between different versions of Windows.  For a list, on Windows 2008, run `serveramanagercmd.exe -q`; on Windows 7, run `Get-WmiObject -Class Win32_OptionalFeature | Select-Object Name`.  On Windows 8/2012, use `Get-WindowsFeature`.
         $Name,
         
         [Switch]
@@ -54,7 +54,7 @@ function Test-WindowsFeature
         $Installed
     )
     
-    if( -not (Assert-WindowsFeatureFunctionsSupported) )
+    if( -not (Get-Module -Name 'ServerManager') -and -not (Assert-WindowsFeatureFunctionsSupported) )
     {
         return
     }

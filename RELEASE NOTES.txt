@@ -10,6 +10,11 @@
 
  * Updated [Invoke-PowerShell](http://get-carbon.org/help/Invoke-PowerShell.html) to test if the appropriate .NET framework is installed if the user chooses an explicit runtime to use.
 
+### Windows Features
+
+ * Marked Assert-WindowsFeatureFunctionsSupported as an internal function.  Please don't use.  It will be removed from future versions of PowerShell.
+ * Updated [Test-WindowsFeature](http://get-carbon.org/help/Invoke-PowerShell.html) to work on Windows 8/2012.
+
 # 1.6.0
 
 ## Enhancements

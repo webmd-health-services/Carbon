@@ -29,8 +29,9 @@ if( (Get-WmiObject -Class Win32_OptionalFeature -ErrorAction SilentlyContinue) )
     {
         Get-WindowsFeature | 
             Where-Object { $_.Installed } |
+            Select-Object -First 1 |
             ForEach-Object {
-                Assert-True (Test-WindowsFeature -Name $_.Name -Installed)
+                Assert-True (Test-WindowsFeature -Name $_.Name -Installed) $_.Name
             }
     }
 
@@ -38,15 +39,17 @@ if( (Get-WmiObject -Class Win32_OptionalFeature -ErrorAction SilentlyContinue) )
     {
         Get-WindowsFeature | 
             Where-Object { -not $_.Installed } |
+            Select-Object -First 1
             ForEach-Object {
-                Assert-False (Test-WindowsFeature -Name $_.Name -Installed)
+                Assert-False (Test-WindowsFeature -Name $_.Name -Installed) $_.Name
             }
     }
 
     function Test-ShouldDetectFeatures
     {
         Get-WindowsFeature |
-            ForEach-Object { Assert-True (Test-WindowsFeature -Name $_.Name) }
+            Select-Object -First 1 |
+            ForEach-Object { Assert-True (Test-WindowsFeature -Name $_.Name) $_.Name }
     }
 
     function Test-ShouldNotDetectFeature

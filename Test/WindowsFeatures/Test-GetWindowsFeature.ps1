@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-if( (Get-WmiObject -Class Win32_OptionalFeature -ErrorAction SilentlyContinue) )
+if( -not (Get-Module 'ServerManager') -and (Get-WmiObject -Class Win32_OptionalFeature -ErrorAction SilentlyContinue) )
 {
     function Setup
     {

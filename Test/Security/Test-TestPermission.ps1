@@ -13,20 +13,23 @@
 # limitations under the License.
 
 $tempDir = $null
-$identity = 'Administrators'
+$identity = 'CarbonTestUser'
 $dirPath = $null
 $filePath = $null
 $tempKeyPath = $null
 $keyPath = $null
 $childKeyPath = $null
 
-function Start-Test
+function Start-TestFixture
 {
     & (Join-Path -Path $TestDir -ChildPath '..\..\Carbon\Import-Carbon.ps1' -Resolve)
+
+    Install-User -Username $identity -Password 'Password1' -Description 'Carbon test user.'
     $tempDir = New-TempDirectoryTree -Prefix 'Carbon-Test-TestPermission' @'
 + Directory
   * File
 '@
+
     $dirPath = Join-Path -Path $tempDir -ChildPath 'Directory'
     $filePath = Join-Path -Path $dirPath -ChildPath 'File'
     Grant-Permission -Identity $identity -Permission ReadAndExecute -Path $dirPath -ApplyTo 'ChildLeaves'
@@ -38,7 +41,7 @@ function Start-Test
     Grant-Permission -Identity $identity -Permission 'ReadKey','WriteKey' -Path $keyPath -ApplyTo 'ChildLeaves'
 }
 
-function Stop-Test
+function Stop-TestFixture
 {
     Remove-Item -Path $tempDir -Recurse
     Remove-Item -Path $tempKeyPath -Recurse
