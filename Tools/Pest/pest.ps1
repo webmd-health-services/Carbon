@@ -42,9 +42,9 @@ param(
     # The paths to search for tests.  All files matching Test-*.ps1 will be run.
     $Path,
     
-    [string]
+    [string[]]
     # The individual test in the script to run.  Defaults to all tests.
-    $Test = $null,
+    $Test,
     
     [Switch]
     # Return objects for each test run.
@@ -128,19 +128,35 @@ function Resolve-Error ($ErrorRecord=$Error[0])
    }
 }
 
+function New-TestInfoObject
+{
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]
+        # The name of the test fixture.
+        $Fixture,
+
+        [Parameter(Mandatory=$true)]
+        [string]
+        # The name of the test.
+        $Name
+    )
+    $props =  @{ 
+                    Fixture = $Fixture; 
+                    Name = $Name ; 
+                    Passed = $false; 
+                    Failure = $null;
+                    Exception = $null; 
+                    Duration = $null; 
+                    PipelineOutput = @();
+                }
+    
+    New-Object PsObject -Property $props
+}
+
 function Invoke-Test($fixture, $function)
 {
-    $testProperties = @{ 
-                            Fixture = $fixture; 
-                            Name = $function ; 
-                            Passed = $false; 
-                            Failure = $null;
-                            Exception = $null; 
-                            Duration = $null; 
-                            PipelineOutput = @();
-                        }
-    
-    $testInfo = New-Object PsObject -Property $testProperties
+    $testInfo = New-TestInfoObject -Fixture $fixture -Name $function
     Set-CurrentTest $function
     $startedAt = Get-Date
     $output = @()
@@ -206,6 +222,7 @@ function Invoke-Test($fixture, $function)
         catch
         {
             Write-Host "An error occured tearing down test '$function': $_" -ForegroundColor Red
+            $testInfo.Passed = $false
             $error.Clear()
         }
     }
@@ -243,16 +260,27 @@ $testScripts |
         
         $testModuleName =  [System.IO.Path]::GetFileNameWithoutExtension($testCase)
 
-        $functions = Get-FunctionsInFile $testCase.FullName
-        
-        if( $functions -contains "Test-$Test" )
-        {
-            $functions = @( "Test-$Test" )
-        }
-        elseif( $functions -contains "Ignore-$Test" )
-        {
-            $functions = @( "Ignore-$Test" )
-        }
+        $functions = Get-FunctionsInFile $testCase.FullName |
+                        Where-Object { $_ -match '^(Test|Ignore)-(.*)$' } |
+                        Where-Object { 
+                            if( $PSBoundParameters.ContainsKey('Test') )
+                            {
+                                return $Test | Where-Object { $Matches[2] -like $_ } 
+                            }
+
+                            if( $Matches[1] -eq 'Ignore' )
+                            {
+                                Write-Warning ("Skipping ignored test '{0}'." -f $_)
+                                $testsIgnored++
+                                return $false
+                            }
+
+                            return $true
+                        }
+        @('Start-TestFixture','Start-Test','Setup','TearDown','Stop-Test','Stop-TestFixture') |
+            ForEach-Object { Join-Path -Path 'function:' -ChildPath $_ } |
+            Where-Object { Test-Path -Path $_ } |
+            Remove-Item
         
         . $testCase.FullName
         try
@@ -270,20 +298,6 @@ $testScripts |
                     continue
                 }
                 
-                if( $function -like 'Ignore-*' )
-                {
-                    if( $function -ne "Ignore-$Test" )
-                    {
-                        Write-Warning "Skipping ignored test '$function'."
-                        $testsIgnored++
-                        continue
-                    }
-                }
-                elseif( $function -notlike 'Test-*' )
-                {
-                    continue
-                }
-                
                 Invoke-Test $testModuleName $function
             }
 
@@ -296,6 +310,9 @@ $testScripts |
                 catch
                 {
                     Write-Host ("An error occured tearing down test fixture '{0}': {1}" -f $testCase.Name,$_) -ForegroundColor Red
+                    $result = New-TestInfoObject -Fixture $testModuleName -Name 'Stop-TestFixture'
+                    $result.Exception = $_
+                    $result
                     $error.Clear()
                 }                
             }
@@ -315,7 +332,7 @@ $testScripts |
             Get-Module | % {
                 if( -not $modules.ContainsKey( $_.Name ) )
                 {
-                    Remove-Module $_.Name
+                    Remove-Module $_.Name -ErrorAction SilentlyContinue
                 }
             }
         }        

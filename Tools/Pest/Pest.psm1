@@ -268,7 +268,7 @@ function Assert-Match
         # The regular expression to use when matching.
         $Regex, 
         
-        [Parameter(Position=2,Mandatory=$true)]
+        [Parameter(Position=2)]
         # The message to show when the assertion fails.
         $Message
     )
