@@ -25,7 +25,7 @@ function Test-Permission
 
     Inherited permissions on *not* checked by default.  To check inherited permission, use the `-Inherited` switch.
 
-    By default, the permission check is not exact, i.e. the user may have additional permissions to what you're checking.  If you want to make sure the user has *exactly* the permission you want, use the `-Exact` switch.  Please note that be default, NTFS will automatically add/grant `Synchronize` permission on an item.  If you are checking for exact permission, and always getting back `$false`, try checking that `Synchronize` is part of the set of permissions you're checking.
+    By default, the permission check is not exact, i.e. the user may have additional permissions to what you're checking.  If you want to make sure the user has *exactly* the permission you want, use the `-Exact` switch.  Please note that by default, NTFS will automatically add/grant `Synchronize` permission on an item, which is handled by this function.
 
     .OUTPUTS
     System.Boolean.
@@ -99,6 +99,11 @@ function Test-Permission
     }
 
     $providerName = Get-PathProvider -Path $Path | Select-Object -ExpandProperty 'Name'
+    if( $providerName -eq 'FileSystem' -and $Exact )
+    {
+        # Synchronize is always on and can't be turned off.
+        $Permission += 'Synchronize'
+    }
     $rights = $Permission | ConvertTo-ProviderAccessControlRights -ProviderName $providerName
     if( -not $rights )
     {
