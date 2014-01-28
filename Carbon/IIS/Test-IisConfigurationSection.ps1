@@ -35,7 +35,7 @@ function Test-IisConfigurationSection
     Returns `True` if the global CGI section is locked.  Otherwise `False`.
     
     .EXAMPLE
-    Test-IisConfigurationSection -SectionPath 'system.webServer/security/authentication/basicAuthentication' -SiteName `Peanuts` -Path 'SopwithCamel' -Locked
+    Test-IisConfigurationSection -SectionPath 'system.webServer/security/authentication/basicAuthentication' -SiteName `Peanuts` -VirtualPath 'SopwithCamel' -Locked
 
     Returns `True` if the `Peanuts` website's `SopwithCamel` sub-directory's `basicAuthentication` security authentication section is locked.  Otherwise, returns `False`.
     #>
@@ -52,9 +52,10 @@ function Test-IisConfigurationSection
         $SiteName,
         
         [Parameter()]
+        [Alias('Path')]
         [string]
         # The optional path under `SiteName` whose configuration section to test.
-        $Path,
+        $VirtualPath,
         
         [Parameter(Mandatory=$true,ParameterSetName='CheckLocked')]
         [Switch]
@@ -70,9 +71,9 @@ function Test-IisConfigurationSection
         $getArgs.SiteName = $SiteName
     }
     
-    if( $Path )
+    if( $VirtualPath )
     {
-        $getArgs.Path = $Path
+        $getArgs.VirtualPath = $VirtualPath
     }
     
     $section = Get-IisConfigurationSection @getArgs -ErrorAction SilentlyContinue
@@ -91,7 +92,7 @@ function Test-IisConfigurationSection
         
     if( -not $section )
     {
-        Write-Error ('IIS:{0}:{1}: not found.' -f $SiteName,$Path,$SectionPath)
+        Write-Error ('IIS:{0}: section {1} not found.' -f (Join-IisVirtualPath $SiteName $VirtualPath),$SectionPath)
         return
     }
     

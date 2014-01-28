@@ -52,9 +52,10 @@ function Get-IisHttpHeader
         # The name of the website whose headers to return.
         $SiteName,
         
+        [Alias('Path')]
         [string]
         # The optional path under `SiteName` whose headers to return.
-        $Path = '',
+        $VirtualPath = '',
         
         [string]
         # The name of the HTTP header to return.  Optional.  If not given, all headers are returned.  Wildcards supported.
@@ -62,7 +63,7 @@ function Get-IisHttpHeader
     )
 
     $httpProtocol = Get-IisConfigurationSection -SiteName $SiteName `
-                                                -Path $Path `
+                                                -VirtualPath $VirtualPath `
                                                 -SectionPath 'system.webServer/httpProtocol'
     $httpProtocol.GetCollection('customHeaders') |
         Where-Object { $_['name'] -like $Name } |

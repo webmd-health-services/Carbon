@@ -42,22 +42,22 @@ function Get-IisWebsite
     [CmdletBinding()]
     param(
         [string]
-        [Alias('Name')]
+        [Alias('SiteName')]
         # The name of the site to get.
-        $SiteName
+        $Name
     )
     
-    if( $SiteName -and -not (Test-IisWebsite -Name $SiteName) )
+    if( $Name -and -not (Test-IisWebsite -Name $Name) )
     {
         return $null
     }
     
-    $mgr = New-Object Microsoft.Web.Administration.ServerManager
+    $mgr = New-Object 'Microsoft.Web.Administration.ServerManager'
     $mgr.Sites | 
         Where-Object {
-            if( $SiteName )
+            if( $Name )
             {
-                $_.Name -eq $SiteName
+                $_.Name -eq $Name
             }
             else
             {

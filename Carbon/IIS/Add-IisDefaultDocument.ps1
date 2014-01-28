@@ -37,14 +37,14 @@ function Add-IisDefaultDocument
         
         [Parameter(Mandatory=$true)]
         [string]
-        # The default document to add
+        # The default document to add.
         $FileName
     )
     
-    $xml = [xml] (Invoke-AppCmd list config `"$SiteName`" /section:defaultDocument )
+    $xml = [xml] (Invoke-AppCmd list config $SiteName /section:defaultDocument )
     $docNode = $xml.SelectSingleNode( "/system.webServer/defaultDocument/files/add[@value = '$FileName']" )
     if( -not $docNode )
     {
-        Invoke-AppCmd set config `"$SiteName`" /section:defaultDocument /+files.[value=`'$FileName`'] /commit:apphost
+        Invoke-AppCmd set config $SiteName /section:defaultDocument "/+files.[value='$FileName']" /commit:apphost
     }
 }

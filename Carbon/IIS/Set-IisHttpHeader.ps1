@@ -30,7 +30,7 @@ function Set-IisHttpHeader
     Sets or creates the `SopwithCamel` website's `X-Flown-By` HTTP header to the value `Snoopy`.
     
     .EXAMPLE
-    Set-IisHttpHeader -SiteName 'SopwithCamel' -Path 'Engine' -Name 'X-Powered-By' -Value 'Root Beer'
+    Set-IisHttpHeader -SiteName 'SopwithCamel' -VirtualPath 'Engine' -Name 'X-Powered-By' -Value 'Root Beer'
     
     Sets or creates the `SopwithCamel` website's `Engine` sub-directory's `X-Powered-By` HTTP header to the value `Root Beer`.
     #>
@@ -41,9 +41,10 @@ function Set-IisHttpHeader
         # The name of the website where the HTTP header should be set/created.
         $SiteName,
         
+        [Alias('Path')]
         [string]
         # The optional path under `SiteName` where the HTTP header should be set/created.
-        $Path = '',
+        $VirtualPath = '',
         
         [Parameter(Mandatory=$true)]
         [string]
@@ -57,7 +58,7 @@ function Set-IisHttpHeader
     )
     
     $httpProtocol = Get-IisConfigurationSection -SiteName $SiteName `
-                                                -Path $Path `
+                                                -VirtualPath $VirtualPath `
                                                 -SectionPath 'system.webServer/httpProtocol'
     $headers = $httpProtocol.GetCollection('customHeaders') 
     $header = $headers | Where-Object { $_['name'] -eq $Name }
@@ -77,9 +78,10 @@ function Set-IisHttpHeader
         [void] $headers.Add( $addElement )
     }
     
-    if( $pscmdlet.ShouldProcess( ('{0}/{1}' -f $SiteName,$Path), ('{0} HTTP header {1}' -f $action,$Name) ) )
+    $fullPath = Join-IisVirtualPath $SiteName $VirtualPath
+    if( $pscmdlet.ShouldProcess( $fullPath, ('{0} HTTP header {1}' -f $action,$Name) ) )
     {
-        Write-Host ('IIS:{0}/{1}: {2} HTTP Header {3}: {4}' -f $SiteName,$Path,$action,$Name,$Value)
+        Write-Host ('IIS:{0}: {1} HTTP Header {2}: {3}' -f $fullPath,$action,$Name,$Value)
         $httpProtocol.CommitChanges()
     }
 }

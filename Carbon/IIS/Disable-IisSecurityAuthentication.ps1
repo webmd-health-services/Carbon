@@ -19,7 +19,7 @@ function Disable-IisSecurityAuthentication
     Disables anonymous or basic authentication for all or part of a website.
 
     .DESCRIPTION
-    By default, disables an authentication type for an entire website.  You can disable an authentication type at a specific path under a website by passing the virtual path (*not* the physical path) to that directory as the value of the `Path` parameter.
+    By default, disables an authentication type for an entire website.  You can disable an authentication type at a specific path under a website by passing the virtual path (*not* the physical path) to that directory as the value of the `VirtualPath` parameter.
 
     .LINK
     Enable-IisSecurityAuthentication
@@ -47,9 +47,10 @@ function Disable-IisSecurityAuthentication
         # The site where anonymous authentication should be set.
         $SiteName,
         
+        [Alias('Path')]
         [string]
         # The optional path where anonymous authentication should be set.
-        $Path = '',
+        $VirtualPath = '',
 
         [Parameter(Mandatory=$true,ParameterSetName='Anonymous')]
         [Switch]
@@ -69,11 +70,12 @@ function Disable-IisSecurityAuthentication
     
     $authType = $pscmdlet.ParameterSetName
     $getArgs = @{ $authType = $true; }
-    $authSettings = Get-IisSecurityAuthentication -SiteName $SiteName -Path $Path @getArgs
+    $authSettings = Get-IisSecurityAuthentication -SiteName $SiteName -VirtualPath $VirtualPath @getArgs
     $authSettings.SetAttributeValue('enabled', 'False')
-    if( $pscmdlet.ShouldProcess( "$SiteName/$Path", ("disable {0} authentication" -f $authType) ) )
+    $fullPath = Join-IisVirtualPath $SiteName $VirtualPath
+    if( $pscmdlet.ShouldProcess( $fullPath, ("disable {0} authentication" -f $authType) ) )
     {
-        Write-Host ('IIS:{0}/{1}: disabling {2} authentication' -f $SiteName,$Path,$authType)
+        Write-Host ('IIS:{0}: disabling {1} authentication' -f $fullPath,$authType)
         $authSettings.CommitChanges()
     }
 }

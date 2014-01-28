@@ -37,9 +37,10 @@ function Get-IisConfigurationSection
         $SiteName,
         
         [Parameter(ParameterSetName='ForSite')]
+        [Alias('Path')]
         [string]
         # The optional site path whose configuration should be returned.
-        $Path = '',
+        $VirtualPath = '',
         
         [Parameter(Mandatory=$true,ParameterSetName='ForSite')]
         [Parameter(Mandatory=$true,ParameterSetName='Global')]
@@ -52,15 +53,15 @@ function Get-IisConfigurationSection
         $Type = [Microsoft.Web.Administration.ConfigurationSection]
     )
     
-    $mgr = New-Object Microsoft.Web.Administration.ServerManager
+    $mgr = New-Object 'Microsoft.Web.Administration.ServerManager'
     $config = $mgr.GetApplicationHostConfiguration()
     
     $section = $null
     try
     {
-        if( $pscmdlet.ParameterSetName -eq 'ForSite' )
+        if( $PSCmdlet.ParameterSetName -eq 'ForSite' )
         {
-            $qualifier = '{0}/{1}' -f $SiteName,$Path
+            $qualifier = Join-IisVirtualPath $SiteName $VirtualPath
             $section = $config.GetSection( $SectionPath, $Type, $qualifier )
         }
         else

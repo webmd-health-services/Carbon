@@ -19,7 +19,7 @@ function Install-IisWebsite
     Installs a website.
 
     .DESCRIPTION
-    Installs a website named `Name`, serving files out of the file system from `Path`.  If no app pool name is given (via the `AppPoolName` parameter), IIS will pick one for you, usually the `DefaultAppPool`.  If a site with name `Name` already exists, it is deleted, and a new site is created.
+    Installs a website named `Name`, serving files out of the file system from `PhysicalPath`.  If no app pool name is given (via the `AppPoolName` parameter), IIS will pick one for you, usually the `DefaultAppPool`.  If a site with name `Name` already exists, it is deleted, and a new site is created.
 
     By default, the site listens on all IP addresses on port 80.  Set custom bindings with the `Bindings` argument.  Multiple bindings are allowed.  Each binding must be in this format (in BNF):
 
@@ -43,17 +43,17 @@ function Install-IisWebsite
     Uninstall-IisWebsite
 
     .EXAMPLE
-    Install-IisWebsite -Name 'Peanuts' -Path C:\Peanuts.com
+    Install-IisWebsite -Name 'Peanuts' -PhysicalPath C:\Peanuts.com
 
     Creates a website named `Peanuts` serving files out of the `C:\Peanuts.com` directory.  The website listens on all the computer's IP addresses on port 80.
 
     .EXAMPLE
-    Install-IisWebsite -Name 'Peanuts' -Path C:\Peanuts.com -Bindings 'http/*:80:peanuts.com:'
+    Install-IisWebsite -Name 'Peanuts' -PhysicalPath C:\Peanuts.com -Bindings 'http/*:80:peanuts.com:'
 
     Creates a website named `Peanuts` which uses name-based hosting to respond to all requests to any of the machine's IP addresses for the `peanuts.com` domain.
 
     .EXAMPLE
-    Install-IisWebsite -Name 'Peanuts' -Path C:\Peanuts.com -AppPoolName 'PeanutsAppPool'
+    Install-IisWebsite -Name 'Peanuts' -PhysicalPath C:\Peanuts.com -AppPoolName 'PeanutsAppPool'
 
     Creates a website named `Peanuts` that runs under the `PeanutsAppPool` app pool
     #>
@@ -65,9 +65,10 @@ function Install-IisWebsite
         $Name,
         
         [Parameter(Position=1,Mandatory=$true)]
+        [Alias('Path')]
         [string]
-        # The path to the website
-        $Path,
+        # The physical path (i.e. on the file system) to the website
+        $PhysicalPath,
         
         [Parameter(Position=2)]
         [string[]]
@@ -88,10 +89,10 @@ function Install-IisWebsite
         Uninstall-IisWebsite -Name $Name
     }
     
-    $Path = Resolve-FullPath -Path $Path
-    if( -not (Test-Path $Path -PathType Container) )
+    $PhysicalPath = Resolve-FullPath -Path $PhysicalPath
+    if( -not (Test-Path $PhysicalPath -PathType Container) )
     {
-        $null = New-Item $Path -ItemType Directory -Force
+        $null = New-Item $PhysicalPath -ItemType Directory -Force
     }
     
     $invalidBindings = $Bindings | 
@@ -106,7 +107,7 @@ function Install-IisWebsite
     }
     
     $bindingsArg = $Bindings -join ','
-    Invoke-AppCmd add site /name:"$Name" /physicalPath:"$Path" /bindings:$bindingsArg
+    Invoke-AppCmd add site /name:"$Name" /physicalPath:"$PhysicalPath" /bindings:$bindingsArg
     
     if( $AppPoolName )
     {

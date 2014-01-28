@@ -36,12 +36,12 @@ function Get-IisApplication
     Gets all the applications running under the `DeathStar` website.
 
     .EXAMPLE
-    Get-IisApplication -SiteName 'DeathStar' -Name '/'
+    Get-IisApplication -SiteName 'DeathStar' -VirtualPath '/'
 
     Demonstrates how to get the main application for a website: use `/` as the application name.
 
     .EXAMPLE
-    Get-IisApplication -SiteName 'DeathStar' -Name 'MainPort/ExhaustPort'
+    Get-IisApplication -SiteName 'DeathStar' -VirtualPath 'MainPort/ExhaustPort'
 
     Demonstrates how to get a nested application, i.e. gets the application at `/MainPort/ExhaustPort` under the `DeathStar` website.
     #>
@@ -53,9 +53,10 @@ function Get-IisApplication
         $SiteName,
         
         [Parameter()]
+        [Alias('Name')]
         [string]
         # The name of the application.  Default is to return all applications running under the website `$SiteName`.
-        $Name
+        $VirtualPath
     )
 
     $site = Get-IisWebsite -SiteName $SiteName
@@ -66,9 +67,9 @@ function Get-IisApplication
 
     $site.Applications |
         Where-Object {
-            if( $Name )
+            if( $VirtualPath )
             {
-                return ($_.Path -eq "/$Name")
+                return ($_.Path -eq "/$VirtualPath")
             }
             return $true
         } | 

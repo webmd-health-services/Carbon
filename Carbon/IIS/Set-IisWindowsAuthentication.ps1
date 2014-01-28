@@ -38,7 +38,7 @@ function Set-IisWindowsAuthentication
     Configures Windows authentication on the `Peanuts` site to use kernel mode.
 
     .EXAMPLE
-    Set-IisWindowsAuthentication -SiteName Peanuts Snoopy/DogHouse -DisableKernelMode
+    Set-IisWindowsAuthentication -SiteName Peanuts -VirtualPath Snoopy/DogHouse -DisableKernelMode
 
     Configures Windows authentication on the `Doghouse` directory of the `Peanuts` site to not use kernel mode.
     #>
@@ -49,9 +49,10 @@ function Set-IisWindowsAuthentication
         # The site where Windows authentication should be set.
         $SiteName,
         
+        [Alias('Path')]
         [string]
         # The optional path where Windows authentication should be set.
-        $Path = '',
+        $VirtualPath = '',
         
         [Switch]
         # Turn on kernel mode.  Default is false.  [More information about Kerndel Mode authentication.](http://blogs.msdn.com/b/webtopics/archive/2009/01/19/service-principal-name-spn-checklist-for-kerberos-authentication-with-iis-7-0.aspx)
@@ -64,11 +65,13 @@ function Set-IisWindowsAuthentication
         $useKernelMode = 'False'
     }
     
-    $authSettings = Get-IisSecurityAuthentication -SiteName $SiteName -Path $Path -Windows
+    $authSettings = Get-IisSecurityAuthentication -SiteName $SiteName -VirtualPath $VirtualPath -Windows
     $authSettings.SetAttributeValue( 'useKernelMode', $useKernelMode )
-    if( $pscmdlet.ShouldProcess( "$SiteName/$Path", "set Windows authentication" ) )
+
+    $fullPath = Join-IisVirtualPath $SiteName $VirtualPath
+    if( $pscmdlet.ShouldProcess( $fullPath, "set Windows authentication" ) )
     {
-        Write-Host ('IIS:{0}/{1}: configuring Windows authentication: useKernelMode: {2}' -f $SiteName,$Path,$useKernelMode)
+        Write-Host ('IIS:{0}: configuring Windows authentication: useKernelMode: {1}' -f $fullPath,$useKernelMode)
         $authSettings.CommitChanges()
     }
 }

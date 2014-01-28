@@ -30,7 +30,7 @@ function Test-IisSecurityAuthentication
     Returns `true` if anonymous authentication is enabled for the `Peanuts` site.  `False` if it isn't.
     
     .EXAMPLE
-    Test-IisSecurityAuthentication -SiteName Peanuts -Path Doghouse -Basic
+    Test-IisSecurityAuthentication -SiteName Peanuts -VirtualPath Doghouse -Basic
     
     Returns `true` if basic authentication is enabled for`Doghouse` directory under  the `Peanuts` site.  `False` if it isn't.
     #>
@@ -41,9 +41,10 @@ function Test-IisSecurityAuthentication
         # The site where anonymous authentication should be set.
         $SiteName,
         
+        [Alias('Path')]
         [string]
         # The optional path where anonymous authentication should be set.
-        $Path = '',
+        $VirtualPath = '',
         
         [Parameter(Mandatory=$true,ParameterSetName='Anonymous')]
         [Switch]
@@ -67,6 +68,6 @@ function Test-IisSecurityAuthentication
     )
     
     $getConfigArgs = @{ $pscmdlet.ParameterSetName = $true }
-    $authSettings = Get-IisSecurityAuthentication -SiteName $SiteName -Path $Path @getConfigArgs
+    $authSettings = Get-IisSecurityAuthentication -SiteName $SiteName -VirtualPath $VirtualPath @getConfigArgs
     return ($authSettings.GetAttributeValue('enabled') -eq 'true')
 }
