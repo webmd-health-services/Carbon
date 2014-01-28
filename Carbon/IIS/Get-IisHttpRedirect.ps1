@@ -50,13 +50,14 @@ function Get-IisHttpRedirect
         # The site's whose HTTP redirect settings will be retrieved.
         $SiteName,
         
+        [Alias('Path')]
         [string]
         # The optional path to a sub-directory under `SiteName` whose settings to return.
-        $Path = ''
+        $VirtualPath = ''
     )
     
     Get-IisConfigurationSection -SiteName $SiteName `
-                                -Path $Path `
+                                -VirtualPath $VirtualPath `
                                 -SectionPath 'system.webServer/httpRedirect' `
                                 -Type ([Carbon.Iis.HttpRedirectConfigurationSection])
 }

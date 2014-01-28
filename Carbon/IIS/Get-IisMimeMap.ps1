@@ -51,7 +51,7 @@ function Get-IisMimeMap
     Gets all the file extenstion to MIME type mappings for the `DeathStar` website.
     
     .EXAMPLE
-    Get-IisMimeMap -SiteName DeathStar -Path ExhaustPort
+    Get-IisMimeMap -SiteName DeathStar -VirtualPath ExhaustPort
     
     Gets all the file extension to MIME type mappings for the `DeathStar`'s `ExhausePort` directory.
     #>
@@ -63,9 +63,10 @@ function Get-IisMimeMap
         $SiteName,
         
         [Parameter(ParameterSetName='ForWebsite')]
+        [Alias('Path')]
         [string]
         # The directory under the website whose MIME mappings to return.  Optional.
-        $Path = '',
+        $VirtualPath = '',
         
         [string]
         # The name of the file extensions to return. Wildcards accepted.
@@ -80,6 +81,6 @@ function Get-IisMimeMap
     $staticContent.GetCollection() | 
         Where-Object { $_['fileExtension'] -like $FileExtension -and $_['mimeType'] -like $MimeType } |
         ForEach-Object {
-            New-Object Carbon.Iis.MimeMap ($_['fileExtension'],$_['mimeType'])
+            New-Object 'Carbon.Iis.MimeMap' ($_['fileExtension'],$_['mimeType'])
         }
 }

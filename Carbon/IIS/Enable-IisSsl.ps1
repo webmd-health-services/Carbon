@@ -40,7 +40,7 @@ function Enable-IisSsl
     Enables SSL on the `Peanuts` website's, making makes SSL connections optional, ignoring client certificates, and making 128-bit SSL optional.
 
     .EXAMPLE
-    Enable-IisSsl -Site Peanuts -Path Snoopy/DogHouse -RequireSsl
+    Enable-IisSsl -Site Peanuts -VirtualPath Snoopy/DogHouse -RequireSsl
     
     Configures the `/Snoopy/DogHouse` directory in the `Peanuts` site to require SSL.  It also turns off any client certificate settings and makes 128-bit SSL optional.
 
@@ -69,9 +69,10 @@ function Enable-IisSsl
         # The website whose SSL flags should be modifed.
         $SiteName,
         
+        [Alias('Path')]
         [string]
         # The path to the folder/virtual directory/application under the website whose SSL flags should be set.
-        $Path = '',
+        $VirtualPath = '',
         
         [Parameter(ParameterSetName='IgnoreClientCertificates')]
         [Parameter(ParameterSetName='AcceptClientCertificates')]
@@ -116,8 +117,9 @@ function Enable-IisSsl
         $flags += 'Ssl128'
     }
     
-    if( $pscmdlet.ShouldProcess( "$SiteName/$Path", "enable SSL" ) )
+    $fullPath = Join-IisVirtualPath $SiteName $VirtualPath
+    if( $pscmdlet.ShouldProcess( $fullPath, "enable SSL" ) )
     {
-        Invoke-AppCmd set config "$SiteName/$Path" "-section:system.webServer/security/access" "/sslFlags:""$($flags -join ',')""" /commit:apphost
+        Invoke-AppCmd set config $fullPath "-section:system.webServer/security/access" "/sslFlags:""$($flags -join ',')""" /commit:apphost
     }
 }

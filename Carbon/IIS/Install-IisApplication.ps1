@@ -19,15 +19,15 @@ function Install-IisApplication
     Creates a new application under a website.
     
     .DESCRIPTION
-    Creates a new application at `Name` under website `SiteName` running the code found on the file system under `Path`, i.e. if SiteName is is `example.com`, the application is accessible at `example.com/Name`.  If an application already exists at that path, it is removed first.  The application can run under a custom application pool using the optional `AppPoolName` parameter.  If no app pool is specified, the application runs under the same app pool as the website it runs under.
+    Creates a new application at `VirtualPath` under website `SiteName` running the code found on the file system under `PhysicalPath`, i.e. if SiteName is is `example.com`, the application is accessible at `example.com/VirtualPath`.  If an application already exists at that path, it is removed first.  The application can run under a custom application pool using the optional `AppPoolName` parameter.  If no app pool is specified, the application runs under the same app pool as the website it runs under.
     
     .EXAMPLE
-    Install-IisApplication -SiteName Peanuts -Name CharlieBrown -Path C:\Path\To\CharlieBrown -AppPoolName CharlieBrownPool
+    Install-IisApplication -SiteName Peanuts -VirtualPath CharlieBrown -PhysicalPath C:\Path\To\CharlieBrown -AppPoolName CharlieBrownPool
     
     Creates an application at `Peanuts/CharlieBrown` which runs from `Path/To/CharlieBrown`.  The application runs under the `CharlieBrownPool`.
     
     .EXAMPLE
-    Install-IisApplication -SiteName Peanuts -Name Snoopy -Path C:\Path\To\Snoopy
+    Install-IisApplication -SiteName Peanuts -VirtualPath Snoopy -PhysicalPath C:\Path\To\Snoopy
     
     Create an application at Peanuts/Snoopy, which runs from C:\Path\To\Snoopy.  It uses the same application as the Peanuts website.
     #>
@@ -39,24 +39,26 @@ function Install-IisApplication
         $SiteName,
         
         [Parameter(Mandatory=$true)]
+        [Alias('Name')]
         [string]
         # The name of the application.
-        $Name,
+        $VirtualPath,
         
         [Parameter(Mandatory=$true)]
+        [Alias('Path')]
         [string]
         # The path to the application.
-        $Path,
+        $PhysicalPath,
         
         [string]
         # The app pool for the application.
         $AppPoolName
     )
     
-    $Path = Resolve-FullPath -Path $Path
-    if( -not (Test-Path $Path -PathType Container) )
+    $PhysicalPath = Resolve-FullPath -Path $PhysicalPath
+    if( -not (Test-Path $PhysicalPath -PathType Container) )
     {
-        $null = New-Item $Path -ItemType Directory
+        $null = New-Item $PhysicalPath -ItemType Directory
     }
 
     $appPoolDesc = ''
@@ -65,15 +67,15 @@ function Install-IisApplication
         $appPoolDesc = '; appPool: {0}' -f $AppPoolName
     }
     
-    $app = Get-IisApplication -SiteName $SiteName -Name $Name
+    $app = Get-IisApplication -SiteName $SiteName -VirtualPath $VirtualPath
     if( $app )
     {
-        Write-Host ('IIS://{0}/{1}: deleting application' -f $SiteName,$Name)
+        Write-Host ('IIS://{0}: deleting application' -f (Join-IisVirtualPath $SiteName $VirtualPath))
         $app.Delete()
         $app.CommitChanges()
     }
 
-    Write-Host ('IIS:/{0}/{1}: creating application: physicalPath: {2}{3}' -f $SiteName,$Name,$Path,$appPoolDesc)
+    Write-Host ('IIS:/{0}: creating application: physicalPath: {1}{2}' -f (Join-IisVirtualPath $SiteName $VirtualPath),$PhysicalPath,$appPoolDesc)
     $site = Get-IisWebsite -SiteName $SiteName
     if( -not $site )
     {
@@ -83,7 +85,7 @@ function Install-IisApplication
     $apps = $site.GetCollection()
     $app = $apps.CreateElement('application') |
                 Add-IisServerManagerMember -ServerManager $site.ServerManager -PassThru
-    $app['path'] = "/{0}" -f $Name
+    $app['path'] = "/{0}" -f $VirtualPath
     $apps.Add( $app ) | Out-Null
 
     if( $AppPoolName )
@@ -99,6 +101,6 @@ function Install-IisApplication
         $vdir['path'] = '/'
         $vdirs.Add( $vdir ) | Out-Null
     }
-    $vdir['physicalPath'] = $Path
+    $vdir['physicalPath'] = $PhysicalPath
     $app.CommitChanges()
 }

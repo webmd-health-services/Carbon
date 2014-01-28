@@ -19,7 +19,7 @@ function Set-IisHttpRedirect
     Turns on HTTP redirect for all or part of a website.
 
     .DESCRIPTION
-    Configures all or part of a website to redirect all requests to another website/URL.  By default, it operates on a specific website.  To configure a directory under a website, set `Path` to the virtual path of that directory.
+    Configures all or part of a website to redirect all requests to another website/URL.  By default, it operates on a specific website.  To configure a directory under a website, set `VirtualPath` to the virtual path of that directory.
 
     .LINK
     http://www.iis.net/configreference/system.webserver/httpredirect#005
@@ -33,7 +33,7 @@ function Set-IisHttpRedirect
     Redirects all requests to the `Peanuts` website to `http://new.peanuts.com`.
 
     .EXAMPLE
-    Set-IisHttpRedirect -SiteName Peanuts -Path Snoopy/DogHouse -Destination 'http://new.peanuts.com'
+    Set-IisHttpRedirect -SiteName Peanuts -VirtualPath Snoopy/DogHouse -Destination 'http://new.peanuts.com'
 
     Redirects all requests to the `/Snoopy/DogHouse` path on the `Peanuts` website to `http://new.peanuts.com`.
 
@@ -49,9 +49,10 @@ function Set-IisHttpRedirect
         # The site where the redirection should be setup.
         $SiteName,
         
+        [Alias('Path')]
         [string]
         # The optional path where redirection should be setup.
-        $Path = '',
+        $VirtualPath = '',
         
         [Parameter(Mandatory=$true)]
         [string]
@@ -72,14 +73,14 @@ function Set-IisHttpRedirect
         $ChildOnly
     )
     
-    $settings = Get-IisHttpRedirect -SiteName $SiteName -Path $Path
+    $settings = Get-IisHttpRedirect -SiteName $SiteName -Path $VirtualPath
     $settings.Enabled = $true
     $settings.Destination = $destination
     $settings.HttpResponseStatus = $HttpResponseStatus
     $settings.ExactDestination = $ExactDestination
     $settings.ChildOnly = $ChildOnly
     	
-    if( $pscmdlet.ShouldProcess( "$SiteName/$Path", "set HTTP redirect settings" ) )
+    if( $pscmdlet.ShouldProcess( (Join-IisVirtualPath $SiteName $VirtualPath), "set HTTP redirect settings" ) ) 
     {
         $settings.CommitChanges()
     }

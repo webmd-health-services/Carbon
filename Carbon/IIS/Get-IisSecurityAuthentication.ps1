@@ -30,7 +30,7 @@ function Get-IisSecurityAuthentication
     Gets the `Peanuts` site's anonymous authentication configuration section.
     
     .EXAMPLE
-    Get-IisSecurityAuthentication -SiteName Peanuts -Path Doghouse -Basic
+    Get-IisSecurityAuthentication -SiteName Peanuts -VirtualPath Doghouse -Basic
     
     Gets the `Peanuts` site's `Doghouse` sub-directory's basic authentication configuration section.
     #>
@@ -41,9 +41,10 @@ function Get-IisSecurityAuthentication
         # The site where anonymous authentication should be set.
         $SiteName,
         
+        [Alias('Path')]
         [string]
         # The optional path where anonymous authentication should be set.
-        $Path = '',
+        $VirtualPath = '',
 
         [Parameter(Mandatory=$true,ParameterSetName='anonymousAuthentication')]        
         [Switch]
@@ -67,5 +68,5 @@ function Get-IisSecurityAuthentication
     )
     
     $sectionPath = 'system.webServer/security/authentication/{0}' -f $pscmdlet.ParameterSetName
-    Get-IisConfigurationSection -SiteName $SiteName -Path $Path -SectionPath $sectionPath
+    Get-IisConfigurationSection -SiteName $SiteName -VirtualPath $VirtualPath -SectionPath $sectionPath
 }

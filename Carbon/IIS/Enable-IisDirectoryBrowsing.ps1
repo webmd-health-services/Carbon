@@ -38,17 +38,13 @@ function Enable-IisDirectoryBrowsing
         # The name of the site where the virtual directory is located.
         $SiteName,
         
+        [Alias('Path')]
         [string]
         # The directory where directory browsing should be enabled.
-        $Path
+        $VirtualPath
     )
     
-    $location = "$SiteName$Path"
-    if( $Path -notlike '/*' )
-    {
-        $location = "$SiteName/$Path"
-    }
-    
+    $location = Join-IisVirtualPath $SiteName $VirtualPath
     Write-Verbose "Enabling directory browsing at location '$location'."
-    Invoke-AppCmd set config `"$location`" /section:directoryBrowse /enabled:true /commit:apphost
+    Invoke-AppCmd set config $location /section:directoryBrowse /enabled:true /commit:apphost
 }
