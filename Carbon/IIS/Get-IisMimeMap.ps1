@@ -77,6 +77,8 @@ function Get-IisMimeMap
         $MimeType = '*'
     )
     
+    Set-StrictMode -Version 'Latest'
+
     $staticContent = Get-IisConfigurationSection -SectionPath 'system.webServer/staticContent'
     $staticContent.GetCollection() | 
         Where-Object { $_['fileExtension'] -like $FileExtension -and $_['mimeType'] -like $MimeType } |

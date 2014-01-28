@@ -59,6 +59,8 @@ function Get-IisApplication
         $VirtualPath
     )
 
+    Set-StrictMode -Version 'Latest'
+
     $site = Get-IisWebsite -SiteName $SiteName
     if( -not $site )
     {

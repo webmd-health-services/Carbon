@@ -55,6 +55,8 @@ function Install-IisApplication
         $AppPoolName
     )
     
+    Set-StrictMode -Version 'Latest'
+
     $PhysicalPath = Resolve-FullPath -Path $PhysicalPath
     if( -not (Test-Path $PhysicalPath -PathType Container) )
     {
@@ -92,8 +94,13 @@ function Install-IisApplication
     {
         $app['applicationPool'] = $AppPoolName
     }
-    $vdir = $app.VirtualDirectories |
-                Where-Object { $_.Path -eq '/' }
+
+    $vdir = $null
+    if( $app | Get-Member 'VirtualDirectories' )
+    {
+        $vdir = $app.VirtualDirectories |
+                    Where-Object { $_.Path -eq '/' }
+    }
     if( -not $vdir )
     {
         $vdirs = $app.GetCollection()

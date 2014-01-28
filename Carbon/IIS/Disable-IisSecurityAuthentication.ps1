@@ -68,6 +68,8 @@ function Disable-IisSecurityAuthentication
         $Windows
     )
     
+    Set-StrictMode -Version 'Latest'
+
     $authType = $pscmdlet.ParameterSetName
     $getArgs = @{ $authType = $true; }
     $authSettings = Get-IisSecurityAuthentication -SiteName $SiteName -VirtualPath $VirtualPath @getArgs

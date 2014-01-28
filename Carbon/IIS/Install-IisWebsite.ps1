@@ -84,6 +84,8 @@ function Install-IisWebsite
         $AppPoolName
     )
     
+    Set-StrictMode -Version 'Latest'
+
     if( Test-IisWebsite -Name $Name )
     {
         Uninstall-IisWebsite -Name $Name

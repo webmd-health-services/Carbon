@@ -53,10 +53,13 @@ function Get-IisConfigurationSection
         $Type = [Microsoft.Web.Administration.ConfigurationSection]
     )
     
+    Set-StrictMode -Version 'Latest'
+
     $mgr = New-Object 'Microsoft.Web.Administration.ServerManager'
     $config = $mgr.GetApplicationHostConfiguration()
     
     $section = $null
+    $qualifier = ''
     try
     {
         if( $PSCmdlet.ParameterSetName -eq 'ForSite' )
@@ -67,7 +70,6 @@ function Get-IisConfigurationSection
         else
         {
             $section = $config.GetSection( $SectionPath, $Type )
-            $qualifier = ''
         }
     }
     catch

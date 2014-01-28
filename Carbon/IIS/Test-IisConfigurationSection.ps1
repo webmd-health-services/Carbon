@@ -63,6 +63,8 @@ function Test-IisConfigurationSection
         $Locked
     )
     
+    Set-StrictMode -Version 'Latest'
+
     $getArgs = @{
                     SectionPath = $SectionPath;
                 }

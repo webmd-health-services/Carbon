@@ -56,6 +56,8 @@ function Get-IisHttpRedirect
         $VirtualPath = ''
     )
     
+    Set-StrictMode -Version 'Latest'
+
     Get-IisConfigurationSection -SiteName $SiteName `
                                 -VirtualPath $VirtualPath `
                                 -SectionPath 'system.webServer/httpRedirect' `

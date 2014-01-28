@@ -44,6 +44,8 @@ function Enable-IisDirectoryBrowsing
         $VirtualPath
     )
     
+    Set-StrictMode -Version 'Latest'
+
     $location = Join-IisVirtualPath $SiteName $VirtualPath
     Write-Verbose "Enabling directory browsing at location '$location'."
     Invoke-AppCmd set config $location /section:directoryBrowse /enabled:true /commit:apphost

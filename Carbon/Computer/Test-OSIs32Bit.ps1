@@ -36,5 +36,7 @@ function Test-OSIs32Bit
     param(
     )
     
+    Set-StrictMode -Version 'Latest'
+
     return -not (Test-OSIs64Bit)
 }

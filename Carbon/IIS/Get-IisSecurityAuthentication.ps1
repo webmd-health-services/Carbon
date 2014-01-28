@@ -67,6 +67,8 @@ function Get-IisSecurityAuthentication
         $Windows
     )
     
+    Set-StrictMode -Version 'Latest'
+
     $sectionPath = 'system.webServer/security/authentication/{0}' -f $pscmdlet.ParameterSetName
     Get-IisConfigurationSection -SiteName $SiteName -VirtualPath $VirtualPath -SectionPath $sectionPath
 }

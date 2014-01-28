@@ -62,6 +62,8 @@ function Get-IisHttpHeader
         $Name = '*'
     )
 
+    Set-StrictMode -Version 'Latest'
+
     $httpProtocol = Get-IisConfigurationSection -SiteName $SiteName `
                                                 -VirtualPath $VirtualPath `
                                                 -SectionPath 'system.webServer/httpProtocol'

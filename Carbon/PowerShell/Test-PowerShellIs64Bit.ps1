@@ -36,5 +36,7 @@ function Test-PowerShellIs64Bit
     param(
     )
     
+    Set-StrictMode -Version 'Latest'
+
     return ([Environment]::Is64BitProcess)
 }

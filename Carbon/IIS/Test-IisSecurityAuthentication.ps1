@@ -66,6 +66,8 @@ function Test-IisSecurityAuthentication
         # Tests if Windows authentication is enabled.
         $Windows
     )
+
+    Set-StrictMode -Version 'Latest'
     
     $getConfigArgs = @{ $pscmdlet.ParameterSetName = $true }
     $authSettings = Get-IisSecurityAuthentication -SiteName $SiteName -VirtualPath $VirtualPath @getConfigArgs

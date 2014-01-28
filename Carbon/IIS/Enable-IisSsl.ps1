@@ -96,6 +96,8 @@ function Enable-IisSsl
         $RequireClientCertificates
     )
     
+    Set-StrictMode -Version 'Latest'
+
     $flags = @()
     if( $RequireSSL -or $RequireClientCertificates )
     {

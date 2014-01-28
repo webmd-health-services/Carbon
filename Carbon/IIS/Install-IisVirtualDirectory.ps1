@@ -51,6 +51,8 @@ function Install-IisVirtualDirectory
         $PhysicalPath
     )
     
+    Set-StrictMode -Version 'Latest'
+
     $vdirID = Join-IisVirtualPath $SiteName $VirtualPath 
     $output = Invoke-AppCmd list vdir $vdirID
     if( $output -like "*$vdirID*" )

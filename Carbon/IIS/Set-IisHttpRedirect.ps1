@@ -73,6 +73,8 @@ function Set-IisHttpRedirect
         $ChildOnly
     )
     
+    Set-StrictMode -Version 'Latest'
+
     $settings = Get-IisHttpRedirect -SiteName $SiteName -Path $VirtualPath
     $settings.Enabled = $true
     $settings.Destination = $destination

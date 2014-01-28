@@ -41,6 +41,8 @@ function Add-IisDefaultDocument
         $FileName
     )
     
+    Set-StrictMode -Version 'Latest'
+
     $xml = [xml] (Invoke-AppCmd list config $SiteName /section:defaultDocument )
     $docNode = $xml.SelectSingleNode( "/system.webServer/defaultDocument/files/add[@value = '$FileName']" )
     if( -not $docNode )

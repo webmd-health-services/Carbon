@@ -59,6 +59,8 @@ function Set-IisWindowsAuthentication
         $DisableKernelMode
     )
     
+    Set-StrictMode -Version 'Latest'
+
     $useKernelMode = 'True'
     if( $DisableKernelMode )
     {

@@ -36,5 +36,7 @@ function Test-PowerShellIs32Bit
     param(
     )
     
+    Set-StrictMode -Version 'Latest'
+
     return -not (Test-PowerShellIs64Bit)
 }

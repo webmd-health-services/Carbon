@@ -47,6 +47,8 @@ function Get-IisWebsite
         $Name
     )
     
+    Set-StrictMode -Version 'Latest'
+
     if( $Name -and -not (Test-IisWebsite -Name $Name) )
     {
         return $null

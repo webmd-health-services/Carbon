@@ -36,5 +36,7 @@ function Test-OSIs64Bit
     param(
     )
     
+    Set-StrictMode -Version 'Latest'
+
     return ([Environment]::Is64BitOperatingSystem)
 }
