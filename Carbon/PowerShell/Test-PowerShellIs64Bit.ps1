@@ -24,6 +24,9 @@ function Test-PowerShellIs64Bit
     .OUTPUTS
     System.Boolean.
 
+    .LINK
+    http://msdn.microsoft.com/en-us/library/system.environment.is64bitprocess.aspx
+
     .EXAMPLE
     Test-PowerShellIs64Bit
 

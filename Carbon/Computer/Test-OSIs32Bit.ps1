@@ -21,6 +21,12 @@ function Test-OSIs32Bit
     .DESCRIPTION
     Regardless of the bitness of the currently running process, returns `True` if the current OS is a 32-bit OS.
     
+    .OUTPUTS
+    System.Boolean.
+
+    .LINK
+    http://msdn.microsoft.com/en-us/library/system.environment.is64bitoperatingsystem.aspx
+    
     .EXAMPLE
     Test-OSIs32Bit
     

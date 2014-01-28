@@ -20,6 +20,12 @@ function Test-OSIs64Bit
 
     .DESCRIPTION
     Regardless of the bitness of the currently running process, returns `True` if the current OS is a 64-bit OS.
+
+    .OUTPUTS
+    System.Boolean.
+
+    .LINK
+    http://msdn.microsoft.com/en-us/library/system.environment.is64bitoperatingsystem.aspx
     
     .EXAMPLE
     Test-OSIs64Bit
@@ -30,5 +36,5 @@ function Test-OSIs64Bit
     param(
     )
     
-    return (Test-Path env:"ProgramFiles(x86)")
+    return ([Environment]::Is64BitOperatingSystem)
 }

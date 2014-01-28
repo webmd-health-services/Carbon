@@ -24,6 +24,9 @@ function Test-PowerShellIs32Bit
     .OUTPUTS
     System.Boolean.
 
+    .LINK
+    http://msdn.microsoft.com/en-us/library/system.environment.is64bitprocess.aspx
+
     .EXAMPLE
     Test-PowerShellIs32Bit
 
@@ -33,5 +36,5 @@ function Test-PowerShellIs32Bit
     param(
     )
     
-    return -not ([Environment]::Is64BitProcess)
+    return -not (Test-PowerShellIs64Bit)
 }
