@@ -81,6 +81,17 @@ function Test-ShouldSetCustomAccount
     Assert-Equal 'Running' $service.Status
 }
 
+function Test-ShouldSetCustomAccountWithNoPassword
+{
+    $Error.Clear()
+    Install-Service -Name $serviceName -Path $servicePath -UserName $serviceAcct -ErrorAction SilentlyContinue
+    Assert-GreaterThan $Error.Count 0
+    $service = Assert-ServiceInstalled
+    Assert-Equal ".\$($serviceAcct)" $service.UserName
+    $service = Get-Service $serviceName
+    Assert-Equal 'Stopped' $service.Status
+}
+
 function Test-ShouldSetFailureActions
 {
     Install-Service -Name $serviceName -Path $servicePath

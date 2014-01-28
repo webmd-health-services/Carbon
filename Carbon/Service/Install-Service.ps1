@@ -23,6 +23,11 @@ function Install-Service
 
     The minimum required information to install a service is its name and path.  By default the servide will run as `NetworkService` and will start automatically.  Review the parameter list for additional configuraiton options and their defaults.  Normally, we would list them here, but there's like 300 of them and we really don't have the time.  I'm so mean, I'm not even going to give you *examples* of all the different options.  Feel free to send in your own.
 
+    [Managed service accounts and virtual accounts](http://technet.microsoft.com/en-us/library/dd548356.aspx) should be supported (we don't know how to test, so can't be sure).  Simply omit the `-Password` parameter when providing a custom account name with the `-Username` parameter.
+
+    .LINK
+    http://technet.microsoft.com/en-us/library/dd548356.aspx
+
     .EXAMPLE
     Install-Service -Name DeathStar -Path C:\ALongTimeAgo\InAGalaxyFarFarAway\DeathStar.exe
 
@@ -88,11 +93,12 @@ function Install-Service
         $Dependency,
         
         [Parameter(ParameterSetName='CustomAccount',Mandatory=$true)]
+        [Alias('Identity')]
         [string]
         # The user the service should run as.
         $Username,
         
-        [Parameter(ParameterSetName='CustomAccount',Mandatory=$true)]
+        [Parameter(ParameterSetName='CustomAccount')]
         [string]
         # The user's password.
         $Password
@@ -147,7 +153,7 @@ function Install-Service
         }
     }
     
-    if( $pscmdlet.ParameterSetName -eq 'CustomAccount' )
+    if( $PSCmdlet.ParameterSetName -eq 'CustomAccount' )
     {
         $identity = Resolve-IdentityName -Name $Username
         if( -not $identity )
@@ -175,19 +181,22 @@ function Install-Service
     
     $passwordArgName = ''
     $passwordArgValue = ''
-    if( $pscmdlet.ParameterSetName -eq 'CustomAccount' )
+    if( $PSCmdlet.ParameterSetName -eq 'CustomAccount' )
     {
-        $passwordArgName = 'password='
-        $passwordArgValue = $Password
+        if( $PSBoundParameters.ContainsKey( 'Password' ) )
+        {
+            $passwordArgName = 'password='
+            $passwordArgValue = $Password
+        }
         
-        if( $pscmdlet.ShouldProcess( $identity, "grant the log on as a service right" ) )
+        if( $PSCmdlet.ShouldProcess( $identity, "grant the log on as a service right" ) )
         {
             Write-Host ("Granting '{0}' the log on as a service right." -f $Identity)
             Grant-Privilege -Identity $identity -Privilege SeServiceLogonRight
         }
     }
     
-    if( $pscmdlet.ShouldProcess( $Path, ('grant {0} ReadAndExecute permissions' -f $identity) ) )
+    if( $PSCmdlet.ShouldProcess( $Path, ('grant {0} ReadAndExecute permissions' -f $identity) ) )
     {
         Grant-Permission -Identity $identity -Permission ReadAndExecute -Path $Path
     }
@@ -223,7 +232,7 @@ function Install-Service
         $dependencyArgValue = $Dependency -join '/'
     }
 
-    if( $pscmdlet.ShouldProcess( "$Name [$Path]", "$operation service" ) )
+    if( $PSCmdlet.ShouldProcess( "$Name [$Path]", "$operation service" ) )
     {
         Write-Host "Installing service '$Name' at '$Path' to run as '$identity'."
         
@@ -238,7 +247,7 @@ function Install-Service
     $secondAction = ConvertTo-FailureActionArg $OnSecondFailure $RestartDelay $RebootDelay
     $thirdAction = ConvertTo-FailureActionArg $OnThirdFailure $RestartDelay $RebootDelay
 
-    if( $pscmdlet.ShouldProcess( $Name, "setting service failure actions" ) )
+    if( $PSCmdlet.ShouldProcess( $Name, "setting service failure actions" ) )
     {
         & $sc failure $Name reset= $ResetFailureCount actions= $firstAction/$secondAction/$thirdAction
         if( $LastExitCode -ne 0 )
@@ -249,9 +258,13 @@ function Install-Service
         
     if( $StartupType -eq [ServiceProcess.ServiceStartMode]::Automatic )
     {
-        if( $pscmdlet.ShouldProcess( $Name, 'start service' ) )
+        if( $PSCmdlet.ShouldProcess( $Name, 'start service' ) )
         {
             Start-Service -Name $Name
+            if( (Get-Service -Name $Name).Status -ne 'Running' -and $PSCmdlet.ParameterSetName -eq 'CustomAccount' -and -not $PSBoundParameters.ContainsKey('Password') )
+            {
+                Write-Warning ('Service ''{0}'' didn''t start and you didn''t supply a password to Install-Service.  Is ''{1}'' a managed service account or virtual account? (See http://technet.microsoft.com/en-us/library/dd548356.aspx.)  If not, please provide the account''s password with the `-Password` parameter.' -f $Name,$Username)
+            }
         }
     }
 }

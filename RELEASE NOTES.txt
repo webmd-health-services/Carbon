@@ -9,6 +9,10 @@
 ### PowerShell
 
  * Updated [Invoke-PowerShell](http://get-carbon.org/help/Invoke-PowerShell.html) to test if the appropriate .NET framework is installed if the user chooses an explicit runtime to use.
+
+### Services
+
+ * [Install-Service](http://get-carbon.org/help/Install-User.html) no longer requires a password, in order to support [managed service accounts and virtual accounts](http://technet.microsoft.com/en-us/library/dd548356.aspx).  We have no idea if this works, since we can't test locally.  Please let us know if this fix works for you.
  
 ### Users and Groups
 
