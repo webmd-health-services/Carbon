@@ -71,7 +71,7 @@ function Test-ShouldCheckExactPartialPermissionOnFileSystem
 
 function Test-ShouldCheckExactPermissionOnFileSystem
 {
-    Assert-True (Test-Permission -Path $dirPath -Identity $identity -Permission 'ReadAndExecute','Synchronize' -Exact)
+    Assert-True (Test-Permission -Path $dirPath -Identity $identity -Permission 'ReadAndExecute' -Exact)
 }
 
 function Test-ShouldExcludeInheritedPermission
@@ -86,12 +86,12 @@ function Test-ShouldIncludeInheritedPermission
 
 function Test-ShouldExcludeInheritedPartialPermission
 {
-    Assert-False (Test-Permission -Path $filePath -Identity $identity -Permission 'ReadAndExecute','Synchronize' -Exact)
+    Assert-False (Test-Permission -Path $filePath -Identity $identity -Permission 'ReadAndExecute' -Exact)
 }
 
 function Test-ShouldIncludeInheritedExactPermission
 {
-    Assert-True (Test-Permission -Path $filePath -Identity $identity -Permission 'ReadAndExecute','Synchronize' -Inherited -Exact)
+    Assert-True (Test-Permission -Path $filePath -Identity $identity -Permission 'ReadAndExecute' -Inherited -Exact)
 }
 
 function Test-ShouldCheckUngrantedPermissionOnRegistry
@@ -128,11 +128,10 @@ function Test-ShouldCheckGrantedInheritanceFlags
 
 function Test-ShouldCheckExactUngrantedInheritanceFlags
 {
-    Assert-False (Test-Permission -Path $dirPath -Identity $identity -Permission 'ReadAndExecute','Synchronize' -ApplyTo ContainerAndLeaves -Exact)
+    Assert-False (Test-Permission -Path $dirPath -Identity $identity -Permission 'ReadAndExecute' -ApplyTo ContainerAndLeaves -Exact)
 }
 
 function Test-ShouldCheckExactGrantedInheritanceFlags
 {
-    Assert-True (Test-Permission -Path $dirPath -Identity $identity -Permission 'ReadAndExecute','Synchronize' -ApplyTo ChildLeaves -Exact)
+    Assert-True (Test-Permission -Path $dirPath -Identity $identity -Permission 'ReadAndExecute' -ApplyTo ChildLeaves -Exact)
 }
-
