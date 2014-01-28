@@ -200,14 +200,6 @@ function Test-ShouldWriteWarningWhenInheritanceFlagsGivenOnLeaf
     Assert-Null $result
 }
 
-function Test-ShouldNotReapplyPermissionsAlreadyGranted
-{
-    Grant-Permission -Identity $user -Permission FullControl -Path $Path -ApplyTo Container
-    Grant-Permission -Identity $user -Permission Read -Path $Path -Apply Container
-    Assert-False (Test-Permission -Identity $user -Permission Read,Synchronize -Path $Path -ApplyTo Container -Exact)
-    Assert-True (Test-Permission -Identity $user -Permission FullControl -Path $Path -ApplyTo Container -Exact)
-}
-
 function Assert-InheritanceFlags
 {
     param(
