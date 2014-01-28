@@ -33,5 +33,5 @@ function Test-PowerShellIs32Bit
     param(
     )
     
-    return ($env:PROCESSOR_ARCHITECTURE -eq 'x86')
+    return -not ([Environment]::Is64BitProcess)
 }

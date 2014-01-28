@@ -5,11 +5,13 @@
 This is a backwards-incompatible release. 
 
  * Remove usages of `Complete-Job`.  We removed it because it was total crap.  Use PowerShell's `Wait-Job` cmdlet instead.
+ * Upgrade to PowerShell 3.
 
 ## Enhancements
 
 ### PowerShell
 
+ * Changed [Test-PowerShellIs32Bit](http://get-carbon.org/help/Test-PowerShellIs32Bit.html) and [Test-PowerShellIs64Bit](http://get-carbon.org/help/Test-PowerShellIs64Bit.html) functions to use the Environment class's new [Is64BitProcess](http://msdn.microsoft.com/en-us/library/system.environment.aspx) property.
  * Removed `Complete-Job` function.  It was total crap.
 
 ### Users and Groups

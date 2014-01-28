@@ -33,5 +33,5 @@ function Test-PowerShellIs64Bit
     param(
     )
     
-    return ($env:PROCESSOR_ARCHITECTURE -eq 'AMD64')
+    return ([Environment]::Is64BitProcess)
 }
