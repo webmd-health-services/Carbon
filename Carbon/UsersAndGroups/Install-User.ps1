@@ -52,6 +52,8 @@ function Install-User
         $PasswordExpires
     )
 
+    Set-StrictMode -Version 'Latest'
+
     # http://msdn.microsoft.com/en-us/library/windows/desktop/aa772300.aspx
     $ADS_UF_ACCOUNTDISABLE     = 0x00002
     $ADS_UF_LOCKOUT            = 0x00010
@@ -81,9 +83,9 @@ function Install-User
         $user = $computerEntry.Create( 'User', $Username )
     }
 
-    $user.SetPassword( $Password )
-    $user.Put( 'Description', $Description )
-    $user.Put( 'FullName', $FullName )
+    [void] $user.SetPassword( $Password )
+    [void] $user.Put( 'Description', $Description )
+    [void] $user.Put( 'FullName', $FullName )
 
     $userFlags = $user.UserFlags.Value
     if( $PasswordExpires )
@@ -94,7 +96,7 @@ function Install-User
     {
         $userFlags = $userFlags -bor $ADS_UF_DONT_EXPIRE_PASSWD
     }
-    $user.Put( 'UserFlags', $userFlags )
+    [void] $user.Put( 'UserFlags', $userFlags )
 
     if( $pscmdlet.ShouldProcess( $Username, "$operation local user" ) )
     {
