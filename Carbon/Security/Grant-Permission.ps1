@@ -19,7 +19,11 @@ function Grant-Permission
     Grants permission on a file, directory or registry key.
 
     .DESCRIPTION
-    Granting access to a file system entry or registry key requires a lot of steps.  This method reduces it to one call.  Very helpful.
+    Granting access to a file system entry or registry key requires a lot of steps.  This method reduces it to one call.  Very helpful.  
+    
+    Beginning with Carbon 2.0, permissions are only granted if they don't exist on an item, which saves a lot of time when granting permissions on large directory trees.  If you always want to grant permissions, use the `Force` switch.  
+
+    Beginning with Carbon 2.0, this function returns any new/updated access rules set on `Path`.
 
     It has the advantage that it will set permissions on a file system object or a registry.  If `Path` is absolute, the correct provider (file system or registry) is used.  If `Path` is relative, the provider of the current location will be used.
 
@@ -84,6 +88,12 @@ function Grant-Permission
     
     The above information adpated from [Manage Access to Windows Objects with ACLs and the .NET Framework](http://msdn.microsoft.com/en-us/magazine/cc163885.aspx#S3), published in the November 2004 copy of *MSDN Magazine*.
 
+    .OUTPUTS
+    System.Security.AccessControl.FileSystemAccessRule.
+
+    .OUTPUTS
+    System.Security.AccessControl.RegistryAccessRule.
+
     .LINK
     http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.filesystemrights.aspx
     
@@ -135,8 +145,14 @@ function Grant-Permission
         
         [Switch]
         # Removes all non-inherited permissions on the item.
-        $Clear
+        $Clear,
+
+        [Switch]
+        # Grants permissions, even if they are already present.
+        $Force
     )
+
+    Set-StrictMode -Version 'Latest'
     
     $Path = Resolve-Path $Path
 
@@ -154,7 +170,6 @@ function Grant-Permission
         return
     }
     
-    Write-Host "Granting $Identity $Permission on $Path."
     # We don't use Get-Acl because it returns the whole security descriptor, which includes owner information.
     # When passed to Set-Acl, this causes intermittent errors.  So, we just grab the ACL portion of the security descriptor.
     # See http://www.bilalaslam.com/2010/12/14/powershell-workaround-for-the-security-identifier-is-not-allowed-to-be-the-owner-of-this-object-with-set-acl/
@@ -175,20 +190,35 @@ function Grant-Permission
         }
     }
     
-    $accessRule = New-Object "Security.AccessControl.$($providerName)AccessRule" $identity,$rights,$inheritanceFlags,$propagationFlags,"Allow"
+    $rulesToRemove = $null
     if( $Clear )
     {
-        $rules = $currentAcl.Access |
+        $rulesToRemove = $currentAcl.Access |
                     Where-Object { -not $_.IsInherited }
         
-        if( $rules )
+        if( $rulesToRemove )
         {
-            $rules | 
+            $rulesToRemove | 
                 ForEach-Object { [void] $currentAcl.RemoveAccessRule( $_ ) }
         }
     }
-    $currentAcl.SetAccessRule( $accessRule )
-    Set-Acl $Path $currentAcl
+
+    $missingPermission = -not (Test-Permission -Path $Path -Identity $Identity -Permission $Permission -ApplyTo $ApplyTo -Exact)
+    $setAccessRule = ($Force -or $missingPermission)
+    if( $setAccessRule )
+    {
+        $accessRule = New-Object "Security.AccessControl.$($providerName)AccessRule" $identity,$rights,$inheritanceFlags,$propagationFlags,"Allow"
+        $currentAcl.SetAccessRule( $accessRule )
+    }
+
+    if( $rulesToRemove -or $setAccessRule )
+    {
+        Set-Acl -Path $Path -AclObject $currentAcl
+        if( $setAccessRule )
+        {
+            $accessRule | Add-Member -MemberType NoteProperty -Name 'Path' -Value $Path -PassThru
+        }
+    }
 }
 
 Set-Alias -Name 'Grant-Permissions' -Value 'Grant-Permission'

@@ -16,29 +16,33 @@ $Path = $null
 $user = 'CarbonGrantPerms'
 $containerPath = $null
 
-function Setup
+function Start-Test
 {
     & (Join-Path $TestDir ..\..\Carbon\Import-Carbon.ps1 -Resolve)
     
     Install-User -Username $user -Password 'a1b2c3d4!' -Description 'User for Carbon Grant-Permission tests.'
     
-    $Path = @([IO.Path]::GetTempFileName())[0]
+    $containerPath = New-TempDir -Prefix 'Carbon_Test-GrantPermisssion'
+    $Path = Join-Path -Path $containerPath -ChildPath ([IO.Path]::GetRandomFileName())
+    $null = New-Item -ItemType 'File' -Path $Path
 }
 
-function TearDown
+function Stop-Test
 {
-    if( Test-Path $Path )
+    if( Test-Path $containerPath )
     {
-        Remove-Item $Path
+        Remove-Item $containerPath -Recurse
     }
     
     Remove-Module Carbon
 }
 
-function Invoke-GrantPermissions($Identity, $Permissions)
+function Invoke-GrantPermissions($Identity, $Permissions, $Path)
 {
     $result = Grant-Permission -Identity $Identity -Permission $Permissions -Path $Path.ToString()
-    Assert-Null $result
+    Assert-NotNull $result
+    Assert-Equal $Identity $result.IdentityReference
+    Assert-Is $result ([Security.AccessControl.FileSystemAccessRule])
 }
 
 function Test-ShouldGrantPermissionOnFile
@@ -46,20 +50,17 @@ function Test-ShouldGrantPermissionOnFile
     $identity = 'BUILTIN\Administrators'
     $permissions = 'Read','Write'
     
-    Invoke-GrantPermissions -Identity $identity -Permissions $permissions
+    Invoke-GrantPermissions -Identity $identity -Permissions $permissions -Path $Path
     Assert-Permissions $identity $permissions
 }
 
 function Test-ShouldGrantPermissionOnDirectory
 {
-    $Path = New-TempDir
-    
     $identity = 'BUILTIN\Administrators'
     $permissions = 'Read','Write'
     
-    Write-Host $SCRIPT:Dir
-    Invoke-GrantPermissions -Identity $identity -Permissions $permissions
-    Assert-Permissions $identity $permissions
+    Invoke-GrantPermissions -Identity $identity -Permissions $permissions -Path $containerPath
+    Assert-Permissions $identity $permissions -path $containerPath
 }
 
 function Test-ShouldGrantPermissionsOnRegistryKey
@@ -70,7 +71,9 @@ function Test-ShouldGrantPermissionsOnRegistryKey
     try
     {
         $result = Grant-Permission -Identity 'BUILTIN\Administrators' -Permission 'ReadKey' -Path $regKey
-        Assert-Null $result
+        Assert-NotNull $result
+        Assert-Is $result ([Security.AccessControl.RegistryAccessRule]) 
+        Assert-Equal $regKey $result.Path
         Assert-Permissions 'BUILTIN\Administrators' -Permissions 'ReadKey' -Path $regKey
     }
     finally
@@ -90,10 +93,11 @@ function Test-ShouldFailIfIncorrectPermissions
 
 function Test-ShouldClearExistingPermissions
 {
-    Invoke-GrantPermissions 'Administrators' 'FullControl'
+    Invoke-GrantPermissions 'Administrators' 'FullControl' -Path $Path
     
-    $result = Grant-Permission -Identity 'Everyone' -Permission 'Read','Write' -Path $Path.ToSTring() -Clear
-    Assert-Null $result
+    $result = Grant-Permission -Identity 'Everyone' -Permission 'Read','Write' -Path $Path.ToString() -Clear
+    Assert-NotNull $result
+    Assert-Equal $Path $result.Path
     
     $acl = Get-Acl -Path $Path.ToString()
     
@@ -117,7 +121,8 @@ function Test-ShouldHandleNoPermissionsToClear
     
     $error.Clear()
     $result = Grant-Permission -Identity 'Everyone' -Permission 'Read','Write' -Path $Path.ToSTring() -Clear -ErrorAction SilentlyContinue
-    Assert-Null $result
+    Assert-NotNull $result
+    Assert-Equal 'Everyone' $result.IdentityReference
     Assert-Equal 0 $error.Count
     $acl = Get-Acl -Path $Path.ToString()
     $rules = $acl.Access | Where-Object { -not $_.IsInherited }
@@ -158,6 +163,11 @@ function Test-ShouldSetInheritanceFlags
         'ChildLeaves' =                               (New-FlagsObject $IFlags::ObjectInherit                      ($PFlags::InheritOnly -bor $PFlags::NoPropagateInherit))
         'ChildContainersAndChildLeaves' =             (New-FlagsObject ($IFlags::ContainerInherit -bor $IFlags::ObjectInherit)   ($PFlags::InheritOnly -bor $PFlags::NoPropagateInherit))
     }
+
+    if( (Test-Path -Path $containerPath -PathType Container) )
+    {
+        Remove-Item -Recurse -Path $containerPath
+    }
     
     $map.Keys |
         ForEach-Object {
@@ -184,7 +194,8 @@ function Test-ShouldSetInheritanceFlags
                 $flags = $map[$containerInheritanceFlag]
                 #Write-Host ('{0}: {1}     {2}' -f $_,$flags.InheritanceFlags,$flags.PropagationFlags)
                 $result = Grant-Permission -Identity $user -Path $containerPath -Permission Read -ApplyTo $containerInheritanceFlag
-                Assert-Null $result
+                Assert-NotNull $result
+                Assert-Equal $containerPath $result.Path
                 Assert-InheritanceFlags $containerInheritanceFlag $flags.InheritanceFlags $flags.PropagationFlags
             }
             finally
@@ -197,7 +208,45 @@ function Test-ShouldSetInheritanceFlags
 function Test-ShouldWriteWarningWhenInheritanceFlagsGivenOnLeaf
 {
     $result = Grant-Permission -Identity $user -Permission Read -Path $Path -ApplyTo Container
-    Assert-Null $result
+    Assert-NotNull $result
+    Assert-Equal $Path $result.Path
+}
+
+function Test-ShouldChangePermissions
+{
+    $rule = Grant-Permission -Identity $user -Permission FullControl -Path $containerPath -ApplyTo Container
+    Assert-NotNull $rule
+    Assert-True (Test-Permission -Identity $user -Permission FullControl -Path $containerPath -ApplyTo Container -Exact)
+    $rule = Grant-Permission -Identity $user -Permission Read -Path $containerPath -Apply Container
+    Assert-NotNull $rule
+    Assert-True (Test-Permission -Identity $user -Permission Read -Path $containerPath -ApplyTo Container -Exact)
+}
+
+function Test-ShouldNotReapplyPermissionsAlreadyGranted
+{
+    $rule = Grant-Permission -Identity $user -Permission FullControl -Path $containerPath
+    Assert-NotNull $rule
+    Assert-True (Test-Permission -Identity $user -Permission FullControl -Path $containerPath -Exact)
+    $rule = Grant-Permission -Identity $user -Permission FullControl -Path $containerPath
+    Assert-Null $rule
+    Assert-True (Test-Permission -Identity $user -Permission FullControl -Path $containerPath -Exact)
+}
+
+function Test-ShouldChangeInheritanceFlags
+{
+    Grant-Permission -Identity $user -Permission FullControl -Path $containerPath -ApplyTo ContainerAndLeaves
+    Assert-True (Test-Permission -Identity $user -Permission FullControl -Path $containerPath -ApplyTo ContainerAndLeaves -Exact)
+    Grant-Permission -Identity $user -Permission Read -Path $containerPath -Apply Container
+    Assert-True (Test-Permission -Identity $user -Permission Read -Path $containerPath -ApplyTo Container -Exact)
+}
+
+
+function Test-ShouldReapplySamePermissions
+{
+    Grant-Permission -Identity $user -Permission FullControl -Path $containerPath -ApplyTo ContainerAndLeaves
+    Assert-True (Test-Permission -Identity $user -Permission FullControl -Path $containerPath -ApplyTo ContainerAndLeaves -Exact)
+    Grant-Permission -Identity $user -Permission FullControl -Path $containerPath -Apply ContainerAndLeaves -Force
+    Assert-True (Test-Permission -Identity $user -Permission FullControl -Path $containerPath -ApplyTo ContainerAndLeaves -Exact)
 }
 
 function Assert-InheritanceFlags
