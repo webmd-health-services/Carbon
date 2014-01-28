@@ -1,6 +1,11 @@
 # 1.6.1
 
+
 ## Enhancements
+
+### IIS
+
+ * Created [Join-IisVirtualPath](http://get-carbon.org/help/Join-IisVirtualPath.html) for joining paths used by the IIS APIs.
 
 ### .NET
 
