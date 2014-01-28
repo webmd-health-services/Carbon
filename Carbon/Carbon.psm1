@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+#Requires -Version 3
+
 $CarbonBinDir = Join-Path $PSScriptRoot bin -Resolve
 
 # Active Directory

@@ -31,8 +31,8 @@ Imports the Carbon module, hiding any warnings about Carbon being loaded as a su
 param(
 )
 
+#Requires -Version 3
 Set-StrictMode -Version Latest
-$PSScriptRoot = Split-Path -Parent -Path $MyInvocation.MyCommand.Definition
 
 if( (Get-Module Carbon) )
 {

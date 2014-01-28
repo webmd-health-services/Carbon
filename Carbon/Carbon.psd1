@@ -19,6 +19,8 @@
 # Generated on: 8/30/2011
 #
 
+#Requires -Version 3
+
 @{
 
 # Script module or binary module file associated with this manifest
