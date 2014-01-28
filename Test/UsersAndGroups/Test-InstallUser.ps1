@@ -17,7 +17,7 @@ $password = [Guid]::NewGuid().ToString().Substring(0,15)
 
 function Start-Test
 {
-    Import-Module (Join-Path $TestDir ..\..\Carbon) -Force
+    & (Join-Path -Path $PSScriptRoot -ChildPath '..\..\Carbon\Import-Carbon.ps1' -Resolve)
     Remove-TestUser
 }
 
@@ -36,13 +36,18 @@ function Test-ShouldCreateNewUser
 {
     $fullName = 'Carbon Install User'
     $description = "Test user for testing the Carbon Install-User function."
-    Install-User -Username $username -Password $password -Description $description -FullName $fullName
+    $user = Install-User -Username $username -Password $password -Description $description -FullName $fullName
+    Assert-NotNull $user
+    Assert-Is $user ([DirectoryServices.AccountManagement.UserPrincipal])
     Assert-True (Test-User -Username $username)
-    $user = Get-WmiLocalUserAccount -Username $Username
+    [DirectoryServices.AccountManagement.UserPrincipal]$user = Get-User -Username $username
     Assert-NotNull $user
     Assert-Equal $description $user.Description
-    Assert-False $user.PasswordExpires 
-    Assert-Equal $fullName $user.FullName
+    Assert-False $user.PasswordNeverExpires 
+    Assert-True $user.Enabled
+    Assert-Equal $username $user.SamAccountName
+    Assert-False $user.UserCannotChangePassword
+    Assert-Equal $fullName $user.DisplayName
     Assert-Credential -Password $password
 }
 
@@ -50,7 +55,7 @@ function Test-ShouldUpdateExistingUsersProperties
 {
     $fullName = 'Carbon Install User'
     Install-User -Username $username -Password $password -Description "Original description" -FullName $fullName
-    $originalUser = Get-WmiLocalUserAccount -Username $username
+    $originalUser = Get-User -Username $username
     Assert-NotNull $originalUser
     
     $newFullName = 'New {0}' -f $fullName
@@ -60,14 +65,16 @@ function Test-ShouldUpdateExistingUsersProperties
                  -Password $newPassword `
                  -Description $newDescription `
                  -FullName $newFullName `
-                 -PasswordExpires 
+                 -UserCannotChangePassword `
+                 -PasswordNeverExpires 
 
-    $newUser = Get-WmiLocalUserAccount -Username $username
+    [DirectoryServices.AccountManagement.UserPrincipal]$newUser = Get-User -Username $username
     Assert-NotNull $newUser
     Assert-Equal $originalUser.SID $newUser.SID
     Assert-Equal $newDescription $newUser.Description
-    Assert-Equal $newFullName $newUser.FullName
-    Assert-True $newUser.PasswordExpires
+    Assert-Equal $newFullName $newUser.DisplayName
+    Assert-True $newUser.PasswordNeverExpires
+    Assert-True $newUser.UserCannotChangePassword
     Assert-Credential -Password $newPassword
 }
 
@@ -76,14 +83,15 @@ function Test-ShouldAllowOptionalFullName
     $fullName = 'Carbon Install User'
     $description = "Test user for testing the Carbon Install-User function."
     Install-User -Username $username -Password $password -Description $description
-    $user = Get-WmiLocalUserAccount -Username $Username
-    Assert-Empty $user.FullName
+    $user = Get-User -Username $Username
+    Assert-Empty $user.DisplayName
 }
 
 function Test-ShouldSupportWhatIf
 {
-    Install-User -Username $username -Password $password -WhatIf
-    $user = Get-WmiLocalUserAccount -Username $username
+    $user = Install-User -Username $username -Password $password -WhatIf
+    Assert-NotNull $user
+    $user = Get-User -Username $username -ErrorAction SilentlyContinue
     Assert-Null $user
 }
 

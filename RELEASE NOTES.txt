@@ -9,6 +9,8 @@ This is a backwards-incompatible release.
  * [Grant-Permission](http://get-carbon.org/help/Grant-Permission.html) now only grants permissions on an object if those permissions aren't present.  To preserve previous behaviour, add the `-Force` switch to all `Grant-Permission` usages.
  * The following Carbon functions now return objects to the pipeline instead of writing output to the host:
      * [Grant-Permission](http://get-carbon.org/help/Grant-Permission.html)
+     * [Install-User](http://get-carbon.org/help/Install-User.html)
+ * [Install-User](http://get-carbon.org/help/Install-User.html) no longer sets the `PasswordNeverExpires` switch for a user.  Add the `-PasswordNeverExpires` switch to usages of `Install-User` to preserve the old behavior.
 
 ## Enhancements
 
@@ -29,8 +31,9 @@ This is a backwards-incompatible release.
 
 ### Users and Groups
 
- * Re-wrote [Install-User](http://get-carbon.org/help/Test-DotNet.html) to use [DirectoryEntry](http://msdn.microsoft.com/en-us/library/system.directoryservices.directoryentry.aspx) .NET class instead of the `net.exe` command-line program.
- * Added `PasswordExpires` switch to [Install-User](http://get-carbon.org/help/Test-DotNet.html) for creating accounts with passwords that expire.
+ * Re-wrote [Install-User](http://get-carbon.org/help/Install-User.html) to use .NET 3.5's [System.DirectoryServices.AccountManagement namespace](http://msdn.microsoft.com/en-us/library/system.directoryservices.accountmanagement.aspx) instead of the `net.exe` command-line program.
+ * Added `PasswordNeverExpires` switch to [Install-User](http://get-carbon.org/help/Install-User.html) for creating accounts with passwords that expire.  This is a breaking change: this flag used to set this flag by default.
+ * Added `UserCannotChangePassword` switch to [Install-User](http://get-carbon.org/help/Install-User.html) to prevent user from changing his password.
 
 # 1.6.1
 

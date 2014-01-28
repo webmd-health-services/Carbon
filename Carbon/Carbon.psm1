@@ -43,6 +43,9 @@ $TrustedHostsPath = 'WSMan:\localhost\Client\TrustedHosts'
 # Services
 Add-Type -AssemblyName System.ServiceProcess
 
+# Users and Groups
+Add-Type -AssemblyName 'System.DirectoryServices.AccountManagement'
+
 # Windows Features
 $useServerManager = ((Get-Command -CommandType 'Application' -Name 'servermanagercmd*.exe' | Where-Object { $_.Name -eq 'servermanagercmd.exe' }) -ne $null)
 $useWmi = $false

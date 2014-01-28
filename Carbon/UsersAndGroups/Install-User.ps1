@@ -19,12 +19,20 @@ function Install-User
     Installs a *local* user account.
 
     .DESCRIPTION
-    Creates a new *local* user account, or, if the account already exists, updates its password and description.  In both cases, the users password is set to never expire.  This should probably be a parameter.  Send us a patch! 
+    Creates a new *local* user account.  If the account already exists, updates it.  Returns the user.
+
+    .OUTPUTS
+    System.DirectoryServices.AccountManagement.UserPrincipal.
 
     .EXAMPLE
     Install-User -Username LSkywalker -Password "whydidn'tyoutellme" -Description "Luke Skywalker's account."
 
     Creates a new `LSkywalker` user account with the given password and description.  Luke's password is set ot never expire.  
+
+    .EXAMPLE
+    Install-User -Username LSkywalker -Password "whydidn'tyoutellme" -UserCannotChangePassword -PasswordNeverExpires
+
+    Demonstrates how to create an account for a user who cannot change his password and whose password never expires.
     #>
     [CmdletBinding(SupportsShouldProcess=$true)]
     param(
@@ -48,59 +56,36 @@ function Install-User
         $FullName,
 
         [Switch]
+        # Prevent the user from changing his password.
+        $UserCannotChangePassword,
+
+        [Switch]
         # Set to true if the user's password should expire.
-        $PasswordExpires
+        $PasswordNeverExpires
     )
 
     Set-StrictMode -Version 'Latest'
 
-    # http://msdn.microsoft.com/en-us/library/windows/desktop/aa772300.aspx
-    $ADS_UF_ACCOUNTDISABLE     = 0x00002
-    $ADS_UF_LOCKOUT            = 0x00010
-    $ADS_UF_PASSWD_NOTREQD     = 0x00020
-    $ADS_UF_PASSWD_CANT_CHANGE = 0x00040
-    $ADS_UF_DONT_EXPIRE_PASSWD = 0x10000
-    
-    $userExists = Test-User -Username $username
-
-    $computerEntry = [adsi]('WinNT://{0}' -f $env:COMPUTERNAME)
-    if( $userExists )
-    {
-        $operation = 'update'
-        $logAction = 'Updating'
-        $user = $computerEntry.Children | 
-                    Where-Object { $_.Name -eq $Username }
-        if( -not $user )
-        {
-            Write-Error ('User ''{0}'' not found.' -f $Username)
-            return
-        }
-    }
-    else
+    $ctx = New-Object 'DirectoryServices.AccountManagement.PrincipalContext' ([DirectoryServices.AccountManagement.ContextType]::Machine)
+    $user = [DirectoryServices.AccountManagement.UserPrincipal]::FindByIdentity( $ctx, $Username )
+    $operation = 'update'
+    if( -not $user )
     {
         $operation = 'create'
-        $logAction = 'Creating'
-        $user = $computerEntry.Create( 'User', $Username )
+        $user = New-Object 'DirectoryServices.AccountManagement.UserPrincipal' $ctx
     }
 
-    [void] $user.SetPassword( $Password )
-    [void] $user.Put( 'Description', $Description )
-    [void] $user.Put( 'FullName', $FullName )
+    $user.SamAccountName = $Username
+    $user.DisplayName = $FullName
+    $user.Description = $Description
+    $user.UserCannotChangePassword = $UserCannotChangePassword
+    $user.PasswordNeverExpires = $PasswordNeverExpires
+    $user.SetPassword( $Password )
 
-    $userFlags = $user.UserFlags.Value
-    if( $PasswordExpires )
+    if( $PSCmdlet.ShouldProcess( $Username, "$operation local user" ) )
     {
-        $userFlags = $userFlags -band -bnot $ADS_UF_DONT_EXPIRE_PASSWD
+        $user.Save()
     }
-    else
-    {
-        $userFlags = $userFlags -bor $ADS_UF_DONT_EXPIRE_PASSWD
-    }
-    [void] $user.Put( 'UserFlags', $userFlags )
+    return $user
 
-    if( $pscmdlet.ShouldProcess( $Username, "$operation local user" ) )
-    {
-        Write-Host "$logAction local user $Username."
-        $user.CommitChanges()
-    }
 }
