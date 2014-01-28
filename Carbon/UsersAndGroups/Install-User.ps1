@@ -39,38 +39,64 @@ function Install-User
         # The user's password.
         $Password,
         
-        [Parameter()]
         [string]
         # A description of the user.
         $Description,
         
-        [Parameter()]
         [string]
         # The full name of the user.
-        $FullName
+        $FullName,
+
+        [Switch]
+        # Set to true if the user's password should expire.
+        $PasswordExpires
     )
+
+    # http://msdn.microsoft.com/en-us/library/windows/desktop/aa772300.aspx
+    $ADS_UF_ACCOUNTDISABLE     = 0x00002
+    $ADS_UF_LOCKOUT            = 0x00010
+    $ADS_UF_PASSWD_NOTREQD     = 0x00020
+    $ADS_UF_PASSWD_CANT_CHANGE = 0x00040
+    $ADS_UF_DONT_EXPIRE_PASSWD = 0x10000
     
     $userExists = Test-User -Username $username
-    $operation = 'update'
-    $logAction = 'Updating'
-    $addArg = ''
-    if( -not $userExists )
+
+    $computerEntry = [adsi]('WinNT://{0}' -f $env:COMPUTERNAME)
+    if( $userExists )
     {
-        $addArg = '/ADD'
-        $operation = 'create'
-        $logAction = 'Creating'
+        $logAction = 'Updating'
+        $user = $computerEntry.Children | 
+                    Where-Object { $_.Name -eq $Username }
+        if( -not $user )
+        {
+            Write-Error ('User ''{0}'' not found.' -f $Username)
+            return
+        }
     }
-    
+    else
+    {
+        $logAction = 'Creating'
+        $user = $computerEntry.Create( 'User', $Username )
+    }
+
+    $user.SetPassword( $Password )
+    $user.Put( 'Description', $Description )
+    $user.Put( 'FullName', $FullName )
+
+    $userFlags = $user.UserFlags.Value
+    if( $PasswordExpires )
+    {
+        $userFlags = $userFlags -band -bnot $ADS_UF_DONT_EXPIRE_PASSWD
+    }
+    else
+    {
+        $userFlags = $userFlags -bor $ADS_UF_DONT_EXPIRE_PASSWD
+    }
+    $user.Put( 'UserFlags', $userFlags )
+
     if( $pscmdlet.ShouldProcess( $Username, "$operation local user" ) )
     {
         Write-Host "$logAction local user $Username."
-        & (Resolve-NetPath) user $Username $Password $addArg /Comment:$Description /Fullname:$FullName
-        
-        if( -not $userExists )
-        {
-            $user = Get-WmiLocalUserAccount -Username $Username
-            $user.PasswordExpires = $false
-            $user.Put()
-        }
+        $user.CommitChanges()
     }
 }

@@ -43,6 +43,7 @@ function Test-ShouldCreateNewUser
     Assert-Equal $description $user.Description
     Assert-False $user.PasswordExpires 
     Assert-Equal $fullName $user.FullName
+    Assert-Credential -Password $password
 }
 
 function Test-ShouldUpdateExistingUsersProperties
@@ -54,12 +55,20 @@ function Test-ShouldUpdateExistingUsersProperties
     
     $newFullName = 'New {0}' -f $fullName
     $newDescription = "New description"
-    Install-User -Username $username -Password ([Guid]::NewGuid().ToString().Substring(0,14)) -Description $newDescription -FullName $newFullName
+    $newPassword = [Guid]::NewGuid().ToString().Substring(0,14)
+    Install-User -Username $username `
+                 -Password $newPassword `
+                 -Description $newDescription `
+                 -FullName $newFullName `
+                 -PasswordExpires 
+
     $newUser = Get-WmiLocalUserAccount -Username $username
     Assert-NotNull $newUser
     Assert-Equal $originalUser.SID $newUser.SID
     Assert-Equal $newDescription $newUser.Description
     Assert-Equal $newFullName $newUser.FullName
+    Assert-True $newUser.PasswordExpires
+    Assert-Credential -Password $newPassword
 }
 
 function Test-ShouldAllowOptionalFullName
@@ -76,4 +85,14 @@ function Test-ShouldSupportWhatIf
     Install-User -Username $username -Password $password -WhatIf
     $user = Get-WmiLocalUserAccount -Username $username
     Assert-Null $user
+}
+
+function Assert-Credential
+{
+    param(
+        $Password
+    )
+    $ctx = [DirectoryServices.AccountManagement.ContextType]::Machine
+    $px = New-Object 'DirectoryServices.AccountManagement.PrincipalContext' $ctx,$env:COMPUTERNAME
+    Assert-True ($px.ValidateCredentials( $username, $password ))
 }
