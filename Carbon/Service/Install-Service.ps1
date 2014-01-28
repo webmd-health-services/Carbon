@@ -93,7 +93,6 @@ function Install-Service
         $Dependency,
         
         [Parameter(ParameterSetName='CustomAccount',Mandatory=$true)]
-        [Alias('Identity')]
         [string]
         # The user the service should run as.
         $Username,
