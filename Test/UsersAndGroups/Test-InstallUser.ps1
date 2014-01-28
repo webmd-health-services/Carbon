@@ -13,15 +13,15 @@
 # limitations under the License.
 
 $username = 'CarbonInstallUser'
-$password = [Guid]::NewGuid().ToString().Substring(0,14)
+$password = [Guid]::NewGuid().ToString().Substring(0,15)
 
-function Setup
+function Start-Test
 {
     Import-Module (Join-Path $TestDir ..\..\Carbon) -Force
     Remove-TestUser
 }
 
-function TearDown
+function Stop-Test
 {
     Remove-TestUser
     Remove-Module Carbon

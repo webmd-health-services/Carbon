@@ -64,6 +64,7 @@ function Install-User
     $computerEntry = [adsi]('WinNT://{0}' -f $env:COMPUTERNAME)
     if( $userExists )
     {
+        $operation = 'update'
         $logAction = 'Updating'
         $user = $computerEntry.Children | 
                     Where-Object { $_.Name -eq $Username }
@@ -75,6 +76,7 @@ function Install-User
     }
     else
     {
+        $operation = 'create'
         $logAction = 'Creating'
         $user = $computerEntry.Create( 'User', $Username )
     }
