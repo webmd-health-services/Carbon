@@ -24,7 +24,7 @@ function Install-SmbShare
     Permissions don't apply to the file system.  They only apply to the share.  Use `Grant-Permission` to grant file system permissions.
 
     .EXAMPLE
-    Install-Share -Name TopSecretDocuments -Path C:\TopSecret -Description 'Share for our top secret documents.' -Permissions "Everyone,Read","Analysts,FULL"
+    Install-Share -Name TopSecretDocuments -Path C:\TopSecret -Description 'Share for our top secret documents.' -ReadAccess "Everyone" -FullAccess "Analysts"
 
     Shares the C:\TopSecret directory as `TopSecretDocuments` and grants `Everyone` read access and `Analysts` full control.  
     #>

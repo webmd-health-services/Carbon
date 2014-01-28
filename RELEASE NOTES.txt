@@ -12,7 +12,11 @@
 
 ### Services
 
- * [Install-Service](http://get-carbon.org/help/Install-User.html) no longer requires a password, in order to support [managed service accounts and virtual accounts](http://technet.microsoft.com/en-us/library/dd548356.aspx).  We have no idea if this works, since we can't test locally.  Please let us know if this fix works for you.
+ * [Install-Service](http://get-carbon.org/help/Install-User.html) no longer requires a password, in order to support [managed service accounts and virtual accounts](http://technet.microsoft.com/en-us/library/dd548356.aspx).  We have no idea if this works, since we can't test locally.  Please let us know if this fix works for you. [#114](https://bitbucket.org/splatteredbits/carbon/issue/114)
+ 
+### Shares
+
+ * Fixed [Install-SmbShare](http://get-carbon.org/help/Install-SmbShare.html) example to use correct syntax. [#111.](https://bitbucket.org/splatteredbits/carbon/issue/111)
  
 ### Users and Groups
 
