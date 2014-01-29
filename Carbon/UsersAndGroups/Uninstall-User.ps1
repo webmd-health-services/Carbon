@@ -22,7 +22,16 @@ function Uninstall-User
     Removes a *local* user account.  If the account doesn't exist, nothing happens.
 
     .LINK
+    Get-User
+
+    .LINK
     Install-User
+
+    .LINK
+    Test-User
+
+    .LINK
+    Uninstall-User
 
     .EXAMPLE
     Uninstall-User -Username WTarkin

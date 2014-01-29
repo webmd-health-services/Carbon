@@ -21,6 +21,18 @@ function Test-User
     .DESCRIPTION
     Uses .NET's AccountManagement API to check if a *local* user account exists.  Returns `True` if the *local* account exists, or `False` if it doesn't.
 
+    .OUTPUTS
+    System.Boolean
+
+    .LINK
+    Get-User
+
+    .LINK
+    Install-User
+
+    .LINK
+    Uninstall-User
+
     .EXAMPLE
     Test-User -Username HSolo
 

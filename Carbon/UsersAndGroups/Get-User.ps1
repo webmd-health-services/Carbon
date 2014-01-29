@@ -25,7 +25,13 @@ function Get-User
     System.DirectoryServices.AccountManagement.UserPrincipal.
 
     .LINK
-    Get-Group
+    Install-User
+
+    .LINK
+    Test-User
+
+    .LINK
+    Uninstall-User
 
     .EXAMPLE
     Get-User

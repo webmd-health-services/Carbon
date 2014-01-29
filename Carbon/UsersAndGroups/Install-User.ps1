@@ -25,6 +25,12 @@ function Install-User
     System.DirectoryServices.AccountManagement.UserPrincipal.
 
     .LINK
+    Get-User
+
+    .LINK
+    Test-User
+
+    .LINK
     Uninstall-User
 
     .EXAMPLE
