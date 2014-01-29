@@ -15,11 +15,12 @@
 $GroupName = 'Setup Group'
 $userName = 'CarbonTestUser'
 $password = '1M33tRequirement$'
+$description = 'Carbon user for use in Carbon tests.'
 
 function Setup
 {
     & (Join-Path -Path $PSScriptRoot -ChildPath '..\..\Carbon\Import-Carbon.ps1' -Resolve)
-    Install-User -Username $userName -Password $password
+    Install-User -Username $userName -Password $password -Description $description
     Remove-Group
 }
 
