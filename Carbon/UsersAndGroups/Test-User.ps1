@@ -19,7 +19,7 @@ function Test-User
     Checks if a *local* user account exists.
 
     .DESCRIPTION
-    Uses WMI to check if a *local* user account exists.  Returns `True` if the *local* account exists, or `False` if it doesn't.
+    Uses .NET's AccountManagement API to check if a *local* user account exists.  Returns `True` if the *local* account exists, or `False` if it doesn't.
 
     .EXAMPLE
     Test-User -Username HSolo
@@ -35,7 +35,16 @@ function Test-User
         $Username
     )
 
-    $user = Get-WmiObject Win32_UserAccount -Filter "Domain='$($env:ComputerName)' and Name='$Username'"
-    return ($user -ne $null)
+    Set-StrictMode -Version 'Latest'
 
+    $ctx = New-Object 'DirectoryServices.AccountManagement.PrincipalContext' ([DirectoryServices.AccountManagement.ContextType]::Machine)
+    $user = [DirectoryServices.AccountManagement.UserPrincipal]::FindByIdentity( $ctx, $Username )
+    if( $user )
+    {
+        return $true
+    }
+    else
+    {
+        return $false
+    }
 }

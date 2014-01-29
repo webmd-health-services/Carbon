@@ -37,6 +37,8 @@ function Uninstall-User
         # The username of the account to remove.
         $Username
     )
+
+    Set-StrictMode -Version 'Latest'
     
     if( Test-User -Username $username )
     {
