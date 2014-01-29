@@ -19,10 +19,13 @@ function Test-Identity
     Tests that a name is a valid Windows local or domain user/group.
     
     .DESCRIPTION
-    Attempts to convert an identity name into a `System.Security.Principal.SecurityIdentifer` object.  If the conversion succeeds, the name belongs to a valid local or domain user/group.  If conversion fails, the user/group doesn't exist. You can also optionally return the applicable `SecurityIdentifier` object.
+    Uses the Windows `LookupAccountName` function to find an identity.  If it can't be found, returns `$false`.  Otherwise, it returns `$true`.
     
-    If the identity testing is in another domain, and there is no trust relationship between the current domain the identity's domain, `$false` will be returned even though the account could exist.
-    
+    Use the `PassThru` switch to return a `Carbon.Identity` object (instead of `$true` if the identity exists.
+
+    .LINK
+    Resolve-Identity
+
     .EXAMPLE
     Test-Identity -Name 'Administrators
     
@@ -46,7 +49,7 @@ function Test-Identity
         $Name,
         
         [Switch]
-        # Returns a `System.Security.Principal.SecurityIdentifier` object if the identity exists.
+        # Returns a `Carbon.Identity` object if the identity exists.
         $PassThru
     )
 
@@ -60,7 +63,7 @@ function Test-Identity
 
     if( $PassThru )
     {
-        return $identity.Sid
+        return $identity
     }
     return $true
 }

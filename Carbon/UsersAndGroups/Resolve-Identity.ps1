@@ -20,7 +20,7 @@ function Resolve-Identity
     Determines the identity of a user or group using its name.
     
     .DESCRIPTION
-    The common name for an account is not always the canonical name used by the operating system.  For example, the local Administrators group is actually called BUILTIN\Administrators.  This function resolves an identity's name into its domain, name, full name, SID, and SID type. It returns a `Carbon.Identity` object with the following properties:
+    The common name for an account is not always the canonical name used by the operating system.  For example, the local Administrators group is actually called BUILTIN\Administrators.  This function uses the `LookupAccountName` Windows function to resolve an account name into its domain, name, full name, SID, and SID type. It returns a `Carbon.Identity` object with the following properties:
 
      * Domain - the domain the user was found in
      * FullName - the users full name, e.g. Domain\Name
@@ -28,7 +28,10 @@ function Resolve-Identity
      * Type - the Sid type.
      * Sid - the account's security identifier as a `System.Security.Principal.SecurityIdentifier` object.
     
-    If the name doesn't represent an actual user or group, an error is written and nothing returned.
+    If the name doesn't represent an actual user or group, an error is written and nothing is returned.
+
+    .LINK
+    Test-Identity
 
     .LINK
     http://msdn.microsoft.com/en-us/library/system.security.principal.securityidentifier.aspx

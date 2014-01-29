@@ -41,7 +41,7 @@ function Test-ShouldReturnSecurityIdentifier
 {
     $sid = Test-Identity -Name 'Administrator' -PassThru
     Assert-NotNull $sid
-    Assert-True ($sid -is [System.Security.Principal.SecurityIdentifier])
+    Assert-True ($sid -is [Carbon.Identity])
 }
 
 function Test-ShouldNotFindMissingLocalUser
