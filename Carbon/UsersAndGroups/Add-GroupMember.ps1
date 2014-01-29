@@ -61,16 +61,20 @@ function Add-GroupMember
     
     $idType = [DirectoryServices.AccountManagement.IdentityType]::Name
     $Member | 
-        ForEach-Object { Resolve-IdentityName -Name $_ } |
+        ForEach-Object { Resolve-Identity -Name $_ } |
         ForEach-Object {
-            $ntAccount = New-Object 'Security.Principal.NTAccount' $_
-            $sid = $ntAccount.Translate([Security.Principal.SecurityIdentifier])
-            $sid = $sid.Value
-            $notAMember = -not $group.Members.Contains( $ctx, 'Sid', $sid )
-            if( $notAMember -and $pscmdlet.ShouldProcess( $group.Name, ("add member {0}" -f $_) ) )
+            $identity = $_
+            $ctxType = 'Domain'
+            if( $identity.Domain -eq $env:COMPUTERNAME -or $identity.Domain -eq 'BUILTIN' -or $identity.Domain -eq 'NT AUTHORITY' )
             {
-                Write-Verbose ('Adding ''{0}'' to group ''{1}''.' -f $_,$group.Name)
-                $group.Members.Add( $ctx, 'Sid', $sid )
+                $ctxType = 'Machine'
+            }
+            $identityCtx = New-Object 'DirectoryServices.AccountManagement.PrincipalContext' $ctxType
+
+            $notAMember = -not $group.Members.Contains( $identityCtx, 'Sid', $identity.Sid.Value )
+            if( $notAMember -and $pscmdlet.ShouldProcess( $group.Name, ("add member {0}" -f $identity.FullName) ) )
+            {
+                $group.Members.Add( $identityCtx, 'Sid', $identity.Sid.Value )
                 $group.Save()
             }
         }
