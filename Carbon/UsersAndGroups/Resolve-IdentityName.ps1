@@ -40,17 +40,13 @@ function Resolve-IdentityName
         $Name
     )
     
-    $commonParams = @{ }
-    if( $PSBoundParameters.ContainsKey( 'ErrorAction' ) )
+    $sid = Test-Identity -Name $Name -PassThru -ErrorAction:$ErrorActionPreference
+    if( -not $sid )
     {
-        $commonParams.ErrorAction = $PSBoundParameters.ErrorAction
+        Write-Error ('Identity ''{0}'' not found.' -f $Name)
+        return
     }
-    
-    $sid = Test-Identity -Name $Name -PassThru @commonParams
-    if( $sid )
-    {
-        $ntAccount = $sid.Translate( [Security.Principal.NTAccount] )
-        return $ntAccount.Value
-    }
-    return $null
+
+    $ntAccount = $sid.Translate( [Security.Principal.NTAccount] )
+    return $ntAccount.Value
 }

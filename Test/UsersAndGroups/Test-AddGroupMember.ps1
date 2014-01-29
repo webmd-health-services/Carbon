@@ -36,11 +36,6 @@ function Remove-Group
     }
 }
 
-function Get-Group
-{
-    return Get-WmiObject Win32_Group -Filter "Name='$GroupName' and LocalAccount=True"
-}
-
 function Get-LocalUsers
 {
     return Get-WmiObject Win32_UserAccount -Filter "LocalAccount=True"
@@ -67,15 +62,9 @@ function Test-ShouldAddLocalUser
     $addedAUser = $false
     foreach( $user in $users )
     {
-        try
-        {
-            Invoke-AddMembersToGroup -Members $user.Name
-            $addedAUser = $true
-            break
-        }
-        catch
-        {
-        }
+        Invoke-AddMembersToGroup -Members $user.Name
+        $addedAUser = $true
+        break
     }
     Assert-True $addedAuser
 }
@@ -108,7 +97,7 @@ function Test-ShouldDetectIfNetworkServiceAlreadyMemberOfGroup
 {
     Add-GroupMember -Name $GroupName -Member 'NetworkService'
     Add-GroupMember -Name $GroupName -Member 'NetworkService'
-    Assert-LastProcessSucceeded
+    Assert-Equal 0 $Error.Count
 }
 
 function Test-ShouldAddAdministrators
@@ -122,7 +111,7 @@ function Test-ShouldDetectIfAdministratorsAlreadyMemberOfGroup
 {
     Add-GroupMember -Name $GroupName -Member 'Administrators'
     Add-GroupMember -Name $GroupName -Member 'Administrators'
-    Assert-LastProcessSucceeded
+    Assert-Equal 0 $Error.Count
 }
 
 function Test-ShouldAddAnonymousLogon
@@ -136,7 +125,7 @@ function Test-ShouldDetectIfAnonymousLogonAlreadyMemberOfGroup
 {
     Add-GroupMember -Name $GroupName -Member 'ANONYMOUS LOGON'
     Add-GroupMember -Name $GroupName -Member 'ANONYMOUS LOGON'
-    Assert-LastProcessSucceeded
+    Assert-Equal 0 $Error.Count
 }
 
 function Test-ShouldNotAddNonExistentMember
@@ -146,11 +135,15 @@ function Test-ShouldNotAddNonExistentMember
 
 function Assert-MembersInGroup($Members)
 {
-    $group = Get-Group
-    Assert-NotNull $group 'Group not created.'
-    $details = net localgroup $GroupName
-    foreach( $member in $Members )
+    $group = Get-Group -Name $GroupName
+    if( -not $group )
     {
-        Assert-ContainsLike $details $member 
+        return
+    }
+    Assert-NotNull $group 'Group not created.'
+    $Members | ForEach-Object { 
+        $memberName = $_
+        $member = $group.Members | Where-Object { $_.Name -eq $memberName }
+        Assert-NotNull $member ('Member ''{0}'' not a member of group ''{1}''' -f $memberName,$group.Name)
     }
 }

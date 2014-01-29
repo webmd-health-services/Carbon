@@ -12,6 +12,7 @@ This is a backwards-incompatible release.
      * [Install-Group](http://get-carbon.org/help/Install-Group.html)
      * [Install-User](http://get-carbon.org/help/Install-User.html)
  * [Install-User](http://get-carbon.org/help/Install-User.html) no longer sets the `PasswordNeverExpires` switch for a user.  Add the `-PasswordNeverExpires` switch to usages of `Install-User` to preserve the old behavior.
+ * [Resolve-IdentityName](http://get-carbon.org/help/Resolve-IdentityName.html) now writes an error if it can't resolve a name.  Use `-ErrorAction SilentlyContinue` or `-ErrorAction Ignore` to preserve old behavior.
 
 ## Enhancements
 
@@ -40,6 +41,8 @@ This is a backwards-incompatible release.
  * Renamed [Install-Group](http://get-carbon.org/help/Install-Group.html)'s `Members` parameter to `Member` (with backwards-compatible alias).
  * [Install-Group](http://get-carbon.org/help/Install-Group.html) re-written to use .NET 3.5's `System.DirectoryServices.AccountManagement` API.
  * [Install-Group](http://get-carbon.org/help/Install-Group.html) now returns the group added or updated.
+ * [Add-MemberToGroup](http://get-carbon.org/help/Add-MemberToGroup.html) re-written to use .NET 3.5's `System.DirectoryServices.AccountManagement` API.
+ * [Resolve-IdentityName](http://get-carbon.org/help/Resolve-IdentityName.html) now writes an error if it can't resolve a name.  Use `-ErrorAction SilentlyContinue` or `-ErrorAction Ignore` to preserve old behavior.
  
  
 # 1.6.1

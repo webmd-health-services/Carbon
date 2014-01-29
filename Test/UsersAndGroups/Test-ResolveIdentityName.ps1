@@ -36,6 +36,9 @@ function Test-ShouldResolveNTAuthorityIdentity
 
 function Test-ShouldNotResolveMadeUpName
 {
-    $fullName = Resolve-IdentityName -Name 'IDONotExist'
+    $Error.Clear()
+    $fullName = Resolve-IdentityName -Name 'IDONotExist' -ErrorAction SilentlyContinue
+    Assert-GreaterThan $Error.Count 0
+    Assert-Like $Error[0].Exception.Message '*not found*'
     Assert-Null $fullName
 }

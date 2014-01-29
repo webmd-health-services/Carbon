@@ -49,57 +49,29 @@ function Add-GroupMember
         $Member
     )
 
-    $Builtins = @{ 
-                    'NetworkService' = 'NT AUTHORITY\NETWORK SERVICE'; 
-                    'Administrators' = 'Administrators'; 
-                    'ANONYMOUS LOGON' = 'NT AUTHORITY\ANONYMOUS LOGON'; 
-                 }
+    Set-StrictMode -Version 'Latest'
     
-    $group = [adsi]('WinNT://{0}/{1}' -f $env:ComputerName,$Name)
-    if( $group -eq $null )
+    [DirectoryServices.AccountManagement.GroupPrincipal]$group = Get-Group -Name $Name
+    if( -not $group )
     {
-        Write-Error "Active directory is unable to find local group $group."
         return
     }
-
-    $currentMembers = & (Resolve-NetPath) localgroup `"$Name`"
-    $Member |
-        Where-Object { $currentMembers -notcontains $_ } |
+    
+    $ctx = New-Object 'DirectoryServices.AccountManagement.PrincipalContext' ([DirectoryServices.AccountManagement.ContextType]::Machine)
+    
+    $idType = [DirectoryServices.AccountManagement.IdentityType]::Name
+    $Member | 
+        ForEach-Object { Resolve-IdentityName -Name $_ } |
         ForEach-Object {
-            $currentMember = $_
-            if( $Builtins.ContainsKey( $currentMember ) )
+            $ntAccount = New-Object 'Security.Principal.NTAccount' $_
+            $sid = $ntAccount.Translate([Security.Principal.SecurityIdentifier])
+            $sid = $sid.Value
+            $notAMember = -not $group.Members.Contains( $ctx, 'Sid', $sid )
+            if( $notAMember -and $pscmdlet.ShouldProcess( $group.Name, ("add member {0}" -f $_) ) )
             {
-                $canonicalMemberName = $Builtins[$currentMember]
-                if( $currentMembers -contains $canonicalMemberName )
-                {
-                    continue
-                }
-                if( $pscmdlet.ShouldProcess( $Name, "add built-in member $currentMember" ) )
-                {
-                    Write-Host "Adding $currentMember to group $Name."
-                    & (Resolve-NetPath) localgroup $Name $currentMember /add
-                }
-            }
-            else
-            {
-                $memberPath = 'WinNT://{0}/{1}' -f $env:ComputerName,$currentMember
-                if( $currentMember.Contains("\") )
-                {
-                    $memberPath = 'WinNT://{0}/{1}' -f ($currentMember -split '\\')
-                }
-                
-                if( $pscmdlet.ShouldProcess( $Name, "add member $currentMember" ) )
-                {
-                    Write-Host "Adding $currentMember to group $Name."
-                    try
-                    {
-                        [void] $group.Add( $memberPath )
-                    }
-                    catch
-                    {
-                        Write-Error ('Failed to add {0} to group {1}: {2}.' -f $currentMember,$Name,$_.Exception.Message)
-                    }
-                }
+                Write-Verbose ('Adding ''{0}'' to group ''{1}''.' -f $_,$group.Name)
+                $group.Members.Add( $ctx, 'Sid', $sid )
+                $group.Save()
             }
         }
 }
