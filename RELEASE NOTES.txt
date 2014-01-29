@@ -34,8 +34,10 @@ This is a backwards-incompatible release.
  * Re-wrote [Install-User](http://get-carbon.org/help/Install-User.html) to use .NET 3.5's [System.DirectoryServices.AccountManagement namespace](http://msdn.microsoft.com/en-us/library/system.directoryservices.accountmanagement.aspx) instead of the `net.exe` command-line program.
  * Added `PasswordNeverExpires` switch to [Install-User](http://get-carbon.org/help/Install-User.html) for creating accounts with passwords that expire.  This is a breaking change: this flag used to set this flag by default.
  * Added `UserCannotChangePassword` switch to [Install-User](http://get-carbon.org/help/Install-User.html) to prevent user from changing his password.
- * Added new [Get-User](http://get-carbon.org/help/Get-User.html) function for getting a local user or all local users.
+ * Added [Get-User](http://get-carbon.org/help/Get-User.html) function for getting a local user or all local users.
+ * Added [Get-Group](http://get-carbon.org/help/Get-Group.html) function for getting a local group or all local groups.
 
+ 
 # 1.6.1
 
 ## Bug Fixes

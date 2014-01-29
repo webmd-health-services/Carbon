@@ -12,55 +12,54 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Get-User
+function Get-Group
 {
     <#
     .SYNOPSIS
-    Gets *local* users.
+    Gets *local* groups.
 
     .DESCRIPTION
-    Gets all *local* users or a specific user by its username.
+    Gets all *local* groups or a specific group by its name.
 
     .OUTPUTS
-    System.DirectoryServices.AccountManagement.UserPrincipal.
+    System.DirectoryServices.AccountManagement.GroupPrincipal.
 
     .LINK
-    Get-Group
-
-    .EXAMPLE
     Get-User
 
-    Demonstrates how to get all local users.
+    .EXAMPLE
+    Get-Group
+
+    Demonstrates how to get all local groups.
 
     .EXAMPLE
-    Get-User -Username LSkywalker 
+    Get-Group -Name RebelAlliance
 
-    Demonstrates how to get a specific user.
+    Demonstrates how to get a specific group.
     #>
     [CmdletBinding()]
     param(
-        [ValidateLength(1,20)]
         [string]
-        # The username for the user.
-        $Username 
+        # The name of the group to return.
+        $Name 
     )
 
     Set-StrictMode -Version 'Latest'
 
     $ctx = New-Object 'DirectoryServices.AccountManagement.PrincipalContext' ([DirectoryServices.AccountManagement.ContextType]::Machine)
-    if( $Username )
+    if( $Name )
     {
-        $user = [DirectoryServices.AccountManagement.UserPrincipal]::FindByIdentity( $ctx, $Username )
-        if( -not $user )
+        $group = [DirectoryServices.AccountManagement.GroupPrincipal]::FindByIdentity( $ctx, $Name )
+        if( -not $group )
         {
-            Write-Error ('Local user ''{0}'' not found.' -f $Username)
+            Write-Error ('Local group ''{0}'' not found.' -f $Name)
             return
         }
-        return $user
+        return $group
     }
     else
     {
-        $query = New-Object 'DirectoryServices.AccountManagement.UserPrincipal' $ctx
+        $query = New-Object 'DirectoryServices.AccountManagement.GroupPrincipal' $ctx
         $searcher = New-Object 'DirectoryServices.AccountManagement.PrincipalSearcher' $query
         $searcher.FindAll() 
     }
