@@ -13,30 +13,42 @@
 # limitations under the License.
 
 
-function Resolve-IdentityName
+function Resolve-Identity
 {
     <#
     .SYNOPSIS
-    Determines the full, NT identity name for a user or group.
+    Determines the identity of a user or group using its name.
     
     .DESCRIPTION
-    The common name for an account is not always the canonical name used by the operating system.  For example, the local Administrators group is actually called BUILTIN\Administrators.  This function converts an identity's name into its canonical name.
+    The common name for an account is not always the canonical name used by the operating system.  For example, the local Administrators group is actually called BUILTIN\Administrators.  This function resolves an identity's name into its domain, name, full name, SID, and SID type. It returns a `Carbon.Identity` object with the following properties:
+
+     * Domain - the domain the user was found in
+     * FullName - the users full name, e.g. Domain\Name
+     * Name - the user's username or the group's name
+     * Type - the Sid type.
+     * Sid - the account's security identifier as a `System.Security.Principal.SecurityIdentifier` object.
     
     If the name doesn't represent an actual user or group, an error is written and nothing returned.
+
+    .LINK
+    http://msdn.microsoft.com/en-us/library/system.security.principal.securityidentifier.aspx
+
+    .LINK
+    http://msdn.microsoft.com/en-us/library/windows/desktop/aa379601.aspx
     
     .OUTPUTS
-    System.String.
+    Carbon.Identity.
     
     .EXAMPLE
-    Resolve-IdentityName -Identity 'Administrators'
+    Resolve-IdentityName -Name 'Administrators'
     
-    Returns `BUILTIN\Administrators`, the canonical name for the local Administrators group.
+    Returns an object representing the `Administrators` group.
     #>
     [CmdletBinding()]
     param(
         [Parameter(Mandatory=$true)]
         [string]
-        # The name of the identity whose canonical name to return.
+        # The name of the identity to return.
         $Name
     )
 
@@ -50,3 +62,5 @@ function Resolve-IdentityName
 
     return [Carbon.Identity]::FindByName( $Name ) | Select-Object -ExpandProperty 'FullName'
 }
+
+Set-Alias -Name 'Resolve-IdentityName' -Value 'Resolve-Identity'

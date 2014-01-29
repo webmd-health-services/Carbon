@@ -12,7 +12,10 @@ This is a backwards-incompatible release.
      * [Install-Group](http://get-carbon.org/help/Install-Group.html)
      * [Install-User](http://get-carbon.org/help/Install-User.html)
  * [Install-User](http://get-carbon.org/help/Install-User.html) no longer sets the `PasswordNeverExpires` switch for a user.  Add the `-PasswordNeverExpires` switch to usages of `Install-User` to preserve the old behavior.
- * [Resolve-IdentityName](http://get-carbon.org/help/Resolve-IdentityName.html) now writes an error if it can't resolve a name.  Use `-ErrorAction SilentlyContinue` or `-ErrorAction Ignore` to preserve old behavior.
+ * `Resolve-IdentityName` renamed to [Resolve-Identity](http://get-carbon.org/help/Resolve-Identity.html), but it has a backwards-compatible alias, so you shouldn't have to do anything.
+ * [Resolve-Identity](http://get-carbon.org/help/Resolve-Identity.html) (née `Resolve-IdentityName`) now returns a `Carbon.Identity` object instead of the identity's name.  Update scripts to use the `FullName` property to get the old return value.
+ * [Resolve-Identity](http://get-carbon.org/help/Resolve-Identity.html) (née `Resolve-IdentityName`) now writes an error if it can't resolve a name.  Use `-ErrorAction SilentlyContinue` or `-ErrorAction Ignore` to preserve old behavior.
+ 
 
 ## Enhancements
 
@@ -46,6 +49,9 @@ This is a backwards-incompatible release.
  * [Uninstall-User](http://get-carbon.org/help/Uninstall-User.html) re-written to use .NET's `System.DirectoryServices.AccountManagement` API (introduced with .NET 3.5).
  * [Test-User](http://get-carbon.org/help/Test-User.html) re-written to use .NET's `System.DirectoryServices.AccountManagement` API (introduced with .NET 3.5).
  * Created [Test-Group](http://get-carbon.org/help/Test-Group.html) function for checking if a *local* group exists.
+ * `Resolve-IdentityName` renamed to [Resolve-Identity](http://get-carbon.org/help/Resolve-Identity.html), but it has a backwards-compatible alias, so you shouldn't have to do anything.
+ * [Resolve-Identity](http://get-carbon.org/help/Resolve-Identity.html) (née `Resolve-IdentityName`) now returns a `Carbon.Identity` object instead of the identity's name.  Update scripts to use the `FullName` property to get the old return value.
+ * [Resolve-Identity](http://get-carbon.org/help/Resolve-Identity.html) (née `Resolve-IdentityName`) now writes an error if it can't resolve a name.  Use `-ErrorAction SilentlyContinue` or `-ErrorAction Ignore` to preserve old behavior.
  
  
 # 1.6.1
