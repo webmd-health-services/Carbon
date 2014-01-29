@@ -39,14 +39,14 @@ function Resolve-IdentityName
         # The name of the identity whose canonical name to return.
         $Name
     )
+
+    Set-StrictMode -Version 'Latest'
     
-    $sid = Test-Identity -Name $Name -PassThru -ErrorAction:$ErrorActionPreference
-    if( -not $sid )
+    if( -not (Test-Identity -Name $Name) )
     {
         Write-Error ('Identity ''{0}'' not found.' -f $Name)
         return
     }
 
-    $ntAccount = $sid.Translate( [Security.Principal.NTAccount] )
-    return $ntAccount.Value
+    return [Carbon.Identity]::FindByName( $Name ) | Select-Object -ExpandProperty 'FullName'
 }

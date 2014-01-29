@@ -106,12 +106,15 @@ This is a backwards-incompatible release.
 ### Users and Groups
 
  * Updated [Install-User](http://get-carbon.org/help/Install-User.html) to support passwords longer than 14 characters.  Thanks to [James Crowley](http://www.jamescrowley.co.uk/) for the fix.
+ * 
 
 ### Windows Features
 
  * Marked Assert-WindowsFeatureFunctionsSupported as an internal function.  Please don't use.  It will be removed from future versions of PowerShell.
  * Updated [Test-WindowsFeature](http://get-carbon.org/help/Invoke-PowerShell.html) to work on Windows 8/2012.
-
+ * Created new `Carbon.Identity` class for representing identities.  It also contains a static `FindByName` method which uses The Windows `LookupAccountName` function to find full account names, domains, and sids.  
+ * Updated [Test-Identity](http://get-carbon.org/help/Test-Identity.html) to use `[Carbon.Identity]::FindByName` to find identities so it no longer throws exceptions when an identity can't be found.
+ * Updated [Resolve-IdentityName](http://get-carbon.org/help/Resolve-IdentityName.html) to use `[Carbon.Identity]::FindByName` to find identities so it no longer throws exceptions when an identity can't be found.
  
 # 1.6.0
 

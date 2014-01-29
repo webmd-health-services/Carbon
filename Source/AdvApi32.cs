@@ -3,22 +3,27 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
 using System.Security.AccessControl;
+using System.Security.Principal;
 using System.ServiceProcess;
+using System.Text;
 
 namespace Carbon
 {
     public sealed class AdvApi32
     {
+
         [DllImport("advapi32.dll", SetLastError = true)]
         private static extern bool QueryServiceObjectSecurity(SafeHandle serviceHandle, SecurityInfos secInfo,
                                                               byte[] lpSecDesrBuf, uint bufSize, out uint bufSizeNeeded);
 
+        // http://msdn.microsoft.com/en-us/library/cc231199.aspx
         private static readonly Dictionary<int, string> QueryServiceObjectSecurityReturnCodes =
             new Dictionary<int, string>
                 {
                     { Win32ErrorCodes.ACCESS_DENIED, "Access denied. The specified handle was not opened with READ_CONTROL access, or the calling process is not the owner of the object." },
                     { Win32ErrorCodes.INVALID_HANDLE, "Invalid handle. The specified handle is not valid."},
-                    { Win32ErrorCodes.INVALID_PARAMETER, "Invalid Parameter. The specified security information is not valid." }
+                    { Win32ErrorCodes.INVALID_PARAMETER, "Invalid Parameter. The specified security information is not valid." },
+                    { Win32ErrorCodes.INVALID_FLAGS, "Invalid flags." }
                 };
 
         public static byte[] GetServiceSecurityDescriptor(string serviceName)
@@ -82,5 +87,24 @@ namespace Carbon
             }
             throw new Win32Exception(errorCode);
         }
+
+        #region ResolveAccountName
+
+        [DllImport("advapi32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        internal static extern bool LookupAccountName(
+            string lpSystemName,
+            string lpAccountName,
+            [MarshalAs(UnmanagedType.LPArray)] byte[] Sid,
+            ref uint cbSid,
+            StringBuilder ReferencedDomainName,
+            ref uint cchReferencedDomainName,
+            out IdentityType peUse);
+
+        [DllImport("advapi32", CharSet = CharSet.Auto, SetLastError = true)]
+        internal static extern bool ConvertSidToStringSid(
+            [MarshalAs(UnmanagedType.LPArray)] byte[] pSID,
+            out IntPtr ptrSid);
+
+        #endregion
     }
 }
