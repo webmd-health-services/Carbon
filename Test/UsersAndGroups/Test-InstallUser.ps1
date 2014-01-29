@@ -13,7 +13,7 @@
 # limitations under the License.
 
 $username = 'CarbonInstallUser'
-$password = [Guid]::NewGuid().ToString().Substring(0,15)
+$password = 'IM33tRequ!rement$'
 
 function Start-Test
 {
