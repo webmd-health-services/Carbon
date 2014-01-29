@@ -9,6 +9,7 @@ This is a backwards-incompatible release.
  * [Grant-Permission](http://get-carbon.org/help/Grant-Permission.html) now only grants permissions on an object if those permissions aren't present.  To preserve previous behaviour, add the `-Force` switch to all `Grant-Permission` usages.
  * The following Carbon functions now return objects to the pipeline instead of writing output to the host:
      * [Grant-Permission](http://get-carbon.org/help/Grant-Permission.html)
+     * [Install-Group](http://get-carbon.org/help/Install-Group.html)
      * [Install-User](http://get-carbon.org/help/Install-User.html)
  * [Install-User](http://get-carbon.org/help/Install-User.html) no longer sets the `PasswordNeverExpires` switch for a user.  Add the `-PasswordNeverExpires` switch to usages of `Install-User` to preserve the old behavior.
 
@@ -36,7 +37,10 @@ This is a backwards-incompatible release.
  * Added `UserCannotChangePassword` switch to [Install-User](http://get-carbon.org/help/Install-User.html) to prevent user from changing his password.
  * Added [Get-User](http://get-carbon.org/help/Get-User.html) function for getting a local user or all local users.
  * Added [Get-Group](http://get-carbon.org/help/Get-Group.html) function for getting a local group or all local groups.
-
+ * Renamed [Install-Group](http://get-carbon.org/help/Install-Group.html)'s `Members` parameter to `Member` (with backwards-compatible alias).
+ * [Install-Group](http://get-carbon.org/help/Install-Group.html) re-written to use .NET 3.5's `System.DirectoryServices.AccountManagement` API.
+ * [Install-Group](http://get-carbon.org/help/Install-Group.html) now returns the group added or updated.
+ 
  
 # 1.6.1
 

@@ -26,6 +26,7 @@ function Install-Group
 
     If the TIE fighters group doesn't exist, it is created with the given description and default members.  If it already exists, its description is updated and the given members are added to it.
     #>
+    [CmdletBinding(SupportsShouldProcess=$true)]
     param(
         [Parameter(Mandatory=$true)]
         [string]
@@ -36,25 +37,34 @@ function Install-Group
         # A description of the group.
         $Description = '',
         
+        [Alias('Members')]
         [string[]]
         # Members of the group.
-        $Members = @()
+        $Member = @()
     )
     
-    $group = Get-WmiObject Win32_Group -Filter "Name='$Name' and LocalAccount = True"
-    $addArg =  ''
-    $action = 'Updating'
-    if( -not $group ) 
+    Set-StrictMode -Version 'Latest'
+
+    $ctx = New-Object 'DirectoryServices.AccountManagement.PrincipalContext' ([DirectoryServices.AccountManagement.ContextType]::Machine)
+    $group = [DirectoryServices.AccountManagement.GroupPrincipal]::FindByIdentity( $ctx, $Name )
+    $operation = 'update'
+    if( -not $group )
     {
-        $action = "Creating" 
-        $addArg = "/ADD" 
-    } 
-    Write-Host "$action local group '$Name'."
-    
-    & (Resolve-NetPath) localgroup `"$Name`" /Comment:"$Description" $addArg
-    
-    if( $Members )
-    {
-        Add-GroupMember -Name $Name -Member $Members
+        $operation = 'create'
+        $group = New-Object 'DirectoryServices.AccountManagement.GroupPrincipal' $ctx
     }
+
+    $group.Name = $Name
+    $group.Description = $Description
+
+    if( $PSCmdlet.ShouldProcess( $Name, "$operation local group" ) )
+    {
+        $group.Save()
+        if( $Member )
+        {
+            Add-GroupMember -Name $Name -Member $Member
+        }
+    }
+    
+    return $group
 }

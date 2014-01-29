@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-Import-Module (Join-Path $TestDir ..\..\Carbon) -Force
+& (Join-Path -Path $PSScriptRoot -ChildPath '..\..\Carbon\Import-Carbon.ps1' -Resolve)
 
 $GroupName = 'Setup Group'
 
@@ -28,58 +28,59 @@ function TearDown
 
 function Remove-Group
 {
-    $group = Get-Group
+    $group = Get-Group |
+                Where-Object { $_.Name -eq $GroupName }
     if( $group -ne $null )
     {
         net localgroup `"$GroupName`" /delete
     }
 }
 
-function Get-Group
-{
-    return Get-WmiObject Win32_Group -Filter "Name='$GroupName' and LocalAccount=True"
-}
-
 function Invoke-NewGroup($Description = '', $Members = @())
 {
-    Install-Group -Name $GroupName -Description $Description -Members $Members
+    $group = Install-Group -Name $GroupName -Description $Description -Members $Members
+    Assert-NotNull $group 'Install-Group didn''t return the created/updated group.'
     Assert-GroupExists
+    $expectedGroup = Get-Group -Name $GroupName
+    Assert-Equal $group.Sid $expectedGroup.Sid
 }
 
 function Test-ShouldCreateGroup
 {
     $expectedDescription = 'Hello, wordl!'
     Invoke-NewGroup -Description $expectedDescription
-    $group = Get-Group
+    $group = Get-Group -Name $GroupName
+    Assert-NotNull $group
+    Assert-Equal $GroupName $group.Name
     Assert-Equal $expectedDescription $group.Description 'Group not created with a description.'
 }
 
-function Ignore-ShouldAddMembers
+function Test-ShouldAddMembers
 {
-    Invoke-NewGroup -Members 'Administrators'
+    Invoke-NewGroup -Members 'Administrator'
     
     $details = net localgroup `"$GroupName`"
-    Assert-ContainsLike $details 'Administrators' 'Administrators not added to group.'
+    Assert-ContainsLike $details 'Administrator' 'Administrator not added to group.'
 }
 
 function Test-ShouldNotRecreateIfGroupAlreadyExists
 {
     Invoke-NewGroup -Description 'Description 1'
-    $group1 = Get-Group
+    $group1 = Get-Group -Name $GroupName
     
     Invoke-NewGroup -Description 'Description 2'
-    $group2 = Get-Group
+    $group2 = Get-Group -Name $GroupName
     
     Assert-Equal 'Description 2' $group2.Description 'Description not changed/updated.'
     Assert-Equal $group1.SID $group2.SID 'A new group was created!'
     
 }
 
-function Ignore-ShouldNotAddMemberMultipleTimes
+function Test-ShouldNotAddMemberMultipleTimes
 {
-    Invoke-NewGroup -Members 'Administrators'
+    Invoke-NewGroup -Members 'Administrator'
     
-    Invoke-NewGroup -Members 'Administrators'
+    Invoke-NewGroup -Members 'Administrator'
 }
 
 function Test-ShouldAddMemberWithLongName
@@ -89,8 +90,19 @@ function Test-ShouldAddMemberWithLongName
     Assert-ContainsLike $details 'WBMD\WHS - Lifecycle Services' 'Lifecycle Services not added to group.'
 }
 
+function Test-ShouldSupportWhatIf
+{
+    $Error.Clear()
+    $group = Install-Group -Name $GroupName -WhatIf -Member 'Administrator'
+    Assert-Equal 0 $Error.Count
+    Assert-NotNull $group
+    $group = Get-Group -Name $GroupName -ErrorAction SilentlyContinue
+    Assert-Null $group
+}
+
 function Assert-GroupExists
 {
-    $group = Get-Group
+    $group = Get-Group |
+                Where-Object { $_.Name -eq $GroupName }
     Assert-NotNull $group 'Group not created.'
 }
