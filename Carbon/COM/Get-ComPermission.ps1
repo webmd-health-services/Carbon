@@ -75,6 +75,8 @@ function Get-ComPermission
         $Identity        
     )
     
+    Set-StrictMode -Version 'Latest'
+
     $comArgs = @{ }
     if( $pscmdlet.ParameterSetName -like 'Default*' )
     {
@@ -98,8 +100,12 @@ function Get-ComPermission
         Where-Object {
             if( $Identity )
             {
-                $rIdentity = Resolve-IdentityName -Name $Identity
-                return ( $_.IdentityReference.Value -eq $rIdentity )
+                $account = Resolve-Identity -Name $Identity
+                if( -not $account )
+                {
+                    return $false
+                }
+                return ( $_.IdentityReference.Value -eq $account.FullName )
             }
             
             return $true

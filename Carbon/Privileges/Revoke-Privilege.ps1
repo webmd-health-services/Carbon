@@ -94,15 +94,14 @@ function Revoke-Privilege
     
     Set-StrictMode -Version Latest
     
-    if( -not (Test-Identity -Name $Identity) )
+    $account = Resolve-Identity -Name $Identity
+    if( -not $account )
     {
-        Write-Error -Message ('[Carbon] [Revoke-Privilege] Identity {0} not found.' -f $identity) `
-                    -Category ObjectNotFound
         return
     }
     
     # Convert the privileges from the user into their canonical names.
-    $cPrivileges = Get-Privilege -Identity $Identity |
+    $cPrivileges = Get-Privilege -Identity $account.FullName |
                         Where-Object { $Privilege -contains $_ }
     if( -not $cPrivileges )
     {
@@ -111,11 +110,11 @@ function Revoke-Privilege
     
     try
     {
-        [Carbon.Lsa]::RevokePrivileges($Identity,$cPrivileges)
+        [Carbon.Lsa]::RevokePrivileges($account.FullName,$cPrivileges)
     }
     catch
     {
-        Write-Error -Message ('Failed to revoke {0}''s {1} privilege(s).' -f $Identity,($cPrivileges -join ', ')) `
+        Write-Error -Message ('Failed to revoke {0}''s {1} privilege(s).' -f $account.FullName,($cPrivileges -join ', ')) `
                     -Exception $_.Exception
 
         $ex = $_.Exception

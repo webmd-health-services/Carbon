@@ -111,11 +111,9 @@ function Test-Permission
         return
     }
 
-    $originalIdentity = $Identity
-    $Identity = Resolve-IdentityName -Name $Identity
-    if( -not $Identity )
+    $account = Resolve-Identity -Name $Identity
+    if( -not $account)
     {
-        Write-Error ('Identity ''{0}'' not found.' -f $originalIdentity)
         return
     }
 
@@ -129,7 +127,7 @@ function Test-Permission
                 Select-Object -ExpandProperty Access | 
                 Where-Object { $_.AccessControlType -eq 'Allow' } |
                 Where-Object { $_.IsInherited -eq $Inherited } |
-                Where-Object { $_.IdentityReference -eq $Identity } |
+                Where-Object { $_.IdentityReference -eq $account.FullName } |
                 Where-Object { 
                     if( $Exact )
                     {

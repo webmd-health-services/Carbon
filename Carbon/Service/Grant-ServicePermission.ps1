@@ -119,8 +119,10 @@ function Grant-ServicePermission
         $WriteOwner
     )
 
-    $rIdentity = Resolve-IdentityName -Name $Identity
-    if( -not $rIdentity )
+    Set-StrictMode -Version 'Latest'
+
+    $account = Resolve-Identity -Name $Identity
+    if( -not $account )
     {
         return
     }
@@ -139,10 +141,8 @@ function Grant-ServicePermission
             ForEach-Object { $accessRights = $accessRights -bor [Carbon.Security.ServiceAccessRights]::$_ }
     }
     
-    $identitySid = Test-Identity -Name $Identity -PassThru
-
     $dacl = Get-ServiceAcl -Name $Name
-    $dacl.SetAccess( [Security.AccessControl.AccessControlType]::Allow, $identitySid, $accessRights, 'None', 'None' )
+    $dacl.SetAccess( [Security.AccessControl.AccessControlType]::Allow, $account.Sid, $accessRights, 'None', 'None' )
     
     Set-ServiceAcl -Name $Name -DACL $dacl
 }

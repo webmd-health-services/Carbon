@@ -71,6 +71,8 @@ function Revoke-ComPermission
         $Limits
     )
     
+    Set-StrictMode -Version 'Latest'
+    
     $comArgs = @{ }
     if( $pscmdlet.ParameterSetName -like 'Default*' )
     {
@@ -94,10 +96,9 @@ function Revoke-ComPermission
         $comArgs.LaunchAndActivation = $true
     }
     
-    $sidAccount = Test-Identity -Name $Identity -PassThru
-    if( -not $sidAccount )
+    $account = Resolve-Identity -Name $Identity
+    if( -not $account )
     {
-        Write-Warning "Unable to find identity $Identity."
         return
     }
 
@@ -111,7 +112,7 @@ function Revoke-ComPermission
 
     # Remove DACL for this user, if it exists
     $newSd.DACL = $currentSD.DACL | 
-                    Where-Object { $_.Trustee.SIDString -ne $sidAccount.Value } | 
+                    Where-Object { $_.Trustee.SIDString -ne $account.Sid.Value } | 
                     ForEach-Object { $_.PsObject.BaseObject }
 
     $converter = New-Object Management.ManagementClass 'Win32_SecurityDescriptorHelper'

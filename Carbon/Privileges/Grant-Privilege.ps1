@@ -91,17 +91,18 @@ function Grant-Privilege
         # The privileges to grant. *Privilege names are **case-sensitive**.*
         $Privilege
     )
+
+    Set-StrictMode -Version 'Latest'
     
-    if( -not (Test-Identity -Name $Identity) )
+    $account = Resolve-Identity -Name $Identity
+    if( -not $account )
     {
-        Write-Error -Message ('[Carbon] [Grant-Privilege] Identity {0} not found.' -f $Identity) `
-                    -Category ObjectNotFound
         return
     }
     
     try
     {
-        [Carbon.Lsa]::GrantPrivileges( $Identity, $Privilege )
+        [Carbon.Lsa]::GrantPrivileges( $account.FullName, $Privilege )
     }
     catch
     {
@@ -111,7 +112,7 @@ function Grant-Privilege
             if( $ex -is [ComponentModel.Win32Exception] -and $ex.Message -eq 'No such privilege. Indicates a specified privilege does not exist.' )
             {
                 $msg = 'Failed to grant {0} {1} privilege(s): {2}  *Privilege names are **case-sensitive**.*' -f `
-                        $Identity,($Privilege -join ','),$ex.Message
+                        $account.FullName,($Privilege -join ','),$ex.Message
                 Write-Error -Message $msg -Exception $ex
                 return
             }
@@ -123,7 +124,7 @@ function Grant-Privilege
         while( $ex )
 
         $ex = $_.Exception        
-        Write-Error -Message ('Failed to grant {0} {1} privilege(s): {2}' -f $Identity,($Privilege -join ', '),$ex.Message) `
+        Write-Error -Message ('Failed to grant {0} {1} privilege(s): {2}' -f $account.FullName,($Privilege -join ', '),$ex.Message) `
                     -Exception $ex
         
         while( $ex.InnerException )

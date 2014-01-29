@@ -154,16 +154,15 @@ function Install-Service
     
     if( $PSCmdlet.ParameterSetName -eq 'CustomAccount' )
     {
-        $identity = Resolve-IdentityName -Name $Username
+        $identity = Resolve-Identity -Name $Username
         if( -not $identity )
         {
-            Write-Error ("Service identity '{0}' not found." -f $Username,$Name)
             return
         }
     }
     else
     {
-        $identity = "NT AUTHORITY\NetworkService"
+        $identity = Resolve-Identity -Name "NT AUTHORITY\NetworkService"
     }
     
     $sc = Join-Path $env:WinDir system32\sc.exe -Resolve
@@ -188,16 +187,16 @@ function Install-Service
             $passwordArgValue = $Password
         }
         
-        if( $PSCmdlet.ShouldProcess( $identity, "grant the log on as a service right" ) )
+        if( $PSCmdlet.ShouldProcess( $identity.FullName, "grant the log on as a service right" ) )
         {
-            Write-Host ("Granting '{0}' the log on as a service right." -f $Identity)
-            Grant-Privilege -Identity $identity -Privilege SeServiceLogonRight
+            Write-Host ("Granting '{0}' the log on as a service right." -f $Identity.FullName)
+            Grant-Privilege -Identity $identity.FullName -Privilege SeServiceLogonRight
         }
     }
     
-    if( $PSCmdlet.ShouldProcess( $Path, ('grant {0} ReadAndExecute permissions' -f $identity) ) )
+    if( $PSCmdlet.ShouldProcess( $Path, ('grant {0} ReadAndExecute permissions' -f $identity.FullName) ) )
     {
-        Grant-Permission -Identity $identity -Permission ReadAndExecute -Path $Path
+        Grant-Permission -Identity $identity.FullName -Permission ReadAndExecute -Path $Path
     }
     
     $service = Get-Service -Name $Name -ErrorAction SilentlyContinue
@@ -233,9 +232,9 @@ function Install-Service
 
     if( $PSCmdlet.ShouldProcess( "$Name [$Path]", "$operation service" ) )
     {
-        Write-Host "Installing service '$Name' at '$Path' to run as '$identity'."
+        Write-Host "Installing service '$Name' at '$Path' to run as '$($identity.FullName)'."
         
-        & $sc $operation $Name binPath= $Path start= $startArg obj= $identity $passwordArgName $passwordArgValue $dependencyArgName $dependencyArgValue
+        & $sc $operation $Name binPath= $Path start= $startArg obj= $identity.FullName $passwordArgName $passwordArgValue $dependencyArgName $dependencyArgValue
         if( $LastExitCode -ne 0 )
         {
             Write-Error "$sc failed $operation and returned '$LastExitCode'."

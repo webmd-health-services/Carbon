@@ -39,7 +39,7 @@ function Test-ShouldInstallService
     Assert-Equal $serviceName $service.Name
     Assert-Equal $serviceName $service.DisplayName
     Assert-Equal 'Automatic' $service.StartMode
-    Assert-Equal 'NT AUTHORITY\NetworkService' $service.UserName
+    Assert-Equal (Resolve-Identity -Name 'NT AUTHORITY\NetworkService').FullName $service.UserName
 }
 
 function Test-ShouldUpdateServiceProperties

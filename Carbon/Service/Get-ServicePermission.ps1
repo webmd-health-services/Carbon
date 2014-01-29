@@ -55,15 +55,16 @@ function Get-ServicePermission
         $Identity
     )
     
+    Set-StrictMode -Version 'Latest'
+
     $dacl = Get-ServiceAcl -Name $Name
     
-    $rIdentity = $null
+    $account = $null
     if( $Identity )
     {
-        $rIdentity = Resolve-IdentityName -Name $Identity
-        if( -not $rIdentity )
+        $account = Resolve-Identity -Name $Identity
+        if( -not $account )
         {
-            Write-Error ("Identity {0} not found." -f $identity)
             return
         }
     }
@@ -101,9 +102,9 @@ function Get-ServicePermission
             New-Object Carbon.Security.ServiceAccessRule $aceSid,$ace.AccessMask,$ruleType            
         } |
         Where-Object { 
-            if( $rIdentity )
+            if( $account )
             {
-                return ($_.IdentityReference.Value -eq $rIdentity)
+                return ($_.IdentityReference.Value -eq $account.FullName)
             }
             return $_
         }

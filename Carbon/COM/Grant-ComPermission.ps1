@@ -142,10 +142,12 @@ function Grant-ComPermission
         $RemoteActivation
     )
     
-    $sid = Test-Identity -Name $Identity -PassThru
-    if( -not $sid )
+    Set-StrictMode -Version 'Latest'
+    
+    $account = Resolve-Identity -Name $Identity
+    if( -not $account )
     {
-        Write-Error ("Identity {0} not found." -f $Identity)
+        return
     }
 
     $comArgs = @{ }
@@ -179,7 +181,7 @@ function Grant-ComPermission
     $newSd.Owner = $currentSD.Owner
 
     $trustee = ([wmiclass]'win32_trustee').CreateInstance()
-    $trustee.SIDString = $sid.Value
+    $trustee.SIDString = $account.Sid.Value
 
     $ace = ([wmiclass]'win32_ace').CreateInstance()
     $accessMask = [Carbon.Security.ComAccessRights]::Execute
@@ -200,7 +202,7 @@ function Grant-ComPermission
         $accessMask = $accessMask -bor [Carbon.Security.ComAccessRights]::ActivateRemote
     }
     
-    Write-Host ("Granting {0} {1} COM {2} {3}." -f $Identity,([Carbon.Security.ComAccessRights]$accessMask),$permissionsDesc,$typeDesc)
+    Write-Host ("Granting {0} {1} COM {2} {3}." -f $account.FullName,([Carbon.Security.ComAccessRights]$accessMask),$permissionsDesc,$typeDesc)
 
     $ace.AccessMask = $accessMask
     $ace.Trustee = $trustee

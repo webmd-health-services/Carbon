@@ -45,8 +45,10 @@ function Revoke-ServicePermission
         $Identity
     )
     
-    $rIdentity = Resolve-IdentityName -Name $Identity
-    if( -not $rIdentity )
+    Set-StrictMode -Version 'Latest'
+
+    $account = Resolve-Identity -Name $Identity
+    if( -not $account )
     {
         return
     }
@@ -56,13 +58,12 @@ function Revoke-ServicePermission
         return
     }
     
-    if( (Get-ServicePermission -Name $Name -Identity $rIdentity) )
+    if( (Get-ServicePermission -Name $Name -Identity $account.FullName) )
     {
-        Write-Host ("Revoking {0}'s {1} service permissions." -f $rIdentity,$Name)
+        Write-Host ("Revoking {0}'s {1} service permissions." -f $account.FullName,$Name)
         
         $dacl = Get-ServiceAcl -Name $Name
-        $sid = Test-Identity -Name $rIdentity -PassThru
-        $dacl.Purge( $sid )
+        $dacl.Purge( $account.Sid )
         
         Set-ServiceAcl -Name $Name -Dacl $dacl
     }
