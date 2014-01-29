@@ -39,18 +39,13 @@ function Resolve-IdentityName
         # The name of the identity whose canonical name to return.
         $Name
     )
+
+    Set-StrictMode -Version 'Latest'
     
-    $commonParams = @{ }
-    if( $PSBoundParameters.ContainsKey( 'ErrorAction' ) )
+    if( Test-Identity -Name $Name )
     {
-        $commonParams.ErrorAction = $PSBoundParameters.ErrorAction
+        return [Carbon.Identity]::FindByName( $Name ) | Select-Object -ExpandProperty 'FullName'
     }
-    
-    $sid = Test-Identity -Name $Name -PassThru @commonParams
-    if( $sid )
-    {
-        $ntAccount = $sid.Translate( [Security.Principal.NTAccount] )
-        return $ntAccount.Value
-    }
+
     return $null
 }

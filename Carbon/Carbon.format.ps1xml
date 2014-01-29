@@ -154,36 +154,73 @@
 					</TableRowEntry>
 				</TableRowEntries>
 			</TableControl>
-		</View>
-	  <View>
-		<Name>CarbonIisMimeMap</Name>
-		<ViewSelectedBy>
-			<TypeName>Carbon.Iis.MimeMap</TypeName>
-		</ViewSelectedBy>
-		<TableControl>
-			<TableHeaders>
-				<TableColumnHeader>
-					<Label>File Extension</Label>
-					<Width>15</Width>
-				</TableColumnHeader>
-				<TableColumnHeader>
-					<Label>MIME Type</Label>
-					<Width>64</Width>
-				</TableColumnHeader>
-			</TableHeaders>
-			<TableRowEntries>
-				<TableRowEntry>
-					<TableColumnItems>
-						<TableColumnItem>
-							<PropertyName>FileExtension</PropertyName>
-						</TableColumnItem>
-						<TableColumnItem>
-							<PropertyName>MimeType</PropertyName>
-						</TableColumnItem>
-					</TableColumnItems>
-					</TableRowEntry>
-				</TableRowEntries>
-			</TableControl>
+        </View>
+        <View>
+		    <Name>CarbonIisMimeMap</Name>
+		    <ViewSelectedBy>
+			    <TypeName>Carbon.Iis.MimeMap</TypeName>
+		    </ViewSelectedBy>
+		    <TableControl>
+			    <TableHeaders>
+				    <TableColumnHeader>
+					    <Label>File Extension</Label>
+					    <Width>15</Width>
+				    </TableColumnHeader>
+				    <TableColumnHeader>
+					    <Label>MIME Type</Label>
+					    <Width>64</Width>
+				    </TableColumnHeader>
+			    </TableHeaders>
+			    <TableRowEntries>
+				    <TableRowEntry>
+					    <TableColumnItems>
+						    <TableColumnItem>
+							    <PropertyName>FileExtension</PropertyName>
+						    </TableColumnItem>
+						    <TableColumnItem>
+							    <PropertyName>MimeType</PropertyName>
+						    </TableColumnItem>
+					    </TableColumnItems>
+				    </TableRowEntry>
+			    </TableRowEntries>
+		    </TableControl>
+	    </View>
+        <View>
+            <Name>CarbonIdentity</Name>
+            <ViewSelectedBy>
+                <TypeName>Carbon.Identity</TypeName>
+            </ViewSelectedBy>
+            <TableControl>
+			    <TableHeaders>
+				    <TableColumnHeader>
+					    <Label>FullName</Label>
+					    <Width>32</Width>
+				    </TableColumnHeader>
+				    <TableColumnHeader>
+					    <Label>Sid</Label>
+					    <Width>46</Width>
+				    </TableColumnHeader>
+				    <TableColumnHeader>
+					    <Label>Type</Label>
+					    <Width>14</Width>
+				    </TableColumnHeader>
+			    </TableHeaders>
+			    <TableRowEntries>
+				    <TableRowEntry>
+					    <TableColumnItems>
+						    <TableColumnItem>
+							    <PropertyName>FullName</PropertyName>
+						    </TableColumnItem>
+						    <TableColumnItem>
+							    <PropertyName>Sid</PropertyName>
+						    </TableColumnItem>
+						    <TableColumnItem>
+							    <PropertyName>Type</PropertyName>
+						    </TableColumnItem>
+					    </TableColumnItems>
+				    </TableRowEntry>
+			    </TableRowEntries>
+            </TableControl>
 		</View>
 	</ViewDefinitions>
 </Configuration>

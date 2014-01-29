@@ -47,8 +47,11 @@
   <ItemGroup>
     <Compile Include="AdvApi32.cs" />
     <Compile Include="Certificates\SslCertificateBinding.cs" />
+    <Compile Include="Identity.cs" />
+    <Compile Include="IdentityType.cs" />
     <Compile Include="Ini\IniNode.cs" />
     <Compile Include="IO\JunctionPoint.cs" />
+    <Compile Include="Kernel32.cs" />
     <Compile Include="Lsa.cs">
       <SubType>Code</SubType>
     </Compile>
