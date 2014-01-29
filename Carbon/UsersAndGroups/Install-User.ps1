@@ -24,6 +24,9 @@ function Install-User
     .OUTPUTS
     System.DirectoryServices.AccountManagement.UserPrincipal.
 
+    .LINK
+    Uninstall-User
+
     .EXAMPLE
     Install-User -Username LSkywalker -Password "whydidn'tyoutellme" -Description "Luke Skywalker's account."
 

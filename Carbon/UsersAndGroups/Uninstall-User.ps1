@@ -21,6 +21,9 @@ function Uninstall-User
     .DESCRIPTION
     Removes a *local* user account.  If the account doesn't exist, nothing happens.
 
+    .LINK
+    Install-User
+
     .EXAMPLE
     Uninstall-User -Username WTarkin
 
@@ -37,9 +40,10 @@ function Uninstall-User
     
     if( Test-User -Username $username )
     {
-        if( $pscmdlet.ShouldProcess( "$Username", "remove local user" ) )
+        $user = Get-User -Username $Username
+        if( $pscmdlet.ShouldProcess( $Username, "remove local user" ) )
         {
-            & (Resolve-NetPath) user $Username /delete
+            $user.Delete()
         }
     }
 }

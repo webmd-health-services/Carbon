@@ -33,17 +33,17 @@ This is a backwards-incompatible release.
 
 ### Users and Groups
 
- * Re-wrote [Install-User](http://get-carbon.org/help/Install-User.html) to use .NET 3.5's [System.DirectoryServices.AccountManagement namespace](http://msdn.microsoft.com/en-us/library/system.directoryservices.accountmanagement.aspx) instead of the `net.exe` command-line program.
+ * Re-wrote [Install-User](http://get-carbon.org/help/Install-User.html) to use .NET's [System.DirectoryServices.AccountManagement](http://msdn.microsoft.com/en-us/library/system.directoryservices.accountmanagement.aspx) API (introduced with .NET 3.5) instead of the `net.exe` command-line program.
  * Added `PasswordNeverExpires` switch to [Install-User](http://get-carbon.org/help/Install-User.html) for creating accounts with passwords that expire.  This is a breaking change: this flag used to set this flag by default.
  * Added `UserCannotChangePassword` switch to [Install-User](http://get-carbon.org/help/Install-User.html) to prevent user from changing his password.
  * Added [Get-User](http://get-carbon.org/help/Get-User.html) function for getting a local user or all local users.
  * Added [Get-Group](http://get-carbon.org/help/Get-Group.html) function for getting a local group or all local groups.
  * Renamed [Install-Group](http://get-carbon.org/help/Install-Group.html)'s `Members` parameter to `Member` (with backwards-compatible alias).
- * [Install-Group](http://get-carbon.org/help/Install-Group.html) re-written to use .NET 3.5's `System.DirectoryServices.AccountManagement` API.
+ * [Install-Group](http://get-carbon.org/help/Install-Group.html) re-written to use .NET's `System.DirectoryServices.AccountManagement` API (introduced with .NET 3.5).
  * [Install-Group](http://get-carbon.org/help/Install-Group.html) now returns the group added or updated.
- * [Add-MemberToGroup](http://get-carbon.org/help/Add-MemberToGroup.html) re-written to use .NET 3.5's `System.DirectoryServices.AccountManagement` API.
+ * [Add-MemberToGroup](http://get-carbon.org/help/Add-MemberToGroup.html) re-written to use .NET's `System.DirectoryServices.AccountManagement` API (introduced with .NET 3.5).
  * [Resolve-IdentityName](http://get-carbon.org/help/Resolve-IdentityName.html) now writes an error if it can't resolve a name.  Use `-ErrorAction SilentlyContinue` or `-ErrorAction Ignore` to preserve old behavior.
- 
+ * [Uninstall-User](http://get-carbon.org/help/Uninstall-User.html) re-written to use .NET's `System.DirectoryServices.AccountManagement` API (introduced with .NET 3.5).
  
 # 1.6.1
 

@@ -13,21 +13,21 @@
 # limitations under the License.
 
 $username = 'CarbonRemoveUser'
-$password = [Guid]::NewGuid().ToString().Substring(0,14)
+$password = 'IM33tRequ!rement$'
 
-function Setup
+function Start-Test
 {
-    Import-Module (Join-Path $TestDir ..\..\Carbon)
-    net user $username $password /add
+    & (Join-Path -Path $PSScriptRoot -ChildPath '..\..\Carbon\Import-Carbon.ps1' -Resolve)
+    net user $username $password /add /Y
+    Assert-True (Test-User -Username $username)
 }
 
-function TearDown
+function Stop-Test
 {
     if( Test-User -Username $username )
     {
         net user $username /delete
     }
-    Remove-Module Carbon
 }
 
 function Test-ShouldRemoveUser
@@ -38,9 +38,9 @@ function Test-ShouldRemoveUser
 
 function Test-ShouldHandleRemovingNonExistentUser
 {
-    $error.Clear()
+    $Error.Clear()
     Uninstall-User -Username ([Guid]::NewGuid().ToString().Substring(0,20))
-    Assert-False $error
+    Assert-False $Error
 }
 
 function Test-ShouldSupportWhatIf
