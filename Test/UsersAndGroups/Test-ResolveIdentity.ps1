@@ -24,14 +24,22 @@ function TearDown
 
 function Test-ShouldResolveBuiltinIdentity
 {
-    $fullName = Resolve-IdentityName -Name 'Administrators'
-    Assert-Equal 'BUILTIN\Administrators' $fullName
+    $identity = Resolve-IdentityName -Name 'Administrators'
+    Assert-Equal 'BUILTIN\Administrators' $identity.FullName
+    Assert-Equal 'BUILTIN' $identity.Domain
+    Assert-Equal 'Administrators' $identity.Name
+    Assert-NotNull $identity.Sid
+    Assert-Equal 'Alias' $identity.Type
 }
 
 function Test-ShouldResolveNTAuthorityIdentity
 {
-    $fullName = Resolve-IdentityName -Name 'NetworkService'
-    Assert-Equal 'NT AUTHORITY\NETWORK SERVICE' $fullName
+    $identity = Resolve-IdentityName -Name 'NetworkService'
+    Assert-Equal 'NT AUTHORITY\NETWORK SERVICE' $identity.FullName
+    Assert-Equal 'NT AUTHORITY' $identity.Domain
+    Assert-Equal 'NETWORK SERVICE' $identity.Name
+    Assert-NotNull $identity.Sid
+    Assert-Equal 'WellKnownGroup' $identity.Type
 }
 
 function Test-ShouldNotResolveMadeUpName

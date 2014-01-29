@@ -63,7 +63,7 @@ function Resolve-Identity
         return
     }
 
-    return [Carbon.Identity]::FindByName( $Name ) | Select-Object -ExpandProperty 'FullName'
+    return [Carbon.Identity]::FindByName( $Name ) 
 }
 
 Set-Alias -Name 'Resolve-IdentityName' -Value 'Resolve-Identity'
