@@ -45,6 +45,8 @@ This is a backwards-incompatible release.
  * [Resolve-IdentityName](http://get-carbon.org/help/Resolve-IdentityName.html) now writes an error if it can't resolve a name.  Use `-ErrorAction SilentlyContinue` or `-ErrorAction Ignore` to preserve old behavior.
  * [Uninstall-User](http://get-carbon.org/help/Uninstall-User.html) re-written to use .NET's `System.DirectoryServices.AccountManagement` API (introduced with .NET 3.5).
  * [Test-User](http://get-carbon.org/help/Test-User.html) re-written to use .NET's `System.DirectoryServices.AccountManagement` API (introduced with .NET 3.5).
+ * Created [Test-Group](http://get-carbon.org/help/Test-Group.html) function for checking if a *local* group exists.
+ 
  
 # 1.6.1
 
