@@ -77,6 +77,10 @@ This is a backwards-incompatible release.
 
 ## Enhancements
 
+### Hosts File
+
+ * Created [Remove-HostsEntry](http://get-carbon.org/help/Remove-HostsEntry.html) function for removing hostnames from a hosts file.
+
 ### IIS
 
  * Created [Join-IisVirtualPath](http://get-carbon.org/help/Join-IisVirtualPath.html) for joining paths used by the IIS APIs.
