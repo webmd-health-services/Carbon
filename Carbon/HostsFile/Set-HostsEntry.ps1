@@ -56,8 +56,7 @@ function Set-HostsEntry
     [CmdletBinding(SupportsShouldProcess=$true)]
     param(
         [Parameter(Mandatory=$true)]
-        [ValidatePattern('\A(?:\b(?:(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.){3}(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\b)\Z')]
-        [string]
+        [Net.IPAddress]
         # The IP address for the hosts entry.
         $IPAddress,
 
