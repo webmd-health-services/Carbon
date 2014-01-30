@@ -1,13 +1,20 @@
-# 1.6.1
+# 1.6.0
 
 ## Bug Fixes
 
+### File System
+
+ * [Remove-Junction](http://get-carbon.org/help/Remove-Junction.html) doesn't delete a junction when given a relative path to the junction.
+ 
+### Services
+
+ * [Install-Service](http://get-carbon.org/help/Install-Service.html) doesn't properly resolve a service's path.
+ 
 ### Shares
 
  * Fixed [Install-SmbShare](http://get-carbon.org/help/Install-SmbShare.html) example to use correct syntax. [#111.](https://bitbucket.org/splatteredbits/carbon/issue/111)
- 
 
- ## Enhancements
+## Enhancements
 
 ### IIS
 
@@ -41,12 +48,17 @@
 
  * Created [Test-DotNet](http://get-carbon.org/help/Test-DotNet.html) for testing if v2 or v4 of the .NET framework is installed.
 
+### Path
+
+ * Created [Get-PathProvider](http://get-carbon.org/help/Get-PathProvider.html) function for getting a path's PowerShell provider.
+ 
 ### PowerShell
 
  * Updated [Invoke-PowerShell](http://get-carbon.org/help/Invoke-PowerShell.html) to test if the appropriate .NET framework is installed if the user chooses an explicit runtime to use.
 
 ### Security
 
+ * Created [Test-Permission](http://get-carbon.org/help/Test-Permission.html) function for checking if a user/group has a set of permissions and, optionally, a set of inheritance and propagation flags on a file, directory, or registry key.
  * [Test-Permission](http://get-carbon.org/help/Test-Permission.html) now automatically includes the `Synchronize` permission when checking for exact permissions, since this permission is always on and can never be removed from a file/directory.
 
 ### Services
@@ -66,30 +78,8 @@
  * Updated [Test-Identity](http://get-carbon.org/help/Test-Identity.html) to use `[Carbon.Identity]::FindByName` to find identities so it no longer throws exceptions when an identity can't be found.
  * Updated [Resolve-IdentityName](http://get-carbon.org/help/Resolve-IdentityName.html) to use `[Carbon.Identity]::FindByName` to find identities so it no longer throws exceptions when an identity can't be found.
  
-# 1.6.0
 
-## Enhancements
-
-### Path
-
- * Created [Get-PathProvider](http://get-carbon.org/help/Get-PathProvider.html) function for getting a path's PowerShell provider.
- 
-### Security
-
- * Created [Test-Permission](http://get-carbon.org/help/Test-Permission.html) function for checking if a user/group has a set of permissions and, optionally, a set of inheritance and propagation flags on a file, directory, or registry key.
-
-## Bug Fixes
-
-### File System
-
- * [Remove-Junction](http://get-carbon.org/help/Remove-Junction.html) doesn't delete a junction when given a relative path to the junction.
- 
-### Services
-
- * [Install-Service](http://get-carbon.org/help/Install-Service.html) doesn't properly resolve a service's path.
-
-
-# 1.5.1 (3 October 2013)
+ # 1.5.1 (3 October 2013)
 
 ## Bug Fixes
 
