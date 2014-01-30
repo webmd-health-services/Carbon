@@ -12,12 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-& (Join-Path -Path $PSScriptRoot -ChildPath '..\..\Carbon\Import-Carbon.ps1' -Resolve)
-
 $GroupName = 'Setup Group'
+$userName = 'CarbonTestUser'
+$password = '1M33tRequirement$'
+$description = 'Carbon user for use in Carbon tests.'
 
 function Setup
 {
+    & (Join-Path -Path $PSScriptRoot -ChildPath '..\..\Carbon\Import-Carbon.ps1' -Resolve)
+    Install-User -Username $userName -Password $password -Description $description
     Remove-Group
 }
 
@@ -57,10 +60,10 @@ function Test-ShouldCreateGroup
 
 function Test-ShouldAddMembers
 {
-    Invoke-NewGroup -Members 'Administrator'
+    Invoke-NewGroup -Members $userName
     
     $details = net localgroup `"$GroupName`"
-    Assert-ContainsLike $details 'Administrator' 'Administrator not added to group.'
+    Assert-ContainsLike $details $userName ('{0} not added to group.' -f $userName)
 }
 
 function Test-ShouldNotRecreateIfGroupAlreadyExists
@@ -78,9 +81,11 @@ function Test-ShouldNotRecreateIfGroupAlreadyExists
 
 function Test-ShouldNotAddMemberMultipleTimes
 {
-    Invoke-NewGroup -Members 'Administrator'
+    Invoke-NewGroup -Members $userName
     
-    Invoke-NewGroup -Members 'Administrator'
+    $Error.Clear()
+    Invoke-NewGroup -Members $userName
+    Assert-Equal 0 $Error.Count
 }
 
 function Test-ShouldAddMemberWithLongName
