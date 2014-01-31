@@ -7,15 +7,15 @@ This is a backwards-incompatible release.
  * Upgrade to PowerShell 3.
  * Remove usages of `Complete-Job`.  We removed it because it was total crap.  Use PowerShell's `Wait-Job` cmdlet instead.
  * [Grant-Permission](http://get-carbon.org/help/Grant-Permission.html) now only grants permissions on an object if those permissions aren't present.  To preserve previous behaviour, add the `-Force` switch to all `Grant-Permission` usages.
- * The following Carbon functions now return objects to the pipeline instead of writing output to the host:
+ * Pipe the output of the following commands to Out-Null, or assign their return values to `$null`.  They now return objects to the pipeline instead of writing output to the host:
      * [Grant-Permission](http://get-carbon.org/help/Grant-Permission.html)
      * [Install-Group](http://get-carbon.org/help/Install-Group.html)
      * [Install-User](http://get-carbon.org/help/Install-User.html)
- * [Install-User](http://get-carbon.org/help/Install-User.html) no longer sets the `PasswordNeverExpires` switch for a user.  Add the `-PasswordNeverExpires` switch to usages of `Install-User` to preserve the old behavior.
+ * Add the new `-PasswordNeverExpires` switch to usages of [Install-User](http://get-carbon.org/help/Install-User.html): it no longer sets the `PasswordNeverExpires` flag for a user by default.
  * `Resolve-IdentityName` renamed to [Resolve-Identity](http://get-carbon.org/help/Resolve-Identity.html), but it has a backwards-compatible alias, so you shouldn't have to do anything.
- * [Resolve-Identity](http://get-carbon.org/help/Resolve-Identity.html) (née `Resolve-IdentityName`) now returns a `Carbon.Identity` object instead of the identity's name.  Update scripts to use the `FullName` property to get the old return value, e.g. `Resolve-Identity -Name $userName -PassThru | Select-Object -Expand 'FullName'`.
- * [Resolve-Identity](http://get-carbon.org/help/Resolve-Identity.html) (née `Resolve-IdentityName`) now writes an error if it can't resolve a name.  Use `-ErrorAction SilentlyContinue` or `-ErrorAction Ignore` to preserve old behavior.
- * [Test-Identity](http://get-carbon.org/help/Test-Identity.html) now returns a `Carbon.Identity` object if the identity exists *and* you use the `-PassThru` switch.  It used to return the identity's name.  Update scripts to use the `FullName` property to get the old return value, e.g. `Test-Identity -Name $userName -PassThru | Select-Object -Expand 'FullName'`.
+ * Use the `FullName` property on objects returned by [Resolve-Identity](http://get-carbon.org/help/Resolve-Identity.html) (née `Resolve-IdentityName`): it now returns a `Carbon.Identity` object instead of the identity's name, e.g. `Resolve-Identity -Name $userName | Select-Object -Expand 'FullName'`.
+ * Add `-ErrorAction SilentlyContinue` or `-ErrorAction Ignore` to usages of [Resolve-Identity](http://get-carbon.org/help/Resolve-Identity.html) (née `Resolve-IdentityName`): it now writes an error if it can't resolve a name.
+ * Use the `Sid` property on objects returned by [Test-Identity](http://get-carbon.org/help/Test-Identity.html) when using the `PassThru` switch: it now returns a `Carbon.Identity` object if the identity exists *and* you use the `-PassThru` switch, e.g. `Test-Identity -Name $userName -PassThru | Select-Object -Expand 'Sid'`.
  * Check that all IP addresses passed to [Set-HostsEntry](http://get-carbon.org/help/Set-HostsEntry.html) are valid IP v4 or v6 addresses.  [Set-HostsEntry](http://get-carbon.org/help/Set-HostsEntry.html)'s IPAddress parameter is now a `System.Net.IPAddress` object.  Previously it was a string validated with a regular expression, so you *should* be OK.
 
 ## Enhancements
