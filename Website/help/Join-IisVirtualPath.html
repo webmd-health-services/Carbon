@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-    <title>PowerShell - New-Credential - Carbon</title>
+    <title>PowerShell - Join-IisVirtualPath - Carbon</title>
 	<link href="styles.css" type="text/css" rel="stylesheet" />
 </head>
 <body>
@@ -261,16 +261,16 @@
 </div>
 
 
-    <h1>New-Credential</h1>
-    <div><p>Creates a new <code>PSCredential</code> object from a given username and password.</p>
+    <h1>Join-IisVirtualPath</h1>
+    <div><p>Combines a path and a child path for an IIS website, application, virtual directory into a single path.</p>
 </div>
 
         <h2>Syntax</h2>
-    <pre class="Syntax"><code>New-Credential [-User] &lt;String&gt; [-Password] &lt;String&gt; [&lt;CommonParameters&gt;]</code></pre>
+    <pre class="Syntax"><code>Join-IisVirtualPath [-Path] &lt;String&gt; [[-ChildPath] &lt;String&gt;] [&lt;CommonParameters&gt;]</code></pre>
     
         <h2>Description</h2>
     <div class="Description">
-        <p>Many PowerShell commands require a <code>PSCredential</code> object instead of username/password.  This function will create one for you.</p>
+        <p>Removes extra slashes.  Converts backward slashes to forward slashes.  Relative portions are not removed.  Sorry.</p>
 
     </div>
     
@@ -287,20 +287,19 @@
 				<th>Default Value</th>
 			</tr>
             			<tr valign='top'>
-				<td>User</td>
+				<td>Path</td>
 				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
-				<td>The username.
+				<td>The parent path.
 </td>
 				<td>true</td>
 				<td>false</td>
                 <td></td>
 			</tr>
 			<tr valign='top'>
-				<td>Password</td>
+				<td>ChildPath</td>
 				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
-				<td>The password.
-</td>
-				<td>true</td>
+				<td></td>
+				<td>false</td>
 				<td>false</td>
                 <td></td>
 			</tr>
@@ -309,15 +308,13 @@
         
     
         
-            <h2>Return Values</h2>
-        <p><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.pscredential.aspx">System.Management.Automation.PSCredential</a>. </p>
-
+    
         
     
         
                 <h2>EXAMPLE 1</h2>
-            <pre><code>New-Credential -User ENTERPRISE\picard -Password 'earlgrey'</code></pre>
-            <p><p>Creates a new credential object for Captain Picard.</p>
+            <pre><code>Join-IisVirtualPath 'SiteName' 'Virtual/Path'</code></pre>
+            <p><p>Demonstrates how to join two IIS paths together.  REturns <code>SiteName/Virtual/Path</code>.</p>
 </p><p></p><p></p><p></p><p></p>
 </body>
 </html>   

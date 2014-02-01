@@ -54,6 +54,7 @@
 		<ul class="CommandMenu">
 			<li><a href="Set-DotNetAppSetting.html">Set-DotNetAppSetting</a></li>
 			<li><a href="Set-DotNetConnectionString.html">Set-DotNetConnectionString</a></li>
+			<li><a href="Test-DotNet.html">Test-DotNet</a></li>
 		</ul>
 		<li class="Category">FileSystem</li>
 		<ul class="CommandMenu">
@@ -77,6 +78,7 @@
 		<li class="Category">HostsFile</li>
 		<ul class="CommandMenu">
 			<li><a href="Get-PathToHostsFile.html">Get-PathToHostsFile</a></li>
+			<li><a href="Remove-HostsEntry.html">Remove-HostsEntry</a></li>
 			<li><a href="Reset-HostsFile.html">Reset-HostsFile</a></li>
 			<li><a href="Set-HostsEntry.html">Set-HostsEntry</a></li>
 		</ul>
@@ -102,6 +104,7 @@
 			<li><a href="Install-IisVirtualDirectory.html">Install-IisVirtualDirectory</a></li>
 			<li><a href="Install-IisWebsite.html">Install-IisWebsite</a></li>
 			<li><a href="Invoke-AppCmd.html">Invoke-AppCmd</a></li>
+			<li><a href="Join-IisVirtualPath.html">Join-IisVirtualPath</a></li>
 			<li><a href="Lock-IisConfigurationSection.html">Lock-IisConfigurationSection</a></li>
 			<li><a href="Remove-IisMimeMap.html">Remove-IisMimeMap</a></li>
 			<li><a href="Set-IisHttpHeader.html">Set-IisHttpHeader</a></li>
@@ -151,6 +154,7 @@
 		</ul>
 		<li class="Category">Path</li>
 		<ul class="CommandMenu">
+			<li><a href="Get-PathProvider.html">Get-PathProvider</a></li>
 			<li><a href="Resolve-FullPath.html">Resolve-FullPath</a></li>
 			<li><a href="Resolve-PathCase.html">Resolve-PathCase</a></li>
 			<li><a href="Resolve-RelativePath.html">Resolve-RelativePath</a></li>
@@ -197,11 +201,13 @@
 			<li><a href="Convert-SecureStringToString.html">Convert-SecureStringToString</a></li>
 			<li><a href="ConvertTo-InheritanceFlag.html">ConvertTo-InheritanceFlag</a></li>
 			<li><a href="ConvertTo-PropagationFlag.html">ConvertTo-PropagationFlag</a></li>
+			<li><a href="ConvertTo-ProviderAccessControlRights.html">ConvertTo-ProviderAccessControlRights</a></li>
 			<li><a href="Get-Permission.html">Get-Permission</a></li>
 			<li><a href="Grant-Permission.html">Grant-Permission</a></li>
 			<li><a href="New-Credential.html">New-Credential</a></li>
 			<li><a href="Protect-Acl.html">Protect-Acl</a></li>
 			<li><a href="Test-AdminPrivilege.html">Test-AdminPrivilege</a></li>
+			<li><a href="Test-Permission.html">Test-Permission</a></li>
 		</ul>
 		<li class="Category">Service</li>
 		<ul class="CommandMenu">
@@ -260,9 +266,9 @@
 </div>
 
         <h2>Syntax</h2>
-    <pre class="Syntax"><code>Enable-IisSsl -SiteName &lt;String&gt; [-Path &lt;String&gt;] [-RequireSsl] [-Require128BitSsl] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
-<pre class="Syntax"><code>Enable-IisSsl -SiteName &lt;String&gt; [-Path &lt;String&gt;] -RequireSsl [-Require128BitSsl] -RequireClientCertificates [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
-<pre class="Syntax"><code>Enable-IisSsl -SiteName &lt;String&gt; [-Path &lt;String&gt;] [-RequireSsl] [-Require128BitSsl] [-AcceptClientCertificates] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
+    <pre class="Syntax"><code>Enable-IisSsl -SiteName &lt;String&gt; [-VirtualPath &lt;String&gt;] [-RequireSsl] [-Require128BitSsl] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
+<pre class="Syntax"><code>Enable-IisSsl -SiteName &lt;String&gt; [-VirtualPath &lt;String&gt;] -RequireSsl [-Require128BitSsl] -RequireClientCertificates [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
+<pre class="Syntax"><code>Enable-IisSsl -SiteName &lt;String&gt; [-VirtualPath &lt;String&gt;] [-RequireSsl] [-Require128BitSsl] [-AcceptClientCertificates] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
     
         <h2>Description</h2>
     <div class="Description">
@@ -309,7 +315,7 @@
                 <td></td>
 			</tr>
 			<tr valign='top'>
-				<td>Path</td>
+				<td>VirtualPath</td>
 				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
 				<td>The path to the folder/virtual directory/application under the website whose SSL flags should be set.
 </td>
@@ -389,7 +395,7 @@
             <pre><code>Enable-IisSsl -Site Peanuts</code></pre>
             <p><p>Enables SSL on the <code>Peanuts</code> website's, making makes SSL connections optional, ignoring client certificates, and making 128-bit SSL optional.</p>
 </p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 2</h2>
-            <pre><code>Enable-IisSsl -Site Peanuts -Path Snoopy/DogHouse -RequireSsl</code></pre>
+            <pre><code>Enable-IisSsl -Site Peanuts -VirtualPath Snoopy/DogHouse -RequireSsl</code></pre>
             <p><p>Configures the <code>/Snoopy/DogHouse</code> directory in the <code>Peanuts</code> site to require SSL.  It also turns off any client certificate settings and makes 128-bit SSL optional.</p>
 </p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 3</h2>
             <pre><code>Enable-IisSsl -Site Peanuts -AcceptClientCertificates</code></pre>

@@ -54,6 +54,7 @@
 		<ul class="CommandMenu">
 			<li><a href="Set-DotNetAppSetting.html">Set-DotNetAppSetting</a></li>
 			<li><a href="Set-DotNetConnectionString.html">Set-DotNetConnectionString</a></li>
+			<li><a href="Test-DotNet.html">Test-DotNet</a></li>
 		</ul>
 		<li class="Category">FileSystem</li>
 		<ul class="CommandMenu">
@@ -77,6 +78,7 @@
 		<li class="Category">HostsFile</li>
 		<ul class="CommandMenu">
 			<li><a href="Get-PathToHostsFile.html">Get-PathToHostsFile</a></li>
+			<li><a href="Remove-HostsEntry.html">Remove-HostsEntry</a></li>
 			<li><a href="Reset-HostsFile.html">Reset-HostsFile</a></li>
 			<li><a href="Set-HostsEntry.html">Set-HostsEntry</a></li>
 		</ul>
@@ -102,6 +104,7 @@
 			<li><a href="Install-IisVirtualDirectory.html">Install-IisVirtualDirectory</a></li>
 			<li><a href="Install-IisWebsite.html">Install-IisWebsite</a></li>
 			<li><a href="Invoke-AppCmd.html">Invoke-AppCmd</a></li>
+			<li><a href="Join-IisVirtualPath.html">Join-IisVirtualPath</a></li>
 			<li><a href="Lock-IisConfigurationSection.html">Lock-IisConfigurationSection</a></li>
 			<li><a href="Remove-IisMimeMap.html">Remove-IisMimeMap</a></li>
 			<li><a href="Set-IisHttpHeader.html">Set-IisHttpHeader</a></li>
@@ -151,6 +154,7 @@
 		</ul>
 		<li class="Category">Path</li>
 		<ul class="CommandMenu">
+			<li><a href="Get-PathProvider.html">Get-PathProvider</a></li>
 			<li><a href="Resolve-FullPath.html">Resolve-FullPath</a></li>
 			<li><a href="Resolve-PathCase.html">Resolve-PathCase</a></li>
 			<li><a href="Resolve-RelativePath.html">Resolve-RelativePath</a></li>
@@ -197,11 +201,13 @@
 			<li><a href="Convert-SecureStringToString.html">Convert-SecureStringToString</a></li>
 			<li><a href="ConvertTo-InheritanceFlag.html">ConvertTo-InheritanceFlag</a></li>
 			<li><a href="ConvertTo-PropagationFlag.html">ConvertTo-PropagationFlag</a></li>
+			<li><a href="ConvertTo-ProviderAccessControlRights.html">ConvertTo-ProviderAccessControlRights</a></li>
 			<li><a href="Get-Permission.html">Get-Permission</a></li>
 			<li><a href="Grant-Permission.html">Grant-Permission</a></li>
 			<li><a href="New-Credential.html">New-Credential</a></li>
 			<li><a href="Protect-Acl.html">Protect-Acl</a></li>
 			<li><a href="Test-AdminPrivilege.html">Test-AdminPrivilege</a></li>
+			<li><a href="Test-Permission.html">Test-Permission</a></li>
 		</ul>
 		<li class="Category">Service</li>
 		<ul class="CommandMenu">
@@ -260,10 +266,10 @@
 </div>
 
         <h2>Syntax</h2>
-    <pre class="Syntax"><code>Get-IisSecurityAuthentication -SiteName &lt;String&gt; [-Path &lt;String&gt;] -Anonymous [&lt;CommonParameters&gt;]</code></pre>
-<pre class="Syntax"><code>Get-IisSecurityAuthentication -SiteName &lt;String&gt; [-Path &lt;String&gt;] -Basic [&lt;CommonParameters&gt;]</code></pre>
-<pre class="Syntax"><code>Get-IisSecurityAuthentication -SiteName &lt;String&gt; [-Path &lt;String&gt;] -Digest [&lt;CommonParameters&gt;]</code></pre>
-<pre class="Syntax"><code>Get-IisSecurityAuthentication -SiteName &lt;String&gt; [-Path &lt;String&gt;] -Windows [&lt;CommonParameters&gt;]</code></pre>
+    <pre class="Syntax"><code>Get-IisSecurityAuthentication -SiteName &lt;String&gt; [-VirtualPath &lt;String&gt;] -Anonymous [&lt;CommonParameters&gt;]</code></pre>
+<pre class="Syntax"><code>Get-IisSecurityAuthentication -SiteName &lt;String&gt; [-VirtualPath &lt;String&gt;] -Basic [&lt;CommonParameters&gt;]</code></pre>
+<pre class="Syntax"><code>Get-IisSecurityAuthentication -SiteName &lt;String&gt; [-VirtualPath &lt;String&gt;] -Digest [&lt;CommonParameters&gt;]</code></pre>
+<pre class="Syntax"><code>Get-IisSecurityAuthentication -SiteName &lt;String&gt; [-VirtualPath &lt;String&gt;] -Windows [&lt;CommonParameters&gt;]</code></pre>
     
         <h2>Description</h2>
     <div class="Description">
@@ -293,7 +299,7 @@
                 <td></td>
 			</tr>
 			<tr valign='top'>
-				<td>Path</td>
+				<td>VirtualPath</td>
 				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
 				<td>The optional path where anonymous authentication should be set.
 </td>
@@ -352,7 +358,7 @@
             <pre><code>Get-IisSecurityAuthentication -SiteName Peanuts -Anonymous</code></pre>
             <p><p>Gets the <code>Peanuts</code> site's anonymous authentication configuration section.</p>
 </p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 2</h2>
-            <pre><code>Get-IisSecurityAuthentication -SiteName Peanuts -Path Doghouse -Basic</code></pre>
+            <pre><code>Get-IisSecurityAuthentication -SiteName Peanuts -VirtualPath Doghouse -Basic</code></pre>
             <p><p>Gets the <code>Peanuts</code> site's <code>Doghouse</code> sub-directory's basic authentication configuration section.</p>
 </p><p></p><p></p><p></p><p></p>
 </body>
