@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-    <title>PowerShell - New-Credential - Carbon</title>
+    <title>PowerShell - Test-Permission - Carbon</title>
 	<link href="styles.css" type="text/css" rel="stylesheet" />
 </head>
 <body>
@@ -261,20 +261,32 @@
 </div>
 
 
-    <h1>New-Credential</h1>
-    <div><p>Creates a new <code>PSCredential</code> object from a given username and password.</p>
+    <h1>Test-Permission</h1>
+    <div><p>Tests if permissions are set on a path.</p>
 </div>
 
         <h2>Syntax</h2>
-    <pre class="Syntax"><code>New-Credential [-User] &lt;String&gt; [-Password] &lt;String&gt; [&lt;CommonParameters&gt;]</code></pre>
+    <pre class="Syntax"><code>Test-Permission [-Path] &lt;String&gt; [-Identity] &lt;String&gt; [-Permission] &lt;String[]&gt; [[-ApplyTo] {Container | SubContainers | ContainerAndSubContainers | Leaves | ContainerAndLeaves | SubContainersAndLeaves | ContainerAndSubContainersAndLeaves | ChildContainers | ContainerAndChildContainers | ChildLeaves | ContainerAndChildLeaves | ChildContainersAndChildLeaves | ContainerAndChildContainersAndChildLeaves}] [-Inherited] [-Exact] [&lt;CommonParameters&gt;]</code></pre>
     
         <h2>Description</h2>
     <div class="Description">
-        <p>Many PowerShell commands require a <code>PSCredential</code> object instead of username/password.  This function will create one for you.</p>
+        <p>Sometimes, you don't want to use <code>Grant-Permission</code> on a big tree.  In these situations, use <code>Test-Permission</code> to see if permissions are set on a given path.</p>
+
+<p>This function supports file system and registry permissions.  You can also test the inheritance and propogation flags on containers, in addition to the permissions, with the <code>ApplyTo</code> parameter.  See <a href="Grant-Permission.html">Grant-Permission</a> documentation for an explanation of the <code>ApplyTo</code> parameter.</p>
+
+<p>Inherited permissions on <em>not</em> checked by default.  To check inherited permission, use the <code>-Inherited</code> switch.</p>
+
+<p>By default, the permission check is not exact, i.e. the user may have additional permissions to what you're checking.  If you want to make sure the user has <em>exactly</em> the permission you want, use the <code>-Exact</code> switch.  Please note that by default, NTFS will automatically add/grant <code>Synchronize</code> permission on an item, which is handled by this function.</p>
 
     </div>
     
-    
+            <h2>Related Commands</h2>
+        <ul>
+<li><a href="http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.filesystemrights.aspx">http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.filesystemrights.aspx</a></li>
+<li><a href="http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.registryrights.aspx">http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.registryrights.aspx</a></li>
+<li><a href="Grant-Permission.html">Grant-Permission</a></li>
+</ul>
+
 
     		<h2> Parameters </h2>
 		<table border='1'>
@@ -287,22 +299,58 @@
 				<th>Default Value</th>
 			</tr>
             			<tr valign='top'>
-				<td>User</td>
+				<td>Path</td>
 				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
-				<td>The username.
+				<td>The path on which the permissions should be checked.  Can be a file system or registry path.
 </td>
 				<td>true</td>
 				<td>false</td>
                 <td></td>
 			</tr>
 			<tr valign='top'>
-				<td>Password</td>
+				<td>Identity</td>
 				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
-				<td>The password.
+				<td>The user or group whose permissions to check.
 </td>
 				<td>true</td>
 				<td>false</td>
                 <td></td>
+			</tr>
+			<tr valign='top'>
+				<td>Permission</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String[]</a></td>
+				<td>The permission to test for: e.g. FullControl, Read, etc.  For file system items, use values from <a href="http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.filesystemrights.aspx">System.Security.AccessControl.FileSystemRights</a>.  For registry items, use values from <a href="http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.registryrights.aspx">System.Security.AccessControl.RegistryRights</a>.
+</td>
+				<td>true</td>
+				<td>false</td>
+                <td></td>
+			</tr>
+			<tr valign='top'>
+				<td>ApplyTo</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/carbon.security.containerinheritanceflags.aspx">ContainerInheritanceFlags</a></td>
+				<td>The container and inheritance flags to check.  These are ignored if not supplied.  See How to apply container permissions.  This controls the inheritance and propagation flags.  Default is full inheritance, e.g. <code>ContainersAndSubContainersAndLeaves</code>. This parameter is ignored if <code>Path</code> is to a leaf item.
+</td>
+				<td>false</td>
+				<td>false</td>
+                <td></td>
+			</tr>
+			<tr valign='top'>
+				<td>Inherited</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+				<td>Include inherited permissions in the check.
+</td>
+				<td>false</td>
+				<td>false</td>
+                <td>False</td>
+			</tr>
+			<tr valign='top'>
+				<td>Exact</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+				<td>Check for the exact permissions, inheritance flags, and propagation flags, i.e. make sure the identity has <em>only</em> the permissions you specify.
+</td>
+				<td>false</td>
+				<td>false</td>
+                <td>False</td>
 			</tr>
             
         </table>
@@ -310,14 +358,20 @@
     
         
             <h2>Return Values</h2>
-        <p><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.pscredential.aspx">System.Management.Automation.PSCredential</a>. </p>
+        <p><a href="http://msdn.microsoft.com/en-us/library/system.boolean.aspx">System.Boolean</a>. </p>
 
         
     
         
                 <h2>EXAMPLE 1</h2>
-            <pre><code>New-Credential -User ENTERPRISE\picard -Password 'earlgrey'</code></pre>
-            <p><p>Creates a new credential object for Captain Picard.</p>
+            <pre><code>Test-Permission -Identity 'STARFLEET\JLPicard' -Permission 'FullControl' -Path 'C:\Enterprise\Bridge'</code></pre>
+            <p><p>Demonstrates how to check that Jean-Luc Picard has <code>FullControl</code> permission on the <code>C:\Enterprise\Bridge</code>.</p>
+</p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 2</h2>
+            <pre><code>Test-Permission -Identity 'STARFLEET\GLaForge' -Permission 'WriteKey' -Path 'HKLM:\Software\Enterprise\Engineering'</code></pre>
+            <p><p>Demonstrates how to check that Geordi LaForge can write registry keys at <code>HKLM:\Software\Enterprise\Engineering</code>.</p>
+</p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 3</h2>
+            <pre><code>Test-Permission -Identity 'STARFLEET\Worf' -Permission 'Write' -ApplyTo 'Container' -Path 'C:\Enterprise\Brig'</code></pre>
+            <p><p>Demonstrates how to test for inheritance/propogation flags, in addition to permissions.</p>
 </p><p></p><p></p><p></p><p></p>
 </body>
 </html>   

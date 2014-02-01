@@ -12,7 +12,121 @@
 		<li><a href="http://pshdo.com">-Blog</a></li>
 	</ul>
     
-    <h1>1.5.1 (3 October 2013)</h1>
+    <h1>1.6.0 (1 February 2014)</h1>
+
+<h2>Bug Fixes</h2>
+
+<h3>File System</h3>
+
+<ul>
+<li><a href="http://get-carbon.org/help/Remove-Junction.html">Remove-Junction</a> doesn't delete a junction when given a relative path to the junction.</li>
+</ul>
+
+<h3>Services</h3>
+
+<ul>
+<li><a href="http://get-carbon.org/help/Install-Service.html">Install-Service</a> doesn't properly resolve a service's path.</li>
+</ul>
+
+<h3>Shares</h3>
+
+<ul>
+<li>Fixed <a href="http://get-carbon.org/help/Install-SmbShare.html">Install-SmbShare</a> example to use correct syntax. <a href="https://bitbucket.org/splatteredbits/carbon/issue/111">#111.</a></li>
+</ul>
+
+<h2>Enhancements</h2>
+
+<h3>Hosts File</h3>
+
+<ul>
+<li>Created <a href="http://get-carbon.org/help/Remove-HostsEntry.html">Remove-HostsEntry</a> function for removing hostnames from a hosts file.</li>
+</ul>
+
+<h3>IIS</h3>
+
+<ul>
+<li>Created <a href="http://get-carbon.org/help/Join-IisVirtualPath.html">Join-IisVirtualPath</a> for joining paths used by the IIS APIs.</li>
+<li>Renamed all IIS <code>Path</code> parameters which represented virtual paths to <code>VirtualPath</code> (with backwards-compatible aliases):
+<ul>
+<li>[Disable-IisSecurityAuthentication](http://get-carbon.org/help/Disable-IisSecurityAuthentication.html]</li>
+<li>[Enable-IisDirectoryBrowsing](http://get-carbon.org/help/Enable-IisDirectoryBrowsing.html]</li>
+<li>[Enable-IisSecurityAuthentication](http://get-carbon.org/help/Enable-IisSecurityAuthentication.html]</li>
+<li>[Enable-IisSsl](http://get-carbon.org/help/Enable-IisSsl.html]</li>
+<li>[Get-IisApplication](http://get-carbon.org/help/Get-IisApplication.html]</li>
+<li>[Get-IisConfigurationSection](http://get-carbon.org/help/Get-IisConfigurationSection.html]</li>
+<li>[Get-IisHttpHeader](http://get-carbon.org/help/Get-IisHttpHeader.html]</li>
+<li>[Get-IisHttpRedirect](http://get-carbon.org/help/Get-IisHttpRedirect.html]</li>
+<li>[Get-IisMimeMap](http://get-carbon.org/help/Get-IisMimeMap.html]</li>
+<li>[Get-IisSecurityAuthentication](http://get-carbon.org/help/Get-IisSecurityAuthentication.html]</li>
+<li>[Set-IisHttpHeader](http://get-carbon.org/help/Set-IisHttpHeader.html]</li>
+<li>[Set-IisHttpRedirect](http://get-carbon.org/help/Set-IisHttpRedirect.html]</li>
+<li>[Set-IisWindowsAuthentication](http://get-carbon.org/help/Set-IisWindowsAuthentication.html]</li>
+<li>[Test-IisConfigurationSection](http://get-carbon.org/help/Test-IisConfigurationSection.html]</li>
+<li>[Test-IisSecurityAuthentication](http://get-carbon.org/help/Test-IisSecurityAuthentication.html]</li>
+</ul></li>
+<li>Renamed <a href="http://get-carbon.org/help/Get-IisWebsite.html">Get-IisWebsite</a>'s <code>SiteName</code> parameter to <code>Name</code> (with a backwards-compatible alias).</li>
+<li>Renamed all IIS <code>Name</code> parameters which represented virtual paths to <code>VirtualPath</code> (with backwards-compatible aliases):
+<ul>
+<li>[Install-IisApplication](http://get-carbon.org/help/Install-IisApplication.html]</li>
+<li>[Install-IisVirtualDirectory](http://get-carbon.org/help/Install-IisVirtualDirectory.html]</li>
+</ul></li>
+<li>Renamed all IIS <code>Path</code> parameters which represented physical paths to <code>PhysicalPath</code> (with backwards-compatible aliases):
+<ul>
+<li>[Install-IisApplication](http://get-carbon.org/help/Install-IisApplication.html]</li>
+<li>[Install-IisVirtualDirectory](http://get-carbon.org/help/Install-IisVirtualDirectory.html]</li>
+<li>[Install-IisWebsite](http://get-carbon.org/help/Install-IisWebsite.html]    </li>
+</ul></li>
+</ul>
+
+<h3>.NET</h3>
+
+<ul>
+<li>Created <a href="http://get-carbon.org/help/Test-DotNet.html">Test-DotNet</a> for testing if v2 or v4 of the .NET framework is installed.</li>
+</ul>
+
+<h3>Path</h3>
+
+<ul>
+<li>Created <a href="http://get-carbon.org/help/Get-PathProvider.html">Get-PathProvider</a> function for getting a path's PowerShell provider.</li>
+</ul>
+
+<h3>PowerShell</h3>
+
+<ul>
+<li>Updated <a href="http://get-carbon.org/help/Invoke-PowerShell.html">Invoke-PowerShell</a> to test if the appropriate .NET framework is installed if the user chooses an explicit runtime to use.</li>
+</ul>
+
+<h3>Security</h3>
+
+<ul>
+<li>Created <a href="http://get-carbon.org/help/Test-Permission.html">Test-Permission</a> function for checking if a user/group has a set of permissions and, optionally, a set of inheritance and propagation flags on a file, directory, or registry key.</li>
+<li><a href="http://get-carbon.org/help/Test-Permission.html">Test-Permission</a> now automatically includes the <code>Synchronize</code> permission when checking for exact permissions, since this permission is always on and can never be removed from a file/directory.</li>
+</ul>
+
+<h3>Services</h3>
+
+<ul>
+<li><a href="http://get-carbon.org/help/Install-User.html">Install-Service</a> no longer requires a password, in order to support <a href="http://technet.microsoft.com/en-us/library/dd548356.aspx">managed service accounts and virtual accounts</a>.  We have no idea if this works, since we can't test locally.  Please let us know if this fix works for you. <a href="https://bitbucket.org/splatteredbits/carbon/issue/114">#114</a></li>
+</ul>
+
+<h3>Users and Groups</h3>
+
+<ul>
+<li>Updated <a href="http://get-carbon.org/help/Install-User.html">Install-User</a> to support passwords longer than 14 characters.  Thanks to <a href="http://www.jamescrowley.co.uk/">James Crowley</a> for the fix.</li>
+ * 
+</ul>
+
+<h3>Windows Features</h3>
+
+<ul>
+<li>Marked Assert-WindowsFeatureFunctionsSupported as an internal function.  Please don't use.  It will be removed from future versions of PowerShell.</li>
+<li>Updated <a href="http://get-carbon.org/help/Invoke-PowerShell.html">Test-WindowsFeature</a> to work on Windows 8/2012.</li>
+<li>Created new <code>Carbon.Identity</code> class for representing identities.  It also contains a static <code>FindByName</code> method which uses The Windows <code>LookupAccountName</code> function to find full account names, domains, and sids.  </li>
+<li>Updated <a href="http://get-carbon.org/help/Test-Identity.html">Test-Identity</a> to use <code>[Carbon.Identity]::FindByName</code> to find identities so it no longer throws exceptions when an identity can't be found.</li>
+<li><p>Updated <a href="http://get-carbon.org/help/Resolve-IdentityName.html">Resolve-IdentityName</a> to use <code>[Carbon.Identity]::FindByName</code> to find identities so it no longer throws exceptions when an identity can't be found.</p>
+
+<h1>1.5.1 (3 October 2013)</h1></li>
+</ul>
 
 <h2>Bug Fixes</h2>
 

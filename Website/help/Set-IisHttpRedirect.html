@@ -54,6 +54,7 @@
 		<ul class="CommandMenu">
 			<li><a href="Set-DotNetAppSetting.html">Set-DotNetAppSetting</a></li>
 			<li><a href="Set-DotNetConnectionString.html">Set-DotNetConnectionString</a></li>
+			<li><a href="Test-DotNet.html">Test-DotNet</a></li>
 		</ul>
 		<li class="Category">FileSystem</li>
 		<ul class="CommandMenu">
@@ -77,6 +78,7 @@
 		<li class="Category">HostsFile</li>
 		<ul class="CommandMenu">
 			<li><a href="Get-PathToHostsFile.html">Get-PathToHostsFile</a></li>
+			<li><a href="Remove-HostsEntry.html">Remove-HostsEntry</a></li>
 			<li><a href="Reset-HostsFile.html">Reset-HostsFile</a></li>
 			<li><a href="Set-HostsEntry.html">Set-HostsEntry</a></li>
 		</ul>
@@ -102,6 +104,7 @@
 			<li><a href="Install-IisVirtualDirectory.html">Install-IisVirtualDirectory</a></li>
 			<li><a href="Install-IisWebsite.html">Install-IisWebsite</a></li>
 			<li><a href="Invoke-AppCmd.html">Invoke-AppCmd</a></li>
+			<li><a href="Join-IisVirtualPath.html">Join-IisVirtualPath</a></li>
 			<li><a href="Lock-IisConfigurationSection.html">Lock-IisConfigurationSection</a></li>
 			<li><a href="Remove-IisMimeMap.html">Remove-IisMimeMap</a></li>
 			<li><a href="Set-IisHttpHeader.html">Set-IisHttpHeader</a></li>
@@ -151,6 +154,7 @@
 		</ul>
 		<li class="Category">Path</li>
 		<ul class="CommandMenu">
+			<li><a href="Get-PathProvider.html">Get-PathProvider</a></li>
 			<li><a href="Resolve-FullPath.html">Resolve-FullPath</a></li>
 			<li><a href="Resolve-PathCase.html">Resolve-PathCase</a></li>
 			<li><a href="Resolve-RelativePath.html">Resolve-RelativePath</a></li>
@@ -197,11 +201,13 @@
 			<li><a href="Convert-SecureStringToString.html">Convert-SecureStringToString</a></li>
 			<li><a href="ConvertTo-InheritanceFlag.html">ConvertTo-InheritanceFlag</a></li>
 			<li><a href="ConvertTo-PropagationFlag.html">ConvertTo-PropagationFlag</a></li>
+			<li><a href="ConvertTo-ProviderAccessControlRights.html">ConvertTo-ProviderAccessControlRights</a></li>
 			<li><a href="Get-Permission.html">Get-Permission</a></li>
 			<li><a href="Grant-Permission.html">Grant-Permission</a></li>
 			<li><a href="New-Credential.html">New-Credential</a></li>
 			<li><a href="Protect-Acl.html">Protect-Acl</a></li>
 			<li><a href="Test-AdminPrivilege.html">Test-AdminPrivilege</a></li>
+			<li><a href="Test-Permission.html">Test-Permission</a></li>
 		</ul>
 		<li class="Category">Service</li>
 		<ul class="CommandMenu">
@@ -260,11 +266,11 @@
 </div>
 
         <h2>Syntax</h2>
-    <pre class="Syntax"><code>Set-IisHttpRedirect [-SiteName] &lt;String&gt; [[-Path] &lt;String&gt;] [-Destination] &lt;String&gt; [[-HttpResponseStatus] {Permanent | Found | Temporary}] [-ExactDestination] [-ChildOnly] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
+    <pre class="Syntax"><code>Set-IisHttpRedirect [-SiteName] &lt;String&gt; [[-VirtualPath] &lt;String&gt;] [-Destination] &lt;String&gt; [[-HttpResponseStatus] {Permanent | Found | Temporary}] [-ExactDestination] [-ChildOnly] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
     
         <h2>Description</h2>
     <div class="Description">
-        <p>Configures all or part of a website to redirect all requests to another website/URL.  By default, it operates on a specific website.  To configure a directory under a website, set <code>Path</code> to the virtual path of that directory.</p>
+        <p>Configures all or part of a website to redirect all requests to another website/URL.  By default, it operates on a specific website.  To configure a directory under a website, set <code>VirtualPath</code> to the virtual path of that directory.</p>
 
     </div>
     
@@ -295,7 +301,7 @@
                 <td></td>
 			</tr>
 			<tr valign='top'>
-				<td>Path</td>
+				<td>VirtualPath</td>
 				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
 				<td>The optional path where redirection should be setup.
 </td>
@@ -375,7 +381,7 @@
             <pre><code>Set-IisHttpRedirect -SiteName Peanuts -Destination 'http://new.peanuts.com'</code></pre>
             <p><p>Redirects all requests to the <code>Peanuts</code> website to <code>http://new.peanuts.com</code>.</p>
 </p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 2</h2>
-            <pre><code>Set-IisHttpRedirect -SiteName Peanuts -Path Snoopy/DogHouse -Destination 'http://new.peanuts.com'</code></pre>
+            <pre><code>Set-IisHttpRedirect -SiteName Peanuts -VirtualPath Snoopy/DogHouse -Destination 'http://new.peanuts.com'</code></pre>
             <p><p>Redirects all requests to the <code>/Snoopy/DogHouse</code> path on the <code>Peanuts</code> website to <code>http://new.peanuts.com</code>.</p>
 </p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 3</h2>
             <pre><code>Set-IisHttpRedirect -SiteName Peanuts -Destination 'http://new.peanuts.com' -StatusCode 'Temporary'</code></pre>

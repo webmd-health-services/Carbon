@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-    <title>PowerShell - New-Credential - Carbon</title>
+    <title>PowerShell - Get-PathProvider - Carbon</title>
 	<link href="styles.css" type="text/css" rel="stylesheet" />
 </head>
 <body>
@@ -261,16 +261,18 @@
 </div>
 
 
-    <h1>New-Credential</h1>
-    <div><p>Creates a new <code>PSCredential</code> object from a given username and password.</p>
+    <h1>Get-PathProvider</h1>
+    <div><p>Returns a path's PowerShell provider.</p>
 </div>
 
         <h2>Syntax</h2>
-    <pre class="Syntax"><code>New-Credential [-User] &lt;String&gt; [-Password] &lt;String&gt; [&lt;CommonParameters&gt;]</code></pre>
+    <pre class="Syntax"><code>Get-PathProvider [-Path] &lt;String&gt; [&lt;CommonParameters&gt;]</code></pre>
     
         <h2>Description</h2>
     <div class="Description">
-        <p>Many PowerShell commands require a <code>PSCredential</code> object instead of username/password.  This function will create one for you.</p>
+        <p>When you want to do something with a path that depends on its provider, use this function.  The path doesn't have to exist.</p>
+
+<p>If you pass in a relative path, it is resolved relative to the current directory.  So make sure you're in the right place.</p>
 
     </div>
     
@@ -287,18 +289,9 @@
 				<th>Default Value</th>
 			</tr>
             			<tr valign='top'>
-				<td>User</td>
+				<td>Path</td>
 				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
-				<td>The username.
-</td>
-				<td>true</td>
-				<td>false</td>
-                <td></td>
-			</tr>
-			<tr valign='top'>
-				<td>Password</td>
-				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
-				<td>The password.
+				<td>The path whose provider to get.
 </td>
 				<td>true</td>
 				<td>false</td>
@@ -310,14 +303,14 @@
     
         
             <h2>Return Values</h2>
-        <p><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.pscredential.aspx">System.Management.Automation.PSCredential</a>. </p>
+        <p><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.providerinfo.aspx">System.Management.Automation.ProviderInfo</a>. </p>
 
         
     
         
                 <h2>EXAMPLE 1</h2>
-            <pre><code>New-Credential -User ENTERPRISE\picard -Password 'earlgrey'</code></pre>
-            <p><p>Creates a new credential object for Captain Picard.</p>
+            <pre><code>Get-PathProvider -Path 'C:\Windows'</code></pre>
+            <p><p>Demonstrates how to get the path provider for an NTFS path.</p>
 </p><p></p><p></p><p></p><p></p>
 </body>
 </html>   
