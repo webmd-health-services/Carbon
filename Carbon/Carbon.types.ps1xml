@@ -112,4 +112,15 @@
             </ScriptProperty>
         </Members>
     </Type>
+    <Type>
+        <Name>System.DirectoryServices.AccountManagement.Principal</Name>
+        <Members>
+            <ScriptProperty>
+                <Name>ConnectedServer</Name>
+                <GetScriptBlock>
+                    $this.Context.ConnectedServer
+                </GetScriptBlock>
+            </ScriptProperty>
+        </Members>
+    </Type>
 </Types>
