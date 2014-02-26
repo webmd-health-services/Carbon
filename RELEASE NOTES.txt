@@ -59,6 +59,21 @@ This is a backwards-incompatible release.
  * [Test-Identity](http://get-carbon.org/help/Test-Identity.html) now returns a `Carbon.Identity` object if the identity exists *and* you use the `-PassThru` switch.  It used to return the identity's name.  Update scripts to use the `FullName` property to get the old return value, e.g. `Test-Identity -Name $userName -PassThru | Select-Object -Expand 'FullName'`.
  
  
+# 1.6.1
+
+## Enhancements
+
+### General
+
+ * Import-Carbon.ps1 now support the `-WhatIf` switch.
+ 
+## Bug Fixes
+
+### General
+
+ * No more silent errors when importing Carbon on Windows 2012 R2.
+
+
 # 1.6.0 (1 February 2014)
 
 ## Bug Fixes

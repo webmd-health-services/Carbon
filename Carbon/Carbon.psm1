@@ -14,7 +14,7 @@
 
 #Requires -Version 3
 
-$CarbonBinDir = Join-Path $PSScriptRoot bin -Resolve
+$CarbonBinDir = Join-Path -Path $PSScriptRoot -ChildPath 'bin' -Resolve
 
 # Active Directory
 
@@ -22,48 +22,48 @@ $CarbonBinDir = Join-Path $PSScriptRoot bin -Resolve
 $ComRegKeyPath = 'hklm:\software\microsoft\ole'
 
 # Cryptography
-Add-Type -AssemblyName System.Security
+Add-Type -AssemblyName 'System.Security'
 
 # IIS
 Add-Type -AssemblyName "System.Web"
-$microsoftWebAdministrationPath = Join-Path $env:SystemRoot system32\inetsrv\Microsoft.Web.Administration.dll
+$microsoftWebAdministrationPath = Join-Path -Path $env:SystemRoot -ChildPath 'system32\inetsrv\Microsoft.Web.Administration.dll'
 if( (Test-Path -Path $microsoftWebAdministrationPath -PathType Leaf) )
 {
     Add-Type -Path $microsoftWebAdministrationPath
-    Add-Type -Path (Join-Path $CarbonBinDir Carbon.Iis.dll -Resolve)
+    Add-Type -Path (Join-Path -Path $CarbonBinDir -ChildPath 'Carbon.Iis.dll' -Resolve)
 }
 
 # MSMQ
-Add-Type -AssemblyName System.ServiceProcess
-Add-Type -AssemblyName System.Messaging
+Add-Type -AssemblyName 'System.ServiceProcess'
+Add-Type -AssemblyName 'System.Messaging'
 
 #PowerShell
 $TrustedHostsPath = 'WSMan:\localhost\Client\TrustedHosts'
 
 # Services
-Add-Type -AssemblyName System.ServiceProcess
+Add-Type -AssemblyName 'System.ServiceProcess'
 
 # Users and Groups
 Add-Type -AssemblyName 'System.DirectoryServices.AccountManagement'
 
 # Windows Features
-$useServerManager = ((Get-Command -CommandType 'Application' -Name 'servermanagercmd*.exe' | Where-Object { $_.Name -eq 'servermanagercmd.exe' }) -ne $null)
+$useServerManager = ($env:Path -split ';' | ForEach-Object { Join-Path -Path $_ -ChildPath 'servermanagercmd.exe' } | Where-Object { Test-Path -Path $_ -PathType Leaf }) -ne $null
 $useWmi = $false
 $useOCSetup = $false
 if( -not $useServerManager )
 {
-    $useWmi = ((Get-WmiObject -Class Win32_OptionalFeature -ErrorAction SilentlyContinue) -ne $null)
-    $useOCSetup = ((Get-Command 'ocsetup.exe' -ErrorAction SilentlyContinue) -ne $null)
+    $useWmi = (Get-WmiObject -List -Namespace 'ROOT\cimv2' | Where-Object { $_.Name -eq 'Win32_OptionalFeature' }) -ne $null
+    $useOCSetup = ($env:Path -split ';' | ForEach-Object { Join-Path -Path $_ -ChildPath 'ocsetup.exe' } | Where-Object { Test-Path -Path $_ -PathType Leaf }) -ne $null
 }
 
 $windowsFeaturesNotSupported = (-not ($useServerManager -or ($useWmi -and $useOCSetup) ))
 $supportNotFoundErrorMessage = 'Unable to find support for managing Windows features.  Couldn''t find servermanagercmd.exe, ocsetup.exe, or WMI support.'
 
-Get-Item (Join-Path $PSScriptRoot *\*.ps1) | 
+Get-Item (Join-Path -Path $PSScriptRoot -ChildPath '*\*.ps1') | 
     Where-Object { $_.Directory.Name -ne 'bin' } |
     ForEach-Object {
-        Write-Debug ("Importing sub-module {0}." -f $_.FullName)
+        Write-Verbose ("Importing sub-module {0}." -f $_.FullName)
         . $_.FullName
     }
 
-Export-ModuleMember -Function * -Cmdlet * -Alias *
+Export-ModuleMember -Function '*' -Cmdlet '*' -Alias '*'

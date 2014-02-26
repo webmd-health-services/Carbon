@@ -27,7 +27,7 @@ Imports the Carbon module, hiding any warnings about Carbon being loaded as a su
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-[CmdletBinding()]
+[CmdletBinding(SupportsShouldProcess=$true)]
 param(
 )
 
