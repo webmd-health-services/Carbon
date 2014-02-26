@@ -47,13 +47,13 @@ Add-Type -AssemblyName 'System.ServiceProcess'
 Add-Type -AssemblyName 'System.DirectoryServices.AccountManagement'
 
 # Windows Features
-$useServerManager = ($env:Path -split ';' | ForEach-Object { Join-Path -Path $_ -ChildPath 'servermanagercmd.exe' } | Where-Object { Test-Path -Path $_ -PathType Leaf }) -ne $null
+$useServerManager = (Get-Command -Name 'servermanagercmd.exe' -ErrorAction Ignore) -ne $null
 $useWmi = $false
 $useOCSetup = $false
 if( -not $useServerManager )
 {
-    $useWmi = (Get-WmiObject -List -Namespace 'ROOT\cimv2' | Where-Object { $_.Name -eq 'Win32_OptionalFeature' }) -ne $null
-    $useOCSetup = ($env:Path -split ';' | ForEach-Object { Join-Path -Path $_ -ChildPath 'ocsetup.exe' } | Where-Object { Test-Path -Path $_ -PathType Leaf }) -ne $null
+    $useWmi = (Get-WmiObject -Class 'Win32_OptionalFeature' -ErrorAction Ignore) -ne $null
+    $useOCSetup = (Get-Command -Name 'ocsetup.exe' -ErrorAction Ignore ) -ne $null
 }
 
 $windowsFeaturesNotSupported = (-not ($useServerManager -or ($useWmi -and $useOCSetup) ))
