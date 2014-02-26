@@ -1,3 +1,18 @@
+# 1.6.1
+
+## Enhancements
+
+### General
+
+ * Import-Carbon.ps1 now support the `-WhatIf` switch.
+ 
+## Bug Fixes
+
+### General
+
+ * No more silent errors when importing Carbon on Windows 2012 R2.
+
+
 # 1.6.0 (1 February 2014)
 
 ## Bug Fixes
