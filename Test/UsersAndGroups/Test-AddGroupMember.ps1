@@ -128,6 +128,13 @@ function Test-ShouldDetectIfAnonymousLogonAlreadyMemberOfGroup
     Assert-Equal 0 $Error.Count
 }
 
+function Test-ShouldRefuseToAddLocalGroupToLocalGroup
+{
+    Add-GroupMember -Name $GroupName -Member $GroupName -ErrorAction SilentlyContinue
+    Assert-Equal 2 $Error.Count
+    Assert-Like $Error[0].Exception.Message '*Failed to save changes*'
+}
+
 function Test-ShouldNotAddNonExistentMember
 {
     $Error.Clear()

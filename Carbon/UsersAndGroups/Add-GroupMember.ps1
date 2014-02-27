@@ -59,25 +59,46 @@ function Add-GroupMember
     
     $ctx = New-Object 'DirectoryServices.AccountManagement.PrincipalContext' ([DirectoryServices.AccountManagement.ContextType]::Machine)
     
-    $idType = [DirectoryServices.AccountManagement.IdentityType]::Name
+    $changesMade = $false
     $Member | 
         ForEach-Object { Resolve-Identity -Name $_ } |
         ForEach-Object {
             $identity = $_
             $ctxType = 'Domain'
+            $ctxName = $identity.Domain
             if( $identity.Domain -eq $env:COMPUTERNAME -or $identity.Domain -eq 'BUILTIN' -or $identity.Domain -eq 'NT AUTHORITY' )
             {
+                $ctxName = $env:COMPUTERNAME
                 $ctxType = 'Machine'
             }
-            $identityCtx = New-Object 'DirectoryServices.AccountManagement.PrincipalContext' $ctxType
+            $identityCtx = New-Object 'DirectoryServices.AccountManagement.PrincipalContext' $ctxType,$ctxName
 
             $notAMember = -not $group.Members.Contains( $identityCtx, 'Sid', $identity.Sid.Value )
             if( $notAMember -and $pscmdlet.ShouldProcess( $group.Name, ("add member {0}" -f $identity.FullName) ) )
             {
-                $group.Members.Add( $identityCtx, 'Sid', $identity.Sid.Value )
-                $group.Save()
+            	try
+            	{
+                    $group.Members.Add( $identityCtx, 'Sid', $identity.Sid.Value )
+                    $changesMade = $true
+                }
+                catch
+                {
+                    Write-Error ('Failed to add ''{0}'' to group ''{1}'': {2}.' -f $identity,$Name,$_)
+                }
             }
         }
+
+    if( $changesMade )
+    {
+        try
+        {
+            $group.Save()
+        }
+        catch
+        {
+            Write-Error ('Failed to save changes to group ''{0}'': {1}.' -f $Name,$_)
+        }
+    }
 }
 
 Set-Alias -Name 'Add-GroupMembers' -Value 'Add-GroupMember'
