@@ -54,9 +54,6 @@ function Assert-CanFindCurrentUser($domainController)
     $domain = [adsi] "LDAP://$domainController"
     $searcher = [adsisearcher] $domain
     
-    $filterPropertyName = 'sAMAccountName'
-    $filterPropertyValue = $sAMAccountName
-    
     $searcher.Filter = "(&(objectClass=User) (sAMAccountName=$($env:Username)))"
     $result = $searcher.FindOne() 
     Assert-NotNull $result

@@ -18,6 +18,7 @@ $fullAccessGroup = 'Carbon Share Full'
 $changeAccessGroup = 'CarbonShareChange'
 $readAccessGroup = 'CarbonShareRead'
 $noAccessGroup = 'CarbonShareNone'
+$Remarks = [Guid]::NewGuid().ToString()
 
 function SetUp
 {
@@ -73,6 +74,7 @@ function Test-ShouldGrantPermissions
     Assert-ContainsLike $details ("{0}, FULL" -f $fullAccessGroup) 'Permissions not set on share.'
     Assert-ContainsLike $details ("{0}, CHANGE" -f $changeAccessGroup) 'Permissions not set on share.'
     Assert-ContainsLike $details ("{0}, READ" -f $readAccessGroup) 'Permissions not set on share.'
+    Assert-ContainsLike $details "Remark            "
 }
 
 function Test-ShouldGrantMultipleFullAccessPermissions
@@ -82,6 +84,7 @@ function Test-ShouldGrantMultipleFullAccessPermissions
     Assert-ContainsLike $details ("{0}, FULL" -f $fullAccessGroup) 'Permissions not set on share.'
     Assert-ContainsLike $details ("{0}, FULL" -f $changeAccessGroup) 'Permissions not set on share.'
     Assert-ContainsLike $details ("{0}, FULL" -f $readAccessGroup) 'Permissions not set on share.'
+    Assert-ContainsLike $details ("Remark            {0}" -f $Remarks)
 }
 
 function Test-ShouldGrantMultipleChangeAccessPermissions
@@ -91,6 +94,7 @@ function Test-ShouldGrantMultipleChangeAccessPermissions
     Assert-ContainsLike $details ("{0}, CHANGE" -f $fullAccessGroup) 'Permissions not set on share.'
     Assert-ContainsLike $details ("{0}, CHANGE" -f $changeAccessGroup) 'Permissions not set on share.'
     Assert-ContainsLike $details ("{0}, CHANGE" -f $readAccessGroup) 'Permissions not set on share.'
+    Assert-ContainsLike $details ("Remark            {0}" -f $Remarks)
 }
 
 function Test-ShouldGrantMultipleFullAccessPermissions
@@ -100,6 +104,7 @@ function Test-ShouldGrantMultipleFullAccessPermissions
     Assert-ContainsLike $details ("{0}, READ" -f $fullAccessGroup) 'Permissions not set on share.'
     Assert-ContainsLike $details ("{0}, READ" -f $changeAccessGroup) 'Permissions not set on share.'
     Assert-ContainsLike $details ("{0}, READ" -f $readAccessGroup) 'Permissions not set on share.'
+    Assert-ContainsLike $details ("Remark            {0}" -f $Remarks)
 }
 
 function Test-ShouldDeleteThenRecreateShare

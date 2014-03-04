@@ -37,7 +37,7 @@ if( Test-AdminPrivilege )
         Set-TrustedHost 'example.com'
         Assert-Equal 'example.com' (Get-TrustedHost)
         Clear-TrustedHost
-        Assert-Empty (Get-TrustedHost)
+        Assert-Null (Get-TrustedHost)
     }
     
     function Test-ShouldSupportWhatIf

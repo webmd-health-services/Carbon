@@ -111,7 +111,7 @@ function Test-ShouldCreateApplicationDirectory
 
 function Assert-ApplicationRunning($appName)
 {
-    $html = Read-Url "http://localhost:$Port/$vdir/NewWebsite.html"
+    $html = Read-Url "http://localhost:$Port/$appName/NewWebsite.html"
     Assert-Like $html 'NewWebsite Test Page' 'Unable to download from new application.'   
 }
 
