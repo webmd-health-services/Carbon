@@ -43,22 +43,23 @@ function Test-ShouldGetIPAddress
 
 function Test-ShouldGetIPv4Addresses
 {
-    $expectedIPAddress = Get-ExpectedIPAddress | Where-Object { $_.AddressFamily -eq 'InterNetwork' }
-    $expectedAddress = [Object[]]$expectedIPAddress
+    [Object[]]$expectedIPAddress = Get-ExpectedIPAddress | Where-Object { $_.AddressFamily -eq 'InterNetwork' }
 
-    $actualIPAddress = Get-IPAddress -V4
-    $actualIPAddress = [Object[]]$actualIPAddress
+    [Object[]]$actualIPAddress = Get-IPAddress -V4
 
     Assert-IPAddress $expectedIPAddress $actualIPAddress
 }
 
 function Test-ShouldGetIPv6Addresses
 {
-    $expectedIPAddress = Get-ExpectedIPAddress | Where-Object { $_.AddressFamily -eq 'InterNetworkV6' }
-    $expectedAddress = [Object[]]$expectedIPAddress
+    [Object[]]$expectedIPAddress = Get-ExpectedIPAddress | Where-Object { $_.AddressFamily -eq 'InterNetworkV6' }
+    if( -not $expectedIPAddress )
+    {
+        Write-Warning ('Unable to test if Get-IPAddress returns just IPv6 addresses: there are on IPv6 addresses on this computer.')
+        return
+    }
 
-    $actualIPAddress = Get-IPAddress -V6
-    $actualIPAddress = [Object[]]$actualIPAddress
+    [Object[]]$actualIPAddress = Get-IPAddress -V6
 
     Assert-IPAddress $expectedIPAddress $actualIPAddress
 }
