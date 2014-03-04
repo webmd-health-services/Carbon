@@ -61,7 +61,8 @@ function Test-AllFilesShouldHaveLicense
 		'*\examples\Initialize-BuildServer.ps1',
 		'*\examples\Initialize-WebServer.ps1',
         '*\bin\Set-DotNetAppSetting.ps1',
-        '*\bin\Set-DotNetConnectionString.ps1'
+        '*\bin\Set-DotNetConnectionString.ps1',
+        '*\Tools\Blade\*'
     )
     
     $filesMissingLicense = New-Object Collections.Generic.List[string]
