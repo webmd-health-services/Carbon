@@ -100,29 +100,29 @@ This is a backwards-incompatible release.
 
  * Created [Join-IisVirtualPath](http://get-carbon.org/help/Join-IisVirtualPath.html) for joining paths used by the IIS APIs.
  * Renamed all IIS `Path` parameters which represented virtual paths to `VirtualPath` (with backwards-compatible aliases):
-    * [Disable-IisSecurityAuthentication](http://get-carbon.org/help/Disable-IisSecurityAuthentication.html]
-    * [Enable-IisDirectoryBrowsing](http://get-carbon.org/help/Enable-IisDirectoryBrowsing.html]
-    * [Enable-IisSecurityAuthentication](http://get-carbon.org/help/Enable-IisSecurityAuthentication.html]
-    * [Enable-IisSsl](http://get-carbon.org/help/Enable-IisSsl.html]
-    * [Get-IisApplication](http://get-carbon.org/help/Get-IisApplication.html]
-    * [Get-IisConfigurationSection](http://get-carbon.org/help/Get-IisConfigurationSection.html]
-    * [Get-IisHttpHeader](http://get-carbon.org/help/Get-IisHttpHeader.html]
-    * [Get-IisHttpRedirect](http://get-carbon.org/help/Get-IisHttpRedirect.html]
-    * [Get-IisMimeMap](http://get-carbon.org/help/Get-IisMimeMap.html]
-    * [Get-IisSecurityAuthentication](http://get-carbon.org/help/Get-IisSecurityAuthentication.html]
-    * [Set-IisHttpHeader](http://get-carbon.org/help/Set-IisHttpHeader.html]
-    * [Set-IisHttpRedirect](http://get-carbon.org/help/Set-IisHttpRedirect.html]
-    * [Set-IisWindowsAuthentication](http://get-carbon.org/help/Set-IisWindowsAuthentication.html]
-    * [Test-IisConfigurationSection](http://get-carbon.org/help/Test-IisConfigurationSection.html]
-    * [Test-IisSecurityAuthentication](http://get-carbon.org/help/Test-IisSecurityAuthentication.html]
+    * [Disable-IisSecurityAuthentication](http://get-carbon.org/help/Disable-IisSecurityAuthentication.html)
+    * [Enable-IisDirectoryBrowsing](http://get-carbon.org/help/Enable-IisDirectoryBrowsing.html)
+    * [Enable-IisSecurityAuthentication](http://get-carbon.org/help/Enable-IisSecurityAuthentication.html)
+    * [Enable-IisSsl](http://get-carbon.org/help/Enable-IisSsl.html)
+    * [Get-IisApplication](http://get-carbon.org/help/Get-IisApplication.html)
+    * [Get-IisConfigurationSection](http://get-carbon.org/help/Get-IisConfigurationSection.html)
+    * [Get-IisHttpHeader](http://get-carbon.org/help/Get-IisHttpHeader.html)
+    * [Get-IisHttpRedirect](http://get-carbon.org/help/Get-IisHttpRedirect.html)
+    * [Get-IisMimeMap](http://get-carbon.org/help/Get-IisMimeMap.html)
+    * [Get-IisSecurityAuthentication](http://get-carbon.org/help/Get-IisSecurityAuthentication.html)
+    * [Set-IisHttpHeader](http://get-carbon.org/help/Set-IisHttpHeader.html)
+    * [Set-IisHttpRedirect](http://get-carbon.org/help/Set-IisHttpRedirect.html)
+    * [Set-IisWindowsAuthentication](http://get-carbon.org/help/Set-IisWindowsAuthentication.html)
+    * [Test-IisConfigurationSection](http://get-carbon.org/help/Test-IisConfigurationSection.html)
+    * [Test-IisSecurityAuthentication](http://get-carbon.org/help/Test-IisSecurityAuthentication.html)
  * Renamed [Get-IisWebsite](http://get-carbon.org/help/Get-IisWebsite.html)'s `SiteName` parameter to `Name` (with a backwards-compatible alias).
  * Renamed all IIS `Name` parameters which represented virtual paths to `VirtualPath` (with backwards-compatible aliases):
-    * [Install-IisApplication](http://get-carbon.org/help/Install-IisApplication.html]
-    * [Install-IisVirtualDirectory](http://get-carbon.org/help/Install-IisVirtualDirectory.html]
+    * [Install-IisApplication](http://get-carbon.org/help/Install-IisApplication.html)
+    * [Install-IisVirtualDirectory](http://get-carbon.org/help/Install-IisVirtualDirectory.html)
  * Renamed all IIS `Path` parameters which represented physical paths to `PhysicalPath` (with backwards-compatible aliases):
-    * [Install-IisApplication](http://get-carbon.org/help/Install-IisApplication.html]
-    * [Install-IisVirtualDirectory](http://get-carbon.org/help/Install-IisVirtualDirectory.html]
-    * [Install-IisWebsite](http://get-carbon.org/help/Install-IisWebsite.html]    
+    * [Install-IisApplication](http://get-carbon.org/help/Install-IisApplication.html)
+    * [Install-IisVirtualDirectory](http://get-carbon.org/help/Install-IisVirtualDirectory.html)
+    * [Install-IisWebsite](http://get-carbon.org/help/Install-IisWebsite.html)    
     
 ### .NET
 
