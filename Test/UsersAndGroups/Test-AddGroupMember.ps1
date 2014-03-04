@@ -158,6 +158,6 @@ function Assert-MembersInGroup($Members)
         ForEach-Object { 
             $identity = $_
             $member = $group.Members | Where-Object { $_.Sid -eq $identity.Sid }
-            Assert-NotNull $member ('Member ''{0}'' not a member of group ''{1}''' -f $memberName,$group.Name)
+            Assert-NotNull $member ('Member ''{0}'' not a member of group ''{1}''' -f $identity.FullName,$group.Name)
         }
 }

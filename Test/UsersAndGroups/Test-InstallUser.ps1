@@ -84,7 +84,7 @@ function Test-ShouldAllowOptionalFullName
     $description = "Test user for testing the Carbon Install-User function."
     Install-User -Username $username -Password $password -Description $description
     $user = Get-User -Username $Username
-    Assert-Empty $user.DisplayName
+    Assert-Null $user.DisplayName
 }
 
 function Test-ShouldSupportWhatIf
