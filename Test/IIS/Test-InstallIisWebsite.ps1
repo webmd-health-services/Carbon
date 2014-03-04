@@ -145,7 +145,7 @@ function Test-ShouldValidateBindings
     Install-IisWebsite -Name $SiteName -Path $TestDir -Bindings 'http/*:80' -ErrorAction SilentlyContinue
     Assert-True ($error.Count -ge 1)
     Assert-False (Test-IisWebsite -Name $SiteName)
-    Assert-True $error[0].Exception.Message -like '*bindings are invalid*'
+    Assert-Error -Last 'bindings are invalid'
 }
 
 function Test-ShouldAllowUrlBindings

@@ -34,7 +34,7 @@ function TearDown
 function Test-ShouldInstallCertificateToLocalMachine
 {
     $cert = Install-Certificate -Path $TestCertPath -StoreLocation CurrentUser -StoreName My
-    Assert-Equal $TestCert.Thumpbring $cert.Thumpprint
+    Assert-Equal $TestCert.Thumbprint $cert.Thumbprint
     $cert = Assert-CertificateInstalled -StoreLocation LocalMachine -StoreName My 
     $exportFailed = $false
     try
@@ -51,7 +51,7 @@ function Test-ShouldInstallCertificateToLocalMachine
 function Test-ShouldInstallCertificateToLocalMachineAsExportable
 {
     $cert = Install-Certificate -Path $TestCertPath -StoreLocation CurrentUser -StoreName My -Exportable
-    Assert-Equal $TestCert.Thumpbring $cert.Thumpprint
+    Assert-Equal $TestCert.Thumbprint $cert.Thumbprint
     $cert = Assert-CertificateInstalled -StoreLocation LocalMachine -StoreName My 
     $bytes = $cert.Export( [Security.Cryptography.X509Certificates.X509ContentType]::Pfx )
     Assert-NotNull $bytes

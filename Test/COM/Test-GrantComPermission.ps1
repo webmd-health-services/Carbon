@@ -64,7 +64,7 @@ function Test-ShouldSetAccessPermissions
             Grant-ComPermission -Access -Identity $groupName @grantArgs
             
             $getArgs = @{ }
-            if( $grantArgs.Default )
+            if( $grantArgs.ContainsKey('Default') -and $grantArgs.Default )
             {
                 $getArgs.Default = $true
             }
@@ -73,7 +73,7 @@ function Test-ShouldSetAccessPermissions
                 $getArgs.Limits = $true
             }
             $accessRule = Get-ComPermission -Access -Identity $groupName @getArgs
-            Assert-NotNull $accessRule
+            Assert-NotNull $accessRule ($grantArgs | Out-String)
             
             $expectedRights = [Carbon.Security.ComAccessRights]::Execute
             if( $grantArgs.Local )
