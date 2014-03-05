@@ -31,12 +31,12 @@ Imports the Carbon module, hiding any warnings about Carbon being loaded as a su
 param(
 )
 
-Set-StrictMode -Version Latest
+Set-StrictMode -Version 'Latest'
 $PSScriptRoot = Split-Path -Parent -Path $MyInvocation.MyCommand.Definition
 
-if( (Get-Module Carbon) )
+if( (Get-Module 'Carbon') )
 {
-    Remove-Module Carbon
+    Remove-Module 'Carbon' -Verbose:$false
 }
 
-Import-Module (Join-Path $PSScriptRoot Carbon.psd1 -Resolve) -ErrorAction Stop
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'Carbon.psd1' -Resolve) -ErrorAction Stop -Verbose:$false
