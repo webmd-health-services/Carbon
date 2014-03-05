@@ -32,11 +32,11 @@ param(
 )
 
 #Requires -Version 3
-Set-StrictMode -Version Latest
+Set-StrictMode -Version 'Latest'
 
-if( (Get-Module Carbon) )
+if( (Get-Module 'Carbon') )
 {
-    Remove-Module Carbon
+    Remove-Module 'Carbon' -Verbose:$false
 }
 
-Import-Module (Join-Path $PSScriptRoot Carbon.psd1 -Resolve) -ErrorAction Stop
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'Carbon.psd1' -Resolve) -ErrorAction Stop -Verbose:$false

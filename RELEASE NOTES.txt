@@ -71,6 +71,7 @@ This is a backwards-incompatible release.
 ### General
 
  * Import-Carbon.ps1 now support the `-WhatIf` switch.
+ * Import-Carbon.ps1 now hides verbose log messages when removing/importing Carbon even when supplying the `-Verbose` switch because I think the verbose output is too verbose and not helpful at all.
  
 ## Bug Fixes
 
