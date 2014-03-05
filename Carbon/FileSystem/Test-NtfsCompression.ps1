@@ -46,7 +46,7 @@ function Test-NtfsCompression
         return
     }
 
-    $attributes = Get-Item -Path $Path | Select-Object -ExpandProperty Attributes
+    $attributes = Get-Item -Path $Path -Force | Select-Object -ExpandProperty Attributes
     if( $attributes )
     {
         return (($attributes -band [IO.FileAttributes]::Compressed) -eq [IO.FileAttributes]::Compressed)

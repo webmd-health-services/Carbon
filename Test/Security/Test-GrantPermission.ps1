@@ -16,10 +16,13 @@ $Path = $null
 $user = 'CarbonGrantPerms'
 $containerPath = $null
 
+function Start-TestFixture
+{
+    & (Join-Path -Path $TestDir -ChildPath '..\..\Carbon\Import-Carbon.ps1' -Resolve)
+}
+
 function Start-Test
 {
-    & (Join-Path $TestDir ..\..\Carbon\Import-Carbon.ps1 -Resolve)
-    
     Install-User -Username $user -Password 'a1b2c3d4!' -Description 'User for Carbon Grant-Permission tests.'
     
     $containerPath = New-TempDir -Prefix 'Carbon_Test-GrantPermisssion'
@@ -31,10 +34,8 @@ function Stop-Test
 {
     if( Test-Path $containerPath )
     {
-        Remove-Item $containerPath -Recurse
+        Remove-Item $containerPath -Recurse -Force
     }
-    
-    Remove-Module Carbon
 }
 
 function Invoke-GrantPermissions($Identity, $Permissions, $Path)
@@ -247,6 +248,23 @@ function Test-ShouldReapplySamePermissions
     Assert-True (Test-Permission -Identity $user -Permission FullControl -Path $containerPath -ApplyTo ContainerAndLeaves -Exact)
     Grant-Permission -Identity $user -Permission FullControl -Path $containerPath -Apply ContainerAndLeaves -Force
     Assert-True (Test-Permission -Identity $user -Permission FullControl -Path $containerPath -ApplyTo ContainerAndLeaves -Exact)
+}
+
+function Test-ShouldGrantPermissionOnHiddenItem
+{
+    $item = Get-Item -Path $Path
+    $item.Attributes = $item.Attributes -bor [IO.FileAttributes]::Hidden
+
+    $result = Grant-Permission -Identity $user -Permission Read -Path $Path
+    Assert-Permissions $user 'Read' $Path
+    Assert-NoError
+}
+
+function Test-ShouldHandleNOnExistentPath
+{
+    $result = Grant-Permission -Identity $user -Permission Read -Path 'C:\I\Do\Not\Exist' -ErrorAction SilentlyContinue
+    Assert-Null $result
+    Assert-Error -Last 'Cannot find path'
 }
 
 function Assert-InheritanceFlags

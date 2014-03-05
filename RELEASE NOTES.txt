@@ -72,6 +72,17 @@ This is a backwards-incompatible release.
 ### General
 
  * No more silent errors when importing Carbon on Windows 2012 R2.
+ 
+### File System
+
+ * [Install-Junction](http://get-carbon.org/help/Install-Junction.html) fails when target path is hidden.
+ * [Test-NtfsCompression](http://get-carbon.org/help/Test-NtfsCompression.html) fails when file/directory is hidden.
+ * [Test-PathIsJunction](http://get-carbon.org/help/Test-PathIsJunction.html) fails when tested directory is hidden.
+
+### Security
+
+ * [Grant-Permission](http://get-carbon.org/help/Grant-Permission.html) fails when item is hidden.
+ * [Grant-Permission](http://get-carbon.org/help/Grant-Permission.html) doesn't handle non-existent paths, causing cascading errors.
 
 
 # 1.6.0 (1 February 2014)

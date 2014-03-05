@@ -41,9 +41,9 @@ function Assert-NoError
 
     Set-StrictMode -Version 'Latest'
 
-    if( $Error.Count -gt 0 )
+    if( $Global:Error.Count -gt 0 )
     {
-        Fail "Found $($Error.Count) errors, expected none.  $Message" 
+        Fail "Found $($Global:Error.Count) errors, expected none. $Message" 
     }
 }
 
