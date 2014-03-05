@@ -16,11 +16,14 @@
 $tempDir = [IO.Path]::GetFullPath( $env:TEMP )
 $junctionPath = $null
 
+function Start-TestFixture
+{
+    & (Join-Path -Path $PSScriptRoot -ChildPath '..\..\Carbon\Import-Carbon.ps1' -Resolve)
+}
+
 function Start-Test
 {
-    & (Join-Path $TestDir ..\..\Carbon\Import-Carbon.ps1 -Resolve)
     $junctionPath = Join-Path $tempDir ('Carbon_Test-InstallJunction_{0}' -f ([IO.Path]::GetRandomFileName()))
-    $Error.Clear()
 }
 
 function Stop-Test
@@ -35,7 +38,7 @@ function Test-ShouldCreateJunction
 {
     Assert-DirectoryDoesNotExist $junctionPath
 
-    Install-Junction -Link $junctionPath -Target $TestDir
+    Install-Junction -Link $junctionPath -Target $PSScriptRoot
 
     Assert-Junction
 }
@@ -47,7 +50,7 @@ function Test-ShouldUpdateExistingJunction
     Install-Junction -Link $junctionPath -Target $env:windir
     Assert-Junction -ExpectedTarget $env:windir
 
-    Install-Junction -LInk $junctionPath -Target $TestDir
+    Install-Junction -LInk $junctionPath -Target $PSScriptRoot
     Assert-Junction
 }
 
@@ -57,9 +60,8 @@ function Test-ShouldGiveAnErrorIfLinkExistsAndIsADirectory
     $Error.Clear()
     try
     {
-        Install-Junction -Link $junctionPath -Target $TestDir -ErrorAction SilentlyContinue
-        Assert-Equal 1 $Error.Count
-        Assert-Like $Error[0].Exception.Message '*exists*'
+        Install-Junction -Link $junctionPath -Target $PSScriptRoot -ErrorAction SilentlyContinue
+        Assert-Error -Last 'exists'
     }
     finally
     {
@@ -69,11 +71,11 @@ function Test-ShouldGiveAnErrorIfLinkExistsAndIsADirectory
 
 function Test-ShouldSupportWhatIf
 {
-    Install-Junction -Link $junctionPath -Target $TestDir -WhatIf
+    Install-Junction -Link $junctionPath -Target $PSScriptRoot -WhatIf
     Assert-DirectoryDoesNotExist $junctionPath
 
     Install-Junction -Link $junctionPath -Target $env:windir
-    Install-Junction -Link $junctionPath -Target $TestDir -WhatIf
+    Install-Junction -Link $junctionPath -Target $PSScriptRoot -WhatIf
     Assert-Junction -ExpectedTarget $env:windir
 }
 
@@ -91,7 +93,7 @@ function Test-ShouldFailIfTargetDoesNotExist
 
 function Test-ShouldFailIfTargetIsAFile
 {
-    $target = Get-ChildItem -Path $TestDir | Select-Object -First 1
+    $target = Get-ChildItem -Path $PSScriptRoot | Select-Object -First 1
     Assert-NotNull $target
     $Error.Clear()
     Install-Junction -Link $junctionPath -Target $target.FullName -ErrorAction SilentlyContinue
@@ -128,10 +130,19 @@ function Test-ShouldCreateJunctionWithRelativePaths
     }
 }
 
+function Test-ShouldHandleHiddenFile
+{
+    Install-Junction -Link $junctionPath -Target $PSScriptRoot
+    $junction = Get-Item -Path $junctionPath
+    $junction.Attributes = $junction.Attributes -bor [IO.FileAttributes]::Hidden
+    Install-Junction -Link $junctionPath -Target $PSScriptRoot
+    Assert-NoError
+}
+
 function Assert-Junction
 {
     param(
-        $ExpectedTarget = $TestDir
+        $ExpectedTarget = $PSScriptRoot
     )
 
     Assert-Equal 0 $Error.Count

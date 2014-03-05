@@ -138,7 +138,11 @@ function Grant-Permission
         $Clear
     )
     
-    $Path = Resolve-Path $Path
+    $Path = Resolve-Path -Path $Path
+    if( -not $Path )
+    {
+        return
+    }
 
     $providerName = Get-PathProvider -Path $Path | Select-Object -ExpandProperty 'Name'
     if( $providerName -ne 'Registry' -and $providerName -ne 'FileSystem' )
@@ -158,7 +162,7 @@ function Grant-Permission
     # We don't use Get-Acl because it returns the whole security descriptor, which includes owner information.
     # When passed to Set-Acl, this causes intermittent errors.  So, we just grab the ACL portion of the security descriptor.
     # See http://www.bilalaslam.com/2010/12/14/powershell-workaround-for-the-security-identifier-is-not-allowed-to-be-the-owner-of-this-object-with-set-acl/
-    $currentAcl = (Get-Item $Path).GetAccessControl("Access")
+    $currentAcl = (Get-Item $Path -Force).GetAccessControl("Access")
     
     $inheritanceFlags = [Security.AccessControl.InheritanceFlags]::None
     $propagationFlags = [Security.AccessControl.PropagationFlags]::None

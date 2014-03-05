@@ -46,7 +46,7 @@ function Test-PathIsJunction
     
     if( Test-Path $Path -PathType Container )
     {
-        return (Get-Item $Path).IsJunction
+        return (Get-Item $Path -Force).IsJunction
     }
     return $false
 }

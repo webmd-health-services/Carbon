@@ -13,10 +13,15 @@
 # limitations under the License.
 
 $tempDir = $null
-$compressedDir = $null
-$compressedFile = $null
-$uncompressedDir = $null
-$uncompressedFile = $null
+$compressedDirPath = $null
+$compressedFilePath = $null
+$uncompressedDirPath = $null
+$uncompressedFilePath = $null
+
+function Start-TestFixture
+{
+    & (Join-Path -Path $PSScriptRoot -ChildPath '..\..\Carbon\Import-Carbon.ps1' -Resolve)
+}
 
 function Setup
 {
@@ -26,33 +31,29 @@ function Setup
 * CompressedFile
 * UncompressedFile
 '@
-    $compressedDir = Join-Path $tempDir 'CompressedDir' -Resolve
-    $compressedFile = Join-Path $tempDir 'CompressedFile' -Resolve
-    $uncompressedDir = Join-Path $tempDir 'UncompressedDir' -Resolve
-    $uncompressedFile = Join-Path $tempDir 'UncompressedFile' -Resolve
+    $compressedDirPath = Join-Path $tempDir 'CompressedDir' -Resolve
+    $compressedFilePath = Join-Path $tempDir 'CompressedFile' -Resolve
+    $uncompressedDirPath = Join-Path $tempDir 'UncompressedDir' -Resolve
+    $uncompressedFilePath = Join-Path $tempDir 'UncompressedFile' -Resolve
 
-    & (Join-Path $TestDir ..\..\Carbon\Import-Carbon.ps1 -Resolve)
-
-    Enable-NtfsCompression -Path $compressedDir
-    Enable-NtfsCompression -Path $compressedFile
+    Enable-NtfsCompression -Path $compressedDirPath
+    Enable-NtfsCompression -Path $compressedFilePath
 }
 
 function TearDown
 {
     if( (Test-Path -Path $tempDir -PathType Container) )
     {
-        Remove-Item -Path $tempDir -Recurse
+        Remove-Item -Path $tempDir -Recurse -Force
     }
-
-    Remove-Module Carbon
 }
 
 function Test-ShouldDetectCompression
 {
-    Assert-True (Test-NtfsCompression -Path $compressedDir)
-    Assert-True (Test-NtfsCompression -Path $compressedFile)
-    Assert-False (Test-NtfsCompression -Path $uncompressedDir)
-    Assert-False (Test-NtfsCompression -Path $uncompressedFile)
+    Assert-True (Test-NtfsCompression -Path $compressedDirPath)
+    Assert-True (Test-NtfsCompression -Path $compressedFilePath)
+    Assert-False (Test-NtfsCompression -Path $uncompressedDirPath)
+    Assert-False (Test-NtfsCompression -Path $uncompressedFilePath)
 }
 
 function Test-ShouldHandleBadPaths
@@ -63,4 +64,13 @@ function Test-ShouldHandleBadPaths
 
     Assert-Equal 1 $Error.Count
     Assert-True ($Error[0].Exception.Message -like '*not found*')
+}
+
+function Test-ShouldHandleHiddenDirectory
+{
+    $compressedDir = Get-Item -Path $compressedDirPath
+    $compressedDir.Attributes = $compressedDir.Attributes -bor ([IO.FileAttributes]::Hidden)
+
+    Assert-True (Test-NtfsCompression $compressedDirPath)
+    Assert-NoError
 }

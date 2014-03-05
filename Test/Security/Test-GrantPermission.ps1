@@ -16,23 +16,24 @@ $Path = $null
 $user = 'CarbonGrantPerms'
 $containerPath = $null
 
-function Setup
+function Start-TestFixture
 {
-    & (Join-Path $TestDir ..\..\Carbon\Import-Carbon.ps1 -Resolve)
-    
+    & (Join-Path -Path $TestDir -ChildPath '..\..\Carbon\Import-Carbon.ps1' -Resolve)
+}
+
+function Start-Test
+{
     Install-User -Username $user -Password 'a1b2c3d4!' -Description 'User for Carbon Grant-Permission tests.'
     
     $Path = @([IO.Path]::GetTempFileName())[0]
 }
 
-function TearDown
+function Stop-Test
 {
     if( Test-Path $Path )
     {
-        Remove-Item $Path
+        Remove-Item $Path -Force
     }
-    
-    Remove-Module Carbon
 }
 
 function Invoke-GrantPermissions($Identity, $Permissions)
@@ -198,6 +199,23 @@ function Test-ShouldWriteWarningWhenInheritanceFlagsGivenOnLeaf
 {
     $result = Grant-Permission -Identity $user -Permission Read -Path $Path -ApplyTo Container
     Assert-Null $result
+}
+
+function Test-ShouldGrantPermissionOnHiddenItem
+{
+    $item = Get-Item -Path $Path
+    $item.Attributes = $item.Attributes -bor [IO.FileAttributes]::Hidden
+
+    $result = Grant-Permission -Identity $user -Permission Read -Path $Path
+    Assert-Permissions $user 'Read' $Path
+    Assert-NoError
+}
+
+function Test-ShouldHandleNOnExistentPath
+{
+    $result = Grant-Permission -Identity $user -Permission Read -Path 'C:\I\Do\Not\Exist' -ErrorAction SilentlyContinue
+    Assert-Null $result
+    Assert-Error -Last 'Cannot find path'
 }
 
 function Assert-InheritanceFlags

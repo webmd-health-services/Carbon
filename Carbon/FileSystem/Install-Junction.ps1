@@ -83,7 +83,7 @@ function Install-Junction
 
     if( Test-Path $Link -PathType Container )
     {
-        $junction = Get-Item $Link
+        $junction = Get-Item $Link -Force
         if( -not $junction.IsJunction )
         {
             Write-Error ('Failed to create junction ''{0}'': a directory exists with that path and it is not a junction.' -f $Link)
