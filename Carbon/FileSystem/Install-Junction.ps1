@@ -23,6 +23,11 @@ function Install-Junction
     
     Both `-Link` and `-Target` parameters accept relative paths for values.  Any non-rooted paths are converted to full paths using the current location, i.e. the path returned by `Get-Location`.
 
+    Returns a `System.IO.DirectoryInfo` object for the target path, if one is created.  Returns a `System.IO.DirectoryInfo` object for the junction, if it is created and/or updated.
+
+    .OUTPUTS
+    System.IO.DirectoryInfo.
+    
     .LINK
     New-Junction
 
@@ -72,7 +77,7 @@ function Install-Junction
     {
         if( $Force )
         {
-            $null = New-Item -Path $Target -ItemType Directory -Force
+            New-Item -Path $Target -ItemType Directory -Force
         }
         else
         {
@@ -100,6 +105,6 @@ function Install-Junction
 
     if( $PSCmdlet.ShouldProcess( $Target, ("creating '{0}' junction" -f $Link) ) )
     {
-        $null = New-Junction -Link $Link -Target $target
+        New-Junction -Link $Link -Target $target
     }
 }

@@ -20,6 +20,11 @@ function New-Junction
     
     .DESCRIPTION
     Creates a junction given by `-Link` which points to the path given by `-Target`.  If something already exists at `Link`, an error is written.  
+
+    Returns a `System.IO.DirectoryInfo` object for the junction, if one is created.
+
+    .OUTPUTS
+    System.IO.DirectoryInfo.
     
     .LINK
     Install-Junction
@@ -51,7 +56,7 @@ function New-Junction
     }
     else
     {
-        Write-Host "Creating junction $Link <=> $Target"
+        Write-Verbose "Creating junction $Link <=> $Target"
         [Carbon.IO.JunctionPoint]::Create( $Link, $Target, $false )
         if( Test-Path $Link -PathType Container ) 
         { 

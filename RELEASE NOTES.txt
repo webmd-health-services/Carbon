@@ -10,6 +10,7 @@ This is a backwards-incompatible release.
  * Pipe the output of the following commands to Out-Null, or assign their return values to `$null`.  They now return objects to the pipeline instead of writing output to the host:
      * [Grant-Permission](http://get-carbon.org/help/Grant-Permission.html)
      * [Install-Group](http://get-carbon.org/help/Install-Group.html)
+     * [Install-Junction](http://get-carbon.org/help/Install-Junction.html)
      * [Install-User](http://get-carbon.org/help/Install-User.html)
  * Add the new `-PasswordNeverExpires` switch to usages of [Install-User](http://get-carbon.org/help/Install-User.html): it no longer sets the `PasswordNeverExpires` flag for a user by default.
  * `Resolve-IdentityName` renamed to [Resolve-Identity](http://get-carbon.org/help/Resolve-Identity.html), but it has a backwards-compatible alias, so you shouldn't have to do anything.
@@ -23,6 +24,10 @@ This is a backwards-incompatible release.
 ### Computer
 
  * Changed [Test-OSIs32Bit](http://get-carbon.org/help/Test-OSIs32Bit.html) and [Test-OSIs64Bit](http://get-carbon.org/help/Test-OSIs64Bit.html) functions to use the Environment class's new [Is64BitOperatingSystem](http://msdn.microsoft.com/en-us/library/system.environment.is64bitoperatingsystem.aspx) property.
+ 
+### File System
+
+ * [Install-Junction](http://get-carbon.org/help/Install-Junction.html) now returns `System.IO.DirectoryInfo` objects for any new target directories and any new/updated junctions.
 
 ### Hosts File
 
