@@ -42,6 +42,16 @@ function Test-ShouldResolveNTAuthorityIdentity
     Assert-Equal 'WellKnownGroup' $identity.Type
 }
 
+function Test-ShouldResolveEveryone
+{
+    $identity  = Resolve-IdentityName -Name 'Everyone'
+    Assert-Equal 'Everyone' $identity.FullName
+    Assert-Equal '' $identity.Domain
+    Assert-Equal 'Everyone' $identity.Name
+    Assert-NotNull $identity.Sid
+    Assert-Equal 'WellKnownGroup' $identity.Type
+}
+
 function Test-ShouldNotResolveMadeUpName
 {
     $Error.Clear()

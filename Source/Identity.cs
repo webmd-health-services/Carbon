@@ -18,7 +18,15 @@ namespace Carbon
 
         public string Domain { get; private set; }
 
-        public string FullName { get { return string.Format("{0}\\{1}", Domain, Name); } }
+        public string FullName
+        {
+            get
+            {
+                return (string.IsNullOrEmpty(Domain)) 
+                    ? Name 
+                    : string.Format("{0}\\{1}", Domain, Name);
+            }
+        }
 
         public string Name { get; private set; }
 
@@ -91,12 +99,15 @@ namespace Carbon
             var ntAccount = sid.Translate(typeof (NTAccount));
             var domainName = referencedDomainName.ToString();
             var accountName = ntAccount.Value;
-            var domainPrefix = string.Format("{0}\\", domainName);
-            if (accountName.StartsWith(domainPrefix))
+            if (!string.IsNullOrEmpty(domainName))
             {
-                accountName = accountName.Replace(domainPrefix, "");
+                var domainPrefix = string.Format("{0}\\", domainName);
+                if (accountName.StartsWith(domainPrefix))
+                {
+                    accountName = accountName.Replace(domainPrefix, "");
+                }
             }
-            return new Identity(referencedDomainName.ToString(), accountName, sid, sidUse);
+            return new Identity(domainName, accountName, sid, sidUse);
         }
     }
 }
