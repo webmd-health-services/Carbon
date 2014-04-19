@@ -1,0 +1,24 @@
+{
+    ModuleName: "Carbon",
+	
+    ModulePath: "Carbon",
+    
+    Title: "Carbon: PowerShell DevOps module for configuring and setting up Windows computers",
+
+    AssemblyNames: [ '.\\Carbon\\bin\\Carbon.dll' ],
+    
+    CommandsToSkip: [ ],
+    
+    Scripts: [ 'Carbon\\Import-Carbon.ps1' ],
+    
+    TitleSeparator: "::",
+    
+    Topics: [
+        {
+            Path: "about_Carbon.md",
+            FileName: "index.html",
+            Title: "Carbon"
+        }
+    ]
+    
+}
