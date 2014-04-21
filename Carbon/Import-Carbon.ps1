@@ -29,6 +29,10 @@ Imports the Carbon module, hiding any warnings about Carbon being loaded as a su
 
 [CmdletBinding(SupportsShouldProcess=$true)]
 param(
+    [Parameter()]
+    [string]
+    # The prefix to use on all the module's functions, cmdlets, etc.
+    $Prefix
 )
 
 Set-StrictMode -Version 'Latest'
@@ -39,4 +43,11 @@ if( (Get-Module 'Carbon') )
     Remove-Module 'Carbon' -Verbose:$false
 }
 
-Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'Carbon.psd1' -Resolve) -ErrorAction Stop -Verbose:$false
+$importModuleParams = @{ }
+if( $Prefix )
+{
+    $importModuleParams.Prefix = $Prefix
+}
+
+$carbonPsd1Path = Join-Path -Path $PSScriptRoot -ChildPath 'Carbon.psd1' -Resolve
+Import-Module $carbonPsd1Path -ErrorAction Stop -Verbose:$false @importModuleParams
