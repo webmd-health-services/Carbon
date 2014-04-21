@@ -1,0 +1,243 @@
+{
+    "ModuleName":  "Carbon",
+    "ModulePath":  "Carbon",
+    "Title":  "Carbon: PowerShell DevOps module for configuring and setting up Windows computers",
+    "AssemblyNames":  [
+                          ".\\Carbon\\bin\\Carbon.dll"
+                      ],
+    "CommandsToSkip":  [
+
+                       ],
+    "Scripts":  [
+                    "Carbon\\Import-Carbon.ps1"
+                ],
+    "TitleSeparator":  "::",
+    "Topics":  [
+                   {
+                       "Path":  "about_Carbon.md",
+                       "FileName":  "index.html",
+                       "Title":  "Carbon"
+                   }
+               ],
+    "Navigation":  {
+                       "Active Directory":  [
+                                                "Find-ADUser",
+                                                "Format-ADSearchFilterValue",
+                                                "Get-ADDomainController"
+                                            ],
+                       "Certificates":  [
+                                            "Get-Certificate",
+                                            "Get-CertificateStore",
+                                            "Get-SslCertificateBinding",
+                                            "Install-Certificate",
+                                            "Remove-SslCertificateBinding",
+                                            "Set-SslCertificateBinding",
+                                            "Test-SslCertificateBinding",
+                                            "Uninstall-Certificate"
+                                        ],
+                       "COM":  [
+                                   "Get-ComPermission",
+                                   "Get-ComSecurityDescriptor",
+                                   "Grant-ComPermission",
+                                   "Revoke-ComPermission"
+                               ],
+                       "Computer":  [
+                                        "Remove-EnvironmentVariable",
+                                        "Resolve-NetPath",
+                                        "Set-EnvironmentVariable",
+                                        "Test-OSIs32Bit",
+                                        "Test-OSIs64Bit"
+                                    ],
+                       "Cryptography":  [
+                                            "Protect-String",
+                                            "Unprotect-String"
+                                        ],
+                       ".NET":  [
+                                    "Set-DotNetAppSetting",
+                                    "Set-DotNetConnectionString",
+                                    "Test-DotNet"
+                                ],
+                       "File System":  [
+                                           "Disable-NtfsCompression",
+                                           "Enable-NtfsCompression",
+                                           "Install-Junction",
+                                           "New-Junction",
+                                           "New-TempDir",
+                                           "Remove-Junction",
+                                           "Test-NtfsCompression",
+                                           "Test-PathIsJunction"
+                                       ],
+                       "Firewall":  [
+                                        "Assert-FirewallConfigurable",
+                                        "Disable-FirewallStatefulFtp",
+                                        "Enable-FirewallStatefulFtp",
+                                        "Get-FirewallRule",
+                                        "Test-FirewallStatefulFtp"
+                                    ],
+                       "Hosts File":  [
+                                          "Get-PathToHostsFile",
+                                          "Remove-HostsEntry",
+                                          "Reset-HostsFile",
+                                          "Set-HostsEntry"
+                                      ],
+                       "IIS":  [
+                                   "Add-IisDefaultDocument",
+                                   "Add-IisServerManagerMember",
+                                   "Disable-IisSecurityAuthentication",
+                                   "Enable-IisDirectoryBrowsing",
+                                   "Enable-IisSecurityAuthentication",
+                                   "Enable-IisSsl",
+                                   "Get-IisApplication",
+                                   "Get-IisAppPool",
+                                   "Get-IisConfigurationSection",
+                                   "Get-IisHttpHeader",
+                                   "Get-IisHttpRedirect",
+                                   "Get-IisMimeMap",
+                                   "Get-IisSecurityAuthentication",
+                                   "Get-IisVersion",
+                                   "Get-IisWebsite",
+                                   "Install-IisApplication",
+                                   "Install-IisAppPool",
+                                   "Install-IisVirtualDirectory",
+                                   "Install-IisWebsite",
+                                   "Invoke-AppCmd",
+                                   "Join-IisVirtualPath",
+                                   "Lock-IisConfigurationSection",
+                                   "Remove-IisMimeMap",
+                                   "Set-IisHttpHeader",
+                                   "Set-IisHttpRedirect",
+                                   "Set-IisMimeMap",
+                                   "Set-IisWebsiteID",
+                                   "Set-IisWebsiteSslCertificate",
+                                   "Set-IisWindowsAuthentication",
+                                   "Test-IisAppPool",
+                                   "Test-IisConfigurationSection",
+                                   "Test-IisSecurityAuthentication",
+                                   "Test-IisWebsite",
+                                   "Uninstall-IisAppPool",
+                                   "Uninstall-IisWebsite",
+                                   "Unlock-IisConfigurationSection"
+                               ],
+                       "INI":  [
+                                   "Remove-IniEntry",
+                                   "Set-IniEntry",
+                                   "Split-Ini"
+                               ],
+                       "Internet Explorer":  [
+                                                 "Disable-IEEnhancedSecurityConfiguration",
+                                                 "Enable-IEActivationPermission"
+                                             ],
+                       "MSI":  [
+                                   "Invoke-WindowsInstaller"
+                               ],
+                       "MSMQ":  [
+                                    "Get-MsmqMessageQueue",
+                                    "Get-MsmqMessageQueuePath",
+                                    "Grant-MsmqMessageQueuePermission",
+                                    "Install-Msmq",
+                                    "Install-MsmqMessageQueue",
+                                    "Reset-MsmqQueueManagerID",
+                                    "Test-MsmqMessageQueue",
+                                    "Uninstall-MsmqMessageQueue"
+                                ],
+                       "Network":  [
+                                       "Get-IPAddress",
+                                       "Test-IPAddress"
+                                   ],
+                       "Path":  [
+                                    "Get-PathProvider",
+                                    "Resolve-FullPath",
+                                    "Resolve-PathCase",
+                                    "Resolve-RelativePath",
+                                    "Test-UncPath"
+                                ],
+                       "Performance Counters":  [
+                                                    "Get-PerformanceCounter",
+                                                    "Install-PerformanceCounter",
+                                                    "Test-PerformanceCounter",
+                                                    "Test-PerformanceCounterCategory",
+                                                    "Uninstall-PerformanceCounterCategory"
+                                                ],
+                       "PowerShell":  [
+                                          "Add-TrustedHost",
+                                          "Clear-TrustedHost",
+                                          "Get-PowershellPath",
+                                          "Get-TrustedHost",
+                                          "Invoke-PowerShell",
+                                          "Set-TrustedHost",
+                                          "Test-PowerShellIs32Bit",
+                                          "Test-PowerShellIs64Bit"
+                                      ],
+                       "Privileges":  [
+                                          "Get-Privilege",
+                                          "Grant-Privilege",
+                                          "Revoke-Privilege",
+                                          "Test-Privilege"
+                                      ],
+                       "Registry":  [
+                                        "Get-RegistryKeyValue",
+                                        "Install-RegistryKey",
+                                        "Remove-RegistryKeyValue",
+                                        "Set-RegistryKeyValue",
+                                        "Test-RegistryKeyValue"
+                                    ],
+                       "Security":  [
+                                        "Assert-AdminPrivilege",
+                                        "Convert-SecureStringToString",
+                                        "ConvertTo-InheritanceFlag",
+                                        "ConvertTo-PropagationFlag",
+                                        "ConvertTo-ProviderAccessControlRights",
+                                        "Get-Permission",
+                                        "Grant-Permission",
+                                        "New-Credential",
+                                        "Protect-Acl",
+                                        "Test-AdminPrivilege",
+                                        "Test-Permission"
+                                    ],
+                       "Service":  [
+                                       "Assert-Service",
+                                       "Get-ServiceAcl",
+                                       "Get-ServicePermission",
+                                       "Get-ServiceSecurityDescriptor",
+                                       "Grant-ServiceControlPermission",
+                                       "Grant-ServicePermission",
+                                       "Install-Service",
+                                       "Restart-RemoteService",
+                                       "Revoke-ServicePermission",
+                                       "Set-ServiceAcl",
+                                       "Test-Service",
+                                       "Uninstall-Service"
+                                   ],
+                       "Shares":  [
+                                      "Install-SmbShare"
+                                  ],
+                       "Text":  [
+                                    "ConvertFrom-Base64",
+                                    "ConvertTo-Base64"
+                                ],
+                       "Users and Groups":  [
+                                                "Add-GroupMember",
+                                                "Get-Group",
+                                                "Get-User",
+                                                "Get-WmiLocalUserAccount",
+                                                "Install-Group",
+                                                "Install-User",
+                                                "Resolve-Identity",
+                                                "Test-Group",
+                                                "Test-Identity",
+                                                "Test-User",
+                                                "Uninstall-User"
+                                            ],
+                       "Windows Features":  [
+                                                "Assert-WindowsFeatureFunctionsSupported",
+                                                "Get-WindowsFeature",
+                                                "Install-WindowsFeature",
+                                                "Resolve-WindowsFeatureName",
+                                                "Test-WindowsFeature",
+                                                "Uninstall-WindowsFeature"
+                                            ],
+                       "Xml":  [
+                                   "Convert-XmlFile"
+                               ]
+                   }
+}
