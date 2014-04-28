@@ -118,10 +118,21 @@ function Test-Permission
     }
 
     $rightsPropertyName = '{0}Rights' -f $providerName
+    $inheritanceFlags = [Security.AccessControl.InheritanceFlags]::None
+    $propagationFlags = [Security.AccessControl.PropagationFlags]::None
+    $testApplyTo = $false
     if( $PSBoundParameters.ContainsKey('ApplyTo') )
     {
-        $inheritanceFlags = ConvertTo-InheritanceFlag -ContainerInheritanceFlag $ApplyTo
-        $propagationFlags = ConvertTo-PropagationFlag -ContainerInheritanceFlag $ApplyTo
+        if( (Test-Path -Path $Path -PathType Leaf ) )
+        {
+            Write-Warning "Can't test inheritance/propagation rules on a leaf. Please omit `ApplyTo` parameter when `Path` is a leaf."
+        }
+        else
+        {
+            $testApplyTo = $true
+            $inheritanceFlags = ConvertTo-InheritanceFlag -ContainerInheritanceFlag $ApplyTo
+            $propagationFlags = ConvertTo-PropagationFlag -ContainerInheritanceFlag $ApplyTo
+        }
     }
     $acl = Get-Acl -Path $Path | 
                 Select-Object -ExpandProperty Access | 
@@ -139,7 +150,7 @@ function Test-Permission
                     }
                 } |
                 Where-Object {
-                    if( -not $PSBoundParameters.ContainsKey('ApplyTo') )
+                    if( -not $testApplyTo )
                     {
                         return $true
                     }

@@ -90,7 +90,7 @@ This is a backwards-incompatible release.
 
  * [Grant-Permission](http://get-carbon.org/help/Grant-Permission.html) fails when item is hidden.
  * [Grant-Permission](http://get-carbon.org/help/Grant-Permission.html) doesn't handle non-existent paths, causing cascading errors.
-
+ * [Test-Permission](http://get-carbon.org/help/Test-Permission.html) always returns `$false` when testing leaf-level permissions and the `ApplyTo` parameter is provided, i.e. it doesn't ignore inheritance/propagation flags on leaves.
 
 # 1.6.0 (1 February 2014)
 

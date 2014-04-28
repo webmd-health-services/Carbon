@@ -94,6 +94,14 @@ function Test-ShouldIncludeInheritedExactPermission
     Assert-True (Test-Permission -Path $filePath -Identity $identity -Permission 'ReadAndExecute' -Inherited -Exact)
 }
 
+function Test-ShouldIgnoreInheritanceAndPropagationFlagsOnFile
+{
+    $warning = @()
+    Assert-True (Test-Permission -Path $filePath -Identity $identity -Permission 'ReadAndExecute' -ApplyTo SubContainers -Inherited -WarningVariable 'warning' -WarningAction SilentlyContinue)
+    Assert-NotNull $warning
+    Assert-Like $warning[0] 'Can''t test inheritance/propagation rules on a leaf.*'
+}
+
 function Test-ShouldCheckUngrantedPermissionOnRegistry
 {
     Assert-False (Test-Permission -Path $keyPath -Identity $identity -Permission 'Delete')
