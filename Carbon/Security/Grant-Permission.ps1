@@ -181,37 +181,44 @@ function Grant-Permission
     
     $inheritanceFlags = [Security.AccessControl.InheritanceFlags]::None
     $propagationFlags = [Security.AccessControl.PropagationFlags]::None
+    $testPermissionParams = @{ }
     if( Test-Path $Path -PathType Container )
     {
         $inheritanceFlags = ConvertTo-InheritanceFlag -ContainerInheritanceFlag $ApplyTo
         $propagationFlags = ConvertTo-PropagationFlag -ContainerInheritanceFlag $ApplyTo
+        $testPermissionParams.ApplyTo = $ApplyTo
     }
     else
     {
         if( $PSBoundParameters.ContainsKey( 'ApplyTo' ) )
         {
-            Write-Warning "Can't apply inheritance rules to a leaf. Please omit `ApplyTo` parameter when `Path` is a leaf."
+            Write-Warning "Can't apply inheritance/propagation rules to a leaf. Please omit `ApplyTo` parameter when `Path` is a leaf."
         }
     }
     
     $rulesToRemove = $null
+    $Identity = Resolve-Identity -Name $Identity
     if( $Clear )
     {
         $rulesToRemove = $currentAcl.Access |
+                    Where-Object { $_.IdentityReference.Value -ne $Identity } |
                     Where-Object { -not $_.IsInherited }
         
         if( $rulesToRemove )
         {
-            $rulesToRemove | 
-                ForEach-Object { [void] $currentAcl.RemoveAccessRule( $_ ) }
+            foreach( $ruleToRemove in $rulesToRemove )
+            {
+                Write-Verbose ('Removing {0}''s non-inherited, {1} {2} rights on {3}.' -f $Identity,$ruleToRemove.AccessControlType,$ruleToRemove."$($providerName)Rights",$Path)
+                [void]$currentAcl.RemoveAccessRule( $rulesToRemove )
+            }
         }
     }
 
-    $missingPermission = -not (Test-Permission -Path $Path -Identity $Identity -Permission $Permission -ApplyTo $ApplyTo -Exact)
+    $missingPermission = -not (Test-Permission -Path $Path -Identity $Identity -Permission $Permission @testPermissionParams -Exact)
     $setAccessRule = ($Force -or $missingPermission)
     if( $setAccessRule )
     {
-        $accessRule = New-Object "Security.AccessControl.$($providerName)AccessRule" $identity,$rights,$inheritanceFlags,$propagationFlags,"Allow"
+        $accessRule = New-Object "Security.AccessControl.$($providerName)AccessRule" $Identity,$rights,$inheritanceFlags,$propagationFlags,"Allow"
         $currentAcl.SetAccessRule( $accessRule )
     }
 

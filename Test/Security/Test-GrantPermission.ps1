@@ -14,20 +14,25 @@
 
 $Path = $null
 $user = 'CarbonGrantPerms'
+$user2 = 'CarbonGrantPerms2'
 $containerPath = $null
+$regContainerPath = $null
 
 function Start-TestFixture
 {
     & (Join-Path -Path $TestDir -ChildPath '..\..\Carbon\Import-Carbon.ps1' -Resolve)
+    Install-User -Username $user -Password 'a1b2c3d4!' -Description 'User for Carbon Grant-Permission tests.'
+    Install-User -Username $user2 -Password 'a1b2c3d4!' -Description 'User for Carbon Grant-Permission tests.'
 }
 
 function Start-Test
 {
-    Install-User -Username $user -Password 'a1b2c3d4!' -Description 'User for Carbon Grant-Permission tests.'
-    
     $containerPath = New-TempDir -Prefix 'Carbon_Test-GrantPermisssion'
     $Path = Join-Path -Path $containerPath -ChildPath ([IO.Path]::GetRandomFileName())
     $null = New-Item -ItemType 'File' -Path $Path
+
+    $regContainerPath = 'hkcu:\CarbonTestGrantPermission{0}' -f ([IO.Path]::GetRandomFileName())
+    New-Item -Path $regContainerPath
 }
 
 function Stop-Test
@@ -36,13 +41,18 @@ function Stop-Test
     {
         Remove-Item $containerPath -Recurse -Force
     }
+
+    if( Test-Path $regContainerPath )
+    {
+        Remove-Item $regContainerPath -Recurse -Force
+    }
 }
 
 function Invoke-GrantPermissions($Identity, $Permissions, $Path)
 {
     $result = Grant-Permission -Identity $Identity -Permission $Permissions -Path $Path.ToString()
     Assert-NotNull $result
-    Assert-Equal $Identity $result.IdentityReference
+    Assert-Equal (Resolve-Identity $Identity).FullName $result.IdentityReference
     Assert-Is $result ([Security.AccessControl.FileSystemAccessRule])
 }
 
@@ -208,9 +218,12 @@ function Test-ShouldSetInheritanceFlags
 
 function Test-ShouldWriteWarningWhenInheritanceFlagsGivenOnLeaf
 {
-    $result = Grant-Permission -Identity $user -Permission Read -Path $Path -ApplyTo Container
+    $warnings = @()
+    $result = Grant-Permission -Identity $user -Permission Read -Path $Path -ApplyTo Container -WarningAction SilentlyContinue -WarningVariable 'warnings'
     Assert-NotNull $result
     Assert-Equal $Path $result.Path
+    Assert-NotNull $warnings
+    Assert-Like $warnings[0] '*Can''t apply inheritance/propagation rules to a leaf*' 
 }
 
 function Test-ShouldChangePermissions
@@ -241,7 +254,6 @@ function Test-ShouldChangeInheritanceFlags
     Assert-True (Test-Permission -Identity $user -Permission Read -Path $containerPath -ApplyTo Container -Exact)
 }
 
-
 function Test-ShouldReapplySamePermissions
 {
     Grant-Permission -Identity $user -Permission FullControl -Path $containerPath -ApplyTo ContainerAndLeaves
@@ -265,6 +277,61 @@ function Test-ShouldHandleNOnExistentPath
     $result = Grant-Permission -Identity $user -Permission Read -Path 'C:\I\Do\Not\Exist' -ErrorAction SilentlyContinue
     Assert-Null $result
     Assert-Error -Last 'Cannot find path'
+}
+
+function Test-ShouldNotClearPermissionGettingSetOnFile
+{
+    $result = Grant-Permission -Identity $user -Permission Read -Path $Path -Verbose 4>&1
+    Assert-NotNull $result
+    Assert-Is $result 'Security.AccessControl.FileSystemAccessRule'
+    $result = Grant-Permission -Identity $user -Permission Read -Path $Path -Clear -Verbose 4>&1
+    Assert-Null $result
+}
+
+function Test-ShouldNotClearPermissionGettingSetOnDirectory
+{
+    $result = Grant-Permission -Identity $user -Permission Read -Path $containerPath -Verbose 4>&1
+    Assert-NotNull $result
+    Assert-Is $result 'Security.AccessControl.FileSystemAccessRule'
+    $result = Grant-Permission -Identity $user -Permission Read -Path $containerPath -Clear -Verbose 4>&1
+    Assert-Null $result
+}
+
+function Test-ShouldNotClearPermissionGettingSetOnRegKey
+{
+    $result = Grant-Permission -Identity $user -Permission QueryValues -Path $regContainerPath -Verbose 4>&1
+    Assert-NotNull $result
+    Assert-Is $result 'Security.AccessControl.RegistryAccessRule'
+    $result = Grant-Permission -Identity $user -Permission QueryValues -Path $regContainerPath -Clear -Verbose 4>&1
+    Assert-Null $result
+}
+
+function Test-ShouldWriteVerboseMessageWhenClearingRuleOnFileSystem
+{
+    $result = Grant-Permission -Identity $user -Permission Read -Path $containerPath -Verbose 4>&1
+    Assert-NotNull $result
+    Assert-Is $result 'Security.AccessControl.FileSystemAccessRule'
+    [object[]]$result = Grant-Permission -Identity $user2 -Permission Read -Path $containerPath -Clear -Verbose 4>&1
+    Assert-NotNull $result
+    Assert-Equal 2 $result.Count
+    Assert-Is $result[0] 'Management.Automation.VerboseRecord'
+    Assert-Like $result[0].Message ('Removing*{0}*Read*' -f $user)
+    Assert-Is $result[1] 'Security.AccessControl.FileSystemAccessRule'
+    Assert-Equal (Resolve-Identity $user2).FullName $result[1].IdentityReference.Value
+}
+
+function Test-ShouldWriteVerboseMessageWhenClearingRuleOnRegKey
+{
+    $result = Grant-Permission -Identity $user -Permission QueryValues -Path $regContainerPath -Verbose 4>&1
+    Assert-NotNull $result
+    Assert-Is $result 'Security.AccessControl.RegistryAccessRule'
+    [object[]]$result = Grant-Permission -Identity $user2 -Permission QueryValues -Path $regContainerPath -Clear -Verbose 4>&1
+    Assert-NotNull $result
+    Assert-Equal 2 $result.Count
+    Assert-Is $result[0] 'Management.Automation.VerboseRecord'
+    Assert-Like $result[0].Message ('Removing*{0}*QueryValues*' -f $user)
+    Assert-Is $result[1] 'Security.AccessControl.RegistryAccessRule'
+    Assert-Equal (Resolve-Identity $user2).FullName $result[1].IdentityReference.Value
 }
 
 function Assert-InheritanceFlags
