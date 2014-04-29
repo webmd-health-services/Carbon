@@ -36,19 +36,35 @@ function Get-CertificateStore
 
     Get the current user's Trusted Root Certification Authorities certificate store.
     #>
-    [CmdletBinding()]
+    [CmdletBinding(DefaultParameterSetName='ByStoreName')]
     param(
         [Parameter(Mandatory=$true)]
         [Security.Cryptography.X509Certificates.StoreLocation]
-        # The certificate store location to get.
+        # The location of the certificate store to get.
         $StoreLocation,
         
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory=$true,ParameterSetName='ByStoreName')]
         [Security.Cryptography.X509Certificates.StoreName]
-        # The certificate store name to get.
-        $StoreName
+        # The name of the certificate store to get.
+        $StoreName,
+
+        [Parameter(Mandatory=$true,ParameterSetName='ByCustomStoreName')]
+        [string]
+        # The name of the non-standard certificate store to get. Use this to pull certificates from a non-standard store.
+        $CustomStoreName
     )
-    $store = New-Object Security.Cryptography.X509Certificates.X509Store $StoreName,$StoreLocation
-    $store.Open( ([Security.Cryptography.X509Certificates.OpenFlags]::OpenExistingOnly -bor [Security.Cryptography.X509Certificates.OpenFlags]::ReadWrite) )
+
+    Set-StrictMode -Version 'Latest'
+
+    if( $PSCmdlet.ParameterSetName -eq 'ByStoreName' )
+    {
+        $store = New-Object Security.Cryptography.X509Certificates.X509Store $StoreName,$StoreLocation
+    }
+    else
+    {
+        $store = New-Object Security.Cryptography.X509Certificates.X509Store $CustomStoreName,$StoreLocation
+    }
+
+    $store.Open( ([Security.Cryptography.X509Certificates.OpenFlags]::ReadWrite) )
     return $store
 }

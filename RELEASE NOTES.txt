@@ -18,8 +18,7 @@ There is now [a Carbon support mailing list](http://www.freelists.org/list/carbo
  
 ### Certificates
 
- * [Get-Certificate](http://get-carbon.org/help/Get-Certificate.html) fails when passed a relative path.
- * [Install-Certificate](http://get-carbon.org/help/Install-Certificate.html) fails when passed a relative path.
+ * [Get-CertificateStore](http://get-carbon.org/help/Get-CertificateStore.html) now supports non-standard, custom certificate stores.
  
 ### File System
 
@@ -37,6 +36,11 @@ There is now [a Carbon support mailing list](http://www.freelists.org/list/carbo
 
 ## Bug Fixes
 
+### Certificates
+
+ * [Get-Certificate](http://get-carbon.org/help/Get-Certificate.html) fails when passed a relative path.
+ * [Install-Certificate](http://get-carbon.org/help/Install-Certificate.html) fails when passed a relative path.
+ 
 ### File System
 
  * [Remove-Junction](http://get-carbon.org/help/Remove-Junction.html) doesn't delete a junction when given a relative path to the junction.
