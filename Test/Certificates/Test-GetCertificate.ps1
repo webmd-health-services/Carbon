@@ -15,20 +15,22 @@
 $TestCertPath = JOin-Path $TestDir CarbonTestCertificate.cer -Resolve
 $TestCert = New-Object Security.Cryptography.X509Certificates.X509Certificate2 $TestCertPath
 
-function Setup
+function Start-TestFixture
 {
-    Import-Module (Join-Path $TestDir ..\..\Carbon -Resolve) -Force
+    & (Join-Path -Path $PSScriptRoot -ChildPath '..\..\Carbon\Import-Carbon.ps1' -Resolve)
+}
 
+function Start-Test
+{
     if( -not (Get-Certificate -Thumbprint $TestCert.Thumbprint -StoreLocation CurrentUser -StoreName My) ) 
     {
         Install-Certificate -Path $TestCertPath -StoreLocation CurrentUser -StoreName My
     }
 }
 
-function TearDown
+function Stop-Test
 {
     Uninstall-Certificate -Certificate $TestCert -storeLocation CurrentUser -StoreName My
-    Remove-Module Carbon
 }
 
 function Test-ShouldFindCertificatesByFriendlyName
@@ -42,6 +44,20 @@ function Test-ShouldFindCertificateByPath
 {
     $cert = Get-Certificate -Path $TestCertPath
     Assert-TestCert $cert
+}
+
+function Test-ShouldFindCertificateByRelativePath
+{
+    Push-Location -Path $PSScriptRoot
+    try
+    {
+        $cert = Get-Certificate -Path ('.\{0}' -f (Split-Path -Leaf -Path $TestCertPath))
+        Assert-TestCert $cert
+    }
+    finally
+    {
+        Pop-Location
+    }
 }
 
 function Test-ShouldFindCertificateByThumbprint

@@ -73,9 +73,13 @@ function Get-Certificate
         # The name of the certificate's store.
         $StoreName
     )
-    
+
+    Set-StrictMode -Version 'Latest'
+
     if( $pscmdlet.ParameterSetName -eq 'ByPath' )
     {
+        $Path = ConvertTo-FullPath -Path $Path
+    
         try
         {
             return New-Object Security.Cryptography.X509Certificates.X509Certificate2 $Path,$Password

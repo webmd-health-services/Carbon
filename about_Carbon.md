@@ -37,13 +37,15 @@ Carbon's automated test suite runs in the following environment:
 
 But it should support PowerShell 2 and 3 running on Windows Server 2008/2008 R2/2012/2012 R2 and Windows 7/8/8.1.
 
-To get help, [send an e-mail to the Carbon mailing list](mailto:carbon@freelist.org).
+To get help, [subscribe to and/or send an e-mail to the Carbon mailing list](http://www.freelists.org/list/carbon).
 
 
 ## Installation
 
  1. Download the latest release.
+
  2. Unblock the .zip file (right-click it, choose "Properties", click "Unblock", then click "OK").
+
  3. Unzip the Carbon module anywhere on your file system. Import the module by running the `Import-Carbon.ps` script:
         
         > & 'Path\To\Carbon\Directory\Import-Carbon.ps1' 

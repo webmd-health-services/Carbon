@@ -59,6 +59,10 @@ function Install-Certificate
         $Password
     )
     
+    Set-StrictMode -Version 'Latest'
+
+    $Path = ConvertTo-FullPath -Path $Path
+
     $cert = New-Object Security.Cryptography.X509Certificates.X509Certificate2
     $keyFlags = [Security.Cryptography.X509Certificates.X509KeyStorageFlags]::MachineKeySet
     if( $StoreLocation -eq [Security.Cryptography.X509Certificates.StoreLocation]::CurrentUser )

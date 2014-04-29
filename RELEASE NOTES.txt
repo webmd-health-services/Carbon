@@ -66,6 +66,8 @@ This is a backwards-incompatible release.
  
 # 1.6.1
 
+There is now [a Carbon support mailing list](http://www.freelists.org/list/carbon).
+
 ## Enhancements
 
 ### General
@@ -79,6 +81,10 @@ This is a backwards-incompatible release.
 ### General
 
  * No more silent errors when importing Carbon on Windows 2012 R2.
+ 
+### Certificates
+
+ * [Get-CertificateStore](http://get-carbon.org/help/Get-CertificateStore.html) now supports non-standard, custom certificate stores.
  
 ### File System
 
@@ -96,6 +102,11 @@ This is a backwards-incompatible release.
 
 ## Bug Fixes
 
+### Certificates
+
+ * [Get-Certificate](http://get-carbon.org/help/Get-Certificate.html) fails when passed a relative path.
+ * [Install-Certificate](http://get-carbon.org/help/Install-Certificate.html) fails when passed a relative path.
+ 
 ### File System
 
  * [Remove-Junction](http://get-carbon.org/help/Remove-Junction.html) doesn't delete a junction when given a relative path to the junction.
