@@ -19,6 +19,7 @@ There is now [a Carbon support mailing list](http://www.freelists.org/list/carbo
 ### Certificates
 
  * [Get-Certificate](http://get-carbon.org/help/Get-Certificate.html) fails when passed a relative path.
+ * [Install-Certificate](http://get-carbon.org/help/Install-Certificate.html) fails when passed a relative path.
  
 ### File System
 

@@ -15,20 +15,22 @@
 $TestCertPath = JOin-Path $TestDir CarbonTestCertificate.cer -Resolve
 $TestCert = New-Object Security.Cryptography.X509Certificates.X509Certificate2 $TestCertPath
 
-function Setup
+function Start-TestFixture
 {
-    Import-Module (Join-Path $TestDir ..\..\Carbon -Resolve) -Force
+    & (Join-Path -Path $PSScriptRoot -ChildPath '..\..\Carbon\Import-Carbon.ps1' -Resolve)
+}
 
+function Start-Test
+{
     if( (Get-Certificate -Thumbprint $TestCert.Thumbprint -SToreLocation CurrentUser -StoreName My) )
     {
         Uninstall-Certificate -Certificate $TestCert -StoreLocation CurrentUser -StoreName My
     }
 }
 
-function TearDown
+function Stop-Test
 {
     Uninstall-Certificate -Certificate $TestCert -StoreLocation CurrentUser -StoreName My
-    Remove-Module Carbon
 }
 
 function Test-ShouldInstallCertificateToLocalMachine
@@ -46,6 +48,22 @@ function Test-ShouldInstallCertificateToLocalMachine
         $exportFailed = $true
     }
     Assert-True $exportFailed
+}
+
+function Test-ShouldInstallCertificateToLocalMachineWithRelativePath
+{
+    Push-Location -Path $PSScriptRoot
+    try
+    {
+        $path = '.\{0}' -f (Split-Path -Leaf -Path $TestCertPath)
+        $cert = Install-Certificate -Path $path -StoreLocation CurrentUser -StoreName My
+        Assert-Equal $TestCert.Thumbprint $cert.Thumbprint
+        $cert = Assert-CertificateInstalled -StoreLocation LocalMachine -StoreName My 
+    }
+    finally
+    {
+        Pop-Location
+    }
 }
 
 function Test-ShouldInstallCertificateToLocalMachineAsExportable
