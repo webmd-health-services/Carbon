@@ -27,7 +27,7 @@ There is now [a Carbon support mailing list](http://www.freelists.org/list/carbo
 
  * [Get-Certificate](http://get-carbon.org/help/Get-Certificate.html) no longer writes a silent error when a certificate does not exist. Instead, no error is written.
 
- ### File System
+### File System
 
  * [Install-Junction](http://get-carbon.org/help/Install-Junction.html) fails when target path is hidden.
  * [Test-NtfsCompression](http://get-carbon.org/help/Test-NtfsCompression.html) fails when file/directory is hidden.
