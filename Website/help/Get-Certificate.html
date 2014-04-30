@@ -268,7 +268,9 @@
         <h2>Syntax</h2>
     <pre class="Syntax"><code>Get-Certificate -FriendlyName &lt;String&gt; -StoreLocation {CurrentUser | LocalMachine} -StoreName {AddressBook | AuthRoot | CertificateAuthority | Disallowed | My | Root | TrustedPeople | TrustedPublisher} [&lt;CommonParameters&gt;]</code></pre>
 <pre class="Syntax"><code>Get-Certificate -Path &lt;String&gt; [-Password &lt;Object&gt;] [&lt;CommonParameters&gt;]</code></pre>
-<pre class="Syntax"><code>Get-Certificate -Thumbprint &lt;String&gt; -StoreLocation {CurrentUser | LocalMachine} -StoreName {AddressBook | AuthRoot | CertificateAuthority | Disallowed | My | Root | TrustedPeople | TrustedPublisher} [&lt;CommonParameters&gt;]</code></pre>
+<pre class="Syntax"><code>Get-Certificate -Thumbprint &lt;String&gt; -StoreLocation {CurrentUser | LocalMachine} -CustomStoreName &lt;String&gt; [&lt;CommonParameters&gt;]</code></pre>
+<pre class="Syntax"><code>Get-Certificate -Thumbprint &lt;String&gt; -StoreLocation {CurrentUser | LocalMachine} -StoreName {AddressBook | AuthRoot | CertificateAuthority | Disallowed | My | Root | TrustedPeople | TrustedPublisher} [&lt;CommonParameters&gt;]</code></pre>
+<pre class="Syntax"><code>Get-Certificate -FriendlyName &lt;String&gt; -StoreLocation {CurrentUser | LocalMachine} -CustomStoreName &lt;String&gt; [&lt;CommonParameters&gt;]</code></pre>
     
         <h2>Description</h2>
     <div class="Description">
@@ -342,6 +344,15 @@
 				<td>false</td>
                 <td></td>
 			</tr>
+			<tr valign='top'>
+				<td>CustomStoreName</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+				<td>The name of the non-standard, custom store.
+</td>
+				<td>true</td>
+				<td>false</td>
+                <td></td>
+			</tr>
             
         </table>
         
@@ -362,6 +373,9 @@
 </p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 3</h2>
             <pre><code>Get-Certificate -FriendlyName 'Development Certificate' -StoreLocation CurrentUser -StoreName TrustedPeople</code></pre>
             <p><p>Gets the X509Certificate2 whose friendly name is Development Certificate from the Current User's Trusted People certificate store.</p>
+</p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 4</h2>
+            <pre><code>Get-Certificate -Thumbprint a909502dd82ae41433e6f83886b00d4277a32a7b -CustomStoreName 'SharePoint' -StoreLocation LocalMachine</code></pre>
+            <p><p>Demonstrates how to get a certificate from a custom store, i.e. one that is not part of the standard <code>StoreName</code> enumeration.</p>
 </p><p></p><p></p><p></p><p></p>
 </body>
 </html>   

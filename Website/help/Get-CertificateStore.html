@@ -266,7 +266,8 @@
 </div>
 
         <h2>Syntax</h2>
-    <pre class="Syntax"><code>Get-CertificateStore [-StoreLocation] {CurrentUser | LocalMachine} [-StoreName] {AddressBook | AuthRoot | CertificateAuthority | Disallowed | My | Root | TrustedPeople | TrustedPublisher} [&lt;CommonParameters&gt;]</code></pre>
+    <pre class="Syntax"><code>Get-CertificateStore -StoreLocation {CurrentUser | LocalMachine} -StoreName {AddressBook | AuthRoot | CertificateAuthority | Disallowed | My | Root | TrustedPeople | TrustedPublisher} [&lt;CommonParameters&gt;]</code></pre>
+<pre class="Syntax"><code>Get-CertificateStore -StoreLocation {CurrentUser | LocalMachine} -CustomStoreName &lt;String&gt; [&lt;CommonParameters&gt;]</code></pre>
     
         <h2>Description</h2>
     <div class="Description">
@@ -291,7 +292,7 @@
             			<tr valign='top'>
 				<td>StoreLocation</td>
 				<td><a href="http://msdn.microsoft.com/en-us/library/system.security.cryptography.x509certificates.storelocation.aspx">StoreLocation</a></td>
-				<td>The certificate store location to get.
+				<td>The location of the certificate store to get.
 </td>
 				<td>true</td>
 				<td>false</td>
@@ -300,7 +301,16 @@
 			<tr valign='top'>
 				<td>StoreName</td>
 				<td><a href="http://msdn.microsoft.com/en-us/library/system.security.cryptography.x509certificates.storename.aspx">StoreName</a></td>
-				<td>The certificate store name to get.
+				<td>The name of the certificate store to get.
+</td>
+				<td>true</td>
+				<td>false</td>
+                <td></td>
+			</tr>
+			<tr valign='top'>
+				<td>CustomStoreName</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+				<td>The name of the non-standard certificate store to get. Use this to pull certificates from a non-standard store.
 </td>
 				<td>true</td>
 				<td>false</td>

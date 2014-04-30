@@ -266,7 +266,9 @@
 </div>
 
         <h2>Syntax</h2>
-    <pre class="Syntax"><code>Uninstall-Certificate -Thumbprint &lt;String&gt; -StoreLocation {CurrentUser | LocalMachine} -StoreName {AddressBook | AuthRoot | CertificateAuthority | Disallowed | My | Root | TrustedPeople | TrustedPublisher} [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
+    <pre class="Syntax"><code>Uninstall-Certificate -Thumbprint &lt;String&gt; -StoreLocation {CurrentUser | LocalMachine} -CustomStoreName &lt;String&gt; [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
+<pre class="Syntax"><code>Uninstall-Certificate -Thumbprint &lt;String&gt; -StoreLocation {CurrentUser | LocalMachine} -StoreName {AddressBook | AuthRoot | CertificateAuthority | Disallowed | My | Root | TrustedPeople | TrustedPublisher} [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
+<pre class="Syntax"><code>Uninstall-Certificate -Certificate &lt;X509Certificate2&gt; -StoreLocation {CurrentUser | LocalMachine} -CustomStoreName &lt;String&gt; [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
 <pre class="Syntax"><code>Uninstall-Certificate -Certificate &lt;X509Certificate2&gt; -StoreLocation {CurrentUser | LocalMachine} -StoreName {AddressBook | AuthRoot | CertificateAuthority | Disallowed | My | Root | TrustedPeople | TrustedPublisher} [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
     
         <h2>Description</h2>
@@ -324,6 +326,15 @@
                 <td></td>
 			</tr>
 			<tr valign='top'>
+				<td>CustomStoreName</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+				<td>The name of the non-standard, custom store where the certificate should be un-installed.
+</td>
+				<td>true</td>
+				<td>false</td>
+                <td></td>
+			</tr>
+			<tr valign='top'>
 				<td>WhatIf</td>
 				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
 				<td></td>
@@ -365,6 +376,9 @@
 </blockquote>
 
 <p>Removes the certificate with friendly name 'Carbon Testing Certificate' from the local machine's Trusted Root Certification Authorities store.</p>
+</p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 3</h2>
+            <pre><code>Uninstall-Certificate -Thumbprint 570895470234023dsaaefdbcgbefa -StoreLocation LocalMachine -StoreName 'SharePoint'</code></pre>
+            <p><p>Demonstrates how to uninstall a certificate from a custom, non-standard store.</p>
 </p><p></p><p></p><p></p><p></p>
 </body>
 </html>   

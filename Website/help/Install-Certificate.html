@@ -266,7 +266,8 @@
 </div>
 
         <h2>Syntax</h2>
-    <pre class="Syntax"><code>Install-Certificate [-Path] &lt;String&gt; [-StoreLocation] {CurrentUser | LocalMachine} [-StoreName] {AddressBook | AuthRoot | CertificateAuthority | Disallowed | My | Root | TrustedPeople | TrustedPublisher} [-Exportable] [[-Password] &lt;Object&gt;] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
+    <pre class="Syntax"><code>Install-Certificate [-Path] &lt;String&gt; -StoreLocation {CurrentUser | LocalMachine} -StoreName {AddressBook | AuthRoot | CertificateAuthority | Disallowed | My | Root | TrustedPeople | TrustedPublisher} [-Exportable] [-Password &lt;Object&gt;] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
+<pre class="Syntax"><code>Install-Certificate [-Path] &lt;String&gt; -StoreLocation {CurrentUser | LocalMachine} -CustomStoreName &lt;String&gt; [-Exportable] [-Password &lt;Object&gt;] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
     
         <h2>Description</h2>
     <div class="Description">
@@ -316,6 +317,15 @@
 <blockquote>
   [Enum]::GetValues([Security.Cryptography.X509Certificates.StoreName])
 </blockquote>
+</td>
+				<td>true</td>
+				<td>false</td>
+                <td></td>
+			</tr>
+			<tr valign='top'>
+				<td>CustomStoreName</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+				<td>The name of the non-standard, custom store where the certificate should be installed.
 </td>
 				<td>true</td>
 				<td>false</td>
