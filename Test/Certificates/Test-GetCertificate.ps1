@@ -66,6 +66,43 @@ function Test-ShouldFindCertificateByThumbprint
     Assert-TestCert $cert
 }
 
+function Test-ShouldNotThrowErrorWhenCertificateDoesNotExist
+{
+    $cert = Get-Certificate -Thumbprint '1234567890abcdef1234567890abcdef12345678' -StoreLocation CurrentUser -StoreName My -ErrorAction SilentlyContinue
+    Assert-NoError
+    Assert-Null $cert
+}
+
+function Test-ShouldFindCertificateInCustomStoreByThumbprint
+{
+    $expectedCert = Install-Certificate -Path $TestCertPath -StoreLocation CurrentUser -CustomStoreName 'Carbon'
+    try
+    {
+        $cert = Get-Certificate -Thumbprint $expectedCert.Thumbprint -StoreLocation CurrentUser -CustomStoreName 'Carbon'
+        Assert-NotNull $cert
+        Assert-Equal $expectedCert.Thumbprint $cert.Thumbprint
+    }
+    finally
+    {
+        Uninstall-Certificate -Certificate $expectedCert -StoreLocation CurrentUser -CustomStoreName 'Carbon'
+    }
+}
+
+function Test-ShouldFindCertificateInCustomStoreByThumbprint
+{
+    $expectedCert = Install-Certificate -Path $TestCertPath -StoreLocation CurrentUser -CustomStoreName 'Carbon'
+    try
+    {
+        $cert = Get-Certificate -FriendlyName $expectedCert.FriendlyName -StoreLocation CurrentUser -CustomStoreName 'Carbon'
+        Assert-NotNull $cert
+        Assert-Equal $expectedCert.Thumbprint $cert.Thumbprint
+    }
+    finally
+    {
+        Uninstall-Certificate -Certificate $expectedCert -StoreLocation CurrentUser -CustomStoreName 'Carbon'
+    }
+}
+
 function Assert-TestCert($actualCert)
 {
     

@@ -35,14 +35,14 @@ Carbon's automated test suite runs in the following environment:
  * .NET Framework v4.5
  * Windows 2008 R2 (x64)/Windows 7 (x64)
 
-But it should support PowerShell 2 and 3 running on Windows Server 2008/2008 R2/2012/2012 R2 and Windows 7/8/8.1.
+But it should support PowerShell 2 and 3 running under .NET 3.5/4/4.5 on Windows Server 2008/2008 R2/2012/2012 R2 and Windows 7/8/8.1.
 
 To get help, [subscribe to and/or send an e-mail to the Carbon mailing list](http://www.freelists.org/list/carbon).
 
 
 ## Installation
 
- 1. Download the latest release.
+ 1. [Download the latest release.](https://bitbucket.org/splatteredbits/carbon/downloads)
 
  2. Unblock the .zip file (right-click it, choose "Properties", click "Unblock", then click "OK").
 
