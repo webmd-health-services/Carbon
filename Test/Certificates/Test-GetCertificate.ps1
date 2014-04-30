@@ -66,15 +66,23 @@ function Test-ShouldFindCertificateByThumbprint
     Assert-TestCert $cert
 }
 
+function Test-ShouldNotThrowErrorWhenCertificateDoesNotExist
+{
+    $cert = Get-Certificate -Thumbprint '1234567890abcdef1234567890abcdef12345678' -StoreLocation CurrentUser -StoreName My -ErrorAction SilentlyContinue
+    Assert-NoError
+    Assert-Null $cert
+}
+
 function Test-ShouldFindCertificateInCustomStore
 {
-    Install-Certificate -Path $TestCertPath -StoreLocation CurrentUser -StoreName 'Carbon'
+    $cert = Install-Certificate -Path $TestCertPath -StoreLocation CurrentUser -CustomStoreName 'Carbon'
     try
     {
         #$cert = 
     }
     finally
     {
+        Uninstall-Certificate -Certificate $cert -StoreLocation CurrentUser -CustomStoreName 'Carbon'
     }
 }
 

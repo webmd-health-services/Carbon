@@ -124,7 +124,12 @@ function Get-Certificate
         
         if( $pscmdlet.ParameterSetName -like 'ByThumbprint*' )
         {
-            return Get-ChildItem cert:\$storeLocationPath\$storeNamePath\$Thumbprint -ErrorAction SilentlyContinue
+            $certPath = 'cert:\{0}\{1}\{2}' -f $storeLocationPath,$storeNamePath,$Thumbprint
+            if( (Test-Path -Path $certPath) )
+            {
+                return Get-ChildItem -Path $certPath
+            }
+            return
         }
         elseif( $PSCmdlet.ParameterSetName -like 'ByFriendlyName*' )
         {
