@@ -42,7 +42,7 @@ To get help, [subscribe to and/or send an e-mail to the Carbon mailing list](htt
 
 ## Installation
 
- 1. Download the latest release.
+ 1. [Download the latest release.](https://bitbucket.org/splatteredbits/carbon/downloads)
 
  2. Unblock the .zip file (right-click it, choose "Properties", click "Unblock", then click "OK").
 
