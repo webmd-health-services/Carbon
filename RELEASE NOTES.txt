@@ -22,7 +22,7 @@ There is now [a Carbon support mailing list](http://www.freelists.org/list/carbo
 ### General
 
  * No more silent errors when importing Carbon on Windows 2012 R2.
- 
+
 ### Certificates
 
  * [Get-Certificate](http://get-carbon.org/help/Get-Certificate.html) no longer writes a silent error when a certificate does not exist. Instead, no error is written.
