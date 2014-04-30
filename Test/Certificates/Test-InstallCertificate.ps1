@@ -76,6 +76,14 @@ function Test-ShouldInstallCertificateToLocalMachineAsExportable
     Assert-NotEqual 0 $bytes.Length
 }
 
+function Test-ShouldInstallCertificateInCustomStore
+{
+    $cert = Install-Certificate -Path $TestCertPath -StoreLocation CurrentUser -CustomStoreName 'SharePoint' 
+    Assert-NotNull $cert
+    Assert-True (Test-Path -Path 'cert:\CurrentUser\SharePoint' -PathType Container)
+    Assert-True (Test-Path -Path ('cert:\CurrentUser\SharePoint\{0}' -f $cert.Thumbprint) -PathType Leaf)
+}
+
 function Assert-CertificateInstalled($StoreLocation, $StoreName)
 {
     $cert = Get-Certificate -Thumbprint $TestCert.Thumbprint -StoreLocation CurrentUser -StoreName My

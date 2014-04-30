@@ -31,15 +31,22 @@ function Uninstall-Certificate
     > Uninstall-Certificate -Certificate $cert -StoreLocation LocalMachine -StoreName Root
     
     Removes the certificate with friendly name 'Carbon Testing Certificate' from the local machine's Trusted Root Certification Authorities store.
+
+    .EXAMPLE
+    Uninstall-Certificate -Thumbprint 570895470234023dsaaefdbcgbefa -StoreLocation LocalMachine -StoreName 'SharePoint'
+
+    Demonstrates how to uninstall a certificate from a custom, non-standard store.
     #>
     [CmdletBinding(SupportsShouldProcess=$true)]
     param(
-        [Parameter(Mandatory=$true,ParameterSetName='ByThumbprint')]
+        [Parameter(Mandatory=$true,ParameterSetName='ByThumbprintAndStoreName')]
+        [Parameter(Mandatory=$true,ParameterSetName='ByThumbprintAndCustomStoreName')]
         [string]
         # The thumbprint of the certificate to remove.
         $Thumbprint,
         
-        [Parameter(Mandatory=$true,ParameterSetName='ByCertificate')]
+        [Parameter(Mandatory=$true,ParameterSetName='ByCertificateAndStoreName')]
+        [Parameter(Mandatory=$true,ParameterSetName='ByCertificateAndCustomStoreName')]
         [Security.Cryptography.X509Certificates.X509Certificate2]
         # The certificate to remove
         $Certificate,
@@ -49,22 +56,43 @@ function Uninstall-Certificate
         # The location of the certificate's store.
         $StoreLocation,
         
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory=$true,ParameterSetName='ByThumbprintAndStoreName')]
+        [Parameter(Mandatory=$true,ParameterSetName='ByCertificateAndStoreName')]
         [Security.Cryptography.X509Certificates.StoreName]
         # The name of the certificate's store.
-        $StoreName
+        $StoreName,
+
+        [Parameter(Mandatory=$true,ParameterSetName='ByThumbprintAndCustomStoreName')]
+        [Parameter(Mandatory=$true,ParameterSetName='ByCertificateAndCustomStoreName')]
+        [string]
+        # The name of the non-standard, custom store where the certificate should be un-installed.
+        $CustomStoreName
     )
     
-    if( $pscmdlet.ParameterSetName -eq 'ByThumbprint' )
+    Set-StrictMode -Version 'Latest'
+
+    $storeNameParams = @{ }
+    if( $PSCmdlet.ParameterSetName -like '*AndCustomStoreName' )
     {
-        $Certificate = Get-Certificate -Thumbprint $Thumbprint -StoreLocation $StoreLocation -StoreName $StoreName
+        $storeNameParams.CustomStoreName = $CustomStoreName
+    }
+    else
+    {
+        $storeNameParams.StoreName = $StoreName
+    }
+
+    if( $PSCmdlet.ParameterSetName -like 'ByThumbprint*' )
+    {
+        $Certificate = Get-Certificate -Thumbprint $Thumbprint -StoreLocation $StoreLocation @storeNameParams
         if( $Certificate -eq $null )
         {
             return
         }
     }
-    $store = Get-CertificateStore -StoreLocation $StoreLocation -StoreName $StoreName
-    if( $pscmdlet.ShouldProcess(  "certificate $StoreLocation\$StoreName\$($Certificate.Thumbprint) ($($Certificate.FriendlyName))", "remove" ) )
+
+    $store = Get-CertificateStore -StoreLocation $StoreLocation @storeNameParams
+
+    if( $PSCmdlet.ShouldProcess(  "certificate $StoreLocation\$StoreName\$($Certificate.Thumbprint) ($($Certificate.FriendlyName))", "remove" ) )
     {
         $store.Remove( $Certificate )
     }

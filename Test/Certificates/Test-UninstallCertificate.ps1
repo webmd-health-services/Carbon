@@ -15,19 +15,17 @@
 $TestCertPath = JOin-Path $TestDir CarbonTestCertificate.cer -Resolve
 $TestCert = New-Object Security.Cryptography.X509Certificates.X509Certificate2 $TestCertPath
 
-function Setup
+function Start-TestFixture
 {
-    Import-Module (Join-Path $TestDir ..\..\Carbon -Resolve) -Force
+    & (Join-Path -Path $PSScriptRoot -ChildPath '..\..\Carbon\Import-Carbon.ps1' -Resolve)
+}
 
+function Start-Test
+{
     if( -not (Test-Path Cert:\CurrentUser\My\$TestCert.Thumbprint -PathType Leaf) )
     {
         Install-Certificate -Path $TestCertPath -StoreLocation CurrentUser -StoreName My
     }
-}
-
-function TearDown
-{
-    Remove-Module Carbon
 }
 
 function Test-ShouldRemoveCertificateByCertificate
@@ -49,4 +47,13 @@ function Test-ShouldSupportWhatIf
     Uninstall-Certificate -Thumbprint $TestCert.Thumbprint -StoreLocation CurrentUser -StoreName My -WhatIf
     $cert = Get-Certificate -Thumbprint $TestCert.Thumbprint -StoreLocation CurrentUser -StoreName My
     Assert-NotNull $cert
+}
+
+function Test-ShouldUninstallCertificateFromCustomStore
+{
+    $cert = Install-Certificate -Path $TestCertPath -StoreLocation CurrentUser -CustomStoreName 'Carbon'
+    Assert-NotNull $cert
+    $certPath = 'Cert:\CurrentUser\Carbon\{0}' -f $cert.Thumbprint
+    Assert-True (Test-Path -Path $certPath -PathType Leaf)
+    Uninstall-Certificate -Thumbprint $cert.Thumbprint -StoreLocation CurrentUser -CustomStoreName 'Carbon'
 }
