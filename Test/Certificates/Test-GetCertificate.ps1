@@ -68,7 +68,14 @@ function Test-ShouldFindCertificateByThumbprint
 
 function Test-ShouldFindCertificateInCustomStore
 {
-    
+    Install-Certificate -Path $TestCertPath -StoreLocation CurrentUser -StoreName 'Carbon'
+    try
+    {
+        #$cert = 
+    }
+    finally
+    {
+    }
 }
 
 function Assert-TestCert($actualCert)

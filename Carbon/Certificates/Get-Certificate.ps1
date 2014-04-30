@@ -90,7 +90,7 @@ function Get-Certificate
 
     Set-StrictMode -Version 'Latest'
 
-    if( $pscmdlet.ParameterSetName -eq 'ByPath' )
+    if( $PSCmdlet.ParameterSetName -eq 'ByPath' )
     {
         $Path = ConvertTo-FullPath -Path $Path
     
@@ -105,23 +105,28 @@ function Get-Certificate
     }
     else
     {
-        $storeLocationPath = $StoreLocation
-        if( -not $StoreLocation )
+        $storeLocationPath = '*'
+        if( $StoreLocation )
         {
-            $storeLocationPath = '*'
+            $storeLocationPath = $StoreLocation
         }
         
+        $storeNamePath = '*'
         $storeNamePath = $StoreName
-        if( -not $StoreName )
+        if( $PSCmdlet.ParameterSetName -like '*CustomStoreName' )
         {
-            $storeNamePath = '*'
+            $storeNamePath = $CustomStoreName
+        }
+        else
+        {
+            $storeNamePath = $StoreName
         }
         
-        if( $pscmdlet.ParameterSetName -eq 'ByThumbprint' )
+        if( $pscmdlet.ParameterSetName -like 'ByThumbprint*' )
         {
             return Get-ChildItem cert:\$storeLocationPath\$storeNamePath\$Thumbprint -ErrorAction SilentlyContinue
         }
-        elseif( $pscmdlet.ParameterSetName -eq 'ByFriendlyName' )
+        elseif( $PSCmdlet.ParameterSetName -like 'ByFriendlyName*' )
         {
             return Get-ChildItem cert:\$storeLocationPath\$storeNamePath\* | Where-Object { $_.FriendlyName -eq $FriendlyName }
         }
