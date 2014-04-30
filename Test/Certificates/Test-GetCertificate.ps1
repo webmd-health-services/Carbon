@@ -73,16 +73,33 @@ function Test-ShouldNotThrowErrorWhenCertificateDoesNotExist
     Assert-Null $cert
 }
 
-function Test-ShouldFindCertificateInCustomStore
+function Test-ShouldFindCertificateInCustomStoreByThumbprint
 {
-    $cert = Install-Certificate -Path $TestCertPath -StoreLocation CurrentUser -CustomStoreName 'Carbon'
+    $expectedCert = Install-Certificate -Path $TestCertPath -StoreLocation CurrentUser -CustomStoreName 'Carbon'
     try
     {
-        #$cert = 
+        $cert = Get-Certificate -Thumbprint $expectedCert.Thumbprint -StoreLocation CurrentUser -CustomStoreName 'Carbon'
+        Assert-NotNull $cert
+        Assert-Equal $expectedCert.Thumbprint $cert.Thumbprint
     }
     finally
     {
-        Uninstall-Certificate -Certificate $cert -StoreLocation CurrentUser -CustomStoreName 'Carbon'
+        Uninstall-Certificate -Certificate $expectedCert -StoreLocation CurrentUser -CustomStoreName 'Carbon'
+    }
+}
+
+function Test-ShouldFindCertificateInCustomStoreByThumbprint
+{
+    $expectedCert = Install-Certificate -Path $TestCertPath -StoreLocation CurrentUser -CustomStoreName 'Carbon'
+    try
+    {
+        $cert = Get-Certificate -FriendlyName $expectedCert.FriendlyName -StoreLocation CurrentUser -CustomStoreName 'Carbon'
+        Assert-NotNull $cert
+        Assert-Equal $expectedCert.Thumbprint $cert.Thumbprint
+    }
+    finally
+    {
+        Uninstall-Certificate -Certificate $expectedCert -StoreLocation CurrentUser -CustomStoreName 'Carbon'
     }
 }
 
