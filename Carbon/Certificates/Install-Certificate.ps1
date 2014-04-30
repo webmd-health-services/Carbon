@@ -31,7 +31,7 @@ function Install-Certificate
     #>
     [CmdletBinding(SupportsShouldProcess=$true,DefaultParameterSetName='ByStoreName')]
     param(
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory=$true,Position=0)]
         [string]
         # The path to the certificate file.
         $Path,
