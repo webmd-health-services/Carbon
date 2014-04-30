@@ -66,6 +66,11 @@ function Test-ShouldFindCertificateByThumbprint
     Assert-TestCert $cert
 }
 
+function Test-ShouldFindCertificateInCustomStore
+{
+    
+}
+
 function Assert-TestCert($actualCert)
 {
     

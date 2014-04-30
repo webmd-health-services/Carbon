@@ -10,15 +10,16 @@ There is now [a Carbon support mailing list](http://www.freelists.org/list/carbo
  * Import-Carbon.ps1 now hides verbose log messages when removing/importing Carbon even when supplying the `-Verbose` switch because I think the verbose output is too verbose and not helpful at all.
  * Import-Carbon.ps1 now supports adding a prefix when importing the Carbon module (with the `Prefix` parameter) to avoid name collisions and [follow best practices](http://blogs.msdn.com/b/powershell/archive/2014/04/07/what-s-in-a-name-using-the-ps-prefix.aspx).
  
+### Certificates
+
+ * [Get-CertificateStore](http://get-carbon.org/help/Get-CertificateStore.html) now supports non-standard, custom certificate stores.
+ * [Install-Certificate](http://get-carbon.org/help/Install-Certificate.html) now supports non-standard, custom certificate stores.
+ 
 ## Bug Fixes
 
 ### General
 
  * No more silent errors when importing Carbon on Windows 2012 R2.
- 
-### Certificates
-
- * [Get-CertificateStore](http://get-carbon.org/help/Get-CertificateStore.html) now supports non-standard, custom certificate stores.
  
 ### File System
 

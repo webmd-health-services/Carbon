@@ -29,7 +29,7 @@ function Install-Certificate
     
     Installs the certificate (which is protected by a password) at C:\Users\me\certificate.cer into the local machine's Personal store.  The certificate is marked exportable.
     #>
-    [CmdletBinding(SupportsShouldProcess=$true)]
+    [CmdletBinding(SupportsShouldProcess=$true,DefaultParameterSetName='ByStoreName')]
     param(
         [Parameter(Mandatory=$true)]
         [string]
@@ -43,13 +43,18 @@ function Install-Certificate
         #   > [Enum]::GetValues([Security.Cryptography.X509Certificates.StoreLocation])
         $StoreLocation,
         
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory=$true,ParameterSetName='ByStoreName')]
         [Security.Cryptography.X509Certificates.StoreName]
         # The name of the certificate's store.  To see a list of acceptable values run:
         #
         #  > [Enum]::GetValues([Security.Cryptography.X509Certificates.StoreName])
         $StoreName,
-        
+
+        [Parameter(Mandatory=$true,ParameterSetName='ByCustomStoreName')]
+        [string]
+        # The name of the non-standard, custom store where the certificate should be installed.
+        $CustomStoreName,
+
         [Switch]
         # Mark the private key as exportable.
         $Exportable,
@@ -77,8 +82,18 @@ function Install-Certificate
     }
     
     $cert.Import( $Path, $Password, $keyFlags )
+
+    $getCertificateStoreParams = @{ }
+    if( $PSCmdlet.ParameterSetName -eq 'ByStoreName' )
+    {
+        $getCertificateStoreParams.StoreName = $StoreName
+    }
+    else
+    {
+        $getCertificateStoreParams.CustomStoreName = $CustomStoreName
+    }
     
-    $store = Get-CertificateStore -StoreLocation $StoreLocation -StoreName $StoreName
+    $store = Get-CertificateStore -StoreLocation $StoreLocation @getCertificateStoreParams
     $store.Add( $cert )
     $store.Close()
     return $cert

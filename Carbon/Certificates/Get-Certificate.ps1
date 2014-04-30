@@ -39,6 +39,10 @@ function Get-Certificate
     
     Gets the X509Certificate2 whose friendly name is Development Certificate from the Current User's Trusted People certificate store.
     
+    .EXAMPLE
+    Get-Certificate -Thumbprint a909502dd82ae41433e6f83886b00d4277a32a7b -CustomStoreName 'SharePoint' -StoreLocation LocalMachine
+
+    Demonstrates how to get a certificate from a custom store, i.e. one that is not part of the standard `StoreName` enumeration.
     #>
     [CmdletBinding(DefaultParameterSetName='ByFriendlyName')]
     param(
@@ -52,17 +56,21 @@ function Get-Certificate
         $Password,
         
         [Parameter(Mandatory=$true,ParameterSetName='ByThumbprint')]
+        [Parameter(Mandatory=$true,ParameterSetName='ByThumbprintCustomStoreName')]
         [string]
         # The certificate's thumbprint.
         $Thumbprint,
         
         [Parameter(Mandatory=$true,ParameterSetName='ByFriendlyName')]
+        [Parameter(Mandatory=$true,ParameterSetName='ByFriendlyNameCustomStoreName')]
         [string]
         # The friendly name of the certificate.
         $FriendlyName,
         
         [Parameter(Mandatory=$true,ParameterSetName='ByFriendlyName')]
+        [Parameter(Mandatory=$true,ParameterSetName='ByFriendlyNameCustomStoreName')]
         [Parameter(Mandatory=$true,ParameterSetName='ByThumbprint')]
+        [Parameter(Mandatory=$true,ParameterSetName='ByThumbprintCustomStoreName')]
         [Security.Cryptography.X509Certificates.StoreLocation]
         # The location of the certificate's store.
         $StoreLocation,
@@ -71,7 +79,13 @@ function Get-Certificate
         [Parameter(Mandatory=$true,ParameterSetName='ByThumbprint')]
         [Security.Cryptography.X509Certificates.StoreName]
         # The name of the certificate's store.
-        $StoreName
+        $StoreName,
+
+        [Parameter(Mandatory=$true,ParameterSetName='ByFriendlyNameCustomStoreName')]
+        [Parameter(Mandatory=$true,ParameterSetName='ByThumbprintCustomStoreName')]
+        [string]
+        # The name of the non-standard, custom store.
+        $CustomStoreName
     )
 
     Set-StrictMode -Version 'Latest'
