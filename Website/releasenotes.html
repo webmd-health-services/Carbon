@@ -12,9 +12,66 @@
 		<li><a href="http://pshdo.com">-Blog</a></li>
 	</ul>
     
+    <h1>1.7.0 (30 April 2014)</h1>
+
+<p>There is now <a href="http://www.freelists.org/list/carbon">a Carbon support mailing list</a>.</p>
+
+<h2>Enhancements</h2>
+
+<h3>General</h3>
+
+<ul>
+<li>Import-Carbon.ps1 now support the <code>-WhatIf</code> switch.</li>
+<li>Import-Carbon.ps1 now hides verbose log messages when removing/importing Carbon even when supplying the <code>-Verbose</code> switch because I think the verbose output is too verbose and not helpful at all.</li>
+<li>Import-Carbon.ps1 now supports adding a prefix when importing the Carbon module (with the <code>Prefix</code> parameter) to avoid name collisions and <a href="http://blogs.msdn.com/b/powershell/archive/2014/04/07/what-s-in-a-name-using-the-ps-prefix.aspx">follow best practices</a>.</li>
+</ul>
+
+<h3>Certificates</h3>
+
+<ul>
+<li><a href="http://get-carbon.org/help/Get-CertificateStore.html">Get-CertificateStore</a> now supports non-standard, custom certificate stores.</li>
+<li><a href="http://get-carbon.org/help/Get-Certificate.html">Get-Certificate</a> now supports non-standard, custom certificate stores.</li>
+<li><a href="http://get-carbon.org/help/Install-Certificate.html">Install-Certificate</a> now supports non-standard, custom certificate stores.</li>
+<li><a href="http://get-carbon.org/help/Uninstall-Certificate.html">Uninstall-Certificate</a> now supports non-standard, custom certificate stores.</li>
+</ul>
+
+<h2>Bug Fixes</h2>
+
+<h3>General</h3>
+
+<ul>
+<li>No more silent errors when importing Carbon on Windows 2012 R2.</li>
+</ul>
+
+<h3>Certificates</h3>
+
+<ul>
+<li><p><a href="http://get-carbon.org/help/Get-Certificate.html">Get-Certificate</a> no longer writes a silent error when a certificate does not exist. Instead, no error is written.</p>
+
+<h3>File System</h3></li>
+<li><p><a href="http://get-carbon.org/help/Install-Junction.html">Install-Junction</a> fails when target path is hidden.</p></li>
+<li><a href="http://get-carbon.org/help/Test-NtfsCompression.html">Test-NtfsCompression</a> fails when file/directory is hidden.</li>
+<li><a href="http://get-carbon.org/help/Test-PathIsJunction.html">Test-PathIsJunction</a> fails when tested directory is hidden.</li>
+</ul>
+
+<h3>Security</h3>
+
+<ul>
+<li><a href="http://get-carbon.org/help/Grant-Permission.html">Grant-Permission</a> fails when item is hidden.</li>
+<li><a href="http://get-carbon.org/help/Grant-Permission.html">Grant-Permission</a> doesn't handle non-existent paths, causing cascading errors.</li>
+<li><a href="http://get-carbon.org/help/Test-Permission.html">Test-Permission</a> always returns <code>$false</code> when testing leaf-level permissions and the <code>ApplyTo</code> parameter is provided, i.e. it doesn't ignore inheritance/propagation flags on leaves.</li>
+</ul>
+
 <h1>1.6.0 (1 February 2014)</h1>
 
 <h2>Bug Fixes</h2>
+
+<h3>Certificates</h3>
+
+<ul>
+<li><a href="http://get-carbon.org/help/Get-Certificate.html">Get-Certificate</a> fails when passed a relative path.</li>
+<li><a href="http://get-carbon.org/help/Install-Certificate.html">Install-Certificate</a> fails when passed a relative path.</li>
+</ul>
 
 <h3>File System</h3>
 

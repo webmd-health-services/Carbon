@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-    <title>PowerShell - New-TempDir - Carbon</title>
+    <title>PowerShell - New-TempDirectory - Carbon</title>
 	<link href="styles.css" type="text/css" rel="stylesheet" />
 </head>
 <body>
@@ -261,36 +261,59 @@
 </div>
 
 
-    <h1>New-TempDir</h1>
-    <div><p>Creates a new temporary directory with a random name.</p>
+    <h1>New-TempDirectory</h1>
+    <div><p>Creates a new temporary directory.</p>
 </div>
 
         <h2>Syntax</h2>
-    <pre class="Syntax"><code>New-TempDir [&lt;CommonParameters&gt;]</code></pre>
+    <pre class="Syntax"><code>New-TempDirectory [[-Prefix] &lt;String&gt;] [&lt;CommonParameters&gt;]</code></pre>
     
         <h2>Description</h2>
     <div class="Description">
-        <p>A new temporary directory is created in the current users temporary directory.  The directory's name is created using the <code>Path</code> class's <a href="http://msdn.microsoft.com/en-us/library/system.io.path.getrandomfilename.aspx">GetRandomFileName method</a>.</p>
+        <p>The temporary directory is created in the current user's <code>TEMP</code> directory (e.g. <code>$env:TEMP</code>).  We use <code>[IO.Path]::GetRandomFilename</code> for the directory's name.  The directory is returned as a <code>System.IO.DirectoryInfo</code> object.</p>
+
+<p>If/when temporary directories fill up, it can be hard to identify the process(es) responsible. To help identify which tests are creating (and not removing) temporary directories, supply a unique, static name as the value to the <code>Prefix</code> parameter.  We recommend the name of the test fixture creating the temp directory.</p>
 
     </div>
     
-            <h2>Related Commands</h2>
-        <ul>
-<li><a href="http://msdn.microsoft.com/en-us/library/system.io.path.getrandomfilename.aspx">http://msdn.microsoft.com/en-us/library/system.io.path.getrandomfilename.aspx</a></li>
-</ul>
-
-
     
+
+    		<h2> Parameters </h2>
+		<table border='1'>
+			<tr>
+				<th>Name</th>
+                <th>Type</th>
+				<th>Description</th>
+				<th>Required?</th>
+				<th>Pipeline Input</th>
+				<th>Default Value</th>
+			</tr>
+            			<tr valign='top'>
+				<td>Prefix</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+				<td>An optional prefix for the temporary directory name.  Helps in identifying tests and things that don't properly clean up after themselves.
+</td>
+				<td>false</td>
+				<td>false</td>
+                <td></td>
+			</tr>
+            
+        </table>
         
     
         
-    
+            <h2>Return Values</h2>
+        <p><a href="http://msdn.microsoft.com/en-us/library/system.io.directoryinfo.aspx">System.IO.DirectoryInfo</a>. </p>
+
         
     
         
                 <h2>EXAMPLE 1</h2>
-            <pre><code>New-TempDir</code></pre>
-            <p><p>Returns the path to a temporary directory with a random name.</p>
+            <pre><code>$tempDir = New-TempDirectory</code></pre>
+            <p><p>Demonstrates how to create a temporary directory.</p>
+</p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 2</h2>
+            <pre><code>$tempDir = New-TempDirectory 'Test-NewTempDirectory+'</code></pre>
+            <p><p>Demonstrates how to use a custom, identifiable prefix for your temporary directory's name.  This is helpful for identfying tests that forget to clean up after themselves.</p>
 </p><p></p><p></p><p></p><p></p>
 </body>
 </html>   

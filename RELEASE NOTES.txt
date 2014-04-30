@@ -1,4 +1,4 @@
-# 1.7.0
+# 1.7.0 (30 April 2014)
 
 There is now [a Carbon support mailing list](http://www.freelists.org/list/carbon).
 
