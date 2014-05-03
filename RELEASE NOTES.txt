@@ -40,6 +40,7 @@ This is a backwards-incompatible release.
  
 ### File System
 
+ * [Disable-NtfsCompression](http://get-carbon.org/help/Disable-NtfsCompression.html) now writes message with `Write-Verbose` instead of `Write-Host`. Improved error handling.
  * [Install-Junction](http://get-carbon.org/help/Install-Junction.html) now returns `System.IO.DirectoryInfo` objects for any new target directories and any new/updated junctions.
 
 ### Hosts File

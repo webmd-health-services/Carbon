@@ -95,11 +95,15 @@ function Disable-NtfsCompression
 
         if( $PSCmdlet.ShouldProcess( $Path, 'disable NTFS compression' ) )
         {
-            Write-Host ('Disabling NTFS compression on {0}.' -f $Path)
-            & $compactPath /U $recurseArg $pathArg | Write-Verbose
+            Write-Verbose ('Disabling NTFS compression on {0}.' -f $Path)
+            $output = & $compactPath /U $recurseArg $pathArg | Where-Object { $_ }
             if( $LASTEXITCODE )
             {
-                Write-Error ('{0} failed with exit code {1}' -f $compactPath,$LASTEXITCODE)
+                Write-Error ('Failed to disable compression on ''{0}'' (exit code {1}): {2}' -f $Path,$LASTEXITCODE,($output -join ([Environment]::NewLine)))
+            }
+            else
+            {
+                $output | Write-Verbose
             }
         }
     }
