@@ -7,6 +7,11 @@
  * [Remove-SslCertificateBinding](http://get-carbon.org/help/Remove-SslCertificateBinding.html) now writes messages with `Write-Verbose` instead of `Write-Host`. Improved error handling.
  * [Set-SslCertificateBinding](http://get-carbon.org/help/Set-SslCertificateBinding.html) now writes messages with `Write-Verbose` instead of `Write-Host`. Improved error handling.
 
+### COM
+
+ * [Grant-ComPermission](http://get-carbon.org/help/Grant-ComPermission.html) now writes messages with `Write-Verbose` instead of `Write-Host`.
+
+
 # 1.7.0 (30 April 2014)
 
 There is now [a Carbon support mailing list](http://www.freelists.org/list/carbon).

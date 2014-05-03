@@ -14,17 +14,20 @@
 
 $groupName = 'CarbonCOM'
 
-function Setup
+function Start-TestFixture
 {
-    & (Join-Path $TestDir ..\..\Carbon\Import-Carbon.ps1 -Resolve)
+    & (Join-Path -Path $PSScriptRoot -ChildPath '..\..\Carbon\Import-Carbon.ps1' -Resolve)
+}
+
+function Start-Test
+{
     Install-Group -Name $groupName -Description 'Group used by the Carbon PowerShell module tests for COM grant/revoke methods.'
     Revoke-TestComPermissions
 }
 
-function TearDown
+function Stop-Test
 {
     Revoke-TestComPermissions
-    Remove-Module Carbon
 }
 
 function Revoke-TestComPermissions

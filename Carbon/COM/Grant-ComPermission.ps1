@@ -200,7 +200,7 @@ function Grant-ComPermission
         $accessMask = $accessMask -bor [Carbon.Security.ComAccessRights]::ActivateRemote
     }
     
-    Write-Host ("Granting {0} {1} COM {2} {3}." -f $Identity,([Carbon.Security.ComAccessRights]$accessMask),$permissionsDesc,$typeDesc)
+    Write-Verbose ("Granting {0} {1} COM {2} {3}." -f $Identity,([Carbon.Security.ComAccessRights]$accessMask),$permissionsDesc,$typeDesc)
 
     $ace.AccessMask = $accessMask
     $ace.Trustee = $trustee
