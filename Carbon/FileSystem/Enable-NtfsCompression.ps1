@@ -95,11 +95,15 @@ function Enable-NtfsCompression
         
         if( $PSCmdlet.ShouldProcess( $Path, 'enable NTFS compression' ) )
         {
-            Write-Host ('Enabling NTFS compression on {0}.' -f $Path)
-            & $compactPath /C $recurseArg $pathArg | Write-Verbose
+            Write-Verbose ('Enabling NTFS compression on {0}.' -f $Path)
+            $output = & $compactPath /C $recurseArg $pathArg | Where-Object { $_ }
             if( $LASTEXITCODE )
             {
-                Write-Error ('{0} failed with exit code {1}' -f $compactPath,$LASTEXITCODE)
+                Write-Error ('Failed to enable compression on ''{0}'' (exit code {1}): {2}' -f $Path,$LASTEXITCODE,($output -join ([Environment]::NewLine)))
+            }
+            else
+            {
+                $output | Write-Verbose
             }
         }
     }

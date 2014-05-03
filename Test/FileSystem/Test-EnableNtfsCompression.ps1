@@ -17,7 +17,12 @@ $childDir = $null
 $grandchildFile = $null
 $childFile = $null
 
-function Setup
+function Start-TestFixture
+{
+    & (Join-Path -Path $PSScriptRoot -ChildPath '..\..\Carbon\Import-Carbon.ps1' -Resolve)
+}
+
+function Start-Test
 {
     $tempDir = New-TempDirectoryTree @'
 + ChildDir
@@ -27,17 +32,14 @@ function Setup
     $childDir = Join-Path $tempDir 'ChildDir' -Resolve
     $grandchildFile = Join-Path $tempDir 'ChildDir\GrandchildFile' -Resolve
     $childFile = Join-Path $tempDir 'ChildFile' -Resolve
-    & (Join-Path $TestDir ..\..\Carbon\Import-Carbon.ps1 -Resolve)
 }
 
-function TearDown
+function Stop-Test
 {
     if( (Test-Path -Path $tempDir -PathType Container) )
     {
         Remove-Item -Path $tempDir -Recurse
     }
-
-    Remove-Module Carbon
 }
 
 function Test-ShouldEnableCompressionOnDirectoryOnly
