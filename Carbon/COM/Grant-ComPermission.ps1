@@ -23,6 +23,9 @@ function Grant-ComPermission
     
     You must set at least one of the `LocalAccess` or `RemoteAccess` switches.
     
+    .OUTPUTS
+    Carbon.Security.ComAccessRule.
+
     .LINK
     Get-ComPermission
 
@@ -202,7 +205,7 @@ function Grant-ComPermission
         $accessMask = $accessMask -bor [Carbon.Security.ComAccessRights]::ActivateRemote
     }
     
-    Write-Host ("Granting {0} {1} COM {2} {3}." -f $account.FullName,([Carbon.Security.ComAccessRights]$accessMask),$permissionsDesc,$typeDesc)
+    Write-Verbose ("Granting {0} {1} COM {2} {3}." -f $account.FullName,([Carbon.Security.ComAccessRights]$accessMask),$permissionsDesc,$typeDesc)
 
     $ace.AccessMask = $accessMask
     $ace.Trustee = $trustee
@@ -219,6 +222,7 @@ function Grant-ComPermission
 
     $regValueName = $pscmdlet.ParameterSetName -replace '(Allow|Deny)$',''
     Set-RegistryKeyValue -Path $ComRegKeyPath -Name $regValueName -Binary $sdBytes.BinarySD -Quiet
+    Get-ComPermission -Identity $Identity @comArgs
 }
 
 Set-Alias -Name 'Grant-ComPermissions' -Value 'Grant-ComPermission'

@@ -14,17 +14,20 @@
 
 $groupName = 'CarbonCOM'
 
-function Setup
+function Start-TestFixture
 {
-    & (Join-Path $TestDir ..\..\Carbon\Import-Carbon.ps1 -Resolve)
+    & (Join-Path -Path $PSScriptRoot -ChildPath '..\..\Carbon\Import-Carbon.ps1' -Resolve)
+}
+
+function Start-Test
+{
     Install-Group -Name $groupName -Description 'Group used by the Carbon PowerShell module tests for COM grant/revoke methods.'
     Revoke-TestComPermissions
 }
 
-function TearDown
+function Stop-Test
 {
     Revoke-TestComPermissions
-    Remove-Module Carbon
 }
 
 function Revoke-TestComPermissions
@@ -61,18 +64,8 @@ function Test-ShouldSetAccessPermissions
     ) |
         ForEach-Object {
             $grantArgs = $_
-            Grant-ComPermission -Access -Identity $groupName @grantArgs
-            
-            $getArgs = @{ }
-            if( $grantArgs.ContainsKey('Default') -and $grantArgs.Default )
-            {
-                $getArgs.Default = $true
-            }
-            else
-            {
-                $getArgs.Limits = $true
-            }
-            $accessRule = Get-ComPermission -Access -Identity $groupName @getArgs
+
+            $accessRule = Grant-ComPermission -Access -Identity $groupName @grantArgs
             Assert-NotNull $accessRule ($grantArgs | Out-String)
             
             $expectedRights = [Carbon.Security.ComAccessRights]::Execute
@@ -118,12 +111,7 @@ function Test-ShouldSetLaunchAndActivationPermissions
                         $grantArgs.$type = $true
                         $grantArgs.$aceType = $true
 
-                        Grant-ComPermission -Identity $groupName -LaunchAndActivation @grantArgs
-                        
-                        $getArgs = @{ }
-                        $getArgs.$type = $true
-
-                        $accessRule = Get-ComPermission -LaunchAndActivation  -Identity $groupName @getArgs
+                        $accessRule = Grant-ComPermission -Identity $groupName -LaunchAndActivation @grantArgs
                         Assert-NotNull $accessRule
                         
                         $expectedRights = [Carbon.Security.ComAccessRights]::Execute

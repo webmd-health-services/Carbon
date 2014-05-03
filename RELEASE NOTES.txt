@@ -7,11 +7,12 @@ This is a backwards-incompatible release.
  * Upgrade to PowerShell 3.
  * Remove usages of `Complete-Job`.  We removed it because it was total crap.  Use PowerShell's `Wait-Job` cmdlet instead.
  * [Grant-Permission](http://get-carbon.org/help/Grant-Permission.html) now only grants permissions on an object if those permissions aren't present.  To preserve previous behaviour, add the `-Force` switch to all `Grant-Permission` usages.
- * Pipe the output of the following commands to Out-Null, or assign their return values to `$null`.  They now return objects to the pipeline instead of writing output to the host:
+ * The following commands now return objects to the pipeline. Depending on your usage, you may need to pipe their output to `Out-Null`, assign their return values to `$null`, or do nothing.
      * [Grant-Permission](http://get-carbon.org/help/Grant-Permission.html)
      * [Install-Group](http://get-carbon.org/help/Install-Group.html)
      * [Install-Junction](http://get-carbon.org/help/Install-Junction.html)
      * [Install-User](http://get-carbon.org/help/Install-User.html)
+     * [Grant-ComPermissions](http://get-carbon.org/help/Grant-ComPermissions.html)
  * [Set-SslCertificateBinding](http://get-carbon.org/help/Set-SslCertificateBinding.html) now returns `Carbon.Certificates.SslCertificateBinding` objects intead of netsh output. Update any code that uses `Set-SslCertificateBinding`'s output.
  * Ensure that all thumbprints passed to [Set-SslCertificateBinding](http://get-carbon.org/help/Set-SslCertificateBinding.html) are valid (40 character hex strings).
  * Add the new `-PasswordNeverExpires` switch to usages of [Install-User](http://get-carbon.org/help/Install-User.html): it no longer sets the `PasswordNeverExpires` flag for a user by default.
@@ -27,6 +28,10 @@ This is a backwards-incompatible release.
 
  * [Remove-SslCertificateBinding](http://get-carbon.org/help/Remove-SslCertificateBinding.html) now writes messages with `Write-Verbose` instead of `Write-Host`. Improved error handling.
  * [Set-SslCertificateBinding](http://get-carbon.org/help/Remove-SslCertificateBinding.html) now returns `Carbon.Certificates.SslCertificateBinding` object for the binding instead of `netsh` output. Improved error handling. Writes messages with `Write-Verbose` instead of `Write-Host`. Thumbprints are now validated.
+
+### COM
+
+ * [Grant-ComPermission](http://get-carbon.org/help/Grant-ComPermission.html) now returns a `Carbon.Security.ComAccessRule`. Also, it now writes message with `Write-Verbose` instead of `Write-Host`.
 
 ### Computer
 
