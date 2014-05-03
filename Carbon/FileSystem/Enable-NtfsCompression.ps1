@@ -57,8 +57,11 @@ function Enable-NtfsCompression
         $Recurse
     )
 
+
     begin
     {
+        Set-StrictMode -Version 'Latest'
+
         $compactPath = Join-Path $env:SystemRoot 'system32\compact.exe'
         if( -not (Test-Path -Path $compactPath -PathType Leaf) )
         {
@@ -76,30 +79,33 @@ function Enable-NtfsCompression
 
     process
     {
-        if( -not (Test-Path -Path $Path) )
+        foreach( $item in $Path )
         {
-            Write-Error -Message ('Path {0} not found.' -f $Path) -Category ObjectNotFound
-            return
-        }
-
-        $recurseArg = ''
-        $pathArg = $Path
-        if( (Test-Path -Path $Path -PathType Container) )
-        {
-            if( $Recurse )
+            if( -not (Test-Path -Path $item) )
             {
-                $recurseArg = ('/S:{0}' -f $Path)
-                $pathArg = ''
+                Write-Error -Message ('Path {0} not found.' -f $item) -Category ObjectNotFound
+                return
             }
-        }
-        
-        if( $PSCmdlet.ShouldProcess( $Path, 'enable NTFS compression' ) )
-        {
-            Write-Host ('Enabling NTFS compression on {0}.' -f $Path)
-            & $compactPath /C $recurseArg $pathArg | Write-Verbose
-            if( $LASTEXITCODE )
+
+            $recurseArg = ''
+            $pathArg = $item
+            if( (Test-Path -Path $item -PathType Container) )
             {
-                Write-Error ('{0} failed with exit code {1}' -f $compactPath,$LASTEXITCODE)
+                if( $Recurse )
+                {
+                    $recurseArg = ('/S:{0}' -f $item)
+                    $pathArg = ''
+                }
+            }
+        
+            if( $PSCmdlet.ShouldProcess( $item, 'enable NTFS compression' ) )
+            {
+                Write-Host ('Enabling NTFS compression on {0}.' -f $item)
+                & $compactPath /C $recurseArg $pathArg | Write-Verbose
+                if( $LASTEXITCODE )
+                {
+                    Write-Error ('{0} failed with exit code {1}' -f $compactPath,$LASTEXITCODE)
+                }
             }
         }
     }
