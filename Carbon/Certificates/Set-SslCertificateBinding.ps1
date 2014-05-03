@@ -19,15 +19,18 @@ function Set-SslCertificateBinding
     Sets an SSL certificate binding for a given IP/port.
     
     .DESCRIPTION
-    Uses the netsh command line application to set the certificate for an IP address and port.  If a binding already exists for the IP/port, it is removed, and the new binding is created.  No validation is performed on the thumbprint.
+    Uses the netsh command line application to set the certificate for an IP address and port.  If a binding already exists for the IP/port, it is removed, and the new binding is created. Returns a `Carbon.Certificates.SslCertificateBinding` object for the binding that was set.
     
+    .OUTPUTS
+    Carbon.Certificates.SslCertificateBinding.
+
     .EXAMPLE
-    Set-SslCertificateBinding -IPAddress 43.27.89.54 -Port 443 -ApplicationID 88d1f8da-aeb5-40a2-a5e5-0e6107825df7 -Thumbprint 478907345890734590743
+    Set-SslCertificateBinding -IPAddress 43.27.89.54 -Port 443 -ApplicationID 88d1f8da-aeb5-40a2-a5e5-0e6107825df7 -Thumbprint 4789073458907345907434789073458907345907
     
     Configures the computer to use the 478907345890734590743 certificate on IP 43.27.89.54, port 443.
     
     .EXAMPLE
-    Set-SslCertificateBinding -ApplicationID 88d1f8da-aeb5-40a2-a5e5-0e6107825df7 -Thumbprint 478907345890734590743
+    Set-SslCertificateBinding -ApplicationID 88d1f8da-aeb5-40a2-a5e5-0e6107825df7 -Thumbprint 4789073458907345907434789073458907345907
     
     Configures the compute to use the 478907345890734590743 certificate as the default certificate on all IP addresses, port 443.
     #>
@@ -47,17 +50,13 @@ function Set-SslCertificateBinding
         $ApplicationID,
         
         [Parameter(Mandatory=$true)]
+        [ValidatePattern("^[0-9a-f]{40}$")]
         [string]
         # The thumbprint of the certificate to use.  The certificate must be installed.
         $Thumbprint
     )
-    
-    $commonParams = @{ }
-    
-    if( $pscmdlet.BoundParameters.WhatIf )
-    {
-        $commonParams.WhatIf = $true
-    }
+
+    Set-StrictMode -Version 'Latest'
     
     if( $IPAddress.AddressFamily -eq [Net.Sockets.AddressFamily]::InterNetworkV6 )
     {
@@ -68,11 +67,20 @@ function Set-SslCertificateBinding
         $ipPort = '{0}:{1}' -f $IPAddress,$Port
     }
 
-    Remove-SslCertificateBinding -IPAddress $IPAddress -Port $Port @commonParams
+    Remove-SslCertificateBinding -IPAddress $IPAddress -Port $Port -WhatIf:$WhatIfPreference -Verbose:$VerbosePreference -ErrorAction:$ErrorActionPreference
     
     if( $pscmdlet.ShouldProcess( $IPPort, 'creating SSL certificate binding' ) )
     {
-        Write-Host "Creating SSL certificate binding for $IPPort with certificate $Thumbprint."
-        netsh http add sslcert ipport=$ipPort "certhash=$($Thumbprint)" "appid={$ApplicationID}" 
+        Write-Verbose ("Creating SSL certificate binding on {0} with certificate {1} for application {2}." -f $ipPort,$Thumbprint ,$ApplicationID)
+        $output = netsh http add sslcert ipport=$ipPort "certhash=$($Thumbprint)" "appid={$ApplicationID}"  | Where-Object { $_ }
+        if( $LASTEXITCODE )
+        {
+            Write-Error ('Failed to create SSL certificate binging on ''{0}'' with certificate ''{1}'' for application ''{2}'': {3}' -f $ipPort,$Thumbprint,$ApplicationID,($output -join ([Environment]::NewLine)))
+        }
+        else
+        {
+            $output | Write-Verbose
+        }
+        Get-SslCertificateBinding -IPAddress $IPAddress -Port $Port
     }
 }

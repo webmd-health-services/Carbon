@@ -14,16 +14,19 @@
 
 $cert = $null
 
-function Setup
+function Start-TestFixture
 {
-    Import-Module (Join-Path $TestDir ..\..\Carbon -Resolve) -Force
+    & (Join-Path -Path $PSScriptRoot -ChildPath '..\..\Carbon\Import-Carbon.ps1' -Resolve)
+}
+
+function Start-Test
+{
     $cert = Install-Certificate (Join-Path $TestDir CarbonTestCertificate.cer -Resolve) -StoreLocation LocalMachine -StoreName My
 }
 
-function TearDown
+function Stop-Test
 {
     Uninstall-Certificate -Certificate $cert -StoreLocation LocalMachine -StoreName My
-    Remove-Module Carbon
 }
 
 function Test-ShouldCreateNewSslCertificateBinding
@@ -31,11 +34,12 @@ function Test-ShouldCreateNewSslCertificateBinding
     $appID = '0e8a659e-8034-4ab1-ab82-dcb0f5e90bfd'
     $ipAddress = '74.32.80.43'
     $port = '3847'
-    Set-SslCertificateBinding -IPAddress $ipAddress -Port $port -ApplicationID $appID -Thumbprint $cert.Thumbprint
-    $binding = Get-SslCertificateBinding -IPAddress $ipAddress -Port $port
+    $binding = Set-SslCertificateBinding -IPAddress $ipAddress -Port $port -ApplicationID $appID -Thumbprint $cert.Thumbprint
+    $expectedBinding = Get-SslCertificateBinding -IPAddress $ipAddress -Port $port
     try
     {
         Assert-NotNull $binding
+        Assert-Equal $expectedBinding $binding
         $ipPort = '{0}:{1}' -f $ipAddress,$port
         Assert-Equal $ipPort $binding.IPPort
         Assert-Equal $appID $binding.ApplicationID
@@ -53,12 +57,11 @@ function Test-ShouldUpdateExistingSslCertificateBinding
     $newAppID = '353364bb-1ca8-4d6c-a596-be7608d57771'
     $ipAddress = '74.38.209.47'
     $port = '8823'
-    Set-SslCertificateBinding -IPAddress $ipAddress -Port $port -ApplicationID $appID -Thumbprint $cert.Thumbprint
-    Set-SslCertificateBinding -IPAddress $ipAddress -Port $port -ApplicationID $newAppID -Thumbprint $cert.Thumbprint
-    $binding = Get-SslCertificateBindings -IPAddress $ipAddress -Port $port
+    $firstBinding = Set-SslCertificateBinding -IPAddress $ipAddress -Port $port -ApplicationID $appID -Thumbprint $cert.Thumbprint
+    $secondBinding = Set-SslCertificateBinding -IPAddress $ipAddress -Port $port -ApplicationID $newAppID -Thumbprint $cert.Thumbprint
     try
     {
-        Assert-Equal $newAppID $binding.ApplicationID
+        Assert-Equal $newAppID $secondBinding.ApplicationID
     }
     finally
     {
@@ -71,8 +74,7 @@ function Test-ShouldSupportShouldProcess
     $appID = '411b1023-be42-458e-8fe7-a7ab6c908566'
     $ipAddress = '54.72.38.90'
     $port = '4782'
-    Set-SslCertificateBinding -IPAddress $ipAddress -Port $port -ApplicationID $appID -Thumbprint $cert.Thumbprint -WhatIf
-    $binding = Get-SslCertificateBindings -IPAddress $ipAddress -Port $port
+    $binding = Set-SslCertificateBinding -IPAddress $ipAddress -Port $port -ApplicationID $appID -Thumbprint $cert.Thumbprint -WhatIf
     try
     {
         Assert-Null $binding
@@ -89,9 +91,10 @@ function Test-ShouldSupportShouldProcessOnBindingUpdate
     $newAppID = 'db48e0ec-6d8c-4b2c-9486-a2bb33c68b05'
     $ipAddress = '54.237.80.94'
     $port = '7821'
-    Set-SslCertificateBinding -IPAddress $ipAddress -Port $port -ApplicationID $appID -Thumbprint $cert.Thumbprint
-    Set-SslCertificateBinding -IPAddress $ipAddress -Port $port -ApplicationID $newAppID -Thumbprint $cert.Thumbprint -WhatIf
-    $binding = Get-SslCertificateBindings -IPAddress $ipAddress -Port $port
+    $firstBinding = Set-SslCertificateBinding -IPAddress $ipAddress -Port $port -ApplicationID $appID -Thumbprint $cert.Thumbprint
+    $binding = Set-SslCertificateBinding -IPAddress $ipAddress -Port $port -ApplicationID $newAppID -Thumbprint $cert.Thumbprint -WhatIf
+    Assert-Null $binding
+    $binding = Get-SslCertificateBinding -IPAddress $ipAddress -Port $port
     try
     {
         Assert-Equal $appID $binding.ApplicationID
@@ -108,8 +111,7 @@ function Test-ShouldSupportIPv6Address
     $appID = '9aa262a9-dfb3-49db-b368-9f15bc12168c'
     $ipAddress = '[::]'
     $port = '7821'
-    Set-SslCertificateBinding -IPAddress $ipAddress -Port $port -ApplicationID $appID -Thumbprint $cert.Thumbprint
-    $binding = Get-SslCertificateBindings -IPAddress $ipAddress -Port $port
+    $binding = Set-SslCertificateBinding -IPAddress $ipAddress -Port $port -ApplicationID $appID -Thumbprint $cert.Thumbprint
     try
     {
         Assert-NotNull $binding

@@ -50,6 +50,7 @@
     <Compile Include="..\Properties\AssemblyVersion.cs">
       <Link>AssemblyVersion.cs</Link>
     </Compile>
+    <Compile Include="Certificates\SslCertificateBindingTestFixture.cs" />
     <Compile Include="IdentityTest.cs" />
     <Compile Include="Lsa\LsaTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

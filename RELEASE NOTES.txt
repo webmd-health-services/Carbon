@@ -12,6 +12,8 @@ This is a backwards-incompatible release.
      * [Install-Group](http://get-carbon.org/help/Install-Group.html)
      * [Install-Junction](http://get-carbon.org/help/Install-Junction.html)
      * [Install-User](http://get-carbon.org/help/Install-User.html)
+ * [Set-SslCertificateBinding](http://get-carbon.org/help/Set-SslCertificateBinding.html) now returns `Carbon.Certificates.SslCertificateBinding` objects intead of netsh output. Update any code that uses `Set-SslCertificateBinding`'s output.
+ * Ensure that all thumbprints passed to [Set-SslCertificateBinding](http://get-carbon.org/help/Set-SslCertificateBinding.html) are valid (40 character hex strings).
  * Add the new `-PasswordNeverExpires` switch to usages of [Install-User](http://get-carbon.org/help/Install-User.html): it no longer sets the `PasswordNeverExpires` flag for a user by default.
  * `Resolve-IdentityName` renamed to [Resolve-Identity](http://get-carbon.org/help/Resolve-Identity.html), but it has a backwards-compatible alias, so you shouldn't have to do anything.
  * Use the `FullName` property on objects returned by [Resolve-Identity](http://get-carbon.org/help/Resolve-Identity.html) (née `Resolve-IdentityName`): it now returns a `Carbon.Identity` object instead of the identity's name, e.g. `Resolve-Identity -Name $userName | Select-Object -Expand 'FullName'`.
@@ -23,9 +25,8 @@ This is a backwards-incompatible release.
 
 ### Certificates
 
- * [Remove-SslCertificateBinding](http://get-carbon.org/help/Remove-SslCertificateBinding.html) no longer writes to the host with `Write-Host` and instead uses `Write-Verbose`.
- * [Remove-SslCertificateBinding](http://get-carbon.org/help/Remove-SslCertificateBinding.html) improved error handling.
- 
+ * [Remove-SslCertificateBinding](http://get-carbon.org/help/Remove-SslCertificateBinding.html) now writes messages with `Write-Verbose` instead of `Write-Host`. Improved error handling.
+ * [Set-SslCertificateBinding](http://get-carbon.org/help/Remove-SslCertificateBinding.html) now returns `Carbon.Certificates.SslCertificateBinding` object for the binding instead of `netsh` output. Improved error handling. Writes messages with `Write-Verbose` instead of `Write-Host`. Thumbprints are now validated.
 
 ### Computer
 
