@@ -33,15 +33,29 @@ function Disable-FirewallStatefulFtp
     #>
     [CmdletBinding(SupportsShouldProcess=$true)]
     param()
+
+    Set-StrictMode -Version 'Latest'
+
+    $commonParams = @{
+                        Verbose = $VerbosePreference;
+                        ErrorAction = $ErrorActionPreference;
+                     }
     
-    if( -not (Assert-FirewallConfigurable) )
+    if( -not (Assert-FirewallConfigurable @commonParams) )
     {
         return
     }
     
     if( $pscmdlet.ShouldProcess( 'firewall', 'disable stateful FTP' ) )
     {
-        Write-Host "Disabling stateful FTP in the firewall."
-        netsh advfirewall set global StatefulFtp disable
+        $output = netsh advfirewall set global StatefulFtp disable | Where-Object { $_ }
+        if( $LASTEXITCODE )
+        {
+            Write-Error -Message ('Failed to disable stateful FTP (exit code {0}): {1}' -f $LASTEXITCODE,($output -join ([Environment]::NewLine)))
+        }
+        else
+        {
+            $output | Write-Verbose
+        }
     }
 }
