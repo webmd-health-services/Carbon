@@ -41,6 +41,8 @@ function Remove-SslCertificateBinding
         # The port of the binding to remove.  Default is port 443.
         $Port = 443
     )
+
+    Set-StrictMode -Version 'Latest'
     
     if( -not (Test-SslCertificateBinding -IPAddress $IPAddress -Port $Port) )
     {
@@ -58,7 +60,7 @@ function Remove-SslCertificateBinding
 
     if( $pscmdlet.ShouldProcess( $ipPort, "removing SSL certificate binding" ) )
     {
-        Write-Verbose "Removing SSL certificate binding for $ipPort."
+        Write-Verbose ("Removing SSL certificate binding on {0}." -f $ipPort)
         $output = netsh http delete sslcert ipport=$ipPort | Where-Object { $_ }
         if( $LASTEXITCODE )
         {
