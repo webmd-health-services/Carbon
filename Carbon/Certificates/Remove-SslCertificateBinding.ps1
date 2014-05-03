@@ -58,7 +58,15 @@ function Remove-SslCertificateBinding
 
     if( $pscmdlet.ShouldProcess( $ipPort, "removing SSL certificate binding" ) )
     {
-        Write-Host "Removing SSL certificate binding for $ipPort."
-        netsh http delete sslcert ipport=$ipPort
+        Write-Verbose "Removing SSL certificate binding for $ipPort."
+        $output = netsh http delete sslcert ipport=$ipPort | Where-Object { $_ }
+        if( $LASTEXITCODE )
+        {
+            Write-Error ('Failed to remove SSL certificate binding ''{1}'': {2}' -f $LASTEXITCODE,$ipPort,($output -join ([Environment]::NewLine)))
+        }
+        else
+        {
+            $output | Write-Verbose
+        }
     }
 }
