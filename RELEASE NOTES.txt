@@ -12,7 +12,18 @@
  * [Grant-ComPermission](http://get-carbon.org/help/Grant-ComPermission.html) now writes messages with `Write-Verbose` instead of `Write-Host`.
  * [Revoke-ComPermission](http://get-carbon.org/help/Revoke-ComPermission.html) now writes messages with `Write-Verbose` instead of `Write-Host`.
 
+### File System
+
+ * [Disable-NtfsCompression](http://get-carbon.org/help/Disable-NtfsCompression.html) now writes message with `Write-Verbose` instead of `Write-Host`. Improved error handling.
+ 
 # 1.7.0 (30 April 2014)
+
+## Bug Fixes
+
+### File System
+
+ * [Disable-NtfsCompression](http://get-carbon.org/help/Disable-NtfsCompression.html) now *really* supports multiple paths.
+ 
 
 There is now [a Carbon support mailing list](http://www.freelists.org/list/carbon).
 

@@ -59,6 +59,12 @@ function Disable-NtfsCompression
 
     begin
     {
+        $commonParams = @{
+                            Verbose = $VerbosePreference;
+                            WhatIf = $WhatIfPreference;
+                            ErrorAction = $ErrorActionPreference;
+                        }
+
         $compactPath = Join-Path $env:SystemRoot 'system32\compact.exe'
         if( -not (Test-Path -Path $compactPath -PathType Leaf) )
         {
@@ -76,30 +82,27 @@ function Disable-NtfsCompression
 
     process
     {
-        if( -not (Test-Path -Path $Path) )
+        foreach( $item in $Path )
         {
-            Write-Error -Message ('Path {0} not found.' -f $Path) -Category ObjectNotFound
-            return
-        }
-
-        $recurseArg = ''
-        $pathArg = $Path
-        if( (Test-Path -Path $Path -PathType Container) )
-        {
-            if( $Recurse )
+            if( -not (Test-Path -Path $item) )
             {
-                $recurseArg = ('/S:{0}' -f $Path)
-                $pathArg = ''
+                Write-Error -Message ('Path {0} not found.' -f $item) -Category ObjectNotFound
+                return
             }
-        }
 
-        if( $PSCmdlet.ShouldProcess( $Path, 'disable NTFS compression' ) )
-        {
-            Write-Host ('Disabling NTFS compression on {0}.' -f $Path)
-            & $compactPath /U $recurseArg $pathArg | Write-Verbose
-            if( $LASTEXITCODE )
+            $recurseArg = ''
+            $pathArg = $item
+            if( (Test-Path -Path $item -PathType Container) )
             {
-                Write-Error ('{0} failed with exit code {1}' -f $compactPath,$LASTEXITCODE)
+                if( $Recurse )
+                {
+                    $recurseArg = ('/S:{0}' -f $item)
+                    $pathArg = ''
+                }
+            }
+
+            Invoke-ConsoleCommand -Target $item -Action 'disable NTFS compression' @commonParams -ScriptBlock {
+                & $compactPath /U $recurseArg $pathArg
             }
         }
     }
