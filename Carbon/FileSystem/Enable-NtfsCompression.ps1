@@ -62,6 +62,12 @@ function Enable-NtfsCompression
     {
         Set-StrictMode -Version 'Latest'
 
+        $commonParams = @{
+                            ErrorAction = $ErrorActionPreference;
+                            Verbose = $VerbosePreference;
+                            WhatIf = $WhatIfPreference;
+                        }
+
         $compactPath = Join-Path $env:SystemRoot 'system32\compact.exe'
         if( -not (Test-Path -Path $compactPath -PathType Leaf) )
         {
@@ -98,14 +104,8 @@ function Enable-NtfsCompression
                 }
             }
         
-            if( $PSCmdlet.ShouldProcess( $item, 'enable NTFS compression' ) )
-            {
-                Write-Host ('Enabling NTFS compression on {0}.' -f $item)
-                & $compactPath /C $recurseArg $pathArg | Write-Verbose
-                if( $LASTEXITCODE )
-                {
-                    Write-Error ('{0} failed with exit code {1}' -f $compactPath,$LASTEXITCODE)
-                }
+            Invoke-ConsoleCommand -Target $item -Action 'enable NTFS compression' @commonParams -ScriptBlock { 
+                & $compactPath /C $recurseArg $pathArg
             }
         }
     }
