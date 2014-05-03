@@ -71,6 +71,13 @@ function Revoke-ComPermission
         $Limits
     )
     
+    Set-StrictMode -Version 'Latest'
+
+    $commonParams = @{
+                        Verbose = $VerbosePreference;
+                        ErrorAction = $ErrorActionPreference;
+                    }
+
     $comArgs = @{ }
     if( $pscmdlet.ParameterSetName -like 'Default*' )
     {
@@ -94,15 +101,15 @@ function Revoke-ComPermission
         $comArgs.LaunchAndActivation = $true
     }
     
-    $sidAccount = Test-Identity -Name $Identity -PassThru
+    $sidAccount = Test-Identity -Name $Identity -PassThru @commonParams
     if( -not $sidAccount )
     {
         Write-Warning "Unable to find identity $Identity."
         return
     }
 
-    Write-Host ("Revoking {0}'s COM {1} {2}." -f $Identity,$permissionsDesc,$typeDesc)
-    $currentSD = Get-ComSecurityDescriptor @comArgs
+    Write-Verbose ("Revoking {0}'s COM {1} {2}." -f $Identity,$permissionsDesc,$typeDesc)
+    $currentSD = Get-ComSecurityDescriptor @comArgs @commonParams
 
     $newSd = ([wmiclass]'win32_securitydescriptor').CreateInstance()
     $newSd.ControlFlags = $currentSD.ControlFlags
@@ -118,7 +125,7 @@ function Revoke-ComPermission
     $sdBytes = $converter.Win32SDToBinarySD( $newSd )
 
     $regValueName = $pscmdlet.ParameterSetName
-    Set-RegistryKeyValue -Path $ComRegKeyPath -Name $regValueName -Binary $sdBytes.BinarySD -Quiet
+    Set-RegistryKeyValue -Path $ComRegKeyPath -Name $regValueName -Binary $sdBytes.BinarySD -Quiet @commonParams -WhatIf:$WhatIfPreference
 }
 
 Set-Alias -Name 'Revoke-ComPermissions' -Value 'Revoke-ComPermission'
