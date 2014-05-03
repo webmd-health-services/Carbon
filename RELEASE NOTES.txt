@@ -31,7 +31,8 @@ This is a backwards-incompatible release.
 
 ### COM
 
- * [Grant-ComPermission](http://get-carbon.org/help/Grant-ComPermission.html) now returns a `Carbon.Security.ComAccessRule`. Also, it now writes message with `Write-Verbose` instead of `Write-Host`.
+ * [Grant-ComPermission](http://get-carbon.org/help/Grant-ComPermission.html) now returns a `Carbon.Security.ComAccessRule`. Also, it now writes messages with `Write-Verbose` instead of `Write-Host`.
+ * [Revoke-ComPermission](http://get-carbon.org/help/Revoke-ComPermission.html) now writes messages with `Write-Verbose` instead of `Write-Host`.
 
 ### Computer
 

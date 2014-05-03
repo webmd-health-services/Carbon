@@ -147,7 +147,7 @@ function Grant-ComPermission
     
     Set-StrictMode -Version 'Latest'
     
-    $account = Resolve-Identity -Name $Identity
+    $account = Resolve-Identity -Name $Identity -Verbose:$VerbosePreference -ErrorAction:$ErrorActionPreference
     if( -not $account )
     {
         return
@@ -176,7 +176,7 @@ function Grant-ComPermission
         $comArgs.LaunchAndActivation = $true
     }
     
-    $currentSD = Get-ComSecurityDescriptor @comArgs
+    $currentSD = Get-ComSecurityDescriptor @comArgs -Verbose:$VerbosePreference -ErrorAction:$ErrorActionPreference
 
     $newSd = ([wmiclass]'win32_securitydescriptor').CreateInstance()
     $newSd.ControlFlags = $currentSD.ControlFlags
@@ -221,8 +221,8 @@ function Grant-ComPermission
     $sdBytes = $converter.Win32SDToBinarySD( $newSd )
 
     $regValueName = $pscmdlet.ParameterSetName -replace '(Allow|Deny)$',''
-    Set-RegistryKeyValue -Path $ComRegKeyPath -Name $regValueName -Binary $sdBytes.BinarySD -Quiet
-    Get-ComPermission -Identity $Identity @comArgs
+    Set-RegistryKeyValue -Path $ComRegKeyPath -Name $regValueName -Binary $sdBytes.BinarySD -Quiet -Verbose:$VerbosePreference -ErrorAction:$ErrorActionPreference
+    Get-ComPermission -Identity $Identity @comArgs  -Verbose:$VerbosePreference -ErrorAction:$ErrorActionPreference
 }
 
 Set-Alias -Name 'Grant-ComPermissions' -Value 'Grant-ComPermission'

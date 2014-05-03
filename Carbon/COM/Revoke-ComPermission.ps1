@@ -96,14 +96,14 @@ function Revoke-ComPermission
         $comArgs.LaunchAndActivation = $true
     }
     
-    $account = Resolve-Identity -Name $Identity
+    $account = Resolve-Identity -Name $Identity -Verbose:$VerbosePreference -ErrorAction:$ErrorActionPreference
     if( -not $account )
     {
         return
     }
 
-    Write-Host ("Revoking {0}'s COM {1} {2}." -f $Identity,$permissionsDesc,$typeDesc)
-    $currentSD = Get-ComSecurityDescriptor @comArgs
+    Write-Verbose ("Revoking {0}'s COM {1} {2}." -f $Identity,$permissionsDesc,$typeDesc)
+    $currentSD = Get-ComSecurityDescriptor @comArgs -Verbose:$VerbosePreference -ErrorAction:$ErrorActionPreference
 
     $newSd = ([wmiclass]'win32_securitydescriptor').CreateInstance()
     $newSd.ControlFlags = $currentSD.ControlFlags
