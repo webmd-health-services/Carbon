@@ -21,6 +21,12 @@ This is a backwards-incompatible release.
 
 ## Enhancements
 
+### Certificates
+
+ * [Remove-SslCertificateBinding](http://get-carbon.org/help/Remove-SslCertificateBinding.html) no longer writes to the host with `Write-Host` and instead uses `Write-Verbose`.
+ * [Remove-SslCertificateBinding](http://get-carbon.org/help/Remove-SslCertificateBinding.html) improved error handling.
+ 
+
 ### Computer
 
  * Changed [Test-OSIs32Bit](http://get-carbon.org/help/Test-OSIs32Bit.html) and [Test-OSIs64Bit](http://get-carbon.org/help/Test-OSIs64Bit.html) functions to use the Environment class's new [Is64BitOperatingSystem](http://msdn.microsoft.com/en-us/library/system.environment.is64bitoperatingsystem.aspx) property.
