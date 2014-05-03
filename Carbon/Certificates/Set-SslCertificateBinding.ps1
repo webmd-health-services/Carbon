@@ -51,13 +51,14 @@ function Set-SslCertificateBinding
         # The thumbprint of the certificate to use.  The certificate must be installed.
         $Thumbprint
     )
+
+    Set-StrictMode -Version 'Latest'
     
-    $commonParams = @{ }
-    
-    if( $pscmdlet.BoundParameters.WhatIf )
-    {
-        $commonParams.WhatIf = $true
-    }
+    $commonParams = @{
+                        WhatIf = $WhatIfPreference;
+                        Verbose = $VerbosePreference;
+                        ErrorAction = $ErrorActionPreference;
+         }
     
     if( $IPAddress.AddressFamily -eq [Net.Sockets.AddressFamily]::InterNetworkV6 )
     {
@@ -70,9 +71,12 @@ function Set-SslCertificateBinding
 
     Remove-SslCertificateBinding -IPAddress $IPAddress -Port $Port @commonParams
     
-    if( $pscmdlet.ShouldProcess( $IPPort, 'creating SSL certificate binding' ) )
+    $action = 'creating SSL certificate binding'
+    if( $pscmdlet.ShouldProcess( $IPPort, $action ) )
     {
-        Write-Host "Creating SSL certificate binding for $IPPort with certificate $Thumbprint."
-        netsh http add sslcert ipport=$ipPort "certhash=$($Thumbprint)" "appid={$ApplicationID}" 
+        $appID = $ApplicationID.ToString('B')
+        Invoke-ConsoleCommand -Target $ipPort -Action $action @commonParams -ScriptBlock {
+            netsh http add sslcert ipport=$ipPort certhash=$Thumbprint appid=$appID
+        }
     }
 }

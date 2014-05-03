@@ -4,8 +4,8 @@
 
 ### Certificates
 
- * [Remove-SslCertificateBinding](http://get-carbon.org/help/Remove-SslCertificateBinding.html) no longer writes to the host with `Write-Host` and instead uses `Write-Verbose`.
- * [Remove-SslCertificateBinding](http://get-carbon.org/help/Remove-SslCertificateBinding.html) improved error handling.
+ * [Remove-SslCertificateBinding](http://get-carbon.org/help/Remove-SslCertificateBinding.html) now writes messages with `Write-Verbose` instead of `Write-Host`. Improved error handling.
+ * [Set-SslCertificateBinding](http://get-carbon.org/help/Set-SslCertificateBinding.html) now writes messages with `Write-Verbose` instead of `Write-Host`. Improved error handling.
 
 # 1.7.0 (30 April 2014)
 

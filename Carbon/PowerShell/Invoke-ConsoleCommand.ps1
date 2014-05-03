@@ -24,7 +24,7 @@ function Invoke-ConsoleCommand
     .EXAMPLE
     INTERNAL.
     #>
-    [CmdletBinding()]
+    [CmdletBinding(SupportsShouldProcess=$true)]
     param(
         [Parameter(Mandatory=$true)]
         [string]
@@ -43,6 +43,11 @@ function Invoke-ConsoleCommand
     )
 
     Set-StrictMode -Version 'Latest'
+
+    if( -not $PSCmdlet.ShouldProcess( $Target, $Action ) )
+    {
+        return
+    }
 
     $output = Invoke-Command -ScriptBlock $ScriptBlock
     if( $LASTEXITCODE )

@@ -14,16 +14,19 @@
 
 $cert = $null
 
+function Start-TestFixture
+{
+    & (Join-Path -Path $PSScriptRoot -ChildPath '..\..\Carbon\Import-Carbon.ps1' -Resolve)
+}
+
 function Setup
 {
-    Import-Module (Join-Path $TestDir ..\..\Carbon -Resolve) -Force
     $cert = Install-Certificate (Join-Path $TestDir CarbonTestCertificate.cer -Resolve) -StoreLocation LocalMachine -StoreName My
 }
 
 function TearDown
 {
     Uninstall-Certificate -Certificate $cert -StoreLocation LocalMachine -StoreName My
-    Remove-Module Carbon
 }
 
 function Test-ShouldCreateNewSslCertificateBinding
