@@ -2,23 +2,78 @@
 <package >
   <metadata>
     <id>Carbon</id>
-    <version>1.7.0.0</version>
+    <version>1.7.0</version>
     <authors>Aaron Jensen</authors>
     <owners>Aaron Jensen</owners>
     <licenseUrl>http://www.apache.org/licenses/LICENSE-2.0</licenseUrl>
     <projectUrl>http://get-carbon.org</projectUrl>
-    <!--<iconUrl>http://ICON_URL_HERE_OR_DELETE_THIS_LINE</iconUrl>-->
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>Carbon is a PowerShell DevOps setup/configuration automation module.</description>
-    <releaseNotes>Bug fixes. Added support for custom certificate store names.</releaseNotes>
+    <summary>Carbon is a PowerShell DevOps setup/configuration automation module.</summary>
+    <description>
+Carbon is a DevOps PowerShell module for automating the configuration of Windows 2008, Windows 2008 R2, 7, 2012, and 2012 R2 computers. Carbon can configure and manage:
+
+ * Local users and groups
+ * IIS websites, virtual directories, and applications
+ * Certificates
+ * .NET connection strings and app settings
+ * File system permissions, junctions, compressions
+ * Hosts file
+ * INI files
+ * Performance counters
+ * Services
+ * Shares
+ * Privileges
+ * COM permissions
+ * Registry keys/values
+    </description>
+    <language>en-us</language>
+    <releaseNotes>
+# 1.7.0
+
+There is now [a Carbon support mailing list](http://www.freelists.org/list/carbon).
+
+## Enhancements
+
+### General
+
+ * Import-Carbon.ps1 now supports the `-WhatIf` switch.
+ * Import-Carbon.ps1 now hides verbose log messages when removing/importing Carbon even when supplying the `-Verbose` switch because I think the verbose output is too verbose and not helpful at all.
+ * Import-Carbon.ps1 now supports adding a prefix when importing the Carbon module (with the `Prefix` parameter) to avoid name collisions and [follow best practices](http://blogs.msdn.com/b/powershell/archive/2014/04/07/what-s-in-a-name-using-the-ps-prefix.aspx).
+ 
+### Certificates
+
+ * [Get-CertificateStore](http://get-carbon.org/help/Get-CertificateStore.html) now supports non-standard, custom certificate stores.
+ * [Get-Certificate](http://get-carbon.org/help/Get-Certificate.html) now supports non-standard, custom certificate stores.
+ * [Install-Certificate](http://get-carbon.org/help/Install-Certificate.html) now supports non-standard, custom certificate stores.
+ * [Uninstall-Certificate](http://get-carbon.org/help/Uninstall-Certificate.html) now supports non-standard, custom certificate stores.
+ 
+## Bug Fixes
+
+### General
+
+ * No more silent errors when importing Carbon on Windows 2012 R2.
+
+### Certificates
+
+ * [Get-Certificate](http://get-carbon.org/help/Get-Certificate.html) no longer writes a silent error when a certificate does not exist. Instead, no error is written.
+
+### File System
+
+ * [Install-Junction](http://get-carbon.org/help/Install-Junction.html) fails when target path is hidden.
+ * [Test-NtfsCompression](http://get-carbon.org/help/Test-NtfsCompression.html) fails when file/directory is hidden.
+ * [Test-PathIsJunction](http://get-carbon.org/help/Test-PathIsJunction.html) fails when tested directory is hidden.
+
+### Security
+
+ * [Grant-Permission](http://get-carbon.org/help/Grant-Permission.html) fails when item is hidden.
+ * [Grant-Permission](http://get-carbon.org/help/Grant-Permission.html) doesn't handle non-existent paths, causing cascading errors.
+ * [Test-Permission](http://get-carbon.org/help/Test-Permission.html) always returns `$false` when testing leaf-level permissions and the `ApplyTo` parameter is provided, i.e. it doesn't ignore inheritance/propagation flags on leaves.
+  </releaseNotes>
     <copyright>Copyright 2012</copyright>
-    <!--<tags>Tag1 Tag2</tags>
-    <dependencies>
-      <dependency id="SampleDependency" version="1.0" />
-    </dependencies>-->
+    <tags>DevOps PowerShell setup computer automation</tags>
   </metadata>
-    <files>
-        <file src=".\content\**\*" />
-        <file src=".\*.txt" />
-    </files>
+  <files>
+      <file src=".\content\**\*" />
+      <file src=".\*.txt" />
+  </files>
 </package>
