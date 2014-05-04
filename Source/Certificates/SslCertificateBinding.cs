@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net;
 using System.Security.Cryptography.X509Certificates;
+using System.Text.RegularExpressions;
 
 namespace Carbon.Certificates
 {
@@ -59,5 +60,34 @@ namespace Carbon.Certificates
         public bool VerifyClientCertificateRevocation { get; private set; }
 
         public bool VerifyRevocationUsingCachedClientCertificatesOnly { get; private set; }
+
+        public override bool Equals(object obj)
+        {
+            var binding = obj as SslCertificateBinding;
+
+            if (binding == null)
+            {
+                return false;
+            }
+
+            return IPAddress.Equals(binding.IPAddress) &&
+                   Port.Equals(binding.Port) &&
+                   CertificateHash.Equals(binding.CertificateHash) &&
+                   ApplicationID.Equals(binding.ApplicationID);
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked // Overflow is fine, just wrap
+            {
+                int hash = 17;
+                // Suitable nullity checks etc, of course :)
+                hash = hash * 23 + IPAddress.GetHashCode();
+                hash = hash * 23 + Port.GetHashCode();
+                hash = hash * 23 + CertificateHash.GetHashCode();
+                hash = hash * 23 + ApplicationID.GetHashCode();
+                return hash;
+            }
+        }
     }
 }
