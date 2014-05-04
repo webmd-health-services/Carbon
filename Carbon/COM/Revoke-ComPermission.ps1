@@ -72,7 +72,12 @@ function Revoke-ComPermission
     )
     
     Set-StrictMode -Version 'Latest'
-    
+
+    $commonParams = @{
+                        Verbose = $VerbosePreference;
+                        ErrorAction = $ErrorActionPreference;
+                    }
+
     $comArgs = @{ }
     if( $pscmdlet.ParameterSetName -like 'Default*' )
     {
@@ -96,14 +101,14 @@ function Revoke-ComPermission
         $comArgs.LaunchAndActivation = $true
     }
     
-    $account = Resolve-Identity -Name $Identity -Verbose:$VerbosePreference -ErrorAction:$ErrorActionPreference
+    $account = Resolve-Identity -Name $Identity @commonParams
     if( -not $account )
     {
         return
     }
 
     Write-Verbose ("Revoking {0}'s COM {1} {2}." -f $Identity,$permissionsDesc,$typeDesc)
-    $currentSD = Get-ComSecurityDescriptor @comArgs -Verbose:$VerbosePreference -ErrorAction:$ErrorActionPreference
+    $currentSD = Get-ComSecurityDescriptor @comArgs @commonParams
 
     $newSd = ([wmiclass]'win32_securitydescriptor').CreateInstance()
     $newSd.ControlFlags = $currentSD.ControlFlags
@@ -119,7 +124,7 @@ function Revoke-ComPermission
     $sdBytes = $converter.Win32SDToBinarySD( $newSd )
 
     $regValueName = $pscmdlet.ParameterSetName
-    Set-RegistryKeyValue -Path $ComRegKeyPath -Name $regValueName -Binary $sdBytes.BinarySD -Quiet
+    Set-RegistryKeyValue -Path $ComRegKeyPath -Name $regValueName -Binary $sdBytes.BinarySD -Quiet @commonParams -WhatIf:$WhatIfPreference
 }
 
 Set-Alias -Name 'Revoke-ComPermissions' -Value 'Revoke-ComPermission'

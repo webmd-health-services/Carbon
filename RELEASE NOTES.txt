@@ -83,6 +83,30 @@ This is a backwards-incompatible release.
  * [Test-Identity](http://get-carbon.org/help/Test-Identity.html) now returns a `Carbon.Identity` object if the identity exists *and* you use the `-PassThru` switch.  It used to return the identity's name.  Update scripts to use the `FullName` property to get the old return value, e.g. `Test-Identity -Name $userName -PassThru | Select-Object -Expand 'FullName'`.
  
  
+ # 1.8
+
+## Enhancements
+
+### Certificates
+
+ * [Remove-SslCertificateBinding](http://get-carbon.org/help/Remove-SslCertificateBinding.html) now writes messages with `Write-Verbose` instead of `Write-Host`. Improved error handling.
+ * [Set-SslCertificateBinding](http://get-carbon.org/help/Set-SslCertificateBinding.html) now writes messages with `Write-Verbose` instead of `Write-Host`. Improved error handling.
+
+### COM
+
+ * [Grant-ComPermission](http://get-carbon.org/help/Grant-ComPermission.html) now writes messages with `Write-Verbose` instead of `Write-Host`.
+ * [Revoke-ComPermission](http://get-carbon.org/help/Revoke-ComPermission.html) now writes messages with `Write-Verbose` instead of `Write-Host`.
+
+### File System
+
+ * [Disable-NtfsCompression](http://get-carbon.org/help/Disable-NtfsCompression.html) no longer writes messages with `Write-Host`. Improved error handling.
+ * [Enable-NtfsCompression](http://get-carbon.org/help/Enable-NtfsCompression.html) no longer writes messages with `Write-Host`. Improved error handling.
+
+### Firewall
+
+ * [Disable-FirewallStatefulFtp](http://get-carbon.org/help/Disable-FirewallStatefulFtp.html) no longer writes messages with `Write-Host`. Improved error handling.
+
+ 
 # 1.7.0 (30 April 2014)
 
 There is now [a Carbon support mailing list](http://www.freelists.org/list/carbon).

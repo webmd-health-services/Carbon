@@ -57,8 +57,17 @@ function Enable-NtfsCompression
         $Recurse
     )
 
+
     begin
     {
+        Set-StrictMode -Version 'Latest'
+
+        $commonParams = @{
+                            ErrorAction = $ErrorActionPreference;
+                            Verbose = $VerbosePreference;
+                            WhatIf = $WhatIfPreference;
+                        }
+
         $compactPath = Join-Path $env:SystemRoot 'system32\compact.exe'
         if( -not (Test-Path -Path $compactPath -PathType Leaf) )
         {
@@ -76,34 +85,27 @@ function Enable-NtfsCompression
 
     process
     {
-        if( -not (Test-Path -Path $Path) )
+        foreach( $item in $Path )
         {
-            Write-Error -Message ('Path {0} not found.' -f $Path) -Category ObjectNotFound
-            return
-        }
+            if( -not (Test-Path -Path $item) )
+            {
+                Write-Error -Message ('Path {0} not found.' -f $item) -Category ObjectNotFound
+                return
+            }
 
-        $recurseArg = ''
-        $pathArg = $Path
-        if( (Test-Path -Path $Path -PathType Container) )
-        {
-            if( $Recurse )
+            $recurseArg = ''
+            $pathArg = $item
+            if( (Test-Path -Path $item -PathType Container) )
             {
-                $recurseArg = ('/S:{0}' -f $Path)
-                $pathArg = ''
+                if( $Recurse )
+                {
+                    $recurseArg = ('/S:{0}' -f $item)
+                    $pathArg = ''
+                }
             }
-        }
         
-        if( $PSCmdlet.ShouldProcess( $Path, 'enable NTFS compression' ) )
-        {
-            Write-Verbose ('Enabling NTFS compression on {0}.' -f $Path)
-            $output = & $compactPath /C $recurseArg $pathArg | Where-Object { $_ }
-            if( $LASTEXITCODE )
-            {
-                Write-Error ('Failed to enable compression on ''{0}'' (exit code {1}): {2}' -f $Path,$LASTEXITCODE,($output -join ([Environment]::NewLine)))
-            }
-            else
-            {
-                $output | Write-Verbose
+            Invoke-ConsoleCommand -Target $item -Action 'enable NTFS compression' @commonParams -ScriptBlock { 
+                & $compactPath /C $recurseArg $pathArg
             }
         }
     }

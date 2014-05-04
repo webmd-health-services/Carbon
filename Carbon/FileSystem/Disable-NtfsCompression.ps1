@@ -59,6 +59,12 @@ function Disable-NtfsCompression
 
     begin
     {
+        $commonParams = @{
+                            Verbose = $VerbosePreference;
+                            WhatIf = $WhatIfPreference;
+                            ErrorAction = $ErrorActionPreference;
+                        }
+
         $compactPath = Join-Path $env:SystemRoot 'system32\compact.exe'
         if( -not (Test-Path -Path $compactPath -PathType Leaf) )
         {
@@ -76,34 +82,27 @@ function Disable-NtfsCompression
 
     process
     {
-        if( -not (Test-Path -Path $Path) )
+        foreach( $item in $Path )
         {
-            Write-Error -Message ('Path {0} not found.' -f $Path) -Category ObjectNotFound
-            return
-        }
-
-        $recurseArg = ''
-        $pathArg = $Path
-        if( (Test-Path -Path $Path -PathType Container) )
-        {
-            if( $Recurse )
+            if( -not (Test-Path -Path $item) )
             {
-                $recurseArg = ('/S:{0}' -f $Path)
-                $pathArg = ''
+                Write-Error -Message ('Path {0} not found.' -f $item) -Category ObjectNotFound
+                return
             }
-        }
 
-        if( $PSCmdlet.ShouldProcess( $Path, 'disable NTFS compression' ) )
-        {
-            Write-Verbose ('Disabling NTFS compression on {0}.' -f $Path)
-            $output = & $compactPath /U $recurseArg $pathArg | Where-Object { $_ }
-            if( $LASTEXITCODE )
+            $recurseArg = ''
+            $pathArg = $item
+            if( (Test-Path -Path $item -PathType Container) )
             {
-                Write-Error ('Failed to disable compression on ''{0}'' (exit code {1}): {2}' -f $Path,$LASTEXITCODE,($output -join ([Environment]::NewLine)))
+                if( $Recurse )
+                {
+                    $recurseArg = ('/S:{0}' -f $item)
+                    $pathArg = ''
+                }
             }
-            else
-            {
-                $output | Write-Verbose
+
+            Invoke-ConsoleCommand -Target $item -Action 'disable NTFS compression' @commonParams -ScriptBlock {
+                & $compactPath /U $recurseArg $pathArg
             }
         }
     }

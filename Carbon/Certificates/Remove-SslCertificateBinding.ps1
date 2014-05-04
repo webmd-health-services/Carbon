@@ -43,8 +43,14 @@ function Remove-SslCertificateBinding
     )
 
     Set-StrictMode -Version 'Latest'
+
+    $commonParams = @{ 
+                        Verbose = $VerbosePreference;
+                        ErrorAction = $ErrorActionPreference;
+                        WhatIf = $WhatIfPreference;
+                    }
     
-    if( -not (Test-SslCertificateBinding -IPAddress $IPAddress -Port $Port) )
+    if( -not (Test-SslCertificateBinding -IPAddress $IPAddress -Port $Port @commonParams) )
     {
         return
     }
@@ -58,17 +64,8 @@ function Remove-SslCertificateBinding
         $ipPort = '{0}:{1}' -f $IPAddress,$Port
     }
 
-    if( $pscmdlet.ShouldProcess( $ipPort, "removing SSL certificate binding" ) )
-    {
-        Write-Verbose ("Removing SSL certificate binding on {0}." -f $ipPort)
-        $output = netsh http delete sslcert ipport=$ipPort | Where-Object { $_ }
-        if( $LASTEXITCODE )
-        {
-            Write-Error ('Failed to remove SSL certificate binding ''{1}'': {2}' -f $LASTEXITCODE,$ipPort,($output -join ([Environment]::NewLine)))
-        }
-        else
-        {
-            $output | Write-Verbose
-        }
-    }
+    $action = "removing SSL certificate binding"
+    Invoke-ConsoleCommand -Target $ipPort `
+                            -Action $action `
+                            -ScriptBlock { netsh http delete sslcert ipPort=$ipPort }
 }

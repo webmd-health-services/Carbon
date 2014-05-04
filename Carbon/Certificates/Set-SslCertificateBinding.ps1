@@ -58,6 +58,11 @@ function Set-SslCertificateBinding
 
     Set-StrictMode -Version 'Latest'
     
+    $commonParams = @{
+                        ErrorAction = $ErrorActionPreference;
+                        Verbose = $VerbosePreference;
+         }
+    
     if( $IPAddress.AddressFamily -eq [Net.Sockets.AddressFamily]::InterNetworkV6 )
     {
         $ipPort = '[{0}]:{1}' -f $IPAddress,$Port
@@ -67,20 +72,15 @@ function Set-SslCertificateBinding
         $ipPort = '{0}:{1}' -f $IPAddress,$Port
     }
 
-    Remove-SslCertificateBinding -IPAddress $IPAddress -Port $Port -WhatIf:$WhatIfPreference -Verbose:$VerbosePreference -ErrorAction:$ErrorActionPreference
+    Remove-SslCertificateBinding -IPAddress $IPAddress -Port $Port @commonParams -WhatIf:$WhatIfPreference
     
-    if( $pscmdlet.ShouldProcess( $IPPort, 'creating SSL certificate binding' ) )
+    $action = 'creating SSL certificate binding'
+    if( $pscmdlet.ShouldProcess( $IPPort, $action ) )
     {
-        Write-Verbose ("Creating SSL certificate binding on {0} with certificate {1} for application {2}." -f $ipPort,$Thumbprint ,$ApplicationID)
-        $output = netsh http add sslcert ipport=$ipPort "certhash=$($Thumbprint)" "appid={$ApplicationID}"  | Where-Object { $_ }
-        if( $LASTEXITCODE )
-        {
-            Write-Error ('Failed to create SSL certificate binging on ''{0}'' with certificate ''{1}'' for application ''{2}'': {3}' -f $ipPort,$Thumbprint,$ApplicationID,($output -join ([Environment]::NewLine)))
+        $appID = $ApplicationID.ToString('B')
+        Invoke-ConsoleCommand -Target $ipPort -Action $action @commonParams -WhatIf:$WhatIfPreference -ScriptBlock {
+            netsh http add sslcert ipport=$ipPort certhash=$Thumbprint appid=$appID
         }
-        else
-        {
-            $output | Write-Verbose
-        }
-        Get-SslCertificateBinding -IPAddress $IPAddress -Port $Port
+        Get-SslCertificateBinding -IPAddress $IPAddress -Port $Port @commonParams
     }
 }
