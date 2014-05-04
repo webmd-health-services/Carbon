@@ -13,7 +13,7 @@
 # limitations under the License.
 
 $username = 'CarbonRemoveUser'
-$password = 'IM33tRequ!rement$'
+$password = 'IM33tRequ!rem$'
 
 function Start-Test
 {

@@ -13,7 +13,7 @@
 # limitations under the License.
 
 $username = 'CarbonInstallUser'
-$password = 'IM33tRequ!rement$'
+$password = 'IM33tRequ!rem$'
 
 function Start-TestFixture
 {
