@@ -16,13 +16,17 @@ $appSettingName = "TEST_APP_SETTING_NAME"
 $appSettingValue = "TEST_APP_SETTING_VALUE"
 $appSettingNewValue = "TEST_APP_SETTING_VALUE"
 
-function Setup
+function Start-TestFixture
 {
-    & (Join-Path -Path $TestDir -ChildPath ..\..\Carbon\Import-Carbon.ps1 -Resolve)
+    & (Join-Path -Path $PSScriptRoot '..\..\Carbon\Import-Carbon.ps1' -Resolve)
+}
+
+function Start-Test
+{
     Remove-AppSetting
 }
 
-function TearDown
+function Stop-Test
 {
     Remove-AppSetting
 }

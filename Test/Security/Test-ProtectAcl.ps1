@@ -15,10 +15,13 @@
 $parentFSPath = $null 
 $childFSPath = $null
 
-function Setup
+function Start-TestFixture
 {
-    & (Join-Path $TestDir ..\..\Carbon\Import-Carbon.ps1 -Resolve)
-	
+    & (Join-Path -Path $PSScriptRoot -ChildPath '..\..\Carbon\Import-Carbon.ps1' -Resolve)
+}
+
+function Start-Test
+{
 	$parentFSPath = New-TempDir
 	$childFSPath = Join-Path $parentFSPath 'TestUnprotectAclAccessRules'
 	
@@ -26,12 +29,9 @@ function Setup
     Grant-Permission -Identity Everyone -Permission FullControl -Path $childFSPath
 }
 
-function TearDown
+function Stop-Test
 {
-    
     Remove-Item $parentFSPath -Recurse -Force
-    
-    REmove-Module Carbon
 }
 
 function Test-ShouldRemoveInheritedAccess

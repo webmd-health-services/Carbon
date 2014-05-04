@@ -14,17 +14,20 @@
 
 $appPoolName = 'CarbonTestUninstallAppPool'
 
-function SetUp
+function Start-TestFixture
 {
-    & (Join-Path $TestDir ..\..\Carbon\Import-Carbon.ps1 -Resolve)
+    & (Join-Path -Path $PSScriptRoot '..\..\Carbon\Import-Carbon.ps1' -Resolve)
+}
+
+function Start-Test
+{
     Uninstall-IisAppPool -Name $appPoolName
     Assert-False (Test-IisAppPool -Name $appPoolName)
 }
 
-function TearDown
+function Stop-Test
 {
     Uninstall-IisAppPool -Name $appPoolName
-    Remove-Module Carbon
 }
 
 function Test-ShouldRemoveAppPool

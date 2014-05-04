@@ -12,14 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Setup
+function Start-TestFixture
 {
-    & (Join-Path $TestDir ..\..\Carbon\Import-Carbon.ps1 -Resolve)    
-}
-
-function TearDown
-{
-    Remove-Module Carbon
+    & (Join-Path -Path $PSScriptRoot -ChildPath '..\..\Carbon\Import-Carbon.ps1' -Resolve)
 }
 
 function Test-ShouldFindExistingServices

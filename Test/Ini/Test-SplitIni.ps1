@@ -14,9 +14,13 @@
 
 $iniPath = $null
 
-function Setup
+function Start-TestFixture
 {
-    Import-Module (Join-Path $TestDir ..\..\Carbon -Resolve) -Force
+    & (Join-Path -Path $PSScriptRoot -ChildPath '..\..\Carbon\Import-Carbon.ps1' -Resolve)
+}
+
+function Start-Test
+{
     $iniPath = [IO.Path]::GetRandomFileName()
     $iniContent = @"
 [section1]
@@ -50,10 +54,9 @@ option1=value8
     $iniContent > $iniPath
 }
 
-function TearDown
+function Stop-Test
 {
     Remove-Item $iniPath
-    Remove-Module Carbon
 }
 
 function Test-ShouldReadIniAsHashtable

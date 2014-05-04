@@ -20,21 +20,22 @@ $readAccessGroup = 'CarbonShareRead'
 $noAccessGroup = 'CarbonShareNone'
 $Remarks = [Guid]::NewGuid().ToString()
 
-function SetUp
+function Start-TestFixture
 {
-    & (Join-Path $TestDir ..\..\Carbon\Import-Carbon.ps1 -Resolve)
+    & (Join-Path -Path $PSScriptRoot -ChildPath '..\..\Carbon\Import-Carbon.ps1' -Resolve)
+}
 
+function Start-Test
+{
     Install-Group -Name $fullAccessGroup -Description 'Carbon module group for testing full share permissions.'
     Install-Group -Name $changeAccessGroup -Description 'Carbon module group for testing change share permissions.'
     Install-Group -Name $readAccessGroup -Description 'Carbon module group for testing read share permissions.'
     Remove-Share
 }
 
-function TearDown
+function Stop-Test
 {
     Remove-Share
-    
-    Remove-Module Carbon
 }
 
 function Remove-Share

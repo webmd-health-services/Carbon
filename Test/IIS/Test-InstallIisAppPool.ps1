@@ -16,19 +16,22 @@ $appPoolName = 'CarbonInstallIisAppPool'
 $username = 'CarbonInstallIisAppP'
 $password = '!QAZ2wsx'
 
-function Setup
+function Start-TestFixture
 {
-    & (Join-Path $TestDir ..\..\Carbon\Import-Carbon.ps1 -Resolve)
+    & (Join-Path -Path $PSScriptRoot '..\..\Carbon\Import-Carbon.ps1' -Resolve)
+}
+
+function Start-Test
+{
     Remove-AppPool
     Install-User -Username $username -Password $password -Description 'User for testing Carbon''s Install-IisAppPool function.'
     Revoke-Privilege -Identity $username -Privilege SeBatchLogonRight
 }
 
-function TearDown
+function Stop-Test
 {
     Remove-AppPool
     Uninstall-User -Username $username
-    Remove-Module Carbon
 }
 
 function Remove-AppPool

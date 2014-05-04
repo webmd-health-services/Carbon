@@ -15,10 +15,13 @@
 $hostsFile = $null
 $hostname = 'example.com'
 
+function Start-TestFixture
+{
+    & (Join-Path -Path $PSScriptRoot '..\..\Carbon\Import-Carbon.ps1' -Resolve)
+}
+
 function Start-Test
 {
-    & (Join-Path -Path $PSScriptRoot -ChildPath '..\..\Carbon\Import-Carbon.ps1' -Resolve)
-
     $hostsFile = Join-Path -Path $env:TEMP -ChildPath ('Carbon+Test-RemoveHostsEntry+{0}' -f [IO.Path]::GetRandomFileName())
 
     Set-HostsEntry -IPAddress '1.2.3.4' -HostName $hostname -Path $hostsFile

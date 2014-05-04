@@ -14,16 +14,10 @@
 
 if( (Get-WmiObject -Class Win32_OptionalFeature -ErrorAction SilentlyContinue) )
 {
-    function Setup
+    function Start-TestFixture
     {
-        Import-Module (Join-Path $TestDir ..\..\Carbon -Resolve) -Force
+        & (Join-Path -Path $PSScriptRoot -ChildPath '..\..\Carbon\Import-Carbon.ps1' -Resolve)
     }
-
-    function TearDown
-    {
-        Remove-Module Carbon
-    }
-
 
     function Test-ShouldDetectInstalledFeature
     {

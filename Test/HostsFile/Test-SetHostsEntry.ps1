@@ -15,7 +15,12 @@
 $originalHostsFile = ''
 $customHostsFile = ''
 
-function Setup
+function Start-TestFixture
+{
+    & (Join-Path -Path $PSScriptRoot '..\..\Carbon\Import-Carbon.ps1' -Resolve)
+}
+
+function Start-Test
 {
     $customHostsFile = Join-Path $env:temp ([IO.Path]::GetRandomFileName())
     @"
@@ -39,14 +44,11 @@ function Setup
 
 127.0.0.1       localhost
 "@ | Out-File -FilePath $customHostsfile -Encoding OEM
-
-    Import-Module (Join-Path $TestDir ..\..\Carbon -Resolve) -Force
 }
 
-function TearDown
+function Stop-Test
 {
     Remove-Item $customHostsFile
-    Remove-Module Carbon
 }
 
 function Test-ShouldOperateOnSystemHostsFileByDefault

@@ -14,10 +14,13 @@
 
 $alreadyEnabled = $false
 
-function Setup
+function Start-TestFixture
 {
-    Import-Module (Join-Path $TestDir ..\..\Carbon -Resolve) -Force
-    
+    & (Join-Path -Path $PSScriptRoot '..\..\Carbon\Import-Carbon.ps1' -Resolve)
+}
+
+function Start-Test
+{
     $alreadyEnabled = Test-FirewallStatefulFtp
     
     if( $alreadyEnabled )
@@ -26,7 +29,7 @@ function Setup
     }
 }
 
-function TearDown
+function Stop-Test
 {
     if( $alreadyEnabled )
     {

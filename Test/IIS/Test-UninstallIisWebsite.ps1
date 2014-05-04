@@ -15,16 +15,19 @@
 
 $SiteName = 'TestSite'
 
-function SetUp()
+function Start-TestFixture
 {
-    Import-Module (Join-Path $TestDir ..\..\Carbon -Resolve)
+    & (Join-Path -Path $PSScriptRoot '..\..\Carbon\Import-Carbon.ps1' -Resolve)
+}
+
+function Start-Test
+{
     Remove-TestWebsite
 }
 
-function TearDown()
+function Stop-Test
 {
     Remove-TestWebsite
-    Remove-Module Carbon
 }
 
 function Remove-TestWebsite

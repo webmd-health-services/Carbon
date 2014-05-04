@@ -17,16 +17,19 @@ if( -not (Get-Module 'ServerManager') -and (Get-WmiObject -Class Win32_OptionalF
     $singleFeature = 'TelnetClient'
     $multipleFeatures = @( $singleFeature, 'TFTP' )
 
-    function Setup
+    function Start-TestFixture
     {
-        & (Join-Path $TestDir ..\..\Carbon\Import-Carbon.ps1 -Resolve)
+        & (Join-Path -Path $PSScriptRoot -ChildPath '..\..\Carbon\Import-Carbon.ps1' -Resolve)
+    }
+
+    function Start-Test
+    {
         Install-WindowsFeature -Name $multipleFeatures
     }
 
-    function Teardown
+    function Stop-Test
     {
         Uninstall-WindowsFeature -Name $multipleFeatures
-        Remove-Module Carbon
     }
 
     function Test-ShouldUninstallFeatures

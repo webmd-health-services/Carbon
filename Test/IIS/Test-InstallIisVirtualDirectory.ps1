@@ -17,10 +17,13 @@ $SiteName = 'TestVirtualDirectory'
 $VDirName = 'VDir'
 $WebConfig = Join-Path $TestDir web.config
 
+function Start-TestFixture
+{
+    & (Join-Path -Path $PSScriptRoot '..\..\Carbon\Import-Carbon.ps1' -Resolve)
+}
+
 function Start-Test
 {
-    & (Join-Path -Path $TestDir -ChildPath ..\..\Carbon\Import-Carbon.ps1 -Resolve)
-
     Uninstall-IisWebsite -Name $SiteName
     Install-IisWebsite -Name $SiteName -Path $TestDir -Bindings "http://*:$Port"
     if( Test-Path $WebConfig )

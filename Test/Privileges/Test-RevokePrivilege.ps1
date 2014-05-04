@@ -15,20 +15,22 @@
 $username = 'CarbonRevokePrivileg' 
 $password = 'a1b2c3d4#'
 
-function Setup
+function Start-TestFixture
 {
-    & (Join-Path $TestDir ..\..\Carbon\Import-Carbon.ps1 -Resolve)
-    
+    & (Join-Path -Path $PSScriptRoot -ChildPath '..\..\Carbon\Import-Carbon.ps1' -Resolve)
+}
+
+function Start-Test
+{
     Install-User -Username $username -Password $password -Description 'Account for testing Carbon Revoke-Privileges functions.'
     
     Grant-Privilege -Identity $username -Privilege 'SeBatchLogonRight'
     Assert-True (Test-Privilege -Identity $username -Privilege 'SeBatchLogonRight')
 }
 
-function TearDown
+function Stop-Test
 {
     Uninstall-User -Username $username
-    Remove-Module Carbon
 }
 
 function Test-ShouldNotRevokePrivilegeForNonExistentUser

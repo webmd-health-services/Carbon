@@ -16,22 +16,24 @@
 if( Get-Service -Name MSMQ -ErrorAction SilentlyContinue )
 {
 
-    Import-Module (Join-Path $TestDir ..\..\Carbon) -Force
     $publicQueueName = $null
     $privateQueueName = $null
 
-    function Setup
+    function Start-TestFixture
     {
-        Import-Module (Join-Path $TestDir ..\..\Carbon) -Force
+        & (Join-Path -Path $PSScriptRoot -ChildPath '..\..\Carbon\Import-Carbon.ps1' -Resolve)
+    }
+
+    function Start-Test
+    {
         $publicQueueName = 'CarbonTestQueue-Public' + [Guid]::NewGuid().ToString()
         $privateQueueName = 'CarbonTestQueue-Private' + [Guid]::NewGuid().ToString()
         Remove-TestQueues
     }
 
-    function TearDown
+    function Stop-Test
     {
         Remove-TestQueues
-        Remove-Module Carbon
     }
     
     function Remove-TestQueues

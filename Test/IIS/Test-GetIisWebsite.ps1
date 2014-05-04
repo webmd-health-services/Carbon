@@ -15,19 +15,21 @@
 $appPoolName = 'Carbon-Get-IisWebsite'
 $siteName = 'Carbon-Get-IisWebsite'
 
-function Setup
+function Start-TestFixture
 {
-    Import-Module (Join-Path $TestDir ..\..\Carbon -Resolve) -Force
+    & (Join-Path -Path $PSScriptRoot '..\..\Carbon\Import-Carbon.ps1' -Resolve)
+}
+
+function Start-Test
+{
     Install-IisAppPool -Name $appPoolName
     $bindings = @( 'http/*:8401:', 'https/*:8401:', 'http/1.2.3.4:80:', "http/5.6.7.8:80:$siteName" )
     Install-IisWebsite -Name $siteName -Bindings $bindings -Path $TestDir -AppPoolName $appPoolName
 }
 
-function TearDown
+function Stop-Test
 {
     Remove-IisWebsite -Name $siteName
-    Remove-Module Carbon
-
 }
 
 function Test-ShouldReturnNullForNonExistentWebsite

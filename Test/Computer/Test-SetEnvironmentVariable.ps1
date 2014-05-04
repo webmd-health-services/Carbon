@@ -14,9 +14,9 @@
 
 $EnvVarName = 'CarbonTestSetEnvironmentVariable'
 
-function Setup
+function Start-TestFixture
 {
-    Import-Module (Join-Path $TestDir ..\..\Carbon)
+    & (Join-Path -Path $PSScriptRoot '..\..\Carbon\Import-Carbon.ps1' -Resolve)
 }
 
 function TearDown
@@ -26,7 +26,6 @@ function TearDown
             $removeArgs = @{ "For$_" = $true; }
             Remove-EnvironmentVariable -Name $EnvVarName @removeArgs
         }
-    Remove-Module Carbon
 }
 
 function Set-TestEnvironmentVariable($Scope)

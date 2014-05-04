@@ -12,13 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Setup
+function Start-TestFixture
 {
-    Import-Module (Join-Path $TestDir ..\..\Carbon -Resolve) -Force
-}
-
-function TearDown
-{
+    & (Join-Path -Path $PSScriptRoot '..\..\Carbon\Import-Carbon.ps1' -Resolve)
 }
 
 function Test-ShouldGetFirewallRules

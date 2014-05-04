@@ -18,10 +18,13 @@ $password = 'a1z2b3y4!'
 $containerPath = $null
 $childPath = $null
 
-function Setup
+function Start-TestFixture
 {
-    & (Join-Path $TestDir ..\..\Carbon\Import-Carbon.ps1 -Resolve)
-    
+    & (Join-Path -Path $PSScriptRoot -ChildPath '..\..\Carbon\Import-Carbon.ps1' -Resolve)
+}
+
+function Start-Test
+{
     Install-User -Username $user -Password $password -Description 'Carbon test user 1'
     Install-Group -Name $group1 -Description 'Carbon test group 1'
 
@@ -34,11 +37,6 @@ function Setup
     $childPath = Join-Path $containerPath 'Child1'
     $null = New-Item $childPath -ItemType File
     Grant-Permission -Path $childPath -Identity $user -Permission Read
-}
-
-function TearDown
-{
-    Remove-Module Carbon
 }
 
 function Test-ShouldGetPermissions

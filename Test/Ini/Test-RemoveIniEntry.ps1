@@ -14,9 +14,13 @@
 
 $iniPath = $null
 
-function Setup
+function Start-TestFixture
 {
-    & (Join-Path $TestDir ..\..\Carbon\Import-Carbon.ps1 -Resolve)
+    & (Join-Path -Path $PSScriptRoot -ChildPath '..\..\Carbon\Import-Carbon.ps1' -Resolve)
+}
+
+function Start-Test
+{
     $iniPath = Join-Path ([IO.Path]::GetTempPath()) ([IO.Path]::GetRandomFileName())
     $null = New-Item $iniPath -ItemType File
     @'
@@ -29,10 +33,9 @@ section1value1 = value2
 '@ > $iniPath
 }
 
-function TearDown
+function Stop-Test
 {
     Remove-Item $iniPath
-    Remove-Module Carbon
 }
 
 function Test-ShouldNotRemoveEntryThatDoesNotExist

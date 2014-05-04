@@ -14,21 +14,21 @@
 
 $rootKey = 'hklm:\Software\Carbon\Test\Test-SetRegistryKeyValue'
 
-function Setup
+function Start-TestFixture
 {
-    & (Join-Path $TestDir ..\..\Carbon\Import-Carbon.ps1 -Resolve)
-    
+    & (Join-Path -Path $PSScriptRoot -ChildPath '..\..\Carbon\Import-Carbon.ps1' -Resolve)
+}
+
+function Start-Test
+{
     if( -not (Test-Path $rootKey -PathType Container) )
     {
         New-Item $rootKey -ItemType RegistryKey -Force
     }
-    
 }
 
-function TearDown
+function Stop-Test
 {
-    Remove-Module Carbon
-    
     Remove-Item $rootKey -Recurse
 }
 

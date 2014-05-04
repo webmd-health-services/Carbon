@@ -15,16 +15,19 @@
 $username = 'CarbonInstallUser'
 $password = 'IM33tRequ!rement$'
 
-function Start-Test
+function Start-TestFixture
 {
     & (Join-Path -Path $PSScriptRoot -ChildPath '..\..\Carbon\Import-Carbon.ps1' -Resolve)
+}
+
+function Start-Test
+{
     Remove-TestUser
 }
 
 function Stop-Test
 {
     Remove-TestUser
-    Remove-Module Carbon
 }
 
 function Remove-TestUser

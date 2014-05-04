@@ -18,8 +18,11 @@ $password = 'IM33tRequ!rement$'
 function Start-Test
 {
     & (Join-Path -Path $PSScriptRoot -ChildPath '..\..\Carbon\Import-Carbon.ps1' -Resolve)
-    net user $username $password /add /Y
-    Assert-True (Test-User -Username $username)
+}
+
+function Start-Test
+{
+    net user $username $password /add
 }
 
 function Stop-Test

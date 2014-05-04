@@ -17,14 +17,18 @@ $userName = 'CarbonTestUser'
 $password = '1M33tRequirement$'
 $description = 'Carbon user for use in Carbon tests.'
 
-function Setup
+function Start-TestFixture
 {
     & (Join-Path -Path $PSScriptRoot -ChildPath '..\..\Carbon\Import-Carbon.ps1' -Resolve)
+}
+
+function Start-Test
+{
     Install-User -Username $userName -Password $password -Description $description
     Remove-Group
 }
 
-function TearDown
+function Stop-Test
 {
     Remove-Group
 }

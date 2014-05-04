@@ -16,16 +16,19 @@ $connectionStringValue = "TEST_CONNECTION_STRING_VALUE"
 $connectionStringNewValue = "TEST_CONNECTION_STRING_NEW_VALUE"
 $providerName = 'Carbon.Set-DotNetConnectionString'
 
-function Setup
+function Start-TestFixture
 {
-    Import-Module (Join-Path $TestDir ..\..\Carbon) -Force
+    & (Join-Path -Path $PSScriptRoot '..\..\Carbon\Import-Carbon.ps1' -Resolve)
+}
+
+function Start-Test
+{
     Remove-ConnectionStrings    
 }
 
-function TearDown
+function Stop-Test
 {
     Remove-ConnectionStrings
-    Remove-Module Carbon
 }
 
 function Remove-ConnectionStrings

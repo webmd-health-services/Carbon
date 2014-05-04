@@ -13,14 +13,9 @@
 # limitations under the License.
 
 
-function SetUp()
+function Start-TestFixture
 {
-    Import-Module (Join-Path $TestDir ..\..\Carbon -Resolve)
-}
-
-function TearDown()
-{
-    Remove-Module Carbon
+    & (Join-Path -Path $PSScriptRoot '..\..\Carbon\Import-Carbon.ps1' -Resolve)
 }
 
 function Test-NewTempDir

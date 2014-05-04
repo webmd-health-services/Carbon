@@ -17,10 +17,13 @@ $xmlFilePath = $null
 $xdtFilePath = $null
 $resultFilePath = $null
 
-function Setup()
+function Start-TestFixture
 {
-    & (Join-Path $TestDir ..\..\Carbon\Import-Carbon.ps1 -Resolve)
-	
+    & (Join-Path -Path $PSScriptRoot -ChildPath '..\..\Carbon\Import-Carbon.ps1' -Resolve)
+}
+
+function Start-Test
+{
     $tempDir = New-TempDirectory -Prefix 'Carbon-Test-ConvertXmlFile'
 	# create a valid base file
 	# create test files
@@ -30,14 +33,12 @@ function Setup()
     $resultFilePath = Join-Path $tempDir 'out.xml'
 }
 
-function TearDown()
+function Stop-Test
 {
     if( (Test-Path -Path $tempDir -PathType Container ) )
     {
         Remove-Item $tempDir -Recurse
     }
-        
-	Remove-Module Carbon
 }
 
 function Set-XmlFile

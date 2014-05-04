@@ -15,17 +15,15 @@
 $originalText = $null
 $protectedText = $null
 
-function Setup
+function Start-TestFixture
 {
-    & (Join-Path $TestDir ..\..\Carbon\Import-Carbon.ps1 -Resolve)
-
-    $originalText = [Guid]::NewGuid().ToString()
-    $protectedText = Protect-String -String $originalText -ForUser
+    & (Join-Path -Path $PSScriptRoot '..\..\Carbon\Import-Carbon.ps1' -Resolve)
 }
 
-function TearDown
+function Start-Test
 {
-    Remove-Module Carbon
+    $originalText = [Guid]::NewGuid().ToString()
+    $protectedText = Protect-String -String $originalText -ForUser
 }
 
 function Test-ShouldUnprotectString

@@ -16,9 +16,13 @@ $siteName = 'Windows Authentication'
 $sitePort = 4387
 $webConfigPath = Join-Path $TestDir web.config
 
-function Setup
+function Start-TestFixture
 {
-    & (Join-Path $TestDir ..\..\Carbon\Import-Carbon.ps1 -Resolve)
+    & (Join-Path -Path $PSScriptRoot '..\..\Carbon\Import-Carbon.ps1' -Resolve)
+}
+
+function Start-Test
+{
     Uninstall-IisWebsite $siteName
     Install-IisWebsite -Name $siteName -Path $TestDir -Bindings "http://*:$sitePort"
     if( Test-Path $webConfigPath -PathType Leaf )
@@ -27,10 +31,9 @@ function Setup
     }
 }
 
-function TearDown
+function Stop-Test
 {
     Uninstall-IisWebsite $siteName
-    Remove-Module Carbon
 }
 
 function Test-ShouldEnableWindowsAuthentication

@@ -13,14 +13,9 @@
 # limitations under the License.
 
 
-function Setup
+function Start-TestFixture
 {
-    Import-Module (Join-Path $TestDir ..\..\Carbon -Resolve) -Force
-}
-
-function TearDown
-{
-    Remove-Module Carbon
+    & (Join-Path -Path $PSScriptRoot -ChildPath '..\..\Carbon\Import-Carbon.ps1' -Resolve)
 }
 
 function Test-ShouldCreateCredential
