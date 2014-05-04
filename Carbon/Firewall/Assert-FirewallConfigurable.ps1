@@ -32,6 +32,9 @@ function Assert-FirewallConfigurable
     [CmdletBinding()]
     param(
     )
+
+    Set-StrictMode -Version 'Latest'
+
     if( (Get-Service 'Windows Firewall').Status -ne 'Running' ) 
     {
         Write-Error "Unable to configure firewall: Windows Firewall service isn't running."

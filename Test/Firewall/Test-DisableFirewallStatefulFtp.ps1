@@ -14,10 +14,13 @@
 
 $alreadyEnabled = $false
 
-function Setup
+function Start-TestFixture
 {
-    Import-Module (Join-Path $TestDir ..\..\Carbon -Resolve) -Force
-    
+    & (Join-Path -Path $PSScriptRoot -ChildPath '..\..\Carbon\Import-Carbon.ps1' -Resolve)
+}
+
+function Start-Test
+{
     $alreadyEnabled = Test-FirewallStatefulFtp
     
     if( -not $alreadyEnabled )
@@ -26,7 +29,7 @@ function Setup
     }
 }
 
-function TearDown
+function Stop-Test
 {
     if( $alreadyEnabled )
     {
@@ -40,7 +43,7 @@ function TearDown
 
 function Test-ShouldDisableStatefulFtp
 {
-    Disable-FirewallStatefulFtp
+    Disable-FirewallStatefulFtp -Verbose
     $enabled = Test-FirewallStatefulFtp
     Assert-False $enabled 'StatefulFtp not enabled on firewall.'
 }
