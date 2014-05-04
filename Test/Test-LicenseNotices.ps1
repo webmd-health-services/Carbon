@@ -12,14 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Setup
-{
-}
-
-function TearDown
-{
-}
-
 function Test-AllFilesShouldHaveLicense
 {
     $projectRoot = Join-Path $TestDir .. -Resolve

@@ -15,18 +15,21 @@
 $junctionName = $null
 $junctionPath = $null
 
-function Setup
+function Start-TestFixture
 {
-    Import-Module (Join-path $TestDir ..\..\Carbon -Resolve)
+    & (Join-Path -Path $PSScriptRoot '..\..\Carbon\Import-Carbon.ps1' -Resolve)
+}
+
+function Start-Test
+{
     $junctionName = [IO.Path]::GetRandomFilename()    
     $junctionPath = Join-Path $env:Temp $junctionName
     New-Junction -Link $junctionPath -Target $TestDir
 }
 
-function TearDown
+function Stop-Test
 {
     Remove-Junction -Path $junctionPath
-    Remove-Module Carbon
 }
 
 function Test-ShouldAddIsJunctionProperty

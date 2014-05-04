@@ -15,16 +15,19 @@
 $username = 'CarbonInstallUser'
 $password = [Guid]::NewGuid().ToString().Substring(0,15)
 
+function Start-TestFixture
+{
+    & (Join-Path -Path $PSScriptRoot -ChildPath '..\..\Carbon\Import-Carbon.ps1' -Resolve)
+}
+
 function Start-Test
 {
-    Import-Module (Join-Path $TestDir ..\..\Carbon) -Force
     Remove-TestUser
 }
 
 function Stop-Test
 {
     Remove-TestUser
-    Remove-Module Carbon
 }
 
 function Remove-TestUser

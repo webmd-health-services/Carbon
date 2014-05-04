@@ -12,20 +12,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-& (Join-Path $TestDir ..\..\Carbon\Import-Carbon.ps1 -Resolve)
-
 # Only administratos can update trusted hosts.
 if( Test-AdminPrivilege )
 {
     $originalTrustedHosts = $null
 
-    function Setup
+    function Start-TestFixture
+    {
+        & (Join-Path -Path $PSScriptRoot -ChildPath '..\..\Carbon\Import-Carbon.ps1' -Resolve)
+    }
+
+    function Start-Test
     {
         $originalTrustedHosts = @( Get-TrustedHost )
         Clear-TrustedHost
     }
 
-    function TearDown
+    function Stop-Test
     {
         if( $originalTrustedHosts )
         {

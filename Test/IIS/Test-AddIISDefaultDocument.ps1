@@ -16,9 +16,13 @@ $siteName = 'DefaultDocument'
 $sitePort = 4387
 $webConfigPath = Join-Path $TestDir web.config
 
-function Setup
+function Start-TestFixture
 {
-    Import-Module (Join-Path $TestDir ..\..\Carbon -Resolve) -Force
+    & (Join-Path -Path $PSScriptRoot -ChildPath '..\..\Carbon\Import-Carbon.ps1' -Resolve)
+}
+
+function Start-Test
+{
     Uninstall-IisWebsite $siteName
     Install-IisWebsite -Name $siteName -Path $TestDir -Bindings "http://*:$sitePort"
     if( Test-Path $webConfigPath -PathType Leaf )
@@ -27,10 +31,9 @@ function Setup
     }
 }
 
-function TearDown
+function Stop-Test
 {
     Uninstall-IisWebsite $siteName
-    Remove-Module Carbon
 }
 
 function Test-ShouldAddDefaultDocument

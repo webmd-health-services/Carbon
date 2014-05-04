@@ -12,13 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-& (Join-Path -Path $TestDir -ChildPath ..\..\Carbon\Import-Carbon.ps1 -Resolve)
-
 $Port = 9878
 $SiteName = 'TestApplication'
 $AppName = 'App'
 $WebConfig = Join-Path $TestDir web.config
 $AppPoolName = 'TestApplication'
+
+function Start-TestFixture
+{
+    & (Join-Path -Path $PSScriptRoot '..\..\Carbon\Import-Carbon.ps1' -Resolve)
+}
 
 function Start-Test
 {

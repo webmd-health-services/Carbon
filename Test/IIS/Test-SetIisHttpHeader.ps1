@@ -15,16 +15,19 @@
 $siteName = 'CarbonSetIisHttpHeader'
 $sitePort = 47938
 
-function Setup()
+function Start-TestFixture
 {
-    & (Join-Path $TestDir ..\..\Carbon\Import-Carbon.ps1 -Resolve)
+    & (Join-Path -Path $PSScriptRoot '..\..\Carbon\Import-Carbon.ps1' -Resolve)
+}
+
+function Start-Test
+{
     Install-IisWebsite -Name $siteName -Path $TestDir -Binding ('http/*:{0}:*' -f $sitePort)
 }
 
-function Remove()
+function Stop-Test
 {
     Remove-IisWebsite -Name $siteName
-    Remove-Module Carbon
 }
 
 function Test-ShouldCreateNewHeader()

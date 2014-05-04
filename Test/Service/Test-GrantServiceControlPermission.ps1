@@ -20,20 +20,23 @@ $user = 'CrbnGrantCntrlSvcUsr'
 $password = [Guid]::NewGuid().ToString().Substring(0,14)
 $userPermStartPattern = "/pace =$($env:ComputerName)\$user*"
     
-function Setup
+function Start-TestFixture
 {
-    Import-Module (Join-Path $TestDir ..\..\Carbon) -Force
+    & (Join-Path -Path $PSScriptRoot -ChildPath '..\..\Carbon\Import-Carbon.ps1' -Resolve)
+}
+
+function Start-Test
+{
     Install-User -username $user -Password $password
     
     $serviceName = $serviceBaseName + ([Guid]::NewGuid().ToString())
     Install-Service -Name $serviceName -Path $servicePath -Username $user -Password $password
 }
 
-function TearDown
+function Stop-Test
 {
     Uninstall-Service -Name $serviceName
     Uninstall-User -Username $user
-    Remove-Module Carbon
 }
 
 function Test-ShouldGrantControlServicePermission

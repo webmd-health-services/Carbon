@@ -16,21 +16,24 @@ $serviceBaseName = 'CarbonGrantControlServiceTest'
 $serviceName = $serviceBaseName
 $servicePath = Join-Path $TestDir NoOpService.exe
 
-function Setup
+function Start-TestFixture
 {
-    Import-Module (Join-Path $TestDir ..\..\Carbon) -Force
+    & (Join-Path -Path $PSScriptRoot -ChildPath '..\..\Carbon\Import-Carbon.ps1' -Resolve)
+}
+
+function Start-Test
+{
     $serviceName = $serviceBaseName + ([Guid]::NewGuid().ToString())
     Install-Service -Name $serviceName -Path $servicePath
 }
 
-function TearDown
+function Stop-Test
 {
     if( (Get-Service $serviceName -ErrorAction SilentlyContinue) )
     {
         Stop-Service $serviceName
         & C:\Windows\system32\sc.exe delete $serviceName
     }
-    Remove-Module Carbon
 }
 
 function Test-ShouldRemoveService

@@ -16,10 +16,13 @@ $windowsAuthWasLocked = $false
 $windowsAuthConfigPath = 'system.webServer/security/authentication/windowsAuthentication'
 $cgiConfigPath = 'system.webServer/cgi'
 
-function Setup
+function Start-TestFixture
 {
-    & (Join-Path $TestDir ..\..\Carbon\Import-Carbon.ps1 -Resolve)
+    & (Join-Path -Path $PSScriptRoot '..\..\Carbon\Import-Carbon.ps1' -Resolve)
+}
 
+function Start-Test
+{
     $windowsAuthWasLocked = Test-IisConfigurationSection -SectionPath $windowsAuthConfigPath -Locked
     Unlock-IisConfigurationSection -SectionPath $windowsAuthConfigPath
     Assert-False (Test-IisConfigurationSection -SectionPath $windowsAuthConfigPath -Locked)
@@ -29,7 +32,7 @@ function Setup
     Assert-False (Test-IisConfigurationSection -SectionPath $cgiConfigPath -Locked)
 }
 
-function TearDown
+function Stop-Test
 {
     # Put things back the way we found them.
     if( $windowsAuthWasLocked )
@@ -55,8 +58,6 @@ function TearDown
     {
         Remove-Item $webConfigPath
     }
-
-    Remove-Module Carbon
 }
 
 function Test-ShouldLockOneConfigurationSection

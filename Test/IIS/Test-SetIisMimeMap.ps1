@@ -14,16 +14,19 @@
 
 $siteName = 'CarbonSetIisMimeMap'
 
-function Setup
+function Start-TestFixture
 {
-    & (Join-Path $TestDir ..\..\Carbon\Import-Carbon.ps1 -Resolve)
+    & (Join-Path -Path $PSScriptRoot '..\..\Carbon\Import-Carbon.ps1' -Resolve)
+}
+
+function Start-Test
+{
     Install-IisWebsite -Name $siteName -Binding 'http/*:48284:*' -Path $TestDir
 }
 
-function TearDown
+function Stop-Test
 {
     Remove-IisWebsite -Name $siteName
-    Remove-Module Carbon
 }
 
 function Test-ShouldCreateNewMimeMapForServer

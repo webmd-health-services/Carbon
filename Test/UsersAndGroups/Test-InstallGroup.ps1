@@ -12,16 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-Import-Module (Join-Path $TestDir ..\..\Carbon) -Force
-
 $GroupName = 'Setup Group'
 
-function Setup
+function Start-TestFixture
+{
+    & (Join-Path -Path $PSScriptRoot -ChildPath '..\..\Carbon\Import-Carbon.ps1' -Resolve)
+}
+
+function Start-Test
 {
     Remove-Group
 }
 
-function TearDown
+function Stop-Test
 {
     Remove-Group
 }

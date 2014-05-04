@@ -14,14 +14,14 @@
 
 $ps3Installed = $false
 
-function Setup
+function Start-TestFixture
 {
-    & (Join-Path -Path $TestDir -ChildPath ..\..\Carbon\Import-Carbon.ps1 -Resolve)
-    $ps3Installed = Test-Path -Path HKLM:\SOFTWARE\Microsoft\PowerShell\3
+    & (Join-Path -Path $PSScriptRoot -ChildPath '..\..\Carbon\Import-Carbon.ps1' -Resolve)
 }
 
-function TearDown
+function Start-Test
 {
+    $ps3Installed = Test-Path -Path HKLM:\SOFTWARE\Microsoft\PowerShell\3
 }
 
 function Test-ShouldInvokePowerShell

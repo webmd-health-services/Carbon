@@ -14,9 +14,13 @@
 
 $SiteName = 'TestNewWebsite'
 
+function Start-TestFixture
+{
+    & (Join-Path -Path $PSScriptRoot '..\..\Carbon\Import-Carbon.ps1' -Resolve)
+}
+
 function Start-Test
 {
-    & (Join-Path -Path $TestDir -ChildPath ..\..\Carbon\Import-Carbon.ps1 -Resolve)
     Remove-TestSite
     Grant-Permission -Identity Everyone -Permission ReadAndExecute -Path $TestDir
 }

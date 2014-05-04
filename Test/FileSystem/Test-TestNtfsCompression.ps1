@@ -23,7 +23,7 @@ function Start-TestFixture
     & (Join-Path -Path $PSScriptRoot -ChildPath '..\..\Carbon\Import-Carbon.ps1' -Resolve)
 }
 
-function Setup
+function Start-Test
 {
     $tempDir = New-TempDirectoryTree @'
 + CompressedDir
@@ -40,7 +40,7 @@ function Setup
     Enable-NtfsCompression -Path $compressedFilePath
 }
 
-function TearDown
+function Stop-Test
 {
     if( (Test-Path -Path $tempDir -PathType Container) )
     {

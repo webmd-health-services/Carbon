@@ -14,17 +14,19 @@
 
 $GroupName = 'AddMemberToGroup'
 
-function Setup
+function Start-TestFixture
 {
-    Import-Module (Join-Path $TestDir ..\..\Carbon) -Force
+    & (Join-Path -Path $PSScriptRoot -ChildPath '..\..\Carbon\Import-Carbon.ps1' -Resolve)
+}
 
+function Start-Test
+{
     Install-Group -Name $GroupName -Description "Group for testing the Add-MemberToGroup Carbon function."
 }
 
-function TearDown
+function Stop-Test
 {
     Remove-Group
-    Remove-Module Carbon
 }
 
 function Remove-Group

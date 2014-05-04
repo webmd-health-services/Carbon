@@ -14,12 +14,12 @@
 
 $CategoryName = 'Carbon-PerformanceCounters'
 
-function Setup
+function Start-TestFixture
 {
-    Import-Module (Join-Path $TestDir ..\..\Carbon -Resolve) -Force
+    & (Join-Path -Path $PSScriptRoot -ChildPath '..\..\Carbon\Import-Carbon.ps1' -Resolve)
 }
 
-function TearDown
+function Stop-Test
 {
     Uninstall-PerformanceCounterCategory -CategoryName $CategoryName
     Assert-False (Test-PerformanceCounterCategory -CategoryName $CategoryName) 'Performance counter category not uninstalled.'

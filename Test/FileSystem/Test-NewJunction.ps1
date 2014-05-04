@@ -12,16 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-Import-Module (Join-Path $TestDir ..\..\Carbon -Resolve) -Force
-
 $JunctionPath = $null
 
-function SetUp
+function Start-TestFixture
+{
+    & (Join-Path -Path $PSScriptRoot '..\..\Carbon\Import-Carbon.ps1' -Resolve)
+}
+
+function Start-Test
 {
     $Script:JunctionPath = Join-Path $env:Temp ([IO.Path]::GetRandomFileName())
 }
 
-function TearDown
+function Stop-Test
 {
     fsutil reparsepoint delete $Script:JunctionPath
 }

@@ -15,15 +15,19 @@
 $appPoolName = 'Carbon-Set-IisWebsiteID'
 $siteName = 'Carbon-Set-IisWebsiteID'
 
-function Setup
+function Start-TestFixture
 {
-    & (Join-Path $TestDir ..\..\Carbon\Import-Carbon.ps1 -Resolve)
+    & (Join-Path -Path $PSScriptRoot '..\..\Carbon\Import-Carbon.ps1' -Resolve)
+}
+
+function Start-Test
+{
     Install-IisAppPool -Name $appPoolName
     Install-IisWebsite -Name $siteName -Binding 'http/*:80:carbon-test-set-iiswebsiteid.com' -Path $TestDir -AppPoolName $appPoolName
 
 }
 
-function TearDown
+function Stop-Test
 {
     Remove-IisWebsite $siteName
 }

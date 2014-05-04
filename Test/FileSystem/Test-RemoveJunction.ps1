@@ -14,20 +14,23 @@
 
 $JunctionPath = $null
 
-function SetUp
+function Start-TestFixture
 {
-    Import-Module (Join-Path $TestDir ..\..\Carbon -Resolve) -Force
+    & (Join-Path -Path $PSScriptRoot '..\..\Carbon\Import-Carbon.ps1' -Resolve)
+}
+
+function Start-Test
+{
     $JunctionPath = Join-Path $env:Temp ([IO.Path]::GetRandomFileName())
     New-Junction $JunctionPath $TestDir
 }
 
-function TearDown
+function Stop-Test
 {
     if( Test-Path $JunctionPath -PathType Container )
     {
         cmd /c rmdir $JunctionPath
     }
-    Remove-Module Carbon
 }
 
 function Invoke-RemoveJunction($junction)

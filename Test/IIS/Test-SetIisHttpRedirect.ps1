@@ -16,9 +16,13 @@ $Port = 9877
 $WebConfig = Join-Path $TestDir web.config
 $SiteName = 'CarbonSetIisHttpRedirect'
 
-function Setup
+function Start-TestFixture
 {
-    Import-Module (Join-Path $TestDir ..\..\Carbon -Resolve) -Force
+    & (Join-Path -Path $PSScriptRoot '..\..\Carbon\Import-Carbon.ps1' -Resolve)
+}
+
+function Start-Test
+{
     Install-IisWebsite -Name $SiteName -Path $TestDir -Bindings "http://*:$Port"
     if( Test-Path $WebConfig )
     {
@@ -26,7 +30,7 @@ function Setup
     }
 }
 
-function TearDown
+function Stop-Test
 {
     Uninstall-IisWebsite -Name $SiteName
 }

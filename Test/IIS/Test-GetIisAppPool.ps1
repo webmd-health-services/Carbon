@@ -14,19 +14,22 @@
 
 $appPoolName = 'CarbonGetIisAppPool'
 
-function Setup()
+function Start-TestFixture
 {
-    & (Join-Path $TestDir ..\..\Carbon\Import-Carbon.ps1 -Resolve)
+    & (Join-Path -Path $PSScriptRoot '..\..\Carbon\Import-Carbon.ps1' -Resolve)
+}
+
+function Start-Test
+{
     Install-IisAppPool -Name $appPoolName
 }
 
-function TearDown()
+function Stop-Test
 {
     if( (Test-IisAppPool -Name $appPoolName) )
     {
         Uninstall-AppPool -Name $appPool
     }
-    Remove-Module Carbon
 }
 
 function Test-ShouldAddServerManagerMembers

@@ -17,10 +17,14 @@ $serviceName = ''
 $serviceAcct = 'CrbnInstllSvcTstAcct'
 $servicePassword = [Guid]::NewGuid().ToString().Substring(0,14)
 
+function Start-TestFixture
+{
+    & (Join-Path -Path $PSScriptRoot -ChildPath '..\..\Carbon\Import-Carbon.ps1' -Resolve)
+}
+
 function Start-Test
 {
     $serviceName = 'CarbonTestService' + ([Guid]::NewGuid().ToString())
-    & (Join-Path -Path $TestDir -ChildPath '..\..\Carbon\Import-Carbon.ps1' -Resolve)
     Install-User -Username $serviceAcct -Password $servicePassword -Description "Account for testing the Carbon Install-Service function."
 }
 
@@ -28,7 +32,6 @@ function Stop-Test
 {
     Uninstall-Service $serviceName
     Uninstall-User $serviceAcct
-    Remove-Module Carbon
 }
 
 function Test-ShouldInstallService

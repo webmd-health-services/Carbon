@@ -19,18 +19,21 @@ $ipAddress = '43.27.98.0'
 $port = '443'
 $allPort = '8013'
 
-function Setup
+function Start-TestFixture
 {
-    & (Join-Path $TestDir ..\..\Carbon\Import-Carbon.ps1 -Resolve)
+    & (Join-Path -Path $PSScriptRoot '..\..\Carbon\Import-Carbon.ps1' -Resolve)
+}
+
+function Start-Test
+{
     Install-IisWebsite -Name $siteName -Path $TestDir -Bindings @( "https/$ipAddress`:$port`:", "https/*:$allPort`:" )
     $cert = Install-Certificate -Path (Join-Path $TestDir ..\Certificates\CarbonTestCertificate.cer -Resolve) -StoreLocation LocalMachine -StoreName My
 }
 
-function TearDown
+function Stop-Test
 {
     Uninstall-Certificate -Certificate $cert -StoreLocation LocalMachine -StoreName My
     Uninstall-IisWebsite -Name $siteName
-    Remove-Module Carbon
 }
 
 function Test-ShouldSetWebsiteSslCertificate

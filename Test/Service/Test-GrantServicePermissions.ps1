@@ -12,10 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Setup
+function Start-TestFixture
 {
-    & (Join-Path $TestDir ..\..\Carbon\Import-Carbon.ps1 -Resolve)
-    
+    & (Join-Path -Path $PSScriptRoot -ChildPath '..\..\Carbon\Import-Carbon.ps1' -Resolve)
+}
+
+function Start-Test
+{
     $username = 'CarbonGrantSrvcPerms' 
     $password = 'a1b2c3d4#'
     Install-User -Username $username -Password $password -Description 'Account for testing Carbon Grant-ServicePermission functions.'
@@ -27,11 +30,6 @@ function Setup
     Revoke-ServicePermission -Name $serviceName -Identity $username
     $perms = Get-ServicePermission -Name $serviceName -Identity $username
     Assert-Null $perms
-}
-
-function TearDown
-{
-    Remove-Module Carbon
 }
 
 function Test-ShouldGrantFullControl

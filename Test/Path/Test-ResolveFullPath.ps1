@@ -13,14 +13,9 @@
 # limitations under the License.
 
 
-function SetUp()
+function Start-TestFixture
 {
-    & (Join-Path $TestDir ..\..\Carbon\Import-Carbon.ps1 -Resolve)
-}
-
-function TearDown()
-{
-    Remove-Module Carbon
+    & (Join-Path -Path $PSScriptRoot -ChildPath '..\..\Carbon\Import-Carbon.ps1' -Resolve)
 }
 
 function Test-GetFullPath

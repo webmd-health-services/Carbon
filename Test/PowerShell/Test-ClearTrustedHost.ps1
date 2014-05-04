@@ -19,12 +19,12 @@ if( Test-AdminPrivilege )
 {
     $originalTrustedHosts = $null
 
-    function Setup
+    function Start-Test
     {
         $originalTrustedHosts = @( Get-TrustedHost )
     }
 
-    function TearDown
+    function Stop-Test
     {
         if( $originalTrustedHosts )
         {

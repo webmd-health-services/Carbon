@@ -14,15 +14,7 @@
 
 function Start-TestFixture
 {
-    & (Join-Path -Path $PSScriptRoot -ChildPath '..\..\Carbon\Import-Carbon.ps1' -Resolve)
-}
-
-function Start-Test
-{
-}
-
-function Stop-Test
-{
+    & (Join-Path -Path $PSScriptRoot '..\..\Carbon\Import-Carbon.ps1' -Resolve)
 }
 
 function Test-ShouldGetCallStores

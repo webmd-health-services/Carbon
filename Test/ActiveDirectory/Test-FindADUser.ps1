@@ -13,17 +13,17 @@
 # limitations under the License.
 
 $domainUrl = ''
+
+function Start-TestFixture
+{
+    & (Join-Path -Path $PSScriptRoot -ChildPath '..\..\Carbon\Import-Carbon.ps1' -Resolve)
+}
+
 function Setup
 {
-    Import-Module (Join-Path $TestDir ..\..\Carbon -Resolve) -Force
     $domainController = Get-ADDomainController -Domain $env:USERDOMAIN
     Assert-NotNull $domainController
     $domainUrl = "LDAP://{0}:389" -f $domainController
-}
-
-function TearDown
-{
-    Remove-Module Carbon
 }
 
 function Test-ShouldFindUser

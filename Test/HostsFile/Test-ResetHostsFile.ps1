@@ -14,10 +14,13 @@
 
 $customHostsFile = ''
 
-function Setup
+function Start-TestFixture
 {
-    Import-Module (Join-Path $TestDir ..\..\Carbon -Resolve) -Force
-    
+    & (Join-Path -Path $PSScriptRoot '..\..\Carbon\Import-Carbon.ps1' -Resolve)
+}
+
+function Start-Test
+{
     $customHostsFile = Join-Path $env:temp ([IO.Path]::GetRandomFileName())
     @"
 # Copyright (c) 1993-1999 Microsoft Corp.
@@ -42,10 +45,9 @@ function Setup
 "@ | Out-File -FilePath $customHostsfile -Encoding OEM    
 }
 
-function TearDown
+function Stop-Test
 {
     Remove-Item $customHostsFile
-    Remove-Module Carbon
 }
 
 function Test-ShouldOperateOnHostsFileByDefault

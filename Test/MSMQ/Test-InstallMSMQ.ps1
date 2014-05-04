@@ -18,19 +18,18 @@ if( -not (Get-Service -Name MSMQ -ErrorAction SilentlyContinue) -and (Get-WmiObj
     $msmqPath = Join-Path $env:SystemRoot 'system32\mqsvc.exe'
     $msmqServiceName = "MSMQ"
 
-    function Setup
+    function Start-TestFixture
     {
-        Import-Module (Join-Path $TestDir ..\..\Carbon) -Force
+        & (Join-Path -Path $PSScriptRoot -ChildPath '..\..\Carbon\Import-Carbon.ps1' -Resolve)
     }
 
-    function TearDown
+    function Stop-Test
     {
         if( (Get-MSMQService) )
         {
             Stop-Service $msmqServiceName -Force
             Uninstall-WindowsFeature -Name MSMQ-ADIntegration,MSMQ-HTTP,MSMQ-Server,MSMQ-Container
         }
-        Remove-Module Carbon
     }
 
     function Test-ShouldInstallMSMQ
