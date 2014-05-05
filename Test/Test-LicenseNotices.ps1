@@ -49,8 +49,9 @@ function Test-AllFilesShouldHaveLicense
         Get-ChildItem -Recurse -File -Exclude $filesToSkip |
         Where-Object { $_.FullName -notlike '*\obj\*' } |
         ForEach-Object {
-            $file = Get-Content $_.FullName -Raw
-            $ok = switch -Regex ( $_.Extension )
+            $fileInfo = $_
+            $file = Get-Content $fileInfo.FullName -Raw
+            $ok = switch -Regex ( $fileInfo.Extension )
             {
                 '^\.ps(m|d)*1$'
                 {
@@ -96,14 +97,14 @@ function Test-AllFilesShouldHaveLicense
                 }
                 default
                 {
-                    Write-Verbose -Verbose $_.FullName
+                    Write-Verbose -Verbose $fileInfo.FullName
                     $false
                     break
                 }
             }
             if( -not $ok )
             {
-                $_.FullName
+                $fileInfo.FullName
             }
         }
     
