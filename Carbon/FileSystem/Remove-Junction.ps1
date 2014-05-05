@@ -47,7 +47,7 @@ function Remove-Junction
     if( Test-PathIsJunction $Path  )
     {
         $Path = Resolve-Path -Path $Path | Select-Object -ExpandProperty ProviderPath
-        if( $pscmdlet.ShouldProcess($Path, "remove junction") )
+        if( $PSCmdlet.ShouldProcess($Path, "remove junction") )
         {
             [Carbon.IO.JunctionPoint]::Delete( $Path )
         }
