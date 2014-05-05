@@ -56,7 +56,7 @@ function New-Junction
     }
     else
     {
-        Write-Verbose "Creating junction $Link <=> $Target"
+        Write-Verbose -Message "Creating junction $Link <=> $Target"
         [Carbon.IO.JunctionPoint]::Create( $Link, $Target, $false )
         if( Test-Path $Link -PathType Container ) 
         { 

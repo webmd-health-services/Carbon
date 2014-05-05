@@ -101,6 +101,7 @@ This is a backwards-incompatible release.
 
  * [Disable-NtfsCompression](http://get-carbon.org/help/Disable-NtfsCompression.html) no longer writes messages with `Write-Host`. Improved error handling.
  * [Enable-NtfsCompression](http://get-carbon.org/help/Enable-NtfsCompression.html) no longer writes messages with `Write-Host`. Improved error handling.
+ * [New-Junction](http://get-carbon.org/help/New-Junction.html) no longer writes message with `Write-Host`.
 
 ### Firewall
 
