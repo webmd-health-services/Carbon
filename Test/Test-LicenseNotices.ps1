@@ -17,62 +17,98 @@ function Test-AllFilesShouldHaveLicense
     $projectRoot = Join-Path $TestDir .. -Resolve
     $licenseFilePath = Join-Path $projectRoot LICENSE.txt -Resolve
     
-    $noticeLines = New-Object Collections.Generic.List[string]
-    $foundNotice = $false
+    $noticeLines = Invoke-Command {
+                            'Copyright 2012 Aaron Jensen'
+                            Get-Content -Path $licenseFilePath -Tail 12
+                        } |
+                        ForEach-Object { $_ -replace '^   ','' } |
+                        Select-Object -First 13
+    $noticeLines | Write-Verbose
     
-    Get-Content $licenseFilePath | ForEach-Object {
-        if( $_ -eq '   Copyright [yyyy] [name of copyright owner]' )
-        {
-            $_ = $_ -replace '\[yyyy\]','2012'
-            $_ = $_ -replace '\[name of copyright owner\]','Aaron Jensen'
-            $foundNotice = $true
-        }
-        
-        if( -not $foundNotice )
-        {
-            return
-        }
-        
-        $trimmedLine = $_
-        if( $_.Length -gt 3 )
-        {
-            $trimmedLine = $_.Substring( 3 )
-        }
-        $noticeLines.Add( '# ' + $trimmedLine )
-    }
-    
-    $expectedNotice = $noticeLines -join "`n"
     $filesToSkip = @(
-        '*\Install-Website.ps1',
-        '*\Carbon\Import-Carbon.ps1',
-        '*\Set-LicenseNotice.ps1',
-        '*\Publish-Carbon.ps1',
-        '*\Carbon\about_Carbon.help.txt',
-        '*\Carbon\Carbon.types.ps1xml',
-        '*\Carbon\Carbon.format.ps1xml',
-		'*\examples\Initialize-BuildServer.ps1',
-		'*\examples\Initialize-WebServer.ps1',
-        '*\bin\Set-DotNetAppSetting.ps1',
-        '*\bin\Set-DotNetConnectionString.ps1',
-        '*\Tools\Blade\*',
-        '*\Update-SilkConfig.ps1'
-    )
-    
-    $filesMissingLicense = New-Object Collections.Generic.List[string]
-    
-    Get-ChildItem $projectRoot *.ps*1 -Recurse | 
-        Where-Object { -not $_.PsIsContainer -and $_.FullName -notmatch '\\(.hg|Tools\\Pest)\\'  } |
-        Where-Object { 
-            $fullName = $_.FullName
-            return (-not ( $filesToSkip | Where-Object { $fullName -like $_ } ) )
-        } | ForEach-Object {
-            $projectFile = (Get-Content $_.FullName) -join "`n"
-            if( -not $projectFile.StartsWith( $expectedNotice ) )
+                        '*.dll',
+                        '*.dll-*',
+                        '*.pdb',
+                        '.hg*',
+                        '*.user',
+                        '*.zip',
+                        '*.exe',
+                        '*.msi',
+                        '*.orig',
+                        '*.snk',
+                        '*.json',
+                        'nunit.framework.xml',
+                        '*.cer',
+                        '*.md',
+                        'license.txt',
+                        '*.help.txt',
+                        'RELEASE NOTES.txt',
+                        '*.sln'
+                    )
+    [object[]]$filesMissingLicense = Get-ChildItem -Path $projectRoot -Exclude 'Tools','Website','.hg' |
+        Get-ChildItem -Recurse -File -Exclude $filesToSkip |
+        Where-Object { $_.FullName -notlike '*\obj\*' } |
+        ForEach-Object {
+            $file = Get-Content $_.FullName -Raw
+            $ok = switch -Regex ( $_.Extension )
             {
-                
-                $filesMissingLicense.Add( $_.FullName.Remove( 0, $projectRoot.Length + 1 ) )
+                '^\.ps(m|d)*1$'
+                {
+                    $expectedNotice = $noticeLines -join ('{0}# ' -f ([Environment]::NewLine))
+                    $expectedNotice = '# {0}' -f $expectedNotice
+                    if( $file.StartsWith('<#') )
+                    {
+                        $file.Contains( $expectedNotice )
+                    }
+                    else
+                    {
+                        $file.StartsWith( $expectedNotice )
+                    }
+                    break
+                }
+                '^\.cs$'
+                {
+                    $expectedNotice = $noticeLines -join ('{0}// ' -f ([Environment]::NewLine))
+                    $expectedNotice = '// {0}' -f $noticeLines
+                    $file.StartsWith( $expectedNotice )
+                    break
+                }
+                '^\.(ps1xml|csproj)$'
+                {
+                    $expectedNotice = $noticeLines -join ('{0}   ' -f ([Environment]::NewLine))
+                    $expectedNotice = '<?xml version="1.0" encoding="utf-8"?>{0}<!--{0}   {1}{0}-->{0}' -f ([Environment]::NewLine),$expectedNotice
+                    $file.StartsWith( $expectedNotice )
+                    break
+                }
+                '^\.nuspec$'
+                {
+                    $expectedNotice = $noticeLines -join ('{0}   ' -f ([Environment]::NewLine))
+                    $expectedNotice = '<?xml version="1.0"?>{0}<!--{0}   {1}{0}-->{0}' -f ([Environment]::NewLine),$expectedNotice
+                    $file.StartsWith( $expectedNotice )
+                    break
+                }
+                '^\.html$'
+                {
+                    $expectedNotice = $noticeLines -join ('{0}   ' -f ([Environment]::NewLine))
+                    $expectedNotice = '<!--{0}   {1}{0}-->{0}' -f ([Environment]::NewLine),$expectedNotice
+                    $file.StartsWith( $expectedNotice )
+                    break
+                }
+                default
+                {
+                    Write-Verbose -Verbose $_.FullName
+                    $false
+                    break
+                }
+            }
+            if( -not $ok )
+            {
+                $_.FullName
             }
         }
     
-    Assert-Equal 0 $filesMissingLicense.Count "The following files are missing license notices:`n$($filesMissingLicense -join "`n")"
+    if( $filesMissingLicense )
+    {
+        Assert-Equal 0 $filesMissingLicense.Count "The following files are missing license notices:`n$($filesMissingLicense -join "`n")"
+    }
 }
