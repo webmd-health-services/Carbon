@@ -22,6 +22,7 @@
 ### Firewall
 
  * [Disable-FirewallStatefulFtp](http://get-carbon.org/help/Disable-FirewallStatefulFtp.html) no longer writes messages with `Write-Host`. Improved error handling.
+ * [Enable-FirewallStatefulFtp](http://get-carbon.org/help/Enable-FirewallStatefulFtp.html) no longer writes message with `Write-Host`.
 
  
 # 1.7.0 (30 April 2014)

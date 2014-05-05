@@ -32,16 +32,22 @@ function Enable-FirewallStatefulFtp
     Enables the `StatefulFtp` Windows firewall setting.
     #>
     [CmdletBinding(SupportsShouldProcess=$true)]
-    param()
+    param(
+    )
     
-    if( -not (Assert-FirewallConfigurable) )
+    Set-StrictMode -Version 'Latest'
+
+    $commonParams = @{
+                        ErrorAction = $ErrorActionPreference;
+                        Verbose = $VerbosePreference;
+                    }
+    if( -not (Assert-FirewallConfigurable @commonParams) )
     {
         return
     }
     
-    if( $pscmdlet.ShouldProcess( 'firewall', 'enable stateful FTP' ) )
+    if( $PSCmdlet.ShouldProcess( 'firewall', 'enable stateful FTP' ) )
     {
-        Write-Host "Enabling stateful FTP in the firewall."
         netsh advfirewall set global StatefulFtp enable
     }
 }
