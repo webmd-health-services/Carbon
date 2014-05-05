@@ -45,8 +45,8 @@ function Remove-SslCertificateBinding
     Set-StrictMode -Version 'Latest'
 
     $commonParams = @{ 
-                        Verbose = $VerbosePreference;
                         ErrorAction = $ErrorActionPreference;
+                        Verbose = $VerbosePreference;
                         WhatIf = $WhatIfPreference;
                     }
     
@@ -64,8 +64,8 @@ function Remove-SslCertificateBinding
         $ipPort = '{0}:{1}' -f $IPAddress,$Port
     }
 
-    $action = "removing SSL certificate binding"
     Invoke-ConsoleCommand -Target $ipPort `
-                            -Action $action `
-                            -ScriptBlock { netsh http delete sslcert ipPort=$ipPort }
+                          -Action "removing SSL certificate binding" `
+                          @commonParams `
+                          -ScriptBlock { netsh http delete sslcert ipPort=$ipPort }
 }

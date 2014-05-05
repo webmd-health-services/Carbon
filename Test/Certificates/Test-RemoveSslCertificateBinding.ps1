@@ -26,14 +26,14 @@ function Start-TestFixture
     & (Join-Path -Path $PSScriptRoot -ChildPath '..\..\Carbon\Import-Carbon.ps1' -Resolve)
 }
 
-function Setup
+function Start-Test
 {
     $cert = Install-Certificate (Join-Path $TestDir CarbonTestCertificate.cer -Resolve) -StoreLocation LocalMachine -StoreName My
     netsh http add sslcert ipport=$ipPort "certhash=$($cert.Thumbprint)" "appid={$appID}"
     netsh http add sslcert ipport=$ipV6Port "certhash=$($cert.Thumbprint)" "appid={$ipV6AppID}"
 }
 
-function TearDown
+function Stop-Test
 {
     netsh http delete sslcert ipport=$ipPort
     netsh http delete sslcerrt ipport=$ipV6Port
