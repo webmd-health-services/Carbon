@@ -13,8 +13,10 @@ This is a backwards-incompatible release.
      * [Install-Junction](http://get-carbon.org/help/Install-Junction.html)
      * [Install-User](http://get-carbon.org/help/Install-User.html)
      * [Grant-ComPermissions](http://get-carbon.org/help/Grant-ComPermissions.html)
- * The following commands no longer return the stdout from various console applications. To see the output, use the `-Verbose` switch. Remove any usage of the output you were procesing.
+ * The following commands no longer return the stdout from various console applications. To see that output, use the `-Verbose` switch. Remove any usage of the output you were procesing.
+     * [Disable-FirewallStatefulFtp](http://get-carbon.org/help/Disable-FirewallStatefulFtp.html)
      * [Enable-FirewallStatefulFtp](http://get-carbon.org/help/Enable-FirewallStatefulFtp.html)
+     * [Remove-SslCertificateBinding](http://get-carbon.org/help/Remove-SslCertificateBinding.html)
  * [Set-SslCertificateBinding](http://get-carbon.org/help/Set-SslCertificateBinding.html) now returns `Carbon.Certificates.SslCertificateBinding` objects intead of netsh output. Update any code that uses `Set-SslCertificateBinding`'s output.
  * Ensure that all thumbprints passed to [Set-SslCertificateBinding](http://get-carbon.org/help/Set-SslCertificateBinding.html) are valid (40 character hex strings).
  * Add the new `-PasswordNeverExpires` switch to usages of [Install-User](http://get-carbon.org/help/Install-User.html): it no longer sets the `PasswordNeverExpires` flag for a user by default.
@@ -48,7 +50,7 @@ This is a backwards-incompatible release.
 
 ### Firewall
 
- * [Disable-FirewallStatefulFtp](http://get-carbon.org/help/Disable-FirewallStatefulFtp.html) now writes messages with `Write-Verbose` instead of `Write-Host`. Improved error handling.
+ * [Disable-FirewallStatefulFtp](http://get-carbon.org/help/Disable-FirewallStatefulFtp.html) no longer returns `netsh` output. Use the `-Verbose` switch to see the output.
  * [Enable-FirewallStatefulFtp](http://get-carbon.org/help/Enable-FirewallStatefulFtp.html) no longer returns `netsh` output. Use the `-Verbose` switch to see the output.
 
 ### Hosts File
