@@ -41,13 +41,13 @@ function Enable-FirewallStatefulFtp
                         ErrorAction = $ErrorActionPreference;
                         Verbose = $VerbosePreference;
                     }
+
     if( -not (Assert-FirewallConfigurable @commonParams) )
     {
         return
     }
     
-    if( $PSCmdlet.ShouldProcess( 'firewall', 'enable stateful FTP' ) )
-    {
+    Invoke-ConsoleCommand -Target 'firewall' -Action 'enable stateful FTP' @commonParams -WhatIf:$WhatIfPreference -ScriptBlock {
         netsh advfirewall set global StatefulFtp enable
     }
 }
