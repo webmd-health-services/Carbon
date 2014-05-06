@@ -27,6 +27,9 @@
 ### Hosts File
 
  * [Reset-HostsFile](http://get-carbon.org/help/Reset-HostsFile.html) now writes messages with `Write-Verbose` instead of `Write-Host`.
+
+### INI
+ * [Remove-IniEntry](http://get-carbon.org/help/Remove-IniEntry.html) now writes messages with `Write-Verbose` instead of `Write-Host`.
  
  
 # 1.7.0 (30 April 2014)
