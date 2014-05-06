@@ -283,7 +283,7 @@ function Assert-IniFile
     }
     Assert-FileExists $iniPath
     $actualContents = @( Get-Content $iniPath )
-    Assert-Equal $expectedLines.Length $actualContents.Length "Number of lines in file not equal."
+    Assert-Equal $expectedLines.Length $actualContents.Length ("Number of lines in file not equal.`n----------`n{0}`n----------`n{1}`n----------`n" -f $ExpectedContents,($actualContents -join "`n"))
     for( $idx = 0; $idx -lt $actualContents.Length; ++$idx )
     {
         Assert-Equal $expectedLines[$idx] $actualContents[$idx] "line $idx"

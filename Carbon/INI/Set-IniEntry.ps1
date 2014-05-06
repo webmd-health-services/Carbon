@@ -83,6 +83,8 @@ function Set-IniEntry
         # The section of the INI where the entry should be set.
         $Section
     )
+
+    Set-StrictMode -Version 'Latest'
     
     if( $Name -like '*=*' )
     {
@@ -115,7 +117,7 @@ function Set-IniEntry
         $setting = $settings[$key]
         if( $setting.Value -cne $Value )
         {
-            Write-Host "Updating INI entry '$key' in '$Path'."
+            Write-Verbose -Message "Updating INI entry '$key' in '$Path'."
             $lines[$setting.LineNumber - 1] = "$Name = $Value" 
         }
     }
@@ -127,12 +129,12 @@ function Set-IniEntry
                                 Select-Object -Last 1
         
         $newLine = "$Name = $Value"
-        Write-Host "Creating INI entry '$key' in '$Path'."
+        Write-Verbose -Message "Creating INI entry '$key' in '$Path'."
         if( $lastItemInSection )
         {
             $idx = $lastItemInSection.LineNumber
             $lines.Insert( $idx, $newLine )
-            if( $lines[$idx + 1] )
+            if( $lines.Count -gt ($idx + 1) -and $lines[$idx + 1])
             {
                 $lines.Insert( $idx + 1, '' )
             }
@@ -141,7 +143,7 @@ function Set-IniEntry
         {
             if( $Section )
             {
-                if( $lines[$lines.Count - 1] )
+                if( $lines.Count -gt 1 -and $lines[$lines.Count - 1] )
                 {
                     [void] $lines.Add( '' )
                 }

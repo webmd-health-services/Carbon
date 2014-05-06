@@ -61,6 +61,8 @@ function Remove-IniEntry
         $Section
     )
 
+    Set-StrictMode -Version 'Latest'
+
     $settings = @{ }
     
     if( Test-Path $Path -PathType Leaf )
@@ -86,7 +88,6 @@ function Remove-IniEntry
         $null = $lines.RemoveAt( ($settings[$key].LineNumber - 1) )
         if( $PSCmdlet.ShouldProcess( $Path, ('remove INI entry {0}' -f $key) ) )
         {
-            Write-Host ("Removing INI entry '{0}' in '{1}'." -f $key,$Path)
             $lines | Out-File -FilePath $Path -Encoding OEM
         }
     }
