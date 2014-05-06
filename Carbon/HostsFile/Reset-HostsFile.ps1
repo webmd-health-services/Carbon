@@ -48,6 +48,8 @@ function Reset-HostsFile
        # The path to the hosts file to modify.  Defaults to the local computer's hosts file.
        $Path = (Get-PathToHostsFile)
     )
+
+    Set-StrictMode -Version 'Latest'
  
     if(-not (Test-Path $Path) )
     {
@@ -72,9 +74,8 @@ function Reset-HostsFile
     
     [void] $outlines.Add("127.0.0.1       localhost")
     
-    if( $pscmdlet.ShouldProcess( $Path, "Reset-HostsFile" ) )
+    if( $PSCmdlet.ShouldProcess( $Path, "Reset-HostsFile" ) )
     {
-        Write-Host "Clearing all hosts entries from '$Path'."
         $outlines | Out-File -FilePath $Path -Encoding OEM
     }     
 }
