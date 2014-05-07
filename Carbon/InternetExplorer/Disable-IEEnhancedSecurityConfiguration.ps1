@@ -32,57 +32,47 @@ function Disable-IEEnhancedSecurityConfiguration
     [CmdletBinding(SupportsShouldProcess=$true)]
     param(
     )
-    
-    $regPathAdmin = "HKLM:SOFTWARE\Microsoft\Active Setup\Installed Components\{A509B1A7-37EF-4b3f-8CFC-4F3A74704073}"
-    $regPathUser = "HKLM:SOFTWARE\Microsoft\Active Setup\Installed Components\{A509B1A8-37EF-4b3f-8CFC-4F3A74704073}"
-    
-    Write-Host "Disabling Internet Explorer Enhanced Security Configuration."
-    
-    if(-not (Test-Path -Path $regPathAdmin))
-    {
-        Write-Warning "Could not find the registry path for admins ($regPathAdmin). Aborting."
-        return
-         
-    }
 
-    if(-not (Test-Path -Path $regPathUser))
-    {
-        Write-Warning "Could not find the registry path for users ($regPathUser). Aborting."
-        return
-    }
+    Set-StrictMode -Version 'Latest'
 
-    if( $pscmdlet.ShouldProcess( "Set Registry Information." ) )
-    {
-        Write-Verbose "Setting registry information."
-        Set-ItemProperty  $regPathAdmin -name "IsInstalled" -value 0 
-        Set-ItemProperty  $regPathUser -name "IsInstalled" -value 0
-    }
+    $commonParams = @{
+                        ErrorAction = $ErrorActionPreference;
+                        Verbose = $VerbosePreference;
+                        WhatIf = $WhatIfPreference;
+                    }
 
-    if( $pscmdlet.ShouldProcess("iesetup.dll", "Call dll reg methods" ) )
+    $adminPath = "SOFTWARE\Microsoft\Active Setup\Installed Components\{A509B1A7-37EF-4b3f-8CFC-4F3A74704073}"
+    $userPath =  "SOFTWARE\Microsoft\Active Setup\Installed Components\{A509B1A8-37EF-4b3f-8CFC-4F3A74704073}"
+    # Yes.  They are different. Right                                     here ^
+
+    $paths = @( $adminPath, $userPath )
+
+    if( $PSCmdlet.ShouldProcess( 'Internet Explorer', 'disabling enhanced security configuration' ) )
     {
-        Write-Verbose "Calling DLL methods."
+        foreach( $path in $paths )
+        {
+            $hklmPath = Join-Path -Path 'hklm:\' -ChildPath $path
+            if( -not (Test-Path -Path $hklmPath) )
+            {
+                Write-Warning ('Applying Enhanced Security Configuration registry key ''{0}'' not found.' -f $hklmPath)
+                return
+            }
+            Set-RegistryKeyValue -Path $hklmPath -Name 'IsInstalled' -DWord 0 @commonParams
+        }
+
+        Write-Verbose ('Calling iesetup.dll hardening methods.')
         Rundll32 iesetup.dll, IEHardenLMSettings
         Rundll32 iesetup.dll, IEHardenUser
         Rundll32 iesetup.dll, IEHardenAdmin 
-        
-    }
 
-    if( $pscmdlet.ShouldProcess( "Delete HKCU keys." ) )
-    {
-        Write-Verbose "Deleting HKCU keys."
-        
-        $deleteKey1 = "HKCU:SOFTWARE\Microsoft\Active Setup\Installed Components\{A509B1A7-37EF-4b3f-8CFC-4F3A74704073}"
-        if(Test-Path -Path $deleteKey1)
+        foreach( $path in $paths )
         {
-            Write-Host "$deleteKey1"
-            Remove-Item -Path $deleteKey1
+            $hkcuPath = Join-Path -Path 'hkcu:\' -ChildPath $path
+            if( Test-Path -Path $hkcuPath )
+            {
+                Remove-Item -Path $hkcuPath
+            }
         }
 
-        $deleteKey2 = "HKCU:SOFTWARE\Microsoft\Active Setup\Installed Components\{A509B1A8-37EF-4b3f-8CFC-4F3A74704073}"
-        if(Test-Path -Path $deleteKey2)
-        {
-            Write-Host "$deleteKey2"
-            Remove-Item -Path $deleteKey2
-        }
     }
 }

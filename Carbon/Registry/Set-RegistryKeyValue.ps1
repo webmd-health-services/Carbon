@@ -136,19 +136,25 @@ function Set-RegistryKeyValue
         Write-Host "Setting registry value '$Path@$Name'."
     }
     
-    Install-RegistryKey -Path $Path
+    $commonParams = @{
+                        ErrorAction = $ErrorActionPreference;
+                        Verbose = $VerbosePreference;
+                        WhatIf = $WhatIfPreference;
+                    }
+    
+    Install-RegistryKey -Path $Path @commonParams
     
     if( $Force )
     {
-        Remove-RegistryKeyValue -Path $Path -Name $Name 
+        Remove-RegistryKeyValue -Path $Path -Name $Name @commonParams
     }
-    
+
     if( Test-RegistryKeyValue -Path $Path -Name $Name )
     {
-        Set-ItemProperty -Path $Path -Name $Name -Value $value
+        Set-ItemProperty -Path $Path -Name $Name -Value $value @commonParams
     }
     else
     {
-        $null = New-ItemProperty -Path $Path -Name $Name -Value $value -PropertyType $type
+        $null = New-ItemProperty -Path $Path -Name $Name -Value $value -PropertyType $type @commonParams
     }
 }

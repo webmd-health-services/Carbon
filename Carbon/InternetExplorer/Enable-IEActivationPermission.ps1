@@ -29,44 +29,36 @@ function Enable-IEActivationPermission
     .LINK
     Disable-IEEnhancedSecurityConfiguration
     #>
-    [CmdletBinding()]
+    [CmdletBinding(SupportsShouldProcess=$true)]
     param(
     )
+
+    Set-StrictMode -Version 'Latest'
+
+    $commonParams = @{
+                        ErrorAction = $ErrorActionPreference;
+                        Verbose = $VerbosePreference;
+                        WhatIf = $WhatIfPreference;
+                    }
     
     $sddlForIe =   "O:BAG:BAD:(A;;CCDCSW;;;SY)(A;;CCDCLCSWRP;;;BA)(A;;CCDCSW;;;IU)(A;;CCDCLCSWRP;;;S-1-5-21-762517215-2652837481-3023104750-5681)"
     $binarySD = ([wmiclass]"Win32_SecurityDescriptorHelper").SDDLToBinarySD($sddlForIE)
     $ieRegPath = "hkcr:\AppID\{0002DF01-0000-0000-C000-000000000046}"
     $ieRegPath64 = "hkcr:\Wow6432Node\AppID\{0002DF01-0000-0000-C000-000000000046}"
 
-    Write-Host "Enabling IE Launch and Activation permissions."
-    
-    if(-not (Test-Path "HKCR:\AppID"))
+    if(-not (Test-Path "HKCR:\"))
     {
         New-PSDrive -Name HKCR -PSProvider Registry -Root HKEY_CLASSES_ROOT
     }
 
-    if(Test-Path $ieRegPath)
+    if( $PSCmdlet.ShouldProcess( 'Internet Explorer', 'enabling launch and activation permission' ) )
     {
-        Set-ItemProperty $ieRegpath -name "(Default)" -value "Internet Explorer(Ver 1.0)"
-    }
-    else
-    {
-       New-Item $ieRegPath
-       New-ItemProperty $ieRegpath "(Default)" -value "Internet Explorer(Ver 1.0)" -PropertyType String
-    }
+        Set-RegistryKeyValue -Path $ieRegPath -Name '(Default)' -String "Internet Explorer(Ver 1.0)" @commonParams
+        Set-RegistryKeyValue -Path $ieRegPath64 -Name '(Default)' -String "Internet Explorer(Ver 1.0)" @commonParams
 
-    if(Test-Path $ieRegPath64)
-    {
-        Set-ItemProperty $ieRegPath64 -name "(Default)" -value "Internet Explorer(Ver 1.0)" 
+        Set-RegistryKeyValue -Path $ieRegPath -Name 'LaunchPermission' -Binary $binarySD.binarySD @commonParams
+        Set-RegistryKeyValue -Path $ieRegPath64 -Name 'LaunchPermission' -Binary $binarySD.binarySD @commonParams
     }
-    else
-    {
-       New-Item $ieRegPath64
-       New-ItemProperty $ieRegPath64 "(default)" -value "Internet Explorer(Ver 1.0)" -PropertyType String
-    }
- 
-    Set-ItemProperty $ieRegPath "LaunchPermission" ([byte[]]$binarySD.binarySD)
-    Set-ItemProperty $ieRegPath64 "LaunchPermission" ([byte[]]$binarySD.binarySD)
 }
 
 Set-Alias -Name 'Enable-IEActivationPermissions' -Value 'Enable-IEActivationPermission'

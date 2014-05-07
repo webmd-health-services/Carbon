@@ -122,6 +122,11 @@ This is a backwards-incompatible release.
 
  * [Remove-IniEntry](http://get-carbon.org/help/Remove-IniEntry.html) now writes messages with `Write-Verbose` instead of `Write-Host`.
  * [Set-IniEntry](http://get-carbon.org/help/Set-IniEntry.html) now writes messages with `Write-Verbose` instead of `Write-Host`.
+
+### Internet Explorer
+
+ * [Disable-IEEnhancedSecurityConfiguration](http://get-carbon.org/help/Disable-IEEnhancedSecurityConfiguration.html) now writes messages with `Write-Verbose` instead of `Write-Host`.
+ * [Enable-IEActivationPermission](http://get-carbon.org/help/Enable-IEActivationPermission.html) now writes messages with `Write-Verbose` instead of `Write-Host`.
  
  
 # 1.7.0 (30 April 2014)
