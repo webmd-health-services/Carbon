@@ -94,6 +94,7 @@ This is a backwards-incompatible release.
 
 ### Certificates
 
+ * Improving error handling when [Get-Certificate](http://get-carbon.org/help/Get-Certificate.html) fails to load a certificate from a file. Original exception now part of error record.
  * [Remove-SslCertificateBinding](http://get-carbon.org/help/Remove-SslCertificateBinding.html) now writes messages with `Write-Verbose` instead of `Write-Host`. Improved error handling.
  * [Set-SslCertificateBinding](http://get-carbon.org/help/Set-SslCertificateBinding.html) now writes messages with `Write-Verbose` instead of `Write-Host`. Improved error handling.
 

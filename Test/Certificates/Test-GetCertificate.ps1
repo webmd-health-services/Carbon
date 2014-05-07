@@ -103,6 +103,24 @@ function Test-ShouldFindCertificateInCustomStoreByThumbprint
     }
 }
 
+function Test-ShouldGetPasswordProtectedCertificate
+{
+    [Security.Cryptography.X509Certificates.X509Certificate2]$cert = Get-Certificate -Path (Join-Path -Path $PSScriptRoot -ChildPath 'CarbonTestCertificateWithPassword.cer') -Password 'password'
+    Assert-NoError
+    Assert-NotNull $cert
+    Assert-Equal 'DE32D78122C2B5136221DE51B33A2F65A98351D2' $cert.Thumbprint
+    Assert-Equal 'Carbon Test Certificate - Password Protected' $cert.FriendlyName
+}
+
+function Test-ShouldIncludeExceptionWhenFailingToLoadCertificate
+{
+    $cert = Get-Certificate -Path (Join-Path -Path $PSScriptRoot -ChildPath 'CarbonTestCertificateWithPassword.cer') -ErrorAction SilentlyContinue
+    Assert-Error -Last -Regex 'password'
+    Assert-Null $cert
+    Assert-NotNull $Error[0].Exception
+    Assert-Is $Error[0].Exception ([Management.Automation.MethodInvocationException])
+}
+
 function Assert-TestCert($actualCert)
 {
     

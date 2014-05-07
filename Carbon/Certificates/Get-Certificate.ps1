@@ -100,7 +100,12 @@ function Get-Certificate
         }
         catch
         {
-            Write-Error ('Failed to create X509Certificate2 object from certificate at ''{0}'': {1}' -f $Path,$_)
+            $ex = $_.Exception
+            while( $ex.InnerException )
+            {
+                $ex = $ex.InnerException
+            }
+            Write-Error -Message ('Failed to create X509Certificate2 object from file ''{0}'': {1}' -f $Path,$ex.Message) -Exception $_.Exception
         }
     }
     else
