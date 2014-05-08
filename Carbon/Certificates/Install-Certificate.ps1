@@ -29,12 +29,19 @@ function Install-Certificate
     
     Installs the certificate (which is protected by a password) at C:\Users\me\certificate.cer into the local machine's Personal store.  The certificate is marked exportable.
     #>
-    [CmdletBinding(SupportsShouldProcess=$true,DefaultParameterSetName='ByStoreName')]
+    [CmdletBinding(SupportsShouldProcess=$true,DefaultParameterSetName='FromFileInWindowsStore')]
     param(
-        [Parameter(Mandatory=$true,Position=0)]
+        [Parameter(Mandatory=$true,Position=0,ParameterSetName='FromFileInWindowsStore')]
+        [Parameter(Mandatory=$true,Position=0,ParameterSetName='FromFileInCustomStore')]
         [string]
         # The path to the certificate file.
         $Path,
+        
+        [Parameter(Mandatory=$true,Position=0,ParameterSetName='FromCertificateInWindowsStore')]
+        [Parameter(Mandatory=$true,Position=0,ParameterSetName='FromCertificateInCustomStore')]
+        [Security.Cryptography.X509Certificates.X509Certificate2]
+        # The certificate to install.
+        $Certificate,
         
         [Parameter(Mandatory=$true)]
         [Security.Cryptography.X509Certificates.StoreLocation]
@@ -43,14 +50,16 @@ function Install-Certificate
         #   > [Enum]::GetValues([Security.Cryptography.X509Certificates.StoreLocation])
         $StoreLocation,
         
-        [Parameter(Mandatory=$true,ParameterSetName='ByStoreName')]
+        [Parameter(Mandatory=$true,ParameterSetName='FromFileInWindowsStore')]
+        [Parameter(Mandatory=$true,ParameterSetName='FromCertificateInWindowsStore')]
         [Security.Cryptography.X509Certificates.StoreName]
         # The name of the certificate's store.  To see a list of acceptable values run:
         #
         #  > [Enum]::GetValues([Security.Cryptography.X509Certificates.StoreName])
         $StoreName,
 
-        [Parameter(Mandatory=$true,ParameterSetName='ByCustomStoreName')]
+        [Parameter(Mandatory=$true,ParameterSetName='FromFileInCustomStore')]
+        [Parameter(Mandatory=$true,ParameterSetName='FromCertificateInCustomStore')]
         [string]
         # The name of the non-standard, custom store where the certificate should be installed.
         $CustomStoreName,
@@ -59,16 +68,14 @@ function Install-Certificate
         # Mark the private key as exportable.
         $Exportable,
         
-        [Parameter()]
-        # The password for the certificate.  Can be a string or a System.Security.SecureString.
+        [Parameter(ParameterSetName='FromFileInWindowsStore')]
+        [Parameter(ParameterSetName='FromFileInCustomStore')]
+        # The password for the certificate.  Can be a string or a `System.Security.SecureString`.
         $Password
     )
     
     Set-StrictMode -Version 'Latest'
 
-    $Path = ConvertTo-FullPath -Path $Path
-
-    $cert = New-Object Security.Cryptography.X509Certificates.X509Certificate2
     $keyFlags = [Security.Cryptography.X509Certificates.X509KeyStorageFlags]::MachineKeySet
     if( $StoreLocation -eq [Security.Cryptography.X509Certificates.StoreLocation]::CurrentUser )
     {
@@ -80,11 +87,16 @@ function Install-Certificate
     {
         $keyFlags = $keyFlags -bor [Security.Cryptography.X509Certificates.X509KeyStorageFlags]::Exportable
     }
-    
-    $cert.Import( $Path, $Password, $keyFlags )
 
+    if( $PSCmdlet.ParameterSetName -like 'FromFile*' )
+    {    
+        $Path = ConvertTo-FullPath -Path $Path
+        $Certificate = New-Object 'Security.Cryptography.X509Certificates.X509Certificate2'
+        $Certificate.Import( $Path, $Password, $keyFlags )
+    }
+    
     $getCertificateStoreParams = @{ }
-    if( $PSCmdlet.ParameterSetName -eq 'ByStoreName' )
+    if( $PSCmdlet.ParameterSetName -like '*InWindowsStore' )
     {
         $getCertificateStoreParams.StoreName = $StoreName
     }
@@ -94,7 +106,7 @@ function Install-Certificate
     }
     
     $store = Get-CertificateStore -StoreLocation $StoreLocation @getCertificateStoreParams
-    $store.Add( $cert )
+    $store.Add( $Certificate )
     $store.Close()
-    return $cert
+    return $Certificate
 }
