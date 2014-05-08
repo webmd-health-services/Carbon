@@ -12,8 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-$TestCertPath = JOin-Path $TestDir CarbonTestCertificate.cer -Resolve
-$TestCert = New-Object Security.Cryptography.X509Certificates.X509Certificate2 $TestCertPath
+$TestCertPath = JOin-Path -Path $PSScriptRoot -ChildPath 'CarbonTestCertificate.cer' -Resolve
+$TestCert = New-Object 'Security.Cryptography.X509Certificates.X509Certificate2' $TestCertPath
+$TestCertProtectedPath = Join-Path -Path $PSScriptRoot -ChildPath 'CarbonTestCertificateWithPassword.cer' -Resolve
+$TestCertProtected = New-Object 'Security.Cryptography.X509Certificates.X509Certificate2' $TestCertProtectedPath,'password'
 
 function Start-TestFixture
 {
@@ -22,15 +24,21 @@ function Start-TestFixture
 
 function Start-Test
 {
-    if( (Get-Certificate -Thumbprint $TestCert.Thumbprint -SToreLocation CurrentUser -StoreName My) )
+    if( (Get-Certificate -Thumbprint $TestCert.Thumbprint -StoreLocation CurrentUser -StoreName My) )
     {
         Uninstall-Certificate -Certificate $TestCert -StoreLocation CurrentUser -StoreName My
+    }
+
+    if( (Get-Certificate -Thumbprint $TestCertProtected.Thumbprint -StoreLocation CurrentUser -StoreName My) )
+    {
+        Uninstall-Certificate -Certificate $TestCertProtected -StoreLocation CurrentUser -StoreName My
     }
 }
 
 function Stop-Test
 {
     Uninstall-Certificate -Certificate $TestCert -StoreLocation CurrentUser -StoreName My
+    Uninstall-Certificate -Certificate $TestCertProtected -StoreLocation CurrentUser -StoreName My
 }
 
 function Test-ShouldInstallCertificateToLocalMachine
@@ -84,10 +92,46 @@ function Test-ShouldInstallCertificateInCustomStore
     Assert-True (Test-Path -Path ('cert:\CurrentUser\SharePoint\{0}' -f $cert.Thumbprint) -PathType Leaf)
 }
 
-function Assert-CertificateInstalled($StoreLocation, $StoreName)
+function Test-ShouldInstallCertificateIdempotently
 {
-    $cert = Get-Certificate -Thumbprint $TestCert.Thumbprint -StoreLocation CurrentUser -StoreName My
+    Install-Certificate -Certificate $TestCert -StoreLocation CurrentUser -StoreName My
+    Assert-NoError
+    Install-Certificate -Certificate $TestCert -StoreLocation CurrentUser -StoreName My
+    Assert-NoError
+    Assert-CertificateInstalled CurrentUser My
+}
+
+function Test-ShouldInstallCertificate
+{
+    $cert = Install-Certificate -Certificate $TestCert -StoreLocation CurrentUser -StoreName My
     Assert-NotNull $cert
-    Assert-Equal $TestCert.Thumbprint $cert.Thumbprint
+    Assert-CertificateInstalled CurrentUser My
+}
+
+function Test-ShouldInstallPasswordProtectedCertificate
+{
+    $cert = Install-Certificate -Certificate $TestCertProtected -StoreLocation CurrentUser -StoreName My
+    Assert-NotNull $cert
+    Assert-CertificateInstalled CurrentUser My $TestCertProtected
+}
+
+function Test-ShouldInstallPasswordProtectedCertificateAsExportable
+{
+    $cert = Install-Certificate -Certificate $TestCertProtected -StoreLocation CurrentUser -StoreName My -Exportable
+    Assert-NotNull $cert
+    Assert-CertificateInstalled CurrentUser My $TestCertProtected
+}
+
+
+function Assert-CertificateInstalled
+{
+    param(
+        $StoreLocation, 
+        $StoreName,
+        $ExpectedCertificate = $TestCert
+    )
+    $cert = Get-Certificate -Thumbprint $ExpectedCertificate.Thumbprint -StoreLocation CurrentUser -StoreName My
+    Assert-NotNull $cert
+    Assert-Equal $ExpectedCertificate.Thumbprint $cert.Thumbprint
     return $cert
 }
