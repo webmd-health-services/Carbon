@@ -48,6 +48,8 @@ function Invoke-WindowsInstaller
         # Runs the installer in quiet mode.
         $Quiet
     )
+
+    Set-StrictMode -Version 'Latest'
     
     if( -not (Test-Path $Path -PathType Leaf) )
     {
@@ -61,9 +63,8 @@ function Invoke-WindowsInstaller
         return
     }
     
-    if( $pscmdlet.ShouldProcess( $Path, "install" ) )
+    if( $PSCmdlet.ShouldProcess( $Path, "install" ) )
     {
-        Write-Host "Installing '$Path'."
         msiexec.exe /i $Path /quiet
         $msiProcess = Get-Process -Name msiexec -ErrorAction SilentlyContinue | 
                         Where-Object { $_.ParentProcessId -eq [Diagnostics.Process]::GetCurrentProcess().ID }
@@ -73,7 +74,7 @@ function Invoke-WindowsInstaller
             $msiProcess.WaitForExit()
             if( $msiProcess.ExitCode -ne $null -and $msiProcess.ExitCode -ne 0 )
             {
-                Write-Error ("Installation failed (msiexec returned '{0}')." -f $msiProcess.ExitCode)
+                Write-Error ("Installation of '{0}' failed (msiexec returned '{1}')." -f $Path,$msiProcess.ExitCode)
             }
         }
     }

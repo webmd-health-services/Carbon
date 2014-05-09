@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Grant-MSMQMessageQueuePermission
+function Grant-MsmqMessageQueuePermission
 {
     <#
     .SYNOPSIS
@@ -59,6 +59,8 @@ function Grant-MSMQMessageQueuePermission
         # The rights to grant the user.
         $AccessRights
     )
+
+    Set-StrictMode -Version 'Latest'
     
     $queueArgs = @{ Name = $Name ; Private = $Private }
     $queue = Get-MsmqMessageQueue @queueArgs
@@ -68,9 +70,8 @@ function Grant-MSMQMessageQueuePermission
         return
     }
     
-    if( $pscmdlet.ShouldProcess( $Name, "grant '$AccessRights' to '$User'" ) )
+    if( $PSCmdlet.ShouldProcess( ('MSMQ queue ''{0}''' -f $Name), ("granting '{0}' rights to '{1}'" -f $AccessRights,$Username) ) )
     {
-        Write-Host "Granting user '$Username' '$AccessRights' permissions to MSMQ message queue '$Name'."
         $queue.SetPermissions( $Username, $AccessRights )
     }
 }
