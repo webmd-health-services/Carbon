@@ -39,7 +39,13 @@
 
  * [Disable-IEEnhancedSecurityConfiguration](http://get-carbon.org/help/Disable-IEEnhancedSecurityConfiguration.html) now writes messages with `Write-Verbose` instead of `Write-Host`.
  * [Enable-IEActivationPermission](http://get-carbon.org/help/Enable-IEActivationPermission.html) now writes messages with `Write-Verbose` instead of `Write-Host`.
- 
+
+## Bug Fixes
+
+### General
+
+ * Importing Carbon gives an error if `PATH` environment variable contains an empty path.
+
  
 # 1.7.0 (30 April 2014)
 
