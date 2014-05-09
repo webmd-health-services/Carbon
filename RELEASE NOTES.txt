@@ -44,6 +44,10 @@
 
  * [Invoke-WindowsInstaller](http://get-carbon.org/help/Invoke-WindowsInstaller.html) no longer writes messages with `Write-Host`. Improved error message if installation fails.
 
+### MSMQ
+
+ * [Grant-MsmqMessageQueuePermission](http://get-carbon.org/help/Grant-MsmqMessageQueuePermission.html) no longer writes messages with `Write-Host`.
+
 ## Bug Fixes
 
 ### General
