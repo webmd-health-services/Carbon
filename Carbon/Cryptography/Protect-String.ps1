@@ -19,7 +19,9 @@ filter Protect-String
     Encrypts a string using the Data Protection API (DPAPI).
     
     .DESCRIPTION
-    Encrypts a string with the Data Protection API (DPAPI).  Encryption can be performed at the user or computer level.  If encrypted at the User level (with the `ForUser` switch), only the user who encrypted the data can decrypt it.  If encrypted at the computer scope (with the `ForComputer` switch), any user logged onto the computer can decrypt it.
+    Encrypts a string with the Data Protection API (DPAPI).  Encryption can be performed at the user or computer level.  If encrypted at the User level (with the `ForUser` switch), only the user who encrypted the data (i.e. the user running `Protect-String`) can decrypt it.  If encrypted at the computer scope (with the `ForComputer` switch), any user logged onto the computer can decrypt it.
+
+    You can encrypt a string as a specific user with the `Credential` parameter. Only that user will be able to decrypt it on the computer on which it was encrypted. Useful for situation where you have a service user who needs access to protected secrets.
     
     .EXAMPLE
     Protect-String -String 'TheStringIWantToEncrypt' -ForUser | Out-File MySecret.txt
@@ -27,10 +29,14 @@ filter Protect-String
     Encrypts the given string and saves the encrypted string into MySecret.txt.  Only the user who encrypts the string can unencrypt it.
     
     .EXAMPLE
-    
     $cipherText = Protect-String -String "MySuperSecretIdentity" -ForComputer
     
     Encrypts the given string and stores the value in $cipherText.  Because the encryption scope is set to LocalMachine, any user logged onto the local computer can decrypt $cipherText.
+
+    .EXAMPLE
+    Protect-String -String 's0000p33333r s33333cr33333t' -Credential (Get-Credential 'builduser')
+
+    Demonstrates how to use `Protect-String` to encrypt a secret as a specific user. This is useful for situation where a secret needs to be encrypted by a user other than the user running `Protect-String`.
     
     .LINK
     Unprotect-String
@@ -53,11 +59,41 @@ filter Protect-String
         [Parameter(Mandatory=$true,ParameterSetName='LocalMachine')]
         # Encrypts for the current computer so that any user logged into the computer can decrypt.
         [Switch]
-        $ForComputer
+        $ForComputer,
+
+        [Parameter(Mandatory=$true,ParameterSetName='ForUser')]
+        [pscredential]
+        # Encrypts for a specific user.
+        $Credential
     )
-    
-    $bytes = [Text.Encoding]::UTF8.GetBytes( $String )
-    $scope = $pscmdlet.ParameterSetName
-    $encryptedBytes = [Security.Cryptography.ProtectedData]::Protect( $bytes, $null, $scope )
-    return [Convert]::ToBase64String( $encryptedBytes )
+
+    Set-StrictMode -Version 'Latest'
+
+    if( $PSCmdlet.ParameterSetName -eq 'ForUser' ) 
+    {
+        $outFile = '{0}-{1}' -f (Split-Path -Leaf -Path $PSCommandPath),([IO.Path]::GetRandomFileName())
+        $outFile = Join-Path -Path $env:TEMP -ChildPath $outFile
+        Write-Verbose $outFile
+        '' | Set-Content -Path $outFile
+
+        try
+        {
+            $protectStringPath = Join-Path -Path $PSScriptRoot -ChildPath '..\bin\Protect-String.ps1' -Resolve
+            $encodedString = Protect-String -String $String -ForComputer
+            $p = Start-Process -FilePath "powershell.exe" -ArgumentList $protectStringPath,"-ProtectedString",$encodedString -Credential $Credential -RedirectStandardOutput $outFile -Wait -WindowStyle Hidden -PassThru
+            $p.WaitForExit()
+            return Get-Content -Path $outFile -TotalCount 1
+        }
+        finally
+        {
+            Remove-Item -Path $outFile -ErrorAction Ignore
+        }
+    }
+    else
+    {
+        $scope = $PSCmdlet.ParameterSetName
+        $stringBytes = [Text.Encoding]::UTF8.GetBytes( $String )
+        $encryptedBytes = [Security.Cryptography.ProtectedData]::Protect( $stringBytes, $null, $scope )
+        return [Convert]::ToBase64String( $encryptedBytes )
+    }
 }

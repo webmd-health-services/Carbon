@@ -40,6 +40,38 @@ function Test-ShouldProtectStringsInPipeline
     }
 }
 
+function Test-ShouldProtectStringForCredential
+{
+    $password = 'Tt6QML1lmDrFSf'
+    Install-User -Username 'CarbonTestUser' -Password $password -Description 'Carbon test user.'
+
+    $credential = New-Credential 'CarbonTestUser' -Password $password
+    # special chars to make sure they get handled correctly
+    $string = ' f u b a r '' " > ~!@#$%^&*()_+`-={}|:"<>?[]\;,./'
+    $protectedString = Protect-String -String $string -Credential $credential
+
+    $outFile = New-TempDir -Prefix (Split-Path -Leaf -Path $PSCommandPath)
+    $outFile = Join-Path -Path $outFile -ChildPath 'secret'
+    try
+    {
+        $p = Start-Process -FilePath "powershell.exe" `
+                           -ArgumentList (Join-Path -Path $PSScriptRoot -ChildPath 'Unprotect-String.ps1'),'-ProtectedString',$protectedString `
+                           -WindowStyle Hidden `
+                           -Credential $credential `
+                           -PassThru `
+                           -Wait `
+                           -RedirectStandardOutput $outFile
+        $p.WaitForExit()
+
+        $decrypedString = Get-Content -Path $outFile -TotalCount 1
+        Assert-Equal $string $decrypedString
+    }
+    finally
+    {
+        Remove-Item -Recurse -Path (Split-Path -Parent -Path $outFile)
+    }
+}
+
 function Assert-IsBase64EncodedString($String)
 {
     Assert-NotEmpty $String 'Didn''t encrypt cipher text.'
