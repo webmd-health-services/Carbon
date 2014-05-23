@@ -71,22 +71,59 @@ filter Protect-String
 
     if( $PSCmdlet.ParameterSetName -eq 'ForUser' ) 
     {
-        $outFile = '{0}-{1}' -f (Split-Path -Leaf -Path $PSCommandPath),([IO.Path]::GetRandomFileName())
+        $outFile = '{0}-{1}-stdout' -f (Split-Path -Leaf -Path $PSCommandPath),([IO.Path]::GetRandomFileName())
         $outFile = Join-Path -Path $env:TEMP -ChildPath $outFile
         Write-Verbose $outFile
         '' | Set-Content -Path $outFile
+
+        $errFile = '{0}-{1}-stderr' -f (Split-Path -Leaf -Path $PSCommandPath),([IO.Path]::GetRandomFileName())
+        $errFile = Join-Path -Path $env:TEMP -ChildPath $errFile
+        Write-Verbose $errFile
+        '' | Set-Content -Path $errFile
 
         try
         {
             $protectStringPath = Join-Path -Path $PSScriptRoot -ChildPath '..\bin\Protect-String.ps1' -Resolve
             $encodedString = Protect-String -String $String -ForComputer
-            $p = Start-Process -FilePath "powershell.exe" -ArgumentList $protectStringPath,"-ProtectedString",$encodedString -Credential $Credential -RedirectStandardOutput $outFile -Wait -WindowStyle Hidden -PassThru
+            
+            $p = Start-Process -FilePath "powershell.exe" `
+                               -ArgumentList $protectStringPath,"-ProtectedString",$encodedString `
+                               -Credential $Credential `
+                               -RedirectStandardOutput $outFile `
+                               -RedirectStandardError $errFile `
+                               -Wait `
+                               -WindowStyle Hidden `
+                               -PassThru
+
             $p.WaitForExit()
-            return Get-Content -Path $outFile -TotalCount 1
+
+            $stdOut = Get-Content -Path $outFile -Raw
+            if( $stdOut )
+            {
+                Write-Verbose -Message $stdOut
+            }
+
+            $stdErr = Get-Content -Path $errFile -Raw
+            if( $stdErr )
+            {
+                Write-Error -Message $stdErr
+                return
+            }
+
+            if( $p.ExitCode -ne 0 )
+            {
+                Write-Error -Message ('Unknown error encrypting string as {0}: exit code {1}' -f $Credential.UserName,$p.ExitCode)
+                return
+            }
+
+            if( $stdOut )
+            {
+                return Get-Content -Path $outFile -TotalCount 1
+            }
         }
         finally
         {
-            Remove-Item -Path $outFile -ErrorAction Ignore
+            Remove-Item -Path $outFile,$errFile -ErrorAction Ignore
         }
     }
     else
