@@ -62,6 +62,7 @@
   <ItemGroup>
     <Compile Include="AdvApi32.cs" />
     <Compile Include="Certificates\SslCertificateBinding.cs" />
+    <Compile Include="Computer\ProgramInstallInfo.cs" />
     <Compile Include="Identity.cs" />
     <Compile Include="IdentityType.cs" />
     <Compile Include="Ini\IniNode.cs" />

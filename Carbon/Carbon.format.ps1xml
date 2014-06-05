@@ -222,5 +222,79 @@
 			    </TableRowEntries>
             </TableControl>
 		</View>
+        <View>
+            <Name>Carbon.Computer.ProgramInstallInfo</Name>
+            <ViewSelectedBy>
+                <TypeName>Carbon.Computer.ProgramInstallInfo</TypeName>
+            </ViewSelectedBy>
+            <TableControl>
+			    <TableHeaders>
+				    <TableColumnHeader>
+					    <Label>DisplayName</Label>
+				    </TableColumnHeader>
+				    <TableColumnHeader>
+					    <Label>Publisher</Label>
+				    </TableColumnHeader>
+				    <TableColumnHeader>
+					    <Label>InstallDate</Label>
+					    <Width>11</Width>
+				    </TableColumnHeader>
+				    <TableColumnHeader>
+					    <Label>Size</Label>
+					    <Alignment>Right</Alignment>
+					    <Width>10</Width>
+				    </TableColumnHeader>
+				    <TableColumnHeader>
+					    <Label>DisplayVersion</Label>
+				    </TableColumnHeader>
+			    </TableHeaders>
+			    <TableRowEntries>
+				    <TableRowEntry>
+					    <TableColumnItems>
+						    <TableColumnItem>
+							    <PropertyName>DisplayName</PropertyName>
+						    </TableColumnItem>
+						    <TableColumnItem>
+							    <PropertyName>Publisher</PropertyName>
+						    </TableColumnItem>
+						    <TableColumnItem>
+    							<ScriptBlock>
+                                    if( $_.InstallDate -eq [DateTime]::MinValue )
+                                    {
+                                        return ""
+                                    }
+                                    "{0:d}" -f $_.InstallDate
+                                </ScriptBlock>
+						    </TableColumnItem>
+						    <TableColumnItem>
+    							<ScriptBlock>
+                                    if( $_.EstimatedSize -eq 0 )
+                                    {
+                                        return ""
+                                    }
+
+                                    $bytes = $_.EstimatedSize * 1kb
+                                    if( $bytes -lt 1mb )
+                                    {
+                                        '{0} KB' -f ($bytes/1kb)
+                                    }
+                                    elseif( $bytes -lt 1gb )
+                                    {
+                                        '{0:0.00} MB' -f ($bytes/1mb)
+                                    }
+                                    else
+                                    {
+                                        '{0:0.00} GB' -f ($bytes/1gb)
+                                    }
+                                </ScriptBlock>
+						    </TableColumnItem>
+						    <TableColumnItem>
+							    <PropertyName>DisplayVersion</PropertyName>
+						    </TableColumnItem>
+					    </TableColumnItems>
+				    </TableRowEntry>
+			    </TableRowEntries>
+            </TableControl>
+		</View>
 	</ViewDefinitions>
 </Configuration>
