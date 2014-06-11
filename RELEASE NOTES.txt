@@ -98,6 +98,7 @@ This is a backwards-incompatible release.
  * [Install-Certificate](http://get-carbon.org/help/Install-Certificate.html) now supports installing with an `X509Certificate2` object instead of just a path to a certificate.
  * [Remove-SslCertificateBinding](http://get-carbon.org/help/Remove-SslCertificateBinding.html) now writes messages with `Write-Verbose` instead of `Write-Host`. Improved error handling.
  * [Set-SslCertificateBinding](http://get-carbon.org/help/Set-SslCertificateBinding.html) now writes messages with `Write-Verbose` instead of `Write-Host`. Improved error handling.
+ * Improved documentation for [Get-Certificate](http://get-carbon.org/help/Get-Certificate.html).
 
 ### COM
 
