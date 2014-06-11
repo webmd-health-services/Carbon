@@ -65,7 +65,7 @@ function Install-Certificate
         $CustomStoreName,
 
         [Switch]
-        # Mark the private key as exportable.
+        # Mark the private key as exportable. Only valid if loading the certificate from a file.
         $Exportable,
         
         [Parameter(ParameterSetName='FromFileInWindowsStore')]
@@ -76,20 +76,20 @@ function Install-Certificate
     
     Set-StrictMode -Version 'Latest'
 
-    $keyFlags = [Security.Cryptography.X509Certificates.X509KeyStorageFlags]::MachineKeySet
-    if( $StoreLocation -eq [Security.Cryptography.X509Certificates.StoreLocation]::CurrentUser )
-    {
-        $keyFlags = [Security.Cryptography.X509Certificates.X509KeyStorageFlags]::UserKeySet
-    }
-    $keyFlags = $keyFlags -bor [Security.Cryptography.X509Certificates.X509KeyStorageFlags]::PersistKeySet
-    
-    if( $Exportable )
-    {
-        $keyFlags = $keyFlags -bor [Security.Cryptography.X509Certificates.X509KeyStorageFlags]::Exportable
-    }
-
     if( $PSCmdlet.ParameterSetName -like 'FromFile*' )
     {    
+        $keyFlags = [Security.Cryptography.X509Certificates.X509KeyStorageFlags]::MachineKeySet
+        if( $StoreLocation -eq [Security.Cryptography.X509Certificates.StoreLocation]::CurrentUser )
+        {
+            $keyFlags = [Security.Cryptography.X509Certificates.X509KeyStorageFlags]::UserKeySet
+        }
+        $keyFlags = $keyFlags -bor [Security.Cryptography.X509Certificates.X509KeyStorageFlags]::PersistKeySet
+    
+        if( $Exportable )
+        {
+            $keyFlags = $keyFlags -bor [Security.Cryptography.X509Certificates.X509KeyStorageFlags]::Exportable
+        }
+
         $Path = ConvertTo-FullPath -Path $Path
         $Certificate = New-Object 'Security.Cryptography.X509Certificates.X509Certificate2'
         $Certificate.Import( $Path, $Password, $keyFlags )
