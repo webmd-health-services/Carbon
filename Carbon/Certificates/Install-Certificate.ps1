@@ -64,6 +64,8 @@ function Install-Certificate
         # The name of the non-standard, custom store where the certificate should be installed.
         $CustomStoreName,
 
+        [Parameter(ParameterSetName='FromFileInWindowsStore')]
+        [Parameter(ParameterSetName='FromFileInCustomStore')]
         [Switch]
         # Mark the private key as exportable. Only valid if loading the certificate from a file.
         $Exportable,
