@@ -48,26 +48,47 @@ function Set-EnvironmentVariable
         # The environment variable's value.
         $Value,
         
-        [Parameter(Mandatory=$true,ParameterSetName='ForProcess')]
         # Sets the environment variable for the current process.
         [Switch]
         $ForProcess,
 
-        [Parameter(Mandatory=$true,ParameterSetName='ForUser')]
         # Sets the environment variable for the current user.
         [Switch]
         $ForUser,
         
-        [Parameter(Mandatory=$true,ParameterSetName='ForMachine')]
         # Sets the environment variable for the current computer.
         [Switch]
         $ForComputer
     )
-    
-    $scope = $pscmdlet.ParameterSetName -replace '^For',''
-    if( $pscmdlet.ShouldProcess( "$scope-level environment variable '$Name'", "set") )
-    {
-        [Environment]::SetEnvironmentVariable( $Name, $Value, $scope )
+
+    $targets = Invoke-Command -ScriptBlock {
+        if( $ForComputer )
+        {
+            [EnvironmentVariableTarget]::Machine
+        }
+
+        if( $ForUser )
+        {
+            [EnvironmentVariableTarget]::User
+        }
+            
+        if( $ForProcess )
+        {
+            [EnvironmentVariableTarget]::Process
+        }    
     }
-    
+
+    if( -not $targets )
+    {
+        Write-Error -Message ('Environment variable target not specified. You must supply one of the ForComputer, ForUser, or ForProcess switches.')
+        return
+    }
+
+    foreach( $target in $targets )
+    {
+        if( $pscmdlet.ShouldProcess( "$target-level environment variable '$Name'", "set") )
+        {
+            [Environment]::SetEnvironmentVariable( $Name, $Value, $target )
+        }
+    }    
 }
