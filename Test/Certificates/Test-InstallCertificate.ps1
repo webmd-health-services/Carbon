@@ -115,14 +115,6 @@ function Test-ShouldInstallPasswordProtectedCertificate
     Assert-CertificateInstalled CurrentUser My $TestCertProtected
 }
 
-function Test-ShouldInstallPasswordProtectedCertificateAsExportable
-{
-    $cert = Install-Certificate -Certificate $TestCertProtected -StoreLocation CurrentUser -StoreName My -Exportable
-    Assert-NotNull $cert
-    Assert-CertificateInstalled CurrentUser My $TestCertProtected
-}
-
-
 function Assert-CertificateInstalled
 {
     param(
