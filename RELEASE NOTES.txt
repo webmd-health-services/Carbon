@@ -1,5 +1,9 @@
 # 2.0.0
 
+## Overview
+
+The focus of version 2.0 is on making necessary, backwards-incompatible changes and adding DSC resources.
+
 ## Upgrade Instructions
 
 This is a backwards-incompatible release. 
@@ -44,6 +48,11 @@ This is a backwards-incompatible release.
 
  * Changed [Test-OSIs32Bit](http://get-carbon.org/help/Test-OSIs32Bit.html) and [Test-OSIs64Bit](http://get-carbon.org/help/Test-OSIs64Bit.html) functions to use the Environment class's new [Is64BitOperatingSystem](http://msdn.microsoft.com/en-us/library/system.environment.is64bitoperatingsystem.aspx) property.
  
+### DSC
+
+ * Created `EnvironmentVariable` resource for creating/removing machine-level environment variables.
+ * New [Clear-DscLocalResourceCache](http://get-carbon.org/help/Clear-DscLocalResourceCache.html) function for clearing the local LCM's DSC resource. This makes developing resources easier.
+ 
 ### File System
 
  * [Disable-NtfsCompression](http://get-carbon.org/help/Disable-NtfsCompression.html) now writes messages with `Write-Verbose` instead of `Write-Host`. Improved error handling.
@@ -63,6 +72,7 @@ This is a backwards-incompatible release.
 
  * Changed [Test-PowerShellIs32Bit](http://get-carbon.org/help/Test-PowerShellIs32Bit.html) and [Test-PowerShellIs64Bit](http://get-carbon.org/help/Test-PowerShellIs64Bit.html) functions to use the Environment class's new [Is64BitProcess](http://msdn.microsoft.com/en-us/library/system.environment.is64bitprocess.aspx) property.
  * Removed `Complete-Job` function.  It was total crap.
+ * Created [Get-PowerShellModuleInstallPath](http://get-carbon.org/help/Get-PowerShellModuleInstallPath.html) function for getting the path where new module's should be installed. Beginning with PowerShell 4, modules should get installed into `$env:ProgramFiles\Windows PowerShell\Modules`. Under PowerShell 3, it is `$PSHome\Modules`. This function returns the correct location for the version of PowerShell you're using.
  
 ### Security
 
