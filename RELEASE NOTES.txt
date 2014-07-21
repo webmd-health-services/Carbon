@@ -62,6 +62,10 @@
 ### General
 
  * Importing Carbon gives an error if `PATH` environment variable contains an empty path.
+ 
+### Path
+
+ * [Resolve-PathCase](http://get-carbon.org/help/Resolve-PathCase.html) didn't work under Windows 2012 R2.
 
  
 # 1.7.0 (30 April 2014)
