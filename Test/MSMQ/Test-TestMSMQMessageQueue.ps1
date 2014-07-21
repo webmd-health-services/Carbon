@@ -14,7 +14,9 @@
 
 
 # These tests should only run if MSMQ is not installed
-if( Get-Service -Name MSMQ -ErrorAction SilentlyContinue )
+$userDomain = $env:USERDNSDOMAIN
+$computerDomain = Get-WmiObject 'Win32_ComputerSystem' | Select-Object -ExpandProperty Domain
+if( Get-Service -Name MSMQ -ErrorAction SilentlyContinue -and $userDomain -eq $computerDomain )
 {
 
     $publicQueueName = 'CarbonTestGetQueue-Public'
@@ -58,5 +60,5 @@ if( Get-Service -Name MSMQ -ErrorAction SilentlyContinue )
 }
 else
 {
-    Write-Warning "Tests for Test-MSMQMessageQueue not run because MSMQ is not installed."
+    Write-Warning ("Tests for Get-MSMQMessageQueue not run because MSMQ is not installed or the current user's domain ({0}) and the computer's domain ({1}) are different." -f $userDomain,$computerDomain)
 }
