@@ -95,6 +95,13 @@ function Test-AllFilesShouldHaveLicense
                     $file.StartsWith( $expectedNotice )
                     break
                 }
+                '^\.mof$'
+                {
+                    $expectedNotice = $noticeLines -join [Environment]::NewLine
+                    $expectedNotice = '/*{0}{1}{0}*/' -f ([Environment]::NewLine),$expectedNotice
+                    $file.StartsWith( $expectedNotice )
+                    break
+                }
                 default
                 {
                     Write-Verbose -Verbose $fileInfo.FullName
