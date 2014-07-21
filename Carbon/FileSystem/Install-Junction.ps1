@@ -105,6 +105,6 @@ function Install-Junction
 
     if( $PSCmdlet.ShouldProcess( $Target, ("creating '{0}' junction" -f $Link) ) )
     {
-        New-Junction -Link $Link -Target $target
+        New-Junction -Link $Link -Target $target -Verbose:$false
     }
 }
