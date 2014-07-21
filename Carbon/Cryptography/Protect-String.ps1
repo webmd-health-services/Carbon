@@ -112,7 +112,7 @@ filter Protect-String
 
             if( $p.ExitCode -ne 0 )
             {
-                Write-Error -Message ('Unknown error encrypting string as {0}: exit code {1}' -f $Credential.UserName,$p.ExitCode)
+                Write-Error -Message ('Unknown error encrypting string as {0}: exit code {1}{2}{3}' -f $Credential.UserName,$p.ExitCode,([Environment]::NewLine),$stdOut)
                 return
             }
 
