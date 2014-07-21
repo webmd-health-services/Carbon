@@ -49,6 +49,10 @@ function Test-ShouldProtectStringForCredential
     # special chars to make sure they get handled correctly
     $string = ' f u b a r '' " > ~!@#$%^&*()_+`-={}|:"<>?[]\;,./'
     $protectedString = Protect-String -String $string -Credential $credential
+    if( -not $protectedString )
+    {
+        Fail ('Failed to protect a string as user {0}.' -f $credential.UserName)
+    }
 
     $outFile = New-TempDir -Prefix (Split-Path -Leaf -Path $PSCommandPath)
     $outFile = Join-Path -Path $outFile -ChildPath 'secret'

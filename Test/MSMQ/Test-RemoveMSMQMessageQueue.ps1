@@ -12,7 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-if( Get-Service -Name MSMQ -ErrorAction SilentlyContinue )
+$userDomain = $env:USERDNSDOMAIN
+$computerDomain = Get-WmiObject 'Win32_ComputerSystem' | Select-Object -ExpandProperty Domain
+if( Get-Service -Name MSMQ -ErrorAction SilentlyContinue -and $userDomain -eq $computerDomain )
 {
 
     $publicQueueName = $null
@@ -77,5 +79,5 @@ if( Get-Service -Name MSMQ -ErrorAction SilentlyContinue )
 }
 else
 {
-    Write-Warning "Tests for Remove-MSMQMessageQueue not run because MSMQ is not installed."
+    Write-Warning ("Tests for Get-MSMQMessageQueue not run because MSMQ is not installed or the current user's domain ({0}) and the computer's domain ({1}) are different." -f $userDomain,$computerDomain)
 }

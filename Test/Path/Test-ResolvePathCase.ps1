@@ -20,15 +20,18 @@ function Start-TestFixture
 function Test-ShouldGetCanonicalCaseForDirectory
 {
     $currentDir = (Resolve-Path '.').Path
-    $canonicalCase = Resolve-PathCase ($currentDir.ToUpper())
-    Assert-True ($currentDir -ceq $canonicalCase)
+    foreach( $badPath in ($currentDir.ToUpper(),$currentDir.ToLower()) )
+    {
+        $canonicalCase = Resolve-PathCase -Path $badPath
+        Assert-True ($currentDir -ceq $canonicalCase) ('{0} != {1}' -f $currentDir,$canonicalCase)
+    }
 }
 
 function Test-ShouldGetCanonicalCaseForFile
 {
     $currentFile = Join-Path $TestDir 'Test-ResolvePathCase.ps1' -Resolve
     $canonicalCase = Resolve-PathCase -Path ($currentFile.ToUpper())
-    Assert-True ($currentFile -ceq $canonicalCase)
+    Assert-True ($currentFile -ceq $canonicalCase) ('{0} != {1}' -f $currentFile,$canonicalCase)
 }
 
 function Test-ShouldNotGetCaseForFileThatDoesNotExist
@@ -50,8 +53,41 @@ function Test-ShouldAcceptPipelineInput
         Resolve-PathCase | 
         ForEach-Object { 
             $gotSomething = $true
-            Assert-True ( $_.StartsWith( 'C:\Windows' ) )
+            Assert-True ( $_.StartsWith( 'C:\Windows' ) ) ('{0} doesn''t start with C:\Windows' -f $_)
         }
     Assert-True $gotSomething
     
+}
+
+function Test-ShouldGetRelativePath
+{
+    Push-Location -Path $PSScriptRoot
+    try
+    {
+        $path = '..\..\Carbon\Import-Carbon.ps1'
+        $canonicalCase = Resolve-PathCase ($path.ToUpper())
+        Assert-Equal (Resolve-Path -Path $path).Path $canonicalCase -CaseSensitive
+
+    }
+    finally
+    {
+        Pop-Location
+    }
+}
+
+function Test-ShouldGetPathToShare
+{
+    $shareName = Get-WmiObject 'Win32_Share' | Where-Object { $_.Name -notlike '*$' } | Select-Object -First 1 | Select-Object -ExpandProperty 'Name'
+    if( -not $shareName )
+    {
+        Fail ('Computer {0} has no shares. Need a share to exist so we can test Resolve-PathCase.' -f $env:COMPUTERNAME)
+    }
+
+    $path = '\\{0}\{1}' -f $env:COMPUTERNAME,$shareName
+    $path = Get-ChildItem -Path $path | Select-Object -First 1 | Select-Object -ExpandProperty 'FullName'
+
+    $canonicalCase = Resolve-PathCase ($path.ToUpper()) -ErrorAction SilentlyContinue
+    Assert-Error -Last -Regex 'UNC .* not supported'
+    Assert-Null $canonicalCase
+
 }
