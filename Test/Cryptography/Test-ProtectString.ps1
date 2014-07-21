@@ -40,40 +40,47 @@ function Test-ShouldProtectStringsInPipeline
     }
 }
 
-function Test-ShouldProtectStringForCredential
+if( -not (Test-Path -Path 'env:CCNetArtifactsDirectory') )
 {
-    $password = 'Tt6QML1lmDrFSf'
-    Install-User -Username 'CarbonTestUser' -Password $password -Description 'Carbon test user.'
-
-    $credential = New-Credential 'CarbonTestUser' -Password $password
-    # special chars to make sure they get handled correctly
-    $string = ' f u b a r '' " > ~!@#$%^&*()_+`-={}|:"<>?[]\;,./'
-    $protectedString = Protect-String -String $string -Credential $credential
-    if( -not $protectedString )
+    function Test-ShouldProtectStringForCredential
     {
-        Fail ('Failed to protect a string as user {0}.' -f $credential.UserName)
-    }
+        $password = 'Tt6QML1lmDrFSf'
+        Install-User -Username 'CarbonTestUser' -Password $password -Description 'Carbon test user.'
 
-    $outFile = New-TempDir -Prefix (Split-Path -Leaf -Path $PSCommandPath)
-    $outFile = Join-Path -Path $outFile -ChildPath 'secret'
-    try
-    {
-        $p = Start-Process -FilePath "powershell.exe" `
-                           -ArgumentList (Join-Path -Path $PSScriptRoot -ChildPath 'Unprotect-String.ps1'),'-ProtectedString',$protectedString `
-                           -WindowStyle Hidden `
-                           -Credential $credential `
-                           -PassThru `
-                           -Wait `
-                           -RedirectStandardOutput $outFile
-        $p.WaitForExit()
+        $credential = New-Credential 'CarbonTestUser' -Password $password
+        # special chars to make sure they get handled correctly
+        $string = ' f u b a r '' " > ~!@#$%^&*()_+`-={}|:"<>?[]\;,./'
+        $protectedString = Protect-String -String $string -Credential $credential
+        if( -not $protectedString )
+        {
+            Fail ('Failed to protect a string as user {0}.' -f $credential.UserName)
+        }
 
-        $decrypedString = Get-Content -Path $outFile -TotalCount 1
-        Assert-Equal $string $decrypedString
+        $outFile = New-TempDir -Prefix (Split-Path -Leaf -Path $PSCommandPath)
+        $outFile = Join-Path -Path $outFile -ChildPath 'secret'
+        try
+        {
+            $p = Start-Process -FilePath "powershell.exe" `
+                               -ArgumentList (Join-Path -Path $PSScriptRoot -ChildPath 'Unprotect-String.ps1'),'-ProtectedString',$protectedString `
+                               -WindowStyle Hidden `
+                               -Credential $credential `
+                               -PassThru `
+                               -Wait `
+                               -RedirectStandardOutput $outFile
+            $p.WaitForExit()
+
+            $decrypedString = Get-Content -Path $outFile -TotalCount 1
+            Assert-Equal $string $decrypedString
+        }
+        finally
+        {
+            Remove-Item -Recurse -Path (Split-Path -Parent -Path $outFile)
+        }
     }
-    finally
-    {
-        Remove-Item -Recurse -Path (Split-Path -Parent -Path $outFile)
-    }
+}
+else
+{
+    Write-Warning ('Can''t test protecting string under another identity: running under CC.Net, and the service user''s profile isn''t loaded, so can''t use Microsoft''s DPAPI.')
 }
 
 function Assert-IsBase64EncodedString($String)
