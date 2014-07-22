@@ -40,7 +40,7 @@ function Test-ShouldProtectStringsInPipeline
     }
 }
 
-if( -not (Test-Path -Path 'env:CCNetArtifactsDirectory') )
+if( -not (Test-Path -Path 'env:CCNetArtifactDirectory') )
 {
     function Test-ShouldProtectStringForCredential
     {
