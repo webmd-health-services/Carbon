@@ -15,6 +15,7 @@
 Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'CarbonDscTest.psm1' -Resolve) -Force
 
 $testConfigName = 'CarbonNpmConfigOption'
+$npmrcPath = Join-Path -Path (Split-Path -Parent -Path (Get-Command -Name 'npm.cmd').Path) -ChildPath 'node_modules\npm\npmrc' -Resolve
 
 function Start-TestFixture
 {
@@ -33,10 +34,19 @@ function Stop-Test
 
 function Remove-NpmTestConfigOption
 {
+    Remove-IniEntry -Path $npmrcPath -Name $testConfigName
+
     $value = npm config get $testConfigName --global
     if( ($value -and $value -ne 'undefined') )
     {
         npm config delete $testConfigName --global 2> $null
+        Assert-NoError
+    }
+
+    $value = npm config get $testConfigName
+    if( ($value -and $value -ne 'undefined') )
+    {
+        npm config delete $testConfigName 2> $null
         Assert-NoError
     }
 }
@@ -77,7 +87,7 @@ function Test-TestMissingConfig
 
 function Test-ShouldHandleConfigSetWithUndefinedAsValue
 {
-    npm config set $testConfigName 'undefined' --global
+    Assert-Equal 'undefined' (npm config get $testConfigName --global)
     $resource = Get-TargetResource -Name $testConfigName
     Assert-NotNull $resource
     Assert-Null $resource.Value
@@ -115,7 +125,8 @@ function Test-ShouldTreatNameAsCaseSensitive
     }
     finally
     {
-        npm config delete $testConfigName.ToUpper() --global
+        Remove-IniEntry -Path $npmrcPath -Name $testConfigName.ToUpper() 
+        #npm config delete $testConfigName.ToUpper() --global
     }
 }
 
@@ -175,13 +186,22 @@ function Assert-NpmConfig
 
     Set-StrictMode -Version 'Latest'
 
+    while( $Value -match '\$\{(.+?)\}' )
+    {
+        $envVarName = $Matches[1]
+        $replaceRegex = '${{{0}}}' -f $envVarName
+        $replaceRegex = [Text.RegularExpressions.RegEx]::Escape($replaceRegex)
+        $envVarValue = Get-Item -Path ('env:{0}' -f $envVarName) -ErrorAction Ignore | Select-Object -ExpandProperty 'Value'
+        $Value = $Value -replace $replaceRegex,$envVarValue
+    }
+
     $actualValue = npm config get $Name --global
-    if( $value -eq $null )
+    if( $Value -eq $null )
     {
         Assert-Equal 'undefined' $actualValue
     }
     else
     {
-        Assert-Equal $value $actualValue -CaseSensitive
+        Assert-Equal $Value $actualValue -CaseSensitive
     }
 }

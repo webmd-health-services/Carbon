@@ -14,6 +14,20 @@
 
 & (Join-Path -Path $PSScriptRoot -ChildPath '..\Initialize-CarbonDscResource.ps1' -Resolve)
 
+$npmCmd = Get-Command -Name 'npm.cmd'
+if( -not $npmCmd )
+{
+    return
+}
+
+$nodeJsRoot = Split-Path -Parent -Path $npmCmd.Path
+$npmrcPath = Join-Path -Path $nodeJsRoot -ChildPath 'node_modules\npm\npmrc'
+if( -not (Test-Path -Path $npmrcPath -PathType Leaf) )
+{
+    Write-Error ('Built-in npmrc ''{0}'' not found.' -f $npmrcPath)
+    return
+}
+
 function Get-TargetResource
 {
 	[CmdletBinding()]
@@ -37,35 +51,14 @@ function Get-TargetResource
     
     Set-StrictMode -Version 'Latest'
 
-    $value = npm config get $Name --global
-    $Ensure = 'Present'
-
-    $exists = $true
-    $currentValue = npm config get $Name
-    if( $currentValue -eq 'undefined' )
+    $ini = Split-Ini -Path $npmrcPath -AsHashtable -CaseSensitive
+    
+    $currentValue = $null
+    $Ensure = 'Absent'
+    if( $ini.ContainsKey( $Name ) )
     {
-        $exists = Invoke-Command -ScriptBlock {
-                            npm config ls -l --global
-                            npm config list --global
-                        } | Where-Object { $_ -clike ('{0} =' -f $Name) }
-        if( $exists )
-        {
-            $exists = $true
-        }
-        else
-        {
-            $exists = $false
-        }
-    }
-
-    if( $exists )
-    {
-        $Ensure = 'Present'
-    }
-    else
-    {
-        $Ensure = 'Absent'
-        $currentValue = $null
+        $currentValue = $ini[$Name].Value
+        $Ensure = 'Present';
     }
 
     @{
@@ -101,14 +94,14 @@ function Set-TargetResource
     if( $resource.Ensure -eq 'Present' -and $Ensure -eq 'Absent' )
     {
         Write-Verbose ('Removing {0}' -f $Name)
-        npm config delete $Name --global
+        Remove-IniEntry -Path $npmrcPath -Name $Name -CaseSensitive
         return
     }
 
     if( $Ensure -eq 'Present' )
     {
         Write-Verbose ('Setting {0}' -f $Name)
-        npm config set $Name $Value --global
+        Set-IniEntry -Path $npmrcPath -Name $Name -Value $Value -CaseSensitive
     }
 }
 
