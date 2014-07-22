@@ -30,11 +30,13 @@ function Set-IniEntry
 
     Names are not allowed to contains the equal sign, `=`.  Values can contain any character.  The INI file is parsed using `Split-Ini`.  [See its documentation for more examples.](Split-Ini.html)
 
+    Be default, operates on the INI file case-insensitively. If your INI is case-sensitive, use the `-CaseSensitive` switch.
+
     .LINK
     Split-Ini
 
     LINK
-    .Remove-IniEntry
+    Remove-IniEntry
 
     .EXAMPLE
     Set-IniEntry -Path C:\Users\rspektor\mercurial.ini -Section extensions -Name share -Value ''
@@ -62,6 +64,10 @@ function Set-IniEntry
 
         genres = alternative,rock,world
 
+    .EXAMPLE
+    Set-IniEntry -Path C:\users\me\npmrc -Name prefix -Value 'C:\Users\me\npm_modules' -CaseSensitive
+
+    Demonstrates how to set an INI entry in a case-sensitive file.
     #>
     [CmdletBinding(SupportsShouldProcess=$true)]
     param(
@@ -81,7 +87,11 @@ function Set-IniEntry
 
         [string]
         # The section of the INI where the entry should be set.
-        $Section
+        $Section,
+
+        [Switch]
+        # Treat the INI file in a case-sensitive manner.
+        $CaseSensitive
     )
 
     Set-StrictMode -Version 'Latest'
@@ -98,7 +108,7 @@ function Set-IniEntry
     
     if( Test-Path $Path -PathType Leaf )
     {
-        $settings = Split-Ini -Path $Path -AsHashtable
+        $settings = Split-Ini -Path $Path -AsHashtable -CaseSensitive:$CaseSensitive
         Get-Content -Path $Path | ForEach-Object { [void] $lines.Add( $_ ) }
     }
     

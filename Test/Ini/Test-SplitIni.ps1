@@ -130,6 +130,42 @@ name3 = value3
     Assert-IniContains -Ini $ini -Name 'name3' -Value 'value3' -Section 'section' -LineNumber 6
 }
 
+function Test-ShouldSupportCaseSensitiveIniFiles
+{
+    @"
+name = a
+NAME = b
+
+[section]
+name1 = c
+NAME1 = d
+
+[SECTION]
+name1 = e
+NAME1 = f
+"@ | Set-Content -Path $iniPath
+
+    $ini = Split-Ini -Path $iniPath -AsHashtable -CaseSensitive
+    Assert-NotNull $ini
+    Assert-Equal 6 $ini.Count
+    Assert-True $ini.ContainsKey('name')
+    Assert-Equal 'a'  $ini['name'].Value
+    Assert-True $ini.ContainsKey('NAME')
+    Assert-Equal 'b'  $ini['NAME'].Value
+    Assert-True $ini.ContainsKey('section.name1')
+    Assert-Equal 'c'  $ini['section.name1'].Value
+    Assert-True $ini.ContainsKey('section.NAME1')
+    Assert-Equal 'd'  $ini['section.NAME1'].Value
+    Assert-True $ini.ContainsKey('SECTION.name1')
+    Assert-Equal 'e'  $ini['SECTION.name1'].Value
+    Assert-True $ini.ContainsKey('SECTION.NAME1')
+    Assert-Equal 'f'  $ini['SECTION.NAME1'].Value
+
+    $ini = Split-Ini -Path $iniPath
+    Assert-NotNull $ini
+    Assert-Equal 6 $ini.Count
+}
+
 function Assert-IniContains
 {
     param(

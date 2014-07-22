@@ -43,6 +43,9 @@
 
  * [Remove-IniEntry](http://get-carbon.org/help/Remove-IniEntry.html) now writes messages with `Write-Verbose` instead of `Write-Host`.
  * [Set-IniEntry](http://get-carbon.org/help/Set-IniEntry.html) now writes messages with `Write-Verbose` instead of `Write-Host`.
+ * [Remove-IniEntry](http://get-carbon.org/help/Remove-IniEntry.html) now handles case-sensitive INI files.
+ * [Set-IniEntry](http://get-carbon.org/help/Set-IniEntry.html) now handles case-sensitive INI files.
+ * [Split-IniEntry](http://get-carbon.org/help/Split-IniEntry.html) now handles case-sensitive INI files.
 
 ### Internet Explorer
 

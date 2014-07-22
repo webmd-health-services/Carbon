@@ -84,6 +84,31 @@ section1value1 = duplicate
 '@
 }
 
+function Test-ShouldRemoveCaseSensitiveIniOptions
+{
+    @'
+name = a
+NAME = b
+
+[section]
+name = c
+
+[SECTION]
+name = d
+
+'@ | Set-Content -Path $iniPath
+
+    Remove-IniEntry -Path $iniPath -Name 'name' -CaseSensitive
+    Remove-IniEntry -Path $iniPath -Section 'section' -Name 'name' -CaseSensitive
+
+    $ini = Split-Ini -Path $iniPath -CaseSensitive -AsHashtable
+    Assert-NotNull $ini
+    Assert-Equal 2 $ini.Count
+    Assert-Equal 'b' $ini['NAME'].Value
+    Assert-Equal 'd' $ini['SECTION.name'].Value
+
+}
+
 function Assert-IniFile
 {
     param(

@@ -76,6 +76,8 @@ function Split-Ini
 
     This would set the "eggs", "ham", and "bread" configuration keys of the "foo" section to "medium", "prosciutto", and "toasted", respectively. As you can see, the only thing that matters is the last value that was set for each of the configuration keys.
 
+    Be default, operates on the INI file case-insensitively. If your INI is case-sensitive, use the `-CaseSensitive` switch.
+
     .LINK
     Set-IniEntry
 
@@ -139,6 +141,48 @@ function Split-Ini
                                        LineNumber = 6;
                                   )
         }
+
+    .EXAMPLE
+    Split-Ini -Path C:\Users\rspektor\mercurial.ini -AsHashtable -CaseSensitive
+
+    Demonstrates how to parse a case-sensitive INI file.
+
+        Given this INI file:
+
+        [ui]
+        username = user@example.com
+        USERNAME = user2example.com
+
+        [UI]
+        username = user3@example.com
+
+
+    `Split-Ini -CaseSensitive` returns the following hashtable:
+
+        @{
+            ui.username = Carbon.Ini.IniNode (
+                                FullName = 'ui.username';
+                                Section = "ui";
+                                Name = "username";
+                                Value = "user@example.com";
+                                LineNumber = 2;
+                            );
+            ui.USERNAME = Carbon.Ini.IniNode (
+                                FullName = 'ui.USERNAME';
+                                Section = "ui";
+                                Name = "USERNAME";
+                                Value = "user2@example.com";
+                                LineNumber = 3;
+                            );
+            UI.username = Carbon.Ini.IniNode (
+                                FullName = 'UI.username';
+                                Section = "UI";
+                                Name = "username";
+                                Value = "user3@example.com";
+                                LineNumber = 6;
+                            );
+        }
+
     #>
     [CmdletBinding(SupportsShouldProcess=$true)]
     param(
@@ -149,7 +193,11 @@ function Split-Ini
         
         [Switch]
         # Pass each parsed setting down the pipeline instead of collecting them all into a hashtable.
-        $AsHashtable
+        $AsHashtable,
+
+        [Switch]
+        # Parses the INI file in a case-sensitive manner.
+        $CaseSensitive
     )
 
     if( -not (Test-Path $Path -PathType Leaf) )
@@ -162,6 +210,10 @@ function Split-Ini
     $lineNum = 0
     $lastSetting = $null
     $settings = @{ }
+    if( $CaseSensitive )
+    {
+        $settings = New-Object 'Collections.Hashtable'
+    }
     
     Get-Content -Path $Path | ForEach-Object {
         

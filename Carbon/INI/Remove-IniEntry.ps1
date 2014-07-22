@@ -32,6 +32,8 @@ function Remove-IniEntry
     
     If the entry doesn't exist, does nothing.
 
+    Be default, operates on the INI file case-insensitively. If your INI is case-sensitive, use the `-CaseSensitive` switch.
+
     .LINK
     Set-IniEntry
 
@@ -42,6 +44,11 @@ function Remove-IniEntry
     Remove-IniEntry -Path C:\Projects\Carbon\StupidStupid.ini -Section rat -Name tails
 
     Removes the `tails` item in the `[rat]` section of the `C:\Projects\Carbon\StupidStupid.ini` file.
+
+    .EXAMPLE
+    Remove-IniEntry -Path C:\Users\me\npmrc -Name 'prefix' -CaseSensitive
+
+    Demonstrates how to remove an INI entry in an INI file that is case-sensitive.
     #>
     [CmdletBinding(SupportsShouldProcess=$true)]
     param
@@ -58,7 +65,11 @@ function Remove-IniEntry
         
         [string]
         # The section of the INI where the entry should be set.
-        $Section
+        $Section,
+
+        [Switch]
+        # Removes INI entries in a case-sensitive manner.
+        $CaseSensitive
     )
 
     Set-StrictMode -Version 'Latest'
@@ -67,7 +78,7 @@ function Remove-IniEntry
     
     if( Test-Path $Path -PathType Leaf )
     {
-        $settings = Split-Ini -Path $Path -AsHashtable
+        $settings = Split-Ini -Path $Path -AsHashtable -CaseSensitive:$CaseSensitive
     }
     else
     {

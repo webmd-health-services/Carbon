@@ -269,6 +269,28 @@ name = value
 "@
 }
 
+function Test-ShouldSupportCaseSensitiveIniFile
+{
+    @"
+name = a
+NAME = b
+
+[section]
+name = c
+
+[SECTION]
+name = d
+"@ | Set-Content -Path $iniPath
+
+    Set-IniEntry -Path $iniPath -Name 'name' -Value 2 -CaseSensitive
+    Set-IniEntry -Path $iniPath -Section 'section' -Name 'name' -Value 4 -CaseSensitive
+    $ini = Split-Ini -Path $iniPath -AsHashtable -CaseSensitive
+    Assert-Equal '2' $ini['name'].Value
+    Assert-Equal 'b' $ini['NAME'].Value
+    Assert-Equal '4' $ini['section.name'].Value
+    Assert-Equal 'd' $ini['SECTION.name'].Value
+}
+
 function Assert-IniFile
 {
     param(
