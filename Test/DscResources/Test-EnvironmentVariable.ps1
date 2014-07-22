@@ -16,8 +16,7 @@ Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'CarbonDscTest.psm
 
 function Start-TestFixture
 {
-    Start-CarbonDscTestFixture
-    Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath '..\..\Carbon\DscResources\Carbon_EnvironmentVariable' -Resolve) -Force
+    Start-CarbonDscTestFixture 'EnvironmentVariable'
     [Environment]::SetEnvironmentVariable('fubar',$null,'Machine')
     [Environment]::SetEnvironmentVariable('fubar',$null,'Process')
 }
@@ -25,7 +24,6 @@ function Start-TestFixture
 function Stop-TestFixture
 {
     Stop-CarbonDscTestFixture
-    Remove-Module 'Carbon_EnvironmentVariable'
     [Environment]::SetEnvironmentVariable('fubar',$null,'Machine')
     [Environment]::SetEnvironmentVariable('fubar',$null,'Process')
 }

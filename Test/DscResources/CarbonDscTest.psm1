@@ -13,12 +13,24 @@
 # limitations under the License.
 
 $CarbonDscOutputRoot = $null
+$currentDscResource = $null
 
 function Start-CarbonDscTestFixture
 {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory=$true,Position=0)]
+        [string]
+        $DscResourceName
+    )
+
+    Set-StrictMode -Version 'Latest'
+
+    $script:currentDscResource = $DscResourceName
+    Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath ('..\..\Carbon\DscResources\Carbon_{0}' -f $DscResourceName) -Resolve) -Force -Global
 
     $tempDir = [IO.Path]::GetRandomFileName()
-    $tempDir = 'CarbonDscTest-{0}-{1}' -f $Name,$tempDir
+    $tempDir = 'CarbonDscTest-{0}-{1}' -f $DscResourceName,$tempDir
     $script:CarbonDscOutputRoot = Join-Path -Path $env:TEMP -ChildPath $tempDir
 
     New-Item -Path $CarbonDscOutputRoot -ItemType 'directory'
@@ -33,6 +45,8 @@ function Stop-CarbonDscTestFixture
     {
         Remove-Item -Path $CarbonDscOutputRoot -Recurse
     }
+
+    Remove-Module ('Carbon_{0}' -f $currentDscResource)
 }
 
 function Invoke-CarbonTestDscConfiguration

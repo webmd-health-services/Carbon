@@ -52,6 +52,7 @@ This is a backwards-incompatible release.
 
  * Created `EnvironmentVariable` resource for creating/removing machine-level environment variables.
  * New [Clear-DscLocalResourceCache](http://get-carbon.org/help/Clear-DscLocalResourceCache.html) function for clearing the local LCM's DSC resource. This makes developing resources easier.
+ * Created `NpmConfig` resource for creating/setting/removing global NPM configuration values (yes, the "Node Package Manager" NPM).
  
 ### File System
 
