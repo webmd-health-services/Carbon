@@ -52,5 +52,5 @@ try
 finally
 {
     $installRoot = Get-PowerShellModuleInstallPath
-    #Remove-Junction -Path $carbonModuleRoot
+    Remove-Junction -Path $carbonModuleRoot
 }
