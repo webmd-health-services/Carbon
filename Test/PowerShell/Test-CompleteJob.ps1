@@ -24,11 +24,11 @@ function TearDown
 
 function Test-ShouldCompleteJobs
 {
-    $numJobsAtStart = (Get-Job).Count
+    $numJobsAtStart = Get-Job | Measure-Object | Select-Object -ExpandProperty 'Count'
     $job = Start-Job { Start-Sleep -Milliseconds 1 } -Name "Sleep1Millisecond"
     $numFailed = Complete-Job -Job $job
     Assert-Equal 0 $numFailed
-    $numJobsNow = (Get-Job).Count
+    $numJobsNow = Get-Job | Measure-Object | Select-Object -ExpandProperty 'Count'
     Assert-Equal $numJobsAtStart $numJobsNow 'completed job not removed'
 }
 

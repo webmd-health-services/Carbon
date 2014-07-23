@@ -58,7 +58,6 @@ function Test-ShouldGrantPermissionOnDirectory
     $identity = 'BUILTIN\Administrators'
     $permissions = 'Read','Write'
     
-    Write-Host $SCRIPT:Dir
     Invoke-GrantPermissions -Identity $identity -Permissions $permissions
     Assert-Permissions $identity $permissions
 }

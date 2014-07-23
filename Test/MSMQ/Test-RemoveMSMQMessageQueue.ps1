@@ -14,7 +14,7 @@
 
 $userDomain = $env:USERDNSDOMAIN
 $computerDomain = Get-WmiObject 'Win32_ComputerSystem' | Select-Object -ExpandProperty Domain
-if( Get-Service -Name MSMQ -ErrorAction SilentlyContinue -and $userDomain -eq $computerDomain )
+if( (Get-Service -Name MSMQ -ErrorAction SilentlyContinue) -and $userDomain -eq $computerDomain )
 {
 
     $publicQueueName = $null
