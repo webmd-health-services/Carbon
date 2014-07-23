@@ -127,6 +127,10 @@ function Get-Certificate
         else
         {
             $storeNamePath = $StoreName
+            if( $StoreName -eq [Security.Cryptography.X509Certificates.StoreName]::CertificateAuthority )
+            {
+                $storeNamePath = 'CA'
+            }
         }
         
         if( $pscmdlet.ParameterSetName -like 'ByThumbprint*' )

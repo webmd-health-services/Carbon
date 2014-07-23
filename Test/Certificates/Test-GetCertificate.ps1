@@ -121,6 +121,16 @@ function Test-ShouldIncludeExceptionWhenFailingToLoadCertificate
     Assert-Is $Error[0].Exception ([Management.Automation.MethodInvocationException])
 }
 
+function Test-ShouldGetCertificatesInCAStore
+{
+    $foundACert = $false
+    dir Cert:\CurrentUser\CA | ForEach-Object {
+        $cert = Get-Certificate -Thumbprint $_.Thumbprint -StoreLocation CurrentUser -StoreName CertificateAuthority
+        Assert-NotNull $cert
+        $foundACert = $true
+    }
+}
+
 function Assert-TestCert($actualCert)
 {
     
