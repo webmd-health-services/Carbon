@@ -36,6 +36,9 @@
 
  * [Disable-FirewallStatefulFtp](http://get-carbon.org/help/Disable-FirewallStatefulFtp.html) no longer writes messages with `Write-Host`. Improved error handling.
  * [Enable-FirewallStatefulFtp](http://get-carbon.org/help/Enable-FirewallStatefulFtp.html) no longer writes message with `Write-Host`.
+ * Added `Name` and `LiteralName` parameters to [Get-FirewallRule](http://get-carbon.org/help/Get-FirewallRule.html) to return specific rules instead of all of them.
+ * [Get-FirewallRule](http://get-carbon.org/help/Get-FirewallRule.html), now returns `Carbon.Firewall.Rule` objects, instead of anonymous hashes.
+ * Added default table format for [Get-FirewallRule](http://get-carbon.org/help/Get-FirewallRule.html) output.
 
 ### Hosts File
 

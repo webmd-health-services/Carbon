@@ -332,5 +332,71 @@
 			    </TableRowEntries>
             </TableControl>
 		</View>
+        <View>
+            <Name>Carbon.Firewall.Rule</Name>
+            <ViewSelectedBy>
+                <TypeName>Carbon.Firewall.Rule</TypeName>
+            </ViewSelectedBy>
+            <TableControl>
+			    <TableHeaders>
+				    <TableColumnHeader />
+				    <TableColumnHeader>
+                        <Width>9</Width>
+                    </TableColumnHeader>
+				    <TableColumnHeader>
+                        <Width>21</Width>
+                    </TableColumnHeader>
+				    <TableColumnHeader>
+                        <Width>7</Width>
+                    </TableColumnHeader>
+				    <TableColumnHeader>
+                        <Width>6</Width>
+                    </TableColumnHeader>
+				    <TableColumnHeader>
+                        <Width>8</Width>
+                    </TableColumnHeader>
+				    <TableColumnHeader />
+				    <TableColumnHeader />
+				    <TableColumnHeader />
+				    <TableColumnHeader />
+			    </TableHeaders>
+			    <TableRowEntries>
+				    <TableRowEntry>
+					    <TableColumnItems>
+						    <TableColumnItem>
+							    <PropertyName>Name</PropertyName>
+						    </TableColumnItem>
+						    <TableColumnItem>
+							    <PropertyName>Direction</PropertyName>
+						    </TableColumnItem>
+						    <TableColumnItem>
+							    <PropertyName>Profiles</PropertyName>
+						    </TableColumnItem>
+						    <TableColumnItem>
+							    <PropertyName>Enabled</PropertyName>
+						    </TableColumnItem>
+						    <TableColumnItem>
+							    <PropertyName>Action</PropertyName>
+						    </TableColumnItem>
+						    <TableColumnItem>
+							    <PropertyName>Protocol</PropertyName>
+						    </TableColumnItem>
+						    <TableColumnItem>
+							    <PropertyName>LocalIP</PropertyName>
+						    </TableColumnItem>
+						    <TableColumnItem>
+							    <PropertyName>LocalPort</PropertyName>
+						    </TableColumnItem>
+						    <TableColumnItem>
+							    <PropertyName>RemoteIP</PropertyName>
+						    </TableColumnItem>
+						    <TableColumnItem>
+							    <PropertyName>RemotePort</PropertyName>
+						    </TableColumnItem>
+					    </TableColumnItems>
+				    </TableRowEntry>
+			    </TableRowEntries>
+            </TableControl>
+		</View>
 	</ViewDefinitions>
 </Configuration>

@@ -63,6 +63,11 @@
     <Compile Include="AdvApi32.cs" />
     <Compile Include="Certificates\SslCertificateBinding.cs" />
     <Compile Include="Computer\ProgramInstallInfo.cs" />
+    <Compile Include="Firewall\Rule.cs" />
+    <Compile Include="Firewall\RuleAction.cs" />
+    <Compile Include="Firewall\RuleDirection.cs" />
+    <Compile Include="Firewall\RuleEdgeTraversalPolicy.cs" />
+    <Compile Include="Firewall\RuleProfile.cs" />
     <Compile Include="Identity.cs" />
     <Compile Include="IdentityType.cs" />
     <Compile Include="Ini\IniNode.cs" />
