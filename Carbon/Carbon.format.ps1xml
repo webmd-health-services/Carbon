@@ -296,5 +296,41 @@
 			    </TableRowEntries>
             </TableControl>
 		</View>
+        <View>
+            <Name>System.Security.Cryptography.X509Certificates.X509Store</Name>
+            <ViewSelectedBy>
+                <TypeName>System.Security.Cryptography.X509Certificates.X509Store</TypeName>
+            </ViewSelectedBy>
+            <TableControl>
+			    <TableHeaders>
+				    <TableColumnHeader>
+                        <Width>12</Width>
+                    </TableColumnHeader>
+				    <TableColumnHeader />
+				    <TableColumnHeader />
+				    <TableColumnHeader>
+                        <Width>20</Width>
+                    </TableColumnHeader>
+			    </TableHeaders>
+			    <TableRowEntries>
+				    <TableRowEntry>
+					    <TableColumnItems>
+						    <TableColumnItem>
+							    <PropertyName>Location</PropertyName>
+						    </TableColumnItem>
+						    <TableColumnItem>
+							    <PropertyName>Name</PropertyName>
+						    </TableColumnItem>
+						    <TableColumnItem>
+							    <PropertyName>DisplayName</PropertyName>
+						    </TableColumnItem>
+						    <TableColumnItem>
+							    <PropertyName>StoreName</PropertyName>
+						    </TableColumnItem>
+					    </TableColumnItems>
+				    </TableRowEntry>
+			    </TableRowEntries>
+            </TableControl>
+		</View>
 	</ViewDefinitions>
 </Configuration>
