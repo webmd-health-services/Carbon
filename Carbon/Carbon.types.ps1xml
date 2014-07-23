@@ -106,7 +106,7 @@
                         'Root' { return 'Trusted Root Certification Authorities' }
                         'TrustedPeople' { return 'Trusted People' }
                         'TrustedPublisher' { return 'Trusted Publishers' }
-                        default { return $this.Name }
+                        default { return '' }
                     }
                 </GetScriptBlock>
             </ScriptProperty>
