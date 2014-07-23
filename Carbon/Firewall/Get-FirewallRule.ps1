@@ -16,30 +16,21 @@ function Get-FirewallRule
 {
     <#
     .SYNOPSIS
-    Returns the computer's list of firewall rules.
+    Gets the local computer's firewall rules.
     
     .DESCRIPTION
-    Sends objects down the pipeline for each of the firewall's rules. Each 
-    object contains the following properties:
-    
-      * Name
-      * Enabled
-      * Direction
-      * Profiles
-      * Grouping
-      * LocalIP
-      * RemoteIP
-      * Protocol
-      * LocalPort
-      * RemotePort
-      * EdgeTraversal
-      * Action
+    Returns a `Carbon.Firewall.Rule` object for each firewall rule on the local computer. 
     
     This data is parsed from the output of:
     
         netsh advfirewall firewall show rule name=all.
 
-    If the firewall isn't configurable, writes an error and returns without returning any objects.
+    You can return specific rule(s) using the `Name` or `LiteralName` parameters. The `Name` parameter accepts wildcards; `LiteralName` does not. There can be multiple firewall rules with the same name.
+
+    If the firewall isn't configurable/running, writes an error and returns without returning any objects.
+
+    .OUTPUTS
+    Carbon.Firewall.Rule.
 
     .LINK
     Assert-FirewallConfigurable
@@ -47,49 +38,72 @@ function Get-FirewallRule
     .EXAMPLE
     Get-FirewallRule
 
-    Here's a sample of the output:
+    Demonstrates how to get the firewall rules running on the current computer.
 
-        EdgeTraversal : Defer to application
-        Grouping      : Remote Assistance
-        Action        : Allow
-        RemotePort    : Any
-        RemoteIP      : Any
-        LocalIP       : Any
-        Name          : Remote Assistance (PNRP-In)
-        Direction     : In
-        Profiles      : Domain,Private
-        LocalPort     : 3540
-        Protocol      : UDP
-        Enabled       : True
+    .EXAMPLE
+    Get-FirewallRule -Name 'World Wide Web Services (HTTP Traffic-In)'
 
-        EdgeTraversal : No
-        Grouping      : Remote Assistance
-        Action        : Allow
-        RemotePort    : Any
-        RemoteIP      : Any
-        LocalIP       : Any
-        Name          : Remote Assistance (PNRP-Out)
-        Direction     : Out
-        Profiles      : Domain,Private
-        LocalPort     : Any
-        Protocol      : UDP
-        Enabled       : True
+    Demonstrates how to get a specific rule.
 
+    .EXAMPLE
+    Get-FirewallRule -Name '*HTTP*'
+
+    Demonstrates how to use wildcards to find rules whose names match a wildcard pattern, in this case any rule whose name contains the text 'HTTP' is returned.
+
+    .EXAMPLE
+    Get-FirewallRule -LiteralName 'Custom Rule **CREATED BY AUTOMATED PROCES'
+
+    Demonstrates how to find a specific firewall rule by name if that name has wildcard characters in it.
     #>
-    param()
+    [CmdletBinding(DefaultParameterSetName='All')]
+    [OutputType([Carbon.Firewall.Rule])]
+    param(
+        [Parameter(Mandatory=$true,ParameterSetName='ByName')]
+        [string]
+        # The name of the rule. Wildcards supported. Names aren't unique, so you may still get back multiple rules
+        $Name,
+
+        [Parameter(Mandatory=$true,ParameterSetName='ByLiteralName')]
+        [string]
+        # The literal name of the rule. Wildcards not supported.
+        $LiteralName
+    )
+
+    Set-StrictMode -Version 'Latest'
     
     if( -not (Assert-FirewallConfigurable) )
     {
         return
     }
 
-    $rule = $null    
-    netsh advfirewall firewall show rule name=all | ForEach-Object {
+    $containsWildcards = $false
+    $nameArgValue = 'all'
+    if( $PSCmdlet.ParameterSetName -eq 'ByName' )
+    {
+        $containsWildcards = [Management.Automation.WildcardPattern]::ContainsWildcardCharacters($Name) 
+        if( -not $containsWildcards )
+        {
+            $nameArgValue = $Name
+        }
+    }
+    elseif( $PSCmdlet.ParameterSetName -eq 'ByLiteralName' )
+    {
+        $nameArgValue = $LiteralName
+    }
+
+    # Don't change/move this. It's so we can detect if we've parsed a rule.
+    $rule = $null
+
+    netsh advfirewall firewall show rule name=$nameArgValue | ForEach-Object {
         $line = $_
         
+        Write-Verbose $line
+
         if( -not $line -and $rule )
         {
-            New-Object PsObject -Property $rule
+            $profiles = [Carbon.Firewall.RuleProfile]::Any
+            $rule.Profiles -split ',' | ForEach-Object { $profiles = $profiles -bor ([Carbon.Firewall.RuleProfile]$_) }
+            New-Object 'Carbon.Firewall.Rule' $rule.Name,$rule.Enabled,$rule.Direction,$profiles,$rule.Grouping,$rule.LocalIP,$rule.LocalPort,$rule.RemoteIP,$rule.RemotePort,$rule.Protocol,$rule.EdgeTraversal,$rule.Action
             return
         }
         
@@ -98,25 +112,31 @@ function Get-FirewallRule
             return
         }
         
-        $name = $matches[1]
+        $propName = $matches[1]
         $value = $matches[2]
-        if( $name -eq 'Rule Name' )
+        if( $propName -eq 'Rule Name' )
         {
-            $rule = @{ }
-            $name = 'Name'
+            $rule = @{
+                        LocalPort = $null;
+                        RemotePort = $null;
+                     }
+            $propName = 'Name'
         }
-        elseif( $name -eq 'Edge traversal' )
+        elseif( $propName -eq 'Edge traversal' )
         {
-            $name = 'EdgeTraversal' 
+            $propName = 'EdgeTraversal' 
         }
 
-        if( $name -eq 'Enabled' )
+        if( $propName -eq 'Enabled' )
         {
             $value = if( $value -eq 'No' ) { $false } else { $value }
             $value = if( $value -eq 'Yes' ) { $true } else { $value }
         }
         
-        $rule[$name] = $value
+        $rule[$propName] = $value
+    } |
+    Where-Object { 
+        -not $containsWildcards -or $_.Name -like $Name 
     }
 }
 

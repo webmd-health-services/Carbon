@@ -65,3 +65,33 @@ function Test-ShouldGetFirewallRules
         $ruleNum += 1
     }
 }
+
+function Test-ShouldGetFirewallRule
+{
+    Get-FirewallRule | ForEach-Object {
+        $rule = $_
+        $actualRule = Get-FirewallRule -Name $rule.Name | ForEach-Object {
+            $actualRule = $_
+
+            Assert-NotNull $actualRule
+            Assert-Equal $rule.Name $actualRule.Name
+        }
+    }
+}
+
+function Test-ShouldSupportWildcardFirewallRule
+{
+    [Carbon.Firewall.Rule[]]$allRules = Get-FirewallRule
+    Assert-NotNull $allRules
+    [Carbon.Firewall.Rule[]]$rules = Get-FirewallRule -Name '*HTTP*' 
+    Assert-NotNull $rules
+    Assert-LessThan $rules.Length $allRules.Length
+    $expectedCount = netsh advfirewall firewall show rule name=all | Where-Object { $_ -like 'Rule Name*HTTP*' } | Measure-Object | Select-Object -ExpandProperty 'Count'
+    Assert-Equal $expectedCount $rules.Length
+}
+
+function Test-ShouldSupportLiteralName
+{
+    $rules = Get-FirewallRule -LiteralName '*HTTP*'
+    Assert-Null $rules
+}
