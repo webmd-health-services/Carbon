@@ -36,7 +36,7 @@ function Test-ShouldCreateDisplayNameProperty
         }
         else
         {
-            Assert-Equal $_.Name $_.DisplayName
+            Assert-Equal '' $_.DisplayName
         }
     }
 }
