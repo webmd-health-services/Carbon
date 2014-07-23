@@ -132,6 +132,22 @@
         </Members>
     </Type>
     <Type>
+        <Name>Carbon.Firewall.Rule</Name>
+        <Members>
+            <AliasProperty>
+                <Name>LocalIP</Name>
+                <ReferencedMemberName>
+                    LocalIPAddress
+                </ReferencedMemberName>
+            </AliasProperty>
+            <AliasProperty>
+                <Name>RemoteIP</Name>
+                <ReferencedMemberName>
+                    RemoteIPAddress
+                </ReferencedMemberName>
+            </AliasProperty>
+    </Type>
+    <Type>
         <Name>System.DirectoryServices.AccountManagement.Principal</Name>
         <Members>
             <ScriptProperty>

@@ -67,7 +67,9 @@
     <Compile Include="Firewall\RuleAction.cs" />
     <Compile Include="Firewall\RuleDirection.cs" />
     <Compile Include="Firewall\RuleEdgeTraversalPolicy.cs" />
+    <Compile Include="Firewall\RuleInterfaceType.cs" />
     <Compile Include="Firewall\RuleProfile.cs" />
+    <Compile Include="Firewall\RuleSecurity.cs" />
     <Compile Include="Identity.cs" />
     <Compile Include="IdentityType.cs" />
     <Compile Include="Ini\IniNode.cs" />

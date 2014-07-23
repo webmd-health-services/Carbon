@@ -19,50 +19,71 @@ function Start-TestFixture
 
 function Test-ShouldGetFirewallRules
 {
-    $rules = Get-FirewallRule
+    [Carbon.Firewall.Rule[]]$rules = Get-FirewallRule
     Assert-NotNull $rules
     Assert-GreaterThan $rules.Count 0 
     
-    $expectedRules = netsh advfirewall firewall show rule name=all
+    $expectedRules = netsh advfirewall firewall show rule name=all verbose
     
-    $expectedIdx = 1
-    $ruleNum = 1
+    $fieldMaps =    @{
+                        'Rule Name' = 'Name';
+                        'Edge traversal' = 'EdgeTraversal';
+                        'InterfaceTypes' = 'InterfaceType';
+                        'Rule source' = 'Source';
+                    }
+
+    $ruleIdx = 0
+    $actualRule = $null
     $format = "{0,-38}{1}"
-    foreach( $actualRule in $rules )
+    for( $idx = 0; $idx -lt $expectedRules.Count; ++$idx )
     {
-        $name = if($actualRule.Name) { $actualRule.Name } else {' '}
-        $ruleID = "for rule $ruleNum`: $($actualRule.Name) [$expectedIdx]"
-        Assert-Equal $expectedRules[$expectedIdx] ($format -f 'Rule Name:',$name) $ruleID
-        $enabled = if( $actualRule.Enabled ) { 'Yes' } else { 'No' }
-        Assert-Equal $expectedRules[$expectedIdx + 2] ($format -f 'Enabled:',$enabled) $ruleID
-        Assert-Equal $expectedRules[$expectedIdx + 3] ($format -f 'Direction:',$actualRule.Direction) $ruleID
-        Assert-Equal $expectedRules[$expectedIdx + 4] ($format -f 'Profiles:',$actualRule.Profiles) $ruleID
-        Assert-Equal $expectedRules[$expectedIdx + 5] ($format -f 'Grouping:',$actualRule.Grouping) $ruleID
-        Assert-Equal $expectedRules[$expectedIdx + 6] ($format -f 'LocalIP:',$actualRule.LocalIP) $ruleID
-        Assert-Equal $expectedRules[$expectedIdx + 7] ($format -f 'RemoteIP:',$actualRule.RemoteIP) $ruleID
-        Assert-Equal $expectedRules[$expectedIdx + 8] ($format -f 'Protocol:',$actualRule.Protocol) $ruleID
-        $localPortOffset = 9
-        $edgeTraversalOffset = 11
-        $nextRuleOffset = 14
-        $expectedLocalPort = $expectedRules[$expectedIdx + $localPortOffset]
-        if( $expectedLocalPort -like 'LocalPort:*' )
+        $line = $expectedRules[$idx]
+        if( -not $line -or $line -match '^\-+$' -or $line -eq 'Ok.' )
         {
-            Assert-Equal $expectedLocalPort ($format -f 'LocalPort:',$actualRule.LocalPort) $ruleID
-            Assert-Equal $expectedRules[$expectedIdx + 10] ($format -f 'RemotePort:',$actualRule.RemotePort) $ruleID
+            continue
         }
-        elseif( $expectedLocalPort -like ($format -f '','*') )
+
+        if( $line -match '^ +Type +Code *$' )
         {
+            $line = $expectedRules[++$idx]
+            if( $line -notmatch '^ +?([^ ]+) +?([^ ]+) *$' )
+            {
+                Fail ('Failed to parse protocol details on line {0}: {1}' -f $idx,$line)
+            }
+            Assert-Like $actualRule.Protocol ('*:{0},{1}' -f $Matches[1],$Matches[2]) ('[{0}] {1}' -f $ruleIdx,$actualRule.Name)
+            continue
         }
-        else
+
+        if( $line -notmatch ('^(.+?):' ) )
         {
-            $edgeTraversalOffset = 9
-            $nextRuleOffset = 12
+            Fail ('Found misshappen line {0}' -f $line)
         }
-        
-        Assert-Equal $expectedRules[$expectedIdx + $edgeTraversalOffset] ($format -f 'Edge traversal:',$actualRule.EdgeTraversal) $ruleID
-        Assert-Equal $expectedRules[$expectedIdx + $edgeTraversalOffset + 1] ($format -f 'Action:',$actualRule.Action) $ruleID
-        $expectedIdx += $nextRuleOffset
-        $ruleNum += 1
+
+        $fieldName = $Matches[1]
+        $propName = $fieldName
+        if( $fieldMaps.ContainsKey($propName) )
+        {
+            $propName = $fieldMaps[$fieldName]
+        }
+
+        if( $propName -eq 'Name' )
+        {
+            $actualRule = $rules[$ruleIdx++]
+        }
+
+        Assert-NotNull ($actualRule | Get-Member $propName) ('property {0} not found on {1} object [{2}] {3}' -f $propName,$actualRule.GetType().FullName,$ruleIdx,$actualRule.Name)
+        $value = $actualRule.$propName
+        if( $value -is [bool] )
+        {
+            $value = if( $value ) { 'Yes' } else { 'No' }
+        }
+
+        if( $propName -eq 'Protocol' )
+        {
+            $value = $value -replace ':.*$',''
+        }
+
+        Assert-Equal $line ($format -f ('{0}:' -f $fieldName),$value) $ruleIdx
     }
 }
 

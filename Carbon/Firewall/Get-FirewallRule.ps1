@@ -94,7 +94,29 @@ function Get-FirewallRule
     # Don't change/move this. It's so we can detect if we've parsed a rule.
     $rule = $null
 
-    netsh advfirewall firewall show rule name=$nameArgValue | ForEach-Object {
+    $fieldMap = @{
+                    'Rule name' = 'Name';
+                    'Enabled' = 'Enabled';
+                    'Direction' = 'Direction';
+                    'Profiles' = 'Profiles';
+                    'Grouping' = 'Grouping';
+                    'LocalIP' = 'LocalIPAddress';
+                    'RemoteIP' = 'RemoteIPAddress';
+                    'Protocol' = 'Protocol';
+                    'LocalPort' = 'LocalPort';
+                    'RemotePort' = 'RemotePort';
+                    'Edge traversal' = 'EdgeTraversal';
+                    'InterfaceTypes' = 'InterfaceType';
+                    'Security' = 'Security';
+                    'Rule source' = 'Source';
+                    'Action' = 'Action';
+                    'Description' = 'Description';
+                    'Program' = 'Program';
+                    'Service' = 'Service';
+                }
+
+    $parsingProtocolTypeCode = $false
+    netsh advfirewall firewall show rule name=$nameArgValue verbose | ForEach-Object {
         $line = $_
         
         Write-Verbose $line
@@ -103,8 +125,45 @@ function Get-FirewallRule
         {
             $profiles = [Carbon.Firewall.RuleProfile]::Any
             $rule.Profiles -split ',' | ForEach-Object { $profiles = $profiles -bor ([Carbon.Firewall.RuleProfile]$_) }
-            New-Object 'Carbon.Firewall.Rule' $rule.Name,$rule.Enabled,$rule.Direction,$profiles,$rule.Grouping,$rule.LocalIP,$rule.LocalPort,$rule.RemoteIP,$rule.RemotePort,$rule.Protocol,$rule.EdgeTraversal,$rule.Action
+            $constructorArgs = @(
+                                    $rule.Name,
+                                    $rule.Enabled,
+                                    $rule.Direction,
+                                    $profiles,
+                                    $rule.Grouping,
+                                    $rule.LocalIPAddress,
+                                    $rule.LocalPort,
+                                    $rule.RemoteIPAddress,
+                                    $rule.RemotePort,
+                                    $rule.Protocol,
+                                    $rule.EdgeTraversal,
+                                    $rule.Action,
+                                    $rule.InterfaceType,
+                                    $rule.Security,
+                                    $rule.Source,
+                                    $rule.Description,
+                                    $rule.Program,
+                                    $rule.Service
+                                )
+            New-Object -TypeName 'Carbon.Firewall.Rule' -ArgumentList $constructorArgs
             return
+        }
+
+        if( $line -match '^ +Type +Code *$' )
+        {
+            $parsingProtocolTypeCode = $true
+            return
+        }
+
+        if( $parsingProtocolTypeCode )
+        {
+            $parsingProtocolTypeCode = $false
+            if( $line -notmatch '^ +?([^ ]+) +?([^ ]+) *$' )
+            {
+                Write-Warning ('Failed to parse protocol type/code for rule {0}' -f $rule.Name)
+                return
+            }
+            $rule.Protocol = '{0}:{1},{2}' -f $rule.Protocol,$Matches[1],$Matches[2]
         }
         
         if( $line -notmatch '^([^:]+): +(.*)$' )
@@ -114,17 +173,22 @@ function Get-FirewallRule
         
         $propName = $matches[1]
         $value = $matches[2]
-        if( $propName -eq 'Rule Name' )
+        if( -not $fieldMap.ContainsKey( $propName ) )
         {
-            $rule = @{
-                        LocalPort = $null;
-                        RemotePort = $null;
-                     }
-            $propName = 'Name'
+            Write-Warning ('Unknown field ''{0}'' for rule ''{1}'' in `netsh advfirewall firewall show rule` output.' -f $propName,$rule.Name)
+            return
         }
-        elseif( $propName -eq 'Edge traversal' )
+        
+        $propName = $fieldMap[$propName]
+        if( $propName -eq 'Name' )
         {
-            $propName = 'EdgeTraversal' 
+            $rule = New-Object 'PsObject'
+            foreach( $item in $fieldMap.Values )
+            {
+                Add-Member -InputObject $rule -MemberType NoteProperty -Name $item -Value $null
+            }
+            $rule.InterfaceType = [Carbon.Firewall.RuleInterfaceType]::Any
+            $rule.Security = [Carbon.Firewall.RuleSecurity]::NotRequired
         }
 
         if( $propName -eq 'Enabled' )
@@ -133,7 +197,7 @@ function Get-FirewallRule
             $value = if( $value -eq 'Yes' ) { $true } else { $value }
         }
         
-        $rule[$propName] = $value
+        $rule.$propName = $value
     } |
     Where-Object { 
         -not $containsWildcards -or $_.Name -like $Name 

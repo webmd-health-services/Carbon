@@ -142,6 +142,7 @@ This is a backwards-incompatible release.
  * Added `Name` and `LiteralName` parameters to [Get-FirewallRule](http://get-carbon.org/help/Get-FirewallRule.html) to return specific rules instead of all of them.
  * [Get-FirewallRule](http://get-carbon.org/help/Get-FirewallRule.html), now returns `Carbon.Firewall.Rule` objects, instead of anonymous hashes.
  * Added default table format for [Get-FirewallRule](http://get-carbon.org/help/Get-FirewallRule.html) output.
+ * [Get-FirewallRule](http://get-carbon.org/help/Get-FirewallRule.html), now returns additional rule information: interface type, security, source, description, program, and service. Who new `netsh advfirewall firewall rule show` had a `verbose` switch? RTFM.
 
 ### Hosts File
 

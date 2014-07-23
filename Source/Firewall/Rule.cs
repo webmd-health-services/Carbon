@@ -18,9 +18,9 @@ namespace Carbon.Firewall
 {
 	public sealed class Rule
 	{
-		public Rule(string name, bool enabled, RuleDirection direction, RuleProfile profile, string grouping,
-			string localIP, string localPort, string remoteIP, string remotePort, string protocol, string edgeTraversal,
-			RuleAction action)
+		public Rule(string name, bool enabled, RuleDirection direction, RuleProfile profile, string grouping, string localIPAddress,
+			string localPort, string remoteIPAddress, string remotePort, string protocol, string edgeTraversal, RuleAction action, 
+			RuleInterfaceType interfaceType,  RuleSecurity security, string source, string description, string program, string service)
 		{
 			Name = name;
 			Enabled = enabled;
@@ -32,7 +32,6 @@ namespace Carbon.Firewall
 			}
 			else
 			{
-
 				var profiles = new List<string>();
 				if (IsDomainProfile)
 				{
@@ -50,9 +49,9 @@ namespace Carbon.Firewall
 			}
 
 			Grouping = grouping;
-			LocalIP = localIP;
+			LocalIPAddress = localIPAddress;
 			LocalPort = localPort;
-			RemoteIP = remoteIP;
+			RemoteIPAddress = remoteIPAddress;
 			RemotePort = remotePort;
 			Protocol = protocol;
 			EdgeTraversal = edgeTraversal;
@@ -72,24 +71,36 @@ namespace Carbon.Firewall
 					break;
 			}
 			Action = action;
+			InterfaceType = interfaceType;
+			Security = security;
+			Source = source;
+			Description = description;
+			Program = program;
+			Service = service;
 		}
 
 		public RuleAction Action { get; private set; }
+		public string Description { get; private set; }
 		public RuleDirection Direction { get; private set; }
 		public string EdgeTraversal { get; private set; }
 		public RuleEdgeTraversalPolicy EdgeTraversalPolicy { get; private set; }
 		public bool Enabled { get; private set; }
 		public string Grouping { get; private set; }
+		public RuleInterfaceType InterfaceType { get; private set; }
 		public bool IsDomainProfile { get { return Profile == RuleProfile.Any || (Profile & RuleProfile.Domain) == RuleProfile.Domain; } }
 		public bool IsPrivateProfile { get { return Profile == RuleProfile.Any || (Profile & RuleProfile.Private) == RuleProfile.Private; } }
 		public bool IsPublicProfile { get { return Profile == RuleProfile.Any || (Profile & RuleProfile.Public) == RuleProfile.Public; } }
-		public string LocalIP { get; private set; }
+		public string LocalIPAddress { get; private set; }
 		public string LocalPort { get; private set; }
 		public string Name { get; private set; }
 		public RuleProfile Profile { get; private set; }
 		public string Profiles { get; private set; }
+		public string Program { get; private set; }
 		public string Protocol { get; private set; }
-		public string RemoteIP { get; private set; }
+		public string RemoteIPAddress { get; private set; }
 		public string RemotePort { get; private set; }
+		public RuleSecurity Security { get; private set; }
+		public string Service { get; private set; }
+		public string Source { get; private set; }
 	}
 }
