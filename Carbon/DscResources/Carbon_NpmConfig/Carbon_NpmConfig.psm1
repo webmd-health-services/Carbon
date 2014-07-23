@@ -14,10 +14,15 @@
 
 & (Join-Path -Path $PSScriptRoot -ChildPath '..\Initialize-CarbonDscResource.ps1' -Resolve)
 
-$npmCmd = Get-Command -Name 'npm.cmd'
+$npmCmd = Get-Command -Name 'npm.cmd' -ErrorAction Ignore
 if( -not $npmCmd )
 {
-    return
+    $npmCmd = Get-Command -Name (Join-Path -Path $env:ProgramFiles -ChildPath 'nodejs\npm.cmd') -ErrorAction Ignore
+    if( -not $npmCmd )
+    {
+        Write-Error ('npm.cmd not found.')
+        return
+    }
 }
 
 $nodeJsRoot = Split-Path -Parent -Path $npmCmd.Path
