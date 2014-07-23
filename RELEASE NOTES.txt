@@ -9,6 +9,7 @@
  * [Remove-SslCertificateBinding](http://get-carbon.org/help/Remove-SslCertificateBinding.html) now writes messages with `Write-Verbose` instead of `Write-Host`. Improved error handling.
  * [Set-SslCertificateBinding](http://get-carbon.org/help/Set-SslCertificateBinding.html) now writes messages with `Write-Verbose` instead of `Write-Host`. Improved error handling.
  * Improved documentation for [Get-Certificate](http://get-carbon.org/help/Get-Certificate.html).
+ * Added extended script property `StoreName` to `X509Store` objects to return the store's `System.Security.Cryptography.X509Certificates.StoreName` value.
 
 ### COM
 
@@ -65,8 +66,12 @@
 ### General
 
  * Importing Carbon gives an error if `PATH` environment variable contains an empty path.
- 
-### Path
+
+### Certificates
+
+ * [Get-Certificate](http://get-carbon.org/help/Get-Certificate.html) couldn't open CA/CertificateAuthority store (fixes issue [#130](https://bitbucket.org/splatteredbits/carbon/issue/130/get-certificate-doesnt-find-any))
+
+ ### Path
 
  * [Resolve-PathCase](http://get-carbon.org/help/Resolve-PathCase.html) didn't work under Windows 2012 R2.
 

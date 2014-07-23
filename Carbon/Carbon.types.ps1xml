@@ -110,6 +110,25 @@
                     }
                 </GetScriptBlock>
             </ScriptProperty>
+            <ScriptProperty>
+                <Name>StoreName</Name>
+                <GetScriptBlock>
+                    if( $this.Name -eq 'CA' )
+                    {
+                        return [Security.Cryptography.X509Certificates.StoreName]::CertificateAuthority
+                    }
+
+                    foreach( $value in ([Enum]::GetValues([Security.Cryptography.X509Certificates.StoreName])) )
+                    {
+                        if( $this.Name -eq $value.ToString() )
+                        {
+                            return $value
+                        }
+                    }
+
+                    return ''
+                </GetScriptBlock>
+            </ScriptProperty>
         </Members>
     </Type>
 </Types>
