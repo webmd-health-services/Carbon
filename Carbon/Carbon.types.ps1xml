@@ -146,6 +146,7 @@
                     RemoteIPAddress
                 </ReferencedMemberName>
             </AliasProperty>
+        </Members>
     </Type>
     <Type>
         <Name>System.DirectoryServices.AccountManagement.Principal</Name>
