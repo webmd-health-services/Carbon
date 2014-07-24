@@ -54,6 +54,7 @@ This is a backwards-incompatible release.
  * New [Clear-DscLocalResourceCache](http://get-carbon.org/help/Clear-DscLocalResourceCache.html) function for clearing the local LCM's DSC resource. This makes developing resources easier.
  * Created `NpmConfig` resource for creating/setting/removing global NPM configuration values (yes, the "Node Package Manager" NPM).
  * Created `FirewallRule` resource for configuring firewall rules.
+ * New [Test-DscTargetResource](http://get-carbon.org/help/Test-DscTargetResource.html) function for comparing target/desired resource states across DSC resources.
  * Created `LocalUser` resource for configuring local users.
  * Created `Privilege` resource for configuring and identity's privileges.
  
