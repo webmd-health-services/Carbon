@@ -55,6 +55,7 @@ This is a backwards-incompatible release.
  * Created `NpmConfig` resource for creating/setting/removing global NPM configuration values (yes, the "Node Package Manager" NPM).
  * Created `FirewallRule` resource for configuring firewall rules.
  * Created `LocalUser` resource for configuring local users.
+ * Created `Privilege` resource for configuring and identity's privileges.
  
 ### File System
 

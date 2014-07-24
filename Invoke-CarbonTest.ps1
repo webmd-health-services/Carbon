@@ -26,7 +26,10 @@ param(
     $Test,
 
     [Switch]
-    $Recurse
+    $Recurse,
+
+    [Switch]
+    $PassThru
 )
 
 #Requires -Version 3
@@ -47,7 +50,7 @@ if( $Test )
 
 try
 {
-    & (Join-Path -Path $PSScriptRoot -ChildPath '.\Tools\Blade\blade.ps1' -Resolve) -Path $Path @bladeTestParam -Recurse:$Recurse
+    & (Join-Path -Path $PSScriptRoot -ChildPath '.\Tools\Blade\blade.ps1' -Resolve) -Path $Path @bladeTestParam -Recurse:$Recurse -PassThru:$PassThru
 }
 finally
 {

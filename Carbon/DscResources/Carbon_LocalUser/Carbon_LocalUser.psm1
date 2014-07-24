@@ -80,7 +80,6 @@ function Get-TargetResource
 function Set-TargetResource
 {
     [CmdletBinding(SupportsShouldProcess=$true)]
-    [OutputType([hashtable])]
     param(
         [Parameter(Mandatory=$true)]
         [ValidateLength(1,20)]
@@ -145,7 +144,7 @@ function Set-TargetResource
 function Test-TargetResource
 {
     [CmdletBinding(SupportsShouldProcess=$true)]
-    [OutputType([hashtable])]
+    [OutputType([bool])]
     param(
         [Parameter(Mandatory=$true)]
         [ValidateLength(1,20)]
