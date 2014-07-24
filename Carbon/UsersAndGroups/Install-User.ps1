@@ -44,6 +44,7 @@ function Install-User
     Demonstrates how to create an account for a user who cannot change his password and whose password never expires.
     #>
     [CmdletBinding(SupportsShouldProcess=$true)]
+    [OutputType([System.DirectoryServices.AccountManagement.UserPrincipal])]
     param(
         [Parameter(Mandatory=$true)]
         [ValidateLength(1,20)]

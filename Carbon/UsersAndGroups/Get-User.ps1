@@ -44,6 +44,7 @@ function Get-User
     Demonstrates how to get a specific user.
     #>
     [CmdletBinding()]
+    [OutputType([System.DirectoryServices.AccountManagement.UserPrincipal])]
     param(
         [ValidateLength(1,20)]
         [string]
@@ -59,7 +60,7 @@ function Get-User
         $user = [DirectoryServices.AccountManagement.UserPrincipal]::FindByIdentity( $ctx, $Username )
         if( -not $user )
         {
-            Write-Error ('Local user ''{0}'' not found.' -f $Username)
+            Write-Error ('Local user ''{0}'' not found.' -f $Username) -ErrorAction:$ErrorActionPreference
             return
         }
         return $user

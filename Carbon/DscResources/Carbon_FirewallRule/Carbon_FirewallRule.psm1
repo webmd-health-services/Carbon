@@ -363,19 +363,7 @@ function Test-TargetResource
         return $false
     }
 
-    $notEqualProperties = $resource.Keys | 
-                            Where-Object { $_ -ne 'Ensure' } |  
-                            Where-Object { $PSBoundParameters.ContainsKey( $_ ) } |
-                            Where-Object { $resource.$_ -ne $PSBoundParameters[$_] }
-
-    if( $notEqualProperties )
-    {
-        Write-Verbose ('Firewall rule ''{0}'' has stale properties: ''{1}''' -f $Name,($notEqualProperties -join ''','''))
-        return $false
-    }
-
-    return $true
-
+    return Test-DscTargetResource -TargetResource $resource -DesiredResource $PSBoundParameters -Target ('Firewall rule ''{0}''' -f $Name)
 }
 
 

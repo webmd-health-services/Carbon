@@ -92,5 +92,4 @@ function Assert-DscResourceAbsent
     Assert-Equal 'Absent' $Resource.Ensure
 }
 
-
 Export-ModuleMember -Function '*-*' -Variable 'CarbonDscOutputRoot'
