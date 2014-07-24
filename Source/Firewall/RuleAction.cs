@@ -17,6 +17,7 @@ namespace Carbon.Firewall
 	public enum RuleAction
 	{
 		Allow,
-		Deny
+		Block,
+		Bypass
 	}
 }

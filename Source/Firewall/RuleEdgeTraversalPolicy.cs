@@ -16,10 +16,9 @@ namespace Carbon.Firewall
 {
 	public enum RuleEdgeTraversalPolicy
 	{
-		NotSet,
+		No = 0,
 		Yes,
 		DeferApp,
 		DeferUser,
-		No
 	}
 }
