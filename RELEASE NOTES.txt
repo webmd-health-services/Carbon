@@ -57,6 +57,7 @@ This is a backwards-incompatible release.
  * New [Test-DscTargetResource](http://get-carbon.org/help/Test-DscTargetResource.html) function for comparing target/desired resource states across DSC resources.
  * Created `LocalUser` resource for configuring local users.
  * Created `Privilege` resource for configuring and identity's privileges.
+ * Created `Permission` resource for configuring file, directory, and registry permissions.
  
 ### File System
 
