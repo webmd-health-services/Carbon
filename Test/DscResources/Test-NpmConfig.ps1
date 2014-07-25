@@ -152,7 +152,7 @@ configuration DscConfiguration
 
     node 'localhost'
     {
-        NpmConfig set
+        Carbon_NpmConfig set
         {
             Name = $testConfigName
             Value = $Value;

@@ -288,7 +288,7 @@ configuration DscConfiguration
 
     node 'localhost'
     {
-        FirewallRule set
+        Carbon_FirewallRule set
         {
             Name = $RuleName;
             Direction = 'In';

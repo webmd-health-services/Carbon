@@ -157,7 +157,7 @@ configuration DscConfiguration
 
     node 'localhost'
     {
-        LocalUser set
+        Carbon_LocalUser set
         {
             UserName = $UserName;
             Password = ([Guid]::NewGuid().ToString());

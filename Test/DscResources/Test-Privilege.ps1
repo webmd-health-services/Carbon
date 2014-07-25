@@ -144,7 +144,7 @@ configuration DscConfiguration
 
     node 'localhost'
     {
-        Privilege set
+        Carbon_Privilege set
         {
             Identity = $UserName;
             Privilege = 'SeDenyBatchLogonRight';

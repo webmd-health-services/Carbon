@@ -171,7 +171,7 @@ configuration DscConfiguration
 
     node 'localhost'
     {
-        Permission set
+        Carbon_Permission set
         {
             Identity = $UserName;
             Path = $tempDir;

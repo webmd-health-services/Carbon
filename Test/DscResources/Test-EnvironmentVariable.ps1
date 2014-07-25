@@ -75,7 +75,7 @@ configuration ShouldSetEnvironmentVariable
 
     node 'localhost'
     {
-        EnvironmentVariable setEnvVariable
+        Carbon_EnvironmentVariable setEnvVariable
         {
             Name = 'CarbonDscEnvironmentVariable';
             Value = $Value;

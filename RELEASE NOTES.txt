@@ -17,11 +17,11 @@ This is a backwards-incompatible release.
      * [Install-Junction](http://get-carbon.org/help/Install-Junction.html)
      * [Install-User](http://get-carbon.org/help/Install-User.html)
      * [Grant-ComPermissions](http://get-carbon.org/help/Grant-ComPermissions.html)
- * The following commands no longer return the stdout from various console applications. To see that output, use the `-Verbose` switch. Remove any usage of the output you were procesing.
+ * The following commands no longer return the stdout from various console applications. To see that output, use the `-Verbose` switch. Remove any usage of the output you were processing.
      * [Disable-FirewallStatefulFtp](http://get-carbon.org/help/Disable-FirewallStatefulFtp.html)
      * [Enable-FirewallStatefulFtp](http://get-carbon.org/help/Enable-FirewallStatefulFtp.html)
      * [Remove-SslCertificateBinding](http://get-carbon.org/help/Remove-SslCertificateBinding.html)
- * [Set-SslCertificateBinding](http://get-carbon.org/help/Set-SslCertificateBinding.html) now returns `Carbon.Certificates.SslCertificateBinding` objects intead of netsh output. Update any code that uses `Set-SslCertificateBinding`'s output.
+ * [Set-SslCertificateBinding](http://get-carbon.org/help/Set-SslCertificateBinding.html) now returns `Carbon.Certificates.SslCertificateBinding` objects instead of netsh output. Update any code that uses the old `Set-SslCertificateBinding` output.
  * Ensure that all thumbprints passed to [Set-SslCertificateBinding](http://get-carbon.org/help/Set-SslCertificateBinding.html) are valid (40 character hex strings).
  * Add the new `-PasswordNeverExpires` switch to usages of [Install-User](http://get-carbon.org/help/Install-User.html): it no longer sets the `PasswordNeverExpires` flag for a user by default.
  * `Resolve-IdentityName` renamed to [Resolve-Identity](http://get-carbon.org/help/Resolve-Identity.html), but it has a backwards-compatible alias, so you shouldn't have to do anything.
@@ -50,14 +50,14 @@ This is a backwards-incompatible release.
  
 ### DSC
 
- * Created `EnvironmentVariable` resource for creating/removing machine-level environment variables.
+ * Created `Carbon_EnvironmentVariable` resource for creating/removing machine-level environment variables.
  * New [Clear-DscLocalResourceCache](http://get-carbon.org/help/Clear-DscLocalResourceCache.html) function for clearing the local LCM's DSC resource. This makes developing resources easier.
- * Created `NpmConfig` resource for creating/setting/removing global NPM configuration values (yes, the "Node Package Manager" NPM).
- * Created `FirewallRule` resource for configuring firewall rules.
+ * Created `Carbon_NpmConfig` resource for creating/setting/removing global NPM configuration values (yes, the "Node Package Manager" NPM).
+ * Created `Carbon_FirewallRule` resource for configuring firewall rules.
  * New [Test-DscTargetResource](http://get-carbon.org/help/Test-DscTargetResource.html) function for comparing target/desired resource states across DSC resources.
- * Created `LocalUser` resource for configuring local users.
- * Created `Privilege` resource for configuring and identity's privileges.
- * Created `Permission` resource for configuring file, directory, and registry permissions.
+ * Created `Carbon_LocalUser` resource for configuring local users.
+ * Created `Carbon_Privilege` resource for configuring and identity's privileges.
+ * Created `Carbon_Permission` resource for configuring file, directory, and registry permissions.
  
 ### File System
 
