@@ -296,5 +296,5 @@ if( $LastBladeResult.Errors -or $LastBladeResult.Failures )
 {
     Write-Error $LastBladeResult.ToString()
 }
-$LastBladeResult
+$LastBladeResult | Format-Table | Out-Host
 
