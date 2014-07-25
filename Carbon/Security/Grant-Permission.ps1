@@ -94,7 +94,16 @@ function Grant-Permission
     http://msdn.microsoft.com/en-us/magazine/cc163885.aspx#S3    
     
     .LINK
+    Get-Permission
+
+    .LINK
     Protect-Acl
+
+    .LINK
+    Revoke-Permission
+
+    .LINK
+    Test-Permission
 
     .EXAMPLE
     Grant-Permission -Identity ENTERPRISE\Engineers -Permission FullControl -Path C:\EngineRoom

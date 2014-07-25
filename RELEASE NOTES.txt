@@ -65,6 +65,10 @@
 ### MSMQ
 
  * [Grant-MsmqMessageQueuePermission](http://get-carbon.org/help/Grant-MsmqMessageQueuePermission.html) no longer writes messages with `Write-Host`.
+ 
+### Security
+
+ * Creating [Revoke-Permission](http://get-carbon.org/help/Revoke-Permission.html) function for revoking a user's permission to a file, directory, or registry key.
 
 ## Bug Fixes
 
