@@ -37,6 +37,9 @@ function Test-Permission
     http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.registryrights.aspx
     
     .LINK
+    ConvertTo-ContainerInheritanceFlags
+
+    .LINK
     Get-Permission
 
     .LINK
@@ -81,7 +84,7 @@ function Test-Permission
         $Permission,
         
         [Carbon.Security.ContainerInheritanceFlags]
-        # The container and inheritance flags to check.  These are ignored if not supplied.  See How to apply container permissions.  This controls the inheritance and propagation flags.  Default is full inheritance, e.g. `ContainersAndSubContainersAndLeaves`. This parameter is ignored if `Path` is to a leaf item.
+        # The container and inheritance flags to check. Ignored if `Path` is a file. These are ignored if not supplied. See `Grant-Permission` for detailed explanation of this parameter. This controls the inheritance and propagation flags.  Default is full inheritance, e.g. `ContainersAndSubContainersAndLeaves`. This parameter is ignored if `Path` is to a leaf item.
         $ApplyTo,
 
         [Switch]

@@ -84,6 +84,8 @@ function Grant-Permission
     
     The above information adpated from [Manage Access to Windows Objects with ACLs and the .NET Framework](http://msdn.microsoft.com/en-us/magazine/cc163885.aspx#S3), published in the November 2004 copy of *MSDN Magazine*.
 
+    If you prefer to speak in `InheritanceFlags` or `PropagationFlags`, you can use the `ConvertTo-ContainerInheritaceFlags` function to convert your flags into Carbon's flags.
+
     .LINK
     http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.filesystemrights.aspx
     
@@ -93,6 +95,9 @@ function Grant-Permission
     .LINK
     http://msdn.microsoft.com/en-us/magazine/cc163885.aspx#S3    
     
+    .LINK
+    ConvertTo-ContainerInheritanceFlags
+
     .LINK
     Get-Permission
 
@@ -129,7 +134,7 @@ function Grant-Permission
         
         [Parameter(Mandatory=$true)]
         [string]
-        # The user or group getting the permissions
+        # The user or group getting the permissions.
         $Identity,
         
         [Parameter(Mandatory=$true)]
