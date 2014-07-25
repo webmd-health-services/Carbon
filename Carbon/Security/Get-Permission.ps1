@@ -26,6 +26,21 @@ function Get-Permission
     .OUTPUTS
     System.Security.AccessControl.AccessRule.
     
+    .LINK
+    Get-Permission
+
+    .LINK
+    Grant-Permission
+
+    .LINK
+    Protect-Acl
+
+    .LINK
+    Revoke-Permission
+
+    .LINK
+    Test-Permission
+
     .EXAMPLE
     Get-Permission -Path C:\Windows
     
@@ -42,6 +57,7 @@ function Get-Permission
     Returns `System.Security.AccessControl.FileSystemAccessRule` objects for all the `Administrators'` rules on `C:\windows`.
     #>
     [CmdletBinding()]
+    [OutputType([System.Security.AccessControl.AccessRule])]
     param(
         [Parameter(Mandatory=$true)]
         [string]

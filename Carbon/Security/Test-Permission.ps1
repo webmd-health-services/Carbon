@@ -37,7 +37,16 @@ function Test-Permission
     http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.registryrights.aspx
     
     .LINK
+    Get-Permission
+
+    .LINK
     Grant-Permission
+
+    .LINK
+    Protect-Acl
+
+    .LINK
+    Revoke-Permission
 
     .EXAMPLE
     Test-Permission -Identity 'STARFLEET\JLPicard' -Permission 'FullControl' -Path 'C:\Enterprise\Bridge'
