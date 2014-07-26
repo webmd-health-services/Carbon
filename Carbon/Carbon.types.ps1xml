@@ -34,18 +34,144 @@
             <ScriptProperty>
                 <Name>StartMode</Name>
                 <GetScriptBlock>
-                    $startMode = (Get-WmiObject -Query "Select StartMode From Win32_Service Where Name='$($this.ServiceName)'").StartMode
-                    if( $startMode -eq 'Auto' )
-                    {
-                        $startMode = 'Automatic'
-                    }
-                    [System.ServiceProcess.ServiceStartMode]$startMode
+                    $this.LoadServiceConfig();
+                    [System.ServiceProcess.ServiceStartMode][int]$this.Configuration.StartType
                 </GetScriptBlock>
             </ScriptProperty>
             <ScriptProperty>
                 <Name>UserName</Name>
                 <GetScriptBlock>
-                    (Get-WmiObject -Query "Select StartName From Win32_Service Where Name='$($this.ServiceName)'").StartName
+                    $this.LoadServiceConfig()
+                    $this.Configuration.UserName
+                </GetScriptBlock>
+            </ScriptProperty>
+            <ScriptMethod>
+                <Name>LoadServiceConfig</Name>
+                <Script>
+                    if( -not ($this | Get-Member -Name 'Configuration') )
+                    {
+                        $value = New-Object 'Carbon.Service.ServiceInfo' $this.Name
+                        Add-Member -InputObject $this -MemberType NoteProperty -Name 'Configuration' -Value $value
+                    }
+                </Script>
+            </ScriptMethod>
+            <ScriptProperty>
+                <Name>FailureProgram</Name>
+                <GetScriptBlock>
+                    $this.LoadServiceConfig()
+                    $this.Configuration.FailureProgram
+                </GetScriptBlock>
+            </ScriptProperty>
+            <ScriptProperty>
+                <Name>Description</Name>
+                <GetScriptBlock>
+                    $this.LoadServiceConfig()
+                    $this.Configuration.Description
+                </GetScriptBlock>
+                </ScriptProperty>
+            <ScriptProperty>
+                <Name>FirstFailure</Name>
+                <GetScriptBlock>
+                    $this.LoadServiceConfig()
+                    $this.Configuration.FirstFailure
+                </GetScriptBlock>
+            </ScriptProperty>
+            <ScriptProperty>
+                <Name>SecondFailure</Name>
+                <GetScriptBlock>
+                    $this.LoadServiceConfig()
+                    $this.Configuration.SecondFailure
+                </GetScriptBlock>
+            </ScriptProperty>
+            <ScriptProperty>
+                <Name>ThirdFailure</Name>
+                <GetScriptBlock>
+                    $this.LoadServiceConfig()
+                    $this.Configuration.ThirdFailure
+                </GetScriptBlock>
+            </ScriptProperty>
+            <ScriptProperty>
+                <Name>Path</Name>
+                <GetScriptBlock>
+                    $this.LoadServiceConfig()
+                    $this.Configuration.Path
+                </GetScriptBlock>
+            </ScriptProperty>
+            <ScriptProperty>
+                <Name>RebootDelay</Name>
+                <GetScriptBlock>
+                    $this.LoadServiceConfig()
+                    $this.Configuration.RebootDelay
+                </GetScriptBlock>
+            </ScriptProperty>
+            <ScriptProperty>
+                <Name>RebootDelayMinutes</Name>
+                <GetScriptBlock>
+                    $this.LoadServiceConfig()
+                    $this.Configuration.RebootDelayMinutes
+                </GetScriptBlock>
+            </ScriptProperty>
+            <ScriptProperty>
+                <Name>RebootMessage</Name>
+                <GetScriptBlock>
+                    $this.LoadServiceConfig()
+                    $this.Configuration.RebootMessage
+                </GetScriptBlock>
+            </ScriptProperty>
+            <ScriptProperty>
+                <Name>ResetPeriod</Name>
+                <GetScriptBlock>
+                    $this.LoadServiceConfig()
+                    $this.Configuration.ResetPeriod
+                </GetScriptBlock>
+            </ScriptProperty>
+            <ScriptProperty>
+                <Name>ResetPeriodDays</Name>
+                <GetScriptBlock>
+                    $this.LoadServiceConfig()
+                    $this.Configuration.ResetPeriodDays
+                </GetScriptBlock>
+            </ScriptProperty>
+            <ScriptProperty>
+                <Name>RestartDelay</Name>
+                <GetScriptBlock>
+                    $this.LoadServiceConfig()
+                    $this.Configuration.RestartDelay
+                </GetScriptBlock>
+            </ScriptProperty>
+            <ScriptProperty>
+                <Name>RestartDelayMinutes</Name>
+                <GetScriptBlock>
+                    $this.LoadServiceConfig()
+                    $this.Configuration.RestartDelayMinutes
+                </GetScriptBlock>
+            </ScriptProperty>
+            <ScriptProperty>
+                <Name>ErrorControl</Name>
+                <GetScriptBlock>
+                    $this.LoadServiceConfig()
+                    $this.Configuration.ErrorControl
+                </GetScriptBlock>
+            </ScriptProperty>
+            <ScriptProperty>
+                <Name>LoadOrderGroup</Name>
+                <GetScriptBlock>
+                    $this.LoadServiceConfig()
+                    $this.Configuration.LoadOrderGroup
+                </GetScriptBlock>
+            </ScriptProperty>
+            <ScriptProperty>
+                <Name>TagID</Name>
+                <GetScriptBlock>
+                    $this.LoadServiceConfig()
+                    $this.Configuration.TagID
+                </GetScriptBlock>
+            </ScriptProperty>
+            <ScriptProperty>
+                <Name>StartType</Name>
+                <GetScriptBlock>
+                    $this.LoadServiceConfig()
+                    $this.Configuration.StartType
                 </GetScriptBlock>
             </ScriptProperty>
         </Members>

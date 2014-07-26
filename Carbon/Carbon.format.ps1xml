@@ -398,5 +398,37 @@
 			    </TableRowEntries>
             </TableControl>
 		</View>
+        <View>
+            <Name>Carbon.Service.ServiceInfo</Name>
+            <ViewSelectedBy>
+                <TypeName>Carbon.Service.ServiceInfo</TypeName>
+            </ViewSelectedBy>
+            <TableControl>
+			    <TableHeaders>
+				    <TableColumnHeader />
+				    <TableColumnHeader />
+				    <TableColumnHeader />
+				    <TableColumnHeader />
+			    </TableHeaders>
+			    <TableRowEntries>
+				    <TableRowEntry>
+					    <TableColumnItems>
+						    <TableColumnItem>
+							    <PropertyName>Name</PropertyName>
+						    </TableColumnItem>
+						    <TableColumnItem>
+							    <PropertyName>Description</PropertyName>
+						    </TableColumnItem>
+						    <TableColumnItem>
+							    <PropertyName>UserName</PropertyName>
+						    </TableColumnItem>
+						    <TableColumnItem>
+							    <PropertyName>Path</PropertyName>
+						    </TableColumnItem>
+					    </TableColumnItems>
+				    </TableRowEntry>
+			    </TableRowEntries>
+            </TableControl>
+		</View>
 	</ViewDefinitions>
 </Configuration>
