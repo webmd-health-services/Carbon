@@ -189,7 +189,6 @@ function Install-Service
         
         if( $PSCmdlet.ShouldProcess( $identity.FullName, "grant the log on as a service right" ) )
         {
-            Write-Host ("Granting '{0}' the log on as a service right." -f $Identity.FullName)
             Grant-Privilege -Identity $identity.FullName -Privilege SeServiceLogonRight
         }
     }
@@ -199,7 +198,7 @@ function Install-Service
         Grant-Permission -Identity $identity.FullName -Permission ReadAndExecute -Path $Path
     }
     
-    $service = Get-Service -Name $Name -ErrorAction SilentlyContinue
+    $service = Get-Service -Name $Name -ErrorAction Ignore
     
     $operation = 'create'
     if( $service )
@@ -207,7 +206,7 @@ function Install-Service
         $stopSuccessful = $false
         if( $service.CanStop )
         {
-            Stop-Service -Name $Name -Force -ErrorAction SilentlyContinue
+            Stop-Service -Name $Name -Force -ErrorAction Ignore
             if( $? )
             {
                 $service.WaitForStatus( 'Stopped' )
@@ -232,8 +231,6 @@ function Install-Service
 
     if( $PSCmdlet.ShouldProcess( "$Name [$Path]", "$operation service" ) )
     {
-        Write-Host "Installing service '$Name' at '$Path' to run as '$($identity.FullName)'."
-        
         & $sc $operation $Name binPath= $Path start= $startArg obj= $identity.FullName $passwordArgName $passwordArgValue $dependencyArgName $dependencyArgValue
         if( $LastExitCode -ne 0 )
         {
@@ -265,4 +262,6 @@ function Install-Service
             }
         }
     }
+
+    Get-Service -Name $Name
 }

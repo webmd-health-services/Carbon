@@ -17,6 +17,7 @@ This is a backwards-incompatible release.
      * [Install-Junction](http://get-carbon.org/help/Install-Junction.html)
      * [Install-User](http://get-carbon.org/help/Install-User.html)
      * [Grant-ComPermissions](http://get-carbon.org/help/Grant-ComPermissions.html)
+     * [Install-Service](http://get-carbon.org/help/Grant-ComPermissions.html)
  * The following commands no longer return the stdout from various console applications. To see that output, use the `-Verbose` switch. Remove any usage of the output you were processing.
      * [Disable-FirewallStatefulFtp](http://get-carbon.org/help/Disable-FirewallStatefulFtp.html)
      * [Enable-FirewallStatefulFtp](http://get-carbon.org/help/Enable-FirewallStatefulFtp.html)
@@ -85,6 +86,11 @@ This is a backwards-incompatible release.
 
  * [Grant-Permission](http://get-carbon.org/help/Grant-Permission.html) now only grants permissions on an object if those permissions aren't present.  To preserve previous behaviour, add the `-Force` switch to all `Grant-Permission` usages.
  * [Grant-Permission](http://get-carbon.org/help/Grant-Permission.html) returns `System.Security.AccessControl.FileSystemRule` or `System.Security.AccessControl.RegistryRule` whenever it updates an item's permissions.  It no longer writes a message to the host.
+
+### Service
+
+ * [Install-Service](http://get-carbon.org/help/Grant-ComPermissions.html) now writes messages with `Write-Verbose` instead of `Write-Host`.
+ * [Install-Service](http://get-carbon.org/help/Grant-ComPermissions.html) now returns a `System.ServiceProcess.ServiceController` object when installation/configuration is successful.
  
 ### Users and Groups
 
