@@ -45,8 +45,6 @@ function Stop-CarbonDscTestFixture
     {
         Remove-Item -Path $CarbonDscOutputRoot -Recurse
     }
-
-    Remove-Module ('Carbon_{0}' -f $currentDscResource)
 }
 
 function Invoke-CarbonTestDscConfiguration

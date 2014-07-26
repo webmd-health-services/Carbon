@@ -65,7 +65,27 @@ function Test-DscTargetResource
     $notEqualProperties = $TargetResource.Keys | 
                             Where-Object { $_ -ne 'Ensure' } |  
                             Where-Object { $DesiredResource.ContainsKey( $_ ) } |
-                            Where-Object { $TargetResource[$_] -ne $DesiredResource[$_] }
+                            Where-Object { 
+                                $desiredObj = $DesiredResource[$_]
+                                $targetObj = $TargetResource[$_]
+
+                                if( $desiredobj -eq $null -or $targetObj -eq $null )
+                                {
+                                    return ($desiredObj -ne $targetObj)
+                                }
+
+                                if( -not $desiredObj.GetType().IsArray -or -not $targetObj.GetType().IsArray )
+                                {
+                                    return ($desiredObj -ne $targetObj)
+                                }
+
+                                if( $desiredObj.Length -ne $targetObj.Length )
+                                {
+                                    return $true
+                                }
+
+                                $desiredObj | Where-Object { $targetObj -notcontains $_ }
+                            }
 
     if( $notEqualProperties )
     {

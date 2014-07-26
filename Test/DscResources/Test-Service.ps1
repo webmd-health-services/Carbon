@@ -16,6 +16,8 @@ Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'CarbonDscTest.psm
 $UserName = 'CarbonDscTestUser'
 $Password = [Guid]::NewGuid().ToString()
 $tempDir = $null
+$servicePath = $null
+$serviceName = 'CarbonDscTestService'
 
 function Start-TestFixture
 {
@@ -28,14 +30,17 @@ function Start-Test
     $tempDir = 'Carbon+{0}+{1}' -f ((Split-Path -Leaf -Path $PSCommandPath),([IO.Path]::GetRandomFileName()))
     $tempDir = Join-Path -Path $env:TEMP -ChildPath $tempDir
     New-Item -Path $tempDir -ItemType 'Directory' | Out-Null
+    Copy-Item -Path (Join-Path -Path $PSScriptRoot -ChildPath '..\Service\NoOpService.exe') -Destination $tempDir
+    $servicePath = Join-Path -Path $tempDir -ChildPath 'NoOpService.exe'
 }
 
 function Stop-Test
 {
     if( (Test-Path -Path $Path -PathType Container) )
     {
-        Remove-Item -Path $Path
+        Remove-Item -Path $Path -Recurse
     }
+    Uninstall-Service -Name $serviceName
 }
 
 function Stop-TestFixture
@@ -89,4 +94,126 @@ function Test-ShouldGetNonExistentService
     
 function Test-ShouldInstallService
 {
+    Set-TargetResource -Path $servicePath -Name $serviceName -Ensure Present
+    Assert-NoError
+    $resource = Get-TargetResource -Name $serviceName
+    Assert-NotNull $resource
+    Assert-Equal $serviceName $resource.Name
+    Assert-Equal $servicePath $resource.Path
+    Assert-Equal 'Automatic' $resource.StartupType
+    Assert-Equal 'TakeNoAction' $resource.OnFirstFailure
+    Assert-Equal 'TakeNoAction' $resource.OnSecondFailure
+    Assert-Equal 'TakeNoAction' $resource.OnThirdFailure
+    Assert-Equal 0 $resource.ResetFailureCount
+    Assert-Equal 0 $resource.RestartDelay
+    Assert-Equal 0 $resource.RebootDelay
+    Assert-Null $resource.Dependency
+    Assert-Equal 'NT AUTHORITY\NETWORK SERVICE' $resource.UserName
+    Assert-Null $resource.Password
+    Assert-DscResourcePresent $resource
 }
+
+function Test-ShouldInstallServiceWithAllOptions
+{
+    Set-TargetResource -Path $servicePath -Name $serviceName -Ensure Present -StartupType Manual -OnFirstFailure Restart -OnSecondFailure Restart -OnThirdFailure Reboot -ResetFailureCount (60*60*24*2) -RestartDelay (1000*60*5) -RebootDelay (1000*60*10) -Dependency 'W3SVC' -Username $UserName -Password $Password
+    Assert-NoError
+    $resource = Get-TargetResource -Name $serviceName
+    Assert-NotNull $resource
+    Assert-Equal $serviceName $resource.Name
+    Assert-Equal $servicePath $resource.Path
+    Assert-Equal 'Manual' $resource.StartupType
+    Assert-Equal 'Restart' $resource.OnFirstFailure
+    Assert-Equal 'Restart' $resource.OnSecondFailure
+    Assert-Equal 'Reboot' $resource.OnThirdFailure
+    Assert-Equal (60*60*24*2) $resource.ResetFailureCount
+    Assert-Equal (1000*60*5) $resource.RestartDelay
+    Assert-Equal (1000*60*10) $resource.RebootDelay
+    Assert-Equal 'W3SVC' $resource.Dependency
+    Assert-Equal ('.\{0}' -f $UserName) $resource.UserName
+    Assert-Null $resource.Password
+    Assert-DscResourcePresent $resource    
+}
+
+function Test-ShouldUninstallService
+{
+    Set-TargetResource -Name $serviceName -Path $servicePath -Ensure Present
+    Assert-NoError
+    Assert-DscResourcePresent (Get-TargetResource -Name $serviceName)
+    Set-TargetResource -Name $serviceName -Path $servicePath -Ensure Absent
+    Assert-NoError
+    Assert-DscResourceAbsent (Get-TargetResource -Name $serviceName)
+}
+
+function Test-ShouldRequirePathWhenInstallingService
+{
+    Set-TargetResource -Name $serviceName -Ensure Present -ErrorAction SilentlyContinue
+    Assert-Error -Last -Regex 'Path\b.*\bmandatory'
+    Assert-DscResourceAbsent (Get-TargetResource -Name $serviceName)
+}
+
+function Test-ShouldTestExistingServices
+{
+    Get-Service | ForEach-Object {
+        Assert-True (Test-TargetResource -Name $_.Name -Ensure Present)
+        Assert-False (Test-TargetResource -Name $_.Name -Ensure Absent)
+    }
+}
+
+function Test-ShouldTestMissingServices
+{
+    Assert-True (Test-TargetResource -Name $serviceName -Ensure Absent)
+    Assert-False (Test-TargetResource -Name $serviceName -Ensure Present)
+}
+
+function Test-ShouldTestOnProperties
+{
+    Set-TargetResource -Name $serviceName -Path $servicePath -Ensure Present
+    $testParams = @{ Name = $serviceName; }
+    Assert-True (Test-TargetResource @testParams -Path $servicePath -Ensure Present)
+    Assert-False (Test-TargetResource @testParams -Path 'C:\fubar.exe' -Ensure Present)
+
+    Assert-True (Test-TargetResource @testParams -StartupType Automatic -Ensure Present)
+    Assert-False (Test-TargetResource @testParams -StartupType Manual -Ensure Present)
+
+    Assert-True (Test-TargetResource @testParams -OnFirstFailure TakeNoAction -Ensure Present)
+    Assert-False (Test-TargetResource @testParams -OnFirstFailure Restart -Ensure Present)
+
+    Assert-True (Test-TargetResource @testParams -OnSecondFailure TakeNoAction -Ensure Present)
+    Assert-False (Test-TargetResource @testParams -OnSecondFailure Restart -Ensure Present)
+
+    Assert-True (Test-TargetResource @testParams -OnThirdFailure TakeNoAction -Ensure Present)
+    Assert-False (Test-TargetResource @testParams -OnThirdFailure Restart -Ensure Present)
+
+    Assert-True (Test-TargetResource @testParams -ResetFailureCount 0 -Ensure Present)
+    Assert-False (Test-TargetResource @testParams -ResetFailureCount 50 -Ensure Present)
+
+    Assert-True (Test-TargetResource @testParams -RestartDelay 0 -Ensure Present)
+    Assert-False (Test-TargetResource @testParams -RestartDelay 50 -Ensure Present)
+
+    Assert-True (Test-TargetResource @testParams -RebootDelay 0 -Ensure Present)
+    Assert-False (Test-TargetResource @testParams -RebootDelay 50 -Ensure Present)
+
+    Assert-True (Test-TargetResource @testParams -Dependency @() -Ensure Present)
+    Assert-False (Test-TargetResource @testParams -Dependency @( 'W3SVC' ) -Ensure Present)
+
+    Assert-True (Test-TargetResource @testParams -UserName 'NT AUTHORITY\NETWORK SERVICE' -Ensure Present)
+    Assert-False (Test-TargetResource @testParams -UserName $UserName -Ensure Present)
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

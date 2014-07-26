@@ -119,80 +119,113 @@ function Set-TargetResource
 {
     <#
     .SYNOPSIS
-    Grants/revokes a user or group permission to a file, directory, or registry key.
+    Install/uninstalls a Windows service.
 
     .DESCRIPTION
 
-    ## Granting Permission
+    The service is installed when the `Ensure` property is set to `Present`. If the service already exists, and its configuration doesn't match the properties being set, the service is stopped, its configuration updated, and the service is restarted. Properties not passed are ignored/left as-is.
 
-    Permissions are granted when the `Ensure` property is set to `Present`.
-    
-    When granting permissions, you *must* supply a value for the `Permission` property. When granting permission to a file or directory, the values for the `Permission` property must be a valid [System.Security.AccessControl.FileSystemRights](http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.filesystemrights.aspx) enumeration value. When granting permission to a registry key, `Permission` must be a valid [System.Security.AccessControl.RegistryRights](http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.registryrights.aspx) enumeration value.
-    
-    The value of the `ApplyTo` property must be a valid `Carbon.Security.ContainerInheritanceFlags` enumeration value. For a list of values, run `[Enum]::GetValues([Carbon.Security.ContainerInheritanceFlags])`. For help on choosing a proper value, see the help for `Grant-Permission`.
+    In addition to installing the service, this resource also grants the service user the logon as a service privilege and execute permissions on the service executable.
 
-    ## Revoking Permission
-        
-    Permissions are revoked when the `Ensure` property is set to `Absent`. *All* a user or group's permissions are revoked. You can't revoke part of a user's access. If you want to revoke part of a user's access, set the `Ensure` property to `Present` and the `Permissions` property to the list of properties you want the user to have.
+    The service is uninstalled when the `Ensure` property is set to `Absent`. The service is stopped, then uninstalled.
 
     .LINK
-    Grant-Permission
+    Install-Service
 
     .LINK
-    Revoke-Permission
+    Uninstall-Service
     #>
     [CmdletBinding()]
     param(
         [Parameter(Mandatory=$true)]
         [string]
-        # The path on which the permissions should be granted.  Can be a file system or registry path.
+        # The name of the service.
+        $Name,
+        
+        [string]
+        # The path to the service.
         $Path,
         
-        [Parameter(Mandatory=$true)]
+        [ValidateSet('Automatic','Manual','Disabled')]
         [string]
-        # The user or group getting the permissions.
-        $Identity,
+        # The startup type: automatic, manual, or disabled.  Default is automatic.
+        $StartupType,
+        
+        [string]
+        [ValidateSet("Reboot","Restart","TakeNoAction")]
+        # What to do on the service's first failure.  Default is to take no action.
+        $OnFirstFailure,
+        
+        [string]
+        [ValidateSet("Reboot","Restart","TakeNoAction")]
+        # What to do on the service's second failure. Default is to take no action.
+        $OnSecondFailure,
+        
+        [string]
+        [ValidateSet("Reboot","Restart","TakeNoAction")]
+        # What to do on the service' third failure.  Default is to take no action.
+        $OnThirdFailure,
+        
+        [int]
+        # How many seconds after which the failure count is reset to 0.
+        $ResetFailureCount,
+        
+        [int]
+        # How many milliseconds to wait before restarting the service.  Default is 60,0000, or 1 minute.
+        $RestartDelay,
+        
+        [int]
+        # How many milliseconds to wait before handling the second failure.  Default is 60,000 or 1 minute.
+        $RebootDelay,
         
         [string[]]
-        # The permission: e.g. FullControl, Read, etc. Mandatory when granting permission. For file system items, use values from [System.Security.AccessControl.FileSystemRights](http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.filesystemrights.aspx).  For registry items, use values from [System.Security.AccessControl.RegistryRights](http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.registryrights.aspx).
-        $Permission,
+        # What other services does this service depend on?
+        $Dependency,
         
-        [ValidateSet('Container','SubContainers','ContainerAndSubContainers','Leaves','ContainerAndLeaves','SubContainersAndLeaves','ContainerAndSubContainersAndLeaves','ChildContainers','ContainerAndChildContainers','ChildLeaves','ContainerAndChildLeaves','ChildContainersAndChildLeaves','ContainerAndChildContainersAndChildLeaves')]
         [string]
-        # How to apply container permissions.  This controls the inheritance and propagation flags.  Default is full inheritance, e.g. `ContainersAndSubContainersAndLeaves`. This parameter is ignored if `Path` is to a file.
-        $ApplyTo,
+        # The user the service should run as.
+        $Username,
         
-        [Parameter(Mandatory=$true)]
+        [string]
+        # The user's password.
+        $Password,
+     
+        [Parameter(Mandatory=$true)]   
         [ValidateSet('Present','Absent')]
         [string]
-        # If set to `Present`, permissions are set. If `Absent`, all permissions to `$Path` removed.
+        # If `Present`, the service is installed/updated. If `Absent`, the service is removed.
         $Ensure
     )
 
     Set-StrictMode -Version 'Latest'
 
-
-    if( $PSBoundParameters.ContainsKey('Ensure') )
-    {
-        $PSBoundParameters.Remove('Ensure')
-    }
-    
+    $serviceExists = Test-Service -Name $Name
     if( $Ensure -eq 'Absent' )
     {
-        Write-Verbose ('Revoking permission for ''{0}'' to ''{1}''' -f $Identity,$Path)
-        Revoke-Permission -Path $Path -Identity $Identity
+        if( $serviceExists )
+        {
+            Write-Verbose ('Removing service ''{0}''' -f $Name)
+            Uninstall-Service -Name $Name
+        }
+        return
+    }
+
+    if( -not $Path )
+    {
+        Write-Error ('Property ''Path'' mandatory when installing/updating a service.')
+        return
+    }
+
+    $PSBoundParameters.Remove('Ensure')
+    if( $serviceExists )
+    {
+        Write-Verbose ('Updating service ''{0}''' -f $Name)
     }
     else
     {
-        if( -not $Permission )
-        {
-            Write-Error ('Permission parameter is mandatory when granting permissions.')
-            return
-        }
-
-        Write-Verbose ('Granting permission for ''{0}'' to ''{1}'': {2}' -f $Identity,$Path,($Permission -join ','))
-        Grant-Permission @PSBoundParameters
+        Write-Verbose ('Installing service ''{0}''' -f $Name)
     }
+    Install-Service @PSBoundParameters
 }
 
 
@@ -203,73 +236,84 @@ function Test-TargetResource
     param(
         [Parameter(Mandatory=$true)]
         [string]
-        # The path on which the permissions should be granted.  Can be a file system or registry path.
+        # The name of the service.
+        $Name,
+        
+        [string]
+        # The path to the service.
         $Path,
         
-        [Parameter(Mandatory=$true)]
+        [ValidateSet('Automatic','Manual','Disabled')]
         [string]
-        # The user or group getting the permissions.
-        $Identity,
+        # The startup type: automatic, manual, or disabled.  Default is automatic.
+        $StartupType,
         
-        [Parameter(Mandatory=$true)]
+        [string]
+        [ValidateSet("Reboot","Restart","TakeNoAction")]
+        # What to do on the service's first failure.  Default is to take no action.
+        $OnFirstFailure,
+        
+        [string]
+        [ValidateSet("Reboot","Restart","TakeNoAction")]
+        # What to do on the service's second failure. Default is to take no action.
+        $OnSecondFailure,
+        
+        [string]
+        [ValidateSet("Reboot","Restart","TakeNoAction")]
+        # What to do on the service' third failure.  Default is to take no action.
+        $OnThirdFailure,
+        
+        [int]
+        # How many seconds after which the failure count is reset to 0.
+        $ResetFailureCount,
+        
+        [int]
+        # How many milliseconds to wait before restarting the service.  Default is 60,0000, or 1 minute.
+        $RestartDelay,
+        
+        [int]
+        # How many milliseconds to wait before handling the second failure.  Default is 60,000 or 1 minute.
+        $RebootDelay,
+        
         [string[]]
-        # The permission: e.g. FullControl, Read, etc.  For file system items, use values from [System.Security.AccessControl.FileSystemRights](http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.filesystemrights.aspx).  For registry items, use values from [System.Security.AccessControl.RegistryRights](http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.registryrights.aspx).
-        $Permission,
+        # What other services does this service depend on?
+        $Dependency,
         
-        [ValidateSet('Container','SubContainers','ContainerAndSubContainers','Leaves','ContainerAndLeaves','SubContainersAndLeaves','ContainerAndSubContainersAndLeaves','ChildContainers','ContainerAndChildContainers','ChildLeaves','ContainerAndChildLeaves','ChildContainersAndChildLeaves','ContainerAndChildContainersAndChildLeaves')]
         [string]
-        # How to apply container permissions.  This controls the inheritance and propagation flags.  Default is full inheritance, e.g. `ContainersAndSubContainersAndLeaves`. This parameter is ignored if `Path` is to a leaf item.
-        $ApplyTo,
+        # The user the service should run as.
+        $Username,
         
+        [string]
+        # The user's password.
+        $Password,
+     
+        [Parameter(Mandatory=$true)]   
         [ValidateSet('Present','Absent')]
         [string]
-        # Should the user exist or not exist?
+        # If `Present`, the service is installed/updated. If `Absent`, the service is removed.
         $Ensure
     )
 
     Set-StrictMode -Version 'Latest'
 
-    $providerName = Get-PathProvider -Path $Path
-    if( -not $providerName )
-    {
-        Write-Error ('Path ''{0}'' not supported. Only file system and registry paths are allowed.')
-        return
-    }
-    $providerName = $providerName.Name
+    $resource = Get-TargetResource -Name $Name
 
-    $resource = Get-TargetResource -Identity $Identity -Path $Path
-    $desiredRights = $Permission -join ','
-    $currentRights = $resource.Permission -join ','
-    
     if( $Ensure -eq 'Absent' )
     {
         if( $resource.Ensure -eq 'Absent' )
         {
-            Write-Verbose ('Identity ''{0}'' has no permission to ''{1}''' -f $Identity,$Path)
             return $true
         }
-        
-        Write-Verbose ('Identity ''{0}'' has permission to ''{1}'': {2}' -f $Identity,$Path,$currentRights)
+
+        Write-Verbose ('Service ''{0}'' found.' -f $Name)
         return $false
     }
 
-    if( -not $currentRights )
+    if( $resource.Ensure -eq 'Absent' )
     {
-        Write-Verbose ('Identity ''{0} has no permission to ''{1}''' -f $Identity,$Path,$currentRights)
+        Write-Verbose ('Service ''{0}'' not found.' -f $Name)
         return $false
     }
 
-    if( $desiredRights -ne $currentRights )
-    {
-        Write-Verbose ('Identity ''{0} has stale permission to ''{1}'': {2}' -f $Identity,$Path,$currentRights)
-        return $false
-    }
-
-    if( $ApplyTo -and $ApplyTo -ne $resource.ApplyTo )
-    {
-        Write-Verbose ('Identity ''{0}'' has stale inheritance/propagation flags to ''{1}'': {2}' -f $Identity,$Path,$resource.ApplyTo)
-        return $false
-    }
-
-    return $true
+    return Test-DscTargetResource -TargetResource $resource -DesiredResource $PSBoundParameters -Target ('Service ''{0}''' -f $Name)
 }
