@@ -84,6 +84,10 @@
     <Compile Include="Security\ContainerInheritanceFlags.cs" />
     <Compile Include="Security\ServiceAccessRights.cs" />
     <Compile Include="Security\ServiceAccessRule.cs" />
+    <Compile Include="Service\ErrorControl.cs" />
+    <Compile Include="Service\FailureAction.cs" />
+    <Compile Include="Service\ServiceInfo.cs" />
+    <Compile Include="Service\StartType.cs" />
     <Compile Include="Win32.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Win32ErrorCodes.cs" />
