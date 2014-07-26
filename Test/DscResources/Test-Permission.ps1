@@ -35,7 +35,7 @@ function Stop-Test
 {
     if( (Test-Path -Path $Path -PathType Container) )
     {
-        Remove-Item -Path $Path
+        Remove-Item -Path $Path -Recurse
     }
 }
 
