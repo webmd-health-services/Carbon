@@ -236,20 +236,3 @@ function Test-ShouldRunThroughDsc
     Assert-False (Test-TargetResource -Name $serviceName -Ensure 'Present')
     Assert-True (Test-TargetResource -Name $serviceName -Ensure 'Absent')
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
