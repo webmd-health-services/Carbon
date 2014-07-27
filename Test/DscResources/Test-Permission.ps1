@@ -33,9 +33,9 @@ function Start-Test
 
 function Stop-Test
 {
-    if( (Test-Path -Path $Path -PathType Container) )
+    if( (Test-Path -Path $tempDir -PathType Container) )
     {
-        Remove-Item -Path $Path -Recurse
+        Remove-Item -Path $tempDir -Recurse
     }
 }
 

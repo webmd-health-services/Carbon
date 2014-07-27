@@ -36,11 +36,11 @@ function Start-Test
 
 function Stop-Test
 {
-    if( (Test-Path -Path $Path -PathType Container) )
-    {
-        Remove-Item -Path $Path -Recurse
-    }
     Uninstall-Service -Name $serviceName
+    if( (Test-Path -Path $tempDir -PathType Container) )
+    {
+        Remove-Item -Path $tempDir -Recurse
+    }
 }
 
 function Stop-TestFixture
