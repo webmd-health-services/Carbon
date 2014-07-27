@@ -201,6 +201,42 @@ function Test-ShouldTestOnProperties
 }
 
 
+configuration DscConfiguration
+{
+    param(
+        $Ensure
+    )
+
+    Set-StrictMode -Off
+
+    Import-DscResource -Name '*' -Module 'Carbon'
+
+    node 'localhost'
+    {
+        Carbon_Service set
+        {
+            Name = $serviceName;
+            Path = $servicePath;
+            Ensure = $Ensure;
+        }
+    }
+}
+
+function Test-ShouldRunThroughDsc
+{
+    & DscConfiguration -Ensure 'Present' -OutputPath $CarbonDscOutputRoot
+    Start-DscConfiguration -Wait -ComputerName 'localhost' -Path $CarbonDscOutputRoot
+    Assert-NoError
+    Assert-True (Test-TargetResource -Name $serviceName -Ensure 'Present')
+    Assert-False (Test-TargetResource -Name $serviceName -Ensure 'Absent')
+
+    & DscConfiguration -Ensure 'Absent' -OutputPath $CarbonDscOutputRoot 
+    Start-DscConfiguration -Wait -ComputerName 'localhost' -Path $CarbonDscOutputRoot
+    Assert-NoError
+    Assert-False (Test-TargetResource -Name $serviceName -Ensure 'Present')
+    Assert-True (Test-TargetResource -Name $serviceName -Ensure 'Absent')
+}
+
 
 
 
