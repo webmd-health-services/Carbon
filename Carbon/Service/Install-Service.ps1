@@ -263,5 +263,5 @@ function Install-Service
         }
     }
 
-    Get-Service -Name $Name
+    Get-Service -Name $Name -ErrorAction Ignore
 }
