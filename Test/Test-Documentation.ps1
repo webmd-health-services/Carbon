@@ -1,4 +1,4 @@
-# Copyright 2012 Aaron Jensen
+    # Copyright 2012 Aaron Jensen
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -28,6 +28,11 @@ function Test-AllFunctionsShouldHaveDocumentation
                                                 return $true
                                             }
                                             
+                                            if( -not (($help | Get-Member 'synopsis') -and ($help | Get-Member 'description') -and ($help | Get-Member 'examples')) )
+                                            {
+                                                return $true
+                                            }                                            
+
                                             return -not ($help.synopsis -and $help.description -and $help.examples)
                                         } | 
                                         Select-Object -ExpandProperty Name | 

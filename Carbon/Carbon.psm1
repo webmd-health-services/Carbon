@@ -54,11 +54,23 @@ if( -not $useServerManager )
 $windowsFeaturesNotSupported = (-not ($useServerManager -or ($useWmi -and $useOCSetup) ))
 $supportNotFoundErrorMessage = 'Unable to find support for managing Windows features.  Couldn''t find servermanagercmd.exe, ocsetup.exe, or WMI support.'
 
-Get-Item (Join-Path -Path $PSScriptRoot -ChildPath '*\*.ps1') | 
-    Where-Object { $_.Directory.Name -ne 'bin' } |
-    ForEach-Object {
-        Write-Verbose ("Importing sub-module {0}." -f $_.FullName)
-        . $_.FullName
-    }
+$privateMembers = @{
+                        'Add-IisServerManagerMember' = $true;
+                        'Get-IdentityPrincipalContext' = $true;
+                        'Invoke-ConsoleCommand' = $true;
+                        'ConvertTo-ProviderAccessControlRights' = $true;
+                        'Assert-WindowsFeatureFunctionsSupported' = $true;
+                        'Resolve-WindowsFeatureName' = $true;
+                   }
 
-Export-ModuleMember -Function '*' -Cmdlet '*' -Alias '*'
+$functionNames = Get-Item (Join-Path -Path $PSScriptRoot -ChildPath '*\*.ps1') | 
+                    Where-Object { $_.Directory.Name -ne 'bin' } |
+                    ForEach-Object {
+                        Write-Verbose ("Importing sub-module {0}." -f $_.FullName)
+                        . $_.FullName | Out-Null
+                        $functionName = Split-Path -Leaf -Path $_.FullName
+                        [IO.Path]::GetFileNameWithoutExtension( $functionName )
+                    } |
+                    Where-Object { -not $privateMembers.ContainsKey( $_ ) }
+
+Export-ModuleMember -Function $functionNames -Cmdlet '*' -Alias '*'
