@@ -137,7 +137,6 @@ function Install-PerformanceCounter
     {
         Uninstall-PerformanceCounterCategory -CategoryName $CategoryName
 
-        Write-Host $msg        
         [void] [Diagnostics.PerformanceCounterCategory]::Create( $CategoryName, '', $counters )
     }
 }

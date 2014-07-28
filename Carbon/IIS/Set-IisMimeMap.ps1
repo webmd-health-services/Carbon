@@ -68,7 +68,6 @@ function Set-IisMimeMap
      
     if( $pscmdlet.ShouldProcess( 'IIS web server', ('{0} MIME map {1} -> {2}' -f $action,$FileExtension,$MimeType) ) )
     {
-        Write-Host ('IIS: {0} MIME map: {1} -> {2}' -f $action,$FileExtension,$MimeType)
         $staticContent.CommitChanges()
     }
 }

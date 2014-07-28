@@ -73,7 +73,6 @@ function Set-IisWindowsAuthentication
     $fullPath = Join-IisVirtualPath $SiteName $VirtualPath
     if( $pscmdlet.ShouldProcess( $fullPath, "set Windows authentication" ) )
     {
-        Write-Host ('IIS:{0}: configuring Windows authentication: useKernelMode: {1}' -f $fullPath,$useKernelMode)
         $authSettings.CommitChanges()
     }
 }

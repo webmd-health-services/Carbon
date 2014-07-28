@@ -61,12 +61,12 @@ function Install-MsmqMessageQueue
     $logMessage = "MSMQ message queue '$Name'."
     if( Test-MsmqMessageQueue @queueArgs )
     {
-        Write-Host "Re-creating $logMessage"
+        Write-Verbose "Re-creating $logMessage"
         Uninstall-MsmqMessageQueue @queueArgs @cmdletArgs
     }
     else
     {
-        Write-Host "Creating $logMessage"
+        Write-Verbose "Creating $logMessage"
     }
     
     $MaxWait = [TimeSpan]'0:00:10'

@@ -63,7 +63,6 @@ function Set-IisWebsiteID
         if( $PSCmdlet.ShouldProcess( ('website {0}' -f $SiteName), ('set site ID to {0}' -f $ID) ) )
         {
             $startWhenDone = ($website.State -eq 'Started')
-            Write-Host ('IIS:/{0}: setting site ID: {1} -> {2}' -f $SiteName,$website.ID,$ID)
             $website.ID = $ID
             $website.CommitChanges()
         }

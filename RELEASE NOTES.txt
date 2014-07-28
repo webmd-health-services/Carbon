@@ -117,20 +117,65 @@ This is a backwards-incompatible release.
 
 ## Enhancements
 
+### General
+
+ * The following functions now write messages with `Write-Verbose` instead of `Write-Host`. See [Write-Host Considered Harmful](http://www.jsnover.com/blog/2013/12/07/write-host-considered-harmful/).
+    * [Add-GroupMember](http://get-carbon.org/help/Add-GroupMember.html)
+    * [Clear-TrustedHost](http://get-carbon.org/help/Clear-TrustedHost.html)
+    * [Convert-XmlFile](http://get-carbon.org/help/Convert-XmlFile.html)
+    * [Disable-FirewallStatefulFtp](http://get-carbon.org/help/Disable-FirewallStatefulFtp.html)
+    * [Disable-IEEnhancedSecurityConfiguration](http://get-carbon.org/help/Disable-IEEnhancedSecurityConfiguration.html)
+    * [Disable-IisSecurityAuthentication](http://get-carbon.org/help/Disable-IisSecurityAuthentication.html)
+    * [Disable-NtfsCompression](http://get-carbon.org/help/Disable-NtfsCompression.html)
+    * [Enable-FirewallStatefulFtp](http://get-carbon.org/help/Enable-FirewallStatefulFtp.html)
+    * [Enable-IEActivationPermission](http://get-carbon.org/help/Enable-IEActivationPermission.html)
+    * [Enable-IisSecurityAuthentication](http://get-carbon.org/help/Enable-IisSecurityAuthentication.html)
+    * [Enable-NtfsCompression](http://get-carbon.org/help/Enable-NtfsCompression.html)
+    * [Grant-ComPermission](http://get-carbon.org/help/Grant-ComPermission.html)
+    * [Grant-MsmqMessageQueuePermission](http://get-carbon.org/help/Grant-MsmqMessageQueuePermission.html)
+    * [Grant-Permission](http://get-carbon.org/help/Grant-Permission.html)
+    * [Grant-ServiceControlPermission](http://get-carbon.org/help/Grant-ServiceControlPermission.html)
+    * [Install-Group](http://get-carbon.org/help/Install-Group.html)
+    * [Install-IisApplication](http://get-carbon.org/help/Install-IisApplication.html)
+    * [Install-MsmqMessageQueue](http://get-carbon.org/help/Install-MsmqMessageQueue.html)
+    * [Install-PerformanceCounter](http://get-carbon.org/help/Install-PerformanceCounter.html)
+    * [Install-RegistryKey](http://get-carbon.org/help/Install-RegistryKey.html)
+    * [Install-Service](http://get-carbon.org/help/Install-Service.html)
+    * [Install-User](http://get-carbon.org/help/Install-User.html)
+    * [Install-WindowsFeature](http://get-carbon.org/help/Install-WindowsFeature.html)
+    * [Invoke-WindowsInstaller](http://get-carbon.org/help/Invoke-WindowsInstaller.html)
+    * [Lock-IisConfigurationSection](http://get-carbon.org/help/Lock-IisConfigurationSection.html)
+    * [New-Junction](http://get-carbon.org/help/New-Junction.html)
+    * [Protect-Acl](http://get-carbon.org/help/Protect-Acl.html)
+    * [Remove-IniEntry](http://get-carbon.org/help/Remove-IniEntry.html) 
+    * [Remove-Junction](http://get-carbon.org/help/Remove-Junction.html)
+    * [Remove-SslCertificateBinding](http://get-carbon.org/help/Remove-SslCertificateBinding.html)
+    * [Reset-HostsFile](http://get-carbon.org/help/Reset-HostsFile.html)
+    * [Reset-MsmqQueueManagerID](http://get-carbon.org/help/Reset-MsmqQueueManagerID.html)
+    * [Revoke-ComPermission](http://get-carbon.org/help/Revoke-ComPermission.html)
+    * [Revoke-ServicePermission](http://get-carbon.org/help/Revoke-ServicePermission.html)
+    * [Set-IisHttpHeader](http://get-carbon.org/help/Set-IisHttpHeader.html)
+    * [Set-IisMimeMap](http://get-carbon.org/help/Set-IisMimeMap.html)
+    * [Set-IisWebsiteID](http://get-carbon.org/help/Set-IisWebsiteID.html)
+    * [Set-IisWindowsAuthentication](http://get-carbon.org/help/Set-IisWindowsAuthentication.html)
+    * [Set-IniEntry](http://get-carbon.org/help/Set-IniEntry.html)
+    * [Set-RegistryKeyValue](http://get-carbon.org/help/Set-RegistryKeyValue.html)
+    * [Set-SslCertificateBinding](http://get-carbon.org/help/Set-SslCertificateBinding.html)
+    * [Test-GrantPermission](http://get-carbon.org/help/Test-GrantPermission.html)
+    * [Uninstall-IisAppPool](http://get-carbon.org/help/Uninstall-IisAppPool.html)
+    * [Uninstall-WindowsFeature](http://get-carbon.org/help/Uninstall-WindowsFeature.html)
+    * [Unlock-IisConfigurationSection](http://get-carbon.org/help/Unlock-IisConfigurationSection.html)
+    
+    
 ### Certificates
 
  * Improving error handling when [Get-Certificate](http://get-carbon.org/help/Get-Certificate.html) fails to load a certificate from a file. Original exception now part of error record.
  * [Install-Certificate](http://get-carbon.org/help/Install-Certificate.html) now supports installing with an `X509Certificate2` object instead of just a path to a certificate.
- * [Remove-SslCertificateBinding](http://get-carbon.org/help/Remove-SslCertificateBinding.html) now writes messages with `Write-Verbose` instead of `Write-Host`. Improved error handling.
- * [Set-SslCertificateBinding](http://get-carbon.org/help/Set-SslCertificateBinding.html) now writes messages with `Write-Verbose` instead of `Write-Host`. Improved error handling.
+ * [Remove-SslCertificateBinding](http://get-carbon.org/help/Remove-SslCertificateBinding.html): improved error handling.
+ * [Set-SslCertificateBinding](http://get-carbon.org/help/Set-SslCertificateBinding.html): improved error handling.
  * Improved documentation for [Get-Certificate](http://get-carbon.org/help/Get-Certificate.html).
  * Added extended script property `StoreName` to `X509Store` objects to return the store's `System.Security.Cryptography.X509Certificates.StoreName` value.
  * Added a table view/format for `X509Store` objects. PowerShell's default view is a list, so you'll have to explicitly format the objects as a table, e.g. `dir cert:\LocalMachine | Format-Table`.
-
-### COM
-
- * [Grant-ComPermission](http://get-carbon.org/help/Grant-ComPermission.html) now writes messages with `Write-Verbose` instead of `Write-Host`.
- * [Revoke-ComPermission](http://get-carbon.org/help/Revoke-ComPermission.html) now writes messages with `Write-Verbose` instead of `Write-Host`.
 
 ### Computer
 
@@ -142,44 +187,26 @@ This is a backwards-incompatible release.
 
 ### File System
 
- * [Disable-NtfsCompression](http://get-carbon.org/help/Disable-NtfsCompression.html) no longer writes messages with `Write-Host`. Improved error handling.
- * [Enable-NtfsCompression](http://get-carbon.org/help/Enable-NtfsCompression.html) no longer writes messages with `Write-Host`. Improved error handling.
- * [New-Junction](http://get-carbon.org/help/New-Junction.html) no longer writes message with `Write-Host`.
- * [Remove-Junction](http://get-carbon.org/help/Remove-Junction.html) no longer writes message with `Write-Host`.
+ * [Disable-NtfsCompression](http://get-carbon.org/help/Disable-NtfsCompression.html): improved error handling.
+ * [Enable-NtfsCompression](http://get-carbon.org/help/Enable-NtfsCompression.html): improved error handling.
 
 ### Firewall
 
- * [Disable-FirewallStatefulFtp](http://get-carbon.org/help/Disable-FirewallStatefulFtp.html) no longer writes messages with `Write-Host`. Improved error handling.
- * [Enable-FirewallStatefulFtp](http://get-carbon.org/help/Enable-FirewallStatefulFtp.html) no longer writes message with `Write-Host`.
+ * [Disable-FirewallStatefulFtp](http://get-carbon.org/help/Disable-FirewallStatefulFtp.html): improved error handling.
  * Added `Name` and `LiteralName` parameters to [Get-FirewallRule](http://get-carbon.org/help/Get-FirewallRule.html) to return specific rules instead of all of them.
  * [Get-FirewallRule](http://get-carbon.org/help/Get-FirewallRule.html), now returns `Carbon.Firewall.Rule` objects, instead of anonymous hashes.
  * Added default table format for [Get-FirewallRule](http://get-carbon.org/help/Get-FirewallRule.html) output.
- * [Get-FirewallRule](http://get-carbon.org/help/Get-FirewallRule.html), now returns additional rule information: interface type, security, source, description, program, and service. Who new `netsh advfirewall firewall rule show` had a `verbose` switch? RTFM.
-
-### Hosts File
-
- * [Reset-HostsFile](http://get-carbon.org/help/Reset-HostsFile.html) now writes messages with `Write-Verbose` instead of `Write-Host`.
+ * [Get-FirewallRule](http://get-carbon.org/help/Get-FirewallRule.html), now returns additional rule information: interface type, security, source, description, program, and service. Who knew `netsh advfirewall firewall rule show` had a `verbose` switch? RTFM.
 
 ### INI
 
- * [Remove-IniEntry](http://get-carbon.org/help/Remove-IniEntry.html) now writes messages with `Write-Verbose` instead of `Write-Host`.
- * [Set-IniEntry](http://get-carbon.org/help/Set-IniEntry.html) now writes messages with `Write-Verbose` instead of `Write-Host`.
  * [Remove-IniEntry](http://get-carbon.org/help/Remove-IniEntry.html) now handles case-sensitive INI files.
  * [Set-IniEntry](http://get-carbon.org/help/Set-IniEntry.html) now handles case-sensitive INI files.
  * [Split-IniEntry](http://get-carbon.org/help/Split-IniEntry.html) now handles case-sensitive INI files.
 
-### Internet Explorer
-
- * [Disable-IEEnhancedSecurityConfiguration](http://get-carbon.org/help/Disable-IEEnhancedSecurityConfiguration.html) now writes messages with `Write-Verbose` instead of `Write-Host`.
- * [Enable-IEActivationPermission](http://get-carbon.org/help/Enable-IEActivationPermission.html) now writes messages with `Write-Verbose` instead of `Write-Host`.
-
 ### MSI
 
- * [Invoke-WindowsInstaller](http://get-carbon.org/help/Invoke-WindowsInstaller.html) no longer writes messages with `Write-Host`. Improved error message if installation fails.
-
-### MSMQ
-
- * [Grant-MsmqMessageQueuePermission](http://get-carbon.org/help/Grant-MsmqMessageQueuePermission.html) no longer writes messages with `Write-Host`.
+ * [Invoke-WindowsInstaller](http://get-carbon.org/help/Invoke-WindowsInstaller.html): improved error message if installation fails.
 
 ### Security
 
@@ -209,6 +236,7 @@ This is a backwards-incompatible release.
    * TagID
    * ThirdFailure
    * UserName
+
 
 ## Bug Fixes
 

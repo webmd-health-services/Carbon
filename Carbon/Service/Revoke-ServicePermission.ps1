@@ -60,7 +60,7 @@ function Revoke-ServicePermission
     
     if( (Get-ServicePermission -Name $Name -Identity $account.FullName) )
     {
-        Write-Host ("Revoking {0}'s {1} service permissions." -f $account.FullName,$Name)
+        Write-Verbose ("Revoking {0}'s {1} service permissions." -f $account.FullName,$Name)
         
         $dacl = Get-ServiceAcl -Name $Name
         $dacl.Purge( $account.Sid )

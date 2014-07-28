@@ -133,7 +133,7 @@ function Set-RegistryKeyValue
     
     if( -not $PSBoundParameters.ContainsKey( 'WhatIf' ) -and -not $Quiet )
     {
-        Write-Host "Setting registry value '$Path@$Name'."
+        Write-Verbose "Setting registry value '$Path@$Name'."
     }
     
     $commonParams = @{

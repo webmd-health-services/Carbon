@@ -83,7 +83,6 @@ function Set-IisHttpHeader
     $fullPath = Join-IisVirtualPath $SiteName $VirtualPath
     if( $pscmdlet.ShouldProcess( $fullPath, ('{0} HTTP header {1}' -f $action,$Name) ) )
     {
-        Write-Host ('IIS:{0}: {1} HTTP Header {2}: {3}' -f $fullPath,$action,$Name,$Value)
         $httpProtocol.CommitChanges()
     }
 }

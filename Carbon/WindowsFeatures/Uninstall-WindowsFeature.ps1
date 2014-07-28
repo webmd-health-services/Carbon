@@ -111,7 +111,6 @@ if( -not (Get-Command -Name 'Uninstall-WindowsFeature*') )
             
         if( $pscmdlet.ShouldProcess( "Windows feature(s) '$featuresToUninstall'", "uninstall" ) )
         {
-            Write-Host "Uninstalling Windows feature(s): '$featuresToUninstall'."
             if( $useServerManager )
             {
                 & servermanagercmd.exe -remove $featuresToUninstall

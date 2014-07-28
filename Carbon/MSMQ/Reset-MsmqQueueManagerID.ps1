@@ -33,7 +33,7 @@ function Reset-MsmqQueueManagerID
     param(
     )
 
-    Write-Host "Resetting MSMQ Queue Manager ID."
+    Write-Verbose "Resetting MSMQ Queue Manager ID."
     Write-Verbose "Stopping MSMQ."
     Stop-Service MSMQ -Force
     

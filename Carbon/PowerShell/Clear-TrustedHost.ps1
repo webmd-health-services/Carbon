@@ -38,7 +38,6 @@ function Clear-TrustedHost
     
     if( $pscmdlet.ShouldProcess( 'trusted hosts', 'clear' ) )
     {
-        Write-Host "Clearing the trusted hosts list."
         Set-Item $TrustedHostsPath -Value '' -Force
     }
 

@@ -44,7 +44,6 @@ function Lock-IisConfigurationSection
             $section.OverrideMode = 'Deny'
             if( $pscmdlet.ShouldProcess( $_, 'locking IIS configuration section' ) )
             {
-                Write-Host ("IIS:{0}: locking" -f $_)
                 $section.CommitChanges()
             }
         }

@@ -72,12 +72,12 @@ function Install-IisApplication
     $app = Get-IisApplication -SiteName $SiteName -VirtualPath $VirtualPath
     if( $app )
     {
-        Write-Host ('IIS://{0}: deleting application' -f (Join-IisVirtualPath $SiteName $VirtualPath))
+        Write-Verbose ('IIS://{0}: deleting application' -f (Join-IisVirtualPath $SiteName $VirtualPath))
         $app.Delete()
         $app.CommitChanges()
     }
 
-    Write-Host ('IIS:/{0}: creating application: physicalPath: {1}{2}' -f (Join-IisVirtualPath $SiteName $VirtualPath),$PhysicalPath,$appPoolDesc)
+    Write-Verbose ('IIS:/{0}: creating application: physicalPath: {1}{2}' -f (Join-IisVirtualPath $SiteName $VirtualPath),$PhysicalPath,$appPoolDesc)
     $site = Get-IisWebsite -SiteName $SiteName
     if( -not $site )
     {
