@@ -114,7 +114,6 @@ if( -not (Get-Command -Name 'Install-WindowsFeature*') )
         
         if( $pscmdlet.ShouldProcess( "Windows feature(s) '$componentsToInstall'", "install" ) )
         {
-            Write-Host "Installing Windows feature(s): '$componentsToInstall'."
             if( $useServerManager )
             {
                 servermanagercmd.exe -install $componentsToInstall

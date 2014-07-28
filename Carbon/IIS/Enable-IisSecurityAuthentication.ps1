@@ -77,7 +77,6 @@ function Enable-IisSecurityAuthentication
     $fullPath = Join-IisVirtualPath $SiteName $VirtualPath
     if( $pscmdlet.ShouldProcess( $fullPath, ("enable {0}" -f $authType) ) )
     {
-        Write-Host ('IIS:{0}: enabling {1} authentication' -f $fullPath,$authType)
         $authSettings.CommitChanges()
     }
 }

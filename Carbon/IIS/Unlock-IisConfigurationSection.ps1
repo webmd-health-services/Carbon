@@ -44,7 +44,6 @@ function Unlock-IisConfigurationSection
             $section.OverrideMode = 'Allow'
             if( $pscmdlet.ShouldProcess( $_, 'unlocking IIS configuration section' ) )
             {
-                Write-Host ("IIS:{0}: unlocking" -f $_)
                 $section.CommitChanges()
             }
         }

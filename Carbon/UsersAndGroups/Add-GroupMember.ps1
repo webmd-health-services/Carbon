@@ -76,7 +76,6 @@ function Add-GroupMember
                 }
                 if( $pscmdlet.ShouldProcess( $Name, "add built-in member $currentMember" ) )
                 {
-                    Write-Host "Adding $currentMember to group $Name."
                     & (Resolve-NetPath) localgroup $Name $currentMember /add
                 }
             }
@@ -90,7 +89,6 @@ function Add-GroupMember
                 
                 if( $pscmdlet.ShouldProcess( $Name, "add member $currentMember" ) )
                 {
-                    Write-Host "Adding $currentMember to group $Name."
                     try
                     {
                         [void] $group.Add( $memberPath )

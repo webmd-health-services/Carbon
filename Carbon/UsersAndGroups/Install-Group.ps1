@@ -49,7 +49,6 @@ function Install-Group
         $action = "Creating" 
         $addArg = "/ADD" 
     } 
-    Write-Host "$action local group '$Name'."
     
     & (Resolve-NetPath) localgroup `"$Name`" /Comment:"$Description" $addArg
     

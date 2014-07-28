@@ -63,7 +63,6 @@ function Install-User
     
     if( $pscmdlet.ShouldProcess( $Username, "$operation local user" ) )
     {
-        Write-Host "$logAction local user $Username."
         & (Resolve-NetPath) user $Username $Password $addArg /Comment:$Description /Fullname:$FullName /Y
         
         if( -not $userExists )

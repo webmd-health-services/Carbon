@@ -172,7 +172,7 @@ function Grant-Permission
         return
     }
     
-    Write-Host "Granting $Identity $Permission on $Path."
+    Write-Verbose "Granting $Identity $Permission on $Path."
     # We don't use Get-Acl because it returns the whole security descriptor, which includes owner information.
     # When passed to Set-Acl, this causes intermittent errors.  So, we just grab the ACL portion of the security descriptor.
     # See http://www.bilalaslam.com/2010/12/14/powershell-workaround-for-the-security-identifier-is-not-allowed-to-be-the-owner-of-this-object-with-set-acl/

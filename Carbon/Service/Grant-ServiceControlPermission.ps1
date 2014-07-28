@@ -50,7 +50,6 @@ function Grant-ServiceControlPermission
    
     if( $pscmdlet.ShouldProcess( $ServiceName, "grant control service permissions to '$Identity'" ) )
     {
-        Write-Host "Granting '$Identity' the permissions to control '$ServiceName'."
         Grant-ServicePermission -Name $ServiceName -Identity $Identity -QueryStatus -EnumerateDependents -Start -Stop
     }
 }

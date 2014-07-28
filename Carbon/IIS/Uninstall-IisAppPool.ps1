@@ -39,7 +39,6 @@ function Uninstall-IisAppPool
     {
         if( $pscmdlet.ShouldProcess( ('IIS app pool {0}' -f $Name), 'remove' ) )
         {
-            Write-Host ('Removing {0} IIS app pool.' -f $Name)
             $appPool.Delete()
             $appPool.CommitChanges()
         }

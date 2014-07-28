@@ -242,8 +242,6 @@ function Convert-XmlFile
 
     try
     {
-        Write-Host ('Transforming ''{0}'' {1}to ''{2}''.' -f $Path,$xdtPathForInfoMsg,$Destination)
-
         if( $PSCmdlet.ShouldProcess( $Path, ('transform with {0} -> {1}' -f $xdtPathForShouldProcess,$Destination) ) )
         {
             $argumentList = $CarbonBinDir,$Path,$XdtPath,$Destination,$TransformAssemblyPath

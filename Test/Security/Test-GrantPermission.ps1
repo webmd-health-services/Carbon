@@ -182,7 +182,6 @@ function Test-ShouldSetInheritanceFlags
                 $null = New-Item $grandchildLeafPath -ItemType File
 
                 $flags = $map[$containerInheritanceFlag]
-                #Write-Host ('{0}: {1}     {2}' -f $_,$flags.InheritanceFlags,$flags.PropagationFlags)
                 $result = Grant-Permission -Identity $user -Path $containerPath -Permission Read -ApplyTo $containerInheritanceFlag
                 Assert-Null $result
                 Assert-InheritanceFlags $containerInheritanceFlag $flags.InheritanceFlags $flags.PropagationFlags
@@ -230,7 +229,6 @@ function Assert-InheritanceFlags
         $PropagationFlags
     )
 
-    #Write-Host ('{0}: {1}     {2}' -f $ContainerInheritanceFlags,$InheritanceFlags,$PropagationFlags)
     $ace = Get-Permission $containerPath -Identity $user
                 
     Assert-NotNull $ace $ContainerInheritanceFlags

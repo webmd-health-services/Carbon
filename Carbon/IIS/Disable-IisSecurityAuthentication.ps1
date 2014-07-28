@@ -75,7 +75,6 @@ function Disable-IisSecurityAuthentication
     $fullPath = Join-IisVirtualPath $SiteName $VirtualPath
     if( $pscmdlet.ShouldProcess( $fullPath, ("disable {0} authentication" -f $authType) ) )
     {
-        Write-Host ('IIS:{0}: disabling {1} authentication' -f $fullPath,$authType)
         $authSettings.CommitChanges()
     }
 }

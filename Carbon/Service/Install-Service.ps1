@@ -190,7 +190,6 @@ function Install-Service
         
         if( $PSCmdlet.ShouldProcess( $identity, "grant the log on as a service right" ) )
         {
-            Write-Host ("Granting '{0}' the log on as a service right." -f $Identity)
             Grant-Privilege -Identity $identity -Privilege SeServiceLogonRight
         }
     }
@@ -233,8 +232,6 @@ function Install-Service
 
     if( $PSCmdlet.ShouldProcess( "$Name [$Path]", "$operation service" ) )
     {
-        Write-Host "Installing service '$Name' at '$Path' to run as '$identity'."
-        
         & $sc $operation $Name binPath= $Path start= $startArg obj= $identity $passwordArgName $passwordArgValue $dependencyArgName $dependencyArgValue
         if( $LastExitCode -ne 0 )
         {

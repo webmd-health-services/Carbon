@@ -58,7 +58,7 @@ function Revoke-ServicePermission
     
     if( (Get-ServicePermission -Name $Name -Identity $rIdentity) )
     {
-        Write-Host ("Revoking {0}'s {1} service permissions." -f $rIdentity,$Name)
+        Write-Verbose ("Revoking {0}'s {1} service permissions." -f $rIdentity,$Name)
         
         $dacl = Get-ServiceAcl -Name $Name
         $sid = Test-Identity -Name $rIdentity -PassThru
