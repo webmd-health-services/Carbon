@@ -165,7 +165,13 @@ This is a backwards-incompatible release.
     * [Uninstall-IisAppPool](http://get-carbon.org/help/Uninstall-IisAppPool.html)
     * [Uninstall-WindowsFeature](http://get-carbon.org/help/Uninstall-WindowsFeature.html)
     * [Unlock-IisConfigurationSection](http://get-carbon.org/help/Unlock-IisConfigurationSection.html)
-    
+ * The following internal functions (which we warned you not to use!) are no longer exported:
+    * Add-IisServerManagerMember
+    * Get-IdentityPrincipalContext
+    * Invoke-ConsoleCommand
+    * ConvertTo-ProviderAccessControlRights
+    * Assert-WindowsFeatureFunctionsSupported
+    * Resolve-WindowsFeatureName
     
 ### Certificates
 
