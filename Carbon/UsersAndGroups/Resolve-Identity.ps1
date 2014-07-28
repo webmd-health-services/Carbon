@@ -48,6 +48,7 @@ function Resolve-Identity
     Returns an object representing the `Administrators` group.
     #>
     [CmdletBinding()]
+    [OutputType([Carbon.Identity])]
     param(
         [Parameter(Mandatory=$true)]
         [string]

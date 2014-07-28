@@ -27,7 +27,10 @@ function Test-AllFunctionsShouldHaveDocumentation
                                             {
                                                 return $true
                                             }
-                                            
+                                            if( -not (($help | Get-Member 'synopsis') -and ($help | Get-Member 'description') -and ($help | Get-Member 'examples')) )
+                                            {
+                                                return $true
+                                            }
                                             return -not ($help.synopsis -and $help.description -and $help.examples)
                                         } | 
                                         Select-Object -ExpandProperty Name | 

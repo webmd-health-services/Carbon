@@ -38,6 +38,7 @@ function Get-Group
     Demonstrates how to get a specific group.
     #>
     [CmdletBinding()]
+    [OutputType([DirectoryServices.AccountManagement.GroupPrincipal])]
     param(
         [string]
         # The name of the group to return.
@@ -52,7 +53,7 @@ function Get-Group
         $group = [DirectoryServices.AccountManagement.GroupPrincipal]::FindByIdentity( $ctx, $Name )
         if( -not $group )
         {
-            Write-Error ('Local group ''{0}'' not found.' -f $Name)
+            Write-Error ('Local group ''{0}'' not found.' -f $Name) -ErrorAction:$ErrorActionPreference
             return
         }
         return $group

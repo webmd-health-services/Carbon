@@ -57,21 +57,12 @@ function Add-GroupMember
         return
     }
     
-    $ctx = New-Object 'DirectoryServices.AccountManagement.PrincipalContext' ([DirectoryServices.AccountManagement.ContextType]::Machine)
-    
     $changesMade = $false
     $Member | 
         ForEach-Object { Resolve-Identity -Name $_ } |
         ForEach-Object {
             $identity = $_
-            $ctxType = 'Domain'
-            $ctxName = $identity.Domain
-            if( $identity.Domain -eq $env:COMPUTERNAME -or $identity.Domain -eq 'BUILTIN' -or $identity.Domain -eq 'NT AUTHORITY' )
-            {
-                $ctxName = $env:COMPUTERNAME
-                $ctxType = 'Machine'
-            }
-            $identityCtx = New-Object 'DirectoryServices.AccountManagement.PrincipalContext' $ctxType,$ctxName
+            $identityCtx = Get-IdentityPrincipalContext -Identity $_
 
             $notAMember = -not $group.Members.Contains( $identityCtx, 'Sid', $identity.Sid.Value )
             if( $notAMember -and $pscmdlet.ShouldProcess( $group.Name, ("add member {0}" -f $identity.FullName) ) )
@@ -93,6 +84,7 @@ function Add-GroupMember
         try
         {
             $group.Save()
+            $group.Dispose()
         }
         catch
         {

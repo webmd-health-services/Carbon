@@ -57,32 +57,20 @@ function Remove-GroupMember
         return
     }
     
-    $ctx = New-Object 'DirectoryServices.AccountManagement.PrincipalContext' ([DirectoryServices.AccountManagement.ContextType]::Machine)
-    
     $changesMade = $false
     $Member | 
         ForEach-Object { Resolve-Identity -Name $_ } |
         ForEach-Object {
             $identity = $_
-            if( $identity.Domain -eq $env:COMPUTERNAME -or $identity.Domain -eq 'BUILTIN' -or $identity.Domain -eq 'NT AUTHORITY' )
-            {
-                $ctxName = $env:COMPUTERNAME
-                $ctxType = 'Machine'
-            }
-			else
-			{
-            	$ctxName = $identity.Domain
-				$ctxType = 'Domain'
-			}
-            $identityCtx = New-Object 'DirectoryServices.AccountManagement.PrincipalContext' $ctxType,$ctxName
+            $identityCtx = Get-IdentityPrincipalContext -Identity $_
 
             $isMember = $group.Members.Contains( $identityCtx, 'Sid', $identity.Sid.Value )
             if( $isMember -and $pscmdlet.ShouldProcess( $group.Name, ("remove member {0}" -f $identity.FullName) ) )
             {
             	try
             	{
-                    $changesMade = $group.Members.Remove( $identityCtx, 'Sid', $identity.Sid.Value )
-                    #$changesMade = $true
+                    [void]$group.Members.Remove( $identityCtx, 'Sid', $identity.Sid.Value )
+                    $changesMade = $true
                 }
                 catch
                 {
@@ -104,5 +92,3 @@ function Remove-GroupMember
         }
     }
 }
-
-Set-Alias -Name 'Remove-GroupMembers' -Value 'Remove-GroupMember'
