@@ -14,18 +14,6 @@
 
 filter Add-IisServerManagerMember
 {
-    <#
-    .SYNOPSIS
-    INTERNAL. Adds a `ServerManager` property and `CommitChanges()` method to an object.
-    
-    .DESCRIPTION
-    This is an internal Carbon function for adding properties/methods to `Microsoft.Web.Administration` objects so that changes to them can be committed/saved.  It adds a `ServerManager` property, which is a reference to the `ServerManager` object which instantiated this object and a CommitChanges method, which calls down to the `ServerManager`'s `CommitChanges` method.
-    
-    .EXAMPLE
-    $appPool | Add-IisServerManagerMember -ServerManager $manager -PassThru
-    
-    Adds a `ServerManager` property and `CommitChanges` method to `$appPool`.
-    #>
     [CmdletBinding()]
     param(
         [Parameter(Mandatory=$true,ValueFromPipeline=$true)]
@@ -51,5 +39,3 @@ filter Add-IisServerManagerMember
         return $InputObject
     }
 }
-
-Set-Alias -Name 'Add-IisServerManagerMembers' -Value 'Add-IisServerManagerMember'
