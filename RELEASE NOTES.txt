@@ -112,7 +112,13 @@ This is a backwards-incompatible release.
  * [Resolve-Identity](http://get-carbon.org/help/Resolve-Identity.html) (née `Resolve-IdentityName`) now writes an error if it can't resolve a name.  Use `-ErrorAction SilentlyContinue` or `-ErrorAction Ignore` to preserve old behavior.
  * [Test-Identity](http://get-carbon.org/help/Test-Identity.html) now returns a `Carbon.Identity` object if the identity exists *and* you use the `-PassThru` switch.  It used to return the identity's name.  Update scripts to use the `FullName` property to get the old return value, e.g. `Test-Identity -Name $userName -PassThru | Select-Object -Expand 'FullName'`.
  * Added [Add-GroupMember](http://get-carbon.org/help/Add-GroupMember.html) function. Thanks to [Philip Kluss](https://bitbucket.org/philkloose) for the contribution. 
- 
+
+## Bug Fixes
+
+### Users and Groups
+
+ * The `Carbon.Identity.FindByName` method and [Resolve-Identity](http://get-carbon.org/help/Resolve-Identity.html) and [Test-Identity](http://get-carbon.org/help/Test-Identity.html)) functions now handle identity names with `.` for the domain/machine name, e.g. `.\Administrator`.
+
 
 # 1.8.0
 

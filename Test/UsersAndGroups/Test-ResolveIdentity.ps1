@@ -55,3 +55,15 @@ function Test-ShouldNotResolveMadeUpName
     Assert-Like $Error[0].Exception.Message '*not found*'
     Assert-Null $fullName
 }
+
+function Test-ShouldResolveDotAccounts
+{
+    foreach( $user in (Get-User) )
+    {
+        $id = Resolve-Identity -Name ('.\{0}' -f $user.SamAccountName)
+        Assert-NoError
+        Assert-NotNull $id
+        Assert-Equal $id.Domain $user.ConnectedServer
+        Assert-Equal $id.Name $user.SamAccountName
+    }
+}
