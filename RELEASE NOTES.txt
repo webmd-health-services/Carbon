@@ -144,6 +144,10 @@
 
  * [Resolve-PathCase](http://get-carbon.org/help/Resolve-PathCase.html) didn't work under Windows 2012 R2.
 
+### Users and Groups
+
+ * The `Carbon.Identity.FindByName` method and [Resolve-Identity](http://get-carbon.org/help/Resolve-Identity.html) and [Test-Identity](http://get-carbon.org/help/Test-Identity.html)) functions now handle identity names with `.` for the domain/machine name, e.g. `.\Administrator`.
+
 
 # 1.7.0 (30 April 2014)
 

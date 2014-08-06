@@ -17,6 +17,7 @@ using System.ComponentModel;
 using System.Runtime.InteropServices;
 using System.Security.Principal;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Carbon
 {
@@ -67,6 +68,11 @@ namespace Carbon
             var referencedDomainName = new StringBuilder();
             var cchReferencedDomainName = (uint) referencedDomainName.Capacity;
             IdentityType sidUse;
+
+	        if (name.StartsWith(".\\"))
+	        {
+		        name = string.Format("{0}{1}", Environment.MachineName, name.Substring(1));
+			}
 
             int err;
             if (AdvApi32.LookupAccountName(null, name, rawSid, ref cbSid, referencedDomainName, ref cchReferencedDomainName, out sidUse))
