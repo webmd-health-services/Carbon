@@ -107,7 +107,12 @@ function Get-TargetResource
         $resource.ResetFailureCount = $service.ResetPeriod
         $resource.RestartDelay = $service.RestartDelay
         $resource.RebootDelay = $service.RebootDelay
-        $resource.UserName = Resolve-Identity -Name $service.UserName | Select-Object -ExpandProperty 'FullName'
+        $resource.UserName = $service.UserName
+        $actualUserName = Resolve-Identity -Name $service.UserName -ErrorAction Ignore
+        if( $actualUserName )
+        {
+            $resource.UserName = $actualUserName.FullName
+        }
         [string[]]$resource.Dependency = $service.ServicesDependedOn | Select-Object -ExpandProperty Name
         $resource.Ensure = 'Present'
     }

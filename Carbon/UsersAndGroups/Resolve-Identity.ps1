@@ -60,7 +60,7 @@ function Resolve-Identity
     
     if( -not (Test-Identity -Name $Name) )
     {
-        Write-Error ('Identity ''{0}'' not found.' -f $Name)
+        Write-Error ('Identity ''{0}'' not found.' -f $Name) -ErrorAction:$ErrorActionPreference
         return
     }
 

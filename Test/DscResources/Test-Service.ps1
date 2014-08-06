@@ -64,7 +64,14 @@ function Test-ShouldGetExistingServices
         Assert-Equal $_.RestartDelay $resource.RestartDelay
         Assert-Equal $_.RebootDelay $resource.RebootDelay
         Assert-Equal (($_.ServicesDependedOn | Select-Object -ExpandProperty 'Name') -join ',') ($resource.Dependency -join ',') $_.Name
-        Assert-Equal $_.UserName $resource.UserName
+        if( (Test-Identity -Name $_.UserName) )
+        {
+            Assert-Equal (Resolve-Identity -Name $_.UserName).FullName $resource.UserName
+        }
+        else
+        {
+            Assert-Equal $_.UserName $resource.UserName
+        }
         Assert-Null $resource.Password
         Assert-DscResourcePresent $resource
     }
@@ -129,7 +136,7 @@ function Test-ShouldInstallServiceWithAllOptions
     Assert-Equal (1000*60*5) $resource.RestartDelay
     Assert-Equal (1000*60*10) $resource.RebootDelay
     Assert-Equal 'W3SVC' $resource.Dependency
-    Assert-Equal ('.\{0}' -f $UserName) $resource.UserName
+    Assert-Equal (Resolve-Identity -Name $UserName).FullName $resource.UserName
     Assert-Null $resource.Password
     Assert-DscResourcePresent $resource    
 }
