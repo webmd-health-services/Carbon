@@ -35,6 +35,11 @@ function Test-ShouldNotResolveMadeUpName
     Assert-Null $fullName
 }
 
+function Test-ShouldResolveLocalSystem
+{
+    Assert-Equal 'NT AUTHORITY\SYSTEM' (Resolve-IdentityName -Name 'localsystem')
+}
+
 function Test-ShouldResolveNameWithDotPrefix
 {
     $id = Resolve-IdentityName -Name '.\Administrator'

@@ -83,6 +83,11 @@ namespace Carbon
 		        name = string.Format("{0}{1}", Environment.MachineName, name.Substring(1));
 			}
 
+	        if (name.Equals("LocalSystem", StringComparison.InvariantCultureIgnoreCase))
+	        {
+		        name = "NT AUTHORITY\\SYSTEM";
+	        }
+
             int err;
             if (AdvApi32.LookupAccountName(null, name, rawSid, ref cbSid, referencedDomainName, ref cchReferencedDomainName, out sidUse))
             {
