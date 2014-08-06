@@ -33,7 +33,16 @@ namespace Carbon
 
         public string Domain { get; private set; }
 
-        public string FullName { get { return string.Format("{0}\\{1}", Domain, Name); } }
+	    public string FullName
+	    {
+		    get
+		    {
+			    if (string.IsNullOrEmpty(Domain))
+				    return Name;
+
+			    return string.Format("{0}\\{1}", Domain, Name);
+		    }
+	    }
 
         public string Name { get; private set; }
 

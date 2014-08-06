@@ -67,3 +67,8 @@ function Test-ShouldNotFindUserInCurrentDomain
     Assert-False (Test-Identity -Name ('{0}\IDoNotExistIHope' -f $env:USERDOMAIN) -ErrorAction SilentlyContinue)
     Assert-Equal 0 $error.Count
 }
+
+function Test-ShouldFindUserWithDotDomain
+{
+    Assert-True (Test-Identity -Name '.\Administrator')
+}

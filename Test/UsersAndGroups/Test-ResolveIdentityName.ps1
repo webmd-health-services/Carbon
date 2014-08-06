@@ -34,3 +34,11 @@ function Test-ShouldNotResolveMadeUpName
     $fullName = Resolve-IdentityName -Name 'IDONotExist'
     Assert-Null $fullName
 }
+
+function Test-ShouldResolveNameWithDotPrefix
+{
+    $id = Resolve-IdentityName -Name '.\Administrator'
+    Assert-NoError
+    Assert-NotNull $id
+    Assert-Equal ('{0}\Administrator' -f $env:COMPUTERNAME) $id
+}
