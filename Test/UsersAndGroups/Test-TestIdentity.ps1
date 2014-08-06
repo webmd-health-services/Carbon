@@ -72,3 +72,8 @@ function Test-ShouldFindUserWithDotDomain
 {
     Assert-True (Test-Identity -Name '.\Administrator')
 }
+
+function Test-ShouldFindLocalSystem
+{
+    Assert-True (Test-Identity -Name 'LocalSystem')
+}

@@ -69,6 +69,14 @@ namespace Carbon.Test
 			ThenIdentityShouldBe(Environment.MachineName, "Administrator");
 	    }
 
+	    [Test]
+	    public void ShouldResolveLocalSystem()
+	    {
+		    GivenIdentityName("localSYSTEM");
+			WhenResolvingIdentityName();
+			ThenIdentityShouldBe("NT AUTHORITY", "SYSTEM");
+	    }
+
         private void ThenIdentityShouldBe(string domain, string name)
         {
 			Assert.That(_identity, Is.Not.Null);

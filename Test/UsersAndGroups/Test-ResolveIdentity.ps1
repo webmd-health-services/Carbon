@@ -56,6 +56,11 @@ function Test-ShouldNotResolveMadeUpName
     Assert-Null $fullName
 }
 
+function Test-ShouldResolveLocalSystem
+{
+    Assert-Equal 'NT AUTHORITY\SYSTEM' (Resolve-Identity -Name 'localsystem').FullName
+}
+
 function Test-ShouldResolveDotAccounts
 {
     foreach( $user in (Get-User) )
