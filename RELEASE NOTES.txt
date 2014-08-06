@@ -81,6 +81,7 @@
  * [Disable-NtfsCompression](http://get-carbon.org/help/Disable-NtfsCompression.html): improved error handling.
  * [Enable-NtfsCompression](http://get-carbon.org/help/Enable-NtfsCompression.html): improved error handling.
  * Created [Compress-Item](http://get-carbon.org/help/Compress-Item.html) function for compressing files/directories into a ZIP file.
+ * Created [Test-ZipFile](http://get-carbon.org/help/Test-ZipFile.html) function for testing if a file is a ZIP file.
 
 ### Firewall
 

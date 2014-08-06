@@ -16,15 +16,31 @@ function Test-ZipFile
 {
     <#
     .SYNOPSIS
-    Tests if a file is a ZIP file.
+    Tests if a file is a ZIP file using the `DotNetZip` library.
 
     .DESCRIPTION
-    Opens and reads the first few bytes of a `Path` with .NET's `System.IO.Compression.DeflateStream`. If the read is successful, the file is a ZIP file and `$true` is returned, otherwise `$false` is returned.
+    Uses the `Ionic.Zip.ZipFile.IsZipFile` static method to determine if a file is a ZIP file.  The file *must* exist. If it doesn't, an error is written and `$null` is returned.
+
+    You can pipe `System.IO.FileInfo` (or strings) to this function to filter multiple items.
+
+    .LINK
+    https://www.nuget.org/packages/DotNetZip
+
+    .LINK
+    Compress-Item
+    
+    .LINK
+    Expand-Item
+    
+    .EXAMPLE
+    Test-ZipFile -Path 'MyCoolZip.zip'
+    
+    Demonstrates how to check the current directory if MyCoolZip.zip is really a ZIP file.  
     #>
     [OutputType([bool])]
     [CmdletBinding()]
     param(
-        [Parameter(Mandatory=$true,ValueFromPipelineByPropertyName=$true,ValueFromPipeline=$true)]
+        [Parameter(Mandatory=$true)]
         [Alias('FullName')]
         [string]
         # The path to the file to test.
@@ -33,5 +49,13 @@ function Test-ZipFile
 
     Set-StrictMode -Version 'Latest'
 
+    $Path = Resolve-FullPath -Path $Path
+    if( -not (Test-Path -Path $Path -PathType Leaf) )
+    {
+        Write-Error ('File ''{0}'' not found.' -f $Path)
+        return
+    }
+
     return [Ionic.Zip.ZipFile]::IsZipFile( $Path )
+
 }
