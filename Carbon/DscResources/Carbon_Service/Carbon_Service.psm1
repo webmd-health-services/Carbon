@@ -107,7 +107,7 @@ function Get-TargetResource
         $resource.ResetFailureCount = $service.ResetPeriod
         $resource.RestartDelay = $service.RestartDelay
         $resource.RebootDelay = $service.RebootDelay
-        $resource.UserName = $service.UserName
+        $resource.UserName = Resolve-Identity -Name $service.UserName | Select-Object -ExpandProperty 'FullName'
         [string[]]$resource.Dependency = $service.ServicesDependedOn | Select-Object -ExpandProperty Name
         $resource.Ensure = 'Present'
     }
@@ -313,6 +313,20 @@ function Test-TargetResource
     {
         Write-Verbose ('Service ''{0}'' not found.' -f $Name)
         return $false
+    }
+
+    if( $PSBoundParameters.ContainsKey( 'UserName' ) )
+    {
+        $identity = Resolve-Identity -Name $Username
+        if( $identity )
+        {
+            $PSBoundParameters['UserName'] = $identity.FullName
+        }
+    }
+
+    if( $resource.ContainsKey('Password') )
+    {
+        $resource.Remove('Password')
     }
 
     return Test-DscTargetResource -TargetResource $resource -DesiredResource $PSBoundParameters -Target ('Service ''{0}''' -f $Name)

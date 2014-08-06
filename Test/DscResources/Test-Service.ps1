@@ -165,6 +165,13 @@ function Test-ShouldTestMissingServices
     Assert-False (Test-TargetResource -Name $serviceName -Ensure Present)
 }
 
+function Test-ShouldTestOnCredentials
+{
+    Set-TargetResource -Name $serviceName -Path $servicePath -UserName $UserName -Password $Password -Ensure Present
+    Assert-True (Test-TargetResource -Name $serviceName -Path $servicePath -UserName $UserName -Ensure Present)
+    Assert-True (Test-TargetResource -Name $serviceName -Path $servicePath -UserName $UserName -Password $Password -Ensure Present)
+}
+
 function Test-ShouldTestOnProperties
 {
     Set-TargetResource -Name $serviceName -Path $servicePath -Ensure Present
