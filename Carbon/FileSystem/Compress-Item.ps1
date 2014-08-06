@@ -33,6 +33,9 @@ function Compress-Item
     .LINK
     Expand-Item
 
+    .LINK
+    Test-ZipFile
+
     .EXAMPLE
     Compress-Item -Path 'C:\Projects\Carbon' -OutFile 'C:\Carbon.zip'
 

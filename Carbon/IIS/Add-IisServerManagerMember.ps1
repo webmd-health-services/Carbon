@@ -51,5 +51,3 @@ filter Add-IisServerManagerMember
         return $InputObject
     }
 }
-
-Set-Alias -Name 'Add-IisServerManagerMembers' -Value 'Add-IisServerManagerMember'
