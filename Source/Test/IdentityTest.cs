@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.DirectoryServices.AccountManagement;
 using NUnit.Framework;
 
 namespace Carbon.Test
@@ -61,13 +62,24 @@ namespace Carbon.Test
             ThenIdentityShouldBe("NT AUTHORITY", "NETWORK SERVICE");
         }
 
-	    [Test]
-	    public void ShouldResolveDotDomain()
-	    {
-		    GivenIdentityName(".\\Administrator");
-			WhenResolvingIdentityName();
-			ThenIdentityShouldBe(Environment.MachineName, "Administrator");
-	    }
+		[Test]
+		public void ShouldResolveDotDomain()
+		{
+			var ctx = new PrincipalContext(ContextType.Machine);
+			var query = new UserPrincipal(ctx);
+			var searcher = new PrincipalSearcher(query);
+			var users = searcher.FindAll();
+			Assert.That(users, Is.Not.Null);
+			var foundAUser = false;
+			foreach (var user in users)
+			{
+				GivenIdentityName(string.Format(".\\{0}", user.SamAccountName));
+				WhenResolvingIdentityName();
+				ThenIdentityShouldBe(Environment.MachineName, user.SamAccountName);
+				foundAUser = true;
+			}
+			Assert.That(foundAUser, Is.True);
+		}
 
 	    [Test]
 	    public void ShouldResolveLocalSystem()

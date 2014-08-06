@@ -70,7 +70,15 @@ function Test-ShouldNotFindUserInCurrentDomain
 
 function Test-ShouldFindUserWithDotDomain
 {
-    Assert-True (Test-Identity -Name '.\Administrator')
+    $users = Get-User
+    Assert-NotNull $users
+    $foundAUser = $false
+    foreach( $user in $users )
+    {
+        Assert-True (Test-Identity -Name ('.\{0}' -f $user.SamAccountName))
+        $foundAUser = $true
+    }
+    Assert-True $foundAUser
 }
 
 function Test-ShouldFindLocalSystem
