@@ -22,6 +22,10 @@ $ComRegKeyPath = 'hklm:\software\microsoft\ole'
 # Cryptography
 Add-Type -AssemblyName 'System.Security'
 
+# FileSystem
+Add-Type -Path (Join-Path -Path $PSScriptRoot -ChildPath 'bin\Ionic.Zip.dll' -Resolve)
+
+
 # IIS
 Add-Type -AssemblyName "System.Web"
 $microsoftWebAdministrationPath = Join-Path -Path $env:SystemRoot -ChildPath 'system32\inetsrv\Microsoft.Web.Administration.dll'
@@ -56,10 +60,10 @@ $supportNotFoundErrorMessage = 'Unable to find support for managing Windows feat
 
 $privateMembers = @{
                         'Add-IisServerManagerMember' = $true;
+                        'Assert-WindowsFeatureFunctionsSupported' = $true;
+                        'ConvertTo-ProviderAccessControlRights' = $true;
                         'Get-IdentityPrincipalContext' = $true;
                         'Invoke-ConsoleCommand' = $true;
-                        'ConvertTo-ProviderAccessControlRights' = $true;
-                        'Assert-WindowsFeatureFunctionsSupported' = $true;
                         'Resolve-WindowsFeatureName' = $true;
                    }
 
