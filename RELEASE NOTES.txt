@@ -191,6 +191,7 @@ This is a backwards-incompatible release.
 ### Cryptography
 
  * [Protect-String](http://get-carbon.org/help/Protect-String.html) can now encrypt strings as a specific user. Use the `Credential` parameter.
+ * Created [New-RsaKeyPair](http://get-carbon.org/help/New-RsaKeyPair.html) for creating public/private RSA key pair using `makecert.exe` and `pkv2pfx.exe`. Requires that you've installed a Windows SDK.
 
 ### File System
 
