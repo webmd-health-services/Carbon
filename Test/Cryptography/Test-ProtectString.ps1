@@ -109,6 +109,21 @@ function Test-ShouldHandleNotGettingAnRSACertificate
     Assert-Null $ciphertext
 }
 
+function Test-ShouldRejectStringsThatAreTooLongForRsaKey
+{
+    $cert = Get-Certificate -Path $privateKeyFilePath
+    $secret = 'f' * 470
+    $ciphertext = Protect-String -String $secret -Certificate $cert
+    Assert-NoError
+    Assert-NotNull $ciphertext
+    Assert-Equal $secret (Unprotect-String -ProtectedString $ciphertext -Certificate $cert)
+
+    $secret = 'f' * 472
+    $ciphertext = Protect-String -String $secret -Certificate $cert -ErrorAction SilentlyContinue
+    Assert-Error -Last -Regex 'String is longer'
+    Assert-Null $ciphertext
+}
+
 function Test-ShouldEncryptFromCertStoreByThumbprint
 {
     $cert = Get-ChildItem -Path cert:\* -Recurse |
@@ -148,19 +163,28 @@ function Test-ShouldHandlePathNotFound
     Assert-Null $ciphertext
 }
 
-function Test-ShouldRejectStringsThatAreTooLongForRsaKey
+function Test-ShouldEncryptFromCertificateFile
 {
-    $cert = Get-Certificate -Path $privateKeyFilePath
-    $secret = 'f' * 470
-    $ciphertext = Protect-String -String $secret -Certificate $cert
-    Assert-NoError
+    $cert = Get-Certificate -Path $publicKeyFilePath
+    Assert-NotNull $cert
+    $secret = [Guid]::NewGuid().ToString()
+    $ciphertext = Protect-String -String $secret -PublicKeyPath $publicKeyFilePath
     Assert-NotNull $ciphertext
-    Assert-Equal $secret (Unprotect-String -ProtectedString $ciphertext -Certificate $cert)
+    Assert-NotEqual $secret $ciphertext
+    $privateKey = Get-Certificate -Path $privateKeyFilePath
+    Assert-Equal $secret (Unprotect-String -ProtectedString $ciphertext -Certificate $privateKey)
+}
 
-    $secret = 'f' * 472
-    $ciphertext = Protect-String -String $secret -Certificate $cert -ErrorAction SilentlyContinue
-    Assert-Error -Last -Regex 'String is longer'
-    Assert-Null $ciphertext
+function Test-ShouldEncryptFromCertificateFileWithRelativePath
+{
+    $cert = Get-Certificate -Path $publicKeyFilePath
+    Assert-NotNull $cert
+    $secret = [Guid]::NewGuid().ToString()
+    $ciphertext = Protect-String -String $secret -PublicKeyPath (Resolve-Path -Path $publicKeyFilePath -Relative)
+    Assert-NotNull $ciphertext
+    Assert-NotEqual $secret $ciphertext
+    $privateKey = Get-Certificate -Path $privateKeyFilePath
+    Assert-Equal $secret (Unprotect-String -ProtectedString $ciphertext -Certificate $privateKey)
 }
 
 function Assert-IsBase64EncodedString($String)

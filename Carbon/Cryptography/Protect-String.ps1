@@ -216,7 +216,25 @@ filter Protect-String
                 Write-Error ('Certificate ''{0}'' not found.' -f $PublicKeyPath)
                 return
             }
-            $Certificate = Get-Item -Path $PublicKeyPath
+
+            $item = Get-Item -Path $PublicKeyPath
+            if( $item -is [Security.Cryptography.X509Certificates.X509Certificate] )
+            {
+                $Certificate = $item
+            }
+            elseif( $item -is [IO.FileInfo] )
+            {
+                $Certificate = Get-Certificate -Path $item.FullName
+                if( -not $Certificate )
+                {
+                    return
+                }
+            }
+            else
+            {
+                Write-Error ('Certificate ''{0}'' not found.' -f $PublicKeyPath)
+                return
+            }
         }
 
         $key = $Certificate.PublicKey.Key
