@@ -43,8 +43,12 @@ function New-RsaKeyPair
     param(
         [Parameter(Mandatory=$true,Position=0)]
         [string]
-        # The key's subject. Should be of the form `CN=Name/OU=Name/O=SuperMagicFunTime/ST=OR/C=US`. Really, only the `CN=Name` part is required.
+        # The key's subject. Should be of the form `CN=Name,OU=Name,O=SuperMagicFunTime,ST=OR,C=US`. Only the `CN=Name` part is required.
         $Subject,
+
+        [string]
+        # The provider to use to generate the keys. Look in `HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Cryptography\Defaults\Provider` for valid values.
+        $ProviderName,
 
         [ValidateSet('md5','sha1','sha256','sha384','sha512')]
         [string]
@@ -185,8 +189,25 @@ function New-RsaKeyPair
             return
         }
 
+        $providerNameArg = ''
+        $providerNameValue = ''
+        if( $ProviderName )
+        {
+            $providerRegPath = Join-Path -Path 'hklm:\SOFTWARE\Microsoft\Cryptography\Defaults\Provider' -ChildPath $ProviderName
+            if( -not (Test-Path -Path $providerRegPath -PathType Container) )
+            {
+                Write-Error ('Provider ''{0}'' not found. See subkeys of HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Cryptography\Defaults\Provider for a list of providers.' -f $ProviderName)
+                return
+            }
+
+            $providerNameArg = '-sp'
+            $providerNameValue = $ProviderName
+        }
+
         $privateKeyPath = Join-Path -Path $tempDir -ChildPath 'private.pkv'
         $output = & $makeCert.FullName -r `
+                             $providerNameArg $providerNameValue `
+                             -sy 13 `
                              -a $Algorithm `
                              -sky 'exchange' `
                              -n $Subject `

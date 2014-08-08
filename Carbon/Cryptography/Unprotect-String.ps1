@@ -16,44 +16,108 @@ filter Unprotect-String
 {
     <#
     .SYNOPSIS
-    Decrypts a string using the Data Protection API (DPAPI).
+    Decrypts a string.
     
     .DESCRIPTION
-    Decrypts a string with the Data Protection API (DPAPI).  The string must have also been encrypted with the DPAPI and the same scope used to decrypt as was used to encrypt.
+    Decrypts a string encrypted via the Data Protection API (DPAPI) or RSA.
+
+    ## DPAPI
+
+    This is the default. The string must have also been encrypted with the DPAPI. The string must have been encrypted at the current user's scope or the local machien scope.
+
+    ## RSA
+
+    RSA is an assymetric encryption/decryption algorithm, which requires a public/private key pair. This method decrypts a secret that was encrypted with the public key using the private key.
+
+    You can specify the private key in three ways: 
     
-    .EXAMPLE
-    PS> $encryptedPassword = Protect-String -String 'MySuperSecretPassword' -ForUser
-        PS> $password = Unprotect-String -ProtectedString  $encryptedPassword
-    
-    Decrypts a protected string which was encrypted at the current user or default scopes.
-    
-    .EXAMPLE
-    PS> $encryptedPassword = Protect-String -String 'MySuperSecretPassword' -ForComputer
-        PS> $cipherText = Unprotect-String -ProtectedString $encryptedPassword
-    
-    Encrypts the given string and stores the value in $cipherText.  Because the string was encrypted at the LocalMachine scope, the string must be 
-    decrypted at the same scope.
-    
-    .EXAMPLE
-    Protect-String -String 'NotSoSecretSecret' -ForUser | Unprotect-String
-    
-    Demonstrates how Unprotect-String takes input from the pipeline.  Adds 'NotSoSecretSecret' to the pipeline.
-    
+     * with a `System.Security.Cryptography.X509Certificates.X509Certificate2` object, via the `Certificate` parameter
+     * with a certificate in one of the Windows certificate stores, passing its unique thumbprint via the `Thumbprint` parameter, or via the `PrivateKeyPath` parameter, which can be a certificat provider path, e.g. it starts with `cert:\`.
+     * with an X509 certificate file, via the `PrivateKeyPath` parameter
+   
+    .LINK
+    New-RsaKeyPair
+        
     .LINK
     Protect-String
 
     .LINK
     http://msdn.microsoft.com/en-us/library/system.security.cryptography.protecteddata.aspx
+
+    .EXAMPLE
+    PS> $password = Unprotect-String -ProtectedString  $encryptedPassword
+    
+    Decrypts a protected string which was encrypted at the current user or default scopes using the DPAPI. The secret must have been encrypted at the current user's scope or at the local computer's scope.
+    
+    .EXAMPLE
+    Protect-String -String 'NotSoSecretSecret' -ForUser | Unprotect-String
+    
+    Demonstrates how Unprotect-String takes input from the pipeline.  Adds 'NotSoSecretSecret' to the pipeline.
+
+    .EXAMPLE
+    Unprotect-String -ProtectedString $ciphertext -Certificate $myCert
+
+    Demonstrates how to encrypt a secret using RSA with a `System.Security.Cryptography.X509Certificates.X509Certificate2` object. You're responsible for creating/loading it. The `New-RsaKeyPair` function will create a key pair for you, if you've got a Windows SDK installed.
+
+    .EXAMPLE
+    Unprotect-String -ProtectedString $ciphertext -Thumbprint '44A7C27F3353BC53F82318C14490D7E2500B6D9E'
+
+    Demonstrates how to decrypt a secret using RSA with a certificate in one of the Windows certificate stores. All local machine and user stores are searched. The current user must have permission/access to the certificate's private key.
+
+    .EXAMPLE
+    Unprotect -ProtectedString $ciphertext -PrivateKeyPath 'C:\Projects\Security\publickey.cer'
+
+    Demonstrates how to encrypt a secret using RSA with a certificate file. The file must be loadable by the `System.Security.Cryptography.X509Certificates.X509Certificate` class.
+
+    .EXAMPLE
+    Unprotect -ProtectedString $ciphertext -PrivateKeyPath 'cert:\LocalMachine\My\44A7C27F3353BC53F82318C14490D7E2500B6D9E'
+
+    Demonstrates how to encrypt a secret using RSA with a certificate in the store, giving its exact path.
     #>
-    [CmdletBinding()]
+    [CmdletBinding(DefaultParameterSetName='DPAPI')]
     param(
         [Parameter(Mandatory = $true, Position=0, ValueFromPipeline = $true)]
         [string]
-        # The text to encrypt.
-        $ProtectedString
+        # The text to decrypt.
+        $ProtectedString,
+
+        [Parameter(Mandatory=$true,ParameterSetName='RSAByCertificate')]
+        [Security.Cryptography.X509Certificates.X509Certificate2]
+        # The private key to use for decrypting.
+        $Certificate,
+
+        [Parameter(Mandatory=$true,ParameterSetName='RSAByThumbprint')]
+        [string]
+        # The thumbprint of the certificate, found in one of the Windows certificate stores, to use when decrypting. All certificate stores are searched. The current user must have permission to the private key.
+        $Thumbprint,
+
+        [Parameter(Mandatory=$true,ParameterSetName='RSAByPath')]
+        [string]
+        # The path to the private key to use for encrypting. Must be to an `X509Certificate2` file or a certificate in a certificate store.
+        $PrivateKeyPath,
+
+        [Parameter(Mandatory=$true,ParameterSetName='RSAByPath')]
+        [string]
+        # The password for the private key, if it has one. It really should.
+        $Password,
+
+        [Parameter(ParameterSetName='RSAByCertificate')]
+        [Parameter(ParameterSetName='RSAByThumbprint')]
+        [Parameter(ParameterSetName='RSAByPath')]
+        [Switch]
+        # If true, uses Direct Encryption (PKCS#1 v1.5) padding. Otherwise (the default), uses OAEP (PKCS#1 v2) padding. See [Encrypt](http://msdn.microsoft.com/en-us/library/system.security.cryptography.rsacryptoserviceprovider.encrypt(v=vs.110).aspx) for information.
+        $UseDirectEncryptionPadding
     )
     
     $encryptedBytes = [Convert]::FromBase64String($ProtectedString)
-    $decryptedBytes = [Security.Cryptography.ProtectedData]::Unprotect( $encryptedBytes, $null, 0 )
+    if( $PSCmdlet.ParameterSetName -eq 'DPAPI' )
+    {
+        $decryptedBytes = [Security.Cryptography.ProtectedData]::Unprotect( $encryptedBytes, $null, 0 )
+    }
+    elseif( $PSCmdlet.ParameterSetName -like 'RSA*' )
+    {
+        [Security.Cryptography.RSACryptoServiceProvider]$key = $Certificate.PrivateKey
+        $decryptedBytes = $key.Decrypt( $encryptedBytes, (-not $UseDirectEncryptionPadding) )
+    }
     [Text.Encoding]::UTF8.GetString( $decryptedBytes )
 }

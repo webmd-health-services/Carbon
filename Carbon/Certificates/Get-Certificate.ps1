@@ -47,6 +47,7 @@ function Get-Certificate
     Demonstrates how to get a certificate from a custom store, i.e. one that is not part of the standard `StoreName` enumeration.
     #>
     [CmdletBinding(DefaultParameterSetName='ByFriendlyName')]
+    [OutputType([Security.Cryptography.X509Certificates.X509Certificate2])]
     param(
         [Parameter(Mandatory=$true,ParameterSetName='ByPath')]
         [string]

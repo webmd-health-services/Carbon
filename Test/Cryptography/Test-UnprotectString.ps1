@@ -56,3 +56,22 @@ function Test-ShouldUnrotectStringsInPipeline
     Assert-Equal 'Buzz' $secrets[2] 'Didn''t decrypt first item in pipeline'
     Assert-Equal 'Bar' $secrets[3] 'Didn''t decrypt first item in pipeline'
 }
+
+function Test-ShouldHandleMissingPrivateKey
+{
+}
+
+function Test-ShouldHandleNonRsaKey
+{
+}
+
+function Test-ShouldHandleCiphertextThatIsTooLong
+{
+    $cert = Get-Certificate -Path $privateKeyFilePath
+    $secret = 'f' * 471
+    Write-Host $secret.Length
+    $ciphertext = Protect-String -String $secret -Certificate $cert
+    Assert-NoError
+    Assert-NotNull $ciphertext
+    Assert-Equal $secret (Unprotect-String -ProtectedString $ciphertext -Certificate $cert)
+}
