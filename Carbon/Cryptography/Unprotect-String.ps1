@@ -96,7 +96,7 @@ filter Unprotect-String
         # The path to the private key to use for encrypting. Must be to an `X509Certificate2` file or a certificate in a certificate store.
         $PrivateKeyPath,
 
-        [Parameter(Mandatory=$true,ParameterSetName='RSAByPath')]
+        [Parameter(ParameterSetName='RSAByPath')]
         [string]
         # The password for the private key, if it has one. It really should.
         $Password,
@@ -116,8 +116,57 @@ filter Unprotect-String
     }
     elseif( $PSCmdlet.ParameterSetName -like 'RSA*' )
     {
-        [Security.Cryptography.RSACryptoServiceProvider]$key = $Certificate.PrivateKey
-        $decryptedBytes = $key.Decrypt( $encryptedBytes, (-not $UseDirectEncryptionPadding) )
+        if( $PSCmdlet.ParameterSetName -like '*ByPath' )
+        {
+            $passwordParam = @{ }
+            if( $Password )
+            {
+                $passwordParam = @{ Password = $Password }
+            }
+            $Certificate = Get-Certificate -Path $PrivateKeyPath @passwordParam
+        }
+
+        $key = $Certificate.PrivateKey
+        if( -not $key )
+        {
+            Write-Error ('Certificate ''{0}'' ({1}) doesn''t have a private key. When decrypting with RSA, secrets are encrypted with the public key, and decrypted with a private key.' -f $Certificate.Subject,$Certificate.Thumbprint)
+            return
+        }
+
+        if( $key -isnot [Security.Cryptography.RSACryptoServiceProvider] )
+        {
+            Write-Error ('Certificate ''{0}'' (''{1}'') is not an RSA key. Found a private key of type ''{2}'', but expected type ''{3}''.' -f $Certificate.Subject,$Certificate.Thumbprint,$key.GetType().FullName,[Security.Cryptography.RSACryptoServiceProvider].FullName)
+            return
+        }
+
+        try
+        {
+            $decryptedBytes = $key.Decrypt( $encryptedBytes, (-not $UseDirectEncryptionPadding) )
+        }
+        catch
+        {
+            if( $_.Exception.Message -match 'Error occurred while decoding OAEP padding' )
+            {
+                [int]$maxLengthGuess = ($key.KeySize - (2 * 160 - 2)) / 8
+                Write-Error (@'
+Failed to decrypt string using certificate '{0}' ({1}). This can happen when:
+ * The string to decrypt is too long because the original string you encrypted was at or near the maximum allowed by your key's size, which is {2} bits. We estimate the maximum string size you can encrypt is {3} bytes. You may get this error even if the original encrypted string is within a couple bytes of that maximum.
+ * The string was encrypted with a different key
+ * The string isn't encrypted
+'@ -f $Certificate.Subject, $Certificate.Thumbprint,$key.KeySize,$maxLengthGuess)
+                return
+            }
+            elseif( $_.Exception.Message -match 'Bad Data\.' )
+            {
+                Write-Error (@'
+Failed to decrypt string using certificate '{0}' ({1}). This usually happens when the padding algorithm used when encrypting/decrypting is different. Check the `-UseDirectEncryptionPadding` switch is the same for both calls to `Protect-String` and `Unprotect-String`.
+'@ -f $Certificate.Subject,$Certificate.Thumbprint)
+                return
+            }
+            Write-Error -Exception $_.Exception
+            return
+        }
     }
+
     [Text.Encoding]::UTF8.GetString( $decryptedBytes )
 }

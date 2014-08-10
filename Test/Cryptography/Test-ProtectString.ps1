@@ -187,6 +187,11 @@ function Test-ShouldEncryptFromCertificateFileWithRelativePath
     Assert-Equal $secret (Unprotect-String -ProtectedString $ciphertext -Certificate $privateKey)
 }
 
+function Test-ShouldUseDirectEncryptionPaddingSwitch
+{
+    Fail 'Write me!'
+}
+
 function Assert-IsBase64EncodedString($String)
 {
     Assert-NotEmpty $String 'Didn''t encrypt cipher text.'
