@@ -109,7 +109,7 @@
 
 ### Security
 
- * Creating [Revoke-Permission](http://get-carbon.org/help/Revoke-Permission.html) function for revoking a user's permission to a file, directory, or registry key.
+ * Creating [Revoke-Permission](http://get-carbon.org/help/Revoke-Permission.html) function for revoking a user's permission to a file, directory, registry key, or certificate's private key.
  * Creating [ConvertTo-ContainerInheritanceFlags](http://get-carbon.org/help/ConvertTo-ContainerInheritanceFlags.html) function for converting  `System.Security.AccessControl.InheritanceFlags` and `System.Security.AccessControl.PropagationFlag` values into a `Carbon.Security.ContainerInheritanceFlags` value.
  * [Get-Permission](http://get-carbon.org/help/Get-Permission.html) now supports returning the permissions on private keys.
  * [Grant-Permission](http://get-carbon.org/help/Grant-Permission.html) now supports granting permissions on private keys.

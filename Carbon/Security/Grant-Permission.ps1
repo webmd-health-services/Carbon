@@ -206,8 +206,7 @@ function Grant-Permission
             Where-Object { $_.HasPrivateKey -and $_.PrivateKey } |
             ForEach-Object {
                 [Security.Cryptography.X509Certificates.X509Certificate2]$certificate = $_
-                $keyContainerInfo = $certificate.PrivateKey.CspKeyContainerInfo
-                [Security.AccessControl.CryptoKeySecurity]$keySecurity = $keyContainerInfo.CryptoKeySecurity
+                [Security.AccessControl.CryptoKeySecurity]$keySecurity = $certificate.PrivateKey.CspKeyContainerInfo.CryptoKeySecurity
 
                 if( $Clear )
                 {
@@ -216,32 +215,8 @@ function Grant-Permission
                 
                 $accessRule = New-Object 'Security.AccessControl.CryptoKeyAccessRule' ($Identity,$rights,'Allow')
                 $keySecurity.SetAccessRule( $accessRule )
-                
-                $cspParams = New-Object 'Security.Cryptography.CspParameters' ($keyContainerInfo.ProviderType, $keyContainerInfo.ProviderName, $keyContainerInfo.KeyContainerName)
-                $cspParams.Flags = [Security.Cryptography.CspProviderFlags]::UseExistingKey
-                if( (Split-Path -NoQualifier -Path $_.PSPath) -like 'LocalMachine\*' )
-                {
-                    $cspParams.Flags = $cspParams.Flags -bor [Security.Cryptography.CspProviderFlags]::UseMachineKeyStore
-                }
-                $cspParams.CryptoKeySecurity = $keySecurity
-                        
-                try
-                {                    
-                    # persist the rule change
-                    if( $PSCmdlet.ShouldProcess( ('{0} ({1})' -f $certificate.Subject,$certificate.Thumbprint), ('grant {0} {1} permission(s)' -f $Identity,($Permission -join ',')) ) )
-                    {
-                        $null = New-Object 'Security.Cryptography.RSACryptoServiceProvider' ($cspParams)
-                    }
-                }
-                catch
-                {
-                    $actualException = $_.Exception
-                    while( $actualException.InnerException )
-                    {
-                        $actualException = $actualException.InnerException
-                    }
-                    Write-Error ('Failed to grant {0} {1} permissions to ''{2}'' ({3}) certificate''s private key: {4}: {5}' -f $Identity,$rights,$certificate.Subject,$certificate.Thumbprint,$actualException.GetType().FullName,$actualException.Message)
-                }
+
+                Set-CryptoKeySecurity -Certificate $certificate -CryptoKeySecurity $keySecurity -Action ('grant {0} {1} permission(s)' -f $Identity,($Permission -join ','))
             }
     }
     else

@@ -15,6 +15,7 @@
 $Path = $null
 $user = 'CarbonGrantPerms'
 $containerPath = $null
+$privateKeyPath = Join-Path -Path $PSScriptRoot -ChildPath '..\Cryptography\CarbonTestPrivateKey.pfx' -Resolve
 
 function Start-TestFixture
 {
@@ -100,5 +101,57 @@ function Test-ShouldRevokePermissionOnRegistry
     finally
     {
         Remove-Item $regKey
+    }
+}
+
+function Test-ShouldRevokeLocalMachinePrivateKeyPermissions
+{
+    $cert = Install-Certificate -Path $privateKeyPath -StoreLocation LocalMachine -StoreName My
+    try
+    {
+        $certPath = Join-Path -Path 'cert:\LocalMachine\My' -ChildPath $cert.Thumbprint
+        Grant-Permission -Path $certPath -Identity $user -Permission 'FullControl'
+        Assert-NotNull (Get-Permission -Path $certPath -Identity $user)
+        Revoke-Permission -Path $certPath -Identity $user
+        Assert-NoError
+        Assert-Null (Get-Permission -Path $certPath -Identity $user)
+    }
+    finally
+    {
+        Uninstall-Certificate -Thumbprint $cert.Thumbprint -StoreLocation LocalMachine -StoreName My
+    }
+}
+
+function Test-ShouldRevokeCurrentUserPrivateKeyPermissions
+{
+    $cert = Install-Certificate -Path $privateKeyPath -StoreLocation CurrentUser -StoreName My
+    try
+    {
+        $certPath = Join-Path -Path 'cert:\CurrentUser\My' -ChildPath $cert.Thumbprint
+        Grant-Permission -Path $certPath -Identity $user -Permission 'FullControl' -WhatIf
+        Assert-NoError
+        Assert-Null (Get-Permission -Path $certPath -Identity $user)
+    }
+    finally
+    {
+        Uninstall-Certificate -Thumbprint $cert.Thumbprint -StoreLocation CurrentUser -StoreName My
+    }
+}
+
+function Test-ShouldSupportWhatIfWhenRevokingPrivateKeyPermissions
+{
+    $cert = Install-Certificate -Path $privateKeyPath -StoreLocation LocalMachine -StoreName My
+    try
+    {
+        $certPath = Join-Path -Path 'cert:\LocalMachine\My' -ChildPath $cert.Thumbprint
+        Grant-Permission -Path $certPath -Identity $user -Permission 'FullControl'
+        Assert-NotNull (Get-Permission -Path $certPath -Identity $user)
+        Revoke-Permission -Path $certPath -Identity $user -WhatIf
+        Assert-NoError
+        Assert-NotNull (Get-Permission -Path $certPath -Identity $user)
+    }
+    finally
+    {
+        Uninstall-Certificate -Thumbprint $cert.Thumbprint -StoreLocation LocalMachine -StoreName My
     }
 }
