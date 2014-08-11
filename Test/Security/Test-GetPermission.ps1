@@ -91,3 +91,38 @@ function Test-ShouldGetPermissionsOnRegistryKey
         Assert-True ($_ -is [Security.AccessControl.RegistryAccessRule])
     }
 }
+
+function Test-ShouldGetPrivateCertPermission
+{
+    $foundPermission = $false
+    Get-ChildItem -Path 'cert:\*\*' -Recurse |
+        Where-Object { -not $_.PsIsContainer } |
+        Where-Object { $_.HasPrivateKey } |
+        Where-Object { $_.PrivateKey } |
+        ForEach-Object { Join-Path -Path 'cert:' -ChildPath (Split-Path -NoQualifier -Path $_.PSPath) } |
+        ForEach-Object { Get-Permission -Path $_ } |
+        ForEach-Object {
+            $foundPermission = $true
+            Assert-NotNull $_
+            Assert-Is $_ ([Security.AccessControl.CryptoKeyAccessRule])
+        }
+    Assert-True $foundPermission
+}
+
+function Test-ShouldGetSpecificIdentityCertPermission
+{
+    $foundPermission = $false
+    Get-ChildItem -Path 'cert:\*\*' -Recurse |
+        Where-Object { -not $_.PsIsContainer } |
+        Where-Object { $_.HasPrivateKey } |
+        Where-Object { $_.PrivateKey } |
+        ForEach-Object { Join-Path -Path 'cert:' -ChildPath (Split-Path -NoQualifier -Path $_.PSPath) } |
+        ForEach-Object { 
+            [object[]]$rules = Get-Permission -Path $_
+            foreach( $rule in $rules )
+            {
+                [object[]]$identityRule = Get-Permission -Path $_ -Identity $rule.IdentityReference.Value
+                Assert-True ($identityRule.Count -le $rules.Count) $
+            }
+        }
+}
