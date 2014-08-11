@@ -16,13 +16,34 @@ filter Protect-String
 {
     <#
     .SYNOPSIS
-    Encrypts a string using the Data Protection API (DPAPI).
+    Encrypts a string.
     
     .DESCRIPTION
-    Encrypts a string with the Data Protection API (DPAPI).  Encryption can be performed at the user or computer level.  If encrypted at the User level (with the `ForUser` switch), only the user who encrypted the data (i.e. the user running `Protect-String`) can decrypt it.  If encrypted at the computer scope (with the `ForComputer` switch), any user logged onto the computer can decrypt it.
-
-    You can encrypt a string as a specific user with the `Credential` parameter. Only that user will be able to decrypt it on the computer on which it was encrypted. Useful for situation where you have a service user who needs access to protected secrets.
+    Strings can be encrypted with the Data Protection API (DPAPI) or RSA.
     
+    ##  DPAPI 
+
+    The DPAPI hides the encryptiong/decryption keys from you. As such, anything encrpted with via DPAPI can only be decrypted on the same computer it was encrypted on. Use the `ForUser` switch so that only the user who encrypted can decrypt. Use the `ForComputer` switch so that any user who can log into the computer can decrypt. To encrypt as a specific user on the local computer, pass that user's credentials with the `Credential` parameter. (Note this method doesn't work over PowerShell remoting.)
+
+    ## RSA
+
+    RSA is an assymetric encryption/decryption algorithm, which requires a public/private key pair. The secret is encrypted with the public key, and can only be decrypted with the corresponding private key. The secret being encrypted can't be larger than the RSA key pair's size/length, usually 1024, 2048, or 4096 bits (128, 256, and 512 bytes, respectively).
+
+    You can specify the public key in three ways: 
+    
+     * with a `System.Security.Cryptography.X509Certificates.X509Certificate2` object, via the `Certificate` parameter
+     * with a certificate in one of the Windows certificate stores, passing its unique thumbprint via the `Thumbprint` parameter, or via the `PublicKeyPath` parameter cn be certificat provider path, e.g. it starts with `cert:\`.
+     * with a X509 certificate file, via the `PublicKeyPath` parameter
+   
+    .LINK
+    New-RsaKeyPair
+
+    .LINK
+    Unprotect-String
+    
+    .LINK
+    http://msdn.microsoft.com/en-us/library/system.security.cryptography.protecteddata.aspx
+
     .EXAMPLE
     Protect-String -String 'TheStringIWantToEncrypt' -ForUser | Out-File MySecret.txt
     
@@ -31,18 +52,32 @@ filter Protect-String
     .EXAMPLE
     $cipherText = Protect-String -String "MySuperSecretIdentity" -ForComputer
     
-    Encrypts the given string and stores the value in $cipherText.  Because the encryption scope is set to LocalMachine, any user logged onto the local computer can decrypt $cipherText.
+    Encrypts the given string and stores the value in $cipherText.  Because the encryption scope is set to LocalMachine, any user logged onto the local computer can decrypt `$cipherText`.
 
     .EXAMPLE
     Protect-String -String 's0000p33333r s33333cr33333t' -Credential (Get-Credential 'builduser')
 
-    Demonstrates how to use `Protect-String` to encrypt a secret as a specific user. This is useful for situation where a secret needs to be encrypted by a user other than the user running `Protect-String`.
-    
-    .LINK
-    Unprotect-String
-    
-    .LINK
-    http://msdn.microsoft.com/en-us/library/system.security.cryptography.protecteddata.aspx
+    Demonstrates how to use `Protect-String` to encrypt a secret as a specific user. This is useful for situation where a secret needs to be encrypted by a user other than the user running `Protect-String`. Encrypting as a specific user won't work over PowerShell remoting.
+
+    .EXAMPLE
+    Protect-String -String 'the secret sauce' -Certificate $myCert
+
+    Demonstrates how to encrypt a secret using RSA with a `System.Security.Cryptography.X509Certificates.X509Certificate2` object. You're responsible for creating/loading it. The `New-RsaKeyPair` function will create a key pair for you, if you've got a Windows SDK installed.
+
+    .EXAMPLE
+    Protect-String -String 'the secret sauce' -Thumbprint '44A7C27F3353BC53F82318C14490D7E2500B6D9E'
+
+    Demonstrates how to encrypt a secret using RSA with a certificate in one of the Windows certificate stores. All local machine and user stores are searched.
+
+    .EXAMPLE
+    ProtectString -String 'the secret sauce' -PublicKeyPath 'C:\Projects\Security\publickey.cer'
+
+    Demonstrates how to encrypt a secret using RSA with a certificate file. The file must be loadable by the `System.Security.Cryptography.X509Certificates.X509Certificate` class.
+
+    .EXAMPLE
+    ProtectString -String 'the secret sauce' -PublicKeyPath 'cert:\LocalMachine\My\44A7C27F3353BC53F82318C14490D7E2500B6D9E'
+
+    Demonstrates how to encrypt a secret using RSA with a certificate in the store, giving its exact path.
     #>
     [CmdletBinding()]
     param(
@@ -51,86 +86,164 @@ filter Protect-String
         # The text to encrypt.
         $String,
         
-        [Parameter(Mandatory=$true,ParameterSetName='CurrentUser')]
+        [Parameter(Mandatory=$true,ParameterSetName='DPAPICurrentUser')]
         # Encrypts for the current user so that only he can decrypt.
         [Switch]
         $ForUser,
         
-        [Parameter(Mandatory=$true,ParameterSetName='LocalMachine')]
+        [Parameter(Mandatory=$true,ParameterSetName='DPAPILocalMachine')]
         # Encrypts for the current computer so that any user logged into the computer can decrypt.
         [Switch]
         $ForComputer,
 
-        [Parameter(Mandatory=$true,ParameterSetName='ForUser')]
+        [Parameter(Mandatory=$true,ParameterSetName='DPAPIForUser')]
         [pscredential]
         # Encrypts for a specific user.
-        $Credential
+        $Credential,
+
+        [Parameter(Mandatory=$true,ParameterSetName='RSAByCertificate')]
+        [Security.Cryptography.X509Certificates.X509Certificate2]
+        # The public key to use for encrypting.
+        $Certificate,
+
+        [Parameter(Mandatory=$true,ParameterSetName='RSAByThumbprint')]
+        [string]
+        # The thumbprint of the certificate, found in one of the Windows certificate stores, to use when encrypting. All certificate stores are searched.
+        $Thumbprint,
+
+        [Parameter(Mandatory=$true,ParameterSetName='RSAByPath')]
+        [string]
+        # The path to the public key to use for encrypting. Must be to an `X509Certificate2` object.
+        $PublicKeyPath,
+
+        [Parameter(ParameterSetName='RSAByCertificate')]
+        [Parameter(ParameterSetName='RSAByThumbprint')]
+        [Parameter(ParameterSetName='RSAByPath')]
+        [Switch]
+        # If true, uses Direct Encryption (PKCS#1 v1.5) padding. Otherwise (the default), uses OAEP (PKCS#1 v2) padding. See [Encrypt](http://msdn.microsoft.com/en-us/library/system.security.cryptography.rsacryptoserviceprovider.encrypt(v=vs.110).aspx) for information.
+        $UseDirectEncryptionPadding
     )
 
     Set-StrictMode -Version 'Latest'
 
-    if( $PSCmdlet.ParameterSetName -eq 'ForUser' ) 
-    {
-        $outFile = '{0}-{1}-stdout' -f (Split-Path -Leaf -Path $PSCommandPath),([IO.Path]::GetRandomFileName())
-        $outFile = Join-Path -Path $env:TEMP -ChildPath $outFile
-        Write-Verbose $outFile
-        '' | Set-Content -Path $outFile
+    $stringBytes = [Text.Encoding]::UTF8.GetBytes( $String )
 
-        $errFile = '{0}-{1}-stderr' -f (Split-Path -Leaf -Path $PSCommandPath),([IO.Path]::GetRandomFileName())
-        $errFile = Join-Path -Path $env:TEMP -ChildPath $errFile
-        Write-Verbose $errFile
-        '' | Set-Content -Path $errFile
+    if( $PSCmdlet.ParameterSetName -like 'DPAPI*' )
+    {
+        if( $PSCmdlet.ParameterSetName -eq 'DPAPIForUser' ) 
+        {
+            $outFile = '{0}-{1}-stdout' -f (Split-Path -Leaf -Path $PSCommandPath),([IO.Path]::GetRandomFileName())
+            $outFile = Join-Path -Path $env:TEMP -ChildPath $outFile
+            Write-Verbose $outFile
+            '' | Set-Content -Path $outFile
+
+            $errFile = '{0}-{1}-stderr' -f (Split-Path -Leaf -Path $PSCommandPath),([IO.Path]::GetRandomFileName())
+            $errFile = Join-Path -Path $env:TEMP -ChildPath $errFile
+            Write-Verbose $errFile
+            '' | Set-Content -Path $errFile
+
+            try
+            {
+                $protectStringPath = Join-Path -Path $PSScriptRoot -ChildPath '..\bin\Protect-String.ps1' -Resolve
+                $encodedString = Protect-String -String $String -ForComputer
+            
+                $p = Start-Process -FilePath "powershell.exe" `
+                                   -ArgumentList $protectStringPath,"-ProtectedString",$encodedString `
+                                   -Credential $Credential `
+                                   -RedirectStandardOutput $outFile `
+                                   -RedirectStandardError $errFile `
+                                   -Wait `
+                                   -WindowStyle Hidden `
+                                   -PassThru
+
+                $p.WaitForExit()
+
+                $stdOut = Get-Content -Path $outFile -Raw
+                if( $stdOut )
+                {
+                    Write-Verbose -Message $stdOut
+                }
+
+                $stdErr = Get-Content -Path $errFile -Raw
+                if( $stdErr )
+                {
+                    Write-Error -Message $stdErr
+                    return
+                }
+
+                if( $p.ExitCode -ne 0 )
+                {
+                    Write-Error -Message ('Unknown error encrypting string as {0}: exit code {1}{2}{3}' -f $Credential.UserName,$p.ExitCode,([Environment]::NewLine),$stdOut)
+                    return
+                }
+
+                if( $stdOut )
+                {
+                    return Get-Content -Path $outFile -TotalCount 1
+                }
+            }
+            finally
+            {
+                Remove-Item -Path $outFile,$errFile -ErrorAction Ignore
+            }
+        }
+        else
+        {
+            $scope = [Security.Cryptography.DataProtectionScope]::CurrentUser
+            if( $PSCmdlet.ParameterSetName -eq 'DPAPILocalMachine' )
+            {
+                $scope = [Security.Cryptography.DataProtectionScope]::LocalMachine
+            }
+
+            $encryptedBytes = [Security.Cryptography.ProtectedData]::Protect( $stringBytes, $null, $scope )
+        }
+    }
+    elseif( $PSCmdlet.ParameterSetName -like 'RSA*' )
+    {
+        if( $PSCmdlet.ParameterSetName -eq 'RSAByThumbprint' )
+        {
+            $Certificate = Get-ChildItem -Path ('cert:\*\{0}' -f $Thumbprint) -Recurse | Select-Object -First 1
+            if( -not $Certificate )
+            {
+                Write-Error ('Certificate with thumbprint ''{0}'' not found.' -f $Thumbprint)
+                return
+            }
+        }
+        elseif( $PSCmdlet.ParameterSetName -eq 'RSAByPath' )
+        {
+            $Certificate = Get-Certificate -Path $PublicKeyPath
+            if( -not $Certificate )
+            {
+                return
+            }
+        }
+
+        $key = $Certificate.PublicKey.Key
+        if( $key -isnot ([Security.Cryptography.RSACryptoServiceProvider]) )
+        {
+            Write-Error ('Certificate ''{0}'' (''{1}'') is not an RSA key. Found a public key of type ''{2}'', but expected type ''{3}''.' -f $Certificate.Subject,$Certificate.Thumbprint,$key.GetType().FullName,[Security.Cryptography.RSACryptoServiceProvider].FullName)
+            return
+        }
 
         try
         {
-            $protectStringPath = Join-Path -Path $PSScriptRoot -ChildPath '..\bin\Protect-String.ps1' -Resolve
-            $encodedString = Protect-String -String $String -ForComputer
-            
-            $p = Start-Process -FilePath "powershell.exe" `
-                               -ArgumentList $protectStringPath,"-ProtectedString",$encodedString `
-                               -Credential $Credential `
-                               -RedirectStandardOutput $outFile `
-                               -RedirectStandardError $errFile `
-                               -Wait `
-                               -WindowStyle Hidden `
-                               -PassThru
-
-            $p.WaitForExit()
-
-            $stdOut = Get-Content -Path $outFile -Raw
-            if( $stdOut )
-            {
-                Write-Verbose -Message $stdOut
-            }
-
-            $stdErr = Get-Content -Path $errFile -Raw
-            if( $stdErr )
-            {
-                Write-Error -Message $stdErr
-                return
-            }
-
-            if( $p.ExitCode -ne 0 )
-            {
-                Write-Error -Message ('Unknown error encrypting string as {0}: exit code {1}{2}{3}' -f $Credential.UserName,$p.ExitCode,([Environment]::NewLine),$stdOut)
-                return
-            }
-
-            if( $stdOut )
-            {
-                return Get-Content -Path $outFile -TotalCount 1
-            }
+            $encryptedBytes = $key.Encrypt( $stringBytes, (-not $UseDirectEncryptionPadding) )
         }
-        finally
+        catch
         {
-            Remove-Item -Path $outFile,$errFile -ErrorAction Ignore
+            if( $_.Exception.Message -match 'Bad Length\.' )
+            {
+                [int]$maxLengthGuess = ($key.KeySize - (2 * 160 - 2)) / 8
+                Write-Error -Message ('Failed to encrypt. String is longer than maximum length allowed by RSA and your key size, which is {0} bits. We estimate the maximum string size you can encrypt with certificate ''{1}'' ({2}) is {3} bytes. You may still get errors when you attempt to decrypt a string within a few bytes of this estimated maximum.' -f $key.KeySize,$Certificate.Subject,$Certificate.Thumbprint,$maxLengthGuess)
+                return
+            }
+            else
+            {
+                Write-Error -Exception $_.Exception
+                return
+            }
         }
     }
-    else
-    {
-        $scope = $PSCmdlet.ParameterSetName
-        $stringBytes = [Text.Encoding]::UTF8.GetBytes( $String )
-        $encryptedBytes = [Security.Cryptography.ProtectedData]::Protect( $stringBytes, $null, $scope )
-        return [Convert]::ToBase64String( $encryptedBytes )
-    }
+
+    return [Convert]::ToBase64String( $encryptedBytes )
 }

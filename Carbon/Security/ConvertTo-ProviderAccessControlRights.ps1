@@ -29,7 +29,7 @@ function ConvertTo-ProviderAccessControlRights
     [CmdletBinding()]
     param(
         [Parameter(Mandatory=$true)]
-        [ValidateSet('FileSystem','Registry')]
+        [ValidateSet('FileSystem','Registry','CryptoKey')]
         [string]
         # The provider name.
         $ProviderName,

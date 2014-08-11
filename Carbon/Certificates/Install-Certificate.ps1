@@ -30,6 +30,7 @@ function Install-Certificate
     Installs the certificate (which is protected by a password) at C:\Users\me\certificate.cer into the local machine's Personal store.  The certificate is marked exportable.
     #>
     [CmdletBinding(SupportsShouldProcess=$true,DefaultParameterSetName='FromFileInWindowsStore')]
+    [OutputType([Security.Cryptography.X509Certificates.X509Certificate2])]
     param(
         [Parameter(Mandatory=$true,Position=0,ParameterSetName='FromFileInWindowsStore')]
         [Parameter(Mandatory=$true,Position=0,ParameterSetName='FromFileInCustomStore')]

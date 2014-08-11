@@ -12,6 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+$publicKeyFilePath = Join-Path -Path $PSScriptRoot -ChildPath 'CarbonTestPublicKey.cer' -Resolve
+$privateKeyFilePath = Join-Path -Path $PSScriptRoot -ChildPath 'CarbonTestPrivateKey.pfx' -Resolve
+$dsaKeyPath = Join-Path -Path $PSScriptRoot -ChildPath 'CarbonTestDsaKey.cer' -Resolve
+
 function Start-TestFixture
 {
     & (Join-Path -Path $PSScriptRoot '..\..\Carbon\Import-Carbon.ps1' -Resolve)
@@ -81,6 +85,116 @@ if( -not (Test-Path -Path 'env:CCNetArtifactDirectory') )
 else
 {
     Write-Warning ('Can''t test protecting string under another identity: running under CC.Net, and the service user''s profile isn''t loaded, so can''t use Microsoft''s DPAPI.')
+}
+
+function Test-ShouldEncryptWithCertificate
+{
+    $cert = Get-Certificate -Path $publicKeyFilePath
+    Assert-NotNull $cert
+    $secret = [Guid]::NewGuid().ToString()
+    $ciphertext = Protect-String -String $secret -Certificate $cert
+    Assert-NotNull $ciphertext
+    Assert-NotEqual $secret $ciphertext
+    $privateKey = Get-Certificate -Path $privateKeyFilePath
+    Assert-Equal $secret (Unprotect-String -ProtectedString $ciphertext -Certificate $privateKey)
+}
+
+function Test-ShouldHandleNotGettingAnRSACertificate
+{
+    $cert = Get-Certificate -Path $dsaKeyPath
+    Assert-NotNull $cert
+    $secret = [Guid]::NewGuid().ToString()
+    $ciphertext = Protect-String -String $secret -Certificate $cert -ErrorAction SilentlyContinue
+    Assert-Error -Last -Regex 'not an RSA key'
+    Assert-Null $ciphertext
+}
+
+function Test-ShouldRejectStringsThatAreTooLongForRsaKey
+{
+    $cert = Get-Certificate -Path $privateKeyFilePath
+    $secret = 'f' * 470
+    $ciphertext = Protect-String -String $secret -Certificate $cert
+    Assert-NoError
+    Assert-NotNull $ciphertext
+    Assert-Equal $secret (Unprotect-String -ProtectedString $ciphertext -Certificate $cert)
+
+    $secret = 'f' * 472
+    $ciphertext = Protect-String -String $secret -Certificate $cert -ErrorAction SilentlyContinue
+    Assert-Error -Last -Regex 'String is longer'
+    Assert-Null $ciphertext
+}
+
+function Test-ShouldEncryptFromCertStoreByThumbprint
+{
+    $cert = Get-ChildItem -Path cert:\* -Recurse |
+                Where-Object { $_ | Get-Member 'PublicKey' } |
+                Where-Object { $_.PublicKey.Key -is [Security.Cryptography.RSACryptoServiceProvider] } |
+                Select-Object -First 1
+    Assert-NotNull $cert
+    $secret = [Guid]::NewGuid().ToString()
+    $expectedCipherText = Protect-String -String $secret -Thumbprint $cert.Thumbprint
+    Assert-NotNull $expectedCipherText
+}
+
+function Test-ShouldHandleThumbprintNotInStore
+{
+   $ciphertext = Protect-String -String 'fubar' -Thumbprint '1111111111111111111111111111111111111111' -ErrorAction SilentlyContinue
+   Assert-Error -Last -Regex 'not found'
+   Assert-Null $ciphertext
+}
+
+function Test-ShouldEncryptFromCertStoreByCertPath
+{
+    $cert = Get-ChildItem -Path cert:\* -Recurse |
+                Where-Object { $_ | Get-Member 'PublicKey' } |
+                Where-Object { $_.PublicKey.Key -is [Security.Cryptography.RSACryptoServiceProvider] } |
+                Select-Object -First 1
+    Assert-NotNull $cert
+    $secret = [Guid]::NewGuid().ToString()
+    $certPath = Join-Path -Path 'cert:\' -ChildPath (Split-Path -NoQualifier -Path $cert.PSPath)
+    $expectedCipherText = Protect-String -String $secret -PublicKeyPath $certPath
+    Assert-NotNull $expectedCipherText
+}
+
+function Test-ShouldHandlePathNotFound
+{
+    $ciphertext = Protect-String -String 'fubar' -PublicKeyPath 'cert:\currentuser\fubar' -ErrorAction SilentlyContinue
+    Assert-Error -Last -Regex 'not found'
+    Assert-Null $ciphertext
+}
+
+function Test-ShouldEncryptFromCertificateFile
+{
+    $cert = Get-Certificate -Path $publicKeyFilePath
+    Assert-NotNull $cert
+    $secret = [Guid]::NewGuid().ToString()
+    $ciphertext = Protect-String -String $secret -PublicKeyPath $publicKeyFilePath
+    Assert-NotNull $ciphertext
+    Assert-NotEqual $secret $ciphertext
+    $privateKey = Get-Certificate -Path $privateKeyFilePath
+    Assert-Equal $secret (Unprotect-String -ProtectedString $ciphertext -Certificate $privateKey)
+}
+
+function Test-ShouldEncryptFromCertificateFileWithRelativePath
+{
+    $cert = Get-Certificate -Path $publicKeyFilePath
+    Assert-NotNull $cert
+    $secret = [Guid]::NewGuid().ToString()
+    $ciphertext = Protect-String -String $secret -PublicKeyPath (Resolve-Path -Path $publicKeyFilePath -Relative)
+    Assert-NotNull $ciphertext
+    Assert-NotEqual $secret $ciphertext
+    $privateKey = Get-Certificate -Path $privateKeyFilePath
+    Assert-Equal $secret (Unprotect-String -ProtectedString $ciphertext -Certificate $privateKey)
+}
+
+function Test-ShouldUseDirectEncryptionPaddingSwitch
+{
+    $secret = [Guid]::NewGuid().ToString()
+    $ciphertext = Protect-String -String $secret -PublicKeyPath $publicKeyFilePath -UseDirectEncryptionPadding
+    Assert-NotNull $ciphertext
+    Assert-NotEqual $secret $ciphertext
+    $revealedSecret = Unprotect-String -ProtectedString $ciphertext -PrivateKeyPath $privateKeyFilePath -UseDirectEncryptionPadding
+    Assert-Equal $secret $revealedSecret
 }
 
 function Assert-IsBase64EncodedString($String)

@@ -16,10 +16,10 @@ function Revoke-Permission
 {
     <#
     .SYNOPSIS
-    Revokes *explicit* permissions on a file, directory or registry key.
+    Revokes *explicit* permissions on a file, directory, registry key, or certificate's private key.
 
     .DESCRIPTION
-    Revokes all of an identity's *explicit* permissions on a file, directory, or registry key. Only explicit permissions are considered; inherited permissions are ignored.
+    Revokes all of an identity's *explicit* permissions on a file, directory, registry key, or certificate's private key. Only explicit permissions are considered; inherited permissions are ignored.
 
     If the identity doesn't have permission, nothing happens, not even errors written out.
 
@@ -36,20 +36,25 @@ function Revoke-Permission
     Test-Permission
 
     .EXAMPLE
-    Revoke-Permission -Identity ENTERPRISE\Engineers -Path C:\EngineRoom
+    Revoke-Permission -Identity ENTERPRISE\Engineers -Path 'C:\EngineRoom'
 
     Demonstrates how to revoke all of the 'Engineers' permissions on the `C:\EngineRoom` directory.
 
     .EXAMPLE
-    Revoke-Permission -Identity ENTERPRISE\Interns -Path rklm:\system\WarpDrive
+    Revoke-Permission -Identity ENTERPRISE\Interns -Path 'hklm:\system\WarpDrive'
 
     Demonstrates how to revoke permission on a registry key.
+
+    .EXAMPLE
+    Revoke-Permission -Identity ENTERPRISE\Officers -Path 'cert:\LocalMachine\My\1234567890ABCDEF1234567890ABCDEF12345678'
+
+    Demonstrates how to revoke the Officers' permission to the `cert:\LocalMachine\My\1234567890ABCDEF1234567890ABCDEF12345678` certificate's private key.
     #>
     [CmdletBinding(SupportsShouldProcess=$true)]
     param(
         [Parameter(Mandatory=$true)]
         [string]
-        # The path on which the permissions should be revoked.  Can be a file system or registry path.
+        # The path on which the permissions should be revoked.  Can be a file system, registry, or certificate path.
         $Path,
         
         [Parameter(Mandatory=$true)]
@@ -66,20 +71,37 @@ function Revoke-Permission
         return
     }
 
-    # We don't use Get-Acl because it returns the whole security descriptor, which includes owner information.
-    # When passed to Set-Acl, this causes intermittent errors.  So, we just grab the ACL portion of the security descriptor.
-    # See http://www.bilalaslam.com/2010/12/14/powershell-workaround-for-the-security-identifier-is-not-allowed-to-be-the-owner-of-this-object-with-set-acl/
-    $currentAcl = (Get-Item $Path -Force).GetAccessControl("Access")
-
     $ruleToRemove = Get-Permission -Path $Path -Identity $Identity
     if( $ruleToRemove )
     {
-        [void]$currentAcl.RemoveAccessRule($ruleToRemove)
-        $Identity = Resolve-Identity -Name $Identity
-        if( $PSCmdlet.ShouldProcess( $Path, ('revoke permission for {0}' -f $Identity)) )
-        {
-            Set-Acl -Path $Path -AclObject $currentAcl
-        }
+        $Identity = Resolve-IdentityName -Name $Identity
+
+        Get-Item $Path -Force |
+            ForEach-Object {
+                if( $_.PSProvider.Name -eq 'Certificate' )
+                {
+                    [Security.Cryptography.X509Certificates.X509Certificate2]$certificate = $_
+
+                    [Security.AccessControl.CryptoKeySecurity]$keySecurity = $certificate.PrivateKey.CspKeyContainerInfo.CryptoKeySecurity
+
+                    [void] $keySecurity.RemoveAccessRule( $ruleToRemove)
+
+                    Set-CryptoKeySecurity -Certificate $certificate -CryptoKeySecurity $keySecurity -Action ('revoke {0}''s permissions' -f $Identity)
+                }
+                else
+                {
+                    # We don't use Get-Acl because it returns the whole security descriptor, which includes owner information.
+                    # When passed to Set-Acl, this causes intermittent errors.  So, we just grab the ACL portion of the security descriptor.
+                    # See http://www.bilalaslam.com/2010/12/14/powershell-workaround-for-the-security-identifier-is-not-allowed-to-be-the-owner-of-this-object-with-set-acl/
+                    $currentAcl = $_.GetAccessControl('Access')
+                    [void]$currentAcl.RemoveAccessRule($ruleToRemove)
+                    if( $PSCmdlet.ShouldProcess( $Path, ('revoke {0}''s permissions' -f $Identity)) )
+                    {
+                        Set-Acl -Path $Path -AclObject $currentAcl
+                    }
+                }
+            }
+
     }
     
 }

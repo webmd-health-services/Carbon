@@ -183,6 +183,8 @@ This is a backwards-incompatible release.
  * Improved documentation for [Get-Certificate](http://get-carbon.org/help/Get-Certificate.html).
  * Added extended script property `StoreName` to `X509Store` objects to return the store's `System.Security.Cryptography.X509Certificates.StoreName` value.
  * Added a table view/format for `X509Store` objects. PowerShell's default view is a list, so you'll have to explicitly format the objects as a table, e.g. `dir cert:\LocalMachine | Format-Table`.
+ * [Get-Certificate](http://get-carbon.org/help/Get-Certificate.html)'s `Path` parameter now supports wildcards and certificate provider paths, e.g. `cert:\`.
+ * [Get-Certificate](http://get-carbon.org/help/Get-Certificate.html) now writes an error if a certificate isn't found when getting a certificate by its path.
 
 ### Computer
 
@@ -192,7 +194,9 @@ This is a backwards-incompatible release.
 
  * [Protect-String](http://get-carbon.org/help/Protect-String.html) can now encrypt strings as a specific user. Use the `Credential` parameter.
  * Created [New-RsaKeyPair](http://get-carbon.org/help/New-RsaKeyPair.html) for creating public/private RSA key pair using `makecert.exe` and `pkv2pfx.exe`. Requires that you've installed a Windows SDK.
-
+ * [Protect-String](http://get-carbon.org/help/Protect-String.html) can now encrypt strings using an RSA public key.
+ * [Unprotect-String](http://get-carbon.org/help/Unprotect-String.html) can now decrypt strings using an RSA private key.
+ 
 ### File System
 
  * [Disable-NtfsCompression](http://get-carbon.org/help/Disable-NtfsCompression.html): improved error handling.
@@ -221,8 +225,11 @@ This is a backwards-incompatible release.
 
 ### Security
 
- * Creating [Revoke-Permission](http://get-carbon.org/help/Revoke-Permission.html) function for revoking a user's permission to a file, directory, or registry key.
+ * Creating [Revoke-Permission](http://get-carbon.org/help/Revoke-Permission.html) function for revoking a user's permission to a file, directory, registry key, or certificate's private key.
  * Creating [ConvertTo-ContainerInheritanceFlags](http://get-carbon.org/help/ConvertTo-ContainerInheritanceFlags.html) function for converting  `System.Security.AccessControl.InheritanceFlags` and `System.Security.AccessControl.PropagationFlag` values into a `Carbon.Security.ContainerInheritanceFlags` value.
+ * [Get-Permission](http://get-carbon.org/help/Get-Permission.html) now supports returning the permissions on private keys.
+ * [Grant-Permission](http://get-carbon.org/help/Grant-Permission.html) now supports granting permissions on private keys.
+ * [Test-Permission](http://get-carbon.org/help/Test-Permission.html) now supports testing permissions on certificate private keys.
 
 ### Services
 

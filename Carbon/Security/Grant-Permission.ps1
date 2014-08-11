@@ -16,28 +16,28 @@ function Grant-Permission
 {
     <#
     .SYNOPSIS
-    Grants permission on a file, directory or registry key.
+    Grants permission on a file, directory, registry key, or certificate's private key.
 
     .DESCRIPTION
-    Granting access to a file system entry or registry key requires a lot of steps.  This method reduces it to one call.  Very helpful.  
+    Granting access to a file system entry, registry key, or certificate's private key requires a lot of steps.  This method reduces it to one call.  Very helpful.
     
     Beginning with Carbon 2.0, permissions are only granted if they don't exist on an item, which saves a lot of time when granting permissions on large directory trees.  If you always want to grant permissions, use the `Force` switch.  
 
     Beginning with Carbon 2.0, this function returns any new/updated access rules set on `Path`.
 
-    It has the advantage that it will set permissions on a file system object or a registry.  If `Path` is absolute, the correct provider (file system or registry) is used.  If `Path` is relative, the provider of the current location will be used.
+    If `Path` is absolute, the correct provider (file system, registry, or certificate private key) is used.  If `Path` is relative, the provider of the current location will be used.
 
-    The `Permissions` attribute can be a list of [FileSystemRights](http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.filesystemrights.aspx) or [RegistryRights](http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.registryrights.aspx).
+    The `Permissions` attribute can be a list of [FileSystemRights](http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.filesystemrights.aspx), [RegistryRights](http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.registryrights.aspx), or [CryptoKeyRights](http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.cryptokeyrights.aspx).
 
-    This command will show you the values for the `FileSystemRights`:
+    These commands will show you the values for the appropriate permissions for your object:
 
         [Enum]::GetValues([Security.AccessControl.FileSystemRights])
-
-    This command will show you the values for the `RegistryRights`:
-
         [Enum]::GetValues([Security.AccessControl.RegistryRights])
-        
-    When setting permissions on a container (directory/registry key) You can control inheritance and propagation flags using the `ApplyTo` parameter.  There are 13 possible combinations.  Examples work best.  Here is a simple hierarchy:
+        [Enum]::GetValues([Security.AccessControl.CryptoKeyRights])
+
+    When setting permissions on a certificate's private key, if a certificate doesn't have a private key, it is ignored and no permissions are set. Since certificate's are always leaves, the `ApplyTo` parameter is ignored.
+
+    When setting permissions on a container (directory/registry key) you can control inheritance and propagation flags using the `ApplyTo` parameter.  There are 13 possible combinations.  Examples work best.  Here is a simple hierarchy:
 
             C
            / \
@@ -91,10 +91,7 @@ function Grant-Permission
     If you prefer to speak in `InheritanceFlags` or `PropagationFlags`, you can use the `ConvertTo-ContainerInheritaceFlags` function to convert your flags into Carbon's flags.
 
     .OUTPUTS
-    System.Security.AccessControl.FileSystemAccessRule.
-
-    .OUTPUTS
-    System.Security.AccessControl.RegistryAccessRule.
+    System.Security.AccessControl.AccessRule.
 
     .LINK
     http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.filesystemrights.aspx
@@ -120,6 +117,18 @@ function Grant-Permission
     .LINK
     Test-Permission
 
+    .LINK
+    http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.filesystemrights.aspx
+    
+    .LINK
+    http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.registryrights.aspx
+    
+    .LINK
+    http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.cryptokeyrights.aspx
+    
+    .LINK
+    http://msdn.microsoft.com/en-us/magazine/cc163885.aspx#S3    
+    
     .EXAMPLE
     Grant-Permission -Identity ENTERPRISE\Engineers -Permission FullControl -Path C:\EngineRoom
 
@@ -134,12 +143,18 @@ function Grant-Permission
     Grant-Permission -Identity ENTERPRISE\Engineers -Permission FullControl -Path C:\EngineRoom -Clear
     
     Grants the Enterprise's engineering group full control on the engine room.  Any non-inherited, existing access rules are removed from `C:\EngineRoom`.
+    
+    .EXAMPLE
+    Grant-Permission -Identity ENTERPRISE\Engineers -Permission FullControl -Path 'cert:\LocalMachine\My\1234567890ABCDEF1234567890ABCDEF12345678'
+    
+    Grants the Enterprise's engineering group full control on the `1234567890ABCDEF1234567890ABCDEF12345678` certificate's private key.
     #>
     [CmdletBinding(SupportsShouldProcess=$true)]
+    [OutputType([Security.AccessControl.AccessRule])]
     param(
         [Parameter(Mandatory=$true)]
         [string]
-        # The path on which the permissions should be granted.  Can be a file system or registry path.
+        # The path on which the permissions should be granted.  Can be a file system, registry, or certificate path.
         $Path,
         
         [Parameter(Mandatory=$true)]
@@ -175,9 +190,14 @@ function Grant-Permission
     }
 
     $providerName = Get-PathProvider -Path $Path | Select-Object -ExpandProperty 'Name'
-    if( $providerName -ne 'Registry' -and $providerName -ne 'FileSystem' )
+    if( $providerName -eq 'Certificate' )
     {
-        Write-Error "Unsupported path: '$Path' belongs to the '$providerName' provider.  Only registry and file system paths are supported."
+        $providerName = 'CryptoKey'
+    }
+
+    if( $providerName -ne 'Registry' -and $providerName -ne 'FileSystem' -and $providerName -ne 'CryptoKey' )
+    {
+        Write-Error "Unsupported path: '$Path' belongs to the '$providerName' provider.  Only file system, registry, and certificate paths are supported."
         return
     }
 
@@ -187,61 +207,104 @@ function Grant-Permission
         Write-Error ('Unable to grant {0} {1} permissions on {2}: received an unknown permission.' -f $Identity,($Permission -join ','),$Path)
         return
     }
-    
-    # We don't use Get-Acl because it returns the whole security descriptor, which includes owner information.
-    # When passed to Set-Acl, this causes intermittent errors.  So, we just grab the ACL portion of the security descriptor.
-    # See http://www.bilalaslam.com/2010/12/14/powershell-workaround-for-the-security-identifier-is-not-allowed-to-be-the-owner-of-this-object-with-set-acl/
-    $currentAcl = (Get-Item $Path -Force).GetAccessControl("Access")
-    
-    $inheritanceFlags = [Security.AccessControl.InheritanceFlags]::None
-    $propagationFlags = [Security.AccessControl.PropagationFlags]::None
-    $testPermissionParams = @{ }
-    if( Test-Path $Path -PathType Container )
+
+    if( -not (Test-Identity -Name $Identity ) )
     {
-        $inheritanceFlags = ConvertTo-InheritanceFlag -ContainerInheritanceFlag $ApplyTo
-        $propagationFlags = ConvertTo-PropagationFlag -ContainerInheritanceFlag $ApplyTo
-        $testPermissionParams.ApplyTo = $ApplyTo
+        Write-Error ('Identity ''{0}'' not found.' -f $Identity)
+        return
+    }
+
+    $Identity = Resolve-IdentityName -Name $Identity
+    
+    if( $providerName -eq 'CryptoKey' )
+    {
+        Get-Item -Path $Path |
+            Where-Object { $_.HasPrivateKey -and $_.PrivateKey } |
+            ForEach-Object {
+                [Security.Cryptography.X509Certificates.X509Certificate2]$certificate = $_
+                [Security.AccessControl.CryptoKeySecurity]$keySecurity = $certificate.PrivateKey.CspKeyContainerInfo.CryptoKeySecurity
+
+                $rulesToRemove = @()
+                if( $Clear )
+                {
+                    $rulesToRemove = $keySecurity.Access | 
+                                        Where-Object { $_.IdentityReference.Value -ne $Identity }
+                    if( $rulesToRemove )
+                    {
+                        $rulesToRemove | ForEach-Object { [void]$keySecurity.RemoveAccessRule( $_ ) }
+                    }
+                }
+                
+                $certPath = Join-Path -Path 'cert:' -ChildPath (Split-Path -NoQualifier -Path $certificate.PSPath)
+                if( $Force -or $rulesToRemove -or -not (Test-Permission -Path $certPath -Identity $Identity -Permission $Permission -Exact) )
+                {
+                    $accessRule = New-Object 'Security.AccessControl.CryptoKeyAccessRule' ($Identity,$rights,'Allow')
+                    $keySecurity.SetAccessRule( $accessRule )
+
+                    Set-CryptoKeySecurity -Certificate $certificate -CryptoKeySecurity $keySecurity -Action ('grant {0} {1} permission(s)' -f $Identity,($Permission -join ','))
+
+                    $accessRule |
+                        Add-Member -MemberType NoteProperty -Name 'Path' -Value $certPath -PassThru
+                }
+            }
     }
     else
     {
-        if( $PSBoundParameters.ContainsKey( 'ApplyTo' ) )
-        {
-            Write-Warning "Can't apply inheritance/propagation rules to a leaf. Please omit `ApplyTo` parameter when `Path` is a leaf."
-        }
-    }
+        # We don't use Get-Acl because it returns the whole security descriptor, which includes owner information.
+        # When passed to Set-Acl, this causes intermittent errors.  So, we just grab the ACL portion of the security descriptor.
+        # See http://www.bilalaslam.com/2010/12/14/powershell-workaround-for-the-security-identifier-is-not-allowed-to-be-the-owner-of-this-object-with-set-acl/
+        $currentAcl = (Get-Item $Path -Force).GetAccessControl("Access")
     
-    $rulesToRemove = $null
-    $Identity = Resolve-Identity -Name $Identity
-    if( $Clear )
-    {
-        $rulesToRemove = $currentAcl.Access |
-                    Where-Object { $_.IdentityReference.Value -ne $Identity } |
-                    Where-Object { -not $_.IsInherited }
-        
-        if( $rulesToRemove )
+        $inheritanceFlags = [Security.AccessControl.InheritanceFlags]::None
+        $propagationFlags = [Security.AccessControl.PropagationFlags]::None
+        $testPermissionParams = @{ }
+        if( Test-Path $Path -PathType Container )
         {
-            foreach( $ruleToRemove in $rulesToRemove )
+            $inheritanceFlags = ConvertTo-InheritanceFlag -ContainerInheritanceFlag $ApplyTo
+            $propagationFlags = ConvertTo-PropagationFlag -ContainerInheritanceFlag $ApplyTo
+            $testPermissionParams.ApplyTo = $ApplyTo
+        }
+        else
+        {
+            if( $PSBoundParameters.ContainsKey( 'ApplyTo' ) )
             {
-                Write-Verbose ('Removing {0}''s non-inherited, {1} {2} rights on {3}.' -f $Identity,$ruleToRemove.AccessControlType,$ruleToRemove."$($providerName)Rights",$Path)
-                [void]$currentAcl.RemoveAccessRule( $rulesToRemove )
+                Write-Warning "Can't apply inheritance/propagation rules to a leaf. Please omit `ApplyTo` parameter when `Path` is a leaf."
             }
         }
-    }
+    
+        $rulesToRemove = $null
+        $Identity = Resolve-Identity -Name $Identity
+        if( $Clear )
+        {
+            $rulesToRemove = $currentAcl.Access |
+                                Where-Object { $_.IdentityReference.Value -ne $Identity } |
+                                Where-Object { -not $_.IsInherited }
+        
+            if( $rulesToRemove )
+            {
+                foreach( $ruleToRemove in $rulesToRemove )
+                {
+                    Write-Verbose ('Removing {0}''s non-inherited, {1} {2} rights on {3}.' -f $Identity,$ruleToRemove.AccessControlType,$ruleToRemove."$($providerName)Rights",$Path)
+                    [void]$currentAcl.RemoveAccessRule( $rulesToRemove )
+                }
+            }
+        }
 
-    $missingPermission = -not (Test-Permission -Path $Path -Identity $Identity -Permission $Permission @testPermissionParams -Exact)
-    $setAccessRule = ($Force -or $missingPermission)
-    if( $setAccessRule )
-    {
-        $accessRule = New-Object "Security.AccessControl.$($providerName)AccessRule" $Identity,$rights,$inheritanceFlags,$propagationFlags,"Allow"
-        $currentAcl.SetAccessRule( $accessRule )
-    }
-
-    if( $rulesToRemove -or $setAccessRule )
-    {
-        Set-Acl -Path $Path -AclObject $currentAcl
+        $missingPermission = -not (Test-Permission -Path $Path -Identity $Identity -Permission $Permission @testPermissionParams -Exact)
+        $setAccessRule = ($Force -or $missingPermission)
         if( $setAccessRule )
         {
-            $accessRule | Add-Member -MemberType NoteProperty -Name 'Path' -Value $Path -PassThru
+            $accessRule = New-Object "Security.AccessControl.$($providerName)AccessRule" $Identity,$rights,$inheritanceFlags,$propagationFlags,"Allow"
+            $currentAcl.SetAccessRule( $accessRule )
+        }
+
+        if( $rulesToRemove -or $setAccessRule )
+        {
+            Set-Acl -Path $Path -AclObject $currentAcl
+            if( $setAccessRule )
+            {
+                $accessRule | Add-Member -MemberType NoteProperty -Name 'Path' -Value $Path -PassThru
+            }
         }
     }
 }
