@@ -15,6 +15,7 @@
 $Path = $null
 $user = 'CarbonGrantPerms'
 $containerPath = $null
+$privateKeyPath = Join-Path -Path $PSScriptRoot -ChildPath '..\Cryptography\CarbonTestPrivateKey.pfx' -Resolve
 
 function Start-TestFixture
 {
@@ -216,6 +217,81 @@ function Test-ShouldHandleNOnExistentPath
     Assert-Error -Last 'Cannot find path'
 }
 
+function Test-ShouldGrantPermissionOnPrivateKey
+{
+    $cert = Install-Certificate -Path $privateKeyPath -StoreLocation LocalMachine -StoreName My
+    try
+    {
+        Assert-NotNull $cert
+        $certPath = Join-Path -Path 'cert:\LocalMachine\My' -ChildPath $cert.Thumbprint
+        Grant-Permission -Path $certPath -Identity $user -Permission 'GenericRead'
+        Assert-NoError
+        Assert-Permissions $user 'GenericRead' $certPath
+    }
+    finally
+    {
+        Uninstall-Certificate -Thumbprint $cert.Thumbprint -StoreLocation LocalMachine -StoreName My
+    }
+}
+
+function Test-ShouldClearPermissionsOnPrivateKey
+{
+    $cert = Install-Certificate -Path $privateKeyPath -StoreLocation LocalMachine -StoreName My
+    try
+    {
+        Assert-NotNull $cert
+        $certPath = Join-Path -Path 'cert:\LocalMachine\My' -ChildPath $cert.Thumbprint
+        [object[]]$perms = Get-Permission -Path $certPath
+        $originalCount = $perms.Count
+        Grant-Permission -Path $certPath -Identity $user -Permission 'GenericRead'
+        $me = '{0}\{1}' -f $env:USERDOMAIN,$env:USERNAME
+        Grant-Permission -Path $certPath -Identity $me -Permission 'FullControl'
+        [object[]]$perms = Get-Permission -Path $certPath
+        Assert-Equal 2 ($perms.Count - $originalCount)
+        Grant-Permission -Path $certPath -Identity $me -Permission 'FullControl' -Clear
+        Assert-NoError
+        Assert-Permissions $me 'GenericRead' $certPath
+        [object[]]$perms = Get-Permission -Path $certPath
+        Assert-Equal 1 ($perms.Count - $originalCount)
+    }
+    finally
+    {
+        Uninstall-Certificate -Thumbprint $cert.Thumbprint -StoreLocation LocalMachine -StoreName My
+    }
+}
+
+function Test-ShouldSetPermissionsOnUserPrivateKey
+{
+    $cert = Install-Certificate -Path $privateKeyPath -StoreLocation CurrentUser -StoreName My
+    try
+    {
+        $certPath = Join-Path -Path 'cert:\CurrentUser\My' -ChildPath $cert.Thumbprint
+        Grant-Permission -Path $certPath -Identity $user -Permission 'GenericRead'
+        Assert-NoError
+        Assert-Permissions $user 'GenericRead' $certPath
+    }
+    finally
+    {
+        Uninstall-Certificate -Thumbprint $cert.Thumbprint -StoreLocation CurrentUser -StoreName My
+    }
+}
+
+function Test-ShouldSupportWhatIfOnPrivateKey
+{
+    $cert = Install-Certificate -Path $privateKeyPath -StoreLocation LocalMachine -StoreName My
+    try
+    {
+        $certPath = Join-Path -Path 'cert:\LocalMachine\My' -ChildPath $cert.Thumbprint
+        Grant-Permission -Path $certPath -Identity $user -Permission 'FullControl' -WhatIf
+        Assert-NoError
+        Assert-Null (Get-Permission -Path $certPath -Identity $user)
+    }
+    finally
+    {
+        Uninstall-Certificate -Thumbprint $cert.Thumbprint -StoreLocation LocalMachine -StoreName My
+    }
+}
+
 function Assert-InheritanceFlags
 {
     param(
@@ -241,6 +317,10 @@ function Assert-InheritanceFlags
 function Assert-Permissions($identity, $permissions, $path = $Path)
 {
     $providerName = (Get-PSDrive (Split-Path -Qualifier (Resolve-Path $path)).Trim(':')).Provider.Name
+    if( $providerName -eq 'Certificate' )
+    {
+        $providerName = 'CryptoKey'
+    }
     
     $rights = 0
     foreach( $permission in $permissions )

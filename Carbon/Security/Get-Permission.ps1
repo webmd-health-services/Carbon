@@ -97,7 +97,7 @@ function Get-Permission
     }
     
     Invoke-Command -ScriptBlock {
-        Get-Item -Path $Path |
+        Get-Item -Path $Path -Force |
             ForEach-Object { 
                 if( $_.PSProvider.Name -eq 'Certificate' )
                 {
