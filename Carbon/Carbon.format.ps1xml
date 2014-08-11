@@ -397,7 +397,7 @@
 				    </TableRowEntry>
 			    </TableRowEntries>
             </TableControl>
-		</View>
+	</View>
         <View>
             <Name>Carbon.Service.ServiceInfo</Name>
             <ViewSelectedBy>
@@ -429,7 +429,97 @@
 				    </TableRowEntry>
 			    </TableRowEntries>
             </TableControl>
+	</View>
+        <View>
+            <Name>System.Security.AccessControl.AccessRule</Name>
+            <ViewSelectedBy>
+                <TypeName>System.Security.AccessControl.AccessRule</TypeName>
+            </ViewSelectedBy>
+            <TableControl>
+			    <TableHeaders>
+				    <TableColumnHeader>
+                        <Label>Rights</Label>
+                    </TableColumnHeader>
+				    <TableColumnHeader>
+                        <Label>Type</Label>
+                        <Width>5</Width>
+                    </TableColumnHeader>
+				    <TableColumnHeader />
+				    <TableColumnHeader>
+                        <Width>11</Width>
+                    </TableColumnHeader>
+				    <TableColumnHeader />
+				    <TableColumnHeader />
+			    </TableHeaders>
+			    <TableRowEntries>
+				    <TableRowEntry>
+					    <TableColumnItems>
+						    <TableColumnItem>
+							    <ScriptBlock>
+                                    $property = Get-Member -InputObject $_ -Name '*Rights' -MemberType Property
+                                    if( $property )
+                                    {
+                                        $_.($property.Name)
+                                    }
+                                    else
+                                    {
+                                        $_.AccessMask
+                                    }
+                                </ScriptBlock>
+						    </TableColumnItem>
+						    <TableColumnItem>
+							    <PropertyName>AccessControlType</PropertyName>
+						    </TableColumnItem>
+						    <TableColumnItem>
+							    <PropertyName>IdentityReference</PropertyName>
+						    </TableColumnItem>
+						    <TableColumnItem>
+							    <PropertyName>IsInherited</PropertyName>
+						    </TableColumnItem>
+						    <TableColumnItem>
+							    <PropertyName>InheritanceFlags</PropertyName>
+						    </TableColumnItem>
+						    <TableColumnItem>
+							    <PropertyName>PropagationFlags</PropertyName>
+						    </TableColumnItem>
+					    </TableColumnItems>
+				    </TableRowEntry>
+			    </TableRowEntries>
+            </TableControl>
 		</View>
+        <View>
+            <Name>System.Security.AccessControl.CryptoKeyAccessRule</Name>
+            <ViewSelectedBy>
+                <TypeName>System.Security.AccessControl.CryptoKeyAccessRule</TypeName>
+            </ViewSelectedBy>
+            <TableControl>
+			    <TableHeaders>
+				    <TableColumnHeader>
+                        <Label>Rights</Label>
+                    </TableColumnHeader>
+				    <TableColumnHeader>
+                        <Label>Type</Label>
+                        <Width>5</Width>
+                    </TableColumnHeader>
+                    <TableColumnHeader />
+			    </TableHeaders>
+			    <TableRowEntries>
+				    <TableRowEntry>
+					    <TableColumnItems>
+						    <TableColumnItem>
+							    <PropertyName>CryptoKeyRights</PropertyName>
+						    </TableColumnItem>
+						    <TableColumnItem>
+							    <PropertyName>AccessControlType</PropertyName>
+						    </TableColumnItem>
+						    <TableColumnItem>
+							    <PropertyName>IdentityReference</PropertyName>
+						    </TableColumnItem>
+					    </TableColumnItems>
+				    </TableRowEntry>
+			    </TableRowEntries>
+            </TableControl>
+	</View>
         <View>
             <Name>System.DirectoryServices.AccountManagement.UserPrincipal</Name>
             <ViewSelectedBy>
@@ -473,7 +563,7 @@
 				    </TableRowEntry>
 			    </TableRowEntries>
             </TableControl>
-		</View>
+	</View>
         <View>
             <Name>System.DirectoryServices.AccountManagement.GroupPrincipal</Name>
             <ViewSelectedBy>
@@ -524,7 +614,7 @@
 					    </TableColumnItems>
 				    </TableRowEntry>
 			    </TableRowEntries>
-            </TableControl>
+	            </TableControl>
 		</View>
 	</ViewDefinitions>
 </Configuration>
