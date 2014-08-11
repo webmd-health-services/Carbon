@@ -67,6 +67,8 @@
  * Improved documentation for [Get-Certificate](http://get-carbon.org/help/Get-Certificate.html).
  * Added extended script property `StoreName` to `X509Store` objects to return the store's `System.Security.Cryptography.X509Certificates.StoreName` value.
  * Added a table view/format for `X509Store` objects. PowerShell's default view is a list, so you'll have to explicitly format the objects as a table, e.g. `dir cert:\LocalMachine | Format-Table`.
+ * [Get-Certificate](http://get-carbon.org/help/Get-Certificate.html)'s `Path` parameter now supports wildcards and certificate provider paths, e.g. `cert:\`.
+ * [Get-Certificate](http://get-carbon.org/help/Get-Certificate.html) now writes an error if a certificate isn't found when getting a certificate by its path.
 
 ### Computer
 

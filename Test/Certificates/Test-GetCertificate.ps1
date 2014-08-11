@@ -117,8 +117,8 @@ function Test-ShouldIncludeExceptionWhenFailingToLoadCertificate
     $cert = Get-Certificate -Path (Join-Path -Path $PSScriptRoot -ChildPath 'CarbonTestCertificateWithPassword.cer') -ErrorAction SilentlyContinue
     Assert-Error -Last -Regex 'password'
     Assert-Null $cert
-    Assert-NotNull $Error[0].Exception
-    Assert-Is $Error[0].Exception ([Management.Automation.MethodInvocationException])
+    Assert-NotNull $Error[1].Exception
+    Assert-Is $Error[1].Exception ([Management.Automation.MethodInvocationException])
 }
 
 function Test-ShouldGetCertificatesInCAStore

@@ -29,7 +29,7 @@ function Get-Certificate
     .EXAMPLE
     Get-Certificate -Path C:\Certificates\certificate.cer -Password MySuperSecurePassword
     
-    Gets an X509Certificate2 object representing the certificate.cer file.
+    Gets an X509Certificate2 object representing the certificate.cer file. Wildcards *not* supported when using a file system path.
     
     .EXAMPLE
     Get-Certificate -Thumbprint a909502dd82ae41433e6f83886b00d4277a32a7b -StoreName My -StoreLocation LocalMachine
@@ -45,13 +45,18 @@ function Get-Certificate
     Get-Certificate -Thumbprint a909502dd82ae41433e6f83886b00d4277a32a7b -CustomStoreName 'SharePoint' -StoreLocation LocalMachine
 
     Demonstrates how to get a certificate from a custom store, i.e. one that is not part of the standard `StoreName` enumeration.
+
+    .EXAMPLE
+    Get-Certificate -Path 'cert:\CurrentUser\a909502dd82ae41433e6f83886b00d4277a32a7b'
+
+    Demonstrates how to get a certificate out of a Windows certificate store with its certificate path. Wildcards supported.
     #>
     [CmdletBinding(DefaultParameterSetName='ByFriendlyName')]
     [OutputType([Security.Cryptography.X509Certificates.X509Certificate2])]
     param(
         [Parameter(Mandatory=$true,ParameterSetName='ByPath')]
         [string]
-        # The path to the certificate.
+        # The path to the certificate. Can be a file system path or a certificate path, e.g. `cert:\`. Wildcards supported.
         $Path,
         
         [Parameter(ParameterSetName='ByPath')]
@@ -95,20 +100,43 @@ function Get-Certificate
 
     if( $PSCmdlet.ParameterSetName -eq 'ByPath' )
     {
-        $Path = ConvertTo-FullPath -Path $Path
-    
-        try
+        if( -not (Test-Path -Path $Path -PathType Leaf) )
         {
-            return New-Object Security.Cryptography.X509Certificates.X509Certificate2 $Path,$Password
+            Write-Error ('Certificate ''{0}'' not found.' -f $Path)
+            return
         }
-        catch
+
+        $foundCerts = @()
+        Get-Item -Path $Path | 
+            ForEach-Object {
+                $item = $_
+                if( $item -is [Security.Cryptography.X509Certificates.X509Certificate2] )
+                {
+                    return $item
+                }
+                elseif( $item -is [IO.FileInfo] )
+                {
+                    try
+                    {
+                        return New-Object 'Security.Cryptography.X509Certificates.X509Certificate2' $item.FullName,$Password
+                    }
+                    catch
+                    {
+                        $ex = $_.Exception
+                        while( $ex.InnerException )
+                        {
+                            $ex = $ex.InnerException
+                        }
+                        Write-Error -Message ('Failed to create X509Certificate2 object from file ''{0}'': {1}' -f $item.FullName,$ex.Message) -Exception $_.Exception
+                    }
+                }
+            } |
+            Tee-Object -Variable 'foundCerts'
+
+        if( -not $foundCerts )
         {
-            $ex = $_.Exception
-            while( $ex.InnerException )
-            {
-                $ex = $ex.InnerException
-            }
-            Write-Error -Message ('Failed to create X509Certificate2 object from file ''{0}'': {1}' -f $Path,$ex.Message) -Exception $_.Exception
+            Write-Error ('Certificate ''{0}'' not found.' -f $Path)
+            return
         }
     }
     else
