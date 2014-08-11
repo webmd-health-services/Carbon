@@ -19,6 +19,7 @@ $filePath = $null
 $tempKeyPath = $null
 $keyPath = $null
 $childKeyPath = $null
+$privateKeyPath = Join-Path -Path $PSScriptRoot -ChildPath '..\Cryptography\CarbonTestPrivateKey.pfx' -Resolve
 
 function Start-TestFixture
 {
@@ -142,4 +143,30 @@ function Test-ShouldCheckExactUngrantedInheritanceFlags
 function Test-ShouldCheckExactGrantedInheritanceFlags
 {
     Assert-True (Test-Permission -Path $dirPath -Identity $identity -Permission 'ReadAndExecute' -ApplyTo ChildLeaves -Exact)
+}
+
+function Test-ShouldCheckPermissionOnPrivateKey
+{
+    $cert = Install-Certificate -Path $privateKeyPath -StoreLocation LocalMachine -StoreName My
+    try
+    {
+        $certPath = Join-Path -Path 'cert:\LocalMachine\My' -ChildPath $cert.Thumbprint
+        Grant-Permission -Path $certPath -Identity $identity -Permission 'GenericAll'
+        Assert-True (Test-Permission -Path $certPath -Identity $identity -Permission 'GenericRead')
+        Assert-False (Test-Permission -Path $certPath -Identity $identity -Permission 'GenericRead' -Exact)
+        Assert-True (Test-Permission -Path $certPath -Identity $identity -Permission 'GenericAll','GenericRead' -Exact)
+    }
+    finally
+    {
+        Uninstall-Certificate -Thumbprint $cert.Thumbprint -StoreLocation LocalMachine -StoreName My
+    }
+}
+
+function Test-ShouldCheckPermissionOnPublicKey
+{
+    $cert = Get-ChildItem 'cert:\*\*' -Recurse | Where-Object { -not $_.HasPrivateKey } | Select-Object -First 1
+    Assert-NotNull $cert
+    $certPath = Join-Path -Path 'cert:\' -ChildPath (Split-Path -NoQualifier -Path $cert.PSPath)
+    Assert-True (Test-Permission -Path $certPath -Identity $identity -Permission 'FullControl')
+    Assert-True (Test-Permission -Path $certPath -Identity $identity -Permission 'FullControl' -Exact)
 }

@@ -113,6 +113,7 @@
  * Creating [ConvertTo-ContainerInheritanceFlags](http://get-carbon.org/help/ConvertTo-ContainerInheritanceFlags.html) function for converting  `System.Security.AccessControl.InheritanceFlags` and `System.Security.AccessControl.PropagationFlag` values into a `Carbon.Security.ContainerInheritanceFlags` value.
  * [Get-Permission](http://get-carbon.org/help/Get-Permission.html) now supports returning the permissions on private keys.
  * [Grant-Permission](http://get-carbon.org/help/Grant-Permission.html) now supports granting permissions on private keys.
+ * [Test-Permission](http://get-carbon.org/help/Test-Permission.html) now supports testing permissions on certificate private keys.
 
 ### Services
 
