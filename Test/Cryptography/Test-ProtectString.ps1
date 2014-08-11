@@ -189,7 +189,12 @@ function Test-ShouldEncryptFromCertificateFileWithRelativePath
 
 function Test-ShouldUseDirectEncryptionPaddingSwitch
 {
-    Fail 'Write me!'
+    $secret = [Guid]::NewGuid().ToString()
+    $ciphertext = Protect-String -String $secret -PublicKeyPath $publicKeyFilePath -UseDirectEncryptionPadding
+    Assert-NotNull $ciphertext
+    Assert-NotEqual $secret $ciphertext
+    $revealedSecret = Unprotect-String -ProtectedString $ciphertext -PrivateKeyPath $privateKeyFilePath -UseDirectEncryptionPadding
+    Assert-Equal $secret $revealedSecret
 }
 
 function Assert-IsBase64EncodedString($String)

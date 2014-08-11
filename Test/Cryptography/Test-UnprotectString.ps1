@@ -135,12 +135,64 @@ function Test-ShouldHandleEncryptedByDifferentKey
 
 function Test-ShouldDecryptWithCertificate
 {
+    $cert = Get-Certificate -Path $privateKeyPath
+    $revealedSecret = Unprotect-String -ProtectedString $rsaCipherText -Certificate $cert
+    Assert-NoError
+    Assert-Equal $secret $revealedSecret
 }
 
 function Test-ShouldDecryptWithThumbprint
 {
+    $cert = Install-Certificate -Path $privateKeyPath -StoreLocation CurrentUser -StoreName My
+    try
+    {
+        $revealedSecret = Unprotect-String -ProtectedString $rsaCipherText -Thumbprint $cert.Thumbprint
+        Assert-NoError
+        Assert-Equal $secret $revealedSecret
+    }
+    finally
+    {
+        Uninstall-Certificate -Thumbprint $cert.Thumbprint -StoreLocation CurrentUser -StoreName My
+    }
+}
+
+function Test-ShouldHandleInvalidThumbprint
+{
+    $revealedSecret = Unprotect-String -ProtectedString $rsaCipherText -Thumbprint ('1' * 40) -ErrorAction SilentlyContinue
+    Assert-Error -Last -Regex 'not found'
+    Assert-Null $revealedSecret
+}
+
+function Test-ShouldHandleThumbprintToCertWithNoPrivateKey
+{
+    $cert = Get-ChildItem -Path 'cert:\*\*' -Recurse | 
+                Where-Object { $_.PublicKey.Key -is [Security.Cryptography.RSACryptoServiceProvider] } |
+                Where-Object { -not $_.HasPrivateKey } |
+                Select-Object -First 1
+    Assert-NotNull $cert
+    $revealedSecret = Unprotect-String -ProtectedString $rsaCipherText -Thumbprint $cert.Thumbprint -ErrorAction SilentlyContinue
+    Assert-Error -Last -Regex 'doesn''t have a private key'
+    Assert-Null $revealedSecret
 }
 
 function Test-ShouldDecryptWithPathToCertInStore
 {
+    $cert = Install-Certificate -Path $privateKeyPath -StoreLocation CurrentUser -StoreName My
+    try
+    {
+        $revealedSecret = Unprotect-String -ProtectedString $rsaCipherText -PrivateKeyPath ('cert:\CurrentUser\My\{0}' -f $cert.Thumbprint)
+        Assert-NoError
+        Assert-Equal $secret $revealedSecret
+    }
+    finally
+    {
+        Uninstall-Certificate -Thumbprint $cert.Thumbprint -StoreLocation CurrentUser -StoreName My
+    }
+}
+
+function Test-ShouldHandlePathNotFound
+{
+    $revealedSecret = Unprotect-String -ProtectedString $rsaCipherText -PrivateKeyPath 'C:\fubar.cer' -ErrorAction SilentlyContinue
+    Assert-Error -Last -Regex 'not found'
+    Assert-Null $revealedSecret
 }

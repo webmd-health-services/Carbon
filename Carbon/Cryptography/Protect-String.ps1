@@ -211,28 +211,9 @@ filter Protect-String
         }
         elseif( $PSCmdlet.ParameterSetName -eq 'RSAByPath' )
         {
-            if( -not (Test-Path -Path $PublicKeyPath -PathType Leaf) )
+            $Certificate = Get-Certificate -Path $PublicKeyPath
+            if( -not $Certificate )
             {
-                Write-Error ('Certificate ''{0}'' not found.' -f $PublicKeyPath)
-                return
-            }
-
-            $item = Get-Item -Path $PublicKeyPath
-            if( $item -is [Security.Cryptography.X509Certificates.X509Certificate] )
-            {
-                $Certificate = $item
-            }
-            elseif( $item -is [IO.FileInfo] )
-            {
-                $Certificate = Get-Certificate -Path $item.FullName
-                if( -not $Certificate )
-                {
-                    return
-                }
-            }
-            else
-            {
-                Write-Error ('Certificate ''{0}'' not found.' -f $PublicKeyPath)
                 return
             }
         }

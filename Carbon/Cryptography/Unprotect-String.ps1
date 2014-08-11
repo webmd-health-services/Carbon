@@ -124,16 +124,35 @@ filter Unprotect-String
                 $passwordParam = @{ Password = $Password }
             }
             $Certificate = Get-Certificate -Path $PrivateKeyPath @passwordParam
+            if( -not $Certificate )
+            {
+                return
+            }
+        }
+        elseif( $PSCmdlet.ParameterSetName -like '*ByThumbprint' )
+        {
+            $certificates = Get-ChildItem -Path ('cert:\*\{0}' -f $Thumbprint) -Recurse 
+            if( -not $certificates )
+            {
+                Write-Error ('Certificate ''{0}'' not found.' -f $Thumbprint)
+                return
+            }
+
+            $Certificate = $certificates | Where-Object { $_.HasPrivateKey } | Select-Object -First 1
+            if( -not $Certificate )
+            {
+                Write-Error ('Certificate ''{0}'' ({1}) doesn''t have a private key.' -f $certificates[0].Subject, $Thumbprint)
+                return
+            }
         }
 
-        $key = $Certificate.PrivateKey
-        if( -not $key )
+        if( -not $Certificate.HasPrivateKey )
         {
             Write-Error ('Certificate ''{0}'' ({1}) doesn''t have a private key. When decrypting with RSA, secrets are encrypted with the public key, and decrypted with a private key.' -f $Certificate.Subject,$Certificate.Thumbprint)
             return
         }
 
-        if( $key -isnot [Security.Cryptography.RSACryptoServiceProvider] )
+        if( $Certificate.PrivateKey -isnot [Security.Cryptography.RSACryptoServiceProvider] )
         {
             Write-Error ('Certificate ''{0}'' (''{1}'') is not an RSA key. Found a private key of type ''{2}'', but expected type ''{3}''.' -f $Certificate.Subject,$Certificate.Thumbprint,$key.GetType().FullName,[Security.Cryptography.RSACryptoServiceProvider].FullName)
             return
@@ -141,6 +160,7 @@ filter Unprotect-String
 
         try
         {
+            [Security.Cryptography.RSACryptoServiceProvider]$key = $Certificate.PrivateKey
             $decryptedBytes = $key.Decrypt( $encryptedBytes, (-not $UseDirectEncryptionPadding) )
         }
         catch
