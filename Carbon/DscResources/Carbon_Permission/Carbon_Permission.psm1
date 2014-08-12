@@ -57,7 +57,12 @@ function Get-TargetResource
     $perm = Get-Permission -Path $Path -Identity $Identity
     if( $perm )
     {
-        [string[]]$resource.Permission = $perm.FileSystemRights.ToString() -split ',' | ForEach-Object { $_.Trim() } | Where-Object { $_ -ne 'Synchronize' }
+        [string[]]$resource.Permission = $perm | 
+                                            Get-Member -Name '*Rights' -MemberType Property | 
+                                            ForEach-Object { ($perm.($_.Name)).ToString() -split ',' } |
+                                            ForEach-Object { $_.Trim() } | 
+                                            Where-Object { $_ -ne 'Synchronize' }
+
         $resource.ApplyTo = ConvertTo-ContainerInheritanceFlags -InheritanceFlags $perm.InheritanceFlags -PropagationFlags $perm.PropagationFlags
         $resource.Ensure = 'Present'
     }
@@ -179,14 +184,6 @@ function Test-TargetResource
     )
 
     Set-StrictMode -Version 'Latest'
-
-    $providerName = Get-PathProvider -Path $Path
-    if( -not $providerName )
-    {
-        Write-Error ('Path ''{0}'' not supported. Only file system and registry paths are allowed.')
-        return
-    }
-    $providerName = $providerName.Name
 
     $resource = Get-TargetResource -Identity $Identity -Path $Path
     $desiredRights = $Permission -join ','

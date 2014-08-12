@@ -57,7 +57,7 @@ This is a backwards-incompatible release.
  * Created `Carbon_FirewallRule` resource for configuring firewall rules.
  * New [Test-DscTargetResource](http://get-carbon.org/help/Test-DscTargetResource.html) function for comparing target/desired resource states across DSC resources.
  * Created `Carbon_Privilege` resource for configuring and identity's privileges.
- * Created `Carbon_Permission` resource for configuring file, directory, and registry permissions.
+ * Created `Carbon_Permission` resource for configuring file, directory, registry, and certificate permissions.
  * Created `Carbon_Service` resource for configuring Windows services.
  * Created `Carbon_Script` resource for running custom PowerShell scripts, with support for passing arguments.
  

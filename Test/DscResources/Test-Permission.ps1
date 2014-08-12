@@ -64,13 +64,45 @@ function Test-ShouldGrantPermissionOnRegistry
     New-Item -Path $keyPath
     try
     {
+        Assert-False (Test-Permission -Identity $UserName -Path $keyPath -Permission ReadKey -ApplyTo Container -Exact)
+        Assert-False (Test-TargetResource -Identity $UserName -Path $keyPath -Permission ReadKey -Ensure Present)
+
         Set-TargetResource -Identity $UserName -Path $keyPath -Permission ReadKey -ApplyTo Container -Ensure Present
         Assert-NoError
         Assert-True (Test-Permission -Identity $UserName -Path $keyPath -Permission ReadKey -ApplyTo Container -Exact)
+        Assert-True (Test-TargetResource -Identity $UserName -Path $keyPath -Permission ReadKey -Ensure Present)
+
+        Set-TargetResource -Identity $UserName -Path $keyPath -Permission ReadKey -ApplyTo Container -Ensure Absent
+        Assert-NoError
+        Assert-False (Test-Permission -Identity $UserName -Path $keyPath -Permission ReadKey -ApplyTo Container -Exact)
+        Assert-True (Test-TargetResource -Identity $UserName -Path $keyPath -Permission ReadKey -Ensure Absent)
     }
     finally
     {
         Remove-Item -Path $keyPath
+    }
+}
+
+function Test-ShouldGrantPermissionOnPrivateKey
+{
+    $cert = Install-Certificate -Path (Join-Path -Path $PSScriptRoot -ChildPath '..\Cryptography\CarbonTestPrivateKey.pfx' -Resolve) -StoreLocation LocalMachine -StoreName My
+    try
+    {
+        $certPath = Join-Path -Path 'cert:\LocalMachine\My' -ChildPath $cert.Thumbprint -Resolve
+        Assert-Null (Get-Permission -Path $certPath -Identity $UserName)
+        Assert-False (Test-TargetResource -Path $certPath -Identity $UserName -Permission 'GenericRead')
+
+        Set-TargetResource -Identity $UserName -Path $certPath -Permission GenericRead -Ensure Present
+        Assert-NotNull (Get-Permission -Path $certPath -Identity $UserName)
+        Assert-True (Test-TargetResource -Path $certPath -Identity $UserName -Permission 'GenericRead')
+
+        Set-TargetResource -Identity $UserName -Path $certPath -Permission GenericRead -Ensure Absent
+        Assert-Null (Get-Permission -Path $certPath -Identity $UserName)
+        Assert-True (Test-TargetResource -Path $certPath -Identity $UserName -Permission 'GenericRead' -Ensure Absent)
+    }
+    finally
+    {
+        Uninstall-Certificate -Certificate $cert -StoreLocation LocalMachine -StoreName My
     }
 }
 
