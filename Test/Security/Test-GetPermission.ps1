@@ -111,7 +111,6 @@ function Test-ShouldGetPrivateCertPermission
 
 function Test-ShouldGetSpecificIdentityCertPermission
 {
-    $foundPermission = $false
     Get-ChildItem -Path 'cert:\*\*' -Recurse |
         Where-Object { -not $_.PsIsContainer } |
         Where-Object { $_.HasPrivateKey } |
@@ -122,6 +121,7 @@ function Test-ShouldGetSpecificIdentityCertPermission
             foreach( $rule in $rules )
             {
                 [object[]]$identityRule = Get-Permission -Path $_ -Identity $rule.IdentityReference.Value
+                Assert-NotNull $identityRule
                 Assert-True ($identityRule.Count -le $rules.Count) $
             }
         }

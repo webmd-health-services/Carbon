@@ -85,10 +85,10 @@ function Get-Permission
     $account = $null
     if( $Identity )
     {
-        $account = Resolve-Identity -Name $Identity
-        if( -not $account )
+        $account = Test-Identity -Name $Identity -PassThru
+        if( $account )
         {
-            return
+            $Identity = $account.FullName
         }
     }
 
@@ -123,9 +123,9 @@ function Get-Permission
             return (-not $_.IsInherited)
         } |
         Where-Object {
-            if( $account )
+            if( $Identity )
             {
-                return ($_.IdentityReference.Value -eq $account.FullName)
+                return ($_.IdentityReference.Value -eq $Identity)
             }
             
             return $true

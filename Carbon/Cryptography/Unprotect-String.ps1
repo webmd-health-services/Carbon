@@ -176,7 +176,7 @@ Failed to decrypt string using certificate '{0}' ({1}). This can happen when:
 '@ -f $Certificate.Subject, $Certificate.Thumbprint,$key.KeySize,$maxLengthGuess)
                 return
             }
-            elseif( $_.Exception.Message -match 'Bad Data\.' )
+            elseif( $_.Exception.Message -match '(Bad Data|The parameter is incorrect)\.' )
             {
                 Write-Error (@'
 Failed to decrypt string using certificate '{0}' ({1}). This usually happens when the padding algorithm used when encrypting/decrypting is different. Check the `-UseDirectEncryptionPadding` switch is the same for both calls to `Protect-String` and `Unprotect-String`.
