@@ -92,7 +92,13 @@ function Uninstall-Certificate
 
     $store = Get-CertificateStore -StoreLocation $StoreLocation @storeNameParams
 
-    if( $PSCmdlet.ShouldProcess(  "certificate $StoreLocation\$StoreName\$($Certificate.Thumbprint) ($($Certificate.FriendlyName))", "remove" ) )
+    $target = $Certificate.FriendlyName
+    if( -not $target )
+    {
+        $target = $Certificate.Subject
+    }
+
+    if( $PSCmdlet.ShouldProcess(  ("certificate $StoreLocation\$StoreName\{0} ({1})" -f $Certificate.Thumbprint,$target), "remove" ) )
     {
         $store.Remove( $Certificate )
     }
