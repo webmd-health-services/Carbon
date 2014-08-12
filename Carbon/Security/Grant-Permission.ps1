@@ -37,7 +37,7 @@ function Grant-Permission
 
         [Enum]::GetValues([Security.AccessControl.CryptoKeyRights])
 
-    When setting permissions on a certificate's private key, if a certificate doesn't have a private key, it is ignored and no permissions are set. Since certificate's are always leaves, the `ApplyTo` parameter is ignored.
+    ## Directories and Registry Keys
 
     When setting permissions on a container (directory/registry key) you can control inheritance and propagation flags using the `ApplyTo` parameter.  There are 13 possible combinations.  Examples work best.  Here is a simple hierarchy:
 
@@ -91,6 +91,12 @@ function Grant-Permission
     The above information adpated from [Manage Access to Windows Objects with ACLs and the .NET Framework](http://msdn.microsoft.com/en-us/magazine/cc163885.aspx#S3), published in the November 2004 copy of *MSDN Magazine*.
 
     If you prefer to speak in `InheritanceFlags` or `PropagationFlags`, you can use the `ConvertTo-ContainerInheritaceFlags` function to convert your flags into Carbon's flags.
+
+    ## Certificate Private Keys
+
+    When setting permissions on a certificate's private key, if a certificate doesn't have a private key, it is ignored and no permissions are set. Since certificate's are always leaves, the `ApplyTo` parameter is ignored.
+
+    When using the `-Clear` switch, note that the local `Administrators` account will always remain. In testing on Windows 2012 R2, we noticed that when `Administrators` access was removed, you couldn't read the key anymore. 
 
     .LINK
     ConvertTo-ContainerInheritanceFlags
@@ -208,9 +214,23 @@ function Grant-Permission
                 [Security.Cryptography.X509Certificates.X509Certificate2]$certificate = $_
                 [Security.AccessControl.CryptoKeySecurity]$keySecurity = $certificate.PrivateKey.CspKeyContainerInfo.CryptoKeySecurity
 
+                $rulesToRemove = @()
                 if( $Clear )
                 {
-                    $keySecurity.Access | ForEach-Object { [void]$keySecurity.RemoveAccessRule( $_ ) }
+                    $rulesToRemove = $keySecurity.Access | 
+                                        Where-Object { $_.IdentityReference.Value -ne $Identity } |
+                                        # Don't remove Administrators access. 
+                                        Where-Object { $_.IdentityReference.Value -ne 'BUILTIN\Administrators' }
+                    if( $rulesToRemove )
+                    {
+                        $rulesToRemove | ForEach-Object { 
+                            Write-Verbose ('Removing {0}''s {1} permissions.' -f $_.IdentityReference,$_.CryptoKeyRights)
+                            if( -not $keySecurity.RemoveAccessRule( $_ ) )
+                            {
+                                Write-Error ('Failed to remove {0}''s {1} permissions on ''{2}'' (3) certificate''s private key.' -f $_.IdentityReference,$_.CryptoKeyRights,$Certificate.Subject,$Certificate.Thumbprint)
+                            }
+                        }
+                    }
                 }
                 
                 $accessRule = New-Object 'Security.AccessControl.CryptoKeyAccessRule' ($Identity,$rights,'Allow')

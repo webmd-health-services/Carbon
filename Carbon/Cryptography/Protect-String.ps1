@@ -231,7 +231,7 @@ filter Protect-String
         }
         catch
         {
-            if( $_.Exception.Message -match 'Bad Length\.' )
+            if( $_.Exception.Message -match 'Bad Length\.' -or $_.Exception.Message -match 'The parameter is incorrect\.')
             {
                 [int]$maxLengthGuess = ($key.KeySize - (2 * 160 - 2)) / 8
                 Write-Error -Message ('Failed to encrypt. String is longer than maximum length allowed by RSA and your key size, which is {0} bits. We estimate the maximum string size you can encrypt with certificate ''{1}'' ({2}) is {3} bytes. You may still get errors when you attempt to decrypt a string within a few bytes of this estimated maximum.' -f $key.KeySize,$Certificate.Subject,$Certificate.Thumbprint,$maxLengthGuess)

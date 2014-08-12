@@ -80,13 +80,15 @@ function Get-Permission
         $Inherited
     )
    
-    $rIdentity = $Identity
-    if( $Identity )
+    Set-StrictMode -Version 'Latest'
+
+    $account = $null
+    if( $Identity  )
     {
-        $rIdentity = Resolve-IdentityName -Name $Identity
-        if( -not $rIdentity )
+        $account = Test-Identity -Name $Identity -PassThru
+        if( $account )
         {
-            return
+            $Identity = $account.FullName
         }
     }
 
@@ -121,9 +123,9 @@ function Get-Permission
             return (-not $_.IsInherited)
         } |
         Where-Object {
-            if( $rIdentity )
+            if( $Identity )
             {
-                return ($_.IdentityReference.Value -eq $rIdentity)
+                return ($_.IdentityReference.Value -eq $Identity)
             }
             
             return $true

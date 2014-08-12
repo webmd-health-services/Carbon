@@ -241,18 +241,18 @@ function Test-ShouldClearPermissionsOnPrivateKey
     {
         Assert-NotNull $cert
         $certPath = Join-Path -Path 'cert:\LocalMachine\My' -ChildPath $cert.Thumbprint
-        [object[]]$perms = Get-Permission -Path $certPath
-        $originalCount = $perms.Count
         Grant-Permission -Path $certPath -Identity $user -Permission 'GenericRead'
+        Assert-NotNull (Get-Permission -Path $certPath -Identity $user)
+
         $me = '{0}\{1}' -f $env:USERDOMAIN,$env:USERNAME
         Grant-Permission -Path $certPath -Identity $me -Permission 'FullControl'
-        [object[]]$perms = Get-Permission -Path $certPath
-        Assert-Equal 2 ($perms.Count - $originalCount)
-        Grant-Permission -Path $certPath -Identity $me -Permission 'FullControl' -Clear
+        Assert-NotNull (Get-Permission -Path $certPath -Identity $me)
+
+        Grant-Permission -Path $certPath -Identity $me -Permission 'FullControl' -Clear -Verbose
+        Assert-Null (Get-Permission -Path $certPath -Identity $user)
+        Assert-NotNull (Get-Permission -Path $certPath -Identity $me)
         Assert-NoError
         Assert-Permissions $me 'GenericRead' $certPath
-        [object[]]$perms = Get-Permission -Path $certPath
-        Assert-Equal 1 ($perms.Count - $originalCount)
     }
     finally
     {
