@@ -27,6 +27,8 @@ function Compress-Item
 
     A `System.IO.FileInfo` object is returned representing the ZIP file.
 
+    Microsoft's DSC Local Configuration Manager is unable to unzip files compressed with the `DotNetZip` library (or the `ZipFile` class in .NET 4.5), so as an alternative, if you specify the `UseShell` switch, the file will be compressed with the Windows COM shell API.
+
     .LINK
     https://www.nuget.org/packages/DotNetZip
 
@@ -45,6 +47,11 @@ function Compress-Item
     Get-ChildItem -Path 'C:\Projects\Carbon' | Where-Object { $_.PsIsContainer} | Compress-Item -OutFile 'C:\Projects\Carbon.zip'
 
     Demonstrates how you can pipe items to `Compress-Item` for compressing.
+
+    .EXAMPLE
+    Compress-Item -Path 'C:\Projects\Carbon' -OutFile 'C:\Carbon.zip' -UseShell
+
+    Demonstrates how to create a ZIP file with the Windows shell COM APIs instead of the `DotNetZip` library.
     #>
     [OutputType([IO.FileInfo])]
     [CmdletBinding(SupportsShouldProcess=$true)]
@@ -60,6 +67,10 @@ function Compress-Item
         $OutFile,
 
         [Switch]
+        # Uses the Windows COM shell API to create the zip file instead of the `DotNetZip` library. Microsoft's DSC Local Configuration Manager can't unzip files zipped with `DotNetZip` (or even the .NET 4.5 `ZipFile` class).
+        $UseShell,
+
+        [Switch]
         # Overwrites an existing ZIP file.
         $Force
     )
@@ -67,6 +78,9 @@ function Compress-Item
     begin
     {
         Set-StrictMode -Version 'Latest'
+
+        $zipFile = $null
+
         if( $OutFile )
         {
             $OutFile = Resolve-FullPath -Path $OutFile
@@ -85,7 +99,27 @@ function Compress-Item
             $OutFile = Join-Path -Path $env:TEMP -ChildPath $OutFile
         }
 
-        $zipFile = New-Object 'Ionic.Zip.ZipFile'
+        if( $UseShell )
+        {
+            [byte[]]$data = New-Object byte[] 22
+            $data[0] = 80
+            $data[1] = 75
+            $data[2] = 5
+            $data[3] = 6
+            [IO.File]::WriteAllBytes($OutFile, $data)
+
+            $shellApp = New-Object -ComObject "Shell.Application"
+            $copyHereFlags = (
+                                0x4 -bor `   # No dialog
+                                0x10 -bor `  # Responde "Yes to All" to any prompts
+                                0x400        # Do not display a user interface if an error occurs
+                            )
+            $zipFile = $shellApp.NameSpace($OutFile) 
+        }
+        else
+        {
+            $zipFile = New-Object 'Ionic.Zip.ZipFile'
+        }
 
     }
 
@@ -100,13 +134,20 @@ function Compress-Item
             $zipEntryName = Split-Path -Leaf -Path $_
             if( $PSCmdlet.ShouldProcess( $_, ('compress to {0} as {1}' -f $OutFile,$zipEntryName)) )
             {
-                if( Test-Path -Path $_ -PathType Container )
+                if( $UseShell )
                 {
-                    [void]$zipFile.AddDirectory( $_, $zipEntryName )
+                    $zipFile.CopyHere($_, $copyHereFlags)
                 }
                 else
                 {
-                    [void]$zipFile.AddFile( $_, '.' )
+                    if( Test-Path -Path $_ -PathType Container )
+                    {
+                        [void]$zipFile.AddDirectory( $_, $zipEntryName )
+                    }
+                    else
+                    {
+                        [void]$zipFile.AddFile( $_, '.' )
+                    }
                 }
             }
         }
@@ -120,11 +161,32 @@ function Compress-Item
             return
         }
 
-        if( $PSCmdlet.ShouldProcess( $OutFile, 'saving' ) )
+        if( $UseShell )
         {
-            $zipFile.Save( $OutFile )
+            [void][Runtime.InteropServices.Marshal]::ReleaseComObject($zipFile)
+            [void][Runtime.InteropServices.Marshal]::ReleaseComObject($shellApp)
+            while( $true )
+            {
+                Start-Sleep -Milliseconds 100
+                try
+                {
+                    $file = [IO.File]::Open($OutFile, 'Open', 'Read', 'None')
+                    $file.Close()
+                    break
+                }
+                catch
+                {
+                }
+            }
         }
-        $zipFile.Dispose()
+        else
+        {
+            if( $PSCmdlet.ShouldProcess( $OutFile, 'saving' ) )
+            {
+                $zipFile.Save( $OutFile )
+            }
+            $zipFile.Dispose()
+        }
 
         Get-Item -Path $OutFile
     }
