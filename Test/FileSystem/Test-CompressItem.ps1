@@ -65,6 +65,23 @@ function Test-ShouldCompressDirectory
     $sourceRoot = Join-Path -Path $PSScriptRoot -ChildPath '..' -Resolve
     $file = Compress-Item -Path $sourceRoot
     Assert-ZipFileExists $file
+    Assert-ZipFileExpands $file $sourceRoot
+}
+
+function Test-ShouldCompressWithCOMShellAPI
+{
+    $sourceRoot = Join-Path -Path $PSScriptRoot -ChildPath '..' -Resolve
+    $file = Compress-Item -Path $sourceRoot -UseShell
+    Assert-ZipFileExists $file
+    Assert-ZipFileExpands $file $sourceRoot
+}
+
+function Assert-ZipFileExpands
+{
+    param(
+        $file,
+        $sourceRoot
+    )
 
     try
     {
@@ -86,7 +103,7 @@ function Test-ShouldCompressDirectory
     finally
     {
         Remove-Item -Path $file -ErrorAction Ignore
-    }
+    }    
 }
 
 function Test-ShouldCompressWithRelativePath
