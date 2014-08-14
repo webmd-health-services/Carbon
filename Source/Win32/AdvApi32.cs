@@ -22,7 +22,7 @@ using System.Text;
 
 namespace Carbon
 {
-    public sealed class AdvApi32
+    internal sealed class AdvApi32
     {
 
         [DllImport("advapi32.dll", SetLastError = true)]
