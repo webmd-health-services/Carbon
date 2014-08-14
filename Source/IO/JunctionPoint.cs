@@ -193,7 +193,7 @@ namespace Carbon.IO
 		/// an existing directory was found and <paramref name="overwrite" /> if false</exception>
 		public static void Create(string junctionPoint, string targetDir, bool overwrite)
 		{
-			targetDir = Path.GetFullPath(targetDir);
+			targetDir = System.IO.Path.GetFullPath(targetDir);
 
 			if (!Directory.Exists(targetDir))
 				throw new IOException("Target path does not exist or is not a directory.");
@@ -210,7 +210,7 @@ namespace Carbon.IO
 
 			using (SafeFileHandle handle = OpenReparsePoint(junctionPoint, EFileAccess.GenericWrite))
 			{
-				byte[] targetDirBytes = Encoding.Unicode.GetBytes(NonInterpretedPathPrefix + Path.GetFullPath(targetDir));
+				byte[] targetDirBytes = Encoding.Unicode.GetBytes(NonInterpretedPathPrefix + System.IO.Path.GetFullPath(targetDir));
 
 				REPARSE_DATA_BUFFER reparseDataBuffer = new REPARSE_DATA_BUFFER();
 
