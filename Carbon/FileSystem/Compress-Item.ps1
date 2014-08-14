@@ -165,18 +165,9 @@ function Compress-Item
         {
             [void][Runtime.InteropServices.Marshal]::ReleaseComObject($zipFile)
             [void][Runtime.InteropServices.Marshal]::ReleaseComObject($shellApp)
-            while( $true )
+            while( Find-OpenFile | Where-Object { $_.Path -eq $OutFile } )
             {
                 Start-Sleep -Milliseconds 100
-                try
-                {
-                    $file = [IO.File]::Open($OutFile, 'Open', 'Read', 'None')
-                    $file.Close()
-                    break
-                }
-                catch
-                {
-                }
             }
         }
         else
