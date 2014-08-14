@@ -60,7 +60,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AdvApi32.cs" />
     <Compile Include="Certificates\SslCertificateBinding.cs" />
     <Compile Include="Computer\ProgramInstallInfo.cs" />
     <Compile Include="Firewall\Rule.cs" />
@@ -74,10 +73,6 @@
     <Compile Include="IdentityType.cs" />
     <Compile Include="Ini\IniNode.cs" />
     <Compile Include="IO\JunctionPoint.cs" />
-    <Compile Include="Kernel32.cs" />
-    <Compile Include="Lsa.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="Properties\AssemblyVersion.cs" />
     <Compile Include="Security\ComAccessRights.cs" />
     <Compile Include="Security\ComAccessRule.cs" />
@@ -89,9 +84,12 @@
     <Compile Include="Service\ServiceInfo.cs" />
     <Compile Include="Service\StartType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Win32.cs" />
-    <Compile Include="Win32ErrorCodes.cs" />
+    <Compile Include="Win32\AdvApi32.cs" />
     <Compile Include="Win32\HandleInfo.cs" />
+    <Compile Include="Win32\Kernel32.cs" />
+    <Compile Include="Win32\Lsa.cs" />
+    <Compile Include="Win32\Win32.cs" />
+    <Compile Include="Win32\Win32ErrorCodes.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Carbon.snk" />
