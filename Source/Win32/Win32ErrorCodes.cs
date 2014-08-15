@@ -12,16 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Carbon
+namespace Carbon.Win32
 {
-    public static class Win32ErrorCodes
+    internal static class Win32ErrorCodes
     {
-        public const int ACCESS_DENIED             = 0x005;
-        public const int INVALID_HANDLE            = 0x006;
-        public const int INVALID_PARAMETER         = 0x057;
-        public const int INSUFFICIENT_BUFFER       = 0x07A;
-        public const int INVALID_FLAGS             = 0x3EC;
-        public const int SERVICE_MARKED_FOR_DELETE = 0x430;
-        public const int NONE_MAPPED               = 0x534;
+        internal const int AccessDenied             = 0x005;
+        internal const int InvalidHandle            = 0x006;
+        internal const int InvalidParameter         = 0x057;
+        internal const int InsufficientBuffer       = 0x07A;
+        internal const int InvalidFlags             = 0x3EC;
+        internal const int ServiceMarkedForDelete   = 0x430;
+        internal const int NoneMapped               = 0x534;
     }
 }

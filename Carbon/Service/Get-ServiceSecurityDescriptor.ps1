@@ -46,6 +46,6 @@ function Get-ServiceSecurityDescriptor
         $Name
     )
 
-    $sdBytes = [Carbon.AdvApi32]::GetServiceSecurityDescriptor($Name)
+    $sdBytes = [Carbon.Service.ServiceSecurity]::GetServiceSecurityDescriptor($Name)
     New-Object Security.AccessControl.RawSecurityDescriptor $sdBytes,0
 }

@@ -19,9 +19,9 @@ using System.Runtime.InteropServices;
 using System.Security.Principal;
 using System.Text;
 
-namespace Carbon.Win32
+namespace Carbon.Security
 {
-    public sealed class Lsa
+    public sealed class Privilege
     {
         // ReSharper disable InconsistentNaming
         [StructLayout(LayoutKind.Sequential)]
@@ -82,12 +82,6 @@ namespace Carbon.Win32
         private const uint POLICY_NOTIFICATION = 0x00001000;
         // ReSharper restore UnusedMember.Local
 
-        [DllImport("advapi32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        public static extern bool LookupPrivilegeValue(
-            [MarshalAs(UnmanagedType.LPTStr)] string lpSystemName, 
-            [MarshalAs(UnmanagedType.LPTStr)] string lpName, 
-            out LUID lpLuid);        
-
         [DllImport("advapi32.dll", CharSet = CharSet.Unicode)]
         private static extern uint LsaAddAccountRights(
             IntPtr PolicyHandle,
@@ -115,7 +109,7 @@ namespace Carbon.Win32
         private static extern uint LsaOpenPolicy(ref LSA_UNICODE_STRING SystemName, ref LSA_OBJECT_ATTRIBUTES ObjectAttributes, uint DesiredAccess, out IntPtr PolicyHandle );
 
         [DllImport("advapi32.dll", SetLastError = true, PreserveSig = true)]
-        static extern uint LsaRemoveAccountRights(
+        private static extern uint LsaRemoveAccountRights(
             IntPtr PolicyHandle,
             IntPtr AccountSid, 
             [MarshalAs(UnmanagedType.U1)] 
@@ -126,8 +120,7 @@ namespace Carbon.Win32
 
         private static IntPtr GetIdentitySid(string identity)
         {
-            var sid =
-                new NTAccount(identity).Translate(typeof (SecurityIdentifier)) as SecurityIdentifier;
+            var sid = new NTAccount(identity).Translate(typeof (SecurityIdentifier)) as SecurityIdentifier;
             if (sid == null)
             {
                 throw new ArgumentException(string.Format("Account {0} not found.", identity));
@@ -152,9 +145,9 @@ namespace Carbon.Win32
                 SecurityQualityOfService = IntPtr.Zero
             };
 
-            const uint ACCESS_MASK = POLICY_CREATE_SECRET | POLICY_LOOKUP_NAMES | POLICY_VIEW_LOCAL_INFORMATION;
+            const uint accessMask = POLICY_CREATE_SECRET | POLICY_LOOKUP_NAMES | POLICY_VIEW_LOCAL_INFORMATION;
             var machineNameLsa = new LSA_UNICODE_STRING(computerName);
-            var result = LsaOpenPolicy(ref machineNameLsa, ref objectAttributes, ACCESS_MASK, out hPolicy);
+            var result = LsaOpenPolicy(ref machineNameLsa, ref objectAttributes, accessMask, out hPolicy);
             HandleLsaResult(result);
             return hPolicy;
         }
@@ -174,7 +167,7 @@ namespace Carbon.Win32
                 var result = LsaEnumerateAccountRights(hPolicy, sidPtr, out rightsPtr, out rightsCount);
                 var win32ErrorCode = LsaNtStatusToWinError(result);
                 // the user has no privileges
-                if( win32ErrorCode == STATUS_OBJECT_NAME_NOT_FOUND )
+                if( win32ErrorCode == StatusObjectNameNotFound )
                 {
                     return new string[0];
                 }
@@ -221,35 +214,35 @@ namespace Carbon.Win32
             }
         }
 
-        const int STATUS_SUCCESS = 0x0;
-        const int STATUS_OBJECT_NAME_NOT_FOUND = 0x00000002;
-        const int STATUS_ACCESS_DENIED = 0x00000005;
-        const int STATUS_INVALID_HANDLE = 0x00000006;
-        const int STATUS_UNSUCCESSFUL = 0x0000001F;
-        const int STATUS_INVALID_PARAMETER = 0x00000057;
-        const int STATUS_NO_SUCH_PRIVILEGE = 0x00000521;
-        const int STATUS_INVALID_SERVER_STATE = 0x00000548;
-        const int STATUS_INTERNAL_DB_ERROR = 0x00000567;
-        const int STATUS_INSUFFICIENT_RESOURCES = 0x000005AA;
+        private const int StatusSuccess = 0x0;
+        private const int StatusObjectNameNotFound = 0x00000002;
+        private const int StatusAccessDenied = 0x00000005;
+        private const int StatusInvalidHandle = 0x00000006;
+        private const int StatusUnsuccessful = 0x0000001F;
+        private const int StatusInvalidParameter = 0x00000057;
+        private const int StatusNoSuchPrivilege = 0x00000521;
+        private const int StatusInvalidServerState = 0x00000548;
+        private const int StatusInternalDbError = 0x00000567;
+        private const int StatusInsufficientResources = 0x000005AA;
 
         private static readonly Dictionary<int, string> ErrorMessages = new Dictionary<int, string>
                                     {
-                                        {STATUS_OBJECT_NAME_NOT_FOUND, "Object name not found. An object in the LSA policy database was not found. The object may have been specified either by SID or by name, depending on its type."},
-                                        {STATUS_ACCESS_DENIED, "Access denied. Caller does not have the appropriate access to complete the operation."},
-                                        {STATUS_INVALID_HANDLE, "Invalid handle. Indicates an object or RPC handle is not valid in the context used."},
-                                        {STATUS_UNSUCCESSFUL, "Unsuccessful. Generic failure, such as RPC connection failure."},
-                                        {STATUS_INVALID_PARAMETER, "Invalid parameter. One of the parameters is not valid."},
-                                        {STATUS_NO_SUCH_PRIVILEGE, "No such privilege. Indicates a specified privilege does not exist."},
-                                        {STATUS_INVALID_SERVER_STATE, "Invalid server state. Indicates the LSA server is currently disabled."},
-                                        {STATUS_INTERNAL_DB_ERROR, "Internal database error. The LSA database contains an internal inconsistency."},
-                                        {STATUS_INSUFFICIENT_RESOURCES, "Insufficient resources. There are not enough system resources (such as memory to allocate buffers) to complete the call."}
+                                        {StatusObjectNameNotFound, "Object name not found. An object in the LSA policy database was not found. The object may have been specified either by SID or by name, depending on its type."},
+                                        {StatusAccessDenied, "Access denied. Caller does not have the appropriate access to complete the operation."},
+                                        {StatusInvalidHandle, "Invalid handle. Indicates an object or RPC handle is not valid in the context used."},
+                                        {StatusUnsuccessful, "Unsuccessful. Generic failure, such as RPC connection failure."},
+                                        {StatusInvalidParameter, "Invalid parameter. One of the parameters is not valid."},
+                                        {StatusNoSuchPrivilege, "No such privilege. Indicates a specified privilege does not exist."},
+                                        {StatusInvalidServerState, "Invalid server state. Indicates the LSA server is currently disabled."},
+                                        {StatusInternalDbError, "Internal database error. The LSA database contains an internal inconsistency."},
+                                        {StatusInsufficientResources, "Insufficient resources. There are not enough system resources (such as memory to allocate buffers) to complete the call."}
                                     };
 
         private static void HandleLsaResult(uint returnCode)
         {
             var win32ErrorCode = LsaNtStatusToWinError(returnCode);
 
-            if( win32ErrorCode == STATUS_SUCCESS)
+            if( win32ErrorCode == StatusSuccess)
                 return;
 
             if( ErrorMessages.ContainsKey(win32ErrorCode) )

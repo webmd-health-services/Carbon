@@ -6,29 +6,29 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace Carbon
+namespace Carbon.Win32
 {
 	public sealed class HandleInfo
 	{
-		private static byte DirectoryObjectTypeNumber = 0;
-		private static bool FoundDirectoryObjectTypeNumber = false;
-		private static byte FileObjectTypeNumber = 0;
-		private static bool FoundFileObjectTypeNumber = false;
+		private static byte _directoryObjectTypeNumber;
+		private static bool _foundDirectoryObjectTypeNumber;
+		private static byte _fileObjectTypeNumber;
+		private static bool _foundFileObjectTypeNumber;
 
 		[DllImport("ntdll.dll")]
-		private static extern NT_STATUS NtQueryObject(
-			[In] IntPtr Handle,
-			[In] OBJECT_INFORMATION_CLASS ObjectInformationClass,
-			[In] IntPtr ObjectInformation,
-			[In] int ObjectInformationLength,
-			[Out] out int ReturnLength);
+		private static extern NtStatus NtQueryObject(
+			[In] IntPtr handle,
+			[In] ObjectInformationClass objectInformationClass,
+			[In] IntPtr objectInformation,
+			[In] int objectInformationLength,
+			[Out] out int returnLength);
 
 		[DllImport("ntdll.dll")]
-		private static extern NT_STATUS NtQuerySystemInformation(
-			[In] SYSTEM_INFORMATION_CLASS SystemInformationClass,
-			[In] IntPtr SystemInformation,
-			[In] int SystemInformationLength,
-			[Out] out int ReturnLength);
+		private static extern NtStatus NtQuerySystemInformation(
+			[In] SystemInformationClass systemInformationClass,
+			[In] IntPtr systemInformation,
+			[In] int systemInformationLength,
+			[Out] out int returnLength);
 
 		[DllImport("kernel32.dll", SetLastError = true)]
 		private static extern IntPtr OpenProcess(
@@ -57,16 +57,19 @@ namespace Carbon
 		[StructLayout(LayoutKind.Sequential)]
 		private struct SystemHandleEntry
 		{
+			// ReSharper disable FieldCanBeMadeReadOnly.Local
 			public int OwnerProcessId;
 			public byte ObjectTypeNumber;
 			public byte Flags;
 			public ushort Handle;
 			public IntPtr Object;
 			public int GrantedAccess;
+			// ReSharper restore FieldCanBeMadeReadOnly.Local
 		}
 
-		private enum SYSTEM_INFORMATION_CLASS
+		private enum SystemInformationClass
 		{
+			// ReSharper disable UnusedMember.Local
 			SystemBasicInformation = 0,
 			SystemPerformanceInformation = 2,
 			SystemTimeOfDayInformation = 3,
@@ -77,22 +80,27 @@ namespace Carbon
 			SystemExceptionInformation = 33,
 			SystemRegistryQuotaInformation = 37,
 			SystemLookasideInformation = 45
+			// ReSharper restore UnusedMember.Local
 		}
 
-		private enum OBJECT_INFORMATION_CLASS
+		private enum ObjectInformationClass
 		{
+			// ReSharper disable UnusedMember.Local
 			ObjectBasicInformation = 0,
 			ObjectNameInformation = 1,
 			ObjectTypeInformation = 2,
 			ObjectAllTypesInformation = 3,
 			ObjectHandleInformation = 4
+			// ReSharper restore UnusedMember.Local
 		}
 
-		private enum NT_STATUS
+		private enum NtStatus
 		{
-			STATUS_SUCCESS = 0x00000000,
-			STATUS_BUFFER_OVERFLOW = unchecked((int) 0x80000005L),
-			STATUS_INFO_LENGTH_MISMATCH = unchecked((int) 0xC0000004L)
+			// ReSharper disable UnusedMember.Local
+			StatusSuccess = 0x00000000,
+			StatusBufferOverflow = unchecked((int) 0x80000005L),
+			StatusInfoLengthMismatch = unchecked((int) 0xC0000004L)
+			// ReSharper restore UnusedMember.Local
 		}
 
 		private HandleInfo(string path, Process process)
@@ -116,16 +124,16 @@ namespace Carbon
 				{
 					ptr = Marshal.AllocHGlobal(length);
 					int wantedLength;
-					var systemHandleInformation = SYSTEM_INFORMATION_CLASS.SystemHandleInformation;
+					var systemHandleInformation = SystemInformationClass.SystemHandleInformation;
 					var result = NtQuerySystemInformation(systemHandleInformation, ptr, length, out wantedLength);
-					;
-					if (result == NT_STATUS.STATUS_INFO_LENGTH_MISMATCH)
+					
+					if (result == NtStatus.StatusInfoLengthMismatch)
 					{
 						length = Math.Max(length, wantedLength);
 						Marshal.FreeHGlobal(ptr);
 						ptr = IntPtr.Zero;
 					}
-					else if (result == NT_STATUS.STATUS_SUCCESS)
+					else if (result == NtStatus.StatusSuccess)
 					{
 						break;
 					}
@@ -150,9 +158,9 @@ namespace Carbon
 					var fileHandle = (SystemHandleEntry) Marshal.PtrToStructure((IntPtr) ((long) ptr + offset), systemHandleEntry.GetType());
 					var typeNumber = fileHandle.ObjectTypeNumber;
 
-					if (FoundFileObjectTypeNumber && FoundDirectoryObjectTypeNumber)
+					if (_foundFileObjectTypeNumber && _foundDirectoryObjectTypeNumber)
 					{
-						if (typeNumber != FileObjectTypeNumber && typeNumber != DirectoryObjectTypeNumber)
+						if (typeNumber != _fileObjectTypeNumber && typeNumber != _directoryObjectTypeNumber)
 						{
 							continue;
 						}
@@ -172,18 +180,18 @@ namespace Carbon
 						continue;
 					}
 
-					if( !FoundFileObjectTypeNumber && fileExists )
+					if( !_foundFileObjectTypeNumber && fileExists )
 					{
 						//Console.WriteLine("File object type number: {0}", typeNumber);
-						FileObjectTypeNumber = typeNumber;
-						FoundFileObjectTypeNumber = true;
+						_fileObjectTypeNumber = typeNumber;
+						_foundFileObjectTypeNumber = true;
 					}
 
-					if( !FoundDirectoryObjectTypeNumber && dirExists )
+					if( !_foundDirectoryObjectTypeNumber && dirExists )
 					{
 						//Console.WriteLine("Directory object type number: {0}", typeNumber);
-						DirectoryObjectTypeNumber = typeNumber;
-						FoundDirectoryObjectTypeNumber = true;
+						_directoryObjectTypeNumber = typeNumber;
+						_foundDirectoryObjectTypeNumber = true;
 					}
 					handles.Add(handle);
 
@@ -219,10 +227,10 @@ namespace Carbon
 				}
 
 				int length;
-				NtQueryObject(handleDuplicate, OBJECT_INFORMATION_CLASS.ObjectNameInformation, IntPtr.Zero, 0, out length);
+				NtQueryObject(handleDuplicate, ObjectInformationClass.ObjectNameInformation, IntPtr.Zero, 0, out length);
 
 				var ptr = Marshal.AllocHGlobal(length);
-				if (NtQueryObject(handleDuplicate, OBJECT_INFORMATION_CLASS.ObjectNameInformation, ptr, length, out length) != NT_STATUS.STATUS_SUCCESS)
+				if (NtQueryObject(handleDuplicate, ObjectInformationClass.ObjectNameInformation, ptr, length, out length) != NtStatus.StatusSuccess)
 				{
 					return null;
 				}

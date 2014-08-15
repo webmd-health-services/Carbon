@@ -32,11 +32,11 @@ function Find-OpenFile
     Demonstrates how to get a list of all the files that are currently open.
     #>
     [CmdletBinding()]
-    [OutputType([Carbon.HandleInfo])]
+    [OutputType([Carbon.Win32.HandleInfo])]
     param(
     )
 
     Set-StrictMode -Version 'Latest'
 
-    [Carbon.HandleInfo]::GetFileSystemHandles()
+    [Carbon.Win32.HandleInfo]::GetFileSystemHandles()
 }

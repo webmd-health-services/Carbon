@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
+using Carbon.Win32;
 using NUnit.Framework;
 
 namespace Carbon.Test.Win32
@@ -16,6 +17,7 @@ namespace Carbon.Test.Win32
 
 			var me = Process.GetCurrentProcess();
 
+			// ReSharper disable once UnusedVariable
 			using (var stream = File.OpenWrite(tempPath))
 			{
 				var startedAt = DateTime.Now;

@@ -521,9 +521,9 @@
             </TableControl>
         </View>
         <View>
-            <Name>Carbon.HandleInfo</Name>
+            <Name>Carbon.Win32.HandleInfo</Name>
             <ViewSelectedBy>
-                <TypeName>Carbon.HandleInfo</TypeName>
+                <TypeName>Carbon.Win32.HandleInfo</TypeName>
             </ViewSelectedBy>
             <TableControl>
                 <TableHeaders>

@@ -188,13 +188,13 @@ namespace Carbon.Service
 		#region P/Invoke declarations
 
 		[StructLayout(LayoutKind.Sequential)]
-		public class SERVICE_DESCRIPTION
+		private class SERVICE_DESCRIPTION
 		{
 			[MarshalAs(UnmanagedType.LPWStr)] public String lpDescription;
 		}
 
 		[StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
-		public class SERVICE_FAILURE_ACTIONS
+		private class SERVICE_FAILURE_ACTIONS
 		{
 			public int dwResetPeriod;
 			[MarshalAs(UnmanagedType.LPWStr)] public string lpRebootMsg;
@@ -203,29 +203,22 @@ namespace Carbon.Service
 			public IntPtr lpsaActions;
 		}
 
-		[StructLayout(LayoutKind.Sequential)]
-		public class SC_ACTION
-		{
-			public Int32 type;
-			public UInt32 dwDelay;
-		}
-
 		[DllImport("advapi32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
-		public static extern IntPtr OpenSCManager(String lpMachineName, String lpDatabaseName, UInt32 dwDesiredAccess);
+		private static extern IntPtr OpenSCManager(String lpMachineName, String lpDatabaseName, UInt32 dwDesiredAccess);
 
 		[DllImport("advapi32.dll", SetLastError = true)]
 		[return: MarshalAs(UnmanagedType.Bool)]
-		public static extern bool CloseServiceHandle(IntPtr hSCObject);
+		private static extern bool CloseServiceHandle(IntPtr hSCObject);
 		
 		[DllImport("advapi32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
-		public static extern IntPtr OpenService(IntPtr hSCManager, String lpServiceName, UInt32 dwDesiredAccess);
+		private static extern IntPtr OpenService(IntPtr hSCManager, String lpServiceName, UInt32 dwDesiredAccess);
 
 		[DllImport("advapi32.dll", CharSet = CharSet.Unicode, SetLastError = true, EntryPoint = "QueryServiceConfig2W")]
-		public static extern Boolean QueryServiceConfig2(IntPtr hService, UInt32 dwInfoLevel, IntPtr buffer, UInt32 cbBufSize,
+		private static extern Boolean QueryServiceConfig2(IntPtr hService, UInt32 dwInfoLevel, IntPtr buffer, UInt32 cbBufSize,
 			out UInt32 pcbBytesNeeded);
 	
 		[DllImport("advapi32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
-		public static extern Boolean QueryServiceConfig(IntPtr hService, IntPtr intPtrQueryConfig, UInt32 cbBufSize, out UInt32 pcbBytesNeeded);
+		private static extern Boolean QueryServiceConfig(IntPtr hService, IntPtr intPtrQueryConfig, UInt32 cbBufSize, out UInt32 pcbBytesNeeded);
 
 		private const Int32 SC_MANAGER_ALL_ACCESS = 0x000F003F;
 		private const Int32 SERVICE_QUERY_CONFIG = 0x00000001;
@@ -233,7 +226,7 @@ namespace Carbon.Service
 		private const UInt32 SERVICE_CONFIG_FAILURE_ACTIONS = 0x02;
 
 		[StructLayout(LayoutKind.Sequential)]
-		public class QUERY_SERVICE_CONFIG
+		private class QUERY_SERVICE_CONFIG
 		{
 			[MarshalAs(System.Runtime.InteropServices.UnmanagedType.U4)]
 			public UInt32 dwServiceType;

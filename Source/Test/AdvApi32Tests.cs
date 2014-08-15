@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Carbon.Service;
 using NUnit.Framework;
-using Carbon.Win32;
 
 namespace Carbon.Test
 {
@@ -23,7 +23,7 @@ namespace Carbon.Test
         [Test]
         public void ShouldGetPermissions()
         {
-            AdvApi32.GetServiceSecurityDescriptor("CarbonGrantPrivilege");
+            ServiceSecurity.GetServiceSecurityDescriptor("CarbonGrantPrivilege");
         }
     }
 }

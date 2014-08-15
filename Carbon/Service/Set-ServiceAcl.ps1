@@ -59,6 +59,6 @@ function Set-ServiceAcl
     
     if( $pscmdlet.ShouldProcess( ("{0} service DACL" -f $Name), "set" ) )
     {
-        [Carbon.AdvApi32]::SetServiceSecurityDescriptor( $Name, $sdBytes )
+        [Carbon.Service.ServiceSecurity]::SetServiceSecurityDescriptor( $Name, $sdBytes )
     }
 }

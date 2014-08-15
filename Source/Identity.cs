@@ -23,6 +23,7 @@ namespace Carbon
 {
     public sealed class Identity
     {
+		// ReSharper disable InconsistentNaming
 		[DllImport("advapi32.dll", CharSet = CharSet.Auto, SetLastError = true)]
 		private static extern bool LookupAccountName(
 			string lpSystemName,
@@ -34,9 +35,13 @@ namespace Carbon
 			out IdentityType peUse);
 
 		[DllImport("advapi32", CharSet = CharSet.Auto, SetLastError = true)]
-		internal static extern bool ConvertSidToStringSid(
+		private static extern bool ConvertSidToStringSid(
 			[MarshalAs(UnmanagedType.LPArray)] byte[] pSID,
 			out IntPtr ptrSid);
+
+		[DllImport("kernel32.dll")]
+		private static extern IntPtr LocalFree(IntPtr hMem);
+		// ReSharper restore InconsistentNaming
 
 		private Identity(string domain, string name, SecurityIdentifier sid, IdentityType type)
         {
@@ -109,7 +114,7 @@ namespace Carbon
             }
 
             err = Marshal.GetLastWin32Error();
-            if (err == Win32ErrorCodes.INSUFFICIENT_BUFFER || err == Win32ErrorCodes.INVALID_FLAGS)
+            if (err == Win32ErrorCodes.InsufficientBuffer || err == Win32ErrorCodes.InvalidFlags)
             {
                 rawSid = new byte[cbSid];
                 referencedDomainName.EnsureCapacity((int) cchReferencedDomainName);
@@ -118,7 +123,7 @@ namespace Carbon
                     throw new Win32Exception();
                 }
             }
-            else if (err == Win32ErrorCodes.NONE_MAPPED)
+            else if (err == Win32ErrorCodes.NoneMapped)
             {
                 // Couldn't find the account.
                 return null;
@@ -135,7 +140,7 @@ namespace Carbon
             }
 
             var sid = new SecurityIdentifier(rawSid, 0);
-            Kernel32.LocalFree(ptrSid);
+            LocalFree(ptrSid);
             var ntAccount = sid.Translate(typeof (NTAccount));
             var domainName = referencedDomainName.ToString();
             var accountName = ntAccount.Value;

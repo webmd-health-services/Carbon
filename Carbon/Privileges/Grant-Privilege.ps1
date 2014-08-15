@@ -102,7 +102,7 @@ function Grant-Privilege
     
     try
     {
-        [Carbon.Lsa]::GrantPrivileges( $account.FullName, $Privilege )
+        [Carbon.Security.Privilege]::GrantPrivileges( $account.FullName, $Privilege )
     }
     catch
     {

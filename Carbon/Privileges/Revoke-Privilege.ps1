@@ -110,7 +110,7 @@ function Revoke-Privilege
     
     try
     {
-        [Carbon.Lsa]::RevokePrivileges($account.FullName,$cPrivileges)
+        [Carbon.Security.Privilege]::RevokePrivileges($account.FullName,$cPrivileges)
     }
     catch
     {

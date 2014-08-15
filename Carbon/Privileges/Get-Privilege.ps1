@@ -49,7 +49,7 @@ function Get-Privilege
         $Identity
     )
     
-    [Carbon.Lsa]::GetPrivileges( $Identity )
+    [Carbon.Security.Privilege]::GetPrivileges( $Identity )
 }
 
 Set-Alias -Name 'Get-Privileges' -Value 'Get-Privilege'

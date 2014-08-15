@@ -17,10 +17,11 @@ using System.ComponentModel;
 using System.Runtime.InteropServices;
 using System.Security.AccessControl;
 using System.ServiceProcess;
+using Carbon.Win32;
 
-namespace Carbon.Win32
+namespace Carbon.Service
 {
-    public sealed class AdvApi32
+    public sealed class ServiceSecurity
     {
 
 		// ReSharper disable InconsistentNaming
@@ -36,10 +37,10 @@ namespace Carbon.Win32
         private static readonly Dictionary<int, string> QueryServiceObjectSecurityReturnCodes =
             new Dictionary<int, string>
                 {
-                    { Win32ErrorCodes.ACCESS_DENIED, "Access denied. The specified handle was not opened with READ_CONTROL access, or the calling process is not the owner of the object." },
-                    { Win32ErrorCodes.INVALID_HANDLE, "Invalid handle. The specified handle is not valid."},
-                    { Win32ErrorCodes.INVALID_PARAMETER, "Invalid Parameter. The specified security information is not valid." },
-                    { Win32ErrorCodes.INVALID_FLAGS, "Invalid flags." }
+                    { Win32ErrorCodes.AccessDenied, "Access denied. The specified handle was not opened with READ_CONTROL access, or the calling process is not the owner of the object." },
+                    { Win32ErrorCodes.InvalidHandle, "Invalid handle. The specified handle is not valid."},
+                    { Win32ErrorCodes.InvalidParameter, "Invalid Parameter. The specified security information is not valid." },
+                    { Win32ErrorCodes.InvalidFlags, "Invalid flags." }
                 };
 
         public static byte[] GetServiceSecurityDescriptor(string serviceName)
@@ -55,7 +56,7 @@ namespace Carbon.Win32
             if (!ok)
             {
                 var errorCode = Marshal.GetLastWin32Error();
-                if (errorCode == Win32ErrorCodes.INSUFFICIENT_BUFFER)
+                if (errorCode == Win32ErrorCodes.InsufficientBuffer)
                 {
                     // expected; now we know bufsize
                     sdBytes = new byte[bufSizeNeeded];
@@ -74,10 +75,10 @@ namespace Carbon.Win32
 
         private static readonly Dictionary<int,string> SetServiceObjectSecurityReturnCodes  = new Dictionary<int, string>
                     {
-                        { Win32ErrorCodes.ACCESS_DENIED, "Access denied. The specified handle was not opened with the required access, or the calling process is not the owner of the object." },
-                        { Win32ErrorCodes.INVALID_HANDLE, "Invalid handle. The specified handle is not valid." },
-                        { Win32ErrorCodes.INVALID_PARAMETER, "Invalid Parameter. The specified security information or security descriptor is not valid." },
-                        { Win32ErrorCodes.SERVICE_MARKED_FOR_DELETE, "Service marked for delete. The specified service has been marked for deletion." }
+                        { Win32ErrorCodes.AccessDenied, "Access denied. The specified handle was not opened with the required access, or the calling process is not the owner of the object." },
+                        { Win32ErrorCodes.InvalidHandle, "Invalid handle. The specified handle is not valid." },
+                        { Win32ErrorCodes.InvalidParameter, "Invalid Parameter. The specified security information or security descriptor is not valid." },
+                        { Win32ErrorCodes.ServiceMarkedForDelete, "Service marked for delete. The specified service has been marked for deletion." }
                     };
 
         public static void SetServiceSecurityDescriptor(string serviceName, byte[] sdBytes)

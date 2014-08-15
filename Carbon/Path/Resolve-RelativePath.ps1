@@ -71,12 +71,12 @@ function Resolve-RelativePath
         {
             'FromFile'
             {
-                $fromAttr = [System.IO.FileAttributes]::Normal
+                $fromAttr = [IO.FileAttributes]::Normal
                 $fromPath = $FromFile
             }
             'FromDirectory'
             {
-                $fromAttr = [System.IO.FileAttributes]::Directory
+                $fromAttr = [IO.FileAttributes]::Directory
                 $fromPath = $FromDirectory
             }
         }
@@ -87,8 +87,8 @@ function Resolve-RelativePath
             $toPath = $Path.FullName
         }
         
-        $toAttr = [System.IO.FileAttributes]::Normal
-        $converted = [Carbon.Win32]::PathRelativePathTo( $relativePath, $fromPath, $fromAttr, $toPath, $toAttr )
+        $toAttr = [IO.FileAttributes]::Normal
+        $converted = [Carbon.IO.Path]::PathRelativePathTo( $relativePath, $fromPath, $fromAttr, $toPath, $toAttr )
         $result = if( $converted ) { $relativePath.ToString() } else { $null }
         return $result
     }

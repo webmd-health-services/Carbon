@@ -275,7 +275,7 @@
         </Members>
     </Type>
     <Type>
-        <Name>Carbon.HandleInfo</Name>
+        <Name>Carbon.Win32.HandleInfo</Name>
         <Members>
             <ScriptProperty>
                 <Name>ProcessID</Name>
