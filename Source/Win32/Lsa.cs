@@ -19,7 +19,7 @@ using System.Runtime.InteropServices;
 using System.Security.Principal;
 using System.Text;
 
-namespace Carbon
+namespace Carbon.Win32
 {
     public sealed class Lsa
     {

@@ -11,8 +11,8 @@ namespace Carbon.Test.Win32
 		[Test]
 		public void ShouldGetFileSystemHandles()
 		{
-			var tempPath = string.Format("Carbon.dll-HandleInfoTestFixture-{0}", Path.GetRandomFileName());
-			tempPath = Path.Combine(Path.GetTempPath(), tempPath);
+			var tempPath = string.Format("Carbon.dll-HandleInfoTestFixture-{0}", System.IO.Path.GetRandomFileName());
+			tempPath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), tempPath);
 
 			var me = Process.GetCurrentProcess();
 

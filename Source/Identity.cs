@@ -17,13 +17,28 @@ using System.ComponentModel;
 using System.Runtime.InteropServices;
 using System.Security.Principal;
 using System.Text;
-using System.Text.RegularExpressions;
+using Carbon.Win32;
 
 namespace Carbon
 {
     public sealed class Identity
     {
-        private Identity(string domain, string name, SecurityIdentifier sid, IdentityType type)
+		[DllImport("advapi32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+		private static extern bool LookupAccountName(
+			string lpSystemName,
+			string lpAccountName,
+			[MarshalAs(UnmanagedType.LPArray)] byte[] Sid,
+			ref uint cbSid,
+			StringBuilder ReferencedDomainName,
+			ref uint cchReferencedDomainName,
+			out IdentityType peUse);
+
+		[DllImport("advapi32", CharSet = CharSet.Auto, SetLastError = true)]
+		internal static extern bool ConvertSidToStringSid(
+			[MarshalAs(UnmanagedType.LPArray)] byte[] pSID,
+			out IntPtr ptrSid);
+
+		private Identity(string domain, string name, SecurityIdentifier sid, IdentityType type)
         {
             Domain = domain;
             Name = name;
@@ -88,7 +103,7 @@ namespace Carbon
 	        }
 
             int err;
-            if (AdvApi32.LookupAccountName(null, name, rawSid, ref cbSid, referencedDomainName, ref cchReferencedDomainName, out sidUse))
+            if (LookupAccountName(null, name, rawSid, ref cbSid, referencedDomainName, ref cchReferencedDomainName, out sidUse))
             {
                 throw new Win32Exception();
             }
@@ -98,7 +113,7 @@ namespace Carbon
             {
                 rawSid = new byte[cbSid];
                 referencedDomainName.EnsureCapacity((int) cchReferencedDomainName);
-                if (!AdvApi32.LookupAccountName(null, name, rawSid, ref cbSid, referencedDomainName, ref cchReferencedDomainName, out sidUse))
+                if (!LookupAccountName(null, name, rawSid, ref cbSid, referencedDomainName, ref cchReferencedDomainName, out sidUse))
                 {
                     throw new Win32Exception();
                 }
@@ -114,7 +129,7 @@ namespace Carbon
             }
 
             IntPtr ptrSid;
-            if (!AdvApi32.ConvertSidToStringSid(rawSid, out ptrSid))
+            if (!ConvertSidToStringSid(rawSid, out ptrSid))
             {
                 throw new Win32Exception();
             }

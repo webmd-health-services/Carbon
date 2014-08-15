@@ -18,7 +18,7 @@ using System.Text;
 
 namespace Carbon
 {
-	public class Win32
+	public class Path
 	{
 		[DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Auto)]
 		public static extern uint GetLongPathName(

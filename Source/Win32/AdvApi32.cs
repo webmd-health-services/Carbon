@@ -12,24 +12,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
 using System.Security.AccessControl;
 using System.ServiceProcess;
-using System.Text;
 
-namespace Carbon
+namespace Carbon.Win32
 {
-    internal sealed class AdvApi32
+    public sealed class AdvApi32
     {
 
-        [DllImport("advapi32.dll", SetLastError = true)]
+		// ReSharper disable InconsistentNaming
+		[DllImport("advapi32.dll", SetLastError = true)]
         private static extern bool QueryServiceObjectSecurity(SafeHandle serviceHandle, SecurityInfos secInfo,
                                                               byte[] lpSecDesrBuf, uint bufSize, out uint bufSizeNeeded);
 
-        // http://msdn.microsoft.com/en-us/library/cc231199.aspx
+		[DllImport("advapi32.dll", SetLastError = true)]
+		private static extern bool SetServiceObjectSecurity(SafeHandle serviceHandle, SecurityInfos secInfos, byte[] lpSecDesrBuf);
+		// ReSharper restore InconsistentNaming
+
+		// http://msdn.microsoft.com/en-us/library/cc231199.aspx
         private static readonly Dictionary<int, string> QueryServiceObjectSecurityReturnCodes =
             new Dictionary<int, string>
                 {
@@ -69,11 +72,6 @@ namespace Carbon
         }
 
 
-        // ReSharper disable InconsistentNaming
-        [DllImport("advapi32.dll", SetLastError = true)]
-        static extern bool SetServiceObjectSecurity(SafeHandle serviceHandle, SecurityInfos secInfos, byte[] lpSecDesrBuf);
-        // ReSharper restore InconsistentNaming
-
         private static readonly Dictionary<int,string> SetServiceObjectSecurityReturnCodes  = new Dictionary<int, string>
                     {
                         { Win32ErrorCodes.ACCESS_DENIED, "Access denied. The specified handle was not opened with the required access, or the calling process is not the owner of the object." },
@@ -100,24 +98,5 @@ namespace Carbon
             }
             throw new Win32Exception(errorCode);
         }
-
-        #region ResolveAccountName
-
-        [DllImport("advapi32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        internal static extern bool LookupAccountName(
-            string lpSystemName,
-            string lpAccountName,
-            [MarshalAs(UnmanagedType.LPArray)] byte[] Sid,
-            ref uint cbSid,
-            StringBuilder ReferencedDomainName,
-            ref uint cchReferencedDomainName,
-            out IdentityType peUse);
-
-        [DllImport("advapi32", CharSet = CharSet.Auto, SetLastError = true)]
-        internal static extern bool ConvertSidToStringSid(
-            [MarshalAs(UnmanagedType.LPArray)] byte[] pSID,
-            out IntPtr ptrSid);
-
-        #endregion
     }
 }

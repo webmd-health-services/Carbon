@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using NUnit.Framework;
+using Carbon.Win32;
 
 namespace Carbon.Test
 {
