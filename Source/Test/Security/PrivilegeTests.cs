@@ -17,7 +17,7 @@ using System.ComponentModel;
 using Carbon.Security;
 using NUnit.Framework;
 
-namespace Carbon.Test.Lsa
+namespace Carbon.Test.Security
 {
     [TestFixture]
     public sealed class LsaTests

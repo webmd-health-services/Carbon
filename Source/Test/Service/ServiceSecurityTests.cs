@@ -15,7 +15,7 @@
 using Carbon.Service;
 using NUnit.Framework;
 
-namespace Carbon.Test
+namespace Carbon.Test.Service
 {
     [TestFixture]
     public sealed class AdvApi32Tests
