@@ -69,10 +69,10 @@
     </Compile>
     <Compile Include="Certificates\SslCertificateBindingTestFixture.cs" />
     <Compile Include="IdentityTest.cs" />
-    <Compile Include="Lsa\LsaTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="AdvApi32Tests.cs" />
+    <Compile Include="Security\PrivilegeTests.cs" />
     <Compile Include="Service\ServiceInfoTestFixture.cs" />
+    <Compile Include="Service\ServiceSecurityTests.cs" />
     <Compile Include="Win32\HandleInfoTestFixture.cs" />
   </ItemGroup>
   <ItemGroup>
