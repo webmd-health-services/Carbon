@@ -208,7 +208,7 @@ function Test-ShouldTestOnProperties
     Assert-True (Test-TargetResource @testParams -Dependency @() -Ensure Present)
     Assert-False (Test-TargetResource @testParams -Dependency @( 'W3SVC' ) -Ensure Present)
 
-    Assert-True (Test-TargetResource @testParams -UserName 'NT AUTHORITY\NETWORK SERVICE' -Ensure Present)
+    Assert-True (Test-TargetResource @testParams -UserName 'NetworkService' -Ensure Present)
     Assert-False (Test-TargetResource @testParams -Credential $credential -Ensure Present)
 }
 

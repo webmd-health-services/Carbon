@@ -64,9 +64,10 @@ function Get-TargetResource
         # What other services does this service depend on?
         $Dependency,
         
+        [ValidateSet("LocalSystem", "LocalService", "NetworkService")]
         [string]
         # The system account the service should run as.
-        $Username,
+        $UserName,
         
         [pscredential]
         # The credentials of the custom account the service should run as.
@@ -187,6 +188,7 @@ function Set-TargetResource
         # What other services does this service depend on?
         $Dependency,
         
+        [ValidateSet("LocalSystem", "LocalService", "NetworkService")]
         [string]
         # The system account the service should run as.
         $UserName,
@@ -291,6 +293,7 @@ function Test-TargetResource
         # What other services does this service depend on?
         $Dependency,
         
+        [ValidateSet("LocalSystem", "LocalService", "NetworkService")]
         [string]
         # The system account the service should run as.
         $UserName,
@@ -329,7 +332,7 @@ function Test-TargetResource
 
     if( $PSBoundParameters.ContainsKey( 'UserName' ) )
     {
-        $identity = Resolve-Identity -Name $Username
+        $identity = Resolve-Identity -Name $UserName
         if( $identity )
         {
             $PSBoundParameters['UserName'] = $identity.FullName
