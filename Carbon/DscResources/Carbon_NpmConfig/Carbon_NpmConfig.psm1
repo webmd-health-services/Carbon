@@ -14,23 +14,36 @@
 
 & (Join-Path -Path $PSScriptRoot -ChildPath '..\Initialize-CarbonDscResource.ps1' -Resolve)
 
-$npmCmd = Get-Command -Name 'npm.cmd' -ErrorAction Ignore
-if( -not $npmCmd )
-{
-    $npmCmd = Get-Command -Name (Join-Path -Path $env:ProgramFiles -ChildPath 'nodejs\npm.cmd') -ErrorAction Ignore
-    if( -not $npmCmd )
-    {
-        Write-Error ('npm.cmd not found.')
-        return
-    }
-}
+$npmrcPath = $null
 
-$nodeJsRoot = Split-Path -Parent -Path $npmCmd.Path
-$npmrcPath = Join-Path -Path $nodeJsRoot -ChildPath 'node_modules\npm\npmrc'
-if( -not (Test-Path -Path $npmrcPath -PathType Leaf) )
+function Get-NpmrcPath
 {
-    Write-Error ('Built-in npmrc ''{0}'' not found.' -f $npmrcPath)
-    return
+    param(
+    )
+
+    if( -not $npmrcPath )
+    {
+        $npmCmd = Get-Command -Name 'npm.cmd' -ErrorAction Ignore
+        if( -not $npmCmd )
+        {
+            $npmCmd = Get-Command -Name (Join-Path -Path $env:ProgramFiles -ChildPath 'nodejs\npm.cmd') -ErrorAction Ignore
+            if( -not $npmCmd )
+            {
+                Write-Error ('npm.cmd not found. Is Node.js installed? If not, make sure you install Node.js before this resource.')
+                return
+            }
+        }
+
+        $nodeJsRoot = Split-Path -Parent -Path $npmCmd.Path
+        $script:npmrcPath = Join-Path -Path $nodeJsRoot -ChildPath 'node_modules\npm\npmrc'
+        if( -not (Test-Path -Path $npmrcPath -PathType Leaf) )
+        {
+            Write-Error ('Built-in npmrc ''{0}'' not found. Is Node.js installed? If not, make sure you install Node.js before this resource.' -f $npmrcPath)
+            return
+        }
+    }
+
+    return $npmrcPath
 }
 
 function Get-TargetResource
@@ -55,6 +68,12 @@ function Get-TargetResource
 	)
     
     Set-StrictMode -Version 'Latest'
+
+    $npmrcPath = Get-NpmrcPath
+    if( -not $npmrcPath )
+    {
+        return
+    }
 
     $ini = Split-Ini -Path $npmrcPath -AsHashtable -CaseSensitive
     
@@ -94,6 +113,12 @@ function Set-TargetResource
 	)
     
     Set-StrictMode -Version 'Latest'
+
+    $npmrcPath = Get-NpmrcPath
+    if( -not $npmrcPath )
+    {
+        return
+    }
 
     $resource = Get-TargetResource -Name $Name
     if( $resource.Ensure -eq 'Present' -and $Ensure -eq 'Absent' )
