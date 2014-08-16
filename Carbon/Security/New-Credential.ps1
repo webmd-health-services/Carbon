@@ -29,6 +29,7 @@ function New-Credential
 
     Creates a new credential object for Captain Picard.
     #>
+    [OutputType([Management.Automation.PSCredential])]
     param(
         [Parameter(Mandatory=$true)]
         [string]

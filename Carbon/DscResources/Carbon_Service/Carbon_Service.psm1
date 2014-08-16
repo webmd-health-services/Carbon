@@ -65,12 +65,12 @@ function Get-TargetResource
         $Dependency,
         
         [string]
-        # The user the service should run as.
+        # The system account the service should run as.
         $Username,
         
-        [string]
-        # The user's password.
-        $Password,
+        [pscredential]
+        # The credentials of the custom account the service should run as.
+        $Credential,
         
         [ValidateSet('Present','Absent')]
         [string]
@@ -91,8 +91,8 @@ function Get-TargetResource
                     RestartDelay = $null;
                     RebootDelay = $null;
                     Dependency = $null;
-                    Username = $null;
-                    Password = $null;
+                    UserName = $null;
+                    Credential = $null;
                     Ensure = 'Absent';
                 }
 
@@ -188,12 +188,12 @@ function Set-TargetResource
         $Dependency,
         
         [string]
-        # The user the service should run as.
-        $Username,
+        # The system account the service should run as.
+        $UserName,
         
-        [string]
-        # The user's password.
-        $Password,
+        [pscredential]
+        # The credentials of the custom account the service should run as.
+        $Credential,
      
         [Parameter(Mandatory=$true)]   
         [ValidateSet('Present','Absent')]
@@ -229,6 +229,13 @@ function Set-TargetResource
     else
     {
         Write-Verbose ('Installing service ''{0}''' -f $Name)
+    }
+
+    if( $PSBoundParameters.ContainsKey('Credential') )
+    {
+        $PSBoundParameters.Remove('Credential')
+        $PSBoundParameters.Password = $Credential.GetNetworkCredential().Password
+        $PSBoundParameters.UserName = $Credential.UserName
     }
     Install-Service @PSBoundParameters
 }
@@ -285,12 +292,12 @@ function Test-TargetResource
         $Dependency,
         
         [string]
-        # The user the service should run as.
-        $Username,
+        # The system account the service should run as.
+        $UserName,
         
-        [string]
-        # The user's password.
-        $Password,
+        [pscredential]
+        # The custom account the service should run as.
+        $Credential,
      
         [Parameter(Mandatory=$true)]   
         [ValidateSet('Present','Absent')]
@@ -329,9 +336,19 @@ function Test-TargetResource
         }
     }
 
-    if( $resource.ContainsKey('Password') )
+    if( $resource.ContainsKey('Credential') )
     {
-        $resource.Remove('Password')
+        [void]$resource.Remove('Credential')
+    }
+
+    if( $PSBoundParameters.ContainsKey('Credential') )
+    {
+        [void]$PSBoundParameters.Remove('Credential')
+        $identity = Resolve-Identity -Name $Credential.UserName -ErrorAction Ignore
+        if( $identity )
+        {
+            $PSBoundParameters.UserName = $identity.FullName
+        }
     }
 
     return Test-DscTargetResource -TargetResource $resource -DesiredResource $PSBoundParameters -Target ('Service ''{0}''' -f $Name)

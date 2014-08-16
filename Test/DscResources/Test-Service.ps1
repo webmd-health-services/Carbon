@@ -13,8 +13,7 @@
 # limitations under the License.
 
 Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'CarbonDscTest.psm1' -Resolve) -Force
-$UserName = 'CarbonDscTestUser'
-$Password = [Guid]::NewGuid().ToString()
+$credential = New-Credential -User 'CarbonDscTestUser' -Password ([Guid]::NewGuid().ToString())
 $tempDir = $null
 $servicePath = $null
 $serviceName = 'CarbonDscTestService'
@@ -22,7 +21,7 @@ $serviceName = 'CarbonDscTestService'
 function Start-TestFixture
 {
     Start-CarbonDscTestFixture 'Service'
-    Install-User -UserName $UserName -Password $Password
+    Install-User -UserName $credential.UserName -Password $credential.GetNetworkCredential().Password
 }
 
 function Start-Test
@@ -72,7 +71,7 @@ function Test-ShouldGetExistingServices
         {
             Assert-Equal $_.UserName $resource.UserName
         }
-        Assert-Null $resource.Password
+        Assert-Null $resource.Credential
         Assert-DscResourcePresent $resource
     }
 }
@@ -95,7 +94,7 @@ function Test-ShouldGetNonExistentService
     Assert-Null $resource.RebootDelay
     Assert-Null $resource.Dependency
     Assert-Null $resource.UserName
-    Assert-Null $resource.Password
+    Assert-Null $resource.Credential
     Assert-DscResourceAbsent $resource
 }
     
@@ -116,13 +115,13 @@ function Test-ShouldInstallService
     Assert-Equal 0 $resource.RebootDelay
     Assert-Null $resource.Dependency
     Assert-Equal 'NT AUTHORITY\NETWORK SERVICE' $resource.UserName
-    Assert-Null $resource.Password
+    Assert-Null $resource.Credential
     Assert-DscResourcePresent $resource
 }
 
 function Test-ShouldInstallServiceWithAllOptions
 {
-    Set-TargetResource -Path $servicePath -Name $serviceName -Ensure Present -StartupType Manual -OnFirstFailure Restart -OnSecondFailure Restart -OnThirdFailure Reboot -ResetFailureCount (60*60*24*2) -RestartDelay (1000*60*5) -RebootDelay (1000*60*10) -Dependency 'W3SVC' -Username $UserName -Password $Password
+    Set-TargetResource -Path $servicePath -Name $serviceName -Ensure Present -StartupType Manual -OnFirstFailure Restart -OnSecondFailure Restart -OnThirdFailure Reboot -ResetFailureCount (60*60*24*2) -RestartDelay (1000*60*5) -RebootDelay (1000*60*10) -Dependency 'W3SVC' -Credential $credential
     Assert-NoError
     $resource = Get-TargetResource -Name $serviceName
     Assert-NotNull $resource
@@ -136,8 +135,8 @@ function Test-ShouldInstallServiceWithAllOptions
     Assert-Equal (1000*60*5) $resource.RestartDelay
     Assert-Equal (1000*60*10) $resource.RebootDelay
     Assert-Equal 'W3SVC' $resource.Dependency
-    Assert-Equal (Resolve-Identity -Name $UserName).FullName $resource.UserName
-    Assert-Null $resource.Password
+    Assert-Equal (Resolve-Identity -Name $credential.UserName).FullName $resource.UserName
+    Assert-Null $resource.Credential
     Assert-DscResourcePresent $resource    
 }
 
@@ -174,9 +173,8 @@ function Test-ShouldTestMissingServices
 
 function Test-ShouldTestOnCredentials
 {
-    Set-TargetResource -Name $serviceName -Path $servicePath -UserName $UserName -Password $Password -Ensure Present
-    Assert-True (Test-TargetResource -Name $serviceName -Path $servicePath -UserName $UserName -Ensure Present)
-    Assert-True (Test-TargetResource -Name $serviceName -Path $servicePath -UserName $UserName -Password $Password -Ensure Present)
+    Set-TargetResource -Name $serviceName -Path $servicePath -Credential $credential -Ensure Present
+    Assert-True (Test-TargetResource -Name $serviceName -Path $servicePath -Credential $credential -Ensure Present)
 }
 
 function Test-ShouldTestOnProperties
@@ -211,7 +209,7 @@ function Test-ShouldTestOnProperties
     Assert-False (Test-TargetResource @testParams -Dependency @( 'W3SVC' ) -Ensure Present)
 
     Assert-True (Test-TargetResource @testParams -UserName 'NT AUTHORITY\NETWORK SERVICE' -Ensure Present)
-    Assert-False (Test-TargetResource @testParams -UserName $UserName -Ensure Present)
+    Assert-False (Test-TargetResource @testParams -Credential $credential -Ensure Present)
 }
 
 
