@@ -23,3 +23,18 @@ function Test-NewTempDir
     $tmpDir = New-TempDir 
     Assert-DirectoryExists $tmpDir
 }
+
+function Test-ShouldSupportPrefix
+{
+    $tempDir = New-TempDir -Prefix 'fubar'
+    Assert-DirectoryExists $tempDir
+    Assert-Like $tempDir.Name 'fubar*'
+}
+
+function Test-ShouldSupportPathsForPrefix
+{
+    $tempDir = New-TempDirectory -Prefix $PSCommandPath
+    Assert-DirectoryExists $tempDir
+    Assert-Like $tempDir.Name ('{0}*' -f (Split-Path -Leaf -Path $PSCommandPath))
+
+}

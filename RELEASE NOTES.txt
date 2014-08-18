@@ -211,6 +211,7 @@ This is a backwards-incompatible release.
  * Created [Test-ZipFile](http://get-carbon.org/help/Test-ZipFile.html) function for testing if a file is a ZIP file.
  * Created [Expand-Item](http://get-carbon.org/help/Expand-Item.html) function for decompressing a ZIP file.
  * Created [Find-OpenFile](http://get-carbon.org/help/Find-OpenFile.html) function for getting all the files open, including the process using each file.
+ * [New-TempDirectory](http://get-carbon.org/help/New-TempDirectory.html) now supports adding a prefix to the temporary directory's name, so you can more easily track down those scripts/processes that don't clean up after themselves.
 
 ### Firewall
 
