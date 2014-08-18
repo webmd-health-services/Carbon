@@ -121,21 +121,21 @@ namespace Carbon
 		public static HandleInfo[] GetFileSystemHandles()
 		{
 			var handles = new List<HandleInfo>();
-			var length = 0x10000;
+			var length = 32;
 			var ptr = IntPtr.Zero;
 			var processes = new Dictionary<int, Process>();
 			try
 			{
 				while (true)
 				{
+					//Trace.WriteLine(string.Format("allocating {0} bytes of memory", length));
 					ptr = Marshal.AllocHGlobal(length);
 					int wantedLength;
-					var systemHandleInformation = SYSTEM_INFORMATION_CLASS.SystemHandleInformation;
-					var result = NtQuerySystemInformation(systemHandleInformation, ptr, length, out wantedLength);
-					;
+					var result = NtQuerySystemInformation(SYSTEM_INFORMATION_CLASS.SystemHandleInformation, ptr, length, out wantedLength);
+
 					if (result == NT_STATUS.STATUS_INFO_LENGTH_MISMATCH)
 					{
-						length = Math.Max(length, wantedLength);
+					    length = wantedLength;
 						Marshal.FreeHGlobal(ptr);
 						ptr = IntPtr.Zero;
 					}
@@ -149,19 +149,32 @@ namespace Carbon
 					}
 				}
 
-				var handleCount = Marshal.ReadInt64(ptr);
-				if (Marshal.SizeOf(typeof (IntPtr)) == 4)
+				var handleCount = (int)Marshal.ReadInt64(ptr);
+				if (IntPtr.Size == 4)
 				{
 					handleCount = Marshal.ReadInt32(ptr);
+					//Trace.WriteLine(string.Format("32-bit ptr"));
 				}
 
-				var offset = IntPtr.Size;
+				long offset = IntPtr.Size;
 				var systemHandleEntry = new SystemHandleEntry();
 				var size = Marshal.SizeOf(systemHandleEntry);
+				var numProcessed = 0;
 
+				var remainder = (length - offset)%size;
+				if (remainder != 0)
+				{
+					throw new ApplicationException(
+						string.Format(
+							"SystemHandleEntry structure size different than expected. Allocated {0} bytes of memory for {1} number of objects, at {2} bytes each, but it looks like we got an extra {3} bytes.",
+							length, handleCount, size, remainder));
+				}
+
+				//Trace.WriteLine(string.Format("handleCount: {0}", handleCount));
 				for (var i = 0; i < handleCount; i++, offset += size)
 				{
 					var fileHandle = (SystemHandleEntry) Marshal.PtrToStructure((IntPtr) ((long) ptr + offset), systemHandleEntry.GetType());
+					numProcessed++;
 					var typeNumber = fileHandle.ObjectTypeNumber;
 
 					if (FoundFileObjectTypeNumber && FoundDirectoryObjectTypeNumber)
@@ -202,6 +215,7 @@ namespace Carbon
 					handles.Add(handle);
 
 				}
+				//Trace.WriteLine(string.Format("numProcessed: {0}", numProcessed));
 				return handles.ToArray();
 			}
 			finally
