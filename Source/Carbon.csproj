@@ -88,10 +88,9 @@
     <Compile Include="Service\FailureAction.cs" />
     <Compile Include="Service\ServiceInfo.cs" />
     <Compile Include="Service\StartType.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Win32.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Win32ErrorCodes.cs" />
-    <Compile Include="Win32\HandleInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Carbon.snk" />

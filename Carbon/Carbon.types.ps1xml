@@ -274,21 +274,4 @@
             </AliasProperty>
         </Members>
     </Type>
-    <Type>
-        <Name>Carbon.HandleInfo</Name>
-        <Members>
-            <ScriptProperty>
-                <Name>ProcessID</Name>
-                <GetScriptBlock>
-                    $this.Process.Id
-                </GetScriptBlock>
-            </ScriptProperty>
-            <ScriptProperty>
-                <Name>ProcessName</Name>
-                <GetScriptBlock>
-                    $this.Process.ProcessName
-                </GetScriptBlock>
-            </ScriptProperty>
-        </Members>
-    </Type>
 </Types>
