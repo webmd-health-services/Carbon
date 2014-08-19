@@ -114,7 +114,8 @@ function Compress-Item
                                 0x10 -bor `  # Responde "Yes to All" to any prompts
                                 0x400        # Do not display a user interface if an error occurs
                             )
-            $zipFile = $shellApp.NameSpace($OutFile) 
+            $zipFile = $shellApp.NameSpace($OutFile)
+            $zipItemCount = 0
         }
         else
         {
@@ -137,6 +138,8 @@ function Compress-Item
                 if( $UseShell )
                 {
                     $zipFile.CopyHere($_, $copyHereFlags)
+                    $entryCount = Get-ChildItem $_ -Recurse | Measure-Object | Select-Object -ExpandProperty 'Count'
+                    $zipItemCount += $entryCount
                 }
                 else
                 {
@@ -165,10 +168,27 @@ function Compress-Item
         {
             [void][Runtime.InteropServices.Marshal]::ReleaseComObject($zipFile)
             [void][Runtime.InteropServices.Marshal]::ReleaseComObject($shellApp)
-            while( Find-OpenFile | Where-Object { $_.Path -eq $OutFile } )
+            do
             {
+                if( [Ionic.Zip.ZipFile]::CheckZip( $OutFile ) )
+                {
+                    $zipFile = [Ionic.Zip.ZipFile]::Read($OutFile)
+                    $count = $zipFile.Count
+                    $zipFile.Dispose()
+                    if( $zipItemCount -eq $count )
+                    {
+                        Write-Verbose ('Found {0} expected entries in ZIP file ''{1}''.' -f $zipItemCount,$OutFile)
+                        break
+                    }
+                    Write-Verbose ('ZIP file ''{0}'' has {1} entries, but expected {2}. Looks like the Shell API is still writing to it.' -f $OutFile,$count,$zipItemCount)
+                }
+                else
+                {
+                    Write-Verbose ('ZIP file ''{0}'' not valid. Looks like Shell API is still writing to it.' -f $OutFile)
+                }
                 Start-Sleep -Milliseconds 100
             }
+            while( $true )
         }
         else
         {
