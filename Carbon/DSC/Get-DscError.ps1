@@ -19,11 +19,11 @@ function Get-DscError
     Gets DSC errors from a computer's event log.
 
     .DESCRIPTION
-    When a DSC Local Configuration Manager (LCM) encounters errors, they are written to the Windows event log. This function returns them.
+    The DSC Local Configuration Manager (LCM) writes any errors it encounters to the `Microsoft-Windows-DSC/Operational` event log, in addition to some error messages that report that encountered an error. This function gets just the import error log messages, skipping the superflous ones that won't help you track down where the problem is.
 
-    By default, errors on the local computer are returned. You can return errors from multiple computers via the `ComputerName` parameter.
+    By default, errors on the local computer are returned. You can return errors from another computer via the `ComputerName` parameter.
 
-    You can filter the results further with the `StartTime` and `EndTime` parameters. `StartTime` will only return entries after the given time. `EndTime` will return entries before the given time.
+    You can filter the results further with the `StartTime` and `EndTime` parameters. `StartTime` will return entries after the given time. `EndTime` will return entries before the given time.
 
     If no items are found, nothing is returned.
 
