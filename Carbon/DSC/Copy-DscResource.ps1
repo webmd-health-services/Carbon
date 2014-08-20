@@ -18,7 +18,7 @@ function Copy-DscResource
     .SYNOPSIS
     Copies DSC resources.
 
-    .DESTINATION
+    .DESCRIPTION
     This function copies a DSC resource or a directory of DSC resources to a DSC pull server share/website. All files under `$Path` are copied.
     
     DSC requires all files have a checksum file (e.g. `localhost.mof.checksum`), which this function generates for you (in a temporary location).
