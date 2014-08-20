@@ -68,6 +68,7 @@ This is a backwards-incompatible release.
  * Created `Carbon_Script` resource for running custom PowerShell scripts, with support for passing arguments.
  * Created [Copy-DscResource](http://get-carbon.org/help/Copy-DscResource.html) function for copying DSC resources (ZIP files, MSI archives, MOF files, etc.), including timestamps and copying only changed files.
  * Created [Clear-MofAuthoringMetadata](http://get-carbon.org/help/Clear-MofAuthoringMetadata.html) function for removing authoring metadata from .mof files.
+ * Created [Get-DscError](http://get-carbon.org/help/Get-DscError.html) function for getting any DSC errors written to a computer's event viewer.
  
 ### File System
 

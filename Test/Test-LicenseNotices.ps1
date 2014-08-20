@@ -52,6 +52,12 @@ function Test-AllFilesShouldHaveLicense
         ForEach-Object {
             $fileInfo = $_
             $file = Get-Content $fileInfo.FullName -Raw
+            if( -not $file )
+            {
+                $fileInfo.FullName
+                return
+            }
+
             $ok = switch -Regex ( $fileInfo.Extension )
             {
                 '^\.ps(m|d)*1$'
