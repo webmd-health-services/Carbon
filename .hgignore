@@ -1,4 +1,3 @@
-relre:.*\.orig
 glob:Carbon*.zip
 glob:Carbon\bin\*.pdb
 glob:Source\obj
