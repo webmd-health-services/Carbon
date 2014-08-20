@@ -66,6 +66,7 @@ This is a backwards-incompatible release.
  * Created `Carbon_Permission` resource for configuring file, directory, registry, and certificate permissions.
  * Created `Carbon_Service` resource for configuring Windows services.
  * Created `Carbon_Script` resource for running custom PowerShell scripts, with support for passing arguments.
+ * Created [Copy-DscResource](http://get-carbon.org/help/Copy-DscResource.html) function for copying DSC resources (ZIP files, MSI archives, MOF files, etc.), including timestamps and copying only changed files.
  
 ### File System
 
