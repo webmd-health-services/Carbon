@@ -41,7 +41,7 @@ function New-TempDirectory
 
     Demonstrates how you can use `$PSCommandPath` to create a new, temporary directory, named after the currently executing scripts, e.g. `C:\Users\ajensen\AppData\Local\Temp\New-TempDirectory.ps15pobd3tu.5rn`.
     #>
-    [CmdletBinding()]
+    [CmdletBinding(SupportsShouldProcess=$true)]
     [OutputType([IO.DirectoryInfo])]
     param(
         [string]
