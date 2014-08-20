@@ -76,6 +76,14 @@ function Test-ShouldCompressWithCOMShellAPI
     Assert-ZipFileExpands $file $sourceRoot
 }
 
+function Test-ShouldCompressLargeDirectorySynchronouslyWithCOMShellAPI
+{
+    $sourceRoot = Join-Path -Path $PSScriptRoot -ChildPath '..' -Resolve
+    $file = Compress-Item -Path $SourceRoot -UseShell
+    Assert-ZipFileExists $file
+    Assert-ZipFileExpands $file $sourceRoot
+}
+
 function Assert-ZipFileExpands
 {
     param(
@@ -91,8 +99,10 @@ function Assert-ZipFileExpands
 
         try
         {
-            $sourceItems = Get-ChildItem -Path $sourceRoot -Recurse
-            $outItems = Get-ChildItem -Path $outRoot -Recurse
+            [object[]]$sourceItems = Get-ChildItem -Path $sourceRoot -Recurse
+            Assert-NotNull $sourceItems
+            [object[]]$outItems = Get-ChildItem -Path $outRoot -Recurse
+            Assert-NotNull $outItems
             Assert-Equal $sourceItems.Count ($outItems.Count - 1)
         }
         finally

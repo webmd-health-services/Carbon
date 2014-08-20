@@ -521,40 +521,6 @@
             </TableControl>
         </View>
         <View>
-            <Name>Carbon.Win32.HandleInfo</Name>
-            <ViewSelectedBy>
-                <TypeName>Carbon.Win32.HandleInfo</TypeName>
-            </ViewSelectedBy>
-            <TableControl>
-                <TableHeaders>
-                    <TableColumnHeader>
-                        <Label>ProcessID</Label>
-                        <Width>9</Width>
-                        <Alignment>Right</Alignment>
-                    </TableColumnHeader>
-                    <TableColumnHeader>
-                        <Label>ProcessName</Label>
-                    </TableColumnHeader>
-                    <TableColumnHeader />
-                </TableHeaders>
-                <TableRowEntries>
-                    <TableRowEntry>
-                        <TableColumnItems>
-                            <TableColumnItem>
-                                <PropertyName>ProcessID</PropertyName>
-                            </TableColumnItem>
-                            <TableColumnItem>
-                                <PropertyName>ProcessName</PropertyName>
-                            </TableColumnItem>
-                            <TableColumnItem>
-                                <PropertyName>Path</PropertyName>
-                            </TableColumnItem>
-                        </TableColumnItems>
-                    </TableRowEntry>
-                </TableRowEntries>
-            </TableControl>
-        </View>
-        <View>
             <Name>System.DirectoryServices.AccountManagement.UserPrincipal</Name>
             <ViewSelectedBy>
                 <TypeName>System.DirectoryServices.AccountManagement.UserPrincipal</TypeName>

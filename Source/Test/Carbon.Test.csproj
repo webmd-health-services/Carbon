@@ -73,7 +73,6 @@
     <Compile Include="Security\PrivilegeTests.cs" />
     <Compile Include="Service\ServiceInfoTestFixture.cs" />
     <Compile Include="Service\ServiceSecurityTests.cs" />
-    <Compile Include="Win32\HandleInfoTestFixture.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Source\Carbon.csproj">
