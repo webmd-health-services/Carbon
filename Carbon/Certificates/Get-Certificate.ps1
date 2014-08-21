@@ -106,7 +106,6 @@ function Get-Certificate
             return
         }
 
-        $foundCerts = @()
         Get-Item -Path $Path | 
             ForEach-Object {
                 $item = $_

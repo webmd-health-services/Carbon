@@ -274,6 +274,10 @@ This is a backwards-incompatible release.
 ### General
 
  * Importing Carbon gives an error if `PATH` environment variable contains an empty path.
+ * Improved the error handling in the following functions so they properly catch exceptions and write friendlier errors:
+   * [Get-Certificate](http://get-carbon.org/help/Get-Certificate.html)
+   * [Grant-Privilege](http://get-carbon.org/help/Grant-Privilege.html)
+   * [Revoke-Privilege](http://get-carbon.org/help/Revoke-Privilege.html)
 
 ### Certificates
 

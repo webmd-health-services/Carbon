@@ -71,5 +71,5 @@ function Test-ShouldGrantCaseSensitivePermission
     $Error.Clear()
     Grant-Privilege -Identity $username -Privilege SESERVICELOGONRIGHT -ErrorAction SilentlyContinue
     Assert-GreaterThan $Error.Count 1
-    Assert-Like $Error[0].ErrorDetails.Message '*case-sensitive*'
+    Assert-Like $Error[0].Exception.Message '*case-sensitive*'
 }
