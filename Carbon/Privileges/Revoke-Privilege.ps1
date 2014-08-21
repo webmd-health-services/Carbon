@@ -115,8 +115,7 @@ function Revoke-Privilege
     }
     catch
     {
-        Write-Error -Message ('Failed to revoke {0}''s {1} privilege(s).' -f $Identity,($cPrivileges -join ', ')) `
-                    -Exception $_.Exception
+        Write-Error -Message ('Failed to revoke {0}''s {1} privilege(s).' -f $Identity,($cPrivileges -join ', ')) 
 
         $ex = $_.Exception
         while( $ex.InnerException )

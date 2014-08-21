@@ -106,7 +106,6 @@ function Get-Certificate
             return
         }
 
-        $foundCerts = @()
         Get-Item -Path $Path | 
             ForEach-Object {
                 $item = $_
@@ -127,17 +126,10 @@ function Get-Certificate
                         {
                             $ex = $ex.InnerException
                         }
-                        Write-Error -Message ('Failed to create X509Certificate2 object from file ''{0}'': {1}' -f $item.FullName,$ex.Message) -Exception $_.Exception
+                        Write-Error -Message ('Failed to create X509Certificate2 object from file ''{0}'': {1}' -f $item.FullName,$ex.Message)
                     }
                 }
-            } |
-            Tee-Object -Variable 'foundCerts'
-
-        if( -not $foundCerts )
-        {
-            Write-Error ('Certificate ''{0}'' not found.' -f $Path)
-            return
-        }
+            }
     }
     else
     {
