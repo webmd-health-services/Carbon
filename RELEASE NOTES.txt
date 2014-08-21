@@ -70,6 +70,7 @@ This is a backwards-incompatible release.
  * Created [Clear-MofAuthoringMetadata](http://get-carbon.org/help/Clear-MofAuthoringMetadata.html) function for removing authoring metadata from .mof files.
  * Created [Get-DscError](http://get-carbon.org/help/Get-DscError.html) function for getting any DSC errors written to a computer's event viewer.
  * Created [Write-DscError](http://get-carbon.org/help/Write-DscError.html) function for writing DSC `ErrorLogRecord` objects as errors.
+ * Created [Start-DscPullConfiguration](http://get-carbon.org/help/Start-DscPullConfiguration.html) function for starting a configuration check on a computer whose computer is configured to use the PULL refresh mode.
  
 ### File System
 

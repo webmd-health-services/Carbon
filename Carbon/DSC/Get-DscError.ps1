@@ -126,7 +126,7 @@ function Get-DscError
 
     try
     {
-        while( -not ($events = Get-WinEvent @getWinEventParams -FilterHashtable $filter -ErrorAction Ignore) )
+        while( -not ($events = Get-WinEvent @getWinEventParams -FilterHashtable $filter -ErrorAction Ignore -Verbose:$false) )
         {
             if( $PSCmdlet.ParameterSetName -ne 'Wait' )
             {
