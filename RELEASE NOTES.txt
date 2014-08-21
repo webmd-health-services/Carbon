@@ -25,7 +25,6 @@ This is a backwards-incompatible release.
  * [Set-SslCertificateBinding](http://get-carbon.org/help/Set-SslCertificateBinding.html) now returns `Carbon.Certificates.SslCertificateBinding` objects instead of netsh output. Update any code that uses the old `Set-SslCertificateBinding` output.
  * Ensure that all thumbprints passed to [Set-SslCertificateBinding](http://get-carbon.org/help/Set-SslCertificateBinding.html) are valid (40 character hex strings).
  * Add the new `-PasswordNeverExpires` switch to usages of [Install-User](http://get-carbon.org/help/Install-User.html): it no longer sets the `PasswordNeverExpires` flag for a user by default.
- * `Resolve-IdentityName` renamed to [Resolve-Identity](http://get-carbon.org/help/Resolve-Identity.html), but it has a backwards-compatible alias, so you shouldn't have to do anything.
  * Use the `FullName` property on objects returned by [Resolve-Identity](http://get-carbon.org/help/Resolve-Identity.html) (née `Resolve-IdentityName`): it now returns a `Carbon.Identity` object instead of the identity's name, e.g. `Resolve-Identity -Name $userName | Select-Object -Expand 'FullName'`.
  * Add `-ErrorAction SilentlyContinue` or `-ErrorAction Ignore` to usages of [Resolve-Identity](http://get-carbon.org/help/Resolve-Identity.html) (née `Resolve-IdentityName`): it now writes an error if it can't resolve a name.
  * Use the `Sid` property on objects returned by [Test-Identity](http://get-carbon.org/help/Test-Identity.html) when using the `PassThru` switch: it now returns a `Carbon.Identity` object if the identity exists *and* you use the `-PassThru` switch, e.g. `Test-Identity -Name $userName -PassThru | Select-Object -Expand 'Sid'`.
@@ -123,7 +122,7 @@ This is a backwards-incompatible release.
  * [Resolve-Identity](http://get-carbon.org/help/Resolve-Identity.html) (née `Resolve-IdentityName`) now returns a `Carbon.Identity` object instead of the identity's name.  Update scripts to use the `FullName` property to get the old return value, e.g. `Resolve-Identity -Name $userName -PassThru | Select-Object -Expand 'FullName'`.
  * [Resolve-Identity](http://get-carbon.org/help/Resolve-Identity.html) (née `Resolve-IdentityName`) now writes an error if it can't resolve a name.  Use `-ErrorAction SilentlyContinue` or `-ErrorAction Ignore` to preserve old behavior.
  * [Test-Identity](http://get-carbon.org/help/Test-Identity.html) now returns a `Carbon.Identity` object if the identity exists *and* you use the `-PassThru` switch.  It used to return the identity's name.  Update scripts to use the `FullName` property to get the old return value, e.g. `Test-Identity -Name $userName -PassThru | Select-Object -Expand 'FullName'`.
- * Added [Add-GroupMember](http://get-carbon.org/help/Add-GroupMember.html) function. Thanks to [Philip Kluss](https://bitbucket.org/philkloose) for the contribution. 
+ * Added [Remove-GroupMember](http://get-carbon.org/help/Remove-GroupMember.html) function. Thanks to [Philip Kluss](https://bitbucket.org/philkloose) for the contribution. 
 
 
 # 1.8.0
@@ -188,7 +187,7 @@ This is a backwards-incompatible release.
     
 ### Certificates
 
- * Improving error handling when [Get-Certificate](http://get-carbon.org/help/Get-Certificate.html) fails to load a certificate from a file. Original exception now part of error record.
+ * Improving error handling when [Get-Certificate](http://get-carbon.org/help/Get-Certificate.html) fails to load a certificate from a file.
  * [Install-Certificate](http://get-carbon.org/help/Install-Certificate.html) now supports installing with an `X509Certificate2` object instead of just a path to a certificate.
  * [Remove-SslCertificateBinding](http://get-carbon.org/help/Remove-SslCertificateBinding.html): improved error handling.
  * [Set-SslCertificateBinding](http://get-carbon.org/help/Set-SslCertificateBinding.html): improved error handling.
@@ -224,7 +223,7 @@ This is a backwards-incompatible release.
  * Added `Name` and `LiteralName` parameters to [Get-FirewallRule](http://get-carbon.org/help/Get-FirewallRule.html) to return specific rules instead of all of them.
  * [Get-FirewallRule](http://get-carbon.org/help/Get-FirewallRule.html), now returns `Carbon.Firewall.Rule` objects, instead of anonymous hashes.
  * Added default table format for [Get-FirewallRule](http://get-carbon.org/help/Get-FirewallRule.html) output.
- * [Get-FirewallRule](http://get-carbon.org/help/Get-FirewallRule.html), now returns additional rule information: interface type, security, source, description, program, and service. Who knew `netsh advfirewall firewall rule show` had a `verbose` switch? RTFM.
+ * [Get-FirewallRule](http://get-carbon.org/help/Get-FirewallRule.html) now returns additional rule information: interface type, security, source, description, program, and service. Who knew `netsh advfirewall firewall rule show` had a `verbose` switch? RTFM.
 
 ### INI
 
@@ -281,18 +280,18 @@ This is a backwards-incompatible release.
 
 ### Certificates
 
- * [Get-Certificate](http://get-carbon.org/help/Get-Certificate.html) couldn't open CA/CertificateAuthority store (fixes issue [#130](https://bitbucket.org/splatteredbits/carbon/issue/130/get-certificate-doesnt-find-any))
+ * [Get-Certificate](http://get-carbon.org/help/Get-Certificate.html) couldn't open CA/CertificateAuthority store (fixes issue [#130](https://bitbucket.org/splatteredbits/carbon/issue/130/get-certificate-doesnt-find-any)).
  * Extended script property `DisplayName` on `X509Store` objects returning wrong store name for custom stores, now returns an empty string.
 
- ### Path
+### Path
 
  * [Resolve-PathCase](http://get-carbon.org/help/Resolve-PathCase.html) didn't work under Windows 2012 R2.
 
 ### Users and Groups
 
- * The `Carbon.Identity.FindByName` method and [Resolve-IdentityName](http://get-carbon.org/help/Resolve-IdentityName.html) and [Test-Identity](http://get-carbon.org/help/Test-Identity.html)) functions now handle identity names with `.` for the domain/machine name, e.g. `.\Administrator`.
+ * The `Carbon.Identity.FindByName` method and the [Resolve-IdentityName](http://get-carbon.org/help/Resolve-IdentityName.html) and [Test-Identity](http://get-carbon.org/help/Test-Identity.html) functions now handle identity names with `.` for the domain/machine name, e.g. `.\Administrator`.
  * The `Carbon.Identity.FullName` property returns the wrong value when domain is empty/null, e.g. `Resolve-IdentityName -Name 'Everyone'` returns `\Everyone`, when it should return `Everyone`.
- * The `Carbon.Identity.FindByName` method and [Resolve-IdentityName](http://get-carbon.org/help/Resolve-IdentityName.html) and [Test-Identity](http://get-carbon.org/help/Test-Identity.html)) functions unable to resolve `LocalSystem` account (which is actually `NT AUTHORITY\SYSTEM`).
+ * The `Carbon.Identity.FindByName` method and the [Resolve-IdentityName](http://get-carbon.org/help/Resolve-IdentityName.html) and [Test-Identity](http://get-carbon.org/help/Test-Identity.html) functions unable to resolve `LocalSystem` account (which is actually `NT AUTHORITY\SYSTEM`).
  
 
 # 1.7.0 (30 April 2014)
