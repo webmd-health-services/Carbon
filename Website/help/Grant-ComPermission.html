@@ -5,7 +5,7 @@
 	<link href="styles.css" type="text/css" rel="stylesheet" />
 </head>
 <body>
-    	<ul id="SiteNav">
+	<ul id="SiteNav">
 		<li><a href="http://get-carbon.org">Get-Carbon</a></li>
 		<li><b>-Documentation</b></li>
         <li><a href="http://get-carbon.org">-ReleaseNotes</a></li>
@@ -76,7 +76,6 @@
 		<ul class="CommandMenu">
 			<li><a href="Assert-FirewallConfigurable.html">Assert-FirewallConfigurable</a></li>
 			<li><a href="Disable-FirewallStatefulFtp.html">Disable-FirewallStatefulFtp</a></li>
-			<li><a href="Enable-FirewallRule.html">Enable-FirewallRule</a></li>
 			<li><a href="Enable-FirewallStatefulFtp.html">Enable-FirewallStatefulFtp</a></li>
 			<li><a href="Get-FirewallRule.html">Get-FirewallRule</a></li>
 			<li><a href="Test-FirewallStatefulFtp.html">Test-FirewallStatefulFtp</a></li>
@@ -91,7 +90,6 @@
 		<li class="Category">IIS</li>
 		<ul class="CommandMenu">
 			<li><a href="Add-IisDefaultDocument.html">Add-IisDefaultDocument</a></li>
-			<li><a href="Add-IisServerManagerMember.html">Add-IisServerManagerMember</a></li>
 			<li><a href="Disable-IisSecurityAuthentication.html">Disable-IisSecurityAuthentication</a></li>
 			<li><a href="Enable-IisDirectoryBrowsing.html">Enable-IisDirectoryBrowsing</a></li>
 			<li><a href="Enable-IisSecurityAuthentication.html">Enable-IisSecurityAuthentication</a></li>
@@ -157,7 +155,6 @@
 		<ul class="CommandMenu">
 			<li><a href="Get-IPAddress.html">Get-IPAddress</a></li>
 			<li><a href="Test-IPAddress.html">Test-IPAddress</a></li>
-			<li><a href="Test-LocalComputerName.html">Test-LocalComputerName</a></li>
 		</ul>
 		<li class="Category">Path</li>
 		<ul class="CommandMenu">
@@ -182,7 +179,6 @@
 			<li><a href="Complete-Job.html">Complete-Job</a></li>
 			<li><a href="Get-PowershellPath.html">Get-PowershellPath</a></li>
 			<li><a href="Get-TrustedHost.html">Get-TrustedHost</a></li>
-			<li><a href="Invoke-ConsoleCommand.html">Invoke-ConsoleCommand</a></li>
 			<li><a href="Invoke-PowerShell.html">Invoke-PowerShell</a></li>
 			<li><a href="Set-TrustedHost.html">Set-TrustedHost</a></li>
 			<li><a href="Test-PowerShellIs32Bit.html">Test-PowerShellIs32Bit</a></li>
@@ -210,13 +206,11 @@
 			<li><a href="ConvertTo-ContainerInheritanceFlags.html">ConvertTo-ContainerInheritanceFlags</a></li>
 			<li><a href="ConvertTo-InheritanceFlag.html">ConvertTo-InheritanceFlag</a></li>
 			<li><a href="ConvertTo-PropagationFlag.html">ConvertTo-PropagationFlag</a></li>
-			<li><a href="ConvertTo-ProviderAccessControlRights.html">ConvertTo-ProviderAccessControlRights</a></li>
 			<li><a href="Get-Permission.html">Get-Permission</a></li>
 			<li><a href="Grant-Permission.html">Grant-Permission</a></li>
 			<li><a href="New-Credential.html">New-Credential</a></li>
 			<li><a href="Protect-Acl.html">Protect-Acl</a></li>
 			<li><a href="Revoke-Permission.html">Revoke-Permission</a></li>
-			<li><a href="Set-CryptoKeySecurity.html">Set-CryptoKeySecurity</a></li>
 			<li><a href="Test-AdminPrivilege.html">Test-AdminPrivilege</a></li>
 			<li><a href="Test-Permission.html">Test-Permission</a></li>
 		</ul>
@@ -258,10 +252,8 @@
 		</ul>
 		<li class="Category">WindowsFeatures</li>
 		<ul class="CommandMenu">
-			<li><a href="Assert-WindowsFeatureFunctionsSupported.html">Assert-WindowsFeatureFunctionsSupported</a></li>
 			<li><a href="Get-WindowsFeature.html">Get-WindowsFeature</a></li>
 			<li><a href="Install-WindowsFeature.html">Install-WindowsFeature</a></li>
-			<li><a href="Resolve-WindowsFeatureName.html">Resolve-WindowsFeatureName</a></li>
 			<li><a href="Test-WindowsFeature.html">Test-WindowsFeature</a></li>
 			<li><a href="Uninstall-WindowsFeature.html">Uninstall-WindowsFeature</a></li>
 		</ul>
@@ -273,12 +265,11 @@
 </div>
 
 
-    <h1>Grant-ComPermission</h1>
-    <div><p>Grants COM access permissions.</p>
-</div>
+<h1>Grant-ComPermission</h1>
+<div><p>Grants COM access permissions.</p></div>
 
-        <h2>Syntax</h2>
-    <pre class="Syntax"><code>Grant-ComPermission -Identity &lt;String&gt; -Access -Limits -Deny [-Local] [-Remote] [&lt;CommonParameters&gt;]</code></pre>
+<h2>Syntax</h2>
+<pre class="Syntax"><code>Grant-ComPermission -Identity &lt;String&gt; -Access -Limits -Deny [-Local] [-Remote] [&lt;CommonParameters&gt;]</code></pre>
 <pre class="Syntax"><code>Grant-ComPermission -Identity &lt;String&gt; -Access -Default -Deny [-Local] [-Remote] [&lt;CommonParameters&gt;]</code></pre>
 <pre class="Syntax"><code>Grant-ComPermission -Identity &lt;String&gt; -Access -Limits -Allow [-Local] [-Remote] [&lt;CommonParameters&gt;]</code></pre>
 <pre class="Syntax"><code>Grant-ComPermission -Identity &lt;String&gt; -Access -Default -Allow [-Local] [-Remote] [&lt;CommonParameters&gt;]</code></pre>
@@ -287,162 +278,148 @@
 <pre class="Syntax"><code>Grant-ComPermission -Identity &lt;String&gt; -LaunchAndActivation -Limits -Allow [-LocalLaunch] [-RemoteLaunch] [-LocalActivation] [-RemoteActivation] [&lt;CommonParameters&gt;]</code></pre>
 <pre class="Syntax"><code>Grant-ComPermission -Identity &lt;String&gt; -LaunchAndActivation -Default -Allow [-LocalLaunch] [-RemoteLaunch] [-LocalActivation] [-RemoteActivation] [&lt;CommonParameters&gt;]</code></pre>
     
-        <h2>Description</h2>
-    <div class="Description">
-        <p>Calling this function is equivalent to opening Component Services (dcomcnfg), right-clicking <code>My Computer</code> under Component Services > Computers, choosing <code>Properties</code>, going to the <code>COM Security</code> tab, and modifying the permission after clicking the <code>Edit Limits...</code> or <code>Edit Default...</code> buttons under the <code>Access Permissions</code> section.</p>
+<h2>Description</h2>
+<div class="Description">
+<p>Calling this function is equivalent to opening Component Services (dcomcnfg), right-clicking <code>My Computer</code> under Component Services > Computers, choosing <code>Properties</code>, going to the <code>COM Security</code> tab, and modifying the permission after clicking the <code>Edit Limits...</code> or <code>Edit Default...</code> buttons under the <code>Access Permissions</code> section.</p>
 
 <p>You must set at least one of the <code>LocalAccess</code> or <code>RemoteAccess</code> switches.</p>
-
-    </div>
+</div>
     
-            <h2>Related Commands</h2>
-        <ul>
+<h2>Related Commands</h2>
+<ul>
 <li><a href="Get-ComPermission.html">Get-ComPermission</a></li>
 <li><a href="Revoke-ComPermission.html">Revoke-ComPermission</a></li>
 </ul>
 
+<h2> Parameters </h2>
+<table border='1'>
+<tr>
+	<th>Name</th>
+    <th>Type</th>
+	<th>Description</th>
+	<th>Required?</th>
+	<th>Pipeline Input</th>
+	<th>Default Value</th>
+</tr>
+<tr valign='top'>
+	<td>Identity</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+	<td></td>
+	<td>true</td>
+	<td>false</td>
+    <td></td>
+</tr>
+<tr valign='top'>
+	<td>Access</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+	<td>Grants Access Permissions.</td>
+	<td>true</td>
+	<td>false</td>
+    <td>False</td>
+</tr>
+<tr valign='top'>
+	<td>LaunchAndActivation</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+	<td>Grants Launch and Activation Permissions.</td>
+	<td>true</td>
+	<td>false</td>
+    <td>False</td>
+</tr>
+<tr valign='top'>
+	<td>Default</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+	<td>Grants default security permissions.</td>
+	<td>true</td>
+	<td>false</td>
+    <td>False</td>
+</tr>
+<tr valign='top'>
+	<td>Limits</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+	<td>Grants security limits permissions.</td>
+	<td>true</td>
+	<td>false</td>
+    <td>False</td>
+</tr>
+<tr valign='top'>
+	<td>Allow</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+	<td>If set, allows the given permissions.</td>
+	<td>true</td>
+	<td>false</td>
+    <td>False</td>
+</tr>
+<tr valign='top'>
+	<td>Deny</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+	<td>If set, denies the given permissions.</td>
+	<td>true</td>
+	<td>false</td>
+    <td>False</td>
+</tr>
+<tr valign='top'>
+	<td>Local</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+	<td>If set, grants local access permissions.  Only valid if <code>Access</code> switch is set.</td>
+	<td>false</td>
+	<td>false</td>
+    <td>False</td>
+</tr>
+<tr valign='top'>
+	<td>Remote</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+	<td>If set, grants remote access permissions.  Only valid if <code>Access</code> switch is set.</td>
+	<td>false</td>
+	<td>false</td>
+    <td>False</td>
+</tr>
+<tr valign='top'>
+	<td>LocalLaunch</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+	<td>If set, grants local launch permissions.  Only valid if <code>LaunchAndActivation</code> switch is set.</td>
+	<td>false</td>
+	<td>false</td>
+    <td>False</td>
+</tr>
+<tr valign='top'>
+	<td>RemoteLaunch</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+	<td>If set, grants remote launch permissions.  Only valid if <code>LaunchAndActivation</code> switch is set.</td>
+	<td>false</td>
+	<td>false</td>
+    <td>False</td>
+</tr>
+<tr valign='top'>
+	<td>LocalActivation</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+	<td>If set, grants local activation permissions.  Only valid if <code>LaunchAndActivation</code> switch is set.</td>
+	<td>false</td>
+	<td>false</td>
+    <td>False</td>
+</tr>
+<tr valign='top'>
+	<td>RemoteActivation</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+	<td>If set, grants remote activation permissions.  Only valid if <code>LaunchAndActivation</code> switch is set.</td>
+	<td>false</td>
+	<td>false</td>
+    <td>False</td>
+</tr>
 
-    		<h2> Parameters </h2>
-		<table border='1'>
-			<tr>
-				<th>Name</th>
-                <th>Type</th>
-				<th>Description</th>
-				<th>Required?</th>
-				<th>Pipeline Input</th>
-				<th>Default Value</th>
-			</tr>
-            			<tr valign='top'>
-				<td>Identity</td>
-				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
-				<td></td>
-				<td>true</td>
-				<td>false</td>
-                <td></td>
-			</tr>
-			<tr valign='top'>
-				<td>Access</td>
-				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
-				<td>Grants Access Permissions.
-</td>
-				<td>true</td>
-				<td>false</td>
-                <td>False</td>
-			</tr>
-			<tr valign='top'>
-				<td>LaunchAndActivation</td>
-				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
-				<td>Grants Launch and Activation Permissions.
-</td>
-				<td>true</td>
-				<td>false</td>
-                <td>False</td>
-			</tr>
-			<tr valign='top'>
-				<td>Default</td>
-				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
-				<td>Grants default security permissions.
-</td>
-				<td>true</td>
-				<td>false</td>
-                <td>False</td>
-			</tr>
-			<tr valign='top'>
-				<td>Limits</td>
-				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
-				<td>Grants security limits permissions.
-</td>
-				<td>true</td>
-				<td>false</td>
-                <td>False</td>
-			</tr>
-			<tr valign='top'>
-				<td>Allow</td>
-				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
-				<td>If set, allows the given permissions.
-</td>
-				<td>true</td>
-				<td>false</td>
-                <td>False</td>
-			</tr>
-			<tr valign='top'>
-				<td>Deny</td>
-				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
-				<td>If set, denies the given permissions.
-</td>
-				<td>true</td>
-				<td>false</td>
-                <td>False</td>
-			</tr>
-			<tr valign='top'>
-				<td>Local</td>
-				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
-				<td>If set, grants local access permissions.  Only valid if <code>Access</code> switch is set.
-</td>
-				<td>false</td>
-				<td>false</td>
-                <td>False</td>
-			</tr>
-			<tr valign='top'>
-				<td>Remote</td>
-				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
-				<td>If set, grants remote access permissions.  Only valid if <code>Access</code> switch is set.
-</td>
-				<td>false</td>
-				<td>false</td>
-                <td>False</td>
-			</tr>
-			<tr valign='top'>
-				<td>LocalLaunch</td>
-				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
-				<td>If set, grants local launch permissions.  Only valid if <code>LaunchAndActivation</code> switch is set.
-</td>
-				<td>false</td>
-				<td>false</td>
-                <td>False</td>
-			</tr>
-			<tr valign='top'>
-				<td>RemoteLaunch</td>
-				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
-				<td>If set, grants remote launch permissions.  Only valid if <code>LaunchAndActivation</code> switch is set.
-</td>
-				<td>false</td>
-				<td>false</td>
-                <td>False</td>
-			</tr>
-			<tr valign='top'>
-				<td>LocalActivation</td>
-				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
-				<td>If set, grants local activation permissions.  Only valid if <code>LaunchAndActivation</code> switch is set.
-</td>
-				<td>false</td>
-				<td>false</td>
-                <td>False</td>
-			</tr>
-			<tr valign='top'>
-				<td>RemoteActivation</td>
-				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
-				<td>If set, grants remote activation permissions.  Only valid if <code>LaunchAndActivation</code> switch is set.
-</td>
-				<td>false</td>
-				<td>false</td>
-                <td>False</td>
-			</tr>
-            
-        </table>
+</table>
         
-    
+
         
-    
+
         
-    
+
         
-                <h2>EXAMPLE 1</h2>
-            <pre><code>Grant-ComPermission -Access -Identity 'Users' -Allow -Default -Local</code></pre>
-            <p><p>Updates access permission default security to allow the local <code>Users</code> group local access permissions.</p>
-</p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 2</h2>
-            <pre><code>Grant-ComPermission -LaunchAndActivation -Identity 'Users' -Limits -Deny -Local -Remote</code></pre>
-            <p><p>Updates access permission security limits to deny the local <code>Users</code> group local and remote access permissions.</p>
-</p><p></p><p></p><p></p><p></p>
+<h2>EXAMPLE 1</h2>
+<pre><code>Grant-ComPermission -Access -Identity 'Users' -Allow -Default -Local</code></pre>
+<p>Updates access permission default security to allow the local <code>Users</code> group local access permissions.</p>
+
+<h2>EXAMPLE 2</h2>
+<pre><code>Grant-ComPermission -LaunchAndActivation -Identity 'Users' -Limits -Deny -Local -Remote</code></pre>
+<p>Updates access permission security limits to deny the local <code>Users</code> group local and remote access permissions.</p>
 </body>
-</html>   
+</html>

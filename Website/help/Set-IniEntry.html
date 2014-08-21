@@ -5,7 +5,7 @@
 	<link href="styles.css" type="text/css" rel="stylesheet" />
 </head>
 <body>
-    	<ul id="SiteNav">
+	<ul id="SiteNav">
 		<li><a href="http://get-carbon.org">Get-Carbon</a></li>
 		<li><b>-Documentation</b></li>
         <li><a href="http://get-carbon.org">-ReleaseNotes</a></li>
@@ -76,7 +76,6 @@
 		<ul class="CommandMenu">
 			<li><a href="Assert-FirewallConfigurable.html">Assert-FirewallConfigurable</a></li>
 			<li><a href="Disable-FirewallStatefulFtp.html">Disable-FirewallStatefulFtp</a></li>
-			<li><a href="Enable-FirewallRule.html">Enable-FirewallRule</a></li>
 			<li><a href="Enable-FirewallStatefulFtp.html">Enable-FirewallStatefulFtp</a></li>
 			<li><a href="Get-FirewallRule.html">Get-FirewallRule</a></li>
 			<li><a href="Test-FirewallStatefulFtp.html">Test-FirewallStatefulFtp</a></li>
@@ -91,7 +90,6 @@
 		<li class="Category">IIS</li>
 		<ul class="CommandMenu">
 			<li><a href="Add-IisDefaultDocument.html">Add-IisDefaultDocument</a></li>
-			<li><a href="Add-IisServerManagerMember.html">Add-IisServerManagerMember</a></li>
 			<li><a href="Disable-IisSecurityAuthentication.html">Disable-IisSecurityAuthentication</a></li>
 			<li><a href="Enable-IisDirectoryBrowsing.html">Enable-IisDirectoryBrowsing</a></li>
 			<li><a href="Enable-IisSecurityAuthentication.html">Enable-IisSecurityAuthentication</a></li>
@@ -157,7 +155,6 @@
 		<ul class="CommandMenu">
 			<li><a href="Get-IPAddress.html">Get-IPAddress</a></li>
 			<li><a href="Test-IPAddress.html">Test-IPAddress</a></li>
-			<li><a href="Test-LocalComputerName.html">Test-LocalComputerName</a></li>
 		</ul>
 		<li class="Category">Path</li>
 		<ul class="CommandMenu">
@@ -182,7 +179,6 @@
 			<li><a href="Complete-Job.html">Complete-Job</a></li>
 			<li><a href="Get-PowershellPath.html">Get-PowershellPath</a></li>
 			<li><a href="Get-TrustedHost.html">Get-TrustedHost</a></li>
-			<li><a href="Invoke-ConsoleCommand.html">Invoke-ConsoleCommand</a></li>
 			<li><a href="Invoke-PowerShell.html">Invoke-PowerShell</a></li>
 			<li><a href="Set-TrustedHost.html">Set-TrustedHost</a></li>
 			<li><a href="Test-PowerShellIs32Bit.html">Test-PowerShellIs32Bit</a></li>
@@ -210,13 +206,11 @@
 			<li><a href="ConvertTo-ContainerInheritanceFlags.html">ConvertTo-ContainerInheritanceFlags</a></li>
 			<li><a href="ConvertTo-InheritanceFlag.html">ConvertTo-InheritanceFlag</a></li>
 			<li><a href="ConvertTo-PropagationFlag.html">ConvertTo-PropagationFlag</a></li>
-			<li><a href="ConvertTo-ProviderAccessControlRights.html">ConvertTo-ProviderAccessControlRights</a></li>
 			<li><a href="Get-Permission.html">Get-Permission</a></li>
 			<li><a href="Grant-Permission.html">Grant-Permission</a></li>
 			<li><a href="New-Credential.html">New-Credential</a></li>
 			<li><a href="Protect-Acl.html">Protect-Acl</a></li>
 			<li><a href="Revoke-Permission.html">Revoke-Permission</a></li>
-			<li><a href="Set-CryptoKeySecurity.html">Set-CryptoKeySecurity</a></li>
 			<li><a href="Test-AdminPrivilege.html">Test-AdminPrivilege</a></li>
 			<li><a href="Test-Permission.html">Test-Permission</a></li>
 		</ul>
@@ -258,10 +252,8 @@
 		</ul>
 		<li class="Category">WindowsFeatures</li>
 		<ul class="CommandMenu">
-			<li><a href="Assert-WindowsFeatureFunctionsSupported.html">Assert-WindowsFeatureFunctionsSupported</a></li>
 			<li><a href="Get-WindowsFeature.html">Get-WindowsFeature</a></li>
 			<li><a href="Install-WindowsFeature.html">Install-WindowsFeature</a></li>
-			<li><a href="Resolve-WindowsFeatureName.html">Resolve-WindowsFeatureName</a></li>
 			<li><a href="Test-WindowsFeature.html">Test-WindowsFeature</a></li>
 			<li><a href="Uninstall-WindowsFeature.html">Uninstall-WindowsFeature</a></li>
 		</ul>
@@ -273,16 +265,15 @@
 </div>
 
 
-    <h1>Set-IniEntry</h1>
-    <div><p>Sets an entry in an INI file.</p>
-</div>
+<h1>Set-IniEntry</h1>
+<div><p>Sets an entry in an INI file.</p></div>
 
-        <h2>Syntax</h2>
-    <pre class="Syntax"><code>Set-IniEntry [-Path] &lt;String&gt; [-Name] &lt;String&gt; [[-Value] &lt;String&gt;] [[-Section] &lt;String&gt;] [-CaseSensitive] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
+<h2>Syntax</h2>
+<pre class="Syntax"><code>Set-IniEntry [-Path] &lt;String&gt; [-Name] &lt;String&gt; [[-Value] &lt;String&gt;] [[-Section] &lt;String&gt;] [-CaseSensitive] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
     
-        <h2>Description</h2>
-    <div class="Description">
-        <p>A configuration file consists of sections, led by a <code>[section]</code> header and followed by <code>name = value</code> entries.  This function creates or updates an entry in an INI file.  Something like this:</p>
+<h2>Description</h2>
+<div class="Description">
+<p>A configuration file consists of sections, led by a <code>[section]</code> header and followed by <code>name = value</code> entries.  This function creates or updates an entry in an INI file.  Something like this:</p>
 
 <pre><code>[ui]
 username = Regina Spektor &lt;regina@reginaspektor.com&gt;
@@ -295,120 +286,115 @@ extdiff =
 <p>Names are not allowed to contains the equal sign, <code>=</code>.  Values can contain any character.  The INI file is parsed using <code>Split-Ini</code>.  <a href="Split-Ini.html">See its documentation for more examples.</a></p>
 
 <p>Be default, operates on the INI file case-insensitively. If your INI is case-sensitive, use the <code>-CaseSensitive</code> switch.</p>
-
-    </div>
+</div>
     
-            <h2>Related Commands</h2>
-        <ul>
+<h2>Related Commands</h2>
+<ul>
 <li><a href="Split-Ini.html">Split-Ini</a></li>
 <li><a href="LINK.html">LINK</a></li>
 <li><a href="Remove-IniEntry.html">Remove-IniEntry</a></li>
 </ul>
 
+<h2> Parameters </h2>
+<table border='1'>
+<tr>
+	<th>Name</th>
+    <th>Type</th>
+	<th>Description</th>
+	<th>Required?</th>
+	<th>Pipeline Input</th>
+	<th>Default Value</th>
+</tr>
+<tr valign='top'>
+	<td>Path</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+	<td>The path to the INI file to set.</td>
+	<td>true</td>
+	<td>false</td>
+    <td></td>
+</tr>
+<tr valign='top'>
+	<td>Name</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+	<td>The name of the INI entry being set.</td>
+	<td>true</td>
+	<td>false</td>
+    <td></td>
+</tr>
+<tr valign='top'>
+	<td>Value</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+	<td>The value of the INI entry being set.</td>
+	<td>false</td>
+	<td>false</td>
+    <td></td>
+</tr>
+<tr valign='top'>
+	<td>Section</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+	<td>The section of the INI where the entry should be set.</td>
+	<td>false</td>
+	<td>false</td>
+    <td></td>
+</tr>
+<tr valign='top'>
+	<td>CaseSensitive</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+	<td>Treat the INI file in a case-sensitive manner.</td>
+	<td>false</td>
+	<td>false</td>
+    <td>False</td>
+</tr>
+<tr valign='top'>
+	<td>WhatIf</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+	<td></td>
+	<td>false</td>
+	<td>false</td>
+    <td></td>
+</tr>
+<tr valign='top'>
+	<td>Confirm</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+	<td></td>
+	<td>false</td>
+	<td>false</td>
+    <td></td>
+</tr>
+<tr valign="top">
+    <td><a href="http://technet.microsoft.com/en-us/library/dd315352.aspx">CommonParameters</a></td>
+    <td></td>
+    <td>This cmdlet supports common parameters.  For more information type <br> <code>Get-Help about_CommonParameters</code>.</td>
+    <td></td>
+    <td></td>
+    <td></td>
+</tr>
+</table>
+        
 
-    		<h2> Parameters </h2>
-		<table border='1'>
-			<tr>
-				<th>Name</th>
-                <th>Type</th>
-				<th>Description</th>
-				<th>Required?</th>
-				<th>Pipeline Input</th>
-				<th>Default Value</th>
-			</tr>
-            			<tr valign='top'>
-				<td>Path</td>
-				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
-				<td>The path to the INI file to set.
-</td>
-				<td>true</td>
-				<td>false</td>
-                <td></td>
-			</tr>
-			<tr valign='top'>
-				<td>Name</td>
-				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
-				<td>The name of the INI entry being set.
-</td>
-				<td>true</td>
-				<td>false</td>
-                <td></td>
-			</tr>
-			<tr valign='top'>
-				<td>Value</td>
-				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
-				<td>The value of the INI entry being set.
-</td>
-				<td>false</td>
-				<td>false</td>
-                <td></td>
-			</tr>
-			<tr valign='top'>
-				<td>Section</td>
-				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
-				<td>The section of the INI where the entry should be set.
-</td>
-				<td>false</td>
-				<td>false</td>
-                <td></td>
-			</tr>
-			<tr valign='top'>
-				<td>CaseSensitive</td>
-				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
-				<td>Treat the INI file in a case-sensitive manner.
-</td>
-				<td>false</td>
-				<td>false</td>
-                <td>False</td>
-			</tr>
-			<tr valign='top'>
-				<td>WhatIf</td>
-				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
-				<td></td>
-				<td>false</td>
-				<td>false</td>
-                <td></td>
-			</tr>
-			<tr valign='top'>
-				<td>Confirm</td>
-				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
-				<td></td>
-				<td>false</td>
-				<td>false</td>
-                <td></td>
-			</tr>
-                            <tr valign="top">
-                <td><a href="http://technet.microsoft.com/en-us/library/dd315352.aspx">CommonParameters</a></td>
-                <td></td>
-                <td>This cmdlet supports common parameters.  For more information type <br> <code>Get-Help about_CommonParameters</code>.</td>
-                <td></td>
-                <td></td>
-                <td></td>
-                </tr>
-        </table>
         
-    
+
         
-    
+
         
-    
-        
-                <h2>EXAMPLE 1</h2>
-            <pre><code>Set-IniEntry -Path C:\Users\rspektor\mercurial.ini -Section extensions -Name share -Value ''</code></pre>
-            <p><p>If the <code>C:\Users\rspektor\mercurial.ini</code> file is empty, adds the following to it:</p>
+<h2>EXAMPLE 1</h2>
+<pre><code>Set-IniEntry -Path C:\Users\rspektor\mercurial.ini -Section extensions -Name share -Value ''</code></pre>
+<p>If the <code>C:\Users\rspektor\mercurial.ini</code> file is empty, adds the following to it:</p>
 
 <pre><code>[extensions]
 share =
 </code></pre>
-</p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 2</h2>
-            <pre><code>Set-IniEntry -Path C:\Users\rspektor\music.ini -Name genres -Value 'alternative,rock'</code></pre>
-            <p><p>If the <code>music.ini</code> file is empty, adds the following to it:</p>
+
+<h2>EXAMPLE 2</h2>
+<pre><code>Set-IniEntry -Path C:\Users\rspektor\music.ini -Name genres -Value 'alternative,rock'</code></pre>
+<p>If the <code>music.ini</code> file is empty, adds the following to it:</p>
 
 <pre><code>genres = alternative,rock
 </code></pre>
-</p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 3</h2>
-            <pre><code>Set-IniEntry -Path C:\Users\rspektor\music.ini -Name genres -Value 'alternative,rock,world'</code></pre>
-            <p><p>If the <code>music.ini</code> file contains the following:</p>
+
+<h2>EXAMPLE 3</h2>
+<pre><code>Set-IniEntry -Path C:\Users\rspektor\music.ini -Name genres -Value 'alternative,rock,world'</code></pre>
+<p>If the <code>music.ini</code> file contains the following:</p>
 
 <pre><code>genres = r&amp;b
 </code></pre>
@@ -417,9 +403,9 @@ share =
 
 <pre><code>genres = alternative,rock,world
 </code></pre>
-</p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 4</h2>
-            <pre><code>Set-IniEntry -Path C:\users\me\npmrc -Name prefix -Value 'C:\Users\me\npm_modules' -CaseSensitive</code></pre>
-            <p><p>Demonstrates how to set an INI entry in a case-sensitive file.</p>
-</p><p></p><p></p><p></p><p></p>
+
+<h2>EXAMPLE 4</h2>
+<pre><code>Set-IniEntry -Path C:\users\me\npmrc -Name prefix -Value 'C:\Users\me\npm_modules' -CaseSensitive</code></pre>
+<p>Demonstrates how to set an INI entry in a case-sensitive file.</p>
 </body>
-</html>   
+</html>

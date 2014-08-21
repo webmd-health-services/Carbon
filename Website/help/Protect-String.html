@@ -5,7 +5,7 @@
 	<link href="styles.css" type="text/css" rel="stylesheet" />
 </head>
 <body>
-    	<ul id="SiteNav">
+	<ul id="SiteNav">
 		<li><a href="http://get-carbon.org">Get-Carbon</a></li>
 		<li><b>-Documentation</b></li>
         <li><a href="http://get-carbon.org">-ReleaseNotes</a></li>
@@ -76,7 +76,6 @@
 		<ul class="CommandMenu">
 			<li><a href="Assert-FirewallConfigurable.html">Assert-FirewallConfigurable</a></li>
 			<li><a href="Disable-FirewallStatefulFtp.html">Disable-FirewallStatefulFtp</a></li>
-			<li><a href="Enable-FirewallRule.html">Enable-FirewallRule</a></li>
 			<li><a href="Enable-FirewallStatefulFtp.html">Enable-FirewallStatefulFtp</a></li>
 			<li><a href="Get-FirewallRule.html">Get-FirewallRule</a></li>
 			<li><a href="Test-FirewallStatefulFtp.html">Test-FirewallStatefulFtp</a></li>
@@ -91,7 +90,6 @@
 		<li class="Category">IIS</li>
 		<ul class="CommandMenu">
 			<li><a href="Add-IisDefaultDocument.html">Add-IisDefaultDocument</a></li>
-			<li><a href="Add-IisServerManagerMember.html">Add-IisServerManagerMember</a></li>
 			<li><a href="Disable-IisSecurityAuthentication.html">Disable-IisSecurityAuthentication</a></li>
 			<li><a href="Enable-IisDirectoryBrowsing.html">Enable-IisDirectoryBrowsing</a></li>
 			<li><a href="Enable-IisSecurityAuthentication.html">Enable-IisSecurityAuthentication</a></li>
@@ -157,7 +155,6 @@
 		<ul class="CommandMenu">
 			<li><a href="Get-IPAddress.html">Get-IPAddress</a></li>
 			<li><a href="Test-IPAddress.html">Test-IPAddress</a></li>
-			<li><a href="Test-LocalComputerName.html">Test-LocalComputerName</a></li>
 		</ul>
 		<li class="Category">Path</li>
 		<ul class="CommandMenu">
@@ -182,7 +179,6 @@
 			<li><a href="Complete-Job.html">Complete-Job</a></li>
 			<li><a href="Get-PowershellPath.html">Get-PowershellPath</a></li>
 			<li><a href="Get-TrustedHost.html">Get-TrustedHost</a></li>
-			<li><a href="Invoke-ConsoleCommand.html">Invoke-ConsoleCommand</a></li>
 			<li><a href="Invoke-PowerShell.html">Invoke-PowerShell</a></li>
 			<li><a href="Set-TrustedHost.html">Set-TrustedHost</a></li>
 			<li><a href="Test-PowerShellIs32Bit.html">Test-PowerShellIs32Bit</a></li>
@@ -210,13 +206,11 @@
 			<li><a href="ConvertTo-ContainerInheritanceFlags.html">ConvertTo-ContainerInheritanceFlags</a></li>
 			<li><a href="ConvertTo-InheritanceFlag.html">ConvertTo-InheritanceFlag</a></li>
 			<li><a href="ConvertTo-PropagationFlag.html">ConvertTo-PropagationFlag</a></li>
-			<li><a href="ConvertTo-ProviderAccessControlRights.html">ConvertTo-ProviderAccessControlRights</a></li>
 			<li><a href="Get-Permission.html">Get-Permission</a></li>
 			<li><a href="Grant-Permission.html">Grant-Permission</a></li>
 			<li><a href="New-Credential.html">New-Credential</a></li>
 			<li><a href="Protect-Acl.html">Protect-Acl</a></li>
 			<li><a href="Revoke-Permission.html">Revoke-Permission</a></li>
-			<li><a href="Set-CryptoKeySecurity.html">Set-CryptoKeySecurity</a></li>
 			<li><a href="Test-AdminPrivilege.html">Test-AdminPrivilege</a></li>
 			<li><a href="Test-Permission.html">Test-Permission</a></li>
 		</ul>
@@ -258,10 +252,8 @@
 		</ul>
 		<li class="Category">WindowsFeatures</li>
 		<ul class="CommandMenu">
-			<li><a href="Assert-WindowsFeatureFunctionsSupported.html">Assert-WindowsFeatureFunctionsSupported</a></li>
 			<li><a href="Get-WindowsFeature.html">Get-WindowsFeature</a></li>
 			<li><a href="Install-WindowsFeature.html">Install-WindowsFeature</a></li>
-			<li><a href="Resolve-WindowsFeatureName.html">Resolve-WindowsFeatureName</a></li>
 			<li><a href="Test-WindowsFeature.html">Test-WindowsFeature</a></li>
 			<li><a href="Uninstall-WindowsFeature.html">Uninstall-WindowsFeature</a></li>
 		</ul>
@@ -273,21 +265,20 @@
 </div>
 
 
-    <h1>Protect-String</h1>
-    <div><p>Encrypts a string.</p>
-</div>
+<h1>Protect-String</h1>
+<div><p>Encrypts a string.</p></div>
 
-        <h2>Syntax</h2>
-    <pre class="Syntax"><code>Protect-String [-String] &lt;String&gt; -ForUser [&lt;CommonParameters&gt;]</code></pre>
+<h2>Syntax</h2>
+<pre class="Syntax"><code>Protect-String [-String] &lt;String&gt; -ForUser [&lt;CommonParameters&gt;]</code></pre>
 <pre class="Syntax"><code>Protect-String [-String] &lt;String&gt; -ForComputer [&lt;CommonParameters&gt;]</code></pre>
 <pre class="Syntax"><code>Protect-String [-String] &lt;String&gt; -Credential &lt;PSCredential&gt; [&lt;CommonParameters&gt;]</code></pre>
 <pre class="Syntax"><code>Protect-String [-String] &lt;String&gt; -Certificate &lt;X509Certificate2&gt; [-UseDirectEncryptionPadding] [&lt;CommonParameters&gt;]</code></pre>
 <pre class="Syntax"><code>Protect-String [-String] &lt;String&gt; -Thumbprint &lt;String&gt; [-UseDirectEncryptionPadding] [&lt;CommonParameters&gt;]</code></pre>
 <pre class="Syntax"><code>Protect-String [-String] &lt;String&gt; -PublicKeyPath &lt;String&gt; [-UseDirectEncryptionPadding] [&lt;CommonParameters&gt;]</code></pre>
     
-        <h2>Description</h2>
-    <div class="Description">
-        <p>Strings can be encrypted with the Data Protection API (DPAPI) or RSA.</p>
+<h2>Description</h2>
+<div class="Description">
+<p>Strings can be encrypted with the Data Protection API (DPAPI) or RSA.</p>
 
 <h2>DPAPI</h2>
 
@@ -304,129 +295,124 @@
 <li>with a certificate in one of the Windows certificate stores, passing its unique thumbprint via the <code>Thumbprint</code> parameter, or via the <code>PublicKeyPath</code> parameter cn be certificat provider path, e.g. it starts with <code>cert:\</code>.</li>
 <li>with a X509 certificate file, via the <code>PublicKeyPath</code> parameter</li>
 </ul>
-
-    </div>
+</div>
     
-            <h2>Related Commands</h2>
-        <ul>
+<h2>Related Commands</h2>
+<ul>
 <li><a href="New-RsaKeyPair.html">New-RsaKeyPair</a></li>
 <li><a href="Unprotect-String.html">Unprotect-String</a></li>
 <li><a href="http://msdn.microsoft.com/en-us/library/system.security.cryptography.protecteddata.aspx">http://msdn.microsoft.com/en-us/library/system.security.cryptography.protecteddata.aspx</a></li>
 </ul>
 
+<h2> Parameters </h2>
+<table border='1'>
+<tr>
+	<th>Name</th>
+    <th>Type</th>
+	<th>Description</th>
+	<th>Required?</th>
+	<th>Pipeline Input</th>
+	<th>Default Value</th>
+</tr>
+<tr valign='top'>
+	<td>String</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+	<td>The text to encrypt.</td>
+	<td>true</td>
+	<td>true (ByValue)</td>
+    <td></td>
+</tr>
+<tr valign='top'>
+	<td>ForUser</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+	<td>Encrypts for the current user so that only he can decrypt.</td>
+	<td>true</td>
+	<td>false</td>
+    <td>False</td>
+</tr>
+<tr valign='top'>
+	<td>ForComputer</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+	<td>Encrypts for the current computer so that any user logged into the computer can decrypt.</td>
+	<td>true</td>
+	<td>false</td>
+    <td>False</td>
+</tr>
+<tr valign='top'>
+	<td>Credential</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.pscredential.aspx">PSCredential</a></td>
+	<td>Encrypts for a specific user.</td>
+	<td>true</td>
+	<td>false</td>
+    <td></td>
+</tr>
+<tr valign='top'>
+	<td>Certificate</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.security.cryptography.x509certificates.x509certificate2.aspx">X509Certificate2</a></td>
+	<td>The public key to use for encrypting.</td>
+	<td>true</td>
+	<td>false</td>
+    <td></td>
+</tr>
+<tr valign='top'>
+	<td>Thumbprint</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+	<td>The thumbprint of the certificate, found in one of the Windows certificate stores, to use when encrypting. All certificate stores are searched.</td>
+	<td>true</td>
+	<td>false</td>
+    <td></td>
+</tr>
+<tr valign='top'>
+	<td>PublicKeyPath</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+	<td>The path to the public key to use for encrypting. Must be to an <code>X509Certificate2</code> object.</td>
+	<td>true</td>
+	<td>false</td>
+    <td></td>
+</tr>
+<tr valign='top'>
+	<td>UseDirectEncryptionPadding</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+	<td>If true, uses Direct Encryption (PKCS#1 v1.5) padding. Otherwise (the default), uses OAEP (PKCS#1 v2) padding. See <a href="http://msdn.microsoft.com/en-us/library/system.security.cryptography.rsacryptoserviceprovider.encrypt(v=vs.110).aspx">Encrypt</a> for information.</td>
+	<td>false</td>
+	<td>false</td>
+    <td>False</td>
+</tr>
 
-    		<h2> Parameters </h2>
-		<table border='1'>
-			<tr>
-				<th>Name</th>
-                <th>Type</th>
-				<th>Description</th>
-				<th>Required?</th>
-				<th>Pipeline Input</th>
-				<th>Default Value</th>
-			</tr>
-            			<tr valign='top'>
-				<td>String</td>
-				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
-				<td>The text to encrypt.
-</td>
-				<td>true</td>
-				<td>true (ByValue)</td>
-                <td></td>
-			</tr>
-			<tr valign='top'>
-				<td>ForUser</td>
-				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
-				<td>Encrypts for the current user so that only he can decrypt.
-</td>
-				<td>true</td>
-				<td>false</td>
-                <td>False</td>
-			</tr>
-			<tr valign='top'>
-				<td>ForComputer</td>
-				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
-				<td>Encrypts for the current computer so that any user logged into the computer can decrypt.
-</td>
-				<td>true</td>
-				<td>false</td>
-                <td>False</td>
-			</tr>
-			<tr valign='top'>
-				<td>Credential</td>
-				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.pscredential.aspx">PSCredential</a></td>
-				<td>Encrypts for a specific user.
-</td>
-				<td>true</td>
-				<td>false</td>
-                <td></td>
-			</tr>
-			<tr valign='top'>
-				<td>Certificate</td>
-				<td><a href="http://msdn.microsoft.com/en-us/library/system.security.cryptography.x509certificates.x509certificate2.aspx">X509Certificate2</a></td>
-				<td>The public key to use for encrypting.
-</td>
-				<td>true</td>
-				<td>false</td>
-                <td></td>
-			</tr>
-			<tr valign='top'>
-				<td>Thumbprint</td>
-				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
-				<td>The thumbprint of the certificate, found in one of the Windows certificate stores, to use when encrypting. All certificate stores are searched.
-</td>
-				<td>true</td>
-				<td>false</td>
-                <td></td>
-			</tr>
-			<tr valign='top'>
-				<td>PublicKeyPath</td>
-				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
-				<td>The path to the public key to use for encrypting. Must be to an <code>X509Certificate2</code> object.
-</td>
-				<td>true</td>
-				<td>false</td>
-                <td></td>
-			</tr>
-			<tr valign='top'>
-				<td>UseDirectEncryptionPadding</td>
-				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
-				<td>If true, uses Direct Encryption (PKCS#1 v1.5) padding. Otherwise (the default), uses OAEP (PKCS#1 v2) padding. See <a href="http://msdn.microsoft.com/en-us/library/system.security.cryptography.rsacryptoserviceprovider.encrypt(v=vs.110).aspx">Encrypt</a> for information.
-</td>
-				<td>false</td>
-				<td>false</td>
-                <td>False</td>
-			</tr>
-            
-        </table>
+</table>
         
-    
+
         
-    
+
         
-    
+
         
-                <h2>EXAMPLE 1</h2>
-            <pre><code>Protect-String -String 'TheStringIWantToEncrypt' -ForUser | Out-File MySecret.txt</code></pre>
-            <p><p>Encrypts the given string and saves the encrypted string into MySecret.txt.  Only the user who encrypts the string can unencrypt it.</p>
-</p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 2</h2>
-            <pre><code>$cipherText = Protect-String -String "MySuperSecretIdentity" -ForComputer</code></pre>
-            <p><p>Encrypts the given string and stores the value in $cipherText.  Because the encryption scope is set to LocalMachine, any user logged onto the local computer can decrypt <code>$cipherText</code>.</p>
-</p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 3</h2>
-            <pre><code>Protect-String -String 's0000p33333r s33333cr33333t' -Credential (Get-Credential 'builduser')</code></pre>
-            <p><p>Demonstrates how to use <code>Protect-String</code> to encrypt a secret as a specific user. This is useful for situation where a secret needs to be encrypted by a user other than the user running <code>Protect-String</code>. Encrypting as a specific user won't work over PowerShell remoting.</p>
-</p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 4</h2>
-            <pre><code>Protect-String -String 'the secret sauce' -Certificate $myCert</code></pre>
-            <p><p>Demonstrates how to encrypt a secret using RSA with a <code>System.Security.Cryptography.X509Certificates.X509Certificate2</code> object. You're responsible for creating/loading it. The <code>New-RsaKeyPair</code> function will create a key pair for you, if you've got a Windows SDK installed.</p>
-</p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 5</h2>
-            <pre><code>Protect-String -String 'the secret sauce' -Thumbprint '44A7C27F3353BC53F82318C14490D7E2500B6D9E'</code></pre>
-            <p><p>Demonstrates how to encrypt a secret using RSA with a certificate in one of the Windows certificate stores. All local machine and user stores are searched.</p>
-</p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 6</h2>
-            <pre><code>ProtectString -String 'the secret sauce' -PublicKeyPath 'C:\Projects\Security\publickey.cer'</code></pre>
-            <p><p>Demonstrates how to encrypt a secret using RSA with a certificate file. The file must be loadable by the <code>System.Security.Cryptography.X509Certificates.X509Certificate</code> class.</p>
-</p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 7</h2>
-            <pre><code>ProtectString -String 'the secret sauce' -PublicKeyPath 'cert:\LocalMachine\My\44A7C27F3353BC53F82318C14490D7E2500B6D9E'</code></pre>
-            <p><p>Demonstrates how to encrypt a secret using RSA with a certificate in the store, giving its exact path.</p>
-</p><p></p><p></p><p></p><p></p>
+<h2>EXAMPLE 1</h2>
+<pre><code>Protect-String -String 'TheStringIWantToEncrypt' -ForUser | Out-File MySecret.txt</code></pre>
+<p>Encrypts the given string and saves the encrypted string into MySecret.txt.  Only the user who encrypts the string can unencrypt it.</p>
+
+<h2>EXAMPLE 2</h2>
+<pre><code>$cipherText = Protect-String -String "MySuperSecretIdentity" -ForComputer</code></pre>
+<p>Encrypts the given string and stores the value in $cipherText.  Because the encryption scope is set to LocalMachine, any user logged onto the local computer can decrypt <code>$cipherText</code>.</p>
+
+<h2>EXAMPLE 3</h2>
+<pre><code>Protect-String -String 's0000p33333r s33333cr33333t' -Credential (Get-Credential 'builduser')</code></pre>
+<p>Demonstrates how to use <code>Protect-String</code> to encrypt a secret as a specific user. This is useful for situation where a secret needs to be encrypted by a user other than the user running <code>Protect-String</code>. Encrypting as a specific user won't work over PowerShell remoting.</p>
+
+<h2>EXAMPLE 4</h2>
+<pre><code>Protect-String -String 'the secret sauce' -Certificate $myCert</code></pre>
+<p>Demonstrates how to encrypt a secret using RSA with a <code>System.Security.Cryptography.X509Certificates.X509Certificate2</code> object. You're responsible for creating/loading it. The <code>New-RsaKeyPair</code> function will create a key pair for you, if you've got a Windows SDK installed.</p>
+
+<h2>EXAMPLE 5</h2>
+<pre><code>Protect-String -String 'the secret sauce' -Thumbprint '44A7C27F3353BC53F82318C14490D7E2500B6D9E'</code></pre>
+<p>Demonstrates how to encrypt a secret using RSA with a certificate in one of the Windows certificate stores. All local machine and user stores are searched.</p>
+
+<h2>EXAMPLE 6</h2>
+<pre><code>ProtectString -String 'the secret sauce' -PublicKeyPath 'C:\Projects\Security\publickey.cer'</code></pre>
+<p>Demonstrates how to encrypt a secret using RSA with a certificate file. The file must be loadable by the <code>System.Security.Cryptography.X509Certificates.X509Certificate</code> class.</p>
+
+<h2>EXAMPLE 7</h2>
+<pre><code>ProtectString -String 'the secret sauce' -PublicKeyPath 'cert:\LocalMachine\My\44A7C27F3353BC53F82318C14490D7E2500B6D9E'</code></pre>
+<p>Demonstrates how to encrypt a secret using RSA with a certificate in the store, giving its exact path.</p>
 </body>
-</html>   
+</html>

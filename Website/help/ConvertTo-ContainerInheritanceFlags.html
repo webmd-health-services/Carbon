@@ -5,7 +5,7 @@
 	<link href="styles.css" type="text/css" rel="stylesheet" />
 </head>
 <body>
-    	<ul id="SiteNav">
+	<ul id="SiteNav">
 		<li><a href="http://get-carbon.org">Get-Carbon</a></li>
 		<li><b>-Documentation</b></li>
         <li><a href="http://get-carbon.org">-ReleaseNotes</a></li>
@@ -76,7 +76,6 @@
 		<ul class="CommandMenu">
 			<li><a href="Assert-FirewallConfigurable.html">Assert-FirewallConfigurable</a></li>
 			<li><a href="Disable-FirewallStatefulFtp.html">Disable-FirewallStatefulFtp</a></li>
-			<li><a href="Enable-FirewallRule.html">Enable-FirewallRule</a></li>
 			<li><a href="Enable-FirewallStatefulFtp.html">Enable-FirewallStatefulFtp</a></li>
 			<li><a href="Get-FirewallRule.html">Get-FirewallRule</a></li>
 			<li><a href="Test-FirewallStatefulFtp.html">Test-FirewallStatefulFtp</a></li>
@@ -91,7 +90,6 @@
 		<li class="Category">IIS</li>
 		<ul class="CommandMenu">
 			<li><a href="Add-IisDefaultDocument.html">Add-IisDefaultDocument</a></li>
-			<li><a href="Add-IisServerManagerMember.html">Add-IisServerManagerMember</a></li>
 			<li><a href="Disable-IisSecurityAuthentication.html">Disable-IisSecurityAuthentication</a></li>
 			<li><a href="Enable-IisDirectoryBrowsing.html">Enable-IisDirectoryBrowsing</a></li>
 			<li><a href="Enable-IisSecurityAuthentication.html">Enable-IisSecurityAuthentication</a></li>
@@ -157,7 +155,6 @@
 		<ul class="CommandMenu">
 			<li><a href="Get-IPAddress.html">Get-IPAddress</a></li>
 			<li><a href="Test-IPAddress.html">Test-IPAddress</a></li>
-			<li><a href="Test-LocalComputerName.html">Test-LocalComputerName</a></li>
 		</ul>
 		<li class="Category">Path</li>
 		<ul class="CommandMenu">
@@ -182,7 +179,6 @@
 			<li><a href="Complete-Job.html">Complete-Job</a></li>
 			<li><a href="Get-PowershellPath.html">Get-PowershellPath</a></li>
 			<li><a href="Get-TrustedHost.html">Get-TrustedHost</a></li>
-			<li><a href="Invoke-ConsoleCommand.html">Invoke-ConsoleCommand</a></li>
 			<li><a href="Invoke-PowerShell.html">Invoke-PowerShell</a></li>
 			<li><a href="Set-TrustedHost.html">Set-TrustedHost</a></li>
 			<li><a href="Test-PowerShellIs32Bit.html">Test-PowerShellIs32Bit</a></li>
@@ -210,13 +206,11 @@
 			<li><a href="ConvertTo-ContainerInheritanceFlags.html">ConvertTo-ContainerInheritanceFlags</a></li>
 			<li><a href="ConvertTo-InheritanceFlag.html">ConvertTo-InheritanceFlag</a></li>
 			<li><a href="ConvertTo-PropagationFlag.html">ConvertTo-PropagationFlag</a></li>
-			<li><a href="ConvertTo-ProviderAccessControlRights.html">ConvertTo-ProviderAccessControlRights</a></li>
 			<li><a href="Get-Permission.html">Get-Permission</a></li>
 			<li><a href="Grant-Permission.html">Grant-Permission</a></li>
 			<li><a href="New-Credential.html">New-Credential</a></li>
 			<li><a href="Protect-Acl.html">Protect-Acl</a></li>
 			<li><a href="Revoke-Permission.html">Revoke-Permission</a></li>
-			<li><a href="Set-CryptoKeySecurity.html">Set-CryptoKeySecurity</a></li>
 			<li><a href="Test-AdminPrivilege.html">Test-AdminPrivilege</a></li>
 			<li><a href="Test-Permission.html">Test-Permission</a></li>
 		</ul>
@@ -258,10 +252,8 @@
 		</ul>
 		<li class="Category">WindowsFeatures</li>
 		<ul class="CommandMenu">
-			<li><a href="Assert-WindowsFeatureFunctionsSupported.html">Assert-WindowsFeatureFunctionsSupported</a></li>
 			<li><a href="Get-WindowsFeature.html">Get-WindowsFeature</a></li>
 			<li><a href="Install-WindowsFeature.html">Install-WindowsFeature</a></li>
-			<li><a href="Resolve-WindowsFeatureName.html">Resolve-WindowsFeatureName</a></li>
 			<li><a href="Test-WindowsFeature.html">Test-WindowsFeature</a></li>
 			<li><a href="Uninstall-WindowsFeature.html">Uninstall-WindowsFeature</a></li>
 		</ul>
@@ -273,72 +265,64 @@
 </div>
 
 
-    <h1>ConvertTo-ContainerInheritanceFlags</h1>
-    <div><p>Converts a combination of InheritanceFlags Propagation Flags into a Carbon.Security.ContainerInheritanceFlags enumeration value.</p>
-</div>
+<h1>ConvertTo-ContainerInheritanceFlags</h1>
+<div><p>Converts a combination of InheritanceFlags Propagation Flags into a Carbon.Security.ContainerInheritanceFlags enumeration value.</p></div>
 
-        <h2>Syntax</h2>
-    <pre class="Syntax"><code>ConvertTo-ContainerInheritanceFlags [-InheritanceFlags] {None | ContainerInherit | ObjectInherit} [-PropagationFlags] {None | NoPropagateInherit | InheritOnly} [&lt;CommonParameters&gt;]</code></pre>
+<h2>Syntax</h2>
+<pre class="Syntax"><code>ConvertTo-ContainerInheritanceFlags [-InheritanceFlags] {None | ContainerInherit | ObjectInherit} [-PropagationFlags] {None | NoPropagateInherit | InheritOnly} [&lt;CommonParameters&gt;]</code></pre>
     
-        <h2>Description</h2>
-    <div class="Description">
-        <p><code>Grant-Permission</code>, <code>Test-Permission</code>, and <code>Get-Permission</code> all take an <code>ApplyTo</code> parameter, which is a <code>Carbon.Security.ContainerInheritanceFlags</code> enumeration value. This enumeration is then converted to the appropriate <code>System.Security.AccessControl.InheritanceFlags</code> and <code>System.Security.AccessControl.PropagationFlags</code> values for getting/granting/testing permissions. If you prefer to speak in terms of <code>InheritanceFlags</code> and <code>PropagationFlags</code>, use this function to convert them to a <code>ContainerInheritanceFlags</code> value.</p>
+<h2>Description</h2>
+<div class="Description">
+<p><code>Grant-Permission</code>, <code>Test-Permission</code>, and <code>Get-Permission</code> all take an <code>ApplyTo</code> parameter, which is a <code>Carbon.Security.ContainerInheritanceFlags</code> enumeration value. This enumeration is then converted to the appropriate <code>System.Security.AccessControl.InheritanceFlags</code> and <code>System.Security.AccessControl.PropagationFlags</code> values for getting/granting/testing permissions. If you prefer to speak in terms of <code>InheritanceFlags</code> and <code>PropagationFlags</code>, use this function to convert them to a <code>ContainerInheritanceFlags</code> value.</p>
 
 <p>If your combination doesn't result in a valid combination, <code>$null</code> is returned.</p>
 
 <p>For detailed description of inheritance and propagation flags, see the help for <code>Grant-Permission</code>.</p>
-
-    </div>
+</div>
     
-            <h2>Related Commands</h2>
-        <ul>
+<h2>Related Commands</h2>
+<ul>
 <li><a href="Grant-Permission.html">Grant-Permission</a></li>
 <li><a href="Test-Permission.html">Test-Permission</a></li>
 </ul>
 
+<h2> Parameters </h2>
+<table border='1'>
+<tr>
+	<th>Name</th>
+    <th>Type</th>
+	<th>Description</th>
+	<th>Required?</th>
+	<th>Pipeline Input</th>
+	<th>Default Value</th>
+</tr>
+<tr valign='top'>
+	<td>InheritanceFlags</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.inheritanceflags.aspx">InheritanceFlags</a></td>
+	<td>The inheritance flags to convert.</td>
+	<td>true</td>
+	<td>false</td>
+    <td></td>
+</tr>
+<tr valign='top'>
+	<td>PropagationFlags</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.propagationflags.aspx">PropagationFlags</a></td>
+	<td>The propagation flags to convert.</td>
+	<td>true</td>
+	<td>false</td>
+    <td></td>
+</tr>
 
-    		<h2> Parameters </h2>
-		<table border='1'>
-			<tr>
-				<th>Name</th>
-                <th>Type</th>
-				<th>Description</th>
-				<th>Required?</th>
-				<th>Pipeline Input</th>
-				<th>Default Value</th>
-			</tr>
-            			<tr valign='top'>
-				<td>InheritanceFlags</td>
-				<td><a href="http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.inheritanceflags.aspx">InheritanceFlags</a></td>
-				<td>The inheritance flags to convert.
-</td>
-				<td>true</td>
-				<td>false</td>
-                <td></td>
-			</tr>
-			<tr valign='top'>
-				<td>PropagationFlags</td>
-				<td><a href="http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.propagationflags.aspx">PropagationFlags</a></td>
-				<td>The propagation flags to convert.
-</td>
-				<td>true</td>
-				<td>false</td>
-                <td></td>
-			</tr>
-            
-        </table>
+</table>
         
-    
-        
-            <h2>Return Values</h2>
-        <p><a href="http://msdn.microsoft.com/en-us/library/carbon.security.containerinheritanceflags.aspx">Carbon.Security.ContainerInheritanceFlags</a>. </p>
 
         
-    
+
         
-                <h2>EXAMPLE 1</h2>
-            <pre><code>ConvertTo-ContainerInheritanceFlags -InheritanceFlags 'ContainerInherit' -PropagationFlags 'None'</code></pre>
-            <p><p>Demonstrates how to convert <code>InheritanceFlags</code> and <code>PropagationFlags</code> enumeration values into a <code>ContainerInheritanceFlags</code>. In this case, <code>[Carbon.Security.ContainerInheritanceFlags]::ContainerAndSubContainers</code> is returned.</p>
-</p><p></p><p></p><p></p><p></p>
+
+        
+<h2>EXAMPLE 1</h2>
+<pre><code>ConvertTo-ContainerInheritanceFlags -InheritanceFlags 'ContainerInherit' -PropagationFlags 'None'</code></pre>
+<p>Demonstrates how to convert <code>InheritanceFlags</code> and <code>PropagationFlags</code> enumeration values into a <code>ContainerInheritanceFlags</code>. In this case, <code>[Carbon.Security.ContainerInheritanceFlags]::ContainerAndSubContainers</code> is returned.</p>
 </body>
-</html>   
+</html>

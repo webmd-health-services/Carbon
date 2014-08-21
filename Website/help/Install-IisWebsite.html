@@ -5,7 +5,7 @@
 	<link href="styles.css" type="text/css" rel="stylesheet" />
 </head>
 <body>
-    	<ul id="SiteNav">
+	<ul id="SiteNav">
 		<li><a href="http://get-carbon.org">Get-Carbon</a></li>
 		<li><b>-Documentation</b></li>
         <li><a href="http://get-carbon.org">-ReleaseNotes</a></li>
@@ -76,7 +76,6 @@
 		<ul class="CommandMenu">
 			<li><a href="Assert-FirewallConfigurable.html">Assert-FirewallConfigurable</a></li>
 			<li><a href="Disable-FirewallStatefulFtp.html">Disable-FirewallStatefulFtp</a></li>
-			<li><a href="Enable-FirewallRule.html">Enable-FirewallRule</a></li>
 			<li><a href="Enable-FirewallStatefulFtp.html">Enable-FirewallStatefulFtp</a></li>
 			<li><a href="Get-FirewallRule.html">Get-FirewallRule</a></li>
 			<li><a href="Test-FirewallStatefulFtp.html">Test-FirewallStatefulFtp</a></li>
@@ -91,7 +90,6 @@
 		<li class="Category">IIS</li>
 		<ul class="CommandMenu">
 			<li><a href="Add-IisDefaultDocument.html">Add-IisDefaultDocument</a></li>
-			<li><a href="Add-IisServerManagerMember.html">Add-IisServerManagerMember</a></li>
 			<li><a href="Disable-IisSecurityAuthentication.html">Disable-IisSecurityAuthentication</a></li>
 			<li><a href="Enable-IisDirectoryBrowsing.html">Enable-IisDirectoryBrowsing</a></li>
 			<li><a href="Enable-IisSecurityAuthentication.html">Enable-IisSecurityAuthentication</a></li>
@@ -157,7 +155,6 @@
 		<ul class="CommandMenu">
 			<li><a href="Get-IPAddress.html">Get-IPAddress</a></li>
 			<li><a href="Test-IPAddress.html">Test-IPAddress</a></li>
-			<li><a href="Test-LocalComputerName.html">Test-LocalComputerName</a></li>
 		</ul>
 		<li class="Category">Path</li>
 		<ul class="CommandMenu">
@@ -182,7 +179,6 @@
 			<li><a href="Complete-Job.html">Complete-Job</a></li>
 			<li><a href="Get-PowershellPath.html">Get-PowershellPath</a></li>
 			<li><a href="Get-TrustedHost.html">Get-TrustedHost</a></li>
-			<li><a href="Invoke-ConsoleCommand.html">Invoke-ConsoleCommand</a></li>
 			<li><a href="Invoke-PowerShell.html">Invoke-PowerShell</a></li>
 			<li><a href="Set-TrustedHost.html">Set-TrustedHost</a></li>
 			<li><a href="Test-PowerShellIs32Bit.html">Test-PowerShellIs32Bit</a></li>
@@ -210,13 +206,11 @@
 			<li><a href="ConvertTo-ContainerInheritanceFlags.html">ConvertTo-ContainerInheritanceFlags</a></li>
 			<li><a href="ConvertTo-InheritanceFlag.html">ConvertTo-InheritanceFlag</a></li>
 			<li><a href="ConvertTo-PropagationFlag.html">ConvertTo-PropagationFlag</a></li>
-			<li><a href="ConvertTo-ProviderAccessControlRights.html">ConvertTo-ProviderAccessControlRights</a></li>
 			<li><a href="Get-Permission.html">Get-Permission</a></li>
 			<li><a href="Grant-Permission.html">Grant-Permission</a></li>
 			<li><a href="New-Credential.html">New-Credential</a></li>
 			<li><a href="Protect-Acl.html">Protect-Acl</a></li>
 			<li><a href="Revoke-Permission.html">Revoke-Permission</a></li>
-			<li><a href="Set-CryptoKeySecurity.html">Set-CryptoKeySecurity</a></li>
 			<li><a href="Test-AdminPrivilege.html">Test-AdminPrivilege</a></li>
 			<li><a href="Test-Permission.html">Test-Permission</a></li>
 		</ul>
@@ -258,10 +252,8 @@
 		</ul>
 		<li class="Category">WindowsFeatures</li>
 		<ul class="CommandMenu">
-			<li><a href="Assert-WindowsFeatureFunctionsSupported.html">Assert-WindowsFeatureFunctionsSupported</a></li>
 			<li><a href="Get-WindowsFeature.html">Get-WindowsFeature</a></li>
 			<li><a href="Install-WindowsFeature.html">Install-WindowsFeature</a></li>
-			<li><a href="Resolve-WindowsFeatureName.html">Resolve-WindowsFeatureName</a></li>
 			<li><a href="Test-WindowsFeature.html">Test-WindowsFeature</a></li>
 			<li><a href="Uninstall-WindowsFeature.html">Uninstall-WindowsFeature</a></li>
 		</ul>
@@ -273,16 +265,15 @@
 </div>
 
 
-    <h1>Install-IisWebsite</h1>
-    <div><p>Installs a website.</p>
-</div>
+<h1>Install-IisWebsite</h1>
+<div><p>Installs a website.</p></div>
 
-        <h2>Syntax</h2>
-    <pre class="Syntax"><code>Install-IisWebsite [-Name] &lt;String&gt; [-PhysicalPath] &lt;String&gt; [[-Bindings] &lt;String[]&gt;] [-AppPoolName &lt;String&gt;] [&lt;CommonParameters&gt;]</code></pre>
+<h2>Syntax</h2>
+<pre class="Syntax"><code>Install-IisWebsite [-Name] &lt;String&gt; [-PhysicalPath] &lt;String&gt; [[-Bindings] &lt;String[]&gt;] [-AppPoolName &lt;String&gt;] [&lt;CommonParameters&gt;]</code></pre>
     
-        <h2>Description</h2>
-    <div class="Description">
-        <p>Installs a website named <code>Name</code>, serving files out of the file system from <code>PhysicalPath</code>.  If no app pool name is given (via the <code>AppPoolName</code> parameter), IIS will pick one for you, usually the <code>DefaultAppPool</code>.  If a site with name <code>Name</code> already exists, it is deleted, and a new site is created.</p>
+<h2>Description</h2>
+<div class="Description">
+<p>Installs a website named <code>Name</code>, serving files out of the file system from <code>PhysicalPath</code>.  If no app pool name is given (via the <code>AppPoolName</code> parameter), IIS will pick one for you, usually the <code>DefaultAppPool</code>.  If a site with name <code>Name</code> already exists, it is deleted, and a new site is created.</p>
 
 <p>By default, the site listens on all IP addresses on port 80.  Set custom bindings with the <code>Bindings</code> argument.  Multiple bindings are allowed.  Each binding must be in this format (in BNF):</p>
 
@@ -303,86 +294,81 @@
 <li>https/10.2.3.4:443:</li>
 <li>http/*:80:example.com</li>
 </ul>
-
-    </div>
+</div>
     
-            <h2>Related Commands</h2>
-        <ul>
+<h2>Related Commands</h2>
+<ul>
 <li><a href="Get-IisWebsite.html">Get-IisWebsite</a></li>
 <li><a href="Uninstall-IisWebsite.html">Uninstall-IisWebsite</a></li>
 </ul>
 
-
-    		<h2> Parameters </h2>
-		<table border='1'>
-			<tr>
-				<th>Name</th>
-                <th>Type</th>
-				<th>Description</th>
-				<th>Required?</th>
-				<th>Pipeline Input</th>
-				<th>Default Value</th>
-			</tr>
-            			<tr valign='top'>
-				<td>Name</td>
-				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
-				<td>The name of the website
-</td>
-				<td>true</td>
-				<td>false</td>
-                <td></td>
-			</tr>
-			<tr valign='top'>
-				<td>PhysicalPath</td>
-				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
-				<td>The physical path (i.e. on the file system) to the website
-</td>
-				<td>true</td>
-				<td>false</td>
-                <td></td>
-			</tr>
-			<tr valign='top'>
-				<td>Bindings</td>
-				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String[]</a></td>
-				<td>The site's network bindings.  Default is <code>http/*:80:</code>.  Bindings should be specified in protocol/IPAddress:Port:Hostname format.  
+<h2> Parameters </h2>
+<table border='1'>
+<tr>
+	<th>Name</th>
+    <th>Type</th>
+	<th>Description</th>
+	<th>Required?</th>
+	<th>Pipeline Input</th>
+	<th>Default Value</th>
+</tr>
+<tr valign='top'>
+	<td>Name</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+	<td>The name of the website</td>
+	<td>true</td>
+	<td>false</td>
+    <td></td>
+</tr>
+<tr valign='top'>
+	<td>PhysicalPath</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+	<td>The physical path (i.e. on the file system) to the website</td>
+	<td>true</td>
+	<td>false</td>
+    <td></td>
+</tr>
+<tr valign='top'>
+	<td>Bindings</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String[]</a></td>
+	<td>The site's network bindings.  Default is <code>http/*:80:</code>.  Bindings should be specified in protocol/IPAddress:Port:Hostname format.  
 
 <ul>
 <li>Protocol should be http or https. </li>
 <li>IPAddress can be a literal IP address or <code>*</code>, which means all of the computer's IP addresses.  This function does not validate if <code>IPAddress</code> is actually in use on this computer.</li>
 <li>Leave hostname blank for non-named websites.</li>
-</ul>
-</td>
-				<td>false</td>
-				<td>false</td>
-                <td>@('http/*:80:')</td>
-			</tr>
-			<tr valign='top'>
-				<td>AppPoolName</td>
-				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
-				<td>The name of the app pool under which the website runs.  The app pool must exist.  If not provided, IIS picks one for you.  No whammy, no whammy!
-</td>
-				<td>false</td>
-				<td>false</td>
-                <td></td>
-			</tr>
-            
-        </table>
+</ul></td>
+	<td>false</td>
+	<td>false</td>
+    <td>@('http/*:80:')</td>
+</tr>
+<tr valign='top'>
+	<td>AppPoolName</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+	<td>The name of the app pool under which the website runs.  The app pool must exist.  If not provided, IIS picks one for you.  No whammy, no whammy!</td>
+	<td>false</td>
+	<td>false</td>
+    <td></td>
+</tr>
+
+</table>
         
-    
+
         
-    
+
         
-    
+
         
-                <h2>EXAMPLE 1</h2>
-            <pre><code>Install-IisWebsite -Name 'Peanuts' -PhysicalPath C:\Peanuts.com</code></pre>
-            <p><p>Creates a website named <code>Peanuts</code> serving files out of the <code>C:\Peanuts.com</code> directory.  The website listens on all the computer's IP addresses on port 80.</p>
-</p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 2</h2>
-            <pre><code>Install-IisWebsite -Name 'Peanuts' -PhysicalPath C:\Peanuts.com -Bindings 'http/*:80:peanuts.com:'</code></pre>
-            <p><p>Creates a website named <code>Peanuts</code> which uses name-based hosting to respond to all requests to any of the machine's IP addresses for the <code>peanuts.com</code> domain.</p>
-</p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 3</h2>
-            <pre><code>Install-IisWebsite -Name 'Peanuts' -PhysicalPath C:\Peanuts.com -AppPoolName 'PeanutsAppPool'</code></pre>
-            <p><p>Creates a website named <code>Peanuts</code> that runs under the <code>PeanutsAppPool</code> app pool</p>
-</p><p></p><p></p><p></p><p></p>
+<h2>EXAMPLE 1</h2>
+<pre><code>Install-IisWebsite -Name 'Peanuts' -PhysicalPath C:\Peanuts.com</code></pre>
+<p>Creates a website named <code>Peanuts</code> serving files out of the <code>C:\Peanuts.com</code> directory.  The website listens on all the computer's IP addresses on port 80.</p>
+
+<h2>EXAMPLE 2</h2>
+<pre><code>Install-IisWebsite -Name 'Peanuts' -PhysicalPath C:\Peanuts.com -Bindings 'http/*:80:peanuts.com:'</code></pre>
+<p>Creates a website named <code>Peanuts</code> which uses name-based hosting to respond to all requests to any of the machine's IP addresses for the <code>peanuts.com</code> domain.</p>
+
+<h2>EXAMPLE 3</h2>
+<pre><code>Install-IisWebsite -Name 'Peanuts' -PhysicalPath C:\Peanuts.com -AppPoolName 'PeanutsAppPool'</code></pre>
+<p>Creates a website named <code>Peanuts</code> that runs under the <code>PeanutsAppPool</code> app pool</p>
 </body>
-</html>   
+</html>
