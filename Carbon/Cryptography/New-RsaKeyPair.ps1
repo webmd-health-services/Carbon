@@ -25,9 +25,9 @@ function New-RsaKeyPair
 
     `makecert.exe` and `pvk2pfx.exe` are part of the Windows SDK. They can be downloaded from the following locations:
 
-        * [Windows 7](http://www.microsoft.com/en-us/download/details.aspx?id=8279)
-        * [Windows 8](http://msdn.microsoft.com/en-us/windows/desktop/hh852363.aspx)
-        * [Windows 8.1](http://msdn.microsoft.com/en-us/windows/desktop/bg162891.aspx)
+      * [Windows 7](http://www.microsoft.com/en-us/download/details.aspx?id=8279)
+      * [Windows 8](http://msdn.microsoft.com/en-us/windows/desktop/hh852363.aspx)
+      * [Windows 8.1](http://msdn.microsoft.com/en-us/windows/desktop/bg162891.aspx)
 
     .OUTPUTS
     System.IO.FileInfo
