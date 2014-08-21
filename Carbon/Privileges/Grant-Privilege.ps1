@@ -113,7 +113,7 @@ function Grant-Privilege
             {
                 $msg = 'Failed to grant {0} {1} privilege(s): {2}  *Privilege names are **case-sensitive**.*' -f `
                         $account.FullName,($Privilege -join ','),$ex.Message
-                Write-Error -Message $msg -Exception $ex
+                Write-Error -Message $msg
                 return
             }
             else
@@ -124,8 +124,7 @@ function Grant-Privilege
         while( $ex )
 
         $ex = $_.Exception        
-        Write-Error -Message ('Failed to grant {0} {1} privilege(s): {2}' -f $account.FullName,($Privilege -join ', '),$ex.Message) `
-                    -Exception $ex
+        Write-Error -Message ('Failed to grant {0} {1} privilege(s): {2}' -f $account.FullName,($Privilege -join ', '),$ex.Message)
         
         while( $ex.InnerException )
         {
