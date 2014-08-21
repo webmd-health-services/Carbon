@@ -58,6 +58,17 @@
 			<li><a href="Set-DotNetConnectionString.html">Set-DotNetConnectionString</a></li>
 			<li><a href="Test-DotNet.html">Test-DotNet</a></li>
 		</ul>
+		<li class="Category">DSC</li>
+		<ul class="CommandMenu">
+			<li><a href="Clear-DscLocalResourceCache.html">Clear-DscLocalResourceCache</a></li>
+			<li><a href="Clear-MofAuthoringMetadata.html">Clear-MofAuthoringMetadata</a></li>
+			<li><a href="Copy-DscResource.html">Copy-DscResource</a></li>
+			<li><a href="Get-DscError.html">Get-DscError</a></li>
+			<li><a href="Initialize-Lcm.html">Initialize-Lcm</a></li>
+			<li><a href="Start-DscPullConfiguration.html">Start-DscPullConfiguration</a></li>
+			<li><a href="Test-DscTargetResource.html">Test-DscTargetResource</a></li>
+			<li><a href="Write-DscError.html">Write-DscError</a></li>
+		</ul>
 		<li class="Category">FileSystem</li>
 		<ul class="CommandMenu">
 			<li><a href="Compress-Item.html">Compress-Item</a></li>
@@ -176,7 +187,7 @@
 		<ul class="CommandMenu">
 			<li><a href="Add-TrustedHost.html">Add-TrustedHost</a></li>
 			<li><a href="Clear-TrustedHost.html">Clear-TrustedHost</a></li>
-			<li><a href="Complete-Job.html">Complete-Job</a></li>
+			<li><a href="Get-PowerShellModuleInstallPath.html">Get-PowerShellModuleInstallPath</a></li>
 			<li><a href="Get-PowershellPath.html">Get-PowershellPath</a></li>
 			<li><a href="Get-TrustedHost.html">Get-TrustedHost</a></li>
 			<li><a href="Invoke-PowerShell.html">Invoke-PowerShell</a></li>
@@ -242,10 +253,14 @@
 		<li class="Category">UsersAndGroups</li>
 		<ul class="CommandMenu">
 			<li><a href="Add-GroupMember.html">Add-GroupMember</a></li>
+			<li><a href="Get-Group.html">Get-Group</a></li>
+			<li><a href="Get-User.html">Get-User</a></li>
 			<li><a href="Get-WmiLocalUserAccount.html">Get-WmiLocalUserAccount</a></li>
 			<li><a href="Install-Group.html">Install-Group</a></li>
 			<li><a href="Install-User.html">Install-User</a></li>
-			<li><a href="Resolve-IdentityName.html">Resolve-IdentityName</a></li>
+			<li><a href="Remove-GroupMember.html">Remove-GroupMember</a></li>
+			<li><a href="Resolve-Identity.html">Resolve-Identity</a></li>
+			<li><a href="Test-Group.html">Test-Group</a></li>
 			<li><a href="Test-Identity.html">Test-Identity</a></li>
 			<li><a href="Test-User.html">Test-User</a></li>
 			<li><a href="Uninstall-User.html">Uninstall-User</a></li>
@@ -269,14 +284,19 @@
 <div><p>Installs a <em>local</em> user account.</p></div>
 
 <h2>Syntax</h2>
-<pre class="Syntax"><code>Install-User [-Username] &lt;String&gt; [-Password] &lt;String&gt; [[-Description] &lt;String&gt;] [[-FullName] &lt;String&gt;] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
+<pre class="Syntax"><code>Install-User [-Username] &lt;String&gt; [-Password] &lt;String&gt; [[-Description] &lt;String&gt;] [[-FullName] &lt;String&gt;] [-UserCannotChangePassword] [-PasswordNeverExpires] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
     
 <h2>Description</h2>
 <div class="Description">
-<p>Creates a new <em>local</em> user account, or, if the account already exists, updates its password and description.  In both cases, the users password is set to never expire.  This should probably be a parameter.  Send us a patch!</p>
+<p>Creates a new <em>local</em> user account.  If the account already exists, updates it.  Returns the user.</p>
 </div>
     
-
+<h2>Related Commands</h2>
+<ul>
+<li><a href="Get-User.html">Get-User</a></li>
+<li><a href="Test-User.html">Test-User</a></li>
+<li><a href="Uninstall-User.html">Uninstall-User</a></li>
+</ul>
 
 <h2> Parameters </h2>
 <table border='1'>
@@ -321,6 +341,22 @@
     <td></td>
 </tr>
 <tr valign='top'>
+	<td>UserCannotChangePassword</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+	<td>Prevent the user from changing his password.</td>
+	<td>false</td>
+	<td>false</td>
+    <td>False</td>
+</tr>
+<tr valign='top'>
+	<td>PasswordNeverExpires</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+	<td>Set to true if the user's password should expire.</td>
+	<td>false</td>
+	<td>false</td>
+    <td>False</td>
+</tr>
+<tr valign='top'>
 	<td>WhatIf</td>
 	<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
 	<td></td>
@@ -355,5 +391,9 @@
 <h2>EXAMPLE 1</h2>
 <pre><code>Install-User -Username LSkywalker -Password "whydidn'tyoutellme" -Description "Luke Skywalker's account."</code></pre>
 <p>Creates a new <code>LSkywalker</code> user account with the given password and description.  Luke's password is set ot never expire.</p>
+
+<h2>EXAMPLE 2</h2>
+<pre><code>Install-User -Username LSkywalker -Password "whydidn'tyoutellme" -UserCannotChangePassword -PasswordNeverExpires</code></pre>
+<p>Demonstrates how to create an account for a user who cannot change his password and whose password never expires.</p>
 </body>
 </html>

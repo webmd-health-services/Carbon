@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-    <title>PowerShell - Complete-Job - Carbon</title>
+    <title>PowerShell - Resolve-Identity - Carbon</title>
 	<link href="styles.css" type="text/css" rel="stylesheet" />
 </head>
 <body>
@@ -57,6 +57,17 @@
 			<li><a href="Set-DotNetAppSetting.html">Set-DotNetAppSetting</a></li>
 			<li><a href="Set-DotNetConnectionString.html">Set-DotNetConnectionString</a></li>
 			<li><a href="Test-DotNet.html">Test-DotNet</a></li>
+		</ul>
+		<li class="Category">DSC</li>
+		<ul class="CommandMenu">
+			<li><a href="Clear-DscLocalResourceCache.html">Clear-DscLocalResourceCache</a></li>
+			<li><a href="Clear-MofAuthoringMetadata.html">Clear-MofAuthoringMetadata</a></li>
+			<li><a href="Copy-DscResource.html">Copy-DscResource</a></li>
+			<li><a href="Get-DscError.html">Get-DscError</a></li>
+			<li><a href="Initialize-Lcm.html">Initialize-Lcm</a></li>
+			<li><a href="Start-DscPullConfiguration.html">Start-DscPullConfiguration</a></li>
+			<li><a href="Test-DscTargetResource.html">Test-DscTargetResource</a></li>
+			<li><a href="Write-DscError.html">Write-DscError</a></li>
 		</ul>
 		<li class="Category">FileSystem</li>
 		<ul class="CommandMenu">
@@ -176,7 +187,7 @@
 		<ul class="CommandMenu">
 			<li><a href="Add-TrustedHost.html">Add-TrustedHost</a></li>
 			<li><a href="Clear-TrustedHost.html">Clear-TrustedHost</a></li>
-			<li><a href="Complete-Job.html">Complete-Job</a></li>
+			<li><a href="Get-PowerShellModuleInstallPath.html">Get-PowerShellModuleInstallPath</a></li>
 			<li><a href="Get-PowershellPath.html">Get-PowershellPath</a></li>
 			<li><a href="Get-TrustedHost.html">Get-TrustedHost</a></li>
 			<li><a href="Invoke-PowerShell.html">Invoke-PowerShell</a></li>
@@ -242,10 +253,14 @@
 		<li class="Category">UsersAndGroups</li>
 		<ul class="CommandMenu">
 			<li><a href="Add-GroupMember.html">Add-GroupMember</a></li>
+			<li><a href="Get-Group.html">Get-Group</a></li>
+			<li><a href="Get-User.html">Get-User</a></li>
 			<li><a href="Get-WmiLocalUserAccount.html">Get-WmiLocalUserAccount</a></li>
 			<li><a href="Install-Group.html">Install-Group</a></li>
 			<li><a href="Install-User.html">Install-User</a></li>
-			<li><a href="Resolve-IdentityName.html">Resolve-IdentityName</a></li>
+			<li><a href="Remove-GroupMember.html">Remove-GroupMember</a></li>
+			<li><a href="Resolve-Identity.html">Resolve-Identity</a></li>
+			<li><a href="Test-Group.html">Test-Group</a></li>
 			<li><a href="Test-Identity.html">Test-Identity</a></li>
 			<li><a href="Test-User.html">Test-User</a></li>
 			<li><a href="Uninstall-User.html">Uninstall-User</a></li>
@@ -265,22 +280,33 @@
 </div>
 
 
-<h1>Complete-Job</h1>
-<div><p>Waits for a set of PowerShell jobs to complete, receives each job as it finishes, and returns the number of jobs that didn't complete successfully.</p></div>
+<h1>Resolve-Identity</h1>
+<div><p>Determines the identity of a user or group using its name.</p></div>
 
 <h2>Syntax</h2>
-<pre class="Syntax"><code>Complete-Job [-Job] &lt;Job[]&gt; [[-IntervalSeconds] &lt;Int32&gt;] [&lt;CommonParameters&gt;]</code></pre>
+<pre class="Syntax"><code>Resolve-Identity [-Name] &lt;String&gt; [&lt;CommonParameters&gt;]</code></pre>
     
 <h2>Description</h2>
 <div class="Description">
-<p>Job management in PowerShell is a pain.  At a minimum, you have to wait for each job to complete, then receive its output.  This function manages all that for you.  It iterates over a list/array of jobs, as each job finishes, it receives its output and removes it.  If a job is blocked or stopped it receives and removes those jobs.  When its all done, it returns the number of jobs that failed, were blocked, or stopped.</p>
+<p>The common name for an account is not always the canonical name used by the operating system.  For example, the local Administrators group is actually called BUILTIN\Administrators.  This function uses the <code>LookupAccountName</code> Windows function to resolve an account name into its domain, name, full name, SID, and SID type. It returns a <code>Carbon.Identity</code> object with the following properties:</p>
 
-<p>By default, it sleeps for one second between status checks.  You can increase this interval using the <code>IntervalSeconds</code> parameter.</p>
+<ul>
+<li>Domain - the domain the user was found in</li>
+<li>FullName - the users full name, e.g. Domain\Name</li>
+<li>Name - the user's username or the group's name</li>
+<li>Type - the Sid type.</li>
+<li>Sid - the account's security identifier as a <code>System.Security.Principal.SecurityIdentifier</code> object.</li>
+</ul>
 
-<p>This function never times out.</p>
+<p>If the name doesn't represent an actual user or group, an error is written and nothing is returned.</p>
 </div>
     
-
+<h2>Related Commands</h2>
+<ul>
+<li><a href="Test-Identity.html">Test-Identity</a></li>
+<li><a href="http://msdn.microsoft.com/en-us/library/system.security.principal.securityidentifier.aspx">http://msdn.microsoft.com/en-us/library/system.security.principal.securityidentifier.aspx</a></li>
+<li><a href="http://msdn.microsoft.com/en-us/library/windows/desktop/aa379601.aspx">http://msdn.microsoft.com/en-us/library/windows/desktop/aa379601.aspx</a></li>
+</ul>
 
 <h2> Parameters </h2>
 <table border='1'>
@@ -293,20 +319,12 @@
 	<th>Default Value</th>
 </tr>
 <tr valign='top'>
-	<td>Job</td>
-	<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.job.aspx">Job[]</a></td>
-	<td>The jobs to complete.</td>
+	<td>Name</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+	<td>The name of the identity to return.</td>
 	<td>true</td>
 	<td>false</td>
     <td></td>
-</tr>
-<tr valign='top'>
-	<td>IntervalSeconds</td>
-	<td><a href="http://msdn.microsoft.com/en-us/library/system.int32.aspx">Int32</a></td>
-	<td>The number of seconds to sleep between job status checks.  Default is 1 second.</td>
-	<td>false</td>
-	<td>false</td>
-    <td>1</td>
 </tr>
 
 </table>
@@ -318,11 +336,7 @@
 
         
 <h2>EXAMPLE 1</h2>
-<pre><code>Complete-Job -Job $jobs</code></pre>
-<p>Sits and waits for all the jobs in <code>$jobs</code> to finish, block, or stop and returns the number that didn't succeed.  It waits one second between status checks.</p>
-
-<h2>EXAMPLE 2</h2>
-<pre><code>Complete-Job -Job $jobs -IntervalSeconds 60</code></pre>
-<p>Waits for all the jobs in <code>$jobs</code> to finish, waiting 60 seconds between status checks.</p>
+<pre><code>Resolve-IdentityName -Name 'Administrators'</code></pre>
+<p>Returns an object representing the <code>Administrators</code> group.</p>
 </body>
 </html>

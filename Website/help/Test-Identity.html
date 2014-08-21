@@ -58,6 +58,17 @@
 			<li><a href="Set-DotNetConnectionString.html">Set-DotNetConnectionString</a></li>
 			<li><a href="Test-DotNet.html">Test-DotNet</a></li>
 		</ul>
+		<li class="Category">DSC</li>
+		<ul class="CommandMenu">
+			<li><a href="Clear-DscLocalResourceCache.html">Clear-DscLocalResourceCache</a></li>
+			<li><a href="Clear-MofAuthoringMetadata.html">Clear-MofAuthoringMetadata</a></li>
+			<li><a href="Copy-DscResource.html">Copy-DscResource</a></li>
+			<li><a href="Get-DscError.html">Get-DscError</a></li>
+			<li><a href="Initialize-Lcm.html">Initialize-Lcm</a></li>
+			<li><a href="Start-DscPullConfiguration.html">Start-DscPullConfiguration</a></li>
+			<li><a href="Test-DscTargetResource.html">Test-DscTargetResource</a></li>
+			<li><a href="Write-DscError.html">Write-DscError</a></li>
+		</ul>
 		<li class="Category">FileSystem</li>
 		<ul class="CommandMenu">
 			<li><a href="Compress-Item.html">Compress-Item</a></li>
@@ -176,7 +187,7 @@
 		<ul class="CommandMenu">
 			<li><a href="Add-TrustedHost.html">Add-TrustedHost</a></li>
 			<li><a href="Clear-TrustedHost.html">Clear-TrustedHost</a></li>
-			<li><a href="Complete-Job.html">Complete-Job</a></li>
+			<li><a href="Get-PowerShellModuleInstallPath.html">Get-PowerShellModuleInstallPath</a></li>
 			<li><a href="Get-PowershellPath.html">Get-PowershellPath</a></li>
 			<li><a href="Get-TrustedHost.html">Get-TrustedHost</a></li>
 			<li><a href="Invoke-PowerShell.html">Invoke-PowerShell</a></li>
@@ -242,10 +253,14 @@
 		<li class="Category">UsersAndGroups</li>
 		<ul class="CommandMenu">
 			<li><a href="Add-GroupMember.html">Add-GroupMember</a></li>
+			<li><a href="Get-Group.html">Get-Group</a></li>
+			<li><a href="Get-User.html">Get-User</a></li>
 			<li><a href="Get-WmiLocalUserAccount.html">Get-WmiLocalUserAccount</a></li>
 			<li><a href="Install-Group.html">Install-Group</a></li>
 			<li><a href="Install-User.html">Install-User</a></li>
-			<li><a href="Resolve-IdentityName.html">Resolve-IdentityName</a></li>
+			<li><a href="Remove-GroupMember.html">Remove-GroupMember</a></li>
+			<li><a href="Resolve-Identity.html">Resolve-Identity</a></li>
+			<li><a href="Test-Group.html">Test-Group</a></li>
 			<li><a href="Test-Identity.html">Test-Identity</a></li>
 			<li><a href="Test-User.html">Test-User</a></li>
 			<li><a href="Uninstall-User.html">Uninstall-User</a></li>
@@ -273,12 +288,15 @@
     
 <h2>Description</h2>
 <div class="Description">
-<p>Attempts to convert an identity name into a <code>System.Security.Principal.SecurityIdentifer</code> object.  If the conversion succeeds, the name belongs to a valid local or domain user/group.  If conversion fails, the user/group doesn't exist. You can also optionally return the applicable <code>SecurityIdentifier</code> object.</p>
+<p>Uses the Windows <code>LookupAccountName</code> function to find an identity.  If it can't be found, returns <code>$false</code>.  Otherwise, it returns <code>$true</code>.</p>
 
-<p>If the identity testing is in another domain, and there is no trust relationship between the current domain the identity's domain, <code>$false</code> will be returned even though the account could exist.</p>
+<p>Use the <code>PassThru</code> switch to return a <code>Carbon.Identity</code> object (instead of <code>$true</code> if the identity exists.</p>
 </div>
     
-
+<h2>Related Commands</h2>
+<ul>
+<li><a href="Resolve-Identity.html">Resolve-Identity</a></li>
+</ul>
 
 <h2> Parameters </h2>
 <table border='1'>
@@ -301,7 +319,7 @@
 <tr valign='top'>
 	<td>PassThru</td>
 	<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
-	<td>Returns a <code>System.Security.Principal.SecurityIdentifier</code> object if the identity exists.</td>
+	<td>Returns a <code>Carbon.Identity</code> object if the identity exists.</td>
 	<td>false</td>
 	<td>false</td>
     <td>False</td>

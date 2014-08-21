@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-    <title>PowerShell - Resolve-IdentityName - Carbon</title>
+    <title>PowerShell - Test-DscTargetResource - Carbon</title>
 	<link href="styles.css" type="text/css" rel="stylesheet" />
 </head>
 <body>
@@ -57,6 +57,17 @@
 			<li><a href="Set-DotNetAppSetting.html">Set-DotNetAppSetting</a></li>
 			<li><a href="Set-DotNetConnectionString.html">Set-DotNetConnectionString</a></li>
 			<li><a href="Test-DotNet.html">Test-DotNet</a></li>
+		</ul>
+		<li class="Category">DSC</li>
+		<ul class="CommandMenu">
+			<li><a href="Clear-DscLocalResourceCache.html">Clear-DscLocalResourceCache</a></li>
+			<li><a href="Clear-MofAuthoringMetadata.html">Clear-MofAuthoringMetadata</a></li>
+			<li><a href="Copy-DscResource.html">Copy-DscResource</a></li>
+			<li><a href="Get-DscError.html">Get-DscError</a></li>
+			<li><a href="Initialize-Lcm.html">Initialize-Lcm</a></li>
+			<li><a href="Start-DscPullConfiguration.html">Start-DscPullConfiguration</a></li>
+			<li><a href="Test-DscTargetResource.html">Test-DscTargetResource</a></li>
+			<li><a href="Write-DscError.html">Write-DscError</a></li>
 		</ul>
 		<li class="Category">FileSystem</li>
 		<ul class="CommandMenu">
@@ -176,7 +187,7 @@
 		<ul class="CommandMenu">
 			<li><a href="Add-TrustedHost.html">Add-TrustedHost</a></li>
 			<li><a href="Clear-TrustedHost.html">Clear-TrustedHost</a></li>
-			<li><a href="Complete-Job.html">Complete-Job</a></li>
+			<li><a href="Get-PowerShellModuleInstallPath.html">Get-PowerShellModuleInstallPath</a></li>
 			<li><a href="Get-PowershellPath.html">Get-PowershellPath</a></li>
 			<li><a href="Get-TrustedHost.html">Get-TrustedHost</a></li>
 			<li><a href="Invoke-PowerShell.html">Invoke-PowerShell</a></li>
@@ -242,10 +253,14 @@
 		<li class="Category">UsersAndGroups</li>
 		<ul class="CommandMenu">
 			<li><a href="Add-GroupMember.html">Add-GroupMember</a></li>
+			<li><a href="Get-Group.html">Get-Group</a></li>
+			<li><a href="Get-User.html">Get-User</a></li>
 			<li><a href="Get-WmiLocalUserAccount.html">Get-WmiLocalUserAccount</a></li>
 			<li><a href="Install-Group.html">Install-Group</a></li>
 			<li><a href="Install-User.html">Install-User</a></li>
-			<li><a href="Resolve-IdentityName.html">Resolve-IdentityName</a></li>
+			<li><a href="Remove-GroupMember.html">Remove-GroupMember</a></li>
+			<li><a href="Resolve-Identity.html">Resolve-Identity</a></li>
+			<li><a href="Test-Group.html">Test-Group</a></li>
 			<li><a href="Test-Identity.html">Test-Identity</a></li>
 			<li><a href="Test-User.html">Test-User</a></li>
 			<li><a href="Uninstall-User.html">Uninstall-User</a></li>
@@ -265,17 +280,29 @@
 </div>
 
 
-<h1>Resolve-IdentityName</h1>
-<div><p>Determines the full, NT identity name for a user or group.</p></div>
+<h1>Test-DscTargetResource</h1>
+<div><p>Tests that all the properties on a resource and object are the same.</p></div>
 
 <h2>Syntax</h2>
-<pre class="Syntax"><code>Resolve-IdentityName [-Name] &lt;String&gt; [&lt;CommonParameters&gt;]</code></pre>
+<pre class="Syntax"><code>Test-DscTargetResource [-TargetResource] &lt;Hashtable&gt; [-DesiredResource] &lt;Hashtable&gt; [-Target] &lt;String&gt; [&lt;CommonParameters&gt;]</code></pre>
     
 <h2>Description</h2>
 <div class="Description">
-<p>The common name for an account is not always the canonical name used by the operating system.  For example, the local Administrators group is actually called BUILTIN\Administrators.  This function converts an identity's name into its canonical name.</p>
+<p>DSC expects a resource's <code>Test-TargetResource</code> function to return <code>$false</code> if an object needs to be updated. Usually, you compare the current state of a resource with the desired state, and return <code>$false</code> if anything doesn't match.</p>
 
-<p>If the name doesn't represent an actual user or group, an error is written and nothing returned.</p>
+<p>This function takes in a hashtable of the current resource's state (what's returned by <code>Get-TargetResource</code>) and compares it to the desired state (the values passed to <code>Test-TargetResource</code>). If any property in the target resource is different than the desired resource, a list of stale resources is written to the verbose stream and <code>$false</code> is returned. </p>
+
+<p>Here's a quick example:</p>
+
+<pre><code>return Test-TargetResource -TargetResource (Get-TargetResource -Name 'fubar') -DesiredResource $PSBoundParameters -Target ('my resource ''fubar''')
+</code></pre>
+
+<p>If you want to exclude properties from the evaluation, just remove them from the hashtable returned by <code>Get-TargetResource</code>:</p>
+
+<pre><code>$resource = Get-TargetResource -Name 'fubar'
+$resource.Remove( 'PropertyThatDoesNotMatter' )
+return Test-TargetResource -TargetResource $resource -DesiredResource $PSBoundParameters -Target ('my resource ''fubar''')
+</code></pre>
 </div>
     
 
@@ -291,9 +318,25 @@
 	<th>Default Value</th>
 </tr>
 <tr valign='top'>
-	<td>Name</td>
+	<td>TargetResource</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.collections.hashtable.aspx">Hashtable</a></td>
+	<td>The current state of the resource.</td>
+	<td>true</td>
+	<td>false</td>
+    <td></td>
+</tr>
+<tr valign='top'>
+	<td>DesiredResource</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.collections.hashtable.aspx">Hashtable</a></td>
+	<td>The desired state of the resource. Properties not in this hashtable are skipped. Usually you'll pass <code>PSBoundParameters</code> from your <code>Test-TargetResource</code> function.</td>
+	<td>true</td>
+	<td>false</td>
+    <td></td>
+</tr>
+<tr valign='top'>
+	<td>Target</td>
 	<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
-	<td>The name of the identity whose canonical name to return.</td>
+	<td>The a description of the target object being tested. Output in verbose messages.</td>
 	<td>true</td>
 	<td>false</td>
     <td></td>
@@ -308,7 +351,7 @@
 
         
 <h2>EXAMPLE 1</h2>
-<pre><code>Resolve-IdentityName -Identity 'Administrators'</code></pre>
-<p>Returns <code>BUILTIN\Administrators</code>, the canonical name for the local Administrators group.</p>
+<pre><code>Test-TargetResource -TargetResource (Get-TargetResource -Name 'fubar') -DesiredResource $PSBoundParameters -Target ('my resource ''fubar''')</code></pre>
+<p>Demonstrates how to test that all the properties on a DSC resource are the same was what's desired.</p>
 </body>
 </html>
