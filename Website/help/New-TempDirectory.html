@@ -1,11 +1,11 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-    <title>PowerShell - Resolve-WindowsFeatureName - Carbon</title>
+    <title>PowerShell - New-TempDirectory - Carbon</title>
 	<link href="styles.css" type="text/css" rel="stylesheet" />
 </head>
 <body>
-    	<ul id="SiteNav">
+	<ul id="SiteNav">
 		<li><a href="http://get-carbon.org">Get-Carbon</a></li>
 		<li><b>-Documentation</b></li>
         <li><a href="http://get-carbon.org">-ReleaseNotes</a></li>
@@ -39,6 +39,7 @@
 		</ul>
 		<li class="Category">Computer</li>
 		<ul class="CommandMenu">
+			<li><a href="Get-ProgramInstallInfo.html">Get-ProgramInstallInfo</a></li>
 			<li><a href="Remove-EnvironmentVariable.html">Remove-EnvironmentVariable</a></li>
 			<li><a href="Resolve-NetPath.html">Resolve-NetPath</a></li>
 			<li><a href="Set-EnvironmentVariable.html">Set-EnvironmentVariable</a></li>
@@ -47,6 +48,7 @@
 		</ul>
 		<li class="Category">Cryptography</li>
 		<ul class="CommandMenu">
+			<li><a href="New-RsaKeyPair.html">New-RsaKeyPair</a></li>
 			<li><a href="Protect-String.html">Protect-String</a></li>
 			<li><a href="Unprotect-String.html">Unprotect-String</a></li>
 		</ul>
@@ -58,14 +60,17 @@
 		</ul>
 		<li class="Category">FileSystem</li>
 		<ul class="CommandMenu">
+			<li><a href="Compress-Item.html">Compress-Item</a></li>
 			<li><a href="Disable-NtfsCompression.html">Disable-NtfsCompression</a></li>
 			<li><a href="Enable-NtfsCompression.html">Enable-NtfsCompression</a></li>
+			<li><a href="Expand-Item.html">Expand-Item</a></li>
 			<li><a href="Install-Junction.html">Install-Junction</a></li>
 			<li><a href="New-Junction.html">New-Junction</a></li>
-			<li><a href="New-TempDir.html">New-TempDir</a></li>
+			<li><a href="New-TempDirectory.html">New-TempDirectory</a></li>
 			<li><a href="Remove-Junction.html">Remove-Junction</a></li>
 			<li><a href="Test-NtfsCompression.html">Test-NtfsCompression</a></li>
 			<li><a href="Test-PathIsJunction.html">Test-PathIsJunction</a></li>
+			<li><a href="Test-ZipFile.html">Test-ZipFile</a></li>
 		</ul>
 		<li class="Category">Firewall</li>
 		<ul class="CommandMenu">
@@ -85,7 +90,6 @@
 		<li class="Category">IIS</li>
 		<ul class="CommandMenu">
 			<li><a href="Add-IisDefaultDocument.html">Add-IisDefaultDocument</a></li>
-			<li><a href="Add-IisServerManagerMember.html">Add-IisServerManagerMember</a></li>
 			<li><a href="Disable-IisSecurityAuthentication.html">Disable-IisSecurityAuthentication</a></li>
 			<li><a href="Enable-IisDirectoryBrowsing.html">Enable-IisDirectoryBrowsing</a></li>
 			<li><a href="Enable-IisSecurityAuthentication.html">Enable-IisSecurityAuthentication</a></li>
@@ -199,13 +203,14 @@
 		<ul class="CommandMenu">
 			<li><a href="Assert-AdminPrivilege.html">Assert-AdminPrivilege</a></li>
 			<li><a href="Convert-SecureStringToString.html">Convert-SecureStringToString</a></li>
+			<li><a href="ConvertTo-ContainerInheritanceFlags.html">ConvertTo-ContainerInheritanceFlags</a></li>
 			<li><a href="ConvertTo-InheritanceFlag.html">ConvertTo-InheritanceFlag</a></li>
 			<li><a href="ConvertTo-PropagationFlag.html">ConvertTo-PropagationFlag</a></li>
-			<li><a href="ConvertTo-ProviderAccessControlRights.html">ConvertTo-ProviderAccessControlRights</a></li>
 			<li><a href="Get-Permission.html">Get-Permission</a></li>
 			<li><a href="Grant-Permission.html">Grant-Permission</a></li>
 			<li><a href="New-Credential.html">New-Credential</a></li>
 			<li><a href="Protect-Acl.html">Protect-Acl</a></li>
+			<li><a href="Revoke-Permission.html">Revoke-Permission</a></li>
 			<li><a href="Test-AdminPrivilege.html">Test-AdminPrivilege</a></li>
 			<li><a href="Test-Permission.html">Test-Permission</a></li>
 		</ul>
@@ -213,6 +218,7 @@
 		<ul class="CommandMenu">
 			<li><a href="Assert-Service.html">Assert-Service</a></li>
 			<li><a href="Get-ServiceAcl.html">Get-ServiceAcl</a></li>
+			<li><a href="Get-ServiceConfiguration.html">Get-ServiceConfiguration</a></li>
 			<li><a href="Get-ServicePermission.html">Get-ServicePermission</a></li>
 			<li><a href="Get-ServiceSecurityDescriptor.html">Get-ServiceSecurityDescriptor</a></li>
 			<li><a href="Grant-ServiceControlPermission.html">Grant-ServiceControlPermission</a></li>
@@ -246,10 +252,8 @@
 		</ul>
 		<li class="Category">WindowsFeatures</li>
 		<ul class="CommandMenu">
-			<li><a href="Assert-WindowsFeatureFunctionsSupported.html">Assert-WindowsFeatureFunctionsSupported</a></li>
 			<li><a href="Get-WindowsFeature.html">Get-WindowsFeature</a></li>
 			<li><a href="Install-WindowsFeature.html">Install-WindowsFeature</a></li>
-			<li><a href="Resolve-WindowsFeatureName.html">Resolve-WindowsFeatureName</a></li>
 			<li><a href="Test-WindowsFeature.html">Test-WindowsFeature</a></li>
 			<li><a href="Uninstall-WindowsFeature.html">Uninstall-WindowsFeature</a></li>
 		</ul>
@@ -261,54 +265,61 @@
 </div>
 
 
-    <h1>Resolve-WindowsFeatureName</h1>
-    <div><p>INTERNAL.  DO NOT USE.  Converts a Carbon-specific, common Windows feature name, into the feature name used on the current computer.</p>
+<h1>New-TempDirectory</h1>
+<div><p>Creates a new temporary directory with a random name.</p></div>
+
+<h2>Syntax</h2>
+<pre class="Syntax"><code>New-TempDirectory [[-Prefix] &lt;String&gt;] [&lt;CommonParameters&gt;]</code></pre>
+    
+<h2>Description</h2>
+<div class="Description">
+<p>A new temporary directory is created in the current user's <code>env:TEMP</code> directory.  The directory's name is created using the <code>Path</code> class's <a href="http://msdn.microsoft.com/en-us/library/system.io.path.getrandomfilename.aspx">GetRandomFileName method</a>.</p>
+
+<p>To add a custom prefix to the directory name, use the <code>Prefix</code> parameter. If you pass in a path, only its name will be used. In this way, you can pass <code>$PSCommandPath</code>, which will help you identify what scripts are leaving cruft around in the temp directory.</p>
 </div>
+    
+<h2>Related Commands</h2>
+<ul>
+<li><a href="http://msdn.microsoft.com/en-us/library/system.io.path.getrandomfilename.aspx">http://msdn.microsoft.com/en-us/library/system.io.path.getrandomfilename.aspx</a></li>
+</ul>
 
-        <h2>Syntax</h2>
-    <pre class="Syntax"><code>Resolve-WindowsFeatureName [-Name] &lt;String[]&gt; [&lt;CommonParameters&gt;]</code></pre>
-    
-        <h2>Description</h2>
-    <div class="Description">
-        <p>Windows feature names change between versions.  This function converts a Carbon-specific name into feature names used on the current computer's version of Windows.</p>
+<h2> Parameters </h2>
+<table border='1'>
+<tr>
+	<th>Name</th>
+    <th>Type</th>
+	<th>Description</th>
+	<th>Required?</th>
+	<th>Pipeline Input</th>
+	<th>Default Value</th>
+</tr>
+<tr valign='top'>
+	<td>Prefix</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+	<td>A prefix to use, so you can more easily identify <em>what</em> created the temporary directory. If you pass in a path, it will be converted to a file name.</td>
+	<td>false</td>
+	<td>false</td>
+    <td></td>
+</tr>
 
-<p><strong>This function is not available on Windows 8/2012.</strong></p>
+</table>
+        
 
-    </div>
-    
-    
+        
 
-    		<h2> Parameters </h2>
-		<table border='1'>
-			<tr>
-				<th>Name</th>
-                <th>Type</th>
-				<th>Description</th>
-				<th>Required?</th>
-				<th>Pipeline Input</th>
-				<th>Default Value</th>
-			</tr>
-            			<tr valign='top'>
-				<td>Name</td>
-				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String[]</a></td>
-				<td>The Carbon feature names to convert to Windows-specific feature names.
-</td>
-				<td>true</td>
-				<td>false</td>
-                <td></td>
-			</tr>
-            
-        </table>
         
-    
+
         
-    
-        
-    
-        
-                <h2>EXAMPLE 1</h2>
-            <pre><code>Resolve-WindowsFeatureNames -Name 'Iis','Msmq'</code></pre>
-            <p><p>Returns <code>'IIS-WebServer','MSMQ-Server'</code> if running Windows 7/Windows 2008 R2, or <code>'Web-WebServer','MSMQ-Server'</code> if on Windows 2008.</p>
-</p><p></p><p></p><p></p><p></p>
+<h2>EXAMPLE 1</h2>
+<pre><code>New-TempDirectory</code></pre>
+<p>Demonstrates how to create a new temporary directory, e.g. <code>C:\Users\ajensen\AppData\Local\Temp\5pobd3tu.5rn</code>.</p>
+
+<h2>EXAMPLE 2</h2>
+<pre><code>New-TempDirectory -Prefix 'Carbon'</code></pre>
+<p>Demonstrates how to create a new temporary directory with a custom prefix for its name, e.g. <code>C:\Users\ajensen\AppData\Local\Temp\Carbon5pobd3tu.5rn</code>.</p>
+
+<h2>EXAMPLE 3</h2>
+<pre><code>New-TempDirectory -Prefix $PSCommandPath</code></pre>
+<p>Demonstrates how you can use <code>$PSCommandPath</code> to create a new, temporary directory, named after the currently executing scripts, e.g. <code>C:\Users\ajensen\AppData\Local\Temp\New-TempDirectory.ps15pobd3tu.5rn</code>.</p>
 </body>
-</html>   
+</html>

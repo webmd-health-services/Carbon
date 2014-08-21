@@ -1,0 +1,18 @@
+NAME
+    Silk
+    
+SYNOPSIS
+    Silk is a PowerShell module for publishing a PowerShell module's help topics as a website.
+    
+DESCRIPTION
+
+  Introduction
+  
+    Silk publishes a PowerShell module's help topics as a website.  It creates an html page for each function in the module.  The module's main about topic (e.g. `about_Silk`) become's the site's index page.  Additional about topics become additional navigation elements.
+    
+    Details of how Silk publishes the website can be controlled via a JSON manifest file.
+
+  System Requirements
+  
+    PowerShell 3
+

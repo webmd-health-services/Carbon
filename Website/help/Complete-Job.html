@@ -5,7 +5,7 @@
 	<link href="styles.css" type="text/css" rel="stylesheet" />
 </head>
 <body>
-    	<ul id="SiteNav">
+	<ul id="SiteNav">
 		<li><a href="http://get-carbon.org">Get-Carbon</a></li>
 		<li><b>-Documentation</b></li>
         <li><a href="http://get-carbon.org">-ReleaseNotes</a></li>
@@ -39,6 +39,7 @@
 		</ul>
 		<li class="Category">Computer</li>
 		<ul class="CommandMenu">
+			<li><a href="Get-ProgramInstallInfo.html">Get-ProgramInstallInfo</a></li>
 			<li><a href="Remove-EnvironmentVariable.html">Remove-EnvironmentVariable</a></li>
 			<li><a href="Resolve-NetPath.html">Resolve-NetPath</a></li>
 			<li><a href="Set-EnvironmentVariable.html">Set-EnvironmentVariable</a></li>
@@ -47,6 +48,7 @@
 		</ul>
 		<li class="Category">Cryptography</li>
 		<ul class="CommandMenu">
+			<li><a href="New-RsaKeyPair.html">New-RsaKeyPair</a></li>
 			<li><a href="Protect-String.html">Protect-String</a></li>
 			<li><a href="Unprotect-String.html">Unprotect-String</a></li>
 		</ul>
@@ -58,14 +60,17 @@
 		</ul>
 		<li class="Category">FileSystem</li>
 		<ul class="CommandMenu">
+			<li><a href="Compress-Item.html">Compress-Item</a></li>
 			<li><a href="Disable-NtfsCompression.html">Disable-NtfsCompression</a></li>
 			<li><a href="Enable-NtfsCompression.html">Enable-NtfsCompression</a></li>
+			<li><a href="Expand-Item.html">Expand-Item</a></li>
 			<li><a href="Install-Junction.html">Install-Junction</a></li>
 			<li><a href="New-Junction.html">New-Junction</a></li>
-			<li><a href="New-TempDir.html">New-TempDir</a></li>
+			<li><a href="New-TempDirectory.html">New-TempDirectory</a></li>
 			<li><a href="Remove-Junction.html">Remove-Junction</a></li>
 			<li><a href="Test-NtfsCompression.html">Test-NtfsCompression</a></li>
 			<li><a href="Test-PathIsJunction.html">Test-PathIsJunction</a></li>
+			<li><a href="Test-ZipFile.html">Test-ZipFile</a></li>
 		</ul>
 		<li class="Category">Firewall</li>
 		<ul class="CommandMenu">
@@ -85,7 +90,6 @@
 		<li class="Category">IIS</li>
 		<ul class="CommandMenu">
 			<li><a href="Add-IisDefaultDocument.html">Add-IisDefaultDocument</a></li>
-			<li><a href="Add-IisServerManagerMember.html">Add-IisServerManagerMember</a></li>
 			<li><a href="Disable-IisSecurityAuthentication.html">Disable-IisSecurityAuthentication</a></li>
 			<li><a href="Enable-IisDirectoryBrowsing.html">Enable-IisDirectoryBrowsing</a></li>
 			<li><a href="Enable-IisSecurityAuthentication.html">Enable-IisSecurityAuthentication</a></li>
@@ -199,13 +203,14 @@
 		<ul class="CommandMenu">
 			<li><a href="Assert-AdminPrivilege.html">Assert-AdminPrivilege</a></li>
 			<li><a href="Convert-SecureStringToString.html">Convert-SecureStringToString</a></li>
+			<li><a href="ConvertTo-ContainerInheritanceFlags.html">ConvertTo-ContainerInheritanceFlags</a></li>
 			<li><a href="ConvertTo-InheritanceFlag.html">ConvertTo-InheritanceFlag</a></li>
 			<li><a href="ConvertTo-PropagationFlag.html">ConvertTo-PropagationFlag</a></li>
-			<li><a href="ConvertTo-ProviderAccessControlRights.html">ConvertTo-ProviderAccessControlRights</a></li>
 			<li><a href="Get-Permission.html">Get-Permission</a></li>
 			<li><a href="Grant-Permission.html">Grant-Permission</a></li>
 			<li><a href="New-Credential.html">New-Credential</a></li>
 			<li><a href="Protect-Acl.html">Protect-Acl</a></li>
+			<li><a href="Revoke-Permission.html">Revoke-Permission</a></li>
 			<li><a href="Test-AdminPrivilege.html">Test-AdminPrivilege</a></li>
 			<li><a href="Test-Permission.html">Test-Permission</a></li>
 		</ul>
@@ -213,6 +218,7 @@
 		<ul class="CommandMenu">
 			<li><a href="Assert-Service.html">Assert-Service</a></li>
 			<li><a href="Get-ServiceAcl.html">Get-ServiceAcl</a></li>
+			<li><a href="Get-ServiceConfiguration.html">Get-ServiceConfiguration</a></li>
 			<li><a href="Get-ServicePermission.html">Get-ServicePermission</a></li>
 			<li><a href="Get-ServiceSecurityDescriptor.html">Get-ServiceSecurityDescriptor</a></li>
 			<li><a href="Grant-ServiceControlPermission.html">Grant-ServiceControlPermission</a></li>
@@ -246,10 +252,8 @@
 		</ul>
 		<li class="Category">WindowsFeatures</li>
 		<ul class="CommandMenu">
-			<li><a href="Assert-WindowsFeatureFunctionsSupported.html">Assert-WindowsFeatureFunctionsSupported</a></li>
 			<li><a href="Get-WindowsFeature.html">Get-WindowsFeature</a></li>
 			<li><a href="Install-WindowsFeature.html">Install-WindowsFeature</a></li>
-			<li><a href="Resolve-WindowsFeatureName.html">Resolve-WindowsFeatureName</a></li>
 			<li><a href="Test-WindowsFeature.html">Test-WindowsFeature</a></li>
 			<li><a href="Uninstall-WindowsFeature.html">Uninstall-WindowsFeature</a></li>
 		</ul>
@@ -261,70 +265,64 @@
 </div>
 
 
-    <h1>Complete-Job</h1>
-    <div><p>Waits for a set of PowerShell jobs to complete, receives each job as it finishes, and returns the number of jobs that didn't complete successfully.</p>
-</div>
+<h1>Complete-Job</h1>
+<div><p>Waits for a set of PowerShell jobs to complete, receives each job as it finishes, and returns the number of jobs that didn't complete successfully.</p></div>
 
-        <h2>Syntax</h2>
-    <pre class="Syntax"><code>Complete-Job [-Job] &lt;Job[]&gt; [[-IntervalSeconds] &lt;Int32&gt;] [&lt;CommonParameters&gt;]</code></pre>
+<h2>Syntax</h2>
+<pre class="Syntax"><code>Complete-Job [-Job] &lt;Job[]&gt; [[-IntervalSeconds] &lt;Int32&gt;] [&lt;CommonParameters&gt;]</code></pre>
     
-        <h2>Description</h2>
-    <div class="Description">
-        <p>Job management in PowerShell is a pain.  At a minimum, you have to wait for each job to complete, then receive its output.  This function manages all that for you.  It iterates over a list/array of jobs, as each job finishes, it receives its output and removes it.  If a job is blocked or stopped it receives and removes those jobs.  When its all done, it returns the number of jobs that failed, were blocked, or stopped.</p>
+<h2>Description</h2>
+<div class="Description">
+<p>Job management in PowerShell is a pain.  At a minimum, you have to wait for each job to complete, then receive its output.  This function manages all that for you.  It iterates over a list/array of jobs, as each job finishes, it receives its output and removes it.  If a job is blocked or stopped it receives and removes those jobs.  When its all done, it returns the number of jobs that failed, were blocked, or stopped.</p>
 
 <p>By default, it sleeps for one second between status checks.  You can increase this interval using the <code>IntervalSeconds</code> parameter.</p>
 
 <p>This function never times out.</p>
-
-    </div>
-    
+</div>
     
 
-    		<h2> Parameters </h2>
-		<table border='1'>
-			<tr>
-				<th>Name</th>
-                <th>Type</th>
-				<th>Description</th>
-				<th>Required?</th>
-				<th>Pipeline Input</th>
-				<th>Default Value</th>
-			</tr>
-            			<tr valign='top'>
-				<td>Job</td>
-				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.job.aspx">Job[]</a></td>
-				<td>The jobs to complete.
-</td>
-				<td>true</td>
-				<td>false</td>
-                <td></td>
-			</tr>
-			<tr valign='top'>
-				<td>IntervalSeconds</td>
-				<td><a href="http://msdn.microsoft.com/en-us/library/system.int32.aspx">Int32</a></td>
-				<td>The number of seconds to sleep between job status checks.  Default is 1 second.
-</td>
-				<td>false</td>
-				<td>false</td>
-                <td>1</td>
-			</tr>
-            
-        </table>
+
+<h2> Parameters </h2>
+<table border='1'>
+<tr>
+	<th>Name</th>
+    <th>Type</th>
+	<th>Description</th>
+	<th>Required?</th>
+	<th>Pipeline Input</th>
+	<th>Default Value</th>
+</tr>
+<tr valign='top'>
+	<td>Job</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.job.aspx">Job[]</a></td>
+	<td>The jobs to complete.</td>
+	<td>true</td>
+	<td>false</td>
+    <td></td>
+</tr>
+<tr valign='top'>
+	<td>IntervalSeconds</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.int32.aspx">Int32</a></td>
+	<td>The number of seconds to sleep between job status checks.  Default is 1 second.</td>
+	<td>false</td>
+	<td>false</td>
+    <td>1</td>
+</tr>
+
+</table>
         
-    
-        
-            <h2>Return Values</h2>
-        <p><a href="http://msdn.microsoft.com/en-us/library/system.int32.aspx">System.Int32</a>. </p>
 
         
-    
+
         
-                <h2>EXAMPLE 1</h2>
-            <pre><code>Complete-Job -Job $jobs</code></pre>
-            <p><p>Sits and waits for all the jobs in <code>$jobs</code> to finish, block, or stop and returns the number that didn't succeed.  It waits one second between status checks.</p>
-</p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 2</h2>
-            <pre><code>Complete-Job -Job $jobs -IntervalSeconds 60</code></pre>
-            <p><p>Waits for all the jobs in <code>$jobs</code> to finish, waiting 60 seconds between status checks.</p>
-</p><p></p><p></p><p></p><p></p>
+
+        
+<h2>EXAMPLE 1</h2>
+<pre><code>Complete-Job -Job $jobs</code></pre>
+<p>Sits and waits for all the jobs in <code>$jobs</code> to finish, block, or stop and returns the number that didn't succeed.  It waits one second between status checks.</p>
+
+<h2>EXAMPLE 2</h2>
+<pre><code>Complete-Job -Job $jobs -IntervalSeconds 60</code></pre>
+<p>Waits for all the jobs in <code>$jobs</code> to finish, waiting 60 seconds between status checks.</p>
 </body>
-</html>   
+</html>

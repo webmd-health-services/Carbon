@@ -1,11 +1,11 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-    <title>PowerShell - Add-IisServerManagerMember - Carbon</title>
+    <title>PowerShell - Test-ZipFile - Carbon</title>
 	<link href="styles.css" type="text/css" rel="stylesheet" />
 </head>
 <body>
-    	<ul id="SiteNav">
+	<ul id="SiteNav">
 		<li><a href="http://get-carbon.org">Get-Carbon</a></li>
 		<li><b>-Documentation</b></li>
         <li><a href="http://get-carbon.org">-ReleaseNotes</a></li>
@@ -39,6 +39,7 @@
 		</ul>
 		<li class="Category">Computer</li>
 		<ul class="CommandMenu">
+			<li><a href="Get-ProgramInstallInfo.html">Get-ProgramInstallInfo</a></li>
 			<li><a href="Remove-EnvironmentVariable.html">Remove-EnvironmentVariable</a></li>
 			<li><a href="Resolve-NetPath.html">Resolve-NetPath</a></li>
 			<li><a href="Set-EnvironmentVariable.html">Set-EnvironmentVariable</a></li>
@@ -47,6 +48,7 @@
 		</ul>
 		<li class="Category">Cryptography</li>
 		<ul class="CommandMenu">
+			<li><a href="New-RsaKeyPair.html">New-RsaKeyPair</a></li>
 			<li><a href="Protect-String.html">Protect-String</a></li>
 			<li><a href="Unprotect-String.html">Unprotect-String</a></li>
 		</ul>
@@ -58,14 +60,17 @@
 		</ul>
 		<li class="Category">FileSystem</li>
 		<ul class="CommandMenu">
+			<li><a href="Compress-Item.html">Compress-Item</a></li>
 			<li><a href="Disable-NtfsCompression.html">Disable-NtfsCompression</a></li>
 			<li><a href="Enable-NtfsCompression.html">Enable-NtfsCompression</a></li>
+			<li><a href="Expand-Item.html">Expand-Item</a></li>
 			<li><a href="Install-Junction.html">Install-Junction</a></li>
 			<li><a href="New-Junction.html">New-Junction</a></li>
-			<li><a href="New-TempDir.html">New-TempDir</a></li>
+			<li><a href="New-TempDirectory.html">New-TempDirectory</a></li>
 			<li><a href="Remove-Junction.html">Remove-Junction</a></li>
 			<li><a href="Test-NtfsCompression.html">Test-NtfsCompression</a></li>
 			<li><a href="Test-PathIsJunction.html">Test-PathIsJunction</a></li>
+			<li><a href="Test-ZipFile.html">Test-ZipFile</a></li>
 		</ul>
 		<li class="Category">Firewall</li>
 		<ul class="CommandMenu">
@@ -85,7 +90,6 @@
 		<li class="Category">IIS</li>
 		<ul class="CommandMenu">
 			<li><a href="Add-IisDefaultDocument.html">Add-IisDefaultDocument</a></li>
-			<li><a href="Add-IisServerManagerMember.html">Add-IisServerManagerMember</a></li>
 			<li><a href="Disable-IisSecurityAuthentication.html">Disable-IisSecurityAuthentication</a></li>
 			<li><a href="Enable-IisDirectoryBrowsing.html">Enable-IisDirectoryBrowsing</a></li>
 			<li><a href="Enable-IisSecurityAuthentication.html">Enable-IisSecurityAuthentication</a></li>
@@ -199,13 +203,14 @@
 		<ul class="CommandMenu">
 			<li><a href="Assert-AdminPrivilege.html">Assert-AdminPrivilege</a></li>
 			<li><a href="Convert-SecureStringToString.html">Convert-SecureStringToString</a></li>
+			<li><a href="ConvertTo-ContainerInheritanceFlags.html">ConvertTo-ContainerInheritanceFlags</a></li>
 			<li><a href="ConvertTo-InheritanceFlag.html">ConvertTo-InheritanceFlag</a></li>
 			<li><a href="ConvertTo-PropagationFlag.html">ConvertTo-PropagationFlag</a></li>
-			<li><a href="ConvertTo-ProviderAccessControlRights.html">ConvertTo-ProviderAccessControlRights</a></li>
 			<li><a href="Get-Permission.html">Get-Permission</a></li>
 			<li><a href="Grant-Permission.html">Grant-Permission</a></li>
 			<li><a href="New-Credential.html">New-Credential</a></li>
 			<li><a href="Protect-Acl.html">Protect-Acl</a></li>
+			<li><a href="Revoke-Permission.html">Revoke-Permission</a></li>
 			<li><a href="Test-AdminPrivilege.html">Test-AdminPrivilege</a></li>
 			<li><a href="Test-Permission.html">Test-Permission</a></li>
 		</ul>
@@ -213,6 +218,7 @@
 		<ul class="CommandMenu">
 			<li><a href="Assert-Service.html">Assert-Service</a></li>
 			<li><a href="Get-ServiceAcl.html">Get-ServiceAcl</a></li>
+			<li><a href="Get-ServiceConfiguration.html">Get-ServiceConfiguration</a></li>
 			<li><a href="Get-ServicePermission.html">Get-ServicePermission</a></li>
 			<li><a href="Get-ServiceSecurityDescriptor.html">Get-ServiceSecurityDescriptor</a></li>
 			<li><a href="Grant-ServiceControlPermission.html">Grant-ServiceControlPermission</a></li>
@@ -246,10 +252,8 @@
 		</ul>
 		<li class="Category">WindowsFeatures</li>
 		<ul class="CommandMenu">
-			<li><a href="Assert-WindowsFeatureFunctionsSupported.html">Assert-WindowsFeatureFunctionsSupported</a></li>
 			<li><a href="Get-WindowsFeature.html">Get-WindowsFeature</a></li>
 			<li><a href="Install-WindowsFeature.html">Install-WindowsFeature</a></li>
-			<li><a href="Resolve-WindowsFeatureName.html">Resolve-WindowsFeatureName</a></li>
 			<li><a href="Test-WindowsFeature.html">Test-WindowsFeature</a></li>
 			<li><a href="Uninstall-WindowsFeature.html">Uninstall-WindowsFeature</a></li>
 		</ul>
@@ -261,70 +265,55 @@
 </div>
 
 
-    <h1>Add-IisServerManagerMember</h1>
-    <div><p>INTERNAL. Adds a <code>ServerManager</code> property and <code>CommitChanges()</code> method to an object.</p>
+<h1>Test-ZipFile</h1>
+<div><p>Tests if a file is a ZIP file using the <code>DotNetZip</code> library.</p></div>
+
+<h2>Syntax</h2>
+<pre class="Syntax"><code>Test-ZipFile [-Path] &lt;String&gt; [&lt;CommonParameters&gt;]</code></pre>
+    
+<h2>Description</h2>
+<div class="Description">
+<p>Uses the <code>Ionic.Zip.ZipFile.IsZipFile</code> static method to determine if a file is a ZIP file.  The file <em>must</em> exist. If it doesn't, an error is written and <code>$null</code> is returned.</p>
+
+<p>You can pipe <code>System.IO.FileInfo</code> (or strings) to this function to filter multiple items.</p>
 </div>
+    
+<h2>Related Commands</h2>
+<ul>
+<li><a href="https://www.nuget.org/packages/DotNetZip">https://www.nuget.org/packages/DotNetZip</a></li>
+<li><a href="Compress-Item.html">Compress-Item</a></li>
+<li><a href="Expand-Item.html">Expand-Item</a></li>
+</ul>
 
-        <h2>Syntax</h2>
-    <pre class="Syntax"><code>Add-IisServerManagerMember [-InputObject] &lt;Object&gt; [-ServerManager] &lt;ServerManager&gt; [-PassThru] [&lt;CommonParameters&gt;]</code></pre>
-    
-        <h2>Description</h2>
-    <div class="Description">
-        <p>This is an internal Carbon function for adding properties/methods to <code>Microsoft.Web.Administration</code> objects so that changes to them can be committed/saved.  It adds a <code>ServerManager</code> property, which is a reference to the <code>ServerManager</code> object which instantiated this object and a CommitChanges method, which calls down to the <code>ServerManager</code>'s <code>CommitChanges</code> method.</p>
+<h2> Parameters </h2>
+<table border='1'>
+<tr>
+	<th>Name</th>
+    <th>Type</th>
+	<th>Description</th>
+	<th>Required?</th>
+	<th>Pipeline Input</th>
+	<th>Default Value</th>
+</tr>
+<tr valign='top'>
+	<td>Path</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+	<td>The path to the file to test.</td>
+	<td>true</td>
+	<td>false</td>
+    <td></td>
+</tr>
 
-    </div>
-    
-    
+</table>
+        
 
-    		<h2> Parameters </h2>
-		<table border='1'>
-			<tr>
-				<th>Name</th>
-                <th>Type</th>
-				<th>Description</th>
-				<th>Required?</th>
-				<th>Pipeline Input</th>
-				<th>Default Value</th>
-			</tr>
-            			<tr valign='top'>
-				<td>InputObject</td>
-				<td><a href="http://msdn.microsoft.com/en-us/library/system.object.aspx">Object</a></td>
-				<td>The object on which the server manager members will be added.
-</td>
-				<td>true</td>
-				<td>true (ByValue)</td>
-                <td></td>
-			</tr>
-			<tr valign='top'>
-				<td>ServerManager</td>
-				<td><a href="http://msdn.microsoft.com/en-us/library/microsoft.web.administration.servermanager.aspx">ServerManager</a></td>
-				<td>The server manager object to use as the basis for the new members.
-</td>
-				<td>true</td>
-				<td>false</td>
-                <td></td>
-			</tr>
-			<tr valign='top'>
-				<td>PassThru</td>
-				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
-				<td>If set, will return the input object.
-</td>
-				<td>false</td>
-				<td>false</td>
-                <td>False</td>
-			</tr>
-            
-        </table>
         
-    
+
         
-    
+
         
-    
-        
-                <h2>EXAMPLE 1</h2>
-            <pre><code>$appPool | Add-IisServerManagerMember -ServerManager $manager -PassThru</code></pre>
-            <p><p>Adds a <code>ServerManager</code> property and <code>CommitChanges</code> method to <code>$appPool</code>.</p>
-</p><p></p><p></p><p></p><p></p>
+<h2>EXAMPLE 1</h2>
+<pre><code>Test-ZipFile -Path 'MyCoolZip.zip'</code></pre>
+<p>Demonstrates how to check the current directory if MyCoolZip.zip is really a ZIP file.</p>
 </body>
-</html>   
+</html>

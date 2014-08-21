@@ -5,7 +5,7 @@
 	<link href="styles.css" type="text/css" rel="stylesheet" />
 </head>
 <body>
-    	<ul id="SiteNav">
+	<ul id="SiteNav">
 		<li><a href="http://get-carbon.org">Get-Carbon</a></li>
 		<li><b>-Documentation</b></li>
         <li><a href="http://get-carbon.org">-ReleaseNotes</a></li>
@@ -39,6 +39,7 @@
 		</ul>
 		<li class="Category">Computer</li>
 		<ul class="CommandMenu">
+			<li><a href="Get-ProgramInstallInfo.html">Get-ProgramInstallInfo</a></li>
 			<li><a href="Remove-EnvironmentVariable.html">Remove-EnvironmentVariable</a></li>
 			<li><a href="Resolve-NetPath.html">Resolve-NetPath</a></li>
 			<li><a href="Set-EnvironmentVariable.html">Set-EnvironmentVariable</a></li>
@@ -47,6 +48,7 @@
 		</ul>
 		<li class="Category">Cryptography</li>
 		<ul class="CommandMenu">
+			<li><a href="New-RsaKeyPair.html">New-RsaKeyPair</a></li>
 			<li><a href="Protect-String.html">Protect-String</a></li>
 			<li><a href="Unprotect-String.html">Unprotect-String</a></li>
 		</ul>
@@ -58,14 +60,17 @@
 		</ul>
 		<li class="Category">FileSystem</li>
 		<ul class="CommandMenu">
+			<li><a href="Compress-Item.html">Compress-Item</a></li>
 			<li><a href="Disable-NtfsCompression.html">Disable-NtfsCompression</a></li>
 			<li><a href="Enable-NtfsCompression.html">Enable-NtfsCompression</a></li>
+			<li><a href="Expand-Item.html">Expand-Item</a></li>
 			<li><a href="Install-Junction.html">Install-Junction</a></li>
 			<li><a href="New-Junction.html">New-Junction</a></li>
-			<li><a href="New-TempDir.html">New-TempDir</a></li>
+			<li><a href="New-TempDirectory.html">New-TempDirectory</a></li>
 			<li><a href="Remove-Junction.html">Remove-Junction</a></li>
 			<li><a href="Test-NtfsCompression.html">Test-NtfsCompression</a></li>
 			<li><a href="Test-PathIsJunction.html">Test-PathIsJunction</a></li>
+			<li><a href="Test-ZipFile.html">Test-ZipFile</a></li>
 		</ul>
 		<li class="Category">Firewall</li>
 		<ul class="CommandMenu">
@@ -85,7 +90,6 @@
 		<li class="Category">IIS</li>
 		<ul class="CommandMenu">
 			<li><a href="Add-IisDefaultDocument.html">Add-IisDefaultDocument</a></li>
-			<li><a href="Add-IisServerManagerMember.html">Add-IisServerManagerMember</a></li>
 			<li><a href="Disable-IisSecurityAuthentication.html">Disable-IisSecurityAuthentication</a></li>
 			<li><a href="Enable-IisDirectoryBrowsing.html">Enable-IisDirectoryBrowsing</a></li>
 			<li><a href="Enable-IisSecurityAuthentication.html">Enable-IisSecurityAuthentication</a></li>
@@ -199,13 +203,14 @@
 		<ul class="CommandMenu">
 			<li><a href="Assert-AdminPrivilege.html">Assert-AdminPrivilege</a></li>
 			<li><a href="Convert-SecureStringToString.html">Convert-SecureStringToString</a></li>
+			<li><a href="ConvertTo-ContainerInheritanceFlags.html">ConvertTo-ContainerInheritanceFlags</a></li>
 			<li><a href="ConvertTo-InheritanceFlag.html">ConvertTo-InheritanceFlag</a></li>
 			<li><a href="ConvertTo-PropagationFlag.html">ConvertTo-PropagationFlag</a></li>
-			<li><a href="ConvertTo-ProviderAccessControlRights.html">ConvertTo-ProviderAccessControlRights</a></li>
 			<li><a href="Get-Permission.html">Get-Permission</a></li>
 			<li><a href="Grant-Permission.html">Grant-Permission</a></li>
 			<li><a href="New-Credential.html">New-Credential</a></li>
 			<li><a href="Protect-Acl.html">Protect-Acl</a></li>
+			<li><a href="Revoke-Permission.html">Revoke-Permission</a></li>
 			<li><a href="Test-AdminPrivilege.html">Test-AdminPrivilege</a></li>
 			<li><a href="Test-Permission.html">Test-Permission</a></li>
 		</ul>
@@ -213,6 +218,7 @@
 		<ul class="CommandMenu">
 			<li><a href="Assert-Service.html">Assert-Service</a></li>
 			<li><a href="Get-ServiceAcl.html">Get-ServiceAcl</a></li>
+			<li><a href="Get-ServiceConfiguration.html">Get-ServiceConfiguration</a></li>
 			<li><a href="Get-ServicePermission.html">Get-ServicePermission</a></li>
 			<li><a href="Get-ServiceSecurityDescriptor.html">Get-ServiceSecurityDescriptor</a></li>
 			<li><a href="Grant-ServiceControlPermission.html">Grant-ServiceControlPermission</a></li>
@@ -246,10 +252,8 @@
 		</ul>
 		<li class="Category">WindowsFeatures</li>
 		<ul class="CommandMenu">
-			<li><a href="Assert-WindowsFeatureFunctionsSupported.html">Assert-WindowsFeatureFunctionsSupported</a></li>
 			<li><a href="Get-WindowsFeature.html">Get-WindowsFeature</a></li>
 			<li><a href="Install-WindowsFeature.html">Install-WindowsFeature</a></li>
-			<li><a href="Resolve-WindowsFeatureName.html">Resolve-WindowsFeatureName</a></li>
 			<li><a href="Test-WindowsFeature.html">Test-WindowsFeature</a></li>
 			<li><a href="Uninstall-WindowsFeature.html">Uninstall-WindowsFeature</a></li>
 		</ul>
@@ -261,68 +265,132 @@
 </div>
 
 
-    <h1>Unprotect-String</h1>
-    <div><p>Decrypts a string using the Data Protection API (DPAPI).</p>
+<h1>Unprotect-String</h1>
+<div><p>Decrypts a string.</p></div>
+
+<h2>Syntax</h2>
+<pre class="Syntax"><code>Unprotect-String [-ProtectedString] &lt;String&gt; [&lt;CommonParameters&gt;]</code></pre>
+<pre class="Syntax"><code>Unprotect-String [-ProtectedString] &lt;String&gt; -Certificate &lt;X509Certificate2&gt; [-UseDirectEncryptionPadding] [&lt;CommonParameters&gt;]</code></pre>
+<pre class="Syntax"><code>Unprotect-String [-ProtectedString] &lt;String&gt; -Thumbprint &lt;String&gt; [-UseDirectEncryptionPadding] [&lt;CommonParameters&gt;]</code></pre>
+<pre class="Syntax"><code>Unprotect-String [-ProtectedString] &lt;String&gt; -PrivateKeyPath &lt;String&gt; [-Password &lt;String&gt;] [-UseDirectEncryptionPadding] [&lt;CommonParameters&gt;]</code></pre>
+    
+<h2>Description</h2>
+<div class="Description">
+<p>Decrypts a string encrypted via the Data Protection API (DPAPI) or RSA.</p>
+
+<h2>DPAPI</h2>
+
+<p>This is the default. The string must have also been encrypted with the DPAPI. The string must have been encrypted at the current user's scope or the local machien scope.</p>
+
+<h2>RSA</h2>
+
+<p>RSA is an assymetric encryption/decryption algorithm, which requires a public/private key pair. This method decrypts a secret that was encrypted with the public key using the private key.</p>
+
+<p>You can specify the private key in three ways: </p>
+
+<ul>
+<li>with a <code>System.Security.Cryptography.X509Certificates.X509Certificate2</code> object, via the <code>Certificate</code> parameter</li>
+<li>with a certificate in one of the Windows certificate stores, passing its unique thumbprint via the <code>Thumbprint</code> parameter, or via the <code>PrivateKeyPath</code> parameter, which can be a certificat provider path, e.g. it starts with <code>cert:\</code>.</li>
+<li>with an X509 certificate file, via the <code>PrivateKeyPath</code> parameter</li>
+</ul>
 </div>
-
-        <h2>Syntax</h2>
-    <pre class="Syntax"><code>Unprotect-String [-ProtectedString] &lt;String&gt; [&lt;CommonParameters&gt;]</code></pre>
     
-        <h2>Description</h2>
-    <div class="Description">
-        <p>Decrypts a string with the Data Protection API (DPAPI).  The string must have also been encrypted with the DPAPI and the same scope used to decrypt as was used to encrypt.</p>
-
-    </div>
-    
-            <h2>Related Commands</h2>
-        <ul>
+<h2>Related Commands</h2>
+<ul>
+<li><a href="New-RsaKeyPair.html">New-RsaKeyPair</a></li>
 <li><a href="Protect-String.html">Protect-String</a></li>
 <li><a href="http://msdn.microsoft.com/en-us/library/system.security.cryptography.protecteddata.aspx">http://msdn.microsoft.com/en-us/library/system.security.cryptography.protecteddata.aspx</a></li>
 </ul>
 
+<h2> Parameters </h2>
+<table border='1'>
+<tr>
+	<th>Name</th>
+    <th>Type</th>
+	<th>Description</th>
+	<th>Required?</th>
+	<th>Pipeline Input</th>
+	<th>Default Value</th>
+</tr>
+<tr valign='top'>
+	<td>ProtectedString</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+	<td>The text to decrypt.</td>
+	<td>true</td>
+	<td>true (ByValue)</td>
+    <td></td>
+</tr>
+<tr valign='top'>
+	<td>Certificate</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.security.cryptography.x509certificates.x509certificate2.aspx">X509Certificate2</a></td>
+	<td>The private key to use for decrypting.</td>
+	<td>true</td>
+	<td>false</td>
+    <td></td>
+</tr>
+<tr valign='top'>
+	<td>Thumbprint</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+	<td>The thumbprint of the certificate, found in one of the Windows certificate stores, to use when decrypting. All certificate stores are searched. The current user must have permission to the private key.</td>
+	<td>true</td>
+	<td>false</td>
+    <td></td>
+</tr>
+<tr valign='top'>
+	<td>PrivateKeyPath</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+	<td>The path to the private key to use for encrypting. Must be to an <code>X509Certificate2</code> file or a certificate in a certificate store.</td>
+	<td>true</td>
+	<td>false</td>
+    <td></td>
+</tr>
+<tr valign='top'>
+	<td>Password</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+	<td>The password for the private key, if it has one. It really should.</td>
+	<td>false</td>
+	<td>false</td>
+    <td></td>
+</tr>
+<tr valign='top'>
+	<td>UseDirectEncryptionPadding</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+	<td>If true, uses Direct Encryption (PKCS#1 v1.5) padding. Otherwise (the default), uses OAEP (PKCS#1 v2) padding. See <a href="http://msdn.microsoft.com/en-us/library/system.security.cryptography.rsacryptoserviceprovider.encrypt(v=vs.110).aspx">Encrypt</a> for information.</td>
+	<td>false</td>
+	<td>false</td>
+    <td>False</td>
+</tr>
 
-    		<h2> Parameters </h2>
-		<table border='1'>
-			<tr>
-				<th>Name</th>
-                <th>Type</th>
-				<th>Description</th>
-				<th>Required?</th>
-				<th>Pipeline Input</th>
-				<th>Default Value</th>
-			</tr>
-            			<tr valign='top'>
-				<td>ProtectedString</td>
-				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
-				<td>The text to encrypt.
-</td>
-				<td>true</td>
-				<td>true (ByValue)</td>
-                <td></td>
-			</tr>
-            
-        </table>
+</table>
         
-    
-        
-    
-        
-    
-        
-                <h2>EXAMPLE 1</h2>
-            <pre><code>$encryptedPassword = Protect-String -String 'MySuperSecretPassword' -ForUser</code></pre>
-            <p><p>PS> $password = Unprotect-String -ProtectedString  $encryptedPassword</p>
 
-<p>Decrypts a protected string which was encrypted at the current user or default scopes.</p>
-</p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 2</h2>
-            <pre><code>$encryptedPassword = Protect-String -String 'MySuperSecretPassword' -ForComputer</code></pre>
-            <p><p>PS> $cipherText = Unprotect-String -ProtectedString $encryptedPassword</p>
+        
 
-<p>Encrypts the given string and stores the value in $cipherText.  Because the string was encrypted at the LocalMachine scope, the string must be 
-decrypted at the same scope.</p>
-</p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 3</h2>
-            <pre><code>Protect-String -String 'NotSoSecretSecret' -ForUser | Unprotect-String</code></pre>
-            <p><p>Demonstrates how Unprotect-String takes input from the pipeline.  Adds 'NotSoSecretSecret' to the pipeline.</p>
-</p><p></p><p></p><p></p><p></p>
+        
+
+        
+<h2>EXAMPLE 1</h2>
+<pre><code>$password = Unprotect-String -ProtectedString  $encryptedPassword</code></pre>
+<p>Decrypts a protected string which was encrypted at the current user or default scopes using the DPAPI. The secret must have been encrypted at the current user's scope or at the local computer's scope.</p>
+
+<h2>EXAMPLE 2</h2>
+<pre><code>Protect-String -String 'NotSoSecretSecret' -ForUser | Unprotect-String</code></pre>
+<p>Demonstrates how Unprotect-String takes input from the pipeline.  Adds 'NotSoSecretSecret' to the pipeline.</p>
+
+<h2>EXAMPLE 3</h2>
+<pre><code>Unprotect-String -ProtectedString $ciphertext -Certificate $myCert</code></pre>
+<p>Demonstrates how to encrypt a secret using RSA with a <code>System.Security.Cryptography.X509Certificates.X509Certificate2</code> object. You're responsible for creating/loading it. The <code>New-RsaKeyPair</code> function will create a key pair for you, if you've got a Windows SDK installed.</p>
+
+<h2>EXAMPLE 4</h2>
+<pre><code>Unprotect-String -ProtectedString $ciphertext -Thumbprint '44A7C27F3353BC53F82318C14490D7E2500B6D9E'</code></pre>
+<p>Demonstrates how to decrypt a secret using RSA with a certificate in one of the Windows certificate stores. All local machine and user stores are searched. The current user must have permission/access to the certificate's private key.</p>
+
+<h2>EXAMPLE 5</h2>
+<pre><code>Unprotect -ProtectedString $ciphertext -PrivateKeyPath 'C:\Projects\Security\publickey.cer'</code></pre>
+<p>Demonstrates how to encrypt a secret using RSA with a certificate file. The file must be loadable by the <code>System.Security.Cryptography.X509Certificates.X509Certificate</code> class.</p>
+
+<h2>EXAMPLE 6</h2>
+<pre><code>Unprotect -ProtectedString $ciphertext -PrivateKeyPath 'cert:\LocalMachine\My\44A7C27F3353BC53F82318C14490D7E2500B6D9E'</code></pre>
+<p>Demonstrates how to encrypt a secret using RSA with a certificate in the store, giving its exact path.</p>
 </body>
-</html>   
+</html>

@@ -5,7 +5,7 @@
 	<link href="styles.css" type="text/css" rel="stylesheet" />
 </head>
 <body>
-    	<ul id="SiteNav">
+	<ul id="SiteNav">
 		<li><a href="http://get-carbon.org">Get-Carbon</a></li>
 		<li><b>-Documentation</b></li>
         <li><a href="http://get-carbon.org">-ReleaseNotes</a></li>
@@ -39,6 +39,7 @@
 		</ul>
 		<li class="Category">Computer</li>
 		<ul class="CommandMenu">
+			<li><a href="Get-ProgramInstallInfo.html">Get-ProgramInstallInfo</a></li>
 			<li><a href="Remove-EnvironmentVariable.html">Remove-EnvironmentVariable</a></li>
 			<li><a href="Resolve-NetPath.html">Resolve-NetPath</a></li>
 			<li><a href="Set-EnvironmentVariable.html">Set-EnvironmentVariable</a></li>
@@ -47,6 +48,7 @@
 		</ul>
 		<li class="Category">Cryptography</li>
 		<ul class="CommandMenu">
+			<li><a href="New-RsaKeyPair.html">New-RsaKeyPair</a></li>
 			<li><a href="Protect-String.html">Protect-String</a></li>
 			<li><a href="Unprotect-String.html">Unprotect-String</a></li>
 		</ul>
@@ -58,14 +60,17 @@
 		</ul>
 		<li class="Category">FileSystem</li>
 		<ul class="CommandMenu">
+			<li><a href="Compress-Item.html">Compress-Item</a></li>
 			<li><a href="Disable-NtfsCompression.html">Disable-NtfsCompression</a></li>
 			<li><a href="Enable-NtfsCompression.html">Enable-NtfsCompression</a></li>
+			<li><a href="Expand-Item.html">Expand-Item</a></li>
 			<li><a href="Install-Junction.html">Install-Junction</a></li>
 			<li><a href="New-Junction.html">New-Junction</a></li>
-			<li><a href="New-TempDir.html">New-TempDir</a></li>
+			<li><a href="New-TempDirectory.html">New-TempDirectory</a></li>
 			<li><a href="Remove-Junction.html">Remove-Junction</a></li>
 			<li><a href="Test-NtfsCompression.html">Test-NtfsCompression</a></li>
 			<li><a href="Test-PathIsJunction.html">Test-PathIsJunction</a></li>
+			<li><a href="Test-ZipFile.html">Test-ZipFile</a></li>
 		</ul>
 		<li class="Category">Firewall</li>
 		<ul class="CommandMenu">
@@ -85,7 +90,6 @@
 		<li class="Category">IIS</li>
 		<ul class="CommandMenu">
 			<li><a href="Add-IisDefaultDocument.html">Add-IisDefaultDocument</a></li>
-			<li><a href="Add-IisServerManagerMember.html">Add-IisServerManagerMember</a></li>
 			<li><a href="Disable-IisSecurityAuthentication.html">Disable-IisSecurityAuthentication</a></li>
 			<li><a href="Enable-IisDirectoryBrowsing.html">Enable-IisDirectoryBrowsing</a></li>
 			<li><a href="Enable-IisSecurityAuthentication.html">Enable-IisSecurityAuthentication</a></li>
@@ -199,13 +203,14 @@
 		<ul class="CommandMenu">
 			<li><a href="Assert-AdminPrivilege.html">Assert-AdminPrivilege</a></li>
 			<li><a href="Convert-SecureStringToString.html">Convert-SecureStringToString</a></li>
+			<li><a href="ConvertTo-ContainerInheritanceFlags.html">ConvertTo-ContainerInheritanceFlags</a></li>
 			<li><a href="ConvertTo-InheritanceFlag.html">ConvertTo-InheritanceFlag</a></li>
 			<li><a href="ConvertTo-PropagationFlag.html">ConvertTo-PropagationFlag</a></li>
-			<li><a href="ConvertTo-ProviderAccessControlRights.html">ConvertTo-ProviderAccessControlRights</a></li>
 			<li><a href="Get-Permission.html">Get-Permission</a></li>
 			<li><a href="Grant-Permission.html">Grant-Permission</a></li>
 			<li><a href="New-Credential.html">New-Credential</a></li>
 			<li><a href="Protect-Acl.html">Protect-Acl</a></li>
+			<li><a href="Revoke-Permission.html">Revoke-Permission</a></li>
 			<li><a href="Test-AdminPrivilege.html">Test-AdminPrivilege</a></li>
 			<li><a href="Test-Permission.html">Test-Permission</a></li>
 		</ul>
@@ -213,6 +218,7 @@
 		<ul class="CommandMenu">
 			<li><a href="Assert-Service.html">Assert-Service</a></li>
 			<li><a href="Get-ServiceAcl.html">Get-ServiceAcl</a></li>
+			<li><a href="Get-ServiceConfiguration.html">Get-ServiceConfiguration</a></li>
 			<li><a href="Get-ServicePermission.html">Get-ServicePermission</a></li>
 			<li><a href="Get-ServiceSecurityDescriptor.html">Get-ServiceSecurityDescriptor</a></li>
 			<li><a href="Grant-ServiceControlPermission.html">Grant-ServiceControlPermission</a></li>
@@ -246,10 +252,8 @@
 		</ul>
 		<li class="Category">WindowsFeatures</li>
 		<ul class="CommandMenu">
-			<li><a href="Assert-WindowsFeatureFunctionsSupported.html">Assert-WindowsFeatureFunctionsSupported</a></li>
 			<li><a href="Get-WindowsFeature.html">Get-WindowsFeature</a></li>
 			<li><a href="Install-WindowsFeature.html">Install-WindowsFeature</a></li>
-			<li><a href="Resolve-WindowsFeatureName.html">Resolve-WindowsFeatureName</a></li>
 			<li><a href="Test-WindowsFeature.html">Test-WindowsFeature</a></li>
 			<li><a href="Uninstall-WindowsFeature.html">Uninstall-WindowsFeature</a></li>
 		</ul>
@@ -261,189 +265,175 @@
 </div>
 
 
-    <h1>Install-Service</h1>
-    <div><p>Installs a Windows service.</p>
-</div>
+<h1>Install-Service</h1>
+<div><p>Installs a Windows service.</p></div>
 
-        <h2>Syntax</h2>
-    <pre class="Syntax"><code>Install-Service -Name &lt;String&gt; -Path &lt;String&gt; [-StartupType {Automatic | Manual | Disabled}] [-OnFirstFailure &lt;String&gt;] [-OnSecondFailure &lt;String&gt;] [-OnThirdFailure &lt;String&gt;] [-ResetFailureCount &lt;Int32&gt;] [-RestartDelay &lt;Int32&gt;] [-RebootDelay &lt;Int32&gt;] [-Dependency &lt;String[]&gt;] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
+<h2>Syntax</h2>
+<pre class="Syntax"><code>Install-Service -Name &lt;String&gt; -Path &lt;String&gt; [-StartupType {Automatic | Manual | Disabled}] [-OnFirstFailure &lt;String&gt;] [-OnSecondFailure &lt;String&gt;] [-OnThirdFailure &lt;String&gt;] [-ResetFailureCount &lt;Int32&gt;] [-RestartDelay &lt;Int32&gt;] [-RebootDelay &lt;Int32&gt;] [-Dependency &lt;String[]&gt;] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
 <pre class="Syntax"><code>Install-Service -Name &lt;String&gt; -Path &lt;String&gt; [-StartupType {Automatic | Manual | Disabled}] [-OnFirstFailure &lt;String&gt;] [-OnSecondFailure &lt;String&gt;] [-OnThirdFailure &lt;String&gt;] [-ResetFailureCount &lt;Int32&gt;] [-RestartDelay &lt;Int32&gt;] [-RebootDelay &lt;Int32&gt;] [-Dependency &lt;String[]&gt;] -Username &lt;String&gt; [-Password &lt;String&gt;] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
     
-        <h2>Description</h2>
-    <div class="Description">
-        <p>Installs a Windows service.  If a service with the given name already exists, it is left in place, and the its configuration is updated to match the parameters passed in.  In order to configure it, the service is stopped, configured, then started.  By default, the service is installed to run as <code>NetworkService</code>.  Set the <code>Username</code> and <code>Password</code> arguments to run as a different account.  This user will be granted the logon as a service right.</p>
+<h2>Description</h2>
+<div class="Description">
+<p>Installs a Windows service.  If a service with the given name already exists, it is left in place, and the its configuration is updated to match the parameters passed in.  In order to configure it, the service is stopped, configured, then started.  By default, the service is installed to run as <code>NetworkService</code>.  Set the <code>Username</code> and <code>Password</code> arguments to run as a different account.  This user will be granted the logon as a service right.</p>
 
 <p>The minimum required information to install a service is its name and path.  By default the servide will run as <code>NetworkService</code> and will start automatically.  Review the parameter list for additional configuraiton options and their defaults.  Normally, we would list them here, but there's like 300 of them and we really don't have the time.  I'm so mean, I'm not even going to give you <em>examples</em> of all the different options.  Feel free to send in your own.</p>
 
 <p><a href="http://technet.microsoft.com/en-us/library/dd548356.aspx">Managed service accounts and virtual accounts</a> should be supported (we don't know how to test, so can't be sure).  Simply omit the <code>-Password</code> parameter when providing a custom account name with the <code>-Username</code> parameter.</p>
-
-    </div>
+</div>
     
-            <h2>Related Commands</h2>
-        <ul>
+<h2>Related Commands</h2>
+<ul>
 <li><a href="http://technet.microsoft.com/en-us/library/dd548356.aspx">http://technet.microsoft.com/en-us/library/dd548356.aspx</a></li>
 </ul>
 
+<h2> Parameters </h2>
+<table border='1'>
+<tr>
+	<th>Name</th>
+    <th>Type</th>
+	<th>Description</th>
+	<th>Required?</th>
+	<th>Pipeline Input</th>
+	<th>Default Value</th>
+</tr>
+<tr valign='top'>
+	<td>Name</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+	<td>The name of the service.</td>
+	<td>true</td>
+	<td>false</td>
+    <td></td>
+</tr>
+<tr valign='top'>
+	<td>Path</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+	<td>The path to the service.</td>
+	<td>true</td>
+	<td>false</td>
+    <td></td>
+</tr>
+<tr valign='top'>
+	<td>StartupType</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.serviceprocess.servicestartmode.aspx">ServiceStartMode</a></td>
+	<td>The startup type: automatic, manual, or disabled.  Default is automatic.</td>
+	<td>false</td>
+	<td>false</td>
+    <td>Automatic</td>
+</tr>
+<tr valign='top'>
+	<td>OnFirstFailure</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+	<td>What to do on the service's first failure.  Default is to take no action.</td>
+	<td>false</td>
+	<td>false</td>
+    <td>TakeNoAction</td>
+</tr>
+<tr valign='top'>
+	<td>OnSecondFailure</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+	<td>What to do on the service's second failure. Default is to take no action.</td>
+	<td>false</td>
+	<td>false</td>
+    <td>TakeNoAction</td>
+</tr>
+<tr valign='top'>
+	<td>OnThirdFailure</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+	<td>What to do on the service' third failure.  Default is to take no action.</td>
+	<td>false</td>
+	<td>false</td>
+    <td>TakeNoAction</td>
+</tr>
+<tr valign='top'>
+	<td>ResetFailureCount</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.int32.aspx">Int32</a></td>
+	<td>How many seconds after which the failure count is reset to 0.</td>
+	<td>false</td>
+	<td>false</td>
+    <td>0</td>
+</tr>
+<tr valign='top'>
+	<td>RestartDelay</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.int32.aspx">Int32</a></td>
+	<td>How many milliseconds to wait before restarting the service.  Default is 60,0000, or 1 minute.</td>
+	<td>false</td>
+	<td>false</td>
+    <td>60000</td>
+</tr>
+<tr valign='top'>
+	<td>RebootDelay</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.int32.aspx">Int32</a></td>
+	<td>How many milliseconds to wait before handling the second failure.  Default is 60,000 or 1 minute.</td>
+	<td>false</td>
+	<td>false</td>
+    <td>60000</td>
+</tr>
+<tr valign='top'>
+	<td>Dependency</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String[]</a></td>
+	<td>What other services does this service depend on?</td>
+	<td>false</td>
+	<td>false</td>
+    <td></td>
+</tr>
+<tr valign='top'>
+	<td>Username</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+	<td>The user the service should run as.</td>
+	<td>true</td>
+	<td>false</td>
+    <td></td>
+</tr>
+<tr valign='top'>
+	<td>Password</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+	<td>The user's password.</td>
+	<td>false</td>
+	<td>false</td>
+    <td></td>
+</tr>
+<tr valign='top'>
+	<td>WhatIf</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+	<td></td>
+	<td>false</td>
+	<td>false</td>
+    <td></td>
+</tr>
+<tr valign='top'>
+	<td>Confirm</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+	<td></td>
+	<td>false</td>
+	<td>false</td>
+    <td></td>
+</tr>
+<tr valign="top">
+    <td><a href="http://technet.microsoft.com/en-us/library/dd315352.aspx">CommonParameters</a></td>
+    <td></td>
+    <td>This cmdlet supports common parameters.  For more information type <br> <code>Get-Help about_CommonParameters</code>.</td>
+    <td></td>
+    <td></td>
+    <td></td>
+</tr>
+</table>
+        
 
-    		<h2> Parameters </h2>
-		<table border='1'>
-			<tr>
-				<th>Name</th>
-                <th>Type</th>
-				<th>Description</th>
-				<th>Required?</th>
-				<th>Pipeline Input</th>
-				<th>Default Value</th>
-			</tr>
-            			<tr valign='top'>
-				<td>Name</td>
-				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
-				<td>The name of the service.
-</td>
-				<td>true</td>
-				<td>false</td>
-                <td></td>
-			</tr>
-			<tr valign='top'>
-				<td>Path</td>
-				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
-				<td>The path to the service.
-</td>
-				<td>true</td>
-				<td>false</td>
-                <td></td>
-			</tr>
-			<tr valign='top'>
-				<td>StartupType</td>
-				<td><a href="http://msdn.microsoft.com/en-us/library/system.serviceprocess.servicestartmode.aspx">ServiceStartMode</a></td>
-				<td>The startup type: automatic, manual, or disabled.  Default is automatic.
-</td>
-				<td>false</td>
-				<td>false</td>
-                <td>Automatic</td>
-			</tr>
-			<tr valign='top'>
-				<td>OnFirstFailure</td>
-				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
-				<td>What to do on the service's first failure.  Default is to take no action.
-</td>
-				<td>false</td>
-				<td>false</td>
-                <td>TakeNoAction</td>
-			</tr>
-			<tr valign='top'>
-				<td>OnSecondFailure</td>
-				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
-				<td>What to do on the service's second failure. Default is to take no action.
-</td>
-				<td>false</td>
-				<td>false</td>
-                <td>TakeNoAction</td>
-			</tr>
-			<tr valign='top'>
-				<td>OnThirdFailure</td>
-				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
-				<td>What to do on the service' third failure.  Default is to take no action.
-</td>
-				<td>false</td>
-				<td>false</td>
-                <td>TakeNoAction</td>
-			</tr>
-			<tr valign='top'>
-				<td>ResetFailureCount</td>
-				<td><a href="http://msdn.microsoft.com/en-us/library/system.int32.aspx">Int32</a></td>
-				<td>How many seconds after which the failure count is reset to 0.
-</td>
-				<td>false</td>
-				<td>false</td>
-                <td>0</td>
-			</tr>
-			<tr valign='top'>
-				<td>RestartDelay</td>
-				<td><a href="http://msdn.microsoft.com/en-us/library/system.int32.aspx">Int32</a></td>
-				<td>How many milliseconds to wait before restarting the service.  Default is 60,0000, or 1 minute.
-</td>
-				<td>false</td>
-				<td>false</td>
-                <td>60000</td>
-			</tr>
-			<tr valign='top'>
-				<td>RebootDelay</td>
-				<td><a href="http://msdn.microsoft.com/en-us/library/system.int32.aspx">Int32</a></td>
-				<td>How many milliseconds to wait before handling the second failure.  Default is 60,000 or 1 minute.
-</td>
-				<td>false</td>
-				<td>false</td>
-                <td>60000</td>
-			</tr>
-			<tr valign='top'>
-				<td>Dependency</td>
-				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String[]</a></td>
-				<td>What other services does this service depend on?
-</td>
-				<td>false</td>
-				<td>false</td>
-                <td></td>
-			</tr>
-			<tr valign='top'>
-				<td>Username</td>
-				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
-				<td>The user the service should run as.
-</td>
-				<td>true</td>
-				<td>false</td>
-                <td></td>
-			</tr>
-			<tr valign='top'>
-				<td>Password</td>
-				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
-				<td>The user's password.
-</td>
-				<td>false</td>
-				<td>false</td>
-                <td></td>
-			</tr>
-			<tr valign='top'>
-				<td>WhatIf</td>
-				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
-				<td></td>
-				<td>false</td>
-				<td>false</td>
-                <td></td>
-			</tr>
-			<tr valign='top'>
-				<td>Confirm</td>
-				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
-				<td></td>
-				<td>false</td>
-				<td>false</td>
-                <td></td>
-			</tr>
-                            <tr valign="top">
-                <td><a href="http://technet.microsoft.com/en-us/library/dd315352.aspx">CommonParameters</a></td>
-                <td></td>
-                <td>This cmdlet supports common parameters.  For more information type <br> <code>Get-Help about_CommonParameters</code>.</td>
-                <td></td>
-                <td></td>
-                <td></td>
-                </tr>
-        </table>
         
-    
+
         
-    
+
         
-    
-        
-                <h2>EXAMPLE 1</h2>
-            <pre><code>Install-Service -Name DeathStar -Path C:\ALongTimeAgo\InAGalaxyFarFarAway\DeathStar.exe</code></pre>
-            <p><p>Installs the Death Star service, which runs the service executable at <code>C:\ALongTimeAgo\InAGalaxyFarFarAway\DeathStar.exe</code>.  The service runs as <code>NetworkService</code> and will start automatically.</p>
-</p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 2</h2>
-            <pre><code>Install-Service -Name DetahStart -Path C:\ALongTimeAgo\InAGalaxyFarFarAway\DeathStar.exe -StartupType Manual</code></pre>
-            <p><p>Install the Death Star service to startup manually.  You certainly don't want the thing roaming the galaxy, destroying thing willy-nilly, do you?</p>
-</p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 3</h2>
-            <pre><code>Install-Service -Name DetahStart -Path C:\ALongTimeAgo\InAGalaxyFarFarAway\DeathStar.exe -Username EMPIRE\wtarkin -Password 5irewh3nready</code></pre>
-            <p><p>Installs the Death Star service to run as Grand Moff Tarkin, who is given the log on as a service right.</p>
-</p><p></p><p></p><p></p><p></p>
+<h2>EXAMPLE 1</h2>
+<pre><code>Install-Service -Name DeathStar -Path C:\ALongTimeAgo\InAGalaxyFarFarAway\DeathStar.exe</code></pre>
+<p>Installs the Death Star service, which runs the service executable at <code>C:\ALongTimeAgo\InAGalaxyFarFarAway\DeathStar.exe</code>.  The service runs as <code>NetworkService</code> and will start automatically.</p>
+
+<h2>EXAMPLE 2</h2>
+<pre><code>Install-Service -Name DetahStart -Path C:\ALongTimeAgo\InAGalaxyFarFarAway\DeathStar.exe -StartupType Manual</code></pre>
+<p>Install the Death Star service to startup manually.  You certainly don't want the thing roaming the galaxy, destroying thing willy-nilly, do you?</p>
+
+<h2>EXAMPLE 3</h2>
+<pre><code>Install-Service -Name DetahStart -Path C:\ALongTimeAgo\InAGalaxyFarFarAway\DeathStar.exe -Username EMPIRE\wtarkin -Password 5irewh3nready</code></pre>
+<p>Installs the Death Star service to run as Grand Moff Tarkin, who is given the log on as a service right.</p>
 </body>
-</html>   
+</html>

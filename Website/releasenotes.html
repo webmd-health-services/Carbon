@@ -12,7 +12,216 @@
 		<li><a href="http://pshdo.com">-Blog</a></li>
 	</ul>
     
-    <h1>1.7.0 (30 April 2014)</h1>
+    <h1>1.8.0</h1>
+
+<h2>Enhancements</h2>
+
+<h3>General</h3>
+
+<ul>
+<li>The following functions now write messages with <code>Write-Verbose</code> instead of <code>Write-Host</code>. See <a href="http://www.jsnover.com/blog/2013/12/07/write-host-considered-harmful/">Write-Host Considered Harmful</a>.
+<ul>
+<li><a href="http://get-carbon.org/help/Add-GroupMember.html">Add-GroupMember</a></li>
+<li><a href="http://get-carbon.org/help/Clear-TrustedHost.html">Clear-TrustedHost</a></li>
+<li><a href="http://get-carbon.org/help/Convert-XmlFile.html">Convert-XmlFile</a></li>
+<li><a href="http://get-carbon.org/help/Disable-FirewallStatefulFtp.html">Disable-FirewallStatefulFtp</a></li>
+<li><a href="http://get-carbon.org/help/Disable-IEEnhancedSecurityConfiguration.html">Disable-IEEnhancedSecurityConfiguration</a></li>
+<li><a href="http://get-carbon.org/help/Disable-IisSecurityAuthentication.html">Disable-IisSecurityAuthentication</a></li>
+<li><a href="http://get-carbon.org/help/Disable-NtfsCompression.html">Disable-NtfsCompression</a></li>
+<li><a href="http://get-carbon.org/help/Enable-FirewallStatefulFtp.html">Enable-FirewallStatefulFtp</a></li>
+<li><a href="http://get-carbon.org/help/Enable-IEActivationPermission.html">Enable-IEActivationPermission</a></li>
+<li><a href="http://get-carbon.org/help/Enable-IisSecurityAuthentication.html">Enable-IisSecurityAuthentication</a></li>
+<li><a href="http://get-carbon.org/help/Enable-NtfsCompression.html">Enable-NtfsCompression</a></li>
+<li><a href="http://get-carbon.org/help/Grant-ComPermission.html">Grant-ComPermission</a></li>
+<li><a href="http://get-carbon.org/help/Grant-MsmqMessageQueuePermission.html">Grant-MsmqMessageQueuePermission</a></li>
+<li><a href="http://get-carbon.org/help/Grant-Permission.html">Grant-Permission</a></li>
+<li><a href="http://get-carbon.org/help/Grant-ServiceControlPermission.html">Grant-ServiceControlPermission</a></li>
+<li><a href="http://get-carbon.org/help/Install-Group.html">Install-Group</a></li>
+<li><a href="http://get-carbon.org/help/Install-IisApplication.html">Install-IisApplication</a></li>
+<li><a href="http://get-carbon.org/help/Install-MsmqMessageQueue.html">Install-MsmqMessageQueue</a></li>
+<li><a href="http://get-carbon.org/help/Install-PerformanceCounter.html">Install-PerformanceCounter</a></li>
+<li><a href="http://get-carbon.org/help/Install-RegistryKey.html">Install-RegistryKey</a></li>
+<li><a href="http://get-carbon.org/help/Install-Service.html">Install-Service</a></li>
+<li><a href="http://get-carbon.org/help/Install-User.html">Install-User</a></li>
+<li><a href="http://get-carbon.org/help/Install-WindowsFeature.html">Install-WindowsFeature</a></li>
+<li><a href="http://get-carbon.org/help/Invoke-WindowsInstaller.html">Invoke-WindowsInstaller</a></li>
+<li><a href="http://get-carbon.org/help/Lock-IisConfigurationSection.html">Lock-IisConfigurationSection</a></li>
+<li><a href="http://get-carbon.org/help/New-Junction.html">New-Junction</a></li>
+<li><a href="http://get-carbon.org/help/Protect-Acl.html">Protect-Acl</a></li>
+<li><a href="http://get-carbon.org/help/Remove-IniEntry.html">Remove-IniEntry</a> </li>
+<li><a href="http://get-carbon.org/help/Remove-Junction.html">Remove-Junction</a></li>
+<li><a href="http://get-carbon.org/help/Remove-SslCertificateBinding.html">Remove-SslCertificateBinding</a></li>
+<li><a href="http://get-carbon.org/help/Reset-HostsFile.html">Reset-HostsFile</a></li>
+<li><a href="http://get-carbon.org/help/Reset-MsmqQueueManagerID.html">Reset-MsmqQueueManagerID</a></li>
+<li><a href="http://get-carbon.org/help/Revoke-ComPermission.html">Revoke-ComPermission</a></li>
+<li><a href="http://get-carbon.org/help/Revoke-ServicePermission.html">Revoke-ServicePermission</a></li>
+<li><a href="http://get-carbon.org/help/Set-IisHttpHeader.html">Set-IisHttpHeader</a></li>
+<li><a href="http://get-carbon.org/help/Set-IisMimeMap.html">Set-IisMimeMap</a></li>
+<li><a href="http://get-carbon.org/help/Set-IisWebsiteID.html">Set-IisWebsiteID</a></li>
+<li><a href="http://get-carbon.org/help/Set-IisWindowsAuthentication.html">Set-IisWindowsAuthentication</a></li>
+<li><a href="http://get-carbon.org/help/Set-IniEntry.html">Set-IniEntry</a></li>
+<li><a href="http://get-carbon.org/help/Set-RegistryKeyValue.html">Set-RegistryKeyValue</a></li>
+<li><a href="http://get-carbon.org/help/Set-SslCertificateBinding.html">Set-SslCertificateBinding</a></li>
+<li><a href="http://get-carbon.org/help/Test-GrantPermission.html">Test-GrantPermission</a></li>
+<li><a href="http://get-carbon.org/help/Uninstall-IisAppPool.html">Uninstall-IisAppPool</a></li>
+<li><a href="http://get-carbon.org/help/Uninstall-WindowsFeature.html">Uninstall-WindowsFeature</a></li>
+<li><a href="http://get-carbon.org/help/Unlock-IisConfigurationSection.html">Unlock-IisConfigurationSection</a></li>
+</ul></li>
+<li>The following internal functions (which we warned you not to use!) are no longer exported:
+<ul>
+<li>Add-IisServerManagerMember</li>
+<li>Get-IdentityPrincipalContext</li>
+<li>Invoke-ConsoleCommand</li>
+<li>ConvertTo-ProviderAccessControlRights</li>
+<li>Assert-WindowsFeatureFunctionsSupported</li>
+<li>Resolve-WindowsFeatureName</li>
+</ul></li>
+</ul>
+
+<h3>Certificates</h3>
+
+<ul>
+<li>Improving error handling when <a href="http://get-carbon.org/help/Get-Certificate.html">Get-Certificate</a> fails to load a certificate from a file. Original exception now part of error record.</li>
+<li><a href="http://get-carbon.org/help/Install-Certificate.html">Install-Certificate</a> now supports installing with an <code>X509Certificate2</code> object instead of just a path to a certificate.</li>
+<li><a href="http://get-carbon.org/help/Remove-SslCertificateBinding.html">Remove-SslCertificateBinding</a>: improved error handling.</li>
+<li><a href="http://get-carbon.org/help/Set-SslCertificateBinding.html">Set-SslCertificateBinding</a>: improved error handling.</li>
+<li>Improved documentation for <a href="http://get-carbon.org/help/Get-Certificate.html">Get-Certificate</a>.</li>
+<li>Added extended script property <code>StoreName</code> to <code>X509Store</code> objects to return the store's <code>System.Security.Cryptography.X509Certificates.StoreName</code> value.</li>
+<li>Added a table view/format for <code>X509Store</code> objects. PowerShell's default view is a list, so you'll have to explicitly format the objects as a table, e.g. <code>dir cert:\LocalMachine | Format-Table</code>.</li>
+<li><a href="http://get-carbon.org/help/Get-Certificate.html">Get-Certificate</a>'s <code>Path</code> parameter now supports wildcards and certificate provider paths, e.g. <code>cert:\</code>.</li>
+<li><a href="http://get-carbon.org/help/Get-Certificate.html">Get-Certificate</a> now writes an error if a certificate isn't found when getting a certificate by its path.</li>
+</ul>
+
+<h3>Computer</h3>
+
+<ul>
+<li>Created <a href="http://get-carbon.org/help/Get-ProgramInstallInfo.html">Get-ProgramInstallInfo</a> function to get the information displayed by the <code>Programs and Features</code> UI.</li>
+</ul>
+
+<h3>Cryptography</h3>
+
+<ul>
+<li><a href="http://get-carbon.org/help/Protect-String.html">Protect-String</a> can now encrypt strings as a specific user. Use the <code>Credential</code> parameter.</li>
+<li>Created <a href="http://get-carbon.org/help/New-RsaKeyPair.html">New-RsaKeyPair</a> for creating public/private RSA key pair using <code>makecert.exe</code> and <code>pkv2pfx.exe</code>. Requires that you've installed a Windows SDK.</li>
+<li><a href="http://get-carbon.org/help/Protect-String.html">Protect-String</a> can now encrypt strings using an RSA public key.</li>
+<li><a href="http://get-carbon.org/help/Unprotect-String.html">Unprotect-String</a> can now decrypt strings using an RSA private key.</li>
+</ul>
+
+<h3>File System</h3>
+
+<ul>
+<li><a href="http://get-carbon.org/help/Disable-NtfsCompression.html">Disable-NtfsCompression</a>: improved error handling.</li>
+<li><a href="http://get-carbon.org/help/Enable-NtfsCompression.html">Enable-NtfsCompression</a>: improved error handling.</li>
+<li>Created <a href="http://get-carbon.org/help/Compress-Item.html">Compress-Item</a> function for compressing files/directories into a ZIP file.</li>
+<li>Created <a href="http://get-carbon.org/help/Test-ZipFile.html">Test-ZipFile</a> function for testing if a file is a ZIP file.</li>
+<li>Created <a href="http://get-carbon.org/help/Expand-Item.html">Expand-Item</a> function for decompressing a ZIP file.</li>
+<li><a href="http://get-carbon.org/help/New-TempDirectory.html">New-TempDirectory</a> now supports adding a prefix to the temporary directory's name, so you can more easily track down those scripts/processes that don't clean up after themselves.</li>
+</ul>
+
+<h3>Firewall</h3>
+
+<ul>
+<li><a href="http://get-carbon.org/help/Disable-FirewallStatefulFtp.html">Disable-FirewallStatefulFtp</a>: improved error handling.</li>
+<li>Added <code>Name</code> and <code>LiteralName</code> parameters to <a href="http://get-carbon.org/help/Get-FirewallRule.html">Get-FirewallRule</a> to return specific rules instead of all of them.</li>
+<li><a href="http://get-carbon.org/help/Get-FirewallRule.html">Get-FirewallRule</a>, now returns <code>Carbon.Firewall.Rule</code> objects, instead of anonymous hashes.</li>
+<li>Added default table format for <a href="http://get-carbon.org/help/Get-FirewallRule.html">Get-FirewallRule</a> output.</li>
+<li><a href="http://get-carbon.org/help/Get-FirewallRule.html">Get-FirewallRule</a>, now returns additional rule information: interface type, security, source, description, program, and service. Who knew <code>netsh advfirewall firewall rule show</code> had a <code>verbose</code> switch? RTFM.</li>
+</ul>
+
+<h3>INI</h3>
+
+<ul>
+<li><a href="http://get-carbon.org/help/Remove-IniEntry.html">Remove-IniEntry</a> now handles case-sensitive INI files.</li>
+<li><a href="http://get-carbon.org/help/Set-IniEntry.html">Set-IniEntry</a> now handles case-sensitive INI files.</li>
+<li><a href="http://get-carbon.org/help/Split-IniEntry.html">Split-IniEntry</a> now handles case-sensitive INI files.</li>
+</ul>
+
+<h3>MSI</h3>
+
+<ul>
+<li><a href="http://get-carbon.org/help/Invoke-WindowsInstaller.html">Invoke-WindowsInstaller</a>: improved error message if installation fails.</li>
+</ul>
+
+<h3>Security</h3>
+
+<ul>
+<li>Creating <a href="http://get-carbon.org/help/Revoke-Permission.html">Revoke-Permission</a> function for revoking a user's permission to a file, directory, registry key, or certificate's private key.</li>
+<li>Creating <a href="http://get-carbon.org/help/ConvertTo-ContainerInheritanceFlags.html">ConvertTo-ContainerInheritanceFlags</a> function for converting  <code>System.Security.AccessControl.InheritanceFlags</code> and <code>System.Security.AccessControl.PropagationFlag</code> values into a <code>Carbon.Security.ContainerInheritanceFlags</code> value.</li>
+<li><a href="http://get-carbon.org/help/Get-Permission.html">Get-Permission</a> now supports returning the permissions on private keys.</li>
+<li><a href="http://get-carbon.org/help/Grant-Permission.html">Grant-Permission</a> now supports granting permissions on private keys.</li>
+<li><a href="http://get-carbon.org/help/Test-Permission.html">Test-Permission</a> now supports testing permissions on certificate private keys.</li>
+</ul>
+
+<h3>Services</h3>
+
+<ul>
+<li>Created <a href="http://get-carbon.org/help/Get-ServiceConfiguration.html">Get-ServiceConfiguration</a> function for loading a service's configuration: description, account name/username, failure actions, etc.</li>
+<li>Added the following extended type data to <code>System.ServiceController.Service</code>:
+<ul>
+<li>Description</li>
+<li>ErrorControl</li>
+<li>FailureProgram</li>
+<li>FirstFailure</li>
+<li>LoadOrderGroup</li>
+<li>Path</li>
+<li>RebootDelay</li>
+<li>RebootDelayMinutes</li>
+<li>RebootMessage</li>
+<li>ResetPeriod</li>
+<li>ResetPeriodDays</li>
+<li>RestartDelay</li>
+<li>RestartDelayMinutes</li>
+<li>SecondFailure</li>
+<li>StartMode</li>
+<li>StartType</li>
+<li>TagID</li>
+<li>ThirdFailure</li>
+<li>UserName</li>
+</ul></li>
+</ul>
+
+<h2>Bug Fixes</h2>
+
+<h3>General</h3>
+
+<ul>
+<li>Importing Carbon gives an error if <code>PATH</code> environment variable contains an empty path.</li>
+<li>Improved the error handling in the following functions so they properly catch exceptions and write friendlier errors:
+<ul>
+<li><a href="http://get-carbon.org/help/Get-Certificate.html">Get-Certificate</a></li>
+<li><a href="http://get-carbon.org/help/Grant-Privilege.html">Grant-Privilege</a></li>
+<li><a href="http://get-carbon.org/help/Revoke-Privilege.html">Revoke-Privilege</a></li>
+</ul></li>
+</ul>
+
+<h3>Certificates</h3>
+
+<ul>
+<li><a href="http://get-carbon.org/help/Get-Certificate.html">Get-Certificate</a> couldn't open CA/CertificateAuthority store (fixes issue <a href="https://bitbucket.org/splatteredbits/carbon/issue/130/get-certificate-doesnt-find-any">#130</a>)</li>
+<li><p>Extended script property <code>DisplayName</code> on <code>X509Store</code> objects returning wrong store name for custom stores, now returns an empty string.</p>
+
+<h3>Path</h3></li>
+<li><p><a href="http://get-carbon.org/help/Resolve-PathCase.html">Resolve-PathCase</a> didn't work under Windows 2012 R2.</p></li>
+</ul>
+
+<h3>Users and Groups</h3>
+
+<ul>
+<li>The <code>Carbon.Identity.FindByName</code> method and <a href="http://get-carbon.org/help/Resolve-IdentityName.html">Resolve-IdentityName</a> and <a href="http://get-carbon.org/help/Test-Identity.html">Test-Identity</a>) functions now handle identity names with <code>.</code> for the domain/machine name, e.g. <code>.\Administrator</code>.</li>
+<li>The <code>Carbon.Identity.FullName</code> property returns the wrong value when domain is empty/null, e.g. <code>Resolve-IdentityName -Name 'Everyone'</code> returns <code>\Everyone</code>, when it should return <code>Everyone</code>.</li>
+<li>The <code>Carbon.Identity.FindByName</code> method and <a href="http://get-carbon.org/help/Resolve-IdentityName.html">Resolve-IdentityName</a> and <a href="http://get-carbon.org/help/Test-Identity.html">Test-Identity</a>) functions unable to resolve <code>LocalSystem</code> account (which is actually <code>NT AUTHORITY\SYSTEM</code>).</li>
+</ul>
+
+<h1>1.7.0 (30 April 2014)</h1>
+
+<h2>Bug Fixes</h2>
+
+<h3>File System</h3>
+
+<ul>
+<li><a href="http://get-carbon.org/help/Disable-NtfsCompression.html">Disable-NtfsCompression</a> now <em>really</em> supports multiple paths.</li>
+<li><a href="http://get-carbon.org/help/Enable-NtfsCompression.html">Enable-NtfsCompression</a> now <em>really</em> supports multiple paths.</li>
+</ul>
 
 <p>There is now <a href="http://www.freelists.org/list/carbon">a Carbon support mailing list</a>.</p>
 
@@ -134,7 +343,7 @@
 <ul>
 <li><a href="http://get-carbon.org/help/Install-IisApplication.html">Install-IisApplication</a></li>
 <li><a href="http://get-carbon.org/help/Install-IisVirtualDirectory.html">Install-IisVirtualDirectory</a></li>
-<li><a href="http://get-carbon.org/help/Install-IisWebsite.html">Install-IisWebsite</a>    </li>
+<li><a href="http://get-carbon.org/help/Install-IisWebsite.html">Install-IisWebsite</a></li>
 </ul></li>
 </ul>
 
@@ -173,7 +382,6 @@
 
 <ul>
 <li>Updated <a href="http://get-carbon.org/help/Install-User.html">Install-User</a> to support passwords longer than 14 characters.  Thanks to <a href="http://www.jamescrowley.co.uk/">James Crowley</a> for the fix.</li>
- * 
 </ul>
 
 <h3>Windows Features</h3>
@@ -181,7 +389,7 @@
 <ul>
 <li>Marked Assert-WindowsFeatureFunctionsSupported as an internal function.  Please don't use.  It will be removed from future versions of PowerShell.</li>
 <li>Updated <a href="http://get-carbon.org/help/Invoke-PowerShell.html">Test-WindowsFeature</a> to work on Windows 8/2012.</li>
-<li>Created new <code>Carbon.Identity</code> class for representing identities.  It also contains a static <code>FindByName</code> method which uses The Windows <code>LookupAccountName</code> function to find full account names, domains, and sids.  </li>
+<li>Created new <code>Carbon.Identity</code> class for representing identities.  It also contains a static <code>FindByName</code> method which uses The Windows <code>LookupAccountName</code> function to find full account names, domains, and sids.</li>
 <li>Updated <a href="http://get-carbon.org/help/Test-Identity.html">Test-Identity</a> to use <code>[Carbon.Identity]::FindByName</code> to find identities so it no longer throws exceptions when an identity can't be found.</li>
 <li><p>Updated <a href="http://get-carbon.org/help/Resolve-IdentityName.html">Resolve-IdentityName</a> to use <code>[Carbon.Identity]::FindByName</code> to find identities so it no longer throws exceptions when an identity can't be found.</p>
 
@@ -490,7 +698,7 @@
 
 <ul>
 <li>The <code>Import-Carbon.ps1</code> script no longer checks if Carbon is a sub-module of another module, so the <code>Quiet</code> parameter was removed.  <strong><em>Please don't nest Carbon in your modules!</em></strong>  It will cause havoc.</li>
-<li><code>Import-Carbon.ps1</code> will no longer stop execution if an error occurs during an import (i.e. the <code>$ErrorActionPreference = 'Stop'</code> line was removed).  </li>
+<li><code>Import-Carbon.ps1</code> will no longer stop execution if an error occurs during an import (i.e. the <code>$ErrorActionPreference = 'Stop'</code> line was removed).</li>
 </ul>
 
 <h3>IIS</h3>
@@ -615,7 +823,7 @@
 <ul>
 <li>Renamed <code>Add-TrustedHosts</code> to <a href="http://get-carbon.org/help/Add-TrustedHost.html">Add-TrustedHost</a>, with backwards-compatible alias.</li>
 <li>Renamed <code>Add-TrustedHost</code>'s <code>Entries</code> parameter to <code>Entry</code>, with backwards-compatible alias.</li>
-<li>Renamed <code>Clear-TrustedHosts</code> to <a href="http://get-carbon.org/help/Clear-TrustedHost.html">Clear-TrustedHost</a>, with backwards-compatible alias. </li>
+<li>Renamed <code>Clear-TrustedHosts</code> to <a href="http://get-carbon.org/help/Clear-TrustedHost.html">Clear-TrustedHost</a>, with backwards-compatible alias.</li>
 <li>Renamed <code>Complete-Jobs</code> to <a href="http://get-carbon.org/help/Complete-Job.html">Complete-Job</a>, with backwards-compatible alias.</li>
 <li>Renamed <code>Complete-Job</code>'s <code>Jobs</code> parameter to <code>Job</code>, with backwards-compatible alias.</li>
 <li>Renamed <code>Get-TrustedHosts</code> to <a href="http://get-carbon.org/help/Get-TrustedHost.html">Get-TrustedHost</a>, with backwards-compatible alias.</li>
@@ -715,13 +923,13 @@
 <p>Replace usages of:</p>
 
 <ul>
-<li><code>Set-IisAnonymousAuthentication</code> with <code>Enable-IisSecurityAuthentication -Anonymous</code> </li>
+<li><code>Set-IisAnonymousAuthentication</code> with <code>Enable-IisSecurityAuthentication -Anonymous</code></li>
 <li><code>Set-IisAnonymousAuthentication -Disabled</code> with <code>Disable-IisSecurityAuthentication -Anonymous</code></li>
 <li><code>Set-IisBasicAuthentication</code> with <code>Enable-IisSecurityAuthentication -Basic</code></li>
 <li><code>Set-IisBasicAuthentication -Disabled</code> with <code>Disable-IisSecurityAuthentication -Basic</code></li>
 <li><code>Set-IisWindowsAuthentication</code> with <code>Enable-IisSecurityAuthentication -Windows</code> and <code>Set-IisWindowsAuthentication -DisableKernelMode</code></li>
 <li><code>Set-IisWindowsAuthentication -UseKernelMode</code> with <code>Set-IisWindowsAuthentication</code></li>
-<li><code>Set-IisWindowsAuthentication -Disabled</code> with <code>Disable-IisSecurityAuthentication -Windows</code>  </li>
+<li><code>Set-IisWindowsAuthentication -Disabled</code> with <code>Disable-IisSecurityAuthentication -Windows</code></li>
 <li><code>Unlock-IisConfigSection -Name &lt;string&gt;</code> with <code>Unlock-IisConfigurationSection -SectionPath &lt;string&gt;</code> (run <code>appcmd.exe lock config -section:?</code> for values to the new <code>SectionPath</code> parameter)</li>
 <li><code>Unlock-IisBasicAuthentication</code> with <code>Unlock-IisConfigurationSection -SectionPath 'system.webServer/security/authentication/basicAuthentication'</code></li>
 <li><code>Unlock-IisCgi</code> with <code>Unlock-IisConfigurationSection -SectionPath 'system.webServer/cgi'</code></li>
@@ -766,7 +974,7 @@
 
 <h3>Shares</h3>
 
-<p>Replace usages of: </p>
+<p>Replace usages of:</p>
 
 <ul>
 <li><code>Install-Share -Permissions '"ShareAdmins,FULL"','"ShareWriters,CHANGE"','"ShareReaders,READ"'</code> with <code>Install-SmbShare -FullAccess ShareAdmins -ChangeAccess ShareWriters -ReadAccess ShareReaders</code>.</li>
@@ -774,7 +982,7 @@
 
 <h3>Windows Features</h3>
 
-<p>Replace usages of: </p>
+<p>Replace usages of:</p>
 
 <ul>
 <li><code>Test-WindowsFeature</code> with <code>Test-WindowsFeature -Installed</code></li>
@@ -823,7 +1031,7 @@
 <li>Moved functionality of <code>Get-SslCertificateBinding</code> into <a href="http://get-carbon.org/help/Get-SslCertificateBindings.html">Get-SslCertificateBindings</a>.  Can now filter by <code>IPAddress</code> and/or <code>Port</code>.</li>
 <li><a href="http://get-carbon.org/help/Get-SslCertificateBindings.html">Get-SslCertificateBindings</a> now returns <code>Carbon.Certificates.SslCertificateBinding</code> objects.  All information displayed by the <code>netsh http show sslcert</code> command is returned as part of those objects.</li>
 <li><a href="http://get-carbon.org/help/Get-SslCertificateBindings.html">Get-SslCertificateBindings</a> now supports filtering by <code>IPAddress</code> and <code>Port</code> separately, instead of requiring both.  The old <code>IPPort</code> parameter is replaced with <code>IPAddress</code> and <code>Port</code> parameters.</li>
-<li><a href="http://get-carbon.org/help/Test-SslCertificateBinding.html">Test-SslCertificateBinding</a> now supports testig by <code>IPAddress</code> and <code>Port</code> separately, instead of requiring both.  The old <code>IPPort</code> parameter is replaced with <code>IPAddress</code> and <code>Port</code> parameters. </li>
+<li><a href="http://get-carbon.org/help/Test-SslCertificateBinding.html">Test-SslCertificateBinding</a> now supports testig by <code>IPAddress</code> and <code>Port</code> separately, instead of requiring both.  The old <code>IPPort</code> parameter is replaced with <code>IPAddress</code> and <code>Port</code> parameters.</li>
 <li>Replaced <code>IPPort</code> parameter on <code>Get-SslCertificateBinding</code> with separate <code>IPAddress</code> and <code>Port</code> parameters on  <a href="http://get-carbon.org/help/Get-SslCertificateBindings.html">Get-SslCertificateBindings</a>.  Set <code>IPAddress</code> only if you want to bind to a specific IP address (i.e. <em>not</em> 0.0.0.0).  Set <code>Port</code> if <em>not</em> binding to port 443.</li>
 <li>Replaced <code>IPPort</code> parameter on <a href="http://get-carbon.org/help/Remove-SslCertificateBinding.html">Remove-SslCertificateBinding</a> with separate <code>IPAddress</code> and <code>Port</code> parameters.  Set <code>IPAddress</code> only if you want to remove a binding for a specific IP address (i.e. <em>not</em> 0.0.0.0).  Set <code>Port</code> if the binding is <em>not</em> on port 443.</li>
 <li>Renamed <code>Remove-Certificate</code> to <a href="http://get-carbon.org/help/Uninstall-Certificate.html">Uninstall-Certificate</a> (added backwards-compatible alias in v0.5.0.1).</li>
@@ -897,14 +1105,14 @@
 <h3>Performance Counters</h3>
 
 <ul>
-<li><a href="http://get-carbon.org/help/Get-PerformanceCounters.html">Get-PerformanceCounters</a> now returns nothing/<code>null</code> or a single object instead of an empty/single element array when there are no or one performance counters. </li>
+<li><a href="http://get-carbon.org/help/Get-PerformanceCounters.html">Get-PerformanceCounters</a> now returns nothing/<code>null</code> or a single object instead of an empty/single element array when there are no or one performance counters.</li>
 <li><a href="http://get-carbon.org/help/Install-PerformanceCounter.html">Install-PerformanceCounter</a> no longer re-installs a counter if a counter with its name, description, and type already exist.</li>
 </ul>
 
 <h3>PowerShell</h3>
 
 <ul>
-<li><a href="http://get-carbon.org/help/Get-TrustedHosts.html">Get-TrustedHosts</a> now returns nothing/<code>null</code> if there are no trusted hosts.  (It used to return an empty array.) </li>
+<li><a href="http://get-carbon.org/help/Get-TrustedHosts.html">Get-TrustedHosts</a> now returns nothing/<code>null</code> if there are no trusted hosts.  (It used to return an empty array.)</li>
 </ul>
 
 <h3>Security</h3>
@@ -982,7 +1190,7 @@
 <li>Created <a href="http://get-carbon.org/help/Revoke-ServicePermission.html">Revoke-ServicePermission</a> function to revoke all of an identity's permissioms to control a service.</li>
 <li>Created <a href="http://get-carbon.org/help/Set-ServiceAcl.html">Set-ServiceAcl</a> function to set a service's discretionary access control list (DACL).</li>
 <li>Created <a href="http://get-carbon.org/help/Test-Service.html">Test-Service</a> function to check if a service exists <em>without</em> writing an error.</li>
-<li>Removed <code>Invoke-SubInAcl</code> function and the <code>subinacl.exe</code> program.  Use the <a href="http://get-carbon.org/help/Grant-ServicePermission.html">Grant-ServicePermission</a> and <a href="http://get-carbon.org/help/Revoke-ServicePermission.html">Revoke-ServicePermission</a> functions instead.  If you still need <code>subinacl.exe</code>, please <a href="http://www.microsoft.com/en-us/download/details.aspx?id=23510">download it from Microsoft</a>.  </li>
+<li>Removed <code>Invoke-SubInAcl</code> function and the <code>subinacl.exe</code> program.  Use the <a href="http://get-carbon.org/help/Grant-ServicePermission.html">Grant-ServicePermission</a> and <a href="http://get-carbon.org/help/Revoke-ServicePermission.html">Revoke-ServicePermission</a> functions instead.  If you still need <code>subinacl.exe</code>, please <a href="http://www.microsoft.com/en-us/download/details.aspx?id=23510">download it from Microsoft</a>.</li>
 <li><a href="http://get-carbon.org/help/Grant-Permissions.html">Grant-Permissions</a> now supports controlling inheritance and propagation flags via the <code>ApplyTo</code> parameter, which should be a value of the new <code>Carbon.Security.ContainerInheritanceFlags</code> enumeration, which encapsualtes all the valid combinations of inheritance/propagation flags.  See the help for <code>Grant-Permissions</code> for more information.  Thanks to Jonathan Valdez for the feature request and initial code.</li>
 <li>Created <a href="http://get-carbon.org/help/ConvertTo-InheritanceFlags.html">ConvertTo-InheritanceFlags</a> function for converting a <code>Carbon.Security.ContainerInheritanceFlags</code> to the necessary/applicable <code>System.Security.AccessControl.InheritanceFlags</code>.</li>
 <li>Created <a href="http://get-carbon.org/help/ConvertTo-PropagationFlags.html">ConvertTo-PropagationFlags</a> function for converting a <code>Carbon.Security.ContainerInheritanceFlags</code> to the necessary/applicable <code>System.Security.AccessControl.PropagationFlags</code>.</li>
@@ -1034,7 +1242,7 @@
 
 <h3>Set-IisSslFlags</h3>
 
-<p>This function was renamed to <code>Enable-IisSsl</code>.  Its <code>Enable128BitSsl</code> parameter was renamed to <code>Require128BitSsl</code>.  </p>
+<p>This function was renamed to <code>Enable-IisSsl</code>.  Its <code>Enable128BitSsl</code> parameter was renamed to <code>Require128BitSsl</code>.</p>
 
 <p>Configuring client certificates is now a little stricter/clearer.  You can no longer specify both <code>AcceptClientCertificates</code> and <code>RequireClientCertificates</code>.  Also, if you specify <code>RequireClientCertificates</code>, you must now also supply the <code>RequireSsl</code> switch (before, setting the <code>RequireClientCertificates</code> switch implicitly set the <code>RequireSsl</code> switch).</p>
 
@@ -1059,7 +1267,7 @@
 <ul>
 <li>Rename <a href="http://get-carbon.org/help/Set-IisSslFlags.html">Enable-IisSsl/Set-IisSslFlags's</a> <code>Enable128BitSsl</code> parameter to <code>Require128BitSsl</code>] (<a href="https://bitbucket.org/splatteredbits/carbon/issue/24/set-iissslflags-rename-the-enable128bitssl">Fix #24 Set-IisSslFlags: Rename the Enable128BitSsl parameter to Require128BitSsl</a>).</li>
 <li><a href="https://bitbucket.org/splatteredbits/carbon/issue/19/install-iisapppool-doesnt-change-an">Fix issue #19</a>: <a href="http://get-carbon.org/help/Install-IisAppPool.html">Install-IisAppPool</a> doesn't change an existing 32-bit app pool to be a 64-bit app pool.</li>
-<li><a href="https://bitbucket.org/splatteredbits/carbon/issue/33/install-msmqmessagequeue-can-wait-forever">Fix issue #33</a>: <a href="http://get-carbon.org/help/Install-MsmqMessageQueue.html">Install-MsmqMessageQueue</a>: Can wait forever for a queue to get created.  It now waits 10 seconds.  </li>
+<li><a href="https://bitbucket.org/splatteredbits/carbon/issue/33/install-msmqmessagequeue-can-wait-forever">Fix issue #33</a>: <a href="http://get-carbon.org/help/Install-MsmqMessageQueue.html">Install-MsmqMessageQueue</a>: Can wait forever for a queue to get created.  It now waits 10 seconds.</li>
 <li><a href="https://bitbucket.org/splatteredbits/carbon/issue/36/get-powershellpath-returns-the-wrong-path">Fix issue #36</a>: <a href="http://get-carbon.org/help/Get-PowershellPath.html">Get-PowerShellPath</a> returns the wrong path when running x86 PowerShell on x64 computers.</li>
 <li><a href="https://bitbucket.org/splatteredbits/carbon/issue/37/invoke-powershell-should-write-an-error">Fix issue #37</a>: <a href="http://get-carbon.org/help/Invoke-PowerShell.html">Invoke-PowerShell</a> should write an error when running as x86 on Windows x64 without the x86 flag (i.e. 32-bit PowerShell can't launch a 64-bit PowerShell, so throw an error in that situation).</li>
 <li><a href="https://bitbucket.org/splatteredbits/carbon/issue/38/set-trustedhosts-passing-an-empty-value">Fix issue #38</a>: <a href="http://get-carbon.org/help/Set-TrustedHosts.html">Set-TrustedHosts</a>: passing an empty value for the Entries parameter clears the hosts list.  The <code>Entries</code> parameter is now required.  To clear the trusted hosts list, use <code>Clear-TrustedHosts</code>.</li>
@@ -1282,7 +1490,6 @@
 <ul>
 <li>First packaged release.</li>
 </ul>
-
     
     <div class="Footer">
 		Copyright &copy; 2012 <a href="http://splatteredbits.com">Aaron Jensen</a>.  All rights reserved.
