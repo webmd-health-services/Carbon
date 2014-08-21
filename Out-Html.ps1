@@ -119,9 +119,7 @@ $helpHtml
 "@ | Set-Content -Path (Join-Path -Path $OutputDir -ChildPath ('{0}.html' -f $command.Name))
 }
 
-$releaseNotesHtml = Get-Content (Join-Path $PSSCriptRoot 'RELEASE NOTES.txt')
-$releaseNotesHtml = $releaseNotesHtml -join "`n" |
-                        Convert-MarkdownToHtml
+$releaseNotesHtml = Get-Content -Raw (Join-Path $PSSCriptRoot 'RELEASE NOTES.txt') | Convert-MarkdownToHtml
 
 @"
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
