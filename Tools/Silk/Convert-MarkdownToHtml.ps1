@@ -1,5 +1,8 @@
 
 filter Convert-MarkdownToHtml
 {
-    $markdown.Transform( $_ )
+    if( $_ )
+    {
+        $markdown.Transform( $_ ).Trim()
+    }
 }

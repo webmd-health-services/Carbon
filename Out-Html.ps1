@@ -111,9 +111,9 @@ foreach( $command in $commands )
 	<link href="styles.css" type="text/css" rel="stylesheet" />
 </head>
 <body>
-    $menu
+$menu
 
-    $helpHtml
+$helpHtml
 </body>
 </html>
 "@ | Set-Content -Path (Join-Path -Path $OutputDir -ChildPath ('{0}.html' -f $command.Name))

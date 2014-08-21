@@ -294,7 +294,6 @@ There is now [a Carbon support mailing list](http://www.freelists.org/list/carbo
 ### Users and Groups
 
  * Updated [Install-User](http://get-carbon.org/help/Install-User.html) to support passwords longer than 14 characters.  Thanks to [James Crowley](http://www.jamescrowley.co.uk/) for the fix.
- *
 
 ### Windows Features
 
