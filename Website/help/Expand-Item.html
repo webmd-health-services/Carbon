@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-    <title>PowerShell - New-TempDir - Carbon</title>
+    <title>PowerShell - Expand-Item - Carbon</title>
 	<link href="styles.css" type="text/css" rel="stylesheet" />
 </head>
 <body>
@@ -39,6 +39,7 @@
 		</ul>
 		<li class="Category">Computer</li>
 		<ul class="CommandMenu">
+			<li><a href="Get-ProgramInstallInfo.html">Get-ProgramInstallInfo</a></li>
 			<li><a href="Remove-EnvironmentVariable.html">Remove-EnvironmentVariable</a></li>
 			<li><a href="Resolve-NetPath.html">Resolve-NetPath</a></li>
 			<li><a href="Set-EnvironmentVariable.html">Set-EnvironmentVariable</a></li>
@@ -47,6 +48,7 @@
 		</ul>
 		<li class="Category">Cryptography</li>
 		<ul class="CommandMenu">
+			<li><a href="New-RsaKeyPair.html">New-RsaKeyPair</a></li>
 			<li><a href="Protect-String.html">Protect-String</a></li>
 			<li><a href="Unprotect-String.html">Unprotect-String</a></li>
 		</ul>
@@ -58,19 +60,23 @@
 		</ul>
 		<li class="Category">FileSystem</li>
 		<ul class="CommandMenu">
+			<li><a href="Compress-Item.html">Compress-Item</a></li>
 			<li><a href="Disable-NtfsCompression.html">Disable-NtfsCompression</a></li>
 			<li><a href="Enable-NtfsCompression.html">Enable-NtfsCompression</a></li>
+			<li><a href="Expand-Item.html">Expand-Item</a></li>
 			<li><a href="Install-Junction.html">Install-Junction</a></li>
 			<li><a href="New-Junction.html">New-Junction</a></li>
-			<li><a href="New-TempDir.html">New-TempDir</a></li>
+			<li><a href="New-TempDirectory.html">New-TempDirectory</a></li>
 			<li><a href="Remove-Junction.html">Remove-Junction</a></li>
 			<li><a href="Test-NtfsCompression.html">Test-NtfsCompression</a></li>
 			<li><a href="Test-PathIsJunction.html">Test-PathIsJunction</a></li>
+			<li><a href="Test-ZipFile.html">Test-ZipFile</a></li>
 		</ul>
 		<li class="Category">Firewall</li>
 		<ul class="CommandMenu">
 			<li><a href="Assert-FirewallConfigurable.html">Assert-FirewallConfigurable</a></li>
 			<li><a href="Disable-FirewallStatefulFtp.html">Disable-FirewallStatefulFtp</a></li>
+			<li><a href="Enable-FirewallRule.html">Enable-FirewallRule</a></li>
 			<li><a href="Enable-FirewallStatefulFtp.html">Enable-FirewallStatefulFtp</a></li>
 			<li><a href="Get-FirewallRule.html">Get-FirewallRule</a></li>
 			<li><a href="Test-FirewallStatefulFtp.html">Test-FirewallStatefulFtp</a></li>
@@ -151,6 +157,7 @@
 		<ul class="CommandMenu">
 			<li><a href="Get-IPAddress.html">Get-IPAddress</a></li>
 			<li><a href="Test-IPAddress.html">Test-IPAddress</a></li>
+			<li><a href="Test-LocalComputerName.html">Test-LocalComputerName</a></li>
 		</ul>
 		<li class="Category">Path</li>
 		<ul class="CommandMenu">
@@ -175,6 +182,7 @@
 			<li><a href="Complete-Job.html">Complete-Job</a></li>
 			<li><a href="Get-PowershellPath.html">Get-PowershellPath</a></li>
 			<li><a href="Get-TrustedHost.html">Get-TrustedHost</a></li>
+			<li><a href="Invoke-ConsoleCommand.html">Invoke-ConsoleCommand</a></li>
 			<li><a href="Invoke-PowerShell.html">Invoke-PowerShell</a></li>
 			<li><a href="Set-TrustedHost.html">Set-TrustedHost</a></li>
 			<li><a href="Test-PowerShellIs32Bit.html">Test-PowerShellIs32Bit</a></li>
@@ -199,6 +207,7 @@
 		<ul class="CommandMenu">
 			<li><a href="Assert-AdminPrivilege.html">Assert-AdminPrivilege</a></li>
 			<li><a href="Convert-SecureStringToString.html">Convert-SecureStringToString</a></li>
+			<li><a href="ConvertTo-ContainerInheritanceFlags.html">ConvertTo-ContainerInheritanceFlags</a></li>
 			<li><a href="ConvertTo-InheritanceFlag.html">ConvertTo-InheritanceFlag</a></li>
 			<li><a href="ConvertTo-PropagationFlag.html">ConvertTo-PropagationFlag</a></li>
 			<li><a href="ConvertTo-ProviderAccessControlRights.html">ConvertTo-ProviderAccessControlRights</a></li>
@@ -206,6 +215,8 @@
 			<li><a href="Grant-Permission.html">Grant-Permission</a></li>
 			<li><a href="New-Credential.html">New-Credential</a></li>
 			<li><a href="Protect-Acl.html">Protect-Acl</a></li>
+			<li><a href="Revoke-Permission.html">Revoke-Permission</a></li>
+			<li><a href="Set-CryptoKeySecurity.html">Set-CryptoKeySecurity</a></li>
 			<li><a href="Test-AdminPrivilege.html">Test-AdminPrivilege</a></li>
 			<li><a href="Test-Permission.html">Test-Permission</a></li>
 		</ul>
@@ -213,6 +224,7 @@
 		<ul class="CommandMenu">
 			<li><a href="Assert-Service.html">Assert-Service</a></li>
 			<li><a href="Get-ServiceAcl.html">Get-ServiceAcl</a></li>
+			<li><a href="Get-ServiceConfiguration.html">Get-ServiceConfiguration</a></li>
 			<li><a href="Get-ServicePermission.html">Get-ServicePermission</a></li>
 			<li><a href="Get-ServiceSecurityDescriptor.html">Get-ServiceSecurityDescriptor</a></li>
 			<li><a href="Grant-ServiceControlPermission.html">Grant-ServiceControlPermission</a></li>
@@ -261,36 +273,111 @@
 </div>
 
 
-    <h1>New-TempDir</h1>
-    <div><p>Creates a new temporary directory with a random name.</p>
+    <h1>Expand-Item</h1>
+    <div><p>Decompresses a ZIP file to a directory using the <code>DotNetZip</code> library.</p>
 </div>
 
         <h2>Syntax</h2>
-    <pre class="Syntax"><code>New-TempDir [&lt;CommonParameters&gt;]</code></pre>
+    <pre class="Syntax"><code>Expand-Item [-Path] &lt;String&gt; [[-OutDirectory] &lt;String&gt;] [-Force] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
     
         <h2>Description</h2>
     <div class="Description">
-        <p>A new temporary directory is created in the current users temporary directory.  The directory's name is created using the <code>Path</code> class's <a href="http://msdn.microsoft.com/en-us/library/system.io.path.getrandomfilename.aspx">GetRandomFileName method</a>.</p>
+        <p>The contents of the ZIP file are extracted to a temporary directory, and that directory is returned as a <code>System.IO.DirectoryInfo</code> object. You are responsible for deleting that directory when you're finished.</p>
+
+<p>You can extract to a specific directory with the <code>OutDirectory</code> parameter. If the directory doesn't exist, it is created. If the directory exists, and is empty, the file is decompressed into that directory. If the directory isn't empty, use the <code>-Force</code> parameter to overwrite any files/directories which may be present.</p>
+
+<p>The directory where the files were decompressed is returned.</p>
 
     </div>
     
             <h2>Related Commands</h2>
         <ul>
-<li><a href="http://msdn.microsoft.com/en-us/library/system.io.path.getrandomfilename.aspx">http://msdn.microsoft.com/en-us/library/system.io.path.getrandomfilename.aspx</a></li>
+<li><a href="https://www.nuget.org/packages/DotNetZip">https://www.nuget.org/packages/DotNetZip</a></li>
+<li><a href="Compress-Item.html">Compress-Item</a></li>
+<li><a href="Test-ZipFile.html">Test-ZipFile</a></li>
 </ul>
 
 
-    
+    		<h2> Parameters </h2>
+		<table border='1'>
+			<tr>
+				<th>Name</th>
+                <th>Type</th>
+				<th>Description</th>
+				<th>Required?</th>
+				<th>Pipeline Input</th>
+				<th>Default Value</th>
+			</tr>
+            			<tr valign='top'>
+				<td>Path</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+				<td>The path to the files/directories to compress.
+</td>
+				<td>true</td>
+				<td>false</td>
+                <td></td>
+			</tr>
+			<tr valign='top'>
+				<td>OutDirectory</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+				<td>Path to a directory where the file should be extracted.
+</td>
+				<td>false</td>
+				<td>false</td>
+                <td></td>
+			</tr>
+			<tr valign='top'>
+				<td>Force</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+				<td>Overwrite any existing files/directories in <code>OutDirectory</code>.
+</td>
+				<td>false</td>
+				<td>false</td>
+                <td>False</td>
+			</tr>
+			<tr valign='top'>
+				<td>WhatIf</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+				<td></td>
+				<td>false</td>
+				<td>false</td>
+                <td></td>
+			</tr>
+			<tr valign='top'>
+				<td>Confirm</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+				<td></td>
+				<td>false</td>
+				<td>false</td>
+                <td></td>
+			</tr>
+                            <tr valign="top">
+                <td><a href="http://technet.microsoft.com/en-us/library/dd315352.aspx">CommonParameters</a></td>
+                <td></td>
+                <td>This cmdlet supports common parameters.  For more information type <br> <code>Get-Help about_CommonParameters</code>.</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                </tr>
+        </table>
         
     
         
-    
+            <h2>Return Values</h2>
+        <p>System.IO.DirectoryInfo</p>
+
         
     
         
                 <h2>EXAMPLE 1</h2>
-            <pre><code>New-TempDir</code></pre>
-            <p><p>Returns the path to a temporary directory with a random name.</p>
+            <pre><code>$unzipRoot = Expand-Item -Path 'C:\Carbon.zip'</code></pre>
+            <p><p>Demonstrates how to unzip a file into a temporary directory. You are responsible for deleting that directory.</p>
+</p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 2</h2>
+            <pre><code>Expand-Item -Path 'C:\Carbon.zip' -OutDirectory 'C:\Modules\Carbon'</code></pre>
+            <p><p>Demonstrates how to unzip a file into a specific directory.</p>
+</p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 3</h2>
+            <pre><code>Expand-Item -Path 'C:\Carbon.zip' -OutDirectory 'C:\Modules\Carbon' -Force</code></pre>
+            <p><p>Demonstrates how to decompress to an existing, non-empty directory with the <code>-Force</code> parameter. Existing files are overwritten.</p>
 </p><p></p><p></p><p></p><p></p>
 </body>
 </html>   

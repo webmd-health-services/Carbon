@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-    <title>PowerShell - Assert-WindowsFeatureFunctionsSupported - Carbon</title>
+    <title>PowerShell - New-TempDirectory - Carbon</title>
 	<link href="styles.css" type="text/css" rel="stylesheet" />
 </head>
 <body>
@@ -39,6 +39,7 @@
 		</ul>
 		<li class="Category">Computer</li>
 		<ul class="CommandMenu">
+			<li><a href="Get-ProgramInstallInfo.html">Get-ProgramInstallInfo</a></li>
 			<li><a href="Remove-EnvironmentVariable.html">Remove-EnvironmentVariable</a></li>
 			<li><a href="Resolve-NetPath.html">Resolve-NetPath</a></li>
 			<li><a href="Set-EnvironmentVariable.html">Set-EnvironmentVariable</a></li>
@@ -47,6 +48,7 @@
 		</ul>
 		<li class="Category">Cryptography</li>
 		<ul class="CommandMenu">
+			<li><a href="New-RsaKeyPair.html">New-RsaKeyPair</a></li>
 			<li><a href="Protect-String.html">Protect-String</a></li>
 			<li><a href="Unprotect-String.html">Unprotect-String</a></li>
 		</ul>
@@ -58,19 +60,23 @@
 		</ul>
 		<li class="Category">FileSystem</li>
 		<ul class="CommandMenu">
+			<li><a href="Compress-Item.html">Compress-Item</a></li>
 			<li><a href="Disable-NtfsCompression.html">Disable-NtfsCompression</a></li>
 			<li><a href="Enable-NtfsCompression.html">Enable-NtfsCompression</a></li>
+			<li><a href="Expand-Item.html">Expand-Item</a></li>
 			<li><a href="Install-Junction.html">Install-Junction</a></li>
 			<li><a href="New-Junction.html">New-Junction</a></li>
-			<li><a href="New-TempDir.html">New-TempDir</a></li>
+			<li><a href="New-TempDirectory.html">New-TempDirectory</a></li>
 			<li><a href="Remove-Junction.html">Remove-Junction</a></li>
 			<li><a href="Test-NtfsCompression.html">Test-NtfsCompression</a></li>
 			<li><a href="Test-PathIsJunction.html">Test-PathIsJunction</a></li>
+			<li><a href="Test-ZipFile.html">Test-ZipFile</a></li>
 		</ul>
 		<li class="Category">Firewall</li>
 		<ul class="CommandMenu">
 			<li><a href="Assert-FirewallConfigurable.html">Assert-FirewallConfigurable</a></li>
 			<li><a href="Disable-FirewallStatefulFtp.html">Disable-FirewallStatefulFtp</a></li>
+			<li><a href="Enable-FirewallRule.html">Enable-FirewallRule</a></li>
 			<li><a href="Enable-FirewallStatefulFtp.html">Enable-FirewallStatefulFtp</a></li>
 			<li><a href="Get-FirewallRule.html">Get-FirewallRule</a></li>
 			<li><a href="Test-FirewallStatefulFtp.html">Test-FirewallStatefulFtp</a></li>
@@ -151,6 +157,7 @@
 		<ul class="CommandMenu">
 			<li><a href="Get-IPAddress.html">Get-IPAddress</a></li>
 			<li><a href="Test-IPAddress.html">Test-IPAddress</a></li>
+			<li><a href="Test-LocalComputerName.html">Test-LocalComputerName</a></li>
 		</ul>
 		<li class="Category">Path</li>
 		<ul class="CommandMenu">
@@ -175,6 +182,7 @@
 			<li><a href="Complete-Job.html">Complete-Job</a></li>
 			<li><a href="Get-PowershellPath.html">Get-PowershellPath</a></li>
 			<li><a href="Get-TrustedHost.html">Get-TrustedHost</a></li>
+			<li><a href="Invoke-ConsoleCommand.html">Invoke-ConsoleCommand</a></li>
 			<li><a href="Invoke-PowerShell.html">Invoke-PowerShell</a></li>
 			<li><a href="Set-TrustedHost.html">Set-TrustedHost</a></li>
 			<li><a href="Test-PowerShellIs32Bit.html">Test-PowerShellIs32Bit</a></li>
@@ -199,6 +207,7 @@
 		<ul class="CommandMenu">
 			<li><a href="Assert-AdminPrivilege.html">Assert-AdminPrivilege</a></li>
 			<li><a href="Convert-SecureStringToString.html">Convert-SecureStringToString</a></li>
+			<li><a href="ConvertTo-ContainerInheritanceFlags.html">ConvertTo-ContainerInheritanceFlags</a></li>
 			<li><a href="ConvertTo-InheritanceFlag.html">ConvertTo-InheritanceFlag</a></li>
 			<li><a href="ConvertTo-PropagationFlag.html">ConvertTo-PropagationFlag</a></li>
 			<li><a href="ConvertTo-ProviderAccessControlRights.html">ConvertTo-ProviderAccessControlRights</a></li>
@@ -206,6 +215,8 @@
 			<li><a href="Grant-Permission.html">Grant-Permission</a></li>
 			<li><a href="New-Credential.html">New-Credential</a></li>
 			<li><a href="Protect-Acl.html">Protect-Acl</a></li>
+			<li><a href="Revoke-Permission.html">Revoke-Permission</a></li>
+			<li><a href="Set-CryptoKeySecurity.html">Set-CryptoKeySecurity</a></li>
 			<li><a href="Test-AdminPrivilege.html">Test-AdminPrivilege</a></li>
 			<li><a href="Test-Permission.html">Test-Permission</a></li>
 		</ul>
@@ -213,6 +224,7 @@
 		<ul class="CommandMenu">
 			<li><a href="Assert-Service.html">Assert-Service</a></li>
 			<li><a href="Get-ServiceAcl.html">Get-ServiceAcl</a></li>
+			<li><a href="Get-ServiceConfiguration.html">Get-ServiceConfiguration</a></li>
 			<li><a href="Get-ServicePermission.html">Get-ServicePermission</a></li>
 			<li><a href="Get-ServiceSecurityDescriptor.html">Get-ServiceSecurityDescriptor</a></li>
 			<li><a href="Grant-ServiceControlPermission.html">Grant-ServiceControlPermission</a></li>
@@ -261,32 +273,66 @@
 </div>
 
 
-    <h1>Assert-WindowsFeatureFunctionsSupported</h1>
-    <div><p>INTERNAL.  DO NOT USE.</p>
+    <h1>New-TempDirectory</h1>
+    <div><p>Creates a new temporary directory with a random name.</p>
 </div>
 
         <h2>Syntax</h2>
-    <pre class="Syntax"><code>Assert-WindowsFeatureFunctionsSupported [&lt;CommonParameters&gt;]</code></pre>
+    <pre class="Syntax"><code>New-TempDirectory [[-Prefix] &lt;String&gt;] [&lt;CommonParameters&gt;]</code></pre>
     
         <h2>Description</h2>
     <div class="Description">
-        <p>INTERNAL.  DO NOT USE.</p>
+        <p>A new temporary directory is created in the current user's <code>env:TEMP</code> directory.  The directory's name is created using the <code>Path</code> class's <a href="http://msdn.microsoft.com/en-us/library/system.io.path.getrandomfilename.aspx">GetRandomFileName method</a>.</p>
+
+<p>To add a custom prefix to the directory name, use the <code>Prefix</code> parameter. If you pass in a path, only its name will be used. In this way, you can pass <code>$PSCommandPath</code>, which will help you identify what scripts are leaving cruft around in the temp directory.</p>
 
     </div>
     
-    
+            <h2>Related Commands</h2>
+        <ul>
+<li><a href="http://msdn.microsoft.com/en-us/library/system.io.path.getrandomfilename.aspx">http://msdn.microsoft.com/en-us/library/system.io.path.getrandomfilename.aspx</a></li>
+</ul>
 
-    
+
+    		<h2> Parameters </h2>
+		<table border='1'>
+			<tr>
+				<th>Name</th>
+                <th>Type</th>
+				<th>Description</th>
+				<th>Required?</th>
+				<th>Pipeline Input</th>
+				<th>Default Value</th>
+			</tr>
+            			<tr valign='top'>
+				<td>Prefix</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+				<td>A prefix to use, so you can more easily identify <em>what</em> created the temporary directory. If you pass in a path, it will be converted to a file name.
+</td>
+				<td>false</td>
+				<td>false</td>
+                <td></td>
+			</tr>
+            
+        </table>
         
     
         
-    
+            <h2>Return Values</h2>
+        <p>System.IO.DirectoryInfo</p>
+
         
     
         
                 <h2>EXAMPLE 1</h2>
-            <pre><code>Assert-WindowsFeatureFunctionsSupported</code></pre>
-            <p><p>Writes an error and returns <code>false</code> if support for managing functions isn't found.</p>
+            <pre><code>New-TempDirectory</code></pre>
+            <p><p>Demonstrates how to create a new temporary directory, e.g. <code>C:\Users\ajensen\AppData\Local\Temp\5pobd3tu.5rn</code>.</p>
+</p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 2</h2>
+            <pre><code>New-TempDirectory -Prefix 'Carbon'</code></pre>
+            <p><p>Demonstrates how to create a new temporary directory with a custom prefix for its name, e.g. <code>C:\Users\ajensen\AppData\Local\Temp\Carbon5pobd3tu.5rn</code>.</p>
+</p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 3</h2>
+            <pre><code>New-TempDirectory -Prefix $PSCommandPath</code></pre>
+            <p><p>Demonstrates how you can use <code>$PSCommandPath</code> to create a new, temporary directory, named after the currently executing scripts, e.g. <code>C:\Users\ajensen\AppData\Local\Temp\New-TempDirectory.ps15pobd3tu.5rn</code>.</p>
 </p><p></p><p></p><p></p><p></p>
 </body>
 </html>   

@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-    <title>PowerShell - ConvertTo-ProviderAccessControlRights - Carbon</title>
+    <title>PowerShell - Revoke-Permission - Carbon</title>
 	<link href="styles.css" type="text/css" rel="stylesheet" />
 </head>
 <body>
@@ -39,6 +39,7 @@
 		</ul>
 		<li class="Category">Computer</li>
 		<ul class="CommandMenu">
+			<li><a href="Get-ProgramInstallInfo.html">Get-ProgramInstallInfo</a></li>
 			<li><a href="Remove-EnvironmentVariable.html">Remove-EnvironmentVariable</a></li>
 			<li><a href="Resolve-NetPath.html">Resolve-NetPath</a></li>
 			<li><a href="Set-EnvironmentVariable.html">Set-EnvironmentVariable</a></li>
@@ -47,6 +48,7 @@
 		</ul>
 		<li class="Category">Cryptography</li>
 		<ul class="CommandMenu">
+			<li><a href="New-RsaKeyPair.html">New-RsaKeyPair</a></li>
 			<li><a href="Protect-String.html">Protect-String</a></li>
 			<li><a href="Unprotect-String.html">Unprotect-String</a></li>
 		</ul>
@@ -58,19 +60,23 @@
 		</ul>
 		<li class="Category">FileSystem</li>
 		<ul class="CommandMenu">
+			<li><a href="Compress-Item.html">Compress-Item</a></li>
 			<li><a href="Disable-NtfsCompression.html">Disable-NtfsCompression</a></li>
 			<li><a href="Enable-NtfsCompression.html">Enable-NtfsCompression</a></li>
+			<li><a href="Expand-Item.html">Expand-Item</a></li>
 			<li><a href="Install-Junction.html">Install-Junction</a></li>
 			<li><a href="New-Junction.html">New-Junction</a></li>
-			<li><a href="New-TempDir.html">New-TempDir</a></li>
+			<li><a href="New-TempDirectory.html">New-TempDirectory</a></li>
 			<li><a href="Remove-Junction.html">Remove-Junction</a></li>
 			<li><a href="Test-NtfsCompression.html">Test-NtfsCompression</a></li>
 			<li><a href="Test-PathIsJunction.html">Test-PathIsJunction</a></li>
+			<li><a href="Test-ZipFile.html">Test-ZipFile</a></li>
 		</ul>
 		<li class="Category">Firewall</li>
 		<ul class="CommandMenu">
 			<li><a href="Assert-FirewallConfigurable.html">Assert-FirewallConfigurable</a></li>
 			<li><a href="Disable-FirewallStatefulFtp.html">Disable-FirewallStatefulFtp</a></li>
+			<li><a href="Enable-FirewallRule.html">Enable-FirewallRule</a></li>
 			<li><a href="Enable-FirewallStatefulFtp.html">Enable-FirewallStatefulFtp</a></li>
 			<li><a href="Get-FirewallRule.html">Get-FirewallRule</a></li>
 			<li><a href="Test-FirewallStatefulFtp.html">Test-FirewallStatefulFtp</a></li>
@@ -151,6 +157,7 @@
 		<ul class="CommandMenu">
 			<li><a href="Get-IPAddress.html">Get-IPAddress</a></li>
 			<li><a href="Test-IPAddress.html">Test-IPAddress</a></li>
+			<li><a href="Test-LocalComputerName.html">Test-LocalComputerName</a></li>
 		</ul>
 		<li class="Category">Path</li>
 		<ul class="CommandMenu">
@@ -175,6 +182,7 @@
 			<li><a href="Complete-Job.html">Complete-Job</a></li>
 			<li><a href="Get-PowershellPath.html">Get-PowershellPath</a></li>
 			<li><a href="Get-TrustedHost.html">Get-TrustedHost</a></li>
+			<li><a href="Invoke-ConsoleCommand.html">Invoke-ConsoleCommand</a></li>
 			<li><a href="Invoke-PowerShell.html">Invoke-PowerShell</a></li>
 			<li><a href="Set-TrustedHost.html">Set-TrustedHost</a></li>
 			<li><a href="Test-PowerShellIs32Bit.html">Test-PowerShellIs32Bit</a></li>
@@ -199,6 +207,7 @@
 		<ul class="CommandMenu">
 			<li><a href="Assert-AdminPrivilege.html">Assert-AdminPrivilege</a></li>
 			<li><a href="Convert-SecureStringToString.html">Convert-SecureStringToString</a></li>
+			<li><a href="ConvertTo-ContainerInheritanceFlags.html">ConvertTo-ContainerInheritanceFlags</a></li>
 			<li><a href="ConvertTo-InheritanceFlag.html">ConvertTo-InheritanceFlag</a></li>
 			<li><a href="ConvertTo-PropagationFlag.html">ConvertTo-PropagationFlag</a></li>
 			<li><a href="ConvertTo-ProviderAccessControlRights.html">ConvertTo-ProviderAccessControlRights</a></li>
@@ -206,6 +215,8 @@
 			<li><a href="Grant-Permission.html">Grant-Permission</a></li>
 			<li><a href="New-Credential.html">New-Credential</a></li>
 			<li><a href="Protect-Acl.html">Protect-Acl</a></li>
+			<li><a href="Revoke-Permission.html">Revoke-Permission</a></li>
+			<li><a href="Set-CryptoKeySecurity.html">Set-CryptoKeySecurity</a></li>
 			<li><a href="Test-AdminPrivilege.html">Test-AdminPrivilege</a></li>
 			<li><a href="Test-Permission.html">Test-Permission</a></li>
 		</ul>
@@ -213,6 +224,7 @@
 		<ul class="CommandMenu">
 			<li><a href="Assert-Service.html">Assert-Service</a></li>
 			<li><a href="Get-ServiceAcl.html">Get-ServiceAcl</a></li>
+			<li><a href="Get-ServiceConfiguration.html">Get-ServiceConfiguration</a></li>
 			<li><a href="Get-ServicePermission.html">Get-ServicePermission</a></li>
 			<li><a href="Get-ServiceSecurityDescriptor.html">Get-ServiceSecurityDescriptor</a></li>
 			<li><a href="Grant-ServiceControlPermission.html">Grant-ServiceControlPermission</a></li>
@@ -261,20 +273,29 @@
 </div>
 
 
-    <h1>ConvertTo-ProviderAccessControlRights</h1>
-    <div><p>Converts strings into the appropriate access control rights for a PowerShell provider (e.g. FileSystemRights or RegistryRights).</p>
+    <h1>Revoke-Permission</h1>
+    <div><p>Revokes <em>explicit</em> permissions on a file, directory, registry key, or certificate's private key.</p>
 </div>
 
         <h2>Syntax</h2>
-    <pre class="Syntax"><code>ConvertTo-ProviderAccessControlRights [-ProviderName] &lt;String&gt; [-InputObject] &lt;String[]&gt; [&lt;CommonParameters&gt;]</code></pre>
+    <pre class="Syntax"><code>Revoke-Permission [-Path] &lt;String&gt; [-Identity] &lt;String&gt; [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
     
         <h2>Description</h2>
     <div class="Description">
-        <p>This is an internal Carbon function, so you're not getting anything more than the synopsis.</p>
+        <p>Revokes all of an identity's <em>explicit</em> permissions on a file, directory, registry key, or certificate's private key. Only explicit permissions are considered; inherited permissions are ignored.</p>
+
+<p>If the identity doesn't have permission, nothing happens, not even errors written out.</p>
 
     </div>
     
-    
+            <h2>Related Commands</h2>
+        <ul>
+<li><a href="Get-Permission.html">Get-Permission</a></li>
+<li><a href="Grant-Permission.html">Grant-Permission</a></li>
+<li><a href="Protect-Acl.html">Protect-Acl</a></li>
+<li><a href="Test-Permission.html">Test-Permission</a></li>
+</ul>
+
 
     		<h2> Parameters </h2>
 		<table border='1'>
@@ -287,24 +308,47 @@
 				<th>Default Value</th>
 			</tr>
             			<tr valign='top'>
-				<td>ProviderName</td>
+				<td>Path</td>
 				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
-				<td>The provider name.
+				<td>The path on which the permissions should be revoked.  Can be a file system, registry, or certificate path.
 </td>
 				<td>true</td>
 				<td>false</td>
                 <td></td>
 			</tr>
 			<tr valign='top'>
-				<td>InputObject</td>
-				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String[]</a></td>
-				<td>The values to convert.
+				<td>Identity</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+				<td>The identity losing permissions.
 </td>
 				<td>true</td>
-				<td>true (ByValue)</td>
+				<td>false</td>
                 <td></td>
 			</tr>
-            
+			<tr valign='top'>
+				<td>WhatIf</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+				<td></td>
+				<td>false</td>
+				<td>false</td>
+                <td></td>
+			</tr>
+			<tr valign='top'>
+				<td>Confirm</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+				<td></td>
+				<td>false</td>
+				<td>false</td>
+                <td></td>
+			</tr>
+                            <tr valign="top">
+                <td><a href="http://technet.microsoft.com/en-us/library/dd315352.aspx">CommonParameters</a></td>
+                <td></td>
+                <td>This cmdlet supports common parameters.  For more information type <br> <code>Get-Help about_CommonParameters</code>.</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                </tr>
         </table>
         
     
@@ -314,8 +358,14 @@
     
         
                 <h2>EXAMPLE 1</h2>
-            <pre><code>ConvertTo-ProviderAccessControlRights -ProviderName 'FileSystem' -InputObject 'Read','Write'</code></pre>
-            <p><p>Demonstrates how to convert <code>Read</code> and <code>Write</code> into a <code>System.Security.AccessControl.FileSystemRights</code> value.</p>
+            <pre><code>Revoke-Permission -Identity ENTERPRISE\Engineers -Path 'C:\EngineRoom'</code></pre>
+            <p><p>Demonstrates how to revoke all of the 'Engineers' permissions on the <code>C:\EngineRoom</code> directory.</p>
+</p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 2</h2>
+            <pre><code>Revoke-Permission -Identity ENTERPRISE\Interns -Path 'hklm:\system\WarpDrive'</code></pre>
+            <p><p>Demonstrates how to revoke permission on a registry key.</p>
+</p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 3</h2>
+            <pre><code>Revoke-Permission -Identity ENTERPRISE\Officers -Path 'cert:\LocalMachine\My\1234567890ABCDEF1234567890ABCDEF12345678'</code></pre>
+            <p><p>Demonstrates how to revoke the Officers' permission to the <code>cert:\LocalMachine\My\1234567890ABCDEF1234567890ABCDEF12345678</code> certificate's private key.</p>
 </p><p></p><p></p><p></p><p></p>
 </body>
 </html>   

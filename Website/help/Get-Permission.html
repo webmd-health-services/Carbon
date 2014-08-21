@@ -39,6 +39,7 @@
 		</ul>
 		<li class="Category">Computer</li>
 		<ul class="CommandMenu">
+			<li><a href="Get-ProgramInstallInfo.html">Get-ProgramInstallInfo</a></li>
 			<li><a href="Remove-EnvironmentVariable.html">Remove-EnvironmentVariable</a></li>
 			<li><a href="Resolve-NetPath.html">Resolve-NetPath</a></li>
 			<li><a href="Set-EnvironmentVariable.html">Set-EnvironmentVariable</a></li>
@@ -47,6 +48,7 @@
 		</ul>
 		<li class="Category">Cryptography</li>
 		<ul class="CommandMenu">
+			<li><a href="New-RsaKeyPair.html">New-RsaKeyPair</a></li>
 			<li><a href="Protect-String.html">Protect-String</a></li>
 			<li><a href="Unprotect-String.html">Unprotect-String</a></li>
 		</ul>
@@ -58,19 +60,23 @@
 		</ul>
 		<li class="Category">FileSystem</li>
 		<ul class="CommandMenu">
+			<li><a href="Compress-Item.html">Compress-Item</a></li>
 			<li><a href="Disable-NtfsCompression.html">Disable-NtfsCompression</a></li>
 			<li><a href="Enable-NtfsCompression.html">Enable-NtfsCompression</a></li>
+			<li><a href="Expand-Item.html">Expand-Item</a></li>
 			<li><a href="Install-Junction.html">Install-Junction</a></li>
 			<li><a href="New-Junction.html">New-Junction</a></li>
-			<li><a href="New-TempDir.html">New-TempDir</a></li>
+			<li><a href="New-TempDirectory.html">New-TempDirectory</a></li>
 			<li><a href="Remove-Junction.html">Remove-Junction</a></li>
 			<li><a href="Test-NtfsCompression.html">Test-NtfsCompression</a></li>
 			<li><a href="Test-PathIsJunction.html">Test-PathIsJunction</a></li>
+			<li><a href="Test-ZipFile.html">Test-ZipFile</a></li>
 		</ul>
 		<li class="Category">Firewall</li>
 		<ul class="CommandMenu">
 			<li><a href="Assert-FirewallConfigurable.html">Assert-FirewallConfigurable</a></li>
 			<li><a href="Disable-FirewallStatefulFtp.html">Disable-FirewallStatefulFtp</a></li>
+			<li><a href="Enable-FirewallRule.html">Enable-FirewallRule</a></li>
 			<li><a href="Enable-FirewallStatefulFtp.html">Enable-FirewallStatefulFtp</a></li>
 			<li><a href="Get-FirewallRule.html">Get-FirewallRule</a></li>
 			<li><a href="Test-FirewallStatefulFtp.html">Test-FirewallStatefulFtp</a></li>
@@ -151,6 +157,7 @@
 		<ul class="CommandMenu">
 			<li><a href="Get-IPAddress.html">Get-IPAddress</a></li>
 			<li><a href="Test-IPAddress.html">Test-IPAddress</a></li>
+			<li><a href="Test-LocalComputerName.html">Test-LocalComputerName</a></li>
 		</ul>
 		<li class="Category">Path</li>
 		<ul class="CommandMenu">
@@ -175,6 +182,7 @@
 			<li><a href="Complete-Job.html">Complete-Job</a></li>
 			<li><a href="Get-PowershellPath.html">Get-PowershellPath</a></li>
 			<li><a href="Get-TrustedHost.html">Get-TrustedHost</a></li>
+			<li><a href="Invoke-ConsoleCommand.html">Invoke-ConsoleCommand</a></li>
 			<li><a href="Invoke-PowerShell.html">Invoke-PowerShell</a></li>
 			<li><a href="Set-TrustedHost.html">Set-TrustedHost</a></li>
 			<li><a href="Test-PowerShellIs32Bit.html">Test-PowerShellIs32Bit</a></li>
@@ -199,6 +207,7 @@
 		<ul class="CommandMenu">
 			<li><a href="Assert-AdminPrivilege.html">Assert-AdminPrivilege</a></li>
 			<li><a href="Convert-SecureStringToString.html">Convert-SecureStringToString</a></li>
+			<li><a href="ConvertTo-ContainerInheritanceFlags.html">ConvertTo-ContainerInheritanceFlags</a></li>
 			<li><a href="ConvertTo-InheritanceFlag.html">ConvertTo-InheritanceFlag</a></li>
 			<li><a href="ConvertTo-PropagationFlag.html">ConvertTo-PropagationFlag</a></li>
 			<li><a href="ConvertTo-ProviderAccessControlRights.html">ConvertTo-ProviderAccessControlRights</a></li>
@@ -206,6 +215,8 @@
 			<li><a href="Grant-Permission.html">Grant-Permission</a></li>
 			<li><a href="New-Credential.html">New-Credential</a></li>
 			<li><a href="Protect-Acl.html">Protect-Acl</a></li>
+			<li><a href="Revoke-Permission.html">Revoke-Permission</a></li>
+			<li><a href="Set-CryptoKeySecurity.html">Set-CryptoKeySecurity</a></li>
 			<li><a href="Test-AdminPrivilege.html">Test-AdminPrivilege</a></li>
 			<li><a href="Test-Permission.html">Test-Permission</a></li>
 		</ul>
@@ -213,6 +224,7 @@
 		<ul class="CommandMenu">
 			<li><a href="Assert-Service.html">Assert-Service</a></li>
 			<li><a href="Get-ServiceAcl.html">Get-ServiceAcl</a></li>
+			<li><a href="Get-ServiceConfiguration.html">Get-ServiceConfiguration</a></li>
 			<li><a href="Get-ServicePermission.html">Get-ServicePermission</a></li>
 			<li><a href="Get-ServiceSecurityDescriptor.html">Get-ServiceSecurityDescriptor</a></li>
 			<li><a href="Grant-ServiceControlPermission.html">Grant-ServiceControlPermission</a></li>
@@ -262,7 +274,7 @@
 
 
     <h1>Get-Permission</h1>
-    <div><p>Gets the permissions (access control rules) for a path.</p>
+    <div><p>Gets the permissions (access control rules) for a file, directory, registry key, or certificate's private key.</p>
 </div>
 
         <h2>Syntax</h2>
@@ -274,9 +286,19 @@
 
 <p>To return inherited permissions, use the <code>Inherited</code> switch.  Otherwise, only non-inherited (i.e. explicit) permissions are returned.</p>
 
+<p>Certificate permissions are only returned if a certificate has a private key. If a certificate doesn't have a private key, <code>$null</code> is returned.</p>
+
     </div>
     
-    
+            <h2>Related Commands</h2>
+        <ul>
+<li><a href="Get-Permission.html">Get-Permission</a></li>
+<li><a href="Grant-Permission.html">Grant-Permission</a></li>
+<li><a href="Protect-Acl.html">Protect-Acl</a></li>
+<li><a href="Revoke-Permission.html">Revoke-Permission</a></li>
+<li><a href="Test-Permission.html">Test-Permission</a></li>
+</ul>
+
 
     		<h2> Parameters </h2>
 		<table border='1'>
@@ -291,7 +313,7 @@
             			<tr valign='top'>
 				<td>Path</td>
 				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
-				<td>The path whose permissions (i.e. access control rules) to return.
+				<td>The path whose permissions (i.e. access control rules) to return. File system, registry, or certificate paths supported. Wildcards supported.
 </td>
 				<td>true</td>
 				<td>false</td>
@@ -327,14 +349,17 @@
     
         
                 <h2>EXAMPLE 1</h2>
-            <pre><code>Get-Permission -Path C:\Windows</code></pre>
+            <pre><code>Get-Permission -Path 'C:\Windows'</code></pre>
             <p><p>Returns <code>System.Security.AccessControl.FileSystemAccessRule</code> objects for all the non-inherited rules on <code>C:\windows</code>.</p>
 </p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 2</h2>
-            <pre><code>Get-Permission -Path hklm:\Software -Inherited</code></pre>
+            <pre><code>Get-Permission -Path 'hklm:\Software' -Inherited</code></pre>
             <p><p>Returns <code>System.Security.AccessControl.RegistryAccessRule</code> objects for all the inherited and non-inherited rules on <code>hklm:\software</code>.</p>
 </p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 3</h2>
-            <pre><code>Get-Permission -Path C:\Windows -Idenity Administrators</code></pre>
+            <pre><code>Get-Permission -Path 'C:\Windows' -Idenity Administrators</code></pre>
             <p><p>Returns <code>System.Security.AccessControl.FileSystemAccessRule</code> objects for all the <code>Administrators'</code> rules on <code>C:\windows</code>.</p>
+</p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 4</h2>
+            <pre><code>Get-Permission -Path 'Cert:\LocalMachine\1234567890ABCDEF1234567890ABCDEF12345678'</code></pre>
+            <p><p>Returns <code>System.Security.AccessControl.CryptoKeyAccesRule</code> objects for certificate's <code>Cert:\LocalMachine\1234567890ABCDEF1234567890ABCDEF12345678</code> private key. If it doesn't have a private key, <code>$null</code> is returned.</p>
 </p><p></p><p></p><p></p><p></p>
 </body>
 </html>   

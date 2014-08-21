@@ -39,6 +39,7 @@
 		</ul>
 		<li class="Category">Computer</li>
 		<ul class="CommandMenu">
+			<li><a href="Get-ProgramInstallInfo.html">Get-ProgramInstallInfo</a></li>
 			<li><a href="Remove-EnvironmentVariable.html">Remove-EnvironmentVariable</a></li>
 			<li><a href="Resolve-NetPath.html">Resolve-NetPath</a></li>
 			<li><a href="Set-EnvironmentVariable.html">Set-EnvironmentVariable</a></li>
@@ -47,6 +48,7 @@
 		</ul>
 		<li class="Category">Cryptography</li>
 		<ul class="CommandMenu">
+			<li><a href="New-RsaKeyPair.html">New-RsaKeyPair</a></li>
 			<li><a href="Protect-String.html">Protect-String</a></li>
 			<li><a href="Unprotect-String.html">Unprotect-String</a></li>
 		</ul>
@@ -58,19 +60,23 @@
 		</ul>
 		<li class="Category">FileSystem</li>
 		<ul class="CommandMenu">
+			<li><a href="Compress-Item.html">Compress-Item</a></li>
 			<li><a href="Disable-NtfsCompression.html">Disable-NtfsCompression</a></li>
 			<li><a href="Enable-NtfsCompression.html">Enable-NtfsCompression</a></li>
+			<li><a href="Expand-Item.html">Expand-Item</a></li>
 			<li><a href="Install-Junction.html">Install-Junction</a></li>
 			<li><a href="New-Junction.html">New-Junction</a></li>
-			<li><a href="New-TempDir.html">New-TempDir</a></li>
+			<li><a href="New-TempDirectory.html">New-TempDirectory</a></li>
 			<li><a href="Remove-Junction.html">Remove-Junction</a></li>
 			<li><a href="Test-NtfsCompression.html">Test-NtfsCompression</a></li>
 			<li><a href="Test-PathIsJunction.html">Test-PathIsJunction</a></li>
+			<li><a href="Test-ZipFile.html">Test-ZipFile</a></li>
 		</ul>
 		<li class="Category">Firewall</li>
 		<ul class="CommandMenu">
 			<li><a href="Assert-FirewallConfigurable.html">Assert-FirewallConfigurable</a></li>
 			<li><a href="Disable-FirewallStatefulFtp.html">Disable-FirewallStatefulFtp</a></li>
+			<li><a href="Enable-FirewallRule.html">Enable-FirewallRule</a></li>
 			<li><a href="Enable-FirewallStatefulFtp.html">Enable-FirewallStatefulFtp</a></li>
 			<li><a href="Get-FirewallRule.html">Get-FirewallRule</a></li>
 			<li><a href="Test-FirewallStatefulFtp.html">Test-FirewallStatefulFtp</a></li>
@@ -151,6 +157,7 @@
 		<ul class="CommandMenu">
 			<li><a href="Get-IPAddress.html">Get-IPAddress</a></li>
 			<li><a href="Test-IPAddress.html">Test-IPAddress</a></li>
+			<li><a href="Test-LocalComputerName.html">Test-LocalComputerName</a></li>
 		</ul>
 		<li class="Category">Path</li>
 		<ul class="CommandMenu">
@@ -175,6 +182,7 @@
 			<li><a href="Complete-Job.html">Complete-Job</a></li>
 			<li><a href="Get-PowershellPath.html">Get-PowershellPath</a></li>
 			<li><a href="Get-TrustedHost.html">Get-TrustedHost</a></li>
+			<li><a href="Invoke-ConsoleCommand.html">Invoke-ConsoleCommand</a></li>
 			<li><a href="Invoke-PowerShell.html">Invoke-PowerShell</a></li>
 			<li><a href="Set-TrustedHost.html">Set-TrustedHost</a></li>
 			<li><a href="Test-PowerShellIs32Bit.html">Test-PowerShellIs32Bit</a></li>
@@ -199,6 +207,7 @@
 		<ul class="CommandMenu">
 			<li><a href="Assert-AdminPrivilege.html">Assert-AdminPrivilege</a></li>
 			<li><a href="Convert-SecureStringToString.html">Convert-SecureStringToString</a></li>
+			<li><a href="ConvertTo-ContainerInheritanceFlags.html">ConvertTo-ContainerInheritanceFlags</a></li>
 			<li><a href="ConvertTo-InheritanceFlag.html">ConvertTo-InheritanceFlag</a></li>
 			<li><a href="ConvertTo-PropagationFlag.html">ConvertTo-PropagationFlag</a></li>
 			<li><a href="ConvertTo-ProviderAccessControlRights.html">ConvertTo-ProviderAccessControlRights</a></li>
@@ -206,6 +215,8 @@
 			<li><a href="Grant-Permission.html">Grant-Permission</a></li>
 			<li><a href="New-Credential.html">New-Credential</a></li>
 			<li><a href="Protect-Acl.html">Protect-Acl</a></li>
+			<li><a href="Revoke-Permission.html">Revoke-Permission</a></li>
+			<li><a href="Set-CryptoKeySecurity.html">Set-CryptoKeySecurity</a></li>
 			<li><a href="Test-AdminPrivilege.html">Test-AdminPrivilege</a></li>
 			<li><a href="Test-Permission.html">Test-Permission</a></li>
 		</ul>
@@ -213,6 +224,7 @@
 		<ul class="CommandMenu">
 			<li><a href="Assert-Service.html">Assert-Service</a></li>
 			<li><a href="Get-ServiceAcl.html">Get-ServiceAcl</a></li>
+			<li><a href="Get-ServiceConfiguration.html">Get-ServiceConfiguration</a></li>
 			<li><a href="Get-ServicePermission.html">Get-ServicePermission</a></li>
 			<li><a href="Get-ServiceSecurityDescriptor.html">Get-ServiceSecurityDescriptor</a></li>
 			<li><a href="Grant-ServiceControlPermission.html">Grant-ServiceControlPermission</a></li>
@@ -266,7 +278,7 @@
 </div>
 
         <h2>Syntax</h2>
-    <pre class="Syntax"><code>Split-Ini -Path &lt;String&gt; [-AsHashtable] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
+    <pre class="Syntax"><code>Split-Ini -Path &lt;String&gt; [-AsHashtable] [-CaseSensitive] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
     
         <h2>Description</h2>
     <div class="Description">
@@ -332,6 +344,8 @@ bread=toasted
 
 <p>This would set the "eggs", "ham", and "bread" configuration keys of the "foo" section to "medium", "prosciutto", and "toasted", respectively. As you can see, the only thing that matters is the last value that was set for each of the configuration keys.</p>
 
+<p>Be default, operates on the INI file case-insensitively. If your INI is case-sensitive, use the <code>-CaseSensitive</code> switch.</p>
+
     </div>
     
             <h2>Related Commands</h2>
@@ -364,6 +378,15 @@ bread=toasted
 				<td>AsHashtable</td>
 				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
 				<td>Pass each parsed setting down the pipeline instead of collecting them all into a hashtable.
+</td>
+				<td>false</td>
+				<td>false</td>
+                <td>False</td>
+			</tr>
+			<tr valign='top'>
+				<td>CaseSensitive</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+				<td>Parses the INI file in a case-sensitive manner.
 </td>
 				<td>false</td>
 				<td>false</td>
@@ -457,6 +480,46 @@ extdiff =
                                Value = "";
                                LineNumber = 6;
                           )
+}
+</code></pre>
+</p><p></p><p></p><p></p><p></p>             <h2>EXAMPLE 3</h2>
+            <pre><code>Split-Ini -Path C:\Users\rspektor\mercurial.ini -AsHashtable -CaseSensitive</code></pre>
+            <p><p>Demonstrates how to parse a case-sensitive INI file.</p>
+
+<pre><code>Given this INI file:
+
+[ui]
+username = user@example.com
+USERNAME = user2example.com
+
+[UI]
+username = user3@example.com
+</code></pre>
+
+<p><code>Split-Ini -CaseSensitive</code> returns the following hashtable:</p>
+
+<pre><code>@{
+    ui.username = Carbon.Ini.IniNode (
+                        FullName = 'ui.username';
+                        Section = "ui";
+                        Name = "username";
+                        Value = "user@example.com";
+                        LineNumber = 2;
+                    );
+    ui.USERNAME = Carbon.Ini.IniNode (
+                        FullName = 'ui.USERNAME';
+                        Section = "ui";
+                        Name = "USERNAME";
+                        Value = "user2@example.com";
+                        LineNumber = 3;
+                    );
+    UI.username = Carbon.Ini.IniNode (
+                        FullName = 'UI.username';
+                        Section = "UI";
+                        Name = "username";
+                        Value = "user3@example.com";
+                        LineNumber = 6;
+                    );
 }
 </code></pre>
 </p><p></p><p></p><p></p><p></p>
