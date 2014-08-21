@@ -81,7 +81,7 @@
 <h3>Certificates</h3>
 
 <ul>
-<li>Improving error handling when <a href="http://get-carbon.org/help/Get-Certificate.html">Get-Certificate</a> fails to load a certificate from a file. Original exception now part of error record.</li>
+<li>Improving error handling when <a href="http://get-carbon.org/help/Get-Certificate.html">Get-Certificate</a> fails to load a certificate from a file.</li>
 <li><a href="http://get-carbon.org/help/Install-Certificate.html">Install-Certificate</a> now supports installing with an <code>X509Certificate2</code> object instead of just a path to a certificate.</li>
 <li><a href="http://get-carbon.org/help/Remove-SslCertificateBinding.html">Remove-SslCertificateBinding</a>: improved error handling.</li>
 <li><a href="http://get-carbon.org/help/Set-SslCertificateBinding.html">Set-SslCertificateBinding</a>: improved error handling.</li>
@@ -125,7 +125,7 @@
 <li>Added <code>Name</code> and <code>LiteralName</code> parameters to <a href="http://get-carbon.org/help/Get-FirewallRule.html">Get-FirewallRule</a> to return specific rules instead of all of them.</li>
 <li><a href="http://get-carbon.org/help/Get-FirewallRule.html">Get-FirewallRule</a>, now returns <code>Carbon.Firewall.Rule</code> objects, instead of anonymous hashes.</li>
 <li>Added default table format for <a href="http://get-carbon.org/help/Get-FirewallRule.html">Get-FirewallRule</a> output.</li>
-<li><a href="http://get-carbon.org/help/Get-FirewallRule.html">Get-FirewallRule</a>, now returns additional rule information: interface type, security, source, description, program, and service. Who knew <code>netsh advfirewall firewall rule show</code> had a <code>verbose</code> switch? RTFM.</li>
+<li><a href="http://get-carbon.org/help/Get-FirewallRule.html">Get-FirewallRule</a> now returns additional rule information: interface type, security, source, description, program, and service. Who knew <code>netsh advfirewall firewall rule show</code> had a <code>verbose</code> switch? RTFM.</li>
 </ul>
 
 <h3>INI</h3>
@@ -197,19 +197,22 @@
 <h3>Certificates</h3>
 
 <ul>
-<li><a href="http://get-carbon.org/help/Get-Certificate.html">Get-Certificate</a> couldn't open CA/CertificateAuthority store (fixes issue <a href="https://bitbucket.org/splatteredbits/carbon/issue/130/get-certificate-doesnt-find-any">#130</a>)</li>
-<li><p>Extended script property <code>DisplayName</code> on <code>X509Store</code> objects returning wrong store name for custom stores, now returns an empty string.</p>
+<li><a href="http://get-carbon.org/help/Get-Certificate.html">Get-Certificate</a> couldn't open CA/CertificateAuthority store (fixes issue <a href="https://bitbucket.org/splatteredbits/carbon/issue/130/get-certificate-doesnt-find-any">#130</a>).</li>
+<li>Extended script property <code>DisplayName</code> on <code>X509Store</code> objects returning wrong store name for custom stores, now returns an empty string.</li>
+</ul>
 
-<h3>Path</h3></li>
-<li><p><a href="http://get-carbon.org/help/Resolve-PathCase.html">Resolve-PathCase</a> didn't work under Windows 2012 R2.</p></li>
+<h3>Path</h3>
+
+<ul>
+<li><a href="http://get-carbon.org/help/Resolve-PathCase.html">Resolve-PathCase</a> didn't work under Windows 2012 R2.</li>
 </ul>
 
 <h3>Users and Groups</h3>
 
 <ul>
-<li>The <code>Carbon.Identity.FindByName</code> method and <a href="http://get-carbon.org/help/Resolve-IdentityName.html">Resolve-IdentityName</a> and <a href="http://get-carbon.org/help/Test-Identity.html">Test-Identity</a>) functions now handle identity names with <code>.</code> for the domain/machine name, e.g. <code>.\Administrator</code>.</li>
+<li>The <code>Carbon.Identity.FindByName</code> method and the <a href="http://get-carbon.org/help/Resolve-IdentityName.html">Resolve-IdentityName</a> and <a href="http://get-carbon.org/help/Test-Identity.html">Test-Identity</a> functions now handle identity names with <code>.</code> for the domain/machine name, e.g. <code>.\Administrator</code>.</li>
 <li>The <code>Carbon.Identity.FullName</code> property returns the wrong value when domain is empty/null, e.g. <code>Resolve-IdentityName -Name 'Everyone'</code> returns <code>\Everyone</code>, when it should return <code>Everyone</code>.</li>
-<li>The <code>Carbon.Identity.FindByName</code> method and <a href="http://get-carbon.org/help/Resolve-IdentityName.html">Resolve-IdentityName</a> and <a href="http://get-carbon.org/help/Test-Identity.html">Test-Identity</a>) functions unable to resolve <code>LocalSystem</code> account (which is actually <code>NT AUTHORITY\SYSTEM</code>).</li>
+<li>The <code>Carbon.Identity.FindByName</code> method and the <a href="http://get-carbon.org/help/Resolve-IdentityName.html">Resolve-IdentityName</a> and <a href="http://get-carbon.org/help/Test-Identity.html">Test-Identity</a> functions unable to resolve <code>LocalSystem</code> account (which is actually <code>NT AUTHORITY\SYSTEM</code>).</li>
 </ul>
 
 <h1>1.7.0 (30 April 2014)</h1>
