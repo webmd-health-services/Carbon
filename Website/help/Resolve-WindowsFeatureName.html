@@ -1,11 +1,11 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-    <title>PowerShell - Test-DscTargetResource - Carbon</title>
+    <title>PowerShell - Resolve-WindowsFeatureName - Carbon</title>
 	<link href="styles.css" type="text/css" rel="stylesheet" />
 </head>
 <body>
-	<ul id="SiteNav">
+    	<ul id="SiteNav">
 		<li><a href="http://get-carbon.org">Get-Carbon</a></li>
 		<li><b>-Documentation</b></li>
         <li><a href="http://get-carbon.org">-ReleaseNotes</a></li>
@@ -39,7 +39,6 @@
 		</ul>
 		<li class="Category">Computer</li>
 		<ul class="CommandMenu">
-			<li><a href="Get-ProgramInstallInfo.html">Get-ProgramInstallInfo</a></li>
 			<li><a href="Remove-EnvironmentVariable.html">Remove-EnvironmentVariable</a></li>
 			<li><a href="Resolve-NetPath.html">Resolve-NetPath</a></li>
 			<li><a href="Set-EnvironmentVariable.html">Set-EnvironmentVariable</a></li>
@@ -48,7 +47,6 @@
 		</ul>
 		<li class="Category">Cryptography</li>
 		<ul class="CommandMenu">
-			<li><a href="New-RsaKeyPair.html">New-RsaKeyPair</a></li>
 			<li><a href="Protect-String.html">Protect-String</a></li>
 			<li><a href="Unprotect-String.html">Unprotect-String</a></li>
 		</ul>
@@ -58,30 +56,16 @@
 			<li><a href="Set-DotNetConnectionString.html">Set-DotNetConnectionString</a></li>
 			<li><a href="Test-DotNet.html">Test-DotNet</a></li>
 		</ul>
-		<li class="Category">DSC</li>
-		<ul class="CommandMenu">
-			<li><a href="Clear-DscLocalResourceCache.html">Clear-DscLocalResourceCache</a></li>
-			<li><a href="Clear-MofAuthoringMetadata.html">Clear-MofAuthoringMetadata</a></li>
-			<li><a href="Copy-DscResource.html">Copy-DscResource</a></li>
-			<li><a href="Get-DscError.html">Get-DscError</a></li>
-			<li><a href="Initialize-Lcm.html">Initialize-Lcm</a></li>
-			<li><a href="Start-DscPullConfiguration.html">Start-DscPullConfiguration</a></li>
-			<li><a href="Test-DscTargetResource.html">Test-DscTargetResource</a></li>
-			<li><a href="Write-DscError.html">Write-DscError</a></li>
-		</ul>
 		<li class="Category">FileSystem</li>
 		<ul class="CommandMenu">
-			<li><a href="Compress-Item.html">Compress-Item</a></li>
 			<li><a href="Disable-NtfsCompression.html">Disable-NtfsCompression</a></li>
 			<li><a href="Enable-NtfsCompression.html">Enable-NtfsCompression</a></li>
-			<li><a href="Expand-Item.html">Expand-Item</a></li>
 			<li><a href="Install-Junction.html">Install-Junction</a></li>
 			<li><a href="New-Junction.html">New-Junction</a></li>
-			<li><a href="New-TempDirectory.html">New-TempDirectory</a></li>
+			<li><a href="New-TempDir.html">New-TempDir</a></li>
 			<li><a href="Remove-Junction.html">Remove-Junction</a></li>
 			<li><a href="Test-NtfsCompression.html">Test-NtfsCompression</a></li>
 			<li><a href="Test-PathIsJunction.html">Test-PathIsJunction</a></li>
-			<li><a href="Test-ZipFile.html">Test-ZipFile</a></li>
 		</ul>
 		<li class="Category">Firewall</li>
 		<ul class="CommandMenu">
@@ -101,6 +85,7 @@
 		<li class="Category">IIS</li>
 		<ul class="CommandMenu">
 			<li><a href="Add-IisDefaultDocument.html">Add-IisDefaultDocument</a></li>
+			<li><a href="Add-IisServerManagerMember.html">Add-IisServerManagerMember</a></li>
 			<li><a href="Disable-IisSecurityAuthentication.html">Disable-IisSecurityAuthentication</a></li>
 			<li><a href="Enable-IisDirectoryBrowsing.html">Enable-IisDirectoryBrowsing</a></li>
 			<li><a href="Enable-IisSecurityAuthentication.html">Enable-IisSecurityAuthentication</a></li>
@@ -187,7 +172,7 @@
 		<ul class="CommandMenu">
 			<li><a href="Add-TrustedHost.html">Add-TrustedHost</a></li>
 			<li><a href="Clear-TrustedHost.html">Clear-TrustedHost</a></li>
-			<li><a href="Get-PowerShellModuleInstallPath.html">Get-PowerShellModuleInstallPath</a></li>
+			<li><a href="Complete-Job.html">Complete-Job</a></li>
 			<li><a href="Get-PowershellPath.html">Get-PowershellPath</a></li>
 			<li><a href="Get-TrustedHost.html">Get-TrustedHost</a></li>
 			<li><a href="Invoke-PowerShell.html">Invoke-PowerShell</a></li>
@@ -214,14 +199,13 @@
 		<ul class="CommandMenu">
 			<li><a href="Assert-AdminPrivilege.html">Assert-AdminPrivilege</a></li>
 			<li><a href="Convert-SecureStringToString.html">Convert-SecureStringToString</a></li>
-			<li><a href="ConvertTo-ContainerInheritanceFlags.html">ConvertTo-ContainerInheritanceFlags</a></li>
 			<li><a href="ConvertTo-InheritanceFlag.html">ConvertTo-InheritanceFlag</a></li>
 			<li><a href="ConvertTo-PropagationFlag.html">ConvertTo-PropagationFlag</a></li>
+			<li><a href="ConvertTo-ProviderAccessControlRights.html">ConvertTo-ProviderAccessControlRights</a></li>
 			<li><a href="Get-Permission.html">Get-Permission</a></li>
 			<li><a href="Grant-Permission.html">Grant-Permission</a></li>
 			<li><a href="New-Credential.html">New-Credential</a></li>
 			<li><a href="Protect-Acl.html">Protect-Acl</a></li>
-			<li><a href="Revoke-Permission.html">Revoke-Permission</a></li>
 			<li><a href="Test-AdminPrivilege.html">Test-AdminPrivilege</a></li>
 			<li><a href="Test-Permission.html">Test-Permission</a></li>
 		</ul>
@@ -229,7 +213,6 @@
 		<ul class="CommandMenu">
 			<li><a href="Assert-Service.html">Assert-Service</a></li>
 			<li><a href="Get-ServiceAcl.html">Get-ServiceAcl</a></li>
-			<li><a href="Get-ServiceConfiguration.html">Get-ServiceConfiguration</a></li>
 			<li><a href="Get-ServicePermission.html">Get-ServicePermission</a></li>
 			<li><a href="Get-ServiceSecurityDescriptor.html">Get-ServiceSecurityDescriptor</a></li>
 			<li><a href="Grant-ServiceControlPermission.html">Grant-ServiceControlPermission</a></li>
@@ -253,22 +236,20 @@
 		<li class="Category">UsersAndGroups</li>
 		<ul class="CommandMenu">
 			<li><a href="Add-GroupMember.html">Add-GroupMember</a></li>
-			<li><a href="Get-Group.html">Get-Group</a></li>
-			<li><a href="Get-User.html">Get-User</a></li>
 			<li><a href="Get-WmiLocalUserAccount.html">Get-WmiLocalUserAccount</a></li>
 			<li><a href="Install-Group.html">Install-Group</a></li>
 			<li><a href="Install-User.html">Install-User</a></li>
-			<li><a href="Remove-GroupMember.html">Remove-GroupMember</a></li>
-			<li><a href="Resolve-Identity.html">Resolve-Identity</a></li>
-			<li><a href="Test-Group.html">Test-Group</a></li>
+			<li><a href="Resolve-IdentityName.html">Resolve-IdentityName</a></li>
 			<li><a href="Test-Identity.html">Test-Identity</a></li>
 			<li><a href="Test-User.html">Test-User</a></li>
 			<li><a href="Uninstall-User.html">Uninstall-User</a></li>
 		</ul>
 		<li class="Category">WindowsFeatures</li>
 		<ul class="CommandMenu">
+			<li><a href="Assert-WindowsFeatureFunctionsSupported.html">Assert-WindowsFeatureFunctionsSupported</a></li>
 			<li><a href="Get-WindowsFeature.html">Get-WindowsFeature</a></li>
 			<li><a href="Install-WindowsFeature.html">Install-WindowsFeature</a></li>
+			<li><a href="Resolve-WindowsFeatureName.html">Resolve-WindowsFeatureName</a></li>
 			<li><a href="Test-WindowsFeature.html">Test-WindowsFeature</a></li>
 			<li><a href="Uninstall-WindowsFeature.html">Uninstall-WindowsFeature</a></li>
 		</ul>
@@ -280,78 +261,54 @@
 </div>
 
 
-<h1>Test-DscTargetResource</h1>
-<div><p>Tests that all the properties on a resource and object are the same.</p></div>
-
-<h2>Syntax</h2>
-<pre class="Syntax"><code>Test-DscTargetResource [-TargetResource] &lt;Hashtable&gt; [-DesiredResource] &lt;Hashtable&gt; [-Target] &lt;String&gt; [&lt;CommonParameters&gt;]</code></pre>
-    
-<h2>Description</h2>
-<div class="Description">
-<p>DSC expects a resource's <code>Test-TargetResource</code> function to return <code>$false</code> if an object needs to be updated. Usually, you compare the current state of a resource with the desired state, and return <code>$false</code> if anything doesn't match.</p>
-
-<p>This function takes in a hashtable of the current resource's state (what's returned by <code>Get-TargetResource</code>) and compares it to the desired state (the values passed to <code>Test-TargetResource</code>). If any property in the target resource is different than the desired resource, a list of stale resources is written to the verbose stream and <code>$false</code> is returned. </p>
-
-<p>Here's a quick example:</p>
-
-<pre><code>return Test-TargetResource -TargetResource (Get-TargetResource -Name 'fubar') -DesiredResource $PSBoundParameters -Target ('my resource ''fubar''')
-</code></pre>
-
-<p>If you want to exclude properties from the evaluation, just remove them from the hashtable returned by <code>Get-TargetResource</code>:</p>
-
-<pre><code>$resource = Get-TargetResource -Name 'fubar'
-$resource.Remove( 'PropertyThatDoesNotMatter' )
-return Test-TargetResource -TargetResource $resource -DesiredResource $PSBoundParameters -Target ('my resource ''fubar''')
-</code></pre>
+    <h1>Resolve-WindowsFeatureName</h1>
+    <div><p>INTERNAL.  DO NOT USE.  Converts a Carbon-specific, common Windows feature name, into the feature name used on the current computer.</p>
 </div>
+
+        <h2>Syntax</h2>
+    <pre class="Syntax"><code>Resolve-WindowsFeatureName [-Name] &lt;String[]&gt; [&lt;CommonParameters&gt;]</code></pre>
+    
+        <h2>Description</h2>
+    <div class="Description">
+        <p>Windows feature names change between versions.  This function converts a Carbon-specific name into feature names used on the current computer's version of Windows.</p>
+
+<p><strong>This function is not available on Windows 8/2012.</strong></p>
+
+    </div>
+    
     
 
-
-<h2> Parameters </h2>
-<table border='1'>
-<tr>
-	<th>Name</th>
-    <th>Type</th>
-	<th>Description</th>
-	<th>Required?</th>
-	<th>Pipeline Input</th>
-	<th>Default Value</th>
-</tr>
-<tr valign='top'>
-	<td>TargetResource</td>
-	<td><a href="http://msdn.microsoft.com/en-us/library/system.collections.hashtable.aspx">Hashtable</a></td>
-	<td>The current state of the resource.</td>
-	<td>true</td>
-	<td>false</td>
-    <td></td>
-</tr>
-<tr valign='top'>
-	<td>DesiredResource</td>
-	<td><a href="http://msdn.microsoft.com/en-us/library/system.collections.hashtable.aspx">Hashtable</a></td>
-	<td>The desired state of the resource. Properties not in this hashtable are skipped. Usually you'll pass <code>PSBoundParameters</code> from your <code>Test-TargetResource</code> function.</td>
-	<td>true</td>
-	<td>false</td>
-    <td></td>
-</tr>
-<tr valign='top'>
-	<td>Target</td>
-	<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
-	<td>The a description of the target object being tested. Output in verbose messages.</td>
-	<td>true</td>
-	<td>false</td>
-    <td></td>
-</tr>
-
-</table>
+    		<h2> Parameters </h2>
+		<table border='1'>
+			<tr>
+				<th>Name</th>
+                <th>Type</th>
+				<th>Description</th>
+				<th>Required?</th>
+				<th>Pipeline Input</th>
+				<th>Default Value</th>
+			</tr>
+            			<tr valign='top'>
+				<td>Name</td>
+				<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String[]</a></td>
+				<td>The Carbon feature names to convert to Windows-specific feature names.
+</td>
+				<td>true</td>
+				<td>false</td>
+                <td></td>
+			</tr>
+            
+        </table>
         
-
+    
         
-
+    
         
-
+    
         
-<h2>EXAMPLE 1</h2>
-<pre><code>Test-TargetResource -TargetResource (Get-TargetResource -Name 'fubar') -DesiredResource $PSBoundParameters -Target ('my resource ''fubar''')</code></pre>
-<p>Demonstrates how to test that all the properties on a DSC resource are the same was what's desired.</p>
+                <h2>EXAMPLE 1</h2>
+            <pre><code>Resolve-WindowsFeatureNames -Name 'Iis','Msmq'</code></pre>
+            <p><p>Returns <code>'IIS-WebServer','MSMQ-Server'</code> if running Windows 7/Windows 2008 R2, or <code>'Web-WebServer','MSMQ-Server'</code> if on Windows 2008.</p>
+</p><p></p><p></p><p></p><p></p>
 </body>
-</html>
+</html>   
