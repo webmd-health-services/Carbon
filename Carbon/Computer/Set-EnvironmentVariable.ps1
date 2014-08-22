@@ -23,6 +23,12 @@ function Set-EnvironmentVariable
     
     Changes to environment variables in the User and Machine scope are not picked up by running processes.  Any running processes that use this environment variable should be restarted.
     
+    .LINK
+    Remove-EnvironmentVariable
+
+    .LINK
+    http://msdn.microsoft.com/en-us/library/z8te35sa
+
     .EXAMPLE
     Set-EnvironmentVariable -Name 'MyEnvironmentVariable' -Value 'Value1' -ForProcess
     
@@ -33,8 +39,6 @@ function Set-EnvironmentVariable
     
     Creates the `MyEnvironmentVariable` with an initial value of `Value1` in the machine scope, i.e. the variable is accessible in all newly launched processes.
     
-    .LINK
-    http://msdn.microsoft.com/en-us/library/z8te35sa
     #>
     [CmdletBinding(SupportsShouldProcess=$true)]
     param(

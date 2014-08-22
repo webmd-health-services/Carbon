@@ -20,6 +20,15 @@ function Test-Privilege
     
     .DESCRIPTION
     Returns `true` if an identity has a privilege.  `False` otherwise.
+
+    .LINK
+    Get-Privilege
+
+    .LINK
+    Grant-Privilege
+
+    .LINK
+    Revoke-Privilege
     
     .EXAMPLE
     Test-Privilege -Identity Forrester -Privilege SeServiceLogonRight

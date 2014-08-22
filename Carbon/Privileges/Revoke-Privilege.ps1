@@ -16,7 +16,7 @@ function Revoke-Privilege
 {
     <#
     .SYNOPSIS
-    Revokes an identity's priveleges to perform system operations.
+    Revokes an identity's privileges to perform system operations and certain types of logons.
     
     .DESCRIPTION
     Valid privileges are documented on Microsoft's website: [Privilege Constants](http://msdn.microsoft.com/en-us/library/windows/desktop/bb530716.aspx) and [Account Right Constants](http://msdn.microsoft.com/en-us/library/windows/desktop/bb545671.aspx). Known values as of August 2014 are:
@@ -68,9 +68,6 @@ function Revoke-Privilege
      * SeUnsolicitedInputPrivilege
 
     .LINK
-    http://msdn.microsoft.com/en-us/library/windows/desktop/aa375728.aspx
-    
-    .LINK
     Get-Privilege
     
     .LINK
@@ -78,6 +75,12 @@ function Revoke-Privilege
     
     .LINK
     Test-Privilege
+    
+    .LINK
+    http://msdn.microsoft.com/en-us/library/windows/desktop/bb530716.aspx
+    
+    .LINK
+    http://msdn.microsoft.com/en-us/library/windows/desktop/bb545671.aspx
     
     .EXAMPLE
     Revoke-Privilege -Identity Batcomputer -Privilege SeServiceLogonRight
@@ -93,7 +96,7 @@ function Revoke-Privilege
         
         [Parameter(Mandatory=$true)]
         [string[]]
-        # The privileges to grant.
+        # The privileges to revoke.
         $Privilege
     )
     

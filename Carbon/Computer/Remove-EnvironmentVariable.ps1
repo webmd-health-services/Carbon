@@ -23,13 +23,16 @@ function Remove-EnvironmentVariable
     
     Changes to environment variables in the User and Machine scope are not picked up by running processes.  Any running processes that use this environment variable should be restarted.
     
+    .LINK
+    Set-EnvironmentVariable
+    
+    .LINK
+    http://msdn.microsoft.com/en-us/library/z8te35sa
+
     .EXAMPLE
     Remove-EnvironmentVariable -Name 'MyEnvironmentVariable' -ForProcess
     
     Removes the `MyEnvironmentVariable` from the process scope.
-    
-    .LINK
-    http://msdn.microsoft.com/en-us/library/z8te35sa
     #>
     [CmdletBinding(SupportsShouldProcess=$true)]
     param(
