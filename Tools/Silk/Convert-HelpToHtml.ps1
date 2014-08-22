@@ -213,11 +213,19 @@ $description
         $examples = $help.Examples.example |
             Where-Object { $_ } |
             ForEach-Object {
+                $title = $_.title.Trim(('-',' '))
+                $code = ''
+                if( $_.code )
+                {
+                    $code = $_.code | Out-HtmlString
+                    $code = '<pre><code>{0}</code></pre>' -f $code
+                }
+                $remarks = $_.remarks | Out-HtmlString | Convert-MarkdownToHtml
                 @"
 <h2>{0}</h2>
-<pre><code>{1}</code></pre>
+{1}
 {2}
-"@ -f $_.title.Trim(('-',' ')),($_.code | Out-HtmlString),($_.remarks | Out-HtmlString | Convert-MarkdownToHtml)
+"@ -f $title,$code,$remarks
             }
     
         $filename = $help.Name
