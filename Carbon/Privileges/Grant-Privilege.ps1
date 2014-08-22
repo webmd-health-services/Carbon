@@ -19,8 +19,9 @@ function Grant-Privilege
     Grants an identity priveleges to perform system operations.
     
     .DESCRIPTION
-    *Privilege names are **case-sensitive**.* The most current list of privileges can be found [on Microsoft's website](http://msdn.microsoft.com/en-us/library/windows/desktop/aa375728.aspx). Here is the most current list, as of November 2012:
+    *Privilege names are **case-sensitive**.* Valid privileges are documented on Microsoft's website: [Privilege Constants](http://msdn.microsoft.com/en-us/library/windows/desktop/bb530716.aspx) and [Account Right Constants](http://msdn.microsoft.com/en-us/library/windows/desktop/bb545671.aspx). Here is the most current list, as of August 2014:
 
+     * SeAssignPrimaryTokenPrivilege
      * SeAuditPrivilege
      * SeBackupPrivilege
      * SeBatchLogonRight
@@ -28,6 +29,8 @@ function Grant-Privilege
      * SeCreateGlobalPrivilege
      * SeCreatePagefilePrivilege
      * SeCreatePermanentPrivilege
+     * SeCreateSymbolicLinkPrivilege
+     * SeCreateTokenPrivilege
      * SeDebugPrivilege
      * SeDenyBatchLogonRight
      * SeDenyInteractiveLogonRight
@@ -38,6 +41,7 @@ function Grant-Privilege
      * SeImpersonatePrivilege
      * SeIncreaseBasePriorityPrivilege
      * SeIncreaseQuotaPrivilege
+     * SeIncreaseWorkingSetPrivilege
      * SeInteractiveLogonRight
      * SeLoadDriverPrivilege
      * SeLockMemoryPrivilege
@@ -45,10 +49,10 @@ function Grant-Privilege
      * SeManageVolumePrivilege
      * SeNetworkLogonRight
      * SeProfileSingleProcessPrivilege
-     * SeRestorePrivilege
+     * SeRelabelPrivilege
      * SeRemoteInteractiveLogonRight
      * SeRemoteShutdownPrivilege
-     * SeReserveProcessorPrivilege
+     * SeRestorePrivilege
      * SeSecurityPrivilege
      * SeServiceLogonRight
      * SeShutdownPrivilege
@@ -58,13 +62,11 @@ function Grant-Privilege
      * SeSystemtimePrivilege
      * SeTakeOwnershipPrivilege
      * SeTcbPrivilege
+     * SeTimeZonePrivilege
      * SeTrustedCredManAccessPrivilege
      * SeUndockPrivilege
      * SeUnsolicitedInputPrivilege
 
-    .LINK
-    http://msdn.microsoft.com/en-us/library/windows/desktop/aa375728.aspx
-    
     .LINK
     Get-Privilege
     
@@ -73,6 +75,12 @@ function Grant-Privilege
     
     .LINK
     Test-Privilege
+    
+    .LINK
+    http://msdn.microsoft.com/en-us/library/windows/desktop/bb530716.aspx
+    
+    .LINK
+    http://msdn.microsoft.com/en-us/library/windows/desktop/bb545671.aspx
     
     .EXAMPLE
     Grant-Privilege -Identity Batcomputer -Privilege SeServiceLogonRight

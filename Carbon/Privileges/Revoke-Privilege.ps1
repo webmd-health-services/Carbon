@@ -19,8 +19,9 @@ function Revoke-Privilege
     Revokes an identity's privileges to perform system operations and certain types of logons.
     
     .DESCRIPTION
-    Valid privileges are documented on Microsoft's website: [Privilege Constants](http://msdn.microsoft.com/en-us/library/windows/desktop/bb530716.aspx) and [Account Right Constants](http://msdn.microsoft.com/en-us/library/windows/desktop/bb545671.aspx). Known values as of November 2012 are:
+    Valid privileges are documented on Microsoft's website: [Privilege Constants](http://msdn.microsoft.com/en-us/library/windows/desktop/bb530716.aspx) and [Account Right Constants](http://msdn.microsoft.com/en-us/library/windows/desktop/bb545671.aspx). Known values as of August 2014 are:
 
+     * SeAssignPrimaryTokenPrivilege
      * SeAuditPrivilege
      * SeBackupPrivilege
      * SeBatchLogonRight
@@ -28,6 +29,8 @@ function Revoke-Privilege
      * SeCreateGlobalPrivilege
      * SeCreatePagefilePrivilege
      * SeCreatePermanentPrivilege
+     * SeCreateSymbolicLinkPrivilege
+     * SeCreateTokenPrivilege
      * SeDebugPrivilege
      * SeDenyBatchLogonRight
      * SeDenyInteractiveLogonRight
@@ -38,6 +41,7 @@ function Revoke-Privilege
      * SeImpersonatePrivilege
      * SeIncreaseBasePriorityPrivilege
      * SeIncreaseQuotaPrivilege
+     * SeIncreaseWorkingSetPrivilege
      * SeInteractiveLogonRight
      * SeLoadDriverPrivilege
      * SeLockMemoryPrivilege
@@ -45,10 +49,10 @@ function Revoke-Privilege
      * SeManageVolumePrivilege
      * SeNetworkLogonRight
      * SeProfileSingleProcessPrivilege
-     * SeRestorePrivilege
+     * SeRelabelPrivilege
      * SeRemoteInteractiveLogonRight
      * SeRemoteShutdownPrivilege
-     * SeReserveProcessorPrivilege
+     * SeRestorePrivilege
      * SeSecurityPrivilege
      * SeServiceLogonRight
      * SeShutdownPrivilege
@@ -58,6 +62,7 @@ function Revoke-Privilege
      * SeSystemtimePrivilege
      * SeTakeOwnershipPrivilege
      * SeTcbPrivilege
+     * SeTimeZonePrivilege
      * SeTrustedCredManAccessPrivilege
      * SeUndockPrivilege
      * SeUnsolicitedInputPrivilege
