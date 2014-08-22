@@ -9,22 +9,32 @@ filter Convert-HelpToHtml
         [Parameter(Mandatory=$true,ValueFromPipeline=$true)]
         [string[]]
         # The name of the command(s) to document.
-        $Name
+        $Name,
+
+        [string]
+        # The display name. Useful if the command name being documented is different than its public name, e.g. DSC resources.
+        $DisplayName,
+
+        [string]
+        # The syntax of the command. Useful when showing syntax for DSC resources.
+        $Syntax
     )
 
     foreach( $commandName in $Name )
     {
         $help = Get-Help -Name $commandName -Full
 
-        $name = $help.Name #| Format-ForHtml
         $synopsis = $help.Synopsis | Convert-MarkdownToHtml
-        $syntax = $help.Syntax | Out-HtmlString | Format-ForHtml | ForEach-Object { $_ -split "`n" }
-        if( $syntax )
+        if( -not $Syntax )
         {
-            $syntax = @"
+            $Syntax = $help.Syntax | Out-HtmlString | Format-ForHtml | ForEach-Object { $_ -split "`n" }
+        }
+        if( $Syntax )
+        {
+            $Syntax = @"
 <h2>Syntax</h2>
 <pre class="Syntax"><code>{0}</code></pre>
-"@ -f ($syntax -join "</code></pre>`n<pre class=""Syntax""><code>")
+"@ -f ($Syntax -join "</code></pre>`n<pre class=""Syntax""><code>")
         }
     
         $description = $help.Description | Out-HtmlString | Convert-MarkdownToHtml
@@ -67,22 +77,22 @@ $description
 "@ -f ($relatedCommands | Convert-MarkdownToHtml)
         }
     
+        $commonParameterNames = @{
+                                    'Verbose' = $true;
+                                    'Debug' = $true;
+                                    'WarningAction' = $true;
+                                    'WarningVariable' = $true;
+                                    'ErrorAction' = $true;
+                                    'ErrorVariable' = $true;
+                                    'OutVariable' = $true;
+                                    'OutBuffer' = $true;
+                                    'WhatIf' = $true;
+                                    'Confirm' = $true;
+                                }
         $hasCommonParameters = $false
         $parameters = $help.Parameters.Parameter |
             Where-Object { $_ } | 
             ForEach-Object {
-                $commonParameterNames = @{
-                                        'Verbose' = $true;
-                                        'Debug' = $true;
-                                        'WarningAction' = $true;
-                                        'WarningVariable' = $true;
-                                        'ErrorAction' = $true;
-                                        'ErrorVariable' = $true;
-                                        'OutVariable' = $true;
-                                        'OutBuffer' = $true;
-                                        'WhatIf' = $true;
-                                        'Confirm' = $true;
-                                     }
                 if( $commonParameterNames.ContainsKey( $_.name ) )
                 {
                     $hasCommonParameters = $true
@@ -94,6 +104,12 @@ $description
                 {
                     $typeName = $typeName -replace '\[\]',''
                 }
+
+                if( $typeName -eq 'bool' )
+                {
+                    $typeName = 'boolean'
+                }
+
                 $typeFullName = $loadedTypes[$typeName]
                 $typeLink = $typeDisplayName
                 if( -not $typeFullName )
@@ -212,8 +228,13 @@ $description
             $filename = $help.FileName
         }
 
+    if( -not $DisplayName )
+    {
+        $DisplayName = $commandName
+    }
+
     @"
-<h1>$name</h1>
+<h1>$DisplayName</h1>
 <div>$synopsis</div>
 
 $syntax
