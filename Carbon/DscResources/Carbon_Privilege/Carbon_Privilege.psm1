@@ -87,8 +87,9 @@ function Set-TargetResource
     
     To revoke *all* a user's privileges, set the `Ensure` property to `Absent`. To revoke specific privileges, grant the user just the desired privileges. All others are revoked.
 
-    *Privilege names are **case-sensitive**.* Valid privileges are documented on Microsoft's website: [Privilege Constants](http://msdn.microsoft.com/en-us/library/windows/desktop/bb530716.aspx) and [Account Right Constants](http://msdn.microsoft.com/en-us/library/windows/desktop/bb545671.aspx). Known values as of November 2012 are:
+    *Privilege names are **case-sensitive**.* Valid privileges are documented on Microsoft's website: [Privilege Constants](http://msdn.microsoft.com/en-us/library/windows/desktop/bb530716.aspx) and [Account Right Constants](http://msdn.microsoft.com/en-us/library/windows/desktop/bb545671.aspx). Here is the most current list, as of August 2014:
 
+     * SeAssignPrimaryTokenPrivilege
      * SeAuditPrivilege
      * SeBackupPrivilege
      * SeBatchLogonRight
@@ -96,6 +97,8 @@ function Set-TargetResource
      * SeCreateGlobalPrivilege
      * SeCreatePagefilePrivilege
      * SeCreatePermanentPrivilege
+     * SeCreateSymbolicLinkPrivilege
+     * SeCreateTokenPrivilege
      * SeDebugPrivilege
      * SeDenyBatchLogonRight
      * SeDenyInteractiveLogonRight
@@ -106,6 +109,7 @@ function Set-TargetResource
      * SeImpersonatePrivilege
      * SeIncreaseBasePriorityPrivilege
      * SeIncreaseQuotaPrivilege
+     * SeIncreaseWorkingSetPrivilege
      * SeInteractiveLogonRight
      * SeLoadDriverPrivilege
      * SeLockMemoryPrivilege
@@ -113,10 +117,10 @@ function Set-TargetResource
      * SeManageVolumePrivilege
      * SeNetworkLogonRight
      * SeProfileSingleProcessPrivilege
-     * SeRestorePrivilege
+     * SeRelabelPrivilege
      * SeRemoteInteractiveLogonRight
      * SeRemoteShutdownPrivilege
-     * SeReserveProcessorPrivilege
+     * SeRestorePrivilege
      * SeSecurityPrivilege
      * SeServiceLogonRight
      * SeShutdownPrivilege
@@ -126,6 +130,7 @@ function Set-TargetResource
      * SeSystemtimePrivilege
      * SeTakeOwnershipPrivilege
      * SeTcbPrivilege
+     * SeTimeZonePrivilege
      * SeTrustedCredManAccessPrivilege
      * SeUndockPrivilege
      * SeUnsolicitedInputPrivilege
