@@ -33,7 +33,7 @@ function Get-TargetResource
         [ValidateSet('Present','Absent')]
         [string]
         # Should the user exist or not exist?
-        $Ensure
+        $Ensure = 'Present'
     )
 
     Set-StrictMode -Version 'Latest'
@@ -76,6 +76,98 @@ function Get-TargetResource
 
 function Set-TargetResource
 {
+    <#
+    .SYNOPSIS
+    DSC resource for managing privileges.
+
+    .DESCRIPTION
+    The `Carbon_Privilege` resource manages privileges, i.e. the system operations and logons a user or group can perform.
+
+    Privileges are granted by default. The user/group is granted only the privileges specified by the `Privilege` property. All other privileges are revoked.
+    
+    To revoke *all* a user's privileges, set the `Ensure` property to `Absent`. To revoke specific privileges, grant the user just the desired privileges. All others are revoked.
+
+    *Privilege names are **case-sensitive**.* Valid privileges are documented on Microsoft's website: [Privilege Constants](http://msdn.microsoft.com/en-us/library/windows/desktop/bb530716.aspx) and [Account Right Constants](http://msdn.microsoft.com/en-us/library/windows/desktop/bb545671.aspx). Known values as of November 2012 are:
+
+     * SeAuditPrivilege
+     * SeBackupPrivilege
+     * SeBatchLogonRight
+     * SeChangeNotifyPrivilege
+     * SeCreateGlobalPrivilege
+     * SeCreatePagefilePrivilege
+     * SeCreatePermanentPrivilege
+     * SeDebugPrivilege
+     * SeDenyBatchLogonRight
+     * SeDenyInteractiveLogonRight
+     * SeDenyNetworkLogonRight
+     * SeDenyRemoteInteractiveLogonRight
+     * SeDenyServiceLogonRight
+     * SeEnableDelegationPrivilege
+     * SeImpersonatePrivilege
+     * SeIncreaseBasePriorityPrivilege
+     * SeIncreaseQuotaPrivilege
+     * SeInteractiveLogonRight
+     * SeLoadDriverPrivilege
+     * SeLockMemoryPrivilege
+     * SeMachineAccountPrivilege
+     * SeManageVolumePrivilege
+     * SeNetworkLogonRight
+     * SeProfileSingleProcessPrivilege
+     * SeRestorePrivilege
+     * SeRemoteInteractiveLogonRight
+     * SeRemoteShutdownPrivilege
+     * SeReserveProcessorPrivilege
+     * SeSecurityPrivilege
+     * SeServiceLogonRight
+     * SeShutdownPrivilege
+     * SeSyncAgentPrivilege
+     * SeSystemEnvironmentPrivilege
+     * SeSystemProfilePrivilege
+     * SeSystemtimePrivilege
+     * SeTakeOwnershipPrivilege
+     * SeTcbPrivilege
+     * SeTrustedCredManAccessPrivilege
+     * SeUndockPrivilege
+     * SeUnsolicitedInputPrivilege
+
+    .LINK
+    Get-Privilege
+
+    .LINK
+    Grant-Privilege
+
+    .LINK
+    Revoke-Privilege
+
+    .LINK
+    Test-Privilege
+
+    .LINK
+    http://msdn.microsoft.com/en-us/library/windows/desktop/bb530716.aspx
+
+    .LINK
+    http://msdn.microsoft.com/en-us/library/windows/desktop/bb545671.aspx
+
+    .EXAMPLE
+    >
+    Demonstrates how to grant a service user the ability to log in as a service.
+
+        Carbon_Privilege GrantServiceLogonPrivileges
+        {
+            Identity = 'CarbonServiceUser'
+            Privilege = 'SeBatchLogonRight','SeServiceLogonRight';
+        }
+
+    .EXAMPLE
+    >
+    Demonstrates how to revoke all a user/group's privileges. To revoke specific privileges, grant just the privileges you want. All other privileges are revoked.
+
+        Carbon_Privilege RevokePrivileges
+        {
+            Identity = 'CarbonServiceUser'
+            Ensure = 'Absent'
+        }
+    #>
     [CmdletBinding(SupportsShouldProcess=$true)]
     param(
         [Parameter(Mandatory=$true)]
@@ -86,14 +178,13 @@ function Set-TargetResource
         [Parameter(Mandatory=$true)]
         [AllowEmptyCollection()]
         [string[]]
-        # The user's expected/desired privileges.
+        # The user's expected/desired privileges. *Privilege names are **case-sensitive**.* Ignored when `Ensure` is set to `Absent`.
         $Privilege,
         
-        [Parameter(Mandatory=$true)]
         [ValidateSet('Present','Absent')]
         [string]
         # Should the user exist or not exist?
-        $Ensure
+        $Ensure = 'Present'
     )
 
     Set-StrictMode -Version 'Latest'
@@ -129,11 +220,10 @@ function Test-TargetResource
         # The user's expected/desired privileges.
         $Privilege,
         
-        [Parameter(Mandatory=$true)]
         [ValidateSet('Present','Absent')]
         [string]
         # Should the user exist or not exist?
-        $Ensure
+        $Ensure = 'Present'
     )
 
     Set-StrictMode -Version 'Latest'

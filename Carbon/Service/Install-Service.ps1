@@ -26,6 +26,12 @@ function Install-Service
     [Managed service accounts and virtual accounts](http://technet.microsoft.com/en-us/library/dd548356.aspx) should be supported (we don't know how to test, so can't be sure).  Simply omit the `-Password` parameter when providing a custom account name with the `-Username` parameter.
 
     .LINK
+    Carbon_Service
+
+    .LINK
+    Uninstall-Service
+
+    .LINK
     http://technet.microsoft.com/en-us/library/dd548356.aspx
 
     .EXAMPLE

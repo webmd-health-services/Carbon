@@ -64,7 +64,7 @@ function Get-TargetResource
 		[ValidateSet("Present","Absent")]
 		[string]
         # Create or delete the NPM config value?
-		$Ensure
+		$Ensure = 'Present'
 	)
     
     Set-StrictMode -Version 'Latest'
@@ -94,6 +94,45 @@ function Get-TargetResource
 
 function Set-TargetResource
 {
+    <#
+    .SYNOPSIS
+    DSC resource for configuring Node Package Manager (NPM) settings.
+
+    .DESCRIPTION
+    The `Carbon_NpmConfig` resource sets NPM configuration settings in the global NPM config file, which is usually found at `C:\Program Files\nodejs\node_modules\npm\npmrc`. All settings added/removed using this resource will be used for all users on the computer, unless a user overrides the setting.
+
+    .LINK
+    Remove-IniEntry
+
+    .LINK
+    Set-IniEntry
+
+    .LINK
+    Split-Ini
+
+    .EXAMPLE
+    >
+    Demonstrates how to create/set an NPM config value.
+
+        Carbon_NpmConfig SetNpmPrefix
+        {
+            Name = 'prefix';
+            Value = 'C:\node-global-modules';
+            Ensure = 'Present';
+        }
+
+    In this case, we're setting the directory all users will use to store node modules.
+
+    .EXAMPLE
+    >
+    Demonstrates how to remove an NPM config value.
+
+        Carbon_NpmConfig SetNpmPrefix
+        {
+            Name = 'prefix';
+            Ensure = 'Absent';
+        }
+    #>
 	[CmdletBinding()]
 	param
 	(
@@ -103,13 +142,13 @@ function Set-TargetResource
 		$Name,
 
 		[string]
-        # the value of the NPM config value.        
+        # The value of the NPM config value. Required when `Ensure` is set to `Present`.
 		$Value,
 
 		[ValidateSet("Present","Absent")]
 		[string]
         # Create or delete the NPM config value?
-		$Ensure
+		$Ensure = 'Present'
 	)
     
     Set-StrictMode -Version 'Latest'
@@ -153,7 +192,7 @@ function Test-TargetResource
 		[ValidateSet("Present","Absent")]
 		[string]
         # Create or delete the NPM config value?
-		$Ensure
+		$Ensure = 'Present'
 	)
     
     Set-StrictMode -Version 'Latest'

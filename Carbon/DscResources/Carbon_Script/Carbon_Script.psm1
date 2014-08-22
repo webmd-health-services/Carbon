@@ -69,11 +69,12 @@ function Set-TargetResource
 {
     <#
     .SYNOPSIS
-    Runs custom PowerShell script.
+    DSC resource for running PowerShell script blocks, including the ability to pass arguments to those blocks.
 
     .DESCRIPTION
+    The `Carbon_Script` resource runs custom PowerShell script blocks, with support for passing arguments to those blocks. Passing arguments is optional.
 
-    This resource exists because the native PowerShell `Script` resource doesn't allow you to pass arguments to your script block. This resource provides that capability.
+    This is useful if you want to run custom code on multiple computers, but the code needs to vary slightly between those computers.
 
     The `GetScript` script must return a hashtable. 
 
@@ -86,34 +87,84 @@ function Set-TargetResource
     In fact, you can call any of the `*-TargetResource` functions from your scripts.
 
     All arguments are passed as strings, so if you need them converted to other types, you'll have to do the converting. Be careful!
+
+    .EXAMPLE
+    >
+    Demonstrates how to use the `Carbon_Script` resource.
+
+        Carbon_Script CustomizeIt
+        {
+            GetScript = {
+                param(
+                    $Name
+                )
+
+                if( Get-Service -Name $Name -ErrorACtion Ignore )
+                {
+                    return @{
+                        Ensure = 'Present'
+                    }
+                }
+                else
+                {
+                    return @{
+                        Ensure = 'Absent';
+                    }
+                }
+            }
+            GetArgumentList = @( 'CarbonNoOpService' ;
+            SetScript = {
+                param(
+                    $Name
+                )
+
+                $resource = Get-TargetResource -Name $Name
+                if( $resource.Ensure -eq 'Present' )
+                {
+                    Restart-Service -Name $Name
+                }
+            }
+            SetARgumentList = @( 'CarbonNoOpService' );
+            TestScript = {
+                param(
+                    $Name
+                )
+
+                $resource = Get-TargetResource -Name $Name
+                return ($resource -eq 'Absent')
+            }
+            TestArgumentList = @( 'CarbonNoOpService' );
+        }
+
+    In this example, we are restarting a service, if it is present, and passing the name of that service into our script blocks, which is really useful if the name of the service changes between computers.
     #>
     [CmdletBinding()]
     param(
         [Parameter(Mandatory=$true)]
         [string]
-        # The name of the service.
+        # The script block to run when getting resource information.
         $GetScript,
         
         [string[]]
-        # The path to the service.
+        # The arguments to pass to the `GetScript` script block.
         $GetArgumentList,
         
         [Parameter(Mandatory=$true)]
         [string]
-        # The name of the service.
+        # The script block to run to set/remove your resource.
         $SetScript,
         
         [string[]]
-        # The path to the service.
+        # The arguments to pass to the `SetScript` script block.
         $SetArgumentList,
         
         [Parameter(Mandatory=$true)]
         [string]
-        # The name of the service.
+        # The script block to run when testing your resource. Must return `$true` or `$false`.
         $TestScript,
         
         [string[]]
-        # The path to the service.
+        # The arguments to pass to the `TestScrtip` script block.
         $TestArgumentList
     )
 

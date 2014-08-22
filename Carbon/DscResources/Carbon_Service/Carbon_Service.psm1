@@ -76,7 +76,7 @@ function Get-TargetResource
         [ValidateSet('Present','Absent')]
         [string]
         # Should the user exist or not exist?
-        $Ensure
+        $Ensure = 'Present'
     )
 
     Set-StrictMode -Version 'Latest'
@@ -125,9 +125,10 @@ function Set-TargetResource
 {
     <#
     .SYNOPSIS
-    Install/uninstalls a Windows service.
+    DSC resource for configuring Windows services.
 
     .DESCRIPTION
+    The `Carbon_Service` resource configures Windows services, including name, credentials, startup type, state, failure actions, and dependencies.
 
     The service is installed when the `Ensure` property is set to `Present`. If the service already exists, and its configuration doesn't match the properties being set, the service is stopped, its configuration updated, and the service is restarted. Properties not passed are ignored/left as-is.
 
@@ -136,10 +137,50 @@ function Set-TargetResource
     The service is uninstalled when the `Ensure` property is set to `Absent`. The service is stopped, then uninstalled.
 
     .LINK
+    Grant-Privilege
+
+    .LINK
     Install-Service
 
     .LINK
     Uninstall-Service
+
+    .EXAMPLE
+    >
+    Demonstrates how to install a service that runs as a custom account.
+
+        Carbon_Service InstallNoOpService
+        {
+            Name = 'CarbonNoOpService';
+            Path = 'C:\Projects\Carbon\bin\NoOpService.bin';
+            StartupType = 'Automatic';
+            Credential = $noOpServiceCreential';
+            OnFirstFailure = 'Restart';
+            OnSecondFailure = 'Restart';
+            RestartDelay = (1000*60*5); # 5 minutes as milliseconds
+        }
+
+    .EXAMPLE
+    >
+    Demonstrates how to install a service that runs as a built-in account.
+
+        Carbon_Service InstallNoOpService
+        {
+            Name = 'CarbonNoOpService';
+            Path = 'C:\Projects\Carbon\bin\NoOpService.bin';
+            StartupType = 'Automatic';
+            UserName = 'LocalService';
+        }
+
+    .EXAMPLE
+    >
+    Demonstrates how to remove a service.
+
+        Carbon_Service InstallNoOpService
+        {
+            Name = 'CarbonNoOpService';
+            Ensure = 'Absent';
+        }
     #>
     [CmdletBinding()]
     param(
@@ -197,11 +238,10 @@ function Set-TargetResource
         # The credentials of the custom account the service should run as.
         $Credential,
      
-        [Parameter(Mandatory=$true)]   
         [ValidateSet('Present','Absent')]
         [string]
         # If `Present`, the service is installed/updated. If `Absent`, the service is removed.
-        $Ensure
+        $Ensure = 'Present'
     )
 
     Set-StrictMode -Version 'Latest'
@@ -302,11 +342,10 @@ function Test-TargetResource
         # The custom account the service should run as.
         $Credential,
      
-        [Parameter(Mandatory=$true)]   
         [ValidateSet('Present','Absent')]
         [string]
         # If `Present`, the service is installed/updated. If `Absent`, the service is removed.
-        $Ensure
+        $Ensure = 'Present'
     )
 
     Set-StrictMode -Version 'Latest'

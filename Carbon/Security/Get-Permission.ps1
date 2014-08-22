@@ -29,6 +29,9 @@ function Get-Permission
     System.Security.AccessControl.AccessRule.
     
     .LINK
+    Carbon_Permission
+
+    .LINK
     Get-Permission
 
     .LINK

@@ -35,6 +35,9 @@ function Get-FirewallRule
     .LINK
     Assert-FirewallConfigurable
 
+    .LINK
+    Carbon_FirewallRule
+
     .EXAMPLE
     Get-FirewallRule
 

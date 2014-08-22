@@ -33,6 +33,9 @@ function Test-Permission
     System.Boolean.
 
     .LINK
+    Carbon_Permission
+
+    .LINK
     ConvertTo-ContainerInheritanceFlags
 
     .LINK

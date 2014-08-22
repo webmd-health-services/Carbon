@@ -29,6 +29,7 @@ function Get-TargetResource
         # The user or group getting the permissions.
         $Identity,
         
+        [ValidateSet("CreateFiles","AppendData","CreateSubKey","EnumerateSubKeys","CreateLink","Delete","ChangePermissions","ExecuteFile","DeleteSubdirectoriesAndFiles","FullControl","GenericRead","GenericAll","GenericExecute","QueryValues","ReadAttributes","ReadData","ReadExtendedAttributes","GenericWrite","Notify","ReadPermissions","Read","ReadAndExecute","Modify","SetValue","ReadKey","TakeOwnership","WriteAttributes","Write","Synchronize","WriteData","WriteExtendedAttributes","WriteKey")]
         [string[]]
         # The permission: e.g. FullControl, Read, etc.  For file system items, use values from [System.Security.AccessControl.FileSystemRights](http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.filesystemrights.aspx).  For registry items, use values from [System.Security.AccessControl.RegistryRights](http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.registryrights.aspx).
         $Permission,
@@ -41,7 +42,7 @@ function Get-TargetResource
         [ValidateSet('Present','Absent')]
         [string]
         # Should the user exist or not exist?
-        $Ensure
+        $Ensure = 'Present'
     )
 
     Set-StrictMode -Version 'Latest'
@@ -75,33 +76,152 @@ function Set-TargetResource
 {
     <#
     .SYNOPSIS
-    Grants/revokes a user or group permission to a file, directory, or registry key.
+    DSC resource for managing permissions on files, directories, registry keys, or a certificate's private key.
 
     .DESCRIPTION
+    The `Carbon_Permission` resource can grant or revoke permissions on a file, a directory, a registry key, or a certificate's private key.
 
-    ## Granting Permission
+    ### Granting Permission
 
     Permissions are granted when the `Ensure` property is set to `Present`.
     
-    When granting permissions, you *must* supply a value for the `Permission` property. When granting permission to a file or directory, the values for the `Permission` property must be a valid [System.Security.AccessControl.FileSystemRights](http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.filesystemrights.aspx) enumeration value. When granting permission to a registry key, `Permission` must be a valid [System.Security.AccessControl.RegistryRights](http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.registryrights.aspx) enumeration value.
-    
-    The value of the `ApplyTo` property must be a valid `Carbon.Security.ContainerInheritanceFlags` enumeration value. For a list of values, run `[Enum]::GetValues([Carbon.Security.ContainerInheritanceFlags])`. For help on choosing a proper value, see the help for `Grant-Permission`.
+    When granting permissions, you *must* supply a value for the `Permission` property. Valid values are:
 
-    ## Revoking Permission
+     * CreateFiles
+     * AppendData
+     * CreateSubKey
+     * EnumerateSubKeys
+     * CreateLink
+     * Delete
+     * ChangePermissions
+     * ExecuteFile
+     * DeleteSubdirectoriesAndFiles
+     * FullControl
+     * GenericRead
+     * GenericAll
+     * GenericExecute
+     * QueryValues
+     * ReadAttributes
+     * ReadData
+     * ReadExtendedAttributes
+     * GenericWrite
+     * Notify
+     * ReadPermissions
+     * Read
+     * ReadAndExecute
+     * Modify
+     * SetValue
+     * ReadKey
+     * TakeOwnership
+     * WriteAttributes
+     * Write
+     * Synchronize
+     * WriteData
+     * WriteExtendedAttributes
+     * WriteKey
+    
+    The `ApplyTo` property is only used when setting permissions on a directory or a registry key. Valid values are:
+
+     * Container
+     * SubContainers
+     * ContainerAndSubContainers
+     * Leaves
+     * ContainerAndLeaves
+     * SubContainersAndLeaves
+     * ContainerAndSubContainersAndLeaves
+     * ChildContainers
+     * ContainerAndChildContainers
+     * ChildLeaves
+     * ContainerAndChildLeaves
+     * ChildContainersAndChildLeaves
+     * ContainerAndChildContainersAndChildLeaves
+
+    ### Revoking Permission
         
-    Permissions are revoked when the `Ensure` property is set to `Absent`. *All* a user or group's permissions are revoked. You can't revoke part of a user's access. If you want to revoke part of a user's access, set the `Ensure` property to `Present` and the `Permissions` property to the list of properties you want the user to have.
+    Permissions are revoked when the `Ensure` property is set to `Absent`. *All* a user or group's permissions are revoked. You can't revoke part of a principal's access. If you want to revoke part of a principal's access, set the `Ensure` property to `Present` and the `Permissions` property to the list of properties you want the principal to have.
+
+    .LINK
+    Get-Permission
 
     .LINK
     Grant-Permission
 
     .LINK
     Revoke-Permission
+
+    .LINK
+    Test-Permission
+
+    .LINK
+    http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.filesystemrights.aspx
+    
+    .LINK
+    http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.registryrights.aspx
+    
+    .LINK
+    http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.cryptokeyrights.aspx
+    
+    .LINK
+    http://msdn.microsoft.com/en-us/magazine/cc163885.aspx#S3    
+    
+    .EXAMPLE
+    >
+    Demonstrates how to grant permissions to an item on the file system.
+
+        Carbon_Permission GrantPermission
+        {
+            Path = 'C:\Projects\Carbon';
+            Identity = 'CarbonServiceUser';
+            Permission = 'ReadAndExecute';
+        }
+
+    This will grant `ReadAndExecute` permission to the `CarbonServiceUser` on the `C:\Projects\Carbon` directory.
+
+    .EXAMPLE
+    >
+    Demonstrates how to grant permissions to a registry key.
+
+        Carbon_Permission GrantPermission
+        {
+            Path = 'hklm:\SOFTWARE\Carbon';
+            Identity = 'CarbonServiceUser';
+            Permission = 'ReadKey';
+        }
+
+    This will grant `ReadKey` permission to the `CarbonServiceUser` on the `C:\Projects\Carbon` directory.
+
+    .EXAMPLE
+    >
+    Demonstrates how to grant permissions to a certificate's private key and how to grant multiple permissions.
+
+        Carbon_Permission GrantPermission
+        {
+            Path = 'cert:\LocalMachine\My\1234567890ABCDEF1234567890ABCDEF12345678';
+            Identity = 'CarbonServiceUser';
+            Permission = 'GenericRead','ReadKey';
+        }
+
+    This will grant `GenericRead` and `ReadKey` permissions to the `CarbonServiceUser` on the `C:\Projects\Carbon` directory.
+
+    .EXAMPLE
+    >
+    Demonstrates how to revoke permissions.
+
+        Carbon_Permission GrantPermission
+        {
+            Path = 'C:\Projects\Carbon';
+            Identity = 'CarbonServiceUser';
+            Ensure = 'Absent';
+        }
+
+    This will revoke all of the `CarbonServiceUser` user's permissions on the `C:\Projects\Carbon`.
+
     #>
     [CmdletBinding()]
     param(
         [Parameter(Mandatory=$true)]
         [string]
-        # The path on which the permissions should be granted.  Can be a file system or registry path.
+        # The path on which the permissions should be granted.  Can be a file system, registry path, or certificate path.
         $Path,
         
         [Parameter(Mandatory=$true)]
@@ -109,20 +229,20 @@ function Set-TargetResource
         # The user or group getting the permissions.
         $Identity,
         
+        [ValidateSet("CreateFiles","AppendData","CreateSubKey","EnumerateSubKeys","CreateLink","Delete","ChangePermissions","ExecuteFile","DeleteSubdirectoriesAndFiles","FullControl","GenericRead","GenericAll","GenericExecute","QueryValues","ReadAttributes","ReadData","ReadExtendedAttributes","GenericWrite","Notify","ReadPermissions","Read","ReadAndExecute","Modify","SetValue","ReadKey","TakeOwnership","WriteAttributes","Write","Synchronize","WriteData","WriteExtendedAttributes","WriteKey")]
         [string[]]
-        # The permission: e.g. FullControl, Read, etc. Mandatory when granting permission. For file system items, use values from [System.Security.AccessControl.FileSystemRights](http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.filesystemrights.aspx).  For registry items, use values from [System.Security.AccessControl.RegistryRights](http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.registryrights.aspx).
+        # The permission: e.g. FullControl, Read, etc. Mandatory when granting permission. Valid values are `CreateFiles`, `AppendData`, `CreateSubKey`, `EnumerateSubKeys`, `CreateLink`, `Delete`, `ChangePermissions`, `ExecuteFile`, `DeleteSubdirectoriesAndFiles`, `FullControl`, `GenericRead`, `GenericAll`, `GenericExecute`, `QueryValues`, `ReadAttributes`, `ReadData`, `ReadExtendedAttributes`, `GenericWrite`, `Notify`, `ReadPermissions`, `Read`, `ReadAndExecute`, `Modify`, `SetValue`, `ReadKey`, `TakeOwnership`, `WriteAttributes`, `Write`, `Synchronize`, `WriteData`, `WriteExtendedAttributes`, `WriteKey`.
         $Permission,
         
         [ValidateSet('Container','SubContainers','ContainerAndSubContainers','Leaves','ContainerAndLeaves','SubContainersAndLeaves','ContainerAndSubContainersAndLeaves','ChildContainers','ContainerAndChildContainers','ChildLeaves','ContainerAndChildLeaves','ChildContainersAndChildLeaves','ContainerAndChildContainersAndChildLeaves')]
         [string]
-        # How to apply container permissions.  This controls the inheritance and propagation flags.  Default is full inheritance, e.g. `ContainersAndSubContainersAndLeaves`. This parameter is ignored if `Path` is to a file.
+        # How to apply container permissions.  This controls the inheritance and propagation flags.  Default is full inheritance, e.g. `ContainersAndSubContainersAndLeaves`. This parameter is only used when `Path` is a directory or registry key. Valid values are `Container`, `SubContainers`, `ContainerAndSubContainers`, `Leaves`, `ContainerAndLeaves`, `SubContainersAndLeaves`, `ContainerAndSubContainersAndLeaves`, `ChildContainers`, `ContainerAndChildContainers`, `ChildLeaves`, `ContainerAndChildLeaves`, `ChildContainersAndChildLeaves`, `ContainerAndChildContainersAndChildLeaves`.
         $ApplyTo,
         
-        [Parameter(Mandatory=$true)]
         [ValidateSet('Present','Absent')]
         [string]
         # If set to `Present`, permissions are set. If `Absent`, all permissions to `$Path` removed.
-        $Ensure
+        $Ensure = 'Present'
     )
 
     Set-StrictMode -Version 'Latest'
@@ -168,6 +288,7 @@ function Test-TargetResource
         $Identity,
         
         [Parameter(Mandatory=$true)]
+        [ValidateSet("CreateFiles","AppendData","CreateSubKey","EnumerateSubKeys","CreateLink","Delete","ChangePermissions","ExecuteFile","DeleteSubdirectoriesAndFiles","FullControl","GenericRead","GenericAll","GenericExecute","QueryValues","ReadAttributes","ReadData","ReadExtendedAttributes","GenericWrite","Notify","ReadPermissions","Read","ReadAndExecute","Modify","SetValue","ReadKey","TakeOwnership","WriteAttributes","Write","Synchronize","WriteData","WriteExtendedAttributes","WriteKey")]
         [string[]]
         # The permission: e.g. FullControl, Read, etc.  For file system items, use values from [System.Security.AccessControl.FileSystemRights](http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.filesystemrights.aspx).  For registry items, use values from [System.Security.AccessControl.RegistryRights](http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.registryrights.aspx).
         $Permission,
@@ -180,7 +301,7 @@ function Test-TargetResource
         [ValidateSet('Present','Absent')]
         [string]
         # Should the user exist or not exist?
-        $Ensure
+        $Ensure = 'Present'
     )
 
     Set-StrictMode -Version 'Latest'

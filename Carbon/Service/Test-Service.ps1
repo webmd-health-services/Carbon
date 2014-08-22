@@ -24,6 +24,15 @@ function Test-Service
     .OUTPUTS
     System.Boolean.
     
+    .LINK
+    Carbon_Service
+
+    .LINK
+    Install-Service
+
+    .LINK
+    Uninstall-Service
+
     .EXAMPLE
     Test-Service -Name 'Drive'
     

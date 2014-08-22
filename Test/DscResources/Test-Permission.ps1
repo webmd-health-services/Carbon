@@ -225,6 +225,6 @@ function Test-ShouldRunThroughDsc
     & DscConfiguration -Ensure 'Absent' -OutputPath $CarbonDscOutputRoot 
     Start-DscConfiguration -Wait -ComputerName 'localhost' -Path $CarbonDscOutputRoot
     Assert-NoError
-    Assert-False (Test-TargetResource -Identity $UserName -Path $tempDir -Permission 'Ready' -ApplyTo 'Container' -Ensure 'Present')
-    Assert-True (Test-TargetResource -Identity $UserName -Path $tempDir -Permission 'Ready' -ApplyTo 'Container' -Ensure 'Absent')
+    Assert-False (Test-TargetResource -Identity $UserName -Path $tempDir -Permission 'Read' -ApplyTo 'Container' -Ensure 'Present')
+    Assert-True (Test-TargetResource -Identity $UserName -Path $tempDir -Permission 'Read' -ApplyTo 'Container' -Ensure 'Absent')
 }

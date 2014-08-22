@@ -16,16 +16,19 @@ function Get-Privilege
 {
     <#
     .SYNOPSIS
-    Gets the privileges an identity has to perform system operations.
+    Gets an identity's privileges.
     
     .DESCRIPTION
-    These privileges are usually managed by Group Policy.
+    These privileges are usually managed by Group Policy and control the system operations and types of logons a user/group can perform.
     
     Note: if a computer is not on a domain, this function won't work.
     
     .OUTPUTS
-    System.String.
+    System.String
     
+    .LINK
+    Carbon_Privilege
+
     .LINK
     Grant-Privilege
     
@@ -36,10 +39,9 @@ function Get-Privilege
     Test-Privilege
     
     .EXAMPLE
-    
     Get-Privilege -Identity TheBeast
     
-    Gets TheBeast's privileges as an array of strings.
+    Gets `TheBeast`'s privileges as an array of strings.
     #>
     [CmdletBinding()]
     param(

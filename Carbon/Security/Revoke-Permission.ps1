@@ -24,6 +24,9 @@ function Revoke-Permission
     If the identity doesn't have permission, nothing happens, not even errors written out.
 
     .LINK
+    Carbon_Permission
+
+    .LINK
     Get-Permission
 
     .LINK

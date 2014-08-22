@@ -19,7 +19,7 @@ function Grant-Privilege
     Grants an identity priveleges to perform system operations.
     
     .DESCRIPTION
-    *Privilege names are **case-sensitive**.* The most current list of privileges can be found [on Microsoft's website](http://msdn.microsoft.com/en-us/library/windows/desktop/aa375728(v=vs.85).aspx). Here is the most current list, as of November 2012:
+    *Privilege names are **case-sensitive**.* The most current list of privileges can be found [on Microsoft's website](http://msdn.microsoft.com/en-us/library/windows/desktop/aa375728.aspx). Here is the most current list, as of November 2012:
 
      * SeAuditPrivilege
      * SeBackupPrivilege

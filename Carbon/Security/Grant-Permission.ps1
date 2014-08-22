@@ -97,6 +97,9 @@ function Grant-Permission
     When using the `-Clear` switch, note that the local `Administrators` account will always remain. In testing on Windows 2012 R2, we noticed that when `Administrators` access was removed, you couldn't read the key anymore. 
 
     .LINK
+    Carbon_Permission
+
+    .LINK
     ConvertTo-ContainerInheritanceFlags
 
     .LINK

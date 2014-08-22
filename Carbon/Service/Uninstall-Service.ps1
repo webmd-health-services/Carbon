@@ -21,6 +21,12 @@ function Uninstall-Service
     .DESCRIPTION
     Removes an existing Windows service.  If the service doesn't exist, nothing happens.  The service is stopped before being deleted, so that the computer doesn't need to be restarted for the removal to complete.  Even then, sometimes it won't go away until a reboot.  I don't get it either.
 
+    .LINK
+    Carbon_Service
+
+    .LINK
+    Install-Service
+
     .EXAMPLE
     Uninstall-Service -Name DeathStar
 
