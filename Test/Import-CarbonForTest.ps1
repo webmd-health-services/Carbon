@@ -12,23 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Start-TestFixture
-{
-    & (Join-Path -Path $PSScriptRoot -ChildPath '..\Import-CarbonForTest.ps1' -Resolve)
-}
+[CmdletBinding()]
+param(
+)
 
-function Test-ShouldFindExistingServices
-{
-    $error.Clear()
-    $missingServices = Get-Service | 
-                            Where-Object { -not (Test-Service -Name $_.Name) }
-    Assert-Null $missingServices
-    Assert-Equal 0 $error.Count
-}
+Set-StrictMode -Version 'Latest'
+$PSScriptRoot = Split-path -Parent -Path $MyInvocation.MyCommand.Definition
 
-function Test-ShouldNotFindMissingService
+if( -not (Get-Module -Name 'Carbon') -or ((Test-Path -Path 'env:CARBON_ENV') -and $env:CARBON_ENV -eq 'developer') )
 {
-    $error.Clear()
-    Assert-False (Test-Service -Name 'ISureHopeIDoNotExist')
-    Assert-Equal 0 $error.Count
+    Write-Verbose ('Importing Carbon.')
+    $carbonRoot = Join-Path -Path $PSScriptRoot -ChildPath '..\Carbon' -Resolve
+    & (Join-Path -Path $carbonRoot -ChildPath 'Import-Carbon.ps1' -Resolve)
 }

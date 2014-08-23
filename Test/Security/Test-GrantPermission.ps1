@@ -19,7 +19,7 @@ $privateKeyPath = Join-Path -Path $PSScriptRoot -ChildPath '..\Cryptography\Carb
 
 function Start-TestFixture
 {
-    & (Join-Path -Path $TestDir -ChildPath '..\..\Carbon\Import-Carbon.ps1' -Resolve)
+    & (Join-Path -Path $TestDir -ChildPath '..\Import-CarbonForTest.ps1' -Resolve)
 }
 
 function Start-Test

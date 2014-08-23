@@ -14,7 +14,7 @@
 
 function Start-TestFixture
 {
-    & (Join-Path -Path $PSScriptRoot -ChildPath '..\..\Carbon\Import-Carbon.ps1' -Resolve)
+    & (Join-Path -Path $PSScriptRoot -ChildPath '..\Import-CarbonForTest.ps1' -Resolve)
 }
 
 function Test-ShouldGetCanonicalCaseForDirectory
@@ -64,7 +64,7 @@ function Test-ShouldGetRelativePath
     Push-Location -Path $PSScriptRoot
     try
     {
-        $path = '..\..\Carbon\Import-Carbon.ps1'
+        $path = '..\Import-CarbonForTest.ps1'
         $canonicalCase = Resolve-PathCase ($path.ToUpper())
         Assert-Equal (Resolve-Path -Path $path).Path $canonicalCase -CaseSensitive
 

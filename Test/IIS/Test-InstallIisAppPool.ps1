@@ -18,7 +18,7 @@ $password = '!QAZ2wsx'
 
 function Start-TestFixture
 {
-    & (Join-Path -Path $PSScriptRoot '..\..\Carbon\Import-Carbon.ps1' -Resolve)
+    & (Join-Path -Path $PSScriptRoot '..\Import-CarbonForTest.ps1' -Resolve)
 }
 
 function Start-Test

@@ -14,7 +14,7 @@
 
 function Start-TestFixture
 {
-    & (Join-Path -Path $PSScriptRoot -ChildPath '..\..\Carbon\Import-Carbon.ps1' -Resolve)
+    & (Join-Path -Path $PSScriptRoot -ChildPath '..\Import-CarbonForTest.ps1' -Resolve)
 }
 
 function Test-ResolveRelativePathWithExplicitPath
@@ -30,18 +30,18 @@ function Test-ResolveRelativePathWithExplicitPath
 
 function Test-ResolveRelativePathFromPipeline
 {
-    $to = [System.IO.Path]::GetFullPath( (Join-Path $TestDir '..\..\Carbon\Import-Carbon.ps1') )
+    $to = [System.IO.Path]::GetFullPath( (Join-Path $TestDir '..\Import-CarbonForTest.ps1') )
     
     $relativePath = Get-Item $to | Resolve-RelativePath -FromDirectory $TestDir
-    Assert-Equal '..\..\Carbon\Import-Carbon.ps1' $relativePath
+    Assert-Equal '..\Import-CarbonForTest.ps1' $relativePath
 }
 
 function Test-ResolvesPathPathFromFilePath
 {
-    $to = [System.IO.Path]::GetFullPath( (Join-Path $TestDir '..\..\Carbon\Import-Carbon.ps1') )
+    $to = [System.IO.Path]::GetFullPath( (Join-Path $TestDir '..\Import-CarbonForTest.ps1') )
     
     $relativePath = Get-Item $to | Resolve-RelativePath -FromFile $TestScript 
-    Assert-Equal '..\..\Carbon\Import-Carbon.ps1' $relativePath
+    Assert-Equal '..\Import-CarbonForTest.ps1' $relativePath
 }
 
 function Test-ResolvesPathForMultiplePaths
