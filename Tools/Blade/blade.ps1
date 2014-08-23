@@ -72,10 +72,9 @@ param(
     $Recurse
 )
 
-#Requires -Version 3
 Set-StrictMode -Version 'Latest'
 
-& (Join-Path -Path $PSScriptRoot -ChildPath 'Import-Blade.ps1' -Resolve)
+& (Join-Path -Path (Split-Path -Parent -Path $MyInvocation.MyCommand.Definition) -ChildPath 'Import-Blade.ps1' -Resolve)
 
 function Get-FunctionsInFile($testScript)
 {
@@ -214,6 +213,7 @@ $testScripts |
         $testCase = $_
         $TestScript = (Resolve-Path $testCase.FullName).Path
         $TestDir = Split-Path -Parent $testCase.FullName 
+        $PSScriptRoot = $TestDir
         
         $testModuleName =  [System.IO.Path]::GetFileNameWithoutExtension($testCase)
 

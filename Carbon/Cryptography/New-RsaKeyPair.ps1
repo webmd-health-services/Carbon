@@ -180,7 +180,7 @@ function New-RsaKeyPair
         }
     }
 
-    $tempDir = '{0}-{1}' -f (Split-Path -Leaf -Path $PSCommandPath),([IO.Path]::GetRandomFileName())
+    $tempDir = 'Carbon+NewRsaKeyPair+{0}+' -f ([IO.Path]::GetRandomFileName())
     $tempDir = Join-Path -Path $env:TEMP -ChildPath $tempDir
     New-Item -Path $tempDir -ItemType 'Directory' -Verbose:$VerbosePreference | Out-Null
 

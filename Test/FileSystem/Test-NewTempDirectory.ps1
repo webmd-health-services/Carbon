@@ -33,8 +33,8 @@ function Test-ShouldSupportPrefix
 
 function Test-ShouldSupportPathsForPrefix
 {
-    $tempDir = New-TempDirectory -Prefix $PSCommandPath
+    $tempDir = New-TempDirectory -Prefix $PSScriptRoot
     Assert-DirectoryExists $tempDir
-    Assert-Like $tempDir.Name ('{0}*' -f (Split-Path -Leaf -Path $PSCommandPath))
+    Assert-Like $tempDir.Name ('{0}*' -f (Split-Path -Leaf -Path $PSScriptRoot))
 
 }

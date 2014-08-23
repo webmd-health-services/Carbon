@@ -29,7 +29,6 @@ Demonstrates how to import the Blade module.
 param(
 )
 
-#Requires -Version 3
 Set-StrictMode -Version 'Latest'
 
 if( (Get-Module -Name 'Blade') )
@@ -37,5 +36,5 @@ if( (Get-Module -Name 'Blade') )
     Remove-Module 'Blade' -Verbose:$false
 }
 
-Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'Blade.psd1' -Resolve) -Verbose:$false
+Import-Module -Name (Join-Path -Path (Split-Path -Parent -Path $MyInvocation.MyCommand.Definition) -ChildPath 'Blade.psd1' -Resolve) -Verbose:$false
 

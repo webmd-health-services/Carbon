@@ -51,7 +51,7 @@ function Assert-FileContains
     Set-StrictMode -Version 'Latest'
 
     Write-Verbose "Checking if '$Path' contains expected content."
-    $actualContents = Get-Content -Path $Path -Raw
+    $actualContents = [IO.File]::ReadAllText( $Path )
     Write-Verbose "Actual:`n$actualContents"
     Write-Verbose "Expected:`n$Needle"
     if( $actualContents.Contains($Needle) )

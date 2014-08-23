@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+$PSCommandPath = $MyInvocation.MyCommand.Definition
+
 function Start-TestFixture
 {
     & (Join-Path -Path $PSScriptRoot -ChildPath '..\..\Carbon\Import-Carbon.ps1' -Resolve)
@@ -22,7 +24,7 @@ function Start-Test
     $PSCommandName = Split-Path -Leaf -Path $PSCommandPath
     $tempDir = New-TempDir -Prefix $PSCommandName
     $zipPath = Join-Path -Path $tempDir -ChildPath ('{0}.zip' -f $PSCommandName)
-    Compress-Item -Path $PSCommandPath -OutFile $zipPath
+    Compress-Item -Path $PSScriptRoot -OutFile $zipPath
 }
 
 function Stop-Test

@@ -19,7 +19,8 @@ function Test-AllFilesShouldHaveLicense
     
     $noticeLines = Invoke-Command {
                             'Copyright 2012 Aaron Jensen'
-                            Get-Content -Path $licenseFilePath -Tail 12
+                            Get-Content -Path $licenseFilePath |
+                                Select-Object -Last 12
                         } |
                         ForEach-Object { $_ -replace '^   ','' } |
                         Select-Object -First 13
@@ -47,11 +48,13 @@ function Test-AllFilesShouldHaveLicense
                         '*.pfx'
                     )
     [object[]]$filesMissingLicense = Get-ChildItem -Path $projectRoot -Exclude 'Tools','Website','.hg' |
-        Get-ChildItem -Recurse -File -Exclude $filesToSkip |
+        Get-ChildItem -Recurse -Exclude $filesToSkip |
+        Where-Object { -not $_.PSIsContainer } |
         Where-Object { $_.FullName -notlike '*\obj\*' } |
+        Where-Object { $name = $_.FullName ; -not ($filesToSkip | ForEach-Object { $name -like $_ }) } |
         ForEach-Object {
             $fileInfo = $_
-            $file = Get-Content $fileInfo.FullName -Raw
+            $file = [IO.File]::ReadAllText( $fileInfo.FullName )
             $ok = switch -Regex ( $fileInfo.Extension )
             {
                 '^\.ps(m|d)*1$'

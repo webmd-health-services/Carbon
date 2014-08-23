@@ -97,7 +97,7 @@ filter Protect-String
         $ForComputer,
 
         [Parameter(Mandatory=$true,ParameterSetName='DPAPIForUser')]
-        [pscredential]
+        [Management.Automation.PSCredential]
         # Encrypts for a specific user.
         $Credential,
 
@@ -132,50 +132,63 @@ filter Protect-String
     {
         if( $PSCmdlet.ParameterSetName -eq 'DPAPIForUser' ) 
         {
-            $outFile = '{0}-{1}-stdout' -f (Split-Path -Leaf -Path $PSCommandPath),([IO.Path]::GetRandomFileName())
+            $outFile = 'Carbon+ProtectString+{0}-stdout' -f ([IO.Path]::GetRandomFileName())
             $outFile = Join-Path -Path $env:TEMP -ChildPath $outFile
             Write-Verbose $outFile
             '' | Set-Content -Path $outFile
 
-            $errFile = '{0}-{1}-stderr' -f (Split-Path -Leaf -Path $PSCommandPath),([IO.Path]::GetRandomFileName())
+            $errFile = 'Carbon+ProtectString+{0}-stderr' -f ([IO.Path]::GetRandomFileName())
             $errFile = Join-Path -Path $env:TEMP -ChildPath $errFile
             Write-Verbose $errFile
             '' | Set-Content -Path $errFile
 
             try
             {
-                $protectStringPath = Join-Path -Path $PSScriptRoot -ChildPath '..\bin\Protect-String.ps1' -Resolve
+                $protectStringPath = Join-Path -Path $CarbonBinDir -ChildPath 'Protect-String.ps1' -Resolve
                 $encodedString = Protect-String -String $String -ForComputer
             
-                $p = Start-Process -FilePath "powershell.exe" `
-                                   -ArgumentList $protectStringPath,"-ProtectedString",$encodedString `
-                                   -Credential $Credential `
-                                   -RedirectStandardOutput $outFile `
-                                   -RedirectStandardError $errFile `
-                                   -Wait `
-                                   -WindowStyle Hidden `
-                                   -PassThru
+                Start-Process -FilePath "powershell.exe" `
+                              -ArgumentList $protectStringPath,"-ProtectedString",$encodedString `
+                              -Credential $Credential `
+                              -RedirectStandardOutput $outFile `
+                              -RedirectStandardError $errFile 
 
-                $p.WaitForExit()
-
-                $stdOut = Get-Content -Path $outFile -Raw
-                if( $stdOut )
+                do
                 {
-                    Write-Verbose -Message $stdOut
+                    try
+                    {
+                        $stdOut = [IO.File]::ReadAllText( $outFile )
+                        if( $stdOut )
+                        {
+                            Write-Verbose -Message $stdOut
+                        }
+                        break
+                    }
+                    catch
+                    {
+                        Start-Sleep -Milliseconds 100
+                    }
                 }
+                while( $true )
 
-                $stdErr = Get-Content -Path $errFile -Raw
-                if( $stdErr )
+                do
                 {
-                    Write-Error -Message $stdErr
-                    return
+                    try
+                    {
+                        $stdErr = [IO.File]::ReadAllText( $errFile )
+                        if( $stdErr )
+                        {
+                            Write-Error -Message $stdErr
+                            return
+                        }
+                        break
+                    }
+                    catch
+                    {
+                        Start-Sleep -Milliseconds 100
+                    }
                 }
-
-                if( $p.ExitCode -ne 0 )
-                {
-                    Write-Error -Message ('Unknown error encrypting string as {0}: exit code {1}{2}{3}' -f $Credential.UserName,$p.ExitCode,([Environment]::NewLine),$stdOut)
-                    return
-                }
+                while( $true )
 
                 if( $stdOut )
                 {
@@ -184,7 +197,7 @@ filter Protect-String
             }
             finally
             {
-                Remove-Item -Path $outFile,$errFile -ErrorAction Ignore
+                Remove-Item -Path $outFile,$errFile -ErrorAction SilentlyContinue
             }
         }
         else
@@ -202,7 +215,7 @@ filter Protect-String
     {
         if( $PSCmdlet.ParameterSetName -eq 'RSAByThumbprint' )
         {
-            $Certificate = Get-ChildItem -Path ('cert:\*\{0}' -f $Thumbprint) -Recurse | Select-Object -First 1
+            $Certificate = Get-ChildItem -Path ('cert:\*\*\{0}' -f $Thumbprint) -Recurse | Select-Object -First 1
             if( -not $Certificate )
             {
                 Write-Error ('Certificate with thumbprint ''{0}'' not found.' -f $Thumbprint)

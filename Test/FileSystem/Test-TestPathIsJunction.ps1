@@ -52,7 +52,7 @@ function Test-ShouldHandleNonExistentPath
 
 function Test-ShouldHandleHiddenFile
 {
-    $tempDir = New-TempDir -Prefix (Split-Path -Leaf -Path $PSCommandPath)
+    $tempDir = New-TempDir -Prefix (Split-Path -Leaf -Path $PSScriptRoot)
     $tempDir.Attributes = $tempDir.Attributes -bor [IO.FileAttributes]::Hidden
     $result = Invoke-TestPathIsJunction $tempDir
     Assert-False $result

@@ -25,7 +25,12 @@ function Set-CryptoKeySecurity
 
         [Parameter(Mandatory=$true)]
         [string]
-        $Action
+        $Action,
+
+        [Parameter(Mandatory=$true)]
+        [string]
+        # The PS provider path for the certificate. Used to determine where the private key is stored.
+        $PSPath
     )
 
     Set-StrictMode -Version 'Latest'
@@ -33,7 +38,7 @@ function Set-CryptoKeySecurity
     $keyContainerInfo = $Certificate.PrivateKey.CspKeyContainerInfo
     $cspParams = New-Object 'Security.Cryptography.CspParameters' ($keyContainerInfo.ProviderType, $keyContainerInfo.ProviderName, $keyContainerInfo.KeyContainerName)
     $cspParams.Flags = [Security.Cryptography.CspProviderFlags]::UseExistingKey
-    if( (Split-Path -NoQualifier -Path $Certificate.PSPath) -like 'LocalMachine\*' )
+    if( (Split-Path -NoQualifier -Path $PSPath) -like 'LocalMachine\*' )
     {
         $cspParams.Flags = $cspParams.Flags -bor [Security.Cryptography.CspProviderFlags]::UseMachineKeyStore
     }

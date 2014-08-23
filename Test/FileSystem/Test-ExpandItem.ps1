@@ -15,7 +15,8 @@
 $tempDir = $null
 $zipPath = $null
 $outputRoot = $null
-$PSCommandName = Split-Path -Leaf -Path $PSCommandPath
+$PSCommandName = 'Test-ExpandItem.ps1'
+$PSCommandPath = $MyInvocation.MyCommand.Definition
 
 function Start-TestFixture
 {
@@ -24,7 +25,7 @@ function Start-TestFixture
 
 function Start-Test
 {
-    $tempDir = New-TempDir -Prefix ('{0}-{1}' -f $PSCommandName,([IO.Path]::GetRandomFileName()))
+    $tempDir = New-TempDir -Prefix ('Carbon+{0}' -f $PSCommandName)
     $zipPath = Join-Path -Path $tempDir -ChildPath ('{0}.zip' -f $PSCommandName)
     Compress-Item -Path $PSCommandPath -OutFile $zipPath
 
@@ -38,7 +39,7 @@ function Stop-Test
 
 function Test-ShouldFailIfFileNotAZipFile
 {
-    $outputRoot = Expand-Item -Path $PSCommandPath -ErrorAction SilentlyContinue
+    $outputRoot = Expand-Item -Path $PSScriptRoot -ErrorAction SilentlyContinue
     Assert-Error -Last -Regex 'not a ZIP file'
     Assert-Null $outputRoot
 }
@@ -102,7 +103,7 @@ function Test-ShouldStopIfOutputDirectoryNotEmpty
     $result = Expand-Item -Path $zipPath -OutDirectory $outputRoot -ErrorAction SilentlyContinue
     Assert-Null $result
     Assert-Error -Last -Regex 'not empty'
-    Assert-Null (Get-Content -Raw -Path $filePath)
+    Assert-Equal '' ([IO.File]::ReadAllText( $filePath ))
 }
 
 function Test-ShouldReplaceOutputDirectoryWithForceFlag
@@ -115,7 +116,7 @@ function Test-ShouldReplaceOutputDirectoryWithForceFlag
     $result = Expand-Item -Path $zipPath -OutDirectory $outputRoot -Force
     Assert-NoError
     Assert-Equal $outputRoot $result.FullName
-    Assert-NotNull (Get-Content -Raw -Path $filePath)
+    Assert-NotNull ([IO.File]::ReadAllText( $filePath ))
 }
 
 function Test-ShouldNotExtractNonExistentFile

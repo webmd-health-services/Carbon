@@ -80,13 +80,16 @@ function Revoke-Permission
             ForEach-Object {
                 if( $_.PSProvider.Name -eq 'Certificate' )
                 {
-                    [Security.Cryptography.X509Certificates.X509Certificate2]$certificate = $_
+                    $certificate = $_
 
                     [Security.AccessControl.CryptoKeySecurity]$keySecurity = $certificate.PrivateKey.CspKeyContainerInfo.CryptoKeySecurity
 
                     [void] $keySecurity.RemoveAccessRule( $ruleToRemove)
 
-                    Set-CryptoKeySecurity -Certificate $certificate -CryptoKeySecurity $keySecurity -Action ('revoke {0}''s permissions' -f $Identity)
+                    Set-CryptoKeySecurity -Certificate $certificate `
+                                          -CryptoKeySecurity $keySecurity `
+                                          -Action ('revoke {0}''s permissions' -f $Identity) `
+                                          -PSPath $certificate.PSPath
                 }
                 else
                 {

@@ -23,7 +23,7 @@ function Start-TestFixture
 
 function Test-ShouldConvertToNtfsContainerInheritanceFlags
 {
-    $tempDir = 'Carbon+{0}+{1}' -f ((Split-Path -Leaf -Path $PSCommandPath),([IO.Path]::GetRandomFileName()))
+    $tempDir = 'Carbon+Test-ConvertToContainerInheritanceFlags+{0}' -f ([IO.Path]::GetRandomFileName())
     $tempDir = Join-Path -Path $env:TEMP -ChildPath $tempDir
     New-Item -Path $tempDir -ItemType 'Directory' | Out-Null
 
@@ -47,7 +47,7 @@ function Test-ShouldConvertToNtfsContainerInheritanceFlags
 
 function Test-ShouldConvertToRegistryContainerInheritanceFlags
 {
-    $tempDir = 'Carbon+{0}+{1}' -f ((Split-Path -Leaf -Path $PSCommandPath),([IO.Path]::GetRandomFileName()))
+    $tempDir = 'Carbon+Test-ConvertToContainerInheritanceFlags+{0}' -f ([IO.Path]::GetRandomFileName())
     $tempDir = Join-Path -Path 'hkcu:\' -ChildPath $tempDir
     New-Item -Path $tempDir 
 

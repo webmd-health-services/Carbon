@@ -211,7 +211,7 @@ function Grant-Permission
         Get-Item -Path $Path |
             Where-Object { $_.HasPrivateKey -and $_.PrivateKey } |
             ForEach-Object {
-                [Security.Cryptography.X509Certificates.X509Certificate2]$certificate = $_
+                $certificate = $_
                 [Security.AccessControl.CryptoKeySecurity]$keySecurity = $certificate.PrivateKey.CspKeyContainerInfo.CryptoKeySecurity
 
                 $rulesToRemove = @()
@@ -236,7 +236,10 @@ function Grant-Permission
                 $accessRule = New-Object 'Security.AccessControl.CryptoKeyAccessRule' ($Identity,$rights,'Allow')
                 $keySecurity.SetAccessRule( $accessRule )
 
-                Set-CryptoKeySecurity -Certificate $certificate -CryptoKeySecurity $keySecurity -Action ('grant {0} {1} permission(s)' -f $Identity,($Permission -join ','))
+                Set-CryptoKeySecurity -Certificate $certificate `
+                                      -CryptoKeySecurity $keySecurity `
+                                      -Action ('grant {0} {1} permission(s)' -f $Identity,($Permission -join ',')) `
+                                      -PSPath $certificate.PSPath
             }
     }
     else

@@ -14,6 +14,7 @@
 
 $tempDir = $null
 $zipPath = $null
+$PSCommandPath = $MyInvocation.MyCommand.Definition
 
 function Start-TestFixture
 {
@@ -45,8 +46,8 @@ function Test-ShouldCompressFile
 
         try
         {
-            $originalFile = Get-Content -Raw -Path $PSCommandPath
-            $expandedFileContent = Get-Content -Raw -Path $expandedFilePath
+            $originalFile = [IO.File]::ReadAllText( $PSCommandPath )
+            $expandedFileContent = [IO.File]::ReadAllText( $expandedFilePath )
             Assert-Equal $originalFile $expandedFileContent
         }
         finally
@@ -107,12 +108,12 @@ function Assert-ZipFileExpands
         }
         finally
         {
-            Remove-Item $outRoot -Recurse -ErrorAction Ignore
+            Remove-Item $outRoot -Recurse -ErrorAction SilentlyContinue
         }
     }
     finally
     {
-        Remove-Item -Path $file -ErrorAction Ignore
+        Remove-Item -Path $file -ErrorAction SilentlyContinue
     }    
 }
 

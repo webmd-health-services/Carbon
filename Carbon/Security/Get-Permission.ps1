@@ -85,10 +85,9 @@ function Get-Permission
     $account = $null
     if( $Identity  )
     {
-        $account = Test-Identity -Name $Identity -PassThru
-        if( $account )
+        if( Test-Identity -Name $Identity )
         {
-            $Identity = $account.FullName
+            $Identity = Resolve-IdentityName -Name $Identity
         }
     }
 

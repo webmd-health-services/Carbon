@@ -21,7 +21,7 @@ function New-TempDirectory
     .DESCRIPTION
     A new temporary directory is created in the current user's `env:TEMP` directory.  The directory's name is created using the `Path` class's [GetRandomFileName method](http://msdn.microsoft.com/en-us/library/system.io.path.getrandomfilename.aspx).
 
-    To add a custom prefix to the directory name, use the `Prefix` parameter. If you pass in a path, only its name will be used. In this way, you can pass `$PSCommandPath`, which will help you identify what scripts are leaving cruft around in the temp directory.
+    To add a custom prefix to the directory name, use the `Prefix` parameter. If you pass in a path, only its name will be used. In this way, you can pass `$MyInvocation.MyCommand.Definition` (PowerShell 2) or `$PSCommandPath` (PowerShell 3+), which will help you identify what scripts are leaving cruft around in the temp directory.
     
     .LINK
     http://msdn.microsoft.com/en-us/library/system.io.path.getrandomfilename.aspx
@@ -37,9 +37,14 @@ function New-TempDirectory
     Demonstrates how to create a new temporary directory with a custom prefix for its name, e.g. `C:\Users\ajensen\AppData\Local\Temp\Carbon5pobd3tu.5rn`.
 
     .EXAMPLE
+    New-TempDirectory -Prefix $MyInvocation.MyCommand.Definition
+
+    Demonstrates how you can use `$MyInvocation.MyCommand.Definition` in PowerShell 2 to create a new, temporary directory, named after the currently executing scripts, e.g. `C:\Users\ajensen\AppData\Local\Temp\New-TempDirectory.ps15pobd3tu.5rn`. 
+
+    .EXAMPLE
     New-TempDirectory -Prefix $PSCommandPath
 
-    Demonstrates how you can use `$PSCommandPath` to create a new, temporary directory, named after the currently executing scripts, e.g. `C:\Users\ajensen\AppData\Local\Temp\New-TempDirectory.ps15pobd3tu.5rn`.
+    Demonstrates how you can use `$PSCommandPath` in PowerShell 3+ to create a new, temporary directory, named after the currently executing scripts, e.g. `C:\Users\ajensen\AppData\Local\Temp\New-TempDirectory.ps15pobd3tu.5rn`. 
     #>
     [CmdletBinding()]
     [OutputType([IO.DirectoryInfo])]

@@ -60,25 +60,63 @@ if( -not (Test-Path -Path 'env:CCNetArtifactDirectory') )
             Fail ('Failed to protect a string as user {0}.' -f $credential.UserName)
         }
 
-        $outFile = New-TempDir -Prefix (Split-Path -Leaf -Path $PSCommandPath)
-        $outFile = Join-Path -Path $outFile -ChildPath 'secret'
+        $tempDir = New-TempDir -Prefix (Split-Path -Leaf -Path $PSScriptRoot)
+        $outFile = Join-Path -Path $tempDir -ChildPath 'secret'
+        $errFile = Join-Path -Path $tempDir -ChildPath 'errors'
         try
         {
-            $p = Start-Process -FilePath "powershell.exe" `
-                               -ArgumentList (Join-Path -Path $PSScriptRoot -ChildPath 'Unprotect-String.ps1'),'-ProtectedString',$protectedString `
-                               -WindowStyle Hidden `
-                               -Credential $credential `
-                               -PassThru `
-                               -Wait `
-                               -RedirectStandardOutput $outFile
-            $p.WaitForExit()
+            Start-Process -FilePath "powershell.exe" `
+                          -ArgumentList (Join-Path -Path $PSScriptRoot -ChildPath 'Unprotect-String.ps1'),'-ProtectedString',$protectedString `
+                          -Credential $credential `
+                          -RedirectStandardOutput $outFile `
+                          -RedirectStandardError $errFile
 
-            $decrypedString = Get-Content -Path $outFile -TotalCount 1
+            $err = ''
+            do
+            {
+                if( -not (Test-Path -Path $errFile -PathType Leaf) )
+                {
+                    break
+                }
+
+                try
+                {
+                    $err = [IO.File]::ReadAllText($errFile)
+                    break
+                }
+                catch
+                {
+                    Start-Sleep -Milliseconds 100
+                }
+            }
+            while( $true )
+
+            Assert-Equal '' $err
+
+            $decrypedString = ''
+            do
+            {
+                if( -not (Test-Path -Path $outFile -PathType Leaf) )
+                {
+                    break
+                }
+
+                try
+                {
+                    $decrypedString = Get-Content -Path $outFile -TotalCount 1
+                    break
+                }
+                catch
+                {
+                    Start-Sleep -Milliseconds 100
+                }
+            }
+            while( $true )
             Assert-Equal $string $decrypedString
         }
         finally
         {
-            Remove-Item -Recurse -Path (Split-Path -Parent -Path $outFile)
+            Remove-Item -Recurse -Path $tempDir -ErrorAction SilentlyContinue
         }
     }
 }

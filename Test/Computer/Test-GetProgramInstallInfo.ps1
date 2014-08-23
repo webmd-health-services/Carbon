@@ -61,7 +61,7 @@ function Test-ShouldGetInstalledPrograms
                 {
                     if( $keyValue -match '^(\d{4})(\d{2})(\d{2})$' )
                     {
-                        $keyValue = Get-date -Year $Matches[1] -Month $Matches[2] -Day $Matches[3] -Hour 0 -Minute 0 -Second 0 -Millisecond 0
+                        $keyValue = New-Object 'DateTime' $Matches[1],$Matches[2],$Matches[3],0,0,0,0
                     }
                     else
                     {

@@ -72,7 +72,7 @@ function Add-GroupMember
                 $canonicalMemberName = $Builtins[$currentMember]
                 if( $currentMembers -contains $canonicalMemberName )
                 {
-                    continue
+                    return
                 }
                 if( $pscmdlet.ShouldProcess( $Name, "add built-in member $currentMember" ) )
                 {
