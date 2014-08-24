@@ -13,10 +13,11 @@
 # limitations under the License.
 
 $ps3Installed = $false
+$PSVersion,$CLRVersion = powershell -NoProfile -NonInteractive -Command { $PSVersionTable.PSVersion ; $PSVersionTable.CLRVersion }
 
 function Start-TestFixture
 {
-    & (Join-Path -Path $PSScriptRoot -ChildPath '..\..\Carbon\Import-Carbon.ps1' -Resolve)
+    & (Join-Path -Path $PSScriptRoot -ChildPath '..\Import-CarbonForTest.ps1' -Resolve)
 }
 
 function Start-Test
@@ -149,8 +150,8 @@ function Test-ShouldRunScript
     Assert-Equal 3 $result.Length
     Assert-Equal '' $result[0]
     Assert-NotNull $result[1]
-    Assert-Equal $PSVersionTable.PSVersion $result[1].PSVersion
-    Assert-Equal $PSVersionTAble.CLRVersion $result[1].CLRVersion
+    Assert-Equal $PSVersion $result[1].PSVersion
+    Assert-Equal $CLRVersion $result[1].CLRVersion
     Assert-NotNull $result[2]
     $architecture = 'AMD64'
     if( Test-OSIs32Bit )
@@ -170,8 +171,8 @@ function Test-ShouldRunScriptWithArguments
     Assert-Equal 3 $result.Length
     Assert-Equal "'Hello World'" $result[0]
     Assert-NotNull $result[1]
-    Assert-Equal $PSVersionTable.PSVersion $result[1].PSVersion
-    Assert-Equal $PSVersionTAble.CLRVersion $result[1].CLRVersion
+    Assert-Equal $PSVersion $result[1].PSVersion
+    Assert-Equal $CLRVersion $result[1].CLRVersion
 }
 
 function Test-ShouldRunScriptUnderPowerShell2

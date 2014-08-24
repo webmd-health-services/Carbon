@@ -21,7 +21,7 @@ $privateKeyPath = Join-Path -Path $PSScriptRoot -ChildPath '..\Cryptography\Carb
 
 function Start-TestFixture
 {
-    & (Join-Path -Path $TestDir -ChildPath '..\..\Carbon\Import-Carbon.ps1' -Resolve)
+    & (Join-Path -Path $TestDir -ChildPath '..\Import-CarbonForTest.ps1' -Resolve)
     Install-User -Username $user -Password 'a1b2c3d4!' -Description 'User for Carbon Grant-Permission tests.'
     Install-User -Username $user2 -Password 'a1b2c3d4!' -Description 'User for Carbon Grant-Permission tests.'
 }

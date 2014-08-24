@@ -17,7 +17,7 @@ $Password = [Guid]::NewGuid().ToString()
 
 function Start-TestFixture
 {
-    & (Join-Path -Path $TestDir -ChildPath '..\..\Carbon\Import-Carbon.ps1' -Resolve)
+    & (Join-Path -Path $TestDir -ChildPath '..\Import-CarbonForTest.ps1' -Resolve)
     Install-User -Username $UserName -Password $Password
 }
 

@@ -17,12 +17,12 @@ $serviceName = $serviceBaseName
 $servicePath = Join-Path $TestDir NoOpService.exe
 
 $user = 'CrbnGrantCntrlSvcUsr'
-$password = [Guid]::NewGuid().ToString().Substring(0,14)
+$password = [Guid]::NewGuid().ToString().Substring(0,9) + "Aa1"
 $userPermStartPattern = "/pace =$($env:ComputerName)\$user*"
     
 function Start-TestFixture
 {
-    & (Join-Path -Path $PSScriptRoot -ChildPath '..\..\Carbon\Import-Carbon.ps1' -Resolve)
+    & (Join-Path -Path $PSScriptRoot -ChildPath '..\Import-CarbonForTest.ps1' -Resolve)
 }
 
 function Start-Test

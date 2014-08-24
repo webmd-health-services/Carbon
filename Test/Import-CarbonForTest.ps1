@@ -12,18 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+[CmdletBinding()]
 param(
-    [Parameter(Mandatory=$true)]
-    [string]
-    # The path to the file/test importing this script. Should be set to $PSCommandPath.
-    $Path
 )
 
-$fixture = Get-Item -Path $Path
-$carbonRoot = Join-Path -Path $PSScriptRoot -ChildPath '..\Carbon' -Resolve
+Set-StrictMode -Version 'Latest'
 
-if( -not (Get-Module -Name 'Carbon') -or (Get-ChildItem -Path $carbonRoot -Recurse -File | Where-Object { $_.LastWriteTime -gt $fixture.LastWriteTime } ) )
+if( -not (Get-Module -Name 'Carbon') -or ((Test-Path -Path 'env:CARBON_ENV') -and $env:CARBON_ENV -eq 'developer') )
 {
-    Write-Host ('Importing Carbon.')
+    Write-Verbose ('Importing Carbon.')
+    $carbonRoot = Join-Path -Path $PSScriptRoot -ChildPath '..\Carbon' -Resolve
     & (Join-Path -Path $carbonRoot -ChildPath 'Import-Carbon.ps1' -Resolve)
 }

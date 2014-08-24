@@ -97,7 +97,7 @@ filter Protect-String
         $ForComputer,
 
         [Parameter(Mandatory=$true,ParameterSetName='DPAPIForUser')]
-        [pscredential]
+        [Management.Automation.PSCredential]
         # Encrypts for a specific user.
         $Credential,
 
@@ -144,7 +144,7 @@ filter Protect-String
 
             try
             {
-                $protectStringPath = Join-Path -Path $PSScriptRoot -ChildPath '..\bin\Protect-String.ps1' -Resolve
+                $protectStringPath = Join-Path -Path $CarbonBinDir -ChildPath 'Protect-String.ps1' -Resolve
                 $encodedString = Protect-String -String $String -ForComputer
             
                 $p = Start-Process -FilePath "powershell.exe" `
@@ -184,7 +184,7 @@ filter Protect-String
             }
             finally
             {
-                Remove-Item -Path $outFile,$errFile -ErrorAction Ignore
+                Remove-Item -Path $outFile,$errFile -ErrorAction SilentlyContinue
             }
         }
         else
@@ -202,7 +202,7 @@ filter Protect-String
     {
         if( $PSCmdlet.ParameterSetName -eq 'RSAByThumbprint' )
         {
-            $Certificate = Get-ChildItem -Path ('cert:\*\{0}' -f $Thumbprint) -Recurse | Select-Object -First 1
+            $Certificate = Get-ChildItem -Path ('cert:\*\*\{0}' -f $Thumbprint) -Recurse | Select-Object -First 1
             if( -not $Certificate )
             {
                 Write-Error ('Certificate with thumbprint ''{0}'' not found.' -f $Thumbprint)

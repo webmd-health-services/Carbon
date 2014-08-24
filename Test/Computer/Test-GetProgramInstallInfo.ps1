@@ -14,7 +14,7 @@
 
 function Start-TestFixture
 {
-    & (Join-Path -Path $PSScriptRoot -ChildPath '..\..\Carbon\Import-Carbon.ps1' -Resolve)
+    & (Join-Path -Path $PSScriptRoot -ChildPath '..\Import-CarbonForTest.ps1' -Resolve)
 }
 
 function Test-ShouldGetInstalledPrograms
@@ -61,7 +61,7 @@ function Test-ShouldGetInstalledPrograms
                 {
                     if( $keyValue -match '^(\d{4})(\d{2})(\d{2})$' )
                     {
-                        $keyValue = Get-date -Year $Matches[1] -Month $Matches[2] -Day $Matches[3] -Hour 0 -Minute 0 -Second 0 -Millisecond 0
+                        $keyValue = Get-Date -Year $Matches[1] -Month $Matches[2] -Day $Matches[3] -Hour 0 -Minute 0 -Second 0 -Millisecond 0
                     }
                     else
                     {

@@ -108,7 +108,9 @@ filter Unprotect-String
         # If true, uses Direct Encryption (PKCS#1 v1.5) padding. Otherwise (the default), uses OAEP (PKCS#1 v2) padding. See [Encrypt](http://msdn.microsoft.com/en-us/library/system.security.cryptography.rsacryptoserviceprovider.encrypt(v=vs.110).aspx) for information.
         $UseDirectEncryptionPadding
     )
-    
+
+    Set-StrictMode -Version 'Latest'
+        
     $encryptedBytes = [Convert]::FromBase64String($ProtectedString)
     if( $PSCmdlet.ParameterSetName -eq 'DPAPI' )
     {
@@ -131,7 +133,7 @@ filter Unprotect-String
         }
         elseif( $PSCmdlet.ParameterSetName -like '*ByThumbprint' )
         {
-            $certificates = Get-ChildItem -Path ('cert:\*\{0}' -f $Thumbprint) -Recurse 
+            $certificates = Get-ChildItem -Path ('cert:\*\*\{0}' -f $Thumbprint) -Recurse 
             if( -not $certificates )
             {
                 Write-Error ('Certificate ''{0}'' not found.' -f $Thumbprint)

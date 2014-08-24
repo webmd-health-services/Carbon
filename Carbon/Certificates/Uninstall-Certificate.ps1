@@ -72,12 +72,15 @@ function Uninstall-Certificate
     Set-StrictMode -Version 'Latest'
 
     $storeNameParams = @{ }
+    $storeDisplayName = ''
     if( $PSCmdlet.ParameterSetName -like '*AndCustomStoreName' )
     {
+        $storeDisplayName = $CustomStoreName
         $storeNameParams.CustomStoreName = $CustomStoreName
     }
     else
     {
+        $storeDisplayName = $StoreName
         $storeNameParams.StoreName = $StoreName
     }
 
@@ -98,7 +101,7 @@ function Uninstall-Certificate
         $target = $Certificate.Subject
     }
 
-    if( $PSCmdlet.ShouldProcess(  ("certificate $StoreLocation\$StoreName\{0} ({1})" -f $Certificate.Thumbprint,$target), "remove" ) )
+    if( $PSCmdlet.ShouldProcess(  ("certificate $StoreLocation\$storeDisplayName\{0} ({1})" -f $Certificate.Thumbprint,$target), "remove" ) )
     {
         $store.Remove( $Certificate )
     }

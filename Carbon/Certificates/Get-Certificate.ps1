@@ -140,7 +140,6 @@ function Get-Certificate
         }
         
         $storeNamePath = '*'
-        $storeNamePath = $StoreName
         if( $PSCmdlet.ParameterSetName -like '*CustomStoreName' )
         {
             $storeNamePath = $CustomStoreName

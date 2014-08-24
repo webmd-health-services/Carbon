@@ -18,7 +18,7 @@ $dsaKeyPath = Join-Path -Path $PSScriptRoot -ChildPath 'CarbonTestDsaKey.cer' -R
 
 function Start-TestFixture
 {
-    & (Join-Path -Path $PSScriptRoot '..\..\Carbon\Import-Carbon.ps1' -Resolve)
+    & (Join-Path -Path $PSScriptRoot '..\Import-CarbonForTest.ps1' -Resolve)
 }
 
 function Test-ShouldProtectString
@@ -60,8 +60,9 @@ if( -not (Test-Path -Path 'env:CCNetArtifactDirectory') )
             Fail ('Failed to protect a string as user {0}.' -f $credential.UserName)
         }
 
-        $outFile = New-TempDir -Prefix (Split-Path -Leaf -Path $PSCommandPath)
-        $outFile = Join-Path -Path $outFile -ChildPath 'secret'
+        $tempDir = New-TempDir -Prefix (Split-Path -Leaf -Path $PSScriptRoot)
+        $outFile = Join-Path -Path $tempDir -ChildPath 'secret'
+        $errFile = Join-Path -Path $tempDir -ChildPath 'errors'
         try
         {
             $p = Start-Process -FilePath "powershell.exe" `
@@ -70,15 +71,24 @@ if( -not (Test-Path -Path 'env:CCNetArtifactDirectory') )
                                -Credential $credential `
                                -PassThru `
                                -Wait `
-                               -RedirectStandardOutput $outFile
+                               -RedirectStandardOutput $outFile `
+			       -RedirectStandardError $errFile
             $p.WaitForExit()
+	    
+	    if( (Test-Path -Path $errFile -PathType Leaf) )
+	    {
+	    	$err = Get-Content -Path $errFile -Raw
+		if( $err )
+		{
+	            Fail $err
+		}
 
             $decrypedString = Get-Content -Path $outFile -TotalCount 1
             Assert-Equal $string $decrypedString
         }
         finally
         {
-            Remove-Item -Recurse -Path (Split-Path -Parent -Path $outFile)
+            Remove-Item -Recurse -Path (Split-Path -Parent -Path $outFile) -ErrorAction Ignore
         }
     }
 }

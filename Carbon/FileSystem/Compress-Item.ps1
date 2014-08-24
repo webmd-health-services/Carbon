@@ -110,9 +110,10 @@ function Compress-Item
 
             $shellApp = New-Object -ComObject "Shell.Application"
             $copyHereFlags = (
-                                0x4 -bor `   # No dialog
-                                0x10 -bor `  # Responde "Yes to All" to any prompts
-                                0x400        # Do not display a user interface if an error occurs
+                                # 0x4   = No dialog
+                                # 0x10  = Responde "Yes to All" to any prompts
+                                # 0x400 = Do not display a user interface if an error occurs
+                                0x4 -bor 0x10 -bor 0x400        
                             )
             $zipFile = $shellApp.NameSpace($OutFile)
             $zipItemCount = 0
