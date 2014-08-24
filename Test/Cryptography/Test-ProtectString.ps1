@@ -75,13 +75,14 @@ if( -not (Test-Path -Path 'env:CCNetArtifactDirectory') )
 			       -RedirectStandardError $errFile
             $p.WaitForExit()
 	    
-	    if( (Test-Path -Path $errFile -PathType Leaf) )
-	    {
-	    	$err = Get-Content -Path $errFile -Raw
-		if( $err )
-		{
-	            Fail $err
-		}
+	        if( (Test-Path -Path $errFile -PathType Leaf) )
+	        {
+	    	    $err = Get-Content -Path $errFile -Raw
+		        if( $err )
+		        {
+	                    Fail $err
+		        }
+            }
 
             $decrypedString = Get-Content -Path $outFile -TotalCount 1
             Assert-Equal $string $decrypedString

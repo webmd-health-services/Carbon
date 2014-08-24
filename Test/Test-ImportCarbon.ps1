@@ -22,6 +22,14 @@ function Start-Test
     }
 }
 
+function Stop-Test
+{
+    if( (Get-Module 'Carbon') )
+    {
+        Remove-Module 'Carbon'
+    }
+}
+
 function Test-ShouldImport
 {
     & $importCarbonPath
