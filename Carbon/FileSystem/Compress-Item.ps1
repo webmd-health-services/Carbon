@@ -171,21 +171,28 @@ function Compress-Item
             [void][Runtime.InteropServices.Marshal]::ReleaseComObject($shellApp)
             do
             {
-                if( [Ionic.Zip.ZipFile]::CheckZip( $OutFile ) )
+                try
                 {
-                    $zipFile = [Ionic.Zip.ZipFile]::Read($OutFile)
-                    $count = $zipFile.Count
-                    $zipFile.Dispose()
-                    if( $zipItemCount -eq $count )
+                    if( [Ionic.Zip.ZipFile]::CheckZip( $OutFile ) )
                     {
-                        Write-Verbose ('Found {0} expected entries in ZIP file ''{1}''.' -f $zipItemCount,$OutFile)
-                        break
+                        $zipFile = [Ionic.Zip.ZipFile]::Read($OutFile)
+                        $count = $zipFile.Count
+                        $zipFile.Dispose()
+                        if( $zipItemCount -eq $count )
+                        {
+                            Write-Verbose ('Found {0} expected entries in ZIP file ''{1}''.' -f $zipItemCount,$OutFile)
+                            break
+                        }
+                        Write-Verbose ('ZIP file ''{0}'' has {1} entries, but expected {2}. Looks like the Shell API is still writing to it.' -f $OutFile,$count,$zipItemCount)
                     }
-                    Write-Verbose ('ZIP file ''{0}'' has {1} entries, but expected {2}. Looks like the Shell API is still writing to it.' -f $OutFile,$count,$zipItemCount)
+                    else
+                    {
+                        Write-Verbose ('ZIP file ''{0}'' not valid. Looks like Shell API is still writing to it.' -f $OutFile)
+                    }
                 }
-                else
+                catch
                 {
-                    Write-Verbose ('ZIP file ''{0}'' not valid. Looks like Shell API is still writing to it.' -f $OutFile)
+                    Write-Verbose ('Encountered an exception checking if the COM Shell API has finished creating ZIP file ''{0}'': {1}' -f $OutFile,$_.Exception.Message) 
                 }
                 Start-Sleep -Milliseconds 100
             }
