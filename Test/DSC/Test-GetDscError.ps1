@@ -16,7 +16,7 @@ $tempDir = $null
 
 function Start-TestFixture
 {
-    & (Join-Path -Path $PSScriptRoot -ChildPath '..\Import-CarbonForTest.ps1' -Resolve) $PSCommandPath
+    & (Join-Path -Path $PSScriptRoot -ChildPath '..\Import-CarbonForTest.ps1' -Resolve)
 }
 
 function Start-Test

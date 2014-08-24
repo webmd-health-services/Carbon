@@ -23,7 +23,7 @@ $password = 'Aa1Bb2Cc3Dd4'
 
 function Start-TestFixture
 {
-    & (Join-Path -Path $PSScriptRoot -ChildPath '..\Import-CarbonForTest.ps1' -Resolve) $PSCommandPath
+    & (Join-Path -Path $PSScriptRoot -ChildPath '..\Import-CarbonForTest.ps1' -Resolve)
     $tempDir = New-TempDirectory -Prefix $PSCommandPath
     Install-User -Username $userName -Password $password -PasswordNeverExpires
 }
