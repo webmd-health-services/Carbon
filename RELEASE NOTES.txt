@@ -156,6 +156,11 @@
  * [Get-Certificate](http://get-carbon.org/help/Get-Certificate.html) couldn't open CA/CertificateAuthority store (fixes issue [#130](https://bitbucket.org/splatteredbits/carbon/issue/130/get-certificate-doesnt-find-any)).
  * Extended script property `DisplayName` on `X509Store` objects returning wrong store name for custom stores, now returns an empty string.
 
+### File System
+
+ * [Disable-NtfsCompression](http://get-carbon.org/help/Disable-NtfsCompression.html) now *really* supports multiple paths.
+ * [Enable-NtfsCompression](http://get-carbon.org/help/Enable-NtfsCompression.html) now *really* supports multiple paths.
+
 ### Path
 
  * [Resolve-PathCase](http://get-carbon.org/help/Resolve-PathCase.html) didn't work under Windows 2012 R2.
@@ -168,13 +173,6 @@
  
 
 # 1.7.0 (30 April 2014)
-
-## Bug Fixes
-
-### File System
-
- * [Disable-NtfsCompression](http://get-carbon.org/help/Disable-NtfsCompression.html) now *really* supports multiple paths.
- * [Enable-NtfsCompression](http://get-carbon.org/help/Enable-NtfsCompression.html) now *really* supports multiple paths.
 
 There is now [a Carbon support mailing list](http://www.freelists.org/list/carbon).
 

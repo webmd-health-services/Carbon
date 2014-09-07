@@ -143,5 +143,5 @@ $releaseNotesHtml = Get-Content -Raw (Join-Path $PSSCriptRoot 'RELEASE NOTES.txt
 	</div>
 </body>
 </html>
-"@ -f ($releaseNotesHtml -join "`n") | Out-File -FilePath (Join-Path $PSScriptRoot 'Website\releasenotes.html') -Encoding OEM
+"@ -f ($releaseNotesHtml -join "`n") | Out-File -FilePath (Join-Path $OutputDir '..\releasenotes.html') -Encoding OEM
 
