@@ -206,6 +206,7 @@
 			<li><a href="ConvertTo-ContainerInheritanceFlags.html">ConvertTo-ContainerInheritanceFlags</a></li>
 			<li><a href="ConvertTo-InheritanceFlag.html">ConvertTo-InheritanceFlag</a></li>
 			<li><a href="ConvertTo-PropagationFlag.html">ConvertTo-PropagationFlag</a></li>
+			<li><a href="ConvertTo-ProviderAccessControlRights.html">ConvertTo-ProviderAccessControlRights</a></li>
 			<li><a href="Get-Permission.html">Get-Permission</a></li>
 			<li><a href="Grant-Permission.html">Grant-Permission</a></li>
 			<li><a href="New-Credential.html">New-Credential</a></li>
@@ -266,14 +267,14 @@
 
 
 <h1>Get-Privilege</h1>
-<div><p>Gets the privileges an identity has to perform system operations.</p></div>
+<div><p>Gets an identity's privileges.</p></div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>Get-Privilege [-Identity] &lt;String&gt; [&lt;CommonParameters&gt;]</code></pre>
     
 <h2>Description</h2>
 <div class="Description">
-<p>These privileges are usually managed by Group Policy.</p>
+<p>These privileges are usually managed by Group Policy and control the system operations and types of logons a user/group can perform.</p>
 
 <p>Note: if a computer is not on a domain, this function won't work.</p>
 </div>
@@ -314,6 +315,6 @@
         
 <h2>EXAMPLE 1</h2>
 <pre><code>Get-Privilege -Identity TheBeast</code></pre>
-<p>Gets TheBeast's privileges as an array of strings.</p>
+<p>Gets <code>TheBeast</code>'s privileges as an array of strings.</p>
 </body>
 </html>

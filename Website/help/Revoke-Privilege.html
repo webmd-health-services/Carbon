@@ -206,6 +206,7 @@
 			<li><a href="ConvertTo-ContainerInheritanceFlags.html">ConvertTo-ContainerInheritanceFlags</a></li>
 			<li><a href="ConvertTo-InheritanceFlag.html">ConvertTo-InheritanceFlag</a></li>
 			<li><a href="ConvertTo-PropagationFlag.html">ConvertTo-PropagationFlag</a></li>
+			<li><a href="ConvertTo-ProviderAccessControlRights.html">ConvertTo-ProviderAccessControlRights</a></li>
 			<li><a href="Get-Permission.html">Get-Permission</a></li>
 			<li><a href="Grant-Permission.html">Grant-Permission</a></li>
 			<li><a href="New-Credential.html">New-Credential</a></li>
@@ -266,16 +267,17 @@
 
 
 <h1>Revoke-Privilege</h1>
-<div><p>Revokes an identity's priveleges to perform system operations.</p></div>
+<div><p>Revokes an identity's privileges to perform system operations and certain types of logons.</p></div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>Revoke-Privilege [-Identity] &lt;String&gt; [-Privilege] &lt;String[]&gt; [&lt;CommonParameters&gt;]</code></pre>
     
 <h2>Description</h2>
 <div class="Description">
-<p>The most current list of privileges can be found <a href="http://msdn.microsoft.com/en-us/library/windows/desktop/aa375728.aspx">on Microsoft's website</a>. Here is the most current list, as of November 2012:</p>
+<p>Valid privileges are documented on Microsoft's website: <a href="http://msdn.microsoft.com/en-us/library/windows/desktop/bb530716.aspx">Privilege Constants</a> and <a href="http://msdn.microsoft.com/en-us/library/windows/desktop/bb545671.aspx">Account Right Constants</a>. Known values as of August 2014 are:</p>
 
 <ul>
+<li>SeAssignPrimaryTokenPrivilege</li>
 <li>SeAuditPrivilege</li>
 <li>SeBackupPrivilege</li>
 <li>SeBatchLogonRight</li>
@@ -283,6 +285,8 @@
 <li>SeCreateGlobalPrivilege</li>
 <li>SeCreatePagefilePrivilege</li>
 <li>SeCreatePermanentPrivilege</li>
+<li>SeCreateSymbolicLinkPrivilege</li>
+<li>SeCreateTokenPrivilege</li>
 <li>SeDebugPrivilege</li>
 <li>SeDenyBatchLogonRight</li>
 <li>SeDenyInteractiveLogonRight</li>
@@ -293,6 +297,7 @@
 <li>SeImpersonatePrivilege</li>
 <li>SeIncreaseBasePriorityPrivilege</li>
 <li>SeIncreaseQuotaPrivilege</li>
+<li>SeIncreaseWorkingSetPrivilege</li>
 <li>SeInteractiveLogonRight</li>
 <li>SeLoadDriverPrivilege</li>
 <li>SeLockMemoryPrivilege</li>
@@ -300,10 +305,10 @@
 <li>SeManageVolumePrivilege</li>
 <li>SeNetworkLogonRight</li>
 <li>SeProfileSingleProcessPrivilege</li>
-<li>SeRestorePrivilege</li>
+<li>SeRelabelPrivilege</li>
 <li>SeRemoteInteractiveLogonRight</li>
 <li>SeRemoteShutdownPrivilege</li>
-<li>SeReserveProcessorPrivilege</li>
+<li>SeRestorePrivilege</li>
 <li>SeSecurityPrivilege</li>
 <li>SeServiceLogonRight</li>
 <li>SeShutdownPrivilege</li>
@@ -313,6 +318,7 @@
 <li>SeSystemtimePrivilege</li>
 <li>SeTakeOwnershipPrivilege</li>
 <li>SeTcbPrivilege</li>
+<li>SeTimeZonePrivilege</li>
 <li>SeTrustedCredManAccessPrivilege</li>
 <li>SeUndockPrivilege</li>
 <li>SeUnsolicitedInputPrivilege</li>
@@ -321,10 +327,11 @@
     
 <h2>Related Commands</h2>
 <ul>
-<li><a href="http://msdn.microsoft.com/en-us/library/windows/desktop/aa375728.aspx">http://msdn.microsoft.com/en-us/library/windows/desktop/aa375728.aspx</a></li>
 <li><a href="Get-Privilege.html">Get-Privilege</a></li>
 <li><a href="Grant-Privilege.html">Grant-Privilege</a></li>
 <li><a href="Test-Privilege.html">Test-Privilege</a></li>
+<li><a href="http://msdn.microsoft.com/en-us/library/windows/desktop/bb530716.aspx">http://msdn.microsoft.com/en-us/library/windows/desktop/bb530716.aspx</a></li>
+<li><a href="http://msdn.microsoft.com/en-us/library/windows/desktop/bb545671.aspx">http://msdn.microsoft.com/en-us/library/windows/desktop/bb545671.aspx</a></li>
 </ul>
 
 <h2> Parameters </h2>
@@ -348,7 +355,7 @@
 <tr valign='top'>
 	<td>Privilege</td>
 	<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String[]</a></td>
-	<td>The privileges to grant.</td>
+	<td>The privileges to revoke.</td>
 	<td>true</td>
 	<td>false</td>
     <td></td>
