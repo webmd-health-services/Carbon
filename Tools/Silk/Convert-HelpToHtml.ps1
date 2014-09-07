@@ -157,17 +157,17 @@ $description
 "@ -f $inputTuypes
         }
     
-        $returnValues = ($commandHelp.returnValues | Out-HtmlString) -replace "`n",' '
+        $returnValues = ($help.returnValues | Out-HtmlString) -replace "`n",' '
         if( $returnValues )
         {
-            if( $returnValues -match '^(.*?)\.(\s+(.*))?$' )
+            if( $returnValues -match '^(.*?)\.?(\s+(.*))?$' )
             {
                 $typeLink = Get-TypeDocumentationLink -TypeName $matches[1]
                 $returnValues = '{0}. {1}' -f $typeLink,$matches[2]
             }
             else
             {
-                Write-Warning ("Command {0}: Unable to find type name in {1}.  Return value full type name should end with a period." -f $_.Name,$returnValues)
+                Write-Warning ("Command {0}: Unable to find type name in `{1}`.  Return value full type name should end with a period." -f $_.Name,$returnValues)
             }
             $returnValues = $returnValues | Convert-MarkdownToHtml
             $returnValues = @"

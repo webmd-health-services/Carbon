@@ -8,7 +8,7 @@
 	<ul id="SiteNav">
 		<li><a href="http://get-carbon.org">Get-Carbon</a></li>
 		<li><b>-Documentation</b></li>
-        <li><a href="http://get-carbon.org">-ReleaseNotes</a></li>
+        <li><a href="http://get-carbon.org/releasenotes.html">-ReleaseNotes</a></li>
 		<li><a href="http://pshdo.com">-Blog</a></li>
 	</ul>
 <div id="CommandMenuContainer" style="float:left;">
@@ -267,7 +267,7 @@
 
 
 <h1>Get-Permission</h1>
-<div><p>Gets the permissions (access control rules) for a file, directory, registry key, or certificate's private key.</p></div>
+<div><p>Gets the permissions (access control rules) for a file, directory, registry key, or certificate's private key/key container.</p></div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>Get-Permission [-Path] &lt;String&gt; [[-Identity] &lt;String&gt;] [-Inherited] [&lt;CommonParameters&gt;]</code></pre>
@@ -278,7 +278,7 @@
 
 <p>To return inherited permissions, use the <code>Inherited</code> switch.  Otherwise, only non-inherited (i.e. explicit) permissions are returned.</p>
 
-<p>Certificate permissions are only returned if a certificate has a private key. If a certificate doesn't have a private key, <code>$null</code> is returned.</p>
+<p>Certificate permissions are only returned if a certificate has a private key/key container. If a certificate doesn't have a private key, <code>$null</code> is returned.</p>
 </div>
     
 <h2>Related Commands</h2>
@@ -329,7 +329,8 @@
         
 
         
-
+<h2>Return Values</h2>
+<p><a href="http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.accessrule.aspx">System.Security.AccessControl.AccessRule</a>. </p>
         
 
         
@@ -347,6 +348,6 @@
 
 <h2>EXAMPLE 4</h2>
 <pre><code>Get-Permission -Path 'Cert:\LocalMachine\1234567890ABCDEF1234567890ABCDEF12345678'</code></pre>
-<p>Returns <code>System.Security.AccessControl.CryptoKeyAccesRule</code> objects for certificate's <code>Cert:\LocalMachine\1234567890ABCDEF1234567890ABCDEF12345678</code> private key. If it doesn't have a private key, <code>$null</code> is returned.</p>
+<p>Returns <code>System.Security.AccessControl.CryptoKeyAccesRule</code> objects for certificate's <code>Cert:\LocalMachine\1234567890ABCDEF1234567890ABCDEF12345678</code> private key/key container. If it doesn't have a private key, <code>$null</code> is returned.</p>
 </body>
 </html>

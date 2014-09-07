@@ -173,7 +173,6 @@ This is a backwards-incompatible release.
     * [Set-IniEntry](http://get-carbon.org/help/Set-IniEntry.html)
     * [Set-RegistryKeyValue](http://get-carbon.org/help/Set-RegistryKeyValue.html)
     * [Set-SslCertificateBinding](http://get-carbon.org/help/Set-SslCertificateBinding.html)
-    * [Test-GrantPermission](http://get-carbon.org/help/Test-GrantPermission.html)
     * [Uninstall-IisAppPool](http://get-carbon.org/help/Uninstall-IisAppPool.html)
     * [Uninstall-WindowsFeature](http://get-carbon.org/help/Uninstall-WindowsFeature.html)
     * [Unlock-IisConfigurationSection](http://get-carbon.org/help/Unlock-IisConfigurationSection.html)
@@ -229,7 +228,7 @@ This is a backwards-incompatible release.
 
  * [Remove-IniEntry](http://get-carbon.org/help/Remove-IniEntry.html) now handles case-sensitive INI files.
  * [Set-IniEntry](http://get-carbon.org/help/Set-IniEntry.html) now handles case-sensitive INI files.
- * [Split-IniEntry](http://get-carbon.org/help/Split-IniEntry.html) now handles case-sensitive INI files.
+ * [Split-Ini](http://get-carbon.org/help/Split-Ini.html) now handles case-sensitive INI files.
 
 ### MSI
 
@@ -237,11 +236,11 @@ This is a backwards-incompatible release.
 
 ### Security
 
- * Creating [Revoke-Permission](http://get-carbon.org/help/Revoke-Permission.html) function for revoking a user's permission to a file, directory, registry key, or certificate's private key.
+ * Creating [Revoke-Permission](http://get-carbon.org/help/Revoke-Permission.html) function for revoking a user's permission to a file, directory, registry key, or certificate's private key/key container.
  * Creating [ConvertTo-ContainerInheritanceFlags](http://get-carbon.org/help/ConvertTo-ContainerInheritanceFlags.html) function for converting  `System.Security.AccessControl.InheritanceFlags` and `System.Security.AccessControl.PropagationFlag` values into a `Carbon.Security.ContainerInheritanceFlags` value.
- * [Get-Permission](http://get-carbon.org/help/Get-Permission.html) now supports returning the permissions on private keys.
- * [Grant-Permission](http://get-carbon.org/help/Grant-Permission.html) now supports granting permissions on private keys.
- * [Test-Permission](http://get-carbon.org/help/Test-Permission.html) now supports testing permissions on certificate private keys.
+ * [Get-Permission](http://get-carbon.org/help/Get-Permission.html) now supports returning the permissions on private keys/key containers.
+ * [Grant-Permission](http://get-carbon.org/help/Grant-Permission.html) now supports granting permissions on private keys//key containers.
+ * [Test-Permission](http://get-carbon.org/help/Test-Permission.html) now supports testing permissions on certificate private keys/key containers.
 
 ### Services
 

@@ -8,7 +8,7 @@
 	<ul id="SiteNav">
 		<li><a href="http://get-carbon.org">Get-Carbon</a></li>
 		<li><b>-Documentation</b></li>
-        <li><a href="http://get-carbon.org">-ReleaseNotes</a></li>
+        <li><a href="http://get-carbon.org/releasenotes.html">-ReleaseNotes</a></li>
 		<li><a href="http://pshdo.com">-Blog</a></li>
 	</ul>
 <div id="CommandMenuContainer" style="float:left;">
@@ -270,9 +270,12 @@
 <div><p>Tests if IIS authentication types are enabled or disabled on a site and/or virtual directory under that site.</p></div>
 
 <h2>Syntax</h2>
-<pre class="Syntax"><code>Test-IisSecurityAuthentication -SiteName &lt;String&gt; [-VirtualPath &lt;String&gt;] -Anonymous [&lt;CommonParameters&gt;]</code></pre>
-<pre class="Syntax"><code>Test-IisSecurityAuthentication -SiteName &lt;String&gt; [-VirtualPath &lt;String&gt;] -Basic [&lt;CommonParameters&gt;]</code></pre>
-<pre class="Syntax"><code>Test-IisSecurityAuthentication -SiteName &lt;String&gt; [-VirtualPath &lt;String&gt;] -Digest [&lt;CommonParameters&gt;]</code></pre>
+<pre class="Syntax"><code>Test-IisSecurityAuthentication -SiteName &lt;String&gt; [-VirtualPath &lt;String&gt;] -Anonymous [&lt;CommonParameters&gt;]
+</code></pre>
+<pre class="Syntax"><code>Test-IisSecurityAuthentication -SiteName &lt;String&gt; [-VirtualPath &lt;String&gt;] -Basic [&lt;CommonParameters&gt;]
+</code></pre>
+<pre class="Syntax"><code>Test-IisSecurityAuthentication -SiteName &lt;String&gt; [-VirtualPath &lt;String&gt;] -Digest [&lt;CommonParameters&gt;]
+</code></pre>
 <pre class="Syntax"><code>Test-IisSecurityAuthentication -SiteName &lt;String&gt; [-VirtualPath &lt;String&gt;] -Windows [&lt;CommonParameters&gt;]</code></pre>
     
 <h2>Description</h2>
@@ -345,7 +348,8 @@
         
 
         
-
+<h2>Return Values</h2>
+<p><a href="http://msdn.microsoft.com/en-us/library/system.boolean.aspx">System.Boolean</a>. </p>
         
 
         

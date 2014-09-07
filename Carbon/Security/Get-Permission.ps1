@@ -16,14 +16,14 @@ function Get-Permission
 {
     <#
     .SYNOPSIS
-    Gets the permissions (access control rules) for a file, directory, registry key, or certificate's private key.
+    Gets the permissions (access control rules) for a file, directory, registry key, or certificate's private key/key container.
     
     .DESCRIPTION
     Permissions for a specific identity can also be returned.  Access control entries are for a path's discretionary access control list.
     
     To return inherited permissions, use the `Inherited` switch.  Otherwise, only non-inherited (i.e. explicit) permissions are returned.
 
-    Certificate permissions are only returned if a certificate has a private key. If a certificate doesn't have a private key, `$null` is returned. 
+    Certificate permissions are only returned if a certificate has a private key/key container. If a certificate doesn't have a private key, `$null` is returned. 
     
     .OUTPUTS
     System.Security.AccessControl.AccessRule.
@@ -64,7 +64,7 @@ function Get-Permission
     .EXAMPLE
     Get-Permission -Path 'Cert:\LocalMachine\1234567890ABCDEF1234567890ABCDEF12345678'
 
-    Returns `System.Security.AccessControl.CryptoKeyAccesRule` objects for certificate's `Cert:\LocalMachine\1234567890ABCDEF1234567890ABCDEF12345678` private key. If it doesn't have a private key, `$null` is returned.
+    Returns `System.Security.AccessControl.CryptoKeyAccesRule` objects for certificate's `Cert:\LocalMachine\1234567890ABCDEF1234567890ABCDEF12345678` private key/key container. If it doesn't have a private key, `$null` is returned.
     #>
     [CmdletBinding()]
     [OutputType([System.Security.AccessControl.AccessRule])]
