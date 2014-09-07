@@ -78,7 +78,8 @@ try
 		    <li><b>-Documentation</b></li>
             <li><a href="http://get-carbon.org">-ReleaseNotes</a></li>
 		    <li><a href="http://pshdo.com">-Blog</a></li>
-	    </ul>"@ )
+	    </ul>
+"@ )
     [void] $menuBuilder.AppendLine( '<div id="CommandMenuContainer" style="float:left;">' )
     [void] $menuBuilder.AppendLine( "`t<ul id=""CategoryMenu"">" )
     $categories.Keys | ForEach-Object {
@@ -185,10 +186,5 @@ try
 	</div>
 </body>
 </html>
-"@ -f ($releaseNotesHtml -join "`n") | Out-File -FilePath (Join-Path $PSScriptRoot 'Website\releasenotes.html') -Encoding OEM
+"@ -f ($releaseNotesHtml -join "`n") | Out-File -FilePath (Join-Path $OutputDir '..\releasenotes.html') -Encoding OEM
 
-}
-finally
-{
-    Remove-Junction -Path $linkPath
-}

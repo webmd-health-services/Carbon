@@ -98,28 +98,7 @@ $description
                     $hasCommonParameters = $true
                 }
             
-                $typeDisplayName = $_.type.name
-                $typeName = $typeDisplayName
-                if( $typeName.EndsWith('[]') )
-                {
-                    $typeName = $typeName -replace '\[\]',''
-                }
-
-                if( $typeName -eq 'bool' )
-                {
-                    $typeName = 'boolean'
-                }
-
-                $typeFullName = $loadedTypes[$typeName]
-                $typeLink = $typeDisplayName
-                if( -not $typeFullName )
-                {
-                    Write-Warning ("Command {0}: Type {1} not found." -f $_.Name,$_.type.name)
-                }
-                else
-                {
-                    $typeLink = '<a href="http://msdn.microsoft.com/en-us/library/{0}.aspx">{1}</a>' -f $typeFullName.ToLower(),$typeDisplayName
-                }
+                $typeLink = Get-TypeDocumentationLink -TypeName $_.type.name
                 $paramDescription = $_.Description | 
                                 Out-HtmlString | 
                                 Convert-MarkdownToHtml | 
@@ -183,12 +162,8 @@ $description
         {
             if( $returnValues -match '^(.*?)\.(\s+(.*))?$' )
             {
-                $type = [Type]$matches[1]
-                if( -not $type )
-                {
-                    Write-Warning ("Command {0}: Type {1} not found." -f $_.Name,$matches[1])
-                }
-                $returnValues = '[{0}](http://msdn.microsoft.com/en-us/library/{1}.aspx). {2}' -f $type.FullName,$type.FullName.ToLower(),$matches[2]
+                $typeLink = Get-TypeDocumentationLink -TypeName $matches[1]
+                $returnValues = '{0}. {1}' -f $typeLink,$matches[2]
             }
             else
             {
