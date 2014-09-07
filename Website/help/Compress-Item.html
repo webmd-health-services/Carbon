@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-    <title>PowerShell - Test-PowerShellIs32Bit - Carbon</title>
+    <title>PowerShell - Compress-Item - Carbon</title>
 	<link href="styles.css" type="text/css" rel="stylesheet" />
 </head>
 <body>
@@ -266,20 +266,99 @@
 </div>
 
 
-<h1>Test-PowerShellIs32Bit</h1>
-<div><p>Tests if the current PowerShell process is 32-bit.</p></div>
+<h1>Compress-Item</h1>
+<div><p>Compresses a file/directory using the <code>DotNetZip</code> library.</p></div>
 
 <h2>Syntax</h2>
-<pre class="Syntax"><code>Test-PowerShellIs32Bit [&lt;CommonParameters&gt;]</code></pre>
+<pre class="Syntax"><code>Compress-Item [-Path] &lt;String[]&gt; [[-OutFile] &lt;String&gt;] [-UseShell] [-Force] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
     
 <h2>Description</h2>
 <div class="Description">
-<p>Returns <code>True</code> if the currently executing PowerShell process is 32-bit/x86, <code>False</code> if it is 64-bit/x64.</p>
+<p>You can supply a destination file path, via the <code>OutFile</code> parameter. If the file doesn't exist, it is created. If it exists, use the <code>-Force</code> parameter to overwrite it.</p>
+
+<p>Each item added to the ZIP file will be added to the root of the file, with a name matching the original file's/directory's name. For example, if adding the file <code>C:\Projects\Carbon\RELEASE NOTE.txt</code>, it would get added to the ZIP file as <code>RELEASE NOTES.txt</code>.</p>
+
+<p>If you don't supply an output file path, one will be created in the current user's TEMP directory.</p>
+
+<p>A <code>System.IO.FileInfo</code> object is returned representing the ZIP file.</p>
+
+<p>Microsoft's DSC Local Configuration Manager is unable to unzip files compressed with the <code>DotNetZip</code> library (or the <code>ZipFile</code> class in .NET 4.5), so as an alternative, if you specify the <code>UseShell</code> switch, the file will be compressed with the Windows COM shell API.</p>
 </div>
     
+<h2>Related Commands</h2>
+<ul>
+<li><a href="https://www.nuget.org/packages/DotNetZip">https://www.nuget.org/packages/DotNetZip</a></li>
+<li><a href="Expand-Item.html">Expand-Item</a></li>
+<li><a href="Test-ZipFile.html">Test-ZipFile</a></li>
+</ul>
 
-
-
+<h2> Parameters </h2>
+<table border='1'>
+<tr>
+	<th>Name</th>
+    <th>Type</th>
+	<th>Description</th>
+	<th>Required?</th>
+	<th>Pipeline Input</th>
+	<th>Default Value</th>
+</tr>
+<tr valign='top'>
+	<td>Path</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String[]</a></td>
+	<td>The path to the files/directories to compress.</td>
+	<td>true</td>
+	<td>true (ByPropertyName)</td>
+    <td></td>
+</tr>
+<tr valign='top'>
+	<td>OutFile</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+	<td>Path to destination ZIP file. If not provided, a ZIP file will be created in the current user's TEMP directory.</td>
+	<td>false</td>
+	<td>false</td>
+    <td></td>
+</tr>
+<tr valign='top'>
+	<td>UseShell</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+	<td>Uses the Windows COM shell API to create the zip file instead of the <code>DotNetZip</code> library. Microsoft's DSC Local Configuration Manager can't unzip files zipped with <code>DotNetZip</code> (or even the .NET 4.5 <code>ZipFile</code> class).</td>
+	<td>false</td>
+	<td>false</td>
+    <td>False</td>
+</tr>
+<tr valign='top'>
+	<td>Force</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+	<td>Overwrites an existing ZIP file.</td>
+	<td>false</td>
+	<td>false</td>
+    <td>False</td>
+</tr>
+<tr valign='top'>
+	<td>WhatIf</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+	<td></td>
+	<td>false</td>
+	<td>false</td>
+    <td></td>
+</tr>
+<tr valign='top'>
+	<td>Confirm</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+	<td></td>
+	<td>false</td>
+	<td>false</td>
+    <td></td>
+</tr>
+<tr valign="top">
+    <td><a href="http://technet.microsoft.com/en-us/library/dd315352.aspx">CommonParameters</a></td>
+    <td></td>
+    <td>This cmdlet supports common parameters.  For more information type <br> <code>Get-Help about_CommonParameters</code>.</td>
+    <td></td>
+    <td></td>
+    <td></td>
+</tr>
+</table>
         
 
         
@@ -288,7 +367,15 @@
 
         
 <h2>EXAMPLE 1</h2>
-<pre><code>Test-PowerShellIs32Bit</code></pre>
-<p>Returns <code>True</code> if PowerShell is 32-bit/x86, <code>False</code> if it is 64-bit/x64.</p>
+<pre><code>Compress-Item -Path 'C:\Projects\Carbon' -OutFile 'C:\Carbon.zip'</code></pre>
+<p>Demonstrates how to create a ZIP file of the <code>C:\Projects\Carbon</code> directory.</p>
+
+<h2>EXAMPLE 2</h2>
+<pre><code>Get-ChildItem -Path 'C:\Projects\Carbon' | Where-Object { $_.PsIsContainer} | Compress-Item -OutFile 'C:\Projects\Carbon.zip'</code></pre>
+<p>Demonstrates how you can pipe items to <code>Compress-Item</code> for compressing.</p>
+
+<h2>EXAMPLE 3</h2>
+<pre><code>Compress-Item -Path 'C:\Projects\Carbon' -OutFile 'C:\Carbon.zip' -UseShell</code></pre>
+<p>Demonstrates how to create a ZIP file with the Windows shell COM APIs instead of the <code>DotNetZip</code> library.</p>
 </body>
 </html>

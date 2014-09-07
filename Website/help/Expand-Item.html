@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-    <title>PowerShell - Test-PowerShellIs32Bit - Carbon</title>
+    <title>PowerShell - Expand-Item - Carbon</title>
 	<link href="styles.css" type="text/css" rel="stylesheet" />
 </head>
 <body>
@@ -266,20 +266,87 @@
 </div>
 
 
-<h1>Test-PowerShellIs32Bit</h1>
-<div><p>Tests if the current PowerShell process is 32-bit.</p></div>
+<h1>Expand-Item</h1>
+<div><p>Decompresses a ZIP file to a directory using the <code>DotNetZip</code> library.</p></div>
 
 <h2>Syntax</h2>
-<pre class="Syntax"><code>Test-PowerShellIs32Bit [&lt;CommonParameters&gt;]</code></pre>
+<pre class="Syntax"><code>Expand-Item [-Path] &lt;String&gt; [[-OutDirectory] &lt;String&gt;] [-Force] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
     
 <h2>Description</h2>
 <div class="Description">
-<p>Returns <code>True</code> if the currently executing PowerShell process is 32-bit/x86, <code>False</code> if it is 64-bit/x64.</p>
+<p>The contents of the ZIP file are extracted to a temporary directory, and that directory is returned as a <code>System.IO.DirectoryInfo</code> object. You are responsible for deleting that directory when you're finished.</p>
+
+<p>You can extract to a specific directory with the <code>OutDirectory</code> parameter. If the directory doesn't exist, it is created. If the directory exists, and is empty, the file is decompressed into that directory. If the directory isn't empty, use the <code>-Force</code> parameter to overwrite any files/directories which may be present.</p>
+
+<p>The directory where the files were decompressed is returned.</p>
 </div>
     
+<h2>Related Commands</h2>
+<ul>
+<li><a href="https://www.nuget.org/packages/DotNetZip">https://www.nuget.org/packages/DotNetZip</a></li>
+<li><a href="Compress-Item.html">Compress-Item</a></li>
+<li><a href="Test-ZipFile.html">Test-ZipFile</a></li>
+</ul>
 
-
-
+<h2> Parameters </h2>
+<table border='1'>
+<tr>
+	<th>Name</th>
+    <th>Type</th>
+	<th>Description</th>
+	<th>Required?</th>
+	<th>Pipeline Input</th>
+	<th>Default Value</th>
+</tr>
+<tr valign='top'>
+	<td>Path</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+	<td>The path to the files/directories to compress.</td>
+	<td>true</td>
+	<td>false</td>
+    <td></td>
+</tr>
+<tr valign='top'>
+	<td>OutDirectory</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+	<td>Path to a directory where the file should be extracted.</td>
+	<td>false</td>
+	<td>false</td>
+    <td></td>
+</tr>
+<tr valign='top'>
+	<td>Force</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+	<td>Overwrite any existing files/directories in <code>OutDirectory</code>.</td>
+	<td>false</td>
+	<td>false</td>
+    <td>False</td>
+</tr>
+<tr valign='top'>
+	<td>WhatIf</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+	<td></td>
+	<td>false</td>
+	<td>false</td>
+    <td></td>
+</tr>
+<tr valign='top'>
+	<td>Confirm</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+	<td></td>
+	<td>false</td>
+	<td>false</td>
+    <td></td>
+</tr>
+<tr valign="top">
+    <td><a href="http://technet.microsoft.com/en-us/library/dd315352.aspx">CommonParameters</a></td>
+    <td></td>
+    <td>This cmdlet supports common parameters.  For more information type <br> <code>Get-Help about_CommonParameters</code>.</td>
+    <td></td>
+    <td></td>
+    <td></td>
+</tr>
+</table>
         
 
         
@@ -288,7 +355,15 @@
 
         
 <h2>EXAMPLE 1</h2>
-<pre><code>Test-PowerShellIs32Bit</code></pre>
-<p>Returns <code>True</code> if PowerShell is 32-bit/x86, <code>False</code> if it is 64-bit/x64.</p>
+<pre><code>$unzipRoot = Expand-Item -Path 'C:\Carbon.zip'</code></pre>
+<p>Demonstrates how to unzip a file into a temporary directory. You are responsible for deleting that directory.</p>
+
+<h2>EXAMPLE 2</h2>
+<pre><code>Expand-Item -Path 'C:\Carbon.zip' -OutDirectory 'C:\Modules\Carbon'</code></pre>
+<p>Demonstrates how to unzip a file into a specific directory.</p>
+
+<h2>EXAMPLE 3</h2>
+<pre><code>Expand-Item -Path 'C:\Carbon.zip' -OutDirectory 'C:\Modules\Carbon' -Force</code></pre>
+<p>Demonstrates how to decompress to an existing, non-empty directory with the <code>-Force</code> parameter. Existing files are overwritten.</p>
 </body>
 </html>

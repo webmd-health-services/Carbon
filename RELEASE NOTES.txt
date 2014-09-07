@@ -125,7 +125,7 @@ This is a backwards-incompatible release.
  * Added [Remove-GroupMember](http://get-carbon.org/help/Remove-GroupMember.html) function. Thanks to [Philip Kluss](https://bitbucket.org/philkloose) for the contribution. 
 
 
-# 1.8.0
+# 1.8.0 (7 September 2014)
 
 ## Enhancements
 

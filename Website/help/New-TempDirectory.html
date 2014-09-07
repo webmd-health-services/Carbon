@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-    <title>PowerShell - Test-PowerShellIs32Bit - Carbon</title>
+    <title>PowerShell - New-TempDirectory - Carbon</title>
 	<link href="styles.css" type="text/css" rel="stylesheet" />
 </head>
 <body>
@@ -266,20 +266,44 @@
 </div>
 
 
-<h1>Test-PowerShellIs32Bit</h1>
-<div><p>Tests if the current PowerShell process is 32-bit.</p></div>
+<h1>New-TempDirectory</h1>
+<div><p>Creates a new temporary directory with a random name.</p></div>
 
 <h2>Syntax</h2>
-<pre class="Syntax"><code>Test-PowerShellIs32Bit [&lt;CommonParameters&gt;]</code></pre>
+<pre class="Syntax"><code>New-TempDirectory [[-Prefix] &lt;String&gt;] [&lt;CommonParameters&gt;]</code></pre>
     
 <h2>Description</h2>
 <div class="Description">
-<p>Returns <code>True</code> if the currently executing PowerShell process is 32-bit/x86, <code>False</code> if it is 64-bit/x64.</p>
+<p>A new temporary directory is created in the current user's <code>env:TEMP</code> directory.  The directory's name is created using the <code>Path</code> class's <a href="http://msdn.microsoft.com/en-us/library/system.io.path.getrandomfilename.aspx">GetRandomFileName method</a>.</p>
+
+<p>To add a custom prefix to the directory name, use the <code>Prefix</code> parameter. If you pass in a path, only its name will be used. In this way, you can pass <code>$MyInvocation.MyCommand.Definition</code> (PowerShell 2) or <code>$PSCommandPath</code> (PowerShell 3+), which will help you identify what scripts are leaving cruft around in the temp directory.</p>
 </div>
     
+<h2>Related Commands</h2>
+<ul>
+<li><a href="http://msdn.microsoft.com/en-us/library/system.io.path.getrandomfilename.aspx">http://msdn.microsoft.com/en-us/library/system.io.path.getrandomfilename.aspx</a></li>
+</ul>
 
+<h2> Parameters </h2>
+<table border='1'>
+<tr>
+	<th>Name</th>
+    <th>Type</th>
+	<th>Description</th>
+	<th>Required?</th>
+	<th>Pipeline Input</th>
+	<th>Default Value</th>
+</tr>
+<tr valign='top'>
+	<td>Prefix</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+	<td>A prefix to use, so you can more easily identify <em>what</em> created the temporary directory. If you pass in a path, it will be converted to a file name.</td>
+	<td>false</td>
+	<td>false</td>
+    <td></td>
+</tr>
 
-
+</table>
         
 
         
@@ -288,7 +312,19 @@
 
         
 <h2>EXAMPLE 1</h2>
-<pre><code>Test-PowerShellIs32Bit</code></pre>
-<p>Returns <code>True</code> if PowerShell is 32-bit/x86, <code>False</code> if it is 64-bit/x64.</p>
+<pre><code>New-TempDirectory</code></pre>
+<p>Demonstrates how to create a new temporary directory, e.g. <code>C:\Users\ajensen\AppData\Local\Temp\5pobd3tu.5rn</code>.</p>
+
+<h2>EXAMPLE 2</h2>
+<pre><code>New-TempDirectory -Prefix 'Carbon'</code></pre>
+<p>Demonstrates how to create a new temporary directory with a custom prefix for its name, e.g. <code>C:\Users\ajensen\AppData\Local\Temp\Carbon5pobd3tu.5rn</code>.</p>
+
+<h2>EXAMPLE 3</h2>
+<pre><code>New-TempDirectory -Prefix $MyInvocation.MyCommand.Definition</code></pre>
+<p>Demonstrates how you can use <code>$MyInvocation.MyCommand.Definition</code> in PowerShell 2 to create a new, temporary directory, named after the currently executing scripts, e.g. <code>C:\Users\ajensen\AppData\Local\Temp\New-TempDirectory.ps15pobd3tu.5rn</code>.</p>
+
+<h2>EXAMPLE 4</h2>
+<pre><code>New-TempDirectory -Prefix $PSCommandPath</code></pre>
+<p>Demonstrates how you can use <code>$PSCommandPath</code> in PowerShell 3+ to create a new, temporary directory, named after the currently executing scripts, e.g. <code>C:\Users\ajensen\AppData\Local\Temp\New-TempDirectory.ps15pobd3tu.5rn</code>.</p>
 </body>
 </html>
