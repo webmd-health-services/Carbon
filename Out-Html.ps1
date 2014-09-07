@@ -62,7 +62,7 @@ $menuBuilder = New-Object Text.StringBuilder
 	<ul id="SiteNav">
 		<li><a href="http://get-carbon.org">Get-Carbon</a></li>
 		<li><b>-Documentation</b></li>
-        <li><a href="http://get-carbon.org">-ReleaseNotes</a></li>
+        <li><a href="http://get-carbon.org/releasenotes.html">-ReleaseNotes</a></li>
 		<li><a href="http://pshdo.com">-Blog</a></li>
 	</ul>"@ )
 [void] $menuBuilder.AppendLine( '<div id="CommandMenuContainer" style="float:left;">' )

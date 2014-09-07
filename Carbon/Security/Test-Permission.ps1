@@ -16,18 +16,18 @@ function Test-Permission
 {
     <#
     .SYNOPSIS
-    Tests if permissions are set on a file, directory, registry key, or certificate's private key..
+    Tests if permissions are set on a file, directory, registry key, or certificate's private key/key container.
 
     .DESCRIPTION
     Sometimes, you don't want to use `Grant-Permission` on a big tree.  In these situations, use `Test-Permission` to see if permissions are set on a given path.
 
-    This function supports file system, registry, and certificate private key permissions.  You can also test the inheritance and propogation flags on containers, in addition to the permissions, with the `ApplyTo` parameter.  See [Grant-Permission](Grant-Permission.html) documentation for an explanation of the `ApplyTo` parameter.
+    This function supports file system, registry, and certificate private key/key container permissions.  You can also test the inheritance and propogation flags on containers, in addition to the permissions, with the `ApplyTo` parameter.  See [Grant-Permission](Grant-Permission.html) documentation for an explanation of the `ApplyTo` parameter.
 
     Inherited permissions on *not* checked by default.  To check inherited permission, use the `-Inherited` switch.
 
     By default, the permission check is not exact, i.e. the user may have additional permissions to what you're checking.  If you want to make sure the user has *exactly* the permission you want, use the `-Exact` switch.  Please note that by default, NTFS will automatically add/grant `Synchronize` permission on an item, which is handled by this function.
 
-    When checking for permissions on certificate private keys, if a certificate doesn't have a private key, `$true` is returned.
+    When checking for permissions on certificate private keys/key containers, if a certificate doesn't have a private key, `$true` is returned.
 
     .OUTPUTS
     System.Boolean.
@@ -74,7 +74,7 @@ function Test-Permission
     .EXAMPLE
     Test-Permission -Identity 'STARFLEET\Data' -Permission 'GenericWrite' -Path 'cert:\LocalMachine\My\1234567890ABCDEF1234567890ABCDEF12345678'
 
-    Demonstrates how to test for permissions on a certificate's private key. If the certificate doesn't have a private key, returns `$true`.
+    Demonstrates how to test for permissions on a certificate's private key/key container. If the certificate doesn't have a private key, returns `$true`.
     #>
     [CmdletBinding()]
     param(

@@ -8,7 +8,7 @@
 	<ul id="SiteNav">
 		<li><a href="http://get-carbon.org">Get-Carbon</a></li>
 		<li><b>-Documentation</b></li>
-        <li><a href="http://get-carbon.org">-ReleaseNotes</a></li>
+        <li><a href="http://get-carbon.org/releasenotes.html">-ReleaseNotes</a></li>
 		<li><a href="http://pshdo.com">-Blog</a></li>
 	</ul>
 <div id="CommandMenuContainer" style="float:left;">
@@ -267,14 +267,14 @@
 
 
 <h1>Revoke-Permission</h1>
-<div><p>Revokes <em>explicit</em> permissions on a file, directory, registry key, or certificate's private key.</p></div>
+<div><p>Revokes <em>explicit</em> permissions on a file, directory, registry key, or certificate's private key/key container.</p></div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>Revoke-Permission [-Path] &lt;String&gt; [-Identity] &lt;String&gt; [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
     
 <h2>Description</h2>
 <div class="Description">
-<p>Revokes all of an identity's <em>explicit</em> permissions on a file, directory, registry key, or certificate's private key. Only explicit permissions are considered; inherited permissions are ignored.</p>
+<p>Revokes all of an identity's <em>explicit</em> permissions on a file, directory, registry key, or certificate's private key/key container. Only explicit permissions are considered; inherited permissions are ignored.</p>
 
 <p>If the identity doesn't have permission, nothing happens, not even errors written out.</p>
 </div>
@@ -355,6 +355,6 @@
 
 <h2>EXAMPLE 3</h2>
 <pre><code>Revoke-Permission -Identity ENTERPRISE\Officers -Path 'cert:\LocalMachine\My\1234567890ABCDEF1234567890ABCDEF12345678'</code></pre>
-<p>Demonstrates how to revoke the Officers' permission to the <code>cert:\LocalMachine\My\1234567890ABCDEF1234567890ABCDEF12345678</code> certificate's private key.</p>
+<p>Demonstrates how to revoke the Officers' permission to the <code>cert:\LocalMachine\My\1234567890ABCDEF1234567890ABCDEF12345678</code> certificate's private key/key container.</p>
 </body>
 </html>

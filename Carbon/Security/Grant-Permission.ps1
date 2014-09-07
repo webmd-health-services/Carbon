@@ -16,12 +16,12 @@ function Grant-Permission
 {
     <#
     .SYNOPSIS
-    Grants permission on a file, directory, registry key, or certificate's private key.
+    Grants permission on a file, directory, registry key, or certificate's private key/key container.
 
     .DESCRIPTION
-    Granting access to a file system entry, registry key, or certificate's private key requires a lot of steps.  This method reduces it to one call.  Very helpful.
+    Granting access to a file system entry, registry key, or certificate's private key/key container requires a lot of steps.  This method reduces it to one call.  Very helpful.
 
-    It has the advantage that it will set permissions on a file system object, a registry key, or a certificate's private key.  If `Path` is absolute, the correct provider (file system or registry) is used.  If `Path` is relative, the provider of the current location will be used.
+    It has the advantage that it will set permissions on a file system object, a registry key, or a certificate's private key/key container.  If `Path` is absolute, the correct provider (file system or registry) is used.  If `Path` is relative, the provider of the current location will be used.
 
     The `Permissions` attribute can be a list of [FileSystemRights](http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.filesystemrights.aspx), [RegistryRights](http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.registryrights.aspx), [CryptoKeyRights](http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.cryptokeyrights.aspx).
 
@@ -92,9 +92,9 @@ function Grant-Permission
 
     If you prefer to speak in `InheritanceFlags` or `PropagationFlags`, you can use the `ConvertTo-ContainerInheritaceFlags` function to convert your flags into Carbon's flags.
 
-    ## Certificate Private Keys
+    ## Certificate Private Keys/Key Containers
 
-    When setting permissions on a certificate's private key, if a certificate doesn't have a private key, it is ignored and no permissions are set. Since certificate's are always leaves, the `ApplyTo` parameter is ignored.
+    When setting permissions on a certificate's private key/key container, if a certificate doesn't have a private key, it is ignored and no permissions are set. Since certificate's are always leaves, the `ApplyTo` parameter is ignored.
 
     When using the `-Clear` switch, note that the local `Administrators` account will always remain. In testing on Windows 2012 R2, we noticed that when `Administrators` access was removed, you couldn't read the key anymore. 
 
@@ -143,7 +143,7 @@ function Grant-Permission
     .EXAMPLE
     Grant-Permission -Identity ENTERPRISE\Engineers -Permission FullControl -Path 'cert:\LocalMachine\My\1234567890ABCDEF1234567890ABCDEF12345678'
     
-    Grants the Enterprise's engineering group full control on the `1234567890ABCDEF1234567890ABCDEF12345678` certificate's private key.
+    Grants the Enterprise's engineering group full control on the `1234567890ABCDEF1234567890ABCDEF12345678` certificate's private key/key container.
     #>
     [CmdletBinding(SupportsShouldProcess=$true)]
     param(

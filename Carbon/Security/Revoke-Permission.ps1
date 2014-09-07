@@ -16,10 +16,10 @@ function Revoke-Permission
 {
     <#
     .SYNOPSIS
-    Revokes *explicit* permissions on a file, directory, registry key, or certificate's private key.
+    Revokes *explicit* permissions on a file, directory, registry key, or certificate's private key/key container.
 
     .DESCRIPTION
-    Revokes all of an identity's *explicit* permissions on a file, directory, registry key, or certificate's private key. Only explicit permissions are considered; inherited permissions are ignored.
+    Revokes all of an identity's *explicit* permissions on a file, directory, registry key, or certificate's private key/key container. Only explicit permissions are considered; inherited permissions are ignored.
 
     If the identity doesn't have permission, nothing happens, not even errors written out.
 
@@ -48,7 +48,7 @@ function Revoke-Permission
     .EXAMPLE
     Revoke-Permission -Identity ENTERPRISE\Officers -Path 'cert:\LocalMachine\My\1234567890ABCDEF1234567890ABCDEF12345678'
 
-    Demonstrates how to revoke the Officers' permission to the `cert:\LocalMachine\My\1234567890ABCDEF1234567890ABCDEF12345678` certificate's private key.
+    Demonstrates how to revoke the Officers' permission to the `cert:\LocalMachine\My\1234567890ABCDEF1234567890ABCDEF12345678` certificate's private key/key container.
     #>
     [CmdletBinding(SupportsShouldProcess=$true)]
     param(
