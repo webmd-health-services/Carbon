@@ -15,7 +15,9 @@
 Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'CarbonDscTest.psm1' -Resolve) -Force
 
 $testConfigName = 'CarbonIniFileOption'
-$npmrcPath = Join-Path -Path (Split-Path -Parent -Path (Get-Command -Name 'npm.cmd').Path) -ChildPath 'node_modules\npm\npmrc' -Resolve
+$tempDir = $null
+$iniPath = $null
+$defaultValue = $null
 
 function Start-TestFixture
 {
@@ -24,31 +26,18 @@ function Start-TestFixture
 
 function Start-Test
 {
-    Remove-NpmTestConfigOption
+    $tempDir = New-TempDir -Prefix $PSCommandPath
+    $iniPath = Join-Path -Path $tempDir -ChildPath 'ini'
+    $defaultValue = [Guid]::NewGuid().ToString()
+    $null = New-Item -Path $iniPath -ItemType 'File'
+    @'
+prefix = {0}
+'@ -f $defaultValue | Set-Content -Path $iniPath
 }
 
 function Stop-Test
 {
-    Remove-NpmTestConfigOption
-}
-
-function Remove-NpmTestConfigOption
-{
-    Remove-IniEntry -Path $npmrcPath -Name $testConfigName
-
-    $value = npm config get $testConfigName --global
-    if( ($value -and $value -ne 'undefined') )
-    {
-        npm config delete $testConfigName --global 2> $null
-        Assert-NoError
-    }
-
-    $value = npm config get $testConfigName
-    if( ($value -and $value -ne 'undefined') )
-    {
-        npm config delete $testConfigName 2> $null
-        Assert-NoError
-    }
+    Remove-Item -Path $tempDir -Recurse
 }
 
 function Stop-TestFixture
@@ -58,7 +47,7 @@ function Stop-TestFixture
 
 function Test-ShouldGetConfigValue
 {
-    $value = Get-TargetResource -Name 'prefix'
+    $value = Get-TargetResource -Path $iniPath -Name 'prefix'
     Assert-NotNull $value
     Assert-Equal $value.Name 'prefix'
     Assert-IniFile -Name 'prefix' -Value $value.Value 
@@ -67,7 +56,7 @@ function Test-ShouldGetConfigValue
 
 function Test-ShouldGetMissingConfigValue
 {
-    $value = Get-TargetResource -Name 'fubar'
+    $value = Get-TargetResource -Path $iniPath -Name 'fubar'
     Assert-NotNull $value
     Assert-Null $value.Value
     Assert-DscResourceAbsent $value
@@ -75,23 +64,14 @@ function Test-ShouldGetMissingConfigValue
 
 function Test-ShouldTestConfig
 {
-    Assert-True (Test-TargetResource -Name 'prefix' -Value (Get-TargetResource -Name 'prefix').Value -Ensure 'Present')
-    Assert-False (Test-TargetResource -Name 'prefix' -Value 'C:\I\Do\Not\Exist' -Ensure 'Present')
+    Assert-True (Test-TargetResource -Path $iniPath -Name 'prefix' -Value (Get-TargetResource -Path $iniPath -Name 'prefix').Value)
+    Assert-False (Test-TargetResource -Path $iniPath -Name 'prefix' -Value 'C:\I\Do\Not\Exist')
 }
 
 function Test-TestMissingConfig
 {
-    Assert-True (Test-TargetResource -Name 'fubar' -Value 'fubar' -Ensure 'Absent')
-    Assert-False (Test-TargetResource -Name 'fubar' -Value 'fubar' -Ensure 'Present')
-}
-
-function Test-ShouldHandleConfigSetWithUndefinedAsValue
-{
-    Assert-Equal 'undefined' (npm config get $testConfigName --global)
-    $resource = Get-TargetResource -Name $testConfigName
-    Assert-NotNull $resource
-    Assert-Null $resource.Value
-    Assert-DscResourceAbsent $resource
+    Assert-True (Test-TargetResource -Path $iniPath -Name 'fubar' -Value 'fubar' -Ensure 'Absent')
+    Assert-False (Test-TargetResource -Path $iniPath -Name 'fubar' -Value 'fubar')
 }
 
 function Test-ShouldSetupConfig
@@ -99,15 +79,15 @@ function Test-ShouldSetupConfig
     $name = 'CarbonIniFile'
     $value = [Guid]::NewGuid().ToString()
 
-    Set-TargetResource -Name $name -Value $value -Ensure 'Present'
+    Set-TargetResource -Path $iniPath -Name $name -Value $value
     Assert-IniFile -Name $name -Value $value
 
     $newValue = [guid]::NewGuid().ToString()
-    Set-TargetResource -Name $name -Value $newValue -Ensure 'Present'
+    Set-TargetResource -Path $iniPath -Name $name -Value $newValue
     Assert-IniFile -Name $name -Value $newValue 
 
-    Set-TargetResource -Name $name -Ensure 'Absent'
-    Assert-Null (Get-TargetResource -Name $name).Value
+    Set-TargetResource -Path $iniPath -Name $name -Ensure 'Absent'
+    Assert-Null (Get-TargetResource -Path $iniPath -Name $name).Value
 }
 
 function Test-ShouldTreatNameAsCaseSensitive
@@ -115,35 +95,27 @@ function Test-ShouldTreatNameAsCaseSensitive
     $value1 = [Guid]::NewGuid()
     $value2 = [Guid]::NewGuid()
 
-    Set-TargetResource -Name $testConfigName -Value $value1 -Ensure 'Present'
-    Set-TargetResource -Name $testConfigName.ToUpper() -Value $value2 -Ensure 'Present'
+    Set-TargetResource -Path $iniPath -Name $testConfigName -Value $value1 -CaseSensitive
+    Set-TargetResource -Path $iniPath -Name $testConfigName.ToUpper() -Value $value2 -CaseSensitive
 
-    try
-    {
-        Assert-IniFile $value1
-        Assert-IniFile -Name $testConfigName.ToUpper() -Value $value2
-    }
-    finally
-    {
-        Remove-IniEntry -Path $npmrcPath -Name $testConfigName.ToUpper() 
-        #npm config delete $testConfigName.ToUpper() --global
-    }
+    Assert-IniFile -Name $testConfigName -Value $value1 -CaseSensitive
+    Assert-IniFile -Name $testConfigName.ToUpper() -Value $value2 -CaseSensitive
 }
 
 function Test-ShouldTreatValueAsCaseSensitive
 {
     $value1 = 'fubar'
 
-    Set-TargetResource -Name $testConfigName -Value $value1 -Ensure 'Present'
-    Assert-True (Test-TargetResource -Name $testConfigName -Value $value1 -Ensure 'Present')
-    Assert-False (Test-TargetResource -Name $testConfigName -Value $value1.ToUpper() -Ensure 'Present')    
+    Set-TargetResource -Path $iniPath -Name $testConfigName -Value $value1
+    Assert-True (Test-TargetResource -Path $iniPath -Name $testConfigName -Value $value1 -CaseSensitive)
+    Assert-False (Test-TargetResource -Path $iniPath -Name $testConfigName -Value $value1.ToUpper() -CaseSensitive)
 }
 
 configuration DscConfiguration
 {
     param(
         $Value,
-        $Ensure
+        $Ensure = 'Present'
     )
 
     Set-StrictMode -Off
@@ -154,6 +126,7 @@ configuration DscConfiguration
     {
         Carbon_IniFile set
         {
+            Path = $iniPath;
             Name = $testConfigName
             Value = $Value;
             Ensure = $Ensure;
@@ -164,7 +137,7 @@ function Test-ShouldRunThroughDsc
 {
     $value = [Guid]::NewGuid().ToString()
 
-    & DscConfiguration -Value $value -Ensure 'Present' -OutputPath $CarbonDscOutputRoot
+    & DscConfiguration -Value $value -OutputPath $CarbonDscOutputRoot
 
     Start-DscConfiguration -Wait -ComputerName 'localhost' -Path $CarbonDscOutputRoot 
     Assert-NoError
@@ -181,27 +154,23 @@ function Assert-IniFile
     param(
         [Parameter(Position=0)]
         $Value,
-        $Name = $testConfigName
+        $Name = $testConfigName,
+
+        [Switch]
+        $CaseSensitive = $false
     )
 
     Set-StrictMode -Version 'Latest'
 
-    while( $Value -match '\$\{(.+?)\}' )
-    {
-        $envVarName = $Matches[1]
-        $replaceRegex = '${{{0}}}' -f $envVarName
-        $replaceRegex = [Text.RegularExpressions.RegEx]::Escape($replaceRegex)
-        $envVarValue = Get-Item -Path ('env:{0}' -f $envVarName) -ErrorAction Ignore | Select-Object -ExpandProperty 'Value'
-        $Value = $Value -replace $replaceRegex,$envVarValue
-    }
+    $ini = Split-Ini -Path $iniPath -AsHashtable -CaseSensitive:$CaseSensitive
 
-    $actualValue = npm config get $Name --global
     if( $Value -eq $null )
     {
-        Assert-Equal 'undefined' $actualValue
+        Assert-False ($ini.ContainsKey( $Name ))
     }
     else
     {
-        Assert-Equal $Value $actualValue -CaseSensitive
+        Assert-True ($ini.ContainsKey( $Name ))
+        Assert-Equal $Value $ini[$Name].Value -CaseSensitive:$CaseSensitive
     }
 }

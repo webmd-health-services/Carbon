@@ -14,44 +14,17 @@
 
 & (Join-Path -Path $PSScriptRoot -ChildPath '..\Initialize-CarbonDscResource.ps1' -Resolve)
 
-$npmrcPath = $null
-
-function Get-NpmrcPath
-{
-    param(
-    )
-
-    if( -not $npmrcPath )
-    {
-        $npmCmd = Get-Command -Name 'npm.cmd' -ErrorAction Ignore
-        if( -not $npmCmd )
-        {
-            $npmCmd = Get-Command -Name (Join-Path -Path $env:ProgramFiles -ChildPath 'nodejs\npm.cmd') -ErrorAction Ignore
-            if( -not $npmCmd )
-            {
-                Write-Error ('npm.cmd not found. Is Node.js installed? If not, make sure you install Node.js before this resource.')
-                return
-            }
-        }
-
-        $nodeJsRoot = Split-Path -Parent -Path $npmCmd.Path
-        $script:npmrcPath = Join-Path -Path $nodeJsRoot -ChildPath 'node_modules\npm\npmrc'
-        if( -not (Test-Path -Path $npmrcPath -PathType Leaf) )
-        {
-            Write-Error ('Built-in npmrc ''{0}'' not found. Is Node.js installed? If not, make sure you install Node.js before this resource.' -f $npmrcPath)
-            return
-        }
-    }
-
-    return $npmrcPath
-}
-
 function Get-TargetResource
 {
 	[CmdletBinding()]
 	[OutputType([Collections.Hashtable])]
 	param
 	(
+        [Parameter(Mandatory=$true)]
+        [string]
+        # The path to the file to update.
+        $Path,
+
 		[Parameter(Mandatory=$true)]
 		[string]
         # The name of the NPM config value.
@@ -61,6 +34,10 @@ function Get-TargetResource
         # the value of the NPM config value.        
 		$Value,
 
+        [Switch]
+        # The INI file being modified is case-sensitive.
+        $CaseSensitive,
+
 		[ValidateSet("Present","Absent")]
 		[string]
         # Create or delete the NPM config value?
@@ -69,13 +46,12 @@ function Get-TargetResource
     
     Set-StrictMode -Version 'Latest'
 
-    $npmrcPath = Get-NpmrcPath
-    if( -not $npmrcPath )
+    if( -not $Path )
     {
         return
     }
 
-    $ini = Split-Ini -Path $npmrcPath -AsHashtable -CaseSensitive
+    $ini = Split-Ini -Path $Path -AsHashtable -CaseSensitive:$CaseSensitive
     
     $currentValue = $null
     $Ensure = 'Absent'
@@ -96,10 +72,10 @@ function Set-TargetResource
 {
     <#
     .SYNOPSIS
-    DSC resource for configuring Node Package Manager (NPM) settings.
+    DSC resource for managing settings in INI files.
 
     .DESCRIPTION
-    The `Carbon_NpmConfig` resource sets NPM configuration settings in the global NPM config file, which is usually found at `C:\Program Files\nodejs\node_modules\npm\npmrc`. All settings added/removed using this resource will be used for all users on the computer, unless a user overrides the setting.
+    The `Carbon_IniFile` resource sets or removes settings from INI files.
 
     .LINK
     Remove-IniEntry
@@ -112,38 +88,83 @@ function Set-TargetResource
 
     .EXAMPLE
     >
-    Demonstrates how to create/set an NPM config value.
+    Demonstrates how to create/set a setting in sectionless INI file.
 
-        Carbon_NpmConfig SetNpmPrefix
+        Carbon_IniFile SetNpmPrefix
         {
+            Path = 'C:\Program Files\nodejs\node_modules\npm\npmrc'
             Name = 'prefix';
             Value = 'C:\node-global-modules';
-            Ensure = 'Present';
+            CaseSensitive = $true;
         }
 
-    In this case, we're setting the directory all users will use to store node modules.
+    In this case, we're setting the `prefix` NPM setting to `C:\node-global-modules` in the `C:\Program Files\nodejs\node_modules\npm\npmrc` file. It is expected this file exists and you'll get an error if it doesn't. NPM configuration files are case-sensitive, so the `CaseSensitive` property is set to `$true`.
+
+    This line will be added to the INI file:
+
+        prefix = C:\node-global-modules
 
     .EXAMPLE
     >
-    Demonstrates how to remove an NPM config value.
+    Demonstrates how to create/set a setting in an INI file with sections.
 
-        Carbon_NpmConfig SetNpmPrefix
+        Carbon_IniFile SetBuildUserMercurialUsername
         {
+            Path = 'C:\Users\BuildUser\mercurial.ini'
+            Section = 'ui';
+            Name = 'username';
+            Value = 'Build User <builduser@example.com>';
+        }
+
+    In this case, we're setting the 'username' setting in the 'ui' section of the `C:\Users\BuildUser\mercurial.ini` file to `Build User <builduser@example.com>`. Since the `$Force` property is `$true`, if the file doesn't exist, it will be created. These lines will be added to the ini file:
+
+        [ui]
+        username = Build User <builduser@example.com>
+
+    .EXAMPLE
+    >
+    Demonstrates how to remove a setting from a case-sensitive INI file.
+
+        Carbon_IniFile RemoveNpmPrefix
+        {
+            Path = 'C:\Program Files\nodejs\node_modules\npm\npmrc'
             Name = 'prefix';
+            CaseSensitive = $true;
+            Ensure = 'Absent';
+        }
+
+    .EXAMPLE
+    >
+    Demonstrates how to remove a setting from an INI file that organizes settings into sections.
+
+        Carbon_IniFile RemoveBuildUserMercurialUsername
+        {
+            Path = 'C:\Users\BuildUser\mercurial.ini'
+            Section = 'ui';
+            Name = 'username';
             Ensure = 'Absent';
         }
     #>
 	[CmdletBinding()]
 	param
 	(
+        [Parameter(Mandatory=$true)]
+        [string]
+        # The path to the file to update.
+        $Path,
+
 		[Parameter(Mandatory=$true)]
 		[string]
         # The name of the NPM config value.
 		$Name,
 
 		[string]
-        # The value of the NPM config value. Required when `Ensure` is set to `Present`.
+        # the value of the NPM config value.        
 		$Value,
+
+        [Switch]
+        # The INI file being modified is case-sensitive.
+        $CaseSensitive,
 
 		[ValidateSet("Present","Absent")]
 		[string]
@@ -153,24 +174,18 @@ function Set-TargetResource
     
     Set-StrictMode -Version 'Latest'
 
-    $npmrcPath = Get-NpmrcPath
-    if( -not $npmrcPath )
-    {
-        return
-    }
-
-    $resource = Get-TargetResource -Name $Name
+    $resource = Get-TargetResource -Path $Path -Name $Name
     if( $resource.Ensure -eq 'Present' -and $Ensure -eq 'Absent' )
     {
         Write-Verbose ('Removing {0}' -f $Name)
-        Remove-IniEntry -Path $npmrcPath -Name $Name -CaseSensitive
+        Remove-IniEntry -Path $Path -Name $Name -CaseSensitive:$CaseSensitive
         return
     }
 
     if( $Ensure -eq 'Present' )
     {
         Write-Verbose ('Setting {0}' -f $Name)
-        Set-IniEntry -Path $npmrcPath -Name $Name -Value $Value -CaseSensitive
+        Set-IniEntry -Path $Path -Name $Name -Value $Value -CaseSensitive:$CaseSensitive
     }
 }
 
@@ -180,14 +195,23 @@ function Test-TargetResource
 	[OutputType([bool])]
 	param
 	(
+        [Parameter(Mandatory=$true)]
+        [string]
+        # The path to the file to update.
+        $Path,
+
 		[Parameter(Mandatory=$true)]
 		[string]
         # The name of the NPM config value.
 		$Name,
 
 		[string]
-        # The value of the NPM config value.        
+        # the value of the NPM config value.        
 		$Value,
+
+        [Switch]
+        # The INI file being modified is case-sensitive.
+        $CaseSensitive,
 
 		[ValidateSet("Present","Absent")]
 		[string]
@@ -197,7 +221,7 @@ function Test-TargetResource
     
     Set-StrictMode -Version 'Latest'
 
-    $resource = Get-TargetResource -Name $Name
+    $resource = Get-TargetResource -Path $Path -Name $Name
     if( -not $resource )
     {
         return $false
