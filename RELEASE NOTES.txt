@@ -1,5 +1,10 @@
 # 1.8.1 
 
+## Bug Fixes
+
+### INI
+
+ * [Set-IniEntry](http://get-carbon.org/help/Set-IniEntry.html) fails when adding the first section-less setting to a file.
  
  
 # 1.8.0 (7 September 2014)
