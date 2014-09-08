@@ -39,6 +39,14 @@ empty = file
 "@
 }
 
+function Test-ShouldAddSectionlessEntryToEmptyFile
+{
+    Set-IniEntry -Path $iniPath -Name empty -Value file
+    Assert-IniFile @"
+empty = file
+"@
+}
+
 function Test-ShouldRejectNamesWithEqualSign
 {
     $error.Clear()

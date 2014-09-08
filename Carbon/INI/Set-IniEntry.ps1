@@ -163,7 +163,7 @@ function Set-IniEntry
             else
             {
                 $lines.Insert( 0, $newLine )
-                if( $lines[1] )
+                if( $lines.Count -gt 1 -and $lines[1] )
                 {
                     $lines.Insert( 1, '' )
                 }
