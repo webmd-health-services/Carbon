@@ -25,45 +25,70 @@ function Get-TargetResource
         # The path to the file to update.
         $Path,
 
-		[Parameter(Mandatory=$true)]
-		[string]
-        # The name of the NPM config value.
-		$Name,
+        [string]
+        # The section of the INI file where the setting can be found.
+        $Section,
 
-		[string]
-        # the value of the NPM config value.        
-		$Value,
+        [Parameter(Mandatory=$true)]
+        [string]
+        # The name of the INI setting.
+        $Name,
+
+        [string]
+        # The value of the INI setting.        
+        $Value,
 
         [Switch]
         # The INI file being modified is case-sensitive.
         $CaseSensitive,
 
-		[ValidateSet("Present","Absent")]
-		[string]
-        # Create or delete the NPM config value?
-		$Ensure = 'Present'
+        [Switch]
+        # If `$true`, creates the INI file if it doesn't exist.
+        $Force,
+
+        [ValidateSet("Present","Absent")]
+        [string]
+        # Create or delete the INI setting?
+        $Ensure = 'Present'
 	)
     
     Set-StrictMode -Version 'Latest'
 
-    if( -not $Path )
+    $ini = @{ }
+    if( (Test-Path -Path $Path -PathType Leaf) )
     {
-        return
+        $ini = Split-Ini -Path $Path -AsHashtable -CaseSensitive:$CaseSensitive
+    }
+    else
+    {
+        if( -not $Force )
+        {
+            Write-Error ('INI file ''{0}'' not found. Set the `Force` property to `true` to create this INI file when it doesn''t exist.' -f $Path)
+            return
+        }
     }
 
-    $ini = Split-Ini -Path $Path -AsHashtable -CaseSensitive:$CaseSensitive
+    $key = $Name
+    if( $Section )
+    {
+        $key = '{0}.{1}' -f $Section,$Name
+    }
     
     $currentValue = $null
     $Ensure = 'Absent'
-    if( $ini.ContainsKey( $Name ) )
+    if( $ini.ContainsKey( $key ) )
     {
-        $currentValue = $ini[$Name].Value
+        $currentValue = $ini[$key].Value
         $Ensure = 'Present';
     }
 
     @{
+        Path = $Path;
+        Section = $Section;
         Name = $Name;
         Value = $currentValue;
+        CaseSensitive = $CaseSensitive;
+        Force = $Force
         Ensure = $Ensure;
     }
 }
@@ -113,6 +138,7 @@ function Set-TargetResource
             Path = 'C:\Users\BuildUser\mercurial.ini'
             Section = 'ui';
             Name = 'username';
+            Force = $true;
             Value = 'Build User <builduser@example.com>';
         }
 
@@ -153,39 +179,57 @@ function Set-TargetResource
         # The path to the file to update.
         $Path,
 
-		[Parameter(Mandatory=$true)]
-		[string]
-        # The name of the NPM config value.
-		$Name,
+        [string]
+        # The section of the INI file where the setting can be found.
+        $Section,
 
-		[string]
-        # the value of the NPM config value.        
-		$Value,
+        [Parameter(Mandatory=$true)]
+        [string]
+        # The name of the INI setting.
+        $Name,
+
+        [string]
+        # The value of the INI setting.        
+        $Value,
 
         [Switch]
         # The INI file being modified is case-sensitive.
         $CaseSensitive,
 
-		[ValidateSet("Present","Absent")]
-		[string]
-        # Create or delete the NPM config value?
-		$Ensure = 'Present'
+        [Switch]
+        # If `$true`, creates the INI file if it doesn't exist.
+        $Force,
+
+        [ValidateSet("Present","Absent")]
+        [string]
+        # Create or delete the INI setting?
+        $Ensure = 'Present'
 	)
     
     Set-StrictMode -Version 'Latest'
 
-    $resource = Get-TargetResource -Path $Path -Name $Name
+    $resource = Get-TargetResource -Path $Path -Section $Section -Name $Name -Force:$Force -CaseSensitive:$CaseSensitive
+    if( -not $resource )
+    {
+        return
+    }
+
+    if( -not (Test-Path -Path $Path -PathType Leaf) -and $Force )
+    {
+        New-Item -Path $Path -ItemType 'File' -Force -Verbose:$VerbosePreference | Out-Null
+    }
+
     if( $resource.Ensure -eq 'Present' -and $Ensure -eq 'Absent' )
     {
         Write-Verbose ('Removing {0}' -f $Name)
-        Remove-IniEntry -Path $Path -Name $Name -CaseSensitive:$CaseSensitive
+        Remove-IniEntry -Path $Path -Section $Section -Name $Name -CaseSensitive:$CaseSensitive
         return
     }
 
     if( $Ensure -eq 'Present' )
     {
         Write-Verbose ('Setting {0}' -f $Name)
-        Set-IniEntry -Path $Path -Name $Name -Value $Value -CaseSensitive:$CaseSensitive
+        Set-IniEntry -Path $Path -Section $Section -Name $Name -Value $Value -CaseSensitive:$CaseSensitive
     }
 }
 
@@ -200,28 +244,36 @@ function Test-TargetResource
         # The path to the file to update.
         $Path,
 
-		[Parameter(Mandatory=$true)]
-		[string]
-        # The name of the NPM config value.
-		$Name,
+        [string]
+        # The section of the INI file where the setting can be found.
+        $Section,
 
-		[string]
-        # the value of the NPM config value.        
-		$Value,
+        [Parameter(Mandatory=$true)]
+        [string]
+        # The name of the INI setting.
+        $Name,
+
+        [string]
+        # The value of the INI setting.        
+        $Value,
 
         [Switch]
         # The INI file being modified is case-sensitive.
         $CaseSensitive,
 
-		[ValidateSet("Present","Absent")]
-		[string]
-        # Create or delete the NPM config value?
-		$Ensure = 'Present'
+        [Switch]
+        # If `$true`, creates the INI file if it doesn't exist.
+        $Force,
+
+        [ValidateSet("Present","Absent")]
+        [string]
+        # Create or delete the INI setting?
+        $Ensure = 'Present'
 	)
     
     Set-StrictMode -Version 'Latest'
 
-    $resource = Get-TargetResource -Path $Path -Name $Name
+    $resource = Get-TargetResource -Path $Path -Section $Section -Name $Name -Force:$Force
     if( -not $resource )
     {
         return $false
@@ -229,7 +281,12 @@ function Test-TargetResource
 
     if( $Ensure -eq 'Present' )
     {
-        $result = ($resource.Value -ceq $Value)
+        $result = ($resource.Value -eq $Value)
+        if( $CaseSensitive )
+        {
+            $result = ($resource.Value -ceq $Value)
+        }
+
         if( $result )
         {
             Write-Verbose ('{0}: current value unchanged' -f $Name)

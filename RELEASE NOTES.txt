@@ -58,7 +58,7 @@ This is a backwards-incompatible release.
 
  * Created `Carbon_EnvironmentVariable` resource for creating/removing machine-level environment variables.
  * New [Clear-DscLocalResourceCache](http://get-carbon.org/help/Clear-DscLocalResourceCache.html) function for clearing the local LCM's DSC resource. This makes developing resources easier.
- * Created `Carbon_NpmConfig` resource for creating/setting/removing global NPM configuration values (yes, the "Node Package Manager" NPM).
+ * Created `Carbon_IniFile` resource for managing settings in INI files.
  * Created `Carbon_FirewallRule` resource for configuring firewall rules.
  * New [Test-DscTargetResource](http://get-carbon.org/help/Test-DscTargetResource.html) function for comparing target/desired resource states across DSC resources.
  * Created `Carbon_Privilege` resource for configuring and identity's privileges.
