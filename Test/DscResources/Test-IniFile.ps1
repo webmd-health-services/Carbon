@@ -14,12 +14,12 @@
 
 Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'CarbonDscTest.psm1' -Resolve) -Force
 
-$testConfigName = 'CarbonNpmConfigOption'
+$testConfigName = 'CarbonIniFileOption'
 $npmrcPath = Join-Path -Path (Split-Path -Parent -Path (Get-Command -Name 'npm.cmd').Path) -ChildPath 'node_modules\npm\npmrc' -Resolve
 
 function Start-TestFixture
 {
-    Start-CarbonDscTestFixture 'NpmConfig'
+    Start-CarbonDscTestFixture 'IniFile'
 }
 
 function Start-Test
@@ -61,7 +61,7 @@ function Test-ShouldGetConfigValue
     $value = Get-TargetResource -Name 'prefix'
     Assert-NotNull $value
     Assert-Equal $value.Name 'prefix'
-    Assert-NpmConfig -Name 'prefix' -Value $value.Value 
+    Assert-IniFile -Name 'prefix' -Value $value.Value 
     Assert-DscResourcePresent $value
 }
 
@@ -96,15 +96,15 @@ function Test-ShouldHandleConfigSetWithUndefinedAsValue
 
 function Test-ShouldSetupConfig
 {
-    $name = 'CarbonNpmConfig'
+    $name = 'CarbonIniFile'
     $value = [Guid]::NewGuid().ToString()
 
     Set-TargetResource -Name $name -Value $value -Ensure 'Present'
-    Assert-NpmConfig -Name $name -Value $value
+    Assert-IniFile -Name $name -Value $value
 
     $newValue = [guid]::NewGuid().ToString()
     Set-TargetResource -Name $name -Value $newValue -Ensure 'Present'
-    Assert-NPmConfig -Name $name -Value $newValue 
+    Assert-IniFile -Name $name -Value $newValue 
 
     Set-TargetResource -Name $name -Ensure 'Absent'
     Assert-Null (Get-TargetResource -Name $name).Value
@@ -120,8 +120,8 @@ function Test-ShouldTreatNameAsCaseSensitive
 
     try
     {
-        Assert-NpmConfig $value1
-        Assert-NpmConfig -Name $testConfigName.ToUpper() -Value $value2
+        Assert-IniFile $value1
+        Assert-IniFile -Name $testConfigName.ToUpper() -Value $value2
     }
     finally
     {
@@ -152,7 +152,7 @@ configuration DscConfiguration
 
     node 'localhost'
     {
-        Carbon_NpmConfig set
+        Carbon_IniFile set
         {
             Name = $testConfigName
             Value = $Value;
@@ -168,15 +168,15 @@ function Test-ShouldRunThroughDsc
 
     Start-DscConfiguration -Wait -ComputerName 'localhost' -Path $CarbonDscOutputRoot 
     Assert-NoError
-    Assert-NpmConfig $value 
+    Assert-IniFile $value 
 
     & DscConfiguration -Ensure 'Absent' -OutputPath $CarbonDscOutputRoot
     Start-DscConfiguration -Wait -ComputerName 'localhost' -Path $CarbonDscOutputRoot 
     Assert-NoError
-    Assert-NpmConfig $null
+    Assert-IniFile $null
 }
 
-function Assert-NpmConfig
+function Assert-IniFile
 {
     param(
         [Parameter(Position=0)]
