@@ -25,7 +25,7 @@
     ModuleToProcess = 'Carbon.psm1'
 
     # Version number of this module.
-    ModuleVersion = '1.8.0'
+    ModuleVersion = '1.8.1'
 
     # ID used to uniquely identify this module
     GUID = '075d9444-c01b-48c3-889a-0b3490716fa2'
