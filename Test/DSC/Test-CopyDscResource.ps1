@@ -60,7 +60,7 @@ function Test-ShouldOnlyCopyChangedFiles
     Assert-NotNull $result
     $result = Copy-DscResource -Path $sourceRoot -Destination $destinationRoot -PassThru
     Assert-Null $result
-    [Guid]::NewGuid().ToString() | Set-Content -Path (Join-path -Path $sourceRoot -ChildPath 'mov.mof')
+    [IO.File]::WriteAllText((Join-path -Path $sourceRoot -ChildPath 'mov.mof'), ([Guid]::NewGuid().ToString()))
     $result = Copy-DscResource -Path $sourceRoot -Destination $destinationRoot -PassThru
     Assert-NotNull $result
     Assert-Equal 2 $result.Count
@@ -72,12 +72,12 @@ function Test-ShouldAlwaysRegenerateChecksums
 {
     $result = Copy-DscResource -Path $sourceRoot -Destination $destinationRoot -PassThru
     Assert-NotNull $result
-    'E4F0D22EE1A26200BA320E18023A56B36FF29AA1D64913C60B46CE7D71E940C6' | Set-Content -Path (Join-Path -Path $sourceRoot -ChildPath 'zip.zip.checksum')
+    [IO.File]::WriteAllText((Join-Path -Path $sourceRoot -ChildPath 'zip.zip.checksum'), 'E4F0D22EE1A26200BA320E18023A56B36FF29AA1D64913C60B46CE7D71E940C6')
     try
     {
         $result = Copy-DscResource -Path $sourceRoot -Destination $destinationRoot -PassThru
         Assert-Null $result
-        [Guid]::NewGuid().ToString() | Set-Content -Path (Join-Path -Path $sourceRoot -ChildPath 'zip.zip')
+        [IO.File]::WriteAllText((Join-Path -Path $sourceRoot -ChildPath 'zip.zip'), ([Guid]::NewGuid().ToString()))
 
         $result = Copy-DscResource -Path $sourceRoot -Destination $destinationRoot -PassThru
         Assert-NotNull $result
@@ -146,7 +146,8 @@ function Assert-Copy
         $sourceHash = Get-FileHash -Path $_.FullName | Select-Object -ExpandProperty 'Hash'
         $destinationHashPath = '{0}.checksum' -f $destinationPath
         Assert-FileExists $destinationHashPath
-        $destinationHash = Get-Content -Path $destinationHashPath -ReadCount 1
+        # hash files can't have newlines, so we can't use Get-Content.
+        $destinationHash = [IO.File]::ReadAllText($destinationHashPath)
         Assert-Equal $sourceHash $destinationHash
     }
 }

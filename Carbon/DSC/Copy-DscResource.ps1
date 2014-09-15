@@ -101,7 +101,8 @@ function Copy-DscResource
             $sourceChecksumPath = '{0}.checksum' -f $item.Name
             $sourceChecksumPath = Join-Path -Path $tempDir -ChildPath $sourceChecksumPath
             $sourceChecksum = Get-FileHash -Path $item.FullName | Select-Object -ExpandProperty 'Hash'
-            Set-Content -Value $sourceChecksum -Path $sourceChecksumPath
+            # hash files can't have any newline characters, so we can't use Set-Content
+            [IO.File]::WriteAllText($sourceChecksumPath, $sourceChecksum)
 
             $destinationChecksum = ''
 
