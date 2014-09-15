@@ -219,16 +219,22 @@ function Set-TargetResource
         New-Item -Path $Path -ItemType 'File' -Force -Verbose:$VerbosePreference | Out-Null
     }
 
+    $fullName = $Name
+    if( $Section )
+    {
+        $fullName = '{0}.{1}' -f $Section,$Name
+    }
+
     if( $resource.Ensure -eq 'Present' -and $Ensure -eq 'Absent' )
     {
-        Write-Verbose ('Removing {0}' -f $Name)
+        Write-Verbose ('{0}: {1}: removing' -f $Path,$fullName)
         Remove-IniEntry -Path $Path -Section $Section -Name $Name -CaseSensitive:$CaseSensitive
         return
     }
 
     if( $Ensure -eq 'Present' )
     {
-        Write-Verbose ('Setting {0}' -f $Name)
+        Write-Verbose ('{0}: {1}: setting' -f $Path,$fullName)
         Set-IniEntry -Path $Path -Section $Section -Name $Name -Value $Value -CaseSensitive:$CaseSensitive
     }
 }
@@ -279,6 +285,12 @@ function Test-TargetResource
         return $false
     }
 
+    $fullName = $Name
+    if( $Section )
+    {
+        $fullName = '{0}.{1}' -f $Section,$Name
+    }
+
     if( $Ensure -eq 'Present' )
     {
         $result = ($resource.Value -eq $Value)
@@ -289,11 +301,11 @@ function Test-TargetResource
 
         if( $result )
         {
-            Write-Verbose ('{0}: current value unchanged' -f $Name)
+            Write-Verbose ('{0}: {1}: current value unchanged' -f $Path,$fullName)
         }
         else
         {
-            Write-Verbose ('{0}: current value differs' -f $Name)
+            Write-Verbose ('{0}: {1}: current value differs' -f $Path,$fullName)
         }
     }
     else
@@ -301,11 +313,11 @@ function Test-TargetResource
         $result = ($resource.Ensure -eq 'Absent')
         if( $result )
         {
-            Write-Verbose ('{0}: not found' -f $Name) 
+            Write-Verbose ('{0}: {1}: not found' -f $Path,$fullName) 
         }
         else
         {
-            Write-Verbose ('{0}: found' -f $Name)
+            Write-Verbose ('{0}: {1}: found' -f $Path,$fullName)
         }
     }
     return $result
