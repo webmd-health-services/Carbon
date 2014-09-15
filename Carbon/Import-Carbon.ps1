@@ -40,7 +40,7 @@ Set-StrictMode -Version 'Latest'
 
 if( (Get-Module 'Carbon') )
 {
-    Remove-Module 'Carbon' -Verbose:$false
+    Remove-Module 'Carbon' -Verbose:$false -WhatIf:$false
 }
 
 $importModuleParams = @{ }

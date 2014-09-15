@@ -130,6 +130,10 @@ This is a backwards-incompatible release.
 
 ## Bug Fixes
 
+### General
+
+ * `Import-Carbon` fails when `-WhatIf` switch is used.
+ 
 ### INI
 
  * [Set-IniEntry](http://get-carbon.org/help/Set-IniEntry.html) fails when adding the first section-less setting to a file.
