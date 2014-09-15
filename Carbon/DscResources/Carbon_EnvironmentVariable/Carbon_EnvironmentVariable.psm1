@@ -45,7 +45,6 @@ function Get-TargetResource
         $Ensure = 'Absent'
     }
 
-    Write-Verbose ('{0} = {1}' -f $Name,$actualValue)
     @{
         Name = $Name;
         Ensure = $Ensure;
@@ -111,14 +110,17 @@ function Set-TargetResource
 
     Set-StrictMode -Version 'Latest'
 
-    Write-Verbose ('{0} environment variable {1} value to {2}' -f $Ensure,$Name,$Value)
+    if( $Ensure -eq 'Absent' )
+    {
+        Write-Verbose ('{0}: removing' -f $Name)
+    }
 
     [Environment]::SetEnvironmentVariable($Name,$null,([EnvironmentVariableTarget]::Machine))
     [Environment]::SetEnvironmentVariable($Name,$null,([EnvironmentVariableTarget]::Process))
 
     if( $Ensure -eq 'Present' )
     {
-        Write-Verbose ('Setting environment variable {0} = {1}.' -f $Name,$Value)
+        Write-Verbose ('{0}: setting' -f $Name)
         Set-EnvironmentVariable -Name $Name -Value $Value -ForComputer -ForProcess
     }
 
@@ -143,25 +145,35 @@ function Test-TargetResource
 	)
 
     Set-StrictMode -Version 'Latest'
-    Write-Verbose ('Getting current value of ''{0}'' environment variable.' -f $Name)
 
     $resource = $null
     $resource = Get-TargetResource -Name $Name
-    if( -not $resource )
-    {
-        Write-Verbose ('Environment variable ''{0}'' not found.' -f $Name)
-        return $false
-    }
 
     if( $Ensure -eq 'Present' )
     {
-        Write-Verbose ('{0} -eq {1}' -f $resource.Value,$Value)
-        return ($resource.Value -eq $Value);
+        $result = ($resource.Value -eq $Value);
+        if( $result )
+        {
+            Write-Verbose ('{0}: value OK' -f $Name)
+        }
+        else
+        {
+            Write-Verbose ('{0}: value differs' -f $Name)
+        }
+        return $result
     }
     else
     {
-        Write-Verbose ('{0}: {1}' -f $Name,$Value)
-        return ($resource.Value -eq $null)
+        $result = ($resource.Value -eq $null)
+        if( $result )
+        {
+            Write-Verbose ('{0}: has no value' -f $Name)
+        }
+        else
+        {
+            Write-Verbose ('{0}: has a value' -f $Name) 
+        }
+        return $result
     }
 
     $false
