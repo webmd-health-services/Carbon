@@ -68,7 +68,7 @@ function Get-DscError
     [CmdletBinding(DefaultParameterSetName='NoWait')]
     [OutputType([Diagnostics.Eventing.Reader.EventLogRecord])]
     param(
-        [string]
+        [string[]]
         # The computer whose DSC errors to return.
         $ComputerName,
 

@@ -79,7 +79,7 @@ function Get-DscWinEvent
     [CmdletBinding(DefaultParameterSetName='NoWait')]
     [OutputType([Diagnostics.Eventing.Reader.EventLogRecord])]
     param(
-        [string]
+        [string[]]
         # The computer whose DSC errors to return.
         $ComputerName,
 
@@ -128,58 +128,88 @@ function Get-DscWinEvent
 
     if( $StartTime )
     {
-        $filter.StartTime = $StartTime
+        $filter['StartTime'] = $StartTime
     }
 
     if( $EndTime )
     {
-        $filter.EndTime = $EndTime
+        $filter['EndTime'] = $EndTime
     }
 
-    $startedAt = Get-Date
-    $events = @()
-    $getWinEventParams = @{ }
+    function Invoke-GetWinEvent
+    {
+        param(
+            [string]
+            $ComputerName
+        )
+
+        Set-StrictMode -Version 'Latest'
+
+        $startedAt = Get-Date
+        $computerNameParam = @{ }
+        if( $ComputerName )
+        {
+            $computerNameParam['ComputerName'] = $ComputerName
+        }
+
+        try
+        {
+            $events = @()
+            while( -not ($events = Get-WinEvent @computerNameParam -FilterHashtable $filter -ErrorAction Ignore -Verbose:$false) )
+            {
+                if( $PSCmdlet.ParameterSetName -ne 'Wait' )
+                {
+                    break
+                }
+
+                Start-Sleep -Milliseconds 100
+
+                [timespan]$duration = (Get-Date) - $startedAt
+                if( $duration.TotalSeconds -gt $WaitTimeoutSeconds )
+                {
+                    break
+                }
+            }
+            return $events
+        }
+        catch
+        {
+            if( $_.Exception.Message -eq 'The RPC server is unavailable' )
+            {
+                Write-Error -Message ("Unable to connect to '{0}': it looks like Remote Event Log Management isn't running or is blocked by the computer's firewall. To allow this traffic through the firewall, run the following command on '{0}':`n`tGet-FirewallRule -Name '*Remove Event Log Management*' |`n`t`t ForEach-Object {{ netsh advfirewall firewall set rule name= `$_.Name new enable=yes }}." -f $ComputerName)
+            }
+            else
+            {
+                Write-Error -Exception $_.Exception
+            }
+        }
+    }
+
     if( $ComputerName )
     {
-        # Check that the computers exist
-        if( -not (Test-Connection -ComputerName $ComputerName -Quiet) )
+        $ComputerName = $ComputerName | 
+                            Where-Object { 
+                                # Get just the computers that exist.
+                                if( (Test-Connection -ComputerName $ComputerName -Quiet) )
+                                {
+                                    return $true
+                                }
+                                else
+                                {
+                                    Write-Error -Message ('Computer ''{0}'' not found.' -f $ComputerName)
+                                    return $false
+                                }
+                            }
+
+        if( -not $ComputerName )
         {
-            Write-Error -Message ('Computer ''{0}'' not found.' -f $ComputerName)
             return
         }
 
-        $getWinEventParams.ComputerName = $ComputerName
+        $ComputerName | ForEach-Object { Invoke-GetWinEvent -ComputerName $_ }
     }
-
-    try
+    else
     {
-        while( -not ($events = Get-WinEvent @getWinEventParams -FilterHashtable $filter -ErrorAction Ignore -Verbose:$false) )
-        {
-            if( $PSCmdlet.ParameterSetName -ne 'Wait' )
-            {
-                break
-            }
-
-            Start-Sleep -Milliseconds 100
-
-            [timespan]$duration = (Get-Date) - $startedAt
-            if( $duration.TotalSeconds -gt $WaitTimeoutSeconds )
-            {
-                break
-            }
-        }
+        Invoke-GetWinEvent
     }
-    catch
-    {
-        if( $_.Exception.Message -eq 'The RPC server is unavailable' )
-        {
-            Write-Error -Message ("Unable to connect to '{0}': it looks like Remote Event Log Management isn't running or is blocked by the computer's firewall. To allow this traffic through the firewall, run the following command on '{0}':`n`tGet-FirewallRule -Name '*Remove Event Log Management*' |`n`t`t ForEach-Object {{ netsh advfirewall firewall set rule name= `$_.Name new enable=yes }}." -f $ComputerName)
-        }
-        else
-        {
-            Write-Error -Exception $_.Exception
-        }
-    }
-
-    $events
 }

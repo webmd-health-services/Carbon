@@ -83,5 +83,9 @@ function Test-ShouldGetDscError
     $result = Get-DscError -ComputerName 'fubar' -ErrorAction SilentlyContinue
     Assert-Error -Last -Regex 'not found'
     Assert-Null $result
+
+    # Now, make sure you can get stuff from multiple computers
+    $dscError = Get-DscError -ComputerName 'localhost',$env:COMPUTERNAME
+    Assert-NotNull $dscError
 }
 
