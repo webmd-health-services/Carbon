@@ -25,11 +25,16 @@ function Start-DscPullConfiguration
 
     If a configuration check fails, the errors are retrieved from the computer's event log and written out as errors. The `Remote Event Log Management` firewall rules must be enabled on the computer for this to work. If they aren't, you'll see an error explaining this. The `Get-DscError` help topic shows how to enable these firewall rules.
 
+    Sometimes, the LCM does a really crappy job of updating to the latest version of a module. `Start-DscPullConfiguration` will delete modules on the target computers. Specify the names of the modules to delete with the `ModuleName` parameter. Make sure you only delete modules that will get installed by the LCM. Only modules installed in the `$env:ProgramFiles\WindowsPowerShell\Modules` directory are removed.
+
     .LINK
     Get-DscError
 
     .LINK
-    Initialize-DscLcmPullMode
+    Initialize-Lcm
+
+    .LINK
+    Get-DscWinEvent
 
     .EXAMPLE
     Start-DscPullConfiguration -ComputerName '10.1.2.3','10.4.5.6'
@@ -45,6 +50,11 @@ function Start-DscPullConfiguration
     Start-DscPullConfiguration -CimSession $session
 
     Demonstrates how to use one or more CIM sessions to invoke a configuration check.
+
+    .EXAMPLE
+    Start-DScPullConfiguration -ComputerName 'example.com' -ModuleName 'Carbon'
+
+    Demonstrates how to delete modules on the target computers, because sometimes the LCM does a really crappy job of it.
     #>
     [CmdletBinding(DefaultParameterSetName='WithCredentials')]
     param(
