@@ -65,9 +65,10 @@ This is a backwards-incompatible release.
  * Created `Carbon_Permission` resource for configuring file, directory, registry, and certificate permissions.
  * Created `Carbon_Service` resource for configuring Windows services.
  * Created `Carbon_Script` resource for running custom PowerShell scripts, with support for passing arguments.
- * Created [Copy-DscResource](http://get-carbon.org/help/Copy-DscResource.html) function for copying DSC resources (ZIP files, MSI archives, MOF files, etc.), including timestamps and copying only changed files.
+ * Created [Copy-DscResource](http://get-carbon.org/help/Copy-DscResource.html) function for copying DSC resources (ZIP files, MSI archives, MOF files, etc.), including timestamps, checksums, and copying only changed files.
  * Created [Clear-MofAuthoringMetadata](http://get-carbon.org/help/Clear-MofAuthoringMetadata.html) function for removing authoring metadata from .mof files.
- * Created [Get-DscError](http://get-carbon.org/help/Get-DscError.html) function for getting any DSC errors written to a computer's event viewer.
+ * Created [Get-DscWinEvent](http://get-carbon.org/help/Get-DscWinEvent.html) function for getting DSC events written to a computer's DSC event log.
+ * Created [Get-DscError](http://get-carbon.org/help/Get-DscError.html) function for getting any DSC errors written to a computer's DSC event log.
  * Created [Write-DscError](http://get-carbon.org/help/Write-DscError.html) function for writing DSC `ErrorLogRecord` objects as errors.
  * Created [Start-DscPullConfiguration](http://get-carbon.org/help/Start-DscPullConfiguration.html) function for starting a configuration check on a computer whose computer is configured to use the PULL refresh mode.
  * Created [Initialize-Lcm](http://get-carbon.org/help/Initialize-Lcm.html) function for configuring the DSC Local Configuration Manager on computers, including installing the private key needed for decrypting credentials.
