@@ -19,7 +19,7 @@ function Get-DscError
     Gets DSC errors from a computer's event log.
 
     .DESCRIPTION
-    The DSC Local Configuration Manager (LCM) writes any errors it encounters to the `Microsoft-Windows-DSC/Operational` event log, in addition to some error messages that report that encountered an error. This function gets just the import error log messages, skipping the superflous ones that won't help you track down where the problem is.
+    The DSC Local Configuration Manager (LCM) writes any errors it encounters to the `Microsoft-Windows-DSC/Operational` event log, in addition to some error messages that report that encountered an error. This function gets just the important error log messages, skipping the superflous ones that won't help you track down where the problem is.
 
     By default, errors on the local computer are returned. You can return errors from another computer via the `ComputerName` parameter.
 
@@ -41,7 +41,7 @@ function Get-DscError
     Write-DscError
 
     .EXAMPLE
-    Get-DscError
+    Get-DscWinEvent
 
     Demonstrates how to get all the DSC errors from the local computer.
 
@@ -93,66 +93,5 @@ function Get-DscError
 
     Set-StrictMode -Version 'Latest'
 
-    $filter = @{ 
-                    LogName = 'Microsoft-Windows-DSC/Operational'; 
-                    ID = 4103;
-                    Level = 2;
-              }
-
-    if( $StartTime )
-    {
-        $filter.StartTime = $StartTime
-    }
-
-    if( $EndTime )
-    {
-        $filter.EndTime = $EndTime
-    }
-
-    $startedAt = Get-Date
-    $events = @()
-    $getWinEventParams = @{ }
-    if( $ComputerName )
-    {
-        # Check that the computers exist
-        if( -not (Test-Connection -ComputerName $ComputerName -Quiet) )
-        {
-            Write-Error -Message ('Computer ''{0}'' not found.' -f $ComputerName)
-            return
-        }
-
-        $getWinEventParams.ComputerName = $ComputerName
-    }
-
-    try
-    {
-        while( -not ($events = Get-WinEvent @getWinEventParams -FilterHashtable $filter -ErrorAction Ignore -Verbose:$false) )
-        {
-            if( $PSCmdlet.ParameterSetName -ne 'Wait' )
-            {
-                break
-            }
-
-            Start-Sleep -Milliseconds 100
-
-            [timespan]$duration = (Get-Date) - $startedAt
-            if( $duration.TotalSeconds -gt $WaitTimeoutSeconds )
-            {
-                break
-            }
-        }
-    }
-    catch
-    {
-        if( $_.Exception.Message -eq 'The RPC server is unavailable' )
-        {
-            Write-Error -Message ("Unable to connect to '{0}': it looks like Remote Event Log Management isn't running or is blocked by the computer's firewall. To allow this traffic through the firewall, run the following command on '{0}':`n`tGet-FirewallRule -Name '*Remove Event Log Management*' |`n`t`t ForEach-Object {{ netsh advfirewall firewall set rule name= `$_.Name new enable=yes }}." -f $ComputerName)
-        }
-        else
-        {
-            Write-Error -Exception $_.Exception
-        }
-    }
-
-    $events
+    Get-DscWinEvent @PSBoundParameters -ID 4103 -Level ([Diagnostics.Eventing.Reader.StandardEventLevel]::Error)
 }
