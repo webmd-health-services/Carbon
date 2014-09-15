@@ -86,7 +86,7 @@ function Set-TargetResource
 
     In fact, you can call any of the `*-TargetResource` functions from your scripts.
 
-    All arguments are passed as strings, so if you need them converted to other types, you'll have to do the converting. Be careful!
+    All arguments are passed as strings, so if you need them converted to other types, you'll have to do the converting. If you get an error about an invalid MOF file, double-check that you're calling `ToString()` on all non-string objects. Be careful!
 
     .EXAMPLE
     >
