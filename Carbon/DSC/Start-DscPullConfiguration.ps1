@@ -60,20 +60,24 @@ function Start-DscPullConfiguration
 
         [Parameter(ParameterSetName='WithCimSession')]
         [Microsoft.Management.Infrastructure.CimSession[]]
-        $CimSession
+        $CimSession,
+
+        [string[]]
+        # Any modules that should be removed from the target computer's PSModulePath (since the LCM does a *really* crappy job of removing them).
+        $ModuleName
     )
 
     Set-StrictMode -Version 'Latest'
 
+    $credentialParam = @{ }
     if( $PSCmdlet.ParameterSetName -eq 'WithCredentials' )
     {
-        $newCimSessionParams = @{ }
         if( $Credential )
         {
-            $newCimSessionParams.Credential = $Credential
+            $credentialParam.Credential = $Credential
         }
 
-        $CimSession = New-CimSession -ComputerName $ComputerName @newCimSessionParams
+        $CimSession = New-CimSession -ComputerName $ComputerName @credentialParam
         if( -not $CimSession )
         {
             return
@@ -100,6 +104,35 @@ function Start-DscPullConfiguration
     if( -not $CimSession )
     {
         return
+    }
+
+    # Get rid of any _tmp directories you might find out there.
+    Invoke-Command -ComputerName $CimSession.ComputerName @credentialParam -ScriptBlock {
+        $modulesRoot = Join-Path -Path $env:ProgramFiles -ChildPath 'WindowsPowerShell\Modules'
+        Get-ChildItem -Path $modulesRoot -Filter '*_tmp' -Directory | 
+            Remove-Item -Recurse -Verbose:$VerbosePreference
+    }
+
+    if( $ModuleName )
+    {
+        # Now, get rid of any modules we know will need to get updated
+        Invoke-Command -ComputerName $CimSession.ComputerName @credentialParam -ScriptBlock {
+            param(
+                [string[]]
+                $ModuleName
+            )
+
+            $dscProcessID = Get-WmiObject msft_providers | 
+                                Where-Object {$_.provider -like 'dsccore'} | 
+                                Select-Object -ExpandProperty HostProcessIdentifier 
+            Stop-Process -Id $dscProcessID -Force
+
+            $modulesRoot = Join-Path -Path $env:ProgramFiles -ChildPath 'WindowsPowerShell\Modules'
+            Get-ChildItem -Path $modulesRoot -Directory |
+                Where-Object { $ModuleName -contains $_.Name } |
+                Remove-Item -Recurse -Verbose:$VerbosePreference
+
+        } -ArgumentList (,$ModuleName)
     }
 
     # Getting the date/time on the remote computers so we can get errors later.
