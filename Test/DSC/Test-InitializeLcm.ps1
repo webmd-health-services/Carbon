@@ -94,6 +94,17 @@ function Test-ShouldConfigurePushMode
     Assert-True (Test-Path -Path $certPath -PathType Leaf)
 }
 
+function Test-ShouldPreserveCertificateIDWhenCertFileNotGiven
+{
+    $lcm = Get-DscLocalConfigurationManager
+    $rebootIfNeeded = -not $lcm.RebootNodeIfNeeded
+    $lcm = Initialize-Lcm -Push -ComputerName 'localhost' -CertificateID 'fubar' -CertFile $privateKeyPath -RebootIfNeeded
+    Assert-NoError
+    Assert-Equal $publicKey.Thumbprint $lcm.CertificateID
+    $lcm = Initialize-Lcm -Push -ComputerName 'localhost' -CertificateID $publicKey.Thumbprint -RebootIfNeeded
+    Assert-Equal $publicKey.Thumbprint $lcm.CertificateID
+}
+
 function Test-ShouldValidateCertFilePath
 {
     $originalLcm = Initialize-Lcm -Push -ComputerName 'localhost' -CertFile $privateKeyPath

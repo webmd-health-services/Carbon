@@ -129,6 +129,11 @@ function Initialize-Lcm
         # Controls whether new configurations downloaded from the configuration server are allowed to overwrite the old ones on the target computer(s).
         $AllowModuleOverwrite,
 
+        [Alias('Thumbprint')]
+        [string]
+        # The thumbprint of the certificate to use to decrypt secrets. If `CertFile` is given, this parameter is ignored in favor of the certificate in `CertFile`.
+        $CertificateID = $null,
+
         [string]
         # The path to the certificate containing the private key to use when decrypting credentials. The certificate will be uploaded and installed for you.
         $CertFile,
@@ -167,6 +172,10 @@ function Initialize-Lcm
     Set-StrictMode -Version 'Latest'
 
     $thumbprint = $null
+    if( $CertificateID )
+    {
+        $thumbprint = $CertificateID
+    }
     $privateKey = $null
     if( $CertFile )
     {
@@ -290,7 +299,7 @@ function Initialize-Lcm
             {
                 Remove-Item -Path $tempDir -Recurse -ErrorAction Ignore -WhatIf:$false -Verbose:$VerbosePreference
             }
-        } -ArgumentList $privateKey.Thumbprint,$encodedCert,$CertPassword,$WhatIfPreference,$VerbosePreference -Verbose:$VerbosePreference
+        } -ArgumentList $thumbprint,$encodedCert,$CertPassword,$WhatIfPreference,$VerbosePreference -Verbose:$VerbosePreference
     }
 
     $sessions = New-CimSession -ComputerName $ComputerName @credentialParam
