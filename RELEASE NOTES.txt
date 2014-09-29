@@ -12,6 +12,7 @@
 ### General
 
  * `Import-Carbon` fails when `-WhatIf` switch is used.
+ * Importing Carbon no longer writes an error if the `PATH` environment variable contains a path to a non-existent drive (issue [#134](https://bitbucket.org/splatteredbits/carbon/issue/134/import-carbon-fails-with-path-environment)).
  
 ### INI
 
