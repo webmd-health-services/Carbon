@@ -147,6 +147,20 @@
                 </GetScriptBlock>
             </ScriptProperty>
             <ScriptProperty>
+                <Name>RunCommandDelay</Name>
+                <GetScriptBlock>
+                    $this.LoadServiceConfig()
+                    $this.Configuration.RunCommandDelay
+                </GetScriptBlock>
+            </ScriptProperty>
+            <ScriptProperty>
+                <Name>RunCommandDelayMinutes</Name>
+                <GetScriptBlock>
+                    $this.LoadServiceConfig()
+                    $this.Configuration.RunCommandDelayMinutes
+                </GetScriptBlock>
+            </ScriptProperty>
+            <ScriptProperty>
                 <Name>ErrorControl</Name>
                 <GetScriptBlock>
                     $this.LoadServiceConfig()
