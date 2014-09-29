@@ -59,6 +59,6 @@ function Set-CryptoKeySecurity
         {
             $actualException = $actualException.InnerException
         }
-        Write-Error ('Failed to {0} to ''{2}'' ({3}) certificate''s private key: {4}: {5}' -f $Action,$Certificate.Subject,$Certificate.Thumbprint,$actualException.GetType().FullName,$actualException.Message)
+        Write-Error ('Failed to {0} to ''{1}'' ({2}) certificate''s private key: {3}: {4}' -f $Action,$Certificate.Subject,$Certificate.Thumbprint,$actualException.GetType().FullName,$actualException.Message)
     }
 }
