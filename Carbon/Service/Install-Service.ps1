@@ -64,19 +64,19 @@ function Install-Service
         $StartupType = [ServiceProcess.ServiceStartMode]::Automatic,
         
         [string]
-        [ValidateSet("Reboot","Restart","TakeNoAction")]
+        [Carbon.Service.FailureAction]
         # What to do on the service's first failure.  Default is to take no action.
-        $OnFirstFailure = 'TakeNoAction',
+        $OnFirstFailure = [Carbon.Service.FailureAction]::TakeNoAction,
         
         [string]
-        [ValidateSet("Reboot","Restart","TakeNoAction")]
+        [Carbon.Service.FailureAction]
         # What to do on the service's second failure. Default is to take no action.
-        $OnSecondFailure = 'TakeNoAction',
+        $OnSecondFailure = [Carbon.Service.FailureAction]::TakeNoAction,
         
         [string]
-        [ValidateSet("Reboot","Restart","TakeNoAction")]
+        [Carbon.Service.FailureAction]
         # What to do on the service' third failure.  Default is to take no action.
-        $OnThirdFailure = 'TakeNoAction',
+        $OnThirdFailure = [Carbon.Service.FailureAction]::TakeNoAction,
         
         [int]
         # How many seconds after which the failure count is reset to 0.
@@ -97,17 +97,21 @@ function Install-Service
         
         [Parameter(ParameterSetName='CustomAccount',Mandatory=$true)]
         [string]
-        # The user the service should run as.
+        # The user the service should run as. Default is NetworkService.
         $Username,
         
         [Parameter(ParameterSetName='CustomAccount')]
         [string]
         # The user's password.
-        $Password
+        $Password,
+
+        [Switch]
+        # Update the service even if there are no changes.
+        $Force
     )
 
     Set-StrictMode -Version 'Latest'
-    
+
     function ConvertTo-FailureActionArg($action, $restartDelay, $rebootDelay)
     {
         if( $action -eq 'Reboot' )
@@ -127,6 +131,96 @@ function Install-Service
             Write-Error "Service failure action '$action' not found/recognized."
             return ''
         }
+    }
+
+    if( $PSCmdlet.ParameterSetName -eq 'CustomAccount' )
+    {
+        $identity = Resolve-IdentityName -Name $Username
+        if( -not $identity )
+        {
+            Write-Error ("Service identity '{0}' not found." -f $Username,$Name)
+            return
+        }
+    }
+    else
+    {
+        $identity = "NT AUTHORITY\NetworkService"
+    }
+    
+    $doInstall = $false
+    if( -not $Force -and (Test-Service -Name $Name) )
+    {
+        Write-Verbose ('Service {0} exists. Checking if configuration has changed.' -f $Name)
+        $service = Get-Service -Name $Name
+        $serviceConfig = Get-ServiceConfiguration -Name $Name
+        $dependentServiceNames = $service.DependentServices | Select-Object -ExpandProperty 'Name'
+
+        Write-Verbose ('[{0}] Path              {1} | {2}' -f $Name,$serviceConfig.Path,$Path)
+        Write-Verbose ('[{0}] OnFirstFailure    {1} | {2}' -f $Name,$serviceConfig.FirstFailure,$OnFirstFailure)
+        Write-Verbose ('[{0}] OnSecondFailure   {1} | {2}' -f $Name,$serviceConfig.SecondFailure,$OnSecondFailure)
+        Write-Verbose ('[{0}] OnThirdFailure    {1} | {2}' -f $Name,$serviceConfig.ThirdFailure,$OnThirdFailure)
+        Write-Verbose ('[{0}] ResetFailureCount {1} | {2}' -f $Name,$serviceConfig.ResetPeriod,$ResetFailureCount)
+
+        $doInstall = $service.Path -ne $Path -or 
+                     $serviceConfig.FirstFailure -ne $OnFirstFailure -or
+                     $serviceConfig.SecondFailure -ne $OnSecondFailure -or
+                     $serviceConfig.ThirdFailure -ne $OnThirdFailure -or
+                     $serviceConfig.ResetPeriod -ne $ResetFailureCount
+        
+        $failureActions = $OnFirstFailure,$OnSecondFailure,$OnThirdFailure
+        if( -not $doInstall )
+        {
+            if( $failureActions | Where-Object { $_ -eq [Carbon.Service.FailureAction]::Reboot } )
+            {
+                Write-Verbose ('[{0}] RebootDelay       {1} | {2}' -f $Name,$serviceConfig.RebootDelay,$RebootDelay)
+                $doInstall = $serviceConfig.RebootDelay -ne $RebootDelay
+            }
+        }
+
+        if( -not $doInstall )
+        {
+            if( $failureActions | Where-Object { $_ -eq [Carbon.Service.FailureAction]::Restart } )
+            {
+                Write-Verbose ('[{0}] RestartDelay      {1} | {2}' -f $Name,$serviceConfig.RestartDelay,$RestartDelay)
+                $doInstall = $serviceConfig.RestartDelay -ne $RestartDelay
+            }
+        }
+
+        if( -not $doInstall )
+        {
+            Write-Verbose ('[{0}] StartupType       {1} | {2}' -f $Name,$serviceConfig.StartType,$StartupType)
+            $doInstall = $service.StartMode -ne $StartupType
+        }
+
+        if( -not $doInstall )
+        {
+            Write-Verbose ('[{0}] Dependency        {1} | {2}' -f $Name,($dependentServiceNames -join ','),($Dependency -join ','))
+            if( $Dependency | Where-Object { $dependentServiceNames -notcontains $_ } )
+            {
+                $doInstall = $true
+            }
+
+            if( $dependentServiceNames | Where-Object { $Dependency -notcontains $_ } )
+            {
+                $doInstall = $true
+            }
+        }
+
+        if( -not $doInstall -and $PSCmdlet.ParameterSetName -eq 'CustomAccount' )
+        {
+            Write-Verbose ('[{0}] UserName          {1} | {2}' -f $Name,$serviceConfig.UserName,$identity)
+            $doinstall = $serviceConfig.UserName -ne $identity
+        }
+    }
+    else
+    {
+        $doInstall = $true
+    }
+
+    if( -not $doInstall )
+    {
+        Write-Verbose ('Skipping {0} service configuration: settings unchanged.' -f $Name)
+        return
     }
 
     if( -not (Test-Path -Path $Path -PathType Leaf) )
@@ -153,20 +247,6 @@ function Install-Service
         {
             return
         }
-    }
-    
-    if( $PSCmdlet.ParameterSetName -eq 'CustomAccount' )
-    {
-        $identity = Resolve-IdentityName -Name $Username
-        if( -not $identity )
-        {
-            Write-Error ("Service identity '{0}' not found." -f $Username,$Name)
-            return
-        }
-    }
-    else
-    {
-        $identity = "NT AUTHORITY\NetworkService"
     }
     
     $sc = Join-Path $env:WinDir system32\sc.exe -Resolve

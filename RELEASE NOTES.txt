@@ -9,8 +9,12 @@
 ### INI
 
  * [Set-IniEntry](http://get-carbon.org/help/Set-IniEntry.html) fails when adding the first section-less setting to a file.
- 
- 
+
+### Services
+
+ * [Install-Service](http://get-carbon.org/help/Install-Service.html) stops Windows service even when no settings/configuration has changed (fixes issue [#131](https://bitbucket.org/splatteredbits/carbon/issue/131/install-service-always-restarts-service)). 
+
+
 # 1.8.0 (7 September 2014)
 
 ## Enhancements
