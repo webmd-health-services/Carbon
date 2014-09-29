@@ -104,6 +104,13 @@ namespace Carbon.Service
 			get { return ConvertToMinutes(RebootDelay); }
 		}
 
+        public uint RunCommandDelay { get; private set; }
+
+	    public uint RunCommandDelayMinutes
+	    {
+	        get { return ConvertToMinutes(RunCommandDelay); }
+	    }
+
 		public FailureAction SecondFailure { get; private set; }
 		public StartType StartType { get; private set; }
 		public uint TagID { get; private set; }
@@ -148,6 +155,7 @@ namespace Carbon.Service
 
 			// Report it.
 			ResetPeriod = (UInt32) failureActions.dwResetPeriod;
+            FailureProgram = failureActions.lpCommand;
 
 			int offset = 0;
 			for (int i = 0; i < failureActions.cActions; i++)
@@ -172,6 +180,9 @@ namespace Carbon.Service
 
 				switch (type)
 				{
+                    case( FailureAction.RunCommand ):
+				        RunCommandDelay = delay;
+				        break;
 					case( FailureAction.Reboot):
 						RebootDelay = delay;
 						break;

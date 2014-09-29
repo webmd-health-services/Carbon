@@ -128,6 +128,13 @@ This is a backwards-incompatible release.
 
 # 1.8.1 
 
+## Enhancements
+
+### Services
+
+ * [Install-Service](http://get-carbon.org/help/Install-Service.html) now supports setting a command to run when a service fails.
+
+ 
 ## Bug Fixes
 
 ### General
@@ -137,8 +144,13 @@ This is a backwards-incompatible release.
 ### INI
 
  * [Set-IniEntry](http://get-carbon.org/help/Set-IniEntry.html) fails when adding the first section-less setting to a file.
- 
- 
+
+### Services
+
+ * [Install-Service](http://get-carbon.org/help/Install-Service.html) stops Windows service even when no settings/configuration has changed (fixes issue [#131](https://bitbucket.org/splatteredbits/carbon/issue/131/install-service-always-restarts-service)). 
+ * [Install-Service](http://get-carbon.org/help/Install-Service.html) didn't clear services depended on re-install.
+
+
 # 1.8.0 (7 September 2014)
 
 ## Enhancements

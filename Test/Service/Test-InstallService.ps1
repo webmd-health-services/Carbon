@@ -16,6 +16,8 @@ $servicePath = Join-Path $TestDir NoOpService.exe
 $serviceName = ''
 $serviceAcct = 'CrbnInstllSvcTstAcct'
 $servicePassword = [Guid]::NewGuid().ToString().Substring(0,14)
+$installServiceParams = @{ }
+$startedAt = Get-Date
 
 function Start-TestFixture
 {
@@ -26,6 +28,8 @@ function Start-Test
 {
     $serviceName = 'CarbonTestService' + ([Guid]::NewGuid().ToString())
     Install-User -Username $serviceAcct -Password $servicePassword -Description "Account for testing the Carbon Install-Service function."
+    $startedAt = Get-Date
+    $startedAt = $startedAt.AddSeconds(-1)
 }
 
 function Stop-Test
@@ -36,7 +40,7 @@ function Stop-Test
 
 function Test-ShouldInstallService
 {
-    Install-Service -Name $serviceName -Path $servicePath
+    Install-Service -Name $serviceName -Path $servicePath @installServiceParams
     $service = Assert-ServiceInstalled 
     Assert-Equal 'Running' $service.Status
     Assert-Equal $serviceName $service.Name
@@ -45,15 +49,182 @@ function Test-ShouldInstallService
     Assert-Equal (Resolve-Identity -Name 'NT AUTHORITY\NetworkService').FullName $service.UserName
 }
 
-function Test-ShouldUpdateServiceProperties
+
+function Test-ShouldReinstallUnchangedServiceWithForceParameter
+{
+    Install-Service -Name $serviceName -Path $servicePath @installServiceParams
+    $now = Get-Date
+    Start-Sleep -Milliseconds (1001 - $now.Millisecond)
+
+    Install-Service -Name $serviceName -Path $servicePath @installServiceParams -Force
+
+    $maxTries = 20
+    $tryNum = 0
+    $serviceReinstalled = $false
+    do
+    {
+        [object[]]$events = Get-EventLog -LogName 'System' `
+                                         -After $startedAt `
+                                         -Source 'Service Control Manager' `
+                                         -EntryType Information |
+                                Where-Object { $_.EventID -eq 7036 -or $_.EventID -eq 7045 }
+
+        if( $events -and $events.Count -ge 4 )
+        {
+            if( $events[0].Message -like '*entered the running state*' -and 
+                $events[1].Message -like '*entered the stopped state*' -and 
+                $events[2].Message -like '*entered the running state*' -and
+                $events[3].Message -like '*was installed*' )
+            {
+                $serviceReinstalled = $true
+                break
+            }
+        }
+        else
+        {
+            Start-Sleep -Milliseconds 100
+        }
+    }
+    while( $tryNum++ -lt $maxTries )
+                                   
+    Assert-True $serviceReinstalled ('service not reinstalled')                                     
+}
+
+function Test-ShouldNotInstallServiceTwice
+{
+    Install-Service -Name $serviceName -Path $servicePath @installServiceParams
+    $now = Get-Date
+    Start-Sleep -Milliseconds (1001 - $now.Millisecond)
+
+    Stop-Service -Name $serviceName
+    Install-Service -Name $serviceName -Path $servicePath @installServiceParams
+    # This could break if Install-Service is ever updated to not start a stopped service
+    Assert-Equal 'Stopped' (Get-Service -Name $serviceName).Status
+}
+
+function Test-ShouldReInstallServiceIfPathChanges
+{
+    $tempDir = New-TempDir -Prefix 'Carbon+Test-InstallService'
+    Copy-Item -Path $servicePath -Destination $tempDir
+    $changedServicePath = Join-Path -Path $tempDir -ChildPath (Split-Path -Leaf -Path $servicePath) -Resolve
+
+    Install-Service -Name $serviceName -Path $servicePath
+    Install-Service -Name $serviceName -Path $changedServicePath
+    Assert-Equal $changedServicePath (Get-ServiceConfiguration -Name $serviceName).Path
+}
+
+function Test-ShouldReinstallServiceIfStartupTypeChanges
 {
     Install-Service -Name $serviceName -Path $servicePath
+    Install-Service -Name $serviceName -Path $servicePath -StartupType Manual
+    Assert-Equal 'Manual' (Get-Service -Name $serviceName).StartMode
+}
+
+function Test-ShouldReinstallServiceIfResetFailureCountChanges
+{
+    Install-Service -Name $serviceName -Path $servicePath
+    Install-Service -Name $serviceName -Path $servicePath -ResetFailureCount 60
+    Assert-Equal 60 (Get-ServiceConfiguration -Name $serviceName).ResetPeriod
+}
+
+function Test-ShouldReinstallServiceIfFirstFailureChanges
+{
+    Install-Service -Name $serviceName -Path $servicePath
+    Install-Service -Name $serviceName -Path $servicePath -OnFirstFailure 'Restart'
+    Assert-Equal 'Restart' (Get-ServiceConfiguration -Name $serviceName).FirstFailure
+}
+
+function Test-ShouldReinstallServiceIfSecondFailureChanges
+{
+    Install-Service -Name $serviceName -Path $servicePath
+    Install-Service -Name $serviceName -Path $servicePath -OnSecondFailure 'Restart'
+    Assert-Equal 'Restart' (Get-ServiceConfiguration -Name $serviceName).SecondFailure
+}
+
+function Test-ShouldReinstallServiceIfThirdFailureChanges
+{
+    Install-Service -Name $serviceName -Path $servicePath
+    Install-Service -Name $serviceName -Path $servicePath -OnThirdFailure 'Restart'
+    Assert-Equal 'Restart' (Get-ServiceConfiguration -Name $serviceName).ThirdFailure
+}
+
+function Test-ShouldReinstallServiceIfRestartDelayChanges
+{
+    Install-Service -Name $serviceName -Path $servicePath -OnFirstFailure 'Restart'
+    Install-Service -Name $serviceName -Path $servicePath -OnFirstFailure 'Restart' -RestartDelay (1000*60*5)
+    Assert-Equal 5 (Get-ServiceConfiguration -Name $serviceName).RestartDelayMinutes
+}
+
+function Test-ShouldReinstallServiceIfRebootDelayChanges
+{
+    Install-Service -Name $serviceName -Path $servicePath -OnFirstFailure 'Reboot'
+    Install-Service -Name $serviceName -Path $servicePath -OnFirstFailure 'Reboot' -RebootDelay (1000*60*5)
+    Assert-Equal 5 (Get-ServiceConfiguration -Name $serviceName).RebootDelayMinutes
+}
+
+function Test-ShouldReinstallServiceIfCommandChanges
+{
+    Install-Service -Name $serviceName -Path $servicePath -OnFirstFailure RunCommand -Command 'fubar'
+    Install-Service -Name $serviceName -Path $servicePath -OnFirstFailure RunCommand -command 'fubar2'
+    Assert-Equal 'fubar2' (Get-ServiceConfiguration -Name $serviceName).FailureProgram
+}
+
+function Test-ShouldReinstallServiceIfRunDelayChanges
+{
+    Install-Service -Name $serviceName -Path $servicePath -OnFirstFailure RunCommand -Command 'fubar' -RunCommandDelay 60000
+    Install-Service -Name $serviceName -Path $servicePath -OnFirstFailure RunCommand -command 'fubar' -RunCommandDelay 30000
+    Assert-Equal 30000 (Get-ServiceConfiguration -Name $serviceName).RunCommandDelay
+}
+
+function Test-ShouldReinstallServiceIfDependenciesChange
+{
+    $service2Name = '{0}-2' -f $serviceName
+    Install-Service -Name $service2Name -Path $servicePath
+
+    try
+    {
+        $service3Name = '{0}-3' -f $serviceName
+        Install-Service -Name $service3Name -Path $servicePath
+
+        try
+        {
+            Install-Service -Name $serviceName -Path $servicePath
+            Install-Service -Name $serviceName -Path $servicePath -Dependency $service2Name
+            Assert-Equal $service2Name (Get-Service -Name $serviceName).ServicesDependedOn[0].Name
+
+            Install-Service -Name $serviceName -Path $servicePath -Dependency $service3Name
+            Assert-Equal $service3Name (Get-Service -Name $serviceName).ServicesDependedOn[0].Name
+        }
+        finally
+        {
+            Uninstall-Service $serviceName
+            Uninstall-Service $service3Name
+        }
+    }
+    finally
+    {
+        Uninstall-Service -Name $service2Name
+    }
+}
+
+function Test-ShouldReinstallServiceIfUsernameChanges
+{
+    Install-Service -Name $serviceName -Path $servicePath
+    Install-Service -Name $serviceName -Path $servicePath -Username 'SYSTEM'
+    Assert-Equal 'NT AUTHORITY\SYSTEM' (Get-ServiceConfiguration -Name $serviceName).UserName
+}
+
+
+
+function Test-ShouldUpdateServiceProperties
+{
+    Install-Service -Name $serviceName -Path $servicePath @installServiceParams
     $service = Assert-ServiceInstalled
     
     $tempDir = New-TempDir
     $newServicePath = Join-Path $TempDir NoOpService.exe
     Copy-Item $servicePath $newServicePath
-    Install-Service -Name $serviceName -Path $newServicePath -StartupType 'Manual' -Username $serviceAcct -Password $servicePassword
+    Install-Service -Name $serviceName -Path $newServicePath -StartupType 'Manual' -Username $serviceAcct -Password $servicePassword @installServiceParams
     $service = Assert-ServiceInstalled
     Assert-Equal 'Manual' $service.StartMode
     Assert-Equal ".\$serviceAcct" $service.UserName
@@ -63,21 +234,21 @@ function Test-ShouldUpdateServiceProperties
 
 function Test-ShouldSupportWhatIf
 {
-    Install-Service -Name $serviceName -Path $servicePath -WhatIf
+    Install-Service -Name $serviceName -Path $servicePath -WhatIf @installServiceParams
     $service = Get-Service $serviceName -ErrorAction SilentlyContinue
     Assert-Null $service
 }
 
 function Test-ShouldSetStartupType
 {
-    Install-Service -Name $serviceName -Path $servicePath -StartupType 'Manual'
+    Install-Service -Name $serviceName -Path $servicePath -StartupType 'Manual' @installServiceParams
     $service = Assert-ServiceInstalled
     Assert-Equal 'Manual' $service.StartMode
 }
 
 function Test-ShouldSetCustomAccount
 {
-    Install-Service -Name $serviceName -Path $servicePath -UserName $serviceAcct -Password $servicePassword
+    Install-Service -Name $serviceName -Path $servicePath -UserName $serviceAcct -Password $servicePassword @installServiceParams
     $service = Assert-ServiceInstalled
     Assert-Equal ".\$($serviceAcct)" $service.UserName
     $service = Get-Service $serviceName
@@ -87,7 +258,7 @@ function Test-ShouldSetCustomAccount
 function Test-ShouldSetCustomAccountWithNoPassword
 {
     $Error.Clear()
-    Install-Service -Name $serviceName -Path $servicePath -UserName $serviceAcct -ErrorAction SilentlyContinue
+    Install-Service -Name $serviceName -Path $servicePath -UserName $serviceAcct -ErrorAction SilentlyContinue @installServiceParams
     Assert-GreaterThan $Error.Count 0
     $service = Assert-ServiceInstalled
     Assert-Equal ".\$($serviceAcct)" $service.UserName
@@ -97,45 +268,60 @@ function Test-ShouldSetCustomAccountWithNoPassword
 
 function Test-ShouldSetFailureActions
 {
-    Install-Service -Name $serviceName -Path $servicePath
+    Install-Service -Name $serviceName -Path $servicePath @installServiceParams
     $service = Assert-ServiceInstalled
-    $failureActionBytes = (Get-ItemProperty "hklm:\System\ControlSet001\services\$serviceName\" -Name FailureActions).FailureActions
-    $failureAction = [Convert]::ToBase64String( $failureActionBytes )
-    Assert-Equal "AAAAAAAAAAAAAAAAAwAAABQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=" $failureAction
-    
-    Install-Service -Name $serviceName -Path $servicePath -ResetFailureCount 1 -OnFirstFailure Restart -OnSecondFailure Restart -OnThirdFailure Reboot -RestartDelay 18000 -RebootDelay 30000
-    $failureActionBytes = (Get-ItemProperty "hklm:\System\ControlSet001\services\$serviceName\" -Name FailureActions).FailureActions
-    $updatedFailureAction = [Convert]::ToBase64String( $failureActionBytes )
+    $config = Get-Serviceconfiguration -Name $serviceName
+    Assert-Equal 'TakeNoAction' $config.FirstFailure
+    Assert-Equal 'TakeNoAction' $config.SecondFailure
+    Assert-Equal 'TakeNoAction' $config.ThirdFailure
+    Assert-Equal 0 $config.RebootDelay
+    Assert-Equal 0 $config.ResetPeriod
+    Assert-Equal 0 $config.RestartDelay
 
-    # First four bytes are reset failure count period.  
-    Assert-Equal $failureActionBytes[0] 1 # The reset failure count
+    Install-Service -Name $serviceName `
+                    -Path $servicePath `
+                    -ResetFailureCount 1 `
+                    -OnFirstFailur RunCommand `
+                    -OnSecondFailure Restart `
+                    -OnThirdFailure Reboot `
+                    -RestartDelay 18000 `
+                    -RebootDelay 30000 `
+                    -RunCommandDelay 6000 `
+                    -Command 'echo Fubar!' `
+                    @installServiceParams
 
-    Assert-Equal 1 $failureActionBytes[20] # Restart on first failure
-    # Bytes 24-27 are the delay in milliseconds
-    $delay = [int]$failureActionBytes[24]
-    $delay = $delay -bor ([int]$failureActionBytes[25] * 256)
-    Assert-Equal 18000 $delay 
+    $config = Get-ServiceConfiguration -Name $serviceName
+    Assert-Equal 'RunCommand' $config.FirstFailure
+    Assert-Equal 'echo Fubar!' $config.FailureProgram
+    Assert-Equal 'Restart' $config.SecondFailure
+    Assert-Equal 'Reboot' $config.ThirdFailure
+    Assert-Equal 30000 $config.RebootDelay
+    Assert-Equal 0 $config.RebootDelayMinutes
+    Assert-Equal 1 $config.ResetPeriod
+    Assert-Equal 0 $config.ResetPeriodDays
+    Assert-Equal 18000 $config.RestartDelay
+    Assert-Equal 0 $config.RestartDelayMinutes
+    Assert-Equal 6000 $config.RunCommandDelay
+    Assert-Equal 0 $config.RunCommandDelayMinutes
+}
 
-    Assert-Equal 1 $failureActionBytes[28] # Restart on second failure
-    # Bytes 32-35 are the delay in milliseconds
-    $delay = [int]$failureActionBytes[32]
-    $delay = $delay -bor ([int]$failureActionBytes[33] * 256)
-    Assert-Equal 18000 $delay 
+function Test-ShouldClearCommand
+{
+    Install-Service -Name $serviceName -Path $servicePath -OnFirstFailure RunCommand -Command 'fubar'
+    $config = Get-ServiceConfiguration -Name $serviceName
+    Assert-Equal 'fubar' $config.FailureProgram
+    Assert-Equal 0 $config.RunCommandDelay
 
-    Assert-Equal 2 $failureActionBytes[36] # Reboot on third failure
-    # Bytes 40-43 are the delay in milliseconds
-    $delay = [int]$failureActionBytes[40]
-    $delay = $delay -bor ([int]$failureActionBytes[41] * 256)
-    Assert-Equal 30000 $delay 
-
-    Assert-NotEqual $updatedFailureAction $failureAction
+    Install-Service -Name $serviceName -Path $servicePath
+    $config = Get-ServiceConfiguration -Name $serviceName
+    Assert-Null $config.FailureProgram
 }
 
 function Test-ShouldSetDependencies
 {
     $firstService = (Get-Service)[0]
     $secondService = (Get-Service)[1]
-    Install-Service -Name $serviceName -Path $servicePath -Dependencies $firstService.Name,$secondService.Name
+    Install-Service -Name $serviceName -Path $servicePath -Dependencies $firstService.Name,$secondService.Name @installServiceParams
     $dependencies = & (Join-Path $env:SystemRoot system32\sc.exe) enumdepend $firstService.Name
     Assert-ContainsLike $dependencies "SERVICE_NAME: $serviceName"
     $dependencies = & (Join-Path $env:SystemRoot system32\sc.exe) enumdepend $secondService.Name
@@ -145,7 +331,7 @@ function Test-ShouldSetDependencies
 function Test-ShouldTestDependenciesExist
 {
     $error.Clear()
-    Install-Service -Name $serviceName -Path $servicePath -Dependencies IAmAServiceThatDoesNotExist -ErrorAction SilentlyContinue
+    Install-Service -Name $serviceName -Path $servicePath -Dependencies IAmAServiceThatDoesNotExist -ErrorAction SilentlyContinue @installServiceParams
     Assert-Equal 1 $error.Count
     Assert-False (Test-Service -Name $serviceName)
 }
@@ -160,7 +346,7 @@ function Test-ShouldInstallServiceWithRelativePath
     Push-Location -Path $parentDir
     try
     {
-        Install-Service -Name $serviceName -Path $path
+        Install-Service -Name $serviceName -Path $path @installServiceParams
         $service = Assert-ServiceInstalled 
         $svc = Get-WmiObject -Class 'Win32_Service' -Filter ('Name = "{0}"' -f $serviceName)
         Assert-Equal $servicePath $svc.PathName
@@ -169,6 +355,21 @@ function Test-ShouldInstallServiceWithRelativePath
     {
         Pop-Location
     }
+}
+
+function Test-ShouldClearDependencies
+{
+    $service2Name = '{0}-2' -f $serviceName
+    Install-Service -Name $service2Name -Path $servicePath
+    Install-Service -Name $serviceName -Path $servicePath -Dependency $service2Name
+
+    $service = Get-Service -Name $serviceName
+    Assert-Equal 1 $service.ServicesDependedOn.Length
+    Assert-Equal $service2Name $service.ServicesDependedOn[0].Name
+
+    Install-Service -Name $serviceName -Path $servicePath
+    $service = Get-Service -Name $serviceName
+    Assert-Equal 0 $service.ServicesDependedOn.Length
 }
 
 
