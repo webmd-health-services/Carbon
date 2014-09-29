@@ -38,6 +38,7 @@ function Set-CryptoKeySecurity
     $keyContainerInfo = $Certificate.PrivateKey.CspKeyContainerInfo
     $cspParams = New-Object 'Security.Cryptography.CspParameters' ($keyContainerInfo.ProviderType, $keyContainerInfo.ProviderName, $keyContainerInfo.KeyContainerName)
     $cspParams.Flags = [Security.Cryptography.CspProviderFlags]::UseExistingKey
+    $cspParams.KeyNumber = $keyContainerInfo.KeyNumber
     if( (Split-Path -NoQualifier -Path $PSPath) -like 'LocalMachine\*' )
     {
         $cspParams.Flags = $cspParams.Flags -bor [Security.Cryptography.CspProviderFlags]::UseMachineKeyStore
