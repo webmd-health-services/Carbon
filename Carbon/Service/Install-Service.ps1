@@ -54,9 +54,9 @@ function Install-Service
     Demonstrates how to install a service to run as a system account other than `NetworkService`. Installs the DeathStart service to run as the local `System` account.
 
     .EXAMPLE
-    Install-Service -Name DeathStar -Path C:\ALongTimeAgo\InAGalaxyFarFarAway\DeathStar.exe -OnFirstFailure Restart -RestartDelay 30000 -OnSecondFailure Reboot -RebootDelay 120000 -ResetFailureCount (60*60*24)
+    Install-Service -Name DeathStar -Path C:\ALongTimeAgo\InAGalaxyFarFarAway\DeathStar.exe -OnFirstFailure RunCommand -RunCommandDelay 5000 -Command 'engage_hyperdrive.exe "Corruscant"' -OnSecondFailure Restart -RestartDelay 30000 -OnThirdFailure Reboot -RebootDelay 120000 -ResetFailureCount (60*60*24)
 
-    Demonstrates how to control the service's failure actions. On the first failure, Windows will restart the service after 30 seconds (`30,000` milliseconds). On the second failure, Windows will reboot after two minutes (`120,000` milliseconds). The failure count gets reset once a day (`60*60*24` seconds).
+    Demonstrates how to control the service's failure actions. On the first failure, Windows will run the `engage-hyperdrive.exe "Corruscant"` command after 5 seconds (`5,000` milliseconds). On the second failure, Windows will restart the service after 30 seconds (`30,000` milliseconds). On the third failure, Windows will reboot after two minutes (`120,000` milliseconds). The failure count gets reset once a day (`60*60*24` seconds).
     #>
     [CmdletBinding(SupportsShouldProcess=$true,DefaultParameterSetName='NetworkServiceAccount')]
     param(
@@ -85,7 +85,7 @@ function Install-Service
         [Carbon.Service.FailureAction]
         # What to do on the service' third failure.  Default is to take no action.
         $OnThirdFailure = [Carbon.Service.FailureAction]::TakeNoAction,
-        
+
         [int]
         # How many seconds after which the failure count is reset to 0.
         $ResetFailureCount = 0,
@@ -97,11 +97,19 @@ function Install-Service
         [int]
         # How many milliseconds to wait before handling the second failure.  Default is 60,000 or 1 minute.
         $RebootDelay = 60000,
-        
+
         [Alias('Dependencies')]
         [string[]]
         # What other services does this service depend on?
         $Dependency,
+        
+        [string]
+        # The command to run when a service fails, including path to the command and arguments.
+        $Command,
+        
+        [int]
+        # How many milliseconds to wait before running the failure command. Default is 0, or immediately.
+        $RunCommandDelay = 0,
         
         [Parameter(ParameterSetName='CustomAccount',Mandatory=$true)]
         [string]
@@ -120,15 +128,19 @@ function Install-Service
 
     Set-StrictMode -Version 'Latest'
 
-    function ConvertTo-FailureActionArg($action, $restartDelay, $rebootDelay)
+    function ConvertTo-FailureActionArg($action)
     {
         if( $action -eq 'Reboot' )
         {
-            return "reboot/$rebootDelay"
+            return "reboot/{0}" -f $RebootDelay
         }
         elseif( $action -eq 'Restart' )
         {
-            return "restart/$restartDelay"
+            return "restart/{0}" -f $RestartDelay
+        }
+        elseif( $action -eq 'RunCommand' )
+        {
+            return 'run/{0}' -f $RunCommandDelay
         }
         elseif( $action -eq 'TakeNoAction' )
         {
@@ -191,6 +203,16 @@ function Install-Service
             {
                 Write-Verbose ('[{0}] RestartDelay      {1} | {2}' -f $Name,$serviceConfig.RestartDelay,$RestartDelay)
                 $doInstall = $serviceConfig.RestartDelay -ne $RestartDelay
+            }
+        }
+
+        if( -not $doInstall )
+        {
+            if( $failureActions | Where-Object { $_ -eq [Carbon.Service.FailureAction]::RunCommand } )
+            {
+                Write-Verbose ('[{0}] Command           {1} | {2}' -f $Name,$serviceConfig.FailureProgram,$Command)
+                $doInstall = $serviceConfig.FailureProgram -ne $Command -or
+                             $serviceConfig.RunCommandDelay -ne $RunCommandDelay
             }
         }
 
@@ -328,13 +350,18 @@ function Install-Service
         }
     }
     
-    $firstAction = ConvertTo-FailureActionArg $OnFirstFailure $RestartDelay $RebootDelay
-    $secondAction = ConvertTo-FailureActionArg $OnSecondFailure $RestartDelay $RebootDelay
-    $thirdAction = ConvertTo-FailureActionArg $OnThirdFailure $RestartDelay $RebootDelay
+    $firstAction = ConvertTo-FailureActionArg $OnFirstFailure
+    $secondAction = ConvertTo-FailureActionArg $OnSecondFailure
+    $thirdAction = ConvertTo-FailureActionArg $OnThirdFailure
+
+    if( -not $Command )
+    {
+        $Command = '""'
+    }
 
     if( $PSCmdlet.ShouldProcess( $Name, "setting service failure actions" ) )
     {
-        & $sc failure $Name reset= $ResetFailureCount actions= $firstAction/$secondAction/$thirdAction
+        & $sc failure $Name reset= $ResetFailureCount actions= $firstAction/$secondAction/$thirdAction command= $Command
         if( $LastExitCode -ne 0 )
         {
             Write-Error "$sc failed when setting failure actions and returned '$LastExitCode'."

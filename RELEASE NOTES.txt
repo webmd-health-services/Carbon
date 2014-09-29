@@ -1,5 +1,12 @@
 # 1.8.1 
 
+## Enhancements
+
+### Services
+
+ * [Install-Service](http://get-carbon.org/help/Install-Service.html) now supports setting a command to run when a service fails.
+
+ 
 ## Bug Fixes
 
 ### General

@@ -162,6 +162,20 @@ function Test-ShouldReinstallServiceIfRebootDelayChanges
     Assert-Equal 5 (Get-ServiceConfiguration -Name $serviceName).RebootDelayMinutes
 }
 
+function Test-ShouldReinstallServiceIfCommandChanges
+{
+    Install-Service -Name $serviceName -Path $servicePath -OnFirstFailure RunCommand -Command 'fubar'
+    Install-Service -Name $serviceName -Path $servicePath -OnFirstFailure RunCommand -command 'fubar2'
+    Assert-Equal 'fubar2' (Get-ServiceConfiguration -Name $serviceName).FailureProgram
+}
+
+function Test-ShouldReinstallServiceIfRunDelayChanges
+{
+    Install-Service -Name $serviceName -Path $servicePath -OnFirstFailure RunCommand -Command 'fubar' -RunCommandDelay 60000
+    Install-Service -Name $serviceName -Path $servicePath -OnFirstFailure RunCommand -command 'fubar' -RunCommandDelay 30000
+    Assert-Equal 30000 (Get-ServiceConfiguration -Name $serviceName).RunCommandDelay
+}
+
 function Test-ShouldReinstallServiceIfDependenciesChange
 {
     $service2Name = '{0}-2' -f $serviceName
@@ -256,36 +270,51 @@ function Test-ShouldSetFailureActions
 {
     Install-Service -Name $serviceName -Path $servicePath @installServiceParams
     $service = Assert-ServiceInstalled
-    $failureActionBytes = (Get-ItemProperty "hklm:\System\ControlSet001\services\$serviceName\" -Name FailureActions).FailureActions
-    $failureAction = [Convert]::ToBase64String( $failureActionBytes )
-    Assert-Equal "AAAAAAAAAAAAAAAAAwAAABQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=" $failureAction
-    
-    Install-Service -Name $serviceName -Path $servicePath -ResetFailureCount 1 -OnFirstFailure Restart -OnSecondFailure Restart -OnThirdFailure Reboot -RestartDelay 18000 -RebootDelay 30000 @installServiceParams
-    $failureActionBytes = (Get-ItemProperty "hklm:\System\ControlSet001\services\$serviceName\" -Name FailureActions).FailureActions
-    $updatedFailureAction = [Convert]::ToBase64String( $failureActionBytes )
+    $config = Get-Serviceconfiguration -Name $serviceName
+    Assert-Equal 'TakeNoAction' $config.FirstFailure
+    Assert-Equal 'TakeNoAction' $config.SecondFailure
+    Assert-Equal 'TakeNoAction' $config.ThirdFailure
+    Assert-Equal 0 $config.RebootDelay
+    Assert-Equal 0 $config.ResetPeriod
+    Assert-Equal 0 $config.RestartDelay
 
-    # First four bytes are reset failure count period.  
-    Assert-Equal $failureActionBytes[0] 1 # The reset failure count
+    Install-Service -Name $serviceName `
+                    -Path $servicePath `
+                    -ResetFailureCount 1 `
+                    -OnFirstFailur RunCommand `
+                    -OnSecondFailure Restart `
+                    -OnThirdFailure Reboot `
+                    -RestartDelay 18000 `
+                    -RebootDelay 30000 `
+                    -RunCommandDelay 6000 `
+                    -Command 'echo Fubar!' `
+                    @installServiceParams
 
-    Assert-Equal 1 $failureActionBytes[20] # Restart on first failure
-    # Bytes 24-27 are the delay in milliseconds
-    $delay = [int]$failureActionBytes[24]
-    $delay = $delay -bor ([int]$failureActionBytes[25] * 256)
-    Assert-Equal 18000 $delay 
+    $config = Get-ServiceConfiguration -Name $serviceName
+    Assert-Equal 'RunCommand' $config.FirstFailure
+    Assert-Equal 'echo Fubar!' $config.FailureProgram
+    Assert-Equal 'Restart' $config.SecondFailure
+    Assert-Equal 'Reboot' $config.ThirdFailure
+    Assert-Equal 30000 $config.RebootDelay
+    Assert-Equal 0 $config.RebootDelayMinutes
+    Assert-Equal 1 $config.ResetPeriod
+    Assert-Equal 0 $config.ResetPeriodDays
+    Assert-Equal 18000 $config.RestartDelay
+    Assert-Equal 0 $config.RestartDelayMinutes
+    Assert-Equal 6000 $config.RunCommandDelay
+    Assert-Equal 0 $config.RunCommandDelayMinutes
+}
 
-    Assert-Equal 1 $failureActionBytes[28] # Restart on second failure
-    # Bytes 32-35 are the delay in milliseconds
-    $delay = [int]$failureActionBytes[32]
-    $delay = $delay -bor ([int]$failureActionBytes[33] * 256)
-    Assert-Equal 18000 $delay 
+function Test-ShouldClearCommand
+{
+    Install-Service -Name $serviceName -Path $servicePath -OnFirstFailure RunCommand -Command 'fubar'
+    $config = Get-ServiceConfiguration -Name $serviceName
+    Assert-Equal 'fubar' $config.FailureProgram
+    Assert-Equal 0 $config.RunCommandDelay
 
-    Assert-Equal 2 $failureActionBytes[36] # Reboot on third failure
-    # Bytes 40-43 are the delay in milliseconds
-    $delay = [int]$failureActionBytes[40]
-    $delay = $delay -bor ([int]$failureActionBytes[41] * 256)
-    Assert-Equal 30000 $delay 
-
-    Assert-NotEqual $updatedFailureAction $failureAction
+    Install-Service -Name $serviceName -Path $servicePath
+    $config = Get-ServiceConfiguration -Name $serviceName
+    Assert-Null $config.FailureProgram
 }
 
 function Test-ShouldSetDependencies
