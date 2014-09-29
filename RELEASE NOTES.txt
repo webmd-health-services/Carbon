@@ -126,7 +126,7 @@ This is a backwards-incompatible release.
  * Added [Remove-GroupMember](http://get-carbon.org/help/Remove-GroupMember.html) function. Thanks to [Philip Kluss](https://bitbucket.org/philkloose) for the contribution. 
 
 
-# 1.8.1 
+# 1.9.0
 
 ## Enhancements
 
@@ -140,6 +140,7 @@ This is a backwards-incompatible release.
 ### General
 
  * `Import-Carbon` fails when `-WhatIf` switch is used.
+ * Importing Carbon no longer writes an error if the `PATH` environment variable contains a path to a non-existent drive (issue [#134](https://bitbucket.org/splatteredbits/carbon/issue/134/import-carbon-fails-with-path-environment)).
  
 ### INI
 

@@ -46,3 +46,31 @@ function Test-ShouldImportWithPrefix
         Assert-Match $cmd.Name '^.+-C.+$'
     }
 }
+
+function Test-ShouldHandleDrivesinEnvPathThatDoNotExist
+{
+    $drive = $null
+    for( $idx = [byte][char]'Z'; $idx -ge [byte][char]'A'; --$idx )
+    {
+        $driveLetter = [char][byte]$idx
+        $drive = '{0}:\' -f $driveLetter
+        if( -not (Test-Path -Path $drive) )
+        {
+            break
+        }
+    }
+
+    $badPath = '{0}fubar' -f $drive
+    $originalPath = $env:Path
+    $env:Path = '{0};{1}' -f $env:Path,$badPath
+    try
+    {
+        & $importCarbonPath
+        Assert-NoError
+    }
+    finally
+    {
+        $env:Path = $originalPath
+    }
+
+}
