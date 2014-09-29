@@ -36,11 +36,6 @@ function Stop-Test
 {
     Uninstall-Service $serviceName
     Uninstall-User $serviceAcct
-    $now = Get-Date
-    if( $now.Second -ne $startedAt.Second )
-    {
-        Start-Sleep -Milliseconds (1000 - $now.Millisecond)
-    }
 }
 
 function Test-ShouldInstallService
@@ -58,31 +53,53 @@ function Test-ShouldInstallService
 function Test-ShouldReinstallUnchangedServiceWithForceParameter
 {
     Install-Service -Name $serviceName -Path $servicePath @installServiceParams
+    $now = Get-Date
+    Start-Sleep -Milliseconds (1001 - $now.Millisecond)
+
     Install-Service -Name $serviceName -Path $servicePath @installServiceParams -Force
-    Assert-ServiceReInstalled
-}
 
-function Test-ShouldNotInstallServiceTwice
-{
-    Install-Service -Name $serviceName -Path $servicePath @installServiceParams
-    Install-Service -Name $serviceName -Path $servicePath @installServiceParams
-
+    $maxTries = 20
+    $tryNum = 0
+    $serviceReinstalled = $false
     do
     {
         [object[]]$events = Get-EventLog -LogName 'System' `
                                          -After $startedAt `
                                          -Source 'Service Control Manager' `
                                          -EntryType Information |
-                                Where-Object { $_.EventID -eq 7045 }
-        if( -not $events )
+                                Where-Object { $_.EventID -eq 7036 -or $_.EventID -eq 7045 }
+
+        if( $events -and $events.Count -ge 4 )
+        {
+            if( $events[0].Message -like '*entered the running state*' -and 
+                $events[1].Message -like '*entered the stopped state*' -and 
+                $events[2].Message -like '*entered the running state*' -and
+                $events[3].Message -like '*was installed*' )
+            {
+                $serviceReinstalled = $true
+                break
+            }
+        }
+        else
         {
             Start-Sleep -Milliseconds 100
         }
     }
-    while( -not $events )
-                                     
-    Assert-NotNull $events
-    Assert-Equal 1 $events.Count
+    while( $tryNum++ -lt $maxTries )
+                                   
+    Assert-True $serviceReinstalled ('service not reinstalled')                                     
+}
+
+function Test-ShouldNotInstallServiceTwice
+{
+    Install-Service -Name $serviceName -Path $servicePath @installServiceParams
+    $now = Get-Date
+    Start-Sleep -Milliseconds (1001 - $now.Millisecond)
+
+    Stop-Service -Name $serviceName
+    Install-Service -Name $serviceName -Path $servicePath @installServiceParams
+    # This could break if Install-Service is ever updated to not start a stopped service
+    Assert-Equal 'Stopped' (Get-Service -Name $serviceName).Status
 }
 
 function Test-ShouldReInstallServiceIfPathChanges
@@ -93,57 +110,56 @@ function Test-ShouldReInstallServiceIfPathChanges
 
     Install-Service -Name $serviceName -Path $servicePath
     Install-Service -Name $serviceName -Path $changedServicePath
-    Assert-ServiceReinstalled 
+    Assert-Equal $changedServicePath (Get-ServiceConfiguration -Name $serviceName).Path
 }
 
 function Test-ShouldReinstallServiceIfStartupTypeChanges
 {
     Install-Service -Name $serviceName -Path $servicePath
     Install-Service -Name $serviceName -Path $servicePath -StartupType Manual
-    Start-Service -Name $serviceName  # So our assertion below passes.
-    Assert-ServiceReInstalled
+    Assert-Equal 'Manual' (Get-Service -Name $serviceName).StartMode
 }
 
 function Test-ShouldReinstallServiceIfResetFailureCountChanges
 {
     Install-Service -Name $serviceName -Path $servicePath
     Install-Service -Name $serviceName -Path $servicePath -ResetFailureCount 60
-    Assert-ServiceReInstalled
+    Assert-Equal 60 (Get-ServiceConfiguration -Name $serviceName).ResetPeriod
 }
 
 function Test-ShouldReinstallServiceIfFirstFailureChanges
 {
     Install-Service -Name $serviceName -Path $servicePath
     Install-Service -Name $serviceName -Path $servicePath -OnFirstFailure 'Restart'
-    Assert-ServiceReInstalled
+    Assert-Equal 'Restart' (Get-ServiceConfiguration -Name $serviceName).FirstFailure
 }
 
 function Test-ShouldReinstallServiceIfSecondFailureChanges
 {
     Install-Service -Name $serviceName -Path $servicePath
     Install-Service -Name $serviceName -Path $servicePath -OnSecondFailure 'Restart'
-    Assert-ServiceReInstalled
+    Assert-Equal 'Restart' (Get-ServiceConfiguration -Name $serviceName).SecondFailure
 }
 
 function Test-ShouldReinstallServiceIfThirdFailureChanges
 {
     Install-Service -Name $serviceName -Path $servicePath
     Install-Service -Name $serviceName -Path $servicePath -OnThirdFailure 'Restart'
-    Assert-ServiceReInstalled
+    Assert-Equal 'Restart' (Get-ServiceConfiguration -Name $serviceName).ThirdFailure
 }
 
 function Test-ShouldReinstallServiceIfRestartDelayChanges
 {
     Install-Service -Name $serviceName -Path $servicePath -OnFirstFailure 'Restart'
     Install-Service -Name $serviceName -Path $servicePath -OnFirstFailure 'Restart' -RestartDelay (1000*60*5)
-    Assert-ServiceReInstalled
+    Assert-Equal 5 (Get-ServiceConfiguration -Name $serviceName).RestartDelayMinutes
 }
 
 function Test-ShouldReinstallServiceIfRebootDelayChanges
 {
     Install-Service -Name $serviceName -Path $servicePath -OnFirstFailure 'Reboot'
     Install-Service -Name $serviceName -Path $servicePath -OnFirstFailure 'Reboot' -RebootDelay (1000*60*5)
-    Assert-ServiceReInstalled
+    Assert-Equal 5 (Get-ServiceConfiguration -Name $serviceName).RebootDelayMinutes
 }
 
 function Test-ShouldReinstallServiceIfDependenciesChange
@@ -155,19 +171,15 @@ function Test-ShouldReinstallServiceIfDependenciesChange
     {
         $service3Name = '{0}-3' -f $serviceName
         Install-Service -Name $service3Name -Path $servicePath
-        $now = Get-Date
-        Start-Sleep -Milliseconds (1000 - $now.Millisecond)
-        $startedAt = Get-Date
-        $startedAt = $startedAt.AddSeconds(-1)
 
         try
         {
             Install-Service -Name $serviceName -Path $servicePath
             Install-Service -Name $serviceName -Path $servicePath -Dependency $service2Name
-            Assert-ServiceReInstalled
+            Assert-Equal $service2Name (Get-Service -Name $serviceName).ServicesDependedOn[0].Name
 
             Install-Service -Name $serviceName -Path $servicePath -Dependency $service3Name
-            Assert-ServiceReInstalled
+            Assert-Equal $service3Name (Get-Service -Name $serviceName).ServicesDependedOn[0].Name
         }
         finally
         {
@@ -185,7 +197,7 @@ function Test-ShouldReinstallServiceIfUsernameChanges
 {
     Install-Service -Name $serviceName -Path $servicePath
     Install-Service -Name $serviceName -Path $servicePath -Username 'SYSTEM'
-    Assert-ServiceReInstalled
+    Assert-Equal 'NT AUTHORITY\SYSTEM' (Get-ServiceConfiguration -Name $serviceName).UserName
 }
 
 
@@ -316,6 +328,22 @@ function Test-ShouldInstallServiceWithRelativePath
     }
 }
 
+function Test-ShouldClearDependencies
+{
+    $service2Name = '{0}-2' -f $serviceName
+    Install-Service -Name $service2Name -Path $servicePath
+    Install-Service -Name $serviceName -Path $servicePath -Dependency $service2Name
+
+    $service = Get-Service -Name $serviceName
+    Assert-Equal 1 $service.ServicesDependedOn.Length
+    Assert-Equal $service2Name $service.ServicesDependedOn[0].Name
+
+    Install-Service -Name $serviceName -Path $servicePath
+    $service = Get-Service -Name $serviceName
+    Assert-Equal 0 $service.ServicesDependedOn.Length
+}
+
+
 function Assert-ServiceInstalled
 {
     $service = Get-Service $serviceName
@@ -333,31 +361,4 @@ function Assert-HasPermissionsOnServiceExecutable($Identity, $Path)
 
     Assert-Null $acl "'$Identity' didn't have full control to '$Path'."
             
-}
-
-function Assert-ServiceReInstalled
-{
-    $maxTries = 10
-    $tryNum = 0
-    do
-    {
-        [object[]]$events = Get-EventLog -LogName 'System' `
-                                         -After $startedAt `
-                                         -Source 'Service Control Manager' `
-                                         -EntryType Information |
-                                Where-Object { $_.EventID -eq 7036 -or $_.EventID -eq 7045 }
-
-        if( -not $events-or $events.Count -lt 4)
-        {
-            Start-Sleep -Milliseconds 100
-        }
-    }
-    while( $tryNum++ -lt $maxTries -and (-not $events -or $events.Count -lt 4) )
-                                     
-    Assert-NotNull $events
-    Assert-Equal 4 $events.Count
-    Assert-Like $events[0].Message '*entered the running state*'
-    Assert-Like $events[1].Message '*entered the stopped state*'
-    Assert-Like $events[2].Message '*entered the running state*'
-    Assert-Like $events[3].Message '*was installed*'
 }

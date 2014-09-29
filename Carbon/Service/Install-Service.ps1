@@ -19,9 +19,11 @@ function Install-Service
     Installs a Windows service.
 
     .DESCRIPTION
-    Installs a Windows service.  If a service with the given name already exists, it is left in place, and the its configuration is updated to match the parameters passed in.  In order to configure it, the service is stopped, configured, then started.  By default, the service is installed to run as `NetworkService`.  Set the `Username` and `Password` arguments to run as a different account.  This user will be granted the logon as a service right.
+    Installs a Windows service. If a service with the given name already exists, it is stopped, its configuration is updated to match the parameters passed in, and then re-started. If its configuration is unchanged, the function returns without making any changes. Settings whose parameters are omitted are reset to their default values.
+    
+    By default, the service is installed to run as `NetworkService`. Set the `Username` and `Password` arguments to run as a different account. This user will be granted the logon as a service right. To run as a system account other than `NetworkService`, provide just the account's name as the `UserName` parameter, and omit the `Password` parameter.
 
-    The minimum required information to install a service is its name and path.  By default the servide will run as `NetworkService` and will start automatically.  Review the parameter list for additional configuraiton options and their defaults.  Normally, we would list them here, but there's like 300 of them and we really don't have the time.  I'm so mean, I'm not even going to give you *examples* of all the different options.  Feel free to send in your own.
+    The minimum required information to install a service is its name and path.
 
     [Managed service accounts and virtual accounts](http://technet.microsoft.com/en-us/library/dd548356.aspx) should be supported (we don't know how to test, so can't be sure).  Simply omit the `-Password` parameter when providing a custom account name with the `-Username` parameter.
 
@@ -37,14 +39,24 @@ function Install-Service
     Installs the Death Star service, which runs the service executable at `C:\ALongTimeAgo\InAGalaxyFarFarAway\DeathStar.exe`.  The service runs as `NetworkService` and will start automatically.
 
     .EXAMPLE
-    Install-Service -Name DetahStart -Path C:\ALongTimeAgo\InAGalaxyFarFarAway\DeathStar.exe -StartupType Manual
+    Install-Service -Name DeathStar -Path C:\ALongTimeAgo\InAGalaxyFarFarAway\DeathStar.exe -StartupType Manual
 
     Install the Death Star service to startup manually.  You certainly don't want the thing roaming the galaxy, destroying thing willy-nilly, do you?
 
     .EXAMPLE
-    Install-Service -Name DetahStart -Path C:\ALongTimeAgo\InAGalaxyFarFarAway\DeathStar.exe -Username EMPIRE\wtarkin -Password 5irewh3nready
+    Install-Service -Name DeathStar -Path C:\ALongTimeAgo\InAGalaxyFarFarAway\DeathStar.exe -Username EMPIRE\wtarkin -Password 5irewh3nready
 
     Installs the Death Star service to run as Grand Moff Tarkin, who is given the log on as a service right.
+
+    .EXAMPLE
+    Install-Service -Name DeathStar -Path C:\ALongTimeAgo\InAGalaxyFarFarAway\DeathStar.exe -Username SYSTEM
+
+    Demonstrates how to install a service to run as a system account other than `NetworkService`. Installs the DeathStart service to run as the local `System` account.
+
+    .EXAMPLE
+    Install-Service -Name DeathStar -Path C:\ALongTimeAgo\InAGalaxyFarFarAway\DeathStar.exe -OnFirstFailure Restart -RestartDelay 30000 -OnSecondFailure Reboot -RebootDelay 120000 -ResetFailureCount (60*60*24)
+
+    Demonstrates how to control the service's failure actions. On the first failure, Windows will restart the service after 30 seconds (`30,000` milliseconds). On the second failure, Windows will reboot after two minutes (`120,000` milliseconds). The failure count gets reset once a day (`60*60*24` seconds).
     #>
     [CmdletBinding(SupportsShouldProcess=$true,DefaultParameterSetName='NetworkServiceAccount')]
     param(
@@ -58,22 +70,18 @@ function Install-Service
         # The path to the service.
         $Path,
         
-        [Parameter()]
         [ServiceProcess.ServiceStartMode]
         # The startup type: automatic, manual, or disabled.  Default is automatic.
         $StartupType = [ServiceProcess.ServiceStartMode]::Automatic,
         
-        [string]
         [Carbon.Service.FailureAction]
         # What to do on the service's first failure.  Default is to take no action.
         $OnFirstFailure = [Carbon.Service.FailureAction]::TakeNoAction,
         
-        [string]
         [Carbon.Service.FailureAction]
         # What to do on the service's second failure. Default is to take no action.
         $OnSecondFailure = [Carbon.Service.FailureAction]::TakeNoAction,
         
-        [string]
         [Carbon.Service.FailureAction]
         # What to do on the service' third failure.  Default is to take no action.
         $OnThirdFailure = [Carbon.Service.FailureAction]::TakeNoAction,
@@ -153,7 +161,7 @@ function Install-Service
         Write-Verbose ('Service {0} exists. Checking if configuration has changed.' -f $Name)
         $service = Get-Service -Name $Name
         $serviceConfig = Get-ServiceConfiguration -Name $Name
-        $dependentServiceNames = $service.DependentServices | Select-Object -ExpandProperty 'Name'
+        $dependedOnServiceNames = $service.ServicesDependedOn | Select-Object -ExpandProperty 'Name'
 
         Write-Verbose ('[{0}] Path              {1} | {2}' -f $Name,$serviceConfig.Path,$Path)
         Write-Verbose ('[{0}] OnFirstFailure    {1} | {2}' -f $Name,$serviceConfig.FirstFailure,$OnFirstFailure)
@@ -194,13 +202,13 @@ function Install-Service
 
         if( -not $doInstall )
         {
-            Write-Verbose ('[{0}] Dependency        {1} | {2}' -f $Name,($dependentServiceNames -join ','),($Dependency -join ','))
-            if( $Dependency | Where-Object { $dependentServiceNames -notcontains $_ } )
+            Write-Verbose ('[{0}] Dependency        {1} | {2}' -f $Name,($dependedOnServiceNames -join ','),($Dependency -join ','))
+            if( $Dependency | Where-Object { $dependedOnServiceNames -notcontains $_ } )
             {
                 $doInstall = $true
             }
 
-            if( $dependentServiceNames | Where-Object { $Dependency -notcontains $_ } )
+            if( $dependedOnServiceNames | Where-Object { $Dependency -notcontains $_ } )
             {
                 $doInstall = $true
             }
@@ -305,17 +313,15 @@ function Install-Service
         $operation = 'config'
     }
     
-    $dependencyArgName = ''
-    $dependencyArgValue = ''
+    $dependencyArgValue = '""'
     if( $Dependency )
     {
-        $dependencyArgName = 'depend='
         $dependencyArgValue = $Dependency -join '/'
     }
 
     if( $PSCmdlet.ShouldProcess( "$Name [$Path]", "$operation service" ) )
     {
-        & $sc $operation $Name binPath= $Path start= $startArg obj= $identity $passwordArgName $passwordArgValue $dependencyArgName $dependencyArgValue
+        & $sc $operation $Name binPath= $Path start= $startArg obj= $identity $passwordArgName $passwordArgValue depend= $dependencyArgValue
         if( $LastExitCode -ne 0 )
         {
             Write-Error "$sc failed $operation and returned '$LastExitCode'."
