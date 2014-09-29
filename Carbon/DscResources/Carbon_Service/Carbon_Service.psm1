@@ -33,18 +33,15 @@ function Get-TargetResource
         # The startup type: automatic, manual, or disabled.  Default is automatic.
         $StartupType,
         
-        [string]
-        [ValidateSet("Reboot","Restart","TakeNoAction")]
+        [Carbon.Service.FailureAction]
         # What to do on the service's first failure.  Default is to take no action.
         $OnFirstFailure,
         
-        [string]
-        [ValidateSet("Reboot","Restart","TakeNoAction")]
+        [Carbon.Service.FailureAction]
         # What to do on the service's second failure. Default is to take no action.
         $OnSecondFailure,
         
-        [string]
-        [ValidateSet("Reboot","Restart","TakeNoAction")]
+        [Carbon.Service.FailureAction]
         # What to do on the service' third failure.  Default is to take no action.
         $OnThirdFailure,
         
@@ -64,6 +61,14 @@ function Get-TargetResource
         # What other services does this service depend on?
         $Dependency,
         
+        [string]
+        # The command to run when a service fails, including path to the command and arguments.
+        $Command,
+        
+        [int]
+        # How many milliseconds to wait before running the failure command. Default is 0, or immediately.
+        $RunCommandDelay,
+        
         [ValidateSet("LocalSystem", "LocalService", "NetworkService")]
         [string]
         # The system account the service should run as.
@@ -75,7 +80,7 @@ function Get-TargetResource
         
         [ValidateSet('Present','Absent')]
         [string]
-        # Should the user exist or not exist?
+        # If `Present`, the service is installed/updated. If `Absent`, the service is removed.
         $Ensure = 'Present'
     )
 
@@ -91,6 +96,8 @@ function Get-TargetResource
                     ResetFailureCount = $null;
                     RestartDelay = $null;
                     RebootDelay = $null;
+                    Command = $null;
+                    RunCommandDelay = $null;
                     Dependency = $null;
                     UserName = $null;
                     Credential = $null;
@@ -108,6 +115,8 @@ function Get-TargetResource
         $resource.ResetFailureCount = $service.ResetPeriod
         $resource.RestartDelay = $service.RestartDelay
         $resource.RebootDelay = $service.RebootDelay
+        $resource.Command = $service.FailureProgram
+        $resource.RunCommandDelay = $service.RunCommandDelay
         $resource.UserName = $service.UserName
         $actualUserName = Resolve-Identity -Name $service.UserName -ErrorAction Ignore
         if( $actualUserName )
@@ -147,7 +156,7 @@ function Set-TargetResource
 
     .EXAMPLE
     >
-    Demonstrates how to install a service that runs as a custom account.
+    Demonstrates how to install a service that runs as a custom account and has custom failure actions.
 
         Carbon_Service InstallNoOpService
         {
@@ -155,7 +164,9 @@ function Set-TargetResource
             Path = 'C:\Projects\Carbon\bin\NoOpService.bin';
             StartupType = 'Automatic';
             Credential = $noOpServiceCreential';
-            OnFirstFailure = 'Restart';
+            OnFirstFailure = 'RunCommand';
+            Command = 'example.exe /fail %1%';
+            RunCommandDelay = 1000;
             OnSecondFailure = 'Restart';
             RestartDelay = (1000*60*5); # 5 minutes as milliseconds
         }
@@ -198,18 +209,15 @@ function Set-TargetResource
         # The startup type: automatic, manual, or disabled.  Default is automatic.
         $StartupType,
         
-        [string]
-        [ValidateSet("Reboot","Restart","TakeNoAction")]
+        [Carbon.Service.FailureAction]
         # What to do on the service's first failure.  Default is to take no action.
         $OnFirstFailure,
         
-        [string]
-        [ValidateSet("Reboot","Restart","TakeNoAction")]
+        [Carbon.Service.FailureAction]
         # What to do on the service's second failure. Default is to take no action.
         $OnSecondFailure,
         
-        [string]
-        [ValidateSet("Reboot","Restart","TakeNoAction")]
+        [Carbon.Service.FailureAction]
         # What to do on the service' third failure.  Default is to take no action.
         $OnThirdFailure,
         
@@ -229,6 +237,14 @@ function Set-TargetResource
         # What other services does this service depend on?
         $Dependency,
         
+        [string]
+        # The command to run when a service fails, including path to the command and arguments.
+        $Command,
+        
+        [int]
+        # How many milliseconds to wait before running the failure command. Default is 0, or immediately.
+        $RunCommandDelay,
+        
         [ValidateSet("LocalSystem", "LocalService", "NetworkService")]
         [string]
         # The system account the service should run as.
@@ -237,7 +253,7 @@ function Set-TargetResource
         [pscredential]
         # The credentials of the custom account the service should run as.
         $Credential,
-     
+        
         [ValidateSet('Present','Absent')]
         [string]
         # If `Present`, the service is installed/updated. If `Absent`, the service is removed.
@@ -302,18 +318,15 @@ function Test-TargetResource
         # The startup type: automatic, manual, or disabled.  Default is automatic.
         $StartupType,
         
-        [string]
-        [ValidateSet("Reboot","Restart","TakeNoAction")]
+        [Carbon.Service.FailureAction]
         # What to do on the service's first failure.  Default is to take no action.
         $OnFirstFailure,
         
-        [string]
-        [ValidateSet("Reboot","Restart","TakeNoAction")]
+        [Carbon.Service.FailureAction]
         # What to do on the service's second failure. Default is to take no action.
         $OnSecondFailure,
         
-        [string]
-        [ValidateSet("Reboot","Restart","TakeNoAction")]
+        [Carbon.Service.FailureAction]
         # What to do on the service' third failure.  Default is to take no action.
         $OnThirdFailure,
         
@@ -333,6 +346,14 @@ function Test-TargetResource
         # What other services does this service depend on?
         $Dependency,
         
+        [string]
+        # The command to run when a service fails, including path to the command and arguments.
+        $Command,
+        
+        [int]
+        # How many milliseconds to wait before running the failure command. Default is 0, or immediately.
+        $RunCommandDelay,
+        
         [ValidateSet("LocalSystem", "LocalService", "NetworkService")]
         [string]
         # The system account the service should run as.
@@ -341,7 +362,7 @@ function Test-TargetResource
         [pscredential]
         # The custom account the service should run as.
         $Credential,
-     
+        
         [ValidateSet('Present','Absent')]
         [string]
         # If `Present`, the service is installed/updated. If `Absent`, the service is removed.
