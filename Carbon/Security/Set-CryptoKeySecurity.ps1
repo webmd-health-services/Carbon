@@ -33,6 +33,7 @@ function Set-CryptoKeySecurity
     $keyContainerInfo = $Certificate.PrivateKey.CspKeyContainerInfo
     $cspParams = New-Object 'Security.Cryptography.CspParameters' ($keyContainerInfo.ProviderType, $keyContainerInfo.ProviderName, $keyContainerInfo.KeyContainerName)
     $cspParams.Flags = [Security.Cryptography.CspProviderFlags]::UseExistingKey
+    $cspParams.KeyNumber = $keyContainerInfo.KeyNumber
     if( (Split-Path -NoQualifier -Path $Certificate.PSPath) -like 'LocalMachine\*' )
     {
         $cspParams.Flags = $cspParams.Flags -bor [Security.Cryptography.CspProviderFlags]::UseMachineKeyStore
@@ -54,6 +55,6 @@ function Set-CryptoKeySecurity
         {
             $actualException = $actualException.InnerException
         }
-        Write-Error ('Failed to {0} to ''{2}'' ({3}) certificate''s private key: {4}: {5}' -f $Action,$Certificate.Subject,$Certificate.Thumbprint,$actualException.GetType().FullName,$actualException.Message)
+        Write-Error ('Failed to {0} to ''{1}'' ({2}) certificate''s private key: {3}: {4}' -f $Action,$Certificate.Subject,$Certificate.Thumbprint,$actualException.GetType().FullName,$actualException.Message)
     }
 }
