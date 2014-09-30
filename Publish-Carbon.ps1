@@ -95,7 +95,7 @@ try
         $helpDirPath = Join-Path $PSScriptRoot Website\help
         Get-ChildItem $helpDirPath *.html | Remove-Item 
         
-        .\Out-Html.ps1 -OutputDir .\Website\help
+        .\Out-Html.ps1 -OutputDir .\Website\help\2.0
         
         hg addremove $helpDirPath
         

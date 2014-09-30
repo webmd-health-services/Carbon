@@ -64,6 +64,7 @@ $menuBuilder = New-Object Text.StringBuilder
 	<ul id="SiteNav">
 		<li><a href="http://get-carbon.org">Get-Carbon</a></li>
 		<li><b>-Documentation</b></li>
+        <li><a href="http://get-carbon.org/help/2.0/">2.0 (beta)</a></li>
         <li><a href="http://get-carbon.org/releasenotes.html">-ReleaseNotes</a></li>
 		<li><a href="http://pshdo.com">-Blog</a></li>
 	</ul>
@@ -163,6 +164,7 @@ if( -not (Test-Path $OutputDir -PathType Container) )
 	<ul id="SiteNav">
 		<li><a href="/">Get-Carbon</a></li>
 		<li><a href="help/">-Documentation</a></li>
+		<li><a href="help/2.0/">2.0 (beta)</a></li>
 		<li><b>-ReleaseNotes</b></li>
 		<li><a href="http://pshdo.com">-Blog</a></li>
 	</ul>
