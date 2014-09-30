@@ -98,7 +98,7 @@ $description
                     $hasCommonParameters = $true
                 }
             
-                $typeLink = Get-TypeDocumentationLink -TypeName $_.type.name
+                $typeLink = Get-TypeDocumentationLink -CommandName $commandName -TypeName $_.type.name
                 $paramDescription = $_.Description | 
                                 Out-HtmlString | 
                                 Convert-MarkdownToHtml | 
@@ -162,7 +162,7 @@ $description
         {
             if( $returnValues -match '^(.*?)\.?(\s+(.*))?$' )
             {
-                $typeLink = Get-TypeDocumentationLink -TypeName $matches[1]
+                $typeLink = Get-TypeDocumentationLink -CommandName $commandName -TypeName $matches[1]
                 $returnValues = '{0}. {1}' -f $typeLink,$matches[2]
             }
             else

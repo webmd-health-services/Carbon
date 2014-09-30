@@ -26,7 +26,13 @@ Set-StrictMode -Version 'Latest'
 & (Join-Path -Path $PSScriptRoot -ChildPath 'Tools\Silk\Import-Silk.ps1' -Resolve)
 & (Join-Path -Path $PSScriptRoot -ChildPath 'Carbon\Import-Carbon.ps1' -Resolve)
 
-Get-ChildItem $OutputDir *.html | Remove-Item
+$moduleInstallPath = Get-PowerShellModuleInstallPath
+$linkPath = Join-Path -Path $moduleInstallPath -ChildPath 'Carbon'
+Install-Junction -Link $linkPath -Target (Join-Path -Path $PSScriptRoot -ChildPath 'Carbon') -Verbose:$VerbosePreference | Out-Null
+
+try
+{
+    Get-ChildItem $OutputDir *.html | Remove-Item
 
 $commands = Get-Command -Module Carbon -CommandType Function,Filter | 
                 Where-Object { $_.ModuleName -eq 'Carbon' -and $_.Name } | 
@@ -43,30 +49,36 @@ foreach( $command in $commands )
         continue
     }
 
-    if( $fileInfo -is [object[]] )
-    {
-        $filePaths = $fileInfo | Select-Object -ExpandProperty 'FullName'
-        Write-Error ("Found multiple files for command '{0}':{1} * {2}" -f $command.Name,([Environment]::NewLine),($filePaths -join ('{0} * ' -f ([Environment]::NewLine))))
-        continue
+        if( $fileInfo -is [object[]] )
+        {
+            $filePaths = $fileInfo | Select-Object -ExpandProperty 'FullName'
+            Write-Error ("Found multiple files for command '{0}':{1} * {2}" -f $command.Name,([Environment]::NewLine),($filePaths -join ('{0} * ' -f ([Environment]::NewLine))))
+            continue
+        }
+        $category = $fileInfo.Directory.Name
+        Write-Verbose ('Command ''{0}'' is in category ''{1}''.' -f $command.Name,$category)
+        if( -not $categories.ContainsKey( $category ) )
+        {
+            $categories[$category] = New-Object 'Collections.ArrayList'
+        }
+        [void] $categories[$category].Add( $command.Name )
     }
-    $category = $fileInfo.Directory.Name
-    Write-Verbose ('Command ''{0}'' is in category ''{1}''.' -f $command.Name,$category)
-    if( -not $categories.ContainsKey( $category ) )
-    {
-        $categories[$category] = New-Object 'Collections.ArrayList'
-    }
-    [void] $categories[$category].Add( $command.Name )
 
-}
+    $dscResources = Get-DscResource | Where-Object { $_.Module -and $_.Module.Name -eq 'Carbon' }
+    $categories['DSC Resources'] = New-Object 'Collections.ArrayList'
+    foreach( $resource in $dscResources )
+    {
+        [void]$categories['DSC Resources'].Add( $resource.Name )
+    }
 
 $menuBuilder = New-Object Text.StringBuilder
 [void] $menuBuilder.AppendLine( @"
 	<ul id="SiteNav">
-		<li><a href="http://get-carbon.org">Get-Carbon</a></li>
-		<li><b>-Documentation</b></li>
-        <li><a href="http://get-carbon.org/help/2.0/">2.0-alpha</a></li>
-        <li><a href="http://get-carbon.org/releasenotes.html">-ReleaseNotes</a></li>
-        <li><a href="http://get-carbon.org/releasenotes-2.0.html">2.0-alpha</a></li>
+		<li><a href="/">Get-Carbon</a></li>
+		<li><a href="help/">-Documentation</a></li>
+        <li><b>2.0-alpha</b></li>
+        <li><a href="/releasenotes.html">-ReleaseNotes</a></li>
+        <li><a href="/releasenotes-2.0.html">2.0-alpha</a></li>
 		<li><a href="http://pshdo.com">-Blog</a></li>
 	</ul>
 "@ )
@@ -166,8 +178,8 @@ if( -not (Test-Path $OutputDir -PathType Container) )
 		<li><a href="/">Get-Carbon</a></li>
 		<li><a href="help/">-Documentation</a></li>
 		<li><a href="help/2.0/">2.0-alpha</a></li>
-		<li><b>-ReleaseNotes</b></li>
-        <li><a href="releasenotes-2.0.html">2.0-alpha</a></li>
+		<li><a href="releasenotes.html">-ReleaseNotes</a></li>
+        <li><b>2.0-alpha</b></li>
 		<li><a href="http://pshdo.com">-Blog</a></li>
 	</ul>
     
@@ -178,5 +190,10 @@ if( -not (Test-Path $OutputDir -PathType Container) )
 	</div>
 </body>
 </html>
-"@ -f ($releaseNotesHtml -join "`n") | Out-File -FilePath (Join-Path $OutputDir '..\releasenotes-2.0.html') -Encoding OEM
+"@ -f ($releaseNotesHtml -join "`n") | Out-File -FilePath (Join-Path $OutputDir '..\..\releasenotes-2.0.html') -Encoding OEM
 
+}
+finally
+{
+    Remove-Junction -Path $linkPath
+}

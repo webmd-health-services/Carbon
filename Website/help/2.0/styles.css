@@ -1,0 +1,48 @@
+@import url(../styles.css);
+
+body
+{
+	width: 800px;
+	margin: 0;
+	padding-left: 17em;
+	margin-top: 1em;
+}
+
+div#CommandMenuContainer
+{
+	font-size: 10pt;
+	width: 20em;
+	position: absolute;
+	left: 0px;
+	top: 1.2em;
+}
+
+ul#CategoryMenu
+{
+	margin: 0;
+	padding: 0;
+	padding-left: .5em;
+	list-style-type: none;
+}
+
+ul#CategoryMenu > li
+{
+	font-weight:bold;
+}
+
+ul.CommandMenu
+{
+	margin-bottom: .5em;
+	padding-left: 1.5em;
+	list-style-type: disc;
+}
+
+pre code 
+{
+	white-space: pre-wrap;
+}
+
+pre.Syntax
+{
+	margin-bottom: 1em;
+}

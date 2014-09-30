@@ -4,6 +4,11 @@ function Get-TypeDocumentationLink
     param(
         [Parameter(Mandatory=$true)]
         [string]
+        # The name of the command where the type was found.
+        $CommandName,
+
+        [Parameter(Mandatory=$true)]
+        [string]
         # The name of the type whose documentation link to return.
         $TypeName
     )
@@ -34,7 +39,7 @@ function Get-TypeDocumentationLink
         }
         catch
         {
-            Write-Warning ("Type {0} not found." -f $TypeName)
+            Write-Warning ("[{0}] Type {1} not found." -f $CommandName,$TypeName)
             return $displayName
         }
     }
