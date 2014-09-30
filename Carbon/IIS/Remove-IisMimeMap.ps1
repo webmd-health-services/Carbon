@@ -34,15 +34,34 @@ function Remove-IisMimeMap
     
     Removes the `.m4v` file extension so that IIS will no longer serve those files.
     #>
-    [CmdletBinding()]
+    [CmdletBinding(DefaultParameterSetName='ForWebServer')]
     param(
+        [Parameter(Mandatory=$true,ParameterSetName='ForWebsite')]
+        [string]
+        # The name of the website whose MIME type to set.
+        $SiteName,
+
+        [Parameter(ParameterSetName='ForWebsite')]
+        [string]
+        # The optional site path whose configuration should be returned.
+        $VirtualPath = '',
+
         [Parameter(Mandatory=$true)]
         [string]
         # The file extension whose MIME map to remove.
         $FileExtension
     )
     
-    $staticContent = Get-IisConfigurationSection -SectionPath 'system.webServer/staticContent'
+    Set-StrictMode -Version 'Latest'
+
+    $getIisConfigSectionParams = @{ }
+    if( $PSCmdlet.ParameterSetName -eq 'ForWebsite' )
+    {
+        $getIisConfigSectionParams['SiteName'] = $SiteName
+        $getIisConfigSectionParams['VirtualPath'] = $VirtualPath
+    }
+    
+    $staticContent = Get-IisConfigurationSection -SectionPath 'system.webServer/staticContent' @getIisConfigSectionParams
     $mimeMapCollection = $staticContent.GetCollection()
     $mimeMapToRemove = $mimeMapCollection |
                             Where-Object { $_['fileExtension'] -eq $FileExtension }

@@ -35,6 +35,16 @@ function Set-IisMimeMap
     #>
     [CmdletBinding(SupportsShouldProcess=$true,DefaultParameterSetName='ForWebServer')]
     param(
+        [Parameter(Mandatory=$true,ParameterSetName='ForWebsite')]
+        [string]
+        # The name of the website whose MIME type to set.
+        $SiteName,
+
+        [Parameter(ParameterSetName='ForWebsite')]
+        [string]
+        # The optional site path whose configuration should be returned.
+        $VirtualPath = '',
+
         [Parameter(Mandatory=$true)]
         [string]
         # The file extension to set.
@@ -45,8 +55,15 @@ function Set-IisMimeMap
         # The MIME type to serve the files as.
         $MimeType
     )
+
+    $getIisConfigSectionParams = @{ }
+    if( $PSCmdlet.ParameterSetName -eq 'ForWebsite' )
+    {
+        $getIisConfigSectionParams['SiteName'] = $SiteName
+        $getIisConfigSectionParams['VirtualPath'] = $VirtualPath
+    }
     
-    $staticContent = Get-IisConfigurationSection -SectionPath 'system.webServer/staticContent'
+    $staticContent = Get-IisConfigurationSection -SectionPath 'system.webServer/staticContent' @getIisConfigSectionParams
     $mimeMapCollection = $staticContent.GetCollection()
     
     $mimeMap = $mimeMapCollection | Where-Object { $_['fileExtension'] -eq $FileExtension }
@@ -66,7 +83,7 @@ function Set-IisMimeMap
         [void] $mimeMapCollection.Add($mimeMap)
     }
      
-    if( $pscmdlet.ShouldProcess( 'IIS web server', ('{0} MIME map {1} -> {2}' -f $action,$FileExtension,$MimeType) ) )
+    if( $PSCmdlet.ShouldProcess( 'IIS web server', ('{0} MIME map {1} -> {2}' -f $action,$FileExtension,$MimeType) ) )
     {
         $staticContent.CommitChanges()
     }

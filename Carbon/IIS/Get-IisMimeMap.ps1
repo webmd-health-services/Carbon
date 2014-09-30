@@ -56,6 +56,7 @@ function Get-IisMimeMap
     Gets all the file extension to MIME type mappings for the `DeathStar`'s `ExhausePort` directory.
     #>
     [CmdletBinding(DefaultParameterSetName='ForWebServer')]
+    [OutputType([Carbon.Iis.MimeMap])]
     param(
         [Parameter(Mandatory=$true,ParameterSetName='ForWebsite')]
         [string]
@@ -76,8 +77,17 @@ function Get-IisMimeMap
         # The name of the MIME type(s) to return.  Wildcards accepted.
         $MimeType = '*'
     )
+
+    Set-StrictMode -Version 'Latest'
     
-    $staticContent = Get-IisConfigurationSection -SectionPath 'system.webServer/staticContent'
+    $getIisConfigSectionParams = @{ }
+    if( $PSCmdlet.ParameterSetName -eq 'ForWebsite' )
+    {
+        $getIisConfigSectionParams['SiteName'] = $SiteName
+        $getIisConfigSectionParams['VirtualPath'] = $VirtualPath
+    }
+
+    $staticContent = Get-IisConfigurationSection -SectionPath 'system.webServer/staticContent' @getIisConfigSectionParams
     $staticContent.GetCollection() | 
         Where-Object { $_['fileExtension'] -like $FileExtension -and $_['mimeType'] -like $MimeType } |
         ForEach-Object {

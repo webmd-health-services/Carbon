@@ -100,3 +100,34 @@ function Test-ShouldSupportWhatIf
         Remove-IisMimeMap -FileExtension $fileExtension
     }    
 }
+
+function Test-ShouldAddMimeMapForSite
+{
+    Install-IisVirtualDirectory -SiteName $siteName -VirtualPath '/recurse' -PhysicalPath $PSScriptRoot
+
+    Set-IisMimeMap -SiteName $siteName -FileExtension '.carbon' -MimeType 'carbon/test+site'
+    Set-IisMimeMap -SiteName $siteName -VirtualPath '/recurse' -FileExtension '.carbon' -MimeType 'carbon/test+vdir'
+
+    try
+    {
+        $mime = Get-IisMimeMap -SiteName $siteName -FileExtension '.carbon'
+        Assert-NotNull $mime
+        Assert-Equal 'carbon/test+site' $mime.MimeType
+
+        Remove-IisMimeMap -SiteName $siteName -FileExtension '.carbon'
+        $mime = Get-IisMimeMap -SiteName $siteName -FileExtension '.carbon'
+        Assert-Null $mime
+
+        $mime = Get-IisMimeMap -SiteName $siteName -VirtualPath '/recurse' -FileExtension '.carbon'
+        Assert-NotNull $mime
+        Assert-Equal 'carbon/test+vdir' $mime.MimeType
+
+        Remove-IisMimeMap -SiteName $siteName -VirtualPath '/recurse' -FileExtension '.carbon'
+        $mime = Get-IisMimeMap -SiteName $siteName -VirtualPath '/recurse' -FileExtension '.carbon'
+        Assert-Null $mime
+    }
+    finally
+    {
+        Remove-IisMimeMap -FileExtension '.carbon'
+    }
+}
