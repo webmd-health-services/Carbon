@@ -2,13 +2,15 @@
 
 ## Overview
 
+Version 2.0 is currently ***in alpha*** and is subject to change at anytime. [We still have some backwards-incompatible changes to make.](https://bitbucket.org/splatteredbits/carbon/issues?status=new&status=open&q=2.0).
+
 The focus of version 2.0 is on making necessary, backwards-incompatible changes and adding DSC resources.
 
 ## Upgrade Instructions
 
 This is a backwards-incompatible release. 
 
- * Upgrade to PowerShell 3.
+ * Upgrade to PowerShell 4. (PowerShell 3 *might* work. We don't know because we don't have any computers available to test on.)
  * Remove usages of `Complete-Job`.  We removed it because it was total crap.  Use PowerShell's `Wait-Job` cmdlet instead.
  * [Grant-Permission](http://get-carbon.org/help/Grant-Permission.html) now only grants permissions on an object if those permissions aren't present.  To preserve previous behaviour, add the `-Force` switch to all `Grant-Permission` usages.
  * The following commands now return objects to the pipeline. Depending on your usage, you may need to pipe their output to `Out-Null`, assign their return values to `$null`, or do nothing.

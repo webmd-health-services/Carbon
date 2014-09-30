@@ -64,8 +64,9 @@ $menuBuilder = New-Object Text.StringBuilder
 	<ul id="SiteNav">
 		<li><a href="http://get-carbon.org">Get-Carbon</a></li>
 		<li><b>-Documentation</b></li>
-        <li><a href="http://get-carbon.org/help/2.0/">2.0 (beta)</a></li>
+        <li><a href="http://get-carbon.org/help/2.0/">2.0-alpha</a></li>
         <li><a href="http://get-carbon.org/releasenotes.html">-ReleaseNotes</a></li>
+        <li><a href="http://get-carbon.org/releasenotes-2.0.html">2.0-alpha</a></li>
 		<li><a href="http://pshdo.com">-Blog</a></li>
 	</ul>
 "@ )
@@ -164,8 +165,9 @@ if( -not (Test-Path $OutputDir -PathType Container) )
 	<ul id="SiteNav">
 		<li><a href="/">Get-Carbon</a></li>
 		<li><a href="help/">-Documentation</a></li>
-		<li><a href="help/2.0/">2.0 (beta)</a></li>
+		<li><a href="help/2.0/">2.0-alpha</a></li>
 		<li><b>-ReleaseNotes</b></li>
+        <li><a href="releasenotes-2.0.html">2.0-alpha</a></li>
 		<li><a href="http://pshdo.com">-Blog</a></li>
 	</ul>
     
@@ -176,5 +178,5 @@ if( -not (Test-Path $OutputDir -PathType Container) )
 	</div>
 </body>
 </html>
-"@ -f ($releaseNotesHtml -join "`n") | Out-File -FilePath (Join-Path $OutputDir '..\releasenotes.html') -Encoding OEM
+"@ -f ($releaseNotesHtml -join "`n") | Out-File -FilePath (Join-Path $OutputDir '..\releasenotes-2.0.html') -Encoding OEM
 
