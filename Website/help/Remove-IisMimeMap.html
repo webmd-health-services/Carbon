@@ -270,7 +270,8 @@
 <div><p>Removes a file extension to MIME type map from an entire web server.</p></div>
 
 <h2>Syntax</h2>
-<pre class="Syntax"><code>Remove-IisMimeMap [-FileExtension] &lt;String&gt; [&lt;CommonParameters&gt;]</code></pre>
+<pre class="Syntax"><code>Remove-IisMimeMap -FileExtension &lt;String&gt; [&lt;CommonParameters&gt;]</code></pre>
+<pre class="Syntax"><code>Remove-IisMimeMap -SiteName &lt;String&gt; [-VirtualPath &lt;String&gt;] -FileExtension &lt;String&gt; [&lt;CommonParameters&gt;]</code></pre>
     
 <h2>Description</h2>
 <div class="Description">
@@ -294,6 +295,22 @@
 	<th>Required?</th>
 	<th>Pipeline Input</th>
 	<th>Default Value</th>
+</tr>
+<tr valign='top'>
+	<td>SiteName</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+	<td>The name of the website whose MIME type to set.</td>
+	<td>true</td>
+	<td>false</td>
+    <td></td>
+</tr>
+<tr valign='top'>
+	<td>VirtualPath</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+	<td>The optional site path whose configuration should be returned.</td>
+	<td>false</td>
+	<td>false</td>
+    <td></td>
 </tr>
 <tr valign='top'>
 	<td>FileExtension</td>
