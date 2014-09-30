@@ -29,30 +29,30 @@
 <ul>
 <li>Upgrade to PowerShell 4. (PowerShell 3 <em>might</em> work. We don't know because we don't have any computers available to test on.)</li>
 <li>Remove usages of <code>Complete-Job</code>.  We removed it because it was total crap.  Use PowerShell's <code>Wait-Job</code> cmdlet instead.</li>
-<li><a href="http://get-carbon.org/help/Grant-Permission.html">Grant-Permission</a> now only grants permissions on an object if those permissions aren't present.  To preserve previous behaviour, add the <code>-Force</code> switch to all <code>Grant-Permission</code> usages.</li>
+<li><a href="http://get-carbon.org/help/2.0/Grant-Permission.html">Grant-Permission</a> now only grants permissions on an object if those permissions aren't present.  To preserve previous behaviour, add the <code>-Force</code> switch to all <code>Grant-Permission</code> usages.</li>
 <li>The following commands now return objects to the pipeline. Depending on your usage, you may need to pipe their output to <code>Out-Null</code>, assign their return values to <code>$null</code>, or do nothing.
 <ul>
-<li><a href="http://get-carbon.org/help/Grant-Permission.html">Grant-Permission</a></li>
-<li><a href="http://get-carbon.org/help/Install-Group.html">Install-Group</a></li>
-<li><a href="http://get-carbon.org/help/Install-Junction.html">Install-Junction</a></li>
-<li><a href="http://get-carbon.org/help/Install-User.html">Install-User</a></li>
-<li><a href="http://get-carbon.org/help/Grant-ComPermissions.html">Grant-ComPermissions</a></li>
-<li><a href="http://get-carbon.org/help/Grant-ComPermissions.html">Install-Service</a></li>
+<li><a href="http://get-carbon.org/help/2.0/Grant-Permission.html">Grant-Permission</a></li>
+<li><a href="http://get-carbon.org/help/2.0/Install-Group.html">Install-Group</a></li>
+<li><a href="http://get-carbon.org/help/2.0/Install-Junction.html">Install-Junction</a></li>
+<li><a href="http://get-carbon.org/help/2.0/Install-User.html">Install-User</a></li>
+<li><a href="http://get-carbon.org/help/2.0/Grant-ComPermissions.html">Grant-ComPermissions</a></li>
+<li><a href="http://get-carbon.org/help/2.0/Grant-ComPermissions.html">Install-Service</a></li>
 </ul></li>
 <li>The following commands no longer return the stdout from various console applications. To see that output, use the <code>-Verbose</code> switch. Remove any usage of the output you were processing.
 <ul>
-<li><a href="http://get-carbon.org/help/Disable-FirewallStatefulFtp.html">Disable-FirewallStatefulFtp</a></li>
-<li><a href="http://get-carbon.org/help/Enable-FirewallStatefulFtp.html">Enable-FirewallStatefulFtp</a></li>
-<li><a href="http://get-carbon.org/help/Remove-SslCertificateBinding.html">Remove-SslCertificateBinding</a></li>
+<li><a href="http://get-carbon.org/help/2.0/Disable-FirewallStatefulFtp.html">Disable-FirewallStatefulFtp</a></li>
+<li><a href="http://get-carbon.org/help/2.0/Enable-FirewallStatefulFtp.html">Enable-FirewallStatefulFtp</a></li>
+<li><a href="http://get-carbon.org/help/2.0/Remove-SslCertificateBinding.html">Remove-SslCertificateBinding</a></li>
 </ul></li>
-<li><a href="http://get-carbon.org/help/Set-SslCertificateBinding.html">Set-SslCertificateBinding</a> now returns <code>Carbon.Certificates.SslCertificateBinding</code> objects instead of netsh output. Update any code that uses the old <code>Set-SslCertificateBinding</code> output.</li>
-<li>Ensure that all thumbprints passed to <a href="http://get-carbon.org/help/Set-SslCertificateBinding.html">Set-SslCertificateBinding</a> are valid (40 character hex strings).</li>
-<li>Add the new <code>-PasswordNeverExpires</code> switch to usages of <a href="http://get-carbon.org/help/Install-User.html">Install-User</a>: it no longer sets the <code>PasswordNeverExpires</code> flag for a user by default.</li>
-<li>Use the <code>FullName</code> property on objects returned by <a href="http://get-carbon.org/help/Resolve-Identity.html">Resolve-Identity</a> (nAce <code>Resolve-IdentityName</code>): it now returns a <code>Carbon.Identity</code> object instead of the identity's name, e.g. <code>Resolve-Identity -Name $userName | Select-Object -Expand 'FullName'</code>.</li>
-<li>Add <code>-ErrorAction SilentlyContinue</code> or <code>-ErrorAction Ignore</code> to usages of <a href="http://get-carbon.org/help/Resolve-Identity.html">Resolve-Identity</a> (nAce <code>Resolve-IdentityName</code>): it now writes an error if it can't resolve a name.</li>
-<li>Use the <code>Sid</code> property on objects returned by <a href="http://get-carbon.org/help/Test-Identity.html">Test-Identity</a> when using the <code>PassThru</code> switch: it now returns a <code>Carbon.Identity</code> object if the identity exists <em>and</em> you use the <code>-PassThru</code> switch, e.g. <code>Test-Identity -Name $userName -PassThru | Select-Object -Expand 'Sid'</code>.</li>
-<li>Check that all IP addresses passed to <a href="http://get-carbon.org/help/Set-HostsEntry.html">Set-HostsEntry</a> are valid IP v4 or v6 addresses.  <a href="http://get-carbon.org/help/Set-HostsEntry.html">Set-HostsEntry</a>'s IPAddress parameter is now a <code>System.Net.IPAddress</code> object.  Previously it was a string validated with a regular expression, so you <em>should</em> be OK.</li>
-<li>Remove the <code>Exportable</code> switch from any usages of <a href="http://get-carbon.org/help/Install-Certificate.html">Install-Certificate</a> when installing from an <code>X509Certificate2</code> object, since that switch only gets used when installing a certificate from a file.</li>
+<li><a href="http://get-carbon.org/help/2.0/Set-SslCertificateBinding.html">Set-SslCertificateBinding</a> now returns <code>Carbon.Certificates.SslCertificateBinding</code> objects instead of netsh output. Update any code that uses the old <code>Set-SslCertificateBinding</code> output.</li>
+<li>Ensure that all thumbprints passed to <a href="http://get-carbon.org/help/2.0/Set-SslCertificateBinding.html">Set-SslCertificateBinding</a> are valid (40 character hex strings).</li>
+<li>Add the new <code>-PasswordNeverExpires</code> switch to usages of <a href="http://get-carbon.org/help/2.0/Install-User.html">Install-User</a>: it no longer sets the <code>PasswordNeverExpires</code> flag for a user by default.</li>
+<li>Use the <code>FullName</code> property on objects returned by <a href="http://get-carbon.org/help/2.0/Resolve-Identity.html">Resolve-Identity</a> (nAce <code>Resolve-IdentityName</code>): it now returns a <code>Carbon.Identity</code> object instead of the identity's name, e.g. <code>Resolve-Identity -Name $userName | Select-Object -Expand 'FullName'</code>.</li>
+<li>Add <code>-ErrorAction SilentlyContinue</code> or <code>-ErrorAction Ignore</code> to usages of <a href="http://get-carbon.org/help/2.0/Resolve-Identity.html">Resolve-Identity</a> (nAce <code>Resolve-IdentityName</code>): it now writes an error if it can't resolve a name.</li>
+<li>Use the <code>Sid</code> property on objects returned by <a href="http://get-carbon.org/help/2.0/Test-Identity.html">Test-Identity</a> when using the <code>PassThru</code> switch: it now returns a <code>Carbon.Identity</code> object if the identity exists <em>and</em> you use the <code>-PassThru</code> switch, e.g. <code>Test-Identity -Name $userName -PassThru | Select-Object -Expand 'Sid'</code>.</li>
+<li>Check that all IP addresses passed to <a href="http://get-carbon.org/help/2.0/Set-HostsEntry.html">Set-HostsEntry</a> are valid IP v4 or v6 addresses.  <a href="http://get-carbon.org/help/2.0/Set-HostsEntry.html">Set-HostsEntry</a>'s IPAddress parameter is now a <code>System.Net.IPAddress</code> object.  Previously it was a string validated with a regular expression, so you <em>should</em> be OK.</li>
+<li>Remove the <code>Exportable</code> switch from any usages of <a href="http://get-carbon.org/help/2.0/Install-Certificate.html">Install-Certificate</a> when installing from an <code>X509Certificate2</code> object, since that switch only gets used when installing a certificate from a file.</li>
 <li>Rename usages of <code>[Carbon.AdvApi32]</code> class to <code>[Carbon.Service.ServiceSecurity]</code>.</li>
 <li>Rename usages of <code>[Carbon.Lsa]</code> class to <code>[Carbon.Security.Privilege]</code>.</li>
 <li>Rename usages of <code>[Carbon.Win32]</code> class to <code>[Carbon.FileSystem.Path]</code>.</li>
@@ -66,109 +66,109 @@
 <h3>Certificates</h3>
 
 <ul>
-<li><a href="http://get-carbon.org/help/Remove-SslCertificateBinding.html">Remove-SslCertificateBinding</a> now writes messages with <code>Write-Verbose</code> instead of <code>Write-Host</code>. Improved error handling.</li>
-<li><a href="http://get-carbon.org/help/Remove-SslCertificateBinding.html">Set-SslCertificateBinding</a> now returns <code>Carbon.Certificates.SslCertificateBinding</code> object for the binding instead of <code>netsh</code> output. Improved error handling. Writes messages with <code>Write-Verbose</code> instead of <code>Write-Host</code>. Thumbprints are now validated.</li>
-<li>The <code>Exportable</code> switch is now only allowed by <a href="http://get-carbon.org/help/Install-Certificate.html">Install-Certificate</a> when installing a certificate from a file. Previously, you could supply the switch when installing from an X509Certificate2 object but it was ignored.</li>
+<li><a href="http://get-carbon.org/help/2.0/Remove-SslCertificateBinding.html">Remove-SslCertificateBinding</a> now writes messages with <code>Write-Verbose</code> instead of <code>Write-Host</code>. Improved error handling.</li>
+<li><a href="http://get-carbon.org/help/2.0/Remove-SslCertificateBinding.html">Set-SslCertificateBinding</a> now returns <code>Carbon.Certificates.SslCertificateBinding</code> object for the binding instead of <code>netsh</code> output. Improved error handling. Writes messages with <code>Write-Verbose</code> instead of <code>Write-Host</code>. Thumbprints are now validated.</li>
+<li>The <code>Exportable</code> switch is now only allowed by <a href="http://get-carbon.org/help/2.0/Install-Certificate.html">Install-Certificate</a> when installing a certificate from a file. Previously, you could supply the switch when installing from an X509Certificate2 object but it was ignored.</li>
 </ul>
 
 <h3>COM</h3>
 
 <ul>
-<li><a href="http://get-carbon.org/help/Grant-ComPermission.html">Grant-ComPermission</a> now returns a <code>Carbon.Security.ComAccessRule</code>. Also, it now writes messages with <code>Write-Verbose</code> instead of <code>Write-Host</code>.</li>
-<li><a href="http://get-carbon.org/help/Revoke-ComPermission.html">Revoke-ComPermission</a> now writes messages with <code>Write-Verbose</code> instead of <code>Write-Host</code>.</li>
+<li><a href="http://get-carbon.org/help/2.0/Grant-ComPermission.html">Grant-ComPermission</a> now returns a <code>Carbon.Security.ComAccessRule</code>. Also, it now writes messages with <code>Write-Verbose</code> instead of <code>Write-Host</code>.</li>
+<li><a href="http://get-carbon.org/help/2.0/Revoke-ComPermission.html">Revoke-ComPermission</a> now writes messages with <code>Write-Verbose</code> instead of <code>Write-Host</code>.</li>
 </ul>
 
 <h3>Computer</h3>
 
 <ul>
-<li>Changed <a href="http://get-carbon.org/help/Test-OSIs32Bit.html">Test-OSIs32Bit</a> and <a href="http://get-carbon.org/help/Test-OSIs64Bit.html">Test-OSIs64Bit</a> functions to use the Environment class's new <a href="http://msdn.microsoft.com/en-us/library/system.environment.is64bitoperatingsystem.aspx">Is64BitOperatingSystem</a> property.</li>
+<li>Changed <a href="http://get-carbon.org/help/2.0/Test-OSIs32Bit.html">Test-OSIs32Bit</a> and <a href="http://get-carbon.org/help/2.0/Test-OSIs64Bit.html">Test-OSIs64Bit</a> functions to use the Environment class's new <a href="http://msdn.microsoft.com/en-us/library/system.environment.is64bitoperatingsystem.aspx">Is64BitOperatingSystem</a> property.</li>
 </ul>
 
 <h3>DSC</h3>
 
 <ul>
 <li>Created <code>Carbon_EnvironmentVariable</code> resource for creating/removing machine-level environment variables.</li>
-<li>New <a href="http://get-carbon.org/help/Clear-DscLocalResourceCache.html">Clear-DscLocalResourceCache</a> function for clearing the local LCM's DSC resource. This makes developing resources easier.</li>
+<li>New <a href="http://get-carbon.org/help/2.0/Clear-DscLocalResourceCache.html">Clear-DscLocalResourceCache</a> function for clearing the local LCM's DSC resource. This makes developing resources easier.</li>
 <li>Created <code>Carbon_IniFile</code> resource for managing settings in INI files.</li>
 <li>Created <code>Carbon_FirewallRule</code> resource for configuring firewall rules.</li>
-<li>New <a href="http://get-carbon.org/help/Test-DscTargetResource.html">Test-DscTargetResource</a> function for comparing target/desired resource states across DSC resources.</li>
+<li>New <a href="http://get-carbon.org/help/2.0/Test-DscTargetResource.html">Test-DscTargetResource</a> function for comparing target/desired resource states across DSC resources.</li>
 <li>Created <code>Carbon_Privilege</code> resource for configuring and identity's privileges.</li>
 <li>Created <code>Carbon_Permission</code> resource for configuring file, directory, registry, and certificate permissions.</li>
 <li>Created <code>Carbon_Service</code> resource for configuring Windows services.</li>
 <li>Created <code>Carbon_Script</code> resource for running custom PowerShell scripts, with support for passing arguments.</li>
-<li>Created <a href="http://get-carbon.org/help/Copy-DscResource.html">Copy-DscResource</a> function for copying DSC resources (ZIP files, MSI archives, MOF files, etc.), including timestamps, checksums, and copying only changed files.</li>
-<li>Created <a href="http://get-carbon.org/help/Clear-MofAuthoringMetadata.html">Clear-MofAuthoringMetadata</a> function for removing authoring metadata from .mof files.</li>
-<li>Created <a href="http://get-carbon.org/help/Get-DscWinEvent.html">Get-DscWinEvent</a> function for getting DSC events written to a computer's DSC event log.</li>
-<li>Created <a href="http://get-carbon.org/help/Get-DscError.html">Get-DscError</a> function for getting any DSC errors written to a computer's DSC event log.</li>
-<li>Created <a href="http://get-carbon.org/help/Write-DscError.html">Write-DscError</a> function for writing DSC <code>ErrorLogRecord</code> objects as errors.</li>
-<li>Created <a href="http://get-carbon.org/help/Start-DscPullConfiguration.html">Start-DscPullConfiguration</a> function for starting a configuration check on a computer whose computer is configured to use the PULL refresh mode.</li>
-<li>Created <a href="http://get-carbon.org/help/Initialize-Lcm.html">Initialize-Lcm</a> function for configuring the DSC Local Configuration Manager on computers, including installing the private key needed for decrypting credentials.</li>
+<li>Created <a href="http://get-carbon.org/help/2.0/Copy-DscResource.html">Copy-DscResource</a> function for copying DSC resources (ZIP files, MSI archives, MOF files, etc.), including timestamps, checksums, and copying only changed files.</li>
+<li>Created <a href="http://get-carbon.org/help/2.0/Clear-MofAuthoringMetadata.html">Clear-MofAuthoringMetadata</a> function for removing authoring metadata from .mof files.</li>
+<li>Created <a href="http://get-carbon.org/help/2.0/Get-DscWinEvent.html">Get-DscWinEvent</a> function for getting DSC events written to a computer's DSC event log.</li>
+<li>Created <a href="http://get-carbon.org/help/2.0/Get-DscError.html">Get-DscError</a> function for getting any DSC errors written to a computer's DSC event log.</li>
+<li>Created <a href="http://get-carbon.org/help/2.0/Write-DscError.html">Write-DscError</a> function for writing DSC <code>ErrorLogRecord</code> objects as errors.</li>
+<li>Created <a href="http://get-carbon.org/help/2.0/Start-DscPullConfiguration.html">Start-DscPullConfiguration</a> function for starting a configuration check on a computer whose computer is configured to use the PULL refresh mode.</li>
+<li>Created <a href="http://get-carbon.org/help/2.0/Initialize-Lcm.html">Initialize-Lcm</a> function for configuring the DSC Local Configuration Manager on computers, including installing the private key needed for decrypting credentials.</li>
 </ul>
 
 <h3>File System</h3>
 
 <ul>
-<li><a href="http://get-carbon.org/help/Disable-NtfsCompression.html">Disable-NtfsCompression</a> now writes messages with <code>Write-Verbose</code> instead of <code>Write-Host</code>. Improved error handling.</li>
-<li><a href="http://get-carbon.org/help/Enable-NtfsCompression.html">Enable-NtfsCompression</a> now writes messages with <code>Write-Verbose</code> instead of <code>Write-Host</code>. Improved error handling.</li>
-<li><a href="http://get-carbon.org/help/Install-Junction.html">Install-Junction</a> now returns <code>System.IO.DirectoryInfo</code> objects for any new target directories and any new/updated junctions.</li>
+<li><a href="http://get-carbon.org/help/2.0/Disable-NtfsCompression.html">Disable-NtfsCompression</a> now writes messages with <code>Write-Verbose</code> instead of <code>Write-Host</code>. Improved error handling.</li>
+<li><a href="http://get-carbon.org/help/2.0/Enable-NtfsCompression.html">Enable-NtfsCompression</a> now writes messages with <code>Write-Verbose</code> instead of <code>Write-Host</code>. Improved error handling.</li>
+<li><a href="http://get-carbon.org/help/2.0/Install-Junction.html">Install-Junction</a> now returns <code>System.IO.DirectoryInfo</code> objects for any new target directories and any new/updated junctions.</li>
 </ul>
 
 <h3>Firewall</h3>
 
 <ul>
-<li><a href="http://get-carbon.org/help/Disable-FirewallStatefulFtp.html">Disable-FirewallStatefulFtp</a> no longer returns <code>netsh</code> output. Use the <code>-Verbose</code> switch to see the output.</li>
-<li><a href="http://get-carbon.org/help/Enable-FirewallStatefulFtp.html">Enable-FirewallStatefulFtp</a> no longer returns <code>netsh</code> output. Use the <code>-Verbose</code> switch to see the output.</li>
+<li><a href="http://get-carbon.org/help/2.0/Disable-FirewallStatefulFtp.html">Disable-FirewallStatefulFtp</a> no longer returns <code>netsh</code> output. Use the <code>-Verbose</code> switch to see the output.</li>
+<li><a href="http://get-carbon.org/help/2.0/Enable-FirewallStatefulFtp.html">Enable-FirewallStatefulFtp</a> no longer returns <code>netsh</code> output. Use the <code>-Verbose</code> switch to see the output.</li>
 </ul>
 
 <h3>Hosts File</h3>
 
 <ul>
-<li><a href="http://get-carbon.org/help/Set-HostsEntry.html">Set-HostsEntry</a>'s IPAddress parameter is now a <code>System.Net.IPAddress</code> object.  Previously it was a string validated with a regular expression.</li>
+<li><a href="http://get-carbon.org/help/2.0/Set-HostsEntry.html">Set-HostsEntry</a>'s IPAddress parameter is now a <code>System.Net.IPAddress</code> object.  Previously it was a string validated with a regular expression.</li>
 </ul>
 
 <h3>PowerShell</h3>
 
 <ul>
-<li>Changed <a href="http://get-carbon.org/help/Test-PowerShellIs32Bit.html">Test-PowerShellIs32Bit</a> and <a href="http://get-carbon.org/help/Test-PowerShellIs64Bit.html">Test-PowerShellIs64Bit</a> functions to use the Environment class's new <a href="http://msdn.microsoft.com/en-us/library/system.environment.is64bitprocess.aspx">Is64BitProcess</a> property.</li>
+<li>Changed <a href="http://get-carbon.org/help/2.0/Test-PowerShellIs32Bit.html">Test-PowerShellIs32Bit</a> and <a href="http://get-carbon.org/help/2.0/Test-PowerShellIs64Bit.html">Test-PowerShellIs64Bit</a> functions to use the Environment class's new <a href="http://msdn.microsoft.com/en-us/library/system.environment.is64bitprocess.aspx">Is64BitProcess</a> property.</li>
 <li>Removed <code>Complete-Job</code> function.  It was total crap.</li>
-<li>Created <a href="http://get-carbon.org/help/Get-PowerShellModuleInstallPath.html">Get-PowerShellModuleInstallPath</a> function for getting the path where new module's should be installed. Beginning with PowerShell 4, modules should get installed into <code>$env:ProgramFiles\Windows PowerShell\Modules</code>. Under PowerShell 3, it is <code>$PSHome\Modules</code>. This function returns the correct location for the version of PowerShell you're using.</li>
+<li>Created <a href="http://get-carbon.org/help/2.0/Get-PowerShellModuleInstallPath.html">Get-PowerShellModuleInstallPath</a> function for getting the path where new module's should be installed. Beginning with PowerShell 4, modules should get installed into <code>$env:ProgramFiles\Windows PowerShell\Modules</code>. Under PowerShell 3, it is <code>$PSHome\Modules</code>. This function returns the correct location for the version of PowerShell you're using.</li>
 </ul>
 
 <h3>Security</h3>
 
 <ul>
-<li><a href="http://get-carbon.org/help/Grant-Permission.html">Grant-Permission</a> now only grants permissions on an object if those permissions aren't present.  To preserve previous behaviour, add the <code>-Force</code> switch to all <code>Grant-Permission</code> usages.</li>
-<li><a href="http://get-carbon.org/help/Grant-Permission.html">Grant-Permission</a> returns <code>System.Security.AccessControl.FileSystemRule</code> or <code>System.Security.AccessControl.RegistryRule</code> whenever it updates an item's permissions.  It no longer writes a message to the host.</li>
+<li><a href="http://get-carbon.org/help/2.0/Grant-Permission.html">Grant-Permission</a> now only grants permissions on an object if those permissions aren't present.  To preserve previous behaviour, add the <code>-Force</code> switch to all <code>Grant-Permission</code> usages.</li>
+<li><a href="http://get-carbon.org/help/2.0/Grant-Permission.html">Grant-Permission</a> returns <code>System.Security.AccessControl.FileSystemRule</code> or <code>System.Security.AccessControl.RegistryRule</code> whenever it updates an item's permissions.  It no longer writes a message to the host.</li>
 </ul>
 
 <h3>Service</h3>
 
 <ul>
-<li><a href="http://get-carbon.org/help/Grant-ComPermissions.html">Install-Service</a> now writes messages with <code>Write-Verbose</code> instead of <code>Write-Host</code>.</li>
-<li><a href="http://get-carbon.org/help/Grant-ComPermissions.html">Install-Service</a> now returns a <code>System.ServiceProcess.ServiceController</code> object when installation/configuration is successful.</li>
+<li><a href="http://get-carbon.org/help/2.0/Grant-ComPermissions.html">Install-Service</a> now writes messages with <code>Write-Verbose</code> instead of <code>Write-Host</code>.</li>
+<li><a href="http://get-carbon.org/help/2.0/Grant-ComPermissions.html">Install-Service</a> now returns a <code>System.ServiceProcess.ServiceController</code> object when installation/configuration is successful.</li>
 </ul>
 
 <h3>Users and Groups</h3>
 
 <ul>
-<li>Re-wrote <a href="http://get-carbon.org/help/Install-User.html">Install-User</a> to use .NET's <a href="http://msdn.microsoft.com/en-us/library/system.directoryservices.accountmanagement.aspx">System.DirectoryServices.AccountManagement</a> API (introduced with .NET 3.5) instead of the <code>net.exe</code> command-line program.</li>
-<li>Added <code>PasswordNeverExpires</code> switch to <a href="http://get-carbon.org/help/Install-User.html">Install-User</a> for creating accounts with passwords that expire.  This is a breaking change: this flag used to set this flag by default.</li>
-<li>Added <code>UserCannotChangePassword</code> switch to <a href="http://get-carbon.org/help/Install-User.html">Install-User</a> to prevent user from changing his password.</li>
-<li>Added <a href="http://get-carbon.org/help/Get-User.html">Get-User</a> function for getting a local user or all local users.</li>
-<li>Added <a href="http://get-carbon.org/help/Get-Group.html">Get-Group</a> function for getting a local group or all local groups.</li>
-<li>Renamed <a href="http://get-carbon.org/help/Install-Group.html">Install-Group</a>'s <code>Members</code> parameter to <code>Member</code> (with backwards-compatible alias).</li>
-<li><a href="http://get-carbon.org/help/Install-Group.html">Install-Group</a> re-written to use .NET's <code>System.DirectoryServices.AccountManagement</code> API (introduced with .NET 3.5).</li>
-<li><a href="http://get-carbon.org/help/Install-Group.html">Install-Group</a> now returns the group added or updated.</li>
-<li><a href="http://get-carbon.org/help/Add-MemberToGroup.html">Add-MemberToGroup</a> re-written to use .NET's <code>System.DirectoryServices.AccountManagement</code> API (introduced with .NET 3.5).</li>
-<li><a href="http://get-carbon.org/help/Resolve-IdentityName.html">Resolve-IdentityName</a> now writes an error if it can't resolve a name.  Use <code>-ErrorAction SilentlyContinue</code> or <code>-ErrorAction Ignore</code> to preserve old behavior.</li>
-<li><a href="http://get-carbon.org/help/Uninstall-User.html">Uninstall-User</a> re-written to use .NET's <code>System.DirectoryServices.AccountManagement</code> API (introduced with .NET 3.5).</li>
-<li><a href="http://get-carbon.org/help/Test-User.html">Test-User</a> re-written to use .NET's <code>System.DirectoryServices.AccountManagement</code> API (introduced with .NET 3.5).</li>
-<li>Created <a href="http://get-carbon.org/help/Test-Group.html">Test-Group</a> function for checking if a <em>local</em> group exists.</li>
-<li><code>Resolve-IdentityName</code> renamed to <a href="http://get-carbon.org/help/Resolve-Identity.html">Resolve-Identity</a>, but it has a backwards-compatible alias, so you shouldn't have to do anything.</li>
-<li><a href="http://get-carbon.org/help/Resolve-Identity.html">Resolve-Identity</a> (nAce <code>Resolve-IdentityName</code>) now returns a <code>Carbon.Identity</code> object instead of the identity's name.  Update scripts to use the <code>FullName</code> property to get the old return value, e.g. <code>Resolve-Identity -Name $userName -PassThru | Select-Object -Expand 'FullName'</code>.</li>
-<li><a href="http://get-carbon.org/help/Resolve-Identity.html">Resolve-Identity</a> (nAce <code>Resolve-IdentityName</code>) now writes an error if it can't resolve a name.  Use <code>-ErrorAction SilentlyContinue</code> or <code>-ErrorAction Ignore</code> to preserve old behavior.</li>
-<li><a href="http://get-carbon.org/help/Test-Identity.html">Test-Identity</a> now returns a <code>Carbon.Identity</code> object if the identity exists <em>and</em> you use the <code>-PassThru</code> switch.  It used to return the identity's name.  Update scripts to use the <code>FullName</code> property to get the old return value, e.g. <code>Test-Identity -Name $userName -PassThru | Select-Object -Expand 'FullName'</code>.</li>
-<li>Added <a href="http://get-carbon.org/help/Remove-GroupMember.html">Remove-GroupMember</a> function. Thanks to <a href="https://bitbucket.org/philkloose">Philip Kluss</a> for the contribution. </li>
+<li>Re-wrote <a href="http://get-carbon.org/help/2.0/Install-User.html">Install-User</a> to use .NET's <a href="http://msdn.microsoft.com/en-us/library/system.directoryservices.accountmanagement.aspx">System.DirectoryServices.AccountManagement</a> API (introduced with .NET 3.5) instead of the <code>net.exe</code> command-line program.</li>
+<li>Added <code>PasswordNeverExpires</code> switch to <a href="http://get-carbon.org/help/2.0/Install-User.html">Install-User</a> for creating accounts with passwords that expire.  This is a breaking change: this flag used to set this flag by default.</li>
+<li>Added <code>UserCannotChangePassword</code> switch to <a href="http://get-carbon.org/help/2.0/Install-User.html">Install-User</a> to prevent user from changing his password.</li>
+<li>Added <a href="http://get-carbon.org/help/2.0/Get-User.html">Get-User</a> function for getting a local user or all local users.</li>
+<li>Added <a href="http://get-carbon.org/help/2.0/Get-Group.html">Get-Group</a> function for getting a local group or all local groups.</li>
+<li>Renamed <a href="http://get-carbon.org/help/2.0/Install-Group.html">Install-Group</a>'s <code>Members</code> parameter to <code>Member</code> (with backwards-compatible alias).</li>
+<li><a href="http://get-carbon.org/help/2.0/Install-Group.html">Install-Group</a> re-written to use .NET's <code>System.DirectoryServices.AccountManagement</code> API (introduced with .NET 3.5).</li>
+<li><a href="http://get-carbon.org/help/2.0/Install-Group.html">Install-Group</a> now returns the group added or updated.</li>
+<li><a href="http://get-carbon.org/help/2.0/Add-MemberToGroup.html">Add-MemberToGroup</a> re-written to use .NET's <code>System.DirectoryServices.AccountManagement</code> API (introduced with .NET 3.5).</li>
+<li><a href="http://get-carbon.org/help/2.0/Resolve-IdentityName.html">Resolve-IdentityName</a> now writes an error if it can't resolve a name.  Use <code>-ErrorAction SilentlyContinue</code> or <code>-ErrorAction Ignore</code> to preserve old behavior.</li>
+<li><a href="http://get-carbon.org/help/2.0/Uninstall-User.html">Uninstall-User</a> re-written to use .NET's <code>System.DirectoryServices.AccountManagement</code> API (introduced with .NET 3.5).</li>
+<li><a href="http://get-carbon.org/help/2.0/Test-User.html">Test-User</a> re-written to use .NET's <code>System.DirectoryServices.AccountManagement</code> API (introduced with .NET 3.5).</li>
+<li>Created <a href="http://get-carbon.org/help/2.0/Test-Group.html">Test-Group</a> function for checking if a <em>local</em> group exists.</li>
+<li><code>Resolve-IdentityName</code> renamed to <a href="http://get-carbon.org/help/2.0/Resolve-Identity.html">Resolve-Identity</a>, but it has a backwards-compatible alias, so you shouldn't have to do anything.</li>
+<li><a href="http://get-carbon.org/help/2.0/Resolve-Identity.html">Resolve-Identity</a> (nAce <code>Resolve-IdentityName</code>) now returns a <code>Carbon.Identity</code> object instead of the identity's name.  Update scripts to use the <code>FullName</code> property to get the old return value, e.g. <code>Resolve-Identity -Name $userName -PassThru | Select-Object -Expand 'FullName'</code>.</li>
+<li><a href="http://get-carbon.org/help/2.0/Resolve-Identity.html">Resolve-Identity</a> (nAce <code>Resolve-IdentityName</code>) now writes an error if it can't resolve a name.  Use <code>-ErrorAction SilentlyContinue</code> or <code>-ErrorAction Ignore</code> to preserve old behavior.</li>
+<li><a href="http://get-carbon.org/help/2.0/Test-Identity.html">Test-Identity</a> now returns a <code>Carbon.Identity</code> object if the identity exists <em>and</em> you use the <code>-PassThru</code> switch.  It used to return the identity's name.  Update scripts to use the <code>FullName</code> property to get the old return value, e.g. <code>Test-Identity -Name $userName -PassThru | Select-Object -Expand 'FullName'</code>.</li>
+<li>Added <a href="http://get-carbon.org/help/2.0/Remove-GroupMember.html">Remove-GroupMember</a> function. Thanks to <a href="https://bitbucket.org/philkloose">Philip Kluss</a> for the contribution. </li>
 </ul>
 
 <h1>1.9.0</h1>
