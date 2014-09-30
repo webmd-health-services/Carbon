@@ -22,6 +22,10 @@
 
  * [Set-IniEntry](http://get-carbon.org/help/Set-IniEntry.html) fails when adding the first section-less setting to a file.
  
+### Internet Explorer
+
+ * [Enable-IEActivationPermission](http://get-carbon.org/help/Enable-IEActivationPermission.html) no longer returns the `hkcr:` drive.
+ 
 ### Security
 
  * Fixed an error that occurs when setting permissions on a private key fails: the error message is created using an invalid format string (issue [#133](https://bitbucket.org/splatteredbits/carbon/issue/133/set-cryptokeysecurity-invalid-parameters)).
