@@ -8,11 +8,70 @@
 	<ul id="SiteNav">
 		<li><a href="/">Get-Carbon</a></li>
 		<li><a href="help/">-Documentation</a></li>
+        <li><a href="/help/2.0">2.0-alpha</a></li>
 		<li><b>-ReleaseNotes</b></li>
+        <li><a href="/releasenotes-2.0.html">2.0-alpha</a></li>
 		<li><a href="http://pshdo.com">-Blog</a></li>
 	</ul>
     
-    <h1>1.8.0 (7 September 2014)</h1>
+    <h1>1.9.0</h1>
+
+<h2>Enhancements</h2>
+
+<h3>Certificates</h3>
+
+<ul>
+<li>Added <code>KeyStorageFlags</code> parameter to <a href="http://get-carbon.org/help/Get-Certificate.html">Get-Certificate</a> when loading a certificate from a file for better control when storing the certificate.</li>
+</ul>
+
+<h3>IIS</h3>
+
+<ul>
+<li><a href="http://get-carbon.org/help/Get-IisMimeMap.html">Get-IisMimeMap</a>, <a href="http://get-carbon.org/help/Remove-IisMimeMap.html">Remove-IisMimeMap</a>, and <a href="http://get-carbon.org/help/Set-IisMimeMap.html">Set-IisMimeMap</a> now support managing MIME types for websites, virtual directories, and applications.</li>
+</ul>
+
+<h3>Services</h3>
+
+<ul>
+<li><a href="http://get-carbon.org/help/Install-Service.html">Install-Service</a> now supports setting a command to run when a service fails.</li>
+</ul>
+
+<h2>Bug Fixes</h2>
+
+<h3>General</h3>
+
+<ul>
+<li><code>Import-Carbon</code> fails when <code>-WhatIf</code> switch is used.</li>
+<li>Importing Carbon no longer writes an error if the <code>PATH</code> environment variable contains a path to a non-existent drive (issue <a href="https://bitbucket.org/splatteredbits/carbon/issue/134/import-carbon-fails-with-path-environment">#134</a>).</li>
+</ul>
+
+<h3>INI</h3>
+
+<ul>
+<li><a href="http://get-carbon.org/help/Set-IniEntry.html">Set-IniEntry</a> fails when adding the first section-less setting to a file.</li>
+</ul>
+
+<h3>Internet Explorer</h3>
+
+<ul>
+<li><a href="http://get-carbon.org/help/Enable-IEActivationPermission.html">Enable-IEActivationPermission</a> no longer returns the <code>hkcr:</code> drive.</li>
+</ul>
+
+<h3>Security</h3>
+
+<ul>
+<li>Fixed an error that occurs when setting permissions on a private key fails: the error message is created using an invalid format string (issue <a href="https://bitbucket.org/splatteredbits/carbon/issue/133/set-cryptokeysecurity-invalid-parameters">#133</a>).</li>
+<li>Fixed an exception that gets thrown when setting a private key's permissions and the only certificate key is AT_SIGNATURE (issue <a href="https://bitbucket.org/splatteredbits/carbon/issue/132/set-cryptokeysecurity-throws-exception">#132</a>).</li>
+</ul>
+
+<h3>Services</h3>
+
+<ul>
+<li><a href="http://get-carbon.org/help/Install-Service.html">Install-Service</a> stops Windows service even when no settings/configuration has changed (fixes issue <a href="https://bitbucket.org/splatteredbits/carbon/issue/131/install-service-always-restarts-service">#131</a>). </li>
+<li><a href="http://get-carbon.org/help/Install-Service.html">Install-Service</a> didn't clear services depended on re-install.</li>
+</ul>
+
+<h1>1.8.0 (7 September 2014)</h1>
 
 <h2>Enhancements</h2>
 

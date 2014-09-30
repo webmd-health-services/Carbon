@@ -8,7 +8,9 @@
 	<ul id="SiteNav">
 		<li><a href="http://get-carbon.org">Get-Carbon</a></li>
 		<li><b>-Documentation</b></li>
-        <li><a href="http://get-carbon.org/releasenotes.html">-ReleaseNotes</a></li>
+        <li><a href="/help/2.0">2.0-alpha</a></li>
+        <li><a href="/releasenotes.html">-ReleaseNotes</a></li>
+        <li><a href="/releasenotes-2.0.html">2.0-alpha</a></li>
 		<li><a href="http://pshdo.com">-Blog</a></li>
 	</ul>
 <div id="CommandMenuContainer" style="float:left;">
@@ -270,7 +272,9 @@
 <div><p>Creates or sets a file extension to MIME type map for an entire web server.</p></div>
 
 <h2>Syntax</h2>
-<pre class="Syntax"><code>Set-IisMimeMap [-FileExtension] &lt;String&gt; [-MimeType] &lt;String&gt; [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
+<pre class="Syntax"><code>Set-IisMimeMap -FileExtension &lt;String&gt; -MimeType &lt;String&gt; [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]
+</code></pre>
+<pre class="Syntax"><code>Set-IisMimeMap -SiteName &lt;String&gt; [-VirtualPath &lt;String&gt;] -FileExtension &lt;String&gt; -MimeType &lt;String&gt; [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
     
 <h2>Description</h2>
 <div class="Description">
@@ -292,6 +296,22 @@
 	<th>Required?</th>
 	<th>Pipeline Input</th>
 	<th>Default Value</th>
+</tr>
+<tr valign='top'>
+	<td>SiteName</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+	<td>The name of the website whose MIME type to set.</td>
+	<td>true</td>
+	<td>false</td>
+    <td></td>
+</tr>
+<tr valign='top'>
+	<td>VirtualPath</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+	<td>The optional site path whose configuration should be returned.</td>
+	<td>false</td>
+	<td>false</td>
+    <td></td>
 </tr>
 <tr valign='top'>
 	<td>FileExtension</td>
