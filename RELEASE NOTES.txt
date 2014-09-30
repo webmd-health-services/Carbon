@@ -2,6 +2,10 @@
 
 ## Enhancements
 
+### Certificates
+
+ * Added `KeyStorageFlags` parameter to [Get-Certificate](http://get-carbon.org/help/Get-Certificate.html) when loading a certificate from a file for better control when storing the certificate.
+
 ### IIS
 
  * [Get-IisMimeMap](http://get-carbon.org/help/Get-IisMimeMap.html), [Remove-IisMimeMap](http://get-carbon.org/help/Remove-IisMimeMap.html), and [Set-IisMimeMap](http://get-carbon.org/help/Set-IisMimeMap.html) now support managing MIME types for websites, virtual directories, and applications.

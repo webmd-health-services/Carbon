@@ -38,7 +38,18 @@ function Test-ShouldRemoveCertificateByCertificate
 function Test-ShouldRemoveCertificateByThumbprint
 {
     Uninstall-Certificate -Thumbprint $TestCert.Thumbprint -StoreLocation CurrentUser -StoreName My
-    $cert = Get-Certificate -Thumbprint $TestCert.Thumbprint -StoreLocation CurrentUser -StoreName My
+    $maxTries = 10
+    $tryNum = 0
+    do
+    {
+        $cert = Get-Certificate -Thumbprint $TestCert.Thumbprint -StoreLocation CurrentUser -StoreName My
+        if( -not $cert )
+        {
+            break
+        }
+        Start-Sleep -Milliseconds 100
+    }
+    while( $tryNum++ -lt $maxTries )
     Assert-Null $cert
 }
 

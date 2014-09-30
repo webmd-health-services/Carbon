@@ -91,9 +91,7 @@ function Install-Certificate
             $keyFlags = $keyFlags -bor [Security.Cryptography.X509Certificates.X509KeyStorageFlags]::Exportable
         }
 
-        $Path = ConvertTo-FullPath -Path $Path
-        $Certificate = New-Object 'Security.Cryptography.X509Certificates.X509Certificate2'
-        $Certificate.Import( $Path, $Password, $keyFlags )
+        $Certificate = Get-Certificate -Path $Path -Password $Password -KeyStorageFlags $keyFlags
     }
     
     $getCertificateStoreParams = @{ }
