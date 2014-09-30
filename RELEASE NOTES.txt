@@ -130,6 +130,14 @@ This is a backwards-incompatible release.
 
 ## Enhancements
 
+### Certificates
+
+ * Added `KeyStorageFlags` parameter to [Get-Certificate](http://get-carbon.org/help/Get-Certificate.html) when loading a certificate from a file for better control when storing the certificate.
+
+### IIS
+
+ * [Get-IisMimeMap](http://get-carbon.org/help/Get-IisMimeMap.html), [Remove-IisMimeMap](http://get-carbon.org/help/Remove-IisMimeMap.html), and [Set-IisMimeMap](http://get-carbon.org/help/Set-IisMimeMap.html) now support managing MIME types for websites, virtual directories, and applications.
+
 ### Services
 
  * [Install-Service](http://get-carbon.org/help/Install-Service.html) now supports setting a command to run when a service fails.
@@ -145,6 +153,10 @@ This is a backwards-incompatible release.
 ### INI
 
  * [Set-IniEntry](http://get-carbon.org/help/Set-IniEntry.html) fails when adding the first section-less setting to a file.
+ 
+### Internet Explorer
+
+ * [Enable-IEActivationPermission](http://get-carbon.org/help/Enable-IEActivationPermission.html) no longer returns the `hkcr:` drive.
  
 ### Security
 

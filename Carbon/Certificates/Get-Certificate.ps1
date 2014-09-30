@@ -62,6 +62,12 @@ function Get-Certificate
         [Parameter(ParameterSetName='ByPath')]
         # The password to the certificate.  Can be plaintext or a [SecureString](http://msdn.microsoft.com/en-us/library/system.securestring.aspx).
         $Password,
+
+        [Parameter(ParameterSetName='ByPath')]
+        [Security.Cryptography.X509Certificates.X509KeyStorageFlags]
+        # The storage flags to use when loading a certificate file. This controls where/how you can store the certificate in the certificate stores later. Use the `-bor` operator to combine flags.
+        $KeyStorageFlags,
+
         
         [Parameter(Mandatory=$true,ParameterSetName='ByThumbprint')]
         [Parameter(Mandatory=$true,ParameterSetName='ByThumbprintCustomStoreName')]
@@ -117,7 +123,12 @@ function Get-Certificate
                 {
                     try
                     {
-                        return New-Object 'Security.Cryptography.X509Certificates.X509Certificate2' $item.FullName,$Password
+                        $ctorParams = @( $item.FullName, $Password )
+                        if( $KeyStorageFlags )
+                        {
+                            $ctorParams += $KeyStorageFlags
+                        }
+                        return New-Object 'Security.Cryptography.X509Certificates.X509Certificate2' $ctorParams
                     }
                     catch
                     {
