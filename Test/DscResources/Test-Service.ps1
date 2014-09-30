@@ -62,6 +62,8 @@ function Test-ShouldGetExistingServices
         Assert-Equal $_.ResetPeriod $resource.ResetFailureCount
         Assert-Equal $_.RestartDelay $resource.RestartDelay
         Assert-Equal $_.RebootDelay $resource.RebootDelay
+        Assert-Equal $_.FailureProgram $resource.Command
+        Assert-Equal $_.RunCommandDelay $resource.RunCommandDelay
         Assert-Equal (($_.ServicesDependedOn | Select-Object -ExpandProperty 'Name') -join ',') ($resource.Dependency -join ',') $_.Name
         if( (Test-Identity -Name $_.UserName) )
         {
@@ -93,6 +95,8 @@ function Test-ShouldGetNonExistentService
     Assert-Null $resource.RestartDelay
     Assert-Null $resource.RebootDelay
     Assert-Null $resource.Dependency
+    Assert-Null $resource.Command
+    Assert-Null $resource.RunCommandDelay
     Assert-Null $resource.UserName
     Assert-Null $resource.Credential
     Assert-DscResourceAbsent $resource
@@ -114,6 +118,8 @@ function Test-ShouldInstallService
     Assert-Equal 0 $resource.RestartDelay
     Assert-Equal 0 $resource.RebootDelay
     Assert-Null $resource.Dependency
+    Assert-Null $resource.Command
+    Assert-Equal 0 $resource.RunCommandDelay
     Assert-Equal 'NT AUTHORITY\NETWORK SERVICE' $resource.UserName
     Assert-Null $resource.Credential
     Assert-DscResourcePresent $resource
@@ -121,20 +127,35 @@ function Test-ShouldInstallService
 
 function Test-ShouldInstallServiceWithAllOptions
 {
-    Set-TargetResource -Path $servicePath -Name $serviceName -Ensure Present -StartupType Manual -OnFirstFailure Restart -OnSecondFailure Restart -OnThirdFailure Reboot -ResetFailureCount (60*60*24*2) -RestartDelay (1000*60*5) -RebootDelay (1000*60*10) -Dependency 'W3SVC' -Credential $credential
+    Set-TargetResource -Path $servicePath `
+                       -Name $serviceName `
+                       -Ensure Present `
+                       -StartupType Manual `
+                       -OnFirstFailure RunCommand `
+                       -OnSecondFailure Restart `
+                       -OnThirdFailure Reboot `
+                       -ResetFailureCount (60*60*24*2) `
+                       -RestartDelay (1000*60*5) `
+                       -RebootDelay (1000*60*10) `
+                       -Command 'fubar.exe' `
+                       -RunCommandDelay (60*1000) `
+                       -Dependency 'W3SVC' `
+                       -Credential $credential
     Assert-NoError
     $resource = Get-TargetResource -Name $serviceName
     Assert-NotNull $resource
     Assert-Equal $serviceName $resource.Name
     Assert-Equal $servicePath $resource.Path
     Assert-Equal 'Manual' $resource.StartupType
-    Assert-Equal 'Restart' $resource.OnFirstFailure
+    Assert-Equal 'RunCommand' $resource.OnFirstFailure
     Assert-Equal 'Restart' $resource.OnSecondFailure
     Assert-Equal 'Reboot' $resource.OnThirdFailure
     Assert-Equal (60*60*24*2) $resource.ResetFailureCount
     Assert-Equal (1000*60*5) $resource.RestartDelay
     Assert-Equal (1000*60*10) $resource.RebootDelay
     Assert-Equal 'W3SVC' $resource.Dependency
+    Assert-Equal 'fubar.exe' $resource.Command 
+    Assert-Equal (60*1000) $resource.RunCommandDelay
     Assert-Equal (Resolve-Identity -Name $credential.UserName).FullName $resource.UserName
     Assert-Null $resource.Credential
     Assert-DscResourcePresent $resource    
@@ -179,7 +200,7 @@ function Test-ShouldTestOnCredentials
 
 function Test-ShouldTestOnProperties
 {
-    Set-TargetResource -Name $serviceName -Path $servicePath -Ensure Present
+    Set-TargetResource -Name $serviceName -Path $servicePath -Command 'fubar.exe' -Ensure Present
     $testParams = @{ Name = $serviceName; }
     Assert-True (Test-TargetResource @testParams -Path $servicePath -Ensure Present)
     Assert-False (Test-TargetResource @testParams -Path 'C:\fubar.exe' -Ensure Present)
@@ -207,6 +228,12 @@ function Test-ShouldTestOnProperties
 
     Assert-True (Test-TargetResource @testParams -Dependency @() -Ensure Present)
     Assert-False (Test-TargetResource @testParams -Dependency @( 'W3SVC' ) -Ensure Present)
+
+    Assert-True (Test-TargetResource @testParams -Command 'fubar.exe' -Ensure Present)
+    Assert-False (Test-TargetResource @testParams -Command 'fubar2.exe' -Ensure Present)
+
+    Assert-True (Test-TargetResource @testParams -RunCommandDelay 0 -Ensure Present)
+    Assert-False (Test-TargetResource @testParams -RunCommandDelay 1000 -Ensure Present)
 
     Assert-True (Test-TargetResource @testParams -UserName 'NetworkService' -Ensure Present)
     Assert-False (Test-TargetResource @testParams -Credential $credential -Ensure Present)
