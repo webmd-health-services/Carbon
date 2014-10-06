@@ -135,6 +135,10 @@ This is a backwards-incompatible release.
 ### Certificates
 
  * Added `KeyStorageFlags` parameter to [Get-Certificate](http://get-carbon.org/help/Get-Certificate.html) when loading a certificate from a file for better control when storing the certificate.
+ 
+### Hosts File
+
+ * [Set-HostsEntry](http://get-carbon.org/help/Set-HostsEntry.html) now handles an in-use/locked hosts file better, by retrying up to 10 times before writing an error, waiting a random amount of time (from 0 to 1000 milliseconds) between each retry attempt.
 
 ### IIS
 

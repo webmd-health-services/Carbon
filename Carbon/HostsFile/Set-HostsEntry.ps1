@@ -26,6 +26,8 @@ function Set-HostsEntry
     This function scans the entire hosts file.  If you have a large hosts file, and are updating multiple entries, this function will be slow.
     
     You can operate on a custom hosts file, too.  Pass its path with the `Path` parameter.
+
+    Sometimes the system's hosts file is in use and locked when you try to update it. The `Set-HostsEntry` function tries 10 times to set a hosts entry before giving up and writing an error. It waits a random amount of time (from 0 to 1000 milliseconds) between each attempt.
     
     .EXAMPLE
     Set-HostsEntry -IPAddress 10.2.3.4 -HostName 'myserver' -Description "myserver's IP address"
@@ -146,6 +148,40 @@ function Set-HostsEntry
     
     if( $pscmdlet.ShouldProcess( $Path, "set hosts entry $HostName to point to $IPAddress" ) )
     {
-        $outlines | Out-File -FilePath $Path -Encoding OEM
+        $succeeded = $false
+        $maxTries = 10
+        $rng = New-Object 'Random'
+        for( $idx = 0; $idx -lt $maxTries; ++$idx )
+        {
+            $exception = $false
+            try
+            {
+                $setHostsEntryError = @()
+                $outlines | Out-File -FilePath $Path -Encoding OEM -ErrorAction SilentlyContinue -ErrorVariable 'setHostsEntryError'
+                $succeeded = $true
+                break
+            }
+            catch
+            {
+                if( $Global:Error.Count -gt 0 )
+                {
+                    $Global:Error.RemoveAt(0)
+                }
+                $exception = $true
+            }
+
+            if( $exception -or $setHostsEntryError )
+            {
+                $timeout = $rng.Next(0,1000)
+                Write-Verbose ('Failed to set hosts entry ''{0}    {1}'' in ''{2}'': waiting {3} milliseconds to try again.' -f $HostName,$IPAddress,$Path,$timeout)
+                Start-Sleep -Milliseconds $timeout
+            }
+        }
+
+        if( -not $succeeded )
+        {
+            Write-Error ('Failed to set hosts entry ''{0}    {1}'' in ''{2}'': looks like the hosts file is in use.' -f $HostName,$IPAddress,$Path)
+        }
+        
     }     
 }
