@@ -152,11 +152,27 @@ function Test-ShouldIgnoreAndCommentInvalidHostsEntry
     Assert-HostsFileContains '# Invalid line'
 }
 
+function Test-ShouldHandleIfHostsFileInUse
+{
+    $file = [IO.File]::Open($customHostsFile, 'Open', 'Read', 'Read')
+    try
+    {
+        Set-HostsEntry '1.2.3.4' -HostName 'example.com' -Path $customHostsFile -ErrorAction SilentlyContinue
+    }
+    finally
+    {
+        $file.Close()
+    }
+    Assert-Equal 1 $Global:Error.Count
+    Assert-Error -Last -Regex 'looks like the hosts file is in use'
+}
+
 function Assert-HostsFileContains($Line, $Path = $customHostsFile)
 {
     $hostsFile = Get-Content $Path
     Assert-Contains $hostsFile $Line "Hosts file"
 }
+
 
 filter Out-HostsFile
 {
