@@ -147,7 +147,6 @@ This is a backwards-incompatible release.
 ### Services
 
  * [Install-Service](http://get-carbon.org/help/Install-Service.html) now supports setting a command to run when a service fails.
-
  
 ## Bug Fixes
 
@@ -172,9 +171,10 @@ This is a backwards-incompatible release.
 ### Services
 
  * [Install-Service](http://get-carbon.org/help/Install-Service.html) stops Windows service even when no settings/configuration has changed (fixes issue [#131](https://bitbucket.org/splatteredbits/carbon/issue/131/install-service-always-restarts-service)). 
- * [Install-Service](http://get-carbon.org/help/Install-Service.html) didn't clear services depended on re-install.
+ * [Install-Service](http://get-carbon.org/help/Install-Service.html) didn't clear services depended on during a re-install.
+ * [Install-Service](http://get-carbon.org/help/Install-Service.html) wasn't restarting a manual service if it was running when configuration began.
 
-
+ 
 # 1.8.0 (7 September 2014)
 
 ## Enhancements

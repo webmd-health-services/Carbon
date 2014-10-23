@@ -228,7 +228,7 @@ function Test-ShouldUpdateServiceProperties
     $service = Assert-ServiceInstalled
     Assert-Equal 'Manual' $service.StartMode
     Assert-Equal ".\$serviceAcct" $service.UserName
-    Assert-Equal 'Stopped' $service.Status
+    Assert-Equal 'Running' $service.Status
     Assert-HasPermissionsOnServiceExecutable "$($env:ComputerName)\$serviceAcct" $newServicePath
 }
 
@@ -370,6 +370,49 @@ function Test-ShouldClearDependencies
     Install-Service -Name $serviceName -Path $servicePath
     $service = Get-Service -Name $serviceName
     Assert-Equal 0 $service.ServicesDependedOn.Length
+}
+
+function Test-ShouldNotStartManualService
+{
+    Install-Service -Name $serviceName -Path $servicePath -StartupType Manual
+    $service = Get-Service -Name $serviceName
+    Assert-NotNull $service
+    Assert-Equal 'Stopped' $service.Status
+
+    Install-Service -Name $serviceName -Path $servicePath -StartupType Manual -Force
+    $service = Get-Service -Name $serviceName
+    Assert-Equal 'Stopped' $service.Status
+
+    Start-Service -Name $serviceName
+    Install-Service -Name $serviceName -Path $servicePath -StartupType Manual -Force
+    $service = Get-Service -Name $serviceName
+    Assert-Equal 'Running' $service.Status
+}
+
+function Test-ShouldNotStartDisabledService
+{
+    Install-Service -Name $serviceName -Path $servicePath -StartupType Disabled
+    $service = Get-Service -Name $serviceName
+    Assert-NotNull $service
+    Assert-Equal 'Stopped' $service.Status
+
+    Install-Service -Name $serviceName -Path $servicePath -StartupType Disabled -Force
+    $service = Get-Service -Name $serviceName
+    Assert-Equal 'Stopped' $service.Status
+}
+
+function Test-ShouldStartAStoppedAutomaticService
+{
+    Install-Service -Name $serviceName -Path $servicePath -StartupType Automatic
+    $service = Get-Service -Name $serviceName
+    Assert-NotNull $service
+    Assert-Equal 'Running' $service.Status
+
+    Stop-Service -Name $serviceName
+    Install-Service -Name $serviceName -Path $servicePath -StartupType Automatic -Force
+    $service = Get-Service -Name $serviceName
+    Assert-Equal 'Running' $service.Status
+
 }
 
 
