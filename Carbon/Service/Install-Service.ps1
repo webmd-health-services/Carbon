@@ -27,6 +27,8 @@ function Install-Service
 
     [Managed service accounts and virtual accounts](http://technet.microsoft.com/en-us/library/dd548356.aspx) should be supported (we don't know how to test, so can't be sure).  Simply omit the `-Password` parameter when providing a custom account name with the `-Username` parameter.
 
+    `Manual` services are not started. `Automatic` services are started after installation. If an existing manual service is started when configuration begins, it is re-started after re-configured.
+
     .LINK
     Uninstall-Service
 
@@ -315,8 +317,16 @@ function Install-Service
     $service = Get-Service -Name $Name -ErrorAction SilentlyContinue
     
     $operation = 'create'
+    $serviceIsRunningStatus = @(
+                                  [ServiceProcess.ServiceControllerStatus]::Running,
+                                  [ServiceProcess.ServiceControllerStatus]::StartPending
+                               )
+
+    $restartService = ($StartupType -eq [ServiceProcess.ServiceStartMode]::Automatic)
     if( $service )
     {
+        $restartService = ( $restartService -or ($serviceIsRunningStatus -contains $service.Status) )
+
         $stopSuccessful = $false
         if( $service.CanStop )
         {
@@ -324,6 +334,11 @@ function Install-Service
             if( $? )
             {
                 $service.WaitForStatus( 'Stopped' )
+                $stopSuccessful = $true
+            }
+
+            if( (Get-Service -Name $Name).Status -eq [ServiceProcess.ServiceControllerStatus]::Stopped )
+            {
                 $stopSuccessful = $true
             }
         }
@@ -368,15 +383,27 @@ function Install-Service
         }
     }
         
-    if( $StartupType -eq [ServiceProcess.ServiceStartMode]::Automatic )
+    if( $restartService )
     {
         if( $PSCmdlet.ShouldProcess( $Name, 'start service' ) )
         {
-            Start-Service -Name $Name
-            if( (Get-Service -Name $Name).Status -ne 'Running' -and $PSCmdlet.ParameterSetName -eq 'CustomAccount' -and -not $PSBoundParameters.ContainsKey('Password') )
+            Start-Service -Name $Name -Verbose:$VerbosePreference
+            if( (Get-Service -Name $Name).Status -ne [ServiceProcess.ServiceControllerStatus]::Running )
             {
-                Write-Warning ('Service ''{0}'' didn''t start and you didn''t supply a password to Install-Service.  Is ''{1}'' a managed service account or virtual account? (See http://technet.microsoft.com/en-us/library/dd548356.aspx.)  If not, please provide the account''s password with the `-Password` parameter.' -f $Name,$Username)
+                if( $PSCmdlet.ParameterSetName -eq 'CustomAccount' -and -not $PSBoundParameters.ContainsKey('Password') )
+                {
+                    Write-Warning ('Service ''{0}'' didn''t start and you didn''t supply a password to Install-Service.  Is ''{1}'' a managed service account or virtual account? (See http://technet.microsoft.com/en-us/library/dd548356.aspx.)  If not, please provide the account''s password with the `-Password` parameter.' -f $Name,$Username)
+                }
+                else
+                {
+                    Write-Warning ('Failed to re-start service ''{0}''.' -f $Name)
+                }
             }
         }
     }
+    else
+    {
+        Write-Verbose ('Not re-starting {0} service. Its startup type is {0} and it wasn''t running when configuration began.' -f $Name,$StartupType)
+    }
+
 }
