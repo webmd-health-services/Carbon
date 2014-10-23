@@ -30,6 +30,7 @@ function Get-IisConfigurationSection
     Returns a configuration section which represents the Peanuts site's Doghouse path's anonymous authentication settings.    
     #>
     [CmdletBinding(DefaultParameterSetName='Global')]
+    [OutputType([Microsoft.Web.Administration.ConfigurationSection])]
     param(
         [Parameter(Mandatory=$true,ParameterSetName='ForSite')]
         [string]
