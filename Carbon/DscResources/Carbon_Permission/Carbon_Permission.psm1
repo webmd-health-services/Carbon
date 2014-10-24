@@ -307,8 +307,8 @@ function Test-TargetResource
     Set-StrictMode -Version 'Latest'
 
     $resource = Get-TargetResource -Identity $Identity -Path $Path
-    $desiredRights = $Permission -join ','
-    $currentRights = $resource.Permission -join ','
+    $desiredRights = ($Permission | Sort-Object) -join ','
+    $currentRights = ($resource.Permission | Sort-Object) -join ','
     
     if( $Ensure -eq 'Absent' )
     {
