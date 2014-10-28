@@ -38,13 +38,14 @@ function Uninstall-Service
     )
     
     $service = Get-Service | Where-Object { $_.Name -eq $Name }
-    
+    $sc = (Join-Path $env:WinDir system32\sc.exe -Resolve)
+
     if( $service )
     {
         if( $pscmdlet.ShouldProcess( "service '$Name'", "remove" ) )
         {
             Stop-Service $Name
-            & C:\Windows\system32\sc.exe delete $Name
+            & $sc delete $Name
         }
     }
 }
