@@ -290,7 +290,7 @@ function Grant-Permission
                 foreach( $ruleToRemove in $rulesToRemove )
                 {
                     Write-Verbose ('Removing {0}''s non-inherited, {1} {2} rights on {3}.' -f $Identity,$ruleToRemove.AccessControlType,$ruleToRemove."$($providerName)Rights",$Path)
-                    [void]$currentAcl.RemoveAccessRule( $rulesToRemove )
+                    [void]$currentAcl.RemoveAccessRule( $ruleToRemove )
                 }
             }
         }
