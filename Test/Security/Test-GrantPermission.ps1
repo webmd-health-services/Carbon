@@ -92,6 +92,7 @@ function Test-ShouldFailIfIncorrectPermissions
 function Test-ShouldClearExistingPermissions
 {
     Invoke-GrantPermissions 'Administrators' 'FullControl'
+    Invoke-GrantPermissions 'SYSTEM' 'FullControl'
     
     $result = Grant-Permission -Identity 'Everyone' -Permission 'Read','Write' -Path $Path.ToSTring() -Clear
     Assert-Null $result
