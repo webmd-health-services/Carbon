@@ -14,6 +14,10 @@
 
  * [Get-IisMimeMap](http://get-carbon.org/help/Get-IisMimeMap.html), [Remove-IisMimeMap](http://get-carbon.org/help/Remove-IisMimeMap.html), and [Set-IisMimeMap](http://get-carbon.org/help/Set-IisMimeMap.html) now support managing MIME types for websites, virtual directories, and applications.
 
+### Scheduled Tasks
+
+ * Created [Get-ScheduledTask](http://get-carbon.org/help/Get-ScheduledTask.html) function for getting the scheduled tasks on the local computer using `schtasks.exe`.
+ 
 ### Services
 
  * [Install-Service](http://get-carbon.org/help/Install-Service.html) now supports setting a command to run when a service fails.

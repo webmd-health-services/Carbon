@@ -79,6 +79,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Properties\AssemblyVersion.cs" />
+    <Compile Include="ScheduledTaskInfo.cs" />
     <Compile Include="Security\ComAccessRights.cs" />
     <Compile Include="Security\ComAccessRule.cs" />
     <Compile Include="Security\ContainerInheritanceFlags.cs" />
