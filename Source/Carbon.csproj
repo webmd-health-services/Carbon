@@ -88,8 +88,8 @@
     <Compile Include="Service\FailureAction.cs" />
     <Compile Include="Service\ServiceInfo.cs" />
     <Compile Include="Service\StartType.cs" />
-    <Compile Include="TaskScheduler\ScheduledTaskInfo.cs" />
     <Compile Include="TaskScheduler\ScheduleInfo.cs" />
+    <Compile Include="TaskScheduler\TaskInfo.cs" />
     <Compile Include="Win32.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Win32ErrorCodes.cs" />

@@ -2,9 +2,9 @@
 
 namespace Carbon.TaskScheduler
 {
-	public sealed class ScheduledTaskInfo
+	public sealed class TaskInfo
 	{
-		public ScheduledTaskInfo(string hostName, string path, string name, string nextRunTime, string status, string logonMode,
+		public TaskInfo(string hostName, string path, string name, string nextRunTime, string status, string logonMode,
 			string lastRunTime, string author, string taskToRun, string startIn, string comment, string scheduledTaskState,
 			string idleTime, string powerManagement, string runAsUser, string deleteTaskIfNotRescheduled)
 		{

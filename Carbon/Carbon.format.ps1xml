@@ -223,9 +223,9 @@
             </TableControl>
         </View>
         <View>
-            <Name>Carbon.ScheduledTaskInfo</Name>
+            <Name>Carbon.TaskScheduler.TaskInfo</Name>
             <ViewSelectedBy>
-                <TypeName>Carbon.ScheduledTaskInfo</TypeName>
+                <TypeName>Carbon.TaskScheduler.TaskInfo</TypeName>
             </ViewSelectedBy>
             <TableControl>
                 <TableHeaders>
@@ -235,29 +235,32 @@
                         <Width>15</Width>
                     </TableColumnHeader>
                     <TableColumnHeader>
+                        <Label>LastResult</Label>
                         <Width>11</Width>
                     </TableColumnHeader>
                     <TableColumnHeader>
-                        <Width>21</Width>
+                        <Width>22</Width>
                     </TableColumnHeader>
                     <TableColumnHeader>
-                        <Width>21</Width>
+                        <Width>22</Width>
                     </TableColumnHeader>
                 </TableHeaders>
                 <TableRowEntries>
                     <TableRowEntry>
                         <TableColumnItems>
                             <TableColumnItem>
-                                <PropertyName>TaskName</PropertyName>
+                                <PropertyName>TaskPath</PropertyName>
                             </TableColumnItem>
                             <TableColumnItem>
-                                <PropertyName>TaskToRun</PropertyName>
+                                <PropertyName>TaskName</PropertyName>
                             </TableColumnItem>
                             <TableColumnItem>
                                 <PropertyName>Status</PropertyName>
                             </TableColumnItem>
                             <TableColumnItem>
-                                <PropertyName>LastResult</PropertyName>
+                                <ScriptBlock>
+                                    $_.Schedules | Select-Object -Expand 'LastResult'
+                                </ScriptBlock>
                             </TableColumnItem>
                             <TableColumnItem>
                                 <PropertyName>LastRunTime</PropertyName>
