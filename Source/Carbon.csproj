@@ -79,8 +79,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Properties\AssemblyVersion.cs" />
-    <Compile Include="ScheduledTaskInfo.cs" />
-    <Compile Include="ScheduledTaskScheduleInfo.cs" />
     <Compile Include="Security\ComAccessRights.cs" />
     <Compile Include="Security\ComAccessRule.cs" />
     <Compile Include="Security\ContainerInheritanceFlags.cs" />
@@ -91,7 +89,7 @@
     <Compile Include="Service\ServiceInfo.cs" />
     <Compile Include="Service\StartType.cs" />
     <Compile Include="TaskScheduler\ScheduledTaskInfo.cs" />
-    <Compile Include="TaskScheduler\ScheduledTaskScheduleInfo.cs" />
+    <Compile Include="TaskScheduler\ScheduleInfo.cs" />
     <Compile Include="Win32.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Win32ErrorCodes.cs" />

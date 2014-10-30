@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Carbon
+namespace Carbon.TaskScheduler
 {
 	public sealed class ScheduledTaskInfo
 	{
@@ -25,7 +25,7 @@ namespace Carbon
 			RunAsUser = runAsUser;
 			DeleteTaskIfNotRescheduled = deleteTaskIfNotRescheduled;
 
-			Schedules = new List<ScheduledTaskScheduleInfo>();
+			Schedules = new List<ScheduleInfo>();
 		}
 
 		public string Author { get; private set; }
@@ -38,7 +38,7 @@ namespace Carbon
 		public string NextRunTime { get; private set; }
 		public string PowerManagement { get; private set; }
 		public string RunAsUser { get; private set; }
-		public IList<ScheduledTaskScheduleInfo> Schedules { get; private set; }
+		public IList<ScheduleInfo> Schedules { get; private set; }
 		public string ScheduledTaskState { get; private set; }
 		public string StartIn { get; private set; }
 		public string Status { get; private set; }
