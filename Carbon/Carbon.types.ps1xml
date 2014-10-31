@@ -245,7 +245,7 @@
                         'My' { return 'Personal' }
                         'Root' { return 'Trusted Root Certification Authorities' }
                         'TrustedPeople' { return 'Trusted People' }
-                        'TrustedPublisher' { return 'Trusted Publishers' }
+                        'TrgetustedPublisher' { return 'Trusted Publishers' }
                         default { return '' }
                     }
                 </GetScriptBlock>
@@ -286,6 +286,21 @@
                     RemoteIPAddress
                 </ReferencedMemberName>
             </AliasProperty>
+        </Members>
+    </Type>
+    <Type>
+        <Name>Carbon.TaskScheduler.TaskInfo</Name>
+        <Members>
+            <AliasProperty>
+                <Name>State</Name>
+                <ReferencedMemberName>Status</ReferencedMemberName>
+            </AliasProperty>
+            <ScriptProperty>
+                <Name>FullName</Name>
+                <GetScriptBlock>
+                    return Join-Path -Path $this.TaskPath -ChildPath $this.TaskName
+                </GetScriptBlock>
+            </ScriptProperty>
         </Members>
     </Type>
 </Types>
