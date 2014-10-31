@@ -25,6 +25,9 @@ function Get-ScheduledTask
 
     This function has the same name as the built-in `Get-ScheduledTask` function that comes on Windows 2012/8 and later. It returns objects with the same properties, but if you want to use the built-in function, use the `ScheduledTasks` qualifier, e.g. `ScheduledTasks\Get-ScheduledTask`.
 
+    .LINK
+    Test-ScheduledTask
+
     .EXAMPLE
     Get-ScheduledTask
 
@@ -33,7 +36,7 @@ function Get-ScheduledTask
     .EXAMPLE
     Get-ScheduledTask -Name 'AutoUpdateMyApp'
 
-    Demonstrates how to get a specific task. This must be the *full task name*, i.e. the task's path/location and its name.
+    Demonstrates how to get a specific task.
 
     .EXAMPLE
     Get-ScheduledTask -Name '*Microsoft*'
@@ -51,7 +54,7 @@ function Get-ScheduledTask
         [Parameter()]
         [Alias('TaskName')]
         [string]
-        # The name of the scheduled task to return. Wildcards supported.
+        # The name of the scheduled task to return. Wildcards supported. This must be the *full task name*, i.e. the task's path/location and its name.
         $Name
     )
 

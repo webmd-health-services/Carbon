@@ -245,7 +245,7 @@
                         'My' { return 'Personal' }
                         'Root' { return 'Trusted Root Certification Authorities' }
                         'TrustedPeople' { return 'Trusted People' }
-                        'TrgetustedPublisher' { return 'Trusted Publishers' }
+                        'TrustedPublisher' { return 'Trusted Publishers' }
                         default { return '' }
                     }
                 </GetScriptBlock>
