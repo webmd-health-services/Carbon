@@ -60,6 +60,75 @@ function Get-ScheduledTask
 
     Set-StrictMode -Version 'Latest'
 
+    function ConvertFrom-RepetitionElement
+    {
+        param(
+            [Xml.XmlElement]
+            $TriggerElement
+        )
+
+        Set-StrictMode -Version 'Latest'
+
+        if( $TriggerElement.GetElementsByTagName('Repetition').Count -eq 0 )
+        {
+            return
+        }
+
+        $scheduleType = $null
+        $interval = $null
+        $duration = $null
+        $stopAtEnd = $false
+
+        $repetition = $TriggerElement.Repetition
+
+        $interval = $repetition.Interval
+        if( $interval -match 'PT(\d+)(.*)$' )
+        {
+            $modifier = $Matches[1]
+            $unit = $Matches[2]
+
+            $hour = 0
+            $minute = 0
+            $second = 0
+            switch( $unit )
+            {
+                'H' { $hour = $modifier }
+                'M' { $minute = $modifier }
+            }
+
+            $scheduleTypes = @{
+                                    'H' = 'Hourly';
+                                    'M' = 'Minute';
+                              }
+            $scheduleType = $scheduleTypes[$unit]
+            $timespan = New-Object 'TimeSpan' $hour,$minute,$second
+            switch( $scheduleType )
+            {
+                'Hourly' { $modifier = $timespan.TotalHours }
+                'Minute' { $modifier = $timespan.TotalMinutes }
+            }
+        }
+        
+        if( $repetition | Get-Member -Name 'Duration' )
+        {
+            $duration = $repetition.Duration
+            if( $duration -match 'PT((\d+)H)?((\d+)M)?((\d+)S)?$' )
+            {
+                $hours = $Matches[2]
+                $minutes = $Matches[4]
+                $seconds = $Matches[6]
+                $duration = New-Object -TypeName 'TimeSpan' -ArgumentList $hours,$minutes,$seconds
+            }
+        }
+
+        if( $repetition | Get-Member -Name 'StopAtDurationEnd' )
+        {
+            $stopAtEnd = ($repetition.StopAtDurationEnd -eq 'true')
+        }
+
+        return $scheduleType,$modifier,$duration,$stopAtEnd
+    }
+
     $optionalArgs = @()
     $wildcardSearch = $false
     if( $Name )
@@ -70,6 +139,7 @@ function Get-ScheduledTask
         }
         else
         {
+            $Name = Join-Path -Path '\' -ChildPath $Name
             $optionalArgs = @( '/tn', $Name )
         }
     }
@@ -113,6 +183,10 @@ function Get-ScheduledTask
     {
         $csvTask = $output[$idx]
 
+        $xml = schtasks /query /tn $csvTask.TaskName /xml | Where-Object { $_ }
+        $xml = $xml -join ([Environment]::NewLine)
+        $xmlDoc = [xml]$xml
+
         $taskPath = Split-Path -Parent -Path $csvTask.TaskName
         # Get-ScheduledTask on Win2012/8 has a trailing slash so we include it here.
         if( $taskPath -ne '\' )
@@ -140,27 +214,112 @@ function Get-ScheduledTask
                         $csvTask.'Delete Task If Not Rescheduled'
                     )
 
-        $task = New-Object -TypeName 'Carbon.TaskScheduler.TaskInfo' -ArgumentList $ctorArgs
+        $task = New-Object -TypeName 'Carbon.TaskScheduler.TaskInfo' -ArgumentList $ctorArgs | 
+                    Add-Member -MemberType NoteProperty -Name IsInteractive -Value ($xmlDoc.Task.Principals.Principal.LogonType -eq 'InteractiveTokenOrPassword') -PassThru |
+                    Add-Member -MemberType NoteProperty -Name IsHighestAvailableRunLevel -Value ($xmlDoc.Task.Principals.Principal.RunLevel -eq 'HighestAvailable') -PassThru
 
+        $scheduleIdx = 0
         while( $idx -lt $output.Count -and $output[$idx].TaskName -eq $csvTask.TaskName )
         {
             $csvTask = $output[$idx++]
+            $scheduleType = $csvTask.'Schedule Type'
+            $days = $csvTask.Days
+            $duration = $csvTask.'Repeat: Until: Duration'
+            [Carbon.TaskScheduler.Months]$months = [Carbon.TaskScheduler.Months]::None
+            $modifier = $null
+            $stopAtEnd = $false
+
+            $triggers = $xmlDoc.DocumentElement.GetElementsByTagName('Triggers') | Select-Object -First 1
+            if( $triggers -and $triggers.ChildNodes.Count -gt 0 )
+            {
+                [Xml.XmlElement]$trigger = $triggers.ChildNodes[$scheduleIdx++]
+                if( $trigger.Name -eq 'TimeTrigger' )
+                {
+                    $days = $null
+                    $scheduleType,$modifier,$duration,$stopAtEnd = ConvertFrom-RepetitionElement $trigger
+                }
+                elseif( $trigger.Name -eq 'CalendarTrigger' )
+                {
+                    if( $trigger.GetElementsByTagName('ScheduleByDay').Count -eq 1 )
+                    {
+                        $scheduleType = 'Daily'
+                        $modifier = $trigger.ScheduleByDay.DaysInterval
+                    }
+                    elseif( $trigger.GetElementsByTagName('ScheduleByWeek').Count -eq 1 )
+                    {
+                        $scheduleType = 'Weekly'
+                        $modifier = $trigger.ScheduleByWeek.WeeksInterval
+                        [string[]]$days = $trigger.ScheduleByWeek.DaysOfWeek.ChildNodes | ForEach-Object { $_.Name }
+                    }
+                    elseif( $trigger.GetElementsByTagName('ScheduleByMonth').Count -eq 1 )
+                    {
+                        $scheduleType = 'Monthly'
+                        $monthsNode = $trigger.ScheduleByMonth.Months
+                        $days = $trigger.ScheduleByMonth.DaysOfMonth.ChildNodes | ForEach-Object { $_.InnerText }
+                        if( $days -eq 'Last' )
+                        {
+                            $modifier = 'LastDay'
+                            $days = $null
+                        }
+                        else
+                        {
+                            switch( $monthsNode.ChildNodes.Count )
+                            {
+                                12 { $modifier = 1 }
+                                6 { $modifier = 2 }
+                                4 { $modifier = 3 }
+                                3 { $modifier = 4 }
+                                2 {
+                                    switch( $monthsNode.ChildNodes[0].Name )
+                                    {
+                                        'May' { $modifier = 5 }
+                                        'June' { $modifier = 6 }
+                                    }
+                                }
+                                1 { 
+                                    switch( $monthsNode.ChildNodes[0].Name )
+                                    {
+                                        'July' { $modifier = 7 }
+                                        'August' { $modifier = 8 }
+                                        'September' { $modifier = 9 }
+                                        'October' { $modifier = 10 }
+                                        'November' { $modifier = 11 }
+                                        'December' { $modifier = 12 }
+                                    }
+                                }
+                            }
+                        }
+
+                        foreach( $monthNode in $monthsNode.ChildNodes )
+                        {
+                            $months = $months -bor ([Carbon.TaskScheduler.Months]$monthNode.Name)
+                        }
+                    }
+                }
+            }
+            else
+            {
+                Write-Verbose ('Task ''{0}'' has no triggers.' -f $task.FullName)
+            }
+
             $scheduleCtorArgs = @(
                                     $csvTask.'Last Result',
                                     $csvTask.'Stop Task If Runs X Hours And X Mins',
-                                    $csvTask.Schedule,
-                                    $csvTask.'Schedule Type',
+                                    $scheduleType,
+                                    $modifier,
                                     $csvTask.'Start Time',
                                     $csvTask.'Start Date',
                                     $csvTask.'End Date',
-                                    $csvTask.Days,
-                                    $csvTask.Months,
+                                    $days,
+                                    $months,
                                     $csvTask.'Repeat: Every',
                                     $csvTask.'Repeat: Until: Time',
-                                    $csvTask.'Repeat: Until: Duration',
+                                    $duration,
                                     $csvTask.'Repeat: Stop If Still Running'
                                 )
-            $schedule = New-Object -TypeName 'Carbon.TaskScheduler.ScheduleInfo' -ArgumentList $scheduleCtorArgs
+
+            $schedule = New-Object -TypeName 'Carbon.TaskScheduler.ScheduleInfo' -ArgumentList $scheduleCtorArgs |
+                            Add-Member -MemberType NoteProperty -Name 'StopAtEnd' -Value $stopAtEnd -PassThru
             $task.Schedules.Add( $schedule )
         }
         --$idx;

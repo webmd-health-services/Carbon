@@ -41,7 +41,9 @@ function Test-ScheduledTask
 
     Set-StrictMode -Version 'Latest'
 
-    $task = Get-ScheduledTask | Where-Object { $_.FullName -eq $Name }
+    $Name = Join-Path -Path '\' -ChildPath $Name
+
+    $task = schtasks /query /fo csv 2> $null | ConvertFrom-Csv | Where-Object { $_.TaskName -eq $Name }
     if( $task )
     {
         return $true
