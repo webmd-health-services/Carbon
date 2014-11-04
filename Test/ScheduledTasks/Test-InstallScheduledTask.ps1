@@ -64,8 +64,57 @@ function Test-ShouldScheduleWeeklyTasksOnMultipleDays
 
 function Test-ShouldScheduleMonthlyTasks
 {
-    Assert-TaskScheduled -InstallArguments @{ Monthly = 5 } -AssertArguments @{ ScheduleType = 'Monthly'; Modifier = 5; Days = 1; Month = @( 'May','October' ) }
+    Assert-TaskScheduled -InstallArguments @{ Monthly = $true; } -AssertArguments @{ ScheduleType = 'Monthly'; Modifier = 1; DayOfMonth = 1; Month = @( 'January','February','March','April','May','June','July','August','September','October','November','December' ) }
 }
+
+function Test-ShouldScheduleMonthlyTasksOnSpecificDay
+{
+    Assert-TaskScheduled -InstallArguments @{ Monthly = $true; DayOfMonth = 13; } -AssertArguments @{ ScheduleType = 'Monthly'; Modifier = 1; DayOfMonth = 13; Month = @( 'January','February','March','April','May','June','July','August','September','October','November','December' ) }
+}
+
+function Test-ShouldScheduleLastDayOfTheMonthTask
+{
+    Assert-TaskScheduled -InstallArguments @{ LastDayOfMonth = $true; } -AssertArguments @{ ScheduleType = 'Monthly'; Modifier = 'LastDay'; Month = @( 'January','February','March','April','May','June','July','August','September','October','November','December' ); }
+}
+
+function Test-ShouldScheduleLastDayOfTheMonthTaskInSpecificMonth
+{
+    Assert-TaskScheduled -InstallArguments @{ LastDayOfMonth = $true; Month = @( 'January' ); } -AssertArguments @{ ScheduleType = 'Monthly'; Modifier = 'LastDay'; Month = @( 'January' ); }
+}
+
+function Test-ShouldScheduleLastDayOfTheMonthTaskInSpecificMonths
+{
+    Assert-TaskScheduled -InstallArguments @{ LastDayOfMonth = $true; Month = @( 'January','June' ); } -AssertArguments @{ ScheduleType = 'Monthly'; Modifier = 'LastDay'; Month = @( 'January','June' ); }
+}
+
+function Test-ShouldScheduleForSpecificMonth
+{
+    Assert-TaskScheduled -InstallArguments @{ Month = @( 'January' ); } -AssertArguments @{ ScheduleType = 'Monthly'; Month = @( 'January' ); DayOfMonth = 1; }
+}
+
+function Test-ShouldScheduleForSpecificMonthWithInteger
+{
+    Assert-TaskScheduled -InstallArguments @{ Month = @( 1 ); } -AssertArguments @{ ScheduleType = 'Monthly'; Month = @( 'January' ); DayOfMonth = 1; }
+}
+
+function Test-ShouldScheduleForSpecificMonths
+{
+    Assert-TaskScheduled -InstallArguments @{ Month = @( 'January','April','July','October' ); } -AssertArguments @{ ScheduleType = 'Monthly'; Month = @( 'January','April','July','October' ); DayOfMonth = 1; }
+}
+
+function Test-ShouldNotScheuleMonthlyTaskWithMonthParameter
+{
+    $result = Install-ScheduledTask -Name $taskName -Principal LocalService -TaskToRun 'notepad' -Month @( 'January','February','March','April','May','June','July','August','September','October','November','December' ) -ErrorAction SilentlyContinue
+    Assert-Error -Last -Regex 'to schedule a monthly task'
+    Assert-Null $result
+    Assert-False (Test-ScheduledTask -Name $taskName)
+}
+
+function Test-ShouldScheduleForSpecificMonthsOnSpecificDay
+{
+    Assert-TaskScheduled -InstallArguments @{ Month = @( 'January','April','July','October' ); DayOfMonth = 5;  } -AssertArguments @{ ScheduleType = 'Monthly'; Month = @( 'January','April','July','October' ); DayOfMonth = 5; }
+}
+
 
 <#
 function Test-ShouldScheduleMonthlyTask
@@ -194,7 +243,7 @@ function Assert-TaskScheduled
     $task = Install-ScheduledTask -Principal System @InstallArguments
     Assert-NotNull $task
     Assert-Is $task ([Carbon.TaskScheduler.TaskInfo])
-    Assert-ScheduledTask -Principal 'System' @AssertArguments 
+    Assert-ScheduledTask -Principal 'System' @AssertArguments
 
     $InstallArguments['Credential'] = $credential
     $AssertArguments['Credential'] = $credential
@@ -323,7 +372,7 @@ function Assert-ScheduledTask
         $ScheduleType,
         $Modifier,
         [int[]]
-        $Days,
+        $DayOfMonth,
         [DayOfWeek[]]
         $DayOfWeek,
         [Carbon.TaskScheduler.Month[]]
@@ -425,9 +474,9 @@ function Assert-ScheduledTask
         Assert-Equal '' $schedule.Modifier 'Modifier'
     }
 
-    if( $PSBoundParameters.ContainsKey('Days') )
+    if( $PSBoundParameters.ContainsKey('DayOfMonth') )
     {
-        Assert-Equal ($Days -join ',') ($schedule.Days -join ',') 'Days'
+        Assert-Equal ($DayOfMonth -join ',') ($schedule.Days -join ',') 'Days'
     }
     else
     {

@@ -121,28 +121,27 @@ function Install-ScheduledTask
         $Weekly,
 
         [Parameter(ParameterSetName='Monthly',Mandatory=$true)]
-        [ValidateRange(1,12)]
-        [int]
-        # Create a scheduled task that runs every N months.
+        [Switch]
+        # Create a scheduled task that runs every month.
         $Monthly,
 
         [Parameter(ParameterSetName='LastDayOfMonth',Mandatory=$true)]
-        [ValidateRange(1,12)]
         [Switch]
         # Create a scheduled task that runs on the last day of every month. To run on specific months, specify the `Month` parameter.
         $LastDayOfMonth,
 
         [Parameter(ParameterSetName='Month',Mandatory=$true)]
         [Parameter(ParameterSetName='LastDayOfMonth')]
+        [Parameter(ParameterSetName='WeekOfMonth')]
         [Carbon.TaskScheduler.Month[]]
-        # Create a scheduled task that runs on specific months.
+        # Create a scheduled task that runs on specific months. To create a monthly/ task, use the `Monthly` switch.
         $Month,
 
         [Parameter(ParameterSetName='Monthly')]
         [Parameter(ParameterSetName='Month')]
         [ValidateRange(1,31)]
-        [int[]]
-        # The day(s) of the month to run a monthly task. Default is 1 (i.e. the first day of the month).
+        [int]
+        # The day of the month to run a monthly task. Default is 1 (i.e. the first day of the month).
         $DayOfMonth,
 
         [Parameter(ParameterSetName='WeekOfMonth',Mandatory=$true)]
@@ -316,6 +315,20 @@ function Install-ScheduledTask
         [void]$parameters.Add( (Resolve-IdentityName -Name $Principal) )
     }
 
+    function ConvertTo-SchtasksCalendarNameList
+    {
+        param(
+            [Parameter(Mandatory=$true)]
+            [object[]]
+            $InputObject
+        )
+
+        Set-StrictMode -Version 'Latest'
+
+        $list = $InputObject | ForEach-Object { $_.ToString().Substring(0,3) }
+        return $list -join ','
+    }
+
     $scheduleType = $PSCmdlet.ParameterSetName.ToUpperInvariant()
     $modifier = $null
     switch( $PSCmdlet.ParameterSetName )
@@ -338,12 +351,12 @@ function Install-ScheduledTask
             if( $DayOfWeek )
             {
                 [void]$parameters.Add( '/D' )
-                [void]$parameters.Add( (($DayOfWeek | ForEach-Object { $_.ToString().Substring(0,3) }) -join ',') )
+                [void]$parameters.Add( (ConvertTo-SchtasksCalendarNameList $DayOfWeek) )
             }
         }
         'Monthly'
         {
-            $modifier = $Monthly
+            $modifier = 1
             if( $DayOfMonth )
             {
                 [void]$parameters.Add( '/D' )
@@ -354,7 +367,13 @@ function Install-ScheduledTask
         {
             $scheduleType = 'MONTHLY'
             [void]$parameters.Add( '/M' )
-            [void]$parameters.Add( ($Month -join ',') )
+            [void]$parameters.Add( (ConvertTo-SchtasksCalendarNameList $Month) )
+            if( ($Month | Select-Object -Unique | Measure-Object).Count -eq 12 )
+            {
+                Write-Error ('It looks like you''re trying to schedule a monthly task, since you passed all 12 months as the `Month` parameter. Please use the `-Monthly` switch to schedule a monthly task.')
+                return
+            }
+
             if( $DayOfMonth )
             {
                 [void]$parameters.Add( '/D' )
@@ -363,11 +382,12 @@ function Install-ScheduledTask
         }
         'LastDayOfMonth'
         {
+            $modifier = 'LASTDAY'
             $scheduleType = 'MONTHLY'
             [void]$parameters.Add( '/M' )
             if( $Month )
             {
-                [void]$parameters.Add( ($Month -join ',') )
+                [void]$parameters.Add( (ConvertTo-SchtasksCalendarNameList $Month) )
             }
             else
             {

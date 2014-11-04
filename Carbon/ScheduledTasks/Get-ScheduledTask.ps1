@@ -304,6 +304,7 @@ function Get-ScheduledTask
                         $daysOfMonth = $trigger.ScheduleByMonth.DaysOfMonth.ChildNodes | ForEach-Object { $_.InnerText }
                         if( $daysOfMonth -eq 'Last' )
                         {
+                            $interval = $modifier
                             $modifier = 'LastDay'
                             $days = @()
                         }
@@ -311,30 +312,15 @@ function Get-ScheduledTask
                         {
                             $days = $daysOfMonth | ForEach-Object { [int]$_ }
                             $interval = $modifier
-                            switch( $monthsNode.ChildNodes.Count )
+                            # Monthly tasks.
+                            if( $monthsNode.ChildNodes.Count -eq 12 )
                             {
-                                12 { $modifier = 1 }
-                                6 { $modifier = 2 }
-                                4 { $modifier = 3 }
-                                3 { $modifier = 4 }
-                                2 {
-                                    switch( $monthsNode.ChildNodes[0].Name )
-                                    {
-                                        'May' { $modifier = 5 }
-                                        'June' { $modifier = 6 }
-                                    }
-                                }
-                                1 { 
-                                    switch( $monthsNode.ChildNodes[0].Name )
-                                    {
-                                        'July' { $modifier = 7 }
-                                        'August' { $modifier = 8 }
-                                        'September' { $modifier = 9 }
-                                        'October' { $modifier = 10 }
-                                        'November' { $modifier = 11 }
-                                        'December' { $modifier = 12 }
-                                    }
-                                }
+                                $modifier = 1
+                            }
+                            else
+                            {
+                                # Non-monthly tasks.
+                                $modifier = $null
                             }
                         }
 

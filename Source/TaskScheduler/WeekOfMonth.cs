@@ -2,7 +2,7 @@
 {
 	public enum WeekOfMonth
 	{
-		First,
+		First = 1,
 		Second,
 		Third,
 		Fourth,
