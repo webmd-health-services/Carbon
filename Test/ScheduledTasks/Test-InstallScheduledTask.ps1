@@ -32,43 +32,27 @@ function Stop-Test
     Uninstall-ScheduledTask -Name $taskName
 }
 
-function Test-ShouldSchedulePerMinuteTask
+function Test-ShouldSchedulePerMinuteTasks
 {
-    Install-ScheduledTask -Name $taskName -TaskToRun 'notepad' -Credential $credential -Minute 1 -Verbose
-    Assert-ScheduledTask -Name $taskName -TaskToRun 'notepad' -Credential $credential -ScheduleType 'Minute' -Modifier 1
+    Assert-TaskScheduled -InstallArguments @{ Minute = 5 } -AssertArguments @{ ScheduleType = 'Minute'; Modifier = 5 }
+}
 
-    Install-ScheduledTask -Name $taskName -TaskToRun 'notepad' -Credential $credential -Minute 13 -Duration '3:03' -StopAtEnd -Interactive -HighestAvailableRunLevel -Verbose
-    Assert-ScheduledTask -Name $taskName -TaskToRun 'notepad' -Credential $credential -ScheduleType 'Minute' -Modifier 13 -Duration '3:03' -StopAtEnd -Interactive -HighestAvailableRunLevel
+function Test-ShouldScheduleHourlyTasks
+{
+    Assert-TaskScheduled -InstallArguments @{ Hourly = 23 } -AssertArguments @{ ScheduleType = 'Hourly'; Modifier = 23 }
 }
 
 function Test-ShouldScheduleDailyTasks
 {
-    foreach( $scheduleType in @('Minute','Hourly') )
-    {
-        Install-ScheduledTask -Name $taskName -TaskToRun 'notepad' -Credential $credential -ScheduleType $scheduleType -Verbose
-        Assert-ScheduledTask -Name $taskName -TaskToRun 'notepad' -Credential $credential -ScheduleType $scheduleType -Modifier 1
-        Install-ScheduledTask -Name $taskName -TaskToRun 'notepad' -Credential $credential -ScheduleType $scheduleType -Modifier 13 -Verbose
-        Assert-ScheduledTask -Name $taskName -TaskToRun 'notepad' -Credential $credential -ScheduleType $scheduleType -Modifier 13
-    }
+    Assert-TaskScheduled -InstallArguments @{ Daily = 29 } -AssertArguments @{ ScheduleType = 'Daily'; Modifier = 29;  }
 }
 
-function Test-ShouldScheduleDailyTask
+function Test-ShouldScheduleWeeklyTasks
 {
-    Install-ScheduledTask -Name $taskName -TaskToRun 'notepad' -Credential $credential -ScheduleType Daily -Verbose
-    Assert-ScheduledTask -Name $taskName -TaskToRun 'notepad' -Credential $credential -ScheduleType Daily -Modifier 1
-    Install-ScheduledTask -Name $taskName -TaskToRun 'notepad' -Credential $credential -ScheduleType Daily -Modifier 13 -Verbose
-    Assert-ScheduledTask -Name $taskName -TaskToRun 'notepad' -Credential $credential -ScheduleType Daily -Modifier 13
+    Assert-TaskScheduled -InstallArguments @{ Weekly = 39 } -AssertArguments @{ ScheduleType = 'Weekly'; Modifier = 39; Days = (Get-Date).DayOfWeek; }
 }
 
-function Test-ShouldScheduleWeeklyTask
-{
-    Install-ScheduledTask -Name $taskName -TaskToRun 'notepad' -Credential $credential -ScheduleType Weekly -Verbose
-    Assert-ScheduledTask -Name $taskName -TaskToRun 'notepad' -Credential $credential -ScheduleType Weekly -Modifier 1 -Days (Get-Date).DayOfWeek
-
-    Install-ScheduledTask -Name $taskName -TaskToRun 'notepad' -Credential $credential -ScheduleType Weekly -Modifier 13 -Verbose
-    Assert-ScheduledTask -Name $taskName -TaskToRun 'notepad' -Credential $credential -ScheduleType Weekly -Modifier 13 -Days (Get-Date).DayOfWeek
-}
-
+<#
 function Test-ShouldScheduleMonthlyTask
 {
     Install-ScheduledTask -Name $taskName -TaskToRun 'notepad' -Credential $credential -ScheduleType Monthly -Verbose
@@ -169,15 +153,152 @@ function Test-ShouldScheduleEventLogTask
     Install-ScheduledTask -Name $taskName -TaskToRun 'wevtvwr.msc' -ScheduleType OnEvent -EventChannelName System -Modifier '*[Sytem/EventID=101]' -Verbose
     Assert-ScheduledTask -Name $taskName -TaskToRun 'wevtvwr.msc' -ScheduleType 'When an event occurs' -EventChannelName System -Modifier '*[Sytem/EventID=101]'
 }
+#>
 
-function Test-ShouldCreateV1Task
+function Assert-TaskScheduled
 {
-    # Write this.
-    # V1 tasks can't be parsed correctly by Get-ScheduledTask, so it should always force a re-install of the task.
+    param(
+        [hashtable]
+        $InstallArguments,
+
+        [hashtable]
+        $AssertArguments
+    )
+
+    Set-StrictMode -Version Latest
+
+    $InstallArguments['Name'] = $taskName
+    $InstallArguments['TaskToRun'] = 'notepad'
+    #$InstallArguments['Verbose'] = $true
+
+    $AssertArguments['Name'] = $taskName
+    $AssertArguments['TaskToRun'] = 'notepad'
+    #$AssertArguments['Verbose'] = $true
+
+    # Install to run as SYSTEM
+    $task = Install-ScheduledTask -Principal System @InstallArguments
+    Assert-NotNull $task
+    Assert-Is $task ([Carbon.TaskScheduler.TaskInfo])
+    Assert-ScheduledTask -Principal 'System' @AssertArguments 
+
+    $InstallArguments['Credential'] = $credential
+    $AssertArguments['Credential'] = $credential
+
+    $task = Install-ScheduledTask @InstallArguments
+    Assert-NotNull $task
+    Assert-Is $task ([Carbon.TaskScheduler.TaskInfo])
+    Assert-ScheduledTask @AssertArguments 
+
+    # Install to start tomorrow
+    $now = Get-Date
+    # Check interval parameter
+    $intervalSchedules = @( 'Daily', 'Weekly', 'Monthly', 'Month', 'LastDayOfMonth', 'WeekOfMonth', 'Once', 'OnEvent' )
+    foreach( $intervalSchedule in $intervalSchedules )
+    {
+        if( $InstallArguments.ContainsKey( $intervalSchedule ) )
+        {
+            $task = Install-ScheduledTask @InstallArguments -Interval 37
+            Assert-NotNull $task
+            Assert-Is $task ([Carbon.TaskScheduler.TaskInfo])
+            Assert-ScheduledTask @AssertArguments -Interval 37
+            break
+        }
+    }
+
+    $startTimeSchedules = @( 'Daily', 'Weekly', 'Monthly', 'Month', 'LastDayOfMonth', 'WeekOfMonth', 'Once' )
+    foreach( $startTimeSchedule in $startTimeSchedules )
+    {
+        if( $InstallArguments.ContainsKey( $startTimeSchedule ) )
+        {
+            $task = Install-ScheduledTask @InstallArguments -StartTime '23:06'
+            Assert-NotNull $task
+            Assert-Is $task ([Carbon.TaskScheduler.TaskInfo])
+            Assert-ScheduledTask @AssertArguments -StartTime '23:06'
+            break
+        }
+    }
+
+    $task = Install-ScheduledTask @InstallArguments -StartDate $now.AddDays(1)
+    Assert-NotNull $task
+    Assert-Is $task ([Carbon.TaskScheduler.TaskInfo])
+    Assert-ScheduledTask @AssertArguments -StartDate $now.AddDays(1)
+
+    $durationSchedules = @( 'Minute', 'Daily', 'Weekly', 'Monthly', 'LastDayOfMonth', 'WeekOfMonth', 'Once' )
+    foreach( $durationSchedule in $durationSchedules )
+    {
+        if( $InstallArguments.ContainsKey( $durationSchedule ) )
+        {
+            $task = Install-ScheduledTask @InstallArguments -Duration '5:00'
+            Assert-NotNull $task
+            Assert-Is $task ([Carbon.TaskScheduler.TaskInfo])
+            Assert-ScheduledTask @AssertArguments -Duration '5:00'
+            break
+        }
+    }
+
+    $endDateSchedules = @( 'Daily', 'Weekly', 'Monthly', 'LastDayOfMonth', 'WeekOfMonth' )
+    foreach( $endDateSchedule in $endDateSchedules )
+    {
+        if( $InstallArguments.ContainsKey( $endDateSchedule ) )
+        {
+            $task = Install-ScheduledTask @InstallArguments -EndDate (Get-Date).AddYears(1)
+            Assert-NotNull $task
+            Assert-Is $task ([Carbon.TaskScheduler.TaskInfo])
+            Assert-ScheduledTask @AssertArguments -EndDate (Get-Date).AddYears(1)
+            break
+        }
+    }
+
+    $endTimeSchedules = @( 'Minute', 'Hourly', 'Daily', 'Weekly', 'Monthly', 'LastDayOfMonth', 'WeekOfMonth', 'Once' )
+    foreach( $endTimeSchedule in $endTimeSchedules )
+    {
+        if( $InstallArguments.ContainsKey( $endTimeSchedule ) )
+        {
+            $task = Install-ScheduledTask @InstallArguments -EndTime '23:06'
+            Assert-NotNull $task
+            Assert-Is $task ([Carbon.TaskScheduler.TaskInfo])
+            Assert-ScheduledTask @AssertArguments -EndTime '23:06'
+            break
+        }
+    }
+
+    # Install as interactive
+    $task = Install-ScheduledTask @InstallArguments -Interactive
+    Assert-NotNull $task
+    Assert-Is $task ([Carbon.TaskScheduler.TaskInfo])
+    Assert-ScheduledTask @AssertArguments -Interactive
+
+    # Install as no password
+    $task = Install-ScheduledTask @InstallArguments -NoPassword
+    Assert-NotNull $task
+    Assert-Is $task ([Carbon.TaskScheduler.TaskInfo])
+    Assert-ScheduledTask @AssertArguments -NoPassword
+
+    # Install as highest run level
+    $task = Install-ScheduledTask @InstallArguments -HighestAvailableRunLevel
+    Assert-NotNull $task
+    Assert-Is $task ([Carbon.TaskScheduler.TaskInfo])
+    Assert-ScheduledTask @AssertArguments -HighestAvailableRunLevel
+
+    $delaySchedules = @( 'OnStart', 'OnLogon', 'OnEvent' )
+    foreach( $delaySchedule in $delaySchedules )
+    {
+        if( $InstallArguments.ContainsKey( $delaySchedule ) )
+        {
+            $task = Install-ScheduledTask @InstallArguments -Delay '00:01:30'
+            Assert-NotNull $task
+            Assert-Is $task ([Carbon.TaskScheduler.TaskInfo])
+            Assert-ScheduledTask @AssertArguments -Delay '00:01:30'
+            break
+        }
+    }
+
+
 }
 
 function Assert-ScheduledTask
 {
+    [CmdletBinding()]
     param(
         $Name,
         $TaskToRun,
@@ -193,6 +314,7 @@ function Assert-ScheduledTask
         [TimeSpan]
         $StartTime,
         $Interval,
+        [TimeSpan]
         $EndTime,
         [TimeSpan]
         $Duration,
@@ -208,8 +330,6 @@ function Assert-ScheduledTask
         [Switch]
         $NoPassword,
         [Switch]
-        $V1,
-        [Switch]
         $HighestAvailableRunLevel,
         $Delay
     )
@@ -219,11 +339,13 @@ function Assert-ScheduledTask
     Assert-True (Test-ScheduledTask -Name $Name)
 
     $task = Get-ScheduledTask -Name $Name
+    $task | Format-List | Out-String | Write-Verbose
     $schedule = $task.Schedules[0]
+    $schedule | Format-List | Out-String | Write-Verbose
 
     Assert-NotNull $task
-    schtasks /query /fo list /v /tn $task.FullName | Write-Host
-    schtasks /query /xml /tn $task.FullName | Where-Object { $_ } | Write-Host
+    schtasks /query /fo list /v /tn $task.FullName | Write-Verbose
+    schtasks /query /xml /tn $task.FullName | Where-Object { $_ } | Write-Verbose
     Assert-Equal $TaskToRun $task.TaskToRun.Trim()
 
     if( $PSBoundParameters.ContainsKey('Credential') )
@@ -241,20 +363,29 @@ function Assert-ScheduledTask
 
     if( $HighestAvailableRunLevel )
     {
-        Assert-True $task.IsHighestAvailableRunLevel
+        Assert-True $task.HighestAvailableRunLevel
     }
     else
     {
-        Assert-False $task.IsHighestAvailableRunLevel
+        Assert-False $task.HighestAvailableRunLevel
     }
 
     if( $Interactive )
     {
-        Assert-True $task.IsInteractive
+        Assert-True $task.Interactive
     }
     else
     {
-        Assert-False $task.IsInteractive
+        Assert-False $task.Interactive
+    }
+
+    if( $NoPassword )
+    {
+        Assert-True $task.NoPassword
+    }
+    else
+    {
+        Assert-False $task.NoPassword
     }
 
     if( $PSBoundParameters.ContainsKey('ScheduleType') )
@@ -282,10 +413,6 @@ function Assert-ScheduledTask
             Assert-True ($schedule.Days -contains $day) ('Days missing {0}' -f $day)
         }
     }
-    else
-    {
-        Assert-Null $schedule.Days 'Days'
-    }
 
     if( $PSBoundParameters.ContainsKey('Months') )
     {
@@ -298,7 +425,7 @@ function Assert-ScheduledTask
 
     if( $PSBoundParameters.ContainsKey('StartDate') )
     {
-        Assert-Equal $StartDate $schedule.StartDate 'StartDate'
+        Assert-Equal $StartDate.ToString('d') $schedule.StartDate 'StartDate'
     }
     else
     {
@@ -310,10 +437,6 @@ function Assert-ScheduledTask
     {
         Assert-Equal $Duration $schedule.RepeatUntilDuration 'Duration'
     }
-    else
-    {
-        Assert-Equal '' $schedule.RepeatUntilDuration 'Duration'
-    }
 
     if( $StopAtEnd )
     {
@@ -324,4 +447,51 @@ function Assert-ScheduledTask
         Assert-False $schedule.StopAtEnd
     }
 
+    if( $PSBoundParameters.ContainsKey('Interval') )
+    {
+        Assert-Equal $Interval $schedule.Interval 'Interval'
+    }
+    else
+    {
+        if( (@('Daily','Weekly','Monthly') -contains $schedule.ScheduleType) -and ($PSBoundParameters.ContainsKey('EndTime') -or $PSBoundParameters.ContainsKey('Duration')) )
+        {
+            Assert-Equal 10 $schedule.Interval 'Interval'
+        }
+        else
+        {
+            Assert-Equal 0 $schedule.Interval 'Interval'
+        }
+    }
+
+    $today = Get-Date
+    $today = Get-Date -Year $today.Year -Month $today.Month -Day $today.Day -Hour 0 -Minute 0 -Second 0 -Millisecond 0
+
+    if( $PSBoundParameters.ContainsKey('StartTime') )
+    {
+        $expectedStartTime = $today + $StartTime
+        Assert-Equal $expectedStartTime.ToString('h:mm:ss tt') $schedule.StartTime 'StartTime'
+    }
+    else
+    {
+        Assert-Equal $task.CreateDate.ToString('h:mm:00 tt') $schedule.StartTime 'StartTime'
+    }
+
+    if( $PSBoundParameters.ContainsKey('EndTime') )
+    {
+        Assert-Equal $EndTime $schedule.EndTime
+    }
+    else
+    {
+        Assert-Equal ([TimeSpan]::Zero) $schedule.EndTime
+    }
+
+    if( $PSBoundParameters.ContainsKey('EndDate') )
+    {
+        Assert-Equal $EndDate.ToString("d") $schedule.EndDate
+    }
+
+    if( $PSBoundParameters.ContainsKey('Delay') )
+    {
+        Fail 'I don''t know how to check delay.'
+    }
 }

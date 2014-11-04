@@ -21,9 +21,11 @@ function Install-ScheduledTask
     .DESCRIPTION
     The `Install-ScheduledTask` function uses `schtasks.exe` to install a scheduled task on the current computer. If the task exists, and its configuration is different, it is deleted and re-created. If it exists and is unchanged, it is left untouched.
     
-    If a new task is created, or a task is updated/chagne, a `Carbon.TaskScheduler.TaskInfo` is returned.
+    If a new task is created, or a task is updated/change, a `Carbon.TaskScheduler.TaskInfo` is returned.
 
     Run `schtasks.exe /create /?` for further help.
+
+    If you get a `The task XML contains a value which is incorrectly formatted or out of range.`, try creating the scheduled task directly  using the `/V1` switch. 
 
     .LINK
     Get-ScheduledTask
@@ -99,12 +101,6 @@ function Install-ScheduledTask
         [int]
         # Create a scheduled task that runs every N hours.
         $Hourly,
-
-        [Parameter(ParameterSetName='Minute')]
-        [Parameter(ParameterSetName='Hourly')]
-        [TimeSpan]
-        # The duration to run the task.
-        $Duration,
 
         [Parameter(ParameterSetName='Minute')]
         [Parameter(ParameterSetName='Hourly')]
@@ -195,11 +191,13 @@ function Install-ScheduledTask
         [Parameter(ParameterSetName='Daily')]
         [Parameter(ParameterSetName='Weekly')]
         [Parameter(ParameterSetName='Monthly')]
+        [Parameter(ParameterSetName='Month')]
         [Parameter(ParameterSetName='LastDayOfMonth')]
         [Parameter(ParameterSetName='WeekOfMonth')]
         [Parameter(ParameterSetName='Once')]
         [Parameter(ParameterSetName='OnEvent')]
         [ValidateRange(1,599940)]
+        [int]
         # The repetition interval in minutes. Only applies when `ScheduleType` is `Daily`, `Weekly`, `Monthly`, or `Once`.
         $Interval,
 
@@ -207,9 +205,12 @@ function Install-ScheduledTask
         # The date the task can start running.
         $StartDate,
 
+        [Parameter(ParameterSetName='Minute')]
+        [Parameter(ParameterSetName='Hourly')]
         [Parameter(ParameterSetName='Daily')]
         [Parameter(ParameterSetName='Weekly')]
         [Parameter(ParameterSetName='Monthly')]
+        [Parameter(ParameterSetName='Month')]
         [Parameter(ParameterSetName='LastDayOfMonth')]
         [Parameter(ParameterSetName='WeekOfMonth')]
         [Parameter(ParameterSetName='Once',Mandatory=$true)]
@@ -220,35 +221,50 @@ function Install-ScheduledTask
 
         [Parameter(ParameterSetName='Minute')]
         [Parameter(ParameterSetName='Hourly')]
-        [ValidateScript({ $_ -lt [timespan]'1' })]
-        [TimeSpan]
-        # The end time to run the task. Must be less than `24:00`.
-        $EndTime,
-
         [Parameter(ParameterSetName='Daily')]
         [Parameter(ParameterSetName='Weekly')]
         [Parameter(ParameterSetName='Monthly')]
+        [Parameter(ParameterSetName='Month')]
+        [Parameter(ParameterSetName='LastDayOfMonth')]
+        [Parameter(ParameterSetName='WeekOfMonth')]
+        [Parameter(ParameterSetName='Once')]
+        [TimeSpan]
+        # The duration to run the task. Can't be used with `EndTime`.
+        $Duration,
+
+        [Parameter(ParameterSetName='Minute')]
+        [Parameter(ParameterSetName='Hourly')]
+        [Parameter(ParameterSetName='Daily')]
+        [Parameter(ParameterSetName='Weekly')]
+        [Parameter(ParameterSetName='Monthly')]
+        [Parameter(ParameterSetName='Month')]
         [Parameter(ParameterSetName='LastDayOfMonth')]
         [Parameter(ParameterSetName='WeekOfMonth')]
         [DateTime]
         # The last date the task should run.
         $EndDate,
 
+        [Parameter(ParameterSetName='Minute')]
+        [Parameter(ParameterSetName='Hourly')]
+        [Parameter(ParameterSetName='Daily')]
+        [Parameter(ParameterSetName='Weekly')]
+        [Parameter(ParameterSetName='Monthly')]
+        [Parameter(ParameterSetName='Month')]
+        [Parameter(ParameterSetName='LastDayOfMonth')]
+        [Parameter(ParameterSetName='WeekOfMonth')]
+        [Parameter(ParameterSetName='Once')]
+        [ValidateScript({ $_ -lt [timespan]'1' })]
+        [TimeSpan]
+        # The end time to run the task. Must be less than `24:00`. Can't be used with `Duration`.
+        $EndTime,
+
         [Switch]
-        # Enables the task to run interactively only if the user is currently logged on at the time the job runs. The task will only run if the user is logged on.
+        # Enables the task to run interactively only if the user is currently logged on at the time the job runs. The task will only run if the user is logged on. Must be used with `Credential` parameter.
         $Interactive,
 
         [Switch]
-        # No password is stored. The task runs non-interactively as the given user. Only local resources are available.
+        # No password is stored. The task runs non-interactively as the given user, who must be logged in. Only local resources are available. Must be used with `Credential` parameter.
         $NoPassword,
-
-        [Switch]
-        # Marks the task for deletion after its final run.
-        $DeleteAfterFinalRun,
-
-        [Switch]
-        # Creates a task visible to pre-Vista platforms.
-        $V1,
 
         [Switch]
         # Marks the task for deletion after its final run.
@@ -263,7 +279,7 @@ function Install-ScheduledTask
         $Delay,
 
         [PSCredential]
-        # The principal the task should run as. Use `Principal` parameter to run as a built-in security principal.
+        # The principal the task should run as. Use `Principal` parameter to run as a built-in security principal. Required if `Interactive` or `NoPassword` switches are used.
         $Credential,
 
         [ValidateSet('System','LocalService','NetworkService')]
@@ -279,12 +295,6 @@ function Install-ScheduledTask
     Set-StrictMode -Version 'Latest'
 
     #$Name = Join-Path -Path '\' -ChildPath $Name
-
-    if( $DeleteAfterFinalRun -and -not $V1 )
-    {
-        Write-Error ('The -V1 switch is required when using the -DeleteAfterFinalRun switch.')
-        return
-    }
 
     if( (Test-ScheduledTask -Name $Name) )
     {
@@ -392,8 +402,8 @@ function Install-ScheduledTask
 
     if( $modifier )
     {
-        $parameters.Add( '/MO' )
-        $parameters.Add( $modifier )
+        [void]$parameters.Add( '/MO' )
+        [void]$parameters.Add( $modifier )
     }
 
     $parameterNameToSchtasksMap = @{
@@ -408,10 +418,8 @@ function Install-ScheduledTask
                                         'EventChannelName' = '/EC';
                                         'Interactive' = '/IT';
                                         'NoPassword' = '/NP';
-                                        'DeleteAfterFinalRun' = '/Z';
                                         'Force' = '/F';
                                         'Delay' = '/DELAY';
-                                        'V1' = '/V1';
                                   }
 
     foreach( $parameterName in $parameterNameToSchtasksMap.Keys )
@@ -425,7 +433,14 @@ function Install-ScheduledTask
         $value = $PSBoundParameters[$parameterName]
         if( $value -is [timespan] )
         {
-            $value = '{0:00}:{1:00}' -f $value.Hours,$value.Minutes
+            if( $parameterName -eq 'Duration' )
+            {
+                $value = '{0:0000}:{1:00}' -f $value.TotalHours,$value.Minutes
+            }
+            else
+            {
+                $value = '{0:00}:{1:00}' -f $value.Hours,$value.Minutes
+            }
         }
         elseif( $value -is [datetime] )
         {
@@ -438,7 +453,6 @@ function Install-ScheduledTask
         {
             [void]$parameters.Add( $value )
         }
-        Write-Verbose ('{0} {1}' -f $schtasksParamName,$value)
     }
 
     [void]$parameters.Add( '/RL' )
@@ -454,11 +468,19 @@ function Install-ScheduledTask
     $errFile = Join-Path -Path $env:TEMP -ChildPath ('Carbon+Uninstall-ScheduledTask+{0}' -f ([IO.Path]::GetRandomFileName()))
     $originalEap = $ErrorActionPreference
     $ErrorActionPreference = 'Continue'
-    $output = schtasks /create /TN $Name /TR $TaskToRun /sc $scheduleType $parameters 2> $errFile 
+    $paramLogString = $parameters -join ' '
+    if( $Credential )
+    {
+        $paramLogString = $paramLogString -replace ([Text.RegularExpressions.Regex]::Escape($Credential.GetNetworkCredential().Password)),'********'
+    }
+    Write-Verbose ('/TN {0} /TR {1} /SC {2} {3}' -f $Name,$TaskToRun,$scheduleType,$paramLogString)
+    $output = schtasks /create /TN $Name /TR $TaskToRun /SC $scheduleType $parameters 2> $errFile 
     $ErrorActionPreference = $originalEap
 
+    $createFailed = $false
     if( $LASTEXITCODE )
     {
+        $createFailed = $true
         Write-Error (Get-Content -Path $errFile -Raw)
     }
 
@@ -475,5 +497,10 @@ function Install-ScheduledTask
         {
             Write-Verbose $_
         }
+    }
+
+    if( -not $createFailed )
+    {
+        Get-ScheduledTask -Name $Name
     }
 }

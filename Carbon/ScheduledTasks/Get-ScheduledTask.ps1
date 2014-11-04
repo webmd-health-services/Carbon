@@ -214,9 +214,37 @@ function Get-ScheduledTask
                         $csvTask.'Delete Task If Not Rescheduled'
                     )
 
+        $xmlTask = $xmlDoc.Task
+        $principal = $xmlTask.Principals.Principal
+        $isInteractive = $false
+        $noPassword = $false
+        if( $principal | Get-Member 'LogonType' )
+        {
+            $isInteractive = $principal.LogonType -eq 'InteractiveTokenOrPassword'
+            $noPassword = $principal.LogonType -eq 'S4U'
+        }
+
+        $highestRunLevel = $false
+        if( $principal | Get-Member 'RunLevel' )
+        {
+            $highestRunLevel = ($principal.RunLevel -eq 'HighestAvailable')
+        }
+
+        $createDate = [DateTime]::MinValue
+        if( $xmlTask | Get-Member -Name 'RegistrationInfo' )
+        {
+            $regInfo = $xmlTask.RegistrationInfo 
+            if( $regInfo | Get-Member -Name 'Date' )
+            {
+                $createDate = [datetime]$regInfo.Date
+            }
+        }
+
         $task = New-Object -TypeName 'Carbon.TaskScheduler.TaskInfo' -ArgumentList $ctorArgs | 
-                    Add-Member -MemberType NoteProperty -Name IsInteractive -Value ($xmlDoc.Task.Principals.Principal.LogonType -eq 'InteractiveTokenOrPassword') -PassThru |
-                    Add-Member -MemberType NoteProperty -Name IsHighestAvailableRunLevel -Value ($xmlDoc.Task.Principals.Principal.RunLevel -eq 'HighestAvailable') -PassThru
+                    Add-Member -MemberType NoteProperty -Name Interactive -Value $isInteractive -PassThru |
+                    Add-Member -MemberType NoteProperty -Name NoPassword -Value $noPassword -PassThru |
+                    Add-Member -MemberType NoteProperty -Name HighestAvailableRunLevel -Value $highestRunLevel -PassThru |
+                    Add-Member -MemberType NoteProperty -Name CreateDate -Value $createDate -PassThru
 
         $scheduleIdx = 0
         while( $idx -lt $output.Count -and $output[$idx].TaskName -eq $csvTask.TaskName )
@@ -228,15 +256,23 @@ function Get-ScheduledTask
             [Carbon.TaskScheduler.Months]$months = [Carbon.TaskScheduler.Months]::None
             $modifier = $null
             $stopAtEnd = $false
+            [int]$interval = 0
+            [TimeSpan]$endTime = [TimeSpan]::Zero
 
-            $triggers = $xmlDoc.DocumentElement.GetElementsByTagName('Triggers') | Select-Object -First 1
+            $triggers = $xmlTask.GetElementsByTagName('Triggers') | Select-Object -First 1
             if( $triggers -and $triggers.ChildNodes.Count -gt 0 )
             {
                 [Xml.XmlElement]$trigger = $triggers.ChildNodes[$scheduleIdx++]
+                if( $trigger | Get-Member -Name 'EndBoundary' )
+                {
+                    $endDateTime = [datetime]$trigger.EndBoundary
+                    $endTime = New-TimeSpan -Hours $endDateTime.Hour -Minutes $endDateTime.Minute -Seconds $endDateTime.Second
+                }
+
+                $scheduleType,$modifier,$duration,$stopAtEnd = ConvertFrom-RepetitionElement $trigger
                 if( $trigger.Name -eq 'TimeTrigger' )
                 {
                     $days = $null
-                    $scheduleType,$modifier,$duration,$stopAtEnd = ConvertFrom-RepetitionElement $trigger
                 }
                 elseif( $trigger.Name -eq 'CalendarTrigger' )
                 {
@@ -244,10 +280,12 @@ function Get-ScheduledTask
                     {
                         $scheduleType = 'Daily'
                         $modifier = $trigger.ScheduleByDay.DaysInterval
+                        $null,$interval,$null,$null = ConvertFrom-RepetitionElement $trigger
                     }
                     elseif( $trigger.GetElementsByTagName('ScheduleByWeek').Count -eq 1 )
                     {
                         $scheduleType = 'Weekly'
+                        $interval = $modifier
                         $modifier = $trigger.ScheduleByWeek.WeeksInterval
                         [string[]]$days = $trigger.ScheduleByWeek.DaysOfWeek.ChildNodes | ForEach-Object { $_.Name }
                     }
@@ -319,7 +357,9 @@ function Get-ScheduledTask
                                 )
 
             $schedule = New-Object -TypeName 'Carbon.TaskScheduler.ScheduleInfo' -ArgumentList $scheduleCtorArgs |
-                            Add-Member -MemberType NoteProperty -Name 'StopAtEnd' -Value $stopAtEnd -PassThru
+                            Add-Member -MemberType NoteProperty -Name 'StopAtEnd' -Value $stopAtEnd -PassThru |
+                            Add-Member -MemberType NoteProperty -Name 'Interval' -Value $interval -PassThru |
+                            Add-Member -MemberType NoteProperty -Name 'EndTime' -Value $endTime -PassThru
             $task.Schedules.Add( $schedule )
         }
         --$idx;
