@@ -134,8 +134,7 @@ function Install-ScheduledTask
 
         [Parameter(ParameterSetName='Month',Mandatory=$true)]
         [Parameter(ParameterSetName='LastDayOfMonth')]
-        [ValidateRange(1,12)]
-        [Carbon.TaskScheduler.Months[]]
+        [Carbon.TaskScheduler.Month[]]
         # Create a scheduled task that runs on specific months.
         $Month,
 
@@ -154,7 +153,7 @@ function Install-ScheduledTask
         [Parameter(ParameterSetName='WeekOfMonth')]
         [Parameter(ParameterSetName='Weekly')]
         [DayOfWeek[]]
-        # The day of the week to run the task.
+        # The day of the week to run the task. Default is today.
         $DayOfWeek,
 
         [Parameter(ParameterSetName='Once',Mandatory=$true)]
@@ -339,7 +338,7 @@ function Install-ScheduledTask
             if( $DayOfWeek )
             {
                 [void]$parameters.Add( '/D' )
-                [void]$parameters.Add( ($DayOfWeek -join ',') )
+                [void]$parameters.Add( (($DayOfWeek | ForEach-Object { $_.ToString().Substring(0,3) }) -join ',') )
             }
         }
         'Monthly'
@@ -355,14 +354,7 @@ function Install-ScheduledTask
         {
             $scheduleType = 'MONTHLY'
             [void]$parameters.Add( '/M' )
-            if( $Month -eq [Carbon.TaskScheduler.Months]::All )
-            {
-                [void]$parameters.Add( '*' )
-            }
-            else
-            {
-                [void]$parameters.Add( ($Month -join ',') )
-            }
+            [void]$parameters.Add( ($Month -join ',') )
             if( $DayOfMonth )
             {
                 [void]$parameters.Add( '/D' )

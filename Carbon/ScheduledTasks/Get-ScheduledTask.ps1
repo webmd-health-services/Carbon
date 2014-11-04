@@ -195,25 +195,6 @@ function Get-ScheduledTask
         }
         $taskName = Split-Path -Leaf -Path $csvTask.TaskName
 
-        $ctorArgs = @(
-                        $csvTask.HostName,
-                        $taskPath,
-                        $taskName,
-                        $csvTask.'Next Run Time',
-                        $csvTask.Status,
-                        $csvTask.'Logon Mode',
-                        $csvTask.'Last Run Time',
-                        $csvTask.Author,
-                        $csvTask.'Task To Run',
-                        $csvTask.'Start In',
-                        $csvTask.Comment,
-                        $csvTask.'Scheduled Task State',
-                        $csvTask.'Idle Time',
-                        $csvTask.'Power Management',
-                        $csvTask.'Run As User',
-                        $csvTask.'Delete Task If Not Rescheduled'
-                    )
-
         $xmlTask = $xmlDoc.Task
         $principal = $xmlTask.Principals.Principal
         $isInteractive = $false
@@ -240,24 +221,50 @@ function Get-ScheduledTask
             }
         }
 
-        $task = New-Object -TypeName 'Carbon.TaskScheduler.TaskInfo' -ArgumentList $ctorArgs | 
-                    Add-Member -MemberType NoteProperty -Name Interactive -Value $isInteractive -PassThru |
-                    Add-Member -MemberType NoteProperty -Name NoPassword -Value $noPassword -PassThru |
-                    Add-Member -MemberType NoteProperty -Name HighestAvailableRunLevel -Value $highestRunLevel -PassThru |
-                    Add-Member -MemberType NoteProperty -Name CreateDate -Value $createDate -PassThru
+        $ctorArgs = @(
+                        $csvTask.HostName,
+                        $taskPath,
+                        $taskName,
+                        $csvTask.'Next Run Time',
+                        $csvTask.Status,
+                        $csvTask.'Logon Mode',
+                        $csvTask.'Last Run Time',
+                        $csvTask.Author,
+                        $createDate,
+                        $csvTask.'Task To Run',
+                        $csvTask.'Start In',
+                        $csvTask.Comment,
+                        $csvTask.'Scheduled Task State',
+                        $csvTask.'Idle Time',
+                        $csvTask.'Power Management',
+                        $csvTask.'Run As User',
+                        $isInteractive,
+                        $noPassword,
+                        $highestRunLevel,
+                        $csvTask.'Delete Task If Not Rescheduled'
+                    )
+
+        $task = New-Object -TypeName 'Carbon.TaskScheduler.TaskInfo' -ArgumentList $ctorArgs
 
         $scheduleIdx = 0
         while( $idx -lt $output.Count -and $output[$idx].TaskName -eq $csvTask.TaskName )
         {
             $csvTask = $output[$idx++]
             $scheduleType = $csvTask.'Schedule Type'
-            $days = $csvTask.Days
+            [int[]]$days = @()
+            [int]$csvDay = 0
+            if( [int]::TryParse($csvTask.Days, [ref]$csvDay) )
+            {
+                $days = @( $csvDay )
+            }
+
             $duration = $csvTask.'Repeat: Until: Duration'
-            [Carbon.TaskScheduler.Months]$months = [Carbon.TaskScheduler.Months]::None
+            [Carbon.TaskScheduler.Month[]]$months = @()
             $modifier = $null
             $stopAtEnd = $false
             [int]$interval = 0
             [TimeSpan]$endTime = [TimeSpan]::Zero
+            [DayOfWeek[]]$daysOfWeek = @()
 
             $triggers = $xmlTask.GetElementsByTagName('Triggers') | Select-Object -First 1
             if( $triggers -and $triggers.ChildNodes.Count -gt 0 )
@@ -272,7 +279,7 @@ function Get-ScheduledTask
                 $scheduleType,$modifier,$duration,$stopAtEnd = ConvertFrom-RepetitionElement $trigger
                 if( $trigger.Name -eq 'TimeTrigger' )
                 {
-                    $days = $null
+                    $days = @( )
                 }
                 elseif( $trigger.Name -eq 'CalendarTrigger' )
                 {
@@ -287,20 +294,23 @@ function Get-ScheduledTask
                         $scheduleType = 'Weekly'
                         $interval = $modifier
                         $modifier = $trigger.ScheduleByWeek.WeeksInterval
-                        [string[]]$days = $trigger.ScheduleByWeek.DaysOfWeek.ChildNodes | ForEach-Object { $_.Name }
+                        $days = @( )
+                        $daysOfWeek = $trigger.ScheduleByWeek.DaysOfWeek.ChildNodes | ForEach-Object { [DayOfWeek]$_.Name }
                     }
                     elseif( $trigger.GetElementsByTagName('ScheduleByMonth').Count -eq 1 )
                     {
                         $scheduleType = 'Monthly'
                         $monthsNode = $trigger.ScheduleByMonth.Months
-                        $days = $trigger.ScheduleByMonth.DaysOfMonth.ChildNodes | ForEach-Object { $_.InnerText }
-                        if( $days -eq 'Last' )
+                        $daysOfMonth = $trigger.ScheduleByMonth.DaysOfMonth.ChildNodes | ForEach-Object { $_.InnerText }
+                        if( $daysOfMonth -eq 'Last' )
                         {
                             $modifier = 'LastDay'
-                            $days = $null
+                            $days = @()
                         }
                         else
                         {
+                            $days = $daysOfMonth | ForEach-Object { [int]$_ }
+                            $interval = $modifier
                             switch( $monthsNode.ChildNodes.Count )
                             {
                                 12 { $modifier = 1 }
@@ -328,10 +338,7 @@ function Get-ScheduledTask
                             }
                         }
 
-                        foreach( $monthNode in $monthsNode.ChildNodes )
-                        {
-                            $months = $months -bor ([Carbon.TaskScheduler.Months]$monthNode.Name)
-                        }
+                        [Carbon.TaskScheduler.Month[]]$months = $monthsNode.ChildNodes | ForEach-Object { ([Carbon.TaskScheduler.Month]$_.Name) }
                     }
                 }
             }
@@ -345,21 +352,22 @@ function Get-ScheduledTask
                                     $csvTask.'Stop Task If Runs X Hours And X Mins',
                                     $scheduleType,
                                     $modifier,
+                                    $interval,
                                     $csvTask.'Start Time',
                                     $csvTask.'Start Date',
+                                    $endTime,
                                     $csvTask.'End Date',
+                                    $daysOfWeek,
                                     $days,
                                     $months,
                                     $csvTask.'Repeat: Every',
                                     $csvTask.'Repeat: Until: Time',
                                     $duration,
-                                    $csvTask.'Repeat: Stop If Still Running'
+                                    $csvTask.'Repeat: Stop If Still Running',
+                                    $stopAtEnd
                                 )
 
-            $schedule = New-Object -TypeName 'Carbon.TaskScheduler.ScheduleInfo' -ArgumentList $scheduleCtorArgs |
-                            Add-Member -MemberType NoteProperty -Name 'StopAtEnd' -Value $stopAtEnd -PassThru |
-                            Add-Member -MemberType NoteProperty -Name 'Interval' -Value $interval -PassThru |
-                            Add-Member -MemberType NoteProperty -Name 'EndTime' -Value $endTime -PassThru
+            $schedule = New-Object -TypeName 'Carbon.TaskScheduler.ScheduleInfo' -ArgumentList $scheduleCtorArgs 
             $task.Schedules.Add( $schedule )
         }
         --$idx;

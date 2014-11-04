@@ -49,7 +49,22 @@ function Test-ShouldScheduleDailyTasks
 
 function Test-ShouldScheduleWeeklyTasks
 {
-    Assert-TaskScheduled -InstallArguments @{ Weekly = 39 } -AssertArguments @{ ScheduleType = 'Weekly'; Modifier = 39; Days = (Get-Date).DayOfWeek; }
+    Assert-TaskScheduled -InstallArguments @{ Weekly = 39 } -AssertArguments @{ ScheduleType = 'Weekly'; Modifier = 39; DayOfWeek = (Get-Date).DayOfWeek; }
+}
+
+function Test-ShouldScheduleWeeklyTasksOnSpecificDay
+{
+    Assert-TaskScheduled -InstallArguments @{ Weekly = 39; DayOfWeek = 'Sunday'; } -AssertArguments @{ ScheduleType = 'Weekly'; Modifier = 39; DayOfWeek = 'Sunday'; }
+}
+
+function Test-ShouldScheduleWeeklyTasksOnMultipleDays
+{
+    Assert-TaskScheduled -InstallArguments @{ Weekly = 39; DayOfWeek = @('Monday','Tuesday','Wednesday'); } -AssertArguments @{ ScheduleType = 'Weekly'; Modifier = 39; DayOfWeek = @('Monday','Tuesday','Wednesday'); }
+}
+
+function Test-ShouldScheduleMonthlyTasks
+{
+    Assert-TaskScheduled -InstallArguments @{ Monthly = 5 } -AssertArguments @{ ScheduleType = 'Monthly'; Modifier = 5; Days = 1; Month = @( 'May','October' ) }
 }
 
 <#
@@ -307,7 +322,11 @@ function Assert-ScheduledTask
         $TaskXmlPath,
         $ScheduleType,
         $Modifier,
+        [int[]]
         $Days,
+        [DayOfWeek[]]
+        $DayOfWeek,
+        [Carbon.TaskScheduler.Month[]]
         $Months,
         [TimeSpan]
         $IdleTime,
@@ -408,19 +427,29 @@ function Assert-ScheduledTask
 
     if( $PSBoundParameters.ContainsKey('Days') )
     {
-        foreach( $day in $Days )
-        {
-            Assert-True ($schedule.Days -contains $day) ('Days missing {0}' -f $day)
-        }
+        Assert-Equal ($Days -join ',') ($schedule.Days -join ',') 'Days'
+    }
+    else
+    {
+        Assert-Empty $schedule.Days ('Days: {0}' -f ($schedule.Days -join ','))
+    }
+
+    if( $PSBoundParameters.ContainsKey('DayOfWeek') )
+    {
+        Assert-Equal ($DayOfWeek -join ',') ($schedule.DaysOfWeek -join ',') 'DaysOfWeek'
+    }
+    else
+    {
+        Assert-Empty $schedule.DaysOfWeek ('DaysOfWeek: {0}' -f ($schedule.DaysOfWeek -join ','))
     }
 
     if( $PSBoundParameters.ContainsKey('Months') )
     {
-        Assert-Equal ($Months -join ', ') $schedule.Months 'Months'
+        Assert-Equal ($Months -join ', ') ($schedule.Months -join ', ')'Months'
     }
     else
     {
-        Assert-Equal ([Carbon.TaskScheduler.Months]::None) $schedule.Months 'Months'
+        Assert-Empty $schedule.Months ('Months: {0}' -f ($schedule.Months -join ','))
     }
 
     if( $PSBoundParameters.ContainsKey('StartDate') )
