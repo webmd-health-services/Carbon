@@ -177,9 +177,19 @@ function Install-ScheduledTask
         $OnIdle,
 
         [Parameter(ParameterSetName='OnEvent',Mandatory=$true)]
-        [string]
-        # Create a scheduled task that runs when the computer is idle for N minutes.
+        [Switch]
+        # Create a scheduled task that runs when events appear in the Windows event log.
         $OnEvent,
+
+        [Parameter(ParameterSetName='OnEvent',Mandatory=$true)]
+        [string]
+        # The name of the event channel to look at.
+        $EventChannelName,
+
+        [Parameter(ParameterSetName='OnEvent',Mandatory=$true)]
+        [string]
+        # The XPath event query to use to determine when to fire `OnEvent` tasks.
+        $EventXPathQuery,
 
         [Parameter(Mandatory=$true,ParameterSetName='Xml')]
         [string]
@@ -193,7 +203,6 @@ function Install-ScheduledTask
         [Parameter(ParameterSetName='LastDayOfMonth')]
         [Parameter(ParameterSetName='WeekOfMonth')]
         [Parameter(ParameterSetName='Once')]
-        [Parameter(ParameterSetName='OnEvent')]
         [ValidateRange(1,599940)]
         [int]
         # Re-run the task every N minutes.
@@ -429,7 +438,7 @@ function Install-ScheduledTask
         }
         'OnEvent'
         {
-            $modifier = $OnEvent
+            $modifier = $EventXPathQuery
         }
         'TaskXml'
         {

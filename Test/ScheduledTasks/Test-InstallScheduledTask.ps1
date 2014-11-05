@@ -151,12 +151,17 @@ function Test-ShouldScheduleTaskToRunAtLogon
 
 function Test-ShouldScheduleTaskToRunAtStart
 {
-    Assert-TaskScheduled -InstallArguments @{ OnStart = $true; } -AssertArguments @{ ScheduleType = 'OnStart'; } -Verbose
+    Assert-TaskScheduled -InstallArguments @{ OnStart = $true; } -AssertArguments @{ ScheduleType = 'OnStart'; }
 }
 
 function Test-ShouldScheduleTaskToRunOnIdle
 {
-    Assert-TaskScheduled -InstallArguments @{ OnIdle = 999; } -AssertArguments @{ ScheduleType = 'OnIdle'; IdleTime = 999; } -Verbose
+    Assert-TaskScheduled -InstallArguments @{ OnIdle = 999; } -AssertArguments @{ ScheduleType = 'OnIdle'; IdleTime = 999; }
+}
+
+function Test-ShouldScheduleTaskToRunOnEvent
+{
+    Assert-TaskScheduled -InstallArguments @{ OnEvent = $true ; EventChannelName = 'System' ; EventXPathQuery = '*[System/EventID=101]'; } -AssertArguments @{ ScheduleType = 'OnEvent'; Modifier = '*[System/EventID=101]'; EventChannelName = 'System'; }
 }
 
 
@@ -301,7 +306,7 @@ function Assert-TaskScheduled
     # Install to start tomorrow
     $now = Get-Date
     # Check interval parameter
-    $intervalSchedules = @( 'Daily', 'Weekly', 'Monthly', 'Month', 'LastDayOfMonth', 'WeekOfMonth', 'Once', 'OnEvent' )
+    $intervalSchedules = @( 'Daily', 'Weekly', 'Monthly', 'Month', 'LastDayOfMonth', 'WeekOfMonth', 'Once' )
     foreach( $intervalSchedule in $intervalSchedules )
     {
         if( $InstallArguments.ContainsKey( $intervalSchedule ) )
@@ -562,7 +567,7 @@ function Assert-ScheduledTask
     }
     else
     {
-        if( @('OnLogon', 'OnStart', 'OnIdle') -contains $ScheduleType )
+        if( @('OnLogon', 'OnStart', 'OnIdle', 'OnEvent') -contains $ScheduleType )
         {
             Assert-Equal 'N/A' $schedule.StartDate
         }
@@ -613,7 +618,7 @@ function Assert-ScheduledTask
     }
     else
     {
-        if( @('OnLogon', 'OnStart', 'OnIdle') -contains $ScheduleType )
+        if( @('OnLogon', 'OnStart', 'OnIdle', 'OnEvent') -contains $ScheduleType )
         {
             Assert-Equal 'N/A' $schedule.StartTime
         }
@@ -653,5 +658,14 @@ function Assert-ScheduledTask
     else
     {
         Assert-Equal 0 $schedule.IdleTime 'IdleTime'
+    }
+
+    if( $PSBoundParameters.ContainsKey('EventChannelName') )
+    {
+        Assert-Equal $EventChannelName $schedule.EventChannelName
+    }
+    else
+    {
+        Assert-Null $schedule.EventChannelName
     }
 }

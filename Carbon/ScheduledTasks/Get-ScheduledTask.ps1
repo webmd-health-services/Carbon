@@ -276,6 +276,7 @@ function Get-ScheduledTask
             [DayOfWeek[]]$daysOfWeek = @()
             [TimeSpan]$delay = [TimeSpan]::Zero
             [int]$idleTime = 0
+            $eventChannelName = $null
 
             $triggers = $xmlTask.GetElementsByTagName('Triggers') | Select-Object -First 1
             if( $triggers -and $triggers.ChildNodes.Count -gt 0 )
@@ -320,6 +321,14 @@ function Get-ScheduledTask
                     {
                         $idleTime = $Matches[1]
                     }
+                }
+                elseif( $trigger.Name -eq 'EventTrigger' )
+                {
+                    $scheduleType = 'OnEvent'
+                    $subscription = [xml]$trigger.Subscription
+                    $selectNode = $subscription.QueryList.Query.Select
+                    $modifier = $selectNode.InnerText
+                    $eventChannelName = $selectNode.GetAttribute('Path')
                 }
                 elseif( $trigger.Name -eq 'CalendarTrigger' )
                 {
@@ -411,7 +420,8 @@ function Get-ScheduledTask
 
             $schedule = New-Object -TypeName 'Carbon.TaskScheduler.ScheduleInfo' -ArgumentList $scheduleCtorArgs |
                             Add-Member -MemberType NoteProperty -Name 'Delay' -Value $delay -PassThru |
-                            Add-Member -MemberType NoteProperty -Name 'IdleTime' -Value $idleTime -PassThru
+                            Add-Member -MemberType NoteProperty -Name 'IdleTime' -Value $idleTime -PassThru |
+                            Add-Member -MemberType NoteProperty -Name 'EventChannelName' -Value $eventChannelName -PassThru
             $task.Schedules.Add( $schedule )
         }
         --$idx;
