@@ -154,6 +154,11 @@ function Test-ShouldScheduleTaskToRunAtStart
     Assert-TaskScheduled -InstallArguments @{ OnStart = $true; } -AssertArguments @{ ScheduleType = 'OnStart'; } -Verbose
 }
 
+function Test-ShouldScheduleTaskToRunOnIdle
+{
+    Assert-TaskScheduled -InstallArguments @{ OnIdle = 999; } -AssertArguments @{ ScheduleType = 'OnIdle'; IdleTime = 999; } -Verbose
+}
+
 
 <#
 function Test-ShouldScheduleMonthlyTask
@@ -427,7 +432,7 @@ function Assert-ScheduledTask
         $DayOfWeek,
         [Carbon.TaskScheduler.Month[]]
         $Months,
-        [TimeSpan]
+        [int]
         $IdleTime,
         [TimeSpan]
         $StartTime,
@@ -557,7 +562,7 @@ function Assert-ScheduledTask
     }
     else
     {
-        if( @('OnLogon', 'OnStart') -contains $ScheduleType )
+        if( @('OnLogon', 'OnStart', 'OnIdle') -contains $ScheduleType )
         {
             Assert-Equal 'N/A' $schedule.StartDate
         }
@@ -608,7 +613,7 @@ function Assert-ScheduledTask
     }
     else
     {
-        if( @('OnLogon', 'OnStart') -contains $ScheduleType )
+        if( @('OnLogon', 'OnStart', 'OnIdle') -contains $ScheduleType )
         {
             Assert-Equal 'N/A' $schedule.StartTime
         }
@@ -639,5 +644,14 @@ function Assert-ScheduledTask
     else
     {
         Assert-Equal ([TimeSpan]::Zero) $schedule.Delay 'Delay'
+    }
+
+    if( $PSBoundParameters.ContainsKey('IdleTime') )
+    {
+        Assert-Equal $IdleTime $schedule.IdleTime 'IdleTime'
+    }
+    else
+    {
+        Assert-Equal 0 $schedule.IdleTime 'IdleTime'
     }
 }

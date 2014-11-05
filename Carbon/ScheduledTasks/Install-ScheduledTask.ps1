@@ -421,6 +421,12 @@ function Install-ScheduledTask
                 }
             }
         }
+        'OnIdle'
+        {
+            $scheduleType = 'ONIDLE'
+            [void]$parameters.Add( '/I' )
+            [void]$parameters.Add( $OnIdle )
+        }
         'OnEvent'
         {
             $modifier = $OnEvent
@@ -437,7 +443,6 @@ function Install-ScheduledTask
     }
 
     $parameterNameToSchtasksMap = @{
-                                        'IdleTime' = '/I';
                                         'StartTime' = '/ST';
                                         'Interval' = '/RI';
                                         'EndTime' = '/ET';

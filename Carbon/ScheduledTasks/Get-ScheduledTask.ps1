@@ -275,6 +275,7 @@ function Get-ScheduledTask
             [TimeSpan]$endTime = [TimeSpan]::Zero
             [DayOfWeek[]]$daysOfWeek = @()
             [TimeSpan]$delay = [TimeSpan]::Zero
+            [int]$idleTime = 0
 
             $triggers = $xmlTask.GetElementsByTagName('Triggers') | Select-Object -First 1
             if( $triggers -and $triggers.ChildNodes.Count -gt 0 )
@@ -308,6 +309,17 @@ function Get-ScheduledTask
                     $scheduleType = 'OnStart'
                     $interval = 0
                     $modifier = $null
+                }
+                elseif( $trigger.Name -eq 'IdleTrigger' )
+                {
+                    $scheduleType = 'OnIdle'
+                    $interval = 0
+                    $modifier = $null
+                    $idleExpression = $xmlTask.Settings.IdleSettings.Duration
+                    if( $idleExpression -match '^PT(\d+)M$' )
+                    {
+                        $idleTime = $Matches[1]
+                    }
                 }
                 elseif( $trigger.Name -eq 'CalendarTrigger' )
                 {
@@ -398,7 +410,8 @@ function Get-ScheduledTask
                                 )
 
             $schedule = New-Object -TypeName 'Carbon.TaskScheduler.ScheduleInfo' -ArgumentList $scheduleCtorArgs |
-                            Add-Member -MemberType NoteProperty -Name 'Delay' -Value $delay -PassThru
+                            Add-Member -MemberType NoteProperty -Name 'Delay' -Value $delay -PassThru |
+                            Add-Member -MemberType NoteProperty -Name 'IdleTime' -Value $idleTime -PassThru
             $task.Schedules.Add( $schedule )
         }
         --$idx;
