@@ -196,7 +196,7 @@ function Install-ScheduledTask
         [Parameter(ParameterSetName='OnEvent')]
         [ValidateRange(1,599940)]
         [int]
-        # The repetition interval in minutes. Only applies when `ScheduleType` is `Daily`, `Weekly`, `Monthly`, or `Once`.
+        # Re-run the task every N minutes.
         $Interval,
 
         [DateTime]
@@ -227,7 +227,7 @@ function Install-ScheduledTask
         [Parameter(ParameterSetName='WeekOfMonth')]
         [Parameter(ParameterSetName='Once')]
         [TimeSpan]
-        # The duration to run the task. Can't be used with `EndTime`.
+        # The duration to run the task. Usually used with `Interval` to repeatedly run a task over a given time span. By default, re-runs for an hour. Can't be used with `EndTime`.
         $Duration,
 
         [Parameter(ParameterSetName='Minute')]

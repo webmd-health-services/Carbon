@@ -139,6 +139,11 @@ function Test-ShouldScheduleWeekOfMonthTasksOnEachWeek
     }
 }
 
+function Test-ShouldScheduleTaskToRunOnce
+{
+    Assert-TaskScheduled -InstallArguments @{ Once = $true; StartTime = '3:03' } -AssertArguments @{ ScheduleType = 'Once'; StartTime = '3:03'; }
+}
+
 <#
 function Test-ShouldScheduleMonthlyTask
 {
@@ -284,24 +289,27 @@ function Assert-TaskScheduled
     {
         if( $InstallArguments.ContainsKey( $intervalSchedule ) )
         {
-            $task = Install-ScheduledTask @InstallArguments -Interval 37
+            $task = Install-ScheduledTask @InstallArguments -Interval 37 
             Assert-NotNull $task
             Assert-Is $task ([Carbon.TaskScheduler.TaskInfo])
-            Assert-ScheduledTask @AssertArguments -Interval 37
+            Assert-ScheduledTask @AssertArguments -Interval 37 
             break
         }
     }
 
-    $startTimeSchedules = @( 'Daily', 'Weekly', 'Monthly', 'Month', 'LastDayOfMonth', 'WeekOfMonth', 'Once' )
-    foreach( $startTimeSchedule in $startTimeSchedules )
+    if( -not $InstallArguments.ContainsKey('StartTime') )
     {
-        if( $InstallArguments.ContainsKey( $startTimeSchedule ) )
+        $startTimeSchedules = @( 'Daily', 'Weekly', 'Monthly', 'Month', 'LastDayOfMonth', 'WeekOfMonth', 'Once' )
+        foreach( $startTimeSchedule in $startTimeSchedules )
         {
-            $task = Install-ScheduledTask @InstallArguments -StartTime '23:06'
-            Assert-NotNull $task
-            Assert-Is $task ([Carbon.TaskScheduler.TaskInfo])
-            Assert-ScheduledTask @AssertArguments -StartTime '23:06'
-            break
+            if( $InstallArguments.ContainsKey( $startTimeSchedule ) )
+            {
+                $task = Install-ScheduledTask @InstallArguments -StartTime '23:06'
+                Assert-NotNull $task
+                Assert-Is $task ([Carbon.TaskScheduler.TaskInfo])
+                Assert-ScheduledTask @AssertArguments -StartTime '23:06'
+                break
+            }
         }
     }
 
@@ -315,10 +323,10 @@ function Assert-TaskScheduled
     {
         if( $InstallArguments.ContainsKey( $durationSchedule ) )
         {
-            $task = Install-ScheduledTask @InstallArguments -Duration '5:00'
+            $task = Install-ScheduledTask @InstallArguments -Duration '5:00' 
             Assert-NotNull $task
             Assert-Is $task ([Carbon.TaskScheduler.TaskInfo])
-            Assert-ScheduledTask @AssertArguments -Duration '5:00'
+            Assert-ScheduledTask @AssertArguments -Duration '5:00' 
             break
         }
     }
@@ -554,7 +562,7 @@ function Assert-ScheduledTask
     }
     else
     {
-        if( (@('Daily','Weekly','Monthly') -contains $schedule.ScheduleType) -and ($PSBoundParameters.ContainsKey('EndTime') -or $PSBoundParameters.ContainsKey('Duration')) )
+        if( (@('Daily','Weekly','Monthly','Once') -contains $schedule.ScheduleType) -and ($PSBoundParameters.ContainsKey('EndTime') -or $PSBoundParameters.ContainsKey('Duration')) )
         {
             Assert-Equal 10 $schedule.Interval 'Interval'
         }

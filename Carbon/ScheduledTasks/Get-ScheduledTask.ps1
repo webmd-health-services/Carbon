@@ -251,6 +251,7 @@ function Get-ScheduledTask
         {
             $csvTask = $output[$idx++]
             $scheduleType = $csvTask.'Schedule Type'
+
             [int[]]$days = @()
             [int]$csvDay = 0
             if( [int]::TryParse($csvTask.Days, [ref]$csvDay) )
@@ -280,6 +281,12 @@ function Get-ScheduledTask
                 if( $trigger.Name -eq 'TimeTrigger' )
                 {
                     $days = @( )
+                    if( $csvTask.'Schedule Type' -like 'One Time Only*' )
+                    {
+                        $scheduleType = 'Once'
+                        $interval = $modifier
+                        $modifier = $null
+                    }
                 }
                 elseif( $trigger.Name -eq 'CalendarTrigger' )
                 {
