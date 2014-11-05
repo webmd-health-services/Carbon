@@ -146,7 +146,12 @@ function Test-ShouldScheduleTaskToRunOnce
 
 function Test-ShouldScheduleTaskToRunAtLogon
 {
-    Assert-TaskScheduled -InstallArguments @{ OnLogon = $true; } -AssertArguments @{ ScheduleType = 'OnLogon'; } -Verbose
+    Assert-TaskScheduled -InstallArguments @{ OnLogon = $true; } -AssertArguments @{ ScheduleType = 'OnLogon'; }
+}
+
+function Test-ShouldScheduleTaskToRunAtStart
+{
+    Assert-TaskScheduled -InstallArguments @{ OnStart = $true; } -AssertArguments @{ ScheduleType = 'OnStart'; } -Verbose
 }
 
 
@@ -552,7 +557,7 @@ function Assert-ScheduledTask
     }
     else
     {
-        if( $ScheduleType -eq 'OnLogon' )
+        if( @('OnLogon', 'OnStart') -contains $ScheduleType )
         {
             Assert-Equal 'N/A' $schedule.StartDate
         }
@@ -603,7 +608,7 @@ function Assert-ScheduledTask
     }
     else
     {
-        if( $ScheduleType -eq 'OnLogon' )
+        if( @('OnLogon', 'OnStart') -contains $ScheduleType )
         {
             Assert-Equal 'N/A' $schedule.StartTime
         }

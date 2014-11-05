@@ -303,6 +303,12 @@ function Get-ScheduledTask
                     $interval = 0
                     $modifier = $null
                 }
+                elseif( $trigger.Name -eq 'BootTrigger' )
+                {
+                    $scheduleType = 'OnStart'
+                    $interval = 0
+                    $modifier = $null
+                }
                 elseif( $trigger.Name -eq 'CalendarTrigger' )
                 {
                     if( $trigger.GetElementsByTagName('ScheduleByDay').Count -eq 1 )
