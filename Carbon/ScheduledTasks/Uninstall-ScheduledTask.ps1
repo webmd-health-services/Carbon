@@ -77,6 +77,6 @@ function Uninstall-ScheduledTask
 
     if( $LASTEXITCODE )
     {
-        Write-Error (Get-Content -Path $errFile -Raw)
+        Write-Error ((Get-Content -Path $errFile) -join ([Environment]::NewLine))
     }
 }

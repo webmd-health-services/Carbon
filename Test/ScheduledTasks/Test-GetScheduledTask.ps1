@@ -62,20 +62,7 @@ function Test-ShouldGetSchedules
         foreach( $expectedSchedule in $expectedSchedules )
         {
             $actualSchedule = $multiScheduleTask.Schedules[$scheduleIdx++]
-            foreach( $property in (Get-Member -InputObject $expectedSchedule -MemberType NoteProperty) )
-            {
-                $columnName = $property.Name
-                if( $taskProps -contains $columnName )
-                {
-                    continue
-                }
-
-                $propertyName = $columnName -replace '[^A-Za-z0-9_]',''
-
-                $failMsg = '{0}.Schedules[{1}]; column {2}; property {3}' -f $multiScheduleTask.FullName,($scheduleIdx - 1),$columnName,$propertyName
-                Assert-NotNull ($actualSchedule | Get-Member -Name $propertyName) $failMsg
-                Assert-Equal $expectedSchedule.$columnName $actualSchedule.$propertyName $failMsg
-            }        
+            Assert-Is $actualSchedule ([Carbon.TaskScheduler.ScheduleInfo])
         }
     }
 }

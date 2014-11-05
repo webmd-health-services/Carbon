@@ -90,22 +90,22 @@ function Test-ShouldScheduleLastDayOfTheMonthTaskInSpecificMonths
 
 function Test-ShouldScheduleForSpecificMonth
 {
-    Assert-TaskScheduled -InstallArguments @{ Month = @( 'January' ); } -AssertArguments @{ ScheduleType = 'Monthly'; Month = @( 'January' ); DayOfMonth = 1; }
+    Assert-TaskScheduled -InstallArguments @{ Month = @( 'January' ); DayOfMonth = 1; } -AssertArguments @{ ScheduleType = 'Monthly'; Month = @( 'January' ); DayOfMonth = 1; }
 }
 
 function Test-ShouldScheduleForSpecificMonthWithInteger
 {
-    Assert-TaskScheduled -InstallArguments @{ Month = @( 1 ); } -AssertArguments @{ ScheduleType = 'Monthly'; Month = @( 'January' ); DayOfMonth = 1; }
+    Assert-TaskScheduled -InstallArguments @{ Month = @( 1 ); DayOfMonth = 19; } -AssertArguments @{ ScheduleType = 'Monthly'; Month = @( 'January' ); DayOfMonth = 19; }
 }
 
 function Test-ShouldScheduleForSpecificMonths
 {
-    Assert-TaskScheduled -InstallArguments @{ Month = @( 'January','April','July','October' ); } -AssertArguments @{ ScheduleType = 'Monthly'; Month = @( 'January','April','July','October' ); DayOfMonth = 1; }
+    Assert-TaskScheduled -InstallArguments @{ Month = @( 'January','April','July','October' ); DayOfMonth = 23; } -AssertArguments @{ ScheduleType = 'Monthly'; Month = @( 'January','April','July','October' ); DayOfMonth = 23; }
 }
 
-function Test-ShouldNotScheuleMonthlyTaskWithMonthParameter
+function Test-ShouldNotScheduleMonthlyTaskWithMonthParameter
 {
-    $result = Install-ScheduledTask -Name $taskName -Principal LocalService -TaskToRun 'notepad' -Month $AllMonths -ErrorAction SilentlyContinue
+    $result = Install-ScheduledTask -Name $taskName -Principal LocalService -TaskToRun 'notepad' -Month $AllMonths -DayOfMonth 17 -ErrorAction SilentlyContinue
     Assert-Error -Last -Regex 'to schedule a monthly task'
     Assert-Null $result
     Assert-False (Test-ScheduledTask -Name $taskName)
@@ -284,10 +284,10 @@ function Assert-TaskScheduled
     {
         if( $InstallArguments.ContainsKey( $intervalSchedule ) )
         {
-            $task = Install-ScheduledTask @InstallArguments -Interval 37 -Verbose
+            $task = Install-ScheduledTask @InstallArguments -Interval 37
             Assert-NotNull $task
             Assert-Is $task ([Carbon.TaskScheduler.TaskInfo])
-            Assert-ScheduledTask @AssertArguments -Interval 37 -Verbose
+            Assert-ScheduledTask @AssertArguments -Interval 37
             break
         }
     }
@@ -531,7 +531,7 @@ function Assert-ScheduledTask
     else
     {
         $today = Get-Date
-        Assert-Equal (Get-Date -Year $today.Year -Month $today.Month -Day $today.Day -Hour 0 -Minute 0 -Second 0 -Millisecond 0) $Schedule.StartDate 'StartDate'
+        Assert-Equal (Get-Date -Year $today.Year -Month $today.Month -Day $today.Day -Hour 0 -Minute 0 -Second 0).ToString('d') $Schedule.StartDate 'StartDate'
     }
 
     if( $PSBoundParameters.ContainsKey('Duration') )
@@ -565,7 +565,7 @@ function Assert-ScheduledTask
     }
 
     $today = Get-Date
-    $today = Get-Date -Year $today.Year -Month $today.Month -Day $today.Day -Hour 0 -Minute 0 -Second 0 -Millisecond 0
+    $today = Get-Date -Year $today.Year -Month $today.Month -Day $today.Day -Hour 0 -Minute 0 -Second 0
 
     if( $PSBoundParameters.ContainsKey('StartTime') )
     {

@@ -154,7 +154,7 @@ function Get-ScheduledTask
     {
         if( (Test-Path -Path $errFile -PathType Leaf) )
         {
-            $error = Get-Content -Path $errFile -Raw
+            $error = (Get-Content -Path $errFile) -join ([Environment]::NewLine)
             try
             {
                 if( $error -like '*The system cannot find the file specified.*' )
@@ -269,7 +269,7 @@ function Get-ScheduledTask
             $triggers = $xmlTask.GetElementsByTagName('Triggers') | Select-Object -First 1
             if( $triggers -and $triggers.ChildNodes.Count -gt 0 )
             {
-                [Xml.XmlElement]$trigger = $triggers.ChildNodes[$scheduleIdx++]
+                [Xml.XmlElement]$trigger = $triggers.ChildNodes.Item($scheduleIdx++)
                 if( $trigger | Get-Member -Name 'EndBoundary' )
                 {
                     $endDateTime = [datetime]$trigger.EndBoundary

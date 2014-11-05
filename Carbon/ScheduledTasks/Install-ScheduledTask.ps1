@@ -138,10 +138,10 @@ function Install-ScheduledTask
         $Month,
 
         [Parameter(ParameterSetName='Monthly')]
-        [Parameter(ParameterSetName='Month')]
+        [Parameter(ParameterSetName='Month',Mandatory=$true)]
         [ValidateRange(1,31)]
         [int]
-        # The day of the month to run a monthly task. Default is 1 (i.e. the first day of the month).
+        # The day of the month to run a monthly task.
         $DayOfMonth,
 
         [Parameter(ParameterSetName='WeekOfMonth',Mandatory=$true)]
@@ -276,7 +276,7 @@ function Install-ScheduledTask
         # The wait time to delay the running of the task after the trigger is fired.  Must be less than 10,000 minutes (6 days, 22 hours, and 40 minutes).
         $Delay,
 
-        [PSCredential]
+        [Management.Automation.PSCredential]
         # The principal the task should run as. Use `Principal` parameter to run as a built-in security principal. Required if `Interactive` or `NoPassword` switches are used.
         $Credential,
 
@@ -502,7 +502,7 @@ function Install-ScheduledTask
     if( $LASTEXITCODE )
     {
         $createFailed = $true
-        Write-Error (Get-Content -Path $errFile -Raw)
+        Write-Error ((Get-Content -Path $errFile) -join ([Environment]::NewLine))
     }
 
     $output | ForEach-Object { 
