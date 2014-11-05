@@ -199,6 +199,15 @@ function Install-ScheduledTask
         # Re-run the task every N minutes.
         $Interval,
 
+        [Parameter(ParameterSetName='Minute')]
+        [Parameter(ParameterSetName='Hourly')]
+        [Parameter(ParameterSetName='Daily')]
+        [Parameter(ParameterSetName='Weekly')]
+        [Parameter(ParameterSetName='Monthly')]
+        [Parameter(ParameterSetName='Month')]
+        [Parameter(ParameterSetName='LastDayOfMonth')]
+        [Parameter(ParameterSetName='WeekOfMonth')]
+        [Parameter(ParameterSetName='Once')]
         [DateTime]
         # The date the task can start running.
         $StartDate,
@@ -272,7 +281,7 @@ function Install-ScheduledTask
         [Parameter(ParameterSetName='OnLogon')]
         [Parameter(ParameterSetName='OnEvent')]
         [ValidateScript({ $_ -lt '6:22:40:00'})]
-        [string]
+        [timespan]
         # The wait time to delay the running of the task after the trigger is fired.  Must be less than 10,000 minutes (6 days, 22 hours, and 40 minutes).
         $Delay,
 
@@ -457,6 +466,11 @@ function Install-ScheduledTask
             if( $parameterName -eq 'Duration' )
             {
                 $value = '{0:0000}:{1:00}' -f $value.TotalHours,$value.Minutes
+            }
+            elseif( $parameterName -eq 'Delay' )
+            {
+                $totalMinutes = ($value.Days * 24 * 60) + ($value.Hours * 60) + $value.Minutes
+                $value = '{0:0000}:{1:00}' -f $totalMinutes,$value.Seconds
             }
             else
             {

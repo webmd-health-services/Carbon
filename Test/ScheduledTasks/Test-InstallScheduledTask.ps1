@@ -144,6 +144,12 @@ function Test-ShouldScheduleTaskToRunOnce
     Assert-TaskScheduled -InstallArguments @{ Once = $true; StartTime = '3:03' } -AssertArguments @{ ScheduleType = 'Once'; StartTime = '3:03'; }
 }
 
+function Test-ShouldScheduleTaskToRunAtLogon
+{
+    Assert-TaskScheduled -InstallArguments @{ OnLogon = $true; } -AssertArguments @{ ScheduleType = 'OnLogon'; } -Verbose
+}
+
+
 <#
 function Test-ShouldScheduleMonthlyTask
 {
@@ -249,6 +255,7 @@ function Test-ShouldScheduleEventLogTask
 
 function Assert-TaskScheduled
 {
+    [CmdletBinding()]
     param(
         [hashtable]
         $InstallArguments,
@@ -261,11 +268,11 @@ function Assert-TaskScheduled
 
     $InstallArguments['Name'] = $taskName
     $InstallArguments['TaskToRun'] = 'notepad'
-    #$InstallArguments['Verbose'] = $true
+    $InstallArguments['Verbose'] = ($VerbosePreference -eq 'Continue')
 
     $AssertArguments['Name'] = $taskName
     $AssertArguments['TaskToRun'] = 'notepad'
-    #$AssertArguments['Verbose'] = $true
+    $AssertArguments['Verbose'] = ($VerbosePreference -eq 'Continue')
 
     # Install to run as SYSTEM
     $task = Install-ScheduledTask -Principal System @InstallArguments
@@ -313,20 +320,27 @@ function Assert-TaskScheduled
         }
     }
 
-    $task = Install-ScheduledTask @InstallArguments -StartDate $now.AddDays(1)
-    Assert-NotNull $task
-    Assert-Is $task ([Carbon.TaskScheduler.TaskInfo])
-    Assert-ScheduledTask @AssertArguments -StartDate $now.AddDays(1)
+    $startDateSchedules =  @( 'Minute','Daily', 'Weekly', 'Monthly', 'Month', 'LastDayOfMonth', 'WeekOfMonth', 'Once' )
+    foreach( $startDateSchedule in $startDateSchedules )
+    {
+        if( $InstallArguments.ContainsKey( $startDateSchedule ) )
+        {
+            $task = Install-ScheduledTask @InstallArguments -StartDate $now.AddDays(1)
+            Assert-NotNull $task
+            Assert-Is $task ([Carbon.TaskScheduler.TaskInfo])
+            Assert-ScheduledTask @AssertArguments -StartDate $now.AddDays(1)
+        }
+    }
 
     $durationSchedules = @( 'Minute', 'Daily', 'Weekly', 'Monthly', 'LastDayOfMonth', 'WeekOfMonth', 'Once' )
     foreach( $durationSchedule in $durationSchedules )
     {
         if( $InstallArguments.ContainsKey( $durationSchedule ) )
         {
-            $task = Install-ScheduledTask @InstallArguments -Duration '5:00' 
+            $task = Install-ScheduledTask @InstallArguments -Duration '5:30'  # Using fractional hours to ensure it gets converted properly.
             Assert-NotNull $task
             Assert-Is $task ([Carbon.TaskScheduler.TaskInfo])
-            Assert-ScheduledTask @AssertArguments -Duration '5:00' 
+            Assert-ScheduledTask @AssertArguments -Duration '5:30' 
             break
         }
     }
@@ -380,10 +394,10 @@ function Assert-TaskScheduled
     {
         if( $InstallArguments.ContainsKey( $delaySchedule ) )
         {
-            $task = Install-ScheduledTask @InstallArguments -Delay '00:01:30'
+            $task = Install-ScheduledTask @InstallArguments -Delay '6.22:39:59'
             Assert-NotNull $task
             Assert-Is $task ([Carbon.TaskScheduler.TaskInfo])
-            Assert-ScheduledTask @AssertArguments -Delay '00:01:30'
+            Assert-ScheduledTask @AssertArguments -Delay '6.22:39:59'
             break
         }
     }
@@ -538,8 +552,15 @@ function Assert-ScheduledTask
     }
     else
     {
-        $today = Get-Date
-        Assert-Equal (Get-Date -Year $today.Year -Month $today.Month -Day $today.Day -Hour 0 -Minute 0 -Second 0).ToString('d') $Schedule.StartDate 'StartDate'
+        if( $ScheduleType -eq 'OnLogon' )
+        {
+            Assert-Equal 'N/A' $schedule.StartDate
+        }
+        else
+        {
+            $today = Get-Date
+            Assert-Equal (Get-Date -Year $today.Year -Month $today.Month -Day $today.Day -Hour 0 -Minute 0 -Second 0).ToString('d') $Schedule.StartDate 'StartDate'
+        }
     }
 
     if( $PSBoundParameters.ContainsKey('Duration') )
@@ -582,7 +603,14 @@ function Assert-ScheduledTask
     }
     else
     {
-        Assert-Equal $task.CreateDate.ToString('h:mm:00 tt') $schedule.StartTime 'StartTime'
+        if( $ScheduleType -eq 'OnLogon' )
+        {
+            Assert-Equal 'N/A' $schedule.StartTime
+        }
+        else
+        {
+            Assert-Equal $task.CreateDate.ToString('h:mm:00 tt') $schedule.StartTime 'StartTime'
+        }
     }
 
     if( $PSBoundParameters.ContainsKey('EndTime') )
@@ -601,6 +629,10 @@ function Assert-ScheduledTask
 
     if( $PSBoundParameters.ContainsKey('Delay') )
     {
-        Fail 'I don''t know how to check delay.'
+        Assert-Equal $Delay $schedule.Delay 'Delay'
+    }
+    else
+    {
+        Assert-Equal ([TimeSpan]::Zero) $schedule.Delay 'Delay'
     }
 }

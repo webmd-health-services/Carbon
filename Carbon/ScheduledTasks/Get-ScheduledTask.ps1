@@ -69,64 +69,72 @@ function Get-ScheduledTask
 
         Set-StrictMode -Version 'Latest'
 
-        if( $TriggerElement.GetElementsByTagName('Repetition').Count -eq 0 )
-        {
-            return
-        }
-
         $scheduleType = $null
         $interval = $null
         $duration = $null
         $stopAtEnd = $false
+        [TimeSpan]$delay = [TimeSpan]::Zero
 
-        $repetition = $TriggerElement.Repetition
-
-        $interval = $repetition.Interval
-        if( $interval -match 'PT(\d+)(.*)$' )
+        if( $TriggerElement.GetElementsByTagName('Repetition').Count -gt 0 )
         {
-            $modifier = $Matches[1]
-            $unit = $Matches[2]
+            $repetition = $TriggerElement.Repetition
 
-            $hour = 0
-            $minute = 0
-            $second = 0
-            switch( $unit )
+            $interval = $repetition.Interval
+            if( $interval -match 'PT(\d+)(.*)$' )
             {
-                'H' { $hour = $modifier }
-                'M' { $minute = $modifier }
-            }
+                $modifier = $Matches[1]
+                $unit = $Matches[2]
 
-            $scheduleTypes = @{
-                                    'H' = 'Hourly';
-                                    'M' = 'Minute';
-                              }
-            $scheduleType = $scheduleTypes[$unit]
-            $timespan = New-Object 'TimeSpan' $hour,$minute,$second
-            switch( $scheduleType )
-            {
-                'Hourly' { $modifier = $timespan.TotalHours }
-                'Minute' { $modifier = $timespan.TotalMinutes }
+                $hour = 0
+                $minute = 0
+                $second = 0
+                switch( $unit )
+                {
+                    'H' { $hour = $modifier }
+                    'M' { $minute = $modifier }
+                }
+
+                $scheduleTypes = @{
+                                        'H' = 'Hourly';
+                                        'M' = 'Minute';
+                                  }
+                $scheduleType = $scheduleTypes[$unit]
+                $timespan = New-Object 'TimeSpan' $hour,$minute,$second
+                switch( $scheduleType )
+                {
+                    'Hourly' { $modifier = $timespan.TotalHours }
+                    'Minute' { $modifier = $timespan.TotalMinutes }
+                }
             }
-        }
         
-        if( $repetition | Get-Member -Name 'Duration' )
-        {
-            $duration = $repetition.Duration
-            if( $duration -match 'PT((\d+)H)?((\d+)M)?((\d+)S)?$' )
+            if( $repetition | Get-Member -Name 'Duration' )
             {
-                $hours = $Matches[2]
-                $minutes = $Matches[4]
-                $seconds = $Matches[6]
-                $duration = New-Object -TypeName 'TimeSpan' -ArgumentList $hours,$minutes,$seconds
+                $duration = $repetition.Duration
+                if( $duration -match 'PT((\d+)H)?((\d+)M)?((\d+)S)?$' )
+                {
+                    $hours = $Matches[2]
+                    $minutes = $Matches[4]
+                    $seconds = $Matches[6]
+                    $duration = New-Object -TypeName 'TimeSpan' -ArgumentList $hours,$minutes,$seconds
+                }
+            }
+
+            if( $repetition | Get-Member -Name 'StopAtDurationEnd' )
+            {
+                $stopAtEnd = ($repetition.StopAtDurationEnd -eq 'true')
             }
         }
 
-        if( $repetition | Get-Member -Name 'StopAtDurationEnd' )
+        if( $TriggerElement | Get-Member -Name 'Delay' )
         {
-            $stopAtEnd = ($repetition.StopAtDurationEnd -eq 'true')
+            $delayExpression = $TriggerElement.Delay
+            if( $delayExpression -match '^PT(\d+)M(\d+)S$' )
+            {
+                $delay = New-Object 'TimeSpan' 0,$Matches[1],$Matches[2]
+            }
         }
 
-        return $scheduleType,$modifier,$duration,$stopAtEnd
+        return $scheduleType,$modifier,$duration,$stopAtEnd,$delay
     }
 
     $optionalArgs = @()
@@ -266,6 +274,7 @@ function Get-ScheduledTask
             [int]$interval = 0
             [TimeSpan]$endTime = [TimeSpan]::Zero
             [DayOfWeek[]]$daysOfWeek = @()
+            [TimeSpan]$delay = [TimeSpan]::Zero
 
             $triggers = $xmlTask.GetElementsByTagName('Triggers') | Select-Object -First 1
             if( $triggers -and $triggers.ChildNodes.Count -gt 0 )
@@ -277,7 +286,7 @@ function Get-ScheduledTask
                     $endTime = New-TimeSpan -Hours $endDateTime.Hour -Minutes $endDateTime.Minute -Seconds $endDateTime.Second
                 }
 
-                $scheduleType,$modifier,$duration,$stopAtEnd = ConvertFrom-RepetitionElement $trigger
+                $scheduleType,$modifier,$duration,$stopAtEnd,$delay = ConvertFrom-RepetitionElement $trigger
                 if( $trigger.Name -eq 'TimeTrigger' )
                 {
                     $days = @( )
@@ -287,6 +296,12 @@ function Get-ScheduledTask
                         $interval = $modifier
                         $modifier = $null
                     }
+                }
+                elseif( $trigger.Name -eq 'LogonTrigger' )
+                {
+                    $scheduleType = 'OnLogon'
+                    $interval = 0
+                    $modifier = $null
                 }
                 elseif( $trigger.Name -eq 'CalendarTrigger' )
                 {
@@ -376,7 +391,8 @@ function Get-ScheduledTask
                                     $stopAtEnd
                                 )
 
-            $schedule = New-Object -TypeName 'Carbon.TaskScheduler.ScheduleInfo' -ArgumentList $scheduleCtorArgs 
+            $schedule = New-Object -TypeName 'Carbon.TaskScheduler.ScheduleInfo' -ArgumentList $scheduleCtorArgs |
+                            Add-Member -MemberType NoteProperty -Name 'Delay' -Value $delay -PassThru
             $task.Schedules.Add( $schedule )
         }
         --$idx;
