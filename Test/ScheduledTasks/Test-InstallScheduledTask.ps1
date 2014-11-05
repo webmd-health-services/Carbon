@@ -14,6 +14,7 @@
 
 $taskName = 'CarbonInstallScheduledTask'
 $credential = $null
+$AllMonths = @( 'January','February','March','April','May','June','July','August','September','October','November','December' )
 
 function Start-TestFixture
 {
@@ -64,17 +65,17 @@ function Test-ShouldScheduleWeeklyTasksOnMultipleDays
 
 function Test-ShouldScheduleMonthlyTasks
 {
-    Assert-TaskScheduled -InstallArguments @{ Monthly = $true; } -AssertArguments @{ ScheduleType = 'Monthly'; Modifier = 1; DayOfMonth = 1; Month = @( 'January','February','March','April','May','June','July','August','September','October','November','December' ) }
+    Assert-TaskScheduled -InstallArguments @{ Monthly = $true; } -AssertArguments @{ ScheduleType = 'Monthly'; Modifier = 1; DayOfMonth = 1; Month = $AllMonths }
 }
 
 function Test-ShouldScheduleMonthlyTasksOnSpecificDay
 {
-    Assert-TaskScheduled -InstallArguments @{ Monthly = $true; DayOfMonth = 13; } -AssertArguments @{ ScheduleType = 'Monthly'; Modifier = 1; DayOfMonth = 13; Month = @( 'January','February','March','April','May','June','July','August','September','October','November','December' ) }
+    Assert-TaskScheduled -InstallArguments @{ Monthly = $true; DayOfMonth = 13; } -AssertArguments @{ ScheduleType = 'Monthly'; Modifier = 1; DayOfMonth = 13; Month = $AllMonths }
 }
 
 function Test-ShouldScheduleLastDayOfTheMonthTask
 {
-    Assert-TaskScheduled -InstallArguments @{ LastDayOfMonth = $true; } -AssertArguments @{ ScheduleType = 'Monthly'; Modifier = 'LastDay'; Month = @( 'January','February','March','April','May','June','July','August','September','October','November','December' ); }
+    Assert-TaskScheduled -InstallArguments @{ LastDayOfMonth = $true; } -AssertArguments @{ ScheduleType = 'Monthly'; Modifier = 'LastDay'; Month = $AllMonths; }
 }
 
 function Test-ShouldScheduleLastDayOfTheMonthTaskInSpecificMonth
@@ -104,7 +105,7 @@ function Test-ShouldScheduleForSpecificMonths
 
 function Test-ShouldNotScheuleMonthlyTaskWithMonthParameter
 {
-    $result = Install-ScheduledTask -Name $taskName -Principal LocalService -TaskToRun 'notepad' -Month @( 'January','February','March','April','May','June','July','August','September','October','November','December' ) -ErrorAction SilentlyContinue
+    $result = Install-ScheduledTask -Name $taskName -Principal LocalService -TaskToRun 'notepad' -Month $AllMonths -ErrorAction SilentlyContinue
     Assert-Error -Last -Regex 'to schedule a monthly task'
     Assert-Null $result
     Assert-False (Test-ScheduledTask -Name $taskName)
@@ -115,6 +116,28 @@ function Test-ShouldScheduleForSpecificMonthsOnSpecificDay
     Assert-TaskScheduled -InstallArguments @{ Month = @( 'January','April','July','October' ); DayOfMonth = 5;  } -AssertArguments @{ ScheduleType = 'Monthly'; Month = @( 'January','April','July','October' ); DayOfMonth = 5; }
 }
 
+function Test-ShouldScheduleWeekOfMonthTasks
+{
+    Assert-TaskScheduled -InstallArguments @{ WeekOfMonth = 'First'; DayOfWeek = (Get-Date).DayOfWeek } -AssertArguments @{ ScheduleType = 'Monthly'; Modifier = 'First'; Month = $AllMonths; DayOfWeek = (Get-Date).DayOfWeek; }
+}
+
+function Test-ShouldNotScheduleWeekOfMonthOnMultipleWeekDays
+{
+    $result = Install-ScheduledTask -Name $taskName -Principal LocalService -TaskToRun 'notepad' -WeekOfMonth First -DayOfWeek Friday,Monday -ErrorAction SilentlyContinue
+    Assert-Error -Last -Regex 'single weekday'
+    Assert-Null $result
+    Assert-False (Test-ScheduledTask -Name $taskName)
+}
+
+function Test-ShouldScheduleWeekOfMonthTasksOnEachWeek
+{
+    foreach( $week in @( 'First', 'Second', 'Third', 'Fourth', 'Last' ) )
+    {
+        $result = Install-ScheduledTask -Name $taskName -Principal LocalService -TaskToRun 'notepad' -WeekOfMonth $week -DayOfWeek (Get-Date).DayOfWeek
+        Assert-NotNull $result
+        Assert-ScheduledTask -Name $taskName -Principal 'Local Service' -TaskToRun 'notepad' -ScheduleType 'Monthly' -Modifier $week -DayOfWeek (Get-Date).DayOfWeek -Months $AllMonths
+    }
+}
 
 <#
 function Test-ShouldScheduleMonthlyTask
@@ -261,10 +284,10 @@ function Assert-TaskScheduled
     {
         if( $InstallArguments.ContainsKey( $intervalSchedule ) )
         {
-            $task = Install-ScheduledTask @InstallArguments -Interval 37
+            $task = Install-ScheduledTask @InstallArguments -Interval 37 -Verbose
             Assert-NotNull $task
             Assert-Is $task ([Carbon.TaskScheduler.TaskInfo])
-            Assert-ScheduledTask @AssertArguments -Interval 37
+            Assert-ScheduledTask @AssertArguments -Interval 37 -Verbose
             break
         }
     }

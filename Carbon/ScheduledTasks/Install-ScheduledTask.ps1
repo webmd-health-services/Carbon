@@ -149,7 +149,7 @@ function Install-ScheduledTask
         # Create a scheduled task that runs a particular week of the month.
         $WeekOfMonth,
 
-        [Parameter(ParameterSetName='WeekOfMonth')]
+        [Parameter(ParameterSetName='WeekOfMonth',Mandatory=$true)]
         [Parameter(ParameterSetName='Weekly')]
         [DayOfWeek[]]
         # The day of the week to run the task. Default is today.
@@ -325,7 +325,7 @@ function Install-ScheduledTask
 
         Set-StrictMode -Version 'Latest'
 
-        $list = $InputObject | ForEach-Object { $_.ToString().Substring(0,3) }
+        $list = $InputObject | ForEach-Object { $_.ToString().Substring(0,3).ToUpperInvariant() }
         return $list -join ','
     }
 
@@ -398,9 +398,18 @@ function Install-ScheduledTask
         {
             $scheduleType = 'MONTHLY'
             $modifier = $WeekOfMonth
+            [void]$parameters.Add( '/D' )
             if( $DayOfWeek )
             {
-                [void]$parameters.Add( ($DayOfWeek -join ',') )
+                if( $DayOfWeek.Count -eq 1 )
+                {
+                    [void]$parameters.Add( (ConvertTo-SchtasksCalendarNameList $DayOfWeek) )
+                }
+                else
+                {
+                    Write-Error ('Tasks that run during a specific week of the month can only occur on a single weekday (received {0} days: {1}). Please pass one weekday with the `-DayOfWeek` parameter.' -f $DayOfWeek.Length,($DayOfWeek -join ','))
+                    return
+                }
             }
         }
         'OnEvent'

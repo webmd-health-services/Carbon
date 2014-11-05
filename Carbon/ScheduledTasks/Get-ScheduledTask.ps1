@@ -326,6 +326,22 @@ function Get-ScheduledTask
 
                         [Carbon.TaskScheduler.Month[]]$months = $monthsNode.ChildNodes | ForEach-Object { ([Carbon.TaskScheduler.Month]$_.Name) }
                     }
+                    elseif( $triggers.GetElementsByTagName('ScheduleByMonthDayOfWeek').Count -eq 1 )
+                    {
+                        $scheduleType = 'Monthly'
+                        $interval = $modifier
+                        $scheduleNode = $trigger.ScheduleByMonthDayOfWeek
+                        $daysOfWeek = $scheduleNode.DaysOfWeek.ChildNodes | ForEach-Object { [DayOfWeek]$_.Name }
+                        $months = $scheduleNode.Months.ChildNodes | ForEach-Object { ([Carbon.TaskScheduler.Month]$_.Name) }
+                        switch( $scheduleNode.Weeks.Week )
+                        {
+                            1 { $modifier = 'First' }
+                            2 { $modifier = 'Second' }
+                            3 { $modifier = 'Third' }
+                            4 { $modifier = 'Fourth' }
+                            'Last' { $modifier = 'Last' }
+                        }
+                    }
                 }
             }
             else
