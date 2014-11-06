@@ -380,7 +380,15 @@ function Install-ScheduledTask
 
     if( (Test-ScheduledTask -Name $Name) )
     {
-        Uninstall-ScheduledTask -Name $Name -Verbose:$VerbosePreference
+        if( $Force )
+        {
+            Uninstall-ScheduledTask -Name $Name -Verbose:$VerbosePreference
+        }
+        else
+        {
+            Write-Verbose ('Scheduled task ''{0}'' already exists. Use -Force switch to re-create it.' -f $Name)
+            return
+        }
     }
 
     $parameters = New-Object 'Collections.ArrayList'

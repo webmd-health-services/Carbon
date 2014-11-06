@@ -37,7 +37,7 @@ function Stop-Test
 
 function Test-ShouldSchedulePerMinuteTasks
 {
-    Assert-TaskScheduled -InstallArguments @{ Minute = 5 } -AssertArguments @{ ScheduleType = 'Minute'; Modifier = 5 }
+    Assert-TaskScheduled -InstallArguments @{ Minute = 5 } -AssertArguments @{ ScheduleType = 'Minute'; Modifier = 5 } -Verbose
 }
 
 function Test-ShouldScheduleHourlyTasks
@@ -196,6 +196,8 @@ function Assert-TaskScheduledFromXml
     $task = Install-ScheduledTask -Name $taskName @installParams -Verbose:$VerbosePreference
     Assert-NotNull $task
     Assert-NoError 
+    # Now, make sure task doesn't get re-created if it already exists.
+    Assert-Null (Install-ScheduledTask -Name $taskName @installParams -Verbose:$VerbosePreference)
     $task = Get-ScheduledTask -Name $taskName
     Assert-NotNull $task
     Assert-Equal $taskName $task.TaskName
@@ -257,7 +259,7 @@ function Test-ShouldInstallFromXmlFileForSystemUser
 
 function Test-ShouldInstallFromXml
 {
-    Assert-TaskScheduledFromXml -Xml ((Get-Content -Path (Join-Path -Path $PSScriptRoot -ChildPath 'task_with_principal.xml')) -join ([Environment]::NewLine))
+    Assert-TaskScheduledFromXml -Xml ((Get-Content -Path (Join-Path -Path $PSScriptRoot -ChildPath 'task_with_principal.xml')) -join ([Environment]::NewLine)) -Verbose
 }
 
 <#
@@ -390,7 +392,13 @@ function Assert-TaskScheduled
     Assert-Is $task ([Carbon.TaskScheduler.TaskInfo])
     Assert-ScheduledTask -Principal 'System' @AssertArguments
 
+    $preTask = Get-ScheduledTask -Name $taskName
+    Assert-Null (Install-ScheduledTask -Principal System @InstallArguments)
+    $postTask = Get-ScheduledTask -Name $taskName
+    Assert-Equal $preTask.CreateDate $postTask.CreateDate
+
     $InstallArguments['Credential'] = $credential
+    $InstallArguments['Force'] = $true
     $AssertArguments['Credential'] = $credential
 
     $task = Install-ScheduledTask @InstallArguments
