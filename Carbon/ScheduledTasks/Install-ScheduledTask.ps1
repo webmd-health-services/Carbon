@@ -84,7 +84,19 @@ function Install-ScheduledTask
         # The name of the scheduled task to return. Wildcards supported. This must be the *full task name*, i.e. the task's path/location and its name.
         $Name,
 
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory=$true,ParameterSetName='Minute')]
+        [Parameter(Mandatory=$true,ParameterSetName='Hourly')]
+        [Parameter(Mandatory=$true,ParameterSetName='Daily')]
+        [Parameter(Mandatory=$true,ParameterSetName='Weekly')]
+        [Parameter(Mandatory=$true,ParameterSetName='Monthly')]
+        [Parameter(Mandatory=$true,ParameterSetName='Month')]
+        [Parameter(Mandatory=$true,ParameterSetName='LastDayOfMonth')]
+        [Parameter(Mandatory=$true,ParameterSetName='WeekOfMonth')]
+        [Parameter(Mandatory=$true,ParameterSetName='Once')]
+        [Parameter(Mandatory=$true,ParameterSetName='OnStart')]
+        [Parameter(Mandatory=$true,ParameterSetName='OnLogon')]
+        [Parameter(Mandatory=$true,ParameterSetName='OnIdle')]
+        [Parameter(Mandatory=$true,ParameterSetName='OnEvent')]
         [ValidateLength(1,262)]
         [string]
         # The task/program to execute, including arguments/parameters.
@@ -191,10 +203,15 @@ function Install-ScheduledTask
         # The XPath event query to use to determine when to fire `OnEvent` tasks.
         $EventXPathQuery,
 
-        [Parameter(Mandatory=$true,ParameterSetName='Xml')]
+        [Parameter(Mandatory=$true,ParameterSetName='XmlFile')]
         [string]
         # Install the task from this XML path.
-        $TaskXmlPath,
+        $TaskXmlFilePath,
+
+        [Parameter(Mandatory=$true,ParameterSetName='Xml')]
+        [xml]
+        # Install the task from this XML.
+        $TaskXml,
 
         [Parameter(ParameterSetName='Daily')]
         [Parameter(ParameterSetName='Weekly')]
@@ -271,14 +288,53 @@ function Install-ScheduledTask
         # The end time to run the task. Must be less than `24:00`. Can't be used with `Duration`.
         $EndTime,
 
+        [Parameter(ParameterSetName='Minute')]
+        [Parameter(ParameterSetName='Hourly')]
+        [Parameter(ParameterSetName='Daily')]
+        [Parameter(ParameterSetName='Weekly')]
+        [Parameter(ParameterSetName='Monthly')]
+        [Parameter(ParameterSetName='Month')]
+        [Parameter(ParameterSetName='LastDayOfMonth')]
+        [Parameter(ParameterSetName='WeekOfMonth')]
+        [Parameter(ParameterSetName='Once')]
+        [Parameter(ParameterSetName='OnStart')]
+        [Parameter(ParameterSetName='OnLogon')]
+        [Parameter(ParameterSetName='OnIdle')]
+        [Parameter(ParameterSetName='OnEvent')]
         [Switch]
         # Enables the task to run interactively only if the user is currently logged on at the time the job runs. The task will only run if the user is logged on. Must be used with `Credential` parameter.
         $Interactive,
 
+        [Parameter(ParameterSetName='Minute')]
+        [Parameter(ParameterSetName='Hourly')]
+        [Parameter(ParameterSetName='Daily')]
+        [Parameter(ParameterSetName='Weekly')]
+        [Parameter(ParameterSetName='Monthly')]
+        [Parameter(ParameterSetName='Month')]
+        [Parameter(ParameterSetName='LastDayOfMonth')]
+        [Parameter(ParameterSetName='WeekOfMonth')]
+        [Parameter(ParameterSetName='Once')]
+        [Parameter(ParameterSetName='OnStart')]
+        [Parameter(ParameterSetName='OnLogon')]
+        [Parameter(ParameterSetName='OnIdle')]
+        [Parameter(ParameterSetName='OnEvent')]
         [Switch]
         # No password is stored. The task runs non-interactively as the given user, who must be logged in. Only local resources are available. Must be used with `Credential` parameter.
         $NoPassword,
 
+        [Parameter(ParameterSetName='Minute')]
+        [Parameter(ParameterSetName='Hourly')]
+        [Parameter(ParameterSetName='Daily')]
+        [Parameter(ParameterSetName='Weekly')]
+        [Parameter(ParameterSetName='Monthly')]
+        [Parameter(ParameterSetName='Month')]
+        [Parameter(ParameterSetName='LastDayOfMonth')]
+        [Parameter(ParameterSetName='WeekOfMonth')]
+        [Parameter(ParameterSetName='Once')]
+        [Parameter(ParameterSetName='OnStart')]
+        [Parameter(ParameterSetName='OnLogon')]
+        [Parameter(ParameterSetName='OnIdle')]
+        [Parameter(ParameterSetName='OnEvent')]
         [Switch]
         # Marks the task for deletion after its final run.
         $HighestAvailableRunLevel,
@@ -295,6 +351,19 @@ function Install-ScheduledTask
         # The principal the task should run as. Use `Principal` parameter to run as a built-in security principal. Required if `Interactive` or `NoPassword` switches are used.
         $Credential,
 
+        [Parameter(ParameterSetName='Minute')]
+        [Parameter(ParameterSetName='Hourly')]
+        [Parameter(ParameterSetName='Daily')]
+        [Parameter(ParameterSetName='Weekly')]
+        [Parameter(ParameterSetName='Monthly')]
+        [Parameter(ParameterSetName='Month')]
+        [Parameter(ParameterSetName='LastDayOfMonth')]
+        [Parameter(ParameterSetName='WeekOfMonth')]
+        [Parameter(ParameterSetName='Once')]
+        [Parameter(ParameterSetName='OnStart')]
+        [Parameter(ParameterSetName='OnLogon')]
+        [Parameter(ParameterSetName='OnIdle')]
+        [Parameter(ParameterSetName='OnEvent')]
         [ValidateSet('System','LocalService','NetworkService')]
         [string]
         # The built-in identity to use. The default is `System`. Use the `Credential` parameter to run as non-built-in security principal.
@@ -346,7 +415,7 @@ function Install-ScheduledTask
 
     $scheduleType = $PSCmdlet.ParameterSetName.ToUpperInvariant()
     $modifier = $null
-    switch( $PSCmdlet.ParameterSetName )
+    switch -Wildcard ( $PSCmdlet.ParameterSetName )
     {
         'Minute'
         {
@@ -437,117 +506,152 @@ function Install-ScheduledTask
         {
             $modifier = $EventXPathQuery
         }
-        'TaskXml'
+        'Xml*'
         {
-        }
-    }
-
-    if( $modifier )
-    {
-        [void]$parameters.Add( '/MO' )
-        [void]$parameters.Add( $modifier )
-    }
-
-    $parameterNameToSchtasksMap = @{
-                                        'StartTime' = '/ST';
-                                        'Interval' = '/RI';
-                                        'EndTime' = '/ET';
-                                        'Duration' = '/DU';
-                                        'StopAtEnd' = '/K';
-                                        'StartDate' = '/SD';
-                                        'EndDate' = '/ED';
-                                        'EventChannelName' = '/EC';
-                                        'Interactive' = '/IT';
-                                        'NoPassword' = '/NP';
-                                        'Force' = '/F';
-                                        'Delay' = '/DELAY';
-                                  }
-
-    foreach( $parameterName in $parameterNameToSchtasksMap.Keys )
-    {
-        if( -not $PSBoundParameters.ContainsKey( $parameterName ) )
-        {
-            continue
-        }
-
-        $schtasksParamName = $parameterNameToSchtasksMap[$parameterName]
-        $value = $PSBoundParameters[$parameterName]
-        if( $value -is [timespan] )
-        {
-            if( $parameterName -eq 'Duration' )
+            if( $PSCmdlet.ParameterSetName -eq 'Xml' )
             {
-                $totalHours = ($value.Days * 24) + $value.Hours
-                $value = '{0:0000}:{1:00}' -f $totalHours,$value.Minutes
+                $TaskXmlFilePath = 'Carbon+Install-ScheduledTask+{0}.xml' -f [IO.Path]::GetRandomFileName()
+                $TaskXmlFilePath = Join-Path -Path $env:TEMP -ChildPath $TaskXmlFilePath
+                $TaskXml.Save($TaskXmlFilePath)
             }
-            elseif( $parameterName -eq 'Delay' )
+
+            $scheduleType = $null
+            $TaskXmlFilePath = Resolve-Path -Path $TaskXmlFilePath
+            if( -not $TaskXmlFilePath )
             {
-                $totalMinutes = ($value.Days * 24 * 60) + ($value.Hours * 60) + $value.Minutes
-                $value = '{0:0000}:{1:00}' -f $totalMinutes,$value.Seconds
+                return
+            }
+
+            [void]$parameters.Add( '/XML' )
+            [void]$parameters.Add( $TaskXmlFilePath )
+        }
+    }
+
+    try
+    {
+        if( $modifier )
+        {
+            [void]$parameters.Add( '/MO' )
+            [void]$parameters.Add( $modifier )
+        }
+
+        if( $PSBoundParameters.ContainsKey('TaskToRun') )
+        {
+            [void]$parameters.Add( '/TR' )
+            [void]$parameters.Add( $TaskToRun )
+        }
+
+        if( $scheduleType )
+        {
+            [void]$parameters.Add( '/SC' )
+            [void]$parameters.Add( $scheduleType )
+        }
+
+
+        $parameterNameToSchtasksMap = @{
+                                            'StartTime' = '/ST';
+                                            'Interval' = '/RI';
+                                            'EndTime' = '/ET';
+                                            'Duration' = '/DU';
+                                            'StopAtEnd' = '/K';
+                                            'StartDate' = '/SD';
+                                            'EndDate' = '/ED';
+                                            'EventChannelName' = '/EC';
+                                            'Interactive' = '/IT';
+                                            'NoPassword' = '/NP';
+                                            'Force' = '/F';
+                                            'Delay' = '/DELAY';
+                                      }
+
+        foreach( $parameterName in $parameterNameToSchtasksMap.Keys )
+        {
+            if( -not $PSBoundParameters.ContainsKey( $parameterName ) )
+            {
+                continue
+            }
+
+            $schtasksParamName = $parameterNameToSchtasksMap[$parameterName]
+            $value = $PSBoundParameters[$parameterName]
+            if( $value -is [timespan] )
+            {
+                if( $parameterName -eq 'Duration' )
+                {
+                    $totalHours = ($value.Days * 24) + $value.Hours
+                    $value = '{0:0000}:{1:00}' -f $totalHours,$value.Minutes
+                }
+                elseif( $parameterName -eq 'Delay' )
+                {
+                    $totalMinutes = ($value.Days * 24 * 60) + ($value.Hours * 60) + $value.Minutes
+                    $value = '{0:0000}:{1:00}' -f $totalMinutes,$value.Seconds
+                }
+                else
+                {
+                    $value = '{0:00}:{1:00}' -f $value.Hours,$value.Minutes
+                }
+            }
+            elseif( $value -is [datetime] )
+            {
+                $value = $value.ToString('MM/dd/yyyy')
+            }
+
+            [void]$parameters.Add( $schtasksParamName )
+
+            if( $value -isnot [switch] )
+            {
+                [void]$parameters.Add( $value )
+            }
+        }
+
+        if( $PSBoundParameters.ContainsKey('HighestAvailableRunLevel') -and $HighestAvailableRunLevel )
+        {
+            [void]$parameters.Add( '/RL' )
+            [void]$parameters.Add( 'HIGHEST' )
+        }
+
+        $errFile = Join-Path -Path $env:TEMP -ChildPath ('Carbon+Uninstall-ScheduledTask+{0}' -f ([IO.Path]::GetRandomFileName()))
+        $originalEap = $ErrorActionPreference
+        $ErrorActionPreference = 'Continue'
+        $paramLogString = $parameters -join ' '
+        if( $Credential )
+        {
+            $paramLogString = $paramLogString -replace ([Text.RegularExpressions.Regex]::Escape($Credential.GetNetworkCredential().Password)),'********'
+        }
+        Write-Verbose ('/TN {0} {1}' -f $Name,$paramLogString)
+        $output = schtasks /create /TN $Name $parameters 2> $errFile 
+        $ErrorActionPreference = $originalEap
+
+        $createFailed = $false
+        if( $LASTEXITCODE )
+        {
+            $createFailed = $true
+            Write-Error ((Get-Content -Path $errFile) -join ([Environment]::NewLine))
+        }
+
+        $output | ForEach-Object { 
+            if( $_ -match '\bERROR\b' )
+            {
+                Write-Error $_
+            }
+            elseif( $_ -match '\bWARNING\b' )
+            {
+                Write-Warning $_
             }
             else
             {
-                $value = '{0:00}:{1:00}' -f $value.Hours,$value.Minutes
+                Write-Verbose $_
             }
         }
-        elseif( $value -is [datetime] )
-        {
-            $value = $value.ToString('MM/dd/yyyy')
-        }
 
-        [void]$parameters.Add( $schtasksParamName )
-
-        if( $value -isnot [switch] )
+        if( -not $createFailed )
         {
-            [void]$parameters.Add( $value )
+            Get-ScheduledTask -Name $Name
         }
     }
-
-    [void]$parameters.Add( '/RL' )
-    if( $HighestAvailableRunLevel )
+    finally
     {
-        [void]$parameters.Add( 'HIGHEST' )
-    }
-    else
-    {
-        [void]$parameters.Add( 'LIMITED' )
-    }
-
-    $errFile = Join-Path -Path $env:TEMP -ChildPath ('Carbon+Uninstall-ScheduledTask+{0}' -f ([IO.Path]::GetRandomFileName()))
-    $originalEap = $ErrorActionPreference
-    $ErrorActionPreference = 'Continue'
-    $paramLogString = $parameters -join ' '
-    if( $Credential )
-    {
-        $paramLogString = $paramLogString -replace ([Text.RegularExpressions.Regex]::Escape($Credential.GetNetworkCredential().Password)),'********'
-    }
-    Write-Verbose ('/TN {0} /TR {1} /SC {2} {3}' -f $Name,$TaskToRun,$scheduleType,$paramLogString)
-    $output = schtasks /create /TN $Name /TR $TaskToRun /SC $scheduleType $parameters 2> $errFile 
-    $ErrorActionPreference = $originalEap
-
-    $createFailed = $false
-    if( $LASTEXITCODE )
-    {
-        $createFailed = $true
-        Write-Error ((Get-Content -Path $errFile) -join ([Environment]::NewLine))
-    }
-
-    $output | ForEach-Object { 
-        if( $_ -match '\bERROR\b' )
+        if( $PSCmdlet.ParameterSetName -eq 'Xml' -and (Test-Path -Path $TaskXmlFilePath -PathType Leaf) )
         {
-            Write-Error $_
+            Remove-Item -Path $TaskXmlFilePath -ErrorAction SilentlyContinue
         }
-        elseif( $_ -match '\bWARNING\b' )
-        {
-            Write-Warning $_
-        }
-        else
-        {
-            Write-Verbose $_
-        }
-    }
-
-    if( -not $createFailed )
-    {
-        Get-ScheduledTask -Name $Name
     }
 }

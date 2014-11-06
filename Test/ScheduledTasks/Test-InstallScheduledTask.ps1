@@ -166,7 +166,99 @@ function Test-ShouldScheduleTaskToRunOnEvent
     Assert-TaskScheduled -InstallArguments @{ OnEvent = $true ; EventChannelName = 'System' ; EventXPathQuery = '*[System/EventID=101]'; } -AssertArguments @{ ScheduleType = 'OnEvent'; Modifier = '*[System/EventID=101]'; EventChannelName = 'System'; }
 }
 
+function Assert-TaskScheduledFromXml
+{
+    [CmdletBinding()]
+    param(
+        $Path,
+        $Xml,
+        $Credential
+    )
 
+    Set-StrictMode -Version 'Latest'
+
+    $installParams = @{ }
+    if( $Credential )
+    {
+        $installParams['Credential'] = $Credential
+    }
+
+    if( $Path )
+    {
+        $installParams['TaskXmlFilePath'] = $Path
+    }
+
+    if( $Xml )
+    {
+        $installParams['TaskXml'] = $Xml
+    }
+
+    $task = Install-ScheduledTask -Name $taskName @installParams -Verbose:$VerbosePreference
+    Assert-NotNull $task
+    Assert-NoError 
+    $task = Get-ScheduledTask -Name $taskName
+    Assert-NotNull $task
+    Assert-Equal $taskName $task.TaskName
+    if( $Credential )
+    {
+        Assert-Equal $credential.Username $task.RunAsUser
+    }
+    else
+    {
+        Assert-Equal 'System' $task.RunAsUser
+    }
+
+    if( $Path )
+    {
+        $Xml = [xml]((Get-Content -Path $Path) -join ([Environment]::NewLine))
+    }
+    else
+    {
+        $Xml = [xml]$Xml
+    }
+
+    $actualXml = schtasks /query /tn $taskName /xml | Where-Object { $_ }
+    $actualXml = $actualXml -join ([Environment]::NewLine)
+    $actualXml = [xml]$actualXml
+    Assert-Equal $Xml.OuterXml $actualXml.OuterXml
+
+    if( $Path )
+    {
+        Assert-FileExists $Path
+    }
+    else
+    {
+        Assert-Null (Get-ChildItem -Path $env:TEMP 'Carbon+Install-ScheduledTask+*')
+    }
+}
+
+function Test-ShouldInstallFromXmlFileWithRelativePath
+{
+    Push-Location -Path $PSScriptRoot
+    try
+    {
+        Assert-TaskScheduledFromXml -Path '.\task.xml' -Credential $credential
+    }
+    finally
+    {
+        Pop-Location
+    }
+}
+
+function Test-ShouldInstallFromXmlFileWithAbsolutePath
+{
+    Assert-TaskScheduledFromXml -Path (Join-Path -Path $PSScriptRoot -ChildPath 'task.xml') -Credential $credential
+}
+
+function Test-ShouldInstallFromXmlFileForSystemUser
+{
+    Assert-TaskScheduledFromXml -Path (Join-Path -Path $PSScriptRoot -ChildPath 'task_with_principal.xml')
+}
+
+function Test-ShouldInstallFromXml
+{
+    Assert-TaskScheduledFromXml -Xml ((Get-Content -Path (Join-Path -Path $PSScriptRoot -ChildPath 'task_with_principal.xml')) -join ([Environment]::NewLine))
+}
 
 <#
 function Test-ShouldScheduleMonthlyTask
