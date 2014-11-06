@@ -71,6 +71,7 @@ function Get-ScheduledTask
 
         $scheduleType = $null
         $interval = $null
+        $modifier = $null
         $duration = $null
         $stopAtEnd = $false
         [TimeSpan]$delay = [TimeSpan]::Zero
@@ -292,7 +293,7 @@ function Get-ScheduledTask
                 if( $trigger.Name -eq 'TimeTrigger' )
                 {
                     $days = @( )
-                    if( $csvTask.'Schedule Type' -like 'One Time Only*' )
+                    if( $csvTask.'Schedule Type' -eq 'One Time Only' )
                     {
                         $scheduleType = 'Once'
                         $interval = $modifier

@@ -202,7 +202,6 @@ function Install-ScheduledTask
         [Parameter(ParameterSetName='Month')]
         [Parameter(ParameterSetName='LastDayOfMonth')]
         [Parameter(ParameterSetName='WeekOfMonth')]
-        [Parameter(ParameterSetName='Once')]
         [ValidateRange(1,599940)]
         [int]
         # Re-run the task every N minutes.
@@ -243,7 +242,6 @@ function Install-ScheduledTask
         [Parameter(ParameterSetName='Month')]
         [Parameter(ParameterSetName='LastDayOfMonth')]
         [Parameter(ParameterSetName='WeekOfMonth')]
-        [Parameter(ParameterSetName='Once')]
         [TimeSpan]
         # The duration to run the task. Usually used with `Interval` to repeatedly run a task over a given time span. By default, re-runs for an hour. Can't be used with `EndTime`.
         $Duration,
@@ -268,7 +266,6 @@ function Install-ScheduledTask
         [Parameter(ParameterSetName='Month')]
         [Parameter(ParameterSetName='LastDayOfMonth')]
         [Parameter(ParameterSetName='WeekOfMonth')]
-        [Parameter(ParameterSetName='Once')]
         [ValidateScript({ $_ -lt [timespan]'1' })]
         [TimeSpan]
         # The end time to run the task. Must be less than `24:00`. Can't be used with `Duration`.
@@ -479,7 +476,8 @@ function Install-ScheduledTask
         {
             if( $parameterName -eq 'Duration' )
             {
-                $value = '{0:0000}:{1:00}' -f $value.TotalHours,$value.Minutes
+                $totalHours = ($value.Days * 24) + $value.Hours
+                $value = '{0:0000}:{1:00}' -f $totalHours,$value.Minutes
             }
             elseif( $parameterName -eq 'Delay' )
             {

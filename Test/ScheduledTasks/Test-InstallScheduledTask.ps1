@@ -165,6 +165,7 @@ function Test-ShouldScheduleTaskToRunOnEvent
 }
 
 
+
 <#
 function Test-ShouldScheduleMonthlyTask
 {
@@ -306,7 +307,7 @@ function Assert-TaskScheduled
     # Install to start tomorrow
     $now = Get-Date
     # Check interval parameter
-    $intervalSchedules = @( 'Daily', 'Weekly', 'Monthly', 'Month', 'LastDayOfMonth', 'WeekOfMonth', 'Once' )
+    $intervalSchedules = @( 'Daily', 'Weekly', 'Monthly', 'Month', 'LastDayOfMonth', 'WeekOfMonth' )
     foreach( $intervalSchedule in $intervalSchedules )
     {
         if( $InstallArguments.ContainsKey( $intervalSchedule ) )
@@ -347,7 +348,7 @@ function Assert-TaskScheduled
         }
     }
 
-    $durationSchedules = @( 'Minute', 'Daily', 'Weekly', 'Monthly', 'LastDayOfMonth', 'WeekOfMonth', 'Once' )
+    $durationSchedules = @( 'Minute', 'Daily', 'Weekly', 'Monthly', 'LastDayOfMonth', 'WeekOfMonth' )
     foreach( $durationSchedule in $durationSchedules )
     {
         if( $InstallArguments.ContainsKey( $durationSchedule ) )
@@ -373,7 +374,7 @@ function Assert-TaskScheduled
         }
     }
 
-    $endTimeSchedules = @( 'Minute', 'Hourly', 'Daily', 'Weekly', 'Monthly', 'LastDayOfMonth', 'WeekOfMonth', 'Once' )
+    $endTimeSchedules = @( 'Minute', 'Hourly', 'Daily', 'Weekly', 'Monthly', 'LastDayOfMonth', 'WeekOfMonth' )
     foreach( $endTimeSchedule in $endTimeSchedules )
     {
         if( $InstallArguments.ContainsKey( $endTimeSchedule ) )
@@ -459,6 +460,7 @@ function Assert-ScheduledTask
         $NoPassword,
         [Switch]
         $HighestAvailableRunLevel,
+        [timespan]
         $Delay
     )
 
