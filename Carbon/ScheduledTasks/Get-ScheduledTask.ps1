@@ -399,16 +399,63 @@ function Get-ScheduledTask
                 Write-Verbose ('Task ''{0}'' has no triggers.' -f $task.FullName)
             }
 
+            function ConvertFrom-SchtasksDate
+            {
+                param(
+                    [Parameter(Mandatory=$true)]
+                    [string]
+                    $SchtasksDate,
+
+                    [Parameter(Mandatory=$true)]
+                    [DateTime]
+                    $DefaultValue
+                )
+
+                Set-StrictMode -Version 'Latest'
+
+                [DateTime]$dateTime = $DefaultValue
+                if( -not [DateTime]::TryParse( $SchtasksDate, [ref] $dateTime ) )
+                {
+                    return $DefaultValue
+                }
+                return New-Object 'DateTime' $dateTime.Year,$dateTime.Month,$dateTime.Day
+            }
+
+            function ConvertFrom-SchtasksTime
+            {
+                param(
+                    [Parameter(Mandatory=$true)]
+                    [string]
+                    $SchtasksTime
+                )
+
+                Set-StrictMode -Version 'Latest'
+
+                [TimeSpan]$timespan = [TimeSpan]::Zero
+                [DateTime]$dateTime = New-Object 'DateTime' 2015,11,6
+                $schtasksTime = '{0} {1}' -f (Get-Date).ToString('d'),$SchtasksTime
+                if( -not [DateTime]::TryParse( $SchtasksTime, [ref] $dateTime ) )
+                {
+                    return $timespan
+                }
+
+                return New-Object 'TimeSpan' $dateTime.Hour,$dateTime.Minute,$dateTime.Second
+            }
+
+            $startDate = ConvertFrom-SchtasksDate $csvTask.'Start Date' -DefaultValue ([DateTime]::MinValue)
+            $startTime = ConvertFrom-SchtasksTime $csvTask.'Start Time'
+            $endDate = ConvertFrom-SchtasksDate $csvTask.'End Date' -DefaultValue ([DateTime]::MaxValue)
+
             $scheduleCtorArgs = @(
                                     $csvTask.'Last Result',
                                     $csvTask.'Stop Task If Runs X Hours And X Mins',
                                     $scheduleType,
                                     $modifier,
                                     $interval,
-                                    $csvTask.'Start Time',
-                                    $csvTask.'Start Date',
+                                    $startTime,
+                                    $startDate,
                                     $endTime,
-                                    $csvTask.'End Date',
+                                    $endDate,
                                     $daysOfWeek,
                                     $days,
                                     $months,
@@ -416,13 +463,13 @@ function Get-ScheduledTask
                                     $csvTask.'Repeat: Until: Time',
                                     $duration,
                                     $csvTask.'Repeat: Stop If Still Running',
-                                    $stopAtEnd
+                                    $stopAtEnd,
+                                    $delay,
+                                    $idleTime,
+                                    $eventChannelName
                                 )
 
-            $schedule = New-Object -TypeName 'Carbon.TaskScheduler.ScheduleInfo' -ArgumentList $scheduleCtorArgs |
-                            Add-Member -MemberType NoteProperty -Name 'Delay' -Value $delay -PassThru |
-                            Add-Member -MemberType NoteProperty -Name 'IdleTime' -Value $idleTime -PassThru |
-                            Add-Member -MemberType NoteProperty -Name 'EventChannelName' -Value $eventChannelName -PassThru
+            $schedule = New-Object -TypeName 'Carbon.TaskScheduler.ScheduleInfo' -ArgumentList $scheduleCtorArgs 
             $task.Schedules.Add( $schedule )
         }
         --$idx;

@@ -4,9 +4,9 @@ namespace Carbon.TaskScheduler
 {
 	public sealed class ScheduleInfo
 	{
-		public ScheduleInfo(string lastResult, string stopTaskIfRunsXHoursAndXMinutes, string scheduleType, string modifier, int interval,
-			string startTime, string startDate, TimeSpan endTime, string endDate, DayOfWeek[] daysOfWeek, int[] days, Month[] months, string repeatEvery,
-			string repeatUntilTime, string repeatUntilDuration, string repeatStopIfStillRunning, bool stopAtEnd)
+		public ScheduleInfo(int lastResult, string stopTaskIfRunsXHoursAndXMinutes, ScheduleType scheduleType, string modifier, int interval,
+			TimeSpan startTime, DateTime startDate, TimeSpan endTime, DateTime endDate, DayOfWeek[] daysOfWeek, int[] days, Month[] months, string repeatEvery,
+			string repeatUntilTime, string repeatUntilDuration, string repeatStopIfStillRunning, bool stopAtEnd, TimeSpan delay, int idleTime, string eventChannelName)
 		{
 			LastResult = lastResult;
 			StopTaskIfRunsXHoursandXMins = stopTaskIfRunsXHoursAndXMinutes;
@@ -25,14 +25,20 @@ namespace Carbon.TaskScheduler
 			RepeatUntilDuration = repeatUntilDuration;
 			RepeatStopIfStillRunning = repeatStopIfStillRunning;
 			StopAtEnd = stopAtEnd;
+			Delay = delay;
+			IdleTime = idleTime;
+			EventChannelName = eventChannelName;
 		}
 
 		public int[] Days { get; private set; }
 		public DayOfWeek[] DaysOfWeek { get; private set; }
-		public string EndDate { get; private set; }
+		public TimeSpan Delay { get; private set; }
+		public DateTime EndDate { get; private set; }
 		public TimeSpan EndTime { get; private set; }
+		public string EventChannelName { get; private set; }
+		public int IdleTime { get; private set; }
 		public int Interval { get; private set; }
-		public string LastResult { get; private set; }
+		public int LastResult { get; private set; }
 		public string Modifier { get; private set; }
 		public Month[] Months { get; private set; }
 		public string RepeatEvery { get; private set; }
@@ -41,9 +47,9 @@ namespace Carbon.TaskScheduler
 		public string RepeatUntilTime { get; private set; }
 		public bool StopAtEnd { get; private set; }
 		public string StopTaskIfRunsXHoursandXMins { get; private set; }
-		public string ScheduleType { get; private set; }
-		public string StartDate { get; private set; }
-		public string StartTime { get; private set; }
+		public ScheduleType ScheduleType { get; private set; }
+		public DateTime StartDate { get; private set; }
+		public TimeSpan StartTime { get; private set; }
 
 	}
 }

@@ -15,6 +15,8 @@
 $taskName = 'CarbonInstallScheduledTask'
 $credential = $null
 $AllMonths = @( 'January','February','March','April','May','June','July','August','September','October','November','December' )
+$today = Get-Date
+$today = New-Object 'DateTime' $today.Year,$today.Month,$today.Day
 
 function Start-TestFixture
 {
@@ -50,7 +52,7 @@ function Test-ShouldScheduleDailyTasks
 
 function Test-ShouldScheduleWeeklyTasks
 {
-    Assert-TaskScheduled -InstallArguments @{ Weekly = 39 } -AssertArguments @{ ScheduleType = 'Weekly'; Modifier = 39; DayOfWeek = (Get-Date).DayOfWeek; }
+    Assert-TaskScheduled -InstallArguments @{ Weekly = 39 } -AssertArguments @{ ScheduleType = 'Weekly'; Modifier = 39; DayOfWeek = $today.DayOfWeek; }
 }
 
 function Test-ShouldScheduleWeeklyTasksOnSpecificDay
@@ -118,7 +120,7 @@ function Test-ShouldScheduleForSpecificMonthsOnSpecificDay
 
 function Test-ShouldScheduleWeekOfMonthTasks
 {
-    Assert-TaskScheduled -InstallArguments @{ WeekOfMonth = 'First'; DayOfWeek = (Get-Date).DayOfWeek } -AssertArguments @{ ScheduleType = 'Monthly'; Modifier = 'First'; Month = $AllMonths; DayOfWeek = (Get-Date).DayOfWeek; }
+    Assert-TaskScheduled -InstallArguments @{ WeekOfMonth = 'First'; DayOfWeek = $today.DayOfWeek } -AssertArguments @{ ScheduleType = 'Monthly'; Modifier = 'First'; Month = $AllMonths; DayOfWeek = $today.DayOfWeek; }
 }
 
 function Test-ShouldNotScheduleWeekOfMonthOnMultipleWeekDays
@@ -133,9 +135,9 @@ function Test-ShouldScheduleWeekOfMonthTasksOnEachWeek
 {
     foreach( $week in @( 'First', 'Second', 'Third', 'Fourth', 'Last' ) )
     {
-        $result = Install-ScheduledTask -Name $taskName -Principal LocalService -TaskToRun 'notepad' -WeekOfMonth $week -DayOfWeek (Get-Date).DayOfWeek
+        $result = Install-ScheduledTask -Name $taskName -Principal LocalService -TaskToRun 'notepad' -WeekOfMonth $week -DayOfWeek $today.DayOfWeek
         Assert-NotNull $result
-        Assert-ScheduledTask -Name $taskName -Principal 'Local Service' -TaskToRun 'notepad' -ScheduleType 'Monthly' -Modifier $week -DayOfWeek (Get-Date).DayOfWeek -Months $AllMonths
+        Assert-ScheduledTask -Name $taskName -Principal 'Local Service' -TaskToRun 'notepad' -ScheduleType 'Monthly' -Modifier $week -DayOfWeek $today.DayOfWeek -Months $AllMonths
     }
 }
 
@@ -305,7 +307,6 @@ function Assert-TaskScheduled
     Assert-ScheduledTask @AssertArguments 
 
     # Install to start tomorrow
-    $now = Get-Date
     # Check interval parameter
     $intervalSchedules = @( 'Daily', 'Weekly', 'Monthly', 'Month', 'LastDayOfMonth', 'WeekOfMonth' )
     foreach( $intervalSchedule in $intervalSchedules )
@@ -341,10 +342,10 @@ function Assert-TaskScheduled
     {
         if( $InstallArguments.ContainsKey( $startDateSchedule ) )
         {
-            $task = Install-ScheduledTask @InstallArguments -StartDate $now.AddDays(1)
+            $task = Install-ScheduledTask @InstallArguments -StartDate $today.AddDays(1)
             Assert-NotNull $task
             Assert-Is $task ([Carbon.TaskScheduler.TaskInfo])
-            Assert-ScheduledTask @AssertArguments -StartDate $now.AddDays(1)
+            Assert-ScheduledTask @AssertArguments -StartDate $today.AddDays(1)
         }
     }
 
@@ -366,10 +367,10 @@ function Assert-TaskScheduled
     {
         if( $InstallArguments.ContainsKey( $endDateSchedule ) )
         {
-            $task = Install-ScheduledTask @InstallArguments -EndDate (Get-Date).AddYears(1)
+            $task = Install-ScheduledTask @InstallArguments -EndDate $today.AddYears(1)
             Assert-NotNull $task
             Assert-Is $task ([Carbon.TaskScheduler.TaskInfo])
-            Assert-ScheduledTask @AssertArguments -EndDate (Get-Date).AddYears(1)
+            Assert-ScheduledTask @AssertArguments -EndDate $today.AddYears(1)
             break
         }
     }
@@ -382,7 +383,7 @@ function Assert-TaskScheduled
             $task = Install-ScheduledTask @InstallArguments -EndTime '23:06'
             Assert-NotNull $task
             Assert-Is $task ([Carbon.TaskScheduler.TaskInfo])
-            Assert-ScheduledTask @AssertArguments -EndTime '23:06'
+            Assert-ScheduledTask @AssertArguments -EndTime '23:06' -EndDate $today
             break
         }
     }
@@ -520,11 +521,7 @@ function Assert-ScheduledTask
 
     if( $PSBoundParameters.ContainsKey('ScheduleType') )
     {
-        Assert-Equal $ScheduleType $schedule.ScheduleType.Trim() 'ScheduleType'
-    }
-    else
-    {
-        Assert-Equal 'fubar' $schedule.ScheduleType 'ScheduleType'
+        Assert-Equal $ScheduleType $schedule.ScheduleType 'ScheduleType'
     }
 
     if( $PSBoundParameters.ContainsKey( 'Modifier' ) )
@@ -565,18 +562,17 @@ function Assert-ScheduledTask
 
     if( $PSBoundParameters.ContainsKey('StartDate') )
     {
-        Assert-Equal $StartDate.ToString('d') $schedule.StartDate 'StartDate'
+        Assert-Equal $StartDate $schedule.StartDate 'StartDate'
     }
     else
     {
         if( @('OnLogon', 'OnStart', 'OnIdle', 'OnEvent') -contains $ScheduleType )
         {
-            Assert-Equal 'N/A' $schedule.StartDate
+            Assert-Equal ([DateTime]::MinValue) $schedule.StartDate
         }
         else
         {
-            $today = Get-Date
-            Assert-Equal (Get-Date -Year $today.Year -Month $today.Month -Day $today.Day -Hour 0 -Minute 0 -Second 0).ToString('d') $Schedule.StartDate 'StartDate'
+            Assert-Equal (New-Object 'DateTime' $today.Year,$today.Month,$today.Day) $Schedule.StartDate 'StartDate'
         }
     }
 
@@ -610,23 +606,19 @@ function Assert-ScheduledTask
         }
     }
 
-    $today = Get-Date
-    $today = Get-Date -Year $today.Year -Month $today.Month -Day $today.Day -Hour 0 -Minute 0 -Second 0
-
     if( $PSBoundParameters.ContainsKey('StartTime') )
     {
-        $expectedStartTime = $today + $StartTime
-        Assert-Equal $expectedStartTime.ToString('h:mm:ss tt') $schedule.StartTime 'StartTime'
+        Assert-Equal $StartTime $schedule.StartTime 'StartTime'
     }
     else
     {
         if( @('OnLogon', 'OnStart', 'OnIdle', 'OnEvent') -contains $ScheduleType )
         {
-            Assert-Equal 'N/A' $schedule.StartTime
+            Assert-Equal ([TimeSpan]::Zero) $schedule.StartTime
         }
         else
         {
-            Assert-Equal $task.CreateDate.ToString('h:mm:00 tt') $schedule.StartTime 'StartTime'
+            Assert-Equal (New-Object 'TimeSpan' $task.CreateDate.Hour,$task.CreateDate.Minute,0) $schedule.StartTime 'StartTime'
         }
     }
 
@@ -641,7 +633,11 @@ function Assert-ScheduledTask
 
     if( $PSBoundParameters.ContainsKey('EndDate') )
     {
-        Assert-Equal $EndDate.ToString("d") $schedule.EndDate
+        Assert-Equal $EndDate $schedule.EndDate
+    }
+    else
+    {
+        Assert-Equal ([datetime]::MaxValue) $schedule.EndDate
     }
 
     if( $PSBoundParameters.ContainsKey('Delay') )
@@ -668,6 +664,6 @@ function Assert-ScheduledTask
     }
     else
     {
-        Assert-Null $schedule.EventChannelName
+        Assert-Empty $schedule.EventChannelName
     }
 }
