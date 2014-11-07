@@ -73,7 +73,7 @@ function Assert-Equal
         {
             for( $idx = 0; $idx -lt $Expected.Length; ++$idx )
             {
-                if( $idx -gt $Actual.Length )
+                if( $idx -ge $Actual.Length )
                 {
                     Fail ("Strings different beginning at index {0}:`n{1}`n({2})`n{3}" -f $idx,$Expected.Substring(0,$idx),$Actual,$Message)
                 }
