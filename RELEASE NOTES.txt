@@ -73,6 +73,7 @@ This is a backwards-incompatible release.
  * Created [Write-DscError](http://get-carbon.org/help/2.0/Write-DscError.html) function for writing DSC `ErrorLogRecord` objects as errors.
  * Created [Start-DscPullConfiguration](http://get-carbon.org/help/2.0/Start-DscPullConfiguration.html) function for starting a configuration check on a computer whose computer is configured to use the PULL refresh mode.
  * Created [Initialize-Lcm](http://get-carbon.org/help/2.0/Initialize-Lcm.html) function for configuring the DSC Local Configuration Manager on computers, including installing the private key needed for decrypting credentials.
+ * Created [Carbon_ScheduledTask](http://get-carbon.org/help/2.0/Carbon_ScheduledTask.html) resource for configuring scheduled tasks with `schtasks.exe`.
  
 ### File System
 
