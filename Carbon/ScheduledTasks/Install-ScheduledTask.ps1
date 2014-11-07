@@ -19,13 +19,11 @@ function Install-ScheduledTask
     Installs a scheduled task on the current computer.
 
     .DESCRIPTION
-    The `Install-ScheduledTask` function uses `schtasks.exe` to install a scheduled task on the current computer. If the task exists, and its configuration is different, it is deleted and re-created. If it exists and is unchanged, it is left untouched.
-    
-    If a new task is created, or a task is updated/change, a `Carbon.TaskScheduler.TaskInfo` is returned.
+    The `Install-ScheduledTask` function uses `schtasks.exe` to install a scheduled task on the current computer. If a task with the same name already exists, the existing task is left in place. Use the `-Force` switch to force `Install-ScheduledTask` to delete any existing tasks before installation.
 
-    Run `schtasks.exe /create /?` for further help.
+    If a new task is created, a `Carbon.TaskScheduler.TaskInfo` object is returned.
 
-    If you get a `The task XML contains a value which is incorrectly formatted or out of range.`, try creating the scheduled task directly  using the `/V1` switch. 
+    The `schtasks.exe` command line application is pretty limited in the kind of tasks it will create. If you need a scheduled task created with options not supported by `Install-ScheduledTask`, you can create an XML file using the [Task Scheduler Schema](http://msdn.microsoft.com/en-us/library/windows/desktop/aa383609.aspx) or create a task with the Task Scheduler MMC then export that task as XML with the `schtasks.exe /query /xml /tn <TaskName>`. Pass the XML file (or the raw XML) with the `TaskXmlFilePath` or `TaskXml` parameters, respectively.
 
     .LINK
     Get-ScheduledTask
@@ -38,41 +36,134 @@ function Install-ScheduledTask
 
     .LINK
     http://technet.microsoft.com/en-us/library/cc725744.aspx#BKMK_create
+    
+    .LINK
+    http://msdn.microsoft.com/en-us/library/windows/desktop/aa383609.aspx
 
     .EXAMPLE
-    Install-ScheduledTask -Name 'doc' -TaskToRun 'notepad' -Credential (Get-Credential 'runasuser') -ScheduleType Hourly
+    Install-ScheduledTask -Name 'CarbonSample' -TaskToRun 'C:\Windows\system32\notepad.exe' -Minute 5
 
-    Creates a scheduled task `doc` which runs `notepad.exe` eery hour under user `runasuser`.
-
-    .EXAMPLE
-    Install-ScheduledTask -Name 'accountant' -TaskToRun 'calc.exe' -ScheduleType Minute -Modifier 5 -StartTime '12:00' -EndTime '14:00' -StartDate '6/6/2006' -EndDate '6/6/2006' -Credential (Get-Credential 'runasuser')
-
-    Creates a scheduled task "accountant" to run calc.exe every five minutes from the specified start time to end time between the start date and end date.
+    Creates a scheduled task "CarbonSample" to run notepad.exe every five minutes. No credential or principal is provided, so the task will run as `System`.
 
     .EXAMPLE
-    Install-ScheduledTask -Name 'gametime' -TaskToRun 'C:\Windows\system32\freecell.exe' -ScheduleType Monthly -Modifier First -Days 'Sun'
+    Install-ScheduledTask -Name 'CarbonSample' -TaskToRun 'C:\Windows\system32\notepad.exe' -Minute 1 -Credential (Get-Credential 'runasuser')
 
-    Creates a scheduled task "gametime" to run freecell on the first Sunday of every month.
-
-    .EXAMPLE
-    Install-ScheduledTask -Name 'report' -TaskToRun 'notepad.exe' -Credential (Get-Credential 'runasuser') -ScheduleType Weekly
-
-    Creates a scheduled task "report" to run notepad.exe every week.
+    Demonstrates how to run a task every minute as a specific user with the `Credential` parameter.
 
     .EXAMPLE
-    Install-ScheduledTask -Name 'logtracker' -TaskToRun 'C:\Windows\system32\notepad.exe' -ScheduleType Minute -Modifier 5 -StartTime '18:30' -Credential (Get-Credential 'runasuser')
+    Install-ScheduledTask -Name 'CarbonSample' -TaskToRun 'C:\Windows\system32\notepad.exe' -Minute 1 -Principal LocalService
 
-    Creates a scheduled task "logtracker" to run notepad.exe every five minutes starting from the specified start time with no end time. 
-
-    .EXAMPLE
-    Install-ScheduledTask -Name 'gaming' -TaskToRun 'C:\freecell' -ScheduleType Daily -StartTime '12:00' -EndTime '14:00' -Terminate
-
-    Creates a scheduled task "gaming" to run freecell.exe starting at 12:00 and automatically terminating at 14:00 hours every day.
+    Demonstrates how to run a task every minute as a built-in principal, in this case `Local Service`.
 
     .EXAMPLE
-    Install-ScheduledTask -Name 'EventLog' -TaskToRun 'wevtvwr.msc' -ScheduleType OnEvent -EventChannelName System -Modifier '*[Sytem/EventID=101]'
+    Install-ScheduledTask -Name 'CarbonSample' -TaskToRun 'calc.exe' -Minute 5 -StartTime '12:00' -EndTime '14:00' -StartDate '6/6/2006' -EndDate '6/6/2006' 
 
-    Creates a scheduled task "EventLog" to run wevtvwr.msc starting whenever event 101 is published in the System channel.
+    Demonstrates how to run a task every 5 minutes between the given start date/time and end date/time. In this case, the task will run between noon and 2 pm on `6/6/2006`.
+
+    .EXAMPLE
+    Install-ScheduledTask -Name 'CarbonSample' -TaskToRun 'notepad' -Hourly 1
+
+    Creates a scheduled task `CarbonSample` which runs `notepad.exe` every hour as the `LocalService` user.
+
+    .EXAMPLE
+    Install-ScheduledTask -Name 'CarbonSample' -TaskToRun 'notepad.exe' -Weekly 1
+
+    Demonstrates how to run a task ever *N* weeks, in this case every week.
+
+    .EXAMPLE
+    Install-ScheduledTask -Name 'CarbonSample' -TaskToRun 'notepad.exe' -Monthly
+
+    Demonstrates how to run a task the 1st of every month.
+
+    .EXAMPLE
+    Install-ScheduledTask -Name 'CarbonSample' -TaskToRun 'notepad.exe' -Monthly -DayOfMonth 15
+
+    Demonstrates how to run a monthly task on a specific day of the month.
+
+    .EXAMPLE
+    Install-ScheduledTask -Name 'CarbonSample' -TaskToRun 'notepad.exe' -Month 1,4,7,10 -DayOfMonth 5
+
+    Demonstrates how to run a task on specific months of the year on a specific day of the month.
+
+    .EXAMPLE
+    Install-ScheduledTask -Name 'CarbonSample' -TaskToRun 'notepad.exe' -WeekOfMonth First -DayOfWeek Sunday
+
+    Demonstrates how to run a task on a specific week of each month. In this case, the task will run the first Sunday of every month.
+
+    .EXAMPLE
+    Install-ScheduledTask -Name 'CarbonSample' -TaskToRun 'notepad.exe' -Month 1,5,9 -WeekOfMonth First -DayOfWeek Sunday
+
+    Demonstrates how to run a task on a specific week of specific months. In this case, the task will run the first Sunday of January, May, and September.
+
+    .EXAMPLE
+    Install-ScheduledTask -Name 'CarbonSample' -TaskToRun 'notepad.exe' -LastDayOfMonth
+
+    Demonstrates how to run a task the last day of every month.
+
+    .EXAMPLE
+    Install-ScheduledTask -Name 'CarbonSample' -TaskToRun 'notepad.exe' -LastDayOfMonth -Month 1,6
+
+    Demonstrates how to run a task the last day of specific months. In this case, the task will run the last day of January and June.
+
+    .EXAMPLE
+    Install-ScheduledTask -Name 'CarbonSample' -TaskToRun 'notepad.exe' -Once -StartTime '0:00'
+
+    Demonstrates how to run a task once. In this case, the task will run at midnight of today (which means it probably won't run since it is always past midnight).
+
+    .EXAMPLE
+    Install-ScheduledTask -Name 'CarbonSample' -TaskToRun 'notepad.exe' -OnStart
+
+    Demonstrates how to run a task when the computer starts up.
+
+    .EXAMPLE
+    Install-ScheduledTask -Name 'CarbonSample' -TaskToRun 'notepad.exe' -OnStart -Delay '0:30'
+
+    Demonstrates how to run a task when the computer starts up after a certain amount of time passes. In this case, the task will run 30 minutes after the computer starts.
+
+    .EXAMPLE
+    Install-ScheduledTask -Name 'CarbonSample' -TaskToRun 'notepad.exe' -OnLogon -Credential (Get-Credential 'runasuser')
+
+    Demonstrates how to run a task when the user running the task logs on. Usually you want to pass a credential when setting up a logon task, since the built-in users never log in.
+
+    .EXAMPLE
+    Install-ScheduledTask -Name 'CarbonSample' -TaskToRun 'notepad.exe' -OnLogon -Delay '1:45' -Credential (Get-Credential 'runasuser')
+
+    Demonstrates how to run a task after a certain amount of time passes after a user logs in. In this case, the task will run after 1 hour and 45 minutes after `runasuser` logs in.
+
+    .EXAMPLE
+    Install-ScheduledTask -Name 'CarbonSample' -TaskToRun 'notepad.exe' -OnIdle
+
+    Demonstrates how to run a task when the computer is idle.
+
+    .EXAMPLE
+    Install-ScheduledTask -Name 'CarbonSample' -TaskToRun 'notepad.exe' -OnIdle -Delay '0:05'
+
+    Demonstrates how to run a task when the computer has been idle for a desired amount of time. In this case, the task will run after the computer has been idle for 5 minutes.
+
+    .EXAMPLE
+    Install-ScheduledTask -Name 'CarbonSample' -TaskToRun 'wevtvwr.msc' -OnEvent -EventChannelName System -EventXPathQuery '*[Sytem/EventID=101]'
+
+    Demonstrates how to run an event when certain events are written to the event log. In this case, wevtvwr.msc will run whenever an event with ID `101` is published in the System event channel.
+
+    .EXAMPLE
+    Install-ScheduledTask -Name 'CarbonSample' -TaskToRun 'notepad.exe' -TaskXmlFilePath $taskXmlPath
+
+    Demonstrates how to create a task using the [Task Scheduler XML schema](http://msdn.microsoft.com/en-us/library/windows/desktop/aa383609.aspx) for a task that runs as a built-in principal. You can export task XML with the `schtasks /query /xml /tn <Name>` command.
+
+    .EXAMPLE
+    Install-ScheduledTask -Name 'CarbonSample' -TaskToRun 'notepad.exe' -TaskXmlFilePath $taskXmlPath -Credential (Get-Credential 'runasuser')
+
+    Demonstrates how to create a task using the [Task Scheduler XML schema](http://msdn.microsoft.com/en-us/library/windows/desktop/aa383609.aspx) for a task that will run as a specific user. The username in the XML file should match the username in the credential.
+
+    .EXAMPLE
+    Install-ScheduledTask -Name 'CarbonSample' -TaskToRun 'notepad.exe' -TaskXml $taskXml
+
+    Demonstrates how to create a task using raw XML that conforms to the [Task Scheduler XML schema](http://msdn.microsoft.com/en-us/library/windows/desktop/aa383609.aspx) for a task that will run as a built-in principal. In this case, `$taskXml` should be an XML document.
+
+    .EXAMPLE
+    Install-ScheduledTask -Name 'CarbonSample' -TaskToRun 'notepad.exe' -TaskXml $taskXml -Credential (Get-Credential 'runasuser')
+
+    Demonstrates how to create a task using raw XML that conforms to the [Task Scheduler XML schema](http://msdn.microsoft.com/en-us/library/windows/desktop/aa383609.aspx) for a task that will run as a specific user. In this case, `$taskXml` should be an XML document.  The username in the XML document should match the username in the credential.
     #>
     [CmdletBinding()]
     [OutputType([Carbon.TaskScheduler.TaskInfo])]
@@ -146,7 +237,7 @@ function Install-ScheduledTask
         [Parameter(ParameterSetName='LastDayOfMonth')]
         [Parameter(ParameterSetName='WeekOfMonth')]
         [Carbon.TaskScheduler.Month[]]
-        # Create a scheduled task that runs on specific months. To create a monthly/ task, use the `Monthly` switch.
+        # Create a scheduled task that runs on specific months. To create a monthly task, use the `Monthly` switch.
         $Month,
 
         [Parameter(ParameterSetName='Monthly')]
@@ -370,13 +461,11 @@ function Install-ScheduledTask
         $Principal = 'System',
 
         [Switch]
-        # Create the task and suppress warnings if the specified task already exists.
+        # Create the task even if a task with the same name already exists (i.e. delete any task with the same name before installation).
         $Force
     )
 
     Set-StrictMode -Version 'Latest'
-
-    #$Name = Join-Path -Path '\' -ChildPath $Name
 
     if( (Test-ScheduledTask -Name $Name) )
     {
