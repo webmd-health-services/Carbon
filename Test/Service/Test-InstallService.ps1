@@ -13,7 +13,7 @@
 # limitations under the License.
 
 $servicePath = Join-Path $TestDir NoOpService.exe
-$serviceName = ''
+$serviceName = 'CarbonTestService'
 $serviceAcct = 'CrbnInstllSvcTstAcct'
 $servicePassword = [Guid]::NewGuid().ToString().Substring(0,14)
 $installServiceParams = @{ }
@@ -22,20 +22,24 @@ $startedAt = Get-Date
 function Start-TestFixture
 {
     & (Join-Path -Path $PSScriptRoot -ChildPath '..\Import-CarbonForTest.ps1' -Resolve)
+    Install-User -Username $serviceAcct -Password $servicePassword -Description "Account for testing the Carbon Install-Service function."
+}
+
+function Stop-TestFixture
+{
+    Uninstall-Service $serviceName
 }
 
 function Start-Test
 {
-    $serviceName = 'CarbonTestService' + ([Guid]::NewGuid().ToString())
-    Install-User -Username $serviceAcct -Password $servicePassword -Description "Account for testing the Carbon Install-Service function."
     $startedAt = Get-Date
     $startedAt = $startedAt.AddSeconds(-1)
+    Uninstall-Service $serviceName
 }
 
 function Stop-Test
 {
     Uninstall-Service $serviceName
-    Uninstall-User $serviceAcct
 }
 
 function Test-ShouldInstallService
@@ -203,7 +207,7 @@ function Test-ShouldReinstallServiceIfDependenciesChange
     }
     finally
     {
-        Uninstall-Service -Name $service2Name
+        Uninstall-Service -Name $service2Name -Verbose
     }
 }
 
@@ -360,16 +364,23 @@ function Test-ShouldInstallServiceWithRelativePath
 function Test-ShouldClearDependencies
 {
     $service2Name = '{0}-2' -f $serviceName
-    Install-Service -Name $service2Name -Path $servicePath
-    Install-Service -Name $serviceName -Path $servicePath -Dependency $service2Name
+    try
+    {
+        Install-Service -Name $service2Name -Path $servicePath
+        Install-Service -Name $serviceName -Path $servicePath -Dependency $service2Name
 
-    $service = Get-Service -Name $serviceName
-    Assert-Equal 1 $service.ServicesDependedOn.Length
-    Assert-Equal $service2Name $service.ServicesDependedOn[0].Name
+        $service = Get-Service -Name $serviceName
+        Assert-Equal 1 $service.ServicesDependedOn.Length
+        Assert-Equal $service2Name $service.ServicesDependedOn[0].Name
 
-    Install-Service -Name $serviceName -Path $servicePath
-    $service = Get-Service -Name $serviceName
-    Assert-Equal 0 $service.ServicesDependedOn.Length
+        Install-Service -Name $serviceName -Path $servicePath
+        $service = Get-Service -Name $serviceName
+        Assert-Equal 0 $service.ServicesDependedOn.Length
+    }
+    finally
+    {
+        Uninstall-Service -Name $service2Name
+    }
 }
 
 function Test-ShouldNotStartManualService
