@@ -69,7 +69,7 @@ function Get-ScheduledTask
 
         Set-StrictMode -Version 'Latest'
 
-        $scheduleType = $null
+        [Carbon.TaskScheduler.ScheduleType]$scheduleType = [Carbon.TaskScheduler.ScheduleType]::Unknown
         $interval = $null
         $modifier = $null
         $duration = $null
@@ -99,7 +99,10 @@ function Get-ScheduledTask
                                         'H' = 'Hourly';
                                         'M' = 'Minute';
                                   }
-                $scheduleType = $scheduleTypes[$unit]
+                if( $scheduleTypes.ContainsKey( $unit ) )
+                {
+                    $scheduleType = $scheduleTypes[$unit]
+                }
                 $timespan = New-Object 'TimeSpan' $hour,$minute,$second
                 switch( $scheduleType )
                 {
@@ -259,7 +262,7 @@ function Get-ScheduledTask
         while( $idx -lt $output.Count -and $output[$idx].TaskName -eq $csvTask.TaskName )
         {
             $csvTask = $output[$idx++]
-            $scheduleType = $csvTask.'Schedule Type'
+            [Carbon.TaskScheduler.ScheduleType]$scheduleType = [Carbon.TaskScheduler.ScheduleType]::Unknown
 
             [int[]]$days = @()
             [int]$csvDay = 0
@@ -280,7 +283,11 @@ function Get-ScheduledTask
             $eventChannelName = $null
 
             $triggers = $xmlTask.GetElementsByTagName('Triggers') | Select-Object -First 1
-            if( $triggers -and $triggers.ChildNodes.Count -gt 0 )
+            if( -not $triggers -or $triggers.ChildNodes.Count -eq 0 )
+            {
+                $scheduleType = [Carbon.TaskScheduler.ScheduleType]::OnDemand
+            }
+            elseif( $triggers.ChildNodes.Count -gt 0 )
             {
                 [Xml.XmlElement]$trigger = $triggers.ChildNodes.Item($scheduleIdx++)
                 if( $trigger | Get-Member -Name 'EndBoundary' )
@@ -317,10 +324,18 @@ function Get-ScheduledTask
                     $scheduleType = 'OnIdle'
                     $interval = 0
                     $modifier = $null
-                    $idleExpression = $xmlTask.Settings.IdleSettings.Duration
-                    if( $idleExpression -match '^PT(\d+)M$' )
+                    $settingsNode = $xmlTask.Settings
+                    if( $settingsNode | Get-Member 'IdleSettings' )
                     {
-                        $idleTime = $Matches[1]
+                        $idleSettingsNode = $settingsNode.IdleSettings
+                        if( $idleSettingsNode | Get-Member 'Duration' )
+                        {
+                            $idleExpression = $xmlTask.Settings.IdleSettings.Duration
+                            if( $idleExpression -match '^PT(\d+)M$' )
+                            {
+                                $idleTime = $Matches[1]
+                            }
+                        }
                     }
                 }
                 elseif( $trigger.Name -eq 'EventTrigger' )
@@ -330,6 +345,14 @@ function Get-ScheduledTask
                     $selectNode = $subscription.QueryList.Query.Select
                     $modifier = $selectNode.InnerText
                     $eventChannelName = $selectNode.GetAttribute('Path')
+                }
+                elseif( $trigger.Name -eq 'SessionStateChangeTrigger' )
+                {
+                    $scheduleType = [Carbon.TaskScheduler.ScheduleType]::SessionStateChange
+                }
+                elseif( $trigger.Name -eq 'RegistrationTrigger' )
+                {
+                    $scheduleType = [Carbon.TaskScheduler.ScheduleType]::Registration
                 }
                 elseif( $trigger.Name -eq 'CalendarTrigger' )
                 {
@@ -393,10 +416,6 @@ function Get-ScheduledTask
                         }
                     }
                 }
-            }
-            else
-            {
-                Write-Verbose ('Task ''{0}'' has no triggers.' -f $task.FullName)
             }
 
             function ConvertFrom-SchtasksDate
