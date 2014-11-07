@@ -84,6 +84,11 @@
     <Compile Include="Service\ServiceInfo.cs" />
     <Compile Include="Service\ServiceSecurity.cs" />
     <Compile Include="Service\StartType.cs" />
+    <Compile Include="TaskScheduler\Months.cs" />
+    <Compile Include="TaskScheduler\ScheduleInfo.cs" />
+    <Compile Include="TaskScheduler\ScheduleType.cs" />
+    <Compile Include="TaskScheduler\TaskInfo.cs" />
+    <Compile Include="TaskScheduler\WeekOfMonth.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Security\Privilege.cs" />
     <Compile Include="IO\Path.cs" />

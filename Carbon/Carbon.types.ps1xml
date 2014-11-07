@@ -289,6 +289,21 @@
         </Members>
     </Type>
     <Type>
+        <Name>Carbon.TaskScheduler.TaskInfo</Name>
+        <Members>
+            <AliasProperty>
+                <Name>State</Name>
+                <ReferencedMemberName>Status</ReferencedMemberName>
+            </AliasProperty>
+            <ScriptProperty>
+                <Name>FullName</Name>
+                <GetScriptBlock>
+                    return Join-Path -Path $this.TaskPath -ChildPath $this.TaskName
+                </GetScriptBlock>
+            </ScriptProperty>
+        </Members>
+    </Type>
+    <Type>
         <Name>System.DirectoryServices.AccountManagement.Principal</Name>
         <Members>
             <ScriptProperty>
