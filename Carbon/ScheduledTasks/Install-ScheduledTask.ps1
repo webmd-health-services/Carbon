@@ -46,9 +46,9 @@ function Install-ScheduledTask
     Creates a scheduled task "CarbonSample" to run notepad.exe every five minutes. No credential or principal is provided, so the task will run as `System`.
 
     .EXAMPLE
-    Install-ScheduledTask -Name 'CarbonSample' -TaskToRun 'C:\Windows\system32\notepad.exe' -Minute 1 -Credential (Get-Credential 'runasuser')
+    Install-ScheduledTask -Name 'CarbonSample' -TaskToRun 'C:\Windows\system32\notepad.exe' -Minute 1 -TaskCredential (Get-Credential 'runasuser')
 
-    Demonstrates how to run a task every minute as a specific user with the `Credential` parameter.
+    Demonstrates how to run a task every minute as a specific user with the `TaskCredential` parameter.
 
     .EXAMPLE
     Install-ScheduledTask -Name 'CarbonSample' -TaskToRun 'C:\Windows\system32\notepad.exe' -Minute 1 -Principal LocalService
@@ -121,12 +121,12 @@ function Install-ScheduledTask
     Demonstrates how to run a task when the computer starts up after a certain amount of time passes. In this case, the task will run 30 minutes after the computer starts.
 
     .EXAMPLE
-    Install-ScheduledTask -Name 'CarbonSample' -TaskToRun 'notepad.exe' -OnLogon -Credential (Get-Credential 'runasuser')
+    Install-ScheduledTask -Name 'CarbonSample' -TaskToRun 'notepad.exe' -OnLogon -TaskCredential (Get-Credential 'runasuser')
 
     Demonstrates how to run a task when the user running the task logs on. Usually you want to pass a credential when setting up a logon task, since the built-in users never log in.
 
     .EXAMPLE
-    Install-ScheduledTask -Name 'CarbonSample' -TaskToRun 'notepad.exe' -OnLogon -Delay '1:45' -Credential (Get-Credential 'runasuser')
+    Install-ScheduledTask -Name 'CarbonSample' -TaskToRun 'notepad.exe' -OnLogon -Delay '1:45' -TaskCredential (Get-Credential 'runasuser')
 
     Demonstrates how to run a task after a certain amount of time passes after a user logs in. In this case, the task will run after 1 hour and 45 minutes after `runasuser` logs in.
 
@@ -151,7 +151,7 @@ function Install-ScheduledTask
     Demonstrates how to create a task using the [Task Scheduler XML schema](http://msdn.microsoft.com/en-us/library/windows/desktop/aa383609.aspx) for a task that runs as a built-in principal. You can export task XML with the `schtasks /query /xml /tn <Name>` command.
 
     .EXAMPLE
-    Install-ScheduledTask -Name 'CarbonSample' -TaskToRun 'notepad.exe' -TaskXmlFilePath $taskXmlPath -Credential (Get-Credential 'runasuser')
+    Install-ScheduledTask -Name 'CarbonSample' -TaskToRun 'notepad.exe' -TaskXmlFilePath $taskXmlPath -TaskCredential (Get-Credential 'runasuser')
 
     Demonstrates how to create a task using the [Task Scheduler XML schema](http://msdn.microsoft.com/en-us/library/windows/desktop/aa383609.aspx) for a task that will run as a specific user. The username in the XML file should match the username in the credential.
 
@@ -161,7 +161,7 @@ function Install-ScheduledTask
     Demonstrates how to create a task using raw XML that conforms to the [Task Scheduler XML schema](http://msdn.microsoft.com/en-us/library/windows/desktop/aa383609.aspx) for a task that will run as a built-in principal. In this case, `$taskXml` should be an XML document.
 
     .EXAMPLE
-    Install-ScheduledTask -Name 'CarbonSample' -TaskToRun 'notepad.exe' -TaskXml $taskXml -Credential (Get-Credential 'runasuser')
+    Install-ScheduledTask -Name 'CarbonSample' -TaskToRun 'notepad.exe' -TaskXml $taskXml -TaskCredential (Get-Credential 'runasuser')
 
     Demonstrates how to create a task using raw XML that conforms to the [Task Scheduler XML schema](http://msdn.microsoft.com/en-us/library/windows/desktop/aa383609.aspx) for a task that will run as a specific user. In this case, `$taskXml` should be an XML document.  The username in the XML document should match the username in the credential.
     #>
@@ -270,7 +270,7 @@ function Install-ScheduledTask
 
         [Parameter(ParameterSetName='OnLogon',Mandatory=$true)]
         [Switch]
-        # Create a scheduled task that runs when the user running the task logs on.  Requires the `Credential` parameter.
+        # Create a scheduled task that runs when the user running the task logs on.  Requires the `TaskCredential` parameter.
         $OnLogon,
 
         [Parameter(ParameterSetName='OnIdle',Mandatory=$true)]
@@ -393,7 +393,7 @@ function Install-ScheduledTask
         [Parameter(ParameterSetName='OnIdle')]
         [Parameter(ParameterSetName='OnEvent')]
         [Switch]
-        # Enables the task to run interactively only if the user is currently logged on at the time the job runs. The task will only run if the user is logged on. Must be used with `Credential` parameter.
+        # Enables the task to run interactively only if the user is currently logged on at the time the job runs. The task will only run if the user is logged on. Must be used with `TaskCredential` parameter.
         $Interactive,
 
         [Parameter(ParameterSetName='Minute')]
@@ -410,7 +410,7 @@ function Install-ScheduledTask
         [Parameter(ParameterSetName='OnIdle')]
         [Parameter(ParameterSetName='OnEvent')]
         [Switch]
-        # No password is stored. The task runs non-interactively as the given user, who must be logged in. Only local resources are available. Must be used with `Credential` parameter.
+        # No password is stored. The task runs non-interactively as the given user, who must be logged in. Only local resources are available. Must be used with `TaskCredential` parameter.
         $NoPassword,
 
         [Parameter(ParameterSetName='Minute')]
@@ -440,7 +440,7 @@ function Install-ScheduledTask
 
         [Management.Automation.PSCredential]
         # The principal the task should run as. Use `Principal` parameter to run as a built-in security principal. Required if `Interactive` or `NoPassword` switches are used.
-        $Credential,
+        $TaskCredential,
 
         [Parameter(ParameterSetName='Minute')]
         [Parameter(ParameterSetName='Hourly')]
@@ -457,7 +457,7 @@ function Install-ScheduledTask
         [Parameter(ParameterSetName='OnEvent')]
         [ValidateSet('System','LocalService','NetworkService')]
         [string]
-        # The built-in identity to use. The default is `System`. Use the `Credential` parameter to run as non-built-in security principal.
+        # The built-in identity to use. The default is `System`. Use the `TaskCredential` parameter to run as non-built-in security principal.
         $Principal = 'System',
 
         [Switch]
@@ -482,13 +482,13 @@ function Install-ScheduledTask
 
     $parameters = New-Object 'Collections.ArrayList'
 
-    if( $Credential )
+    if( $TaskCredential )
     {
         [void]$parameters.Add( '/RU' )
-        [void]$parameters.Add( $Credential.UserName )
+        [void]$parameters.Add( $TaskCredential.UserName )
         [void]$parameters.Add( '/RP' )
-        [void]$parameters.Add( $Credential.GetNetworkCredential().Password )
-        Grant-Privilege -Identity $Credential.UserName -Privilege 'SeBatchLogonRight' -Verbose:$VerbosePreference
+        [void]$parameters.Add( $TaskCredential.GetNetworkCredential().Password )
+        Grant-Privilege -Identity $TaskCredential.UserName -Privilege 'SeBatchLogonRight' -Verbose:$VerbosePreference
     }
     else
     {
@@ -709,9 +709,9 @@ function Install-ScheduledTask
         $originalEap = $ErrorActionPreference
         $ErrorActionPreference = 'Continue'
         $paramLogString = $parameters -join ' '
-        if( $Credential )
+        if( $TaskCredential )
         {
-            $paramLogString = $paramLogString -replace ([Text.RegularExpressions.Regex]::Escape($Credential.GetNetworkCredential().Password)),'********'
+            $paramLogString = $paramLogString -replace ([Text.RegularExpressions.Regex]::Escape($TaskCredential.GetNetworkCredential().Password)),'********'
         }
         Write-Verbose ('/TN {0} {1}' -f $Name,$paramLogString)
         $output = schtasks /create /TN $Name $parameters 2> $errFile 

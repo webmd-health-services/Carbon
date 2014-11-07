@@ -37,7 +37,7 @@ function Stop-Test
 
 function Test-ShouldSchedulePerMinuteTasks
 {
-    Assert-TaskScheduled -InstallArguments @{ Minute = 5 } -AssertArguments @{ ScheduleType = 'Minute'; Modifier = 5 } -Verbose
+    Assert-TaskScheduled -InstallArguments @{ Minute = 5 } -AssertArguments @{ ScheduleType = 'Minute'; Modifier = 5 }
 }
 
 function Test-ShouldScheduleHourlyTasks
@@ -135,7 +135,7 @@ function Test-ShouldScheduleWeekOfMonthTasksOnEachWeek
 {
     foreach( $week in @( 'First', 'Second', 'Third', 'Fourth', 'Last' ) )
     {
-        $result = Install-ScheduledTask -Name $taskName -Principal LocalService -TaskToRun 'notepad' -WeekOfMonth $week -DayOfWeek $today.DayOfWeek
+        $result = Install-ScheduledTask -Name $taskName -Principal LocalService -TaskToRun 'notepad' -WeekOfMonth $week -DayOfWeek $today.DayOfWeek -Force
         Assert-NotNull $result
         Assert-ScheduledTask -Name $taskName -Principal 'Local Service' -TaskToRun 'notepad' -ScheduleType 'Monthly' -Modifier $week -DayOfWeek $today.DayOfWeek -Months $AllMonths
     }
@@ -172,15 +172,15 @@ function Assert-TaskScheduledFromXml
     param(
         $Path,
         $Xml,
-        $Credential
+        $TaskCredential
     )
 
     Set-StrictMode -Version 'Latest'
 
     $installParams = @{ }
-    if( $Credential )
+    if( $TaskCredential )
     {
-        $installParams['Credential'] = $Credential
+        $installParams['TaskCredential'] = $TaskCredential
     }
 
     if( $Path )
@@ -201,9 +201,9 @@ function Assert-TaskScheduledFromXml
     $task = Get-ScheduledTask -Name $taskName
     Assert-NotNull $task
     Assert-Equal $taskName $task.TaskName
-    if( $Credential )
+    if( $TaskCredential )
     {
-        Assert-Equal $credential.Username $task.RunAsUser
+        Assert-Equal $TaskCredential.Username $task.RunAsUser
     }
     else
     {
@@ -239,7 +239,7 @@ function Test-ShouldInstallFromXmlFileWithRelativePath
     Push-Location -Path $PSScriptRoot
     try
     {
-        Assert-TaskScheduledFromXml -Path '.\task.xml' -Credential $credential
+        Assert-TaskScheduledFromXml -Path '.\task.xml' -TaskCredential $credential
     }
     finally
     {
@@ -249,7 +249,7 @@ function Test-ShouldInstallFromXmlFileWithRelativePath
 
 function Test-ShouldInstallFromXmlFileWithAbsolutePath
 {
-    Assert-TaskScheduledFromXml -Path (Join-Path -Path $PSScriptRoot -ChildPath 'task.xml') -Credential $credential
+    Assert-TaskScheduledFromXml -Path (Join-Path -Path $PSScriptRoot -ChildPath 'task.xml') -TaskCredential $credential
 }
 
 function Test-ShouldInstallFromXmlFileForSystemUser
@@ -259,7 +259,7 @@ function Test-ShouldInstallFromXmlFileForSystemUser
 
 function Test-ShouldInstallFromXml
 {
-    Assert-TaskScheduledFromXml -Xml ((Get-Content -Path (Join-Path -Path $PSScriptRoot -ChildPath 'task_with_principal.xml')) -join ([Environment]::NewLine)) -Verbose
+    Assert-TaskScheduledFromXml -Xml ((Get-Content -Path (Join-Path -Path $PSScriptRoot -ChildPath 'task_with_principal.xml')) -join ([Environment]::NewLine))
 }
 
 
@@ -295,9 +295,9 @@ function Assert-TaskScheduled
     $postTask = Get-ScheduledTask -Name $taskName
     Assert-Equal $preTask.CreateDate $postTask.CreateDate
 
-    $InstallArguments['Credential'] = $credential
+    $InstallArguments['TaskCredential'] = $credential
     $InstallArguments['Force'] = $true
-    $AssertArguments['Credential'] = $credential
+    $AssertArguments['TaskCredential'] = $credential
 
     $task = Install-ScheduledTask @InstallArguments
     Assert-NotNull $task
@@ -426,7 +426,7 @@ function Assert-ScheduledTask
     param(
         $Name,
         $TaskToRun,
-        $Credential,
+        $TaskCredential,
         $Principal,
         $TaskXmlPath,
         $ScheduleType,
@@ -477,9 +477,9 @@ function Assert-ScheduledTask
     schtasks /query /xml /tn $task.FullName | Where-Object { $_ } | Write-Verbose
     Assert-Equal $TaskToRun $task.TaskToRun.Trim()
 
-    if( $PSBoundParameters.ContainsKey('Credential') )
+    if( $PSBoundParameters.ContainsKey('TaskCredential') )
     {
-        Assert-Equal $Credential.Username $task.RunAsUser 'RunAsUser'
+        Assert-Equal $TaskCredential.Username $task.RunAsUser 'RunAsUser'
     }
     elseif( $PSBoundParameters.ContainsKey('Principal') )
     {

@@ -17,7 +17,9 @@
 ### Scheduled Tasks
 
  * Created [Get-ScheduledTask](http://get-carbon.org/help/Get-ScheduledTask.html) function for getting the scheduled tasks on the local computer using `schtasks.exe`.
+ * Created [Install-ScheduledTask](http://get-carbon.org/help/Install-ScheduledTask.html) function for installing a scheduled task.
  * Created [Test-ScheduledTask](http://get-carbon.org/help/Test-ScheduledTask.html) function for testing if a scheduled tasks on the local computer exists.
+ * Created [Uninstall-ScheduledTask](http://get-carbon.org/help/Uninstall-ScheduledTask.html) function for deleting a scheduled task.
  
 ### Services
 
