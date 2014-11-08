@@ -62,12 +62,10 @@ namespace Carbon.Computer
 			}
 			else
 			{
-				try
+				Version version;
+				if (Version.TryParse(GetValueAsString("Version"), out version))
 				{
-					Version = new Version(GetValueAsString("Version"));
-				}
-				catch
-				{
+					Version = version;
 				}
 			}
 

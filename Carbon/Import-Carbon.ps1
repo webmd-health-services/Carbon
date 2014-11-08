@@ -35,7 +35,7 @@ param(
     $Prefix
 )
 
-#Requires -Version 3
+#Requires -Version 4
 Set-StrictMode -Version 'Latest'
 
 if( (Get-Module 'Carbon') )

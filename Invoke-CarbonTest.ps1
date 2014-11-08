@@ -32,7 +32,7 @@ param(
     $PassThru
 )
 
-#Requires -Version 3
+#Requires -Version 4
 Set-StrictMode -Version 'Latest'
 
 & (Join-Path -Path $PSScriptRoot -ChildPath 'Carbon\Import-Carbon.ps1' -Resolve)

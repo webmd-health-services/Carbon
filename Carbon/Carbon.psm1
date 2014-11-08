@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-#Requires -Version 3
+#Requires -Version 4
 
 $CarbonBinDir = Join-Path -Path $PSScriptRoot -ChildPath 'bin' -Resolve
 

@@ -10,7 +10,7 @@ The focus of version 2.0 is on making necessary, backwards-incompatible changes 
 
 This is a ***backwards-incompatible*** release. 
 
- * Upgrade to PowerShell 4. (PowerShell 3 *might* work. We don't know because we don't have any computers available to test on.)
+ * Upgrade to PowerShell 4.
  * Remove usages of `Complete-Job`.  We removed it because it was total crap.  Use PowerShell's `Wait-Job` cmdlet instead.
  * [Grant-Permission](http://get-carbon.org/help/2.0/Grant-Permission.html) now only grants permissions on an object if those permissions aren't present.  To preserve previous behaviour, add the `-Force` switch to all `Grant-Permission` usages.
  * The following commands now return objects to the pipeline. Depending on your usage, you may need to pipe their output to `Out-Null`, assign their return values to `$null`, or do nothing.
@@ -41,6 +41,10 @@ This is a ***backwards-incompatible*** release.
  * Update usages of `Carbon.Computer.ProgramInstallInfo`'s `Version` property (returned by [Get-ProgramInstallInfo](http://get-carbon.org/help/2.0/Get-ProgramInstallInfo.html). It was an `int` and is now a [Version](http://msdn.microsoft.com/en-us/library/y0hf9t2e.aspx) object.
  
 ## Enhancements
+
+### General
+
+ * Carbon now requires PowerShell 4.
 
 ### Certificates
 
