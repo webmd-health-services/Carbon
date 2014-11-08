@@ -433,7 +433,7 @@ function Install-ScheduledTask
         [Parameter(ParameterSetName='OnStart')]
         [Parameter(ParameterSetName='OnLogon')]
         [Parameter(ParameterSetName='OnEvent')]
-        [ValidateScript({ $_ -lt '6:22:40:00'})]
+        [ValidateScript({ $_ -lt '6.22:40:00'})]
         [timespan]
         # The wait time to delay the running of the task after the trigger is fired.  Must be less than 10,000 minutes (6 days, 22 hours, and 40 minutes).
         $Delay,
@@ -490,7 +490,7 @@ function Install-ScheduledTask
         [void]$parameters.Add( $TaskCredential.GetNetworkCredential().Password )
         Grant-Privilege -Identity $TaskCredential.UserName -Privilege 'SeBatchLogonRight' -Verbose:$VerbosePreference
     }
-    else
+    elseif( $PSCmdlet.ParameterSetName -notlike 'Xml*' )
     {
         [void]$parameters.Add( '/RU' )
         [void]$parameters.Add( (Resolve-IdentityName -Name $Principal) )
