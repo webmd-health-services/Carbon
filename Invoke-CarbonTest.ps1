@@ -48,57 +48,20 @@ if( $Test )
     $bladeTestParam.Test = $Test
 }
 
-$bladePath = Join-Path -Path $PSScriptRoot -ChildPath '.\Tools\Blade\blade.ps1' -Resolve
-
 try
 {
-    $Path | ForEach-Object {
-
-            Get-Item -Path $_
-
-            if( $Recurse -and (Test-Path -Path $_ -PathType Container) )
-            {
-                Get-ChildItem -Path $_ -Directory
-            }
-
-        } | ForEach-Object {
-            Start-Job -Name $_.FullName -ScriptBlock { 
-                param(
-                    $BladePath,
-                    $Path,
-                    [hashtable]
-                    $BladeTestParam,
-                    [Switch]
-                    $Recurse,
-                    [Switch]
-                    $PassThru
-                )
-
-                Write-Verbose $Path
-                & $BladePath -Path $Path @BladeTestParam -PassThru:$PassThru
-            } -ArgumentList $bladePath,$_.FullName,$bladeTestParam,$Recurse,$PassThru
-        } |
-            Wait-Job |
-            ForEach-Object {
-                $job = $_
-
-                $job.Name
-                Receive-Job $job -ErrorAction SilentlyContinue
-                Remove-Job $job
-
-                foreach( $errorItem in $Error )
-                {
-                    $errorItem | Out-String | ForEach-Object { $_.TrimEnd() }
-                    if( $error | Get-Member -Name 'ScriptStackTrace' )
-                    {
-                        $errorItem.ScriptStackTrace | Out-String 
-                    }
-                }
-                $Error.Clear()
-            }
+    & (Join-Path -Path $PSScriptRoot -ChildPath '.\Tools\Blade\blade.ps1' -Resolve) -Path $Path @bladeTestParam -Recurse:$Recurse -PassThru:$PassThru
 }
 finally
 {
     $installRoot = Get-PowerShellModuleInstallPath
     Remove-Junction -Path $carbonModuleRoot
+}
+
+$Error | ForEach-Object {
+    $_ | Out-String | ForEach-Object { $_.TrimEnd() }
+    if( $_ | Get-Member -Name 'ScriptStackTrace' )
+    {
+        $_.ScriptStackTrace | Out-String
+    }
 }
