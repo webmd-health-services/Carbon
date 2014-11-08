@@ -43,7 +43,12 @@ function Assert-NoError
 
     if( $Global:Error.Count -gt 0 )
     {
-        Fail "Found $($Global:Error.Count) errors, expected none. $Message" 
+        $failMessage = Invoke-Command {
+            "Found $($Global:Error.Count) errors, expected none. $Message" 
+            $Global:Error
+        } | Out-String
+        $failMessage = $failMessage -join ([Environment]::NewLine)
+        Fail $failMessage
     }
 }
 

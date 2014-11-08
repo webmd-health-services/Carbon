@@ -33,6 +33,7 @@ function Start-Test
 
 function Stop-Test
 {
+    $Error.Clear()
     Uninstall-ScheduledTask -Name $taskName
     Assert-NoError
 }

@@ -705,7 +705,6 @@ function Install-ScheduledTask
             [void]$parameters.Add( 'HIGHEST' )
         }
 
-        $errFile = Join-Path -Path $env:TEMP -ChildPath ('Carbon+Uninstall-ScheduledTask+{0}' -f ([IO.Path]::GetRandomFileName()))
         $originalEap = $ErrorActionPreference
         $ErrorActionPreference = 'Continue'
         $paramLogString = $parameters -join ' '
@@ -714,14 +713,24 @@ function Install-ScheduledTask
             $paramLogString = $paramLogString -replace ([Text.RegularExpressions.Regex]::Escape($TaskCredential.GetNetworkCredential().Password)),'********'
         }
         Write-Verbose ('/TN {0} {1}' -f $Name,$paramLogString)
-        $output = schtasks /create /TN $Name $parameters 2> $errFile 
+        # Warnings get written by schtasks to the error stream. Fortunately, errors and warnings 
+        # are prefixed with ERRROR and WARNING, so we can combine output/error streams and parse 
+        # it later. We just have to make sure we remove any errors added to the $Error variable.
+        $errorCount = $Global:Error.Count
+        $output = schtasks /create /TN $Name $parameters 2>&1
+        if( $Global:Error.Count -gt $errorCount )
+        {
+            for( $idx = 0; $idx -lt ($Global:Error.Count - $errorCount); ++$idx )
+            {
+                $Global:Error.RemoveAt(0)
+            }
+        }
         $ErrorActionPreference = $originalEap
 
         $createFailed = $false
         if( $LASTEXITCODE )
         {
             $createFailed = $true
-            Write-Error ((Get-Content -Path $errFile) -join ([Environment]::NewLine))
         }
 
         $output | ForEach-Object { 
@@ -731,7 +740,7 @@ function Install-ScheduledTask
             }
             elseif( $_ -match '\bWARNING\b' )
             {
-                Write-Warning $_
+                Write-Warning ($_ -replace '^WARNING: ','')
             }
             else
             {
