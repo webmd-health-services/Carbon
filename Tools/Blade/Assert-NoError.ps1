@@ -45,7 +45,13 @@ function Assert-NoError
     {
         $failMessage = Invoke-Command {
             "Found $($Global:Error.Count) errors, expected none. $Message" 
-            $Global:Error
+            $Global:Error | ForEach-Object {
+                $_
+                if( $_ | Get-Member -Name 'ScriptStackTrace' )
+                {
+                    $_.ScriptStackTrace
+                }
+            }
         } | Out-String
         $failMessage = $failMessage -join ([Environment]::NewLine)
         Fail $failMessage
