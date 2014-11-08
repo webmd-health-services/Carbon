@@ -29,8 +29,9 @@ Demonstrates how to import the Blade module.
 param(
 )
 
-#Requires -Version 3
+#Requires -Version 2
 Set-StrictMode -Version 'Latest'
+$PSScriptRoot = Split-Path -Parent -Path $MyInvocation.MyCommand.Definition
 
 if( (Get-Module -Name 'Blade') )
 {
