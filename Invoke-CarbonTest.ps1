@@ -54,7 +54,7 @@ try
 {
     $Path | ForEach-Object {
 
-            Get-Item -Path $Path
+            Get-Item -Path $_
 
             if( $Recurse -and (Test-Path -Path $_ -PathType Container) )
             {
@@ -75,7 +75,7 @@ try
                 )
 
                 Write-Verbose $Path
-                & $BladePath -Path $Path @BladeTestParam -Recurse:$Recurse -PassThru:$PassThru
+                & $BladePath -Path $Path @BladeTestParam -PassThru:$PassThru
             } -ArgumentList $bladePath,$_.FullName,$bladeTestParam,$Recurse,$PassThru
         } |
             Wait-Job |
