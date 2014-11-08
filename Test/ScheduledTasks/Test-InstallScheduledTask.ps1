@@ -28,11 +28,13 @@ function Start-TestFixture
 function Start-Test
 {
     Uninstall-ScheduledTask -Name $taskName
+    Assert-NoError
 }
 
 function Stop-Test
 {
     Uninstall-ScheduledTask -Name $taskName
+    Assert-NoError
 }
 
 function Test-ShouldSchedulePerMinuteTasks
@@ -136,6 +138,7 @@ function Test-ShouldScheduleWeekOfMonthTasksOnEachWeek
     foreach( $week in @( 'First', 'Second', 'Third', 'Fourth', 'Last' ) )
     {
         $result = Install-ScheduledTask -Name $taskName -Principal LocalService -TaskToRun 'notepad' -WeekOfMonth $week -DayOfWeek $today.DayOfWeek -Force
+        Assert-NoError
         Assert-NotNull $result
         Assert-ScheduledTask -Name $taskName -Principal 'Local Service' -TaskToRun 'notepad' -ScheduleType 'Monthly' -Modifier $week -DayOfWeek $today.DayOfWeek -Months $AllMonths
     }
@@ -198,6 +201,7 @@ function Assert-TaskScheduledFromXml
     Assert-NoError 
     # Now, make sure task doesn't get re-created if it already exists.
     Assert-Null (Install-ScheduledTask -Name $taskName @installParams -Verbose:$VerbosePreference)
+    Assert-NoError
     $task = Get-ScheduledTask -Name $taskName
     Assert-NotNull $task
     Assert-Equal $taskName $task.TaskName
@@ -286,12 +290,14 @@ function Assert-TaskScheduled
 
     # Install to run as SYSTEM
     $task = Install-ScheduledTask -Principal System @InstallArguments
+    Assert-NoError
     Assert-NotNull $task
     Assert-Is $task ([Carbon.TaskScheduler.TaskInfo])
     Assert-ScheduledTask -Principal 'System' @AssertArguments
 
     $preTask = Get-ScheduledTask -Name $taskName
     Assert-Null (Install-ScheduledTask -Principal System @InstallArguments)
+    Assert-NoError
     $postTask = Get-ScheduledTask -Name $taskName
     Assert-Equal $preTask.CreateDate $postTask.CreateDate
 
@@ -300,6 +306,7 @@ function Assert-TaskScheduled
     $AssertArguments['TaskCredential'] = $credential
 
     $task = Install-ScheduledTask @InstallArguments
+    Assert-NoError
     Assert-NotNull $task
     Assert-Is $task ([Carbon.TaskScheduler.TaskInfo])
     Assert-ScheduledTask @AssertArguments 
@@ -327,6 +334,7 @@ function Assert-TaskScheduled
             if( $InstallArguments.ContainsKey( $startTimeSchedule ) )
             {
                 $task = Install-ScheduledTask @InstallArguments -StartTime '23:06'
+                Assert-NoError
                 Assert-NotNull $task
                 Assert-Is $task ([Carbon.TaskScheduler.TaskInfo])
                 Assert-ScheduledTask @AssertArguments -StartTime '23:06'
@@ -341,6 +349,7 @@ function Assert-TaskScheduled
         if( $InstallArguments.ContainsKey( $startDateSchedule ) )
         {
             $task = Install-ScheduledTask @InstallArguments -StartDate $today.AddDays(1)
+            Assert-NoError
             Assert-NotNull $task
             Assert-Is $task ([Carbon.TaskScheduler.TaskInfo])
             Assert-ScheduledTask @AssertArguments -StartDate $today.AddDays(1)
@@ -353,6 +362,7 @@ function Assert-TaskScheduled
         if( $InstallArguments.ContainsKey( $durationSchedule ) )
         {
             $task = Install-ScheduledTask @InstallArguments -Duration '5:30'  # Using fractional hours to ensure it gets converted properly.
+            Assert-NoError
             Assert-NotNull $task
             Assert-Is $task ([Carbon.TaskScheduler.TaskInfo])
             Assert-ScheduledTask @AssertArguments -Duration '5:30' 
@@ -366,6 +376,7 @@ function Assert-TaskScheduled
         if( $InstallArguments.ContainsKey( $endDateSchedule ) )
         {
             $task = Install-ScheduledTask @InstallArguments -EndDate $today.AddYears(1)
+            Assert-NoError
             Assert-NotNull $task
             Assert-Is $task ([Carbon.TaskScheduler.TaskInfo])
             Assert-ScheduledTask @AssertArguments -EndDate $today.AddYears(1)
@@ -379,6 +390,7 @@ function Assert-TaskScheduled
         if( $InstallArguments.ContainsKey( $endTimeSchedule ) )
         {
             $task = Install-ScheduledTask @InstallArguments -EndTime '23:06'
+            Assert-NoError
             Assert-NotNull $task
             Assert-Is $task ([Carbon.TaskScheduler.TaskInfo])
             Assert-ScheduledTask @AssertArguments -EndTime '23:06' -EndDate $today
@@ -388,18 +400,21 @@ function Assert-TaskScheduled
 
     # Install as interactive
     $task = Install-ScheduledTask @InstallArguments -Interactive
+    Assert-NoError
     Assert-NotNull $task
     Assert-Is $task ([Carbon.TaskScheduler.TaskInfo])
     Assert-ScheduledTask @AssertArguments -Interactive
 
     # Install as no password
     $task = Install-ScheduledTask @InstallArguments -NoPassword
+    Assert-NoError
     Assert-NotNull $task
     Assert-Is $task ([Carbon.TaskScheduler.TaskInfo])
     Assert-ScheduledTask @AssertArguments -NoPassword
 
     # Install as highest run level
     $task = Install-ScheduledTask @InstallArguments -HighestAvailableRunLevel
+    Assert-NoError
     Assert-NotNull $task
     Assert-Is $task ([Carbon.TaskScheduler.TaskInfo])
     Assert-ScheduledTask @AssertArguments -HighestAvailableRunLevel
@@ -410,6 +425,7 @@ function Assert-TaskScheduled
         if( $InstallArguments.ContainsKey( $delaySchedule ) )
         {
             $task = Install-ScheduledTask @InstallArguments -Delay '6.22:39:59'
+            Assert-NoError
             Assert-NotNull $task
             Assert-Is $task ([Carbon.TaskScheduler.TaskInfo])
             Assert-ScheduledTask @AssertArguments -Delay '6.22:39:59'
