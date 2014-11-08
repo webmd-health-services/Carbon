@@ -72,7 +72,9 @@ param(
     $Recurse
 )
 
+#Requires -Version 2
 Set-StrictMode -Version 'Latest'
+$PSScriptRoot = Split-Path -Parent -Path $MyInvocation.MyCommand.Definition
 
 & (Join-Path -Path (Split-Path -Parent -Path $MyInvocation.MyCommand.Definition) -ChildPath 'Import-Blade.ps1' -Resolve)
 

@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+#Requires -Version 2
+
 @{
 
     # Script module or binary module file associated with this manifest
