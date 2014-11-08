@@ -62,7 +62,7 @@ function Test-ShouldReinstallUnchangedServiceWithForceParameter
 
     Install-Service -Name $serviceName -Path $servicePath @installServiceParams -Force
 
-    $maxTries = 20
+    $maxTries = 50
     $tryNum = 0
     $serviceReinstalled = $false
     do
@@ -71,7 +71,7 @@ function Test-ShouldReinstallUnchangedServiceWithForceParameter
                                          -After $startedAt `
                                          -Source 'Service Control Manager' `
                                          -EntryType Information |
-                                Where-Object { $_.EventID -eq 7036 -or $_.EventID -eq 7045 }
+                                Where-Object { ($_.EventID -eq 7036 -or $_.EventID -eq 7045) -and $_.Message -like ('*{0}*' -f $serviceName) }
 
         if( $events -and $events.Count -ge 4 )
         {
