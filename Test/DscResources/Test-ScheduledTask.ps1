@@ -42,7 +42,7 @@ function Stop-TestFixture
 
 function Test-ShouldGetExistingTasks
 {
-    Get-ScheduledTask -Name '\Apple\AppleSoftwareUpdate' | ForEach-Object {
+    Get-ScheduledTask | ForEach-Object {
         $expectedXml = schtasks /query /xml /tn $_.FullName | Where-Object { $_ }
         $expectedXml = $expectedXml -join ([Environment]::NewLine) 
 
