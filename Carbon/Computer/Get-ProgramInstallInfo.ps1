@@ -40,6 +40,7 @@ function Get-ProgramInstallInfo
     Demonstrates how to use wildcards to search for multiple programs.
     #>
     [CmdletBinding()]
+    [OutputType([Carbon.Computer.ProgramInstallInfo])]
     param(
         [string]
         # The name of a specific program to get. Wildcards supported.

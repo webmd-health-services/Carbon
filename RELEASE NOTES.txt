@@ -8,7 +8,7 @@ The focus of version 2.0 is on making necessary, backwards-incompatible changes 
 
 ## Upgrade Instructions
 
-This is a backwards-incompatible release. 
+This is a ***backwards-incompatible*** release. 
 
  * Upgrade to PowerShell 4. (PowerShell 3 *might* work. We don't know because we don't have any computers available to test on.)
  * Remove usages of `Complete-Job`.  We removed it because it was total crap.  Use PowerShell's `Wait-Job` cmdlet instead.
@@ -38,6 +38,7 @@ This is a backwards-incompatible release.
  * Rename usages of `[Carbon.HandleInfo]` class to `[Carbon.Win32.HandleInfo]`.
  * Remove usages of `[Carbon.Lsa]::LookupPrivilegeValue` class method. It was incorrectly exposed as a public method.
  * Remove usages of `[Carbon.Kernel32]::LocalFree` class method. It was incorrectly exposed as a public method.
+ * Update usages of `Carbon.Computer.ProgramInstallInfo`'s `Version` property (returned by [Get-ProgramInstallInfo](http://get-carbon.org/help/2.0/Get-ProgramInstallInfo.html). It was an `int` and is now a [Version](http://msdn.microsoft.com/en-us/library/y0hf9t2e.aspx) object.
  
 ## Enhancements
 
@@ -55,6 +56,7 @@ This is a backwards-incompatible release.
 ### Computer
 
  * Changed [Test-OSIs32Bit](http://get-carbon.org/help/2.0/Test-OSIs32Bit.html) and [Test-OSIs64Bit](http://get-carbon.org/help/2.0/Test-OSIs64Bit.html) functions to use the Environment class's new [Is64BitOperatingSystem](http://msdn.microsoft.com/en-us/library/system.environment.is64bitoperatingsystem.aspx) property.
+ * Changed `Carbon.Computer.ProgramInstallInfo`'s `Version` property (returned by [Get-ProgramInstallInfo](http://get-carbon.org/help/2.0/Get-ProgramInstallInfo.html) from an `int` to a [Version](http://msdn.microsoft.com/en-us/library/y0hf9t2e.aspx) object.
  
 ### DSC
 

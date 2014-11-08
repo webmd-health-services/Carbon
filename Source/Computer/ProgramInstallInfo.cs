@@ -51,7 +51,26 @@ namespace Carbon.Computer
 			UninstallString = GetValueAsString("UninstallString");
 			UrlInfoAbout = GetValueAsString("URLInfoAbout");
 			UrlUpdateInfo = GetValueAsString("URLUpdateInfo");
-			Version = GetValueAsInt("Version");
+
+			var intVersion = GetValueAsInt("Version");
+			if (intVersion != 0)
+			{
+				var major = intVersion >> 24; // first 8 bits are major version number
+				var minor = (intVersion & 0x00ff0000) >> 16; // bits 9 - 16 are the minor version number
+				var build = intVersion & 0x0000ffff; // last 16 bits are the build number
+				Version = new Version(major, minor, build);
+			}
+			else
+			{
+				try
+				{
+					Version = new Version(GetValueAsString("Version"));
+				}
+				catch
+				{
+				}
+			}
+
 			VersionMajor = GetValueAsInt("VersionMajor");
 			VersionMinor = GetValueAsInt("VersionMinor");
 
@@ -122,7 +141,7 @@ namespace Carbon.Computer
 	
 		public string UrlUpdateInfo { get; private set; }
 
-		public int Version { get; private set; }
+		public Version Version { get; private set; }
 
 		public int VersionMajor { get; private set; }
 	

@@ -42,6 +42,10 @@ function Test-ShouldGetInstalledPrograms
                 {
                     $keyValue = 0
                 }
+                elseif( $typeName -eq 'Version' )
+                {
+                    $keyValue = $null
+                }
                 elseif( $typeName -eq 'DateTime' )
                 {
                     $keyValue = [DateTime]::MinValue
@@ -74,8 +78,34 @@ function Test-ShouldGetInstalledPrograms
                     $keyValue = [Int32]::TryParse($keyValue, [ref] $intValue)
                     $keyValue = $intValue
                 }
+                elseif( $typeName -eq 'Version' )
+                {
+                    if( $keyValue -is [int32] )
+                    {
+                        $major = $keyValue -shr 24   # First 8 bits
+                        $minor = ($keyValue -band 0x00ff0000) -shr 16  # bits 9 - 16
+                        $build = $keyValue -band 0x0000ffff   # last 8 bits
+                        $keyValue = New-Object 'Version' $major,$minor,$build
+                    }
+                    else
+                    {
+                        [Version]$version = $null
+                        if( [Version]::TryParse($keyValue, [ref]$version) )
+                        {
+                            $keyValue = $version
+                        }
+                    }
+                }
             }
-            Assert-Equal $keyValue $propertyValue ('{0}: {1}' -f $program.Key.Name,$propertyName)
+
+            if( $keyValue -eq $null )
+            {
+                Assert-Null $propertyValue
+            }
+            else
+            {
+                Assert-Equal $keyValue $propertyValue ('{0}: {1}' -f $program.Key.Name,$propertyName)
+            }
         }
     }
 }
