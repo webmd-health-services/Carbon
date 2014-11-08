@@ -48,9 +48,39 @@ if( $Test )
     $bladeTestParam.Test = $Test
 }
 
+$bladePath = Join-Path -Path $PSScriptRoot -ChildPath '.\Tools\Blade\blade.ps1' -Resolve
+
 try
 {
-    & (Join-Path -Path $PSScriptRoot -ChildPath '.\Tools\Blade\blade.ps1' -Resolve) -Path $Path @bladeTestParam -Recurse:$Recurse -PassThru:$PassThru
+    $Path | ForEach-Object {
+
+            Get-Item -Path $Path
+
+            if( $Recurse -and (Test-Path -Path $_ -PathType Container) )
+            {
+                Get-ChildItem -Path $_ -Directory
+            }
+
+        } | ForEach-Object {
+            Start-Job -ScriptBlock { 
+                param(
+                    $BladePath,
+                    $Path,
+                    [hashtable]
+                    $BladeTestParam,
+                    [Switch]
+                    $Recurse,
+                    [Switch]
+                    $PassThru
+                )
+
+                Write-Verbose $Path
+                & $BladePath -Path $Path @BladeTestParam -Recurse:$Recurse -PassThru:$PassThru
+            } -ArgumentList $bladePath,$_.FullName,$bladeTestParam,$Recurse,$PassThru
+        } |
+            Wait-Job |
+            Receive-Job |
+            Remove-Job
 }
 finally
 {
