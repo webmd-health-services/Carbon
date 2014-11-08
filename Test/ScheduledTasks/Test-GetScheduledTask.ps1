@@ -104,6 +104,10 @@ function Assert-ScheduledTaskEqual
                                     '\Microsoft\Windows\Power Efficiency Diagnostics\AnalyzeSystem' = $true;
                                     '\Microsoft\Windows\Registry\RegIdleBackup' = $true;
                                     '\Microsoft\Windows\RAC\RacTask' = $true;
+                                    '\Microsoft\Windows\Customer Experience Improvement Program\Server\ServerCeipAssistant' = $true;
+                                    '\Microsoft\Windows\Data Integrity Scan\Data Integrity Scan' = $true;
+                                    '\Microsoft\Windows\TaskScheduler\Regular Maintenance' = $true;
+                                    '\Microsoft\Windows\WindowsUpdate\Scheduled Start' = $true;
                                 }
     $scheduleProps = @(
                            'Last Result',
