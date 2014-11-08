@@ -62,7 +62,7 @@ try
             }
 
         } | ForEach-Object {
-            Start-Job -ScriptBlock { 
+            Start-Job -Name $_.FullName -ScriptBlock { 
                 param(
                     $BladePath,
                     $Path,
@@ -79,8 +79,23 @@ try
             } -ArgumentList $bladePath,$_.FullName,$bladeTestParam,$Recurse,$PassThru
         } |
             Wait-Job |
-            Receive-Job |
-            Remove-Job
+            ForEach-Object {
+                $job = $_
+
+                $job.Name
+                Receive-Job $job -ErrorAction SilentlyContinue
+                Remove-Job $job
+
+                foreach( $errorItem in $Error )
+                {
+                    $errorItem | Out-String | ForEach-Object { $_.TrimEnd() }
+                    if( $error | Get-Member -Name 'ScriptStackTrace' )
+                    {
+                        $errorItem.ScriptStackTrace | Out-String 
+                    }
+                }
+                $Error.Clear()
+            }
 }
 finally
 {
