@@ -201,6 +201,13 @@
 			<li><a href="Set-RegistryKeyValue.html">Set-RegistryKeyValue</a></li>
 			<li><a href="Test-RegistryKeyValue.html">Test-RegistryKeyValue</a></li>
 		</ul>
+		<li class="Category">ScheduledTasks</li>
+		<ul class="CommandMenu">
+			<li><a href="Get-ScheduledTask.html">Get-ScheduledTask</a></li>
+			<li><a href="Install-ScheduledTask.html">Install-ScheduledTask</a></li>
+			<li><a href="Test-ScheduledTask.html">Test-ScheduledTask</a></li>
+			<li><a href="Uninstall-ScheduledTask.html">Uninstall-ScheduledTask</a></li>
+		</ul>
 		<li class="Category">Security</li>
 		<ul class="CommandMenu">
 			<li><a href="Assert-AdminPrivilege.html">Assert-AdminPrivilege</a></li>
@@ -285,6 +292,8 @@
 <p>The minimum required information to install a service is its name and path.</p>
 
 <p><a href="http://technet.microsoft.com/en-us/library/dd548356.aspx">Managed service accounts and virtual accounts</a> should be supported (we don't know how to test, so can't be sure).  Simply omit the <code>-Password</code> parameter when providing a custom account name with the <code>-Username</code> parameter.</p>
+
+<p><code>Manual</code> services are not started. <code>Automatic</code> services are started after installation. If an existing manual service is started when configuration begins, it is re-started after re-configured.</p>
 </div>
     
 <h2>Related Commands</h2>

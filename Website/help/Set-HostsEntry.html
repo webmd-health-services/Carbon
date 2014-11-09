@@ -201,6 +201,13 @@
 			<li><a href="Set-RegistryKeyValue.html">Set-RegistryKeyValue</a></li>
 			<li><a href="Test-RegistryKeyValue.html">Test-RegistryKeyValue</a></li>
 		</ul>
+		<li class="Category">ScheduledTasks</li>
+		<ul class="CommandMenu">
+			<li><a href="Get-ScheduledTask.html">Get-ScheduledTask</a></li>
+			<li><a href="Install-ScheduledTask.html">Install-ScheduledTask</a></li>
+			<li><a href="Test-ScheduledTask.html">Test-ScheduledTask</a></li>
+			<li><a href="Uninstall-ScheduledTask.html">Uninstall-ScheduledTask</a></li>
+		</ul>
 		<li class="Category">Security</li>
 		<ul class="CommandMenu">
 			<li><a href="Assert-AdminPrivilege.html">Assert-AdminPrivilege</a></li>
@@ -283,6 +290,8 @@
 <p>This function scans the entire hosts file.  If you have a large hosts file, and are updating multiple entries, this function will be slow.</p>
 
 <p>You can operate on a custom hosts file, too.  Pass its path with the <code>Path</code> parameter.</p>
+
+<p>Sometimes the system's hosts file is in use and locked when you try to update it. The <code>Set-HostsEntry</code> function tries 10 times to set a hosts entry before giving up and writing an error. It waits a random amount of time (from 0 to 1000 milliseconds) between each attempt.</p>
 </div>
     
 
