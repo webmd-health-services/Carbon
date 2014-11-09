@@ -88,7 +88,7 @@ function Test-ShouldFindCertificateInCustomStoreByThumbprint
     }
 }
 
-function Test-ShouldFindCertificateInCustomStoreByThumbprint
+function Test-ShouldFindCertificateInCustomStoreByFriendlyName
 {
     $expectedCert = Install-Certificate -Path $TestCertPath -StoreLocation CurrentUser -CustomStoreName 'Carbon'
     try
