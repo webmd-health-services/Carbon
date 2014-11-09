@@ -169,7 +169,7 @@ function Test-ShouldEncryptFromCertStoreByThumbprint
                 Where-Object { $_.PublicKey.Key -is [Security.Cryptography.RSACryptoServiceProvider] } |
                 Select-Object -First 1
     Assert-NotNull $cert
-    $secret = [Guid]::NewGuid().ToString()
+    $secret = [Guid]::NewGuid().ToString().Substring(0,20)
     $expectedCipherText = Protect-String -String $secret -Thumbprint $cert.Thumbprint
     Assert-NotNull $expectedCipherText
 }
@@ -188,7 +188,7 @@ function Test-ShouldEncryptFromCertStoreByCertPath
                 Where-Object { $_.PublicKey.Key -is [Security.Cryptography.RSACryptoServiceProvider] } |
                 Select-Object -First 1
     Assert-NotNull $cert
-    $secret = [Guid]::NewGuid().ToString()
+    $secret = [Guid]::NewGuid().ToString().Substring(0,20)
     $certPath = Join-Path -Path 'cert:\' -ChildPath (Split-Path -NoQualifier -Path $cert.PSPath)
     $expectedCipherText = Protect-String -String $secret -PublicKeyPath $certPath
     Assert-NotNull $expectedCipherText
