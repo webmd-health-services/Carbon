@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-if( -not (Get-Module 'ServerManager') -and (Get-WmiObject -Class Win32_OptionalFeature -ErrorAction SilentlyContinue) )
+if( $PSVersionTable.PSVersion -gt [Version]'2.0' -and -not (Get-Module 'ServerManager') -and -not (Get-Module 'ServerManager') -and (Get-WmiObject -Class Win32_OptionalFeature -ErrorAction SilentlyContinue) )
 {
     $singleFeature = 'TelnetClient'
     $multipleFeatures = @( $singleFeature, 'TFTP' )
