@@ -42,8 +42,8 @@ function Test-ShouldResolveLocalSystem
 
 function Test-ShouldResolveNameWithDotPrefix
 {
-    $id = Resolve-IdentityName -Name '.\Administrator'
+    $id = Resolve-IdentityName -Name '.\Administrators'
     Assert-NoError
     Assert-NotNull $id
-    Assert-Equal ('{0}\Administrator' -f $env:COMPUTERNAME) $id
+    Assert-Equal 'BUILTIN\Administrators' $id
 }

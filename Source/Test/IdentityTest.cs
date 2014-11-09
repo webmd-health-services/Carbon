@@ -38,6 +38,7 @@ namespace Carbon.Test
         }
 
         [Test]
+        [Ignore]
         public void ShouldResolveAdministrator()
         {
             GivenIdentityName("Administrator");
@@ -62,6 +63,7 @@ namespace Carbon.Test
         }
 
 	    [Test]
+        [Ignore]
 	    public void ShouldResolveDotDomain()
 	    {
 		    GivenIdentityName(".\\Administrator");
