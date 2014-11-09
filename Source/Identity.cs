@@ -80,8 +80,8 @@ namespace Carbon
 
 	        if (name.StartsWith(".\\"))
 	        {
-		        name = string.Format("{0}{1}", Environment.MachineName, name.Substring(1));
-			}
+		        name = name.Substring(2);
+	        }
 
 	        if (name.Equals("LocalSystem", StringComparison.InvariantCultureIgnoreCase))
 	        {
