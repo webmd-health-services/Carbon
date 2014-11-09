@@ -386,15 +386,16 @@ function Assert-TaskScheduled
     }
 
     $endTimeSchedules = @( 'Minute', 'Hourly', 'Daily', 'Weekly', 'Monthly', 'LastDayOfMonth', 'WeekOfMonth' )
+    $endTime = (Get-Date).AddHours(7)
     foreach( $endTimeSchedule in $endTimeSchedules )
     {
         if( $InstallArguments.ContainsKey( $endTimeSchedule ) )
         {
-            $task = Install-ScheduledTask @InstallArguments -EndTime '23:06'
+            $task = Install-ScheduledTask @InstallArguments -EndTime $endTime.ToString('HH:mm')
             Assert-NoError
             Assert-NotNull $task
             Assert-Is $task ([Carbon.TaskScheduler.TaskInfo])
-            Assert-ScheduledTask @AssertArguments -EndTime '23:06' -EndDate $today
+            Assert-ScheduledTask @AssertArguments -EndTime $endTime.ToString('HH:mm') -EndDate $endTime.ToString('MM/dd/yyyy')
             break
         }
     }
