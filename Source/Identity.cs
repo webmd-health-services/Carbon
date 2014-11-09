@@ -99,7 +99,15 @@ namespace Carbon
 
 	        if (name.StartsWith(".\\"))
 	        {
-		        name = name.Substring(2);
+	            var username = name.Substring(2);
+                name = string.Format("{0}\\{1}", Environment.MachineName, username);
+	            var identity = FindByName(name);
+	            if (identity == null)
+	            {
+	                name = string.Format("BUILTIN\\{0}", username);
+	                identity = FindByName(name);
+	            }
+	            return identity;
 	        }
 
 	        if (name.Equals("LocalSystem", StringComparison.InvariantCultureIgnoreCase))

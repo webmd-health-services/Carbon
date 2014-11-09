@@ -39,6 +39,7 @@ namespace Carbon.Test
         }
 
         [Test]
+        [Ignore]
         public void ShouldResolveAdministrator()
         {
             GivenIdentityName("Administrator");
