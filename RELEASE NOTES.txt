@@ -1,4 +1,6 @@
-# 1.9.0
+# 1.9.0 (8 November 2014)
+
+This is the last minor release for version 1.0. Future 1.0-compatible releases will *only* contain bug fixes, no new features. It takes too much time to maintain two versions, and I'd rather spend my time getting 2.0 out the door.  Carbon 2.0 will require PowerShell 4.0, so start planning.
 
 ## Enhancements
 
@@ -8,7 +10,7 @@
  
 ### Hosts File
 
- * [Set-HostsEntry](http://get-carbon.org/help/Set-HostsEntry.html) now handles an in-use/locked hosts file better, by retrying up to 10 times before writing an error, waiting a random amount of time (from 0 to 1000 milliseconds) between each retry attempt.
+ * [Set-HostsEntry](http://get-carbon.org/help/Set-HostsEntry.html) now handles writing to an in-use/locked hosts file, retrying up to 10 times before writing an error, waiting a random amount of time (from 0 to 1000 milliseconds) between each retry attempt.
 
 ### IIS
 
@@ -17,9 +19,9 @@
 ### Scheduled Tasks
 
  * Created [Get-ScheduledTask](http://get-carbon.org/help/Get-ScheduledTask.html) function for getting the scheduled tasks on the local computer using `schtasks.exe`.
- * Created [Install-ScheduledTask](http://get-carbon.org/help/Install-ScheduledTask.html) function for installing a scheduled task.
- * Created [Test-ScheduledTask](http://get-carbon.org/help/Test-ScheduledTask.html) function for testing if a scheduled tasks on the local computer exists.
- * Created [Uninstall-ScheduledTask](http://get-carbon.org/help/Uninstall-ScheduledTask.html) function for deleting a scheduled task.
+ * Created [Install-ScheduledTask](http://get-carbon.org/help/Install-ScheduledTask.html) function for installing a scheduled task using `schtasks.exe`.
+ * Created [Test-ScheduledTask](http://get-carbon.org/help/Test-ScheduledTask.html) function for testing if a scheduled tasks on the local computer exists using `schtasks.exe`.
+ * Created [Uninstall-ScheduledTask](http://get-carbon.org/help/Uninstall-ScheduledTask.html) function for deleting a scheduled task using `schtasks.exe`.
  
 ### Services
 

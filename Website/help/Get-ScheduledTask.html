@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-    <title>PowerShell - Get-ServiceConfiguration - Carbon</title>
+    <title>PowerShell - Get-ScheduledTask - Carbon</title>
 	<link href="styles.css" type="text/css" rel="stylesheet" />
 </head>
 <body>
@@ -275,34 +275,25 @@
 </div>
 
 
-<h1>Get-ServiceConfiguration</h1>
-<div><p>Gets a service's full configuration, e.g. username, path, failure actions, etc.</p></div>
+<h1>Get-ScheduledTask</h1>
+<div><p>Gets the scheduled tasks for the current computer.</p></div>
 
 <h2>Syntax</h2>
-<pre class="Syntax"><code>Get-ServiceConfiguration [-Name] &lt;String&gt; [&lt;CommonParameters&gt;]</code></pre>
+<pre class="Syntax"><code>Get-ScheduledTask [[-Name] &lt;String&gt;] [&lt;CommonParameters&gt;]</code></pre>
     
 <h2>Description</h2>
 <div class="Description">
-<p>The .NET <code>ServiceController</code> object only returns basic information about a service. This function returns a bunch of the missing configuration in the form of a <code>Carbon.Service.ServiceInfo</code> object:</p>
+<p>The <code>Get-ScheduledTask</code> function gets the scheduled tasks on the current computer. It returns <code>Carbon.TaskScheduler.TaskInfo</code> objects for each one.</p>
 
-<ul>
-<li>Account name/user name</li>
-<li>Path</li>
-<li>Description</li>
-<li>Failure actions</li>
-</ul>
+<p>With no parameters, <code>Get-ScheduledTask</code> returns all scheduled tasks. To get a specific scheduled task, use the <code>Name</code> parameter, which must be the full name of the task, i.e. path plus name. The name parameter accepts wildcards. If a scheduled task with the given name isn't found, an error is written.</p>
 
-<p>You can load a specific service using its name, or pipe in <code>ServiceController</code> objects.</p>
-
-<p>In addition to this function, Carbon also adds this information as extended type data properties onto the <code>ServiceController</code> class. To see it, </p>
-
-<pre><code>Get-Service | Get-Member
-</code></pre>
-
-<p>This function is new in Carbon 1.8.</p>
+<p>This function has the same name as the built-in <code>Get-ScheduledTask</code> function that comes on Windows 2012/8 and later. It returns objects with the same properties, but if you want to use the built-in function, use the <code>ScheduledTasks</code> qualifier, e.g. <code>ScheduledTasks\Get-ScheduledTask</code>.</p>
 </div>
     
-
+<h2>Related Commands</h2>
+<ul>
+<li><a href="Test-ScheduledTask.html">Test-ScheduledTask</a></li>
+</ul>
 
 <h2> Parameters </h2>
 <table border='1'>
@@ -317,9 +308,9 @@
 <tr valign='top'>
 	<td>Name</td>
 	<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
-	<td>The name of the service.</td>
-	<td>true</td>
-	<td>true (ByPropertyName)</td>
+	<td>The name of the scheduled task to return. Wildcards supported. This must be the <em>full task name</em>, i.e. the task's path/location and its name.</td>
+	<td>false</td>
+	<td>false</td>
     <td></td>
 </tr>
 
@@ -328,16 +319,24 @@
 
         
 <h2>Return Values</h2>
-<p>Carbon.Service.ServiceInfo. </p>
+<p>Carbon.TaskScheduler.TaskInfo. </p>
         
 
         
 <h2>EXAMPLE 1</h2>
-<pre><code>Get-Service | Get-ServiceConfiguration</code></pre>
-<p>Demonstrates how you can pipe in a <code>ServiceController</code> object to load the service.</p>
+<pre><code>Get-ScheduledTask</code></pre>
+<p>Demonstrates how to get all scheduled tasks.</p>
 
 <h2>EXAMPLE 2</h2>
-<pre><code>Get-ServiceConfiguration -Name  'w3svc'</code></pre>
-<p>Demonstrates how you can get a specific service's configuration.</p>
+<pre><code>Get-ScheduledTask -Name 'AutoUpdateMyApp'</code></pre>
+<p>Demonstrates how to get a specific task.</p>
+
+<h2>EXAMPLE 3</h2>
+<pre><code>Get-ScheduledTask -Name '*Microsoft*'</code></pre>
+<p>Demonstrates how to get all tasks that match a wildcard pattern.</p>
+
+<h2>EXAMPLE 4</h2>
+<pre><code>ScheduledTasks\Get-ScheduledTask</code></pre>
+<p>Demonstrates how to call the <code>Get-ScheduledTask</code> function in the <code>ScheduledTasks</code> module which ships on Windows 2012/8 and later.</p>
 </body>
 </html>
