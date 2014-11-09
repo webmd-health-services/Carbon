@@ -38,7 +38,22 @@ This is a ***backwards-incompatible*** release.
  * Rename usages of `[Carbon.HandleInfo]` class to `[Carbon.Win32.HandleInfo]`.
  * Remove usages of `[Carbon.Lsa]::LookupPrivilegeValue` class method. It was incorrectly exposed as a public method.
  * Remove usages of `[Carbon.Kernel32]::LocalFree` class method. It was incorrectly exposed as a public method.
- * Update usages of `Carbon.Computer.ProgramInstallInfo`'s `Version` property (returned by [Get-ProgramInstallInfo](http://get-carbon.org/help/2.0/Get-ProgramInstallInfo.html). It was an `int` and is now a [Version](http://msdn.microsoft.com/en-us/library/y0hf9t2e.aspx) object.
+ * Update usages of `Carbon.Computer.ProgramInstallInfo`'s `Version` property (returned by [Get-ProgramInstallInfo](http://get-carbon.org/help/2.0/Get-ProgramInstallInfo.html)). It was an `int` and is now a [Version](http://msdn.microsoft.com/en-us/library/y0hf9t2e.aspx) object.
+ 
+## Changes Since `alpha.26`
+
+### Enhancements
+
+ * Includes all changes made in version 1.9.0.
+ * PowerShell 4 is now required. Carbon won't even import under PowerShell 3.
+ * Removed `Carbon_Script` resource. It only existed so I could pass values to my script blocks. Turns out, the built-in `Script` resource supports this with the `$using:` scope. Remember, your most important features is documentation!
+ * Created a new [Carbon_ScheduledTask](http://get-carbon.org/help/2.0/Carbon_ScheduledTask.html) DSC resource for managing scheduled tasks.
+ * The `Version` property on the objects returned by [Get-ProgramInstallInfo](http://get-carbon.org/help/2.0/Get-ProgramInstallInfo.html) is now a proper .NET `Version` object instead of an integer.
+ 
+### Bug Fixes
+
+ * `Carbon_Permission` DSC resource fails when assigning multiple permissions
+ * Grant-Permission fails when clearing multiple existing, non-inherited permission on an item.
  
 ## Enhancements
 
