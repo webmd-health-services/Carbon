@@ -164,6 +164,11 @@ function Install-ScheduledTask
     Install-ScheduledTask -Name 'CarbonSample' -TaskToRun 'notepad.exe' -TaskXml $taskXml -TaskCredential (Get-Credential 'runasuser')
 
     Demonstrates how to create a task using raw XML that conforms to the [Task Scheduler XML schema](http://msdn.microsoft.com/en-us/library/windows/desktop/aa383609.aspx) for a task that will run as a specific user. In this case, `$taskXml` should be an XML document.  The username in the XML document should match the username in the credential.
+
+    .EXAMPLE
+    Install-ScheduledTask -Name 'CarbonTasks\CarbonSample' -TaskToRun 'notepad.exe' -Monthly
+
+    Demonstrates how to create tasks under a folder/directory: use a path for the `Name` parameter.
     #>
     [CmdletBinding()]
     [OutputType([Carbon.TaskScheduler.TaskInfo])]
@@ -172,7 +177,7 @@ function Install-ScheduledTask
         [ValidateLength(1,238)]
         [Alias('TaskName')]
         [string]
-        # The name of the scheduled task to return. Wildcards supported. This must be the *full task name*, i.e. the task's path/location and its name.
+        # The name of the scheduled task to create. Paths are allowed to create tasks under folders.
         $Name,
 
         [Parameter(Mandatory=$true,ParameterSetName='Minute')]
