@@ -151,15 +151,17 @@ function Set-TargetResource
 
     if( $Ensure -eq 'Present' )
     {
+        $installParams = @{ }
         if( (Test-ScheduledTask -Name $Name ) )
         {
             Write-Verbose ('[{0}] Re-installing' -f $Name)
+            $installParams['Force'] = $true
         }
         else
         {
             Write-Verbose ('[{0}] Installing' -f $Name)
         }
-        Install-ScheduledTask @PSBoundParameters
+        Install-ScheduledTask @PSBoundParameters @installParams
     }
     else
     {
@@ -261,6 +263,10 @@ function Test-TargetResource
                 Write-Verbose ('{0}         -----------------------------------^' -f $linePrefix)
             }
             return $false
+        }
+        else
+        {
+            Write-Verbose ('[{0}] Task XML unchanged' -f $Name)
         }
 
         if( $TaskCredential -and $resource.RunAsUser -ne $TaskCredential.UserName )

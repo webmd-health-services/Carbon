@@ -92,6 +92,15 @@ function Test-ShouldInstallTaskForSystemPrincipal
     Assert-DscResourcePresent $resource
 }
 
+function Test-ShouldReinstallTask
+{
+    Set-TargetResource -Name $taskName -TaskXml $taskForUser -TaskCredential $credential
+    Set-TargetResource -Name $taskName -TaskXml $taskForSystem
+    $resource = Get-TargetResource -Name $taskName
+    Assert-DscResourcePresent $resource
+    Assert-Equal 'System' $resource.RunAsUser
+}
+
 function Test-ShouldUninstallTask
 {
     Set-TargetResource -Name $taskName -TaskXml $taskForSystem
