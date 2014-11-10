@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+d
 $taskName = 'CarbonInstallScheduledTask'
 $credential = $null
 $AllMonths = @( 'January','February','March','April','May','June','July','August','September','October','November','December' )
@@ -36,6 +36,15 @@ function Stop-Test
     $Error.Clear()
     Uninstall-ScheduledTask -Name $taskName
     Assert-NoError
+}
+
+function Test-ShouldCreateScheduledTaskWithPath
+{
+    $result = Install-ScheduledTask -Name 'PARENT\CHILD' -TaskToRun 'notepad' -Monthly -Force
+    Assert-NotNull $result
+    Assert-Equal '\PARENT\' $result.TaskPath
+    Assert-Equal 'CHILD' $result.TaskName
+    Assert-Equal '\PARENT\CHILD' $result.FullName
 }
 
 function Test-ShouldSchedulePerMinuteTasks
