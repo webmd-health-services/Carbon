@@ -77,7 +77,8 @@ function Set-HostsEntry
     )
  
     $matchPattern = '^(?<IP>[0-9a-f.:]+)\s+(?<HostName>[^\s#]+)(?<Tail>.*)$'  
-    $lineFormat = "{0,-16}{1}{2}"
+    $lineFormat = "{0,-16}{1}"
+    $lineFormatWithComment = "{0,-16}{1}`t# {2}"
     
     if(-not (Test-Path $Path))
     {
@@ -102,7 +103,7 @@ function Set-HostsEntry
         {
             $ip = $matches["IP"]
             $hn = $matches["HostName"]
-            $tail = $matches["Tail"].Trim()
+            $tail = $matches["Tail"].Replace("#","").Trim()
             if($HostName -eq $hn)
             {
                 if($found)
@@ -112,16 +113,19 @@ function Set-HostsEntry
                     continue
                 }
                 $ip = $IPAddress
-                $tail = if( $Description ) { "`t# $Description" } else { '' }
+                $tail = $Description
                 $found = $true   
             }
            
-            if($tail.Trim() -eq "#")
+            $outline = ""
+            if($tail)
             {
-                $tail = ""
+                $outline = $lineFormatWithComment -f $ip, $hn, $tail
             }
-           
-            $outline = $lineformat -f $ip, $hn, $tail
+            else{
+                $outline = $lineFormat -f $ip, $hn
+            }
+            
             [void] $outlines.Add($outline)
                 
         }
@@ -136,13 +140,14 @@ function Set-HostsEntry
     if(-not $found)
     {
        #add a new entry
-       $tail = "`t# $Description"
-       if($tail.Trim() -eq "#")
+       $outline = ""
+       if($Description)
        {
-           $tail = ""
+           $outline = $lineFormatWithComment -f  $IPAddress, $HostName, $Description
        }
-           
-       $outline = $lineformat -f $IPAddress, $HostName, $tail
+       else{
+           $outline = $lineFormat -f $IPAddress, $HostName
+       }
        [void] $outlines.Add($outline)
     }
     
