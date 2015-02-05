@@ -167,6 +167,19 @@ function Test-ShouldHandleIfHostsFileInUse
     Assert-Error -Last -Regex 'looks like the hosts file is in use'
 }
 
+#This test check case from Issue #148 
+function Test-MultipleCallShouldNotDeleteTabulation
+{
+    Set-HostsEntry -IPAddress 127.0.0.1 -HostName 'test' -Description 'Test' -Path $customHostsFile
+    Set-HostsEntry -IPAddress 127.0.0.1 -HostName 'test2' -Description 'Test2' -Path $customHostsFile
+    Set-HostsEntry -IPAddress 127.0.0.1 -HostName 'test3' -Path $customHostsFile
+    
+    Assert-HostsFileContains -Line "127.0.0.1       test`t# Test"
+    Assert-HostsFileContains -Line "127.0.0.1       test2`t# Test2"
+    Assert-HostsFileContains -Line "127.0.0.1       test3"
+}
+
+
 function Assert-HostsFileContains($Line, $Path = $customHostsFile)
 {
     $hostsFile = Get-Content $Path
