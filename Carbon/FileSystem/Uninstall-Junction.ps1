@@ -12,14 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Remove-Junction
+function Uninstall-Junction
 {
     <#
     .SYNOPSIS
-    Removes a junction.
+    Uninstall a junction.
     
     .DESCRIPTION
-    Safely removes a junction without removing the junction's target.  If you try to remove something that isn't a junction, an error will be written.  Use `Test-PathIsJunction` or the `IsJunction` extended method on `DirectoryInfo` object.
+    Safely removes a junction without removing the junction's target.  If you try to remove something that isn't a junction, nothing will be written.  Use `Test-PathIsJunction` or the `IsJunction` extended method on `DirectoryInfo` object.
     
     .LINK
     Install-Junction
@@ -28,13 +28,13 @@ function Remove-Junction
     New-Junction
 
     .EXAMPLE
-    Remove-Junction -Path 'C:\I\Am\A\Junction'
+    Uninstall-Junction -Path 'C:\I\Am\A\Junction'
     
-    Removes the `C:\I\Am\A\Junction`
+    Uninstall the `C:\I\Am\A\Junction`
     
     .LINK
     Test-PathIsJunction
-    Uninstall-Junction
+    Remove-Junction
     #>
     [CmdletBinding(SupportsShouldProcess=$true)]
     param(
@@ -52,9 +52,5 @@ function Remove-Junction
         {
             [Carbon.IO.JunctionPoint]::Delete( $Path )
         }
-    }
-    else
-    {
-        Write-Error "'$Path' doesn't exist or is not a junction."
     }
 }
