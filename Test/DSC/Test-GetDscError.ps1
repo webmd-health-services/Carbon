@@ -52,7 +52,7 @@ function Test-ShouldGetDscError
 
     Start-Sleep -Milliseconds 100
 
-    Start-DscConfiguration -Wait -ComputerName 'localhost' -Path $tempDir.FullName -ErrorAction SilentlyContinue
+    Start-DscConfiguration -Wait -ComputerName 'localhost' -Path $tempDir.FullName -ErrorAction SilentlyContinue -Force
 
     $dscError = Get-DscError -StartTime $startTime -Wait
     Assert-NotNull $dscError

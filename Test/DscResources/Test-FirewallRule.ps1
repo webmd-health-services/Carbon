@@ -302,7 +302,7 @@ function Test-ShouldRunThroughDsc
 {
     & DscConfiguration -Ensure 'Present' -OutputPath $CarbonDscOutputRoot
     
-    Start-DscConfiguration -Wait -ComputerName 'localhost' -Path $CarbonDscOutputRoot
+    Start-DscConfiguration -Wait -ComputerName 'localhost' -Path $CarbonDscOutputRoot -Force
     Assert-NoError
 
     $rule = Get-FirewallRule -Name $RuleName
@@ -312,7 +312,7 @@ function Test-ShouldRunThroughDsc
     Assert-Equal 'Allow' $rule.Action
 
     & DscConfiguration -Ensure 'Absent' -OutputPath $CarbonDscOutputRoot 
-    Start-DscConfiguration -Wait -ComputerName 'localhost' -Path $CarbonDscOutputRoot
+    Start-DscConfiguration -Wait -ComputerName 'localhost' -Path $CarbonDscOutputRoot -Force
     Assert-NoError
 
     $rule = Get-FirewallRule -Name $RuleName

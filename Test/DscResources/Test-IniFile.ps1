@@ -241,12 +241,12 @@ function Test-ShouldRunThroughDsc
 
     & DscConfiguration -Value $value -OutputPath $CarbonDscOutputRoot
 
-    Start-DscConfiguration -Wait -ComputerName 'localhost' -Path $CarbonDscOutputRoot 
+    Start-DscConfiguration -Wait -ComputerName 'localhost' -Path $CarbonDscOutputRoot  -Force
     Assert-NoError
     Assert-IniFile $value 
 
     & DscConfiguration -Ensure 'Absent' -OutputPath $CarbonDscOutputRoot
-    Start-DscConfiguration -Wait -ComputerName 'localhost' -Path $CarbonDscOutputRoot 
+    Start-DscConfiguration -Wait -ComputerName 'localhost' -Path $CarbonDscOutputRoot  -Force
     Assert-NoError
     Assert-IniFile $null
 }

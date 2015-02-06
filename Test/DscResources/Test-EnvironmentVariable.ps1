@@ -89,12 +89,12 @@ function Test-ShouldRunThroughDsc
 
     & ShouldSetEnvironmentVariable -Value $value -Ensure 'Present' -OutputPath $CarbonDscOutputRoot
 
-    Start-DscConfiguration -Wait -ComputerName 'localhost' -Path $CarbonDscOutputRoot
+    Start-DscConfiguration -Wait -ComputerName 'localhost' -Path $CarbonDscOutputRoot -Force
     Assert-NoError
     Assert-EnvironmentVariable 'CarbonDscEnvironmentVariable' $value
 
     & ShouldSetEnvironmentVariable -Ensure 'Absent' -OutputPath $CarbonDscOutputRoot
-    Start-DscConfiguration -Wait -ComputerName 'localhost' -Path $CarbonDscOutputRoot
+    Start-DscConfiguration -Wait -ComputerName 'localhost' -Path $CarbonDscOutputRoot -Force
     Assert-NoError
     Assert-EnvironmentVariable 'CarbonDscEnvironmentVariable' $null
 }

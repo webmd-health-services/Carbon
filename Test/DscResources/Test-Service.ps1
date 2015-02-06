@@ -264,13 +264,13 @@ configuration DscConfiguration
 function Test-ShouldRunThroughDsc
 {
     & DscConfiguration -Ensure 'Present' -OutputPath $CarbonDscOutputRoot
-    Start-DscConfiguration -Wait -ComputerName 'localhost' -Path $CarbonDscOutputRoot
+    Start-DscConfiguration -Wait -ComputerName 'localhost' -Path $CarbonDscOutputRoot -Force
     Assert-NoError
     Assert-True (Test-TargetResource -Name $serviceName -Ensure 'Present')
     Assert-False (Test-TargetResource -Name $serviceName -Ensure 'Absent')
 
     & DscConfiguration -Ensure 'Absent' -OutputPath $CarbonDscOutputRoot 
-    Start-DscConfiguration -Wait -ComputerName 'localhost' -Path $CarbonDscOutputRoot
+    Start-DscConfiguration -Wait -ComputerName 'localhost' -Path $CarbonDscOutputRoot -Force
     Assert-NoError
     Assert-False (Test-TargetResource -Name $serviceName -Ensure 'Present')
     Assert-True (Test-TargetResource -Name $serviceName -Ensure 'Absent')
