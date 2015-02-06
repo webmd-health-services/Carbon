@@ -69,6 +69,17 @@ function Assert-Equal
 
     if( -not $equal )
     {
+        if( $Expected -eq $null )
+        {
+            Fail ('Expected $null but was ''{0}''.' -f $Actual)
+            return
+        }
+        if( $Actual -eq $null )
+        {
+            Fail ('Expected ''{0}'' but was $null.' -f $Expected)
+            return
+        }
+
         if( $Expected -is [string] -and $Actual -is [string] -and ($Expected.Contains("`n") -or $Actual.Contains("`n")))
         {
             for( $idx = 0; $idx -lt $Expected.Length; ++$idx )
