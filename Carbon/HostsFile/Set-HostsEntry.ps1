@@ -75,10 +75,11 @@ function Set-HostsEntry
         # The path to the hosts file where the entry should be set. Defaults to the local computer's hosts file.
         $Path = (Get-PathToHostsFile)
     )
+
+    Set-StrictMode -Version 'Latest'
  
     $matchPattern = '^(?<IP>[0-9a-f.:]+)\s+(?<HostName>[^\s#]+)(?<Tail>.*)$'  
-    $lineFormat = "{0,-16}{1}"
-    $lineFormatWithComment = "{0,-16}{1}`t# {2}"
+    $lineFormat = "{0,-16}{1}{2}"
     
     if(-not (Test-Path $Path))
     {
@@ -86,8 +87,8 @@ function Set-HostsEntry
         New-Item $Path -ItemType File
     }
      
-    $lines = @( Get-Content -Path $Path )
-    $outLines = New-Object System.Collections.ArrayList
+    [string[]]$lines = Get-Content -Path $Path
+    $outLines = New-Object 'Collections.ArrayList'
     $found = $false
     $lineNum = 0
      
@@ -103,7 +104,7 @@ function Set-HostsEntry
         {
             $ip = $matches["IP"]
             $hn = $matches["HostName"]
-            $tail = $matches["Tail"].Replace("#","").Trim()
+            $tail = $matches["Tail"].Trim()
             if($HostName -eq $hn)
             {
                 if($found)
@@ -113,19 +114,20 @@ function Set-HostsEntry
                     continue
                 }
                 $ip = $IPAddress
-                $tail = $Description
+                $tail = if( $Description ) { "`t# $Description" } else { '' }
                 $found = $true   
             }
-           
-            $outline = ""
-            if($tail)
+            else
             {
-                $outline = $lineFormatWithComment -f $ip, $hn, $tail
+                $tail = "`t{0}" -f $tail
             }
-            else{
-                $outline = $lineFormat -f $ip, $hn
+           
+            if($tail.Trim() -eq "#")
+            {
+                $tail = ""
             }
-            
+
+            $outline = $lineformat -f $ip, $hn, $tail
             [void] $outlines.Add($outline)
                 
         }
@@ -140,14 +142,13 @@ function Set-HostsEntry
     if(-not $found)
     {
        #add a new entry
-       $outline = ""
-       if($Description)
+       $tail = "`t# $Description"
+       if($tail.Trim() -eq "#")
        {
-           $outline = $lineFormatWithComment -f  $IPAddress, $HostName, $Description
+           $tail = ""
        }
-       else{
-           $outline = $lineFormat -f $IPAddress, $HostName
-       }
+           
+       $outline = $lineformat -f $IPAddress, $HostName, $tail
        [void] $outlines.Add($outline)
     }
     

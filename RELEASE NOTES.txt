@@ -55,6 +55,12 @@ This is a ***backwards-incompatible*** release.
  * `Carbon_Permission` DSC resource fails when assigning multiple permissions
  * Grant-Permission fails when clearing multiple existing, non-inherited permission on an item.
  
+## Changes Since `alpha.31`
+
+### Bug Fixes
+
+ * `Set-HostsEntry` fails to preserve whitespace if existing lines end with a comment/description. Thanks to [Konstantin Ushenin](https://vk.com/kostanew) for the fix.
+ 
 ## Enhancements
 
 ### General
@@ -147,6 +153,12 @@ This is a ***backwards-incompatible*** release.
  * [Resolve-Identity](http://get-carbon.org/help/2.0/Resolve-Identity.html) (nAce `Resolve-IdentityName`) now writes an error if it can't resolve a name.  Use `-ErrorAction SilentlyContinue` or `-ErrorAction Ignore` to preserve old behavior.
  * [Test-Identity](http://get-carbon.org/help/2.0/Test-Identity.html) now returns a `Carbon.Identity` object if the identity exists *and* you use the `-PassThru` switch.  It used to return the identity's name.  Update scripts to use the `FullName` property to get the old return value, e.g. `Test-Identity -Name $userName -PassThru | Select-Object -Expand 'FullName'`.
  * Added [Remove-GroupMember](http://get-carbon.org/help/2.0/Remove-GroupMember.html) function. Thanks to [Philip Kluss](https://bitbucket.org/philkloose) for the contribution. 
+
+## Bug Fixes
+
+### Hosts Entries
+
+ * `Set-HostsEntry` fails to preserve whitespace if existing lines end with a comment/description. Thanks to [Konstantin Ushenin](https://vk.com/kostanew) for the fix.
 
 
 # 1.9.0 (8 November 2014)
