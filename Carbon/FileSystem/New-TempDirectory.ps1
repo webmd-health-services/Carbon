@@ -22,6 +22,8 @@ function New-TempDirectory
     A new temporary directory is created in the current user's `env:TEMP` directory.  The directory's name is created using the `Path` class's [GetRandomFileName method](http://msdn.microsoft.com/en-us/library/system.io.path.getrandomfilename.aspx).
 
     To add a custom prefix to the directory name, use the `Prefix` parameter. If you pass in a path, only its name will be used. In this way, you can pass `$MyInvocation.MyCommand.Definition` (PowerShell 2) or `$PSCommandPath` (PowerShell 3+), which will help you identify what scripts are leaving cruft around in the temp directory.
+
+    Added `-WhatIf` support in Carbon 2.0.
     
     .LINK
     http://msdn.microsoft.com/en-us/library/system.io.path.getrandomfilename.aspx

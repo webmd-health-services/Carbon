@@ -21,6 +21,8 @@ function Install-User
     .DESCRIPTION
     Creates a new *local* user account.  If the account already exists, updates it.  Returns the user.
 
+    The `UserCannotChangePassword` and `PasswordNeverExpires` switches were added in Carbon 2.0.
+
     .OUTPUTS
     System.DirectoryServices.AccountManagement.UserPrincipal.
 
@@ -66,11 +68,11 @@ function Install-User
         $FullName,
 
         [Switch]
-        # Prevent the user from changing his password.
+        # Prevent the user from changing his password. New in Carbon 2.0.
         $UserCannotChangePassword,
 
         [Switch]
-        # Set to true if the user's password should expire.
+        # Set to true if the user's password should expire. New in Carbon 2.0.
         $PasswordNeverExpires
     )
 

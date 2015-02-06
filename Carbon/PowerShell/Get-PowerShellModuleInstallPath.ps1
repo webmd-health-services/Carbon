@@ -21,6 +21,8 @@ function Get-PowerShellModuleInstallPath
     .DESCRIPTION
     Custom modules should be installed under the `Program Files` directory. This function looks at the `PSModulePath` environment variable to find the install location under `Program Files`. If that path doesn't exist or isn't part of the `PSModulePath` environment variable, returns the module path under `$PSHOME`. If that path doesn't exist or isn't part of the `PSModulePath` environment variable, an error is written and nothing is returned.
 
+    `Get-PowerShellModuleInstallPath` is new in Carbon 2.0.
+
     .EXAMPLE
     Get-PowerShellModuleInstallPath
 

@@ -27,6 +27,8 @@ function Start-DscPullConfiguration
 
     Sometimes, the LCM does a really crappy job of updating to the latest version of a module. `Start-DscPullConfiguration` will delete modules on the target computers. Specify the names of the modules to delete with the `ModuleName` parameter. Make sure you only delete modules that will get installed by the LCM. Only modules installed in the `$env:ProgramFiles\WindowsPowerShell\Modules` directory are removed.
 
+    `Start-DscPullConfiguration` is new in Carbon 2.0.
+
     .LINK
     Get-DscError
 

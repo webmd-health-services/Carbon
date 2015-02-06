@@ -21,6 +21,8 @@ function Clear-DscLocalResourceCache
     .DESCRIPTION
     DSC caches resources. This is painful when developing, since you're constantly updating your resources. This function allows you to clear the DSC resource cache on the local computer. What this function really does, is kill the DSC host process running DSC.
 
+    `Clear-DscLocalResourceCache` is new in Carbon 2.0.
+
     .EXAMPLE
     Clear-DscLocalResourceCache
     #>

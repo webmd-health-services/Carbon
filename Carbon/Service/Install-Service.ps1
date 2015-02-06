@@ -19,8 +19,10 @@ function Install-Service
     Installs a Windows service.
 
     .DESCRIPTION
-    Installs a Windows service. If a service with the given name already exists, it is stopped, its configuration is updated to match the parameters passed in, and then re-started. A `ServiceController` object is returned. If the service's configuration is unchanged, the function returns nothing without making any changes. Settings whose parameters are omitted are reset to their default values.
+    Installs a Windows service. If a service with the given name already exists, it is stopped, its configuration is updated to match the parameters passed in, and then re-started. Settings whose parameters are omitted are reset to their default values.
     
+    Beginning in Carbon 2.0, if the service's configuration changes, a `ServiceController` object is returned. If the service's configuration is unchanged, the function returns nothing without making any changes. 
+
     By default, the service is installed to run as `NetworkService`. Set the `Username` and `Password` arguments to run as a different account. This user will be granted the logon as a service right. To run as a system account other than `NetworkService`, provide just the account's name as the `UserName` parameter, and omit the `Password` parameter.
 
     The minimum required information to install a service is its name and path.

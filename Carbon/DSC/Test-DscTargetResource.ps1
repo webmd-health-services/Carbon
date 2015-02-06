@@ -32,6 +32,8 @@ function Test-DscTargetResource
         $resource = Get-TargetResource -Name 'fubar'
         $resource.Remove( 'PropertyThatDoesNotMatter' )
         return Test-TargetResource -TargetResource $resource -DesiredResource $PSBoundParameters -Target ('my resource ''fubar''')
+    
+    `Test-DscTargetResource` is new in Carbon 2.0.
 
     .OUTPUTS
     System.Boolean.

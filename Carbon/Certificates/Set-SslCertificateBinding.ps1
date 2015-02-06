@@ -19,8 +19,10 @@ function Set-SslCertificateBinding
     Sets an SSL certificate binding for a given IP/port.
     
     .DESCRIPTION
-    Uses the netsh command line application to set the certificate for an IP address and port.  If a binding already exists for the IP/port, it is removed, and the new binding is created. Returns a `Carbon.Certificates.SslCertificateBinding` object for the binding that was set.
+    Uses the netsh command line application to set the certificate for an IP address and port.  If a binding already exists for the IP/port, it is removed, and the new binding is created. 
     
+    Beginning with Carbon 2.0, returns a `Carbon.Certificates.SslCertificateBinding` object for the binding that was set.
+
     .OUTPUTS
     Carbon.Certificates.SslCertificateBinding.
 

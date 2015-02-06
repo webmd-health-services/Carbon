@@ -45,6 +45,8 @@ function Initialize-Lcm
 
     See [Windows PowerShell Desired State Configuration Local Configuration Manager](http://technet.microsoft.com/en-us/library/dn249922.aspx) for more information.
 
+    `Initialize-Lcm` is new in Carbon 2.0.
+
     .LINK
     New-RsaKeyPair
 

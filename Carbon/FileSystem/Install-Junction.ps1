@@ -23,7 +23,7 @@ function Install-Junction
     
     Both `-Link` and `-Target` parameters accept relative paths for values.  Any non-rooted paths are converted to full paths using the current location, i.e. the path returned by `Get-Location`.
 
-    Returns a `System.IO.DirectoryInfo` object for the target path, if one is created.  Returns a `System.IO.DirectoryInfo` object for the junction, if it is created and/or updated.
+    Beginning with Carbon 2.0, returns a `System.IO.DirectoryInfo` object for the target path, if one is created.  Returns a `System.IO.DirectoryInfo` object for the junction, if it is created and/or updated.
 
     .OUTPUTS
     System.IO.DirectoryInfo.

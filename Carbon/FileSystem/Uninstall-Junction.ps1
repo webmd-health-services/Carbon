@@ -22,6 +22,8 @@ function Uninstall-Junction
     `Uninstall-Junction` removes a junction that may or may not exist, without errors.
     
     If `Path` is not a direcory, you *will* see errors.
+
+    `Uninstall-Junction` is new in Carbon 2.0.
     
     .LINK
     Install-Junction

@@ -25,6 +25,8 @@ function Remove-GroupMember
 
     If the user or group is not a member, nothing happens.
 
+    `Remove-GroupMember` is new in Carbon 2.0.
+
     .EXAMPLE
     Remove-GroupMember -Name Administrators -Member EMPIRE\DarthVader,EMPIRE\EmperorPalpatine,REBELS\LSkywalker
 

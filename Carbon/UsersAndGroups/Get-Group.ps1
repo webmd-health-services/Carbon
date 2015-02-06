@@ -21,6 +21,8 @@ function Get-Group
     .DESCRIPTION
     Gets all *local* groups or a specific group by its name.
 
+    `Get-Group` is new in Carbon 2.0.
+
     .OUTPUTS
     System.DirectoryServices.AccountManagement.GroupPrincipal.
 

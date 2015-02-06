@@ -1,0 +1,538 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <title>PowerShell - Initialize-Lcm - Carbon</title>
+	<link href="styles.css" type="text/css" rel="stylesheet" />
+</head>
+<body>
+    	<ul id="SiteNav">
+		<li><a href="/">Get-Carbon</a></li>
+		<li>-Documentation</li>
+        <li><a href="../releasenotes.html">-ReleaseNotes</a></li>
+		<li><a href="http://pshdo.com">-Blog</a></li>
+	</ul>
+<div id="CommandMenuContainer" style="float:left;">
+	<ul id="CategoryMenu">
+		<li class="Category">ActiveDirectory</li>
+		<ul class="CommandMenu">
+			<li><a href="Find-ADUser.html">Find-ADUser</a></li>
+			<li><a href="Format-ADSearchFilterValue.html">Format-ADSearchFilterValue</a></li>
+			<li><a href="Get-ADDomainController.html">Get-ADDomainController</a></li>
+		</ul>
+		<li class="Category">Certificates</li>
+		<ul class="CommandMenu">
+			<li><a href="Get-Certificate.html">Get-Certificate</a></li>
+			<li><a href="Get-CertificateStore.html">Get-CertificateStore</a></li>
+			<li><a href="Get-SslCertificateBinding.html">Get-SslCertificateBinding</a></li>
+			<li><a href="Install-Certificate.html">Install-Certificate</a></li>
+			<li><a href="Remove-SslCertificateBinding.html">Remove-SslCertificateBinding</a></li>
+			<li><a href="Set-SslCertificateBinding.html">Set-SslCertificateBinding</a></li>
+			<li><a href="Test-SslCertificateBinding.html">Test-SslCertificateBinding</a></li>
+			<li><a href="Uninstall-Certificate.html">Uninstall-Certificate</a></li>
+		</ul>
+		<li class="Category">COM</li>
+		<ul class="CommandMenu">
+			<li><a href="Get-ComPermission.html">Get-ComPermission</a></li>
+			<li><a href="Get-ComSecurityDescriptor.html">Get-ComSecurityDescriptor</a></li>
+			<li><a href="Grant-ComPermission.html">Grant-ComPermission</a></li>
+			<li><a href="Revoke-ComPermission.html">Revoke-ComPermission</a></li>
+		</ul>
+		<li class="Category">Computer</li>
+		<ul class="CommandMenu">
+			<li><a href="Get-ProgramInstallInfo.html">Get-ProgramInstallInfo</a></li>
+			<li><a href="Remove-EnvironmentVariable.html">Remove-EnvironmentVariable</a></li>
+			<li><a href="Resolve-NetPath.html">Resolve-NetPath</a></li>
+			<li><a href="Set-EnvironmentVariable.html">Set-EnvironmentVariable</a></li>
+			<li><a href="Test-OSIs32Bit.html">Test-OSIs32Bit</a></li>
+			<li><a href="Test-OSIs64Bit.html">Test-OSIs64Bit</a></li>
+		</ul>
+		<li class="Category">Cryptography</li>
+		<ul class="CommandMenu">
+			<li><a href="New-RsaKeyPair.html">New-RsaKeyPair</a></li>
+			<li><a href="Protect-String.html">Protect-String</a></li>
+			<li><a href="Unprotect-String.html">Unprotect-String</a></li>
+		</ul>
+		<li class="Category">DotNet</li>
+		<ul class="CommandMenu">
+			<li><a href="Set-DotNetAppSetting.html">Set-DotNetAppSetting</a></li>
+			<li><a href="Set-DotNetConnectionString.html">Set-DotNetConnectionString</a></li>
+			<li><a href="Test-DotNet.html">Test-DotNet</a></li>
+		</ul>
+		<li class="Category">DSC</li>
+		<ul class="CommandMenu">
+			<li><a href="Clear-DscLocalResourceCache.html">Clear-DscLocalResourceCache</a></li>
+			<li><a href="Clear-MofAuthoringMetadata.html">Clear-MofAuthoringMetadata</a></li>
+			<li><a href="Copy-DscResource.html">Copy-DscResource</a></li>
+			<li><a href="Get-DscError.html">Get-DscError</a></li>
+			<li><a href="Get-DscWinEvent.html">Get-DscWinEvent</a></li>
+			<li><a href="Initialize-Lcm.html">Initialize-Lcm</a></li>
+			<li><a href="Start-DscPullConfiguration.html">Start-DscPullConfiguration</a></li>
+			<li><a href="Test-DscTargetResource.html">Test-DscTargetResource</a></li>
+			<li><a href="Write-DscError.html">Write-DscError</a></li>
+		</ul>
+		<li class="Category">DSC Resources</li>
+		<ul class="CommandMenu">
+			<li><a href="Carbon_EnvironmentVariable.html">Carbon_EnvironmentVariable</a></li>
+			<li><a href="Carbon_FirewallRule.html">Carbon_FirewallRule</a></li>
+			<li><a href="Carbon_IniFile.html">Carbon_IniFile</a></li>
+			<li><a href="Carbon_Permission.html">Carbon_Permission</a></li>
+			<li><a href="Carbon_Privilege.html">Carbon_Privilege</a></li>
+			<li><a href="Carbon_ScheduledTask.html">Carbon_ScheduledTask</a></li>
+			<li><a href="Carbon_Service.html">Carbon_Service</a></li>
+		</ul>
+		<li class="Category">FileSystem</li>
+		<ul class="CommandMenu">
+			<li><a href="Compress-Item.html">Compress-Item</a></li>
+			<li><a href="Disable-NtfsCompression.html">Disable-NtfsCompression</a></li>
+			<li><a href="Enable-NtfsCompression.html">Enable-NtfsCompression</a></li>
+			<li><a href="Expand-Item.html">Expand-Item</a></li>
+			<li><a href="Install-Junction.html">Install-Junction</a></li>
+			<li><a href="New-Junction.html">New-Junction</a></li>
+			<li><a href="New-TempDirectory.html">New-TempDirectory</a></li>
+			<li><a href="Remove-Junction.html">Remove-Junction</a></li>
+			<li><a href="Test-NtfsCompression.html">Test-NtfsCompression</a></li>
+			<li><a href="Test-PathIsJunction.html">Test-PathIsJunction</a></li>
+			<li><a href="Test-ZipFile.html">Test-ZipFile</a></li>
+			<li><a href="Uninstall-Junction.html">Uninstall-Junction</a></li>
+		</ul>
+		<li class="Category">Firewall</li>
+		<ul class="CommandMenu">
+			<li><a href="Assert-FirewallConfigurable.html">Assert-FirewallConfigurable</a></li>
+			<li><a href="Disable-FirewallStatefulFtp.html">Disable-FirewallStatefulFtp</a></li>
+			<li><a href="Enable-FirewallStatefulFtp.html">Enable-FirewallStatefulFtp</a></li>
+			<li><a href="Get-FirewallRule.html">Get-FirewallRule</a></li>
+			<li><a href="Test-FirewallStatefulFtp.html">Test-FirewallStatefulFtp</a></li>
+		</ul>
+		<li class="Category">HostsFile</li>
+		<ul class="CommandMenu">
+			<li><a href="Get-PathToHostsFile.html">Get-PathToHostsFile</a></li>
+			<li><a href="Remove-HostsEntry.html">Remove-HostsEntry</a></li>
+			<li><a href="Reset-HostsFile.html">Reset-HostsFile</a></li>
+			<li><a href="Set-HostsEntry.html">Set-HostsEntry</a></li>
+		</ul>
+		<li class="Category">IIS</li>
+		<ul class="CommandMenu">
+			<li><a href="Add-IisDefaultDocument.html">Add-IisDefaultDocument</a></li>
+			<li><a href="Disable-IisSecurityAuthentication.html">Disable-IisSecurityAuthentication</a></li>
+			<li><a href="Enable-IisDirectoryBrowsing.html">Enable-IisDirectoryBrowsing</a></li>
+			<li><a href="Enable-IisSecurityAuthentication.html">Enable-IisSecurityAuthentication</a></li>
+			<li><a href="Enable-IisSsl.html">Enable-IisSsl</a></li>
+			<li><a href="Get-IisApplication.html">Get-IisApplication</a></li>
+			<li><a href="Get-IisAppPool.html">Get-IisAppPool</a></li>
+			<li><a href="Get-IisConfigurationSection.html">Get-IisConfigurationSection</a></li>
+			<li><a href="Get-IisHttpHeader.html">Get-IisHttpHeader</a></li>
+			<li><a href="Get-IisHttpRedirect.html">Get-IisHttpRedirect</a></li>
+			<li><a href="Get-IisMimeMap.html">Get-IisMimeMap</a></li>
+			<li><a href="Get-IisSecurityAuthentication.html">Get-IisSecurityAuthentication</a></li>
+			<li><a href="Get-IisVersion.html">Get-IisVersion</a></li>
+			<li><a href="Get-IisWebsite.html">Get-IisWebsite</a></li>
+			<li><a href="Install-IisApplication.html">Install-IisApplication</a></li>
+			<li><a href="Install-IisAppPool.html">Install-IisAppPool</a></li>
+			<li><a href="Install-IisVirtualDirectory.html">Install-IisVirtualDirectory</a></li>
+			<li><a href="Install-IisWebsite.html">Install-IisWebsite</a></li>
+			<li><a href="Invoke-AppCmd.html">Invoke-AppCmd</a></li>
+			<li><a href="Join-IisVirtualPath.html">Join-IisVirtualPath</a></li>
+			<li><a href="Lock-IisConfigurationSection.html">Lock-IisConfigurationSection</a></li>
+			<li><a href="Remove-IisMimeMap.html">Remove-IisMimeMap</a></li>
+			<li><a href="Set-IisHttpHeader.html">Set-IisHttpHeader</a></li>
+			<li><a href="Set-IisHttpRedirect.html">Set-IisHttpRedirect</a></li>
+			<li><a href="Set-IisMimeMap.html">Set-IisMimeMap</a></li>
+			<li><a href="Set-IisWebsiteID.html">Set-IisWebsiteID</a></li>
+			<li><a href="Set-IisWebsiteSslCertificate.html">Set-IisWebsiteSslCertificate</a></li>
+			<li><a href="Set-IisWindowsAuthentication.html">Set-IisWindowsAuthentication</a></li>
+			<li><a href="Test-IisAppPool.html">Test-IisAppPool</a></li>
+			<li><a href="Test-IisConfigurationSection.html">Test-IisConfigurationSection</a></li>
+			<li><a href="Test-IisSecurityAuthentication.html">Test-IisSecurityAuthentication</a></li>
+			<li><a href="Test-IisWebsite.html">Test-IisWebsite</a></li>
+			<li><a href="Uninstall-IisAppPool.html">Uninstall-IisAppPool</a></li>
+			<li><a href="Uninstall-IisWebsite.html">Uninstall-IisWebsite</a></li>
+			<li><a href="Unlock-IisConfigurationSection.html">Unlock-IisConfigurationSection</a></li>
+		</ul>
+		<li class="Category">INI</li>
+		<ul class="CommandMenu">
+			<li><a href="Remove-IniEntry.html">Remove-IniEntry</a></li>
+			<li><a href="Set-IniEntry.html">Set-IniEntry</a></li>
+			<li><a href="Split-Ini.html">Split-Ini</a></li>
+		</ul>
+		<li class="Category">InternetExplorer</li>
+		<ul class="CommandMenu">
+			<li><a href="Disable-IEEnhancedSecurityConfiguration.html">Disable-IEEnhancedSecurityConfiguration</a></li>
+			<li><a href="Enable-IEActivationPermission.html">Enable-IEActivationPermission</a></li>
+		</ul>
+		<li class="Category">MSI</li>
+		<ul class="CommandMenu">
+			<li><a href="Invoke-WindowsInstaller.html">Invoke-WindowsInstaller</a></li>
+		</ul>
+		<li class="Category">MSMQ</li>
+		<ul class="CommandMenu">
+			<li><a href="Get-MsmqMessageQueue.html">Get-MsmqMessageQueue</a></li>
+			<li><a href="Get-MsmqMessageQueuePath.html">Get-MsmqMessageQueuePath</a></li>
+			<li><a href="Grant-MsmqMessageQueuePermission.html">Grant-MsmqMessageQueuePermission</a></li>
+			<li><a href="Install-Msmq.html">Install-Msmq</a></li>
+			<li><a href="Install-MsmqMessageQueue.html">Install-MsmqMessageQueue</a></li>
+			<li><a href="Reset-MsmqQueueManagerID.html">Reset-MsmqQueueManagerID</a></li>
+			<li><a href="Test-MsmqMessageQueue.html">Test-MsmqMessageQueue</a></li>
+			<li><a href="Uninstall-MsmqMessageQueue.html">Uninstall-MsmqMessageQueue</a></li>
+		</ul>
+		<li class="Category">Network</li>
+		<ul class="CommandMenu">
+			<li><a href="Get-IPAddress.html">Get-IPAddress</a></li>
+			<li><a href="Test-IPAddress.html">Test-IPAddress</a></li>
+		</ul>
+		<li class="Category">Path</li>
+		<ul class="CommandMenu">
+			<li><a href="Get-PathProvider.html">Get-PathProvider</a></li>
+			<li><a href="Resolve-FullPath.html">Resolve-FullPath</a></li>
+			<li><a href="Resolve-PathCase.html">Resolve-PathCase</a></li>
+			<li><a href="Resolve-RelativePath.html">Resolve-RelativePath</a></li>
+			<li><a href="Test-UncPath.html">Test-UncPath</a></li>
+		</ul>
+		<li class="Category">PerformanceCounters</li>
+		<ul class="CommandMenu">
+			<li><a href="Get-PerformanceCounter.html">Get-PerformanceCounter</a></li>
+			<li><a href="Install-PerformanceCounter.html">Install-PerformanceCounter</a></li>
+			<li><a href="Test-PerformanceCounter.html">Test-PerformanceCounter</a></li>
+			<li><a href="Test-PerformanceCounterCategory.html">Test-PerformanceCounterCategory</a></li>
+			<li><a href="Uninstall-PerformanceCounterCategory.html">Uninstall-PerformanceCounterCategory</a></li>
+		</ul>
+		<li class="Category">PowerShell</li>
+		<ul class="CommandMenu">
+			<li><a href="Add-TrustedHost.html">Add-TrustedHost</a></li>
+			<li><a href="Clear-TrustedHost.html">Clear-TrustedHost</a></li>
+			<li><a href="Get-PowerShellModuleInstallPath.html">Get-PowerShellModuleInstallPath</a></li>
+			<li><a href="Get-PowershellPath.html">Get-PowershellPath</a></li>
+			<li><a href="Get-TrustedHost.html">Get-TrustedHost</a></li>
+			<li><a href="Invoke-PowerShell.html">Invoke-PowerShell</a></li>
+			<li><a href="Set-TrustedHost.html">Set-TrustedHost</a></li>
+			<li><a href="Test-PowerShellIs32Bit.html">Test-PowerShellIs32Bit</a></li>
+			<li><a href="Test-PowerShellIs64Bit.html">Test-PowerShellIs64Bit</a></li>
+		</ul>
+		<li class="Category">Privileges</li>
+		<ul class="CommandMenu">
+			<li><a href="Get-Privilege.html">Get-Privilege</a></li>
+			<li><a href="Grant-Privilege.html">Grant-Privilege</a></li>
+			<li><a href="Revoke-Privilege.html">Revoke-Privilege</a></li>
+			<li><a href="Test-Privilege.html">Test-Privilege</a></li>
+		</ul>
+		<li class="Category">Registry</li>
+		<ul class="CommandMenu">
+			<li><a href="Get-RegistryKeyValue.html">Get-RegistryKeyValue</a></li>
+			<li><a href="Install-RegistryKey.html">Install-RegistryKey</a></li>
+			<li><a href="Remove-RegistryKeyValue.html">Remove-RegistryKeyValue</a></li>
+			<li><a href="Set-RegistryKeyValue.html">Set-RegistryKeyValue</a></li>
+			<li><a href="Test-RegistryKeyValue.html">Test-RegistryKeyValue</a></li>
+		</ul>
+		<li class="Category">ScheduledTasks</li>
+		<ul class="CommandMenu">
+			<li><a href="Get-ScheduledTask.html">Get-ScheduledTask</a></li>
+			<li><a href="Install-ScheduledTask.html">Install-ScheduledTask</a></li>
+			<li><a href="Test-ScheduledTask.html">Test-ScheduledTask</a></li>
+			<li><a href="Uninstall-ScheduledTask.html">Uninstall-ScheduledTask</a></li>
+		</ul>
+		<li class="Category">Security</li>
+		<ul class="CommandMenu">
+			<li><a href="Assert-AdminPrivilege.html">Assert-AdminPrivilege</a></li>
+			<li><a href="Convert-SecureStringToString.html">Convert-SecureStringToString</a></li>
+			<li><a href="ConvertTo-ContainerInheritanceFlags.html">ConvertTo-ContainerInheritanceFlags</a></li>
+			<li><a href="ConvertTo-InheritanceFlag.html">ConvertTo-InheritanceFlag</a></li>
+			<li><a href="ConvertTo-PropagationFlag.html">ConvertTo-PropagationFlag</a></li>
+			<li><a href="Get-Permission.html">Get-Permission</a></li>
+			<li><a href="Grant-Permission.html">Grant-Permission</a></li>
+			<li><a href="New-Credential.html">New-Credential</a></li>
+			<li><a href="Protect-Acl.html">Protect-Acl</a></li>
+			<li><a href="Revoke-Permission.html">Revoke-Permission</a></li>
+			<li><a href="Test-AdminPrivilege.html">Test-AdminPrivilege</a></li>
+			<li><a href="Test-Permission.html">Test-Permission</a></li>
+		</ul>
+		<li class="Category">Service</li>
+		<ul class="CommandMenu">
+			<li><a href="Assert-Service.html">Assert-Service</a></li>
+			<li><a href="Get-ServiceAcl.html">Get-ServiceAcl</a></li>
+			<li><a href="Get-ServiceConfiguration.html">Get-ServiceConfiguration</a></li>
+			<li><a href="Get-ServicePermission.html">Get-ServicePermission</a></li>
+			<li><a href="Get-ServiceSecurityDescriptor.html">Get-ServiceSecurityDescriptor</a></li>
+			<li><a href="Grant-ServiceControlPermission.html">Grant-ServiceControlPermission</a></li>
+			<li><a href="Grant-ServicePermission.html">Grant-ServicePermission</a></li>
+			<li><a href="Install-Service.html">Install-Service</a></li>
+			<li><a href="Restart-RemoteService.html">Restart-RemoteService</a></li>
+			<li><a href="Revoke-ServicePermission.html">Revoke-ServicePermission</a></li>
+			<li><a href="Set-ServiceAcl.html">Set-ServiceAcl</a></li>
+			<li><a href="Test-Service.html">Test-Service</a></li>
+			<li><a href="Uninstall-Service.html">Uninstall-Service</a></li>
+		</ul>
+		<li class="Category">Shares</li>
+		<ul class="CommandMenu">
+			<li><a href="Install-SmbShare.html">Install-SmbShare</a></li>
+		</ul>
+		<li class="Category">Text</li>
+		<ul class="CommandMenu">
+			<li><a href="ConvertFrom-Base64.html">ConvertFrom-Base64</a></li>
+			<li><a href="ConvertTo-Base64.html">ConvertTo-Base64</a></li>
+		</ul>
+		<li class="Category">UsersAndGroups</li>
+		<ul class="CommandMenu">
+			<li><a href="Add-GroupMember.html">Add-GroupMember</a></li>
+			<li><a href="Get-Group.html">Get-Group</a></li>
+			<li><a href="Get-User.html">Get-User</a></li>
+			<li><a href="Get-WmiLocalUserAccount.html">Get-WmiLocalUserAccount</a></li>
+			<li><a href="Install-Group.html">Install-Group</a></li>
+			<li><a href="Install-User.html">Install-User</a></li>
+			<li><a href="Remove-GroupMember.html">Remove-GroupMember</a></li>
+			<li><a href="Resolve-Identity.html">Resolve-Identity</a></li>
+			<li><a href="Test-Group.html">Test-Group</a></li>
+			<li><a href="Test-Identity.html">Test-Identity</a></li>
+			<li><a href="Test-User.html">Test-User</a></li>
+			<li><a href="Uninstall-User.html">Uninstall-User</a></li>
+		</ul>
+		<li class="Category">WindowsFeatures</li>
+		<ul class="CommandMenu">
+			<li><a href="Get-WindowsFeature.html">Get-WindowsFeature</a></li>
+			<li><a href="Install-WindowsFeature.html">Install-WindowsFeature</a></li>
+			<li><a href="Test-WindowsFeature.html">Test-WindowsFeature</a></li>
+			<li><a href="Uninstall-WindowsFeature.html">Uninstall-WindowsFeature</a></li>
+		</ul>
+		<li class="Category">Xml</li>
+		<ul class="CommandMenu">
+			<li><a href="Convert-XmlFile.html">Convert-XmlFile</a></li>
+		</ul>
+	</ul>
+</div>
+
+
+    <h1>Initialize-Lcm</h1>
+<div><p>Configures a computer's DSC Local Configuration Manager (LCM).</p></div>
+
+<h2>Syntax</h2>
+<pre class="Syntax"><code>Initialize-Lcm -Push -ComputerName &lt;String[]&gt; [-Credential &lt;PSCredential&gt;] [-CertificateID &lt;String&gt;] [-CertFile &lt;String&gt;] [-CertPassword &lt;Object&gt;] [-RebootIfNeeded] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;] Initialize-Lcm -ServerUrl &lt;String&gt; [-AllowUnsecureConnection] -ConfigurationID &lt;Guid&gt; -ConfigurationMode &lt;String&gt; -ComputerName &lt;String[]&gt; [-Credential &lt;PSCredential&gt;] [-AllowModuleOverwrite] [-CertificateID &lt;String&gt;] [-CertFile &lt;String&gt;] [-CertPassword &lt;Object&gt;] [-RebootIfNeeded] [-RefreshIntervalMinutes &lt;Int32&gt;] [-ConfigurationFrequency &lt;Int32&gt;] [-LcmCredential &lt;PSCredential&gt;] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;] Initialize-Lcm -SourcePath &lt;String&gt; -ConfigurationID &lt;Guid&gt; -ConfigurationMode &lt;String&gt; -ComputerName &lt;String[]&gt; [-Credential &lt;PSCredential&gt;] [-AllowModuleOverwrite] [-CertificateID &lt;String&gt;] [-CertFile &lt;String&gt;] [-CertPassword &lt;Object&gt;] [-RebootIfNeeded] [-RefreshIntervalMinutes &lt;Int32&gt;] [-ConfigurationFrequency &lt;Int32&gt;] [-LcmCredential &lt;PSCredential&gt;] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
+    
+<h2>Description</h2>
+<div class="Description">
+<p>The Local Configuration Manager (LCM) is the Windows PowerShell Desired State Configuration (DSC) engine. It runs on all target computers, and it is responsible for calling the configuration resources that are included in a DSC configuration script. It can be configured to receive changes (i.e. <code>Push</code> mode) or pull and apply changes its own changes (i.e. <code>Pull</code> mode).</p>
+
+<h2>Push Mode</h2>
+
+<p>Push mode is simplest. The LCM only applies configurations that are pushed to it via <code>Start-DscConfiguration</code>. It is expected that all resources needed by the LCM are installed and available on the computer. To use <code>Push</code> mode, use the <code>Push</code> switch.</p>
+
+<h2>Pull Mode</h2>
+
+<p>In order to get a computer to pulls its configuration automatically, you need to configure its LCM so it knows where and how to find its DSC pull server. The pull server holds all the resources and modules needed by the computer's configuration.</p>
+
+<p>The LCM can pull from two sources: a DSC website (the web download manager) or an SMB files hare (the file download manager). To use the web download manager, specify the URL to the website with the <code>ServerUrl</code> parameter. To use the file download manager, specify the path to the resources with the <code>SourcePath</code> parameter. This path can be an SMB share path or a local (on the LCM's computer) file system path. No matter where the LCM pulls its configuration from, you're responsible for putting all modules, resources, and .mof files at that location.</p>
+
+<p>The most frequently the LCM will <em>download</em> new configuration is every 15 minutes. This is the minimum interval. The refresh interval is set via the <code>RefreshIntervalMinutes</code> parameter. The LCM will only <em>apply</em> a configuration on one of the refreshes. At most, it will apply configuration every 2nd refresh (i.e. every other refresh). You can control the frequency when configuration is applied via the <code>ConfigurationFrequency</code> parameter. For example, if <code>RefreshIntervalMinutes</code> is set to <code>30</code>, and <code>ConfigurationFrequency</code> is set to 4, then configuration will be downloaded every 30 minutes, and applied every two hours (i.e. <code>30 * 4 = 120</code> minutes).</p>
+
+<p>The <code>ConfigurationMode</code> parameter controls <em>how</em> the LCM applies its configuration. It supports three values:</p>
+
+<ul>
+<li><code>ApplyOnly</code>: Configuration is applied once and isn't applied again until a new configuration is detected. If the computer's configuration drifts, no action is taken.</li>
+<li><code>ApplyAndMonitor</code>: The same as <code>ApplyOnly</code>, but if the configuration drifts, it is reported in event logs.</li>
+<li><code>ApplyAndAutoCorrect</code>: The same as <code>ApplyOnly</code>, and when the configuratio drifts, the discrepency is reported in event logs, and the LCM attempts to correct the configuration drift.</li>
+</ul>
+
+<p>When credentials are needed on the target computer, the DSC system encrypts those credentials with a public key when generating the configuration. Those credentials are then decrypted on the target computer, using the corresponding private key. A computer can't run its configuration until the private key is installed. Use the <code>CertFile</code> and <code>CertPassword</code> parameters to specify the path to the certificate containing the private key and the private key's password, respectively. This function will upload the certificate to the target computer and install it in the proper Windows certificate store. To generate a public/private key pair, use <code>New-RsaKeyPair</code>.</p>
+
+<p>Returns an object representing the computer's updated LCM settings.</p>
+
+<p>See <a href="http://technet.microsoft.com/en-us/library/dn249922.aspx">Windows PowerShell Desired State Configuration Local Configuration Manager</a> for more information.</p>
+
+<p><code>Initialize-Lcm</code> is new in Carbon 2.0.</p>
+</div>
+    
+<h2>Related Commands</h2>
+<ul>
+<li><a href="New-RsaKeyPair.html">New-RsaKeyPair</a></li>
+<li><a href="Start-DscPullConfiguration.html">Start-DscPullConfiguration</a></li>
+<li><a href="http://technet.microsoft.com/en-us/library/dn249922.aspx">http://technet.microsoft.com/en-us/library/dn249922.aspx</a></li>
+</ul>
+
+<h2> Parameters </h2>
+<table border='1'>
+<tr>
+	<th>Name</th>
+    <th>Type</th>
+	<th>Description</th>
+	<th>Required?</th>
+	<th>Pipeline Input</th>
+	<th>Default Value</th>
+</tr>
+<tr valign='top'>
+	<td>Push</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+	<td>Configures the LCM to receive its configuration via pushes using <code>Start-DscConfiguration</code>.</td>
+	<td>true</td>
+	<td>false</td>
+    <td>False</td>
+</tr>
+<tr valign='top'>
+	<td>ServerUrl</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+	<td>Configures the LCM to pull its configuration from a DSC website using the web download manager</td>
+	<td>true</td>
+	<td>false</td>
+    <td></td>
+</tr>
+<tr valign='top'>
+	<td>AllowUnsecureConnection</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+	<td>When using the web download manager, allow the <code>ServerUrl</code> to use an unsecured, http connection when contacting the DSC web pull server.</td>
+	<td>false</td>
+	<td>false</td>
+    <td>False</td>
+</tr>
+<tr valign='top'>
+	<td>SourcePath</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+	<td>Configures the LCM to pull its configuration from an SMB share or directory. This is the path to the SMB share where resources can be found. Local paths are also allowed, e.g. <code>C:\DscResources</code>.</td>
+	<td>true</td>
+	<td>false</td>
+    <td></td>
+</tr>
+<tr valign='top'>
+	<td>ConfigurationID</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.guid.aspx">Guid</a></td>
+	<td>The GUID that identifies what configuration to pull to the computer. The Local Configuration Manager will look for a '$Guid.mof' file to pull.</td>
+	<td>true</td>
+	<td>false</td>
+    <td></td>
+</tr>
+<tr valign='top'>
+	<td>ConfigurationMode</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+	<td>Specifies how the Local Configuration Manager applies configuration to the target computer(s). It supports three values: <code>ApplyOnly</code>, <code>ApplyAndMonitor</code>, or <code>ApplyAndAutoCorrect</code>.</td>
+	<td>true</td>
+	<td>false</td>
+    <td></td>
+</tr>
+<tr valign='top'>
+	<td>ComputerName</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String[]</a></td>
+	<td>The computer(s) whose Local Configuration Manager to configure.</td>
+	<td>true</td>
+	<td>false</td>
+    <td></td>
+</tr>
+<tr valign='top'>
+	<td>Credential</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.pscredential.aspx">PSCredential</a></td>
+	<td>The credentials to use when connecting to the target computer(s).</td>
+	<td>false</td>
+	<td>false</td>
+    <td></td>
+</tr>
+<tr valign='top'>
+	<td>AllowModuleOverwrite</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+	<td>Controls whether new configurations downloaded from the configuration server are allowed to overwrite the old ones on the target computer(s).</td>
+	<td>false</td>
+	<td>false</td>
+    <td>False</td>
+</tr>
+<tr valign='top'>
+	<td>CertificateID</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+	<td>The thumbprint of the certificate to use to decrypt secrets. If <code>CertFile</code> is given, this parameter is ignored in favor of the certificate in <code>CertFile</code>.</td>
+	<td>false</td>
+	<td>false</td>
+    <td></td>
+</tr>
+<tr valign='top'>
+	<td>CertFile</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+	<td>The path to the certificate containing the private key to use when decrypting credentials. The certificate will be uploaded and installed for you.</td>
+	<td>false</td>
+	<td>false</td>
+    <td></td>
+</tr>
+<tr valign='top'>
+	<td>CertPassword</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.object.aspx">Object</a></td>
+	<td>The password for the certificate specified by <code>CertFile</code>. It can be a <code>string</code> or a <code>SecureString</code>.</td>
+	<td>false</td>
+	<td>false</td>
+    <td></td>
+</tr>
+<tr valign='top'>
+	<td>RebootIfNeeded</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+	<td>Reboot the target computer(s) if needed.</td>
+	<td>false</td>
+	<td>false</td>
+    <td>False</td>
+</tr>
+<tr valign='top'>
+	<td>RefreshIntervalMinutes</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.int32.aspx">Int32</a></td>
+	<td>The interval (in minutes) at which the target computer(s) will contact the pull server to <em>download</em> its current configuration. The default (and minimum) interval is 15 minutes.</td>
+	<td>false</td>
+	<td>false</td>
+    <td>15</td>
+</tr>
+<tr valign='top'>
+	<td>ConfigurationFrequency</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.int32.aspx">Int32</a></td>
+	<td>The frequency (in number of <code>RefreshIntervalMinutes</code>) at which the target computer will run/implement its current configuration. The default (and minimum) frequency is 2 refresh intervals. This value is multiplied by the <code>RefreshIntervalMinutes</code> parameter to calculate the interval in minutes that the configuration is applied.</td>
+	<td>false</td>
+	<td>false</td>
+    <td>2</td>
+</tr>
+<tr valign='top'>
+	<td>LcmCredential</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.pscredential.aspx">PSCredential</a></td>
+	<td>The credentials the Local Configuration Manager should use when contacting the pull server.</td>
+	<td>false</td>
+	<td>false</td>
+    <td></td>
+</tr>
+<tr valign='top'>
+	<td>WhatIf</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+	<td></td>
+	<td>false</td>
+	<td>false</td>
+    <td></td>
+</tr>
+<tr valign='top'>
+	<td>Confirm</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+	<td></td>
+	<td>false</td>
+	<td>false</td>
+    <td></td>
+</tr>
+<tr valign="top">
+    <td><a href="http://technet.microsoft.com/en-us/library/dd315352.aspx">CommonParameters</a></td>
+    <td></td>
+    <td>This cmdlet supports common parameters.  For more information type <br> <code>Get-Help about_CommonParameters</code>.</td>
+    <td></td>
+    <td></td>
+    <td></td>
+</tr>
+</table>
+        
+
+        
+
+        
+
+        
+<h2>EXAMPLE 1</h2>
+<pre><code>Initialize-Lcm -Push -ComputerName '1.2.3.4'</code></pre>
+<p>Demonstrates how to configure an LCM to use push mode.</p>
+
+<h2>EXAMPLE 2</h2>
+<pre><code>Initialize-Lcm -ConfigurationID 'fc2ffe50-13cd-4cd2-9942-d25ac66d6c13' -ComputerName '10.1.2.3' -ServerUrl 'https://10.4.5.6/PSDSCPullServer.dsc'</code></pre>
+<p>Demonstrates the minimum needed to configure a computer (in this case, <code>10.1.2.3</code>) to pull its configuration from a DSC web server.</p>
+
+<h2>EXAMPLE 3</h2>
+<pre><code>Initialize-Lcm -ConfigurationID 'fc2ffe50-13cd-4cd2-9942-d25ac66d6c13' -ComputerName '10.1.2.3' -SourcePath '\\10.4.5.6\DSCResources'</code></pre>
+<p>Demonstrates the minimum needed to configure a computer (in this case, <code>10.1.2.3</code>) to pull its configuration from an SMB file share.</p>
+
+<h2>EXAMPLE 4</h2>
+<pre><code>Initialize-Lcm -CertFile 'D:\Projects\Resources\PrivateKey.pfx' -CertPassword $secureStringPassword -ConfigurationID 'fc2ffe50-13cd-4cd2-9942-d25ac66d6c13' -ComputerName '10.1.2.3' -SourcePath '\\10.4.5.6\DSCResources'</code></pre>
+<p>Demonstrates how to upload the private key certificate on to the targer computer(s).</p>
+
+<h2>EXAMPLE 5</h2>
+<pre><code>Initialize-Lcm -RefreshIntervalMinutes 25 -ConfigurationFrequency 3 -ConfigurationID 'fc2ffe50-13cd-4cd2-9942-d25ac66d6c13' -ComputerName '10.1.2.3' -SourcePath '\\10.4.5.6\DSCResources'</code></pre>
+<p>Demonstrates how to use the <code>RefreshIntervalMinutes</code> and <code>ConfigurationFrequency</code> parameters to control when the LCM downloads new configuration and applies that configuration. In this case, new configuration is downloaded every 25 minutes, and apllied every 75 minutes (<code>RefreshIntervalMinutes * ConfigurationFrequency</code>).</p>
+</body>
+</html>

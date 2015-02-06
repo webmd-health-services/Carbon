@@ -25,6 +25,8 @@ function Copy-DscResource
     
     Only new files, or files whose checksums have changed, are copied. You can force all files to be copied with the `Force` switch.
 
+    `Copy-DscResource` is new in Carbon 2.0.
+
     .EXAMPLE
     Copy-DscResource -Path 'localhost.mof' -Destination '\\dscserver\DscResources'
 

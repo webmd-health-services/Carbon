@@ -57,6 +57,8 @@ function Clear-MofAuthoringMetadata
         };
 
 
+    `Clear-MofAuthoringMetadata` is new in Carbon 2.0.
+
     .EXAMPLE
     Clear-MofAuthoringMetadata -Path 'C:\Projects\DSC\localhost.mof'
 

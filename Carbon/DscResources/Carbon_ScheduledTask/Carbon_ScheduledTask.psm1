@@ -73,6 +73,8 @@ function Set-TargetResource
 
     The task is installed when the `Ensure` property is set to `Present`. If the task already exists, and the XML of the current task doesn't match the XML passed in, the task is deleted, and a new task is created in its place. The XML comparison is pretty dumb: it compares the XML document(s) as a giant string, not element by element. This means if your XML doesn't order elements in the same way as `schtasks.exe /query /xml`, then your task will always be deleted and re-created. This may or may not be a problem for you.
 
+    `Carbon_ScheduledTask` is new in Carbon 2.0.
+
     .LINK
     Get-ScheduledTask
 

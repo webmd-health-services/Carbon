@@ -75,10 +75,8 @@ $menuBuilder = New-Object Text.StringBuilder
 [void] $menuBuilder.AppendLine( @"
 	<ul id="SiteNav">
 		<li><a href="/">Get-Carbon</a></li>
-		<li><a href="help/">-Documentation</a></li>
-        <li><b>2.0-alpha</b></li>
-        <li><a href="/releasenotes.html">-ReleaseNotes</a></li>
-        <li><a href="/releasenotes-2.0.html">2.0-alpha</a></li>
+		<li>-Documentation</li>
+        <li><a href="../releasenotes.html">-ReleaseNotes</a></li>
 		<li><a href="http://pshdo.com">-Blog</a></li>
 	</ul>
 "@ )
@@ -177,9 +175,7 @@ if( -not (Test-Path $OutputDir -PathType Container) )
 	<ul id="SiteNav">
 		<li><a href="/">Get-Carbon</a></li>
 		<li><a href="help/">-Documentation</a></li>
-		<li><a href="help/2.0/">2.0-alpha</a></li>
-		<li><a href="releasenotes.html">-ReleaseNotes</a></li>
-        <li><b>2.0-alpha</b></li>
+		<li>-ReleaseNotes</li>
 		<li><a href="http://pshdo.com">-Blog</a></li>
 	</ul>
     

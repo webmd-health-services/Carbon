@@ -32,6 +32,8 @@ function Get-DscWinEvent
         Get-FirewallRule -Name '*Remove Event Log Management*' |
             ForEach-Object { netsh advfirewall firewall set rule name= $_.Name new enable=yes }
 
+    `Get-DscWinEvent` is new in Carbon 2.0.
+
     .OUTPUTS
     System.Diagnostics.Eventing.Reader.EventLogRecord
 

@@ -139,6 +139,8 @@ function Set-TargetResource
 
     When modifying existing rules, only properties you pass are updated/changed. All other properties are left as-is.
 
+    `Carbon_FirewallRule` is new in Carbon 2.0.
+
     .LINK
     Get-FirewallRule
 

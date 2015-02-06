@@ -145,6 +145,8 @@ function Set-TargetResource
 
     The service is uninstalled when the `Ensure` property is set to `Absent`. The service is stopped, then uninstalled.
 
+    `Carbon_Service` is new in Carbon 2.0.
+
     .LINK
     Grant-Privilege
 

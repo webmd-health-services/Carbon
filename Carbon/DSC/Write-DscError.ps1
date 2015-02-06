@@ -21,6 +21,8 @@ function Write-DscError
     .DESCRIPTION
     The Local Configuration Manager (LCM) applies configuration in a separate process space as a background service which writes its errors to the `Microsoft-Windows-DSC/Operational` event log. This function is intended to be used with `Get-DscError`, and will write errors returned by that function as PowerShell errors.
 
+    `Write-DscError` is new in Carbon 2.0.
+
     .OUTPUTS
     System.Diagnostics.Eventing.Reader.EventLogRecord
 

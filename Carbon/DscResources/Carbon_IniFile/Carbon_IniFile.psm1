@@ -102,6 +102,8 @@ function Set-TargetResource
     .DESCRIPTION
     The `Carbon_IniFile` resource sets or removes settings from INI files.
 
+    `Carbon_IniFile` is new in Carbon 2.0.
+
     .LINK
     Remove-IniEntry
 

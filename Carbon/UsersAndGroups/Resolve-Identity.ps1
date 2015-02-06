@@ -30,6 +30,8 @@ function Resolve-Identity
     
     If the name doesn't represent an actual user or group, an error is written and nothing is returned.
 
+    In versions before 2.0, this function was known as `Resolve-IdendityName` and returned the full name of the identity instead of an object.
+
     .LINK
     Test-Identity
 

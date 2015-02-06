@@ -5,12 +5,10 @@
 	<link href="styles.css" type="text/css" rel="stylesheet" />
 </head>
 <body>
-	<ul id="SiteNav">
-		<li><a href="http://get-carbon.org">Get-Carbon</a></li>
-		<li><b>-Documentation</b></li>
-        <li><a href="/help/2.0">2.0-alpha</a></li>
-        <li><a href="/releasenotes.html">-ReleaseNotes</a></li>
-        <li><a href="/releasenotes-2.0.html">2.0-alpha</a></li>
+    	<ul id="SiteNav">
+		<li><a href="/">Get-Carbon</a></li>
+		<li>-Documentation</li>
+        <li><a href="../releasenotes.html">-ReleaseNotes</a></li>
 		<li><a href="http://pshdo.com">-Blog</a></li>
 	</ul>
 <div id="CommandMenuContainer" style="float:left;">
@@ -60,6 +58,28 @@
 			<li><a href="Set-DotNetConnectionString.html">Set-DotNetConnectionString</a></li>
 			<li><a href="Test-DotNet.html">Test-DotNet</a></li>
 		</ul>
+		<li class="Category">DSC</li>
+		<ul class="CommandMenu">
+			<li><a href="Clear-DscLocalResourceCache.html">Clear-DscLocalResourceCache</a></li>
+			<li><a href="Clear-MofAuthoringMetadata.html">Clear-MofAuthoringMetadata</a></li>
+			<li><a href="Copy-DscResource.html">Copy-DscResource</a></li>
+			<li><a href="Get-DscError.html">Get-DscError</a></li>
+			<li><a href="Get-DscWinEvent.html">Get-DscWinEvent</a></li>
+			<li><a href="Initialize-Lcm.html">Initialize-Lcm</a></li>
+			<li><a href="Start-DscPullConfiguration.html">Start-DscPullConfiguration</a></li>
+			<li><a href="Test-DscTargetResource.html">Test-DscTargetResource</a></li>
+			<li><a href="Write-DscError.html">Write-DscError</a></li>
+		</ul>
+		<li class="Category">DSC Resources</li>
+		<ul class="CommandMenu">
+			<li><a href="Carbon_EnvironmentVariable.html">Carbon_EnvironmentVariable</a></li>
+			<li><a href="Carbon_FirewallRule.html">Carbon_FirewallRule</a></li>
+			<li><a href="Carbon_IniFile.html">Carbon_IniFile</a></li>
+			<li><a href="Carbon_Permission.html">Carbon_Permission</a></li>
+			<li><a href="Carbon_Privilege.html">Carbon_Privilege</a></li>
+			<li><a href="Carbon_ScheduledTask.html">Carbon_ScheduledTask</a></li>
+			<li><a href="Carbon_Service.html">Carbon_Service</a></li>
+		</ul>
 		<li class="Category">FileSystem</li>
 		<ul class="CommandMenu">
 			<li><a href="Compress-Item.html">Compress-Item</a></li>
@@ -73,6 +93,7 @@
 			<li><a href="Test-NtfsCompression.html">Test-NtfsCompression</a></li>
 			<li><a href="Test-PathIsJunction.html">Test-PathIsJunction</a></li>
 			<li><a href="Test-ZipFile.html">Test-ZipFile</a></li>
+			<li><a href="Uninstall-Junction.html">Uninstall-Junction</a></li>
 		</ul>
 		<li class="Category">Firewall</li>
 		<ul class="CommandMenu">
@@ -178,7 +199,7 @@
 		<ul class="CommandMenu">
 			<li><a href="Add-TrustedHost.html">Add-TrustedHost</a></li>
 			<li><a href="Clear-TrustedHost.html">Clear-TrustedHost</a></li>
-			<li><a href="Complete-Job.html">Complete-Job</a></li>
+			<li><a href="Get-PowerShellModuleInstallPath.html">Get-PowerShellModuleInstallPath</a></li>
 			<li><a href="Get-PowershellPath.html">Get-PowershellPath</a></li>
 			<li><a href="Get-TrustedHost.html">Get-TrustedHost</a></li>
 			<li><a href="Invoke-PowerShell.html">Invoke-PowerShell</a></li>
@@ -215,7 +236,6 @@
 			<li><a href="ConvertTo-ContainerInheritanceFlags.html">ConvertTo-ContainerInheritanceFlags</a></li>
 			<li><a href="ConvertTo-InheritanceFlag.html">ConvertTo-InheritanceFlag</a></li>
 			<li><a href="ConvertTo-PropagationFlag.html">ConvertTo-PropagationFlag</a></li>
-			<li><a href="ConvertTo-ProviderAccessControlRights.html">ConvertTo-ProviderAccessControlRights</a></li>
 			<li><a href="Get-Permission.html">Get-Permission</a></li>
 			<li><a href="Grant-Permission.html">Grant-Permission</a></li>
 			<li><a href="New-Credential.html">New-Credential</a></li>
@@ -252,10 +272,14 @@
 		<li class="Category">UsersAndGroups</li>
 		<ul class="CommandMenu">
 			<li><a href="Add-GroupMember.html">Add-GroupMember</a></li>
+			<li><a href="Get-Group.html">Get-Group</a></li>
+			<li><a href="Get-User.html">Get-User</a></li>
 			<li><a href="Get-WmiLocalUserAccount.html">Get-WmiLocalUserAccount</a></li>
 			<li><a href="Install-Group.html">Install-Group</a></li>
 			<li><a href="Install-User.html">Install-User</a></li>
-			<li><a href="Resolve-IdentityName.html">Resolve-IdentityName</a></li>
+			<li><a href="Remove-GroupMember.html">Remove-GroupMember</a></li>
+			<li><a href="Resolve-Identity.html">Resolve-Identity</a></li>
+			<li><a href="Test-Group.html">Test-Group</a></li>
 			<li><a href="Test-Identity.html">Test-Identity</a></li>
 			<li><a href="Test-User.html">Test-User</a></li>
 			<li><a href="Uninstall-User.html">Uninstall-User</a></li>
@@ -275,13 +299,11 @@
 </div>
 
 
-<h1>Remove-IisMimeMap</h1>
+    <h1>Remove-IisMimeMap</h1>
 <div><p>Removes a file extension to MIME type map from an entire web server.</p></div>
 
 <h2>Syntax</h2>
-<pre class="Syntax"><code>Remove-IisMimeMap -FileExtension &lt;String&gt; [&lt;CommonParameters&gt;]
-</code></pre>
-<pre class="Syntax"><code>Remove-IisMimeMap -SiteName &lt;String&gt; [-VirtualPath &lt;String&gt;] -FileExtension &lt;String&gt; [&lt;CommonParameters&gt;]</code></pre>
+<pre class="Syntax"><code>Remove-IisMimeMap -FileExtension &lt;String&gt; [&lt;CommonParameters&gt;] Remove-IisMimeMap -SiteName &lt;String&gt; [-VirtualPath &lt;String&gt;] -FileExtension &lt;String&gt; [&lt;CommonParameters&gt;]</code></pre>
     
 <h2>Description</h2>
 <div class="Description">

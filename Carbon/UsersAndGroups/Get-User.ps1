@@ -21,6 +21,8 @@ function Get-User
     .DESCRIPTION
     Gets all *local* users or a specific user by its username.
 
+    `Get-User` is new in Carbon 2.0.
+
     .OUTPUTS
     System.DirectoryServices.AccountManagement.UserPrincipal.
 

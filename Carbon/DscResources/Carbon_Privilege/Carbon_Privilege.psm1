@@ -135,6 +135,8 @@ function Set-TargetResource
      * SeUndockPrivilege
      * SeUnsolicitedInputPrivilege
 
+    `Carbon_Privilege` is new in Carbon 2.0.
+
     .LINK
     Get-Privilege
 
