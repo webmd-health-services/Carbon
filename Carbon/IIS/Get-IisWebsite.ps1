@@ -40,6 +40,7 @@ function Get-IisWebsite
     Returns the details for the site named `WebsiteName`.
     #>
     [CmdletBinding()]
+    [OutputType([Microsoft.Web.Administration.Site])]
     param(
         [string]
         [Alias('SiteName')]
@@ -65,12 +66,5 @@ function Get-IisWebsite
             {
                 $true
             }
-        } | Add-IisServerManagerMember -ServerManager $mgr -PassThru |
-        Add-Member -MemberType ScriptProperty -Name PhysicalPath -Value {
-            $this.Applications |
-                Where-Object { $_.Path -eq '/' } |
-                Select-Object -ExpandProperty VirtualDirectories |
-                Where-Object { $_.Path -eq '/' } |
-                Select-Object -ExpandProperty PhysicalPath
-        } -PassThru
+        } | Add-IisServerManagerMember -ServerManager $mgr -PassThru
 }

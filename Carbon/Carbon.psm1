@@ -16,6 +16,8 @@
 
 $CarbonBinDir = Join-Path -Path $PSScriptRoot -ChildPath 'bin' -Resolve
 
+. (Join-Path -Path $PSScriptRoot -ChildPath 'PowerShell\Test-TypeDataMember.ps1' -Resolve)
+
 # Active Directory
 
 # COM
@@ -35,6 +37,26 @@ if( (Test-Path -Path $microsoftWebAdministrationPath -PathType Leaf) )
 {
     Add-Type -Path $microsoftWebAdministrationPath
     Add-Type -Path (Join-Path -Path $CarbonBinDir -ChildPath 'Carbon.Iis.dll' -Resolve)
+
+    if( -not (Test-TypeDataMember -TypeName 'Microsoft.Web.Administration.Site' -MemberName 'PhysicalPath') )
+    {
+        Update-TypeData -TypeName 'Microsoft.Web.Administration.Site' -MemberType ScriptProperty -MemberName 'PhysicalPath' -Value { 
+                $this.Applications |
+                    Where-Object { $_.Path -eq '/' } |
+                    Select-Object -ExpandProperty VirtualDirectories |
+                    Where-Object { $_.Path -eq '/' } |
+                    Select-Object -ExpandProperty PhysicalPath
+            }
+    }
+
+    if( -not (Test-TypeDataMember -TypeName 'Microsoft.Web.Administration.Application' -MemberName 'PhysicalPath') )
+    {
+        Update-TypeData -TypeName 'Microsoft.Web.Administration.Application' -MemberType ScriptProperty -MemberName 'PhysicalPath' -Value { 
+                $this.VirtualDirectories |
+                    Where-Object { $_.Path -eq '/' } |
+                    Select-Object -ExpandProperty PhysicalPath
+            }
+    }
 }
 
 # MSMQ

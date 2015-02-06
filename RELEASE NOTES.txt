@@ -66,6 +66,7 @@ This is a ***backwards-incompatible*** release.
  * Created [Uninstall-Junction](http://get-carbon.org/help/2.0/Uninstall-Junction.html) for uninstalling a junction in an idempotent way (i.e. without errors). Thanks to [Konstantin Ushenin](https://vk.com/kostanew) for the contribution.
  * Added improved error handling to [Remove-Junction](http://get-carbon.org/help/2.0/Remove-Junction.html).
  * [Install-Service](http://get-carbon.org/help/2.0/Install-Service.html) now supports service startup parameters/arguments.
+ * New [Test-TypeDataMember](http://get-carbon.org/help/2.0/Install-Service.html) for testing if a type has an extended type member defined.
 
  
 ## Enhancements
@@ -129,6 +130,7 @@ This is a ***backwards-incompatible*** release.
  * Changed [Test-PowerShellIs32Bit](http://get-carbon.org/help/2.0/Test-PowerShellIs32Bit.html) and [Test-PowerShellIs64Bit](http://get-carbon.org/help/2.0/Test-PowerShellIs64Bit.html) functions to use the Environment class's new [Is64BitProcess](http://msdn.microsoft.com/en-us/library/system.environment.is64bitprocess.aspx) property.
  * Removed `Complete-Job` function.  It was total crap.
  * Created [Get-PowerShellModuleInstallPath](http://get-carbon.org/help/2.0/Get-PowerShellModuleInstallPath.html) function for getting the path where new module's should be installed. Beginning with PowerShell 4, modules should get installed into `$env:ProgramFiles\Windows PowerShell\Modules`. Under PowerShell 3, it is `$PSHome\Modules`. This function returns the correct location for the version of PowerShell you're using.
+ * Created [Test-TypeDataMember](http://get-carbon.org/help/2.0/Test-TypeDataMember.html) for testing if a type has an extended type member defined.
  
 ### Security
 

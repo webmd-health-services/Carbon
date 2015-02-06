@@ -46,6 +46,7 @@ function Get-IisApplication
     Demonstrates how to get a nested application, i.e. gets the application at `/MainPort/ExhaustPort` under the `DeathStar` website.
     #>
     [CmdletBinding()]
+    [OutputType([Microsoft.Web.Administration.Application])]
     param(
         [Parameter(Mandatory=$true)]
         [string]
@@ -75,10 +76,5 @@ function Get-IisApplication
             }
             return $true
         } | 
-        Add-IisServerManagerMember -ServerManager $site.ServerManager -PassThru |
-        Add-Member -MemberType ScriptProperty -Name PhysicalPath -Value {
-            $this.VirtualDirectories |
-                Where-Object { $_.Path -eq '/' } |
-                Select-Object -ExpandProperty PhysicalPath
-        } -PassThru
+        Add-IisServerManagerMember -ServerManager $site.ServerManager -PassThru
 }
