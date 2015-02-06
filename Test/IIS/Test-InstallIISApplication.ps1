@@ -41,8 +41,10 @@ function Stop-Test
 
 function Invoke-InstallApplication($Path = $TestDir)
 {
-    Install-IISApplication -SiteName $SiteName -Name $AppName -Path $Path -AppPoolName $AppPoolName
-    Assert-LastProcessSucceeded 'Failed to create virtual directory.'
+    $result = Install-IISApplication -SiteName $SiteName -Name $AppName -Path $Path -AppPoolName $AppPoolName
+    Assert-NoError
+    Assert-NotNull $result
+    Assert-Is $result ([Microsoft.Web.Administration.Application])
     Assert-FileDoesNotExist $WebConfig
 }
 
@@ -75,19 +77,36 @@ function Test-ShouldChangePathOfExistingApplication
     Assert-Equal $TestDir $app.PhysicalPath
 }
 
-function Test-ShouldDeleteExistingApplication
+function Test-ShouldUpdatePath
 {
     Invoke-InstallApplication -Path $env:SystemRoot
     Invoke-InstallApplication
     Assert-ApplicationRunning
+    $result = Install-IisApplication -SiteName $SiteName -VirtualPath $AppName -PhysicalPath $TestDir -AppPoolName $AppPoolName
+    Assert-Null $result
 }
 
-function Test-ShouldAllowOptionalAppPoolName
+function Test-ShouldUpdateApplicationPool
 {
-    Install-IISApplication -SiteName $SiteName -Name $AppName -Path $TestDir
+    $result = Install-IISApplication -SiteName $SiteName -Name $AppName -Path $TestDir
+    Assert-NoError
+    Assert-NotNull $result
+    Assert-Equal 'DefaultAppPool' $result.ApplicationPoolName
     Assert-ApplicationRunning
-    $output = Invoke-AppCmd list app "$SiteName/$AppName"
-    Assert-Equal "APP ""$SiteName/$AppName"" (applicationPool:DefaultAppPool)" $output
+
+    $result = Install-IisApplication -SiteName $SiteName -Name $AppName -PhysicalPath $TestDir -AppPoolName $AppPoolName
+    Assert-NoError
+    Assert-NotNull $result
+    Assert-Equal $AppPoolName $result.ApplicationPoolName
+
+    $result = Install-IisApplication -SiteName $SiteName -Name $AppName -PhysicalPath $TestDir -AppPoolName $AppPoolName
+    Assert-NoError
+    Assert-Null $result
+
+    $result = Install-IisApplication -SiteName $SiteName -Name $AppName -PhysicalPath $TestDir 
+    Assert-NoError
+    Assert-NotNull $result
+    Assert-Equal 'DefaultAppPool' $result.ApplicationPoolName
 }
 
 function Test-ShouldCreateApplicationDirectory

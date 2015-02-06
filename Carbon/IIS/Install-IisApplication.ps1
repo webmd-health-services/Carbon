@@ -20,6 +20,10 @@ function Install-IisApplication
     
     .DESCRIPTION
     Creates a new application at `VirtualPath` under website `SiteName` running the code found on the file system under `PhysicalPath`, i.e. if SiteName is is `example.com`, the application is accessible at `example.com/VirtualPath`.  If an application already exists at that path, it is removed first.  The application can run under a custom application pool using the optional `AppPoolName` parameter.  If no app pool is specified, the application runs under the same app pool as the website it runs under.
+
+    Beginning with Carbon 2.0, returns a `Microsoft.Web.Administration.Application` object for the new application if one is created or modified.
+
+    Beginning with Carbon 2.0, if no app pool name is given, existing application's are updated to use `DefaultAppPool`.
     
     .EXAMPLE
     Install-IisApplication -SiteName Peanuts -VirtualPath CharlieBrown -PhysicalPath C:\Path\To\CharlieBrown -AppPoolName CharlieBrownPool
@@ -32,6 +36,7 @@ function Install-IisApplication
     Create an application at Peanuts/Snoopy, which runs from C:\Path\To\Snoopy.  It uses the same application as the Peanuts website.
     #>
     [CmdletBinding()]
+    [OutputType([Microsoft.Web.Administration.Application])]
     param(
         [Parameter(Mandatory=$true)]
         [string]
@@ -51,15 +56,25 @@ function Install-IisApplication
         $PhysicalPath,
         
         [string]
-        # The app pool for the application.
-        $AppPoolName
+        # The app pool for the application. Default is `DefaultAppPool`.
+        $AppPoolName = 'DefaultAppPool'
     )
     
     Set-StrictMode -Version 'Latest'
 
+    $site = Get-IisWebsite -SiteName $SiteName
+    if( -not $site )
+    {
+        Write-Error ('[IIS] Website ''{0}'' not found.' -f $SiteName)
+        return
+    }
+
+    $iisAppPath = Join-IisVirtualPath $SiteName $VirtualPath
+
     $PhysicalPath = Resolve-FullPath -Path $PhysicalPath
     if( -not (Test-Path $PhysicalPath -PathType Container) )
     {
+        Write-Verbose ('IIS://{0}: creating physical path {1}' -f $iisAppPath,$PhysicalPath)
         $null = New-Item $PhysicalPath -ItemType Directory
     }
 
@@ -69,30 +84,31 @@ function Install-IisApplication
         $appPoolDesc = '; appPool: {0}' -f $AppPoolName
     }
     
-    $app = Get-IisApplication -SiteName $SiteName -VirtualPath $VirtualPath
-    if( $app )
-    {
-        Write-Verbose ('IIS://{0}: deleting application' -f (Join-IisVirtualPath $SiteName $VirtualPath))
-        $app.Delete()
-        $app.CommitChanges()
-    }
-
-    Write-Verbose ('IIS:/{0}: creating application: physicalPath: {1}{2}' -f (Join-IisVirtualPath $SiteName $VirtualPath),$PhysicalPath,$appPoolDesc)
-    $site = Get-IisWebsite -SiteName $SiteName
-    if( -not $site )
-    {
-        Write-Error ('[IIS] Website ''{0}'' not found.' -f $SiteName)
-        return
-    }
     $apps = $site.GetCollection()
-    $app = $apps.CreateElement('application') |
-                Add-IisServerManagerMember -ServerManager $site.ServerManager -PassThru
-    $app['path'] = "/{0}" -f $VirtualPath
-    $apps.Add( $app ) | Out-Null
 
-    if( $AppPoolName )
+    $appPath = "/{0}" -f $VirtualPath
+    $app = Get-IisApplication -SiteName $SiteName -VirtualPath $VirtualPath
+    $modified = $false
+    if( -not $app )
+    {
+        Write-Verbose ('IIS://{0}: creating application' -f $iisAppPath)
+        $app = $apps.CreateElement('application') |
+                    Add-IisServerManagerMember -ServerManager $site.ServerManager -PassThru
+        $app['path'] = $appPath
+        $apps.Add( $app ) | Out-Null
+        $modified = $true
+    }
+
+    if( $app['path'] -ne $appPath )
+    {
+        $app['path'] = $appPath
+        $modified = $true
+    }
+        
+    if( $AppPoolName -and $app['applicationPool'] -ne $AppPoolName)
     {
         $app['applicationPool'] = $AppPoolName
+        $modified = $true
     }
 
     $vdir = $null
@@ -101,13 +117,30 @@ function Install-IisApplication
         $vdir = $app.VirtualDirectories |
                     Where-Object { $_.Path -eq '/' }
     }
+
     if( -not $vdir )
     {
+        Write-Verbose ('IIS://{0}: creating virtual directory' -f $iisAppPath)
         $vdirs = $app.GetCollection()
         $vdir = $vdirs.CreateElement('virtualDirectory')
         $vdir['path'] = '/'
         $vdirs.Add( $vdir ) | Out-Null
+        $modified = $true
     }
-    $vdir['physicalPath'] = $PhysicalPath
-    $app.CommitChanges()
+
+    if( $vdir['physicalPath'] -ne $PhysicalPath )
+    {
+        Write-Verbose ('IIS://{0}: setting physical path {1}' -f $iisAppPath,$PhysicalPath)
+        $vdir['physicalPath'] = $PhysicalPath
+        $modified = $true
+    }
+
+    if( $modified )
+    {
+        Write-Verbose ('IIS://{0}: committing changes' -f $iisAppPath)
+        $app.CommitChanges()
+
+        return Get-IisApplication -SiteName $SiteName -VirtualPath $VirtualPath
+    }
+
 }
