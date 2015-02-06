@@ -41,28 +41,29 @@ function Invoke-UninstallJunction($junction)
 function Test-ShouldUninstallJunction
 {
     Invoke-UninstallJunction $JunctionPath
+    Assert-NoError
     Assert-DirectoryDoesNotExist $JunctionPath 'Failed to delete junction.'
     Assert-DirectoryExists $TestDir
 }
 
-function Test-ShouldDoNothingIfJunctionActuallyADirectory
+function Test-ShouldFailIfJunctionActuallyADirectory
 {
     $realDir = Join-Path $env:Temp ([IO.Path]::GetRandomFileName())
     New-Item $realDir -ItemType 'Directory'
     $error.Clear()
     Invoke-UninstallJunction $realDir 2> $null
+    Assert-Error -Last -Regex 'is a directory'
     Assert-DirectoryExists $realDir 'Real directory was removed.'
-    Assert-Equal 0 $error.Count "Wrote out error."
     Remove-Item $realDir
 }
 
-function Test-ShouldDoNothingIfJunctionActuallyAFile
+function Test-ShouldFailIfJunctionActuallyAFile
 {
     $path = [IO.Path]::GetTempFileName()
     $error.Clear()
     Invoke-UninstallJunction $path 2> $null
+    Assert-Error -Last -Regex 'is a file'
     Assert-FileExists $path 'File was deleted'
-    Assert-Equal 0 $error.Count "Wrote out error."
     Remove-Item $path
 }
 

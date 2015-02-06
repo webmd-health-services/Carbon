@@ -59,7 +59,12 @@ This is a ***backwards-incompatible*** release.
 
 ### Bug Fixes
 
- * `Set-HostsEntry` fails to preserve whitespace if existing lines end with a comment/description. Thanks to [Konstantin Ushenin](https://vk.com/kostanew) for the fix.
+ * [Set-HostsEntry](http://get-carbon.org/help/2.0/Set-HostsEntry.html) fails to preserve whitespace if existing lines end with a comment/description. Thanks to [Konstantin Ushenin](https://vk.com/kostanew) for the fix.
+ 
+### Enhancements
+
+ * Created [Uninstall-Junction](http://get-carbon.org/help/2.0/Uninstall-Junction.html) for uninstalling a junction in an idempotent way (i.e. without errors). Thanks to [Konstantin Ushenin](https://vk.com/kostanew) for the contribution.
+ * Added improved error handling to [Remove-Junction](http://get-carbon.org/help/2.0/Remove-Junction.html).
  
 ## Enhancements
 

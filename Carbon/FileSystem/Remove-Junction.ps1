@@ -19,13 +19,16 @@ function Remove-Junction
     Removes a junction.
     
     .DESCRIPTION
-    Safely removes a junction without removing the junction's target.  If you try to remove something that isn't a junction, an error will be written.  Use `Test-PathIsJunction` or the `IsJunction` extended method on `DirectoryInfo` object.
+    `Remove-Junction` removes an existing junction. You'll get errors if `Path` doesn't exist, is a file, or is a directory.
     
     .LINK
     Install-Junction
 
     .LINK
     New-Junction
+
+    .LINK
+    Uninstall-Junction
 
     .EXAMPLE
     Remove-Junction -Path 'C:\I\Am\A\Junction'
@@ -44,6 +47,18 @@ function Remove-Junction
     )
 
     Set-StrictMode -Version 'Latest'
+
+    if( -not (Test-Path -Path $Path) )
+    {
+        Write-Error ('Path ''{0}'' not found.' -f $Path)
+        return
+    }
+    
+    if( (Test-Path -Path $Path -PathType Leaf) )
+    {
+        Write-Error ('Path ''{0}'' is a file, not a junction.' -f $Path)
+        return
+    }
     
     if( Test-PathIsJunction $Path  )
     {
@@ -55,6 +70,6 @@ function Remove-Junction
     }
     else
     {
-        Write-Error "'$Path' doesn't exist or is not a junction."
+        Write-Error ("Path '{0}' is a directory, not a junction." -f $Path)
     }
 }

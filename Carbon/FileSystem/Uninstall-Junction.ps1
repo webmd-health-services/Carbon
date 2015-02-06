@@ -19,13 +19,18 @@ function Uninstall-Junction
     Uninstall a junction.
     
     .DESCRIPTION
-    Safely removes a junction without removing the junction's target.  If you try to remove something that isn't a junction, nothing will be written.  Use `Test-PathIsJunction` or the `IsJunction` extended method on `DirectoryInfo` object.
+    `Uninstall-Junction` removes a junction that may or may not exist, without errors.
+    
+    If `Path` is not a direcory, you *will* see errors.
     
     .LINK
     Install-Junction
 
     .LINK
     New-Junction
+
+    .LINK
+    Remove-Junction
 
     .EXAMPLE
     Uninstall-Junction -Path 'C:\I\Am\A\Junction'
@@ -44,13 +49,11 @@ function Uninstall-Junction
     )
 
     Set-StrictMode -Version 'Latest'
-    
-    if( Test-PathIsJunction $Path  )
+
+    if( -not (Test-Path -Path $Path) )
     {
-        $Path = Resolve-Path -Path $Path | Select-Object -ExpandProperty ProviderPath
-        if( $PSCmdlet.ShouldProcess($Path, "remove junction") )
-        {
-            [Carbon.IO.JunctionPoint]::Delete( $Path )
-        }
+        return
     }
+
+    Remove-Junction -Path $Path
 }
