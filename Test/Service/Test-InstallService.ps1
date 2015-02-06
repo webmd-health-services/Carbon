@@ -106,6 +106,26 @@ function Test-ShouldNotInstallServiceTwice
     Assert-Equal 'Stopped' (Get-Service -Name $serviceName).Status
 }
 
+function Test-ShouldNotInstallServiceWithSpaceInItsPath
+{
+    $tempDir = New-TempDirectory -Prefix 'Carbon Test Install Service'
+    Copy-Item -Path $servicePath -Destination $tempDir
+    try
+    {
+        $servicePath = Join-Path -Path $tempDir -ChildPath (Split-Path -Leaf -Path $servicePath)
+
+        $svc = Install-Service -Name $serviceName -Path $servicePath
+        Assert-NotNull $svc
+        $svc = Install-Service -Name $serviceName -Path $servicePath
+        Assert-Null $svc
+    }
+    finally
+    {
+        Uninstall-Service -Name $serviceName
+        Remove-Item -Path $tempDir -Recurse -Force
+    }
+}
+
 function Test-ShouldReInstallServiceIfPathChanges
 {
     $tempDir = New-TempDir -Prefix 'Carbon+Test-InstallService'
@@ -115,6 +135,37 @@ function Test-ShouldReInstallServiceIfPathChanges
     Install-Service -Name $serviceName -Path $servicePath
     Install-Service -Name $serviceName -Path $changedServicePath
     Assert-Equal $changedServicePath (Get-ServiceConfiguration -Name $serviceName).Path
+}
+
+function Test-ShouldInstallServiceWithArgumentList
+{
+    $tempDir = New-TempDirectory -Prefix 'Carbon Test Install Service'
+    Copy-Item -Path $servicePath -Destination $tempDir
+    try
+    {
+        $servicePath = Join-Path -Path $tempDir -ChildPath (Split-Path -Leaf -Path $servicePath)
+
+        $svc = Install-Service -Name $serviceName -Path $servicePath -ArgumentList "-k","Fu bar"
+        Assert-NoError
+        $svcConfig = Get-ServiceConfiguration -Name $serviceName
+        Assert-Equal ('"{0}" -k "Fu bar"' -f $servicePath) $svcConfig.Path
+    }
+    finally
+    {
+        Uninstall-Service -Name $serviceName
+        Remove-Item -Path $tempDir -Recurse -Force
+    }
+}
+
+function Test-ShouldReinstallServiceIfArgumentListChanges
+{
+    $svc = Install-Service -Name $serviceName -Path $servicePath -ArgumentList "-k","Fu bar"
+    Assert-NoError
+    $svc = Install-Service -Name $serviceName -Path $servicePath -ArgumentList "-k","Fubar"
+    Assert-NoError
+    Assert-NotNull $svc
+    $svc = Install-Service -Name $serviceName -Path $servicePath -ArgumentList "-k","Fubar"
+    Assert-Null $svc
 }
 
 function Test-ShouldReinstallServiceIfStartupTypeChanges

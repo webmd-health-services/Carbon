@@ -31,6 +31,7 @@ function Install-Service
 
     `Manual` services are not started. `Automatic` services are started after installation. If an existing manual service is started when configuration begins, it is re-started after re-configured.
 
+    The ability to provice service arguments/parameters via the `ArgumentList` parameter was added in Carbon 2.0.
 
     .LINK
     Carbon_Service
@@ -77,6 +78,10 @@ function Install-Service
         [string]
         # The path to the service.
         $Path,
+
+        [string[]]
+        # The arguments/startup parameters for the service. Added in Carbon 2.0.
+        $ArgumentList,
         
         [ServiceProcess.ServiceStartMode]
         # The startup type: automatic, manual, or disabled.  Default is automatic.
@@ -175,6 +180,35 @@ function Install-Service
         $identity = Resolve-Identity "NetworkService"
     }
     
+    if( -not (Test-Path -Path $Path -PathType Leaf) )
+    {
+        Write-Warning ('Service ''{0}'' executable ''{1}'' not found.' -f $Name,$Path)
+    }
+    else
+    {
+        $Path = Resolve-Path -Path $Path | Select-Object -ExpandProperty ProviderPath
+    }
+
+    if( $ArgumentList )
+    {
+        $binPathArg = Invoke-Command -ScriptBlock {
+                            $Path
+                            $ArgumentList 
+                        } |
+                        ForEach-Object { 
+                            if( $_.Contains(' ') )
+                            {
+                                return '"{0}"' -f $_
+                            }
+                            return $_
+                        }
+        $binPathArg = $binPathArg -join ' '
+    }
+    else
+    {
+        $binPathArg = $Path
+    }
+
     $doInstall = $false
     if( -not $Force -and (Test-Service -Name $Name) )
     {
@@ -183,13 +217,13 @@ function Install-Service
         $serviceConfig = Get-ServiceConfiguration -Name $Name
         $dependedOnServiceNames = $service.ServicesDependedOn | Select-Object -ExpandProperty 'Name'
 
-        Write-Verbose ('[{0}] Path              {1} | {2}' -f $Name,$serviceConfig.Path,$Path)
+        Write-Verbose ('[{0}] Path              {1} | {2}' -f $Name,$serviceConfig.Path,$binPathArg)
         Write-Verbose ('[{0}] OnFirstFailure    {1} | {2}' -f $Name,$serviceConfig.FirstFailure,$OnFirstFailure)
         Write-Verbose ('[{0}] OnSecondFailure   {1} | {2}' -f $Name,$serviceConfig.SecondFailure,$OnSecondFailure)
         Write-Verbose ('[{0}] OnThirdFailure    {1} | {2}' -f $Name,$serviceConfig.ThirdFailure,$OnThirdFailure)
         Write-Verbose ('[{0}] ResetFailureCount {1} | {2}' -f $Name,$serviceConfig.ResetPeriod,$ResetFailureCount)
 
-        $doInstall = $service.Path -ne $Path -or 
+        $doInstall = $service.Path -ne $binPathArg -or 
                      $serviceConfig.FirstFailure -ne $OnFirstFailure -or
                      $serviceConfig.SecondFailure -ne $OnSecondFailure -or
                      $serviceConfig.ThirdFailure -ne $OnThirdFailure -or
@@ -259,15 +293,6 @@ function Install-Service
     {
         Write-Verbose ('Skipping {0} service configuration: settings unchanged.' -f $Name)
         return
-    }
-
-    if( -not (Test-Path -Path $Path -PathType Leaf) )
-    {
-        Write-Warning ('Service ''{0}'' executable ''{1}'' not found.' -f $Name,$Path)
-    }
-    else
-    {
-        $Path = Resolve-Path -Path $Path | Select-Object -ExpandProperty ProviderPath
     }
 
     if( $Dependency )
@@ -362,9 +387,12 @@ function Install-Service
         $dependencyArgValue = $Dependency -join '/'
     }
 
+    $binPathArg = $binPathArg -replace '"','\"'
+    $binPathArg = '"{0}"' -f $binPathArg
     if( $PSCmdlet.ShouldProcess( "$Name [$Path]", "$operation service" ) )
     {
-        & $sc $operation $Name binPath= $Path start= $startArg obj= $identity.FullName $passwordArgName $passwordArgValue depend= $dependencyArgValue
+        & $sc $operation $Name binPath= $binPathArg start= $startArg obj= $identity.FullName $passwordArgName $passwordArgValue depend= $dependencyArgValue |
+            Write-Verbose
         if( $LastExitCode -ne 0 )
         {
             Write-Error "$sc failed $operation and returned '$LastExitCode'."
@@ -382,7 +410,8 @@ function Install-Service
 
     if( $PSCmdlet.ShouldProcess( $Name, "setting service failure actions" ) )
     {
-        & $sc failure $Name reset= $ResetFailureCount actions= $firstAction/$secondAction/$thirdAction command= $Command
+        & $sc failure $Name reset= $ResetFailureCount actions= $firstAction/$secondAction/$thirdAction command= $Command |
+            Write-Verbose
         if( $LastExitCode -ne 0 )
         {
             Write-Error "$sc failed when setting failure actions and returned '$LastExitCode'."

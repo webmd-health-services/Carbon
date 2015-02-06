@@ -61,7 +61,7 @@ namespace Carbon.Service
 			Marshal.FreeHGlobal(ptr);
 
 			UserName = config.lpServiceStartName.Trim('"');
-			Path = config.lpBinaryPathName.Trim('"');
+			Path = config.lpBinaryPathName;
 			ErrorControl = (ErrorControl) config.dwErrorControl;
 			LoadOrderGroup = config.lpLoadOrderGroup;
 			TagID = config.dwTagID;

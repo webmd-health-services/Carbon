@@ -19,7 +19,7 @@ This is a ***backwards-incompatible*** release.
      * [Install-Junction](http://get-carbon.org/help/2.0/Install-Junction.html)
      * [Install-User](http://get-carbon.org/help/2.0/Install-User.html)
      * [Grant-ComPermissions](http://get-carbon.org/help/2.0/Grant-ComPermissions.html)
-     * [Install-Service](http://get-carbon.org/help/2.0/Grant-ComPermissions.html)
+ * [Install-Service](http://get-carbon.org/help/2.0/Grant-ComPermissions.html) now returns `ServiceController` objects instead of `sc.exe` output.
  * The following commands no longer return the stdout from various console applications. To see that output, use the `-Verbose` switch. Remove any usage of the output you were processing.
      * [Disable-FirewallStatefulFtp](http://get-carbon.org/help/2.0/Disable-FirewallStatefulFtp.html)
      * [Enable-FirewallStatefulFtp](http://get-carbon.org/help/2.0/Enable-FirewallStatefulFtp.html)
@@ -65,6 +65,8 @@ This is a ***backwards-incompatible*** release.
 
  * Created [Uninstall-Junction](http://get-carbon.org/help/2.0/Uninstall-Junction.html) for uninstalling a junction in an idempotent way (i.e. without errors). Thanks to [Konstantin Ushenin](https://vk.com/kostanew) for the contribution.
  * Added improved error handling to [Remove-Junction](http://get-carbon.org/help/2.0/Remove-Junction.html).
+ * [Install-Service](http://get-carbon.org/help/2.0/Install-Service.html) now supports service startup parameters/arguments.
+
  
 ## Enhancements
 
@@ -137,6 +139,7 @@ This is a ***backwards-incompatible*** release.
 
  * [Install-Service](http://get-carbon.org/help/2.0/Grant-ComPermissions.html) now writes messages with `Write-Verbose` instead of `Write-Host`.
  * [Install-Service](http://get-carbon.org/help/2.0/Grant-ComPermissions.html) now returns a `System.ServiceProcess.ServiceController` object when installation/configuration is successful.
+ * [Install-Service](http://get-carbon.org/help/2.0/Install-Service.html) now supports service startup parameters/arguments via the `ArgumentList` parameter.
  
 ### Users and Groups
 
@@ -165,6 +168,7 @@ This is a ***backwards-incompatible*** release.
 
  * `Set-HostsEntry` fails to preserve whitespace if existing lines end with a comment/description. Thanks to [Konstantin Ushenin](https://vk.com/kostanew) for the fix.
 
+ 
 
 # 1.9.0 (8 November 2014)
 
