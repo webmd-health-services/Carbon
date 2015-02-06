@@ -45,7 +45,8 @@ function Test-ShouldFailIfFileNotAZipFile
 
 function Test-ShouldExpandWithRelativePathToZip
 {
-    Push-Location -Path $env:windir
+    $tempDir2 = New-TempDirectory -Prefix $PSCommandPath
+    Push-Location $tempDir2
     try
     {
         $relativePath = Resolve-Path -Relative -Path $zipPath
@@ -62,7 +63,8 @@ function Test-ShouldExpandWithRelativePathToZip
 
 function Test-ShouldExpandWithRelativePathToOutput
 {
-    Push-Location -Path $env:windir
+    $tempDir2 = New-TempDirectory -Prefix $PSCommandPath
+    Push-Location -Path $tempDir2
     try
     {
         New-Item -Path $outputRoot -ItemType 'Directory'
