@@ -128,7 +128,7 @@ function Test-ShouldHandleNoPermissionsToClear
     if( $rules )
     {
         $rules |
-            ForEach-Object { $acl.REmoveAccessRule( $rule ) }
+            ForEach-Object { $acl.REmoveAccessRule( $_ ) }
         Set-Acl -Path $Path.ToString() -AclObject $acl
     }
     
@@ -282,20 +282,27 @@ function Test-ShouldHandleNOnExistentPath
 
 function Test-ShouldNotClearPermissionGettingSetOnFile
 {
-    $result = Grant-Permission -Identity $user -Permission Read -Path $Path -Verbose 4>&1
+    $result = Grant-Permission -Identity $user -Permission Read -Path $Path
     Assert-NotNull $result
     Assert-Is $result 'Security.AccessControl.FileSystemAccessRule'
-    $result = Grant-Permission -Identity $user -Permission Read -Path $Path -Clear -Verbose 4>&1
+    $result = Grant-Permission -Identity $user -Permission Read -Path $Path -Clear
     Assert-Null $result
 }
 
 function Test-ShouldNotClearPermissionGettingSetOnDirectory
 {
-    $result = Grant-Permission -Identity $user -Permission Read -Path $containerPath -Verbose 4>&1
+    $result = Grant-Permission -Identity $user -Permission Read -Path $containerPath
     Assert-NotNull $result
     Assert-Is $result 'Security.AccessControl.FileSystemAccessRule'
-    $result = Grant-Permission -Identity $user -Permission Read -Path $containerPath -Clear -Verbose 4>&1
-    Assert-Null $result
+    $result = Grant-Permission -Identity $user -Permission Read -Path $containerPath -Clear
+    if( $result )
+    {
+        Assert-Null ($result | Where-Object { $_.IdentityReference.Value -eq $user })
+    }
+    else
+    {
+        Assert-Null $result
+    }
 }
 
 function Test-ShouldNotClearPermissionGettingSetOnRegKey
@@ -314,11 +321,14 @@ function Test-ShouldWriteVerboseMessageWhenClearingRuleOnFileSystem
     Assert-Is $result 'Security.AccessControl.FileSystemAccessRule'
     [object[]]$result = Grant-Permission -Identity $user2 -Permission Read -Path $containerPath -Clear -Verbose 4>&1
     Assert-NotNull $result
-    Assert-Equal 2 $result.Count
-    Assert-Is $result[0] 'Management.Automation.VerboseRecord'
-    Assert-Like $result[0].Message ('Removing*{0}*Read*' -f $user)
-    Assert-Is $result[1] 'Security.AccessControl.FileSystemAccessRule'
-    Assert-Equal (Resolve-Identity $user2).FullName $result[1].IdentityReference.Value
+    Assert-True ($result.Count -ge 2)
+    for( $idx = 0; $idx -lt $result.Count - 1; ++$idx )
+    {
+        Assert-Is $result[$idx] 'Management.Automation.VerboseRecord'
+        Assert-Like $result[$idx].Message ('Removing*{0}*' -f $user)
+    }
+    Assert-Is $result[-1] 'Security.AccessControl.FileSystemAccessRule'
+    Assert-Equal (Resolve-Identity $user2).FullName $result[-1].IdentityReference.Value
 }
 
 function Test-ShouldWriteVerboseMessageWhenClearingRuleOnRegKey

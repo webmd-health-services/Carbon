@@ -108,6 +108,7 @@ function Assert-ScheduledTaskEqual
                                     '\Microsoft\Windows\Data Integrity Scan\Data Integrity Scan' = $true;
                                     '\Microsoft\Windows\TaskScheduler\Regular Maintenance' = $true;
                                     '\Microsoft\Windows\WindowsUpdate\Scheduled Start' = $true;
+                                    '\Microsoft\Windows\WindowsUpdate\Scheduled Start With Network' = $true;
                                 }
     $scheduleProps = @(
                            'Last Result',

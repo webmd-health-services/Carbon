@@ -211,7 +211,7 @@ function Test-ShouldConfigureFileDownloadManager
                           -CertFile $privateKeyPath `
                           -ConfigurationMode ApplyOnly `
                           -RebootIfNeeded `
-                          -RefreshIntervalMinutes 20 `
+                          -RefreshIntervalMinutes 35 `
                           -ConfigurationFrequency 3 `
                           -LcmCredential (New-Credential -User $username -Password $password)
 
@@ -221,8 +221,8 @@ function Test-ShouldConfigureFileDownloadManager
     Assert-True $lcm.AllowModuleOverwrite
     Assert-True $lcm.RebootNodeIfNeeded
     Assert-Equal 'ApplyOnly' $lcm.ConfigurationMode
-    Assert-Equal 20 $lcm.RefreshFrequencyMins
-    Assert-Equal 60 $lcm.ConfigurationModeFrequencyMins
+    Assert-Equal 35 $lcm.RefreshFrequencyMins
+    Assert-Equal 105 $lcm.ConfigurationModeFrequencyMins
     Assert-Equal 'DscFileDownloadManager' $lcm.DownloadManagerName
     Assert-Equal $PSScriptRoot $lcm.DownloadManagerCustomData[0].value
     Assert-Equal $username $lcm.Credential.UserName
@@ -238,7 +238,7 @@ function Test-ShouldConfigureFileDownloadManager
     Assert-False $lcm.AllowModuleOverwrite
     Assert-False $lcm.RebootNodeIfNeeded
     Assert-Equal 'ApplyAndMonitor' $lcm.ConfigurationMode
-    Assert-Equal 15 $lcm.RefreshFrequencyMins
+    Assert-Equal 30 $lcm.RefreshFrequencyMins
     Assert-Equal 30 $lcm.ConfigurationModeFrequencyMins
     Assert-Equal 'DscFileDownloadManager' $lcm.DownloadManagerName
     Assert-Equal $env:TEMP $lcm.DownloadManagerCustomData[0].value
@@ -259,7 +259,7 @@ function Test-ShouldConfigureWebDownloadManager
                           -CertFile $privateKeyPath `
                           -ConfigurationMode ApplyOnly `
                           -RebootIfNeeded `
-                          -RefreshIntervalMinutes 20 `
+                          -RefreshIntervalMinutes 40 `
                           -ConfigurationFrequency 3 `
                           -LcmCredential (New-Credential -User $username -Password $password)
 
@@ -269,8 +269,8 @@ function Test-ShouldConfigureWebDownloadManager
     Assert-True $lcm.AllowModuleOverwrite
     Assert-True $lcm.RebootNodeIfNeeded
     Assert-Equal 'ApplyOnly' $lcm.ConfigurationMode
-    Assert-Equal 20 $lcm.RefreshFrequencyMins
-    Assert-Equal 60 $lcm.ConfigurationModeFrequencyMins
+    Assert-Equal 40 $lcm.RefreshFrequencyMins
+    Assert-Equal 120 $lcm.ConfigurationModeFrequencyMins
     Assert-Equal 'WebDownloadManager' $lcm.DownloadManagerName
     Assert-Equal 'http://localhost:8976' $lcm.DownloadManagerCustomData[0].value
     Assert-Equal 'True' $lcm.DownloadManagerCustomData[1].value
@@ -287,7 +287,7 @@ function Test-ShouldConfigureWebDownloadManager
     Assert-False $lcm.AllowModuleOverwrite
     Assert-False $lcm.RebootNodeIfNeeded
     Assert-Equal 'ApplyAndMonitor' $lcm.ConfigurationMode
-    Assert-Equal 15 $lcm.RefreshFrequencyMins
+    Assert-Equal 30 $lcm.RefreshFrequencyMins
     Assert-Equal 30 $lcm.ConfigurationModeFrequencyMins
     Assert-Equal 'WebDownloadManager' $lcm.DownloadManagerName
     Assert-Equal 'https://localhost:6798' $lcm.DownloadManagerCustomData[0].value
@@ -307,7 +307,7 @@ function Test-ShouldClearPullValuesWhenSwitchingToPush
                           -CertFile $privateKeyPath `
                           -ConfigurationMode ApplyOnly `
                           -RebootIfNeeded `
-                          -RefreshIntervalMinutes 20 `
+                          -RefreshIntervalMinutes 45 `
                           -ConfigurationFrequency 3 `
                           -LcmCredential (New-Credential -User $username -Password $password)
     Assert-NoError    
@@ -320,8 +320,8 @@ function Test-ShouldClearPullValuesWhenSwitchingToPush
     Assert-Equal 'False' $lcm.AllowModuleOverwrite
     Assert-Equal 'False' $lcm.RebootNodeIfNeeded
     Assert-Equal 'ApplyAndMonitor' $lcm.ConfigurationMode
-    Assert-Equal 15 $lcm.RefreshFrequencyMins
-    Assert-Equal 30 $lcm.ConfigurationModeFrequencyMins
+    Assert-Equal 30 $lcm.RefreshFrequencyMins
+    Assert-Equal 15 $lcm.ConfigurationModeFrequencyMins
     Assert-Null $lcm.DownloadManagerName
     Assert-Null $lcm.DownloadManagerCustomData
     Assert-Null $lcm.Credential

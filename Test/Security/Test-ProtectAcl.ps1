@@ -14,6 +14,7 @@
 
 $parentFSPath = $null 
 $childFSPath = $null
+$originalAcl = $null
 
 function Start-TestFixture
 {
@@ -27,6 +28,7 @@ function Start-Test
 	
     $null = New-Item $childFSPath -ItemType Container
     Grant-Permission -Identity Everyone -Permission FullControl -Path $childFSPath
+    $originalAcl = Get-Acl $childFSPath
 }
 
 function Stop-Test
@@ -36,25 +38,19 @@ function Stop-Test
 
 function Test-ShouldRemoveInheritedAccess
 {
-    $previousAcl = Get-Acl $childFSPath
     Protect-Acl -Path $childFSPath
-    $acl = Get-Acl $childFSPath
-    Assert-NotEqual $previousAcl.Access.Count $acl.Access.Count
-    Assert-Equal 1 $acl.Access.Count
-    $acl.Access | 
-        ForEach-Object { Assert-False $_.IsInherited }
+    Assert-InheritedPermissionRemoved
 }
 
 function Test-ShouldPreserveInheritedAccessRules
 {
-    $previousAcl = Get-Acl $childFSPath
     Protect-Acl -Path $childFSPath -Preserve
     $acl = Get-Acl $childFSPath
-    Assert-Equal $previousAcl.Access.Count $acl.Access.Count
+    Assert-True ($acl.Access.Count -le $originalAcl.Access.Count)
     for( $idx = 0; $idx -lt $acl.Access.Count; $idx++ )
     {
-        $expectedRule = $previousAcl.Access[$idx]
-        $actualRule = $previousAcl.Access[$idx]
+        $expectedRule = $originalAcl.Access[$idx]
+        $actualRule = $originalAcl.Access[$idx]
         Assert-Equal $expectedRule.FileSystemRights $actualRule.FileSystemRights
         Assert-Equal $expectedRule.AccessControlType $actualRule.AccessControlType
         Assert-Equal $expectedRule.IdentityReference.Value $actualRule.IdentityReference.Value
@@ -67,6 +63,14 @@ function Test-ShouldPreserveInheritedAccessRules
 function Test-ShouldAcceptPathFromPipelineInput
 {
     Get-Item $childFSPath | Protect-Acl
+    Assert-InheritedPermissionRemoved
+}
+
+function Assert-InheritedPermissionRemoved
+{
+    [object[]]$inherited = $originalAcl.Access | Where-Object { $_.IsInherited }
     $acl = Get-Acl $childFSPath
-    Assert-Equal 1 $acl.Access.Count
+    Assert-Equal ($originalAcl.Access.Count - $inherited.Count) $acl.Access.Count
+    $acl.Access | 
+        ForEach-Object { Assert-False $_.IsInherited }
 }

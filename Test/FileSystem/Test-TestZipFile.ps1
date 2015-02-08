@@ -42,7 +42,8 @@ function Test-ShouldTestNonZipFile
 
 function Test-ShouldTestWithRelativePath
 {
-    Push-Location $env:windir
+    $tempDir2 = New-TempDirectory -Prefix $PSCommandPath
+    Push-Location $tempDir2
     try
     {
         $relativePath = Resolve-RelativePath -Path $zipPath -FromDirectory (Get-Location).ProviderPath
@@ -51,6 +52,7 @@ function Test-ShouldTestWithRelativePath
     finally
     {
         Pop-Location
+        Remove-Item -Path $tempDir2 -Recurse
     }
 }
 
