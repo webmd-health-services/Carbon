@@ -38,6 +38,7 @@ function Get-IisAppPool
     Returns `null` since, for purposes of this example, there is no `Missing~` application pool.
     #>
     [CmdletBinding()]
+    [OutputType([Microsoft.Web.Administration.ApplicationPool])]
     param(
         [Parameter(Mandatory=$true)]
         [string]

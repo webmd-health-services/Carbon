@@ -25,6 +25,7 @@ This is a ***backwards-incompatible*** release.
      * [Disable-FirewallStatefulFtp](http://get-carbon.org/help/2.0/Disable-FirewallStatefulFtp.html)
      * [Enable-FirewallStatefulFtp](http://get-carbon.org/help/2.0/Enable-FirewallStatefulFtp.html)
      * [Remove-SslCertificateBinding](http://get-carbon.org/help/2.0/Remove-SslCertificateBinding.html)
+     * [Install-IisAppPool](http://get-carbon.org/help/Install-IisAppPool.html)
  * [Set-SslCertificateBinding](http://get-carbon.org/help/2.0/Set-SslCertificateBinding.html) now returns `Carbon.Certificates.SslCertificateBinding` objects instead of netsh output. Update any code that uses the old `Set-SslCertificateBinding` output.
  * Ensure that all thumbprints passed to [Set-SslCertificateBinding](http://get-carbon.org/help/2.0/Set-SslCertificateBinding.html) are valid (40 character hex strings).
  * Add the new `-PasswordNeverExpires` switch to usages of [Install-User](http://get-carbon.org/help/2.0/Install-User.html): it no longer sets the `PasswordNeverExpires` flag for a user by default.
@@ -41,7 +42,7 @@ This is a ***backwards-incompatible*** release.
  * Remove usages of `[Carbon.Kernel32]::LocalFree` class method. It was incorrectly exposed as a public method.
  * Update usages of `Carbon.Computer.ProgramInstallInfo`'s `Version` property (returned by [Get-ProgramInstallInfo](http://get-carbon.org/help/2.0/Get-ProgramInstallInfo.html)). It was an `int` and is now a [Version](http://msdn.microsoft.com/en-us/library/y0hf9t2e.aspx) object.
  * If you're not providing a value for [Install-IisApplication](http://get-carbon.org/help/2.0/Install-IisApplication.html)'s `AppPoolName` parameter, our application's app pool will be reset to `DefaultAppPool`. If you don't want this behaviour, pass the app pool you want to use.
- 
+
 ## Changes Since `alpha.26`
 
 ### Enhancements
@@ -71,7 +72,7 @@ This is a ***backwards-incompatible*** release.
  * New [Test-TypeDataMember](http://get-carbon.org/help/2.0/Install-Service.html) for testing if a type has an extended type member defined.
  * [Install-IisApplication](http://get-carbon.org/help/2.0/Install-IisApplication.html) now returns a `Microsoft.Web.Administration.Application` object when creating/modifying an application. If an application is unchanged, nothing is returned.
  * [Install-IisApplication](http://get-carbon.org/help/2.0/Install-IisApplication.html) now resets an application's app pool to `DefaultAppPool` if no app pool name is provided with the `AppPoolName` parameter.
-
+ * [Install-IisAppPool](http://get-carbon.org/help/2.0/Install-IisAppPool.html) no longer returns appcmd.exe output.
  
 ## Enhancements
 
@@ -133,6 +134,7 @@ This is a ***backwards-incompatible*** release.
 
  * [Install-IisApplication](http://get-carbon.org/help/2.0/Install-IisApplication.html) now returns a `Microsoft.Web.Administration.Application` object when creating/modifying an application. If an application is unchanged, nothing is returned.
  * [Install-IisApplication](http://get-carbon.org/help/2.0/Install-IisApplication.html) now resets an application's app pool to `DefaultAppPool` if no app pool name is provided with the `AppPoolName` parameter.
+ * [Install-IisAppPool](http://get-carbon.org/help/2.0/Install-IisAppPool.html) no longer returns appcmd.exe output.
 
 ### PowerShell
 

@@ -35,6 +35,8 @@ function Install-IisAppPool
 
     By default, this function will create an application pool running the latest version of .NET, with an integrated pipeline, as the NetworkService account.
 
+    Beginning with Carbon 2.0, the `PassThru` switch will cause this function to return a `Microsoft.Web.Administration.ApplicationPool` object for the created/updated application pool.
+
     .LINK
     http://learn.iis.net/page.aspx/624/application-pool-identities/
     
@@ -54,6 +56,7 @@ function Install-IisAppPool
     Creates or sets the Cyberdyne app pool to run as the `PEANUTS\charliebrown` domain account, under .NET 4.0, with an integrated pipeline.
     #>
     [CmdletBinding(DefaultParameterSetName='AsServiceAccount')]
+    [OutputType([Microsoft.Web.Administration.ApplicationPool])]
     param(
         [Parameter(Mandatory=$true)]
         [string]
@@ -90,8 +93,14 @@ function Install-IisAppPool
         
         [Parameter(ParameterSetName='AsSpecificUser',Mandatory=$true)]
         # The password for the user account.  Can be a string or a SecureString.
-        $Password
+        $Password,
+
+        [Switch]
+        # Return an object represeing the app pool.
+        $PassThru
     )
+
+    Set-StrictMode -Version 'Latest'
     
     if( $pscmdlet.ParameterSetName -eq 'AsSpecificUser' -and -not (Test-Identity -Name $UserName) )
     {
@@ -100,44 +109,87 @@ function Install-IisAppPool
     
     if( -not (Test-IisAppPool -Name $Name) )
     {
-        Invoke-AppCmd add apppool /name:`"$Name`" /commit:apphost
+        Write-Verbose ('Creating IIS Application Pool {0}' -f $Name)
+        $mgr = New-Object 'Microsoft.Web.Administration.ServerManager'
+        $appPool = $mgr.ApplicationPools.Add($Name)
+        $mgr.CommitChanges()
     }
+
+    $appPool = Get-IisAppPool -Name $Name
     
-    $pipelineMode = 'Integrated'
+    $updated = $false
+
+    if( $appPool.ManagedRuntimeVersion -ne $ManagedRuntimeVersion )
+    {
+        Write-Verbose ('IIS Application Pool {0}: Setting ManagedRuntimeVersion = {0}' -f $Name,$ManagedRuntimeVersion)
+        $appPool.ManagedRuntimeVersion = $ManagedRuntimeVersion
+        $updated = $true
+    }
+
+    $pipelineMode = [Microsoft.Web.Administration.ManagedPipelineMode]::Integrated
     if( $ClassicPipelineMode )
     {
-        $pipelineMode = 'Classic'
+        $pipelineMode = [Microsoft.Web.Administration.ManagedPipelineMode]::Classic
     }
-    
-    Invoke-AppCmd set apppool `"$Name`" /managedRuntimeVersion:$ManagedRuntimeVersion /managedPipelineMode:$pipelineMode
-    
-    Invoke-AppCmd set config /section:applicationPools /[name=`'$Name`'].processModel.idleTimeout:"$(New-TimeSpan -minutes $IdleTimeout)"
-    
-    Invoke-AppCmd set config /section:applicationPools /[name=`'$name`'].enable32BitAppOnWin64:$Enable32BitApps
+    if( $appPool.ManagedPipelineMode -ne $pipelineMode )
+    {
+        Write-Verbose ('IIS Application Pool {0}: Setting ManagedPipelineMode = {0}' -f $Name,$pipelineMode)
+        $appPool.ManagedPipelineMode = $pipelineMode
+        $updated = $true
+    }
+
+    $idleTimeoutTimeSpan = New-TimeSpan -Minutes $IdleTimeout
+    if( $appPool.ProcessModel.IdleTimeout -ne $idleTimeoutTimeSpan )
+    {
+        Write-Verbose ('IIS Application Pool {0}: Setting idle timeout = {0}' -f $Name,$idleTimeoutTimeSpan)
+        $appPool.ProcessModel.IdleTimeout = $idleTimeoutTimeSpan 
+        $updated = $true
+    }
+
+    if( $appPool.Enable32BitAppOnWin64 -ne ([bool]$Enable32BitApps) )
+    {
+        Write-Verbose ('IIS Application Pool {0}: Setting Enable32BitAppOnWin64 = {0}' -f $Name,$Enable32BitApps)
+        $appPool.Enable32BitAppOnWin64 = $Enable32BitApps
+        $updated = $true
+    }
     
     if( $pscmdlet.ParameterSetName -eq 'AsSpecificUser' )
     {
-        if( $Password -is [Security.SecureString] )
+        if( $appPool.ProcessModel.UserName -ne $UserName )
         {
-            $Password = Convert-SecureStringToString $Password
-        }
-        Invoke-AppCmd set config /section:applicationPools /[name=`'$Name`'].processModel.identityType:SpecificUser `
-                                                           /[name=`'$Name`'].processModel.userName:$UserName `
-                                                           /[name=`'$Name`'].processModel.password:$Password
+            Write-Verbose ('IIS Application Pool {0}: Setting username = {0}' -f $Name,$UserName)
+            if( $Password -is [Security.SecureString] )
+            {
+                $Password = Convert-SecureStringToString $Password
+            }
+            $appPool.ProcessModel.IdentityType = [Microsoft.Web.Administration.ProcessModelIdentityType]::SpecificUser
+            $appPool.ProcessModel.UserName = $UserName
+            $appPool.ProcessModel.Password = $Password
 
-        # On Windows Server 2008 R2, custom app pool users need this privilege.
-        Grant-Privilege -Identity $UserName -Privilege SeBatchLogonRight
+            # On Windows Server 2008 R2, custom app pool users need this privilege.
+            Grant-Privilege -Identity $UserName -Privilege SeBatchLogonRight -Verbose:$VerbosePreference
+            $updated = $true
+        }
     }
     else
     {
+        $identityType = [Microsoft.Web.Administration.ProcessModelIdentityType]::ApplicationPoolIdentity
         if( $ServiceAccount )
         {
-            Invoke-AppCmd set config /section:applicationPools /[name=`'$Name`'].processModel.identityType:$ServiceAccount
+            $identityType = $ServiceAccount
         }
-        else
+
+        if( $appPool.ProcessModel.IdentityType -ne $identityType )
         {
-            Invoke-AppCmd clear config /section:applicationPools /[name=`'$Name`'].processModel.identityType
+            Write-Verbose ('IIS Application Pool {0}: Setting IdentityType = {0}' -f $Name,$identityType)
+            $appPool.ProcessModel.IdentityType = $identityType
+            $updated = $true
         }
+    }
+
+    if( $updated )
+    {
+        $appPool.CommitChanges()
     }
     
     # TODO: Pull this out into its own Start-IisAppPool function.  I think.
@@ -152,5 +204,10 @@ function Install-IisAppPool
         {
             Write-Error ('Failed to start {0} app pool: {1}' -f $Name,$_.Exception.Message)
         }
+    }
+
+    if( $PassThru )
+    {
+        $appPool
     }
 }
