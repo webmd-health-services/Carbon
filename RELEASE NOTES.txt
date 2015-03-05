@@ -65,6 +65,7 @@ This is a ***backwards-incompatible*** release.
  
 ### Enhancements
 
+ * `Import-Carbon.ps1` is more intelligent about when it tries to re-load Carbon. It will force a re-import of Carbon if any of Carbon's files have changed or the version has changed.
  * Created [Uninstall-Junction](http://get-carbon.org/help/2.0/Uninstall-Junction.html) for uninstalling a junction in an idempotent way (i.e. without errors). Thanks to [Konstantin Ushenin](https://vk.com/kostanew) for the contribution.
  * Added improved error handling to [Remove-Junction](http://get-carbon.org/help/2.0/Remove-Junction.html).
  * [Install-Service](http://get-carbon.org/help/2.0/Install-Service.html) now supports service startup parameters/arguments.
@@ -78,6 +79,7 @@ This is a ***backwards-incompatible*** release.
 ### General
 
  * Carbon now requires PowerShell 4.
+ * `Import-Carbon.ps1` is more intelligent about when it tries to re-load Carbon. It will force a re-import of Carbon if any of Carbon's files have changed or the version has changed.
 
 ### Certificates
 

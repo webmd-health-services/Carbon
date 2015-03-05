@@ -24,7 +24,7 @@
 @{
 
     # Script module or binary module file associated with this manifest
-    ModuleToProcess = 'Carbon.psm1'
+    RootModule = 'Carbon.psm1'
 
     # Version number of this module.
     ModuleVersion = '2.0.0'
@@ -69,7 +69,7 @@
     RequiredAssemblies = @((Join-Path $PSScriptRoot bin\Carbon.dll))
 
     # Script files (.ps1) that are run in the caller's environment prior to importing this module
-    ScriptsToProcess = @()
+    ScriptsToProcess = @( )
 
     # Type files (.ps1xml) to be loaded when importing this module
     TypesToProcess = 'Carbon.types.ps1xml'
