@@ -50,7 +50,9 @@ if( $Test )
 
 try
 {
-    & (Join-Path -Path $PSScriptRoot -ChildPath '.\Tools\Blade\blade.ps1' -Resolve) -Path $Path @bladeTestParam -Recurse:$Recurse -PassThru:$PassThru
+    $xmlLogPath = Split-Path -Qualifier -Path $PSScriptRoot
+    $xmlLogPath = Join-Path -Path $xmlLogPath -ChildPath 'BuildOutput\Carbon\CodeQuality\Carbon.blade.xml'
+    & (Join-Path -Path $PSScriptRoot -ChildPath '.\Tools\Blade\blade.ps1' -Resolve) -Path $Path -XmlLogPath $xmlLogPath @bladeTestParam -Recurse:$Recurse -PassThru:$PassThru
 }
 finally
 {

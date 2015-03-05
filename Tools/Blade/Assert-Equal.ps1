@@ -1,4 +1,4 @@
-# Copyright 2012 - 2014 Aaron Jensen
+# Copyright 2012 - 2015 Aaron Jensen
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -69,34 +69,51 @@ function Assert-Equal
 
     if( -not $equal )
     {
-        if( $Expected -eq $null )
+        if( $Expected -is [string] -and $Actual -is [string] )
         {
-            Fail ('Expected $null but was ''{0}''.' -f $Actual)
-            return
-        }
-        if( $Actual -eq $null )
-        {
-            Fail ('Expected ''{0}'' but was $null.' -f $Expected)
-            return
-        }
+            $expectedLength = $Expected.Length
+            $actualLength = $Actual.Length
 
-        if( $Expected -is [string] -and $Actual -is [string] -and ($Expected.Contains("`n") -or $Actual.Contains("`n")))
-        {
+            function Convert-UnprintableChars
+            {
+                param(
+                    [Parameter(Mandatory=$true,Position=0)]
+                    [AllowEmptyString()]
+                    [AllowNull()]
+                    [string]
+                    $InputObject
+                )
+                $InputObject = $InputObject -replace "`r","\r"
+                $InputObject = $InputObject -replace "`n","\n`n"
+                $InputObject = $InputObject -replace "`t","\t`t"
+                return $InputObject
+            }
+
+            if( $expectedLength -ne $actualLength )
+            {
+                Fail ("Strings are different length ({0} != {1}).`n----- EXPECTED`n{2}`n----- ACTUAL`n{3}`n-----`n{4}" -f $expectedlength,$actualLength,(Convert-UnprintableChars $Expected),(Convert-UnprintableChars $Actual),$Message)
+                return
+            }
+
             for( $idx = 0; $idx -lt $Expected.Length; ++$idx )
             {
-                if( $idx -ge $Actual.Length )
-                {
-                    Fail ("Strings different beginning at index {0}:`n{1}`n({2})`n{3}" -f $idx,$Expected.Substring(0,$idx),$Actual,$Message)
-                }
-                
                 $charEqual = $Expected[$idx] -eq $Actual[$idx]
                 if( $CaseSensitive )
                 {
                     $charEqual = $Expected[$idx] -ceq $Actual[$idx]
                 }
+
                 if( -not $charEqual )
                 {
-                    Fail ("Strings different beginning at index {0}: {0}`n{1}`n{2}`n{3}" -f $idx,$Expected.Substring(0,$idx),$Actual.Substring(0,$idx),$Message)
+                    $startIdx = $idx - 70
+                    if( $startIdx -lt 0 )
+                    {
+                        $startIdx = 0
+                    }
+
+                    $expectedSubstring = $Expected.Substring($startIdx,$idx - $startIdx + 1)
+                    $actualSubstring = $Actual.Substring($startIdx,$idx - $startIdx + 1)
+                    Fail ("Strings different beginning at index {0}:`n'{1}' != '{2}'`n----- EXPECTED`n{3}`n----- ACTUAL`n{4}`n-----`n{5}" -f $idx,(Convert-UnprintableChars $Expected[$idx]),(Convert-UnprintableChars $Actual[$idx]),(Convert-UnprintableChars $expectedSubstring),(Convert-UnprintableChars $actualSubstring),$Message)
                 }
             }
             

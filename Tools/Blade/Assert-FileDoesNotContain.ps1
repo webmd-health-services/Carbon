@@ -12,22 +12,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Assert-FileContains
+function Assert-FileDoesNotContain
 {
     <#
     .SYNOPSIS
-    Asserts that a file contains another string.
+    Asserts that a file doesn not contain a string.
 
     .DESCRIPTION
-    Performs a case-sensitive check for the string within the file.  
+    `Assert-FileDoesNotContain` searches a file for a string and fails if that string isf ound.
 
     .EXAMPLE
-    Assert-FileContains 'C:\Windows\System32\drivers\etc\hosts' '127.0.0.1'
+    Assert-FileDoesNotContain 'C:\Windows\System32\drivers\etc\hosts' '127.0.0.1'
 
-    Demonstrates how to assert that a file contains a string.
+    Demonstrates how to assert that a file does not contain a string.
 
     .EXAMPLE
-    Assert-FileContains 'C:\Windows\System32\drivers\etc\hosts' 'doubclick.net' 'Ad-blocking hosts entry not added.
+    Assert-FileDoesNotContain 'C:\Windows\System32\drivers\etc\hosts' 'doubclick.net' 'Ad-blocking hosts entry not added.'
 
     Shows how to use the `Message` parameter to describe why the assertion might fail.
     #>
@@ -40,7 +40,7 @@ function Assert-FileContains
 
         [Parameter(Position=1)]
         [string]
-        # The string to look for. Case-sensitive.
+        # The string to not look for.
         $Needle,
 
         [Parameter(Position=2)]
@@ -50,13 +50,13 @@ function Assert-FileContains
 
     Set-StrictMode -Version 'Latest'
 
-    Write-Verbose "Checking if '$Path' contains expected content."
+    Write-Verbose "Checking that '$Path' does not contain expected content."
     $actualContents = Get-Content -Path $Path -Raw
     Write-Verbose "Actual:`n$actualContents"
     Write-Verbose "Expected:`n$Needle"
-    if( $actualContents -notmatch ([Text.RegularExpressions.Regex]::Escape($Needle)) )
+    if( $actualContents -match ([Text.RegularExpressions.Regex]::Escape($Needle)) )
     {
-        Fail ("File '{0}' does not contain '{1}'. {2}" -f $Path,$Needle,$Message)
+        Fail ("File '{0}' contains '{1}'. {2}" -f $Path,$Needle,$Message)
     }
 }
 

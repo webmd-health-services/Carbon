@@ -1,4 +1,4 @@
-# Copyright 2012 - 2014 Aaron Jensen
+# Copyright 2012 - 2015 Aaron Jensen
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -43,18 +43,8 @@ function Assert-NoError
 
     if( $Global:Error.Count -gt 0 )
     {
-        $failMessage = Invoke-Command {
-            "Found $($Global:Error.Count) errors, expected none. $Message" 
-            $Global:Error | ForEach-Object {
-                $_
-                if( $_ | Get-Member -Name 'ScriptStackTrace' )
-                {
-                    $_.ScriptStackTrace
-                }
-            }
-        } | Out-String
-        $failMessage = $failMessage -join ([Environment]::NewLine)
-        Fail $failMessage
+        $errors = $Global:Error | ForEach-Object { $_; if( (Get-Member 'ScriptStackTrace' -InputObject $_) ) { $_.ScriptStackTrace } ; "`n" } | Out-String
+        Fail "Found $($Global:Error.Count) errors, expected none. $Message`n$errors" 
     }
 }
 

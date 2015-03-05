@@ -12,7 +12,7 @@ Import-Blade.ps1
 
 Demonstrates how to import the Blade module.
 #>
-# Copyright 2012 - 2014 Aaron Jensen
+# Copyright 2012 - 2015 Aaron Jensen
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -28,9 +28,8 @@ Demonstrates how to import the Blade module.
 param(
 )
 
-#Requires -Version 2
+#Requires -Version 3
 Set-StrictMode -Version 'Latest'
-$PSScriptRoot = Split-Path -Parent -Path $MyInvocation.MyCommand.Definition
 
 if( (Get-Module -Name 'Blade') )
 {

@@ -1,4 +1,4 @@
-# Copyright 2012 - 2014 Aaron Jensen
+# Copyright 2012 - 2015 Aaron Jensen
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -49,7 +49,7 @@ function Assert-NodeDoesNotExist
         # The short prefix for the document's default namespace, if any.
         $DefaultNamespacePrefix, 
 
-        [Parameter()]
+        [Parameter(Position=3)]
         [string]
         # The message to describe the failure if the assertion fails.
         $Message

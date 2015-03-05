@@ -1,4 +1,4 @@
-# Copyright 2012 - 2014 Aaron Jensen
+# Copyright 2012 - 2015 Aaron Jensen
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -67,6 +67,10 @@ function Assert-Error
         # The index of the error to check.
         $Index,
 
+        [int]
+        # Check the number of errors.
+        $Count,
+
         [Parameter(Mandatory=$true,Position=0,ParameterSetName='CheckLastError')]
         [Parameter(Mandatory=$true,Position=0,ParameterSetName='CheckFirstError')]
         [Parameter(Mandatory=$true,Position=1,ParameterSetName='CheckSpecificError')]
@@ -86,6 +90,10 @@ function Assert-Error
     Set-StrictMode -Version 'Latest'
     
     Assert-GreaterThan $Global:Error.Count 0 'Expected there to be errors, but there aren''t any.'
+    if( $Count )
+    {
+        Assert-Equal $Count $Global:Error.Count ('Expected ''{0}'' errors, but found ''{1}''' -f $Count,$Global:Error.Count)
+    }
 
     if( $PSCmdlet.ParameterSetName -like 'Check*Error' )
     {

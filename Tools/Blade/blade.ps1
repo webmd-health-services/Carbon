@@ -58,13 +58,21 @@ param(
     [string[]]
     # The paths to search for tests.  All files matching Test-*.ps1 will be run.
     $Path,
-    
+
+    [string]
+    # The name of the tests being run.
+    $Name,
+
     [string[]]
     # The individual test in the script to run.  Defaults to all tests.
     $Test,
+
+    [string]
+    # Path to the file where XML results should be saved.
+    $XmlLogPath,
     
     [Switch]
-    # Return objects for each test run.
+    # Return objects for each test run, and a final summary object.
     $PassThru,
     
     [Switch]
@@ -72,11 +80,10 @@ param(
     $Recurse
 )
 
-#Requires -Version 2
+#Requires -Version 3
 Set-StrictMode -Version 'Latest'
-$PSScriptRoot = Split-Path -Parent -Path $MyInvocation.MyCommand.Definition
 
-& (Join-Path -Path (Split-Path -Parent -Path $MyInvocation.MyCommand.Definition) -ChildPath 'Import-Blade.ps1' -Resolve)
+& (Join-Path -Path $PSScriptRoot -ChildPath 'Import-Blade.ps1' -Resolve)
 
 function Get-FunctionsInFile($testScript)
 {
@@ -292,10 +299,24 @@ $testScripts |
     Tee-Object -Variable 'results' |
     Where-Object { $PassThru -or -not $_.Passed } 
 
-$Global:LastBladeResult = New-Object 'Blade.RunResult' ([Blade.TestResult[]]$results), $testsIgnored
+$Global:LastBladeResult = New-Object 'Blade.RunResult' $Name,([Blade.TestResult[]]$results), $testsIgnored
 if( $LastBladeResult.Errors -or $LastBladeResult.Failures )
 {
     Write-Error $LastBladeResult.ToString()
 }
-$LastBladeResult
+
+if( $XmlLogPath )
+{
+    $LastBladeResult | Export-RunResultXml -FilePath $XmlLogPath
+}
+
+if( $PassThru )
+{
+    $LastBladeResult
+}
+else
+{
+    $LastBladeResult | Format-Table | Out-Host
+}
+
 

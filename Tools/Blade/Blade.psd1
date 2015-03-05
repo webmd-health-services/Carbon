@@ -1,4 +1,4 @@
-# Copyright 2012 - 2014 Aaron Jensen
+# Copyright 2012 - 2015 Aaron Jensen
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-#Requires -Version 2
+#Requires -Version 3
 
 @{
 
@@ -20,7 +20,7 @@
     ModuleToProcess = 'Blade.psm1'
 
     # Version number of this module.
-    ModuleVersion = '1.0.0'
+    ModuleVersion = '0.11.0'
 
     # ID used to uniquely identify this module
     GUID = '075d9444-c01b-48c3-889a-0b3490716fa2'
