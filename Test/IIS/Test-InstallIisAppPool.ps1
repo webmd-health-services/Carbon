@@ -51,42 +51,49 @@ function Get-IISDefaultAppPoolIdentity
 
 function Test-ShouldCreateNewAppPool
 {
-    Install-IisAppPool -Name $appPoolName
-    Assert-AppPoolExists
-    Assert-ManagedRuntimeVersion 'v4.0'
-    Assert-ManagedPipelineMode 'Integrated'
-    Assert-IdentityType (Get-IISDefaultAppPoolIdentity)
-    Assert-AppPool32BitEnabled $false
-    Assert-IdleTimeout 0
+    $result = Install-IisAppPool -Name $appPoolName -PassThru
+    Assert-NotNull $result
+    Assert-AppPool $result
+}
+
+function Test-ShouldCreateNewAppPoolButNotREturnObject
+{
+    $result = Install-IisAppPool -Name $appPoolName
+    Assert-Null $result
     $appPool = Get-IisAppPool -Name $appPoolName
     Assert-NotNull $appPool
-    Assert-Equal ([Microsoft.Web.Administration.ObjectState]::Started) $appPool.state
+    Assert-AppPool $appPool
+    
 }
 
 function Test-ShouldSetManagedRuntimeVersion
 {
-    Install-IisAppPool -Name $appPoolName -ManagedRuntimeVersion 'v2.0'
+    $result = Install-IisAppPool -Name $appPoolName -ManagedRuntimeVersion 'v2.0'
+    Assert-Null $result
     Assert-AppPoolExists
     Assert-ManagedRuntimeVersion 'v2.0'
 }
 
 function Test-ShouldSetManagedPipelineMode
 {
-    Install-IisAppPool -Name $appPoolName -ClassicPipelineMode
+    $result = Install-IisAppPool -Name $appPoolName -ClassicPipelineMode
+    Assert-Null $result
     Assert-AppPoolExists
     Assert-ManagedPipelineMode 'Classic'
 }
 
 function Test-ShouldSetIdentityAsServiceAccount
 {
-    Install-IisAppPool -Name $appPoolName -ServiceAccount 'NetworkService'
+    $result = Install-IisAppPool -Name $appPoolName -ServiceAccount 'NetworkService'
+    Assert-Null $result
     Assert-AppPoolExists
     Assert-IdentityType 'NetworkService'
 }
 
 function Test-ShouldSetIdentityAsSpecificUser
 {
-    Install-IisAppPool -Name $appPoolName -UserName $username -Password $password
+    $result = Install-IisAppPool -Name $appPoolName -UserName $username -Password $password
+    Assert-Null $result
     Assert-AppPoolExists
     Assert-Identity $username $password
     Assert-IdentityType 'SpecificUser'
@@ -95,22 +102,26 @@ function Test-ShouldSetIdentityAsSpecificUser
 
 function Test-ShouldSetIdleTimeout
 {
-    Install-IisAppPool -Name $appPoolName -IdleTimeout 55
+    $result = Install-IisAppPool -Name $appPoolName -IdleTimeout 55
+    Assert-Null $result
     Assert-AppPoolExists
     Assert-Idletimeout 55
 }
 
 function Test-ShouldEnable32bitApps
 {
-    Install-IisAppPool -Name $appPoolName -Enable32BitApps
+    $result = Install-IisAppPool -Name $appPoolName -Enable32BitApps
+    Assert-Null $result
     Assert-AppPoolExists
     Assert-AppPool32BitEnabled $true
 }
 
 function Test-ShouldHandleAppPoolThatExists
 {
-    Install-IisAppPool -Name $appPoolName
-    Install-IisAppPool -Name $appPoolName
+    $result = Install-IisAppPool -Name $appPoolName
+    Assert-Null $result
+    $result = Install-IisAppPool -Name $appPoolName
+    Assert-Null $result
 }
 
 function Assert-AppPoolExists
@@ -121,7 +132,8 @@ function Assert-AppPoolExists
 
 function Test-ShouldChangeSettingsOnExistingAppPool
 {
-    Install-IisAppPool -Name $appPoolName
+    $result = Install-IisAppPool -Name $appPoolName
+    Assert-Null $result
     Assert-AppPoolExists
     Assert-ManagedRuntimeVersion 'v4.0'
     Assert-ManagedPipelineMode 'Integrated'
@@ -129,7 +141,8 @@ function Test-ShouldChangeSettingsOnExistingAppPool
 
     Assert-AppPool32BitEnabled $false
 
-    Install-IisAppPool -Name $appPoolName -ManagedRuntimeVersion 'v2.0' -ClassicPipeline -ServiceAccount 'LocalSystem' -Enable32BitApps
+    $result = Install-IisAppPool -Name $appPoolName -ManagedRuntimeVersion 'v2.0' -ClassicPipeline -ServiceAccount 'LocalSystem' -Enable32BitApps
+    Assert-Null $result
     Assert-AppPoolExists
     Assert-ManagedRuntimeVersion 'v2.0'
     Assert-ManagedPipelineMode 'Classic'
@@ -230,3 +243,58 @@ function Assert-AppPool32BitEnabled($expected32BitEnabled)
     $32BitEnabled = Invoke-AppCmd list apppool $appPoolName /text:enable32BitAppOnWin64
     Assert-Equal ([string]$expected32BitEnabled) $32BitEnabled '32-bit apps enabled flag.'
 }
+
+function Assert-AppPool
+{
+    param(
+        [Parameter(Position=0)]
+        $AppPool,
+
+        $ManangedRuntimeVersion = 'v4.0',
+
+        [Switch]
+        $ClassicPipelineMode,
+
+        $IdentityType = (Get-IISDefaultAppPoolIdentity),
+
+        [Switch]
+        $Enable32Bit,
+
+        [TimeSpan]
+        $IdleTimeout = (New-TimeSpan -Seconds 0)
+    )
+
+    Set-StrictMode -Version 'Latest'
+
+    Assert-AppPoolExists
+
+    if( -not $AppPool )
+    {
+        $AppPool = Get-IisAppPool -Name $appPoolName
+    }
+
+    Assert-Equal $ManangedRuntimeVersion $AppPool.ManagedRuntimeVersion
+    $pipelineMode = 'Integrated'
+    if( $ClassicPipelineMode )
+    {
+        $pipelineMode = 'Classic'
+    }
+    Assert-Equal $pipelineMode $AppPool.ManagedPipelineMode
+    Assert-Equal $IdentityType $AppPool.ProcessModel.IdentityType
+    Assert-Equal ([bool]$Enable32Bit) $AppPool.Enable32BitAppOnWin64
+    Assert-Equal $IdleTimeout $AppPool.ProcessModel.IdleTimeout
+
+    $MAX_TRIES = 20
+    for ( $idx = 0; $idx -lt $MAX_TRIES; ++$idx )
+    {
+        $AppPool = Get-IisAppPool -Name $appPoolName
+        Assert-NotNull $AppPool
+        if( $AppPool.State )
+        {
+            Assert-Equal ([Microsoft.Web.Administration.ObjectState]::Started) $AppPool.State
+            break
+        }
+        Start-Sleep -Milliseconds 1000
+    }
+}
+
