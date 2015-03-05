@@ -54,7 +54,7 @@ if( $loadedModule )
     if( -not $Force -and ($loadedModule | Get-Member 'ImportedAt') )
     {
         $importedAt = $loadedModule.ImportedAt
-        $newFiles = Get-ChildItem -Path $PSScriptRoot |
+        $newFiles = Get-ChildItem -Path $PSScriptRoot -File -Recurse |
                         Where-Object { $_.LastWriteTime -gt $importedAt }
         if( $newFiles )
         {
