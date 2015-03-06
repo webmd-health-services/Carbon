@@ -8,7 +8,6 @@ Intelligently imports the Carbon module, re-importing it if needed. Carbon will 
  * a different version is currently loaded
  * any of Carbon's files were modified since it was last imported with this script
  * the `Force` switch is set
- * or the `CARBON_ENV` environment variable is set to `developer`
 
 .EXAMPLE
 Import-Carbon.ps1
@@ -71,12 +70,6 @@ if( $loadedModule )
             Write-Verbose ('Reloading Carbon module. Module from {0} at version {1} not equal to module from {2} at version {3}.' -f $loadedModule.ModuleBase,$loadedModule.Version,(Split-Path -Parent -Path $thisModuleManifest.Path),$thisModuleManifest.Version) -Verbose
             $Force = $true
         }
-    }
-
-    if( -not $Force -and $env:CARBON_ENV -eq 'Developer' )
-    {
-        Write-Verbose ('Reloading Carbon module. CARBON_ENV environment variable set to ''{0}''.' -f $env:CARBON_ENV) -Verbose
-        $Force = $true
     }
 }
 
