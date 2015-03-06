@@ -155,22 +155,6 @@
     <Type>
         <Name>System.ServiceProcess.ServiceController</Name>
         <Members>
-            <ScriptProperty>
-                <Name>StartMode</Name>
-                <GetScriptBlock>
-                    $startType = $this.GetServiceConfigProperty( 'StartMode' )
-                    if( $startType -ne $null )
-                    {
-                        [System.ServiceProcess.ServiceStartMode][int]$startType
-                    }
-                </GetScriptBlock>
-            </ScriptProperty>
-            <ScriptProperty>
-                <Name>UserName</Name>
-                <GetScriptBlock>
-                    $this.GetServiceConfigProperty( 'UserName' )
-                </GetScriptBlock>
-            </ScriptProperty>
             <ScriptMethod>
                 <Name>GetServiceConfigProperty</Name>
                 <Script>
@@ -220,15 +204,21 @@
                 </Script>
             </ScriptMethod>
             <ScriptProperty>
-                <Name>FailureProgram</Name>
-                <GetScriptBlock>
-                    $this.GetServiceConfigProperty( 'FailureProgram' )
-                </GetScriptBlock>
-            </ScriptProperty>
-            <ScriptProperty>
                 <Name>Description</Name>
                 <GetScriptBlock>
                     $this.GetServiceConfigProperty( 'Description' )
+                </GetScriptBlock>
+            </ScriptProperty>
+            <ScriptProperty>
+                <Name>ErrorControl</Name>
+                <GetScriptBlock>
+                    $this.GetServiceConfigProperty( 'ErrorControl' )
+                </GetScriptBlock>
+            </ScriptProperty>
+            <ScriptProperty>
+                <Name>FailureProgram</Name>
+                <GetScriptBlock>
+                    $this.GetServiceConfigProperty( 'FailureProgram' )
                 </GetScriptBlock>
             </ScriptProperty>
             <ScriptProperty>
@@ -238,15 +228,9 @@
                 </GetScriptBlock>
             </ScriptProperty>
             <ScriptProperty>
-                <Name>SecondFailure</Name>
+                <Name>LoadOrderGroup</Name>
                 <GetScriptBlock>
-                    $this.GetServiceConfigProperty( 'SecondFailure' )
-                </GetScriptBlock>
-            </ScriptProperty>
-            <ScriptProperty>
-                <Name>ThirdFailure</Name>
-                <GetScriptBlock>
-                    $this.GetServiceConfigProperty( 'ThirdFailure' )
+                    $this.GetServiceConfigProperty( 'LoadOrderGroup' )
                 </GetScriptBlock>
             </ScriptProperty>
             <ScriptProperty>
@@ -310,15 +294,25 @@
                 </GetScriptBlock>
             </ScriptProperty>
             <ScriptProperty>
-                <Name>ErrorControl</Name>
+                <Name>SecondFailure</Name>
                 <GetScriptBlock>
-                    $this.GetServiceConfigProperty( 'ErrorControl' )
+                    $this.GetServiceConfigProperty( 'SecondFailure' )
                 </GetScriptBlock>
             </ScriptProperty>
             <ScriptProperty>
-                <Name>LoadOrderGroup</Name>
+                <Name>StartMode</Name>
                 <GetScriptBlock>
-                    $this.GetServiceConfigProperty( 'LoadOrderGroup' )
+                    $startType = $this.GetServiceConfigProperty( 'StartType' )
+                    if( $startType -ne $null )
+                    {
+                        [System.ServiceProcess.ServiceStartMode][int]$startType
+                    }
+                </GetScriptBlock>
+            </ScriptProperty>
+            <ScriptProperty>
+                <Name>StartType</Name>
+                <GetScriptBlock>
+                    $this.GetServiceConfigProperty( 'StartType' )
                 </GetScriptBlock>
             </ScriptProperty>
             <ScriptProperty>
@@ -328,9 +322,15 @@
                 </GetScriptBlock>
             </ScriptProperty>
             <ScriptProperty>
-                <Name>StartType</Name>
+                <Name>ThirdFailure</Name>
                 <GetScriptBlock>
-                    $this.GetServiceConfigProperty( 'StartType' )
+                    $this.GetServiceConfigProperty( 'ThirdFailure' )
+                </GetScriptBlock>
+            </ScriptProperty>
+            <ScriptProperty>
+                <Name>UserName</Name>
+                <GetScriptBlock>
+                    $this.GetServiceConfigProperty( 'UserName' )
                 </GetScriptBlock>
             </ScriptProperty>
         </Members>
