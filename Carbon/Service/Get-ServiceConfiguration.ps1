@@ -45,7 +45,7 @@ function Get-ServiceConfiguration
     Demonstrates how you can get a specific service's configuration.
 
     .EXAMPLE
-    Get-ServiceConfiguration -Name 'w3svc' -ComputerName 'enterprise
+    Get-ServiceConfiguration -Name 'w3svc' -ComputerName 'enterprise'
 
     Demonstrates how to get service configuration for a service on a remote computer.
     #>
