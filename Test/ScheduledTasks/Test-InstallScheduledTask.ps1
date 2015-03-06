@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-$taskName = 'CarbonInstallScheduledTask'
+$taskName = $null
+$taskCount = 0
 $credential = $null
 $AllMonths = @( 'January','February','March','April','May','June','July','August','September','October','November','December' )
 $today = Get-Date
@@ -27,6 +28,7 @@ function Start-TestFixture
 
 function Start-Test
 {
+    $script:taskName = 'CarbonInstallScheduledTask{0}' -f $script:taskCount++
     Uninstall-ScheduledTask -Name $taskName
     Assert-NoError
 }
