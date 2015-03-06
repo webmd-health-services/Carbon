@@ -51,8 +51,10 @@ function Export-RunResultXml
 <test-results name="" total="" errors="" failures="" not-run="0" inconclusive="0" ignored="" skipped="0" invalid="0" date="{0:yyyy-MM-dd}" time="{0:HH:mm:ss}">
   <environment blade-version="{1}" clr-version="{2}" powershell-version="{3}" os-version="{4}" platform="{5}" cwd="{6}" machine-name="{7}" user="{8}" user-domain="{9}" />
   <culture-info current-culture="{10}" current-uiculture="{11}" />
+  <test-suite name="" type="BladeFixture" executed="True" asserts="0" result="" success="" time="" />
 </test-results>
 '@ -f $now,$bladeVersion,$clrVersion,$psVersion,$osVersion,$platform,$cwd,$env:COMPUTERNAME,$env:USERNAME,$env:USERDOMAIN,$cultureName,$uiCultureName)
+
     }
 
     process
@@ -64,6 +66,13 @@ function Export-RunResultXml
         $testResults.SetAttribute( 'failures', $RunResult.Failures.Count )
         $testResults.SetAttribute( 'ignored', $RunResult.IgnoredCount )
 
+        $rootTestSuite = $testResults.'test-suite'
+        $rootTestSuite.SetAttribute( 'name', $RunResult.Name )
+
+        $totalTime = [TimeSpan]::Zero
+        $allResult = 'Success'
+        $allSuccess = $true
+
         Invoke-Command -ScriptBlock {
                 $RunResult.Failures
                 $RunResult.Errors
@@ -72,7 +81,7 @@ function Export-RunResultXml
             Group-Object -Property 'FixtureName' |
             ForEach-Object {
                 $testSuite = $resultXml.CreateElement('test-suite')
-                [void]$testResults.AppendChild( $testSuite )
+                [void]$rootTestSuite.AppendChild( $testSuite )
 
                 $testSuite.SetAttribute( 'type', 'BladeFixture' )
                 $testSuite.SetAttribute( 'name', $_.Name )
@@ -94,16 +103,17 @@ function Export-RunResultXml
                     $testCase = $resultXml.CreateElement('test-case')
                     [void]$results.AppendChild( $testCase )
 
-                    $testCase.SetAttribute( 'name', $testResult.Name )
+                    $testCase.SetAttribute( 'name', ('{0}: {1}' -f $testSuite.name,$testResult.Name) )
                     $testCase.SetAttribute( 'executed', 'True' )
                     $testCase.SetAttribute( 'time', $testResult.Duration.TotalSeconds )
                     $testCase.SetAttribute( 'asserts', '0' )
 
                     $duration += $testResult.Duration
+                    $totalTime += $testResult.Duration
                     if( -not $testResult.Passed )
                     {
-                        $success = $false
-                        $result = 'Failure'
+                        $allSuccess = $success = $false
+                        $allResult = $result = 'Failure'
 
                         $testCase.SetAttribute( 'result', 'Failure' )
                         $testCase.SetAttribute( 'success', 'False' )
@@ -145,6 +155,10 @@ function Export-RunResultXml
                 $testSuite.SetAttribute( 'time', $duration.TotalSeconds )
 
             }
+
+        $rootTestSuite.SetAttribute( 'result', $allResult )
+        $rootTestSuite.SetAttribute( 'success', $allSuccess )
+        $rootTestSuite.SetAttribute( 'time', $totalTime.TotalSeconds )
     }
 
     end
