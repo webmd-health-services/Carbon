@@ -63,6 +63,7 @@ This is a ***backwards-incompatible*** release.
 ### Bug Fixes
 
  * [Set-HostsEntry](http://get-carbon.org/help/2.0/Set-HostsEntry.html) fails to preserve whitespace if existing lines end with a comment/description. Thanks to [Konstantin Ushenin](https://vk.com/kostanew) for the fix.
+ * Carbon's `System.ServiceProcess.ServiceController` extended type data causes errors when PowerShell formats `System.ServiceProcess.ServiceController` objects that represent services on remote computers.
  
 ### Enhancements
 
@@ -74,6 +75,7 @@ This is a ***backwards-incompatible*** release.
  * [Install-IisApplication](http://get-carbon.org/help/2.0/Install-IisApplication.html) now returns a `Microsoft.Web.Administration.Application` object when creating/modifying an application. If an application is unchanged, nothing is returned.
  * [Install-IisApplication](http://get-carbon.org/help/2.0/Install-IisApplication.html) now resets an application's app pool to `DefaultAppPool` if no app pool name is provided with the `AppPoolName` parameter.
  * [Install-IisAppPool](http://get-carbon.org/help/2.0/Install-IisAppPool.html) no longer returns appcmd.exe output.
+ * [Get-ServiceConfiguration](http://get-carbon.org/help/2.0/Get-ServiceConfiguration.html) and Carbon's extended type data for `System.ServiceProcess.ServiceController` objects now supports services from remote computers.
  
 ## Enhancements
 
@@ -155,6 +157,7 @@ This is a ***backwards-incompatible*** release.
  * [Install-Service](http://get-carbon.org/help/2.0/Grant-ComPermissions.html) now writes messages with `Write-Verbose` instead of `Write-Host`.
  * [Install-Service](http://get-carbon.org/help/2.0/Grant-ComPermissions.html) now returns a `System.ServiceProcess.ServiceController` object when installation/configuration is successful.
  * [Install-Service](http://get-carbon.org/help/2.0/Install-Service.html) now supports service startup parameters/arguments via the `ArgumentList` parameter.
+ * [Get-ServiceConfiguration](http://get-carbon.org/help/2.0/Get-ServiceConfiguration.html) and Carbon's extended type data for `System.ServiceProcess.ServiceController` objects now supports services from remote computers.
  
 ### Users and Groups
 
@@ -182,6 +185,10 @@ This is a ***backwards-incompatible*** release.
 ### Hosts Entries
 
  * `Set-HostsEntry` fails to preserve whitespace if existing lines end with a comment/description. Thanks to [Konstantin Ushenin](https://vk.com/kostanew) for the fix.
+
+### Services
+
+  * Carbon's `System.ServiceProcess.ServiceController` extended type data causes errors when PowerShell formats `System.ServiceProcess.ServiceController` objects that represent services on remote computers.
 
  
 

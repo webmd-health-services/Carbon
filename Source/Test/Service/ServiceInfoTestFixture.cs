@@ -29,7 +29,7 @@ namespace Carbon.Test.Service
 		{
 			foreach (var service in ServiceController.GetServices())
 			{
-				var info = new ServiceInfo(service.ServiceName);
+				var info = new ServiceInfo(service.ServiceName, "");
 				Assert.That(info, Is.Not.Null);
 			}
 		}
@@ -38,7 +38,7 @@ namespace Carbon.Test.Service
 		[ExpectedException(typeof(Win32Exception))]
 		public void ShouldNotGetInvalidService()
 		{
-			new ServiceInfo(Guid.NewGuid().ToString());
+			new ServiceInfo(Guid.NewGuid().ToString(), "");
 		}
 	}
 }

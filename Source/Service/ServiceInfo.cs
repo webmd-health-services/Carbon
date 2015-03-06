@@ -21,9 +21,13 @@ namespace Carbon.Service
 
 	public sealed class ServiceInfo
 	{
-		public ServiceInfo(string name)
+		public ServiceInfo(string name) : this(name, null)
 		{
-			var databaseHandle = OpenSCManager(null, null, SC_MANAGER_ALL_ACCESS);
+		}
+
+		public ServiceInfo(string name, string computerName)
+		{
+			var databaseHandle = OpenSCManager(computerName, null, SC_MANAGER_ALL_ACCESS);
 			if (databaseHandle == IntPtr.Zero)
 			{
 				throw new Win32Exception();

@@ -37,12 +37,17 @@ function Get-ServiceConfiguration
     .EXAMPLE
     Get-Service | Get-ServiceConfiguration
 
-    Demonstrates how you can pipe in a `ServiceController` object to load the service.
+    Demonstrates how you can pipe in a `ServiceController` object to load the service. This works for services on remote computers as well.
     
     .EXAMPLE
     Get-ServiceConfiguration -Name  'w3svc'
 
     Demonstrates how you can get a specific service's configuration.
+
+    .EXAMPLE
+    Get-ServiceConfiguration -Name 'w3svc' -ComputerName 'enterprise
+
+    Demonstrates how to get service configuration for a service on a remote computer.
     #>
     [CmdletBinding()]
     [OutputType([Carbon.Service.ServiceInfo])]
@@ -50,7 +55,13 @@ function Get-ServiceConfiguration
         [Parameter(Mandatory=$true,ValueFromPipelineByPropertyName=$true,Position=0)]
         [string]
         # The name of the service.
-        $Name
+        $Name,
+
+        [Parameter(ValueFromPipelineByPropertyName=$true)]
+        [Alias('MachineName')]
+        [string]
+        # The name of the computer where the service lives.
+        $ComputerName
     )
 
     begin
@@ -60,6 +71,6 @@ function Get-ServiceConfiguration
 
     process
     {
-        New-Object 'Carbon.Service.ServiceInfo' $Name
+        New-Object 'Carbon.Service.ServiceInfo' $Name,$ComputerName
     }
 }

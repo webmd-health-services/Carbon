@@ -174,7 +174,7 @@
                 <Script>
                     if( -not ($this | Get-Member -Name 'Configuration') )
                     {
-                        $value = New-Object 'Carbon.Service.ServiceInfo' $this.Name
+                        $value = New-Object 'Carbon.Service.ServiceInfo' $this.Name,$this.MachineName
                         Add-Member -InputObject $this -MemberType NoteProperty -Name 'Configuration' -Value $value
                     }
                 </Script>
