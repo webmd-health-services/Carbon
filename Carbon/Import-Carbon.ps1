@@ -79,6 +79,21 @@ if( $Prefix )
     $importModuleParams.Prefix = $Prefix
 }
 
+if( $Force -and $loadedModule )
+{
+    # Remove so we don't get errors about conflicting type data.
+    Remove-Module -Name 'Carbon'
+}
+
 Import-Module $carbonPsd1Path -ErrorAction Stop -Force:$Force -Verbose:$false @importModuleParams
 
-Get-Module -Name 'Carbon' | Add-Member -MemberType NoteProperty -Name 'ImportedAt' -Value (Get-Date) -Force
+if( -not (Get-Module -Name 'Carbon' | Get-Member -Name 'ImportedAt') )
+{
+    Get-Module -Name 'Carbon' | Add-Member -MemberType NoteProperty -Name 'ImportedAt' -Value (Get-Date)
+}
+
+if( $Force )
+{
+    $loadedModule = Get-Module -Name 'Carbon'
+    $loadedModule.ImportedAt = Get-Date
+}
