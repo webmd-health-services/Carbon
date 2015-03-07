@@ -18,9 +18,5 @@ param(
 
 Set-StrictMode -Version 'Latest'
 
-if( -not (Get-Module -Name 'Carbon') -or ((Test-Path -Path 'env:CARBON_ENV') -and $env:CARBON_ENV -eq 'developer') )
-{
-    Write-Verbose ('Importing Carbon.')
-    $carbonRoot = Join-Path -Path $PSScriptRoot -ChildPath '..\Carbon' -Resolve
-    & (Join-Path -Path $carbonRoot -ChildPath 'Import-Carbon.ps1' -Resolve)
-}
+$carbonRoot = Join-Path -Path $PSScriptRoot -ChildPath '..\Carbon' -Resolve
+& (Join-Path -Path $carbonRoot -ChildPath 'Import-Carbon.ps1' -Resolve)
