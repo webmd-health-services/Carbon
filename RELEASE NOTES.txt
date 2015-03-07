@@ -76,6 +76,7 @@ This is a ***backwards-incompatible*** release.
  * [Install-IisApplication](http://get-carbon.org/help/2.0/Install-IisApplication.html) now resets an application's app pool to `DefaultAppPool` if no app pool name is provided with the `AppPoolName` parameter.
  * [Install-IisAppPool](http://get-carbon.org/help/2.0/Install-IisAppPool.html) no longer returns appcmd.exe output.
  * [Get-ServiceConfiguration](http://get-carbon.org/help/2.0/Get-ServiceConfiguration.html) and Carbon's extended type data for `System.ServiceProcess.ServiceController` objects now supports services from remote computers.
+ * [Uninstall-ScheduledTask](http://get-carbon.org/help/2.0/Uninstall-ScheduledTask.html) now retries when un-installing a task fails with "The function attempted to use a name that is reserved for use by another transaction." error.
  
 ## Enhancements
 
@@ -147,6 +148,10 @@ This is a ***backwards-incompatible*** release.
  * Created [Get-PowerShellModuleInstallPath](http://get-carbon.org/help/2.0/Get-PowerShellModuleInstallPath.html) function for getting the path where new module's should be installed. Beginning with PowerShell 4, modules should get installed into `$env:ProgramFiles\Windows PowerShell\Modules`. Under PowerShell 3, it is `$PSHome\Modules`. This function returns the correct location for the version of PowerShell you're using.
  * Created [Test-TypeDataMember](http://get-carbon.org/help/2.0/Test-TypeDataMember.html) for testing if a type has an extended type member defined.
  
+### Scheduled Tasks
+
+ * [Uninstall-ScheduledTask](http://get-carbon.org/help/2.0/Uninstall-ScheduledTask.html) now retries when un-installing a task fails with "The function attempted to use a name that is reserved for use by another transaction." error.
+
 ### Security
 
  * [Grant-Permission](http://get-carbon.org/help/2.0/Grant-Permission.html) now only grants permissions on an object if those permissions aren't present.  To preserve previous behaviour, add the `-Force` switch to all `Grant-Permission` usages.

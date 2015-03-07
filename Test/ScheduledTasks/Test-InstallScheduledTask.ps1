@@ -13,7 +13,6 @@
 # limitations under the License.
 
 $taskName = $null
-$taskCount = 0
 $credential = $null
 $AllMonths = @( 'January','February','March','April','May','June','July','August','September','October','November','December' )
 $today = Get-Date
@@ -28,25 +27,34 @@ function Start-TestFixture
 
 function Start-Test
 {
-    $script:taskName = 'CarbonInstallScheduledTask{0}' -f $script:taskCount++
+    $script:taskName = 'CarbonInstallScheduledTask{0}' -f [Guid]::NewGuid()
     Uninstall-ScheduledTask -Name $taskName
     Assert-NoError
 }
 
 function Stop-Test
 {
-    $Error.Clear()
-    Uninstall-ScheduledTask -Name $taskName
+    $Global:Error.Clear()
+    Get-ScheduledTask -Name '*CarbonInstallScheduledTask*' |
+        ForEach-Object { Uninstall-ScheduledTask -Name $_.TaskName }
     Assert-NoError
 }
 
 function Test-ShouldCreateScheduledTaskWithPath
 {
-    $result = Install-ScheduledTask -Name 'PARENT\CHILD' -TaskToRun 'notepad' -Monthly -Force
-    Assert-NotNull $result
-    Assert-Equal '\PARENT\' $result.TaskPath
-    Assert-Equal 'CHILD' $result.TaskName
-    Assert-Equal '\PARENT\CHILD' $result.FullName
+    $fullName = 'PARENT\{0}' -f $taskName
+    $result = Install-ScheduledTask -Name $fullName -TaskToRun 'notepad' -Monthly -Force
+    try
+    {
+        Assert-NotNull $result
+        Assert-Equal '\PARENT\' $result.TaskPath
+        Assert-Equal $taskName $result.TaskName
+        Assert-Equal ('\{0}' -f $fullName) $result.FullName
+    }
+    finally
+    {
+        Uninstall-ScheduledTask -Name $fullName
+    }
 }
 
 function Test-ShouldSchedulePerMinuteTasks
