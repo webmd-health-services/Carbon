@@ -47,7 +47,7 @@ Set-StrictMode -Version 'Latest'
 $carbonPsd1Path = Join-Path -Path $PSScriptRoot -ChildPath 'Carbon.psd1' -Resolve
 
 $startedAt = Get-Date
-$loadedModule = Get-Module 'Carbon'
+$loadedModule = Get-Module -Name 'Carbon'
 if( $loadedModule )
 {
     if( -not $Force -and ($loadedModule | Get-Member 'ImportedAt') )
@@ -72,6 +72,15 @@ if( $loadedModule )
         }
     }
 }
+else
+{
+    $Force = $true
+}
+
+if( -not $Force )
+{
+    return
+}
 
 $importModuleParams = @{ }
 if( $Prefix )
@@ -82,10 +91,11 @@ if( $Prefix )
 if( $Force -and $loadedModule )
 {
     # Remove so we don't get errors about conflicting type data.
-    Remove-Module -Name 'Carbon'
+    Remove-Module -Name 'Carbon' -Verbose:$false -WhatIf:$false
 }
 
-Import-Module $carbonPsd1Path -ErrorAction Stop -Force:$Force -Verbose:$false @importModuleParams
+Write-Verbose ('Importing Carbon ({0}).' -f $carbonPsd1Path)
+Import-Module $carbonPsd1Path -ErrorAction Stop -Verbose:$false @importModuleParams
 
 if( -not (Get-Module -Name 'Carbon' | Get-Member -Name 'ImportedAt') )
 {
