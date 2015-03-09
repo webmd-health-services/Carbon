@@ -19,6 +19,7 @@ using System.Runtime.InteropServices;
 namespace Carbon.Service
 {
 
+	// ReSharper disable InconsistentNaming
 	public sealed class ServiceInfo
 	{
 		public ServiceInfo(string name) : this(name, null)
@@ -27,7 +28,7 @@ namespace Carbon.Service
 
 		public ServiceInfo(string name, string computerName)
 		{
-			var databaseHandle = OpenSCManager(computerName, null, SC_MANAGER_ALL_ACCESS);
+			var databaseHandle = OpenSCManager(computerName, null, SC_MANAGER_CONNECT);
 			if (databaseHandle == IntPtr.Zero)
 			{
 				throw new Win32Exception();
@@ -54,11 +55,11 @@ namespace Carbon.Service
 			UInt32 dwBytesNeeded;
 
 			// Allocate memory for struct.
-			IntPtr ptr = Marshal.AllocHGlobal(4096);
+			var ptr = Marshal.AllocHGlobal(4096);
 
-			bool success = QueryServiceConfig(serviceHandle, ptr, 4096, out dwBytesNeeded);
+			QueryServiceConfig(serviceHandle, ptr, 4096, out dwBytesNeeded);
 
-			QUERY_SERVICE_CONFIG config = new QUERY_SERVICE_CONFIG();
+			var config = new QUERY_SERVICE_CONFIG();
 			// Copy 
 			Marshal.PtrToStructure(ptr, config);
 			// Free memory for struct.
@@ -79,7 +80,6 @@ namespace Carbon.Service
 		public string LoadOrderGroup { get; private set; }
 		public string Name { get; private set; }
 		public string Path { get; private set; }
-		public string RebootMessage { get; private set; }
 		public uint ResetPeriod { get; private set; }
 
 		public uint ResetPeriodDays
@@ -150,19 +150,19 @@ namespace Carbon.Service
 			UInt32 dwBytesNeeded;
 
 			// Determine the buffer size needed
-			bool success = QueryServiceConfig2(serviceHandle, SERVICE_CONFIG_FAILURE_ACTIONS, IntPtr.Zero, 0, out dwBytesNeeded);
+			QueryServiceConfig2(serviceHandle, SERVICE_CONFIG_FAILURE_ACTIONS, IntPtr.Zero, 0, out dwBytesNeeded);
 
-			IntPtr ptr = Marshal.AllocHGlobal((int) dwBytesNeeded);
-			success = QueryServiceConfig2(serviceHandle, SERVICE_CONFIG_FAILURE_ACTIONS, ptr, dwBytesNeeded, out dwBytesNeeded);
-			SERVICE_FAILURE_ACTIONS failureActions = new SERVICE_FAILURE_ACTIONS();
+			var ptr = Marshal.AllocHGlobal((int) dwBytesNeeded);
+			QueryServiceConfig2(serviceHandle, SERVICE_CONFIG_FAILURE_ACTIONS, ptr, dwBytesNeeded, out dwBytesNeeded);
+			var failureActions = new SERVICE_FAILURE_ACTIONS();
 			Marshal.PtrToStructure(ptr, failureActions);
 
 			// Report it.
 			ResetPeriod = (UInt32) failureActions.dwResetPeriod;
             FailureProgram = failureActions.lpCommand;
 
-			int offset = 0;
-			for (int i = 0; i < failureActions.cActions; i++)
+			var offset = 0;
+			for (var i = 0; i < failureActions.cActions; i++)
 			{
 				var type = (FailureAction)Marshal.ReadInt32(failureActions.lpsaActions, offset);
 				offset += sizeof(Int32);
@@ -202,6 +202,8 @@ namespace Carbon.Service
 
 		#region P/Invoke declarations
 
+#pragma warning disable 649
+#pragma warning disable 169
 		[StructLayout(LayoutKind.Sequential)]
 		private class SERVICE_DESCRIPTION
 		{
@@ -235,7 +237,7 @@ namespace Carbon.Service
 		[DllImport("advapi32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
 		private static extern Boolean QueryServiceConfig(IntPtr hService, IntPtr intPtrQueryConfig, UInt32 cbBufSize, out UInt32 pcbBytesNeeded);
 
-		private const Int32 SC_MANAGER_ALL_ACCESS = 0x000F003F;
+		private const Int32 SC_MANAGER_CONNECT		= 0x00000001;
 		private const Int32 SERVICE_QUERY_CONFIG = 0x00000001;
 		private const UInt32 SERVICE_CONFIG_DESCRIPTION = 0x01;
 		private const UInt32 SERVICE_CONFIG_FAILURE_ACTIONS = 0x02;
@@ -243,25 +245,27 @@ namespace Carbon.Service
 		[StructLayout(LayoutKind.Sequential)]
 		private class QUERY_SERVICE_CONFIG
 		{
-			[MarshalAs(System.Runtime.InteropServices.UnmanagedType.U4)]
+			[MarshalAs(UnmanagedType.U4)]
 			public UInt32 dwServiceType;
-			[MarshalAs(System.Runtime.InteropServices.UnmanagedType.U4)]
+			[MarshalAs(UnmanagedType.U4)]
 			public UInt32 dwStartType;
-			[MarshalAs(System.Runtime.InteropServices.UnmanagedType.U4)]
+			[MarshalAs(UnmanagedType.U4)]
 			public UInt32 dwErrorControl;
-			[MarshalAs(System.Runtime.InteropServices.UnmanagedType.LPWStr)]
+			[MarshalAs(UnmanagedType.LPWStr)]
 			public String lpBinaryPathName;
-			[MarshalAs(System.Runtime.InteropServices.UnmanagedType.LPWStr)]
+			[MarshalAs(UnmanagedType.LPWStr)]
 			public String lpLoadOrderGroup;
-			[MarshalAs(System.Runtime.InteropServices.UnmanagedType.U4)]
+			[MarshalAs(UnmanagedType.U4)]
 			public UInt32 dwTagID;
-			[MarshalAs(System.Runtime.InteropServices.UnmanagedType.LPWStr)]
+			[MarshalAs(UnmanagedType.LPWStr)]
 			public String lpDependencies;
-			[MarshalAs(System.Runtime.InteropServices.UnmanagedType.LPWStr)]
+			[MarshalAs(UnmanagedType.LPWStr)]
 			public String lpServiceStartName;
-			[MarshalAs(System.Runtime.InteropServices.UnmanagedType.LPWStr)]
+			[MarshalAs(UnmanagedType.LPWStr)]
 			public String lpDisplayName;
 		};
+#pragma warning restore 169
+#pragma warning restore 649
 		#endregion // P/Invoke declarations
 	}
 }
