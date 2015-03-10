@@ -32,7 +32,12 @@ function Get-ServiceConfiguration
 
         Get-Service | Get-Member
 
+    The user running this function must have `QueryConfig`, `QueryStatus`, and `EnumerateDependents` permissions on the service. Use `Grant-ServicePermission` to grant these permissions.
+
     This function is new in Carbon 1.8.
+
+    .LINK
+    Grant-ServicePermission
 
     .EXAMPLE
     Get-Service | Get-ServiceConfiguration
