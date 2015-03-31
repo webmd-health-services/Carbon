@@ -85,6 +85,62 @@ if( -not $useServerManager )
 $windowsFeaturesNotSupported = (-not ($useServerManager -or ($useWmi -and $useOCSetup) ))
 $supportNotFoundErrorMessage = 'Unable to find support for managing Windows features.  Couldn''t find servermanagercmd.exe, ocsetup.exe, or WMI support.'
 
+
+# Extended Type
+if( -not (Test-TypeDataMember -TypeName 'System.IO.FileInfo' -MemberName 'GetCarbonFileInfo') )
+{
+    Update-TypeData -TypeName 'System.IO.FileInfo' -MemberType ScriptMethod -MemberName 'GetCarbonFileInfo' -Value {
+        param(
+            [Parameter(Mandatory=$true)]
+            [string]
+            # The name of the Carbon file info property to get.
+            $Name
+        )
+
+        Set-StrictMode -Version 'Latest'
+
+        if( -not $this.Exists )
+        {
+            return
+        }
+
+        if( -not ($this | Get-Member -Name 'CarbonFileInfo') )
+        {
+            $this | Add-Member -MemberType NoteProperty -Name 'CarbonFileInfo' -Value (New-Object 'Carbon.IO.FileInfo' $this.FullName)
+        }
+
+        if( $this.CarbonFileInfo | Get-Member -Name $Name )
+        {
+            return $this.CarbonFileInfo.$Name
+        }
+    }
+}
+
+if( -not (Test-TypeDataMember -TypeName 'System.IO.FileInfo' -MemberName 'FileIndex') )
+{
+    Update-TypeData -TypeName 'System.IO.FileInfo' -MemberType ScriptProperty -MemberName 'FileIndex' -Value {
+        Set-StrictMode -Version 'Latest'
+        return $this.GetCarbonFileInfo( 'FileIndex' )
+    }
+}
+
+if( -not (Test-TypeDataMember -TypeName 'System.IO.FileInfo' -MemberName 'LinkCount') )
+{
+    Update-TypeData -TypeName 'System.IO.FileInfo' -MemberType ScriptProperty -MemberName 'LinkCount' -Value {
+        Set-StrictMode -Version 'Latest'
+        return $this.GetCarbonFileInfo( 'LinkCount' )
+    }
+}
+
+if( -not (Test-TypeDataMember -TypeName 'System.IO.FileInfo' -MemberName 'VolumeSerialNumber') )
+{
+    Update-TypeData -TypeName 'System.IO.FileInfo' -MemberType ScriptProperty -MemberName 'VolumeSerialNumber' -Value {
+        Set-StrictMode -Version 'Latest'
+        return $this.GetCarbonFileInfo( 'VolumeSerialNumber' )
+    }
+}
+
+
 $privateMembers = @{
                         'Add-IisServerManagerMember' = $true;
                         'Assert-WindowsFeatureFunctionsSupported' = $true;

@@ -75,6 +75,8 @@
     <Compile Include="Identity.cs" />
     <Compile Include="IdentityType.cs" />
     <Compile Include="Ini\IniNode.cs" />
+    <Compile Include="IO\File.cs" />
+    <Compile Include="IO\FileInfo.cs" />
     <Compile Include="IO\JunctionPoint.cs" />
     <Compile Include="Properties\AssemblyVersion.cs" />
     <Compile Include="Security\ComAccessRights.cs" />

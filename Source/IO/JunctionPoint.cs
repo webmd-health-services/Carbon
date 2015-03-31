@@ -17,6 +17,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
 using Microsoft.Win32.SafeHandles;
+using IOFile = System.IO.File;
 
 namespace Carbon.IO
 {
@@ -256,7 +257,7 @@ namespace Carbon.IO
 		{
 			if (!Directory.Exists(junctionPoint))
 			{
-				if (File.Exists(junctionPoint))
+				if (IOFile.Exists(junctionPoint))
 					throw new IOException("Path is not a junction point.");
 
 				return;

@@ -77,6 +77,7 @@ This is a ***backwards-incompatible*** release.
  * [Install-IisAppPool](http://get-carbon.org/help/Install-IisAppPool.html) no longer returns appcmd.exe output.
  * [Get-ServiceConfiguration](http://get-carbon.org/help/Get-ServiceConfiguration.html) and Carbon's extended type data for `System.ServiceProcess.ServiceController` objects now supports services from remote computers.
  * [Uninstall-ScheduledTask](http://get-carbon.org/help/Uninstall-ScheduledTask.html) now retries when un-installing a task fails with "The function attempted to use a name that is reserved for use by another transaction." error.
+ * Added new `FileIndex`, `LinkCount`, and `VolumeSerialNumber` extended type data on `System.IO.FileInfo` objects for getting a file's index, its hard link count, and volume serial number, respectively.
  
 ## Enhancements
 
@@ -84,6 +85,7 @@ This is a ***backwards-incompatible*** release.
 
  * Carbon now requires PowerShell 4.
  * `Import-Carbon.ps1` is more intelligent about when it tries to re-load Carbon. It will force a re-import of Carbon if any of Carbon's files have changed or the version has changed.
+ * Added new `FileIndex`, `LinkCount`, and `VolumeSerialNumber` extended type data on `System.IO.FileInfo` objects for getting a file's index, its hard link count, and volume serial number, respectively.
 
 ### Certificates
 
