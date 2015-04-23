@@ -26,7 +26,7 @@ function Install-Junction
     Beginning with Carbon 2.0, returns a `System.IO.DirectoryInfo` object for the target path, if one is created.  Returns a `System.IO.DirectoryInfo` object for the junction, if it is created and/or updated.
 
     .OUTPUTS
-    System.IO.DirectoryInfo.
+    System.IO.DirectoryInfo. To return a `DirectoryInfo` object for installed junction, use the `PassThru` switch.
     
     .LINK
     New-Junction
@@ -45,6 +45,7 @@ function Install-Junction
     This example demonstrates how to create the target directory if it doesn't exist.  After this example runs, the directory `C:\Foo\bar` and junction `C:\Projects\Foobar` will be created.
     #>
     [CmdletBinding(SupportsShouldProcess=$true)]
+    [OutputType([IO.DirectoryInfo])]
     param(
         [Parameter(Mandatory=$true)]
         [Alias("Junction")]
@@ -56,6 +57,10 @@ function Install-Junction
         [string]
         # The target of the junction, i.e. where the junction will point to.  Relative paths are converted to absolute paths using the curent location.
         $Target,
+
+        [Switch]
+        # Return a `DirectoryInfo` object for the installed junction. Returns nothing if `WhatIf` switch is used.
+        $PassThru,
 
         [Switch]
         # Create the target directory if it does not exist.
@@ -77,7 +82,7 @@ function Install-Junction
     {
         if( $Force )
         {
-            New-Item -Path $Target -ItemType Directory -Force
+            New-Item -Path $Target -ItemType Directory -Force | Out-String | Write-Verbose
         }
         else
         {
@@ -105,6 +110,10 @@ function Install-Junction
 
     if( $PSCmdlet.ShouldProcess( $Target, ("creating '{0}' junction" -f $Link) ) )
     {
-        New-Junction -Link $Link -Target $target -Verbose:$false
+        $result = New-Junction -Link $Link -Target $target -Verbose:$false
+        if( $PassThru )
+        {
+            return $result
+        }
     }
 }

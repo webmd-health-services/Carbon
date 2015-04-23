@@ -14,7 +14,6 @@ This is a ***backwards-incompatible*** release.
  * Remove usages of `Complete-Job`.  We removed it because it was total crap.  Use PowerShell's `Wait-Job` cmdlet instead.
  * [Grant-Permission](http://get-carbon.org/help/Grant-Permission.html) now only grants permissions on an object if those permissions aren't present.  To preserve previous behaviour, add the `-Force` switch to all `Grant-Permission` usages.
  * The following commands now return objects to the pipeline. Depending on your usage, you may need to pipe their output to `Out-Null`, assign their return values to `$null`, or do nothing.
-     * [Install-Junction](http://get-carbon.org/help/Install-Junction.html)
      * [Install-User](http://get-carbon.org/help/Install-User.html)
      * [Grant-ComPermissions](http://get-carbon.org/help/Grant-ComPermissions.html)
      * [Install-IisApplication](http://get-carbon.org/help/Install-IisApplication.html)
@@ -125,7 +124,7 @@ This is a ***backwards-incompatible*** release.
 
  * [Disable-NtfsCompression](http://get-carbon.org/help/Disable-NtfsCompression.html) now writes messages with `Write-Verbose` instead of `Write-Host`. Improved error handling.
  * [Enable-NtfsCompression](http://get-carbon.org/help/Enable-NtfsCompression.html) now writes messages with `Write-Verbose` instead of `Write-Host`. Improved error handling.
- * [Install-Junction](http://get-carbon.org/help/Install-Junction.html) now returns `System.IO.DirectoryInfo` objects for any new target directories and any new/updated junctions.
+ * Added `PassThru` switch to [Install-Junction](http://get-carbon.org/help/Install-Junction.html) now returns `System.IO.DirectoryInfo` objects for any new target directories and any new/updated junctions.
 
 ### Firewall
 
