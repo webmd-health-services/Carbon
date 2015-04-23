@@ -40,7 +40,11 @@ function Install-Group
         [Alias('Members')]
         [string[]]
         # Members of the group.
-        $Member = @()
+        $Member = @(),
+
+        [Switch]
+        # Return the group object.
+        $PassThru
     )
     
     Set-StrictMode -Version 'Latest'
@@ -66,5 +70,8 @@ function Install-Group
         }
     }
     
-    return $group
+    if( $PassThru )
+    {
+        return $group
+    }
 }

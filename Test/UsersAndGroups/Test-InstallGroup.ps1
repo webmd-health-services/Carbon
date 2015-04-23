@@ -45,7 +45,7 @@ function Remove-Group
 
 function Invoke-NewGroup($Description = '', $Members = @())
 {
-    $group = Install-Group -Name $GroupName -Description $Description -Members $Members
+    $group = Install-Group -Name $GroupName -Description $Description -Members $Members -PassThru
     Assert-NotNull $group 'Install-Group didn''t return the created/updated group.'
     Assert-GroupExists
     $expectedGroup = Get-Group -Name $GroupName
@@ -60,6 +60,15 @@ function Test-ShouldCreateGroup
     Assert-NotNull $group
     Assert-Equal $GroupName $group.Name
     Assert-Equal $expectedDescription $group.Description 'Group not created with a description.'
+}
+
+function Test-ShouldPassThruGroup
+{
+    $result = Install-Group -Name $GroupName 
+    Assert-Null $result
+    $result = Install-Group -Name $GroupName -PassThru
+    Assert-NotNull $result
+    Assert-Is $result ([DirectoryServices.AccountManagement.GroupPrincipal])
 }
 
 function Test-ShouldAddMembers
@@ -94,17 +103,26 @@ function Test-ShouldNotAddMemberMultipleTimes
 
 function Test-ShouldAddMemberWithLongName
 {
-    Invoke-NewGroup -Members 'WBMD\WHS - Lifecycle Services'
-    $details = net localgroup `"$GroupName`"
-    Assert-ContainsLike $details 'WBMD\WHS - Lifecycle Services' 'Lifecycle Services not added to group.'
+    $longUsername = 'abcdefghijklmnopqrst' 
+    Install-User -Username $longUsername -Password 'a1b2c34d!'
+    try
+    {
+        Invoke-NewGroup -Members ('{0}\{1}' -f $env:COMPUTERNAME,$longUsername)
+        $details = net localgroup `"$GroupName`"
+        Assert-ContainsLike $details $longUsername ('{0} not added to group.' -f $longUsername)
+    }
+    finally
+    {
+        Uninstall-User -Username $userName
+    }
 }
 
 function Test-ShouldSupportWhatIf
 {
     $Error.Clear()
     $group = Install-Group -Name $GroupName -WhatIf -Member 'Administrator'
-    Assert-Equal 0 $Error.Count
-    Assert-NotNull $group
+    Assert-NoError
+    Assert-Null $group
     $group = Get-Group -Name $GroupName -ErrorAction SilentlyContinue
     Assert-Null $group
 }

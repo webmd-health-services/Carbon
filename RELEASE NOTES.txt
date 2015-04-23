@@ -14,7 +14,6 @@ This is a ***backwards-incompatible*** release.
  * Remove usages of `Complete-Job`.  We removed it because it was total crap.  Use PowerShell's `Wait-Job` cmdlet instead.
  * [Grant-Permission](http://get-carbon.org/help/Grant-Permission.html) now only grants permissions on an object if those permissions aren't present.  To preserve previous behaviour, add the `-Force` switch to all `Grant-Permission` usages.
  * The following commands now return objects to the pipeline. Depending on your usage, you may need to pipe their output to `Out-Null`, assign their return values to `$null`, or do nothing.
-     * [Install-Group](http://get-carbon.org/help/Install-Group.html)
      * [Install-Junction](http://get-carbon.org/help/Install-Junction.html)
      * [Install-User](http://get-carbon.org/help/Install-User.html)
      * [Grant-ComPermissions](http://get-carbon.org/help/Grant-ComPermissions.html)
@@ -176,7 +175,7 @@ This is a ***backwards-incompatible*** release.
  * Added [Get-Group](http://get-carbon.org/help/Get-Group.html) function for getting a local group or all local groups.
  * Renamed [Install-Group](http://get-carbon.org/help/Install-Group.html)'s `Members` parameter to `Member` (with backwards-compatible alias).
  * [Install-Group](http://get-carbon.org/help/Install-Group.html) re-written to use .NET's `System.DirectoryServices.AccountManagement` API (introduced with .NET 3.5).
- * [Install-Group](http://get-carbon.org/help/Install-Group.html) now returns the group added or updated.
+ * Added `PassThru` switch to [Install-Group](http://get-carbon.org/help/Install-Group.html) so it will return the group added or updated.
  * [Add-MemberToGroup](http://get-carbon.org/help/Add-MemberToGroup.html) re-written to use .NET's `System.DirectoryServices.AccountManagement` API (introduced with .NET 3.5).
  * [Resolve-IdentityName](http://get-carbon.org/help/Resolve-IdentityName.html) now writes an error if it can't resolve a name.  Use `-ErrorAction SilentlyContinue` or `-ErrorAction Ignore` to preserve old behavior.
  * [Uninstall-User](http://get-carbon.org/help/Uninstall-User.html) re-written to use .NET's `System.DirectoryServices.AccountManagement` API (introduced with .NET 3.5).
