@@ -13,8 +13,6 @@ This is a ***backwards-incompatible*** release.
  * Upgrade to PowerShell 4.
  * Remove usages of `Complete-Job`.  We removed it because it was total crap.  Use PowerShell's `Wait-Job` cmdlet instead.
  * [Grant-Permission](http://get-carbon.org/help/Grant-Permission.html) now only grants permissions on an object if those permissions aren't present.  To preserve previous behaviour, add the `-Force` switch to all `Grant-Permission` usages.
- * The following commands now return objects to the pipeline. Depending on your usage, you may need to pipe their output to `Out-Null`, assign their return values to `$null`, or do nothing.
-     * [Install-IisApplication](http://get-carbon.org/help/Install-IisApplication.html)
  * [Install-Service](http://get-carbon.org/help/Grant-ComPermissions.html) now returns `ServiceController` objects instead of `sc.exe` output.
  * The following commands no longer return the stdout from console applications each one calls. To see that output, use the `-Verbose` switch. Remove any usage of the output you were processing.
      * [Disable-FirewallStatefulFtp](http://get-carbon.org/help/Disable-FirewallStatefulFtp.html)
@@ -76,6 +74,7 @@ This is a ***backwards-incompatible*** release.
  * [Grant-Permission](http://get-carbon.org/help/Grant-Permission.html) only returns an access rule object when the new `PassThru` switch is used. In previous 2.0 alpha releases, it only returned something when permissions on an object were added or changed.
  * [Install-User](http://get-carbon.org/help/Install-User.html) only returns a user object when the new `PassThru` switch is used. In previous 2.0 alpha releases, it only returned an object if a user was created or updated.
  * [Grant-ComPermissions](http://get-carbon.org/help/Grant-ComPermissions.html) only returns an access rule object when the new `PassThru` switch is used. In previous 2.0 alpha releases, it only returned an object if permissions were changed.
+ * [Install-IisApplication](http://get-carbon.org/help/Install-IisApplication.html) only returns an IIS application object when the new `PassThru` switch is used. In previous 2.0 alpha releases, it only returned an object if the application was created or modified.
  
 ## Enhancements
 
@@ -137,7 +136,7 @@ This is a ***backwards-incompatible*** release.
 
 ### IIS
 
- * [Install-IisApplication](http://get-carbon.org/help/Install-IisApplication.html) now returns a `Microsoft.Web.Administration.Application` object when creating/modifying an application. If an application is unchanged, nothing is returned.
+ * Added `PassThru` switch to [Install-IisApplication](http://get-carbon.org/help/Install-IisApplication.html) to return a `Microsoft.Web.Administration.Application` object.
  * [Install-IisApplication](http://get-carbon.org/help/Install-IisApplication.html) now resets an application's app pool to `DefaultAppPool` if no app pool name is provided with the `AppPoolName` parameter.
  * [Install-IisAppPool](http://get-carbon.org/help/Install-IisAppPool.html) no longer returns appcmd.exe output.
 

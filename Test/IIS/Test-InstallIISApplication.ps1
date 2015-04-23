@@ -41,11 +41,21 @@ function Stop-Test
 
 function Invoke-InstallApplication($Path = $TestDir)
 {
-    $result = Install-IISApplication -SiteName $SiteName -Name $AppName -Path $Path -AppPoolName $AppPoolName
+    $result = Install-IISApplication -SiteName $SiteName -Name $AppName -Path $Path -AppPoolName $AppPoolName -PassThru
     Assert-NoError
     Assert-NotNull $result
     Assert-Is $result ([Microsoft.Web.Administration.Application])
     Assert-FileDoesNotExist $WebConfig
+}
+
+function Test-ShouldNotReturnAnything($Path = $TestDir)
+{
+    $result = Install-IISApplication -SiteName $SiteName -Name $AppName -Path $Path 
+    Assert-NoError
+    Assert-Null $result
+    $result = Install-IISApplication -SiteName $SiteName -Name $AppName -Path $env:TEMP
+    Assert-NoError
+    Assert-Null $result
 }
 
 function Test-ShouldCreateApplication
@@ -88,22 +98,22 @@ function Test-ShouldUpdatePath
 
 function Test-ShouldUpdateApplicationPool
 {
-    $result = Install-IISApplication -SiteName $SiteName -Name $AppName -Path $TestDir
+    $result = Install-IISApplication -SiteName $SiteName -Name $AppName -Path $TestDir -PassThru
     Assert-NoError
     Assert-NotNull $result
     Assert-Equal 'DefaultAppPool' $result.ApplicationPoolName
     Assert-ApplicationRunning
 
-    $result = Install-IisApplication -SiteName $SiteName -Name $AppName -PhysicalPath $TestDir -AppPoolName $AppPoolName
+    $result = Install-IisApplication -SiteName $SiteName -Name $AppName -PhysicalPath $TestDir -AppPoolName $AppPoolName -PassThru
     Assert-NoError
     Assert-NotNull $result
     Assert-Equal $AppPoolName $result.ApplicationPoolName
 
-    $result = Install-IisApplication -SiteName $SiteName -Name $AppName -PhysicalPath $TestDir -AppPoolName $AppPoolName
+    $result = Install-IisApplication -SiteName $SiteName -Name $AppName -PhysicalPath $TestDir -AppPoolName $AppPoolName -PassThru
     Assert-NoError
-    Assert-Null $result
+    Assert-NotNull $result
 
-    $result = Install-IisApplication -SiteName $SiteName -Name $AppName -PhysicalPath $TestDir 
+    $result = Install-IisApplication -SiteName $SiteName -Name $AppName -PhysicalPath $TestDir -PassThru
     Assert-NoError
     Assert-NotNull $result
     Assert-Equal 'DefaultAppPool' $result.ApplicationPoolName
@@ -119,7 +129,8 @@ function Test-ShouldCreateApplicationDirectory
 
     try
     {
-        Invoke-InstallApplication -Path $appDir
+        $result = Invoke-InstallApplication -Path $appDir
+        Assert-Null $result
         Assert-DirectoryExists $appDir
     }
     finally

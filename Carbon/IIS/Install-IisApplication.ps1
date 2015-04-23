@@ -57,7 +57,11 @@ function Install-IisApplication
         
         [string]
         # The app pool for the application. Default is `DefaultAppPool`.
-        $AppPoolName = 'DefaultAppPool'
+        $AppPoolName = 'DefaultAppPool',
+
+        [Switch]
+        # Returns IIS application object. This switch is new in Carbon 2.0.
+        $PassThru
     )
     
     Set-StrictMode -Version 'Latest'
@@ -139,7 +143,10 @@ function Install-IisApplication
     {
         Write-Verbose ('IIS://{0}: committing changes' -f $iisAppPath)
         $app.CommitChanges()
+    }
 
+    if( $PassThru )
+    {
         return Get-IisApplication -SiteName $SiteName -VirtualPath $VirtualPath
     }
 
