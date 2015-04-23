@@ -14,7 +14,6 @@ This is a ***backwards-incompatible*** release.
  * Remove usages of `Complete-Job`.  We removed it because it was total crap.  Use PowerShell's `Wait-Job` cmdlet instead.
  * [Grant-Permission](http://get-carbon.org/help/Grant-Permission.html) now only grants permissions on an object if those permissions aren't present.  To preserve previous behaviour, add the `-Force` switch to all `Grant-Permission` usages.
  * The following commands now return objects to the pipeline. Depending on your usage, you may need to pipe their output to `Out-Null`, assign their return values to `$null`, or do nothing.
-     * [Grant-Permission](http://get-carbon.org/help/Grant-Permission.html)
      * [Install-Group](http://get-carbon.org/help/Install-Group.html)
      * [Install-Junction](http://get-carbon.org/help/Install-Junction.html)
      * [Install-User](http://get-carbon.org/help/Install-User.html)
@@ -78,6 +77,7 @@ This is a ***backwards-incompatible*** release.
  * [Get-ServiceConfiguration](http://get-carbon.org/help/Get-ServiceConfiguration.html) and Carbon's extended type data for `System.ServiceProcess.ServiceController` objects now supports services from remote computers.
  * [Uninstall-ScheduledTask](http://get-carbon.org/help/Uninstall-ScheduledTask.html) now retries when un-installing a task fails with "The function attempted to use a name that is reserved for use by another transaction." error.
  * Added new `FileIndex`, `LinkCount`, and `VolumeSerialNumber` extended type data on `System.IO.FileInfo` objects for getting a file's index, its hard link count, and volume serial number, respectively.
+ * [Grant-Permission](http://get-carbon.org/help/Grant-Permission.html) returns an access rule object when the new `PassThru` switch is used. In previous 2.0 alpha releases, it only returned something when permissions on an object were added or changed.
  
 ## Enhancements
 
@@ -157,7 +157,8 @@ This is a ***backwards-incompatible*** release.
 ### Security
 
  * [Grant-Permission](http://get-carbon.org/help/Grant-Permission.html) now only grants permissions on an object if those permissions aren't present.  To preserve previous behaviour, add the `-Force` switch to all `Grant-Permission` usages.
- * [Grant-Permission](http://get-carbon.org/help/Grant-Permission.html) returns `System.Security.AccessControl.FileSystemRule` or `System.Security.AccessControl.RegistryRule` whenever it updates an item's permissions.  It no longer writes a message to the host.
+ * Added `PassThru` switch to [Grant-Permission](http://get-carbon.org/help/Grant-Permission.html) to return the access rule objects it creates/sets.
+ * [Grant-Permission](http://get-carbon.org/help/Grant-Permission.html) no longer writes a message to the host.
 
 ### Service
 

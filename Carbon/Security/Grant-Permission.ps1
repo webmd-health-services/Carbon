@@ -96,6 +96,9 @@ function Grant-Permission
 
     When using the `-Clear` switch, note that the local `Administrators` account will always remain. In testing on Windows 2012 R2, we noticed that when `Administrators` access was removed, you couldn't read the key anymore. 
 
+    .OUTPUTS
+    System.Security.AccessControl.AccessRule. When setting permissions on a file or directory, a `System.Security.AccessControl.FileSystemAccessRule` is returned. When setting permissions on a registry key, a `System.Security.AccessControl.RegistryAccessRule` returned. When setting permissions on a private key, a `System.Security.AccessControl.CryptoKeyAccessRule` object is returned.
+
     .LINK
     Carbon_Permission
 
@@ -174,6 +177,12 @@ function Grant-Permission
         $Clear,
 
         [Switch]
+        # Returns an object representing the permission created or set on the `Path`. The returned object will have a `Path` propery added to it so it can be piped to any cmdlet that uses a path. 
+        #
+        # The `PassThru` switch is new in Carbon 2.0.
+        $PassThru,
+
+        [Switch]
         # Grants permissions, even if they are already present.
         $Force
     )
@@ -241,15 +250,20 @@ function Grant-Permission
                 }
                 
                 $certPath = Join-Path -Path 'cert:' -ChildPath (Split-Path -NoQualifier -Path $certificate.PSPath)
+
+                $accessRule = New-Object 'Security.AccessControl.CryptoKeyAccessRule' ($Identity,$rights,'Allow') |
+                                Add-Member -MemberType NoteProperty -Name 'Path' -Value $certPath -PassThru
+
                 if( $Force -or $rulesToRemove -or -not (Test-Permission -Path $certPath -Identity $Identity -Permission $Permission -Exact) )
                 {
-                    $accessRule = New-Object 'Security.AccessControl.CryptoKeyAccessRule' ($Identity,$rights,'Allow')
                     $keySecurity.SetAccessRule( $accessRule )
 
                     Set-CryptoKeySecurity -Certificate $certificate -CryptoKeySecurity $keySecurity -Action ('grant {0} {1} permission(s)' -f $Identity,($Permission -join ','))
+                }
 
-                    $accessRule |
-                        Add-Member -MemberType NoteProperty -Name 'Path' -Value $certPath -PassThru
+                if( $PassThru )
+                {
+                    return $accessRule
                 }
             }
     }
@@ -295,21 +309,25 @@ function Grant-Permission
             }
         }
 
+        $accessRule = New-Object "Security.AccessControl.$($providerName)AccessRule" $Identity,$rights,$inheritanceFlags,$propagationFlags,"Allow" |
+                        Add-Member -MemberType NoteProperty -Name 'Path' -Value $Path -PassThru
+
         $missingPermission = -not (Test-Permission -Path $Path -Identity $Identity -Permission $Permission @testPermissionParams -Exact)
+
         $setAccessRule = ($Force -or $missingPermission)
         if( $setAccessRule )
         {
-            $accessRule = New-Object "Security.AccessControl.$($providerName)AccessRule" $Identity,$rights,$inheritanceFlags,$propagationFlags,"Allow"
             $currentAcl.SetAccessRule( $accessRule )
         }
 
         if( $rulesToRemove -or $setAccessRule )
         {
             Set-Acl -Path $Path -AclObject $currentAcl
-            if( $setAccessRule )
-            {
-                $accessRule | Add-Member -MemberType NoteProperty -Name 'Path' -Value $Path -PassThru
-            }
+        }
+
+        if( $PassThru )
+        {
+            return $accessRule
         }
     }
 }

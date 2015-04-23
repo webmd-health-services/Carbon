@@ -51,7 +51,7 @@ function Stop-Test
 
 function Invoke-GrantPermissions($Identity, $Permissions, $Path)
 {
-    $result = Grant-Permission -Identity $Identity -Permission $Permissions -Path $Path.ToString()
+    $result = Grant-Permission -Identity $Identity -Permission $Permissions -Path $Path.ToString() -PassThru
     Assert-NotNull $result
     Assert-Equal (Resolve-Identity $Identity).FullName $result.IdentityReference
     Assert-Is $result ([Security.AccessControl.FileSystemAccessRule])
@@ -82,7 +82,7 @@ function Test-ShouldGrantPermissionsOnRegistryKey
     
     try
     {
-        $result = Grant-Permission -Identity 'BUILTIN\Administrators' -Permission 'ReadKey' -Path $regKey
+        $result = Grant-Permission -Identity 'BUILTIN\Administrators' -Permission 'ReadKey' -Path $regKey -PassThru
         Assert-NotNull $result
         Assert-Is $result ([Security.AccessControl.RegistryAccessRule]) 
         Assert-Equal $regKey $result.Path
@@ -98,7 +98,7 @@ function Test-ShouldFailIfIncorrectPermissions
 {
     $failed = $false
     $error.Clear()
-    $result = Grant-Permission -Identity 'BUILTIN\Administrators' -Permission 'BlahBlahBlah' -Path $Path.ToString() -ErrorAction SilentlyContinue
+    $result = Grant-Permission -Identity 'BUILTIN\Administrators' -Permission 'BlahBlahBlah' -Path $Path.ToString() -PassThru -ErrorAction SilentlyContinue
     Assert-Null $result
     Assert-Equal 2 $error.Count
 }
@@ -108,7 +108,7 @@ function Test-ShouldClearExistingPermissions
     Invoke-GrantPermissions $user 'FullControl' -Path $Path
     Invoke-GrantPermissions $user2 'FullControl' -Path $Path
     
-    $result = Grant-Permission -Identity 'Everyone' -Permission 'Read','Write' -Path $Path.ToString() -Clear
+    $result = Grant-Permission -Identity 'Everyone' -Permission 'Read','Write' -Path $Path.ToString() -Clear -PassThru
     Assert-NotNull $result
     Assert-Equal $Path $result.Path
     
@@ -133,7 +133,7 @@ function Test-ShouldHandleNoPermissionsToClear
     }
     
     $error.Clear()
-    $result = Grant-Permission -Identity 'Everyone' -Permission 'Read','Write' -Path $Path.ToSTring() -Clear -ErrorAction SilentlyContinue
+    $result = Grant-Permission -Identity 'Everyone' -Permission 'Read','Write' -Path $Path.ToSTring() -Clear -PassThru -ErrorAction SilentlyContinue
     Assert-NotNull $result
     Assert-Equal 'Everyone' $result.IdentityReference
     Assert-Equal 0 $error.Count
@@ -205,7 +205,7 @@ function Test-ShouldSetInheritanceFlags
                 $null = New-Item $grandchildLeafPath -ItemType File
 
                 $flags = $map[$containerInheritanceFlag]
-                $result = Grant-Permission -Identity $user -Path $containerPath -Permission Read -ApplyTo $containerInheritanceFlag
+                $result = Grant-Permission -Identity $user -Path $containerPath -Permission Read -ApplyTo $containerInheritanceFlag -PassThru
                 Assert-NotNull $result
                 Assert-Equal $containerPath $result.Path
                 Assert-InheritanceFlags $containerInheritanceFlag $flags.InheritanceFlags $flags.PropagationFlags
@@ -220,7 +220,7 @@ function Test-ShouldSetInheritanceFlags
 function Test-ShouldWriteWarningWhenInheritanceFlagsGivenOnLeaf
 {
     $warnings = @()
-    $result = Grant-Permission -Identity $user -Permission Read -Path $Path -ApplyTo Container -WarningAction SilentlyContinue -WarningVariable 'warnings'
+    $result = Grant-Permission -Identity $user -Permission Read -Path $Path -ApplyTo Container -PassThru -WarningAction SilentlyContinue -WarningVariable 'warnings'
     Assert-NotNull $result
     Assert-Equal $Path $result.Path
     Assert-NotNull $warnings
@@ -229,38 +229,42 @@ function Test-ShouldWriteWarningWhenInheritanceFlagsGivenOnLeaf
 
 function Test-ShouldChangePermissions
 {
-    $rule = Grant-Permission -Identity $user -Permission FullControl -Path $containerPath -ApplyTo Container
+    $rule = Grant-Permission -Identity $user -Permission FullControl -Path $containerPath -ApplyTo Container -PassThru
     Assert-NotNull $rule
     Assert-True (Test-Permission -Identity $user -Permission FullControl -Path $containerPath -ApplyTo Container -Exact)
-    $rule = Grant-Permission -Identity $user -Permission Read -Path $containerPath -Apply Container
+    $rule = Grant-Permission -Identity $user -Permission Read -Path $containerPath -Apply Container -PassThru
     Assert-NotNull $rule
     Assert-True (Test-Permission -Identity $user -Permission Read -Path $containerPath -ApplyTo Container -Exact)
 }
 
 function Test-ShouldNotReapplyPermissionsAlreadyGranted
 {
-    $rule = Grant-Permission -Identity $user -Permission FullControl -Path $containerPath
+    $rule = Grant-Permission -Identity $user -Permission FullControl -Path $containerPath -PassThru
     Assert-NotNull $rule
     Assert-True (Test-Permission -Identity $user -Permission FullControl -Path $containerPath -Exact)
-    $rule = Grant-Permission -Identity $user -Permission FullControl -Path $containerPath
-    Assert-Null $rule
+    $rule = Grant-Permission -Identity $user -Permission FullControl -Path $containerPath -PassThru
+    Assert-NotNull $rule
     Assert-True (Test-Permission -Identity $user -Permission FullControl -Path $containerPath -Exact)
 }
 
 function Test-ShouldChangeInheritanceFlags
 {
-    Grant-Permission -Identity $user -Permission FullControl -Path $containerPath -ApplyTo ContainerAndLeaves
+    $result = Grant-Permission -Identity $user -Permission FullControl -Path $containerPath -ApplyTo ContainerAndLeaves
+    Assert-Null $result
     Assert-True (Test-Permission -Identity $user -Permission FullControl -Path $containerPath -ApplyTo ContainerAndLeaves -Exact)
-    Grant-Permission -Identity $user -Permission Read -Path $containerPath -Apply Container
+    $result = Grant-Permission -Identity $user -Permission Read -Path $containerPath -Apply Container
+    Assert-Null $result
     Assert-True (Test-Permission -Identity $user -Permission Read -Path $containerPath -ApplyTo Container -Exact)
 }
 
 function Test-ShouldReapplySamePermissions
 {
-    Grant-Permission -Identity $user -Permission FullControl -Path $containerPath -ApplyTo ContainerAndLeaves
+    $result = Grant-Permission -Identity $user -Permission FullControl -Path $containerPath -ApplyTo ContainerAndLeaves
+    Assert-Null $result
     Assert-True (Test-Permission -Identity $user -Permission FullControl -Path $containerPath -ApplyTo ContainerAndLeaves -Exact)
-    Grant-Permission -Identity $user -Permission FullControl -Path $containerPath -Apply ContainerAndLeaves -Force
+    $result = Grant-Permission -Identity $user -Permission FullControl -Path $containerPath -Apply ContainerAndLeaves -Force
     Assert-True (Test-Permission -Identity $user -Permission FullControl -Path $containerPath -ApplyTo ContainerAndLeaves -Exact)
+    Assert-Null $result
 }
 
 function Test-ShouldGrantPermissionOnHiddenItem
@@ -269,57 +273,52 @@ function Test-ShouldGrantPermissionOnHiddenItem
     $item.Attributes = $item.Attributes -bor [IO.FileAttributes]::Hidden
 
     $result = Grant-Permission -Identity $user -Permission Read -Path $Path
+    Assert-Null $result
     Assert-Permissions $user 'Read' $Path
     Assert-NoError
 }
 
 function Test-ShouldHandleNOnExistentPath
 {
-    $result = Grant-Permission -Identity $user -Permission Read -Path 'C:\I\Do\Not\Exist' -ErrorAction SilentlyContinue
+    $result = Grant-Permission -Identity $user -Permission Read -Path 'C:\I\Do\Not\Exist' -PassThru -ErrorAction SilentlyContinue
     Assert-Null $result
     Assert-Error -Last 'Cannot find path'
 }
 
 function Test-ShouldNotClearPermissionGettingSetOnFile
 {
-    $result = Grant-Permission -Identity $user -Permission Read -Path $Path
+    $result = Grant-Permission -Identity $user -Permission Read -Path $Path -PassThru
     Assert-NotNull $result
     Assert-Is $result 'Security.AccessControl.FileSystemAccessRule'
-    $result = Grant-Permission -Identity $user -Permission Read -Path $Path -Clear
-    Assert-Null $result
+    $result = Grant-Permission -Identity $user -Permission Read -Path $Path -Clear -PassThru
+    Assert-NotNull $result
 }
 
 function Test-ShouldNotClearPermissionGettingSetOnDirectory
 {
-    $result = Grant-Permission -Identity $user -Permission Read -Path $containerPath
+    $result = Grant-Permission -Identity $user -Permission Read -Path $containerPath -PassThru
     Assert-NotNull $result
     Assert-Is $result 'Security.AccessControl.FileSystemAccessRule'
-    $result = Grant-Permission -Identity $user -Permission Read -Path $containerPath -Clear
-    if( $result )
-    {
-        Assert-Null ($result | Where-Object { $_.IdentityReference.Value -eq $user })
-    }
-    else
-    {
-        Assert-Null $result
-    }
+    $result = Grant-Permission -Identity $user -Permission Read -Path $containerPath -Clear -Pass
+    Assert-NOtNull $result
+    Assert-Null ($result | Where-Object { $_.IdentityReference.Value -eq $user })
 }
 
 function Test-ShouldNotClearPermissionGettingSetOnRegKey
 {
-    $result = Grant-Permission -Identity $user -Permission QueryValues -Path $regContainerPath -Verbose 4>&1
+    $result = Grant-Permission -Identity $user -Permission QueryValues -Path $regContainerPath -PassThru -Verbose 4>&1
     Assert-NotNull $result
     Assert-Is $result 'Security.AccessControl.RegistryAccessRule'
-    $result = Grant-Permission -Identity $user -Permission QueryValues -Path $regContainerPath -Clear -Verbose 4>&1
-    Assert-Null $result
+    $result = Grant-Permission -Identity $user -Permission QueryValues -Path $regContainerPath -Clear -PassThru -Verbose 4>&1
+    Assert-NotNull $result
 }
 
 function Test-ShouldWriteVerboseMessageWhenClearingRuleOnFileSystem
 {
-    $result = Grant-Permission -Identity $user -Permission Read -Path $containerPath -Verbose 4>&1
+    $result = Grant-Permission -Identity $user -Permission Read -Path $containerPath -PassThru -Verbose 4>&1
     Assert-NotNull $result
     Assert-Is $result 'Security.AccessControl.FileSystemAccessRule'
-    [object[]]$result = Grant-Permission -Identity $user2 -Permission Read -Path $containerPath -Clear -Verbose 4>&1
+    [object[]]$result = Grant-Permission -Identity $user2 -Permission Read -Path $containerPath -Clear -PassThru -Verbose 4>&1
     Assert-NotNull $result
     Assert-True ($result.Count -ge 2)
     for( $idx = 0; $idx -lt $result.Count - 1; ++$idx )
@@ -333,10 +332,10 @@ function Test-ShouldWriteVerboseMessageWhenClearingRuleOnFileSystem
 
 function Test-ShouldWriteVerboseMessageWhenClearingRuleOnRegKey
 {
-    $result = Grant-Permission -Identity $user -Permission QueryValues -Path $regContainerPath -Verbose 4>&1
+    $result = Grant-Permission -Identity $user -Permission QueryValues -Path $regContainerPath -PassThru -Verbose 4>&1
     Assert-NotNull $result
     Assert-Is $result 'Security.AccessControl.RegistryAccessRule'
-    [object[]]$result = Grant-Permission -Identity $user2 -Permission QueryValues -Path $regContainerPath -Clear -Verbose 4>&1
+    [object[]]$result = Grant-Permission -Identity $user2 -Permission QueryValues -Path $regContainerPath -Clear -PassThru -Verbose 4>&1
     Assert-NotNull $result
     Assert-Equal 2 $result.Count
     Assert-Is $result[0] 'Management.Automation.VerboseRecord'
@@ -352,27 +351,27 @@ function Test-ShouldGrantPermissionOnPrivateKey
     {
         Assert-NotNull $cert
         $certPath = Join-Path -Path 'cert:\LocalMachine\My' -ChildPath $cert.Thumbprint
-        $result = Grant-Permission -Path $certPath -Identity $user -Permission 'GenericRead'
+        $result = Grant-Permission -Path $certPath -Identity $user -Permission 'GenericRead' -PassThru
         Assert-NoError
         Assert-Is $result ([Security.AccessControl.CryptoKeyAccessRule])
         Assert-Equal $certPath $result.Path
         Assert-Permissions $user 'GenericRead' $certPath
 
         # Now, check that permissions don't get re-applied.
-        $result = Grant-Permission -Path $certPath -Identity $user -Permission 'GenericRead'
+        $result = Grant-Permission -Path $certPath -Identity $user -Permission 'GenericRead' -PassThru
         Assert-NoError
-        Assert-Null $result
+        Assert-Is $result ([Security.AccessControl.CryptoKeyAccessRule])
         Assert-Permissions $user 'GenericRead' $certPath
 
         # Now, test that you can force the change
-        $result = Grant-Permission -Path $certPath -Identity $user -Permission 'GenericRead' -Force
+        $result = Grant-Permission -Path $certPath -Identity $user -Permission 'GenericRead' -Force -PassThru
         Assert-NoError
         Assert-Is $result ([Security.AccessControl.CryptoKeyAccessRule])
         Assert-Equal $certPath $result.Path
         Assert-Permissions $user 'GenericRead' $certPath
 
         # Now, check that permissions get updated.
-        $result = Grant-Permission -Path $certPath -Identity $user -Permission 'GenericWrite'
+        $result = Grant-Permission -Path $certPath -Identity $user -Permission 'GenericWrite' -PassThru
         Assert-NoError
         Assert-NotNull $result
         Assert-Is $result ([Security.AccessControl.CryptoKeyAccessRule])
@@ -392,12 +391,14 @@ function Test-ShouldSetPermissionsWhenSameAndClearingOtherPermissions
     {
         Assert-NotNull $cert
         $certPath = Join-Path -Path 'cert:\LocalMachine\My' -ChildPath $cert.Thumbprint
-        Grant-Permission -Path $certPath -Identity $user -Permission 'GenericRead'
+        $result = Grant-Permission -Path $certPath -Identity $user -Permission 'GenericRead'
+        Assert-Null $result
         Assert-Permissions $user 'GenericRead' $certPath
         $me = '{0}\{1}' -f $env:USERDOMAIN,$env:USERNAME
-        Grant-Permission -Path $certPath -Identity $me -Permission 'GenericRead'
+        $result = Grant-Permission -Path $certPath -Identity $me -Permission 'GenericRead'
+        Assert-Null $result
         Assert-Permissions $me 'GenericRead' $certPath
-        $result = Grant-Permission -Path $certPath -Identity $user -Permission 'GenericRead' -Clear -Verbose
+        $result = Grant-Permission -Path $certPath -Identity $user -Permission 'GenericRead' -Clear -PassThru -Verbose
         Assert-NoError
         Assert-Is $result ([Security.AccessControl.CryptoKeyAccessRule])
         Assert-Equal $certPath $result.Path
@@ -417,14 +418,17 @@ function Test-ShouldClearPermissionsOnPrivateKey
     {
         Assert-NotNull $cert
         $certPath = Join-Path -Path 'cert:\LocalMachine\My' -ChildPath $cert.Thumbprint
-        Grant-Permission -Path $certPath -Identity $user -Permission 'GenericRead'
+        $result = Grant-Permission -Path $certPath -Identity $user -Permission 'GenericRead'
+        Assert-Null $result
         Assert-NotNull (Get-Permission -Path $certPath -Identity $user)
 
         $me = '{0}\{1}' -f $env:USERDOMAIN,$env:USERNAME
-        Grant-Permission -Path $certPath -Identity $me -Permission 'FullControl'
+        $result = Grant-Permission -Path $certPath -Identity $me -Permission 'FullControl'
+        Assert-Null $result
         Assert-NotNull (Get-Permission -Path $certPath -Identity $me)
 
-        Grant-Permission -Path $certPath -Identity $me -Permission 'FullControl' -Clear -Verbose
+        $result = Grant-Permission -Path $certPath -Identity $me -Permission 'FullControl' -Clear -Verbose
+        Assert-Null $result
         Assert-Null (Get-Permission -Path $certPath -Identity $user)
         Assert-NotNull (Get-Permission -Path $certPath -Identity $me)
         Assert-NoError
@@ -442,7 +446,8 @@ function Test-ShouldSetPermissionsOnUserPrivateKey
     try
     {
         $certPath = Join-Path -Path 'cert:\CurrentUser\My' -ChildPath $cert.Thumbprint
-        Grant-Permission -Path $certPath -Identity $user -Permission 'GenericRead'
+        $result = Grant-Permission -Path $certPath -Identity $user -Permission 'GenericRead'
+        Assert-Null $result
         Assert-NoError
         Assert-Permissions $user 'GenericRead' $certPath
     }
@@ -458,7 +463,8 @@ function Test-ShouldSupportWhatIfOnPrivateKey
     try
     {
         $certPath = Join-Path -Path 'cert:\LocalMachine\My' -ChildPath $cert.Thumbprint
-        Grant-Permission -Path $certPath -Identity $user -Permission 'FullControl' -WhatIf
+        $result = Grant-Permission -Path $certPath -Identity $user -Permission 'FullControl' -WhatIf
+        Assert-Null $result
         Assert-NoError
         Assert-Null (Get-Permission -Path $certPath -Identity $user)
     }
