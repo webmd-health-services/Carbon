@@ -59,7 +59,7 @@ function Install-Junction
         $Target,
 
         [Switch]
-        # Return a `DirectoryInfo` object for the installed junction. Returns nothing if `WhatIf` switch is used.
+        # Return a `DirectoryInfo` object for the installed junction. Returns nothing if `WhatIf` switch is used. This switch is new in Carbon 2.0.
         $PassThru,
 
         [Switch]
