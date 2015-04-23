@@ -142,7 +142,11 @@ function Grant-ComPermission
         [Parameter(ParameterSetName='MachineLaunchRestrictionDeny')]
         [Switch]
         # If set, grants remote activation permissions.  Only valid if `LaunchAndActivation` switch is set.
-        $RemoteActivation
+        $RemoteActivation,
+
+        [Switch]
+        # Return a `Carbon.Security.ComAccessRights` object for the permissions granted.
+        $PassThru
     )
     
     Set-StrictMode -Version 'Latest'
@@ -222,7 +226,11 @@ function Grant-ComPermission
 
     $regValueName = $pscmdlet.ParameterSetName -replace '(Allow|Deny)$',''
     Set-RegistryKeyValue -Path $ComRegKeyPath -Name $regValueName -Binary $sdBytes.BinarySD -Quiet -Verbose:$VerbosePreference -ErrorAction:$ErrorActionPreference
-    Get-ComPermission -Identity $Identity @comArgs  -Verbose:$VerbosePreference -ErrorAction:$ErrorActionPreference
+    
+    if( $PassThru )
+    {
+        Get-ComPermission -Identity $Identity @comArgs  -Verbose:$VerbosePreference -ErrorAction:$ErrorActionPreference
+    }
 }
 
 Set-Alias -Name 'Grant-ComPermissions' -Value 'Grant-ComPermission'

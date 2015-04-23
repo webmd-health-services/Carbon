@@ -65,7 +65,7 @@ function Test-ShouldSetAccessPermissions
         ForEach-Object {
             $grantArgs = $_
 
-            $accessRule = Grant-ComPermission -Access -Identity $groupName @grantArgs
+            $accessRule = Grant-ComPermission -Access -Identity $groupName @grantArgs -PassThru
             Assert-NotNull $accessRule ($grantArgs | Out-String)
             
             $expectedRights = [Carbon.Security.ComAccessRights]::Execute
@@ -111,7 +111,7 @@ function Test-ShouldSetLaunchAndActivationPermissions
                         $grantArgs.$type = $true
                         $grantArgs.$aceType = $true
 
-                        $accessRule = Grant-ComPermission -Identity $groupName -LaunchAndActivation @grantArgs
+                        $accessRule = Grant-ComPermission -Identity $groupName -LaunchAndActivation @grantArgs -PassThru
                         Assert-NotNull $accessRule
                         
                         $expectedRights = [Carbon.Security.ComAccessRights]::Execute
@@ -136,4 +136,14 @@ function Test-ShouldSetLaunchAndActivationPermissions
                     }
                 } 
         }
+}
+
+function Test-ShouldNotReturnAccessRule
+{
+    $result = Grant-ComPermission -Identity $groupName -Access -Default -Allow -Local
+    Assert-Null $result
+    $perm = Get-ComPermission -Access -Identity $groupName -Default
+    Assert-NotNull $perm
+    $expectedRights = [Carbon.Security.ComAccessrights]::ExecuteLocal -bor [Carbon.Security.ComAccessRights]::Execute
+    Assert-Equal $expectedRights $perm.ComAccessRights
 }

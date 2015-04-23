@@ -45,6 +45,7 @@ function Get-ComPermission
     Gets the security limits for COM Launch and Activation permissions for the local administrators group.
     #>
     [CmdletBinding()]
+    [OutputType([Carbon.Security.ComAccessRights])]
     param(
         [Parameter(Mandatory=$true,ParameterSetName='DefaultAccessPermission')]
         [Parameter(Mandatory=$true,ParameterSetName='MachineAccessRestriction')]
