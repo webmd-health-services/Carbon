@@ -72,8 +72,12 @@ function Install-User
         $UserCannotChangePassword,
 
         [Switch]
-        # Set to true if the user's password should expire. New in Carbon 2.0.
-        $PasswordNeverExpires
+        # Set to true if the user's password should never expire. New in Carbon 2.0.
+        $PasswordNeverExpires,
+
+        [Switch]
+        # Return the user. New in Carbon 2.0.
+        $PassThru
     )
 
     Set-StrictMode -Version 'Latest'
@@ -98,6 +102,10 @@ function Install-User
     {
         $user.Save()
     }
-    return $user
+
+    if( $PassThru )
+    {
+        return $user
+    }
 
 }

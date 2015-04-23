@@ -39,7 +39,7 @@ function Test-ShouldCreateNewUser
 {
     $fullName = 'Carbon Install User'
     $description = "Test user for testing the Carbon Install-User function."
-    $user = Install-User -Username $username -Password $password -Description $description -FullName $fullName
+    $user = Install-User -Username $username -Password $password -Description $description -FullName $fullName -PassThru
     Assert-NotNull $user
     Assert-Is $user ([DirectoryServices.AccountManagement.UserPrincipal])
     Assert-True (Test-User -Username $username)
@@ -57,19 +57,22 @@ function Test-ShouldCreateNewUser
 function Test-ShouldUpdateExistingUsersProperties
 {
     $fullName = 'Carbon Install User'
-    Install-User -Username $username -Password $password -Description "Original description" -FullName $fullName
+    $result = Install-User -Username $username -Password $password -Description "Original description" -FullName $fullName
+    Assert-Null $result
     $originalUser = Get-User -Username $username
     Assert-NotNull $originalUser
     
     $newFullName = 'New {0}' -f $fullName
     $newDescription = "New description"
     $newPassword = [Guid]::NewGuid().ToString().Substring(0,14)
-    Install-User -Username $username `
-                 -Password $newPassword `
-                 -Description $newDescription `
-                 -FullName $newFullName `
-                 -UserCannotChangePassword `
-                 -PasswordNeverExpires 
+    $result = Install-User -Username $username `
+                           -Password $newPassword `
+                           -Description $newDescription `
+                           -FullName $newFullName `
+                           -UserCannotChangePassword `
+                           -PasswordNeverExpires 
+    
+    Assert-Null $result
 
     [DirectoryServices.AccountManagement.UserPrincipal]$newUser = Get-User -Username $username
     Assert-NotNull $newUser
@@ -85,14 +88,15 @@ function Test-ShouldAllowOptionalFullName
 {
     $fullName = 'Carbon Install User'
     $description = "Test user for testing the Carbon Install-User function."
-    Install-User -Username $username -Password $password -Description $description
+    $result = Install-User -Username $username -Password $password -Description $description
+    Assert-Null $result
     $user = Get-User -Username $Username
     Assert-Null $user.DisplayName
 }
 
 function Test-ShouldSupportWhatIf
 {
-    $user = Install-User -Username $username -Password $password -WhatIf
+    $user = Install-User -Username $username -Password $password -WhatIf -PassThru
     Assert-NotNull $user
     $user = Get-User -Username $username -ErrorAction SilentlyContinue
     Assert-Null $user
