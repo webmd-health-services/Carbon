@@ -81,7 +81,7 @@ $PSScriptRoot = Split-Path -Parent $MyInvocation.MyCommand.Definition
 
 <p>To get a list of all commands imported by Carbon:</p>
 
-<pre><code>&gt; Get-Command | Where-Object { $_.ModuleName -eq 'Carbon' }
+<pre><code>&gt; Get-Command -Module 'Carbon'
 </code></pre>
 
 	<div class="Footer">
