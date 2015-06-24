@@ -14,6 +14,8 @@
 
 using System;
 using System.Globalization;
+using System.Security.Principal;
+using System.Text.RegularExpressions;
 using Microsoft.Win32;
 
 namespace Carbon.Computer
@@ -45,12 +47,47 @@ namespace Carbon.Computer
 			Language = GetValueAsInt("Language");
 			ModifyPath = GetValueAsString("ModifyPath");
 			Path = GetValueAsString("Path");
+
+			ProductCode = Guid.Empty;
+			Guid productCode;
+			var keyName = System.IO.Path.GetFileName(key.Name);
+			if (Guid.TryParse(keyName, out productCode))
+			{
+				ProductCode = productCode;
+			}
+
 			Publisher = GetValueAsString("Publisher");
 			Readme = GetValueAsString("Readme");
 			Size = GetValueAsString("Size");
 			UninstallString = GetValueAsString("UninstallString");
 			UrlInfoAbout = GetValueAsString("URLInfoAbout");
 			UrlUpdateInfo = GetValueAsString("URLUpdateInfo");
+
+			User = String.Empty;
+			if (key.Name.StartsWith("HKEY_USERS", StringComparison.InvariantCultureIgnoreCase))
+			{
+				var match = Regex.Match(key.Name, @"^HKEY_USERS\\([^\\]+)\\");
+				if (match.Success)
+				{
+					User = match.Groups[1].Value;
+					try
+					{
+						var sid = new SecurityIdentifier(User);
+						if (sid.IsValidTargetType(typeof(NTAccount)))
+						{
+							var ntAccount = sid.Translate(typeof(NTAccount)) as NTAccount;
+							if (ntAccount != null)
+							{
+								User = ntAccount.Value;
+							}
+						}
+					}
+					// ReSharper disable once EmptyGeneralCatchClause
+					catch (Exception)
+					{
+					}
+				}
+			}
 
 			var intVersion = GetValueAsInt("Version");
 			if (intVersion != 0)
@@ -109,6 +146,8 @@ namespace Carbon.Computer
 
 		public int EstimatedSize { get; private set; }
 
+		public Guid ProductCode { get; private set; }
+
 		public string HelpLink { get; private set; }
 
 		public string HelpTelephone { get; private set; }
@@ -138,6 +177,8 @@ namespace Carbon.Computer
 		public string UrlInfoAbout { get; private set; }
 	
 		public string UrlUpdateInfo { get; private set; }
+
+		public string User { get; private set; }
 
 		public Version Version { get; private set; }
 

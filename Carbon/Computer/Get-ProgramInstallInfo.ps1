@@ -19,7 +19,14 @@ function Get-ProgramInstallInfo
     Gets information about the programs installed on the computer.
     
     .DESCRIPTION
-    This function is the PowerShell equivalent of the Programs and Features UI.
+    The `Get-ProgramInstallInfo` function is the PowerShell equivalent of the Programs and Features UI in the Control Panel. It inspects the registry to determine what programs are installed. It will return programs installed for *all* users, not just the current user. 
+    
+    `Get-ProgramInstallInfo` tries its best to get accurate data. The following properties either isn't stored consistently, is in strange formats, can't be parsed, etc.
+
+     * The `ProductCode` property is set to `[Guid]::Empty` if the software doesn't have a product code.
+     * The `User` property will only be set for software installed for specific users. For global software, the `User` property will be `[String]::Empty`.
+     * The `InstallDate` property is set to `[DateTime]::MinValue` if the install date can't be determined.
+     * The `Version` property is `$null` if the version can't be parsed
 
     .OUTPUTS
     Carbon.Computer.ProgramInstallInfo.
