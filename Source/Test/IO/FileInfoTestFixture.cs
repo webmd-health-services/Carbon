@@ -1,0 +1,108 @@
+﻿using System;
+using System.IO;
+using Carbon.IO;
+using NUnit.Framework;
+using CFileInfo = Carbon.IO.FileInfo;
+using CFile = Carbon.IO.File;
+using IOPath = System.IO.Path;
+using IOFile = System.IO.File;
+
+namespace Carbon.Test.IO
+{
+	[TestFixture]
+	public sealed class FileInfoTestFixture
+	{
+		[Test]
+		[ExpectedException(typeof(DirectoryNotFoundException))]
+		public void ShouldIgnoreFileInDirectoryThatDoesNotExist()
+		{
+			var fileInfo = new CFileInfo("C:\\I\\do\\not\\exist.txt");
+			Assert.That(fileInfo.FileIndex, Is.EqualTo(0));
+			Assert.That(fileInfo.LinkCount, Is.EqualTo(0));
+			Assert.That(fileInfo.VolumeSerialNumber, Is.EqualTo(0));
+		}
+
+		[Test]
+		[ExpectedException(typeof(FileNotFoundException))]
+		public void ShouldIgnoreFileThatDoesNotExist()
+		{
+			var path = IOPath.GetTempPath();
+			path = IOPath.Combine(path, IOPath.GetRandomFileName());
+			var fileInfo = new CFileInfo(path);
+			Assert.That(fileInfo.FileIndex, Is.EqualTo(0));
+			Assert.That(fileInfo.LinkCount, Is.EqualTo(0));
+			Assert.That(fileInfo.VolumeSerialNumber, Is.EqualTo(0));
+		}
+
+		[Test]
+		public void ShouldGetFileInfo()
+		{
+			var path = IOPath.GetTempPath();
+			path = IOPath.Combine(path, IOPath.GetRandomFileName());
+			var file = IOFile.Create(path);
+			file.Close();
+			try
+			{
+				var fileInfo = new CFileInfo(path);
+				BY_HANDLE_FILE_INFORMATION kernelFileInfo;
+				using (file = IOFile.Open(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+				{
+					try
+					{
+						CFileInfo.GetFileInformationByHandle(file.SafeFileHandle, out kernelFileInfo);
+					}
+					finally
+					{
+						file.Close();
+					}
+				}
+
+				Assert.That(fileInfo.LinkCount, Is.EqualTo(kernelFileInfo.NumberOfLinks), "LinkCount");
+				Assert.That(fileInfo.VolumeSerialNumber, Is.EqualTo(kernelFileInfo.VolumeSerialNumber), "VolumeSerialNumber");
+
+				UInt64 fileIndex = kernelFileInfo.FileIndexHigh;
+				fileIndex = fileIndex << 32;
+				fileIndex |= kernelFileInfo.FileIndexLow;
+
+				Assert.That(fileInfo.FileIndex, Is.EqualTo(fileIndex), "FileIndex");
+
+				fileIndex = fileInfo.FileIndex;
+				var upperIndex = (uint)((fileIndex >> 32) & 0xffffffff);
+				Assert.That(kernelFileInfo.FileIndexHigh, Is.EqualTo(upperIndex));
+
+				var lowerIndex = (uint) (fileIndex & 0xffffffff);
+				Assert.That(kernelFileInfo.FileIndexLow, Is.EqualTo(lowerIndex));
+			}
+			finally
+			{
+				IOFile.Delete(path);
+			}
+		}
+
+		[Test]
+		public void ShouldGetFileInfoWithMultipleHardLinks()
+		{
+			var path = IOPath.GetTempPath();
+			path = IOPath.Combine(path, IOPath.GetRandomFileName());
+
+			var file = IOFile.Create(path);
+			file.Close();
+
+			var linkPath = IOPath.GetTempPath();
+			linkPath = IOPath.Combine(linkPath, IOPath.GetRandomFileName());
+
+			CFile.CreateHardLink(linkPath, path);
+
+			try
+			{
+				var fileInfo = new CFileInfo(path);
+				Assert.That(fileInfo.LinkCount, Is.EqualTo(2), "LinkCount");
+			}
+			finally
+			{
+				IOFile.Delete(path);
+				IOFile.Delete(linkPath);
+			}
+		}
+	}
+}
