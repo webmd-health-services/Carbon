@@ -667,5 +667,45 @@
                 </TableRowEntries>
             </TableControl>
         </View>
+        <View>
+            <Name>Carbon.Msi.MsiInfo</Name>
+            <ViewSelectedBy>
+                <TypeName>Carbon.Msi.MsiInfo</TypeName>
+            </ViewSelectedBy>
+            <TableControl>
+                <TableHeaders>
+                    <TableColumnHeader>
+                        <Label>ProductName</Label>
+                    </TableColumnHeader>
+                    <TableColumnHeader>
+                        <Label>ProductVersion</Label>
+                    </TableColumnHeader>
+                    <TableColumnHeader>
+                        <Label>Manufacturer</Label>
+                    </TableColumnHeader>
+                    <TableColumnHeader>
+                        <Label>ProductCode</Label>
+                    </TableColumnHeader>
+                </TableHeaders>
+                <TableRowEntries>
+                    <TableRowEntry>
+                        <TableColumnItems>
+                            <TableColumnItem>
+                                <PropertyName>ProductName</PropertyName>
+                            </TableColumnItem>
+                            <TableColumnItem>
+                                <PropertyName>ProductVersion</PropertyName>
+                            </TableColumnItem>
+                            <TableColumnItem>
+                                <PropertyName>Manufacturer</PropertyName>
+                            </TableColumnItem>
+                            <TableColumnItem>
+                                <PropertyName>ProductCode</PropertyName>
+                            </TableColumnItem>
+                        </TableColumnItems>
+                    </TableRowEntry>
+                </TableRowEntries>
+            </TableControl>
+        </View>
     </ViewDefinitions>
 </Configuration>

@@ -1,6 +1,8 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 13.00
+Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
+VisualStudioVersion = 12.0.31101.0
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Carbon", "Carbon.csproj", "{FAC30031-F36B-4A7F-B887-114D0B3DFD7D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Carbon.Test", "Test\Carbon.Test.csproj", "{C661482E-C379-4973-B8A4-35F6F04218A7}"
@@ -10,6 +12,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Carbon.Xdt", "Xdt\Carbon.Xdt.csproj", "{D1D7AE6D-E489-43F2-9716-D0FB0774851A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Carbon.Test.Xdt", "Test\Xdt\Carbon.Test.Xdt.csproj", "{6F3E420E-796A-4E21-93B2-0EE47940DC33}"
+EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "CarbonNoOpMsi", "CarbonNoOpMsi\CarbonNoOpMsi.vdproj", "{AFF68EB7-57D4-4D47-971C-F0BCA2149B04}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -37,8 +41,16 @@ Global
 		{6F3E420E-796A-4E21-93B2-0EE47940DC33}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6F3E420E-796A-4E21-93B2-0EE47940DC33}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6F3E420E-796A-4E21-93B2-0EE47940DC33}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AFF68EB7-57D4-4D47-971C-F0BCA2149B04}.Debug|Any CPU.ActiveCfg = Debug
+		{AFF68EB7-57D4-4D47-971C-F0BCA2149B04}.Debug|Any CPU.Build.0 = Debug
+		{AFF68EB7-57D4-4D47-971C-F0BCA2149B04}.Release|Any CPU.ActiveCfg = Release
+		{AFF68EB7-57D4-4D47-971C-F0BCA2149B04}.Release|Any CPU.Build.0 = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 EndGlobal

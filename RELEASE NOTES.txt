@@ -45,6 +45,7 @@ This is a ***backwards-incompatible*** release.
  * Removed `Carbon_Script` resource. It only existed so I could pass values to my script blocks. Turns out, the built-in `Script` resource supports this with the `$using:` scope. Remember, your most important features is documentation!
  * Created a new [Carbon_ScheduledTask](http://get-carbon.org/help/Carbon_ScheduledTask.html) DSC resource for managing scheduled tasks.
  * The `Version` property on the objects returned by [Get-ProgramInstallInfo](http://get-carbon.org/help/Get-ProgramInstallInfo.html) is now a proper .NET `Version` object instead of an integer.
+ * Created `Get-Msi` function for reading MSI information and properties from an MSI file.
  
 ### Bug Fixes
 
@@ -139,6 +140,11 @@ This is a ***backwards-incompatible*** release.
  * Added `PassThru` switch to [Install-IisApplication](http://get-carbon.org/help/Install-IisApplication.html) to return a `Microsoft.Web.Administration.Application` object.
  * [Install-IisApplication](http://get-carbon.org/help/Install-IisApplication.html) now resets an application's app pool to `DefaultAppPool` if no app pool name is provided with the `AppPoolName` parameter.
  * [Install-IisAppPool](http://get-carbon.org/help/Install-IisAppPool.html) no longer returns appcmd.exe output.
+ 
+### MSI
+
+ * Created `Get-Msi` function for reading MSI information and properties from an MSI file.
+
 
 ### PowerShell
 

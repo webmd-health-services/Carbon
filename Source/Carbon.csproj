@@ -78,6 +78,7 @@
     <Compile Include="IO\File.cs" />
     <Compile Include="IO\FileInfo.cs" />
     <Compile Include="IO\JunctionPoint.cs" />
+    <Compile Include="Msi\MsiInfo.cs" />
     <Compile Include="Properties\AssemblyVersion.cs" />
     <Compile Include="Security\ComAccessRights.cs" />
     <Compile Include="Security\ComAccessRule.cs" />
