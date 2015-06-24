@@ -59,7 +59,16 @@ function Get-Msi
 
             $msi = New-Object -ComObject 'WindowsInstaller.Installer'
             Write-Verbose ('Opening MSI {0}' -f $item)
-            $database = $msi.OpenDatabase( [string]$item, 0 )
+
+            $database = $null
+            try
+            {
+                $database = $msi.OpenDatabase( [string]$item, 0 )
+            }
+            catch
+            {
+                Write-Error -Exception $_.Exception
+            }
 
             if( -not $database )
             {

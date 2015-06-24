@@ -12,23 +12,59 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Start-TestFixture
+& (Join-Path -Path $PSScriptRoot -ChildPath '..\Import-CarbonForTest.ps1' -Resolve)
+$carbonNoOpMsiPath = Join-Path -Path $PSScriptRoot -ChildPath 'CarbonNoOpMsi.msi' -Resolve
+
+function Start-Test
 {
-    & (Join-Path -Path $PSScriptRoot -ChildPath '..\Import-CarbonForTest.ps1' -Resolve)
+    Uninstall-CarbonNoOpMsi
+}
+
+function Stop-Test
+{
+    Uninstall-CarbonNoOpMsi
 }
 
 function Test-ShouldValidateFileIsAnMSI
 {
-    $error.Clear()
-    Invoke-WindowsInstaller -Path (Join-Path $TestDir Test-InvokeWindowsInstaller.ps1 -Resolve) -Quiet -ErrorAction SilentlyContinue
-    Assert-Equal 1 $error.Count
+    Invoke-WindowsInstaller -Path $PSCommandPath -Quiet -ErrorAction SilentlyContinue
+    Assert-Error -Count 2
 }
 
 function Test-ShouldSupportWhatIf
 {
-    $fakeInstallerPath = Join-Path $TestDir FakeInstaller.msi -Resolve
-    $error.Clear()
+    Assert-CarbonNoOpNotInstalled
+    $fakeInstallerPath = Join-Path $TestDir CarbonNoOpMsi.msi -Resolve
     Invoke-WindowsInstaller -Path $fakeInstallerPath -Quiet -WhatIf
-    Assert-Equal 0 $error.Count
-    Assert-Equal 0 $LastExitCode
+    Assert-NoError
+    Assert-LastProcessSucceeded
+    Assert-CarbonNoOpNotInstalled
+}
+
+function Test-ShouldInstallMsi
+{
+    Assert-CarbonNoOpNotInstalled
+    Install-Msi -Path $carbonNoOpMsiPath
+    $item = Get-ProgramInstallInfo -Name '*Carbon*'
+    Assert-NotNull $item
+}
+
+function Test-ShouldHandleFailedInstaller
+{
+    Install-Msi -Path (Join-Path -Path $PSScriptRoot -ChildPath 'CarbonNoOpFailingMsi.msi' -Resolve)
+    Assert-CarbonNoOpNotInstalled
+}
+
+function Assert-CarbonNoOpNotInstalled
+{
+    $item = Get-ProgramInstallInfo -Name '*Carbon*'
+    Assert-Null $item
+}
+
+function Uninstall-CarbonNoOpMsi
+{
+    if( (Get-ProgramInstallInfo -Name 'Carbon NoOp') )
+    {
+        msiexec /uninstall $carbonNoOpMsiPath /quiet 
+    }
 }

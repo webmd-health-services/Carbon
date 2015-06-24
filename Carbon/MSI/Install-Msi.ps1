@@ -47,31 +47,19 @@ function Install-Msi
 
     Set-StrictMode -Version 'Latest'
     
-    if( -not (Test-Path $Path -PathType Leaf) )
+    $msi = Get-Msi -Path $Path
+    if( -not $msi )
     {
-        Write-Error "Installer '$Path' not found."
         return
     }
-    
-    if( $Path -notlike '*.msi' )
-    {
-        Write-Error "Installer '$Path' not an MSI package: filename must end in .msi."
-        return
-    }
-    
+
     if( $PSCmdlet.ShouldProcess( $Path, "install" ) )
     {
-        msiexec.exe /i $Path /quiet
-        $msiProcess = Get-Process -Name msiexec -ErrorAction SilentlyContinue | 
-                        Where-Object { $_.ParentProcessId -eq [Diagnostics.Process]::GetCurrentProcess().ID }
+        $msiProcess = Start-Process -FilePath "msiexec.exe" -ArgumentList "/i",$Path,"/quiet" -NoNewWindow -Wait -PassThru
 
-        if( $msiProcess )
+        if( $msiProcess.ExitCode -ne $null -and $msiProcess.ExitCode -ne 0 )
         {
-            $msiProcess.WaitForExit()
-            if( $msiProcess.ExitCode -ne $null -and $msiProcess.ExitCode -ne 0 )
-            {
-                Write-Error ("Installation of '{0}' failed (msiexec returned '{1}')." -f $Path,$msiProcess.ExitCode)
-            }
+            Write-Error ("{0} {1} installtion failed. (Exit code: {2}; MSI: {3})" -f $msi.ProductName,$msi.ProductVersion,$msiProcess.ExitCode,$msi.Path)
         }
     }
 }
