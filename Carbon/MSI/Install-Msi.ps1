@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Invoke-WindowsInstaller
+function Install-Msi
 {
     <#
     .SYNOPSIS
@@ -29,13 +29,9 @@ function Invoke-WindowsInstaller
     You can optionally run the installer in quiet mode.  This hides any installer UI and installs the package with the default options.
     
     .EXAMPLE
-    Invoke-WindowsInstaller -Path Path\to\installer.msi
+    Install-Msi -Path Path\to\installer.msi
     
     Runs installer.msi, and waits untils for the installer to finish.  If the installer has a UI, it is shown to the user.
-    
-    .EXAMPLE
-    Invoke-WindowsInstaller -Path Path\to\installer.msi -Quiet
-    Runs installer.msi without showing its UI (i.e. performs a silent install using the package's default options).
     #>
     [CmdletBinding(SupportsShouldProcess=$true)]
     param(
@@ -45,7 +41,7 @@ function Invoke-WindowsInstaller
         $Path,
         
         [Switch]
-        # Runs the installer in quiet mode.
+        # This switch is ignored. Installers are run in quiet mode by default.
         $Quiet
     )
 
@@ -79,3 +75,5 @@ function Invoke-WindowsInstaller
         }
     }
 }
+
+Set-Alias -Name 'Invoke-WindowsInstaller' -Value 'Install-Msi'
