@@ -4,10 +4,10 @@ using System.ComponentModel;
 using System.Configuration.Install;
 using System.Diagnostics;
 
-namespace ThrowInstallException
+namespace Carbon.Test.Installer
 {
 	[RunInstaller(true)]
-	public partial class Installer1 : Installer
+	public partial class Installer1 : System.Configuration.Install.Installer
 	{
 		public Installer1()
 		{

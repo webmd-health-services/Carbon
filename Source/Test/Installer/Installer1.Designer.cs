@@ -1,4 +1,4 @@
-﻿namespace ThrowInstallException
+﻿namespace Carbon.Test.Installer
 {
 	partial class Installer1
 	{

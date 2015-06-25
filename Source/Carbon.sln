@@ -13,9 +13,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Carbon.Xdt", "Xdt\Carbon.Xd
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Carbon.Test.Xdt", "Test\Xdt\Carbon.Test.Xdt.csproj", "{6F3E420E-796A-4E21-93B2-0EE47940DC33}"
 EndProject
-Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "CarbonTestInstaller", "CarbonTestInstaller\CarbonNoOpMsi.vdproj", "{AFF68EB7-57D4-4D47-971C-F0BCA2149B04}"
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "CarbonTestInstaller", "CarbonTestInstaller\CarbonTestInstaller.vdproj", "{AFF68EB7-57D4-4D47-971C-F0BCA2149B04}"
 EndProject
-Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "CarbonTestInstallerWithCustomActions", "CarbonTestInstallerWithCustomActions\CarbonNoOpFailingMsi.vdproj", "{F75D4E03-F601-48F9-9858-4CFAD6A4AED4}"
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "CarbonTestInstallerWithCustomActions", "CarbonTestInstallerWithCustomActions\CarbonTestInstallerWithCustomActions.vdproj", "{F75D4E03-F601-48F9-9858-4CFAD6A4AED4}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Carbon.Test.Installer", "Test\Installer\Carbon.Test.Installer.csproj", "{D3F2D40C-A985-46D4-A317-03D7CF6B10E0}"
 EndProject
