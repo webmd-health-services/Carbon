@@ -36,7 +36,7 @@ function Get-Msi
     [CmdletBinding()]
     [OutputType('Carbon.Msi.MsiInfo')]
     param (
-        [Parameter(Mandatory=$True, ValueFromPipeline=$True, ValueFromPipelineByPropertyName=$True, HelpMessage='What is the path of the MSI you would like to query?')]
+        [Parameter(Mandatory=$True,ValueFromPipeline=$True,ValueFromPipelineByPropertyName=$True)]
         [Alias('FullName')]
         [string[]]
         # Path to the MSI file whose information to retrieve. Wildcards supported.
