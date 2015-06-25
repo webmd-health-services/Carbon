@@ -35,6 +35,26 @@ function Test-ShouldGetInstalledPrograms
 
             $keyValue = $key.GetValue( $propertyName )
             $propertyValue = $program.$propertyName
+
+            if( $propertyName -eq 'ProductCode' )
+            {
+                $propertyValue = Split-Path -Leaf -Path $key.Name
+                [Guid]$guid = [Guid]::Empty
+                [Guid]::TryParse( $propertyValue, [ref]$guid )
+                $propertyValue = $guid
+                $keyValue = $guid
+            }
+            elseif( $propertyName -eq 'User' )
+            {
+                if( $key.Name -match 'HKEY_USERS\\([^\\]+)\\' )
+                {
+                    $sddl = $Matches[1]
+                    $sid = New-Object 'Security.Principal.SecurityIdentifier' $sddl
+                    $propertyValue = $sid.Translate([Security.Principal.NTAccount]).Value
+                    $keyValue = $propertyValue
+                }
+            }
+
             $typeName = $program.GetType().GetProperty($propertyName).PropertyType.Name
             if( $keyValue -eq $null )
             {
@@ -53,6 +73,10 @@ function Test-ShouldGetInstalledPrograms
                 elseif( $typeName -eq 'Boolean' )
                 {
                     $keyValue = $false
+                }
+                elseif( $typeName -eq 'Guid' )
+                {
+                    $keyValue = [Guid]::Empty
                 }
                 else
                 {
