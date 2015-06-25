@@ -48,7 +48,11 @@ function Install-Msi
         
         [Switch]
         # This switch is ignored. Installers are run in quiet mode by default.
-        $Quiet
+        $Quiet,
+
+        [Switch]
+        # Install the MSI even if it has already been installed. Will cause a repair/reinstall to run.
+        $Force
     )
 
     Set-StrictMode -Version 'Latest'
