@@ -9,7 +9,8 @@ function Test-ShouldGetMsi
 function Test-ShouldAcceptPipelineInput
 {
     $msi = Get-ChildItem -Path $PSScriptRoot -Filter *.msi | Get-Msi
-    Assert-CarbonMsi $msi
+    Assert-NotNull $msi
+    $msi | ForEach-Object {  Assert-CarbonMsi $_ }
 }
 
 function Test-ShouldAcceptArrayOfStrings
@@ -38,6 +39,16 @@ function Test-ShouldAcceptArrayOfFileInfo
     }
 }
 
+function Test-ShouldSupportWildcards
+{
+    $msi = Get-Msi -Path (Join-Path -Path $PSScriptRoot -ChildPath '*.msi')
+    Assert-Is $msi ([object[]])
+    foreach( $item in $msi )
+    {
+        Assert-CarbonMsi $item
+    }
+}
+
 function Assert-CarbonMsi
 {
     param(
@@ -47,10 +58,11 @@ function Assert-CarbonMsi
     Assert-NotNull $msi
     Assert-Is $msi ([Carbon.Msi.MsiInfo])
     Assert-Equal 'Carbon' $msi.Manufacturer
-    Assert-Equal 'Carbon NoOp' $msi.ProductName
-    Assert-Equal ([Guid]'{E1724ABC-A8D6-4D88-BBED-2E077C9AE6D2}') $msi.ProductCode
+    Assert-Like $msi.ProductName 'Carbon *' 
+    Assert-NotNull $msi.ProductCode
+    Assert-NotEqual $msi.ProductCode ([Guid]::Empty)
     Assert-Equal 1033 $msi.ProductLanguage
     Assert-Equal '1.0.0' $msi.ProductVersion
     Assert-NotNull $msi.Properties
-    Assert-Equal 32 $msi.Properties.Count
+    Assert-GreaterThan $msi.Properties.Count 5
 }
