@@ -3,7 +3,7 @@
 "VSVersion" = "3:800"
 "ProjectType" = "8:{978C614F-708E-4E1A-B201-565925725DBA}"
 "IsWebType" = "8:FALSE"
-"ProjectName" = "8:CarbonNoOpMsi"
+"ProjectName" = "8:CarbonTestInstaller"
 "LanguageId" = "3:1033"
 "CodePage" = "3:1252"
 "UILanguageId" = "3:1033"
@@ -21,7 +21,7 @@
         "DisplayName" = "8:Debug"
         "IsDebugOnly" = "11:TRUE"
         "IsReleaseOnly" = "11:FALSE"
-        "OutputFilename" = "8:..\\..\\Test\\MSI\\CarbonNoOpMsi.msi"
+        "OutputFilename" = "8:..\\..\\Test\\MSI\\CarbonTestInstaller.msi"
         "PackageFilesAs" = "3:2"
         "PackageFileSize" = "3:-2147483648"
         "CabType" = "3:1"
@@ -70,6 +70,14 @@
             "PrerequisitesLocation" = "2:1"
             "Url" = "8:"
             "ComponentsUrl" = "8:"
+                "Items"
+                {
+                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:.NETFramework,Version=v4.5"
+                    {
+                    "Name" = "8:Microsoft .NET Framework 4.5 (x86 and x64)"
+                    "ProductCode" = "8:.NETFramework,Version=v4.5"
+                    }
+                }
             }
         }
     }
@@ -147,7 +155,7 @@
         "Product"
         {
         "Name" = "8:Microsoft Visual Studio"
-        "ProductName" = "8:Carbon NoOp"
+        "ProductName" = "8:Carbon Test Installer"
         "ProductCode" = "8:{E1724ABC-A8D6-4D88-BBED-2E077C9AE6D2}"
         "PackageCode" = "8:{38CAAD30-1CA4-4F5F-B436-457CBEE51C58}"
         "UpgradeCode" = "8:{287AD39E-FCB3-4F42-AABA-21AF57EC8434}"
@@ -160,11 +168,11 @@
         "Manufacturer" = "8:Carbon"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:"
-        "Title" = "8:Carbon NoOp"
+        "Title" = "8:Carbon Test Installer"
         "Subject" = "8:"
         "ARPCONTACT" = "8:Aaron Jensen"
         "Keywords" = "8:"
-        "ARPCOMMENTS" = "8:Empty, no-op installer for testing Carbon MSI functions."
+        "ARPCOMMENTS" = "8:Installer for testing Carbon MSI functions."
         "ARPURLINFOABOUT" = "8:http://get-carbon.org/"
         "ARPPRODUCTICON" = "8:"
         "ARPIconIndex" = "3:0"

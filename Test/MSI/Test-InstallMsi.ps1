@@ -13,16 +13,16 @@
 # limitations under the License.
 
 & (Join-Path -Path $PSScriptRoot -ChildPath '..\Import-CarbonForTest.ps1' -Resolve)
-$carbonNoOpMsiPath = Join-Path -Path $PSScriptRoot -ChildPath 'CarbonNoOpMsi.msi' -Resolve
+$carbonNoOpMsiPath = Join-Path -Path $PSScriptRoot -ChildPath 'CarbonTestInstaller.msi' -Resolve
 
 function Start-Test
 {
-    Uninstall-CarbonNoOpMsi
+    Uninstall-CarbonTestInstaller
 }
 
 function Stop-Test
 {
-    Uninstall-CarbonNoOpMsi
+    Uninstall-CarbonTestInstaller
 }
 
 function Test-ShouldValidateFileIsAnMSI
@@ -34,8 +34,7 @@ function Test-ShouldValidateFileIsAnMSI
 function Test-ShouldSupportWhatIf
 {
     Assert-CarbonNoOpNotInstalled
-    $fakeInstallerPath = Join-Path $TestDir CarbonNoOpMsi.msi -Resolve
-    Invoke-WindowsInstaller -Path $fakeInstallerPath -Quiet -WhatIf
+    Invoke-WindowsInstaller -Path $carbonNoOpMsiPath -Quiet -WhatIf
     Assert-NoError
     Assert-LastProcessSucceeded
     Assert-CarbonNoOpNotInstalled
@@ -53,7 +52,7 @@ function Test-ShouldHandleFailedInstaller
     Set-EnvironmentVariable -Name 'CARBON_TEST_INSTALLER_THROW_INSTALL_EXCEPTION' -Value $true -ForComputer
     try
     {
-        Install-Msi -Path (Join-Path -Path $PSScriptRoot -ChildPath 'CarbonNoOpFailingMsi.msi' -Resolve) -ErrorAction SilentlyContinue
+        Install-Msi -Path (Join-Path -Path $PSScriptRoot -ChildPath 'CarbonTestInstallerWithCustomActions.msi' -Resolve) -ErrorAction SilentlyContinue
         Assert-CarbonNoOpNotInstalled
     }
     finally
@@ -101,10 +100,12 @@ function Assert-CarbonNoOpNotInstalled
     Assert-Null $item
 }
 
-function Uninstall-CarbonNoOpMsi
+function Uninstall-CarbonTestInstaller
 {
-    if( (Get-ProgramInstallInfo -Name 'Carbon NoOp') )
-    {
-        msiexec /uninstall $carbonNoOpMsiPath /quiet 
-    }
+    Get-ChildItem -Path $PSScriptRoot -Filter *.msi |
+        Get-Msi |
+        Where-Object { Get-ProgramInstallInfo -Name $_.ProductName } |
+        ForEach-Object {
+            msiexec /uninstall $_.Path /quiet
+        }
 }

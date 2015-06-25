@@ -3,7 +3,7 @@
 
 function Test-ShouldGetMsi
 {
-    $msi = Get-Msi -Path (Join-Path -Path $PSScriptRoot -ChildPath 'CarbonNoOpMsi.msi' -Resolve)
+    $msi = Get-Msi -Path (Join-Path -Path $PSScriptRoot -ChildPath 'CarbonTestInstaller.msi' -Resolve)
 }
 
 function Test-ShouldAcceptPipelineInput
@@ -15,7 +15,7 @@ function Test-ShouldAcceptPipelineInput
 
 function Test-ShouldAcceptArrayOfStrings
 {
-    $path = Join-Path -Path $PSScriptRoot -ChildPath 'CarbonNoOpMsi.msi'
+    $path = Join-Path -Path $PSScriptRoot -ChildPath 'CarbonTestInstaller.msi'
 
     $msi = Get-Msi -Path @( $path, $path )
     Assert-Is $msi ([object[]])
@@ -27,7 +27,7 @@ function Test-ShouldAcceptArrayOfStrings
 
 function Test-ShouldAcceptArrayOfFileInfo
 {
-    $path = Join-Path -Path $PSScriptRoot -ChildPath 'CarbonNoOpMsi.msi'
+    $path = Join-Path -Path $PSScriptRoot -ChildPath 'CarbonTestInstaller.msi'
 
     $item = Get-Item -Path $path
     $msi = Get-Msi -Path @( $item, $item )

@@ -7,8 +7,8 @@
     <ProjectGuid>{D3F2D40C-A985-46D4-A317-03D7CF6B10E0}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ThrowInstallException</RootNamespace>
-    <AssemblyName>ThrowInstallException</AssemblyName>
+    <RootNamespace>Carbon.Test.Installer</RootNamespace>
+    <AssemblyName>Carbon.Test.Installer</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>

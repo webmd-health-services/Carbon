@@ -15,9 +15,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Carbon.Test.Xdt", "Test\Xdt
 EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "CarbonNoOpMsi", "CarbonNoOpMsi\CarbonNoOpMsi.vdproj", "{AFF68EB7-57D4-4D47-971C-F0BCA2149B04}"
 EndProject
-Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "CarbonNoOpFailingMsi", "CarbonNoOpFailingMsi\CarbonNoOpFailingMsi.vdproj", "{F75D4E03-F601-48F9-9858-4CFAD6A4AED4}"
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "CarbonTestInstallerWithCustomActions", "CarbonNoOpFailingMsi\CarbonNoOpFailingMsi.vdproj", "{F75D4E03-F601-48F9-9858-4CFAD6A4AED4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ThrowInstallException", "ThrowInstallException\ThrowInstallException.csproj", "{D3F2D40C-A985-46D4-A317-03D7CF6B10E0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Carbon.Test.Installer", "ThrowInstallException\Carbon.Test.Installer.csproj", "{D3F2D40C-A985-46D4-A317-03D7CF6B10E0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -58,9 +58,5 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Debug|Any CPU = Debug|Any CPU
-		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 EndGlobal
