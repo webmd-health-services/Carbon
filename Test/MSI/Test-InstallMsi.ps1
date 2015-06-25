@@ -45,14 +45,36 @@ function Test-ShouldInstallMsi
 {
     Assert-CarbonNoOpNotInstalled
     Install-Msi -Path $carbonNoOpMsiPath
-    $item = Get-ProgramInstallInfo -Name '*Carbon*'
-    Assert-NotNull $item
+    Assert-CarbonNoOpInstalled
 }
 
 function Test-ShouldHandleFailedInstaller
 {
     Install-Msi -Path (Join-Path -Path $PSScriptRoot -ChildPath 'CarbonNoOpFailingMsi.msi' -Resolve)
     Assert-CarbonNoOpNotInstalled
+}
+
+function Test-ShouldSupportWildcards
+{
+    $tempDir = New-TempDirectory -Prefix $PSCommandPath
+    try
+    {
+        Copy-Item $carbonNoOpMsiPath -Destination (Join-Path -Path $tempDir -ChildPath 'One.msi')
+        Copy-Item $carbonNoOpMsiPath -Destination (Join-Path -Path $tempDir -ChildPath 'Two.msi')
+        Install-Msi -Path (Join-Path -Path $tempDir -ChildPath '*.msi') -Verbose
+        Assert-CarbonNoOpInstalled
+    }
+    finally
+    {
+        Remove-Item -Path $tempDir -Recurse
+    }
+}
+
+function Assert-CarbonNoOpInstalled
+{
+    Assert-NoError
+    $item = Get-ProgramInstallInfo -Name '*Carbon*'
+    Assert-NotNull $item
 }
 
 function Assert-CarbonNoOpNotInstalled

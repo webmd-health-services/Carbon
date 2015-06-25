@@ -32,12 +32,18 @@ function Install-Msi
     Install-Msi -Path Path\to\installer.msi
     
     Runs installer.msi, and waits untils for the installer to finish.  If the installer has a UI, it is shown to the user.
+
+    .EXAMPLE
+    Get-ChildItem *.msi | Install-Msi
+
+    Demonstrates how to pipe MSI files into `Install-Msi` for installation.
     #>
     [CmdletBinding(SupportsShouldProcess=$true)]
     param(
-        [Parameter(Mandatory=$true)]
-        [string]
-        # The installer to run.
+        [Parameter(Mandatory=$true,ValueFromPipeline=$true,ValueFromPipelineByPropertyName=$true)]
+        [Alias('FullName')]
+        [string[]]
+        # The path to the installer to run. Wildcards supported.
         $Path,
         
         [Switch]
@@ -47,21 +53,19 @@ function Install-Msi
 
     Set-StrictMode -Version 'Latest'
     
-    $msi = Get-Msi -Path $Path
-    if( -not $msi )
-    {
-        return
-    }
+    Get-Msi -Path $Path |
+        ForEach-Object {
+            $msi = $_
+            if( $PSCmdlet.ShouldProcess( $msi.Path, "install" ) )
+            {
+                $msiProcess = Start-Process -FilePath "msiexec.exe" -ArgumentList "/i",$msi.Path,"/quiet" -NoNewWindow -Wait -PassThru
 
-    if( $PSCmdlet.ShouldProcess( $Path, "install" ) )
-    {
-        $msiProcess = Start-Process -FilePath "msiexec.exe" -ArgumentList "/i",$Path,"/quiet" -NoNewWindow -Wait -PassThru
-
-        if( $msiProcess.ExitCode -ne $null -and $msiProcess.ExitCode -ne 0 )
-        {
-            Write-Error ("{0} {1} installtion failed. (Exit code: {2}; MSI: {3})" -f $msi.ProductName,$msi.ProductVersion,$msiProcess.ExitCode,$msi.Path)
+                if( $msiProcess.ExitCode -ne $null -and $msiProcess.ExitCode -ne 0 )
+                {
+                    Write-Error ("{0} {1} installation failed. (Exit code: {2}; MSI: {3})" -f $msi.ProductName,$msi.ProductVersion,$msiProcess.ExitCode,$msi.Path)
+                }
+            }
         }
-    }
 }
 
 Set-Alias -Name 'Invoke-WindowsInstaller' -Value 'Install-Msi'

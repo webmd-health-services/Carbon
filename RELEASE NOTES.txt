@@ -47,6 +47,8 @@ This is a ***backwards-incompatible*** release.
  * The `Version` property on the objects returned by [Get-ProgramInstallInfo](http://get-carbon.org/help/Get-ProgramInstallInfo.html) is now a proper .NET `Version` object instead of an integer.
  * Created `Get-Msi` function for reading MSI information and properties from an MSI file.
  * `Carbon.Computer.ProgramInstallInfo` objects (returned from `Get-ProgramInstallInfo`) now have `ProductCode` and `User` properties. If a program doesn't have a product code, it is set to `[Guid]::Empty`. The `User` property is only set for per-user software installs.
+ * `Invoke-WindowsInstaller` renamed `Install-Msi`, with a backwards-compatibility-preserving alias.
+ * `Install-Msi` now supports wildcards for MSI path to install.
  
 ### Bug Fixes
 
@@ -147,6 +149,8 @@ This is a ***backwards-incompatible*** release.
 ### MSI
 
  * Created `Get-Msi` function for reading MSI information and properties from an MSI file.
+ * `Invoke-WindowsInstaller` renamed `Install-Msi`, with a backwards-compatibility-preserving alias.
+ * `Install-Msi` now supports wildcards for MSI path to install.
 
 
 ### PowerShell
