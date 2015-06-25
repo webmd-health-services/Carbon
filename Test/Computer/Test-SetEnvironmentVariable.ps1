@@ -55,6 +55,14 @@ function Test-ShouldSetEnvironmentVariableAtProcessScope
     Assert-TestEnvironmentVariableIs -ExpectedValue $null -Scope 'User'
 }
 
+function Test-ShouldSetProcessEnvVariable
+{
+    $name = 'Carbon+Set-EnvironmentVariable+ForProcess'
+    $value = ([Guid]::NewGuid())
+    Set-EnvironmentVariable -Name $name -Value $value -ForProcess
+    Assert-Equal $value (Get-Item -Path ('env:{0}' -f $name)).Value
+}
+
 function Test-ShouldNotSetVariableIfWhatIf
 {
     Set-EnvironmentVariable -Name $EnvVarName -Value 'Doesn''t matter.' -ForProcess -WhatIf

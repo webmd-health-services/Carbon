@@ -55,6 +55,7 @@ This is a ***backwards-incompatible*** release.
  * `Carbon_Permission` DSC resource fails when assigning multiple permissions
  * Grant-Permission fails when clearing multiple existing, non-inherited permission on an item.
  * `Install-Msi` didn't properly detect when installation failed.
+ * `Set-EnvironmentVariable` fails to set process-level environment variable.
  
 ## Changes Since `alpha.31`
 
@@ -201,6 +202,10 @@ This is a ***backwards-incompatible*** release.
 
 ## Bug Fixes
 
+### Computer
+
+ * `Set-EnvironmentVariable` fails to set process-level environment variable.
+
 ### Hosts Entries
 
  * `Set-HostsEntry` fails to preserve whitespace if existing lines end with a comment/description. Thanks to [Konstantin Ushenin](https://vk.com/kostanew) for the fix.
@@ -208,7 +213,6 @@ This is a ***backwards-incompatible*** release.
 ### Msi`
 
  * `Install-Msi` didn't properly detect when installation failed.
-
 
 ### Services
 

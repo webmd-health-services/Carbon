@@ -68,34 +68,35 @@ function Set-EnvironmentVariable
         $ForComputer
     )
 
-    $targets = Invoke-Command -ScriptBlock {
-        if( $ForComputer )
-        {
-            [EnvironmentVariableTarget]::Machine
-        }
+    Set-StrictMode -Version 'Latest'
 
-        if( $ForUser )
-        {
-            [EnvironmentVariableTarget]::User
-        }
-            
-        if( $ForProcess )
-        {
-            [EnvironmentVariableTarget]::Process
-        }    
-    }
-
-    if( -not $targets )
+    if( -not $ForProcess -and -not $ForUser -and -not $ForComputer )
     {
         Write-Error -Message ('Environment variable target not specified. You must supply one of the ForComputer, ForUser, or ForProcess switches.')
         return
     }
 
-    foreach( $target in $targets )
-    {
-        if( $pscmdlet.ShouldProcess( "$target-level environment variable '$Name'", "set") )
-        {
-            [Environment]::SetEnvironmentVariable( $Name, $Value, $target )
-        }
-    }    
+    Invoke-Command -ScriptBlock {
+            if( $ForComputer )
+            {
+                [EnvironmentVariableTarget]::Machine
+            }
+
+            if( $ForUser )
+            {
+                [EnvironmentVariableTarget]::User
+            }
+            
+            if( $ForProcess )
+            {
+                [EnvironmentVariableTarget]::Process
+            }    
+        } | 
+        ForEach-Object {
+            $target = $_
+            if( $PSCmdlet.ShouldProcess( "$target-level environment variable '$Name'", "set") )
+            {
+                [Environment]::SetEnvironmentVariable( $Name, $Value, $target )
+            }
+        }    
 }
