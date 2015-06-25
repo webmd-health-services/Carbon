@@ -45,7 +45,9 @@ function Test-AllFilesShouldHaveLicense
                         'RELEASE NOTES.txt',
                         '*.sln',
                         '*.pfx',
-                        'task*.xml'
+                        'task*.xml',
+                        '*.vdproj',
+                        '*.csproj'
                     )
     [object[]]$filesMissingLicense = Get-ChildItem -Path $projectRoot -Exclude 'Tools','Website','.hg' |
         Get-ChildItem -Recurse -File -Exclude $filesToSkip |
