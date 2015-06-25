@@ -1,55 +1,120 @@
 ﻿using System;
 using System.Collections;
+using System.Runtime.InteropServices;
+using WindowsInstaller;
 
 namespace Carbon.Msi
 {
 	public sealed class MsiInfo
 	{
-		public MsiInfo(string path, Hashtable properties)
+		public MsiInfo(string path)
 		{
 			if (String.IsNullOrEmpty(path))
 			{
 				throw new ArgumentException("Path must not be null or empty.", "path");
 			}
 
-			if (properties == null)
+			var winInstallerType = Type.GetTypeFromProgID("WindowsInstaller.Installer");
+			if (winInstallerType == null)
 			{
-				throw new ArgumentNullException("properties");
+				throw new Exception("Unable to get type from prog ID 'WindowsInstaller.Installer'.");
 			}
 
+			var installer = Activator.CreateInstance(winInstallerType) as Installer;
+			if (installer == null)
+			{
+				throw new Exception("Unable to create instance of prog ID 'WindowsInstaller.Installer'.");
+			}
+
+			Database database = null;
+			View view = null;
+
+			try
+			{
+
+				database = installer.OpenDatabase(path, 0);
+				if (database == null)
+				{
+					throw new Exception(string.Format("Unable to open database '{0}'.", path));
+				}
+
+				const string query = "select * from Property";
+
+				view = database.OpenView(query);
+				if (view == null)
+				{
+					throw new Exception(string.Format("Failed to query properties for MSI '{0}'.", path));
+				}
+
+				view.Execute();
+				var record = view.Fetch();
+
+				Properties = new Hashtable();
+
+				while (record != null)
+				{
+					Properties[record.StringData[1]] = record.StringData[2];
+					record = view.Fetch();
+				}
+
+				Initialize(path);
+			}
+			finally
+			{
+				if (view != null)
+				{
+					view.Close();
+					Marshal.FinalReleaseComObject(view);
+				}
+
+				if (database != null)
+				{
+					Marshal.FinalReleaseComObject(database);
+				}
+
+				if (installer != null)
+				{
+					Marshal.FinalReleaseComObject(installer);
+				}
+			}
+		}
+
+		private void Initialize(string path)
+		{
 			var requiredProperties = new[] {"Manufacturer", "ProductCode", "ProductLanguage", "ProductName", "ProductVersion"};
 			foreach (var requiredProperty in requiredProperties)
 			{
-				if( !properties.ContainsKey(requiredProperty) )
+				if (!Properties.ContainsKey(requiredProperty))
 				{
 					throw new ArgumentException(string.Format("Property '{0}' not found (MSI: {1}).", requiredProperty, path));
 				}
 			}
 
 			Path = path;
-			Properties = properties.Clone() as Hashtable;
 
-			Manufacturer = properties["Manufacturer"] as string;
+			Manufacturer = Properties["Manufacturer"] as string;
 
 			Guid productCode;
-			if (!Guid.TryParse(properties["ProductCode"] as string, out productCode))
+			if (!Guid.TryParse(Properties["ProductCode"] as string, out productCode))
 			{
-				throw new ArgumentException(string.Format("Property 'ProductCode' is an invalid GUID (value: {0}; MSI {1}).", properties["ProductCode"], path));
+				throw new ArgumentException(string.Format("Property 'ProductCode' is an invalid GUID (value: {0}; MSI {1}).",
+					Properties["ProductCode"], path));
 			}
 			ProductCode = productCode;
 
 			int langID;
-			if (! int.TryParse(properties["ProductLanguage"] as string, out langID))
+			if (!int.TryParse(Properties["ProductLanguage"] as string, out langID))
 			{
-				throw new ArgumentException(string.Format("Property 'ProductLanguage' is an invalid integer (value: {0}; MSI {1}).", properties["ProductLanguage"], path));
+				throw new ArgumentException(string.Format("Property 'ProductLanguage' is an invalid integer (value: {0}; MSI {1}).",
+					Properties["ProductLanguage"], path));
 			}
 			ProductLanguage = langID;
 
-			ProductName = properties["ProductName"] as string;
+			ProductName = Properties["ProductName"] as string;
 
-			ProductVersion = properties["ProductVersion"] as string;
-
+			ProductVersion = Properties["ProductVersion"] as string;
 		}
+
 
 		public string Manufacturer { get; private set; }
 		public string Path { get; private set; }

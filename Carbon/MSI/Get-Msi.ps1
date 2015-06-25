@@ -56,27 +56,18 @@ function Get-Msi
 
                 $msiPath = $_
 
-                $msi = New-Object -ComObject 'WindowsInstaller.Installer'
-
-                Write-Verbose ('Opening MSI {0}' -f $msiPath)
-
-                $database = $null
-                $ex = $null
                 try
                 {
-                    $database = $msi.OpenDatabase( [string]$msiPath, 0 )
+                    Write-Verbose ('Opening MSI {0}' -f $msiPath)
+                    New-Object -TypeName 'Carbon.Msi.MsiInfo' -ArgumentList $msiPath
                 }
                 catch
                 {
                     $ex = $_.Exception
-                }
-
-                if( -not $database )
-                {
-                    $errMsg = 'Failed to open database in MSI file ''{0}''.' -f $msiPath
+                    $errMsg = 'Failed to open MSI file ''{0}''.' -f $msiPath
                     if( $ex )
                     {
-                        $errMsg = '{0} OpenDatabase threw a {1} exception. The exception message is: ''{2}''.' -f $errMsg,$ex.GetType().FullName,$ex.Message
+                        $errMsg = '{0} {1} was thrown. The exception message is: ''{2}''.' -f $errMsg,$ex.GetType().FullName,$ex.Message
                         if( $ex -is [Runtime.InteropServices.COMException] )
                         {
                             $errMsg = '{0} HRESULT: {1:x}. (You can look up the meaning of HRESULT values at https://msdn.microsoft.com/en-us/library/cc704587.aspx.)' -f $errMsg,$ex.ErrorCode
@@ -86,40 +77,7 @@ function Get-Msi
                     return
                 }
 
-                try
-                {
-                    $query = "SELECT * FROM Property"
-            
-                    $view = $database.OpenView( $query )
-                    if( -not $view )
-                    {
-                        Write-Error ('Failed to query properties for MSI ''{0}''.' -f $msiPath)
-                        return
-                    }
 
-                    $null = $view.Execute()
-                    $record = $view.Fetch()
-
-                    $properties = @{ }
-                    while ($record -ne $null) 
-                    {
-                        $properties[$record.StringData(1)] = $record.StringData(2)
-                        $record = $view.Fetch()
-                    }
-
-                    New-Object -TypeName 'Carbon.Msi.MsiInfo' -ArgumentList $msiPath,$properties
-                }
-                finally
-                {
-                    if( $view )
-                    {
-                        [void]$view.Close()
-                        [void][Runtime.InteropServices.Marshal]::FinalReleaseComObject($view);
-                    }
-
-                    [void][Runtime.InteropServices.Marshal]::FinalReleaseComObject($database);
-                    [void][Runtime.InteropServices.Marshal]::FinalReleaseComObject($msi);
-                }
             }
     }
 
