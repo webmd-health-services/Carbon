@@ -13,7 +13,8 @@
 # limitations under the License.
 
 & (Join-Path -Path $PSScriptRoot -ChildPath '..\Import-CarbonForTest.ps1' -Resolve)
-$carbonNoOpMsiPath = Join-Path -Path $PSScriptRoot -ChildPath 'CarbonTestInstaller.msi' -Resolve
+$carbonTestInstaller = Join-Path -Path $PSScriptRoot -ChildPath 'CarbonTestInstaller.msi' -Resolve
+$carbonTestInstallerActions = Join-Path -Path $PSScriptRoot -ChildPath 'CarbonTestInstallerWithCustomActions.msi' -Resolve
 
 function Start-Test
 {
@@ -33,18 +34,18 @@ function Test-ShouldValidateFileIsAnMSI
 
 function Test-ShouldSupportWhatIf
 {
-    Assert-CarbonNoOpNotInstalled
-    Invoke-WindowsInstaller -Path $carbonNoOpMsiPath -Quiet -WhatIf
+    Assert-CarbonTestInstallerNotInstalled
+    Invoke-WindowsInstaller -Path $carbonTestInstaller -Quiet -WhatIf
     Assert-NoError
     Assert-LastProcessSucceeded
-    Assert-CarbonNoOpNotInstalled
+    Assert-CarbonTestInstallerNotInstalled
 }
 
 function Test-ShouldInstallMsi
 {
-    Assert-CarbonNoOpNotInstalled
-    Install-Msi -Path $carbonNoOpMsiPath
-    Assert-CarbonNoOpInstalled
+    Assert-CarbonTestInstallerNotInstalled
+    Install-Msi -Path $carbonTestInstaller
+    Assert-CarbonTestInstallerInstalled
 }
 
 function Test-ShouldHandleFailedInstaller
@@ -52,8 +53,8 @@ function Test-ShouldHandleFailedInstaller
     Set-EnvironmentVariable -Name 'CARBON_TEST_INSTALLER_THROW_INSTALL_EXCEPTION' -Value $true -ForComputer
     try
     {
-        Install-Msi -Path (Join-Path -Path $PSScriptRoot -ChildPath 'CarbonTestInstallerWithCustomActions.msi' -Resolve) -ErrorAction SilentlyContinue
-        Assert-CarbonNoOpNotInstalled
+        Install-Msi -Path $carbonTestInstallerActions -ErrorAction SilentlyContinue
+        Assert-CarbonTestInstallerNotInstalled
     }
     finally
     {
@@ -66,10 +67,10 @@ function Test-ShouldSupportWildcards
     $tempDir = New-TempDirectory -Prefix $PSCommandPath
     try
     {
-        Copy-Item $carbonNoOpMsiPath -Destination (Join-Path -Path $tempDir -ChildPath 'One.msi')
-        Copy-Item $carbonNoOpMsiPath -Destination (Join-Path -Path $tempDir -ChildPath 'Two.msi')
-        Install-Msi -Path (Join-Path -Path $tempDir -ChildPath '*.msi') -Verbose
-        Assert-CarbonNoOpInstalled
+        Copy-Item $carbonTestInstaller -Destination (Join-Path -Path $tempDir -ChildPath 'One.msi')
+        Copy-Item $carbonTestInstaller -Destination (Join-Path -Path $tempDir -ChildPath 'Two.msi')
+        Install-Msi -Path (Join-Path -Path $tempDir -ChildPath '*.msi')
+        Assert-CarbonTestInstallerInstalled
     }
     finally
     {
@@ -79,22 +80,36 @@ function Test-ShouldSupportWildcards
 
 function Test-ShouldNotReinstallIfAlreadyInstalled
 {
-    # Remove the install directory, check that it didn't get re-created.
+    Install-Msi -Path $carbonTestInstallerActions
+    Assert-CarbonTestInstallerInstalled
+    $msi = Get-Msi -Path $carbonTestInstallerActions
+    $installDir = Join-Path ${env:ProgramFiles(x86)} -ChildPath ('{0}\{1}' -f $msi.Manufacturer,$msi.ProductName)
+    Assert-DirectoryExists $installDir
+    Remove-Item -Path $installDir -Recurse
+    Install-Msi -Path $carbonTestInstallerActions
+    Assert-DirectoryDoesNotExist $installDir
 }
 
 function Test-ShouldReinstallIfForcedTo
 {
-    # Remove the install directory, check that it got re-created.
+    Install-Msi -Path $carbonTestInstallerActions
+    Assert-CarbonTestInstallerInstalled
+    $msi = Get-Msi -Path $carbonTestInstallerActions
+    $installDir = Join-Path ${env:ProgramFiles(x86)} -ChildPath ('{0}\{1}' -f $msi.Manufacturer,$msi.ProductName)
+    Assert-DirectoryExists $installDir
+    Remove-Item -Path $installDir -Recurse
+    Install-Msi -Path $carbonTestInstallerActions -Force
+    Assert-DirectoryExists $installDir
 }
 
-function Assert-CarbonNoOpInstalled
+function Assert-CarbonTestInstallerInstalled
 {
     Assert-NoError
     $item = Get-ProgramInstallInfo -Name '*Carbon*'
     Assert-NotNull $item
 }
 
-function Assert-CarbonNoOpNotInstalled
+function Assert-CarbonTestInstallerNotInstalled
 {
     $item = Get-ProgramInstallInfo -Name '*Carbon*'
     Assert-Null $item
@@ -106,6 +121,7 @@ function Uninstall-CarbonTestInstaller
         Get-Msi |
         Where-Object { Get-ProgramInstallInfo -Name $_.ProductName } |
         ForEach-Object {
+            msiexec /f $_.Path /quiet
             msiexec /uninstall $_.Path /quiet
         }
 }

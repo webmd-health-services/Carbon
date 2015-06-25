@@ -16,17 +16,14 @@ function Install-Msi
 {
     <#
     .SYNOPSIS
-    Runs an MSI installer.
+    Installs software from an MSI file.
 
     .DESCRIPTION
-    There are two problems running an MSI (for MicroSoft Installer):
-    
-     * The installer runs asynchronously, which means running/invoking it returns immediately, with no notification about whether it succeeded or failed.
-     * A UI is shown.
-    
-    This function will run an MSI installer and wait for the MSI to finish.  If the install process returns a non-zero exit code, an error will be written.
-    
-    You can optionally run the installer in quiet mode.  This hides any installer UI and installs the package with the default options.
+    `Install-Msi` installs software from an MSI file. If the install fails, it writes an error. Installation is always done in quiet mode, i.e. you won't see any UI.
+
+    In Carbon 1.9 and earlier, this function was called `Invoke-WindowsInstaller`.
+
+    Beginning with Carbon 2.0, `Install-Msi` only runs the MSI if the software isn't installed. Use the `-Force` switch to always run the installer.
     
     .EXAMPLE
     Install-Msi -Path Path\to\installer.msi
@@ -56,8 +53,22 @@ function Install-Msi
     )
 
     Set-StrictMode -Version 'Latest'
-    
+
     Get-Msi -Path $Path |
+        Where-Object {
+            if( $Force )
+            {
+                return $true
+            }
+
+            $installInfo = Get-ProgramInstallInfo -Name $_.ProductName -ErrorAction Ignore
+            if( -not $installInfo )
+            {
+                return $true
+            }
+
+            return ($installInfo.ProductCode -ne $_.ProductCode)
+        } |
         ForEach-Object {
             $msi = $_
             if( $PSCmdlet.ShouldProcess( $msi.Path, "install" ) )

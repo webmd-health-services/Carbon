@@ -13,6 +13,7 @@ This is a ***backwards-incompatible*** release.
  * Upgrade to PowerShell 4.
  * Remove usages of `Complete-Job`.  We removed it because it was total crap.  Use PowerShell's `Wait-Job` cmdlet instead.
  * [Grant-Permission](http://get-carbon.org/help/Grant-Permission.html) now only grants permissions on an object if those permissions aren't present.  To preserve previous behaviour, add the `-Force` switch to all `Grant-Permission` usages.
+ * [Install-Msi](http://get-carbon.org/help/Install-Msi.html) (fka `Invoke-WindowsInstaller`) now only install the MSI if it isn't already installed. To preserve the previous behavior and always install, add the `-Force` switch to all `Invoke-WindowsInstaller`\`Install-Msi` usages.
  * [Install-Service](http://get-carbon.org/help/Grant-ComPermissions.html) now returns `ServiceController` objects instead of `sc.exe` output.
  * The following commands no longer return the stdout from console applications each one calls. To see that output, use the `-Verbose` switch. Remove any usage of the output you were processing.
      * [Disable-FirewallStatefulFtp](http://get-carbon.org/help/Disable-FirewallStatefulFtp.html)
@@ -49,6 +50,7 @@ This is a ***backwards-incompatible*** release.
  * `Carbon.Computer.ProgramInstallInfo` objects (returned from `Get-ProgramInstallInfo`) now have `ProductCode` and `User` properties. If a program doesn't have a product code, it is set to `[Guid]::Empty`. The `User` property is only set for per-user software installs.
  * `Invoke-WindowsInstaller` renamed `Install-Msi`, with a backwards-compatibility-preserving alias.
  * `Install-Msi` now supports wildcards for MSI path to install.
+ * `Install-Msi` now only installs an MSI if it isn't already installed. To preserve the previous behavior and always install, add the `-Force` switch to all `Invoke-WindowsInstaller`\`Install-Msi` usages.
  
 ### Bug Fixes
 
@@ -152,7 +154,7 @@ This is a ***backwards-incompatible*** release.
  * Created `Get-Msi` function for reading MSI information and properties from an MSI file.
  * `Invoke-WindowsInstaller` renamed `Install-Msi`, with a backwards-compatibility-preserving alias.
  * `Install-Msi` now supports wildcards for MSI path to install.
-
+ * `Install-Msi` now only installs an MSI if it isn't already installed. To preserve the previous behavior and always install, add the `-Force` switch to all `Invoke-WindowsInstaller`\`Install-Msi` usages.
 
 ### PowerShell
 
