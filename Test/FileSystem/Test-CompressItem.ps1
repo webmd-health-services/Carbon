@@ -136,7 +136,7 @@ function Test-ShouldCreateCustomZipFile
     try
     {
         $file = Compress-Item -Path $PSCommandPath -OutFile '.\test.zip'
-        Assert-ZipFileExists -Path (Join-Path -Path $tempDir -ChildPath 'test.zip')
+        Assert-ZipFileExists -Path (Get-Item -Path (Join-Path -Path $tempDir -ChildPath 'test.zip'))
         Assert-ZipFileExists $file
     }
     finally
@@ -194,7 +194,12 @@ function Assert-ZipFileExists
     )
 
     Assert-NoError
-    Assert-NotNull $Path
-    Assert-FileExists $Path
-    Assert-True (Test-ZipFile -Path $Path) ('zip file ''{0}'' not found' -f $Path)
+
+    foreach( $item in $Path )
+    {
+        Assert-NotNull $item
+        Assert-Is $item ([IO.FileInfo])
+        Assert-FileExists $item
+        Assert-True (Test-ZipFile -Path $item) ('zip file ''{0}'' not found' -f $item)
+    }
 }

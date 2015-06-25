@@ -138,7 +138,7 @@ function Compress-Item
             {
                 if( $UseShell )
                 {
-                    $zipFile.CopyHere($_, $copyHereFlags)
+                    [void]$zipFile.CopyHere($_, $copyHereFlags)
                     $entryCount = Get-ChildItem $_ -Recurse | Measure-Object | Select-Object -ExpandProperty 'Count'
                     $zipItemCount += $entryCount
                 }
