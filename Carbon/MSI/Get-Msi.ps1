@@ -51,6 +51,7 @@ function Get-Msi
     {
         $Path |
             Resolve-Path |
+            Select-Object -ExpandProperty 'ProviderPath' |
             ForEach-Object {
 
                 $msiPath = $_
