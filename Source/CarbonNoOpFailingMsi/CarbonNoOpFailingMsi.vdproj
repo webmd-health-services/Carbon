@@ -15,6 +15,12 @@
     {
         "Entry"
         {
+        "MsmKey" = "8:_10D3F2C21DE14E29BB097757827D5B32"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_CC0A2D32D0DD4E40977A367D421E8965"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -23,6 +29,12 @@
         {
         "MsmKey" = "8:_UNDEFINED"
         "OwnerKey" = "8:_CC0A2D32D0DD4E40977A367D421E8965"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_10D3F2C21DE14E29BB097757827D5B32"
         "MsmSig" = "8:_UNDEFINED"
         }
     }
@@ -108,6 +120,20 @@
             "EntryPoint" = "8:"
             "Sequence" = "3:1"
             "Identifier" = "8:_23903FA9_5405_4FCF_867F_ED97C226B7DE"
+            "InstallerClass" = "11:TRUE"
+            "CustomActionData" = "8:"
+            }
+            "{4AA51A2D-7D85-4A59-BA75-B0809FC8B380}:_CA70955C2632474AA8DA76D1F4ABDDCD"
+            {
+            "Name" = "8:Primary output from ThrowInstallException (Active)"
+            "Condition" = "8:"
+            "Object" = "8:_10D3F2C21DE14E29BB097757827D5B32"
+            "FileType" = "3:1"
+            "InstallAction" = "3:4"
+            "Arguments" = "8:"
+            "EntryPoint" = "8:"
+            "Sequence" = "3:1"
+            "Identifier" = "8:_7C10414D_8FD0_4FE0_8B83_12632D143C03"
             "InstallerClass" = "11:TRUE"
             "CustomActionData" = "8:"
             }
@@ -205,7 +231,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Carbon NoOp Failing MSI"
         "ProductCode" = "8:{9FB04550-432E-4E8C-86C3-D51E31522EBC}"
-        "PackageCode" = "8:{17172E32-6E4D-4EF8-BBC6-A692F76D6FD8}"
+        "PackageCode" = "8:{8B1CE3FD-E84C-447A-8589-1B5EB992D515}"
         "UpgradeCode" = "8:{287AD39E-FCB3-4F42-AABA-21AF57EC8434}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
@@ -724,6 +750,34 @@
         }
         "ProjectOutput"
         {
+            "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_10D3F2C21DE14E29BB097757827D5B32"
+            {
+            "SourcePath" = "8:..\\ThrowInstallException\\obj\\Debug\\ThrowInstallException.dll"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_E89DD5DD809849A6A340ED3E5E715E13"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            "ProjectOutputGroupRegister" = "3:1"
+            "OutputConfiguration" = "8:"
+            "OutputGroupCanonicalName" = "8:Built"
+            "OutputProjectGuid" = "8:{D3F2D40C-A985-46D4-A317-03D7CF6B10E0}"
+            "ShowKeyOutput" = "11:TRUE"
+                "ExcludeFilters"
+                {
+                }
+            }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_CC0A2D32D0DD4E40977A367D421E8965"
             {
             "SourcePath" = "8:..\\ThrowInstallException\\obj\\Debug\\ThrowInstallException.dll"

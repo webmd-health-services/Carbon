@@ -50,8 +50,16 @@ function Test-ShouldInstallMsi
 
 function Test-ShouldHandleFailedInstaller
 {
-    Install-Msi -Path (Join-Path -Path $PSScriptRoot -ChildPath 'CarbonNoOpFailingMsi.msi' -Resolve)
-    Assert-CarbonNoOpNotInstalled
+    Set-EnvironmentVariable -Name 'CARBON_TEST_INSTALLER_THROW_INSTALL_EXCEPTION' -Value $true -ForComputer
+    try
+    {
+        Install-Msi -Path (Join-Path -Path $PSScriptRoot -ChildPath 'CarbonNoOpFailingMsi.msi' -Resolve) -ErrorAction SilentlyContinue
+        Assert-CarbonNoOpNotInstalled
+    }
+    finally
+    {
+        Remove-EnvironmentVariable -Name 'CARBON_TEST_INSTALLER_THROW_INSTALL_EXCEPTION' -ForComputer
+    }
 }
 
 function Test-ShouldSupportWildcards
@@ -68,6 +76,16 @@ function Test-ShouldSupportWildcards
     {
         Remove-Item -Path $tempDir -Recurse
     }
+}
+
+function Test-ShouldNotReinstallIfAlreadyInstalled
+{
+    # Remove the install directory, check that it didn't get re-created.
+}
+
+function Test-ShouldReinstallIfForcedTo
+{
+    # Remove the install directory, check that it got re-created.
 }
 
 function Assert-CarbonNoOpInstalled
