@@ -67,7 +67,7 @@ function Test-ShouldGetExistingServices
         Assert-Equal (($_.ServicesDependedOn | Select-Object -ExpandProperty 'Name') -join ',') ($resource.Dependency -join ',') $_.Name
         if( (Test-Identity -Name $_.UserName) )
         {
-            Assert-Equal (Resolve-Identity -Name $_.UserName).FullName $resource.UserName
+            Assert-Equal (Resolve-IdentityName -Name $_.UserName) $resource.UserName
         }
         else
         {

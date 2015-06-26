@@ -53,7 +53,7 @@ function Invoke-GrantPermissions($Identity, $Permissions, $Path)
 {
     $result = Grant-Permission -Identity $Identity -Permission $Permissions -Path $Path.ToString() -PassThru
     Assert-NotNull $result
-    Assert-Equal (Resolve-Identity $Identity).FullName $result.IdentityReference
+    Assert-Equal (Resolve-IdentityName $Identity) $result.IdentityReference
     Assert-Is $result ([Security.AccessControl.FileSystemAccessRule])
 }
 
@@ -327,7 +327,7 @@ function Test-ShouldWriteVerboseMessageWhenClearingRuleOnFileSystem
         Assert-Like $result[$idx].Message ('Removing*{0}*' -f $user)
     }
     Assert-Is $result[-1] 'Security.AccessControl.FileSystemAccessRule'
-    Assert-Equal (Resolve-Identity $user2).FullName $result[-1].IdentityReference.Value
+    Assert-Equal (Resolve-IdentityName $user2) $result[-1].IdentityReference.Value
 }
 
 function Test-ShouldWriteVerboseMessageWhenClearingRuleOnRegKey
@@ -341,7 +341,7 @@ function Test-ShouldWriteVerboseMessageWhenClearingRuleOnRegKey
     Assert-Is $result[0] 'Management.Automation.VerboseRecord'
     Assert-Like $result[0].Message ('Removing*{0}*QueryValues*' -f $user)
     Assert-Is $result[1] 'Security.AccessControl.RegistryAccessRule'
-    Assert-Equal (Resolve-Identity $user2).FullName $result[1].IdentityReference.Value
+    Assert-Equal (Resolve-IdentityName $user2) $result[1].IdentityReference.Value
 }
 
 function Test-ShouldGrantPermissionOnPrivateKey

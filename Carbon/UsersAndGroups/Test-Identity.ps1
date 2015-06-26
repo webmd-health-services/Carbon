@@ -26,6 +26,9 @@ function Test-Identity
     .LINK
     Resolve-Identity
 
+    .LINK
+    Resolve-IdentityName
+
     .EXAMPLE
     Test-Identity -Name 'Administrators
     

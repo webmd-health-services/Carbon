@@ -23,8 +23,6 @@ This is a ***backwards-incompatible*** release.
  * [Set-SslCertificateBinding](http://get-carbon.org/help/Set-SslCertificateBinding.html) now returns `Carbon.Certificates.SslCertificateBinding` objects instead of netsh output. Update any code that uses the old `Set-SslCertificateBinding` output.
  * Ensure that all thumbprints passed to [Set-SslCertificateBinding](http://get-carbon.org/help/Set-SslCertificateBinding.html) are valid (40 character hex strings).
  * Add the new `-PasswordNeverExpires` switch to usages of [Install-User](http://get-carbon.org/help/Install-User.html): it no longer sets the `PasswordNeverExpires` flag for a user by default.
- * Use the `FullName` property on objects returned by [Resolve-Identity](http://get-carbon.org/help/Resolve-Identity.html) (nAce `Resolve-IdentityName`): it now returns a `Carbon.Identity` object instead of the identity's name, e.g. `Resolve-Identity -Name $userName | Select-Object -Expand 'FullName'`.
- * Add `-ErrorAction SilentlyContinue` or `-ErrorAction Ignore` to usages of [Resolve-Identity](http://get-carbon.org/help/Resolve-Identity.html) (nAce `Resolve-IdentityName`): it now writes an error if it can't resolve a name.
  * Use the `Sid` property on objects returned by [Test-Identity](http://get-carbon.org/help/Test-Identity.html) when using the `PassThru` switch: it now returns a `Carbon.Identity` object if the identity exists *and* you use the `-PassThru` switch, e.g. `Test-Identity -Name $userName -PassThru | Select-Object -Expand 'Sid'`.
  * Check that all IP addresses passed to [Set-HostsEntry](http://get-carbon.org/help/Set-HostsEntry.html) are valid IP v4 or v6 addresses.  [Set-HostsEntry](http://get-carbon.org/help/Set-HostsEntry.html)'s IPAddress parameter is now a `System.Net.IPAddress` object.  Previously it was a string validated with a regular expression, so you *should* be OK.
  * Remove the `Exportable` switch from any usages of [Install-Certificate](http://get-carbon.org/help/Install-Certificate.html) when installing from an `X509Certificate2` object, since that switch only gets used when installing a certificate from a file.
@@ -35,7 +33,7 @@ This is a ***backwards-incompatible*** release.
  * Remove usages of `[Carbon.Lsa]::LookupPrivilegeValue` class method. It was incorrectly exposed as a public method.
  * Remove usages of `[Carbon.Kernel32]::LocalFree` class method. It was incorrectly exposed as a public method.
  * Update usages of `Carbon.Computer.ProgramInstallInfo`'s `Version` property (returned by [Get-ProgramInstallInfo](http://get-carbon.org/help/Get-ProgramInstallInfo.html)). It was an `int` and is now a [Version](http://msdn.microsoft.com/en-us/library/y0hf9t2e.aspx) object.
- * If you're not providing a value for [Install-IisApplication](http://get-carbon.org/help/Install-IisApplication.html)'s `AppPoolName` parameter, our application's app pool will be reset to `DefaultAppPool`. If you don't want this behaviour, pass the app pool you want to use.
+ * If you're not providing a value for [Install-IisApplication](http://get-carbon.org/help/Install-IisApplication.html)'s `AppPoolName` parameter, your application's app pool will be reset to `DefaultAppPool`. If you don't want this behaviour, pass the app pool you want to use.
 
 ## Changes Since `alpha.26`
 
@@ -194,14 +192,11 @@ This is a ***backwards-incompatible*** release.
  * [Install-Group](http://get-carbon.org/help/Install-Group.html) re-written to use .NET's `System.DirectoryServices.AccountManagement` API (introduced with .NET 3.5).
  * Added `PassThru` switch to [Install-Group](http://get-carbon.org/help/Install-Group.html) so it will return the group added or updated.
  * [Add-MemberToGroup](http://get-carbon.org/help/Add-MemberToGroup.html) re-written to use .NET's `System.DirectoryServices.AccountManagement` API (introduced with .NET 3.5).
- * [Resolve-IdentityName](http://get-carbon.org/help/Resolve-IdentityName.html) now writes an error if it can't resolve a name.  Use `-ErrorAction SilentlyContinue` or `-ErrorAction Ignore` to preserve old behavior.
  * [Uninstall-User](http://get-carbon.org/help/Uninstall-User.html) re-written to use .NET's `System.DirectoryServices.AccountManagement` API (introduced with .NET 3.5).
  * [Test-User](http://get-carbon.org/help/Test-User.html) re-written to use .NET's `System.DirectoryServices.AccountManagement` API (introduced with .NET 3.5).
  * Created [Test-Group](http://get-carbon.org/help/Test-Group.html) function for checking if a *local* group exists.
- * `Resolve-IdentityName` renamed to [Resolve-Identity](http://get-carbon.org/help/Resolve-Identity.html), but it has a backwards-compatible alias, so you shouldn't have to do anything.
- * [Resolve-Identity](http://get-carbon.org/help/Resolve-Identity.html) (nAce `Resolve-IdentityName`) now returns a `Carbon.Identity` object instead of the identity's name.  Update scripts to use the `FullName` property to get the old return value, e.g. `Resolve-Identity -Name $userName -PassThru | Select-Object -Expand 'FullName'`.
- * [Resolve-Identity](http://get-carbon.org/help/Resolve-Identity.html) (nAce `Resolve-IdentityName`) now writes an error if it can't resolve a name.  Use `-ErrorAction SilentlyContinue` or `-ErrorAction Ignore` to preserve old behavior.
- * [Test-Identity](http://get-carbon.org/help/Test-Identity.html) now returns a `Carbon.Identity` object if the identity exists *and* you use the `-PassThru` switch.  It used to return the identity's name.  Update scripts to use the `FullName` property to get the old return value, e.g. `Test-Identity -Name $userName -PassThru | Select-Object -Expand 'FullName'`.
+ * Created [Resolve-Identity](http://get-carbon.org/help/Resolve-Identity.html) to return extended identity information: domain, type, and SID.
+ * [Test-Identity](http://get-carbon.org/help/Test-Identity.html) now returns a `Carbon.Identity` object if the identity exists *and* you use the `-PassThru` switch.  It used to return the identity's SID.  Update scripts to use the `FullName` property to get the old return value, e.g. `Test-Identity -Name $userName -PassThru | Select-Object -Expand 'FullName'`.
  * Added [Remove-GroupMember](http://get-carbon.org/help/Remove-GroupMember.html) function. Thanks to [Philip Kluss](https://bitbucket.org/philkloose) for the contribution. 
  * Added `PassThru` switch to [Install-User](http://get-carbon.org/help/Install-User.html) to return a `System.DirectoryServices.AccountManagement.UserPrincipal` object representing the user.
 

@@ -19,7 +19,7 @@ function Start-TestFixture
 
 function Test-ShouldResolveBuiltinIdentity
 {
-    $identity = Resolve-IdentityName -Name 'Administrators'
+    $identity = Resolve-Identity -Name 'Administrators'
     Assert-Equal 'BUILTIN\Administrators' $identity.FullName
     Assert-Equal 'BUILTIN' $identity.Domain
     Assert-Equal 'Administrators' $identity.Name
@@ -29,7 +29,7 @@ function Test-ShouldResolveBuiltinIdentity
 
 function Test-ShouldResolveNTAuthorityIdentity
 {
-    $identity = Resolve-IdentityName -Name 'NetworkService'
+    $identity = Resolve-Identity -Name 'NetworkService'
     Assert-Equal 'NT AUTHORITY\NETWORK SERVICE' $identity.FullName
     Assert-Equal 'NT AUTHORITY' $identity.Domain
     Assert-Equal 'NETWORK SERVICE' $identity.Name
@@ -39,7 +39,7 @@ function Test-ShouldResolveNTAuthorityIdentity
 
 function Test-ShouldResolveEveryone
 {
-    $identity  = Resolve-IdentityName -Name 'Everyone'
+    $identity  = Resolve-Identity -Name 'Everyone'
     Assert-Equal 'Everyone' $identity.FullName
     Assert-Equal '' $identity.Domain
     Assert-Equal 'Everyone' $identity.Name
@@ -50,7 +50,7 @@ function Test-ShouldResolveEveryone
 function Test-ShouldNotResolveMadeUpName
 {
     $Error.Clear()
-    $fullName = Resolve-IdentityName -Name 'IDONotExist' -ErrorAction SilentlyContinue
+    $fullName = Resolve-Identity -Name 'IDONotExist' -ErrorAction SilentlyContinue
     Assert-GreaterThan $Error.Count 0
     Assert-Like $Error[0].Exception.Message '*not found*'
     Assert-Null $fullName

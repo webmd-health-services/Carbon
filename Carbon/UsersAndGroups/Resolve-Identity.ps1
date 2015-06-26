@@ -17,7 +17,7 @@ function Resolve-Identity
 {
     <#
     .SYNOPSIS
-    Determines the identity of a user or group using its name.
+    Gets domain, name, type, and SID information about a user or group.
     
     .DESCRIPTION
     The common name for an account is not always the canonical name used by the operating system.  For example, the local Administrators group is actually called BUILTIN\Administrators.  This function uses the `LookupAccountName` Windows function to resolve an account name into its domain, name, full name, SID, and SID type. It returns a `Carbon.Identity` object with the following properties:
@@ -30,10 +30,11 @@ function Resolve-Identity
     
     If the name doesn't represent an actual user or group, an error is written and nothing is returned.
 
-    In versions before 2.0, this function was known as `Resolve-IdendityName` and returned the full name of the identity instead of an object.
-
     .LINK
     Test-Identity
+
+    .LINK
+    Resolve-IdentityName
 
     .LINK
     http://msdn.microsoft.com/en-us/library/system.security.principal.securityidentifier.aspx
@@ -45,7 +46,7 @@ function Resolve-Identity
     Carbon.Identity.
     
     .EXAMPLE
-    Resolve-IdentityName -Name 'Administrators'
+    Resolve-Identity -Name 'Administrators'
     
     Returns an object representing the `Administrators` group.
     #>
@@ -68,5 +69,3 @@ function Resolve-Identity
 
     return [Carbon.Identity]::FindByName( $Name ) 
 }
-
-Set-Alias -Name 'Resolve-IdentityName' -Value 'Resolve-Identity'
