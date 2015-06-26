@@ -15,7 +15,7 @@ This is a ***backwards-incompatible*** release.
  * [Grant-Permission](http://get-carbon.org/help/Grant-Permission.html) now only grants permissions on an object if those permissions aren't present.  To preserve previous behaviour, add the `-Force` switch to all `Grant-Permission` usages.
  * [Install-Msi](http://get-carbon.org/help/Install-Msi.html) (fka `Invoke-WindowsInstaller`) now only installs the MSI if it isn't already installed. To preserve the previous behavior and always install, add the `-Force` switch to all `Invoke-WindowsInstaller`\`Install-Msi` usages.
  * [Install-Service](http://get-carbon.org/help/Grant-ComPermissions.html) now returns `ServiceController` objects instead of `sc.exe` output.
- * The following commands no longer return the stdout from console applications each one calls. To see that output, use the `-Verbose` switch. Remove any usage of the output you were processing.
+ * The following commands no longer return the stdout output from the console applications each one calls. To see that output, use the `-Verbose` switch. Remove any usage of the output you were processing.
      * [Disable-FirewallStatefulFtp](http://get-carbon.org/help/Disable-FirewallStatefulFtp.html)
      * [Enable-FirewallStatefulFtp](http://get-carbon.org/help/Enable-FirewallStatefulFtp.html)
      * [Remove-SslCertificateBinding](http://get-carbon.org/help/Remove-SslCertificateBinding.html)
