@@ -81,7 +81,11 @@ function Install-IisWebsite
         
         [string]
         # The name of the app pool under which the website runs.  The app pool must exist.  If not provided, IIS picks one for you.  No whammy, no whammy!
-        $AppPoolName
+        $AppPoolName,
+
+        [int]
+        # The site's IIS ID. IIS picks one for you automatically if you don't supply one. Must be greater than 0.
+        $SiteID
     )
     
     Set-StrictMode -Version 'Latest'
@@ -114,6 +118,11 @@ function Install-IisWebsite
     if( $AppPoolName )
     {
         Invoke-AppCmd set site /site.name:"$Name" /[path=`'/`'].applicationPool:`"$AppPoolName`"
+    }
+    
+    if( $SiteID )
+    {
+        Set-IisWebsiteID -SiteName $Name -ID $SiteID
     }
     
     # Make sure anonymous authentication uses the application pool identity

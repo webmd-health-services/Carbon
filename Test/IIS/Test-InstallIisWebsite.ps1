@@ -39,23 +39,26 @@ function Remove-TestSite
     }
 }
 
-function Invoke-NewWebsite($Bindings = $null)
+function Invoke-NewWebsite($Bindings = $null, $SiteID)
 {
-    if( $Bindings -eq $null )
+    $optionalParams = @{ }
+    if( $PSBoundParameters.ContainsKey( 'SiteID' ) )
     {
-        Install-IisWebsite -Name $SiteName -Path $TestDir
+        $optionalParams['SiteID'] = $SiteID
     }
-    else
+
+    if( $PSBoundParameters.ContainsKey( 'Bindings' ) )
     {
-        Install-IisWebsite -Name $SiteName -Path $TestDir -Bindings $Bindings
+        $optionalParams['Bindings'] = $Bindings
     }
-    Assert-LastProcessSucceeded 'Test site not created'
-    
+
+    Install-IisWebsite -Name $SiteName -Path $TestDir @optionalParams
+    Assert-LastProcessSucceeded 'Test site not created'    
 }
 
 function Test-ShouldCreateWebsite
 {
-    Invoke-NewWebsite
+    Invoke-NewWebsite -SiteID 5478
     
     $details = Invoke-AppCmd list site $SiteName
     Assert-NotEmpty $details "Site '$siteName' not created."
@@ -68,6 +71,10 @@ function Test-ShouldCreateWebsite
     $authXml = [xml] (Invoke-AppCmd list config $SiteName /section:anonymousAuthentication)
     $username = $authXml['system.webServer'].security.authentication.anonymousAuthentication.userName
     Assert-Empty $username "Anonymous authentication username not set to application pool's identity."
+
+    $website = Get-IisWebsite -Name $SiteName
+    Assert-NotNull $website
+    Assert-Equal 5478 $website.Id
 }
 
 function Test-ShouldResolveRelativePath
