@@ -44,19 +44,11 @@ This is a ***backwards-incompatible*** release.
  * Removed `Carbon_Script` resource. It only existed so I could pass values to my script blocks. Turns out, the built-in `Script` resource supports this with the `$using:` scope. Remember, your most important features is documentation!
  * Created a new [Carbon_ScheduledTask](http://get-carbon.org/help/Carbon_ScheduledTask.html) DSC resource for managing scheduled tasks.
  * The `Version` property on the objects returned by [Get-ProgramInstallInfo](http://get-carbon.org/help/Get-ProgramInstallInfo.html) is now a proper .NET `Version` object instead of an integer.
- * Created `Get-Msi` function for reading MSI information and properties from an MSI file.
- * `Carbon.Computer.ProgramInstallInfo` objects (returned from `Get-ProgramInstallInfo`) now have `ProductCode` and `User` properties. If a program doesn't have a product code, it is set to `[Guid]::Empty`. The `User` property is only set for per-user software installs.
- * `Invoke-WindowsInstaller` renamed `Install-Msi`, with a backwards-compatibility-preserving alias.
- * `Install-Msi` now supports wildcards for MSI path to install.
- * `Install-Msi` now only installs an MSI if it isn't already installed. To preserve the previous behavior and always install, add the `-Force` switch to all `Invoke-WindowsInstaller`\`Install-Msi` usages.
- * Added `SiteID` parameter to [Install-IisWebsite](http://get-carbon.org/help/Install-IisWebsite.html) for setting a website's IIS ID.
  
 ### Bug Fixes
 
  * `Carbon_Permission` DSC resource fails when assigning multiple permissions
  * Grant-Permission fails when clearing multiple existing, non-inherited permission on an item.
- * `Install-Msi` didn't properly detect when installation failed.
- * `Set-EnvironmentVariable` fails to set process-level environment variable.
  
 ## Changes Since `alpha.31`
 
@@ -64,24 +56,33 @@ This is a ***backwards-incompatible*** release.
 
  * [Set-HostsEntry](http://get-carbon.org/help/Set-HostsEntry.html) fails to preserve whitespace if existing lines end with a comment/description. Thanks to [Konstantin Ushenin](https://vk.com/kostanew) for the fix.
  * Carbon's `System.ServiceProcess.ServiceController` extended type data causes errors when PowerShell formats `System.ServiceProcess.ServiceController` objects that represent services on remote computers.
+ * `Install-Msi` didn't properly detect when installation failed.
+ * `Set-EnvironmentVariable` fails to set process-level environment variable.
  
 ### Enhancements
 
  * `Import-Carbon.ps1` is more intelligent about when it tries to re-load Carbon. It will force a re-import of Carbon if any of Carbon's files have changed or the version has changed.
  * Created [Uninstall-Junction](http://get-carbon.org/help/Uninstall-Junction.html) for uninstalling a junction in an idempotent way (i.e. without errors). Thanks to [Konstantin Ushenin](https://vk.com/kostanew) for the contribution.
- * Added improved error handling to [Remove-Junction](http://get-carbon.org/help/Remove-Junction.html).
+ * Improved error handling in [Remove-Junction](http://get-carbon.org/help/Remove-Junction.html).
  * [Install-Service](http://get-carbon.org/help/Install-Service.html) now supports service startup parameters/arguments.
  * New [Test-TypeDataMember](http://get-carbon.org/help/Install-Service.html) for testing if a type has an extended type member defined.
- * [Install-IisApplication](http://get-carbon.org/help/Install-IisApplication.html) now returns a `Microsoft.Web.Administration.Application` object when creating/modifying an application. If an application is unchanged, nothing is returned.
  * [Install-IisApplication](http://get-carbon.org/help/Install-IisApplication.html) now resets an application's app pool to `DefaultAppPool` if no app pool name is provided with the `AppPoolName` parameter.
  * [Install-IisAppPool](http://get-carbon.org/help/Install-IisAppPool.html) no longer returns appcmd.exe output.
+ * Added `PassThru` parameter to [Install-IisAppPool](http://get-carbon.org/help/Install-IisAppPool.html) to control when a `Microsoft.Web.Administration.ApplicationPool` for the installed app pool is returned.
  * [Get-ServiceConfiguration](http://get-carbon.org/help/Get-ServiceConfiguration.html) and Carbon's extended type data for `System.ServiceProcess.ServiceController` objects now supports services from remote computers.
  * [Uninstall-ScheduledTask](http://get-carbon.org/help/Uninstall-ScheduledTask.html) now retries when un-installing a task fails with "The function attempted to use a name that is reserved for use by another transaction." error.
  * Added new `FileIndex`, `LinkCount`, and `VolumeSerialNumber` extended type data on `System.IO.FileInfo` objects for getting a file's index, its hard link count, and volume serial number, respectively.
- * [Grant-Permission](http://get-carbon.org/help/Grant-Permission.html) only returns an access rule object when the new `PassThru` switch is used. In previous 2.0 alpha releases, it only returned something when permissions on an object were added or changed.
+ * [Grant-Permission](http://get-carbon.org/help/Grant-Permission.html) now only returns an access rule object when the new `PassThru` switch is used. In previous 2.0 alpha releases, it only returned something when permissions on an object were added or changed.
  * [Install-User](http://get-carbon.org/help/Install-User.html) only returns a user object when the new `PassThru` switch is used. In previous 2.0 alpha releases, it only returned an object if a user was created or updated.
- * [Grant-ComPermissions](http://get-carbon.org/help/Grant-ComPermissions.html) only returns an access rule object when the new `PassThru` switch is used. In previous 2.0 alpha releases, it only returned an object if permissions were changed.
+ * [Grant-ComPermissions](http://get-carbon.org/help/Grant-ComPermissions.html) only returns an access rule object when the new `PassThru` switch is used. In previous 2.0 alpha releases, it only returned an object if permissions were changed.
  * [Install-IisApplication](http://get-carbon.org/help/Install-IisApplication.html) only returns an IIS application object when the new `PassThru` switch is used. In previous 2.0 alpha releases, it only returned an object if the application was created or modified.
+ * Created `Get-Msi` function for reading MSI information and properties from an MSI file.
+ * `Carbon.Computer.ProgramInstallInfo` objects (returned from `Get-ProgramInstallInfo`) now have `ProductCode` and `User` properties. If a program doesn't have a product code, it is set to `[Guid]::Empty`. The `User` property is only set for per-user software installs.
+ * `Invoke-WindowsInstaller` renamed `Install-Msi`, with a backwards-compatibility-preserving alias.
+ * `Install-Msi` now supports wildcards for MSI path to install.
+ * `Install-Msi` now only installs an MSI if it isn't already installed. To preserve the previous behavior and always install, add the `-Force` switch to all `Invoke-WindowsInstaller`\`Install-Msi` usages.
+ * Added `SiteID` parameter to [Install-IisWebsite](http://get-carbon.org/help/Install-IisWebsite.html) for setting a website's IIS ID.
+ * Put the [Resolve-IdentityName](http://get-carbon.org/help/Resolve-IdentityName.html) function back. It was removed from previous alpha releases.
  
 ## Enhancements
 
