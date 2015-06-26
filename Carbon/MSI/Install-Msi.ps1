@@ -73,7 +73,7 @@ function Install-Msi
             $msi = $_
             if( $PSCmdlet.ShouldProcess( $msi.Path, "install" ) )
             {
-                $msiProcess = Start-Process -FilePath "msiexec.exe" -ArgumentList "/i",$msi.Path,"/quiet" -NoNewWindow -Wait -PassThru
+                $msiProcess = Start-Process -FilePath "msiexec.exe" -ArgumentList "/quiet","/i",('"{0}"' -f $msi.Path) -NoNewWindow -Wait -PassThru
 
                 if( $msiProcess.ExitCode -ne $null -and $msiProcess.ExitCode -ne 0 )
                 {

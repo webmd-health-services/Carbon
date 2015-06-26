@@ -102,6 +102,23 @@ function Test-ShouldReinstallIfForcedTo
     Assert-DirectoryExists $installDir
 }
 
+function Test-ShouldInstallMsiWithSpacesInPath
+{
+    $tempDir = New-TempDirectory -Prefix $PSCommandPath
+    try
+    {
+        $newInstaller = Join-Path -Path $tempDir -ChildPath 'Installer With Spaces.msi'
+        Copy-Item -Path $carbonTestInstaller -Destination $newInstaller
+        Install-Msi -Path $newInstaller
+        Assert-CarbonTestInstallerInstalled
+    }
+    finally
+    {
+        Remove-Item -Path $tempDir -Recurse
+    }
+
+}
+
 function Assert-CarbonTestInstallerInstalled
 {
     Assert-NoError
