@@ -35,6 +35,7 @@ function Get-IisSecurityAuthentication
     Gets the `Peanuts` site's `Doghouse` sub-directory's basic authentication configuration section.
     #>
     [CmdletBinding()]
+    [OutputType([Microsoft.Web.Administration.ConfigurationSection])]
     param(
         [Parameter(Mandatory=$true)]
         [string]

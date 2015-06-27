@@ -19,9 +19,11 @@ function Install-IisWebsite
     Installs a website.
 
     .DESCRIPTION
-    Installs a website named `Name`, serving files out of the file system from `PhysicalPath`.  If no app pool name is given (via the `AppPoolName` parameter), IIS will pick one for you, usually the `DefaultAppPool`.  If a site with name `Name` already exists, it is deleted, and a new site is created.
+    `Install-IisWebsite` installs an IIS website. If the website already exists, its configuration is changed to match the values of the parameters passed in. Anonymous authentication is enabled, and the anonymous user is set to the website's application pool identity.
+    
+    If don't set the website's app pool, IIS will pick one for you, and `Install-IisWebsite` will never manage the app pool for you (i.e. if someone changes it manually, this function won't set it back to the default). We recommend always supplying an app pool name, even if it is `DefaultAppPool`.
 
-    By default, the site listens on all IP addresses on port 80.  Set custom bindings with the `Bindings` argument.  Multiple bindings are allowed.  Each binding must be in this format (in BNF):
+    By default, the site listens on (i.e. is bound to) all IP addresses on port 80 (binding `http/*:80:`). Set custom bindings with the `Bindings` argument. Multiple bindings are allowed. Each binding must be in this format (in BNF):
 
         <PROTOCOL> '/' <IP_ADDRESS> ':' <PORT> ':' [ <HOSTNAME> ]
 
@@ -35,7 +37,7 @@ function Install-IisWebsite
      * http/*:80:
      * https/10.2.3.4:443:
      * http/*:80:example.com
-    
+
     .LINK
     Get-IisWebsite
     
@@ -61,13 +63,13 @@ function Install-IisWebsite
     param(
         [Parameter(Position=0,Mandatory=$true)]
         [string]
-        # The name of the website
+        # The name of the website.
         $Name,
         
         [Parameter(Position=1,Mandatory=$true)]
         [Alias('Path')]
         [string]
-        # The physical path (i.e. on the file system) to the website
+        # The physical path (i.e. on the file system) to the website. If it doesn't exist, it will be created for you.
         $PhysicalPath,
         
         [Parameter(Position=2)]
@@ -90,34 +92,88 @@ function Install-IisWebsite
     
     Set-StrictMode -Version 'Latest'
 
-    if( Test-IisWebsite -Name $Name )
-    {
-        Uninstall-IisWebsite -Name $Name
-    }
-    
     $PhysicalPath = Resolve-FullPath -Path $PhysicalPath
     if( -not (Test-Path $PhysicalPath -PathType Container) )
     {
-        $null = New-Item $PhysicalPath -ItemType Directory -Force
+        New-Item $PhysicalPath -ItemType Directory | Out-String | Write-Verbose
     }
     
+    $bindingRegex = '^(?<Protocol>https?):?//?(?<IPAddress>\*|[\d\.]+):(?<Port>\d+):?(?<HostName>.*)$'
     $invalidBindings = $Bindings | 
-                           Where-Object { $_ -notmatch '^http(s)?/(\*|[\d\.]+):\d+:(.*)$' } |
-                           Where-Object { $_ -notmatch '^http(s)?://(\*|[\d\.]+):\d+(:.*)?$' }
+                           Where-Object { $_ -notmatch $bindingRegex } 
     if( $invalidBindings )
     {
         $invalidBindings = $invalidBindings -join "`n`t"
-        $errorMsg = "The following bindings are invalid.  The correct format is protocol/IPAddress:Port:Hostname.  IP address can be * for all IP addresses.  Hostname is optional.`n`t{0}" -f $invalidBindings
+        $errorMsg = "The following bindings are invalid. The correct format is protocol/IPAddress:Port:Hostname. Protocol and IP address must be separted by a single slash, not ://. IP address can be * for all IP addresses. Hostname is optional. If hostname is not provided, the binding must end with a colon.`n`t{0}" -f $invalidBindings
         Write-Error $errorMsg
         return
     }
-    
-    $bindingsArg = $Bindings -join ','
-    Invoke-AppCmd add site /name:"$Name" /physicalPath:"$PhysicalPath" /bindings:$bindingsArg
+
+    [Microsoft.Web.Administration.Site]$site = $null
+    $modified = $true
+    $created = $false
+    if( (Test-IisWebsite -Name $Name) )
+    {
+        $site = Get-IisWebsite -Name $Name
+    }
+    else
+    {
+        Write-Verbose -Message ('Creating website ''{0}'' ({1}).' -f $Name,$PhysicalPath)
+        $mgr = New-Object 'Microsoft.Web.Administration.ServerManager'
+        $site = $mgr.Sites.Add( $Name, $PhysicalPath, 80 ) | Add-IisServerManagerMember -ServerManager $mgr -PassThru
+        $modified = $true
+        $created = $true
+    }
+
+    $existingBindings = New-Object 'Collections.Generic.Hashset[string]'
+    $site.Bindings | ForEach-Object { $existingBindings.Add( ('{0}/{1}' -f $_.Protocol,$_.BindingInformation ) ) }
+
+    $missingBinding = $Bindings | Where-Object { -not $existingBindings.Contains( $_ ) }
+    $hasExtraBinding = $existingBindings | Where-Object { $Bindings -notcontains $_ }
+    if( $missingBinding -or $hasExtraBinding )
+    {
+        $site.Bindings.Clear()
+        $Bindings | ForEach-Object { 
+            $_ -match $bindingRegex | Out-Null
+            $protocol = $Matches['Protocol']
+            $bindingInfo = '{0}:{1}:{2}' -f $Matches['IPAddress'],$Matches['Port'],$Matches['HostName']
+            Write-Verbose -Message ('IIS://{0}: adding binding [{1}] {2}' -f $Name,$protocol,$bindingInfo)
+            $site.Bindings.Add( $bindingInfo, $protocol )
+        }
+        $modified = $true
+    }
+
+    if( $site.Applications.Count -eq 0 )
+    {
+        $rootApp = $site.Applications.Add("/", $PhysicalPath)
+        $modifed = $true
+    }
+    else
+    {
+        [Microsoft.Web.Administration.Application]$rootApp = $site.Applications | Where-Object { $_.Path -eq '/' }
+        if( $site.PhysicalPath -ne $PhysicalPath )
+        {
+            Write-Verbose -Message ('IIS://{0}: PhysicalPath: {1}' -f $Name,$PhysicalPath)
+            [Microsoft.Web.Administration.VirtualDirectory]$vdir = $rootApp.VirtualDirectories | Where-Object { $_.Path -eq '/' }
+            $vdir.PhysicalPath = $PhysicalPath
+            $modified = $true
+        }
+    }
     
     if( $AppPoolName )
     {
-        Invoke-AppCmd set site /site.name:"$Name" /[path=`'/`'].applicationPool:`"$AppPoolName`"
+        if( $rootApp.ApplicationPoolName -ne $AppPoolName )
+        {
+            Write-Verbose -Message ('IIS://{0}: AppPool: {1}' -f $Name,$AppPoolName)
+            $rootApp.ApplicationPoolName = $AppPoolName
+            $modified = $true
+        }
+    }
+
+    if( $modified )
+    {
+        Write-Verbose -Message ('IIS://{0}: Committing changes' -f $Name)
+        $site.CommitChanges()
     }
     
     if( $SiteID )
@@ -125,9 +181,11 @@ function Install-IisWebsite
         Set-IisWebsiteID -SiteName $Name -ID $SiteID
     }
     
-    # Make sure anonymous authentication uses the application pool identity
-    Invoke-AppCmd set config `"$Name`" /section:anonymousAuthentication /userName: /commit:apphost
-    
+    # Make sure anonymous authentication is enabled and uses the application pool identity
+    $security = Get-IisSecurityAuthentication -SiteName $Name -VirtualPath '/' -Anonymous
+    $security['username'] = ''
+    $security.CommitChanges()
+
     # Now, wait until site is actually running
     $tries = 0
     do

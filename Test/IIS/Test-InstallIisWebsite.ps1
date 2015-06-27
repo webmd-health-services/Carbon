@@ -153,7 +153,7 @@ function Test-ShouldCreateSiteDirectory
 function Test-ShouldValidateBindings
 {
     $error.Clear()
-    Install-IisWebsite -Name $SiteName -Path $TestDir -Bindings 'http/*:80' -ErrorAction SilentlyContinue
+    Install-IisWebsite -Name $SiteName -Path $TestDir -Bindings 'http/*' -ErrorAction SilentlyContinue
     Assert-True ($error.Count -ge 1)
     Assert-False (Test-IisWebsite -Name $SiteName)
     Assert-Error -Last 'bindings are invalid'
@@ -174,6 +174,80 @@ function Test-ShouldAllowHttpsBindings
     $bindings = Get-IisWebsite -SiteName $SiteName | Select-Object -ExpandProperty Bindings
     Assert-Equal 'https' $bindings[0].Protocol
     Assert-Equal 'https' $bindings[1].Protocol
+}
+
+function Test-ShouldNotRecreateExistingWebsite
+{
+    Install-IisWebsite -Name $SiteName -PhysicalPath $TestDir -Bindings 'http/*:9876:'
+    $website = Get-IisWebsite -Name $SiteName
+    Assert-NotNull $website
+
+    Install-IisWebsite -Name $SiteName -PhysicalPath $TestDir -Bindings 'http/*:9876:'
+    Assert-NoError
+    $newWebsite = Get-IisWebsite -Name $SiteName
+    Assert-NotNull $newWebsite
+    Assert-Equal $website.Id $newWebsite.Id
+}
+
+function Test-ShouldChangeWebsiteSettings
+{
+    $appPool = Install-IisAppPool -Name 'CarbonShouldChangeWebsiteSettings' -PassThru
+    $tempDir = New-TempDirectory -Prefix $PSCommandPath
+    
+    try
+    {
+        Install-IisWebsite -Name $SiteName -PhysicalPath $PSScriptRoot
+        Assert-NoError
+        $website = Get-IisWebsite -Name $SiteName
+        Assert-NotNull $website
+        Assert-Equal $SiteName $website.Name
+        Assert-Equal $PSScriptRoot $website.PhysicalPath
+
+        Install-IisWebsite -Name $SiteName -PhysicalPath $tempDir -Bindings 'http/*:9986:' -SiteID 9986 -AppPoolName $appPool.Name
+        Assert-NoError
+        $website = Get-IisWebsite -Name $SiteName
+        Assert-NotNull $website
+        Assert-Equal $SiteName $website.Name
+        Assert-Equal $tempDir.FullName $website.PhysicalPath
+        Assert-Equal 9986 $website.Id
+        Assert-Equal $appPool.Name $website.Applications[0].ApplicationPoolName
+        Assert-WebsiteBinding '[http] *:9986:' 
+    }
+    finally
+    {
+        Uninstall-IisAppPool -Name $appPool.Name
+        Remove-Item -Path $tempDir -Recurse
+    }
+}
+
+function Test-ShouldUpdateBindings
+{
+    Install-IisWebsite -Name $SiteName -PhysicalPath $PSScriptRoot
+
+    Install-IisWebsite -Name $SiteName -Bindings 'http/*:8001:' -PhysicalPath $PSScriptRoot
+    Assert-WebsiteBinding '[http] *:8001:'
+    Install-IisWebsite -Name $SiteName -Bindings 'http/*:8001:','http/*:8002:' -PhysicalPath $PSScriptRoot
+    Assert-WebsiteBinding '[http] *:8001:', '[http] *:8002:'
+    Install-IisWebsite -Name $SiteName -Bindings 'http/*:8002:' -PhysicalPath $PSScriptRoot
+    Assert-WebsiteBinding '[http] *:8002:'
+    Install-IisWebsite -Name $SiteName -Bindings 'http/*:8003:' -PhysicalPath $PSScriptRoot
+    Assert-WebsiteBinding '[http] *:8003:'
+}
+
+function Assert-WebsiteBinding
+{
+    param(
+        [string[]]
+        $Binding
+    )
+
+    $website = Get-IisWebsite -Name $SiteName
+    [string[]]$actualBindings = $website.Bindings | ForEach-Object { $_.ToString() }
+    Assert-Equal $Binding.Count $actualBindings.Count
+    foreach( $item in $Binding )
+    {
+        Assert-True ($actualBindings -contains $item) ('{0} not in @( "{1}" )' -f $item,($actualBindings -join '", "'))
+    }
 }
 
 function Assert-WebsiteRunning($port)

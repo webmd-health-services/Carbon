@@ -57,7 +57,7 @@ function Enable-IisSecurityAuthentication
         [Switch]
         # Enable anonymouse authentication.
         $Anonymous,
-        
+
         [Parameter(Mandatory=$true,ParameterSetName='Basic')]
         [Switch]
         # Enable basic authentication.
