@@ -151,7 +151,8 @@ This is a ***backwards-incompatible*** release.
  * [Install-IisApplication](http://get-carbon.org/help/Install-IisApplication.html) now resets an application's app pool to `DefaultAppPool` if no app pool name is provided with the `AppPoolName` parameter.
  * [Install-IisAppPool](http://get-carbon.org/help/Install-IisAppPool.html) no longer returns appcmd.exe output.
  * Added `SiteID` parameter to [Install-IisWebsite](http://get-carbon.org/help/Install-IisWebsite.html) for setting a website's IIS ID.
-
+ * [Install-IisWebsite](https://get-carbon.org/help/Install-IisWebsite.ps1) no longer deletes and re-creates websites. This may or may not be a breaking change in your environment.
+ * Added `PassThru` parameter to [Install-IisWebsite](https://get-carbon.org/help/Install-IisWebsite.ps1). When used, `Install-IisWebsite` will return a `Microsoft.Web.Administration.Site` object for the website.
  
 ### MSI
 

@@ -60,6 +60,7 @@ function Install-IisWebsite
     Creates a website named `Peanuts` that runs under the `PeanutsAppPool` app pool
     #>
     [CmdletBinding()]
+    [OutputType([Microsoft.Web.Administration.Site])]
     param(
         [Parameter(Position=0,Mandatory=$true)]
         [string]
@@ -87,7 +88,11 @@ function Install-IisWebsite
 
         [int]
         # The site's IIS ID. IIS picks one for you automatically if you don't supply one. Must be greater than 0.
-        $SiteID
+        $SiteID,
+
+        [Switch]
+        # Return a `Microsoft.Web.Administration.Site` object for the website.
+        $PassThru
     )
     
     Set-StrictMode -Version 'Latest'
@@ -126,7 +131,7 @@ function Install-IisWebsite
     }
 
     $existingBindings = New-Object 'Collections.Generic.Hashset[string]'
-    $site.Bindings | ForEach-Object { $existingBindings.Add( ('{0}/{1}' -f $_.Protocol,$_.BindingInformation ) ) }
+    $site.Bindings | ForEach-Object { [void]$existingBindings.Add( ('{0}/{1}' -f $_.Protocol,$_.BindingInformation ) ) }
 
     $missingBinding = $Bindings | Where-Object { -not $existingBindings.Contains( $_ ) }
     $hasExtraBinding = $existingBindings | Where-Object { $Bindings -notcontains $_ }
@@ -182,19 +187,21 @@ function Install-IisWebsite
     }
     
     # Make sure anonymous authentication is enabled and uses the application pool identity
+    Write-Verbose ('IIS://{0}: Enabling anonymous authentication; setting anonymous user to app pool identity.')
     $security = Get-IisSecurityAuthentication -SiteName $Name -VirtualPath '/' -Anonymous
     $security['username'] = ''
     $security.CommitChanges()
 
     # Now, wait until site is actually running
     $tries = 0
+    $website = $null
     do
     {
         $website = Get-IisWebsite -SiteName $Name
         $tries += 1
         if($website.State -ne 'Unknown')
         {
-            break
+            return $website
         }
         else
         {
@@ -202,4 +209,6 @@ function Install-IisWebsite
         }
     }
     while( $tries -lt 100 )
+
+    return $website
 }

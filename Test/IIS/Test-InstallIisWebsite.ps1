@@ -234,6 +234,15 @@ function Test-ShouldUpdateBindings
     Assert-WebsiteBinding '[http] *:8003:'
 }
 
+function Test-ShouldReturnSiteObject
+{
+    $site = Install-IisWebsite -Name $SiteName -PhysicalPath $PSScriptRoot -PassThru
+    Assert-NotNull $site
+    Assert-Is $site ([Microsoft.Web.Administration.Site])
+    Assert-Equal $SiteName $site.Name
+    Assert-Equal $PSScriptRoot $site.PhysicalPath
+}
+
 function Assert-WebsiteBinding
 {
     param(
