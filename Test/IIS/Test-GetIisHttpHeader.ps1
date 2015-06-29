@@ -25,10 +25,9 @@ function Start-Test
     Install-IisWebsite -Name $siteName -Path $TestDir -Binding ('http/*:{0}:*' -f $sitePort)
 }
 
-function Remove()
+function Stop-Test
 {
-    Remove-IisWebsite -Name $siteName
-    Remove-Module Carbon
+    Uninstall-IisWebsite -Name $siteName
 }
 
 function Test-ShouldReturnAllHeaders
