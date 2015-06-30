@@ -19,9 +19,9 @@ function Install-User
     Installs a *local* user account.
 
     .DESCRIPTION
-    Creates a new *local* user account.  If the account already exists, updates it.  Returns the user.
+    Creates a new *local* user account.  If the account already exists, updates it.  Returns the user if `-PassThru` switch is used.
 
-    The `UserCannotChangePassword` and `PasswordNeverExpires` switches were added in Carbon 2.0.
+    The `UserCannotChangePassword` and `PasswordExpires` switches were added in Carbon 2.0.
 
     .OUTPUTS
     System.DirectoryServices.AccountManagement.UserPrincipal.
@@ -38,12 +38,12 @@ function Install-User
     .EXAMPLE
     Install-User -Username LSkywalker -Password "whydidn'tyoutellme" -Description "Luke Skywalker's account."
 
-    Creates a new `LSkywalker` user account with the given password and description.  Luke's password is set ot never expire.  
+    Creates a new `LSkywalker` user account with the given password and description.  Luke's password is set to never expire.  
 
     .EXAMPLE
-    Install-User -Username LSkywalker -Password "whydidn'tyoutellme" -UserCannotChangePassword -PasswordNeverExpires
+    Install-User -Username LSkywalker -Password "whydidn'tyoutellme" -UserCannotChangePassword -PasswordExpires
 
-    Demonstrates how to create an account for a user who cannot change his password and whose password never expires.
+    Demonstrates how to create an account for a user who cannot change his password and whose password will expire.
     #>
     [CmdletBinding(SupportsShouldProcess=$true)]
     [OutputType([System.DirectoryServices.AccountManagement.UserPrincipal])]
@@ -72,8 +72,8 @@ function Install-User
         $UserCannotChangePassword,
 
         [Switch]
-        # Set to true if the user's password should never expire. New in Carbon 2.0.
-        $PasswordNeverExpires,
+        # Set to true if the user's password should expire. New in Carbon 2.0.
+        $PasswordExpires,
 
         [Switch]
         # Return the user. New in Carbon 2.0.
@@ -95,7 +95,7 @@ function Install-User
     $user.DisplayName = $FullName
     $user.Description = $Description
     $user.UserCannotChangePassword = $UserCannotChangePassword
-    $user.PasswordNeverExpires = $PasswordNeverExpires
+    $user.PasswordNeverExpires = -not $PasswordExpires
     $user.SetPassword( $Password )
 
     if( $PSCmdlet.ShouldProcess( $Username, "$operation local user" ) )

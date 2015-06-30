@@ -46,7 +46,7 @@ function Test-ShouldCreateNewUser
     [DirectoryServices.AccountManagement.UserPrincipal]$user = Get-User -Username $username
     Assert-NotNull $user
     Assert-Equal $description $user.Description
-    Assert-False $user.PasswordNeverExpires 
+    Assert-True $user.PasswordNeverExpires 
     Assert-True $user.Enabled
     Assert-Equal $username $user.SamAccountName
     Assert-False $user.UserCannotChangePassword
@@ -70,7 +70,7 @@ function Test-ShouldUpdateExistingUsersProperties
                            -Description $newDescription `
                            -FullName $newFullName `
                            -UserCannotChangePassword `
-                           -PasswordNeverExpires 
+                           -PasswordExpires 
     
     Assert-Null $result
 
@@ -79,7 +79,7 @@ function Test-ShouldUpdateExistingUsersProperties
     Assert-Equal $originalUser.SID $newUser.SID
     Assert-Equal $newDescription $newUser.Description
     Assert-Equal $newFullName $newUser.DisplayName
-    Assert-True $newUser.PasswordNeverExpires
+    Assert-False $newUser.PasswordNeverExpires
     Assert-True $newUser.UserCannotChangePassword
     Assert-Credential -Password $newPassword
 }

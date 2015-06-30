@@ -23,7 +23,6 @@ This is a ***backwards-incompatible*** release.
      * [Install-Service](http://get-carbon.org/help/Install-Service.html)
  * [Set-SslCertificateBinding](http://get-carbon.org/help/Set-SslCertificateBinding.html) now returns `Carbon.Certificates.SslCertificateBinding` objects instead of netsh output. Update any code that uses the old `Set-SslCertificateBinding` output.
  * Ensure that all thumbprints passed to [Set-SslCertificateBinding](http://get-carbon.org/help/Set-SslCertificateBinding.html) are valid (40 character hex strings).
- * Add the new `-PasswordNeverExpires` switch to usages of [Install-User](http://get-carbon.org/help/Install-User.html): it no longer sets the `PasswordNeverExpires` flag for a user by default.
  * Use the `Sid` property on objects returned by [Test-Identity](http://get-carbon.org/help/Test-Identity.html) when using the `PassThru` switch: it now returns a `Carbon.Identity` object if the identity exists *and* you use the `-PassThru` switch, e.g. `Test-Identity -Name $userName -PassThru | Select-Object -Expand 'Sid'`.
  * Check that all IP addresses passed to [Set-HostsEntry](http://get-carbon.org/help/Set-HostsEntry.html) are valid IP v4 or v6 addresses.  [Set-HostsEntry](http://get-carbon.org/help/Set-HostsEntry.html)'s IPAddress parameter is now a `System.Net.IPAddress` object.  Previously it was a string validated with a regular expression, so you *should* be OK.
  * Remove the `Exportable` switch from any usages of [Install-Certificate](http://get-carbon.org/help/Install-Certificate.html) when installing from an `X509Certificate2` object, since that switch only gets used when installing a certificate from a file.
@@ -86,6 +85,7 @@ This is a ***backwards-incompatible*** release.
  * [Install-IisWebsite](https://get-carbon.org/help/Install-IisWebsite.ps1) no longer deletes and re-creates websites. This may or may not be a breaking change in your environment.
  * [Install-SmbShare](https://get-carbon.org/help/Install-SmbShare.ps1) no longer returns net.exe output, instead writing it to the verbose stream. To see previous output, use the `-Verbose` switch.
  * [Install-Service](http://get-carbon.org/help/Install-Service.html) no longer returns `ServiceController` objects by default. This should improve backwards-compatability. Added a `PassThru` switch you can use to get a `ServiceController` object returned to you.
+ * Changed `-PasswordNeverExpires` switch to  `PasswordExpires` on [Install-User](http://get-carbon.org/help/Install-User.html) for improved backwards-compatability.
  
 ## Enhancements
 
@@ -193,7 +193,7 @@ This is a ***backwards-incompatible*** release.
 ### Users and Groups
 
  * Re-wrote [Install-User](http://get-carbon.org/help/Install-User.html) to use .NET's [System.DirectoryServices.AccountManagement](http://msdn.microsoft.com/en-us/library/system.directoryservices.accountmanagement.aspx) API (introduced with .NET 3.5) instead of the `net.exe` command-line program.
- * Added `PasswordNeverExpires` switch to [Install-User](http://get-carbon.org/help/Install-User.html) for creating accounts with passwords that expire.  This is a breaking change: this flag used to set this flag by default.
+ * Added `PasswordExpires` switch to [Install-User](http://get-carbon.org/help/Install-User.html) for creating accounts with passwords that expire.
  * Added `UserCannotChangePassword` switch to [Install-User](http://get-carbon.org/help/Install-User.html) to prevent user from changing his password.
  * Added [Get-User](http://get-carbon.org/help/Get-User.html) function for getting a local user or all local users.
  * Added [Get-Group](http://get-carbon.org/help/Get-Group.html) function for getting a local group or all local groups.
