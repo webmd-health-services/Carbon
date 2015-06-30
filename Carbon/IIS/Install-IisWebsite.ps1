@@ -19,7 +19,7 @@ function Install-IisWebsite
     Installs a website.
 
     .DESCRIPTION
-    `Install-IisWebsite` installs an IIS website. If the website already exists, its configuration is changed to match the values of the parameters passed in. Anonymous authentication is enabled, and the anonymous user is set to the website's application pool identity.
+    `Install-IisWebsite` installs an IIS website. Anonymous authentication is enabled, and the anonymous user is set to the website's application pool identity. Before Carbon 2.0, if a website already existed, it was deleted and re-created. Beginning with Carbon 2.0, existing websites are modified in place. Also starting in Carbon 2.0, when a website is created or its application pool changes, its app pool is recycled.
     
     If don't set the website's app pool, IIS will pick one for you, and `Install-IisWebsite` will never manage the app pool for you (i.e. if someone changes it manually, this function won't set it back to the default). We recommend always supplying an app pool name, even if it is `DefaultAppPool`.
 
@@ -165,6 +165,7 @@ function Install-IisWebsite
         }
     }
     
+    $setAppPool = $false
     if( $AppPoolName )
     {
         if( $rootApp.ApplicationPoolName -ne $AppPoolName )
@@ -172,6 +173,7 @@ function Install-IisWebsite
             Write-Verbose -Message ('IIS://{0}: AppPool: {1}' -f $Name,$AppPoolName)
             $rootApp.ApplicationPoolName = $AppPoolName
             $modified = $true
+            $setAppPool = $true
         }
     }
 
@@ -179,6 +181,13 @@ function Install-IisWebsite
     {
         Write-Verbose -Message ('IIS://{0}: Committing changes' -f $Name)
         $site.CommitChanges()
+        if( $created -or $setAppPool )
+        {
+            $rootApp = Get-IisApplication -SiteName $Name
+            $appPool = Get-IisAppPool -Name $rootApp.ApplicationPoolName
+            Write-Verbose ('IIS://{0}: recycling ''{1}'' app pool' -f $Name,$appPool.Name)
+            $appPool.Recycle() | Write-Verbose
+        }
     }
     
     if( $SiteID )
@@ -187,7 +196,7 @@ function Install-IisWebsite
     }
     
     # Make sure anonymous authentication is enabled and uses the application pool identity
-    Write-Verbose ('IIS://{0}: Enabling anonymous authentication; setting anonymous user to app pool identity.')
+    Write-Verbose ('IIS://{0}: Enabling anonymous authentication; setting anonymous user to app pool identity.' -f $Name)
     $security = Get-IisSecurityAuthentication -SiteName $Name -VirtualPath '/' -Anonymous
     $security['username'] = ''
     $security.CommitChanges()
