@@ -68,6 +68,7 @@ function Install-Service
     Demonstrates how to control the service's failure actions. On the first failure, Windows will run the `engage-hyperdrive.exe "Corruscant"` command after 5 seconds (`5,000` milliseconds). On the second failure, Windows will restart the service after 30 seconds (`30,000` milliseconds). On the third failure, Windows will reboot after two minutes (`120,000` milliseconds). The failure count gets reset once a day (`60*60*24` seconds).
     #>
     [CmdletBinding(SupportsShouldProcess=$true,DefaultParameterSetName='NetworkServiceAccount')]
+    [OutputType([ServiceProcess.ServiceController])]
     param(
         [Parameter(Mandatory=$true)]
         [string]
@@ -136,7 +137,11 @@ function Install-Service
 
         [Switch]
         # Update the service even if there are no changes.
-        $Force
+        $Force,
+
+        [Switch]
+        # Return a `System.ServiceProcess.ServiceController` object for the configured service.
+        $PassThru
     )
 
     Set-StrictMode -Version 'Latest'
@@ -292,7 +297,10 @@ function Install-Service
     if( -not $doInstall )
     {
         Write-Verbose ('Skipping {0} service configuration: settings unchanged.' -f $Name)
-        return
+        if( $PassThru )
+        {
+            return Get-Service -Name $Name -ErrorAction Ignore
+        }
     }
 
     if( $Dependency )
@@ -441,5 +449,8 @@ function Install-Service
         Write-Verbose ('Not re-starting {0} service. Its startup type is {0} and it wasn''t running when configuration began.' -f $Name,$StartupType)
     }
 
-    Get-Service -Name $Name -ErrorAction Ignore
+    if( $PassThru )
+    {
+        Get-Service -Name $Name -ErrorAction Ignore
+    }
 }

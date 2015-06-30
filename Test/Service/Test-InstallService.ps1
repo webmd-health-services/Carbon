@@ -44,7 +44,8 @@ function Stop-Test
 
 function Test-ShouldInstallService
 {
-    Install-Service -Name $serviceName -Path $servicePath @installServiceParams
+    $result = Install-Service -Name $serviceName -Path $servicePath @installServiceParams
+    Assert-Null $result
     $service = Assert-ServiceInstalled 
     Assert-Equal 'Running' $service.Status
     Assert-Equal $serviceName $service.Name
@@ -101,7 +102,8 @@ function Test-ShouldNotInstallServiceTwice
     Start-Sleep -Milliseconds (1001 - $now.Millisecond)
 
     Stop-Service -Name $serviceName
-    Install-Service -Name $serviceName -Path $servicePath @installServiceParams
+    $result = Install-Service -Name $serviceName -Path $servicePath @installServiceParams
+    Assert-Null $result
     # This could break if Install-Service is ever updated to not start a stopped service
     Assert-Equal 'Stopped' (Get-Service -Name $serviceName).Status
 }
@@ -115,7 +117,7 @@ function Test-ShouldNotInstallServiceWithSpaceInItsPath
         $servicePath = Join-Path -Path $tempDir -ChildPath (Split-Path -Leaf -Path $servicePath)
 
         $svc = Install-Service -Name $serviceName -Path $servicePath
-        Assert-NotNull $svc
+        Assert-Null $svc
         $svc = Install-Service -Name $serviceName -Path $servicePath
         Assert-Null $svc
     }
@@ -146,6 +148,7 @@ function Test-ShouldInstallServiceWithArgumentList
         $servicePath = Join-Path -Path $tempDir -ChildPath (Split-Path -Leaf -Path $servicePath)
 
         $svc = Install-Service -Name $serviceName -Path $servicePath -ArgumentList "-k","Fu bar"
+        Assert-Null $svc
         Assert-NoError
         $svcConfig = Get-ServiceConfiguration -Name $serviceName
         Assert-Equal ('"{0}" -k "Fu bar"' -f $servicePath) $svcConfig.Path
@@ -160,10 +163,11 @@ function Test-ShouldInstallServiceWithArgumentList
 function Test-ShouldReinstallServiceIfArgumentListChanges
 {
     $svc = Install-Service -Name $serviceName -Path $servicePath -ArgumentList "-k","Fu bar"
+    Assert-Null $svc
     Assert-NoError
     $svc = Install-Service -Name $serviceName -Path $servicePath -ArgumentList "-k","Fubar"
     Assert-NoError
-    Assert-NotNull $svc
+    Assert-Null $svc
     $svc = Install-Service -Name $serviceName -Path $servicePath -ArgumentList "-k","Fubar"
     Assert-Null $svc
 }
@@ -474,7 +478,23 @@ function Test-ShouldStartAStoppedAutomaticService
     Install-Service -Name $serviceName -Path $servicePath -StartupType Automatic -Force
     $service = Get-Service -Name $serviceName
     Assert-Equal 'Running' $service.Status
+}
 
+function Test-ShouldReturnServiceObject
+{
+    $svc = Install-Service -Name $serviceName -Path $servicePath -StartupType Automatic -PassThru
+    Assert-NotNull $svc
+    Assert-Equal $serviceName $svc.Name
+
+    # Change service, make sure  object reeturned
+    $svc = Install-Service -Name $serviceName -Path $servicePath -StartupType Manual -PassThru
+    Assert-NotNull $svc
+    Assert-Equal $serviceName $svc.Name
+
+    # No changes, service still returned
+    $svc = Install-Service -Name $serviceName -Path $servicePath -StartupType Manual -PassThru
+    Assert-NotNull $svc
+    Assert-Equal $serviceName $svc.Name
 }
 
 
