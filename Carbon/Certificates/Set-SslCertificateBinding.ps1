@@ -37,6 +37,7 @@ function Set-SslCertificateBinding
     Configures the compute to use the 478907345890734590743 certificate as the default certificate on all IP addresses, port 443.
     #>
     [CmdletBinding(SupportsShouldProcess=$true)]
+    [OutputType([Carbon.Certificates.SslCertificateBinding])]
     param(
         [IPAddress]
         # The IP address for the binding.  Defaults to all IP addresses.
@@ -55,7 +56,11 @@ function Set-SslCertificateBinding
         [ValidatePattern("^[0-9a-f]{40}$")]
         [string]
         # The thumbprint of the certificate to use.  The certificate must be installed.
-        $Thumbprint
+        $Thumbprint,
+
+        [Switch]
+        # Return a `Carbon.Certificates.SslCertificateBinding` for the configured binding.
+        $PassThru
     )
 
     Set-StrictMode -Version 'Latest'
@@ -83,6 +88,10 @@ function Set-SslCertificateBinding
         Invoke-ConsoleCommand -Target $ipPort -Action $action @commonParams -WhatIf:$WhatIfPreference -ScriptBlock {
             netsh http add sslcert ipport=$ipPort certhash=$Thumbprint appid=$appID
         }
-        Get-SslCertificateBinding -IPAddress $IPAddress -Port $Port @commonParams
+
+        if( $PassThru )
+        {
+            Get-SslCertificateBinding -IPAddress $IPAddress -Port $Port @commonParams
+        }
     }
 }

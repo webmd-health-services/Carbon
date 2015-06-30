@@ -21,7 +21,7 @@ This is a ***backwards-incompatible*** release.
      * [Install-IisAppPool](http://get-carbon.org/help/Install-IisAppPool.html)
      * [Install-SmbShare[(http://get-carbon.org/help/Install-SmbShare.html)
      * [Install-Service](http://get-carbon.org/help/Install-Service.html)
- * [Set-SslCertificateBinding](http://get-carbon.org/help/Set-SslCertificateBinding.html) now returns `Carbon.Certificates.SslCertificateBinding` objects instead of netsh output. Update any code that uses the old `Set-SslCertificateBinding` output.
+     * [Set-SslCertificateBinding](http://get-carbon.org/help/Set-SslCertificateBinding.html)
  * Ensure that all thumbprints passed to [Set-SslCertificateBinding](http://get-carbon.org/help/Set-SslCertificateBinding.html) are valid (40 character hex strings).
  * Use the `Sid` property on objects returned by [Test-Identity](http://get-carbon.org/help/Test-Identity.html) when using the `PassThru` switch: it now returns a `Carbon.Identity` object if the identity exists *and* you use the `-PassThru` switch, e.g. `Test-Identity -Name $userName -PassThru | Select-Object -Expand 'Sid'`.
  * Check that all IP addresses passed to [Set-HostsEntry](http://get-carbon.org/help/Set-HostsEntry.html) are valid IP v4 or v6 addresses.  [Set-HostsEntry](http://get-carbon.org/help/Set-HostsEntry.html)'s IPAddress parameter is now a `System.Net.IPAddress` object.  Previously it was a string validated with a regular expression, so you *should* be OK.
@@ -86,6 +86,7 @@ This is a ***backwards-incompatible*** release.
  * [Install-SmbShare](https://get-carbon.org/help/Install-SmbShare.ps1) no longer returns net.exe output, instead writing it to the verbose stream. To see previous output, use the `-Verbose` switch.
  * [Install-Service](http://get-carbon.org/help/Install-Service.html) no longer returns `ServiceController` objects by default. This should improve backwards-compatability. Added a `PassThru` switch you can use to get a `ServiceController` object returned to you.
  * Changed `-PasswordNeverExpires` switch to  `PasswordExpires` on [Install-User](http://get-carbon.org/help/Install-User.html) for improved backwards-compatability.
+ * [Set-SslCertificateBinding](http://get-carbon.org/help/Set-SslCertificateBinding.html) no longer returns binding objects by default. Use new `PassThru` switch to get the old behavior.
  
 ## Enhancements
 
@@ -98,7 +99,8 @@ This is a ***backwards-incompatible*** release.
 ### Certificates
 
  * [Remove-SslCertificateBinding](http://get-carbon.org/help/Remove-SslCertificateBinding.html) now writes messages with `Write-Verbose` instead of `Write-Host`. Improved error handling.
- * [Set-SslCertificateBinding](http://get-carbon.org/help/Remove-SslCertificateBinding.html) now returns `Carbon.Certificates.SslCertificateBinding` object for the binding instead of `netsh` output. Improved error handling. Writes messages with `Write-Verbose` instead of `Write-Host`. Thumbprints are now validated.
+ * Added `PassThru` switch to [Set-SslCertificateBinding](http://get-carbon.org/help/Set-SslCertificateBinding.html). When used, `Set-SslCertificateBinding` will return a `Carbon.Certificates.SslCertificateBinding` object for the configured binding.
+ * [Set-SslCertificateBinding](http://get-carbon.org/help/Set-SslCertificateBinding.html) no longer returns console output, instead writing it to the verbose stream. Use the `Verbose` stream to see the previous output.
  * The `Exportable` switch is now only allowed by [Install-Certificate](http://get-carbon.org/help/Install-Certificate.html) when installing a certificate from a file. Previously, you could supply the switch when installing from an X509Certificate2 object but it was ignored.
 
 ### COM

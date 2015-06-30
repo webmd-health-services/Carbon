@@ -40,6 +40,7 @@ function Get-SslCertificateBinding
     Gets the default SSL certificate bound to ALL the computer's IP addresses on port 443.
     #>
     [CmdletBinding()]
+    [OutputType([Carbon.Certificates.SslCertificateBinding])]
     param(
         [IPAddress]
         # The IP address whose certificate(s) to get.  Should be in the form IP:port. Optional.
