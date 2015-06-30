@@ -34,7 +34,6 @@ This is a ***backwards-incompatible*** release.
  * Remove usages of `[Carbon.Lsa]::LookupPrivilegeValue` class method. It was incorrectly exposed as a public method.
  * Remove usages of `[Carbon.Kernel32]::LocalFree` class method. It was incorrectly exposed as a public method.
  * Update usages of `Carbon.Computer.ProgramInstallInfo`'s `Version` property (returned by [Get-ProgramInstallInfo](http://get-carbon.org/help/Get-ProgramInstallInfo.html)). It was an `int` and is now a [Version](http://msdn.microsoft.com/en-us/library/y0hf9t2e.aspx) object.
- * If you're not providing a value for [Install-IisApplication](http://get-carbon.org/help/Install-IisApplication.html)'s `AppPoolName` parameter, your application's app pool will be reset to `DefaultAppPool`. If you don't want this behaviour, pass the app pool you want to use.
  * [Install-IisWebsite](https://get-carbon.org/help/Install-IisWebsite.ps1) no longer deletes and re-creates websites. If a website exists, it updates its configuration to match parameters passed in. This may or may not be a breaking change in your environment.
 
 ## Changes Since `alpha.26`
@@ -68,7 +67,6 @@ This is a ***backwards-incompatible*** release.
  * Improved error handling in [Remove-Junction](http://get-carbon.org/help/Remove-Junction.html).
  * [Install-Service](http://get-carbon.org/help/Install-Service.html) now supports service startup parameters/arguments.
  * New [Test-TypeDataMember](http://get-carbon.org/help/Install-Service.html) for testing if a type has an extended type member defined.
- * [Install-IisApplication](http://get-carbon.org/help/Install-IisApplication.html) now resets an application's app pool to `DefaultAppPool` if no app pool name is provided with the `AppPoolName` parameter.
  * [Install-IisAppPool](http://get-carbon.org/help/Install-IisAppPool.html) no longer returns appcmd.exe output.
  * Added `PassThru` parameter to [Install-IisAppPool](http://get-carbon.org/help/Install-IisAppPool.html) to control when a `Microsoft.Web.Administration.ApplicationPool` for the installed app pool is returned.
  * [Get-ServiceConfiguration](http://get-carbon.org/help/Get-ServiceConfiguration.html) and Carbon's extended type data for `System.ServiceProcess.ServiceController` objects now supports services from remote computers.
@@ -151,7 +149,6 @@ This is a ***backwards-incompatible*** release.
 ### IIS
 
  * Added `PassThru` switch to [Install-IisApplication](http://get-carbon.org/help/Install-IisApplication.html) to return a `Microsoft.Web.Administration.Application` object.
- * [Install-IisApplication](http://get-carbon.org/help/Install-IisApplication.html) now resets an application's app pool to `DefaultAppPool` if no app pool name is provided with the `AppPoolName` parameter.
  * [Install-IisAppPool](http://get-carbon.org/help/Install-IisAppPool.html) no longer returns appcmd.exe output.
  * Added `SiteID` parameter to [Install-IisWebsite](http://get-carbon.org/help/Install-IisWebsite.html) for setting a website's IIS ID.
  * [Install-IisWebsite](https://get-carbon.org/help/Install-IisWebsite.ps1) no longer deletes and re-creates websites. This may or may not be a breaking change in your environment.

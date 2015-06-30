@@ -116,7 +116,7 @@ function Test-ShouldUpdateApplicationPool
     $result = Install-IisApplication -SiteName $SiteName -Name $AppName -PhysicalPath $TestDir -PassThru
     Assert-NoError
     Assert-NotNull $result
-    Assert-Equal 'DefaultAppPool' $result.ApplicationPoolName
+    Assert-Equal $AppPoolName $result.ApplicationPoolName
 }
 
 function Test-ShouldCreateApplicationDirectory

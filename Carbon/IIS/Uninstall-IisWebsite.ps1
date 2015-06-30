@@ -47,7 +47,7 @@ function Uninstall-IisWebsite
     
     if( Test-IisWebsite -Name $Name )
     {
-        Invoke-AppCmd delete site `"$Name`"
+        Invoke-AppCmd delete site `"$Name`" 
     }
 }
 

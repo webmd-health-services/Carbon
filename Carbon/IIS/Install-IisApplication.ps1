@@ -57,7 +57,7 @@ function Install-IisApplication
         
         [string]
         # The app pool for the application. Default is `DefaultAppPool`.
-        $AppPoolName = 'DefaultAppPool',
+        $AppPoolName,
 
         [Switch]
         # Returns IIS application object. This switch is new in Carbon 2.0.
