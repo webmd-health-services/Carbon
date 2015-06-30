@@ -94,5 +94,6 @@ function Install-SmbShare
         $null = New-Item -Path $Path -ItemType Directory -Force
     }
     
-    & (Resolve-NetPath) share $Name=$($Path.Trim('\')) /REMARK:$Description $fullAccessArg $changeAccessArg $readAccessArg /CACHE:NONE /UNLIMITED
+    & (Resolve-NetPath) share $Name=$($Path.Trim('\')) /REMARK:$Description $fullAccessArg $changeAccessArg $readAccessArg /CACHE:NONE /UNLIMITED |
+        Write-Verbose
 }
