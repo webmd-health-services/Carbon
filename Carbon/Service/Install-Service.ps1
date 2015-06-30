@@ -299,8 +299,9 @@ function Install-Service
         Write-Verbose ('Skipping {0} service configuration: settings unchanged.' -f $Name)
         if( $PassThru )
         {
-            return Get-Service -Name $Name -ErrorAction Ignore
+            Get-Service -Name $Name -ErrorAction Ignore
         }
+        return
     }
 
     if( $Dependency )
