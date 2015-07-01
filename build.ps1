@@ -33,6 +33,18 @@ Set-StrictMode -Version Latest
 
 if( $Version )
 {
+    if( $Version.Build -lt 0 )
+    {
+        Write-Error ('Version number must have a build number, i.e. it must have three parts.' -f $Version)
+        return
+    }
+
+    if( $Version.Revision -ge 0 )
+    {
+        Write-Error ('Version number must not have a revision number, i.e. it must only have three parts.' -f $Version)
+        return
+    }
+
     $releaseNotesFileName = 'RELEASE NOTES.txt'
     $releaseNotesPath = Join-Path $PSScriptRoot $releaseNotesFileName -Resolve
     $newVersionHeader = "# {0}" -f $Version
