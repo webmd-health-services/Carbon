@@ -204,7 +204,7 @@ if( $All -or $NuGetPackage )
                             }
 
     $carbonNuspec = [xml](Get-Content -Raw -Path $carbonNuspecPath)
-    $carbonNuspec.package.metadata.version = $version.ToString()
+    $carbonNuspec.package.metadata.version = $versionName
     $carbonNuspec.package.metadata.releaseNotes = $nugetReleaseNotes -join ([Environment]::NewLine)
     $carbonNuspec.Save( $carbonNuspecPath )
 
@@ -254,7 +254,7 @@ if( $All -or $NuGetPackage )
 
 if( $All -or $Commit )
 {
-    hg commit -m ("Releasing version {0}." -f $Version) --include $releaseNotesFileName --include .\Website --include Carbon\Carbon.psd1 --include Carbon\bin
+    hg commit -m ("Releasing version {0}." -f $Version)
     if( -not (hg tags | Where-Object { $_ -like "$version*" } ) )
     {
         hg tag $version
