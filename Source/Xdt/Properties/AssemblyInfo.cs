@@ -15,15 +15,15 @@
 using System.Reflection;
 using System.Runtime.InteropServices;
 
+
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Carbon.net4")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("Carbon XDT")]
+[assembly: AssemblyDescription("XDT assembly for Carbon, a PowerShell DevOps setup/configuration automation module.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("Carbon.net4")]
-[assembly: AssemblyCopyright("Copyright ©  2013")]
+[assembly: AssemblyProduct("Carbon XDT")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

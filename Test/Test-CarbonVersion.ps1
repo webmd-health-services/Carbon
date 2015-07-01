@@ -25,7 +25,7 @@ function Start-Test
                 Where-Object { $_ -match '^# (\d+)\.(\d+)\.(\d+)\s*' } |
                 Select-Object -First 1
     
-    $expectedVersion = New-Object Version $matches[1],$matches[2],$matches[3],0
+    $expectedVersion = New-Object Version $matches[1],$matches[2],$matches[3]
 }
 
 function Test-CarbonModuleVersionIsCorrect
@@ -42,7 +42,7 @@ function Test-CarbonAssemblyVersionIsCorrect
     Get-ChildItem (Join-Path $TestDir '..\Carbon\bin') Carbon*.dll | ForEach-Object {
 
         Assert-Equal $expectedVersion $_.VersionInfo.FileVersion ('{0} assembly file version not correct.' -f $_.Name)
-        Assert-Equal $expectedVersion $_.VersionInfo.ProductVersion ('{0} assembly product version not correct.' -f $_.Name)
+        Assert-True $_.VersionInfo.ProductVersion.ToString().StartsWith($expectedVersion.ToString())  ('{0} assembly product version not correct.' -f $_.Name)
 
     }
 }

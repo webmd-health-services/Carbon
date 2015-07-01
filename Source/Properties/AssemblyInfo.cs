@@ -24,7 +24,6 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("Carbon")]
-[assembly: AssemblyCopyright("Copyright © 2012 - 2013 Aaron Jensen")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

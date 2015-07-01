@@ -15,6 +15,7 @@
 using System.Reflection;
 using System.Runtime.InteropServices;
 
+
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
@@ -23,7 +24,6 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("Carbon IIS")]
-[assembly: AssemblyCopyright("Copyright © 2012 - 2013 Aaron Jensen")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

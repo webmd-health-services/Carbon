@@ -14,3 +14,4 @@ glob:Test\MSI\setup.exe
 
 re:/bin/Debug/
 re:/bin/Release/
+re:\.snk$
