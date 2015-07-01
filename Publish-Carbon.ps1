@@ -29,6 +29,11 @@ param(
 
     [Parameter(ParameterSetName='Some')]
     [Switch]
+    # Create the NuGet package.
+    $NuGetPackage,
+
+    [Parameter(ParameterSetName='Some')]
+    [Switch]
     # Update the website.
     $Website,
 
@@ -102,7 +107,6 @@ if( $All -or $Website )
 
 if( $All -or $ZipPackage )
 {
-    $releaseNotesPath = Join-Path $PSScriptRoot $releaseNotesFileName -Resolve
     $newVersionHeader = "# {0} ({1})" -f $version,((Get-Date).ToString("d MMMM yyyy"))
     $releaseNotes = Get-Content -Path $releaseNotesPath |
                         ForEach-Object {
@@ -169,14 +173,90 @@ if( $All -or $ZipPackage )
     }
 }
 
+if( $All -or $NuGetPackage )
+{
+    $carbonNuspecPath = Join-Path -Path $PSScriptRoot -ChildPath 'Carbon.nuspec' -Resolve
+    if( -not $carbonNuspecPath )
+    {
+        return
+    }
+
+    $foundVersion = $false
+    $nugetReleaseNotes = Get-Content -Path $releaseNotesPath |
+                            Where-Object {
+                                $line = $_
+                                if( -not $foundVersion )
+                                {
+                                    if( $line -match ('^# {0}' -f [regex]::Escape($version)) )
+                                    {
+                                        $foundVersion = $true
+                                        return
+                                    }
+                                }
+                                else
+                                {
+                                    if( $line -match ('^# (?!{0})' -f [regex]::Escape($version)) )
+                                    {
+                                        $foundVersion = $false
+                                    }
+                                }
+                                return( $foundVersion )
+                            }
+
+    $carbonNuspec = [xml](Get-Content -Raw -Path $carbonNuspecPath)
+    $carbonNuspec.package.metadata.version = $version.ToString()
+    $carbonNuspec.package.metadata.releaseNotes = $nugetReleaseNotes -join ([Environment]::NewLine)
+    $carbonNuspec.Save( $carbonNuspecPath )
+
+    $tempDir = New-TempDirectory -Prefix 'Carbon'
+    try
+    {
+        $libDir = Join-Path -Path $tempDir -ChildPath 'lib'
+        $contentDir = Join-Path -Path $tempDir -ChildPath 'content'
+        $toolsDir = Join-Path -Path $tempDir -ChildPath 'tools'
+
+        foreach( $contentSource in @( 'Carbon', 'Website', 'Examples' ) )
+        {
+            Copy-Item -Path (Join-Path -Path $PSScriptRoot -ChildPath $contentSource)  `
+                      -Destination (Join-Path -Path $contentDir -ChildPath $contentSource) `
+                      -Recurse
+        }
+
+        foreach( $file in @( '*.txt', 'Carbon.nuspec' ) )
+        {
+            Copy-Item -Path (Join-Path -Path $PSScriptRoot -ChildPath $file) `
+                      -Destination $tempDir
+        }
+
+        Push-Location -Path $tempDir
+        try
+        {
+            $nugetPath = Join-Path -Path $PSScriptRoot -ChildPath 'Tools\NuGet-2.8\NuGet.exe' -Resolve
+            & $nugetPath pack '.\Carbon.nuspec' -BasePath '.' -NoPackageAnalysis
+            $carbonNupkgPath = Join-Path -Path $tempDir -ChildPath ('Carbon.{0}.nupkg' -f $version) -Resolve
+            if( -not $carbonNupkgPath )
+            {
+                return
+            }
+
+            Copy-Item -Path $carbonNupkgPath -Destination $PSScriptRoot
+        }
+        finally
+        {
+            Pop-Location
+        }
+    }
+    finally
+    {
+        Remove-Item -Path $tempDir -Recurse
+    }
+}
+
 if( $All -or $Commit )
 {
-    if( $All )
-    {   
-        hg commit -m ("Releasing version {0}." -f $Version) --include $releaseNotesFileName --include .\Website --include Carbon\Carbon.psd1 --include Carbon\bin
-        if( -not (hg tags | Where-Object { $_ -like "$version*" } ) )
-        {
-            hg tag $version
-        }
+    hg commit -m ("Releasing version {0}." -f $Version) --include $releaseNotesFileName --include .\Website --include Carbon\Carbon.psd1 --include Carbon\bin
+    if( -not (hg tags | Where-Object { $_ -like "$version*" } ) )
+    {
+        hg tag $version
     }
 }
