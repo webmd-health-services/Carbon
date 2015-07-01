@@ -19,11 +19,6 @@ Packages and publishes Carbon packages.
 
 [CmdletBinding()]
 param(
-    [Parameter(Mandatory=$true)]
-    [Version]
-    # The version to be published.
-    $Version,
-
     [Parameter(ParameterSetName='All')]
     [Switch]
     $All,
@@ -31,11 +26,6 @@ param(
     [Parameter(ParameterSetName='Some')]
     [Switch]
     $ZipPackage,
-
-    [Parameter(ParameterSetName='Some')]
-    [Switch]
-    # Updates the Carbon version and re-builds the binaries.
-    $Build,
 
     [Parameter(ParameterSetName='Some')]
     [Switch]
@@ -60,48 +50,44 @@ if( $PSCmdlet.ParameterSetName -eq 'Some' )
 
 $licenseFileName = 'LICENSE.txt'
 $releaseNotesFileName = 'RELEASE NOTES.txt'
+$releaseNotesPath = Join-Path -Path $PSScriptRoot -ChildPath $releaseNotesFileName -Resolve
 
-if( $All -or $Build )
+$carbonModule = Get-Module -Name 'Carbon'
+$version = $carbonModule.Version
+Write-Verbose ('Publishing version {0}.' -f $version)
+
+$versionReleaseNotes = $null
+foreach( $line in (Get-Content -Path $releaseNotesPath) )
 {
-    $manifestPath = Join-Path $PSScriptRoot Carbon\Carbon.psd1 -Resolve
-    $manifest = Get-Content $manifestPath
-    $manifest |
-        ForEach-Object {
-            if( $_ -like 'ModuleVersion = *' )
-            {
-                'ModuleVersion = ''{0}''' -f $Version.ToString()
-            }
-            else
-            {
-                $_
-            }
-        } |
-        Set-Content -Path $manifestPath
-
-    $assemblyVersionPath = Join-Path -Path $PSScriptRoot -ChildPath 'Source\Properties\AssemblyVersion.cs'
-    $assemblyVersionRegex = 'Assembly(File|Informational)?Version\("[^"]*"\)'
-    $assemblyVersion = Get-Content -Path $assemblyVersionPath |
-                            ForEach-Object {
-                                if( $_ -match $assemblyVersionRegex )
-                                {
-                                    return $_ -replace $assemblyVersionRegex,('Assembly$1Version("{0}.0")' -f $Version)
-                                }
-                                $_
-                            }
-    $assemblyVersion | Set-Content -Path $assemblyVersionPath
-
-    $msbuildRoot = Get-ItemProperty -Path HKLM:\SOFTWARE\Microsoft\MSBuild\ToolsVersions\12.0 -Name 'MSBuildToolsPath' | Select-Object -ExpandProperty 'MSBuildToolsPath'
-    $msbuildExe = Join-Path -Path $msbuildRoot -ChildPath 'MSBuild.exe' -Resolve
-    if( -not $msbuildExe )
+    if( $line -match '^# ' )
     {
-        return
+        $versionReleaseNotes = $line
+        break
     }
-
-    $carbonBinPath = Join-Path -Path $PSScriptRoot -ChildPath 'Carbon\bin'
-    Get-ChildItem -Path $carbonBinPath -Exclude *.ps1,'Ionic.Zip.dll','Microsoft.Web.XmlTransform.dll' | Remove-Item
-    & $msbuildExe /target:"clean;build" (Join-Path -Path $PSScriptRoot -ChildPath 'Source\Carbon.sln') /property:Configuration=Release
-    Get-ChildItem -Path $carbonBinPath -Filter *.pdb | Remove-Item
 }
+
+if( $versionReleaseNotes -notmatch [regex]::Escape($version.ToString()) )
+{
+    Write-Error ('Unable to publish Carbon. Latest version in release notes file ''{0}'' is not {1}. Please build Carbon at that version, run tests, then publish again.' -f $versionReleaseNotes,$Version)
+    return
+}
+
+$badAssemblies = Get-ChildItem -Path (Join-Path -Path $PSScriptRoot -ChildPath 'Carbon\bin') -Filter 'Carbon*.dll' |
+                        Where-Object { 
+                            -not ($_.VersionInfo.FileVersion.ToString().StartsWith($Version.ToString())) -or -not ($_.VersionInfo.ProductVersion.ToString().StartsWith($Version.ToString()))
+                        } |
+                        ForEach-Object {
+                            ' * {0} (FileVersion: {1}; ProductVersion: {2})' -f $_.Name,$_.VersionInfo.FileVersion,$_.VersionInfo.ProductVersion
+                        }
+if( $badAssemblies )
+{
+    Write-Error ('Unable to publish Carbon. Versions of the following assemblies are not {0}. Please build Carbon at that version, run tests, then publish again.{1}{2}' -f $version,([Environment]::NewLine),($badAssemblies -join ([Environment]::NewLine)))
+    return
+}
+
+$versionName = Get-Item -Path (Join-Path -Path $PSScriptRoot -ChildPath 'Carbon\bin\Carbon.dll') |
+                    Select-Object -ExpandProperty VersionInfo |
+                    Select-Object -ExpandProperty ProductVersion
 
 if( $All -or $Website )
 {
@@ -117,14 +103,14 @@ if( $All -or $Website )
 if( $All -or $ZipPackage )
 {
     $releaseNotesPath = Join-Path $PSScriptRoot $releaseNotesFileName -Resolve
-    $newVersionHeader = "# {0} ({1})" -f $Version,((Get-Date).ToString("d MMMM yyyy"))
+    $newVersionHeader = "# {0} ({1})" -f $version,((Get-Date).ToString("d MMMM yyyy"))
     $releaseNotes = Get-Content -Path $releaseNotesPath |
                         ForEach-Object {
                             if( $_ -match '^# Next$' )
                             {
                                 return $newVersionHeader
                             }
-                            elseif( $_ -match '^# {0}\s*' -f [regex]::Escape($Version.ToString()) )
+                            elseif( $_ -match '^# {0}\s*' -f [regex]::Escape($version.ToString()) )
                             {
                                 return $newVersionHeader
                             }
@@ -132,7 +118,7 @@ if( $All -or $ZipPackage )
                         }
     $releaseNotes | Set-Content -Path $releaseNotesPath
 
-    $carbonZipFileName = "Carbon-{0}.zip" -f $Version
+    $carbonZipFileName = "Carbon-{0}.zip" -f $versionName
 
     $aspNetClientPath = Join-Path -Path $PSScriptRoot -ChildPath 'Website\aspnet_client'
     if( (Test-Path -Path $aspNetClientPath -PathType Container) )
