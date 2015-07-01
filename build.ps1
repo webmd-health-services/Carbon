@@ -19,9 +19,8 @@ Packages and publishes Carbon packages.
 
 [CmdletBinding()]
 param(
-    [Parameter(Mandatory=$true)]
     [Version]
-    # The version to be published.
+    # The version to build. If not supplied, build the version as currently defined.
     $Version,
 
     [string]
@@ -32,52 +31,55 @@ param(
 #Requires -Version 4
 Set-StrictMode -Version Latest
 
-$releaseNotesFileName = 'RELEASE NOTES.txt'
-$releaseNotesPath = Join-Path $PSScriptRoot $releaseNotesFileName -Resolve
-$newVersionHeader = "# {0}" -f $Version
-$updatedVersion = $false
-$releaseNotes = Get-Content -Path $releaseNotesPath |
-                    ForEach-Object {
-                        if( -not $updatedVersion -and $_ -match '^# (Next|\d+\.\d+\.\d+)$' )
-                        {
-                            $updatedVersion = $true
-                            return $newVersionHeader
-                        }
-                        return $_
-                    }
-$releaseNotes | Set-Content -Path $releaseNotesPath
-
-$manifestPath = Join-Path $PSScriptRoot Carbon\Carbon.psd1 -Resolve
-$manifest = Get-Content $manifestPath
-$manifest |
-    ForEach-Object {
-        if( $_ -like 'ModuleVersion = *' )
-        {
-            'ModuleVersion = ''{0}''' -f $Version.ToString()
-        }
-        else
-        {
-            $_
-        }
-    } |
-    Set-Content -Path $manifestPath
-
-$assemblyVersionPath = Join-Path -Path $PSScriptRoot -ChildPath 'Source\Properties\AssemblyVersion.cs'
-$assemblyVersionRegex = 'Assembly(File|Informational)?Version\("[^"]*"\)'
-$assemblyVersion = Get-Content -Path $assemblyVersionPath |
+if( $Version )
+{
+    $releaseNotesFileName = 'RELEASE NOTES.txt'
+    $releaseNotesPath = Join-Path $PSScriptRoot $releaseNotesFileName -Resolve
+    $newVersionHeader = "# {0}" -f $Version
+    $updatedVersion = $false
+    $releaseNotes = Get-Content -Path $releaseNotesPath |
                         ForEach-Object {
-                            if( $_ -match $assemblyVersionRegex )
+                            if( -not $updatedVersion -and $_ -match '^# (Next|\d+\.\d+\.\d+)$' )
                             {
-                                $infoVersion = ''
-                                if( $Matches[1] -eq 'Informational' -and $PreReleaseVersion)
-                                {
-                                    $infoVersion = '-{0}' -f $PreReleaseVersion
-                                }
-                                return $_ -replace $assemblyVersionRegex,('Assembly$1Version("{0}{1}")' -f $Version,$infoVersion)
+                                $updatedVersion = $true
+                                return $newVersionHeader
                             }
-                            $_
+                            return $_
                         }
-$assemblyVersion | Set-Content -Path $assemblyVersionPath
+    $releaseNotes | Set-Content -Path $releaseNotesPath
+
+    $manifestPath = Join-Path $PSScriptRoot Carbon\Carbon.psd1 -Resolve
+    $manifest = Get-Content $manifestPath
+    $manifest |
+        ForEach-Object {
+            if( $_ -like 'ModuleVersion = *' )
+            {
+                'ModuleVersion = ''{0}''' -f $Version.ToString()
+            }
+            else
+            {
+                $_
+            }
+        } |
+        Set-Content -Path $manifestPath
+
+    $assemblyVersionPath = Join-Path -Path $PSScriptRoot -ChildPath 'Source\Properties\AssemblyVersion.cs'
+    $assemblyVersionRegex = 'Assembly(File|Informational)?Version\("[^"]*"\)'
+    $assemblyVersion = Get-Content -Path $assemblyVersionPath |
+                            ForEach-Object {
+                                if( $_ -match $assemblyVersionRegex )
+                                {
+                                    $infoVersion = ''
+                                    if( $Matches[1] -eq 'Informational' -and $PreReleaseVersion)
+                                    {
+                                        $infoVersion = '-{0}' -f $PreReleaseVersion
+                                    }
+                                    return $_ -replace $assemblyVersionRegex,('Assembly$1Version("{0}{1}")' -f $Version,$infoVersion)
+                                }
+                                $_
+                            }
+    $assemblyVersion | Set-Content -Path $assemblyVersionPath
+}
 
 $msbuildRoot = Get-ItemProperty -Path HKLM:\SOFTWARE\Microsoft\MSBuild\ToolsVersions\12.0 -Name 'MSBuildToolsPath' | Select-Object -ExpandProperty 'MSBuildToolsPath'
 $msbuildExe = Join-Path -Path $msbuildRoot -ChildPath 'MSBuild.exe' -Resolve
