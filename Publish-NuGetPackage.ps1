@@ -1,6 +1,6 @@
 ﻿<#
 .SYNOPSIS
-Createa a Carbon NuGet package and pushes it to nuget.org.
+Publishes a NuGet package to nuget.org.
 #>
 # Copyright 2012 Aaron Jensen
 # 
@@ -17,19 +17,29 @@ Createa a Carbon NuGet package and pushes it to nuget.org.
 # limitations under the License.
 [CmdletBinding()]
 param(
+    [Parameter(Mandatory=$true)]
+    [string]
+    # The path to the nupkg file to publish.
+    $FilePath,
+
+    [Parameter(Mandatory=$true)]
+    [string]
+    # The API key to use.
+    $ApiKey
 )
 
 Set-StrictMode -Version 'Latest'
 
-& (Join-Path -Path $PSScriptRoot -ChildPath 'Carbon\Import-Carbon.ps1' -Resolve)
+$nugetPath = Join-Path -Path $PSScriptRoot -ChildPath 'Tools\NuGet-2.8\NuGet.exe' -Resolve
+if( -not $nugetPath )
+{
+    return
+}
 
-Push-Location $tempDir
-try
+if( -not (Test-Path -Path $FilePath -PathType Leaf) )
 {
-    & $nugetPath push (Join-Path -Path $tempDir -ChildPath 'Carbon*.nupkg')
+    Write-Error ('NuGet package ''{0}'' not found.' -f $FilePath)
+    return
 }
-finally
-{
-    Pop-Location
-    Remove-Item -Recurse $tempDir
-}
+
+& $nugetPath push $FilePath -ApiKey $ApiKey
