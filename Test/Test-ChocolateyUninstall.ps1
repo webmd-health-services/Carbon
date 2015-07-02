@@ -32,6 +32,7 @@ function Stop-TestFixture
 
 function Start-Test
 {
+    Stop-Test
     & $chocolateyInstall
     Assert-NoError
     Assert-DirectoryExists $destinationDir
