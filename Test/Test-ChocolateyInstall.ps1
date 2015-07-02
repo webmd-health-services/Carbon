@@ -1,7 +1,34 @@
+# Copyright 2012 Aaron Jensen
+# 
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# 
+#     http://www.apache.org/licenses/LICENSE-2.0
+# 
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 $chocolateyInstall = Join-Path -Path $PSScriptRoot -ChildPath '..\tools\chocolateyInstall.ps1' -Resolve
 & (Join-Path -Path $PSScriptRoot -ChildPath 'Import-CarbonForTest.ps1' -Resolve)
 $destinationDir = Join-Path -Path (Get-PowerShellModuleInstallPath) -ChildPath 'Carbon'
+$installCarbonJunction = $false
+
+function Start-TestFixture
+{
+    $installCarbonJunction = (Test-PathIsJunction -Path $destinationDir)
+}
+
+function Stop-TestFixture
+{
+    if( $installCarbonJunction )
+    {
+        Install-Junction -Link $destinationDir -Target (Join-Path -Path $PSScriptRoot -ChildPath '..\Carbon' -Resolve) -Verbose
+    }
+}
 
 function Start-Test
 {
@@ -10,14 +37,13 @@ function Start-Test
 
 function Stop-Test
 {
-    $moduleDir = Join-Path -Path (Get-PowerShellModuleInstallPath) -ChildPath 'Carbon'
-    if( (Test-PathIsJunction -Path $moduleDir) )
+    if( (Test-PathIsJunction -Path $destinationDir) )
     {
-        Uninstall-Junction -Path $moduleDir
+        Uninstall-Junction -Path $destinationDir
     }
-    elseif( (Test-Path -Path $moduleDir -PathType Container) )
+    elseif( (Test-Path -Path $destinationDir -PathType Container) )
     {
-        Remove-Item -Path $moduleDir -Recurse -Force
+        Remove-Item -Path $destinationDir -Recurse -Force
     }
 }
 

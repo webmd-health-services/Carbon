@@ -56,8 +56,7 @@ try
 }
 finally
 {
-    $installRoot = Get-PowerShellModuleInstallPath
-    Remove-Junction -Path $carbonModuleRoot
+    Uninstall-Junction -Path $carbonModuleRoot
 }
 
 $Error | ForEach-Object {
