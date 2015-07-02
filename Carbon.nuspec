@@ -17,7 +17,7 @@
 <package>
   <metadata>
     <id>Carbon</id>
-    <version>2.0.0</version>
+    <version>2.0.0.0</version>
     <authors>Aaron Jensen</authors>
     <owners>Aaron Jensen</owners>
     <licenseUrl>http://www.apache.org/licenses/LICENSE-2.0</licenseUrl>
@@ -277,10 +277,9 @@ This is a ***backwards-incompatible*** release.
  
 </releaseNotes>
     <copyright>Copyright 2012</copyright>
-    <tags>DevOps PowerShell setup computer automation</tags>
+    <tags>DevOps PowerShell setup computer automation admin</tags>
   </metadata>
   <files>
-    <file src=".\content\**\*" />
-    <file src=".\*.txt" />
+    <file src=".\**\*" target="" />
   </files>
 </package>

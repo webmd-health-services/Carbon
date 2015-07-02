@@ -105,135 +105,123 @@ if( $All -or $Website )
 
 }
 
-if( $All -or $ZipPackage )
+$aspNetClientPath = Join-Path -Path $PSScriptRoot -ChildPath 'Website\aspnet_client'
+if( (Test-Path -Path $aspNetClientPath -PathType Container) )
 {
-    $newVersionHeader = "# {0} ({1})" -f $version,((Get-Date).ToString("d MMMM yyyy"))
-    $releaseNotes = Get-Content -Path $releaseNotesPath |
-                        ForEach-Object {
-                            if( $_ -match '^# Next$' )
-                            {
-                                return $newVersionHeader
-                            }
-                            elseif( $_ -match '^# {0}\s*' -f [regex]::Escape($version.ToString()) )
-                            {
-                                return $newVersionHeader
-                            }
-                            return $_
-                        }
-    $releaseNotes | Set-Content -Path $releaseNotesPath
-
-    $carbonZipFileName = "Carbon-{0}.zip" -f $versionName
-
-    $aspNetClientPath = Join-Path -Path $PSScriptRoot -ChildPath 'Website\aspnet_client'
-    if( (Test-Path -Path $aspNetClientPath -PathType Container) )
-    {
-        Remove-Item -Path $aspNetClientPath -Recurse
-    }
+    Remove-Item -Path $aspNetClientPath -Recurse
+}
         
-    if( Test-Path $carbonZipFileName -PathType Leaf )
+$tempDir = [IO.Path]::GetRandomFileName()
+$tempDir = Join-Path -Path $env:TEMP -ChildPath $tempDir
+
+New-Item -Path $tempDir -ItemType 'Directory' | Out-String | Write-Verbose
+
+try
+{
+    foreach( $item in @( 'Carbon', 'Website', 'Examples', $licenseFileName, $releaseNotesFileName ) )
     {
-        Remove-Item $carbonZipFileName
-    }
-
-    $tempDir = [IO.Path]::GetRandomFileName()
-    $tempDir = Join-Path -Path $env:TEMP -ChildPath $tempDir
-
-    New-Item -Path $tempDir -ItemType 'Directory' | Out-String | Write-Verbose
-
-    try
-    {
-        foreach( $item in @( 'Carbon', 'Website', 'Examples', $licenseFileName, $releaseNotesFileName ) )
+        $sourcePath = Join-Path -Path $PSScriptRoot -ChildPath $item
+        $extraFiles = hg st --unknown --ignored $sourcePath
+        if( $extraFiles )
         {
-            $sourcePath = Join-Path -Path $PSScriptRoot -ChildPath $item
-            $extraFiles = hg st --unknown --ignored $sourcePath
-            if( $extraFiles )
-            {
-                Write-Error ('Unable to package: there are unknown/ignored files in {0}:{1} {2}' -f $sourcePath,([Environment]::NewLine),($extraFiles -join ('{0} ' -f ([Environment]::NewLine))))
-                return
-            }
-
-            if( (Test-Path -Path $sourcePath -PathType Container) )
-            {
-                robocopy $sourcePath (Join-Path -Path $tempDir -ChildPath $item) /MIR /XF *.orig /XF *.pdb | Write-Verbose
-            }
-            else
-            {
-                Copy-Item -Path $sourcePath -Destination $tempDir
-            }
+            Write-Error ('Unable to package: there are unknown/ignored files in {0}:{1} {2}' -f $sourcePath,([Environment]::NewLine),($extraFiles -join ('{0} ' -f ([Environment]::NewLine))))
+            return
         }
 
-        # Put another copy of the license file with the module.
-        Copy-Item -Path (Join-Path -Path $PSScriptRoot -ChildPath $licenseFileName) -Destination (Join-Path -Path $tempDir -ChildPath 'Carbon')
+        if( (Test-Path -Path $sourcePath -PathType Container) )
+        {
+            robocopy $sourcePath (Join-Path -Path $tempDir -ChildPath $item) /MIR /XF *.orig /XF *.pdb | Write-Verbose
+        }
+        else
+        {
+            Copy-Item -Path $sourcePath -Destination $tempDir
+        }
+    }
+
+    # Put another copy of the license file with the module.
+    Copy-Item -Path (Join-Path -Path $PSScriptRoot -ChildPath $licenseFileName) -Destination (Join-Path -Path $tempDir -ChildPath 'Carbon')
+
+    if( $All -or $ZipPackage )
+    {
+        $newVersionHeader = "# {0} ({1})" -f $version,((Get-Date).ToString("d MMMM yyyy"))
+        $releaseNotes = Get-Content -Path $releaseNotesPath |
+                            ForEach-Object {
+                                if( $_ -match '^# Next$' )
+                                {
+                                    return $newVersionHeader
+                                }
+                                elseif( $_ -match '^# {0}\s*' -f [regex]::Escape($version.ToString()) )
+                                {
+                                    return $newVersionHeader
+                                }
+                                return $_
+                            }
+        $releaseNotes | Set-Content -Path $releaseNotesPath
+
+        $carbonZipFileName = "Carbon-{0}.zip" -f $versionName
+
+        if( Test-Path $carbonZipFileName -PathType Leaf )
+        {
+            Remove-Item $carbonZipFileName
+        }
+
 
         Compress-Item -Path (Get-ChildItem -Path $tempDir) -OutFile (Join-Path -Path $PSScriptRoot -ChildPath $carbonZipFileName)
     }
-    finally
+
+    if( $All -or $NuGetPackage )
     {
-        Remove-Item -Recurse -Path $tempDir
-    }
-}
-
-if( $All -or $NuGetPackage )
-{
-    $carbonNuspecPath = Join-Path -Path $PSScriptRoot -ChildPath 'Carbon.nuspec' -Resolve
-    if( -not $carbonNuspecPath )
-    {
-        return
-    }
-
-    $foundVersion = $false
-    $nugetReleaseNotes = Get-Content -Path $releaseNotesPath |
-                            Where-Object {
-                                $line = $_
-                                if( -not $foundVersion )
-                                {
-                                    if( $line -match ('^# {0}' -f [regex]::Escape($version)) )
-                                    {
-                                        $foundVersion = $true
-                                        return
-                                    }
-                                }
-                                else
-                                {
-                                    if( $line -match ('^# (?!{0})' -f [regex]::Escape($version)) )
-                                    {
-                                        $foundVersion = $false
-                                    }
-                                }
-                                return( $foundVersion )
-                            }
-
-    $carbonNuspec = [xml](Get-Content -Raw -Path $carbonNuspecPath)
-    $carbonNuspec.package.metadata.version = $versionName
-    $carbonNuspec.package.metadata.releaseNotes = $nugetReleaseNotes -join ([Environment]::NewLine)
-    $carbonNuspec.Save( $carbonNuspecPath )
-
-    $tempDir = New-TempDirectory -Prefix 'Carbon'
-    try
-    {
-        $libDir = Join-Path -Path $tempDir -ChildPath 'lib'
-        $contentDir = Join-Path -Path $tempDir -ChildPath 'content'
-        $toolsDir = Join-Path -Path $tempDir -ChildPath 'tools'
-
-        foreach( $contentSource in @( 'Carbon', 'Website', 'Examples' ) )
+        $carbonNuspecPath = Join-Path -Path $PSScriptRoot -ChildPath 'Carbon.nuspec' -Resolve
+        if( -not $carbonNuspecPath )
         {
-            Copy-Item -Path (Join-Path -Path $PSScriptRoot -ChildPath $contentSource)  `
-                      -Destination (Join-Path -Path $contentDir -ChildPath $contentSource) `
-                      -Recurse
+            return
         }
+
+        $foundVersion = $false
+        $nugetReleaseNotes = Get-Content -Path $releaseNotesPath |
+                                Where-Object {
+                                    $line = $_
+                                    if( -not $foundVersion )
+                                    {
+                                        if( $line -match ('^# {0}' -f [regex]::Escape($version)) )
+                                        {
+                                            $foundVersion = $true
+                                            return
+                                        }
+                                    }
+                                    else
+                                    {
+                                        if( $line -match ('^# (?!{0})' -f [regex]::Escape($version)) )
+                                        {
+                                            $foundVersion = $false
+                                        }
+                                    }
+                                    return( $foundVersion )
+                                }
+
+        $carbonNuspec = [xml](Get-Content -Raw -Path $carbonNuspecPath)
+        $nuGetVersion = $versionName -replace '-([A-Z0-9]+)[^A-Z0-9]*(\d+)$','-$1$2'
+        $carbonNuspec.package.metadata.version = $nugetVersion
+        $carbonNuspec.package.metadata.releaseNotes = $nugetReleaseNotes -join ([Environment]::NewLine)
+        $carbonNuspec.Save( $carbonNuspecPath )
 
         foreach( $file in @( '*.txt', 'Carbon.nuspec' ) )
         {
             Copy-Item -Path (Join-Path -Path $PSScriptRoot -ChildPath $file) `
-                      -Destination $tempDir
+                        -Destination $tempDir
         }
+
+        $toolsDir = Join-Path -Path $tempDir -ChildPath 'tools'
+        New-Item -Path $toolsDir -ItemType 'directory' | Out-String | Write-Verbose
+        Get-ChildItem -Path (Join-Path -Path $PSScriptRoot -ChildPath 'Tools') -Filter 'chocolatey*.ps1' |
+            Copy-Item -Destination $toolsDir
 
         Push-Location -Path $tempDir
         try
         {
             $nugetPath = Join-Path -Path $PSScriptRoot -ChildPath 'Tools\NuGet-2.8\NuGet.exe' -Resolve
             & $nugetPath pack '.\Carbon.nuspec' -BasePath '.' -NoPackageAnalysis
-            $carbonNupkgPath = Join-Path -Path $tempDir -ChildPath ('Carbon.{0}.nupkg' -f $version) -Resolve
+            $carbonNupkgPath = Join-Path -Path $tempDir -ChildPath ('Carbon.{0}.nupkg' -f $nuGetVersion) -Resolve
             if( -not $carbonNupkgPath )
             {
                 return
@@ -246,12 +234,11 @@ if( $All -or $NuGetPackage )
             Pop-Location
         }
     }
-    finally
-    {
-        Remove-Item -Path $tempDir -Recurse
-    }
 }
-
+finally
+{
+    Remove-Item -Recurse -Path $tempDir
+}
 if( $All -or $Commit )
 {
     hg commit -m ("Releasing version {0}." -f $Version)
