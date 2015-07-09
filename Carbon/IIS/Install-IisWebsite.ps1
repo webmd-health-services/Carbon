@@ -152,7 +152,6 @@ function Install-IisWebsite
     $expectedBindings = New-Object 'Collections.Generic.Hashset[string]'
     $Binding | ConvertTo-Binding | ForEach-Object { [void]$expectedBindings.Add( ('{0}/{1}' -f $_.Protocol,$_.BindingInformation) ) }
 
-    $existingBindings = New-Object 'Collections.Generic.Hashset[string]'
     $bindingsToRemove = $site.Bindings | Where-Object { -not $expectedBindings.Contains(  ('{0}/{1}' -f $_.Protocol,$_.BindingInformation ) ) }
     foreach( $bindingToRemove in $bindingsToRemove )
     {
@@ -167,7 +166,7 @@ function Install-IisWebsite
     foreach( $bindingToAdd in $bindingsToAdd )
     {
         Write-Verbose -Message ('IIS://{0}: Binding        -> {1}/{2}' -f $Name,$bindingToAdd.Protocol,$bindingToAdd.BindingInformation) -Verbose
-        $site.Bindings.Add( $bindingToAdd.BindingInformation, $bindingToAdd.Protocol )
+        $site.Bindings.Add( $bindingToAdd.BindingInformation, $bindingToAdd.Protocol ) | Out-Null
         $modified = $true
     }
     
@@ -202,7 +201,7 @@ function Install-IisWebsite
 
     if( $modified )
     {
-        Write-Verbose -Message ('IIS://{0}: Committing changes' -f $Name) -Verbose
+        Write-Verbose -Message ('IIS://{0}:               Committing changes' -f $Name) -Verbose
         $site.CommitChanges()
     }
     
@@ -226,7 +225,7 @@ function Install-IisWebsite
         $tries += 1
         if($website.State -ne 'Unknown')
         {
-            return $website
+            break
         }
         else
         {
@@ -235,5 +234,8 @@ function Install-IisWebsite
     }
     while( $tries -lt 100 )
 
-    return $website
+    if( $PassThru )
+    {
+        return $website
+    }
 }

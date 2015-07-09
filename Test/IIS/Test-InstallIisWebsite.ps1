@@ -52,8 +52,9 @@ function Invoke-NewWebsite($Bindings = $null, $SiteID)
         $optionalParams['Bindings'] = $Bindings
     }
 
-    Install-IisWebsite -Name $SiteName -Path $TestDir @optionalParams
-    Assert-LastProcessSucceeded 'Test site not created'    
+    $site = Install-IisWebsite -Name $SiteName -Path $TestDir @optionalParams
+    Assert-Null $site
+    Assert-NoError
 }
 
 function Test-ShouldCreateWebsite
@@ -222,7 +223,8 @@ function Test-ShouldChangeWebsiteSettings
 
 function Test-ShouldUpdateBindings
 {
-    Install-IisWebsite -Name $SiteName -PhysicalPath $PSScriptRoot
+    $output = Install-IisWebsite -Name $SiteName -PhysicalPath $PSScriptRoot
+    Assert-Null $output
 
     Install-IisWebsite -Name $SiteName -Bindings 'http/*:8001:' -PhysicalPath $PSScriptRoot
     Assert-WebsiteBinding '[http] *:8001:'
@@ -241,6 +243,9 @@ function Test-ShouldReturnSiteObject
     Assert-Is $site ([Microsoft.Web.Administration.Site])
     Assert-Equal $SiteName $site.Name
     Assert-Equal $PSScriptRoot $site.PhysicalPath
+
+    $site = Install-IisWebsite -Name $SiteName -PhysicalPath $PSScriptRoot 
+    Assert-Null $site
 }
 
 function Assert-WebsiteBinding
