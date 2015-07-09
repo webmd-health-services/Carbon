@@ -19,7 +19,7 @@ function Install-IisWebsite
     Installs a website.
 
     .DESCRIPTION
-    `Install-IisWebsite` installs an IIS website. Anonymous authentication is enabled, and the anonymous user is set to the website's application pool identity. Before Carbon 2.0, if a website already existed, it was deleted and re-created. Beginning with Carbon 2.0, existing websites are modified in place. Also starting in Carbon 2.0, when a website is created or its application pool changes, its app pool is recycled.
+    `Install-IisWebsite` installs an IIS website. Anonymous authentication is enabled, and the anonymous user is set to the website's application pool identity. Before Carbon 2.0, if a website already existed, it was deleted and re-created. Beginning with Carbon 2.0, existing websites are modified in place. 
     
     If you don't set the website's app pool, IIS will pick one for you, and `Install-IisWebsite` will never manage the app pool for you (i.e. if someone changes it manually, this function won't set it back to the default). We recommend always supplying an app pool name, even if it is `DefaultAppPool`.
 
@@ -74,13 +74,14 @@ function Install-IisWebsite
         $PhysicalPath,
         
         [Parameter(Position=2)]
+        [Alias('Bindings')]
         [string[]]
         # The site's network bindings.  Default is `http/*:80:`.  Bindings should be specified in protocol/IPAddress:Port:Hostname format.  
         #
         #  * Protocol should be http or https. 
         #  * IPAddress can be a literal IP address or `*`, which means all of the computer's IP addresses.  This function does not validate if `IPAddress` is actually in use on this computer.
         #  * Leave hostname blank for non-named websites.
-        $Bindings = @('http/*:80:'),
+        $Binding = @('http/*:80:'),
         
         [string]
         # The name of the app pool under which the website runs.  The app pool must exist.  If not provided, IIS picks one for you.  No whammy, no whammy!
@@ -94,8 +95,30 @@ function Install-IisWebsite
         # Return a `Microsoft.Web.Administration.Site` object for the website.
         $PassThru
     )
-    
+
     Set-StrictMode -Version 'Latest'
+
+    $bindingRegex = '^(?<Protocol>https?):?//?(?<IPAddress>\*|[\d\.]+):(?<Port>\d+):?(?<HostName>.*)$'
+
+    filter ConvertTo-Binding
+    {
+        param(
+            [Parameter(ValueFromPipeline=$true,Mandatory=$true)]
+            [string]
+            $InputObject
+        )
+
+        Set-StrictMode -Version 'Latest'
+
+        $InputObject -match $bindingRegex | Out-Null
+        [pscustomobject]@{ 
+                            'Protocol' = $Matches['Protocol'];
+                            'IPAddress' = $Matches['IPAddress'];
+                            'Port' = $Matches['Port'];
+                            'HostName' = $Matches['HostName'];
+                          } |
+                            Add-Member -MemberType ScriptProperty -Name 'BindingInformation' -Value { '{0}:{1}:{2}' -f $this.IPAddress,$this.Port,$this.HostName } -PassThru
+    }
 
     $PhysicalPath = Resolve-FullPath -Path $PhysicalPath
     if( -not (Test-Path $PhysicalPath -PathType Container) )
@@ -103,8 +126,7 @@ function Install-IisWebsite
         New-Item $PhysicalPath -ItemType Directory | Out-String | Write-Verbose
     }
     
-    $bindingRegex = '^(?<Protocol>https?):?//?(?<IPAddress>\*|[\d\.]+):(?<Port>\d+):?(?<HostName>.*)$'
-    $invalidBindings = $Bindings | 
+    $invalidBindings = $Binding | 
                            Where-Object { $_ -notmatch $bindingRegex } 
     if( $invalidBindings )
     {
@@ -116,38 +138,40 @@ function Install-IisWebsite
 
     [Microsoft.Web.Administration.Site]$site = $null
     $modified = $true
-    $created = $false
-    if( (Test-IisWebsite -Name $Name) )
-    {
-        $site = Get-IisWebsite -Name $Name
-    }
-    else
+    if( -not (Test-IisWebsite -Name $Name) )
     {
         Write-Verbose -Message ('Creating website ''{0}'' ({1}).' -f $Name,$PhysicalPath)
+        $firstBinding = $Binding | Select-Object -First 1 | ConvertTo-Binding
         $mgr = New-Object 'Microsoft.Web.Administration.ServerManager'
-        $site = $mgr.Sites.Add( $Name, $PhysicalPath, 80 ) | Add-IisServerManagerMember -ServerManager $mgr -PassThru
+        $site = $mgr.Sites.Add( $Name, $firstBinding.Protocol, $firstBinding.BindingInformation, $PhysicalPath )
+        $mgr.CommitChanges()
+    }
+
+    $site = Get-IisWebsite -Name $Name
+
+    $expectedBindings = New-Object 'Collections.Generic.Hashset[string]'
+    $Binding | ConvertTo-Binding | ForEach-Object { [void]$expectedBindings.Add( ('{0}/{1}' -f $_.Protocol,$_.BindingInformation) ) }
+
+    $existingBindings = New-Object 'Collections.Generic.Hashset[string]'
+    $bindingsToRemove = $site.Bindings | Where-Object { -not $expectedBindings.Contains(  ('{0}/{1}' -f $_.Protocol,$_.BindingInformation ) ) }
+    foreach( $bindingToRemove in $bindingsToRemove )
+    {
+        Write-Verbose -Message ('IIS://{0}: Binding       {1}/{2} -> ' -f $Name,$bindingToRemove.Protocol,$bindingToRemove.BindingInformation) -Verbose
+        $site.Bindings.Remove( $bindingToRemove )
         $modified = $true
-        $created = $true
     }
 
     $existingBindings = New-Object 'Collections.Generic.Hashset[string]'
-    $site.Bindings | ForEach-Object { [void]$existingBindings.Add( ('{0}/{1}' -f $_.Protocol,$_.BindingInformation ) ) }
-
-    $missingBinding = $Bindings | Where-Object { -not $existingBindings.Contains( $_ ) }
-    $hasExtraBinding = $existingBindings | Where-Object { $Bindings -notcontains $_ }
-    if( $missingBinding -or $hasExtraBinding )
+    $site.Bindings | ForEach-Object { [void]$existingBindings.Add( ('{0}/{1}' -f $_.Protocol,$_.BindingInformation) ) }
+    $bindingsToAdd = $Binding | ConvertTo-Binding | Where-Object { -not $existingBindings.Contains(  ('{0}/{1}' -f $_.Protocol,$_.BindingInformation ) ) }
+    foreach( $bindingToAdd in $bindingsToAdd )
     {
-        $site.Bindings.Clear()
-        $Bindings | ForEach-Object { 
-            $_ -match $bindingRegex | Out-Null
-            $protocol = $Matches['Protocol']
-            $bindingInfo = '{0}:{1}:{2}' -f $Matches['IPAddress'],$Matches['Port'],$Matches['HostName']
-            Write-Verbose -Message ('IIS://{0}: adding binding [{1}] {2}' -f $Name,$protocol,$bindingInfo)
-            $site.Bindings.Add( $bindingInfo, $protocol )
-        }
+        Write-Verbose -Message ('IIS://{0}: Binding        -> {1}/{2}' -f $Name,$bindingToAdd.Protocol,$bindingToAdd.BindingInformation) -Verbose
+        $site.Bindings.Add( $bindingToAdd.BindingInformation, $bindingToAdd.Protocol )
         $modified = $true
     }
-
+    
+    [Microsoft.Web.Administration.Application]$rootApp = $null
     if( $site.Applications.Count -eq 0 )
     {
         $rootApp = $site.Applications.Add("/", $PhysicalPath)
@@ -155,25 +179,24 @@ function Install-IisWebsite
     }
     else
     {
-        [Microsoft.Web.Administration.Application]$rootApp = $site.Applications | Where-Object { $_.Path -eq '/' }
-        if( $site.PhysicalPath -ne $PhysicalPath )
-        {
-            Write-Verbose -Message ('IIS://{0}: PhysicalPath: {1}' -f $Name,$PhysicalPath)
-            [Microsoft.Web.Administration.VirtualDirectory]$vdir = $rootApp.VirtualDirectories | Where-Object { $_.Path -eq '/' }
-            $vdir.PhysicalPath = $PhysicalPath
-            $modified = $true
-        }
+        $rootApp = $site.Applications | Where-Object { $_.Path -eq '/' }
+    }
+
+    if( $site.PhysicalPath -ne $PhysicalPath )
+    {
+        Write-Verbose -Message ('IIS://{0}: PhysicalPath  {1} -> {2}' -f $Name,$site.PhysicalPath,$PhysicalPath) -Verbose
+        [Microsoft.Web.Administration.VirtualDirectory]$vdir = $rootApp.VirtualDirectories | Where-Object { $_.Path -eq '/' }
+        $vdir.PhysicalPath = $PhysicalPath
+        $modified = $true
     }
     
-    $setAppPool = $false
     if( $AppPoolName )
     {
         if( $rootApp.ApplicationPoolName -ne $AppPoolName )
         {
-            Write-Verbose -Message ('IIS://{0}: AppPool: {1}' -f $Name,$AppPoolName)
+            Write-Verbose -Message ('IIS://{0}: AppPool       {1} -> {2}' -f $Name,$rootApp.ApplicationPoolName,$AppPoolName) -Verbose
             $rootApp.ApplicationPoolName = $AppPoolName
             $modified = $true
-            $setAppPool = $true
         }
     }
 
@@ -181,30 +204,6 @@ function Install-IisWebsite
     {
         Write-Verbose -Message ('IIS://{0}: Committing changes' -f $Name)
         $site.CommitChanges()
-        if( $created -or $setAppPool )
-        {
-            $rootApp = Get-IisApplication -SiteName $Name
-            Write-Verbose -Verbose -Message $rootApp.ApplicationPoolName
-            $MAX_TRIES = 100
-            $tryNum = 0
-            do
-            {
-                try
-                {
-                    $appPool = Get-IisAppPool -Name $rootApp.ApplicationPoolName
-                    Write-Verbose ('IIS://{0}: recycling ''{1}'' app pool' -f $Name,$appPool.Name)
-                    $appPool.Recycle() | Write-Verbose -Verbose
-                    break
-                }
-                catch
-                {
-                    $Global:Error.RemoveAt(0)
-                    Write-Verbose ('Failed to recycle app pool:{0}{1}' -f ([Environment]::NewLine),$_) -Verbose
-                    Start-Sleep -Milliseconds 100
-                }
-            }
-            while( $tryNum++ -lt $MAX_TRIES )
-        }
     }
     
     if( $SiteID )
