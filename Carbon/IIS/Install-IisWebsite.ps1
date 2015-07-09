@@ -137,7 +137,7 @@ function Install-IisWebsite
     }
 
     [Microsoft.Web.Administration.Site]$site = $null
-    $modified = $true
+    $modified = $false
     if( -not (Test-IisWebsite -Name $Name) )
     {
         Write-Verbose -Message ('Creating website ''{0}'' ({1}).' -f $Name,$PhysicalPath)
@@ -202,7 +202,7 @@ function Install-IisWebsite
 
     if( $modified )
     {
-        Write-Verbose -Message ('IIS://{0}: Committing changes' -f $Name)
+        Write-Verbose -Message ('IIS://{0}: Committing changes' -f $Name) -Verbose
         $site.CommitChanges()
     }
     
