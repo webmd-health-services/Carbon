@@ -21,7 +21,7 @@ function Install-IisWebsite
     .DESCRIPTION
     `Install-IisWebsite` installs an IIS website. Anonymous authentication is enabled, and the anonymous user is set to the website's application pool identity. Before Carbon 2.0, if a website already existed, it was deleted and re-created. Beginning with Carbon 2.0, existing websites are modified in place. Also starting in Carbon 2.0, when a website is created or its application pool changes, its app pool is recycled.
     
-    If don't set the website's app pool, IIS will pick one for you, and `Install-IisWebsite` will never manage the app pool for you (i.e. if someone changes it manually, this function won't set it back to the default). We recommend always supplying an app pool name, even if it is `DefaultAppPool`.
+    If you don't set the website's app pool, IIS will pick one for you, and `Install-IisWebsite` will never manage the app pool for you (i.e. if someone changes it manually, this function won't set it back to the default). We recommend always supplying an app pool name, even if it is `DefaultAppPool`.
 
     By default, the site listens on (i.e. is bound to) all IP addresses on port 80 (binding `http/*:80:`). Set custom bindings with the `Bindings` argument. Multiple bindings are allowed. Each binding must be in this format (in BNF):
 
@@ -184,9 +184,26 @@ function Install-IisWebsite
         if( $created -or $setAppPool )
         {
             $rootApp = Get-IisApplication -SiteName $Name
-            $appPool = Get-IisAppPool -Name $rootApp.ApplicationPoolName
-            Write-Verbose ('IIS://{0}: recycling ''{1}'' app pool' -f $Name,$appPool.Name)
-            $appPool.Recycle() | Write-Verbose
+            Write-Verbose -Verbose -Message $rootApp.ApplicationPoolName
+            $MAX_TRIES = 100
+            $tryNum = 0
+            do
+            {
+                try
+                {
+                    $appPool = Get-IisAppPool -Name $rootApp.ApplicationPoolName
+                    Write-Verbose ('IIS://{0}: recycling ''{1}'' app pool' -f $Name,$appPool.Name)
+                    $appPool.Recycle() | Write-Verbose -Verbose
+                    break
+                }
+                catch
+                {
+                    $Global:Error.RemoveAt(0)
+                    Write-Verbose ('Failed to recycle app pool:{0}{1}' -f ([Environment]::NewLine),$_) -Verbose
+                    Start-Sleep -Milliseconds 100
+                }
+            }
+            while( $tryNum++ -lt $MAX_TRIES )
         }
     }
     
