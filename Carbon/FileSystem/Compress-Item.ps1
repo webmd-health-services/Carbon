@@ -193,6 +193,7 @@ function Compress-Item
                 catch
                 {
                     Write-Verbose ('Encountered an exception checking if the COM Shell API has finished creating ZIP file ''{0}'': {1}' -f $OutFile,$_.Exception.Message) 
+                    $Global:Error.RemoveAt(0)
                 }
                 Start-Sleep -Milliseconds 100
             }

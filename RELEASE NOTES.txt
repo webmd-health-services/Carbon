@@ -58,6 +58,7 @@ This is a ***backwards-incompatible*** release.
  * Carbon's `System.ServiceProcess.ServiceController` extended type data causes errors when PowerShell formats `System.ServiceProcess.ServiceController` objects that represent services on remote computers.
  * `Install-Msi` didn't properly detect when installation failed.
  * `Set-EnvironmentVariable` fails to set process-level environment variable.
+ * `Compress-Item` doesn't remove handled errors from global error array.
  
 ### Enhancements
 
@@ -221,6 +222,11 @@ This is a ***backwards-incompatible*** release.
 ### Computer
 
  * `Set-EnvironmentVariable` fails to set process-level environment variable.
+ 
+### File System
+
+ * `Compress-Item` doesn't remove handled errors from global error array.
+
 
 ### Hosts Entries
 
