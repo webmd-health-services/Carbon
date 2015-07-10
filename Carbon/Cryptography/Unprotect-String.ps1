@@ -112,7 +112,7 @@ filter Unprotect-String
         $UseDirectEncryptionPadding,
 
         [Switch]
-        # Returns the unprotected string as a secure string. The original decrpted bytes are zeroed out to limit the memory exposure of the decrypted secret, i.e. the decrypted secret will never be in a `string` object.
+        # Returns the unprotected string as a secure string. The original decrypted bytes are zeroed out to limit the memory exposure of the decrypted secret, i.e. the decrypted secret will never be in a `string` object.
         $AsSecureString
     )
 
