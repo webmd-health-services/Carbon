@@ -31,7 +31,7 @@ function Stop-TestFixture
 function Start-Test
 {
     Uninstall-IisWebsite $siteName
-    Install-IisWebsite -Name $siteName -Path $TestDir -Bindings "http://*:$sitePort"
+    Install-IisWebsite -Name $siteName -Path $TestDir -Bindings "http://*:$sitePort" -AppPoolName $siteName
     if( Test-Path $webConfigPath -PathType Leaf )
     {
         Remove-Item $webConfigPath
