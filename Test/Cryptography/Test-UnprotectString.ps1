@@ -200,7 +200,8 @@ function Test-ShouldHandlePathNotFound
 
 function Test-ShouldConvertToSecureString
 {
-    $secureSecret = Unprotect-String -ProtectedString $protectedText -AsSecureString 
+    [securestring]$secureSecret = Unprotect-String -ProtectedString $protectedText -AsSecureString 
     Assert-Is $secureSecret ([securestring])
     Assert-Equal $originalText (Convert-SecureStringToString -SecureString $secureSecret)
+    Assert-True $secureSecret.IsReadOnly()
 }

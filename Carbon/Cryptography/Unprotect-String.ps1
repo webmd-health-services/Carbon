@@ -209,6 +209,7 @@ Failed to decrypt string using certificate '{0}' ({1}). This usually happens whe
                 $chars[$idx] = 0
             }
 
+            $secureString.MakeReadOnly()
             return $secureString
         }
         else
