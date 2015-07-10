@@ -26,3 +26,28 @@ function Test-ShouldCreateCredential
     Assert-Equal 'Credential' $cred.UserName 'username not set correctly'
     Assert-NotEmpty (ConvertFrom-SecureString $cred.Password) 'password not set correctly'
 }
+
+function Test-ShouldCreateCredentialFromSecureString
+{
+    $secureString = New-Object 'Security.SecureString'
+    $secureString.AppendChar( 'a' )
+
+    $c = New-Credential -UserName 'fubar' -Password $secureString
+    Assert-NotNull $c
+    Assert-Equal 'a' $c.GetNetworkCredential().Password
+}
+
+function Test-ShouldGiveAnErrorIfPassNotAStringOrSecureString
+{
+    $c = New-Credential -UserName 'fubar' -Password 1 -ErrorAction SilentlyContinue
+    Assert-Null $c
+    Assert-Error -Last -Regex 'must be'
+}
+
+function Test-ShouldAcceptPipelineInput
+{
+    $c = 'fubar' | New-Credential -UserName 'fizzbuzz'
+    Assert-NotNull $c
+    Assert-Equal 'fizzbuzz' $c.UserName
+    Assert-Equal 'fubar' $c.GetNetworkCredential().Password
+}
