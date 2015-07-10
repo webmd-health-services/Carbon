@@ -20,6 +20,13 @@ $WebConfig = Join-Path $TestDir web.config
 function Start-TestFixture
 {
     & (Join-Path -Path $PSScriptRoot '..\Import-CarbonForTest.ps1' -Resolve)
+
+    Install-IisAppPool -Name $SiteName
+}
+
+function Stop-TestFixture
+{
+    Uninstall-IisAppPool -Name $SiteName
 }
 
 function Start-Test

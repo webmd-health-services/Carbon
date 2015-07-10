@@ -21,7 +21,7 @@ function Install-IisWebsite
     .DESCRIPTION
     `Install-IisWebsite` installs an IIS website. Anonymous authentication is enabled, and the anonymous user is set to the website's application pool identity. Before Carbon 2.0, if a website already existed, it was deleted and re-created. Beginning with Carbon 2.0, existing websites are modified in place. 
     
-    If you don't set the website's app pool, IIS will pick one for you, and `Install-IisWebsite` will never manage the app pool for you (i.e. if someone changes it manually, this function won't set it back to the default). We recommend always supplying an app pool name, even if it is `DefaultAppPool`.
+    If you don't set the website's app pool, IIS will pick one for you (usually `DefaultAppPool`), and `Install-IisWebsite` will never manage the app pool for you (i.e. if someone changes it manually, this function won't set it back to the default). We recommend always supplying an app pool name, even if it is `DefaultAppPool`.
 
     By default, the site listens on (i.e. is bound to) all IP addresses on port 80 (binding `http/*:80:`). Set custom bindings with the `Bindings` argument. Multiple bindings are allowed. Each binding must be in this format (in BNF):
 
@@ -37,6 +37,10 @@ function Install-IisWebsite
      * http/*:80:
      * https/10.2.3.4:443:
      * http/*:80:example.com
+
+     ## Troubleshooting
+
+     In some situations, when you add a website to an application pool that another website/application is part of, the new website will fail to load in a browser with a 500 error saying `Failed to map the path '/'.`. We've been unable to track down the root cause. The solution is to recycle the app pool, e.g. `(Get-IisAppPool -Name 'AppPoolName').Recycle()`.
 
     .LINK
     Get-IisWebsite
@@ -84,7 +88,7 @@ function Install-IisWebsite
         $Binding = @('http/*:80:'),
         
         [string]
-        # The name of the app pool under which the website runs.  The app pool must exist.  If not provided, IIS picks one for you.  No whammy, no whammy!
+        # The name of the app pool under which the website runs.  The app pool must exist.  If not provided, IIS picks one for you.  No whammy, no whammy! It is recommended that you create an app pool for each website. That's what the IIS Manager does.
         $AppPoolName,
 
         [int]
