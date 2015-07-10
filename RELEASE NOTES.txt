@@ -90,6 +90,7 @@ This is a ***backwards-incompatible*** release.
  * [Set-SslCertificateBinding](http://get-carbon.org/help/Set-SslCertificateBinding.html) no longer returns binding objects by default. Use new `PassThru` switch to get the old behavior.
  * The product version of the Carbon assembly now includes pre-release version information, as defined by the [Semantic Versioning specification](http://semver.org). To get this version, run `Get-Item Carbon.dll | Select-Object -ExpandProperty 'VersionInfo' | Select-Object -ExpandProperty 'ProductVersion'
  * The Carbon NuGet package now supports installing and uninstalling using Chocolatey.
+ * Added `AsSecureString` switch to [Unprotect-String](http://get-carbon.org/help/Unprotect-String.html) which causes `Unprotect-String` to return a secure string instead of a normal string.
  
 ## Enhancements
 
@@ -108,6 +109,10 @@ This is a ***backwards-incompatible*** release.
  * Added `PassThru` switch to [Set-SslCertificateBinding](http://get-carbon.org/help/Set-SslCertificateBinding.html). When used, `Set-SslCertificateBinding` will return a `Carbon.Certificates.SslCertificateBinding` object for the configured binding.
  * [Set-SslCertificateBinding](http://get-carbon.org/help/Set-SslCertificateBinding.html) no longer returns console output, instead writing it to the verbose stream. Use the `Verbose` stream to see the previous output.
  * The `Exportable` switch is now only allowed by [Install-Certificate](http://get-carbon.org/help/Install-Certificate.html) when installing a certificate from a file. Previously, you could supply the switch when installing from an X509Certificate2 object but it was ignored.
+
+### Cryptography
+
+ * Added `AsSecureString` switch to [Unprotect-String](http://get-carbon.org/help/Unprotect-String.html) which causes `Unprotect-String` to return a secure string instead of a normal string.
 
 ### COM
 

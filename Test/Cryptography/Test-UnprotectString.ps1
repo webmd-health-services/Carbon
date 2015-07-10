@@ -197,3 +197,10 @@ function Test-ShouldHandlePathNotFound
     Assert-Error -Last -Regex 'not found'
     Assert-Null $revealedSecret
 }
+
+function Test-ShouldConvertToSecureString
+{
+    $secureSecret = Unprotect-String -ProtectedString $protectedText -AsSecureString 
+    Assert-Is $secureSecret ([securestring])
+    Assert-Equal $originalText (Convert-SecureStringToString -SecureString $secureSecret)
+}

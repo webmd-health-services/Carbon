@@ -19,7 +19,11 @@ filter Unprotect-String
     Decrypts a string.
     
     .DESCRIPTION
-    Decrypts a string encrypted via the Data Protection API (DPAPI) or RSA.
+    `Unprotect-String` decrypts a string encrypted via the Data Protection API (DPAPI) or RSA. It uses the DP/RSA APIs to decrypted the secret into an array of bytes, which is then converted to a UTF8 string. Beginning with Carbon 2.0, after conversion, the decrypted array of bytes is cleared in memory.
+
+    Also beginning in Carbon 2.0, use the `AsSecureString` switch to cause `Unprotect-String` to return the decrypted string as a `System.Security.SecureString`, thus preventing your secret from hanging out in memory. When converting to a secure string, the secret is decrypted to an array of bytes, and then converted to an array of characters. Each character is appended to the secure string, after which it is cleared in memory. When the conversion is complete, the decrypted byte array is also cleared out in memory.
+
+    `Unprotect-String` can decrypt using the following techniques.
 
     ## DPAPI
 
@@ -97,8 +101,7 @@ filter Unprotect-String
         $PrivateKeyPath,
 
         [Parameter(ParameterSetName='RSAByPath')]
-        [string]
-        # The password for the private key, if it has one. It really should.
+        # The password for the private key, if it has one. It really should. Can be a `[string]` or a `[securestring]`.
         $Password,
 
         [Parameter(ParameterSetName='RSAByCertificate')]
@@ -106,7 +109,11 @@ filter Unprotect-String
         [Parameter(ParameterSetName='RSAByPath')]
         [Switch]
         # If true, uses Direct Encryption (PKCS#1 v1.5) padding. Otherwise (the default), uses OAEP (PKCS#1 v2) padding. See [Encrypt](http://msdn.microsoft.com/en-us/library/system.security.cryptography.rsacryptoserviceprovider.encrypt(v=vs.110).aspx) for information.
-        $UseDirectEncryptionPadding
+        $UseDirectEncryptionPadding,
+
+        [Switch]
+        # Returns the unprotected string as a secure string. The original decrpted bytes are zeroed out to limit the memory exposure of the decrypted secret, i.e. the decrypted secret will never be in a `string` object.
+        $AsSecureString
     )
 
     Set-StrictMode -Version 'Latest'
@@ -190,5 +197,27 @@ Failed to decrypt string using certificate '{0}' ({1}). This usually happens whe
         }
     }
 
-    [Text.Encoding]::UTF8.GetString( $decryptedBytes )
+    try
+    {
+        if( $AsSecureString )
+        {
+            $secureString = New-Object 'Security.SecureString'
+            [char[]]$chars = [Text.Encoding]::UTF8.GetChars( $decryptedBytes )
+            for( $idx = 0; $idx -lt $chars.Count ; $idx++ )
+            {
+                $secureString.AppendChar( $chars[$idx] )
+                $chars[$idx] = 0
+            }
+
+            return $secureString
+        }
+        else
+        {
+            [Text.Encoding]::UTF8.GetString( $decryptedBytes )
+        }
+    }
+    finally
+    {
+        [Array]::Clear( $decryptedBytes, 0, $decryptedBytes.Length )
+    }
 }
