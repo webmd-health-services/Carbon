@@ -92,6 +92,7 @@ This is a ***backwards-incompatible*** release.
  * The Carbon NuGet package now supports installing and uninstalling using Chocolatey.
  * Added `AsSecureString` switch to [Unprotect-String](http://get-carbon.org/help/Unprotect-String.html) which causes `Unprotect-String` to return a secure string instead of a normal string.
  * [Unprotect-String](http://get-carbon.org/help/Unprotect-String.html) now accepts a `SecureString` as the value for the `Password` parameter, which is the password for the private key used to decrypt from password-protected RSA certificate file.
+ * Added `Credential` parameter to [Install-IisAppPool](https://get-carbon.org/help/Install-IisAppPool.ps1) for increased security and to follow PowerShell guidelines.
  
 ## Enhancements
 
@@ -168,6 +169,7 @@ This is a ***backwards-incompatible*** release.
  * Added `SiteID` parameter to [Install-IisWebsite](http://get-carbon.org/help/Install-IisWebsite.html) for setting a website's IIS ID.
  * [Install-IisWebsite](https://get-carbon.org/help/Install-IisWebsite.ps1) no longer deletes and re-creates websites. This may or may not be a breaking change in your environment.
  * Added `PassThru` parameter to [Install-IisWebsite](https://get-carbon.org/help/Install-IisWebsite.ps1). When used, `Install-IisWebsite` will return a `Microsoft.Web.Administration.Site` object for the website.
+ * Added `Credential` parameter to [Install-IisAppPool](https://get-carbon.org/help/Install-IisAppPool.ps1) for increased security and to follow PowerShell guidelines.
  
 ### MSI
 

@@ -92,11 +92,26 @@ function Test-ShouldSetIdentityAsServiceAccount
 
 function Test-ShouldSetIdentityAsSpecificUser
 {
-    $result = Install-IisAppPool -Name $appPoolName -UserName $username -Password $password
+    $warnings = @()
+    $result = Install-IisAppPool -Name $appPoolName -UserName $username -Password $password -WarningVariable 'warnings'
     Assert-Null $result
     Assert-AppPoolExists
     Assert-Identity $username $password
     Assert-IdentityType 'SpecificUser'
+    Assert-Contains (Get-Privilege $username) 'SeBatchLogonRight' 'custom user not granted SeBatchLogonRight'
+    Assert-Equal 1 $warnings.Count
+    Assert-Like $warnings[0] '*obsolete*'
+}
+
+function Test-ShouldSetIdentityWithCredential
+{
+    $credential = New-Credential -UserName $username -Password $password
+    Assert-NotNull $credential
+    $result = Install-IisAppPool -Name $appPoolName -Credential $credential
+    Assert-Null $result
+    Assert-AppPoolExists
+    Assert-Identity $credential.UserName $credential.GetNetworkCredential().Password
+    Assert-IdentityType 'Specificuser'
     Assert-Contains (Get-Privilege $username) 'SeBatchLogonRight' 'custom user not granted SeBatchLogonRight'
 }
 

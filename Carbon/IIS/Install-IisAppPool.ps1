@@ -29,7 +29,7 @@ function Install-IisAppPool
 
     An app pool can run as several built-in service accounts, by passing one of them as the value of the `ServiceAccount` parameter: `NetworkService`, `LocalService`, or `LocalSystem`  The default is `ApplicationPoolIdentity`, which causes IIS to create and use a custom local account with the name of the app pool.  See [Application Pool Identities](http://learn.iis.net/page.aspx/624/application-pool-identities/) for more information.
 
-    To run the app pool as a specific user, pass the username and password for the account to the `Username` and `Password` parameters, respectively. This user will be granted the `SeBatchLogonRight` privilege.
+    To run the app pool as a specific user, pass the credentials with the `Credential` parameter. (In some versions of Carbon, there is no `Credential` parameter, so use the `UserName` and `Password` parameters instead.) The user will be granted the `SeBatchLogonRight` privilege.
 
     If an existing app pool exists with name `Name`, it's settings are modified.  The app pool isn't deleted.  (You can't delete an app pool if there are any websites using it, that's why.)
 
@@ -95,6 +95,11 @@ function Install-IisAppPool
         # The password for the user account.  Can be a string or a SecureString.
         $Password,
 
+        [Parameter(ParameterSetName='AsSpecificUserWithCredential',Mandatory=$true)]
+        [pscredential]
+        # The credential to use to run the app pool.
+        $Credential,
+
         [Switch]
         # Return an object represeing the app pool.
         $PassThru
@@ -102,9 +107,18 @@ function Install-IisAppPool
 
     Set-StrictMode -Version 'Latest'
     
-    if( $pscmdlet.ParameterSetName -eq 'AsSpecificUser' -and -not (Test-Identity -Name $UserName) )
+    if( $PSCmdlet.ParameterSetName -like 'AsSpecificUser*' )
     {
-        Write-Error ('Identity {0} not found. {0} IIS websites and applications assigned to this app pool won''t run.' -f $UserName,$Name)
+        if( $PSCmdlet.ParameterSetName -notlike '*WithCredential' ) 
+        {
+            Write-Warning ('`Install-IisAppPool` function''s `UserName` and `Password` parameters are obsolete and will be removed from a future version of Carbon. Please use the `Credential` parameter instead.')
+            $Credential = New-Credential -UserName $UserName -Password $Password
+        }
+    }
+
+    if( $PSCmdlet.ParameterSetName -eq 'AsSpecificUser' -and -not (Test-Identity -Name $Credential.UserName) )
+    {
+        Write-Error ('Identity {0} not found. {0} IIS websites and applications assigned to this app pool won''t run.' -f $Credential.UserName,$Name)
     }
     
     if( -not (Test-IisAppPool -Name $Name) )
@@ -153,21 +167,17 @@ function Install-IisAppPool
         $updated = $true
     }
     
-    if( $pscmdlet.ParameterSetName -eq 'AsSpecificUser' )
+    if( $PSCmdlet.ParameterSetName -like 'AsSpecificUser*' )
     {
-        if( $appPool.ProcessModel.UserName -ne $UserName )
+        if( $appPool.ProcessModel.UserName -ne $Credential.UserName )
         {
-            Write-Verbose ('IIS Application Pool {0}: Setting username = {0}' -f $Name,$UserName)
-            if( $Password -is [Security.SecureString] )
-            {
-                $Password = Convert-SecureStringToString $Password
-            }
+            Write-Verbose ('IIS Application Pool {0}: Setting username = {0}' -f $Name,$Credential.UserName)
             $appPool.ProcessModel.IdentityType = [Microsoft.Web.Administration.ProcessModelIdentityType]::SpecificUser
-            $appPool.ProcessModel.UserName = $UserName
-            $appPool.ProcessModel.Password = $Password
+            $appPool.ProcessModel.UserName = $Credential.UserName
+            $appPool.ProcessModel.Password = $Credential.GetNetworkCredential().Password
 
             # On Windows Server 2008 R2, custom app pool users need this privilege.
-            Grant-Privilege -Identity $UserName -Privilege SeBatchLogonRight -Verbose:$VerbosePreference
+            Grant-Privilege -Identity $Credential.UserName -Privilege SeBatchLogonRight -Verbose:$VerbosePreference
             $updated = $true
         }
     }
