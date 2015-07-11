@@ -19,17 +19,17 @@ function New-Credential
     Creates a new `PSCredential` object from a given username and password.
 
     .DESCRIPTION
-    `New-Credential` will create a credential for you from a username and password, and will convert a password stored as a `String` into a `SecureString`.
+    `New-Credential` will create a credential for you from a username and password, converting a password stored as a `String` into a `SecureString`.
 
-    Many PowerShell commands require a `PSCredential` object instead of username/password. Although Microsoft recommends using `Get-Credential` to get credentials, when automating installs, there's usually no one around to answer that prompt so secrets are often pulled from encrypted stores. 
-
-    We do *not* recommend passing plaintext passwords around. Please upgrade to Carbon 2.0 so you can decrypt secrets directly to `SecureStrings` with `Unprotect-String` and then use those secure strings with `New-Credential` to create a credential.
+    PowerShell commands use `PSCredential` objects instead of username/password. Although Microsoft recommends using `Get-Credential` to get credentials, when automating installs, there's usually no one around to answer that prompt, so secrets are often pulled from encrypted stores. 
 
     Beginning with Carbon 2.0, you can pass a `SecureString` as the value for the `Password` parameter.
 
     Beginning with Carbon 2.0, you can pipe passwords to `New-Credential`, e.g.
 
         Read-EncrptedPassword | Unprotect-String | New-Credential -Username 'fubar'
+
+    We do *not* recommend passing plaintext passwords around. Beginning ing with Carbon 2.0, you can use `Unprotect-String` to decrypt secrets securely to `SecureStrings` and then use those secure strings with `New-Credential` to create a credential.
 
     .LINK
     Protect-String
