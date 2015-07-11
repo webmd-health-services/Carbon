@@ -34,7 +34,7 @@ function New-Credential
     .LINK
     Protect-String
 
-    .LINKE
+    .LINK
     Unprotect-String
 
     .OUTPUTS
