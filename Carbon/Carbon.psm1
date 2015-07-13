@@ -149,6 +149,7 @@ $privateMembers = @{
                         'Invoke-ConsoleCommand' = $true;
                         'Resolve-WindowsFeatureName' = $true;
                         'Set-CryptoKeySecurity' = $true;
+                        'Write-IisVerbose' = $true;
                    }
 
 $functionNames = Get-Item (Join-Path -Path $PSScriptRoot -ChildPath '*\*.ps1') | 
