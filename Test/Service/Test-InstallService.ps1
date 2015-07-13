@@ -288,7 +288,7 @@ function Test-ShouldUpdateServiceProperties
     Assert-Equal 'Manual' $service.StartMode
     Assert-Equal ".\$serviceAcct" $service.UserName
     Assert-Equal 'Running' $service.Status
-    Assert-HasPermissionsOnServiceExecutable "$($env:ComputerName)\$serviceAcct" $newServicePath
+    Assert-HasPermissionsOnServiceExecutable $serviceAcct $newServicePath
 }
 
 function Test-ShouldSupportWhatIf
@@ -507,12 +507,7 @@ function Assert-ServiceInstalled
 
 function Assert-HasPermissionsOnServiceExecutable($Identity, $Path)
 {
-    $acl = Get-Acl $Path |
-            Select-Object -ExpandProperty Access |
-            Where-Object { 
-                $_.IdentityReference -eq $Identity -and (($_.FileSystemRights -band [Security.AccessControl.FileSystemRights]::ReadAndExecute) -eq 'ReadAndExecute') 
-            }
-
-    Assert-Null $acl "'$Identity' didn't have full control to '$Path'."
-            
+    $access = Get-Permission -Path $Path -Identity $Identity
+    Assert-NotNull $access "'$Identity' doesn't have any access to '$Path'."
+    Assert-Equal ($access.FileSystemRights -band [Security.AccessControl.FileSystemRights]::ReadAndExecute) ([Security.AccessControl.FileSystemRights]::ReadAndExecute) "'$Identity' doesn't have ReadAndExecute on '$Path'."
 }
