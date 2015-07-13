@@ -34,6 +34,7 @@ This is a ***backwards-incompatible*** release.
  * Remove usages of `[Carbon.Kernel32]::LocalFree` class method. It was incorrectly exposed as a public method.
  * Update usages of `Carbon.Computer.ProgramInstallInfo`'s `Version` property (returned by [Get-ProgramInstallInfo](http://get-carbon.org/help/Get-ProgramInstallInfo.html)). It was an `int` and is now a [Version](http://msdn.microsoft.com/en-us/library/y0hf9t2e.aspx) object.
  * [Install-IisWebsite](https://get-carbon.org/help/Install-IisWebsite.ps1) no longer deletes and re-creates websites. If a website exists, it updates its configuration to match parameters passed in. This may or may not be a breaking change in your environment.
+ * [Install-IisVirtualDirectory](https://get-carbon.org/help/Install-IisVirtualDirectory.html) no longer deletes and re-creates virtual directories. If a virtual directory exists, its configuration is updated in place. This may or may not be a breaking change in your environment.
 
 ## Changes Since `alpha.26`
 
@@ -97,6 +98,7 @@ This is a ***backwards-incompatible*** release.
  * Improved [Install-Service](https://get-carbon.org/help/Install-Service.html) handling of arguments/services with spaces in them under PowerShell 5.
  * Added `Credential` parameter to [Install-Service](https://get-carbon.org/help/Install-Service.html) for increased security and to follow PowerShell guidelines.
  * Added `Credential` parameter to [Install-User](https://get-carbon.org/help/Install-User.html) for increased security and to follow PowerShell guidelines.
+ * [Install-IisVirtualDirectory](https://get-carbon.org/help/Install-IisVirtualDirectory.html) now modifies existing virtual directories in place, instead of deleting and re-creating.
  
 ## Enhancements
 
@@ -174,6 +176,7 @@ This is a ***backwards-incompatible*** release.
  * [Install-IisWebsite](https://get-carbon.org/help/Install-IisWebsite.ps1) no longer deletes and re-creates websites. This may or may not be a breaking change in your environment.
  * Added `PassThru` parameter to [Install-IisWebsite](https://get-carbon.org/help/Install-IisWebsite.ps1). When used, `Install-IisWebsite` will return a `Microsoft.Web.Administration.Site` object for the website.
  * Added `Credential` parameter to [Install-IisAppPool](https://get-carbon.org/help/Install-IisAppPool.ps1) for increased security and to follow PowerShell guidelines.
+ * [Install-IisVirtualDirectory](https://get-carbon.org/help/Install-IisVirtualDirectory.html) now modifies existing virtual directories in place, instead of deleting and re-creating.
  
 ### MSI
 

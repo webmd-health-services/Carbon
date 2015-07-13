@@ -53,13 +53,41 @@ function Install-IisVirtualDirectory
     
     Set-StrictMode -Version 'Latest'
 
-    $vdirID = Join-IisVirtualPath $SiteName $VirtualPath 
-    $output = Invoke-AppCmd list vdir $vdirID
-    if( $output -like "*$vdirID*" )
+    $site = Get-IisWebsite -Name $SiteName
+    [Microsoft.Web.Administration.Application]$rootApp = $site.Applications | Where-Object { $_.Path -eq '/' }# $_.VirtualDirectories | Where-Object { $_.Path -eq $VirtualPath } }
+    if( -not $rootApp )
     {
-        Invoke-AppCmd delete vdir $vdirID
+        Write-Error ('Default website application not found.')
+        return
     }
-    
+
     $PhysicalPath = Resolve-FullPath -Path $PhysicalPath
-    Invoke-AppCmd add vdir /app.name:"$SiteName/" / /path:/$VirtualPath /physicalPath:"$PhysicalPath"       
+
+    $modified = $false
+
+    $VirtualPath = $VirtualPath.Trim('/')
+    $VirtualPath = '/{0}' -f $VirtualPath
+
+    $vdir = $rootApp.VirtualDirectories | Where-Object { $_.Path -eq $VirtualPath }
+    if( -not $vdir )
+    {
+        [Microsoft.Web.Administration.ConfigurationElementCollection]$vdirs = $rootApp.GetCollection()
+        $vdir = $vdirs.CreateElement('virtualDirectory')
+        Write-IisVerbose $SiteName -VirtualPath $VirtualPath 'VirtualPath' '' $VirtualPath
+        $vdir['path'] = $VirtualPath
+        $vdirs.Add( $vdir )
+        $modified = $true
+    }
+
+    if( $vdir['physicalPath'] -ne $PhysicalPath )
+    {
+        Write-IisVerbose $SiteName -VirtualPath $VirtualPath 'PhysicalPath' $vdir['physicalPath'] $PhysicalPath
+        $vdir['physicalPath'] = $PhysicalPath
+        $modified = $true
+    }
+
+    if( $modified )
+    {
+        $site.CommitChanges()
+    }
 }

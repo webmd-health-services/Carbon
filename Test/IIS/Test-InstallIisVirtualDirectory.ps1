@@ -56,6 +56,14 @@ function Test-ShouldCreateVirtualDirectory
     Assert-VirtualDirectoryRunning
 }
 
+function Test-ShouldHandleExtraDirectorySeparatorCharacter
+{
+    Install-IisVirtualDirectory -SiteName $SiteName -VirtualPath ('/{0}/' -f $VDirName) -PhysicalPath $PSScriptRoot
+    Assert-VirtualDirectoryRunning
+    $website = Get-IisWebsite -Name $SiteName
+    Assert-Equal ('/{0}' -f $VDirName) ($website.Applications[0].VirtualDirectories[1].Path)
+}
+
 function Test-ShouldResolvePhysicalPath
 {
     Install-IisVirtualDirectory -SiteName $SiteName -Name $VDirName -Path "$TestDir\..\..\Test\IIS"
@@ -68,11 +76,18 @@ function Test-ShouldResolvePhysicalPath
     Assert-Equal $TestDir $physicalPath
 }
 
-function Test-ShouldDeleteExistingVirtualDirectory
+function Test-ShouldUpdatePhysicalPath
 {
     Invoke-NewVirtualDirectory -Path $env:SystemRoot
     Invoke-NewVirtualDirectory
     Assert-VirtualDirectoryRunning
+}
+
+function Test-ShouldCreateDoubleVitualDirectory
+{
+    $virtualPath = '{0}/{0}' -f $VDirName
+    Install-IisVirtualDirectory -SiteName $SiteName -VirtualPath $virtualPath -PhysicalPath $PSScriptRoot
+    Assert-VirtualDirectoryRunning $virtualPath
 }
 
 function Test-ShouldTurnOnDirectoryBrowsing
