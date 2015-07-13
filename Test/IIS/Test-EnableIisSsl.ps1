@@ -83,13 +83,17 @@ function Test-ShouldSupportWhatIf
 function Test-ShouldSetFlagsOnSubFolder
 {
     Enable-IisSsl -SiteName $siteName -Path SubFolder -RequireSsl
-    Assert-SslFlags -ExpectedValue 'Ssl' -Path "$SiteName/SubFolder"
+    Assert-SslFlags -ExpectedValue 'Ssl' -VirtualPath "SubFolder"
     Assert-SslFlags -ExpectedValue 'None'
 }
 
-function Assert-SslFlags($ExpectedValue, $Path = $siteName)
+function Assert-SslFlags($ExpectedValue, $VirtualPath)
 {
+    $Path = Join-IisVirtualPath $SiteName $VirtualPath
     $authSettings = [xml] (Invoke-AppCmd list config $Path '-section:system.webServer/security/access')
     $sslFlags = $authSettings['system.webServer'].security.access.sslFlags
+    $section = Get-IisConfigurationSection -SiteName $SiteName -VirtualPath $VirtualPath -SectionPath 'system.webServer/security/access'
+    $sslIntFlags = $section['sslFlags']
+    Write-Verbose ('{0} ({1})' -f $sslIntFlags,$sslFlags)
     Assert-Equal $ExpectedValue $sslFlags
 }

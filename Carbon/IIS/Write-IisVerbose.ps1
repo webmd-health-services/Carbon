@@ -21,6 +21,9 @@ function Write-IisVerbose
         # The name of the site.
         $SiteName,
 
+        [string]
+        $VirtualPath = '',
+
         [Parameter(Position=1)]
         [string]
         # The name of the setting.
@@ -36,6 +39,11 @@ function Write-IisVerbose
     )
 
     Set-StrictMode -Version 'Latest'
+
+    if( $VirtualPath )
+    {
+        $Name = Join-IisVirtualPath -Path $SiteName -ChildPath $VirtualPath
+    }
 
     Write-Verbose -Message ('[IIS Website] [{0}] {1,-34} {2} -> {3}' -f $SiteName,$Name,$OldValue,$NewValue) -Verbose
 }
