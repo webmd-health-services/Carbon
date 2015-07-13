@@ -43,10 +43,21 @@ function Add-IisDefaultDocument
     
     Set-StrictMode -Version 'Latest'
 
-    $xml = [xml] (Invoke-AppCmd list config $SiteName /section:defaultDocument )
-    $docNode = $xml.SelectSingleNode( "/system.webServer/defaultDocument/files/add[@value = '$FileName']" )
-    if( -not $docNode )
+    $section = Get-IisConfigurationSection -SiteName $SiteName -SectionPath 'system.webServer/defaultDocument'
+    if( -not $section )
     {
-        Invoke-AppCmd set config $SiteName /section:defaultDocument "/+files.[value='$FileName']" /commit:apphost
+        return
+    }
+
+    [Microsoft.Web.Administration.ConfigurationElementCollection]$files = $section.GetCollection('files')
+    $defaultDocElement = $files | Where-Object { $_["value"] -eq $FileName }
+    if( -not $defaultDocElement )
+    {
+        Write-Verbose ('IIS://{0}: Default Document   -> {1}' -f $SiteName,$FileName)
+        $defaultDocElement = $files.CreateElement('add')
+        $defaultDocElement["value"] = $FileName
+        $files.Add( $defaultDocElement )
+        Write-Verbose ('IIS://{0}:                   Committing Changes' -f $SiteName)
+        $section.CommitChanges() 
     }
 }

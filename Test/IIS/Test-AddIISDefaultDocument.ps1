@@ -54,6 +54,10 @@ function Test-ShouldAddDefaultDocumentTwice
 {
     Add-IISDefaultDocument -Site $SiteName -FileName 'NewWebsite.html'
     Add-IISDefaultDocument -Site $SiteName -FileName 'NewWebsite.html'
+    Assert-NoError
+    $section = Get-IisConfigurationSection -SiteName $SiteName -SectionPath 'system.webServer/defaultDocument'
+    Assert-NotNull $section
+    Assert-Is ($section.GetCollection('files') | Where-Object { $_['value'] -eq 'NewWebsite.html' }) ([Microsoft.Web.Administration.ConfigurationElement])
     Assert-DefaultDocumentReturned
 }
 

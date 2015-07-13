@@ -159,7 +159,7 @@ function Install-IisWebsite
     $bindingsToRemove = $site.Bindings | Where-Object { -not $expectedBindings.Contains(  ('{0}/{1}' -f $_.Protocol,$_.BindingInformation ) ) }
     foreach( $bindingToRemove in $bindingsToRemove )
     {
-        Write-Verbose -Message ('IIS://{0}: Binding       {1}/{2} -> ' -f $Name,$bindingToRemove.Protocol,$bindingToRemove.BindingInformation) -Verbose
+        Write-Verbose -Message ('IIS://{0}: Binding           {1}/{2} -> ' -f $Name,$bindingToRemove.Protocol,$bindingToRemove.BindingInformation) -Verbose
         $site.Bindings.Remove( $bindingToRemove )
         $modified = $true
     }
@@ -169,7 +169,7 @@ function Install-IisWebsite
     $bindingsToAdd = $Binding | ConvertTo-Binding | Where-Object { -not $existingBindings.Contains(  ('{0}/{1}' -f $_.Protocol,$_.BindingInformation ) ) }
     foreach( $bindingToAdd in $bindingsToAdd )
     {
-        Write-Verbose -Message ('IIS://{0}: Binding        -> {1}/{2}' -f $Name,$bindingToAdd.Protocol,$bindingToAdd.BindingInformation) -Verbose
+        Write-Verbose -Message ('IIS://{0}: Binding            -> {1}/{2}' -f $Name,$bindingToAdd.Protocol,$bindingToAdd.BindingInformation) -Verbose
         $site.Bindings.Add( $bindingToAdd.BindingInformation, $bindingToAdd.Protocol ) | Out-Null
         $modified = $true
     }
@@ -187,7 +187,7 @@ function Install-IisWebsite
 
     if( $site.PhysicalPath -ne $PhysicalPath )
     {
-        Write-Verbose -Message ('IIS://{0}: PhysicalPath  {1} -> {2}' -f $Name,$site.PhysicalPath,$PhysicalPath) -Verbose
+        Write-Verbose -Message ('IIS://{0}: PhysicalPath      {1} -> {2}' -f $Name,$site.PhysicalPath,$PhysicalPath) -Verbose
         [Microsoft.Web.Administration.VirtualDirectory]$vdir = $rootApp.VirtualDirectories | Where-Object { $_.Path -eq '/' }
         $vdir.PhysicalPath = $PhysicalPath
         $modified = $true
@@ -197,7 +197,7 @@ function Install-IisWebsite
     {
         if( $rootApp.ApplicationPoolName -ne $AppPoolName )
         {
-            Write-Verbose -Message ('IIS://{0}: AppPool       {1} -> {2}' -f $Name,$rootApp.ApplicationPoolName,$AppPoolName) -Verbose
+            Write-Verbose -Message ('IIS://{0}: AppPool           {1} -> {2}' -f $Name,$rootApp.ApplicationPoolName,$AppPoolName) -Verbose
             $rootApp.ApplicationPoolName = $AppPoolName
             $modified = $true
         }
@@ -205,7 +205,7 @@ function Install-IisWebsite
 
     if( $modified )
     {
-        Write-Verbose -Message ('IIS://{0}:               Committing changes' -f $Name) -Verbose
+        Write-Verbose -Message ('IIS://{0}:                   Committing changes' -f $Name) -Verbose
         $site.CommitChanges()
     }
     
