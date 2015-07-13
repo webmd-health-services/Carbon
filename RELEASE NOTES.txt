@@ -102,6 +102,7 @@ This is a ***backwards-incompatible*** release.
  * Added `Credential` parameter to [Install-Service](https://get-carbon.org/help/Install-Service.html) for increased security and to follow PowerShell guidelines.
  * Added `Credential` parameter to [Install-User](https://get-carbon.org/help/Install-User.html) for increased security and to follow PowerShell guidelines.
  * [Install-IisVirtualDirectory](https://get-carbon.org/help/Install-IisVirtualDirectory.html) now modifies existing virtual directories in place, instead of deleting and re-creating.
+ * [Invoke-AppCmd](https://get-carbon.org/help/Invoke-AppCmd.html) is now obsolete and will be removed from a future version of Carbon. Switch to Carbon's IIS functions, or use [Get-IisConfigurationSection](https://get-carbon.org/help/Get-IisConfigurationSection.html) to get `ConfigurationElement` objects from the `Microsoft.Web.Administration` API that you can modify.
  
 ## Enhancements
 
@@ -182,6 +183,7 @@ This is a ***backwards-incompatible*** release.
  * [Install-IisVirtualDirectory](https://get-carbon.org/help/Install-IisVirtualDirectory.html) now modifies existing virtual directories in place, instead of deleting and re-creating.
  * [Get-IisAppPool](https://get-carbon.org/help/Get-IisAppPool.html) can now return all application pools installed on the local computer.
  * Added a default table format for `Microsoft.Web.Administration.ApplicationPool` objects.
+ * [Invoke-AppCmd](https://get-carbon.org/help/Invoke-AppCmd.html) is now obsolete and will be removed from a future version of Carbon. Switch to Carbon's IIS functions, or use [Get-IisConfigurationSection](https://get-carbon.org/help/Get-IisConfigurationSection.html) to get `ConfigurationElement` objects from the `Microsoft.Web.Administration` API that you can modify.
  
 ### MSI
 

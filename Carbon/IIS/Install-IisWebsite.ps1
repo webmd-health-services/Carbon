@@ -159,7 +159,7 @@ function Install-IisWebsite
     $bindingsToRemove = $site.Bindings | Where-Object { -not $expectedBindings.Contains(  ('{0}/{1}' -f $_.Protocol,$_.BindingInformation ) ) }
     foreach( $bindingToRemove in $bindingsToRemove )
     {
-        Write-IisVerbose $SiteName 'Binding' ('{0}/{1}' -f $bindingToRemove.Protocol,$bindingToRemove.BindingInformation)
+        Write-IisVerbose $Name 'Binding' ('{0}/{1}' -f $bindingToRemove.Protocol,$bindingToRemove.BindingInformation)
         $site.Bindings.Remove( $bindingToRemove )
         $modified = $true
     }
@@ -169,7 +169,7 @@ function Install-IisWebsite
     $bindingsToAdd = $Binding | ConvertTo-Binding | Where-Object { -not $existingBindings.Contains(  ('{0}/{1}' -f $_.Protocol,$_.BindingInformation ) ) }
     foreach( $bindingToAdd in $bindingsToAdd )
     {
-        Write-IisVerbose $SiteName 'Binding' '' ('{0}/{1}' -f $bindingToRemove.Protocol,$bindingToRemove.BindingInformation)
+        Write-IisVerbose $Name 'Binding' '' ('{0}/{1}' -f $bindingToAdd.Protocol,$bindingToAdd.BindingInformation)
         $site.Bindings.Add( $bindingToAdd.BindingInformation, $bindingToAdd.Protocol ) | Out-Null
         $modified = $true
     }
@@ -187,7 +187,7 @@ function Install-IisWebsite
 
     if( $site.PhysicalPath -ne $PhysicalPath )
     {
-        Write-IisVerbose $SiteName 'PhysicalPath' $site.PhysicalPath $PhysicalPath 
+        Write-IisVerbose $Name 'PhysicalPath' $site.PhysicalPath $PhysicalPath 
         [Microsoft.Web.Administration.VirtualDirectory]$vdir = $rootApp.VirtualDirectories | Where-Object { $_.Path -eq '/' }
         $vdir.PhysicalPath = $PhysicalPath
         $modified = $true

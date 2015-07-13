@@ -61,17 +61,16 @@ function Test-ShouldCreateWebsite
 {
     Invoke-NewWebsite -SiteID 5478
     
-    $details = Invoke-AppCmd list site $SiteName
-    Assert-NotEmpty $details "Site '$siteName' not created."
+    $details = Get-IisWebsite -Name $SiteName
+    Assert-NotNull $details "Site '$siteName' not created."
     Assert-Like $details $SiteName 'Didn''t create site with given site name.'
-    Assert-Like $details 'bindings:http/*:80' 'Didn''t default to binding on port 80.'
+    Assert-Equal 'http' $details.Bindings[0].Protocol
+    Assert-Equal '*:80:' $details.Bindings[0].BindingInformation
     
-    $details = Invoke-AppCmd list vdirs /app.name:"$SiteName/"
-    Assert-Equal $details "VDIR ""$SiteName/"" (physicalPath:$TestDir)" "Site not created with expected physical path."
+    Assert-Equal $PSScriptRoot $details.PhysicalPath "Site not created with expected physical path."
     
-    $authXml = [xml] (Invoke-AppCmd list config $SiteName /section:anonymousAuthentication)
-    $username = $authXml['system.webServer'].security.authentication.anonymousAuthentication.userName
-    Assert-Empty $username "Anonymous authentication username not set to application pool's identity."
+    $anonymousAuthInfo = Get-IisSecurityAuthentication -Anonymous -SiteName $SiteName
+    Assert-Empty $anonymousAuthInfo['userName'] "Anonymous authentication username not set to application pool's identity."
 
     $website = Get-IisWebsite -Name $SiteName
     Assert-NotNull $website
@@ -108,7 +107,8 @@ function Test-ShouldAddSiteToCustomAppPool
     try
     {
         Install-IisWebsite -Name $SiteName -Path $TestDir -AppPoolName $SiteName
-        $appPool = Invoke-AppCmd list site $SiteName /text:[path=`'/`'].applicationPool
+        $appPool = Get-IisWebsite -Name $SiteName
+        $appPool = $appPool.Applications[0].ApplicationPoolName
     }
     finally
     {
@@ -118,15 +118,19 @@ function Test-ShouldAddSiteToCustomAppPool
     Assert-Equal $SiteName $appPool "Site not assigned to correct app pool."
 }
 
-function Test-ShouldRemoveExistingSite
+function Test-ShouldUpdateExistingSite
 {
     Invoke-NewWebsite -Bindings 'http/*:9876:'
-    $output = Invoke-AppCmd list site `"$SiteName`"
-    Assert-Match $output 'http/\*:9876' "Custom binding not set."
+    Assert-NoError
+    Assert-True (Test-IisWebsite -Name $SiteName)
+    Install-IisVirtualDirectory -SiteName $SiteName -VirtualPath '/ShouldStillHangAround' -PhysicalPath $PSScriptRoot
     
     Invoke-NewWebsite
-    $output = Invoke-AppCmd list site `"$SiteName`"
-    Assert-Match $output 'http/\*:80' 'Site not replaced.'
+    Assert-NoError
+    Assert-True (Test-IisWebsite -Name $SiteName)
+
+    $website = Get-IisWebsite -Name $SiteName
+    Assert-NotNull ($website.Applications[0].VirtualDirectories | Where-Object { $_.Path -eq '/ShouldStillHangAround' } ) 'Site deleted.'
 }
 
 function Test-ShouldCreateSiteDirectory
@@ -273,7 +277,8 @@ function Assert-WebsiteRunning($port)
 
 function Wait-ForWebsiteToBeRunning
 {
-    Invoke-AppCmd start site /site.name:$SiteName -ErrorAction SilentlyContinue
+    $website = Get-IisWebsite -Name $SiteName
+    $website.Start()
     $state = ''
     $tryNum = 0
     do

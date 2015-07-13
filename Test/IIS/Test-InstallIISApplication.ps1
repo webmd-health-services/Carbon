@@ -62,8 +62,9 @@ function Test-ShouldCreateApplication
 {
     Invoke-InstallApplication
     Assert-ApplicationRunning
-    $output = Invoke-AppCmd list app "$SiteName/$AppName"
-    Assert-Like $output "APP ""$SiteName/$AppName"" (applicationPool:$AppPoolName)"
+    $app = Get-IisApplication -SiteName $SiteName -VirtualPath $AppName
+    Assert-NotNull $app
+    Assert-Equal $AppPoolName $app.ApplicationPoolName
 }
 
 function Test-ShouldResolveApplicationPhysicalPath

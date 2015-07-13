@@ -90,7 +90,7 @@ function Test-ShouldSetFlagsOnSubFolder
 function Assert-SslFlags($ExpectedValue, $VirtualPath)
 {
     $Path = Join-IisVirtualPath $SiteName $VirtualPath
-    $authSettings = [xml] (Invoke-AppCmd list config $Path '-section:system.webServer/security/access')
+    $authSettings = [xml] (& (Join-Path -Path $env:SystemRoot -ChildPath 'system32\inetsrv\appcmd.exe' -Resolve) list config $Path '-section:system.webServer/security/access')
     $sslFlags = $authSettings['system.webServer'].security.access.sslFlags
     $section = Get-IisConfigurationSection -SiteName $SiteName -VirtualPath $VirtualPath -SectionPath 'system.webServer/security/access'
     $sslIntFlags = $section['sslFlags']

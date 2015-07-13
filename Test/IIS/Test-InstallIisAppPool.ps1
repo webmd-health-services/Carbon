@@ -24,7 +24,7 @@ function Start-TestFixture
 function Start-Test
 {
     Remove-AppPool
-    Install-User -Username $username -Password $password -Description 'User for testing Carbon''s Install-IisAppPool function.'
+    Install-User -Credential (New-Credential -Username $username -Password $password) -Description 'User for testing Carbon''s Install-IisAppPool function.'
     Revoke-Privilege -Identity $username -Privilege SeBatchLogonRight
 }
 
@@ -213,50 +213,42 @@ function Test-ShouldFailIfIdentityDoesNotExist
     Assert-True ($error.Count -ge 2)
 }
 
-function Get-AppPoolDetails
-{
-    return Invoke-AppCmd list apppool /name:`"$appPoolname`"
-}
-
 function Assert-ManagedRuntimeVersion($Version)
 {
-    $apppool = Get-AppPoolDetails
-    $correctVersion = $apppool -match "MgdVersion:$([Text.RegularExpressions.Regex]::Escape($Version))"
-    Assert-True $correctVersion "App pool's managed runtime not at correct version."
+    $apppool = Get-IisAppPool -Name $appPoolName
+    Assert-Equal $Version $apppool.ManagedRuntimeVersion "App pool's managed runtime not at correct version."
 }
 
 function Assert-ManagedPipelineMode($expectedMode)
 {
-    $apppool = Get-AppPoolDetails
-    $correctMode = $apppool -match "MgdMode:$expectedMode"
-    Assert-True $correctMode "App pool's managed pipeline not in $expectedMode mode."
+    $apppool = Get-IisAppPool -Name $appPoolName
+    Assert-Equal $expectedMode $apppool.ManagedPipelineMode "App pool's managed pipeline not in $expectedMode mode."
 }
 
 function Assert-IdentityType($expectedIdentityType)
 {
-    $identityType = Invoke-AppCmd list apppool $appPoolName /text:processModel.identityType
-    Assert-Equal $expectedIdentityType $identityType 'App pool identity type not set correctly'
+    $appPool = Get-IisAppPool -Name $appPoolName
+    Assert-Equal $expectedIdentityType $appPool.ProcessModel.IdentityType 'App pool identity type not set correctly'
 }
 
 function Assert-IdleTimeout($expectedIdleTimeout)
 {
-    $idleTimeout = Invoke-AppCmd list apppool $appPoolName /text:processModel.idleTimeout
+    $appPool = Get-IisAppPool -Name $appPoolName
     $expectedIdleTimeoutTimespan = New-TimeSpan -minutes $expectedIdleTimeout
-    Assert-Equal $expectedIdleTimeoutTimespan $idleTimeout 'App pool idle timeout not set correctly'
+    Assert-Equal $expectedIdleTimeoutTimespan $appPool.ProcessModel.IdleTimeout 'App pool idle timeout not set correctly'
 }
 
 function Assert-Identity($expectedUsername, $expectedPassword)
 {
-    $actualUserName = Invoke-AppCmd list apppool $appPoolName /text:processModel.username
-    Assert-Equal $expectedUsername $actualUserName 'App pool username not set correctly'
-    $actualPassword = Invoke-AppCmd list apppool $appPoolName /text:processModel.password
-    Assert-Equal $expectedPassword $actualPassword 'App pool username not set correctly'
+    $appPool = Get-IisAppPool -Name $appPoolName
+    Assert-Equal $expectedUsername $appPool.ProcessModel.UserName 'App pool username not set correctly'
+    Assert-Equal $expectedPassword $appPool.ProcessModel.Password 'App pool password not set correctly'
 }
 
-function Assert-AppPool32BitEnabled($expected32BitEnabled)
+function Assert-AppPool32BitEnabled([bool]$expected32BitEnabled)
 {
-    $32BitEnabled = Invoke-AppCmd list apppool $appPoolName /text:enable32BitAppOnWin64
-    Assert-Equal ([string]$expected32BitEnabled) $32BitEnabled '32-bit apps enabled flag.'
+    $appPool = Get-IisAppPool -Name $appPoolName
+    Assert-Equal $expected32BitEnabled $appPool.Enable32BitAppOnWin64 '32-bit apps enabled flag.'
 }
 
 function Assert-AppPool

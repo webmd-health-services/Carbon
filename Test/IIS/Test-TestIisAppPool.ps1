@@ -21,21 +21,17 @@ function Test-ShouldNotFindNonExistentAppPool
 {
     $exists = Test-IisAppPool -Name 'ANameIMadeUpThatShouldNotExist'
     Assert-False $exists "A non-existent app pool exists."
+    Assert-NoError
 }
 
 function Test-ShouldFindAppPools
 {
-    $apppools = Invoke-AppCmd list apppool
+    $apppools = Get-IisAppPool
     Assert-GreaterThan $apppools.Length 0 "There aren't any app pools on the current machine!"
     foreach( $apppool in $apppools )
     {
-        if( $apppool -notmatch "^APPPOOL ""([^""]+)" )
-        {
-            Fail "Unable to find app pool name: $apppool"
-        }
-        
-        $appPoolName = $matches[1]
-        $exists = Test-IisAppPool -Name $appPoolName
-        Assert-True $exists "An existing app pool '$appPoolName' not found."
+        $exists = Test-IisAppPool -Name $appPool.Name
+        Assert-True $exists "An existing app pool '$($appPool.Name)' not found."
     }
 }
+
