@@ -108,6 +108,37 @@ function Test-ShouldUpdateExistingUsersProperties
     Assert-Credential -Password $newPassword
 }
 
+function Test-ShouldUpdateExistingUsersPropertiesWithCredential
+{
+    $fullName = 'Carbon Install User'
+    $credential = New-Credential -Username $username -Password $password
+    $result = Install-User -Credential $credential -Description "Original description" -FullName $fullName
+    Assert-Null $result
+    $originalUser = Get-User -Username $username
+    Assert-NotNull $originalUser
+    
+    $newFullName = 'New {0}' -f $fullName
+    $newDescription = "New description"
+    $newPassword = [Guid]::NewGuid().ToString().Substring(0,14)
+    $credential = New-Credential -UserName $username -Password $newPassword
+    $result = Install-User -Credential $credential `
+                           -Description $newDescription `
+                           -FullName $newFullName `
+                           -UserCannotChangePassword `
+                           -PasswordExpires 
+    
+    Assert-Null $result
+
+    [DirectoryServices.AccountManagement.UserPrincipal]$newUser = Get-User -Username $username
+    Assert-NotNull $newUser
+    Assert-Equal $originalUser.SID $newUser.SID
+    Assert-Equal $newDescription $newUser.Description
+    Assert-Equal $newFullName $newUser.DisplayName
+    Assert-False $newUser.PasswordNeverExpires
+    Assert-True $newUser.UserCannotChangePassword
+    Assert-Credential -Password $newPassword
+}
+
 function Test-ShouldAllowOptionalFullName
 {
     $fullName = 'Carbon Install User'

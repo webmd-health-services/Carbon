@@ -88,15 +88,22 @@ function Install-User
 
     Set-StrictMode -Version 'Latest'
 
+    if( $PSCmdlet.ParameterSetName -eq 'WithCredential' )
+    {
+        $UserName = $Credential.UserName
+    }
+
     $ctx = New-Object 'DirectoryServices.AccountManagement.PrincipalContext' ([DirectoryServices.AccountManagement.ContextType]::Machine)
-    $user = [DirectoryServices.AccountManagement.UserPrincipal]::FindByIdentity( $ctx, $Username )
+    $user = [DirectoryServices.AccountManagement.UserPrincipal]::FindByIdentity( $ctx, $UserName )
     $operation = 'update'
     if( -not $user )
     {
         $operation = 'create'
         $user = New-Object 'DirectoryServices.AccountManagement.UserPrincipal' $ctx
+        $creating = $true
     }
 
+    $user.SamAccountName = $UserName
     $user.DisplayName = $FullName
     $user.Description = $Description
     $user.UserCannotChangePassword = $UserCannotChangePassword
@@ -105,12 +112,10 @@ function Install-User
     if( $PSCmdlet.ParameterSetName -eq 'WithUserNameAndPassword' )
     {
         Write-Warning ('`Install-User` function''s `UserName` and `Password` parameters are obsolete and will be removed from a future version of Carbon. Please use the `Credential` parameter instead.')
-        $user.SamAccountName = $Username
         $user.SetPassword( $Password )
     }
     else
     {
-        $user.SamAccountName = $Credential.UserName
         $user.SetPassword( $Credential.GetNetworkCredential().Password )
     }
 
