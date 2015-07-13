@@ -45,19 +45,25 @@ function Install-User
 
     Demonstrates how to create an account for a user who cannot change his password and whose password will expire.
     #>
-    [CmdletBinding(SupportsShouldProcess=$true)]
+    [CmdletBinding(SupportsShouldProcess=$true,DefaultParameterSetName='WithUserNameAndPassword')]
     [OutputType([System.DirectoryServices.AccountManagement.UserPrincipal])]
+    [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSAvoidUsingUserNameAndPassWordParams", "", Scope="Function", Target="*")]
     param(
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory=$true,ParameterSetName='WithUserNameAndPassword')]
         [ValidateLength(1,20)]
         [string]
         # The username for the user.
-        $Username,
+        $UserName,
         
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory=$true,ParameterSetName='WithUserNameAndPassword')]
         [string]
         # The user's password.
         $Password,
+
+        [Parameter(Mandatory=$true,ParameterSetName='WithCredential')]
+        [pscredential]
+        # The user's credentials.
+        $Credential,
         
         [string]
         # A description of the user.
@@ -91,12 +97,23 @@ function Install-User
         $user = New-Object 'DirectoryServices.AccountManagement.UserPrincipal' $ctx
     }
 
-    $user.SamAccountName = $Username
     $user.DisplayName = $FullName
     $user.Description = $Description
     $user.UserCannotChangePassword = $UserCannotChangePassword
     $user.PasswordNeverExpires = -not $PasswordExpires
-    $user.SetPassword( $Password )
+
+    if( $PSCmdlet.ParameterSetName -eq 'WithUserNameAndPassword' )
+    {
+        Write-Warning ('`Install-User` function''s `UserName` and `Password` parameters are obsolete and will be removed from a future version of Carbon. Please use the `Credential` parameter instead.')
+        $user.SamAccountName = $Username
+        $user.SetPassword( $Password )
+    }
+    else
+    {
+        $user.SamAccountName = $Credential.UserName
+        $user.SetPassword( $Credential.GetNetworkCredential().Password )
+    }
+
 
     if( $PSCmdlet.ShouldProcess( $Username, "$operation local user" ) )
     {

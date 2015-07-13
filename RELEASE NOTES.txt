@@ -92,10 +92,11 @@ This is a ***backwards-incompatible*** release.
  * The Carbon NuGet package now supports installing and uninstalling using Chocolatey.
  * Added `AsSecureString` switch to [Unprotect-String](http://get-carbon.org/help/Unprotect-String.html) which causes `Unprotect-String` to return a secure string instead of a normal string.
  * [Unprotect-String](http://get-carbon.org/help/Unprotect-String.html) now accepts a `SecureString` as the value for the `Password` parameter, which is the password for the private key used to decrypt from password-protected RSA certificate file.
- * Added `Credential` parameter to [Install-IisAppPool](https://get-carbon.org/help/Install-IisAppPool.ps1) for increased security and to follow PowerShell guidelines.
- * Improved [Install-Service](https://get-carbon.org/help/Install-Service.ps1) error handling. It now uses `net helpmsg` to get helpful error messages based on sc.exe exit codes.
- * Improved [Install-Service](https://get-carbon.org/help/Install-Service.ps1) handling of arguments/services with spaces in them under PowerShell 5.
- * Added `Credential` parameter to [Install-Service](https://get-carbon.org/help/Install-Service.ps1) for increased security and to follow PowerShell guidelines.
+ * Added `Credential` parameter to [Install-IisAppPool](https://get-carbon.org/help/Install-IisAppPool.html) for increased security and to follow PowerShell guidelines.
+ * Improved [Install-Service](https://get-carbon.org/help/Install-Service.html) error handling. It now uses `net helpmsg` to get helpful error messages based on sc.exe exit codes.
+ * Improved [Install-Service](https://get-carbon.org/help/Install-Service.html) handling of arguments/services with spaces in them under PowerShell 5.
+ * Added `Credential` parameter to [Install-Service](https://get-carbon.org/help/Install-Service.html) for increased security and to follow PowerShell guidelines.
+ * Added `Credential` parameter to [Install-User](https://get-carbon.org/help/Install-User.html) for increased security and to follow PowerShell guidelines.
  
 ## Enhancements
 

@@ -37,9 +37,33 @@ function Remove-TestUser
 
 function Test-ShouldCreateNewUser
 {
+    $warnings = @()
     $fullName = 'Carbon Install User'
     $description = "Test user for testing the Carbon Install-User function."
-    $user = Install-User -Username $username -Password $password -Description $description -FullName $fullName -PassThru
+    $user = Install-User -UserName $username -Password $password -Description $description -FullName $fullName -PassThru -WarningVariable 'warnings'
+    Assert-NotNull $user
+    Assert-Is $user ([DirectoryServices.AccountManagement.UserPrincipal])
+    Assert-True (Test-User -Username $username)
+    [DirectoryServices.AccountManagement.UserPrincipal]$user = Get-User -Username $username
+    Assert-NotNull $user
+    Assert-Equal $description $user.Description
+    Assert-True $user.PasswordNeverExpires 
+    Assert-True $user.Enabled
+    Assert-Equal $username $user.SamAccountName
+    Assert-False $user.UserCannotChangePassword
+    Assert-Equal $fullName $user.DisplayName
+    Assert-Credential -Password $password
+    Assert-Equal 1 $warnings.Count
+    Assert-Like $warnings[0] '*obsolete*'
+}
+
+
+function Test-ShouldCreateNewUserWithCredential
+{
+    $fullName = 'Carbon Install User'
+    $description = "Test user for testing the Carbon Install-User function."
+    $c = New-Credential -UserName $username -Password $password
+    $user = Install-User -Credential $c -Description $description -FullName $fullName -PassThru
     Assert-NotNull $user
     Assert-Is $user ([DirectoryServices.AccountManagement.UserPrincipal])
     Assert-True (Test-User -Username $username)
