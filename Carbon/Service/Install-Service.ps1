@@ -474,7 +474,7 @@ function Install-Service
     }
     else
     {
-        Write-Verbose ('Not re-starting {0} service. Its startup type is {0} and it wasn''t running when configuration began.' -f $Name,$StartupType)
+        Write-Verbose ('Not re-starting {0} service. Its startup type is {1} and it wasn''t running when configuration began.' -f $Name,$StartupType)
     }
 
     if( $PassThru )
