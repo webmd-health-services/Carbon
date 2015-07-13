@@ -46,7 +46,13 @@ function Enable-IisDirectoryBrowsing
     
     Set-StrictMode -Version 'Latest'
 
-    $location = Join-IisVirtualPath $SiteName $VirtualPath
-    Write-Verbose "Enabling directory browsing at location '$location'."
-    Invoke-AppCmd set config $location /section:directoryBrowse /enabled:true /commit:apphost
+    $section = Get-IisConfigurationSection -SiteName $SiteName -SectionPath 'system.webServer/directoryBrowse'
+
+    if( $section['enabled'] -ne 'true' )
+    {
+        Write-IisVerbose $SiteName 'Directory Browsing' 'disabled' 'enabled'
+        $section['enabled'] = $true
+        $section.CommitChanges()
+    }
+
 }

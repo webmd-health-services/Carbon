@@ -53,11 +53,10 @@ function Add-IisDefaultDocument
     $defaultDocElement = $files | Where-Object { $_["value"] -eq $FileName }
     if( -not $defaultDocElement )
     {
-        Write-Verbose ('IIS://{0}: Default Document   -> {1}' -f $SiteName,$FileName)
+        Write-IisVerbose $SiteName 'Default Document' '' $FileName
         $defaultDocElement = $files.CreateElement('add')
         $defaultDocElement["value"] = $FileName
         $files.Add( $defaultDocElement )
-        Write-Verbose ('IIS://{0}:                   Committing Changes' -f $SiteName)
         $section.CommitChanges() 
     }
 }
