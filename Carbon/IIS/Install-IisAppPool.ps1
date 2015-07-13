@@ -57,7 +57,7 @@ function Install-IisAppPool
     #>
     [CmdletBinding(DefaultParameterSetName='AsServiceAccount')]
     [OutputType([Microsoft.Web.Administration.ApplicationPool])]
-    [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSAvoidUsingUserNameAndPassWordParams", "", Scope="Function", Target="*")]
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSAvoidUsingUserNameAndPassWordParams")]
     param(
         [Parameter(Mandatory=$true)]
         [string]

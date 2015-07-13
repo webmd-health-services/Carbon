@@ -69,7 +69,7 @@ function Install-Service
     #>
     [CmdletBinding(SupportsShouldProcess=$true,DefaultParameterSetName='NetworkServiceAccount')]
     [OutputType([ServiceProcess.ServiceController])]
-    [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSAvoidUsingUserNameAndPassWordParams", "", Scope="Function", Target="*")]
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSAvoidUsingUserNameAndPassWordParams")]
     param(
         [Parameter(Mandatory=$true)]
         [string]

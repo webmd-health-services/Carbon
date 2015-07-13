@@ -52,7 +52,7 @@ function New-Credential
     #>
     [CmdletBinding()]
     [OutputType([Management.Automation.PSCredential])]
-    [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSAvoidUsingUserNameAndPassWordParams", "", Scope="Function", Target="*")]
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSAvoidUsingUserNameAndPassWordParams")]
     param(
         [Alias('User')]
         [string]
