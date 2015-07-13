@@ -44,7 +44,7 @@ function Install-Msi
         $Path,
         
         [Switch]
-        # This switch is ignored. Installers are run in quiet mode by default.
+        # OBSOLETE. Installers are run in quiet mode by default. This switch will be removed in a future version of Carbon.
         $Quiet,
 
         [Switch]
@@ -53,6 +53,11 @@ function Install-Msi
     )
 
     Set-StrictMode -Version 'Latest'
+
+    if( $PSBoundParameters.ContainsKey( 'Quiet' ) )
+    {
+        Write-Warning ('Install-Msi''s `Quiet` switch is obsolete and will be removed in a future version of Carbon. Installers are run in quiet mode by default. Please remove usages of the `Quiet` switch.')
+    }
 
     Get-Msi -Path $Path |
         Where-Object {

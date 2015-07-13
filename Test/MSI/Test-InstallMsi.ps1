@@ -28,14 +28,14 @@ function Stop-Test
 
 function Test-ShouldValidateFileIsAnMSI
 {
-    Invoke-WindowsInstaller -Path $PSCommandPath -Quiet -ErrorAction SilentlyContinue
+    Invoke-WindowsInstaller -Path $PSCommandPath -ErrorAction SilentlyContinue
     Assert-Error -Count 2
 }
 
 function Test-ShouldSupportWhatIf
 {
     Assert-CarbonTestInstallerNotInstalled
-    Invoke-WindowsInstaller -Path $carbonTestInstaller -Quiet -WhatIf
+    Invoke-WindowsInstaller -Path $carbonTestInstaller -WhatIf
     Assert-NoError
     Assert-LastProcessSucceeded
     Assert-CarbonTestInstallerNotInstalled
@@ -46,6 +46,14 @@ function Test-ShouldInstallMsi
     Assert-CarbonTestInstallerNotInstalled
     Install-Msi -Path $carbonTestInstaller
     Assert-CarbonTestInstallerInstalled
+}
+
+function Test-ShouldWarnQuietSwitchIsObsolete
+{
+    $warnings = @()
+    Install-Msi -Path $carbonTestInstaller -Quiet -WarningVariable 'warnings'
+    Assert-Equal 1 $warnings.Count
+    Assert-Like $warnings[0] '*obsolete*'
 }
 
 function Test-ShouldHandleFailedInstaller

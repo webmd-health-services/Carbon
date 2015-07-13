@@ -189,9 +189,12 @@ This is a ***backwards-incompatible*** release.
 
  * Created `Get-Msi` function for reading MSI information and properties from an MSI file.
  * `Invoke-WindowsInstaller` renamed `Install-Msi`, with a backwards-compatibility-preserving alias.
- * `Install-Msi` now supports wildcards for MSI path to install.
- * `Install-Msi` now only installs an MSI if it isn't already installed. To preserve the previous behavior and always install, add the `-Force` switch to all `Invoke-WindowsInstaller`\`Install-Msi` usages.
+ * [Install-Msi](http://get-carbon.org/help/Install-Msi.html] now supports wildcards for MSI path to install.
+ * [Install-Msi](http://get-carbon.org/help/Install-Msi.html] now only installs an MSI if it isn't already installed. To preserve the previous behavior and always install, add the `-Force` switch to all `Invoke-WindowsInstaller`\`Install-Msi` usages.
+ * [Install-Msi](http://get-carbon.org/help/Install-Msi.html] now only installs an MSI if it isn't already installed. To preserve the previous behavior and always install, add the `-Force` switch to all `Invoke-WindowsInstaller`\`Install-Msi` usages.
+ * [Install-Msi's](http://get-carbon.org/help/Install-Msi.html] `Quiet` switch is obsolete. `Install-Msi` always installs in quiet mode. Please remove usages.
 
+ 
 ### PowerShell
 
  * Changed [Test-PowerShellIs32Bit](http://get-carbon.org/help/Test-PowerShellIs32Bit.html) and [Test-PowerShellIs64Bit](http://get-carbon.org/help/Test-PowerShellIs64Bit.html) functions to use the Environment class's new [Is64BitProcess](http://msdn.microsoft.com/en-us/library/system.environment.is64bitprocess.aspx) property.
