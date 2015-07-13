@@ -22,7 +22,7 @@ $startedAt = Get-Date
 function Start-TestFixture
 {
     & (Join-Path -Path $PSScriptRoot -ChildPath '..\Import-CarbonForTest.ps1' -Resolve)
-    Install-User -Username $serviceAcct -Password $servicePassword -Description "Account for testing the Carbon Install-Service function."
+    Install-User -Credential (New-Credential -UserName $serviceAcct -Password $servicePassword) -Description "Account for testing the Carbon Install-Service function."
 }
 
 function Stop-TestFixture
@@ -53,7 +53,6 @@ function Test-ShouldInstallService
     Assert-Equal 'Automatic' $service.StartMode
     Assert-Equal (Resolve-IdentityName -Name 'NT AUTHORITY\NetworkService') $service.UserName
 }
-
 
 function Test-ShouldReinstallUnchangedServiceWithForceParameter
 {
@@ -510,6 +509,29 @@ function Test-ShouldReturnServiceObject
     Assert-Equal $serviceName $svc.Name
 }
 
+function Test-ShouldSetDescription
+{
+    $description = [Guid]::NewGuid()
+    $output = Install-Service -Name $serviceName -Path $servicePath -Description $description
+    Assert-Null $output
+
+    $svc = Get-Service -Name $serviceName
+    Assert-NotNull $svc
+    Assert-Equal $description $svc.Description
+
+    $description = [Guid]::NewGuid().ToString()
+    $output = Install-Service -Name $serviceName -Path $servicePath -Description $description
+    Assert-Null $output
+
+    $svc = Get-Service -Name $serviceName
+    Assert-NotNull $svc
+    Assert-Equal $description $svc.Description
+
+    # Should preserve the description
+    $output = Install-Service -Name $serviceName -Path $servicePath
+    Assert-Null $output
+    Assert-Equal $description $svc.Description
+}
 
 function Assert-ServiceInstalled
 {

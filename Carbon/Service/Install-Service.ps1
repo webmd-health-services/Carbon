@@ -19,19 +19,19 @@ function Install-Service
     Installs a Windows service.
 
     .DESCRIPTION
-    Installs a Windows service. If a service with the given name already exists, it is stopped, its configuration is updated to match the parameters passed in, and then re-started. Settings whose parameters are omitted are reset to their default values.
+    `Install-Service` uses `sc.exe` to install a Windows service. If a service with the given name already exists, it is stopped, its configuration is updated to match the parameters passed in, and then re-started. Settings whose parameters are omitted are reset to their default values.
     
-    Beginning in Carbon 2.0, if the service's configuration changes, a `ServiceController` object is returned. If the service's configuration is unchanged, the function returns nothing without making any changes. 
+    Beginning in Carbon 2.0, use the `PassThru` switch to return a `ServiceController` object for the new/updated service.
 
-    By default, the service is installed to run as `NetworkService`. Set the `Username` and `Password` arguments to run as a different account. This user will be granted the logon as a service right. To run as a system account other than `NetworkService`, provide just the account's name as the `UserName` parameter, and omit the `Password` parameter.
+    By default, the service is installed to run as `NetworkService`. Use the `Credential` parameter to run as a different account (if you don't have a `Credential` parameter, upgrade to Carbon 2.0 or use the `UserName` and `Password` parameters). This user will be granted the logon as a service right. To run as a system account other than `NetworkService`, provide just the account's name as the `UserName` parameter.
 
     The minimum required information to install a service is its name and path.
 
     [Managed service accounts and virtual accounts](http://technet.microsoft.com/en-us/library/dd548356.aspx) should be supported (we don't know how to test, so can't be sure).  Simply omit the `-Password` parameter when providing a custom account name with the `-Username` parameter.
 
-    `Manual` services are not started. `Automatic` services are started after installation. If an existing manual service is started when configuration begins, it is re-started after re-configured.
+    `Manual` services are not started. `Automatic` services are started after installation. If an existing manual service is running when configuration begins, it is re-started after re-configured.
 
-    The ability to provice service arguments/parameters via the `ArgumentList` parameter was added in Carbon 2.0.
+    The ability to provide service arguments/parameters via the `ArgumentList` parameter was added in Carbon 2.0.
 
     .LINK
     Carbon_Service
@@ -125,6 +125,12 @@ function Install-Service
         [int]
         # How many milliseconds to wait before running the failure command. Default is 0, or immediately.
         $RunCommandDelay = 0,
+
+        [string]
+        # The service's description. If you don't supply a value, the service's existing description is preserved.
+        #
+        # New in Carbon 2.0.
+        $Description,
         
         [Parameter(ParameterSetName='CustomAccount',Mandatory=$true)]
         [string]
@@ -305,6 +311,12 @@ function Install-Service
             }
         }
 
+        if( $Description -and $serviceConfig.Description -ne $Description )
+        {
+            Write-Verbose ('[{0}] Description       {1} | {2}' -f $Name,$serviceConfig.Description,$Description)
+            $doInstall = $true
+        }
+
         if( -not $doInstall -and $PSCmdlet.ParameterSetName -eq 'CustomAccount' )
         {
             Write-Verbose ('[{0}] UserName          {1} | {2}' -f $Name,$serviceConfig.UserName,$identity.FullName)
@@ -427,8 +439,20 @@ function Install-Service
         if( $scExitCode -ne 0 )
         {
             $reason = net helpmsg $scExitCode 2>$null | Where-Object { $_ }
-            Write-Error ("Falied to {0} service '{1}'. {2} returned exit code {3}: : {4}" -f $operation,$Name,$sc,$scExitCode,$reason)
+            Write-Error ("Falied to {0} service '{1}'. {2} returned exit code {3}: {4}" -f $operation,$Name,$sc,$scExitCode,$reason)
             return
+        }
+
+        if( $Description )
+        {
+            & $sc 'description' $Name $Description | Write-Verbose
+            $scExitCode = $LastExitCode
+            if( $scExitCode -ne 0 )
+            {
+                $reason = net helpmsg $scExitCode 2>$null | Where-Object { $_ }
+                Write-Error ("Falied to set {0} service's description. {1} returned exit code {2}: {3}" -f $Name,$sc,$scExitCode,$reason)
+                return
+            }
         }
     }
     
@@ -453,7 +477,7 @@ function Install-Service
             return
         }
     }
-        
+
     if( $restartService )
     {
         if( $PSCmdlet.ShouldProcess( $Name, 'start service' ) )
