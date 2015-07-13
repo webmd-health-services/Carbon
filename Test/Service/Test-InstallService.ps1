@@ -307,11 +307,14 @@ function Test-ShouldSetStartupType
 
 function Test-ShouldSetCustomAccount
 {
-    Install-Service -Name $serviceName -Path $servicePath -UserName $serviceAcct -Password $servicePassword @installServiceParams
+    $warnings = @()
+    Install-Service -Name $serviceName -Path $servicePath -UserName $serviceAcct -Password $servicePassword @installServiceParams -WarningVariable 'warnings'
     $service = Assert-ServiceInstalled
     Assert-Equal ".\$($serviceAcct)" $service.UserName
     $service = Get-Service $serviceName
     Assert-Equal 'Running' $service.Status
+    Assert-Equal 1 $warnings.Count
+    Assert-Like $warnings[0] '*obsolete*'
 }
 
 function Test-ShouldSetCustomAccountWithNoPassword
@@ -323,6 +326,16 @@ function Test-ShouldSetCustomAccountWithNoPassword
     Assert-Equal ".\$($serviceAcct)" $service.UserName
     $service = Get-Service $serviceName
     Assert-Equal 'Stopped' $service.Status
+}
+
+function Test-ShouldSetCustomAccountWithCredential
+{
+    $credential = New-Credential -UserName $serviceAcct -Password $servicePassword
+    Install-Service -Name $serviceName -Path $servicePath -Credential $credential @installServiceParams
+    $service = Assert-ServiceInstalled
+    Assert-Equal ".\$($serviceAcct)" $service.UserName
+    $service = Get-Service $serviceName
+    Assert-Equal 'Running' $service.Status
 }
 
 function Test-ShouldSetFailureActions

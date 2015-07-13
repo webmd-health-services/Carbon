@@ -127,13 +127,18 @@ function Install-Service
         
         [Parameter(ParameterSetName='CustomAccount',Mandatory=$true)]
         [string]
-        # The user the service should run as. Default is NetworkService.
-        $Username,
+        # The user the service should run as. Default is `NetworkService`.
+        $UserName,
         
         [Parameter(ParameterSetName='CustomAccount')]
         [string]
         # The user's password.
         $Password,
+
+        [Parameter(ParameterSetName='CustomAccountWithCredential',Mandatory=$true)]
+        [pscredential]
+        # The credential of the account the service should run as.
+        $Credential,
 
         [Switch]
         # Update the service even if there are no changes.
@@ -171,12 +176,28 @@ function Install-Service
         }
     }
 
-    if( $PSCmdlet.ParameterSetName -eq 'CustomAccount' )
+    if( $PSCmdlet.ParameterSetName -like 'CustomAccount*' )
     {
-        $identity = Resolve-Identity -Name $Username
+        if( $PSCmdlet.ParameterSetName -like '*WithCredential' )
+        {
+            $UserName = $Credential.UserName
+        }
+        elseif( $Password )
+        {
+            Write-Warning ('`Install-Service` function''s `Password` parameter is obsolete and will be removed from a future version of Carbon. Please use the `Credential` parameter instead.')
+            $Credential = New-Credential -UserName $UserName -Password $Password
+        }
+        else
+        {
+            $Credential = $null
+        }
+
+
+        $identity = Resolve-Identity -Name $UserName
+
         if( -not $identity )
         {
-            Write-Error ("Service identity '{0}' not found." -f $Username)
+            Write-Error ("Identity '{0}' not found." -f $UserName)
             return
         }
     }
@@ -335,12 +356,12 @@ function Install-Service
     
     $passwordArgName = ''
     $passwordArgValue = ''
-    if( $PSCmdlet.ParameterSetName -eq 'CustomAccount' )
+    if( $PSCmdlet.ParameterSetName -like 'CustomAccount*' )
     {
-        if( $PSBoundParameters.ContainsKey( 'Password' ) )
+        if( $Credential )
         {
             $passwordArgName = 'password='
-            $passwordArgValue = $Password
+            $passwordArgValue = $Credential.GetNetworkCredential().Password
         }
         
         if( $PSCmdlet.ShouldProcess( $identity.FullName, "grant the log on as a service right" ) )
@@ -439,9 +460,9 @@ function Install-Service
             Start-Service -Name $Name -Verbose:$VerbosePreference
             if( (Get-Service -Name $Name).Status -ne [ServiceProcess.ServiceControllerStatus]::Running )
             {
-                if( $PSCmdlet.ParameterSetName -eq 'CustomAccount' -and -not $PSBoundParameters.ContainsKey('Password') )
+                if( $PSCmdlet.ParameterSetName -like 'CustomAccount*' -and -not $Credential )
                 {
-                    Write-Warning ('Service ''{0}'' didn''t start and you didn''t supply a password to Install-Service.  Is ''{1}'' a managed service account or virtual account? (See http://technet.microsoft.com/en-us/library/dd548356.aspx.)  If not, please provide the account''s password with the `-Password` parameter.' -f $Name,$Username)
+                    Write-Warning ('Service ''{0}'' didn''t start and you didn''t supply a password to Install-Service.  Is ''{1}'' a managed service account or virtual account? (See http://technet.microsoft.com/en-us/library/dd548356.aspx.)  If not, please use the `Credential` parameter to pass the account''s credentials.' -f $Name,$UserName)
                 }
                 else
                 {

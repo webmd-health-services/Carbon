@@ -95,6 +95,7 @@ This is a ***backwards-incompatible*** release.
  * Added `Credential` parameter to [Install-IisAppPool](https://get-carbon.org/help/Install-IisAppPool.ps1) for increased security and to follow PowerShell guidelines.
  * Improved [Install-Service](https://get-carbon.org/help/Install-Service.ps1) error handling. It now uses `net helpmsg` to get helpful error messages based on sc.exe exit codes.
  * Improved [Install-Service](https://get-carbon.org/help/Install-Service.ps1) handling of arguments/services with spaces in them under PowerShell 5.
+ * Added `Credential` parameter to [Install-Service](https://get-carbon.org/help/Install-Service.ps1) for increased security and to follow PowerShell guidelines.
  
 ## Enhancements
 
@@ -205,6 +206,7 @@ This is a ***backwards-incompatible*** release.
  * [Get-ServiceConfiguration](http://get-carbon.org/help/Get-ServiceConfiguration.html) and Carbon's extended type data for `System.ServiceProcess.ServiceController` objects now supports services from remote computers.
  * [Install-Service](http://get-carbon.org/help/Install-Service.html) no longer returns `ServiceController` objects by default. This should improve backwards-compatability. Added a `PassThru` switch you can use to get a `ServiceController` object returned to you.
  * Improved [Install-Service](https://get-carbon.org/help/Install-Service.ps1) error handling. It now uses `net helpmsg` to get helpful error messages based on sc.exe exit codes.
+ * Added `Credential` parameter to [Install-Service](https://get-carbon.org/help/Install-Service.ps1) for increased security and to follow PowerShell guidelines.
 
 ### Shares
 
