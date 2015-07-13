@@ -50,7 +50,9 @@ function New-Credential
 
     Demonstrates how to securely decrypt a secret into a new credential object.
     #>
+    [CmdletBinding()]
     [OutputType([Management.Automation.PSCredential])]
+    [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSAvoidUsingUserNameAndPassWordParams", "", Scope="Function", Target="*")]
     param(
         [Alias('User')]
         [string]
@@ -76,11 +78,6 @@ function New-Credential
         {
             Write-Error ('Value for Password parameter must be a [String] or [System.Security.SecureString]. You passed a [{0}].' -f $Password.GetType())
             return
-        }
-
-        if( -not $UserName )
-        {
-            $UserName = ''
         }
 
         return New-Object 'Management.Automation.PsCredential' $UserName,$Password
