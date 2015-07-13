@@ -47,7 +47,7 @@ function Install-User
     #>
     [CmdletBinding(SupportsShouldProcess=$true,DefaultParameterSetName='WithUserNameAndPassword')]
     [OutputType([System.DirectoryServices.AccountManagement.UserPrincipal])]
-    [Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSAvoidUsingUserNameAndPassWordParams")]
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSAvoidUsingUserNameAndPassWordParams","")]
     param(
         [Parameter(Mandatory=$true,ParameterSetName='WithUserNameAndPassword')]
         [ValidateLength(1,20)]
