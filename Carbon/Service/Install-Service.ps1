@@ -397,14 +397,16 @@ function Install-Service
     }
 
     $binPathArg = $binPathArg -replace '"','\"'
-    $binPathArg = '"{0}"' -f $binPathArg
     if( $PSCmdlet.ShouldProcess( "$Name [$Path]", "$operation service" ) )
     {
         & $sc $operation $Name binPath= $binPathArg start= $startArg obj= $identity.FullName $passwordArgName $passwordArgValue depend= $dependencyArgValue |
             Write-Verbose
-        if( $LastExitCode -ne 0 )
+        $scExitCode = $LastExitCode
+        if( $scExitCode -ne 0 )
         {
-            Write-Error "$sc failed $operation and returned '$LastExitCode'."
+            $reason = net helpmsg $scExitCode 2>$null | Where-Object { $_ }
+            Write-Error ("Falied to {0} service '{1}'. {2} returned exit code {3}: : {4}" -f $operation,$Name,$sc,$scExitCode,$reason)
+            return
         }
     }
     
@@ -421,9 +423,12 @@ function Install-Service
     {
         & $sc failure $Name reset= $ResetFailureCount actions= $firstAction/$secondAction/$thirdAction command= $Command |
             Write-Verbose
-        if( $LastExitCode -ne 0 )
+        $scExitCode = $LastExitCode
+        if( $scExitCode -ne 0 )
         {
-            Write-Error "$sc failed when setting failure actions and returned '$LastExitCode'."
+            $reason = net helpmsg $scExitCode 2>$null | Where-Object { $_ }
+            Write-Error ("Failed to set {0} service's failure actions. {1} returned exit code {2}: {3}" -f $Name,$sc,$scExitCode,$reason)
+            return
         }
     }
         

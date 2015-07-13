@@ -93,6 +93,8 @@ This is a ***backwards-incompatible*** release.
  * Added `AsSecureString` switch to [Unprotect-String](http://get-carbon.org/help/Unprotect-String.html) which causes `Unprotect-String` to return a secure string instead of a normal string.
  * [Unprotect-String](http://get-carbon.org/help/Unprotect-String.html) now accepts a `SecureString` as the value for the `Password` parameter, which is the password for the private key used to decrypt from password-protected RSA certificate file.
  * Added `Credential` parameter to [Install-IisAppPool](https://get-carbon.org/help/Install-IisAppPool.ps1) for increased security and to follow PowerShell guidelines.
+ * Improved [Install-Service](https://get-carbon.org/help/Install-Service.ps1) error handling. It now uses `net helpmsg` to get helpful error messages based on sc.exe exit codes.
+ * Improved [Install-Service](https://get-carbon.org/help/Install-Service.ps1) handling of arguments/services with spaces in them under PowerShell 5.
  
 ## Enhancements
 
@@ -202,6 +204,7 @@ This is a ***backwards-incompatible*** release.
  * [Install-Service](http://get-carbon.org/help/Install-Service.html) now supports service startup parameters/arguments via the `ArgumentList` parameter.
  * [Get-ServiceConfiguration](http://get-carbon.org/help/Get-ServiceConfiguration.html) and Carbon's extended type data for `System.ServiceProcess.ServiceController` objects now supports services from remote computers.
  * [Install-Service](http://get-carbon.org/help/Install-Service.html) no longer returns `ServiceController` objects by default. This should improve backwards-compatability. Added a `PassThru` switch you can use to get a `ServiceController` object returned to you.
+ * Improved [Install-Service](https://get-carbon.org/help/Install-Service.ps1) error handling. It now uses `net helpmsg` to get helpful error messages based on sc.exe exit codes.
 
 ### Shares
 
