@@ -44,10 +44,22 @@ function Uninstall-IisWebsite
         # The name or ID of the website to remove.
         $Name
     )
+
+    Set-StrictMode -Version 'Latest'
     
     if( Test-IisWebsite -Name $Name )
     {
-        Invoke-AppCmd delete site `"$Name`" 
+        $manager = New-Object 'Microsoft.Web.Administration.ServerManager'
+        try
+        {
+            $site = $manager.Sites | Where-Object { $_.Name -eq $Name }
+            $manager.Sites.Remove( $site )
+            $manager.CommitChanges()
+        }
+        finally
+        {
+            $manager.Dispose()
+        }
     }
 }
 
