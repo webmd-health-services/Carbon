@@ -33,15 +33,22 @@ function Test-IisWebsite
         $Name
     )
     
-    $output = Invoke-AppCmd list site -ErrorAction SilentlyContinue
-    foreach( $line in $output )
+    Set-StrictMode -Version 'Latest'
+
+    $manager = New-Object 'Microsoft.Web.Administration.ServerManager'
+    try
     {
-        if( $line -like "SITE ""$Name""*" )
+        $site = $manager.Sites | Where-Object { $_.Name -eq $Name }
+        if( $site )
         {
             return $true
         }
+        return $false
     }
-    return $false
+    finally
+    {
+        $manager.Dispose()
+    }
 }
 
 Set-Alias -Name Test-IisWebsiteExists -Value Test-IisWebsite
