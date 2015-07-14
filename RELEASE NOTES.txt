@@ -269,6 +269,7 @@ This is a ***backwards-incompatible*** release.
 ### Services
 
   * Carbon's `System.ServiceProcess.ServiceController` extended type data causes errors when PowerShell formats `System.ServiceProcess.ServiceController` objects that represent services on remote computers.
+ * [Install-Service](https://get-carbon.org/help/Install-Service.ps1) no longer writes a warning about being unable to stop an already stopped service (fixes [issue #158](https://bitbucket.org/splatteredbits/carbon/issues/158/install-service-extraneous-warning-about)).
 
  
 

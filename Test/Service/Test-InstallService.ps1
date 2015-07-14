@@ -107,6 +107,20 @@ function Test-ShouldNotInstallServiceTwice
     Assert-Equal 'Stopped' (Get-Service -Name $serviceName).Status
 }
 
+function Test-ShouldStartStoppedAutomaticService
+{
+    $output = Install-Service -Name $serviceName -Path $servicePath @installServiceParams
+    Assert-Null $output
+
+    Stop-Service -Name $serviceName
+
+    $warnings = @()
+    $output = Install-Service -Name $serviceName -Path $servicePath -Description 'something new' @installServiceParams -WarningVariable 'warnings'
+    Assert-Null $output
+    Assert-Equal 'Running' (Get-Service -Name $serviceName).Status
+    Assert-Equal 0 $warnings.Count
+}
+
 function Test-ShouldNotInstallServiceWithSpaceInItsPath
 {
     $tempDir = New-TempDirectory -Prefix 'Carbon Test Install Service'
@@ -123,7 +137,7 @@ function Test-ShouldNotInstallServiceWithSpaceInItsPath
     finally
     {
         Uninstall-Service -Name $serviceName
-        Remove-Item -Path $tempDir -Recurse -Force
+        Remove-Item -Path $tempDir -Recurse -Force -ErrorAction Ignore
     }
 }
 

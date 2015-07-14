@@ -401,23 +401,16 @@ function Install-Service
     {
         $restartService = ( $restartService -or ($serviceIsRunningStatus -contains $service.Status) )
 
-        $stopSuccessful = $false
         if( $service.CanStop )
         {
             Stop-Service -Name $Name -Force -ErrorAction Ignore
             if( $? )
             {
                 $service.WaitForStatus( 'Stopped' )
-                $stopSuccessful = $true
-            }
-
-            if( (Get-Service -Name $Name).Status -eq [ServiceProcess.ServiceControllerStatus]::Stopped )
-            {
-                $stopSuccessful = $true
             }
         }
-        
-        if( -not $stopSuccessful )
+
+        if( -not ($service.Status -eq [ServiceProcess.ServiceControllerStatus]::Stopped) )
         {
             Write-Warning "Unable to stop service '$Name' before applying config changes.  You may need to restart this service manually for any changes to take affect."
         }
