@@ -105,6 +105,7 @@ This is a ***backwards-incompatible*** release.
  * [Invoke-AppCmd](https://get-carbon.org/help/Invoke-AppCmd.html) is now obsolete and will be removed from a future version of Carbon. Switch to Carbon's IIS functions, or use [Get-IisConfigurationSection](https://get-carbon.org/help/Get-IisConfigurationSection.html) to get `ConfigurationElement` objects from the `Microsoft.Web.Administration` API that you can modify.
  * Added `Description` parameter to [Install-Service](https://get-carbon.org/help/Install-Service.html) for setting a service's description.
  * Added `DisplayName` parameter to [Install-Service](https://get-carbon.org/help/Install-Service.html) for setting a service's display name.
+ * Added `Description` and `DisplayName` properties to [Carbon_Service](https://get-carbon.org/help/Carbon_Service.html) for setting a service's description and display name.
  
 ## Enhancements
 

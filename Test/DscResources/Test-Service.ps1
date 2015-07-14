@@ -21,7 +21,7 @@ $serviceName = 'CarbonDscTestService'
 function Start-TestFixture
 {
     Start-CarbonDscTestFixture 'Service'
-    Install-User -UserName $credential.UserName -Password $credential.GetNetworkCredential().Password
+    Install-User -Credential $credential
 }
 
 function Start-Test
@@ -64,6 +64,8 @@ function Test-ShouldGetExistingServices
         Assert-Equal $_.RebootDelay $resource.RebootDelay
         Assert-Equal $_.FailureProgram $resource.Command
         Assert-Equal $_.RunCommandDelay $resource.RunCommandDelay
+        Assert-Equal $_.DisplayName $resource.DisplayName
+        Assert-Equal $_.Description $resource.Description
         Assert-Equal (($_.ServicesDependedOn | Select-Object -ExpandProperty 'Name') -join ',') ($resource.Dependency -join ',') $_.Name
         if( (Test-Identity -Name $_.UserName) )
         {
@@ -97,6 +99,8 @@ function Test-ShouldGetNonExistentService
     Assert-Null $resource.Dependency
     Assert-Null $resource.Command
     Assert-Null $resource.RunCommandDelay
+    Assert-Null $resource.DisplayName
+    Assert-Null $resource.Description
     Assert-Null $resource.UserName
     Assert-Null $resource.Credential
     Assert-DscResourceAbsent $resource
@@ -122,6 +126,8 @@ function Test-ShouldInstallService
     Assert-Equal 0 $resource.RunCommandDelay
     Assert-Equal 'NT AUTHORITY\NETWORK SERVICE' $resource.UserName
     Assert-Null $resource.Credential
+    Assert-Equal $serviceName $resource.DisplayName
+    Assert-Null $resource.Description
     Assert-DscResourcePresent $resource
 }
 
@@ -140,6 +146,8 @@ function Test-ShouldInstallServiceWithAllOptions
                        -Command 'fubar.exe' `
                        -RunCommandDelay (60*1000) `
                        -Dependency 'W3SVC' `
+                       -DisplayName 'Display Name' `
+                       -Description 'Description description description' `
                        -Credential $credential
     Assert-NoError
     $resource = Get-TargetResource -Name $serviceName
@@ -156,6 +164,8 @@ function Test-ShouldInstallServiceWithAllOptions
     Assert-Equal 'W3SVC' $resource.Dependency
     Assert-Equal 'fubar.exe' $resource.Command 
     Assert-Equal (60*1000) $resource.RunCommandDelay
+    Assert-Equal 'Display Name' $resource.DisplayName
+    Assert-Equal 'Description description description' $resource.Description
     Assert-Equal (Resolve-Identity -Name $credential.UserName).FullName $resource.UserName
     Assert-Null $resource.Credential
     Assert-DscResourcePresent $resource    
@@ -198,9 +208,16 @@ function Test-ShouldTestOnCredentials
     Assert-True (Test-TargetResource -Name $serviceName -Path $servicePath -Credential $credential -Ensure Present)
 }
 
+function Test-ShouldNotAllowbothUserNameAndCredentials
+{
+    Set-TargetResource -Name $serviceName -Path $servicePath -Credential $credential -username LocalService -Ensure Present -ErrorAction SilentlyContinue
+    Assert-Error
+    Assert-False (Test-Service -Name $serviceName)
+}
+
 function Test-ShouldTestOnProperties
 {
-    Set-TargetResource -Name $serviceName -Path $servicePath -Command 'fubar.exe' -Ensure Present
+    Set-TargetResource -Name $serviceName -Path $servicePath -Command 'fubar.exe' -Description 'Fubar' -Ensure Present
     $testParams = @{ Name = $serviceName; }
     Assert-True (Test-TargetResource @testParams -Path $servicePath -Ensure Present)
     Assert-False (Test-TargetResource @testParams -Path 'C:\fubar.exe' -Ensure Present)
@@ -237,6 +254,12 @@ function Test-ShouldTestOnProperties
 
     Assert-True (Test-TargetResource @testParams -UserName 'NetworkService' -Ensure Present)
     Assert-False (Test-TargetResource @testParams -Credential $credential -Ensure Present)
+
+    Assert-True (Test-TargetResource @testParams -Description 'Fubar' -Ensure Present)
+    Assert-False (Test-TargetResource @testParams -Description 'Description' -Ensure Present)
+
+    Assert-True (Test-TargetResource @testParams -DisplayName $serviceName -Ensure Present)
+    Assert-False (Test-TargetResource @testParams -DisplayName 'fubar' -Ensure Present)
 }
 
 

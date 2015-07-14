@@ -68,6 +68,14 @@ function Get-TargetResource
         [int]
         # How many milliseconds to wait before running the failure command. Default is 0, or immediately.
         $RunCommandDelay,
+
+        [string]
+        # The service's display names.
+        $DisplayName,
+        
+        [string]
+        # The service's description.
+        $Description,
         
         [ValidateSet("LocalSystem", "LocalService", "NetworkService")]
         [string]
@@ -99,6 +107,8 @@ function Get-TargetResource
                     Command = $null;
                     RunCommandDelay = $null;
                     Dependency = $null;
+                    DisplayName = $null;
+                    Description = $null;
                     UserName = $null;
                     Credential = $null;
                     Ensure = 'Absent';
@@ -117,6 +127,8 @@ function Get-TargetResource
         $resource.RebootDelay = $service.RebootDelay
         $resource.Command = $service.FailureProgram
         $resource.RunCommandDelay = $service.RunCommandDelay
+        $resource.DisplayName = $service.DisplayName
+        $resource.Description = $service.Description
         $resource.UserName = $service.UserName
         $actualUserName = Resolve-Identity -Name $service.UserName -ErrorAction Ignore
         if( $actualUserName )
@@ -247,6 +259,14 @@ function Set-TargetResource
         # How many milliseconds to wait before running the failure command. Default is 0, or immediately.
         $RunCommandDelay,
         
+        [string]
+        # The service's display names.
+        $DisplayName,
+        
+        [string]
+        # The service's description.
+        $Description,
+        
         [ValidateSet("LocalSystem", "LocalService", "NetworkService")]
         [string]
         # The system account the service should run as.
@@ -281,6 +301,12 @@ function Set-TargetResource
         return
     }
 
+    if( $UserName -and $Credential )
+    {
+        Write-Error ('UserName and Credential properties are mutually exclusive. Please provide either Credential or UserName, not both.')
+        return
+    }
+
     $PSBoundParameters.Remove('Ensure')
     if( $serviceExists )
     {
@@ -291,12 +317,6 @@ function Set-TargetResource
         Write-Verbose ('Installing service ''{0}''' -f $Name)
     }
 
-    if( $PSBoundParameters.ContainsKey('Credential') )
-    {
-        $PSBoundParameters.Remove('Credential')
-        $PSBoundParameters.Password = $Credential.GetNetworkCredential().Password
-        $PSBoundParameters.UserName = $Credential.UserName
-    }
     Install-Service @PSBoundParameters
 }
 
@@ -355,6 +375,14 @@ function Test-TargetResource
         [int]
         # How many milliseconds to wait before running the failure command. Default is 0, or immediately.
         $RunCommandDelay,
+        
+        [string]
+        # The service's display names.
+        $DisplayName,
+        
+        [string]
+        # The service's description.
+        $Description,
         
         [ValidateSet("LocalSystem", "LocalService", "NetworkService")]
         [string]
