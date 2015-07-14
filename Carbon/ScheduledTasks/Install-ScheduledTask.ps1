@@ -534,7 +534,7 @@ function Install-ScheduledTask
         'Weekly'
         {
             $modifier = $Weekly
-            if( $DayOfWeek.Count )
+            if( $PSBoundParameters.ContainsKey('DayOfWeek') )
             {
                 [void]$parameters.Add( '/D' )
                 [void]$parameters.Add( (ConvertTo-SchtasksCalendarNameList $DayOfWeek) )
