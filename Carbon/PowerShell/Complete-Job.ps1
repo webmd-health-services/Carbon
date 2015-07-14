@@ -16,27 +16,15 @@ function Complete-Job
 {
     <#
     .SYNOPSIS
-    Waits for a set of PowerShell jobs to complete, receives each job as it finishes, and returns the number of jobs that didn't complete successfully.
+    OBSOLETE. Use PowerShell's `Wait-Job` cmdlet instead.
 
     .DESCRIPTION
-    Job management in PowerShell is a pain.  At a minimum, you have to wait for each job to complete, then receive its output.  This function manages all that for you.  It iterates over a list/array of jobs, as each job finishes, it receives its output and removes it.  If a job is blocked or stopped it receives and removes those jobs.  When its all done, it returns the number of jobs that failed, were blocked, or stopped.
-
-    By default, it sleeps for one second between status checks.  You can increase this interval using the `IntervalSeconds` parameter.
-
-    This function never times out.
-
-    .OUTPUTS
-    System.Int32.
+    OBSOLETE. Use PowerShell's `Wait-Job` cmdlet instead.
 
     .EXAMPLE
-    Complete-Job -Job $jobs
+    Get-Job | Wait-Job
 
-    Sits and waits for all the jobs in `$jobs` to finish, block, or stop and returns the number that didn't succeed.  It waits one second between status checks.
-
-    .EXAMPLE
-    Complete-Job -Job $jobs -IntervalSeconds 60
-
-    Waits for all the jobs in `$jobs` to finish, waiting 60 seconds between status checks.
+    Demonstrates that `Complete-Job` is OBSOLETE and you should use PowerShell's `Wait-Job` cmdlet instead.
     #>
     [CmdletBinding()]
     param(
@@ -51,6 +39,8 @@ function Complete-Job
         # The number of seconds to sleep between job status checks.  Default is 1 second.
         $IntervalSeconds = 1
     )
+
+    Write-Warning ('Complete-Job is obsolete and will be removed from a future major version of Carbon. Use PowerShell''s `Wait-Job` cmdlet instead.')
     
     $errorAction = 'Continue'
     $params = $PSBoundParameters
