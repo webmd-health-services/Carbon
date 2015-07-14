@@ -367,7 +367,13 @@ function Initialize-Lcm
             AllNodes = $allNodes
         }
 
-        & Lcm -OutputPath $tempDir -WhatIf:$false -ConfigurationData $configData | Out-Null
+        $whatIfParam = @{ }
+        if( (Get-Command -Name 'Lcm').Parameters.ContainsKey('WhatIf') )
+        {
+            $whatIfParam['WhatIf'] = $false
+        }
+
+        & Lcm -OutputPath $tempDir @whatIfParam -ConfigurationData $configData | Out-Null
 
         Set-DscLocalConfigurationManager -ComputerName $ComputerName -Path $tempDir @credentialParam
 
