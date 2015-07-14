@@ -44,7 +44,7 @@ function Install-Msi
         $Path,
         
         [Switch]
-        # OBSOLETE. Installers are run in quiet mode by default. This switch will be removed in a future version of Carbon.
+        # OBSOLETE. Installers are run in quiet mode by default. This switch will be removed in a future version of Carbon. 
         $Quiet,
 
         [Switch]

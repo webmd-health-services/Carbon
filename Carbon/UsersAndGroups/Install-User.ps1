@@ -30,18 +30,21 @@ function Install-User
     Get-User
 
     .LINK
+    New-Credential
+
+    .LINK
     Test-User
 
     .LINK
     Uninstall-User
 
     .EXAMPLE
-    Install-User -Username LSkywalker -Password "whydidn'tyoutellme" -Description "Luke Skywalker's account."
+    Install-User -Credential $lukeCredentials -Description "Luke Skywalker's account."
 
     Creates a new `LSkywalker` user account with the given password and description.  Luke's password is set to never expire.  
 
     .EXAMPLE
-    Install-User -Username LSkywalker -Password "whydidn'tyoutellme" -UserCannotChangePassword -PasswordExpires
+    Install-User -Credential $lukeCredentials -UserCannotChangePassword -PasswordExpires
 
     Demonstrates how to create an account for a user who cannot change his password and whose password will expire.
     #>
@@ -52,17 +55,19 @@ function Install-User
         [Parameter(Mandatory=$true,ParameterSetName='WithUserNameAndPassword')]
         [ValidateLength(1,20)]
         [string]
-        # The username for the user.
+        # OBSOLETE. The `UserName` parameter will be removed from a future major version of Carbon. Use the `Credential` parameter instead.
         $UserName,
         
         [Parameter(Mandatory=$true,ParameterSetName='WithUserNameAndPassword')]
         [string]
-        # The user's password.
+        # OBSOLETE. The `Password` parameter will be removed from a future major version of Carbon. Use the `Credential` parameter instead.
         $Password,
 
         [Parameter(Mandatory=$true,ParameterSetName='WithCredential')]
         [pscredential]
         # The user's credentials.
+        #
+        # The `Credential` parameter was added in Carbon 2.0.
         $Credential,
         
         [string]

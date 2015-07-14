@@ -16,15 +16,15 @@ function Invoke-AppCmd
 {
     <#
     .SYNOPSIS
-    Invokes appcmd.exe, the IIS command line configuration utility.
+    OBSOLETE. Will be removed in a future major version of Carbon. Use `Get-IisConfigurationSection` with the `Microsoft.Web.Administration` API instead.
 
     .DESCRIPTION
-    Runs appcmd.exe, passing all the arguments that get passed to `Invoke-AppCmd`.
+    OBSOLETE. Will be removed in a future major version of Carbon. Use `Get-IisConfigurationSection` with the `Microsoft.Web.Administration` API instead.
 
     .EXAMPLE
-    Invoke-AppCmd list site Peanuts
+    Get-IisConfigurationSection -SiteName 'Peanuts' -Section 'system.webServer'
 
-    Runs `appcmd.exe list site Peanuts`, which will list the configuration for the Peanuts website.
+    Demonstrates the `Invoke-AppCmd` is OBSOLETE and will be removed in a future major version of Carbon. Use `Get-IisConfigurationSection` with the `Microsoft.Web.Administration` API instead.
     #>
     [CmdletBinding()]
     param(

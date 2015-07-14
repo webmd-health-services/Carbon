@@ -39,6 +39,9 @@ function Install-IisAppPool
 
     .LINK
     http://learn.iis.net/page.aspx/624/application-pool-identities/
+
+    .LINK
+    New-Credential
     
     .EXAMPLE
     Install-IisAppPool -Name Cyberdyne -ServiceAccount NetworkService
@@ -51,7 +54,7 @@ function Install-IisAppPool
     Creates or sets the Cyberdyne app pool to run as NetworkService, in 32-bit mode (i.e. 32-bit applications are enabled), using the classic IIS request pipeline.
 
     .EXAMPLE
-    Install-IisAppPool -Name Cyberdyne -Username 'PEANUTS\charliebrown' -Password '5noopyrulez'
+    Install-IisAppPool -Name Cyberdyne -Credential $charlieBrownCredential
 
     Creates or sets the Cyberdyne app pool to run as the `PEANUTS\charliebrown` domain account, under .NET 4.0, with an integrated pipeline.
     #>
@@ -89,20 +92,22 @@ function Install-IisAppPool
         
         [Parameter(ParameterSetName='AsSpecificUser',Mandatory=$true)]
         [string]
-        # Runs the app pool under a specific user account.
+        # OBSOLETE. The `UserName` parameter will be removed in a future major version of Carbon. Use the `Credential` parameter instead.
         $UserName,
         
         [Parameter(ParameterSetName='AsSpecificUser',Mandatory=$true)]
-        # The password for the user account.  Can be a string or a SecureString.
+        # OBSOLETE. The `Password` parameter will be removed in a future major version of Carbon. Use the `Credential` parameter instead.
         $Password,
 
         [Parameter(ParameterSetName='AsSpecificUserWithCredential',Mandatory=$true)]
         [pscredential]
         # The credential to use to run the app pool.
+        #
+        # The `Credential` parameter is new in Carbon 2.0.
         $Credential,
 
         [Switch]
-        # Return an object represeing the app pool.
+        # Return an object representing the app pool.
         $PassThru
     )
 

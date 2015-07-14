@@ -37,6 +37,9 @@ function Install-Service
     Carbon_Service
 
     .LINK
+    New-Credential
+
+    .LINK
     Uninstall-Service
 
     .LINK
@@ -53,7 +56,7 @@ function Install-Service
     Install the Death Star service to startup manually.  You certainly don't want the thing roaming the galaxy, destroying thing willy-nilly, do you?
 
     .EXAMPLE
-    Install-Service -Name DeathStar -Path C:\ALongTimeAgo\InAGalaxyFarFarAway\DeathStar.exe -Username EMPIRE\wtarkin -Password 5irewh3nready
+    Install-Service -Name DeathStar -Path C:\ALongTimeAgo\InAGalaxyFarFarAway\DeathStar.exe -Credential $tarkinCredentials
 
     Installs the Death Star service to run as Grand Moff Tarkin, who is given the log on as a service right.
 
@@ -129,7 +132,7 @@ function Install-Service
         [string]
         # The service's description. If you don't supply a value, the service's existing description is preserved.
         #
-        # New in Carbon 2.0.
+        # The `Description` parameter was added in Carbon 2.0.
         $Description,
 
         [string]
@@ -145,12 +148,14 @@ function Install-Service
         
         [Parameter(ParameterSetName='CustomAccount')]
         [string]
-        # The user's password.
+        # OBSOLETE. The `Password` parameter will be removed in a future major version of Carbon. Use the `Credential` parameter instead.
         $Password,
 
         [Parameter(ParameterSetName='CustomAccountWithCredential',Mandatory=$true)]
         [pscredential]
         # The credential of the account the service should run as.
+        #
+        # The `Credential` parameter was added in Carbon 2.0.
         $Credential,
 
         [Switch]
