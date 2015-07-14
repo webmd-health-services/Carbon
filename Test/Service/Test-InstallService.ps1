@@ -16,7 +16,7 @@ $servicePath = Join-Path $TestDir NoOpService.exe
 $serviceName = 'CarbonTestService'
 $serviceAcct = 'CrbnInstllSvcTstAcct'
 $servicePassword = [Guid]::NewGuid().ToString().Substring(0,14)
-$installServiceParams = @{ }
+$installServiceParams = @{ Verbose = $true }
 $startedAt = Get-Date
 
 function Start-TestFixture
@@ -286,8 +286,6 @@ function Test-ShouldReinstallServiceIfUsernameChanges
     Assert-Equal 'NT AUTHORITY\SYSTEM' (Get-ServiceConfiguration -Name $serviceName).UserName
 }
 
-
-
 function Test-ShouldUpdateServiceProperties
 {
     Install-Service -Name $serviceName -Path $servicePath @installServiceParams
@@ -545,6 +543,33 @@ function Test-ShouldSetDescription
     $output = Install-Service -Name $serviceName -Path $servicePath @installServiceParams
     Assert-Null $output
     Assert-Equal $description $svc.Description
+}
+
+function Test-ShouldSetDisplayName
+{
+    $displayName = [Guid]::NewGuid().ToString()
+    $output = Install-Service -Name $serviceName -Path $servicePath -DisplayName $displayName @installServiceParams
+    Assert-Null $output
+
+    $svc = Get-Service -Name $serviceName
+    Assert-NotNull $svc
+    Assert-Equal $displayName $svc.DisplayName
+
+    $displayName = [Guid]::NewGuid().ToString()
+    $output = Install-Service -Name $serviceName -Path $servicePath -DisplayName $displayName @installServiceParams
+    Assert-Null $output
+
+    $svc = Get-Service -Name $serviceName
+    Assert-NotNull $svc
+    Assert-Equal $displayName $svc.DisplayName
+
+    $output = Install-Service -Name $serviceName -Path $servicePath @installServiceParams
+    Assert-Null $output
+
+    $svc = Get-Service -Name $serviceName
+    Assert-NotNull $svc
+    Assert-Equal $serviceName $svc.DisplayName
+
 }
 
 function Assert-ServiceInstalled

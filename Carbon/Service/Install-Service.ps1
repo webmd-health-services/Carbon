@@ -131,6 +131,12 @@ function Install-Service
         #
         # New in Carbon 2.0.
         $Description,
+
+        [string]
+        # The service's display name. If you don't supply a value, the display name will set to Name.
+        #
+        # The `DisplayName` parameter was added in Carbon 2.0.
+        $DisplayName,
         
         [Parameter(ParameterSetName='CustomAccount',Mandatory=$true)]
         [string]
@@ -253,6 +259,12 @@ function Install-Service
         if( $service.Path -ne $binPathArg )
         {
             Write-Verbose ('[{0}] Path              {1} -> {2}' -f $Name,$serviceConfig.Path,$binPathArg)
+            $doInstall = $true
+        }
+
+        if( $service.DisplayName -ne $DisplayName )
+        {
+            Write-Verbose ('[{0}] DisplayName       {1} -> {2}' -f $Name,$service.DisplayName,$DisplayName)
             $doInstall = $true
         }
 
@@ -433,10 +445,17 @@ function Install-Service
         $dependencyArgValue = $Dependency -join '/'
     }
 
+    $displayNameArgName = 'DisplayName='
+    $displayNameArgValue = '""'
+    if( $DisplayName )
+    {
+        $displayNameArgValue = $DisplayName
+    }
+
     $binPathArg = $binPathArg -replace '"','\"'
     if( $PSCmdlet.ShouldProcess( "$Name [$Path]", "$operation service" ) )
     {
-        & $sc $operation $Name binPath= $binPathArg start= $startArg obj= $identity.FullName $passwordArgName $passwordArgValue depend= $dependencyArgValue |
+        & $sc $operation $Name binPath= $binPathArg start= $startArg obj= $identity.FullName $passwordArgName $passwordArgValue depend= $dependencyArgValue $displayNameArgName $displayNameArgValue |
             Write-Verbose
         $scExitCode = $LastExitCode
         if( $scExitCode -ne 0 )
