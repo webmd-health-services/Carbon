@@ -262,9 +262,20 @@ function Install-Service
             $doInstall = $true
         }
 
-        if( $service.DisplayName -ne $DisplayName )
+        # DisplayName, if not set, defaults to the service name. This makes it a little bit tricky to update.
+        # If provided, make sure display name matches.
+        # If not provided, reset it to an empty/default value.
+        if( $PSBoundParameters.ContainsKey('DisplayName') )
         {
-            Write-Verbose ('[{0}] DisplayName       {1} -> {2}' -f $Name,$service.DisplayName,$DisplayName)
+            if( $service.DisplayName -ne $DisplayName )
+            {
+                Write-Verbose ('[{0}] DisplayName       {1} -> {2}' -f $Name,$service.DisplayName,$DisplayName)
+                $doInstall = $true
+            }
+        }
+        elseif( $service.DisplayName -ne $service.Name )
+        {
+            Write-Verbose ('[{0}] DisplayName       {1} -> ' -f $Name,$service.DisplayName)
             $doInstall = $true
         }
 
