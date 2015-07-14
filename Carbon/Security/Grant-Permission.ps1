@@ -225,10 +225,27 @@ function Grant-Permission
     if( $providerName -eq 'CryptoKey' )
     {
         Get-Item -Path $Path |
-            Where-Object { $_.HasPrivateKey -and $_.PrivateKey } |
             ForEach-Object {
                 [Security.Cryptography.X509Certificates.X509Certificate2]$certificate = $_
+
+                if( -not $certificate.HasPrivateKey )
+                {
+                    Write-Warning ('Certificate {0} ({1}; {2}) does not have a private key.' -f $certificate.Thumbprint,$certificate.Subject,$Path)
+                    return
+                }
+
+                if( -not $certificate.PrivateKey )
+                {
+                    Write-Error ('Access is denied to private key of certificate {0} ({1}; {2}).' -f $certificate.Thumbprint,$certificate.Subject,$Path)
+                    return
+                }
+
                 [Security.AccessControl.CryptoKeySecurity]$keySecurity = $certificate.PrivateKey.CspKeyContainerInfo.CryptoKeySecurity
+                if( -not $keySecurity )
+                {
+                    Write-Error ('Private key ACL not found for certificate {0} ({1}; {2}).' -f $certificate.Thumbprint,$certificate.Subject,$Path)
+                    return
+                }
 
                 $rulesToRemove = @()
                 if( $Clear )

@@ -13,6 +13,7 @@ This is a ***backwards-incompatible*** release.
  * Upgrade to PowerShell 4.
  * Remove usages of `Complete-Job`.  We removed it because it was total crap.  Use PowerShell's `Wait-Job` cmdlet instead.
  * [Grant-Permission](http://get-carbon.org/help/Grant-Permission.html) now only grants permissions on an object if those permissions aren't present.  To preserve previous behaviour, add the `-Force` switch to all `Grant-Permission` usages.
+ * [Grant-Permission](http://get-carbon.org/help/Grant-Permission.html) now writes an error if you don't have access to a private key. Previously, it would skip the key without any messages.
  * [Install-Msi](http://get-carbon.org/help/Install-Msi.html) (fka `Invoke-WindowsInstaller`) now only installs the MSI if it isn't already installed. To preserve the previous behavior and always install, add the `-Force` switch to all `Invoke-WindowsInstaller`\`Install-Msi` usages.
  * The following commands no longer return the stdout output from the console applications each one calls. To see that output, use the `-Verbose` switch. Remove any usage of the output you were processing.
      * [Disable-FirewallStatefulFtp](http://get-carbon.org/help/Disable-FirewallStatefulFtp.html)
@@ -63,6 +64,7 @@ This is a ***backwards-incompatible*** release.
  * `Install-Msi` didn't properly detect when installation failed.
  * `Set-EnvironmentVariable` fails to set process-level environment variable.
  * `Compress-Item` doesn't remove handled errors from global error array.
+ * [Grant-Permission](http://get-carbon.org/help/Grant-Permission.html) fails with an unhelpful error message if it is unable to get the ACL on a private key.
  
 ### Enhancements
 
@@ -106,6 +108,7 @@ This is a ***backwards-incompatible*** release.
  * Added `Description` parameter to [Install-Service](https://get-carbon.org/help/Install-Service.html) for setting a service's description.
  * Added `DisplayName` parameter to [Install-Service](https://get-carbon.org/help/Install-Service.html) for setting a service's display name.
  * Added `Description` and `DisplayName` properties to [Carbon_Service](https://get-carbon.org/help/Carbon_Service.html) for setting a service's description and display name.
+ * [Grant-Permission](http://get-carbon.org/help/Grant-Permission.html) now writes an error if you don't have access to a private key. Previously, it would skip the key without any messages.
  
 ## Enhancements
 
@@ -271,6 +274,10 @@ This is a ***backwards-incompatible*** release.
 ### Scheduled Tasks
 
  * [Install-ScheduledTask](https://get-carbon.org/help/Install-ScheduledTask.html) fails under PowerShell 5 to create a scheduled task to run on Sunday.
+
+### Security
+
+ * [Grant-Permission](http://get-carbon.org/help/Grant-Permission.html) fails with an unhelpful error message if it is unable to get the ACL on a private key.
 
 
 ### Services
