@@ -19,13 +19,11 @@ This is a ***backwards-incompatible*** release.
      * [Disable-FirewallStatefulFtp](http://get-carbon.org/help/Disable-FirewallStatefulFtp.html)
      * [Enable-FirewallStatefulFtp](http://get-carbon.org/help/Enable-FirewallStatefulFtp.html)
      * [Remove-SslCertificateBinding](http://get-carbon.org/help/Remove-SslCertificateBinding.html)
-     * [Install-IisAppPool](http://get-carbon.org/help/Install-IisAppPool.html)
      * [Install-SmbShare](http://get-carbon.org/help/Install-SmbShare.html)
      * [Install-Service](http://get-carbon.org/help/Install-Service.html)
      * [Set-SslCertificateBinding](http://get-carbon.org/help/Set-SslCertificateBinding.html)
-     * [Add-IisDefaultDocument](http://get-carbon.org/help/Add-IisDefaultDocument.html)
-     * [Enable-IisDirectoryBrowsing](http://get-carbon.org/help/Enable-IisDirectoryBrowsing.html)
      * [Enable-Ssl](http://get-carbon.org/help/Enable-Ssl.html)
+ * All IIS functions were re-written to use the `Microsoft.Web.Administration` API, so they no longer use `appcmd.exe`, which means they no longer return any `appcmd.exe` console output. If you were using this output, you'll need to update your scripts not to.
  * Ensure that all thumbprints passed to [Set-SslCertificateBinding](http://get-carbon.org/help/Set-SslCertificateBinding.html) are valid (40 character hex strings).
  * Use the `Sid` property on objects returned by [Test-Identity](http://get-carbon.org/help/Test-Identity.html) when using the `PassThru` switch: it now returns a `Carbon.Identity` object if the identity exists *and* you use the `-PassThru` switch, e.g. `Test-Identity -Name $userName -PassThru | Select-Object -Expand 'Sid'`.
  * Check that all IP addresses passed to [Set-HostsEntry](http://get-carbon.org/help/Set-HostsEntry.html) are valid IP v4 or v6 addresses.  [Set-HostsEntry](http://get-carbon.org/help/Set-HostsEntry.html)'s IPAddress parameter is now a `System.Net.IPAddress` object.  Previously it was a string validated with a regular expression, so you *should* be OK.
