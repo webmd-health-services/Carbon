@@ -260,14 +260,18 @@ This is a ***backwards-incompatible*** release.
 
  * `Compress-Item` doesn't remove handled errors from global error array.
 
-
 ### Hosts Entries
 
  * `Set-HostsEntry` fails to preserve whitespace if existing lines end with a comment/description. Thanks to [Konstantin Ushenin](https://vk.com/kostanew) for the fix.
  
-### Msi`
+### Msi
 
  * `Install-Msi` didn't properly detect when installation failed.
+ 
+### Scheduled Tasks
+
+ * [Install-ScheduledTask](https://get-carbon.org/help/Install-ScheduledTask.html) fails under PowerShell 5 to create a scheduled task to run on Sunday.
+
 
 ### Services
 

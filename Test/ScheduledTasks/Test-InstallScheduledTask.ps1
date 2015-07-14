@@ -21,8 +21,8 @@ $today = New-Object 'DateTime' $today.Year,$today.Month,$today.Day
 function Start-TestFixture
 {
     & (Join-Path -Path $PSScriptRoot -ChildPath '..\Import-CarbonForTest.ps1' -Resolve)
-    Install-User -Username 'CarbonInstallSchedul' -Password 'a1b2c34d!' -Description 'Test user for running scheduled tasks.'
     $credential = New-Credential -User 'CarbonInstallSchedul' -Password 'a1b2c34d!'
+    Install-User -Credential $credential -Description 'Test user for running scheduled tasks.'
 }
 
 function Start-Test
