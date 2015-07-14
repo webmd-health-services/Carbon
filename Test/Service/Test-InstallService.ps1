@@ -129,9 +129,9 @@ function Test-ShouldNotInstallServiceWithSpaceInItsPath
     {
         $servicePath = Join-Path -Path $tempDir -ChildPath (Split-Path -Leaf -Path $servicePath)
 
-        $svc = Install-Service -Name $serviceName -Path $servicePath
+        $svc = Install-Service -Name $serviceName -Path $servicePath @installServiceParams
         Assert-Null $svc
-        $svc = Install-Service -Name $serviceName -Path $servicePath
+        $svc = Install-Service -Name $serviceName -Path $servicePath @installServiceParams
         Assert-Null $svc
     }
     finally
@@ -147,8 +147,8 @@ function Test-ShouldReInstallServiceIfPathChanges
     Copy-Item -Path $servicePath -Destination $tempDir
     $changedServicePath = Join-Path -Path $tempDir -ChildPath (Split-Path -Leaf -Path $servicePath) -Resolve
 
-    Install-Service -Name $serviceName -Path $servicePath
-    Install-Service -Name $serviceName -Path $changedServicePath
+    Install-Service -Name $serviceName -Path $servicePath @installServiceParams
+    Install-Service -Name $serviceName -Path $changedServicePath @installServiceParams
     Assert-Equal $changedServicePath (Get-ServiceConfiguration -Name $serviceName).Path
 }
 
@@ -160,7 +160,7 @@ function Test-ShouldInstallServiceWithArgumentList
     {
         $servicePath = Join-Path -Path $tempDir -ChildPath (Split-Path -Leaf -Path $servicePath)
 
-        $svc = Install-Service -Name $serviceName -Path $servicePath -ArgumentList "-k","Fu bar"
+        $svc = Install-Service -Name $serviceName -Path $servicePath -ArgumentList "-k","Fu bar" @installServiceParams
         Assert-Null $svc
         Assert-NoError
         $svcConfig = Get-ServiceConfiguration -Name $serviceName
@@ -175,76 +175,76 @@ function Test-ShouldInstallServiceWithArgumentList
 
 function Test-ShouldReinstallServiceIfArgumentListChanges
 {
-    $svc = Install-Service -Name $serviceName -Path $servicePath -ArgumentList "-k","Fu bar"
+    $svc = Install-Service -Name $serviceName -Path $servicePath -ArgumentList "-k","Fu bar" @installServiceParams
     Assert-Null $svc
     Assert-NoError
-    $svc = Install-Service -Name $serviceName -Path $servicePath -ArgumentList "-k","Fubar"
+    $svc = Install-Service -Name $serviceName -Path $servicePath -ArgumentList "-k","Fubar" @installServiceParams
     Assert-NoError
     Assert-Null $svc
-    $svc = Install-Service -Name $serviceName -Path $servicePath -ArgumentList "-k","Fubar"
+    $svc = Install-Service -Name $serviceName -Path $servicePath -ArgumentList "-k","Fubar" @installServiceParams
     Assert-Null $svc
 }
 
 function Test-ShouldReinstallServiceIfStartupTypeChanges
 {
-    Install-Service -Name $serviceName -Path $servicePath
-    Install-Service -Name $serviceName -Path $servicePath -StartupType Manual
+    Install-Service -Name $serviceName -Path $servicePath @installServiceParams
+    Install-Service -Name $serviceName -Path $servicePath -StartupType Manual @installServiceParams
     Assert-Equal 'Manual' (Get-Service -Name $serviceName).StartMode
 }
 
 function Test-ShouldReinstallServiceIfResetFailureCountChanges
 {
-    Install-Service -Name $serviceName -Path $servicePath
-    Install-Service -Name $serviceName -Path $servicePath -ResetFailureCount 60
+    Install-Service -Name $serviceName -Path $servicePath @installServiceParams
+    Install-Service -Name $serviceName -Path $servicePath -ResetFailureCount 60 @installServiceParams
     Assert-Equal 60 (Get-ServiceConfiguration -Name $serviceName).ResetPeriod
 }
 
 function Test-ShouldReinstallServiceIfFirstFailureChanges
 {
-    Install-Service -Name $serviceName -Path $servicePath
-    Install-Service -Name $serviceName -Path $servicePath -OnFirstFailure 'Restart'
+    Install-Service -Name $serviceName -Path $servicePath @installServiceParams
+    Install-Service -Name $serviceName -Path $servicePath -OnFirstFailure 'Restart' @installServiceParams
     Assert-Equal 'Restart' (Get-ServiceConfiguration -Name $serviceName).FirstFailure
 }
 
 function Test-ShouldReinstallServiceIfSecondFailureChanges
 {
-    Install-Service -Name $serviceName -Path $servicePath
-    Install-Service -Name $serviceName -Path $servicePath -OnSecondFailure 'Restart'
+    Install-Service -Name $serviceName -Path $servicePath @installServiceParams
+    Install-Service -Name $serviceName -Path $servicePath -OnSecondFailure 'Restart' @installServiceParams
     Assert-Equal 'Restart' (Get-ServiceConfiguration -Name $serviceName).SecondFailure
 }
 
 function Test-ShouldReinstallServiceIfThirdFailureChanges
 {
-    Install-Service -Name $serviceName -Path $servicePath
-    Install-Service -Name $serviceName -Path $servicePath -OnThirdFailure 'Restart'
+    Install-Service -Name $serviceName -Path $servicePath @installServiceParams
+    Install-Service -Name $serviceName -Path $servicePath -OnThirdFailure 'Restart' @installServiceParams
     Assert-Equal 'Restart' (Get-ServiceConfiguration -Name $serviceName).ThirdFailure
 }
 
 function Test-ShouldReinstallServiceIfRestartDelayChanges
 {
-    Install-Service -Name $serviceName -Path $servicePath -OnFirstFailure 'Restart'
-    Install-Service -Name $serviceName -Path $servicePath -OnFirstFailure 'Restart' -RestartDelay (1000*60*5)
+    Install-Service -Name $serviceName -Path $servicePath -OnFirstFailure 'Restart' @installServiceParams
+    Install-Service -Name $serviceName -Path $servicePath -OnFirstFailure 'Restart' -RestartDelay (1000*60*5) @installServiceParams
     Assert-Equal 5 (Get-ServiceConfiguration -Name $serviceName).RestartDelayMinutes
 }
 
 function Test-ShouldReinstallServiceIfRebootDelayChanges
 {
-    Install-Service -Name $serviceName -Path $servicePath -OnFirstFailure 'Reboot'
-    Install-Service -Name $serviceName -Path $servicePath -OnFirstFailure 'Reboot' -RebootDelay (1000*60*5)
+    Install-Service -Name $serviceName -Path $servicePath -OnFirstFailure 'Reboot' @installServiceParams
+    Install-Service -Name $serviceName -Path $servicePath -OnFirstFailure 'Reboot' -RebootDelay (1000*60*5) @installServiceParams
     Assert-Equal 5 (Get-ServiceConfiguration -Name $serviceName).RebootDelayMinutes
 }
 
 function Test-ShouldReinstallServiceIfCommandChanges
 {
-    Install-Service -Name $serviceName -Path $servicePath -OnFirstFailure RunCommand -Command 'fubar'
-    Install-Service -Name $serviceName -Path $servicePath -OnFirstFailure RunCommand -command 'fubar2'
+    Install-Service -Name $serviceName -Path $servicePath -OnFirstFailure RunCommand -Command 'fubar' @installServiceParams
+    Install-Service -Name $serviceName -Path $servicePath -OnFirstFailure RunCommand -command 'fubar2' @installServiceParams
     Assert-Equal 'fubar2' (Get-ServiceConfiguration -Name $serviceName).FailureProgram
 }
 
 function Test-ShouldReinstallServiceIfRunDelayChanges
 {
-    Install-Service -Name $serviceName -Path $servicePath -OnFirstFailure RunCommand -Command 'fubar' -RunCommandDelay 60000
-    Install-Service -Name $serviceName -Path $servicePath -OnFirstFailure RunCommand -command 'fubar' -RunCommandDelay 30000
+    Install-Service -Name $serviceName -Path $servicePath -OnFirstFailure RunCommand -Command 'fubar' -RunCommandDelay 60000 @installServiceParams
+    Install-Service -Name $serviceName -Path $servicePath -OnFirstFailure RunCommand -command 'fubar' -RunCommandDelay 30000 @installServiceParams
     Assert-Equal 30000 (Get-ServiceConfiguration -Name $serviceName).RunCommandDelay
 }
 
@@ -256,15 +256,15 @@ function Test-ShouldReinstallServiceIfDependenciesChange
     try
     {
         $service3Name = '{0}-3' -f $serviceName
-        Install-Service -Name $service3Name -Path $servicePath
+        Install-Service -Name $service3Name -Path $servicePath @installServiceParams
 
         try
         {
-            Install-Service -Name $serviceName -Path $servicePath
-            Install-Service -Name $serviceName -Path $servicePath -Dependency $service2Name
+            Install-Service -Name $serviceName -Path $servicePath  @installServiceParams
+            Install-Service -Name $serviceName -Path $servicePath -Dependency $service2Name @installServiceParams
             Assert-Equal $service2Name (Get-Service -Name $serviceName).ServicesDependedOn[0].Name
 
-            Install-Service -Name $serviceName -Path $servicePath -Dependency $service3Name
+            Install-Service -Name $serviceName -Path $servicePath -Dependency $service3Name @installServiceParams
             Assert-Equal $service3Name (Get-Service -Name $serviceName).ServicesDependedOn[0].Name
         }
         finally
@@ -281,8 +281,8 @@ function Test-ShouldReinstallServiceIfDependenciesChange
 
 function Test-ShouldReinstallServiceIfUsernameChanges
 {
-    Install-Service -Name $serviceName -Path $servicePath
-    Install-Service -Name $serviceName -Path $servicePath -Username 'SYSTEM'
+    Install-Service -Name $serviceName -Path $servicePath @installServiceParams
+    Install-Service -Name $serviceName -Path $servicePath -Username 'SYSTEM' @installServiceParams
     Assert-Equal 'NT AUTHORITY\SYSTEM' (Get-ServiceConfiguration -Name $serviceName).UserName
 }
 
@@ -392,7 +392,7 @@ function Test-ShouldSetFailureActions
 
 function Test-ShouldClearCommand
 {
-    Install-Service -Name $serviceName -Path $servicePath -OnFirstFailure RunCommand -Command 'fubar'
+    Install-Service -Name $serviceName -Path $servicePath -OnFirstFailure RunCommand -Command 'fubar' @installServiceParams
     $config = Get-ServiceConfiguration -Name $serviceName
     Assert-Equal 'fubar' $config.FailureProgram
     Assert-Equal 0 $config.RunCommandDelay
@@ -447,8 +447,8 @@ function Test-ShouldClearDependencies
     $service2Name = '{0}-2' -f $serviceName
     try
     {
-        Install-Service -Name $service2Name -Path $servicePath
-        Install-Service -Name $serviceName -Path $servicePath -Dependency $service2Name
+        Install-Service -Name $service2Name -Path $servicePath @installServiceParams
+        Install-Service -Name $serviceName -Path $servicePath -Dependency $service2Name @installServiceParams
 
         $service = Get-Service -Name $serviceName
         Assert-Equal 1 $service.ServicesDependedOn.Length
@@ -466,59 +466,59 @@ function Test-ShouldClearDependencies
 
 function Test-ShouldNotStartManualService
 {
-    Install-Service -Name $serviceName -Path $servicePath -StartupType Manual
+    Install-Service -Name $serviceName -Path $servicePath -StartupType Manual @installServiceParams
     $service = Get-Service -Name $serviceName
     Assert-NotNull $service
     Assert-Equal 'Stopped' $service.Status
 
-    Install-Service -Name $serviceName -Path $servicePath -StartupType Manual -Force
+    Install-Service -Name $serviceName -Path $servicePath -StartupType Manual -Force @installServiceParams
     $service = Get-Service -Name $serviceName
     Assert-Equal 'Stopped' $service.Status
 
     Start-Service -Name $serviceName
-    Install-Service -Name $serviceName -Path $servicePath -StartupType Manual -Force
+    Install-Service -Name $serviceName -Path $servicePath -StartupType Manual -Force @installServiceParams
     $service = Get-Service -Name $serviceName
     Assert-Equal 'Running' $service.Status
 }
 
 function Test-ShouldNotStartDisabledService
 {
-    Install-Service -Name $serviceName -Path $servicePath -StartupType Disabled
+    Install-Service -Name $serviceName -Path $servicePath -StartupType Disabled @installServiceParams
     $service = Get-Service -Name $serviceName
     Assert-NotNull $service
     Assert-Equal 'Stopped' $service.Status
 
-    Install-Service -Name $serviceName -Path $servicePath -StartupType Disabled -Force
+    Install-Service -Name $serviceName -Path $servicePath -StartupType Disabled -Force @installServiceParams
     $service = Get-Service -Name $serviceName
     Assert-Equal 'Stopped' $service.Status
 }
 
 function Test-ShouldStartAStoppedAutomaticService
 {
-    Install-Service -Name $serviceName -Path $servicePath -StartupType Automatic
+    Install-Service -Name $serviceName -Path $servicePath -StartupType Automatic @installServiceParams
     $service = Get-Service -Name $serviceName
     Assert-NotNull $service
     Assert-Equal 'Running' $service.Status
 
     Stop-Service -Name $serviceName
-    Install-Service -Name $serviceName -Path $servicePath -StartupType Automatic -Force
+    Install-Service -Name $serviceName -Path $servicePath -StartupType Automatic -Force @installServiceParams
     $service = Get-Service -Name $serviceName
     Assert-Equal 'Running' $service.Status
 }
 
 function Test-ShouldReturnServiceObject
 {
-    $svc = Install-Service -Name $serviceName -Path $servicePath -StartupType Automatic -PassThru
+    $svc = Install-Service -Name $serviceName -Path $servicePath -StartupType Automatic -PassThru @installServiceParams
     Assert-NotNull $svc
     Assert-Equal $serviceName $svc.Name
 
     # Change service, make sure  object reeturned
-    $svc = Install-Service -Name $serviceName -Path $servicePath -StartupType Manual -PassThru
+    $svc = Install-Service -Name $serviceName -Path $servicePath -StartupType Manual -PassThru @installServiceParams
     Assert-NotNull $svc
     Assert-Equal $serviceName $svc.Name
 
     # No changes, service still returned
-    $svc = Install-Service -Name $serviceName -Path $servicePath -StartupType Manual -PassThru
+    $svc = Install-Service -Name $serviceName -Path $servicePath -StartupType Manual -PassThru @installServiceParams
     Assert-NotNull $svc
     Assert-Equal $serviceName $svc.Name
 }
@@ -526,7 +526,7 @@ function Test-ShouldReturnServiceObject
 function Test-ShouldSetDescription
 {
     $description = [Guid]::NewGuid()
-    $output = Install-Service -Name $serviceName -Path $servicePath -Description $description
+    $output = Install-Service -Name $serviceName -Path $servicePath -Description $description @installServiceParams
     Assert-Null $output
 
     $svc = Get-Service -Name $serviceName
@@ -534,7 +534,7 @@ function Test-ShouldSetDescription
     Assert-Equal $description $svc.Description
 
     $description = [Guid]::NewGuid().ToString()
-    $output = Install-Service -Name $serviceName -Path $servicePath -Description $description
+    $output = Install-Service -Name $serviceName -Path $servicePath -Description $description @installServiceParams
     Assert-Null $output
 
     $svc = Get-Service -Name $serviceName
@@ -542,7 +542,7 @@ function Test-ShouldSetDescription
     Assert-Equal $description $svc.Description
 
     # Should preserve the description
-    $output = Install-Service -Name $serviceName -Path $servicePath
+    $output = Install-Service -Name $serviceName -Path $servicePath @installServiceParams
     Assert-Null $output
     Assert-Equal $description $svc.Description
 }

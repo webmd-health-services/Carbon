@@ -250,77 +250,87 @@ function Install-Service
         $serviceConfig = Get-ServiceConfiguration -Name $Name
         $dependedOnServiceNames = $service.ServicesDependedOn | Select-Object -ExpandProperty 'Name'
 
-        Write-Verbose ('[{0}] Path              {1} | {2}' -f $Name,$serviceConfig.Path,$binPathArg)
-        Write-Verbose ('[{0}] OnFirstFailure    {1} | {2}' -f $Name,$serviceConfig.FirstFailure,$OnFirstFailure)
-        Write-Verbose ('[{0}] OnSecondFailure   {1} | {2}' -f $Name,$serviceConfig.SecondFailure,$OnSecondFailure)
-        Write-Verbose ('[{0}] OnThirdFailure    {1} | {2}' -f $Name,$serviceConfig.ThirdFailure,$OnThirdFailure)
-        Write-Verbose ('[{0}] ResetFailureCount {1} | {2}' -f $Name,$serviceConfig.ResetPeriod,$ResetFailureCount)
+        if( $service.Path -ne $binPathArg )
+        {
+            Write-Verbose ('[{0}] Path              {1} -> {2}' -f $Name,$serviceConfig.Path,$binPathArg)
+            $doInstall = $true
+        }
 
-        $doInstall = $service.Path -ne $binPathArg -or 
-                     $serviceConfig.FirstFailure -ne $OnFirstFailure -or
-                     $serviceConfig.SecondFailure -ne $OnSecondFailure -or
-                     $serviceConfig.ThirdFailure -ne $OnThirdFailure -or
-                     $serviceConfig.ResetPeriod -ne $ResetFailureCount
+        if( $serviceConfig.FirstFailure -ne $OnFirstFailure )
+        {
+            Write-Verbose ('[{0}] OnFirstFailure    {1} -> {2}' -f $Name,$serviceConfig.FirstFailure,$OnFirstFailure)
+            $doInstall = $true
+        }
+
+        if( $serviceConfig.SecondFailure -ne $OnSecondFailure )
+        {
+            Write-Verbose ('[{0}] OnSecondFailure   {1} -> {2}' -f $Name,$serviceConfig.SecondFailure,$OnSecondFailure)
+            $doInstall = $true
+        }
+
+        if( $serviceConfig.ThirdFailure -ne $OnThirdFailure )
+        {
+            Write-Verbose ('[{0}] OnThirdFailure    {1} -> {2}' -f $Name,$serviceConfig.ThirdFailure,$OnThirdFailure)
+            $doInstall = $true
+        }
+
+        if( $serviceConfig.ResetPeriod -ne $ResetFailureCount )
+        {
+            Write-Verbose ('[{0}] ResetFailureCount {1} -> {2}' -f $Name,$serviceConfig.ResetPeriod,$ResetFailureCount)
+            $doInstall = $true
+        }
         
         $failureActions = $OnFirstFailure,$OnSecondFailure,$OnThirdFailure
-        if( -not $doInstall )
+        if( ($failureActions | Where-Object { $_ -eq [Carbon.Service.FailureAction]::Reboot }) -and $serviceConfig.RebootDelay -ne $RebootDelay )
         {
-            if( $failureActions | Where-Object { $_ -eq [Carbon.Service.FailureAction]::Reboot } )
-            {
-                Write-Verbose ('[{0}] RebootDelay       {1} | {2}' -f $Name,$serviceConfig.RebootDelay,$RebootDelay)
-                $doInstall = $serviceConfig.RebootDelay -ne $RebootDelay
-            }
+            Write-Verbose ('[{0}] RebootDelay       {1} -> {2}' -f $Name,$serviceConfig.RebootDelay,$RebootDelay)
+            $doInstall = $true
         }
 
-        if( -not $doInstall )
+        if( ($failureActions | Where-Object { $_ -eq [Carbon.Service.FailureAction]::Restart }) -and $serviceConfig.RestartDelay -ne $RestartDelay)
         {
-            if( $failureActions | Where-Object { $_ -eq [Carbon.Service.FailureAction]::Restart } )
-            {
-                Write-Verbose ('[{0}] RestartDelay      {1} | {2}' -f $Name,$serviceConfig.RestartDelay,$RestartDelay)
-                $doInstall = $serviceConfig.RestartDelay -ne $RestartDelay
-            }
+            Write-Verbose ('[{0}] RestartDelay      {1} -> {2}' -f $Name,$serviceConfig.RestartDelay,$RestartDelay)
+            $doInstall = $true
         }
 
-        if( -not $doInstall )
+        if( $failureActions | Where-Object { $_ -eq [Carbon.Service.FailureAction]::RunCommand } )
         {
-            if( $failureActions | Where-Object { $_ -eq [Carbon.Service.FailureAction]::RunCommand } )
+            if( $serviceConfig.FailureProgram -ne $Command )
             {
-                Write-Verbose ('[{0}] Command           {1} | {2}' -f $Name,$serviceConfig.FailureProgram,$Command)
-                $doInstall = $serviceConfig.FailureProgram -ne $Command -or
-                             $serviceConfig.RunCommandDelay -ne $RunCommandDelay
-            }
-        }
-
-        if( -not $doInstall )
-        {
-            Write-Verbose ('[{0}] StartupType       {1} | {2}' -f $Name,$serviceConfig.StartType,$StartupType)
-            $doInstall = $service.StartMode -ne $StartupType
-        }
-
-        if( -not $doInstall )
-        {
-            Write-Verbose ('[{0}] Dependency        {1} | {2}' -f $Name,($dependedOnServiceNames -join ','),($Dependency -join ','))
-            if( $Dependency | Where-Object { $dependedOnServiceNames -notcontains $_ } )
-            {
+                Write-Verbose ('[{0}] Command           {1} -> {2}' -f $Name,$serviceConfig.FailureProgram,$Command)
                 $doInstall = $true
             }
 
-            if( $dependedOnServiceNames | Where-Object { $Dependency -notcontains $_ } )
+            if( $serviceConfig.RunCommandDelay -ne $RunCommandDelay )
             {
+                Write-Verbose ('[{0}] RunCommandDelay   {1} -> {2}' -f $Name,$serviceConfig.RunCommandDelay,$RunCommandDelay)
                 $doInstall = $true
             }
+        }
+
+        if( $service.StartMode -ne $StartupType )
+        {
+            Write-Verbose ('[{0}] StartupType       {1} -> {2}' -f $Name,$serviceConfig.StartType,$StartupType)
+            $doInstall = $true
+        }
+
+        if( ($Dependency | Where-Object { $dependedOnServiceNames -notcontains $_ }) -or `
+            ($dependedOnServiceNames | Where-Object { $Dependency -notcontains $_ })  )
+        {
+            Write-Verbose ('[{0}] Dependency        {1} -> {2}' -f $Name,($dependedOnServiceNames -join ','),($Dependency -join ','))
+            $doInstall = $true
         }
 
         if( $Description -and $serviceConfig.Description -ne $Description )
         {
-            Write-Verbose ('[{0}] Description       {1} | {2}' -f $Name,$serviceConfig.Description,$Description)
+            Write-Verbose ('[{0}] Description       {1} -> {2}' -f $Name,$serviceConfig.Description,$Description)
             $doInstall = $true
         }
 
-        if( -not $doInstall -and $PSCmdlet.ParameterSetName -eq 'CustomAccount' )
+        if( $PSCmdlet.ParameterSetName -eq 'CustomAccount' -and $serviceConfig.UserName -ne $identity.FullName )
         {
-            Write-Verbose ('[{0}] UserName          {1} | {2}' -f $Name,$serviceConfig.UserName,$identity.FullName)
-            $doinstall = $serviceConfig.UserName -ne $identity.FullName
+            Write-Verbose ('[{0}] UserName          {1} -> {2}' -f $Name,$serviceConfig.UserName,$identity.FullName)
+            $doinstall = $true
         }
     }
     else
