@@ -84,6 +84,12 @@ function Test-ShouldNotWriteErrorIfNoWildcardMatches
     Assert-Null $carbonShare
 }
 
+function Test-ShouldIgnoreErrors
+{
+    Get-FileShare -Name 'fhsdfsdfhsdfsdaf' -ErrorAction Ignore
+    Assert-NoError
+}
+
 function Assert-CarbonShare
 {
     param(

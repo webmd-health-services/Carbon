@@ -28,13 +28,20 @@ function Test-ShouldGetPermissions
     $shareName = 'CarbonGetFileSharePermission'
     Install-SmbShare -Path $tempDir -Name $shareName -ReadAccess $reader -ChangeAccess $writer -FullAccess $admin -Description 'Share for testing Carbon''s Get-FileSharePermission.'
 
-    $perms = Get-FileSharePermission -Name $shareName
-    Assert-Is $perms ([object[]])
-    Assert-Equal 3 $perms.Count
+    try
+    {
+        $perms = Get-FileSharePermission -Name $shareName
+        Assert-Is $perms ([object[]])
+        Assert-Equal 3 $perms.Count
     
-    Assert-FileSharePermission $perms $reader ([Carbon.Security.ShareRights]::Read -bor [Carbon.Security.ShareRights]::Synchronize)
-    Assert-FileSharePermission $perms $writer ([Carbon.Security.ShareRights]::Change -bor [Carbon.Security.ShareRights]::Synchronize)
-    Assert-FileSharePermission $perms $admin ([Carbon.Security.ShareRights]::FullControl -bor [Carbon.Security.ShareRights]::Synchronize)
+        Assert-FileSharePermission $perms $reader ([Carbon.Security.ShareRights]::Read -bor [Carbon.Security.ShareRights]::Synchronize)
+        Assert-FileSharePermission $perms $writer ([Carbon.Security.ShareRights]::Change -bor [Carbon.Security.ShareRights]::Synchronize)
+        Assert-FileSharePermission $perms $admin ([Carbon.Security.ShareRights]::FullControl -bor [Carbon.Security.ShareRights]::Synchronize)
+    }
+    finally
+    {
+        Get-FileShare -Name $shareName | ForEach-Object { $_.Delete() }
+    }
 }
 
 function Assert-FileSharePermission

@@ -82,6 +82,6 @@ function Get-FileShare
     
     if( $Name -and -not $shares -and -not $wildcardSearch )
     {
-        Write-Error ('Share ''{0}'' not found.' -f $Name)
+        Write-Error ('Share ''{0}'' not found.' -f $Name) -ErrorAction $ErrorActionPreference
     }
 }
