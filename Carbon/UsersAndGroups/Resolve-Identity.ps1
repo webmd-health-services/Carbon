@@ -111,14 +111,14 @@ function Resolve-Identity
         $id = [Carbon.Identity]::FindBySid( $SID )
         if( -not $id )
         {
-            Write-Error ('Identity ''{0}'' not found.' -f $SID) -ErrorAction:$ErrorActionPreference
+            Write-Error ('Identity ''{0}'' not found.' -f $SID) #-ErrorAction:$ErrorActionPreference
         }
         return $id
     }
     
     if( -not (Test-Identity -Name $Name) )
     {
-        Write-Error ('Identity ''{0}'' not found.' -f $Name) -ErrorAction:$ErrorActionPreference
+        Write-Error ('Identity ''{0}'' not found.' -f $Name) #-ErrorAction:$ErrorActionPreference
         return
     }
 

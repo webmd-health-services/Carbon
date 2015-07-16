@@ -197,6 +197,7 @@ namespace Carbon
                 {
                     name.EnsureCapacity((int) cchName);
                     referencedDomainName.EnsureCapacity((int) cchReferencedDomainName);
+	                err = ok;
                     if ( !LookupAccountSid(null, sidBytes, name, ref cchName, referencedDomainName, ref cchReferencedDomainName, out identityType))
                         err = Marshal.GetLastWin32Error();
                 }
