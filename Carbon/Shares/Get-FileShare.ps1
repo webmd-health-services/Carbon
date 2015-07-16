@@ -68,20 +68,20 @@ function Get-FileShare
         $filter = '{0} and Name = ''{1}''' -f $filter,$Name
     }
 
-    $shares = @()
-    Get-WmiObject -Class 'Win32_Share' -Filter $filter |
-        Where-Object { 
-            if( -not $wildcardSearch )
-            {
-                return $true
-            }
+    $shares = Get-WmiObject -Class 'Win32_Share' -Filter $filter |
+                    Where-Object { 
+                        if( -not $wildcardSearch )
+                        {
+                            return $true
+                        }
 
-            return $_.Name -like $Name
-        } |
-        Tee-Object -Variable 'shares'
+                        return $_.Name -like $Name
+                    }
     
     if( $Name -and -not $shares -and -not $wildcardSearch )
     {
         Write-Error ('Share ''{0}'' not found.' -f $Name) -ErrorAction $ErrorActionPreference
     }
+
+    $shares
 }

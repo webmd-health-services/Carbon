@@ -106,6 +106,7 @@ We've added parameter validation to some functions. This shouldn't impact anybod
  * [Test-Group](http://get-carbon.org/help/Test-Group.html) checks if a *local* group exists.
  * [Test-FileShare](http://get-carbon.org/help/Test-FileShare.html) uses WMI to check if a file/SMB share exists on the local computer.
  * [Test-TypeDataMember](http://get-carbon.org/help/Test-TypeDataMember.html) tests if a type has an extended type member defined.
+ * [Uninstall-FileShare](http://get-carbon.org/help/Uninstall-FileShare.html) uninstalls/removes a file share, if it exists.
  * [Write-DscError](http://get-carbon.org/help/Write-DscError.html) writes DSC `ErrorLogRecord` objects as errors.
 
 ### New DSC Resources
