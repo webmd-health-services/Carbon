@@ -37,6 +37,7 @@ function Test-FileShare
     #>
     [CmdletBinding()]
     param(
+        [Parameter(Mandatory=$true)]
         [string]
         # The name of a specific share to check.
         $Name
