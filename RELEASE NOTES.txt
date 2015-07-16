@@ -164,6 +164,7 @@ The following functions now have obsolete parameters, which will be removed from
 The following functions were renamed, but with backwards-compatible aliases in place, so you shouldn't have to change any code.
 
  * `Invoke-WindowsInstaller` -> [Install-Msi](http://get-carbon.org/help/Install-Msi.html)
+ * `Install-SmbShare` -> [Install-FileShare](http://get-carbon.org/help/Install-FileShare.html)
  
 ### Switch to System.DirectoryServices.AccountManagement API for User/Group Management
 
@@ -288,7 +289,8 @@ The following functions were re-written to use the `System.DirectoryServices.Acc
  * [Resolve-Identity](http://get-carbon.org/help/Resolve-Identity.html) now converts SIDs to a `Carbon.Identity` object. The SID may be a string (SID in SDDL form), byte array, or a `SecurityIdentifier` object.
  * [Get-FileSharePermission](http://get-carbon.org/help/Get-FileSharePermission.ps1) gets the sharing permissions on a file/SMB share (*not* the NTFS file system permissions).
  * Created [Get-FileShare](http://get-carbon.org/help/Get-FileSharePermission.ps1) function. It uses WMI to get `Win32_Share` objects for the file shares installed on the local computer.
-
+ * Renamed `Install-SmbShare` to [Install-FileShare](http://get-carbon.org/help/Install-FileShare.html), with a backwards-compatible alias in place.
+ 
 # 1.9.0 (8 November 2014)
 
 This is the last minor release for version 1.0. Future 1.0-compatible releases will *only* contain bug fixes, no new features. It takes too much time to maintain two versions, and I'd rather spend my time getting 2.0 out the door.  Carbon 2.0 will require PowerShell 4.0, so start planning.

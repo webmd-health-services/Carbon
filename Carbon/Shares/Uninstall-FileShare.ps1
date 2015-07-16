@@ -30,7 +30,7 @@ function Uninstall-FileShare
     Get-FileSharePermission
 
     .LINK
-    Install-SmbShare
+    Install-FileShare
 
     .LINK
     Test-FileShare

@@ -34,7 +34,7 @@ function Get-FileShare
     Get-FileSharePermission
 
     .LINK
-    Install-SmbShare
+    Install-FileShare
 
     .LINK
     Test-FileShare

@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Install-SmbShare
+function Install-FileShare
 {
     <#
     .SYNOPSIS
@@ -22,6 +22,8 @@ function Install-SmbShare
     Creates a new Windows SMB share, or replaces an existing share with the same name.  Optionally grants permissions on that share.  Unfortunately, there isn't a way in Carbon to set permissions on a share after it is created.  Send us the code!
 
     Permissions don't apply to the file system.  They only apply to the share.  Use `Grant-Permission` to grant file system permissions.
+
+    Before Carbon 2.0, this function was called `Install-SmbShare`.
 
     .LINK
     Get-FileShare
@@ -109,3 +111,5 @@ function Install-SmbShare
     & (Resolve-NetPath) share $Name=$($Path.Trim('\')) /REMARK:$Description $fullAccessArg $changeAccessArg $readAccessArg /CACHE:NONE /UNLIMITED |
         Write-Verbose
 }
+
+Set-Alias -Name 'Install-SmbShare' -Value 'Install-FileShare'
