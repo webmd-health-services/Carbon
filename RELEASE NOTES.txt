@@ -93,6 +93,7 @@ We've added parameter validation to some functions. This shouldn't impact anybod
  * [Get-DscError](http://get-carbon.org/help/Get-DscError.html) gets any DSC errors that were written to a computer's DSC event log.
  * [Get-DscWinEvent](http://get-carbon.org/help/Get-DscWinEvent.html) gets DSC events that were written to a computer's DSC event log.
  * [Get-FileSharePermission](http://get-carbon.org/help/Get-FileSharePermission.ps1) gets the sharing permissions on a file/SMB share (*not* the NTFS file system permissions).
+ * [Get-FileShare](http://get-carbon.org/help/Get-FileSharePermission.ps1) uses WMI to get `Win32_Share` objects for the file shares installed on the local computer.
  * [Get-Group](http://get-carbon.org/help/Get-Group.html) gets a local group or all local groups.
  * [Get-Msi](http://get-carbon.org/help/Get-Msi.html) reads installer information and properties from an MSI file.
  * [Get-PowerShellModuleInstallPath](http://get-carbon.org/help/Get-PowerShellModuleInstallPath.html) gets the path where new module's should be installed. Beginning with PowerShell 4, modules should get installed into `$env:ProgramFiles\Windows PowerShell\Modules`. Under PowerShell 3, it is `$PSHome\Modules`. This function returns the correct location for the version of PowerShell you're using.
@@ -283,7 +284,8 @@ The following functions were re-written to use the `System.DirectoryServices.Acc
  * Added `Description` and `DisplayName` properties to [Carbon_Service](https://get-carbon.org/help/Carbon_Service.html) for setting a service's description and display name.
  * [Grant-Permission](http://get-carbon.org/help/Grant-Permission.html) now writes an error if you don't have access to a private key. Previously, it would skip the key without any messages.
  * [Resolve-Identity](http://get-carbon.org/help/Resolve-Identity.html) now converts SIDs to a `Carbon.Identity` object. The SID may be a string (SID in SDDL form), byte array, or a `SecurityIdentifier` object.
- * [Get-FileSharePermission](http://get-carbon.org/help/Get-FileSharePermission.ps1) gets the sharing permissions on a file/SMB share (*not* the NTFS file system permissions). 
+ * [Get-FileSharePermission](http://get-carbon.org/help/Get-FileSharePermission.ps1) gets the sharing permissions on a file/SMB share (*not* the NTFS file system permissions).
+ * Created [Get-FileShare](http://get-carbon.org/help/Get-FileSharePermission.ps1) function. It uses WMI to get `Win32_Share` objects for the file shares installed on the local computer.
 
 # 1.9.0 (8 November 2014)
 

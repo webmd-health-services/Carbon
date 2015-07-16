@@ -32,7 +32,13 @@ function Get-FileSharePermission
      * FullControl
      * Synchronize
 
-    If the share doesn't exist, nothing is returned.
+    If the share doesn't exist, nothing is returned and an error is written.
+
+    .LINK
+    Get-FileShare
+
+    .LINK
+    Install-SmbShare
 
     .EXAMPLE
     Get-FileSharePermission -Name 'Build'
@@ -50,7 +56,7 @@ function Get-FileSharePermission
 
     Set-StrictMode -Version 'Latest'
 
-    $share = Get-WmiObject -Class 'Win32_Share' -Filter ('Name = ''{0}''' -f $Name)
+    $share = Get-FileShare -Name $Name
     if( -not $share )
     {
         return
