@@ -34,6 +34,9 @@ function Get-FileShare
     .LINK
     Install-SmbShare
 
+    .LINK
+    Test-FileShare
+
     .EXAMPLE
     Get-FileShare
 

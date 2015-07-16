@@ -40,6 +40,9 @@ function Get-FileSharePermission
     .LINK
     Install-SmbShare
 
+    .LINK
+    Test-FileShare
+
     .EXAMPLE
     Get-FileSharePermission -Name 'Build'
 

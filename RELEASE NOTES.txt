@@ -104,6 +104,7 @@ We've added parameter validation to some functions. This shouldn't impact anybod
  * [Start-DscPullConfiguration](http://get-carbon.org/help/Start-DscPullConfiguration.html) starts a configuration check on a computer that is configured to use the PULL refresh mode.
  * [Test-DscTargetResource](http://get-carbon.org/help/Test-DscTargetResource.html) compares target resource with desired resource. Helpful when writing `Test-TargetResource` functions.
  * [Test-Group](http://get-carbon.org/help/Test-Group.html) checks if a *local* group exists.
+ * [Test-FileShare](http://get-carbon.org/help/Test-FileShare.html) uses WMI to check if a file/SMB share exists on the local computer.
  * [Test-TypeDataMember](http://get-carbon.org/help/Test-TypeDataMember.html) tests if a type has an extended type member defined.
  * [Write-DscError](http://get-carbon.org/help/Write-DscError.html) writes DSC `ErrorLogRecord` objects as errors.
 
