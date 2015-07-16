@@ -32,6 +32,9 @@ function Install-SmbShare
     .LINK
     Test-FileShare
 
+    .LINK
+    Uninstall-FileShare
+
     .EXAMPLE
     Install-Share -Name TopSecretDocuments -Path C:\TopSecret -Description 'Share for our top secret documents.' -ReadAccess "Everyone" -FullAccess "Analysts"
 

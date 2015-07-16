@@ -21,6 +21,8 @@ function Uninstall-FileShare
     .DESCRIPTION
     The `Uninstall-FileShare` function uses WMI to uninstall/remove a file share from the local computer, if it exists. If the file shares does not exist, no errors are written and nothing happens. The directory on the file system the share points to is not removed.
 
+    `Uninstall-FileShare` was added in Carbon 2.0.
+
     .LINK
     Get-FileShare
 

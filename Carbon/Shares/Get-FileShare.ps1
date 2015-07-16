@@ -25,6 +25,8 @@ function Get-FileShare
     
     The `Name` parameter supports wildcards. If you're using wildcards to find a share, and no shares are found, no error is written and nothing is returned.
 
+    `Get-FileShare` was added in Carbon 2.0.
+
     .LINK
     https://msdn.microsoft.com/en-us/library/aa394435.aspx
 
@@ -36,6 +38,9 @@ function Get-FileShare
 
     .LINK
     Test-FileShare
+
+    .LINK
+    Uninstall-FileShare
 
     .EXAMPLE
     Get-FileShare

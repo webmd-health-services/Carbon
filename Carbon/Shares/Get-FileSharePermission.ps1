@@ -34,6 +34,8 @@ function Get-FileSharePermission
 
     If the share doesn't exist, nothing is returned and an error is written.
 
+    `Get-FileSharePermission` was added in Carbon 2.0.
+
     .LINK
     Get-FileShare
 
@@ -42,6 +44,9 @@ function Get-FileSharePermission
 
     .LINK
     Test-FileShare
+
+    .LINK
+    Uninstall-FileShare
 
     .EXAMPLE
     Get-FileSharePermission -Name 'Build'

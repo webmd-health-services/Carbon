@@ -21,6 +21,8 @@ function Test-FileShare
     .DESCRIPTION
     The `Test-FileShare` function uses WMI to check if a file share exists on the local computer. If the share exists, `Test-FileShare` returns `$true`. Otherwise, it returns `$false`.
 
+    `Test-FileShare` was added in Carbon 2.0.
+
     .LINK
     Get-FileShare
 
@@ -29,6 +31,9 @@ function Test-FileShare
 
     .LINK
     Install-SmbShare
+
+    .LINK
+    Uninstall-FileShare
 
     .EXAMPLE
     Test-FileShare -Name 'CarbonShare'
