@@ -72,3 +72,51 @@ function Test-ShouldResolveDotAccounts
         Assert-Equal $id.Name $user.SamAccountName
     }
 }
+
+function Test-ShouldResolveSid
+{
+    @( 'NT AUTHORITY\SYSTEM', 'Everyone', 'BUILTIN\Administrators' ) | ForEach-Object {
+        $id = Resolve-Identity -Name $_
+        $idFromSid = Resolve-Identity -Sid $id.Sid
+        Assert-Equal $id $idFromSid
+    }
+}
+
+function Test-ShouldResolveUnknownSid
+{
+    $id = Resolve-Identity -SID 'S-1-5-21-2678556459-1010642102-471947008-1017' -ErrorAction SilentlyContinue
+    Assert-Error -Last -Regex 'not found'
+    Assert-Null $id
+}
+
+function Test-ShouldResolveSidByByteArray
+{
+    $id = Resolve-Identity -Name 'Administrators'
+    Assert-NotNull $id
+    $sidBytes = New-Object 'byte[]' $id.Sid.BinaryLength
+    $id.Sid.GetBinaryForm( $sidBytes, 0 )
+
+    $idBySid = Resolve-Identity -SID $sidBytes
+    Assert-NotNull $idBySid
+    Assert-NoError 
+    Assert-Equal $id $idBySid
+}
+
+function Test-ShouldHandleInvalidSddl
+{
+    $Error.Clear()
+    $id = Resolve-Identity -SID 'iamnotasid' -ErrorAction SilentlyContinue
+    Assert-Error 'exception converting'
+    Assert-Error -Count 2
+    Assert-Null $id
+}
+
+
+function Test-ShouldHandleInvalidBinarySid
+{
+    $Error.Clear()
+    $id = Resolve-Identity -SID (New-Object 'byte[]' 28) -ErrorAction SilentlyContinue
+    Assert-Error 'exception converting'
+    Assert-Error -Count 2
+    Assert-Null $id
+}

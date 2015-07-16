@@ -98,7 +98,7 @@ We've added parameter validation to some functions. This shouldn't impact anybod
  * [Get-User](http://get-carbon.org/help/Get-User.html) gets a local user or all local users.
  * [Initialize-Lcm](http://get-carbon.org/help/Initialize-Lcm.html) configures the DSC Local Configuration Manager on computers, including installing the private key needed for decrypting credentials.
  * [Remove-GroupMember](http://get-carbon.org/help/Remove-GroupMember.html) removes a user/group from a local group. Thanks to [Philip Kluss](https://bitbucket.org/philkloose) for the contribution. 
- * [Resolve-Identity](http://get-carbon.org/help/Resolve-Identity.html) converts a system, local, or domain principal name into its canonical representation and includes extended identity information: domain, type, and SID.
+ * [Resolve-Identity](http://get-carbon.org/help/Resolve-Identity.html) converts a system, local, or domain principal name or a SID (as a `SecurityIdentifer`, string SDDL, or byte array) into its canonical representation and includes extended identity information: domain, type, and SID.
  * [Start-DscPullConfiguration](http://get-carbon.org/help/Start-DscPullConfiguration.html) starts a configuration check on a computer that is configured to use the PULL refresh mode.
  * [Test-DscTargetResource](http://get-carbon.org/help/Test-DscTargetResource.html) compares target resource with desired resource. Helpful when writing `Test-TargetResource` functions.
  * [Test-Group](http://get-carbon.org/help/Test-Group.html) checks if a *local* group exists.
@@ -281,6 +281,7 @@ The following functions were re-written to use the `System.DirectoryServices.Acc
  * Added `DisplayName` parameter to [Install-Service](https://get-carbon.org/help/Install-Service.html) for setting a service's display name.
  * Added `Description` and `DisplayName` properties to [Carbon_Service](https://get-carbon.org/help/Carbon_Service.html) for setting a service's description and display name.
  * [Grant-Permission](http://get-carbon.org/help/Grant-Permission.html) now writes an error if you don't have access to a private key. Previously, it would skip the key without any messages.
+ * [Resolve-Identity](http://get-carbon.org/help/Resolve-Identity.html) now converts SIDs to a `Carbon.Identity` object. The SID may be a string (SID in SDDL form), byte array, or a `SecurityIdentifier` object.
  
 
 # 1.9.0 (8 November 2014)

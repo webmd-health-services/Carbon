@@ -14,6 +14,7 @@
 
 using System;
 using System.DirectoryServices.AccountManagement;
+using System.Security.Principal;
 using NUnit.Framework;
 
 namespace Carbon.Test
@@ -88,6 +89,21 @@ namespace Carbon.Test
 		    GivenIdentityName("localSYSTEM");
 			WhenResolvingIdentityName();
 			ThenIdentityShouldBe("NT AUTHORITY", "SYSTEM");
+	    }
+
+	    [Test]
+	    public void ShouldResolveBySid()
+	    {
+		    var id = Identity.FindByName("BUILTIN\\Administrators");
+		    var idBySid = Identity.FindBySid(id.Sid);
+		    Assert.That(id, Is.EqualTo(idBySid));
+	    }
+
+	    [Test]
+	    public void ShouldResolveUnknownSid()
+	    {
+		    var id = Identity.FindBySid(new SecurityIdentifier("S-1-5-21-2678556459-1010642102-471947008-1017"));
+		    Assert.That(id, Is.Null);
 	    }
 
         private void ThenIdentityShouldBe(string domain, string name)

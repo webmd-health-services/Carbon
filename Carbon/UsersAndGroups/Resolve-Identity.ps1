@@ -20,7 +20,7 @@ function Resolve-Identity
     Gets domain, name, type, and SID information about a user or group.
     
     .DESCRIPTION
-    The common name for an account is not always the canonical name used by the operating system.  For example, the local Administrators group is actually called BUILTIN\Administrators.  This function uses the `LookupAccountName` Windows function to resolve an account name into its domain, name, full name, SID, and SID type. It returns a `Carbon.Identity` object with the following properties:
+    The `Resolve-Identity` function takes an identity name or security identifier (SID) and gets its canonical representation. It returns a `Carbon.Identity` object, which contains the following information about the identity:
 
      * Domain - the domain the user was found in
      * FullName - the users full name, e.g. Domain\Name
@@ -28,7 +28,11 @@ function Resolve-Identity
      * Type - the Sid type.
      * Sid - the account's security identifier as a `System.Security.Principal.SecurityIdentifier` object.
     
-    If the name doesn't represent an actual user or group, an error is written and nothing is returned.
+    The common name for an account is not always the canonical name used by the operating system.  For example, the local Administrators group is actually called BUILTIN\Administrators.  This function uses the `LookupAccountName` and `LookupAccountSid` Windows functions to resolve an account name or security identifier into its domain, name, full name, SID, and SID type. 
+
+    You may pass a `System.Security.Principal.SecurityIdentifer`, a SID in SDDL form (as a string), or a SID in binary form (a byte array) as the value to the `SID` parameter. You'll get an error and nothing returned if the SDDL or byte array SID are invalid.
+
+    If the name or security identifier doesn't represent an actual user or group, an error is written and nothing is returned.
 
     .LINK
     Test-Identity
@@ -49,17 +53,68 @@ function Resolve-Identity
     Resolve-Identity -Name 'Administrators'
     
     Returns an object representing the `Administrators` group.
+
+    .EXAMPLE
+    Resolve-Identity -SID 'S-1-5-21-2678556459-1010642102-471947008-1017'
+
+    Demonstrates how to use a SID in SDDL form to convert a SID into an identity.
+
+    .EXAMPLE
+    Resolve-Identity -SID (New-Object 'Security.Principal.SecurityIdentifier' 'S-1-5-21-2678556459-1010642102-471947008-1017')
+
+    Demonstrates that you can pass a `SecurityIdentifier` object as the value of the SID parameter.
+
+    .EXAMPLE
+    Resolve-Identity -SID $sidBytes
+
+    Demonstrates that you can use a byte array that represents a SID as the value of the `SID` parameter.
     #>
-    [CmdletBinding()]
+    [CmdletBinding(DefaultParameterSetName='ByName')]
     [OutputType([Carbon.Identity])]
     param(
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory=$true,ParameterSetName='ByName')]
         [string]
         # The name of the identity to return.
-        $Name
+        $Name,
+
+        [Parameter(Mandatory=$true,ParameterSetName='BySid')]
+        # The SID of the identity to return. Accepts a SID in SDDL form as a `string`, a `System.Security.Principal.SecurityIdentifier` object, or a SID in binary form as an array of bytes.
+        $SID
     )
 
     Set-StrictMode -Version 'Latest'
+
+    if( $PSCmdlet.ParameterSetName -eq 'BySid' )
+    {
+        try
+        {
+            if( $SID -is [string] )
+            {
+                $SID = New-Object 'Security.Principal.SecurityIdentifier' $SID
+            }
+            elseif( $SID -is [byte[]] )
+            {
+                $SID = New-Object 'Security.Principal.SecurityIdentifier' $SID,0
+            }
+            elseif( $SID -isnot [Security.Principal.SecurityIdentifier] )
+            {
+                Write-Error ('Invalid SID. The `SID` parameter accepts a `System.Security.Principal.SecurityIdentifier` object, a SID in SDDL form as a `string`, or a SID in binary form as byte array. You passed a ''{0}''.' -f $SID.GetType())
+                return
+            }
+        }
+        catch
+        {
+            Write-Error ('Exception converting SID parameter to a `SecurityIdentifier` object. This usually means you passed an invalid SID in SDDL form (as a string) or an invalid SID in binary form (as a byte array): {0}' -f $_.Exception.Message)
+            return
+        }
+
+        $id = [Carbon.Identity]::FindBySid( $SID )
+        if( -not $id )
+        {
+            Write-Error ('Identity ''{0}'' not found.' -f $SID) -ErrorAction:$ErrorActionPreference
+        }
+        return $id
+    }
     
     if( -not (Test-Identity -Name $Name) )
     {

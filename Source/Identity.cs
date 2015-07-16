@@ -23,27 +23,36 @@ namespace Carbon
 {
     public sealed class Identity
     {
-		// ReSharper disable InconsistentNaming
-		[DllImport("advapi32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-		private static extern bool LookupAccountName(
-			string lpSystemName,
-			string lpAccountName,
-			[MarshalAs(UnmanagedType.LPArray)] byte[] Sid,
-			ref uint cbSid,
-			StringBuilder ReferencedDomainName,
-			ref uint cchReferencedDomainName,
-			out IdentityType peUse);
+        [DllImport("advapi32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        private static extern bool LookupAccountName(
+            string lpSystemName,
+            string lpAccountName,
+            [MarshalAs(UnmanagedType.LPArray)] byte[] Sid,
+            ref uint cbSid,
+            StringBuilder referencedDomainName,
+            ref uint cchReferencedDomainName,
+            out IdentityType peUse);
 
-		[DllImport("advapi32", CharSet = CharSet.Auto, SetLastError = true)]
-		private static extern bool ConvertSidToStringSid(
-			[MarshalAs(UnmanagedType.LPArray)] byte[] pSID,
-			out IntPtr ptrSid);
+        [DllImport("advapi32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        static extern bool LookupAccountSid(
+          string lpSystemName,
+          [MarshalAs(UnmanagedType.LPArray)] byte[] Sid,
+          StringBuilder lpName,
+          ref uint cchName,
+          StringBuilder referencedDomainName,
+          ref uint cchReferencedDomainName,
+          out IdentityType peUse);
+        
+        [DllImport("advapi32", CharSet = CharSet.Auto, SetLastError = true)]
+        private static extern bool ConvertSidToStringSid(
+            [MarshalAs(UnmanagedType.LPArray)] byte[] pSID,
+            out IntPtr ptrSid);
 
-		[DllImport("kernel32.dll")]
-		private static extern IntPtr LocalFree(IntPtr hMem);
-		// ReSharper restore InconsistentNaming
+        [DllImport("kernel32.dll")]
+        private static extern IntPtr LocalFree(IntPtr hMem);
+        // ReSharper restore InconsistentNaming
 
-		private Identity(string domain, string name, SecurityIdentifier sid, IdentityType type)
+        private Identity(string domain, string name, SecurityIdentifier sid, IdentityType type)
         {
             Domain = domain;
             Name = name;
@@ -97,31 +106,30 @@ namespace Carbon
             var cchReferencedDomainName = (uint) referencedDomainName.Capacity;
             IdentityType sidUse;
 
-	        if (name.StartsWith(".\\"))
-	        {
-	            var username = name.Substring(2);
+            if (name.StartsWith(".\\"))
+            {
+                var username = name.Substring(2);
                 name = string.Format("{0}\\{1}", Environment.MachineName, username);
-	            var identity = FindByName(name);
-	            if (identity == null)
-	            {
-	                name = string.Format("BUILTIN\\{0}", username);
-	                identity = FindByName(name);
-	            }
-	            return identity;
-	        }
+                var identity = FindByName(name);
+                if (identity == null)
+                {
+                    name = string.Format("BUILTIN\\{0}", username);
+                    identity = FindByName(name);
+                }
+                return identity;
+            }
 
-	        if (name.Equals("LocalSystem", StringComparison.InvariantCultureIgnoreCase))
-	        {
-		        name = "NT AUTHORITY\\SYSTEM";
-	        }
+            if (name.Equals("LocalSystem", StringComparison.InvariantCultureIgnoreCase))
+            {
+                name = "NT AUTHORITY\\SYSTEM";
+            }
 
-            int err;
-            if (LookupAccountName(null, name, rawSid, ref cbSid, referencedDomainName, ref cchReferencedDomainName, out sidUse))
+	        if (LookupAccountName(null, name, rawSid, ref cbSid, referencedDomainName, ref cchReferencedDomainName, out sidUse))
             {
                 throw new Win32Exception();
             }
 
-            err = Marshal.GetLastWin32Error();
+            var err = Marshal.GetLastWin32Error();
             if (err == Win32ErrorCodes.InsufficientBuffer || err == Win32ErrorCodes.InvalidFlags)
             {
                 rawSid = new byte[cbSid];
@@ -161,6 +169,49 @@ namespace Carbon
                 }
             }
             return new Identity(domainName, accountName, sid, sidUse);
+        }
+
+        /// <summary>
+        /// Searches for an identity by SID. If the SID is invalid, or the identity doesn't exist, null is returned.
+        /// </summary>
+        /// <param name="sid"></param>
+        /// <returns>Null if the identity isn't found or the SID is invalid. Otherwise, a `Carbon.Identity` object.</returns>
+        public static Identity FindBySid(SecurityIdentifier sid)
+        {
+            const int ok = 0;
+
+            var sidBytes = new byte[sid.BinaryLength];
+            sid.GetBinaryForm(sidBytes, 0);
+
+            var name = new StringBuilder();
+            var cchName = (uint) name.Capacity;
+            var referencedDomainName = new StringBuilder();
+            var cchReferencedDomainName = (uint) referencedDomainName.Capacity;
+            IdentityType identityType;
+
+            var err = ok;
+            if ( !LookupAccountSid(null, sidBytes, name, ref cchName, referencedDomainName, ref cchReferencedDomainName, out identityType))
+            {
+                err = Marshal.GetLastWin32Error();
+                if( err == Win32ErrorCodes.InsufficientBuffer )
+                {
+                    name.EnsureCapacity((int) cchName);
+                    referencedDomainName.EnsureCapacity((int) cchReferencedDomainName);
+                    if ( !LookupAccountSid(null, sidBytes, name, ref cchName, referencedDomainName, ref cchReferencedDomainName, out identityType))
+                        err = Marshal.GetLastWin32Error();
+                }
+            }
+
+            switch (err)
+            {
+                case ok:
+                    return new Identity(referencedDomainName.ToString(), name.ToString(), sid, identityType);
+				case Win32ErrorCodes.NoneMapped:
+                    return null;
+                default:
+                    throw new Win32Exception(err, string.Format("Failed to lookup account SID for '{0}'.", sid));
+            }
+
         }
     }
 }

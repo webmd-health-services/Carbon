@@ -85,6 +85,8 @@
     <Compile Include="Security\ContainerInheritanceFlags.cs" />
     <Compile Include="Security\ServiceAccessRights.cs" />
     <Compile Include="Security\ServiceAccessRule.cs" />
+    <Compile Include="Security\ShareAccessRights.cs" />
+    <Compile Include="Security\ShareAccessRule.cs" />
     <Compile Include="Service\ErrorControl.cs" />
     <Compile Include="Service\FailureAction.cs" />
     <Compile Include="Service\ServiceInfo.cs" />
