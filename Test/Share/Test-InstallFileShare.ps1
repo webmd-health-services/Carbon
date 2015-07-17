@@ -65,6 +65,7 @@ function Get-Share
 function Test-ShouldCreateShare
 {
     Invoke-NewShare
+    Assert-Share -ReadAccess 'EVERYONE'
 }
 
 function Test-ShouldGrantPermissions
@@ -108,15 +109,6 @@ function Test-ShouldGrantMultipleFullAccessPermissions
     Assert-ContainsLike $details ("Remark            {0}" -f $Remarks)
 }
 
-function Test-ShouldDeleteThenRecreateShare
-{
-    Invoke-NewShare -FullAccess 'Administrators'
-    
-    Invoke-NewShare
-    $details = net share """$ShareName"""
-    Assert-ContainsNotLike $details "Administrators, FULL" "Share not deleted and re-created."
-}
-
 function Test-ShouldSetRemarks
 {
     $expectedRemarks = 'Hello, workd.'
@@ -143,8 +135,107 @@ function Test-ShouldCreateShareDirectory
     Assert-DirectoryExists $shareDir
 }
 
+function Test-ShouldUpdatePath
+{
+    $tempDir = New-TempDirectory -Prefix $PSCommandPath
+    try
+    {
+        Install-FileShare -Name $ShareName -Path $SharePath 
+        Assert-Share -ReadAccess 'Everyone'
+
+        Install-FileShare -Name $ShareName -Path $tempDir 
+        Assert-Share -Path $tempDir.FullName -ReadAccess 'Everyone'
+    }
+    finally
+    {
+        Remove-Item -Path $tempDir
+    }
+}
+
+function Test-ShouldUpdateDescription
+{
+    Install-FileShare -Name $ShareName -Path $SharePath -Description 'first'
+    Assert-Share -ReadAccess 'Everyone' -Description 'first'
+
+    Install-FileShare -Name $ShareName -Path $SharePath -Description 'second'
+    Assert-Share -ReadAccess 'everyone' -Description 'second'
+}
+
+function Test-ShouldAddNewPermissionsToExistingShare
+{
+    Install-FileShare -Name $ShareName -Path $SharePath 
+    Assert-Share -ReadAccess 'Everyone'
+
+    Install-FileShare -Name $ShareName -Path $SharePath -FullAccess $fullAccessGroup -ChangeAccess $changeAccessGroup -ReadAccess $readAccessGroup
+    Assert-Share -FullAccess $fullAccessGroup -ChangeAccess $changeAccessGroup -ReadAccess $readAccessGroup
+}
+
+function Test-ShouldRemoveExistingPermissions
+{
+    Install-FileShare -Name $ShareName -Path $SharePath -FullAccess $fullAccessGroup
+    Assert-Share -FullAccess $fullAccessGroup
+
+    Install-FileShare -Name $ShareName -Path $SharePath
+    Assert-Share -ReadAccess 'Everyone'
+}
+
+function Test-ShouldUpdateExistingPermissions
+{
+    Install-FileShare -Name $ShareName -Path $SharePath -FullAccess $changeAccessGroup
+    Assert-Share -FullAccess $changeAccessGroup
+
+    Install-FileShare -Name $ShareName -Path $SharePath -ChangeAccess $changeAccessGroup
+    Assert-Share -ChangeAccess $changeAccessGroup
+}
+
 function Assert-ShareCreated
 {
     $share = Get-Share
     Assert-NotNull $share "Share not created."
+}
+
+function Assert-Share
+{
+    param(
+        $Name = $ShareName,
+        $Path = $SharePath,
+        $Description = '',
+        $FullAccess,
+        $ChangeAccess,
+        $ReadAccess
+    )
+
+    Assert-True (Test-FileShare -Name $Name)
+
+    $share = Get-FileShare -Name $Name
+    Assert-NotNull $share
+
+    Assert-Equal $Description $share.Description
+    Assert-Equal $Path $share.Path
+
+    function Assert-ShareRight
+    {
+        param(
+            $IdentityName,
+            $ExpectedRigths
+        )
+
+        if( $IdentityName )
+        {
+            foreach( $idName in $IdentityName )
+            {
+                $perm = Get-FileSharePermission -Name $Name -Identity $idName
+                Assert-NotNull $perm
+                Assert-Equal $perm.ShareRights $ExpectedRigths
+            }
+        }
+        else
+        {
+            Assert-Null (Get-FileSharePermission -Name $Name | Where-Object { $_.ShareRights -eq $ExpectedRigths }) ('found {0} access rules when there shouldn''t be' -f $ExpectedRigths)
+        }
+    }
+
+    Assert-ShareRight $FullAccess ([Carbon.Security.ShareRights]::FullControl)
+    Assert-ShareRight $ChangeAccess ([Carbon.Security.ShareRights]::Change)
+    Assert-ShareRight $ReadAccess ([Carbon.Security.ShareRights]::Read)
 }

@@ -16,12 +16,12 @@ function Install-FileShare
 {
     <#
     .SYNOPSIS
-    Creates a share, replacing any existing share with the same name.
+    Installs a file/SMB share.
 
     .DESCRIPTION
-    Creates a new Windows SMB share, or replaces an existing share with the same name.  Optionally grants permissions on that share.  Unfortunately, there isn't a way in Carbon to set permissions on a share after it is created.  Send us the code!
+    The `Install-FileShare` function installs a new file/SMB share. If the share doesn't exist, it is created. In Carbon 2.0, if a share does exist, its properties and permissions are updated in place, unless the share's path needs to change. Changing a share's path requires deleting and re-creating. Before Carbon 2.0, shares were always deleted and re-created.
 
-    Permissions don't apply to the file system.  They only apply to the share.  Use `Grant-Permission` to grant file system permissions.
+    Use the `FullAccess`, `ChangeAccess`, and `ReadAccess` parameters to grant full, change, and read sharing permissions on the share. Each parameter takes a list of user/group names. If you don't supply any permissions, `Everyone` will get `Read` access. Permissions on existing shares are cleared before permissions are granted. Permissions don't apply to the file system, only to the share. Use `Grant-Permission` to grant file system permissions. 
 
     Before Carbon 2.0, this function was called `Install-SmbShare`.
 
@@ -30,6 +30,9 @@ function Install-FileShare
 
     .LINK
     Get-FileSharePermission
+
+    .LINK
+    Grant-Permission
 
     .LINK
     Test-FileShare
@@ -70,46 +73,172 @@ function Install-FileShare
         # The identities who have read access to the share
         $ReadAccess = @()
     )
-    
-    function ConvertTo-NetShareGrantArg
+
+    Set-StrictMode -Version 'Latest'
+
+    function New-ShareAce
     {
         param(
+            [Parameter(Mandatory=$true)]
+            [AllowEmptyCollection()]
             [string[]]
-            $Name,
-            
-            [string]
-            [ValidateSet('FULL','CHANGE','READ')]
-            $Access
+            # The identity 
+            $Identity,
+
+            [Carbon.Security.ShareRights]
+            # The rights to grant to Identity.
+            $ShareRight
         )
-        $Name | ForEach-Object {
-            $perm = ''
-            if( $Access -ne 'NONE' )
+
+        Set-StrictMode -Version 'Latest'
+
+        foreach( $identityName in $Identity )
+        {
+            $trustee = ([wmiclass]'Win32_Trustee').CreateInstance()
+            [Security.Principal.SecurityIdentifier]$sid = Resolve-Identity -Name $identityName | Select-Object -ExpandProperty 'Sid'
+            if( -not $sid )
             {
-                $perm = ',{0}' -f $Access
+                continue
             }
-            '/GRANT:{0}{1}' -f $_,$perm
+
+            $sidBytes = New-Object 'byte[]' $sid.BinaryLength
+            $sid.GetBinaryForm( $sidBytes, 0)
+
+            $trustee.Sid = $sidBytes
+
+            $ace = ([wmiclass]'Win32_Ace').CreateInstance()
+            $ace.AccessMask = $ShareRight
+            $ace.AceFlags = 0
+            $ace.AceType = 0
+            $ace.Trustee = $trustee
+
+            $ace
         }
     }
 
-    $share = Get-WmiObject Win32_Share -Filter "Name='$Name'"
-    if( $share -ne $null )
+    $errors = @{
+                [uint32]2 = 'Access Denied';
+                [uint32]8 = 'Unknown Failure';
+                [uint32]9 = 'Invalid Name';
+                [uint32]10 = 'Invalid Level';
+                [uint32]21 = 'Invalid Parameter';
+                [uint32]22 = 'Duplicate Share';
+                [uint32]23 = 'Restricted Path';
+                [uint32]24 = 'Unknown Device or Directory';
+                [uint32]25 = 'Net Name Not Found';
+            }
+
+    $VerbosePreference = 'Continue'
+
+    $Path = Resolve-FullPath -Path $Path
+    $Path = $Path.Trim('\\')
+
+    if( (Test-FileShare -Name $Name) )
     {
-        Write-Verbose "Share '$Name' exists and will be deleted."
-        [void] $share.Delete()
+        $share = Get-FileShare -Name $Name
+        if( $share.Path -ne $Path )
+        {
+            Write-Verbose -Message ('[SHARE] [{0}] Path         {1} -> {2}.' -f $Name,$share.Path,$Path)
+            $result = $share.Delete()
+            if( $result.ReturnValue )
+            {
+                Write-Error ('Failed to delete share ''{0}'' (Path: {1}). Win32_Share.Delete() method returned error code {2} which means: {3}.' -f $Name,$share.Path,$result.ReturnValue,$errors[$result.ReturnValue])
+                return
+            }
+        }
     }
 
-    $fullAccessArg = ConvertTo-NetShareGrantArg -Name $FullAccess -Access 'FULL'
-    $changeAccessArg = ConvertTo-NetShareGrantArg -Name $ChangeAccess -Access 'CHANGE'
-    $readAccessArg = ConvertTo-NetShareGrantArg -Name $ReadAccess -Access 'READ'
-
-    # Create the share's path if it does not exist.
-    if( -not (Test-Path -Path $Path -PathType Container) )
+    $shareAces = Invoke-Command -ScriptBlock {
+                                                New-ShareAce -Identity $FullAccess -ShareRight FullControl
+                                                New-ShareAce -Identity $ChangeAccess -ShareRight Change
+                                                New-ShareAce -Identity $ReadAccess -ShareRight Read
+                                           }
+    if( -not $shareAces )
     {
-        $null = New-Item -Path $Path -ItemType Directory -Force
+        $shareAces = New-ShareAce -Identity 'Everyone' -ShareRight Read
     }
+
+    # if we don't pass a $null security descriptor, default Everyone permissions aren't setup correctly, and extra admin rights are slapped on.
+    $shareSecurityDescriptor = ([wmiclass] "Win32_SecurityDescriptor").CreateInstance() 
+    $shareSecurityDescriptor.DACL = $shareAces
+    $shareSecurityDescriptor.ControlFlags = "0x4"
+
+    if( -not (Test-FileShare -Name $Name) )
+    {
+        if( -not (Test-Path -Path $Path -PathType Container) )
+        {
+            New-Item -Path $Path -ItemType Directory -Force | Out-String | Write-Verbose
+        }
     
-    & (Resolve-NetPath) share $Name=$($Path.Trim('\')) /REMARK:$Description $fullAccessArg $changeAccessArg $readAccessArg /CACHE:NONE /UNLIMITED |
-        Write-Verbose
+        $shareClass = Get-WmiObject -Class 'Win32_Share' -List
+        Write-Verbose -Message ('[SHARE] [{0}]              Sharing {1}' -f $Name,$Path)
+        $result = $shareClass.Create( $Path, $Name, 0, $null, $Description, $null, $shareSecurityDescriptor )
+        if( $result.ReturnValue )
+        {
+            Write-Error ('Failed to create share ''{0}'' (Path: {1}). WMI returned error code {2} which means: {3}.' -f $Name,$Path,$result.ReturnValue,$errors[$result.ReturnValue])
+            return
+        }
+    }
+    else
+    {
+        $share = Get-FileShare -Name $Name
+        $updateShare = $false
+        if( $share.Description -ne $Description )
+        {
+            Write-Verbose -Message ('[SHARE] [{0}] Description  {1} -> {2}' -f $Name,$share.Description,$Description)
+            $updateShare = $true
+        }
+
+        # Check if the share is missing any of the new ACEs.
+        foreach( $ace in $shareAces )
+        {
+            $identityName = Resolve-IdentityName -SID $ace.Trustee.SID
+            $permission = Get-FileSharePermission -Name $Name -Identity $identityName
+
+            if( -not $permission )
+            {
+                Write-Verbose -Message ('[SHARE] [{0}] Access       {1}:  -> {2}' -f $Name,$identityName,([Carbon.Security.ShareRights]$ace.AccessMask))
+                $updateShare = $true
+            }
+            elseif( [int]$permission.ShareRights -ne $ace.AccessMask )
+            {
+                Write-Verbose -Message ('[SHARE] [{0}] Access       {1}: {2} -> {3}' -f $Name,$identityName,$permission.ShareRights,([Carbon.Security.ShareRights]$ace.AccessMask))
+                $updateShare = $true
+            }
+        }
+
+        # Now, check that there aren't any existing ACEs that need to get deleted.
+        $existingAces = Get-FileSharePermission -Name $Name
+        foreach( $ace in $existingAces )
+        {
+            $identityName = $ace.IdentityReference.Value
+
+            $extraAce = $ace
+            if( $shareAces )
+            {
+                $extraAce = $shareAces | Where-Object { 
+                                                        $newIdentityName = Resolve-IdentityName -SID $_.Trustee.SID
+                                                        return ( $newIdentityName -ne $ace.IdentityReference.Value )
+                                                    }
+            }
+
+            if( $extraAce )
+            {
+                Write-Verbose -Message ('[SHARE] [{0}] Access       {1}: {2} ->' -f $Name,$identityName,$ace.ShareRights)
+                $updateShare = $true
+            }
+        }
+
+        if( $updateShare )
+        {
+            $result = $share.SetShareInfo( $share.MaximumAllowed, $Description, $shareSecurityDescriptor )
+            if( $result.ReturnValue )
+            {
+                Write-Error ('Failed to create share ''{0}'' (Path: {1}). WMI returned error code {2} which means: {3}' -f $Name,$Path,$result.ReturnValue,$errors[$result.ReturnValue])
+                return
+            }
+        }
+    }
 }
 
 Set-Alias -Name 'Install-SmbShare' -Value 'Install-FileShare'

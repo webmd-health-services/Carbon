@@ -142,7 +142,6 @@ The following functions no longer return the console output of the program each 
  * [Enable-FirewallStatefulFtp](http://get-carbon.org/help/Enable-FirewallStatefulFtp.html)
  * [Enable-Ssl](http://get-carbon.org/help/Enable-Ssl.html)
  * [Install-Service](http://get-carbon.org/help/Install-Service.html)
- * [Install-SmbShare](http://get-carbon.org/help/Install-SmbShare.html)
  * [Remove-SslCertificateBinding](http://get-carbon.org/help/Remove-SslCertificateBinding.html)
  * [Set-SslCertificateBinding](http://get-carbon.org/help/Set-SslCertificateBinding.html)
  
@@ -152,6 +151,7 @@ The following functions are now obsolete. Please don't use them and stop using t
 
  * [Complete-Job](https://get-carbon.org/help/Complete-Job.html): It's total crap. Use PowerShell's `Wait-Job` cmdlet instead.
  * [Invoke-AppCmd](https://get-carbon.org/help/Invoke-AppCmd.html): Switch to Carbon's IIS functions, or use [Get-IisConfigurationSection](https://get-carbon.org/help/Get-IisConfigurationSection.html) to get `ConfigurationElement` objects from the `Microsoft.Web.Administration` API that you can modify.
+ * [Resolve-NetPath](https://get-carbon.org/help/Resolve-NetPath.html): Switch to something else. Carbon doesn't use `net.exe` anymore.
  
 The following functions now have obsolete parameters, which will be removed from a future major version of Carbon. You'll get warnings if you use them.
 
@@ -203,6 +203,9 @@ The following functions were re-written to use the `System.DirectoryServices.Acc
     * Added `Credential` parameter for increased security and to follow PowerShell guidelines.
     * Added `Description` parameter for setting a service's description.
     * Added `DisplayName` parameter for setting a service's display name.
+ * [Install-FileShare](http://get-carbon.org/help/Install-FileShare.html) (fka `Install-SmbShare`):
+    * Re-written to use WMI isntead of `net.exe`, so it no longer returns any console output.
+    * Modifies existing shares in place, instead of deleting and re-creating, *unless* the share's path changes. Changing a share's path requires the old share to be deleted and a new one created.
  * [Install-User](http://get-carbon.org/help/Install-User.html)
     * Added `PasswordExpires` switch for creating accounts with passwords that expire.
     * Added `UserCannotChangePassword` to prevent user from changing his password.
@@ -294,6 +297,9 @@ The following functions were re-written to use the `System.DirectoryServices.Acc
  * Renamed `Install-SmbShare` to [Install-FileShare](http://get-carbon.org/help/Install-FileShare.html), with a backwards-compatible alias in place.
  * Added `SID` parameter to [Resolve-IdentityName](http://get-carbon.org/help/Resolve-IdentityName.html) to resolve a SID into its identity name.
  * Created [ConvertTo-SecurityIdentifer](http://get-carbon.org/help/ConvertTo-SecurityIdentifer.html) function to convert a binary, string, or `System.Security.Principal.SecurityIdentifier` object into a `System.Security.Principal.SecurityIdentifier` object.
+ * [Install-FileShare](http://get-carbon.org/help/Install-FileShare.html) (fka `Install-SmbShare`):
+    * Re-written to use WMI isntead of `net.exe`.
+    * Modifies existing shares in place, instead of deleting and re-creating, *unless* the share's path changes. Changing a share's path requires the old share to be deleted and a new one created.
  
 # 1.9.0 (8 November 2014)
 
