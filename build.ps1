@@ -25,7 +25,11 @@ param(
 
     [string]
     # The pre-release version, e.g. alpha.39, rc.1, etc.
-    $PreReleaseVersion
+    $PreReleaseVersion,
+
+    [string]
+    # Build metadata.
+    $BuildMetadata
 )
 
 #Requires -Version 4
@@ -82,9 +86,16 @@ if( $Version )
                                 if( $_ -match $assemblyVersionRegex )
                                 {
                                     $infoVersion = ''
-                                    if( $Matches[1] -eq 'Informational' -and $PreReleaseVersion)
+                                    if( $Matches[1] -eq 'Informational' )
                                     {
-                                        $infoVersion = '-{0}' -f $PreReleaseVersion
+                                        if( $PreReleaseVersion )
+                                        {
+                                            $infoVersion = '-{0}' -f $PreReleaseVersion
+                                        }
+                                        if( $BuildMetadata )
+                                        {
+                                            $infoVersion = '{0}+{1}' -f $infoVersion,$BuildMetadata
+                                        }
                                     }
                                     return $_ -replace $assemblyVersionRegex,('Assembly$1Version("{0}{1}")' -f $Version,$infoVersion)
                                 }
