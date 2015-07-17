@@ -50,6 +50,18 @@ function Uninstall-FileShare
 
     Set-StrictMode -Version 'Latest'
 
+    $errors = @{
+                [uint32]2 = 'Access Denied';
+                [uint32]8 = 'Unknown Failure';
+                [uint32]9 = 'Invalid Name';
+                [uint32]10 = 'Invalid Level';
+                [uint32]21 = 'Invalid Parameter';
+                [uint32]22 = 'Duplicate Share';
+                [uint32]23 = 'Restricted Path';
+                [uint32]24 = 'Unknown Device or Directory';
+                [uint32]25 = 'Net Name Not Found';
+            }
+
     if( -not (Test-FileShare -Name $Name) )
     {
         return
@@ -60,7 +72,11 @@ function Uninstall-FileShare
             if( $PSCmdlet.ShouldProcess( ('{0} ({1})' -f $_.Name,$_.Path), 'delete' ) )
             {
                 Write-Verbose ('Deleting file share ''{0}'' (Path: {1}).' -f $_.Name,$_.Path)
-                $_.Delete() 
+                $result = $_.Delete() 
+                if( $result.ReturnValue )
+                {
+                    Write-Error ('Failed to delete share ''{0}'' (Path: {1}). Win32_Share.Delete() method returned error code {2} which means: {3}.' -f $Name,$share.Path,$result.ReturnValue,$errors[$result.ReturnValue])                
+                }
             }
         }
 }

@@ -32,7 +32,8 @@ function Stop-Test
 
 function Test-ShouldDeleteShare
 {
-    Uninstall-FileShare -Name $shareName
+    $output = Uninstall-FileShare -Name $shareName
+    Assert-Null $output
     Assert-NoError
     Assert-False (Test-FileShare -Name $shareName)
     Assert-DirectoryExists -Path $sharePath
@@ -40,12 +41,14 @@ function Test-ShouldDeleteShare
 
 function Test-ShouldSupportShouldProcess
 {
-    Uninstall-FileShare -Name $shareName -WhatIf
+    $output = Uninstall-FileShare -Name $shareName -WhatIf
+    Assert-Null $output
     Assert-True (Test-FileShare -Name $shareName)
 }
 
 function Test-ShouldHandleShareThatDoesNotExist
 {
-    Uninstall-FileShare -Name 'fdsfdsurwoim'
+    $output = Uninstall-FileShare -Name 'fdsfdsurwoim'
+    Assert-Null $output
     Assert-NoError
 }
