@@ -520,7 +520,7 @@ function Install-Service
     {
         if( $PSCmdlet.ShouldProcess( $Name, 'start service' ) )
         {
-            Start-Service -Name $Name -Verbose:$VerbosePreference
+            Start-Service -Name $Name -Verbose:$VerbosePreference -ErrorAction $ErrorActionPreference
             if( (Get-Service -Name $Name).Status -ne [ServiceProcess.ServiceControllerStatus]::Running )
             {
                 if( $PSCmdlet.ParameterSetName -like 'CustomAccount*' -and -not $Credential )

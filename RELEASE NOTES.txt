@@ -61,7 +61,9 @@ We've added parameter validation to some functions. This shouldn't impact anybod
  * [Grant-Permission](http://get-carbon.org/help/Grant-Permission.html) fails with an unhelpful error message if it is unable to get the ACL on a private key.
  * [Install-Msi](http://get-carbon.org/help/Install-Msi.html) didn't properly detect when installation failed.
  * [Install-ScheduledTask](https://get-carbon.org/help/Install-ScheduledTask.html) fails under PowerShell 5 to create a scheduled task to run on Sunday.
- * [Install-Service](https://get-carbon.org/help/Install-Service.ps1) no longer writes a warning about being unable to stop an already stopped service (fixes [issue #158](https://bitbucket.org/splatteredbits/carbon/issues/158/install-service-extraneous-warning-about)).
+ * [Install-Service](https://get-carbon.org/help/Install-Service.ps1):
+   * No longer writes a warning about being unable to stop an already stopped service (fixes [issue #158](https://bitbucket.org/splatteredbits/carbon/issues/158/install-service-extraneous-warning-about)).
+   * Starting the service now respects caller's error action preference. Before, `Start-Service` would write an error even if somone called `Install-Service` with an `Ignore` or `SilentlyContinue` error action preference.
  * [Set-EnvironmentVariable](http://get-carbon.org/help/Set-EnvironmentVariable].html) fails to set process-level environment variable. 
  * [Set-HostsEntry](http://get-carbon.org/help/Set-HostsEntry.html) fails to preserve whitespace if existing lines end with a comment/description. Thanks to [Konstantin Ushenin](https://vk.com/kostanew) for the fix.
 
@@ -253,8 +255,15 @@ The following functions were re-written to use the `System.DirectoryServices.Acc
  * `Import-Carbon.ps1` is more intelligent about when it tries to re-load Carbon. It will force a re-import of Carbon if any of Carbon's files have changed or the version has changed.
  * Created [Uninstall-Junction](http://get-carbon.org/help/Uninstall-Junction.html) for uninstalling a junction in an idempotent way (i.e. without errors). Thanks to [Konstantin Ushenin](https://vk.com/kostanew) for the contribution.
  * Improved error handling in [Remove-Junction](http://get-carbon.org/help/Remove-Junction.html).
- * [Install-Service](http://get-carbon.org/help/Install-Service.html) now supports service startup parameters/arguments.
- * New [Test-TypeDataMember](http://get-carbon.org/help/Install-Service.html) for testing if a type has an extended type member defined.
+ * [Install-Service](http://get-carbon.org/help/Install-Service.html):
+   * Now supports service startup parameters/arguments.
+   * No longer returns `ServiceController` objects by default. This should improve backwards-compatability. Added a `PassThru` switch you can use to get a `ServiceController` object returned to you.
+   * Improved error handling. It now uses `net helpmsg` to get helpful error messages based on sc.exe exit codes.
+   * Improved handling of arguments/services with spaces in them under PowerShell 5.
+   * Added `Credential` parameter for increased security and to follow PowerShell guidelines.
+   * Now supports setting a service's description and display name.
+   * Starting the service now respects caller's error action preference. Before, `Start-Service` would write an error even if somone called `Install-Service` with an `Ignore` or `SilentlyContinue` error action preference.
+ * New [Test-TypeDataMember](http://get-carbon.org/help/Test-TypeDataMember.html) for testing if a type has an extended type member defined.
  * [Install-IisAppPool](http://get-carbon.org/help/Install-IisAppPool.html) no longer returns appcmd.exe output.
  * Added `PassThru` parameter to [Install-IisAppPool](http://get-carbon.org/help/Install-IisAppPool.html) to control when a `Microsoft.Web.Administration.ApplicationPool` for the installed app pool is returned.
  * [Get-ServiceConfiguration](http://get-carbon.org/help/Get-ServiceConfiguration.html) and Carbon's extended type data for `System.ServiceProcess.ServiceController` objects now supports services from remote computers.
@@ -273,7 +282,6 @@ The following functions were re-written to use the `System.DirectoryServices.Acc
  * Put the [Resolve-IdentityName](http://get-carbon.org/help/Resolve-IdentityName.html) function back. It was removed from previous alpha releases.
  * [Install-IisWebsite](https://get-carbon.org/help/Install-IisWebsite.ps1) no longer deletes and re-creates websites. This may or may not be a breaking change in your environment.
  * [Install-SmbShare](https://get-carbon.org/help/Install-SmbShare.ps1) no longer returns net.exe output, instead writing it to the verbose stream. To see previous output, use the `-Verbose` switch.
- * [Install-Service](http://get-carbon.org/help/Install-Service.html) no longer returns `ServiceController` objects by default. This should improve backwards-compatability. Added a `PassThru` switch you can use to get a `ServiceController` object returned to you.
  * Changed `-PasswordNeverExpires` switch to  `PasswordExpires` on [Install-User](http://get-carbon.org/help/Install-User.html) for improved backwards-compatability.
  * [Set-SslCertificateBinding](http://get-carbon.org/help/Set-SslCertificateBinding.html) no longer returns binding objects by default. Use new `PassThru` switch to get the old behavior.
  * The product version of the Carbon assembly now includes pre-release version information, as defined by the [Semantic Versioning specification](http://semver.org). To get this version, run `Get-Item Carbon.dll | Select-Object -ExpandProperty 'VersionInfo' | Select-Object -ExpandProperty 'ProductVersion'`
@@ -281,14 +289,9 @@ The following functions were re-written to use the `System.DirectoryServices.Acc
  * Added `AsSecureString` switch to [Unprotect-String](http://get-carbon.org/help/Unprotect-String.html) which causes `Unprotect-String` to return a secure string instead of a normal string.
  * [Unprotect-String](http://get-carbon.org/help/Unprotect-String.html) now accepts a `SecureString` as the value for the `Password` parameter, which is the password for the private key used to decrypt from password-protected RSA certificate file.
  * Added `Credential` parameter to [Install-IisAppPool](https://get-carbon.org/help/Install-IisAppPool.html) for increased security and to follow PowerShell guidelines.
- * Improved [Install-Service](https://get-carbon.org/help/Install-Service.html) error handling. It now uses `net helpmsg` to get helpful error messages based on sc.exe exit codes.
- * Improved [Install-Service](https://get-carbon.org/help/Install-Service.html) handling of arguments/services with spaces in them under PowerShell 5.
- * Added `Credential` parameter to [Install-Service](https://get-carbon.org/help/Install-Service.html) for increased security and to follow PowerShell guidelines.
  * Added `Credential` parameter to [Install-User](https://get-carbon.org/help/Install-User.html) for increased security and to follow PowerShell guidelines.
  * [Install-IisVirtualDirectory](https://get-carbon.org/help/Install-IisVirtualDirectory.html) now modifies existing virtual directories in place, instead of deleting and re-creating.
  * [Invoke-AppCmd](https://get-carbon.org/help/Invoke-AppCmd.html) is now obsolete and will be removed from a future version of Carbon. Switch to Carbon's IIS functions, or use [Get-IisConfigurationSection](https://get-carbon.org/help/Get-IisConfigurationSection.html) to get `ConfigurationElement` objects from the `Microsoft.Web.Administration` API that you can modify.
- * Added `Description` parameter to [Install-Service](https://get-carbon.org/help/Install-Service.html) for setting a service's description.
- * Added `DisplayName` parameter to [Install-Service](https://get-carbon.org/help/Install-Service.html) for setting a service's display name.
  * Added `Description` and `DisplayName` properties to [Carbon_Service](https://get-carbon.org/help/Carbon_Service.html) for setting a service's description and display name.
  * [Grant-Permission](http://get-carbon.org/help/Grant-Permission.html) now writes an error if you don't have access to a private key. Previously, it would skip the key without any messages.
  * [Resolve-Identity](http://get-carbon.org/help/Resolve-Identity.html) now converts SIDs to a `Carbon.Identity` object. The SID may be a string (SID in SDDL form), byte array, or a `SecurityIdentifier` object.
