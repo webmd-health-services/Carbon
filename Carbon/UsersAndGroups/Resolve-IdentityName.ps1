@@ -53,7 +53,7 @@ function Resolve-IdentityName
     [CmdletBinding(DefaultParameterSetName='ByName')]
     [OutputType([string])]
     param(
-        [Parameter(Mandatory=$true,ParameterSetName='ByName')]
+        [Parameter(Mandatory=$true,ParameterSetName='ByName',Position=0)]
         [string]
         # The name of the identity to return.
         $Name,
