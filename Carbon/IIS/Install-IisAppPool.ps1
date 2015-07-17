@@ -117,7 +117,7 @@ function Install-IisAppPool
     {
         if( $PSCmdlet.ParameterSetName -notlike '*WithCredential' ) 
         {
-            Write-Warning ('`Install-IisAppPool` function''s `UserName` and `Password` parameters are obsolete and will be removed from a future version of Carbon. Please use the `Credential` parameter instead.')
+            Write-Warning ('`Install-IisAppPool` function''s `UserName` and `Password` parameters are obsolete and will be removed in a future major version of Carbon. Please use the `Credential` parameter instead.')
             $Credential = New-Credential -UserName $UserName -Password $Password
         }
     }

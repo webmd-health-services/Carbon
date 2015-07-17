@@ -16,13 +16,13 @@ function Resolve-NetPath
 {
     <#
     .SYNOPSIS
-    OBSOLETE. Will be removed in a future version of Carbon.
+    OBSOLETE. Will be removed in a future major version of Carbon.
     
     .DESCRIPTION
-    OBSOLETE. Will be removed in a future version of Carbon.
+    OBSOLETE. Will be removed in a future major version of Carbon.
     
     .EXAMPLE
-    Write-Error 'OBSOLETE. Will be removed in a future version of Carbon.'
+    Write-Error 'OBSOLETE. Will be removed in a future major version of Carbon.'
     
     Demonstates that `Resolve-NetPath` is obsolete and you shouldn't use it.
     #>
@@ -30,7 +30,7 @@ function Resolve-NetPath
     param(
     )
 
-    Write-Warning ('Resolve-NetPath is obsolete and will be removed in a future version of Carbon. Do not use.')
+    Write-Warning ('Resolve-NetPath is obsolete and will be removed in a future major version of Carbon. Do not use.')
     
     $netCmd = Get-Command -CommandType Application -Name net.exe* |
                 Where-Object { $_.Name -eq 'net.exe' }

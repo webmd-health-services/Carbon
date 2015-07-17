@@ -57,12 +57,12 @@ function Install-User
         [Parameter(Mandatory=$true,ParameterSetName='WithUserNameAndPassword')]
         [ValidateLength(1,20)]
         [string]
-        # OBSOLETE. The `UserName` parameter will be removed from a future major version of Carbon. Use the `Credential` parameter instead.
+        # OBSOLETE. The `UserName` parameter will be removed in a future major version of Carbon. Use the `Credential` parameter instead.
         $UserName,
         
         [Parameter(Mandatory=$true,ParameterSetName='WithUserNameAndPassword')]
         [string]
-        # OBSOLETE. The `Password` parameter will be removed from a future major version of Carbon. Use the `Credential` parameter instead.
+        # OBSOLETE. The `Password` parameter will be removed in a future major version of Carbon. Use the `Credential` parameter instead.
         $Password,
 
         [Parameter(Mandatory=$true,ParameterSetName='WithCredential')]
@@ -120,7 +120,7 @@ function Install-User
 
         if( $PSCmdlet.ParameterSetName -eq 'WithUserNameAndPassword' )
         {
-            Write-Warning ('`Install-User` function''s `UserName` and `Password` parameters are obsolete and will be removed from a future version of Carbon. Please use the `Credential` parameter instead.')
+            Write-Warning ('Install-User function''s `UserName` and `Password` parameters are obsolete and will be removed in a future version of Carbon. Please use the `Credential` parameter instead.')
             $user.SetPassword( $Password )
         }
         else

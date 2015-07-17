@@ -16,10 +16,10 @@ function Complete-Job
 {
     <#
     .SYNOPSIS
-    OBSOLETE. Use PowerShell's `Wait-Job` cmdlet instead.
+    OBSOLETE. Use PowerShell's `Wait-Job` cmdlet instead. Will be removed in a future major version of Carbon.
 
     .DESCRIPTION
-    OBSOLETE. Use PowerShell's `Wait-Job` cmdlet instead.
+    OBSOLETE. Use PowerShell's `Wait-Job` cmdlet instead. Will be removed in a future major version of Carbon.
 
     .EXAMPLE
     Get-Job | Wait-Job
@@ -40,7 +40,7 @@ function Complete-Job
         $IntervalSeconds = 1
     )
 
-    Write-Warning ('Complete-Job is obsolete and will be removed from a future major version of Carbon. Use PowerShell''s `Wait-Job` cmdlet instead.')
+    Write-Warning ('Complete-Job is obsolete and will be removed in a future major version of Carbon. Use PowerShell''s `Wait-Job` cmdlet instead.')
     
     $errorAction = 'Continue'
     $params = $PSBoundParameters

@@ -35,7 +35,7 @@ function Invoke-AppCmd
     
     Set-StrictMode -Version 'Latest'
 
-    Write-Warning ('Invoke-AppCmd is obsolete and will be removed from a future version of Carbon. Use Carbon''s IIS functions, or `Get-IisConfigurationSection` to get `ConfigurationElement` objects to manipulate using the `Microsoft.Web.Administration` API.')
+    Write-Warning ('Invoke-AppCmd is obsolete and will be removed in a future major version of Carbon. Use Carbon''s IIS functions, or `Get-IisConfigurationSection` to get `ConfigurationElement` objects to manipulate using the `Microsoft.Web.Administration` API.')
 
     Write-Verbose ($AppCmdArgs -join " ")
     & (Join-Path $env:SystemRoot 'System32\inetsrv\appcmd.exe') $AppCmdArgs
