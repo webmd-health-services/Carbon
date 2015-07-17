@@ -90,6 +90,7 @@ We've added parameter validation to some functions. This shouldn't impact anybod
  * [Clear-DscLocalResourceCache](http://get-carbon.org/help/Clear-DscLocalResourceCache.html) clears the local LCM's DSC resource. This makes developing resources easier.
  * [Clear-MofAuthoringMetadata](http://get-carbon.org/help/Clear-MofAuthoringMetadata.html) removes authoring metadata from .mof files.
  * [Copy-DscResource](http://get-carbon.org/help/Copy-DscResource.html) copies DSC resources (ZIP files, MSI archives, MOF files, etc.), including timestamps, checksums, and copying only changed files.
+ * [ConvertTo-SecurityIdentifer](http://get-carbon.org/help/ConvertTo-SecurityIdentifer.html) converts a binary, string, or `System.Security.Principal.SecurityIdentifier` object into a `System.Security.Principal.SecurityIdentifier` object.
  * [Get-DscError](http://get-carbon.org/help/Get-DscError.html) gets any DSC errors that were written to a computer's DSC event log.
  * [Get-DscWinEvent](http://get-carbon.org/help/Get-DscWinEvent.html) gets DSC events that were written to a computer's DSC event log.
  * [Get-FileSharePermission](http://get-carbon.org/help/Get-FileSharePermission.ps1) gets the sharing permissions on a file/SMB share (*not* the NTFS file system permissions).
@@ -206,6 +207,7 @@ The following functions were re-written to use the `System.DirectoryServices.Acc
     * Added `PasswordExpires` switch for creating accounts with passwords that expire.
     * Added `UserCannotChangePassword` to prevent user from changing his password.
  * [Remove-SslCertificateBinding](http://get-carbon.org/help/Remove-SslCertificateBinding.html) has better error handling.
+ * Added `SID` parameter to [Resolve-IdentityName](http://get-carbon.org/help/Resolve-IdentityName.html) to resolve a SID into its identity name.
  * [Set-HostsEntry's](http://get-carbon.org/help/Set-HostsEntry.html) `IPAddress` parameter is now a `System.Net.IPAddress` object. It used to be a string validated with a regular expression.
  * [Test-Identity](http://get-carbon.org/help/Test-Identity.html) now returns a `Carbon.Identity` object if the identity exists *and* you use the `-PassThru` switch. It used to return the identity's SID. Update scripts to use the `FullName` property to get the old return value, e.g. `Test-Identity -Name $userName -PassThru | Select-Object -Expand 'FullName'`.
  * [Test-OSIs32Bit](http://get-carbon.org/help/Test-OSIs32Bit.html) now uses the Environment class's new [Is64BitOperatingSystem](http://msdn.microsoft.com/en-us/library/system.environment.is64bitoperatingsystem.aspx) property.
@@ -290,6 +292,8 @@ The following functions were re-written to use the `System.DirectoryServices.Acc
  * [Get-FileSharePermission](http://get-carbon.org/help/Get-FileSharePermission.ps1) gets the sharing permissions on a file/SMB share (*not* the NTFS file system permissions).
  * Created [Get-FileShare](http://get-carbon.org/help/Get-FileSharePermission.ps1) function. It uses WMI to get `Win32_Share` objects for the file shares installed on the local computer.
  * Renamed `Install-SmbShare` to [Install-FileShare](http://get-carbon.org/help/Install-FileShare.html), with a backwards-compatible alias in place.
+ * Added `SID` parameter to [Resolve-IdentityName](http://get-carbon.org/help/Resolve-IdentityName.html) to resolve a SID into its identity name.
+ * Created [ConvertTo-SecurityIdentifer](http://get-carbon.org/help/ConvertTo-SecurityIdentifer.html) function to convert a binary, string, or `System.Security.Principal.SecurityIdentifier` object into a `System.Security.Principal.SecurityIdentifier` object.
  
 # 1.9.0 (8 November 2014)
 

@@ -55,3 +55,18 @@ function Test-ShouldResolveDotAccounts
         Assert-Equal ('{0}\{1}' -f $env:COMPUTERNAME,$user.SamAccountName) $id
     }
 }
+
+function Test-ShouldResolveBySid
+{
+    $id = Resolve-Identity -Name 'Administrators'
+    Assert-NotNull $id
+    $id = Resolve-IdentityName -Sid $id.Sid.ToString()
+    Assert-Equal 'BUILTIN\Administrators' $id
+}
+
+function Test-ShouldResolveByUnknownSid
+{
+    $id = Resolve-IdentityName -SID 'S-1-5-21-2678556459-1010642102-471947008-1017'
+    Assert-Equal $id 'S-1-5-21-2678556459-1010642102-471947008-1017'
+    Assert-NoError
+}

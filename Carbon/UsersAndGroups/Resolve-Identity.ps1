@@ -46,6 +46,15 @@ function Resolve-Identity
     .LINK
     http://msdn.microsoft.com/en-us/library/windows/desktop/aa379601.aspx
     
+    .LINK
+    ConvertTo-SecurityIdentifier
+
+    .LINK
+    Resolve-IdentityName
+
+    .LINK
+    Test-Identity
+
     .OUTPUTS
     Carbon.Identity.
     
@@ -86,25 +95,9 @@ function Resolve-Identity
 
     if( $PSCmdlet.ParameterSetName -eq 'BySid' )
     {
-        try
+        $SID = ConvertTo-SecurityIdentifier -SID $SID
+        if( -not $SID )
         {
-            if( $SID -is [string] )
-            {
-                $SID = New-Object 'Security.Principal.SecurityIdentifier' $SID
-            }
-            elseif( $SID -is [byte[]] )
-            {
-                $SID = New-Object 'Security.Principal.SecurityIdentifier' $SID,0
-            }
-            elseif( $SID -isnot [Security.Principal.SecurityIdentifier] )
-            {
-                Write-Error ('Invalid SID. The `SID` parameter accepts a `System.Security.Principal.SecurityIdentifier` object, a SID in SDDL form as a `string`, or a SID in binary form as byte array. You passed a ''{0}''.' -f $SID.GetType())
-                return
-            }
-        }
-        catch
-        {
-            Write-Error ('Exception converting SID parameter to a `SecurityIdentifier` object. This usually means you passed an invalid SID in SDDL form (as a string) or an invalid SID in binary form (as a byte array): {0}' -f $_.Exception.Message)
             return
         }
 
