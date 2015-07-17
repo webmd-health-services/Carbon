@@ -68,7 +68,7 @@ function Test-ShouldGetDscError
     Assert-NotNull $dscErrorsBefore
     Assert-Equal ($dscErrors.Count - 1) $dscErrorsBefore.Count
 
-    Start-Sleep -Milliseconds 400
+    Start-Sleep -Milliseconds 800
     $Error.Clear()
     $dscErrors = Get-DscError -StartTime (Get-Date)
     Assert-NoError
