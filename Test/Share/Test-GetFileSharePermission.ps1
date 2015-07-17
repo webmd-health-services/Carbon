@@ -14,34 +14,56 @@
 
 & (Join-Path -Path $PSScriptRoot -ChildPath '..\Import-CarbonForTest.ps1' -Resolve)
 
-function Test-ShouldGetPermissions
+$shareName = 'CarbonGetFileSharePermission'
+$sharePath = $null
+$reader = 'CarbonFileShareReadr'
+$writer = 'CarbonFileShareWritr'
+$admin  = 'CarbonFileShareAdmin'
+
+function Start-TestFixture
 {
-    $tempDir = New-TempDirectory -Prefix $PSCommandPath
-    $reader = 'CarbonFileShareReadr'
-    $writer = 'CarbonFileShareWritr'
-    $admin  = 'CarbonFileShareAdmin'
+    $sharePath = New-TempDirectory -Prefix $PSCommandPath
     foreach( $user in ($reader,$writer,$admin) )
     {
         Install-User -Credential (New-Credential -UserName $user -Password '!m33trequ!r3m3n+s') -Description 'Carbon test user.'
     }
 
-    $shareName = 'CarbonGetFileSharePermission'
-    Install-SmbShare -Path $tempDir -Name $shareName -ReadAccess $reader -ChangeAccess $writer -FullAccess $admin -Description 'Share for testing Carbon''s Get-FileSharePermission.'
+    Install-SmbShare -Path $sharePath -Name $shareName -ReadAccess $reader -ChangeAccess $writer -FullAccess $admin -Description 'Share for testing Carbon''s Get-FileSharePermission.'
+}
 
-    try
+function Stop-TestFixture
+{
+    foreach( $user in ($reader,$writer,$admin) )
     {
-        $perms = Get-FileSharePermission -Name $shareName
-        Assert-Is $perms ([object[]])
-        Assert-Equal 3 $perms.Count
+        Uninstall-User $user
+    }
     
-        Assert-FileSharePermission $perms $reader ([Carbon.Security.ShareRights]::Read -bor [Carbon.Security.ShareRights]::Synchronize)
-        Assert-FileSharePermission $perms $writer ([Carbon.Security.ShareRights]::Change -bor [Carbon.Security.ShareRights]::Synchronize)
-        Assert-FileSharePermission $perms $admin ([Carbon.Security.ShareRights]::FullControl -bor [Carbon.Security.ShareRights]::Synchronize)
-    }
-    finally
-    {
-        Get-FileShare -Name $shareName | ForEach-Object { $_.Delete() }
-    }
+    Uninstall-FileShare -Name $shareName
+}
+
+function Test-ShouldGetPermissions
+{
+    $perms = Get-FileSharePermission -Name $shareName
+    Assert-Is $perms ([object[]])
+    Assert-Equal 3 $perms.Count
+    
+    Assert-FileSharePermission $perms $reader ([Carbon.Security.ShareRights]::Read)
+    Assert-FileSharePermission $perms $writer ([Carbon.Security.ShareRights]::Change)
+    Assert-FileSharePermission $perms $admin ([Carbon.Security.ShareRights]::FullControl)
+}
+
+function Test-GetUserPermission
+{
+    $perm = Get-FileSharePermission -Name $shareName -Identity $reader
+    Assert-Is $perm ([Carbon.Security.ShareAccessRule])
+    Assert-FileSharePermission $perm $reader ([Carbon.Security.ShareRights]::Read)
+}
+
+function Test-GetUserPermissionWithWildcard
+{
+    $perm = Get-FileSharePermission -Name $shareName -Identity '*Writr*'
+    Assert-Is $perm ([Carbon.Security.ShareAccessRule])
+    Assert-FileSharePermission $perms $writer ([Carbon.Security.ShareRights]::Change)
 }
 
 function Assert-FileSharePermission

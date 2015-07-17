@@ -34,6 +34,8 @@ function Get-FileSharePermission
 
     If the share doesn't exist, nothing is returned and an error is written.
 
+    Use the `Identity` parameter to get a specific user/group's permissions. Wildcards are supported.
+
     `Get-FileSharePermission` was added in Carbon 2.0.
 
     .LINK
@@ -59,7 +61,11 @@ function Get-FileSharePermission
         [Parameter(Mandatory=$true)]
         [string]
         # The share's name.
-        $Name
+        $Name,
+
+        [string]
+        # Get permissions for a specific identity. Wildcards supported.
+        $Identity
     )
 
     Set-StrictMode -Version 'Latest'
@@ -69,24 +75,53 @@ function Get-FileSharePermission
     {
         return
     }
-  
-    $acl = $null  
-    $objShareSec = Get-WmiObject -Class 'Win32_LogicalShareSecuritySetting' -Filter "name='$Name'"
 
-    $SD = $objShareSec.GetSecurityDescriptor().Descriptor    
+    if( $Identity )
+    {
+        if( -not [System.Management.Automation.WildcardPattern]::ContainsWildcardCharacters( $Identity ) )
+        {
+            $Identity = Resolve-IdentityName -Name $Identity -ErrorAction $ErrorActionPreference
+            if( -not $Identity )
+            {
+                return
+            }
+        }
+    }
+        
+    $acl = $null  
+    $lsss = Get-WmiObject -Class 'Win32_LogicalShareSecuritySetting' -Filter "name='$Name'"
+
+    $result = $lsss.GetSecurityDescriptor()
+    if( $result.ReturnValue )
+    {
+        $win32lsssErrors = @{
+                                [uint32]2 = 'Access Denied';
+                                [uint32]8 = 'Unknown Failure';
+                                [uint32]9 = 'Privilege Missing';
+                                [uint32]21 = 'Invalid Parameter';
+                            }
+        Write-Error ('Failed to get ''{0}'' share''s security descriptor. WMI returned error code {1} which means: {2}' -f $Name,$result.ReturnValue,$win32lsssErrors[$result.ReturnValue])
+        return
+    }
+
+    $sd = $result.Descriptor
     foreach($ace in $SD.DACL)
     {   
-        
-        $identity = [Carbon.Identity]::FindBySid( $ace.Trustee.SIDString )
-        if( $identity )
+        [Carbon.Identity]$rId = [Carbon.Identity]::FindBySid( $ace.Trustee.SIDString )
+        if( $Identity -and  (-not $rId -or $rId.FullName -notlike $Identity) )
         {
-            $identity = New-Object 'Security.Principal.NTAccount' $identity.FullName
+            continue
+        }
+
+        if( $rId )
+        {
+            $aceId = New-Object 'Security.Principal.NTAccount' $rId.FullName
         }
         else
         {
-            $identity = New-Object 'Security.Principal.SecurityIdentifier' $ace.Trustee.SIDString
+            $aceId = New-Object 'Security.Principal.SecurityIdentifier' $ace.Trustee.SIDString
         }
 
-        New-Object 'Carbon.Security.ShareAccessRule' $identity, $ace.AccessMask, $ace.AceType
+        New-Object 'Carbon.Security.ShareAccessRule' $aceId, $ace.AccessMask, $ace.AceType
     } 
 }
