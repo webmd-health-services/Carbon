@@ -24,9 +24,16 @@ function Stop-Test
 function Test-ShouldGetAllGroups
 {
     $groups = Get-Group
-    Assert-NotNull $groups
-    Assert-GreaterThan $groups.Length 0
-    $groups | ForEach-Object { Assert-Is $_ ([DirectoryServices.AccountManagement.GroupPrincipal]) }
+    try
+    {
+        Assert-NotNull $groups
+        Assert-GreaterThan $groups.Length 0
+        $groups | ForEach-Object { Assert-Is $_ ([DirectoryServices.AccountManagement.GroupPrincipal]) }
+    }
+    finally
+    {
+        $groups | ForEach-Object { $_.Dispose() }
+    }
 }
 
 function Test-ShouldGetOneGroup
@@ -34,8 +41,25 @@ function Test-ShouldGetOneGroup
     Get-Group |
         ForEach-Object { 
             $expectedGroup = $_
-            $group = Get-Group -Name $expectedGroup.Name
-            Assert-Equal $expectedGroup.Sid $group.Sid
+            try
+            {
+                $group = Get-Group -Name $expectedGroup.Name
+                try
+                {
+                    Assert-Equal $expectedGroup.Sid $group.Sid
+                }
+                finally
+                {
+                    if( $group )
+                    {
+                        $group.Dispose()
+                    }
+                }
+            }
+            finally
+            {
+                $expectedGroup.Dispose()
+            }
         }
 }
 

@@ -22,10 +22,24 @@ function Start-TestFixture
 function Start-Test
 {
     $users = Get-User
-    Remove-Group
-    Install-Group -Name $GroupName -Description "Group for testing the Remvoe-GroupMember Carbon function." -Member $users
-    $group = Get-Group -Name $GroupName
-    Assert-Equal $users.Count $group.Members.Count
+    try
+    {
+        Remove-Group
+        Install-Group -Name $GroupName -Description "Group for testing the Remvoe-GroupMember Carbon function." -Member $users
+        $group = Get-Group -Name $GroupName
+        try
+        {
+            Assert-Equal $users.Count $group.Members.Count
+        }
+        finally
+        {
+            $group.Dispose()
+        }
+    }
+    finally
+    {
+        $users | ForEach-Object { $_.Dispose() }
+    }
 }
 
 function Stop-Test
@@ -36,33 +50,72 @@ function Stop-Test
 function Remove-Group
 {
     $group = Get-Group -Name $GroupName -ErrorAction Ignore
-    if( $group -ne $null )
+    try
     {
-        net localgroup `"$GroupName`" /delete
+        if( $group -ne $null )
+        {
+            net localgroup `"$GroupName`" /delete
+        }
+    }
+    finally
+    {
+        if( $group )
+        {
+            $group.Dispose()
+        }
     }
 }
 
 function Test-ShouldRemoveIndividualMembers
 {
-    Get-User | ForEach-Object { Remove-GroupMember -Name $GroupName -Member $_.SamAccountName }
+    Get-User | ForEach-Object { Remove-GroupMember -Name $GroupName -Member $_.SamAccountName ; $_.Dispose() }
     Assert-NoError
     $group = Get-Group -Name $GroupName
-    Assert-Equal 0 $group.Members.Count
+    try
+    {
+        Assert-Equal 0 $group.Members.Count
+    }
+    finally
+    {
+        $group.Dispose()
+    }
 }
 
 function Test-ShouldRemoveBulkMembers
 {
     $users = Get-User
-    Remove-GroupMember -Name $GroupName -Member $users
-    Assert-NoError
+    try
+    {
+        Remove-GroupMember -Name $GroupName -Member $users
+        Assert-NoError
+    }
+    finally
+    {
+        $users | ForEach-Object { $_.Dispose() }
+    }
+
     $group = Get-Group -Name $GroupName
-    Assert-Equal 0 $group.Members.Count
+    try
+    {
+        Assert-Equal 0 $group.Members.Count
+    }
+    finally
+    {
+        $group.Dispose()
+    }
 }
 
 function Test-ShouldSupportWhatIf
 {
     $users = Get-User
-    $users | ForEach-Object { Remove-GroupMember -Name $GroupName -Member $_.SamAccountName -WhatIf }
+    $users | ForEach-Object { Remove-GroupMember -Name $GroupName -Member $_.SamAccountName -WhatIf; $_.Dispose() }
     $group = Get-Group -Name $GroupName
-    Assert-Equal $users.Count $group.Members.Count
+    try
+    {
+        Assert-Equal $users.Count $group.Members.Count
+    }
+    finally
+    {
+        $group.Dispose()
+    }
 }

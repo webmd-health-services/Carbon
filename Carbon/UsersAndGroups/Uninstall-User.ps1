@@ -52,9 +52,16 @@ function Uninstall-User
     if( Test-User -Username $username )
     {
         $user = Get-User -Username $Username
-        if( $pscmdlet.ShouldProcess( $Username, "remove local user" ) )
+        try
         {
-            $user.Delete()
+            if( $pscmdlet.ShouldProcess( $Username, "remove local user" ) )
+            {
+                $user.Delete()
+            }
+        }
+        finally
+        {
+            $user.Dispose()
         }
     }
 }

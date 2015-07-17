@@ -50,12 +50,20 @@ function Test-Group
 
     $ctx = New-Object 'DirectoryServices.AccountManagement.PrincipalContext' ([DirectoryServices.AccountManagement.ContextType]::Machine)
     $group = [DirectoryServices.AccountManagement.GroupPrincipal]::FindByIdentity( $ctx, $Name )
-    if( $group )
+    try
     {
-        return $true
+        if( $group )
+        {
+            $group.Dispose()
+            return $true
+        }
+        else
+        {
+            return $false
+        }
     }
-    else
+    finally
     {
-        return $false
+        $ctx.Dispose()
     }
 }

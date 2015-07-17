@@ -24,9 +24,16 @@ function Stop-Test
 function Test-ShouldGetAllUsers
 {
     $users = Get-User
-    Assert-NotNull $users
-    Assert-GreaterThan $users.Length 0
-    $users | ForEach-Object { Assert-is $_ ([DirectoryServices.AccountManagement.UserPrincipal]) }
+    try
+    {
+        Assert-NotNull $users
+        Assert-GreaterThan $users.Length 0
+        $users | ForEach-Object { Assert-is $_ ([DirectoryServices.AccountManagement.UserPrincipal]) }
+    }
+    finally
+    {
+        $users | ForEach-Object { $_.Dispose() }
+    }
 }
 
 function Test-ShouldGetOneUser
@@ -34,8 +41,25 @@ function Test-ShouldGetOneUser
     Get-User |
         ForEach-Object { 
             $expectedUser = $_
-            $user = Get-User -Username $expectedUser.SamAccountName
-            Assert-Equal $expectedUser.Sid $user.Sid
+            try
+            {
+                $user = Get-User -Username $expectedUser.SamAccountName
+                try
+                {
+                    Assert-Equal $expectedUser.Sid $user.Sid
+                }
+                finally
+                {
+                    if( $user )
+                    {
+                        $user.Dispose()
+                    }
+                }
+            }
+            finally
+            {
+                $expectedUser.Dispose()
+            }
         }
 }
 

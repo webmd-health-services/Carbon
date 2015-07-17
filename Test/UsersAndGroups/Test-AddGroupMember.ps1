@@ -32,9 +32,16 @@ function Stop-Test
 function Remove-Group
 {
     $group = Get-Group
-    if( $group -ne $null )
+    try
     {
-        net localgroup `"$GroupName`" /delete
+        if( $group -ne $null )
+        {
+            net localgroup `"$GroupName`" /delete
+        }
+    }
+    finally
+    {
+        $group.Dispose()
     }
 }
 
@@ -141,10 +148,17 @@ function Test-ShouldNotAddNonExistentMember
 {
     $Error.Clear()
     $groupBefore = Get-Group -Name $GroupName
-    Add-GroupMember -Name $GroupName -Member 'FJFDAFJ' -ErrorAction SilentlyContinue
-    Assert-Equal 1 $Error.Count
-    $groupAfter = Get-Group -Name $GroupName
-    Assert-Equal $groupBefore.Members.Count $groupAfter.Members.Count
+    try
+    {
+        Add-GroupMember -Name $GroupName -Member 'FJFDAFJ' -ErrorAction SilentlyContinue
+        Assert-Equal 1 $Error.Count
+        $groupAfter = Get-Group -Name $GroupName
+        Assert-Equal $groupBefore.Members.Count $groupAfter.Members.Count
+    }
+    finally
+    {
+        $groupBefore.Dispose()
+    }
 }
 
 function Assert-MembersInGroup($Members)
@@ -154,12 +168,20 @@ function Assert-MembersInGroup($Members)
     {
         return
     }
-    Assert-NotNull $group 'Group not created.'
-    $Members | 
-        ForEach-Object { Resolve-Identity -Name $_ } |
-        ForEach-Object { 
-            $identity = $_
-            $member = $group.Members | Where-Object { $_.Sid -eq $identity.Sid }
-            Assert-NotNull $member ('Member ''{0}'' not a member of group ''{1}''' -f $identity.FullName,$group.Name)
-        }
+
+    try
+    {
+        Assert-NotNull $group 'Group not created.'
+        $Members | 
+            ForEach-Object { Resolve-Identity -Name $_ } |
+            ForEach-Object { 
+                $identity = $_
+                $member = $group.Members | Where-Object { $_.Sid -eq $identity.Sid }
+                Assert-NotNull $member ('Member ''{0}'' not a member of group ''{1}''' -f $identity.FullName,$group.Name)
+            }
+    }
+    finally
+    {
+        $group.Dispose()
+    }
 }

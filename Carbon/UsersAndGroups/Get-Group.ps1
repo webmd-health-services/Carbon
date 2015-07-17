@@ -19,7 +19,9 @@ function Get-Group
     Gets *local* groups.
 
     .DESCRIPTION
-    Gets all *local* groups or a specific group by its name.
+    `Get-Group` gets all *local* groups or a specific group by its name.
+
+    The objects returned, `DirectoryServices.AccountManagement.GroupPrincipal`, use external resources, which means they don't clean up propertly when garbage collected, resulting in memory leaks. You should call `Dispose()` on the objects you receieve from this function when you're done using them so these external resources can be cleaned up correctly.
 
     `Get-Group` is new in Carbon 2.0.
 
@@ -55,8 +57,15 @@ function Get-Group
         $group = [DirectoryServices.AccountManagement.GroupPrincipal]::FindByIdentity( $ctx, $Name )
         if( -not $group )
         {
-            Write-Error ('Local group ''{0}'' not found.' -f $Name) -ErrorAction:$ErrorActionPreference
-            return
+            try
+            {
+                Write-Error ('Local group ''{0}'' not found.' -f $Name) -ErrorAction:$ErrorActionPreference
+                return
+            }
+            finally
+            {
+                $ctx.Dispose()
+            }
         }
         return $group
     }
@@ -64,6 +73,14 @@ function Get-Group
     {
         $query = New-Object 'DirectoryServices.AccountManagement.GroupPrincipal' $ctx
         $searcher = New-Object 'DirectoryServices.AccountManagement.PrincipalSearcher' $query
-        $searcher.FindAll() 
+        try
+        {
+            $searcher.FindAll() 
+        }
+        finally
+        {
+            $searcher.Dispose()
+            $query.Dispose()
+        }
     }
 }

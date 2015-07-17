@@ -19,7 +19,9 @@ function Get-User
     Gets *local* users.
 
     .DESCRIPTION
-    Gets all *local* users or a specific user by its username.
+    `Get-User` gets all *local* users. Use the `UserName` parameter to get  a specific user by its username.
+
+    The objects returned by `Get-User` are instances of `System.DirectoryServices.AccountManagement.UserPrincipal`. These objects use external resources, which, if they are disposed of correctly, will cause memory leaks. When you're done using the objects returne by `Get-User`, call `Dispose()` on each one to clean up its external resources.
 
     `Get-User` is new in Carbon 2.0.
 
@@ -51,7 +53,7 @@ function Get-User
         [ValidateLength(1,20)]
         [string]
         # The username for the user.
-        $Username 
+        $UserName 
     )
 
     Set-StrictMode -Version 'Latest'
@@ -62,8 +64,15 @@ function Get-User
         $user = [DirectoryServices.AccountManagement.UserPrincipal]::FindByIdentity( $ctx, $Username )
         if( -not $user )
         {
-            Write-Error ('Local user ''{0}'' not found.' -f $Username) -ErrorAction:$ErrorActionPreference
-            return
+            try
+            {
+                Write-Error ('Local user ''{0}'' not found.' -f $Username) -ErrorAction:$ErrorActionPreference
+                return
+            }
+            finally
+            {
+                $ctx.Dispose()
+            }
         }
         return $user
     }
@@ -71,6 +80,14 @@ function Get-User
     {
         $query = New-Object 'DirectoryServices.AccountManagement.UserPrincipal' $ctx
         $searcher = New-Object 'DirectoryServices.AccountManagement.PrincipalSearcher' $query
-        $searcher.FindAll() 
+        try
+        {
+            $searcher.FindAll() 
+        }
+        finally
+        {
+            $searcher.Dispose()
+            $query.Dispose()
+        }
     }
 }

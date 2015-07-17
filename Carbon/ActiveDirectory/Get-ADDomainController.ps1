@@ -49,6 +49,7 @@ function Get-ADDomainController
     
     if( $Domain )
     {
+        $principalContext = $null
         try
         {
             Add-Type -AssemblyName System.DirectoryServices.AccountManagement
@@ -65,10 +66,24 @@ function Get-ADDomainController
             Write-Error ("Unable to find domain controller for domain '{0}': {1}: {2}" -f $Domain,$firstException.GetType().FullName,$firstException.Message)
             return $null
         }
+        finally
+        {
+            if( $principalContext )
+            {
+                $principalContext.Dispose()
+            }
+        }
     }
     else
     {
         $root = New-Object DirectoryServices.DirectoryEntry "LDAP://RootDSE"
-        return  $root.Properties["dnsHostName"][0].ToString();
+        try
+        {
+            return  $root.Properties["dnsHostName"][0].ToString();
+        }
+        finally
+        {
+            $root.Dispose()
+        }
     }
 }

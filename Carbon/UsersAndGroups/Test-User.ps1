@@ -57,6 +57,13 @@ function Test-User
     }
     else
     {
-        return $false
+        try
+        {
+            return $false
+        }
+        finally
+        {
+            $ctx.Dispose()
+        }
     }
 }

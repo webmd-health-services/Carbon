@@ -72,13 +72,20 @@ function Test-ShouldFindUserWithDotDomain
 {
     $users = Get-User
     Assert-NotNull $users
-    $foundAUser = $false
-    foreach( $user in $users )
+    try
     {
-        Assert-True (Test-Identity -Name ('.\{0}' -f $user.SamAccountName))
-        $foundAUser = $true
+        $foundAUser = $false
+        foreach( $user in $users )
+        {
+            Assert-True (Test-Identity -Name ('.\{0}' -f $user.SamAccountName))
+            $foundAUser = $true
+        }
+        Assert-True $foundAUser
     }
-    Assert-True $foundAUser
+    finally
+    {
+        $users | ForEach-Object { $_.Dispose() }
+    }
 }
 
 function Test-ShouldFindLocalSystem

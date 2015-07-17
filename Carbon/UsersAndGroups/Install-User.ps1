@@ -19,7 +19,9 @@ function Install-User
     Installs a *local* user account.
 
     .DESCRIPTION
-    Creates a new *local* user account.  If the account already exists, updates it.  Returns the user if `-PassThru` switch is used.
+    `Install-User` creates a new *local* user account, or updates an existing *local* user account. 
+    
+    Returns the user if `-PassThru` switch is used. The object returned, an instance of `System.DirectoryServices.AccountManagement.UserPrincipal`, uses external resources, which means it can leak memory when garbage collected. When you're done using the user object you get, call its `Dispose()` method so its external resources are cleaned up properly.
 
     The `UserCannotChangePassword` and `PasswordExpires` switches were added in Carbon 2.0.
 
@@ -100,39 +102,49 @@ function Install-User
 
     $ctx = New-Object 'DirectoryServices.AccountManagement.PrincipalContext' ([DirectoryServices.AccountManagement.ContextType]::Machine)
     $user = [DirectoryServices.AccountManagement.UserPrincipal]::FindByIdentity( $ctx, $UserName )
-    $operation = 'update'
-    if( -not $user )
+    try
     {
-        $operation = 'create'
-        $user = New-Object 'DirectoryServices.AccountManagement.UserPrincipal' $ctx
-        $creating = $true
+        $operation = 'update'
+        if( -not $user )
+        {
+            $operation = 'create'
+            $user = New-Object 'DirectoryServices.AccountManagement.UserPrincipal' $ctx
+            $creating = $true
+        }
+
+        $user.SamAccountName = $UserName
+        $user.DisplayName = $FullName
+        $user.Description = $Description
+        $user.UserCannotChangePassword = $UserCannotChangePassword
+        $user.PasswordNeverExpires = -not $PasswordExpires
+
+        if( $PSCmdlet.ParameterSetName -eq 'WithUserNameAndPassword' )
+        {
+            Write-Warning ('`Install-User` function''s `UserName` and `Password` parameters are obsolete and will be removed from a future version of Carbon. Please use the `Credential` parameter instead.')
+            $user.SetPassword( $Password )
+        }
+        else
+        {
+            $user.SetPassword( $Credential.GetNetworkCredential().Password )
+        }
+
+
+        if( $PSCmdlet.ShouldProcess( $Username, "$operation local user" ) )
+        {
+            $user.Save()
+        }
+
+        if( $PassThru )
+        {
+            return $user
+        }
     }
-
-    $user.SamAccountName = $UserName
-    $user.DisplayName = $FullName
-    $user.Description = $Description
-    $user.UserCannotChangePassword = $UserCannotChangePassword
-    $user.PasswordNeverExpires = -not $PasswordExpires
-
-    if( $PSCmdlet.ParameterSetName -eq 'WithUserNameAndPassword' )
+    finally
     {
-        Write-Warning ('`Install-User` function''s `UserName` and `Password` parameters are obsolete and will be removed from a future version of Carbon. Please use the `Credential` parameter instead.')
-        $user.SetPassword( $Password )
+        if( -not $PassThru )
+        {
+            $user.Dispose()
+            $ctx.Dispose()
+        }
     }
-    else
-    {
-        $user.SetPassword( $Credential.GetNetworkCredential().Password )
-    }
-
-
-    if( $PSCmdlet.ShouldProcess( $Username, "$operation local user" ) )
-    {
-        $user.Save()
-    }
-
-    if( $PassThru )
-    {
-        return $user
-    }
-
 }

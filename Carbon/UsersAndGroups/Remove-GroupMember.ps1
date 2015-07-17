@@ -59,38 +59,55 @@ function Remove-GroupMember
         return
     }
     
-    $changesMade = $false
-    $Member | 
-        ForEach-Object { Resolve-Identity -Name $_ } |
-        ForEach-Object {
-            $identity = $_
-            $identityCtx = Get-IdentityPrincipalContext -Identity $_
-
-            $isMember = $group.Members.Contains( $identityCtx, 'Sid', $identity.Sid.Value )
-            if( $isMember -and $pscmdlet.ShouldProcess( $group.Name, ("remove member {0}" -f $identity.FullName) ) )
-            {
-            	try
-            	{
-                    [void]$group.Members.Remove( $identityCtx, 'Sid', $identity.Sid.Value )
-                    $changesMade = $true
-                }
-                catch
+    try
+    {
+        $changesMade = $false
+        $Member | 
+            ForEach-Object { Resolve-Identity -Name $_ } |
+            ForEach-Object {
+                $identity = $_
+                [DirectoryServices.AccountManagement.PrincipalContext]$identityCtx = Get-IdentityPrincipalContext -Identity $_
+                if( -not $identityCtx )
                 {
-                    Write-Error ('Failed to remove ''{0}'' to group ''{1}'': {2}.' -f $identity,$Name,$_)
+                    return
+                }
+
+                try
+                {
+                    $isMember = $group.Members.Contains( $identityCtx, 'Sid', $identity.Sid.Value )
+                    if( $isMember -and $pscmdlet.ShouldProcess( $group.Name, ("remove member {0}" -f $identity.FullName) ) )
+                    {
+            	        try
+            	        {
+                            [void]$group.Members.Remove( $identityCtx, 'Sid', $identity.Sid.Value )
+                            $changesMade = $true
+                        }
+                        catch
+                        {
+                            Write-Error ('Failed to remove ''{0}'' to group ''{1}'': {2}.' -f $identity,$Name,$_)
+                        }
+                    }
+                }
+                finally
+                {
+                    $identityCtx.Dispose()
                 }
             }
-        }
 
-    if( $changesMade )
+        if( $changesMade )
+        {
+            try
+            {
+                $group.Save()
+            }
+            catch
+            {
+                Write-Error ('Failed to save changes to group ''{0}'': {1}.' -f $Name,$_)
+            }
+        }
+    }
+    finally
     {
-        try
-        {
-            $group.Save()
-			$group.Dispose()
-        }
-        catch
-        {
-            Write-Error ('Failed to save changes to group ''{0}'': {1}.' -f $Name,$_)
-        }
+        $group.Dispose()
     }
 }

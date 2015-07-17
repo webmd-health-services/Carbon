@@ -19,7 +19,9 @@ function Install-Group
     Creates a new local group, or updates the settings for an existing group.
 
     .DESCRIPTION
-    Creates a new group with a description and default set of members.  If a group with the same name already exists, it updates the group's description and adds the given members to it.
+    `Install-Group` creates a local group, or, updates a group that already exists.
+
+    YOu can get a `System.DirectoryServices.AccountManagement.GroupPrincipal` object representing the group returned to you by using the `PassThru` switch. This object implements the `IDisposable` interface, which means it uses external resources that don't get garbage collected. When you're done using the object, make sure you call `Dispose()` to free those resources, otherwise you'll leak memory. All over the place.
 
     .EXAMPLE
     Install-Group -Name TIEFighters -Description 'Users allowed to be TIE fighter pilots.' -Members EMPIRE\Pilots,EMPIRE\DarthVader
@@ -27,6 +29,7 @@ function Install-Group
     If the TIE fighters group doesn't exist, it is created with the given description and default members.  If it already exists, its description is updated and the given members are added to it.
     #>
     [CmdletBinding(SupportsShouldProcess=$true)]
+    [OutputType([DirectoryServices.AccountManagement.GroupPrincipal])]
     param(
         [Parameter(Mandatory=$true)]
         [string]
@@ -43,7 +46,9 @@ function Install-Group
         $Member = @(),
 
         [Switch]
-        # Return the group object.
+        # Return the group as a `System.DirectoryServices.AccountManagement.GroupPrincipal`.
+        #
+        # This object uses external resources that don't get cleaned up by .NET's garbage collector. In order to avoid memory leaks, make sure you call its `Dispose()` method when you're done with it.
         $PassThru
     )
     
@@ -51,6 +56,7 @@ function Install-Group
 
     $ctx = New-Object 'DirectoryServices.AccountManagement.PrincipalContext' ([DirectoryServices.AccountManagement.ContextType]::Machine)
     $group = [DirectoryServices.AccountManagement.GroupPrincipal]::FindByIdentity( $ctx, $Name )
+
     $operation = 'update'
     if( -not $group )
     {
@@ -58,20 +64,32 @@ function Install-Group
         $group = New-Object 'DirectoryServices.AccountManagement.GroupPrincipal' $ctx
     }
 
-    $group.Name = $Name
-    $group.Description = $Description
-
-    if( $PSCmdlet.ShouldProcess( $Name, "$operation local group" ) )
+    try
     {
-        $group.Save()
-        if( $Member )
+        $group.Name = $Name
+        $group.Description = $Description
+
+        if( $PSCmdlet.ShouldProcess( $Name, "$operation local group" ) )
         {
-            Add-GroupMember -Name $Name -Member $Member
+            $group.Save()
+            if( $Member )
+            {
+                Add-GroupMember -Name $Name -Member $Member
+            }
+        }
+    
+        if( $PassThru )
+        {
+            return $group
         }
     }
-    
-    if( $PassThru )
+    finally
     {
-        return $group
+        if( -not $PassThru )
+        {
+            $group.Dispose()
+            $ctx.Dispose()
+        }
+
     }
 }

@@ -24,8 +24,15 @@ function Stop-Test
 function Test-ShouldCheckIfLocalGroupExists
 {
     $groups = Get-Group
-    Assert-NotNull $groups
-    $groups | ForEach-Object { Assert-True (Test-Group -Name $_.Name) }
+    try
+    {
+        Assert-NotNull $groups
+        $groups | ForEach-Object { Assert-True (Test-Group -Name $_.Name) }
+    }
+    finally
+    {
+        $groups | ForEach-Object { $_.Dispose() }
+    }
 }
 
 function Test-ShouldNotFindNonExistentAccount
