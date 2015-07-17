@@ -63,7 +63,7 @@ function Test-GetUserPermissionWithWildcard
 {
     $perm = Get-FileSharePermission -Name $shareName -Identity '*Writr*'
     Assert-Is $perm ([Carbon.Security.ShareAccessRule])
-    Assert-FileSharePermission $perms $writer ([Carbon.Security.ShareRights]::Change)
+    Assert-FileSharePermission $perm $writer ([Carbon.Security.ShareRights]::Change)
 }
 
 function Assert-FileSharePermission
