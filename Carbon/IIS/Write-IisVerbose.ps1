@@ -45,5 +45,5 @@ function Write-IisVerbose
         $SiteName = Join-IisVirtualPath -Path $SiteName -ChildPath $VirtualPath
     }
 
-    Write-Verbose -Message ('[IIS Website] [{0}] {1,-34} {2} -> {3}' -f $SiteName,$Name,$OldValue,$NewValue) -Verbose
+    Write-Verbose -Message ('[IIS Website] [{0}] {1,-34} {2} -> {3}' -f $SiteName,$Name,$OldValue,$NewValue)
 }

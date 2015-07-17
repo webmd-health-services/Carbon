@@ -57,7 +57,7 @@ if( $loadedModule )
                         Where-Object { $_.LastWriteTime -gt $importedAt }
         if( $newFiles )
         {
-            Write-Verbose ('Reloading Carbon module. The following files were modified since {0}:{1} * {2}' -f $importedAt,([Environment]::NewLine),($newFiles -join ('{0} * ' -f ([Environment]::NewLine)))) -Verbose
+            Write-Verbose -Message ('Reloading Carbon module. The following files were modified since {0}:{1} * {2}' -f $importedAt,([Environment]::NewLine),($newFiles -join ('{0} * ' -f ([Environment]::NewLine))))
             $Force = $true
         }
     }
@@ -67,7 +67,7 @@ if( $loadedModule )
     {
         if( -not $Force -and $thisModuleManifest.Version -ne $loadedModule.Version )
         {
-            Write-Verbose ('Reloading Carbon module. Module from {0} at version {1} not equal to module from {2} at version {3}.' -f $loadedModule.ModuleBase,$loadedModule.Version,(Split-Path -Parent -Path $thisModuleManifest.Path),$thisModuleManifest.Version) -Verbose
+            Write-Verbose -Message ('Reloading Carbon module. Module from {0} at version {1} not equal to module from {2} at version {3}.' -f $loadedModule.ModuleBase,$loadedModule.Version,(Split-Path -Parent -Path $thisModuleManifest.Path),$thisModuleManifest.Version)
             $Force = $true
         }
     }
@@ -94,7 +94,7 @@ if( $Force -and $loadedModule )
     Remove-Module -Name 'Carbon' -Verbose:$false -WhatIf:$false
 }
 
-Write-Verbose ('Importing Carbon ({0}).' -f $carbonPsd1Path)
+Write-Verbose -Message ('Importing Carbon ({0}).' -f $carbonPsd1Path)
 Import-Module $carbonPsd1Path -ErrorAction Stop -Verbose:$false @importModuleParams
 
 if( -not (Get-Module -Name 'Carbon' | Get-Member -Name 'ImportedAt') )
