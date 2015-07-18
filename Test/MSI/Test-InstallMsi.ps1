@@ -103,7 +103,20 @@ function Test-ShouldReinstallIfForcedTo
     Install-Msi -Path $carbonTestInstallerActions
     Assert-CarbonTestInstallerInstalled
     $msi = Get-Msi -Path $carbonTestInstallerActions
+
     $installDir = Join-Path ${env:ProgramFiles(x86)} -ChildPath ('{0}\{1}' -f $msi.Manufacturer,$msi.ProductName)
+    $maxTries = 100
+    $tryNum = 0
+    do
+    {
+        if( (Test-Path -Path $installDir -PathType Container) )
+        {
+            break
+        }
+        Start-Sleep -Milliseconds 100
+    }
+    while( $tryNum++ -lt $maxTries )
+
     Assert-DirectoryExists $installDir
     Remove-Item -Path $installDir -Recurse
     Install-Msi -Path $carbonTestInstallerActions -Force
