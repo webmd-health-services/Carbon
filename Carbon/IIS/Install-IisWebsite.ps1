@@ -93,11 +93,21 @@ function Install-IisWebsite
 
         [int]
         # The site's IIS ID. IIS picks one for you automatically if you don't supply one. Must be greater than 0.
+        #
+        # The `SiteID` switch is new in Carbon 2.0.
         $SiteID,
 
         [Switch]
         # Return a `Microsoft.Web.Administration.Site` object for the website.
-        $PassThru
+        #
+        # The `PassThru` switch is new in Carbon 2.0.
+        $PassThru,
+
+        [Switch]
+        # Deletes the website before installation, if it exists. Preserves default beheaviro in Carbon before 2.0.
+        #
+        # The `Force` switch is new in Carbon 2.0.
+        $Force
     )
 
     Set-StrictMode -Version 'Latest'
@@ -138,6 +148,11 @@ function Install-IisWebsite
         $errorMsg = "The following bindings are invalid. The correct format is protocol/IPAddress:Port:Hostname. Protocol and IP address must be separted by a single slash, not ://. IP address can be * for all IP addresses. Hostname is optional. If hostname is not provided, the binding must end with a colon.`n`t{0}" -f $invalidBindings
         Write-Error $errorMsg
         return
+    }
+
+    if( $Force )
+    {
+        Uninstall-IisWebsite -Name $Name
     }
 
     [Microsoft.Web.Administration.Site]$site = $null

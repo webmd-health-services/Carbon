@@ -252,6 +252,18 @@ function Test-ShouldReturnSiteObject
     Assert-Null $site
 }
 
+function Test-ShouldForceDeleteAndRecreate
+{
+    $output = Install-IisWebsite -Name $SiteName -PhysicalPath $PSScriptRoot -Binding 'http/*:9891:'
+    Assert-Null $output
+
+    Set-IisHttpHeader -SiteName $SiteName -Name 'X-Carbon-Test' -Value 'Test-ShouldFoceDeleteAndRecreate'
+
+    $output = Install-IisWebsite -Name $SiteName -PhysicalPath $PSScriptRoot -Binding 'http/*:9891:' -Force
+    Assert-Null $output
+    Assert-Null (Get-IisHttpHeader -SiteName $SiteName -Name 'X-Carbon-Test')
+}
+
 function Assert-WebsiteBinding
 {
     param(

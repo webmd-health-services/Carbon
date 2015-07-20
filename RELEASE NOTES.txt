@@ -45,7 +45,7 @@ The following functions' internal behaviour has changed. This may or may not imp
  * [Grant-Permission](http://get-carbon.org/help/Grant-Permission.html) now writes an error if you don't have access to a private key. Previously, it would skip the key without any messages.
  * [Install-Msi](http://get-carbon.org/help/Install-Msi.html) (fka `Invoke-WindowsInstaller`) now only installs the MSI if it isn't already installed. To preserve the previous behavior and always install, add the `-Force` switch to all `Invoke-WindowsInstaller`\`Install-Msi` usages.
  * All IIS functions were re-written to use the `Microsoft.Web.Administration` API instead of `appcmd.exe`.
- * [Install-IisWebsite](https://get-carbon.org/help/Install-IisWebsite.ps1) no longer deletes and re-creates websites. If a website exists, it updates its configuration to match parameters passed in. 
+ * [Install-IisWebsite](https://get-carbon.org/help/Install-IisWebsite.ps1) no longer deletes and re-creates websites. If a website exists, it updates its configuration to match parameters passed in.  To preserve previous behaviour and delete the website before installing, add the `-Force` switch to `Install-IisWebsite` usages.
  * [Install-IisVirtualDirectory](https://get-carbon.org/help/Install-IisVirtualDirectory.html) no longer deletes and re-creates virtual directories. If a virtual directory exists, its configuration is updated in place.
 
 We've added parameter validation to some functions. This shouldn't impact anybody, since if you were passing data that breaks this new validation, the function wouldn't have worked even in previous versions of Carbon.
