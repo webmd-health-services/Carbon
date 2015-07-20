@@ -188,6 +188,21 @@ function Test-ShouldUpdateExistingPermissions
     Assert-Share -ChangeAccess $changeAccessGroup
 }
 
+function Test-ShouldDeleteFileShareIfForced
+{
+    $output = Install-FileShare -Name $ShareName -Path $SharePath 
+    Assert-Null $output
+
+    $share = Get-FileShare -Name $ShareName
+    $share.SetShareInfo( 1, $share.Description, $null )
+
+    $output = Install-FileShare -Name $ShareName -Path $SharePath -Force
+    Assert-Null $output
+
+    $share = Get-FileShare -Name $ShareName
+    Assert-NotEqual 1 $share.MaximumAllowed
+}
+
 function Assert-ShareCreated
 {
     $share = Get-Share

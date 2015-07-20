@@ -39,14 +39,15 @@ The following commands no longer return the stdout output from the console appli
  * [Remove-SslCertificateBinding](http://get-carbon.org/help/Remove-SslCertificateBinding.html)
  * [Set-SslCertificateBinding](http://get-carbon.org/help/Set-SslCertificateBinding.html)
 
-The following functions' internal behaviour has changed. This may or may not impact you.
+The following functions' internal behavior has changed. This may or may not impact you.
 
- * [Grant-Permission](http://get-carbon.org/help/Grant-Permission.html) now only grants permissions on an object if those permissions aren't present.  To preserve previous behaviour, add the `-Force` switch to all `Grant-Permission` usages.
+ * [Grant-Permission](http://get-carbon.org/help/Grant-Permission.html) now only grants permissions on an object if those permissions aren't present.  To preserve previous behavior, add the `-Force` switch to all `Grant-Permission` usages.
  * [Grant-Permission](http://get-carbon.org/help/Grant-Permission.html) now writes an error if you don't have access to a private key. Previously, it would skip the key without any messages.
  * [Install-Msi](http://get-carbon.org/help/Install-Msi.html) (fka `Invoke-WindowsInstaller`) now only installs the MSI if it isn't already installed. To preserve the previous behavior and always install, add the `-Force` switch to all `Invoke-WindowsInstaller`\`Install-Msi` usages.
  * All IIS functions were re-written to use the `Microsoft.Web.Administration` API instead of `appcmd.exe`.
- * [Install-IisWebsite](https://get-carbon.org/help/Install-IisWebsite.ps1) no longer deletes and re-creates websites. If a website exists, it updates its configuration to match parameters passed in.  To preserve previous behaviour and delete the website before installing, use the `-Force` switch.
+ * [Install-IisWebsite](https://get-carbon.org/help/Install-IisWebsite.ps1) no longer deletes and re-creates websites. If a website exists, it updates its configuration to match parameters passed in. To preserve previous behavior and delete the website before installing, use the `-Force` switch.
  * [Install-IisVirtualDirectory](https://get-carbon.org/help/Install-IisVirtualDirectory.html) no longer deletes and re-creates virtual directories. If a virtual directory exists, its configuration is updated in place. To preserve previous behavior and delete the virtual directory before installing, use the `Force` switch.
+ * [Install-FileShare](https://get-carbon.org/help/Install-FileShare.html) (fka `Install-SmbShare`) no longer deletes and re-creates the share, instead it modifies existing shares in place. To preserve previous behavior and delete existing shares before re-creating, use the `Force` switch.
 
 We've added parameter validation to some functions. This shouldn't impact anybody, since if you were passing data that breaks this new validation, the function wouldn't have worked even in previous versions of Carbon.
 
@@ -188,7 +189,7 @@ The following functions were re-written to use the `System.DirectoryServices.Acc
     * Return object's `Version` property changed from an `int` to a [Version](http://msdn.microsoft.com/en-us/library/y0hf9t2e.aspx) object.
     * Return object's now have `ProductCode` and `User` properties. If a program doesn't have a product code, it is set to `[Guid]::Empty`. The `User` property is only set for per-user software installs.
  * [Get-ServiceConfiguration](http://get-carbon.org/help/Get-ServiceConfiguration.html) now supports services from remote computers.
- * [Grant-Permission](http://get-carbon.org/help/Grant-Permission.html) now only grants permissions on an object if those permissions aren't present.  To preserve previous behaviour, add the `-Force` switch to all `Grant-Permission` usages.
+ * [Grant-Permission](http://get-carbon.org/help/Grant-Permission.html) now only grants permissions on an object if those permissions aren't present.  To preserve previous behavior, add the `-Force` switch to all `Grant-Permission` usages.
  * [Install-Certificate's](http://get-carbon.org/help/Install-Certificate.html) `Exportable` switch is now only allowed when installing a certificate from a file. Previously, you could supply the switch when installing from an X509Certificate2 object but it was ignored.
  * [Install-Group's](http://get-carbon.org/help/Install-Group.html) `Members` parameter renamed to `Member` (with backwards-compatible alias).
  * Added `Credential` parameter to [Install-IisAppPool](https://get-carbon.org/help/Install-IisAppPool.ps1) for increased security and to follow PowerShell guidelines.

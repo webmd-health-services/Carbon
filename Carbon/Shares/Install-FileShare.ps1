@@ -71,7 +71,13 @@ function Install-FileShare
         
         [string[]]
         # The identities who have read access to the share
-        $ReadAccess = @()
+        $ReadAccess = @(),
+
+        [Switch]
+        # Deletes the share and re-creates it, if it exists. Preserves default beheavior in Carbon before 2.0.
+        #
+        # The `Force` switch is new in Carbon 2.0.
+        $Force
     )
 
     Set-StrictMode -Version 'Latest'
@@ -128,23 +134,28 @@ function Install-FileShare
                 [uint32]25 = 'Net Name Not Found';
             }
 
-    $VerbosePreference = 'Continue'
-
     $Path = Resolve-FullPath -Path $Path
     $Path = $Path.Trim('\\')
 
     if( (Test-FileShare -Name $Name) )
     {
         $share = Get-FileShare -Name $Name
+        [bool]$delete = $false
+        
+        if( $Force )
+        {
+            $delete = $true
+        }
+
         if( $share.Path -ne $Path )
         {
             Write-Verbose -Message ('[SHARE] [{0}] Path         {1} -> {2}.' -f $Name,$share.Path,$Path)
-            $result = $share.Delete()
-            if( $result.ReturnValue )
-            {
-                Write-Error ('Failed to delete share ''{0}'' (Path: {1}). Win32_Share.Delete() method returned error code {2} which means: {3}.' -f $Name,$share.Path,$result.ReturnValue,$errors[$result.ReturnValue])
-                return
-            }
+            $delete = $true
+        }
+
+        if( $delete )
+        {
+            Uninstall-FileShare -Name $Name
         }
     }
 
