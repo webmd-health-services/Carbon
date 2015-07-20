@@ -87,6 +87,7 @@ We've added parameter validation to some functions. This shouldn't impact anybod
    * [Install-Service](http://get-carbon.org/help/Grant-ComPermissions.html) 
    * [Remove-SslCertificateBinding](http://get-carbon.org/help/Remove-SslCertificateBinding.html) 
    * [Revoke-ComPermission](http://get-carbon.org/help/Revoke-ComPermission.html) 
+ * Created default, table-based display formats for `System.DirectoryServices.AccountManagement.UserPrincipal`, `System.DirectoryServices.AccountManagement.GroupPrincipal`, `Microsoft.Web.Administration.ApplicationPool`, `Microsoft.Web.Administration.Site`, and `Microsoft.Web.Administration.Application` objects.
  
 ### New Functions
 
