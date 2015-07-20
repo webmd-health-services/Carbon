@@ -19,7 +19,7 @@ function Install-IisVirtualDirectory
     Installs a virtual directory.
 
     .DESCRIPTION
-    This function creates a virtual directory under website `SiteName` at `/VirtualPath`, serving files out of `PhysicalPath`.  If a virtual directory at `VirtualPath` already exists, it is deleted first, and a new virtual directory is created.
+    The `Install-IisVirtualDirectory` function creates a virtual directory under website `SiteName` at `/VirtualPath`, serving files out of `PhysicalPath`.  If a virtual directory at `VirtualPath` already exists, it is updated in palce. (Before Carbon 2.0, the virtual directory was deleted before installation.)
 
     .EXAMPLE
     Install-IisVirtualDirectory -SiteName 'Peanuts' -VirtualPath 'DogHouse' -PhysicalPath C:\Peanuts\Doghouse
@@ -48,13 +48,21 @@ function Install-IisVirtualDirectory
         [Alias('Path')]
         [string]
         # The file system path to the virtual directory.
-        $PhysicalPath
+        $PhysicalPath,
+
+        [Switch]
+        # Deletes the virttual directory before installation, if it exists. Preserves default beheaviro in Carbon before 2.0.
+        # 
+        # *Does not* delete custom configuration for the virtual directory, just the virtual directory. If you've customized the location of the virtual directory, those customizations will remain in place.
+        #
+        # The `Force` switch is new in Carbon 2.0.
+        $Force
     )
     
     Set-StrictMode -Version 'Latest'
 
     $site = Get-IisWebsite -Name $SiteName
-    [Microsoft.Web.Administration.Application]$rootApp = $site.Applications | Where-Object { $_.Path -eq '/' }# $_.VirtualDirectories | Where-Object { $_.Path -eq $VirtualPath } }
+    [Microsoft.Web.Administration.Application]$rootApp = $site.Applications | Where-Object { $_.Path -eq '/' }
     if( -not $rootApp )
     {
         Write-Error ('Default website application not found.')
@@ -63,19 +71,30 @@ function Install-IisVirtualDirectory
 
     $PhysicalPath = Resolve-FullPath -Path $PhysicalPath
 
-    $modified = $false
-
     $VirtualPath = $VirtualPath.Trim('/')
     $VirtualPath = '/{0}' -f $VirtualPath
 
     $vdir = $rootApp.VirtualDirectories | Where-Object { $_.Path -eq $VirtualPath }
+    if( $Force -and $vdir )
+    {
+        Write-IisVerbose $SiteName -VirtualPath $VirtualPath 'REMOVE' '' ''
+        $rootApp.VirtualDirectories.Remove($vdir)
+        $site.CommitChanges()
+        $vdir = $null
+
+        $site = Get-IisWebsite -Name $SiteName
+        $rootApp = $site.Applications | Where-Object { $_.Path -eq '/' }
+    }
+
+    $modified = $false
+
     if( -not $vdir )
     {
         [Microsoft.Web.Administration.ConfigurationElementCollection]$vdirs = $rootApp.GetCollection()
         $vdir = $vdirs.CreateElement('virtualDirectory')
         Write-IisVerbose $SiteName -VirtualPath $VirtualPath 'VirtualPath' '' $VirtualPath
         $vdir['path'] = $VirtualPath
-        $vdirs.Add( $vdir )
+        [void]$vdirs.Add( $vdir )
         $modified = $true
     }
 

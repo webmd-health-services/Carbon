@@ -52,7 +52,8 @@ function Invoke-NewVirtualDirectory($Path = $TestDir)
 
 function Test-ShouldCreateVirtualDirectory
 {
-    Invoke-NewVirtualDirectory
+    $output = Invoke-NewVirtualDirectory
+    Assert-Null $output
     Assert-VirtualDirectoryRunning
 }
 
@@ -112,6 +113,28 @@ function Test-ShouldTurnOnDirectoryBrowsing
     }
     while( $numTries -lt $maxTries )
     Assert-True $foundDirectoryListing "Didn't get directory list."
+}
+
+function Test-ShouldDeleteIfForced
+{
+    $output = Install-IisVirtualDirectory -SiteName $SiteName -VirtualPath $VDirName -PhysicalPath $PSScriptRoot
+    Assert-Null $output
+
+    $app = Get-IisApplication -SiteName $SiteName 
+    $vdir = $app.VirtualDirectories[('/{0}' -f $VDirName)]
+    Assert-NotNull $vdir
+
+    $defaultLogonMethod = $vdir.LogonMethod
+    Assert-NotEqual 2 $defaultLogonMethod
+    $vdir.LogonMethod = 2
+    $app.CommitChanges()
+
+    $output = Install-IisVirtualDirectory -SiteName $SiteName -VirtualPath $VDirName -PhysicalPath $PSScriptRoot -Force -Verbose
+    Assert-Null $output
+
+    $app = Get-IisApplication -SiteName $SiteName 
+    $vdir = $app.VirtualDirectories[('/{0}' -f $VDirName)]
+    Assert-Equal $defaultLogonMethod $vdir.LogonMethod
 }
 
 function Assert-VirtualDirectoryRunning($vdir)
