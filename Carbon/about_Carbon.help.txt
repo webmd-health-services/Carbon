@@ -3,24 +3,22 @@ TOPIC
     
 SHORT DESCRIPTION
     Carbon is a PowerShell module for automating the configuration of computers 
-    running Windows 7, 8, 2008, and 2012.
+    running Windows 7, 8, 2008, and 2012. It can configure and manage:
     
-LONG DESCRIPTION
-    Carbon can configure and manage:
-      * Local users and groups
-      * IIS websites, virtual directories, and applications
-      * File system, registry, and certificate permissions
-      * Certificates
-      * Privileges
-      * Services
-      * Encryption
-      * Junctions
-      * Hosts file
-      * INI files
-      * Performance counters
-      * Shares
-      * .NET connection strings and app settings
-      * And much more!
+     * Local users and groups
+     * IIS websites, virtual directories, and applications
+     * File system, registry, and certificate permissions
+     * Certificates
+     * Privileges
+     * Services
+     * Encryption
+     * Junctions
+     * Hosts file
+     * INI files
+     * Performance counters
+     * Shares
+     * .NET connection strings and app settings
+     * And much more!
     
     All functions are designed to be idempotent: when run multiple times with the 
     same arguments, your system will be in the same state without failing or producing
@@ -56,7 +54,7 @@ OVERVIEW
 
 VERSIONING
 
-    Carbon uses semantic versioning (see http://semver.org/). We use our version number
+    Carbon uses [semantic versioning](http://semver.org/). We use our version number
     to communicate how Carbon changes from the last version. Carbon version numbers have
     the form Major.Minor.Patch.
     
@@ -83,3 +81,4 @@ SEE ALSO
     about_Carbon_Extended_Type_Data
     about_Carbon_2.0
     about_Carbon_Contributing
+    http://semver.org

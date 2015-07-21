@@ -83,7 +83,7 @@ function Out-HtmlPage
 
     <ul id="SiteNav">
 		<li><a href="/">Get-Carbon</a></li>
-        <li><a href="https://bitbucket.org/splatteredbits/carbon/downloads">-Download</li>
+        <li><a href="/help/about_Carbon_Installation.html">-Install</a></li>
 		<li><a href="/help/index.html">-Documentation</a></li>
         <li><a href="/releasenotes.html">-ReleaseNotes</a></li>
 		<li><a href="http://pshdo.com">-Blog</a></li>
@@ -105,45 +105,7 @@ function Out-HtmlPage
     }
 }
 
-function Convert-CommandNameToMarkdownLink
-{
-    [CmdletBinding()]
-    param(
-        [Parameter(Mandatory=$true,VAlueFromPipeline=$true)]
-        # The text to convert.
-        $InputObject
-    )
 
-    begin
-    {
-        Set-StrictMode -Version 'Latest'
-    }
-
-    process
-    {
-        $cmdRegex = $commands | Select-Object -ExpandProperty 'Name' | Where-Object { Test-Path -Path (Join-Path $PSScriptRoot -ChildPath ('Website\help\{0}.html' -f $_)) }
-        $cmdRegex = $cmdRegex -join '|'
-        $cmdRegex = '`({0})`' -f $cmdRegex
-        $replacement = '[$1](/help/$1.html)'
-
-        $aliases = Get-Command -Module 'Carbon' -CommandType Alias | Get-Alias
-
-       $InputObject | 
-            ForEach-Object { $_ -replace $cmdRegex,$replacement } |
-            ForEach-Object {
-                $releaseNotes = $_
-                foreach( $alias in $aliases )
-                {
-                    $releaseNotes = $releaseNotes -replace ('`({0})`' -f $alias.Name),('[$1](/help/{0}.html)' -f $alias.Definition)
-                }
-                return $releaseNotes
-            }
-    }
-
-    end
-    {
-    }
-}
 & (Join-Path -Path $PSScriptRoot -ChildPath '.\Tools\Silk\Import-Silk.ps1' -Resolve)
 
 if( (Get-Module -Name 'Blade') )
@@ -228,15 +190,20 @@ $verbList = $verbs.Keys | Sort-Object | ForEach-Object {
 $topicList = New-Object 'Collections.Generic.List[string]'
 
 $topicsFiles = Get-ChildItem -Path (Join-Path -Path $PSScriptRoot -ChildPath 'Carbon') -Filter 'about_Carbon*.help.txt'
+$headingMap = @{
+                    'NEW DSC RESOURCES' = 'New DSC Resources';
+                    'ADDED PASSTHRU PARAMETERS' = 'Added PassThru Parameters';
+                    'SWITCH TO SYSTEM.DIRECTORYSERVICES.ACCOUNTMANAGEMENT API FOR USER/GROUP MANAGEMENT' = 'Switch To System.DirectoryServices.AccountManagement API For User/Group Management';
+                    'INSTALL FROM ZIP ARCHIVE' = 'Install From ZIP Archive';
+                    'INSTALL FROM POWERSHELL GALLERY' = 'Install From PowerShell Gallery';
+                    'INSTALL WITH NUGET' = 'Install With NuGet';
+               }
 foreach( $topicFile in $topicsFiles )
 {
     $topicName = $topicFile.BaseName -replace '\.help$',''
     $virtualPath = '/help/{0}.html' -f $topicName
 
-    $title = $topicFile.BaseName -replace '^about_Carbon_',''
-    $title = $title -replace '_',' '
-
-    $topicFile | Get-Content -Raw | Convert-CommandNameToMarkdownLink | Convert-AboutTopicToHtml -ModuleName 'Carbon' | Out-HtmlPage -Title ('Carbon - {0}' -f $title) -VirtualPath $virtualPath
+    $topicFile | Convert-AboutTopicToHtml -ModuleName 'Carbon' -HeadingMap $headingMap | Out-HtmlPage -Title ('Carbon - {0}' -f $topicName) -VirtualPath $virtualPath
 
     $topicList.Add( ('<li><a href="{0}">{1}</a></li>' -f $virtualPath,$topicName) )
 }
@@ -287,10 +254,18 @@ $helpIndexArgs = @(
 '@ -f $helpIndexArgs | Out-HtmlPage -Title 'Carbon PowerShell Module Documentation' -JQuery -VirtualPath '/help/index.html'
 
 $carbonTitle = 'Carbon: PowerShell DevOps module for configuring and setting up Windows computers, applications, and websites'
-Get-Content -Path (Join-Path -Path $PSScriptRoot -ChildPath 'Website\index.md') -Raw | Convert-MarkdownToHtml | Out-HtmlPage -Title $carbonTitle -VirtualPath '/index.html'
+Get-Item -Path (Join-Path -Path $PSScriptRoot -ChildPath 'Carbon\about_Carbon.help.txt') |
+    Convert-AboutTopicToHtml -ModuleName 'Carbon' |
+    ForEach-Object {
+        $text = $_ -replace '<a href="([^/]+)\.html">([^<]+)</a>','<a href="/help/$1.html">$2</a>'
+        $text -replace '<h1>about_Carbon</h1>','<h1>Carbon</h1>'
+    } |
+    Out-HtmlPage -Title $carbonTitle -VirtualPath '/index.html'
+
+#Get-Content -Path (Join-Path -Path $PSScriptRoot -ChildPath 'Website\index.md') -Raw | Convert-MarkdownToHtml | Out-HtmlPage -Title $carbonTitle -VirtualPath '/index.html'
 
 Get-Content -Path (Join-Path -Path $PSScriptRoot -ChildPath 'RELEASE NOTES.txt') -Raw | 
-    Convert-CommandNameToMarkdownLink |
+    Edit-HelpText -ModuleName 'Carbon' |
     Convert-MarkdownToHtml | 
     Out-HtmlPage -Title ('Release Notes - {0}' -f $carbonTitle) -VirtualPath '/releasenotes.html'
 

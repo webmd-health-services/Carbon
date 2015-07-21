@@ -7,8 +7,8 @@ SHORT DESCRIPTION
 LONG DESCRIPTION
     Carbon can be installed from a ZIP archive, from the PowerShell gallery, with 
     Chocolatey, and NuGet.
-
-  INSTALL FROM ZIP ARCHIVE
+    
+INSTALL FROM ZIP ARCHIVE
     1. [Download the ZIP file from Bitbucket.](https://bitbucket.org/splatteredbits/carbon/downloads)
     2. Unblock the zip file (right-click the .zip file, choose Properties, click 
        "Unblock", then click "OK").
@@ -16,62 +16,62 @@ LONG DESCRIPTION
     
     You can now import module using the `Import-Carbon.ps1` script:
     
-        > .\Carbon\Import-Carbon.ps1
+        PS> .\Carbon\Import-Carbon.ps1
     
     To make Carbon available so you can run `Import-Module Carbon`, copy the `Carbon`
     directory into one of PowerShell's module paths. This command will you a list:
            
-        > $env:PSModuelPath -split ';'
+        PS> $env:PSModuelPath -split ';'
     
     Once you do, you can import Carbon by running:
     
-        > Import-Module 'Carbon'
+        PS> Import-Module 'Carbon'
 
-  INSTALL FROM POWERSHELL GALLERY
+INSTALL FROM POWERSHELL GALLERY
     To install from the PowerShell Gallery, you must be running PowerShell 5. If so,
     run:
     
-        > Install-Module -Name 'Carbon'
+        PS> Install-Module -Name 'Carbon'
     
     You can now import Carbon by running:
     
-        > Import-Module 'Carbon'
+        PS> Import-Module 'Carbon'
   
-  INSTALL WITH CHOCOLATEY
+INSTALL WITH CHOCOLATEY
     To install with Chocolatey, you'll need [Chocolatey installed](http://chocolatey.org).
     With Chocolatey installed, run:
     
-        > choco install Carbon
+        PS> choco install Carbon
 
     This will install Carbon into one of PowerShell's module paths. You can now import
     Carbon by running:
     
-        > Import-Module 'Carbon'  
+        PS> Import-Module 'Carbon'  
 
-  INSTALL WITH NUGET
+INSTALL WITH NUGET
     To install with NuGet, you'll need [NuGet installed](http://nuget.org). With NuGet
     installed, run:
     
-        > nuget install Carbon
+        PS> nuget install Carbon
     
     This will create a `Carbon-X.Y.Z` directory in your current directory (or the 
     output directory you specified with Nuget's `OutputDirectory` parameter). You can
     import Carbon from that directory using the `Import-Carbon.ps1 script:
     
-        > .\Carbon-X.Y.Z\Carbon\Import-Carbon.ps1
+        PS> .\Carbon-X.Y.Z\Carbon\Import-Carbon.ps1
      
     Or with PowerShell's `Import-Module` command:
     
-        > Import-Module '.\Carbon-X.Y.Z\Carbon'
+        PS> Import-Module '.\Carbon-X.Y.Z\Carbon'
         
     If you want Carbon available so you can run `Import-Module Carbon`, copy the
     `Carbon-X.Y.Z\Carbon` directory into one of PowerShell's module paths. This command
     will give you a list:
     
-        > $env:PSModulePath -split ';'
+        PS> $env:PSModulePath -split ';'
 
 SEE ALSO
     http://chocolatey.org
-    http://nuget.org
-    https://powershellgallery.com/
+    http://www.nuget.org
+    https://www.powershellgallery.com/
     https://bitbucket.org/splatteredbits/carbon/downloads
