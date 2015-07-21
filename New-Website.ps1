@@ -142,7 +142,7 @@ foreach( $command in $commands )
     $verbs[$command.Verb].Add( $command.Name )
 
     Write-Progress -Activity 'Generating Command HTML' -PercentComplete ($count / $numCommands * 100) -CurrentOperation $command.Name
-    #Convert-HelpToHtml -Name $command.Name | Out-HtmlPage -Title ('PowerShell - {0} - Carbon' -f $command.Name) -VirtualPath ('/help/{0}.html' -f $command.Name)
+    Convert-HelpToHtml -Name $command.Name | Out-HtmlPage -Title ('PowerShell - {0} - Carbon' -f $command.Name) -VirtualPath ('/help/{0}.html' -f $command.Name)
     $count++
 }
 
