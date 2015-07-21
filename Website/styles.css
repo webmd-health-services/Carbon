@@ -75,3 +75,72 @@ ul#SiteNav li
 	margin-right: .5em;
 	padding:0;
 }
+
+#CommandsMenu
+{
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+#CommandsMenu li 
+{
+    float: left;
+    border: 1px solid #9DAEC4;
+    border-bottom-width: 0;
+    margin: 0em 0.5em 0em 0.5em;
+}
+
+#CommandsMenu a 
+{
+    text-decoration: none;
+    display: block;
+    background: #eee;
+    background: #ddf;
+	background: lightblue;
+	background: cornflowerblue;
+	background: lavender;
+    background: #A7BAD1;
+    padding: 0.24em 1em;
+    color: #00c;
+    width: 8em;
+    text-align: center;
+}
+
+#CommandsMenu a:hover 
+{
+    background: #ddf;
+	background: lightblue;
+	background: lavender;
+	background: cornflowerblue;
+    background: #BCC9D8;
+    background: #C5D0DD;
+}
+
+#CommandsMenu .selected 
+{
+    border-color: black;
+}
+
+#CommandsMenu .selected a 
+{
+    position: relative;
+    top: 1px;
+    background: white;
+    background-color: lightsteelblue;
+    color: black;
+    font-weight: bold;
+}
+
+#CommandsContent 
+{
+    border: 1px solid black;
+    clear: both;
+    padding: 0 1em;
+}
+
+#ByName, #ByVerb
+{
+    visibility: hidden;
+    display: none;
+}

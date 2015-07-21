@@ -152,7 +152,7 @@ $verbList = $verbs.Keys | Sort-Object | ForEach-Object {
     $verb = $_
     $verbCommands = $verbs[$verb] | ForEach-Object { '<li><a href="/help/{0}.html">{0}</a></li>' -f $_ }
     @'
-<h2>{0}</h2>
+<h3>{0}</h3>
 
 {1}
 '@ -f $verb,($verbCommands -join ([Environment]::NewLine))
@@ -191,28 +191,29 @@ $helpIndexArgs = @(
 </ul>
 
 <h2>Commands</h1>
-<ul>
-    <li>By Tag</li>
-    <li>By Name</li>
-    <li>By Verb</li>
+<ul id="CommandsMenu">
+    <li class="selected"><a href="#ByTag">By Tag</a></li>
+    <li><a href="#ByName">By Name</a></li>
+    <li><a href="#ByVerb">By Verb</a></li>
 </ul>
 
-<div id="ByTag">
-    <ul id="Tags">
-    {0}
-    </ul>
-</div>
+<div id="CommandsContent">
 
-<div id="ByName">
-    <ul>
+    <div id="ByTag">
+        <a id="ByTag"></a>
+        {0}
+    </div>
+
+    <div id="ByName">
+        <a id="ByName"></a>
         {1}
-    </ul>
-</div>
+    </div>
 
-<div id="ByVerb">
-    <ul>
+    <div id="ByVerb">
+        <a id="ByVerb"></a>
         {2}
-    </ul>
+    </div>
+
 </div>
 '@ -f $helpIndexArgs | Out-HtmlPage -Title 'Carbon PowerShell Module Documentation' -JQuery -VirtualPath '/help/index.html'
 
