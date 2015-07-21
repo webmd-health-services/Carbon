@@ -22,6 +22,9 @@ The `New-Website.ps1` script generates the get-carbon.org website. It uses the S
 
 [CmdletBinding()]
 param(
+    [Switch]
+    # Skips generating the command help.
+    $SkipCommandHelp
 )
 
 #Requires -Version 4
@@ -104,7 +107,12 @@ function Out-HtmlPage
 
 & (Join-Path -Path $PSScriptRoot -ChildPath '.\Tools\Silk\Import-Silk.ps1' -Resolve)
 
-& (Join-Path -Path $PSScriptRoot -ChildPath '.\Carbon\Import-Carbon.ps1' -Resolve)
+if( (Get-Module -Name 'Blade') )
+{
+    Remove-Module 'Blade'
+}
+
+& (Join-Path -Path $PSScriptRoot -ChildPath '.\Carbon\Import-Carbon.ps1' -Resolve) -Force
 
 $webRoot = Join-Path -Path $PSScriptRoot -ChildPath 'Website'
 $cmdRoot = Join-Path -Path $webRoot -ChildPath 'help'
@@ -156,8 +164,11 @@ foreach( $command in $commands )
     }
     $verbs[$command.Verb].Add( $command.Name )
 
-    Write-Progress -Activity 'Generating Command HTML' -PercentComplete ($count / $numCommands * 100) -CurrentOperation $command.Name
-    Convert-HelpToHtml -Name $command.Name | Out-HtmlPage -Title ('PowerShell - {0} - Carbon' -f $command.Name) -VirtualPath ('/help/{0}.html' -f $command.Name)
+    if( -not $SkipCommandHelp )
+    {
+        Write-Progress -Activity 'Generating Command HTML' -PercentComplete ($count / $numCommands * 100) -CurrentOperation $command.Name
+        Convert-HelpToHtml -Name $command.Name | Out-HtmlPage -Title ('PowerShell - {0} - Carbon' -f $command.Name) -VirtualPath ('/help/{0}.html' -f $command.Name)
+    }
     $count++
 }
 
@@ -238,5 +249,24 @@ $helpIndexArgs = @(
 
 $carbonTitle = 'Carbon: PowerShell DevOps module for configuring and setting up Windows computers, applications, and websites'
 Get-Content -Path (Join-Path -Path $PSScriptRoot -ChildPath 'Website\index.md') -Raw | Convert-MarkdownToHtml | Out-HtmlPage -Title $carbonTitle -VirtualPath '/index.html'
-Get-Content -Path (Join-Path -Path $PSScriptRoot -ChildPath 'RELEASE NOTES.txt') -Raw | Convert-MarkdownToHtml | Out-HtmlPage -Title ('Release Notes - {0}' -f $carbonTitle) -VirtualPath '/releasenotes.html'
+
+$cmdRegex = $commands | Select-Object -ExpandProperty 'Name' | Where-Object { Test-Path -Path (Join-Path $PSScriptRoot -ChildPath ('Website\help\{0}.html' -f $_)) }
+$cmdRegex = $cmdRegex -join '|'
+$cmdRegex = '`({0})`' -f $cmdRegex
+$replacement = '[$1](http://get-carbon.org/help/$1.html)'
+
+$aliases = Get-Command -Module 'Carbon' -CommandType Alias | Get-Alias
+
+Get-Content -Path (Join-Path -Path $PSScriptRoot -ChildPath 'RELEASE NOTES.txt') -Raw | 
+    ForEach-Object { $_ -replace $cmdRegex,$replacement } |
+    ForEach-Object {
+        $releaseNotes = $_
+        foreach( $alias in $aliases )
+        {
+            $releaseNotes = $releaseNotes -replace ('`({0})`' -f $alias.Name),('[$1](http://get-carbon.org/help/{0}.html)' -f $alias.Definition)
+        }
+        return $releaseNotes
+    } |
+    Convert-MarkdownToHtml | 
+    Out-HtmlPage -Title ('Release Notes - {0}' -f $carbonTitle) -VirtualPath '/releasenotes.html'
 

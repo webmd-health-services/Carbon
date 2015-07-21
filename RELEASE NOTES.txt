@@ -788,7 +788,7 @@ There is now [a Carbon support mailing list](http://www.freelists.org/list/carbo
 
 ### .NET
 
- * Added `ProviderName` parameter to `Set-DotNetConnectionString ` for setting a connection string's `providerName` attribute/value.
+ * Added `ProviderName` parameter to `Set-DotNetConnectionString` for setting a connection string's `providerName` attribute/value.
 
 ### File System
 
