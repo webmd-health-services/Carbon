@@ -50,8 +50,12 @@ function Convert-AboutTopicToHtml
     [CmdletBinding()]
     param(
         [Parameter(Mandatory=$true,ValueFromPipeline=$true)]
-        # The name of the help topic, include the `about_` prefix, or a `FileInfo` object representing the help topic.
+        # The name of the help topic, include the `about_` prefix, or a `FileInfo` object representing the help topic, or the help topic as a giant string.
         $InputObject,
+        
+        [string]
+        # The name of the topic you're converting. Only used if `InputObject` is the text of the about topic.
+        $TopicName,
 
         [string]
         # The name of the module being documented.
@@ -125,9 +129,9 @@ function Convert-AboutTopicToHtml
         if( $InputObject -is [IO.FileInfo] )
         {
             [string[]]$lines = $InputObject | Get-Content
-            $topicName = $InputObject.BaseName -replace '\.help$' -f ''
+            $TopicName = $InputObject.BaseName -replace '\.help$' -f ''
         }
-        else
+        elseif( $InputObject -is [string] -and $InputObject -match '^about_' )
         {
             [string[]]$lines = Get-Help -Name $InputObject
             if( -not $lines )
@@ -135,7 +139,11 @@ function Convert-AboutTopicToHtml
                 Write-Error ('About topic ''{0}'' not found.' -f $InputObject)
                 return
             }
-            $topicName = $InputObject
+            $TopicName = $InputObject
+        }
+        else
+        {
+            $lines = $InputObject -split ([Environment]::NewLine)
         }
 
         $topic = [pscustomobject]@{ }
@@ -174,19 +182,19 @@ function Convert-AboutTopicToHtml
 
         if( -not ($topic | Get-Member -Name $TopicHeading) )
         {
-            Write-Warning ('Topic ''{0}'' doesn''t have a ''{1}'' heading. Defaulting to {0}. Use the `TopicHeading` parameter to set the topic''s topic heading.' -f $topicName,$TopicHeading)
-            Complete-Section -Heading 'TOPIC' -Body $topicName
+            Write-Warning ('Topic ''{0}'' doesn''t have a ''{1}'' heading. Defaulting to {0}. Use the `TopicHeading` parameter to set the topic''s topic heading.' -f $TopicName,$TopicHeading)
+            Complete-Section -Heading 'TOPIC' -Body $TopicName
         }
 
         if( -not ($topic | Get-Member -Name $ShortDescriptionHeading) )
         {
-            Write-Warning ('Topic ''{0}'' doesn''t have a ''{1}'' heading. Use the `ShortDescription` parameter to set the topic''s SHORT DESCRIPTION heading.' -f $topicName,$ShortDescriptionHeading)
+            Write-Warning ('Topic ''{0}'' doesn''t have a ''{1}'' heading. Use the `ShortDescription` parameter to set the topic''s SHORT DESCRIPTION heading.' -f $TopicName,$ShortDescriptionHeading)
             Complete-Section -Heading 'SHORT DESCRIPTION' -Body ''
         }
 
         if( -not ($topic | Get-Member -Name $LongDescriptionHeading) )
         {
-            Write-Warning ('Topic ''{0}'' doesn''t have a ''{1}'' heading. Use the `lONGDescription` parameter to set the topic''s LONG DESCRIPTION heading.' -f $topicName,$LongDescriptionHeading)
+            Write-Warning ('Topic ''{0}'' doesn''t have a ''{1}'' heading. Use the `lONGDescription` parameter to set the topic''s LONG DESCRIPTION heading.' -f $TopicName,$LongDescriptionHeading)
             Complete-Section -Heading 'LONG DESCRIPTION' -Body ''
         }
 
