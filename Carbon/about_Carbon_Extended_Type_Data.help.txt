@@ -1,0 +1,25 @@
+TOPIC
+    about_Carbon_Extended_Type_Data
+    
+SHORT DESCRIPTION
+    Explains all the extended type data Carbon adds to native .NET objects.
+    
+LONG DESCRIPTION
+    The extended type data that Carbon adds are outlined below. 
+    
+    ## System.Diagnostics.Process
+    
+     * Property `ParentProcessID`: the ID of the parent process (i.e. the process that started this process). Uses WMI, so it can be a little slow.
+     
+    ## System.DirectoryServices.AccountManagement.Principal
+    
+     * Property `ConnectedServer`: the server the principal came from. This information is normally available as `$principal.Context.ConnectedServer`. I'm lazy so added this member.
+     
+    ## System.IO.DirectoryInfo
+    
+     * Property `IsJunction`: returns `$true` if the directory is a junction, `$false` otherwise.
+
+SEE ALSO
+    about_Types.ps1xml
+    
+    

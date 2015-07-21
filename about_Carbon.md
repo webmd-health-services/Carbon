@@ -1,13 +1,7 @@
-# TOPIC
-
-about\_Carbon
-
-# SHORT DESCRIPTION
+# Carbon
 
 Carbon is a PowerShell module for automating the configuration of computers running Windows 2008, 2008 RS and 7.    
 
-
-# LONG DESCRIPTION
 
 Carbon is a DevOps PowerShell module for automating the configuration of Windows 2008, Windows 2008 R2, 7, 2012, and 2012 R2 computers. Carbon can configure and manage:
 
