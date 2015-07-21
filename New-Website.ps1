@@ -119,6 +119,21 @@ $webRoot = Join-Path -Path $PSScriptRoot -ChildPath 'Website'
 $cmdRoot = Join-Path -Path $webRoot -ChildPath 'help'
 $tagsRoot = Join-Path -Path $webRoot -ChildPath 'tags'
 
+$headingMap = @{
+                    'NEW DSC RESOURCES' = 'New DSC Resources';
+                    'ADDED PASSTHRU PARAMETERS' = 'Added PassThru Parameters';
+                    'SWITCH TO SYSTEM.DIRECTORYSERVICES.ACCOUNTMANAGEMENT API FOR USER/GROUP MANAGEMENT' = 'Switch To System.DirectoryServices.AccountManagement API For User/Group Management';
+                    'INSTALL FROM ZIP ARCHIVE' = 'Install From ZIP Archive';
+                    'INSTALL FROM POWERSHELL GALLERY' = 'Install From PowerShell Gallery';
+                    'INSTALL WITH NUGET' = 'Install With NuGet';
+               }
+
+$help = Convert-ModuleHelpToHtml -ModuleName 'Carbon' -HeadingMap $headingMap -SkipCommandHelp:$SkipCommandHelp |
+            ForEach-Object {
+                $_.Html | Out-HtmlPage -Title ('PowerShell - {0} - Carbon' -f $_.Name) -VirtualPath ('/help/{0}.html' -f $_.Name)
+                $_
+            }
+
 $tagsJson = Get-Content -Path (Join-Path -Path $PSScriptRoot -ChildPath 'tags.json') | ConvertFrom-Json
 if( -not $tagsJson )
 {
@@ -154,9 +169,7 @@ $tagCloud = $tags.Keys | Sort-Object | ForEach-Object {
 
 $verbs = @{ }
 
-$commands = Get-Command -Module 'Carbon' | Where-Object { $_.CommandType -ne 'Alias' } | Sort-Object -Property 'Name'
-[int]$numCommands = $commands | Measure-Object | Select-Object -ExpandProperty 'Count'
-$count = 0
+$commands = Get-Command -Module 'Carbon' -CommandType Cmdlet,Function,Filter | Sort-Object -Property 'Name'
 foreach( $command in $commands )
 {
     if( -not $verbs.ContainsKey( $command.Verb ) )
@@ -164,13 +177,6 @@ foreach( $command in $commands )
         $verbs[$command.Verb] = New-Object 'Collections.Generic.List[string]'
     }
     $verbs[$command.Verb].Add( $command.Name )
-
-    if( -not $SkipCommandHelp )
-    {
-        Write-Progress -Activity 'Generating Command HTML' -PercentComplete ($count / $numCommands * 100) -CurrentOperation $command.Name
-        Convert-HelpToHtml -Name $command.Name | Out-HtmlPage -Title ('PowerShell - {0} - Carbon' -f $command.Name) -VirtualPath ('/help/{0}.html' -f $command.Name)
-    }
-    $count++
 }
 
 $commandList = $commands | Select-Object -ExpandProperty 'Name' | Sort-Object | ForEach-Object { '<li><a href="/help/{0}.html">{0}</a></li>' -f $_ }
@@ -189,23 +195,15 @@ $verbList = $verbs.Keys | Sort-Object | ForEach-Object {
 
 $topicList = New-Object 'Collections.Generic.List[string]'
 
-$topicsFiles = Get-ChildItem -Path (Join-Path -Path $PSScriptRoot -ChildPath 'Carbon') -Filter 'about_Carbon*.help.txt'
-$headingMap = @{
-                    'NEW DSC RESOURCES' = 'New DSC Resources';
-                    'ADDED PASSTHRU PARAMETERS' = 'Added PassThru Parameters';
-                    'SWITCH TO SYSTEM.DIRECTORYSERVICES.ACCOUNTMANAGEMENT API FOR USER/GROUP MANAGEMENT' = 'Switch To System.DirectoryServices.AccountManagement API For User/Group Management';
-                    'INSTALL FROM ZIP ARCHIVE' = 'Install From ZIP Archive';
-                    'INSTALL FROM POWERSHELL GALLERY' = 'Install From PowerShell Gallery';
-                    'INSTALL WITH NUGET' = 'Install With NuGet';
-               }
-foreach( $topicFile in $topicsFiles )
+foreach( $helpItem in $help )
 {
-    $topicName = $topicFile.BaseName -replace '\.help$',''
-    $virtualPath = '/help/{0}.html' -f $topicName
+    if( $helpItem.Type -ne 'AboutTopic' )
+    {
+        continue
+    }
 
-    $topicFile | Convert-AboutTopicToHtml -ModuleName 'Carbon' -HeadingMap $headingMap | Out-HtmlPage -Title ('Carbon - {0}' -f $topicName) -VirtualPath $virtualPath
-
-    $topicList.Add( ('<li><a href="{0}">{1}</a></li>' -f $virtualPath,$topicName) )
+    $virtualPath = '/help/{0}.html' -f $helpItem.Name
+    $topicList.Add( ('<li><a href="{0}">{1}</a></li>' -f $virtualPath,$helpItem.Name) )
 }
 
 $helpIndexArgs = @(
@@ -261,8 +259,6 @@ Get-Item -Path (Join-Path -Path $PSScriptRoot -ChildPath 'Carbon\about_Carbon.he
         $text -replace '<h1>about_Carbon</h1>','<h1>Carbon</h1>'
     } |
     Out-HtmlPage -Title $carbonTitle -VirtualPath '/index.html'
-
-#Get-Content -Path (Join-Path -Path $PSScriptRoot -ChildPath 'Website\index.md') -Raw | Convert-MarkdownToHtml | Out-HtmlPage -Title $carbonTitle -VirtualPath '/index.html'
 
 Get-Content -Path (Join-Path -Path $PSScriptRoot -ChildPath 'RELEASE NOTES.txt') -Raw | 
     Edit-HelpText -ModuleName 'Carbon' |
