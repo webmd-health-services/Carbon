@@ -237,6 +237,6 @@ $helpIndexArgs = @(
 '@ -f $helpIndexArgs | Out-HtmlPage -Title 'Carbon PowerShell Module Documentation' -JQuery -VirtualPath '/help/index.html'
 
 $carbonTitle = 'Carbon: PowerShell DevOps module for configuring and setting up Windows computers, applications, and websites'
-Get-Content -Path (Join-Path -Path $PSScriptRoot -ChildPath 'about_Carbon.md') -Raw | Convert-MarkdownToHtml | Out-HtmlPage -Title $carbonTitle -VirtualPath '/index.html'
+Get-Content -Path (Join-Path -Path $PSScriptRoot -ChildPath 'Website\index.md') -Raw | Convert-MarkdownToHtml | Out-HtmlPage -Title $carbonTitle -VirtualPath '/index.html'
 Get-Content -Path (Join-Path -Path $PSScriptRoot -ChildPath 'RELEASE NOTES.txt') -Raw | Convert-MarkdownToHtml | Out-HtmlPage -Title ('Release Notes - {0}' -f $carbonTitle) -VirtualPath '/releasenotes.html'
 
