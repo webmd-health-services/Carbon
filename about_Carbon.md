@@ -1,8 +1,5 @@
 # Carbon
 
-Carbon is a PowerShell module for automating the configuration of computers running Windows 2008, 2008 RS and 7.    
-
-
 Carbon is a DevOps PowerShell module for automating the configuration of Windows 2008, Windows 2008 R2, 7, 2012, and 2012 R2 computers. Carbon can configure and manage:
 
  * Local users and groups
@@ -66,4 +63,4 @@ If importing Carbon in a script, we recommend always using relative paths to cre
 
 To get a list of all commands imported by Carbon:
 
-    > Get-Command | Where-Object { $_.ModuleName -eq 'Carbon' }
+    > Get-Command -Module 'Carbon'

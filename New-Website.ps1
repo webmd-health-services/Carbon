@@ -47,6 +47,12 @@ function Out-HtmlPage
         }
 
         $path = Join-Path -Path $webRoot -ChildPath $VirtualPath
+        $templateArgs = @(
+                            $Title,
+                            $jQueryScriptTag,
+                            $Content,
+                            (Get-Date).Year
+                        )
         @'
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
@@ -66,9 +72,14 @@ function Out-HtmlPage
     </ul>
 
     {2}
+
+	<div class="Footer">
+		Copyright &copy; 2012 - {3} <a href="http://pshdo.com">Aaron Jensen</a>.  All rights reserved.
+	</div>
+
 </body>
 </html>
-'@ -f $Title,$jQueryScriptTag,$Content | Set-Content -Path $path
+'@ -f $templateArgs | Set-Content -Path $path
     }
 
     end
@@ -173,7 +184,7 @@ $helpIndexArgs = @(
 @'
 <h1>Carbon Documentation</h1>
 
-<h2>Help Topics</h2>
+<h2>About Help Topics</h2>
 
 <ul>
     {3}
