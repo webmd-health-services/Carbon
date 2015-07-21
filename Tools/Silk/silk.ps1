@@ -22,9 +22,10 @@ param(
     $DestinationPath
 )
 
-$Error.Clear()
+#Requires -Version 4
+Set-StrictMode -Version 'Latest'
+
 Set-StrictMode -Version Latest
-$PSScriptRoot = Split-Path -Parent -Path $PSCommandPath
 
 & (Join-Path $PSScriptRoot Import-Silk.ps1 -Resolve)
 
@@ -135,13 +136,13 @@ Join-Path $PSScriptRoot 'Resources\styles.css' | Get-Item | Copy-Item -Destinati
 
 $config.Topics | 
     Split-MarkdownTopic -ConfigFileRoot $ConfigFileRoot |
-    Convert-HelpToHtml -Menu $menuBuilder.ToString() -Config $config -DestinationPath $DestinationPath
+    Convert-HelpToHtml -Config $config -DestinationPath $DestinationPath
 
 $commands | 
     #Where-Object { $_.Name -eq 'Invoke-SqlScript' } | 
     Where-Object { $config.CommandsToSkip -notcontains $_.Name } |
     Get-Help -Full | 
-    Convert-HelpToHtml -Menu $menuBuilder.ToString() -Config $config -DestinationPath $DestinationPath
+    Convert-HelpToHtml -Config $config -DestinationPath $DestinationPath
 
 $config.Scripts |
     ForEach-Object { Join-Path -Path $ConfigFileRoot -ChildPath $_ -Resolve } |
@@ -169,4 +170,4 @@ $config.Scripts |
         }
         $topic
     } |
-    Convert-HelpToHtml -Menu $menuBuilder.ToString() -Config $config -DestinationPath $DestinationPath
+    Convert-HelpToHtml -Config $config -DestinationPath $DestinationPath

@@ -48,33 +48,23 @@ $description
 "@
         }
     
-        $relatedCommands = $help.RelatedLinks |
+        [string[]]$relatedCommands = $help.RelatedLinks |
             Out-String -Width ([Int32]::MaxValue) |
             ForEach-Object { $_ -split "`n" } |
             ForEach-Object { $_.Trim() } |
             Where-Object { $_ } |
-            ForEach-Object {
-                if( $_ -match '^https?\:\/\/' )
-                {
-                    "[{0}]({1})" -f $_,$_
-                }
-                else
-                {
-                    "[{0}]({0}.html)" -f $_
-                }
-            }
+            Convert-RelatedLinkToHtml
     
         if( $relatedCommands )
         {
-            $relatedCommands = @( $relatedCommands )
-            if( $relatedCommands.Length -gt 0 )
-            {
-                $relatedCommands = " * {0}" -f (($relatedCommands -replace '_','\_') -join "`n * ")
-            }
+            $relatedCommands = $relatedCommands | ForEach-Object { "<li>{0}</li>" -f $_ }
             $relatedCommands = @"
 <h2>Related Commands</h2>
+
+<ul>
 {0}
-"@ -f ($relatedCommands | Convert-MarkdownToHtml)
+</ul>
+"@ -f ($relatedCommands -join ([Environment]::NewLine))
         }
     
         $commonParameterNames = @{
