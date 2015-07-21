@@ -225,6 +225,8 @@ The following functions were re-written to use the `System.DirectoryServices.Acc
  * [Unprotect-String](http://get-carbon.org/help/Unprotect-String.html)
     * Added `AsSecureString` switch, which will return a secure string instead of a normal string.
     * The `Password` parameter now accepts `SecureString` values.
+ * [Initialize-Lcm](http://get-carbon.org/help/Unprotect-String.html)
+    * Added support for PowerShell 5: `RefreshIntervalMinutes` default value changed to from 15 to 30; `RefreshIntervalMinutes` minimum value is now 30; `ConfigurationFrequency`'s minimum value is now 1 (from 2).
  
 ## Changes Since `alpha.26`
 
@@ -305,6 +307,7 @@ The following functions were re-written to use the `System.DirectoryServices.Acc
  * [Install-FileShare](http://get-carbon.org/help/Install-FileShare.html) (fka `Install-SmbShare`):
     * Re-written to use WMI isntead of `net.exe`.
     * Modifies existing shares in place, instead of deleting and re-creating, *unless* the share's path changes. Changing a share's path requires the old share to be deleted and a new one created.
+ 
  
 # 1.9.0 (8 November 2014)
 

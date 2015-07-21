@@ -151,18 +151,18 @@ function Initialize-Lcm
 
         [Parameter(ParameterSetName='PullWebDownloadManager')]
         [Parameter(ParameterSetName='PullFileDownloadManager')]
-        [ValidateRange(15,[Int32]::MaxValue)]
+        [ValidateRange(30,[Int32]::MaxValue)]
         [Alias('RefreshFrequencyMinutes')]
         [int]
         # The interval (in minutes) at which the target computer(s) will contact the pull server to *download* its current configuration. The default (and minimum) interval is 15 minutes.
-        $RefreshIntervalMinutes = 15,
+        $RefreshIntervalMinutes = 30,
 
         [Parameter(ParameterSetName='PullWebDownloadManager')]
         [Parameter(ParameterSetName='PullFileDownloadManager')]
-        [ValidateRange(2,([int]([Int32]::MaxValue)))]
+        [ValidateRange(1,([int]([Int32]::MaxValue)))]
         [int]
         # The frequency (in number of `RefreshIntervalMinutes`) at which the target computer will run/implement its current configuration. The default (and minimum) frequency is 2 refresh intervals. This value is multiplied by the `RefreshIntervalMinutes` parameter to calculate the interval in minutes that the configuration is applied.
-        $ConfigurationFrequency = 2,
+        $ConfigurationFrequency = 1,
 
         [Parameter(ParameterSetName='PullWebDownloadManager')]
         [Parameter(ParameterSetName='PullFileDownloadManager')]
@@ -312,9 +312,15 @@ function Initialize-Lcm
     {
         Set-StrictMode -Off
 
+        $configID = $null
+        if( $ConfigurationID )
+        {
+            $configID = $ConfigurationID.ToString()
+        }
+
         node $AllNodes.NodeName
         {
-            if( $PSCmdlet.ParameterSetName -eq 'Push' )
+            if( $Node.RefreshMode -eq 'Push' )
             {
                 LocalConfigurationManager
                 {
@@ -325,7 +331,7 @@ function Initialize-Lcm
             }
             else
             {
-                if( $PSCmdlet.ParameterSetName -like '*FileDownloadManager' )
+                if( $Node.RefreshMode -like '*FileDownloadManager' )
                 {
                     $downloadManagerName = 'DscFileDownloadManager'
                     $customData = @{ SourcePath = $SourcePath }
@@ -343,7 +349,7 @@ function Initialize-Lcm
                 {
                     AllowModuleOverwrite = $AllowModuleOverwrite;
                     CertificateID = $thumbprint;
-                    ConfigurationID = $ConfigurationID.ToString();
+                    ConfigurationID = $configID;
                     ConfigurationMode = $ConfigurationMode;
                     ConfigurationModeFrequencyMins = $RefreshIntervalMinutes * $ConfigurationFrequency;
                     Credential = $LcmCredential;
@@ -362,7 +368,7 @@ function Initialize-Lcm
 
     try
     {
-        [object[]]$allNodes = $ComputerName | ForEach-Object { @{ NodeName = $_; PSDscAllowPlainTextPassword = $true } }
+        [object[]]$allNodes = $ComputerName | ForEach-Object { @{ NodeName = $_; PSDscAllowPlainTextPassword = $true; RefreshMode = $PSCmdlet.ParameterSetName } }
         $configData = @{
             AllNodes = $allNodes
         }
