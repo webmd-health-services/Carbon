@@ -119,6 +119,7 @@ function Convert-AboutTopicToHtml
         if( $InputObject -is [IO.FileInfo] )
         {
             [string[]]$lines = $InputObject | Get-Content
+            $topicName = $InputObject.BaseName -replace '\.help$' -f ''
         }
         else
         {
@@ -128,6 +129,7 @@ function Convert-AboutTopicToHtml
                 Write-Error ('About topic ''{0}'' not found.' -f $InputObject)
                 return
             }
+            $topicName = $InputObject
         }
 
         $topic = [pscustomobject]@{ }
@@ -166,19 +168,19 @@ function Convert-AboutTopicToHtml
 
         if( -not ($topic | Get-Member -Name $TopicHeading) )
         {
-            Write-Warning ('Topic ''{0}'' doesn''t have a ''{1}'' heading. Defaulting to {0}. Use the `TopicHeading` parameter to set the topic''s topic heading.' -f $Name,$TopicHeading)
-            Complete-Section -Heading 'TOPIC' -Body $Name
+            Write-Warning ('Topic ''{0}'' doesn''t have a ''{1}'' heading. Defaulting to {0}. Use the `TopicHeading` parameter to set the topic''s topic heading.' -f $topicName,$TopicHeading)
+            Complete-Section -Heading 'TOPIC' -Body $topicName
         }
 
         if( -not ($topic | Get-Member -Name $ShortDescriptionHeading) )
         {
-            Write-Warning ('Topic ''{0}'' doesn''t have a ''{1}'' heading. Use the `ShortDescription` parameter to set the topic''s SHORT DESCRIPTION heading.' -f $Name,$ShortDescriptionHeading)
+            Write-Warning ('Topic ''{0}'' doesn''t have a ''{1}'' heading. Use the `ShortDescription` parameter to set the topic''s SHORT DESCRIPTION heading.' -f $topicName,$ShortDescriptionHeading)
             Complete-Section -Heading 'SHORT DESCRIPTION' -Body ''
         }
 
         if( -not ($topic | Get-Member -Name $LongDescriptionHeading) )
         {
-            Write-Warning ('Topic ''{0}'' doesn''t have a ''{1}'' heading. Use the `lONGDescription` parameter to set the topic''s LONG DESCRIPTION heading.' -f $Name,$LongDescriptionHeading)
+            Write-Warning ('Topic ''{0}'' doesn''t have a ''{1}'' heading. Use the `lONGDescription` parameter to set the topic''s LONG DESCRIPTION heading.' -f $topicName,$LongDescriptionHeading)
             Complete-Section -Heading 'LONG DESCRIPTION' -Body ''
         }
 
