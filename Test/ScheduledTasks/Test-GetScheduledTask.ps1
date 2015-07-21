@@ -109,6 +109,7 @@ function Assert-ScheduledTaskEqual
                                     '\Microsoft\Windows\TaskScheduler\Regular Maintenance' = $true;
                                     '\Microsoft\Windows\WindowsUpdate\Scheduled Start' = $true;
                                     '\Microsoft\Windows\WindowsUpdate\Scheduled Start With Network' = $true;
+                                    '\Microsoft\Office\Office 15 Subscription Heartbeat' = $true;
                                 }
     $scheduleProps = @(
                            'Last Result',
