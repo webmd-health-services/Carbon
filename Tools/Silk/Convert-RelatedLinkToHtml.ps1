@@ -24,6 +24,7 @@ function Convert-RelatedLinkToHtml
     begin
     {
         Set-StrictMode -Version 'Latest'
+
     }
 
     process
@@ -31,6 +32,16 @@ function Convert-RelatedLinkToHtml
         if( ($CommandHelp | Get-Member -Name 'ModuleName') -and $CommandHelp.ModuleName )
         {
             $ModuleName = $CommandHelp.ModuleName
+        }
+
+        $aboutTopics = @()
+        if( $ModuleName )
+        {
+            $aboutTopics = Get-Module -Name $ModuleName | 
+                                Select-Object -ExpandProperty 'ModuleBase' | 
+                                Get-ChildItem -Filter 'about_*' | 
+                                Select-Object -ExpandProperty 'BaseName' | 
+                                ForEach-Object { $_ -replace '\.help$','' }
         }
 
         Invoke-Command -ScriptBlock {
@@ -60,7 +71,12 @@ function Convert-RelatedLinkToHtml
                 {
                     return '<a href="{0}.html">{1}</a>' -f $cmd.HelpUri,$_
                 }
-                  
+
+                if( $aboutTopics -contains $_ )
+                {
+                    return '<a href="{0}.html">{0}</a>' -f $_
+                }
+                
                 return $_
             }
     }

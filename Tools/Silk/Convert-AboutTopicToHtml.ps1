@@ -57,6 +57,7 @@ function Convert-AboutTopicToHtml
         # The name of the topic you're converting. Only used if `InputObject` is the text of the about topic.
         $TopicName,
 
+        [Parameter(Mandatory=$true)]
         [string]
         # The name of the module being documented.
         $ModuleName,
@@ -75,7 +76,11 @@ function Convert-AboutTopicToHtml
 
         [string]
         # The heading used for the topic's `See Also` section. Default is `SEE ALSO`.
-        $SeeAlsoHeading = 'SEE ALSO'
+        $SeeAlsoHeading = 'SEE ALSO',
+
+        [hashtable]
+        # A hashtable of headings to use. They key should be the section name. The value should be the heading name.
+        $HeadingMap = @{}
     )
 
     begin
@@ -119,7 +124,7 @@ function Convert-AboutTopicToHtml
                 }
                 default
                 {
-                    $Body = $Body | Convert-MarkdownToHtml 
+                    $Body = $Body | Edit-HelpText -ModuleName $ModuleName | Convert-MarkdownToHtml 
                 }
             }
 
@@ -155,9 +160,18 @@ function Convert-AboutTopicToHtml
         {
             $line = $lines[$idx]
 
-            if( $line -match '^\s+' )
+            if( -not $line -or $line -match '^\s+' )
             {
-                $currentContent.AppendLine( $line.Trim() )
+                if( $line.StartsWith('    ') )
+                {
+                    $line = $line -replace '^    ',''
+                }
+                elseif( $line.StartsWith('  ') )
+                {
+                    $line = $line -replace '^  ',''
+                }
+
+                $currentContent.AppendLine( $line )
                 if( $idx -eq $lastLineIdx )
                 {
                     Complete-Section -Heading $currentHeader -Body $currentContent.ToString()
@@ -175,7 +189,7 @@ function Convert-AboutTopicToHtml
                 }
 
                 $currentContent = New-Object 'Text.StringBuilder'
-                $currentHeader = $line
+                $currentHeader =  [Globalization.CultureInfo]::CurrentCulture.TextInfo.ToTitleCase( $line.ToLowerInvariant() )
                 $sectionOrder.Add( $currentHeader )
             }
         }
@@ -192,21 +206,25 @@ function Convert-AboutTopicToHtml
             Complete-Section -Heading 'SHORT DESCRIPTION' -Body ''
         }
 
-        if( -not ($topic | Get-Member -Name $LongDescriptionHeading) )
+        if( -not $HeadingMap.ContainsKey($LongDescriptionHeading) )
         {
-            Write-Warning ('Topic ''{0}'' doesn''t have a ''{1}'' heading. Use the `lONGDescription` parameter to set the topic''s LONG DESCRIPTION heading.' -f $TopicName,$LongDescriptionHeading)
-            Complete-Section -Heading 'LONG DESCRIPTION' -Body ''
+            $HeadingMap[$LongDescriptionHeading] = 'Description'
         }
 
         $content = New-Object 'Text.StringBuilder'
         foreach( $section in $sectionOrder )
         {
-            if( $section -eq $TopicHeading -or $section -eq $ShortDescriptionHeading -or $section -eq $LongDescriptionHeading )
+            if( $section -eq $TopicHeading -or $section -eq $ShortDescriptionHeading )
             {
                 continue
             }
 
-            $content.AppendLine( ('<h2>{0}</h2>' -f $section) )
+            $heading = $section
+            if( $HeadingMap.ContainsKey($section) )
+            {
+                $heading = $HeadingMap[$section]
+            }
+            $content.AppendLine( ('<h2>{0}</h2>' -f $heading) )
             $content.AppendLine( $topic.$Section )
         }
 
@@ -215,13 +233,9 @@ function Convert-AboutTopicToHtml
 
     {1}
 
-    <h2>Description</h2>
-
     {2}
 
-    {3}
-
-'@ -f $topic.$TopicHeading,$topic.$ShortDescriptionHeading,$topic.$LongDescriptionHeading,$content
+'@ -f $topic.$TopicHeading,$topic.$ShortDescriptionHeading,$content
 
     }
 
