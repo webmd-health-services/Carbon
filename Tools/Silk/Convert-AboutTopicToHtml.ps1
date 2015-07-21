@@ -54,6 +54,10 @@ function Convert-AboutTopicToHtml
         $InputObject,
 
         [string]
+        # The name of the module being documented.
+        $ModuleName,
+
+        [string]
         # The heading used for the topic's name. Default is `TOPIC`.
         $TopicHeading = 'TOPIC',
 
@@ -100,7 +104,9 @@ function Convert-AboutTopicToHtml
 
                 $SeeAlsoHeading
                 {
-                    $lines = $Body -split ([Environment]::NewLine) | Convert-RelatedLinkToHtml | ForEach-Object { '<li>{0}</li>' -f $_ }
+                    $lines = $Body -split ([Environment]::NewLine) | 
+                                Convert-RelatedLinkToHtml -ModuleName $ModuleName | 
+                                ForEach-Object { '<li>{0}</li>' -f $_ }
                     $Body = @'
     <ul>
         {0}

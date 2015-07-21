@@ -6,14 +6,19 @@ function Convert-RelatedLinkToHtml
     Converts a command's related link to HTML.
 
     .DESCRIPTION
-    `Convert-RelatedLinkToHtml` converts a command's related link to HTML. If the related link is not a URL, the command name is converted to a link that poitns to a `CommandName.html` file.
+    `Convert-RelatedLinkToHtml` converts a command's related links to HTML. If the related link is not a URL, the command name is converted to a link that poitns to a `CommandName.html` file.
+
+
     #>
     [CmdletBinding()]
     param(
         [Parameter(Mandatory=$true,ValueFromPipeline=$true)]
+        # The help object returned by `Get-Help`.
+        $CommandHelp,
+
         [string]
-        # The related link to convert.
-        $RelatedLink
+        # The name of the module the command is in.
+        $ModuleName
     )
 
     begin
@@ -23,14 +28,41 @@ function Convert-RelatedLinkToHtml
 
     process
     {
-        if( $RelatedLink -match '^https?\:\/\/' )
+        if( ($CommandHelp | Get-Member -Name 'ModuleName') -and $CommandHelp.ModuleName )
         {
-            '<a href="{0}">{0}</a>' -f $RelatedLink
+            $ModuleName = $CommandHelp.ModuleName
         }
-        else
-        {
-            '<a href="{0}.html">{0}</a>' -f $RelatedLink
-        } 
+
+        Invoke-Command -ScriptBlock {
+                if( $CommandHelp | Get-Member -Name 'RelatedLinks' )
+                {
+                     return $CommandHelp.RelatedLinks
+                                Out-String -Width ([Int32]::MaxValue) |
+                                ForEach-Object { $_ -split "`n" } |
+                                ForEach-Object { $_.Trim() } |
+                                Where-Object { $_ }
+                }
+                return $CommandHelp
+            } |
+            ForEach-Object {
+                if( $_ -match '^https?\:\/\/' )
+                {
+                    return '<a href="{0}">{0}</a>' -f $_
+                }
+
+                if( $ModuleName -and (Get-Command -Name $_ -Module $ModuleName -ErrorAction Ignore) )
+                {
+                    return '<a href="{0}.html">{0}</a>' -f $_
+                }
+
+                $cmd = Get-Command -Name $_ -ErrorAction Ignore
+                if( $cmd -and $cmd.HelpUri )
+                {
+                    return '<a href="{0}.html">{1}</a>' -f $cmd.HelpUri,$_
+                }
+                  
+                return $_
+            }
     }
 
     end
