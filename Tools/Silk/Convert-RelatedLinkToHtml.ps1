@@ -47,13 +47,17 @@ function Convert-RelatedLinkToHtml
         Invoke-Command -ScriptBlock {
                 if( $CommandHelp | Get-Member -Name 'RelatedLinks' )
                 {
-                     return $CommandHelp.RelatedLinks
+                     return $CommandHelp.RelatedLinks |
                                 Out-String -Width ([Int32]::MaxValue) |
                                 ForEach-Object { $_ -split "`n" } |
                                 ForEach-Object { $_.Trim() } |
                                 Where-Object { $_ }
                 }
-                return $CommandHelp
+
+                if( $CommandHelp -is [string] )
+                {
+                    return $CommandHelp
+                }
             } |
             ForEach-Object {
                 if( $_ -match '^https?\:\/\/' )

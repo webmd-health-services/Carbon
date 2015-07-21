@@ -20,6 +20,8 @@ filter Convert-HelpToHtml
         $Syntax
     )
 
+    Set-StrictMode -Version 'Latest'
+
     foreach( $commandName in $Name )
     {
         $help = Get-Help -Name $commandName -Full
@@ -48,12 +50,7 @@ $description
 "@
         }
     
-        [string[]]$relatedCommands = $help.RelatedLinks |
-            Out-String -Width ([Int32]::MaxValue) |
-            ForEach-Object { $_ -split "`n" } |
-            ForEach-Object { $_.Trim() } |
-            Where-Object { $_ } |
-            Convert-RelatedLinkToHtml
+        [string[]]$relatedCommands = $help | Convert-RelatedLinkToHtml
     
         if( $relatedCommands )
         {
@@ -80,20 +77,25 @@ $description
                                     'Confirm' = $true;
                                 }
         $hasCommonParameters = $false
-        $parameters = $help.Parameters.Parameter |
-            Where-Object { $_ } | 
-            ForEach-Object {
-                if( $commonParameterNames.ContainsKey( $_.name ) )
-                {
-                    $hasCommonParameters = $true
-                }
+        $parameters = $help | 
+                        Select-Object -ExpandProperty 'Parameters' |
+                        Where-Object { $_ | Get-Member -Name 'parameter' } |
+                        Select-Object -ExpandProperty 'parameter' |
+                        Where-Object { $_ } | 
+                        ForEach-Object {
+                            if( $commonParameterNames.ContainsKey( $_.name ) )
+                            {
+                                $hasCommonParameters = $true
+                            }
             
-                $typeLink = Get-TypeDocumentationLink -CommandName $commandName -TypeName $_.type.name
-                $paramDescription = $_.Description | 
-                                Out-HtmlString | 
-                                Convert-MarkdownToHtml | 
-                                ForEach-Object { $_.Replace('<p>','').Replace('</p>','') }
-                @"
+                            $typeLink = Get-TypeDocumentationLink -CommandName $commandName -TypeName $_.type.name
+                            $paramDescription = $_ | 
+                                                    Where-Object { $_ | Get-Member -name 'Description' } |
+                                                    Select-Object -ExpandProperty 'Description' |
+                                                    Out-HtmlString | 
+                                                    Convert-MarkdownToHtml | 
+                                                    ForEach-Object { $_.Replace('<p>','').Replace('</p>','') }
+                            @"
 <tr valign='top'>
 	<td>{0}</td>
 	<td>{1}</td>
@@ -103,7 +105,7 @@ $description
     <td>{5}</td>
 </tr>
 "@ -f $_.Name,$typeLink,$paramDescription,$_.Required,$_.PipelineInput,$_.DefaultValue
-            }
+                    }
         
         if( $parameters )
         {
@@ -138,7 +140,12 @@ $description
 "@ -f ($parameters -join "`n"),$commonParameters
         }
 
-        $inputTypes = $help.inputTypes | Out-HtmlString
+        $inputTypes = @()
+        if( $help | Get-Member -Name 'inputTypes' )
+        {
+            $inputTypes = $help.inputTypes | Out-HtmlString
+        }
+
         if( $inputTypes )
         {
             $inputTypes = @"
@@ -147,7 +154,12 @@ $description
 "@ -f $inputTuypes
         }
     
-        $returnValues = ($help.returnValues | Out-HtmlString) -replace "`n",' '
+        $returnValues =@()
+        if( $help | Get-Member -Name 'returnValues' )
+        {
+            $returnValues = ($help.returnValues | Out-HtmlString) -replace "`n",' '
+        }
+
         if( $returnValues )
         {
             if( $returnValues -match '^(.*?)\.?(\s+(.*))?$' )
@@ -166,7 +178,12 @@ $description
 "@ -f $returnValues
         }
     
-        $notes = $help.AlertSet | Out-HtmlString
+        $notes = ''
+        if( $help | Get-Member -Name 'AlertSet' )
+        {
+            $notes = $help.AlertSet | Out-HtmlString
+        }
+
         if( $notes )
         {
             $notes = @"
@@ -175,28 +192,32 @@ $description
 "@ -f $notes
         }
     
-        $examples = $help.Examples.example |
-            Where-Object { $_ } |
-            ForEach-Object {
-                $title = $_.title.Trim(('-',' '))
-                $code = ''
-                if( $_.code )
-                {
-                    $code = $_.code | Out-HtmlString
-                    $code = '<pre><code>{0}</code></pre>' -f $code
-                }
-                $remarks = $_.remarks | Out-HtmlString | Convert-MarkdownToHtml
-                @"
+        $examples = @()
+        if( $help | Get-Member -Name 'Examples' )
+        {
+            $examples = $help.Examples.example |
+                Where-Object { $_ } |
+                ForEach-Object {
+                    $title = $_.title.Trim(('-',' '))
+                    $code = ''
+                    if( $_.code )
+                    {
+                        $code = $_.code | Out-HtmlString
+                        $code = '<pre><code>{0}</code></pre>' -f $code
+                    }
+                    $remarks = $_.remarks | Out-HtmlString | Convert-MarkdownToHtml
+                    @"
 <h2>{0}</h2>
 {1}
 {2}
 "@ -f $title,$code,$remarks
-            }
+                }
+        }
     
         $filename = $help.Name
         $fileName = Split-Path -Leaf -Path $filename # handle help for scripts
         $filename = '{0}.html' -f $filename
-        if( $help | Get-Member FileName )
+        if( $help | Get-Member -Name 'FileName' )
         {
             $filename = $help.FileName
         }
