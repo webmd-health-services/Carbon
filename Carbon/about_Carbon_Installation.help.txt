@@ -2,9 +2,6 @@ TOPIC
     about_Carbon_Installation
     
 SHORT DESCRIPTION
-    This topic describes how to install Carbon.
-    
-LONG DESCRIPTION
     Carbon can be installed from a ZIP archive, from the PowerShell gallery, with 
     Chocolatey, and NuGet.
     

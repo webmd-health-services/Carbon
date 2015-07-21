@@ -76,7 +76,7 @@ function Out-HtmlPage
 <html>
 <head>
     <title>{0}</title>
-	<link href="styles.css" type="text/css" rel="stylesheet" />
+	<link href="/styles.css" type="text/css" rel="stylesheet" />
     {1}
 </head>
 <body>

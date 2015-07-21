@@ -1,0 +1,76 @@
+TOPIC
+    about_Carbon_Contributing
+
+SHORT DESCRIPTION
+    This topic describes how to contribute to the Carbon project.
+    
+LONG DESCRIPTION
+    We welcome your feedback and contributions!  
+    
+    We use Mercurial for source control. To get the Carbon source code onto your computer,
+    run:
+    
+        PS> hg clone https://bitbucket.org/splatteredbits/carbon
+
+    We belive in Test-Driven Development (TDD)! If you don't, you won't be happy 
+    contributing. Anything you want to submit back to the project must have good tests. 
+    If not, it will take longer to accept your contribution, because we'll have to take 
+    time to write tests. TDD enables us to release new versions of Carbon as soon changes 
+    are committed, pushed, and the tests pass. If the code is ready and works, we want to 
+    release it. No waiting! 
+
+    Blade is our testing framework. It uses NUnit-inspired assertions, e.g. Assert-True, 
+    Assert-Equal, etc. See http://bitbucket.org/splatteredbits/blade for more information.
+    
+    To run Carbon's tests (the full suite takes about 45 minutes), run this command in the 
+    root of your Carbon working directory:
+    
+        PS> .\Invoke-CarbonTest.ps1 -Path .\Test
+        
+    Tests should always clean-up after themselves and strive to leave an operating system 
+    in the exact state it was in before the test fixture ran. 
+    
+    Unfortunately, we only have the resources to run our tests on a 64-bit Windows 2012 R2
+    and 7 computer. Any donations to the project would be used to purchase licenses and 
+    hosting for running our tests on 32-bit and 64-bit versions of Windows 7, Windows 
+    2008 R2, and Windows 2012 R2.
+ 
+    Carbon uses semantic versioning (see http://semver.org/). Carbon version numbers 
+    take the form X.Y.Z: X is the major version, Y is the minor version, and Z is the 
+    patch version. The patch version is incremented when backwards-compatible bug 
+    fixes are made. You should feel comfortable rolling out a new patch version 
+    quickly, with limited testing. The minor version is incremented when new, 
+    backwards-compatible changes are introduced, or existing functions are deprecated.  
+    You'll probably want to review the release notes and test those bits that changed 
+    since the last release. The major version is incremented when 
+    backwards-incompatible changes are made. In this case, you'll need to do thorough 
+    testing, and upgrade your scripts to use new functionality. 
+
+STYLE GUIDE
+ 
+    We use spaces for indenting.  Each level of indent (i.e. "tab") should be four spaces. 
+    This is default in the PowerShell ISE.
+    
+    Use camel-casing for all function names, including abbreviations three letters or 
+    longer, e.g. Install-Msmq, Install-IisWebsite. Capitalize all letters in one or two 
+    letter abbreviations, e.g. Test-OSIs32Bit.
+    
+    All function parameter and module variables names must be capitalized, e.g. `$Path`, 
+    `$Name`, etc. All variable names should be lowercase, e.g. `$result`, `$csprojXml`.
+    
+    Variables that contain a path should end in `Path`, e.g. $csprojPath, $websitePath.
+    
+    *Always* use an [approved PowerShell verb](http://msdn.microsoft.com/en-us/library/windows/desktop/ms714428.aspx).
+    
+    If possible, use an [approved PowerShell parameter name](http://msdn.microsoft.com/en-us/library/windows/desktop/dd878352(v=vs.85).aspx).
+      
+    Use a prefix for all functions that manage a common area of Windows, e.g. Iis for all 
+    IIS-related functions, Msmq for MSMQ-related functions, etc.
+    
+    All functions must have synopsis, description, and example documentation.
+    
+SEE ALSO
+    https://bitbucket.org/splatteredbits/carbon
+    https://bitbucket.org/splatteredbits/blade
+    http://mercurial.selenic.com
+    
