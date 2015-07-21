@@ -95,11 +95,6 @@ ul#SiteNav li
 {
     text-decoration: none;
     display: block;
-    background: #eee;
-    background: #ddf;
-	background: lightblue;
-	background: cornflowerblue;
-	background: lavender;
     background: #A7BAD1;
     padding: 0.24em 1em;
     color: #00c;
@@ -109,11 +104,6 @@ ul#SiteNav li
 
 #CommandsMenu a:hover 
 {
-    background: #ddf;
-	background: lightblue;
-	background: lavender;
-	background: cornflowerblue;
-    background: #BCC9D8;
     background: #C5D0DD;
 }
 
@@ -141,6 +131,20 @@ ul#SiteNav li
 
 #ByName, #ByVerb
 {
-    visibility: hidden;
     display: none;
+}
+
+#ByName 
+{
+    margin-top: 1.3em;
+}
+
+#ByName ul
+{
+    list-style-type: none;
+}
+
+#ByName ul li
+{
+    padding: .15em 0 .15em 0;
 }

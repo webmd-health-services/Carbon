@@ -43,7 +43,7 @@ function Out-HtmlPage
         $jQueryScriptTag = ''
         if( $JQuery )
         {
-            $jQueryScriptTag = '<script src="/jquery-2.1.4-min.js"></script>'
+            $jQueryScriptTag = '<script src="/jquery-2.1.4.min.js"></script>{0}<script src="/helpindex.js"></script>' -f ([Environment]::NewLine)
         }
 
         $path = Join-Path -Path $webRoot -ChildPath $VirtualPath
@@ -154,7 +154,9 @@ $verbList = $verbs.Keys | Sort-Object | ForEach-Object {
     @'
 <h3>{0}</h3>
 
-{1}
+<ul>
+    {1}
+</ul>
 '@ -f $verb,($verbCommands -join ([Environment]::NewLine))
 }
 
@@ -192,9 +194,9 @@ $helpIndexArgs = @(
 
 <h2>Commands</h1>
 <ul id="CommandsMenu">
-    <li class="selected"><a href="#ByTag">By Tag</a></li>
-    <li><a href="#ByName">By Name</a></li>
-    <li><a href="#ByVerb">By Verb</a></li>
+    <li id="ByTagMenuItem" class="selected"><a href="#ByTag">By Tag</a></li>
+    <li id="ByNameMenuItem" ><a href="#ByName">By Name</a></li>
+    <li id="ByVerbMenuItem" ><a href="#ByVerb">By Verb</a></li>
 </ul>
 
 <div id="CommandsContent">
@@ -206,7 +208,9 @@ $helpIndexArgs = @(
 
     <div id="ByName">
         <a id="ByName"></a>
-        {1}
+        <ul>
+            {1}
+        </ul>
     </div>
 
     <div id="ByVerb">
