@@ -171,7 +171,7 @@ function Convert-AboutTopicToHtml
                     $line = $line -replace '^  ',''
                 }
 
-                $currentContent.AppendLine( $line )
+                [void]$currentContent.AppendLine( $line )
                 if( $idx -eq $lastLineIdx )
                 {
                     Complete-Section -Heading $currentHeader -Body $currentContent.ToString()
@@ -224,8 +224,8 @@ function Convert-AboutTopicToHtml
             {
                 $heading = $HeadingMap[$section]
             }
-            $content.AppendLine( ('<h2>{0}</h2>' -f $heading) )
-            $content.AppendLine( $topic.$Section )
+            [void]$content.AppendLine( ('<h2>{0}</h2>' -f $heading) )
+            [void]$content.AppendLine( $topic.$Section )
         }
 
         @'
