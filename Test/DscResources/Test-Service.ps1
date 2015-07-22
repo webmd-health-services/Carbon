@@ -38,7 +38,7 @@ function Stop-Test
     Uninstall-Service -Name $serviceName
     if( (Test-Path -Path $tempDir -PathType Container) )
     {
-        Remove-Item -Path $tempDir -Recurse
+        Remove-Item -Path $tempDir -Recurse -ErrorAction Ignore
     }
 }
 
