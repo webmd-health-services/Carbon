@@ -39,6 +39,34 @@
                  ]
     },
     {
+        "Name":  "Carbon_EnvironmentVariable",
+        "Tags": [ "DSC", "DSC Resources", "Computer", "Environment" ]
+    },
+    {
+        "Name":  "Carbon_FirewallRule",
+        "Tags": [ "DSC", "DSC Resources", "Firewall", "Networking" ]
+    },
+    {
+        "Name":  "Carbon_IniFile",
+        "Tags": [ "DSC", "DSC Resources", "INI", "Text" ]
+    },
+    {
+        "Name":  "Carbon_Permission",
+        "Tags": [ "DSC", "DSC Resources", "Security", "File System", "NTFS", "Registry", "Certificates", "ACL" ]
+    },
+    {
+        "Name":  "Carbon_Privilege",
+        "Tags": [ "DSC", "DSC Resources", "Security", "Privileges", "Users", "Groups", "Identity", "Principal" ]
+    },
+    {
+        "Name":  "Carbon_ScheduledTask",
+        "Tags": [ "DSC", "DSC Resources", "Scheduled Tasks" ]
+    },
+    {
+        "Name":  "Carbon_Service",
+        "Tags": [ "DSC", "DSC Resources", "Service" ]
+    },
+    {
         "Name":  "Clear-DscLocalResourceCache",
         "Tags":  [
                      "DSC"
@@ -348,7 +376,7 @@
     {
         "Name":  "Get-IPAddress",
         "Tags":  [
-                     "Network",
+                     "Networking",
                      "IP"
                  ]
     },
@@ -1070,7 +1098,7 @@
     {
         "Name":  "Test-IPAddress",
         "Tags":  [
-                     "Network",
+                     "Networking",
                      "IP"
                  ]
     },
