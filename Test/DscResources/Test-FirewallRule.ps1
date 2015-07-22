@@ -37,7 +37,9 @@ function Stop-TestFixture
 
 function Test-ShouldGetPresentTargetResource
 {
-    $rule = Get-FirewallRule | Select-Object -First 1
+    # Select a firewall rule that has a unique name.
+    $rule = Get-FirewallRuleUnique
+
     $resource = Get-TargetResource -Name $rule.Name -Direction $rule.Direction -Action $rule.Action
     Assert-NotNull $resource
     foreach( $propName in $resource.Keys )
@@ -46,7 +48,7 @@ function Test-ShouldGetPresentTargetResource
         {
             continue
         }
-        Assert-Equal $rule.$propName $resource[$propName]
+        Assert-Equal $rule.$propName $resource[$propName] ('{0}: {1}' -f $rule.Name,$propName)
     }
     Assert-DscResourcePresent $resource
 }
@@ -118,7 +120,7 @@ function Test-ShouldTestTargetResource
     Assert-Null (Get-FirewallRule -Name $RuleName)
     Assert-False (Test-TargetResource -Name $RuleName -Direction In -Action Allow -Ensure Present)
     Assert-True (Test-TargetResource -Name $RuleName -Direction In -Action Allow -Ensure Absent)
-    $rule = Get-FirewallRule | select -First 1
+    $rule = Get-FirewallRuleUnique
     Assert-NotNull $rule
     Assert-True (Test-TargetResource -Name $rule.Name -Direction $rule.Direction -Action $rule.Action -Ensure Present)
     Assert-False (Test-TargetResource -Name $rule.Name -Direction $rule.Direction -Action $rule.Action -Ensure Absent)
@@ -330,4 +332,17 @@ function Remove-FirewallRule
     {
         netsh advfirewall firewall delete rule name=$Name
     }
+}
+
+function Get-FirewallRuleUnique
+{
+    [OutputType([Carbon.Firewall.Rule])]
+    param(
+    )
+
+    Get-FirewallRule | 
+        Group-Object -Property 'Name' | 
+        Sort-Object -Property 'Count' | 
+        Select-Object -First 1 |
+        Select-Object -ExpandProperty 'Group'
 }

@@ -82,6 +82,11 @@ function Get-TargetResource
     Set-StrictMode -Version 'Latest'
 
     $rule = Get-FirewallRule -LiteralName $Name
+    if( $rule -is [object[]] )
+    {
+        Write-Error ('Found {0} firewall rules named ''{1}''.' -f $rule.Count,$Name)
+        return
+    }
     
     $resource = @{ 
                     'Action' = $Action;

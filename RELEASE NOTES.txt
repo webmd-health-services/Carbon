@@ -305,6 +305,7 @@ The following functions were re-written to use the `System.DirectoryServices.Acc
  * `Install-FileShare` (fka `Install-SmbShare`):
     * Re-written to use WMI isntead of `net.exe`.
     * Modifies existing shares in place, instead of deleting and re-creating, *unless* the share's path changes. Changing a share's path requires the old share to be deleted and a new one created.
+ * `Carbon_FirewallRule` now fails with an error if it finds multiple firewall rules with the same name.
  
  
 # 1.9.0 (8 November 2014)
