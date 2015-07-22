@@ -32,16 +32,20 @@ function Convert-ModuleHelpToHtml
                         Select-Object -ExpandProperty 'ModuleBase' |
                         Get-ChildItem -Filter 'about_*.help.txt'
 
+    $dscResources = Get-Module -Name $ModuleName |
+                        Select-Object -ExpandProperty 'ModuleBase' |
+                        Join-Path -ChildPath 'DscResources' |
+                        Where-Object { Test-Path -Path $_ -PathType Container } |
+                        Get-ChildItem -Directory 
+
     [int]$numCommands = $commands | Measure-Object | Select-Object -ExpandProperty 'Count'
     [int]$numAboutTopics = $aboutTopics | Measure-Object | Select-Object -ExpandProperty 'Count'
+    [int]$numDscResources = $dscResources | Measure-Object | Select-Object -ExpandProperty 'Count'
 
-    if( $SkipCommandHelp )
+    [int]$numPages = $numAboutTopics + $numDscResources
+    if( -not $SkipCommandHelp )
     {
-        [int]$numPages = $numAboutTopics
-    }
-    else
-    {
-        [int]$numPages = $numCommands + $numAboutTopics
+        $numPages += $numCommands
     }
 
     $count = 0
@@ -59,6 +63,7 @@ function Convert-ModuleHelpToHtml
         }
     }
 
+    <#
     foreach( $aboutTopic in $aboutTopics )
     {
         $topicName = $aboutTopic.BaseName -replace '\.help',''
@@ -68,6 +73,20 @@ function Convert-ModuleHelpToHtml
                             Name = $topicName;
                             Type = 'AboutTopic';
                             Html = $html
+                         }
+    }
+    #>
+
+    foreach( $dscResource in $dscResources )
+    {
+        $dscResourceName = $dscResource.BaseName
+        Write-Progress -Activity 'Generating Module HTML' -PercentComplete ($count++ / $numPages * 100) -CurrentOperation $dscResourceName
+        Import-Module -Name $dscResource.FullName
+        $html = Convert-HelpToHtml -Name 'Set-TargetResource' -DisplayName $dscResourceName -Syntax (Get-DscResource -Name $dscResourceName -Syntax) -ModuleName $ModuleName
+        [pscustomobject]@{
+                            Name = $dscResourceName;
+                            Type = 'DscResource';
+                            Html = $html;
                          }
     }
 }

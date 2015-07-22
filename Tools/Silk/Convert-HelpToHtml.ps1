@@ -17,7 +17,11 @@ filter Convert-HelpToHtml
 
         [string]
         # The syntax of the command. Useful when showing syntax for DSC resources.
-        $Syntax
+        $Syntax,
+
+        [string]
+        # The name of the module whose help is getting converted.
+        $ModuleName
     )
 
     Set-StrictMode -Version 'Latest'
@@ -50,7 +54,7 @@ $description
 "@
         }
     
-        [string[]]$relatedCommands = $help | Convert-RelatedLinkToHtml
+        [string[]]$relatedCommands = $help | Convert-RelatedLinkToHtml -ModuleName $ModuleName
     
         if( $relatedCommands )
         {

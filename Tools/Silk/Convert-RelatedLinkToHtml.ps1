@@ -29,7 +29,7 @@ function Convert-RelatedLinkToHtml
 
     process
     {
-        if( ($CommandHelp | Get-Member -Name 'ModuleName') -and $CommandHelp.ModuleName )
+        if( -not $ModuleName -and ($CommandHelp | Get-Member -Name 'ModuleName') -and $CommandHelp.ModuleName )
         {
             $ModuleName = $CommandHelp.ModuleName
         }
