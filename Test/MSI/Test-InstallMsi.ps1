@@ -143,7 +143,19 @@ function Test-ShouldInstallMsiWithSpacesInPath
 function Assert-CarbonTestInstallerInstalled
 {
     Assert-NoError
-    $item = Get-ProgramInstallInfo -Name '*Carbon*'
+    $maxTries = 100
+    $tryNum = 0
+    do
+    {
+        $item = Get-ProgramInstallInfo -Name '*Carbon*'
+        if( $item )
+        {
+            break
+        }
+
+        Start-Sleep -Milliseconds 100
+    }
+    while( $tryNum++ -lt $maxTries )
     Assert-NotNull $item
 }
 
