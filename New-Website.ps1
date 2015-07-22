@@ -33,7 +33,8 @@ Set-StrictMode -Version 'Latest'
 function Out-HtmlPage
 {
     param(
-        [Parameter(Mandatory=$true,ValueFromPipeline=$true)]
+        [Parameter(Mandatory=$true,ValueFromPipeline=$true,ValueFromPipelineByPropertyName=$true)]
+        [Alias('Html')]
         # The contents of the page.
         $Content,
 
@@ -113,11 +114,8 @@ $headingMap = @{
                     'INSTALL WITH NUGET' = 'Install With NuGet';
                }
 
-$help = Convert-ModuleHelpToHtml -ModuleName 'Carbon' -HeadingMap $headingMap -SkipCommandHelp:$SkipCommandHelp |
-            ForEach-Object {
-                $_.Html | Out-HtmlPage -Title ('PowerShell - {0} - Carbon' -f $_.Name) -VirtualPath ('/help/{0}.html' -f $_.Name)
-                $_
-            }
+Convert-ModuleHelpToHtml -ModuleName 'Carbon' -HeadingMap $headingMap -SkipCommandHelp:$SkipCommandHelp |
+    ForEach-Object { Out-HtmlPage -Title ('PowerShell - {0} - Carbon' -f $_.Name) -VirtualPath ('/help/{0}.html' -f $_.Name) -Content $_.Html }
 
 New-ModuleHelpIndex -TagsJsonPath (Join-Path -Path $PSScriptRoot -ChildPath 'tags.json') -ModuleName 'Carbon' |
      Out-HtmlPage -Title 'PowerShell - Carbon Module Documentation' -VirtualPath '/help/index.html'
