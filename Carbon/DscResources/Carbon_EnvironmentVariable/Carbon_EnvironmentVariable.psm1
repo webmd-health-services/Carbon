@@ -65,9 +65,6 @@ function Set-TargetResource
     `Carbon_EnvironmentVariable` is new in Carbon 2.0.
 
     .LINK
-    Get-EnvironmentVariable
-
-    .LINK
     Set-EnvironmentVariable
 
     .EXAMPLE
