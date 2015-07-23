@@ -63,7 +63,6 @@ function Convert-ModuleHelpToHtml
         }
     }
 
-    <#
     foreach( $aboutTopic in $aboutTopics )
     {
         $topicName = $aboutTopic.BaseName -replace '\.help',''
@@ -75,7 +74,6 @@ function Convert-ModuleHelpToHtml
                             Html = $html
                          }
     }
-    #>
 
     foreach( $dscResource in $dscResources )
     {

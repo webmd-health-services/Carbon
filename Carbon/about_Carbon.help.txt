@@ -31,6 +31,10 @@ SYSTEM REQUIREMENTS
 
 INSTALLATION
     See the `about_Carbon_Installation` help topic for installation instructions.
+
+SUPPORT
+    See the `about_Carbon_Support` help topic for ways to ask questions about using 
+    Carbon.
     
 OVERVIEW  
     Only PowerShell [approved verbs](http://msdn.microsoft.com/en-us/library/windows/desktop/ms714428.aspx)
@@ -78,6 +82,7 @@ SEE ALSO
     http://get-carbon.org
     https://bitbucket.org/splatteredbits/carbon
     about_Carbon_Installation
+    about_Carbon_Support
     about_Carbon_Extended_Type_Data
     about_Carbon_2.0
     about_Carbon_Contributing

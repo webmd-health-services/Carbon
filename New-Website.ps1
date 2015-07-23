@@ -75,6 +75,7 @@ function Out-HtmlPage
 		<li><a href="/">Get-Carbon</a></li>
         <li><a href="/help/about_Carbon_Installation.html">-Install</a></li>
 		<li><a href="/help/index.html">-Documentation</a></li>
+        <li><a href="/help/about_Carbon_Support.html">-Support</a></li>
         <li><a href="/releasenotes.html">-ReleaseNotes</a></li>
 		<li><a href="http://pshdo.com">-Blog</a></li>
     </ul>
