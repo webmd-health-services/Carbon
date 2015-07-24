@@ -7,18 +7,92 @@ SHORT DESCRIPTION
 LONG DESCRIPTION
     The extended type data that Carbon adds are outlined below. 
     
-    ## System.Diagnostics.Process
+    ## Microsoft.Web.Administration.Site
+     * `[string] PhysicalPath { get; }`: the website's physical path (i.e. web root).
+     
+    ## Microsoft.Web.Administration.Application
+     * `[string] PhysicalPath`: the application's phyiscal path (i.e. web root).
     
-     * Property `ParentProcessID`: the ID of the parent process (i.e. the process that started this process). Uses WMI, so it can be a little slow.
+    ## System.Diagnostics.Process
+     * `[int] ParentProcessID { get; }`: the ID of the parent process (i.e. the process 
+       that started this process). Uses WMI, so it can be a little slow.
      
     ## System.DirectoryServices.AccountManagement.Principal
-    
-     * Property `ConnectedServer`: the server the principal came from. This information is normally available as `$principal.Context.ConnectedServer`. I'm lazy so added this member.
+     * `[string] ConnectedServer { get; }`: the server the principal came from. This 
+       information  is normally available as `$principal.Context.ConnectedServer`. I'm 
+       lazy so added this member.
      
     ## System.IO.DirectoryInfo
+     * `[bool] IsJunction { get; }`: returns `$true` if the directory is a junction, 
+       `$false` otherwise. Uses the `DirectoryInfo`'s `Attributes` properties to make 
+       this determination.
+     * `[string] TargetPath { get; }`: if the `DirectoryInfo` represents a junction, 
+       returns the junction's target path (i.e. the path it points to).
     
-     * Property `IsJunction`: returns `$true` if the directory is a junction, `$false` otherwise.
-
+    ## System.IO.FileInfo
+     * `[uint64] FileIndex { get; }`: the file's index. This is the file's unique 
+       identifier.
+     * `[uint32] LinkCount { get; }`: the number of links to the file. Each unique file
+       can be linked to at different paths on the file system.
+     * `[uint32] VolumeSerialNumber { get; }`: the serial number of the volume the file
+       is on.
+    
+    ## System.Security.Cryptography.X509Certificates.X509Certificate2
+     * `[string] IssueTo { get; }`: gets the Issued To information from the certificate.
+       This is the same information displayed in the Certificates MMC snap-in.
+     * `[string] IssuedBy { get; }`: gets the Issued By information from the certificate.
+       This is the same information displayed in the Certificates MMC snap-in.
+    
+    ## System.Security.Cryptography.X509Certificates.X509Store
+     * `[string] DisplayName { get; }`: gets the name of the store as displayed in the 
+       Certificates MMC snap-in.
+     * `[Security.Cryptography.X509Certificates.StoreName] StoreName { get; }`: gets the
+       `Security.Cryptography.X509Certificates.StoreName` enumeration value for a store.
+       If it doesn't have one, returns an empty string.
+    
+    ## System.ServiceProcess.ServiceController
+     * `[string] Description { get; }`: gets the service's description.
+     * `[Carbon.Service.ErrorControl] ErrorControl { get; }`: Specifies how Windows 
+       proceeds if the service fails to load or initialize properly. See
+       [ErrorControl](https://technet.microsoft.com/en-us/library/Cc963244.aspx) for 
+       an explanation of these values.
+     * `[string] FailureProgram { get; }`: the program to run if the service fails.
+     * `[Carbon.Service.FailureAction] FailureAction { get; }`: specifies the action to
+       take the first time the service fails.
+     * `[string] LoadOrderGroup { get; }`: the group the service is in when the system
+       starts services during startup.
+     * `[string] Path { get; }`: the path, with arguments, of the service's executable.
+     * `[uint32] RebootDelay { get; }`: the number of milliseconds to wait after the 
+       service fails to restart the computer.
+     * `[uint32] RebootDelayMinutes { get; }`: the number of minutes (rounded down) to 
+       wait after the service fails to restart the computer. Calculated from the 
+       `RebootDelay`.
+     * `[string] RebootMessage { get; }`: the message to use when rebooting the system
+       after the service fails.
+     * `[uint32] ResetPeriod { get; }`: the number of seconds to wait after a failure 
+       before resetting the failure count back to zero.
+     * `[uint32] ResetPeriodDays { get; }`: the number of days to wait after a failure 
+       before resetting the failure count back to zero. Calculated from the 
+       `ResetPeriodDays` property, and rounded down to the nearest day.
+     * `[uint32] RestartDelay { get; }`: the number of milliseconds to wait after the
+       service fails before attempting to restart it.
+     * `[uint32] RestartDelayMinutes { get; }`: the number of minutes to wait after the
+       service fails before attempting to restart it. Calculated from `RestartDelay` and
+       round down.
+     * `[uint32] RunCommandDelay { get; }`: the number of milliseconds to wait after a
+       failure before running the failure command.
+     * `[uint32] RunCommandDelayMinutes { get; }`: the number of minutes to wait after 
+       a failure before running the failure command.
+     * `[Carbon.Service.FailureAction] SecondFailure { get; }`: the action to take
+       when the service fails for the second time.
+     * `[System.ServiceProcess.ServiceStartMode] StartMode { get; }`: the service's 
+       start mode.
+     * `[string] TagID { get; }`: the service's tag ID.
+     * `[Carbon.Service.FailureAction] ThirdFailure { get; }`: the action to take when
+       the service fails the third time.
+     * `[string] UserName { get; }`: the name of the user whose credentials the service
+       runs under.
+ 
 SEE ALSO
     about_Types.ps1xml
     
