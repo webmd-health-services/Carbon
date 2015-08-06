@@ -29,6 +29,7 @@ function Convert-SecureStringToString
 
     Returns the plain text/decrypted value of the secure string.
     #>
+    [CmdletBinding()]
     param(
         [Parameter(Mandatory=$true)]
         [Security.SecureString]

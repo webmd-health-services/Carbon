@@ -36,6 +36,7 @@ function Test-SslCertificateBinding
 	
 	Tests if there are any SSL certificates bound to any IP address/port on the machine.
     #>
+    [CmdletBinding()]
     param(
         [IPAddress]
         # The IP address to test for an SSL certificate.

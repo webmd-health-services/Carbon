@@ -54,7 +54,6 @@ function Use-CallerPreference
 
     Demonstrates how to set the caller's common parameter preference variables in a module function.
     #>
-
     [CmdletBinding()]
     param (
         [Parameter(Mandatory = $true)]

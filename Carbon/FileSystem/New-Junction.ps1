@@ -37,6 +37,7 @@ function New-Junction
     
     Creates the `C:\Windows\system32Link` directory, which points to `C:\Windows\system32`.
     #>
+    [CmdletBinding()]
     param(
         [Parameter(Mandatory=$true)]
         [Alias("Junction")]

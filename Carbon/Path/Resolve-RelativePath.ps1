@@ -46,6 +46,7 @@ function Resolve-RelativePath
     .LINK
     http://msdn.microsoft.com/en-us/library/windows/desktop/bb773740.aspx
     #>
+    [CmdletBinding()]
     param(
         [Parameter(ValueFromPipelineByPropertyName=$true)]
         [string]

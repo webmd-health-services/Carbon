@@ -33,6 +33,9 @@ function Get-TrustedHost
         api.example.com
         docs.example.com
     #>
+    [CmdletBinding()]
+    param(
+    )
 
     Set-StrictMode -Version 'Latest'
 

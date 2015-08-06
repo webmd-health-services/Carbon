@@ -38,6 +38,7 @@ function Test-PathIsJunction
     
     Demonstrates an alternative way of testing for junctions.  Uses Carbon's `IsJunction` extension method on the `DirectoryInfo` type to check if any directories under the current directory are junctions.
     #>
+    [CmdletBinding()]
     param(
         [string]
         # The path to check

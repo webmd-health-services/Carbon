@@ -34,6 +34,7 @@ function Test-DotNet
 
     Demonstrates how to test if the full .NET v4 is installed.
     #>
+    [CmdletBinding()]
     param(
         [Parameter(Mandatory=$true,ParameterSetName='v2')]
         [Switch]

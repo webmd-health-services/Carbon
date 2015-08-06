@@ -26,6 +26,7 @@ function Test-IisWebsite
 
     Returns `True` if the `Peanuts` website exists.  `False` if it doesn't.
     #>
+    [CmdletBinding()]
     param(
         [Parameter(Mandatory=$true)]
         [string]
