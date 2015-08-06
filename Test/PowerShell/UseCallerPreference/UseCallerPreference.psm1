@@ -28,6 +28,20 @@ function Write-VerboseMessage
     Write-Verbose -Message $Message
 }
 
+function Write-WarningMessage
+{
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]
+        $Message
+    )
+
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
+    Write-Warning -Message $Message
+}
+
 function Write-ErrorMessage
 {
     [CmdletBinding()]

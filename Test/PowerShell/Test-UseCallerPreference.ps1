@@ -88,6 +88,23 @@ function Test-ShouldWriteInfoMessage
     Assert-NoError
 }
 
+function Test-ShouldWriteWarningMessage
+{
+    function DoIt
+    {
+        [CmdletBinding()]
+        param(
+        )
+
+        Write-WarningMessage -Message $message
+    }
+
+    # Ignore isn't fully supported as a passed-in preference variable, so convert it to SilentlyContinue.
+    $output = DoIt -WarningAction SilentlyContinue 3>&1
+    Assert-Null $output
+    Assert-NoError
+}
+
 function Test-ShouldSupportWhatIfPreference
 {
     function DoIt
