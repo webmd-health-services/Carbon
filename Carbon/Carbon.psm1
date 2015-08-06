@@ -149,6 +149,7 @@ $privateMembers = @{
                         'Invoke-ConsoleCommand' = $true;
                         'Resolve-WindowsFeatureName' = $true;
                         'Set-CryptoKeySecurity' = $true;
+                        'Use-CallerPreference' = $true;
                         'Write-IisVerbose' = $true;
                    }
 
