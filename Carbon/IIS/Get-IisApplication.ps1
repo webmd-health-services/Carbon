@@ -62,6 +62,8 @@ function Get-IisApplication
 
     Set-StrictMode -Version 'Latest'
 
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
     $site = Get-IisWebsite -SiteName $SiteName
     if( -not $site )
     {

@@ -39,6 +39,10 @@ function Test-RegistryKeyValue
         $Name
     )
     
+    Set-StrictMode -Version 'Latest'
+
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
     if( -not (Test-Path -Path $Path -PathType Container) )
     {
         return $false

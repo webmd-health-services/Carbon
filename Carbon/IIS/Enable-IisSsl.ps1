@@ -98,6 +98,8 @@ function Enable-IisSsl
     
     Set-StrictMode -Version 'Latest'
 
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
     $SslFlags_Ssl = 8
     $SslFlags_SslNegotiateCert = 32
     $SslFlags_SslRequireCert = 64

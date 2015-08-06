@@ -77,6 +77,8 @@ function Set-HostsEntry
     )
 
     Set-StrictMode -Version 'Latest'
+
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
  
     $matchPattern = '^(?<IP>[0-9a-f.:]+)\s+(?<HostName>[^\s#]+)(?<Tail>.*)$'  
     $lineFormat = "{0,-16}{1}{2}"

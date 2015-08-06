@@ -59,6 +59,8 @@ function Test-DotNet
 
     Set-StrictMode -Version 'Latest'
 
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
     $runtimeSetupRegPath = switch( $PSCmdlet.ParameterSetName )
     {
         'v2' { 'hklm:\SOFTWARE\Microsoft\NET Framework Setup\NDP\v2.0.50727' }

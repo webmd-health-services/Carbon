@@ -472,6 +472,8 @@ function Install-ScheduledTask
 
     Set-StrictMode -Version 'Latest'
 
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
     if( (Test-ScheduledTask -Name $Name) )
     {
         if( $Force )

@@ -84,6 +84,10 @@ if( -not (Get-Command -Name 'Install-WindowsFeature*') )
             $MsmqActiveDirectoryIntegration
         )
         
+        Set-StrictMode -Version 'Latest'
+
+        Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+    
         if( -not (Assert-WindowsFeatureFunctionsSupported) )
         {
             return

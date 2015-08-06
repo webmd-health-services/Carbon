@@ -37,6 +37,10 @@ function Get-PerformanceCounter
         $CategoryName
     )
     
+    Set-StrictMode -Version 'Latest'
+
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
     if( (Test-PerformanceCounterCategory -CategoryName $CategoryName) )
     {
         $category = New-Object Diagnostics.PerformanceCounterCategory $CategoryName

@@ -58,6 +58,8 @@ function Test-Identity
 
     Set-StrictMode -Version 'Latest'
 
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+    
     $identity = [Carbon.Identity]::FindByName( $Name )
     if( -not $identity )
     {

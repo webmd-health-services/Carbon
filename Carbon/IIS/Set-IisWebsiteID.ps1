@@ -43,6 +43,10 @@ function Set-IisWebsiteID
         $ID
     )
 
+    Set-StrictMode -Version 'Latest'
+
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
     if( -not (Test-IisWebsite -Name $SiteName) )
     {
         Write-Error ('Website {0} not found.' -f $SiteName)

@@ -60,6 +60,8 @@ function Get-ScheduledTask
 
     Set-StrictMode -Version 'Latest'
 
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
     function ConvertFrom-RepetitionElement
     {
         param(

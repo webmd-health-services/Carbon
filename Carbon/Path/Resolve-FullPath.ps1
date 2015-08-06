@@ -46,6 +46,10 @@ function Resolve-FullPath
         $Path
     )
     
+    Set-StrictMode -Version 'Latest'
+
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
     if( -not ( [System.IO.Path]::IsPathRooted($Path) ) )
     {
         $Path = Join-Path (Get-Location) $Path

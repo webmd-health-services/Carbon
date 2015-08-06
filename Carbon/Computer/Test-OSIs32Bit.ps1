@@ -38,5 +38,7 @@ function Test-OSIs32Bit
     
     Set-StrictMode -Version 'Latest'
 
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
     return -not (Test-OSIs64Bit)
 }

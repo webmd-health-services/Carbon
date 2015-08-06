@@ -67,6 +67,8 @@ function Revoke-Permission
     )
 
     Set-StrictMode -Version 'Latest'
+
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
     
     $Path = Resolve-Path -Path $Path
     if( -not $Path )

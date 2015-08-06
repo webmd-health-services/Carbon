@@ -42,6 +42,10 @@ function Resolve-PathCase
         $Path
     )
     
+    Set-StrictMode -Version 'Latest'
+
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
     if( -not (Test-Path -Path $Path) )
     {
         Write-Error "Path '$Path' not found."

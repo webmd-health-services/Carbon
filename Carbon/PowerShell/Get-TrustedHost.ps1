@@ -33,6 +33,11 @@ function Get-TrustedHost
         api.example.com
         docs.example.com
     #>
+
+    Set-StrictMode -Version 'Latest'
+
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
     $trustedHosts = (Get-Item $TrustedHostsPath -Force).Value 
     if( $trustedHosts )
     {

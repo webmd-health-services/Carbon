@@ -58,6 +58,8 @@ function New-TempDirectory
 
     Set-StrictMode -Version 'Latest'
 
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
     $tempDir = [IO.Path]::GetRandomFileName()
     if( $Prefix )
     {

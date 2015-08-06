@@ -95,6 +95,8 @@ function Install-User
 
     Set-StrictMode -Version 'Latest'
 
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+    
     if( $PSCmdlet.ParameterSetName -eq 'WithCredential' )
     {
         $UserName = $Credential.UserName

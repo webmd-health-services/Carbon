@@ -200,6 +200,10 @@ function Split-Ini
         $CaseSensitive
     )
 
+    Set-StrictMode -Version 'Latest'
+
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
     if( -not (Test-Path $Path -PathType Leaf) )
     {
         Write-Error ("INI file '{0}' not found." -f $Path)

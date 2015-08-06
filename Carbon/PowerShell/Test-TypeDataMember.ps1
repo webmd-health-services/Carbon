@@ -46,6 +46,8 @@ function Test-TypeDataMember
 
     Set-StrictMode -Version 'Latest'
 
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
     $typeData = Get-TypeData -TypeName $TypeName
     if( -not $typeData )
     {

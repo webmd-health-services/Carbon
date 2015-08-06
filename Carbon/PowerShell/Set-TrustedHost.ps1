@@ -40,6 +40,10 @@ function Set-TrustedHost
         $Entry
     )
     
+    Set-StrictMode -Version 'Latest'
+
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
     $value = $Entry -join ','
     if( $pscmdlet.ShouldProcess( 'trusted hosts', 'set' ) )
     {

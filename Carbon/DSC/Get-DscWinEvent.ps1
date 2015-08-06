@@ -114,6 +114,8 @@ function Get-DscWinEvent
 
     Set-StrictMode -Version 'Latest'
 
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
     $filter = @{ 
                     LogName = 'Microsoft-Windows-DSC/Operational'; 
               }

@@ -34,5 +34,9 @@ function Test-PerformanceCounterCategory
         $CategoryName
     )
     
+    Set-StrictMode -Version 'Latest'
+
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
     return [Diagnostics.PerformanceCounterCategory]::Exists( $CategoryName )
 }

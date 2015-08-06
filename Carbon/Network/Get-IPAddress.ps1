@@ -59,6 +59,10 @@ function Get-IPAddress
         $V6
     )
 
+    Set-StrictMode -Version 'Latest'
+
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
     [Net.NetworkInformation.NetworkInterface]::GetAllNetworkInterfaces() | 
         Where-Object { $_.OperationalStatus -eq 'Up' -and $_.NetworkInterfaceType -ne 'Loopback' } | 
         ForEach-Object { $_.GetIPProperties() } | 

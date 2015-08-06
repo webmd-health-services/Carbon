@@ -50,6 +50,10 @@ function Install-Msmq
         $Dtc
     )
     
+    Set-StrictMode -Version 'Latest'
+
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
     $optionalArgs = @{ }
     if( $HttpSupport )
     {

@@ -39,6 +39,10 @@ function Test-PerformanceCounter
         $Name
     )
     
+    Set-StrictMode -Version 'Latest'
+
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
     if( (Test-PerformanceCounterCategory -CategoryName $CategoryName) )
     {
         return [Diagnostics.PerformanceCounterCategory]::CounterExists( $Name, $CategoryName )

@@ -43,6 +43,10 @@ function Uninstall-MsmqMessageQueue
         $Private
     )
     
+    Set-StrictMode -Version 'Latest'
+
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
     $commonArgs = @{ 'Name' = $Name ; 'Private' = $Private }
     
     if( -not (Test-MsmqMessageQueue @commonArgs) )

@@ -34,6 +34,10 @@ function Uninstall-IisAppPool
         $Name
     )
     
+    Set-StrictMode -Version 'Latest'
+
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
     $appPool = Get-IisAppPool -Name $Name
     if( $appPool )
     {

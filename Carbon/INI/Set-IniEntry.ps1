@@ -95,6 +95,8 @@ function Set-IniEntry
     )
 
     Set-StrictMode -Version 'Latest'
+
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
     
     if( $Name -like '*=*' )
     {

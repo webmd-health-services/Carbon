@@ -67,7 +67,9 @@ function Install-Junction
         $Force
     )
 
-    Set-StrictMode -Version Latest
+    Set-StrictMode -Version 'Latest'
+
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
     $Link = Resolve-FullPath -Path $Link
     $Target = Resolve-FullPath -Path $Target

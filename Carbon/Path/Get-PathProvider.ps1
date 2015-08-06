@@ -41,6 +41,8 @@ function Get-PathProvider
 
     Set-StrictMode -Version 'Latest'
 
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
     $pathQualifier = Split-Path -Qualifier $Path -ErrorAction SilentlyContinue
     if( -not $pathQualifier )
     {

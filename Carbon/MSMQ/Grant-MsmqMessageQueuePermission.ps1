@@ -61,6 +61,8 @@ function Grant-MsmqMessageQueuePermission
     )
 
     Set-StrictMode -Version 'Latest'
+
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
     
     $queueArgs = @{ Name = $Name ; Private = $Private }
     $queue = Get-MsmqMessageQueue @queueArgs

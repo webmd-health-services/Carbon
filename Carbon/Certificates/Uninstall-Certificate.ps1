@@ -71,6 +71,8 @@ function Uninstall-Certificate
     
     Set-StrictMode -Version 'Latest'
 
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+    
     $storeNameParams = @{ }
     $storeDisplayName = ''
     if( $PSCmdlet.ParameterSetName -like '*AndCustomStoreName' )

@@ -44,6 +44,10 @@ function ConvertTo-InheritanceFlag
         $ContainerInheritanceFlag
     )
 
+    Set-StrictMode -Version 'Latest'
+
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
     $Flags = [Security.AccessControl.InheritanceFlags]
     $map = @{
         'Container' =                                  $Flags::None;

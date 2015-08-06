@@ -50,6 +50,10 @@ function Set-ServiceAcl
         $Dacl
     )
     
+    Set-StrictMode -Version 'Latest'
+
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
     $rawSD = Get-ServiceSecurityDescriptor -Name $Name
     $daclBytes = New-Object byte[] $Dacl.BinaryLength 
     $Dacl.GetBinaryForm($daclBytes, 0);

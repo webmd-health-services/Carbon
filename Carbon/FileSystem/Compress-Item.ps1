@@ -79,6 +79,8 @@ function Compress-Item
     {
         Set-StrictMode -Version 'Latest'
 
+        Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
         $zipFile = $null
 
         if( $OutFile )

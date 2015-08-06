@@ -32,6 +32,10 @@ function Test-AdminPrivilege
     param(
     )
     
+    Set-StrictMode -Version 'Latest'
+
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
     $identity = [Security.Principal.WindowsIdentity]::GetCurrent()
     Write-Verbose "Checking if current user '$($identity.Name)' has administrative privileges."
 

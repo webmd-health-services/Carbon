@@ -40,6 +40,8 @@ function Write-IisVerbose
 
     Set-StrictMode -Version 'Latest'
 
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
     if( $VirtualPath )
     {
         $SiteName = Join-IisVirtualPath -Path $SiteName -ChildPath $VirtualPath

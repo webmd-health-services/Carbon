@@ -46,6 +46,10 @@ function Test-SslCertificateBinding
         $Port
     )
     
+    Set-StrictMode -Version 'Latest'
+
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+    
     $getArgs = @{ }
     if( $IPAddress )
     {

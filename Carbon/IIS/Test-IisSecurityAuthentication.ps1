@@ -68,6 +68,8 @@ function Test-IisSecurityAuthentication
     )
 
     Set-StrictMode -Version 'Latest'
+
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
     
     $getConfigArgs = @{ $pscmdlet.ParameterSetName = $true }
     $authSettings = Get-IisSecurityAuthentication -SiteName $SiteName -VirtualPath $VirtualPath @getConfigArgs

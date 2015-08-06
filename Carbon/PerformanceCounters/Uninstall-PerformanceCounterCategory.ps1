@@ -34,6 +34,10 @@ function Uninstall-PerformanceCounterCategory
         $CategoryName
     )
     
+    Set-StrictMode -Version 'Latest'
+
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
     if( (Test-PerformanceCounterCategory -CategoryName $CategoryName) )
     {
         if( $pscmdlet.ShouldProcess( $CategoryName, 'uninstall performance counter category' ) )

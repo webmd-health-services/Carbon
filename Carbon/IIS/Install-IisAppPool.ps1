@@ -112,6 +112,8 @@ function Install-IisAppPool
     )
 
     Set-StrictMode -Version 'Latest'
+
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
     
     if( $PSCmdlet.ParameterSetName -like 'AsSpecificUser*' )
     {

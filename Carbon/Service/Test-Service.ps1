@@ -46,6 +46,10 @@ function Test-Service
         $Name
     )
     
+    Set-StrictMode -Version 'Latest'
+
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
     $service = Get-Service -Name "$Name*" |
                     Where-Object { $_.Name -eq $Name }
     if( $service )

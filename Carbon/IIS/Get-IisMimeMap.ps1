@@ -79,6 +79,8 @@ function Get-IisMimeMap
     )
 
     Set-StrictMode -Version 'Latest'
+
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
     
     $getIisConfigSectionParams = @{ }
     if( $PSCmdlet.ParameterSetName -eq 'ForWebsite' )

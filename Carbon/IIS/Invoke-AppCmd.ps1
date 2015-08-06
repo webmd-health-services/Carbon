@@ -35,6 +35,8 @@ function Invoke-AppCmd
     
     Set-StrictMode -Version 'Latest'
 
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
     Write-Warning ('Invoke-AppCmd is obsolete and will be removed in a future major version of Carbon. Use Carbon''s IIS functions, or `Get-IisConfigurationSection` to get `ConfigurationElement` objects to manipulate using the `Microsoft.Web.Administration` API.')
 
     Write-Verbose ($AppCmdArgs -join " ")

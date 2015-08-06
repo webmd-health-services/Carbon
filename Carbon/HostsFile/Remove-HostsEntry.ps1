@@ -57,6 +57,8 @@ function Remove-HostsEntry
     {
         Set-StrictMode -Version 'Latest'
 
+        Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
         $allHostNames = New-Object 'Collections.ArrayList'
     }
 

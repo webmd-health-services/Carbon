@@ -73,6 +73,8 @@ function Revoke-ComPermission
     
     Set-StrictMode -Version 'Latest'
 
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
     $commonParams = @{
                         Verbose = $VerbosePreference;
                         ErrorAction = $ErrorActionPreference;

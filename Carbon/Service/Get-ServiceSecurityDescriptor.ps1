@@ -46,6 +46,10 @@ function Get-ServiceSecurityDescriptor
         $Name
     )
 
+    Set-StrictMode -Version 'Latest'
+
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
     $sdBytes = [Carbon.Service.ServiceSecurity]::GetServiceSecurityDescriptor($Name)
     New-Object Security.AccessControl.RawSecurityDescriptor $sdBytes,0
 }

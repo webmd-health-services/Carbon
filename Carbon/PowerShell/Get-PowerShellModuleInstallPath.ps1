@@ -35,6 +35,8 @@ function Get-PowerShellModuleInstallPath
 
     Set-StrictMode -Version 'Latest'
 
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
     $modulePaths = $env:PSModulePath -split ';' 
     $installRoot = $modulePaths | Where-Object { $_ -like ('{0}\WindowsPowerShell*' -f $env:ProgramFiles) }
     if( -not $installRoot -or -not (Test-Path -Path $installRoot -PathType Container) )

@@ -49,6 +49,10 @@ function Install-MsmqMessageQueue
         $Transactional
     )
     
+    Set-StrictMode -Version 'Latest'
+
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
     $queueArgs = @{ Name = $Name ; Private = $Private }
     $path = Get-MsmqMessageQueuePath @queueArgs 
     

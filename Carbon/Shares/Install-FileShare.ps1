@@ -82,6 +82,8 @@ function Install-FileShare
 
     Set-StrictMode -Version 'Latest'
 
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
     function New-ShareAce
     {
         param(

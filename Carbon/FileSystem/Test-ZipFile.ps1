@@ -49,6 +49,8 @@ function Test-ZipFile
 
     Set-StrictMode -Version 'Latest'
 
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
     $Path = Resolve-FullPath -Path $Path
     if( -not (Test-Path -Path $Path -PathType Leaf) )
     {

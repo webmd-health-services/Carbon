@@ -39,6 +39,10 @@ function Remove-RegistryKeyValue
         $Name
     )
     
+    Set-StrictMode -Version 'Latest'
+
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
     if( (Test-RegistryKeyValue -Path $Path -Name $Name) )
     {
         if( $pscmdlet.ShouldProcess( ('Item: {0} Property: {1}' -f $Path,$Name), 'Remove Property' ) )

@@ -46,6 +46,10 @@ function Test-MsmqMessageQueue
         $Private
     )
     
+    Set-StrictMode -Version 'Latest'
+
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
     $queueArgs = @{ Name = $Name ; Private = $Private }
     $path = Get-MsmqMessageQueuePath @queueArgs 
     return ( [Messaging.MessageQueue]::Exists( $path ) )

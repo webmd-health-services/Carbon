@@ -40,6 +40,10 @@ function Add-TrustedHost
         $Entry
     )
     
+    Set-StrictMode -Version 'Latest'
+
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
     $trustedHosts = @( Get-TrustedHost )
     $newEntries = @()
     

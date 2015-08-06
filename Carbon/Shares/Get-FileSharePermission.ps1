@@ -70,6 +70,8 @@ function Get-FileSharePermission
 
     Set-StrictMode -Version 'Latest'
 
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
     $share = Get-FileShare -Name $Name
     if( -not $share )
     {

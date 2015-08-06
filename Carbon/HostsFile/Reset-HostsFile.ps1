@@ -50,6 +50,8 @@ function Reset-HostsFile
     )
 
     Set-StrictMode -Version 'Latest'
+
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
  
     if(-not (Test-Path $Path) )
     {

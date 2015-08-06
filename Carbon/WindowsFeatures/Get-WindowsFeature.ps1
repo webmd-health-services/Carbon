@@ -63,6 +63,10 @@ if( -not (Get-Command -Name 'Get-WindowsFeature*') )
             $Name
         )
         
+        Set-StrictMode -Version 'Latest'
+
+        Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+    
         if( -not (Assert-WindowsFeatureFunctionsSupported) )
         {
             return

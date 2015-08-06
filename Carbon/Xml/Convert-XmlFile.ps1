@@ -105,7 +105,10 @@ function Convert-XmlFile
         $Force
     )
     
+    Set-StrictMode -Version 'Latest'
 
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+    
 	if( -not (Test-Path -Path $Path -PathType Leaf))
 	{
 		Write-Error ("Path '{0}' not found." -f $Path)

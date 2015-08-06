@@ -54,6 +54,8 @@ function Install-Msi
 
     Set-StrictMode -Version 'Latest'
 
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
     if( $PSBoundParameters.ContainsKey( 'Quiet' ) )
     {
         Write-Warning ('Install-Msi''s `Quiet` switch is obsolete and will be removed in a future major version of Carbon. Installers are run in quiet mode by default. Please remove usages of the `Quiet` switch.')

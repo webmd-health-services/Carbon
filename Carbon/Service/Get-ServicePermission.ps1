@@ -57,6 +57,8 @@ function Get-ServicePermission
     
     Set-StrictMode -Version 'Latest'
 
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
     $dacl = Get-ServiceAcl -Name $Name
     
     $account = $null

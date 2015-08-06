@@ -104,6 +104,8 @@ function Get-Certificate
 
     Set-StrictMode -Version 'Latest'
 
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+    
     if( $PSCmdlet.ParameterSetName -eq 'ByPath' )
     {
         if( -not (Test-Path -Path $Path -PathType Leaf) )

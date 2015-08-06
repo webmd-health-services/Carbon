@@ -78,6 +78,8 @@ function Get-ComPermission
     
     Set-StrictMode -Version 'Latest'
 
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
     $comArgs = @{ }
     if( $pscmdlet.ParameterSetName -like 'Default*' )
     {

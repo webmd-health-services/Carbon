@@ -74,6 +74,10 @@ function Set-DotNetAppSetting
         $Clr4
     )
     
+    Set-StrictMode -Version 'Latest'
+
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
     if( -not ($Framework -or $Framework64) )
     {
         Write-Error "You must supply either or both of the Framework and Framework64 switches."

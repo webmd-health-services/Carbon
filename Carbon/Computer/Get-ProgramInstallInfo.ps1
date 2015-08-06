@@ -56,6 +56,8 @@ function Get-ProgramInstallInfo
 
     Set-StrictMode -Version 'Latest'
 
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
     if( -not (Test-Path -Path 'hku:\') )
     {
         $null = New-PSDrive -Name 'HKU' -PSProvider Registry -Root 'HKEY_USERS'

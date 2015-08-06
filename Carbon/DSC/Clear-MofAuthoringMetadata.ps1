@@ -79,6 +79,8 @@ function Clear-MofAuthoringMetadata
 
     Set-StrictMode -Version 'Latest'
 
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
     $tempDir = New-TempDirectory -Prefix ('Carbon+ClearMofAuthoringMetadata+') -WhatIf:$false
 
     foreach( $item in (Get-ChildItem -Path $Path -Filter '*.mof') )

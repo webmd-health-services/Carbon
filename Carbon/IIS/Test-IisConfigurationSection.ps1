@@ -65,6 +65,8 @@ function Test-IisConfigurationSection
     
     Set-StrictMode -Version 'Latest'
 
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
     $getArgs = @{
                     SectionPath = $SectionPath;
                 }

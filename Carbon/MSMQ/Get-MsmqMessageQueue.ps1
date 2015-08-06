@@ -48,6 +48,10 @@ function Get-MsmqMessageQueue
         $Private
     )
    
+    Set-StrictMode -Version 'Latest'
+
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
     $privateArg = @{ Private = $Private }
     
     if( Test-MsmqMessageQueue -Name $Name @privateArg )

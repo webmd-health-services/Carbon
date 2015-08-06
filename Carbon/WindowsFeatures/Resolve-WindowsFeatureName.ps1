@@ -36,6 +36,10 @@ function Resolve-WindowsFeatureName
         $Name
     )
     
+    Set-StrictMode -Version 'Latest'
+
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+    
     $featureMap = @{
                         Iis = 'Web-WebServer';
                         IisHttpRedirection = 'Web-Http-Redirect';

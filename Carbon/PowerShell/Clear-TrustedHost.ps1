@@ -36,6 +36,10 @@ function Clear-TrustedHost
     param(
     )
     
+    Set-StrictMode -Version 'Latest'
+
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
     if( $pscmdlet.ShouldProcess( 'trusted hosts', 'clear' ) )
     {
         Set-Item $TrustedHostsPath -Value '' -Force

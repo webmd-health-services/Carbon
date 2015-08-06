@@ -64,6 +64,8 @@ function Test-DscTargetResource
 
     Set-StrictMode -Version 'Latest'
 
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
     $notEqualProperties = $TargetResource.Keys | 
                             Where-Object { $_ -ne 'Ensure' } |  
                             Where-Object { $DesiredResource.ContainsKey( $_ ) } |

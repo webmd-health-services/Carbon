@@ -91,6 +91,10 @@ function Invoke-PowerShell
         $Runtime
     )
     
+    Set-StrictMode -Version 'Latest'
+
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
     $powerShellv3Installed = Test-Path -Path HKLM:\SOFTWARE\Microsoft\PowerShell\3
     $currentRuntime = 'v{0}.0' -f $PSVersionTable.CLRVersion.Major
     if( $powerShellv3Installed )

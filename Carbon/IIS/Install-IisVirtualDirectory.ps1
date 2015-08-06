@@ -61,6 +61,8 @@ function Install-IisVirtualDirectory
     
     Set-StrictMode -Version 'Latest'
 
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
     $site = Get-IisWebsite -Name $SiteName
     [Microsoft.Web.Administration.Application]$rootApp = $site.Applications | Where-Object { $_.Path -eq '/' }
     if( -not $rootApp )

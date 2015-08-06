@@ -30,6 +30,8 @@ function Set-CryptoKeySecurity
 
     Set-StrictMode -Version 'Latest'
 
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
     $keyContainerInfo = $Certificate.PrivateKey.CspKeyContainerInfo
     $cspParams = New-Object 'Security.Cryptography.CspParameters' ($keyContainerInfo.ProviderType, $keyContainerInfo.ProviderName, $keyContainerInfo.KeyContainerName)
     $cspParams.Flags = [Security.Cryptography.CspProviderFlags]::UseExistingKey

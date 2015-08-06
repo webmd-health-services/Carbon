@@ -79,6 +79,8 @@ function Install-Certificate
     
     Set-StrictMode -Version 'Latest'
 
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+    
     if( $PSCmdlet.ParameterSetName -like 'FromFile*' )
     {    
         $keyFlags = [Security.Cryptography.X509Certificates.X509KeyStorageFlags]::MachineKeySet

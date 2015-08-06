@@ -46,6 +46,10 @@ function Find-ADUser
         $sAMAccountName
     )
    
+    Set-StrictMode -Version 'Latest'
+
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+    
     $domain = [adsi] $DomainUrl
     $searcher = [adsisearcher] $domain
     

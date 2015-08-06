@@ -42,6 +42,10 @@ function Format-ADSearchFilterValue
         $String
     )
     
+    Set-StrictMode -Version 'Latest'
+
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+    
     $string = $string.Replace('\', '\5c')
     $string = $string.Replace('*', '\2a')
     $string = $string.Replace('(', '\28')

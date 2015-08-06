@@ -40,6 +40,10 @@ function Assert-Service
         $Name
     )
     
+    Set-StrictMode -Version 'Latest'
+
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
     if( -not (Test-Service $Name) )
     {
         Write-Error ('Service {0} not found.' -f $Name)

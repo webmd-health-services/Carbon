@@ -85,6 +85,10 @@ function Get-ComSecurityDescriptor
         $AsComAccessRule
     )
     
+    Set-StrictMode -Version 'Latest'
+
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
     $regValueName = $pscmdlet.ParameterSetName
     
     $bytes = Get-RegistryKeyValue -Path $ComRegKeyPath -Name $regValueName

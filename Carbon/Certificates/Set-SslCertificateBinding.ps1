@@ -64,6 +64,8 @@ function Set-SslCertificateBinding
     )
 
     Set-StrictMode -Version 'Latest'
+
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
     
     $commonParams = @{
                         ErrorAction = $ErrorActionPreference;

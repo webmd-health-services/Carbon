@@ -30,6 +30,10 @@ function Resolve-NetPath
     param(
     )
 
+    Set-StrictMode -Version 'Latest'
+
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
     Write-Warning ('Resolve-NetPath is obsolete and will be removed in a future major version of Carbon. Do not use.')
     
     $netCmd = Get-Command -CommandType Application -Name net.exe* |

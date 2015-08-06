@@ -40,6 +40,10 @@ function Test-NtfsCompression
         $Path
     )
 
+    Set-StrictMode -Version 'Latest'
+
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
     if( -not (Test-Path -Path $Path) )
     {
         Write-Error ('Path {0} not found.' -f $Path)

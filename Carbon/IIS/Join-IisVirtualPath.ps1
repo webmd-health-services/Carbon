@@ -40,6 +40,8 @@ function Join-IisVirtualPath
 
     Set-StrictMode -Version 'Latest'
 
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
     if( $ChildPath )
     {
         $Path = Join-Path -Path $Path -ChildPath $ChildPath

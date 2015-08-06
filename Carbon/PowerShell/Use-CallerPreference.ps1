@@ -70,6 +70,8 @@ function Use-CallerPreference
         $SessionState
     )
 
+    Set-StrictMode -Version 'Latest'
+
     # List of preference variables taken from the about_Preference_Variables and their common parameter name (taken from about_CommonParameters).
     $commonPreferences = @{
                               'ErrorActionPreference' = 'ErrorAction';

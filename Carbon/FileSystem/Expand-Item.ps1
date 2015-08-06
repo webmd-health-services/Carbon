@@ -68,6 +68,8 @@ function Expand-Item
 
     Set-StrictMode -Version 'Latest'
 
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
     $Path = Resolve-Path -Path $Path | Select-Object -ExpandProperty 'ProviderPath'
     if( -not $Path )
     {

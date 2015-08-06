@@ -73,6 +73,8 @@ function Get-FirewallRule
     )
 
     Set-StrictMode -Version 'Latest'
+
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
     
     if( -not (Assert-FirewallConfigurable) )
     {

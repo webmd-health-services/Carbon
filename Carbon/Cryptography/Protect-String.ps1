@@ -126,6 +126,8 @@ filter Protect-String
 
     Set-StrictMode -Version 'Latest'
 
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
     $stringBytes = [Text.Encoding]::UTF8.GetBytes( $String )
 
     if( $PSCmdlet.ParameterSetName -like 'DPAPI*' )

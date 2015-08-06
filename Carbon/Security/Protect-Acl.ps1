@@ -46,6 +46,10 @@ function Protect-Acl
         $Preserve
     )
     
+    Set-StrictMode -Version 'Latest'
+
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
     Write-Verbose "Removing access rule inheritance on '$Path'."
     $acl = Get-Acl -Path $Path
     $acl.SetAccessRuleProtection( $true, $Preserve )

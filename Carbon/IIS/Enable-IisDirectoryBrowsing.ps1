@@ -46,6 +46,8 @@ function Enable-IisDirectoryBrowsing
     
     Set-StrictMode -Version 'Latest'
 
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
     $section = Get-IisConfigurationSection -SiteName $SiteName -SectionPath 'system.webServer/directoryBrowse'
 
     if( $section['enabled'] -ne 'true' )

@@ -150,6 +150,8 @@ function Grant-ComPermission
     )
     
     Set-StrictMode -Version 'Latest'
+
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
     
     $account = Resolve-Identity -Name $Identity -Verbose:$VerbosePreference -ErrorAction:$ErrorActionPreference
     if( -not $account )

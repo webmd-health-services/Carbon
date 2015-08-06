@@ -74,6 +74,8 @@ function Remove-IniEntry
 
     Set-StrictMode -Version 'Latest'
 
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
     $settings = @{ }
     
     if( Test-Path $Path -PathType Leaf )

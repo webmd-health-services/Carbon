@@ -42,6 +42,10 @@ function ConvertTo-ProviderAccessControlRights
 
     begin
     {
+        Set-StrictMode -Version 'Latest'
+
+        Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
         $rights = 0
         $rightTypeName = 'Security.AccessControl.{0}Rights' -f $ProviderName
         $foundInvalidRight = $false

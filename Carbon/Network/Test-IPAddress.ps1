@@ -47,6 +47,10 @@ function Test-IPAddress
         $IPAddress
     )
 
+    Set-StrictMode -Version 'Latest'
+
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
     $ip = Get-IPAddress | Where-Object { $_ -eq $IPAddress }
     if( $ip )
     {

@@ -35,6 +35,8 @@ function Test-IisWebsite
     
     Set-StrictMode -Version 'Latest'
 
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
     $manager = New-Object 'Microsoft.Web.Administration.ServerManager'
     try
     {

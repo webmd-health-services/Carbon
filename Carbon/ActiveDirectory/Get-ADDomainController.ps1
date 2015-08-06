@@ -46,6 +46,10 @@ function Get-ADDomainController
         # current computer's domain controller.
         $Domain
     )
+
+    Set-StrictMode -Version 'Latest'
+
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
     
     if( $Domain )
     {

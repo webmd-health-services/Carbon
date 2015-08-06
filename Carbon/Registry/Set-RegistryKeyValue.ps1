@@ -113,6 +113,10 @@ function Set-RegistryKeyValue
         $Quiet
     )
     
+    Set-StrictMode -Version 'Latest'
+
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
     $value = $null
     $type = $pscmdlet.ParameterSetName
     switch ( $pscmdlet.ParameterSetName )

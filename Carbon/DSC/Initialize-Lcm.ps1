@@ -173,6 +173,8 @@ function Initialize-Lcm
 
     Set-StrictMode -Version 'Latest'
 
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
     $thumbprint = $null
     if( $CertificateID )
     {

@@ -111,6 +111,8 @@ function Test-Permission
 
     Set-StrictMode -Version 'Latest'
 
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
     $originalPath = $Path
     $Path = Resolve-Path -Path $Path -ErrorAction 'SilentlyContinue'
     if( -not $Path -or -not (Test-Path -Path $Path) )

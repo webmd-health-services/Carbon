@@ -50,6 +50,8 @@ function Add-GroupMember
     )
 
     Set-StrictMode -Version 'Latest'
+
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
     
     [DirectoryServices.AccountManagement.GroupPrincipal]$group = Get-Group -Name $Name
     if( -not $group )

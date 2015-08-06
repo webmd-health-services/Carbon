@@ -35,6 +35,8 @@ function Assert-FirewallConfigurable
 
     Set-StrictMode -Version 'Latest'
 
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
     if( (Get-Service 'Windows Firewall').Status -ne 'Running' ) 
     {
         Write-Error "Unable to configure firewall: Windows Firewall service isn't running."

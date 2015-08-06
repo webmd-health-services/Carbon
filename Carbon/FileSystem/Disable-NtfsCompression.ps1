@@ -59,6 +59,10 @@ function Disable-NtfsCompression
 
     begin
     {
+        Set-StrictMode -Version 'Latest'
+
+        Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
         $commonParams = @{
                             Verbose = $VerbosePreference;
                             WhatIf = $WhatIfPreference;

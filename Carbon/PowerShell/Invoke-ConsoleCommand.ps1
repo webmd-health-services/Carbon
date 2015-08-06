@@ -44,6 +44,8 @@ function Invoke-ConsoleCommand
 
     Set-StrictMode -Version 'Latest'
 
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
     if( -not $PSCmdlet.ShouldProcess( $Target, $Action ) )
     {
         return

@@ -117,6 +117,8 @@ filter Unprotect-String
     )
 
     Set-StrictMode -Version 'Latest'
+
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
         
     $encryptedBytes = [Convert]::FromBase64String($ProtectedString)
     if( $PSCmdlet.ParameterSetName -eq 'DPAPI' )

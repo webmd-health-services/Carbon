@@ -53,6 +53,7 @@ We've added parameter validation to some functions. This shouldn't impact anybod
  * Ensure that all thumbprints passed to `Set-SslCertificateBinding` are valid (40 character hex strings), since it now validates thumbprints.
  * Check that all IP addresses passed to `Set-HostsEntry` are valid IP v4 or v6 addresses.  `Set-HostsEntry`'s IPAddress parameter is now a `System.Net.IPAddress` object.  Previously it was a string validated with a regular expression, so you *should* be OK.
 
+All Carbon functions now respect each caller's common parameters (e.g. `-Verbose`, `-ErrorAction`, etc.). This means if you pass a common parameter to a script that calls a Carbon function, that Carbon function will use that common parameter. This may or may not impact you.
 
 ## Bug Fixes
 

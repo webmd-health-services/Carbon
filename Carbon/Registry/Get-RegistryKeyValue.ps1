@@ -39,6 +39,10 @@ function Get-RegistryKeyValue
         $Name
     )
     
+    Set-StrictMode -Version 'Latest'
+
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
     if( -not (Test-RegistryKeyValue -Path $Path -Name $Name) )
     {
         return $null

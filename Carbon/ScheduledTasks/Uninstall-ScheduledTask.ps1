@@ -51,6 +51,8 @@ function Uninstall-ScheduledTask
 
     Set-StrictMode -Version 'Latest'
 
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
     $Name = Join-Path -Path '\' -ChildPath $Name
 
     $MAX_TRIES = 5

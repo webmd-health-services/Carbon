@@ -40,6 +40,10 @@ function Uninstall-Service
         $Name
     )
     
+    Set-StrictMode -Version 'Latest'
+
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
     $service = Get-Service | Where-Object { $_.Name -eq $Name }
     $sc = (Join-Path $env:WinDir system32\sc.exe -Resolve)
 

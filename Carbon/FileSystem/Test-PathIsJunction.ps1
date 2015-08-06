@@ -44,6 +44,10 @@ function Test-PathIsJunction
         $Path
     )
     
+    Set-StrictMode -Version 'Latest'
+
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
     if( Test-Path $Path -PathType Container )
     {
         return (Get-Item $Path -Force).IsJunction

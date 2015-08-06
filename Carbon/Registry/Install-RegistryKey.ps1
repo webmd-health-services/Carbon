@@ -34,6 +34,10 @@ function Install-RegistryKey
         $Path
     )
     
+    Set-StrictMode -Version 'Latest'
+
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
     if( -not (Test-Path -Path $Path -PathType Container) )
     {
         Write-Verbose "Creating registry key '$Path'."

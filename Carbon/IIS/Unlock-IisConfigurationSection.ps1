@@ -38,6 +38,10 @@ function Unlock-IisConfigurationSection
         $SectionPath
     )
     
+    Set-StrictMode -Version 'Latest'
+
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
     $SectionPath |
         ForEach-Object {
             $section = Get-IisConfigurationSection -SectionPath $_

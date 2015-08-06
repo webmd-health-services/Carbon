@@ -61,6 +61,8 @@ function Set-IisWindowsAuthentication
     
     Set-StrictMode -Version 'Latest'
 
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
     $useKernelMode = 'True'
     if( $DisableKernelMode )
     {

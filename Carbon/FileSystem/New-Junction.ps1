@@ -50,6 +50,10 @@ function New-Junction
         $Target
     )
     
+    Set-StrictMode -Version 'Latest'
+
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
     if( Test-Path $Link -PathType Container )
     {
         Write-Error "'$Link' already exists."

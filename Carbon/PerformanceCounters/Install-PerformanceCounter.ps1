@@ -79,6 +79,10 @@ function Install-PerformanceCounter
     
     Set-StrictMode -Version Latest
     
+    Set-StrictMode -Version 'Latest'
+
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
     $currentCounters = @( Get-PerformanceCounter -CategoryName $CategoryName )
     
     $counter = $currentCounters | 

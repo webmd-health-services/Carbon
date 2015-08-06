@@ -56,6 +56,8 @@ function Get-CertificateStore
 
     Set-StrictMode -Version 'Latest'
 
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+    
     if( $PSCmdlet.ParameterSetName -eq 'ByStoreName' )
     {
         $store = New-Object Security.Cryptography.X509Certificates.X509Store $StoreName,$StoreLocation

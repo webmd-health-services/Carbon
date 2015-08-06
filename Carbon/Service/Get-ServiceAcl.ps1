@@ -43,6 +43,10 @@ function Get-ServiceAcl
         $Name
     )
 
+    Set-StrictMode -Version 'Latest'
+
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
     $rawSD = Get-ServiceSecurityDescriptor -Name $Name
     $rawDacl = $rawSD.DiscretionaryAcl
     New-Object Security.AccessControl.DiscretionaryAcl $false,$false,$rawDacl

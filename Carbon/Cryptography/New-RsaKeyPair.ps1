@@ -98,6 +98,8 @@ function New-RsaKeyPair
 
     Set-StrictMode -Version 'Latest'
 
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
     function Find-WindowsSdkCommand
     {
         param(

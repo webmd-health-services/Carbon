@@ -169,6 +169,8 @@ function Install-Service
 
     Set-StrictMode -Version 'Latest'
 
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
     function ConvertTo-FailureActionArg($action)
     {
         if( $action -eq 'Reboot' )

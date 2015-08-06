@@ -93,6 +93,8 @@ function Resolve-Identity
 
     Set-StrictMode -Version 'Latest'
 
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+    
     if( $PSCmdlet.ParameterSetName -eq 'BySid' )
     {
         $SID = ConvertTo-SecurityIdentifier -SID $SID

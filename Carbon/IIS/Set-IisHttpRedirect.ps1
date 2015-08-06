@@ -75,6 +75,8 @@ function Set-IisHttpRedirect
     
     Set-StrictMode -Version 'Latest'
 
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
     $settings = Get-IisHttpRedirect -SiteName $SiteName -Path $VirtualPath
     $settings.Enabled = $true
     $settings.Destination = $destination

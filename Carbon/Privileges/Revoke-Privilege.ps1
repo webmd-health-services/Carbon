@@ -103,7 +103,9 @@ function Revoke-Privilege
         $Privilege
     )
     
-    Set-StrictMode -Version Latest
+    Set-StrictMode -Version 'Latest'
+
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
     
     $account = Resolve-Identity -Name $Identity
     if( -not $account )

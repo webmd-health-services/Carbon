@@ -36,6 +36,10 @@ function Convert-SecureStringToString
         $SecureString
     )
     
+    Set-StrictMode -Version 'Latest'
+
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
     $stringPtr = [Runtime.InteropServices.Marshal]::SecureStringToBSTR($SecureString)
     return [Runtime.InteropServices.Marshal]::PtrToStringAuto($stringPtr)
 }

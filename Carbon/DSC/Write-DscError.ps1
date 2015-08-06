@@ -51,6 +51,8 @@ function Write-DscError
     {
         Set-StrictMode -Version 'Latest'
 
+        Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
         foreach( $record in $EventLogRecord )
         {
             [string[]]$property = $record.Properties | Select-Object -ExpandProperty Value

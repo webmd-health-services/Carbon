@@ -85,6 +85,8 @@ function Get-Permission
    
     Set-StrictMode -Version 'Latest'
 
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
     $account = $null
     if( $Identity )
     {

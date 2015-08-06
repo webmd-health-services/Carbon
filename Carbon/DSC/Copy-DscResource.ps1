@@ -79,7 +79,9 @@ function Copy-DscResource
     )
 
     Set-StrictMode -Version 'Latest'
-    
+
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
     $tempDir = New-TempDirectory -Prefix 'Carbon+Copy-DscResource+'
 
     try

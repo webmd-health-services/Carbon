@@ -53,6 +53,8 @@ function ConvertTo-SecurityIdentifier
 
     Set-StrictMode -Version 'Latest'
 
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+    
     try
     {
         if( $SID -is [string] )

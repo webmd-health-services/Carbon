@@ -50,6 +50,8 @@ function Uninstall-FileShare
 
     Set-StrictMode -Version 'Latest'
 
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
     $errors = @{
                 [uint32]2 = 'Access Denied';
                 [uint32]8 = 'Unknown Failure';

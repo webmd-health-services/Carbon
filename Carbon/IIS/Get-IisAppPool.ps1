@@ -54,6 +54,10 @@ function Get-IisAppPool
         $Name
     )
     
+    Set-StrictMode -Version 'Latest'
+
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
     $mgr = New-Object Microsoft.Web.Administration.ServerManager
     $mgr.ApplicationPools |
         Where-Object { 

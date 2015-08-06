@@ -64,6 +64,13 @@ function Resolve-RelativePath
         $FromFile
     )
     
+    begin
+    {
+        Set-StrictMode -Version 'Latest'
+
+        Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+    }
+
     process
     {
         $relativePath = New-Object System.Text.StringBuilder 260

@@ -51,6 +51,10 @@ function Test-Privilege
         $Privilege
     )
     
+    Set-StrictMode -Version 'Latest'
+
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
     $matchingPrivilege = Get-Privilege -Identity $Identity |
                             Where-Object { $_ -eq $Privilege }
     return ($matchingPrivilege -ne $null)

@@ -17,6 +17,7 @@
 $CarbonBinDir = Join-Path -Path $PSScriptRoot -ChildPath 'bin' -Resolve
 
 . (Join-Path -Path $PSScriptRoot -ChildPath 'PowerShell\Test-TypeDataMember.ps1' -Resolve)
+. (Join-Path -Path $PSScriptRoot -ChildPath 'PowerShell\Use-CallerPreference.ps1' -Resolve)
 
 # Active Directory
 

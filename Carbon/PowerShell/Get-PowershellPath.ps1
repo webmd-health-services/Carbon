@@ -51,6 +51,10 @@ function Get-PowershellPath
         $x86
     )
     
+    Set-StrictMode -Version 'Latest'
+
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
     $psPath = $PSHOME
     if( Test-OSIs64Bit )
     {

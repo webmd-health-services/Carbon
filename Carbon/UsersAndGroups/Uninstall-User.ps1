@@ -48,6 +48,8 @@ function Uninstall-User
     )
 
     Set-StrictMode -Version 'Latest'
+
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
     
     if( Test-User -Username $username )
     {

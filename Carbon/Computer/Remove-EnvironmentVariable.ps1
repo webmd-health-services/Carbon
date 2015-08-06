@@ -60,6 +60,10 @@ function Remove-EnvironmentVariable
         $ForComputer
     )
     
+    Set-StrictMode -Version 'Latest'
+
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
     $scope = $pscmdlet.ParameterSetName -replace '^For',''
     if( $pscmdlet.ShouldProcess( "$scope-level environment variable '$Name'", "remove" ) )
     {

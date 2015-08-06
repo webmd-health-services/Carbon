@@ -70,6 +70,8 @@ function Set-EnvironmentVariable
 
     Set-StrictMode -Version 'Latest'
 
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
     if( -not $ForProcess -and -not $ForUser -and -not $ForComputer )
     {
         Write-Error -Message ('Environment variable target not specified. You must supply one of the ForComputer, ForUser, or ForProcess switches.')

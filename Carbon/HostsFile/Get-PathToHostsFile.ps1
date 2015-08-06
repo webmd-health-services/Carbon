@@ -26,5 +26,10 @@ function Get-PathToHostsFile
     
     Returns `C:\Windows\system32\drivers\etc\hosts`.  Uses the environment variable to find the root to the Windows directory.
     #>
+
+    Set-StrictMode -Version 'Latest'
+
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
     return Join-Path $env:windir system32\drivers\etc\hosts
 }

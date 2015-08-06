@@ -33,6 +33,8 @@ function Get-IdentityPrincipalContext
 
     Set-StrictMode -Version 'Latest'
 
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+    
     $ctxType = 'Domain'
     $ctxName = $Identity.Domain
     if( $Identity.Domain -eq $env:COMPUTERNAME -or $Identity.Domain -eq 'BUILTIN' -or $Identity.Domain -eq 'NT AUTHORITY' )

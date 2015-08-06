@@ -51,6 +51,10 @@ function Get-Privilege
         $Identity
     )
     
+    Set-StrictMode -Version 'Latest'
+
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
     [Carbon.Security.Privilege]::GetPrivileges( $Identity )
 }
 

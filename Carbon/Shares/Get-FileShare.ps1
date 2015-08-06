@@ -66,6 +66,8 @@ function Get-FileShare
 
     Set-StrictMode -Version 'Latest'
 
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
     $filter = '(Type = 0 or Type = 2147483648)'
     $wildcardSearch = [Management.Automation.WildcardPattern]::ContainsWildcardCharacters($Name)
     if( $Name -and -not $wildcardSearch)

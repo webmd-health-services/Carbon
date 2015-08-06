@@ -56,6 +56,8 @@ function Get-IisConfigurationSection
     
     Set-StrictMode -Version 'Latest'
 
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
     $mgr = New-Object 'Microsoft.Web.Administration.ServerManager'
     $config = $mgr.GetApplicationHostConfiguration()
     

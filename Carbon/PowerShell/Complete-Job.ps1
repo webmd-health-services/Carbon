@@ -40,6 +40,8 @@ function Complete-Job
         $IntervalSeconds = 1
     )
 
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
     Write-Warning ('Complete-Job is obsolete and will be removed in a future major version of Carbon. Use PowerShell''s `Wait-Job` cmdlet instead.')
     
     $errorAction = 'Continue'

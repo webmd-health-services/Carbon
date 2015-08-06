@@ -62,6 +62,8 @@ function Enable-NtfsCompression
     {
         Set-StrictMode -Version 'Latest'
 
+        Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
         $commonParams = @{
                             ErrorAction = $ErrorActionPreference;
                             Verbose = $VerbosePreference;

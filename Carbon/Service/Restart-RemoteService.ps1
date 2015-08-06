@@ -51,6 +51,10 @@ function Restart-RemoteService
         $ComputerName
     )
     
+    Set-StrictMode -Version 'Latest'
+
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
     $service = Get-Service -Name $name -ComputerName $computerName
     if($service)
     {

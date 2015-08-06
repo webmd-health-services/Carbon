@@ -72,6 +72,8 @@ function Get-ServiceConfiguration
     begin
     {
         Set-StrictMode -Version 'Latest'
+
+        Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
     }
 
     process

@@ -38,5 +38,7 @@ function Test-OSIs64Bit
     
     Set-StrictMode -Version 'Latest'
 
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
     return ([Environment]::Is64BitOperatingSystem)
 }

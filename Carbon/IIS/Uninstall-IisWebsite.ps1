@@ -46,6 +46,8 @@ function Uninstall-IisWebsite
     )
 
     Set-StrictMode -Version 'Latest'
+
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
     
     if( Test-IisWebsite -Name $Name )
     {

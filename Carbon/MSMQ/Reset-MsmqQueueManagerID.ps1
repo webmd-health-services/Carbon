@@ -33,6 +33,10 @@ function Reset-MsmqQueueManagerID
     param(
     )
 
+    Set-StrictMode -Version 'Latest'
+
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
     Write-Verbose "Resetting MSMQ Queue Manager ID."
     Write-Verbose "Stopping MSMQ."
     Stop-Service MSMQ -Force

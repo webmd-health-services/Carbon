@@ -47,6 +47,10 @@ function Test-UncPath
         $Path
     )
 
+    Set-StrictMode -Version 'Latest'
+
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
     ([Uri]$Path).IsUnc
 
 }
