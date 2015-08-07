@@ -32,8 +32,10 @@ param(
     $ProviderName
 )
 
-#Requires -Version 4
-Set-StrictMode -Version Latest
+Set-StrictMode -Version 'Latest'
+
+# Keep cause this script is used by PowerShell 2.
+$PSScriptRoot = Split-Path -Parent -Path $MyInvocation.MyCommand.Definition
 
 . (Join-Path -Path $PSScriptRoot -ChildPath '..\PowerShell\Use-CallerPreference.ps1' -Resolve)
 . (Join-Path -Path $PSScriptRoot -ChildPath '..\Text\ConvertFrom-Base64.ps1' -Resolve)

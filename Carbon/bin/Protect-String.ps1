@@ -21,8 +21,10 @@ param(
     $ProtectedString
 )
 
-#Requires -Version 4
 Set-StrictMode -Version 'Latest'
+
+# Keep cause this script is used by PowerShell 2.
+$PSScriptRoot = Split-Path -Parent -Path $MyInvocation.MyCommand.Definition
 
 Add-Type -AssemblyName 'System.Security'
 
