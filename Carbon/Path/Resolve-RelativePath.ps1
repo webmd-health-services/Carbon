@@ -90,7 +90,7 @@ function Resolve-RelativePath
         }
         
         $toPath = $Path
-        if( $Path.FullName )
+        if( $Path | Get-Member -Name 'FullName' )
         {
             $toPath = $Path.FullName
         }
