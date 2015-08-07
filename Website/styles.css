@@ -43,16 +43,6 @@ pre
 	white-space: pre-line;
 }
 
-pre code 
-{
-	white-space: pre-wrap;
-}
-
-pre.Syntax
-{
-	margin-bottom: 1em;
-}
-
 p, td, div
 {
 	font-size: 12pt;
@@ -86,18 +76,30 @@ ul#SiteNav li
 	padding:0;
 }
 
+#CommandsMenu
+{
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
 #CommandsMenu li 
 {
-    margin: 0em 0.5em 0em 0.5em;
+    float: left;
     border: 1px solid #9DAEC4;
+    border-bottom-width: 0;
+    margin: 0em 0.5em 0em 0.5em;
 }
 
 #CommandsMenu a 
 {
     text-decoration: none;
+    display: block;
     background: #A7BAD1;
+    padding: 0.24em 1em;
     color: #00c;
     width: 8em;
+    text-align: center;
 }
 
 #CommandsMenu a:hover 
@@ -112,6 +114,8 @@ ul#SiteNav li
 
 #CommandsMenu .selected a 
 {
+    position: relative;
+    top: 1px;
     background: white;
     background-color: lightsteelblue;
     color: black;
@@ -121,4 +125,26 @@ ul#SiteNav li
 #CommandsContent 
 {
     border: 1px solid black;
+    clear: both;
+    padding: 0 1em;
+}
+
+#ByName, #ByVerb
+{
+    display: none;
+}
+
+#ByName 
+{
+    margin-top: 1.3em;
+}
+
+#ByName ul
+{
+    list-style-type: none;
+}
+
+#ByName ul li
+{
+    padding: .15em 0 .15em 0;
 }
