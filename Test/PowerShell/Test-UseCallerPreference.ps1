@@ -71,21 +71,24 @@ function Test-ShouldWriteDebugMessage
     DoIt 5>&1 | Assert-Message
 }
 
-function Test-ShouldWriteInfoMessage
+if( $PSVersionTable.PSVersion.Major -ge 5 )
 {
-    function DoIt
+    function Test-ShouldWriteInfoMessage
     {
-        [CmdletBinding()]
-        param(
-        )
+        function DoIt
+        {
+            [CmdletBinding()]
+            param(
+            )
 
-        Write-InfoMessage -Message $message
+            Write-InfoMessage -Message $message
+        }
+
+        # Ignore isn't fully supported as a passed-in preference variable, so convert it to SilentlyContinue.
+        $output = DoIt -InformationAction SilentlyContinue 6>&1
+        Assert-Null $output
+        Assert-NoError
     }
-
-    # Ignore isn't fully supported as a passed-in preference variable, so convert it to SilentlyContinue.
-    $output = DoIt -InformationAction SilentlyContinue 6>&1
-    Assert-Null $output
-    Assert-NoError
 }
 
 function Test-ShouldWriteWarningMessage
