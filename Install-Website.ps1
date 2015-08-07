@@ -17,9 +17,8 @@ Installs the get-carbon.org website on the local computer.
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+#Requires -Version 4
 Set-StrictMode -Version Latest
-$ErrorActionPreference = 'Stop'
-$PSScriptRoot = Split-Path -Parent $MyInvocation.MyCommand.Definition
 
 & (Join-Path $PSScriptRoot Carbon\Import-Carbon.ps1 -Resolve)
 

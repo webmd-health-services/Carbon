@@ -154,7 +154,7 @@ function New-RsaKeyPair
             $root = Split-Path -Parent -Path $Path
             if( -not (Test-Path -Path $root -PathType Container) )
             {
-                New-Item -Path $root -ItemType 'Directory' -Force -Verbose:$VerbosePreference | Out-Null
+                New-Item -Path $root -ItemType 'Directory' -Force | Out-Null
             }
         }
 
@@ -184,7 +184,7 @@ function New-RsaKeyPair
 
     $tempDir = '{0}-{1}' -f (Split-Path -Leaf -Path $PSCommandPath),([IO.Path]::GetRandomFileName())
     $tempDir = Join-Path -Path $env:TEMP -ChildPath $tempDir
-    New-Item -Path $tempDir -ItemType 'Directory' -Verbose:$VerbosePreference | Out-Null
+    New-Item -Path $tempDir -ItemType 'Directory' | Out-Null
 
     try
     {

@@ -478,7 +478,7 @@ function Install-ScheduledTask
     {
         if( $Force )
         {
-            Uninstall-ScheduledTask -Name $Name -Verbose:$VerbosePreference
+            Uninstall-ScheduledTask -Name $Name
         }
         else
         {
@@ -495,7 +495,7 @@ function Install-ScheduledTask
         [void]$parameters.Add( $TaskCredential.UserName )
         [void]$parameters.Add( '/RP' )
         [void]$parameters.Add( $TaskCredential.GetNetworkCredential().Password )
-        Grant-Privilege -Identity $TaskCredential.UserName -Privilege 'SeBatchLogonRight' -Verbose:$VerbosePreference
+        Grant-Privilege -Identity $TaskCredential.UserName -Privilege 'SeBatchLogonRight'
     }
     elseif( $PSCmdlet.ParameterSetName -notlike 'Xml*' )
     {

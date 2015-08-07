@@ -46,13 +46,7 @@ function Remove-SslCertificateBinding
 
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
     
-    $commonParams = @{ 
-                        ErrorAction = $ErrorActionPreference;
-                        Verbose = $VerbosePreference;
-                        WhatIf = $WhatIfPreference;
-                    }
-    
-    if( -not (Test-SslCertificateBinding -IPAddress $IPAddress -Port $Port @commonParams) )
+    if( -not (Test-SslCertificateBinding -IPAddress $IPAddress -Port $Port) )
     {
         return
     }
@@ -68,6 +62,5 @@ function Remove-SslCertificateBinding
 
     Invoke-ConsoleCommand -Target $ipPort `
                           -Action "removing SSL certificate binding" `
-                          @commonParams `
                           -ScriptBlock { netsh http delete sslcert ipPort=$ipPort }
 }

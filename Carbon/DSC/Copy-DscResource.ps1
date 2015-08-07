@@ -95,7 +95,7 @@ function Copy-DscResource
                 {
                     if( -not (Test-Path -Path $destinationPath -PathType Container) )
                     {
-                        New-Item -Path $destinationPath -ItemType 'Directory' -Verbose:$VerbosePreference | Out-Null
+                        New-Item -Path $destinationPath -ItemType 'Directory' | Out-Null
                     }
                     Copy-DscResource -Path $item.FullName -Destination $destinationPath -Recurse -Force:$Force -PassThru:$PassThru
                 }
@@ -118,8 +118,8 @@ function Copy-DscResource
 
             if( $Force -or -not (Test-Path -Path $destinationPath -PathType Leaf) -or ($sourceChecksum -ne $destinationChecksum) )
             {
-                Copy-Item -Path $item -Destination $Destination -Verbose:$VerbosePreference -PassThru:$PassThru
-                Copy-Item -Path $sourceChecksumPath -Destination $Destination -Verbose:$VerbosePreference -PassThru:$PassThru
+                Copy-Item -Path $item -Destination $Destination -PassThru:$PassThru
+                Copy-Item -Path $sourceChecksumPath -Destination $Destination -PassThru:$PassThru
             }
             else
             {

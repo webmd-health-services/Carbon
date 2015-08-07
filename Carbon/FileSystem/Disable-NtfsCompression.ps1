@@ -63,12 +63,6 @@ function Disable-NtfsCompression
 
         Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
-        $commonParams = @{
-                            Verbose = $VerbosePreference;
-                            WhatIf = $WhatIfPreference;
-                            ErrorAction = $ErrorActionPreference;
-                        }
-
         $compactPath = Join-Path $env:SystemRoot 'system32\compact.exe'
         if( -not (Test-Path -Path $compactPath -PathType Leaf) )
         {
@@ -105,7 +99,7 @@ function Disable-NtfsCompression
                 }
             }
 
-            Invoke-ConsoleCommand -Target $item -Action 'disable NTFS compression' @commonParams -ScriptBlock {
+            Invoke-ConsoleCommand -Target $item -Action 'disable NTFS compression' -ScriptBlock {
                 & $compactPath /U $recurseArg $pathArg
             }
         }

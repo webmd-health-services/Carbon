@@ -216,11 +216,11 @@ function Assert-TaskScheduledFromXml
         $installParams['TaskXml'] = $Xml
     }
 
-    $task = Install-ScheduledTask -Name $taskName @installParams -Verbose:$VerbosePreference
+    $task = Install-ScheduledTask -Name $taskName @installParams
     Assert-NotNull $task
     Assert-NoError 
     # Now, make sure task doesn't get re-created if it already exists.
-    Assert-Null (Install-ScheduledTask -Name $taskName @installParams -Verbose:$VerbosePreference)
+    Assert-Null (Install-ScheduledTask -Name $taskName @installParams)
     Assert-NoError
     $task = Get-ScheduledTask -Name $taskName
     Assert-NotNull $task
@@ -302,11 +302,9 @@ function Assert-TaskScheduled
 
     $InstallArguments['Name'] = $taskName
     $InstallArguments['TaskToRun'] = 'notepad'
-    $InstallArguments['Verbose'] = ($VerbosePreference -eq 'Continue')
 
     $AssertArguments['Name'] = $taskName
     $AssertArguments['TaskToRun'] = 'notepad'
-    $AssertArguments['Verbose'] = ($VerbosePreference -eq 'Continue')
 
     # Install to run as SYSTEM
     $task = Install-ScheduledTask -Principal System @InstallArguments

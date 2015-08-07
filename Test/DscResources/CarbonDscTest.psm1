@@ -61,7 +61,7 @@ function Invoke-CarbonTestDscConfiguration
 
     & $Name -OutputPath $tempDir
 
-    Start-DscConfiguration -Wait -ComputerName 'localhost' -Verbose:$VerbosePreference
+    Start-DscConfiguration -Wait -ComputerName 'localhost'
 }
 
 function Assert-DscResourcePresent

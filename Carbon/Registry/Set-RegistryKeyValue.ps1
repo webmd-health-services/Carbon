@@ -140,25 +140,19 @@ function Set-RegistryKeyValue
         Write-Verbose "Setting registry value '$Path@$Name'."
     }
     
-    $commonParams = @{
-                        ErrorAction = $ErrorActionPreference;
-                        Verbose = $VerbosePreference;
-                        WhatIf = $WhatIfPreference;
-                    }
-    
-    Install-RegistryKey -Path $Path @commonParams
+    Install-RegistryKey -Path $Path
     
     if( $Force )
     {
-        Remove-RegistryKeyValue -Path $Path -Name $Name @commonParams
+        Remove-RegistryKeyValue -Path $Path -Name $Name
     }
 
     if( Test-RegistryKeyValue -Path $Path -Name $Name )
     {
-        Set-ItemProperty -Path $Path -Name $Name -Value $value @commonParams
+        Set-ItemProperty -Path $Path -Name $Name -Value $value
     }
     else
     {
-        $null = New-ItemProperty -Path $Path -Name $Name -Value $value -PropertyType $type @commonParams
+        $null = New-ItemProperty -Path $Path -Name $Name -Value $value -PropertyType $type
     }
 }

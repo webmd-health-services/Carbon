@@ -22,8 +22,7 @@ This sample script shows how to setup a simple build server running CruiseContro
 param(
 )
 
-$ErrorActionPreference = 'Stop'
-$PSScriptRoot = Split-Path -Parent $MyInvocation.MyCommand.Definition
+#Requires -Version 4
 Set-StrictMode -Version Latest
 
 & (Join-Path $PSScriptRoot ..\Import-Carbon.ps1 -Resolve)

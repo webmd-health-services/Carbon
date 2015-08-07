@@ -271,7 +271,7 @@ function Initialize-Lcm
 
             $tempDir = 'Carbon+Initialize-Lcm+Install-Certificate+{0}' -f [IO.Path]::GetRandomFileName()
             $tempDir = Join-Path -Path $env:TEMP -ChildPath $tempDir
-            New-Item -Path $tempDir -ItemType 'Directory' -Verbose:$VerbosePreference -WhatIf:$false | Out-Null
+            New-Item -Path $tempDir -ItemType 'Directory' -WhatIf:$false | Out-Null
 
             try
             {
@@ -301,9 +301,9 @@ function Initialize-Lcm
             }
             finally
             {
-                Remove-Item -Path $tempDir -Recurse -ErrorAction Ignore -WhatIf:$false -Verbose:$VerbosePreference
+                Remove-Item -Path $tempDir -Recurse -ErrorAction Ignore -WhatIf:$false
             }
-        } -ArgumentList $thumbprint,$encodedCert,$CertPassword,$WhatIfPreference,$VerbosePreference -Verbose:$VerbosePreference
+        } -ArgumentList $thumbprint,$encodedCert,$CertPassword,$WhatIfPreference,$VerbosePreference
     }
 
     $sessions = New-CimSession -ComputerName $ComputerName @credentialParam

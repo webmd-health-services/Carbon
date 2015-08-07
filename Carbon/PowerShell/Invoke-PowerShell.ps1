@@ -192,9 +192,9 @@ function Invoke-PowerShell
                 $powerShellArgs += '-ExecutionPolicy'
                 $powerShellArgs += $ExecutionPolicy
             }
-            Write-Verbose ('{0} {1} -Command {2} {3}' -f $psPath,($powerShellArgs -join " "),$FilePath,($ArgumentList -join ' '))
+            Write-Debug ('{0} {1} -Command {2} {3}' -f $psPath,($powerShellArgs -join " "),$FilePath,($ArgumentList -join ' '))
             & $psPath $powerShellArgs -File $FilePath $ArgumentList
-            Write-Verbose ('LASTEXITCODE: {0}' -f $LASTEXITCODE)
+            Write-Debug ('LASTEXITCODE: {0}' -f $LASTEXITCODE)
         }
     }
     finally

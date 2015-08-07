@@ -40,7 +40,7 @@ Set-StrictMode -Version 'Latest'
 $installRoot = Get-PowerShellModuleInstallPath
 $carbonModuleRoot = Join-Path -Path $installRoot -ChildPath 'Carbon'
 Install-Junction -Link $carbonModuleRoot -Target (Join-Path -Path $PSScriptRoot -ChildPath 'Carbon' -Resolve) | Format-Table | Out-String | Write-Verbose
-Clear-DscLocalResourceCache -Verbose:$VerbosePreference
+Clear-DscLocalResourceCache
 
 $bladeTestParam = @{ }
 if( $Test )

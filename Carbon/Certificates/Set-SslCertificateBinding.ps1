@@ -67,11 +67,6 @@ function Set-SslCertificateBinding
 
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
     
-    $commonParams = @{
-                        ErrorAction = $ErrorActionPreference;
-                        Verbose = $VerbosePreference;
-         }
-    
     if( $IPAddress.AddressFamily -eq [Net.Sockets.AddressFamily]::InterNetworkV6 )
     {
         $ipPort = '[{0}]:{1}' -f $IPAddress,$Port
@@ -81,19 +76,19 @@ function Set-SslCertificateBinding
         $ipPort = '{0}:{1}' -f $IPAddress,$Port
     }
 
-    Remove-SslCertificateBinding -IPAddress $IPAddress -Port $Port @commonParams -WhatIf:$WhatIfPreference
+    Remove-SslCertificateBinding -IPAddress $IPAddress -Port $Port
     
     $action = 'creating SSL certificate binding'
     if( $pscmdlet.ShouldProcess( $IPPort, $action ) )
     {
         $appID = $ApplicationID.ToString('B')
-        Invoke-ConsoleCommand -Target $ipPort -Action $action @commonParams -WhatIf:$WhatIfPreference -ScriptBlock {
+        Invoke-ConsoleCommand -Target $ipPort -Action $action -ScriptBlock {
             netsh http add sslcert ipport=$ipPort certhash=$Thumbprint appid=$appID
         }
 
         if( $PassThru )
         {
-            Get-SslCertificateBinding -IPAddress $IPAddress -Port $Port @commonParams
+            Get-SslCertificateBinding -IPAddress $IPAddress -Port $Port
         }
     }
 }

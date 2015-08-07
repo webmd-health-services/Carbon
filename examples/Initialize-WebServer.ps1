@@ -20,9 +20,8 @@ Example script showing how to setup a simple web server.
 param(
 )
 
+#Requires -Version 4
 Set-StrictMode -Version Latest
-$ErrorActionPreference = 'Stop'
-$PSScriptRoot = Split-Path -Parent $MyInvocation.MyCommand.Definition
 
 & (Join-Path $PSSCriptRoot ..\Import-Carbon.ps1 -Resolve)
 

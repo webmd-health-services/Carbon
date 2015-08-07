@@ -147,6 +147,6 @@ function Clear-MofAuthoringMetadata
                 return $true
 
             } | 
-            Set-Content -Path $item.FullName -Verbose:$VerbosePreference
+            Set-Content -Path $item.FullName
     }
 }

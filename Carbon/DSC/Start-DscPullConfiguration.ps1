@@ -124,7 +124,7 @@ function Start-DscPullConfiguration
     Invoke-Command -ComputerName $CimSession.ComputerName @credentialParam -ScriptBlock {
         $modulesRoot = Join-Path -Path $env:ProgramFiles -ChildPath 'WindowsPowerShell\Modules'
         Get-ChildItem -Path $modulesRoot -Filter '*_tmp' -Directory | 
-            Remove-Item -Recurse -Verbose:$VerbosePreference
+            Remove-Item -Recurse
     }
 
     if( $ModuleName )
@@ -144,7 +144,7 @@ function Start-DscPullConfiguration
             $modulesRoot = Join-Path -Path $env:ProgramFiles -ChildPath 'WindowsPowerShell\Modules'
             Get-ChildItem -Path $modulesRoot -Directory |
                 Where-Object { $ModuleName -contains $_.Name } |
-                Remove-Item -Recurse -Verbose:$VerbosePreference
+                Remove-Item -Recurse
 
         } -ArgumentList (,$ModuleName)
     }
@@ -156,8 +156,7 @@ function Start-DscPullConfiguration
                                 -Namespace 'root/microsoft/windows/desiredstateconfiguration' `
                                 -Class 'MSFT_DscLocalConfigurationManager' `
                                 -MethodName 'PerformRequiredConfigurationChecks' `
-                                -Arguments @{ 'Flags' = [uint32]1 } `
-                                -Verbose:$VerbosePreference
+                                -Arguments @{ 'Flags' = [uint32]1 } 
 
     $successfulComputers = $results | Where-Object { $_ -and $_.ReturnValue -eq 0 } | Select-Object -ExpandProperty 'PSComputerName'
 

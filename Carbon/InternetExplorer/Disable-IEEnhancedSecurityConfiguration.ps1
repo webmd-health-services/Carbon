@@ -37,12 +37,6 @@ function Disable-IEEnhancedSecurityConfiguration
 
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
-    $commonParams = @{
-                        ErrorAction = $ErrorActionPreference;
-                        Verbose = $VerbosePreference;
-                        WhatIf = $WhatIfPreference;
-                    }
-
     $adminPath = "SOFTWARE\Microsoft\Active Setup\Installed Components\{A509B1A7-37EF-4b3f-8CFC-4F3A74704073}"
     $userPath =  "SOFTWARE\Microsoft\Active Setup\Installed Components\{A509B1A8-37EF-4b3f-8CFC-4F3A74704073}"
     # Yes.  They are different. Right                                     here ^
@@ -59,7 +53,7 @@ function Disable-IEEnhancedSecurityConfiguration
                 Write-Warning ('Applying Enhanced Security Configuration registry key ''{0}'' not found.' -f $hklmPath)
                 return
             }
-            Set-RegistryKeyValue -Path $hklmPath -Name 'IsInstalled' -DWord 0 @commonParams
+            Set-RegistryKeyValue -Path $hklmPath -Name 'IsInstalled' -DWord 0
         }
 
         Write-Verbose ('Calling iesetup.dll hardening methods.')

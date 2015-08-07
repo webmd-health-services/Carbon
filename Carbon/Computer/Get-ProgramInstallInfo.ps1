@@ -73,7 +73,7 @@ function Get-ProgramInstallInfo
 
             if( $valueNames -notcontains 'DisplayName' )
             {
-                Write-Verbose ('Skipping {0}: DisplayName not found.' -f $_.Name)
+                Write-Debug ('Skipping {0}: DisplayName not found.' -f $_.Name)
                 return $false
             }
 
@@ -81,13 +81,13 @@ function Get-ProgramInstallInfo
 
             if( $valueNames -contains 'ParentKeyName' )
             {
-                Write-Verbose ('Skipping {0} ({1}): found ParentKeyName property.' -f $displayName,$_.Name)
+                Write-Debug ('Skipping {0} ({1}): found ParentKeyName property.' -f $displayName,$_.Name)
                 return $false
             }
 
             if( $valueNames -contains 'SystemComponent' -and $_.GetValue( 'SystemComponent' ) -eq 1 )
             {
-                Write-Verbose ('Skipping {0} ({1}): SystemComponent property is 1.' -f $displayName,$_.Name)
+                Write-Debug ('Skipping {0} ({1}): SystemComponent property is 1.' -f $displayName,$_.Name)
                 return $false
             }
 

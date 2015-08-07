@@ -38,5 +38,5 @@ function Clear-DscLocalResourceCache
         Where-Object {$_.provider -like 'dsccore'} | 
         Select-Object -ExpandProperty HostProcessIdentifier | 
         ForEach-Object { Get-Process -ID $_ } | 
-        Stop-Process -Force -Verbose:$VerbosePreference -WhatIf:$WhatIfPreference
+        Stop-Process -Force
 }

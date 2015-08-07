@@ -241,7 +241,7 @@ function Split-Ini
             }
             $lastSetting = $null
             $sectionName = $matches[1]
-            Write-Verbose "Parsed section [$sectionName]"
+            Write-Debug "Parsed section [$sectionName]"
             return
         }
         
@@ -267,7 +267,7 @@ function Split-Ini
             $setting = New-Object Carbon.Ini.IniNode $sectionName,$name,$value,$lineNum
             $settings[$setting.FullName] = $setting
             $lastSetting = $setting
-            Write-Verbose "Parsed setting '$($setting.FullName)'"
+            Write-Debug "Parsed setting '$($setting.FullName)'"
         }
     }
     

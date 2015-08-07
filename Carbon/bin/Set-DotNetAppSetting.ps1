@@ -29,9 +29,11 @@ param(
     $Value
 )
 
+#Requires -Version 4
 Set-StrictMode -Version Latest
-$PSScriptRoot = Split-Path -Parent -Path $MyInvocation.MyCommand.Definition
-. (Join-Path $PSScriptRoot ..\Text\ConvertFrom-Base64.ps1 -Resolve)
+
+. (Join-Path -Path $PSScriptRoot -ChildPath '..\PowerShell\Use-CallerPreference.ps1' -Resolve)
+. (Join-Path -Path $PSScriptRoot -ChildPath '..\Text\ConvertFrom-Base64.ps1' -Resolve)
 
 $Name = $Name | ConvertFrom-Base64
 $Value = $Value | ConvertFrom-Base64

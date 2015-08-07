@@ -218,7 +218,7 @@ function Set-TargetResource
 
     if( -not (Test-Path -Path $Path -PathType Leaf) -and $Force )
     {
-        New-Item -Path $Path -ItemType 'File' -Force -Verbose:$VerbosePreference | Out-Null
+        New-Item -Path $Path -ItemType 'File' -Force | Out-Null
     }
 
     $fullName = $Name
