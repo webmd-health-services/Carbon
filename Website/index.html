@@ -1,109 +1,115 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-	<title>Carbon: PowerShell DevOps module for configuring and setting up Windows computers</title>
-	<link href="styles.css" type="text/css" rel="stylesheet" />
+    <title>Carbon: PowerShell DevOps module for configuring and setting up Windows computers, applications, and websites</title>
+	<link href="/styles.css" type="text/css" rel="stylesheet" />
 </head>
 <body>
-	<ul id="SiteNav">
-		<li><b>Get-Carbon</b></li>
-		<li><a href="help/">-Documentation</a></li>
-		<li><a href="releasenotes.html">-ReleaseNotes</a></li>
+
+    <ul id="SiteNav">
+		<li><a href="/">Get-Carbon</a></li>
+        <li><a href="/help/about_Carbon_Installation.html">-Install</a></li>
+		<li><a href="/help/index.html">-Documentation</a></li>
+        <li><a href="/help/about_Carbon_Support.html">-Support</a></li>
+        <li><a href="/releasenotes.html">-ReleaseNotes</a></li>
 		<li><a href="http://pshdo.com">-Blog</a></li>
-	</ul>
-	
-	<h1>Carbon</h1>
-<p>Carbon is a DevOps PowerShell module for automating the configuration of Windows 2008, Windows 2008 R2, 7, 2012, and 2012 R2 computers. Carbon can configure and manage:</p>
+    </ul>
+
+        <h1>Carbon</h1>
+
+    <p>Carbon is a PowerShell module for automating the configuration of computers 
+running Windows 7, 8, 2008, and 2012. It can configure and manage:</p>
 
 <ul>
 <li>Local users and groups</li>
 <li>IIS websites, virtual directories, and applications</li>
+<li>File system, registry, and certificate permissions</li>
 <li>Certificates</li>
-<li>.NET connection strings and app settings</li>
+<li>Privileges</li>
+<li>Services</li>
+<li>Encryption</li>
 <li>Junctions</li>
-<li>File system permissions</li>
 <li>Hosts file</li>
 <li>INI files</li>
 <li>Performance counters</li>
-<li>Services</li>
 <li>Shares</li>
-<li>Windows features/components</li>
+<li>.NET connection strings and app settings</li>
+<li>And much more!</li>
 </ul>
 
-<p>And much more!</p>
+<p>All functions are designed to be idempotent: when run multiple times with the 
+same arguments, your system will be in the same state without failing or producing
+errors.</p>
 
-<h2>System Requirements</h2>
+    <h2>System Requirements</h2>
+<p>PowerShell 4.0/5.0 and .NET Framework 4.5 </p>
 
-<p>Carbon's automated test suite runs in the following environment:</p>
+<p>Windows 7, 8, 2008, or 2012.</p>
+<h2>Installation</h2>
+<p>See the <a href="/help/about_Carbon_Installation.html">about_Carbon_Installation</a> help topic for installation instructions.</p>
+<h2>Support</h2>
+<p>See the <a href="/help/about_Carbon_Support.html">about_Carbon_Support</a> help topic for ways to ask questions about using 
+Carbon.</p>
+<h2>Overview  </h2>
+<p>Only PowerShell <a href="http://msdn.microsoft.com/en-us/library/windows/desktop/ms714428.aspx">approved verbs</a>
+are used for command names. Carbon assigns special meaning to these verbs:</p>
 
 <ul>
-<li>PowerShell v3.0</li>
-<li>.NET Framework v4.5</li>
-<li>Windows 2008 R2 (x64)/Windows 7 (x64)</li>
+<li>Format: Escape (e.g. <a href="/help/Format-ADSearchFilterValue.html">Format-ADSearchFilterValue</a>).</li>
+<li>Install: Create a resource if it doesn't exist. If it does exist, update its 
+configuration to your desired state (e.g. <a href="/help/Install-User.html">Install-User</a>, <a href="/help/Install-IisWebsite.html">Install-IisWebsite</a>,
+etc.).</li>
+<li>Split: Parse (e.g. Split-Ini)</li>
+<li>Uninstall: Remove a resource if it exists. If it doesn't exist, do nothing.</li>
 </ul>
 
-<p>But it should support PowerShell 2 and 3 running under .NET 3.5/4/4.5 on Windows Server 2008/2008 R2/2012/2012 R2 and Windows 7/8/8.1</p>
+<p>Carbon has no dependencies and is designed to work on a computer running a fresh
+install of Windows. Some functions do interact with some Windows features. If those 
+features aren't installed, you'll get errors.</p>
 
-<h2>Installation</h2>
+<p>Carbon has an automated test suite that runs after every change on a computer
+running Windows 2012 R2. Before release, the test suite is run automatically on a 
+computer running Windows 7 and PowerShell 5. No releases are made unless all tests 
+pass.</p>
+<h2>Versioning</h2>
+<p>Carbon uses <a href="http://semver.org/">semantic versioning</a>. We use our version number
+to communicate how Carbon changes from the last version. Carbon version numbers have
+the form Major.Minor.Patch.</p>
 
-<ol>
-<li><p><a href="https://bitbucket.org/splatteredbits/carbon/downloads">Download the latest release.</a></p></li>
-<li><p>Unblock the .zip file (right-click it, choose "Properties", click "Unblock", then click "OK").</p></li>
-<li><p>Unzip the Carbon module anywhere on your file system. Import the module by running the <code>Import-Carbon.ps</code> script:</p>
+<p>When upgrading to a new version, if:</p>
 
-<pre><code>&gt; &amp; 'Path\To\Carbon\Directory\Import-Carbon.ps1' 
-</code></pre>
+<ul>
+<li>Just the patch number has changed (e.g. 1.5.0 -> 1.5.1) then we've only fixed bugs
+in a 100% backwards-compatible way. You should feel comfortable upgrading with no
+or limited testing.</li>
+<li><p>The Minor version has changed (e.g. 1.8.0 -> 1.9.0), then we've only fixed bugs or
+introduced new functionality in a 100% backwards-compatible way. Again, you should
+feel comfortable upgrading with light to limited testing.</p>
 
-<p>Replace <code>Path\To\Carbon\Directory</code> with the actual path where you unzipped Carbon.</p>
+<p>When upgrading to a new minor version, always upgrade to the minor version with the
+highest patch number.   </p></li>
+<li>The Major version has changed (e.g. 1.9.0 -> 2.0.0), then we've broken 
+compatibility with previous versions of Carbon. You should carefully review the
+release notes and update your code to work with the new version. You'll need to do
+a thorough test of any changes to ensure your scripts still work.</li>
+</ul>
+<h2>See Also</h2>
+    <ul>
+        <li><a href="http://get-carbon.org">http://get-carbon.org</a></li>
+<li><a href="https://bitbucket.org/splatteredbits/carbon">https://bitbucket.org/splatteredbits/carbon</a></li>
+<li><a href="/help/about_Carbon_Installation.html">about_Carbon_Installation</a></li>
+<li><a href="/help/about_Carbon_Support.html">about_Carbon_Support</a></li>
+<li><a href="/help/about_Carbon_Extended_Type_Data.html">about_Carbon_Extended_Type_Data</a></li>
+<li><a href="/help/about_Carbon_2.0.html">about_Carbon_2.0</a></li>
+<li><a href="/help/about_Carbon_Contributing.html">about_Carbon_Contributing</a></li>
+<li><a href="http://semver.org">http://semver.org</a></li>
+    </ul>
 
-<p>If you don't want to worry about remembering/finding the path to Carbon, put the Carbon directory into one of the following directories:</p>
 
-<pre><code>Join-Path -Path $PSHOME -ChildPath Modules
-Join-Path -Path $env:USERPROFILE -ChildPath Documents\WindowsPowerShell\Modules
-</code></pre>
-
-<p>Then, you can simply</p>
-
-<pre><code>&gt; Import-Module Carbon 
-</code></pre></li>
-</ol>
-
-<h2>Usage</h2>
-
-<p>If importing Carbon in a script, we recommend always using relative paths to create a full path to Import-Carbon.ps1. This makes your scripts portable. You can get the directory in which the current script is executing, and use that to get the path to Carbon, like this:</p>
-
-<pre><code># You only need this line for PowerShell 2:
-$PSScriptRoot = Split-Path -Parent $MyInvocation.MyCommand.Definition
-&amp; (Join-Path -Path $PSScriptRoot -ChildPath ..\Tools\Carbon\Import-Carbon.ps1 -Resolve) 
-</code></pre>
-
-<p>To get a list of all commands imported by Carbon:</p>
-
-<pre><code>&gt; Get-Command -Module 'Carbon'
-</code></pre>
-
-<h2>Help and Support</h2>
-
-<p>
-Remember, Carbon is open-source software. The Carbon users and developers are volunteering to help you. Please respect their time and assistance.
-</p>
-
-<h3>E-mail</h3>
-
-<p>
-Carbon has a mailing list: <a href="mailto:&#099;&#097;&#114;&#098;&#111;&#110;&#064;&#102;&#114;&#101;&#101;&#108;&#105;&#115;&#116;&#115;&#046;&#111;&#114;&#103;">&#099;&#097;&#114;&#098;&#111;&#110;&#064;&#102;&#114;&#101;&#101;&#108;&#105;&#115;&#116;&#115;&#046;&#111;&#114;&#103;</a>.  You don't need to subscribe to ask questions, but you do need to subscribe to be part of the community and answer questions. <a href="http://www.freelists.org/list/carbon">Subscribe to the list.</a></p>
-
-<h3>Chat</h3>
-
-<p>Carbon has a <a href="https://carbonps.slack.com/">Slack chat room</a> you can use to ask questions and get help. The project owner/maintainer usually hangs out there during business hours, Monday through Friday. He's in the Pacific time zone. </p>
-
-<h3>Bugs/Enhancements</h3>
-
-<p>If you've found a bug or want to request an enhancement, <a href="https://bitbucket.org/splatteredbits/carbon/issues?status=new&status=open">create an issue on the project's Bitbucket site</a>.
 
 	<div class="Footer">
-		Copyright &copy; 2012 - 2013 <a href="http://pshdo.com">Aaron Jensen</a>.  All rights reserved.
+		Copyright &copy; 2012 - 2015 <a href="http://pshdo.com">Aaron Jensen</a>.  All rights reserved.
 	</div>
-	
+
 </body>
 </html>

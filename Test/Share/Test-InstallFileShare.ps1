@@ -203,6 +203,15 @@ function Test-ShouldDeleteFileShareIfForced
     Assert-NotEqual 1 $share.MaximumAllowed
 }
 
+function Test-ShouldLeaveShareAloneIfNothingChanges
+{
+    $output = Install-FileShare -Name $ShareName -Path $SharePath -FullAccess $fullAccessGroup -ReadAccess $readAccessGroup
+    Assert-Null $output
+
+    $output = Install-FileShare -Name $ShareName -Path $SharePath -FullAccess $fullAccessGroup -ReadAccess $readAccessGroup -Verbose 4>&1
+    Assert-Null $output
+}
+
 function Assert-ShareCreated
 {
     $share = Get-Share
