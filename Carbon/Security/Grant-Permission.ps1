@@ -189,6 +189,8 @@ function Grant-Permission
 
     Set-StrictMode -Version 'Latest'
 
+    $VerbosePreference = 'Continue';
+
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
     
     $Path = Resolve-Path -Path $Path
@@ -259,7 +261,7 @@ function Grant-Permission
                     if( $rulesToRemove )
                     {
                         $rulesToRemove | ForEach-Object { 
-                            Write-Verbose ('Removing {0}''s {1} permissions.' -f $_.IdentityReference,$_.CryptoKeyRights)
+                            Write-Verbose ('[{0} {1}] [{1}]  {2} -> ' -f $certificate.IssuedTo,$Path,$_.IdentityReference,$_.CryptoKeyRights)
                             if( -not $keySecurity.RemoveAccessRule( $_ ) )
                             {
                                 Write-Error ('Failed to remove {0}''s {1} permissions on ''{2}'' (3) certificate''s private key.' -f $_.IdentityReference,$_.CryptoKeyRights,$Certificate.Subject,$Certificate.Thumbprint)
@@ -275,8 +277,13 @@ function Grant-Permission
 
                 if( $Force -or $rulesToRemove -or -not (Test-Permission -Path $certPath -Identity $Identity -Permission $Permission -Exact) )
                 {
+                    $currentPerm = Get-Permission -Path $certPath -Identity $Identity
+                    if( $currentPerm )
+                    {
+                        $currentPerm = $currentPerm."$($providerName)Rights"
+                    }
+                    Write-Verbose -Message ('[{0} {1}] [{2}]  {3} -> {4}' -f $certificate.IssuedTo,$certPath,$accessRule.IdentityReference,$currentPerm,$accessRule.CryptoKeyRights) -Verbose
                     $keySecurity.SetAccessRule( $accessRule )
-
                     Set-CryptoKeySecurity -Certificate $certificate -CryptoKeySecurity $keySecurity -Action ('grant {0} {1} permission(s)' -f $Identity,($Permission -join ','))
                 }
 
@@ -322,7 +329,7 @@ function Grant-Permission
             {
                 foreach( $ruleToRemove in $rulesToRemove )
                 {
-                    Write-Verbose ('Removing {0}''s non-inherited, {1} {2} rights on {3}.' -f $Identity,$ruleToRemove.AccessControlType,$ruleToRemove."$($providerName)Rights",$Path)
+                    Write-Verbose ('[{0}] [{1}]  {2} -> ' -f $Path,$Identity,$ruleToRemove."$($providerName)Rights")
                     [void]$currentAcl.RemoveAccessRule( $ruleToRemove )
                 }
             }

@@ -306,10 +306,10 @@ function Test-ShouldNotClearPermissionGettingSetOnDirectory
 
 function Test-ShouldNotClearPermissionGettingSetOnRegKey
 {
-    $result = Grant-Permission -Identity $user -Permission QueryValues -Path $regContainerPath -PassThru -Verbose 4>&1
+    $result = Grant-Permission -Identity $user -Permission QueryValues -Path $regContainerPath -PassThru
     Assert-NotNull $result
     Assert-Is $result 'Security.AccessControl.RegistryAccessRule'
-    $result = Grant-Permission -Identity $user -Permission QueryValues -Path $regContainerPath -Clear -PassThru -Verbose 4>&1
+    $result = Grant-Permission -Identity $user -Permission QueryValues -Path $regContainerPath -Clear -PassThru
     Assert-NotNull $result
 }
 
@@ -317,14 +317,16 @@ function Test-ShouldWriteVerboseMessageWhenClearingRuleOnFileSystem
 {
     $result = Grant-Permission -Identity $user -Permission Read -Path $containerPath -PassThru -Verbose 4>&1
     Assert-NotNull $result
-    Assert-Is $result 'Security.AccessControl.FileSystemAccessRule'
+    Assert-Equal 2 $result.Count
+    Assert-Is $result[0] 'Management.Automation.VerboseRecord'
+    Assert-Is $result[1] 'Security.AccessControl.FileSystemAccessRule'
     [object[]]$result = Grant-Permission -Identity $user2 -Permission Read -Path $containerPath -Clear -PassThru -Verbose 4>&1
     Assert-NotNull $result
     Assert-True ($result.Count -ge 2)
     for( $idx = 0; $idx -lt $result.Count - 1; ++$idx )
     {
         Assert-Is $result[$idx] 'Management.Automation.VerboseRecord'
-        Assert-Like $result[$idx].Message ('Removing*{0}*' -f $user)
+        Assert-Like $result[$idx].Message ('*{0}* -> ' -f $user)
     }
     Assert-Is $result[-1] 'Security.AccessControl.FileSystemAccessRule'
     Assert-Equal (Resolve-IdentityName $user2) $result[-1].IdentityReference.Value
@@ -334,14 +336,18 @@ function Test-ShouldWriteVerboseMessageWhenClearingRuleOnRegKey
 {
     $result = Grant-Permission -Identity $user -Permission QueryValues -Path $regContainerPath -PassThru -Verbose 4>&1
     Assert-NotNull $result
-    Assert-Is $result 'Security.AccessControl.RegistryAccessRule'
-    [object[]]$result = Grant-Permission -Identity $user2 -Permission QueryValues -Path $regContainerPath -Clear -PassThru -Verbose 4>&1
-    Assert-NotNull $result
     Assert-Equal 2 $result.Count
     Assert-Is $result[0] 'Management.Automation.VerboseRecord'
-    Assert-Like $result[0].Message ('Removing*{0}*QueryValues*' -f $user)
     Assert-Is $result[1] 'Security.AccessControl.RegistryAccessRule'
-    Assert-Equal (Resolve-IdentityName $user2) $result[1].IdentityReference.Value
+    [object[]]$result = Grant-Permission -Identity $user2 -Permission QueryValues -Path $regContainerPath -Clear -PassThru -Verbose 4>&1
+    Assert-NotNull $result
+    Assert-Equal 3 $result.Count
+    Assert-Is $result[0] 'Management.Automation.VerboseRecord'
+    Assert-Like $result[0].Message ('*QueryValues -> ' -f $user)
+    Assert-Is $result[1] 'Management.Automation.VerboseRecord'
+    Assert-Like $result[1].Message ('* -> QueryValues' -f $user)
+    Assert-Is $result[2] 'Security.AccessControl.RegistryAccessRule'
+    Assert-Equal (Resolve-IdentityName $user2) $result[2].IdentityReference.Value
 }
 
 function Test-ShouldGrantPermissionOnPrivateKey
