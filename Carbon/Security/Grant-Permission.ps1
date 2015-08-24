@@ -341,6 +341,12 @@ function Grant-Permission
 
         if( $rulesToRemove -or $setAccessRule )
         {
+            $currentPerm = Get-Permission -Path $Path -Identity $Identity
+            if( $currentPerm )
+            {
+                $currentPerm = $currentPerm."$($providerName)Rights"
+            }
+            Write-Verbose -Message ('[{0}] [{1}]  {2} -> {3}' -f $Path,$accessRule.IdentityReference,$currentPerm,$accessRule."$($providerName)Rights") -Verbose
             Set-Acl -Path $Path -AclObject $currentAcl
         }
 
