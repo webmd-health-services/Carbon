@@ -138,6 +138,11 @@ function Install-FileShare
 
     $Path = Resolve-FullPath -Path $Path
     $Path = $Path.Trim('\\')
+    # When sharing drives, path must end with \. Otherwise, it shouldn't.
+    if( $Path -eq (Split-Path -Qualifier -Path $Path ) )
+    {
+        $Path = Join-Path -Path $Path -ChildPath '\'
+    }
 
     if( (Test-FileShare -Name $Name) )
     {
@@ -226,16 +231,16 @@ function Install-FileShare
         {
             $identityName = $ace.IdentityReference.Value
 
-            $existingAce = $null
+            $extraAce = $ace
             if( $shareAces )
             {
-                $existingAce = $shareAces | Where-Object { 
+                $extraAce = $shareAces | Where-Object { 
                                                         $newIdentityName = Resolve-IdentityName -SID $_.Trustee.SID
-                                                        return ( $newIdentityName -eq $ace.IdentityReference.Value )
+                                                        return ( $newIdentityName -ne $ace.IdentityReference.Value )
                                                     }
             }
 
-            if( -not $existingAce )
+            if( $extraAce )
             {
                 Write-Verbose -Message ('[SHARE] [{0}] Access       {1}: {2} ->' -f $Name,$identityName,$ace.ShareRights)
                 $updateShare = $true
