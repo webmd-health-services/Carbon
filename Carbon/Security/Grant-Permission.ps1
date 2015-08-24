@@ -189,8 +189,6 @@ function Grant-Permission
 
     Set-StrictMode -Version 'Latest'
 
-    $VerbosePreference = 'Continue';
-
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
     
     $Path = Resolve-Path -Path $Path
