@@ -49,5 +49,7 @@ function Get-RegistryKeyValue
     }
     
     $itemProperties = Get-ItemProperty -Path $Path -Name *
-    return $itemProperties.$Name
+    $value = $itemProperties.$Name
+    Write-Debug -Message ('[{0}@{1}: {2} -is {3}' -f $Path,$Name,$value,$value.GetType())
+    return $value
 }

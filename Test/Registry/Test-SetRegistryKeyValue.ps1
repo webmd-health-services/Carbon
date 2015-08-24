@@ -159,3 +159,39 @@ function Test-ShouldSupportWhatIfWhenUpdatingValue
     Assert-True (Test-RegistryKeyValue -Path $rootKey -Name $name)
     Assert-Equal $value (Get-REgistryKeyValue -Path $rootKey -Name $name)
 }
+
+function Test-ShouldSetBitConvertedInt32ToUInt32
+{
+    $name = 'maxvalue'
+    foreach( $value in @( [int32]::MaxValue, 0, -1, [int32]::MinValue, [uint32]::MaxValue, [uint32]::MinValue ) )
+    {
+        Write-Debug -Message ('T {0} -is {1}' -f $value,$value.GetType())
+        $bytes = [BitConverter]::GetBytes( $value )
+        $int32 = [BitConverter]::ToInt32( $bytes, 0 )
+        Write-Debug -Message ('T {0} -is {1}' -f $value,$value.GetType())
+        Set-RegistryKeyValue -Path $rootKey -Name $name -DWord $int32
+        $setValue = Get-RegistryKeyValue -Path $rootKey -Name $name
+        Write-Debug -Message ('T {0} -is {1}' -f $setValue,$setValue.GetType())
+        Write-Debug -Message '-----'
+        $uint32 = [BitConverter]::ToUInt32( $bytes, 0 )
+        Assert-Equal $uint32 $setValue
+    }
+}
+
+function Test-ShouldSetToUnsignedInt64
+{
+    $name = 'uint64maxvalue'
+    $value = [uint64]::MaxValue
+    Set-RegistryKeyValue -Path $rootKey -Name $name -UQWord $value
+    $setValue = Get-RegistryKeyValue -Path $rootKey -Name $name
+    Assert-Equal $value $setValue
+}
+
+function Test-ShouldSetToUnsignedInt32
+{
+    $name = 'uint32maxvalue'
+    $value = [uint32]::MaxValue
+    Set-RegistryKeyValue -Path $rootKey -Name $name -UDWord $value
+    $setValue = Get-RegistryKeyValue -Path $rootKey -Name $name
+    Assert-Equal $value $setValue
+}

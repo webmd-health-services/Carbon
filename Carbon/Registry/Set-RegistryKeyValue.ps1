@@ -19,7 +19,21 @@ function Set-RegistryKeyValue
     Sets a value in a registry key.
     
     .DESCRIPTION
-    If the key doesn't exist, it is created.  If the value doesn't exist, it is created.
+    The `Set-RegistryKeyValue` function sets the value of a registry key. If the key doesn't exist, it is created first. Uses PowerShell's `New-ItemPropery` to create the value if doesn't exist. Otherwise uses `Set-ItemProperty` to set the value.
+
+    `DWord` and `QWord` values are stored in the registry as unsigned integers. If you pass a negative integer for the `DWord` and `QWord` parameters, PowerShell will convert it to an unsigned integer before storing. You won't get the same negative number back.
+
+    To store integer values greater than `[Int32]::MaxValue` or `[Int64]::MaxValue`, use the `UDWord` and `UQWord` parameters, respectively, which are unsigned integers. These parameters were in Carbon 2.0.
+
+    In versions of Carbon before 2.0, you'll need to convert these large unsigned integers into signed integers. You can't do this with casting. Casting preservers the value, not the bits underneath. You need to re-interpret the bits. Here's some sample code:
+
+        # Carbon 1.0
+        $bytes = [BitConverter]::GetBytes( $unsignedInt )
+        $signedInt = [BitConverter]::ToInt32( $bytes, 0 )  # Or use `ToInt64` if you're working with 64-bit/QWord values
+        Set-RegistryKeyValue -Path $Path -Name 'MyUnsignedDWord' -DWord $signedInt
+
+        # Carbon 2.0
+        Set-RegistryKeyValue -Path $Path -Name 'MyUnsignedDWord' -UDWord $unsignedInt
     
     .LINK
     Get-RegistryKeyValue
@@ -58,6 +72,28 @@ function Set-RegistryKeyValue
     Sets a binary value (i.e. `REG_QWORD`).
     
     .EXAMPLE
+    Set-RegistryKeyValue -Path hklm:\Software\Carbon\Test -Name 'AnUnsignedInt' -UDWord [uint32]::MaxValue
+    
+    Demonstrates how to set a registry value with an unsigned integer or an integer bigger than `[int]::MaxValue`.
+
+    The `UDWord` parameter was added in Carbon 2.0. In earlier versions of Carbon, you have to convert the unsigned int's bits to a signed integer:
+
+        $bytes = [BitConverter]::GetBytes( $unsignedInt )
+        $signedInt = [BitConverter]::ToInt32( $bytes, 0 )
+        Set-RegistryKeyValue -Path $Path -Name 'MyUnsignedDWord' -DWord $signedInt
+        
+    .EXAMPLE
+    Set-RegistryKeyValue -Path hklm:\Software\Carbon\Test -Name 'AnUnsignedInt64' -UQWord [uint64]::MaxValue
+    
+    Demonstrates how to set a registry value with an unsigned 64-bit integer or a 64-bit integer bigger than `[long]::MaxValue`.
+
+    The `UQWord parameter was added in Carbon 2.0. In earlier versions of Carbon, you have to convert the unsigned int's bits to a signed integer:
+
+        $bytes = [BitConverter]::GetBytes( $unsignedInt )
+        $signedInt = [BitConverter]::ToInt64( $bytes, 0 )
+        Set-RegistryKeyValue -Path $Path -Name 'MyUnsignedDWord' -DWord $signedInt
+    
+    .EXAMPLE
     Set-RegistryKeyValue -Path hklm:\Software\Carbon\Test -Name 'UsedToBeAStringNowShouldBeDWord' -DWord 1 -Force
     
     Uses the `Force` parameter to delete the existing `UsedToBeAStringNowShouldBeDWord` before re-creating it.  This flag is useful if you need to change the type of a registry value.
@@ -94,10 +130,20 @@ function Set-RegistryKeyValue
         # The value's data.  Creates a value for holding a 32-bit integer (i.e. `REG_DWORD`).
         $DWord,
         
+        [Parameter(Mandatory=$true,ParameterSetName='DWordAsUnsignedInt')]
+        [uint32]
+        # The value's data as an unsigned integer (i.e. `UInt32`).  Creates a value for holding a 32-bit integer (i.e. `REG_DWORD`).
+        $UDWord,
+        
         [Parameter(Mandatory=$true,ParameterSetName='QWord')]
         [long]
         # The value's data.  Creates a value for holding a 64-bit integer (i.e. `REG_QWORD`).
         $QWord,
+        
+        [Parameter(Mandatory=$true,ParameterSetName='QWordAsUnsignedInt')]
+        [uint64]
+        # The value's data as an unsigned long (i.e. `UInt64`).  Creates a value for holding a 64-bit integer (i.e. `REG_QWORD`).
+        $UQWord,
         
         [Parameter(Mandatory=$true,ParameterSetName='MultiString')]
         [string[]]
@@ -109,7 +155,7 @@ function Set-RegistryKeyValue
         $Force,
         
         [Switch]
-        # If set, won't write any information about what values are being set.
+        # OBSOLETE. Will be removed in a future version of Carbon.
         $Quiet
     )
     
@@ -117,9 +163,14 @@ function Set-RegistryKeyValue
 
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
+    if( $PSBoundParameters.ContainsKey('Quiet') )
+    {
+        Write-Warning ('Set-RegistryKeyValue''s -Quiet switch is obsolete and will be removed in a future version of Carbon. Please remove usages.')
+    }
+
     $value = $null
     $type = $pscmdlet.ParameterSetName
-    switch ( $pscmdlet.ParameterSetName )
+    switch -Exact ( $pscmdlet.ParameterSetName )
     {
         'String' 
         { 
@@ -132,12 +183,17 @@ function Set-RegistryKeyValue
         'Binary' { $value = $Binary }
         'DWord' { $value = $DWord }
         'QWord' { $value = $QWord }
+        'DWordAsUnsignedInt' 
+        { 
+            $value = $UDWord 
+            $type = 'DWord'
+        }
+        'QWordAsUnsignedInt' 
+        { 
+            $value = $UQWord 
+            $type = 'QWord'
+        }
         'MultiString' { $value = $Strings }
-    }
-    
-    if( -not $PSBoundParameters.ContainsKey( 'WhatIf' ) -and -not $Quiet )
-    {
-        Write-Verbose "Setting registry value '$Path@$Name'."
     }
     
     Install-RegistryKey -Path $Path
@@ -149,10 +205,16 @@ function Set-RegistryKeyValue
 
     if( Test-RegistryKeyValue -Path $Path -Name $Name )
     {
-        Set-ItemProperty -Path $Path -Name $Name -Value $value
+        $currentValue = Get-RegistryKeyValue -Path $Path -Name $Name
+        if( $currentValue -ne $value )
+        {
+            Write-Verbose -Message ("[{0}@{1}] {2} -> {3}'" -f $Path,$Name,$currentValue,$value)
+            Set-ItemProperty -Path $Path -Name $Name -Value $value
+        }
     }
     else
     {
+        Write-Verbose -Message ("[{0}@{1}]  -> {2}'" -f $Path,$Name,$value)
         $null = New-ItemProperty -Path $Path -Name $Name -Value $value -PropertyType $type
     }
 }

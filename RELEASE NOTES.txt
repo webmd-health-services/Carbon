@@ -47,6 +47,7 @@ The following functions' internal behavior has changed. This may or may not impa
  * `Install-IisWebsite` no longer deletes and re-creates websites. If a website exists, it updates its configuration to match parameters passed in. To preserve previous behavior and delete the website before installing, use the `-Force` switch.
  * `Install-IisVirtualDirectory` no longer deletes and re-creates virtual directories. If a virtual directory exists, its configuration is updated in place. To preserve previous behavior and delete the virtual directory before installing, use the `Force` switch.
  * `Install-FileShare` (fka `Install-SmbShare`) no longer deletes and re-creates the share, instead it modifies existing shares in place. To preserve previous behavior and delete existing shares before re-creating, use the `Force` switch.
+ * `Set-RegistryKeyValue` only sets the value if the value doesn't exist or the current value is different than the desired value.
 
 We've added parameter validation to some functions. This shouldn't impact anybody, since if you were passing data that breaks this new validation, the function wouldn't have worked even in previous versions of Carbon.
 
@@ -162,7 +163,8 @@ The following functions now have obsolete parameters, which will be removed from
  * `Install-Msi's` `Quiet` switch. `Install-Msi` always installs in quiet mode. Please remove usages.
  * `Install-Service's` `Password` parameter. Use the new `Credential` parameter instead.
  * `Install-User's` `UserName` and `Password` parameters. Use the new `Credential` parameter instead.
-
+ * `Set-RegistryKeyValue`'s `Quiet` parameter. Please remove usages.
+ 
 ### Renamed Functions
 
 The following functions were renamed, but with backwards-compatible aliases in place, so you shouldn't have to change any code.
@@ -215,6 +217,10 @@ The following functions were re-written to use the `System.DirectoryServices.Acc
  * `Remove-SslCertificateBinding` has better error handling.
  * Added `SID` parameter to `Resolve-IdentityName` to resolve a SID into its identity name.
  * `Set-HostsEntry's` `IPAddress` parameter is now a `System.Net.IPAddress` object. It used to be a string validated with a regular expression.
+ * `Set-RegistryKeyValue`: 
+    * Added `UDWord` and `UQWord` parameters for setting registry key values to unsigned integers (i.e. integer values greater than `[int]::MaxValue` and `[long]::MaxValue`). Fixes [issue #165: Set-RegistryKeyValue rejects unsigned integers larger than [int]::MaxValue](https://bitbucket.org/splatteredbits/carbon/issues/165/set-registrykeyvalue).
+    * Deprecated `Quiet` switch.
+    *  Only sets the value if the value doesn't exist or the current value is different than the desired value. Use the `Force` parameter to preserve previous behavior.
  * `Test-Identity` now returns a `Carbon.Identity` object if the identity exists *and* you use the `-PassThru` switch. It used to return the identity's SID. Update scripts to use the `FullName` property to get the old return value, e.g. `Test-Identity -Name $userName -PassThru | Select-Object -Expand 'FullName'`.
  * `Test-OSIs32Bit` now uses the Environment class's new [Is64BitOperatingSystem](http://msdn.microsoft.com/en-us/library/system.environment.is64bitoperatingsystem.aspx) property.
  * `Test-OSIs64Bit` now uses the Environment class's new [Is64BitOperatingSystem](http://msdn.microsoft.com/en-us/library/system.environment.is64bitoperatingsystem.aspx) property.
@@ -307,7 +313,10 @@ The following functions were re-written to use the `System.DirectoryServices.Acc
     * Re-written to use WMI isntead of `net.exe`.
     * Modifies existing shares in place, instead of deleting and re-creating, *unless* the share's path changes. Changing a share's path requires the old share to be deleted and a new one created.
  * `Carbon_FirewallRule` now fails with an error if it finds multiple firewall rules with the same name.
- 
+ * `Set-RegistryKeyValue`: 
+    * Added `UDWord` and `UQWord` parameters for setting registry key values to unsigned integers (i.e. integer values greater than `[int]::MaxValue` and `[long]::MaxValue`). Fixes [issue #165: Set-RegistryKeyValue rejects unsigned integers larger than [int]::MaxValue](https://bitbucket.org/splatteredbits/carbon/issues/165/set-registrykeyvalue).
+    * Deprecated `Quiet` switch.
+    * Only sets value if the value is changed. Use the `Force` parameter to preserve previous behavior.
  
 # 1.9.0 (8 November 2014)
 
