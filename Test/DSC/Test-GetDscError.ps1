@@ -50,7 +50,7 @@ function Test-ShouldGetDscError
 
     & IAmBroken -OutputPath $tempDir.FullName
 
-    Start-Sleep -Milliseconds 200
+    Start-Sleep -Milliseconds 400
 
     Start-DscConfiguration -Wait -ComputerName 'localhost' -Path $tempDir.FullName -ErrorAction SilentlyContinue -Force
 
