@@ -258,7 +258,7 @@ function Install-Service
     $doInstall = $false
     if( -not $Force -and (Test-Service -Name $Name) )
     {
-        Write-Verbose ('Service {0} exists. Checking if configuration has changed.' -f $Name)
+        Write-Debug -Message ('Service {0} exists. Checking if configuration has changed.' -f $Name)
         $service = Get-Service -Name $Name
         $serviceConfig = Get-ServiceConfiguration -Name $Name
         $dependedOnServiceNames = $service.ServicesDependedOn | Select-Object -ExpandProperty 'Name'
@@ -370,7 +370,7 @@ function Install-Service
 
     if( -not $doInstall )
     {
-        Write-Verbose ('Skipping {0} service configuration: settings unchanged.' -f $Name)
+        Write-Debug -Message ('Skipping {0} service configuration: settings unchanged.' -f $Name)
         if( $PassThru )
         {
             Get-Service -Name $Name -ErrorAction Ignore
