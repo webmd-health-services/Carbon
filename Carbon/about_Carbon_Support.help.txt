@@ -11,9 +11,10 @@ OVERVIEW
     assistance. 
 
 CHAT
-    Carbon has a [Slack chat room](https://carbonps.slack.com/) you can use to ask 
-    questions and get help. The project owner/maintainer usually hangs out there during 
-    business hours, Monday through Friday. He's in the Pacific time zone.
+    Carbon has a [Gitter chat room](https://gitter.com/splatteredbits/Carbon/) you can 
+    use to ask questions and get help. The project owner/maintainer usually hangs out 
+    there during business hours, Monday through Friday. He's in the Pacific time zone. 
+    You'll need a [GitHub](https://github.com) account to login and ask questions.
 
 E-MAIL
     Carbon has a mailing list: [carbon@freelists.org](mailto:carbon@freelists.org). You 
@@ -25,7 +26,7 @@ REPORTING BUGS AND REQUESTING NEW FEATURES AND ENHANCEMENTS
     project's [Bitbucket site](https://bitbucket.org/splatteredbits/carbon/issues?status=new&status=open).
     
 SEE ALSO
-    https://carbonps.slack.com/
+    https://gitter.com/splatteredbits/Carbon/
     carbon@freelists.org
     http://www.freelists.org/list/carbon
     https://bitbucket.org/splatteredbits/carbon/issues?status=new&status=open
