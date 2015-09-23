@@ -74,12 +74,18 @@ function Install-Msi
                 return $true
             }
 
-            return ($installInfo.ProductCode -ne $_.ProductCode)
+            $result = ($installInfo.ProductCode -ne $_.ProductCode)
+            if( -not $result )
+            {
+                Write-Verbose -Message ('[MSI] [{0}] Installed {1}.' -f $installInfo.DisplayName,$installInfo.InstallDate)
+            }
+            return $result
         } |
         ForEach-Object {
             $msi = $_
             if( $PSCmdlet.ShouldProcess( $msi.Path, "install" ) )
             {
+                Write-Verbose -Message ('[MSI] [{0}] Installing from {1}.' -f $msi.ProductName,$msi.Path)
                 $msiProcess = Start-Process -FilePath "msiexec.exe" -ArgumentList "/quiet","/i",('"{0}"' -f $msi.Path) -NoNewWindow -Wait -PassThru
 
                 if( $msiProcess.ExitCode -ne $null -and $msiProcess.ExitCode -ne 0 )
