@@ -244,7 +244,7 @@ function Install-Service
                         ForEach-Object { 
                             if( $_.Contains(' ') )
                             {
-                                return '"{0}"' -f $_
+                                return '"{0}"' -f $_.Trim('"')
                             }
                             return $_
                         }

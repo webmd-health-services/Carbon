@@ -160,11 +160,11 @@ function Test-ShouldInstallServiceWithArgumentList
     {
         $servicePath = Join-Path -Path $tempDir -ChildPath (Split-Path -Leaf -Path $servicePath)
 
-        $svc = Install-Service -Name $serviceName -Path $servicePath -ArgumentList "-k","Fu bar" @installServiceParams
+        $svc = Install-Service -Name $serviceName -Path $servicePath -ArgumentList "-k","Fu bar","-w",'"Surrounded By Quotes"' @installServiceParams
         Assert-Null $svc
         Assert-NoError
         $svcConfig = Get-ServiceConfiguration -Name $serviceName
-        Assert-Equal ('"{0}" -k "Fu bar"' -f $servicePath) $svcConfig.Path
+        Assert-Equal ('"{0}" -k "Fu bar" -w "Surrounded By Quotes"' -f $servicePath) $svcConfig.Path
     }
     finally
     {

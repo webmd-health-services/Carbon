@@ -66,6 +66,7 @@ All Carbon functions now respect each caller's common parameters (e.g. `-Verbose
  * `Install-Service`:
    * No longer writes a warning about being unable to stop an already stopped service (fixes [issue #158](https://bitbucket.org/splatteredbits/carbon/issues/158/install-service-extraneous-warning-about)).
    * Starting the service now respects caller's error action preference. Before, `Start-Service` would write an error even if somone called `Install-Service` with an `Ignore` or `SilentlyContinue` error action preference.
+   * Service arguments that are quoted still get quoted. Now, quotes are trimmed before arguments are quoted.
  * `Set-EnvironmentVariable` fails to set process-level environment variable. 
  * `Set-HostsEntry` fails to preserve whitespace if existing lines end with a comment/description. Thanks to [Konstantin Ushenin](https://vk.com/kostanew) for the fix.
 
