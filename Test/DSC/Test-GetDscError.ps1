@@ -46,6 +46,8 @@ configuration IAmBroken
 
 function Test-ShouldGetDscError
 {
+    [Diagnostics.Eventing.Reader.EventLogRecord[]]$errorsAtStart = Get-DscError
+
     $startTime = Get-Date
 
     & IAmBroken -OutputPath $tempDir.FullName
@@ -62,11 +64,8 @@ function Test-ShouldGetDscError
     Assert-NotNull $dscErrors
     Assert-GreaterThan $dscErrors.Count 0
 
-    $endTime = Get-Date
-
     [Diagnostics.Eventing.Reader.EventLogRecord[]]$dscErrorsBefore = Get-DscError -EndTime $startTime
-    Assert-NotNull $dscErrorsBefore
-    Assert-Equal ($dscErrors.Count - 1) $dscErrorsBefore.Count
+    Assert-Equal ($dscErrors.Count - 1) $errorsAtStart.Count
 
     Start-Sleep -Milliseconds 800
     $Error.Clear()
