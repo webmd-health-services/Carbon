@@ -40,7 +40,8 @@ function Test-ShouldRemoveService
 {
     $service = Get-Service -Name $serviceName
     Assert-NotNull $service
-    Uninstall-Service -Name $serviceName
+    $output = Uninstall-Service -Name $serviceName
+    Assert-Null $output
     $service = Get-Service -Name $serviceName -ErrorAction SilentlyContinue
     Assert-Null $service
 }

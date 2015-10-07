@@ -52,7 +52,15 @@ function Uninstall-Service
         if( $pscmdlet.ShouldProcess( "service '$Name'", "remove" ) )
         {
             Stop-Service $Name
-            & $sc delete $Name
+            $output = & $sc delete $Name
+            if( $LASTEXITCODE )
+            {
+                Write-Error -Message ('Failed to uninstall {0} service (returned non-zero exit code {1}):{2}{3}' -f $Name,$LASTEXITCODE,([Environment]::NewLine),($output -join ([Environment]::NewLine)))
+            }
+            else
+            {
+                $output | Write-Verbose
+            }
         }
     }
 }

@@ -37,6 +37,7 @@ The following commands no longer return the stdout output from the console appli
  * `Install-SmbShare`
  * `Remove-SslCertificateBinding`
  * `Set-SslCertificateBinding`
+ * `Uninstall-Service`
 
 The following functions' internal behavior has changed. This may or may not impact you.
 
@@ -150,6 +151,7 @@ The following functions no longer return the console output of the program each 
  * `Install-Service`
  * `Remove-SslCertificateBinding`
  * `Set-SslCertificateBinding`
+ * `Uninstall-Service`
  
 ### Obsolete Functions and Parameters
 
@@ -319,6 +321,7 @@ The following functions were re-written to use the `System.DirectoryServices.Acc
     * Added `UDWord` and `UQWord` parameters for setting registry key values to unsigned integers (i.e. integer values greater than `[int]::MaxValue` and `[long]::MaxValue`). Fixes [issue #165: Set-RegistryKeyValue rejects unsigned integers larger than [int]::MaxValue](https://bitbucket.org/splatteredbits/carbon/issues/165/set-registrykeyvalue).
     * Deprecated `Quiet` switch.
     * Only sets value if the value is changed. Use the `Force` parameter to preserve previous behavior.
+ * `Uninstall-Service` no longer returns sc.exe stdout.
  
 # 1.9.0 (8 November 2014)
 
