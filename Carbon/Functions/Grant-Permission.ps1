@@ -280,7 +280,7 @@ function Grant-Permission
                     {
                         $currentPerm = $currentPerm."$($providerName)Rights"
                     }
-                    Write-Verbose -Message ('[{0} {1}] [{2}]  {3} -> {4}' -f $certificate.IssuedTo,$certPath,$accessRule.IdentityReference,$currentPerm,$accessRule.CryptoKeyRights) -Verbose
+                    Write-Verbose -Message ('[{0} {1}] [{2}]  {3} -> {4}' -f $certificate.IssuedTo,$certPath,$accessRule.IdentityReference,$currentPerm,$accessRule.CryptoKeyRights)
                     $keySecurity.SetAccessRule( $accessRule )
                     Set-CryptoKeySecurity -Certificate $certificate -CryptoKeySecurity $keySecurity -Action ('grant {0} {1} permission(s)' -f $Identity,($Permission -join ','))
                 }
@@ -351,7 +351,7 @@ function Grant-Permission
             {
                 $currentPerm = $currentPerm."$($providerName)Rights"
             }
-            Write-Verbose -Message ('[{0}] [{1}]  {2} -> {3}' -f $Path,$accessRule.IdentityReference,$currentPerm,$accessRule."$($providerName)Rights") -Verbose
+            Write-Verbose -Message ('[{0}] [{1}]  {2} -> {3}' -f $Path,$accessRule.IdentityReference,$currentPerm,$accessRule."$($providerName)Rights")
             Set-Acl -Path $Path -AclObject $currentAcl
         }
 
