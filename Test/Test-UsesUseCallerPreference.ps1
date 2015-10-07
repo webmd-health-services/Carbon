@@ -14,8 +14,8 @@
 
 function Test-FunctionsShouldUseUseCallerPreference
 {
-    $files = Get-ChildItem -Path (Join-Path -Path $PSScriptRoot -ChildPath '..\Carbon\*\*.ps1') -File |
-                Where-Object { $_.Directory.Name -ne 'bin' -and $_.Directory.Name -ne 'DscResources' -and $_.BaseName -ne 'Use-CallerPreference' } |
+    $files = Get-ChildItem -Path (Join-Path -Path $PSScriptRoot -ChildPath '..\Carbon\Functions\*.ps1') -File |
+                Where-Object { $_.BaseName -ne 'Use-CallerPreference' } |
                 Where-Object { -not ($_ | Select-String -Pattern 'Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState' -SimpleMatch) } | 
                 Select-Object -ExpandProperty 'Name' |
                 Sort-Object

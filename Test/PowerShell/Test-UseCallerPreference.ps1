@@ -73,7 +73,8 @@ function Test-ShouldWriteDebugMessage
 
 if( $PSVersionTable.PSVersion.Major -ge 5 )
 {
-    function Test-ShouldWriteInfoMessage
+    # Write-Information messages are always present when re-directing. Maybe someday I'll think of way to test this.
+    function Ignore-ShouldWriteInfoMessage
     {
         function DoIt
         {

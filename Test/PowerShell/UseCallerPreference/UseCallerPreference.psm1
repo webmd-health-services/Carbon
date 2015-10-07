@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-. (Join-Path -Path $PSScriptRoot -ChildPath '..\..\..\Carbon\PowerShell\Use-CallerPreference.ps1' -Resolve)
+. (Join-Path -Path $PSScriptRoot -ChildPath '..\..\..\Carbon\Functions\Use-CallerPreference.ps1' -Resolve)
 
 function Write-VerboseMessage
 {
