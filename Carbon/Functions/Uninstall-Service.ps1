@@ -55,7 +55,14 @@ function Uninstall-Service
             $output = & $sc delete $Name
             if( $LASTEXITCODE )
             {
-                Write-Error -Message ('Failed to uninstall {0} service (returned non-zero exit code {1}):{2}{3}' -f $Name,$LASTEXITCODE,([Environment]::NewLine),($output -join ([Environment]::NewLine)))
+                if( $LASTEXITCODE -eq 1072 )
+                {
+                    Write-Warning -Message ('The {0} service is marked for deletion and will be removed during the next reboot.{1}{2}' -f $Name,([Environment]::NewLine),($output -join ([Environment]::NewLine)))
+                }
+                else
+                {
+                    Write-Error -Message ('Failed to uninstall {0} service (returned non-zero exit code {1}):{2}{3}' -f $Name,$LASTEXITCODE,([Environment]::NewLine),($output -join ([Environment]::NewLine)))
+                }
             }
             else
             {
