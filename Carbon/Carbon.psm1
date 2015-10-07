@@ -16,8 +16,8 @@
 
 $CarbonBinDir = Join-Path -Path $PSScriptRoot -ChildPath 'bin' -Resolve
 
-. (Join-Path -Path $PSScriptRoot -ChildPath 'PowerShell\Test-TypeDataMember.ps1' -Resolve)
-. (Join-Path -Path $PSScriptRoot -ChildPath 'PowerShell\Use-CallerPreference.ps1' -Resolve)
+. (Join-Path -Path $PSScriptRoot -ChildPath 'Functions\Test-TypeDataMember.ps1' -Resolve)
+. (Join-Path -Path $PSScriptRoot -ChildPath 'Functions\Use-CallerPreference.ps1' -Resolve)
 
 # Active Directory
 
@@ -154,10 +154,9 @@ $privateMembers = @{
                         'Write-IisVerbose' = $true;
                    }
 
-$functionNames = Get-Item (Join-Path -Path $PSScriptRoot -ChildPath '*\*.ps1') | 
-                    Where-Object { $_.Directory.Name -ne 'bin' -and $_.Directory.Name -ne 'DscResources' } |
+$functionNames = Get-Item (Join-Path -Path $PSScriptRoot -ChildPath 'Functions\*.ps1') | 
                     ForEach-Object {
-                        Write-Verbose ("Importing sub-module {0}." -f $_.FullName)
+                        Write-Verbose ("Importing function {0}." -f $_.FullName)
                         . $_.FullName | Out-Null
                         $functionName = Split-Path -Leaf -Path $_.FullName
                         [IO.Path]::GetFileNameWithoutExtension( $functionName )
