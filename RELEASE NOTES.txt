@@ -2,7 +2,7 @@
 
 ## Overview
 
-Carbon version 2.0 is a *huge* release, with lots of new enhancements. We hope you like them. Carbon 2.0 now requires PowerShell 4, so it is not backwards-compatabile with Carbon 1.x. Because of this, we made some additional backwards-incompatible changes. See the `Upgrade Instructions` section for things to look out for.
+Carbon version 2.0 is a *huge* release, with lots of new enhancements and bug fixes. We hope you like them. Carbon 2.0 now requires PowerShell 4, so it is not backwards-compatabile with Carbon 1.x. Because of this, we made some additional backwards-incompatible changes. See the `Upgrade Instructions` section for things to look out for.
 
 If you're upgrading from a previous 2.0 alpha release, you'll want to review the changes since your alpha version (found after the *Upgrade Instructions* section). We improved backwards-compatability with Carbon 1.x since the last alpha release, but that broke compatability with the alphas. 
 
@@ -90,6 +90,7 @@ All Carbon functions now respect each caller's common parameters (e.g. `-Verbose
    * `Remove-SslCertificateBinding` 
    * `Revoke-ComPermission` 
  * Created default, table-based display formats for `System.DirectoryServices.AccountManagement.UserPrincipal`, `System.DirectoryServices.AccountManagement.GroupPrincipal`, `Microsoft.Web.Administration.ApplicationPool`, `Microsoft.Web.Administration.Site`, and `Microsoft.Web.Administration.Application` objects.
+ * Re-organized Carbon's internal directory structure. You shouldn't be reaching into Carbon's internals, so this shouldn't matter, but wanted to let everyone know just in case.
  
 ### New Functions
 
