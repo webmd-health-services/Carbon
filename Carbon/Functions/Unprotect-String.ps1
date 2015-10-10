@@ -165,7 +165,7 @@ filter Unprotect-String
 
         if( -not $Certificate.PrivateKey )
         {
-            Write-Error ('Certificate ''{0}'' ({1}) has a private key, but it is currently null or not set. Make sure the certificate supports digital signing.' -f $Certificate.Subject,$Certificate.Thumbprint)
+            Write-Error ('Certificate ''{0}'' ({1}) has a private key, but it is currently null or not set. This usually means your certificate was imported or generated incorrectly. Make sure you''ve generated an RSA public/private key pair and are using the private key. If the private key is in the Windows certificate stores, make sure it was imported correctly (`Get-ChildItem $pathToCert | Select-Object -Expand PrivateKey` isn''t null).' -f $Certificate.Subject,$Certificate.Thumbprint)
             return
         }
 
@@ -191,14 +191,18 @@ Failed to decrypt string using certificate '{0}' ({1}). This can happen when:
  * The string to decrypt is too long because the original string you encrypted was at or near the maximum allowed by your key's size, which is {2} bits. We estimate the maximum string size you can encrypt is {3} bytes. You may get this error even if the original encrypted string is within a couple bytes of that maximum.
  * The string was encrypted with a different key
  * The string isn't encrypted
-'@ -f $Certificate.Subject, $Certificate.Thumbprint,$privateKey.KeySize,$maxLengthGuess)
+
+{4}: {5}
+'@ -f $Certificate.Subject, $Certificate.Thumbprint,$privateKey.KeySize,$maxLengthGuess,$_.Exception.GetType().FullName,$_.Exception.Message)
                 return
             }
             elseif( $_.Exception.Message -match '(Bad Data|The parameter is incorrect)\.' )
             {
                 Write-Error (@'
 Failed to decrypt string using certificate '{0}' ({1}). This usually happens when the padding algorithm used when encrypting/decrypting is different. Check the `-UseDirectEncryptionPadding` switch is the same for both calls to `Protect-String` and `Unprotect-String`.
-'@ -f $Certificate.Subject,$Certificate.Thumbprint)
+
+{2}: {3}
+'@ -f $Certificate.Subject,$Certificate.Thumbprint,$_.Exception.GetType().FullName,$_.Exception.Message)
                 return
             }
             Write-Error -Exception $_.Exception
