@@ -36,9 +36,8 @@ $filesToSkip = @{
                     'Import-Silk' = $true;
                 }
 
-Get-Item (Join-Path $PSScriptRoot *-*.ps1) | 
-    Where-Object { -not $filesToSkip.ContainsKey( $_.BaseName ) } |
+Get-Item (Join-Path -Path $PSScriptRoot -ChildPath 'Functions\*.ps1') | 
     ForEach-Object {
-        Write-Debug ("Importing sub-module {0}." -f $_.FullName)
+        Write-Debug ("Importing function {0}." -f $_.FullName)
         . $_.FullName
     }
