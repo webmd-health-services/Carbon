@@ -67,7 +67,7 @@ function Convert-ModuleHelpToHtml
         if( -not $SkipCommandHelp )
         {
             Write-Progress -Activity $activity -PercentComplete ($count++ / $numPages * 100) -CurrentOperation $command.Name -Status 'Commands'
-            $html = Convert-HelpToHtml -Name $command.Name -Script $Script
+            $html = Convert-HelpToHtml -Name $command.Name -Script $Script -ModuleName $ModuleName
             [pscustomobject]@{
                                 Name = $command.Name;
                                 Type = 'Command';

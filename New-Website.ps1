@@ -67,17 +67,17 @@ function Out-HtmlPage
 <html>
 <head>
     <title>{0}</title>
-    <link href="/silk.css" type="text/css" rel="stylesheet" />
-	<link href="/styles.css" type="text/css" rel="stylesheet" />
+    <link href="silk.css" type="text/css" rel="stylesheet" />
+	<link href="styles.css" type="text/css" rel="stylesheet" />
 </head>
 <body>
 
     <ul id="SiteNav">
-		<li><a href="/">Get-Carbon</a></li>
-        <li><a href="/help/about_Carbon_Installation.html">-Install</a></li>
-		<li><a href="/help/index.html">-Documentation</a></li>
-        <li><a href="/help/about_Carbon_Support.html">-Support</a></li>
-        <li><a href="/releasenotes.html">-ReleaseNotes</a></li>
+		<li><a href="index.html">Get-Carbon</a></li>
+        <li><a href="about_Carbon_Installation.html">-Install</a></li>
+		<li><a href="documentation.html">-Documentation</a></li>
+        <li><a href="about_Carbon_Support.html">-Support</a></li>
+        <li><a href="releasenotes.html">-ReleaseNotes</a></li>
 		<li><a href="http://pshdo.com">-Blog</a></li>
     </ul>
 
@@ -120,25 +120,27 @@ $moduleInstallPath = Get-PowerShellModuleInstallPath
 $linkPath = Join-Path -Path $moduleInstallPath -ChildPath 'Carbon'
 Install-Junction -Link $linkPath -Target (Join-Path -Path $PSScriptRoot -ChildPath 'Carbon') -Verbose:$VerbosePreference
 
-try
+if( -not $SkipCommandHelp )
 {
-    Convert-ModuleHelpToHtml -ModuleName 'Carbon' -HeadingMap $headingMap -SkipCommandHelp:$SkipCommandHelp -Script 'Import-Carbon.ps1' |
-        ForEach-Object { Out-HtmlPage -Title ('PowerShell - {0} - Carbon' -f $_.Name) -VirtualPath ('/help/{0}.html' -f $_.Name) -Content $_.Html }
-}
-finally
-{
-    Uninstall-Junction -Path $linkPath
+    try
+    {
+        Convert-ModuleHelpToHtml -ModuleName 'Carbon' -HeadingMap $headingMap -SkipCommandHelp:$SkipCommandHelp -Script 'Import-Carbon.ps1' |
+            ForEach-Object { Out-HtmlPage -Title ('PowerShell - {0} - Carbon' -f $_.Name) -VirtualPath ('{0}.html' -f $_.Name) -Content $_.Html }
+    }
+    finally
+    {
+        Uninstall-Junction -Path $linkPath
+    }
 }
 
 New-ModuleHelpIndex -TagsJsonPath (Join-Path -Path $PSScriptRoot -ChildPath 'tags.json') -ModuleName 'Carbon' -Script 'Import-Carbon.ps1' |
-     Out-HtmlPage -Title 'PowerShell - Carbon Module Documentation' -VirtualPath '/help/index.html'
+     Out-HtmlPage -Title 'PowerShell - Carbon Module Documentation' -VirtualPath '/documentation.html'
 
 $carbonTitle = 'Carbon: PowerShell DevOps module for configuring and setting up Windows computers, applications, and websites'
-Get-Item -Path (Join-Path -Path $PSScriptRoot -ChildPath 'Carbon\about_Carbon.help.txt') |
+Get-Item -Path (Join-Path -Path $PSScriptRoot -ChildPath 'Carbon\en-US\about_Carbon.help.txt') |
     Convert-AboutTopicToHtml -ModuleName 'Carbon' -Script 'Import-Carbon.ps1' |
     ForEach-Object {
-        $text = $_ -replace '<a href="([^/]+)\.html">([^<]+)</a>','<a href="/help/$1.html">$2</a>'
-        $text -replace '<h1>about_Carbon</h1>','<h1>Carbon</h1>'
+        $_ -replace '<h1>about_Carbon</h1>','<h1>Carbon</h1>'
     } |
     Out-HtmlPage -Title $carbonTitle -VirtualPath '/index.html'
 
@@ -147,3 +149,5 @@ Get-Content -Path (Join-Path -Path $PSScriptRoot -ChildPath 'RELEASE NOTES.txt')
     Convert-MarkdownToHtml | 
     Out-HtmlPage -Title ('Release Notes - {0}' -f $carbonTitle) -VirtualPath '/releasenotes.html'
 
+Copy-Item -Path (Join-Path -Path $PSScriptRoot -ChildPath 'Tools\Silk\Resources\silk.css' -Resolve) `
+          -Destination (Join-Path -Path $PSScriptRoot -ChildPath 'Website') -Verbose

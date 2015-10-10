@@ -29,7 +29,7 @@ function Edit-HelpText
                                                     Get-Command -Module $ModuleName -CommandType Filter
                                                 }
         $aliases = Get-Command -Module $ModuleName -CommandType Alias | Get-Alias
-        $aboutTopicNames = Get-ChildItem -Path (Get-Module -Name 'Carbon').ModuleBase -Filter 'about_*' |
+        $aboutTopicNames = Get-ChildItem -Path (Get-Module -Name $ModuleName).ModuleBase -Filter 'en-US\about_*' |
                                 Select-Object -ExpandProperty 'BaseName' |
                                 ForEach-Object { $_ -replace '\.help$','' }
     }

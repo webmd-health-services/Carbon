@@ -8,10 +8,6 @@ body
 	width: 800px;
 	margin-left:auto;
 	margin-right:auto;
-	background-color: cornflowerblue;
-	background-color: lavender;
-	background-color: lightblue;
-	background-color: lightsteelblue;
 }
 
 h1, h2, h3, h4, h5, h6
@@ -34,7 +30,6 @@ code
 
 pre
 {
-	background-color: lightgrey;
 	background-color: navy;
 	color: white;
 	border: 1px solid black;
@@ -76,6 +71,16 @@ ul#SiteNav li
 	padding:0;
 }
 
+pre code 
+{
+	white-space: pre-wrap;
+}
+
+pre.Syntax
+{
+	margin-bottom: 1em;
+}
+
 #CommandsMenu
 {
     list-style: none;
@@ -85,8 +90,8 @@ ul#SiteNav li
 
 #CommandsMenu li 
 {
-    float: left;
     border: 1px solid #9DAEC4;
+    float: left;
     border-bottom-width: 0;
     margin: 0em 0.5em 0em 0.5em;
 }
@@ -95,56 +100,70 @@ ul#SiteNav li
 {
     text-decoration: none;
     display: block;
-    background: #A7BAD1;
     padding: 0.24em 1em;
-    color: #00c;
-    width: 8em;
     text-align: center;
-}
-
-#CommandsMenu a:hover 
-{
-    background: #C5D0DD;
+    border-bottom: none;
 }
 
 #CommandsMenu .selected 
 {
-    border-color: black;
-}
-
-#CommandsMenu .selected a 
-{
+    font-weight: bold;
     position: relative;
     top: 1px;
-    background: white;
-    background-color: lightsteelblue;
-    color: black;
-    font-weight: bold;
+}
+
+#CommandsMenu .selected a
+{
+        position:relative;
+        top: -1px;
 }
 
 #CommandsContent 
 {
-    border: 1px solid black;
+    border: 1px solid #9DAEC4;
     clear: both;
     padding: 0 1em;
 }
 
-#ByName, #ByVerb
+#ByNameContent
 {
-    display: none;
+    margin-top: 0em;
 }
 
-#ByName 
-{
-    margin-top: 1.3em;
-}
-
-#ByName ul
+#ByNameContent ul
 {
     list-style-type: none;
+    padding-left: 0;
+    margin-top: .5em
 }
 
-#ByName ul li
+#ByNameContent ul li
 {
-    padding: .15em 0 .15em 0;
+    padding: .25em 0 .25em 0;
+}
+
+
+table#Parameters
+{
+    border-collapse: collapse;
+}
+
+table#Parameters td
+{
+    border-width: 1px solid black;
+}
+
+table#Parameters td, table#Parameters th
+{
+    padding: 0.4em 0.4em;
+}
+
+table#Parameters td.ParamDescription p:first-child
+{
+   margin-top: 0;
+}
+
+table#Parameters td.ParamDescription p:last-child
+{
+   margin-bottom: 0;
 }

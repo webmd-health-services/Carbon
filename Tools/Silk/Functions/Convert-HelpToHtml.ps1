@@ -19,6 +19,7 @@ filter Convert-HelpToHtml
         # The syntax of the command. Useful when showing syntax for DSC resources.
         $Syntax,
 
+        [Parameter(Mandatory=$true)]
         [string]
         # The name of the module whose help is getting converted.
         $ModuleName,
@@ -32,7 +33,13 @@ filter Convert-HelpToHtml
 
     foreach( $commandName in $Name )
     {
-        $help = Get-Help -Name $commandName -Full
+        $fullCommandName = $commandName
+        if( (Get-Help -Name $commandName | Measure-Object).Count -gt 1 )
+        {
+            $fullCommandName = '{0}\{1}' -f $ModuleName,$commandName
+        }
+        Write-Verbose -Message $fullCommandName -Verbose
+        $help = Get-Help -Name $fullCommandName -Full
 
         $synopsis = $help.Synopsis | Convert-MarkdownToHtml
         if( -not $Syntax )
@@ -179,7 +186,7 @@ $description
         {
             if( $help.returnValues.returnValue.type.name -match '^([^\s]+)\s*(.*)?$' )
             {
-                $typeLink = Get-TypeDocumentationLink -CommandName $commandName -TypeName $matches[1].Trim('.')
+                $typeLink = Get-TypeDocumentationLink -CommandName $commandName -TypeName $Matches[1].Trim('.')
                 $returnValues = '{0}. {1}' -f $typeLink,$matches[2]
                 Write-Verbose $returnValues
             }

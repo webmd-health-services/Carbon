@@ -1,0 +1,110 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <title>PowerShell - about_Carbon_Installation - Carbon</title>
+    <link href="silk.css" type="text/css" rel="stylesheet" />
+	<link href="styles.css" type="text/css" rel="stylesheet" />
+</head>
+<body>
+
+    <ul id="SiteNav">
+		<li><a href="index.html">Get-Carbon</a></li>
+        <li><a href="about_Carbon_Installation.html">-Install</a></li>
+		<li><a href="documentation.html">-Documentation</a></li>
+        <li><a href="about_Carbon_Support.html">-Support</a></li>
+        <li><a href="releasenotes.html">-ReleaseNotes</a></li>
+		<li><a href="http://pshdo.com">-Blog</a></li>
+    </ul>
+
+        <h1>about_Carbon_Installation</h1>
+
+    <p>Carbon can be installed from a ZIP archive, from the PowerShell gallery, with 
+Chocolatey, and NuGet.</p>
+
+    <h2>Install From Zip Archive</h2>
+<ol>
+<li><a href="https://bitbucket.org/splatteredbits/carbon/downloads">Download the ZIP file from Bitbucket.</a></li>
+<li>Unblock the zip file (right-click the .zip file, choose Properties, click 
+"Unblock", then click "OK").</li>
+<li>Unzip the Carbon module anywhere on your file system. </li>
+</ol>
+
+<p>You can now import module using the <code>Import-Carbon.ps1</code> script:</p>
+
+<pre><code>PS&gt; .\Carbon\Import-Carbon.ps1
+</code></pre>
+
+<p>To make Carbon available so you can run <code>Import-Module Carbon</code>, copy the <code>Carbon</code>
+directory into one of PowerShell's module paths. This command will you a list:</p>
+
+<pre><code>PS&gt; $env:PSModuelPath -split ';'
+</code></pre>
+
+<p>Once you do, you can import Carbon by running:</p>
+
+<pre><code>PS&gt; Import-Module 'Carbon'
+</code></pre>
+<h2>Install From Powershell Gallery</h2>
+<p>To install from the PowerShell Gallery, you must be running PowerShell 5. If so,
+run:</p>
+
+<pre><code>PS&gt; Install-Module -Name 'Carbon'
+</code></pre>
+
+<p>You can now import Carbon by running:</p>
+
+<pre><code>PS&gt; Import-Module 'Carbon'
+</code></pre>
+<h2>Install With Chocolatey</h2>
+<p>To install with Chocolatey, you'll need <a href="http://chocolatey.org">Chocolatey installed</a>.
+With Chocolatey installed, run:</p>
+
+<pre><code>PS&gt; choco install Carbon
+</code></pre>
+
+<p>This will install Carbon into one of PowerShell's module paths. You can now import
+Carbon by running:</p>
+
+<pre><code>PS&gt; Import-Module 'Carbon'
+</code></pre>
+<h2>Install With Nuget</h2>
+<p>To install with NuGet, you'll need <a href="http://nuget.org">NuGet installed</a>. With NuGet
+installed, run:</p>
+
+<pre><code>PS&gt; nuget install Carbon
+</code></pre>
+
+<p>This will create a <code>Carbon-X.Y.Z</code> directory in your current directory (or the 
+output directory you specified with Nuget's <code>OutputDirectory</code> parameter). You can
+import Carbon from that directory using the `Import-Carbon.ps1 script:</p>
+
+<pre><code>PS&gt; .\Carbon-X.Y.Z\Carbon\Import-Carbon.ps1
+</code></pre>
+
+<p>Or with PowerShell's <code>Import-Module</code> command:</p>
+
+<pre><code>PS&gt; Import-Module '.\Carbon-X.Y.Z\Carbon'
+</code></pre>
+
+<p>If you want Carbon available so you can run <code>Import-Module Carbon</code>, copy the
+<code>Carbon-X.Y.Z\Carbon</code> directory into one of PowerShell's module paths. This command
+will give you a list:</p>
+
+<pre><code>PS&gt; $env:PSModulePath -split ';'
+</code></pre>
+<h2>See Also</h2>
+    <ul>
+        <li><a href="http://chocolatey.org">http://chocolatey.org</a></li>
+<li><a href="http://www.nuget.org">http://www.nuget.org</a></li>
+<li><a href="https://www.powershellgallery.com/">https://www.powershellgallery.com/</a></li>
+<li><a href="https://bitbucket.org/splatteredbits/carbon/downloads">https://bitbucket.org/splatteredbits/carbon/downloads</a></li>
+    </ul>
+
+
+
+	<div class="Footer">
+		Copyright &copy; 2012 - 2015 <a href="http://pshdo.com">Aaron Jensen</a>.  All rights reserved.
+	</div>
+
+</body>
+</html>
