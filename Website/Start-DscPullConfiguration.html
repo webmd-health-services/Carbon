@@ -1,0 +1,119 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <title>PowerShell - Start-DscPullConfiguration - Carbon</title>
+    <link href="silk.css" type="text/css" rel="stylesheet" />
+	<link href="styles.css" type="text/css" rel="stylesheet" />
+</head>
+<body>
+
+    <ul id="SiteNav">
+		<li><a href="index.html">Get-Carbon</a></li>
+        <li><a href="about_Carbon_Installation.html">-Install</a></li>
+		<li><a href="documentation.html">-Documentation</a></li>
+        <li><a href="about_Carbon_Support.html">-Support</a></li>
+        <li><a href="releasenotes.html">-ReleaseNotes</a></li>
+		<li><a href="http://pshdo.com">-Blog</a></li>
+    </ul>
+
+    <h1>Start-DscPullConfiguration</h1>
+<div><p>Performs a configuration check on a computer that is using DSC's Pull refresh mode.</p></div>
+
+<h2>Syntax</h2>
+<pre class="Syntax"><code>Start-DscPullConfiguration -ComputerName &lt;String[]&gt; [-Credential &lt;PSCredential&gt;] [-ModuleName &lt;String[]&gt;] [&lt;CommonParameters&gt;]</code></pre>
+<pre class="Syntax"><code>Start-DscPullConfiguration [-CimSession &lt;CimSession[]&gt;] [-ModuleName &lt;String[]&gt;] [&lt;CommonParameters&gt;]</code></pre>
+    
+<h2>Description</h2>
+<div class="Description">
+<p>The most frequently a computer's LCM will download new configuration is every 15 minutes; the most frequently it will apply it is every 30 minutes. This function contacts a computer's LCM and tells it to apply and download its configuration immediately.</p>
+
+<p>If a computer's LCM isn't configured to pull its configuration, an error is written, and nothing happens.</p>
+
+<p>If a configuration check fails, the errors are retrieved from the computer's event log and written out as errors. The <code>Remote Event Log Management</code> firewall rules must be enabled on the computer for this to work. If they aren't, you'll see an error explaining this. The <code>Get-DscError</code> help topic shows how to enable these firewall rules.</p>
+
+<p>Sometimes, the LCM does a really crappy job of updating to the latest version of a module. <code>Start-DscPullConfiguration</code> will delete modules on the target computers. Specify the names of the modules to delete with the <code>ModuleName</code> parameter. Make sure you only delete modules that will get installed by the LCM. Only modules installed in the <code>$env:ProgramFiles\WindowsPowerShell\Modules</code> directory are removed.</p>
+
+<p><code>Start-DscPullConfiguration</code> is new in Carbon 2.0.</p>
+</div>
+    
+<h2>Related Commands</h2>
+
+<ul>
+<li><a href="Get-DscError.html">Get-DscError</a></li>
+<li><a href="Initialize-Lcm.html">Initialize-Lcm</a></li>
+<li><a href="Get-DscWinEvent.html">Get-DscWinEvent</a></li>
+</ul>
+
+<h2> Parameters </h2>
+<table id="Parameters">
+<tr>
+	<th>Name</th>
+    <th>Type</th>
+	<th>Description</th>
+	<th>Required?</th>
+	<th>Pipeline Input</th>
+	<th>Default Value</th>
+</tr>
+<tr valign='top'>
+	<td>ComputerName</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String[]</a></td>
+	<td class="ParamDescription"><p>The credential to use when connecting to the target computer.</p></td>
+	<td>true</td>
+	<td>false</td>
+    <td></td>
+</tr>
+<tr valign='top'>
+	<td>Credential</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.pscredential.aspx">PSCredential</a></td>
+	<td class="ParamDescription"><p>The credentials to use when connecting to the computers.</p></td>
+	<td>false</td>
+	<td>false</td>
+    <td></td>
+</tr>
+<tr valign='top'>
+	<td>CimSession</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/microsoft.management.infrastructure.cimsession.aspx">CimSession[]</a></td>
+	<td class="ParamDescription"></td>
+	<td>false</td>
+	<td>false</td>
+    <td></td>
+</tr>
+<tr valign='top'>
+	<td>ModuleName</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String[]</a></td>
+	<td class="ParamDescription"><p>Any modules that should be removed from the target computer's PSModulePath (since the LCM does a <em>really</em> crappy job of removing them).</p></td>
+	<td>false</td>
+	<td>false</td>
+    <td></td>
+</tr>
+
+</table>
+        
+
+        
+
+        
+
+        
+<h2>EXAMPLE 1</h2>
+<pre><code>Start-DscPullConfiguration -ComputerName '10.1.2.3','10.4.5.6'</code></pre>
+<p>Demonstrates how to immedately download and apply a computer from its pull server.</p>
+
+<h2>EXAMPLE 2</h2>
+<pre><code>Start-DscPullConfiguration -ComputerName '10.1.2.3' -Credential (Get-Credential domain\username)</code></pre>
+<p>Demonstrates how to use custom credentials to contact the remote server.</p>
+
+<h2>EXAMPLE 3</h2>
+<pre><code>Start-DscPullConfiguration -CimSession $session</code></pre>
+<p>Demonstrates how to use one or more CIM sessions to invoke a configuration check.</p>
+
+<h2>EXAMPLE 4</h2>
+<pre><code>Start-DScPullConfiguration -ComputerName 'example.com' -ModuleName 'Carbon'</code></pre>
+<p>Demonstrates how to delete modules on the target computers, because sometimes the LCM does a really crappy job of it.</p>
+
+	<div class="Footer">
+		Copyright &copy; 2012 - 2015 <a href="http://pshdo.com">Aaron Jensen</a>.  All rights reserved.
+	</div>
+
+</body>
+</html>

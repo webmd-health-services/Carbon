@@ -1,0 +1,287 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <title>PowerShell - Install-Service - Carbon</title>
+    <link href="silk.css" type="text/css" rel="stylesheet" />
+	<link href="styles.css" type="text/css" rel="stylesheet" />
+</head>
+<body>
+
+    <ul id="SiteNav">
+		<li><a href="index.html">Get-Carbon</a></li>
+        <li><a href="about_Carbon_Installation.html">-Install</a></li>
+		<li><a href="documentation.html">-Documentation</a></li>
+        <li><a href="about_Carbon_Support.html">-Support</a></li>
+        <li><a href="releasenotes.html">-ReleaseNotes</a></li>
+		<li><a href="http://pshdo.com">-Blog</a></li>
+    </ul>
+
+    <h1>Install-Service</h1>
+<div><p>Installs a Windows service.</p></div>
+
+<h2>Syntax</h2>
+<pre class="Syntax"><code>Install-Service -Name &lt;String&gt; -Path &lt;String&gt; [-ArgumentList &lt;String[]&gt;] [-StartupType {Automatic | Manual | Disabled}] [-OnFirstFailure {TakeNoAction | Restart | Reboot | RunCommand}] [-OnSecondFailure {TakeNoAction | Restart | Reboot | RunCommand}] [-OnThirdFailure {TakeNoAction | Restart | Reboot | RunCommand}] [-ResetFailureCount &lt;Int32&gt;] [-RestartDelay &lt;Int32&gt;] [-RebootDelay &lt;Int32&gt;] [-Dependency &lt;String[]&gt;] [-Command &lt;String&gt;] [-RunCommandDelay &lt;Int32&gt;] [-Description &lt;String&gt;] [-DisplayName &lt;String&gt;] [-Force] [-PassThru] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
+<pre class="Syntax"><code>Install-Service -Name &lt;String&gt; -Path &lt;String&gt; [-ArgumentList &lt;String[]&gt;] [-StartupType {Automatic | Manual | Disabled}] [-OnFirstFailure {TakeNoAction | Restart | Reboot | RunCommand}] [-OnSecondFailure {TakeNoAction | Restart | Reboot | RunCommand}] [-OnThirdFailure {TakeNoAction | Restart | Reboot | RunCommand}] [-ResetFailureCount &lt;Int32&gt;] [-RestartDelay &lt;Int32&gt;] [-RebootDelay &lt;Int32&gt;] [-Dependency &lt;String[]&gt;] [-Command &lt;String&gt;] [-RunCommandDelay &lt;Int32&gt;] [-Description &lt;String&gt;] [-DisplayName &lt;String&gt;] -UserName &lt;String&gt; [-Password &lt;String&gt;] [-Force] [-PassThru] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
+<pre class="Syntax"><code>Install-Service -Name &lt;String&gt; -Path &lt;String&gt; [-ArgumentList &lt;String[]&gt;] [-StartupType {Automatic | Manual | Disabled}] [-OnFirstFailure {TakeNoAction | Restart | Reboot | RunCommand}] [-OnSecondFailure {TakeNoAction | Restart | Reboot | RunCommand}] [-OnThirdFailure {TakeNoAction | Restart | Reboot | RunCommand}] [-ResetFailureCount &lt;Int32&gt;] [-RestartDelay &lt;Int32&gt;] [-RebootDelay &lt;Int32&gt;] [-Dependency &lt;String[]&gt;] [-Command &lt;String&gt;] [-RunCommandDelay &lt;Int32&gt;] [-Description &lt;String&gt;] [-DisplayName &lt;String&gt;] -Credential &lt;PSCredential&gt; [-Force] [-PassThru] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
+    
+<h2>Description</h2>
+<div class="Description">
+<p><code>Install-Service</code> uses <code>sc.exe</code> to install a Windows service. If a service with the given name already exists, it is stopped, its configuration is updated to match the parameters passed in, and then re-started. Settings whose parameters are omitted are reset to their default values.</p>
+
+<p>Beginning in Carbon 2.0, use the <code>PassThru</code> switch to return a <code>ServiceController</code> object for the new/updated service.</p>
+
+<p>By default, the service is installed to run as <code>NetworkService</code>. Use the <code>Credential</code> parameter to run as a different account (if you don't have a <code>Credential</code> parameter, upgrade to Carbon 2.0 or use the <code>UserName</code> and <code>Password</code> parameters). This user will be granted the logon as a service right. To run as a system account other than <code>NetworkService</code>, provide just the account's name as the <code>UserName</code> parameter.</p>
+
+<p>The minimum required information to install a service is its name and path.</p>
+
+<p><a href="http://technet.microsoft.com/en-us/library/dd548356.aspx">Managed service accounts and virtual accounts</a> should be supported (we don't know how to test, so can't be sure).  Simply omit the <code>-Password</code> parameter when providing a custom account name with the <code>-Username</code> parameter.</p>
+
+<p><code>Manual</code> services are not started. <code>Automatic</code> services are started after installation. If an existing manual service is running when configuration begins, it is re-started after re-configured.</p>
+
+<p>The ability to provide service arguments/parameters via the <code>ArgumentList</code> parameter was added in Carbon 2.0.</p>
+</div>
+    
+<h2>Related Commands</h2>
+
+<ul>
+<li>Carbon_Service</li>
+<li><a href="New-Credential.html">New-Credential</a></li>
+<li><a href="Uninstall-Service.html">Uninstall-Service</a></li>
+<li><a href="http://technet.microsoft.com/en-us/library/dd548356.aspx">http://technet.microsoft.com/en-us/library/dd548356.aspx</a></li>
+</ul>
+
+<h2> Parameters </h2>
+<table id="Parameters">
+<tr>
+	<th>Name</th>
+    <th>Type</th>
+	<th>Description</th>
+	<th>Required?</th>
+	<th>Pipeline Input</th>
+	<th>Default Value</th>
+</tr>
+<tr valign='top'>
+	<td>Name</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+	<td class="ParamDescription"><p>The name of the service.</p></td>
+	<td>true</td>
+	<td>false</td>
+    <td></td>
+</tr>
+<tr valign='top'>
+	<td>Path</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+	<td class="ParamDescription"><p>The path to the service.</p></td>
+	<td>true</td>
+	<td>false</td>
+    <td></td>
+</tr>
+<tr valign='top'>
+	<td>ArgumentList</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String[]</a></td>
+	<td class="ParamDescription"><p>The arguments/startup parameters for the service. Added in Carbon 2.0.</p></td>
+	<td>false</td>
+	<td>false</td>
+    <td></td>
+</tr>
+<tr valign='top'>
+	<td>StartupType</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.serviceprocess.servicestartmode.aspx">ServiceStartMode</a></td>
+	<td class="ParamDescription"><p>The startup type: automatic, manual, or disabled.  Default is automatic.</p></td>
+	<td>false</td>
+	<td>false</td>
+    <td>Automatic</td>
+</tr>
+<tr valign='top'>
+	<td>OnFirstFailure</td>
+	<td>FailureAction</td>
+	<td class="ParamDescription"><p>What to do on the service's first failure.  Default is to take no action.</p></td>
+	<td>false</td>
+	<td>false</td>
+    <td>TakeNoAction</td>
+</tr>
+<tr valign='top'>
+	<td>OnSecondFailure</td>
+	<td>FailureAction</td>
+	<td class="ParamDescription"><p>What to do on the service's second failure. Default is to take no action.</p></td>
+	<td>false</td>
+	<td>false</td>
+    <td>TakeNoAction</td>
+</tr>
+<tr valign='top'>
+	<td>OnThirdFailure</td>
+	<td>FailureAction</td>
+	<td class="ParamDescription"><p>What to do on the service' third failure.  Default is to take no action.</p></td>
+	<td>false</td>
+	<td>false</td>
+    <td>TakeNoAction</td>
+</tr>
+<tr valign='top'>
+	<td>ResetFailureCount</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.int32.aspx">Int32</a></td>
+	<td class="ParamDescription"><p>How many seconds after which the failure count is reset to 0.</p></td>
+	<td>false</td>
+	<td>false</td>
+    <td>0</td>
+</tr>
+<tr valign='top'>
+	<td>RestartDelay</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.int32.aspx">Int32</a></td>
+	<td class="ParamDescription"><p>How many milliseconds to wait before restarting the service.  Default is 60,0000, or 1 minute.</p></td>
+	<td>false</td>
+	<td>false</td>
+    <td>60000</td>
+</tr>
+<tr valign='top'>
+	<td>RebootDelay</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.int32.aspx">Int32</a></td>
+	<td class="ParamDescription"><p>How many milliseconds to wait before handling the second failure.  Default is 60,000 or 1 minute.</p></td>
+	<td>false</td>
+	<td>false</td>
+    <td>60000</td>
+</tr>
+<tr valign='top'>
+	<td>Dependency</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String[]</a></td>
+	<td class="ParamDescription"><p>What other services does this service depend on?</p></td>
+	<td>false</td>
+	<td>false</td>
+    <td></td>
+</tr>
+<tr valign='top'>
+	<td>Command</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+	<td class="ParamDescription"><p>The command to run when a service fails, including path to the command and arguments.</p></td>
+	<td>false</td>
+	<td>false</td>
+    <td></td>
+</tr>
+<tr valign='top'>
+	<td>RunCommandDelay</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.int32.aspx">Int32</a></td>
+	<td class="ParamDescription"><p>How many milliseconds to wait before running the failure command. Default is 0, or immediately.</p></td>
+	<td>false</td>
+	<td>false</td>
+    <td>0</td>
+</tr>
+<tr valign='top'>
+	<td>Description</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+	<td class="ParamDescription"><p>The service's description. If you don't supply a value, the service's existing description is preserved.</p>
+
+<p>The <code>Description</code> parameter was added in Carbon 2.0.</p></td>
+	<td>false</td>
+	<td>false</td>
+    <td></td>
+</tr>
+<tr valign='top'>
+	<td>DisplayName</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+	<td class="ParamDescription"><p>The service's display name. If you don't supply a value, the display name will set to Name.</p>
+
+<p>The <code>DisplayName</code> parameter was added in Carbon 2.0.</p></td>
+	<td>false</td>
+	<td>false</td>
+    <td></td>
+</tr>
+<tr valign='top'>
+	<td>UserName</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+	<td class="ParamDescription"><p>The user the service should run as. Default is <code>NetworkService</code>.</p></td>
+	<td>true</td>
+	<td>false</td>
+    <td></td>
+</tr>
+<tr valign='top'>
+	<td>Password</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+	<td class="ParamDescription"><p>OBSOLETE. The <code>Password</code> parameter will be removed in a future major version of Carbon. Use the <code>Credential</code> parameter instead.</p></td>
+	<td>false</td>
+	<td>false</td>
+    <td></td>
+</tr>
+<tr valign='top'>
+	<td>Credential</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.pscredential.aspx">PSCredential</a></td>
+	<td class="ParamDescription"><p>The credential of the account the service should run as.</p>
+
+<p>The <code>Credential</code> parameter was added in Carbon 2.0.</p></td>
+	<td>true</td>
+	<td>false</td>
+    <td></td>
+</tr>
+<tr valign='top'>
+	<td>Force</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+	<td class="ParamDescription"><p>Update the service even if there are no changes.</p></td>
+	<td>false</td>
+	<td>false</td>
+    <td>False</td>
+</tr>
+<tr valign='top'>
+	<td>PassThru</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+	<td class="ParamDescription"><p>Return a <code>System.ServiceProcess.ServiceController</code> object for the configured service.</p></td>
+	<td>false</td>
+	<td>false</td>
+    <td>False</td>
+</tr>
+<tr valign='top'>
+	<td>WhatIf</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+	<td class="ParamDescription"></td>
+	<td>false</td>
+	<td>false</td>
+    <td></td>
+</tr>
+<tr valign='top'>
+	<td>Confirm</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+	<td class="ParamDescription"></td>
+	<td>false</td>
+	<td>false</td>
+    <td></td>
+</tr>
+<tr valign="top">
+    <td><a href="http://technet.microsoft.com/en-us/library/dd315352.aspx">CommonParameters</a></td>
+    <td></td>
+    <td>This cmdlet supports common parameters.  For more information type <br> <code>Get-Help about_CommonParameters</code>.</td>
+    <td></td>
+    <td></td>
+    <td></td>
+</tr>
+</table>
+        
+
+        
+<h2>Return Values</h2>
+<p><a href="http://msdn.microsoft.com/en-us/library/system.serviceprocess.servicecontroller.aspx">System.ServiceProcess.ServiceController</a>. </p>
+        
+
+        
+<h2>EXAMPLE 1</h2>
+<pre><code>Install-Service -Name DeathStar -Path C:\ALongTimeAgo\InAGalaxyFarFarAway\DeathStar.exe</code></pre>
+<p>Installs the Death Star service, which runs the service executable at <code>C:\ALongTimeAgo\InAGalaxyFarFarAway\DeathStar.exe</code>.  The service runs as <code>NetworkService</code> and will start automatically.</p>
+
+<h2>EXAMPLE 2</h2>
+<pre><code>Install-Service -Name DeathStar -Path C:\ALongTimeAgo\InAGalaxyFarFarAway\DeathStar.exe -StartupType Manual</code></pre>
+<p>Install the Death Star service to startup manually.  You certainly don't want the thing roaming the galaxy, destroying thing willy-nilly, do you?</p>
+
+<h2>EXAMPLE 3</h2>
+<pre><code>Install-Service -Name DeathStar -Path C:\ALongTimeAgo\InAGalaxyFarFarAway\DeathStar.exe -Credential $tarkinCredentials</code></pre>
+<p>Installs the Death Star service to run as Grand Moff Tarkin, who is given the log on as a service right.</p>
+
+<h2>EXAMPLE 4</h2>
+<pre><code>Install-Service -Name DeathStar -Path C:\ALongTimeAgo\InAGalaxyFarFarAway\DeathStar.exe -Username SYSTEM</code></pre>
+<p>Demonstrates how to install a service to run as a system account other than <code>NetworkService</code>. Installs the DeathStart service to run as the local <code>System</code> account.</p>
+
+<h2>EXAMPLE 5</h2>
+<pre><code>Install-Service -Name DeathStar -Path C:\ALongTimeAgo\InAGalaxyFarFarAway\DeathStar.exe -OnFirstFailure RunCommand -RunCommandDelay 5000 -Command 'engage_hyperdrive.exe "Corruscant"' -OnSecondFailure Restart -RestartDelay 30000 -OnThirdFailure Reboot -RebootDelay 120000 -ResetFailureCount (60*60*24)</code></pre>
+<p>Demonstrates how to control the service's failure actions. On the first failure, Windows will run the <code>engage-hyperdrive.exe "Corruscant"</code> command after 5 seconds (<code>5,000</code> milliseconds). On the second failure, Windows will restart the service after 30 seconds (<code>30,000</code> milliseconds). On the third failure, Windows will reboot after two minutes (<code>120,000</code> milliseconds). The failure count gets reset once a day (<code>60*60*24</code> seconds).</p>
+
+	<div class="Footer">
+		Copyright &copy; 2012 - 2015 <a href="http://pshdo.com">Aaron Jensen</a>.  All rights reserved.
+	</div>
+
+</body>
+</html>

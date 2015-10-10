@@ -1,0 +1,107 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <title>PowerShell - Get-ServiceConfiguration - Carbon</title>
+    <link href="silk.css" type="text/css" rel="stylesheet" />
+	<link href="styles.css" type="text/css" rel="stylesheet" />
+</head>
+<body>
+
+    <ul id="SiteNav">
+		<li><a href="index.html">Get-Carbon</a></li>
+        <li><a href="about_Carbon_Installation.html">-Install</a></li>
+		<li><a href="documentation.html">-Documentation</a></li>
+        <li><a href="about_Carbon_Support.html">-Support</a></li>
+        <li><a href="releasenotes.html">-ReleaseNotes</a></li>
+		<li><a href="http://pshdo.com">-Blog</a></li>
+    </ul>
+
+    <h1>Get-ServiceConfiguration</h1>
+<div><p>Gets a service's full configuration, e.g. username, path, failure actions, etc.</p></div>
+
+<h2>Syntax</h2>
+<pre class="Syntax"><code>Get-ServiceConfiguration [-Name] &lt;String&gt; [-ComputerName &lt;String&gt;] [&lt;CommonParameters&gt;]</code></pre>
+    
+<h2>Description</h2>
+<div class="Description">
+<p>The .NET <code>ServiceController</code> object only returns basic information about a service. This function returns a bunch of the missing configuration in the form of a <code>Carbon.Service.ServiceInfo</code> object:</p>
+
+<ul>
+<li>Account name/user name</li>
+<li>Path</li>
+<li>Description</li>
+<li>Failure actions</li>
+</ul>
+
+<p>You can load a specific service using its name, or pipe in <code>ServiceController</code> objects.</p>
+
+<p>In addition to this function, Carbon also adds this information as extended type data properties onto the <code>ServiceController</code> class. To see it, </p>
+
+<pre><code>Get-Service | Get-Member
+</code></pre>
+
+<p>The user running this function must have <code>QueryConfig</code>, <code>QueryStatus</code>, and <code>EnumerateDependents</code> permissions on the service. Use <code>Grant-ServicePermission</code> to grant these permissions.</p>
+
+<p>This function is new in Carbon 1.8.</p>
+</div>
+    
+<h2>Related Commands</h2>
+
+<ul>
+<li><a href="Grant-ServicePermission.html">Grant-ServicePermission</a></li>
+</ul>
+
+<h2> Parameters </h2>
+<table id="Parameters">
+<tr>
+	<th>Name</th>
+    <th>Type</th>
+	<th>Description</th>
+	<th>Required?</th>
+	<th>Pipeline Input</th>
+	<th>Default Value</th>
+</tr>
+<tr valign='top'>
+	<td>Name</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+	<td class="ParamDescription"><p>The name of the service.</p></td>
+	<td>true</td>
+	<td>true (ByPropertyName)</td>
+    <td></td>
+</tr>
+<tr valign='top'>
+	<td>ComputerName</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+	<td class="ParamDescription"><p>The name of the computer where the service lives.</p></td>
+	<td>false</td>
+	<td>true (ByPropertyName)</td>
+    <td></td>
+</tr>
+
+</table>
+        
+
+        
+<h2>Return Values</h2>
+<p>Carbon.Service.ServiceInfo. </p>
+        
+
+        
+<h2>EXAMPLE 1</h2>
+<pre><code>Get-Service | Get-ServiceConfiguration</code></pre>
+<p>Demonstrates how you can pipe in a <code>ServiceController</code> object to load the service. This works for services on remote computers as well.</p>
+
+<h2>EXAMPLE 2</h2>
+<pre><code>Get-ServiceConfiguration -Name  'w3svc'</code></pre>
+<p>Demonstrates how you can get a specific service's configuration.</p>
+
+<h2>EXAMPLE 3</h2>
+<pre><code>Get-ServiceConfiguration -Name 'w3svc' -ComputerName 'enterprise'</code></pre>
+<p>Demonstrates how to get service configuration for a service on a remote computer.</p>
+
+	<div class="Footer">
+		Copyright &copy; 2012 - 2015 <a href="http://pshdo.com">Aaron Jensen</a>.  All rights reserved.
+	</div>
+
+</body>
+</html>

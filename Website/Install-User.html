@@ -1,0 +1,166 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <title>PowerShell - Install-User - Carbon</title>
+    <link href="silk.css" type="text/css" rel="stylesheet" />
+	<link href="styles.css" type="text/css" rel="stylesheet" />
+</head>
+<body>
+
+    <ul id="SiteNav">
+		<li><a href="index.html">Get-Carbon</a></li>
+        <li><a href="about_Carbon_Installation.html">-Install</a></li>
+		<li><a href="documentation.html">-Documentation</a></li>
+        <li><a href="about_Carbon_Support.html">-Support</a></li>
+        <li><a href="releasenotes.html">-ReleaseNotes</a></li>
+		<li><a href="http://pshdo.com">-Blog</a></li>
+    </ul>
+
+    <h1>Install-User</h1>
+<div><p>Installs a <em>local</em> user account.</p></div>
+
+<h2>Syntax</h2>
+<pre class="Syntax"><code>Install-User -UserName &lt;String&gt; -Password &lt;String&gt; [-Description &lt;String&gt;] [-FullName &lt;String&gt;] [-UserCannotChangePassword] [-PasswordExpires] [-PassThru] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
+<pre class="Syntax"><code>Install-User -Credential &lt;PSCredential&gt; [-Description &lt;String&gt;] [-FullName &lt;String&gt;] [-UserCannotChangePassword] [-PasswordExpires] [-PassThru] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
+    
+<h2>Description</h2>
+<div class="Description">
+<p><code>Install-User</code> creates a new <em>local</em> user account, or updates an existing <em>local</em> user account. </p>
+
+<p>Returns the user if <code>-PassThru</code> switch is used. The object returned, an instance of <code>System.DirectoryServices.AccountManagement.UserPrincipal</code>, uses external resources, which means it can leak memory when garbage collected. When you're done using the user object you get, call its <code>Dispose()</code> method so its external resources are cleaned up properly.</p>
+
+<p>The <code>UserCannotChangePassword</code> and <code>PasswordExpires</code> switches were added in Carbon 2.0.</p>
+</div>
+    
+<h2>Related Commands</h2>
+
+<ul>
+<li><a href="Get-User.html">Get-User</a></li>
+<li><a href="New-Credential.html">New-Credential</a></li>
+<li><a href="Test-User.html">Test-User</a></li>
+<li><a href="Uninstall-User.html">Uninstall-User</a></li>
+</ul>
+
+<h2> Parameters </h2>
+<table id="Parameters">
+<tr>
+	<th>Name</th>
+    <th>Type</th>
+	<th>Description</th>
+	<th>Required?</th>
+	<th>Pipeline Input</th>
+	<th>Default Value</th>
+</tr>
+<tr valign='top'>
+	<td>UserName</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+	<td class="ParamDescription"><p>OBSOLETE. The <code>UserName</code> parameter will be removed in a future major version of Carbon. Use the <code>Credential</code> parameter instead.</p></td>
+	<td>true</td>
+	<td>false</td>
+    <td></td>
+</tr>
+<tr valign='top'>
+	<td>Password</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+	<td class="ParamDescription"><p>OBSOLETE. The <code>Password</code> parameter will be removed in a future major version of Carbon. Use the <code>Credential</code> parameter instead.</p></td>
+	<td>true</td>
+	<td>false</td>
+    <td></td>
+</tr>
+<tr valign='top'>
+	<td>Credential</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.pscredential.aspx">PSCredential</a></td>
+	<td class="ParamDescription"><p>The user's credentials.</p>
+
+<p>The <code>Credential</code> parameter was added in Carbon 2.0.</p></td>
+	<td>true</td>
+	<td>false</td>
+    <td></td>
+</tr>
+<tr valign='top'>
+	<td>Description</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+	<td class="ParamDescription"><p>A description of the user.</p></td>
+	<td>false</td>
+	<td>false</td>
+    <td></td>
+</tr>
+<tr valign='top'>
+	<td>FullName</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+	<td class="ParamDescription"><p>The full name of the user.</p></td>
+	<td>false</td>
+	<td>false</td>
+    <td></td>
+</tr>
+<tr valign='top'>
+	<td>UserCannotChangePassword</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+	<td class="ParamDescription"><p>Prevent the user from changing his password. New in Carbon 2.0.</p></td>
+	<td>false</td>
+	<td>false</td>
+    <td>False</td>
+</tr>
+<tr valign='top'>
+	<td>PasswordExpires</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+	<td class="ParamDescription"><p>Set to true if the user's password should expire. New in Carbon 2.0.</p></td>
+	<td>false</td>
+	<td>false</td>
+    <td>False</td>
+</tr>
+<tr valign='top'>
+	<td>PassThru</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+	<td class="ParamDescription"><p>Return the user. New in Carbon 2.0.</p></td>
+	<td>false</td>
+	<td>false</td>
+    <td>False</td>
+</tr>
+<tr valign='top'>
+	<td>WhatIf</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+	<td class="ParamDescription"></td>
+	<td>false</td>
+	<td>false</td>
+    <td></td>
+</tr>
+<tr valign='top'>
+	<td>Confirm</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+	<td class="ParamDescription"></td>
+	<td>false</td>
+	<td>false</td>
+    <td></td>
+</tr>
+<tr valign="top">
+    <td><a href="http://technet.microsoft.com/en-us/library/dd315352.aspx">CommonParameters</a></td>
+    <td></td>
+    <td>This cmdlet supports common parameters.  For more information type <br> <code>Get-Help about_CommonParameters</code>.</td>
+    <td></td>
+    <td></td>
+    <td></td>
+</tr>
+</table>
+        
+
+        
+<h2>Return Values</h2>
+<p><a href="http://msdn.microsoft.com/en-us/library/system.directoryservices.accountmanagement.userprincipal.aspx">System.DirectoryServices.AccountManagement.UserPrincipal</a>. </p>
+        
+
+        
+<h2>EXAMPLE 1</h2>
+<pre><code>Install-User -Credential $lukeCredentials -Description "Luke Skywalker's account."</code></pre>
+<p>Creates a new <code>LSkywalker</code> user account with the given password and description.  Luke's password is set to never expire.</p>
+
+<h2>EXAMPLE 2</h2>
+<pre><code>Install-User -Credential $lukeCredentials -UserCannotChangePassword -PasswordExpires</code></pre>
+<p>Demonstrates how to create an account for a user who cannot change his password and whose password will expire.</p>
+
+	<div class="Footer">
+		Copyright &copy; 2012 - 2015 <a href="http://pshdo.com">Aaron Jensen</a>.  All rights reserved.
+	</div>
+
+</body>
+</html>

@@ -1,0 +1,153 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <title>PowerShell - New-RsaKeyPair - Carbon</title>
+    <link href="silk.css" type="text/css" rel="stylesheet" />
+	<link href="styles.css" type="text/css" rel="stylesheet" />
+</head>
+<body>
+
+    <ul id="SiteNav">
+		<li><a href="index.html">Get-Carbon</a></li>
+        <li><a href="about_Carbon_Installation.html">-Install</a></li>
+		<li><a href="documentation.html">-Documentation</a></li>
+        <li><a href="about_Carbon_Support.html">-Support</a></li>
+        <li><a href="releasenotes.html">-ReleaseNotes</a></li>
+		<li><a href="http://pshdo.com">-Blog</a></li>
+    </ul>
+
+    <h1>New-RsaKeyPair</h1>
+<div><p>Generates a public/private RSA key pair.</p></div>
+
+<h2>Syntax</h2>
+<pre class="Syntax"><code>New-RsaKeyPair [-Subject] &lt;String&gt; [-Algorithm &lt;String&gt;] [-ValidFrom &lt;DateTime&gt;] [-ValidTo &lt;DateTime&gt;] [-Length &lt;Int32&gt;] [-Authority &lt;String&gt;] [-PublicKeyFile] &lt;String&gt; [-PrivateKeyFile] &lt;String&gt; [-Force] [&lt;CommonParameters&gt;]</code></pre>
+    
+<h2>Description</h2>
+<div class="Description">
+<p>Uses the <code>makecert.exe</code> and <code>pvk2pfx.exe</code> programs to generate a public/private RSA key pair, and saves each to files of your choosing. The public key is saved as an X509Certificate. The private key is saved as a PFX file. Both can be loaded by .NET's <code>X509Certificate</code> class. Returns <code>System.IO.FileInfo</code> objects for the public and private key, in that order.</p>
+
+<p>You will be prompted for the private key password. Once when creating the private key, once to save it to a file, and finally to export it to a PFX file. Sorry about that: the <code>makecert.exe</code> tool doesn't have an password command-line parameter. The first two prompts will be GUIs, so you can't run this command headless. To create a password-less private key, click "None" when prompted for the private key password, and leave the other password prompts blank.</p>
+
+<p><code>makecert.exe</code> and <code>pvk2pfx.exe</code> are part of the Windows SDK. They can be downloaded from the following locations:</p>
+
+<ul>
+<li><a href="http://www.microsoft.com/en-us/download/details.aspx?id=8279">Windows 7</a></li>
+<li><a href="http://msdn.microsoft.com/en-us/windows/desktop/hh852363.aspx">Windows 8</a></li>
+<li><a href="http://msdn.microsoft.com/en-us/windows/desktop/bg162891.aspx">Windows 8.1</a></li>
+</ul>
+</div>
+    
+<h2>Related Commands</h2>
+
+<ul>
+<li><a href="http://www.microsoft.com/en-us/download/details.aspx?id=8279">http://www.microsoft.com/en-us/download/details.aspx?id=8279</a></li>
+<li><a href="http://msdn.microsoft.com/en-us/windows/desktop/hh852363.aspx">http://msdn.microsoft.com/en-us/windows/desktop/hh852363.aspx</a></li>
+<li><a href="http://msdn.microsoft.com/en-us/windows/desktop/bg162891.aspx">http://msdn.microsoft.com/en-us/windows/desktop/bg162891.aspx</a></li>
+</ul>
+
+<h2> Parameters </h2>
+<table id="Parameters">
+<tr>
+	<th>Name</th>
+    <th>Type</th>
+	<th>Description</th>
+	<th>Required?</th>
+	<th>Pipeline Input</th>
+	<th>Default Value</th>
+</tr>
+<tr valign='top'>
+	<td>Subject</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+	<td class="ParamDescription"><p>The key's subject. Should be of the form <code>CN=Name,OU=Name,O=SuperMagicFunTime,ST=OR,C=US</code>. Only the <code>CN=Name</code> part is required.</p></td>
+	<td>true</td>
+	<td>false</td>
+    <td></td>
+</tr>
+<tr valign='top'>
+	<td>Algorithm</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+	<td class="ParamDescription"><p>The signature algorithm. Default is <code>sha512</code>.</p></td>
+	<td>false</td>
+	<td>false</td>
+    <td>sha512</td>
+</tr>
+<tr valign='top'>
+	<td>ValidFrom</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.datetime.aspx">DateTime</a></td>
+	<td class="ParamDescription"><p>The date/time the keys will become valid. Default is now.</p></td>
+	<td>false</td>
+	<td>false</td>
+    <td>(Get-Date)</td>
+</tr>
+<tr valign='top'>
+	<td>ValidTo</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.datetime.aspx">DateTime</a></td>
+	<td class="ParamDescription"><p>The date/time the keys should expire. Default is <code>DateTime::MaxValue</code>.</p></td>
+	<td>false</td>
+	<td>false</td>
+    <td>([DateTime]::MaxValue)</td>
+</tr>
+<tr valign='top'>
+	<td>Length</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.int32.aspx">Int32</a></td>
+	<td class="ParamDescription"><p>The length, in bits, of the generated key length. Default is <code>4096</code>.</p></td>
+	<td>false</td>
+	<td>false</td>
+    <td>4096</td>
+</tr>
+<tr valign='top'>
+	<td>Authority</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+	<td class="ParamDescription"><p>The signing authority of the certificate. Must be <code>commercial</code> (for certificates used by commercial software publishers) or <code>individual</code>, for certificates used by individual software publishers. Default is <code>individual</code>.</p></td>
+	<td>false</td>
+	<td>false</td>
+    <td>individual</td>
+</tr>
+<tr valign='top'>
+	<td>PublicKeyFile</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+	<td class="ParamDescription"><p>The file where the public key should be stored. Saved as an X509 certificate.</p></td>
+	<td>true</td>
+	<td>false</td>
+    <td></td>
+</tr>
+<tr valign='top'>
+	<td>PrivateKeyFile</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+	<td class="ParamDescription"><p>The file where the private key should be stored. The private key will be saved as an X509 certificate in PFX format and will include the public key.</p></td>
+	<td>true</td>
+	<td>false</td>
+    <td></td>
+</tr>
+<tr valign='top'>
+	<td>Force</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+	<td class="ParamDescription"><p>Overwrites <code>PublicKeyFile</code> and/or <code>PrivateKeyFile</code>, if they exist.</p></td>
+	<td>false</td>
+	<td>false</td>
+    <td>False</td>
+</tr>
+
+</table>
+        
+
+        
+<h2>Return Values</h2>
+<p><a href="http://msdn.microsoft.com/en-us/library/system.io.fileinfo.aspx">System.IO.FileInfo</a>. </p>
+        
+
+        
+<h2>EXAMPLE 1</h2>
+<pre><code>New-RsaKeyPair -Subject 'CN=MyName' -PublicKeyFile 'MyName.cer' -PrivateKeyFile 'MyName.pfx'</code></pre>
+<p>Demonstrates the minimal parameters needed to generate a key pair. The key will use a sha512 signing algorithm, have a length of 4096 bits, expire on <code>DateTime::MaxValue</code>, as an <code>individual</code> authority. The public key will be saved in the current directory as <code>MyName.cer</code>. The private key will be saved to the current directory as <code>MyName.pfx</code>.</p>
+
+<h2>EXAMPLE 2</h2>
+<pre><code>New-RsaKeyPair -Subject 'CN=MyName' -PublicKeyFile 'MyName.cer' -PrivateKeyFile 'MyName.pfx' -Algorithm 'sha1' -ValidFrom (Get-Date -Year 2015 -Month 1 -Day 1) -ValidTo (Get-Date -Year 2015 -Month 12 -Day 31) -Length 1024 -Authority 'commercial'</code></pre>
+<p>Demonstrates how to use all the parameters to create a truly customized key pair. The generated certificate will use the sha1 signing algorithm, becomes effective 1/1/2015, expires 12/31/2015, is 1024 bits in length, as specifies <code>commercial</code> as the signing authority.</p>
+
+	<div class="Footer">
+		Copyright &copy; 2012 - 2015 <a href="http://pshdo.com">Aaron Jensen</a>.  All rights reserved.
+	</div>
+
+</body>
+</html>

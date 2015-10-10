@@ -1,0 +1,105 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <title>PowerShell - Get-FirewallRule - Carbon</title>
+    <link href="silk.css" type="text/css" rel="stylesheet" />
+	<link href="styles.css" type="text/css" rel="stylesheet" />
+</head>
+<body>
+
+    <ul id="SiteNav">
+		<li><a href="index.html">Get-Carbon</a></li>
+        <li><a href="about_Carbon_Installation.html">-Install</a></li>
+		<li><a href="documentation.html">-Documentation</a></li>
+        <li><a href="about_Carbon_Support.html">-Support</a></li>
+        <li><a href="releasenotes.html">-ReleaseNotes</a></li>
+		<li><a href="http://pshdo.com">-Blog</a></li>
+    </ul>
+
+    <h1>Get-FirewallRule</h1>
+<div><p>Gets the local computer's firewall rules.</p></div>
+
+<h2>Syntax</h2>
+<pre class="Syntax"><code>Get-FirewallRule [&lt;CommonParameters&gt;]</code></pre>
+<pre class="Syntax"><code>Get-FirewallRule -Name &lt;String&gt; [&lt;CommonParameters&gt;]</code></pre>
+<pre class="Syntax"><code>Get-FirewallRule -LiteralName &lt;String&gt; [&lt;CommonParameters&gt;]</code></pre>
+    
+<h2>Description</h2>
+<div class="Description">
+<p>Returns a <code>Carbon.Firewall.Rule</code> object for each firewall rule on the local computer. </p>
+
+<p>This data is parsed from the output of:</p>
+
+<pre><code>netsh advfirewall firewall show rule name=all.
+</code></pre>
+
+<p>You can return specific rule(s) using the <code>Name</code> or <code>LiteralName</code> parameters. The <code>Name</code> parameter accepts wildcards; <code>LiteralName</code> does not. There can be multiple firewall rules with the same name.</p>
+
+<p>If the firewall isn't configurable/running, writes an error and returns without returning any objects.</p>
+</div>
+    
+<h2>Related Commands</h2>
+
+<ul>
+<li><a href="Assert-FirewallConfigurable.html">Assert-FirewallConfigurable</a></li>
+<li>Carbon_FirewallRule</li>
+</ul>
+
+<h2> Parameters </h2>
+<table id="Parameters">
+<tr>
+	<th>Name</th>
+    <th>Type</th>
+	<th>Description</th>
+	<th>Required?</th>
+	<th>Pipeline Input</th>
+	<th>Default Value</th>
+</tr>
+<tr valign='top'>
+	<td>Name</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+	<td class="ParamDescription"><p>The name of the rule. Wildcards supported. Names aren't unique, so you may still get back multiple rules</p></td>
+	<td>true</td>
+	<td>false</td>
+    <td></td>
+</tr>
+<tr valign='top'>
+	<td>LiteralName</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+	<td class="ParamDescription"><p>The literal name of the rule. Wildcards not supported.</p></td>
+	<td>true</td>
+	<td>false</td>
+    <td></td>
+</tr>
+
+</table>
+        
+
+        
+<h2>Return Values</h2>
+<p>Carbon.Firewall.Rule. </p>
+        
+
+        
+<h2>EXAMPLE 1</h2>
+<pre><code>Get-FirewallRule</code></pre>
+<p>Demonstrates how to get the firewall rules running on the current computer.</p>
+
+<h2>EXAMPLE 2</h2>
+<pre><code>Get-FirewallRule -Name 'World Wide Web Services (HTTP Traffic-In)'</code></pre>
+<p>Demonstrates how to get a specific rule.</p>
+
+<h2>EXAMPLE 3</h2>
+<pre><code>Get-FirewallRule -Name '*HTTP*'</code></pre>
+<p>Demonstrates how to use wildcards to find rules whose names match a wildcard pattern, in this case any rule whose name contains the text 'HTTP' is returned.</p>
+
+<h2>EXAMPLE 4</h2>
+<pre><code>Get-FirewallRule -LiteralName 'Custom Rule **CREATED BY AUTOMATED PROCES'</code></pre>
+<p>Demonstrates how to find a specific firewall rule by name if that name has wildcard characters in it.</p>
+
+	<div class="Footer">
+		Copyright &copy; 2012 - 2015 <a href="http://pshdo.com">Aaron Jensen</a>.  All rights reserved.
+	</div>
+
+</body>
+</html>

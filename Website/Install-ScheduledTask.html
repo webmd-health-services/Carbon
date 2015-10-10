@@ -1,0 +1,467 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <title>PowerShell - Install-ScheduledTask - Carbon</title>
+    <link href="silk.css" type="text/css" rel="stylesheet" />
+	<link href="styles.css" type="text/css" rel="stylesheet" />
+</head>
+<body>
+
+    <ul id="SiteNav">
+		<li><a href="index.html">Get-Carbon</a></li>
+        <li><a href="about_Carbon_Installation.html">-Install</a></li>
+		<li><a href="documentation.html">-Documentation</a></li>
+        <li><a href="about_Carbon_Support.html">-Support</a></li>
+        <li><a href="releasenotes.html">-ReleaseNotes</a></li>
+		<li><a href="http://pshdo.com">-Blog</a></li>
+    </ul>
+
+    <h1>Install-ScheduledTask</h1>
+<div><p>Installs a scheduled task on the current computer.</p></div>
+
+<h2>Syntax</h2>
+<pre class="Syntax"><code>Install-ScheduledTask -Name &lt;String&gt; -TaskToRun &lt;String&gt; -OnEvent -EventChannelName &lt;String&gt; -EventXPathQuery &lt;String&gt; [-Interactive] [-NoPassword] [-HighestAvailableRunLevel] [-Delay &lt;TimeSpan&gt;] [-TaskCredential &lt;PSCredential&gt;] [-Principal &lt;String&gt;] [-Force] [&lt;CommonParameters&gt;]</code></pre>
+<pre class="Syntax"><code>Install-ScheduledTask -Name &lt;String&gt; -TaskToRun &lt;String&gt; -OnIdle &lt;Int32&gt; [-Interactive] [-NoPassword] [-HighestAvailableRunLevel] [-TaskCredential &lt;PSCredential&gt;] [-Principal &lt;String&gt;] [-Force] [&lt;CommonParameters&gt;]</code></pre>
+<pre class="Syntax"><code>Install-ScheduledTask -Name &lt;String&gt; -TaskToRun &lt;String&gt; -OnLogon [-Interactive] [-NoPassword] [-HighestAvailableRunLevel] [-Delay &lt;TimeSpan&gt;] [-TaskCredential &lt;PSCredential&gt;] [-Principal &lt;String&gt;] [-Force] [&lt;CommonParameters&gt;]</code></pre>
+<pre class="Syntax"><code>Install-ScheduledTask -Name &lt;String&gt; -TaskToRun &lt;String&gt; -OnStart [-Interactive] [-NoPassword] [-HighestAvailableRunLevel] [-Delay &lt;TimeSpan&gt;] [-TaskCredential &lt;PSCredential&gt;] [-Principal &lt;String&gt;] [-Force] [&lt;CommonParameters&gt;]</code></pre>
+<pre class="Syntax"><code>Install-ScheduledTask -Name &lt;String&gt; -TaskToRun &lt;String&gt; -Once [-StartDate &lt;DateTime&gt;] -StartTime &lt;TimeSpan&gt; [-Interactive] [-NoPassword] [-HighestAvailableRunLevel] [-TaskCredential &lt;PSCredential&gt;] [-Principal &lt;String&gt;] [-Force] [&lt;CommonParameters&gt;]</code></pre>
+<pre class="Syntax"><code>Install-ScheduledTask -Name &lt;String&gt; -TaskToRun &lt;String&gt; [-Month &lt;Month[]&gt;] -WeekOfMonth {First | Second | Third | Fourth | Last} -DayOfWeek &lt;DayOfWeek[]&gt; [-Interval &lt;Int32&gt;] [-StartDate &lt;DateTime&gt;] [-StartTime &lt;TimeSpan&gt;] [-Duration &lt;TimeSpan&gt;] [-EndDate &lt;DateTime&gt;] [-EndTime &lt;TimeSpan&gt;] [-Interactive] [-NoPassword] [-HighestAvailableRunLevel] [-TaskCredential &lt;PSCredential&gt;] [-Principal &lt;String&gt;] [-Force] [&lt;CommonParameters&gt;]</code></pre>
+<pre class="Syntax"><code>Install-ScheduledTask -Name &lt;String&gt; -TaskToRun &lt;String&gt; -LastDayOfMonth [-Month &lt;Month[]&gt;] [-Interval &lt;Int32&gt;] [-StartDate &lt;DateTime&gt;] [-StartTime &lt;TimeSpan&gt;] [-Duration &lt;TimeSpan&gt;] [-EndDate &lt;DateTime&gt;] [-EndTime &lt;TimeSpan&gt;] [-Interactive] [-NoPassword] [-HighestAvailableRunLevel] [-TaskCredential &lt;PSCredential&gt;] [-Principal &lt;String&gt;] [-Force] [&lt;CommonParameters&gt;]</code></pre>
+<pre class="Syntax"><code>Install-ScheduledTask -Name &lt;String&gt; -TaskToRun &lt;String&gt; -Month &lt;Month[]&gt; -DayOfMonth &lt;Int32&gt; [-Interval &lt;Int32&gt;] [-StartDate &lt;DateTime&gt;] [-StartTime &lt;TimeSpan&gt;] [-Duration &lt;TimeSpan&gt;] [-EndDate &lt;DateTime&gt;] [-EndTime &lt;TimeSpan&gt;] [-Interactive] [-NoPassword] [-HighestAvailableRunLevel] [-TaskCredential &lt;PSCredential&gt;] [-Principal &lt;String&gt;] [-Force] [&lt;CommonParameters&gt;]</code></pre>
+<pre class="Syntax"><code>Install-ScheduledTask -Name &lt;String&gt; -TaskToRun &lt;String&gt; -Monthly [-DayOfMonth &lt;Int32&gt;] [-Interval &lt;Int32&gt;] [-StartDate &lt;DateTime&gt;] [-StartTime &lt;TimeSpan&gt;] [-Duration &lt;TimeSpan&gt;] [-EndDate &lt;DateTime&gt;] [-EndTime &lt;TimeSpan&gt;] [-Interactive] [-NoPassword] [-HighestAvailableRunLevel] [-TaskCredential &lt;PSCredential&gt;] [-Principal &lt;String&gt;] [-Force] [&lt;CommonParameters&gt;]</code></pre>
+<pre class="Syntax"><code>Install-ScheduledTask -Name &lt;String&gt; -TaskToRun &lt;String&gt; -Weekly &lt;Int32&gt; [-DayOfWeek &lt;DayOfWeek[]&gt;] [-Interval &lt;Int32&gt;] [-StartDate &lt;DateTime&gt;] [-StartTime &lt;TimeSpan&gt;] [-Duration &lt;TimeSpan&gt;] [-EndDate &lt;DateTime&gt;] [-EndTime &lt;TimeSpan&gt;] [-Interactive] [-NoPassword] [-HighestAvailableRunLevel] [-TaskCredential &lt;PSCredential&gt;] [-Principal &lt;String&gt;] [-Force] [&lt;CommonParameters&gt;]</code></pre>
+<pre class="Syntax"><code>Install-ScheduledTask -Name &lt;String&gt; -TaskToRun &lt;String&gt; -Daily &lt;Int32&gt; [-Interval &lt;Int32&gt;] [-StartDate &lt;DateTime&gt;] [-StartTime &lt;TimeSpan&gt;] [-Duration &lt;TimeSpan&gt;] [-EndDate &lt;DateTime&gt;] [-EndTime &lt;TimeSpan&gt;] [-Interactive] [-NoPassword] [-HighestAvailableRunLevel] [-TaskCredential &lt;PSCredential&gt;] [-Principal &lt;String&gt;] [-Force] [&lt;CommonParameters&gt;]</code></pre>
+<pre class="Syntax"><code>Install-ScheduledTask -Name &lt;String&gt; -TaskToRun &lt;String&gt; -Hourly &lt;Int32&gt; [-StopAtEnd] [-StartDate &lt;DateTime&gt;] [-StartTime &lt;TimeSpan&gt;] [-Duration &lt;TimeSpan&gt;] [-EndDate &lt;DateTime&gt;] [-EndTime &lt;TimeSpan&gt;] [-Interactive] [-NoPassword] [-HighestAvailableRunLevel] [-TaskCredential &lt;PSCredential&gt;] [-Principal &lt;String&gt;] [-Force] [&lt;CommonParameters&gt;]</code></pre>
+<pre class="Syntax"><code>Install-ScheduledTask -Name &lt;String&gt; -TaskToRun &lt;String&gt; -Minute &lt;Int32&gt; [-StopAtEnd] [-StartDate &lt;DateTime&gt;] [-StartTime &lt;TimeSpan&gt;] [-Duration &lt;TimeSpan&gt;] [-EndDate &lt;DateTime&gt;] [-EndTime &lt;TimeSpan&gt;] [-Interactive] [-NoPassword] [-HighestAvailableRunLevel] [-TaskCredential &lt;PSCredential&gt;] [-Principal &lt;String&gt;] [-Force] [&lt;CommonParameters&gt;]</code></pre>
+<pre class="Syntax"><code>Install-ScheduledTask -Name &lt;String&gt; -TaskXmlFilePath &lt;String&gt; [-TaskCredential &lt;PSCredential&gt;] [-Force] [&lt;CommonParameters&gt;]</code></pre>
+<pre class="Syntax"><code>Install-ScheduledTask -Name &lt;String&gt; -TaskXml &lt;XmlDocument&gt; [-TaskCredential &lt;PSCredential&gt;] [-Force] [&lt;CommonParameters&gt;]</code></pre>
+    
+<h2>Description</h2>
+<div class="Description">
+<p>The <code>Install-ScheduledTask</code> function uses <code>schtasks.exe</code> to install a scheduled task on the current computer. If a task with the same name already exists, the existing task is left in place. Use the <code>-Force</code> switch to force <code>Install-ScheduledTask</code> to delete any existing tasks before installation.</p>
+
+<p>If a new task is created, a <code>Carbon.TaskScheduler.TaskInfo</code> object is returned.</p>
+
+<p>The <code>schtasks.exe</code> command line application is pretty limited in the kind of tasks it will create. If you need a scheduled task created with options not supported by <code>Install-ScheduledTask</code>, you can create an XML file using the <a href="http://msdn.microsoft.com/en-us/library/windows/desktop/aa383609.aspx">Task Scheduler Schema</a> or create a task with the Task Scheduler MMC then export that task as XML with the <code>schtasks.exe /query /xml /tn &lt;TaskName&gt;</code>. Pass the XML file (or the raw XML) with the <code>TaskXmlFilePath</code> or <code>TaskXml</code> parameters, respectively.</p>
+</div>
+    
+<h2>Related Commands</h2>
+
+<ul>
+<li><a href="Get-ScheduledTask.html">Get-ScheduledTask</a></li>
+<li><a href="Test-ScheduledTask.html">Test-ScheduledTask</a></li>
+<li><a href="Uninstall-ScheduledTask.html">Uninstall-ScheduledTask</a></li>
+<li><a href="http://technet.microsoft.com/en-us/library/cc725744.aspx#BKMK_create">http://technet.microsoft.com/en-us/library/cc725744.aspx#BKMK_create</a></li>
+<li><a href="http://msdn.microsoft.com/en-us/library/windows/desktop/aa383609.aspx">http://msdn.microsoft.com/en-us/library/windows/desktop/aa383609.aspx</a></li>
+</ul>
+
+<h2> Parameters </h2>
+<table id="Parameters">
+<tr>
+	<th>Name</th>
+    <th>Type</th>
+	<th>Description</th>
+	<th>Required?</th>
+	<th>Pipeline Input</th>
+	<th>Default Value</th>
+</tr>
+<tr valign='top'>
+	<td>Name</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+	<td class="ParamDescription"><p>The name of the scheduled task to create. Paths are allowed to create tasks under folders.</p></td>
+	<td>true</td>
+	<td>false</td>
+    <td></td>
+</tr>
+<tr valign='top'>
+	<td>TaskToRun</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+	<td class="ParamDescription"><p>The task/program to execute, including arguments/parameters.</p></td>
+	<td>true</td>
+	<td>false</td>
+    <td></td>
+</tr>
+<tr valign='top'>
+	<td>Minute</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.int32.aspx">Int32</a></td>
+	<td class="ParamDescription"><p>Create a scheduled task that runs every N minutes.</p></td>
+	<td>true</td>
+	<td>false</td>
+    <td>0</td>
+</tr>
+<tr valign='top'>
+	<td>Hourly</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.int32.aspx">Int32</a></td>
+	<td class="ParamDescription"><p>Create a scheduled task that runs every N hours.</p></td>
+	<td>true</td>
+	<td>false</td>
+    <td>0</td>
+</tr>
+<tr valign='top'>
+	<td>StopAtEnd</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+	<td class="ParamDescription"><p>Stops the task at the <code>EndTime</code> or <code>Duration</code> if it is still running.</p></td>
+	<td>false</td>
+	<td>false</td>
+    <td>False</td>
+</tr>
+<tr valign='top'>
+	<td>Daily</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.int32.aspx">Int32</a></td>
+	<td class="ParamDescription"><p>Creates a scheduled task that runs every N days.</p></td>
+	<td>true</td>
+	<td>false</td>
+    <td>0</td>
+</tr>
+<tr valign='top'>
+	<td>Weekly</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.int32.aspx">Int32</a></td>
+	<td class="ParamDescription"><p>Creates a scheduled task that runs every N weeks.</p></td>
+	<td>true</td>
+	<td>false</td>
+    <td>0</td>
+</tr>
+<tr valign='top'>
+	<td>Monthly</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+	<td class="ParamDescription"><p>Create a scheduled task that runs every month.</p></td>
+	<td>true</td>
+	<td>false</td>
+    <td>False</td>
+</tr>
+<tr valign='top'>
+	<td>LastDayOfMonth</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+	<td class="ParamDescription"><p>Create a scheduled task that runs on the last day of every month. To run on specific months, specify the <code>Month</code> parameter.</p></td>
+	<td>true</td>
+	<td>false</td>
+    <td>False</td>
+</tr>
+<tr valign='top'>
+	<td>Month</td>
+	<td>Month[]</td>
+	<td class="ParamDescription"><p>Create a scheduled task that runs on specific months. To create a monthly task, use the <code>Monthly</code> switch.</p></td>
+	<td>false</td>
+	<td>false</td>
+    <td></td>
+</tr>
+<tr valign='top'>
+	<td>DayOfMonth</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.int32.aspx">Int32</a></td>
+	<td class="ParamDescription"><p>The day of the month to run a monthly task.</p></td>
+	<td>true</td>
+	<td>false</td>
+    <td>0</td>
+</tr>
+<tr valign='top'>
+	<td>WeekOfMonth</td>
+	<td>WeekOfMonth</td>
+	<td class="ParamDescription"><p>Create a scheduled task that runs a particular week of the month.</p></td>
+	<td>true</td>
+	<td>false</td>
+    <td></td>
+</tr>
+<tr valign='top'>
+	<td>DayOfWeek</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.dayofweek.aspx">DayOfWeek[]</a></td>
+	<td class="ParamDescription"><p>The day of the week to run the task. Default is today.</p></td>
+	<td>true</td>
+	<td>false</td>
+    <td></td>
+</tr>
+<tr valign='top'>
+	<td>Once</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+	<td class="ParamDescription"><p>Create a scheduled task that runs once.</p></td>
+	<td>true</td>
+	<td>false</td>
+    <td>False</td>
+</tr>
+<tr valign='top'>
+	<td>OnStart</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+	<td class="ParamDescription"><p>Create a scheduled task that runs at startup.</p></td>
+	<td>true</td>
+	<td>false</td>
+    <td>False</td>
+</tr>
+<tr valign='top'>
+	<td>OnLogon</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+	<td class="ParamDescription"><p>Create a scheduled task that runs when the user running the task logs on.  Requires the <code>TaskCredential</code> parameter.</p></td>
+	<td>true</td>
+	<td>false</td>
+    <td>False</td>
+</tr>
+<tr valign='top'>
+	<td>OnIdle</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.int32.aspx">Int32</a></td>
+	<td class="ParamDescription"><p>Create a scheduled task that runs when the computer is idle for N minutes.</p></td>
+	<td>true</td>
+	<td>false</td>
+    <td>0</td>
+</tr>
+<tr valign='top'>
+	<td>OnEvent</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+	<td class="ParamDescription"><p>Create a scheduled task that runs when events appear in the Windows event log.</p></td>
+	<td>true</td>
+	<td>false</td>
+    <td>False</td>
+</tr>
+<tr valign='top'>
+	<td>EventChannelName</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+	<td class="ParamDescription"><p>The name of the event channel to look at.</p></td>
+	<td>true</td>
+	<td>false</td>
+    <td></td>
+</tr>
+<tr valign='top'>
+	<td>EventXPathQuery</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+	<td class="ParamDescription"><p>The XPath event query to use to determine when to fire <code>OnEvent</code> tasks.</p></td>
+	<td>true</td>
+	<td>false</td>
+    <td></td>
+</tr>
+<tr valign='top'>
+	<td>TaskXmlFilePath</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+	<td class="ParamDescription"><p>Install the task from this XML path.</p></td>
+	<td>true</td>
+	<td>false</td>
+    <td></td>
+</tr>
+<tr valign='top'>
+	<td>TaskXml</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.xml.xmldocument.aspx">XmlDocument</a></td>
+	<td class="ParamDescription"><p>Install the task from this XML.</p></td>
+	<td>true</td>
+	<td>false</td>
+    <td></td>
+</tr>
+<tr valign='top'>
+	<td>Interval</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.int32.aspx">Int32</a></td>
+	<td class="ParamDescription"><p>Re-run the task every N minutes.</p></td>
+	<td>false</td>
+	<td>false</td>
+    <td>0</td>
+</tr>
+<tr valign='top'>
+	<td>StartDate</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.datetime.aspx">DateTime</a></td>
+	<td class="ParamDescription"><p>The date the task can start running.</p></td>
+	<td>false</td>
+	<td>false</td>
+    <td></td>
+</tr>
+<tr valign='top'>
+	<td>StartTime</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.timespan.aspx">TimeSpan</a></td>
+	<td class="ParamDescription"><p>The start time to run the task. Must be less than <code>24:00</code>.</p></td>
+	<td>true</td>
+	<td>false</td>
+    <td></td>
+</tr>
+<tr valign='top'>
+	<td>Duration</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.timespan.aspx">TimeSpan</a></td>
+	<td class="ParamDescription"><p>The duration to run the task. Usually used with <code>Interval</code> to repeatedly run a task over a given time span. By default, re-runs for an hour. Can't be used with <code>EndTime</code>.</p></td>
+	<td>false</td>
+	<td>false</td>
+    <td></td>
+</tr>
+<tr valign='top'>
+	<td>EndDate</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.datetime.aspx">DateTime</a></td>
+	<td class="ParamDescription"><p>The last date the task should run.</p></td>
+	<td>false</td>
+	<td>false</td>
+    <td></td>
+</tr>
+<tr valign='top'>
+	<td>EndTime</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.timespan.aspx">TimeSpan</a></td>
+	<td class="ParamDescription"><p>The end time to run the task. Must be less than <code>24:00</code>. Can't be used with <code>Duration</code>.</p></td>
+	<td>false</td>
+	<td>false</td>
+    <td></td>
+</tr>
+<tr valign='top'>
+	<td>Interactive</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+	<td class="ParamDescription"><p>Enables the task to run interactively only if the user is currently logged on at the time the job runs. The task will only run if the user is logged on. Must be used with <code>TaskCredential</code> parameter.</p></td>
+	<td>false</td>
+	<td>false</td>
+    <td>False</td>
+</tr>
+<tr valign='top'>
+	<td>NoPassword</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+	<td class="ParamDescription"><p>No password is stored. The task runs non-interactively as the given user, who must be logged in. Only local resources are available. Must be used with <code>TaskCredential</code> parameter.</p></td>
+	<td>false</td>
+	<td>false</td>
+    <td>False</td>
+</tr>
+<tr valign='top'>
+	<td>HighestAvailableRunLevel</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+	<td class="ParamDescription"><p>Marks the task for deletion after its final run.</p></td>
+	<td>false</td>
+	<td>false</td>
+    <td>False</td>
+</tr>
+<tr valign='top'>
+	<td>Delay</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.timespan.aspx">TimeSpan</a></td>
+	<td class="ParamDescription"><p>The wait time to delay the running of the task after the trigger is fired.  Must be less than 10,000 minutes (6 days, 22 hours, and 40 minutes).</p></td>
+	<td>false</td>
+	<td>false</td>
+    <td></td>
+</tr>
+<tr valign='top'>
+	<td>TaskCredential</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.pscredential.aspx">PSCredential</a></td>
+	<td class="ParamDescription"><p>The principal the task should run as. Use <code>Principal</code> parameter to run as a built-in security principal. Required if <code>Interactive</code> or <code>NoPassword</code> switches are used.</p></td>
+	<td>false</td>
+	<td>false</td>
+    <td></td>
+</tr>
+<tr valign='top'>
+	<td>Principal</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+	<td class="ParamDescription"><p>The built-in identity to use. The default is <code>System</code>. Use the <code>TaskCredential</code> parameter to run as non-built-in security principal.</p></td>
+	<td>false</td>
+	<td>false</td>
+    <td>System</td>
+</tr>
+<tr valign='top'>
+	<td>Force</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+	<td class="ParamDescription"><p>Create the task even if a task with the same name already exists (i.e. delete any task with the same name before installation).</p></td>
+	<td>false</td>
+	<td>false</td>
+    <td>False</td>
+</tr>
+
+</table>
+        
+
+        
+<h2>Return Values</h2>
+<p>Carbon.TaskScheduler.TaskInfo. </p>
+        
+
+        
+<h2>EXAMPLE 1</h2>
+<pre><code>Install-ScheduledTask -Name 'CarbonSample' -TaskToRun 'C:\Windows\system32\notepad.exe' -Minute 5</code></pre>
+<p>Creates a scheduled task "CarbonSample" to run notepad.exe every five minutes. No credential or principal is provided, so the task will run as <code>System</code>.</p>
+
+<h2>EXAMPLE 2</h2>
+<pre><code>Install-ScheduledTask -Name 'CarbonSample' -TaskToRun 'C:\Windows\system32\notepad.exe' -Minute 1 -TaskCredential (Get-Credential 'runasuser')</code></pre>
+<p>Demonstrates how to run a task every minute as a specific user with the <code>TaskCredential</code> parameter.</p>
+
+<h2>EXAMPLE 3</h2>
+<pre><code>Install-ScheduledTask -Name 'CarbonSample' -TaskToRun 'C:\Windows\system32\notepad.exe' -Minute 1 -Principal LocalService</code></pre>
+<p>Demonstrates how to run a task every minute as a built-in principal, in this case <code>Local Service</code>.</p>
+
+<h2>EXAMPLE 4</h2>
+<pre><code>Install-ScheduledTask -Name 'CarbonSample' -TaskToRun 'calc.exe' -Minute 5 -StartTime '12:00' -EndTime '14:00' -StartDate '6/6/2006' -EndDate '6/6/2006'</code></pre>
+<p>Demonstrates how to run a task every 5 minutes between the given start date/time and end date/time. In this case, the task will run between noon and 2 pm on <code>6/6/2006</code>.</p>
+
+<h2>EXAMPLE 5</h2>
+<pre><code>Install-ScheduledTask -Name 'CarbonSample' -TaskToRun 'notepad' -Hourly 1</code></pre>
+<p>Creates a scheduled task <code>CarbonSample</code> which runs <code>notepad.exe</code> every hour as the <code>LocalService</code> user.</p>
+
+<h2>EXAMPLE 6</h2>
+<pre><code>Install-ScheduledTask -Name 'CarbonSample' -TaskToRun 'notepad.exe' -Weekly 1</code></pre>
+<p>Demonstrates how to run a task ever <em>N</em> weeks, in this case every week.</p>
+
+<h2>EXAMPLE 7</h2>
+<pre><code>Install-ScheduledTask -Name 'CarbonSample' -TaskToRun 'notepad.exe' -Monthly</code></pre>
+<p>Demonstrates how to run a task the 1st of every month.</p>
+
+<h2>EXAMPLE 8</h2>
+<pre><code>Install-ScheduledTask -Name 'CarbonSample' -TaskToRun 'notepad.exe' -Monthly -DayOfMonth 15</code></pre>
+<p>Demonstrates how to run a monthly task on a specific day of the month.</p>
+
+<h2>EXAMPLE 9</h2>
+<pre><code>Install-ScheduledTask -Name 'CarbonSample' -TaskToRun 'notepad.exe' -Month 1,4,7,10 -DayOfMonth 5</code></pre>
+<p>Demonstrates how to run a task on specific months of the year on a specific day of the month.</p>
+
+<h2>EXAMPLE 10</h2>
+<pre><code>Install-ScheduledTask -Name 'CarbonSample' -TaskToRun 'notepad.exe' -WeekOfMonth First -DayOfWeek Sunday</code></pre>
+<p>Demonstrates how to run a task on a specific week of each month. In this case, the task will run the first Sunday of every month.</p>
+
+<h2>EXAMPLE 11</h2>
+<pre><code>Install-ScheduledTask -Name 'CarbonSample' -TaskToRun 'notepad.exe' -Month 1,5,9 -WeekOfMonth First -DayOfWeek Sunday</code></pre>
+<p>Demonstrates how to run a task on a specific week of specific months. In this case, the task will run the first Sunday of January, May, and September.</p>
+
+<h2>EXAMPLE 12</h2>
+<pre><code>Install-ScheduledTask -Name 'CarbonSample' -TaskToRun 'notepad.exe' -LastDayOfMonth</code></pre>
+<p>Demonstrates how to run a task the last day of every month.</p>
+
+<h2>EXAMPLE 13</h2>
+<pre><code>Install-ScheduledTask -Name 'CarbonSample' -TaskToRun 'notepad.exe' -LastDayOfMonth -Month 1,6</code></pre>
+<p>Demonstrates how to run a task the last day of specific months. In this case, the task will run the last day of January and June.</p>
+
+<h2>EXAMPLE 14</h2>
+<pre><code>Install-ScheduledTask -Name 'CarbonSample' -TaskToRun 'notepad.exe' -Once -StartTime '0:00'</code></pre>
+<p>Demonstrates how to run a task once. In this case, the task will run at midnight of today (which means it probably won't run since it is always past midnight).</p>
+
+<h2>EXAMPLE 15</h2>
+<pre><code>Install-ScheduledTask -Name 'CarbonSample' -TaskToRun 'notepad.exe' -OnStart</code></pre>
+<p>Demonstrates how to run a task when the computer starts up.</p>
+
+<h2>EXAMPLE 16</h2>
+<pre><code>Install-ScheduledTask -Name 'CarbonSample' -TaskToRun 'notepad.exe' -OnStart -Delay '0:30'</code></pre>
+<p>Demonstrates how to run a task when the computer starts up after a certain amount of time passes. In this case, the task will run 30 minutes after the computer starts.</p>
+
+<h2>EXAMPLE 17</h2>
+<pre><code>Install-ScheduledTask -Name 'CarbonSample' -TaskToRun 'notepad.exe' -OnLogon -TaskCredential (Get-Credential 'runasuser')</code></pre>
+<p>Demonstrates how to run a task when the user running the task logs on. Usually you want to pass a credential when setting up a logon task, since the built-in users never log in.</p>
+
+<h2>EXAMPLE 18</h2>
+<pre><code>Install-ScheduledTask -Name 'CarbonSample' -TaskToRun 'notepad.exe' -OnLogon -Delay '1:45' -TaskCredential (Get-Credential 'runasuser')</code></pre>
+<p>Demonstrates how to run a task after a certain amount of time passes after a user logs in. In this case, the task will run after 1 hour and 45 minutes after <code>runasuser</code> logs in.</p>
+
+<h2>EXAMPLE 19</h2>
+<pre><code>Install-ScheduledTask -Name 'CarbonSample' -TaskToRun 'notepad.exe' -OnIdle</code></pre>
+<p>Demonstrates how to run a task when the computer is idle.</p>
+
+<h2>EXAMPLE 20</h2>
+<pre><code>Install-ScheduledTask -Name 'CarbonSample' -TaskToRun 'notepad.exe' -OnIdle -Delay '0:05'</code></pre>
+<p>Demonstrates how to run a task when the computer has been idle for a desired amount of time. In this case, the task will run after the computer has been idle for 5 minutes.</p>
+
+<h2>EXAMPLE 21</h2>
+<pre><code>Install-ScheduledTask -Name 'CarbonSample' -TaskToRun 'wevtvwr.msc' -OnEvent -EventChannelName System -EventXPathQuery '*[Sytem/EventID=101]'</code></pre>
+<p>Demonstrates how to run an event when certain events are written to the event log. In this case, wevtvwr.msc will run whenever an event with ID <code>101</code> is published in the System event channel.</p>
+
+<h2>EXAMPLE 22</h2>
+<pre><code>Install-ScheduledTask -Name 'CarbonSample' -TaskToRun 'notepad.exe' -TaskXmlFilePath $taskXmlPath</code></pre>
+<p>Demonstrates how to create a task using the <a href="http://msdn.microsoft.com/en-us/library/windows/desktop/aa383609.aspx">Task Scheduler XML schema</a> for a task that runs as a built-in principal. You can export task XML with the <code>schtasks /query /xml /tn &lt;Name&gt;</code> command.</p>
+
+<h2>EXAMPLE 23</h2>
+<pre><code>Install-ScheduledTask -Name 'CarbonSample' -TaskToRun 'notepad.exe' -TaskXmlFilePath $taskXmlPath -TaskCredential (Get-Credential 'runasuser')</code></pre>
+<p>Demonstrates how to create a task using the <a href="http://msdn.microsoft.com/en-us/library/windows/desktop/aa383609.aspx">Task Scheduler XML schema</a> for a task that will run as a specific user. The username in the XML file should match the username in the credential.</p>
+
+<h2>EXAMPLE 24</h2>
+<pre><code>Install-ScheduledTask -Name 'CarbonSample' -TaskToRun 'notepad.exe' -TaskXml $taskXml</code></pre>
+<p>Demonstrates how to create a task using raw XML that conforms to the <a href="http://msdn.microsoft.com/en-us/library/windows/desktop/aa383609.aspx">Task Scheduler XML schema</a> for a task that will run as a built-in principal. In this case, <code>$taskXml</code> should be an XML document.</p>
+
+<h2>EXAMPLE 25</h2>
+<pre><code>Install-ScheduledTask -Name 'CarbonSample' -TaskToRun 'notepad.exe' -TaskXml $taskXml -TaskCredential (Get-Credential 'runasuser')</code></pre>
+<p>Demonstrates how to create a task using raw XML that conforms to the <a href="http://msdn.microsoft.com/en-us/library/windows/desktop/aa383609.aspx">Task Scheduler XML schema</a> for a task that will run as a specific user. In this case, <code>$taskXml</code> should be an XML document.  The username in the XML document should match the username in the credential.</p>
+
+<h2>EXAMPLE 26</h2>
+<pre><code>Install-ScheduledTask -Name 'CarbonTasks\CarbonSample' -TaskToRun 'notepad.exe' -Monthly</code></pre>
+<p>Demonstrates how to create tasks under a folder/directory: use a path for the <code>Name</code> parameter.</p>
+
+	<div class="Footer">
+		Copyright &copy; 2012 - 2015 <a href="http://pshdo.com">Aaron Jensen</a>.  All rights reserved.
+	</div>
+
+</body>
+</html>

@@ -1,0 +1,161 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <title>PowerShell - Get-DscWinEvent - Carbon</title>
+    <link href="silk.css" type="text/css" rel="stylesheet" />
+	<link href="styles.css" type="text/css" rel="stylesheet" />
+</head>
+<body>
+
+    <ul id="SiteNav">
+		<li><a href="index.html">Get-Carbon</a></li>
+        <li><a href="about_Carbon_Installation.html">-Install</a></li>
+		<li><a href="documentation.html">-Documentation</a></li>
+        <li><a href="about_Carbon_Support.html">-Support</a></li>
+        <li><a href="releasenotes.html">-ReleaseNotes</a></li>
+		<li><a href="http://pshdo.com">-Blog</a></li>
+    </ul>
+
+    <h1>Get-DscWinEvent</h1>
+<div><p>Gets events from the DSC Windows event log.</p></div>
+
+<h2>Syntax</h2>
+<pre class="Syntax"><code>Get-DscWinEvent [-ComputerName &lt;String[]&gt;] [-ID &lt;Int32&gt;] [-Level &lt;Int32&gt;] [-StartTime &lt;DateTime&gt;] [-EndTime &lt;DateTime&gt;] [&lt;CommonParameters&gt;]</code></pre>
+<pre class="Syntax"><code>Get-DscWinEvent [-ComputerName &lt;String[]&gt;] [-ID &lt;Int32&gt;] [-Level &lt;Int32&gt;] [-StartTime &lt;DateTime&gt;] [-EndTime &lt;DateTime&gt;] -Wait [-WaitTimeoutSeconds &lt;UInt32&gt;] [&lt;CommonParameters&gt;]</code></pre>
+    
+<h2>Description</h2>
+<div class="Description">
+<p>Thie <code>Get-DscWinEvent</code> function gets log entries from the <code>Microsoft-Windows-DSC/Operational</code> event log, where the Local Configuration Manager writes events. By default, entries on the local computer are returned. You can return entries from another computer via the <code>ComputerName</code> parameter.</p>
+
+<p>You can filter the results further with the <code>ID</code>, <code>Level</code>, <code>StartTime</code> and <code>EndTime</code> parameters. <code>ID</code> will get events with the specific ID. <code>Level</code> will get events at the specified level. <code>StartTime</code> will return entries after the given time. <code>EndTime</code> will return entries before the given time.</p>
+
+<p>If no items are found, nothing is returned.</p>
+
+<p>It can take several seconds for event log entries to get written to the log, so you might not get results back. If you want to wait for entries to come back, use the <code>-Wait</code> switch. You can control how long to wait (in seconds) via the <code>WaitTimeoutSeconds</code> parameter. The default is 10 seconds.</p>
+
+<p>When getting errors on a remote computer, that computer must have Remote Event Log Management firewall rules enabled. To enable them, run</p>
+
+<pre><code>Get-FirewallRule -Name '*Remove Event Log Management*' |
+    ForEach-Object { netsh advfirewall firewall set rule name= $_.Name new enable=yes }
+</code></pre>
+
+<p><code>Get-DscWinEvent</code> is new in Carbon 2.0.</p>
+</div>
+    
+<h2>Related Commands</h2>
+
+<ul>
+<li><a href="Write-DscError.html">Write-DscError</a></li>
+<li><a href="Get-DscWinEvent.html">Get-DscWinEvent</a></li>
+</ul>
+
+<h2> Parameters </h2>
+<table id="Parameters">
+<tr>
+	<th>Name</th>
+    <th>Type</th>
+	<th>Description</th>
+	<th>Required?</th>
+	<th>Pipeline Input</th>
+	<th>Default Value</th>
+</tr>
+<tr valign='top'>
+	<td>ComputerName</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String[]</a></td>
+	<td class="ParamDescription"><p>The computer whose DSC errors to return.</p></td>
+	<td>false</td>
+	<td>false</td>
+    <td></td>
+</tr>
+<tr valign='top'>
+	<td>ID</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.int32.aspx">Int32</a></td>
+	<td class="ParamDescription"><p>The event ID. Only events with this ID will be returned.</p></td>
+	<td>false</td>
+	<td>false</td>
+    <td>0</td>
+</tr>
+<tr valign='top'>
+	<td>Level</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.int32.aspx">Int32</a></td>
+	<td class="ParamDescription"><p>The level. Only events at this level will be returned.</p></td>
+	<td>false</td>
+	<td>false</td>
+    <td>0</td>
+</tr>
+<tr valign='top'>
+	<td>StartTime</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.datetime.aspx">DateTime</a></td>
+	<td class="ParamDescription"><p>Get errors that occurred after this date/time.</p></td>
+	<td>false</td>
+	<td>false</td>
+    <td></td>
+</tr>
+<tr valign='top'>
+	<td>EndTime</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.datetime.aspx">DateTime</a></td>
+	<td class="ParamDescription"><p>Get errors that occurred before this date/time.</p></td>
+	<td>false</td>
+	<td>false</td>
+    <td></td>
+</tr>
+<tr valign='top'>
+	<td>Wait</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+	<td class="ParamDescription"><p>Wait for entries to appear, as it can sometimes take several seconds for entries to get written to the event log.</p></td>
+	<td>true</td>
+	<td>false</td>
+    <td>False</td>
+</tr>
+<tr valign='top'>
+	<td>WaitTimeoutSeconds</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.uint32.aspx">UInt32</a></td>
+	<td class="ParamDescription"><p>The time to wait for entries to appear before giving up. Default is 10 seconds. There is no way to wait an infinite amount of time.</p></td>
+	<td>false</td>
+	<td>false</td>
+    <td>10</td>
+</tr>
+
+</table>
+        
+
+        
+<h2>Return Values</h2>
+<p><a href="http://msdn.microsoft.com/en-us/library/system.diagnostics.eventing.reader.eventlogrecord.aspx">System.Diagnostics.Eventing.Reader.EventLogRecord</a>. </p>
+        
+
+        
+<h2>EXAMPLE 1</h2>
+<pre><code>Get-DscWinEvent</code></pre>
+<p>Demonstrates how to get all the DSC errors from the local computer.</p>
+
+<h2>EXAMPLE 2</h2>
+<pre><code>Get-DscWinEvent -ComputerName 10.1.2.3</code></pre>
+<p>Demonstrates how to get all the DSC errors from a specific computer.</p>
+
+<h2>EXAMPLE 3</h2>
+<pre><code>Get-DscWinEvent -StartTime '8/1/2014 0:00'</code></pre>
+<p>Demonstrates how to get errors that occurred <em>after</em> a given time.</p>
+
+<h2>EXAMPLE 4</h2>
+<pre><code>Get-DscWinEvent -EndTime '8/30/2014 11:59:59'</code></pre>
+<p>Demonstrates how to get errors that occurred <em>before</em> a given time.</p>
+
+<h2>EXAMPLE 5</h2>
+<pre><code>Get-DscWinEvent -StartTime '8/1/2014 2:58 PM' -Wait -WaitTimeoutSeconds 5</code></pre>
+<p>Demonstrates how to wait for entries that match the specified criteria to appear in the event log. It can take several seconds between the time a log entry is written to when you can read it.</p>
+
+<h2>EXAMPLE 6</h2>
+<pre><code>Get-DscWinEvent -Level ([Diagnostics.Eventing.Reader.StandardEventLevel]::Error)</code></pre>
+<p>Demonstrates how to get events at a specific level, in this case, only error level entries will be returned.</p>
+
+<h2>EXAMPLE 7</h2>
+<pre><code>Get-DscWinEvent -ID 4103</code></pre>
+<p>Demonstrates how to get events with a specific ID, in this case <code>4103</code>.</p>
+
+	<div class="Footer">
+		Copyright &copy; 2012 - 2015 <a href="http://pshdo.com">Aaron Jensen</a>.  All rights reserved.
+	</div>
+
+</body>
+</html>
