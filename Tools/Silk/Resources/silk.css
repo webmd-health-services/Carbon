@@ -1,0 +1,169 @@
+* 
+{
+	font-family: Calibri, Helvetica, sans-serif;
+}
+
+body
+{
+	width: 800px;
+	margin-left:auto;
+	margin-right:auto;
+}
+
+h1, h2, h3, h4, h5, h6
+{
+	font-family: Cambria, Georgia, serif;
+	clear:both;
+}
+	
+kbd
+{
+	font-family: Consolas, Monaco, monospace;
+	font-size: 11pt;
+}
+
+code
+{
+	font-family: Consolas, Monaco, monospace;
+	font-size: 11pt;
+}
+
+pre
+{
+	background-color: navy;
+	color: white;
+	border: 1px solid black;
+	margin:0;
+	padding: 1em;
+	white-space: pre-line;
+}
+
+p, td, div
+{
+	font-size: 12pt;
+}
+
+div.Footer
+{
+	font-size: 10pt;
+	margin-top:3em;
+	border-top: 1px solid black;
+	padding-top: 1em;
+	padding-bottom: 3em;
+}
+
+ul#SiteNav
+{
+	font-size: 10pt;
+	margin:0;
+	margin-bottom: 0pt;
+	padding:0;
+	height: 14pt;
+}
+
+ul#SiteNav li
+{
+	list-style-type: none;
+	float:left;
+	display:block;
+	margin:0;
+	margin-right: .5em;
+	padding:0;
+}
+
+pre code 
+{
+	white-space: pre-wrap;
+}
+
+pre.Syntax
+{
+	margin-bottom: 1em;
+}
+
+#CommandsMenu
+{
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+#CommandsMenu li 
+{
+    border: 1px solid #9DAEC4;
+    float: left;
+    border-bottom-width: 0;
+    margin: 0em 0.5em 0em 0.5em;
+}
+
+#CommandsMenu a 
+{
+    text-decoration: none;
+    display: block;
+    padding: 0.24em 1em;
+    text-align: center;
+    border-bottom: none;
+}
+
+#CommandsMenu .selected 
+{
+    font-weight: bold;
+    position: relative;
+    top: 1px;
+}
+
+#CommandsMenu .selected a
+{
+        position:relative;
+        top: -1px;
+}
+
+#CommandsContent 
+{
+    border: 1px solid #9DAEC4;
+    clear: both;
+    padding: 0 1em;
+}
+
+#ByNameContent
+{
+    margin-top: 0em;
+}
+
+#ByNameContent ul
+{
+    list-style-type: none;
+    padding-left: 0;
+    margin-top: .5em
+}
+
+#ByNameContent ul li
+{
+    padding: .25em 0 .25em 0;
+}
+
+
+table#Parameters
+{
+    border-collapse: collapse;
+}
+
+table#Parameters td
+{
+    border-width: 1px solid black;
+}
+
+table#Parameters td, table#Parameters th
+{
+    padding: 0.4em 0.4em;
+}
+
+table#Parameters td.ParamDescription p:first-child
+{
+   margin-top: 0;
+}
+
+table#Parameters td.ParamDescription p:last-child
+{
+   margin-bottom: 0;
+}

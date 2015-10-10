@@ -15,13 +15,17 @@ filter Convert-HelpToHtml
         # The display name. Useful if the command name being documented is different than its public name, e.g. DSC resources.
         $DisplayName,
 
-        [string]
+        [string[]]
         # The syntax of the command. Useful when showing syntax for DSC resources.
         $Syntax,
 
         [string]
         # The name of the module whose help is getting converted.
-        $ModuleName
+        $ModuleName,
+
+        [string[]]
+        # The names of any scripts in the module.
+        $Script
     )
 
     Set-StrictMode -Version 'Latest'
@@ -33,6 +37,10 @@ filter Convert-HelpToHtml
         $synopsis = $help.Synopsis | Convert-MarkdownToHtml
         if( -not $Syntax )
         {
+            $help.Syntax |
+                Where-Object { [IO.Path]::IsPathRooted($_.syntaxItem.name) } |
+                ForEach-Object { $_.syntaxItem.Name = Split-Path -Leaf -Path $_.syntaxItem.name }
+
             $Syntax = $help.Syntax | Out-HtmlString | Format-ForHtml | ForEach-Object { $_ -split "`n" }
         }
         if( $Syntax )
@@ -42,8 +50,12 @@ filter Convert-HelpToHtml
 <pre class="Syntax"><code>{0}</code></pre>
 "@ -f ($Syntax -join "</code></pre>`n<pre class=""Syntax""><code>")
         }
-    
-        $description = $help.Description | Out-HtmlString | Convert-MarkdownToHtml
+
+        $description = $null
+        if( $help | Get-Member -Name 'Description' )
+        {    
+            $description = $help.Description | Out-HtmlString | Convert-MarkdownToHtml
+        }
         if( $description )
         {
             $description = @"
@@ -54,7 +66,7 @@ $description
 "@
         }
     
-        [string[]]$relatedCommands = $help | Convert-RelatedLinkToHtml -ModuleName $ModuleName
+        [string[]]$relatedCommands = $help | Convert-RelatedLinkToHtml -ModuleName $ModuleName -Script $Script
     
         if( $relatedCommands )
         {
@@ -92,23 +104,27 @@ $description
                                 $hasCommonParameters = $true
                             }
             
+                            $defaultValue = '&nbsp;'
+                            if( $_ | Get-Member -Name 'DefaultValue' )
+                            {
+                                $defaultValue = $_.DefaultValue
+                            }
                             $typeLink = Get-TypeDocumentationLink -CommandName $commandName -TypeName $_.type.name
                             $paramDescription = $_ | 
                                                     Where-Object { $_ | Get-Member -name 'Description' } |
                                                     Select-Object -ExpandProperty 'Description' |
                                                     Out-HtmlString | 
-                                                    Convert-MarkdownToHtml | 
-                                                    ForEach-Object { $_.Replace('<p>','').Replace('</p>','') }
+                                                    Convert-MarkdownToHtml
                             @"
 <tr valign='top'>
 	<td>{0}</td>
 	<td>{1}</td>
-	<td>{2}</td>
+	<td class="ParamDescription">{2}</td>
 	<td>{3}</td>
 	<td>{4}</td>
     <td>{5}</td>
 </tr>
-"@ -f $_.Name,$typeLink,$paramDescription,$_.Required,$_.PipelineInput,$_.DefaultValue
+"@ -f $_.Name,$typeLink,$paramDescription,$_.Required,$_.PipelineInput,$defaultValue
                     }
         
         if( $parameters )
@@ -129,7 +145,7 @@ $description
             }
             $parameters = @"
 <h2> Parameters </h2>
-<table border='1'>
+<table id="Parameters">
 <tr>
 	<th>Name</th>
     <th>Type</th>
@@ -155,27 +171,23 @@ $description
             $inputTypes = @"
 <h2>Input Type</h2>
 <div>{0}</div>
-"@ -f $inputTuypes
+"@ -f $inputTypes
         }
     
         $returnValues =@()
-        if( $help | Get-Member -Name 'returnValues' )
+        if( ($help | Get-Member -Name 'returnValues') -and ($help.returnValues | Get-Member -Name 'returnValue') -and ($help.returnValues.returnValue | Get-Member -Name 'type') -and $help.returnValues.returnValue.type )
         {
-            $returnValues = ($help.returnValues | Out-HtmlString) -replace "`n",' '
+            if( $help.returnValues.returnValue.type.name -match '^([^\s]+)\s*(.*)?$' )
+            {
+                $typeLink = Get-TypeDocumentationLink -CommandName $commandName -TypeName $matches[1].Trim('.')
+                $returnValues = '{0}. {1}' -f $typeLink,$matches[2]
+                Write-Verbose $returnValues
+            }
+            $returnValues = $returnValues | Convert-MarkdownToHtml
         }
 
         if( $returnValues )
         {
-            if( $returnValues -match '^(.*?)\.?(\s+(.*))?$' )
-            {
-                $typeLink = Get-TypeDocumentationLink -CommandName $commandName -TypeName $matches[1]
-                $returnValues = '{0}. {1}' -f $typeLink,$matches[2]
-            }
-            else
-            {
-                Write-Warning ("Command {0}: Unable to find type name in `{1}`.  Return value full type name should end with a period." -f $_.Name,$returnValues)
-            }
-            $returnValues = $returnValues | Convert-MarkdownToHtml
             $returnValues = @"
 <h2>Return Values</h2>
 {0}
@@ -199,8 +211,10 @@ $description
         $examples = @()
         if( $help | Get-Member -Name 'Examples' )
         {
-            $examples = $help.Examples.example |
+            $examples = $help.Examples |
                 Where-Object { $_ } |
+                Where-Object { $_ | Get-Member -Name 'example' } |
+                Select-Object -ExpandProperty 'example' |
                 ForEach-Object {
                     $title = $_.title.Trim(('-',' '))
                     $code = ''
@@ -229,6 +243,10 @@ $description
     if( -not $DisplayName )
     {
         $DisplayName = $commandName
+        if( [IO.Path]::IsPathRooted($DisplayName) )
+        {
+            $DisplayName = Split-Path -Leaf -Path $DisplayName
+        }
     }
 
     @"

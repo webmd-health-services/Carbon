@@ -80,7 +80,11 @@ function Convert-AboutTopicToHtml
 
         [hashtable]
         # A hashtable of headings to use. They key should be the section name. The value should be the heading name.
-        $HeadingMap = @{}
+        $HeadingMap = @{},
+
+        [string[]]
+        # The names of any scripts in the module.
+        $Script
     )
 
     begin
@@ -114,7 +118,7 @@ function Convert-AboutTopicToHtml
                 $SeeAlsoHeading
                 {
                     $lines = $Body -split ([Environment]::NewLine) | 
-                                Convert-RelatedLinkToHtml -ModuleName $ModuleName | 
+                                Convert-RelatedLinkToHtml -ModuleName $ModuleName -Script $Script | 
                                 ForEach-Object { '<li>{0}</li>' -f $_ }
                     $Body = @'
     <ul>

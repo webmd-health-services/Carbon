@@ -18,7 +18,11 @@ function Convert-RelatedLinkToHtml
 
         [string]
         # The name of the module the command is in.
-        $ModuleName
+        $ModuleName,
+
+        [string[]]
+        # The names of any scripts in the module.
+        $Script
     )
 
     begin
@@ -39,7 +43,7 @@ function Convert-RelatedLinkToHtml
         {
             $aboutTopics = Get-Module -Name $ModuleName | 
                                 Select-Object -ExpandProperty 'ModuleBase' | 
-                                Get-ChildItem -Filter 'about_*' | 
+                                Get-ChildItem -Filter 'en-US\about_*' | 
                                 Select-Object -ExpandProperty 'BaseName' | 
                                 ForEach-Object { $_ -replace '\.help$','' }
         }
@@ -67,7 +71,13 @@ function Convert-RelatedLinkToHtml
 
                 if( $ModuleName -and (Get-Command -Name $_ -Module $ModuleName -ErrorAction Ignore) )
                 {
-                    return '<a href="{0}.html">{0}</a>' -f $_
+                    $cmdName = $_
+                    $alias = Get-Alias -Name $_ -ErrorAction Ignore | Where-Object { $_.ModuleName -eq $ModuleName }
+                    if( $alias )
+                    {
+                        $cmdName = $alias.ReferencedCommand
+                    }
+                    return '<a href="{0}.html">{1}</a>' -f $cmdName,$_
                 }
 
                 $cmd = Get-Command -Name $_ -ErrorAction Ignore
@@ -76,11 +86,11 @@ function Convert-RelatedLinkToHtml
                     return '<a href="{0}.html">{1}</a>' -f $cmd.HelpUri,$_
                 }
 
-                if( $aboutTopics -contains $_ )
+                if( $aboutTopics -contains $_ -or $Script -contains $_ )
                 {
                     return '<a href="{0}.html">{0}</a>' -f $_
                 }
-                
+
                 return $_
             }
     }

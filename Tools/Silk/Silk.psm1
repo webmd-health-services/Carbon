@@ -19,10 +19,12 @@ $markdown.AutoHyperlink = $true
 $loadedTypes = @{ }
 [AppDomain]::CurrentDomain.GetAssemblies() | 
     ForEach-Object { $_.GetTypes() } | 
+    Where-Object { $_.IsPublic } |
+    Sort-Object -Property 'Name' |
     ForEach-Object { 
         if( $loadedTypes.ContainsKey( $_.Name ) )
         {
-            Write-Verbose ("Found multiple <{0}> types." -f $_.Name)
+            Write-Verbose ("Found multiple <{0}> types <{1}> <{2}>." -f $_.Name,$_.FullName,$loadedTypes[$_.Name])
         }
         else
         {
