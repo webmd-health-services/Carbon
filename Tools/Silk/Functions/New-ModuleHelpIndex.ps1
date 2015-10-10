@@ -63,7 +63,7 @@ function New-ModuleHelpIndex
 
     $verbs = @{ }
 
-    $commands = Get-Command -Module $ModuleName -CommandType Cmdlet,Function,Filter | Sort-Object -Property 'Name'
+    $commands = Get-Command -Module $ModuleName -CommandType Cmdlet,Function,Filter 
     foreach( $command in $commands )
     {
         if( -not $verbs.ContainsKey( $command.Verb ) )
@@ -73,7 +73,17 @@ function New-ModuleHelpIndex
         $verbs[$command.Verb].Add( $command.Name )
     }
 
-    $commandList = $commands | Select-Object -ExpandProperty 'Name' | Sort-Object | ForEach-Object { '<li><a href="{0}.html">{0}</a></li>' -f $_ }
+    $commandList = Invoke-Command {
+                                        $commands |  Select-Object -ExpandProperty 'Name'
+                                        $moduleBase = Get-Module -Name $ModuleName | Select-Object -ExpandProperty 'ModuleBase'
+                                        $dscResourceBase = Join-Path -Path $moduleBase -ChildPath 'DscResources'
+                                        if( (Test-Path -Path $dscResourceBase -PathType Container) )
+                                        {
+                                            Get-ChildItem -Directory -Path $dscResourceBase
+                                        }
+                                    } |
+                        Sort-Object | 
+                        ForEach-Object { '<li><a href="{0}.html">{0}</a></li>' -f $_ }
     $commandList = @'
 <ul>
     {0}
