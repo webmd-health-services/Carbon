@@ -67,6 +67,7 @@ function Out-HtmlPage
 <html>
 <head>
     <title>{0}</title>
+    <link href="/silk.css" type="text/css" rel="stylesheet" />
 	<link href="/styles.css" type="text/css" rel="stylesheet" />
 </head>
 <body>
@@ -121,7 +122,7 @@ Install-Junction -Link $linkPath -Target (Join-Path -Path $PSScriptRoot -ChildPa
 
 try
 {
-    Convert-ModuleHelpToHtml -ModuleName 'Carbon' -HeadingMap $headingMap -SkipCommandHelp:$SkipCommandHelp |
+    Convert-ModuleHelpToHtml -ModuleName 'Carbon' -HeadingMap $headingMap -SkipCommandHelp:$SkipCommandHelp -Script 'Import-Carbon.ps1' |
         ForEach-Object { Out-HtmlPage -Title ('PowerShell - {0} - Carbon' -f $_.Name) -VirtualPath ('/help/{0}.html' -f $_.Name) -Content $_.Html }
 }
 finally
@@ -129,12 +130,12 @@ finally
     Uninstall-Junction -Path $linkPath
 }
 
-New-ModuleHelpIndex -TagsJsonPath (Join-Path -Path $PSScriptRoot -ChildPath 'tags.json') -ModuleName 'Carbon' |
+New-ModuleHelpIndex -TagsJsonPath (Join-Path -Path $PSScriptRoot -ChildPath 'tags.json') -ModuleName 'Carbon' -Script 'Import-Carbon.ps1' |
      Out-HtmlPage -Title 'PowerShell - Carbon Module Documentation' -VirtualPath '/help/index.html'
 
 $carbonTitle = 'Carbon: PowerShell DevOps module for configuring and setting up Windows computers, applications, and websites'
 Get-Item -Path (Join-Path -Path $PSScriptRoot -ChildPath 'Carbon\about_Carbon.help.txt') |
-    Convert-AboutTopicToHtml -ModuleName 'Carbon' |
+    Convert-AboutTopicToHtml -ModuleName 'Carbon' -Script 'Import-Carbon.ps1' |
     ForEach-Object {
         $text = $_ -replace '<a href="([^/]+)\.html">([^<]+)</a>','<a href="/help/$1.html">$2</a>'
         $text -replace '<h1>about_Carbon</h1>','<h1>Carbon</h1>'
