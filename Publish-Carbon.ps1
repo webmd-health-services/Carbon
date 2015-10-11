@@ -143,34 +143,34 @@ if( -not $carbonNuspecPath )
     return
 }
 
+$foundVersion = $false
+$versionReleaseNotes = Get-Content -Path $releaseNotesPath |
+                        Where-Object {
+                            $line = $_
+                            if( -not $foundVersion )
+                            {
+                                if( $line -match ('^# {0}' -f [regex]::Escape($version)) )
+                                {
+                                    $foundVersion = $true
+                                    return
+                                }
+                            }
+                            else
+                            {
+                                if( $line -match ('^# (?!{0})' -f [regex]::Escape($version)) )
+                                {
+                                    $foundVersion = $false
+                                }
+                            }
+                            return( $foundVersion )
+                        }
+
 $carbonNuspec = [xml](Get-Content -Raw -Path $carbonNuspecPath)
 if( $carbonNuspec.package.metadata.version -ne $version.ToString() )
 {
-    $foundVersion = $false
-    $nugetReleaseNotes = Get-Content -Path $releaseNotesPath |
-                            Where-Object {
-                                $line = $_
-                                if( -not $foundVersion )
-                                {
-                                    if( $line -match ('^# {0}' -f [regex]::Escape($version)) )
-                                    {
-                                        $foundVersion = $true
-                                        return
-                                    }
-                                }
-                                else
-                                {
-                                    if( $line -match ('^# (?!{0})' -f [regex]::Escape($version)) )
-                                    {
-                                        $foundVersion = $false
-                                    }
-                                }
-                                return( $foundVersion )
-                            }
-
     $nuGetVersion = $version -replace '-([A-Z0-9]+)[^A-Z0-9]*(\d+)$','-$1$2'
     $carbonNuspec.package.metadata.version = $nugetVersion
-    $carbonNuspec.package.metadata.releaseNotes = $nugetReleaseNotes -join ([Environment]::NewLine)
+    $carbonNuspec.package.metadata.releaseNotes = $versionReleaseNotes -join ([Environment]::NewLine)
     $carbonNuspec.Save( $carbonNuspecPath )
 }
 
@@ -311,3 +311,88 @@ Publish-PowerShellGalleryModule -Name 'Carbon' `
                                 -Path (Join-Path -Path $cloneDir -ChildPath 'Carbon') `
                                 -Version $version `
                                 -LicenseUri 'http://www.apache.org/licenses/LICENSE-2.0'
+
+$pshdoRoot = Join-Path -Path $PSScriptRoot -ChildPath 'pshdo.com'
+if( -not (Test-Path -Path $pshdoRoot -PathType Container) )
+{
+    hg clone https://bitbucket.org/splatteredbits/pshdo.com $pshdoRoot
+}
+
+Push-Location $pshdoRoot
+try
+{
+    hg pull
+    hg update -C
+
+    $postsRoot = Join-Path -Path $pshdoRoot -ChildPath 'source/_posts'
+    $postName = '{0:yyyy\-MM\-dd}-carbon-{1}-released.markdown' -f (Get-Date),$version
+    $postPath = Join-Path -Path $postsRoot -ChildPath $postName
+
+    if( -not (Test-Path -Path $postPath -PathType Leaf) )
+    {
+        if( -not (Test-Path -Path (Join-Path -Path $postsRoot -ChildPath '*carbon-2.0.0-released.markdown')) )
+        {
+            bundle exec rake ("new_post[Carbon {0} Released]" -f $version)
+        }
+
+        $crappyName = '*carbon-{0}-dot-{1}-{2}-released.markdown' -f $version.Major,$version.Minor,$version.Build
+        $crappyName = Join-Path -Path $postsRoot -ChildPath $crappyName
+        if( (Test-Path -Path $crappyName -PathType Leaf) )
+        {
+            Get-Item -Path $crappyName | Rename-Item -NewName $postName
+        }
+
+        if( -not (Test-Path -Path $postPath -PathType Leaf) )
+        {
+            Write-Error ('Post {0} not found.' -f $postName)
+            return
+        }
+    }
+
+    $inHeader = $false
+    $pastHeader = $false
+    $header = Get-Content -Path $postPath |
+                    ForEach-Object {
+                        if( $pastHeader )
+                        {
+                            return
+                        }
+
+                        $_
+
+                        if( -not $inHeader -and $_ -eq '---' )
+                        {
+                            $inHeader = $true
+                        }
+                        elseif( $inHeader -and $_ -eq '---' )
+                        {
+                            $pastHeader = $true
+                        }
+
+                    }
+    (@'
+{0}
+Carbon {1} is out. You can [download Carbon as a .ZIP archive, NuGet package, Chocolatey package, or from the PowerShell Gallery](http://get-carbon.org/about_Carbon_Installation.html). It may take a week or two for the package to show up at chocolatey.org.
+
+{2}
+'@ -f ($header -join ([Environment]::NewLine)),$version,($versionReleaseNotes -join ([Environment]::NewLine))) | Set-Content -Path $postPath
+    
+    bundle exec rake generate
+
+    hg addremove
+
+    if( hg status )
+    {
+        hg commit -m ('Carbon {0} Released' -f $version)
+        hg log -rtip
+    }
+
+    if( hg out )
+    {
+        hg push
+    }
+}
+finally
+{
+    Pop-Location
+}
