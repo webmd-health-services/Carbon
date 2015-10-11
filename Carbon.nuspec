@@ -17,7 +17,7 @@
 <package>
   <metadata>
     <id>Carbon</id>
-    <version>2.0.0.0</version>
+    <version>2.0.0</version>
     <authors>Aaron Jensen</authors>
     <owners>Aaron Jensen</owners>
     <licenseUrl>http://www.apache.org/licenses/LICENSE-2.0</licenseUrl>
@@ -45,39 +45,241 @@ Carbon is a DevOps PowerShell module for automating the configuration of Windows
     <releaseNotes>
 ## Overview
 
-Version 2.0 is currently ***in alpha*** and is subject to change at anytime. [We still have some backwards-incompatible changes to make.](https://bitbucket.org/splatteredbits/carbon/issues?status=new&amp;status=open&amp;q=2.0).
+Carbon version 2.0 is a *huge* release, with lots of new enhancements and bug fixes. We hope you like them. Carbon 2.0 now requires PowerShell 4, so it is not backwards-compatabile with Carbon 1.x. Because of this, we made some additional backwards-incompatible changes. See the `Upgrade Instructions` section for things to look out for.
 
-The focus of version 2.0 is on making necessary, backwards-incompatible changes and adding DSC resources.
+If you're upgrading from a previous 2.0 alpha release, you'll want to review the changes since your alpha version (found after the *Upgrade Instructions* section). We improved backwards-compatability with Carbon 1.x since the last alpha release, but that broke compatability with the alphas. 
 
 ## Upgrade Instructions
 
-This is a ***backwards-incompatible*** release. 
+Make sure you're running PowerShell 4. 
 
- * Upgrade to PowerShell 4.
- * Remove usages of `Complete-Job`.  We removed it because it was total crap.  Use PowerShell's `Wait-Job` cmdlet instead.
- * [Grant-Permission](http://get-carbon.org/help/Grant-Permission.html) now only grants permissions on an object if those permissions aren't present.  To preserve previous behaviour, add the `-Force` switch to all `Grant-Permission` usages.
- * [Install-Msi](http://get-carbon.org/help/Install-Msi.html) (fka `Invoke-WindowsInstaller`) now only installs the MSI if it isn't already installed. To preserve the previous behavior and always install, add the `-Force` switch to all `Invoke-WindowsInstaller`\`Install-Msi` usages.
- * The following commands no longer return the stdout output from the console applications each one calls. To see that output, use the `-Verbose` switch. Remove any usage of the output you were processing.
-     * [Disable-FirewallStatefulFtp](http://get-carbon.org/help/Disable-FirewallStatefulFtp.html)
-     * [Enable-FirewallStatefulFtp](http://get-carbon.org/help/Enable-FirewallStatefulFtp.html)
-     * [Remove-SslCertificateBinding](http://get-carbon.org/help/Remove-SslCertificateBinding.html)
-     * [Install-IisAppPool](http://get-carbon.org/help/Install-IisAppPool.html)
-     * [Install-SmbShare[(http://get-carbon.org/help/Install-SmbShare.html)
-     * [Install-Service](http://get-carbon.org/help/Install-Service.html)
-     * [Set-SslCertificateBinding](http://get-carbon.org/help/Set-SslCertificateBinding.html)
- * Ensure that all thumbprints passed to [Set-SslCertificateBinding](http://get-carbon.org/help/Set-SslCertificateBinding.html) are valid (40 character hex strings).
- * Use the `Sid` property on objects returned by [Test-Identity](http://get-carbon.org/help/Test-Identity.html) when using the `PassThru` switch: it now returns a `Carbon.Identity` object if the identity exists *and* you use the `-PassThru` switch, e.g. `Test-Identity -Name $userName -PassThru | Select-Object -Expand 'Sid'`.
- * Check that all IP addresses passed to [Set-HostsEntry](http://get-carbon.org/help/Set-HostsEntry.html) are valid IP v4 or v6 addresses.  [Set-HostsEntry](http://get-carbon.org/help/Set-HostsEntry.html)'s IPAddress parameter is now a `System.Net.IPAddress` object.  Previously it was a string validated with a regular expression, so you *should* be OK.
- * Remove the `Exportable` switch from any usages of [Install-Certificate](http://get-carbon.org/help/Install-Certificate.html) when installing from an `X509Certificate2` object, since that switch only gets used when installing a certificate from a file.
+`Install-Certificate`'s parameters have changed:
+
+ * Remove the `Exportable` switch from any usages of `Install-Certificate` when installing from an `X509Certificate2` *object*, since that switch only gets used when installing a certificate from a file.
+
+Some functions now return different objects and/or the objects returned have changed:
+
+* Use the `Sid` property on objects returned by `Test-Identity` when using the `PassThru` switch: it now returns a `Carbon.Identity` object if the identity exists *and* you use the `-PassThru` switch, e.g. `Test-Identity -Name $userName -PassThru | Select-Object -Expand 'Sid'`.
+ * Update usages of `Carbon.Computer.ProgramInstallInfo`'s `Version` property (returned by `Get-ProgramInstallInfo`). It was an `int` and is now a [Version](http://msdn.microsoft.com/en-us/library/y0hf9t2e.aspx) object.
+
+The Carbon assembly was re-organized. If you were reaching into `Carbon.dll` (***NOT RECOMMENDED***), you'll want to:
+
  * Rename usages of `[Carbon.AdvApi32]` class to `[Carbon.Service.ServiceSecurity]`.
  * Rename usages of `[Carbon.Lsa]` class to `[Carbon.Security.Privilege]`.
  * Rename usages of `[Carbon.Win32]` class to `[Carbon.FileSystem.Path]`.
  * Rename usages of `[Carbon.HandleInfo]` class to `[Carbon.Win32.HandleInfo]`.
  * Remove usages of `[Carbon.Lsa]::LookupPrivilegeValue` class method. It was incorrectly exposed as a public method.
  * Remove usages of `[Carbon.Kernel32]::LocalFree` class method. It was incorrectly exposed as a public method.
- * Update usages of `Carbon.Computer.ProgramInstallInfo`'s `Version` property (returned by [Get-ProgramInstallInfo](http://get-carbon.org/help/Get-ProgramInstallInfo.html)). It was an `int` and is now a [Version](http://msdn.microsoft.com/en-us/library/y0hf9t2e.aspx) object.
- * [Install-IisWebsite](https://get-carbon.org/help/Install-IisWebsite.ps1) no longer deletes and re-creates websites. If a website exists, it updates its configuration to match parameters passed in. This may or may not be a breaking change in your environment.
 
+The following commands no longer return the stdout output from the console applications each one calls. To see the old output, use the `-Verbose` switch. Remove any usage of the output you were processing.
+
+ * All IIS functions.
+ * `Disable-FirewallStatefulFtp`
+ * `Enable-FirewallStatefulFtp`
+ * `Install-Service`
+ * `Install-SmbShare`
+ * `Remove-SslCertificateBinding`
+ * `Set-SslCertificateBinding`
+ * `Uninstall-Service`
+
+The following functions' internal behavior has changed. This may or may not impact you.
+
+ * `Grant-Permission` now only grants permissions on an object if those permissions aren't present.  To preserve previous behavior, add the `-Force` switch to all `Grant-Permission` usages.
+ * `Grant-Permission` now writes an error if you don't have access to a private key. Previously, it would skip the key without any messages.
+ * `Install-Msi` (fka `Invoke-WindowsInstaller`) now only installs the MSI if it isn't already installed. To preserve the previous behavior and always install, add the `-Force` switch to all `Invoke-WindowsInstaller`\`Install-Msi` usages.
+ * All IIS functions were re-written to use the `Microsoft.Web.Administration` API instead of `appcmd.exe`.
+ * `Install-IisWebsite` no longer deletes and re-creates websites. If a website exists, it updates its configuration to match parameters passed in. To preserve previous behavior and delete the website before installing, use the `-Force` switch.
+ * `Install-IisVirtualDirectory` no longer deletes and re-creates virtual directories. If a virtual directory exists, its configuration is updated in place. To preserve previous behavior and delete the virtual directory before installing, use the `Force` switch.
+ * `Install-FileShare` (fka `Install-SmbShare`) no longer deletes and re-creates the share, instead it modifies existing shares in place. To preserve previous behavior and delete existing shares before re-creating, use the `Force` switch.
+ * `Set-RegistryKeyValue` only sets the value if the value doesn't exist or the current value is different than the desired value.
+
+We've added parameter validation to some functions. This shouldn't impact anybody, since if you were passing data that breaks this new validation, the function wouldn't have worked even in previous versions of Carbon.
+
+ * Ensure that all thumbprints passed to `Set-SslCertificateBinding` are valid (40 character hex strings), since it now validates thumbprints.
+ * Check that all IP addresses passed to `Set-HostsEntry` are valid IP v4 or v6 addresses.  `Set-HostsEntry`'s IPAddress parameter is now a `System.Net.IPAddress` object.  Previously it was a string validated with a regular expression, so you *should* be OK.
+
+All Carbon functions now respect each caller's common parameters (e.g. `-Verbose`, `-ErrorAction`, etc.). This means if you pass a common parameter to a script that calls a Carbon function, that Carbon function will use that common parameter. This may or may not impact you.
+
+## Bug Fixes
+
+ * Carbon's `System.ServiceProcess.ServiceController` extended type data causes errors when PowerShell formats `System.ServiceProcess.ServiceController` objects that represent services on remote computers.
+ * `Compress-Item` doesn't remove handled errors from global error array.
+ * `Grant-Permission` fails with an unhelpful error message if it is unable to get the ACL on a private key.
+ * `Install-Msi` didn't properly detect when installation failed.
+ * `Install-ScheduledTask` fails under PowerShell 5 to create a scheduled task to run on Sunday.
+ * `Install-Service`:
+   * No longer writes a warning about being unable to stop an already stopped service (fixes [issue #158](https://bitbucket.org/splatteredbits/carbon/issues/158/install-service-extraneous-warning-about)).
+   * Starting the service now respects caller's error action preference. Before, `Start-Service` would write an error even if somone called `Install-Service` with an `Ignore` or `SilentlyContinue` error action preference.
+   * Service arguments that are quoted still get quoted. Now, quotes are trimmed before arguments are quoted.
+ * `Set-EnvironmentVariable` fails to set process-level environment variable. 
+ * `Set-HostsEntry` fails to preserve whitespace if existing lines end with a comment/description. Thanks to [Konstantin Ushenin](https://vk.com/kostanew) for the fix.
+
+
+## Enhancements
+
+### General
+
+ * Carbon now requires PowerShell 4.
+ * `Import-Carbon.ps1` is more intelligent about when it tries to re-load Carbon. It will force a re-import of Carbon if any of Carbon's files have changed or the version has changed.
+ * Added new `FileIndex`, `LinkCount`, and `VolumeSerialNumber` extended type data on `System.IO.FileInfo` objects for getting a file's index, its hard link count, and volume serial number, respectively.
+ * The product version of the Carbon assembly now includes pre-release version information, as defined by the [Semantic Versioning specification](http://semver.org). To get this version, run `Get-Item Carbon.dll | Select-Object -ExpandProperty 'VersionInfo' | Select-Object -ExpandProperty 'ProductVersion'`.
+ * The Carbon NuGet package now supports installing and uninstalling under Chocolatey.
+ * All IIS functions were re-written to use the `Microsoft.Web.Administration` API instead of `appcmd.exe`. As a side effect, they no longer return `appcmd.exe` console output.
+ * The following functions no longer use `Write-Host`. Instead, they use `Write-Verbose`:
+   * `Disable-NtfsCompression`
+   * `Enable-NtfsCompression`
+   * `Grant-ComPermission`
+   * `Grant-Permission`
+   * `Install-Service` 
+   * `Remove-SslCertificateBinding` 
+   * `Revoke-ComPermission` 
+ * Created default, table-based display formats for `System.DirectoryServices.AccountManagement.UserPrincipal`, `System.DirectoryServices.AccountManagement.GroupPrincipal`, `Microsoft.Web.Administration.ApplicationPool`, `Microsoft.Web.Administration.Site`, and `Microsoft.Web.Administration.Application` objects.
+ * Re-organized Carbon's internal directory structure. You shouldn't be reaching into Carbon's internals, so this shouldn't matter, but wanted to let everyone know just in case.
+ 
+### New Functions
+
+ * `Clear-DscLocalResourceCache` clears the local LCM's DSC resource. This makes developing resources easier.
+ * `Clear-MofAuthoringMetadata` removes authoring metadata from .mof files.
+ * `Copy-DscResource` copies DSC resources (ZIP files, MSI archives, MOF files, etc.), including timestamps, checksums, and copying only changed files.
+ * `ConvertTo-SecurityIdentifer` converts a binary, string, or `System.Security.Principal.SecurityIdentifier` object into a `System.Security.Principal.SecurityIdentifier` object.
+ * `Get-DscError` gets any DSC errors that were written to a computer's DSC event log.
+ * `Get-DscWinEvent` gets DSC events that were written to a computer's DSC event log.
+ * `Get-FileSharePermission` gets the sharing permissions on a file/SMB share (*not* the NTFS file system permissions).
+ * `Get-FileShare` uses WMI to get `Win32_Share` objects for the file shares installed on the local computer.
+ * `Get-Group` gets a local group or all local groups.
+ * `Get-Msi` reads installer information and properties from an MSI file.
+ * `Get-PowerShellModuleInstallPath` gets the path where new module's should be installed. Beginning with PowerShell 4, modules should get installed into `$env:ProgramFiles\Windows PowerShell\Modules`. Under PowerShell 3, it is `$PSHome\Modules`. This function returns the correct location for the version of PowerShell you're using.
+ * `Get-User` gets a local user or all local users.
+ * `Initialize-Lcm` configures the DSC Local Configuration Manager on computers, including installing the private key needed for decrypting credentials.
+ * `Remove-GroupMember` removes a user/group from a local group. Thanks to [Philip Kluss](https://bitbucket.org/philkloose) for the contribution. 
+ * `Resolve-Identity` converts a system, local, or domain principal name or a SID (as a `SecurityIdentifer`, string SDDL, or byte array) into its canonical representation and includes extended identity information: domain, type, and SID.
+ * `Start-DscPullConfiguration` starts a configuration check on a computer that is configured to use the PULL refresh mode.
+ * `Test-DscTargetResource` compares target resource with desired resource. Helpful when writing `Test-TargetResource` functions.
+ * `Test-Group` checks if a *local* group exists.
+ * `Test-FileShare` uses WMI to check if a file/SMB share exists on the local computer.
+ * `Test-TypeDataMember` tests if a type has an extended type member defined.
+ * `Uninstall-FileShare` uninstalls/removes a file share, if it exists.
+ * `Write-DscError` writes DSC `ErrorLogRecord` objects as errors.
+
+### New DSC Resources
+
+ * `Carbon_EnvironmentVariable` creates/removes machine-level environment variables.
+ * `Carbon_FirewallRule` configures firewall rules.
+ * `Carbon_IniFile` manages the contents of INI files.
+ * `Carbon_Permission` configures file, directory, registry, and certificate permissions.
+ * `Carbon_Privilege` configures an identity's privileges.
+ * `Carbon_ScheduledTask` configures scheduled tasks with `schtasks.exe`.
+ * `Carbon_Service` configures Windows services.
+ 
+### Added `PassThru` Switches
+
+Added a `PassThru` switch to the following functions, which will return objects of the given type:
+
+ * `Grant-ComPermission`: `Carbon.Security.ComAccessRule`, representing the granted permission.
+ * `Grant-Permission`: `System.Security.AccessControl.AccessRule`, representing the granted permission.
+ * `Install-Group`: `System.DirectoryServices.AccountManagement.GroupPrincipal`, representing the group. 
+ * `Install-IisApplication`: `Microsoft.Web.Administration.Application`, representing the application.
+ * `Install-IisWebsite`: `Microsoft.Web.Administration.Site`, representing the website.
+ * `Install-Junction`: `System.IO.DirectoryInfo`, representing new target directories and any new/updated junctions.
+ * `Install-Service`: `System.ServiceProcess.ServiceController`, representing the service.
+ * `Install-User`: `System.DirectoryServices.AccountManagement.UserPrincipal`, representing the user.
+ * `Set-SslCertificateBinding`: `Carbon.Certificates.SslCertificateBinding`, representing the configured binding.
+ 
+### No More Console Output
+
+The following functions no longer return the console output of the program each one runs. Instead, the output is written to the verbose stream (i.e. use the `-Verbose` switch to see it).
+
+ * `Disable-FirewallStatefulFtp`
+ * `Enable-FirewallStatefulFtp`
+ * `Install-Service`
+ * `Remove-SslCertificateBinding`
+ * `Set-SslCertificateBinding`
+ * `Uninstall-Service`
+ 
+### Obsolete Functions and Parameters
+
+The following functions are now obsolete. Please don't use them and stop using them if you are. They will be removed from a future major version of Carbon. You'll get warnings if you use them.
+
+ * `Complete-Job`: It's total crap. Use PowerShell's `Wait-Job` cmdlet instead.
+ * `Invoke-AppCmd`: Switch to Carbon's IIS functions, or use `Get-IisConfigurationSection` to get `ConfigurationElement` objects from the `Microsoft.Web.Administration` API that you can modify.
+ * `Resolve-NetPath`: Switch to something else. Carbon doesn't use `net.exe` anymore.
+ 
+The following functions now have obsolete parameters, which will be removed from a future major version of Carbon. You'll get warnings if you use them.
+
+ * `Install-IisAppPool's` `UserName` and `Password` parameters. Use the new `Credential` parameter instead.
+ * `Install-Msi's` `Quiet` switch. `Install-Msi` always installs in quiet mode. Please remove usages.
+ * `Install-Service's` `Password` parameter. Use the new `Credential` parameter instead.
+ * `Install-User's` `UserName` and `Password` parameters. Use the new `Credential` parameter instead.
+ * `Set-RegistryKeyValue`'s `Quiet` parameter. Please remove usages.
+ 
+### Renamed Functions
+
+The following functions were renamed, but with backwards-compatible aliases in place, so you shouldn't have to change any code.
+
+ * `Invoke-WindowsInstaller` -&gt; `Install-Msi`
+ * `Install-SmbShare` -&gt; `Install-FileShare`
+ 
+### Switch to System.DirectoryServices.AccountManagement API for User/Group Management
+
+The following functions were re-written to use the `System.DirectoryServices.AccountManagement` API, introduced in .NET 3.5.
+
+ * `Add-MemberToGroup`
+ * `Install-Group`
+ * `Install-User` 
+ * `Test-User`
+ * `Uninstall-User`
+ 
+### Miscellaneous Changes
+
+ * `Get-IisAppPool`
+    * Now return all application pools installed on the local computer when called with no parameters.
+    * Added a default table format for `Microsoft.Web.Administration.ApplicationPool` objects.
+ * `Get-ProgramInstallInfo`
+    * Return object's `Version` property changed from an `int` to a [Version](http://msdn.microsoft.com/en-us/library/y0hf9t2e.aspx) object.
+    * Return object's now have `ProductCode` and `User` properties. If a program doesn't have a product code, it is set to `[Guid]::Empty`. The `User` property is only set for per-user software installs.
+ * `Get-ServiceConfiguration` now supports services from remote computers.
+ * `Grant-Permission` now only grants permissions on an object if those permissions aren't present.  To preserve previous behavior, add the `-Force` switch to all `Grant-Permission` usages.
+ * `Install-Certificate's` `Exportable` switch is now only allowed when installing a certificate from a file. Previously, you could supply the switch when installing from an X509Certificate2 object but it was ignored.
+ * `Install-Group's` `Members` parameter renamed to `Member` (with backwards-compatible alias).
+ * Added `Credential` parameter to `Install-IisAppPool` for increased security and to follow PowerShell guidelines.
+ * `Install-IisVirtualDirectory` no longer deletes and re-creates existing virtual directories, but modifies existing virtual directories in place.
+ * `Install-IisWebsite`
+    * Added `SiteID` parameter tfor setting a website's IIS ID.
+    * No longer deletes and re-creates websites, but modifies existing websites in place. This may or may not be a breaking change in your environment.
+ * `Install-Msi`
+    * `Path` parameter now supports wildcards.
+    * Now only installs an MSI if it isn't already installed. To preserve the previous behavior and always install, add the `-Force` switch to all `Invoke-WindowsInstaller`\`Install-Msi` usages.
+ * `Install-Service`
+    * Now supports service startup parameters/arguments via the `ArgumentList` parameter.
+    * Improved error handling and messages. It now uses `net helpmsg` to get helpful error messages based on sc.exe exit codes.
+    * Added `Credential` parameter for increased security and to follow PowerShell guidelines.
+    * Added `Description` parameter for setting a service's description.
+    * Added `DisplayName` parameter for setting a service's display name.
+ * `Install-FileShare` (fka `Install-SmbShare`):
+    * Re-written to use WMI isntead of `net.exe`, so it no longer returns any console output.
+    * Modifies existing shares in place, instead of deleting and re-creating, *unless* the share's path changes. Changing a share's path requires the old share to be deleted and a new one created.
+ * `Install-User`
+    * Added `PasswordExpires` switch for creating accounts with passwords that expire.
+    * Added `UserCannotChangePassword` to prevent user from changing his password.
+ * `Remove-SslCertificateBinding` has better error handling.
+ * Added `SID` parameter to `Resolve-IdentityName` to resolve a SID into its identity name.
+ * `Set-HostsEntry's` `IPAddress` parameter is now a `System.Net.IPAddress` object. It used to be a string validated with a regular expression.
+ * `Set-RegistryKeyValue`: 
+    * Added `UDWord` and `UQWord` parameters for setting registry key values to unsigned integers (i.e. integer values greater than `[int]::MaxValue` and `[long]::MaxValue`). Fixes [issue #165: Set-RegistryKeyValue rejects unsigned integers larger than [int]::MaxValue](https://bitbucket.org/splatteredbits/carbon/issues/165/set-registrykeyvalue).
+    * Deprecated `Quiet` switch.
+    *  Only sets the value if the value doesn't exist or the current value is different than the desired value. Use the `Force` parameter to preserve previous behavior.
+ * `Test-Identity` now returns a `Carbon.Identity` object if the identity exists *and* you use the `-PassThru` switch. It used to return the identity's SID. Update scripts to use the `FullName` property to get the old return value, e.g. `Test-Identity -Name $userName -PassThru | Select-Object -Expand 'FullName'`.
+ * `Test-OSIs32Bit` now uses the Environment class's new [Is64BitOperatingSystem](http://msdn.microsoft.com/en-us/library/system.environment.is64bitoperatingsystem.aspx) property.
+ * `Test-OSIs64Bit` now uses the Environment class's new [Is64BitOperatingSystem](http://msdn.microsoft.com/en-us/library/system.environment.is64bitoperatingsystem.aspx) property.
+ * `Test-PowerShellIs32Bit` now uses the `Environment` class's new [Is64BitProcess](http://msdn.microsoft.com/en-us/library/system.environment.is64bitprocess.aspx) property.
+ * `Test-PowerShellIs64Bit` now uses the `Environment` class's new [Is64BitProcess](http://msdn.microsoft.com/en-us/library/system.environment.is64bitprocess.aspx) property.
+ * `Uninstall-ScheduledTask` now retries when un-installing a task fails with "The function attempted to use a name that is reserved for use by another transaction." error.
+ * `Unprotect-String`
+    * Added `AsSecureString` switch, which will return a secure string instead of a normal string.
+    * The `Password` parameter now accepts `SecureString` values.
+ * `Initialize-Lcm`
+    * Added support for PowerShell 5: `RefreshIntervalMinutes` default value changed to from 15 to 30; `RefreshIntervalMinutes` minimum value is now 30; `ConfigurationFrequency`'s minimum value is now 1 (from 2).
+ 
 ## Changes Since `alpha.26`
 
 ### Enhancements
@@ -85,8 +287,8 @@ This is a ***backwards-incompatible*** release.
  * Includes all changes made in version 1.9.0.
  * PowerShell 4 is now required. Carbon won't even import under PowerShell 3.
  * Removed `Carbon_Script` resource. It only existed so I could pass values to my script blocks. Turns out, the built-in `Script` resource supports this with the `$using:` scope. Remember, your most important features is documentation!
- * Created a new [Carbon_ScheduledTask](http://get-carbon.org/help/Carbon_ScheduledTask.html) DSC resource for managing scheduled tasks.
- * The `Version` property on the objects returned by [Get-ProgramInstallInfo](http://get-carbon.org/help/Get-ProgramInstallInfo.html) is now a proper .NET `Version` object instead of an integer.
+ * Created a new `Carbon_ScheduledTask` DSC resource for managing scheduled tasks.
+ * The `Version` property on the objects returned by `Get-ProgramInstallInfo` is now a proper .NET `Version` object instead of an integer.
  
 ### Bug Fixes
 
@@ -97,185 +299,73 @@ This is a ***backwards-incompatible*** release.
 
 ### Bug Fixes
 
- * [Set-HostsEntry](http://get-carbon.org/help/Set-HostsEntry.html) fails to preserve whitespace if existing lines end with a comment/description. Thanks to [Konstantin Ushenin](https://vk.com/kostanew) for the fix.
+ * `Set-HostsEntry` fails to preserve whitespace if existing lines end with a comment/description. Thanks to [Konstantin Ushenin](https://vk.com/kostanew) for the fix.
  * Carbon's `System.ServiceProcess.ServiceController` extended type data causes errors when PowerShell formats `System.ServiceProcess.ServiceController` objects that represent services on remote computers.
  * `Install-Msi` didn't properly detect when installation failed.
  * `Set-EnvironmentVariable` fails to set process-level environment variable.
+ * `Compress-Item` doesn't remove handled errors from global error array.
+ * `Grant-Permission` fails with an unhelpful error message if it is unable to get the ACL on a private key.
  
 ### Enhancements
 
  * `Import-Carbon.ps1` is more intelligent about when it tries to re-load Carbon. It will force a re-import of Carbon if any of Carbon's files have changed or the version has changed.
- * Created [Uninstall-Junction](http://get-carbon.org/help/Uninstall-Junction.html) for uninstalling a junction in an idempotent way (i.e. without errors). Thanks to [Konstantin Ushenin](https://vk.com/kostanew) for the contribution.
- * Improved error handling in [Remove-Junction](http://get-carbon.org/help/Remove-Junction.html).
- * [Install-Service](http://get-carbon.org/help/Install-Service.html) now supports service startup parameters/arguments.
- * New [Test-TypeDataMember](http://get-carbon.org/help/Install-Service.html) for testing if a type has an extended type member defined.
- * [Install-IisAppPool](http://get-carbon.org/help/Install-IisAppPool.html) no longer returns appcmd.exe output.
- * Added `PassThru` parameter to [Install-IisAppPool](http://get-carbon.org/help/Install-IisAppPool.html) to control when a `Microsoft.Web.Administration.ApplicationPool` for the installed app pool is returned.
- * [Get-ServiceConfiguration](http://get-carbon.org/help/Get-ServiceConfiguration.html) and Carbon's extended type data for `System.ServiceProcess.ServiceController` objects now supports services from remote computers.
- * [Uninstall-ScheduledTask](http://get-carbon.org/help/Uninstall-ScheduledTask.html) now retries when un-installing a task fails with "The function attempted to use a name that is reserved for use by another transaction." error.
+ * Created `Uninstall-Junction` for uninstalling a junction in an idempotent way (i.e. without errors). Thanks to [Konstantin Ushenin](https://vk.com/kostanew) for the contribution.
+ * Improved error handling in `Remove-Junction`.
+ * `Install-Service`:
+   * Now supports service startup parameters/arguments.
+   * No longer returns `ServiceController` objects by default. This should improve backwards-compatability. Added a `PassThru` switch you can use to get a `ServiceController` object returned to you.
+   * Improved error handling. It now uses `net helpmsg` to get helpful error messages based on sc.exe exit codes.
+   * Improved handling of arguments/services with spaces in them under PowerShell 5.
+   * Added `Credential` parameter for increased security and to follow PowerShell guidelines.
+   * Now supports setting a service's description and display name.
+   * Starting the service now respects caller's error action preference. Before, `Start-Service` would write an error even if somone called `Install-Service` with an `Ignore` or `SilentlyContinue` error action preference.
+ * New `Test-TypeDataMember` for testing if a type has an extended type member defined.
+ * `Install-IisAppPool` no longer returns appcmd.exe output.
+ * Added `PassThru` parameter to `Install-IisAppPool` to control when a `Microsoft.Web.Administration.ApplicationPool` for the installed app pool is returned.
+ * `Get-ServiceConfiguration` and Carbon's extended type data for `System.ServiceProcess.ServiceController` objects now supports services from remote computers.
+ * `Uninstall-ScheduledTask` now retries when un-installing a task fails with "The function attempted to use a name that is reserved for use by another transaction." error.
  * Added new `FileIndex`, `LinkCount`, and `VolumeSerialNumber` extended type data on `System.IO.FileInfo` objects for getting a file's index, its hard link count, and volume serial number, respectively.
- * [Grant-Permission](http://get-carbon.org/help/Grant-Permission.html) now only returns an access rule object when the new `PassThru` switch is used. In previous 2.0 alpha releases, it only returned something when permissions on an object were added or changed.
- * [Install-User](http://get-carbon.org/help/Install-User.html) only returns a user object when the new `PassThru` switch is used. In previous 2.0 alpha releases, it only returned an object if a user was created or updated.
- * [Grant-ComPermissions](http://get-carbon.org/help/Grant-ComPermissions.html) only returns an access rule object when the new `PassThru` switch is used. In previous 2.0 alpha releases, it only returned an object if permissions were changed.
- * [Install-IisApplication](http://get-carbon.org/help/Install-IisApplication.html) only returns an IIS application object when the new `PassThru` switch is used. In previous 2.0 alpha releases, it only returned an object if the application was created or modified.
+ * `Grant-Permission` now only returns an access rule object when the new `PassThru` switch is used. In previous 2.0 alpha releases, it only returned something when permissions on an object were added or changed.
+ * `Install-User` only returns a user object when the new `PassThru` switch is used. In previous 2.0 alpha releases, it only returned an object if a user was created or updated.
+ * `Grant-ComPermissions` only returns an access rule object when the new `PassThru` switch is used. In previous 2.0 alpha releases, it only returned an object if permissions were changed.
+ * `Install-IisApplication` only returns an IIS application object when the new `PassThru` switch is used. In previous 2.0 alpha releases, it only returned an object if the application was created or modified.
  * Created `Get-Msi` function for reading MSI information and properties from an MSI file.
  * `Carbon.Computer.ProgramInstallInfo` objects (returned from `Get-ProgramInstallInfo`) now have `ProductCode` and `User` properties. If a program doesn't have a product code, it is set to `[Guid]::Empty`. The `User` property is only set for per-user software installs.
  * `Invoke-WindowsInstaller` renamed `Install-Msi`, with a backwards-compatibility-preserving alias.
  * `Install-Msi` now supports wildcards for MSI path to install.
  * `Install-Msi` now only installs an MSI if it isn't already installed. To preserve the previous behavior and always install, add the `-Force` switch to all `Invoke-WindowsInstaller`\`Install-Msi` usages.
- * Added `SiteID` parameter to [Install-IisWebsite](http://get-carbon.org/help/Install-IisWebsite.html) for setting a website's IIS ID.
- * Put the [Resolve-IdentityName](http://get-carbon.org/help/Resolve-IdentityName.html) function back. It was removed from previous alpha releases.
- * [Install-IisWebsite](https://get-carbon.org/help/Install-IisWebsite.ps1) no longer deletes and re-creates websites. This may or may not be a breaking change in your environment.
- * [Install-SmbShare](https://get-carbon.org/help/Install-SmbShare.ps1) no longer returns net.exe output, instead writing it to the verbose stream. To see previous output, use the `-Verbose` switch.
- * [Install-Service](http://get-carbon.org/help/Install-Service.html) no longer returns `ServiceController` objects by default. This should improve backwards-compatability. Added a `PassThru` switch you can use to get a `ServiceController` object returned to you.
- * Changed `-PasswordNeverExpires` switch to  `PasswordExpires` on [Install-User](http://get-carbon.org/help/Install-User.html) for improved backwards-compatability.
- * [Set-SslCertificateBinding](http://get-carbon.org/help/Set-SslCertificateBinding.html) no longer returns binding objects by default. Use new `PassThru` switch to get the old behavior.
- * The product version of the Carbon assembly now includes pre-release version information, as defined by the [Semantic Versioning specification](http://semver.org). To get this version, run `Get-Item Carbon.dll | Select-Object -ExpandProperty 'VersionInfo' | Select-Object -ExpandProperty 'ProductVersion'
- 
-## Enhancements
-
-### General
-
- * Carbon now requires PowerShell 4.
- * `Import-Carbon.ps1` is more intelligent about when it tries to re-load Carbon. It will force a re-import of Carbon if any of Carbon's files have changed or the version has changed.
- * Added new `FileIndex`, `LinkCount`, and `VolumeSerialNumber` extended type data on `System.IO.FileInfo` objects for getting a file's index, its hard link count, and volume serial number, respectively.
- * The product version of the Carbon assembly now includes pre-release version information, as defined by the [Semantic Versioning specification](http://semver.org). To get this version, run `Get-Item Carbon.dll | Select-Object -ExpandProperty 'VersionInfo' | Select-Object -ExpandProperty 'ProductVersion'
-
-### Certificates
-
- * [Remove-SslCertificateBinding](http://get-carbon.org/help/Remove-SslCertificateBinding.html) now writes messages with `Write-Verbose` instead of `Write-Host`. Improved error handling.
- * Added `PassThru` switch to [Set-SslCertificateBinding](http://get-carbon.org/help/Set-SslCertificateBinding.html). When used, `Set-SslCertificateBinding` will return a `Carbon.Certificates.SslCertificateBinding` object for the configured binding.
- * [Set-SslCertificateBinding](http://get-carbon.org/help/Set-SslCertificateBinding.html) no longer returns console output, instead writing it to the verbose stream. Use the `Verbose` stream to see the previous output.
- * The `Exportable` switch is now only allowed by [Install-Certificate](http://get-carbon.org/help/Install-Certificate.html) when installing a certificate from a file. Previously, you could supply the switch when installing from an X509Certificate2 object but it was ignored.
-
-### COM
-
- * Added `PassThru` switch to [Grant-ComPermission](http://get-carbon.org/help/Grant-ComPermission.html) to return `Carbon.Security.ComAccessRule` objects. Also, it now writes messages with `Write-Verbose` instead of `Write-Host`.
- * [Revoke-ComPermission](http://get-carbon.org/help/Revoke-ComPermission.html) now writes messages with `Write-Verbose` instead of `Write-Host`.
-
-### Computer
-
- * Changed [Test-OSIs32Bit](http://get-carbon.org/help/Test-OSIs32Bit.html) and [Test-OSIs64Bit](http://get-carbon.org/help/Test-OSIs64Bit.html) functions to use the Environment class's new [Is64BitOperatingSystem](http://msdn.microsoft.com/en-us/library/system.environment.is64bitoperatingsystem.aspx) property.
- * Changed `Carbon.Computer.ProgramInstallInfo`'s `Version` property (returned by [Get-ProgramInstallInfo](http://get-carbon.org/help/Get-ProgramInstallInfo.html) from an `int` to a [Version](http://msdn.microsoft.com/en-us/library/y0hf9t2e.aspx) object.
- * `Carbon.Computer.ProgramInstallInfo` objects (returned from `Get-ProgramInstallInfo`) now have `ProductCode` and `User` properties. If a program doesn't have a product code, it is set to `[Guid]::Empty`. The `User` property is only set for per-user software installs.
- 
-### DSC
-
- * Created [Carbon_EnvironmentVariable](http://get-carbon.org/help/Carbon_EnvironmentVariable.html) resource for creating/removing machine-level environment variables.
- * New [Clear-DscLocalResourceCache](http://get-carbon.org/help/Clear-DscLocalResourceCache.html) function for clearing the local LCM's DSC resource. This makes developing resources easier.
- * Created [Carbon_IniFile](http://get-carbon.org/help/Carbon_IniFile.html) resource for managing settings in INI files.
- * Created [Carbon_FirewallRule](http://get-carbon.org/help/Carbon_FirewallRule.html) resource for configuring firewall rules.
- * New [Test-DscTargetResource](http://get-carbon.org/help/Test-DscTargetResource.html) function for comparing target/desired resource states across DSC resources.
- * Created [Carbon_Privilege](http://get-carbon.org/help/Carbon_Privilege.html) resource for configuring and identity's privileges.
- * Created [Carbon_Permission](http://get-carbon.org/help/Carbon_Permission.html) resource for configuring file, directory, registry, and certificate permissions.
- * Created [Carbon_Service](http://get-carbon.org/help/Carbon_Service.html) resource for configuring Windows services.
- * Created [Copy-DscResource](http://get-carbon.org/help/Copy-DscResource.html) function for copying DSC resources (ZIP files, MSI archives, MOF files, etc.), including timestamps, checksums, and copying only changed files.
- * Created [Clear-MofAuthoringMetadata](http://get-carbon.org/help/Clear-MofAuthoringMetadata.html) function for removing authoring metadata from .mof files.
- * Created [Get-DscWinEvent](http://get-carbon.org/help/Get-DscWinEvent.html) function for getting DSC events written to a computer's DSC event log.
- * Created [Get-DscError](http://get-carbon.org/help/Get-DscError.html) function for getting any DSC errors written to a computer's DSC event log.
- * Created [Write-DscError](http://get-carbon.org/help/Write-DscError.html) function for writing DSC `ErrorLogRecord` objects as errors.
- * Created [Start-DscPullConfiguration](http://get-carbon.org/help/Start-DscPullConfiguration.html) function for starting a configuration check on a computer whose computer is configured to use the PULL refresh mode.
- * Created [Initialize-Lcm](http://get-carbon.org/help/Initialize-Lcm.html) function for configuring the DSC Local Configuration Manager on computers, including installing the private key needed for decrypting credentials.
- * Created [Carbon_ScheduledTask](http://get-carbon.org/help/Carbon_ScheduledTask.html) resource for configuring scheduled tasks with `schtasks.exe`.
- 
-### File System
-
- * [Disable-NtfsCompression](http://get-carbon.org/help/Disable-NtfsCompression.html) now writes messages with `Write-Verbose` instead of `Write-Host`. Improved error handling.
- * [Enable-NtfsCompression](http://get-carbon.org/help/Enable-NtfsCompression.html) now writes messages with `Write-Verbose` instead of `Write-Host`. Improved error handling.
- * Added `PassThru` switch to [Install-Junction](http://get-carbon.org/help/Install-Junction.html) now returns `System.IO.DirectoryInfo` objects for any new target directories and any new/updated junctions.
-
-### Firewall
-
- * [Disable-FirewallStatefulFtp](http://get-carbon.org/help/Disable-FirewallStatefulFtp.html) no longer returns `netsh` output. Use the `-Verbose` switch to see the output.
- * [Enable-FirewallStatefulFtp](http://get-carbon.org/help/Enable-FirewallStatefulFtp.html) no longer returns `netsh` output. Use the `-Verbose` switch to see the output.
-
-### Hosts File
-
- * [Set-HostsEntry](http://get-carbon.org/help/Set-HostsEntry.html)'s IPAddress parameter is now a `System.Net.IPAddress` object.  Previously it was a string validated with a regular expression.
-
-### IIS
-
- * Added `PassThru` switch to [Install-IisApplication](http://get-carbon.org/help/Install-IisApplication.html) to return a `Microsoft.Web.Administration.Application` object.
- * [Install-IisAppPool](http://get-carbon.org/help/Install-IisAppPool.html) no longer returns appcmd.exe output.
- * Added `SiteID` parameter to [Install-IisWebsite](http://get-carbon.org/help/Install-IisWebsite.html) for setting a website's IIS ID.
- * [Install-IisWebsite](https://get-carbon.org/help/Install-IisWebsite.ps1) no longer deletes and re-creates websites. This may or may not be a breaking change in your environment.
- * Added `PassThru` parameter to [Install-IisWebsite](https://get-carbon.org/help/Install-IisWebsite.ps1). When used, `Install-IisWebsite` will return a `Microsoft.Web.Administration.Site` object for the website.
- 
-### MSI
-
- * Created `Get-Msi` function for reading MSI information and properties from an MSI file.
- * `Invoke-WindowsInstaller` renamed `Install-Msi`, with a backwards-compatibility-preserving alias.
- * `Install-Msi` now supports wildcards for MSI path to install.
- * `Install-Msi` now only installs an MSI if it isn't already installed. To preserve the previous behavior and always install, add the `-Force` switch to all `Invoke-WindowsInstaller`\`Install-Msi` usages.
-
-### PowerShell
-
- * Changed [Test-PowerShellIs32Bit](http://get-carbon.org/help/Test-PowerShellIs32Bit.html) and [Test-PowerShellIs64Bit](http://get-carbon.org/help/Test-PowerShellIs64Bit.html) functions to use the Environment class's new [Is64BitProcess](http://msdn.microsoft.com/en-us/library/system.environment.is64bitprocess.aspx) property.
- * Removed `Complete-Job` function.  It was total crap.
- * Created [Get-PowerShellModuleInstallPath](http://get-carbon.org/help/Get-PowerShellModuleInstallPath.html) function for getting the path where new module's should be installed. Beginning with PowerShell 4, modules should get installed into `$env:ProgramFiles\Windows PowerShell\Modules`. Under PowerShell 3, it is `$PSHome\Modules`. This function returns the correct location for the version of PowerShell you're using.
- * Created [Test-TypeDataMember](http://get-carbon.org/help/Test-TypeDataMember.html) for testing if a type has an extended type member defined.
- 
-### Scheduled Tasks
-
- * [Uninstall-ScheduledTask](http://get-carbon.org/help/Uninstall-ScheduledTask.html) now retries when un-installing a task fails with "The function attempted to use a name that is reserved for use by another transaction." error.
-
-### Security
-
- * [Grant-Permission](http://get-carbon.org/help/Grant-Permission.html) now only grants permissions on an object if those permissions aren't present.  To preserve previous behaviour, add the `-Force` switch to all `Grant-Permission` usages.
- * Added `PassThru` switch to [Grant-Permission](http://get-carbon.org/help/Grant-Permission.html) to return the access rule objects it creates/sets.
- * [Grant-Permission](http://get-carbon.org/help/Grant-Permission.html) no longer writes a message to the host.
-
-### Service
-
- * [Install-Service](http://get-carbon.org/help/Grant-ComPermissions.html) now writes messages with `Write-Verbose` instead of `Write-Host`.
- * Added a `PassThru` switch to [Install-Service](http://get-carbon.org/help/Grant-ComPermissions.html) to control if a `System.ServiceProcess.ServiceController` object is returned for the configured service.
- * [Install-Service](http://get-carbon.org/help/Install-Service.html) now supports service startup parameters/arguments via the `ArgumentList` parameter.
- * [Get-ServiceConfiguration](http://get-carbon.org/help/Get-ServiceConfiguration.html) and Carbon's extended type data for `System.ServiceProcess.ServiceController` objects now supports services from remote computers.
- * [Install-Service](http://get-carbon.org/help/Install-Service.html) no longer returns `ServiceController` objects by default. This should improve backwards-compatability. Added a `PassThru` switch you can use to get a `ServiceController` object returned to you.
-
-### Shares
-
- * [Install-SmbShare](https://get-carbon.org/help/Install-SmbShare.ps1) no longer returns net.exe output, instead writing it to the verbose stream. To see previous output, use the `-Verbose` switch.
- 
-### Users and Groups
-
- * Re-wrote [Install-User](http://get-carbon.org/help/Install-User.html) to use .NET's [System.DirectoryServices.AccountManagement](http://msdn.microsoft.com/en-us/library/system.directoryservices.accountmanagement.aspx) API (introduced with .NET 3.5) instead of the `net.exe` command-line program.
- * Added `PasswordExpires` switch to [Install-User](http://get-carbon.org/help/Install-User.html) for creating accounts with passwords that expire.
- * Added `UserCannotChangePassword` switch to [Install-User](http://get-carbon.org/help/Install-User.html) to prevent user from changing his password.
- * Added [Get-User](http://get-carbon.org/help/Get-User.html) function for getting a local user or all local users.
- * Added [Get-Group](http://get-carbon.org/help/Get-Group.html) function for getting a local group or all local groups.
- * Renamed [Install-Group](http://get-carbon.org/help/Install-Group.html)'s `Members` parameter to `Member` (with backwards-compatible alias).
- * [Install-Group](http://get-carbon.org/help/Install-Group.html) re-written to use .NET's `System.DirectoryServices.AccountManagement` API (introduced with .NET 3.5).
- * Added `PassThru` switch to [Install-Group](http://get-carbon.org/help/Install-Group.html) so it will return the group added or updated.
- * [Add-MemberToGroup](http://get-carbon.org/help/Add-MemberToGroup.html) re-written to use .NET's `System.DirectoryServices.AccountManagement` API (introduced with .NET 3.5).
- * [Uninstall-User](http://get-carbon.org/help/Uninstall-User.html) re-written to use .NET's `System.DirectoryServices.AccountManagement` API (introduced with .NET 3.5).
- * [Test-User](http://get-carbon.org/help/Test-User.html) re-written to use .NET's `System.DirectoryServices.AccountManagement` API (introduced with .NET 3.5).
- * Created [Test-Group](http://get-carbon.org/help/Test-Group.html) function for checking if a *local* group exists.
- * Created [Resolve-Identity](http://get-carbon.org/help/Resolve-Identity.html) to return extended identity information: domain, type, and SID.
- * [Test-Identity](http://get-carbon.org/help/Test-Identity.html) now returns a `Carbon.Identity` object if the identity exists *and* you use the `-PassThru` switch.  It used to return the identity's SID.  Update scripts to use the `FullName` property to get the old return value, e.g. `Test-Identity -Name $userName -PassThru | Select-Object -Expand 'FullName'`.
- * Added [Remove-GroupMember](http://get-carbon.org/help/Remove-GroupMember.html) function. Thanks to [Philip Kluss](https://bitbucket.org/philkloose) for the contribution. 
- * Added `PassThru` switch to [Install-User](http://get-carbon.org/help/Install-User.html) to return a `System.DirectoryServices.AccountManagement.UserPrincipal` object representing the user.
-
-## Bug Fixes
-
-### Computer
-
- * `Set-EnvironmentVariable` fails to set process-level environment variable.
-
-### Hosts Entries
-
- * `Set-HostsEntry` fails to preserve whitespace if existing lines end with a comment/description. Thanks to [Konstantin Ushenin](https://vk.com/kostanew) for the fix.
- 
-### Msi`
-
- * `Install-Msi` didn't properly detect when installation failed.
-
-### Services
-
-  * Carbon's `System.ServiceProcess.ServiceController` extended type data causes errors when PowerShell formats `System.ServiceProcess.ServiceController` objects that represent services on remote computers.
-
- 
-</releaseNotes>
+ * Added `SiteID` parameter to `Install-IisWebsite` for setting a website's IIS ID.
+ * Put the `Resolve-IdentityName` function back. It was removed from previous alpha releases.
+ * `Install-IisWebsite` no longer deletes and re-creates websites. This may or may not be a breaking change in your environment.
+ * `Install-SmbShare` no longer returns net.exe output, instead writing it to the verbose stream. To see previous output, use the `-Verbose` switch.
+ * Changed `-PasswordNeverExpires` switch to  `PasswordExpires` on `Install-User` for improved backwards-compatability.
+ * `Set-SslCertificateBinding` no longer returns binding objects by default. Use new `PassThru` switch to get the old behavior.
+ * The product version of the Carbon assembly now includes pre-release version information, as defined by the [Semantic Versioning specification](http://semver.org). To get this version, run `Get-Item Carbon.dll | Select-Object -ExpandProperty 'VersionInfo' | Select-Object -ExpandProperty 'ProductVersion'`
+ * The Carbon NuGet package now supports installing and uninstalling using Chocolatey.
+ * Added `AsSecureString` switch to `Unprotect-String` which causes `Unprotect-String` to return a secure string instead of a normal string.
+ * `Unprotect-String` now accepts a `SecureString` as the value for the `Password` parameter, which is the password for the private key used to decrypt from password-protected RSA certificate file.
+ * Added `Credential` parameter to `Install-IisAppPool` for increased security and to follow PowerShell guidelines.
+ * Added `Credential` parameter to `Install-User` for increased security and to follow PowerShell guidelines.
+ * `Install-IisVirtualDirectory` now modifies existing virtual directories in place, instead of deleting and re-creating.
+ * `Invoke-AppCmd` is now obsolete and will be removed from a future version of Carbon. Switch to Carbon's IIS functions, or use `Get-IisConfigurationSection` to get `ConfigurationElement` objects from the `Microsoft.Web.Administration` API that you can modify.
+ * Added `Description` and `DisplayName` properties to `Carbon_Service` for setting a service's description and display name.
+ * `Grant-Permission` now writes an error if you don't have access to a private key. Previously, it would skip the key without any messages.
+ * `Resolve-Identity` now converts SIDs to a `Carbon.Identity` object. The SID may be a string (SID in SDDL form), byte array, or a `SecurityIdentifier` object.
+ * `Get-FileSharePermission` gets the sharing permissions on a file/SMB share (*not* the NTFS file system permissions).
+ * Created `Get-FileShare` function. It uses WMI to get `Win32_Share` objects for the file shares installed on the local computer.
+ * Renamed `Install-SmbShare` to `Install-FileShare`, with a backwards-compatible alias in place.
+ * Added `SID` parameter to `Resolve-IdentityName` to resolve a SID into its identity name.
+ * Created `ConvertTo-SecurityIdentifer` function to convert a binary, string, or `System.Security.Principal.SecurityIdentifier` object into a `System.Security.Principal.SecurityIdentifier` object.
+ * `Install-FileShare` (fka `Install-SmbShare`):
+    * Re-written to use WMI isntead of `net.exe`.
+    * Modifies existing shares in place, instead of deleting and re-creating, *unless* the share's path changes. Changing a share's path requires the old share to be deleted and a new one created.
+ * `Carbon_FirewallRule` now fails with an error if it finds multiple firewall rules with the same name.
+ * `Set-RegistryKeyValue`: 
+    * Added `UDWord` and `UQWord` parameters for setting registry key values to unsigned integers (i.e. integer values greater than `[int]::MaxValue` and `[long]::MaxValue`). Fixes [issue #165: Set-RegistryKeyValue rejects unsigned integers larger than [int]::MaxValue](https://bitbucket.org/splatteredbits/carbon/issues/165/set-registrykeyvalue).
+    * Deprecated `Quiet` switch.
+    * Only sets value if the value is changed. Use the `Force` parameter to preserve previous behavior.
+ * `Uninstall-Service` no longer returns sc.exe stdout.
+ </releaseNotes>
     <copyright>Copyright 2012</copyright>
     <tags>DevOps PowerShell setup computer automation admin</tags>
   </metadata>
