@@ -19,10 +19,23 @@ Publishes Carbon to the PowerShell gallery.
 param(
     [Parameter(Mandatory=$true)]
     [string]
+    # The path to the module.
+    $Path,
+
+    [Parameter(Mandatory=$true)]
+    [string]
     # The API key for the PowerShell Gallery.
-    $ApiKey
+    $ApiKey,
+
+    [Parameter(Mandatory=$true)]
+    [string]
+    # The URL to the module's license.
+    $LicenseUri
 )
 
 Set-StrictMode -Version 'Latest'
 
-Publish-Module -Path (Join-Path -Path $PSScriptRoot -ChildPath 'Carbon') -NuGetApiKey $ApiKey -LicenseUri 'http://www.apache.org/licenses/LICENSE-2.0'
+Publish-Module -Path $Path `
+               -Repository 'PSGallery' `
+               -NuGetApiKey $ApiKey `
+               -LicenseUri $LicenseUri
