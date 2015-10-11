@@ -18,13 +18,14 @@ function Publish-BitbucketDownload
     .SYNOPSIS
     Publishes a file to Bitbucket so it is available on a project's download page.
 
+    .DESCRIPTION
+    The `Publish-BitbucketDownload` function publishes a file to a repository so it is availabe on a project's download page. If the file already exists on Bitbucket, it is replaced with the current file.
+
     .LINK
     https://bitbucket.org/Swyter/bitbucket-curl-upload-to-repo-downloads
     #>
     [CmdletBinding()]
-
     param(
-        [Parameter(Mandatory=$true)]
         [pscredential]
         # The Bitbucket credentials to use.
         $Credential,
@@ -77,7 +78,7 @@ function Publish-BitbucketDownload
         }
 
         $errorElement = $Response.ParsedHtml.getElementById('error')
-        if( $errorElement )
+        if( $errorElement -and ($errorElement | Get-Member 'innerHtml') -and $erroElement.innerHtml )
         {
             Write-Error $errorElement.innerHtml
             return $false
@@ -85,6 +86,11 @@ function Publish-BitbucketDownload
 
         return $true
 
+    }
+
+    if( -not $Credential )
+    {
+        $Credential = Get-Credential -Message ('Enter credentials for https://bitbucket.org/{0}/{1}' -f $Username,$ProjectName)
     }
 
     $outFile = '{0}+{1}' -f (Split-Path -Leaf -Path $PSCommandPath),[IO.Path]::GetRandomFileName()
