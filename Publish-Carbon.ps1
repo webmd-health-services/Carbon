@@ -1,57 +1,72 @@
 <#
 .SYNOPSIS
 Packages and publishes Carbon packages.
+
+.DESCRIPTION
+The `Publish-Carbon.ps1` script packages and publishes a version of the Carbon module. It use the version defined in the Carbon.psd1 file. Before publishing, it adds the current date to the version in the release notes, updates the module's website, then tags the latest revision with the version number. It then publishes the module to Bitbucket, NuGet, Chocolatey, and PowerShell Gallery. If the version of Carbon being publishes already exists in a location, it is not re-published. If the PowerShellGet module isn't installed, the module is not publishes to the PowerShell Gallery.
+
+.EXAMPLE
+Publish-Carbon.ps1
+
+Yup. That's it.
 #>
-
-# Copyright 2012 Aaron Jensen
-# 
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-# 
-#     http://www.apache.org/licenses/LICENSE-2.0
-# 
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
 [CmdletBinding()]
 param(
-    [Parameter(ParameterSetName='All')]
     [Switch]
-    $All,
-    
-    [Parameter(ParameterSetName='Some')]
-    [Switch]
-    $ZipPackage,
-
-    [Parameter(ParameterSetName='Some')]
-    [Switch]
-    # Create the NuGet package.
-    $NuGetPackage,
-
-    [Parameter(ParameterSetName='Some')]
-    [Switch]
-    # Update the website.
-    $Website,
-
-    [Parameter(ParameterSetName='Some')]
-    [Switch]
-    # Commit any changes made by the publishing process.
-    $Commit
+    # Skip generating the website.
+    $SkipWebsite
 )
 
 #Requires -Version 4
 Set-StrictMode -Version Latest
 
-if( $PSCmdlet.ParameterSetName -eq 'Some' )
+function Copy-Carbon
 {
-    $All = $false
+    param(
+        $Source,
+        $Destination
+    )
+
+    foreach( $item in @( 'Carbon', 'Website', 'Examples', $licenseFileName, $releaseNotesFileName ) )
+    {
+        $sourcePath = Join-Path -Path $Source -ChildPath $item
+
+        if( (Test-Path -Path $sourcePath -PathType Container) )
+        {
+            robocopy $sourcePath (Join-Path -Path $Destination -ChildPath $item) /MIR /XF *.orig /XF *.pdb | Write-Debug
+        }
+        else
+        {
+            Copy-Item -Path $sourcePath -Destination $Destination
+        }
+    }
+
+    # Put another copy of the license file with the module.
+    Copy-Item -Path (Join-Path -Path $PSScriptRoot -ChildPath $licenseFileName) `
+                -Destination (Join-Path -Path $Destination -ChildPath 'Carbon')
+}
+
+function Test-Uri
+{
+    param(
+        [Uri]
+        $Uri
+    )
+
+    try
+    {
+        $resp = Invoke-WebRequest -Uri $Uri -ErrorAction Ignore
+        return ($resp.StatusCode -eq 200)
+    }
+    catch
+    {
+        return $false
+    }
 }
 
 & (Join-Path -Path $PSScriptRoot -ChildPath 'Carbon\Import-Carbon.ps1' -Resolve)
+& (Join-Path -Path $PSScriptRoot -ChildPath 'Tools\Silk\Import-Silk.ps1' -Resolve)
+
 
 $licenseFileName = 'LICENSE.txt'
 $releaseNotesFileName = 'RELEASE NOTES.txt'
@@ -59,7 +74,7 @@ $releaseNotesPath = Join-Path -Path $PSScriptRoot -ChildPath $releaseNotesFileNa
 
 $carbonModule = Get-Module -Name 'Carbon'
 $version = $carbonModule.Version
-Write-Verbose ('Publishing version {0}.' -f $version)
+Write-Verbose -Message ('Publishing version {0}.' -f $version)
 
 $versionReleaseNotes = $null
 foreach( $line in (Get-Content -Path $releaseNotesPath) )
@@ -90,160 +105,209 @@ if( $badAssemblies )
     return
 }
 
-$versionName = Get-Item -Path (Join-Path -Path $PSScriptRoot -ChildPath 'Carbon\bin\Carbon.dll') |
-                    Select-Object -ExpandProperty VersionInfo |
-                    Select-Object -ExpandProperty ProductVersion
-
-if( $All -or $Website )
+$newVersionHeader = "# {0} ({1})" -f $version,((Get-Date).ToString("d MMMM yyyy"))
+$releaseNotes = Get-Content -Path $releaseNotesPath |
+                    ForEach-Object {
+                        if( $_ -match '^# Next$' )
+                        {
+                            return $newVersionHeader
+                        }
+                        elseif( $_ -match '^# {0}\s*' -f [regex]::Escape($version.ToString()) )
+                        {
+                            return $newVersionHeader
+                        }
+                        return $_
+                    }
+$releaseNotes | Set-Content -Path $releaseNotesPath
+if( hg status $releaseNotesPath )
 {
-    $helpDirPath = Join-Path $PSScriptRoot Website\help
-    Get-ChildItem $helpDirPath *.html | Remove-Item 
-        
-    & (Join-Path -Path $PSScriptRoot -ChildPath 'Out-Html.ps1' -Resolve) -OutputDir $helpDirPath        
-
-    hg addremove $helpDirPath
-
+    hg commit -m ('[{0}] Updating release date in release notes.' -f $version) $releaseNotesPath
+    hg log -rtip
 }
 
-$aspNetClientPath = Join-Path -Path $PSScriptRoot -ChildPath 'Website\aspnet_client'
-if( (Test-Path -Path $aspNetClientPath -PathType Container) )
+if( -not $SkipWebsite )
 {
-    Remove-Item -Path $aspNetClientPath -Recurse
-}
-        
-$tempDir = [IO.Path]::GetRandomFileName()
-$tempDir = Join-Path -Path $env:TEMP -ChildPath $tempDir
-
-New-Item -Path $tempDir -ItemType 'Directory' | Out-String | Write-Verbose
-
-try
-{
-    foreach( $item in @( 'Carbon', 'Website', 'Examples', $licenseFileName, $releaseNotesFileName ) )
+    Write-Verbose -Message ('Generating website.')
+    & (Join-Path -Path $PSScriptRoot -ChildPath 'New-Website.ps1' -Resolve)
+    hg addremove 'Website'
+    if( (hg status 'Website') )
     {
-        $sourcePath = Join-Path -Path $PSScriptRoot -ChildPath $item
-        $extraFiles = hg st --unknown --ignored $sourcePath
-        if( $extraFiles )
-        {
-            Write-Error ('Unable to package: there are unknown/ignored files in {0}:{1} {2}' -f $sourcePath,([Environment]::NewLine),($extraFiles -join ('{0} ' -f ([Environment]::NewLine))))
-            return
-        }
-
-        if( (Test-Path -Path $sourcePath -PathType Container) )
-        {
-            robocopy $sourcePath (Join-Path -Path $tempDir -ChildPath $item) /MIR /XF *.orig /XF *.pdb | Write-Verbose
-        }
-        else
-        {
-            Copy-Item -Path $sourcePath -Destination $tempDir
-        }
+        hg commit -m ('[{0}] Updating website.' -f $version) 'Website'
+        hg log -rtip
     }
+}
 
-    # Put another copy of the license file with the module.
-    Copy-Item -Path (Join-Path -Path $PSScriptRoot -ChildPath $licenseFileName) -Destination (Join-Path -Path $tempDir -ChildPath 'Carbon')
+$carbonNuspecPath = Join-Path -Path $PSScriptRoot -ChildPath 'Carbon.nuspec' -Resolve
+if( -not $carbonNuspecPath )
+{
+    return
+}
 
-    if( $All -or $ZipPackage )
-    {
-        $newVersionHeader = "# {0} ({1})" -f $version,((Get-Date).ToString("d MMMM yyyy"))
-        $releaseNotes = Get-Content -Path $releaseNotesPath |
-                            ForEach-Object {
-                                if( $_ -match '^# Next$' )
+$carbonNuspec = [xml](Get-Content -Raw -Path $carbonNuspecPath)
+if( $carbonNuspec.package.metadata.version -ne $version.ToString() )
+{
+    $foundVersion = $false
+    $nugetReleaseNotes = Get-Content -Path $releaseNotesPath |
+                            Where-Object {
+                                $line = $_
+                                if( -not $foundVersion )
                                 {
-                                    return $newVersionHeader
+                                    if( $line -match ('^# {0}' -f [regex]::Escape($version)) )
+                                    {
+                                        $foundVersion = $true
+                                        return
+                                    }
                                 }
-                                elseif( $_ -match '^# {0}\s*' -f [regex]::Escape($version.ToString()) )
+                                else
                                 {
-                                    return $newVersionHeader
+                                    if( $line -match ('^# (?!{0})' -f [regex]::Escape($version)) )
+                                    {
+                                        $foundVersion = $false
+                                    }
                                 }
-                                return $_
+                                return( $foundVersion )
                             }
-        $releaseNotes | Set-Content -Path $releaseNotesPath
 
-        $carbonZipFileName = "Carbon-{0}.zip" -f $versionName
+    $nuGetVersion = $version -replace '-([A-Z0-9]+)[^A-Z0-9]*(\d+)$','-$1$2'
+    $carbonNuspec.package.metadata.version = $nugetVersion
+    $carbonNuspec.package.metadata.releaseNotes = $nugetReleaseNotes -join ([Environment]::NewLine)
+    $carbonNuspec.Save( $carbonNuspecPath )
+}
+
+if( hg status $carbonNuspecPath )
+{
+    hg commit -m ('[{0}] Updating Carbon.' -f $version) $carbonNuspecPath
+    hg log -rtip
+}
+
+if( -not (hg log -r ('tag({0})' -f $version)) )
+{
+    hg tag $version.ToString()
+    hg log -rtip
+}
+
+# Create a clean clone so that our packages don't pick up any cruft.
+$cloneDir = New-TempDirectory -Prefix 'Carbon'
+hg clone . $cloneDir
+hg update -r ('tag({0})' -f $version) -R $cloneDir
+
+$carbonZipFileName = "Carbon-{0}.zip" -f $version
+$zipDownloadUrl = 'https://bitbucket.org/splatteredbits/carbon/downloads/{0}' -f $carbonZipFileName
+
+if( (Test-Uri $zipDownloadUrl) )
+{
+    Write-Warning -Message ('Bitbucket ZIP file already published.')
+}
+else
+{
+    $zipRoot = New-TempDirectory -Prefix 'Carbon'
+    try
+    {
+        Copy-Carbon -Source $cloneDir -Destination $zipRoot
 
         if( Test-Path $carbonZipFileName -PathType Leaf )
         {
             Remove-Item $carbonZipFileName
         }
 
+        Compress-Item -Path (Get-ChildItem -Path $zipRoot) `
+                      -OutFile (Join-Path -Path $PSScriptRoot -ChildPath $carbonZipFileName)
 
-        Compress-Item -Path (Get-ChildItem -Path $tempDir) -OutFile (Join-Path -Path $PSScriptRoot -ChildPath $carbonZipFileName)
+        Publish-BitbucketDownload -Username 'splatteredbits' `
+                                  -ProjectName 'carbon' `
+                                  -FilePath $carbonZipFileName
+
+        $resp = Invoke-WebRequest -Uri $zipDownloadUrl
+        $resp | Select-Object -Property 'StatusCode','StatusDescription',@{ Name = 'Uri'; Expression = { $zipDownloadUrl }}
     }
-
-    if( $All -or $NuGetPackage )
+    finally
     {
-        $carbonNuspecPath = Join-Path -Path $PSScriptRoot -ChildPath 'Carbon.nuspec' -Resolve
-        if( -not $carbonNuspecPath )
-        {
-            return
-        }
+        Remove-Item -Path $zipRoot -Recurse
+    }
+}
 
-        $foundVersion = $false
-        $nugetReleaseNotes = Get-Content -Path $releaseNotesPath |
-                                Where-Object {
-                                    $line = $_
-                                    if( -not $foundVersion )
-                                    {
-                                        if( $line -match ('^# {0}' -f [regex]::Escape($version)) )
-                                        {
-                                            $foundVersion = $true
-                                            return
-                                        }
-                                    }
-                                    else
-                                    {
-                                        if( $line -match ('^# (?!{0})' -f [regex]::Escape($version)) )
-                                        {
-                                            $foundVersion = $false
-                                        }
-                                    }
-                                    return( $foundVersion )
-                                }
+$nugetPackageUrl = 'http://www.nuget.org/api/v2/package/Carbon/{0}' -f $version
+$publishToNuGet = -not (Test-Uri -Uri $nugetPackageUrl)
 
-        $carbonNuspec = [xml](Get-Content -Raw -Path $carbonNuspecPath)
-        $nuGetVersion = $versionName -replace '-([A-Z0-9]+)[^A-Z0-9]*(\d+)$','-$1$2'
-        $carbonNuspec.package.metadata.version = $nugetVersion
-        $carbonNuspec.package.metadata.releaseNotes = $nugetReleaseNotes -join ([Environment]::NewLine)
-        $carbonNuspec.Save( $carbonNuspecPath )
+$chocolatelyPackageUrl = 'https://chocolatey.org/api/v2/package/carbon/{0}' -f $version
+$publishToChocolatey = -not (Test-Uri -Uri $chocolatelyPackageUrl)
 
+if( -not $publishToNuGet -and -not $publishToChocolatey )
+{
+    Write-Warning -Message ('NuGet and Chocolatey packages already published.')
+}
+else
+{
+    Write-Verbose -Message ('Publishing NuGet/Chocolatey packages.')
+    $nugetRoot = New-TempDirectory -Prefix 'CarbonNuGet'
+    try
+    {
+        Copy-Carbon -Source $cloneDir -Destination $nugetRoot
+
+        # Create the NuGet package.
         foreach( $file in @( '*.txt', 'Carbon.nuspec' ) )
         {
             Copy-Item -Path (Join-Path -Path $PSScriptRoot -ChildPath $file) `
-                        -Destination $tempDir
+                        -Destination $nugetRoot
         }
 
-        $toolsDir = Join-Path -Path $tempDir -ChildPath 'tools'
+        $toolsDir = Join-Path -Path $nugetRoot -ChildPath 'tools'
         New-Item -Path $toolsDir -ItemType 'directory' | Out-String | Write-Verbose
         Get-ChildItem -Path (Join-Path -Path $PSScriptRoot -ChildPath 'Tools') -Filter 'chocolatey*.ps1' |
             Copy-Item -Destination $toolsDir
 
-        Push-Location -Path $tempDir
+        $nugetPath = Join-Path -Path $PSScriptRoot -ChildPath 'Tools\Silk\bin\nuget.exe' -Resolve
+        if( -not $nugetPath )
+        {
+            return
+        }
+
+        Push-Location -Path $nugetRoot
         try
         {
-            $nugetPath = Join-Path -Path $PSScriptRoot -ChildPath 'Tools\NuGet-2.8\NuGet.exe' -Resolve
             & $nugetPath pack '.\Carbon.nuspec' -BasePath '.' -NoPackageAnalysis
-            $carbonNupkgPath = Join-Path -Path $tempDir -ChildPath ('Carbon.{0}.nupkg' -f $nuGetVersion) -Resolve
+            $carbonNupkgPath = Join-Path -Path $nugetRoot -ChildPath ('Carbon.{0}.nupkg' -f $nuGetVersion) -Resolve
             if( -not $carbonNupkgPath )
             {
                 return
             }
-
-            Copy-Item -Path $carbonNupkgPath -Destination $PSScriptRoot
         }
         finally
         {
             Pop-Location
         }
+        
+        # Publish to NuGet
+        if( $publishToNuGet )
+        {
+            Publish-NuGetPackage -FilePath $carbonNupkgPath
+            $resp = Invoke-WebRequest -Uri $nugetPackageUrl
+            $resp | Select-Object -Property 'StatusCode','StatusDescription',@{ Name = 'Uri'; Expression = { $nugetPackageUrl }}
+        }
+        else
+        {
+            Write-Warning ('NuGet package already published.')
+        }
+
+        # Publish to NuGet
+        if( $publishToChocolatey )
+        {
+            Publish-ChocolateyPackage -FilePath $carbonNupkgPath
+            $resp = Invoke-WebRequest -Uri $chocolatelyPackageUrl
+            $resp | Select-Object -Property 'StatusCode','StatusDescription',@{ Name = 'Uri'; Expression = { $chocolatelyPackageUrl }}
+        }
+        else
+        {
+            Write-Warning ('Chocolatey package already published.')
+        }
     }
-}
-finally
-{
-    Remove-Item -Recurse -Path $tempDir
-}
-if( $All -or $Commit )
-{
-    hg commit -m ("Releasing version {0}." -f $Version)
-    if( -not (hg tags | Where-Object { $_ -like "$version*" } ) )
+    finally
     {
-        hg tag $version
+        Remove-Item -Path $nugetRoot -Recurse
     }
 }
+
+Publish-PowerShellGalleryModule -Name 'Carbon' `
+                                -Path (Join-Path -Path $cloneDir -ChildPath 'Carbon') `
+                                -Version $version `
+                                -LicenseUri 'http://www.apache.org/licenses/LICENSE-2.0'
