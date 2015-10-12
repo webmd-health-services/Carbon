@@ -50,9 +50,18 @@ function Test-AllFilesShouldHaveLicense
                         '*.csproj',
                         '*.nupkg',
                         '*.pshproj',
-                        '*.nuspec'
+                        '*.nuspec',
+                        'Publish-Carbon.ps1'
                     )
-    [object[]]$filesMissingLicense = Get-ChildItem -Path $projectRoot -Exclude 'Tools','Website','.hg' |
+    
+    $directoriesToCheck = @(
+                                (Join-Path -Path $projectRoot -ChildPath 'Carbon'),
+                                (Join-Path -Path $projectRoot -ChildPath 'examples'),
+                                (Join-Path -Path $projectRoot -ChildPath 'Source'),
+                                (Join-Path -Path $projectRoot -ChildPath 'Test')
+                            )
+
+    [object[]]$filesMissingLicense = Get-ChildItem -Path $projectRoot -Exclude 'Tools','Website','.hg','pshdo.com' |
         Get-ChildItem -Recurse -File -Exclude $filesToSkip |
         Where-Object { $_.FullName -notlike '*\obj\*' } |
         ForEach-Object {
