@@ -112,7 +112,7 @@ $releaseNotes = Get-Content -Path $releaseNotesPath |
                         {
                             return $newVersionHeader
                         }
-                        elseif( $_ -match '^# {0}\s*' -f [regex]::Escape($version.ToString()) )
+                        elseif( $_ -match '^# {0}\s*$' -f [regex]::Escape($version.ToString()) )
                         {
                             return $newVersionHeader
                         }
@@ -372,7 +372,7 @@ try
                     }
     (@'
 {0}
-Carbon {1} is out. You can [download Carbon as a .ZIP archive, NuGet package, Chocolatey package, or from the PowerShell Gallery](http://get-carbon.org/about_Carbon_Installation.html). It may take a week or two for the package to show up at chocolatey.org.
+[Carbon](http://get-carbon.org) {1} is out. You can [download Carbon as a .ZIP archive, NuGet package, Chocolatey package, or from the PowerShell Gallery](http://get-carbon.org/about_Carbon_Installation.html). It may take a week or two for the package to show up at chocolatey.org.
 
 {2}
 '@ -f ($header -join ([Environment]::NewLine)),$version,($versionReleaseNotes -join ([Environment]::NewLine))) | Set-Content -Path $postPath
