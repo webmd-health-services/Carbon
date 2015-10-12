@@ -148,12 +148,9 @@ function Publish-BitbucketDownload
                     ForEach-Object { $_.Fields.csrfmiddlewaretoken }
     Write-Debug $csrfToken
 
-    $bytes = $fileBin = [IO.File]::ReadAllBytes($FilePath)
-    $bytes = [Text.Encoding]::ASCII.GetString($bytes)
-
     $boundary = [Guid]::NewGuid().ToString()
 
-    $body = @"
+    $bodyStart = @"
 --$boundary
 Content-Disposition: form-data; name="csrfmiddlewaretoken"
 
@@ -165,17 +162,52 @@ Content-Disposition: form-data; name="token"
 Content-Disposition: form-data; name="files"; filename="$(Split-Path -Leaf -Path $FilePath)"
 Content-Type: application/octet-stream
 
-$bytes
+
+"@
+
+$bodyEnd = @"
+
 --$boundary--
 "@
 
-    Write-Debug $body
+    $requestInFile = Join-Path -Path $env:TEMP -ChildPath ([IO.Path]::GetRandomFileName())
 
-    $contentType = 'multipart/form-data; boundary={0}' -f $boundary
-
-    $resp = Invoke-WebRequest -Uri $downloadUri -Method Post -Body $body -ContentType $contentType -Headers @{ Referer = $downloadUri }
-    if( -not (Assert-Response -Response $resp -ExpectedUri $downloadUri) )
+    try
     {
-        return
+        $fileStream = New-Object 'System.IO.FileStream' ($requestInFile, [System.IO.FileMode]'Create', [System.IO.FileAccess]'Write')
+    
+        try
+        {
+            $bytes = [Text.Encoding]::UTF8.GetBytes($bodyStart)
+            $fileStream.Write( $bytes, 0, $bytes.Length )
+
+            $bytes = [IO.File]::ReadAllBytes($FilePath)
+            $fileStream.Write( $bytes, 0, $bytes.Length )
+
+            $bytes = [Text.Encoding]::UTF8.GetBytes($bodyEnd)
+            $fileStream.Write( $bytes, 0, $bytes.Length )
+        }
+        finally
+        { 
+            $fileStream.Close()
+        }
+
+        $contentType = 'multipart/form-data; boundary={0}' -f $boundary
+
+        $resp = Invoke-WebRequest -Uri $downloadUri `
+                                  -Method Post `
+                                  -InFile $requestInFile `
+                                  -ContentType $contentType `
+                                  -Headers @{ Referer = $downloadUri }
+        if( -not (Assert-Response -Response $resp -ExpectedUri $downloadUri) )
+        {
+            return
+        }
+
     }
+    finally
+    {
+        Remove-Item -Path $requestInFile
+    }
+
 }
