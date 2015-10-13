@@ -67,62 +67,24 @@ function Test-Uri
 & (Join-Path -Path $PSScriptRoot -ChildPath 'Carbon\Import-Carbon.ps1' -Resolve)
 & (Join-Path -Path $PSScriptRoot -ChildPath 'Tools\Silk\Import-Silk.ps1' -Resolve)
 
-
 $licenseFileName = 'LICENSE.txt'
 $releaseNotesFileName = 'RELEASE NOTES.txt'
 $releaseNotesPath = Join-Path -Path $PSScriptRoot -ChildPath $releaseNotesFileName -Resolve
 
-$carbonModule = Get-Module -Name 'Carbon'
-$version = $carbonModule.Version
-Write-Verbose -Message ('Publishing version {0}.' -f $version)
-
-$versionReleaseNotes = $null
-foreach( $line in (Get-Content -Path $releaseNotesPath) )
+$manifestPath = Join-Path -Path $PSScriptRoot -ChildPath 'Carbon\Carbon.psd1'
+$manifest = Test-ModuleManifest -Path $manifestPath
+if( -not $manifest )
 {
-    if( $line -match '^# ' )
-    {
-        $versionReleaseNotes = $line
-        break
-    }
-}
-
-if( $versionReleaseNotes -notmatch [regex]::Escape($version.ToString()) )
-{
-    Write-Error ('Unable to publish Carbon. Latest version in release notes file ''{0}'' is not {1}. Please build Carbon at that version, run tests, then publish again.' -f $versionReleaseNotes,$Version)
     return
 }
 
-$badAssemblies = Get-ChildItem -Path (Join-Path -Path $PSScriptRoot -ChildPath 'Carbon\bin') -Filter 'Carbon*.dll' |
-                        Where-Object { 
-                            -not ($_.VersionInfo.FileVersion.ToString().StartsWith($Version.ToString())) -or -not ($_.VersionInfo.ProductVersion.ToString().StartsWith($Version.ToString()))
-                        } |
-                        ForEach-Object {
-                            ' * {0} (FileVersion: {1}; ProductVersion: {2})' -f $_.Name,$_.VersionInfo.FileVersion,$_.VersionInfo.ProductVersion
-                        }
-if( $badAssemblies )
+$additionalAssemblyPath = Join-Path -Path $PSScriptRoot -ChildPath 'Carbon\bin\Carbon.*.dll'
+$nuspecPath = Join-Path -Path $PSScriptRoot -ChildPath 'Carbon.nuspec'
+$valid = Assert-ModuleVersion -ManifestPath $manifestPath -AssemblyPath $additionalAssemblyPath -ReleaseNotesPath $releaseNotesPath -NuspecPath $nuspecPath
+if( -not $valid )
 {
-    Write-Error ('Unable to publish Carbon. Versions of the following assemblies are not {0}. Please build Carbon at that version, run tests, then publish again.{1}{2}' -f $version,([Environment]::NewLine),($badAssemblies -join ([Environment]::NewLine)))
+    Write-Error -Message ('Carbon isn''t at the right version. Please rebuild with build.ps1.')
     return
-}
-
-$newVersionHeader = "# {0} ({1})" -f $version,((Get-Date).ToString("d MMMM yyyy"))
-$releaseNotes = Get-Content -Path $releaseNotesPath |
-                    ForEach-Object {
-                        if( $_ -match '^# Next$' )
-                        {
-                            return $newVersionHeader
-                        }
-                        elseif( $_ -match '^# {0}\s*$' -f [regex]::Escape($version.ToString()) )
-                        {
-                            return $newVersionHeader
-                        }
-                        return $_
-                    }
-$releaseNotes | Set-Content -Path $releaseNotesPath
-if( hg status $releaseNotesPath )
-{
-    hg commit -m ('[{0}] Updating release date in release notes.' -f $version) $releaseNotesPath
-    hg log -rtip
 }
 
 if( -not $SkipWebsite )
@@ -132,67 +94,46 @@ if( -not $SkipWebsite )
     hg addremove 'Website'
     if( (hg status 'Website') )
     {
-        hg commit -m ('[{0}] Updating website.' -f $version) 'Website'
+        hg commit -m ('[{0}] Updating website.' -f $manifest.Version) 'Website'
         hg log -rtip
     }
 }
 
-$carbonNuspecPath = Join-Path -Path $PSScriptRoot -ChildPath 'Carbon.nuspec' -Resolve
-if( -not $carbonNuspecPath )
+$tags = Get-Content -Raw -Path (Join-Path -Path $PSScriptRoot -ChildPath 'tags.json') |
+            ConvertFrom-Json |
+            ForEach-Object { $_ } |
+            Select-Object -ExpandProperty 'Tags' |
+            Select-Object -Unique |
+            Sort-Object |
+            ForEach-Object { $_.ToLower() -replace ' ','-' }
+$tags += @( 'PSModule', 'DscResources', 'setup', 'automation', 'admin' )
+
+$nuspecPath = Join-Path -Path $PSScriptRoot -ChildPath 'Carbon.nuspec' -Resolve
+if( -not $nuspecPath )
 {
     return
 }
 
-$foundVersion = $false
-$versionReleaseNotes = Get-Content -Path $releaseNotesPath |
-                        Where-Object {
-                            $line = $_
-                            if( -not $foundVersion )
-                            {
-                                if( $line -match ('^# {0}' -f [regex]::Escape($version)) )
-                                {
-                                    $foundVersion = $true
-                                    return
-                                }
-                            }
-                            else
-                            {
-                                if( $line -match ('^# (?!{0})' -f [regex]::Escape($version)) )
-                                {
-                                    $foundVersion = $false
-                                }
-                            }
-                            return( $foundVersion )
-                        }
-$versionReleaseNotes = $versionReleaseNotes -join [Environment]::NewLine
+Set-ModuleNuspec -ManifestPath $manifestPath -NuspecPath $nuspecPath -ReleaseNotesPath $releaseNotesPath -Tags $tags
 
-$carbonNuspec = [xml](Get-Content -Raw -Path $carbonNuspecPath)
-if( $carbonNuspec.package.metadata.version -ne $version.ToString() )
+if( (hg status $nuspecPath) )
 {
-    $nuGetVersion = $version -replace '-([A-Z0-9]+)[^A-Z0-9]*(\d+)$','-$1$2'
-    $carbonNuspec.package.metadata.version = $nugetVersion
-    $carbonNuspec.package.metadata.releaseNotes = $versionReleaseNotes
-    $carbonNuspec.Save( $carbonNuspecPath )
-}
-
-if( hg status $carbonNuspecPath )
-{
-    hg commit -m ('[{0}] Updating Carbon.' -f $version) $carbonNuspecPath
+    hg commit -m ('[{0}] Updating Nuspec settings.' -f $manifest.Version) $nuspecPath
     hg log -rtip
 }
 
-if( -not (hg log -r ('tag({0})' -f $version)) )
+if( -not (hg log -r ('tag({0})' -f $manifest.Version)) )
 {
-    hg tag $version.ToString()
+    hg tag $manifest.Version.ToString()
     hg log -rtip
 }
 
 # Create a clean clone so that our packages don't pick up any cruft.
 $cloneDir = New-TempDirectory -Prefix 'Carbon'
 hg clone . $cloneDir
-hg update -r ('tag({0})' -f $version) -R $cloneDir
+hg update -r ('tag({0})' -f $manifest.Version) -R $cloneDir
 
-$carbonZipFileName = "Carbon-{0}.zip" -f $version
+$carbonZipFileName = "Carbon-{0}.zip" -f $manifest.Version
 $zipDownloadUrl = 'https://bitbucket.org/splatteredbits/carbon/downloads/{0}' -f $carbonZipFileName
 
 if( (Test-Uri $zipDownloadUrl) )
@@ -227,10 +168,10 @@ else
     }
 }
 
-$nugetPackageUrl = 'http://www.nuget.org/api/v2/package/Carbon/{0}' -f $version
+$nugetPackageUrl = 'http://www.nuget.org/api/v2/package/Carbon/{0}' -f $manifest.Version
 $publishToNuGet = -not (Test-Uri -Uri $nugetPackageUrl)
 
-$chocolatelyPackageUrl = 'https://chocolatey.org/api/v2/package/carbon/{0}' -f $version
+$chocolatelyPackageUrl = 'https://chocolatey.org/api/v2/package/carbon/{0}' -f $manifest.Version
 $publishToChocolatey = -not (Test-Uri -Uri $chocolatelyPackageUrl)
 
 if( -not $publishToNuGet -and -not $publishToChocolatey )
@@ -308,18 +249,9 @@ else
     }
 }
 
-$tags = Get-Content -Raw -Path (Join-Path -Path $PSScriptRoot -ChildPath 'tags.json') |
-            ConvertFrom-Json |
-            ForEach-Object { $_ } |
-            Select-Object -ExpandProperty 'Tags' |
-            Select-Object -Unique |
-            Sort-Object |
-            ForEach-Object { $_.ToLower() -replace ' ','-' }
-$tags += @( 'PSModule', 'DscResources' )
-
 Publish-PowerShellGalleryModule -Name 'Carbon' `
                                 -Path (Join-Path -Path $cloneDir -ChildPath 'Carbon') `
-                                -Version $version `
+                                -Version $manifest.Version `
                                 -LicenseUri 'http://www.apache.org/licenses/LICENSE-2.0' `
                                 -ReleaseNotes $versionReleaseNotes `
                                 -ProjectUri 'http://get-carbon.org/' `
@@ -344,7 +276,7 @@ $announcement = @'
 [Carbon](http://get-carbon.org) {0} is out. You can [download Carbon as a .ZIP archive, NuGet package, Chocolatey package, or from the PowerShell Gallery](http://get-carbon.org/about_Carbon_Installation.html). It may take a week or two for the package to show up at chocolatey.org.
 
 {1}
-'@ -f $version,$versionReleaseNotes
+'@ -f $manifest.Version,$versionReleaseNotes
 
-& $newModuleReleasedAnnouncement -ModuleName 'Carbon' -Version $version -Content $announcement
+& $newModuleReleasedAnnouncement -ModuleName 'Carbon' -Version $manifest.Version -Content $announcement
 
