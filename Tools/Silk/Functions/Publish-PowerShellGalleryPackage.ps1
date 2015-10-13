@@ -58,7 +58,19 @@ function Publish-PowerShellGalleryModule
         [Parameter(Mandatory=$true)]
         [string]
         # The URL to the module's license.
-        $LicenseUri
+        $LicenseUri,
+
+        [string]
+        # The release notes.
+        $ReleaseNotes,
+
+        [string[]]
+        # Any tags for the module.
+        $Tags,
+
+        [string]
+        # The URL to the project's home page.
+        $ProjectUri
     )
 
     Set-StrictMode -Version 'Latest'
@@ -76,7 +88,10 @@ function Publish-PowerShellGalleryModule
             Publish-Module -Path $Path `
                            -Repository 'PSGallery' `
                            -NuGetApiKey $ApiKey `
-                           -LicenseUri $LicenseUri
+                           -LicenseUri $LicenseUri `
+                           -ReleaseNotes $ReleaseNotes `
+                           -Tags $Tags `
+                           -ProjectUri $ProjectUri
 
             Find-Module -Name $Name -RequiredVersion $Version -Repository 'PSGallery'
         }
