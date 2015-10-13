@@ -43,4 +43,5 @@ Set-ModuleVersion -ManifestPath (Join-Path -Path $PSScriptRoot -ChildPath 'Carbo
                   -Version $Version `
                   -PreReleaseVersion $PreReleaseVersion `
                   -BuildMetadata $BuildMetadata `
-                  -ReleaseNotesPath (Join-Path -Path $PSScriptRoot -ChildPath 'RELEASE NOTES.txt' -Resolve)
+                  -ReleaseNotesPath (Join-Path -Path $PSScriptRoot -ChildPath 'RELEASE NOTES.txt' -Resolve) `
+                  -NuspecPath (Join-Path -Path $PSScriptRoot -ChildPath 'Carbon.nuspec' -Resolve)
