@@ -19,7 +19,7 @@
 # Generated on: 8/30/2011
 #
 
-#Requires -Version 3
+#Requires -Version 4
 
 @{
 
@@ -39,8 +39,8 @@
     CompanyName = ''
 
     # Copyright statement for this module
-    Copyright = '(c) 2011 - 2013 Aaron Jensen. All rights reserved.'
-
+    Copyright = 'Copyright 2011 - 2015 Aaron Jensen.'
+    
     # Description of the functionality provided by this module
     Description = @'
 Carbon is a PowerShell module for automating the configuration Windows 7, 8, 2008, and 2012 and automation the installation and configuration of Windows applications, websites, and services. It can configure and manage:
@@ -85,7 +85,7 @@ All functions are idempotent: when run multiple times with the same arguments, y
     RequiredModules = @()
 
     # Assemblies that must be loaded prior to importing this module
-    RequiredAssemblies = @((Join-Path $PSScriptRoot bin\Carbon.dll))
+    RequiredAssemblies = @( (Join-Path -Path $PSScriptRoot -ChildPath 'bin\Carbon.dll') )
 
     # Script files (.ps1) that are run in the caller's environment prior to importing this module
     ScriptsToProcess = @( )
