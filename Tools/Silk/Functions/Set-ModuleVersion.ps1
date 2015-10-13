@@ -24,6 +24,10 @@ function Set-ModuleVersion
         # Path to a release notes file.
         $ReleaseNotesPath,
 
+        [string]
+        # Path to the module's Nuspec file.
+        $NuspecPath,
+
         [Version]
         # The version to build. If not provided, pulled from the module's manifest.
         $Version,
@@ -41,13 +45,10 @@ function Set-ModuleVersion
 
     if( -not $Version )
     {
+        $Version = Test-ModuleManifest -Path $ManifestPath | Select-Object -ExpandProperty 'Version'
         if( -not $Version )
         {
-            $Version = Test-ModuleManifest -Path $ManifestPath | Select-Object -ExpandProperty 'Version'
-            if( -not $Version )
-            {
-                return
-            }
+            return
         }
     }
 
@@ -63,10 +64,16 @@ function Set-ModuleVersion
         return
     }
 
+    $manifest = Test-ModuleManifest -Path $ManifestPath
+    if( -not $manifest )
+    {
+        return
+    }
+
     $moduleVersionRegex = 'ModuleVersion\s*=\s*(''|")([^''"])+(''|")' 
-    $manifest = Get-Content -Raw -Path $manifestPath
-    $manifest = $manifest -replace $moduleVersionRegex,('ModuleVersion = ''{0}''' -f $version)
-    $manifest | Set-Content -Path $manifestPath
+    $rawManifest = Get-Content -Raw -Path $manifestPath
+    $rawManifest = $rawManifest -replace $moduleVersionRegex,('ModuleVersion = ''{0}''' -f $version)
+    $rawManifest | Set-Content -Path $manifestPath
 
     if( $AssemblyInfoPath )
     {
@@ -88,6 +95,10 @@ function Set-ModuleVersion
                                             }
                                         }
                                         return $_ -replace $assemblyVersionRegex,('Assembly$1Version("{0}{1}")' -f $Version,$infoVersion)
+                                    }
+                                    elseif( $_ -match 'AssemblyCopyright' )
+                                    {
+                                        return $_ -replace '\("[^"]*"\)',('("{0}")' -f $manifest.Copyright)
                                     }
                                     $_
                                 }
@@ -123,4 +134,14 @@ function Set-ModuleVersion
         & $msbuildExe /target:"clean;build" $SolutionPath /v:m /nologo
     }
 
+    if( $NuspecPath )
+    {
+        $nuspec = [xml](Get-Content -Raw -Path $nuspecPath)
+        if( $nuspec.package.metadata.version -ne $version.ToString() )
+        {
+            $nuGetVersion = $version -replace '-([A-Z0-9]+)[^A-Z0-9]*(\d+)$','-$1$2'
+            $nuspec.package.metadata.version = $nugetVersion
+            $nuspec.Save( $nuspecPath )
+        }
+    }
 }
