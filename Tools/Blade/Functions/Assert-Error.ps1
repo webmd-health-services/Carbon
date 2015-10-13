@@ -90,7 +90,7 @@ function Assert-Error
     Set-StrictMode -Version 'Latest'
     
     Assert-GreaterThan $Global:Error.Count 0 'Expected there to be errors, but there aren''t any.'
-    if( $Count )
+    if( $PSBoundParameters.ContainsKey('Count') )
     {
         Assert-Equal $Count $Global:Error.Count ('Expected ''{0}'' errors, but found ''{1}''' -f $Count,$Global:Error.Count)
     }

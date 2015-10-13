@@ -20,7 +20,7 @@
     ModuleToProcess = 'Blade.psm1'
 
     # Version number of this module.
-    ModuleVersion = '0.11.1'
+    ModuleVersion = '0.15.0'
 
     # ID used to uniquely identify this module
     GUID = '075d9444-c01b-48c3-889a-0b3490716fa2'
@@ -35,7 +35,9 @@
     Copyright = '(c) 2011 - 2013 Aaron Jensen. All rights reserved.'
 
     # Description of the functionality provided by this module
-    Description = 'PowerShell Testing Module'
+    Description = @'
+Blade is a tool and module used to test your PowerShell code. It is inspired by NUnit.
+'@
 
     # Minimum version of the Windows PowerShell engine required by this module
     PowerShellVersion = ''
@@ -59,7 +61,7 @@
     RequiredModules = @()
 
     # Assemblies that must be loaded prior to importing this module
-    RequiredAssemblies = @( (Join-Path -Path $PSScriptRoot -ChildPath 'Blade.dll') )
+    RequiredAssemblies = @( (Join-Path -Path $PSScriptRoot -ChildPath 'bin\Blade.dll') )
 
     # Script files (.ps1) that are run in the caller's environment prior to importing this module
     ScriptsToProcess = @()
@@ -68,7 +70,7 @@
     TypesToProcess = @( )
 
     # Format files (.ps1xml) to be loaded when importing this module
-    FormatsToProcess = @( 'Blade.format.ps1xml' )
+    FormatsToProcess = @( 'Formats\Blade.RunResult.format.ps1xml', 'Formats\Blade.TestResult.format.ps1xml' )
 
     # Modules to import as nested modules of the module specified in ModuleToProcess
     NestedModules = @()
@@ -95,4 +97,8 @@
     PrivateData = ''
 
 }
+
+
+
+
 

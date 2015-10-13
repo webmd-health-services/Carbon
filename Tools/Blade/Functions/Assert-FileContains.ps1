@@ -12,22 +12,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Assert-FileDoesNotContain
+function Assert-FileContains
 {
     <#
     .SYNOPSIS
-    Asserts that a file doesn not contain a string.
+    Asserts that a file contains another string.
 
     .DESCRIPTION
-    `Assert-FileDoesNotContain` searches a file for a string and fails if that string isf ound.
+    Performs a case-sensitive check for the string within the file.  
 
     .EXAMPLE
-    Assert-FileDoesNotContain 'C:\Windows\System32\drivers\etc\hosts' '127.0.0.1'
+    Assert-FileContains 'C:\Windows\System32\drivers\etc\hosts' '127.0.0.1'
 
-    Demonstrates how to assert that a file does not contain a string.
+    Demonstrates how to assert that a file contains a string.
 
     .EXAMPLE
-    Assert-FileDoesNotContain 'C:\Windows\System32\drivers\etc\hosts' 'doubclick.net' 'Ad-blocking hosts entry not added.'
+    Assert-FileContains 'C:\Windows\System32\drivers\etc\hosts' 'doubclick.net' 'Ad-blocking hosts entry not added.
 
     Shows how to use the `Message` parameter to describe why the assertion might fail.
     #>
@@ -40,7 +40,7 @@ function Assert-FileDoesNotContain
 
         [Parameter(Position=1)]
         [string]
-        # The string to not look for.
+        # The string to look for. Case-sensitive.
         $Needle,
 
         [Parameter(Position=2)]
@@ -50,13 +50,19 @@ function Assert-FileDoesNotContain
 
     Set-StrictMode -Version 'Latest'
 
-    Write-Verbose "Checking that '$Path' does not contain expected content."
+    Write-Debug -Message "Checking if '$Path' contains expected content."
     $actualContents = Get-Content -Path $Path -Raw
-    Write-Verbose "Actual:`n$actualContents"
-    Write-Verbose "Expected:`n$Needle"
-    if( $actualContents -match ([Text.RegularExpressions.Regex]::Escape($Needle)) )
+    if( $actualContents -eq $null )
     {
-        Fail ("File '{0}' contains '{1}'. {2}" -f $Path,$Needle,$Message)
+        Fail ('File ''{0}'' is empty and does not contain ''{1}''. {2}' -f $Path,$Needle,$Message)
+        return
+    }
+
+    Write-Debug -Message "Actual:`n$actualContents"
+    Write-Debug -Message "Expected:`n$Needle"
+    if( $actualContents -notmatch ([Text.RegularExpressions.Regex]::Escape($Needle)) )
+    {
+        Fail ("File '{0}' does not contain '{1}'. {2}" -f $Path,$Needle,$Message)
     }
 }
 

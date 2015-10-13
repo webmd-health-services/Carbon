@@ -55,7 +55,7 @@ function Test-NodeExists
     $nsManager = New-Object 'System.Xml.XmlNamespaceManager' $xml.NameTable
     if( $xml.DocumentElement.NamespaceURI -ne '' -and $xml.DocumentElement.Prefix -eq '' )
     {
-        Write-Verbose "XML document has a default namespace, setting prefix to '$defaultNamespacePrefix'."
+        Write-Debug -Message "XML document has a default namespace, setting prefix to '$defaultNamespacePrefix'."
         $nsManager.AddNamespace($defaultNamespacePrefix, $xml.DocumentElement.NamespaceURI)
     }
     

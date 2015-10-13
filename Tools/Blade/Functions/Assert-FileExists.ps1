@@ -46,7 +46,7 @@ function Assert-FileExists
 
     Set-StrictMode -Version 'Latest'
 
-    Write-Verbose "Testing if file '$Path' exists."
+    Write-Debug -Message "Testing if file '$Path' exists."
     if( -not (Test-Path $Path -PathType Leaf) )
     {
         Fail "File $Path does not exist. $Message"

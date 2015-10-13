@@ -12,10 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-$doNotImport = @{ 'Import-Blade' = $true }
-
-Get-Item -Path (Join-Path $PSScriptRoot '*-*.ps1') | 
-    Where-Object { -not $doNotImport.ContainsKey( $_.BaseName ) } |
+Get-Item -Path (Join-Path -Path $PSScriptRoot -ChildPath 'Functions\*.ps1') | 
     ForEach-Object { . $_.FullName }
 
 $privateFunctions = @{ 

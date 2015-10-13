@@ -1,22 +1,53 @@
 <#
 .SYNOPSIS
-Runs Blade tests in a file or set of directories.
+Runs Blade tests in a file or directory.
 
 .DESCRIPTION
-Blade is a simple testing framework, inspired by NUnit.  It reads in all the files under a given path (or paths), and opens each file that matches the `Test-*` pattern.  It will then execute the tests in that file.  Blade tests are functions that that use the `Test` verb in their name, i.e. whose name match the `Test-*` pattern.
+The `blade.ps1` script, located in the root of the Blade module, is the script used to execute Blade tests. Given a path, it runs tests in any PowerShell script that begins with `Test-` (i.e. that matches the wildcard pattern `Test-*.ps1`. Tests are functions that that use the `Test` verb (i.e. whose name match the `Test-*` wildcard pattern).
 
-When executing the tests in a file, Blade does the following:
+When executing tests, `blade.ps1` does the following:
 
- * Calls the `Start-TestFixture` function (if one is defined)
- * Executes each test.  For each test, Blade calls the `Start-Test` function (if defined), followed by the test, followed by the `Stop-Test` function (if defined).
- * Calls the `Stop-TestFixture` function (if one is defined)
+ * Calls the `Start-TestFixture` function (if defined)
+ * For each test, calls the `Start-Test` function (if defined), executes the test, then calls the `Stop-Test` (if defined).
+ * Calls the `Stop-TestFixture` function (if defined)
 
-Blade will return `Blade.TestResult` objects for all failed tests and a final `Blade.RunResult` object summarizing the results.  Use the `PassThru` switch to also get `Blade.TestResult` objects for passing tests.
+By default, Blade returns `Blade.TestResult` objects for each failed test. 
 
-You can access the `Blade.RunResult` object from the last test run via the global `LASTBLADERESULT` variable.
+After running all tests, `blade.ps1` will write an error if any tests failed, then write a summary of the test run. The results of the last test run is available as a `Blade.RunResult` object in a global `$LastBladeResult` variable, e.g.
+
+    > .\Blade\blade.ps1 .\Test
+    
+       Count Failures   Errors  Ignored Duration        
+       ----- --------   ------  ------- --------        
+          47        0        0        0 00:00:11.6870000
+    
+
+
+    > $LastBladeResult | Format-List
+    
+    
+    Count        : 47
+    Name         : 
+    Passed       : {Test-ShouldDetectNoErrors, Test-ShouldThrowErrorIfNeedleMissingFromFile, Test-ShouldFailIfFileZeroBytes, Test-ShouldFailIfFileEmpty...}
+    Failures     : {}
+    Errors       : {}
+    IgnoredCount : 0
+    Duration     : 00:00:11.6870000
+    
+    
+    
+If you want Blade to return objects for each test, regarless if it failed or not, use the `-PassThru` switch.
+
+You can run specific test(s) by passing names to the `Test` parameter. Do not include the `Test-` verb/prefix.
+
+`blade.ps1` can also save test results as an NUnit XML report, so you can integrate test results into build servers and other reporting tools. Use the `XmlLogPath` parameter to specify the path to a log file. The file, and its parent directories, will be created if it doesn't exist.
+
 
 .LINK
 about_Blade
+
+.LINK
+about_Blade_Objects
 
 .EXAMPLE
 .\blade Test-MyScript.ps1
@@ -37,21 +68,7 @@ Will run all tests in the files which match the `Test-*.ps1` wildcard in the .\M
 blade .\MyModule -Recurse
 
 Will run all test in files which match the `Test-*.ps1` wildcard under the .\MyModule directory and its sub-directories.
-
 #>
-# Copyright 2012 - 2014 Aaron Jensen
-# 
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-# 
-#     http://www.apache.org/licenses/LICENSE-2.0
-# 
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
 [CmdletBinding()]
 param(
     [Parameter(Mandatory=$true,Position=0)]
@@ -64,11 +81,11 @@ param(
     $Name,
 
     [string[]]
-    # The individual test in the script to run.  Defaults to all tests.
+    # The individual test in the script to run. Defaults to all tests. Do not include the `Test-` verb/prefix.
     $Test,
 
     [string]
-    # Path to the file where XML results should be saved.
+    # Path to the file where XML results should be saved. This file, and its parent directories, will be created if they don't exist.
     $XmlLogPath,
     
     [Switch]
@@ -87,7 +104,7 @@ Set-StrictMode -Version 'Latest'
 
 function Get-FunctionsInFile($testScript)
 {
-    Write-Verbose "Loading test script '$testScript'."
+    Write-Debug -Message "Loading test script '$testScript'."
     $testScriptContent = Get-Content "$testScript"
     if( -not $testScriptContent )
     {
@@ -102,7 +119,7 @@ function Get-FunctionsInFile($testScript)
         return
     }
     
-    Write-Verbose "Found $($tokens.Count) tokens in '$testScript'."
+    Write-Debug -Message "Found $($tokens.Count) tokens in '$testScript'."
     
     $functions = New-Object System.Collections.ArrayList
     $atFunction = $false
@@ -116,7 +133,7 @@ function Get-FunctionsInFile($testScript)
         
         if( $atFunction -and $token.Type -eq 'CommandArgument' -and $token.Content -ne '' )
         {
-            Write-Verbose "Found function '$($token.Content).'"
+            Write-Debug -Message "Found function '$($token.Content).'"
             [void] $functions.Add( $token.Content )
             $atFunction = $false
         }
@@ -146,6 +163,7 @@ function Invoke-Test
 
     $Error.Clear()
 
+    $testPassed = $false
     try
     {
         if( Test-path function:Start-Test )
@@ -154,6 +172,7 @@ function Invoke-Test
         }
         elseif( Test-Path function:SetUp )
         {
+            Write-Warning ('The SetUp function is obsolete and will be removed in a future version of Blade. Please use Start-Test instead.')
             . SetUp | ForEach-Object { $testInfo.Output.Add( $_ ) }
         }
         
@@ -161,8 +180,7 @@ function Invoke-Test
         {
             . $function | ForEach-Object { $testInfo.Output.Add( $_ ) }
         }
-
-        $testInfo.Completed()
+        $testPassed = $true
     }
     catch [Blade.AssertionException]
     {
@@ -175,23 +193,46 @@ function Invoke-Test
     }
     finally
     {
-        $testInfo
+        $tearDownResult = New-Object 'Blade.TestResult' $fixture,$function
+        $tearDownFailed = $false
         try
         {
-            $tearDownResult = New-Object 'Blade.TestResult' $fixture,'Stop-Test'
             if( Test-Path function:Stop-Test )
             {
                 . Stop-Test | ForEach-Object { $tearDownResult.Output.Add( $_ ) }
             }
             elseif( Test-Path -Path function:TearDown )
             {
+                Write-Warning ('The TearDown function is obsolete and will be removed in a future version of Blade. Please use Start-Test instead.')
                 . TearDown | ForEach-Object { $tearDownResult.Output.Add( $_ ) }
             }
+            $tearDownResult.Completed()
         }
         catch
         {
             $tearDownResult.Completed( $_ )
-            $tearDownResult
+            $tearDownFailed = $true
+        }
+        finally
+        {
+            if( $testPassed )
+            {
+                $testInfo.Completed()
+            }
+
+            $flag = '! '
+            $result = 'FAILED'
+            if( $testInfo.Passed )
+            {
+                $flag = '  '
+                $result = 'Passed'
+            }
+            Write-Verbose -Message ('  {0}{1} in {2:mm\:ss\.fff}  [{3}]' -f $flag,$result,$testInfo.Duration,$function)
+            $testInfo
+            if( $tearDownFailed )
+            {
+                $tearDownResult
+            }
         }
 
         $Error.Clear()
@@ -217,6 +258,7 @@ $TestScript = $null
 $TestDir = $null
 
 $results = $null
+
 $testScripts | 
     ForEach-Object {
         $testCase = $_
@@ -252,12 +294,15 @@ $testScripts |
             Where-Object { Test-Path -Path $_ } |
             Remove-Item
         
+        Write-Verbose -Message ('[{0}]' -f $testCase.Name)
+
         . $testCase.FullName
+
         try
         {
             if( Test-Path -Path 'function:Start-TestFixture' )
             {
-                . Start-TestFixture | Write-Verbose
+                . Start-TestFixture | Out-String | Write-Debug
             }
 
             foreach( $function in $functions )
@@ -268,14 +313,14 @@ $testScripts |
                     continue
                 }
                 
-                Invoke-Test $testModuleName $function
+                Invoke-Test $testModuleName $function 
             }
 
             if( Test-Path -Path function:Stop-TestFixture )
             {
                 try
                 {
-                    . Stop-TestFixture | Write-Verbose
+                    . Stop-TestFixture | Out-String | Write-Debug
                 }
                 catch
                 {
@@ -310,13 +355,4 @@ if( $XmlLogPath )
     $LastBladeResult | Export-RunResultXml -FilePath $XmlLogPath
 }
 
-if( $PassThru )
-{
-    $LastBladeResult
-}
-else
-{
-    $LastBladeResult | Format-Table | Out-Host
-}
-
-
+$LastBladeResult | Format-Table | Out-Host

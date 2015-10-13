@@ -51,7 +51,9 @@ function Export-RunResultXml
 <test-results name="" total="" errors="" failures="" not-run="0" inconclusive="0" ignored="" skipped="0" invalid="0" date="{0:yyyy-MM-dd}" time="{0:HH:mm:ss}">
   <environment blade-version="{1}" clr-version="{2}" powershell-version="{3}" os-version="{4}" platform="{5}" cwd="{6}" machine-name="{7}" user="{8}" user-domain="{9}" />
   <culture-info current-culture="{10}" current-uiculture="{11}" />
-  <test-suite name="" type="BladeFixture" executed="True" asserts="0" result="" success="" time="" />
+  <test-suite name="" type="BladeFixture" executed="True" asserts="0" result="" success="" time="">
+    <results />
+  </test-suite>
 </test-results>
 '@ -f $now,$bladeVersion,$clrVersion,$psVersion,$osVersion,$platform,$cwd,$env:COMPUTERNAME,$env:USERNAME,$env:USERDOMAIN,$cultureName,$uiCultureName)
 
@@ -69,6 +71,8 @@ function Export-RunResultXml
         $rootTestSuite = $testResults.'test-suite'
         $rootTestSuite.SetAttribute( 'name', $RunResult.Name )
 
+        $rootResults = $rootTestSuite.ChildNodes[0]
+
         $totalTime = [TimeSpan]::Zero
         $allResult = 'Success'
         $allSuccess = $true
@@ -81,7 +85,7 @@ function Export-RunResultXml
             Group-Object -Property 'FixtureName' |
             ForEach-Object {
                 $testSuite = $resultXml.CreateElement('test-suite')
-                [void]$rootTestSuite.AppendChild( $testSuite )
+                [void]$rootResults.AppendChild( $testSuite )
 
                 $testSuite.SetAttribute( 'type', 'BladeFixture' )
                 $testSuite.SetAttribute( 'name', $_.Name )

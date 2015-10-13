@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+   Copyright 2012 - 2014 Aaron Jensen
+ 
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+ 
+       http://www.apache.org/licenses/LICENSE-2.0
+ 
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License. 
+-->
+<Configuration>
+    <ViewDefinitions>
+        <View>
+            <Name>Blade.TestResult</Name>
+            <ViewSelectedBy>
+                <TypeName>Blade.TestResult</TypeName>
+            </ViewSelectedBy>
+             <ListControl>
+                <ListEntries>
+                    <ListEntry>
+                        <ListItems>
+                            <ListItem>
+                                <PropertyName>FixtureName</PropertyName>
+                            </ListItem>
+                            <ListItem>
+                                <PropertyName>Name</PropertyName>
+                            </ListItem>
+                            <ListItem>
+                                <Label>Failure</Label>
+                                <ScriptBlock>
+                                    if( $_.Failure )
+                                    {
+                                        $stackTrace = $_.Failure.PSStackTrace -join ("{0}  at " -f [Environment]::NewLine)
+                                        '{0}{1}  at {2}' -f $_.Failure.Message,[Environment]::NewLine,$stackTrace
+                                    }
+                                </ScriptBlock>
+                            </ListItem>
+                            <ListItem>
+                                <Label>Error</Label>
+                                <ScriptBlock>
+                                    if( $_.Error )
+                                    {
+                                        $ex = $_.Error.Exception
+                                        while( $ex.InnerException )
+                                        {
+                                            $ex = $ex.InnerException
+                                        }
+                                        $stackTrace = $_.Error.ScriptStackTrace -split ([Environment]::NewLine)
+                                        $stackTrace = $stackTrace -join ("{0}  " -f [Environment]::NewLine)
+                                        return '{0}: {1}{2}  at {3}' -f $ex.GetType().FullName,$ex.Message,[Environment]::NewLine,$stackTrace
+                                    }
+                                </ScriptBlock>
+                            </ListItem>
+                            <ListItem>
+                                <PropertyName>Duration</PropertyName>
+                            </ListItem>
+                        </ListItems>
+                    </ListEntry>
+                </ListEntries>
+            </ListControl>
+	    </View>
+        <View>
+            <Name>Blade.TestResult</Name>
+            <ViewSelectedBy>
+                <TypeName>Blade.TestResult</TypeName>
+            </ViewSelectedBy>
+            <TableControl>
+		        <TableHeaders>
+			        <TableColumnHeader>
+                        <Label>Result</Label>
+				        <Alignment>Right</Alignment>
+                        <Width>6</Width>
+			        </TableColumnHeader>
+			        <TableColumnHeader>
+				        <Label>FixtureName</Label>
+			        </TableColumnHeader>
+			        <TableColumnHeader>
+                        <Label>Name</Label>
+			        </TableColumnHeader>
+		        </TableHeaders>
+		        <TableRowEntries>
+			        <TableRowEntry>
+				        <TableColumnItems>
+					        <TableColumnItem>
+						        <ScriptBlock>
+                                    if( $_.Failure )
+                                    {
+                                        'Failed'
+                                    }
+                                    elseif( $_.Error )
+                                    {
+                                        'Error'
+                                    }
+                                    else
+                                    {
+                                        'Passed'
+                                    }
+                                </ScriptBlock>
+					        </TableColumnItem>
+					        <TableColumnItem>
+						        <PropertyName>FixtureName</PropertyName>
+					        </TableColumnItem>
+					        <TableColumnItem>
+						        <PropertyName>Name</PropertyName>
+					        </TableColumnItem>
+				        </TableColumnItems>
+				    </TableRowEntry>
+			    </TableRowEntries>
+            </TableControl>
+        </View>
+    </ViewDefinitions>
+</Configuration>

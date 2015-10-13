@@ -71,54 +71,5 @@
 			    </TableRowEntries>
 		    </TableControl>
 	    </View>
-        <View>
-            <Name>Blade.TestResult</Name>
-            <ViewSelectedBy>
-                <TypeName>Blade.TestResult</TypeName>
-            </ViewSelectedBy>
-             <ListControl>
-                <ListEntries>
-                    <ListEntry>
-                        <ListItems>
-                            <ListItem>
-                                <PropertyName>FixtureName</PropertyName>
-                            </ListItem>
-                            <ListItem>
-                                <PropertyName>Name</PropertyName>
-                            </ListItem>
-                            <ListItem>
-                                <Label>Failure</Label>
-                                <ScriptBlock>
-                                    if( $_.Failure )
-                                    {
-                                        $stackTrace = $_.Failure.PSStackTrace -join ("{0}  at " -f [Environment]::NewLine)
-                                        '{0}{1}  at {2}' -f $_.Failure.Message,[Environment]::NewLine,$stackTrace
-                                    }
-                                </ScriptBlock>
-                            </ListItem>
-                            <ListItem>
-                                <Label>Error</Label>
-                                <ScriptBlock>
-                                    if( $_.Error )
-                                    {
-                                        $ex = $_.Error.Exception
-                                        while( $ex.InnerException )
-                                        {
-                                            $ex = $ex.InnerException
-                                        }
-                                        $stackTrace = $_.Error.ScriptStackTrace -split ([Environment]::NewLine)
-                                        $stackTrace = $stackTrace -join ("{0}  " -f [Environment]::NewLine)
-                                        return '{0}: {1}{2}  at {3}' -f $ex.GetType().FullName,$ex.Message,[Environment]::NewLine,$stackTrace
-                                    }
-                                </ScriptBlock>
-                            </ListItem>
-                            <ListItem>
-                                <PropertyName>Duration</PropertyName>
-                            </ListItem>
-                        </ListItems>
-                    </ListEntry>
-                </ListEntries>
-            </ListControl>
-        </View>
     </ViewDefinitions>
 </Configuration>

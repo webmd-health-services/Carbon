@@ -16,20 +16,20 @@ function Assert-DoesNotContain
 {
     <#
     .SYNOPSIS
-    Asserts that a collection doesn't contain an object/item.
+    OBSOLETE. Use `Assert-That -DoesNotContain` instead.
 
     .DESCRIPTION
-    Use's PowerShell's `-contains` operator to check that a collection is missing an object/item.
+    OBSOLETE. Use `Assert-That -DoesNotContain` instead.
 
     .EXAMPLE
-    Assert-DoesNotContains @( 1, 2, 3 ) 4
+    Assert-That @( 1, 2, 3 ) -DoesNotContain 4
 
-    Demonstrates how to assert a collection doesn't contain an item.
+    Demonstrates that you should use `Assert-That` instead.
 
     .EXAMPLE
-    Assert-DoesNotContain @( 1, 2, 3 ) 3 'Three is the loneliest number.'
+    Assert-That @( 1, 2, 3 ) -DoesNotContain 3 'Three is the loneliest number.'
 
-    Demonstrates how to show your own message if the assertion fails.
+    Demonstrates that you should use `Assert-That` instead.
     #>
     [CmdletBinding()]
     param(
@@ -50,6 +50,8 @@ function Assert-DoesNotContain
     )
 
     Set-StrictMode -Version 'Latest'
+
+    Write-Warning ('Assert-Contains is obsolete and will be removed from a future version of Blade. Please use `Assert-That -Contains` instead.')
 
     if( $Haystack -contains $Needle )
     {

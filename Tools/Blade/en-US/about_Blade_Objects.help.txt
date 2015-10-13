@@ -1,0 +1,53 @@
+TOPIC
+    about_Blade_Objects
+    
+SHORT DESCRIPTION
+    Explains the Blade .NET objects.
+
+LONG DESCRIPTION
+    ## Blade.RunResult
+    
+    This is the object returned by `blade.ps1` when it finishes running all the tests. It 
+    is also available via a special global variable Blade creates after each test run 
+    called `$LastBladeResult`. By default, it is displayed like this: 
+
+           Count Failures   Errors  Ignored Duration        
+           ----- --------   ------  ------- --------        
+               1        0        1        0 00:00:01.3621362
+
+    It has the following properties:
+
+     * `[int] Count`: the number of tests that were run.
+     * `[TimeSpan] Duration`: the amount of time it took to run all the tests. This is 
+       actually the sum of all the durations of each test, so this maybe less than the wall
+       time Blade took to run.
+     * `[Blade.TestResult[]] Errors`: all the tests that encountered terminating errors. 
+       Non-terminating errors don't cause a test to fail.
+     * `[Blade.TestResult[]] Failures`: all the tests that failed (i.e. whose assertions 
+       failed).
+     * `[int] IgnoredCount`: the number of tests that were ignored/not run.
+     * `[Blade.TestResult[]] Passed`: all the tests that passed.
+
+    ## Blade.TestResult
+
+    A `Blade.TestResult` object represents an individual test that Blade ran. You usually 
+    get these objects by passing the `-PassThru` switch to `blade.ps1`, or from the 
+    `Errors`, `Failures`, or `Passed` properties on a `Blade.RunResult` objects (returned 
+    by `blade.ps1` when it finishes running tests). It has the following properties:
+
+     * `[TimeSpan] Duration`: the amount of time the test took.
+     * `System.Management.Automation.ErrorRecord Error`: the terminating error thrown by 
+       the test, if any,
+     * `Blade.AssertionException Failure`: the assertion failure thrown by the test, if 
+       any.
+     * `[string] FixtureName`: the name of the script file the test was in.
+     * `[string] Name`: the name of the test's function.
+     * `[object[]] Output`: any output returned by the test function.
+     * `[bool] Passed`: `$true` if the test passed; $false otherwise. A test fails when it
+       throws a terminating exception or one of Blade's assert functions fails (e.g. throws
+       a `Blade.AssertionException`.
+     * `[DateTime] StartedAt`: the date/time the test started.
+
+
+SEE ALSO
+    about_Blade

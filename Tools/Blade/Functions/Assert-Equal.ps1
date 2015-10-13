@@ -60,7 +60,7 @@ function Assert-Equal
 
     Set-StrictMode -Version 'Latest'
 
-    Write-Verbose "Is '$Expected' -eq '$Actual'?"
+    Write-Debug -Message "Is '$Expected' -eq '$Actual'?"
     $equal = $Expected -eq $Actual
     if( $CaseSensitive )
     {

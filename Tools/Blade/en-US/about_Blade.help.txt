@@ -1,0 +1,125 @@
+TOPIC
+    about_Blade
+    
+SHORT DESCRIPTION
+    Blade is a testing tool for PowerShell inspired by [NUnit](http://nunit.org). 
+
+LONG DESCRIPTION
+    Test fixtures are PowerShell scripts that begin with `Test-`.  A test is any 
+    function in the test fixture script that begins with the Test verb.
+        
+    To get started, create a test fixture file:
+
+        > New-Item -ItemType File Test-BladeDemo.ps1
+
+    Now, open up your new test fixture, and start adding tests.
+
+        function Test-ShouldRunThisTest
+        {
+            Assert-True $true
+        }
+
+    Save your test fixture, then execute it with `blade.ps1` and you should see output 
+    similar to this:
+
+        > blade.ps1 Test-BladeDemo.ps1
+
+           Count Failures   Errors  Ignored Duration
+           ----- --------   ------  ------- --------
+               1        0        0        0 00:00:00
+    
+    Test details are available after your tests finish in a global `$LastBladeResult` 
+    variable. This is a `Blade.RunResult` object. See `about_Blade_Objects` for more 
+    information.
+
+        > $LastBladeResult
+        
+           Count Failures   Errors  Ignored Duration
+           ----- --------   ------  ------- --------
+               1        0        0        0 00:00:00
+        
+
+    Pretty easy. If all your tests have common setup/teardown functionality, create 
+    `Start-Test` and `Stop-Test` functions, which will get run once before and after 
+    each test, respectively:
+
+        $tempDir = $null
+        
+        function Start-Test
+        {
+            $tempDir = New-TempDir
+        }
+        
+        function Stop-Test
+        {
+            Remove-Item -Path $tempDir -Recurse
+        }
+        
+        function Test-ShouldCreateTempDir
+        {
+            Assert-DirectoryExists $tempDir
+        }
+
+    Finally, if you have setup/teardown that needs to run once before/after all tests, 
+    create `Start-TestFixture` and `Stop-TestFixture` functions, which get run before 
+    any tests run and aftera ll tests run, respectively:
+
+        $tempDir = $null
+
+        function Start-TestFixture
+        {
+            # Import the PowerShell module we're testing.
+            & (Join-Path -Path $PSScriptRoot -ChildPath '..\CoolestModuleEver\Import-CoolestModuleEver.ps1' -Resolve)
+        }
+
+        function Start-Test
+        {
+            $tempDir = New-TempDir
+        }
+
+        function Stop-Test
+        {
+            Remove-Item -Path $tempDir -Recurse
+        }
+
+        function Stop-TestFixture
+        {
+            Remove-Module 'CoolestModuleEver'
+        }
+
+        function Test-ShouldCreateTempDir
+        {
+            Assert-DirectoryExists $tempDir
+        }
+        
+    ## Error Handling
+    
+    A test fails if one of its assertions fails (an assertion fails when it throws a 
+    `Blade.AssertionException` exception) or if it encounters a terminating error. In 
+    all other cases, a test passes. 
+
+    If a test, or the code you're testing, writes an error with `Write-Error`, your 
+    test will still pass. If you want to fail a test if there is an error, use the 
+    `Assert-NoError` assertion. Blade clears all errors from `$Error` before each test.
+
+
+SYSTEM REQUIREMENTS
+    PowerShell 3
+
+
+INSTALLATION
+    1. [Download the ZIP file from Bitbucket.](https://bitbucket.org/splatteredbits/blade/downloads)
+    2. Unblock the zip file (right-click the .zip file, choose Properties, click 
+       "Unblock", then click "OK").
+    3. Unzip the Blade module anywhere on your file system. 
+    
+    You can now use Blade: 
+    
+        PS> .\Blade\blade.ps1
+    
+    
+SEE ALSO
+    http://get-blade.org
+    blade.ps1
+    about_Blade_Assertions
+    about_Blade_Objects

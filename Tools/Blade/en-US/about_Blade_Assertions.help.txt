@@ -1,0 +1,61 @@
+TOPIC
+    about_Blade_Assertions
+    
+SHORT DESCRIPTION
+    A summary of all the assertions included with Blade.
+    
+LONG DESCRIPTION
+
+    Blade ships with the following assertions you can use in your tests:
+
+    ## Assert-That
+
+    The main Blade assertion is `Assert-That`. `Assert-That` makes your assertions 
+    read like sentences, e.g.
+
+        Assert-That 'fubar' -Contains 'snafu'
+        
+    `Assert-That` can assert that:
+
+     * A script block throws an exception (use the `-Throws` parameter)
+     * A script block doesn't throw an exception (use the `-DoesNotThrowException` 
+       parameter)
+     * An array, hashtable, collection, or string contains a value (use the 
+       `-Contains` parameter)
+     * An array, hashtable, collection, or string doesn't contain a value (use the 
+       `-DoesNotContain` parameter)
+
+    ## Other Assertions
+
+     * `Assert-CEqual`: asserts that two strings are equal. Case sensitive.
+     * `Assert-ContainsLike`: asserts that a list of items contains an item that 
+       matches a given wildcard pattern.
+     * `Assert-ContainsNotLike`: asserts that a list of items *doesn't* contain an 
+       item that matches a wildcard pattern.
+     * `Assert-DirectoryDoesNotExist`: asserts that a directory doesn't exist.
+     * `Assert-DirectoryExists`: asserts that a directory exists.
+     * `Assert-Empty`: asserts that an array, hashtable, collection, or string is empty.
+     * `Assert-Equal`: asserts that two objects are equal.
+     * `Assert-Error`: asserts that there is an error in the `$Error` variable.
+     * `Assert-False`: asserts that a value is `$false`.
+     * `Assert-FileContains`: asserts that a file contains a string.
+     * `Assert-FileDoesNotContain`: asserts that a file doesn't contain a string.
+     * `Assert-FileDoesNotExist`: asserts that a file doesn't exist.
+     * `Assert-FileExists`: asserts that a file exists.
+     * `Assert-GreaterThan`: asserts that a number is greater than another number.
+     * `Assert-Is`: asserts that an object is of a given type.
+     * `Assert-LastProcessFailed`: asserts that `$LastExitCode` is non-zero.
+     * `Assert-LastProcessSucceeded`: asserts that `$LastExitCode` is zero.
+     * `Assert-LessThan`: asserts that a number is less than another number.
+     * `Assert-Like`: asserts that a string matches a wildcard pattern.
+     * `Assert-Match`: asserts that a string matches a regular expression.
+     * `Assert-NodeDoesNotExist`: asserts that an XML document does not contain a node.
+     * `Assert-NodeExists`: asserts that an XML document contains a node.
+     * `Assert-NoError`: asserts there are no errors in `$Error`.
+     * `Assert-NotEmpty`: asserts that an array, hashtable, collection, or string 
+       isn't empty.
+ * `Assert-NotEqual`: asserts that two objects aren't equal.
+ * `Assert-NotNull`: asserts that an object isn't null.
+ * `Assert-Null`: asserts that an object is null.
+ * `Assert-True`: asserts that a value is `$true`.
+
