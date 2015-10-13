@@ -35,83 +35,37 @@ param(
 #Requires -Version 4
 Set-StrictMode -Version Latest
 
-if( $Version )
+& (Join-Path -Path $PSScriptRoot -ChildPath 'Tools\Silk\Import-Silk.ps1' -Resolve)
+
+$moduleRoot = Join-Path -Path $PSScriptRoot -ChildPath 'Carbon' -Resolve
+if( -not $Version )
 {
-    if( $Version.Build -lt 0 )
+    $Version = Test-ModuleManifest -Path (Join-Path -Path $moduleRoot -ChildPath 'Carbon.psd1') | Select-Object -ExpandProperty 'Version'
+    if( -not $Version )
     {
-        Write-Error ('Version number must have a build number, i.e. it must have three parts.' -f $Version)
         return
     }
+}
 
-    if( $Version.Revision -ge 0 )
-    {
-        Write-Error ('Version number must not have a revision number, i.e. it must only have three parts.' -f $Version)
-        return
-    }
-
-    $releaseNotesFileName = 'RELEASE NOTES.txt'
-    $releaseNotesPath = Join-Path $PSScriptRoot $releaseNotesFileName -Resolve
-    $newVersionHeader = "# {0}" -f $Version
-    $updatedVersion = $false
-    $releaseNotes = Get-Content -Path $releaseNotesPath |
-                        ForEach-Object {
-                            if( -not $updatedVersion -and $_ -match '^# (Next|\d+\.\d+\.\d+)$' )
-                            {
-                                $updatedVersion = $true
-                                return $newVersionHeader
-                            }
-                            return $_
+$releaseNotesFileName = 'RELEASE NOTES.txt'
+$releaseNotesPath = Join-Path -Path $PSScriptRoot -ChildPath $releaseNotesFileName -Resolve
+$newVersionHeader = "# {0}" -f $Version
+$updatedVersion = $false
+$releaseNotes = Get-Content -Path $releaseNotesPath |
+                    ForEach-Object {
+                        if( -not $updatedVersion -and $_ -match '^#\s+' )
+                        {
+                            $updatedVersion = $true
+                            return $newVersionHeader
                         }
-    $releaseNotes | Set-Content -Path $releaseNotesPath
 
-    $manifestPath = Join-Path $PSScriptRoot Carbon\Carbon.psd1 -Resolve
-    $manifest = Get-Content $manifestPath
-    $manifest |
-        ForEach-Object {
-            if( $_ -like 'ModuleVersion = *' )
-            {
-                'ModuleVersion = ''{0}''' -f $Version.ToString()
-            }
-            else
-            {
-                $_
-            }
-        } |
-        Set-Content -Path $manifestPath
+                        return $_
+                    }
+$releaseNotes | Set-Content -Path $releaseNotesPath
 
-    $assemblyVersionPath = Join-Path -Path $PSScriptRoot -ChildPath 'Source\Properties\AssemblyVersion.cs'
-    $assemblyVersionRegex = 'Assembly(File|Informational)?Version\("[^"]*"\)'
-    $assemblyVersion = Get-Content -Path $assemblyVersionPath |
-                            ForEach-Object {
-                                if( $_ -match $assemblyVersionRegex )
-                                {
-                                    $infoVersion = ''
-                                    if( $Matches[1] -eq 'Informational' )
-                                    {
-                                        if( $PreReleaseVersion )
-                                        {
-                                            $infoVersion = '-{0}' -f $PreReleaseVersion
-                                        }
-                                        if( $BuildMetadata )
-                                        {
-                                            $infoVersion = '{0}+{1}' -f $infoVersion,$BuildMetadata
-                                        }
-                                    }
-                                    return $_ -replace $assemblyVersionRegex,('Assembly$1Version("{0}{1}")' -f $Version,$infoVersion)
-                                }
-                                $_
-                            }
-    $assemblyVersion | Set-Content -Path $assemblyVersionPath
-}
-
-$msbuildRoot = Get-ItemProperty -Path HKLM:\SOFTWARE\Microsoft\MSBuild\ToolsVersions\12.0 -Name 'MSBuildToolsPath' | Select-Object -ExpandProperty 'MSBuildToolsPath'
-$msbuildExe = Join-Path -Path $msbuildRoot -ChildPath 'MSBuild.exe' -Resolve
-if( -not $msbuildExe )
-{
-    return
-}
-
-$carbonBinPath = Join-Path -Path $PSScriptRoot -ChildPath 'Carbon\bin'
-Get-ChildItem -Path $carbonBinPath -Exclude *.ps1,'Ionic.Zip.dll','Microsoft.Web.XmlTransform.dll' | Remove-Item
-& $msbuildExe /target:"clean;build" (Join-Path -Path $PSScriptRoot -ChildPath 'Source\Carbon.sln') /v:m /nologo
-Get-ChildItem -Path $carbonBinPath -Filter *.pdb | Remove-Item
+Set-ModuleVersion -ManifestPath (Join-Path -Path $moduleRoot -ChildPath 'Carbon.psd1') `
+                  -SolutionPath (Join-Path -Path $PSScriptRoot -ChildPath 'Source\Carbon.sln') `
+                  -AssemblyInfoPath (Join-Path -Path $PSScriptRoot -ChildPath 'Source\Properties\AssemblyVersion.cs') `
+                  -Version $Version `
+                  -PreReleaseVersion $PreReleaseVersion `
+                  -BuildMetadata $BuildMetadata
