@@ -21,6 +21,8 @@ function Test-IisAppPool
     .DESCRIPTION 
     Returns `True` if an app pool with `Name` exists.  `False` if it doesn't exist.
 
+    Beginning with Carbon 2.0.1, this function is available only if IIS is installed.
+
     .EXAMPLE
     Test-IisAppPool -Name Peanuts
 

@@ -21,6 +21,8 @@ function Set-IisHttpHeader
     .DESCRIPTION
     If the HTTP header doesn't exist, it is created.  If a header exists, its value is replaced.
     
+    Beginning with Carbon 2.0.1, this function is available only if IIS is installed.
+
     .LINK
     Get-IisHttpHeader
     

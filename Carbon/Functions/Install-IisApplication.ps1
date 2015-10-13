@@ -25,6 +25,8 @@ function Install-IisApplication
 
     Beginning with Carbon 2.0, if no app pool name is given, existing application's are updated to use `DefaultAppPool`.
     
+    Beginning with Carbon 2.0.1, this function is available only if IIS is installed.
+
     .EXAMPLE
     Install-IisApplication -SiteName Peanuts -VirtualPath CharlieBrown -PhysicalPath C:\Path\To\CharlieBrown -AppPoolName CharlieBrownPool
     

@@ -31,6 +31,8 @@ function Enable-IisSsl
     
     Beginning with IIS 7.5, the `Require128BitSsl` parameter won't actually change the behavior of a website since [there are no longer 128-bit crypto providers](https://forums.iis.net/p/1163908/1947203.aspx) in versions of Windows running IIS 7.5.
     
+    Beginning with Carbon 2.0.1, this function is available only if IIS is installed.
+
     .LINK
     http://support.microsoft.com/?id=907274
 

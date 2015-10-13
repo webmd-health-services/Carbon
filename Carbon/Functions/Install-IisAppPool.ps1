@@ -37,6 +37,8 @@ function Install-IisAppPool
 
     Beginning with Carbon 2.0, the `PassThru` switch will cause this function to return a `Microsoft.Web.Administration.ApplicationPool` object for the created/updated application pool.
 
+    Beginning with Carbon 2.0.1, this function is available only if IIS is installed.
+
     .LINK
     http://learn.iis.net/page.aspx/624/application-pool-identities/
 

@@ -21,6 +21,8 @@ function Get-IisSecurityAuthentication
     .DESCRIPTION
     You can get the anonymous, basic, digest, and Windows authentication sections by using the `Anonymous`, `Basic`, `Digest`, or `Windows` switches, respectively.
     
+    Beginning with Carbon 2.0.1, this function is available only if IIS is installed.
+
     .OUTPUTS
     Microsoft.Web.Administration.ConfigurationSection.
     

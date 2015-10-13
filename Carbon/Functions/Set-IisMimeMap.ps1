@@ -21,6 +21,8 @@ function Set-IisMimeMap
     .DESCRIPTION
     IIS won't serve static files unless they have an entry in the MIME map.  Use this function to create/update a MIME map entry.
     
+    Beginning with Carbon 2.0.1, this function is available only if IIS is installed.
+
     .LINK
     Get-IisMimeMap
     

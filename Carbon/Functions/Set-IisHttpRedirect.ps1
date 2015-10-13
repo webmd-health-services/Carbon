@@ -21,6 +21,8 @@ function Set-IisHttpRedirect
     .DESCRIPTION
     Configures all or part of a website to redirect all requests to another website/URL.  By default, it operates on a specific website.  To configure a directory under a website, set `VirtualPath` to the virtual path of that directory.
 
+    Beginning with Carbon 2.0.1, this function is available only if IIS is installed.
+
     .LINK
     http://www.iis.net/configreference/system.webserver/httpredirect#005
 	

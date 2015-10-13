@@ -27,6 +27,8 @@ function Get-IisHttpRedirect
      * ExactDestination - `True` if redirects are to destination, regardless of the request path.  This will send all requests to `Destination`.
      * ChildOnly - `True` if redirects are only to content in the destination directory (not subdirectories).
 	 
+    Beginning with Carbon 2.0.1, this function is available only if IIS is installed.
+
     .LINK
     http://www.iis.net/configreference/system.webserver/httpredirect
      

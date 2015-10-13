@@ -25,6 +25,8 @@ function Get-IisAppPool
 
     Beginning in Carbon 2.0, `Get-IisAppPool` will return all application pools installed on the current computer.
     
+    Beginning with Carbon 2.0.1, this function is available only if IIS is installed.
+
     .LINK
     http://msdn.microsoft.com/en-us/library/microsoft.web.administration.applicationpool(v=vs.90).aspx
     

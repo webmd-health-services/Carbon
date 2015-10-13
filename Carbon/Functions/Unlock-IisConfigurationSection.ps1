@@ -23,6 +23,8 @@ function Unlock-IisConfigurationSection
 
         C:\Windows\System32\inetsrv\appcmd.exe unlock config /section:?
 
+    Beginning with Carbon 2.0.1, this function is available only if IIS is installed.
+
     .EXAMPLE
     Unlock-IisConfigSection -Name 'system.webServer/cgi'
 

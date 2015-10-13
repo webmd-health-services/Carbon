@@ -21,6 +21,8 @@ function Uninstall-IisAppPool
     .DESCRIPTION
     If the app pool doesn't exist, nothing happens.
     
+    Beginning with Carbon 2.0.1, this function is available only if IIS is installed.
+
     .EXAMPLE
     Uninstall-IisAppPool -Name Batcave
     

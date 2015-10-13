@@ -19,6 +19,10 @@ $CarbonBinDir = Join-Path -Path $PSScriptRoot -ChildPath 'bin' -Resolve
 . (Join-Path -Path $PSScriptRoot -ChildPath 'Functions\Test-TypeDataMember.ps1' -Resolve)
 . (Join-Path -Path $PSScriptRoot -ChildPath 'Functions\Use-CallerPreference.ps1' -Resolve)
 
+$doNotImport = @{ }
+
+$functionRoot = Join-Path -Path $PSScriptRoot -ChildPath 'Functions' -Resolve
+
 # Active Directory
 
 # COM
@@ -58,6 +62,11 @@ if( (Test-Path -Path $microsoftWebAdministrationPath -PathType Leaf) )
                     Select-Object -ExpandProperty PhysicalPath
             }
     }
+}
+else
+{
+    Get-ChildItem -Path $functionRoot -Filter '*-Iis*.ps1' |
+        ForEach-Object { $doNotImport[$_.Name] = $true }
 }
 
 # MSMQ
@@ -154,7 +163,8 @@ $privateMembers = @{
                         'Write-IisVerbose' = $true;
                    }
 
-$functionNames = Get-Item (Join-Path -Path $PSScriptRoot -ChildPath 'Functions\*.ps1') | 
+$functionNames = Get-ChildItem -Path $functionRoot -Filter '*.ps1' | 
+                    Where-Object { -not $doNotImport.Contains($_.Name) } |
                     ForEach-Object {
                         Write-Verbose ("Importing function {0}." -f $_.FullName)
                         . $_.FullName | Out-Null

@@ -21,6 +21,8 @@ function Disable-IisSecurityAuthentication
     .DESCRIPTION
     By default, disables an authentication type for an entire website.  You can disable an authentication type at a specific path under a website by passing the virtual path (*not* the physical path) to that directory as the value of the `VirtualPath` parameter.
 
+    Beginning with Carbon 2.0.1, this function is available only if IIS is installed.
+
     .LINK
     Enable-IisSecurityAuthentication
 

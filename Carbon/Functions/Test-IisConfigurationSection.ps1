@@ -21,6 +21,8 @@ function Test-IisConfigurationSection
     .DESCRIPTION
     You can test if a configuration section exists or wheter it is locked.
     
+    Beginning with Carbon 2.0.1, this function is available only if IIS is installed.
+
     .OUTPUTS
     System.Boolean.
     

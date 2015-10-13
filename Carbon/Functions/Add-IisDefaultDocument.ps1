@@ -23,6 +23,8 @@ function Add-IisDefaultDocument
     
     If the website already has `FileName` in its list of default documents, this function silently returns.
     
+    Beginning with Carbon 2.0.1, this function is available only if IIS is installed.
+
     .EXAMPLE
     Add-IisDefaultDocument -SiteName MySite -FileName home.html
     

@@ -21,6 +21,8 @@ function Test-IisWebsite
     .DESCRIPTION
     Returns `True` if a website with name `Name` exists.  `False` if it doesn't.
 
+    Beginning with Carbon 2.0.1, this function is available only if IIS is installed.
+
     .EXAMPLE
     Test-IisWebsite -Name 'Peanuts'
 

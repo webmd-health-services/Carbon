@@ -21,6 +21,8 @@ function Get-IisVersion
     .DESCRIPTION
     Reads the version of IIS from the registry, and returns it as a `Major.Minor` formatted string.
     
+    Beginning with Carbon 2.0.1, this function is available only if IIS is installed.
+
     .EXAMPLE
     Get-IisVersion
     

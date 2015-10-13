@@ -27,6 +27,8 @@ function Get-IisApplication
      * `CommitChanges()` - Persists any configuration changes made to the object back into IIS's configuration files.
      * `PhysicalPath { get; }` - The physical path to the application.
 
+    Beginning with Carbon 2.0.1, this function is available only if IIS is installed.
+
     .OUTPUTS
     Microsoft.Web.Administration.Application.
 

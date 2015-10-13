@@ -21,6 +21,8 @@ function Uninstall-IisWebsite
     .DESCRIPTION
     Pretty simple: removes the website named `Name`.  If no website with that name exists, nothing happens.
 
+    Beginning with Carbon 2.0.1, this function is not available if IIS isn't installed.
+
     .LINK
     Get-IisWebsite
     

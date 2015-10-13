@@ -42,6 +42,8 @@ function Install-IisWebsite
 
      In some situations, when you add a website to an application pool that another website/application is part of, the new website will fail to load in a browser with a 500 error saying `Failed to map the path '/'.`. We've been unable to track down the root cause. The solution is to recycle the app pool, e.g. `(Get-IisAppPool -Name 'AppPoolName').Recycle()`.
 
+    Beginning with Carbon 2.0.1, this function is available only if IIS is installed.
+
     .LINK
     Get-IisWebsite
     

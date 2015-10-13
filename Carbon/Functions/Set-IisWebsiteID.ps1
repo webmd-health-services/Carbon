@@ -25,6 +25,8 @@ function Set-IisWebsiteID
 
     When you change a website's ID, IIS will stop the site, but not start the site after saving the ID change. This function waits until the site's ID is changed, and then will start the website.
 
+    Beginning with Carbon 2.0.1, this function is available only if IIS is installed.
+
     .EXAMPLE
     Set-IisWebsiteID -SiteName Holodeck -ID 483
 

@@ -21,6 +21,8 @@ function Join-IisVirtualPath
     .DESCRIPTION
     Removes extra slashes.  Converts backward slashes to forward slashes.  Relative portions are not removed.  Sorry.
 
+    Beginning with Carbon 2.0.1, this function is available only if IIS is installed.
+
     .EXAMPLE
     Join-IisVirtualPath 'SiteName' 'Virtual/Path'
 

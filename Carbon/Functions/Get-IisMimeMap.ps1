@@ -24,6 +24,8 @@ function Get-IisMimeMap
      * `FileExtension`: the mapping's file extension
      * `MimeType`: the mapping's MIME type
     
+    Beginning with Carbon 2.0.1, this function is available only if IIS is installed.
+
     .OUTPUTS
     Carbon.Iis.MimeMap.
     

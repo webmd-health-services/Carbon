@@ -23,6 +23,8 @@ function Set-IisWindowsAuthentication
     
     The changes only take effect if Windows authentication is enabled (see `Enable-IisSecurityAuthentication`).
 
+    Beginning with Carbon 2.0.1, this function is available only if IIS is installed.
+
     .LINK
     http://blogs.msdn.com/b/webtopics/archive/2009/01/19/service-principal-name-spn-checklist-for-kerberos-authentication-with-iis-7-0.aspx
     

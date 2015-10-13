@@ -21,6 +21,8 @@ function Get-IisConfigurationSection
     .DESCRIPTION
     Uses the Microsoft.Web.Administration API to get a `Microsoft.Web.Administration.ConfigurationSection`.
     
+    Beginning with Carbon 2.0.1, this function is available only if IIS is installed.
+
     .OUTPUTS
     Microsoft.Web.Administration.ConfigurationSection.
     

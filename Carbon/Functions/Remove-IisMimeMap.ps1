@@ -23,6 +23,8 @@ function Remove-IisMimeMap
     
     If a specific website has the file extension in its MIME map, that site will continue to serve files with those extensions.
     
+    Beginning with Carbon 2.0.1, this function is available only if IIS is installed.
+
     .LINK
     Get-IisMimeMap
     

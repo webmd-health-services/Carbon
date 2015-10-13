@@ -24,6 +24,8 @@ function Get-IisHttpHeader
      * Name: the name of the HTTP header
      * Value: the value of the HTTP header
     
+    Beginning with Carbon 2.0.1, this function is available only if IIS is installed.
+
     .OUTPUTS
     Carbon.Iis.HttpHeader.
     

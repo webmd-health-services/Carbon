@@ -21,6 +21,8 @@ function Enable-IisDirectoryBrowsing
     .DESCRIPTION
     Enables directory browsing (i.e. showing the contents of a directory by requesting that directory in a web browser) for a website.  To enable directory browsing on a directory under the website, pass the virtual path to that directory as the value to the `Directory` parameter.
 
+    Beginning with Carbon 2.0.1, this function is available only if IIS is installed.
+
     .EXAMPLE
     Enable-IisDirectoryBrowsing -SiteName Peanuts
 

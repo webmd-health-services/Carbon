@@ -21,6 +21,8 @@ function Test-IisSecurityAuthentication
     .DESCRIPTION
     You can check if anonymous, basic, or Windows authentication are enabled.  There are switches for each authentication type.
     
+    Beginning with Carbon 2.0.1, this function is available only if IIS is installed.
+
     .OUTPUTS
     System.Boolean.
     

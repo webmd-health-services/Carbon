@@ -23,6 +23,8 @@ function Lock-IisConfigurationSection
     
         C:\Windows\System32\inetsrv\appcmd.exe lock config /section:?
     
+    Beginning with Carbon 2.0.1, this function is available only if IIS is installed.
+
     .EXAMPLE
     Lock-IisConfigurationSection -SectionPath 'system.webServer/security/authentication/basicAuthentication'
     

@@ -23,6 +23,8 @@ function Get-IisWebsite
 
     Each object will have a `CommitChanges` script method added which will allow you to commit/persist any changes to the website's configuration.
      
+    Beginning with Carbon 2.0.1, this function is available only if IIS is installed.
+
     .OUTPUTS
     Microsoft.Web.Administration.Site.
     
