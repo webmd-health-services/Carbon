@@ -164,13 +164,14 @@ $versionReleaseNotes = Get-Content -Path $releaseNotesPath |
                             }
                             return( $foundVersion )
                         }
+$versionReleaseNotes = $versionReleaseNotes -join [Environment]::NewLine
 
 $carbonNuspec = [xml](Get-Content -Raw -Path $carbonNuspecPath)
 if( $carbonNuspec.package.metadata.version -ne $version.ToString() )
 {
     $nuGetVersion = $version -replace '-([A-Z0-9]+)[^A-Z0-9]*(\d+)$','-$1$2'
     $carbonNuspec.package.metadata.version = $nugetVersion
-    $carbonNuspec.package.metadata.releaseNotes = $versionReleaseNotes -join ([Environment]::NewLine)
+    $carbonNuspec.package.metadata.releaseNotes = $versionReleaseNotes
     $carbonNuspec.Save( $carbonNuspecPath )
 }
 
@@ -307,10 +308,22 @@ else
     }
 }
 
+$tags = Get-Content -Raw -Path (Join-Path -Path $PSScriptRoot -ChildPath 'tags.json') |
+            ConvertFrom-Json |
+            ForEach-Object { $_ } |
+            Select-Object -ExpandProperty 'Tags' |
+            Select-Object -Unique |
+            Sort-Object |
+            ForEach-Object { $_.ToLower() -replace ' ','-' }
+$tags += @( 'PSModule', 'DscResources' )
+
 Publish-PowerShellGalleryModule -Name 'Carbon' `
                                 -Path (Join-Path -Path $cloneDir -ChildPath 'Carbon') `
                                 -Version $version `
-                                -LicenseUri 'http://www.apache.org/licenses/LICENSE-2.0'
+                                -LicenseUri 'http://www.apache.org/licenses/LICENSE-2.0' `
+                                -ReleaseNotes $versionReleaseNotes `
+                                -ProjectUri 'http://get-carbon.org/' `
+                                -Tags $tags
 
 $pshdoRoot = Join-Path -Path $PSScriptRoot -ChildPath 'pshdo.com'
 if( -not (Test-Path -Path $pshdoRoot -PathType Container) )
@@ -318,81 +331,20 @@ if( -not (Test-Path -Path $pshdoRoot -PathType Container) )
     hg clone https://bitbucket.org/splatteredbits/pshdo.com $pshdoRoot
 }
 
-Push-Location $pshdoRoot
-try
+hg pull -R $pshdoRoot
+hg update -C -R $pshdoRoot
+
+$newModuleReleasedAnnouncement = Join-Path -Path $pshdoRoot -ChildPath 'New-ModuleReleasedAnnouncement.ps1' -Resolve
+if( -not $newModuleReleasedAnnouncement )
 {
-    hg pull
-    hg update -C
-
-    $postsRoot = Join-Path -Path $pshdoRoot -ChildPath 'source/_posts'
-    $postName = '{0:yyyy\-MM\-dd}-carbon-{1}-released.markdown' -f (Get-Date),$version
-    $postPath = Join-Path -Path $postsRoot -ChildPath $postName
-
-    if( -not (Test-Path -Path $postPath -PathType Leaf) )
-    {
-        if( -not (Test-Path -Path (Join-Path -Path $postsRoot -ChildPath '*carbon-2.0.0-released.markdown')) )
-        {
-            bundle exec rake ("new_post[Carbon {0} Released]" -f $version)
-        }
-
-        $crappyName = '*carbon-{0}-dot-{1}-{2}-released.markdown' -f $version.Major,$version.Minor,$version.Build
-        $crappyName = Join-Path -Path $postsRoot -ChildPath $crappyName
-        if( (Test-Path -Path $crappyName -PathType Leaf) )
-        {
-            Get-Item -Path $crappyName | Rename-Item -NewName $postName
-        }
-
-        if( -not (Test-Path -Path $postPath -PathType Leaf) )
-        {
-            Write-Error ('Post {0} not found.' -f $postName)
-            return
-        }
-    }
-
-    $inHeader = $false
-    $pastHeader = $false
-    $header = Get-Content -Path $postPath |
-                    ForEach-Object {
-                        if( $pastHeader )
-                        {
-                            return
-                        }
-
-                        $_
-
-                        if( -not $inHeader -and $_ -eq '---' )
-                        {
-                            $inHeader = $true
-                        }
-                        elseif( $inHeader -and $_ -eq '---' )
-                        {
-                            $pastHeader = $true
-                        }
-
-                    }
-    (@'
-{0}
-[Carbon](http://get-carbon.org) {1} is out. You can [download Carbon as a .ZIP archive, NuGet package, Chocolatey package, or from the PowerShell Gallery](http://get-carbon.org/about_Carbon_Installation.html). It may take a week or two for the package to show up at chocolatey.org.
-
-{2}
-'@ -f ($header -join ([Environment]::NewLine)),$version,($versionReleaseNotes -join ([Environment]::NewLine))) | Set-Content -Path $postPath
-    
-    bundle exec rake generate
-
-    hg addremove
-
-    if( hg status )
-    {
-        hg commit -m ('Carbon {0} Released' -f $version)
-        hg log -rtip
-    }
-
-    if( hg out )
-    {
-        hg push
-    }
+    return
 }
-finally
-{
-    Pop-Location
-}
+
+$announcement = @'
+[Carbon](http://get-carbon.org) {0} is out. You can [download Carbon as a .ZIP archive, NuGet package, Chocolatey package, or from the PowerShell Gallery](http://get-carbon.org/about_Carbon_Installation.html). It may take a week or two for the package to show up at chocolatey.org.
+
+{1}
+'@ -f $version,$versionReleaseNotes
+
+& $newModuleReleasedAnnouncement -ModuleName 'Carbon' -Version $version -Content $announcement
+
