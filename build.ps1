@@ -37,35 +37,10 @@ Set-StrictMode -Version Latest
 
 & (Join-Path -Path $PSScriptRoot -ChildPath 'Tools\Silk\Import-Silk.ps1' -Resolve)
 
-$moduleRoot = Join-Path -Path $PSScriptRoot -ChildPath 'Carbon' -Resolve
-if( -not $Version )
-{
-    $Version = Test-ModuleManifest -Path (Join-Path -Path $moduleRoot -ChildPath 'Carbon.psd1') | Select-Object -ExpandProperty 'Version'
-    if( -not $Version )
-    {
-        return
-    }
-}
-
-$releaseNotesFileName = 'RELEASE NOTES.txt'
-$releaseNotesPath = Join-Path -Path $PSScriptRoot -ChildPath $releaseNotesFileName -Resolve
-$newVersionHeader = "# {0}" -f $Version
-$updatedVersion = $false
-$releaseNotes = Get-Content -Path $releaseNotesPath |
-                    ForEach-Object {
-                        if( -not $updatedVersion -and $_ -match '^#\s+' )
-                        {
-                            $updatedVersion = $true
-                            return $newVersionHeader
-                        }
-
-                        return $_
-                    }
-$releaseNotes | Set-Content -Path $releaseNotesPath
-
-Set-ModuleVersion -ManifestPath (Join-Path -Path $moduleRoot -ChildPath 'Carbon.psd1') `
+Set-ModuleVersion -ManifestPath (Join-Path -Path $PSScriptRoot -ChildPath 'Carbon\Carbon.psd1') `
                   -SolutionPath (Join-Path -Path $PSScriptRoot -ChildPath 'Source\Carbon.sln') `
                   -AssemblyInfoPath (Join-Path -Path $PSScriptRoot -ChildPath 'Source\Properties\AssemblyVersion.cs') `
                   -Version $Version `
                   -PreReleaseVersion $PreReleaseVersion `
-                  -BuildMetadata $BuildMetadata
+                  -BuildMetadata $BuildMetadata `
+                  -ReleaseNotesPath (Join-Path -Path $PSScriptRoot -ChildPath 'RELEASE NOTES.txt' -Resolve)
