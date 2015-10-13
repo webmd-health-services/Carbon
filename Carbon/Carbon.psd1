@@ -42,7 +42,26 @@
     Copyright = '(c) 2011 - 2013 Aaron Jensen. All rights reserved.'
 
     # Description of the functionality provided by this module
-    Description = 'PowerShell Setup Module'
+    Description = @'
+Carbon is a PowerShell module for automating the configuration Windows 7, 8, 2008, and 2012 and automation the installation and configuration of Windows applications, websites, and services. It can configure and manage:
+
+ * Local users and groups
+ * IIS websites, virtual directories, and applications
+ * File system, registry, and certificate permissions
+ * Certificates
+ * Privileges
+ * Services
+ * Encryption
+ * Junctions
+ * Hosts file
+ * INI files
+ * Performance counters
+ * Shares
+ * .NET connection strings and app settings
+ * And much more!
+
+All functions are idempotent: when run multiple times with the same arguments, your system will be in the same state without failing or producing errors.
+'@
 
     # Minimum version of the Windows PowerShell engine required by this module
     PowerShellVersion = '4.0'
