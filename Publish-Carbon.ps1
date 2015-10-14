@@ -27,7 +27,7 @@ function Copy-Carbon
         $Destination
     )
 
-    foreach( $item in @( 'Carbon', 'Website', 'Examples', $licenseFileName, $releaseNotesFileName ) )
+    foreach( $item in @( 'Carbon', 'Website', 'Examples', $licenseFileName, $releaseNotesFileName, $noticeFileName ) )
     {
         $sourcePath = Join-Path -Path $Source -ChildPath $item
 
@@ -42,6 +42,8 @@ function Copy-Carbon
     }
 
     # Put another copy of the license file with the module.
+    Copy-Item -Path (Join-Path -Path $PSScriptRoot -ChildPath $noticeFileName) `
+                -Destination (Join-Path -Path $Destination -ChildPath 'Carbon')
     Copy-Item -Path (Join-Path -Path $PSScriptRoot -ChildPath $licenseFileName) `
                 -Destination (Join-Path -Path $Destination -ChildPath 'Carbon')
 }
@@ -68,6 +70,7 @@ function Test-Uri
 & (Join-Path -Path $PSScriptRoot -ChildPath 'Tools\Silk\Import-Silk.ps1' -Resolve)
 
 $licenseFileName = 'LICENSE.txt'
+$noticeFileName = 'NOTICE.txt'
 $releaseNotesFileName = 'RELEASE NOTES.txt'
 $releaseNotesPath = Join-Path -Path $PSScriptRoot -ChildPath $releaseNotesFileName -Resolve
 
