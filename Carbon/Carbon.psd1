@@ -117,8 +117,4 @@ All functions are idempotent: when run multiple times with the same arguments, y
 
     # Private data to pass to the module specified in ModuleToProcess
     PrivateData = ''
-
 }
-
-
-

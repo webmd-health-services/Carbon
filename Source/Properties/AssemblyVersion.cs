@@ -22,7 +22,7 @@ using System.Reflection;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("2.0.1")]
-[assembly: AssemblyCopyright("Copyright © 2012 - 2013 Aaron Jensen")]
+[assembly: AssemblyCopyright("Copyright 2011 - 2015 Aaron Jensen.")]
 [assembly: AssemblyVersion("2.0.1")]
 [assembly: AssemblyFileVersion("2.0.1")]
 [assembly: AssemblyInformationalVersion("2.0.1")]
