@@ -72,8 +72,11 @@ function Set-ModuleVersion
 
     $moduleVersionRegex = 'ModuleVersion\s*=\s*(''|")([^''"])+(''|")' 
     $rawManifest = Get-Content -Raw -Path $manifestPath
-    $rawManifest = $rawManifest -replace $moduleVersionRegex,('ModuleVersion = ''{0}''' -f $version)
-    $rawManifest | Set-Content -Path $manifestPath
+    if( $rawManifest -notmatch ('ModuleVersion\s*=\s*(''|"){0}(''|")' -f [regex]::Escape($version.ToString())) )
+    {
+        $rawManifest = $rawManifest -replace $moduleVersionRegex,('ModuleVersion = ''{0}''' -f $version)
+        $rawManifest | Set-Content -Path $manifestPath -NoNewline
+    }
 
     if( $AssemblyInfoPath )
     {
