@@ -2,8 +2,6 @@
 .SYNOPSIS
 **INTERNAL. DO NOT USE**
 #>
-# Copyright 2012 Aaron Jensen
-# 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -34,3 +32,4 @@ Add-Type -AssemblyName 'System.Security'
 
 $string = Unprotect-String -ProtectedString $ProtectedString
 Protect-String -String $string -ForUser
+

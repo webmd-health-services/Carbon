@@ -1,5 +1,3 @@
-# Copyright 2012 Aaron Jensen
-# 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -60,3 +58,4 @@ function Test-ShouldNotCreateJunctionIfJunctionAlreadyExists
     Assert-Equal 1 @($error).Length "Didn't get an error failing to create a junction."
     Assert-Null $result 'Returned a non-null object when creating a junction that already exists.'
 }
+

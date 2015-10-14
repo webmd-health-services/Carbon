@@ -1,5 +1,3 @@
-# Copyright 2012 Aaron Jensen
-# 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -25,3 +23,4 @@ function Test-FunctionsShouldUseUseCallerPreference
         Fail ('The following scripts don''t don''t use `Use-CallerPreference`:{0} * {1}' -f ([Environment]::NewLine),($files -join ('{0} * ' -f ([Environment]::NewLine))))
     }
 }
+

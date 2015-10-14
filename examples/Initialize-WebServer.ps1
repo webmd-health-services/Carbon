@@ -3,8 +3,6 @@
 Example script showing how to setup a simple web server.
 
 #>
-# Copyright 2012 Aaron Jensen
-# 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -63,3 +61,4 @@ Set-DotNetConnectionString -Name 'example1DB' `
                            -Value 'Data Source=db.example1.get-carbon.org; Initial Catalog=example1DB; Integrated Security=SSPI;' `
                            -Framework64 `
                            -Clr4
+

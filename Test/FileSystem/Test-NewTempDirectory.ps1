@@ -1,5 +1,3 @@
-# Copyright 2012 Aaron Jensen
-# 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -38,3 +36,4 @@ function Test-ShouldSupportPathsForPrefix
     Assert-Like $tempDir.Name ('{0}*' -f (Split-Path -Leaf -Path $PSCommandPath))
 
 }
+

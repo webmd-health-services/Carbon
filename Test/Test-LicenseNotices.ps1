@@ -1,5 +1,3 @@
-# Copyright 2012 Aaron Jensen
-# 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -17,10 +15,7 @@ function Test-AllFilesShouldHaveLicense
     $projectRoot = Join-Path $TestDir .. -Resolve
     $licenseFilePath = Join-Path $projectRoot LICENSE.txt -Resolve
     
-    $noticeLines = Invoke-Command {
-                            'Copyright 2012 Aaron Jensen'
-                            Get-Content -Path $licenseFilePath -Tail 12
-                        } |
+    $noticeLines = Get-Content -Path $licenseFilePath -Tail 11 |
                         ForEach-Object { $_ -replace '^   ','' } |
                         Select-Object -First 13
     $noticeLines | Write-Verbose
@@ -54,13 +49,6 @@ function Test-AllFilesShouldHaveLicense
                         'Publish-Carbon.ps1'
                     )
     
-    $directoriesToCheck = @(
-                                (Join-Path -Path $projectRoot -ChildPath 'Carbon'),
-                                (Join-Path -Path $projectRoot -ChildPath 'examples'),
-                                (Join-Path -Path $projectRoot -ChildPath 'Source'),
-                                (Join-Path -Path $projectRoot -ChildPath 'Test')
-                            )
-
     [object[]]$filesMissingLicense = Get-ChildItem -Path $projectRoot -Exclude 'Tools','Website','.hg','pshdo.com' |
         Get-ChildItem -Recurse -File -Exclude $filesToSkip |
         Where-Object { $_.FullName -notlike '*\obj\*' } |

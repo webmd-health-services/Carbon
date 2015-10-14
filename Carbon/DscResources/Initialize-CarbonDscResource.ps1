@@ -2,8 +2,6 @@
 .SYNOPSIS
 Configures PowerShell so that Carbon's DSC resources can use Carbon functions/commands.
 #>
-# Copyright 2012 Aaron Jensen
-# 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -28,3 +26,4 @@ if( -not (Get-Module -Name 'Carbon') )
     Write-Verbose ('Loading Carbon module.')
     Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath '..\Carbon.psd1' -Resolve) -Global
 }
+

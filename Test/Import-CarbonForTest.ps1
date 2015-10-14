@@ -1,5 +1,3 @@
-# Copyright 2012 Aaron Jensen
-# 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -20,3 +18,4 @@ Set-StrictMode -Version 'Latest'
 
 $carbonRoot = Join-Path -Path $PSScriptRoot -ChildPath '..\Carbon' -Resolve
 & (Join-Path -Path $carbonRoot -ChildPath 'Import-Carbon.ps1' -Resolve)
+

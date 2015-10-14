@@ -1,5 +1,3 @@
-# Copyright 2012 Aaron Jensen
-# 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -70,3 +68,4 @@ function Test-ShouldResolveByUnknownSid
     Assert-Equal $id 'S-1-5-21-2678556459-1010642102-471947008-1017'
     Assert-NoError
 }
+

@@ -1,5 +1,3 @@
-# Copyright 2012 Aaron Jensen
-# 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -23,3 +21,4 @@ function Test-ShouldEscapeADSpecialCharacters
     $escapedCharacters = Format-ADSearchFilterValue -String $specialCharacters
     Assert-Equal '\2a\28\29\5c\00\2f' $escapedCharacters
 }
+

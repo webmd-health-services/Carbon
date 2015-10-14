@@ -6,8 +6,6 @@ Creates the get-carbon.org website.
 The `New-Website.ps1` script generates the get-carbon.org website. It uses the Silk module for Markdown to HTML conversion.
 #>
 
-# Copyright 2012 Aaron Jensen
-# 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -84,7 +82,7 @@ function Out-HtmlPage
     {1}
 
 	<div class="Footer">
-		Copyright &copy; 2012 - {2} <a href="http://pshdo.com">Aaron Jensen</a>.  All rights reserved.
+		Copyright 2012 - {2} <a href="http://pshdo.com">Aaron Jensen</a>.
 	</div>
 
 </body>

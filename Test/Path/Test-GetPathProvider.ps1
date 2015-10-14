@@ -1,5 +1,3 @@
-# Copyright 2012 Aaron Jensen
-# 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -49,3 +47,4 @@ function Test-ShouldGetNoProviderForBadPath
 {
     Assert-Equal 'FileSystem' ((Get-PathProvider -Path 'C:\I\Do\Not\Exist').Name)
 }
+

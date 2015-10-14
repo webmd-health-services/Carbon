@@ -1,5 +1,3 @@
-# Copyright 2012 Aaron Jensen
-# 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -529,4 +527,5 @@ function Assert-Permissions($identity, $permissions, $path = $Path)
     Assert-Equal ([Security.AccessControl.PropagationFlags]::None) $ace.PropagationFlags
     Assert-Equal ($ace."$($providerName)Rights" -band $rights) $rights
 }
+
 

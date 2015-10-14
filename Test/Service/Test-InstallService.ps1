@@ -1,5 +1,3 @@
-# Copyright 2012 Aaron Jensen
-# 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -585,3 +583,4 @@ function Assert-HasPermissionsOnServiceExecutable($Identity, $Path)
     Assert-NotNull $access "'$Identity' doesn't have any access to '$Path'."
     Assert-Equal ($access.FileSystemRights -band [Security.AccessControl.FileSystemRights]::ReadAndExecute) ([Security.AccessControl.FileSystemRights]::ReadAndExecute) "'$Identity' doesn't have ReadAndExecute on '$Path'."
 }
+

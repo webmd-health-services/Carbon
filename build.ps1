@@ -3,8 +3,6 @@
 Packages and publishes Carbon packages.
 #>
 
-# Copyright 2012 Aaron Jensen
-# 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -45,3 +43,4 @@ Set-ModuleVersion -ManifestPath (Join-Path -Path $PSScriptRoot -ChildPath 'Carbo
                   -BuildMetadata $BuildMetadata `
                   -ReleaseNotesPath (Join-Path -Path $PSScriptRoot -ChildPath 'RELEASE NOTES.txt' -Resolve) `
                   -NuspecPath (Join-Path -Path $PSScriptRoot -ChildPath 'Carbon.nuspec' -Resolve)
+

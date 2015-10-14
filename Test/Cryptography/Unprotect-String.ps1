@@ -2,8 +2,6 @@
 .SYNOPSIS
 **INTERNAL. DO NOT USE** Standalone wrapper script for Carbon's `Unprotect-String` function to make it easier to decrypt a string as a custom user.
 #>
-# Copyright 2012 Aaron Jensen
-# 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -30,3 +28,4 @@ Add-Type -AssemblyName 'System.Security'
 . (Join-Path -Path $PSScriptRoot -ChildPath '..\..\Carbon\Functions\Unprotect-String.ps1' -Resolve)
 
 Unprotect-String -ProtectedString $ProtectedString
+
