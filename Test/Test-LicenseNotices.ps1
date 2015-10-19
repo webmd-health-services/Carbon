@@ -38,6 +38,7 @@ function Test-AllFilesShouldHaveLicense
                         'license.txt',
                         '*.help.txt',
                         'RELEASE NOTES.txt',
+                        'NOTICE.txt',
                         '*.sln',
                         '*.pfx',
                         'task*.xml',
