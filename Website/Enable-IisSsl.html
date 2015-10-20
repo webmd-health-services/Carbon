@@ -39,6 +39,8 @@
 <p>Changing any SSL settings will do you no good if the website doesn't have an SSL binding or doesn't have an SSL certificate.  The configuration will most likely succeed, but won't work in a browser.  So sad.</p>
 
 <p>Beginning with IIS 7.5, the <code>Require128BitSsl</code> parameter won't actually change the behavior of a website since <a href="https://forums.iis.net/p/1163908/1947203.aspx">there are no longer 128-bit crypto providers</a> in versions of Windows running IIS 7.5.</p>
+
+<p>Beginning with Carbon 2.0.1, this function is available only if IIS is installed.</p>
 </div>
     
 <h2>Related Commands</h2>
@@ -159,7 +161,7 @@
 <p>Enables SSL on the <code>Peanuts</code> website and require 128-bit SSL.  Also, makes SSL connections optional and ignores client certificates.</p>
 
 	<div class="Footer">
-		Copyright &copy; 2012 - 2015 <a href="http://pshdo.com">Aaron Jensen</a>.  All rights reserved.
+		Copyright 2012 - 2015 <a href="http://pshdo.com">Aaron Jensen</a>.
 	</div>
 
 </body>

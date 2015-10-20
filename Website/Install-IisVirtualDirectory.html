@@ -25,6 +25,8 @@
 <h2>Description</h2>
 <div class="Description">
 <p>The <code>Install-IisVirtualDirectory</code> function creates a virtual directory under website <code>SiteName</code> at <code>/VirtualPath</code>, serving files out of <code>PhysicalPath</code>.  If a virtual directory at <code>VirtualPath</code> already exists, it is updated in palce. (Before Carbon 2.0, the virtual directory was deleted before installation.)</p>
+
+<p>Beginning with Carbon 2.0.1, this function is available only if IIS is installed.</p>
 </div>
     
 
@@ -93,7 +95,7 @@
 <p>Creates a DogHouse virtual directory under the <code>Peanuts</code> website at <code>/Brown/Snoopy/DogHouse</code> serving files out of the <code>C:\Peanuts\DogHouse</code> directory.  If the Peanuts website responds to hostname <code>peanuts.com</code>, the virtual directory is accessible at <code>peanuts.com/Brown/Snoopy/DogHouse</code>.</p>
 
 	<div class="Footer">
-		Copyright &copy; 2012 - 2015 <a href="http://pshdo.com">Aaron Jensen</a>.  All rights reserved.
+		Copyright 2012 - 2015 <a href="http://pshdo.com">Aaron Jensen</a>.
 	</div>
 
 </body>

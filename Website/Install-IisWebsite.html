@@ -51,6 +51,8 @@
 
 <p>In some situations, when you add a website to an application pool that another website/application is part of, the new website will fail to load in a browser with a 500 error saying <code>Failed to map the path '/'.</code>. We've been unable to track down the root cause. The solution is to recycle the app pool, e.g. <code>(Get-IisAppPool -Name 'AppPoolName').Recycle()</code>.</p></li>
 </ul>
+
+<p>Beginning with Carbon 2.0.1, this function is available only if IIS is installed.</p>
 </div>
     
 <h2>Related Commands</h2>
@@ -161,7 +163,7 @@
 <p>Creates a website named <code>Peanuts</code> that runs under the <code>PeanutsAppPool</code> app pool</p>
 
 	<div class="Footer">
-		Copyright &copy; 2012 - 2015 <a href="http://pshdo.com">Aaron Jensen</a>.  All rights reserved.
+		Copyright 2012 - 2015 <a href="http://pshdo.com">Aaron Jensen</a>.
 	</div>
 
 </body>
