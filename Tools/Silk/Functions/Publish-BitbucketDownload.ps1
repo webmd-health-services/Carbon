@@ -16,10 +16,10 @@ function Publish-BitbucketDownload
 {
     <#
     .SYNOPSIS
-    Publishes a file to Bitbucket so it is available on a project's download page.
+    Creates and publishes a ZIP file to Bitbucket so it is available on a project's download page.
 
     .DESCRIPTION
-    The `Publish-BitbucketDownload` function publishes a file to a repository so it is availabe on a project's download page. If the file already exists on Bitbucket, it is replaced with the current file.
+    The `Publish-BitbucketDownload` function creates a ZIP file and publishes it to a repository so it is availabe on a project's download page. If the file already exists on Bitbucket, nothing is uploaded.
 
     .LINK
     https://bitbucket.org/Swyter/bitbucket-curl-upload-to-repo-downloads
@@ -41,13 +41,17 @@ function Publish-BitbucketDownload
         $ProjectName,
 
         [Parameter(Mandatory=$true)]
+        [string[]]
+        # The paths to the files and directories to include in the ZIP file. All files and sub-directories under directory are added.
+        $Path,
+
+        [Parameter(Mandatory=$true)]
         [string]
-        # The file to upload.
-        $FilePath 
+        # The path to the manifest of the module being published.
+        $ManifestPath
     )
 
     Set-StrictMode -Version 'Latest'
-    #Requires -Version 4
 
     function Assert-Response
     {
@@ -88,69 +92,102 @@ function Publish-BitbucketDownload
 
     }
 
-    if( -not $Credential )
+    $manifest = Test-ModuleManifest -Path $ManifestPath
+    if( -not $manifest )
     {
-        $Credential = Get-Credential -Message ('Enter credentials for https://bitbucket.org/{0}/{1}' -f $Username,$ProjectName)
+        return
     }
 
-    $outFile = '{0}+{1}' -f (Split-Path -Leaf -Path $PSCommandPath),[IO.Path]::GetRandomFileName()
+    $baseProjectUri = 'https://bitbucket.org/{0}/{1}' -f $Username,$ProjectName
+
+    $zipFileName = "{0}-{1}.zip" -f $manifest.Name,$manifest.Version
+    $zipDownloadUrl = '{0}/downloads/{1}' -f $baseProjectUri,$zipFileName
+
+    try
+    {
+        $resp = Invoke-WebRequest -Uri $zipDownloadUrl -ErrorAction Ignore
+        $publish = ($resp.StatusCode -ne 200)
+    }
+    catch
+    {
+        $publish = $true
+    }
+
+    if( -not $publish )
+    {
+        Write-Warning -Message ('{0} file already published.' -f $zipFileName)
+        return
+    }
+
+    $zipFilePath = Join-Path -Path $env:TEMP -ChildPath $zipFileName
+
+    $outFile = '{0}+{1}' -f $manifest.Name,[IO.Path]::GetRandomFileName()
     $outFile = Join-Path -Path $env:TEMP -ChildPath $outFile
 
-    $PSDefaultParameterValues.Clear()
-    $PSDefaultParameterValues['Invoke-WebRequest:PassThru'] = $true
-    $PSDefaultParameterValues['Invoke-WebRequest:OutFile'] = $outFile
-
-    $session = $null
-    $loginUri = 'https://bitbucket.org/account/signin/'
-    $resp = Invoke-WebRequest -Uri $loginUri -SessionVariable 'session' -Method Get 
-    if( -not (Assert-Response -Response $resp -ExpectedUri $loginUri) )
+    try
     {
-        return
-    }
+        if( Test-Path $zipFilePath -PathType Leaf )
+        {
+            Remove-Item $zipFilePath
+        }
 
-    $PSDefaultParameterValues['Invoke-WebRequest:WebSession'] = $session
+        Write-Verbose -Message ('Creating {0} ZIP file.' -f $zipFileName)
+        Compress-Item -Path $Path -OutFile $zipFilePath
 
-    $form = $resp.Forms | 
-                Where-Object { $_.Action -eq '/account/signin/' }
-    $formFields = $form.Fields
-    $formFields.id_username = $Credential.UserName
-    $formFields.id_password = $Credential.GetNetworkCredential().Password
+        $PSDefaultParameterValues.Clear()
+        $PSDefaultParameterValues['Invoke-WebRequest:PassThru'] = $true
+        $PSDefaultParameterValues['Invoke-WebRequest:OutFile'] = $outFile
 
-    $FilePath = Resolve-Path -Path $FilePath
-    if( -not $FilePath )
-    {
-        return
-    }
+        if( -not $Credential )
+        {
+            $Credential = Get-Credential -Message ('Enter credentials for {0}' -f $baseProjectUri)
+        }
 
-    $loginUri = 'https://bitbucket.org{0}' -f $form.Action
-    $body = @{
-                    'username' = $Credential.UserName;
-                    'password' = $Credential.GetNetworkCredential().Password;
-                    'csrfmiddlewaretoken' = $formFields.csrfmiddlewaretoken;
-                    'submit' = '';
-                    'next' = '';
-                 }
-    $resp = Invoke-WebRequest -Uri $loginUri -Method $form.Method -Body $body -Headers @{ Referer = $loginUri }
-    if( -not (Assert-Response -Response $resp -ExpectedUri 'https://bitbucket.org/') )
-    {
-        exit 1
-    }
+        $session = $null
+        $loginUri = 'https://bitbucket.org/account/signin/'
+        $resp = Invoke-WebRequest -Uri $loginUri -SessionVariable 'session' -Method Get 
+        if( -not (Assert-Response -Response $resp -ExpectedUri $loginUri) )
+        {
+            return
+        }
 
-    $downloadUri = 'https://bitbucket.org/{0}/{1}/downloads' -f $Username,$ProjectName
-    $resp = Invoke-WebRequest -Uri $downloadUri -Method Get 
-    if( -not (Assert-Response -Response $resp -ExpectedUri $downloadUri) )
-    {
-        exit 1
-    }
+        $PSDefaultParameterValues['Invoke-WebRequest:WebSession'] = $session
 
-    $csrfToken = $resp.Forms |
-                    Where-Object { $_.Fields.ContainsKey( 'csrfmiddlewaretoken' ) } |
-                    ForEach-Object { $_.Fields.csrfmiddlewaretoken }
-    Write-Debug $csrfToken
+        $form = $resp.Forms | 
+                    Where-Object { $_.Action -eq '/account/signin/' }
+        $formFields = $form.Fields
+        $formFields.id_username = $Credential.UserName
+        $formFields.id_password = $Credential.GetNetworkCredential().Password
 
-    $boundary = [Guid]::NewGuid().ToString()
+        $loginUri = 'https://bitbucket.org{0}' -f $form.Action
+        $body = @{
+                        'username' = $Credential.UserName;
+                        'password' = $Credential.GetNetworkCredential().Password;
+                        'csrfmiddlewaretoken' = $formFields.csrfmiddlewaretoken;
+                        'submit' = '';
+                        'next' = '';
+                        }
+        $resp = Invoke-WebRequest -Uri $loginUri -Method $form.Method -Body $body -Headers @{ Referer = $loginUri }
+        if( -not (Assert-Response -Response $resp -ExpectedUri 'https://bitbucket.org/') )
+        {
+            exit 1
+        }
 
-    $bodyStart = @"
+        $downloadUri = '{0}/downloads' -f $baseProjectUri
+        $resp = Invoke-WebRequest -Uri $downloadUri -Method Get 
+        if( -not (Assert-Response -Response $resp -ExpectedUri $downloadUri) )
+        {
+            exit 1
+        }
+
+        $csrfToken = $resp.Forms |
+                        Where-Object { $_.Fields.ContainsKey( 'csrfmiddlewaretoken' ) } |
+                        ForEach-Object { $_.Fields.csrfmiddlewaretoken }
+        Write-Debug $csrfToken
+
+        $boundary = [Guid]::NewGuid().ToString()
+
+        $bodyStart = @"
 --$boundary
 Content-Disposition: form-data; name="csrfmiddlewaretoken"
 
@@ -159,55 +196,84 @@ $csrfToken
 Content-Disposition: form-data; name="token"
 
 --$boundary
-Content-Disposition: form-data; name="files"; filename="$(Split-Path -Leaf -Path $FilePath)"
+Content-Disposition: form-data; name="files"; filename="$(Split-Path -Leaf -Path $zipFilePath)"
 Content-Type: application/octet-stream
 
 
 "@
 
-$bodyEnd = @"
+        $bodyEnd = @"
 
 --$boundary--
 "@
 
-    $requestInFile = Join-Path -Path $env:TEMP -ChildPath ([IO.Path]::GetRandomFileName())
+        $requestInFile = Join-Path -Path $env:TEMP -ChildPath ([IO.Path]::GetRandomFileName())
 
-    try
-    {
-        $fileStream = New-Object 'System.IO.FileStream' ($requestInFile, [System.IO.FileMode]'Create', [System.IO.FileAccess]'Write')
-    
         try
         {
-            $bytes = [Text.Encoding]::UTF8.GetBytes($bodyStart)
-            $fileStream.Write( $bytes, 0, $bytes.Length )
+            $fileStream = New-Object 'System.IO.FileStream' ($requestInFile, [System.IO.FileMode]'Create', [System.IO.FileAccess]'Write')
+    
+            try
+            {
+                $bytes = [Text.Encoding]::UTF8.GetBytes($bodyStart)
+                $fileStream.Write( $bytes, 0, $bytes.Length )
 
-            $bytes = [IO.File]::ReadAllBytes($FilePath)
-            $fileStream.Write( $bytes, 0, $bytes.Length )
+                $bytes = [IO.File]::ReadAllBytes($zipFilePath)
+                $fileStream.Write( $bytes, 0, $bytes.Length )
 
-            $bytes = [Text.Encoding]::UTF8.GetBytes($bodyEnd)
-            $fileStream.Write( $bytes, 0, $bytes.Length )
+                $bytes = [Text.Encoding]::UTF8.GetBytes($bodyEnd)
+                $fileStream.Write( $bytes, 0, $bytes.Length )
+            }
+            finally
+            { 
+                $fileStream.Close()
+            }
+
+            $contentType = 'multipart/form-data; boundary={0}' -f $boundary
+
+            $resp = Invoke-WebRequest -Uri $downloadUri `
+                                      -Method Post `
+                                      -InFile $requestInFile `
+                                      -ContentType $contentType `
+                                      -Headers @{ Referer = $downloadUri }
+            if( -not (Assert-Response -Response $resp -ExpectedUri $downloadUri) )
+            {
+                return
+            }
+
         }
         finally
-        { 
-            $fileStream.Close()
+        {
+            Remove-Item -Path $requestInFile
         }
 
-        $contentType = 'multipart/form-data; boundary={0}' -f $boundary
-
-        $resp = Invoke-WebRequest -Uri $downloadUri `
-                                  -Method Post `
-                                  -InFile $requestInFile `
-                                  -ContentType $contentType `
-                                  -Headers @{ Referer = $downloadUri }
-        if( -not (Assert-Response -Response $resp -ExpectedUri $downloadUri) )
+        $numTries = 10
+        $tryNum = 0
+        while( $tryNum++ -lt $numTries )
         {
-            return
+            try
+            {
+                $resp = Invoke-WebRequest -Uri $zipDownloadUrl
+                $resp | Select-Object -Property 'StatusCode','StatusDescription',@{ Name = 'Uri'; Expression = { $zipDownloadUrl }}
+                break
+            }
+            catch
+            {
+                Start-Sleep -Seconds 1
+            }
         }
 
     }
     finally
     {
-        Remove-Item -Path $requestInFile
-    }
+        if( (Test-Path -Path $outFile -PathType Leaf) )
+        {
+            Remove-Item -Path $outFile
+        }
 
+        if( (Test-Path -Path $zipFilePath -PathType Leaf) )
+        {
+            Remove-Item -Path $zipFilePath
+        }
+    }
 }

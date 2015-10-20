@@ -38,18 +38,22 @@ function Publish-PowerShellGalleryModule
     param(
         [Parameter(Mandatory=$true)]
         [string]
-        # The name of the module being published.
-        $Name,
+        # Path to the module's manifest.
+        $ManifestPath,
 
         [Parameter(Mandatory=$true)]
         [string]
         # The path to the module.
-        $Path,
+        $ModulePath,
 
         [Parameter(Mandatory=$true)]
-        [Version]
-        # The version being published. Nothing is published if this version already exists in the PowerShell Gallery.
-        $Version,
+        [string]
+        # The release notes.
+        $ReleaseNotesPath,
+
+        [string]
+        # The name of the module being published. Defaults to the name in the module manifest.
+        $Name,
 
         [string]
         # The API key for the PowerShell Gallery.
@@ -59,10 +63,6 @@ function Publish-PowerShellGalleryModule
         [string]
         # The URL to the module's license.
         $LicenseUri,
-
-        [string]
-        # The release notes.
-        $ReleaseNotes,
 
         [string[]]
         # Any tags for the module.
@@ -75,29 +75,41 @@ function Publish-PowerShellGalleryModule
 
     Set-StrictMode -Version 'Latest'
 
+    $manifest = Test-ModuleManifest -Path $ManifestPath
+    if( -not $manifest )
+    {
+        return
+    }
+
+    if( -not $Name )
+    {
+        $Name = $manifest.Name
+    }
+
     if( Get-Module -Name 'PowerShellGet' )
     {
-        if( -not (Find-Module -Name $Name -RequiredVersion $Version -Repository 'PSGallery' -ErrorAction Ignore) )
+        if( -not (Find-Module -Name $Name -RequiredVersion $manifest.Version -Repository 'PSGallery' -ErrorAction Ignore) )
         {
+            $releaseNotes = Get-ModuleReleaseNotes -ManifestPath $ManifestPath -ReleaseNotesPath $ReleaseNotesPath
             Write-Verbose -Message ('Publishing to PowerShell Gallery.')
             if( -not $ApiKey )
             {
                 $ApiKey = Read-Host -Prompt ('Please enter PowerShell Gallery API key')
             }
 
-            Publish-Module -Path $Path `
+            Publish-Module -Path $ModulePath `
                            -Repository 'PSGallery' `
                            -NuGetApiKey $ApiKey `
                            -LicenseUri $LicenseUri `
-                           -ReleaseNotes $ReleaseNotes `
+                           -ReleaseNotes $releaseNotes `
                            -Tags $Tags `
                            -ProjectUri $ProjectUri
 
-            Find-Module -Name $Name -RequiredVersion $Version -Repository 'PSGallery'
+            Find-Module -Name $Name -RequiredVersion $manifest.Version -Repository 'PSGallery'
         }
         else
         {
-            Write-Warning -Message ('{0} {1} already exists in the PowerShell Gallery.' -f $Name,$Version)
+            Write-Warning -Message ('{0} {1} already exists in the PowerShell Gallery.' -f $Name,$manifest.Version)
         }
     }
     else
