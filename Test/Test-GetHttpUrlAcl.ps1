@@ -1,5 +1,18 @@
 
 & (Join-Path -Path $PSScriptRoot -ChildPath 'Import-CarbonForTest.ps1' -Resolve)
+$user = $null
+$url = 'http://test-gethttpurlacl:10939/'
+
+function Start-Test
+{
+    $user = Install-User -Credential (New-Credential -UserName 'CarbonTestUser' -Password 'Password1') -PassThru
+    netsh http add urlacl ('url={0}' -f $url)('user={0}\{1}' -f $env:COMPUTERNAME,$user.SamAccountName) | Write-Debug
+}
+
+function Stop-Test
+{
+    netsh http delete urlacl ('url={0}' -f $url)
+}
 
 function Test-ShouldGetAllUrlAcls
 {
@@ -42,4 +55,63 @@ function Test-ShouldGetAllUrlAcls
 
         }
     }
+}
+
+function Test-ShouldGetSpecificUrl
+{
+    [Carbon.Security.HttpUrlSecurity[]]$acls = Get-HttpUrlAcl -LiteralUrl $url
+    Assert-TestUrl $acls
+}
+
+
+function Test-ShouldIgnoreWildcardsWithLiteralUrlParameter
+{
+    [Carbon.Security.HttpUrlSecurity[]]$acls = Get-HttpUrlAcl -LiteralUrl 'http://*:10939/' -ErrorAction SilentlyContinue
+    Assert-Null $acls
+    Assert-Error -Last -Regex 'not found'
+}
+
+function Test-ShouldFindWithWildcard
+{
+    [Carbon.Security.HttpUrlSecurity[]]$acls = Get-HttpUrlAcl -Url 'http://*:10939/'
+    Assert-TestUrl $acls
+}
+
+function Test-ShouldWriteErrorIfLiteralUrlNotFound
+{
+    $acl = Get-HttpUrlAcl -LiteralUrl 'fubar' -ErrorAction SilentlyContinue
+    Assert-Null $acl
+    Assert-Error -Last -Regex 'not found'
+}
+
+function Test-ShouldFailIfUrlWithNoWildcardsNotFound
+{
+    $acl = Get-HttpUrlAcl -Url 'fubar' -ErrorAction SilentlyContinue
+    Assert-Null $acl
+    Assert-Error -Last -Regex 'not found'
+}
+
+function Test-ShouldNotFailIfUrlWithWildcardsNotFound
+{
+    $acl = Get-HttpUrlAcl -Url 'fubar*' 
+    Assert-Null $acl
+    Assert-NoError
+}
+
+function Assert-TestUrl
+{
+    param(
+        [Carbon.Security.HttpUrlSecurity[]]
+        $Acls 
+    )
+
+    Assert-NoError
+
+    Assert-NotNull $Acls
+    Assert-Equal 1 $Acls.Count
+
+    $acl = $Acls[0]
+    Assert-Equal 1 $acl.Access.Count 
+    $rule = $acl.Access[0]
+    Assert-Equal ('{0}\{1}' -f $env:COMPUTERNAME,$user.SamAccountName) $rule.IdentityReference
 }
