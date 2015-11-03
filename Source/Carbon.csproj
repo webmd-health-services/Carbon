@@ -70,6 +70,9 @@
     <Compile Include="Firewall\RuleInterfaceType.cs" />
     <Compile Include="Firewall\RuleProfile.cs" />
     <Compile Include="Firewall\RuleSecurity.cs" />
+    <Compile Include="Security\HttpUrlAccessRights.cs" />
+    <Compile Include="Security\HttpUrlAccessRule.cs" />
+    <Compile Include="Security\HttpUrlSecurity.cs" />
     <Compile Include="Identity.cs" />
     <Compile Include="IdentityType.cs" />
     <Compile Include="Ini\IniNode.cs" />
@@ -114,6 +117,7 @@
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </COMReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

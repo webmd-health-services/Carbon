@@ -92,7 +92,7 @@ All functions are idempotent: when run multiple times with the same arguments, y
     TypesToProcess = 'Carbon.types.ps1xml'
 
     # Format files (.ps1xml) to be loaded when importing this module
-    FormatsToProcess = @( 'Carbon.format.ps1xml' )
+    FormatsToProcess = @( 'Carbon.format.ps1xml', 'Formats\Carbon.Security.HttpUrlAcl.format.ps1xml' )
 
     # Modules to import as nested modules of the module specified in ModuleToProcess
     NestedModules = @()

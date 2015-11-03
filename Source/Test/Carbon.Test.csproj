@@ -74,6 +74,7 @@
       <Link>AssemblyVersion.cs</Link>
     </Compile>
     <Compile Include="Certificates\SslCertificateBindingTestFixture.cs" />
+    <Compile Include="Security\UrlSecurityTests.cs" />
     <Compile Include="IdentityTest.cs" />
     <Compile Include="IO\FileInfoTestFixture.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -97,6 +98,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Carbon.snk" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Http\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

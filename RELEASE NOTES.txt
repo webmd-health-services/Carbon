@@ -1,3 +1,10 @@
+# 2.1.0
+
+## New Functions
+
+ * `Get-HttpUrlAcl`: uses Windows API to return HTTP URL ACLs; replaces the `netsh http show urlacl` command.
+
+
 # 2.0.1 (19 October 2015)
 
  * Fixed: errors importing Carbon when IIS not installed on Windows 2012 R2 and Windows 10 (fixes [issue 168: Cannot import Carbon 2.0 module due to issues with IIS related functionality](https://bitbucket.org/splatteredbits/carbon/issues/168)).

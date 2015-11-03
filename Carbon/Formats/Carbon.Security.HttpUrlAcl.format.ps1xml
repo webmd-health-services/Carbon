@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Configuration>
+    <ViewDefinitions>
+        <View>
+            <Name>Carbon.Security.HttpUrlSecurity</Name>
+            <ViewSelectedBy>
+                <TypeName>Carbon.Security.HttpUrlSecurity</TypeName>
+            </ViewSelectedBy>
+            <TableControl>
+                <TableHeaders>
+                    <TableColumnHeader>
+                        <Label>Url</Label>
+                    </TableColumnHeader>
+                    <TableColumnHeader>
+                        <Label>Access</Label>
+                    </TableColumnHeader>
+                </TableHeaders>
+                <TableRowEntries>
+                    <TableRowEntry>
+                        <TableColumnItems>
+                            <TableColumnItem>
+                                <PropertyName>Url</PropertyName>
+                            </TableColumnItem>
+                            <TableColumnItem>
+                                <ScriptBlock>
+                                    foreach( $rule in $_.Access )
+                                    {
+                                        '{0}: {1}' -f $rule.IdentityReference,$rule.HttpUrlAccessRights
+                                    }
+                                </ScriptBlock>
+                            </TableColumnItem>
+                        </TableColumnItems>
+                    </TableRowEntry>
+                </TableRowEntries>
+            </TableControl>
+        </View>
+    </ViewDefinitions>
+</Configuration>
