@@ -12,7 +12,7 @@
 
 & (Join-Path -Path $PSScriptRoot -ChildPath 'Import-CarbonForTest.ps1' -Resolve)
 
-[Carbon.Identity]$user = $null
+$user = $null
 $url = 'http://test-granthttpurlpermission:10383/'
 
 function Start-Test
