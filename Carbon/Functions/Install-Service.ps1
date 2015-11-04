@@ -144,7 +144,7 @@ function Install-Service
         # The user the service should run as. Default is `NetworkService`.
         $UserName,
         
-        [Parameter(ParameterSetName='CustomAccount')]
+        [Parameter(ParameterSetName='CustomAccount',DontShow=$true)]
         [string]
         # OBSOLETE. The `Password` parameter will be removed in a future major version of Carbon. Use the `Credential` parameter instead.
         $Password,

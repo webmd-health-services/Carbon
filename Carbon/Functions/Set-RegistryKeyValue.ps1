@@ -152,6 +152,7 @@ function Set-RegistryKeyValue
         # Removes and re-creates the value.  Useful for changing a value's type.
         $Force,
         
+        [Parameter(DontShow=$true)]
         [Switch]
         # OBSOLETE. Will be removed in a future version of Carbon.
         $Quiet

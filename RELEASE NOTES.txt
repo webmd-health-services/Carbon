@@ -7,6 +7,7 @@
  * `Revoke-HttpUrlPermission`: uses Windows API to revoke all a user or group's permissions on HTTP URLs; replaces the `netsh http delete urlacl` command.
  * `Install-Directory`: creates a directory (and any missing parents), if it doesn't exist already. Finally!
  * `Uninstall-Directory`: removes a directory, if it exists. Finally!
+ * Obsolete function parameters will no longer show in Intellisense (added the `DontShow` parameter property).
 
 
 # 2.0.1 (19 October 2015)

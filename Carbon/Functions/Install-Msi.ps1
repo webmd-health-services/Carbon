@@ -41,6 +41,7 @@ function Install-Msi
         # The path to the installer to run. Wildcards supported.
         $Path,
         
+        [Parameter(DontShow=$true)]
         [Switch]
         # OBSOLETE. Installers are run in quiet mode by default. This switch will be removed in a future major version of Carbon. 
         $Quiet,

@@ -52,13 +52,13 @@ function Install-User
     [OutputType([System.DirectoryServices.AccountManagement.UserPrincipal])]
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSAvoidUsingUserNameAndPassWordParams","")]
     param(
-        [Parameter(Mandatory=$true,ParameterSetName='WithUserNameAndPassword')]
+        [Parameter(Mandatory=$true,ParameterSetName='WithUserNameAndPassword',DontShow=$true)]
         [ValidateLength(1,20)]
         [string]
         # OBSOLETE. The `UserName` parameter will be removed in a future major version of Carbon. Use the `Credential` parameter instead.
         $UserName,
         
-        [Parameter(Mandatory=$true,ParameterSetName='WithUserNameAndPassword')]
+        [Parameter(Mandatory=$true,ParameterSetName='WithUserNameAndPassword',DontShow=$true)]
         [string]
         # OBSOLETE. The `Password` parameter will be removed in a future major version of Carbon. Use the `Credential` parameter instead.
         $Password,

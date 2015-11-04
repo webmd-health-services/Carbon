@@ -90,12 +90,12 @@ function Install-IisAppPool
         # Run the app pool under the given local service account.  Valid values are `NetworkService`, `LocalService`, and `LocalSystem`.  The default is `ApplicationPoolIdentity`, which causes IIS to create a custom local user account for the app pool's identity.  The default is `ApplicationPoolIdentity`.
         $ServiceAccount,
         
-        [Parameter(ParameterSetName='AsSpecificUser',Mandatory=$true)]
+        [Parameter(ParameterSetName='AsSpecificUser',Mandatory=$true,DontShow=$true)]
         [string]
         # OBSOLETE. The `UserName` parameter will be removed in a future major version of Carbon. Use the `Credential` parameter instead.
         $UserName,
         
-        [Parameter(ParameterSetName='AsSpecificUser',Mandatory=$true)]
+        [Parameter(ParameterSetName='AsSpecificUser',Mandatory=$true,DontShow=$true)]
         # OBSOLETE. The `Password` parameter will be removed in a future major version of Carbon. Use the `Credential` parameter instead.
         $Password,
 
