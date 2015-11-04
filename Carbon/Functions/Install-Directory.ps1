@@ -27,6 +27,6 @@ function Install-Directory
 
     if( -not (Test-Path -Path $Path -PathType Container) )
     {
-        New-Item -Path $Path -ItemType 'Directory' | Out-String | Write-Verbose -Verbose
+        New-Item -Path $Path -ItemType 'Directory' | Out-String | Write-Verbose
     }
 }

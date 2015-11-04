@@ -768,6 +768,10 @@
         "Tags":  [ "Certificates" ]
     },
     {
+        "Name":  "Uninstall-Directory",
+        "Tags":  [ "File System", "NTFS", "Directory" ]
+    },
+    {
         "Name":  "Uninstall-FileShare",
         "Tags":  [ "Shares" ]
     },

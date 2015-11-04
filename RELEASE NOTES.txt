@@ -6,6 +6,7 @@
  * `Grant-HttpUrlPermission`: uses Windows API to grant listen/delegate permissions on HTTP URLs; replaces the `netsh http add urlacl` command.
  * `Revoke-HttpUrlPermission`: uses Windows API to revoke all a user or group's permissions on HTTP URLs; replaces the `netsh http delete urlacl` command.
  * `Install-Directory`: creates a directory (and any missing parents), if it doesn't exist already. Finally!
+ * `Uninstall-Directory`: removes a directory, if it exists. Finally!
 
 
 # 2.0.1 (19 October 2015)
