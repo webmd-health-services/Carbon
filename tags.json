@@ -264,7 +264,7 @@
         "Tags":  [ "Path", "PowerShell" ]
     },
     {
-        "Name":  "Get-PathToHosts File",
+        "Name":  "Get-PathToHostsFile",
         "Tags":  [ "Hosts File" ]
     },
     {
@@ -370,6 +370,10 @@
     {
         "Name":  "Install-Certificate",
         "Tags":  [ "Certificates" ]
+    },
+    {
+        "Name":  "Install-Directory",
+        "Tags":  [ "File System", "NTFS", "Directory" ]
     },
     {
         "Name":  "Install-FileShare",
@@ -546,6 +550,10 @@
     {
         "Name":  "Revoke-ComPermission",
         "Tags":  [ "COM", "Security" ]
+    },
+    {
+        "Name": "Revoke-HttpUrlPermission",
+        "Tags": [ "Security", "HTTP", "WCF", "netsh", "ACL" ]
     },
     {
         "Name":  "Revoke-Permission",
