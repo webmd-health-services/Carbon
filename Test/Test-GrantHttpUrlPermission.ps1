@@ -17,9 +17,9 @@ function Stop-Test
 
 function Test-ShouldRegisterAUrl
 {
-    Grant-HttpUrlPermission -Url $url -Principal $user -Permission Register
+    Grant-HttpUrlPermission -Url $url -Principal $user -Permission Listen
     Assert-NoError
-    Assert-Permission -ExpectedPermission ([Carbon.Security.HttpUrlAccessRights]::Register)
+    Assert-Permission -ExpectedPermission ([Carbon.Security.HttpUrlAccessRights]::Listen)
 }
 
 function Test-ShouldGrantJustDelegatePermission
@@ -38,28 +38,28 @@ function Test-ShouldGrantJustReadPermission
 
 function Test-ShouldChangePermission
 {
-    Grant-HttpUrlPermission -Url $url -Principal $user -Permission Register
+    Grant-HttpUrlPermission -Url $url -Principal $user -Permission Listen
     Assert-NoError
-    Assert-Permission -ExpectedPermission ([Carbon.Security.HttpUrlAccessRights]::Register)
+    Assert-Permission -ExpectedPermission ([Carbon.Security.HttpUrlAccessRights]::Listen)
 
-    Grant-HttpUrlPermission -Url $url -Principal $user -Permission RegisterAndDelegate
+    Grant-HttpUrlPermission -Url $url -Principal $user -Permission ListenAndDelegate
     Assert-NoError
-    Assert-Permission -ExpectedPermission ([Carbon.Security.HttpUrlAccessRights]::RegisterAndDelegate)
+    Assert-Permission -ExpectedPermission ([Carbon.Security.HttpUrlAccessRights]::ListenAndDelegate)
 }
 
 function Test-ShouldGrantMultipleUsersPermission
 {
-    Grant-HttpUrlPermission -Url $url -Principal $user -Permission Register
+    Grant-HttpUrlPermission -Url $url -Principal $user -Permission Listen
     Assert-NoError
 
     Install-User -Credential (New-Credential -UserName 'CarbonTestUser2' -Password 'Password1') -PassThru
     $user2 = Resolve-Identity -Name 'CarbonTestUser2'
 
-    Grant-HttpUrlPermission -Url $url -Principal $user2.FullName -Permission Register
+    Grant-HttpUrlPermission -Url $url -Principal $user2.FullName -Permission Listen
     Assert-NoError
 
-    Assert-Permission -ExpectedPermission ([Carbon.Security.HttpUrlAccessRights]::Register)
-    Assert-Permission -ExpectedPermission ([Carbon.Security.HttpUrlAccessRights]::Register) -ExpectedUser $user2.FullName
+    Assert-Permission -ExpectedPermission ([Carbon.Security.HttpUrlAccessRights]::Listen)
+    Assert-Permission -ExpectedPermission ([Carbon.Security.HttpUrlAccessRights]::Listen) -ExpectedUser $user2.FullName
 }
 
 function Assert-Permission

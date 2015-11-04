@@ -12,9 +12,9 @@ function Grant-HttpUrlPermission
 
     > enables applications to communicate over HTTP without using Microsoft Internet Information Server (IIS). Applications can register to receive HTTP requests for particular URLs, receive HTTP requests, and send HTTP responses.
 
-    An application that uses the HTTP Server API must register all URLs it binds to. A user can have two permissions: 
+    An application that uses the HTTP Server API must register all URLs it listens (i.e. binds, registers) to. A user can have three permissions: 
     
-     * `Register`, which allows the user to bind to the `$Url` url
+     * `Listen`, which allows the user to bind to the `$Url` url
      * `Delegate`, which allows the user to "reserve (delegate) a subtree of this URL for another user" (whatever that means)
 
     If the user already has the desired permissions, nothing happens. If the user has any permissions not specified by the `Permission` parameter, they are removed (i.e. if the user currently has delegate permission, but you don't pass that permission in, it will be removed).
@@ -30,9 +30,9 @@ function Grant-HttpUrlPermission
     Get-HttpUrlAcl
 
     .EXAMPLE
-    Grant-HttpUrlAclPermission -Url 'http://+:4833' -Principal 'FALCON\HSolo' -Permission [Carbon.Security.HttpUrlAccessRights]::Register
+    Grant-HttpUrlAclPermission -Url 'http://+:4833' -Principal 'FALCON\HSolo' -Permission [Carbon.Security.HttpUrlAccessRights]::Listen
 
-    Demonstrates how to grant a user permission to bind to (i.e. "register") an HTTP URL. IN this case user `FALCON\HSolo` can use `http://+:4833`.
+    Demonstrates how to grant a user permission to listen to (i.e. "bind" or "register") an HTTP URL. In this case user `FALCON\HSolo` can listen to `http://+:4833`.
 
     .EXAMPLE
     Grant-HttpUrlAclPermission -Url 'http://+:4833' -Principal 'FALCON\HSolo' -Permission [Carbon.Security.HttpUrlAccessRights]::Delegate
@@ -40,9 +40,9 @@ function Grant-HttpUrlPermission
     Demonstrates how to grant a user permission to delegate an HTTP URL, but not the ability to bind to that URL. In this case user `FALCON\HSolo` can delegate `http://+:4833`, but can't bind to it.
 
     .EXAMPLE
-    Grant-HttpUrlAclPermission -Url 'http://+:4833' -Principal 'FALCON\HSolo' -Permission [Carbon.Security.HttpUrlAccessRights]::RegisterAndDelegate
+    Grant-HttpUrlAclPermission -Url 'http://+:4833' -Principal 'FALCON\HSolo' -Permission [Carbon.Security.HttpUrlAccessRights]::ListenAndDelegate
 
-    Demonstrates how to grant a user permission to regisgter *and* delegate an HTTP URL. In this case user `FALCON\HSolo` can bind to and delegate `http://+:4833`.
+    Demonstrates how to grant a user permission to listen (i.e "bind" or "register") to *and* delegate an HTTP URL. In this case user `FALCON\HSolo` can listen to and delegate `http://+:4833`.
     #>
     [CmdletBinding()]
     param(
@@ -61,9 +61,9 @@ function Grant-HttpUrlPermission
         [Carbon.Security.HttpUrlAccessRights]
         # The permission(s) to grant the user. There are two permissions:
         #
-        #  * `Register`, which allows the user to bind to the `$Url` url
+        #  * `Listen`, which allows the user to bind to the `$Url` url
         #  * `Delegate`, which allows the user to "reserve (delegate) a subtree of this URL for another user" (whatever that means)
-        #  * `RegisterAndDelegate`, which grants both `Register` and `Delegate` permissions
+        #  * `ListenAndDelegate`, which grants both `Listen` and `Delegate` permissions
         $Permission
     )
 
@@ -94,7 +94,7 @@ function Grant-HttpUrlPermission
         $currentRights = $currentRule.HttpUrlAccessRights
     }
 
-    Write-Verbose -Message ('[{0}]  [{1}]  {2} -> {3}' -f $Url,$id.FullName,$currentRights,$Permission) -Verbose
+    Write-Verbose -Message ('[{0}]  [{1}]  {2} -> {3}' -f $Url,$id.FullName,$currentRights,$Permission)
     $rule = New-Object 'Carbon.Security.HttpUrlAccessRule' $id.Sid,$Permission
     $modifiedRule = $null
     $acl.ModifyAccessRule( ([Security.AccessControl.AccessControlModification]::RemoveAll), $rule, [ref]$modifiedRule )

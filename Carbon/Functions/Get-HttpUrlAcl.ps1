@@ -12,7 +12,7 @@ function Get-HttpUrlAcl
 
     > enables applications to communicate over HTTP without using Microsoft Internet Information Server (IIS). Applications can register to receive HTTP requests for particular URLs, receive HTTP requests, and send HTTP responses.
 
-    An application that uses the HTTP Server API must register all URLs it binds to. When registering, the user who will bind to the URL must also be provided. Typically, this is done with the `netsh http (show|add|remove) urlacl` command. This function replaces the `netsh http show urlacl` command.
+    An application that uses the HTTP Server API must register all URLs it listens (i.e. binds, registers) to. When registering, the user who will listen to the URL must also be provided. Typically, this is done with the `netsh http (show|add|remove) urlacl` command(s). This function replaces the `netsh http show urlacl` command.
 
     `Get-HttpUrlAcl` was introduced in Carbon 2.1.0.
 

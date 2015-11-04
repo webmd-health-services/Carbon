@@ -35,13 +35,13 @@ function Test-ShouldGetAllUrlAcls
             }
 
             $listen = 'No'
-            if( $rule.HttpUrlAccessRights -eq [Carbon.Security.HttpUrlAccessRights]::Register -or $rule.HttpUrlAccessRights -eq [Carbon.Security.HttpUrlAccessRights]::RegisterAndDelegate )
+            if( $rule.HttpUrlAccessRights -eq [Carbon.Security.HttpUrlAccessRights]::Listen -or $rule.HttpUrlAccessRights -eq [Carbon.Security.HttpUrlAccessRights]::ListenAndDelegate )
             {
                 $listen = 'Yes'
             }
 
             $delegate = 'No'
-            if( $rule.HttpUrlAccessRights -eq [Carbon.Security.HttpUrlAccessRights]::Delegate -or $rule.HttpUrlAccessRights -eq [Carbon.Security.HttpUrlAccessRights]::RegisterAndDelegate )
+            if( $rule.HttpUrlAccessRights -eq [Carbon.Security.HttpUrlAccessRights]::Delegate -or $rule.HttpUrlAccessRights -eq [Carbon.Security.HttpUrlAccessRights]::ListenAndDelegate )
             {
                 $delegate = 'Yes'
             }
