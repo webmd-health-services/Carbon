@@ -19,6 +19,8 @@ function Install-Directory
     .DESCRIPTION
     The `Install-Directory` function creates a directory. If the directory already exists, it does nothing. If any parent directories don't exist, they are created, too.
 
+    `Install-Directory` was added in Carbon 2.1.0.
+
     .EXAMPLE
     Install-Directory -Path 'C:\Projects\Carbon'
 

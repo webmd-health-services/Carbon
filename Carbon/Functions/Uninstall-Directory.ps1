@@ -19,6 +19,8 @@ function Uninstall-Directory
     .DESCRIPTION
     The `Uninstall-Directory` function removes a directory. If the directory doesn't exist, it does nothing. If the directory has any files or sub-directories, you will be prompted to confirm the deletion of the directory and all its contents. To avoid the prompt, use the `-Recurse` switch.
 
+    `Uninstall-Directory` was added in Carbon 2.1.0.
+
     .EXAMPLE
     Uninstall-Directory -Path 'C:\Projects\Carbon'
 
