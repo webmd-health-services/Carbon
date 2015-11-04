@@ -20,7 +20,10 @@ function Get-HttpUrlAcl
     https://msdn.microsoft.com/en-us/library/aa364510.aspx
 
     .LINK
-    Grant-HttpUrlAcl
+    Grant-HttpUrlPermission
+
+    .LINK
+    Revoke-HttpUrlPermission
 
     .OUTPUTS
     Carbon.Security.HttpUrlSecurity.

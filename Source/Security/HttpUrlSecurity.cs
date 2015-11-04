@@ -11,6 +11,7 @@ namespace Carbon.Security
 	public sealed class HttpUrlSecurity : CommonObjectSecurity
 	{
 		private const uint HttpInitializeConfig = 0x00000002;
+		private const string AuditingNotSupportedMessage = "HTTP URL security does not support audit rules.";
 
 		#region httpapi.dll
 		// ReSharper disable InconsistentNaming
@@ -132,7 +133,34 @@ namespace Carbon.Security
 			Url = url;
 		}
 
+		public override Type AccessRightType
+		{
+			get { return typeof(HttpUrlAccessRights); }
+		}
+
+		public override Type AccessRuleType
+		{
+			get { return typeof(HttpUrlAccessRule); }
+		}
+
+		public override Type AuditRuleType
+		{
+			get { throw new NotImplementedException(AuditingNotSupportedMessage); }
+		}
+
 		public string Url { get; private set; }
+
+		public override AccessRule AccessRuleFactory(IdentityReference identityReference, int accessMask, bool isInherited,
+			InheritanceFlags inheritanceFlags, PropagationFlags propagationFlags, AccessControlType type)
+		{
+			return new HttpUrlAccessRule(identityReference, (HttpUrlAccessRights)accessMask);
+		}
+
+		public override AuditRule AuditRuleFactory(IdentityReference identityReference, int accessMask, bool isInherited,
+			InheritanceFlags inheritanceFlags, PropagationFlags propagationFlags, AuditFlags flags)
+		{
+			throw new NotImplementedException(AuditingNotSupportedMessage);
+		}
 
 		public static HttpUrlSecurity[] GetHttpUrlSecurity()
 		{
@@ -221,11 +249,6 @@ namespace Carbon.Security
 			}
 		}
 
-		private static void TerminateHttp()
-		{
-			HttpTerminate(HttpInitializeConfig, IntPtr.Zero);
-		}
-
 		private static void InitializeHttp()
 		{
 			var httpApiVersion = new HTTPAPI_VERSION(1, 0);
@@ -237,56 +260,73 @@ namespace Carbon.Security
 			}
 		}
 
+		public void RemoveAccessRule(HttpUrlAccessRule rule)
+		{
+			RemoveAccessRuleAll(rule);
+			SetHttpUrlSddl();
+		}
+
 		public void SetAccessRule(HttpUrlAccessRule rule)
+		{
+			AddAccessRule(rule);
+			SetHttpUrlSddl();
+		}
+
+		private void SetHttpUrlSddl()
 		{
 			InitializeHttp();
 
-			AddAccessRule(rule);
-
 			try
 			{
-				var keyDesc = new HTTP_SERVICE_CONFIG_URLACL_KEY(this.Url);
+				var keyDesc = new HTTP_SERVICE_CONFIG_URLACL_KEY(Url);
+
 				var sddl = GetSecurityDescriptorSddlForm(AccessControlSections.Access);
+
 				var paramDesc = new HTTP_SERVICE_CONFIG_URLACL_PARAM(sddl);
 
 				var inputConfigInfoSet = new HTTP_SERVICE_CONFIG_URLACL_SET {KeyDesc = keyDesc, ParamDesc = paramDesc};
 
-				IntPtr pInputConfigInfo = Marshal.AllocCoTaskMem(Marshal.SizeOf(typeof(HTTP_SERVICE_CONFIG_URLACL_SET)));
+				var pInputConfigInfo = Marshal.AllocCoTaskMem(Marshal.SizeOf(typeof (HTTP_SERVICE_CONFIG_URLACL_SET)));
 				Marshal.StructureToPtr(inputConfigInfoSet, pInputConfigInfo, false);
 
-				var retVal = HttpSetServiceConfiguration(IntPtr.Zero,
-					HTTP_SERVICE_CONFIG_ID.HttpServiceConfigUrlAclInfo,
-					pInputConfigInfo,
-					Marshal.SizeOf(inputConfigInfoSet),
-					IntPtr.Zero);
-
-				if (Win32ErrorCodes.AlreadyExists == retVal)
+				ulong retVal;
+				var currentAccess = GetAccessRules(true, true, typeof (SecurityIdentifier));
+				if (currentAccess.Count == 0)
 				{
 					retVal = HttpDeleteServiceConfiguration(IntPtr.Zero,
 						HTTP_SERVICE_CONFIG_ID.HttpServiceConfigUrlAclInfo,
 						pInputConfigInfo,
 						Marshal.SizeOf(inputConfigInfoSet),
 						IntPtr.Zero);
+				}
+				else
+				{
+					retVal = HttpSetServiceConfiguration(IntPtr.Zero,
+						HTTP_SERVICE_CONFIG_ID.HttpServiceConfigUrlAclInfo,
+						pInputConfigInfo,
+						Marshal.SizeOf(inputConfigInfoSet),
+						IntPtr.Zero);
 
-					if (Win32ErrorCodes.Ok == retVal)
+					if (Win32ErrorCodes.AlreadyExists == retVal)
 					{
-						retVal = HttpSetServiceConfiguration(IntPtr.Zero,
+						retVal = HttpDeleteServiceConfiguration(IntPtr.Zero,
 							HTTP_SERVICE_CONFIG_ID.HttpServiceConfigUrlAclInfo,
 							pInputConfigInfo,
 							Marshal.SizeOf(inputConfigInfoSet),
 							IntPtr.Zero);
 
-						if (Win32ErrorCodes.Ok != retVal)
+						if (Win32ErrorCodes.Ok == retVal)
 						{
-							throw new Win32Exception();
+							retVal = HttpSetServiceConfiguration(IntPtr.Zero,
+								HTTP_SERVICE_CONFIG_ID.HttpServiceConfigUrlAclInfo,
+								pInputConfigInfo,
+								Marshal.SizeOf(inputConfigInfoSet),
+								IntPtr.Zero);
 						}
 					}
-					else
-					{
-						throw new Win32Exception();
-					}
 				}
-				else if (Win32ErrorCodes.Ok != retVal)
+
+				if (Win32ErrorCodes.Ok != retVal)
 				{
 					throw new Win32Exception();
 				}
@@ -298,31 +338,11 @@ namespace Carbon.Security
 				TerminateHttp();
 			}
 		}
-		public override AccessRule AccessRuleFactory(IdentityReference identityReference, int accessMask, bool isInherited,
-			InheritanceFlags inheritanceFlags, PropagationFlags propagationFlags, AccessControlType type)
+
+		private static void TerminateHttp()
 		{
-			return new HttpUrlAccessRule(identityReference, (HttpUrlAccessRights)accessMask);
+			HttpTerminate(HttpInitializeConfig, IntPtr.Zero);
 		}
 
-		public override AuditRule AuditRuleFactory(IdentityReference identityReference, int accessMask, bool isInherited,
-			InheritanceFlags inheritanceFlags, PropagationFlags propagationFlags, AuditFlags flags)
-		{
-			throw new NotImplementedException();
-		}
-
-		public override Type AccessRightType
-		{
-			get { return typeof (HttpUrlAccessRights); }
-		}
-
-		public override Type AccessRuleType
-		{
-			get { return typeof (HttpUrlAccessRule); }
-		}
-
-		public override Type AuditRuleType
-		{
-			get { throw new NotImplementedException(); }
-		}
 	}
 }

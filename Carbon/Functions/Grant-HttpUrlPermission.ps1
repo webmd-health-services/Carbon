@@ -29,6 +29,9 @@ function Grant-HttpUrlPermission
     .LINK
     Get-HttpUrlAcl
 
+    .LINK
+    Revoke-HttpUrlPermission
+
     .EXAMPLE
     Grant-HttpUrlAclPermission -Url 'http://+:4833' -Principal 'FALCON\HSolo' -Permission [Carbon.Security.HttpUrlAccessRights]::Listen
 
