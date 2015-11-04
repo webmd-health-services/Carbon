@@ -33,6 +33,17 @@ function Test-ShouldRegisterAUrl
     Assert-Permission -ExpectedPermission ([Carbon.Security.HttpUrlAccessRights]::Listen)
 }
 
+function Test-ShouldRegisterUrlWithoutTrailingForwardSlash
+{
+    Grant-HttpUrlPermission -Url $url.TrimEnd("/") -Principal $user -Permission ListenAndDelegate
+    Install-User -Credential (New-Credential -UserName 'CarbonTestUser2' -Password 'Password1') -PassThru
+    $user2 = Resolve-Identity -Name 'CarbonTestUser2'
+    Grant-HttpUrlPermission -Url $url.TrimEnd("/") -Principal $user2.FullName -Permission ListenAndDelegate
+    Assert-NoError
+    Assert-Permission -ExpectedPermission ([Carbon.Security.HttpUrlAccessRights]::ListenAndDelegate)
+    Assert-Permission -ExpectedPermission ([Carbon.Security.HttpUrlAccessRights]::ListenAndDelegate) -ExpectedUser $user2.FullName
+}
+
 function Test-ShouldGrantJustDelegatePermission
 {
     Grant-HttpUrlPermission -Url $url -Principal $user -Permission Delegate

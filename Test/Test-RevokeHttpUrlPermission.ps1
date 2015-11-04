@@ -41,3 +41,9 @@ function Test-ShouldRevokePermissionMultipleTimes
     Assert-NoError
     Assert-Null (Get-HttpUrlAcl -Url $url -ErrorAction Ignore)
 }
+
+function Test-ShouldRevokeProperlyIfUrlDoesNotEndWithTrailingSlash
+{
+    Revoke-HttpUrlPermission -Url $url.TrimEnd('/') -Principal $user
+    Assert-Null (Get-HttpUrlAcl -LiteralUrl $url -ErrorAction Ignore)
+}

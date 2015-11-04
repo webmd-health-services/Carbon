@@ -85,7 +85,12 @@ function Grant-HttpUrlPermission
 
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
-    $acl = Get-HttpUrlAcl -Url $Url -ErrorAction Ignore
+    if( -not $Url.EndsWith("/") )
+    {
+        $Url = '{0}/' -f $Url
+    }
+
+    $acl = Get-HttpUrlAcl -LiteralUrl $Url -ErrorAction Ignore
     if( -not $acl )
     {
         $acl = New-Object 'Carbon.Security.HttpUrlSecurity' $Url

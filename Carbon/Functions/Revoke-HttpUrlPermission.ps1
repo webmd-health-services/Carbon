@@ -69,7 +69,12 @@ function Revoke-HttpUrlPermission
         return
     }
 
-    $acl = Get-HttpUrlAcl -Url $Url -ErrorAction Ignore
+    if( -not $Url.EndsWith('/') )
+    {
+        $Url = '{0}/' -f $Url
+    }
+
+    $acl = Get-HttpUrlAcl -LiteralUrl $Url -ErrorAction Ignore
     if( -not $acl )
     {
         return

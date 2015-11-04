@@ -112,11 +112,11 @@ function Get-HttpUrlAcl
     {
         if( $PSCmdlet.ParameterSetName -eq 'ByLiteralUrl' )
         {
-            Write-Error ('HTTP ACL for URL {0} not found.' -f $LiteralUrl) @errorActionParam
+            Write-Error ('HTTP ACL for URL {0} not found. The HTTP API adds a trailing forward slash (/) to the end of all URLs. Make sure your URL ends with a trailing slash.' -f $LiteralUrl) @errorActionParam
         }
         elseif( -not [Management.Automation.WildcardPattern]::ContainsWildcardCharacters($Url) )
         {
-            Write-Error ('HTTP ACL for URL {0} not found.' -f $Url) @errorActionParam
+            Write-Error ('HTTP ACL for URL {0} not found. The HTTP API adds a trailing forward slash (/) to the end of all URLs. Make sure your URL ends with a trailing slash.' -f $Url) @errorActionParam
         }
     }
 }
