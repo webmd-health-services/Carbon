@@ -14,8 +14,13 @@ function Get-HttpUrlAcl
 
     An application that uses the HTTP Server API must register all URLs it binds to. When registering, the user who will bind to the URL must also be provided. Typically, this is done with the `netsh http (show|add|remove) urlacl` command. This function replaces the `netsh http show urlacl` command.
 
+    `Get-HttpUrlAcl` was introduced in Carbon 2.1.0.
+
     .LINK
     https://msdn.microsoft.com/en-us/library/aa364510.aspx
+
+    .LINK
+    Grant-HttpUrlAcl
 
     .OUTPUTS
     Carbon.Security.HttpUrlSecurity.
@@ -62,6 +67,14 @@ function Get-HttpUrlAcl
 
     Set-StrictMode -Version 'Latest'
 
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
+    $errorActionParam = @{ 'ErrorAction' = $ErrorActionPreference }
+    if( $ErrorActionPreference -eq 'Ignore' )
+    {
+        $ErrorActionPreference = 'SilentlyContinue'
+    }
+
     $acls = @()
     [Carbon.Security.HttpUrlSecurity]::GetHttpUrlSecurity() |
         Where-Object {
@@ -85,11 +98,11 @@ function Get-HttpUrlAcl
     {
         if( $PSCmdlet.ParameterSetName -eq 'ByLiteralUrl' )
         {
-            Write-Error ('HTTP ACL for URL {0} not found.' -f $LiteralUrl)
+            Write-Error ('HTTP ACL for URL {0} not found.' -f $LiteralUrl) @errorActionParam
         }
         elseif( -not [Management.Automation.WildcardPattern]::ContainsWildcardCharacters($Url) )
         {
-            Write-Error ('HTTP ACL for URL {0} not found.' -f $Url)
+            Write-Error ('HTTP ACL for URL {0} not found.' -f $Url) @errorActionParam
         }
     }
 }

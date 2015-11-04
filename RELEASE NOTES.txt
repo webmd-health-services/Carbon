@@ -3,6 +3,7 @@
 ## New Functions
 
  * `Get-HttpUrlAcl`: uses Windows API to return HTTP URL ACLs; replaces the `netsh http show urlacl` command.
+ * `Grant-HttpUrlPermission`: uses Windows API to grant listen/delegate permissions on HTTP URLs; replaces the `netsh http add urlacl` command.
 
 
 # 2.0.1 (19 October 2015)

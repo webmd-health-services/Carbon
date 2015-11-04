@@ -204,6 +204,10 @@
         "Tags":  [ "Groups" ]
     },
     {
+        "Name": "Get-HttpUrlAcl",
+        "Tags": [ "Security", "HTTP", "WCF", "netsh", "ACL" ]
+    },
+    {
         "Name":  "Get-IisApplication",
         "Tags":  [ "IIS" ]
     },
@@ -338,6 +342,10 @@
     {
         "Name":  "Grant-MsmqMessageQueuePermission",
         "Tags":  [ "MSMQ" ]
+    },
+    {
+        "Name": "Grant-HttpUrlPermission",
+        "Tags": [ "Security", "HTTP", "WCF", "netsh", "ACL" ]
     },
     {
         "Name":  "Grant-Permission",
