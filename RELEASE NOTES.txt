@@ -8,6 +8,10 @@
  * `Install-Directory`: creates a directory (and any missing parents), if it doesn't exist already. Finally!
  * `Uninstall-Directory`: removes a directory, if it exists. Finally!
  * Obsolete function parameters will no longer show in Intellisense (added the `DontShow` parameter property).
+ 
+## Bug Fixes
+ 
+ * Fixed: `Install-FileShare` always re-configures existing shares; it doesn't properly detect permissions that need to be removed.
 
 
 # 2.0.1 (19 October 2015)

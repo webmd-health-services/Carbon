@@ -77,6 +77,18 @@ function Test-ShouldGrantPermissions
     Assert-ContainsLike $details "Remark            "
 }
 
+function Test-ShouldGrantPermissionsTwice
+{
+    Assert-True ($fullAccessGroup -like '* *') 'full access group must contain a space.'
+    Invoke-NewShare -FullAccess $fullAccessGroup -ChangeAccess $changeAccessGroup -ReadAccess $readAccessGroup
+    Invoke-NewShare -FullAccess $fullAccessGroup -ChangeAccess $changeAccessGroup -ReadAccess $readAccessGroup
+    $details = net share $ShareName
+    Assert-ContainsLike $details ("{0}, FULL" -f $fullAccessGroup) 'Permissions not set on share.'
+    Assert-ContainsLike $details ("{0}, CHANGE" -f $changeAccessGroup) 'Permissions not set on share.'
+    Assert-ContainsLike $details ("{0}, READ" -f $readAccessGroup) 'Permissions not set on share.'
+    Assert-ContainsLike $details "Remark            "
+}
+
 function Test-ShouldGrantMultipleFullAccessPermissions
 {
     Install-SmbShare -Name $shareName -Path $TestDir -Description $Remarks -FullAccess $fullAccessGroup,$changeAccessGroup,$readAccessGroup

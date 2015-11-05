@@ -229,16 +229,16 @@ function Install-FileShare
         {
             $identityName = $ace.IdentityReference.Value
 
-            $extraAce = $ace
+            $existingAce = $ace
             if( $shareAces )
             {
-                $extraAce = $shareAces | Where-Object { 
+                $existingAce = $shareAces | Where-Object { 
                                                         $newIdentityName = Resolve-IdentityName -SID $_.Trustee.SID
-                                                        return ( $newIdentityName -ne $ace.IdentityReference.Value )
+                                                        return ( $newIdentityName -eq $ace.IdentityReference.Value )
                                                     }
             }
 
-            if( $extraAce )
+            if( -not $existingAce )
             {
                 Write-Verbose -Message ('[SHARE] [{0}] Access       {1}: {2} ->' -f $Name,$identityName,$ace.ShareRights)
                 $updateShare = $true
