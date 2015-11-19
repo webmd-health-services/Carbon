@@ -14,7 +14,7 @@ $iniPath = $null
 
 function Start-TestFixture
 {
-    & (Join-Path -Path $PSScriptRoot -ChildPath '..\Import-CarbonForTest.ps1' -Resolve)
+    & (Join-Path -Path $PSScriptRoot -ChildPath 'Import-CarbonForTest.ps1' -Resolve)
 }
 
 function Start-Test
@@ -27,8 +27,9 @@ section1value1 = duplicate
 
 [section1]
 section1value1 = value2
+unicodevalue = הגûךיטאשחה
 
-'@ > $iniPath
+'@ | Set-Content -Path $iniPath
 }
 
 function Stop-Test
@@ -38,7 +39,6 @@ function Stop-Test
 
 function Test-ShouldNotRemoveEntryThatDoesNotExist
 {
-    $Error.Clear()
     $originalIniFile = ((Get-Content -Path $iniPath) -join "`r`n")
 
     Remove-IniEntry -Path $iniPath -Section section -Name empty 
@@ -65,6 +65,7 @@ sectionless = value
 
 [section1]
 section1value1 = value2
+unicodevalue = הגûךיטאשחה
 
 '@
 }
@@ -78,6 +79,7 @@ sectionless = value
 section1value1 = duplicate
 
 [section1]
+unicodevalue = הגûךיטאשחה
 
 '@
 }
