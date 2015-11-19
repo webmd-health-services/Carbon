@@ -14,7 +14,7 @@ $iniPath = $null
 
 function Start-TestFixture
 {
-    & (Join-Path -Path $PSScriptRoot -ChildPath '..\Import-CarbonForTest.ps1' -Resolve)
+    & (Join-Path -Path $PSScriptRoot -ChildPath 'Import-CarbonForTest.ps1' -Resolve)
 }
 
 function Start-Test
@@ -295,6 +295,15 @@ name = d
     Assert-Equal 'b' $ini['NAME'].Value
     Assert-Equal '4' $ini['section.name'].Value
     Assert-Equal 'd' $ini['SECTION.name'].Value
+}
+
+function Test-ShouldSupportUnicode
+{
+    $value = 'הגûךיטאשחה'
+    Set-IniEntry -Path $iniPath -Name 'username' -Value $value
+    $ini = Split-Ini -Path $iniPath -AsHashtable
+    Assert-NotNull $ini
+    Assert-Equal $value $ini['username'].Value
 }
 
 function Assert-IniFile

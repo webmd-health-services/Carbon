@@ -171,6 +171,6 @@ function Set-IniEntry
         }
     }
     
-    $lines | Out-File -FilePath $Path -Encoding OEM
+    $lines | Set-Content -Path $Path
 }
 

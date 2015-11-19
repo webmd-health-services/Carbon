@@ -12,6 +12,7 @@
 ## Bug Fixes
  
  * Fixed: `Install-FileShare` always re-configures existing shares; it doesn't properly detect permissions that need to be removed.
+ * Fixed: `Set-IniEntry` fails to preservice unicode characters with diacritics in INI entry names and values.
 
 
 # 2.0.1 (19 October 2015)
