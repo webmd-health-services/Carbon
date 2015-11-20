@@ -35,7 +35,7 @@ function Test-AdminPrivilege
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
     $identity = [Security.Principal.WindowsIdentity]::GetCurrent()
-    Write-Verbose "Checking if current user '$($identity.Name)' has administrative privileges."
+    Write-Debug -Message "Checking if current user '$($identity.Name)' has administrative privileges."
 
     $hasElevatedPermissions = $false
     foreach ( $group in $identity.Groups )
