@@ -14,10 +14,15 @@
  * Fixed: `Install-FileShare` always re-configures existing shares; it doesn't properly detect permissions that need to be removed.
  * Fixed: `Set-IniEntry` fails to preserve unicode characters with diacritics in INI entry names and values.
  * Fixed: `Remove-IniEntry` fails to preserve unicode characters with diacritics in INI entry names and values.
+ * Fixed: `Set-HostsEntry` leaves trailing tabs and whitespace after all but the last line
  
 ## Other Improvements
 
  * `Test-AdminPrivilege`: changed its verbose message to a debug message.
+ * `Set-HostsEntry`: 
+    * only updates hosts file if it needs to change
+    * added an improved verbose message when setting a hosts entry
+    * improved error handling when hosts file can't be opened for reading
 
 
 # 2.0.1 (19 October 2015)

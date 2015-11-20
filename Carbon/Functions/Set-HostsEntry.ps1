@@ -87,10 +87,45 @@ function Set-HostsEntry
         New-Item $Path -ItemType File
     }
      
-    [string[]]$lines = Get-Content -Path $Path
+    [string[]]$lines = @()
+    
+    $succeeded = $false
+    for( $idx = 0; $idx -lt 20; ++$idx )
+    {
+        $exception = $false
+        try
+        {
+            $getHostsEntryError = @()
+            $lines = Get-Content -Path $Path -ErrorAction SilentlyContinue -ErrorVariable 'getHostsEntryError'
+            $succeeded = $true
+            break
+        }
+        catch
+        {
+            if( $Global:Error.Count -gt 0 )
+            {
+                $Global:Error.RemoveAt(0)
+            }
+            $exception = $true
+        }
+
+        if( $exception -or $getHostsEntryError )
+        {
+            Write-Debug -Message ('Failed to get hosts entries from ''{0}''. Retrying in 500 milliseconds.' -f $Path)
+            Start-Sleep -Milliseconds 500
+        }
+    }
+
+    if( -not $succeeded )
+    {
+        Write-Error ('Failed to read hosts file ''{0}''.' -f $Path)
+        return
+    }
+
     $outLines = New-Object 'Collections.ArrayList'
     $found = $false
     $lineNum = 0
+    $updateHostsFile = $false
      
     foreach($line in $lines)
     {
@@ -105,12 +140,13 @@ function Set-HostsEntry
             $ip = $matches["IP"]
             $hn = $matches["HostName"]
             $tail = $matches["Tail"].Trim()
-            if($HostName -eq $hn)
+            if( $HostName -eq $hn )
             {
                 if($found)
                 {
                     #this is a duplicate so, let's comment it out
                     [void] $outlines.Add("#$line")
+                    $updateHostsFile = $true
                     continue
                 }
                 $ip = $IPAddress
@@ -122,12 +158,18 @@ function Set-HostsEntry
                 $tail = "`t{0}" -f $tail
             }
            
-            if($tail.Trim() -eq "#")
+            if( $tail.Trim() -eq "#" )
             {
                 $tail = ""
             }
 
             $outline = $lineformat -f $ip, $hn, $tail
+            $outline = $outline.Trim()
+            if( $outline -ne $line )
+            {
+                $updateHostsFile = $true
+            }
+
             [void] $outlines.Add($outline)
                 
         }
@@ -149,46 +191,50 @@ function Set-HostsEntry
        }
            
        $outline = $lineformat -f $IPAddress, $HostName, $tail
+       $outline = $outline.Trim()
        [void] $outlines.Add($outline)
+       $updateHostsFile = $true
+    }
+
+    if( -not $updateHostsFile )
+    {
+        return
     }
     
-    if( $pscmdlet.ShouldProcess( $Path, "set hosts entry $HostName to point to $IPAddress" ) )
+    Write-Verbose -Message ('[HOSTS]  [{0}]  {1,-15}  {2}' -f $Path,$IPAddress,$HostName)
+    $succeeded = $false
+    $maxTries = 10
+    $rng = New-Object 'Random'
+    for( $idx = 0; $idx -lt $maxTries; ++$idx )
     {
-        $succeeded = $false
-        $maxTries = 10
-        $rng = New-Object 'Random'
-        for( $idx = 0; $idx -lt $maxTries; ++$idx )
+        $exception = $false
+        try
         {
-            $exception = $false
-            try
+            $setHostsEntryError = @()
+            $outlines | Set-Content -Path $Path -ErrorAction SilentlyContinue -ErrorVariable 'setHostsEntryError'
+            $succeeded = $true
+            break
+        }
+        catch
+        {
+            if( $Global:Error.Count -gt 0 )
             {
-                $setHostsEntryError = @()
-                $outlines | Out-File -FilePath $Path -Encoding OEM -ErrorAction SilentlyContinue -ErrorVariable 'setHostsEntryError'
-                $succeeded = $true
-                break
+                $Global:Error.RemoveAt(0)
             }
-            catch
-            {
-                if( $Global:Error.Count -gt 0 )
-                {
-                    $Global:Error.RemoveAt(0)
-                }
-                $exception = $true
-            }
-
-            if( $exception -or $setHostsEntryError )
-            {
-                $timeout = $rng.Next(0,1000)
-                Write-Verbose ('Failed to set hosts entry ''{0}    {1}'' in ''{2}'': waiting {3} milliseconds to try again.' -f $HostName,$IPAddress,$Path,$timeout)
-                Start-Sleep -Milliseconds $timeout
-            }
+            $exception = $true
         }
 
-        if( -not $succeeded )
+        if( $exception -or $setHostsEntryError )
         {
-            Write-Error ('Failed to set hosts entry ''{0}    {1}'' in ''{2}'': looks like the hosts file is in use.' -f $HostName,$IPAddress,$Path)
+            $timeout = $rng.Next(0,1000)
+            Write-Debug -Message ('Failed to set hosts entry ''{0}    {1}'' in ''{2}'': waiting {3} milliseconds to try again.' -f $HostName,$IPAddress,$Path,$timeout)
+            Start-Sleep -Milliseconds $timeout
         }
-        
-    }     
+    }
+
+    if( -not $succeeded )
+    {
+        Write-Error ('Failed to set hosts entry ''{0}    {1}'' in ''{2}'': looks like the hosts file is in use.' -f $HostName,$IPAddress,$Path)
+    }
 }
 

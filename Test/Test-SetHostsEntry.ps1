@@ -15,7 +15,7 @@ $customHostsFile = ''
 
 function Start-TestFixture
 {
-    & (Join-Path -Path $PSScriptRoot '..\Import-CarbonForTest.ps1' -Resolve)
+    & (Join-Path -Path $PSScriptRoot 'Import-CarbonForTest.ps1' -Resolve)
 }
 
 function Start-Test
@@ -121,6 +121,7 @@ function Test-ShouldSupportWhatIf
     Set-HostsEntry -IPAddress '127.0.0.1' -Hostname 'example.com' -WhatIf -Path $customHostsFile
     
     Assert-HostsFileContains '127.0.0.1       localhost'
+    Assert-That (Get-Content -Raw -Path $customHostsFile) -DoesNotContain 'example.com'
 }
 
 function Test-ShouldSetEntryInEmptyHostsFile
@@ -177,11 +178,23 @@ function Test-MultipleCallShouldNotDeleteTabulation
     Assert-HostsFileContains -Line "127.0.0.1       test3"
 }
 
+function Test-ShouldTrimTrailingSpace
+{
+    $line = @"
+127.0.0.1       fubarsnafu
+127.0.0.1       snafufubar
+"@
+    $line | Set-Content -Path $customHostsFile
+
+    Set-HostsEntry -IPAddress '127.0.0.1' -HostName 'fubarsnafu' -Path $customHostsFile
+    Assert-Equal $line.Trim() (Get-Content -Raw -Path $customHostsFile).Trim("`r","`n")
+}
+
 
 function Assert-HostsFileContains($Line, $Path = $customHostsFile)
 {
     $hostsFile = Get-Content $Path
-    Assert-Contains $hostsFile $Line "Hosts file"
+    Assert-That $hostsFile -Contains $Line "Hosts file"
 }
 
 
@@ -189,7 +202,7 @@ filter Out-HostsFile
 {
     process
     {
-        $_ | Out-File $customHostsFile -Append -Encoding OEM
+        $_ | Add-Content $customHostsFile 
     }
 }
 
