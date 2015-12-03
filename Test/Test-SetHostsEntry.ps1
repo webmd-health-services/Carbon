@@ -153,6 +153,9 @@ function Test-ShouldIgnoreAndCommentInvalidHostsEntry
 
 function Test-ShouldHandleIfHostsFileInUse
 {
+    Set-HostsEntry '0.3.2.1' -HostName 'example1.com' -Path $customHostsFile -ErrorAction SilentlyContinue
+    Set-HostsEntry '0.6.7.8' -HostName 'example2.com' -Path $customHostsFile -ErrorAction SilentlyContinue
+
     $file = [IO.File]::Open($customHostsFile, 'Open', 'Read', 'Read')
     try
     {
@@ -164,6 +167,50 @@ function Test-ShouldHandleIfHostsFileInUse
     }
     Assert-Equal 1 $Global:Error.Count
     Assert-Error -Last -Regex 'looks like the hosts file is in use'
+
+    $expectedHostsFile = @'
+0.3.2.1         example1.com
+0.6.7.8         example2.com
+'@
+    Assert-That (Get-Content -Raw -Path $customHostsFile) -Contains $expectedHostsFile
+}
+
+function Test-ShouldHandleIfHostsFileCanNotBeRead
+{
+    Set-HostsEntry '0.3.2.1' -HostName 'example1.com' -Path $customHostsFile -ErrorAction SilentlyContinue
+    Set-HostsEntry '0.6.7.8' -HostName 'example2.com' -Path $customHostsFile -ErrorAction SilentlyContinue
+
+    $job = Start-Job -ScriptBlock {
+                                        $file = [IO.File]::Open($using:customHostsFile, 'Open', 'Read', 'None')
+                                        Start-Sleep -Seconds 1
+                                        $file.Close()
+                                  }
+    do
+    {
+        Start-Sleep -Milliseconds 100
+        Write-Debug -Message ('Waiting for hosts file to get locked.')
+    }
+    while( (Get-Content -Raw -Path $customHostsFile -ErrorAction Ignore) )
+
+    Set-HostsEntry '1.2.3.4' -HostName 'example.com' -Path $customHostsFile -ErrorAction SilentlyContinue
+
+    #Assert-Equal 1 $Global:Error.Count
+    #Assert-Error -Last -Regex 'looks like the hosts file is in use'
+
+    do
+    {
+        Start-Sleep -Milliseconds 100
+        Write-Debug -Message ('Waiting for hosts file to get unlocked.')
+    }
+    while( -not (Get-Content -Raw -Path $customHostsFile -ErrorAction Ignore) )
+
+    $expectedHostsFile = @'
+0.3.2.1         example1.com
+0.6.7.8         example2.com
+'@
+    $hostsFile = Get-Content -Raw -Path $customHostsFile -ErrorAction Ignore
+    Assert-NotNull $hostsFile
+    Assert-That $hostsFile -Contains $expectedHostsFile
 }
 
 #This test check case from Issue #148 

@@ -93,12 +93,11 @@ function Set-HostsEntry
     for( $idx = 0; $idx -lt 20; ++$idx )
     {
         $exception = $false
+        $getHostsEntryError = @()
         try
         {
-            $getHostsEntryError = @()
             $lines = Get-Content -Path $Path -ErrorAction SilentlyContinue -ErrorVariable 'getHostsEntryError'
             $succeeded = $true
-            break
         }
         catch
         {
@@ -111,8 +110,14 @@ function Set-HostsEntry
 
         if( $exception -or $getHostsEntryError )
         {
+            $succeeded = $false
             Write-Debug -Message ('Failed to get hosts entries from ''{0}''. Retrying in 500 milliseconds.' -f $Path)
             Start-Sleep -Milliseconds 500
+        }
+
+        if( $succeeded )
+        {
+            break
         }
     }
 
@@ -208,12 +213,11 @@ function Set-HostsEntry
     for( $idx = 0; $idx -lt $maxTries; ++$idx )
     {
         $exception = $false
+        $setHostsEntryError = @()
         try
         {
-            $setHostsEntryError = @()
             $outlines | Set-Content -Path $Path -ErrorAction SilentlyContinue -ErrorVariable 'setHostsEntryError'
             $succeeded = $true
-            break
         }
         catch
         {
@@ -226,9 +230,15 @@ function Set-HostsEntry
 
         if( $exception -or $setHostsEntryError )
         {
+            $succeeded = $false
             $timeout = $rng.Next(0,1000)
             Write-Debug -Message ('Failed to set hosts entry ''{0}    {1}'' in ''{2}'': waiting {3} milliseconds to try again.' -f $HostName,$IPAddress,$Path,$timeout)
             Start-Sleep -Milliseconds $timeout
+        }
+
+        if( $succeeded )
+        {
+            break
         }
     }
 
