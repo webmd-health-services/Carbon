@@ -17,9 +17,8 @@ CHAT
     You'll need a [GitHub](https://github.com) account to login and ask questions.
 
 E-MAIL
-    Carbon has a mailing list: [carbon@freelists.org](mailto:carbon@freelists.org). You 
-    don't need to subscribe to ask questions, but you do need to subscribe to be part of
-    the community and answer questions. [Subscribe to the list.](http://www.freelists.org/list/carbon).
+    Carbon has a public mailing list: [carbonps@googlegroups.com](mailto:carbonps@googlegroups.com). Anyone can ask questions. You do need to subscribe to be part of
+    the community and answer questions. [Subscribe to the list.](https://groups.google.com/forum/#!forum/carbonps).
 
 REPORTING BUGS AND REQUESTING NEW FEATURES AND ENHANCEMENTS
     If you've found a bug or want to request an enhancement, create an issue on the 
@@ -27,6 +26,6 @@ REPORTING BUGS AND REQUESTING NEW FEATURES AND ENHANCEMENTS
     
 SEE ALSO
     https://gitter.im/splatteredbits/Carbon/
-    carbon@freelists.org
-    http://www.freelists.org/list/carbon
+    carbonps@googlegroups.com
+    https://groups.google.com/forum/#!forum/carbonps
     https://bitbucket.org/splatteredbits/carbon/issues?status=new&status=open

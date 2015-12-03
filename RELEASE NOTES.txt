@@ -589,7 +589,7 @@ This is the last minor release for version 1.0. Future 1.0-compatible releases w
 
 # 1.7.0 (30 April 2014)
 
-There is now [a Carbon support mailing list](http://www.freelists.org/list/carbon).
+There is now [a Carbon support mailing list](https://groups.google.com/forum/#!forum/carbonps).
 
 ## Enhancements
 
