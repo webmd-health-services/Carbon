@@ -306,6 +306,24 @@ function Test-ShouldSupportUnicode
     Assert-Equal $value $ini['username'].Value
 }
 
+function Test-ShouldPreserveExistingSectionHeadersOnUpdate
+{
+    # Set the contents of the INI file with an empty section header
+    '[TestSection01]' | Set-Content $iniPath
+
+    $expectedFileContents = @"
+[TestSection01]
+TestKey01 = TestValue01
+
+"@
+    # Update the ini file
+    Set-IniEntry -Path $iniPath -Section 'TestSection01' -Name 'TestKey01' -Value 'TestValue01'
+
+    $actualFileContents = Get-Content -Path $iniPath -Raw
+
+    Assert-Equal -Expected $expectedFileContents -Actual $actualFileContents
+}
+
 function Assert-IniFile
 {
     param(
