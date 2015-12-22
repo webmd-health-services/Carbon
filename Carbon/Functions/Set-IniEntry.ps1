@@ -157,8 +157,23 @@ function Set-IniEntry
                 {
                     [void] $lines.Add( '' )
                 }
-                [void] $lines.Add( "[$Section]" )
-                [void] $lines.Add( $newLine )
+
+                if(-not $lines.Contains("[$Section]"))
+                {
+                    [void] $lines.Add( "[$Section]" )
+                    [void] $lines.Add( $newLine )
+                }
+                else
+                {
+                    for ($i=0; $i -lt $lines.Count; $i++)
+                    {
+                        if ($lines[$i] -eq "[$Section]")
+                        {
+                            $lines.Insert($i+1, $newLine)
+                            break
+                        }
+                    }
+                }
             }
             else
             {
