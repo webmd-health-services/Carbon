@@ -5,7 +5,7 @@ describe 'Get-PowerShellModuleInstallPath' {
     it "should get preferred module install path" {
         if( $PSVersionTable.PSVersion -lt [Version]'5.0.0' )
         {
-            Get-PowerShellModuleInstallPath | should be (Join-Path -Path $env:SystemRoot -ChildPath 'system32\WindowsPowerShell\v1.0\Modules')
+            Get-PowerShellModuleInstallPath | should be (Join-Path -Path $env:SystemRoot -ChildPath 'system32\WindowsPowerShell\v1.0\Modules\')
         }
         else
         {

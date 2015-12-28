@@ -37,7 +37,7 @@ function Get-PowerShellModuleInstallPath
 
     $modulePaths = $env:PSModulePath -split ';' 
     $installRoot = $modulePaths | Where-Object { $_ -like ('{0}\WindowsPowerShell*' -f $env:ProgramFiles) }
-    if( -not $installRoot -or -not (Test-Path -Path $installRoot -PathType Container) )
+    if( $PSVersionTable.PSVersion -lt [Version]'5.0.0' -or -not $installRoot -or -not (Test-Path -Path $installRoot -PathType Container) )
     {
         Write-Verbose ('Module path under ''{0}'' not found.' -f $env:ProgramFiles)
         $installRoot = $modulePaths | Where-Object { $_ -like ('{0}\*' -f $env:SystemRoot) }
