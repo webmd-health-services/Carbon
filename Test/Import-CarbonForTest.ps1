@@ -18,4 +18,5 @@ Set-StrictMode -Version 'Latest'
 
 $carbonRoot = Join-Path -Path $PSScriptRoot -ChildPath '..\Carbon' -Resolve
 & (Join-Path -Path $carbonRoot -ChildPath 'Import-Carbon.ps1' -Resolve)
+Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath '..\Tools\Pester\3.3.14\Pester.psd1' -Resolve)
 
