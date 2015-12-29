@@ -52,9 +52,9 @@ try
     $xmlLogPath = Join-Path -Path $xmlLogPath -ChildPath 'BuildOutput\Carbon\CodeQuality\Carbon.blade.xml'
     & (Join-Path -Path $PSScriptRoot -ChildPath '.\Tools\Blade\blade.ps1' -Resolve) -Path $Path -XmlLogPath $xmlLogPath @bladeTestParam -Recurse:$Recurse -PassThru:$PassThru
 
-    $xmlLogPath = Join-Path -Path $xmlLogPath -ChildPath 'BuildOutput\Carbon\CodeQuality\Carbon.pester.xml'
+    $xmlLogPath = Join-Path -Path (Split-Path -Parent -Path $xmlLogPath) -ChildPath 'Carbon.pester.xml'
     Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'Tools\Pester\3.3.14\Pester.psd1' -Resolve)
-    Invoke-Pester -Script (Join-Path -Path $PSScriptRoot -ChildPath 'Test') -OutputXml $xmlLogPath 
+    Invoke-Pester -Script (Join-Path -Path $PSScriptRoot -ChildPath 'Test') -OutputFile $xmlLogPath -OutputFormat LegacyNUnitXml
 }
 finally
 {
