@@ -75,18 +75,26 @@ function Test-ShouldGetRelativePath
 
 function Test-ShouldGetPathToShare
 {
-    $shareName = Get-WmiObject 'Win32_Share' | Where-Object { $_.Name -notlike '*$' } | Select-Object -First 1 | Select-Object -ExpandProperty 'Name'
-    if( -not $shareName )
+    $tempDir = New-TempDirectory -Prefix $PSCommandPath 
+    $shareName = Split-Path -Leaf -Path $tempDir
+    try
     {
-        Fail ('Computer {0} has no shares. Need a share to exist so we can test Resolve-PathCase.' -f $env:COMPUTERNAME)
+        Install-FileShare -Name $shareName -Path $tempDir.FullName -ReadAccess 'Everyone'
+        try
+        {
+            $path = '\\{0}\{1}' -f $env:COMPUTERNAME,$shareName
+            $canonicalCase = Resolve-PathCase ($path.ToUpper()) -ErrorAction SilentlyContinue
+            Assert-Error -Last -Regex 'UNC .* not supported'
+            Assert-Null $canonicalCase
+        }
+        finally
+        {
+            Uninstall-FileShare -Name $shareName
+        }
     }
-
-    $path = '\\{0}\{1}' -f $env:COMPUTERNAME,$shareName
-    $path = Get-ChildItem -Path $path | Select-Object -First 1 | Select-Object -ExpandProperty 'FullName'
-
-    $canonicalCase = Resolve-PathCase ($path.ToUpper()) -ErrorAction SilentlyContinue
-    Assert-Error -Last -Regex 'UNC .* not supported'
-    Assert-Null $canonicalCase
-
+    finally
+    {
+        Remove-Item -Path $tempDir -Recurse -Force
+    }
 }
 
