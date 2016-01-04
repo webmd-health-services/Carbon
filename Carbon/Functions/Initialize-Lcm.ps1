@@ -37,7 +37,7 @@ function Initialize-Lcm
      * `ApplyAndMonitor`: The same as `ApplyOnly`, but if the configuration drifts, it is reported in event logs.
      * `ApplyAndAutoCorrect`: The same as `ApplyOnly`, and when the configuratio drifts, the discrepency is reported in event logs, and the LCM attempts to correct the configuration drift.
 
-    When credentials are needed on the target computer, the DSC system encrypts those credentials with a public key when generating the configuration. Those credentials are then decrypted on the target computer, using the corresponding private key. A computer can't run its configuration until the private key is installed. Use the `CertFile` and `CertPassword` parameters to specify the path to the certificate containing the private key and the private key's password, respectively. This function will upload the certificate to the target computer and install it in the proper Windows certificate store. To generate a public/private key pair, use `New-RsaKeyPair`.
+    When credentials are needed on the target computer, the DSC system encrypts those credentials with a public key when generating the configuration. Those credentials are then decrypted on the target computer, using the corresponding private key. A computer can't run its configuration until the private key is installed. Use the `CertFile` and `CertPassword` parameters to specify the path to the certificate containing the private key and the private key's password, respectively. This function will use Carbon's `Install-Certificate` function to upload the certificate to the target computer and install it in the proper Windows certificate store. To generate a public/private key pair, use `New-RsaKeyPair`.
 
     Returns an object representing the computer's updated LCM settings.
 
@@ -50,6 +50,9 @@ function Initialize-Lcm
 
     .LINK
     Start-DscPullConfiguration
+
+    .LINK
+    Install-Certificate
     
     .LINK
     http://technet.microsoft.com/en-us/library/dn249922.aspx
@@ -173,11 +176,18 @@ function Initialize-Lcm
 
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
+    if( $CertPassword -and $CertPassword -isnot [securestring] )
+    {
+        Write-Warning -Message ('You passed a plain text password to `Initialize-Lcm`. A future version of Carbon will remove support for plain-text passwords. Please pass a `SecureString` instead.')
+        $CertPassword = ConvertTo-SecureString -String $CertPassword -AsPlainText -Force
+    }
+    
     $thumbprint = $null
     if( $CertificateID )
     {
         $thumbprint = $CertificateID
     }
+
     $privateKey = $null
     if( $CertFile )
     {
@@ -193,6 +203,7 @@ function Initialize-Lcm
         {
             return
         }
+
         if( -not $privateKey.HasPrivateKey )
         {
             Write-Error ('Certificate file ''{0}'' does not have a private key.' -f $CertFile)
@@ -225,83 +236,13 @@ function Initialize-Lcm
     # Upload the private key, if one was given.
     if( $privateKey )
     {
-        # Get the bytes of the private key as a base-64 encoded string for easy transfer to the destination computer.
-        $certBytes = [IO.File]::ReadAllBytes($CertFile)
-        $encodedCert = [Convert]::ToBase64String( $certBytes )
-
-        Invoke-Command -ComputerName $ComputerName @credentialParam -ScriptBlock {
-            param(
-                [Parameter(Mandatory=$true)]
-                [string]
-                # The certificate's thumbprint.
-                $Thumbprint,
-
-                [Parameter(Mandatory=$true)]
-                [string]
-                # The base-64 encoded certificate to install.
-                $EncodedCertificate,
-
-                # The password for the certificate.
-                $Password,
-
-                [bool]
-                $WhatIf,
-
-                [Management.Automation.ActionPreference]
-                $Verbosity
-            )
-
-            Set-StrictMode -Version 'Latest'
-
-            $WhatIfPreference = $WhatIf
-            $VerbosePreference = $Verbosity
-
-            $certPath = Join-Path -Path 'cert:\LocalMachine\My' -ChildPath $Thumbprint
-            if( (Test-Path -Path $certPath -PathType Leaf) )
-            {
-                $cert = Get-Item -Path $certPath
-                if( $cert.HasPrivateKey )
-                {
-                    Write-Verbose -Message ('{0} ({1}) found at {2}' -f $cert.Subject,$cert.Thumbprint,$certPath)
-                    return
-                }
-            }
-
-            $tempDir = 'Carbon+Initialize-Lcm+Install-Certificate+{0}' -f [IO.Path]::GetRandomFileName()
-            $tempDir = Join-Path -Path $env:TEMP -ChildPath $tempDir
-            New-Item -Path $tempDir -ItemType 'Directory' -WhatIf:$false | Out-Null
-
-            try
-            {
-                $certBytes = [Convert]::FromBase64String( $EncodedCertificate )
-                $certFilePath = Join-Path -Path $tempDir -ChildPath ([IO.Path]::GetRandomFileName())
-                [IO.File]::WriteAllBytes( $certFilePath, $certBytes )
-
-                $keyFlags = [Security.Cryptography.X509Certificates.X509KeyStorageFlags]::MachineKeySet -bor [Security.Cryptography.X509Certificates.X509KeyStorageFlags]::PersistKeySet
-                $cert = New-Object 'Security.Cryptography.X509Certificates.X509Certificate2'
-                $cert.Import( $certFilePath, $Password, $keyFlags )
-
-                $store = New-Object 'Security.Cryptography.X509Certificates.X509Store' ([Security.Cryptography.X509Certificates.StoreName]::My),([Security.Cryptography.X509Certificates.StoreLocation]::LocalMachine)
-                $store.Open( ([Security.Cryptography.X509Certificates.OpenFlags]::ReadWrite) )
-
-                $description = $cert.FriendlyName
-                if( -not $description )
-                {
-                    $description = $cert.Subject
-                }
-
-                if( $PSCmdlet.ShouldProcess( 'install into LocalMachine''s My store', ('{0} ({1})' -f $description,$cert.Thumbprint) ) )
-                {
-                    Write-Verbose ('Installing certificate ''{0}'' ({1}) into Local Machine''s My store.' -f $description,$cert.Thumbprint)
-                    $store.Add( $cert )
-                }
-                $store.Close()
-            }
-            finally
-            {
-                Remove-Item -Path $tempDir -Recurse -ErrorAction Ignore -WhatIf:$false
-            }
-        } -ArgumentList $thumbprint,$encodedCert,$CertPassword,$WhatIfPreference,$VerbosePreference
+        Install-Certificate -ComputerName $ComputerName `
+                            @credentialParam `
+                            -Path $CertFile `
+                            -Password $CertPassword `
+                            -StoreLocation ([Security.Cryptography.X509Certificates.StoreLocation]::LocalMachine) `
+                            -StoreName ([Security.Cryptography.X509Certificates.StoreName]::My) | 
+            Out-Null
     }
 
     $sessions = New-CimSession -ComputerName $ComputerName @credentialParam

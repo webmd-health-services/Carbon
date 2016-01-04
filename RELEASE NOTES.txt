@@ -24,6 +24,11 @@
     * only updates hosts file if it needs to change
     * added an improved verbose message when setting a hosts entry
     * improved error handling when hosts file can't be opened for reading
+ * `Install-Certificate` can now install a certificate on a remote computer.
+ * `Initialize-Lcm` now uses `Install-Certificate` to install the decryption certificate on the remote computer.
+ * The following functions now write warning if you pass them a plain-text password. You should pass a `SecureString` instead.
+    * `Install-Certificate`
+    * `Initialize-Lcm`
 
 
 # 2.0.1 (19 October 2015)
