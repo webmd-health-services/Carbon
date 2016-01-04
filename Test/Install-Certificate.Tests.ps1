@@ -21,11 +21,11 @@ Describe "Install-Certificate" {
     function Assert-CertificateInstalled
     {
         param(
-            $StoreLocation, 
-            $StoreName,
+            $StoreLocation = 'CurrentUser', 
+            $StoreName = 'My',
             $ExpectedCertificate = $TestCert
         )
-        $cert = Get-Certificate -Thumbprint $ExpectedCertificate.Thumbprint -StoreLocation CurrentUser -StoreName My
+        $cert = Get-Certificate -Thumbprint $ExpectedCertificate.Thumbprint -StoreLocation $StoreLocation -StoreName $StoreName
         $cert | Should Not BeNullOrEmpty | Out-Null
         $cert.Thumbprint | Should Be $ExpectedCertificate.Thumbprint | Out-Null
         return $cert
@@ -47,13 +47,15 @@ Describe "Install-Certificate" {
 
     AfterEach {
         Uninstall-Certificate -Certificate $TestCert -StoreLocation CurrentUser -StoreName My
+        Uninstall-Certificate -Certificate $TestCert -StoreLocation LocalMachine -StoreName My
         Uninstall-Certificate -Certificate $TestCertProtected -StoreLocation CurrentUser -StoreName My
+        Uninstall-Certificate -Certificate $TestCertProtected -StoreLocation LocalMachine -StoreName My
     }
 
     It 'should install certificate to local machine' {
         $cert = Install-Certificate -Path $TestCertPath -StoreLocation CurrentUser -StoreName My
         $cert.Thumbprint | Should Be $TestCert.Thumbprint
-        $cert = Assert-CertificateInstalled -StoreLocation LocalMachine -StoreName My 
+        $cert = Assert-CertificateInstalled -StoreLocation CurrentUser -StoreName My 
         {
             $bytes = $cert.Export( [Security.Cryptography.X509Certificates.X509ContentType]::Pfx )
         } | Should Throw
@@ -66,7 +68,7 @@ Describe "Install-Certificate" {
             $path = '.\Certificates\{0}' -f (Split-Path -Leaf -Path $TestCertPath)
             $cert = Install-Certificate -Path $path -StoreLocation CurrentUser -StoreName My
             $cert.Thumbprint | Should Be $TestCert.Thumbprint
-            $cert = Assert-CertificateInstalled -StoreLocation LocalMachine -StoreName My 
+            $cert = Assert-CertificateInstalled -StoreLocation CurrentUser -StoreName My 
         }
         finally
         {
@@ -77,7 +79,7 @@ Describe "Install-Certificate" {
     It 'should install certificate to local machine as exportable' {
         $cert = Install-Certificate -Path $TestCertPath -StoreLocation CurrentUser -StoreName My -Exportable
         $cert.Thumbprint | Should Be $TestCert.Thumbprint
-        $cert = Assert-CertificateInstalled -StoreLocation LocalMachine -StoreName My 
+        $cert = Assert-CertificateInstalled -StoreLocation CurrentUser -StoreName My 
         $bytes = $cert.Export( [Security.Cryptography.X509Certificates.X509ContentType]::Pfx )
         $bytes | Should Not BeNullOrEmpty
     }
@@ -107,5 +109,11 @@ Describe "Install-Certificate" {
         $cert = Install-Certificate -Certificate $TestCertProtected -StoreLocation CurrentUser -StoreName My
         $cert | Should Not BeNullOrEmpty
         Assert-CertificateInstalled CurrentUser My $TestCertProtected
+    }
+
+    It 'should install certificate in remote computer' {
+        $cert = Install-Certificate -Certificate $TestCert -StoreLocation LocalMachine -StoreName My -ComputerName $env:COMPUTERNAME
+        $cert | Should Not BeNullOrEmpty
+        Assert-CertificateInstalled LocalMachine My
     }
 }
