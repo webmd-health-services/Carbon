@@ -26,6 +26,7 @@
     * improved error handling when hosts file can't be opened for reading
  * `Install-Certificate` can now install a certificate on a remote computer.
  * `Initialize-Lcm` now uses `Install-Certificate` to install the decryption certificate on the remote computer.
+ * `Uninstall-Certificate` can now uninstall a certificate on a remote computer.
  * The following functions now write warning if you pass them a plain-text password. You should pass a `SecureString` instead.
     * `Install-Certificate`
     * `Initialize-Lcm`

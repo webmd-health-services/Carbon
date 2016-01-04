@@ -60,4 +60,17 @@ Describe 'Uninstall-Certificate' {
         Uninstall-Certificate -Thumbprint $cert.Thumbprint -StoreLocation CurrentUser -CustomStoreName 'Carbon'
         $certPath | Should Not Exist   
     }
+
+    It 'should uninstall certificate from remote computer' {
+        $Global:Error.Clear()
+
+        Uninstall-Certificate -Thumbprint $TestCert.Thumbprint `
+                              -StoreLocation CurrentUser `
+                              -StoreName My `
+                              -ComputerName 'localhost'
+        $Global:Error.Count | Should Be 0
+
+        $cert = Get-Certificate -Thumbprint $TestCert.Thumbprint -StoreLocation CurrentUser -StoreName My
+        $cert | Should BeNullOrEmpty
+    }
 }
