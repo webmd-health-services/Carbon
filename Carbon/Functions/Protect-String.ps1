@@ -146,9 +146,9 @@ filter Protect-String
             {
                 $protectStringPath = Join-Path -Path $CarbonBinDir -ChildPath 'Protect-String.ps1' -Resolve
                 $encodedString = Protect-String -String $String -ForComputer
-            
+
                 $p = Start-Process -FilePath "powershell.exe" `
-                                   -ArgumentList $protectStringPath,"-ProtectedString",$encodedString `
+                                   -ArgumentList ('-File "{0}" -ProtectedString {1}' -f $protectStringPath,$encodedString) `
                                    -Credential $Credential `
                                    -RedirectStandardOutput $outFile `
                                    -RedirectStandardError $errFile `

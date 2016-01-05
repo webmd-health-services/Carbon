@@ -16,6 +16,7 @@
  * Fixed: `Remove-IniEntry` fails to preserve unicode characters with diacritics in INI entry names and values.
  * Fixed: `Set-HostsEntry` leaves trailing tabs and whitespace after all but the last line.
  * Fixed: `Get-PowerShellModuleInstallPath` returns wrong path for PowerShell 4.
+ * Fixed: `Protect-String` fails when Carbon is installed in a module path that contains spaces ([fixes issue #174](https://bitbucket.org/splatteredbits/carbon/issues/174/protect-string-throws-when-module-path))
  
 ## Other Improvements
 

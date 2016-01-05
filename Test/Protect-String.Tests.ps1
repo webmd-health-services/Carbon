@@ -14,8 +14,15 @@ $publicKeyFilePath = Join-Path -Path $PSScriptRoot -ChildPath 'Cryptography\Carb
 $privateKeyFilePath = Join-Path -Path $PSScriptRoot -ChildPath 'Cryptography\CarbonTestPrivateKey.pfx' -Resolve
 $dsaKeyPath = Join-Path -Path $PSScriptRoot -ChildPath 'Cryptography\CarbonTestDsaKey.cer' -Resolve
 & (Join-Path -Path $PSScriptRoot -ChildPath 'Import-CarbonForTest.ps1' -Resolve)
+$credential = $null
 
 Describe 'Protect-String' {
+
+    BeforeAll {
+        $password = 'Tt6QML1lmDrFSf'
+        $credential = New-Credential 'CarbonTestUser' -Password $password
+        Install-User -Credential $credential -Description 'Carbon test user.'    
+    }
 
     BeforeEach {
         $Global:Error.Clear()
@@ -50,17 +57,10 @@ Describe 'Protect-String' {
     if( -not (Test-Path -Path 'env:CCNetArtifactDirectory') )
     {
         It 'should protect string for credential' {
-            $password = 'Tt6QML1lmDrFSf'
-            Install-User -Credential (New-Credential -Username 'CarbonTestUser' -Password $password) -Description 'Carbon test user.'
-    
-            $credential = New-Credential 'CarbonTestUser' -Password $password
             # special chars to make sure they get handled correctly
             $string = ' f u b a r '' " > ~!@#$%^&*()_+`-={}|:"<>?[]\;,./'
             $protectedString = Protect-String -String $string -Credential $credential
-            if( -not $protectedString )
-            {
-                Fail ('Failed to protect a string as user {0}.' -f $credential.UserName)
-            }
+            $protectedString | Should Not BeNullOrEmpty ('Failed to protect a string as user {0}.' -f $credential.UserName)
     
             $tempDir = New-TempDir -Prefix (Split-Path -Leaf -Path $PSScriptRoot)
             $outFile = Join-Path -Path $tempDir -ChildPath 'secret'
@@ -202,6 +202,39 @@ Describe 'Protect-String' {
         $ciphertext | Should Not Be $secret
         $revealedSecret = Unprotect-String -ProtectedString $ciphertext -PrivateKeyPath $privateKeyFilePath -UseDirectEncryptionPadding
         $revealedSecret | Should Be $secret
+    }
+
+    It 'should handle spaces in path to Carbon' {
+        $tempDir = New-TempDirectory -Prefix 'Carbon Program Files'
+        try
+        {
+            $junctionPath = Join-Path -Path $tempDir -ChildPath 'Carbon'
+            Install-Junction -Link $junctionPath -Target (Join-Path -Path $PSScriptRoot -ChildPath '..\Carbon' -Resolve)
+            try
+            {
+                Remove-Module 'Carbon'
+                Import-Module $junctionPath
+                try
+                {
+                    $ciphertext = Protect-String -String 'fubar' -Credential $credential
+                    $Global:Error.Count | Should Be 0
+                    Assert-IsBase64EncodedString $ciphertext
+                }
+                finally
+                {
+                    Remove-Module 'Carbon'
+                    & (Join-Path -Path $PSScriptRoot -ChildPath 'Import-CarbonForTest.ps1' -Resolve)
+                }
+            }
+            finally
+            {
+                Uninstall-Junction -Path $junctionPath
+            }
+        }
+        finally
+        {
+            Remove-Item -Path $tempDir -Recurse -Force
+        }
     }
     
 }
