@@ -10,80 +10,77 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+& (Join-Path -Path $PSScriptRoot -ChildPath 'Import-CarbonForTest.ps1' -Resolve)
 $tempDir = $null
 
-function Start-TestFixture
-{
-    & (Join-Path -Path $PSScriptRoot -ChildPath '..\Import-CarbonForTest.ps1' -Resolve)
-}
-
-function Start-Test
-{
-    $tempDir = New-TempDirectory -Prefix $PSCommandPath
-}
-
-function Stop-Test
-{
-    Remove-Item $tempDir.FullName -Recurse
-}
-
-configuration IAmBroken
-{
-    Set-StrictMode -Off
-
-    node 'localhost' 
+Describe 'Get-DscError' {
+    
+    BeforeEach {
+        $tempDir = New-TempDirectory -Prefix $PSCommandPath
+    }
+    
+    AfterEach {
+        Remove-Item $tempDir.FullName -Recurse
+    }
+    
+    configuration IAmBroken
     {
-        Script Fails
+        Set-StrictMode -Off
+    
+        node 'localhost' 
         {
-             GetScript = { Write-Error 'GetScript' }
-             SetScript = { Write-Error 'SetScript' }
-             TestScript = { Write-Error 'TestScript' ; return $false }
+            Script Fails
+            {
+                 GetScript = { Write-Error 'GetScript' }
+                 SetScript = { Write-Error 'SetScript' }
+                 TestScript = { Write-Error 'TestScript' ; return $false }
+            }
         }
     }
+    
+    It 'should get dsc error' {
+        [Diagnostics.Eventing.Reader.EventLogRecord[]]$errorsAtStart = Get-DscError
+    
+        $startTime = Get-Date
+    
+        & IAmBroken -OutputPath $tempDir.FullName
+    
+        Start-Sleep -Milliseconds 400
+    
+        Start-DscConfiguration -Wait -ComputerName 'localhost' -Path $tempDir.FullName -ErrorAction SilentlyContinue -Force
+    
+        $dscError = Get-DscError -StartTime $startTime -Wait
+        $dscError | Should Not BeNullOrEmpty
+        $dscError | Should BeOfType ([Diagnostics.Eventing.Reader.EventLogRecord])
+    
+        [Diagnostics.Eventing.Reader.EventLogRecord[]]$dscErrors = Get-DscError
+        $dscErrors | Should Not BeNullOrEmpty
+        $dscErrors.Count | Should BeGreaterThan 0
+    
+        [Diagnostics.Eventing.Reader.EventLogRecord[]]$dscErrorsBefore = Get-DscError -EndTime $startTime
+        $errorsAtStart.Count | Should Be ($dscErrors.Count - 1)
+    
+        Start-Sleep -Milliseconds 800
+        $Error.Clear()
+        $dscErrors = Get-DscError -StartTime (Get-Date)
+        $Global:Error.Count | Should Be 0
+        $dscErrors | Should BeNullOrEmpty
+    
+        # Now, make sure the timeout is customizable.
+        $startedAt = Get-Date
+        $dscErrors = Get-DscError -StartTime (Get-Date) -Wait -WaitTimeoutSeconds 1
+        $Global:Error.Count | Should Be 0
+        ((Get-Date) -gt $startedAt.AddSeconds(1)) | Should Be $true
+    
+        $result = Get-DscError -ComputerName 'fubar' -ErrorAction SilentlyContinue
+        $Global:Error.Count | Should BeGreaterThan 0
+        $Global:Error[0] | Should Match 'not found'
+        $result | Should BeNullOrEmpty
+    
+        # Now, make sure you can get stuff from multiple computers
+        $dscError = Get-DscError -ComputerName 'localhost',$env:COMPUTERNAME
+        $dscError | Should Not BeNullOrEmpty
+    }
+    
+    
 }
-
-function Test-ShouldGetDscError
-{
-    [Diagnostics.Eventing.Reader.EventLogRecord[]]$errorsAtStart = Get-DscError
-
-    $startTime = Get-Date
-
-    & IAmBroken -OutputPath $tempDir.FullName
-
-    Start-Sleep -Milliseconds 400
-
-    Start-DscConfiguration -Wait -ComputerName 'localhost' -Path $tempDir.FullName -ErrorAction SilentlyContinue -Force
-
-    $dscError = Get-DscError -StartTime $startTime -Wait
-    Assert-NotNull $dscError
-    Assert-Is $dscError ([Diagnostics.Eventing.Reader.EventLogRecord])
-
-    [Diagnostics.Eventing.Reader.EventLogRecord[]]$dscErrors = Get-DscError
-    Assert-NotNull $dscErrors
-    Assert-GreaterThan $dscErrors.Count 0
-
-    [Diagnostics.Eventing.Reader.EventLogRecord[]]$dscErrorsBefore = Get-DscError -EndTime $startTime
-    Assert-Equal ($dscErrors.Count - 1) $errorsAtStart.Count
-
-    Start-Sleep -Milliseconds 800
-    $Error.Clear()
-    $dscErrors = Get-DscError -StartTime (Get-Date)
-    Assert-NoError
-    Assert-Null $dscErrors
-
-    # Now, make sure the timeout is customizable.
-    $startedAt = Get-Date
-    $dscErrors = Get-DscError -StartTime (Get-Date) -Wait -WaitTimeoutSeconds 1
-    Assert-NoError 
-    Assert-True ((Get-Date) -gt $startedAt.AddSeconds(1))
-
-    $result = Get-DscError -ComputerName 'fubar' -ErrorAction SilentlyContinue
-    Assert-Error -Last -Regex 'not found'
-    Assert-Null $result
-
-    # Now, make sure you can get stuff from multiple computers
-    $dscError = Get-DscError -ComputerName 'localhost',$env:COMPUTERNAME
-    Assert-NotNull $dscError
-}
-
-
