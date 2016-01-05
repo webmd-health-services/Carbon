@@ -148,7 +148,7 @@ filter Protect-String
                 $encodedString = Protect-String -String $String -ForComputer
 
                 $p = Start-Process -FilePath "powershell.exe" `
-                                   -ArgumentList ('-NonInteractive -ExecutionPolicy ByPass -NoProfile -File "{0}" -ProtectedString {1}' -f $protectStringPath,$encodedString) `
+                                   -ArgumentList ('-NonInteractive -ExecutionPolicy ByPass -File "{0}" -ProtectedString {1}' -f $protectStringPath,$encodedString) `
                                    -Credential $Credential `
                                    -RedirectStandardOutput $outFile `
                                    -RedirectStandardError $errFile `
