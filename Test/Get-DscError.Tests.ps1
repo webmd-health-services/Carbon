@@ -17,6 +17,7 @@ Describe 'Get-DscError' {
     
     BeforeEach {
         $tempDir = New-TempDirectory -Prefix $PSCommandPath
+        [Diagnostics.Eventing.Reader.EventLogSession]::GlobalSession.ClearLog('Microsoft-Windows-DSC/Operational')
     }
     
     AfterEach {
@@ -40,6 +41,7 @@ Describe 'Get-DscError' {
     
     It 'should get dsc error' {
         [Diagnostics.Eventing.Reader.EventLogRecord[]]$errorsAtStart = Get-DscError
+        $errorsAtStart | Should BeNullOrEmpty
     
         $startTime = Get-Date
     
@@ -58,7 +60,7 @@ Describe 'Get-DscError' {
         $dscErrors.Count | Should BeGreaterThan 0
     
         [Diagnostics.Eventing.Reader.EventLogRecord[]]$dscErrorsBefore = Get-DscError -EndTime $startTime
-        $errorsAtStart.Count | Should Be ($dscErrors.Count - 1)
+        $dscErrorsBefore | Should BeNullOrEmpty
     
         Start-Sleep -Milliseconds 800
         $Error.Clear()
