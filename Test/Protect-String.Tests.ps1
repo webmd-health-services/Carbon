@@ -94,6 +94,39 @@ Describe 'Protect-String' {
                 Remove-Item -Recurse -Path (Split-Path -Parent -Path $outFile) -ErrorAction Ignore
             }
         }
+
+        It 'should handle spaces in path to Carbon' {
+            $tempDir = New-TempDirectory -Prefix 'Carbon Program Files'
+            try
+            {
+                $junctionPath = Join-Path -Path $tempDir -ChildPath 'Carbon'
+                Install-Junction -Link $junctionPath -Target (Join-Path -Path $PSScriptRoot -ChildPath '..\Carbon' -Resolve)
+                try
+                {
+                    Remove-Module 'Carbon'
+                    Import-Module $junctionPath
+                    try
+                    {
+                        $ciphertext = Protect-String -String 'fubar' -Credential $credential
+                        $Global:Error.Count | Should Be 0
+                        Assert-IsBase64EncodedString $ciphertext
+                    }
+                    finally
+                    {
+                        Remove-Module 'Carbon'
+                        & (Join-Path -Path $PSScriptRoot -ChildPath 'Import-CarbonForTest.ps1' -Resolve)
+                    }
+                }
+                finally
+                {
+                    Uninstall-Junction -Path $junctionPath
+                }
+            }
+            finally
+            {
+                Remove-Item -Path $tempDir -Recurse -Force
+            }
+        }
     }
     else
     {
@@ -204,37 +237,4 @@ Describe 'Protect-String' {
         $revealedSecret | Should Be $secret
     }
 
-    It 'should handle spaces in path to Carbon' {
-        $tempDir = New-TempDirectory -Prefix 'Carbon Program Files'
-        try
-        {
-            $junctionPath = Join-Path -Path $tempDir -ChildPath 'Carbon'
-            Install-Junction -Link $junctionPath -Target (Join-Path -Path $PSScriptRoot -ChildPath '..\Carbon' -Resolve)
-            try
-            {
-                Remove-Module 'Carbon'
-                Import-Module $junctionPath
-                try
-                {
-                    $ciphertext = Protect-String -String 'fubar' -Credential $credential
-                    $Global:Error.Count | Should Be 0
-                    Assert-IsBase64EncodedString $ciphertext
-                }
-                finally
-                {
-                    Remove-Module 'Carbon'
-                    & (Join-Path -Path $PSScriptRoot -ChildPath 'Import-CarbonForTest.ps1' -Resolve)
-                }
-            }
-            finally
-            {
-                Uninstall-Junction -Path $junctionPath
-            }
-        }
-        finally
-        {
-            Remove-Item -Path $tempDir -Recurse -Force
-        }
-    }
-    
 }
