@@ -237,6 +237,11 @@ function Initialize-Lcm
     if( $privateKey )
     {
         $session = New-PSSession -ComputerName $ComputerName @credentialParam
+        if( -not $session )
+        {
+            return
+        }
+
         try
         {
             Install-Certificate -Session $session `
@@ -248,93 +253,101 @@ function Initialize-Lcm
         }
         finally
         {
-            Remove-PSSession $session
+            Remove-PSSession -Session $session -WhatIf:$false
         }
     }
 
     $sessions = New-CimSession -ComputerName $ComputerName @credentialParam
 
-    $originalWhatIf = $WhatIfPreference
-    $WhatIfPreference = $false
-    configuration Lcm 
+    try
     {
-        Set-StrictMode -Off
-
-        $configID = $null
-        if( $ConfigurationID )
+        $originalWhatIf = $WhatIfPreference
+        $WhatIfPreference = $false
+        configuration Lcm 
         {
-            $configID = $ConfigurationID.ToString()
-        }
+            Set-StrictMode -Off
 
-        node $AllNodes.NodeName
-        {
-            if( $Node.RefreshMode -eq 'Push' )
+            $configID = $null
+            if( $ConfigurationID )
             {
-                LocalConfigurationManager
-                {
-                    CertificateID = $thumbprint;
-                    RebootNodeIfNeeded = $RebootIfNeeded;
-                    RefreshMode = 'Push';
-                }
+                $configID = $ConfigurationID.ToString()
             }
-            else
+
+            node $AllNodes.NodeName
             {
-                if( $Node.RefreshMode -like '*FileDownloadManager' )
+                if( $Node.RefreshMode -eq 'Push' )
                 {
-                    $downloadManagerName = 'DscFileDownloadManager'
-                    $customData = @{ SourcePath = $SourcePath }
+                    LocalConfigurationManager
+                    {
+                        CertificateID = $thumbprint;
+                        RebootNodeIfNeeded = $RebootIfNeeded;
+                        RefreshMode = 'Push';
+                    }
                 }
                 else
                 {
-                    $downloadManagerName = 'WebDownloadManager'
-                    $customData = @{
-                                        ServerUrl = $ServerUrl;
-                                        AllowUnsecureConnection = $AllowUnsecureConnection.ToString();
-                                  }
-                }
+                    if( $Node.RefreshMode -like '*FileDownloadManager' )
+                    {
+                        $downloadManagerName = 'DscFileDownloadManager'
+                        $customData = @{ SourcePath = $SourcePath }
+                    }
+                    else
+                    {
+                        $downloadManagerName = 'WebDownloadManager'
+                        $customData = @{
+                                            ServerUrl = $ServerUrl;
+                                            AllowUnsecureConnection = $AllowUnsecureConnection.ToString();
+                                      }
+                    }
 
-                LocalConfigurationManager
-                {
-                    AllowModuleOverwrite = $AllowModuleOverwrite;
-                    CertificateID = $thumbprint;
-                    ConfigurationID = $configID;
-                    ConfigurationMode = $ConfigurationMode;
-                    ConfigurationModeFrequencyMins = $RefreshIntervalMinutes * $ConfigurationFrequency;
-                    Credential = $LcmCredential;
-                    DownloadManagerCustomData = $customData;
-                    DownloadManagerName = $downloadManagerName;
-                    RebootNodeIfNeeded = $RebootIfNeeded;
-                    RefreshFrequencyMins = $RefreshIntervalMinutes;
-                    RefreshMode = 'Pull'
+                    LocalConfigurationManager
+                    {
+                        AllowModuleOverwrite = $AllowModuleOverwrite;
+                        CertificateID = $thumbprint;
+                        ConfigurationID = $configID;
+                        ConfigurationMode = $ConfigurationMode;
+                        ConfigurationModeFrequencyMins = $RefreshIntervalMinutes * $ConfigurationFrequency;
+                        Credential = $LcmCredential;
+                        DownloadManagerCustomData = $customData;
+                        DownloadManagerName = $downloadManagerName;
+                        RebootNodeIfNeeded = $RebootIfNeeded;
+                        RefreshFrequencyMins = $RefreshIntervalMinutes;
+                        RefreshMode = 'Pull'
+                    }
                 }
             }
         }
-    }
-    $WhatIfPreference = $originalWhatIf
 
-    $tempDir = New-TempDirectory -Prefix 'Carbon+Initialize-Lcm+' -WhatIf:$false
+        $WhatIfPreference = $originalWhatIf
 
-    try
-    {
-        [object[]]$allNodes = $ComputerName | ForEach-Object { @{ NodeName = $_; PSDscAllowPlainTextPassword = $true; RefreshMode = $PSCmdlet.ParameterSetName } }
-        $configData = @{
-            AllNodes = $allNodes
-        }
+        $tempDir = New-TempDirectory -Prefix 'Carbon+Initialize-Lcm+' -WhatIf:$false
 
-        $whatIfParam = @{ }
-        if( (Get-Command -Name 'Lcm').Parameters.ContainsKey('WhatIf') )
+        try
         {
-            $whatIfParam['WhatIf'] = $false
+            [object[]]$allNodes = $ComputerName | ForEach-Object { @{ NodeName = $_; PSDscAllowPlainTextPassword = $true; RefreshMode = $PSCmdlet.ParameterSetName } }
+            $configData = @{
+                AllNodes = $allNodes
+            }
+
+            $whatIfParam = @{ }
+            if( (Get-Command -Name 'Lcm').Parameters.ContainsKey('WhatIf') )
+            {
+                $whatIfParam['WhatIf'] = $false
+            }
+
+            & Lcm -OutputPath $tempDir @whatIfParam -ConfigurationData $configData | Out-Null
+
+            Set-DscLocalConfigurationManager -ComputerName $ComputerName -Path $tempDir @credentialParam
+
+            Get-DscLocalConfigurationManager -CimSession $sessions
         }
-
-        & Lcm -OutputPath $tempDir @whatIfParam -ConfigurationData $configData | Out-Null
-
-        Set-DscLocalConfigurationManager -ComputerName $ComputerName -Path $tempDir @credentialParam
-
-        Get-DscLocalConfigurationManager -CimSession $sessions
+        finally
+        {
+            Remove-Item -Path $tempDir -Recurse -WhatIf:$false
+        }
     }
     finally
     {
-        Remove-Item -Path $tempDir -Recurse -WhatIf:$false
+        Remove-CimSession -CimSession $sessions -WhatIf:$false
     }
 }

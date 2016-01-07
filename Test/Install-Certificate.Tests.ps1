@@ -121,7 +121,7 @@ Describe "Install-Certificate" {
         }
         finally
         {
-            Remove-PSSession $session
+            Remove-PSSession -Session $session
         }
     }
 }

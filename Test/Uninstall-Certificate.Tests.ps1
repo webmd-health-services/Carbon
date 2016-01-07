@@ -78,7 +78,7 @@ Describe 'Uninstall-Certificate' {
         }
         finally
         {
-            Remove-PSSession $session
+            Remove-PSSession -Session $session
         }
     }
 }
