@@ -236,13 +236,20 @@ function Initialize-Lcm
     # Upload the private key, if one was given.
     if( $privateKey )
     {
-        Install-Certificate -ComputerName $ComputerName `
-                            @credentialParam `
-                            -Path $CertFile `
-                            -Password $CertPassword `
-                            -StoreLocation ([Security.Cryptography.X509Certificates.StoreLocation]::LocalMachine) `
-                            -StoreName ([Security.Cryptography.X509Certificates.StoreName]::My) | 
-            Out-Null
+        $session = New-PSSession -ComputerName $ComputerName @credentialParam
+        try
+        {
+            Install-Certificate -Session $session `
+                                -Path $CertFile `
+                                -Password $CertPassword `
+                                -StoreLocation ([Security.Cryptography.X509Certificates.StoreLocation]::LocalMachine) `
+                                -StoreName ([Security.Cryptography.X509Certificates.StoreName]::My) | 
+                Out-Null
+        }
+        finally
+        {
+            Remove-PSSession $session
+        }
     }
 
     $sessions = New-CimSession -ComputerName $ComputerName @credentialParam

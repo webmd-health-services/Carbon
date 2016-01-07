@@ -21,7 +21,7 @@ function Uninstall-Certificate
 
     If the certificate isn't in the store, nothing happens, not even an error.
 
-    To uninstall a certificate from a remote computer, use the `ComputerName` and `Credential` parameters, which were added in Carbon 2.1.0.
+    To uninstall a certificate from a remote computer, use the `Session`parameter, which was added in Carbon 2.1.0. You can create a new session with the `New-PSSession` cmdlet.
 
     .EXAMPLE
     > Uninstall-Certificate -Thumbprint 570895470234023dsaaefdbcgbefa -StoreLocation CurrentUser -StoreName My
@@ -40,9 +40,9 @@ function Uninstall-Certificate
     Demonstrates how to uninstall a certificate from a custom, non-standard store.
 
     .EXAMPLE
-    > Uninstall-Certificate -Thumbprint 570895470234023dsaaefdbcgbefa -StoreLocation CurrentUser -StoreName My -ComputerName remote1,remote2
+    > Uninstall-Certificate -Thumbprint 570895470234023dsaaefdbcgbefa -StoreLocation CurrentUser -StoreName My -Session (New-PSSession -ComputerName remote1,remote2)
     
-    Demonstrates how to uninstall a certificate from a remote computer. To connect to that computer as a specific principal, use the `Credential` parameter.
+    Demonstrates how to uninstall a certificate from a remote computer.
     #>
     [CmdletBinding(SupportsShouldProcess=$true)]
     param(
@@ -75,13 +75,11 @@ function Uninstall-Certificate
         # The name of the non-standard, custom store where the certificate should be un-installed.
         $CustomStoreName,
 
-        [string[]]
-        # The computer(s) from which the certificate should be uninstalled.
-        $ComputerName,
-
-        [pscredential]
-        # The credential to use when uninstalling the certificate from a remote computer.
-        $Credential
+        [Management.Automation.Runspaces.PSSession]
+        # Use the `Session` parameter to uninstall a certificate on remote computer(s) using PowerShell remoting. Use `New-PSSession` to create a session.
+        #
+        # This parameter was added in Carbon 2.1.0.
+        $Session
     )
     
     Set-StrictMode -Version 'Latest'
@@ -94,14 +92,9 @@ function Uninstall-Certificate
     }
     
     $invokeCommandParameters = @{}
-    if( $ComputerName )
+    if( $Session )
     {
-        $invokeCommandParameters['ComputerName'] = $ComputerName
-    }
-
-    if( $Credential )
-    {
-        $invokeCommandParameters['Credential'] = $Credential
+        $invokeCommandParameters['Session'] = $Session
     }
 
     Invoke-Command @invokeCommandParameters -ScriptBlock {

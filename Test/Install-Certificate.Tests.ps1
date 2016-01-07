@@ -112,8 +112,16 @@ Describe "Install-Certificate" {
     }
 
     It 'should install certificate in remote computer' {
-        $cert = Install-Certificate -Certificate $TestCert -StoreLocation LocalMachine -StoreName My -ComputerName $env:COMPUTERNAME
-        $cert | Should Not BeNullOrEmpty
-        Assert-CertificateInstalled LocalMachine My
+        $session = New-PSSession -ComputerName $env:COMPUTERNAME
+        try
+        {
+            $cert = Install-Certificate -Certificate $TestCert -StoreLocation LocalMachine -StoreName My -Session $session
+            $cert | Should Not BeNullOrEmpty
+            Assert-CertificateInstalled LocalMachine My
+        }
+        finally
+        {
+            Remove-PSSession $session
+        }
     }
 }

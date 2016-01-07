@@ -19,7 +19,7 @@ function Install-Certificate
     .DESCRIPTION
     Uses the .NET certificates API to add a certificate to a store for the machine or current user.  The user performing the action must have permission to modify the store or the installation will fail.
 
-    To install a certificate on a remote computer, use the `ComputerName` and `Credential` parameters. The certificate's binary data is converted to a base-64 encoded string and sent to the remote computer, where it is converted back into a certificate. If installing a certificate from a file, the file's bytes are converted to base-64, sent to the remote computer, saved as a temporary file, installed, and the temporary file is removed.
+    To install a certificate on a remote computer, create a remoting session with the `New-PSSession` cmdlet, and pass the session object to this function's `Session` parameter. When installing to a remote computer, the certificate's binary data is converted to a base-64 encoded string and sent to the remote computer, where it is converted back into a certificate. If installing a certificate from a file, the file's bytes are converted to base-64, sent to the remote computer, saved as a temporary file, installed, and the temporary file is removed.
 
     The ability to install a certificate on a remote computer was added in Carbon 2.1.0.
     
@@ -83,13 +83,11 @@ function Install-Certificate
         # The password for the certificate.  Should be a `System.Security.SecureString`.
         $Password,
 
-        [string[]]
-        # Install the certificate on these computers. The `ComputerName` parameter was added in Carbon 2.1.0.
-        $ComputerName,
-
-        [pscredential]
-        # Use this credential when connecting. The `Credential` parameter was added in Carbon 2.1.0.
-        $Credential
+        [Management.Automation.Runspaces.PSSession]
+        # Use the `Session` parameter to install a certificate on remote computer(s) using PowerShell remoting. Use `New-PSSession` to create a session.
+        #
+        # This parameter was added in Carbon 2.1.0.
+        $Session
     )
     
     Set-StrictMode -Version 'Latest'
@@ -136,18 +134,13 @@ function Install-Certificate
     }
 
     $invokeCommandArgs = @{ }
-    if( $ComputerName )
+    if( $Session )
     {
-        $invokeCommandArgs['ComputerName'] = $ComputerName
-    }
-
-    if( $Credential )
-    {
-        $invokeCommandArgs['Credential'] = $Credential
+        $invokeCommandArgs['Session'] = $Session
     }
 
 
-    Invoke-Command -ScriptBlock {
+    Invoke-Command @invokeCommandArgs -ScriptBlock {
         [CmdletBinding()]
         param(
             [Parameter(Mandatory=$true)]
