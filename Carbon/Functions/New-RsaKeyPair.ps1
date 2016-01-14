@@ -205,7 +205,7 @@ function New-RsaKeyPair
 
     try
     {
-        $certReqPath = Get-Command -Name 'certreq.exe'  | Select-Object -ExpandProperty 'Source'
+        $certReqPath = Get-Command -Name 'certreq.exe' | Select-Object -ExpandProperty 'Path'
         if( -not $certReqPath )
         {
             return
