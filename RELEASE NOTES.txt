@@ -17,6 +17,7 @@
  * Fixed: `Set-HostsEntry` leaves trailing tabs and whitespace after all but the last line.
  * Fixed: `Get-PowerShellModuleInstallPath` returns wrong path for PowerShell 4.
  * Fixed: `Protect-String` fails when Carbon is installed in a module path that contains spaces ([fixes issue #174](https://bitbucket.org/splatteredbits/carbon/issues/174/protect-string-throws-when-module-path))
+ * Fixed: `New-RsaKeyPair` generates a key pair that isn't supported for encrypting/decrypting DSC credentials or supported by the CMS message cmdlets.
  
 ## Other Improvements
 
@@ -31,6 +32,11 @@
  * The following functions now write warning if you pass them a plain-text password. You should pass a `SecureString` instead.
     * `Install-Certificate`
     * `Initialize-Lcm`
+ * `New-RsaKeyPair`:
+    * Refactored to use `certreq.exe` instead of `makecert.exe` and `pvk2pfx.exe`.
+    * Can now run non-interactively: added a `-Password` parameter used to protect the private key (it used to prompt you).
+    * Fixed: generates a key pair that isn't supported for encrypting/decrypting DSC credentials or supported by the CMS message cmdlets.
+    * Made the `-ValidFrom` and `-Authority` parameters obsolete.
 
 
 # 2.0.1 (19 October 2015)
