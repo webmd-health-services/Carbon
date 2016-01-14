@@ -83,7 +83,7 @@ function Install-Certificate
         # The password for the certificate.  Should be a `System.Security.SecureString`.
         $Password,
 
-        [Management.Automation.Runspaces.PSSession]
+        [Management.Automation.Runspaces.PSSession[]]
         # Use the `Session` parameter to install a certificate on remote computer(s) using PowerShell remoting. Use `New-PSSession` to create a session.
         #
         # This parameter was added in Carbon 2.1.0.

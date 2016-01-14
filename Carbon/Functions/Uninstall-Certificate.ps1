@@ -75,7 +75,7 @@ function Uninstall-Certificate
         # The name of the non-standard, custom store where the certificate should be un-installed.
         $CustomStoreName,
 
-        [Management.Automation.Runspaces.PSSession]
+        [Management.Automation.Runspaces.PSSession[]]
         # Use the `Session` parameter to uninstall a certificate on remote computer(s) using PowerShell remoting. Use `New-PSSession` to create a session.
         #
         # This parameter was added in Carbon 2.1.0.
