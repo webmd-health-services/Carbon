@@ -212,8 +212,8 @@ function New-RsaKeyPair
         }
 
         # Taken from example 1 of the Protect-CmsMessage help topic.
-        [int]$daysValid = ($ValidTo - $ValidFrom).TotalDays
-        $MaxDaysValid = 2916082
+        [int]$daysValid = [Math]::Floor(($ValidTo - $ValidFrom).TotalDays)
+        $MaxDaysValid = [Math]::Floor(([DateTime]::MaxValue - [DateTime]::UtcNow).TotalDays)
         if( $daysValid -gt $MaxDaysValid )
         {
             $daysValid = $MaxDaysValid
@@ -244,7 +244,7 @@ ValidityPeriodUnits = {3}
 
         Get-Content -Raw -Path $tempInfFile | Write-Debug
 
-        $output = & $certReqPath -new $tempInfFile $PublicKeyFile 
+        $output = & $certReqPath -q -new $tempInfFile $PublicKeyFile 
         if( $LASTEXITCODE -or -not (Test-Path -Path $PublicKeyFile -PathType Leaf) )
         {
             Write-Error ('Failed to create public/private key pair:{0}{1}' -f ([Environment]::NewLine),($output -join ([Environment]::NewLine)))

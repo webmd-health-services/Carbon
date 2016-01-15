@@ -24,9 +24,18 @@ Describe 'New-RsaKeyPair' {
     {
         param(
             $Length = 4096,
-            $ValidTo = ([DateTime]::MaxValue),
+            [datetime]
+            $ValidTo,
             $Algorithm = 'sha512RSA'
         )
+
+        Set-StrictMode -Version 'Latest'
+
+        if( -not $ValidTo )
+        {
+            $ValidTo = (Get-Date).AddDays( [Math]::Floor(([DateTime]::MaxValue - [DateTime]::UtcNow).TotalDays) )
+        }
+
         $cert = Get-Certificate -Path $publicKeyPath
         $cert.NotAfter.ToShortDateString() | Should Be $ValidTo.ToShortDateString()
         $cert.Subject | Should Be $subject
