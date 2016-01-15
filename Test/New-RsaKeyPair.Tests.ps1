@@ -10,6 +10,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+Set-StrictMode -Version 'Latest'
+
 & (Join-Path -Path $PSScriptRoot -ChildPath 'Import-CarbonForTest.ps1' -Resolve)
 
 $tempDir = $null
@@ -85,13 +87,16 @@ Describe 'New-RsaKeyPair' {
         $decryptedSecret = Unprotect-String -ProtectedString $protectedSecret -PrivateKeyPath $privateKeyPath -Password $privateKeyPassword
         $decryptedSecret | Should Be $secret
 
+        $publicKey = Get-Certificate -Path $publicKeyPath
+        $publicKey | Should Not BeNullOrEmpty
+
         # Make sure it works with DSC
         $configData = @{
             AllNodes = @(
                 @{
                     NodeName = 'localhost';
                     CertificateFile = $PublicKeyPath;
-                    Thumbprint = $output[0].Thumbprint;
+                    Thumbprint = $publicKey.Thumbprint;
                 }
             )
         }

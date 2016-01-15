@@ -10,6 +10,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+Set-StrictMode -Version 'Latest'
+
 & (Join-Path -Path $PSScriptRoot -ChildPath 'Import-CarbonForTest.ps1' -Resolve)
 $tempDir = $null
 
@@ -27,6 +29,8 @@ Describe 'Get-DscError' {
     configuration IAmBroken
     {
         Set-StrictMode -Off
+
+        Import-DscResource -ModuleName 'PSDesiredStateConfiguration'
     
         node 'localhost' 
         {
