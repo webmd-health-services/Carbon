@@ -103,6 +103,8 @@ Describe 'New-RsaKeyPair' {
 
         configuration TestEncryption
         {
+            Set-StrictMode -Off
+
             Import-DscResource –ModuleName 'PSDesiredStateConfiguration'
 
             node $AllNodes.NodeName 
