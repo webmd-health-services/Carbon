@@ -43,7 +43,7 @@ Describe 'Get-DscError' {
         }
     }
     
-    It 'should get dsc error' {
+    It 'should get dsc errors' {
         [Diagnostics.Eventing.Reader.EventLogRecord[]]$errorsAtStart = Get-DscError
         $errorsAtStart | Should BeNullOrEmpty
     
