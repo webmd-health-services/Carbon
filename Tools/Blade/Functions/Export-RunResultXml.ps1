@@ -107,7 +107,7 @@ function Export-RunResultXml
                     $testCase = $resultXml.CreateElement('test-case')
                     [void]$results.AppendChild( $testCase )
 
-                    $testCase.SetAttribute( 'name', ('{0}: {1}' -f $testSuite.name,$testResult.Name) )
+                    $testCase.SetAttribute( 'name', $testResult.Name )
                     $testCase.SetAttribute( 'executed', 'True' )
                     $testCase.SetAttribute( 'time', $testResult.Duration.TotalSeconds )
                     $testCase.SetAttribute( 'asserts', '0' )
