@@ -10,155 +10,158 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Start-TestFixture
-{
-    & (Join-Path -Path $PSScriptRoot -ChildPath '..\Import-CarbonForTest.ps1' -Resolve)
-}
 
-function Start-Test
-{
-}
+& (Join-Path -Path $PSScriptRoot -ChildPath 'Import-CarbonForTest.ps1' -Resolve)
 
-function Test-ShouldGetScheduledTasks
-{
-    schtasks /query /v /fo csv | ConvertFrom-Csv | Where-Object { $_.TaskName -and $_.HostName -ne 'HostName' } | ForEach-Object {
-        $expectedTask = $_
-        $task = Get-ScheduledTask -Name $expectedTask.TaskName
-        Assert-NotNull $task $expectedTask.TaskName
+Describe 'Get-ScheduledTask' {
+    function Assert-ScheduledTaskEqual
+    {
+        param(
+            $Expected,
+            $Actual
+        )
+    
+        Write-Debug ('{0} <=> {1}' -f $Expected.TaskName,$Actual.TaskName)
+        $randomNextRunTimeTasks = @{
+                                        '\Microsoft\Windows\Application Experience\Microsoft Compatibility Appraiser' = $true;
+                                        '\Microsoft\Windows\Application Experience\ProgramDataUpdater' = $true;
+                                        '\Microsoft\Windows\Defrag\ScheduledDefrag' = $true;
+                                        '\Microsoft\Windows\Desired State Configuration\Consistency' = $true;
+                                        '\Microsoft\Windows\Power Efficiency Diagnostics\AnalyzeSystem' = $true;
+                                        '\Microsoft\Windows\Registry\RegIdleBackup' = $true;
+                                        '\Microsoft\Windows\RAC\RacTask' = $true;
+                                        '\Microsoft\Windows\Customer Experience Improvement Program\Server\ServerCeipAssistant' = $true;
+                                        '\Microsoft\Windows\Data Integrity Scan\Data Integrity Scan' = $true;
+                                        '\Microsoft\Windows\TaskScheduler\Regular Maintenance' = $true;
+                                        '\Microsoft\Windows\WindowsUpdate\Scheduled Start' = $true;
+                                        '\Microsoft\Windows\WindowsUpdate\Scheduled Start With Network' = $true;
+                                        '\Microsoft\Office\Office 15 Subscription Heartbeat' = $true;
+                                        '\Microsoft\Windows\Windows Activation Technologies\ValidationTaskDeadline' = $true;
+                                    }
+        $scheduleProps = @(
+                               'Last Result',
+                               'Stop Task If Runs X Hours And X Mins',
+                               'Schedule',
+                               'Schedule Type',
+                               'Start Time',
+                               'Start Date',
+                               'End Date',
+                               'Days',
+                               'Months',
+                               'Repeat: Every',
+                               'Repeat: Until: Time',
+                               'Repeat: Until: Duration',
+                               'Repeat: Stop If Still Running'
+                         )
+    
+        foreach( $property in (Get-Member -InputObject $Expected -MemberType NoteProperty) )
+        {
+            $columnName = $property.Name
+            if( $scheduleProps -contains $columnName )
+            {
+                continue
+            }
+            
+            $propertyName = $columnName -replace '[^A-Za-z0-9_]',''
+    
+            $failMsg = '{0}; column {1}; property {2}' -f $Actual.FullName,$columnName,$propertyName
+            if( $propertyName -eq 'TaskName' )
+            {
+                $name = Split-Path -Leaf -Path $Expected.TaskName
+                $path = Split-Path -Parent -Path $Expected.TaskName
+                if( $path -ne '\' )
+                {
+                    $path = '{0}\' -f $path
+                }
+                $Actual.TaskName | Should Be $name
+                $Actual.TaskPath | Should Be $path
+            }
+            elseif( $propertyName -eq 'NextRunTime' -and $randomNextRunTimeTasks.ContainsKey($task.FullName) )
+            {
+                # This task's next run time changes every time you retrieve it.
+                continue
+            }
+            else
+            {
+                ($Actual | Get-Member -Name $propertyName) | Should Not BeNullOrEmpty
+                Write-Debug ('  {0} <=> {1}' -f $propertyName,$columnName)
+                $expectedValue = $Expected.$columnName
+                ($Actual.$propertyName) | Should Be $expectedValue
+            }
+        }
+    
+    
+    }
 
+    BeforeEach {
+        $Global:Error.Clear()
+    }
+    
+    It 'should get scheduled tasks' {
+        schtasks /query /v /fo csv | 
+            ConvertFrom-Csv | 
+            Where-Object { $_.TaskName -and $_.HostName -ne 'HostName' } | 
+            ForEach-Object {
+                $expectedTask = $_
+                $task = Get-ScheduledTask -Name $expectedTask.TaskName
+                $task | Should Not BeNullOrEmpty
+    
+                Assert-ScheduledTaskEqual $expectedTask $task
+            }
+    }
+    
+    It 'should get schedules' {
+        $multiScheduleTasks = Get-ScheduledTask | Where-Object { $_.Schedules.Count -gt 1 }
+    
+        $multiScheduleTasks | Should Not BeNullOrEmpty
+    
+        $taskProps = @(
+                            'HostName',
+                            'TaskName',
+                            'Next Run Time',
+                            'Status',
+                            'Logon Mode',
+                            'Last Run Time',
+                            'Author',
+                            'Task To Run',
+                            'Start In',
+                            'Comment',
+                            'Scheduled Task State',
+                            'Idle Time',
+                            'Power Management',
+                            'Run As User',
+                            'Delete Task If Not Rescheduled'
+                     )
+        foreach( $multiScheduleTask in $multiScheduleTasks )
+        {
+            $expectedSchedules = schtasks /query /v /fo csv /tn $multiScheduleTask.FullName | ConvertFrom-Csv
+            $scheduleIdx = 0
+            foreach( $expectedSchedule in $expectedSchedules )
+            {
+                $actualSchedule = $multiScheduleTask.Schedules[$scheduleIdx++]
+                $actualSchedule | Should BeOfType ([Carbon.TaskScheduler.ScheduleInfo])
+            }
+        }
+    }
+    
+    It 'should support wildcards' {
+        $expectedTask = schtasks /query /v /fo csv | Select-Object -First 2 | ConvertFrom-Csv
+        $task = Get-ScheduledTask -Name ('*{0}*' -f $expectedTask.TaskName.Substring(1,$expectedTask.TaskName.Length - 2))
+        $task | Should Not BeNullOrEmpty
+        $task | Should BeOfType ([Carbon.TaskScheduler.TaskInfo])
         Assert-ScheduledTaskEqual $expectedTask $task
     }
-}
-
-function Test-ShouldGetSchedules
-{
-    $multiScheduleTasks = Get-ScheduledTask | Where-Object { $_.Schedules.Count -gt 1 }
-
-    Assert-NotNull $multiScheduleTasks
-
-    $taskProps = @(
-                        'HostName',
-                        'TaskName',
-                        'Next Run Time',
-                        'Status',
-                        'Logon Mode',
-                        'Last Run Time',
-                        'Author',
-                        'Task To Run',
-                        'Start In',
-                        'Comment',
-                        'Scheduled Task State',
-                        'Idle Time',
-                        'Power Management',
-                        'Run As User',
-                        'Delete Task If Not Rescheduled'
-                 )
-    foreach( $multiScheduleTask in $multiScheduleTasks )
-    {
-        $expectedSchedules = schtasks /query /v /fo csv /tn $multiScheduleTask.FullName | ConvertFrom-Csv
-        $scheduleIdx = 0
-        foreach( $expectedSchedule in $expectedSchedules )
-        {
-            $actualSchedule = $multiScheduleTask.Schedules[$scheduleIdx++]
-            Assert-Is $actualSchedule ([Carbon.TaskScheduler.ScheduleInfo])
-        }
+    
+    It 'should get all scheduled tasks' {
+        $expectedTasks = schtasks /query /v /fo csv | ConvertFrom-Csv | Where-Object { $_.TaskName -and $_.HostName -ne 'HostName' } | Select-Object -Unique -Property 'TaskName'
+        $actualTasks = Get-ScheduledTask
+        $actualTasks.Count | Should Be $expectedTasks.Count
     }
-}
-
-function Test-ShouldSupportWildcards
-{
-    $expectedTask = schtasks /query /v /fo csv | Select-Object -First 2 | ConvertFrom-Csv
-    $task = Get-ScheduledTask -Name ('*{0}*' -f $expectedTask.TaskName.Substring(1,$expectedTask.TaskName.Length - 2))
-    Assert-NotNull $task
-    Assert-Is $task ([Carbon.TaskScheduler.TaskInfo])
-    Assert-ScheduledTaskEqual $expectedTask $task
-}
-
-function Test-ShouldGetAllScheduledTasks
-{
-    $expectedTasks = schtasks /query /v /fo csv | ConvertFrom-Csv | Where-Object { $_.TaskName -and $_.HostName -ne 'HostName' } | Select-Object -Unique -Property 'TaskName'
-    $actualTasks = Get-ScheduledTask
-    Assert-Equal $expectedTasks.Count $actualTasks.Count
-}
-
-function Test-ShouldGetNonExistentTask
-{
-    Get-ScheduledTask -Name 'fjdskfjsdflkjdskfjsdklfjskadljfksdljfklsdjf' -ErrorAction SilentlyContinue
-    Assert-Error -Last -Regex 'not found'
-}
-
-function Assert-ScheduledTaskEqual
-{
-    param(
-        $Expected,
-        $Actual
-    )
-
-    $randomNextRunTimeTasks = @{
-                                    '\Microsoft\Windows\Application Experience\Microsoft Compatibility Appraiser' = $true;
-                                    '\Microsoft\Windows\Application Experience\ProgramDataUpdater' = $true;
-                                    '\Microsoft\Windows\Defrag\ScheduledDefrag' = $true;
-                                    '\Microsoft\Windows\Desired State Configuration\Consistency' = $true;
-                                    '\Microsoft\Windows\Power Efficiency Diagnostics\AnalyzeSystem' = $true;
-                                    '\Microsoft\Windows\Registry\RegIdleBackup' = $true;
-                                    '\Microsoft\Windows\RAC\RacTask' = $true;
-                                    '\Microsoft\Windows\Customer Experience Improvement Program\Server\ServerCeipAssistant' = $true;
-                                    '\Microsoft\Windows\Data Integrity Scan\Data Integrity Scan' = $true;
-                                    '\Microsoft\Windows\TaskScheduler\Regular Maintenance' = $true;
-                                    '\Microsoft\Windows\WindowsUpdate\Scheduled Start' = $true;
-                                    '\Microsoft\Windows\WindowsUpdate\Scheduled Start With Network' = $true;
-                                    '\Microsoft\Office\Office 15 Subscription Heartbeat' = $true;
-                                }
-    $scheduleProps = @(
-                           'Last Result',
-                           'Stop Task If Runs X Hours And X Mins',
-                           'Schedule',
-                           'Schedule Type',
-                           'Start Time',
-                           'Start Date',
-                           'End Date',
-                           'Days',
-                           'Months',
-                           'Repeat: Every',
-                           'Repeat: Until: Time',
-                           'Repeat: Until: Duration',
-                           'Repeat: Stop If Still Running'
-                     )
-
-    foreach( $property in (Get-Member -InputObject $Expected -MemberType NoteProperty) )
-    {
-        $columnName = $property.Name
-        if( $scheduleProps -contains $columnName )
-        {
-            continue
-        }
-        
-        $propertyName = $columnName -replace '[^A-Za-z0-9_]',''
-
-        $failMsg = '{0}; column {1}; property {2}' -f $Actual.FullName,$columnName,$propertyName
-        if( $propertyName -eq 'TaskName' )
-        {
-            $name = Split-Path -Leaf -Path $Expected.TaskName
-            $path = Split-Path -Parent -Path $Expected.TaskName
-            if( $path -ne '\' )
-            {
-                $path = '{0}\' -f $path
-            }
-            Assert-Equal $name $Actual.TaskName $failMsg
-            Assert-Equal $path $Actual.TaskPath $failMsg
-        }
-        elseif( $propertyName -eq 'NextRunTime' -and $randomNextRunTimeTasks.ContainsKey($task.FullName) )
-        {
-            # This task's next run time changes every time you retrieve it.
-            continue
-        }
-        else
-        {
-            Assert-NotNull ($Actual | Get-Member -Name $propertyName) $failMsg
-            Assert-Equal $Expected.$columnName $Actual.$propertyName $failMsg
-        }
+    
+    It 'should get non existent task' {
+        Get-ScheduledTask -Name 'fjdskfjsdflkjdskfjsdklfjskadljfksdljfklsdjf' -ErrorAction SilentlyContinue
+        $Global:Error.Count | Should BeGreaterThan 0
+        $Global:Error[0] | Should Match 'not found'
     }
-
-
+    
 }
-
