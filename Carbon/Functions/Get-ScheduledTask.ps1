@@ -233,6 +233,26 @@ function Get-ScheduledTask
             }
         }
 
+        $taskToRun = $csvTask.'Task To Run'
+        if( ($xmlTask | Get-Member -Name 'Actions') -and $xmlTask.Actions.ChildNodes.Count -eq 1 )
+        {
+            $actions = $xmlTask.Actions
+            if( ($actions | Get-Member -Name 'Exec') -and ($actions.Exec | Measure-Object | Select-Object -ExpandProperty 'Count') -eq 1)
+            {
+                $exec = $actions.Exec
+
+                if( $exec | Get-Member -Name 'Command' )
+                {
+                    $taskToRun = $exec.Command
+                }
+
+                if( $exec | Get-Member -Name 'Arguments' )
+                {
+                    $taskToRun = '{0} {1}' -f $taskToRun,$exec.Arguments
+                }
+            }
+        }
+
         $ctorArgs = @(
                         $csvTask.HostName,
                         $taskPath,
@@ -243,7 +263,7 @@ function Get-ScheduledTask
                         $csvTask.'Last Run Time',
                         $csvTask.Author,
                         $createDate,
-                        $csvTask.'Task To Run',
+                        $taskToRun,
                         $csvTask.'Start In',
                         $csvTask.Comment,
                         $csvTask.'Scheduled Task State',

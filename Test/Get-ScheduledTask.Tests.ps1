@@ -86,6 +86,27 @@ Describe 'Get-ScheduledTask' {
                 ($Actual | Get-Member -Name $propertyName) | Should Not BeNullOrEmpty
                 Write-Debug ('  {0} <=> {1}' -f $propertyName,$columnName)
                 $expectedValue = $Expected.$columnName
+                if( $propertyName -eq 'TaskToRun' )
+                {
+                    $expectedValue = $expectedValue.TrimEnd()
+
+                    if( $expectedValue -like '*"*' )
+                    {
+                        $rawXml = schtasks /query /xml /tn $Expected.TaskName | Where-Object { $_ }
+                        $rawXml = $rawXml -join [Environment]::NewLine
+                        Write-Debug -Message $rawXml
+                        $taskxml = [xml]$rawXml
+                        $task = $taskxml.Task
+                        if( ($task | Get-Member -Name 'Actions') -and ($task.Actions | Get-Member -Name 'Exec') )
+                        {
+                            $expectedValue = $taskXml.Task.Actions.Exec.Command
+                            if( $taskXml.Task.Actions.Exec.Arguments )
+                            {
+                                $expectedValue = '{0} {1}' -f $expectedValue,$taskxml.Task.Actions.Exec.Arguments
+                            }
+                        }
+                    }
+                }
                 ($Actual.$propertyName) | Should Be $expectedValue
             }
         }

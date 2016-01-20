@@ -18,6 +18,7 @@
  * Fixed: `Get-PowerShellModuleInstallPath` returns wrong path for PowerShell 4.
  * Fixed: `Protect-String` fails when Carbon is installed in a module path that contains spaces ([fixes issue #174](https://bitbucket.org/splatteredbits/carbon/issues/174/protect-string-throws-when-module-path))
  * Fixed: `New-RsaKeyPair` generates a key pair that isn't supported for encrypting/decrypting DSC credentials or supported by the CMS message cmdlets.
+ * Fixed: `Get-ScheduledTask` returns invalid task commands when those commands contain quotes (works around an issue where `schtasks.exe` CSV output can't be parsed correctly by `ConvertFrom-Csv`).
  
 ## Other Improvements
 
