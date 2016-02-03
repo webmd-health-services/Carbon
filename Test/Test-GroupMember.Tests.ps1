@@ -14,10 +14,12 @@ Set-StrictMode -Version 'Latest'
 
 & (Join-Path -Path $PSScriptRoot -ChildPath 'Import-CarbonForTest.ps1')
 
+# I know, these should be inside the describe block, but when inside the describe block
+#     the variables are unable to be resolved
 $groupName = 'TestGroupMember01'
-    $userName = 'TestGroupMemberUser'
-    $userPass = 'P@ssw0rd!'
-    $description = 'Used by Test-GroupMember.Tests.ps1'    
+$userName = 'TestGroupMemberUser'
+$userPass = 'P@ssw0rd!'
+$description = 'Used by Test-GroupMember.Tests.ps1'
 
 describe Test-GroupMember {
     
