@@ -16,9 +16,10 @@
  * Fixed: `Remove-IniEntry` fails to preserve unicode characters with diacritics in INI entry names and values.
  * Fixed: `Set-HostsEntry` leaves trailing tabs and whitespace after all but the last line.
  * Fixed: `Get-PowerShellModuleInstallPath` returns wrong path for PowerShell 4.
- * Fixed: `Protect-String` fails when Carbon is installed in a module path that contains spaces ([fixes issue #174](https://bitbucket.org/splatteredbits/carbon/issues/174/protect-string-throws-when-module-path))
+ * Fixed: `Protect-String` fails when Carbon is installed in a module path that contains spaces ([fixes issue #174](https://bitbucket.org/splatteredbits/carbon/issues/174/protect-string-throws-when-module-path)).
  * Fixed: `New-RsaKeyPair` generates a key pair that isn't supported for encrypting/decrypting DSC credentials or supported by the CMS message cmdlets.
  * Fixed: `Get-ScheduledTask` returns invalid task commands when those commands contain quotes (works around an issue where `schtasks.exe` CSV output can't be parsed correctly by `ConvertFrom-Csv`).
+ * Fixed: `Add-GroupMember` and `Remove-GroupMember` fail when adding `Everyone` or `NT Service\*` accounts to a group ([fixes issue #177](https://bitbucket.org/splatteredbits/carbon/issues/177/add-groupmembers-201-doesnt-like-vsa-names)).
  
 ## Other Improvements
 

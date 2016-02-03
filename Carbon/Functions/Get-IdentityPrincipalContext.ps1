@@ -32,13 +32,19 @@ function Get-IdentityPrincipalContext
     Set-StrictMode -Version 'Latest'
 
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
-    
-    $ctxType = 'Domain'
-    $ctxName = $Identity.Domain
-    if( $Identity.Domain -eq $env:COMPUTERNAME -or $Identity.Domain -eq 'BUILTIN' -or $Identity.Domain -eq 'NT AUTHORITY' )
+
+    # First, check for a local match
+    $machineCtx = New-Object 'DirectoryServices.AccountManagement.PrincipalContext' 'Machine',$env:COMPUTERNAME
+    if( [DirectoryServices.AccountManagement.Principal]::FindByIdentity( $machineCtx, 'Sid', $Identity.Sid.Value ) )
     {
-        $ctxName = $env:COMPUTERNAME
-        $ctxType = 'Machine'
+        return $machineCtx
     }
-    New-Object 'DirectoryServices.AccountManagement.PrincipalContext' $ctxType,$ctxName
+
+    $domainCtx = New-Object 'DirectoryServices.AccountManagement.PrincipalContext' 'Domain',$Identity.Domain
+    if( [DirectoryServices.AccountManagement.PRincipal]::FindByIdentity( $domainCtx, 'Sid', $Identity.Sid.Value ) )
+    {
+        return $domainCtx
+    }
+
+    Write-Error -Message ('Unable to determine if principal ''{0}'' (SID: {1}; Type: {2}) is a machien or domain principal.' -f $Identity.FullName,$Identity.Sid.Value,$Identity.Type)
 }

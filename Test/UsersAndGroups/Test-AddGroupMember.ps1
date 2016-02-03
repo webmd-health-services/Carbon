@@ -135,6 +135,20 @@ function Test-ShouldDetectIfAnonymousLogonAlreadyMemberOfGroup
     Assert-Equal 0 $Error.Count
 }
 
+function Test-ShouldAddEveryone
+{
+    Add-GroupMember -Name $GroupName -Member 'Everyone'
+    Assert-Equal 0 $Error.Count
+    Assert-MembersInGroup 'Everyone'
+}
+
+function Test-ShouldNTServiceAccounts
+{
+    Add-GroupMember -Name $GroupName -Member 'NT SERVICE\Fax'
+    Assert-Equal 0 $Error.Count
+    Assert-MembersInGroup 'NT SERVICE\Fax'
+}
+
 function Test-ShouldRefuseToAddLocalGroupToLocalGroup
 {
     Add-GroupMember -Name $GroupName -Member $GroupName -ErrorAction SilentlyContinue
