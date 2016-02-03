@@ -142,11 +142,14 @@ function Test-ShouldAddEveryone
     Assert-MembersInGroup 'Everyone'
 }
 
-function Test-ShouldNTServiceAccounts
+function Test-ShouldAddNTServiceAccounts
 {
-    Add-GroupMember -Name $GroupName -Member 'NT SERVICE\Fax'
-    Assert-Equal 0 $Error.Count
-    Assert-MembersInGroup 'NT SERVICE\Fax'
+    if( (Test-Identity -Name 'NT Service\Fax') )
+    {
+        Add-GroupMember -Name $GroupName -Member 'NT SERVICE\Fax'
+        Assert-Equal 0 $Error.Count
+        Assert-MembersInGroup 'NT SERVICE\Fax'
+    }
 }
 
 function Test-ShouldRefuseToAddLocalGroupToLocalGroup
