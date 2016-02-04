@@ -10,59 +10,66 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-Set-StrictMode -Version 'Latest'
-
 function Uninstall-Group
 {
     <#
     .SYNOPSIS
-    Removes a local group
+    Removes a *local* group.
     
     .DESCRIPTION
-    Uses DirectoryServices.AccountManagement.GroupPrincipal]::FindByIdentity() to search for a local group by name
+    The `Uninstall-Group` function removes a *local* group using .NET's [DirectoryServices.AccountManagement API](https://msdn.microsoft.com/en-us/library/system.directoryservices.accountmanagement.aspx). If the group doesn't exist, returns without doing any work or writing any errors.
     
-    .PARAMETER Name    
-    
-    .EXAMPLE
-    Uninstall-WhsGroup -Name 'TestGroup1'
-    
-    Removes group TestGroup1 from the local computer
+    .LINK
+    Add-GroupMember
+
+    .LINK
+    Install-Group
+
+    .LINK
+    Remove-GroupMember
+
+    .LINK
+    Test-Group
+
+    .LINK
+    Test-GroupMember
 
     .INPUTS
     System.String
 
-    .LINK
-    Install-WhsGroup
-    #>
+    .EXAMPLE
+    Uninstall-WhsGroup -Name 'TestGroup1'
     
+    Demonstrates how to uninstall a group. In this case, the `TestGroup1` group is removed.
+    #>
     [CmdletBinding(SupportsShouldProcess=$true)]
-
     param
     (
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
         [String]
-        # Name of group to remove
+        # The name of the group to remove/uninstall.
         $Name
     )
 
 	Set-StrictMode -Version 'Latest'
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
-    $ctx = New-Object 'DirectoryServices.AccountManagement.PrincipalContext' ([DirectoryServices.AccountManagement.ContextType]::Machine)
-    $group = [DirectoryServices.AccountManagement.GroupPrincipal]::FindByIdentity( $ctx, $Name )
-
-    if ($PSCmdlet.ShouldProcess($Name, 'Delete local group'))
+    if( -not (Test-Group -Name $Name) )
     {
-        if ($group)
-        {
-            Write-Verbose ('Deleting local group {0}' -f $Name)
-            $group.Delete()
-        }
-        else
-        {
-            Write-Verbose ('Local group {0} not found' -f $Name)
-        }
+        return
+    }
+
+    $group = Get-Group -Name $Name
+    if( -not $group )
+    {
+        return
+    }
+
+    if( $PSCmdlet.ShouldProcess(('local group {0}' -f $Name), 'remove') )
+    {
+        Write-Verbose -Message ('[{0}] Removing group.' -f $Name)
+        $group.Delete()
     }
 
 }

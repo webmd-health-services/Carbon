@@ -8,6 +8,7 @@
  * `Install-Directory`: creates a directory (and any missing parents), if it doesn't exist already. Finally!
  * `Uninstall-Directory`: removes a directory, if it exists. Finally!
  * Obsolete function parameters will no longer show in Intellisense (added the `DontShow` parameter property).
+ * `Uninstall-Group`: uses the `DirectoryServices.AccountManagement` .NET API to remove a group, if it exists.
  
 ## Bug Fixes
  

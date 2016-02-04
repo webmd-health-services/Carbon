@@ -776,6 +776,10 @@
         "Tags":  [ "Shares" ]
     },
     {
+        "Name":  "Uninstall-Group",
+        "Tags":  [ "Groups", "Identity", "Principal" ]
+    },
+    {
         "Name":  "Uninstall-IisAppPool",
         "Tags":  [ "IIS" ]
     },
