@@ -19,6 +19,8 @@ function Uninstall-Group
     .DESCRIPTION
     The `Uninstall-Group` function removes a *local* group using .NET's [DirectoryServices.AccountManagement API](https://msdn.microsoft.com/en-us/library/system.directoryservices.accountmanagement.aspx). If the group doesn't exist, returns without doing any work or writing any errors.
     
+    This function was added in Carbon 2.1.0.
+
     .LINK
     Add-GroupMember
 
