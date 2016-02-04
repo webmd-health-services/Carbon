@@ -485,7 +485,7 @@
     },
     {
         "Name":  "Remove-GroupMember",
-        "Tags":  [ "Groups" ]
+        "Tags":  [ "Groups", "Identity", "Principal" ]
     },
     {
         "Name":  "Remove-HostsEntry",
@@ -660,6 +660,10 @@
         "Tags":  [ "Groups", "Identity", "Principal" ]
     },
     {
+        "Name":  "Test-GroupMember",
+        "Tags":  [ "Groups", "Identity", "Principal" ]
+    },
+    {
         "Name":  "Test-Identity",
         "Tags":  [ "Users", "Groups", "Security", "Identity", "Principal", "SID" ]
     },
@@ -774,6 +778,10 @@
     {
         "Name":  "Uninstall-FileShare",
         "Tags":  [ "Shares" ]
+    },
+    {
+        "Name":  "Uninstall-Group",
+        "Tags":  [ "Groups", "Identity", "Principal" ]
     },
     {
         "Name":  "Uninstall-IisAppPool",

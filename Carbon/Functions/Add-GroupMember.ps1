@@ -23,6 +23,8 @@ function Add-GroupMember
 
     If the members are already part of the group, nothing happens.
 
+    The user running this function must have access to the directory where each principal in the `Member` parameter and the directory where each of the group's current members are located.
+
     .EXAMPLE
     Add-GroupMember -Name Administrators -Member EMPIRE\DarthVader,EMPIRE\EmperorPalpatine,REBELS\LSkywalker
 

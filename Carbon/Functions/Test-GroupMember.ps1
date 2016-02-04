@@ -14,91 +14,76 @@ function Test-GroupMember
 {
     <#
     .SYNOPSIS
-    brief description of the function.
+    Tests if a user or group is a member of a *local* group.
 
     .DESCRIPTION
-    detailed description of the function.
+    The `Test-GroupMember` function tests if a user or group is a member of a *local* group using [.NET's DirectoryServices.AccountManagement APIs](https://msdn.microsoft.com/en-us/library/system.directoryservices.accountmanagement.aspx). If the group or member you want to check don't exist, you'll get errors and `$null` will be returned. If `Member` is in the group, `$true` is returned. If `Member` is not in the group, `$false` is returned.
 
-    .PARAMETER  ParameterA
-    description of the ParameterA parameter.
+    The user running this function must have permission to access whatever directory the `Member` is in and whatever directory current members of the group are in.
 
-    .PARAMETER  ParameterB
-    description of the ParameterB parameter.
-
-    .EXAMPLE
-    C:\> Get-Something -ParameterA 'One value' -ParameterB 32
-
-    .EXAMPLE
-    C:\> Get-Something 'One value' 32
-
-    .INPUTS
-    .String,System.Int32
-
-    .OUTPUTS
-    .String
-
-    .NOTES
-    information about the function go here.
+    This function was added in Carbon 2.1.0.
 
     .LINK
-    _functions_advanced
+    Add-GroupMember
 
     .LINK
-    _comment_based_help
+    Install-Group
+
+    .LINK
+    Remove-GroupMember
+
+    .LINK
+    Test-Group
+
+    .LINK
+    Uninstall-Group
+
+    .EXAMPLE
+    Test-GroupMember -GroupName 'SithLords' -Member 'REBELS\LSkywalker'
+
+    Demonstrates how to test if a user is a member of a group. In this case, it tests if `REBELS\LSkywalker` is in the local `SithLords`, *which obviously he isn't*, so `$false` is returned.
     #>
+    [CmdletBinding()]
+    Param(
+        [Parameter(Mandatory=$true)]
+        [string]
+        # The name of the group whose membership is being tested.
+        $GroupName,
 
-[CmdletBinding()]
-Param(
-    [Parameter(Mandatory=$true)]
-    [string]
-    $Name,
-
-    [Parameter(Mandatory=$true)]
-    [string] 
-    $Member
-)
+        [Parameter(Mandatory=$true)]
+        [string] 
+        # The name of the member to check.
+        $Member
+    )
     
     Set-StrictMode -Version 'Latest'
-
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
-    # Get current group members (if group exists)
-    if ((Test-Group -Name $Name))
+    if( -not (Test-Group -Name $GroupName) )
     {
-        $currMembers = ((Get-Group -Name $Name).Members)
-        Write-Debug ('Current members of group {0}' -f $Name)
-        ($currMembers | Select SamAccountName,ContextType,@{Name="Domain";Expression={($_.Context.Name)}} | Format-Table -AutoSize -Wrap | Out-String | Write-Debug)
+        Write-Error -Message ('Group ''{0}'' not found.' -f $GroupName)
+        return
+    }
 
-        # Return value
-        $userExists = $false
-        # Loop through $currMembers looking to see if 
-        foreach($cMember in $currMembers)
+    $group = Get-Group -Name $GroupName
+    if( -not $group )
+    {
+        return
+    }
+    
+    $principal = Resolve-Identity -Name $Member
+    if( -not $principal )
+    {
+        return
+    }
+
+    foreach($currentMember in $group.Members)
+    {
+        if ($principal.Sid -eq $currentMember.Sid)
         {
-            try
-            {
-                Write-Debug ('User Resolution - Start:    {0}' -f $Member)
-                $secPrincipal = Resolve-Identity -Name $Member -ErrorAction Stop
-            }
-            catch
-            {
-                Write-Warning -Message ('User Resolution - Failed: {0}' -f $PSItem.Exception.Message)
-                return $false
-            }
-
-            if ($secPrincipal)
-            {
-                if ($secPrincipal.Sid -eq $cMember.Sid)
-                {
-                    return $true                    
-                }
-            }
+            return $true                    
         }
+    }
 
-        return $userExists
-    }
-    else
-    {
-        Write-Error ('Group ''{0}'' not found' -f $Name)
-        return $false
-    }
+    return $false
 }

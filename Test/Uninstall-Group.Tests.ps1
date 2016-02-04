@@ -14,16 +14,17 @@ Set-StrictMode -Version 'Latest'
 
 & (Join-Path -Path $PSScriptRoot -ChildPath 'Import-CarbonForTest.ps1')
 
-$groupName = 'TestUninstallGroup'
-$description = 'Used by Uninstall-Group.Tests.ps1'
-
 describe Uninstall-Group {
 
-    BeforeAll {
+    $groupName = 'TestUninstallGroup'
+    $description = 'Used by Uninstall-Group.Tests.ps1'
+
+    BeforeEach {
         Install-Group -Name $groupName -Description $description
+        $Global:Error.Clear()
     }
 
-    AfterAll {
+    AfterEach {
         Uninstall-Group -Name $groupName
     }
 
@@ -32,8 +33,18 @@ describe Uninstall-Group {
     }
 
     It 'should remove the group' {
+        Test-Group -Name $groupName | Should Be $true
         Uninstall-Group -Name $groupName
-        $groupExists = Get-Group | Where-Object {$_ -eq $groupName}
-        $groupExists | Should BeNullOrEmpty
+        Test-Group -Name $groupName | Should Be $false
+    }
+
+    It 'should remove nonexistent group without errors' {
+        Uninstall-Group -Name 'fubarsnafu'
+        $Global:Error.Count | Should Be 0
+    }
+
+    It 'should support WhatIf' {
+        Uninstall-Group -Name $groupName -WhatIf
+        Test-Group -Name $groupName | Should Be $true
     }
 }
