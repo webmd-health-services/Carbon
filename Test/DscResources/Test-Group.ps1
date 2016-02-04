@@ -11,7 +11,7 @@
 # limitations under the License.
 
 Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'CarbonDscTest.psm1' -Resolve) -Force
-& (Join-Path -Path $PSScriptRoot -ChildPath ..\..\Carbon\Import-Carbon.ps1 -Resolve)
+& (Join-Path -Path $PSScriptRoot -ChildPath '..\..\Carbon\Import-Carbon.ps1' -Resolve)
 
 function Start-TestFixture
 {
@@ -26,9 +26,9 @@ function Stop-TestFixture
 function Test-GetTargetResource
 {
     $groupName = 'Administrators'
-    $resource = Get-TargetResource -GroupName $groupName
+    $resource = Get-TargetResource -Name $groupName
     Assert-NotNull $resource
-    Assert-Equal $resource.GroupName $groupName
+    Assert-Equal $resource.Name $groupName
     Assert-DscResourcePresent $resource
 }
 
@@ -37,19 +37,19 @@ function Test-TestTargetResource
     $groupName = 'Administrators'
     $member = 'Domain Admins'
 
-    $result = Test-TargetResource -GroupName $groupName
+    $result = Test-TargetResource -Name $groupName
     Assert-NotNull $result
     Assert-True $result
 
-    $result = Test-TargetResource -GroupName $groupName -Ensure Absent
+    $result = Test-TargetResource -Name $groupName -Ensure Absent
     Assert-NotNull $result
     Assert-False $result
 
-    $result = Test-TargetResource -GroupName $groupName -Members $member
+    $result = Test-TargetResource -Name $groupName -Members $member
     Assert-NotNull $result
     Assert-True $result
 
-    $result = Test-TargetResource -GroupName $groupName -Members $member -Ensure Absent
+    $result = Test-TargetResource -Name $groupName -Members $member -Ensure Absent
     Assert-NotNull $result
     Assert-False $result
 }
@@ -65,30 +65,30 @@ function Test-SetTargetResource
     try
     {
         # Test for group creation
-        Set-TargetResource -GroupName $groupName -Ensure 'Present'
+        Set-TargetResource -Name $groupName -Ensure 'Present'
     
-        $resource = Get-TargetResource -GroupName $groupName
+        $resource = Get-TargetResource -Name $groupName
         Assert-NotNull $resource
         Assert-Equal $groupName $resource.GroupName
         Assert-DscResourcePresent $resource
 
         # Test for group deletion
-        Set-TargetResource -GroupName $groupName -Ensure 'Absent'
+        Set-TargetResource -Name $groupName -Ensure 'Absent'
     
-        $resource = Get-TargetResource -GroupName $groupName
+        $resource = Get-TargetResource -Name $groupName
         Assert-NotNull $resource
         Assert-Equal $groupName $resource.GroupName
         Assert-DscResourceAbsent $resource
 
         # Test for group creation with members
-        Set-TargetResource -GroupName $groupName -Members $member -Ensure 'Present'
+        Set-TargetResource -Name $groupName -Members $member -Ensure 'Present'
 
-        $resource = Get-TargetResource -GroupName $groupName
+        $resource = Get-TargetResource -Name $groupName
         Assert-NotNull $resource
         Assert-Equal $groupName $resource.GroupName
         Assert-DscResourcePresent $resource
 
-        $result = Test-TargetResource -GroupName $groupName -Members $member -Ensure 'Present'
+        $result = Test-TargetResource -Name $groupName -Members $member -Ensure 'Present'
         Assert-NotNull $result
         Assert-True $result
     }
@@ -112,7 +112,7 @@ Configuration ShouldCreateGroup
     {
         Carbon_Group CarbonTestGroup
         {
-            GroupName = 'CarbonTestGroup01'
+            Name = 'CarbonTestGroup01'
             Ensure = $Ensure
         }
     }
@@ -127,7 +127,7 @@ function Test-ShouldRunThroughDsc
     Start-DscConfiguration -Wait -ComputerName 'localhost' -Path $CarbonDscOutputRoot -Force
     Assert-NoError
 
-    $result = Test-TargetResource -GroupName $groupName
+    $result = Test-TargetResource -Name $groupName
     Assert-NotNull $result
     Assert-True $result
 
@@ -136,7 +136,7 @@ function Test-ShouldRunThroughDsc
     Start-DscConfiguration -Wait -ComputerName 'localhost' -Path $CarbonDscOutputRoot -Force
     Assert-NoError
 
-    $result = Test-TargetResource -GroupName $groupName
+    $result = Test-TargetResource -Name $groupName
     Assert-NotNull $result
     Assert-False $result
 }
