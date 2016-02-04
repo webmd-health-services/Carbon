@@ -133,7 +133,7 @@ Describe 'License Notices' {
     
         if( $filesMissingLicense )
         {
-                $filesMissingLicense.Count | Should Be 0
+                ,$filesMissingLicense | Should BeNullOrEmpty
         }
     }
 }
