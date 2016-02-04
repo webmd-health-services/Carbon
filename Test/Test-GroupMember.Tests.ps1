@@ -24,7 +24,6 @@ $description = 'Used by Test-GroupMember.Tests.ps1'
 describe Test-GroupMember {
     
     BeforeAll {
-
         Install-Group -Name $groupName -Description $description
 
         $testUserCred = New-Credential -UserName $userName -Password $userPass
@@ -42,15 +41,28 @@ describe Test-GroupMember {
         $Global:Error.Clear()
     }
 
-    It 'should find the local user' {
-        $result = Test-GroupMember -Name $groupName -Member $userName
+    It 'should find a group member' {
+        $result = Test-GroupMember -GroupName $groupName -Member $userName
         $result | Should Be $true
         $Global:Error.Count | Should Be 0
     }
 
-    It 'should not find the local user' {
-        $result = Test-GroupMember -Name $groupName -Member 'nonExistantUser'
-        $result | Should Be $false
-        $Global:Error.Count | Should Be 1
+    It 'should not find a group member' {
+        $user = Get-User | Select-Object -First 1
+        $User | Should Not BeNullOrEmpty
+        Test-GroupMember -GroupName $groupName -Member $user | Should Be $false
+        $Global:Error.Count | Should Be 0
+    }
+
+    It 'should not find a non existent user' {
+        $result = Test-GroupMember -GroupName $groupName -Member 'nonExistantUser' -ErrorAction SilentlyContinue
+        $result | Should BeNullOrEmpty
+        $Global:Error[0] | Should Match 'identity.*not found'
+    }
+
+    It 'should write an error if group does not exist' {
+        $result = Test-GroupMember -GroupName 'fubarsnafu' -Member 'snafufubar' -ErrorAction SilentlyContinue
+        $result | Should BeNullOrEmpty
+        $Global:Error[0] | Should Match 'group.*not found'
     }
 }

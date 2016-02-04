@@ -485,7 +485,7 @@
     },
     {
         "Name":  "Remove-GroupMember",
-        "Tags":  [ "Groups" ]
+        "Tags":  [ "Groups", "Identity", "Principal" ]
     },
     {
         "Name":  "Remove-HostsEntry",
@@ -657,6 +657,10 @@
     },
     {
         "Name":  "Test-Group",
+        "Tags":  [ "Groups", "Identity", "Principal" ]
+    },
+    {
+        "Name":  "Test-GroupMember",
         "Tags":  [ "Groups", "Identity", "Principal" ]
     },
     {
