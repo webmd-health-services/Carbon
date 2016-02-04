@@ -213,9 +213,12 @@ function New-RsaKeyPair
 
         # Taken from example 1 of the Protect-CmsMessage help topic.
         [int]$daysValid = [Math]::Floor(($ValidTo - $ValidFrom).TotalDays)
-        $MaxDaysValid = [Math]::Floor(([DateTime]::MaxValue - [DateTime]::UtcNow).TotalDays)
+        [int]$MaxDaysValid = [Math]::Floor(([DateTime]::MaxValue - [DateTime]::UtcNow).TotalDays)
+        Write-Debug -Message ('Days Valid:              {0}' -f $daysValid)
+        Write-Debug -Message ('Max Days Valid:          {0}' -f $MaxDaysValid)
         if( $daysValid -gt $MaxDaysValid )
         {
+            Write-Debug -Message ('Adjusted Days Valid:     {0}' -f $daysValid)
             $daysValid = $MaxDaysValid
         }
         (@'

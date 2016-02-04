@@ -146,7 +146,7 @@ Describe 'New-RsaKeyPair' {
 
 
     It 'should generate key with custom configuration' {
-        $validTo = [datetime]::UtcNow.AddDays(30)
+        $validTo = [datetime]::Now.AddDays(30)
         $length = 2048
 
         $output = New-RsaKeyPair -Subject $subject `
