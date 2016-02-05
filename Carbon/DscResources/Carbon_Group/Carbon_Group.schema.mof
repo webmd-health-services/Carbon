@@ -15,9 +15,9 @@ limitations under the License.
 [ClassVersion("1.0.0.0"), FriendlyName("Carbon_Group")]
 class Carbon_Group : OMI_BaseResource
 {
-	[Key, Description("Name of group to modify")] String GroupName;
-	[Write, Description("Description of group")] String Description;
+	[Key, Description("Name of the group to configure.")] String Name;
+	[Write, Description("Description of the group.")] String Description;
 	[Write, Description("Determines whether the group is created or deleted"), ValueMap{"Present","Absent"}, Values{"Present","Absent"}] String Ensure;
-	[Write, Description("Members to be added to group")] String Members[];
+	[Write, Description("Members of the group. After configuration, only these members will be in the group.")] String Members[];
 };
 

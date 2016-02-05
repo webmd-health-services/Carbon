@@ -13,9 +13,22 @@
 Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'CarbonDscTest.psm1' -Resolve) -Force
 & (Join-Path -Path $PSScriptRoot -ChildPath '..\..\Carbon\Import-Carbon.ps1' -Resolve)
 
+$groupName = 'CarbonGroupTest'
+$username1 = 'CarbonTestUser'
+$username2 = 'CarbonTestUser2'
+$username3 = 'CarbonTestUser3'
+$user1 = $null
+$user2 = $null
+$user3 = $null
+$description = 'Group for testing Carbon''s Group DSC resource.'
+
 function Start-TestFixture
 {
     Start-CarbonDscTestFixture 'Group'
+    $user1 = Install-User -Credential (New-Credential -UserName $username1 -Password 'P@ssw0rd1') -Description 'Carbon test user' -PassThru
+    $user2 = Install-User -Credential (New-Credential -UserName $username2 -Password 'P@ssw0rd1') -Description 'Carbon test user' -PassThru
+    $user3 = Install-User -Credential (New-Credential -UserName $username3 -Password 'P@ssw0rd1') -Description 'Carbon test user' -PassThru
+    Install-Group -Name $groupName -Description $description -Member $username1,$username2
 }
 
 function Stop-TestFixture
@@ -25,19 +38,45 @@ function Stop-TestFixture
 
 function Test-GetTargetResource
 {
+    $admins = Get-Group 'Administrators'
+
     $groupName = 'Administrators'
     $resource = Get-TargetResource -Name $groupName
     Assert-NotNull $resource
     Assert-Equal $resource.Name $groupName
+    Assert-Equal $admins.Description $resource.Description
     Assert-DscResourcePresent $resource
+
+    Assert-Equal $admins.Members.Count $resource.Members.Count
+
+    foreach( $admin in $admins.Members )
+    {
+        $found = $false
+        foreach( $potentialAdmin in $resource.Members )
+        {
+            if( $potentialAdmin.Sid -eq $admin.Sid )
+            {
+                $found = $true
+                break
+            }
+        }
+        Assert-True $found
+    }
+}
+
+function Test-GetTargetResourceDoesNotExist
+{
+    $resource = Get-TargetResource -Name 'fubarsnafu'
+    Assert-NotNull $resource
+    Assert-Equal 'fubarsnafu' $resource.Name
+    Assert-Null $resource.Description
+    Assert-Empty $resource.Members
+    Assert-DscResourceAbsent $resource
 }
 
 function Test-TestTargetResource
 {
-    $groupName = 'Administrators'
-    $member = 'Domain Admins'
-
-    $result = Test-TargetResource -Name $groupName
+    $result = Test-TargetResource -Name $groupName -Description $description -Members ($username1,$username2)
     Assert-NotNull $result
     Assert-True $result
 
@@ -45,11 +84,37 @@ function Test-TestTargetResource
     Assert-NotNull $result
     Assert-False $result
 
-    $result = Test-TargetResource -Name $groupName -Members $member
+    # should be out of date with no properties passed
+    $result = Test-TargetResource -Name $groupName
+    Assert-NotNull $result
+    Assert-False $result
+
+    $result = Test-TargetResource -Name $groupName -Members ($username1,$username2) -Description $description
     Assert-NotNull $result
     Assert-True $result
 
-    $result = Test-TargetResource -Name $groupName -Members $member -Ensure Absent
+    # Now, make sure if group has extra member we get false
+    $result = Test-TargetResource -Name $groupName -Members ($username1) -Description $description
+    Assert-NotNull $result
+    Assert-False $result
+
+    # Now, make sure if group is missing a member we get false
+    $result = Test-TargetResource -Name $groupName -Members ($username1,$username2,$username3) -Description $description
+    Assert-NotNull $result
+    Assert-False $result
+
+    # Now, make sure if group description is different we get false
+    $result = Test-TargetResource -Name $groupName -Members ($username1,$username2) -Description 'a new description'
+    Assert-NotNull $result
+    Assert-False $result
+
+    # We get false even if members are same when should be absent
+    $result = Test-TargetResource -Name $groupName -Members $username1,$username2 -Ensure Absent
+    Assert-NotNull $result
+    Assert-False $result
+
+    # We get false even if description is the same when should be absent
+    $result = Test-TargetResource -Name $groupName -Description $description -Ensure Absent
     Assert-NotNull $result
     Assert-False $result
 }
@@ -57,46 +122,70 @@ function Test-TestTargetResource
 function Test-SetTargetResource
 {
     $groupName = 'TestCarbonGroup01'
-    $member = 'CarbonUser01'
 
-    $testMemberCred = New-Credential -UserName $member -Password 'P@ssw0rd!'
-    Install-User -Credential $testMemberCred
-
-    try
-    {
-        # Test for group creation
-        Set-TargetResource -Name $groupName -Ensure 'Present'
+    # Test for group creation
+    Set-TargetResource -Name $groupName -Ensure 'Present'
     
-        $resource = Get-TargetResource -Name $groupName
-        Assert-NotNull $resource
-        Assert-Equal $groupName $resource.GroupName
-        Assert-DscResourcePresent $resource
+    $group = Get-Group -Name $groupName
+    Assert-NotNull $group
+    Assert-Equal $groupName $group.Name
+    Assert-Null $group.Description
+    Assert-Equal 0 $group.Members.Count
 
-        # Test for group deletion
-        Set-TargetResource -Name $groupName -Ensure 'Absent'
+    # Change members
+    Set-TargetResource -Name $groupName -Members $username1 -Ensure 'Present'
+    $group = Get-Group -Name $groupName
+    Assert-NotNull $group
+    Assert-Equal $groupName $group.Name
+    Assert-Null $group.Description
+    Assert-Equal 1 $group.Members.Count
+    Assert-Equal $user1.Sid $group.Members[0].Sid
+
+    # Change description
+    Set-TargetResource -Name $groupName -Members $username1 -Description 'group description' -Ensure 'Present'
     
-        $resource = Get-TargetResource -Name $groupName
-        Assert-NotNull $resource
-        Assert-Equal $groupName $resource.GroupName
-        Assert-DscResourceAbsent $resource
+    $group = Get-Group -Name $groupName
+    Assert-NotNull $group
+    Assert-Equal $groupName $group.Name
+    Assert-Equal 'group description' $group.Description
+    Assert-Equal 1 $group.Members.Count
+    Assert-Equal $user1.Sid $group.Members[0].Sid
+    
+    # Should add member
+    Set-TargetResource -Name $groupName -Members $username1,$username2 -Description 'group description' -Ensure 'Present'
+    $group = Get-Group -Name $groupName
+    Assert-NotNull $group
+    Assert-Equal $groupName $group.Name
+    Assert-Equal 'group description' $group.Description
+    Assert-Equal 2 $group.Members.Count
+    Assert-True ($group.Members.Sid -contains $user1.Sid)
+    Assert-True ($group.Members.Sid -contains $user2.Sid)
 
-        # Test for group creation with members
-        Set-TargetResource -Name $groupName -Members $member -Ensure 'Present'
+    # should support whatif for updating group
+    Set-TargetResource -Name $groupName -Description 'new description' -WhatIf
+    $group = Get-Group -Name $groupName
+    Assert-Equal 'group description' $group.Description
 
-        $resource = Get-TargetResource -Name $groupName
-        Assert-NotNull $resource
-        Assert-Equal $groupName $resource.GroupName
-        Assert-DscResourcePresent $resource
+    # Should support whatif for removing members
+    Set-TargetResource -Name $groupName -Description 'group description' -WhatIf
+    $group = Get-Group -Name $groupName
+    Assert-Equal 2 $group.Members.Count
 
-        $result = Test-TargetResource -Name $groupName -Members $member -Ensure 'Present'
-        Assert-NotNull $result
-        Assert-True $result
-    }
-    finally
-    {
-        Uninstall-User -Username $member
-    }
+    # Should remove members and set description
+    Set-TargetResource -Name $groupName -Ensure 'Present'
+    $group = Get-Group -Name $groupName
+    Assert-NotNull $group
+    Assert-Equal $groupName $group.Name
+    Assert-Null $group.Description
+    Assert-Equal 0 $group.Members.Count
 
+    # Should support WhatIf
+    Set-TargetResource -Name $groupName -Ensure Absent -WhatIf
+    Assert-True (Test-Group -Name $groupName)
+
+    # Test for group deletion
+    Set-TargetResource -Name $groupName -Ensure 'Absent'
+    Assert-False (Test-Group -Name $groupName)
 }
 
 Configuration ShouldCreateGroup
@@ -104,6 +193,7 @@ Configuration ShouldCreateGroup
     param(
         $Ensure
     )
+
     Set-StrictMode -Off
 
     Import-DscResource -Name '*' -Module 'Carbon'
@@ -112,7 +202,9 @@ Configuration ShouldCreateGroup
     {
         Carbon_Group CarbonTestGroup
         {
-            Name = 'CarbonTestGroup01'
+            Name = 'CDscGroup1'
+            Description = 'Carbon_Group DSC resource test group'
+            Members = @( $username1 )
             Ensure = $Ensure
         }
     }
@@ -120,20 +212,20 @@ Configuration ShouldCreateGroup
 
 function Test-ShouldRunThroughDsc
 {
-    $groupName = 'CarbonTestGroup01'
+    $groupName = 'CDscGroup1'
 
     # Test for group creation through DSC execution
     & ShouldCreateGroup -Ensure 'Present' -OutputPath $CarbonDscOutputRoot
     Start-DscConfiguration -Wait -ComputerName 'localhost' -Path $CarbonDscOutputRoot -Force
     Assert-NoError
 
-    $result = Test-TargetResource -Name $groupName
+    $result = Test-TargetResource -Name $groupName -Description 'Carbon_Group DSC resource test group' -Members $username1
     Assert-NotNull $result
     Assert-True $result
 
     # Test for group deletion through DSC execution
     & ShouldCreateGroup -Ensure 'Absent' -OutputPath $CarbonDscOutputRoot
-    Start-DscConfiguration -Wait -ComputerName 'localhost' -Path $CarbonDscOutputRoot -Force
+    Start-DscConfiguration -Wait -ComputerName 'localhost' -Path $CarbonDscOutputRoot -Force -Verbose
     Assert-NoError
 
     $result = Test-TargetResource -Name $groupName

@@ -9,6 +9,10 @@
  * `Uninstall-Directory`: removes a directory, if it exists. Finally!
  * `Uninstall-Group`: uses the `DirectoryServices.AccountManagement` .NET API to remove a group, if it exists.
  * `Test-GroupMember`: uses the `DirectoryServices.AccountManagemetn` .NET API to test if a principal is a member of a group.
+
+## New DSC Resource
+
+ * `Carbon_Group`: resource for configuring local groups.
  
 ## Bug Fixes
  
