@@ -76,6 +76,8 @@ function Test-GetTargetResourceDoesNotExist
 
 function Test-TestTargetResource
 {
+    $VerbosePreference = 'Continue'
+
     $result = Test-TargetResource -Name $groupName -Description $description -Members ($username1,$username2)
     Assert-NotNull $result
     Assert-True $result
@@ -121,6 +123,8 @@ function Test-TestTargetResource
 
 function Test-SetTargetResource
 {
+    $VerbosePreference = 'Continue'
+
     $groupName = 'TestCarbonGroup01'
 
     # Test for group creation
@@ -216,7 +220,7 @@ function Test-ShouldRunThroughDsc
 
     # Test for group creation through DSC execution
     & ShouldCreateGroup -Ensure 'Present' -OutputPath $CarbonDscOutputRoot
-    Start-DscConfiguration -Wait -ComputerName 'localhost' -Path $CarbonDscOutputRoot -Force
+    Start-DscConfiguration -Wait -ComputerName 'localhost' -Path $CarbonDscOutputRoot -Force -Verbose
     Assert-NoError
 
     $result = Test-TargetResource -Name $groupName -Description 'Carbon_Group DSC resource test group' -Members $username1
