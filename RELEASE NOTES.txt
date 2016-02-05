@@ -25,7 +25,6 @@
  * Fixed: `New-RsaKeyPair` generates a key pair that isn't supported for encrypting/decrypting DSC credentials or supported by the CMS message cmdlets.
  * Fixed: `Get-ScheduledTask` returns invalid task commands when those commands contain quotes (works around an issue where `schtasks.exe` CSV output can't be parsed correctly by `ConvertFrom-Csv`).
  * Fixed: `Add-GroupMember` and `Remove-GroupMember` fail when adding `Everyone` or `NT Service\*` accounts to a group ([fixes issue #177](https://bitbucket.org/splatteredbits/carbon/issues/177/add-groupmembers-201-doesnt-like-vsa-names)).
- * Fixed: `Add-GroupMember` ignores `-WhatIf` switch.
  
 ## Other Improvements
 

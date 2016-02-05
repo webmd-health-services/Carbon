@@ -75,7 +75,7 @@ function Add-GroupMember
                 try
                 {
                     $notAMember = -not $group.Members.Contains( $identityCtx, 'Sid', $identity.Sid.Value )
-                    if( $notAMember -and $pscmdlet.ShouldProcess( $group.Name, ("add member {0}" -f $identity.FullName) ) )
+                    if( $notAMember )
                     {
             	        try
             	        {
