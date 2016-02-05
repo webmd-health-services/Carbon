@@ -70,7 +70,7 @@ function Uninstall-Group
 
     if( $PSCmdlet.ShouldProcess(('local group {0}' -f $Name), 'remove') )
     {
-        Write-Verbose -Message ('[{0}] Removing group.' -f $Name)
+        Write-Verbose -Message ('[{0}]              -' -f $Name)
         $group.Delete()
     }
 
