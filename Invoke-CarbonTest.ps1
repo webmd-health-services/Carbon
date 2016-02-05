@@ -54,7 +54,7 @@ try
 
     $xmlLogPath = Join-Path -Path (Split-Path -Parent -Path $xmlLogPath) -ChildPath 'Carbon.pester.xml'
     Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'Tools\Pester\3.3.14\Pester.psd1' -Resolve)
-    $result = Invoke-Pester -Script (Join-Path -Path $PSScriptRoot -ChildPath 'Test') -OutputFile $xmlLogPath -OutputFormat LegacyNUnitXml -PassThru
+    $result = Invoke-Pester -Script $Path -OutputFile $xmlLogPath -OutputFormat LegacyNUnitXml -PassThru
     if( $result.FailedCount )
     {
         Write-Error -Message ('{0} Pester tests failed. Check the NUnit reports for more details.' -f $result.FailedCount)
