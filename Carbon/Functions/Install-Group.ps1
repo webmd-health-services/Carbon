@@ -92,7 +92,7 @@ function Install-Group
             $group.Save()
         }
 
-        if( $Member )
+        if( $Member -and $PSCmdlet.ShouldProcess( ('local group {0}' -f $Name), 'adding members' ) )
         {
             Add-GroupMember -Name $Name -Member $Member
         }
