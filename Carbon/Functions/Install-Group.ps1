@@ -58,24 +58,43 @@ function Install-Group
     $group = [DirectoryServices.AccountManagement.GroupPrincipal]::FindByIdentity( $ctx, $Name )
 
     $operation = 'update'
+    $save = $false
+    $new = $false
     if( -not $group )
     {
         $operation = 'create'
+        $new = $true
         $group = New-Object 'DirectoryServices.AccountManagement.GroupPrincipal' $ctx
+        $group.Name = $Name
+        $group.Description = $Description
+        $save = $true
+    }
+    else
+    {
+        # We only update the description if one or the other has a value. This guards against setting description to $null from empty string and vice-versa.
+        if( $group.Description -ne $Description -and ($group.Description -or $Description) )
+        {
+            Write-Verbose -Message ('[{0}] Description  {1} -> {2}' -f $Name,$group.Description,$Description)
+            $group.Description = $Description
+            $save = $true
+        }
     }
 
     try
     {
-        $group.Name = $Name
-        $group.Description = $Description
 
-        if( $PSCmdlet.ShouldProcess( $Name, "$operation local group" ) )
+        if( $save -and $PSCmdlet.ShouldProcess( ('local group {0}' -f $Name), $operation ) )
         {
-            $group.Save()
-            if( $Member )
+            if( $new )
             {
-                Add-GroupMember -Name $Name -Member $Member
+                Write-Verbose -Message ('[{0}]              +' -f $Name)
             }
+            $group.Save()
+        }
+
+        if( $Member )
+        {
+            Add-GroupMember -Name $Name -Member $Member
         }
     
         if( $PassThru )
