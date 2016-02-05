@@ -79,6 +79,7 @@ function Add-GroupMember
                     {
             	        try
             	        {
+                            Write-Verbose -Message ('[{0}] Members       -> {1}' -f $Name,$identity.FullName)
                             $group.Members.Add( $identityCtx, 'Sid', $identity.Sid.Value )
                             $changesMade = $true
                         }
@@ -98,7 +99,10 @@ function Add-GroupMember
         {
             try
             {
-                $group.Save()
+                if( $PSCmdlet.ShouldProcess( ('local group {0}' -f $Name), 'adding members' ) )
+                {
+                    $group.Save()
+                }
             }
             catch
             {
