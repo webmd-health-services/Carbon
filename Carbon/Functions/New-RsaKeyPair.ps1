@@ -73,8 +73,9 @@ function New-RsaKeyPair
 
     Demonstrates how to use all the parameters to create a truly customized key pair. The generated certificate will use the sha1 signing algorithm, becomes effective 1/1/2015, expires 12/31/2015, and is 1024 bits in length.
     #>
-    [OutputType([IO.FileInfo])]
     [CmdletBinding()]
+    [OutputType([IO.FileInfo])]
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSAvoidUsingUserNameAndPassWordParams","")]
     param(
         [Parameter(Mandatory=$true,Position=0)]
         [ValidatePattern('^CN=')]
