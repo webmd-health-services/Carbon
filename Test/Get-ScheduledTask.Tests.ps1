@@ -100,7 +100,7 @@ Describe 'Get-ScheduledTask' {
                         if( ($task | Get-Member -Name 'Actions') -and ($task.Actions | Get-Member -Name 'Exec') )
                         {
                             $expectedValue = $taskXml.Task.Actions.Exec.Command
-                            if( $taskXml.Task.Actions.Exec.Arguments )
+                            if( ($taskxml.Task.Actions.Exec | Get-Member 'Arguments') -and  $taskXml.Task.Actions.Exec.Arguments )
                             {
                                 $expectedValue = '{0} {1}' -f $expectedValue,$taskxml.Task.Actions.Exec.Arguments
                             }
