@@ -83,7 +83,7 @@ All functions are idempotent: when run multiple times with the same arguments, y
     RequiredModules = @()
 
     # Assemblies that must be loaded prior to importing this module
-    RequiredAssemblies = @( (Join-Path -Path $PSScriptRoot -ChildPath 'bin\Carbon.dll') )
+    RequiredAssemblies = @( 'bin\Carbon.dll' )
 
     # Script files (.ps1) that are run in the caller's environment prior to importing this module
     ScriptsToProcess = @( )
