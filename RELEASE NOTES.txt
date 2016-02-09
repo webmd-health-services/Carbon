@@ -4,7 +4,8 @@
 
  * Fixed: unable to publish module to PowerShell Gallery because `RequiredAssemblies` module manifest data used an absolute path generated with `Join-Path` and `$PSScriptRoot`, which aren't allowed in module manifests.
  * Fixed: missing PowerShell Gallery tags, license URI, project URI, and release notes metadata.
- * Fixed: copyright date in module manifest updated to 2016.
+ * Fixed: copyright date in module manifest is 2015.
+ * Fixed: PowerShell gallery missing function list.
  
  
 # 2.1.0 (8 February 2016)
