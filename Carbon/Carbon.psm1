@@ -148,28 +148,9 @@ if( -not (Test-TypeDataMember -TypeName 'System.IO.FileInfo' -MemberName 'Volume
     }
 }
 
-
-$privateMembers = @{
-                        'Add-IisServerManagerMember' = $true;
-                        'Assert-WindowsFeatureFunctionsSupported' = $true;
-                        'ConvertTo-ProviderAccessControlRights' = $true;
-                        'Get-IdentityPrincipalContext' = $true;
-                        'Invoke-ConsoleCommand' = $true;
-                        'Resolve-WindowsFeatureName' = $true;
-                        'Set-CryptoKeySecurity' = $true;
-                        'Use-CallerPreference' = $true;
-                        'Write-IisVerbose' = $true;
-                   }
-
-$functionNames = Get-ChildItem -Path $functionRoot -Filter '*.ps1' | 
+Get-ChildItem -Path $functionRoot -Filter '*.ps1' | 
                     Where-Object { -not $doNotImport.Contains($_.Name) } |
                     ForEach-Object {
                         Write-Verbose ("Importing function {0}." -f $_.FullName)
                         . $_.FullName | Out-Null
-                        $functionName = Split-Path -Leaf -Path $_.FullName
-                        [IO.Path]::GetFileNameWithoutExtension( $functionName )
-                    } |
-                    Where-Object { -not $privateMembers.ContainsKey( $_ ) }
-
-Export-ModuleMember -Function $functionNames -Cmdlet '*' -Alias '*'
-
+                    }
