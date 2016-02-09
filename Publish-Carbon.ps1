@@ -73,6 +73,13 @@ $tags = Get-Content -Raw -Path (Join-Path -Path $PSScriptRoot -ChildPath 'tags.j
             ForEach-Object { $_.ToLower() -replace ' ','-' }
 $tags += @( 'PSModule', 'DscResources', 'setup', 'automation', 'admin' )
 
+Set-ModuleManifestMetadata -ManifestPath $manifestPath -Tag $tags -ReleaseNotesPath $releaseNotesPath
+if( hg status $manifestPath )
+{
+    hg commit -m ('[{0}] Updating module manifest.' -f $manifest.Version) $manifestPath
+    hg log -r tip
+}
+
 $nuspecPath = Join-Path -Path $PSScriptRoot -ChildPath 'Carbon.nuspec' -Resolve
 if( -not $nuspecPath )
 {
