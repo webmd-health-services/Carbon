@@ -99,46 +99,46 @@ UPGRADE INSTRUCTIONS
     
     
 BUG FIXES
-     * Carbon's `System.ServiceProcess.ServiceController` extended type data causes 
-       errors when PowerShell formats `System.ServiceProcess.ServiceController` objects 
-       that represent services on remote computers.
-        * `Compress-Item` doesn't remove handled errors from global error array.
-     * `Grant-Permission` fails with an unhelpful error message if it is unable to get 
-       the ACL on a private key.
-     * `Install-Msi` didn't properly detect when installation failed.
-     * `Install-ScheduledTask` fails under PowerShell 5 to create a scheduled task to 
+    * Carbon's `System.ServiceProcess.ServiceController` extended type data causes 
+      errors when PowerShell formats `System.ServiceProcess.ServiceController` objects 
+      that represent services on remote computers.
+    * `Compress-Item` doesn't remove handled errors from global error array.
+    * `Grant-Permission` fails with an unhelpful error message if it is unable to get 
+      the ACL on a private key.
+    * `Install-Msi` didn't properly detect when installation failed.
+    * `Install-ScheduledTask` fails under PowerShell 5 to create a scheduled task to 
        run on Sunday.
-     * `Install-Service`:
+    * `Install-Service`:
        * No longer writes a warning about being unable to stop an already stopped 
          service (fixes [issue #158](https://bitbucket.org/splatteredbits/carbon/issues/158/install-service-extraneous-warning-about)).
        * Starting the service now respects caller's error action preference. Before, 
         `Start-Service` would write an error even if somone called `Install-Service` 
         with an `Ignore` or `SilentlyContinue` error action preference.
-     * `Set-EnvironmentVariable` fails to set process-level environment variable. 
-     * `Set-HostsEntry` fails to preserve whitespace if existing lines end with a 
-       comment/description. Thanks to [Konstantin Ushenin](https://vk.com/kostanew) for 
-       the fix.
+    * `Set-EnvironmentVariable` fails to set process-level environment variable. 
+    * `Set-HostsEntry` fails to preserve whitespace if existing lines end with a 
+      comment/description. Thanks to [Konstantin Ushenin](https://vk.com/kostanew) for 
+      the fix.
     
 GENERAL EHANCEMENTS
     
-     * Carbon now requires PowerShell 4.
-     * `Import-Carbon.ps1` is more intelligent about when it tries to re-load Carbon. 
-       It will force a re-import of Carbon if any of Carbon's files have changed or the 
-       version has changed.
-     * Added new `FileIndex`, `LinkCount`, and `VolumeSerialNumber` extended type data 
-       on `System.IO.FileInfo` objects for getting a file's index, its hard link count, 
-       and volume serial number, respectively.
-     * The product version of the Carbon assembly now includes pre-release version 
-       information, as defined by the [Semantic Versioning 
-       specification](http://semver.org). To get this version, run `Get-Item Carbon.dll | 
-       Select-Object -ExpandProperty 'VersionInfo' | Select-Object -ExpandProperty 
-       'ProductVersion'`.
-     * The Carbon NuGet package now supports installing and uninstalling under 
+    * Carbon now requires PowerShell 4.
+    * `Import-Carbon.ps1` is more intelligent about when it tries to re-load Carbon. 
+      It will force a re-import of Carbon if any of Carbon's files have changed or the 
+      version has changed.
+    * Added new `FileIndex`, `LinkCount`, and `VolumeSerialNumber` extended type data 
+      on `System.IO.FileInfo` objects for getting a file's index, its hard link count, 
+      and volume serial number, respectively.
+    * The product version of the Carbon assembly now includes pre-release version 
+      information, as defined by the [Semantic Versioning 
+      specification](http://semver.org). To get this version, run `Get-Item Carbon.dll | 
+      Select-Object -ExpandProperty 'VersionInfo' | Select-Object -ExpandProperty 
+      'ProductVersion'`.
+    * The Carbon NuGet package now supports installing and uninstalling under 
        Chocolatey.
-     * All IIS functions were re-written to use the `Microsoft.Web.Administration` API 
-       instead of `appcmd.exe`. As a side effect, they no longer return `appcmd.exe` 
-       console output.
-     * The following functions no longer use `Write-Host`. Instead, they use 
+    * All IIS functions were re-written to use the `Microsoft.Web.Administration` API 
+      instead of `appcmd.exe`. As a side effect, they no longer return `appcmd.exe` 
+      console output.
+    * The following functions no longer use `Write-Host`. Instead, they use 
        `Write-Verbose`:
        * `Disable-NtfsCompression`
        * `Enable-NtfsCompression`
@@ -147,7 +147,7 @@ GENERAL EHANCEMENTS
        * `Install-Service` 
        * `Remove-SslCertificateBinding` 
        * `Revoke-ComPermission` 
-     * Created default, table-based display formats for 
+    * Created default, table-based display formats for 
        `System.DirectoryServices.AccountManagement.UserPrincipal`, 
        `System.DirectoryServices.AccountManagement.GroupPrincipal`, 
        `Microsoft.Web.Administration.ApplicationPool`, 
@@ -156,57 +156,57 @@ GENERAL EHANCEMENTS
      
 NEW FUNCTIONS
     
-     * `Clear-DscLocalResourceCache` clears the local LCM's DSC resource. This makes 
-       developing resources easier.
-     * `Clear-MofAuthoringMetadata` removes authoring metadata from .mof files.
-     * `Copy-DscResource` copies DSC resources (ZIP files, MSI archives, MOF files, 
-       etc.), including timestamps, checksums, and copying only changed files.
-     * `ConvertTo-SecurityIdentifer` converts a binary, string, or 
-       `System.Security.Principal.SecurityIdentifier` object into a 
-       `System.Security.Principal.SecurityIdentifier` object.
-     * `Get-DscError` gets any DSC errors that were written to a computer's DSC event 
-       log.
-     * `Get-DscWinEvent` gets DSC events that were written to a computer's DSC event log.
-     * `Get-FileSharePermission` gets the sharing permissions on a file/SMB share 
-       (*not* the NTFS file system permissions).
-     * `Get-FileShare` uses WMI to get `Win32_Share` objects for the file shares 
-       installed on the local computer.
-     * `Get-Group` gets a local group or all local groups.
-     * `Get-Msi` reads installer information and properties from an MSI file.
-     * `Get-PowerShellModuleInstallPath` gets the path where new module's should be 
-       installed. Beginning with PowerShell 4, modules should get installed into 
-       `$env:ProgramFiles\Windows PowerShell\Modules`. Under PowerShell 3, it is 
-       `$PSHome\Modules`. This function returns the correct location for the version of 
-       PowerShell you're using.
-     * `Get-User` gets a local user or all local users.
-     * `Initialize-Lcm` configures the DSC Local Configuration Manager on computers, 
-       including installing the private key needed for decrypting credentials.
-     * `Remove-GroupMember` removes a user/group from a local group. Thanks to [Philip Kluss](https://bitbucket.org/philkloose) 
-       for the contribution. 
-     * `Resolve-Identity` converts a system, local, or domain principal name or a SID 
-       (as a `SecurityIdentifer`, string SDDL, or byte array) into its canonical 
-       representation and includes extended identity information: domain, type, and SID.
-     * `Start-DscPullConfiguration` starts a configuration check on a computer that is 
-       configured to use the PULL refresh mode.
-     * `Test-DscTargetResource` compares target resource with desired resource. Helpful 
-       when writing `Test-TargetResource` functions.
-     * `Test-Group` checks if a *local* group exists.
-     * `Test-FileShare` uses WMI to check if a file/SMB share exists on the local 
-       computer.
-     * `Test-TypeDataMember` tests if a type has an extended type member defined.
-     * `Uninstall-FileShare` uninstalls/removes a file share, if it exists.
-     * `Write-DscError` writes DSC `ErrorLogRecord` objects as errors.
+    * `Clear-DscLocalResourceCache` clears the local LCM's DSC resource. This makes 
+      developing resources easier.
+    * `Clear-MofAuthoringMetadata` removes authoring metadata from .mof files.
+    * `Copy-DscResource` copies DSC resources (ZIP files, MSI archives, MOF files, 
+      etc.), including timestamps, checksums, and copying only changed files.
+    * `ConvertTo-SecurityIdentifer` converts a binary, string, or 
+      `System.Security.Principal.SecurityIdentifier` object into a 
+      `System.Security.Principal.SecurityIdentifier` object.
+    * `Get-DscError` gets any DSC errors that were written to a computer's DSC event 
+      log.
+    * `Get-DscWinEvent` gets DSC events that were written to a computer's DSC event log.
+    * `Get-FileSharePermission` gets the sharing permissions on a file/SMB share 
+      (*not* the NTFS file system permissions).
+    * `Get-FileShare` uses WMI to get `Win32_Share` objects for the file shares 
+      installed on the local computer.
+    * `Get-Group` gets a local group or all local groups.
+    * `Get-Msi` reads installer information and properties from an MSI file.
+    * `Get-PowerShellModuleInstallPath` gets the path where new module's should be 
+      installed. Beginning with PowerShell 4, modules should get installed into 
+      `$env:ProgramFiles\Windows PowerShell\Modules`. Under PowerShell 3, it is 
+      `$PSHome\Modules`. This function returns the correct location for the version of 
+      PowerShell you're using.
+    * `Get-User` gets a local user or all local users.
+    * `Initialize-Lcm` configures the DSC Local Configuration Manager on computers, 
+      including installing the private key needed for decrypting credentials.
+    * `Remove-GroupMember` removes a user/group from a local group. Thanks to [Philip Kluss](https://bitbucket.org/philkloose) 
+      for the contribution. 
+    * `Resolve-Identity` converts a system, local, or domain principal name or a SID 
+      (as a `SecurityIdentifer`, string SDDL, or byte array) into its canonical 
+      representation and includes extended identity information: domain, type, and SID.
+    * `Start-DscPullConfiguration` starts a configuration check on a computer that is 
+      configured to use the PULL refresh mode.
+    * `Test-DscTargetResource` compares target resource with desired resource. Helpful 
+      when writing `Test-TargetResource` functions.
+    * `Test-Group` checks if a *local* group exists.
+    * `Test-FileShare` uses WMI to check if a file/SMB share exists on the local 
+      computer.
+    * `Test-TypeDataMember` tests if a type has an extended type member defined.
+    * `Uninstall-FileShare` uninstalls/removes a file share, if it exists.
+    * `Write-DscError` writes DSC `ErrorLogRecord` objects as errors.
     
 NEW DSC RESOURCES
     
-     * `Carbon_EnvironmentVariable` creates/removes machine-level environment variables.
-     * `Carbon_FirewallRule` configures firewall rules.
-     * `Carbon_IniFile` manages the contents of INI files.
-     * `Carbon_Permission` configures file, directory, registry, and certificate 
-       permissions.
-     * `Carbon_Privilege` configures an identity's privileges.
-     * `Carbon_ScheduledTask` configures scheduled tasks with `schtasks.exe`.
-     * `Carbon_Service` configures Windows services.
+    * `Carbon_EnvironmentVariable` creates/removes machine-level environment variables.
+    * `Carbon_FirewallRule` configures firewall rules.
+    * `Carbon_IniFile` manages the contents of INI files.
+    * `Carbon_Permission` configures file, directory, registry, and certificate 
+      permissions.
+    * `Carbon_Privilege` configures an identity's privileges.
+    * `Carbon_ScheduledTask` configures scheduled tasks with `schtasks.exe`.
+    * `Carbon_Service` configures Windows services.
      
 ADDED PASSTHRU PARAMETERS
     
@@ -259,113 +259,113 @@ OBSOLETE FUNCTIONS AND PARAMETERS
     The following functions now have obsolete parameters, which will be removed from a 
     future major version of Carbon. You'll get warnings if you use them.
     
-     * `Install-IisAppPool's` `UserName` and `Password` parameters. Use the new 
-       `Credential` parameter instead.
-     * `Install-Msi's` `Quiet` switch. `Install-Msi` always installs in quiet mode. 
-       Please remove usages.
-     * `Install-Service's` `Password` parameter. Use the new `Credential` parameter 
-       instead.
-     * `Install-User's` `UserName` and `Password` parameters. Use the new `Credential` 
-       parameter instead.
+    * `Install-IisAppPool's` `UserName` and `Password` parameters. Use the new 
+      `Credential` parameter instead.
+    * `Install-Msi's` `Quiet` switch. `Install-Msi` always installs in quiet mode. 
+      Please remove usages.
+    * `Install-Service's` `Password` parameter. Use the new `Credential` parameter 
+      instead.
+    * `Install-User's` `UserName` and `Password` parameters. Use the new `Credential` 
+      parameter instead.
     
 RENAMED FUNCTIONS
     
     The following functions were renamed, but with backwards-compatible aliases in 
     place, so you shouldn't have to change any code.
     
-     * `Invoke-WindowsInstaller` -> `Install-Msi`
-     * `Install-SmbShare` -> `Install-FileShare`
+    * `Invoke-WindowsInstaller` -> `Install-Msi`
+    * `Install-SmbShare` -> `Install-FileShare`
      
 SWITCH TO SYSTEM.DIRECTORYSERVICES.ACCOUNTMANAGEMENT API FOR USER/GROUP MANAGEMENT
     
     The following functions were re-written to use the 
     `System.DirectoryServices.AccountManagement` API, introduced in .NET 3.5.
     
-     * `Add-MemberToGroup`
-     * `Install-Group`
-     * `Install-User` 
-     * `Test-User`
-     * `Uninstall-User`
+    * `Add-GroupMember`
+    * `Install-Group`
+    * `Install-User` 
+    * `Test-User`
+    * `Uninstall-User`
      
 MISCELLANEOUS CHANGES
     
-     * `Get-IisAppPool`
-        * Now return all application pools installed on the local computer when called 
+    * `Get-IisAppPool`
+       * Now return all application pools installed on the local computer when called 
           with no parameters.
-        * Added a default table format for 
+       * Added a default table format for 
           `Microsoft.Web.Administration.ApplicationPool` objects.
-     * `Get-ProgramInstallInfo`
-        * Return object's `Version` property changed from an `int` to a 
+    * `Get-ProgramInstallInfo`
+       * Return object's `Version` property changed from an `int` to a 
           [Version](http://msdn.microsoft.com/en-us/library/y0hf9t2e.aspx) object.
-        * Return object's now have `ProductCode` and `User` properties. If a program 
+       * Return object's now have `ProductCode` and `User` properties. If a program 
           doesn't have a product code, it is set to `[Guid]::Empty`. The `User` property 
           is only set for per-user software installs.
-     * `Get-ServiceConfiguration` now supports services from remote computers.
-     * `Grant-Permission` now only grants permissions on an object if those permissions 
+    * `Get-ServiceConfiguration` now supports services from remote computers.
+    * `Grant-Permission` now only grants permissions on an object if those permissions 
        aren't present.  To preserve previous behavior, add the `-Force` switch to all 
        `Grant-Permission` usages.
-     * `Install-Certificate's` `Exportable` switch is now only allowed when installing 
+    * `Install-Certificate's` `Exportable` switch is now only allowed when installing 
        a certificate from a file. Previously, you could supply the switch when installing 
        from an X509Certificate2 object but it was ignored.
-     * `Install-Group's` `Members` parameter renamed to `Member` (with 
+    * `Install-Group's` `Members` parameter renamed to `Member` (with 
        backwards-compatible alias).
-     * Added `Credential` parameter to `Install-IisAppPool` for increased security and 
+    * Added `Credential` parameter to `Install-IisAppPool` for increased security and 
        to follow PowerShell guidelines.
-     * `Install-IisVirtualDirectory` no longer deletes and re-creates existing virtual 
+    * `Install-IisVirtualDirectory` no longer deletes and re-creates existing virtual 
        directories, but modifies existing virtual directories in place.
-     * `Install-IisWebsite`
-        * Added `SiteID` parameter tfor setting a website's IIS ID.
-        * No longer deletes and re-creates websites, but modifies existing websites in 
+    * `Install-IisWebsite`
+       * Added `SiteID` parameter tfor setting a website's IIS ID.
+       * No longer deletes and re-creates websites, but modifies existing websites in 
           place. This may or may not be a breaking change in your environment.
-     * `Install-Msi`
-        * `Path` parameter now supports wildcards.
-        * Now only installs an MSI if it isn't already installed. To preserve the 
+    * `Install-Msi`
+       * `Path` parameter now supports wildcards.
+       * Now only installs an MSI if it isn't already installed. To preserve the 
           previous behavior and always install, add the `-Force` switch to all 
           `Invoke-WindowsInstaller`\`Install-Msi` usages.
-     * `Install-Service`
-        * Now supports service startup parameters/arguments via the `ArgumentList` 
+    * `Install-Service`
+       * Now supports service startup parameters/arguments via the `ArgumentList` 
           parameter.
-        * Improved error handling and messages. It now uses `net helpmsg` to get 
+       * Improved error handling and messages. It now uses `net helpmsg` to get 
           helpful error messages based on sc.exe exit codes.
-        * Added `Credential` parameter for increased security and to follow PowerShell 
+       * Added `Credential` parameter for increased security and to follow PowerShell 
           guidelines.
-        * Added `Description` parameter for setting a service's description.
-        * Added `DisplayName` parameter for setting a service's display name.
-     * `Install-FileShare` (fka `Install-SmbShare`):
-        * Re-written to use WMI isntead of `net.exe`, so it no longer returns any 
+       * Added `Description` parameter for setting a service's description.
+       * Added `DisplayName` parameter for setting a service's display name.
+    * `Install-FileShare` (fka `Install-SmbShare`):
+       * Re-written to use WMI isntead of `net.exe`, so it no longer returns any 
           console output.
-        * Modifies existing shares in place, instead of deleting and re-creating, 
+       * Modifies existing shares in place, instead of deleting and re-creating, 
          *unless* the share's path changes. Changing a share's path requires the old 
          share to be deleted and a new one created.
-     * `Install-User`
-        * Added `PasswordExpires` switch for creating accounts with passwords that 
+    * `Install-User`
+       * Added `PasswordExpires` switch for creating accounts with passwords that 
           expire.
-        * Added `UserCannotChangePassword` to prevent user from changing his password.
-     * `Remove-SslCertificateBinding` has better error handling.
-     * Added `SID` parameter to `Resolve-IdentityName` to resolve a SID into its 
+       * Added `UserCannotChangePassword` to prevent user from changing his password.
+    * `Remove-SslCertificateBinding` has better error handling.
+    * Added `SID` parameter to `Resolve-IdentityName` to resolve a SID into its 
        identity name.
-     * `Set-HostsEntry's` `IPAddress` parameter is now a `System.Net.IPAddress` object. 
+    * `Set-HostsEntry's` `IPAddress` parameter is now a `System.Net.IPAddress` object. 
        It used to be a string validated with a regular expression.
-     * `Test-Identity` now returns a `Carbon.Identity` object if the identity exists 
+    * `Test-Identity` now returns a `Carbon.Identity` object if the identity exists 
        *and* you use the `-PassThru` switch. It used to return the identity's SID. Update 
        scripts to use the `FullName` property to get the old return value, e.g. 
        `Test-Identity -Name $userName -PassThru | Select-Object -Expand 'FullName'`.
-     * `Test-OSIs32Bit` now uses the Environment class's new 
+    * `Test-OSIs32Bit` now uses the Environment class's new 
        [Is64BitOperatingSystem](http://msdn.microsoft.com/en-us/library/system.environment.is64bitoperatingsystem.aspx) property.
-     * `Test-OSIs64Bit` now uses the Environment class's new 
+    * `Test-OSIs64Bit` now uses the Environment class's new 
        [Is64BitOperatingSystem](http://msdn.microsoft.com/en-us/library/system.environment.is64bitoperatingsystem.aspx) property.
-     * `Test-PowerShellIs32Bit` now uses the `Environment` class's new 
+    * `Test-PowerShellIs32Bit` now uses the `Environment` class's new 
        [Is64BitProcess](http://msdn.microsoft.com/en-us/library/system.environment.is64bitprocess.aspx) property.
-     * `Test-PowerShellIs64Bit` now uses the `Environment` class's new 
+    * `Test-PowerShellIs64Bit` now uses the `Environment` class's new 
        [Is64BitProcess](http://msdn.microsoft.com/en-us/library/system.environment.is64bitprocess.aspx) property.
-     * `Uninstall-ScheduledTask` now retries when un-installing a task fails with "The 
+    * `Uninstall-ScheduledTask` now retries when un-installing a task fails with "The 
        function attempted to use a name that is reserved for use by another transaction." 
        error.
-     * `Unprotect-String`
-        * Added `AsSecureString` switch, which will return a secure string instead of a 
+    * `Unprotect-String`
+       * Added `AsSecureString` switch, which will return a secure string instead of a 
           normal string.
-        * The `Password` parameter now accepts `SecureString` values.
-     * `Initialize-Lcm`
-        * Added support for PowerShell 5: `RefreshIntervalMinutes` default value 
+       * The `Password` parameter now accepts `SecureString` values.
+    * `Initialize-Lcm`
+       * Added support for PowerShell 5: `RefreshIntervalMinutes` default value 
           changed to from 15 to 30; `RefreshIntervalMinutes` minimum value is now 30; 
           `ConfigurationFrequency`'s minimum value is now 1 (from 2).

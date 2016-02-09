@@ -170,10 +170,6 @@ function Convert-AboutTopicToHtml
                 {
                     $line = $line -replace '^    ',''
                 }
-                elseif( $line.StartsWith('  ') )
-                {
-                    $line = $line -replace '^  ',''
-                }
 
                 [void]$currentContent.AppendLine( $line )
                 if( $idx -eq $lastLineIdx )

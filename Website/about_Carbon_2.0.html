@@ -126,30 +126,29 @@ regular expression, so you <em>should</em> be OK.</li>
 <ul>
 <li>Carbon's <code>System.ServiceProcess.ServiceController</code> extended type data causes 
 errors when PowerShell formats <code>System.ServiceProcess.ServiceController</code> objects 
-that represent services on remote computers.
-<ul>
+that represent services on remote computers.</li>
 <li><a href="Compress-Item.html">Compress-Item</a> doesn't remove handled errors from global error array.</li>
 <li><a href="Grant-Permission.html">Grant-Permission</a> fails with an unhelpful error message if it is unable to get 
 the ACL on a private key.</li>
 <li><a href="Install-Msi.html">Install-Msi</a> didn't properly detect when installation failed.</li>
 <li><a href="Install-ScheduledTask.html">Install-ScheduledTask</a> fails under PowerShell 5 to create a scheduled task to 
 run on Sunday.</li>
-<li><a href="Install-Service.html">Install-Service</a>:</li>
+<li><a href="Install-Service.html">Install-Service</a>:
+<ul>
 <li>No longer writes a warning about being unable to stop an already stopped 
 service (fixes <a href="https://bitbucket.org/splatteredbits/carbon/issues/158/install-service-extraneous-warning-about">issue #158</a>).</li>
 <li>Starting the service now respects caller's error action preference. Before, 
 <code>Start-Service</code> would write an error even if somone called <a href="Install-Service.html">Install-Service</a> 
 with an <code>Ignore</code> or <code>SilentlyContinue</code> error action preference.</li>
+</ul></li>
 <li><a href="Set-EnvironmentVariable.html">Set-EnvironmentVariable</a> fails to set process-level environment variable. </li>
 <li><a href="Set-HostsEntry.html">Set-HostsEntry</a> fails to preserve whitespace if existing lines end with a 
 comment/description. Thanks to <a href="https://vk.com/kostanew">Konstantin Ushenin</a> for 
 the fix.</li>
-</ul></li>
 </ul>
 <h2>General Ehancements</h2>
 <ul>
-<li>Carbon now requires PowerShell 4.
-<ul>
+<li>Carbon now requires PowerShell 4.</li>
 <li><code>Import-Carbon.ps1</code> is more intelligent about when it tries to re-load Carbon. 
 It will force a re-import of Carbon if any of Carbon's files have changed or the 
 version has changed.</li>
@@ -167,7 +166,8 @@ Chocolatey.</li>
 instead of <code>appcmd.exe</code>. As a side effect, they no longer return <code>appcmd.exe</code> 
 console output.</li>
 <li>The following functions no longer use <code>Write-Host</code>. Instead, they use 
-<code>Write-Verbose</code>:</li>
+<code>Write-Verbose</code>:
+<ul>
 <li><a href="Disable-NtfsCompression.html">Disable-NtfsCompression</a></li>
 <li><a href="Enable-NtfsCompression.html">Enable-NtfsCompression</a></li>
 <li><a href="Grant-ComPermission.html">Grant-ComPermission</a></li>
@@ -175,19 +175,18 @@ console output.</li>
 <li><a href="Install-Service.html">Install-Service</a> </li>
 <li><a href="Remove-SslCertificateBinding.html">Remove-SslCertificateBinding</a> </li>
 <li><a href="Revoke-ComPermission.html">Revoke-ComPermission</a> </li>
+</ul></li>
 <li>Created default, table-based display formats for 
 <code>System.DirectoryServices.AccountManagement.UserPrincipal</code>, 
 <code>System.DirectoryServices.AccountManagement.GroupPrincipal</code>, 
 <code>Microsoft.Web.Administration.ApplicationPool</code>, 
 <code>Microsoft.Web.Administration.Site</code>, and 
 <code>Microsoft.Web.Administration.Application</code> objects.</li>
-</ul></li>
 </ul>
 <h2>New Functions</h2>
 <ul>
 <li><a href="Clear-DscLocalResourceCache.html">Clear-DscLocalResourceCache</a> clears the local LCM's DSC resource. This makes 
-developing resources easier.
-<ul>
+developing resources easier.</li>
 <li><a href="Clear-MofAuthoringMetadata.html">Clear-MofAuthoringMetadata</a> removes authoring metadata from .mof files.</li>
 <li><a href="Copy-DscResource.html">Copy-DscResource</a> copies DSC resources (ZIP files, MSI archives, MOF files, 
 etc.), including timestamps, checksums, and copying only changed files.</li>
@@ -226,12 +225,10 @@ computer.</li>
 <li><a href="Test-TypeDataMember.html">Test-TypeDataMember</a> tests if a type has an extended type member defined.</li>
 <li><a href="Uninstall-FileShare.html">Uninstall-FileShare</a> uninstalls/removes a file share, if it exists.</li>
 <li><a href="Write-DscError.html">Write-DscError</a> writes DSC <code>ErrorLogRecord</code> objects as errors.</li>
-</ul></li>
 </ul>
 <h2>New Dsc Resources</h2>
 <ul>
-<li><code>Carbon_EnvironmentVariable</code> creates/removes machine-level environment variables.
-<ul>
+<li><code>Carbon_EnvironmentVariable</code> creates/removes machine-level environment variables.</li>
 <li><code>Carbon_FirewallRule</code> configures firewall rules.</li>
 <li><code>Carbon_IniFile</code> manages the contents of INI files.</li>
 <li><code>Carbon_Permission</code> configures file, directory, registry, and certificate 
@@ -239,7 +236,6 @@ permissions.</li>
 <li><code>Carbon_Privilege</code> configures an identity's privileges.</li>
 <li><code>Carbon_ScheduledTask</code> configures scheduled tasks with <code>schtasks.exe</code>.</li>
 <li><code>Carbon_Service</code> configures Windows services.</li>
-</ul></li>
 </ul>
 <h2>Added Passthru Parameters</h2>
 <p>Added a <code>PassThru</code> switch to the following functions, which will return objects of 
@@ -316,7 +312,7 @@ place, so you shouldn't have to change any code.</p>
 <code>System.DirectoryServices.AccountManagement</code> API, introduced in .NET 3.5.</p>
 
 <ul>
-<li><code>Add-MemberToGroup</code></li>
+<li><a href="Add-GroupMember.html">Add-GroupMember</a></li>
 <li><a href="Install-Group.html">Install-Group</a></li>
 <li><a href="Install-User.html">Install-User</a> </li>
 <li><a href="Test-User.html">Test-User</a></li>
@@ -330,12 +326,15 @@ place, so you shouldn't have to change any code.</p>
 with no parameters.</li>
 <li>Added a default table format for 
 <code>Microsoft.Web.Administration.ApplicationPool</code> objects.</li>
-<li><a href="Get-ProgramInstallInfo.html">Get-ProgramInstallInfo</a></li>
+</ul></li>
+<li><a href="Get-ProgramInstallInfo.html">Get-ProgramInstallInfo</a>
+<ul>
 <li>Return object's <code>Version</code> property changed from an <code>int</code> to a 
 <a href="http://msdn.microsoft.com/en-us/library/y0hf9t2e.aspx">Version</a> object.</li>
 <li>Return object's now have <code>ProductCode</code> and <code>User</code> properties. If a program 
 doesn't have a product code, it is set to <code>[Guid]::Empty</code>. The <code>User</code> property 
 is only set for per-user software installs.</li>
+</ul></li>
 <li><a href="Get-ServiceConfiguration.html">Get-ServiceConfiguration</a> now supports services from remote computers.</li>
 <li><a href="Grant-Permission.html">Grant-Permission</a> now only grants permissions on an object if those permissions 
 aren't present.  To preserve previous behavior, add the <code>-Force</code> switch to all 
@@ -349,16 +348,21 @@ backwards-compatible alias).</li>
 to follow PowerShell guidelines.</li>
 <li><a href="Install-IisVirtualDirectory.html">Install-IisVirtualDirectory</a> no longer deletes and re-creates existing virtual 
 directories, but modifies existing virtual directories in place.</li>
-<li><a href="Install-IisWebsite.html">Install-IisWebsite</a></li>
+<li><a href="Install-IisWebsite.html">Install-IisWebsite</a>
+<ul>
 <li>Added <code>SiteID</code> parameter tfor setting a website's IIS ID.</li>
 <li>No longer deletes and re-creates websites, but modifies existing websites in 
 place. This may or may not be a breaking change in your environment.</li>
-<li><a href="Install-Msi.html">Install-Msi</a></li>
+</ul></li>
+<li><a href="Install-Msi.html">Install-Msi</a>
+<ul>
 <li><code>Path</code> parameter now supports wildcards.</li>
 <li>Now only installs an MSI if it isn't already installed. To preserve the 
 previous behavior and always install, add the <code>-Force</code> switch to all 
 <a href="Install-Msi.html">Invoke-WindowsInstaller</a>[Install-Msi](Install-Msi.html) usages.</li>
-<li><a href="Install-Service.html">Install-Service</a></li>
+</ul></li>
+<li><a href="Install-Service.html">Install-Service</a>
+<ul>
 <li>Now supports service startup parameters/arguments via the <code>ArgumentList</code> 
 parameter.</li>
 <li>Improved error handling and messages. It now uses <code>net helpmsg</code> to get 
@@ -367,16 +371,21 @@ helpful error messages based on sc.exe exit codes.</li>
 guidelines.</li>
 <li>Added <code>Description</code> parameter for setting a service's description.</li>
 <li>Added <code>DisplayName</code> parameter for setting a service's display name.</li>
-<li><a href="Install-FileShare.html">Install-FileShare</a> (fka <a href="Install-FileShare.html">Install-SmbShare</a>):</li>
+</ul></li>
+<li><a href="Install-FileShare.html">Install-FileShare</a> (fka <a href="Install-FileShare.html">Install-SmbShare</a>):
+<ul>
 <li>Re-written to use WMI isntead of <code>net.exe</code>, so it no longer returns any 
 console output.</li>
 <li>Modifies existing shares in place, instead of deleting and re-creating, 
 <em>unless</em> the share's path changes. Changing a share's path requires the old 
 share to be deleted and a new one created.</li>
-<li><a href="Install-User.html">Install-User</a></li>
+</ul></li>
+<li><a href="Install-User.html">Install-User</a>
+<ul>
 <li>Added <code>PasswordExpires</code> switch for creating accounts with passwords that 
 expire.</li>
 <li>Added <code>UserCannotChangePassword</code> to prevent user from changing his password.</li>
+</ul></li>
 <li><a href="Remove-SslCertificateBinding.html">Remove-SslCertificateBinding</a> has better error handling.</li>
 <li>Added <code>SID</code> parameter to <a href="Resolve-IdentityName.html">Resolve-IdentityName</a> to resolve a SID into its 
 identity name.</li>
@@ -397,11 +406,14 @@ scripts to use the <code>FullName</code> property to get the old return value, e
 <li><a href="Uninstall-ScheduledTask.html">Uninstall-ScheduledTask</a> now retries when un-installing a task fails with "The 
 function attempted to use a name that is reserved for use by another transaction." 
 error.</li>
-<li><a href="Unprotect-String.html">Unprotect-String</a></li>
+<li><a href="Unprotect-String.html">Unprotect-String</a>
+<ul>
 <li>Added <code>AsSecureString</code> switch, which will return a secure string instead of a 
 normal string.</li>
 <li>The <code>Password</code> parameter now accepts <code>SecureString</code> values.</li>
-<li><a href="Initialize-Lcm.html">Initialize-Lcm</a></li>
+</ul></li>
+<li><a href="Initialize-Lcm.html">Initialize-Lcm</a>
+<ul>
 <li>Added support for PowerShell 5: <code>RefreshIntervalMinutes</code> default value 
 changed to from 15 to 30; <code>RefreshIntervalMinutes</code> minimum value is now 30; 
 <code>ConfigurationFrequency</code>'s minimum value is now 1 (from 2).</li>

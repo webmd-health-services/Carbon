@@ -118,17 +118,14 @@ $moduleInstallPath = Get-PowerShellModuleInstallPath
 $linkPath = Join-Path -Path $moduleInstallPath -ChildPath 'Carbon'
 Install-Junction -Link $linkPath -Target (Join-Path -Path $PSScriptRoot -ChildPath 'Carbon') -Verbose:$VerbosePreference
 
-if( -not $SkipCommandHelp )
+try
 {
-    try
-    {
-        Convert-ModuleHelpToHtml -ModuleName 'Carbon' -HeadingMap $headingMap -SkipCommandHelp:$SkipCommandHelp -Script 'Import-Carbon.ps1' |
-            ForEach-Object { Out-HtmlPage -Title ('PowerShell - {0} - Carbon' -f $_.Name) -VirtualPath ('{0}.html' -f $_.Name) -Content $_.Html }
-    }
-    finally
-    {
-        Uninstall-Junction -Path $linkPath
-    }
+    Convert-ModuleHelpToHtml -ModuleName 'Carbon' -HeadingMap $headingMap -SkipCommandHelp:$SkipCommandHelp -Script 'Import-Carbon.ps1' |
+        ForEach-Object { Out-HtmlPage -Title ('PowerShell - {0} - Carbon' -f $_.Name) -VirtualPath ('{0}.html' -f $_.Name) -Content $_.Html }
+}
+finally
+{
+    Uninstall-Junction -Path $linkPath
 }
 
 New-ModuleHelpIndex -TagsJsonPath (Join-Path -Path $PSScriptRoot -ChildPath 'tags.json') -ModuleName 'Carbon' -Script 'Import-Carbon.ps1' |
