@@ -32,6 +32,10 @@
         "Tags": [ "DSC", "DSC Resources", "Firewall", "Networking" ]
     },
     {
+        "Name":  "Carbon_Group",
+        "Tags": [ "DSC", "DSC Resources", "Groups", "Identity", "Principal" ]
+    },
+    {
         "Name":  "Carbon_IniFile",
         "Tags": [ "DSC", "DSC Resources", "INI", "Text" ]
     },
