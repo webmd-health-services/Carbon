@@ -211,6 +211,7 @@ All functions are idempotent: when run multiple times with the same arguments, y
                             'New-RsaKeyPair',
                             'New-TempDirectory',
                             'Protect-Acl',
+                            'Protect-String',
                             'Remove-EnvironmentVariable',
                             'Remove-GroupMember',
                             'Remove-HostsEntry',
@@ -297,6 +298,7 @@ All functions are idempotent: when run multiple times with the same arguments, y
                             'Uninstall-User',
                             'Uninstall-WindowsFeature',
                             'Unlock-IisConfigurationSection',
+                            'Unprotect-String',
                             'Write-DscError'
                         )
 
