@@ -16,7 +16,72 @@
 		<li><a href="http://pshdo.com">-Blog</a></li>
     </ul>
 
-    <h1>2.0.1 (19 October 2015)</h1>
+    <h1>2.1.0 (8 February 2016)</h1>
+
+<h2>New Functions</h2>
+
+<ul>
+<li><a href="Get-HttpUrlAcl.html">Get-HttpUrlAcl</a>: uses Windows API to return HTTP URL ACLs; replaces the <code>netsh http show urlacl</code> command.</li>
+<li><a href="Grant-HttpUrlPermission.html">Grant-HttpUrlPermission</a>: uses Windows API to grant listen/delegate permissions on HTTP URLs; replaces the <code>netsh http add urlacl</code> command.</li>
+<li><a href="Revoke-HttpUrlPermission.html">Revoke-HttpUrlPermission</a>: uses Windows API to revoke all a user or group's permissions on HTTP URLs; replaces the <code>netsh http delete urlacl</code> command.</li>
+<li><a href="Install-Directory.html">Install-Directory</a>: creates a directory (and any missing parents), if it doesn't exist already. Finally!</li>
+<li><a href="Uninstall-Directory.html">Uninstall-Directory</a>: removes a directory, if it exists. Finally!</li>
+<li><a href="Uninstall-Group.html">Uninstall-Group</a>: uses the <code>DirectoryServices.AccountManagement</code> .NET API to remove a group, if it exists.</li>
+<li><a href="Test-GroupMember.html">Test-GroupMember</a>: uses the <code>DirectoryServices.AccountManagemetn</code> .NET API to test if a principal is a member of a group.</li>
+</ul>
+
+<h2>New DSC Resource</h2>
+
+<ul>
+<li><code>Carbon_Group</code>: resource for configuring local groups.</li>
+</ul>
+
+<h2>Bug Fixes</h2>
+
+<ul>
+<li>Fixed: <a href="Install-FileShare.html">Install-FileShare</a> always re-configures existing shares; it doesn't properly detect permissions that need to be removed.</li>
+<li>Fixed: <a href="Set-IniEntry.html">Set-IniEntry</a> fails to preserve unicode characters with diacritics in INI entry names and values.</li>
+<li>Fixed: <a href="Remove-IniEntry.html">Remove-IniEntry</a> fails to preserve unicode characters with diacritics in INI entry names and values.</li>
+<li>Fixed: <a href="Set-HostsEntry.html">Set-HostsEntry</a> leaves trailing tabs and whitespace after all but the last line.</li>
+<li>Fixed: <a href="Get-PowerShellModuleInstallPath.html">Get-PowerShellModuleInstallPath</a> returns wrong path for PowerShell 4.</li>
+<li>Fixed: <a href="Protect-String.html">Protect-String</a> fails when Carbon is installed in a module path that contains spaces (<a href="https://bitbucket.org/splatteredbits/carbon/issues/174/protect-string-throws-when-module-path">fixes issue #174</a>).</li>
+<li>Fixed: <a href="New-RsaKeyPair.html">New-RsaKeyPair</a> generates a key pair that isn't supported for encrypting/decrypting DSC credentials or supported by the CMS message cmdlets.</li>
+<li>Fixed: <a href="Get-ScheduledTask.html">Get-ScheduledTask</a> returns invalid task commands when those commands contain quotes (works around an issue where <code>schtasks.exe</code> CSV output can't be parsed correctly by <code>ConvertFrom-Csv</code>).</li>
+<li>Fixed: <a href="Add-GroupMember.html">Add-GroupMember</a> and <a href="Remove-GroupMember.html">Remove-GroupMember</a> fail when adding <code>Everyone</code> or <code>NT Service\*</code> accounts to a group (<a href="https://bitbucket.org/splatteredbits/carbon/issues/177/add-groupmembers-201-doesnt-like-vsa-names">fixes issue #177</a>).</li>
+<li>Fixed: <code>Get-SheduledTask</code> writes an error if a scheduled task's XML definition is for an executable and doesn't contain an arguments element.</li>
+</ul>
+
+<h2>Other Improvements</h2>
+
+<ul>
+<li>Obsolete function parameters will no longer show in Intellisense (added the <code>DontShow</code> parameter property).</li>
+<li><a href="Test-AdminPrivilege.html">Test-AdminPrivilege</a>: changed its verbose message to a debug message.</li>
+<li><a href="Set-HostsEntry.html">Set-HostsEntry</a>: 
+<ul>
+<li>only updates hosts file if it needs to change</li>
+<li>added an improved verbose message when setting a hosts entry</li>
+<li>improved error handling when hosts file can't be opened for reading</li>
+</ul></li>
+<li><a href="Install-Certificate.html">Install-Certificate</a> can now install a certificate on a remote computer.</li>
+<li><a href="Initialize-Lcm.html">Initialize-Lcm</a> now uses <a href="Install-Certificate.html">Install-Certificate</a> to install the decryption certificate on the remote computer.</li>
+<li><a href="Uninstall-Certificate.html">Uninstall-Certificate</a> can now uninstall a certificate on a remote computer.</li>
+<li>The following functions now write warning if you pass them a plain-text password. You should pass a <code>SecureString</code> instead.
+<ul>
+<li><a href="Install-Certificate.html">Install-Certificate</a></li>
+<li><a href="Initialize-Lcm.html">Initialize-Lcm</a></li>
+</ul></li>
+<li><a href="New-RsaKeyPair.html">New-RsaKeyPair</a>:
+<ul>
+<li>Refactored to use <code>certreq.exe</code> instead of <code>makecert.exe</code> and <code>pvk2pfx.exe</code>.</li>
+<li>Can now run non-interactively: added a <code>-Password</code> parameter used to protect the private key (it used to prompt you).</li>
+<li>Fixed: generates a key pair that isn't supported for encrypting/decrypting DSC credentials or supported by the CMS message cmdlets.</li>
+<li>Made the <code>-ValidFrom</code> and <code>-Authority</code> parameters obsolete.</li>
+</ul></li>
+<li>Added some verbose messages to <a href="Install-Group.html">Install-Group</a> and <code>Add-MemberToGroup</code> when they create/modify their objects.</li>
+<li><a href="Install-Group.html">Install-Group</a> only saves changes to a group if changes were made.</li>
+</ul>
+
+<h1>2.0.1 (19 October 2015)</h1>
 
 <ul>
 <li>Fixed: errors importing Carbon when IIS not installed on Windows 2012 R2 and Windows 10 (fixes <a href="https://bitbucket.org/splatteredbits/carbon/issues/168">issue 168: Cannot import Carbon 2.0 module due to issues with IIS related functionality</a>).</li>
@@ -1978,7 +2043,7 @@
 </ul>
 
 	<div class="Footer">
-		Copyright 2012 - 2015 <a href="http://pshdo.com">Aaron Jensen</a>.
+		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.
 	</div>
 
 </body>

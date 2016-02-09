@@ -20,14 +20,18 @@
 <div><p>Removes a certificate from a store for the user or machine account.</p></div>
 
 <h2>Syntax</h2>
-<pre class="Syntax"><code>Uninstall-Certificate -Thumbprint &lt;String&gt; -StoreLocation {CurrentUser | LocalMachine} -CustomStoreName &lt;String&gt; [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
-<pre class="Syntax"><code>Uninstall-Certificate -Thumbprint &lt;String&gt; -StoreLocation {CurrentUser | LocalMachine} -StoreName {AddressBook | AuthRoot | CertificateAuthority | Disallowed | My | Root | TrustedPeople | TrustedPublisher} [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
-<pre class="Syntax"><code>Uninstall-Certificate -Certificate &lt;X509Certificate2&gt; -StoreLocation {CurrentUser | LocalMachine} -CustomStoreName &lt;String&gt; [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
-<pre class="Syntax"><code>Uninstall-Certificate -Certificate &lt;X509Certificate2&gt; -StoreLocation {CurrentUser | LocalMachine} -StoreName {AddressBook | AuthRoot | CertificateAuthority | Disallowed | My | Root | TrustedPeople | TrustedPublisher} [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
+<pre class="Syntax"><code>Uninstall-Certificate -Thumbprint &lt;String&gt; -StoreLocation {CurrentUser | LocalMachine} -CustomStoreName &lt;String&gt; [-Session &lt;PSSession[]&gt;] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
+<pre class="Syntax"><code>Uninstall-Certificate -Thumbprint &lt;String&gt; -StoreLocation {CurrentUser | LocalMachine} -StoreName {AddressBook | AuthRoot | CertificateAuthority | Disallowed | My | Root | TrustedPeople | TrustedPublisher} [-Session &lt;PSSession[]&gt;] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
+<pre class="Syntax"><code>Uninstall-Certificate -Certificate &lt;X509Certificate2&gt; -StoreLocation {CurrentUser | LocalMachine} -CustomStoreName &lt;String&gt; [-Session &lt;PSSession[]&gt;] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
+<pre class="Syntax"><code>Uninstall-Certificate -Certificate &lt;X509Certificate2&gt; -StoreLocation {CurrentUser | LocalMachine} -StoreName {AddressBook | AuthRoot | CertificateAuthority | Disallowed | My | Root | TrustedPeople | TrustedPublisher} [-Session &lt;PSSession[]&gt;] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
     
 <h2>Description</h2>
 <div class="Description">
-<p>Uses .NET's certificates API to remove a certificate from a given store for the machine or current user.  Use the thumbprint or friendly name to identify which certificate to remove.  The thumbprint is unique to each certificate.  Friendly names are not guaranteed to be unique.  The user performing the removal must have permission on the store where the certificate is located.</p>
+<p>The <code>Uninstall-Certificate</code> function uses .NET's certificates API to remove a certificate from a given store for the machine or current user. Use the thumbprint to identify which certificate to remove. The thumbprint is unique to each certificate. The user performing the removal must have read and write permission on the store where the certificate is located.</p>
+
+<p>If the certificate isn't in the store, nothing happens, not even an error.</p>
+
+<p>To uninstall a certificate from a remote computer, use the <code>Session</code>parameter, which was added in Carbon 2.1.0. You can create a new session with the <code>New-PSSession</code> cmdlet.</p>
 </div>
     
 
@@ -83,6 +87,16 @@
     <td></td>
 </tr>
 <tr valign='top'>
+	<td>Session</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.runspaces.pssession.aspx">PSSession[]</a></td>
+	<td class="ParamDescription"><p>Use the <code>Session</code> parameter to uninstall a certificate on remote computer(s) using PowerShell remoting. Use <code>New-PSSession</code> to create a session.</p>
+
+<p>This parameter was added in Carbon 2.1.0.</p></td>
+	<td>false</td>
+	<td>false</td>
+    <td></td>
+</tr>
+<tr valign='top'>
 	<td>WhatIf</td>
 	<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
 	<td class="ParamDescription"></td>
@@ -130,8 +144,12 @@
 <pre><code>Uninstall-Certificate -Thumbprint 570895470234023dsaaefdbcgbefa -StoreLocation LocalMachine -StoreName 'SharePoint'</code></pre>
 <p>Demonstrates how to uninstall a certificate from a custom, non-standard store.</p>
 
+<h2>EXAMPLE 4</h2>
+<pre><code>Uninstall-Certificate -Thumbprint 570895470234023dsaaefdbcgbefa -StoreLocation CurrentUser -StoreName My -Session (New-PSSession -ComputerName remote1,remote2)</code></pre>
+<p>Demonstrates how to uninstall a certificate from a remote computer.</p>
+
 	<div class="Footer">
-		Copyright 2012 - 2015 <a href="http://pshdo.com">Aaron Jensen</a>.
+		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.
 	</div>
 
 </body>

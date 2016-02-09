@@ -85,11 +85,14 @@ jQuery( document ).ready(function() {
 <li><a href="ConvertTo-PropagationFlag.html">ConvertTo-PropagationFlag</a></li>
 <li><a href="Get-ComPermission.html">Get-ComPermission</a></li>
 <li><a href="Get-ComSecurityDescriptor.html">Get-ComSecurityDescriptor</a></li>
+<li><a href="Get-HttpUrlAcl.html">Get-HttpUrlAcl</a></li>
 <li><a href="Get-Permission.html">Get-Permission</a></li>
 <li><a href="Get-ServicePermission.html">Get-ServicePermission</a></li>
+<li><a href="Grant-HttpUrlPermission.html">Grant-HttpUrlPermission</a></li>
 <li><a href="Grant-Permission.html">Grant-Permission</a></li>
 <li><a href="Grant-ServiceControlPermission.html">Grant-ServiceControlPermission</a></li>
 <li><a href="Grant-ServicePermission.html">Grant-ServicePermission</a></li>
+<li><a href="Revoke-HttpUrlPermission.html">Revoke-HttpUrlPermission</a></li>
 <li><a href="Revoke-Permission.html">Revoke-Permission</a></li>
 <li><a href="Revoke-ServicePermission.html">Revoke-ServicePermission</a></li>
 <li><a href="Set-ServiceAcl.html">Set-ServiceAcl</a></li>
@@ -161,7 +164,9 @@ jQuery( document ).ready(function() {
     <h3>Directory</h3>
 
     <ul>
-        <li><a href="New-TempDirectory.html">New-TempDirectory</a></li>
+        <li><a href="Install-Directory.html">Install-Directory</a></li>
+<li><a href="New-TempDirectory.html">New-TempDirectory</a></li>
+<li><a href="Uninstall-Directory.html">Uninstall-Directory</a></li>
     </ul>
     <h3>DSC</h3>
 
@@ -217,6 +222,7 @@ jQuery( document ).ready(function() {
 <li><a href="Expand-Item.html">Expand-Item</a></li>
 <li><a href="Get-Permission.html">Get-Permission</a></li>
 <li><a href="Grant-Permission.html">Grant-Permission</a></li>
+<li><a href="Install-Directory.html">Install-Directory</a></li>
 <li><a href="Install-Junction.html">Install-Junction</a></li>
 <li><a href="New-Junction.html">New-Junction</a></li>
 <li><a href="New-TempDirectory.html">New-TempDirectory</a></li>
@@ -227,6 +233,7 @@ jQuery( document ).ready(function() {
 <li><a href="Test-PathIsJunction.html">Test-PathIsJunction</a></li>
 <li><a href="Test-Permission.html">Test-Permission</a></li>
 <li><a href="Test-ZipFile.html">Test-ZipFile</a></li>
+<li><a href="Uninstall-Directory.html">Uninstall-Directory</a></li>
 <li><a href="Uninstall-Junction.html">Uninstall-Junction</a></li>
     </ul>
     <h3>Firewall</h3>
@@ -251,15 +258,24 @@ jQuery( document ).ready(function() {
 <li><a href="Resolve-Identity.html">Resolve-Identity</a></li>
 <li><a href="Resolve-IdentityName.html">Resolve-IdentityName</a></li>
 <li><a href="Test-Group.html">Test-Group</a></li>
+<li><a href="Test-GroupMember.html">Test-GroupMember</a></li>
 <li><a href="Test-Identity.html">Test-Identity</a></li>
+<li><a href="Uninstall-Group.html">Uninstall-Group</a></li>
     </ul>
     <h3>Hosts File</h3>
 
     <ul>
-        <li><a href="Get-PathToHosts File.html">Get-PathToHosts File</a></li>
+        <li><a href="Get-PathToHostsFile.html">Get-PathToHostsFile</a></li>
 <li><a href="Remove-HostsEntry.html">Remove-HostsEntry</a></li>
 <li><a href="Reset-HostsFile.html">Reset-HostsFile</a></li>
 <li><a href="Set-HostsEntry.html">Set-HostsEntry</a></li>
+    </ul>
+    <h3>HTTP</h3>
+
+    <ul>
+        <li><a href="Get-HttpUrlAcl.html">Get-HttpUrlAcl</a></li>
+<li><a href="Grant-HttpUrlPermission.html">Grant-HttpUrlPermission</a></li>
+<li><a href="Revoke-HttpUrlPermission.html">Revoke-HttpUrlPermission</a></li>
     </ul>
     <h3>Identity</h3>
 
@@ -271,11 +287,14 @@ jQuery( document ).ready(function() {
 <li><a href="Get-WmiLocalUserAccount.html">Get-WmiLocalUserAccount</a></li>
 <li><a href="Install-Group.html">Install-Group</a></li>
 <li><a href="Install-User.html">Install-User</a></li>
+<li><a href="Remove-GroupMember.html">Remove-GroupMember</a></li>
 <li><a href="Resolve-Identity.html">Resolve-Identity</a></li>
 <li><a href="Resolve-IdentityName.html">Resolve-IdentityName</a></li>
 <li><a href="Test-Group.html">Test-Group</a></li>
+<li><a href="Test-GroupMember.html">Test-GroupMember</a></li>
 <li><a href="Test-Identity.html">Test-Identity</a></li>
 <li><a href="Test-User.html">Test-User</a></li>
+<li><a href="Uninstall-Group.html">Uninstall-Group</a></li>
 <li><a href="Uninstall-User.html">Uninstall-User</a></li>
     </ul>
     <h3>IIS</h3>
@@ -374,6 +393,13 @@ jQuery( document ).ready(function() {
 <li><a href="Test-MsmqMessageQueue.html">Test-MsmqMessageQueue</a></li>
 <li><a href="Uninstall-MsmqMessageQueue.html">Uninstall-MsmqMessageQueue</a></li>
     </ul>
+    <h3>netsh</h3>
+
+    <ul>
+        <li><a href="Get-HttpUrlAcl.html">Get-HttpUrlAcl</a></li>
+<li><a href="Grant-HttpUrlPermission.html">Grant-HttpUrlPermission</a></li>
+<li><a href="Revoke-HttpUrlPermission.html">Revoke-HttpUrlPermission</a></li>
+    </ul>
     <h3>Networking</h3>
 
     <ul>
@@ -389,6 +415,7 @@ jQuery( document ).ready(function() {
 <li><a href="Enable-NtfsCompression.html">Enable-NtfsCompression</a></li>
 <li><a href="Get-Permission.html">Get-Permission</a></li>
 <li><a href="Grant-Permission.html">Grant-Permission</a></li>
+<li><a href="Install-Directory.html">Install-Directory</a></li>
 <li><a href="Install-Junction.html">Install-Junction</a></li>
 <li><a href="New-Junction.html">New-Junction</a></li>
 <li><a href="Protect-Acl.html">Protect-Acl</a></li>
@@ -397,6 +424,7 @@ jQuery( document ).ready(function() {
 <li><a href="Test-NtfsCompression.html">Test-NtfsCompression</a></li>
 <li><a href="Test-PathIsJunction.html">Test-PathIsJunction</a></li>
 <li><a href="Test-Permission.html">Test-Permission</a></li>
+<li><a href="Uninstall-Directory.html">Uninstall-Directory</a></li>
     </ul>
     <h3>Operating System</h3>
 
@@ -455,11 +483,14 @@ jQuery( document ).ready(function() {
 <li><a href="Get-WmiLocalUserAccount.html">Get-WmiLocalUserAccount</a></li>
 <li><a href="Install-Group.html">Install-Group</a></li>
 <li><a href="Install-User.html">Install-User</a></li>
+<li><a href="Remove-GroupMember.html">Remove-GroupMember</a></li>
 <li><a href="Resolve-Identity.html">Resolve-Identity</a></li>
 <li><a href="Resolve-IdentityName.html">Resolve-IdentityName</a></li>
 <li><a href="Test-Group.html">Test-Group</a></li>
+<li><a href="Test-GroupMember.html">Test-GroupMember</a></li>
 <li><a href="Test-Identity.html">Test-Identity</a></li>
 <li><a href="Test-User.html">Test-User</a></li>
+<li><a href="Uninstall-Group.html">Uninstall-Group</a></li>
 <li><a href="Uninstall-User.html">Uninstall-User</a></li>
     </ul>
     <h3>Privileges</h3>
@@ -520,8 +551,10 @@ jQuery( document ).ready(function() {
 <li><a href="Get-ComPermission.html">Get-ComPermission</a></li>
 <li><a href="Get-ComSecurityDescriptor.html">Get-ComSecurityDescriptor</a></li>
 <li><a href="Get-FileSharePermission.html">Get-FileSharePermission</a></li>
+<li><a href="Get-HttpUrlAcl.html">Get-HttpUrlAcl</a></li>
 <li><a href="Get-Permission.html">Get-Permission</a></li>
 <li><a href="Get-ServicePermission.html">Get-ServicePermission</a></li>
+<li><a href="Grant-HttpUrlPermission.html">Grant-HttpUrlPermission</a></li>
 <li><a href="Grant-Permission.html">Grant-Permission</a></li>
 <li><a href="Grant-Privilege.html">Grant-Privilege</a></li>
 <li><a href="Grant-ServiceControlPermission.html">Grant-ServiceControlPermission</a></li>
@@ -531,6 +564,7 @@ jQuery( document ).ready(function() {
 <li><a href="Resolve-Identity.html">Resolve-Identity</a></li>
 <li><a href="Resolve-IdentityName.html">Resolve-IdentityName</a></li>
 <li><a href="Revoke-ComPermission.html">Revoke-ComPermission</a></li>
+<li><a href="Revoke-HttpUrlPermission.html">Revoke-HttpUrlPermission</a></li>
 <li><a href="Revoke-Permission.html">Revoke-Permission</a></li>
 <li><a href="Revoke-Privilege.html">Revoke-Privilege</a></li>
 <li><a href="Revoke-ServicePermission.html">Revoke-ServicePermission</a></li>
@@ -624,6 +658,13 @@ jQuery( document ).ready(function() {
 <li><a href="Test-User.html">Test-User</a></li>
 <li><a href="Uninstall-User.html">Uninstall-User</a></li>
     </ul>
+    <h3>WCF</h3>
+
+    <ul>
+        <li><a href="Get-HttpUrlAcl.html">Get-HttpUrlAcl</a></li>
+<li><a href="Grant-HttpUrlPermission.html">Grant-HttpUrlPermission</a></li>
+<li><a href="Revoke-HttpUrlPermission.html">Revoke-HttpUrlPermission</a></li>
+    </ul>
     <h3>Windows</h3>
 
     <ul>
@@ -663,6 +704,7 @@ jQuery( document ).ready(function() {
 <li><a href="Assert-Service.html">Assert-Service</a></li>
 <li><a href="Carbon_EnvironmentVariable.html">Carbon_EnvironmentVariable</a></li>
 <li><a href="Carbon_FirewallRule.html">Carbon_FirewallRule</a></li>
+<li><a href="Carbon_Group.html">Carbon_Group</a></li>
 <li><a href="Carbon_IniFile.html">Carbon_IniFile</a></li>
 <li><a href="Carbon_Permission.html">Carbon_Permission</a></li>
 <li><a href="Carbon_Privilege.html">Carbon_Privilege</a></li>
@@ -706,6 +748,7 @@ jQuery( document ).ready(function() {
 <li><a href="Get-FileSharePermission.html">Get-FileSharePermission</a></li>
 <li><a href="Get-FirewallRule.html">Get-FirewallRule</a></li>
 <li><a href="Get-Group.html">Get-Group</a></li>
+<li><a href="Get-HttpUrlAcl.html">Get-HttpUrlAcl</a></li>
 <li><a href="Get-IisApplication.html">Get-IisApplication</a></li>
 <li><a href="Get-IisAppPool.html">Get-IisAppPool</a></li>
 <li><a href="Get-IisConfigurationSection.html">Get-IisConfigurationSection</a></li>
@@ -739,6 +782,7 @@ jQuery( document ).ready(function() {
 <li><a href="Get-WindowsFeature.html">Get-WindowsFeature</a></li>
 <li><a href="Get-WmiLocalUserAccount.html">Get-WmiLocalUserAccount</a></li>
 <li><a href="Grant-ComPermission.html">Grant-ComPermission</a></li>
+<li><a href="Grant-HttpUrlPermission.html">Grant-HttpUrlPermission</a></li>
 <li><a href="Grant-MsmqMessageQueuePermission.html">Grant-MsmqMessageQueuePermission</a></li>
 <li><a href="Grant-Permission.html">Grant-Permission</a></li>
 <li><a href="Grant-Privilege.html">Grant-Privilege</a></li>
@@ -746,6 +790,7 @@ jQuery( document ).ready(function() {
 <li><a href="Grant-ServicePermission.html">Grant-ServicePermission</a></li>
 <li><a href="Initialize-Lcm.html">Initialize-Lcm</a></li>
 <li><a href="Install-Certificate.html">Install-Certificate</a></li>
+<li><a href="Install-Directory.html">Install-Directory</a></li>
 <li><a href="Install-FileShare.html">Install-FileShare</a></li>
 <li><a href="Install-Group.html">Install-Group</a></li>
 <li><a href="Install-IisApplication.html">Install-IisApplication</a></li>
@@ -790,6 +835,7 @@ jQuery( document ).ready(function() {
 <li><a href="Resolve-RelativePath.html">Resolve-RelativePath</a></li>
 <li><a href="Restart-RemoteService.html">Restart-RemoteService</a></li>
 <li><a href="Revoke-ComPermission.html">Revoke-ComPermission</a></li>
+<li><a href="Revoke-HttpUrlPermission.html">Revoke-HttpUrlPermission</a></li>
 <li><a href="Revoke-Permission.html">Revoke-Permission</a></li>
 <li><a href="Revoke-Privilege.html">Revoke-Privilege</a></li>
 <li><a href="Revoke-ServicePermission.html">Revoke-ServicePermission</a></li>
@@ -816,6 +862,7 @@ jQuery( document ).ready(function() {
 <li><a href="Test-FileShare.html">Test-FileShare</a></li>
 <li><a href="Test-FirewallStatefulFtp.html">Test-FirewallStatefulFtp</a></li>
 <li><a href="Test-Group.html">Test-Group</a></li>
+<li><a href="Test-GroupMember.html">Test-GroupMember</a></li>
 <li><a href="Test-Identity.html">Test-Identity</a></li>
 <li><a href="Test-IisAppPool.html">Test-IisAppPool</a></li>
 <li><a href="Test-IisConfigurationSection.html">Test-IisConfigurationSection</a></li>
@@ -843,7 +890,9 @@ jQuery( document ).ready(function() {
 <li><a href="Test-WindowsFeature.html">Test-WindowsFeature</a></li>
 <li><a href="Test-ZipFile.html">Test-ZipFile</a></li>
 <li><a href="Uninstall-Certificate.html">Uninstall-Certificate</a></li>
+<li><a href="Uninstall-Directory.html">Uninstall-Directory</a></li>
 <li><a href="Uninstall-FileShare.html">Uninstall-FileShare</a></li>
+<li><a href="Uninstall-Group.html">Uninstall-Group</a></li>
 <li><a href="Uninstall-IisAppPool.html">Uninstall-IisAppPool</a></li>
 <li><a href="Uninstall-IisWebsite.html">Uninstall-IisWebsite</a></li>
 <li><a href="Uninstall-Junction.html">Uninstall-Junction</a></li>
@@ -965,6 +1014,7 @@ jQuery( document ).ready(function() {
 <li><a href="Get-FileSharePermission.html">Get-FileSharePermission</a></li>
 <li><a href="Get-FirewallRule.html">Get-FirewallRule</a></li>
 <li><a href="Get-Group.html">Get-Group</a></li>
+<li><a href="Get-HttpUrlAcl.html">Get-HttpUrlAcl</a></li>
 <li><a href="Get-IisApplication.html">Get-IisApplication</a></li>
 <li><a href="Get-IisAppPool.html">Get-IisAppPool</a></li>
 <li><a href="Get-IisConfigurationSection.html">Get-IisConfigurationSection</a></li>
@@ -1002,6 +1052,7 @@ jQuery( document ).ready(function() {
 
     <ul>
         <li><a href="Grant-ComPermission.html">Grant-ComPermission</a></li>
+<li><a href="Grant-HttpUrlPermission.html">Grant-HttpUrlPermission</a></li>
 <li><a href="Grant-MsmqMessageQueuePermission.html">Grant-MsmqMessageQueuePermission</a></li>
 <li><a href="Grant-Permission.html">Grant-Permission</a></li>
 <li><a href="Grant-Privilege.html">Grant-Privilege</a></li>
@@ -1017,6 +1068,7 @@ jQuery( document ).ready(function() {
 
     <ul>
         <li><a href="Install-Certificate.html">Install-Certificate</a></li>
+<li><a href="Install-Directory.html">Install-Directory</a></li>
 <li><a href="Install-FileShare.html">Install-FileShare</a></li>
 <li><a href="Install-Group.html">Install-Group</a></li>
 <li><a href="Install-IisApplication.html">Install-IisApplication</a></li>
@@ -1101,6 +1153,7 @@ jQuery( document ).ready(function() {
 
     <ul>
         <li><a href="Revoke-ComPermission.html">Revoke-ComPermission</a></li>
+<li><a href="Revoke-HttpUrlPermission.html">Revoke-HttpUrlPermission</a></li>
 <li><a href="Revoke-Permission.html">Revoke-Permission</a></li>
 <li><a href="Revoke-Privilege.html">Revoke-Privilege</a></li>
 <li><a href="Revoke-ServicePermission.html">Revoke-ServicePermission</a></li>
@@ -1143,6 +1196,7 @@ jQuery( document ).ready(function() {
 <li><a href="Test-FileShare.html">Test-FileShare</a></li>
 <li><a href="Test-FirewallStatefulFtp.html">Test-FirewallStatefulFtp</a></li>
 <li><a href="Test-Group.html">Test-Group</a></li>
+<li><a href="Test-GroupMember.html">Test-GroupMember</a></li>
 <li><a href="Test-Identity.html">Test-Identity</a></li>
 <li><a href="Test-IisAppPool.html">Test-IisAppPool</a></li>
 <li><a href="Test-IisConfigurationSection.html">Test-IisConfigurationSection</a></li>
@@ -1174,7 +1228,9 @@ jQuery( document ).ready(function() {
 
     <ul>
         <li><a href="Uninstall-Certificate.html">Uninstall-Certificate</a></li>
+<li><a href="Uninstall-Directory.html">Uninstall-Directory</a></li>
 <li><a href="Uninstall-FileShare.html">Uninstall-FileShare</a></li>
+<li><a href="Uninstall-Group.html">Uninstall-Group</a></li>
 <li><a href="Uninstall-IisAppPool.html">Uninstall-IisAppPool</a></li>
 <li><a href="Uninstall-IisWebsite.html">Uninstall-IisWebsite</a></li>
 <li><a href="Uninstall-Junction.html">Uninstall-Junction</a></li>
@@ -1206,7 +1262,7 @@ jQuery( document ).ready(function() {
 </div>
 
 	<div class="Footer">
-		Copyright 2012 - 2015 <a href="http://pshdo.com">Aaron Jensen</a>.
+		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.
 	</div>
 
 </body>
