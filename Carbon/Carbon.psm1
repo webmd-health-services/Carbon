@@ -154,3 +154,11 @@ Get-ChildItem -Path $functionRoot -Filter '*.ps1' |
                         Write-Verbose ("Importing function {0}." -f $_.FullName)
                         . $_.FullName | Out-Null
                     }
+
+$module = Test-ModuleManifest -Path (Join-Path -Path $PSScriptRoot -ChildPath 'Carbon.psd1' -Resolve)
+if( -not $module )
+{
+    return
+}
+
+Export-ModuleMember -Alias '*' -Function ([string[]]$module.ExportedFunctions.Keys)
