@@ -129,7 +129,7 @@ name = d
 
     It 'should remove last entry from a file when it is the only line' {
 
-        # Regression. Make sure there is only one line in the file.
+        # Regression. Make sure there is only one line in the file for test to catch it.
 @'
 MyKey = a
 '@ | Set-Content -Path $iniPath
@@ -138,15 +138,5 @@ MyKey = a
 
         $ini = Split-Ini -Path $iniPath -AsHashtable
         $ini.Count | Should Be 0
-
-        <#
-                @'
-sectionless = value
-section1value1 = duplicate
-
-[section1]
-section1value1 = value2
-unicodevalue = הגûךיטאשחה
-#>
     }
 }
