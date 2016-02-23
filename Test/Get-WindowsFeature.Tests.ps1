@@ -12,55 +12,65 @@
 
 Write-Verbose -Message ('=' * 70) -Verbose
 Write-Verbose -Message ($PSVersionTable.PSVersion) -Verbose
-Get-Module -List | ? { $_.Name -eq 'ServerManager' } | Out-String | Write-Verbose -Verbose
+Get-Module -List | Where-Object { $_.Name -eq 'ServerManager' } | Out-String | Write-Verbose -Verbose
 Get-WmiObject -List -Class Win32_OptionalFeature | Out-String | Write-Verbose -Verbose
 Write-Verbose -Message ('=' * 70) -Verbose
 
 if( $PSVersionTable.PSVersion -gt [Version]'2.0' -and -not (Get-Module -List | Where-Object { $_.Name -eq 'ServerManager' }) -and (Get-WmiObject -List -Class Win32_OptionalFeature) )
 {
-    function Start-TestFixture
-    {
-        & (Join-Path -Path $PSScriptRoot -ChildPath '..\Import-CarbonForTest.ps1' -Resolve)
-    }
+    Describe 'Get-WindowsFeature' {
 
-    function Test-ShouldReturnAllWindowsFeatures
-    {
-        $features = Get-WindowsFeature
-        Assert-NotNull $features
-        Assert-True ($features.Length -gt 1)
-        $features | ForEach-Object {
-            Assert-NotNull $_.Installed
-            Assert-NotNull $_.Name
-            Assert-NotNull $_.DisplayName
+        BeforeAll {
+            & (Join-Path -Path $PSScriptRoot -ChildPath 'Import-CarbonForTest.ps1' -Resolve)
         }
-    }
-
-    function Test-ShouldReturnSpecificFeature
-    {
-        Get-WindowsFeature | ForEach-Object {
-            $expectedFeature = $_
-            $feature = Get-WindowsFeature -Name $expectedFeature.Name
-            Assert-NotNull $feature
-            Assert-Equal $expectedFeature.Name $feature.Name
-            Assert-Equal $expectedFeature.DisplayName $feature.DisplayName
-            Assert-Equal $expectedFeature.Installed $feature.Installed
+    
+        It 'should return all windows features' {
+            $featuresWithoutDisplayNames = @{ 
+                                                WindowsRemoteManagement = $true;
+                                                OEMHelpCustomization = $true;
+                                                CorporationHelpCustomization = $true;
+                                            }
+            $features = Get-WindowsFeature
+            $features | Should Not BeNullOrEmpty
+            ($features.Length -gt 1) | Should Be $true
+            $features | ForEach-Object {
+                $_.Installed | Should Not BeNullOrEmpty
+                $_.Name | Should Not BeNullOrEmpty
+                if( $featuresWithoutDisplayNames.ContainsKey( $_.Name ) )
+                {
+                    $_.DisplayName | Should BeNullOrEmpty
+                }
+                else
+                {
+                    $_.DisplayName | Should Not BeNullOrEmpty
+                }
+            }
         }
-    }
-
-    function Test-ShouldReturnWildcardMatches
-    {
-        $features = Get-WindowsFeature -Name *msmq*
-        Assert-NotNull $features
-        $features | ForEach-Object {
-            Assert-NotNull $_.Installed
-            Assert-NotNull $_.Name
-            Assert-True ($_.Name -like '*msmq*')
-            Assert-NotNull $_.DisplayName
+    
+        It 'should return specific feature' {
+            Get-WindowsFeature | ForEach-Object {
+                $expectedFeature = $_
+                $feature = Get-WindowsFeature -Name $expectedFeature.Name
+                $feature | Should Not BeNullOrEmpty
+                $feature.Name | Should Be $expectedFeature.Name
+                $feature.DisplayName | Should Be $expectedFeature.DisplayName
+                $feature.Installed | Should Be $expectedFeature.Installed
+            }
         }
-    }
+    
+        It 'should return wildcard matches' {
+            $features = Get-WindowsFeature -Name *msmq*
+            $features | Should Not BeNullOrEmpty
+            $features | ForEach-Object {
+                $_.Installed | Should Not BeNullOrEmpty
+                $_.Name | Should Not BeNullOrEmpty
+                ($_.Name -like '*msmq*') | Should Be $true
+                $_.DisplayName | Should Not BeNullOrEmpty
+            }
+        }
+    }    
 }
 else
 {
     Write-Warning "Tests for Get-WindowsFeature not supported on this operating system."
 }
-

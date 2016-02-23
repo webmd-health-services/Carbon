@@ -12,51 +12,49 @@
 
 Write-Verbose -Message ('=' * 70) -Verbose
 Write-Verbose -Message ($PSVersionTable.PSVersion) -Verbose
-Get-Module -List | ? { $_.Name -eq 'ServerManager' } | Out-String | Write-Verbose -Verbose
+Get-Module -List | Where-Object { $_.Name -eq 'ServerManager' } | Out-String | Write-Verbose -Verbose
 Get-WmiObject -List -Class Win32_OptionalFeature | Out-String | Write-Verbose -Verbose
 Write-Verbose -Message ('=' * 70) -Verbose
 
 if( $PSVersionTable.PSVersion -gt [Version]'2.0' -and -not (Get-Module -List | Where-Object { $_.Name -eq 'ServerManager' }) -and (Get-WmiObject -List -Class Win32_OptionalFeature) )
 {
-    function Start-TestFixture
-    {
-        & (Join-Path -Path $PSScriptRoot -ChildPath '..\Import-CarbonForTest.ps1' -Resolve)
-    }
+    Describe 'Test-WindowsFeature' {
 
-    function Test-ShouldDetectInstalledFeature
-    {
-        Get-WindowsFeature | 
-            Where-Object { $_.Installed } |
-            Select-Object -First 1 |
-            ForEach-Object {
-                Assert-True (Test-WindowsFeature -Name $_.Name -Installed) $_.Name
-            }
+        BeforeAll {
+            & (Join-Path -Path $PSScriptRoot -ChildPath 'Import-CarbonForTest.ps1' -Resolve)
+        }
+    
+        It 'should detect installed feature' {
+            Get-WindowsFeature | 
+                Where-Object { $_.Installed } |
+                Select-Object -First 1 |
+                ForEach-Object {
+                    (Test-WindowsFeature -Name $_.Name -Installed) | Should Be $true
+                }
+        }
+    
+        It 'should detect uninstalled feature' {
+            Get-WindowsFeature | 
+                Where-Object { -not $_.Installed } |
+                Select-Object -First 1 |
+                ForEach-Object {
+                    (Test-WindowsFeature -Name $_.Name -Installed) | Should Be $false
+                }
+        }
+    
+        It 'should detect features' {
+            Get-WindowsFeature |
+                Select-Object -First 1 |
+                ForEach-Object { (Test-WindowsFeature -Name $_.Name) | Should Be $true }
+        }
+    
+        It 'should not detect feature' {
+            (Test-WindowsFeature -Name 'IDoNotExist') | Should Be $false
+        }
     }
-
-    function Test-ShouldDetectUninstalledFeature
-    {
-        Get-WindowsFeature | 
-            Where-Object { -not $_.Installed } |
-            Select-Object -First 1
-            ForEach-Object {
-                Assert-False (Test-WindowsFeature -Name $_.Name -Installed) $_.Name
-            }
-    }
-
-    function Test-ShouldDetectFeatures
-    {
-        Get-WindowsFeature |
-            Select-Object -First 1 |
-            ForEach-Object { Assert-True (Test-WindowsFeature -Name $_.Name) $_.Name }
-    }
-
-    function Test-ShouldNotDetectFeature
-    {
-        Assert-False (Test-WindowsFeature -Name 'IDoNotExist')
-    }
+    
 }
 else
 {
     Write-Warning "Tests for Test-WindowsFeature not supported on this operating system."
 }
-

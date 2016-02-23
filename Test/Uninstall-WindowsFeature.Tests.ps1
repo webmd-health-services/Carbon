@@ -12,7 +12,7 @@
 
 Write-Verbose -Message ('=' * 70) -Verbose
 Write-Verbose -Message ($PSVersionTable.PSVersion) -Verbose
-Get-Module -List | ? { $_.Name -eq 'ServerManager' } | Out-String | Write-Verbose -Verbose
+Get-Module -List | Where-Object { $_.Name -eq 'ServerManager' } | Out-String | Write-Verbose -Verbose
 Get-WmiObject -List -Class Win32_OptionalFeature | Out-String | Write-Verbose -Verbose
 Write-Verbose -Message ('=' * 70) -Verbose
 
@@ -21,47 +21,43 @@ if( $PSVersionTable.PSVersion -gt [Version]'2.0' -and -not (Get-Module -List | W
     $singleFeature = 'TelnetClient'
     $multipleFeatures = @( $singleFeature, 'TFTP' )
 
-    function Start-TestFixture
-    {
-        & (Join-Path -Path $PSScriptRoot -ChildPath '..\Import-CarbonForTest.ps1' -Resolve)
-    }
+    Describe 'Uninstall-WindowsFeature' {
 
-    function Start-Test
-    {
-        Install-WindowsFeature -Name $multipleFeatures
-    }
-
-    function Stop-Test
-    {
-        Uninstall-WindowsFeature -Name $multipleFeatures
-    }
-
-    function Test-ShouldUninstallFeatures
-    {
-        Assert-True (Test-WindowsFeature -Name $singleFeature -Installed)
-        Uninstall-WindowsFeature -Name $singleFeature
-        Assert-False (Test-WindowsFeature -Name $singleFeature -Installed)
-    }
-
-    function Test-ShouldUninstallMultipleFeatures
-    {
-        Assert-True (Test-WindowsFeature -Name $multipleFeatures[0] -Installed)
-        Assert-True (Test-WindowsFeature -Name $multipleFeatures[1] -Installed)
-        Uninstall-WindowsFeature -Name $multipleFeatures
-        Assert-False (Test-WindowsFeature -Name $multipleFeatures[0] -Installed)
-        Assert-False (Test-WindowsFeature -Name $multipleFeatures[1] -Installed)
-    }
-
-    function Test-ShouldSupportWhatIf
-    {
-        Assert-True (Test-WindowsFeature -Name $singleFeature -Installed)
-        Uninstall-WindowsFeature -Name $singleFeature -WhatIf
-        Assert-True (Test-WindowsFeature -Name $singleFeature -Installed)
-    }
-
+        BeforeAll {
+            & (Join-Path -Path $PSScriptRoot -ChildPath 'Import-CarbonForTest.ps1' -Resolve)
+        }
+    
+        BeforeEach {
+            Install-WindowsFeature -Name $multipleFeatures
+        }
+    
+        AfterEach {
+            Uninstall-WindowsFeature -Name $multipleFeatures
+        }
+    
+        It 'should uninstall features' {
+            (Test-WindowsFeature -Name $singleFeature -Installed) | Should Be $true
+            Uninstall-WindowsFeature -Name $singleFeature
+            (Test-WindowsFeature -Name $singleFeature -Installed) | Should Be $false
+        }
+    
+        It 'should uninstall multiple features' {
+            (Test-WindowsFeature -Name $multipleFeatures[0] -Installed) | Should Be $true
+            (Test-WindowsFeature -Name $multipleFeatures[1] -Installed) | Should Be $true
+            Uninstall-WindowsFeature -Name $multipleFeatures
+            (Test-WindowsFeature -Name $multipleFeatures[0] -Installed) | Should Be $false
+            (Test-WindowsFeature -Name $multipleFeatures[1] -Installed) | Should Be $false
+        }
+    
+        It 'should support what if' {
+            (Test-WindowsFeature -Name $singleFeature -Installed) | Should Be $true
+            Uninstall-WindowsFeature -Name $singleFeature -WhatIf
+            (Test-WindowsFeature -Name $singleFeature -Installed) | Should Be $true
+        }
+    
+    }    
 }
 else
 {
     Write-Warning "Tests for Uninstall-WindowsFeature not supported on this operating system."
 }
-
