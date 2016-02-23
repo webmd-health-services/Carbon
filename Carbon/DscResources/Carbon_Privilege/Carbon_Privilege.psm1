@@ -22,11 +22,10 @@ function Get-TargetResource
         # The identity of the principal whose privileges to get.
         $Identity,
         
-        [Parameter(Mandatory=$true)]
         [AllowEmptyCollection()]
         [string[]]
         # The user's expected/desired privileges.
-        $Privilege,
+        $Privilege = @(),
         
         [ValidateSet('Present','Absent')]
         [string]
@@ -180,11 +179,10 @@ function Set-TargetResource
         # The identity of the principal whose privileges to set.
         $Identity,
         
-        [Parameter(Mandatory=$true)]
         [AllowEmptyCollection()]
         [string[]]
         # The user's expected/desired privileges. *Privilege names are **case-sensitive**.* Ignored when `Ensure` is set to `Absent`.
-        $Privilege,
+        $Privilege = @(),
         
         [ValidateSet('Present','Absent')]
         [string]
@@ -201,7 +199,7 @@ function Set-TargetResource
         Revoke-Privilege -Identity $Identity -Privilege $currentPrivileges
     }
 
-    if( $Ensure -eq 'Present' )
+    if( $Ensure -eq 'Present' -and $Privilege )
     {
         Write-Verbose ('Granting ''{0}'' privileges: {1}' -f $Identity,($Privilege -join ','))
         Grant-Privilege -Identity $Identity -Privilege $Privilege
@@ -219,11 +217,10 @@ function Test-TargetResource
         # The identity of the principal whose privileges to test.
         $Identity,
         
-        [Parameter(Mandatory=$true)]
         [AllowEmptyCollection()]
         [string[]]
         # The user's expected/desired privileges.
-        $Privilege,
+        $Privilege = @(),
         
         [ValidateSet('Present','Absent')]
         [string]

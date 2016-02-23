@@ -70,6 +70,30 @@ function Test-ShouldRevokeAllOtherPrivileges
     Assert-True (Test-Privilege -Identity $UserName -Privilege 'SeDenyInteractiveLogonRight')
 }
 
+function Test-ShouldRevokeAllPrivilegesIfEnsureAbsent
+{
+    Set-TargetResource -Identity $UserName -Privilege 'SeDenyBatchLogonRight','SeDenyNetworkLogonRight' -Ensure 'Present'
+    Set-TargetResource -Identity $UserName -Ensure 'Absent'    
+    Assert-False (Test-Privilege -Identity $UserName -Privilege 'SeDenyBatchLogonRight')
+    Assert-False (Test-Privilege -Identity $UserName -Privilege 'SeDenyNetworkLogonRight')
+}
+
+function Test-ShouldRevokeAllPrivilegesIfPrivilegeNull
+{
+    Set-TargetResource -Identity $UserName -Privilege 'SeDenyBatchLogonRight','SeDenyNetworkLogonRight' -Ensure 'Present'
+    Set-TargetResource -Identity $UserName -Privilege $null -Ensure 'Present'    
+    Assert-False (Test-Privilege -Identity $UserName -Privilege 'SeDenyBatchLogonRight')
+    Assert-False (Test-Privilege -Identity $UserName -Privilege 'SeDenyNetworkLogonRight')
+}
+
+function Test-ShouldRevokeAllPrivilegesIfPrivilegeEmpty
+{
+    Set-TargetResource -Identity $UserName -Privilege 'SeDenyBatchLogonRight','SeDenyNetworkLogonRight' -Ensure 'Present'
+    Set-TargetResource -Identity $UserName -Privilege @() -Ensure 'Present'    
+    Assert-False (Test-Privilege -Identity $UserName -Privilege 'SeDenyBatchLogonRight')
+    Assert-False (Test-Privilege -Identity $UserName -Privilege 'SeDenyNetworkLogonRight')
+}
+
 function Test-GetsNoPrivileges
 {
     $resource = Get-TargetResource -Identity $UserName -Privilege @()
@@ -164,5 +188,98 @@ function Test-ShouldRunThroughDsc
     Assert-NoError
     Assert-False (Test-TargetResource -Identity $UserName -Privilege 'SeDenyBatchLogonRight' -Ensure 'Present')
     Assert-True (Test-TargetResource -Identity $UserName -Privilege 'SeDenyBatchLogonRight' -Ensure 'Absent')
+}
+
+configuration DscConfiguration2
+{
+    Set-StrictMode -Off
+
+    Import-DscResource -Name '*' -Module 'Carbon'
+
+    node 'localhost'
+    {
+        Carbon_Privilege set
+        {
+            Identity = $UserName;
+            Privilege = 'SeDenyBatchLogonRight';
+            Ensure = 'Present';
+        }
+    }
+}
+
+configuration DscConfiguration3
+{
+    Set-StrictMode -Off
+
+    Import-DscResource -Name '*' -Module 'Carbon'
+
+    node 'localhost'
+    {
+        Carbon_Privilege set
+        {
+            Identity = $UserName;
+            Ensure = 'Absent';
+        }
+    }
+}
+
+function Test-ShouldRunThroughDsc
+{
+    & DscConfiguration2 -OutputPath $CarbonDscOutputRoot
+    Start-DscConfiguration -Wait -ComputerName 'localhost' -Path $CarbonDscOutputRoot -Force
+    Assert-NoError
+    Assert-True (Test-TargetResource -Identity $UserName -Privilege 'SeDenyBatchLogonRight' -Ensure 'Present')
+
+    & DscConfiguration3 -OutputPath $CarbonDscOutputRoot
+    Start-DscConfiguration -Wait -ComputerName 'localhost' -Path $CarbonDscOutputRoot -Force
+    Assert-NoError
+    Assert-True (Test-TargetResource -Identity $UserName -Privilege 'SeDenyBatchLogonRight' -Ensure 'Absent')
+}
+
+configuration DscConfiguration4
+{
+    Set-StrictMode -Off
+
+    Import-DscResource -Name '*' -Module 'Carbon'
+
+    node 'localhost'
+    {
+        Carbon_Privilege set
+        {
+            Identity = $UserName;
+            Privilege = 'SeDenyBatchLogonRight';
+            Ensure = 'Present';
+        }
+    }
+}
+
+configuration DscConfiguration5
+{
+    Set-StrictMode -Off
+
+    Import-DscResource -Name '*' -Module 'Carbon'
+
+    node 'localhost'
+    {
+        Carbon_Privilege set
+        {
+            Identity = $UserName;
+            Privilege = $null;
+            Ensure = 'Present';
+        }
+    }
+}
+
+function Test-ShouldRunThroughDsc
+{
+    & DscConfiguration2 -OutputPath $CarbonDscOutputRoot
+    Start-DscConfiguration -Wait -ComputerName 'localhost' -Path $CarbonDscOutputRoot -Force
+    Assert-NoError
+    Assert-True (Test-TargetResource -Identity $UserName -Privilege 'SeDenyBatchLogonRight' -Ensure 'Present')
+
+    & DscConfiguration3 -OutputPath $CarbonDscOutputRoot
+    Start-DscConfiguration -Wait -ComputerName 'localhost' -Path $CarbonDscOutputRoot -Force
+    Assert-NoError
+    Assert-False (Test-TargetResource -Identity $UserName -Privilege 'SeDenyBatchLogonRight' -Ensure 'Present')
 }
 
