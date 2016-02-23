@@ -116,7 +116,21 @@ function Test-ShouldReinstallIfForcedTo
     while( $tryNum++ -lt $maxTries )
 
     Assert-DirectoryExists $installDir
-    Remove-Item -Path $installDir -Recurse
+
+    $tryNum = 0
+    do
+    {
+        Remove-Item -Path $installDir -Recurse -ErrorAction Ignore
+        if( -not (Test-Path -Path $installDir -PathType Container) )
+        {
+            break
+        }
+        Start-Sleep -Milliseconds 100
+    }
+    while( $tryNum++ -lt $maxTries )
+
+    Assert-DirectoryDoesNotExist $installDir
+
     Install-Msi -Path $carbonTestInstallerActions -Force
     Assert-DirectoryExists $installDir
 }
