@@ -99,7 +99,14 @@ function Remove-IniEntry
         $null = $lines.RemoveAt( ($settings[$key].LineNumber - 1) )
         if( $PSCmdlet.ShouldProcess( $Path, ('remove INI entry {0}' -f $key) ) )
         {
-            $lines | Set-Content -Path $Path
+            if( $lines )
+            {
+                $lines | Set-Content -Path $Path
+            }
+            else
+            {
+                Clear-Content -Path $Path
+            }
         }
     }
 
