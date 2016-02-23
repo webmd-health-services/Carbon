@@ -86,7 +86,7 @@ $useWmi = $false
 $useOCSetup = $false
 if( -not $useServerManager )
 {
-    $useWmi = (Get-WmiObject -Class 'Win32_OptionalFeature' -ErrorAction Ignore) -ne $null
+    $useWmi = (Get-WmiObject -List -Class 'Win32_OptionalFeature') -ne $null
     $useOCSetup = (Get-Command -Name 'ocsetup.exe' -ErrorAction Ignore ) -ne $null
 }
 

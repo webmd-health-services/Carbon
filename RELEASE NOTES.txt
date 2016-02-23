@@ -6,6 +6,7 @@
  * Fixed: missing PowerShell Gallery tags, license URI, project URI, and release notes metadata.
  * Fixed: copyright date in module manifest is 2015.
  * Fixed: PowerShell gallery missing function list.
+ * Fixed: Restricted user accounts can't import Carbon ([issue #180](https://bitbucket.org/splatteredbits/carbon/issues/180)).
  
  
 # 2.1.0 (8 February 2016)
