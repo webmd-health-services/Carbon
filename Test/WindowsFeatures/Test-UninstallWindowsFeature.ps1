@@ -12,11 +12,11 @@
 
 Write-Verbose -Message ('=' * 70) -Verbose
 Write-Verbose -Message ($PSVersionTable.PSVersion) -Verbose
-Get-Module 'ServerManager' | Out-String | Write-Verbose
+Get-Module -List | ? { $_.Name -eq 'ServerManager' } | Out-String | Write-Verbose -Verbose
 Get-WmiObject -List -Class Win32_OptionalFeature | Out-String | Write-Verbose -Verbose
 Write-Verbose -Message ('=' * 70) -Verbose
 
-if( $PSVersionTable.PSVersion -gt [Version]'2.0' -and -not (Get-Module 'ServerManager') -and (Get-WmiObject -List -Class Win32_OptionalFeature) )
+if( $PSVersionTable.PSVersion -gt [Version]'2.0' -and -not (Get-Module -List | Where-Object { $_.Name -eq 'ServerManager' }) -and (Get-WmiObject -List -Class Win32_OptionalFeature) )
 {
     $singleFeature = 'TelnetClient'
     $multipleFeatures = @( $singleFeature, 'TFTP' )
