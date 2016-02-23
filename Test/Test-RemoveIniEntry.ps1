@@ -12,16 +12,15 @@
 
 $iniPath = $null
 
-function Start-TestFixture
-{
-    & (Join-Path -Path $PSScriptRoot -ChildPath 'Import-CarbonForTest.ps1' -Resolve)
-}
-
-function Start-Test
-{
-    $iniPath = Join-Path ([IO.Path]::GetTempPath()) ([IO.Path]::GetRandomFileName())
-    $null = New-Item $iniPath -ItemType File
-    @'
+Describe 'Test-RemoveIniEntry' {
+    BeforeAll {
+        & (Join-Path -Path $PSScriptRoot -ChildPath 'Import-CarbonForTest.ps1' -Resolve)
+    }
+    
+    BeforeEach {
+        $iniPath = Join-Path ([IO.Path]::GetTempPath()) ([IO.Path]::GetRandomFileName())
+        $null = New-Item $iniPath -ItemType File
+        @'
 sectionless = value
 section1value1 = duplicate
 
@@ -30,36 +29,57 @@ section1value1 = value2
 unicodevalue = הגûךיטאשחה
 
 '@ | Set-Content -Path $iniPath
-}
+        $Global:Error.Clear()
+    }
+    
+    AfterEach {
+        Remove-Item $iniPath
+    }
+    
+    
+    function Assert-IniFile
+    {
+        param(
+            [string]
+            $ExpectedContents
+        )
+        
+        $expectedLines = @()
+        if( $ExpectedContents )
+        {
+            $expectedLines = $ExpectedContents -split "`r`n"
+        }
 
-function Stop-Test
-{
-    Remove-Item $iniPath
-}
+        $iniPath | Should Exist
 
-function Test-ShouldNotRemoveEntryThatDoesNotExist
-{
-    $originalIniFile = ((Get-Content -Path $iniPath) -join "`r`n")
-
-    Remove-IniEntry -Path $iniPath -Section section -Name empty 
-    Assert-Equal 0 $Error.Count
-    Assert-IniFile $originalIniFile
-}
-
-function Test-ShouldSupportWhatIf
-{
-    $Error.Clear()
-    $originalIniFile = ((Get-Content -Path $iniPath) -join "`r`n")
-
-    Remove-IniEntry -Path $iniPath -Section section1 -Name section1value1 -WhatIf
-    Assert-Equal 0 $Error.Count
-    Assert-IniFile $originalIniFile
-}
-
-function Test-ShouldRemoveSectionlessEntry
-{
-    Remove-IniEntry -Path $iniPath -Name section1value1
-
+        $actualContents = @( Get-Content $iniPath )
+        $actualContents.Length | Should Be $expectedLines.Length
+        for( $idx = 0; $idx -lt $actualContents.Length; ++$idx )
+        {
+            $actualContents[$idx] | Should Be $expectedLines[$idx]
+        }
+    }
+    
+    It 'should not remove entry that does not exist' {
+        $originalIniFile = ((Get-Content -Path $iniPath) -join "`r`n")
+    
+        Remove-IniEntry -Path $iniPath -Section section -Name empty 
+        $Error.Count | Should Be 0
+        Assert-IniFile $originalIniFile
+    }
+    
+    It 'should support what if' {
+        $Error.Clear()
+        $originalIniFile = ((Get-Content -Path $iniPath) -join "`r`n")
+    
+        Remove-IniEntry -Path $iniPath -Section section1 -Name section1value1 -WhatIf
+        $Error.Count | Should Be 0
+        Assert-IniFile $originalIniFile
+    }
+    
+    It 'should remove sectionless entry' {
+        Remove-IniEntry -Path $iniPath -Name section1value1
+    
     Assert-IniFile @'
 sectionless = value
 
@@ -68,12 +88,11 @@ section1value1 = value2
 unicodevalue = הגûךיטאשחה
 
 '@
-}
-
-function Test-ShouldRemoveEntryInSection
-{
-    Remove-IniEntry -Path $iniPath -Name section1value1 -Section section1
-
+    }
+    
+    It 'should remove entry in section' {
+        Remove-IniEntry -Path $iniPath -Name section1value1 -Section section1
+    
     Assert-IniFile @'
 sectionless = value
 section1value1 = duplicate
@@ -82,11 +101,10 @@ section1value1 = duplicate
 unicodevalue = הגûךיטאשחה
 
 '@
-}
-
-function Test-ShouldRemoveCaseSensitiveIniOptions
-{
-    @'
+    }
+    
+    It 'should remove case sensitive ini options' {
+        @'
 name = a
 NAME = b
 
@@ -97,36 +115,15 @@ name = c
 name = d
 
 '@ | Set-Content -Path $iniPath
-
-    Remove-IniEntry -Path $iniPath -Name 'name' -CaseSensitive
-    Remove-IniEntry -Path $iniPath -Section 'section' -Name 'name' -CaseSensitive
-
-    $ini = Split-Ini -Path $iniPath -CaseSensitive -AsHashtable
-    Assert-NotNull $ini
-    Assert-Equal 2 $ini.Count
-    Assert-Equal 'b' $ini['NAME'].Value
-    Assert-Equal 'd' $ini['SECTION.name'].Value
-
-}
-
-function Assert-IniFile
-{
-    param(
-        [string]
-        $ExpectedContents
-    )
     
-    $expectedLines = @()
-    if( $ExpectedContents )
-    {
-        $expectedLines = $ExpectedContents -split "`r`n"
-    }
-    Assert-FileExists $iniPath
-    $actualContents = @( Get-Content $iniPath )
-    Assert-Equal $expectedLines.Length $actualContents.Length "Number of lines in file not equal."
-    for( $idx = 0; $idx -lt $actualContents.Length; ++$idx )
-    {
-        Assert-Equal $expectedLines[$idx] $actualContents[$idx] "line $idx"
+        Remove-IniEntry -Path $iniPath -Name 'name' -CaseSensitive
+        Remove-IniEntry -Path $iniPath -Section 'section' -Name 'name' -CaseSensitive
+    
+        $ini = Split-Ini -Path $iniPath -CaseSensitive -AsHashtable
+        $ini | Should Not BeNullOrEmpty
+        $ini.Count | Should Be 2
+        $ini['NAME'].Value | Should Be 'b'
+        $ini['SECTION.name'].Value | Should Be 'd'
+    
     }
 }
-
