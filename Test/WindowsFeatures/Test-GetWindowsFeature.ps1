@@ -10,7 +10,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-if( $PSVersionTable.PSVersion -gt [Version]'2.0' -and -not (Get-Module 'ServerManager') -and (Get-WmiObject -Class Win32_OptionalFeature -ErrorAction SilentlyContinue) )
+Write-Verbose -Message ('=' * 70) -Verbose
+Write-Verbose -Message ($PSVersionTable.PSVersion) -Verbose
+Get-Module 'ServerManager' | Out-String | Write-Verbose
+Get-WmiObject -List -Class Win32_OptionalFeature | Out-String | Write-Verbose -Verbose
+Write-Verbose -Message ('=' * 70) -Verbose
+
+if( $PSVersionTable.PSVersion -gt [Version]'2.0' -and -not (Get-Module 'ServerManager') -and (Get-WmiObject -List -Class Win32_OptionalFeature) )
 {
     function Start-TestFixture
     {
