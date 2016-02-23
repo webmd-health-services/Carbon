@@ -85,14 +85,13 @@ function Test-ShouldGetInstalledPrograms
             {
                 if( $typeName -eq 'DateTime' )
                 {
-                    if( $keyValue -match '^(\d{4})(\d{2})(\d{2})$' )
+                    [DateTime]$dateTime = [DateTime]::MinValue
+
+                    if( -not ([DateTime]::TryParse($keyValue,[ref]$dateTime)) )
                     {
-                        $keyValue = Get-Date -Year $Matches[1] -Month $Matches[2] -Day $Matches[3] -Hour 0 -Minute 0 -Second 0 -Millisecond 0
+                        [DateTime]::TryParseExact( $keyValue, 'yyyyMMdd', [Globalization.CultureInfo]::CurrentCulture, [Globalization.DateTimeStyles]::None, [ref]$dateTime)
                     }
-                    else
-                    {
-                        $keyValue = [DateTime]$keyValue
-                    }
+                    $keyValue = $dateTime
                 }
                 elseif( $typeName -eq 'Int32' )
                 {
