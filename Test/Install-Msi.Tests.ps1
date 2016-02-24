@@ -19,7 +19,7 @@ Describe 'Install-Msi' {
     function Assert-CarbonTestInstallerInstalled
     {
         $Global:Error.Count | Should Be 0
-        $maxTries = 100
+        $maxTries = 200
         $tryNum = 0
         do
         {
@@ -37,7 +37,7 @@ Describe 'Install-Msi' {
     
     function Assert-CarbonTestInstallerNotInstalled
     {
-        $maxTries = 100
+        $maxTries = 200
         $tryNum = 0
         do
         {
