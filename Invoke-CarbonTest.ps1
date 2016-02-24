@@ -33,6 +33,13 @@ param(
 #Requires -Version 4
 Set-StrictMode -Version 'Latest'
 
+# Let's get full stack traces in our errors.
+$prependFormats = @(
+                        (Join-Path -Path $PSScriptRoot -ChildPath 'System.Management.Automation.ErrorRecord.format.ps1xml'),
+                        (Join-Path -Path $PSScriptRoot -ChildPath 'System.Exception.format.ps1xml')
+                    )
+Update-FormatData -PrependPath $prependFormats
+
 & (Join-Path -Path $PSScriptRoot -ChildPath 'Carbon\Import-Carbon.ps1' -Resolve)
 
 $installRoot = Get-PowerShellModuleInstallPath
@@ -63,12 +70,4 @@ try
 finally
 {
     Uninstall-Junction -Path $carbonModuleRoot
-}
-
-$Error | ForEach-Object {
-    $_ | Out-String | ForEach-Object { $_.TrimEnd() }
-    if( $_ | Get-Member -Name 'ScriptStackTrace' )
-    {
-        $_.ScriptStackTrace | Out-String
-    }
 }
