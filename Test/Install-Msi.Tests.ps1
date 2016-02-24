@@ -97,7 +97,7 @@ Describe 'Install-Msi' {
         $warnings = @()
         Install-Msi -Path $carbonTestInstaller -Quiet -WarningVariable 'warnings'
         $warnings.Count | Should Be 1
-        Assert-Like $warnings[0] '*obsolete*'
+        ($warnings[0] -like '*obsolete*') | Should Be $true
     }
     
     It 'should handle failed installer' {
@@ -114,18 +114,11 @@ Describe 'Install-Msi' {
     }
     
     It 'should support wildcards' {
-        $tempDir = New-TempDirectory -Prefix $PSCommandPath
-        try
-        {
-            Copy-Item $carbonTestInstaller -Destination (Join-Path -Path $tempDir -ChildPath 'One.msi')
-            Copy-Item $carbonTestInstaller -Destination (Join-Path -Path $tempDir -ChildPath 'Two.msi')
-            Install-Msi -Path (Join-Path -Path $tempDir -ChildPath '*.msi')
-            Assert-CarbonTestInstallerInstalled
-        }
-        finally
-        {
-            Remove-Item -Path $tempDir -Recurse
-        }
+        $tempDir = 'TestDrive:'
+        Copy-Item $carbonTestInstaller -Destination (Join-Path -Path $tempDir -ChildPath 'One.msi')
+        Copy-Item $carbonTestInstaller -Destination (Join-Path -Path $tempDir -ChildPath 'Two.msi')
+        Install-Msi -Path (Join-Path -Path $tempDir -ChildPath '*.msi')
+        Assert-CarbonTestInstallerInstalled
     }
     
     It 'should not reinstall if already installed' {
@@ -133,10 +126,10 @@ Describe 'Install-Msi' {
         Assert-CarbonTestInstallerInstalled
         $msi = Get-Msi -Path $carbonTestInstallerActions
         $installDir = Join-Path ${env:ProgramFiles(x86)} -ChildPath ('{0}\{1}' -f $msi.Manufacturer,$msi.ProductName)
-        Assert-DirectoryExists $installDir
+        $installDir | Should Exist
         Remove-Item -Path $installDir -Recurse
         Install-Msi -Path $carbonTestInstallerActions
-        Assert-DirectoryDoesNotExist $installDir
+        $installDir | Should Not Exist
     }
     
     It 'should reinstall if forced to' {
@@ -157,7 +150,7 @@ Describe 'Install-Msi' {
         }
         while( $tryNum++ -lt $maxTries )
     
-        Assert-DirectoryExists $installDir
+        $installDir | Should Exist
     
         $tryNum = 0
         do
@@ -171,25 +164,18 @@ Describe 'Install-Msi' {
         }
         while( $tryNum++ -lt $maxTries )
     
-        Assert-DirectoryDoesNotExist $installDir
+        $installDir | Should Not Exist
     
         Install-Msi -Path $carbonTestInstallerActions -Force
-        Assert-DirectoryExists $installDir
+        $installDir | Should Exist
     }
     
     It 'should install msi with spaces in path' {
-        $tempDir = New-TempDirectory -Prefix $PSCommandPath
-        try
-        {
-            $newInstaller = Join-Path -Path $tempDir -ChildPath 'Installer With Spaces.msi'
-            Copy-Item -Path $carbonTestInstaller -Destination $newInstaller
-            Install-Msi -Path $newInstaller
-            Assert-CarbonTestInstallerInstalled
-        }
-        finally
-        {
-            Remove-Item -Path $tempDir -Recurse
-        }
-    
+        $tempDir = 'TestDrive:'
+        $newInstaller = Join-Path -Path $tempDir -ChildPath 'Installer With Spaces.msi'
+        Copy-Item -Path $carbonTestInstaller -Destination $newInstaller
+        Install-Msi -Path $newInstaller
+        Assert-CarbonTestInstallerInstalled
     }
 }
+
