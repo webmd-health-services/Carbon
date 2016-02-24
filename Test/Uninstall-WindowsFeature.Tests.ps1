@@ -55,7 +55,7 @@ if( $PSVersionTable.PSVersion -gt [Version]'2.0' -and -not (Get-Module -List | W
             (Test-WindowsFeature -Name $singleFeature -Installed) | Should Be $true
         }
     
-    }    
+    }
 }
 else
 {
