@@ -84,7 +84,6 @@ Describe 'Install-Msi' {
         Assert-CarbonTestInstallerNotInstalled
         Invoke-WindowsInstaller -Path $carbonTestInstaller -WhatIf
         $Global:Error.Count | Should Be 0
-        $LASTEXITCODE | Should Be 0
         Assert-CarbonTestInstallerNotInstalled
     }
     
