@@ -94,18 +94,20 @@ if( (hg status $nuspecPath) )
     hg log -rtip
 }
 
-if( -not (hg log -r ('tag({0})' -f $manifest.Version)) )
+if( -not (hg tags | Where-Object { $_ -match ('^{0}\b' -f [regex]::Escape($manifest.Version.ToString())) }) )
 {
     hg tag $manifest.Version.ToString()
     hg log -rtip
 }
 
 # Create a clean clone so that our packages don't pick up any cruft.
-$cloneDir = New-TempDirectory -Prefix 'Carbon'
+$cloneDir = 'Carbon+{0}' -f [IO.Path]::GetRandomFileName()
+$cloneDir = Join-Path -Path $env:TEMP -ChildPath $cloneDir
 hg clone . $cloneDir
 hg update -r ('tag({0})' -f $manifest.Version) -R $cloneDir
 
-$zipRoot = New-TempDirectory -Prefix 'Carbon'
+$zipRoot = 'Carbon+{0}' -f [IO.Path]::GetRandomFileName()
+$zipRoot = Join-Path -Path $env:TEMP -ChildPath $zipRoot
 
 $zipContents = @(
                     'Carbon',
