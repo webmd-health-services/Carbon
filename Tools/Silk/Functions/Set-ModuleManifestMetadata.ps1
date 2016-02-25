@@ -28,13 +28,8 @@ function Set-ModuleManifestMetadata
 
     $module = Import-Module -Force -Name $manifestPath -PassThru
 
-    $functionNames = Get-Command -CommandType Function -Module $module.Name |
-                        Select-Object -ExpandProperty 'Name' |
-                        Sort-Object
-
     $foundTags = $false
     $foundReleaseNotes = $false
-    $foundFunctionsToExport = $false
     $inReleaseNotes = $false
     $releaseNotesWhitespacePrefix = ''
     $moduleManifestLines = Get-Content -Path $manifestPath |
@@ -65,23 +60,11 @@ function Set-ModuleManifestMetadata
                                         return '{0}Tags = @(''{1}'')' -f $Matches[1],($Tag -join ''',''')
                                     }
 
-                                    if( $line -match '^(\s+)FunctionsToExport\s*=\s*' )
-                                    {
-                                        $foundFunctionsToExport = $true
-                                        return '{0}FunctionsToExport = @(''{1}'')' -f $Matches[1],($functionNames -join "','")
-                                    }
-
                                     return $_
                                 }
     if( -not $foundTags )
     {
         Write-Error -Message ('PrivateData PSData hashtable missing Tags metadata. Please add `Tags = @()` to the PSData section of {0} and re-run.' -f $ManifestPath)
-        return
-    }
-
-    if( -not $foundFunctionsToExport )
-    {
-        Write-Error -Message ('FunctionsToExport metadata not found in module manifest {0}. Please add `FunctionsToExport = @()` to the manifest and re-run.' -f $ManifestPath)
         return
     }
 
