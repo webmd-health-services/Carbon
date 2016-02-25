@@ -35,7 +35,14 @@ function Assert-ModuleVersion
     Write-Verbose -Message ('Checking that {0} module is at version {1}.' -f $manifest.Name,$version)
 
     $badAssemblies = Invoke-Command {
-                            $manifest.RequiredAssemblies
+                            $manifest.RequiredAssemblies |
+                                    ForEach-Object { 
+                                        if( [IO.Path]::IsPathRooted($_) )
+                                        {
+                                            return $_
+                                        }
+                                        return Join-Path -Path $manifest.ModuleBase -ChildPath $_
+                                    }
                             if( $AssemblyPath )
                             {
                                 $AssemblyPath
