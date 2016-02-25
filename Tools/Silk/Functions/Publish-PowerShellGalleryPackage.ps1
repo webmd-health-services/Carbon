@@ -86,7 +86,7 @@ function Publish-PowerShellGalleryModule
         $Name = $manifest.Name
     }
 
-    if( Get-Module -Name 'PowerShellGet' )
+    if( Get-Module -ListAvailable -Name 'PowerShellGet' )
     {
         if( -not (Find-Module -Name $Name -RequiredVersion $manifest.Version -Repository 'PSGallery' -ErrorAction Ignore) )
         {
