@@ -98,7 +98,7 @@ All functions are idempotent: when run multiple times with the same arguments, y
     NestedModules = @()
 
     # Functions to export from this module
-    FunctionsToExport = @(
+    FunctionsToExport = @('Add-GroupMember','Add-IisDefaultDocument','Add-TrustedHost','Assert-AdminPrivilege','Assert-FirewallConfigurable','Assert-Service','Clear-DscLocalResourceCache','Clear-MofAuthoringMetadata','Clear-TrustedHost','Complete-Job','Compress-Item','ConvertFrom-Base64','Convert-SecureStringToString','ConvertTo-Base64','ConvertTo-ContainerInheritanceFlags','ConvertTo-InheritanceFlag','ConvertTo-PropagationFlag','ConvertTo-SecurityIdentifier','Convert-XmlFile','Copy-DscResource','Disable-FirewallStatefulFtp','Disable-IEEnhancedSecurityConfiguration','Disable-IisSecurityAuthentication','Disable-NtfsCompression','Enable-FirewallStatefulFtp','Enable-IEActivationPermission','Enable-IisDirectoryBrowsing','Enable-IisSecurityAuthentication','Enable-IisSsl','Enable-NtfsCompression','Expand-Item','Find-ADUser','Format-ADSearchFilterValue','Get-ADDomainController','Get-Certificate','Get-CertificateStore','Get-ComPermission','Get-ComSecurityDescriptor','Get-DscError','Get-DscWinEvent','Get-FileShare','Get-FileSharePermission','Get-FirewallRule','Get-Group','Get-HttpUrlAcl','Get-IisApplication','Get-IisAppPool','Get-IisConfigurationSection','Get-IisHttpHeader','Get-IisHttpRedirect','Get-IisMimeMap','Get-IisSecurityAuthentication','Get-IisVersion','Get-IisWebsite','Get-IPAddress','Get-Msi','Get-MsmqMessageQueue','Get-MsmqMessageQueuePath','Get-PathProvider','Get-PathToHostsFile','Get-PerformanceCounter','Get-Permission','Get-PowerShellModuleInstallPath','Get-PowershellPath','Get-Privilege','Get-ProgramInstallInfo','Get-RegistryKeyValue','Get-ScheduledTask','Get-ServiceAcl','Get-ServiceConfiguration','Get-ServicePermission','Get-ServiceSecurityDescriptor','Get-SslCertificateBinding','Get-TrustedHost','Get-User','Get-WindowsFeature','Get-WmiLocalUserAccount','Grant-ComPermission','Grant-HttpUrlPermission','Grant-MsmqMessageQueuePermission','Grant-Permission','Grant-Privilege','Grant-ServiceControlPermission','Grant-ServicePermission','Initialize-Lcm','Install-Certificate','Install-Directory','Install-FileShare','Install-Group','Install-IisApplication','Install-IisAppPool','Install-IisVirtualDirectory','Install-IisWebsite','Install-Junction','Install-Msi','Install-Msmq','Install-MsmqMessageQueue','Install-PerformanceCounter','Install-RegistryKey','Install-ScheduledTask','Install-Service','Install-User','Install-WindowsFeature','Invoke-AppCmd','Invoke-PowerShell','Join-IisVirtualPath','Lock-IisConfigurationSection','New-Credential','New-Junction','New-RsaKeyPair','New-TempDirectory','Protect-Acl','Remove-EnvironmentVariable','Remove-GroupMember','Remove-HostsEntry','Remove-IisMimeMap','Remove-IniEntry','Remove-Junction','Remove-RegistryKeyValue','Remove-SslCertificateBinding','Reset-HostsFile','Reset-MsmqQueueManagerID','Resolve-FullPath','Resolve-Identity','Resolve-IdentityName','Resolve-NetPath','Resolve-PathCase','Resolve-RelativePath','Restart-RemoteService','Revoke-ComPermission','Revoke-HttpUrlPermission','Revoke-Permission','Revoke-Privilege','Revoke-ServicePermission','Set-DotNetAppSetting','Set-DotNetConnectionString','Set-EnvironmentVariable','Set-HostsEntry','Set-IisHttpHeader','Set-IisHttpRedirect','Set-IisMimeMap','Set-IisWebsiteID','Set-IisWebsiteSslCertificate','Set-IisWindowsAuthentication','Set-IniEntry','Set-RegistryKeyValue','Set-ServiceAcl','Set-SslCertificateBinding','Set-TrustedHost','Split-Ini','Start-DscPullConfiguration','Test-AdminPrivilege','Test-DotNet','Test-DscTargetResource','Test-FileShare','Test-FirewallStatefulFtp','Test-Group','Test-GroupMember','Test-Identity','Test-IisAppPool','Test-IisConfigurationSection','Test-IisSecurityAuthentication','Test-IisWebsite','Test-IPAddress','Test-MsmqMessageQueue','Test-NtfsCompression','Test-OSIs32Bit','Test-OSIs64Bit','Test-PathIsJunction','Test-PerformanceCounter','Test-PerformanceCounterCategory','Test-Permission','Test-PowerShellIs32Bit','Test-PowerShellIs64Bit','Test-Privilege','Test-RegistryKeyValue','Test-ScheduledTask','Test-Service','Test-SslCertificateBinding','Test-TypeDataMember','Test-UncPath','Test-User','Test-WindowsFeature','Test-ZipFile','Uninstall-Certificate','Uninstall-Directory','Uninstall-FileShare','Uninstall-Group','Uninstall-IisAppPool','Uninstall-IisWebsite','Uninstall-Junction','Uninstall-MsmqMessageQueue','Uninstall-PerformanceCounterCategory','Uninstall-ScheduledTask','Uninstall-Service','Uninstall-User','Uninstall-WindowsFeature','Unlock-IisConfigurationSection','Write-DscError')
                             'Add-GroupMember',
                             'Add-IisDefaultDocument',
                             'Add-TrustedHost',
@@ -323,7 +323,7 @@ All functions are idempotent: when run multiple times with the same arguments, y
         PSData = @{
 
             # Tags applied to this module. These help with module discovery in online galleries.
-            Tags = @('.net','acl','active-directory','certificates','com','compression','computer','credential','cryptography','directory','dsc','dsc-resources','encryption','environment','file-system','firewall','groups','hosts-file','http','identity','iis','ini','installers','internet-explorer','ip','junctions','msi','msmq','netsh','networking','ntfs','operating-system','os','path','performance-counters','powershell','principal','privileges','programs','registry','rsa','scheduled-tasks','security','service','shares','sid','smb','ssl','text','trusted-host','users','wcf','windows','windows-features','xml','zip')
+            Tags = @('.net','acl','active-directory','certificates','com','compression','computer','credential','cryptography','directory','dsc','dsc-resources','encryption','environment','file-system','firewall','groups','hosts-file','http','identity','iis','ini','installers','internet-explorer','ip','junctions','msi','msmq','netsh','networking','ntfs','operating-system','os','path','performance-counters','powershell','principal','privileges','programs','registry','rsa','scheduled-tasks','security','service','shares','sid','smb','ssl','text','trusted-host','users','wcf','windows','windows-features','xml','zip','PSModule','DscResources','setup','automation','admin')
 
             # A URL to the license for this module.
             LicenseUri = 'http://www.apache.org/licenses/LICENSE-2.0'
@@ -333,54 +333,15 @@ All functions are idempotent: when run multiple times with the same arguments, y
 
             # ReleaseNotes of this module
             ReleaseNotes = @'
-## New Functions
-
- * `Get-HttpUrlAcl`: uses Windows API to return HTTP URL ACLs; replaces the `netsh http show urlacl` command.
- * `Grant-HttpUrlPermission`: uses Windows API to grant listen/delegate permissions on HTTP URLs; replaces the `netsh http add urlacl` command.
- * `Revoke-HttpUrlPermission`: uses Windows API to revoke all a user or group's permissions on HTTP URLs; replaces the `netsh http delete urlacl` command.
- * `Install-Directory`: creates a directory (and any missing parents), if it doesn't exist already. Finally!
- * `Uninstall-Directory`: removes a directory, if it exists. Finally!
- * `Uninstall-Group`: uses the `DirectoryServices.AccountManagement` .NET API to remove a group, if it exists.
- * `Test-GroupMember`: uses the `DirectoryServices.AccountManagemetn` .NET API to test if a principal is a member of a group.
-
-## New DSC Resource
-
- * `Carbon_Group`: resource for configuring local groups.
- 
 ## Bug Fixes
- 
- * Fixed: `Install-FileShare` always re-configures existing shares; it doesn't properly detect permissions that need to be removed.
- * Fixed: `Set-IniEntry` fails to preserve unicode characters with diacritics in INI entry names and values.
- * Fixed: `Remove-IniEntry` fails to preserve unicode characters with diacritics in INI entry names and values.
- * Fixed: `Set-HostsEntry` leaves trailing tabs and whitespace after all but the last line.
- * Fixed: `Get-PowerShellModuleInstallPath` returns wrong path for PowerShell 4.
- * Fixed: `Protect-String` fails when Carbon is installed in a module path that contains spaces ([fixes issue #174](https://bitbucket.org/splatteredbits/carbon/issues/174/protect-string-throws-when-module-path)).
- * Fixed: `New-RsaKeyPair` generates a key pair that isn't supported for encrypting/decrypting DSC credentials or supported by the CMS message cmdlets.
- * Fixed: `Get-ScheduledTask` returns invalid task commands when those commands contain quotes (works around an issue where `schtasks.exe` CSV output can't be parsed correctly by `ConvertFrom-Csv`).
- * Fixed: `Add-GroupMember` and `Remove-GroupMember` fail when adding `Everyone` or `NT Service\*` accounts to a group ([fixes issue #177](https://bitbucket.org/splatteredbits/carbon/issues/177/add-groupmembers-201-doesnt-like-vsa-names)).
- * Fixed: `Get-SheduledTask` writes an error if a scheduled task's XML definition is for an executable and doesn't contain an arguments element.
- 
-## Other Improvements
 
- * Obsolete function parameters will no longer show in Intellisense (added the `DontShow` parameter property).
- * `Test-AdminPrivilege`: changed its verbose message to a debug message.
- * `Set-HostsEntry`: 
-    * only updates hosts file if it needs to change
-    * added an improved verbose message when setting a hosts entry
-    * improved error handling when hosts file can't be opened for reading
- * `Install-Certificate` can now install a certificate on a remote computer.
- * `Initialize-Lcm` now uses `Install-Certificate` to install the decryption certificate on the remote computer.
- * `Uninstall-Certificate` can now uninstall a certificate on a remote computer.
- * The following functions now write warning if you pass them a plain-text password. You should pass a `SecureString` instead.
-    * `Install-Certificate`
-    * `Initialize-Lcm`
- * `New-RsaKeyPair`:
-    * Refactored to use `certreq.exe` instead of `makecert.exe` and `pvk2pfx.exe`.
-    * Can now run non-interactively: added a `-Password` parameter used to protect the private key (it used to prompt you).
-    * Fixed: generates a key pair that isn't supported for encrypting/decrypting DSC credentials or supported by the CMS message cmdlets.
-    * Made the `-ValidFrom` and `-Authority` parameters obsolete.
- * Added some verbose messages to `Install-Group` and `Add-MemberToGroup` when they create/modify their objects.
- * `Install-Group` only saves changes to a group if changes were made.
+ * Fixed: unable to publish module to PowerShell Gallery because `RequiredAssemblies` module manifest data used an absolute path generated with `Join-Path` and `$PSScriptRoot`, which aren't allowed in module manifests.
+ * Fixed: missing PowerShell Gallery tags, license URI, project URI, and release notes metadata.
+ * Fixed: copyright date in module manifest is 2015.
+ * Fixed: PowerShell gallery missing function list.
+ * Fixed: Restricted user accounts can't import Carbon ([issue #180](https://bitbucket.org/splatteredbits/carbon/issues/180)).
+ * Fixed: `Carbon_Privilege` DSC resource fails to remove all a user's privileges ([issue #178](https://bitbucket.org/splatteredbits/carbon/issues/178)).
+ * Fixed: `Remove-IniEntry` fails to remove last INI entry in a file ([issue #179](https://bitbucket.org/splatteredbits/carbon/issues/179)).
 '@
         } # End of PSData hashtable
     
