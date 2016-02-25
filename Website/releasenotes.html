@@ -16,7 +16,21 @@
 		<li><a href="http://pshdo.com">-Blog</a></li>
     </ul>
 
-    <h1>2.1.0 (8 February 2016)</h1>
+    <h1>2.1.1 (25 February 2016)</h1>
+
+<h2>Bug Fixes</h2>
+
+<ul>
+<li>Fixed: unable to publish module to PowerShell Gallery because <code>RequiredAssemblies</code> module manifest data used an absolute path generated with <code>Join-Path</code> and <code>$PSScriptRoot</code>, which aren't allowed in module manifests.</li>
+<li>Fixed: missing PowerShell Gallery tags, license URI, project URI, and release notes metadata.</li>
+<li>Fixed: copyright date in module manifest is 2015.</li>
+<li>Fixed: PowerShell gallery missing function list.</li>
+<li>Fixed: Restricted user accounts can't import Carbon (<a href="https://bitbucket.org/splatteredbits/carbon/issues/180">issue #180</a>).</li>
+<li>Fixed: <code>Carbon_Privilege</code> DSC resource fails to remove all a user's privileges (<a href="https://bitbucket.org/splatteredbits/carbon/issues/178">issue #178</a>).</li>
+<li>Fixed: <a href="Remove-IniEntry.html">Remove-IniEntry</a> fails to remove last INI entry in a file (<a href="https://bitbucket.org/splatteredbits/carbon/issues/179">issue #179</a>).</li>
+</ul>
+
+<h1>2.1.0 (8 February 2016)</h1>
 
 <h2>New Functions</h2>
 
