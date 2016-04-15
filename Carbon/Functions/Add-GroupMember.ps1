@@ -59,13 +59,14 @@ function Add-GroupMember
         return
     }
     
+    [DirectoryServices.DirectoryEntry]$groupDE = $group.GetUnderlyingObject();
     try
     {
         $changesMade = $false
         $Member | 
             ForEach-Object { Resolve-Identity -Name $_ } |
             ForEach-Object {
-                $identity = $_
+                [Carbon.Identity]$identity = $_
                 [DirectoryServices.AccountManagement.PrincipalContext]$identityCtx = Get-IdentityPrincipalContext -Identity $_
                 if( -not $identityCtx )
                 {
@@ -74,13 +75,31 @@ function Add-GroupMember
 
                 try
                 {
-                    $notAMember = -not $group.Members.Contains( $identityCtx, 'Sid', $identity.Sid.Value )
-                    if( $notAMember )
+                    # We can't enumerate the GroupPrincipal object's Members because it does a full
+                    # lookup on each member which doesn't work over PowerShell remoting if the group 
+                    # has a member from a domain.
+                    $members = $groupDE.Invoke('Members')
+                    $isAMember = $false
+                    foreach( $_member in $members )
+                    {
+                        $memberDE = New-Object 'DirectoryServices.DirectoryEntry' $_member
+                        $sid = New-Object 'Security.Principal.SecurityIdentifier' $memberDE.Properties['objectSid'].Value, 0
+                        if( $sid -eq $identity.Sid.Value )
+                        {
+                            $isAMember = $true
+                            break
+                        }
+                    }
+
+                    if( -not $isAMember )
                     {
             	        try
             	        {
                             Write-Verbose -Message ('[{0}] Members       -> {1}' -f $Name,$identity.FullName)
-                            $group.Members.Add( $identityCtx, 'Sid', $identity.Sid.Value )
+                            # We can't use the GroupPrincipal object's Members.Add() method because it enumerates
+                            # all the members which doesn't work over PowerShell remoting if the group has a member
+                            # from a domain.
+                            $groupDE.Add( ('WinNT://{0}/{1}' -f $identity.Domain, $identity.Name) )
                             $changesMade = $true
                         }
                         catch
@@ -101,7 +120,7 @@ function Add-GroupMember
             {
                 if( $PSCmdlet.ShouldProcess( ('local group {0}' -f $Name), 'adding members' ) )
                 {
-                    $group.Save()
+                    $groupDE.CommitChanges()
                 }
             }
             catch
