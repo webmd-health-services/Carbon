@@ -21,7 +21,16 @@ namespace Carbon
 {
     public sealed class Identity
     {
-        [DllImport("advapi32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+		// ReSharper disable InconsistentNaming
+		[DllImport("advapi32", CharSet = CharSet.Auto, SetLastError = true)]
+		private static extern bool ConvertSidToStringSid(
+			[MarshalAs(UnmanagedType.LPArray)] byte[] pSID,
+			out IntPtr ptrSid);
+
+		[DllImport("kernel32.dll")]
+		private static extern IntPtr LocalFree(IntPtr hMem);
+
+		[DllImport("advapi32.dll", CharSet = CharSet.Auto, SetLastError = true)]
         private static extern bool LookupAccountName(
             string lpSystemName,
             string lpAccountName,
@@ -41,14 +50,46 @@ namespace Carbon
           ref uint cchReferencedDomainName,
           out IdentityType peUse);
         
-        [DllImport("advapi32", CharSet = CharSet.Auto, SetLastError = true)]
-        private static extern bool ConvertSidToStringSid(
-            [MarshalAs(UnmanagedType.LPArray)] byte[] pSID,
-            out IntPtr ptrSid);
+		[DllImport("NetApi32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+		private static extern int NetLocalGroupAddMembers(
+			string servername, //server name 
+			string groupname, //group name 
+			UInt32 level, //info level 
+			ref LOCALGROUP_MEMBERS_INFO_0 buf, //Group info structure 
+			UInt32 totalentries //number of entries 
+			);
 
-        [DllImport("kernel32.dll")]
-        private static extern IntPtr LocalFree(IntPtr hMem);
-        // ReSharper restore InconsistentNaming
+		[DllImport("NetApi32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+		private static extern int NetLocalGroupDelMembers(
+			string servername, //server name 
+			string groupname, //group name 
+			UInt32 level, //info level 
+			ref LOCALGROUP_MEMBERS_INFO_0 buf, //Group info structure 
+			UInt32 totalentries //number of entries 
+			);
+
+		[DllImport("NetAPI32.dll", CharSet = CharSet.Unicode)]
+		private extern static int NetLocalGroupGetMembers(
+			[MarshalAs(UnmanagedType.LPWStr)] string servername,
+			[MarshalAs(UnmanagedType.LPWStr)] string localgroupname,
+			int level,
+			out IntPtr bufptr,
+			int prefmaxlen,
+			out int entriesread,
+			out int totalentries,
+			IntPtr resume_handle);
+
+		[DllImport("Netapi32.dll", SetLastError = true)]
+		private static extern int NetApiBufferFree(IntPtr buffer);
+
+		[StructLayout(LayoutKind.Sequential)]
+		private struct LOCALGROUP_MEMBERS_INFO_0
+		{
+			[MarshalAs(UnmanagedType.SysInt)]
+			public IntPtr pSID;
+
+		}
+		// ReSharper restore InconsistentNaming
 
         private Identity(string domain, string name, SecurityIdentifier sid, IdentityType type)
         {
@@ -86,15 +127,33 @@ namespace Carbon
             return Sid.Equals(((Identity) obj).Sid);
         }
 
-        public override int GetHashCode()
-        {
-            return Sid.GetHashCode();
-        }
+		public void AddToLocalGroup(string groupName)
+		{
+			var sidBytes = new byte[Sid.BinaryLength];
+			Sid.GetBinaryForm(sidBytes, 0);
 
-        public override string ToString()
-        {
-            return FullName;
-        }
+			var info3 = new LOCALGROUP_MEMBERS_INFO_0
+			{
+				pSID = Marshal.AllocHGlobal(sidBytes.Length)
+			};
+
+			try
+			{
+				Marshal.Copy(sidBytes, 0, info3.pSID, sidBytes.Length);
+
+				var result = NetLocalGroupAddMembers(null, groupName, 0, ref info3, 1);
+				if (result == Win32ErrorCodes.NERR_Success || result == Win32ErrorCodes.MemberInAlias)
+				{
+					return;
+				}
+
+				throw new Win32Exception(result);
+			}
+			finally
+			{
+				Marshal.FreeHGlobal(info3.pSID);
+			}
+		}
 
         public static Identity FindByName(string name)
         {
@@ -212,6 +271,83 @@ namespace Carbon
             }
 
         }
-    }
+
+		public override int GetHashCode()
+		{
+			return Sid.GetHashCode();
+		}
+
+		public bool IsMemberOfLocalGroup(string groupName)
+		{
+			int entriesRead;
+			int totalEntries;
+			var resume = IntPtr.Zero;
+			IntPtr buffer;
+			var result = NetLocalGroupGetMembers(null, groupName, 0, out buffer, -1, out entriesRead, out totalEntries, resume);
+			try
+			{
+				if (result != Win32ErrorCodes.NERR_Success)
+				{
+					throw new Win32Exception(result);
+				}
+
+				if (entriesRead == 0)
+				{
+					return false;
+				}
+
+				var iter = buffer;
+				for (var i = 0; i < entriesRead; i++)
+				{
+					var memberPtr = iter + (Marshal.SizeOf(typeof(LOCALGROUP_MEMBERS_INFO_0)) * i);
+					var memberInfo = (LOCALGROUP_MEMBERS_INFO_0)Marshal.PtrToStructure(memberPtr, typeof(LOCALGROUP_MEMBERS_INFO_0));
+					var sid = new SecurityIdentifier(memberInfo.pSID);
+					if (sid.Value == Sid.Value)
+					{
+						return true;
+					}
+				}
+			}
+			finally
+			{
+				NetApiBufferFree(buffer);
+			}
+			return false;
+		}
+
+		public void RemoveFromLocalGroup(string groupName)
+		{
+			var sidBytes = new byte[Sid.BinaryLength];
+			Sid.GetBinaryForm(sidBytes, 0);
+
+			var info3 = new LOCALGROUP_MEMBERS_INFO_0
+			{
+				pSID = Marshal.AllocHGlobal(sidBytes.Length)
+			};
+
+			try
+			{
+				Marshal.Copy(sidBytes, 0, info3.pSID, sidBytes.Length);
+
+				var result = NetLocalGroupDelMembers(null, groupName, 0, ref info3, 1);
+				if (result == Win32ErrorCodes.NERR_Success || result == Win32ErrorCodes.MemberNotInAlias)
+				{
+					return;
+				}
+
+				throw new Win32Exception(result);
+			}
+			finally
+			{
+				Marshal.FreeHGlobal(info3.pSID);
+			}
+		}
+
+		public override string ToString()
+		{
+			return FullName;
+		}
+
+	}
 }
 

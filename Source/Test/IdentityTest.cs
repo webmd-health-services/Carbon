@@ -104,6 +104,20 @@ namespace Carbon.Test
 		    Assert.That(id, Is.Null);
 	    }
 
+	    [Test]
+	    public void ShouldAddUserToGroup()
+	    {
+		    var id = Identity.FindByName(string.Format("{0}\\{1}", Environment.UserDomainName, Environment.UserName));
+		    id.AddToLocalGroup("CarbonShareRead");
+	    }
+
+	    [Test]
+	    public void ShouldFindUserInGroup()
+	    {
+			var id = Identity.FindByName(string.Format("{0}\\{1}", Environment.UserDomainName, Environment.UserName));
+		    Assert.That(id.IsMemberOfLocalGroup("Administrators"), Is.True);
+	    }
+
         private void ThenIdentityShouldBe(string domain, string name)
         {
 			Assert.That(_identity, Is.Not.Null);

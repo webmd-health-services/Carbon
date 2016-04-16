@@ -59,73 +59,34 @@ function Add-GroupMember
         return
     }
     
-    [DirectoryServices.DirectoryEntry]$groupDE = $group.GetUnderlyingObject();
     try
     {
-        $changesMade = $false
-        $Member | 
-            ForEach-Object { Resolve-Identity -Name $_ } |
-            ForEach-Object {
-                [Carbon.Identity]$identity = $_
-                [DirectoryServices.AccountManagement.PrincipalContext]$identityCtx = Get-IdentityPrincipalContext -Identity $_
-                if( -not $identityCtx )
-                {
-                    return
-                }
-
-                try
-                {
-                    # We can't enumerate the GroupPrincipal object's Members because it does a full
-                    # lookup on each member which doesn't work over PowerShell remoting if the group 
-                    # has a member from a domain.
-                    $members = $groupDE.Invoke('Members')
-                    $isAMember = $false
-                    foreach( $_member in $members )
-                    {
-                        $memberDE = New-Object 'DirectoryServices.DirectoryEntry' $_member
-                        $sid = New-Object 'Security.Principal.SecurityIdentifier' $memberDE.Properties['objectSid'].Value, 0
-                        if( $sid -eq $identity.Sid.Value )
-                        {
-                            $isAMember = $true
-                            break
-                        }
-                    }
-
-                    if( -not $isAMember )
-                    {
-            	        try
-            	        {
-                            Write-Verbose -Message ('[{0}] Members       -> {1}' -f $Name,$identity.FullName)
-                            # We can't use the GroupPrincipal object's Members.Add() method because it enumerates
-                            # all the members which doesn't work over PowerShell remoting if the group has a member
-                            # from a domain.
-                            $groupDE.Add( ('WinNT://{0}/{1}' -f $identity.Domain, $identity.Name) )
-                            $changesMade = $true
-                        }
-                        catch
-                        {
-                            Write-Error ('Failed to add ''{0}'' to group ''{1}'': {2}.' -f $identity,$Name,$_)
-                        }
-                    }
-                }
-                finally
-                {
-                    $identityCtx.Dispose()
-                }
+        foreach( $_member in $Member )
+        {
+            $identity = Resolve-Identity -Name $_member
+            if( -not $identity )
+            {
+                continue
             }
 
-        if( $changesMade )
-        {
+            if( (Test-GroupMember -GroupName $group.Name -Member $_member) )
+            {
+                continue
+            }
+
+            Write-Verbose -Message ('[{0}] Members       -> {1}' -f $Name,$identity.FullName)
+            if( -not $PSCmdlet.ShouldProcess(('adding ''{0}'' to local group ''{1}''' -f $identity.FullName, $group.Name), $null, $null) )
+            {
+                continue
+            }
+
             try
             {
-                if( $PSCmdlet.ShouldProcess( ('local group {0}' -f $Name), 'adding members' ) )
-                {
-                    $groupDE.CommitChanges()
-                }
+                $identity.AddToLocalGroup( $group.Name )
             }
             catch
             {
-                Write-Error ('Failed to save changes to group ''{0}'': {1}.' -f $Name,$_)
+                Write-Error ('Failed to add ''{0}'' to group ''{1}'': {2}.' -f $identity,$group.Name,$_)
             }
         }
     }

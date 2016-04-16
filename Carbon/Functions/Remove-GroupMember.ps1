@@ -61,48 +61,32 @@ function Remove-GroupMember
     
     try
     {
-        $changesMade = $false
-        $Member | 
-            ForEach-Object { Resolve-Identity -Name $_ } |
-            ForEach-Object {
-                $identity = $_
-                [DirectoryServices.AccountManagement.PrincipalContext]$identityCtx = Get-IdentityPrincipalContext -Identity $_
-                if( -not $identityCtx )
-                {
-                    return
-                }
-
-                try
-                {
-                    $isMember = $group.Members.Contains( $identityCtx, 'Sid', $identity.Sid.Value )
-                    if( $isMember -and $pscmdlet.ShouldProcess( $group.Name, ("remove member {0}" -f $identity.FullName) ) )
-                    {
-            	        try
-            	        {
-                            [void]$group.Members.Remove( $identityCtx, 'Sid', $identity.Sid.Value )
-                            $changesMade = $true
-                        }
-                        catch
-                        {
-                            Write-Error ('Failed to remove ''{0}'' to group ''{1}'': {2}.' -f $identity,$Name,$_)
-                        }
-                    }
-                }
-                finally
-                {
-                    $identityCtx.Dispose()
-                }
+        foreach( $_member in $Member )
+        {
+            $identity = Resolve-Identity -Name $_member
+            if( -not $identity )
+            {
+                continue
             }
 
-        if( $changesMade )
-        {
+            if( -not (Test-GroupMember -GroupName $group.Name -Member $_member) )
+            {
+                continue
+            }
+
+            Write-Verbose -Message ('[{0}] Members      {1} ->' -f $Name,$identity.FullName)
+            if( -not $PSCmdlet.ShouldProcess(('removing ''{0}'' from local group ''{1}''' -f $identity.FullName, $group.Name), $null, $null) )
+            {
+                continue
+            }
+
             try
             {
-                $group.Save()
+                $identity.RemoveFromLocalGroup( $group.Name )
             }
             catch
             {
-                Write-Error ('Failed to save changes to group ''{0}'': {1}.' -f $Name,$_)
+                Write-Error ('Failed to remove ''{0}'' from local group ''{1}'': {2}.' -f $identity,$group.Name,$_)
             }
         }
     }

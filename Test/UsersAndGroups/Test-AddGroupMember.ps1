@@ -156,7 +156,7 @@ function Test-ShouldRefuseToAddLocalGroupToLocalGroup
 {
     Add-GroupMember -Name $GroupName -Member $GroupName -ErrorAction SilentlyContinue
     Assert-Equal 2 $Error.Count
-    Assert-Like $Error[0].Exception.Message '*Failed to save changes*'
+    Assert-Like $Error[0].Exception.Message '*Failed to add*'
 }
 
 function Test-ShouldNotAddNonExistentMember
