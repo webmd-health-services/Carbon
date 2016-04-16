@@ -60,8 +60,18 @@ Describe 'Install-Msi' {
             Get-Msi |
             Where-Object { Get-ProgramInstallInfo -Name $_.ProductName } |
             ForEach-Object {
-                msiexec /f $_.Path /quiet
-                msiexec /uninstall $_.Path /quiet
+                #msiexec /fa $_.Path /quiet /l*vx 'D:\restore.log'
+                $msiProcess = Start-Process -FilePath "msiexec.exe" -ArgumentList "/quiet","/fa",('"{0}"' -f $_.Path) -NoNewWindow -Wait -PassThru
+                if( $msiProcess.ExitCode -ne $null -and $msiProcess.ExitCode -ne 0 )
+                {
+                    Write-Error ("{0} {1} repair failed. (Exit code: {2}; MSI: {3})" -f $_.ProductName,$_.ProductVersion,$msiProcess.ExitCode,$_.Path)
+                }
+                #msiexec /uninstall $_.Path /quiet /l*vx 'D:\uninstall.log'
+                $msiProcess = Start-Process -FilePath "msiexec.exe" -ArgumentList "/quiet","/uninstall",('"{0}"' -f $_.Path) -NoNewWindow -Wait -PassThru
+                if( $msiProcess.ExitCode -ne $null -and $msiProcess.ExitCode -ne 0 )
+                {
+                    Write-Error ("{0} {1} uninstall failed. (Exit code: {2}; MSI: {3})" -f $_.ProductName,$_.ProductVersion,$msiProcess.ExitCode,$_.Path)
+                }
             }
         Assert-CarbonTestInstallerNotInstalled
     }
@@ -127,9 +137,19 @@ Describe 'Install-Msi' {
         $msi = Get-Msi -Path $carbonTestInstallerActions
         $installDir = Join-Path ${env:ProgramFiles(x86)} -ChildPath ('{0}\{1}' -f $msi.Manufacturer,$msi.ProductName)
         $installDir | Should Exist
-        Remove-Item -Path $installDir -Recurse
-        Install-Msi -Path $carbonTestInstallerActions
-        $installDir | Should Not Exist
+        $tempName = [IO.Path]::GetRandomFileName()
+        Rename-Item -Path $installDir -NewName $tempName
+        try
+        {
+            Install-Msi -Path $carbonTestInstallerActions
+            $installDir | Should Not Exist
+        }
+        finally
+        {
+            $tempDir = Split-Path -Path $installDir -Parent
+            $tempDir = Join-Path -Path $tempDir -ChildPath $tempName
+            Rename-Item -Path $tempDir -NewName (Split-Path -Path $installDir -Leaf)
+        }
     }
     
     It 'should reinstall if forced to' {
