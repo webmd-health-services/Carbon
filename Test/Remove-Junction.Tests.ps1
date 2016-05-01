@@ -24,6 +24,7 @@ Describe 'Remove-Junction' {
     }
     
     BeforeEach {
+        $Global:Error.Clear()
         $JunctionPath = Join-Path $tempDir ([IO.Path]::GetRandomFileName())
         New-Junction $JunctionPath $PSScriptRoot
     }
@@ -33,6 +34,10 @@ Describe 'Remove-Junction' {
         {
             cmd /c rmdir $JunctionPath
         }
+        Get-ChildItem -Path $tempDir -Directory |
+            Where-Object { $_.IsJunction } |
+            ForEach-Object { Remove-Junction -LiteralPath $_.FullName }
+        Remove-Item -Path $tempDir -Recurse
     }
     
     It 'should remove junction' {
@@ -84,5 +89,48 @@ Describe 'Remove-Junction' {
             Pop-Location
         }
     }
+
+    It 'should remove junction with wildcard characters' {
+        Remove-Junction -Path $junctionPath
+        $junctionPath = Join-Path -Path $tempDir -ChildPath 'withspecialchars[]'
+        Install-Junction -Link $junctionPath -Target $PSScriptRoot
+        Remove-Junction -Path $junctionPath
+    }
     
+    It 'should remove multiple junctions with wildcards' {
+        $filePath = Join-Path -Path $tempDir -ChildPath 'file'
+        New-Item -Path $filePath -ItemType 'file'
+        $dirPath = Join-Path -Path $tempDir -ChildPath 'dir'
+        New-Item -Path $dirPath -ItemType 'directory'
+        $secondJunction = Join-Path -Path $tempDir -ChildPath 'junction2' 
+        Install-Junction -Link $secondJunction -Target $PSScriptRoot
+
+        Remove-Junction -Path (Join-Path -Path $tempDir -ChildPath '*')
+        Get-ChildItem -Path $tempDir | Measure-Object | Select-Object -ExpandProperty 'Count' | Should Be 2
+        $filePath | Should Exist
+        $dirPath | Should Exist
+        $JunctionPath | Should Not Exist
+        $secondJunction | Should not Exist
+    }
+
+    It 'should not give an error if no junctions and using a wildcard' {
+        Remove-Junction -Path $JunctionPath
+
+        $filePath = Join-Path -Path $tempDir -ChildPath 'file'
+        New-Item -Path $filePath -ItemType 'file'
+        $dirPath = Join-Path -Path $tempDir -ChildPath 'dir'
+        New-Item -Path $dirPath -ItemType 'directory'
+
+        Remove-Junction -Path (Join-Path -Path $tempDir -ChildPath '*')
+        $Global:Error.Count | Should Be 0
+        $filePath | Should Exist
+        $dirPath | Should Exist
+    }
+
+    It 'should not give an error if nothing at all to delete' {
+        Remove-Junction -Path $JunctionPath
+        Get-ChildItem -Path $tempDir | Measure-Object | Select-Object -ExpandProperty 'Count' | Should Be 0
+        Remove-Junction -Path (Join-Path -Path $tempDir -ChildPath '*')
+        $Global:Error.Count | Should Be 0
+    }
 }
