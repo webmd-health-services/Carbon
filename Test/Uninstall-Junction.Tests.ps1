@@ -10,83 +10,78 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-$JunctionPath = $null
+& (Join-Path -Path $PSScriptRoot 'Import-CarbonForTest.ps1' -Resolve)
 
-function Start-TestFixture
-{
-    & (Join-Path -Path $PSScriptRoot '..\Import-CarbonForTest.ps1' -Resolve)
-}
+Describe 'Uninstall-Junction' {
+    $JunctionPath = $null
 
-function Start-Test
-{
-    $JunctionPath = Join-Path $env:Temp ([IO.Path]::GetRandomFileName())
-    New-Junction $JunctionPath $TestDir
-}
-
-function Stop-Test
-{
-    if( Test-Path $JunctionPath -PathType Container )
-    {
-        cmd /c rmdir $JunctionPath
+    BeforeEach {
+        $Global:Error.Clear()
+        $JunctionPath = Join-Path $env:Temp ([IO.Path]::GetRandomFileName())
+        New-Junction $JunctionPath $PSScriptRoot
     }
-}
-
-function Invoke-UninstallJunction($junction)
-{
-    Uninstall-Junction $junction
-}
-
-function Test-ShouldUninstallJunction
-{
-    Invoke-UninstallJunction $JunctionPath
-    Assert-NoError
-    Assert-DirectoryDoesNotExist $JunctionPath 'Failed to delete junction.'
-    Assert-DirectoryExists $TestDir
-}
-
-function Test-ShouldFailIfJunctionActuallyADirectory
-{
-    $realDir = Join-Path $env:Temp ([IO.Path]::GetRandomFileName())
-    New-Item $realDir -ItemType 'Directory'
-    $error.Clear()
-    Invoke-UninstallJunction $realDir 2> $null
-    Assert-Error -Last -Regex 'is a directory'
-    Assert-DirectoryExists $realDir 'Real directory was removed.'
-    Remove-Item $realDir
-}
-
-function Test-ShouldFailIfJunctionActuallyAFile
-{
-    $path = [IO.Path]::GetTempFileName()
-    $error.Clear()
-    Invoke-UninstallJunction $path 2> $null
-    Assert-Error -Last -Regex 'is a file'
-    Assert-FileExists $path 'File was deleted'
-    Remove-Item $path
-}
-
-function Test-ShouldSupportWhatIf
-{
-    Uninstall-Junction -Path $JunctionPath -WhatIf
-    Assert-DirectoryExists $JunctionPath
-    Assert-FileExists (Join-Path $JunctionPath Test-RemoveJunction.ps1)
-    Assert-DirectoryExists $TestDir
-}
-
-function Test-ShouldRemoveJunctionWithRelativePath
-{
-    $parentDir = Split-Path -Parent -Path $JunctionPath
-    $junctionName = Split-Path -Leaf -Path $JunctionPath
-    Push-Location $parentDir
-    try
-    {
-        Uninstall-Junction -Path ".\$junctionName"
-        Assert-DirectoryDoesNotExist $JunctionPath 'Failed to delete junction with relative path.'
-        Assert-DirectoryExists $TestDir
+    
+    AfterEach {
+        if( Test-Path $JunctionPath -PathType Container )
+        {
+            cmd /c rmdir $JunctionPath
+        }
     }
-    finally
+    
+    function Invoke-UninstallJunction($junction)
     {
-        Pop-Location
+        Uninstall-Junction $junction
     }
+    
+    It 'should uninstall junction' {
+        Invoke-UninstallJunction $JunctionPath
+        $Global:Error.Count | Should Be 0
+        $JunctionPath | Should Not Exist
+        $PSScriptRoot | Should Exist
+    }
+    
+    It 'should fail if junction actually a directory' {
+        $realDir = Join-Path $env:Temp ([IO.Path]::GetRandomFileName())
+        New-Item $realDir -ItemType 'Directory'
+        $error.Clear()
+        Invoke-UninstallJunction $realDir 2> $null
+        $Global:Error.Count | Should BeGreaterThan 0
+        $Global:Error[0] | Should Match 'is a directory'
+        $realDir | Should Exist
+        Remove-Item $realDir
+    }
+    
+    It 'should fail if junction actually a file' {
+        $path = [IO.Path]::GetTempFileName()
+        $error.Clear()
+        Invoke-UninstallJunction $path 2> $null
+        $Global:Error.Count | Should BeGreaterThan 0
+        $Global:Error[0] | Should Match 'is a file'
+        $path | Should Exist
+        Remove-Item $path
+    }
+    
+    It 'should support what if' {
+        Uninstall-Junction -Path $JunctionPath -WhatIf
+        $JunctionPath | Should Exist
+        (Join-Path $JunctionPath (Split-Path $PSCommandPath -Leaf)) | Should Exist
+        $PSScriptRoot | Should Exist
+    }
+    
+    It 'should remove junction with relative path' {
+        $parentDir = Split-Path -Parent -Path $JunctionPath
+        $junctionName = Split-Path -Leaf -Path $JunctionPath
+        Push-Location $parentDir
+        try
+        {
+            Uninstall-Junction -Path ".\$junctionName"
+            $JunctionPath | Should Not Exist
+            $PSScriptRoot | Should Exist
+        }
+        finally
+        {
+            Pop-Location
+        }
+    }
+    
 }
-
