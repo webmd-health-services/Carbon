@@ -71,9 +71,10 @@ function Test-ShouldReinstallUnchangedServiceWithForceParameter
                                          -EntryType Information |
                                 Where-Object { ($_.EventID -eq 7036 -or $_.EventID -eq 7045) -and $_.Message -like ('*{0}*' -f $serviceName) }
 
-        if( $events -and $events.Count -ge 4 )
+        if( $events )
         {
-            if( $events[0].Message -like '*entered the running state*' -and 
+            if( $events.Count -ge 4 -and
+                $events[0].Message -like '*entered the running state*' -and 
                 $events[1].Message -like '*entered the stopped state*' -and 
                 $events[2].Message -like '*entered the running state*' -and
                 $events[3].Message -like '*was installed*' )
@@ -81,6 +82,15 @@ function Test-ShouldReinstallUnchangedServiceWithForceParameter
                 $serviceReinstalled = $true
                 break
             }
+
+            # Windows 10 (and probably Windows 2016)
+            if( $events.Count -eq 1 -and 
+                $events[0].Message -like '*A service was installed*' )
+            {
+                $serviceReinstalled = $true
+                break
+            }
+
         }
         else
         {
