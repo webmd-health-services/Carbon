@@ -10,52 +10,47 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-$JunctionPath = $null
+& (Join-Path -Path $PSScriptRoot 'Import-CarbonForTest.ps1' -Resolve)
 
-function Start-TestFixture
-{
-    & (Join-Path -Path $PSScriptRoot '..\Import-CarbonForTest.ps1' -Resolve)
-}
+Describe 'New-Junction' {
 
-function Start-Test
-{
-    $Script:JunctionPath = Join-Path $env:Temp ([IO.Path]::GetRandomFileName())
-}
-
-function Stop-Test
-{
-    fsutil reparsepoint delete $Script:JunctionPath
-}
-
-function Invoke-NewJunction($link, $target)
-{
-    return New-Junction $link $target
-}
-
-function Test-ShouldCreateJunction
-{
-    $result = Invoke-NewJunction $JunctionPath $TestDir
-    Assert-NotNull $result 'Did not get a result from New-Junction'
-    Assert-DirectoryExists $JunctionPath
-    Assert-Like $result.Attributes ReparsePoint 'Junction not created as a junction.'
-}
-
-function Test-ShouldNotCreateJunctionIfLinkIsDirectory
-{
-    $error.Clear()
-    $result = Invoke-NewJunction $TestDir $env:Temp 2> $null
-    Assert-Equal 1 @($error).Length "Didn't write an error if a junction already exists."
-    Assert-Null $result "Returned a non-null object when failing to create a junction."
-}
-
-function Test-ShouldNotCreateJunctionIfJunctionAlreadyExists
-{
-    $error.Clear()
-    Invoke-NewJunction $JunctionPath $TestDir
-    Assert-Equal 0 @($error).Length "Got an error creating a junction."
+    $JunctionPath = $null
     
-    $result = Invoke-NewJunction $JunctionPath $env:Temp 2> $null
-    Assert-Equal 1 @($error).Length "Didn't get an error failing to create a junction."
-    Assert-Null $result 'Returned a non-null object when creating a junction that already exists.'
+    BeforeEach {
+        $JunctionPath = Join-Path $env:Temp ([IO.Path]::GetRandomFileName())
+    }
+    
+    AfterEach {
+        fsutil reparsepoint delete $JunctionPath
+    }
+    
+    function Invoke-NewJunction($link, $target)
+    {
+        return New-Junction $link $target
+    }
+    
+    It 'should create junction' {
+        $result = Invoke-NewJunction $JunctionPath $PSScriptRoot
+        $result | Should Not BeNullOrEmpty
+        $JunctionPath | Should Exist
+        $result.Attributes -like '*ReparsePoint*' | Should Be $true
+    }
+    
+    It 'should not create junction if link is directory' {
+        $error.Clear()
+        $result = Invoke-NewJunction $PSScriptRoot $env:Temp 2> $null
+        @($error).Length | Should Be 1
+        $result | Should BeNullOrEmpty
+    }
+    
+    It 'should not create junction if junction already exists' {
+        $error.Clear()
+        Invoke-NewJunction $JunctionPath $PSScriptRoot
+        @($error).Length | Should Be 0
+        
+        $result = Invoke-NewJunction $JunctionPath $env:Temp 2> $null
+        @($error).Length | Should Be 1
+        $result | Should BeNullOrEmpty
+    }
+    
 }
-
