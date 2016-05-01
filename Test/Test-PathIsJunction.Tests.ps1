@@ -10,50 +10,49 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Start-TestFixture
-{
-    & (Join-Path -Path $PSScriptRoot -ChildPath '..\Import-CarbonForTest.ps1' -Resolve)
-}
+& (Join-Path -Path $PSScriptRoot -ChildPath 'Import-CarbonForTest.ps1' -Resolve)
 
-function Invoke-TestPathIsJunction($path)
-{
-    return Test-PathIsJunction $path
-}
+Describe 'Test-PathIsJunction' {
+    
+    function Invoke-TestPathIsJunction($path)
+    {
+        return Test-PathIsJunction $path
+    }
 
-function Test-ShouldKnowFilesAreNotReparsePoints
-{
-    $result = Test-PathIsJunction $TestScript
-    Assert-False $result 'Detected a file as being a reparse point'
+    BeforeEach {
+        $Global:Error.Clear()
+    }
+    
+    It 'should know files are not reparse points' {
+        $result = Test-PathIsJunction $PSCommandPath
+        $result | Should Be $false
+    }
+    
+    It 'should know directories are not reparse points' {
+        $result = Invoke-TestPathIsJunction $PSScriptRoot
+        $result | Should Be $false
+    }
+    
+    It 'should detect a reparse point' {
+        $reparsePath = Join-Path $env:Temp ([IO.Path]::GetRandomFileName())
+        New-Junction $reparsePath $PSScriptRoot
+        $result = Invoke-TestPathIsJunction $reparsePath
+        $result | Should Be $true
+        Remove-Junction $reparsePath
+    }
+    
+    It 'should handle non existent path' {
+        $result = Invoke-TestPathIsJunction ([IO.Path]::GetRandomFileName())
+        $result | Should Be $false
+        $error.Count | Should Be 0
+    }
+    
+    It 'should handle hidden file' {
+        $tempDir = New-TempDir -Prefix (Split-Path -Leaf -Path $PSCommandPath)
+        $tempDir.Attributes = $tempDir.Attributes -bor [IO.FileAttributes]::Hidden
+        $result = Invoke-TestPathIsJunction $tempDir
+        $result | Should Be $false
+        $Global:Error.Count | Should Be 0
+    }
+    
 }
-
-function Test-ShouldKnowDirectoriesAreNotReparsePoints
-{
-    $result = Invoke-TestPathIsJunction $PSScriptRoot
-    Assert-False $result 'Detected a directory as being a reparse point'
-}
-
-function Test-ShouldDetectAReparsePoint
-{
-    $reparsePath = Join-Path $env:Temp ([IO.Path]::GetRandomFileName())
-    New-Junction $reparsePath $PSScriptRoot
-    $result = Invoke-TestPathIsJunction $reparsePath
-    Assert-True $result 'junction not detected'
-    Remove-Junction $reparsePath
-}
-
-function Test-ShouldHandleNonExistentPath
-{
-    $result = Invoke-TestPathIsJunction ([IO.Path]::GetRandomFileName())
-    Assert-False $result 'detected a non-existent junction'
-    Assert-Equal 0 $error.Count 'there were errors detecting a non-existent junction'
-}
-
-function Test-ShouldHandleHiddenFile
-{
-    $tempDir = New-TempDir -Prefix (Split-Path -Leaf -Path $PSCommandPath)
-    $tempDir.Attributes = $tempDir.Attributes -bor [IO.FileAttributes]::Hidden
-    $result = Invoke-TestPathIsJunction $tempDir
-    Assert-False $result
-    Assert-NoError
-}
-
