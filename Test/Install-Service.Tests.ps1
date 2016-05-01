@@ -20,7 +20,9 @@ Describe 'Install-Service' {
     $servicePassword = [Guid]::NewGuid().ToString().Substring(0,14)
     $installServiceParams = @{ Verbose = $true }
     $startedAt = Get-Date
-    Install-User -Credential (New-Credential -UserName $serviceAcct -Password $servicePassword) -Description "Account for testing the Carbon Install-Service function."
+    $serviceCredential = New-Credential -UserName $serviceAcct -Password $servicePassword
+    Install-User -Credential $serviceCredential -Description "Account for testing the Carbon Install-Service function."
+    $defaultServiceAccountName = Resolve-IdentityName -Name 'NT AUTHORITY\NetworkService'
 
     function Assert-ServiceInstalled
     {
@@ -50,7 +52,7 @@ Describe 'Install-Service' {
     AfterEach {
         Uninstall-Service $serviceName
     }
-    
+
     It 'should install service' {
         $result = Install-Service -Name $serviceName -Path $servicePath @installServiceParams
         $result | Should BeNullOrEmpty
@@ -59,7 +61,7 @@ Describe 'Install-Service' {
         $service.Name | Should Be $serviceName
         $service.DisplayName | Should Be $serviceName
         $service.StartMode | Should Be 'Automatic'
-        $service.UserName | Should Be (Resolve-IdentityName -Name 'NT AUTHORITY\NetworkService')
+        $service.UserName | Should Be $defaultServiceAccountName
     }
     
     It 'should reinstall unchanged service with force parameter' {
@@ -554,4 +556,13 @@ Describe 'Install-Service' {
     
     }
     
+    It 'should switch from built-in account to custom acount with credential' {
+        Install-Service -Name $serviceName -Path $servicePath @installServiceParams
+        $service = Assert-ServiceInstalled
+        $service.UserName | Should Be $defaultServiceAccountName
+        Install-Service -Name $serviceName -Path $servicePath -Credential $serviceCredential
+        $service = Assert-ServiceInstalled
+        (Resolve-IdentityName $service.UserName) | Should Be (Resolve-IdentityName $serviceCredential.UserName)
+    }
+
 }
