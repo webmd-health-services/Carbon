@@ -9,7 +9,8 @@
 ## Bug Fixes
 
  * Fixed: `Add-GroupMember`, over PowerShell remoting, fails to add a member to groups that have non-local users/groups (fixes [issue #187: Add-GroupMember fails when using PowerShell Remoting](https://bitbucket.org/splatteredbits/carbon/issues/187/add-groupmember-fails-when-using))
- * Fixed: `Remove-GroupMember`, over PowerShell remoting, fails to remove a member from groups that have non-local users/groups
+ * Fixed: `Remove-GroupMember`, over PowerShell remoting, fails to remove a member from groups that have non-local users/groups.
+ * Fixed: `Test-PathIsJunction` returns multiple results if the `Path` parameter contains wildcards and matches multiple items.
  
  
 # 2.1.1 (25 February 2016)

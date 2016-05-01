@@ -57,7 +57,17 @@ Describe 'Test-PathIsJunction' {
  
     It 'should support literal paths' {
         $literalPath = Join-Path -Path 'TestDrive:' -ChildPath 'withspecialchars[]'
-        Test-PathIsJunction -LiteralPath $literalPath | Should Be $false
+        Test-PathIsJunction -Path $literalPath | Should Be $false
         $Global:Error.Count | Should Be 0
-    }   
+    }
+
+    It 'should return true if any path is a junction' {
+        New-Item -Path 'TestDrive:\dir' -ItemType 'Directory'
+        New-Item -Path 'TestDrive:\file' -ItemType 'File'
+        $tempDir = Get-Item -Path 'TestDrive:' |
+                        Select-Object -ExpandProperty 'FullName'
+        New-Junction -Link (Join-Path -Path $tempDir -ChildPath 'junction') -Target $PSScriptRoot
+        Test-PathIsJunction -Path 'TestDrive:\*' | Should Be $true
+        $Global:Error.Count | Should Be 0
+    }
 }
