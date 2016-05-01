@@ -53,7 +53,7 @@ function New-Junction
 
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
-    if( Test-Path $Link -PathType Container )
+    if( Test-Path -LiteralPath $Link -PathType Container )
     {
         Write-Error "'$Link' already exists."
     }

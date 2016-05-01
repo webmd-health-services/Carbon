@@ -15,13 +15,17 @@
 Describe 'New-Junction' {
 
     $JunctionPath = $null
+    $tempDir = Get-Item -Path 'TestDrive:'
     
     BeforeEach {
-        $JunctionPath = Join-Path $env:Temp ([IO.Path]::GetRandomFileName())
+        $Global:Error.Clear()
+        $JunctionPath = Join-Path $tempDir ([IO.Path]::GetRandomFileName())
     }
     
     AfterEach {
-        fsutil reparsepoint delete $JunctionPath
+        Get-ChildItem -Path $tempDir |
+            Where-Object { $_.PsIsContainer -and $_.IsJunction } |
+            ForEach-Object { Remove-Junction -LiteralPath $_.FullName }
     }
     
     function Invoke-NewJunction($link, $target)
@@ -38,7 +42,7 @@ Describe 'New-Junction' {
     
     It 'should not create junction if link is directory' {
         $error.Clear()
-        $result = Invoke-NewJunction $PSScriptRoot $env:Temp 2> $null
+        $result = Invoke-NewJunction $PSScriptRoot $tempDir 2> $null
         @($error).Length | Should Be 1
         $result | Should BeNullOrEmpty
     }
@@ -48,9 +52,26 @@ Describe 'New-Junction' {
         Invoke-NewJunction $JunctionPath $PSScriptRoot
         @($error).Length | Should Be 0
         
-        $result = Invoke-NewJunction $JunctionPath $env:Temp 2> $null
+        $result = Invoke-NewJunction $JunctionPath $tempDir 2> $null
         @($error).Length | Should Be 1
         $result | Should BeNullOrEmpty
+    }
+
+    It 'should create a junction containing wildcard characters' {
+        $JunctionPath = Join-Path -Path $tempDir -ChildPath 'containswildcards[]'
+        $result = New-Junction -Link $JunctionPath -Target $PSScriptRoot
+        $result | Should BeNullOrEmpty
+        $Global:Error.Count | Should Be 0
+        Test-PathIsJunction -LiteralPath $JunctionPath | Should Be $true
+    }
+
+    It 'should error if creating an existin junction containing wildcard characters' {
+        $JunctionPath = Join-Path -Path $tempDir -ChildPath 'containswildcards[]'
+        New-Junction -Link $JunctionPath -Target $PSScriptRoot
+        $Global:Error.Count | Should Be 0
+        New-Junction -Link $JunctionPath -Target $PSScriptRoot -ErrorAction SilentlyContinue
+        $Global:Error.Count | Should Be 1
+        $Global:Error | Where { $_ -like '*already exists*' } | Should Not BeNullOrEmpty
     }
     
 }

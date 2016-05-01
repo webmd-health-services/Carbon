@@ -12,7 +12,7 @@
  * Fixed: `Remove-GroupMember`, over PowerShell remoting, fails to remove a member from groups that have non-local users/groups.
  * Fixed: `Test-PathIsJunction` returns multiple results if the `Path` parameter contains wildcards and matches multiple items.
  * Fixed: `Install-Junction` can't install a junction whose path contains wildcard characters (fixes [issue #190](https://bitbucket.org/splatteredbits/carbon/issues/190/install-junction-fails-when-the-path)).
- 
+ * Fixed: `New-Junction` writes wrong error when creating an existing junction whose path contains wildcard characters.
  
 # 2.1.1 (25 February 2016)
 
