@@ -54,5 +54,10 @@ Describe 'Test-PathIsJunction' {
         $result | Should Be $false
         $Global:Error.Count | Should Be 0
     }
-    
+ 
+    It 'should support literal paths' {
+        $literalPath = Join-Path -Path 'TestDrive:' -ChildPath 'withspecialchars[]'
+        Test-PathIsJunction -LiteralPath $literalPath | Should Be $false
+        $Global:Error.Count | Should Be 0
+    }   
 }

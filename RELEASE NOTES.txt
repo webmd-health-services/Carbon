@@ -1,4 +1,8 @@
-# 2.1.2
+# 2.2.0
+
+## Enhancements
+
+ * `Test-PathIsJunction` now supports literal paths (i.e. paths with wildcard characters in them, e.g. `[`, `]`, etc.).
 
 ## Bug Fixes
 

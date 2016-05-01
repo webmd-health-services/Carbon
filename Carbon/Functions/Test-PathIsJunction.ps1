@@ -17,39 +17,65 @@ function Test-PathIsJunction
     Tests if a path is a junction.
     
     .DESCRIPTION
-    Tests if path is the path to a junction.  If `Path` doesn't exist, returns false.
+    The `Test-PathIsJunction` function tests if path is a junction (i.e. reparse point). If `Path` or `LiteralPath` doesn't exist, returns `$false`.
     
-    The alternate way of doing this is to use the `IsJunction` extension method on `DirectoryInfo` objects, which are returned by the `Get-Item` and `Get-ChildItem` cmdlets.
+    Carbon adds an `IsJunction` extension method on `DirectoryInfo` objects, which you can use instead e.g.
+    
+        Get-ChildItem -Path $env:Temp | 
+            Where-Object { $_.PsIsContainer -and $_.IsJunction }
+
+    would return all the junctions under the current user's temporary directory.
     
     .EXAMPLE
     Test-PathIsJunction -Path C:\I\Am\A\Junction
     
-    Returns `True`.
+    Returns `$true`.
     
     .EXAMPLE
     Test-PathIsJunction -Path C:\I\Am\Not\A\Junction
     
-    Returns `False`.
+    Returns `$false`.
     
     .EXAMPLE
     Get-ChildItem * | Where-Object { $_.PsIsContainer -and $_.IsJunction }
     
     Demonstrates an alternative way of testing for junctions.  Uses Carbon's `IsJunction` extension method on the `DirectoryInfo` type to check if any directories under the current directory are junctions.
+
+    .EXAMPLE
+    Test-PathIsJunction -LiteralPath 'C:\PathWithWildcards[]'
+
+    Demonstrates how to test if a path with wildcards is a junction.
     #>
-    [CmdletBinding()]
+    [CmdletBinding(DefaultParameterSetName='Path')]
     param(
+        [Parameter(Mandatory=$true,ParameterSetName='Path',Position=0)]
         [string]
-        # The path to check
-        $Path
+        # The path to check. Wildcards allowed.
+        $Path,
+
+        [Parameter(Mandatory=$true,ParameterSetName='LiteralPath')]
+        [string]
+        # The literal path to check. Wildcards not supported.
+        $LiteralPath
     )
     
     Set-StrictMode -Version 'Latest'
 
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
-    if( Test-Path $Path -PathType Container )
+    $pathParam = @{}
+    if( $PSCmdlet.ParameterSetName -eq 'Path' )
     {
-        return (Get-Item $Path -Force).IsJunction
+        $pathParam['Path'] = $Path
+    }
+    else
+    {
+        $pathParam['LiteralPath'] = $LiteralPath
+    }
+
+    if( Test-Path @pathParam -PathType Container )
+    {
+        return (Get-Item @pathParam -Force).IsJunction
     }
     return $false
 }
