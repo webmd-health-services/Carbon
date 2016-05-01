@@ -14,10 +14,11 @@
 
 Describe 'Uninstall-Junction' {
     $JunctionPath = $null
+    $tempDir = Get-Item -Path 'TestDrive:'
 
     BeforeEach {
         $Global:Error.Clear()
-        $JunctionPath = Join-Path $env:Temp ([IO.Path]::GetRandomFileName())
+        $JunctionPath = Join-Path $tempDir ([IO.Path]::GetRandomFileName())
         New-Junction $JunctionPath $PSScriptRoot
     }
     
@@ -41,7 +42,7 @@ Describe 'Uninstall-Junction' {
     }
     
     It 'should fail if junction actually a directory' {
-        $realDir = Join-Path $env:Temp ([IO.Path]::GetRandomFileName())
+        $realDir = Join-Path $tempDir ([IO.Path]::GetRandomFileName())
         New-Item $realDir -ItemType 'Directory'
         $error.Clear()
         Invoke-UninstallJunction $realDir 2> $null
@@ -82,6 +83,36 @@ Describe 'Uninstall-Junction' {
         {
             Pop-Location
         }
+    }
+
+    It 'should silently not remove a non-existent junction with wildcards' {
+        $path = Join-Path -Path $tempDir -ChildPath 'withwildcards[]'
+        Uninstall-Junction -Path $path
+        $Global:Error.Count | Should Be 0
+    }
+
+    It 'should remove a junction with wildcards' {
+        $path = Join-Path -Path $tempDir -ChildPath 'withwildcards[]'
+        Install-Junction -Link $path -Target $PSScriptRoot
+        Uninstall-Junction -LiteralPath $path
+        $Global:Error.Count | Should Be 0
+        Test-Path -LiteralPath $path | Should Be $false
+    }
+
+    It 'should only delete junctions when using wildcards' {
+        $filePath = Join-Path -Path $tempDir -ChildPath 'file'
+        New-Item -Path $filePath -ItemType 'file'
+        $dirPath = Join-Path -Path $tempDir -ChildPath 'dir'
+        New-Item -Path $dirPath -ItemType 'Directory'
+        $secondJunction = Join-Path -Path $tempDir -ChildPath 'junction2'
+        Install-Junction -Link $secondJunction -Target $PSScriptRoot
+
+        Uninstall-Junction -Path (Join-Path -Path $tempDir -ChildPath '*')
+        $Global:Error.Count | Should Be 0
+        $filePath | Should Exist
+        $dirPath | Should Exist
+        $JunctionPath | Should Not Exist
+        $secondJunction | Should not Exist
     }
     
 }

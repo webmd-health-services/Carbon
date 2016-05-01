@@ -4,7 +4,8 @@
 
  * Aded a `LiteralPath` parameter to `Test-PathIsJunction` for testing paths that contain wildcard characters (e.g. `[`, `]`, etc.).
  * `Remove-Junction` now supports removing multiple junctions with wildcards.
- * Added a `LiteralPath` parameter to `Remove-Junction` for deleting junctions whose paths contains wildcard characters (e.g. `[`, `]`, etc.).
+ * Added a `LiteralPath` parameter to `Remove-Junction` for deleting junctions whose paths contain wildcard characters (e.g. `[`, `]`, etc.).
+ * Added a `LiteralPath` parameter to `Uninstall-Junction` for deleting junctions whose paths contain wildcard characters (e.g. `[`, `]`, etc.).
 
 ## Bug Fixes
 
@@ -13,6 +14,7 @@
  * Fixed: `Test-PathIsJunction` returns multiple results if the `Path` parameter contains wildcards and matches multiple items.
  * Fixed: `Install-Junction` can't install a junction whose path contains wildcard characters (fixes [issue #190](https://bitbucket.org/splatteredbits/carbon/issues/190/install-junction-fails-when-the-path)).
  * Fixed: `New-Junction` writes wrong error when creating an existing junction whose path contains wildcard characters.
+
  
 # 2.1.1 (25 February 2016)
 
