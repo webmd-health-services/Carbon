@@ -72,13 +72,13 @@ function Install-Junction
     $Link = Resolve-FullPath -Path $Link
     $Target = Resolve-FullPath -Path $Target
 
-    if( Test-Path -Path $Target -PathType Leaf )
+    if( Test-Path -LiteralPath $Target -PathType Leaf )
     {
         Write-Error ('Unable to create junction {0}: target {1} exists and is a file.' -f $Link,$Target)
         return
     }
 
-    if( -not (Test-Path -Path $Target -PathType Container) )
+    if( -not (Test-Path -LiteralPath $Target -PathType Container) )
     {
         if( $Force )
         {
@@ -91,9 +91,9 @@ function Install-Junction
         }
     }
 
-    if( Test-Path $Link -PathType Container )
+    if( Test-Path -LiteralPath $Link -PathType Container )
     {
-        $junction = Get-Item $Link -Force
+        $junction = Get-Item -LiteralPath $Link -Force
         if( -not $junction.IsJunction )
         {
             Write-Error ('Failed to create junction ''{0}'': a directory exists with that path and it is not a junction.' -f $Link)
@@ -105,7 +105,7 @@ function Install-Junction
             return
         }
 
-        Remove-Junction -Path $Link
+        Remove-Junction -LiteralPath $Link
     }
 
     if( $PSCmdlet.ShouldProcess( $Target, ("creating '{0}' junction" -f $Link) ) )

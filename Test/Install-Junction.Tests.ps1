@@ -26,9 +26,9 @@ Describe 'Install-Junction' {
         )
     
         $Error.Count | Should Be 0
-        $junctionPath | Should Exist
+        Test-Path -LiteralPath $junctionPath -PathType Container | Should Be $true
     
-        $junction = Get-Item $junctionPath
+        $junction = Get-Item -LiteralPath $junctionPath
         $junction.IsJunction | Should Be $true
         $junction.TargetPath | Should Be $ExpectedTarget
     }
@@ -43,6 +43,10 @@ Describe 'Install-Junction' {
         {
             Remove-Junction -Path $junctionPath
         }
+        Get-ChildItem -Path $tempDir |
+            Where-Object { $_.IsJunction } |
+            ForEach-Object { Remove-Junction -LiteralPath $_.FullName }
+        Get-ChildItem -Path $tempDir | Remove-Item -Recurse
     }
     
     It 'should create junction' {
@@ -168,5 +172,45 @@ Describe 'Install-Junction' {
         $result | Should BeNullOrEmpty
         Assert-Junction
     }
+
+    It 'should handle special characters in paths' {
+        $targetPath = Join-Path -Path $tempDir -ChildPath 'hasspecialchars[]'
+        New-Item -Path $targetPath -ItemType 'Directory'
+        $junctionPath = Join-Path -Path $tempDir -ChildPath 'linkhasspecialchars[]'
+        $result = Install-Junction -Link $junctionPath -Target $targetPath
+        $result | Should BeNullOrEmpty
+        Assert-Junction -ExpectedTarget $targetPath
+    }
+
+    It 'should handle special characters in existing directory' {
+        $targetPath = Join-Path -Path $tempDir -ChildPath 'hasspecialchars[]'
+        New-Item -Path $targetPath -ItemType 'Directory'
+        $junctionPath = Join-Path -Path $tempDir -ChildPath 'linkhasspecialchars[]'
+        New-Item -Path $junctionPath -ItemType 'Directory'
+        $result = Install-Junction -Link $junctionPath -Target $targetPath -ErrorAction SilentlyContinue
+        $result | Should BeNullOrEmpty
+        $Global:Error.Count | Should Be 1
+        $Global:Error | Where-Object { $_ -like '*is not a junction*' } | Should Not BeNullOrEmpty
+    }
     
+
+    It 'should handle special characters in existing junction' {
+        $targetPath = Join-Path -Path $tempDir -ChildPath 'originaltarget[]'
+        New-Item -Path $targetPath -ItemType 'Directory'
+
+        $secondTarget = Join-Path -Path $tempDir -ChildPath 'secondtarget[]'
+        New-Item -Path $secondTarget -ItemType 'Directory'
+
+        $junctionPath = Join-Path -Path $tempDir -ChildPath 'linkhasspecialchars[]'
+
+        $result = Install-Junction -Link $junctionPath -Target $targetPath
+        $result | Should BeNullOrEmpty
+        $Global:Error.Count | Should Be 0
+        Assert-Junction -ExpectedTarget $targetPath
+
+        $result = Install-Junction -Link $junctionPath -Target $secondTarget
+        $result | Should BeNullOrEmpty
+        $Global:Error.Count | Should Be 0
+        Assert-Junction -ExpectedTarget $secondTarget
+    }
 }
