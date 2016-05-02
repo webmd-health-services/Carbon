@@ -22,6 +22,12 @@ Describe 'Test-PathIsJunction' {
     BeforeEach {
         $Global:Error.Clear()
     }
+
+    AfterEach {
+        Get-ChildItem -Path 'TestDrive:' |
+            Where-Object { $_.PsIsContainer -and $_.IsJunction } |
+            ForEach-Object { Remove-Junction -Path $_.FullName }
+    }
     
     It 'should know files are not reparse points' {
         $result = Test-PathIsJunction $PSCommandPath
@@ -71,3 +77,4 @@ Describe 'Test-PathIsJunction' {
         $Global:Error.Count | Should Be 0
     }
 }
+
