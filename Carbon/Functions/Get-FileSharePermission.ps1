@@ -90,8 +90,17 @@ function Get-FileSharePermission
         
     $acl = $null  
     $lsss = Get-WmiObject -Class 'Win32_LogicalShareSecuritySetting' -Filter "name='$Name'"
+    if( -not $lsss )
+    {
+        return
+    }
 
     $result = $lsss.GetSecurityDescriptor()
+    if( -not $result )
+    {
+        return
+    }
+
     if( $result.ReturnValue )
     {
         $win32lsssErrors = @{
@@ -105,8 +114,18 @@ function Get-FileSharePermission
     }
 
     $sd = $result.Descriptor
+    if( -not $sd -or -not $sd.DACL )
+    {
+        return
+    }
+
     foreach($ace in $SD.DACL)
     {   
+        if( -not $ace -or -not $ace.Trustee )
+        {
+            continue
+        }
+
         [Carbon.Identity]$rId = [Carbon.Identity]::FindBySid( $ace.Trustee.SIDString )
         if( $Identity -and  (-not $rId -or $rId.FullName -notlike $Identity) )
         {

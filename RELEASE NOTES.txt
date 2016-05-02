@@ -16,6 +16,7 @@
  * Fixed: `New-Junction` writes wrong error when creating an existing junction whose path contains wildcard characters.
  * Fixed: `Install-Service` doesn't update/change an existing service's account when using the `Credential` parameter (fixes [issue #185](https://bitbucket.org/splatteredbits/carbon/issues/185/install-service-never-updates-logon-as-if)).
  * Fixed: `Uninstall-FileShare` fails if a share's physical path doesn't exist.
+ * Fixed (hopefully): `Get-FileSharePermission` writes an error if a share's security information is corrupted (fixes [issue #188](https://bitbucket.org/splatteredbits/carbon/issues/188/get-filesharepermission-crashes-when-a)). I was unable to reproduce the error, and the error was reported anonyously, so I did my best.
 
 # 2.1.1 (25 February 2016)
 
