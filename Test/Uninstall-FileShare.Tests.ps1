@@ -10,44 +10,43 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-& (Join-Path -Path $PSScriptRoot -ChildPath '..\Import-CarbonForTest.ps1' -Resolve)
-$shareName = 'CarbonUninstallFileShare'
-$sharePath = $null
-$shareDescription = 'Share for testing Carbon''s Uninstall-FileShare function.'
+& (Join-Path -Path $PSScriptRoot -ChildPath 'Import-CarbonForTest.ps1' -Resolve)
 
-function Start-Test
-{
-    $sharePath = New-TempDirectory -Prefix $PSCommandPath
-    Install-SmbShare -Path $sharePath -Name $shareName -Description $shareDescription
-    Assert-True (Test-FileShare -Name $shareName)
+Describe 'Uninstall-FileShare' {
+    $shareName = 'CarbonUninstallFileShare'
+    $sharePath = $null
+    $shareDescription = 'Share for testing Carbon''s Uninstall-FileShare function.'
+
+    BeforeEach {
+        $Global:Error.Clear()
+
+        $sharePath = Get-Item -Path 'TestDrive:' 
+        Install-SmbShare -Path $sharePath -Name $shareName -Description $shareDescription
+        (Test-FileShare -Name $shareName) | Should Be $true
+    }
+    
+    AfterEach {
+        Get-FileShare -Name $shareName -ErrorAction Ignore | ForEach-Object { $_.Delete() }
+    }
+    
+    It 'should delete share' {
+        $output = Uninstall-FileShare -Name $shareName
+        $output | Should BeNullOrEmpty
+        $Global:Error.Count | Should Be 0
+        (Test-FileShare -Name $shareName) | Should Be $false
+        Assert-DirectoryExists -Path $sharePath
+    }
+    
+    It 'should support should process' {
+        $output = Uninstall-FileShare -Name $shareName -WhatIf
+        $output | Should BeNullOrEmpty
+        (Test-FileShare -Name $shareName) | Should Be $true
+    }
+    
+    It 'should handle share that does not exist' {
+        $output = Uninstall-FileShare -Name 'fdsfdsurwoim'
+        $output | Should BeNullOrEmpty
+        $Global:Error.Count | Should Be 0
+    }
+    
 }
-
-function Stop-Test
-{
-    Remove-Item -Path $sharePath
-    Get-FileShare -Name $shareName -ErrorAction Ignore | ForEach-Object { $_.Delete() }
-}
-
-function Test-ShouldDeleteShare
-{
-    $output = Uninstall-FileShare -Name $shareName
-    Assert-Null $output
-    Assert-NoError
-    Assert-False (Test-FileShare -Name $shareName)
-    Assert-DirectoryExists -Path $sharePath
-}
-
-function Test-ShouldSupportShouldProcess
-{
-    $output = Uninstall-FileShare -Name $shareName -WhatIf
-    Assert-Null $output
-    Assert-True (Test-FileShare -Name $shareName)
-}
-
-function Test-ShouldHandleShareThatDoesNotExist
-{
-    $output = Uninstall-FileShare -Name 'fdsfdsurwoim'
-    Assert-Null $output
-    Assert-NoError
-}
-
