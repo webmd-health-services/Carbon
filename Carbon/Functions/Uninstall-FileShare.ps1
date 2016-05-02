@@ -69,14 +69,27 @@ function Uninstall-FileShare
 
     Get-FileShare -Name $Name |
         ForEach-Object { 
-            if( $PSCmdlet.ShouldProcess( ('{0} ({1})' -f $_.Name,$_.Path), 'delete' ) )
+            $share = $_
+            $deletePhysicalPath = $false
+            if( -not (Test-Path -Path $share.Path -PathType Container) )
             {
-                Write-Verbose ('Deleting file share ''{0}'' (Path: {1}).' -f $_.Name,$_.Path)
-                $result = $_.Delete() 
+                New-Item -Path $share.Path -ItemType 'Directory' -Force | Out-String | Write-Debug
+                $deletePhysicalPath = $true
+            }
+
+            if( $PSCmdlet.ShouldProcess( ('{0} ({1})' -f $share.Name,$share.Path), 'delete' ) )
+            {
+                Write-Verbose ('Deleting file share ''{0}'' (Path: {1}).' -f $share.Name,$share.Path)
+                $result = $share.Delete() 
                 if( $result.ReturnValue )
                 {
-                    Write-Error ('Failed to delete share ''{0}'' (Path: {1}). Win32_Share.Delete() method returned error code {2} which means: {3}.' -f $Name,$share.Path,$result.ReturnValue,$errors[$result.ReturnValue])                
+                    Write-Error ('Failed to delete share ''{0}'' (Path: {1}). Win32_Share.Delete() method returned error code {2} which means: {3}.' -f $Name,$share.Path,$result.ReturnValue,$errors[$result.ReturnValue])
                 }
+            }
+
+            if( $deletePhysicalPath -and (Test-Path -Path $share.Path) )
+            {
+                Remove-Item -Path $share.Path -Force -Recurse
             }
         }
 }

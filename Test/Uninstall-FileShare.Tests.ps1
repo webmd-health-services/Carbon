@@ -48,5 +48,19 @@ Describe 'Uninstall-FileShare' {
         $output | Should BeNullOrEmpty
         $Global:Error.Count | Should Be 0
     }
+
+    It 'should uninstall file share if share directory does not exist' {
+        Remove-Item -Path $sharePath
+        try
+        {
+            Uninstall-FileShare -Name $shareName
+            $Global:Error.Count | Should Be 0
+            $sharePath | Should Not Exist
+        }
+        finally
+        {
+            New-Item -Path $sharePath -ItemType 'Directory'
+        }
+    }
     
 }
