@@ -15,6 +15,10 @@ Set-StrictMode -Version 'Latest'
 & (Join-Path -Path $PSScriptRoot -ChildPath 'Import-CarbonForTest.ps1')
 
 describe 'Get-PowerShellModuleInstallPath' {
+    BeforeEach {
+        $Global:Error.Clear()
+    }
+
     it "should get preferred module install path" {
         if( $PSVersionTable.PSVersion -lt [Version]'5.0.0' )
         {
@@ -23,6 +27,40 @@ describe 'Get-PowerShellModuleInstallPath' {
         else
         {
             Get-PowerShellModuleInstallPath | should be (Join-Path -Path $env:ProgramFiles -ChildPath 'WindowsPowerShell\Modules')
+        }
+    }
+
+    It 'should handle multiple module paths under program files' {
+        $originalPsModulePath = $env:PSModulePath
+        try
+        {
+            $modulePath = ('{0}\WindowsPowerShell' -f $env:ProgramFiles)
+            $env:PSModulePath = '{0};{0}' -f $modulePath
+            $path = Get-PowerShellModuleInstallPath 
+            $Global:Error.Count | Should Be 0
+            ,$path | Should BeOfType ([string])
+            ,$path | Should Be $modulePath
+        }
+        finally
+        {
+            $env:PSModulePath = $originalPsModulePath
+        }
+    }
+
+    It 'should handle multiple module paths under system root' {
+        $originalPsModulePath = $env:PSModulePath
+        try
+        {
+            $modulePath = ('{0}\System32\WindowsPowerShell\v1.0' -f $env:SystemRoot)
+            $env:PSModulePath = '{0};{0}' -f $modulePath
+            $path = Get-PowerShellModuleInstallPath 
+            $Global:Error.Count | Should Be 0
+            ,$path | Should BeOfType ([string])
+            ,$path | Should Be $modulePath
+        }
+        finally
+        {
+            $env:PSModulePath = $originalPsModulePath
         }
     }
 }

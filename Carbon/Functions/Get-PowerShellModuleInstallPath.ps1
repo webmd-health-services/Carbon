@@ -36,11 +36,11 @@ function Get-PowerShellModuleInstallPath
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
     $modulePaths = $env:PSModulePath -split ';' 
-    $installRoot = $modulePaths | Where-Object { $_ -like ('{0}\WindowsPowerShell*' -f $env:ProgramFiles) }
+    $installRoot = $modulePaths | Where-Object { $_ -like ('{0}\WindowsPowerShell*' -f $env:ProgramFiles) } | Select-Object -First 1
     if( $PSVersionTable.PSVersion -lt [Version]'5.0.0' -or -not $installRoot -or -not (Test-Path -Path $installRoot -PathType Container) )
     {
         Write-Verbose ('Module path under ''{0}'' not found.' -f $env:ProgramFiles)
-        $installRoot = $modulePaths | Where-Object { $_ -like ('{0}\*' -f $env:SystemRoot) }
+        $installRoot = $modulePaths | Where-Object { $_ -like ('{0}\*' -f $env:SystemRoot) } | Select-Object -First 1
         if( -not $installRoot -or -not (Test-Path -Path $installRoot -PathType Container) )
         {
             Write-Verbose ('Module path under ''{0}'' not found.' -f $env:SystemRoot)
