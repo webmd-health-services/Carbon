@@ -30,4 +30,4 @@ choco install 'conemu' -y
 
 & (Join-Path -Path $PSScriptRoot -ChildPath '.\Carbon\Import-Carbon.ps1')
 
-Uninstalld-IisWebsite -Name 'Default Web Site'
+Uninstall-IisWebsite -Name 'Default Web Site'
