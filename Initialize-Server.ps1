@@ -16,7 +16,8 @@ $os = Get-WmiObject -Class 'Win32_OperatingSystem'
 $osVersion = [version]$os.Version
 if( $osVersion.Major -eq 6 -and $osVersion.Minor -eq 1 )
 {
-    servermanagercmd.exe -install 'PowerShell-ISE' 'MSMQ-Server' 'Net-Framework-Core' 'Web-Server'
+    Import-Module -Name 'ServerManager'
+    Add-WindowsFeature -Name 'PowerShell-ISE','MSMQ-Server','Net-Framework-Core','Web-Server'
 }
 # Windows 2012 R2
 elseif( $osVersion.Major -eq 6 -and $osVersion.Minor -eq 3 )
