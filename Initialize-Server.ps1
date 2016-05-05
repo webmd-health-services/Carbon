@@ -31,3 +31,6 @@ choco install 'conemu' -y
 & (Join-Path -Path $PSScriptRoot -ChildPath '.\Carbon\Import-Carbon.ps1')
 
 Uninstall-IisWebsite -Name 'Default Web Site'
+
+# For tests that do stuff over remoting.
+Add-TrustedHost -Entry $env:COMPUTERNAME
