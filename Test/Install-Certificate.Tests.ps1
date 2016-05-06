@@ -126,4 +126,11 @@ Describe "Install-Certificate" {
             Remove-PSSession -Session $session
         }
     }
+    
+    It 'should support ShouldProcess' {
+        $cert = Install-Certificate -Path $TestCertPath -StoreLocation CurrentUser -StoreName My -WhatIf
+        $cert.Thumbprint | Should Be $TestCert.Thumbprint
+        Join-Path -Path 'cert:\CurrentUser\My' -ChildPath $TestCert.Thumbprint |
+            Should Not Exist
+    }
 }
