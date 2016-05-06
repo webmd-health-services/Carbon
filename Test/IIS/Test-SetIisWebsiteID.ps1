@@ -45,19 +45,29 @@ function Test-ShouldChangeID
 
 function Test-ShouldDetectDuplicateIDs
 {
-    $originalSite = Get-IisWebsite | Select-Object -First 1
-    Assert-NotNull $originalSite
-    Assert-NotEqual $siteName $originalSite.Name
+    $alreadyTakenSiteName = 'AlreadyGotIt'
+    $alreadyTakenSiteID = 4571
+    $alreadyTakenSite = Install-IisWebsite -Name $alreadyTakenSiteName `
+                                           -PhysicalPath $PSScriptRoot `
+                                           -Binding 'http/*:9983:' `
+                                           -SiteID $alreadyTakenSiteID `
+                                           -PassThru
+    try
+    {
+        $currentSite = Get-IisWebsite -SiteName $siteName
+        Assert-NotNull $siteName
 
-    $currentSite = Get-IisWebsite -SiteName $siteName
-    Assert-NotNull $siteName
+        Assert-NotEqual $currentSite.ID $alreadyTakenSite.ID
 
-    Assert-NotEqual $currentSite.ID $originalSite.ID
-
-    $Error.Clear()
-    Set-IisWebsiteID -SiteName $siteName -ID $originalSite.ID -ErrorAction SilentlyContinue
-    Assert-Equal 1 $Error.Count
-    Assert-Like $Error[0].Exception.Message '*ID * already in use*'
+        $Error.Clear()
+        Set-IisWebsiteID -SiteName $siteName -ID $alreadyTakenSiteID -ErrorAction SilentlyContinue
+        Assert-Equal 1 $Error.Count
+        Assert-Like $Error[0].Exception.Message '*ID * already in use*'
+    }
+    finally
+    {
+        Uninstall-IisWebsite -Name $alreadyTakenSiteName
+    }
 }
 
 function Test-ShouldHandleNonExistentWebsite
