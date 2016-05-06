@@ -66,7 +66,7 @@ Describe 'Uninstall-Certificate' {
     It 'should uninstall certificate from remote computer' {
         $Global:Error.Clear()
 
-        $session = New-PSSession -ComputerName 'localhost'
+        $session = New-PSSession -ComputerName $env:COMPUTERNAME
         try
         {
             Uninstall-Certificate -Thumbprint $TestCert.Thumbprint `
