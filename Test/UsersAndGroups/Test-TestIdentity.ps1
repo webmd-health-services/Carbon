@@ -10,9 +10,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+$user1 = $null
+
 function Start-TestFixture
 {
     & (Join-Path -Path $PSScriptRoot -ChildPath '..\Import-CarbonForTest.ps1' -Resolve)
+    $user1 = Install-User -Credential (New-Credential -UserName 'CarbonTestUser1' -Password 'P@ssw0rd!') -PassThru
 }
 
 function Test-ShouldFindLocalGroup
@@ -23,17 +26,20 @@ function Test-ShouldFindLocalGroup
 
 function Test-ShouldFindLocalUser
 {
-    Assert-True (Test-Identity -Name 'Administrator')
+    Assert-True (Test-Identity -Name $user1.SamAccountName)
 }
 
-function Test-ShouldFindDomainUser
+if( (Get-WmiObject -Class 'Win32_ComputerSystem').Domain -ne 'WORKGROUP' )
 {
-    Assert-True (Test-Identity -Name ('{0}\Administrator' -f $env:USERDOMAIN))
+    function Test-ShouldFindDomainUser
+    {
+        Assert-True (Test-Identity -Name ('{0}\Administrator' -f $env:USERDOMAIN))
+    }
 }
 
 function Test-ShouldReturnSecurityIdentifier
 {
-    $sid = Test-Identity -Name 'Administrator' -PassThru
+    $sid = Test-Identity -Name $user1.SamAccountName -PassThru
     Assert-NotNull $sid
     Assert-True ($sid -is [Carbon.Identity])
 }
