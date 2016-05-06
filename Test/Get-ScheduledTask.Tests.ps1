@@ -168,11 +168,16 @@ Describe 'Get-ScheduledTask' {
     }
 
     It 'should support wildcards' {
-        $expectedTask = schtasks /query /v /fo csv | Select-Object -First 2 | ConvertFrom-Csv
-        $task = Get-ScheduledTask -Name ('*{0}*' -f $expectedTask.TaskName.Substring(1,$expectedTask.TaskName.Length - 2))
+        $expectedTask = schtasks /query /fo list | 
+                            Where-Object { $_ -match '^TaskName: +(.*)$' } | 
+                            ForEach-Object { $Matches[1] } |
+                            Select-Object -First 1
+        $expectedTask | Should Not BeNullOrEmpty
+        $wildcard = ('*{0}*' -f $expectedTask.Substring(1,$expectedTask.Length - 2))
+        $task = Get-ScheduledTask -Name $wildcard
         $task | Should Not BeNullOrEmpty
         $task | Should BeOfType ([Carbon.TaskScheduler.TaskInfo])
-        Assert-ScheduledTaskEqual $expectedTask $task
+        Join-Path -Path $task.TaskPath -ChildPath $task.TaskName | Should Be $expectedTask
     }
     
     It 'should get all scheduled tasks' {
