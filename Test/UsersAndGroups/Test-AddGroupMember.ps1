@@ -11,10 +11,14 @@
 # limitations under the License.
 
 $GroupName = 'AddMemberToGroup'
+$user1 = $null
+$user2 = $null
 
 function Start-TestFixture
 {
     & (Join-Path -Path $PSScriptRoot -ChildPath '..\Import-CarbonForTest.ps1' -Resolve)
+    $user1 = Install-User -Credential (New-Credential -UserName 'CarbonTestUser1' -Password 'P@ssw0rd!') -PassThru
+    $user2 = Install-User -Credential (New-Credential -UserName 'CarbonTestUser2' -Password 'P@ssw0rd!') -PassThru
 }
 
 function Start-Test
@@ -54,9 +58,12 @@ function Invoke-AddMembersToGroup($Members = @())
     Assert-MembersInGroup -Member $Members
 }
 
-function Test-ShouldAddMemberFromDomain
+if( (Get-WmiObject -Class 'Win32_ComputerSystem').Domain -eq 'WBMD' )
 {
-    Invoke-AddMembersToGroup -Members 'WBMD\WHS - Lifecycle Services' 
+    function Test-ShouldAddMemberFromDomain
+    {
+        Invoke-AddMembersToGroup -Members 'WBMD\WHS - Lifecycle Services' 
+    }
 }
 
 function Test-ShouldAddLocalUser
@@ -78,18 +85,17 @@ function Test-ShouldAddLocalUser
 
 function Test-ShouldAddMultipleMembers
 {
-    $users = Get-LocalUsers
-    $members = @( $users[0].Name, 'WBMD\WHS - Lifecycle Services' )
+    $members = @( $user1.SamAccountName, $user2.SamAccountName )
     Invoke-AddMembersToGroup -Members $members
 }
 
 function Test-ShouldSupportShouldProcess
 {
-    Add-GroupMember -Name $GroupName -Member 'WBMD\WHS - Lifecycle Services' -WhatIf
+    Add-GroupMember -Name $GroupName -Member $user1.SamAccountName -WhatIf
     $details = net localgroup $GroupName
     foreach( $line in $details )
     {
-        Assert-False ($details -like '*WBMD\WHS - Lifecycle Services*')
+        Assert-False ($details -like ('*{0}*' -f $user1.SamAccountName))
     }
 }
 
