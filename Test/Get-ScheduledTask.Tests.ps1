@@ -37,6 +37,8 @@ Describe 'Get-ScheduledTask' {
                                         '\Microsoft\Windows\WindowsUpdate\Scheduled Start With Network' = $true;
                                         '\Microsoft\Office\Office 15 Subscription Heartbeat' = $true;
                                         '\Microsoft\Windows\Windows Activation Technologies\ValidationTaskDeadline' = $true;
+                                        '\Microsoft\Windows\Customer Experience Improvement Program\Server\ServerRoleCollector' = $true;
+                                        '\Microsoft\Windows\Customer Experience Improvement Program\Server\ServerRoleUsageCollector' = $true;
                                     }
         $scheduleProps = @(
                                'Last Result',
@@ -117,7 +119,7 @@ Describe 'Get-ScheduledTask' {
     BeforeEach {
         $Global:Error.Clear()
     }
-    
+
     It 'should get scheduled tasks' {
         schtasks /query /v /fo csv | 
             ConvertFrom-Csv | 
@@ -164,7 +166,7 @@ Describe 'Get-ScheduledTask' {
             }
         }
     }
-    
+
     It 'should support wildcards' {
         $expectedTask = schtasks /query /v /fo csv | Select-Object -First 2 | ConvertFrom-Csv
         $task = Get-ScheduledTask -Name ('*{0}*' -f $expectedTask.TaskName.Substring(1,$expectedTask.TaskName.Length - 2))
