@@ -29,7 +29,7 @@ Describe 'Install-Service' {
     function Assert-ServiceInstalled
     {
         $service = Get-Service $serviceName
-        $service | Should Not BeNullOrEmpty
+        $service | Should Not BeNullOrEmpty | Out-Null
         return $service
     }
     
