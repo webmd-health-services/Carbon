@@ -66,7 +66,7 @@ Describe 'Install-Service' {
         $service.UserName | Should Be $defaultServiceAccountName
     }
     
-    It 'should reinstall unchanged service with force parameter' {
+    It 'should reinstall unchanged service with force parameter' -Skip {
         Install-Service -Name $serviceName -Path $servicePath @installServiceParams
         $now = Get-Date
         Start-Sleep -Milliseconds (1001 - $now.Millisecond)
