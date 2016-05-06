@@ -18,7 +18,9 @@ Describe 'Install-Service' {
     $serviceName = 'CarbonTestService'
     $serviceAcct = 'CrbnInstllSvcTstAcct'
     $servicePassword = [Guid]::NewGuid().ToString().Substring(0,14)
-    $installServiceParams = @{ Verbose = $true }
+    $installServiceParams = @{ 
+                                #Verbose = $true 
+                             }
     $startedAt = Get-Date
     $serviceCredential = New-Credential -UserName $serviceAcct -Password $servicePassword
     Install-User -Credential $serviceCredential -Description "Account for testing the Carbon Install-Service function."
