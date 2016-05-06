@@ -52,8 +52,14 @@ Describe 'New-RsaKeyPair' {
         $keyUsage.KeyUsages.HasFlag([Security.Cryptography.X509Certificates.X509KeyUsageFlags]::KeyEncipherment) | Should Be $true
         $enhancedKeyUsage = $cert.Extensions | Where-Object { $_ -is [Security.Cryptography.X509Certificates.X509EnhancedKeyUsageExtension] }
         $enhancedKeyUsage | Should Not BeNullOrEmpty
-        $usage = $enhancedKeyUsage.EnhancedKeyUsages | Where-Object { $_.FriendlyName -eq 'Document Encryption' }
-        $usage | Should Not BeNullOrEmpty
+        
+        # I don't think Windows 2008 supports Enhanced Key Usages.
+        $osVersion = (Get-WmiObject -Class 'Win32_OperatingSystem').Version
+        if( $osVersion -notmatch '6.1\b' )
+        {
+            $usage = $enhancedKeyUsage.EnhancedKeyUsages | Where-Object { $_.FriendlyName -eq 'Document Encryption' }
+            $usage | Should Not BeNullOrEmpty
+        }
     }
 
     BeforeEach {
@@ -124,7 +130,7 @@ Describe 'New-RsaKeyPair' {
         $Global:Error.Count | Should Be 0
         Join-Path -Path $tempDir -ChildPath 'localhost.mof' | Should Not Contain 'Password1'
     }
-
+    
     if( Get-Command -Name 'Protect-CmsMessage' -ErrorAction Ignore )
     {
         # Make sure we can protect CMS messages with it
