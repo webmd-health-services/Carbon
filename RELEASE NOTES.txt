@@ -19,6 +19,7 @@
  * Fixed (hopefully): `Get-FileSharePermission` writes an error if a share's security information is corrupted (fixes [issue #188](https://bitbucket.org/splatteredbits/carbon/issues/188/get-filesharepermission-crashes-when-a)). I was unable to reproduce the error, and the error was reported anonyously, so I did my best.
  * Fixed: `Get-PowerShellModuleInstallPath` returns multiple paths if the standard PowerShell module path is listed twice in the `PSModulePath` environment variable.
  * Fixed: Chocolatey package fails if the standard PowerShell module path is listed twice in the`PSModulePath` environment (fixes [issue #192](https://bitbucket.org/splatteredbits/carbon/issues/192/installation-of-carbon-via-chocolatey)).
+ * Fixed: `Get-PowerShellModuleInstallPath` doesn't return the module install path if it doesn't exist. Sometimes it doesn't yet.
  
 
 # 2.1.1 (25 February 2016)

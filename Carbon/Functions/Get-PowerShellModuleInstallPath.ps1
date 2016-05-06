@@ -17,7 +17,7 @@ function Get-PowerShellModuleInstallPath
     Returns the path to the directory where you can install custom modules.
 
     .DESCRIPTION
-    Custom modules should be installed under the `Program Files` directory. This function looks at the `PSModulePath` environment variable to find the install location under `Program Files`. If that path doesn't exist or isn't part of the `PSModulePath` environment variable, returns the module path under `$PSHOME`. If that path doesn't exist or isn't part of the `PSModulePath` environment variable, an error is written and nothing is returned.
+    Custom modules should be installed under the `Program Files` directory. This function looks at the `PSModulePath` environment variable to find the install location under `Program Files`. If that path isn't part of the `PSModulePath` environment variable, returns the module path under `$PSHOME`. If that isn't part of the `PSModulePath` environment variable, an error is written and nothing is returned.
 
     `Get-PowerShellModuleInstallPath` is new in Carbon 2.0.
 
@@ -35,20 +35,26 @@ function Get-PowerShellModuleInstallPath
 
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
-    $modulePaths = $env:PSModulePath -split ';' 
-    $installRoot = $modulePaths | Where-Object { $_ -like ('{0}\WindowsPowerShell*' -f $env:ProgramFiles) } | Select-Object -First 1
-    if( $PSVersionTable.PSVersion -lt [Version]'5.0.0' -or -not $installRoot -or -not (Test-Path -Path $installRoot -PathType Container) )
+    $modulePaths = $env:PSModulePath -split ';'
+
+    $programFileModulePath = Join-Path -Path $env:ProgramFiles -ChildPath 'WindowsPowerShell\Modules'
+    $installRoot = $modulePaths | 
+                        Where-Object { $_.TrimEnd('\') -eq $programFileModulePath } |
+                        Select-Object -First 1
+    if( $installRoot )
     {
-        Write-Verbose ('Module path under ''{0}'' not found.' -f $env:ProgramFiles)
-        $installRoot = $modulePaths | Where-Object { $_ -like ('{0}\*' -f $env:SystemRoot) } | Select-Object -First 1
-        if( -not $installRoot -or -not (Test-Path -Path $installRoot -PathType Container) )
-        {
-            Write-Verbose ('Module path under ''{0}'' not found.' -f $env:SystemRoot)
-            Write-Error ('Module path under ''{0}'' and ''{1}'' not found.' -f $env:ProgramFiles,$env:SystemRoot)
-            return
-        }
+        return $programFileModulePath
     }
 
-    return $installRoot
+    $psHomeModulePath = Join-Path -Path $PSHOME -ChildPath 'Modules'
 
+    $installRoot = $modulePaths | 
+                        Where-Object { $_.TrimEnd('\') -eq $psHomeModulePath } |
+                        Select-Object -First 1
+    if( $installRoot )
+    {
+        return $psHomeModulePath
+    }
+
+    Write-Error -Message ('PSModulePaths ''{0}'' and ''{1}'' not found in the PSModulePath environment variable.' -f $programFileModulePath,$psHomeModulePath)
 }

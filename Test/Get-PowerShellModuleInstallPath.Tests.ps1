@@ -15,31 +15,33 @@ Set-StrictMode -Version 'Latest'
 & (Join-Path -Path $PSScriptRoot -ChildPath 'Import-CarbonForTest.ps1')
 
 describe 'Get-PowerShellModuleInstallPath' {
+    $programFilesModulePath = Join-Path -Path $env:ProgramFiles -ChildPath 'WindowsPowerShell\Modules'
+    $psHomeModulePath = Join-Path -Path $env:SystemRoot -ChildPath 'system32\WindowsPowerShell\v1.0\Modules'
+
     BeforeEach {
         $Global:Error.Clear()
     }
 
     it "should get preferred module install path" {
-        if( $PSVersionTable.PSVersion -lt [Version]'5.0.0' )
+        if( (Test-Path -Path $programFilesModulePath -PathType Container) )
         {
-            Get-PowerShellModuleInstallPath | should be (Join-Path -Path $env:SystemRoot -ChildPath 'system32\WindowsPowerShell\v1.0\Modules\')
+            Get-PowerShellModuleInstallPath | should be $programFilesModulePath
         }
         else
         {
-            Get-PowerShellModuleInstallPath | should be (Join-Path -Path $env:ProgramFiles -ChildPath 'WindowsPowerShell\Modules')
+            Get-PowerShellModuleInstallPath | should be $psHomeModulePath
         }
     }
 
-    It 'should handle multiple module paths under program files' {
+    It 'should use PSHOME if Program Files not in PSModulePath' {
         $originalPsModulePath = $env:PSModulePath
+        $env:PSModulePath = $psHomeModulePath
         try
         {
-            $modulePath = ('{0}\WindowsPowerShell' -f $env:ProgramFiles)
-            $env:PSModulePath = '{0};{0}' -f $modulePath
             $path = Get-PowerShellModuleInstallPath 
             $Global:Error.Count | Should Be 0
             ,$path | Should BeOfType ([string])
-            ,$path | Should Be $modulePath
+            ,$path | Should Be $psHomeModulePath
         }
         finally
         {
@@ -47,16 +49,15 @@ describe 'Get-PowerShellModuleInstallPath' {
         }
     }
 
-    It 'should handle multiple module paths under system root' {
+    It 'should fail if modules paths aren''t in PSModulePath' {
         $originalPsModulePath = $env:PSModulePath
         try
         {
-            $modulePath = ('{0}\System32\WindowsPowerShell\v1.0' -f $env:SystemRoot)
-            $env:PSModulePath = '{0};{0}' -f $modulePath
-            $path = Get-PowerShellModuleInstallPath 
-            $Global:Error.Count | Should Be 0
-            ,$path | Should BeOfType ([string])
-            ,$path | Should Be $modulePath
+            $env:PSModulePath = (Get-Location).Path
+            $path = Get-PowerShellModuleInstallPath -ErrorAction SilentlyContinue 
+            $Global:Error.Count | Should Be 1
+            $Global:Error | Should Match 'not found'
+            ,$path | Should BeNullOrEmpty
         }
         finally
         {
