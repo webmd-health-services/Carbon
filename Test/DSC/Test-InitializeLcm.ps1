@@ -26,6 +26,11 @@ function Start-TestFixture
     Install-User -Credential (New-Credential -Username $userName -Password $password)
 }
 
+function Stop-TestFixture
+{
+    Uninstall-Directory -Path $tempDir -Recurse
+}
+
 function Start-Test
 {
     $originalLcm = Get-DscLocalConfigurationManager

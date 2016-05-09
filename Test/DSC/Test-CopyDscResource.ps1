@@ -28,9 +28,19 @@ function Start-TestFixture
 '@
 }
 
+function Stop-TestFixture
+{
+    Uninstall-Directory -Path $sourceRoot -Recurse
+}
+
 function Start-Test
 {
     $destinationRoot = New-TempDir -Prefix $PSCommandPath
+}
+
+function Stop-Test
+{
+    Uninstall-Directory -Path $destinationRoot -Recurse
 }
 
 function Test-ShouldCopyFiles

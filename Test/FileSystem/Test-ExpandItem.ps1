@@ -31,7 +31,7 @@ function Start-Test
 
 function Stop-Test
 {
-    Remove-Item -Path $tempDir -Recurse
+    Uninstall-Directory -Path $tempDir -Recurse
 }
 
 function Test-ShouldFailIfFileNotAZipFile
@@ -56,6 +56,7 @@ function Test-ShouldExpandWithRelativePathToZip
     finally
     {
         Pop-Location
+        Uninstall-Directory -Path $tempDir2 -Recurse
     }
 }
 
@@ -75,6 +76,7 @@ function Test-ShouldExpandWithRelativePathToOutput
     finally
     {
         Pop-Location
+        Uninstall-Directory -Path $tempDir2 -Recurse
     }
 }
 
