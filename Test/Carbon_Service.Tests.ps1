@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'DscResources\CarbonDscTest.psm1' -Resolve) -Force
+Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'CarbonDscTest' -Resolve) -Force
 
 Describe 'Carbon_Service' {
     $credential = New-Credential -User 'CarbonDscTestUser' -Password ([Guid]::NewGuid().ToString())
