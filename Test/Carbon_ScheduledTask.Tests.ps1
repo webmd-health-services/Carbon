@@ -27,6 +27,7 @@ Describe 'Carbon_ScheduledTask' {
     try
     {    
         BeforeEach {
+            $Global:Error.Clear()
         }
     
         AfterEach {
@@ -41,8 +42,8 @@ Describe 'Carbon_ScheduledTask' {
                 $resource = Get-TargetResource -Name $_.FullName
                 $Global:Error.Count | Should Be 0
                 $resource | Should Not BeNullOrEmpty
-                $resource.TaskName | Should Be $_.FullName
-                $resource.RunAsUser | Should Be $_.RunAsUser
+                $resource.Name | Should Be $_.FullName
+                $resource.TaskCredential | Should Be $_.RunAsUser
                 $resource.TaskXml | Should Be $expectedXml
                 Assert-DscResourcePresent $resource
             }
@@ -53,9 +54,9 @@ Describe 'Carbon_ScheduledTask' {
             $resource = Get-TargetResource -Name $name
             $Global:Error.Count | Should Be 0
             $resource | Should Not BeNullOrEmpty
-            $resource.TaskName | Should Be $name
+            $resource.Name | Should Be $name
             $resource.TaskXml | Should BeNullOrEmpty
-            $resource.RunAsUser | Should BeNullOrEmpty
+            $resource.TaskCredential | Should BeNullOrEmpty
             Assert-DscResourceAbsent $resource
         }
         
@@ -64,9 +65,9 @@ Describe 'Carbon_ScheduledTask' {
             $Global:Error.Count | Should Be 0
             $resource = Get-TargetResource -Name $taskName
             $resource | Should Not BeNullOrEmpty
-            $resource.TaskName | Should Be $taskName
+            $resource.Name | Should Be $taskName
             $resource.TaskXml | Should Be $taskForUser
-            $resource.RunAsUser | Should Be $credential.UserName
+            $resource.TaskCredential | Should Be $credential.UserName
             Assert-DscResourcePresent $resource
         }
     
@@ -75,9 +76,9 @@ Describe 'Carbon_ScheduledTask' {
             $Global:Error.Count | Should Be 0
             $resource = Get-TargetResource -Name $taskName
             $resource | Should Not BeNullOrEmpty
-            $resource.TaskName | Should Be $taskName
+            $resource.Name | Should Be $taskName
             $resource.TaskXml | Should Be $taskForSystem
-            $resource.RunAsUser | Should Be 'System'
+            $resource.TaskCredential | Should Be 'System'
             Assert-DscResourcePresent $resource
         }
     
@@ -86,7 +87,7 @@ Describe 'Carbon_ScheduledTask' {
             Set-TargetResource -Name $taskName -TaskXml $taskForSystem
             $resource = Get-TargetResource -Name $taskName
             Assert-DscResourcePresent $resource
-            $resource.RunAsUser | Should Be 'System'
+            $resource.TaskCredential | Should Be 'System'
         }
     
         It 'should uninstall task' {
@@ -153,6 +154,12 @@ Describe 'Carbon_ScheduledTask' {
             $Global:Error.Count | Should Be 0
             (Test-TargetResource -Name $taskName -TaskXml $taskForSystem -Ensure 'Present') | Should Be $false
             (Test-TargetResource -Name $taskName -Ensure 'Absent') | Should Be $true
+
+            $result = Get-DscConfiguration
+            $Global:Error.Count | Should Be 0
+            $result | Should BeOfType ([Microsoft.Management.Infrastructure.CimInstance])
+            $result.PsTypeNames | Where-Object { $_ -eq 'GetDscConfigurationType' } | Should Not BeNullOrEmpty
+            $result.PsTypeNames | Where-Object { $_ -like '*Carbon_ScheduledTask' } | Should Not BeNullOrEmpty
         }
     
     }

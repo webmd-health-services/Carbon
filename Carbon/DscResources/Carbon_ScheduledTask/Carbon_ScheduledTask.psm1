@@ -41,16 +41,16 @@ function Get-TargetResource
     Set-StrictMode -Version 'Latest'
 
     $resource = @{
-                    TaskName = $Name;
+                    Name = $Name;
                     TaskXml = '';
-                    RunAsUser = '';
+                    TaskCredential = '';
                     Ensure = 'Absent';
                 }
 
     if( (Test-ScheduledTask -Name $Name) )
     {
         $task = Get-ScheduledTask -Name $Name
-        $resource.RunAsUser = $task.RunAsUser
+        $resource.TaskCredential = $task.RunAsUser
         $resource.TaskXml = schtasks.exe /query /xml /tn $Name | Where-Object { $_ }
         $resource.TaskXml = $resource.TaskXml -join ([Environment]::NewLine)
         $resource.Ensure = 'Present'
@@ -269,9 +269,9 @@ function Test-TargetResource
             Write-Verbose ('[{0}] Task XML unchanged' -f $Name)
         }
 
-        if( $TaskCredential -and $resource.RunAsUser -ne $TaskCredential.UserName )
+        if( $TaskCredential -and $resource.TaskCredential -ne $TaskCredential.UserName )
         {
-            Write-Verbose ('[{0}] [RunAsUser] {0} != {1}' -f $Name,$resource.RunAsUser,$TaskCredential.UserName)
+            Write-Verbose ('[{0}] [TaskCredential] {0} != {1}' -f $Name,$resource.TaskCredential,$TaskCredential.UserName)
             return $false
         }
 
