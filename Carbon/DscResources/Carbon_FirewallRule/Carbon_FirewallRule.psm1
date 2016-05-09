@@ -115,7 +115,7 @@ function Get-TargetResource
                 $propName = $_
                 switch( $propName )
                 {
-                    'Profile' { $value = $rule.Profile.ToString() -split ',' }
+                    'Profile' { $value = $rule.Profile.ToString() -split ', ' }
                     'Enabled' { $value = $rule.Enabled }
                     default
                     {
