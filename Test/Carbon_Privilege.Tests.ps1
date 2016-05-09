@@ -263,6 +263,12 @@ Describe 'Carbon_Privilege' {
         Start-DscConfiguration -Wait -ComputerName 'localhost' -Path $CarbonDscOutputRoot -Force
         $Global:Error.Count | Should Be 0
         (Test-TargetResource -Identity $UserName -Privilege 'SeDenyBatchLogonRight' -Ensure 'Present') | Should Be $false
+
+        $result = Get-DscConfiguration
+        $Global:Error.Count | Should Be 0
+        $result | Should BeOfType ([Microsoft.Management.Infrastructure.CimInstance])
+        $result.PsTypeNames | Where-Object { $_ -eq 'GetDscConfigurationType' } | Should Not BeNullOrEmpty
+        $result.PsTypeNames | Where-Object { $_ -like '*Carbon_Privilege' } | Should Not BeNullOrEmpty
     }
     
 }
