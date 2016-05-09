@@ -10,220 +10,206 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'CarbonDscTest.psm1' -Resolve) -Force
-$UserName = 'CarbonDscTestUser'
-$Password = [Guid]::NewGuid().ToString()
-$tempDir = $null
+Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'DscResources\CarbonDscTest.psm1' -Resolve) -Force
 
-function Start-TestFixture
-{
-    Start-CarbonDscTestFixture 'Permission'
+Describe 'Carbon_Permission' {
+    $UserName = 'CarbonDscTestUser'
+    $Password = [Guid]::NewGuid().ToString()
+    $tempDir = $null
     Install-User -UserName $UserName -Password $Password
 
-}
-
-function Start-Test
-{
-    $tempDir = 'Carbon+{0}+{1}' -f ((Split-Path -Leaf -Path $PSCommandPath),([IO.Path]::GetRandomFileName()))
-    $tempDir = Join-Path -Path $env:TEMP -ChildPath $tempDir
-    New-Item -Path $tempDir -ItemType 'Directory' | Out-Null
-}
-
-function Stop-Test
-{
-    if( (Test-Path -Path $tempDir -PathType Container) )
-    {
-        Remove-Item -Path $tempDir -Recurse
+    BeforeAll {
+        Start-CarbonDscTestFixture 'Permission'
     }
-}
-
-function Stop-TestFixture
-{
-    Stop-CarbonDscTestFixture
-}
-
-function Test-ShouldGrantPermissionOnFileSystem
-{
-    Set-TargetResource -Identity $UserName -Path $tempDir -Permission FullControl -Ensure Present
-    Assert-NoError
-    Assert-True (Test-Permission -Identity $UserName -Path $tempDir -Permission FullControl -ApplyTo ContainerAndSubContainersAndLeaves -Exact)
-}
-
-function Test-ShouldGrantPermissionWithInheritenceOnFileSystem
-{
-    Set-TargetResource -Identity $UserName -Path $tempDir -Permission FullControl -ApplyTo Container -Ensure Present
-    Assert-NoError
-    Assert-True (Test-Permission -Identity $UserName -Path $tempDir -Permission FullControl -ApplyTo Container -Exact)
-}
-
-function Test-ShouldGrantPermissionOnRegistry
-{
-    $keyPath = 'hkcu:\{0}' -f (Split-Path -Leaf -Path $tempDir)
-    New-Item -Path $keyPath
-    try
-    {
-        Assert-False (Test-Permission -Identity $UserName -Path $keyPath -Permission ReadKey -ApplyTo Container -Exact)
-        Assert-False (Test-TargetResource -Identity $UserName -Path $keyPath -Permission ReadKey -Ensure Present)
-
-        Set-TargetResource -Identity $UserName -Path $keyPath -Permission ReadKey -ApplyTo Container -Ensure Present
-        Assert-NoError
-        Assert-True (Test-Permission -Identity $UserName -Path $keyPath -Permission ReadKey -ApplyTo Container -Exact)
-        Assert-True (Test-TargetResource -Identity $UserName -Path $keyPath -Permission ReadKey -Ensure Present)
-
-        Set-TargetResource -Identity $UserName -Path $keyPath -Permission ReadKey -ApplyTo Container -Ensure Absent
-        Assert-NoError
-        Assert-False (Test-Permission -Identity $UserName -Path $keyPath -Permission ReadKey -ApplyTo Container -Exact)
-        Assert-True (Test-TargetResource -Identity $UserName -Path $keyPath -Permission ReadKey -Ensure Absent)
+    
+    BeforeEach {
+        $Global:Error.Clear()
+        $tempDir = 'Carbon+{0}+{1}' -f ((Split-Path -Leaf -Path $PSCommandPath),([IO.Path]::GetRandomFileName()))
+        $tempDir = Join-Path -Path $env:TEMP -ChildPath $tempDir
+        New-Item -Path $tempDir -ItemType 'Directory' | Out-Null
     }
-    finally
-    {
-        Remove-Item -Path $keyPath
-    }
-}
-
-function Test-ShouldGrantPermissionOnPrivateKey
-{
-    $cert = Install-Certificate -Path (Join-Path -Path $PSScriptRoot -ChildPath '..\Cryptography\CarbonTestPrivateKey.pfx' -Resolve) -StoreLocation LocalMachine -StoreName My
-    try
-    {
-        $certPath = Join-Path -Path 'cert:\LocalMachine\My' -ChildPath $cert.Thumbprint -Resolve
-        Assert-Null (Get-Permission -Path $certPath -Identity $UserName)
-        Assert-False (Test-TargetResource -Path $certPath -Identity $UserName -Permission 'GenericRead')
-
-        Set-TargetResource -Identity $UserName -Path $certPath -Permission GenericRead -Ensure Present
-        Assert-NotNull (Get-Permission -Path $certPath -Identity $UserName)
-        Assert-True (Test-TargetResource -Path $certPath -Identity $UserName -Permission 'GenericRead')
-
-        Set-TargetResource -Identity $UserName -Path $certPath -Permission GenericRead -Ensure Absent
-        Assert-Null (Get-Permission -Path $certPath -Identity $UserName)
-        Assert-True (Test-TargetResource -Path $certPath -Identity $UserName -Permission 'GenericRead' -Ensure Absent)
-    }
-    finally
-    {
-        Uninstall-Certificate -Certificate $cert -StoreLocation LocalMachine -StoreName My
-    }
-}
-
-function Test-ShouldChangePermission
-{
-    Set-TargetResource -Identity $UserName -Path $tempDir -Permission FullControl -Ensure Present
-    Set-TargetResource -Identity $UserName -Path $tempDir -Permission Read -ApplyTo Container -Ensure Present
-    Assert-True (Test-Permission -Identity $UserName -Path $tempDir -Permission Read -ApplyTo Container -Exact)
-}
-
-function Test-ShouldRevokePermission
-{
-    Set-TargetResource -Identity $UserName -Path $tempDir -Permission FullControl -Ensure Present
-    Set-TargetResource -Identity $UserName -Path $tempDir -Ensure Absent
-    Assert-False (Test-Permission -Identity $UserName -Path $tempDir -Permission FullControl -Exact)
-}
-
-function Test-ShouldRequirePermissionWhenGranting
-{
-    Set-TargetResource -Identity $UserName -Path $tempDir -Ensure Present -ErrorAction SilentlyContinue
-    Assert-Error -Last -Regex 'mandatory'
-    Assert-Null (Get-Permission -Path $tempDir -Identity $UserName)
-}
-
-function Test-ShouldGetNoPermission
-{
-    $resource = Get-TargetResource -Identity $UserName -Path $tempDir
-    Assert-NotNull $resource
-    Assert-Equal $UserName $resource.Identity
-    Assert-Equal $tempDir $resource.Path
-    Assert-Empty $resource.Permission
-    Assert-Null $resource.ApplyTo
-    Assert-DscResourceAbsent $resource
-}
-
-function Test-ShouldGetCurrentPermission
-{
-    Set-TargetResource -Identity $UserName -Path $tempDir -Permission FullControl -Ensure Present
-    $resource = Get-TargetResource -Identity $UserName -Path $tempDir
-    Assert-NotNull $resource
-    Assert-Equal $UserName $resource.Identity
-    Assert-Equal $tempDir $resource.Path
-    Assert-Equal 'FullControl' $resource.Permission
-    Assert-Equal 'ContainerAndSubContainersAndLeaves' $resource.ApplyTo
-    Assert-DscResourcePresent $resource
-}
-
-function Test-ShouldGetMultiplePermissions
-{
-    Set-TargetResource -Identity $UserName -Path $tempDir -Permission Read,Write -Ensure Present
-    $resource = Get-TargetResource -Identity $UserName -Path $tempDir
-    Assert-Is $resource.Permission 'string[]'
-    Assert-Equal 'Write,Read' ($resource.Permission -join ',')
-}
-
-
-function Test-ShouldGetCurrentContainerInheritanceFlags
-{
-    Set-TargetResource -Identity $UserName -Path $tempDir -Permission FullControl -ApplyTo SubContainers -Ensure Present
-    $resource = Get-TargetResource -Identity $UserName -Path $tempDir
-    Assert-NotNull $resource
-    Assert-Equal 'SubContainers' $resource.ApplyTo
-}
-
-function Test-ShouldTestNoPermission
-{
-    Assert-False (Test-TargetResource -Identity $UserName -Path $tempDir -Permission FullControl -Ensure Present)
-    Assert-False (Test-TargetResource -Identity $UserName -Path $tempDir -Permission FullControl -ApplyTo ContainerAndSubContainersAndLeaves -Ensure Present)
-    Assert-True (Test-TargetResource -Identity $UserName -Path $tempDir -Permission FullControl -Ensure Absent)
-    Assert-True (Test-TargetResource -Identity $UserName -Path $tempDir -Permission FullControl -ApplyTo ContainerAndSubContainersAndLeaves -Ensure Absent)
-}
-
-function Test-ShouldTestExistingPermission
-{
-    Set-TargetResource -Identity $UserName -Path $tempDir -Permission Read -ApplyTo Container -Ensure Present
-    Assert-True (Test-TargetResource -Identity $UserName -Path $tempDir -Permission Read -Ensure Present -Verbose)
-    Assert-True (Test-TargetResource -Identity $UserName -Path $tempDir -Permission Read -ApplyTo Container -Ensure Present)
-    Assert-False (Test-TargetResource -Identity $UserName -Path $tempDir -Permission Read -Ensure Absent)
-    Assert-False (Test-TargetResource -Identity $UserName -Path $tempDir -Permission Read -ApplyTo Container -Ensure Absent)
-
-    # Now, see what happens if permissions are wrong
-    Assert-False (Test-TargetResource -Identity $UserName -Path $tempDir -Permission Write -Ensure Present)
-    Assert-False (Test-TargetResource -Identity $UserName -Path $tempDir -Permission Read -ApplyTo Leaves -Ensure Present)
-    Assert-False (Test-TargetResource -Identity $UserName -Path $tempDir -Permission Write -Ensure Absent)
-    Assert-False (Test-TargetResource -Identity $UserName -Path $tempDir -Permission Read -ApplyTo Leaves -Ensure Absent)
-}
-
-
-configuration DscConfiguration
-{
-    param(
-        $Ensure
-    )
-
-    Set-StrictMode -Off
-
-    Import-DscResource -Name '*' -Module 'Carbon'
-
-    node 'localhost'
-    {
-        Carbon_Permission set
+    
+    AfterEach {
+        if( (Test-Path -Path $tempDir -PathType Container) )
         {
-            Identity = $UserName;
-            Path = $tempDir;
-            Permission = 'Read','Write';
-            ApplyTo = 'Container';
-            Ensure = $Ensure;
+            Remove-Item -Path $tempDir -Recurse
         }
     }
+    
+    AfterAll {
+        Stop-CarbonDscTestFixture
+    }
+    
+    It 'should grant permission on file system' {
+        Set-TargetResource -Identity $UserName -Path $tempDir -Permission FullControl -Ensure Present
+        $Global:Error.Count | Should Be 0
+        (Test-Permission -Identity $UserName -Path $tempDir -Permission FullControl -ApplyTo ContainerAndSubContainersAndLeaves -Exact) | Should Be $true
+    }
+    
+    It 'should grant permission with inheritence on file system' {
+        Set-TargetResource -Identity $UserName -Path $tempDir -Permission FullControl -ApplyTo Container -Ensure Present
+        $Global:Error.Count | Should Be 0
+        (Test-Permission -Identity $UserName -Path $tempDir -Permission FullControl -ApplyTo Container -Exact) | Should Be $true
+    }
+    
+    It 'should grant permission on registry' {
+        $keyPath = 'hkcu:\{0}' -f (Split-Path -Leaf -Path $tempDir)
+        New-Item -Path $keyPath
+        try
+        {
+            (Test-Permission -Identity $UserName -Path $keyPath -Permission ReadKey -ApplyTo Container -Exact) | Should Be $false
+            (Test-TargetResource -Identity $UserName -Path $keyPath -Permission ReadKey -Ensure Present) | Should Be $false
+    
+            Set-TargetResource -Identity $UserName -Path $keyPath -Permission ReadKey -ApplyTo Container -Ensure Present
+            $Global:Error.Count | Should Be 0
+            (Test-Permission -Identity $UserName -Path $keyPath -Permission ReadKey -ApplyTo Container -Exact) | Should Be $true
+            (Test-TargetResource -Identity $UserName -Path $keyPath -Permission ReadKey -Ensure Present) | Should Be $true
+    
+            Set-TargetResource -Identity $UserName -Path $keyPath -Permission ReadKey -ApplyTo Container -Ensure Absent
+            $Global:Error.Count | Should Be 0
+            (Test-Permission -Identity $UserName -Path $keyPath -Permission ReadKey -ApplyTo Container -Exact) | Should Be $false
+            (Test-TargetResource -Identity $UserName -Path $keyPath -Permission ReadKey -Ensure Absent) | Should Be $true
+        }
+        finally
+        {
+            Remove-Item -Path $keyPath
+        }
+    }
+    
+    It 'should grant permission on private key' {
+        $cert = Install-Certificate -Path (Join-Path -Path $PSScriptRoot -ChildPath 'Cryptography\CarbonTestPrivateKey.pfx' -Resolve) -StoreLocation LocalMachine -StoreName My
+        try
+        {
+            $certPath = Join-Path -Path 'cert:\LocalMachine\My' -ChildPath $cert.Thumbprint -Resolve
+            (Get-Permission -Path $certPath -Identity $UserName) | Should BeNullOrEmpty
+            (Test-TargetResource -Path $certPath -Identity $UserName -Permission 'GenericRead') | Should Be $false
+    
+            Set-TargetResource -Identity $UserName -Path $certPath -Permission GenericRead -Ensure Present
+            (Get-Permission -Path $certPath -Identity $UserName) | Should Not BeNullOrEmpty
+            (Test-TargetResource -Path $certPath -Identity $UserName -Permission 'GenericRead') | Should Be $true
+    
+            Set-TargetResource -Identity $UserName -Path $certPath -Permission GenericRead -Ensure Absent
+            (Get-Permission -Path $certPath -Identity $UserName) | Should BeNullOrEmpty
+            (Test-TargetResource -Path $certPath -Identity $UserName -Permission 'GenericRead' -Ensure Absent) | Should Be $true
+        }
+        finally
+        {
+            Uninstall-Certificate -Certificate $cert -StoreLocation LocalMachine -StoreName My
+        }
+    }
+    
+    It 'should change permission' {
+        Set-TargetResource -Identity $UserName -Path $tempDir -Permission FullControl -Ensure Present
+        Set-TargetResource -Identity $UserName -Path $tempDir -Permission Read -ApplyTo Container -Ensure Present
+        (Test-Permission -Identity $UserName -Path $tempDir -Permission Read -ApplyTo Container -Exact) | Should Be $true
+    }
+    
+    It 'should revoke permission' {
+        Set-TargetResource -Identity $UserName -Path $tempDir -Permission FullControl -Ensure Present
+        Set-TargetResource -Identity $UserName -Path $tempDir -Ensure Absent
+        (Test-Permission -Identity $UserName -Path $tempDir -Permission FullControl -Exact) | Should Be $false
+    }
+    
+    It 'should require permission when granting' {
+        Set-TargetResource -Identity $UserName -Path $tempDir -Ensure Present -ErrorAction SilentlyContinue
+        $Global:Error.Count | Should BeGreaterThan 0
+        $Global:Error[0] | Should Match 'mandatory'
+        (Get-Permission -Path $tempDir -Identity $UserName) | Should BeNullOrEmpty
+    }
+    
+    It 'should get no permission' {
+        $resource = Get-TargetResource -Identity $UserName -Path $tempDir
+        $resource | Should Not BeNullOrEmpty
+        $resource.Identity | Should Be $UserName
+        $resource.Path | Should Be $tempDir
+        $resource.Permission | Should BeNullOrEmpty
+        $resource.ApplyTo | Should BeNullOrEmpty
+        Assert-DscResourceAbsent $resource
+    }
+    
+    It 'should get current permission' {
+        Set-TargetResource -Identity $UserName -Path $tempDir -Permission FullControl -Ensure Present
+        $resource = Get-TargetResource -Identity $UserName -Path $tempDir
+        $resource | Should Not BeNullOrEmpty
+        $resource.Identity | Should Be $UserName
+        $resource.Path | Should Be $tempDir
+        $resource.Permission | Should Be 'FullControl'
+        $resource.ApplyTo | Should Be 'ContainerAndSubContainersAndLeaves'
+        Assert-DscResourcePresent $resource
+    }
+    
+    It 'should get multiple permissions' {
+        Set-TargetResource -Identity $UserName -Path $tempDir -Permission Read,Write -Ensure Present
+        $resource = Get-TargetResource -Identity $UserName -Path $tempDir
+        ,$resource.Permission | Should BeOfType 'string[]'
+        ($resource.Permission -join ',') | Should Be 'Write,Read'
+    }
+    
+    
+    It 'should get current container inheritance flags' {
+        Set-TargetResource -Identity $UserName -Path $tempDir -Permission FullControl -ApplyTo SubContainers -Ensure Present
+        $resource = Get-TargetResource -Identity $UserName -Path $tempDir
+        $resource | Should Not BeNullOrEmpty
+        $resource.ApplyTo | Should Be 'SubContainers'
+    }
+    
+    It 'should test no permission' {
+        (Test-TargetResource -Identity $UserName -Path $tempDir -Permission FullControl -Ensure Present) | Should Be $false
+        (Test-TargetResource -Identity $UserName -Path $tempDir -Permission FullControl -ApplyTo ContainerAndSubContainersAndLeaves -Ensure Present) | Should Be $false
+        (Test-TargetResource -Identity $UserName -Path $tempDir -Permission FullControl -Ensure Absent) | Should Be $true
+        (Test-TargetResource -Identity $UserName -Path $tempDir -Permission FullControl -ApplyTo ContainerAndSubContainersAndLeaves -Ensure Absent) | Should Be $true
+    }
+    
+    It 'should test existing permission' {
+        Set-TargetResource -Identity $UserName -Path $tempDir -Permission Read -ApplyTo Container -Ensure Present
+        (Test-TargetResource -Identity $UserName -Path $tempDir -Permission Read -Ensure Present -Verbose) | Should Be $true
+        (Test-TargetResource -Identity $UserName -Path $tempDir -Permission Read -ApplyTo Container -Ensure Present) | Should Be $true
+        (Test-TargetResource -Identity $UserName -Path $tempDir -Permission Read -Ensure Absent) | Should Be $false
+        (Test-TargetResource -Identity $UserName -Path $tempDir -Permission Read -ApplyTo Container -Ensure Absent) | Should Be $false
+    
+        # Now, see what happens if permissions are wrong
+        (Test-TargetResource -Identity $UserName -Path $tempDir -Permission Write -Ensure Present) | Should Be $false
+        (Test-TargetResource -Identity $UserName -Path $tempDir -Permission Read -ApplyTo Leaves -Ensure Present) | Should Be $false
+        (Test-TargetResource -Identity $UserName -Path $tempDir -Permission Write -Ensure Absent) | Should Be $false
+        (Test-TargetResource -Identity $UserName -Path $tempDir -Permission Read -ApplyTo Leaves -Ensure Absent) | Should Be $false
+    }
+    
+    
+    configuration DscConfiguration
+    {
+        param(
+            $Ensure
+        )
+    
+        Set-StrictMode -Off
+    
+        Import-DscResource -Name '*' -Module 'Carbon'
+    
+        node 'localhost'
+        {
+            Carbon_Permission set
+            {
+                Identity = $UserName;
+                Path = $tempDir;
+                Permission = 'Read','Write';
+                ApplyTo = 'Container';
+                Ensure = $Ensure;
+            }
+        }
+    }
+    
+    It 'should run through dsc' {
+        & DscConfiguration -Ensure 'Present' -OutputPath $CarbonDscOutputRoot
+        Start-DscConfiguration -Wait -ComputerName 'localhost' -Path $CarbonDscOutputRoot -Force
+        $Global:Error.Count | Should Be 0
+        (Test-TargetResource -Identity $UserName -Path $tempDir -Permission 'Read','Write' -ApplyTo 'Container' -Ensure 'Present') | Should Be $true
+        (Test-TargetResource -Identity $UserName -Path $tempDir -Permission 'Read','Write' -ApplyTo 'Container' -Ensure 'Absent') | Should Be $false
+    
+        & DscConfiguration -Ensure 'Absent' -OutputPath $CarbonDscOutputRoot 
+        Start-DscConfiguration -Wait -ComputerName 'localhost' -Path $CarbonDscOutputRoot -Force
+        $Global:Error.Count | Should Be 0
+        (Test-TargetResource -Identity $UserName -Path $tempDir -Permission 'Read','Write' -ApplyTo 'Container' -Ensure 'Present') | Should Be $false
+        (Test-TargetResource -Identity $UserName -Path $tempDir -Permission 'Read','Write' -ApplyTo 'Container' -Ensure 'Absent') | Should Be $true
+    }
+    
 }
-
-function Test-ShouldRunThroughDsc
-{
-    & DscConfiguration -Ensure 'Present' -OutputPath $CarbonDscOutputRoot
-    Start-DscConfiguration -Wait -ComputerName 'localhost' -Path $CarbonDscOutputRoot -Force
-    Assert-NoError
-    Assert-True (Test-TargetResource -Identity $UserName -Path $tempDir -Permission 'Read','Write' -ApplyTo 'Container' -Ensure 'Present')
-    Assert-False (Test-TargetResource -Identity $UserName -Path $tempDir -Permission 'Read','Write' -ApplyTo 'Container' -Ensure 'Absent')
-
-    & DscConfiguration -Ensure 'Absent' -OutputPath $CarbonDscOutputRoot 
-    Start-DscConfiguration -Wait -ComputerName 'localhost' -Path $CarbonDscOutputRoot -Force
-    Assert-NoError
-    Assert-False (Test-TargetResource -Identity $UserName -Path $tempDir -Permission 'Read','Write' -ApplyTo 'Container' -Ensure 'Present')
-    Assert-True (Test-TargetResource -Identity $UserName -Path $tempDir -Permission 'Read','Write' -ApplyTo 'Container' -Ensure 'Absent')
-}
-

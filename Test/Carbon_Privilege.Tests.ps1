@@ -10,276 +10,259 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'CarbonDscTest.psm1' -Resolve) -Force
-$UserName = 'CarbonDscTestUser'
-$Password = [Guid]::NewGuid().ToString()
+Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'DscResources\CarbonDscTest.psm1' -Resolve) -Force
 
-function Start-TestFixture
-{
-    Start-CarbonDscTestFixture 'Privilege'
+Describe 'Carbon_Privilege' {
+    $UserName = 'CarbonDscTestUser'
+    $Password = [Guid]::NewGuid().ToString()
     Install-User -UserName $UserName -Password $Password
-}
 
-function Start-Test
-{
-    Revoke-TestUserPrivilege
-}
-
-function Stop-Test
-{
-    Revoke-TestUserPrivilege
-}
-
-function Revoke-TestUserPrivilege
-{
-    if( (Get-Privilege -Identity $UserName) )
-    {
-        Revoke-Privilege -Identity $UserName -Privilege (Get-Privilege -Identity $UserName)
+    BeforeAll {
+        Start-CarbonDscTestFixture 'Privilege'
     }
-}
-
-function Stop-TestFixture
-{
-    Uninstall-User -UserName $UserName
-    Stop-CarbonDscTestFixture
-}
-
-function Test-ShouldGrantPrivilege
-{
-    Set-TargetResource -Identity $UserName -Privilege 'SeDenyBatchLogonRight','SeDenyNetworkLogonRight' -Ensure 'Present'
-    Assert-True (Test-Privilege -Identity $UserName -Privilege 'SeDenyBatchLogonRight')
-    Assert-True (Test-Privilege -Identity $UserName -Privilege 'SeDenyNetworkLogonRight')
-}
-
-function Test-ShouldRevokePrivilege
-{
-    Set-TargetResource -Identity $UserName -Privilege 'SeDenyBatchLogonRight','SeDenyNetworkLogonRight' -Ensure 'Present'
-    Assert-True (Test-Privilege -Identity $UserName -Privilege 'SeDenyBatchLogonRight')
-    Assert-True (Test-Privilege -Identity $UserName -Privilege 'SeDenyNetworkLogonRight')
-    Set-TargetResource -Identity $UserName -Privilege 'SeDenyBatchLogonRight','SeDenyNetworkLogonRight' -Ensure 'Absent'
-    Assert-False (Test-Privilege -Identity $UserName -Privilege 'SeDenyBatchLogonRight')
-    Assert-False (Test-Privilege -Identity $UserName -Privilege 'SeDenyNetworkLogonRight')
-}
-
-function Test-ShouldRevokeAllOtherPrivileges
-{
-    Set-TargetResource -Identity $UserName -Privilege 'SeDenyBatchLogonRight','SeDenyNetworkLogonRight' -Ensure 'Present'
-    Set-TargetResource -Identity $UserName -Privilege 'SeDenyInteractiveLogonRight' -Ensure 'Present'
-    Assert-False (Test-Privilege -Identity $UserName -Privilege 'SeDenyBatchLogonRight')
-    Assert-False (Test-Privilege -Identity $UserName -Privilege 'SeDenyNetworkLogonRight')
-    Assert-True (Test-Privilege -Identity $UserName -Privilege 'SeDenyInteractiveLogonRight')
-}
-
-function Test-ShouldRevokeAllPrivilegesIfEnsureAbsent
-{
-    Set-TargetResource -Identity $UserName -Privilege 'SeDenyBatchLogonRight','SeDenyNetworkLogonRight' -Ensure 'Present'
-    Set-TargetResource -Identity $UserName -Ensure 'Absent'    
-    Assert-False (Test-Privilege -Identity $UserName -Privilege 'SeDenyBatchLogonRight')
-    Assert-False (Test-Privilege -Identity $UserName -Privilege 'SeDenyNetworkLogonRight')
-}
-
-function Test-ShouldRevokeAllPrivilegesIfPrivilegeNull
-{
-    Set-TargetResource -Identity $UserName -Privilege 'SeDenyBatchLogonRight','SeDenyNetworkLogonRight' -Ensure 'Present'
-    Set-TargetResource -Identity $UserName -Privilege $null -Ensure 'Present'    
-    Assert-False (Test-Privilege -Identity $UserName -Privilege 'SeDenyBatchLogonRight')
-    Assert-False (Test-Privilege -Identity $UserName -Privilege 'SeDenyNetworkLogonRight')
-}
-
-function Test-ShouldRevokeAllPrivilegesIfPrivilegeEmpty
-{
-    Set-TargetResource -Identity $UserName -Privilege 'SeDenyBatchLogonRight','SeDenyNetworkLogonRight' -Ensure 'Present'
-    Set-TargetResource -Identity $UserName -Privilege @() -Ensure 'Present'    
-    Assert-False (Test-Privilege -Identity $UserName -Privilege 'SeDenyBatchLogonRight')
-    Assert-False (Test-Privilege -Identity $UserName -Privilege 'SeDenyNetworkLogonRight')
-}
-
-function Test-GetsNoPrivileges
-{
-    $resource = Get-TargetResource -Identity $UserName -Privilege @()
-    Assert-NotNull $resource
-    Assert-Equal $UserName $resource.Identity
-    Assert-Is $resource.Privilege ([string[]])
-    Assert-Equal 0 $resource.Privilege.Count
-    Assert-DscResourcePresent $resource
-}
-
-function Test-GetsCurrentPrivileges
-{
-    Set-TargetResource -Identity $UserName -Privilege 'SeDenyBatchLogonRight','SeDenyNetworkLogonRight' -Ensure 'Present'
-    $resource = Get-TargetResource -Identity $UserName -Privilege @()
-    Assert-NotNull $resource
-    Assert-Contains $resource.Privilege 'SeDenyBatchLogonRight'
-    Assert-Contains $resource.Privilege 'SeDenyNetworkLogonRight'
-    Assert-DscResourceAbsent $resource
-}
-
-function Test-ShouldBeAbsentIfAnyPrivilegeMissing
-{
-    Set-TargetResource -Identity $UserName -Privilege 'SeDenyBatchLogonRight' -Ensure 'Present'
-    $resource = Get-TargetResource -Identity $UserName -Privilege 'SeDenyNetworkLogonRight'
-    Assert-NotNull $resource
-    Assert-Contains $resource.Privilege 'SeDenyBatchLogonRight'
-    Assert-False ($resource.Privilege -contains 'SeDenyNetworkLogonRight')
-    Assert-DscResourceAbsent $resource
-}
-
-function Test-ShouldTestNoPrivileges
-{
-    Assert-True (Test-TargetResource -Identity $UserName -Privilege @() -Ensure 'Present')
-    Assert-True (Test-TargetResource -Identity $UserName -Privilege @() -Ensure 'Absent')
-}
-
-function Test-ShouldTestExistingPrivileges
-{
-    Set-TargetResource -Identity $UserName -Privilege 'SeDenyBatchLogonRight' -Ensure 'Present'
-    Assert-True (Test-TargetResource -Identity $UserName -Privilege 'SeDenyBatchLogonRight' -Ensure 'Present')
-    Assert-False (Test-TargetResource -Identity $UserName -Privilege 'SeDenyBatchLogonRight' -Ensure 'Absent')
-}
-
-function Test-ShouldTestAndNotAllowAnyPrivilegesWhenAbsent
-{
-    Set-TargetResource -Identity $UserName -Privilege 'SeDenyBatchLogonRight' -Ensure 'Present'
-    Assert-False (Test-TargetResource -Identity $UserName -Privilege 'SeDenyNetworkLogonRight' -Ensure 'Absent')
-    Assert-False (Test-TargetResource -Identity $UserName -Privilege 'SeDenyNetworkLogonRight' -Ensure 'Present')
-    Set-TargetResource -Identity $UserName -Privilege @() -Ensure 'Absent'
-    Assert-True (Test-TargetResource -Identity $UserName -Privilege 'SeDenyNetworkLogonRight' -Ensure 'Absent')
-    Assert-False (Test-TargetResource -Identity $UserName -Privilege 'SeDenyNetworkLogonRight' -Ensure 'Present')
-}
-
-function Test-ShouldTestWhenUserHasExtraPrivilege
-{
-    Set-TargetResource -Identity $UserName -Privilege 'SeDenyBatchLogonRight','SeDenyInteractiveLogonRight' -Ensure 'Present'
-    Assert-False (Test-TargetResource -Identity $UserName -Privilege 'SeDenyBatchLogonRight' -Ensure 'Absent')
-    Assert-False (Test-TargetResource -Identity $UserName -Privilege 'SeDenyBatchLogonRight' -Ensure 'Present')
-}
-
-configuration DscConfiguration
-{
-    param(
-        $Ensure
-    )
-
-    Set-StrictMode -Off
-
-    Import-DscResource -Name '*' -Module 'Carbon'
-
-    node 'localhost'
+    
+    BeforeEach {
+        $Global:Error.Clear()
+        Revoke-TestUserPrivilege
+    }
+    
+    AfterEach {
+        Revoke-TestUserPrivilege
+    }
+    
+    function Revoke-TestUserPrivilege
     {
-        Carbon_Privilege set
+        if( (Get-Privilege -Identity $UserName) )
         {
-            Identity = $UserName;
-            Privilege = 'SeDenyBatchLogonRight';
-            Ensure = $Ensure;
+            Revoke-Privilege -Identity $UserName -Privilege (Get-Privilege -Identity $UserName)
         }
     }
-}
-
-function Test-ShouldRunThroughDsc
-{
-    & DscConfiguration -Ensure 'Present' -OutputPath $CarbonDscOutputRoot
-    Start-DscConfiguration -Wait -ComputerName 'localhost' -Path $CarbonDscOutputRoot -Force
-    Assert-NoError
-    Assert-True (Test-TargetResource -Identity $UserName -Privilege 'SeDenyBatchLogonRight' -Ensure 'Present')
-    Assert-False (Test-TargetResource -Identity $UserName -Privilege 'SeDenyBatchLogonRight' -Ensure 'Absent')
-
-    & DscConfiguration -Ensure 'Absent' -OutputPath $CarbonDscOutputRoot 
-    Start-DscConfiguration -Wait -ComputerName 'localhost' -Path $CarbonDscOutputRoot -Force
-    Assert-NoError
-    Assert-False (Test-TargetResource -Identity $UserName -Privilege 'SeDenyBatchLogonRight' -Ensure 'Present')
-    Assert-True (Test-TargetResource -Identity $UserName -Privilege 'SeDenyBatchLogonRight' -Ensure 'Absent')
-}
-
-configuration DscConfiguration2
-{
-    Set-StrictMode -Off
-
-    Import-DscResource -Name '*' -Module 'Carbon'
-
-    node 'localhost'
+    
+    AfterAll {
+        Stop-CarbonDscTestFixture
+    }
+    
+    It 'should grant privilege' {
+        Set-TargetResource -Identity $UserName -Privilege 'SeDenyBatchLogonRight','SeDenyNetworkLogonRight' -Ensure 'Present'
+        (Test-Privilege -Identity $UserName -Privilege 'SeDenyBatchLogonRight') | Should Be $true
+        (Test-Privilege -Identity $UserName -Privilege 'SeDenyNetworkLogonRight') | Should Be $true
+    }
+    
+    It 'should revoke privilege' {
+        Set-TargetResource -Identity $UserName -Privilege 'SeDenyBatchLogonRight','SeDenyNetworkLogonRight' -Ensure 'Present'
+        (Test-Privilege -Identity $UserName -Privilege 'SeDenyBatchLogonRight') | Should Be $true
+        (Test-Privilege -Identity $UserName -Privilege 'SeDenyNetworkLogonRight') | Should Be $true
+        Set-TargetResource -Identity $UserName -Privilege 'SeDenyBatchLogonRight','SeDenyNetworkLogonRight' -Ensure 'Absent'
+        (Test-Privilege -Identity $UserName -Privilege 'SeDenyBatchLogonRight') | Should Be $false
+        (Test-Privilege -Identity $UserName -Privilege 'SeDenyNetworkLogonRight') | Should Be $false
+    }
+    
+    It 'should revoke all other privileges' {
+        Set-TargetResource -Identity $UserName -Privilege 'SeDenyBatchLogonRight','SeDenyNetworkLogonRight' -Ensure 'Present'
+        Set-TargetResource -Identity $UserName -Privilege 'SeDenyInteractiveLogonRight' -Ensure 'Present'
+        (Test-Privilege -Identity $UserName -Privilege 'SeDenyBatchLogonRight') | Should Be $false
+        (Test-Privilege -Identity $UserName -Privilege 'SeDenyNetworkLogonRight') | Should Be $false
+        (Test-Privilege -Identity $UserName -Privilege 'SeDenyInteractiveLogonRight') | Should Be $true
+    }
+    
+    It 'should revoke all privileges if ensure absent' {
+        Set-TargetResource -Identity $UserName -Privilege 'SeDenyBatchLogonRight','SeDenyNetworkLogonRight' -Ensure 'Present'
+        Set-TargetResource -Identity $UserName -Ensure 'Absent'    
+        (Test-Privilege -Identity $UserName -Privilege 'SeDenyBatchLogonRight') | Should Be $false
+        (Test-Privilege -Identity $UserName -Privilege 'SeDenyNetworkLogonRight') | Should Be $false
+    }
+    
+    It 'should revoke all privileges if privilege null' {
+        Set-TargetResource -Identity $UserName -Privilege 'SeDenyBatchLogonRight','SeDenyNetworkLogonRight' -Ensure 'Present'
+        Set-TargetResource -Identity $UserName -Privilege $null -Ensure 'Present'    
+        (Test-Privilege -Identity $UserName -Privilege 'SeDenyBatchLogonRight') | Should Be $false
+        (Test-Privilege -Identity $UserName -Privilege 'SeDenyNetworkLogonRight') | Should Be $false
+    }
+    
+    It 'should revoke all privileges if privilege empty' {
+        Set-TargetResource -Identity $UserName -Privilege 'SeDenyBatchLogonRight','SeDenyNetworkLogonRight' -Ensure 'Present'
+        Set-TargetResource -Identity $UserName -Privilege @() -Ensure 'Present'    
+        (Test-Privilege -Identity $UserName -Privilege 'SeDenyBatchLogonRight') | Should Be $false
+        (Test-Privilege -Identity $UserName -Privilege 'SeDenyNetworkLogonRight') | Should Be $false
+    }
+    
+    It 'gets no privileges' {
+        $resource = Get-TargetResource -Identity $UserName -Privilege @()
+        $resource | Should Not BeNullOrEmpty
+        $resource.Identity | Should Be $UserName
+        ,$resource.Privilege | Should BeOfType ([string[]])
+        $resource.Privilege.Count | Should Be 0
+        Assert-DscResourcePresent $resource
+    }
+    
+    It 'gets current privileges' {
+        Set-TargetResource -Identity $UserName -Privilege 'SeDenyBatchLogonRight','SeDenyNetworkLogonRight' -Ensure 'Present'
+        $resource = Get-TargetResource -Identity $UserName -Privilege @()
+        $resource | Should Not BeNullOrEmpty
+        $resource.Privilege | Where-Object { $_ -eq 'SeDenyBatchLogonRight' } | Should Not BeNullOrEmpty
+        $resource.Privilege | Where-Object { $_ -eq 'SeDenyNetworkLogonRight' } | Should Not BeNullOrEmpty
+        Assert-DscResourceAbsent $resource
+    }
+    
+    It 'should be absent if any privilege missing' {
+        Set-TargetResource -Identity $UserName -Privilege 'SeDenyBatchLogonRight' -Ensure 'Present'
+        $resource = Get-TargetResource -Identity $UserName -Privilege 'SeDenyNetworkLogonRight'
+        $resource | Should Not BeNullOrEmpty
+        $resource.Privilege | Where-Object { $_ -eq 'SeDenyBatchLogonRight' } | Should Not BeNullOrEmpty
+        ($resource.Privilege -contains 'SeDenyNetworkLogonRight') | Should Be $false
+        Assert-DscResourceAbsent $resource
+    }
+    
+    It 'should test no privileges' {
+        (Test-TargetResource -Identity $UserName -Privilege @() -Ensure 'Present') | Should Be $true
+        (Test-TargetResource -Identity $UserName -Privilege @() -Ensure 'Absent') | Should Be $true
+    }
+    
+    It 'should test existing privileges' {
+        Set-TargetResource -Identity $UserName -Privilege 'SeDenyBatchLogonRight' -Ensure 'Present'
+        (Test-TargetResource -Identity $UserName -Privilege 'SeDenyBatchLogonRight' -Ensure 'Present') | Should Be $true
+        (Test-TargetResource -Identity $UserName -Privilege 'SeDenyBatchLogonRight' -Ensure 'Absent') | Should Be $false
+    }
+    
+    It 'should test and not allow any privileges when absent' {
+        Set-TargetResource -Identity $UserName -Privilege 'SeDenyBatchLogonRight' -Ensure 'Present'
+        (Test-TargetResource -Identity $UserName -Privilege 'SeDenyNetworkLogonRight' -Ensure 'Absent') | Should Be $false
+        (Test-TargetResource -Identity $UserName -Privilege 'SeDenyNetworkLogonRight' -Ensure 'Present') | Should Be $false
+        Set-TargetResource -Identity $UserName -Privilege @() -Ensure 'Absent'
+        (Test-TargetResource -Identity $UserName -Privilege 'SeDenyNetworkLogonRight' -Ensure 'Absent') | Should Be $true
+        (Test-TargetResource -Identity $UserName -Privilege 'SeDenyNetworkLogonRight' -Ensure 'Present') | Should Be $false
+    }
+    
+    It 'should test when user has extra privilege' {
+        Set-TargetResource -Identity $UserName -Privilege 'SeDenyBatchLogonRight','SeDenyInteractiveLogonRight' -Ensure 'Present'
+        (Test-TargetResource -Identity $UserName -Privilege 'SeDenyBatchLogonRight' -Ensure 'Absent') | Should Be $false
+        (Test-TargetResource -Identity $UserName -Privilege 'SeDenyBatchLogonRight' -Ensure 'Present') | Should Be $false
+    }
+    
+    configuration DscConfiguration
     {
-        Carbon_Privilege set
+        param(
+            $Ensure
+        )
+    
+        Set-StrictMode -Off
+    
+        Import-DscResource -Name '*' -Module 'Carbon'
+    
+        node 'localhost'
         {
-            Identity = $UserName;
-            Privilege = 'SeDenyBatchLogonRight';
-            Ensure = 'Present';
+            Carbon_Privilege set
+            {
+                Identity = $UserName;
+                Privilege = 'SeDenyBatchLogonRight';
+                Ensure = $Ensure;
+            }
         }
     }
-}
-
-configuration DscConfiguration3
-{
-    Set-StrictMode -Off
-
-    Import-DscResource -Name '*' -Module 'Carbon'
-
-    node 'localhost'
+    
+    It 'should run through dsc' {
+        & DscConfiguration -Ensure 'Present' -OutputPath $CarbonDscOutputRoot
+        Start-DscConfiguration -Wait -ComputerName 'localhost' -Path $CarbonDscOutputRoot -Force
+        $Global:Error.Count | Should Be 0
+        (Test-TargetResource -Identity $UserName -Privilege 'SeDenyBatchLogonRight' -Ensure 'Present') | Should Be $true
+        (Test-TargetResource -Identity $UserName -Privilege 'SeDenyBatchLogonRight' -Ensure 'Absent') | Should Be $false
+    
+        & DscConfiguration -Ensure 'Absent' -OutputPath $CarbonDscOutputRoot 
+        Start-DscConfiguration -Wait -ComputerName 'localhost' -Path $CarbonDscOutputRoot -Force
+        $Global:Error.Count | Should Be 0
+        (Test-TargetResource -Identity $UserName -Privilege 'SeDenyBatchLogonRight' -Ensure 'Present') | Should Be $false
+        (Test-TargetResource -Identity $UserName -Privilege 'SeDenyBatchLogonRight' -Ensure 'Absent') | Should Be $true
+    }
+    
+    configuration DscConfiguration2
     {
-        Carbon_Privilege set
+        Set-StrictMode -Off
+    
+        Import-DscResource -Name '*' -Module 'Carbon'
+    
+        node 'localhost'
         {
-            Identity = $UserName;
-            Ensure = 'Absent';
+            Carbon_Privilege set
+            {
+                Identity = $UserName;
+                Privilege = 'SeDenyBatchLogonRight';
+                Ensure = 'Present';
+            }
         }
     }
-}
-
-function Test-ShouldRunThroughDsc
-{
-    & DscConfiguration2 -OutputPath $CarbonDscOutputRoot
-    Start-DscConfiguration -Wait -ComputerName 'localhost' -Path $CarbonDscOutputRoot -Force
-    Assert-NoError
-    Assert-True (Test-TargetResource -Identity $UserName -Privilege 'SeDenyBatchLogonRight' -Ensure 'Present')
-
-    & DscConfiguration3 -OutputPath $CarbonDscOutputRoot
-    Start-DscConfiguration -Wait -ComputerName 'localhost' -Path $CarbonDscOutputRoot -Force
-    Assert-NoError
-    Assert-True (Test-TargetResource -Identity $UserName -Privilege 'SeDenyBatchLogonRight' -Ensure 'Absent')
-}
-
-configuration DscConfiguration4
-{
-    Set-StrictMode -Off
-
-    Import-DscResource -Name '*' -Module 'Carbon'
-
-    node 'localhost'
+    
+    configuration DscConfiguration3
     {
-        Carbon_Privilege set
+        Set-StrictMode -Off
+    
+        Import-DscResource -Name '*' -Module 'Carbon'
+    
+        node 'localhost'
         {
-            Identity = $UserName;
-            Privilege = 'SeDenyBatchLogonRight';
-            Ensure = 'Present';
+            Carbon_Privilege set
+            {
+                Identity = $UserName;
+                Ensure = 'Absent';
+            }
         }
     }
-}
-
-configuration DscConfiguration5
-{
-    Set-StrictMode -Off
-
-    Import-DscResource -Name '*' -Module 'Carbon'
-
-    node 'localhost'
+    
+    It 'should run through dsc' {
+        & DscConfiguration2 -OutputPath $CarbonDscOutputRoot
+        Start-DscConfiguration -Wait -ComputerName 'localhost' -Path $CarbonDscOutputRoot -Force
+        $Global:Error.Count | Should Be 0
+        (Test-TargetResource -Identity $UserName -Privilege 'SeDenyBatchLogonRight' -Ensure 'Present') | Should Be $true
+    
+        & DscConfiguration3 -OutputPath $CarbonDscOutputRoot
+        Start-DscConfiguration -Wait -ComputerName 'localhost' -Path $CarbonDscOutputRoot -Force
+        $Global:Error.Count | Should Be 0
+        (Test-TargetResource -Identity $UserName -Privilege 'SeDenyBatchLogonRight' -Ensure 'Absent') | Should Be $true
+    }
+    
+    configuration DscConfiguration4
     {
-        Carbon_Privilege set
+        Set-StrictMode -Off
+    
+        Import-DscResource -Name '*' -Module 'Carbon'
+    
+        node 'localhost'
         {
-            Identity = $UserName;
-            Privilege = $null;
-            Ensure = 'Present';
+            Carbon_Privilege set
+            {
+                Identity = $UserName;
+                Privilege = 'SeDenyBatchLogonRight';
+                Ensure = 'Present';
+            }
         }
     }
+    
+    configuration DscConfiguration5
+    {
+        Set-StrictMode -Off
+    
+        Import-DscResource -Name '*' -Module 'Carbon'
+    
+        node 'localhost'
+        {
+            Carbon_Privilege set
+            {
+                Identity = $UserName;
+                Privilege = $null;
+                Ensure = 'Present';
+            }
+        }
+    }
+    
+    It 'should run through dsc' {
+        & DscConfiguration2 -OutputPath $CarbonDscOutputRoot
+        Start-DscConfiguration -Wait -ComputerName 'localhost' -Path $CarbonDscOutputRoot -Force
+        $Global:Error.Count | Should Be 0
+        (Test-TargetResource -Identity $UserName -Privilege 'SeDenyBatchLogonRight' -Ensure 'Present') | Should Be $true
+    
+        & DscConfiguration3 -OutputPath $CarbonDscOutputRoot
+        Start-DscConfiguration -Wait -ComputerName 'localhost' -Path $CarbonDscOutputRoot -Force
+        $Global:Error.Count | Should Be 0
+        (Test-TargetResource -Identity $UserName -Privilege 'SeDenyBatchLogonRight' -Ensure 'Present') | Should Be $false
+    }
+    
 }
-
-function Test-ShouldRunThroughDsc
-{
-    & DscConfiguration2 -OutputPath $CarbonDscOutputRoot
-    Start-DscConfiguration -Wait -ComputerName 'localhost' -Path $CarbonDscOutputRoot -Force
-    Assert-NoError
-    Assert-True (Test-TargetResource -Identity $UserName -Privilege 'SeDenyBatchLogonRight' -Ensure 'Present')
-
-    & DscConfiguration3 -OutputPath $CarbonDscOutputRoot
-    Start-DscConfiguration -Wait -ComputerName 'localhost' -Path $CarbonDscOutputRoot -Force
-    Assert-NoError
-    Assert-False (Test-TargetResource -Identity $UserName -Privilege 'SeDenyBatchLogonRight' -Ensure 'Present')
-}
-

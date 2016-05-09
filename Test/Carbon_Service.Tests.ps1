@@ -10,290 +10,279 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'CarbonDscTest.psm1' -Resolve) -Force
-$credential = New-Credential -User 'CarbonDscTestUser' -Password ([Guid]::NewGuid().ToString())
-$tempDir = $null
-$servicePath = $null
-$serviceName = 'CarbonDscTestService'
+Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'DscResources\CarbonDscTest.psm1' -Resolve) -Force
 
-function Start-TestFixture
-{
-    Start-CarbonDscTestFixture 'Service'
+Describe 'Carbon_Service' {
+    $credential = New-Credential -User 'CarbonDscTestUser' -Password ([Guid]::NewGuid().ToString())
+    $tempDir = $null
+    $servicePath = $null
+    $serviceName = 'CarbonDscTestService'
     Install-User -Credential $credential
-}
 
-function Start-Test
-{
-    $tempDir = 'Carbon+{0}+{1}' -f ((Split-Path -Leaf -Path $PSCommandPath),([IO.Path]::GetRandomFileName()))
-    $tempDir = Join-Path -Path $env:TEMP -ChildPath $tempDir
-    New-Item -Path $tempDir -ItemType 'Directory' | Out-Null
-    Copy-Item -Path (Join-Path -Path $PSScriptRoot -ChildPath '..\Service\NoOpService.exe') -Destination $tempDir
-    $servicePath = Join-Path -Path $tempDir -ChildPath 'NoOpService.exe'
-}
-
-function Stop-Test
-{
-    Uninstall-Service -Name $serviceName
-    if( (Test-Path -Path $tempDir -PathType Container) )
-    {
-        Remove-Item -Path $tempDir -Recurse -ErrorAction Ignore
+    BeforeAll {
+        Start-CarbonDscTestFixture 'Service'
     }
-}
-
-function Stop-TestFixture
-{
-    Stop-CarbonDscTestFixture
-}
-
-function Test-ShouldGetExistingServices
-{
-    Get-Service | ForEach-Object {
-        $resource = Get-TargetResource -Name $_.Name
-        Assert-NoError
-        Assert-NotNull $resource
-        Assert-Equal $_.Name $resource.Name
-        Assert-Equal $_.Path $resource.Path
-        Assert-Equal $_.StartMode $resource.StartupType
-        Assert-Equal $_.FirstFailure $resource.OnFirstFailure
-        Assert-Equal $_.SecondFailure $resource.OnSecondFailure
-        Assert-Equal $_.ThirdFailure $resource.OnThirdFailure
-        Assert-Equal $_.ResetPeriod $resource.ResetFailureCount
-        Assert-Equal $_.RestartDelay $resource.RestartDelay
-        Assert-Equal $_.RebootDelay $resource.RebootDelay
-        Assert-Equal $_.FailureProgram $resource.Command
-        Assert-Equal $_.RunCommandDelay $resource.RunCommandDelay
-        Assert-Equal $_.DisplayName $resource.DisplayName
-        Assert-Equal $_.Description $resource.Description
-        Assert-Equal (($_.ServicesDependedOn | Select-Object -ExpandProperty 'Name') -join ',') ($resource.Dependency -join ',') $_.Name
-        if( (Test-Identity -Name $_.UserName) )
+    
+    BeforeEach {
+        $Global:Error.Clear()
+        $tempDir = 'Carbon+{0}+{1}' -f ((Split-Path -Leaf -Path $PSCommandPath),([IO.Path]::GetRandomFileName()))
+        $tempDir = Join-Path -Path $env:TEMP -ChildPath $tempDir
+        New-Item -Path $tempDir -ItemType 'Directory' | Out-Null
+        Copy-Item -Path (Join-Path -Path $PSScriptRoot -ChildPath 'Service\NoOpService.exe') -Destination $tempDir
+        $servicePath = Join-Path -Path $tempDir -ChildPath 'NoOpService.exe'
+    }
+    
+    AfterEach {
+        Uninstall-Service -Name $serviceName
+        if( (Test-Path -Path $tempDir -PathType Container) )
         {
-            Assert-Equal (Resolve-IdentityName -Name $_.UserName) $resource.UserName
+            Remove-Item -Path $tempDir -Recurse -ErrorAction Ignore
         }
-        else
-        {
-            Assert-Equal $_.UserName $resource.UserName
+    }
+    
+    AfterAll {
+        Stop-CarbonDscTestFixture
+    }
+    
+    It 'should get existing services' {
+        Get-Service | ForEach-Object {
+            $resource = Get-TargetResource -Name $_.Name
+            $Global:Error.Count | Should Be 0
+            $resource | Should Not BeNullOrEmpty
+            $resource.Name | Should Be $_.Name
+            $resource.Path | Should Be $_.Path
+            $resource.StartupType | Should Be $_.StartMode
+            $resource.OnFirstFailure | Should Be $_.FirstFailure
+            $resource.OnSecondFailure | Should Be $_.SecondFailure
+            $resource.OnThirdFailure | Should Be $_.ThirdFailure
+            $resource.ResetFailureCount | Should Be $_.ResetPeriod
+            $resource.RestartDelay | Should Be $_.RestartDelay
+            $resource.RebootDelay | Should Be $_.RebootDelay
+            $resource.Command | Should Be $_.FailureProgram
+            $resource.RunCommandDelay | Should Be $_.RunCommandDelay
+            $resource.DisplayName | Should Be $_.DisplayName
+            $resource.Description | Should Be $_.Description
+            ($resource.Dependency -join ',') | Should Be (($_.ServicesDependedOn | Select-Object -ExpandProperty 'Name') -join ',')
+            if( (Test-Identity -Name $_.UserName) )
+            {
+                $resource.UserName | Should Be (Resolve-IdentityName -Name $_.UserName)
+            }
+            else
+            {
+                $resource.UserName | Should Be $_.UserName
+            }
+            $resource.Credential | Should BeNullOrEmpty
+            Assert-DscResourcePresent $resource
         }
-        Assert-Null $resource.Credential
+    }
+    
+    It 'should get non existent service' {
+        $name = [Guid]::NewGuid().ToString()
+        $resource = Get-TargetResource -Name $name
+    
+        $Global:Error.Count | Should Be 0
+        $resource | Should Not BeNullOrEmpty
+        $resource.Name | Should Be $name
+        $resource.Path | Should BeNullOrEmpty
+        $resource.StartupType | Should BeNullOrEmpty
+        $resource.OnFirstFailure | Should BeNullOrEmpty
+        $resource.OnSecondFailure | Should BeNullOrEmpty
+        $resource.OnThirdFailure | Should BeNullOrEmpty
+        $resource.ResetFailureCount | Should BeNullOrEmpty
+        $resource.RestartDelay | Should BeNullOrEmpty
+        $resource.RebootDelay | Should BeNullOrEmpty
+        $resource.Dependency | Should BeNullOrEmpty
+        $resource.Command | Should BeNullOrEmpty
+        $resource.RunCommandDelay | Should BeNullOrEmpty
+        $resource.DisplayName | Should BeNullOrEmpty
+        $resource.Description | Should BeNullOrEmpty
+        $resource.UserName | Should BeNullOrEmpty
+        $resource.Credential | Should BeNullOrEmpty
+        Assert-DscResourceAbsent $resource
+    }
+        
+    It 'should install service' {
+        Set-TargetResource -Path $servicePath -Name $serviceName -Ensure Present
+        $Global:Error.Count | Should Be 0
+        $resource = Get-TargetResource -Name $serviceName
+        $resource | Should Not BeNullOrEmpty
+        $resource.Name | Should Be $serviceName
+        $resource.Path | Should Be $servicePath
+        $resource.StartupType | Should Be 'Automatic'
+        $resource.OnFirstFailure | Should Be 'TakeNoAction'
+        $resource.OnSecondFailure | Should Be 'TakeNoAction'
+        $resource.OnThirdFailure | Should Be 'TakeNoAction'
+        $resource.ResetFailureCount | Should Be 0
+        $resource.RestartDelay | Should Be 0
+        $resource.RebootDelay | Should Be 0
+        $resource.Dependency | Should BeNullOrEmpty
+        $resource.Command | Should BeNullOrEmpty
+        $resource.RunCommandDelay | Should Be 0
+        $resource.UserName | Should Be 'NT AUTHORITY\NETWORK SERVICE'
+        $resource.Credential | Should BeNullOrEmpty
+        $resource.DisplayName | Should Be $serviceName
+        $resource.Description | Should BeNullOrEmpty
         Assert-DscResourcePresent $resource
     }
-}
-
-function Test-ShouldGetNonExistentService
-{
-    $name = [Guid]::NewGuid().ToString()
-    $resource = Get-TargetResource -Name $name
-
-    Assert-NoError
-    Assert-NotNull $resource
-    Assert-Equal $name $resource.Name
-    Assert-Null $resource.Path
-    Assert-Null $resource.StartupType
-    Assert-Null $resource.OnFirstFailure
-    Assert-Null $resource.OnSecondFailure
-    Assert-Null $resource.OnThirdFailure
-    Assert-Null $resource.ResetFailureCount
-    Assert-Null $resource.RestartDelay
-    Assert-Null $resource.RebootDelay
-    Assert-Null $resource.Dependency
-    Assert-Null $resource.Command
-    Assert-Null $resource.RunCommandDelay
-    Assert-Null $resource.DisplayName
-    Assert-Null $resource.Description
-    Assert-Null $resource.UserName
-    Assert-Null $resource.Credential
-    Assert-DscResourceAbsent $resource
-}
     
-function Test-ShouldInstallService
-{
-    Set-TargetResource -Path $servicePath -Name $serviceName -Ensure Present
-    Assert-NoError
-    $resource = Get-TargetResource -Name $serviceName
-    Assert-NotNull $resource
-    Assert-Equal $serviceName $resource.Name
-    Assert-Equal $servicePath $resource.Path
-    Assert-Equal 'Automatic' $resource.StartupType
-    Assert-Equal 'TakeNoAction' $resource.OnFirstFailure
-    Assert-Equal 'TakeNoAction' $resource.OnSecondFailure
-    Assert-Equal 'TakeNoAction' $resource.OnThirdFailure
-    Assert-Equal 0 $resource.ResetFailureCount
-    Assert-Equal 0 $resource.RestartDelay
-    Assert-Equal 0 $resource.RebootDelay
-    Assert-Null $resource.Dependency
-    Assert-Null $resource.Command
-    Assert-Equal 0 $resource.RunCommandDelay
-    Assert-Equal 'NT AUTHORITY\NETWORK SERVICE' $resource.UserName
-    Assert-Null $resource.Credential
-    Assert-Equal $serviceName $resource.DisplayName
-    Assert-Null $resource.Description
-    Assert-DscResourcePresent $resource
-}
-
-function Test-ShouldInstallServiceWithAllOptions
-{
-    Set-TargetResource -Path $servicePath `
-                       -Name $serviceName `
-                       -Ensure Present `
-                       -StartupType Manual `
-                       -OnFirstFailure RunCommand `
-                       -OnSecondFailure Restart `
-                       -OnThirdFailure Reboot `
-                       -ResetFailureCount (60*60*24*2) `
-                       -RestartDelay (1000*60*5) `
-                       -RebootDelay (1000*60*10) `
-                       -Command 'fubar.exe' `
-                       -RunCommandDelay (60*1000) `
-                       -Dependency 'W3SVC' `
-                       -DisplayName 'Display Name' `
-                       -Description 'Description description description' `
-                       -Credential $credential
-    Assert-NoError
-    $resource = Get-TargetResource -Name $serviceName
-    Assert-NotNull $resource
-    Assert-Equal $serviceName $resource.Name
-    Assert-Equal $servicePath $resource.Path
-    Assert-Equal 'Manual' $resource.StartupType
-    Assert-Equal 'RunCommand' $resource.OnFirstFailure
-    Assert-Equal 'Restart' $resource.OnSecondFailure
-    Assert-Equal 'Reboot' $resource.OnThirdFailure
-    Assert-Equal (60*60*24*2) $resource.ResetFailureCount
-    Assert-Equal (1000*60*5) $resource.RestartDelay
-    Assert-Equal (1000*60*10) $resource.RebootDelay
-    Assert-Equal 'W3SVC' $resource.Dependency
-    Assert-Equal 'fubar.exe' $resource.Command 
-    Assert-Equal (60*1000) $resource.RunCommandDelay
-    Assert-Equal 'Display Name' $resource.DisplayName
-    Assert-Equal 'Description description description' $resource.Description
-    Assert-Equal (Resolve-Identity -Name $credential.UserName).FullName $resource.UserName
-    Assert-Null $resource.Credential
-    Assert-DscResourcePresent $resource    
-}
-
-function Test-ShouldUninstallService
-{
-    Set-TargetResource -Name $serviceName -Path $servicePath -Ensure Present
-    Assert-NoError
-    Assert-DscResourcePresent (Get-TargetResource -Name $serviceName)
-    Set-TargetResource -Name $serviceName -Path $servicePath -Ensure Absent
-    Assert-NoError
-    Assert-DscResourceAbsent (Get-TargetResource -Name $serviceName)
-}
-
-function Test-ShouldRequirePathWhenInstallingService
-{
-    Set-TargetResource -Name $serviceName -Ensure Present -ErrorAction SilentlyContinue
-    Assert-Error -Last -Regex 'Path\b.*\bmandatory'
-    Assert-DscResourceAbsent (Get-TargetResource -Name $serviceName)
-}
-
-function Test-ShouldTestExistingServices
-{
-    Get-Service | ForEach-Object {
-        Assert-True (Test-TargetResource -Name $_.Name -Ensure Present)
-        Assert-False (Test-TargetResource -Name $_.Name -Ensure Absent)
+    It 'should install service with all options' {
+        Set-TargetResource -Path $servicePath `
+                           -Name $serviceName `
+                           -Ensure Present `
+                           -StartupType Manual `
+                           -OnFirstFailure RunCommand `
+                           -OnSecondFailure Restart `
+                           -OnThirdFailure Reboot `
+                           -ResetFailureCount (60*60*24*2) `
+                           -RestartDelay (1000*60*5) `
+                           -RebootDelay (1000*60*10) `
+                           -Command 'fubar.exe' `
+                           -RunCommandDelay (60*1000) `
+                           -Dependency 'W3SVC' `
+                           -DisplayName 'Display Name' `
+                           -Description 'Description description description' `
+                           -Credential $credential
+        $Global:Error.Count | Should Be 0
+        $resource = Get-TargetResource -Name $serviceName
+        $resource | Should Not BeNullOrEmpty
+        $resource.Name | Should Be $serviceName
+        $resource.Path | Should Be $servicePath
+        $resource.StartupType | Should Be 'Manual'
+        $resource.OnFirstFailure | Should Be 'RunCommand'
+        $resource.OnSecondFailure | Should Be 'Restart'
+        $resource.OnThirdFailure | Should Be 'Reboot'
+        $resource.ResetFailureCount | Should Be (60*60*24*2)
+        $resource.RestartDelay | Should Be (1000*60*5)
+        $resource.RebootDelay | Should Be (1000*60*10)
+        $resource.Dependency | Should Be 'W3SVC'
+        $resource.Command | Should Be 'fubar.exe'
+        $resource.RunCommandDelay | Should Be (60*1000)
+        $resource.DisplayName | Should Be 'Display Name'
+        $resource.Description | Should Be 'Description description description'
+        $resource.UserName | Should Be (Resolve-Identity -Name $credential.UserName).FullName
+        $resource.Credential | Should BeNullOrEmpty
+        Assert-DscResourcePresent $resource    
     }
-}
-
-function Test-ShouldTestMissingServices
-{
-    Assert-True (Test-TargetResource -Name $serviceName -Ensure Absent)
-    Assert-False (Test-TargetResource -Name $serviceName -Ensure Present)
-}
-
-function Test-ShouldTestOnCredentials
-{
-    Set-TargetResource -Name $serviceName -Path $servicePath -Credential $credential -Ensure Present
-    Assert-True (Test-TargetResource -Name $serviceName -Path $servicePath -Credential $credential -Ensure Present)
-}
-
-function Test-ShouldNotAllowbothUserNameAndCredentials
-{
-    Set-TargetResource -Name $serviceName -Path $servicePath -Credential $credential -username LocalService -Ensure Present -ErrorAction SilentlyContinue
-    Assert-Error
-    Assert-False (Test-Service -Name $serviceName)
-}
-
-function Test-ShouldTestOnProperties
-{
-    Set-TargetResource -Name $serviceName -Path $servicePath -Command 'fubar.exe' -Description 'Fubar' -Ensure Present
-    $testParams = @{ Name = $serviceName; }
-    Assert-True (Test-TargetResource @testParams -Path $servicePath -Ensure Present)
-    Assert-False (Test-TargetResource @testParams -Path 'C:\fubar.exe' -Ensure Present)
-
-    Assert-True (Test-TargetResource @testParams -StartupType Automatic -Ensure Present)
-    Assert-False (Test-TargetResource @testParams -StartupType Manual -Ensure Present)
-
-    Assert-True (Test-TargetResource @testParams -OnFirstFailure TakeNoAction -Ensure Present)
-    Assert-False (Test-TargetResource @testParams -OnFirstFailure Restart -Ensure Present)
-
-    Assert-True (Test-TargetResource @testParams -OnSecondFailure TakeNoAction -Ensure Present)
-    Assert-False (Test-TargetResource @testParams -OnSecondFailure Restart -Ensure Present)
-
-    Assert-True (Test-TargetResource @testParams -OnThirdFailure TakeNoAction -Ensure Present)
-    Assert-False (Test-TargetResource @testParams -OnThirdFailure Restart -Ensure Present)
-
-    Assert-True (Test-TargetResource @testParams -ResetFailureCount 0 -Ensure Present)
-    Assert-False (Test-TargetResource @testParams -ResetFailureCount 50 -Ensure Present)
-
-    Assert-True (Test-TargetResource @testParams -RestartDelay 0 -Ensure Present)
-    Assert-False (Test-TargetResource @testParams -RestartDelay 50 -Ensure Present)
-
-    Assert-True (Test-TargetResource @testParams -RebootDelay 0 -Ensure Present)
-    Assert-False (Test-TargetResource @testParams -RebootDelay 50 -Ensure Present)
-
-    Assert-True (Test-TargetResource @testParams -Dependency @() -Ensure Present)
-    Assert-False (Test-TargetResource @testParams -Dependency @( 'W3SVC' ) -Ensure Present)
-
-    Assert-True (Test-TargetResource @testParams -Command 'fubar.exe' -Ensure Present)
-    Assert-False (Test-TargetResource @testParams -Command 'fubar2.exe' -Ensure Present)
-
-    Assert-True (Test-TargetResource @testParams -RunCommandDelay 0 -Ensure Present)
-    Assert-False (Test-TargetResource @testParams -RunCommandDelay 1000 -Ensure Present)
-
-    Assert-True (Test-TargetResource @testParams -UserName 'NetworkService' -Ensure Present)
-    Assert-False (Test-TargetResource @testParams -Credential $credential -Ensure Present)
-
-    Assert-True (Test-TargetResource @testParams -Description 'Fubar' -Ensure Present)
-    Assert-False (Test-TargetResource @testParams -Description 'Description' -Ensure Present)
-
-    Assert-True (Test-TargetResource @testParams -DisplayName $serviceName -Ensure Present)
-    Assert-False (Test-TargetResource @testParams -DisplayName 'fubar' -Ensure Present)
-}
-
-
-configuration DscConfiguration
-{
-    param(
-        $Ensure
-    )
-
-    Set-StrictMode -Off
-
-    Import-DscResource -Name '*' -Module 'Carbon'
-
-    node 'localhost'
-    {
-        Carbon_Service set
-        {
-            Name = $serviceName;
-            Path = $servicePath;
-            Ensure = $Ensure;
+    
+    It 'should uninstall service' {
+        Set-TargetResource -Name $serviceName -Path $servicePath -Ensure Present
+        $Global:Error.Count | Should Be 0
+        Assert-DscResourcePresent (Get-TargetResource -Name $serviceName)
+        Set-TargetResource -Name $serviceName -Path $servicePath -Ensure Absent
+        $Global:Error.Count | Should Be 0
+        Assert-DscResourceAbsent (Get-TargetResource -Name $serviceName)
+    }
+    
+    It 'should require path when installing service' {
+        Set-TargetResource -Name $serviceName -Ensure Present -ErrorAction SilentlyContinue
+        $Global:Error.Count | Should BeGreaterThan 0
+        $Global:Error[0] | Should Match 'Path\b.*\bmandatory'
+        Assert-DscResourceAbsent (Get-TargetResource -Name $serviceName)
+    }
+    
+    It 'should test existing services' {
+        Get-Service | ForEach-Object {
+            (Test-TargetResource -Name $_.Name -Ensure Present) | Should Be $true
+            (Test-TargetResource -Name $_.Name -Ensure Absent) | Should Be $false
         }
     }
+    
+    It 'should test missing services' {
+        (Test-TargetResource -Name $serviceName -Ensure Absent) | Should Be $true
+        (Test-TargetResource -Name $serviceName -Ensure Present) | Should Be $false
+    }
+    
+    It 'should test on credentials' {
+        Set-TargetResource -Name $serviceName -Path $servicePath -Credential $credential -Ensure Present
+        (Test-TargetResource -Name $serviceName -Path $servicePath -Credential $credential -Ensure Present) | Should Be $true
+    }
+    
+    It 'should not allowboth user name and credentials' {
+        Set-TargetResource -Name $serviceName -Path $servicePath -Credential $credential -username LocalService -Ensure Present -ErrorAction SilentlyContinue
+        $Global:Error.Count | Should BeGreaterThan 0
+        (Test-Service -Name $serviceName) | Should Be $false
+    }
+    
+    It 'should test on properties' {
+        Set-TargetResource -Name $serviceName -Path $servicePath -Command 'fubar.exe' -Description 'Fubar' -Ensure Present
+        $testParams = @{ Name = $serviceName; }
+        (Test-TargetResource @testParams -Path $servicePath -Ensure Present) | Should Be $true
+        (Test-TargetResource @testParams -Path 'C:\fubar.exe' -Ensure Present) | Should Be $false
+    
+        (Test-TargetResource @testParams -StartupType Automatic -Ensure Present) | Should Be $true
+        (Test-TargetResource @testParams -StartupType Manual -Ensure Present) | Should Be $false
+    
+        (Test-TargetResource @testParams -OnFirstFailure TakeNoAction -Ensure Present) | Should Be $true
+        (Test-TargetResource @testParams -OnFirstFailure Restart -Ensure Present) | Should Be $false
+    
+        (Test-TargetResource @testParams -OnSecondFailure TakeNoAction -Ensure Present) | Should Be $true
+        (Test-TargetResource @testParams -OnSecondFailure Restart -Ensure Present) | Should Be $false
+    
+        (Test-TargetResource @testParams -OnThirdFailure TakeNoAction -Ensure Present) | Should Be $true
+        (Test-TargetResource @testParams -OnThirdFailure Restart -Ensure Present) | Should Be $false
+    
+        (Test-TargetResource @testParams -ResetFailureCount 0 -Ensure Present) | Should Be $true
+        (Test-TargetResource @testParams -ResetFailureCount 50 -Ensure Present) | Should Be $false
+    
+        (Test-TargetResource @testParams -RestartDelay 0 -Ensure Present) | Should Be $true
+        (Test-TargetResource @testParams -RestartDelay 50 -Ensure Present) | Should Be $false
+    
+        (Test-TargetResource @testParams -RebootDelay 0 -Ensure Present) | Should Be $true
+        (Test-TargetResource @testParams -RebootDelay 50 -Ensure Present) | Should Be $false
+    
+        (Test-TargetResource @testParams -Dependency @() -Ensure Present) | Should Be $true
+        (Test-TargetResource @testParams -Dependency @( 'W3SVC' ) -Ensure Present) | Should Be $false
+    
+        (Test-TargetResource @testParams -Command 'fubar.exe' -Ensure Present) | Should Be $true
+        (Test-TargetResource @testParams -Command 'fubar2.exe' -Ensure Present) | Should Be $false
+    
+        (Test-TargetResource @testParams -RunCommandDelay 0 -Ensure Present) | Should Be $true
+        (Test-TargetResource @testParams -RunCommandDelay 1000 -Ensure Present) | Should Be $false
+    
+        (Test-TargetResource @testParams -UserName 'NetworkService' -Ensure Present) | Should Be $true
+        (Test-TargetResource @testParams -Credential $credential -Ensure Present) | Should Be $false
+    
+        (Test-TargetResource @testParams -Description 'Fubar' -Ensure Present) | Should Be $true
+        (Test-TargetResource @testParams -Description 'Description' -Ensure Present) | Should Be $false
+    
+        (Test-TargetResource @testParams -DisplayName $serviceName -Ensure Present) | Should Be $true
+        (Test-TargetResource @testParams -DisplayName 'fubar' -Ensure Present) | Should Be $false
+    }
+    
+    
+    configuration DscConfiguration
+    {
+        param(
+            $Ensure
+        )
+    
+        Set-StrictMode -Off
+    
+        Import-DscResource -Name '*' -Module 'Carbon'
+    
+        node 'localhost'
+        {
+            Carbon_Service set
+            {
+                Name = $serviceName;
+                Path = $servicePath;
+                Ensure = $Ensure;
+            }
+        }
+    }
+    
+    It 'should run through dsc' {
+        & DscConfiguration -Ensure 'Present' -OutputPath $CarbonDscOutputRoot
+        Start-DscConfiguration -Wait -ComputerName 'localhost' -Path $CarbonDscOutputRoot -Force
+        $Global:Error.Count | Should Be 0
+        (Test-TargetResource -Name $serviceName -Ensure 'Present') | Should Be $true
+        (Test-TargetResource -Name $serviceName -Ensure 'Absent') | Should Be $false
+    
+        & DscConfiguration -Ensure 'Absent' -OutputPath $CarbonDscOutputRoot 
+        Start-DscConfiguration -Wait -ComputerName 'localhost' -Path $CarbonDscOutputRoot -Force
+        $Global:Error.Count | Should Be 0
+        (Test-TargetResource -Name $serviceName -Ensure 'Present') | Should Be $false
+        (Test-TargetResource -Name $serviceName -Ensure 'Absent') | Should Be $true
+    }
+    
 }
-
-function Test-ShouldRunThroughDsc
-{
-    & DscConfiguration -Ensure 'Present' -OutputPath $CarbonDscOutputRoot
-    Start-DscConfiguration -Wait -ComputerName 'localhost' -Path $CarbonDscOutputRoot -Force
-    Assert-NoError
-    Assert-True (Test-TargetResource -Name $serviceName -Ensure 'Present')
-    Assert-False (Test-TargetResource -Name $serviceName -Ensure 'Absent')
-
-    & DscConfiguration -Ensure 'Absent' -OutputPath $CarbonDscOutputRoot 
-    Start-DscConfiguration -Wait -ComputerName 'localhost' -Path $CarbonDscOutputRoot -Force
-    Assert-NoError
-    Assert-False (Test-TargetResource -Name $serviceName -Ensure 'Present')
-    Assert-True (Test-TargetResource -Name $serviceName -Ensure 'Absent')
-}
-
