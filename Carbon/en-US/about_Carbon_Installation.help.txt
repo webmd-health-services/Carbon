@@ -18,7 +18,7 @@ INSTALL FROM ZIP ARCHIVE
     To make Carbon available so you can run `Import-Module Carbon`, copy the `Carbon`
     directory into one of PowerShell's module paths. This command will you a list:
            
-        PS> $env:PSModuelPath -split ';'
+        PS> $env:PSModulePath -split ';'
     
     Once you do, you can import Carbon by running:
     
