@@ -35,18 +35,20 @@ Describe 'Carbon_ScheduledTask' {
         }
     
         It 'should get existing tasks' {
-            Get-ScheduledTask | ForEach-Object {
-                $expectedXml = schtasks /query /xml /tn $_.FullName | Where-Object { $_ }
-                $expectedXml = $expectedXml -join ([Environment]::NewLine) 
+            Get-ScheduledTask |
+                Select-Object -First 5 |
+                 ForEach-Object {
+                    $expectedXml = schtasks /query /xml /tn $_.FullName | Where-Object { $_ }
+                    $expectedXml = $expectedXml -join ([Environment]::NewLine) 
     
-                $resource = Get-TargetResource -Name $_.FullName
-                $Global:Error.Count | Should Be 0
-                $resource | Should Not BeNullOrEmpty
-                $resource.Name | Should Be $_.FullName
-                $resource.TaskCredential | Should Be $_.RunAsUser
-                $resource.TaskXml | Should Be $expectedXml
-                Assert-DscResourcePresent $resource
-            }
+                    $resource = Get-TargetResource -Name $_.FullName
+                    $Global:Error.Count | Should Be 0
+                    $resource | Should Not BeNullOrEmpty
+                    $resource.Name | Should Be $_.FullName
+                    $resource.TaskCredential | Should Be $_.RunAsUser
+                    $resource.TaskXml | Should Be $expectedXml
+                    Assert-DscResourcePresent $resource
+                }
         }
     
         It 'should get non existent task' {
@@ -144,6 +146,7 @@ Describe 'Carbon_ScheduledTask' {
     
         It 'should run through dsc' {
             & DscConfiguration -Ensure 'Present' -OutputPath $CarbonDscOutputRoot
+            
             Start-DscConfiguration -Wait -ComputerName 'localhost' -Path $CarbonDscOutputRoot -Force
             $Global:Error.Count | Should Be 0
             (Test-TargetResource -Name $taskName -TaskXml $taskForSystem -Ensure 'Present') | Should Be $true
@@ -154,7 +157,7 @@ Describe 'Carbon_ScheduledTask' {
             $Global:Error.Count | Should Be 0
             (Test-TargetResource -Name $taskName -TaskXml $taskForSystem -Ensure 'Present') | Should Be $false
             (Test-TargetResource -Name $taskName -Ensure 'Absent') | Should Be $true
-
+            
             $result = Get-DscConfiguration
             $Global:Error.Count | Should Be 0
             $result | Should BeOfType ([Microsoft.Management.Infrastructure.CimInstance])
