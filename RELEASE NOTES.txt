@@ -22,6 +22,7 @@
  * Fixed: `Get-PowerShellModuleInstallPath` doesn't return the module install path if it doesn't exist. Sometimes it doesn't yet.
  * Fixed: `Carbon_ScheduledTask` and `Carbon_IniFile` DSC resources' `Get-TargetResource` functions don't return correct resource properties and causes `Get-DscConfiguration` to fail (fixes [issue #193](https://bitbucket.org/splatteredbits/carbon/issues/193/get-targetresource-returns-taskname-in-its)).
  * Fixed: `Carbon_FirewallRule` DSC resource always re-installs a firewall rule if `Profile` property contains multiple values (i.e. it doesn't properly parse netsh output).
+ * Fixed: `about_Carbon_Installation` help topic had a typo.
  
 
 # 2.1.1 (25 February 2016)
