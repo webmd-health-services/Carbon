@@ -212,6 +212,7 @@ All functions are idempotent: when run multiple times with the same arguments, y
                             'New-TempDirectory',
                             'Protect-Acl',
                             'Protect-String',
+                            'Remove-DotNetAppSetting',
                             'Remove-EnvironmentVariable',
                             'Remove-GroupMember',
                             'Remove-HostsEntry',

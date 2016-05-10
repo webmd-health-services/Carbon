@@ -484,6 +484,10 @@
         "Tags":  [ "Cryptography", "Encryption" ]
     },
     {
+        "Name":  "Remove-DotNetAppSetting",
+        "Tags":  [ ".NET" ]
+    },
+    {
         "Name":  "Remove-EnvironmentVariable",
         "Tags":  [ "Computer", "Environment" ]
     },

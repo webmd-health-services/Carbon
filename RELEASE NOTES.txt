@@ -6,6 +6,7 @@
  * `Remove-Junction` now supports removing multiple junctions with wildcards.
  * Added a `LiteralPath` parameter to `Remove-Junction` for deleting junctions whose paths contain wildcard characters (e.g. `[`, `]`, etc.).
  * Added a `LiteralPath` parameter to `Uninstall-Junction` for deleting junctions whose paths contain wildcard characters (e.g. `[`, `]`, etc.).
+ * Added a `Remove-DotNetAppSetting` function for removing app settings from .NET framework machine.config files.
 
 ## Bug Fixes
 

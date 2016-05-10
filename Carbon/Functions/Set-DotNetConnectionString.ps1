@@ -26,6 +26,12 @@ function Set-DotNetConnectionString
       
     Any combination of Framework and Clr switch can be used, but you MUST supply one of each.
 
+    .LINK
+    Set-DotNetAppSetting
+
+    .LINK
+    Remove-DotNetAppSetting
+
     .EXAMPLE
     > Set-DotNetConnectionString -Name DevDB -Value "data source=.\DevDB;Integrated Security=SSPI;" -Framework -Framework64 -Clr2 -Clr4
     

@@ -10,14 +10,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Set-DotNetAppSetting
+function Remove-DotNetAppSetting
 {
     <#
     .SYNOPSIS
-    Sets an app setting in the .NET machine.config file.
+    Remove an app setting from the .NET machine.config file.
     
     .DESCRIPTION
-    The app setting can be set in up to four different machine.config files:
+    The `Remove-DotNetAppSetting` removes an app setting from one or more of the .NET machine.config file. The app setting can be removed from up to four different machine.config files:
     
      * .NET 2.0 32-bit (switches -Clr2 -Framework)
      * .NET 2.0 64-bit (switches -Clr2 -Framework64)
@@ -25,25 +25,29 @@ function Set-DotNetAppSetting
      * .NET 4.0 64-bit (switches -Clr4 -Framework64)
       
     Any combination of Framework and Clr switch can be used, but you MUST supply one of each.
+
+    If the app setting doesn't exist in the machine.config, nothing happens.
+
+    `Remove-DotNetAppSetting` was added in Carbon 2.2.0.
     
+    .LINK
+    Set-DotNetAppSetting
+
+    .LINK
+    Set-DotNetConnectionString
+
     .EXAMPLE
-    > Set-DotNetAppSetting -Name ExampleUrl -Value example.com -Framework -Framework64 -Clr2 -Clr4
+    > Remove-DotNetAppSetting -Name ExampleUrl -Framework -Framework64 -Clr2 -Clr4
     
-    Sets the ExampleUrl app setting in the following machine.config files:
+    Remvoes the `ExampleUrl` app setting from the following machine.config files:
     
      * `%SYSTEMROOT%\Microsoft.NET\Framework\v2.0.50727\CONFIG\machine.config`
      * `%SYSTEMROOT%\Microsoft.NET\Framework64\v2.0.50727\CONFIG\machine.config`
      * `%SYSTEMROOT%\Microsoft.NET\Framework\v4.0.30319\CONFIG\machine.config`
      * `%SYSTEMROOT%\Microsoft.NET\Framework64\v4.0.30319\CONFIG\machine.config`
 
-    .LINK
-    Remove-DotNetAppSetting
-
-    .LINK
-    Set-DotNetConnectionString
-
     .EXAMPLE
-    > Set-DotNetAppSetting -Name ExampleUrl -Value example.com -Framework64 -Clr4
+    > Remove-DotNetAppSetting -Name ExampleUrl -Framework64 -Clr4
     
     Sets the ExampleUrl app setting in the following machine.config file:
     
@@ -53,28 +57,23 @@ function Set-DotNetAppSetting
     param(
         [Parameter(Mandatory=$true)]
         [string]
-        # The name of the app setting to be set
+        # The name of the app setting to remove.
         $Name,
 
-        [Parameter(Mandatory=$true)]
-        [string]
-        # The valie of the app setting to be set.
-        $Value,
-        
         [Switch]
-        # Set the app setting in the 32-bit machine.config.
+        # Remove the app setting from a 32-bit machine.config. Must be used with one or both of the `Clr2` and `Clr4` switches to control which machine.config files to operate on.
         $Framework,
         
         [Switch]
-        # Set the app setting in the 64-bit machine.config.  Ignored if running on a 32-bit operating system.
+        # Remove the app setting from a 64-bit machine.config. Ignored if running on a 32-bit operating system. Must be used with one or both of the `Clr2` and `Clr4` switches to control which machine.config files to operate on.
         $Framework64,
         
         [Switch]
-        # Set the app setting in the .NET 2.0 machine.config.
+        # Remove the app setting from a .NET 2.0 machine.config. Must be used with one or both of the `Framework` and `Framework64` switches to control which machine.config files to operate on.
         $Clr2,
         
         [Switch]
-        # Set the app setting in the .NET 4.0 machine.config.
+        # Remove the app setting from a .NET 4.0 machine.config. Must be used with one or both of the `Framework` and `Framework64` switches to control which machine.config files to operate on.
         $Clr4
     )
     
@@ -106,10 +105,9 @@ function Set-DotNetAppSetting
 
     $runtimes | ForEach-Object {
         $params = @{
-            FilePath = (Join-Path $CarbonBinDir 'Set-DotNetAppSetting.ps1' -Resolve);
+            FilePath = (Join-Path $CarbonBinDir 'Remove-DotNetAppSetting.ps1' -Resolve);
             ArgumentList = @( 
-                                (ConvertTo-Base64 -Value $Name),
-                                (ConvertTo-Base64 -Value $Value)
+                                (ConvertTo-Base64 -Value $Name)
                             );
             Runtime = $_;
             ExecutionPolicy = [Microsoft.PowerShell.ExecutionPolicy]::RemoteSigned;
