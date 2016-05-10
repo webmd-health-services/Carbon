@@ -20,7 +20,7 @@
  * Fixed: `Get-PowerShellModuleInstallPath` returns multiple paths if the standard PowerShell module path is listed twice in the `PSModulePath` environment variable.
  * Fixed: Chocolatey package fails if the standard PowerShell module path is listed twice in the`PSModulePath` environment (fixes [issue #192](https://bitbucket.org/splatteredbits/carbon/issues/192/installation-of-carbon-via-chocolatey)).
  * Fixed: `Get-PowerShellModuleInstallPath` doesn't return the module install path if it doesn't exist. Sometimes it doesn't yet.
- * Fixed: `Carbon_ScheduledTask` DSC resource's `Get-TargetResource` function doesn't return correct resource properties and causes `Get-DscConfiguration` to fail (fixes [issue #193](https://bitbucket.org/splatteredbits/carbon/issues/193/get-targetresource-returns-taskname-in-its)).
+ * Fixed: `Carbon_ScheduledTask` and `Carbon_IniFile` DSC resources' `Get-TargetResource` functions don't return correct resource properties and causes `Get-DscConfiguration` to fail (fixes [issue #193](https://bitbucket.org/splatteredbits/carbon/issues/193/get-targetresource-returns-taskname-in-its)).
  * Fixed: `Carbon_FirewallRule` DSC resource always re-installs a firewall rule if `Profile` property contains multiple values (i.e. it doesn't properly parse netsh output).
  
 

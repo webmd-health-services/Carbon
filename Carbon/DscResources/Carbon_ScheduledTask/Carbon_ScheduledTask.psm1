@@ -24,7 +24,7 @@ function Get-TargetResource
         # The name of the scheduled task to return. Wildcards supported. This must be the *full task name*, i.e. the task's path/location and its name.
         $Name,
 
-        [xml]
+        [string]
         # Install the task from this XML.
         $TaskXml,
 
@@ -43,7 +43,7 @@ function Get-TargetResource
     $resource = @{
                     Name = $Name;
                     TaskXml = '';
-                    TaskCredential = '';
+                    TaskCredential = $null;
                     Ensure = 'Absent';
                 }
 
@@ -131,7 +131,7 @@ function Set-TargetResource
         # The name of the scheduled task to return. Wildcards supported. This must be the *full task name*, i.e. the task's path/location and its name.
         $Name,
 
-        [xml]
+        [string]
         # Install the task from this XML.
         $TaskXml,
 
@@ -184,7 +184,7 @@ function Test-TargetResource
         # The name of the scheduled task to return. Wildcards supported. This must be the *full task name*, i.e. the task's path/location and its name.
         $Name,
 
-        [xml]
+        [string]
         # Install the task from this XML.
         $TaskXml,
 
@@ -218,7 +218,7 @@ function Test-TargetResource
 
         $resourceXml = [xml]$resource.TaskXml
         $currentTaskXml = $resourceXml.OuterXml
-        $desiredTaskXml = $TaskXml.OuterXml
+        $desiredTaskXml = ([xml]$TaskXml).OuterXml
         if( $currentTaskXml -ne $desiredTaskXml )
         {
             $differsAt = 0

@@ -65,7 +65,7 @@ function Get-TargetResource
             return
         }
     }
-
+    
     $key = $Name
     if( $Section )
     {
@@ -79,14 +79,14 @@ function Get-TargetResource
         $currentValue = $ini[$key].Value
         $Ensure = 'Present';
     }
-
+    
     @{
         Path = $Path;
         Section = $Section;
         Name = $Name;
         Value = $currentValue;
-        CaseSensitive = $CaseSensitive;
-        Force = $Force
+        CaseSensitive = [bool]$CaseSensitive;
+        Force = [bool]$Force
         Ensure = $Ensure;
     }
 }
