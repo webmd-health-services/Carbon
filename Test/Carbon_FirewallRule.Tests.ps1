@@ -354,7 +354,6 @@ Describe 'Carbon_FirewallRule' {
         $result = Get-DscConfiguration
         $Global:Error.Count | Should Be 0
         $result | Should BeOfType ([Microsoft.Management.Infrastructure.CimInstance])
-        $result.PsTypeNames | Where-Object { $_ -eq 'GetDscConfigurationType' } | Should Not BeNullOrEmpty
         $result.PsTypeNames | Where-Object { $_ -like '*Carbon_FirewallRule' } | Should Not BeNullOrEmpty
     }
 
