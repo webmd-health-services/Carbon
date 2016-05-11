@@ -846,5 +846,5 @@
     {
         "Name":  "Write-File",
         "Tags":  [ "File System", "NTFS", "Text" ]
-    },
+    }
 ]
