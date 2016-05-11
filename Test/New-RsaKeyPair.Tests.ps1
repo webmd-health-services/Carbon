@@ -41,7 +41,8 @@ Describe 'New-RsaKeyPair' {
         $cert = Get-Certificate -Path $publicKeyPath
         # Weird date/time stamps in generated certificate that I can't figure out/replicate. So we'll just check that the expected/actual dates are within a day of each other.
         [timespan]$span = $ValidTo - $cert.NotAfter
-        (-1 -lt $span.TotalDays -and $span.TotalDays -lt 1) | Should Be $true
+        $span.TotalDays | Should BeGreaterThan (-2)
+        $span.TotalDays | Should BeLessThan 2
         $cert.Subject | Should Be $subject
         $cert.PublicKey.Key.KeySize | Should Be $Length
         $cert.PublicKey.Key.KeyExchangeAlgorithm | Should Be 'RSA-PKCS1-KeyEx'

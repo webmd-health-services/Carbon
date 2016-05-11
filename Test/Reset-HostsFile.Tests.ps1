@@ -69,7 +69,10 @@ $secondEntry
         }
         finally
         {
-            Write-File -Path (Get-PathToHostsFile) -InputObject $originalHostsFile
+            if( $originalHostsfile )
+            {
+                Write-File -Path (Get-PathToHostsFile) -InputObject $originalHostsFile
+            }
         }
     }
     
@@ -91,9 +94,9 @@ $customEntry
     
     It 'should support should process' {
         $customEntry = '1.2.3.4       example.com'
-        $customEntry >> $customHostsFile
+        $customEntry | Set-Content -Path $customHostsFile
         Reset-HostsFile -WhatIf
-        $hostsFile | Where-Object { $_ -eq $customEntry } | Should BeNullOrEmpty
+        Get-Content -Path $customHostsFile | Where-Object { $_ -eq $customEntry } | Should Not BeNullOrEmpty
     }
     
     It 'should create file if it does not exist' {
