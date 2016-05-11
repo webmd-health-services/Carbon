@@ -9,6 +9,12 @@
  * Created `Remove-DotNetAppSetting` function for removing app settings from .NET framework machine.config files.
  * Created `Read-File` function for reading text files and retrying if the read fails. Good for reading files that get intermittently locked, like the Windows hosts file.
  * Created `Write-File` function for writing text files and retrying if the write fails. Good for writing files that get intermittently locked, like the Windows hosts file.
+ * Made the following functions obsolete:
+   * `Get-WindowsFeature`
+   * `Install-Msmq`
+   * `Install-WindowsFeature`
+   * `Resolve-WindowsFeatureName`
+   * `Uninstall-WindowsFeature`
 
 ## Bug Fixes
 

@@ -38,6 +38,8 @@ function Resolve-WindowsFeatureName
 
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
     
+    Write-Warning -Message ('Resolve-WindowsFeatureName is obsolete and will be removed in a future major version of Carbon.')
+
     $featureMap = @{
                         Iis = 'Web-WebServer';
                         IisHttpRedirection = 'Web-Http-Redirect';

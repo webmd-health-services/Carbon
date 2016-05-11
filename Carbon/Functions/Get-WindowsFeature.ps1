@@ -65,6 +65,8 @@ if( -not (Get-Command -Name 'Get-WindowsFeature*' | Where-Object { $_.ModuleName
 
         Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
     
+        Write-Warning -Message ('Get-WindowsFeature is obsolete and will be removed in a future major version of Carbon.')
+
         if( -not (Assert-WindowsFeatureFunctionsSupported) )
         {
             return

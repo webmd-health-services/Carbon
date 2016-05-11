@@ -82,6 +82,8 @@ if( -not (Get-Command -Name 'Get-WindowsFeature*' | Where-Object { $_.ModuleName
         Set-StrictMode -Version 'Latest'
 
         Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
+        Write-Warning -Message ('Uninstall-WindowsFeature is obsolete and will be removed in a future major version of Carbon.')
     
         if( -not (Assert-WindowsFeatureFunctionsSupported) )
         {

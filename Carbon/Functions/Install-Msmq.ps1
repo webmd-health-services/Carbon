@@ -52,6 +52,8 @@ function Install-Msmq
 
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
+    Write-Warning -Message ('Install-Msmq is obsolete and will be removed in a future major version of Carbon.')
+
     $optionalArgs = @{ }
     if( $HttpSupport )
     {
