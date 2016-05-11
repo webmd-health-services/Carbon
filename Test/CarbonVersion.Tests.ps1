@@ -32,7 +32,8 @@ Describe 'CarbonVersion' {
     }
     
     It 'carbon assembly version is correct' {
-        Get-ChildItem (Join-Path $PSScriptRoot '..\Carbon\bin') Carbon*.dll | ForEach-Object {
+        $binPath = Join-Path -Path $PSScriptRoot -ChildPath '..\Carbon\bin\*'
+        Get-ChildItem -Path $binPath -Include 'Carbon*.dll' | ForEach-Object {
     
             $_.VersionInfo.FileVersion | Should Be $expectedVersion
             $_.VersionInfo.ProductVersion.ToString().StartsWith($expectedVersion.ToString()) | Should Be $true
