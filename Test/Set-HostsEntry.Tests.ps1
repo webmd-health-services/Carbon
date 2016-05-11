@@ -179,40 +179,47 @@ Describe 'Set-HostsEntry' {
     }
     
     It 'should handle if hosts file can not be read' {
-        Set-HostsEntry '0.3.2.1' -HostName 'example1.com' -Path $customHostsFile -ErrorAction SilentlyContinue
-        Set-HostsEntry '0.6.7.8' -HostName 'example2.com' -Path $customHostsFile -ErrorAction SilentlyContinue
+        Set-HostsEntry '0.3.2.1' -HostName 'example1.com' -Path $customHostsFile #-ErrorAction SilentlyContinue
+        Set-HostsEntry '0.6.7.8' -HostName 'example2.com' -Path $customHostsFile #-ErrorAction SilentlyContinue
     
         $job = Start-Job -ScriptBlock {
                                             $file = [IO.File]::Open($using:customHostsFile, 'Open', 'Read', 'None')
-                                            Start-Sleep -Seconds 1
+                                            Start-Sleep -Seconds 11
                                             $file.Close()
                                         }
-        do
+        try
         {
-            Start-Sleep -Milliseconds 100
-            Write-Debug -Message ('Waiting for hosts file to get locked.')
-        }
-        while( (Get-Content -Raw -Path $customHostsFile -ErrorAction Ignore) )
+            do
+            {
+                Start-Sleep -Milliseconds 100
+                Write-Debug -Message ('Waiting for hosts file to get locked.')
+            }
+            while( (Get-Content -Raw -Path $customHostsFile -ErrorAction Ignore) )
     
-        Set-HostsEntry '1.2.3.4' -HostName 'example.com' -Path $customHostsFile -ErrorAction SilentlyContinue
+            Set-HostsEntry '0.3.2.1' -HostName 'example.com' -Path $customHostsFile -ErrorAction SilentlyContinue
     
-        $Global:Error.Count | Should BeGreaterThan 0
-        $Global:Error[0] | Should Match 'looks like the hosts file is in use'
+            $Global:Error.Count | Should BeGreaterThan 0
+            $Global:Error[0] | Should Match 'failed to read'
     
-        do
-        {
-            Start-Sleep -Milliseconds 100
-            Write-Debug -Message ('Waiting for hosts file to get unlocked.')
-        }
-        while( -not (Get-Content -Raw -Path $customHostsFile -ErrorAction Ignore) )
+            do
+            {
+                Start-Sleep -Milliseconds 100
+                Write-Debug -Message ('Waiting for hosts file to get unlocked.')
+            }
+            while( -not (Get-Content -Raw -Path $customHostsFile -ErrorAction Ignore) )
     
-        $expectedHostsFile = @'
+            $expectedHostsFile = @'
 0.3.2.1         example1.com
 0.6.7.8         example2.com
 '@
-        $hostsFile = Get-Content -Raw -Path $customHostsFile -ErrorAction Ignore
-        $hostsFile | Should Not BeNullOrEmpty
-        $hostsFile.Contains($expectedHostsFile) | Should Be $true
+            $hostsFile = Get-Content -Raw -Path $customHostsFile -ErrorAction Ignore
+            $hostsFile | Should Not BeNullOrEmpty
+            $hostsFile.Contains($expectedHostsFile) | Should Be $true
+        }
+        finally
+        {
+            $job | Wait-Job | Receive-Job | Out-String | Write-Debug
+        }
     }
     
     #This test check case from Issue #148 

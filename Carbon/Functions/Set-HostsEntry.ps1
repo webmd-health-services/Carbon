@@ -101,15 +101,19 @@ function Set-HostsEntry
         }
         catch
         {
-            if( $Global:Error.Count -gt 0 )
-            {
-                $Global:Error.RemoveAt(0)
-            }
             $exception = $true
         }
 
         if( $exception -or $getHostsEntryError )
         {
+            if( $getHostsEntryError )
+            {
+                foreach( $item in $getHostsEntryError )
+                {
+                    $Global:Error.RemoveAt(0)
+                }
+            }
+
             $succeeded = $false
             Write-Debug -Message ('Failed to get hosts entries from ''{0}''. Retrying in 500 milliseconds.' -f $Path)
             Start-Sleep -Milliseconds 500
