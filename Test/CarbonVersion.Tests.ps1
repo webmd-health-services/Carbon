@@ -10,38 +10,34 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-$expectedVersion = $null
+& (Join-Path -Path $PSScriptRoot -ChildPath 'Import-CarbonForTest.ps1' -Resolve)
 
-function Start-TestFixture
-{
-    & (Join-Path -Path $PSScriptRoot -ChildPath 'Import-CarbonForTest.ps1' -Resolve)
-}
-
-function Start-Test
-{
-    $line = Get-Content -Path (Join-Path $TestDir '..\RELEASE NOTES.txt' -Resolve) | 
-                Where-Object { $_ -match '^# (\d+)\.(\d+)\.(\d+)\s*' } |
-                Select-Object -First 1
+Describe 'CarbonVersion' {
+    $expectedVersion = $null
     
-    $expectedVersion = New-Object Version $matches[1],$matches[2],$matches[3]
-}
-
-function Test-CarbonModuleVersionIsCorrect
-{
-    $moduleInfo = Get-Module -Name Carbon
-    Assert-NotNull $moduleInfo
-    Assert-Equal $expectedVersion.Major $moduleInfo.Version.Major 'Carbon module major version not correct.'
-    Assert-Equal $expectedVersion.Minor $moduleInfo.Version.Minor 'Carbon module minor version not correct.'
-    Assert-Equal $expectedVersion.Build $moduleInfo.Version.Build 'Carbon module build version not correct.'
-}
-
-function Test-CarbonAssemblyVersionIsCorrect
-{
-    Get-ChildItem (Join-Path $TestDir '..\Carbon\bin') Carbon*.dll | ForEach-Object {
-
-        Assert-Equal $expectedVersion $_.VersionInfo.FileVersion ('{0} assembly file version not correct.' -f $_.Name)
-        Assert-True $_.VersionInfo.ProductVersion.ToString().StartsWith($expectedVersion.ToString())  ('{0} assembly product version not correct.' -f $_.Name)
-
+    BeforeEach {
+        $line = Get-Content -Path (Join-Path $PSScriptRoot '..\RELEASE NOTES.txt' -Resolve) | 
+                    Where-Object { $_ -match '^# (\d+)\.(\d+)\.(\d+)\s*' } |
+                    Select-Object -First 1
+        
+        $expectedVersion = New-Object Version $matches[1],$matches[2],$matches[3]
     }
+    
+    It 'carbon module version is correct' {
+        $moduleInfo = Get-Module -Name Carbon
+        $moduleInfo | Should Not BeNullOrEmpty
+        $moduleInfo.Version.Major | Should Be $expectedVersion.Major
+        $moduleInfo.Version.Minor | Should Be $expectedVersion.Minor
+        $moduleInfo.Version.Build | Should Be $expectedVersion.Build
+    }
+    
+    It 'carbon assembly version is correct' {
+        Get-ChildItem (Join-Path $PSScriptRoot '..\Carbon\bin') Carbon*.dll | ForEach-Object {
+    
+            $_.VersionInfo.FileVersion | Should Be $expectedVersion
+            $_.VersionInfo.ProductVersion.ToString().StartsWith($expectedVersion.ToString()) | Should Be $true
+    
+        }
+    }
+    
 }
-
