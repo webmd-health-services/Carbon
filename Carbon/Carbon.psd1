@@ -212,6 +212,7 @@ All functions are idempotent: when run multiple times with the same arguments, y
                             'New-TempDirectory',
                             'Protect-Acl',
                             'Protect-String',
+                            'Read-File',
                             'Remove-DotNetAppSetting',
                             'Remove-EnvironmentVariable',
                             'Remove-GroupMember',
@@ -300,7 +301,8 @@ All functions are idempotent: when run multiple times with the same arguments, y
                             'Uninstall-WindowsFeature',
                             'Unlock-IisConfigurationSection',
                             'Unprotect-String',
-                            'Write-DscError'
+                            'Write-DscError',
+                            'Write-File'
                         )
 
     # Cmdlets to export from this module

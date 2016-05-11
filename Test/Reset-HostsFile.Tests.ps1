@@ -46,7 +46,7 @@ Describe 'Reset-HostsFile' {
     }
     
     It 'should operate on hosts file by default' {
-        $originalHostsfile = Get-Content (Get-PathToHostsFile)
+        $originalHostsfile = Read-File -Path (Get-PathToHostsFile)
     
         $firstEntry = '10.1.1.1     one.example.com'
         $commentLine = '# Below are all my custom host entries.'
@@ -57,19 +57,19 @@ $firstEntry
 $commentLine
 $secondEntry
     
-"@ | Out-File -FilePath (Get-PathToHostsFile) -Encoding OEM -Append
+"@ | Write-File -Path (Get-PathToHostsFile) 
     
         try
         {
             Reset-HostsFile
-            $hostsFile = Get-Content -Path (Get-PathToHostsFile)
+            $hostsFile = Read-File -Path (Get-PathToHostsFile)
             $hostsFile | Where-Object { $_ -eq $firstEntry } | Should BeNullOrEmpty
             $hostsFile | Where-Object { $_ -eq $commentLine } | Should BeNullOrEmpty
             $hostsFile | Where-Object { $_ -eq $secondEntry } | Should BeNullOrEmpty
         }
         finally
         {
-            Set-Content -Path (Get-PathToHostsFile) -Value $originalHostsFile
+            Write-File -Path (Get-PathToHostsFile) -InputObject $originalHostsFile
         }
     }
     

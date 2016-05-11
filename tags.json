@@ -484,6 +484,10 @@
         "Tags":  [ "Cryptography", "Encryption" ]
     },
     {
+        "Name":  "Read-File",
+        "Tags":  [ "File System", "NTFS", "Text" ]
+    },
+    {
         "Name":  "Remove-DotNetAppSetting",
         "Tags":  [ ".NET" ]
     },
@@ -838,5 +842,9 @@
     {
         "Name":  "Write-DscError",
         "Tags":  [ "DSC" ]
-    }
+    },
+    {
+        "Name":  "Write-File",
+        "Tags":  [ "File System", "NTFS", "Text" ]
+    },
 ]

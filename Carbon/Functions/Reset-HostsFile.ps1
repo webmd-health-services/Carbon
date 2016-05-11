@@ -57,11 +57,16 @@ function Reset-HostsFile
        New-Item $Path -ItemType File
     }
     
-    $lines = @( Get-Content -Path $Path )
-    $outLines = New-Object System.Collections.ArrayList
+    $cmdErrors = @()
+    [string[]]$lines = Read-File -Path $Path -ErrorVariable 'cmdErrors'
+    if( $cmdErrors )
+    {
+        return
+    }
+
+    $outLines = New-Object -TypeName 'System.Collections.ArrayList'
     foreach($line in $lines)
     {
-     
         if($line.Trim().StartsWith("#") -or ($line.Trim() -eq '') )
         {
             [void] $outlines.Add($line)
@@ -76,7 +81,7 @@ function Reset-HostsFile
     
     if( $PSCmdlet.ShouldProcess( $Path, "Reset-HostsFile" ) )
     {
-        $outlines | Out-File -FilePath $Path -Encoding OEM
+        $outlines | Write-File -Path $Path
     }     
 }
 

@@ -13,12 +13,13 @@
 & (Join-Path -Path $PSScriptRoot 'Import-CarbonForTest.ps1' -Resolve)
 
 Describe 'Set-HostsEntry' {
+
     $originalHostsFile = ''
     $customHostsFile = ''
     
     function Assert-HostsFileContains($Line, $Path = $customHostsFile)
     {
-        $hostsFile = Get-Content $Path
+        $hostsFile = Read-File -Path $Path
         $hostsFile | Where-Object { $_ -eq $Line } | Should Not BeNullOrEmpty
     }
     
@@ -62,7 +63,7 @@ Describe 'Set-HostsEntry' {
     }
     
     It 'should operate on system hosts file by default' {
-        $originalHostsfile = Get-Content (Get-PathToHostsFile)
+        $originalHostsfile = Read-File -Path (Get-PathToHostsFile)
     
         try
         {
@@ -72,7 +73,7 @@ Describe 'Set-HostsEntry' {
         }
         finally
         {
-            Set-Content -Path (Get-PathToHostsFile) -Value $originalHostsFile
+            $originalHostsfile | Write-File -Path (Get-PathToHostsFile)
         }
     }
     
@@ -169,7 +170,7 @@ Describe 'Set-HostsEntry' {
         }
         $Global:Error.Count | Should Be 1
         $Global:Error.Count | Should BeGreaterThan 0
-        $Global:Error[0] | Should Match 'looks like the hosts file is in use'
+        $Global:Error[0] | Should Match 'cannot access the file'
     
         $expectedHostsFile = @'
 0.3.2.1         example1.com
@@ -184,7 +185,7 @@ Describe 'Set-HostsEntry' {
     
         $job = Start-Job -ScriptBlock {
                                             $file = [IO.File]::Open($using:customHostsFile, 'Open', 'Read', 'None')
-                                            Start-Sleep -Seconds 11
+                                            Start-Sleep -Seconds 4
                                             $file.Close()
                                         }
         try
@@ -199,7 +200,7 @@ Describe 'Set-HostsEntry' {
             Set-HostsEntry '0.3.2.1' -HostName 'example.com' -Path $customHostsFile -ErrorAction SilentlyContinue
     
             $Global:Error.Count | Should BeGreaterThan 0
-            $Global:Error[0] | Should Match 'failed to read'
+            $Global:Error[0] | Should Match 'cannot access the file'
     
             do
             {

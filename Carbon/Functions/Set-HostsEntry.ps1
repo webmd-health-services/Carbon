@@ -86,50 +86,13 @@ function Set-HostsEntry
         Write-Warning "Creating hosts file at: $Path"
         New-Item $Path -ItemType File
     }
-     
-    [string[]]$lines = @()
     
-    $succeeded = $false
-    for( $idx = 0; $idx -lt 20; ++$idx )
+    $cmdErrors = @()
+    [string[]]$lines = Read-File -Path $Path -ErrorVariable 'cmdErrors'
+    if( $cmdErrors )
     {
-        $exception = $false
-        $getHostsEntryError = @()
-        try
-        {
-            $lines = Get-Content -Path $Path -ErrorAction SilentlyContinue -ErrorVariable 'getHostsEntryError'
-            $succeeded = $true
-        }
-        catch
-        {
-            $exception = $true
-        }
-
-        if( $exception -or $getHostsEntryError )
-        {
-            if( $getHostsEntryError )
-            {
-                foreach( $item in $getHostsEntryError )
-                {
-                    $Global:Error.RemoveAt(0)
-                }
-            }
-
-            $succeeded = $false
-            Write-Debug -Message ('Failed to get hosts entries from ''{0}''. Retrying in 500 milliseconds.' -f $Path)
-            Start-Sleep -Milliseconds 500
-        }
-
-        if( $succeeded )
-        {
-            break
-        }
-    }
-
-    if( -not $succeeded )
-    {
-        Write-Error ('Failed to read hosts file ''{0}''.' -f $Path)
         return
-    }
+    }    
 
     $outLines = New-Object 'Collections.ArrayList'
     $found = $false
@@ -211,44 +174,6 @@ function Set-HostsEntry
     }
     
     Write-Verbose -Message ('[HOSTS]  [{0}]  {1,-15}  {2}' -f $Path,$IPAddress,$HostName)
-    $succeeded = $false
-    $maxTries = 10
-    $rng = New-Object 'Random'
-    for( $idx = 0; $idx -lt $maxTries; ++$idx )
-    {
-        $exception = $false
-        $setHostsEntryError = @()
-        try
-        {
-            $outlines | Set-Content -Path $Path -ErrorAction SilentlyContinue -ErrorVariable 'setHostsEntryError'
-            $succeeded = $true
-        }
-        catch
-        {
-            if( $Global:Error.Count -gt 0 )
-            {
-                $Global:Error.RemoveAt(0)
-            }
-            $exception = $true
-        }
-
-        if( $exception -or $setHostsEntryError )
-        {
-            $succeeded = $false
-            $timeout = $rng.Next(0,1000)
-            Write-Debug -Message ('Failed to set hosts entry ''{0}    {1}'' in ''{2}'': waiting {3} milliseconds to try again.' -f $HostName,$IPAddress,$Path,$timeout)
-            Start-Sleep -Milliseconds $timeout
-        }
-
-        if( $succeeded )
-        {
-            break
-        }
-    }
-
-    if( -not $succeeded )
-    {
-        Write-Error ('Failed to set hosts entry ''{0}    {1}'' in ''{2}'': looks like the hosts file is in use.' -f $HostName,$IPAddress,$Path)
-    }
+    $outLines | Write-File -Path $Path
 }
 

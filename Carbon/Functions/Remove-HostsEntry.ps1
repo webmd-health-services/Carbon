@@ -48,7 +48,7 @@ function Remove-HostsEntry
 
         [string]
         # The hosts file to modify.  Defaults to the Windows hosts file.
-        $Path = (Join-Path -Path $env:SystemRoot -ChildPath 'System32\drivers\etc\hosts' -Resolve)
+        $Path = (Get-PathToHostsFile)
     )
 
     begin
@@ -72,8 +72,13 @@ function Remove-HostsEntry
         $regex = $allHostNames -join '|'
         $regex = '^[0-9a-f.:]+\s+\b({0})\b.*$' -f $regex 
 
-        $newHostsFile = Get-Content -Path $Path |
+        $cmdErrors = @()
+        $newHostsFile = Read-File -Path $Path -ErrorVariable 'cmdErrors' |
                             Where-Object { $_ -notmatch $regex }
+        if( $cmdErrors )
+        {
+            return
+        }
 
         $entryNoun = 'entry'
         if( $HostName.Count -gt 1 )
@@ -83,7 +88,7 @@ function Remove-HostsEntry
 
         if( $PSCmdlet.ShouldProcess( $Path, ('removing hosts {0} {1}' -f $entryNoun,($HostName -join ', ')) ) )
         {
-            Set-Content -Path $Path -Value $newHostsFile
+            $newHostsFile | Write-File -Path $Path
         }
     }
 }
