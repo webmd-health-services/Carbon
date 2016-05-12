@@ -24,7 +24,7 @@
     
 <h2>Description</h2>
 <div class="Description">
-<p>Custom modules should be installed under the <code>Program Files</code> directory. This function looks at the <code>PSModulePath</code> environment variable to find the install location under <code>Program Files</code>. If that path doesn't exist or isn't part of the <code>PSModulePath</code> environment variable, returns the module path under <code>$PSHOME</code>. If that path doesn't exist or isn't part of the <code>PSModulePath</code> environment variable, an error is written and nothing is returned.</p>
+<p>Custom modules should be installed under the <code>Program Files</code> directory. This function looks at the <code>PSModulePath</code> environment variable to find the install location under <code>Program Files</code>. If that path isn't part of the <code>PSModulePath</code> environment variable, returns the module path under <code>$PSHOME</code>. If that isn't part of the <code>PSModulePath</code> environment variable, an error is written and nothing is returned.</p>
 
 <p><code>Get-PowerShellModuleInstallPath</code> is new in Carbon 2.0.</p>
 </div>

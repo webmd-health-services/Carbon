@@ -53,7 +53,7 @@
 	<td class="ParamDescription"><p>The hosts file to modify.  Defaults to the Windows hosts file.</p></td>
 	<td>false</td>
 	<td>false</td>
-    <td>(Join-Path -Path $env:SystemRoot -ChildPath 'System32\drivers\etc\hosts' -Resolve)</td>
+    <td>(Get-PathToHostsFile)</td>
 </tr>
 <tr valign='top'>
 	<td>WhatIf</td>

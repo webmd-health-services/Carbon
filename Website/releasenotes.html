@@ -16,7 +16,49 @@
 		<li><a href="http://pshdo.com">-Blog</a></li>
     </ul>
 
-    <h1>2.1.1 (25 February 2016)</h1>
+    <h1>2.2.0 (11 May 2016)</h1>
+
+<h2>Enhancements</h2>
+
+<ul>
+<li>Aded a <code>LiteralPath</code> parameter to <a href="Test-PathIsJunction.html">Test-PathIsJunction</a> for testing paths that contain wildcard characters (e.g. <code>[</code>, <code>]</code>, etc.).</li>
+<li><a href="Remove-Junction.html">Remove-Junction</a> now supports removing multiple junctions with wildcards.</li>
+<li>Added a <code>LiteralPath</code> parameter to <a href="Remove-Junction.html">Remove-Junction</a> for deleting junctions whose paths contain wildcard characters (e.g. <code>[</code>, <code>]</code>, etc.).</li>
+<li>Added a <code>LiteralPath</code> parameter to <a href="Uninstall-Junction.html">Uninstall-Junction</a> for deleting junctions whose paths contain wildcard characters (e.g. <code>[</code>, <code>]</code>, etc.).</li>
+<li>Created <a href="Remove-DotNetAppSetting.html">Remove-DotNetAppSetting</a> function for removing app settings from .NET framework machine.config files.</li>
+<li>Created <a href="Read-File.html">Read-File</a> function for reading text files and retrying if the read fails. Good for reading files that get intermittently locked, like the Windows hosts file.</li>
+<li>Created <a href="Write-File.html">Write-File</a> function for writing text files and retrying if the write fails. Good for writing files that get intermittently locked, like the Windows hosts file.</li>
+<li>Made the following functions obsolete:
+<ul>
+<li><a href="Get-WindowsFeature.html">Get-WindowsFeature</a></li>
+<li><a href="Install-Msmq.html">Install-Msmq</a></li>
+<li><a href="Install-WindowsFeature.html">Install-WindowsFeature</a></li>
+<li><code>Resolve-WindowsFeatureName</code></li>
+<li><a href="Uninstall-WindowsFeature.html">Uninstall-WindowsFeature</a></li>
+</ul></li>
+</ul>
+
+<h2>Bug Fixes</h2>
+
+<ul>
+<li>Fixed: <a href="Add-GroupMember.html">Add-GroupMember</a>, over PowerShell remoting, fails to add a member to groups that have non-local users/groups (fixes <a href="https://bitbucket.org/splatteredbits/carbon/issues/187/add-groupmember-fails-when-using">issue #187: Add-GroupMember fails when using PowerShell Remoting</a>)</li>
+<li>Fixed: <a href="Remove-GroupMember.html">Remove-GroupMember</a>, over PowerShell remoting, fails to remove a member from groups that have non-local users/groups.</li>
+<li>Fixed: <a href="Test-PathIsJunction.html">Test-PathIsJunction</a> returns multiple results if the <code>Path</code> parameter contains wildcards and matches multiple items.</li>
+<li>Fixed: <a href="Install-Junction.html">Install-Junction</a> can't install a junction whose path contains wildcard characters (fixes <a href="https://bitbucket.org/splatteredbits/carbon/issues/190/install-junction-fails-when-the-path">issue #190</a>).</li>
+<li>Fixed: <a href="New-Junction.html">New-Junction</a> writes wrong error when creating an existing junction whose path contains wildcard characters.</li>
+<li>Fixed: <a href="Install-Service.html">Install-Service</a> doesn't update/change an existing service's account when using the <code>Credential</code> parameter (fixes <a href="https://bitbucket.org/splatteredbits/carbon/issues/185/install-service-never-updates-logon-as-if">issue #185</a>).</li>
+<li>Fixed: <a href="Uninstall-FileShare.html">Uninstall-FileShare</a> fails if a share's physical path doesn't exist.</li>
+<li>Fixed (hopefully): <a href="Get-FileSharePermission.html">Get-FileSharePermission</a> writes an error if a share's security information is corrupted (fixes <a href="https://bitbucket.org/splatteredbits/carbon/issues/188/get-filesharepermission-crashes-when-a">issue #188</a>). I was unable to reproduce the error, and the error was reported anonyously, so I did my best.</li>
+<li>Fixed: <a href="Get-PowerShellModuleInstallPath.html">Get-PowerShellModuleInstallPath</a> returns multiple paths if the standard PowerShell module path is listed twice in the <code>PSModulePath</code> environment variable.</li>
+<li>Fixed: Chocolatey package fails if the standard PowerShell module path is listed twice in the<code>PSModulePath</code> environment (fixes <a href="https://bitbucket.org/splatteredbits/carbon/issues/192/installation-of-carbon-via-chocolatey">issue #192</a>).</li>
+<li>Fixed: <a href="Get-PowerShellModuleInstallPath.html">Get-PowerShellModuleInstallPath</a> doesn't return the module install path if it doesn't exist. Sometimes it doesn't yet.</li>
+<li>Fixed: <code>Carbon_ScheduledTask</code> and <code>Carbon_IniFile</code> DSC resources' <code>Get-TargetResource</code> functions don't return correct resource properties and causes <code>Get-DscConfiguration</code> to fail (fixes <a href="https://bitbucket.org/splatteredbits/carbon/issues/193/get-targetresource-returns-taskname-in-its">issue #193</a>).</li>
+<li>Fixed: <code>Carbon_FirewallRule</code> DSC resource always re-installs a firewall rule if <code>Profile</code> property contains multiple values (i.e. it doesn't properly parse netsh output).</li>
+<li>Fixed: <a href="about_Carbon_Installation.html">about_Carbon_Installation</a> help topic had a typo.</li>
+<li>Fixed: <a href="Set-HostsEntry.html">Set-HostsEntry</a> fails to stop when the hosts file is in use and can't be read.</li>
+</ul>
+
+<h1>2.1.1 (25 February 2016)</h1>
 
 <h2>Bug Fixes</h2>
 

@@ -20,15 +20,18 @@
 <div><p>Uninstall a junction.</p></div>
 
 <h2>Syntax</h2>
-<pre class="Syntax"><code>Uninstall-Junction [[-Path] &lt;String&gt;] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
+<pre class="Syntax"><code>Uninstall-Junction [-Path] &lt;String&gt; [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
+<pre class="Syntax"><code>Uninstall-Junction -LiteralPath &lt;String&gt; [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
     
 <h2>Description</h2>
 <div class="Description">
-<p><code>Uninstall-Junction</code> removes a junction that may or may not exist, without errors.</p>
+<p>The <code>Uninstall-Junction</code> removes a junction that may or may not exist. If the junction exists, it is removed. If a junction doesn't exist, nothing happens.</p>
 
-<p>If <code>Path</code> is not a direcory, you <em>will</em> see errors.</p>
+<p>If the path to uninstall is not a direcory, you <em>will</em> see errors.</p>
 
 <p><code>Uninstall-Junction</code> is new in Carbon 2.0.</p>
+
+<p>Beginning in Carbon 2.2.0, you can uninstall junctions whose paths contain wildcard characters with the <code>LiteralPath</code> parameter.</p>
 </div>
     
 <h2>Related Commands</h2>
@@ -54,8 +57,18 @@
 <tr valign='top'>
 	<td>Path</td>
 	<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
-	<td class="ParamDescription"><p>The path to the junction to remove.</p></td>
+	<td class="ParamDescription"><p>The path to the junction to remove. Wildcards supported.</p></td>
+	<td>true</td>
 	<td>false</td>
+    <td></td>
+</tr>
+<tr valign='top'>
+	<td>LiteralPath</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
+	<td class="ParamDescription"><p>The literal path to the junction to remove. Use this parameter if the junction's path contains wildcard characters.</p>
+
+<p>This parameter was added in Carbon 2.2.0.</p></td>
+	<td>true</td>
 	<td>false</td>
     <td></td>
 </tr>
