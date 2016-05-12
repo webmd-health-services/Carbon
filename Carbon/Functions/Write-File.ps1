@@ -104,7 +104,6 @@ function Write-File
         do
         {
             $exception = $false
-            $cmdErrors = @()
             $lastTry = $tryNum -eq $MaximumTries
             if( $lastTry )
             {
@@ -114,7 +113,7 @@ function Write-File
             $numErrorsAtStart = $Global:Error.Count
             try
             {
-                Set-Content -Path $Path -Value $content -ErrorVariable 'cmdErrors' @errorAction
+                Set-Content -Path $Path -Value $content @errorAction
             }
             catch
             {
@@ -122,23 +121,23 @@ function Write-File
                 {
                     Write-Error -ErrorRecord $_
                 }
-                $exception = $true
             }
 
-            if( $exception -or $cmdErrors )
+            $numErrors = $Global:Error.Count - $numErrorsAtStart
+            if( $numErrors -and -not $lastTry )
             {
-                Write-Debug -Message ('Failed to write file ''{0}'' (attempt #{1}). Retrying in {2} milliseconds.' -f $Path,$tryNum,$RetryDelayMilliseconds)
-                if( $cmdErrors -and -not $lastTry )
+                for( $idx = 0; $idx -lt $numErrors; ++$idx )
                 {
-                    foreach( $item in $cmdErrors )
-                    {
-                        $Global:Error[0] | Out-String | Write-Debug
-                        $Global:Error.RemoveAt(0)
-                    }
+                    $Global:Error[0] | Out-String | Write-Debug
+                    $Global:Error.RemoveAt(0)
                 }
+            }
 
+            if( $numErrors )
+            {
                 if( -not $lastTry )
                 {
+                    Write-Debug -Message ('Failed to write file ''{0}'' (attempt #{1}). Retrying in {2} milliseconds.' -f $Path,$tryNum,$RetryDelayMilliseconds)
                     Start-Sleep -Milliseconds $RetryDelayMilliseconds
                 }
             }

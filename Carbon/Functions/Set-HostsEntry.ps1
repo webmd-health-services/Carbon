@@ -87,13 +87,12 @@ function Set-HostsEntry
         New-Item $Path -ItemType File
     }
     
-    $cmdErrors = @()
     [string[]]$lines = Read-File -Path $Path -ErrorVariable 'cmdErrors'
     if( $cmdErrors )
     {
         return
     }    
-
+    
     $outLines = New-Object 'Collections.ArrayList'
     $found = $false
     $lineNum = 0

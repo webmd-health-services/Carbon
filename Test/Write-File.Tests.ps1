@@ -88,33 +88,41 @@ Describe 'Write-File' {
         'b' | Write-File -Path $file -WhatIf
         [IO.File]::ReadAllText($file) | Should Be ("a{0}" -f [Environment]::NewLine)
     }
-    
+
+    function Lock-File
+    {
+        param(
+            $Seconds
+        )
+
+        Start-Job -ScriptBlock {
+                                            
+                                    $file = [IO.File]::Open($using:file, 'Open', 'Write', 'None')
+                                    try
+                                    {
+                                        Start-Sleep -Seconds $using:Seconds
+                                    }
+                                    finally
+                                    {
+                                        $file.Close()
+                                    }
+                                }
+        # Wait for file to get locked
+        do
+        {
+            Start-Sleep -Milliseconds 100
+            Write-Debug -Message ('Waiting for hosts file to get locked.')
+        }
+        while( (Get-Content -Path $file -ErrorAction SilentlyContinue ) )
+
+        $Global:Error.Clear()
+    }
+        
     It 'should wait while file is in use' {
         'b' | Set-Content -Path $file
-        $job = Start-Job -ScriptBlock {
-                                            
-                                            $file = [IO.File]::Open($using:file, 'Open', 'Write', 'None')
-                                            try
-                                            {
-                                                Start-Sleep -Seconds 1
-                                            }
-                                            finally
-                                            {
-                                                $file.Close()
-                                            }
-                                       }
+        $job = Lock-File -Seconds 1
         try
         {
-            # Wait for file to get locked
-            do
-            {
-                Start-Sleep -Milliseconds 100
-                Write-Debug -Message ('Waiting for hosts file to get locked.')
-            }
-            while( (Get-Content -Path $file -ErrorAction SilentlyContinue ) )
-
-            $Global:Error.Clear()
-
             'a' | Write-File -Path $file
             $Global:Error.Count | Should Be 0
         }
@@ -128,29 +136,10 @@ Describe 'Write-File' {
   
     It 'should control how long to wait for file to be released and report final error' {
         'b' | Set-Content -Path $file
-        $job = Start-Job -ScriptBlock {
-                                            $file = [IO.File]::Open($using:file, 'Open', 'Write', 'None')
-                                            try
-                                            {
-                                                Start-Sleep -Seconds 1
-                                            }
-                                            finally
-                                            {
-                                                $file.Close()
-                                            }
-                                       }
+        $job = Lock-File -Seconds 1
         try
         {
             # Wait for file to get locked
-            do
-            {
-                Start-Sleep -Milliseconds 100
-                Write-Debug -Message ('Waiting for hosts file to get locked.')
-            }
-            while( (Get-Content -Path $file -ErrorAction SilentlyContinue ) )
-
-            $Global:Error.Clear()
-
             'a' | Write-File -Path $file -MaximumTries 1 -RetryDelayMilliseconds 100 -ErrorAction SilentlyContinue
             $Global:Error.Count | Should Be 1
             $Global:Error | Should Match 'cannot access the file'
@@ -163,4 +152,23 @@ Describe 'Write-File' {
         [IO.File]::ReadAllText($file) | Should Be ("b{0}" -f [Environment]::NewLine)
     }
 
+
+    It 'should report errors with ErrorVariable parameter' {
+        'b' | Set-Content -Path $file
+        $job = Lock-File -Seconds 1
+        try
+        {
+            $result = 'a' | Write-File -Path $file -MaximumTries 1 -ErrorVariable 'cmdErrors' -ErrorAction SilentlyContinue
+            ,$result | Should BeNullOrEmpty
+            ,$cmdErrors | Should Not BeNullOrEmpty
+            $cmdErrors.Count | Should BeGreaterThan 0
+            $cmdErrors | Should Match 'cannot access the file'
+        }
+        finally
+        {
+            $job | Wait-Job | Receive-Job | Write-Debug
+        }
+        Get-Content -Path $file | Should Be 'b'
+
+    }
 }

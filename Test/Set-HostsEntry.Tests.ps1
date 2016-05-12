@@ -61,7 +61,7 @@ Describe 'Set-HostsEntry' {
     AfterEach {
         Remove-Item $customHostsFile
     }
-    
+
     It 'should operate on system hosts file by default' {
         $originalHostsfile = Read-File -Path (Get-PathToHostsFile)
     
@@ -178,14 +178,14 @@ Describe 'Set-HostsEntry' {
 '@
         [IO.File]::ReadAllText($customHostsFile).Contains($expectedHostsFile) | Should Be $true
     }
-    
+
     It 'should handle if hosts file can not be read' {
-        Set-HostsEntry '0.3.2.1' -HostName 'example1.com' -Path $customHostsFile #-ErrorAction SilentlyContinue
-        Set-HostsEntry '0.6.7.8' -HostName 'example2.com' -Path $customHostsFile #-ErrorAction SilentlyContinue
+        Set-HostsEntry '0.3.2.1' -HostName 'example1.com' -Path $customHostsFile 
+        Set-HostsEntry '0.6.7.8' -HostName 'example2.com' -Path $customHostsFile 
     
         $job = Start-Job -ScriptBlock {
                                             $file = [IO.File]::Open($using:customHostsFile, 'Open', 'Read', 'None')
-                                            Start-Sleep -Seconds 4
+                                            Start-Sleep -Seconds 5
                                             $file.Close()
                                         }
         try
@@ -197,7 +197,7 @@ Describe 'Set-HostsEntry' {
             }
             while( (Get-Content -Raw -Path $customHostsFile -ErrorAction Ignore) )
     
-            Set-HostsEntry '0.3.2.1' -HostName 'example.com' -Path $customHostsFile -ErrorAction SilentlyContinue
+            Set-HostsEntry '0.4.5.6' -HostName 'example1.com' -Path $customHostsFile -ErrorAction SilentlyContinue
     
             $Global:Error.Count | Should BeGreaterThan 0
             $Global:Error[0] | Should Match 'cannot access the file'
@@ -222,7 +222,7 @@ Describe 'Set-HostsEntry' {
             $job | Wait-Job | Receive-Job | Out-String | Write-Debug
         }
     }
-    
+
     #This test check case from Issue #148 
     It 'multiple call should not delete tabulation' {
         Set-HostsEntry -IPAddress 127.0.0.1 -HostName 'test' -Description 'Test' -Path $customHostsFile

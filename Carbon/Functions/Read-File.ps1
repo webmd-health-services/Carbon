@@ -74,15 +74,11 @@ function Read-File
         return
     }
 
-    $cmdErrors = @()
     $tryNum = 1
     $output = @()
     do
     {
-        $exception = $false
-        $cmdErrors = @()
         $lastTry = $tryNum -eq $MaximumTries
-        $errorAction = @{ 'ErrorAction' = 'SilentlyContinue' }
         if( $lastTry )
         {
             $errorAction = @{}
@@ -91,43 +87,48 @@ function Read-File
         $numErrorsAtStart = $Global:Error.Count
         try
         {
+
             if( $Raw )
             {
                 $output = [IO.File]::ReadAllText($Path)
             }
             else
             {
-                $output = Get-Content -Path $Path -ErrorVariable 'cmdErrors' @errorAction
+                $output = Get-Content -Path $Path -ErrorAction SilentlyContinue -ErrorVariable 'cmdErrors'
+                if( $cmdErrors -and $lastTry )
+                {
+                    foreach( $item in $cmdErrors )
+                    {
+                        $Global:Error.RemoveAt(0)
+                    }
+                    $cmdErrors | Write-Error 
+                }
             }
         }
         catch
         {
-            for( $idx = 0; $idx -lt ($Global:Error.Count - $numErrorsAtStart); ++$idx )
-            {
-                $Global:Error.RemoveAt(0)
-            }
-
             if( $lastTry )
             {
                 Write-Error -ErrorRecord $_
             }
-            $exception = $true
         }
 
-        if( $exception -or $cmdErrors )
-        {
-            Write-Debug -Message ('Failed to get read file ''{0}'' (attempt #{1}). Retrying in {2} milliseconds.' -f $Path,$tryNum,$RetryDelayMilliseconds)
-            if( $cmdErrors -and -not $lastTry )
-            {
-                foreach( $item in $cmdErrors )
-                {
-                    $Global:Error[0] | Out-String | Write-Debug
-                    $Global:Error.RemoveAt(0)
-                }
-            }
+        $numErrors = $Global:Error.Count - $numErrorsAtStart
 
+        if( -not $lastTry )
+        {
+            for( $idx = 0; $idx -lt $numErrors; ++$idx )
+            {
+                $Global:Error[0] | Out-String | Write-Debug
+                $Global:Error.RemoveAt(0)
+            }
+        }
+
+        if( $numErrors )
+        {
             if( -not $lastTry )
             {
+                Write-Debug -Message ('Failed to read file ''{0}'' (attempt #{1}). Retrying in {2} milliseconds.' -f $Path,$tryNum,$RetryDelayMilliseconds)
                 Start-Sleep -Milliseconds $RetryDelayMilliseconds
             }
         }
@@ -136,5 +137,5 @@ function Read-File
             return $output
         }
     }
-    while( $tryNum++ -le $MaximumTries )
+    while( $tryNum++ -lt $MaximumTries )
 }
