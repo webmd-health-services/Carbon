@@ -120,7 +120,7 @@ Describe 'Read-File' {
             $result = Read-File -Path $file -MaximumTries 1 -ErrorVariable 'cmdErrors' -ErrorAction SilentlyContinue
             ,$result | Should BeNullOrEmpty
             ,$cmdErrors | Should Not BeNullOrEmpty
-            $cmdErrors.Count | Should Be 1
+            $cmdErrors.Count | Should BeGreaterThan 0
             $cmdErrors | Should Match 'cannot access the file'
 
             $Global:Error.Clear()
