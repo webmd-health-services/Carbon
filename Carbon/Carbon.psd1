@@ -336,15 +336,39 @@ All functions are idempotent: when run multiple times with the same arguments, y
 
             # ReleaseNotes of this module
             ReleaseNotes = @'
+## Enhancements
+
+ * Aded a `LiteralPath` parameter to `Test-PathIsJunction` for testing paths that contain wildcard characters (e.g. `[`, `]`, etc.).
+ * `Remove-Junction` now supports removing multiple junctions with wildcards.
+ * Added a `LiteralPath` parameter to `Remove-Junction` for deleting junctions whose paths contain wildcard characters (e.g. `[`, `]`, etc.).
+ * Added a `LiteralPath` parameter to `Uninstall-Junction` for deleting junctions whose paths contain wildcard characters (e.g. `[`, `]`, etc.).
+ * Created `Remove-DotNetAppSetting` function for removing app settings from .NET framework machine.config files.
+ * Created `Read-File` function for reading text files and retrying if the read fails. Good for reading files that get intermittently locked, like the Windows hosts file.
+ * Created `Write-File` function for writing text files and retrying if the write fails. Good for writing files that get intermittently locked, like the Windows hosts file.
+ * Made the following functions obsolete:
+   * `Get-WindowsFeature`
+   * `Install-Msmq`
+   * `Install-WindowsFeature`
+   * `Resolve-WindowsFeatureName`
+   * `Uninstall-WindowsFeature`
+
 ## Bug Fixes
 
- * Fixed: unable to publish module to PowerShell Gallery because `RequiredAssemblies` module manifest data used an absolute path generated with `Join-Path` and `$PSScriptRoot`, which aren't allowed in module manifests.
- * Fixed: missing PowerShell Gallery tags, license URI, project URI, and release notes metadata.
- * Fixed: copyright date in module manifest is 2015.
- * Fixed: PowerShell gallery missing function list.
- * Fixed: Restricted user accounts can't import Carbon ([issue #180](https://bitbucket.org/splatteredbits/carbon/issues/180)).
- * Fixed: `Carbon_Privilege` DSC resource fails to remove all a user's privileges ([issue #178](https://bitbucket.org/splatteredbits/carbon/issues/178)).
- * Fixed: `Remove-IniEntry` fails to remove last INI entry in a file ([issue #179](https://bitbucket.org/splatteredbits/carbon/issues/179)).
+ * Fixed: `Add-GroupMember`, over PowerShell remoting, fails to add a member to groups that have non-local users/groups (fixes [issue #187: Add-GroupMember fails when using PowerShell Remoting](https://bitbucket.org/splatteredbits/carbon/issues/187/add-groupmember-fails-when-using))
+ * Fixed: `Remove-GroupMember`, over PowerShell remoting, fails to remove a member from groups that have non-local users/groups.
+ * Fixed: `Test-PathIsJunction` returns multiple results if the `Path` parameter contains wildcards and matches multiple items.
+ * Fixed: `Install-Junction` can't install a junction whose path contains wildcard characters (fixes [issue #190](https://bitbucket.org/splatteredbits/carbon/issues/190/install-junction-fails-when-the-path)).
+ * Fixed: `New-Junction` writes wrong error when creating an existing junction whose path contains wildcard characters.
+ * Fixed: `Install-Service` doesn't update/change an existing service's account when using the `Credential` parameter (fixes [issue #185](https://bitbucket.org/splatteredbits/carbon/issues/185/install-service-never-updates-logon-as-if)).
+ * Fixed: `Uninstall-FileShare` fails if a share's physical path doesn't exist.
+ * Fixed (hopefully): `Get-FileSharePermission` writes an error if a share's security information is corrupted (fixes [issue #188](https://bitbucket.org/splatteredbits/carbon/issues/188/get-filesharepermission-crashes-when-a)). I was unable to reproduce the error, and the error was reported anonyously, so I did my best.
+ * Fixed: `Get-PowerShellModuleInstallPath` returns multiple paths if the standard PowerShell module path is listed twice in the `PSModulePath` environment variable.
+ * Fixed: Chocolatey package fails if the standard PowerShell module path is listed twice in the`PSModulePath` environment (fixes [issue #192](https://bitbucket.org/splatteredbits/carbon/issues/192/installation-of-carbon-via-chocolatey)).
+ * Fixed: `Get-PowerShellModuleInstallPath` doesn't return the module install path if it doesn't exist. Sometimes it doesn't yet.
+ * Fixed: `Carbon_ScheduledTask` and `Carbon_IniFile` DSC resources' `Get-TargetResource` functions don't return correct resource properties and causes `Get-DscConfiguration` to fail (fixes [issue #193](https://bitbucket.org/splatteredbits/carbon/issues/193/get-targetresource-returns-taskname-in-its)).
+ * Fixed: `Carbon_FirewallRule` DSC resource always re-installs a firewall rule if `Profile` property contains multiple values (i.e. it doesn't properly parse netsh output).
+ * Fixed: `about_Carbon_Installation` help topic had a typo.
+ * Fixed: `Set-HostsEntry` fails to stop when the hosts file is in use and can't be read.
 '@
         } # End of PSData hashtable
     
