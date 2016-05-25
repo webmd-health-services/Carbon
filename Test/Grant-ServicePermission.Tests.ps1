@@ -10,59 +10,55 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Start-TestFixture
-{
-    & (Join-Path -Path $PSScriptRoot -ChildPath '..\Import-CarbonForTest.ps1' -Resolve)
-}
+& (Join-Path -Path $PSScriptRoot -ChildPath 'Import-CarbonForTest.ps1' -Resolve)
 
-function Start-Test
-{
-    $username = 'CarbonGrantSrvcPerms' 
-    $password = 'a1b2c3d4#'
-    Install-User -Username $username -Password $password -Description 'Account for testing Carbon Grant-ServicePermission functions.'
+Describe 'Grant-ServicePermission' {
     
-    $serviceName = 'CarbonGrantServicePermission' 
-    $servicePath = Join-Path $TestDir ..\Service\NoOpService.exe -Resolve
-    Install-Service -Name $serviceName -Path $servicePath -StartupType Disabled
-
-    Revoke-ServicePermission -Name $serviceName -Identity $username
-    $perms = Get-ServicePermission -Name $serviceName -Identity $username
-    Assert-Null $perms
-}
-
-function Test-ShouldGrantFullControl
-{
-    
-    Grant-ServicePermission -Name $serviceName -Identity $username -FullControl
-    $perm = Get-ServicePermission -Name $serviceName -Identity $username
-    Assert-NotNull $perm
-    Assert-Equal ([Carbon.Security.ServiceAccessRights]::FullControl) $perm.ServiceAccessRights
-}
-
-function Test-ShouldGrantIndividualPermissions
-{
-    [Enum]::GetValues( [Carbon.Security.ServiceAccessRights] ) |
-        ForEach-Object {
-            $grantArgs = @{
-                $_ = $true;
-            }
-            Grant-ServicePermission -Name $serviceName -Identity $username @grantArgs
-            $perm = Get-ServicePermission -Name $serviceName -Identity $username
-            Assert-NotNull $perm
-            Assert-Equal ([Carbon.Security.ServiceAccessRights]::$_) $perm.ServiceAccessRights
-        }
-}
-
-function Test-ShouldGrantAllPermissions
-{
-    $grantArgs = @{ }
-    [Enum]::GetValues( [Carbon.Security.ServiceAccessRights] ) |
-        Where-Object { $_ -ne 'FullControl' } |
-        ForEach-Object { $grantArgs.$_ = $true }
+    BeforeEach {
+        $username = 'CarbonGrantSrvcPerms' 
+        $password = 'a1b2c3d4#'
+        Install-User -Username $username -Password $password -Description 'Account for testing Carbon Grant-ServicePermission functions.'
         
-    Grant-ServicePermission -Name $serviceName -Identity $username @grantArgs
-    $perm = Get-ServicePermission -Name $serviceName -Identity $username
-    Assert-NotNull $perm
-    Assert-Equal ([Carbon.Security.ServiceAccessRights]::FullControl) $perm.ServiceAccessRights
+        $serviceName = 'CarbonGrantServicePermission' 
+        $servicePath = Join-Path $PSScriptRoot Service\NoOpService.exe -Resolve
+        Install-Service -Name $serviceName -Path $servicePath -StartupType Disabled
+    
+        Revoke-ServicePermission -Name $serviceName -Identity $username
+        $perms = Get-ServicePermission -Name $serviceName -Identity $username
+        $perms | Should BeNullOrEmpty
+    }
+    
+    It 'should grant full control' {
+        
+        Grant-ServicePermission -Name $serviceName -Identity $username -FullControl
+        $perm = Get-ServicePermission -Name $serviceName -Identity $username
+        $perm | Should Not BeNullOrEmpty
+        $perm.ServiceAccessRights | Should Be ([Carbon.Security.ServiceAccessRights]::FullControl)
+    }
+    
+    It 'should grant individual permissions' {
+        [Enum]::GetValues( [Carbon.Security.ServiceAccessRights] ) |
+            ForEach-Object {
+                $grantArgs = @{
+                    $_ = $true;
+                }
+                Grant-ServicePermission -Name $serviceName -Identity $username @grantArgs
+                $perm = Get-ServicePermission -Name $serviceName -Identity $username
+                $perm | Should Not BeNullOrEmpty
+                $perm.ServiceAccessRights | Should Be ([Carbon.Security.ServiceAccessRights]::$_)
+            }
+    }
+    
+    It 'should grant all permissions' {
+        $grantArgs = @{ }
+        [Enum]::GetValues( [Carbon.Security.ServiceAccessRights] ) |
+            Where-Object { $_ -ne 'FullControl' } |
+            ForEach-Object { $grantArgs.$_ = $true }
+            
+        Grant-ServicePermission -Name $serviceName -Identity $username @grantArgs
+        $perm = Get-ServicePermission -Name $serviceName -Identity $username
+        $perm | Should Not BeNullOrEmpty
+        $perm.ServiceAccessRights | Should Be ([Carbon.Security.ServiceAccessRights]::FullControl)
+    }
+    
 }
-
