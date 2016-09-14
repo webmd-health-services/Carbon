@@ -17,7 +17,11 @@ function Assert-ModuleVersion
 
         [string]
         # The path to the module's nuspec file.
-        $NuspecPath
+        $NuspecPath,
+
+        [string[]]
+        # A list of assembly file names that should be excluded from the version check. Wildcards allowed. Only assembly names are matched
+        $ExcludeAssembly
     )
 
     Set-StrictMode -Version 'Latest'
@@ -35,18 +39,31 @@ function Assert-ModuleVersion
     Write-Verbose -Message ('Checking that {0} module is at version {1}.' -f $manifest.Name,$version)
 
     $badAssemblies = Invoke-Command {
-                            $manifest.RequiredAssemblies |
-                                    ForEach-Object { 
-                                        if( [IO.Path]::IsPathRooted($_) )
-                                        {
-                                            return $_
-                                        }
-                                        return Join-Path -Path $manifest.ModuleBase -ChildPath $_
+                            $manifest.RequiredAssemblies | 
+                                ForEach-Object { 
+                                    if( -not [IO.Path]::IsPathRooted($_) )
+                                    {
+                                        Join-Path -Path (Split-Path -Parent -Path $manifest.Path) -ChildPath $_
                                     }
+                                    else
+                                    {
+                                        $_
+                                    }
+                                }
                             if( $AssemblyPath )
                             {
                                 $AssemblyPath
                             }
+                        } |
+                        Where-Object { 
+                            foreach( $exclusion in $ExcludeAssembly )
+                            {
+                                if( (Split-Path -Leaf -Path $_) -like $exclusion )
+                                {
+                                    return $false
+                                }
+                            }
+                            return $true
                         } |
                         Get-Item | 
                         Where-Object { 

@@ -41,11 +41,18 @@ function Convert-RelatedLinkToHtml
         $aboutTopics = @()
         if( $ModuleName )
         {
-            $aboutTopics = Get-Module -Name $ModuleName | 
-                                Select-Object -ExpandProperty 'ModuleBase' | 
-                                Get-ChildItem -Filter 'en-US\about_*' | 
-                                Select-Object -ExpandProperty 'BaseName' | 
-                                ForEach-Object { $_ -replace '\.help$','' }
+            $moduleBase = Get-Module -Name $ModuleName |  Select-Object -ExpandProperty 'ModuleBase'
+            if( (Test-Path -Path (Join-Path -Path $moduleBase -ChildPath 'en-US') -PathType Container) )
+            {
+                $aboutTopics = $moduleBase | 
+                                    Get-ChildItem -Filter 'en-US\about_*' | 
+                                    Select-Object -ExpandProperty 'BaseName' | 
+                                    ForEach-Object { $_ -replace '\.help$','' }
+            }
+            else
+            {
+                $aboutTopics = @()
+            }
         }
 
         Invoke-Command -ScriptBlock {

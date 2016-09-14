@@ -35,7 +35,12 @@ function Convert-ModuleHelpToHtml
     $moduleBase = Get-Module -Name $ModuleName |
                         Select-Object -ExpandProperty 'ModuleBase'
 
-    $aboutTopics = Get-ChildItem -Path $moduleBase -Filter 'en-US\about_*.help.txt'
+
+    $aboutTopics = @()
+    if( (Test-Path -Path (Join-Path -Path $moduleBase -ChildPath 'en-US') -PathType Container) )
+    {
+        $aboutTopics = Get-ChildItem -Path $moduleBase -Filter 'en-US\about_*.help.txt'
+    }
 
     $dscResources = Join-Path -Path $moduleBase -ChildPath 'DscResources' |
                         Where-Object { Test-Path -Path $_ -PathType Container } |

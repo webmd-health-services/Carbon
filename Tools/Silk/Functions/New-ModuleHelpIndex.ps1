@@ -12,7 +12,6 @@ function New-ModuleHelpIndex
         # The name of the module whose index page to create.
         $ModuleName,
 
-        [Parameter(Mandatory=$true)]
         [string[]]
         # The names of any scripts that should be included.
         $Script,
@@ -116,9 +115,13 @@ function New-ModuleHelpIndex
 
     $topicList = New-Object 'Collections.Generic.List[string]'
 
-    $aboutTopics = Get-Module -Name $ModuleName |
-                        Select-Object -ExpandProperty 'ModuleBase' |
-                        Get-ChildItem -Filter 'en-US\about_*.help.txt'
+    $moduleBase = Get-Module -Name $ModuleName |  Select-Object -ExpandProperty 'ModuleBase'
+    $aboutTopics = @()
+    if( (Test-Path -Path (Join-Path -Path $moduleBase -ChildPath 'en-US') -PathType Container) )
+    {
+        $aboutTopics = Get-ChildItem -Path $moduleBase -Filter 'en-US\about_*.help.txt'
+    }
+
     foreach( $aboutTopic in $aboutTopics )
     {
         $topicName = $aboutTopic.BaseName -replace '\.help$',''
