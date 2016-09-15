@@ -29,7 +29,7 @@ class Carbon_FirewallRule : OMI_BaseResource
 	[Write, 
      ValueMap{"Any","Domain","Private","Public"}, 
      Values{"Any","Domain","Private","Public"}] 
-    string Profile;
+    string Profile[];
 
     [Write] 
     string LocalIPAddress;

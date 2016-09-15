@@ -333,12 +333,17 @@ function Set-TargetResource
             {
                 $argName = $argMap[$argName]
             }
+            if( $argName -eq 'Profile' )
+            {
+                $argValue = $argValue -join ','
+            }
 
             [void]$netshArgs.Add( ('{0}=' -f $argName) )
             [void]$netshArgs.Add( $argValue )
         }
     
-    Write-Verbose ('{0} firewall rule ''{1}''' -f $cmdDisplayName,$Name)
+    Write-Verbose ('{0} firewall rule ''{1}'': cmd= {2}; name= {3}; newArg: {4}; netshargs= {5}' -f $cmdDisplayName,$Name,$cmd,$Name,$newArg,($netshArgs -join ' '))
+    Write-Debug -Message ('cmd= {0}; name= {1}; newArg: {2}; netshargs= {3}' -f $cmd,$Name,$newArg,($netshArgs -join ' '))
     $output = netsh advfirewall firewall $cmd rule name= $Name $newArg $netshArgs 
     if( $LASTEXITCODE )
     {

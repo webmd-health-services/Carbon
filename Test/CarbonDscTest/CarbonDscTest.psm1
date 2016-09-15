@@ -72,7 +72,14 @@ function Assert-DscResourcePresent
 
     Set-StrictMode -Version 'Latest'
 
-    Assert-Equal 'Present' $Resource.Ensure
+    if( (Get-Command -Name 'Assert-Equal' -ErrorAction Ignore) )
+    {
+        Assert-Equal 'Present' $Resource.Ensure
+    }
+    else
+    {
+        $Resource.Ensure | Should Be 'Present'
+    }
 }
 
 function Assert-DscResourceAbsent
@@ -85,7 +92,14 @@ function Assert-DscResourceAbsent
 
     Set-StrictMode -Version 'Latest'
 
-    Assert-Equal 'Absent' $Resource.Ensure
+    if( (Get-Command -Name 'Assert-Equal' -ErrorAction Ignore) )
+    {
+        Assert-Equal 'Absent' $Resource.Ensure
+    }
+    else
+    {
+        $Resource.Ensure | Should Be 'Absent'
+    }
 }
 
 Export-ModuleMember -Function '*-*' -Variable 'CarbonDscOutputRoot'

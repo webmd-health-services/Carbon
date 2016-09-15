@@ -12,8 +12,11 @@
 
 Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'CarbonDscTest' -Resolve) -Force
 
+$RuleName = 'CarbonDscFirewallRule'
+
+Start-CarbonDscTestFixture 'FirewallRule'
+
 Describe 'Carbon_FirewallRule' {
-    $RuleName = 'CarbonDscFirewallRule'
     
     function Remove-FirewallRule
     {
@@ -42,7 +45,6 @@ Describe 'Carbon_FirewallRule' {
     }
     
     BeforeAll {
-        Start-CarbonDscTestFixture 'FirewallRule'
     }
     
     BeforeEach {
@@ -309,7 +311,12 @@ Describe 'Carbon_FirewallRule' {
         $Global:Error[0] | Should Match '\bDirection\b.*\bAction\b'
         (Get-FirewallRule -Name $RuleName) | Should BeNullOrEmpty
     }
+}
+
+Describe 'Carbon_FirewallRule when run as a DSC resource' {
     
+    $Global:Error.Clear()
+
     configuration DscConfiguration
     {
         param(
@@ -355,6 +362,55 @@ Describe 'Carbon_FirewallRule' {
         $Global:Error.Count | Should Be 0
         $result | Should BeOfType ([Microsoft.Management.Infrastructure.CimInstance])
         $result.PsTypeNames | Where-Object { $_ -like '*Carbon_FirewallRule' } | Should Not BeNullOrEmpty
+    }
+}
+
+Describe 'Carbon_FirewallRule when run through DSC with multiple profiles' {
+
+    $Global:Error.Clear()
+    $RuleName = 'SupportMultiplePRofiles'
+    configuration DscConfiguration
+    {
+        param(
+            $Ensure
+        )
+    
+        Set-StrictMode -Off
+    
+        Import-DscResource -Name '*' -Module 'Carbon'
+    
+        node 'localhost'
+        {
+            Carbon_FirewallRule set
+            {
+                Name = $RuleName;
+                Direction = 'In';
+                Action = 'Allow';
+                Profile = 'Public','Private'
+                Ensure = $Ensure;
+            }
+        }
+    }
+    
+    It 'should run through dsc' {
+        & DscConfiguration -Ensure 'Present' -OutputPath $CarbonDscOutputRoot
+        
+        Start-DscConfiguration -Wait -ComputerName 'localhost' -Path $CarbonDscOutputRoot -Force
+        $Global:Error.Count | Should Be 0
+    }
+
+    It 'should set multiple profiles' {
+        $rule = Get-FirewallRule -Name $RuleName
+        $rule | Should Not BeNullOrEmpty
+        $rule.Profile | Should Match '\bPublic\b'
+        $rule.Profile | Should Match '\bPrivate\b'
+    }
+
+    It 'should remove the rule' {
+        & DscConfiguration -Ensure 'Absent' -OutputPath $CarbonDscOutputRoot
+        Start-DscConfiguration -Wait -ComputerName 'localhost' -Path $CarbonDscOutputRoot -Force
+        $Global:Error.Count | Should Be 0
+        Get-FirewallRule -Name $RuleName | Should BeNullOrEmpty
     }
 
 }
