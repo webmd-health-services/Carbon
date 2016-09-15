@@ -1,3 +1,11 @@
+# 2.3.0
+
+## Enhancements
+
+ * `Protect-String` can now encrypt with a key, password, or passphrase (i.e. it can now encrypt with symmetric encryption).
+ * `Unprotect-String` can now decrypt with a key, password, or passphrase (i.e. it can now decrypt using symmetric encryption).
+
+
 # 2.2.0 (11 May 2016)
 
 ## Enhancements

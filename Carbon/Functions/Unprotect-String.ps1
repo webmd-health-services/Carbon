@@ -17,7 +17,7 @@ filter Unprotect-String
     Decrypts a string.
     
     .DESCRIPTION
-    `Unprotect-String` decrypts a string encrypted via the Data Protection API (DPAPI) or RSA. It uses the DP/RSA APIs to decrypted the secret into an array of bytes, which is then converted to a UTF8 string. Beginning with Carbon 2.0, after conversion, the decrypted array of bytes is cleared in memory.
+    `Unprotect-String` decrypts a string encrypted via the Data Protection API (DPAPI), RSA, or AES. It uses the DP/RSA APIs to decrypted the secret into an array of bytes, which is then converted to a UTF8 string. Beginning with Carbon 2.0, after conversion, the decrypted array of bytes is cleared in memory.
 
     Also beginning in Carbon 2.0, use the `AsSecureString` switch to cause `Unprotect-String` to return the decrypted string as a `System.Security.SecureString`, thus preventing your secret from hanging out in memory. When converting to a secure string, the secret is decrypted to an array of bytes, and then converted to an array of characters. Each character is appended to the secure string, after which it is cleared in memory. When the conversion is complete, the decrypted byte array is also cleared out in memory.
 
@@ -25,11 +25,11 @@ filter Unprotect-String
 
     ## DPAPI
 
-    This is the default. The string must have also been encrypted with the DPAPI. The string must have been encrypted at the current user's scope or the local machien scope.
+    This is the default. The string must have also been encrypted with the DPAPI. The string must have been encrypted at the current user's scope or the local machine scope.
 
     ## RSA
 
-    RSA is an assymetric encryption/decryption algorithm, which requires a public/private key pair. This method decrypts a secret that was encrypted with the public key using the private key.
+    RSA is an assymetric encryption/decryption algorithm, which requires a public/private key pair. It uses a private key to decrypt a secret encrypted with the public key. Only the private key can decrypt secrets. `Protect-String` decrypts with .NET's `System.Security.Cryptography.RSACryptoServiceProvider` class.
 
     You can specify the private key in three ways: 
     
@@ -37,6 +37,16 @@ filter Unprotect-String
      * with a certificate in one of the Windows certificate stores, passing its unique thumbprint via the `Thumbprint` parameter, or via the `PrivateKeyPath` parameter, which can be a certificat provider path, e.g. it starts with `cert:\`.
      * with an X509 certificate file, via the `PrivateKeyPath` parameter
    
+    ## AES
+
+    AES is a symmetric encryption/decryption algorithm. You supply a 16-, 24-, or 32-byte key, password, or passphrase with the `Key` parameter, and that key is used to decrypt. You must decrypt with the same key you used to encrypt. `Unprotect-String` decrypts with .NET's `System.Security.Cryptography.AesCryptoServiceProvider` class.
+
+    Symmetric encryption requires a random, unique initialization vector (i.e. IV) everytime you encrypt something. If you encrypted your original string with Carbon's `Protect-String` function, that IV was pre-pended to the encrypted secret. If you encrypted the secret yourself, you'll need to ensure the original IV is pre-pended to the protected string.
+
+    The help topic for `Protect-String` demonstrates how to generate an AES key and how to encode it as a base-64 string.
+
+    The ability to decrypt with AES was added in Carbon 2.3.0.
+    
     .LINK
     New-RsaKeyPair
         
@@ -109,6 +119,11 @@ filter Unprotect-String
         # If true, uses Direct Encryption (PKCS#1 v1.5) padding. Otherwise (the default), uses OAEP (PKCS#1 v2) padding. See [Encrypt](http://msdn.microsoft.com/en-us/library/system.security.cryptography.rsacryptoserviceprovider.encrypt(v=vs.110).aspx) for information.
         $UseDirectEncryptionPadding,
 
+        [Parameter(Mandatory=$true,ParameterSetName='Symmetric')]
+        [object]
+        # The key to use to decrypt the secret. Must be a `SecureString`, `string`, or an array of bytes.
+        $Key,
+
         [Switch]
         # Returns the unprotected string as a secure string. The original decrypted bytes are zeroed out to limit the memory exposure of the decrypted secret, i.e. the decrypted secret will never be in a `string` object.
         $AsSecureString
@@ -118,7 +133,7 @@ filter Unprotect-String
 
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
         
-    $encryptedBytes = [Convert]::FromBase64String($ProtectedString)
+    [byte[]]$encryptedBytes = [Convert]::FromBase64String($ProtectedString)
     if( $PSCmdlet.ParameterSetName -eq 'DPAPI' )
     {
         $decryptedBytes = [Security.Cryptography.ProtectedData]::Unprotect( $encryptedBytes, $null, 0 )
@@ -205,6 +220,57 @@ Failed to decrypt string using certificate '{0}' ({1}). This usually happens whe
             }
             Write-Error -Exception $_.Exception
             return
+        }
+    }
+    elseif( $PSCmdlet.ParameterSetName -eq 'Symmetric' )
+    {
+        $Key = ConvertTo-Key -InputObject $Key -From 'Unprotect-String'
+        if( -not $Key )
+        {
+            return
+        }
+                
+        $aes = New-Object 'Security.Cryptography.AesCryptoServiceProvider'
+        try
+        {
+            $aes.Padding = [Security.Cryptography.PaddingMode]::PKCS7
+            $aes.KeySize = $Key.Length * 8
+            $aes.Key = $Key
+            $iv = New-Object 'Byte[]' $aes.IV.Length
+            [Array]::Copy($encryptedBytes,$iv,16)
+
+            $encryptedBytes = $encryptedBytes[16..($encryptedBytes.Length - 1)]
+            $encryptedStream = New-Object 'IO.MemoryStream' (,$encryptedBytes)
+            try
+            {
+                $decryptor = $aes.CreateDecryptor($aes.Key, $iv)
+                try
+                {
+                    $cryptoStream = New-Object 'Security.Cryptography.CryptoStream' $encryptedStream,$decryptor,([Security.Cryptography.CryptoStreamMode]::Read)
+                    try
+                    {
+                        $decryptedBytes = New-Object 'byte[]' ($encryptedBytes.Length)
+                        [void]$cryptoStream.Read($decryptedBytes, 0, $decryptedBytes.Length)
+                    }
+                    finally
+                    {
+                        $cryptoStream.Dispose()
+                    }
+                }
+                finally
+                {
+                    $decryptor.Dispose()
+                }
+
+            }
+            finally
+            {
+                $encryptedStream.Dispose()
+            }
+        }
+        finally
+        {
+            $aes.Dispose()
         }
     }
 

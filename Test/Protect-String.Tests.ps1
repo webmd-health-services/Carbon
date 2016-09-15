@@ -240,3 +240,24 @@ Describe 'Protect-String' {
     }
 
 }
+
+foreach( $keySize in @( 128, 192, 256 ) )
+{
+    Describe ('Protect-String when given a {0}-bit key' -f $keySize) {
+        $Global:Error.Clear()
+        # Generate a secret that is too long for asymmetric encryption
+        $secret = [Guid]::NewGuid().ToString() * 20
+        $passphrase = [Guid]::NewGuid().ToString().Substring(0,($keySize / 8))
+        $ciphertext = Protect-String -String $secret -Key $passphrase
+        It 'should return ciphertext' {
+            $ciphertext | Should Not BeNullOrEmpty
+            ConvertFrom-Base64 -Value $ciphertext | Should Not BeNullOrEmpty
+            $Global:Error.Count | Should Be 0
+        }
+
+        It 'should encrypt ciphertext' {
+            $revealedSecret = Unprotect-String -ProtectedString $ciphertext -Key $passphrase
+            $revealedSecret | Should Be $secret
+        }
+    }
+}
