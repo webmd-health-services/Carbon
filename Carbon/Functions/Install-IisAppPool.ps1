@@ -19,7 +19,7 @@ function Install-IisAppPool
     .DESCRIPTION
     By default, creates a 64-bit app pool running as the `ApplicationPoolIdentity` service account under .NET v4.0 with an integrated pipeline.
     
-    You can control which version of .NET is used to run an app pool with the `ManagedRuntimeVersion` parameter: versions `v1.0`, `v1.1`, `v2.0`, and `v4.0` are supported.
+    You can control which version of .NET is used to run an app pool with the `ManagedRuntimeVersion` parameter: versions `v1.0`, `v1.1`, `v2.0`, and `v4.0` are supported. Use an empty string if you're running .NET Core or to set the .NET framework version to `No Managed Code`.
 
     To run an application pool using the classic pipeline mode, set the `ClassicPipelineMode` switch.
 
@@ -68,8 +68,8 @@ function Install-IisAppPool
         $Name,
         
         [string]
-        [ValidateSet('v1.0','v1.1','v2.0','v4.0')]
-        # The managed .NET runtime version to use.  Default is 'v4.0'.  Valid values are `v1.0`, `v1.1`, `v2.0`, or `v4.0`.
+        [ValidateSet('v1.0','v1.1','v2.0','v4.0','')]
+        # The managed .NET runtime version to use.  Default is 'v4.0'.  Valid values are `v1.0`, `v1.1`, `v2.0`, or `v4.0`. Use an empty string if you're using .NET Core or to set the .NET framework version to `No Managed Code`.
         $ManagedRuntimeVersion = 'v4.0',
         
         [int]

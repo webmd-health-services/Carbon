@@ -11,7 +11,8 @@
  * Fixed: Can't import Carbon in a 32-bit PowerShell 4 session on a 64-bit operating system ([fixes issue #199](https://bitbucket.org/splatteredbits/carbon/issues/199/community-issue-importing-carbon-on-x64)).
  * Fixed: Documentation for the `Install-ScheduledTask` function's `HighestAvailableRunLevel` is lying ([fixes issue #205](https://bitbucket.org/splatteredbits/carbon/issues/205/documentation-install-scheduledtask-typo)).
  * Fixed: `Carbon_FirewallRule` fails when `Profile` property set to multiple values ([fixes issue #209](https://bitbucket.org/splatteredbits/carbon/issues/209/dsc-carbon_firewallrule-does-not-accept)).
- 
+ * Fixed: `Install-IisAppPool` can't set .NET framework version to `No Managed Code` ([fixes issue #210](https://bitbucket.org/splatteredbits/carbon/issues/210/install-iisapppool-need-to-be-able-to-set)).
+
 
 # 2.2.0 (11 May 2016)
 

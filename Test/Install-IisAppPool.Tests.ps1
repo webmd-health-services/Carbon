@@ -16,6 +16,8 @@ $password = '!QAZ2wsx'
 
 & (Join-Path -Path $PSScriptRoot 'Import-CarbonForTest.ps1' -Resolve)
 
+Install-User -Credential (New-Credential -Username $username -Password $password) -Description 'User for testing Carbon''s Install-IisAppPool function.'
+
 function Assert-AppPoolExists
 {
     $exists = Test-IisAppPool -Name $appPoolname
@@ -113,25 +115,25 @@ function Assert-AppPool
         Start-Sleep -Milliseconds 1000
     }
 }
+
+function Start-Test
+{
+    Uninstall-IisAppPool -Name $appPoolName
+    Revoke-Privilege -Identity $username -Privilege SeBatchLogonRight
+}
+    
+Describe 'Install-IisAppPool when running no manage code' {
+    Start-Test
+
+    Install-IisAppPool -Name $appPoolName -ManagedRuntimeVersion ''
+    It 'should set managed runtime to nothing' {
+        Assert-ManagedRuntimeVersion -Version ''
+    }
+}
     
 Describe 'Install-IisAppPool' {
-    BeforeAll {
-    }
-    
     BeforeEach {
-        Remove-AppPool
-        Install-User -Credential (New-Credential -Username $username -Password $password) -Description 'User for testing Carbon''s Install-IisAppPool function.'
-        Revoke-Privilege -Identity $username -Privilege SeBatchLogonRight
-    }
-    
-    AfterEach {
-        Remove-AppPool
-        Uninstall-User -Username $username
-    }
-    
-    function Remove-AppPool
-    {
-        Uninstall-IisAppPool -Name $appPoolName
+        Start-Test
     }
     
     function Get-IISDefaultAppPoolIdentity
@@ -288,3 +290,5 @@ Describe 'Install-IisAppPool' {
     
     
 }
+
+Start-Test
