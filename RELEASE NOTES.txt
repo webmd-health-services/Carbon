@@ -9,6 +9,7 @@
 
  * Fixed: `Set-RegistryKeyValue` fails when `-String` parameter's value is `$null` or empty ([fixes issue #211](https://bitbucket.org/splatteredbits/carbon/issues/211/set-registrykeyvalue-null-string-invalid)).
  * Fixed: Can't import Carbon in a 32-bit PowerShell 4 session on a 64-bit operating system ([fixes issue #199](https://bitbucket.org/splatteredbits/carbon/issues/199/community-issue-importing-carbon-on-x64)).
+ * Fixed: Documentation for the `Install-ScheduledTask` function's `HighestAvailableRunLevel` is lying ([fixes issue #205](https://bitbucket.org/splatteredbits/carbon/issues/205/documentation-install-scheduledtask-typo)).
  
 
 # 2.2.0 (11 May 2016)

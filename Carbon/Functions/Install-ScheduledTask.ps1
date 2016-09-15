@@ -430,7 +430,9 @@ function Install-ScheduledTask
         [Parameter(ParameterSetName='OnIdle')]
         [Parameter(ParameterSetName='OnEvent')]
         [Switch]
-        # Marks the task for deletion after its final run.
+        # If the user is an administrator, runs the task with full administrator rights. The default is to run with limited administrative privileges. 
+        #
+        # If UAC is enabled, an administrator has two security tokens: a filtered token that gets used by default and grants standard user rights and a full token that grants administrative rights that is only used when a program is "Run as administrator". Using this switch runs the scheduled task with the adminisrators full token. (Information taken from [How does "Run with the highest privileges" really work in Task Scheduler ?](https://social.technet.microsoft.com/Forums/windows/en-US/7167bb31-f375-4f77-b430-0339092e16b9/how-does-run-with-the-highest-privileges-really-work-in-task-scheduler-).)
         $HighestAvailableRunLevel,
 
         [Parameter(ParameterSetName='OnStart')]
