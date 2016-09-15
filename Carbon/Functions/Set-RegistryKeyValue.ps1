@@ -109,8 +109,10 @@ function Set-RegistryKeyValue
         $Name,
         
         [Parameter(Mandatory=$true,ParameterSetName='String')]
+        [AllowEmptyString()]
+        [AllowNull()]
         [string]
-        # The value's data.  Creates a value for holding string data (i.e. `REG_SZ`).
+        # The value's data.  Creates a value for holding string data (i.e. `REG_SZ`). If `$null`, the value will be saved as an empty string.
         $String,
         
         [Parameter(ParameterSetName='String')]

@@ -134,7 +134,28 @@ Describe 'Set-RegistryKeyValue when setting values of different types' {
         $setValue = Get-RegistryKeyValue -Path $rootKey -Name $name
         $setValue | Should Be $value
     }
+
+    It 'should set string value' {
+        $name = 'string'
+        $value = 'fubarsnafu'
+        Set-RegistryKeyValue -Path $rootKey -Name $name -String $value
+        Test-RegistryKeyValue -Path $rootKey -Name $name | Should Be $true
+        Get-RegistryKeyValue -Path $rootKey -Name $name | Should Be $value
+    }
     
+    It 'should set string value to null string' {
+        $name = 'string'
+        Set-RegistryKeyValue -Path $rootKey -Name $name -String $null
+        Test-RegistryKeyValue -Path $rootKey -Name $name | Should Be $true
+        Get-RegistryKeyValue -Path $rootKey -Name $name | Should Be ''
+    }
+    
+    It 'should set string value to empty string' {
+        $name = 'string'
+        Set-RegistryKeyValue -Path $rootKey -Name $name -String ''
+        Test-RegistryKeyValue -Path $rootKey -Name $name | Should Be $true
+        Get-RegistryKeyValue -Path $rootKey -Name $name | Should Be ''
+    }
 }
 
 Describe 'Set-RegistryKeyValue when user needs to change the value''s type' {
