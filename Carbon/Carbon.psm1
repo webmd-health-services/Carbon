@@ -19,6 +19,11 @@ $CarbonBinDir = Join-Path -Path $PSScriptRoot -ChildPath 'bin' -Resolve
 
 $doNotImport = @{ }
 
+if( [Environment]::Is64BitOperatingSystem -and -not [Environment]::Is64BitProcess ) 
+{
+    $doNotImport = 'Initialize-Lcm.ps1'
+}
+
 $functionRoot = Join-Path -Path $PSScriptRoot -ChildPath 'Functions' -Resolve
 
 # Active Directory

@@ -43,6 +43,8 @@ function Initialize-Lcm
 
     See [Windows PowerShell Desired State Configuration Local Configuration Manager](http://technet.microsoft.com/en-us/library/dn249922.aspx) for more information.
 
+    This function is not available in 32-bit PowerShell 4 processes on 64-bit operating systems.
+
     `Initialize-Lcm` is new in Carbon 2.0.
 
     .LINK
