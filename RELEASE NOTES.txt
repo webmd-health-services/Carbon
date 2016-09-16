@@ -4,6 +4,7 @@
 
  * `Protect-String` can now encrypt with a key, password, or passphrase (i.e. it can now encrypt with symmetric encryption).
  * `Unprotect-String` can now decrypt with a key, password, or passphrase (i.e. it can now decrypt using symmetric encryption).
+ * `Set-HostsEntry` now supports IPv6 addresses ([fixes issue](https://bitbucket.org/splatteredbits/carbon/issues/181/community-set-hostsentry-add-support-for)).
 
 ## Bug Fixes
 

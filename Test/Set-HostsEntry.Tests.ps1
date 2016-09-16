@@ -12,179 +12,221 @@
 
 & (Join-Path -Path $PSScriptRoot 'Import-CarbonForTest.ps1' -Resolve)
 
-Describe 'Set-HostsEntry' {
+function Assert-HostsFileContains
+{
+    param(
+        [Parameter(ParameterSetName='ExactLine')]
+        $Line, 
+        [Parameter(ParameterSetName='ConstructLine')]
+        [Net.IPAddress]
+        $IPAddress,
+        [Parameter(ParameterSetName='ConstructLine')]
+        $HostName,
+        [Parameter(ParameterSetName='ConstructLine')]
+        $Description,
+        $Path = $customHostsFile
+    )
 
-    $originalHostsFile = ''
-    $customHostsFile = ''
-    
-    function Assert-HostsFileContains($Line, $Path = $customHostsFile)
+    if( $PSCmdlet.ParameterSetName -eq 'ConstructLine' )
     {
+        $Line = '{0,-45}  {1}' -f $IPAddress,$HostName
+        if( $Description )
+        {
+            $Line = "{0}`t# {1}" -f $Line,$Description
+        }
+    }
+
+    It ('should set entry {0}' -f $Line) {
         $hostsFile = Read-File -Path $Path
         $hostsFile | Where-Object { $_ -eq $Line } | Should Not BeNullOrEmpty
     }
+}
     
-    
-    filter Out-HostsFile
+function New-TestHostsFile
+{
+    param(
+        [Parameter(ValueFromPipeline=$true)]
+        [string]
+        $Line
+    )
+    begin
     {
-        process
-        {
-            $_ | Add-Content $customHostsFile 
-        }
+        $testDrive = (Get-Item -Path 'TestDrive:').FullName
+        $path = Join-Path -Path $testDrive -ChildPath 'hosts'
     }
-    
-    BeforeEach {
-        $Global:Error.Clear()
-        $customHostsFile = Join-Path $env:temp ([IO.Path]::GetRandomFileName())
-        @"
-# Copyright (c) 1993-1999 Microsoft Corp.
-#
-# This is a sample HOSTS file used by Microsoft TCP/IP for Windows.
-#
-# This file contains the mappings of IP addresses to host names. Each
-# entry should be kept on an individual line. The IP address should
-# be placed in the first column followed by the corresponding host name.
-# The IP address and the host name should be separated by at least one
-# space.
-#
-# Additionally, comments (such as these) may be inserted on individual
-# lines or following the machine name denoted by a '#' symbol.
-#
-# For example:
-#
-#      102.54.94.97     rhino.acme.com          # source server
-#       38.25.63.10     x.acme.com              # x client host
-    
-127.0.0.1       localhost
-"@ | Out-File -FilePath $customHostsfile -Encoding OEM
+    process
+    {
+        $Line | Add-Content -Path $path
     }
-    
-    AfterEach {
-        Remove-Item $customHostsFile
+    end
+    {
+        return $path
     }
+}
+
+Describe 'Set-HostsEntry when passed a new IPv6 address' {
+    $hostsPath = New-TestHostsFile
+    Set-HostsEntry -IPAddress  'cc1a:2078:ec06:4f32:8ea8:7119:663a:f2d2' -HostName 'ipv6' -Path $hostsPath
+    Assert-HostsFileContains -IPAddress 'cc1a:2078:ec06:4f32:8ea8:7119:663a:f2d2' -HostName 'ipv6' -Path $hostsPath
+}
+
+Describe 'Set-HostsEntry when IPv6 address contains IP tunnel' {
+    $hostsPath = New-TestHostsFile
+    Set-HostsEntry -IPAddress '2001:4860:4860::8888:255.255.255.255' -HostName 'ipv6' -Path $hostsPath
+    Assert-HostsFileContains -IPAddress '2001:4860:4860::8888:255.255.255.255' -HostName 'ipv6' -Path $hostsPath
+}
+
+Describe 'Set-HostsEntry when updating an existing IPv6 address' {
+    $hostsPath = New-TestHostsFile
+    Set-HostsEntry -IPAddress '2001:4860:4860::8888' -HostName 'ipv6' -Path $hostsPath
+    Set-HostsEntry -IPAddress '2001:4860:4860::8844' -HostName 'ipv6' -Path $hostsPath
+    Assert-HostsFileContains -IPAddress '2001:4860:4860::8844' -HostName 'ipv6' -Path $hostsPath
+}
+
+Describe 'Set-HostsEntry when no path parameter provided' {
+    Mock -CommandName 'Write-File' -Verifiable -ModuleName 'Carbon'
+
+    Set-HostsEntry -IPAddress '5.6.7.8' -HostName 'example.com' -Description 'Customizing example.com'
 
     It 'should operate on system hosts file by default' {
-        $originalHostsfile = Read-File -Path (Get-PathToHostsFile)
-    
-        try
-        {
-            Set-HostsEntry -IPAddress '5.6.7.8' -HostName 'example.com' -Description 'Customizing example.com'
-        
-            Assert-HostsFileContains -Line "5.6.7.8         example.com`t# Customizing example.com"  -Path (Get-PathToHostsFile)
-        }
-        finally
-        {
-            $originalHostsfile | Write-File -Path (Get-PathToHostsFile)
+        Assert-MockCalled -CommandName 'Write-File' -ModuleName 'Carbon' -Times 1 -Exactly -ParameterFilter {
+            #$DebugPreference = 'Continue'
+            Write-Debug $Path 
+            Write-Debug (Get-PathToHostsFile)
+            $Path -eq (Get-PathToHostsFile)
         }
     }
+}
+
+Describe 'Set-HostsEntry when setting an existin IPv4 entry' {
+    $hostsFile = '1.2.3.4  example.com' | New-TestHostsFile
     
-    It 'should update existing hosts entry' {
-        $hostsEntry = '1.2.3.4  example.com'
-        $hostsEntry | Out-HostsFile
+    Set-HostsEntry -IPAddress '5.6.7.8' -HostName 'example.com' -Description 'Customizing example.com' -Path $hostsFile
+    Assert-HostsFileContains -IPAddress "5.6.7.8" -HostName 'example.com' -Description 'Customizing example.com' -Path $hostsFile
+}
+
+Describe 'Set-HostsEntry when adding a new IPv4 entry' {    
+    $hostsFile = New-TestHostsFile
+    $ip = '255.255.255.255'
+    $hostname = 'shouldaddnewhostsentry.example.com'
+    $description = 'testing if new hosts entries get added'
         
-        Assert-HostsFileContains -Line $hostsEntry
+    Set-HostsEntry -IPAddress $ip -Hostname $hostname -Description $description -Path $hostsFile
         
-        Set-HostsEntry -IPAddress '5.6.7.8' -HostName 'example.com' -Description 'Customizing example.com' -Path $customHostsFile
+    Assert-HostsFileContains -IPAddress $ip -HostName $hostname -Description $description -Path $hostsFile
+}
+
+Describe 'Set-HostsEntry when an existing entry has a comment but is updated without a comment' {    
+    $hostsFile = "$ip $hostname  # this comment should get removed" | New-TestHostsFile
+    $ip = '1.1.1.1'
+    $hostname = 'shouldremovecomment.example.com'
         
-        Assert-HostsFileContains -Line "5.6.7.8         example.com`t# Customizing example.com"  
-    }
-    
-    It 'should add new hosts entry' {
-        $ip = '255.255.255.255'
-        $hostname = 'shouldaddnewhostsentry.example.com'
-        $description = 'testing if new hosts entries get added'
-        
-        Set-HostsEntry -IPAddress $ip -Hostname $hostname -Description $description -Path $customHostsFile
-        
-        Assert-HostsFileContains -Line "$ip $hostname`t# $description"
-    }
-    
-    It 'should remove comment' {
-        $ip = '1.1.1.1'
-        $hostname = 'shouldremovecomment.example.com'
-        
-        "$ip $hostname  # this comment should get removed" | Out-HostsFile
-        
-        Set-HostsEntry -IPAddress $ip -HostName $hostname -Path $customHostsFile
+    Set-HostsEntry -IPAddress $ip -HostName $hostname -Path $hostsFile
        
-        Assert-HostsFileContains -Line "$ip         $hostname"
+    Assert-HostsFileContains -IPAddress $ip -HostName $hostname -Path $hostsFile
+}
+    
+Describe 'Set-HostsEntry when there are duplicate hostnames' {
+    $ip = '3.3.3.3'
+    $hostname = 'shouldcommentoutduplicates.example.com'
+    $line = "$ip $hostname"
+
+    $hostsFile = ($line,$line) | New-TestHostsFile
+        
+    Set-HostsEntry -IPAddress $ip -HostName $hostname -Path $hostsFile
+        
+    Assert-HostsFileContains -IPAddress $ip -HostName $hostname -Path $hostsFile
+
+    $commentedLine = '#{0}' -f $line
+
+    Assert-HostsFileContains -Line $commentedLine -Path $hostsFile
+    It 'should comment out second duplicate' {
+        Get-Content -Path $hostsFile | Select-Object -Last 1 | Should Be $commentedLine
     }
-    
-    It 'should comment out duplicates' {
-        $ip = '3.3.3.3'
-        $hostname = 'shouldcommentoutduplicates.example.com'
+}
+
+Describe 'Set-HostsEntry when using -WhatIf switch' {
+    $hostsFile = New-TestHostsFile
         
-        $line = "$ip $hostname"
-        ($line,$line) | Out-HostsFile
+    Set-HostsEntry -IPAddress '127.0.0.1' -Hostname 'example.com' -WhatIf -Path $hostsFile
         
-        Set-HostsEntry -IPAddress $ip -HostName $hostname -Path $customHostsFile
-        
-        Assert-HostsFileContains -Line "$ip         $hostname"
-        Assert-HostsFileContains -Line "#$ip $hostname"
+    It 'should not update the hosts file' {
+        Get-Content -Path $hostsFile | Should BeNullOrEmpty
     }
-    
-    It 'should support what if' {
-        Reset-HostsFile -Path $customHostsFile
-        
-        Set-HostsEntry -IPAddress '127.0.0.1' -Hostname 'example.com' -WhatIf -Path $customHostsFile
-        
-        Assert-HostsFileContains '127.0.0.1       localhost'
-        Get-Content -Path $customHostsFile | Where-Object { $_ -like '*example.com*' } | Should BeNullOrEmpty
+}
+
+Describe 'Set-HostsEntry when hosts file exists and is empty' {
+    $hostsFile = New-TestHostsFile
+    Remove-Item -Path $hostsFile
+    New-Item -Path $hostsFile -ItemType File
+    Set-HostsEntry -IPAddress '127.0.0.1' -Hostname 'example.com' -Path $hostsFile
+    Assert-HostsFileContains -IPAddress '127.0.0.1' -Hostname 'example.com' -Path $hostsFile
+}    
+
+Describe 'Set-HostsEntry when hosts file does not exist' {
+    $Global:Error.Clear()
+    $hostsFile = New-TestHostsFile
+    Remove-Item -Path $hostsFile
+
+    Set-HostsEntry -IPAddress '127.0.0.1' -Hostname 'example.com' -Path $hostsFile
+    It 'should not write any errors' {
+        $Global:Error | Should BeNullOrEmpty
     }
-    
-    It 'should set entry in empty hosts file' {
-        Remove-Item $customHostsFile
-        New-Item -Path $customHostsFile -ItemType File
-        
-        Set-HostsEntry -IPAddress '127.0.0.1' -Hostname 'example.com' -Path $customHostsFile
-        
-        Assert-HostsFileContains '127.0.0.1       example.com'
+    It 'should create hosts file' {
+        $hostsFile | Should Exist
     }
-    
-    It 'should handle missing hosts file' {
-        Remove-Item $customHostsFile
+    Assert-HostsFileContains -IPAddress '127.0.0.1' -HostName 'example.com' -Path $hostsFile
+}
+
+Describe 'Set-HostsEntry when hosts file contains invalid entries' {
+    $hostsFile = 'Invalid Line' | New-TestHostsFile
         
-        Set-HostsEntry -IPAddress '127.0.0.1' -Hostname 'example.com' -Path $customHostsFile
-        
-        Assert-HostsFileContains '127.0.0.1       example.com'
-    }
+    Set-HostsEntry -IPAddress '4.3.2.1' -Hostname 'example.com' -Path $hostsFile
+    Assert-HostsFileContains -IPAddress '4.3.2.1' -HostName 'example.com' -Path $hostsFile
+    Assert-HostsFileContains -Line '# Invalid line' -Path $hostsFile
+}
     
-    It 'should ignore and comment invalid hosts entry' {
-        'Invalid Line' | Out-HostsFile
-        Set-HostsEntry -IPAddress '4.3.2.1' -Hostname 'example.com' -Path $customHostsFile
-        Assert-HostsFileContains '4.3.2.1         example.com'
-        Assert-HostsFileContains '# Invalid line'
-    }
+Describe 'Set-HostsEntry when the hosts file is in use' {
+    $Global:Error.Clear()
+
+    $line1 = '0.3.2.1 example1.com'
+    $line2 = '0.6.7.8 example2.com'
+
+    $hostsFile = $line1,$line2 | New-TestHostsFile
     
-    It 'should handle if hosts file in use' {
-        Set-HostsEntry '0.3.2.1' -HostName 'example1.com' -Path $customHostsFile -ErrorAction SilentlyContinue
-        Set-HostsEntry '0.6.7.8' -HostName 'example2.com' -Path $customHostsFile -ErrorAction SilentlyContinue
-    
-        $file = [IO.File]::Open($customHostsFile, 'Open', 'Read', 'Read')
+    $expectedHostsFile = @"
+$line1
+$line2
+
+"@
+
+    Context 'the hosts file is locked for writing' {
+        $file = [IO.File]::Open($hostsFile, 'Open', 'Read', 'Read')
         try
         {
-            Set-HostsEntry '1.2.3.4' -HostName 'example.com' -Path $customHostsFile -ErrorAction SilentlyContinue
+            Set-HostsEntry '1.2.3.4' -HostName 'example.com' -Path $hostsFile -ErrorAction SilentlyContinue
         }
         finally
         {
             $file.Close()
         }
-        $Global:Error.Count | Should Be 1
-        $Global:Error.Count | Should BeGreaterThan 0
-        $Global:Error[0] | Should Match 'cannot access the file'
-    
-        $expectedHostsFile = @'
-0.3.2.1         example1.com
-0.6.7.8         example2.com
-'@
-        [IO.File]::ReadAllText($customHostsFile).Contains($expectedHostsFile) | Should Be $true
+
+        It 'should write an error' {
+            $Global:Error.Count | Should Be 1
+            $Global:Error.Count | Should BeGreaterThan 0
+            $Global:Error | Should Match 'cannot access the file'
+        }
+            
+        It 'should not modify the file' {    
+            Get-Content -Raw -Path $hostsFile | Should Be $expectedHostsFile
+        }
     }
 
-    It 'should handle if hosts file can not be read' {
-        Set-HostsEntry '0.3.2.1' -HostName 'example1.com' -Path $customHostsFile 
-        Set-HostsEntry '0.6.7.8' -HostName 'example2.com' -Path $customHostsFile 
+    Context 'the hosts file is locked for reading' {
+        $Global:Error.Clear()
     
         $job = Start-Job -ScriptBlock {
-                                            $file = [IO.File]::Open($using:customHostsFile, 'Open', 'Read', 'None')
+                                            $file = [IO.File]::Open($using:hostsFile, 'Open', 'Read', 'None')
                                             Start-Sleep -Seconds 5
                                             $file.Close()
                                         }
@@ -195,53 +237,56 @@ Describe 'Set-HostsEntry' {
                 Start-Sleep -Milliseconds 100
                 Write-Debug -Message ('Waiting for hosts file to get locked.')
             }
-            while( (Get-Content -Raw -Path $customHostsFile -ErrorAction Ignore) )
+            while( (Get-Content -Raw -Path $hostsFile -ErrorAction Ignore) )
     
-            Set-HostsEntry '0.4.5.6' -HostName 'example1.com' -Path $customHostsFile -ErrorAction SilentlyContinue
+            Set-HostsEntry '0.4.5.6' -HostName 'example1.com' -Path $hostsFile -ErrorAction SilentlyContinue
     
-            $Global:Error.Count | Should BeGreaterThan 0
-            $Global:Error[0] | Should Match 'cannot access the file'
+            It 'should write error' {
+                $Global:Error.Count | Should BeGreaterThan 0
+                $Global:Error[0] | Should Match 'cannot access the file'
+            }
     
             do
             {
                 Start-Sleep -Milliseconds 100
                 Write-Debug -Message ('Waiting for hosts file to get unlocked.')
             }
-            while( -not (Get-Content -Raw -Path $customHostsFile -ErrorAction Ignore) )
-    
-            $expectedHostsFile = @'
-0.3.2.1         example1.com
-0.6.7.8         example2.com
-'@
-            $hostsFile = Get-Content -Raw -Path $customHostsFile -ErrorAction Ignore
-            $hostsFile | Should Not BeNullOrEmpty
-            $hostsFile.Contains($expectedHostsFile) | Should Be $true
+            while( -not (Get-Content -Raw -Path $hostsFile -ErrorAction Ignore) )
+
+            It 'should not modify the file' {    
+                $hostsFile = Get-Content -Raw -Path $hostsFile -ErrorAction Ignore | Should Be $expectedHostsFile
+            }
         }
         finally
         {
             $job | Wait-Job | Receive-Job | Out-String | Write-Debug
         }
     }
+}
 
-    #This test check case from Issue #148 
-    It 'multiple call should not delete tabulation' {
-        Set-HostsEntry -IPAddress 127.0.0.1 -HostName 'test' -Description 'Test' -Path $customHostsFile
-        Set-HostsEntry -IPAddress 127.0.0.1 -HostName 'test2' -Description 'Test2' -Path $customHostsFile
-        Set-HostsEntry -IPAddress 127.0.0.1 -HostName 'test3' -Path $customHostsFile
+# This test check case from Issue #148 
+Describe 'Set-HostsEnty when updating entries with descriptions' {
+    $hostsFile = New-TestHostsFile
+
+    Set-HostsEntry -IPAddress 127.0.0.1 -HostName 'test' -Description 'Test' -Path $hostsFile
+    Set-HostsEntry -IPAddress 127.0.0.1 -HostName 'test2' -Description 'Test2' -Path $hostsFile
+    Set-HostsEntry -IPAddress 127.0.0.1 -HostName 'test3' -Path $hostsFile
         
-        Assert-HostsFileContains -Line "127.0.0.1       test`t# Test"
-        Assert-HostsFileContains -Line "127.0.0.1       test2`t# Test2"
-        Assert-HostsFileContains -Line "127.0.0.1       test3"
-    }
-    
-    It 'should trim trailing space' {
+    Assert-HostsFileContains -IPAddress "127.0.0.1" -HostName 'test' -Description 'Test' -Path $hostsFile
+    Assert-HostsFileContains -IPAddress "127.0.0.1" -HostName 'test2' -Description 'Test2' -Path $hostsFile
+    Assert-HostsFileContains -IPAddress "127.0.0.1" -HostName 'test3' -Path $hostsFile
+}
+
+Describe 'Set-HostsEntry when the hosts file contains trailing empty lines' {
         $line = @"
-127.0.0.1       fubarsnafu
-127.0.0.1       snafufubar
-"@
-        $line | Set-Content -Path $customHostsFile
-    
-        Set-HostsEntry -IPAddress '127.0.0.1' -HostName 'fubarsnafu' -Path $customHostsFile
-        (Get-Content -Raw -Path $customHostsFile).Trim("`r","`n") | Should Be $line.Trim()
+{0,-45}  fubarsnafu
+{0,-45}  snafufubar
+"@ -f '127.0.0.1'
+
+    $hostsFile = $line | New-TestHostsFile
+
+    Set-HostsEntry -IPAddress '127.0.0.1' -HostName 'fubarsnafu' -Path $hostsFile
+    It 'should trim trailing space' {
+        (Get-Content -Raw -Path $hostsFile).Trim("`r","`n") | Should Be $line.Trim()
     }
 }

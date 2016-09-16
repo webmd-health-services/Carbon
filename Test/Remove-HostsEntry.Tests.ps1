@@ -54,11 +54,45 @@ function Assert-NoHostsEntry
     
     (Get-HostsEntry -HostName $HostName -Path $Path) | Should BeNullOrEmpty
 }
+
+function New-TestHostsFile
+{
+    param(
+        [Parameter(ValueFromPipeline=$true)]
+        [string]
+        $InputObject    
+    )
+    begin
+    {
+        $path = Join-Path -Path (Get-Item -Path 'TestDrive:').FullName -ChildPath ('Carbon+Test-RemoveHostsEntry+{0}' -f [IO.Path]::GetRandomFileName())
+    }
+
+    process
+    {
+        if( $InputObject )
+        {
+            $InputObject | Add-Content -Path $path
+        }
+    }
+
+    end
+    {
+        return $path
+    }
+}
+
+Describe 'Remove-HostsEntry when removing an IPv6 address' {
+    $hostsFile = '2001:4860:4860::8844 one','2001:4860:4860::8844 two' | New-TestHostsFile
+    Remove-HostsEntry -HostName 'two'  -Path $hostsFile
+    It 'should remove the hosts entry' {
+        Get-Content -Path $hostsFile | Where-Object { $_ -like '* two' } | Should BeNullOrEmpty
+        Get-Content -Path $hostsFile | Where-Object { $_ -like '* one' } | Should Not BeNullOrEmpty
+    }
+}
     
 Describe 'Remove-HostsEntry' {
     BeforeEach {
-        $hostsFile = Join-Path -Path $env:TEMP -ChildPath ('Carbon+Test-RemoveHostsEntry+{0}' -f [IO.Path]::GetRandomFileName())
-    
+        $hostsFile = New-TestHostsFile
         Set-HostsEntry -IPAddress '1.2.3.4' -HostName $hostname -Path $hostsFile
     }
     

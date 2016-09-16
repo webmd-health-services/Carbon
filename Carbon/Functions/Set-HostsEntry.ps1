@@ -79,7 +79,7 @@ function Set-HostsEntry
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
  
     $matchPattern = '^(?<IP>[0-9a-f.:]+)\s+(?<HostName>[^\s#]+)(?<Tail>.*)$'  
-    $lineFormat = "{0,-16}{1}{2}"
+    $lineFormat = "{0,-45}  {1}{2}"
     
     if(-not (Test-Path $Path))
     {
@@ -172,7 +172,7 @@ function Set-HostsEntry
         return
     }
     
-    Write-Verbose -Message ('[HOSTS]  [{0}]  {1,-15}  {2}' -f $Path,$IPAddress,$HostName)
+    Write-Verbose -Message ('[HOSTS]  [{0}]  {1,-45}  {2}' -f $Path,$IPAddress,$HostName)
     $outLines | Write-File -Path $Path
 }
 
