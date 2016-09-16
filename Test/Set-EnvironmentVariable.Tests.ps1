@@ -10,71 +10,79 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+Set-StrictMode -Version 'Latest'
+& (Join-Path -Path $PSScriptRoot -ChildPath 'Import-CarbonForTest.ps1' -Resolve)
+
 $EnvVarName = 'CarbonTestSetEnvironmentVariable'
 
-function Start-TestFixture
-{
-    & (Join-Path -Path $PSScriptRoot '..\Import-CarbonForTest.ps1' -Resolve)
-}
-
-function TearDown
-{
-    @( 'Computer', 'User', 'Process' ) | 
-        ForEach-Object { 
-            $removeArgs = @{ "For$_" = $true; }
-            Remove-EnvironmentVariable -Name $EnvVarName @removeArgs
-        }
-}
-
-function Set-TestEnvironmentVariable($Scope)
-{
-    $value = [Guid]::NewGuid().ToString()
-    $setArgs = @{ "For$Scope" = $true }
-    Set-EnvironmentVariable -Name $EnvVarName -Value $value @setArgs
-    Assert-TestEnvironmentVariableIs -ExpectedValue $value -Scope $Scope
-    return $value
-}
-
-function Test-ShouldSetEnvironmentVariableAtComputerScope
-{
-    Set-TestEnvironmentVariable -Scope Computer
-}
-
-function Test-ShouldSetEnvironmentVariableAtUserScope
-{
-    Set-TestEnvironmentVariable -Scope User
-    Assert-TestEnvironmentVariableIs -ExpectedValue $null -Scope 'Computer'
-}
-
-function Test-ShouldSetEnvironmentVariableAtProcessScope
-{
-    Set-TestEnvironmentVariable -Scope Process
-    Assert-TestEnvironmentVariableIs -ExpectedValue $null -Scope 'Computer'
-    Assert-TestEnvironmentVariableIs -ExpectedValue $null -Scope 'User'
-}
-
-function Test-ShouldSetProcessEnvVariable
-{
-    $name = 'Carbon+Set-EnvironmentVariable+ForProcess'
-    $value = ([Guid]::NewGuid())
-    Set-EnvironmentVariable -Name $name -Value $value -ForProcess
-    Assert-Equal $value (Get-Item -Path ('env:{0}' -f $name)).Value
-}
-
-function Test-ShouldNotSetVariableIfWhatIf
-{
-    Set-EnvironmentVariable -Name $EnvVarName -Value 'Doesn''t matter.' -ForProcess -WhatIf
-    Assert-TestEnvironmentVariableIs -ExpectedValue $null -Scope 'Process'
-}
-
-function Assert-TestEnvironmentVariableIs($ExpectedValue, $Scope)
+function Assert-TestEnvironmentVariableIs($ExpectedValue, $Scope, $ExpectedName = $EnvVarName)
 {
     if( $Scope -eq 'Computer' )
     {
         $Scope = 'Machine'
     }
-    $actualValue = [Environment]::GetEnvironmentVariable($EnvVarName, $Scope)
-    Assert-Equal $ExpectedValue $actualValue "Environment variable not set at $Scope scope."
+    $actualValue = [Environment]::GetEnvironmentVariable($ExpectedName, $Scope)
+
+    It ('should set the environment variable in {0} scope' -f $Scope) {
+        $actualValue | Should Be $ExpectedValue
+    }
+}
     
+function Set-TestEnvironmentVariable($Scope)
+{
+    $value = [Guid]::NewGuid().ToString()
+    $setArgs = @{ "For$Scope" = $true }
+    
+    Remove-EnvironmentVariable -Name $EnvVarName -ForProcess
+    Remove-EnvironmentVariable -Name $EnvVarName -ForUser
+    Remove-EnvironmentVariable -Name $EnvVarName -ForComputer
+
+    Set-EnvironmentVariable -Name $EnvVarName -Value $value @setArgs
+    Assert-TestEnvironmentVariableIs -ExpectedValue $value -Scope $Scope
+    return $value
+}
+    
+Describe 'Set-Environment Variable when setting machine-level variable' {
+    Set-TestEnvironmentVariable -Scope Computer
+}
+    
+Describe 'Set-EnvironmentVariable when setting user-level variable for current user' {
+    Set-TestEnvironmentVariable -Scope User
+    Assert-TestEnvironmentVariableIs -ExpectedValue $null -Scope 'Computer'
+}
+    
+Describe 'Set-EnvironmentVariable when setting process-level variable' {
+    $name = 'Carbon+Set-EnvironmentVariable+ForProcess'
+    Remove-EnvironmentVariable -Name $name -ForProcess
+    Remove-EnvironmentVariable -Name $name -ForComputer
+    Remove-EnvironmentVariable -Name $name -ForUser
+    $value = ([Guid]::NewGuid())
+    Set-EnvironmentVariable -Name $name -Value $value -ForProcess
+    try
+    {
+        Assert-TestEnvironmentVariableIs -ExpectedValue $null -Scope 'Computer' -ExpectedName $name
+        Assert-TestEnvironmentVariableIs -ExpectedValue $null -Scope 'User' -ExpectedName $name
+        Assert-TestEnvironmentVariableIs -ExpectedValue $value -Scope 'Process' -ExpectedName $name
+        It 'should set environment variable in current process' {
+            (Get-Item -Path ('env:{0}' -f $name)).Value | Should Be $value
+        }
+    }
+    finally
+    {
+        Remove-EnvironmentVariable -Name $name -ForProcess
+        Remove-EnvironmentVariable -Name $name -ForComputer
+        Remove-EnvironmentVariable -Name $name -ForUser
+    }
+}
+    
+Describe 'Set-EnvironmentVariable when using -WhatIf switch' {
+    Remove-EnvironmentVariable -Name $EnvVarName -ForProcess
+    Set-EnvironmentVariable -Name $EnvVarName -Value 'Doesn''t matter.' -ForProcess -WhatIf
+    Assert-TestEnvironmentVariableIs -ExpectedValue $null -Scope 'Process'
 }
 
+@( 'Computer', 'User', 'Process' ) | 
+    ForEach-Object { 
+        $removeArgs = @{ "For$_" = $true; }
+        Remove-EnvironmentVariable -Name $EnvVarName @removeArgs
+    }
