@@ -18,6 +18,7 @@ function ConvertTo-Key
     )
 
     Set-StrictMode -Version 'Latest'
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState    
 
     if( $InputObject -isnot [byte[]] )
     {
