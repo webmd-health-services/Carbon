@@ -12,49 +12,56 @@
 
 & (Join-Path -Path $PSScriptRoot -ChildPath 'Import-CarbonForTest.ps1' -Resolve)
 
+$servicePath = Join-Path -Path $PSScriptRoot -ChildPath 'Service\NoOpService.exe' -Resolve
+$serviceName = 'CarbonTestService'
+$serviceAcct = 'CrbnInstllSvcTstAcct'
+$servicePassword = [Guid]::NewGuid().ToString().Substring(0,14)
+$installServiceParams = @{ 
+                            #Verbose = $true 
+                            }
+$startedAt = Get-Date
+$serviceCredential = New-Credential -UserName $serviceAcct -Password $servicePassword
+Install-User -Credential $serviceCredential -Description "Account for testing the Carbon Install-Service function."
+$defaultServiceAccountName = Resolve-IdentityName -Name 'NT AUTHORITY\NetworkService'
+
+function Assert-ServiceInstalled
+{
+    $service = Get-Service $serviceName
+    $service | Should Not BeNullOrEmpty | Out-Null
+    return $service
+}
+    
+function Assert-HasPermissionsOnServiceExecutable($Identity, $Path)
+{
+    $access = Get-Permission -Path $Path -Identity $Identity
+    $access | Should Not BeNullOrEmpty
+    ([Security.AccessControl.FileSystemRights]::ReadAndExecute) | Should Be ($access.FileSystemRights -band [Security.AccessControl.FileSystemRights]::ReadAndExecute)
+}
+
+function GivenTheServiceIsNotInstalled
+{
+    Uninstall-Service $serviceName
+}
+    
+Describe 'Install-Service when using the -WhatIf switch' {
+    GivenTheServiceIsNotInstalled
+    Install-Service -Name $serviceName -Path $servicePath -WhatIf @installServiceParams
+
+    It 'should not install the service ' {
+        $service = Get-Service $serviceName -ErrorAction SilentlyContinue
+        $service | Should BeNullOrEmpty
+    }
+ }
+
 Describe 'Install-Service' {
 
-    $servicePath = Join-Path -Path $PSScriptRoot -ChildPath 'Service\NoOpService.exe' -Resolve
-    $serviceName = 'CarbonTestService'
-    $serviceAcct = 'CrbnInstllSvcTstAcct'
-    $servicePassword = [Guid]::NewGuid().ToString().Substring(0,14)
-    $installServiceParams = @{ 
-                                #Verbose = $true 
-                             }
-    $startedAt = Get-Date
-    $serviceCredential = New-Credential -UserName $serviceAcct -Password $servicePassword
-    Install-User -Credential $serviceCredential -Description "Account for testing the Carbon Install-Service function."
-    $defaultServiceAccountName = Resolve-IdentityName -Name 'NT AUTHORITY\NetworkService'
-
-    function Assert-ServiceInstalled
-    {
-        $service = Get-Service $serviceName
-        $service | Should Not BeNullOrEmpty | Out-Null
-        return $service
-    }
-    
-    function Assert-HasPermissionsOnServiceExecutable($Identity, $Path)
-    {
-        $access = Get-Permission -Path $Path -Identity $Identity
-        $access | Should Not BeNullOrEmpty
-        ([Security.AccessControl.FileSystemRights]::ReadAndExecute) | Should Be ($access.FileSystemRights -band [Security.AccessControl.FileSystemRights]::ReadAndExecute)
-    }
-    
-    AfterAll {
-        Uninstall-Service 'CarbonTestService'
-    }
-    
     BeforeEach {
         $Global:Error.Clear()
         $startedAt = Get-Date
         $startedAt = $startedAt.AddSeconds(-1)
-        Uninstall-Service $serviceName
+        GivenTheServiceIsNotInstalled
     }
     
-    AfterEach {
-        Uninstall-Service $serviceName
-    }
-
     It 'should install service' {
         $result = Install-Service -Name $serviceName -Path $servicePath @installServiceParams
         $result | Should BeNullOrEmpty
@@ -303,12 +310,6 @@ Describe 'Install-Service' {
         $service.UserName | Should Be ".\$serviceAcct"
         $service.Status | Should Be 'Running'
         Assert-HasPermissionsOnServiceExecutable $serviceAcct $newServicePath
-    }
-    
-    It 'should support what if' {
-        Install-Service -Name $serviceName -Path $servicePath -WhatIf @installServiceParams
-        $service = Get-Service $serviceName -ErrorAction SilentlyContinue
-        $service | Should BeNullOrEmpty
     }
     
     It 'should set startup type' {
@@ -568,3 +569,5 @@ Describe 'Install-Service' {
     }
 
 }
+
+GivenTheServiceIsNotInstalled
