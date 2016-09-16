@@ -17,37 +17,39 @@ function Grant-Permission
     Grants permission on a file, directory, registry key, or certificate's private key/key container.
 
     .DESCRIPTION
-    Granting access to a file system entry, registry key, or certificate's private key/key container requires a lot of steps.  This method reduces it to one call.  Very helpful.
+    The `Grant-Permission` functions grants permissions to files, directories, registry keys, and certificate private key/key containers. It detects what you are setting permissions on by inspecting the path of the item. If the path is relative, it uses the current location to determine if file system, registry, or private keys permissions should be set.
     
-    Beginning with Carbon 2.0, permissions are only granted if they don't exist on an item, which saves a lot of time when granting permissions on large directory trees.  If you always want to grant permissions, use the `Force` switch.  
-
-    Beginning with Carbon 2.0, this function returns any new/updated access rules set on `Path`.
-
-    It has the advantage that it will set permissions on a file system object, a registry key, or a certificate's private key/key container.  If `Path` is absolute, the correct provider (file system or registry) is used.  If `Path` is relative, the provider of the current location will be used.
-
-    The `Permissions` attribute can be a list of [FileSystemRights](http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.filesystemrights.aspx), [RegistryRights](http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.registryrights.aspx), or [CryptoKeyRights](http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.cryptokeyrights.aspx).
-
-    These commands will show you the values for the appropriate permissions for your object:
+    The `Permissions` attribute should be a list of [FileSystemRights](http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.filesystemrights.aspx), [RegistryRights](http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.registryrights.aspx), or [CryptoKeyRights](http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.cryptokeyrights.aspx), for files/directories, registry keys, and certificate private keys, respectively. These commands will show you the values for the appropriate permissions for your object:
 
         [Enum]::GetValues([Security.AccessControl.FileSystemRights])
         [Enum]::GetValues([Security.AccessControl.RegistryRights])
         [Enum]::GetValues([Security.AccessControl.CryptoKeyRights])
 
+    Beginning with Carbon 2.0, permissions are only granted if they don't exist on an item (inherited permissions are ignored).  If you always want to grant permissions, use the `Force` switch.  
+
+    Before Carbon 2.0, this function returned any new/updated access rules set on `Path`. In Carbon 2.0 and later, use the `PassThru` switch to get an access rule object back (you'll always get one regardless if the permissions changed or not).
+
+    By default, permissions allowing access are granted. Beginning in Carbon 2.3.0, you can grant permissions denying access by passing `Deny` as the value of the `Type` parameter.
+
     ## Directories and Registry Keys
 
-    When setting permissions on a container (directory/registry key) you can control inheritance and propagation flags using the `ApplyTo` parameter.  There are 13 possible combinations.  Examples work best.  Here is a simple hierarchy:
+    When setting permissions on a container (directory/registry key) you can control inheritance and propagation flags using the `ApplyTo` parameter. This parameter is designed to hide the complexities of the Windows' inheritance and propagation flags. There are 13 possible combinations.
+
+    Given this tree
 
             C
            / \
           CC CL
          /  \
         GC  GL
+
+    where
     
-    C is the **C**ontainer permissions are getting set on  
-    CC is a **C**hild **C**ontainer  
-    CL is a **C**hild **L**eaf  
-    GC is a **G**randchild **C**ontainer and includes all sub-containers below it  
-    GL is a **G**randchild **L**eaf  
+     * C is the **C**ontainer permissions are getting set on  
+     * CC is a **C**hild **C**ontainer  
+     * CL is a **C**hild **L**eaf  
+     * GC is a **G**randchild **C**ontainer and includes all sub-containers below it  
+     * GL is a **G**randchild **L**eaf  
     
     The `ApplyTo` parameter takes one of the following 13 values and applies permissions to:
     
@@ -84,7 +86,7 @@ function Grant-Permission
         ContainerAndSubContainersAndLeaves          ContainerInherit,ObjectInherit   None
         ChildContainersAndChildLeaves               ContainerInherit,ObjectInherit   InheritOnly
     
-    The above information adpated from [Manage Access to Windows Objects with ACLs and the .NET Framework](http://msdn.microsoft.com/en-us/magazine/cc163885.aspx#S3), published in the November 2004 copy of *MSDN Magazine*.
+    The above information adapated from [Manage Access to Windows Objects with ACLs and the .NET Framework](http://msdn.microsoft.com/en-us/magazine/cc163885.aspx#S3), published in the November 2004 copy of *MSDN Magazine*.
 
     If you prefer to speak in `InheritanceFlags` or `PropagationFlags`, you can use the `ConvertTo-ContainerInheritaceFlags` function to convert your flags into Carbon's flags.
 
@@ -169,6 +171,12 @@ function Grant-Permission
         [Carbon.Security.ContainerInheritanceFlags]
         # How to apply container permissions.  This controls the inheritance and propagation flags.  Default is full inheritance, e.g. `ContainersAndSubContainersAndLeaves`. This parameter is ignored if `Path` is to a leaf item.
         $ApplyTo = ([Carbon.Security.ContainerInheritanceFlags]::ContainerAndSubContainersAndLeaves),
+
+        [Security.AccessControl.AccessControlType]
+        # The type of rule to apply, either `Allow` or `Deny`. The default is `Allow`, which will allow access to the item. The other option is `Deny`, which will deny access to the item.
+        #
+        # This parameter was added in Carbon 2.3.0.
+        $Type = [Security.AccessControl.AccessControlType]::Allow,
         
         [Switch]
         # Removes all non-inherited permissions on the item.
@@ -268,7 +276,7 @@ function Grant-Permission
                 
                 $certPath = Join-Path -Path 'cert:' -ChildPath (Split-Path -NoQualifier -Path $certificate.PSPath)
 
-                $accessRule = New-Object 'Security.AccessControl.CryptoKeyAccessRule' ($Identity,$rights,'Allow') |
+                $accessRule = New-Object 'Security.AccessControl.CryptoKeyAccessRule' ($Identity,$rights,$Type) |
                                 Add-Member -MemberType NoteProperty -Name 'Path' -Value $certPath -PassThru
 
                 if( $Force -or $rulesToRemove -or -not (Test-Permission -Path $certPath -Identity $Identity -Permission $Permission -Exact) )
@@ -331,7 +339,7 @@ function Grant-Permission
             }
         }
 
-        $accessRule = New-Object "Security.AccessControl.$($providerName)AccessRule" $Identity,$rights,$inheritanceFlags,$propagationFlags,"Allow" |
+        $accessRule = New-Object "Security.AccessControl.$($providerName)AccessRule" $Identity,$rights,$inheritanceFlags,$propagationFlags,$Type |
                         Add-Member -MemberType NoteProperty -Name 'Path' -Value $Path -PassThru
 
         $missingPermission = -not (Test-Permission -Path $Path -Identity $Identity -Permission $Permission @testPermissionParams -Exact)

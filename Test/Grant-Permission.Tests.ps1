@@ -58,7 +58,8 @@ function Assert-Permissions
         $identity, 
         $permissions, 
         $path,
-        $ApplyTo
+        $ApplyTo,
+        $Type = 'Allow'
     )
 
     $providerName = (Get-PSDrive (Split-Path -Qualifier (Resolve-Path $path)).Trim(':')).Provider.Name
@@ -103,6 +104,10 @@ function Assert-Permissions
     It ('should set permissions to {0}' -f $rights) {
         $rights | Should Be ($ace."$($providerName)Rights" -band $rights)
     }
+
+   It ('should create {0} rule' -f $Type) {
+        $ace.AccessControlType | Should Be ([Security.AccessControl.AccessControlType]$Type)
+   }
 }
 
 function Invoke-GrantPermissions
@@ -115,7 +120,8 @@ function Invoke-GrantPermissions
         $ExpectedRuleType = 'FileSystem',
         [Switch]
         $Clear,
-        $ExpectedPermission
+        $ExpectedPermission,
+        $Type
     )
 
     $optionalParams = @{ }
@@ -129,6 +135,12 @@ function Invoke-GrantPermissions
     if( $Clear )
     {
         $optionalParams['Clear'] = $Clear
+    }
+
+    if( $Type )
+    {
+        $optionalParams['Type'] = $Type
+        $assertOptionalParams['Type'] = $Type
     }
 
     $ExpectedRuleType = [Type]('Security.AccessControl.{0}AccessRule' -f $ExpectedRuleType)
@@ -518,6 +530,10 @@ foreach( $location in @( 'LocalMachine','CurrentUser' ) )
                 }
             }
 
+            Context 'creating a deny rule' {
+                Invoke-GrantPermissions -Path $certPath -Identity $user -Permission 'GenericRead' -Type 'Deny' -ExpectedRuleType 'CryptoKey'
+            }
+
             Mock -CommandName 'Set-CryptoKeySecurity' -Verifiable -ModuleName 'Carbon' 
 
             Context 'permissions exist' {
@@ -540,4 +556,14 @@ foreach( $location in @( 'LocalMachine','CurrentUser' ) )
             Uninstall-Certificate -Thumbprint $cert.Thumbprint -StoreLocation $location -StoreName My
         }
     }
+}
+
+Describe 'Grant-Permission when setting Deny rule on file system' {
+    $filePath = New-TestFile
+    Invoke-GrantPermissions -Identity $user -Permissions 'Write' -Path $filePath -Type 'Deny'
+}
+
+Describe 'Grant-Permission when setting Deny rule on registry' {
+    $path = New-TestContainer -Registry
+    Invoke-GrantPermissions -Identity $user -Permissions 'Write' -Path $path -Type 'Deny' -ExpectedRuleType 'Registry'
 }
