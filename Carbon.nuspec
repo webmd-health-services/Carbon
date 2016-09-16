@@ -15,13 +15,14 @@
 <package>
   <metadata>
     <id>Carbon</id>
+    <title>Carbon</title>
     <version>2.3.0</version>
     <authors>Aaron Jensen</authors>
     <owners>Aaron Jensen</owners>
     <licenseUrl>http://www.apache.org/licenses/LICENSE-2.0</licenseUrl>
     <projectUrl>http://get-carbon.org</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <summary>Carbon is a PowerShell DevOps setup/configuration automation module.</summary>
+    <summary>Carbon is a PowerShell module for automating the configuration of Windows 7, 8, 2008, and 2012, Windows services, applications, and websites.</summary>
     <description>Carbon is a PowerShell module for automating the configuration Windows 7, 8, 2008, and 2012 and automation the installation and configuration of Windows applications, websites, and services. It can configure and manage:
 
  * Local users and groups
