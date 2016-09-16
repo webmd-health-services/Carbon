@@ -26,6 +26,7 @@ function Test-ShouldConvertNetshOutputToSslCertificateBindingObjects
                 return
             }
             
+            Write-Debug -Message $_
             $name = $matches[1].Trim()
             $value = $matches[2].Trim()
             
@@ -95,7 +96,7 @@ function Test-ShouldConvertNetshOutputToSslCertificateBindingObjects
             }
             elseif( $name -eq 'Ctl Identifier' )
             {
-                Assert-Equal $value $binding.CtlIdentifier
+                Assert-Equal $value $binding.CtlIdentifier 
             }
             elseif( $name -eq 'Ctl Store Name' )
             {

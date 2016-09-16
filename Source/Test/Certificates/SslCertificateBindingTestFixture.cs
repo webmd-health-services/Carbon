@@ -20,6 +20,12 @@ namespace Carbon.Test.Certificates
     [TestFixture]
     public sealed class SslCertificateBindingTestFixture
     {
+	    [Test]
+	    public void ShouldGetAllBindings()
+	    {
+		    SslCertificateBinding.GetSslCertificateBindings();
+	    }
+
         [Test]
         public void ShouldCompareTwoBindings()
         {

@@ -50,96 +50,29 @@ function Get-SslCertificateBinding
     )
    
     Set-StrictMode -Version 'Latest'
-
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
     
-    $binding = $null
-    $lineNum = 0
-
-    netsh http show sslcert | 
-        ForEach-Object {
-        
-            $lineNum += 1
-            
-            if( -not ($_.Trim()) -and $binding )
+    [Carbon.Certificates.SslCertificateBinding]::GetSslCertificateBindings() |
+        Where-Object {
+            if( $IPAddress )
             {
-                $ctorArgs = @(
-                                $binding.IPAddress,
-                                $binding.Port,
-                                $binding['Certificate Hash'],
-                                $binding['Application ID'],
-                                $binding['Certificate Store Name'],
-                                $binding['Verify Client Certificate Revocation'],
-                                $binding['Verify Revocation Using Cached Client Certificate Only'],
-                                $binding['Usage Check'],
-                                $binding['Revocation Freshness Time'],
-                                $binding['URL Retrieval Timeout'],
-                                $binding['Ctl Identifier'],
-                                $binding['Ctl Store Name'],
-                                $binding['DS Mapper Usage'],
-                                $binding['Negotiate Client Certificate']
-                             )
-                New-Object Carbon.Certificates.SslCertificateBinding $ctorArgs
-                $binding = $null
+                $_.IPAddress -eq $IPAddress
             }
-            
-            if( $_ -notmatch '^    (.*)\s+: (.*)$' )
+            else
             {
-                return
+                return $true
             }
-
-            $name = $matches[1].Trim()
-            $value = $matches[2].Trim()
-
-            if( $name -eq 'IP:port' )
+        } |
+        Where-Object {
+            if( $Port )
             {
-                $binding = @{}
-                $name = "IPPort"
-                if( $value -notmatch '^(.*):(\d+)$' )
-                {
-                    Write-Error ('Invalid IP address/port in netsh output: {0}.' -f $value)
-                }
-                else
-                {
-                    $binding['IPAddress'] = $matches[1]
-                    $binding['Port'] = $matches[2]
-                }                
+                $_.Port -eq $Port
             }
-            if( $value -eq '(null)' )
+            else
             {
-                $value = $null
+                return $true
             }
-            elseif( $value -eq 'Enabled' )
-            {
-                $value = $true
-            }
-            elseif( $value -eq 'Disabled' )
-            {
-                $value = $false
-            }
-            
-            $binding[$name] = $value
-        } | 
-    Where-Object {
-        if( $IPAddress )
-        {
-            $_.IPAddress -eq $IPAddress
         }
-        else
-        {
-            return $true
-        }
-    } |
-    Where-Object {
-        if( $Port )
-        {
-            $_.Port -eq $Port
-        }
-        else
-        {
-            return $true
-        }
-    }
     
 }
 
