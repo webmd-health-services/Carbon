@@ -262,7 +262,10 @@ function Invoke-PowerShell
 
         if( $runningAScriptBlock )
         {
+            $DebugPreference = 'Continue'
+            Write-Debug -Message ('& {0} {1} -Command {2} -Args {3}' -f $psPath,($powerShellArgs -join ' '),$ScriptBlock,($ArgumentList -join ' '))
             & $psPath $powerShellArgs -Command $ScriptBlock -Args $ArgumentList
+            Write-Debug -Message ('LASTEXITCODE: {0}' -f $LASTEXITCODE)
         }
         elseif( $PSCmdlet.ParameterSetName -eq 'FilePath' )
         {

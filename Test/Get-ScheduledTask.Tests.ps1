@@ -67,6 +67,7 @@ Describe 'Get-ScheduledTask' {
             
             $propertyName = $columnName -replace '[^A-Za-z0-9_]',''
     
+            Write-Debug ('  {0} <=> {1}' -f $propertyName,$columnName)
             $failMsg = '{0}; column {1}; property {2}' -f $Actual.FullName,$columnName,$propertyName
             if( $propertyName -eq 'TaskName' )
             {
@@ -87,7 +88,6 @@ Describe 'Get-ScheduledTask' {
             else
             {
                 ($Actual | Get-Member -Name $propertyName) | Should Not BeNullOrEmpty
-                Write-Debug ('  {0} <=> {1}' -f $propertyName,$columnName)
                 $expectedValue = $Expected.$columnName
                 if( $propertyName -eq 'TaskToRun' )
                 {
@@ -110,6 +110,7 @@ Describe 'Get-ScheduledTask' {
                         }
                     }
                 }
+                Write-Debug ('    {0} <=> {1}' -f $Actual.$propertyName,$expectedValue)
                 ($Actual.$propertyName) | Should Be $expectedValue
             }
         }

@@ -12,7 +12,7 @@
 
 if( Test-Path -Path 'env:APPVEYOR' )
 {
-    Write-Warning -Message 'Can''t test Initialize-Lcm under Appveyor.'
+    Write-Warning -Message 'Can''t test Initialize-Lcm under AppVeyor.'
     return
 }
 
