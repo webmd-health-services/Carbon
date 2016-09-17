@@ -99,9 +99,22 @@ Describe 'Remove-EnvironmentVariable when using -WhatIf switch' {
         $envVarValue | Should Be $actualValue
     }
 }
-    
-@( 'Computer', 'User', 'Process') | 
-    ForEach { 
-        $removeArgs = @{ "For$_" = $true; }
-        Remove-EnvironmentVariable -Name $EnvVarName @removeArgs
+
+Describe 'Remove-EnvironmentVariable when removing from all scopes at once' {
+    $value = [Guid]::NewGuid().ToString()
+    Set-EnvironmentVariable -Name $EnvVarName -Value $value -ForProcess -ForUser -ForComputer
+    Remove-EnvironmentVariable -Name $EnvVarName -ForProcess -ForUser -ForComputer
+    Assert-NoTestEnvironmentVariableAt -Scope Machine
+    Assert-NoTestEnvironmentVariableAt -Scope User
+    Assert-NoTestEnvironmentVariableAt -Scope Process
+}
+
+Describe 'Remove-EnvironmentVariable when no scopes selected' {
+    $Global:Error.Clear()
+    Remove-EnvironmentVariable -Name $EnvVarName -ErrorAction SilentlyContinue
+    It 'should write an error' {
+        $Global:Error | Should Match 'target not specified' 
     }
+}
+    
+Remove-EnvironmentVariable -Name $EnvVarName -ForProcess -ForUser -ForComputer

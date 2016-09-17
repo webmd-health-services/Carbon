@@ -55,17 +55,17 @@ function Set-EnvironmentVariable
         # The environment variable's value.
         $Value,
         
-        # Sets the environment variable for the current process.
+        # Sets the environment variable for the current computer.
         [Switch]
-        $ForProcess,
+        $ForComputer,
 
         # Sets the environment variable for the current user.
         [Switch]
         $ForUser,
         
-        # Sets the environment variable for the current computer.
+        # Sets the environment variable for the current process.
         [Switch]
-        $ForComputer,
+        $ForProcess,
 
         [Switch]
         # Set the variable in the current PowerShell session's `env:` drive, too. Normally, you have to restart your session to see the variable in the `env:` drive.
@@ -100,12 +100,7 @@ function Set-EnvironmentVariable
                 [EnvironmentVariableTarget]::Process
             }
         } | 
-        ForEach-Object {
-            $target = $_
-            if( $PSCmdlet.ShouldProcess( "$target-level environment variable '$Name'", "set") )
-            {
-                [Environment]::SetEnvironmentVariable( $Name, $Value, $target )
-            }
-        }    
+        Where-Object { $PSCmdlet.ShouldProcess( "$_-level environment variable '$Name'", "set") } |
+        ForEach-Object { [Environment]::SetEnvironmentVariable( $Name, $Value, $_ ) }    
 }
 

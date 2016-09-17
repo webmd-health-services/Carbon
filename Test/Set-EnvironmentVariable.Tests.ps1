@@ -63,9 +63,7 @@ function Set-TestEnvironmentVariable($Scope, $Value)
 {
     $setArgs = @{ "For$Scope" = $true }
     
-    Remove-EnvironmentVariable -Name $EnvVarName -ForProcess
-    Remove-EnvironmentVariable -Name $EnvVarName -ForUser
-    Remove-EnvironmentVariable -Name $EnvVarName -ForComputer
+    Remove-EnvironmentVariable -Name $EnvVarName -ForProcess -ForUser -ForComputer
 
     Set-EnvironmentVariable -Name $EnvVarName -Value $value @setArgs
     Assert-TestEnvironmentVariableIs -ExpectedValue $value -Scope $Scope
@@ -94,9 +92,7 @@ Describe 'Set-EnvironmentVariable when setting user-level variable for current u
 Describe 'Set-EnvironmentVariable when setting process-level variable' {
     $name = 'Carbon+Set-EnvironmentVariable+ForProcess'
     $value = New-TestValue
-    Remove-EnvironmentVariable -Name $name -ForProcess
-    Remove-EnvironmentVariable -Name $name -ForComputer
-    Remove-EnvironmentVariable -Name $name -ForUser
+    Remove-EnvironmentVariable -Name $name -ForProcess -ForUser -ForComputer
 
     Set-EnvironmentVariable -Name $name -Value $value -ForProcess
     try
@@ -108,9 +104,7 @@ Describe 'Set-EnvironmentVariable when setting process-level variable' {
     }
     finally
     {
-        Remove-EnvironmentVariable -Name $name -ForProcess
-        Remove-EnvironmentVariable -Name $name -ForComputer
-        Remove-EnvironmentVariable -Name $name -ForUser
+        Remove-EnvironmentVariable -Name $name -ForProcess -ForUser -ForComputer
     }
 }
 
@@ -128,17 +122,11 @@ foreach( $scope in 'Computer','User','Process' )
 }
 
 Describe 'Set-EnvironmentVariable when using -WhatIf switch' {
-    Remove-EnvironmentVariable -Name $EnvVarName -ForProcess
-    Remove-EnvironmentVariable -Name $EnvVarName -ForUser
-    Remove-EnvironmentVariable -Name $EnvVarName -ForComputer
+    Remove-EnvironmentVariable -Name $EnvVarName -ForProcess -ForUser -ForComputer
     Set-EnvironmentVariable -Name $EnvVarName -Value 'Doesn''t matter.' -ForProcess -WhatIf
     Assert-TestEnvironmentVariableIs -ExpectedValue $null -Scope 'Computer'
     Assert-TestEnvironmentVariableIs -ExpectedValue $null -Scope 'User'
     Assert-TestEnvironmentVariableIs -ExpectedValue $null -Scope 'Process'
 }
 
-@( 'Computer', 'User', 'Process' ) | 
-    ForEach-Object { 
-        $removeArgs = @{ "For$_" = $true; }
-        Remove-EnvironmentVariable -Name $EnvVarName @removeArgs
-    }
+Remove-EnvironmentVariable -Name $EnvVarName -ForProcess -ForUser -ForComputer

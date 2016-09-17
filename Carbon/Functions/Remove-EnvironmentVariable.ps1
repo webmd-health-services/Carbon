@@ -22,6 +22,8 @@ function Remove-EnvironmentVariable
     Changes to environment variables in the User and Machine scope are not picked up by running processes.  Any running processes that use this environment variable should be restarted.
 
     Normally, you have to restart your PowerShell session/process to no longer see the variable in the `env:` drive. Use the `-Force` switch to also remove the variable from the `env:` drive. This functionality was added in Carbon 2.3.0.
+
+    Beginning in Carbon 2.3.0, you can specify multiple scopes from which to remove an environment variable. In previous versions, you could only remove from one scope.
     
     .LINK
     Carbon_EnvironmentVariable
@@ -44,20 +46,18 @@ function Remove-EnvironmentVariable
         # The environment variable to remove.
         $Name,
         
-        [Parameter(Mandatory=$true,ParameterSetName='ForProcess')]
-        # Removes the environment variable for the current process.
         [Switch]
-        $ForProcess,
+        # Removes the environment variable for the current computer.
+        $ForComputer,
 
-        [Parameter(Mandatory=$true,ParameterSetName='ForUser')]
         # Removes the environment variable for the current user.
         [Switch]
         $ForUser,
         
-        [Parameter(Mandatory=$true,ParameterSetName='ForMachine')]
-        # Removes the environment variable for the current computer.
         [Switch]
-        $ForComputer,
+        # Removes the environment variable for the current process.
+        [Switch]
+        $ForProcess,
 
         [Switch]
         # Remove the variable from the current PowerShell session's `env:` drive, too. Normally, you have to restart your session to no longer see the variable in the `env:` drive.
@@ -70,14 +70,36 @@ function Remove-EnvironmentVariable
 
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
-    $scope = $pscmdlet.ParameterSetName -replace '^For',''
-    if( $pscmdlet.ShouldProcess( "$scope-level environment variable '$Name'", "remove" ) )
+    if( -not $ForProcess -and -not $ForUser -and -not $ForComputer )
     {
-        [Environment]::SetEnvironmentVariable( $Name, $null, $scope )
-        if( $Force -and $scope -ne 'Process' )
-        {
-            [Environment]::SetEnvironmentVariable($Name, $null, 'Process')
-        }
+        Write-Error -Message ('Environment variable target not specified. You must supply one of the ForComputer, ForUser, or ForProcess switches.')
+        return
     }
+
+    Invoke-Command -ScriptBlock {
+                                    if( $ForComputer )
+                                    {
+                                        [EnvironmentVariableTarget]::Machine
+                                    }
+
+                                    if( $ForUser )
+                                    {
+                                        [EnvironmentVariableTarget]::User
+                                    }
+
+                                    if( $ForProcess )
+                                    {
+                                        [EnvironmentVariableTarget]::Process
+                                    }
+                                } |
+        Where-Object { $PSCmdlet.ShouldProcess( "$_-level environment variable '$Name'", "remove" ) } |
+        ForEach-Object { 
+                            $scope = $_
+                            [Environment]::SetEnvironmentVariable( $Name, $null, $scope )
+                            if( $Force -and $scope -ne [EnvironmentVariableTarget]::Process )
+                            {
+                                [Environment]::SetEnvironmentVariable($Name, $null, 'Process')
+                            }
+            }
 }
 
