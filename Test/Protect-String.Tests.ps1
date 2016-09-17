@@ -64,37 +64,10 @@ Describe 'Protect-String' {
             $protectedString = Protect-String -String $string -Credential $credential
             $protectedString | Should Not BeNullOrEmpty ('Failed to protect a string as user {0}.' -f $credential.UserName)
     
-            $tempDir = New-TempDir -Prefix (Split-Path -Leaf -Path $PSScriptRoot)
-            $outFile = Join-Path -Path $tempDir -ChildPath 'secret'
-            $errFile = Join-Path -Path $tempDir -ChildPath 'errors'
-            try
-            {
-                $p = Start-Process -FilePath "powershell.exe" `
-                                   -ArgumentList (Join-Path -Path $PSScriptRoot -ChildPath 'Cryptography\Unprotect-String.ps1'),'-ProtectedString',$protectedString `
-                                   -WindowStyle Hidden `
-                                   -Credential $credential `
-                                   -PassThru `
-                                   -Wait `
-                                   -RedirectStandardOutput $outFile `
-    			       -RedirectStandardError $errFile
-                $p.WaitForExit()
-    	    
-    	        if( (Test-Path -Path $errFile -PathType Leaf) )
-    	        {
-    	    	    $err = Get-Content -Path $errFile -Raw
-    		        if( $err )
-    		        {
-    	                    Fail $err
-    		        }
-                }
-    
-                $decrypedString = Get-Content -Path $outFile -TotalCount 1
-                $decrypedString | Should Be $string
-            }
-            finally
-            {
-                Remove-Item -Recurse -Path (Split-Path -Parent -Path $outFile) -ErrorAction Ignore
-            }
+            $decrypedString = Invoke-PowerShell -FilePath (Join-Path -Path $PSScriptRoot -ChildPath 'Cryptography\Unprotect-String.ps1') `
+                                                -ArgumentList '-ProtectedString',$protectedString `
+                                                -Credential $credential
+            $decrypedString | Should Be $string
         }
 
         It 'should handle spaces in path to Carbon' {

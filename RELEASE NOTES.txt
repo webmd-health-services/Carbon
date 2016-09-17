@@ -10,6 +10,7 @@
  * `Remove-EnvironmentVariable`: 
    * Added `-Force` switch to make all variable removals immediately visible in the current PowerShell process's `env:` drive. Restarts are no longer required.
    * You can now remove variables from multiple targets/scopes at once.
+ * `Invoke-PowerShell`: you can now run PowerShell scripts as another use by passing the user's credentials to the new `Credential` parameter.
 
 ## Bug Fixes
 

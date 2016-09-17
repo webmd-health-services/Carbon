@@ -174,60 +174,12 @@ filter Protect-String
     {
         if( $PSCmdlet.ParameterSetName -eq 'DPAPIForUser' ) 
         {
-            $outFile = '{0}-{1}-stdout' -f (Split-Path -Leaf -Path $PSCommandPath),([IO.Path]::GetRandomFileName())
-            $outFile = Join-Path -Path $env:TEMP -ChildPath $outFile
-            Write-Verbose $outFile
-            '' | Set-Content -Path $outFile
-
-            $errFile = '{0}-{1}-stderr' -f (Split-Path -Leaf -Path $PSCommandPath),([IO.Path]::GetRandomFileName())
-            $errFile = Join-Path -Path $env:TEMP -ChildPath $errFile
-            Write-Verbose $errFile
-            '' | Set-Content -Path $errFile
-
-            try
-            {
-                $protectStringPath = Join-Path -Path $CarbonBinDir -ChildPath 'Protect-String.ps1' -Resolve
-                $encodedString = Protect-String -String $String -ForComputer
-
-                $p = Start-Process -FilePath "powershell.exe" `
-                                   -ArgumentList ('-NonInteractive -ExecutionPolicy ByPass -File "{0}" -ProtectedString {1}' -f $protectStringPath,$encodedString) `
-                                   -Credential $Credential `
-                                   -RedirectStandardOutput $outFile `
-                                   -RedirectStandardError $errFile `
-                                   -Wait `
-                                   -WindowStyle Hidden `
-                                   -PassThru
-
-                $p.WaitForExit()
-
-                $stdOut = Get-Content -Path $outFile -Raw
-                if( $stdOut )
-                {
-                    Write-Verbose -Message $stdOut
-                }
-
-                $stdErr = Get-Content -Path $errFile -Raw
-                if( $stdErr )
-                {
-                    Write-Error -Message $stdErr
-                    return
-                }
-
-                if( $p.ExitCode -ne 0 )
-                {
-                    Write-Error -Message ('Unknown error encrypting string as {0}: exit code {1}{2}{3}' -f $Credential.UserName,$p.ExitCode,([Environment]::NewLine),$stdOut)
-                    return
-                }
-
-                if( $stdOut )
-                {
-                    return Get-Content -Path $outFile -TotalCount 1
-                }
-            }
-            finally
-            {
-                Remove-Item -Path $outFile,$errFile -ErrorAction SilentlyContinue
-            }
+            $protectStringPath = Join-Path -Path $CarbonBinDir -ChildPath 'Protect-String.ps1' -Resolve
+            $encodedString = Protect-String -String $String -ForComputer
+            $argumentList = '-ProtectedString {0}' -f $encodedString
+            Invoke-PowerShell -ExecutionPolicy 'ByPass' -NonInteractive -FilePath $protectStringPath -ArgumentList $argumentList -Credential $Credential |
+                Select-Object -First 1
+            return
         }
         else
         {
