@@ -219,6 +219,19 @@ function Invoke-PowerShell
             $ArgumentList = @()
         }
 
+        $runningAScriptBlock = $PSCmdlet.ParameterSetName -eq 'ScriptBlock' 
+        if( $PSCmdlet.ParameterSetName -eq 'Command' -and $Command -is [scriptblock] )
+        {
+            Write-Warning -Message ('Passing a script block to the Command parameter is OBSOLETE and will be removed in a future major version of Carbon. Use the `ScriptBlock` parameter instead.')
+            $ScriptBlock = $Command
+            $runningAScriptBlock = $true
+            if( $Credential )
+            {
+                Write-Error -Message ('It looks like you''re trying to run a script block as another user. `Start-Process` is used to start powershell.exe as that user. Start-Process requires all arguments to be strings. Converting a script block to a string automatically is unreliable. Please convert the script block to a command string or omit the Credential parameter.')
+                return
+            }
+        }
+
         $powerShellArgs = Invoke-Command -ScriptBlock {
             if( $powerShellv3Installed -and $Runtime -eq 'v2.0' )
             {
@@ -226,7 +239,8 @@ function Invoke-PowerShell
                 '2.0'
             }
 
-            if( $NonInteractive )
+            # Can't run a script block in non-interactive mode. Because reasons.
+            if( $NonInteractive -and -not $runningAScriptBlock )
             {
                 '-NonInteractive'
             }
@@ -246,18 +260,7 @@ function Invoke-PowerShell
             }
         }
 
-        if( $PSCmdlet.ParameterSetName -eq 'Command' -and $Command -is [scriptblock] )
-        {
-            Write-Warning -Message ('Passing a ScripBlock to the Command parameter is OBSOLETE and will be removed in a future major version of Carbon. Use the `ScriptBlock` parameter instead.')
-            $ScriptBlock = $Command
-            if( $Credential )
-            {
-                Write-Error -Message ('It looks like you''re trying to run a script block as another user. `Start-Process` is used to start powershell.exe as that user. Start-Process requires all arguments to be strings. Converting a script block to a string automatically is unreliable. Please convert the script block to a command string or omit the Credential parameter.')
-                return
-            }
-        }
-
-        if( $PSCmdlet.ParameterSetName -eq 'ScriptBlock' -or $ScriptBlock )
+        if( $runningAScriptBlock )
         {
             & $psPath $powerShellArgs -Command $ScriptBlock -Args $ArgumentList
         }
