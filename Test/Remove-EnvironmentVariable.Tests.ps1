@@ -10,82 +10,82 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+Set-StrictMode -Version 'Latest'
+
+& (Join-Path -Path $PSScriptRoot -ChildPath 'Import-CarbonForTest.ps1' -Resolve)
+ 
 $EnvVarName = "CarbonRemoveEnvironmentVar"
 
-function Start-TestFixture
+function Assert-NoTestEnvironmentVariableAt( $Scope )
 {
-    & (Join-Path -Path $PSScriptRoot '..\Import-CarbonForTest.ps1' -Resolve)
-}
-
-function TearDown
-{
-    @( 'Computer', 'User', 'Process') | 
-        ForEach { 
-            $removeArgs = @{ "For$_" = $true; }
-            Remove-EnvironmentVariable -Name $EnvVarName @removeArgs
-        }
+    $actualValue = [Environment]::GetEnvironmentVariable($EnvVarName, $Scope)
+    It ('should remove variable from {0} scope' -f $Scope) {
+        $actualValue | Should BeNullOrEmpty
+    }
 }
 
 function Set-TestEnvironmentVariable($Scope)
 {
     $EnvVarValue = [Guid]::NewGuid().ToString()
     [Environment]::SetEnvironmentVariable($EnvVarName, $EnvVarValue, $Scope)
-    
+        
     $actualValue = [Environment]::GetEnvironmentVariable($EnvVarName, $Scope) 
-    Assert-Equal $EnvVarValue $actualValue "$Scope environment variable not set."
-    
+    It 'should set variable that will be deleted' {
+        $actualValue | Should Be $EnvVarValue
+    }
+        
     return $EnvVarValue
 }
-
-function Test-ShouldRemoveMachineEnvironmentVar
-{
+   
+Describe 'Remove-EnvironmentVariable when removing computer-level variable' {
     Set-TestEnvironmentVariable 'Machine'
     Remove-EnvironmentVariable -Name $EnvVarName -ForComputer
     Assert-NoTestEnvironmentVariableAt -Scope Machine
 }
-
-function Test-ShouldRemoveUserEnvironmentVar
-{
+    
+Describe 'Remove-EnvironmentVariable when remoing user-level variable' {
     Set-TestEnvironmentVariable 'User'
-    
+        
     Assert-NoTestEnvironmentVariableAt -Scope Machine
-    
+        
     Remove-EnvironmentVariable -Name $EnvVarName -ForUser
-
+    
     Assert-NoTestEnvironmentVariableAt -Scope User
 }
-
-function Test-ShouldRemoveProcessEnvironmentVar
-{
-    Set-TestEnvironmentVariable 'Process'
     
+Describe 'Remove-EnvironmentVariable when removing process-level variable' {
+    Set-TestEnvironmentVariable 'Process'
+        
     Assert-NoTestEnvironmentVariableAt -Scope Machine
     Assert-NoTestEnvironmentVariableAt -Scope User
-    
+        
     Remove-EnvironmentVariable -Name $EnvVarName -ForProcess
-
+    
     Assert-NoTestEnvironmentVariableAt -Scope Process
 }
-
-function Test-ShouldRemoveNonExistentEnvironmentVar
-{
+    
+Describe 'Remove-EnvironmentVariable when variable doesn''t exist' {
+    $Global:Error.Clear()
     Remove-EnvironmentVariable -Name "IDoNotExist" -ForComputer
+    It 'should not write an error' {
+        $Global:Error | Should BeNullOrEmpty
+    }
 }
-
-function Test-ShouldSupportWhatIf
-{
+    
+Describe 'Remove-EnvironmentVariable when using -WhatIf switch' {
     $envVarValue = Set-TestEnvironmentVariable -Scope Process
-    
+        
     Remove-EnvironmentVariable -Name $EnvVarName -ForProcess -WhatIf
-    
+        
     $actualValue = [Environment]::GetEnvironmentVariable($EnvVarName, 'Process') 
-    Assert-NotNull $actualValue "WhatIf parameter resulted in environment variable being deleted."
-    Assert-Equal $actualValue $envVarValue "WhatIf parameter resulted in environment variable being deleted."
+    It 'should not remove variable' {
+        $actualValue | Should Not BeNullOrEmpty
+        $envVarValue | Should Be $actualValue
+    }
 }
-
-function Assert-NoTestEnvironmentVariableAt( $Scope )
-{
-    $actualValue = [Environment]::GetEnvironmentVariable($EnvVarName, $Scope)
-    Assert-Null $actualValue "Environment variable '$EnvVarName' found at scope $Scope."
-}
-
+    
+@( 'Computer', 'User', 'Process') | 
+    ForEach { 
+        $removeArgs = @{ "For$_" = $true; }
+        Remove-EnvironmentVariable -Name $EnvVarName @removeArgs
+    }
