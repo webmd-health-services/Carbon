@@ -15,7 +15,7 @@ Set-StrictMode -Version 'Latest'
 
 $EnvVarName = 'CarbonTestSetEnvironmentVariable'
 
-function Assert-TestEnvironmentVariableIs($ExpectedValue, $Scope, $ExpectedName = $EnvVarName)
+function Assert-TestEnvironmentVariableIs($ExpectedValue, $Scope, $ExpectedName = $EnvVarName, [switch]$Force)
 {
     if( $Scope -eq 'Computer' )
     {
@@ -23,14 +23,44 @@ function Assert-TestEnvironmentVariableIs($ExpectedValue, $Scope, $ExpectedName 
     }
     $actualValue = [Environment]::GetEnvironmentVariable($ExpectedName, $Scope)
 
-    It ('should set the environment variable in {0} scope' -f $Scope) {
+    $qualifer = ''
+    if( -not $ExpectedValue )
+    {
+        $qualifer = 'not '
+    }
+
+    It ('should {0}set the environment variable in {1} scope' -f $qualifer,$Scope) {
         $actualValue | Should Be $ExpectedValue
+    }
+
+    if( $Scope -eq 'Process' )
+    {
+        if( -not $Force )
+        {
+            $envPath = 'env:{0}' -f $EnvVarName
+            It 'should not set the variable in the env: drive' {
+                Test-Path -Path $envPath | Should Be $false
+            }
+        }
+    }        
+}
+
+function Assert-TestEnvironmentVariableSetInEnvDrive
+{
+    param(
+        $ExpectedName = $EnvVarName,
+        $ExpectedValue
+    )
+
+    $envPath = 'env:{0}' -f $ExpectedName
+    It 'should set the variable in the env: drive' {
+        Test-Path -Path $envPath | Should Be $true
+        (Get-Item -Path $envPath).Value | Should Be $ExpectedValue
     }
 }
     
-function Set-TestEnvironmentVariable($Scope)
+function Set-TestEnvironmentVariable($Scope, $Value)
 {
-    $value = [Guid]::NewGuid().ToString()
     $setArgs = @{ "For$Scope" = $true }
     
     Remove-EnvironmentVariable -Name $EnvVarName -ForProcess
@@ -41,31 +71,40 @@ function Set-TestEnvironmentVariable($Scope)
     Assert-TestEnvironmentVariableIs -ExpectedValue $value -Scope $Scope
     return $value
 }
+
+function New-TestValue
+{
+    [Guid]::NewGuid().ToString()
+}
     
 Describe 'Set-Environment Variable when setting machine-level variable' {
-    Set-TestEnvironmentVariable -Scope Computer
+    $value = New-TestValue
+    Set-TestEnvironmentVariable -Scope Computer -Value $value
+    Assert-TestEnvironmentVariableIs -ExpectedValue $null -Scope User
+    Assert-TestEnvironmentVariableIs -ExpectedValue $null -Scope Process
 }
     
 Describe 'Set-EnvironmentVariable when setting user-level variable for current user' {
-    Set-TestEnvironmentVariable -Scope User
+    $value = New-TestValue
+    Set-TestEnvironmentVariable -Scope User -Value $value
     Assert-TestEnvironmentVariableIs -ExpectedValue $null -Scope 'Computer'
+    Assert-TestEnvironmentVariableIs -ExpectedValue $null -Scope Process
 }
     
 Describe 'Set-EnvironmentVariable when setting process-level variable' {
     $name = 'Carbon+Set-EnvironmentVariable+ForProcess'
+    $value = New-TestValue
     Remove-EnvironmentVariable -Name $name -ForProcess
     Remove-EnvironmentVariable -Name $name -ForComputer
     Remove-EnvironmentVariable -Name $name -ForUser
-    $value = ([Guid]::NewGuid())
+
     Set-EnvironmentVariable -Name $name -Value $value -ForProcess
     try
     {
         Assert-TestEnvironmentVariableIs -ExpectedValue $null -Scope 'Computer' -ExpectedName $name
         Assert-TestEnvironmentVariableIs -ExpectedValue $null -Scope 'User' -ExpectedName $name
         Assert-TestEnvironmentVariableIs -ExpectedValue $value -Scope 'Process' -ExpectedName $name
-        It 'should set environment variable in current process' {
-            (Get-Item -Path ('env:{0}' -f $name)).Value | Should Be $value
-        }
+        Assert-TestEnvironmentVariableSetInEnvDrive -ExpectedValue $value  -ExpectedName $name
     }
     finally
     {
@@ -74,10 +113,27 @@ Describe 'Set-EnvironmentVariable when setting process-level variable' {
         Remove-EnvironmentVariable -Name $name -ForUser
     }
 }
-    
+
+foreach( $scope in 'Computer','User','Process' )
+{
+    Describe ('Set-Environment when forcing set at the {0} level' -f $scope) {
+        $value = New-TestValue
+        $scopeParam = @{ 
+                            ('For{0}' -f $scope) = $true
+                       }
+        Set-EnvironmentVariable -Name $EnvVarName -Value $value -Force @scopeParam
+        Assert-TestEnvironmentVariableIs -ExpectedValue $value -Scope $scope -Force
+        Assert-TestEnvironmentVariableSetInEnvDrive -ExpectedValue $value
+    }
+}
+
 Describe 'Set-EnvironmentVariable when using -WhatIf switch' {
     Remove-EnvironmentVariable -Name $EnvVarName -ForProcess
+    Remove-EnvironmentVariable -Name $EnvVarName -ForUser
+    Remove-EnvironmentVariable -Name $EnvVarName -ForComputer
     Set-EnvironmentVariable -Name $EnvVarName -Value 'Doesn''t matter.' -ForProcess -WhatIf
+    Assert-TestEnvironmentVariableIs -ExpectedValue $null -Scope 'Computer'
+    Assert-TestEnvironmentVariableIs -ExpectedValue $null -Scope 'User'
     Assert-TestEnvironmentVariableIs -ExpectedValue $null -Scope 'Process'
 }
 

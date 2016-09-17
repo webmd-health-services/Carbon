@@ -20,6 +20,8 @@ function Set-EnvironmentVariable
     Uses the .NET [Environment class](http://msdn.microsoft.com/en-us/library/z8te35sa) to create or set an environment variable in the Process, User, or Machine scopes.
     
     Changes to environment variables in the User and Machine scope are not picked up by running processes.  Any running processes that use this environment variable should be restarted.
+
+    Normally, you have to restart your PowerShell session/process to see the variable in the `env:` drive. Use the `-Force` switch to also add the variable to the `env:` drive. This functionality was added in Carbon 2.3.0.
     
     .LINK
     Carbon_EnvironmentVariable
@@ -63,7 +65,13 @@ function Set-EnvironmentVariable
         
         # Sets the environment variable for the current computer.
         [Switch]
-        $ForComputer
+        $ForComputer,
+
+        [Switch]
+        # Set the variable in the current PowerShell session's `env:` drive, too. Normally, you have to restart your session to see the variable in the `env:` drive.
+        #
+        # This parameter was added in Carbon 2.3.0.
+        $Force
     )
 
     Set-StrictMode -Version 'Latest'
@@ -87,10 +95,10 @@ function Set-EnvironmentVariable
                 [EnvironmentVariableTarget]::User
             }
             
-            if( $ForProcess )
+            if( $Force -or $ForProcess )
             {
                 [EnvironmentVariableTarget]::Process
-            }    
+            }
         } | 
         ForEach-Object {
             $target = $_

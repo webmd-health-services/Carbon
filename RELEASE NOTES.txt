@@ -6,6 +6,7 @@
  * `Unprotect-String` can now decrypt with a key, password, or passphrase (i.e. it can now decrypt using symmetric encryption).
  * `Set-HostsEntry` now supports IPv6 addresses ([fixes issue](https://bitbucket.org/splatteredbits/carbon/issues/181/community-set-hostsentry-add-support-for)).
  * `Grant-Permission` now supports creating `Deny` access rules. Use the new `Type` parameter. [Fixes issue #152.](https://bitbucket.org/splatteredbits/carbon/issues/152)
+ * `Set-EnvironmentVariable`: added `-Force` switch to make all variable modifications immediately visible in the current PowerShell process's `env:` drive. Restarts are no longer required.
 
 ## Bug Fixes
 
