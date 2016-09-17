@@ -28,10 +28,12 @@ function Set-TestEnvironmentVariable($Scope)
 {
     $EnvVarValue = [Guid]::NewGuid().ToString()
     [Environment]::SetEnvironmentVariable($EnvVarName, $EnvVarValue, $Scope)
+    Set-Item -Path ('env:{0}' -f $EnvVarName) -Value $EnvVarValue
         
     $actualValue = [Environment]::GetEnvironmentVariable($EnvVarName, $Scope) 
     It 'should set variable that will be deleted' {
         $actualValue | Should Be $EnvVarValue
+        Test-Path -Path ('env:{0}' -f $EnvVarName) | Should Be $true
     }
         
     return $EnvVarValue
@@ -43,25 +45,39 @@ Describe 'Remove-EnvironmentVariable when removing computer-level variable' {
     Assert-NoTestEnvironmentVariableAt -Scope Machine
 }
     
-Describe 'Remove-EnvironmentVariable when remoing user-level variable' {
+Describe 'Remove-EnvironmentVariable when removing user-level variable' {
     Set-TestEnvironmentVariable 'User'
-        
-    Assert-NoTestEnvironmentVariableAt -Scope Machine
-        
     Remove-EnvironmentVariable -Name $EnvVarName -ForUser
-    
     Assert-NoTestEnvironmentVariableAt -Scope User
 }
     
 Describe 'Remove-EnvironmentVariable when removing process-level variable' {
     Set-TestEnvironmentVariable 'Process'
-        
-    Assert-NoTestEnvironmentVariableAt -Scope Machine
-    Assert-NoTestEnvironmentVariableAt -Scope User
-        
     Remove-EnvironmentVariable -Name $EnvVarName -ForProcess
-    
     Assert-NoTestEnvironmentVariableAt -Scope Process
+}
+
+Describe 'Remove-EnviromentVariable when removing computer/user-level variables with the Force switch' {
+
+    foreach( $scope in 'Computer','User','Process' )
+    {
+        Context ('{0}-level' -f $scope) {
+            $setScope = $scope
+            if( $scope -eq 'Computer' )
+            {
+                $setScope = 'Machine'
+            }
+            Set-TestEnvironmentVariable $setScope
+            $scopeParam = @{
+                                ('For{0}' -f $scope) = $true
+                           }
+            Remove-EnvironmentVariable -Name $EnvVarName @scopeParam -Force
+            Assert-NoTestEnvironmentVariableAt -Scope $setScope
+            It 'should remove the variable from the env: drive' {
+                Test-Path -Path ('env:{0}' -f $EnvVarName) | Should Be $false
+            }
+        }
+    }
 }
     
 Describe 'Remove-EnvironmentVariable when variable doesn''t exist' {

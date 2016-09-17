@@ -20,6 +20,8 @@ function Remove-EnvironmentVariable
     Uses the .NET [Environment class](http://msdn.microsoft.com/en-us/library/z8te35sa) to remove an environment variable from the Process, User, or Computer scopes.
     
     Changes to environment variables in the User and Machine scope are not picked up by running processes.  Any running processes that use this environment variable should be restarted.
+
+    Normally, you have to restart your PowerShell session/process to no longer see the variable in the `env:` drive. Use the `-Force` switch to also remove the variable from the `env:` drive. This functionality was added in Carbon 2.3.0.
     
     .LINK
     Carbon_EnvironmentVariable
@@ -55,7 +57,13 @@ function Remove-EnvironmentVariable
         [Parameter(Mandatory=$true,ParameterSetName='ForMachine')]
         # Removes the environment variable for the current computer.
         [Switch]
-        $ForComputer
+        $ForComputer,
+
+        [Switch]
+        # Remove the variable from the current PowerShell session's `env:` drive, too. Normally, you have to restart your session to no longer see the variable in the `env:` drive.
+        #
+        # This parameter was added in Carbon 2.3.0.
+        $Force
     )
     
     Set-StrictMode -Version 'Latest'
@@ -66,6 +74,10 @@ function Remove-EnvironmentVariable
     if( $pscmdlet.ShouldProcess( "$scope-level environment variable '$Name'", "remove" ) )
     {
         [Environment]::SetEnvironmentVariable( $Name, $null, $scope )
+        if( $Force -and $scope -ne 'Process' )
+        {
+            [Environment]::SetEnvironmentVariable($Name, $null, 'Process')
+        }
     }
 }
 
