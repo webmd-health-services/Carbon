@@ -55,17 +55,50 @@ if( $Test )
 
 try
 {
+    $uploadTestResults = $false 
+    $uploadUri = ''
+    if( Test-Path -Path 'env:APPVEYOR' )
+    {
+        $uploadTestResults = $true
+        $uploadUri = 'https://ci.appveyor.com/api/testresults/nunit/{0}' -f $env:APPVEYOR_JOB_ID 
+    }
+
+    $testsFailed = $false
+
     $xmlLogPath = Split-Path -Qualifier -Path $PSScriptRoot
     $xmlLogPath = Join-Path -Path $xmlLogPath -ChildPath 'BuildOutput\Carbon\CodeQuality\Carbon.blade.xml'
     & (Join-Path -Path $PSScriptRoot -ChildPath '.\Tools\Blade\blade.ps1' -Resolve) -Path $Path -XmlLogPath $xmlLogPath @bladeTestParam -Recurse:$Recurse -PassThru:$PassThru
+    if( $LastBladeResult.Errors -or $LastBladeResult.Failures )
+    {
+        $testsFailed = $true
+    }
+    
+    $webClient = New-Object 'Net.WebClient'
+
+    if( $uploadTestResults )
+    {
+        $webClient.UploadFile($uploadUri, $xmlLogPath)
+    }
 
     $xmlLogPath = Join-Path -Path (Split-Path -Parent -Path $xmlLogPath) -ChildPath 'Carbon.pester.xml'
     Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'Tools\Pester\3.3.14\Pester.psd1' -Resolve)
     $result = Invoke-Pester -Script $Path -OutputFile $xmlLogPath -OutputFormat LegacyNUnitXml -PassThru |
                     Select-Object -Last 1
+
+    if( $uploadTestResults )
+    {
+        $webClient.UploadFile($uploadUri, $xmlLogPath)
+    }
+
     if( $result.FailedCount )
     {
+        $testsFailed =$true
         Write-Error -Message ('{0} Pester tests failed. Check the NUnit reports for more details.' -f $result.FailedCount)
+    }
+
+    if( $testsFailed )
+    {
+        throw 'Some tests failed.'
     }
 }
 finally
