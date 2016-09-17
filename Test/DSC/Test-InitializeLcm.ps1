@@ -10,6 +10,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+if( Test-Path -Path 'env:APPVEYOR' )
+{
+    Write-Warning -Message 'Can''t test Initialize-Lcm under Appveyor.'
+    return
+}
+
 $originalLcm = $null
 $tempDir = $null
 $privateKeyPath = Join-Path -Path $PSScriptRoot -ChildPath '..\Cryptography\CarbonTestPrivateKey.pfx' -Resolve

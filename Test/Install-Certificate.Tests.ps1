@@ -113,7 +113,7 @@ Describe "Install-Certificate" {
         Assert-CertificateInstalled CurrentUser My $TestCertProtected
     }
 
-    It 'should install certificate in remote computer' {
+    It 'should install certificate in remote computer' -Skip:(Test-Path -Path 'env:APPVEYOR') {
         $session = New-PSSession -ComputerName $env:COMPUTERNAME
         try
         {
@@ -126,7 +126,7 @@ Describe "Install-Certificate" {
             Remove-PSSession -Session $session
         }
     }
-    
+        
     It 'should support ShouldProcess' {
         $cert = Install-Certificate -Path $TestCertPath -StoreLocation CurrentUser -StoreName My -WhatIf
         $cert.Thumbprint | Should Be $TestCert.Thumbprint

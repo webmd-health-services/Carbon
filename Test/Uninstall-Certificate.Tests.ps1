@@ -63,7 +63,7 @@ Describe 'Uninstall-Certificate' {
         $certPath | Should Not Exist   
     }
 
-    It 'should uninstall certificate from remote computer' {
+    It 'should uninstall certificate from remote computer' -Skip:(Test-Path -Path 'env:APPVEYOR') {
         $Global:Error.Clear()
 
         $session = New-PSSession -ComputerName $env:COMPUTERNAME
