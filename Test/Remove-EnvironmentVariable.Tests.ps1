@@ -117,4 +117,18 @@ Describe 'Remove-EnvironmentVariable when no scopes selected' {
     }
 }
     
+Describe 'Remove-EnvironmentVariable when removing variable for another user' {
+    #$DebugPreference = 'Continue'
+    $value = [Guid]::NewGuid().ToString()
+    $credential = New-Credential -UserName 'CarbonTestUser' -Password 'abcd1234!'
+    Install-User -Credential $credential
+    Set-EnvironmentVariable -Name $EnvVarName -Value $value -ForUser -Credential $credential | Write-Debug
+    Remove-EnvironmentVariable -Name $EnvVarName -ForUser -Credential $credential | Write-Debug
+    $actualValue = $value
+    $actualValue = Invoke-PowerShell -Command ('$env:{0} ; [Environment]::SetEnvironmentVariable("{0}",$null,''User'')' -f $EnvVarName) -Encode -Credential $credential -OutputFormat 'text'
+    Write-Debug -Message ($actualValue -join "`n")
+    It 'should set that user''s environment variable' {
+        $actualValue | Should Be $null
+    }
+}
 Remove-EnvironmentVariable -Name $EnvVarName -ForProcess -ForUser -ForComputer

@@ -129,4 +129,17 @@ Describe 'Set-EnvironmentVariable when using -WhatIf switch' {
     Assert-TestEnvironmentVariableIs -ExpectedValue $null -Scope 'Process'
 }
 
+Describe 'Set-EnvironmentVariable when setting variable for another user' {
+    #$DebugPreference = 'Continue'
+    $value = New-TestValue
+    $credential = New-Credential -UserName 'CarbonTestUser' -Password 'abcd1234!'
+    Install-User -Credential $credential
+    Set-EnvironmentVariable -Name $EnvVarName -Value $value -ForUser -Credential $credential | Write-Debug
+    $actualValue = Invoke-PowerShell -Command ('$env:{0} ; [Environment]::SetEnvironmentVariable("{0}",$null,''User'')' -f $EnvVarName) -Encode -Credential $credential -OutputFormat 'text'
+    Write-Debug -Message ($actualValue -join "`n")
+    It 'should set that user''s environment variable' {
+        $actualValue | Should Be $value
+    }
+}
+
 Remove-EnvironmentVariable -Name $EnvVarName -ForProcess -ForUser -ForComputer

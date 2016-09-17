@@ -60,13 +60,21 @@ function Invoke-PowerShell
     Invoke-PowerShell -FilePath Get-PsVersionTable.ps1 -Credential $cred
 
     Demonstrates that you can run PowerShell scripts as a specific user with the `Credential` parameter.
+
+    .EXAMPLE
+    Invoke-PowerShell -FilePath Get-PsVersionTable.ps1 -Credential $cred
+
+    Demonstrates that you can run PowerShell scripts as a specific user with the `Credential` parameter.
     #>
     [CmdletBinding(DefaultParameterSetName='ScriptBlock')]
     param(
         [Parameter(Mandatory=$true,ParameterSetName='ScriptBlock')]
+        [Parameter(Mandatory=$true,ParameterSetName='CommandWithCredential')]
         [Alias('Command')]
-        [ScriptBlock]
-        # The command to run.
+        [object]
+        # Pass a script block or a string of PowerShell code.
+        #
+        # If you pass a string, you can run that command as another user with the `Credential` parameter.
         $ScriptBlock,
         
         [Parameter(Mandatory=$true,ParameterSetName='FilePath')]
@@ -74,18 +82,26 @@ function Invoke-PowerShell
         [string]
         # The script to run.
         $FilePath,
-        
+
+        [Parameter(Mandatory=$true,ParameterSetName='ScriptBlock')]
+        [Parameter(Mandatory=$true,ParameterSetName='FilePath')]
+        [Parameter(Mandatory=$true,ParameterSetName='FilePathWithCredential')]
         [object[]]
         [Alias('Args')]
         # Any arguments to pass to the command/scripts. These *are not* powershell.exe arguments.
         $ArgumentList,
+
+        [Parameter(ParameterSetName='CommandWithCredential')]
+        [Switch]
+        # Base-64 encode the command in `ScriptBlock` and run it with PowerShell.exe's -EncodedCommand switch.
+        $Encode,
         
         [string]
         # Determines how output from the PowerShel command is formatted
         $OutputFormat,
 
         [Parameter(ParameterSetName='FilePath')]
-        [Parameter(ParameterSetName='FilePathWithCredential')]
+        [Parameter(ParameterSetName='CommandWithCredential')]
         [Microsoft.PowerShell.ExecutionPolicy]
         # The execution policy to use when running a script.  By default, execution policies are set to `Restricted`. If running an architecture of PowerShell whose execution policy isn't set, `Invoke-PowerShell` will fail.
         $ExecutionPolicy,
@@ -103,7 +119,8 @@ function Invoke-PowerShell
         # The CLR to use.  Must be one of `v2.0` or `v4.0`.  Default is the current PowerShell runtime.
         $Runtime,
 
-        [Parameter(Mandatory=$true,ParameterSetName='FilePathWithCredential')]
+        [Parameter(ParameterSetName='FilePath')]
+        [Parameter(Mandatory=$true,ParameterSetName='CommandWithCredential')]
         [pscredential]
         # Run the process as this user.
         #
@@ -218,18 +235,28 @@ function Invoke-PowerShell
         {
             & $psPath $powerShellArgs -Command $ScriptBlock -Args $ArgumentList
         }
-        else
+        elseif( $PSCmdlet.ParameterSetName -like 'FilePath*' )
         {
-            if( $PSCmdlet.ParameterSetName -eq 'FilePath' )
-            {
-                Write-Debug ('{0} {1} -Command {2} {3}' -f $psPath,($powerShellArgs -join " "),$FilePath,($ArgumentList -join ' '))
-                & $psPath $powerShellArgs -File $FilePath $ArgumentList
-                Write-Debug ('LASTEXITCODE: {0}' -f $LASTEXITCODE)
-            }
-            else
+            if( $Credential )
             {
                 Start-PowerShellProcess -CommandLine ('{0} -File "{1}" {2}' -f ($powerShellArgs -join " "),$FilePath,($ArgumentList -join " ")) -Credential $Credential
             }
+            else
+            {
+                Write-Debug ('{0} {1} -File {2} {3}' -f $psPath,($powerShellArgs -join " "),$FilePath,($ArgumentList -join ' '))
+                & $psPath $powerShellArgs -File $FilePath $ArgumentList
+                Write-Debug ('LASTEXITCODE: {0}' -f $LASTEXITCODE)
+            }
+        }
+        else
+        {
+            $argName = '-Command'
+            if( $Encode )
+            {
+                $ScriptBlock = ConvertTo-Base64 -Value $ScriptBlock
+                $argName = '-EncodedCommand'
+            }
+            Start-PowerShellProcess -CommandLine ('{0} {1} {2}' -f ($powerShellArgs -join " "),$argName,$ScriptBlock) -Credential $Credential
         }
     }
     finally

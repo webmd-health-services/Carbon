@@ -21,6 +21,8 @@ function Set-EnvironmentVariable
     
     Changes to environment variables in the User and Machine scope are not picked up by running processes.  Any running processes that use this environment variable should be restarted.
 
+    Beginning with Carbon 2.3.0, you can set an environment variable for a specific user by specifying the `-ForUser` switch and passing the user's credentials with the `-Credential` parameter.
+
     Normally, you have to restart your PowerShell session/process to see the variable in the `env:` drive. Use the `-Force` switch to also add the variable to the `env:` drive. This functionality was added in Carbon 2.3.0.
     
     .LINK
@@ -55,28 +57,48 @@ function Set-EnvironmentVariable
         # The environment variable's value.
         $Value,
         
+        [Parameter(ParameterSetName='ForCurrentUser')]
         # Sets the environment variable for the current computer.
         [Switch]
         $ForComputer,
 
+        [Parameter(ParameterSetName='ForCurrentUser')]
+        [Parameter(Mandatory=$true,ParameterSetName='ForSpecificUser')]
         # Sets the environment variable for the current user.
         [Switch]
         $ForUser,
         
+        [Parameter(ParameterSetName='ForCurrentUser')]
         # Sets the environment variable for the current process.
         [Switch]
         $ForProcess,
 
+        [Parameter(ParameterSetName='ForCurrentUser')]
         [Switch]
         # Set the variable in the current PowerShell session's `env:` drive, too. Normally, you have to restart your session to see the variable in the `env:` drive.
         #
         # This parameter was added in Carbon 2.3.0.
-        $Force
+        $Force,
+
+        [Parameter(Mandatory=$true,ParameterSetName='ForSpecificUser')]
+        [pscredential]
+        # Set an environment variable for a specific user.
+        $Credential
     )
 
     Set-StrictMode -Version 'Latest'
 
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
+    if( $PSCmdlet.ParameterSetName -eq 'ForSpecificUser' )
+    {
+        Invoke-PowerShell -FilePath (Join-Path -Path $PSScriptRoot -ChildPath '..\bin\Set-EnvironmentVariable.ps1' -Resolve) `
+                          -Credential $credential `
+                          -ArgumentList ('-Name {0} -Value {1}' -f (ConvertTo-Base64 $Name),(ConvertTo-Base64 $Value)) `
+                          -NonInteractive `
+                          -OutputFormat 'text'
+        return
+    }
 
     if( -not $ForProcess -and -not $ForUser -and -not $ForComputer )
     {

@@ -23,6 +23,8 @@ function Remove-EnvironmentVariable
 
     Normally, you have to restart your PowerShell session/process to no longer see the variable in the `env:` drive. Use the `-Force` switch to also remove the variable from the `env:` drive. This functionality was added in Carbon 2.3.0.
 
+    Beginning with Carbon 2.3.0, you can set an environment variable for a specific user by specifying the `-ForUser` switch and passing the user's credentials with the `-Credential` parameter.
+
     Beginning in Carbon 2.3.0, you can specify multiple scopes from which to remove an environment variable. In previous versions, you could only remove from one scope.
     
     .LINK
@@ -46,29 +48,48 @@ function Remove-EnvironmentVariable
         # The environment variable to remove.
         $Name,
         
+        [Parameter(ParameterSetName='ForCurrentUser')]
         [Switch]
         # Removes the environment variable for the current computer.
         $ForComputer,
 
-        # Removes the environment variable for the current user.
+        [Parameter(ParameterSetName='ForCurrentUser')]
+        [Parameter(Mandatory=$true,ParameterSetName='ForSpecificUser')]
         [Switch]
+        # Removes the environment variable for the current user.
         $ForUser,
         
+        [Parameter(ParameterSetName='ForCurrentUser')]
         [Switch]
         # Removes the environment variable for the current process.
-        [Switch]
         $ForProcess,
 
+        [Parameter(ParameterSetName='ForCurrentUser')]
         [Switch]
         # Remove the variable from the current PowerShell session's `env:` drive, too. Normally, you have to restart your session to no longer see the variable in the `env:` drive.
         #
         # This parameter was added in Carbon 2.3.0.
-        $Force
+        $Force,
+
+        [Parameter(Mandatory=$true,ParameterSetName='ForSpecificUser')]
+        [pscredential]
+        # Remove an environment variable for a specific user.
+        $Credential
     )
     
     Set-StrictMode -Version 'Latest'
 
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
+    if( $PSCmdlet.ParameterSetName -eq 'ForSpecificUser' )
+    {
+        Invoke-PowerShell -FilePath (Join-Path -Path $PSScriptRoot -ChildPath '..\bin\Remove-EnvironmentVariable.ps1' -Resolve) `
+                          -Credential $credential `
+                          -ArgumentList ('-Name {0}' -f (ConvertTo-Base64 $Name)) `
+                          -NonInteractive `
+                          -OutputFormat 'text'
+        return
+    }
 
     if( -not $ForProcess -and -not $ForUser -and -not $ForComputer )
     {
