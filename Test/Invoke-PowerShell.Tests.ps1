@@ -248,10 +248,82 @@ Describe 'Invoke-PowerShell when running script under v2.0 runtime' {
 Describe 'Invoke-PowerShell when setting execution policy when running a script' {
     $Global:Error.Clear()
     $result = Invoke-PowerShell -FilePath $getPsVersionTablePath `
-                                -ExecutionPolicy Restricted 
+                                -ExecutionPolicy Restricted `
+                                -ErrorAction SilentlyContinue
     
     It 'should set the execution policy' {
        $result | Should BeNullOrEmpty
         ($Global:Error -join [Environment]::NewLine) |  Should Match 'disabled'
+    }
+}
+
+$getUsernamePath = Join-Path -Path $PSScriptRoot -ChildPath 'PowerShell\Get-Username.ps1' -Resolve
+$credential = New-Credential -UserName 'CarbonTestUser' -Password 'abcd1234!'
+Install-User -Credential $credential
+Describe 'Invoke-PowerShell when running a script as another user' {
+    $Global:Error.Clear()
+    $return = 'fubar'
+    $result = Invoke-PowerShell -FilePath $getUsernamePath `
+                                -ArgumentList '-InputObject',$return `
+                                -Credential $credential
+    It 'should run the script' {
+        $result.Count | Should Be 2
+        $result[0] | Should Be $return
+        $result[1] | Should Be $credential.UserName
+    }
+
+    $result = Invoke-PowerShell -FilePath $getUsernamePath `
+                                -ArgumentList '-InputObject',$return `
+                                -ExecutionPolicy Restricted `
+                                -Credential $credential `
+                                -ErrorAction SilentlyContinue
+    It 'should use PowerShell parameters' {
+        $result | Should BeNullOrEmpty
+        ($Global:Error -join [Environment]::NewLine) |  Should Match 'disabled'
+    }
+}
+
+Describe 'Invoke-PowerShell when running a command as another user' {
+    $Global:Error.Clear()
+    $result = Invoke-PowerShell -Command '$env:Username' -Credential $credential
+    It 'should run the command as the user' {
+        $result | Should Be $credential.UserName
+    }
+
+    $result = Invoke-PowerShell -Command $getUsernamePath -ExecutionPolicy Restricted -Credential $credential -ErrorAction SilentlyContinue
+    It 'should set powershell.exe parameters' {
+        $result | Should BeNullOrEmpty
+        ($Global:Error -join [Environment]::NewLine) |  Should Match 'disabled'
+    }
+}
+
+Describe 'Invoke-PowerShell when running a script block as another user' {
+    $Global:Error.Clear()
+    $result = Invoke-PowerShell -Command { 'fubar' } -Credential $credential -ErrorAction SilentlyContinue
+    It 'should write an error' {
+        $Global:Error | Should Match 'script block as another user'
+    }
+    It 'should not write anything' {
+        $result | Should BeNullOrEmpty
+    }
+}
+
+Describe 'Invoke-PowerShell when running a command with an argument list' {
+    $Global:Error.Clear()
+    $result = Invoke-PowerShell -Command 'write-host fubar' -ArgumentList 'snafu' -ErrorAction SilentlyContinue
+    It 'should write an error' {
+        $Global:Error | Should Match 'doesn''t support'
+    }
+
+    It 'should not run the command' {
+        $result | Should BeNullOrEmpty
+    }
+}
+
+Describe 'Invoke-PowerShell when running non-interactively' {
+    $Global:Error.Clear()
+    $result = Invoke-PowerShell -Command 'Read-Host ''prompt''' -NonInteractive -ErrorAction SilentlyContinue
+    It 'should write an error' {
+        ($Global:Error -join [Environment]::NewLine) | Should Match 'is in NonInteractive mode'
     }
 }

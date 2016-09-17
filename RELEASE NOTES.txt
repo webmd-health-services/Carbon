@@ -13,8 +13,11 @@
    * Added `-Force` switch to make all variable removals immediately visible in the current PowerShell process's `env:` drive. Restarts are no longer required.
    * You can now remove variables from multiple targets/scopes at once.
    * You can now remove an environment variable for other users. Use the `Credential` parameter to specify the user's credentials.
- * `Invoke-PowerShell`: you can now run PowerShell scripts as another use by passing the user's credentials to the new `Credential` parameter.
-
+ * `Invoke-PowerShell`:
+   * It now runs PowerShell commands. Pass a string of PowerShell code with the `Command` parameter. 
+   * It now runs encoded PowerShell commands. Pass the string of PowerShell code with the `Command` parameter and use the `-Encode` switch.
+   * It now runs scripts and commands as another user. Use the `Credential` parameter to pass the user's credentials along with the `FilePath` and `Command` parameters to run scripts and commands, respectively.
+   
 ## Bug Fixes
 
  * Fixed: `Set-RegistryKeyValue` fails when `-String` parameter's value is `$null` or empty ([fixes issue #211](https://bitbucket.org/splatteredbits/carbon/issues/211/set-registrykeyvalue-null-string-invalid)).

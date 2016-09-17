@@ -14,20 +14,27 @@ function Invoke-PowerShell
 {
     <#
     .SYNOPSIS
-    Invokes a script block or script in a separate powershell.exe process.
+    Invokes a script block, script, command, or encoded command under a new `powershell.exe` process.
     
     .DESCRIPTION
-    The `Invoke-PowerShell` scripts runs a script block or a PowerShell script under a new `powershell.exe` process. You pass arguments to the script block or script with the `ArgumentList` parameter. To pass parameters to `powershell.exe` itself, use the other switches and parameters.
 
-    If using PowerShell v2.0, the invoked PowerShell process can run under the .NET 4.0 CLR (using `v4.0` as the value to the Runtime parameter).
-
-    If using PowerShell v3.0, you can *only* run script blocks under a `v4.0` CLR.  PowerShell converts script blocks to an encoded command, and when running encoded commands, PowerShell doesn't allow the `-Version` parameter for running PowerShell under a different version.  To run code under a .NET 2.0 CLR from PowerShell 3, use the `FilePath` parameter to run a specfic script.
+    The `Invoke-PowerShell` scripts executes `powershell.exe`. All processes are started with powershell.exe's `-NoProfile` paramter. You can specify values for powershell.exe's `OutputFormat`, `ExecutionPolicy`, and `NonInteractive` paramters via parameters of the same name on the `Invoke-PowerShell` function. Use the `Runtime` parameter to run `powershell.exe` version 2.
     
-    This function launches a PowerShell process that matches the architecture of the *operating system*.  On 64-bit operating systems, you can run under 32-bit PowerShell by specifying the `x86` switch).
+    To run a script, pass the path to the script with the `-FilePath` paramter. Pass any script arguments with the `ArgumentList` parameter. You must escape any parameters. They are passed to `powershell.exe` as-is.
+    
+    To run a script block, pass the script block with the `-ScriptBlock` parameter. Pass any script block arguments with the `ArgumentList` parameter. You must escape any parameters. They are passed to `powershell.exe` as-is.
+    
+    To run a command (Carbon 2.3.0 and later only), pass the command (i.e. string of PowerShell code) with the `Command` parameter. Any arguments to your command must be in the command itself. You must do any escaping.
+    
+    To run an encoded command (Carbon 2.3.0 and later only), pass the command (i.e. string of PowerShell code) with the `Command` parameter and the `-Encode` switch. `Invoke-PowerShell` will base-64 encode your command for you and pass it to `powershell.exe` with its `-EncodedCommand` parameter.
+    
+    Beginning in Carbon 2.3.0, you can run scripts, commands, and encoded commands as another user. Pass that user's credentials with the `Credential` parameter.
+    
+    On 64-bit operating systems, use the `-x86` switch to run the new `powershell.exe` process under 32-bit PowerShell. If this switch is ommitted, `powershell.exe` will be run under a 64-bit PowerShell process (even if called from a 32-bit process). On 32-bit operating systems, this switch is ignored.
+    
+    The `Runtime` paramter controls what version of the .NET framework `powershell.exe` should use. Pass `v2.0` and `v4.0` to run under .NET versions 2.0 or 4.0, respectivey. Those frameworks must be installed. When running under PowerShell 2, `Invoke-PowerShell` uses a temporary [activation configuration file](https://msdn.microsoft.com/en-us/library/ff361644(v=vs.100).aspx) to force PowerShell 2 to use .NET 4. When run under PowerShell 3 and later, `powershell.exe` is run with the `-Version` switch set to `2.0` to run `powershell.exe` under .NET 2.
 
-    PowerShell's execution policy has to be set seperately in all architectures (i.e. x86 and x64), so you may get an error message about scripts being disabled.  Use the `-ExecutionPolicy` parameter to set a temporary execution policy when running a script.
-
-    Beginning with PowerShell 2.3.0, you can run a PowerShell script as another user. Pass the user's credentials to the `$Credential` parameter.
+    If using PowerShell v3.0 or later with a version of Carbon before 2.0, you can *only* run script blocks under a `v4.0` CLR.  PowerShell converts script blocks to an encoded command, and when running encoded commands, PowerShell doesn't allow the `-Version` parameter for running PowerShell under a different version.  To run code under a .NET 2.0 CLR from PowerShell 3, use the `FilePath` parameter to run a specfic script.
     
     .EXAMPLE
     Invoke-PowerShell -Command { $PSVersionTable }
@@ -69,60 +76,68 @@ function Invoke-PowerShell
     [CmdletBinding(DefaultParameterSetName='ScriptBlock')]
     param(
         [Parameter(Mandatory=$true,ParameterSetName='ScriptBlock')]
-        [Parameter(Mandatory=$true,ParameterSetName='CommandWithCredential')]
-        [Alias('Command')]
-        [object]
-        # Pass a script block or a string of PowerShell code.
-        #
-        # If you pass a string, you can run that command as another user with the `Credential` parameter.
+        [ScriptBlock]
+        # The script block to pass to `powershell.exe`.
         $ScriptBlock,
         
+        [Parameter(Mandatory=$true,ParameterSetName='Command')]
+        [object]
+        # The command to run, as a string. Passed to PowerShell.exe as the value to the `-Command` parameter. 
+        #
+        # Use the `-Encode` switch to avoid complicated quoting, and have `Invoke-PowerShell` encode this command for you and pass it to powershell.exe's `-EncodedCommand parameter.
+        #
+        # This parameter was introduced in Carbon 2.3.0. In previous versions, this parameter was an alias to the `ScriptBlock` parameter. To maintain backwards-compatibility, if you pass a `ScriptBlock` to this parameter, `Invoke-PowerShell` will run the script block as a script block. In the next major version of Carbon, this parameter will stop accepting `ScriptBlock` objects.
+        $Command,
+
         [Parameter(Mandatory=$true,ParameterSetName='FilePath')]
-        [Parameter(Mandatory=$true,ParameterSetName='FilePathWithCredential')]
         [string]
         # The script to run.
         $FilePath,
 
-        [Parameter(Mandatory=$true,ParameterSetName='ScriptBlock')]
-        [Parameter(Mandatory=$true,ParameterSetName='FilePath')]
-        [Parameter(Mandatory=$true,ParameterSetName='FilePathWithCredential')]
+        [Parameter(ParameterSetName='Command')]
+        [Parameter(ParameterSetName='ScriptBlock')]
+        [Parameter(ParameterSetName='FilePath')]
         [object[]]
         [Alias('Args')]
-        # Any arguments to pass to the command/scripts. These *are not* powershell.exe arguments.
+        # Any arguments to pass to the script or command. These *are not* powershell.exe arguments. They are passed to powershell.exe as-is, so you'll need to escape them.
         $ArgumentList,
 
-        [Parameter(ParameterSetName='CommandWithCredential')]
+        [Parameter(ParameterSetName='Command')]
         [Switch]
-        # Base-64 encode the command in `ScriptBlock` and run it with PowerShell.exe's -EncodedCommand switch.
+        # Base-64 encode the command in `Command` and run it with powershell.exe's `-EncodedCommand` switch.
+        #
+        # This parameter was added in Carbon 2.3.0.
         $Encode,
         
         [string]
-        # Determines how output from the PowerShel command is formatted
+        # Determines how output from the PowerShel command is formatted. The value of this parameter is passed as-is to `powershell.exe` with its `-OutputFormat` paramter.
         $OutputFormat,
 
-        [Parameter(ParameterSetName='FilePath')]
-        [Parameter(ParameterSetName='CommandWithCredential')]
         [Microsoft.PowerShell.ExecutionPolicy]
-        # The execution policy to use when running a script.  By default, execution policies are set to `Restricted`. If running an architecture of PowerShell whose execution policy isn't set, `Invoke-PowerShell` will fail.
+        # The execution policy to use when running `powershell.exe`. Passed to `powershell.exe` with its `-ExecutionPolicy` parameter.
         $ExecutionPolicy,
 
         [Switch]
-        # Run PowerShell non-interactively. This passes the `-NonInteractive` switch to powershell.exe.
+        # Run `powershell.exe` non-interactively. This passes the `-NonInteractive` switch to powershell.exe.
         $NonInteractive,
 
         [Switch]
-        # Run the x86 (32-bit) version of PowerShell, otherwise the version which matches the OS architecture is run, *regardless of the architecture of the currently running process*.
+        # Run the x86 (32-bit) version of PowerShell. if not provided, the version which matches the OS architecture is used, *regardless of the architecture of the currently running process*. I.e. this command is run under a 32-bit PowerShell on a 64-bit operating system, without this switch, `Invoke-Command` will start a 64-bit `powershell.exe`.
         $x86,
         
         [string]
         [ValidateSet('v2.0','v4.0')]
         # The CLR to use.  Must be one of `v2.0` or `v4.0`.  Default is the current PowerShell runtime.
+        #
+        # Beginning with Carbon 2.3.0, this parameter is ignored, since Carbon 2.0 and later only supports PowerShell 4 and you can't run PowerShell 4 under .NET 2.0. 
+        #
+        # This parameter is OBSOLETE and will be removed in a future major version of Carbon.
         $Runtime,
 
         [Parameter(ParameterSetName='FilePath')]
-        [Parameter(Mandatory=$true,ParameterSetName='CommandWithCredential')]
+        [Parameter(ParameterSetName='Command')]
         [pscredential]
-        # Run the process as this user.
+        # Run `powershell.exe` as a specific user. Pass that user's credentials with this parameter.
         #
         # This parameter is new in Carbon 2.3.0.
         $Credential
@@ -231,11 +246,22 @@ function Invoke-PowerShell
             }
         }
 
-        if( $PSCmdlet.ParameterSetName -eq 'ScriptBlock' )
+        if( $PSCmdlet.ParameterSetName -eq 'Command' -and $Command -is [scriptblock] )
+        {
+            Write-Warning -Message ('Passing a ScripBlock to the Command parameter is OBSOLETE and will be removed in a future major version of Carbon. Use the `ScriptBlock` parameter instead.')
+            $ScriptBlock = $Command
+            if( $Credential )
+            {
+                Write-Error -Message ('It looks like you''re trying to run a script block as another user. `Start-Process` is used to start powershell.exe as that user. Start-Process requires all arguments to be strings. Converting a script block to a string automatically is unreliable. Please convert the script block to a command string or omit the Credential parameter.')
+                return
+            }
+        }
+
+        if( $PSCmdlet.ParameterSetName -eq 'ScriptBlock' -or $ScriptBlock )
         {
             & $psPath $powerShellArgs -Command $ScriptBlock -Args $ArgumentList
         }
-        elseif( $PSCmdlet.ParameterSetName -like 'FilePath*' )
+        elseif( $PSCmdlet.ParameterSetName -eq 'FilePath' )
         {
             if( $Credential )
             {
@@ -250,13 +276,28 @@ function Invoke-PowerShell
         }
         else
         {
+            if( $ArgumentList )
+            {
+                Write-Error -Message ('Can''t use ArgumentList parameter with Command parameter because powershell.exe''s -Command parameter doesn''t support it. Please embed the argument list in your command string, or convert your command to a script block and use the `ScriptBlock` parameter.')
+                return
+            }
+
             $argName = '-Command'
             if( $Encode )
             {
-                $ScriptBlock = ConvertTo-Base64 -Value $ScriptBlock
+                $Command = ConvertTo-Base64 -Value $Command
                 $argName = '-EncodedCommand'
             }
-            Start-PowerShellProcess -CommandLine ('{0} {1} {2}' -f ($powerShellArgs -join " "),$argName,$ScriptBlock) -Credential $Credential
+            if( $Credential )
+            {
+                Start-PowerShellProcess -CommandLine ('{0} {1} {2}' -f ($powerShellArgs -join " "),$argName,$Command) -Credential $Credential
+            }
+            else
+            {
+                Write-Debug ('{0} {1} {2} {3}' -f $psPath,($powerShellArgs -join " "),$argName,$Command)
+                & $psPath $powerShellArgs $argName $Command
+                Write-Debug ('LASTEXITCODE: {0}' -f $LASTEXITCODE)
+            }
         }
     }
     finally
