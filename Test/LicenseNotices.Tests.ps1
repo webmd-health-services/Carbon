@@ -50,7 +50,8 @@ Describe 'License Notices' {
                             '*.nupkg',
                             '*.pshproj',
                             '*.nuspec',
-                            'Publish-Carbon.ps1'
+                            'Publish-Carbon.ps1',
+                            '*.pdn'
                         )
     
         [object[]]$filesMissingLicense = Get-ChildItem -Path $projectRoot -Exclude 'Tools','Website','.hg','pshdo.com' |
