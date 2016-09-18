@@ -42,7 +42,6 @@ function Remove-ConnectionStrings
             `$connectionStrings.Remove( '$connectionStringName' )
             `$config.Save()
         }
-    }
 "@
     
     if( (Test-DotNet -V2) )
@@ -198,6 +197,8 @@ function Assert-ConnectionString
         $Clr4
     )
 
+    $Name = $Name -replace "'","''"
+
     $command = @"
         
         Add-Type -AssemblyName System.Configuration
@@ -237,6 +238,7 @@ function Assert-ConnectionString
                 Command = $command
                 Encode = $true
                 Runtime = $_
+                OutputFormat = 'XML'
             }
 
             if( $Framework )
