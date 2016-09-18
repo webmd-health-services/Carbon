@@ -10,7 +10,10 @@ param(
 Set-StrictMode -Version 'Latest'
 $ErrorActionPreference = 'Stop'
 
-$env:PSModulePath -split ';' |
+# Use Get-Item so we can mock it
+Get-Item -Path 'env:PSModulePath' |
+    Select-Object -ExpandProperty 'Value'-ErrorAction Ignore |
+    ForEach-Object { $_ -split ';' } |
     Join-Path -ChildPath 'Carbon' |
     Where-Object { Test-Path -Path $_ -PathType Container } |
     Rename-Item -NewName { 'Carbon{0}' -f [IO.Path]::GetRandomFileName() } -PassThru |

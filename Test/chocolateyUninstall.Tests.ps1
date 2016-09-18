@@ -10,58 +10,80 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-$chocolateyInstall = Join-Path -Path $PSScriptRoot -ChildPath '..\tools\chocolateyInstall.ps1' -Resolve
+Set-StrictMode -Version 'Latest'
+
 $chocolateyUninstall = Join-Path -Path $PSScriptRoot -ChildPath '..\tools\chocolateyUninstall.ps1' -Resolve
 & (Join-Path -Path $PSScriptRoot -ChildPath 'Import-CarbonForTest.ps1' -Resolve)
-$destinationDir = Join-Path -Path (Get-PowerShellModuleInstallPath) -ChildPath 'Carbon'
 
-function Start-TestFixture
+function Assert-CarbonRemoved
 {
-    $installCarbonJunction = (Test-PathIsJunction -Path $destinationDir)
-}
+    param(
+        $CarbonRoot
+    )
 
-function Stop-TestFixture
-{
-    if( $installCarbonJunction )
+    foreach( $root in $CarbonRoot )
     {
-        Install-Junction -Link $destinationDir -Target (Join-Path -Path $PSScriptRoot -ChildPath '..\Carbon' -Resolve)
+        It ('should remove Carbon module directory ''{0}''' -f $root) {
+            $root | Should Not Exist
+        }
     }
 }
 
-function Start-Test
+function Assert-CarbonNotInstalled 
 {
-    Stop-Test
-    & $chocolateyInstall
-    Assert-NoError
-    Assert-DirectoryExists $destinationDir
+    It 'should uninstall Carbon from all module paths' {
+        Get-Item -Path 'env:PSModulePath' |
+            Select-Object -ExpandProperty 'Value' -ErrorAction Ignore |
+            ForEach-Object { $_ -split ';' } |
+            Join-Path -ChildPath 'Carbon*' |
+            Should Not Exist
+        }
 }
 
-function Stop-Test
+function MockCarbonInstalled
 {
-    if( (Test-PathIsJunction -Path $destinationDir) )
-    {
-        Uninstall-Junction -Path $destinationDir
-    }
-    elseif( (Test-Path -Path $destinationDir -PathType Container) )
-    {
-        Remove-Item -Path $destinationDir -Recurse -Force
-    }
+    $testDriveRoot =  Microsoft.PowerShell.Management\Get-Item -Path 'TestDrive:'
+    $modulesRoot = Join-Path -Path $testDriveRoot.FullName -ChildPath 'Modules'
+    $modulesRoot2 = Join-Path -Path $testDriveRoot.FullName -ChildPath 'Modules2'
+    $modulesRoot,$modulesRoot2 | ForEach-Object { Install-Directory -Path $_ }
+    $carbonRoot = Join-Path -Path $modulesRoot -ChildPath 'Carbon'
+    $carbonRoot2 = Join-Path -Path $modulesRoot2 -ChildPath 'Carbon'
 
-    Get-ChildItem -Path (Get-PowerShellModuleInstallPath) -Filter 'Carbon*.*' | Remove-Item -Recurse -Force
+    robocopy (Join-Path -Path $PSScriptRoot -ChildPath '..\Carbon' -Resolve) $carbonRoot /MIR | Write-Debug
+    robocopy (Join-Path -Path $PSScriptRoot -ChildPath '..\Carbon' -Resolve) $carbonRoot2 /MIR | Write-Debug
+
+    Mock 'Get-Item' -Verifiable -MockWith {
+        $DebugPreference = 'Continue'
+        $testDriveRoot =  Microsoft.PowerShell.Management\Get-Item -Path 'TestDrive:'
+        $modulesRoot = Join-Path -Path $testDriveRoot.FullName -ChildPath 'Modules'
+        $modulesRoot2 = Join-Path -Path $testDriveRoot.FullName -ChildPath 'Modules2'
+        return [pscustomobject]@{ Name = 'PSModulePath'; Value = ('{0};{1}'-f $modulesRoot,$modulesRoot2) }
+    } -ParameterFilter {
+        $Path -eq 'env:PSModulePath'
+    }
+    
+    return $carbonRoot,$carbonRoot2
 }
 
-function Test-ShouldRemoveCarbonModule
-{
+Describe 'chocolateyUninstall.ps1 when module is installed' {
+
+    $carbonRoot = MockCarbonInstalled
+    $paths = Get-Item 'env:PSModulePath'
     & $chocolateyUninstall -Verbose
-    Assert-CarbonUninstalled
+    Assert-CarbonRemoved $carbonRoot
+    Assert-CarbonNotInstalled
 }
 
-function Test-ShouldDeleteNothingIfModuleInUse
-{
-    $preCount = Get-ChildItem -Path $destinationDir -Recurse | Measure-Object | Select-Object -ExpandProperty 'Count'
+Describe 'chocolateyUninstall.ps1 when module is installed and in use' {
+    $Global:Error.Clear()
 
-    $carbonDllPath = Join-Path -Path $destinationDir -ChildPath 'bin\Carbon.dll' -Resolve
-    $file = [IO.File]::Open($carbonDllPath, 'Open', 'Read', 'Read')
+    $carbonRoot = MockCarbonInstalled
+
+    $preCount = $carbonRoot | Get-ChildItem  -Recurse | Measure-Object | Select-Object -ExpandProperty 'Count'
+    
+    $file = $carbonRoot | 
+                Join-Path -ChildPath 'bin\Carbon.dll' -Resolve |
+                ForEach-Object { [IO.File]::Open($_, 'Open', 'Read', 'Read') }
     try
     {
         & $chocolateyUninstall
@@ -71,27 +93,36 @@ function Test-ShouldDeleteNothingIfModuleInUse
     }
     finally
     {
-        $file.Close()
+        $file | ForEach-Object { $_.Close() }
     }
-    Assert-Error
-    Assert-DirectoryExists $destinationDir
 
+    It 'should write an error' {
+        $Global:Error.Count | Should BeGreaterThan 0
+        $Global:Error | Should Match 'access\ to\ the\ path\ .*\ is\ denied'
+    }
+
+    $carbonRoot | Should Exist
+    
     # Make sure no files were deleted during a failed uninstall
-    $postCount = Get-ChildItem -Path $destinationDir -Recurse | Measure-Object | Select-Object -ExpandProperty 'Count'
-    Assert-Equal $preCount $postCount 'some files were deleted during failed uninstall'
+    $postCount = $carbonRoot | Get-ChildItem -Recurse | Measure-Object | Select-Object -ExpandProperty 'Count'
+    It 'should not delete any files' {
+        $postCount | Should Be $preCount
+    }
 }
 
-function Test-ShouldDeleteIfModuleNotInstalled
-{
-    & $chocolateyUninstall
-    Assert-CarbonUninstalled
+Describe 'chocolateyUninstall.ps1 when the module isn''t installed' {
 
-    & $chocolateyUninstall
-    Assert-NoError
-}
+    $Global:Error.Clear()
 
-function Assert-CarbonUninstalled
-{
-    Assert-DirectoryDoesNotExist $destinationDir
-    Assert-Null (Get-ChildItem -Path (Get-PowerShellModuleInstallPath) -Filter 'Carbon*')
+    $carbonRoot = MockCarbonInstalled
+    & $chocolateyUninstall
+    Assert-CarbonRemoved $carbonRoot
+    Assert-CarbonNotInstalled
+    & $chocolateyUninstall
+        
+    & $chocolateyUninstall
+    It 'should not write an error' {
+        $Global:Error | Should BeNullOrEmpty
+    }
+    Assert-CarbonNotInstalled
 }
