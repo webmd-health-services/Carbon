@@ -42,10 +42,6 @@ Update-FormatData -PrependPath $prependFormats
 
 & (Join-Path -Path $PSScriptRoot -ChildPath 'Carbon\Import-Carbon.ps1' -Resolve)
 
-$installRoot = Get-PowerShellModuleInstallPath
-$carbonModuleRoot = Join-Path -Path $installRoot -ChildPath 'Carbon'
-Install-Junction -Link $carbonModuleRoot -Target (Join-Path -Path $PSScriptRoot -ChildPath 'Carbon' -Resolve) | Format-Table | Out-String | Write-Verbose
-Clear-DscLocalResourceCache
 
 $bladeTestParam = @{ }
 if( $Test )
@@ -71,6 +67,13 @@ try
         [Environment]::SetEnvironmentVariable('PSModulePath',$env:PSModulePath,[EnvironmentVariableTarget]::Machine)
         $env:PSModulePath
     }
+    else
+    {
+        $installRoot = Get-PowerShellModuleInstallPath
+        $carbonModuleRoot = Join-Path -Path $installRoot -ChildPath 'Carbon'
+        Install-Junction -Link $carbonModuleRoot -Target (Join-Path -Path $PSScriptRoot -ChildPath 'Carbon' -Resolve) | Format-Table | Out-String | Write-Verbose
+    }
+    Clear-DscLocalResourceCache
 
     
 
