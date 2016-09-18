@@ -67,8 +67,9 @@ try
                                                          $env:PSModulePath -split ';' | Select-Object -Unique
                                                          $PSScriptRoot
                                                    }
-        $env:PSModulePath = $modulePaths
+        $env:PSModulePath = $modulePaths -join ';'
         [Environment]::SetEnvironmentVariable('PSModulePath',$env:PSModulePath,[EnvironmentVariableTarget]::Machine)
+        $env:PSModulePath
     }
 
     
