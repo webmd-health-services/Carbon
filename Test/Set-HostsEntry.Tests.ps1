@@ -89,7 +89,7 @@ Describe 'Set-HostsEntry when no path parameter provided' {
     Set-HostsEntry -IPAddress '5.6.7.8' -HostName 'example.com' -Description 'Customizing example.com'
 
     It 'should operate on system hosts file by default' {
-        Assert-MockCalled -CommandName 'Write-File' -ModuleName 'Carbon' -Times 1 -Exactly -ParameterFilter {
+        Assert-MockCalled -CommandName 'Write-File' -ModuleName 'Carbon'  -ParameterFilter {
             #$DebugPreference = 'Continue'
             Write-Debug $Path 
             Write-Debug (Get-PathToHostsFile)
@@ -117,9 +117,10 @@ Describe 'Set-HostsEntry when adding a new IPv4 entry' {
 }
 
 Describe 'Set-HostsEntry when an existing entry has a comment but is updated without a comment' {    
-    $hostsFile = "$ip $hostname  # this comment should get removed" | New-TestHostsFile
     $ip = '1.1.1.1'
     $hostname = 'shouldremovecomment.example.com'
+
+    $hostsFile = "$ip $hostname  # this comment should get removed" | New-TestHostsFile
         
     Set-HostsEntry -IPAddress $ip -HostName $hostname -Path $hostsFile
        
