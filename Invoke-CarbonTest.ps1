@@ -63,7 +63,11 @@ try
         $uploadUri = 'https://ci.appveyor.com/api/testresults/nunit/{0}' -f $env:APPVEYOR_JOB_ID 
 
         # On AppVeyor, VMs have duplicate PSModulePaths.
-        $env:PSModulePath = ($env:PSModulePath -split ';' | Select-Object -Unique) -join ';'
+        $modulePaths = Invoke-Command -ScriptBlock {
+                                                         $env:PSModulePath -split ';' | Select-Object -Unique
+                                                         $PSScriptRoot
+                                                   }
+        $env:PSModulePath = $modulePaths
         [Environment]::SetEnvironmentVariable('PSModulePath',$env:PSModulePath,[EnvironmentVariableTarget]::Machine)
     }
 
