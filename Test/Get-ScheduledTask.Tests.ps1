@@ -40,6 +40,7 @@ Describe 'Get-ScheduledTask' {
                                         '\Microsoft\Windows\Windows Activation Technologies\ValidationTaskDeadline' = $true;
                                         '\Microsoft\Windows\Customer Experience Improvement Program\Server\ServerRoleCollector' = $true;
                                         '\Microsoft\Windows\Customer Experience Improvement Program\Server\ServerRoleUsageCollector' = $true;
+                                        '\Microsoft\Windows\WS\WSRefreshBannedAppsListTask' = $true;
                                     }
         $scheduleProps = @(
                                'Last Result',
