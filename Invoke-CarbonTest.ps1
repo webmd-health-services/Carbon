@@ -119,5 +119,8 @@ try
 }
 finally
 {
-    Uninstall-Junction -Path $carbonModuleRoot
+    if( -not (Test-Path -Path 'env:APPVEYOR') )
+    {
+        Uninstall-Junction -Path $carbonModuleRoot
+    }
 }
