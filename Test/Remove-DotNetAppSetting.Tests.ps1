@@ -18,27 +18,24 @@ Describe 'Remove-DotNetAppSetting' {
 
     function Assert-AppSetting($Name, $value, [Switch]$Framework, [Switch]$Framework64, [Switch]$Clr2, [Switch]$Clr4)
     {
-        $command = {
-            param(
-                $Name
-            )
+        $command = @"
             
             Add-Type -AssemblyName System.Configuration
             
-            $config = [Configuration.ConfigurationManager]::OpenMachineConfiguration()
+            `$config = [Configuration.ConfigurationManager]::OpenMachineConfiguration()
             
-            $appSettings = $config.AppSettings.Settings
+            `$appSettings = `$config.AppSettings.Settings
             
-            if( $appSettings[$Name] )
+            if( `$appSettings['$Name'] )
             {
-                $appSettings[$Name].Value
+                `$appSettings['$Name'].Value
             }
             else
             {
-                $null
+                `$null
             }
-        }
-        
+"@
+
         $runtimes = @()
         if( $Clr2 )
         {
@@ -57,7 +54,7 @@ Describe 'Remove-DotNetAppSetting' {
         $runtimes | ForEach-Object {
             $params = @{
                 Command = $command
-                Args = $Name
+                Encode = $true
                 Runtime = $_
             }
             
@@ -77,33 +74,31 @@ Describe 'Remove-DotNetAppSetting' {
 
     function Remove-AppSetting
     {
-        $command = {
-            param(
-                [Parameter(Position=0)]
-                $Name
-            )
+        $appSettingName = $appSettingName -replace "'","''"
+        $command = @"
             
             Add-Type -AssemblyName System.Configuration
             
-            $config = [Configuration.ConfigurationManager]::OpenMachineConfiguration()
-            $appSettings = $config.AppSettings.Settings
-            if( $appSettings[$Name] )
+            `$config = [Configuration.ConfigurationManager]::OpenMachineConfiguration()
+            `$appSettings = `$config.AppSettings.Settings
+            if( `$appSettings[$appSettingName] )
             {
-                $appSettings.Remove( $Name )
-                $config.Save()
+                `$appSettings.Remove( $appSettingName )
+                `$config.Save()
             }
-        }
+"@
+
         
         if( (Test-DotNet -V2) )
         {
-            Invoke-PowerShell -Command $command -Args $appSettingName -x86 -Runtime 'v2.0'
-            Invoke-PowerShell -Command $command -Args $appSettingName -Runtime 'v2.0'
+            Invoke-PowerShell -Command $command -Encode -x86 -Runtime 'v2.0'
+            Invoke-PowerShell -Command $command -Encode -Runtime 'v2.0'
         }
     
         if( (Test-DotNet -V4 -Full) )
         {
-            Invoke-PowerShell -Command $command -Args $appSettingName -x86 -Runtime 'v4.0'
-            Invoke-PowerShell -Command $command -Args $appSettingName -Runtime 'v4.0'
+            Invoke-PowerShell -Command $command -Encode -x86 -Runtime 'v4.0'
+            Invoke-PowerShell -Command $command -Encode -Runtime 'v4.0'
         }
     }
     

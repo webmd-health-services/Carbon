@@ -114,7 +114,7 @@ Describe 'Invoke-PowerShell when running a command under PowerShell 4' {
     
 if( (Test-OSIs64Bit) )
 {
-    Describe 'should run x64 PowerShell from x86 PowerShell' {
+    Describe 'Invoke-PowerShell when running x86 PowerShell' {
         $error.Clear()
         if( (Test-PowerShellIs32Bit) )
         {
@@ -249,7 +249,7 @@ Describe 'Invoke-PowerShell when setting execution policy when running a script'
     $Global:Error.Clear()
     $result = Invoke-PowerShell -FilePath $getPsVersionTablePath `
                                 -ExecutionPolicy Restricted `
-                                -ErrorAction SilentlyContinue
+                                -ErrorAction SilentlyContinue 2>$null
     
     It 'should set the execution policy' {
        $result | Should BeNullOrEmpty
@@ -324,6 +324,12 @@ Describe 'Invoke-PowerShell when running non-interactively' {
     $Global:Error.Clear()
     $result = Invoke-PowerShell -Command 'Read-Host ''prompt''' -NonInteractive -ErrorAction SilentlyContinue
     It 'should write an error' {
-        ($Global:Error -join [Environment]::NewLine) | Should Match 'is in NonInteractive mode'
+        Invoke-Command -ScriptBlock {
+                                        # The message can be in different places depending on host
+                                        $result 
+                                        ($Global:Error -join [Environment]::NewLine) 
+                                    } |
+            Where-Object { $_ -match 'is in NonInteractive mode' } |
+            Should Not BeNullOrEmpty
     }
 }
