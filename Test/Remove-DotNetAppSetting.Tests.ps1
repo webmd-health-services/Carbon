@@ -82,9 +82,9 @@ Describe 'Remove-DotNetAppSetting' {
             
             `$config = [Configuration.ConfigurationManager]::OpenMachineConfiguration()
             `$appSettings = `$config.AppSettings.Settings
-            if( `$appSettings[$appSettingName] )
+            if( `$appSettings['$appSettingName'] )
             {
-                `$appSettings.Remove( $appSettingName )
+                `$appSettings.Remove( '$appSettingName' )
                 `$config.Save()
             }
 "@
