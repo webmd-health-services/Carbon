@@ -61,7 +61,13 @@ try
     {
         $uploadTestResults = $true
         $uploadUri = 'https://ci.appveyor.com/api/testresults/nunit/{0}' -f $env:APPVEYOR_JOB_ID 
+
+        # On AppVeyor, VMs have duplicate PSModulePaths.
+        $env:PSModulePath = ($env:PSModulePath -split ';' | Select-Object -Unique) -join ';'
+        [Environment]::SetEnvironmentVariable('PSModulePath',$env:PSModulePath,[EnvironmentVariableTarget]::Machine)
     }
+
+    
 
     $testsFailed = $false
 
