@@ -18,6 +18,7 @@ Describe 'Remove-DotNetAppSetting' {
 
     function Assert-AppSetting($Name, $value, [Switch]$Framework, [Switch]$Framework64, [Switch]$Clr2, [Switch]$Clr4)
     {
+        $Name = $Name -replace "'","''"
         $command = @"
             
             Add-Type -AssemblyName System.Configuration
