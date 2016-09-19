@@ -23,7 +23,7 @@ Describe 'Install-Msi' {
         $tryNum = 0
         do
         {
-            $item = Get-ProgramInstallInfo -Name '*Carbon*'
+            $item = Get-ProgramInstallInfo -Name 'Carbon Test Installer*'
             if( $item )
             {
                 break
@@ -41,7 +41,7 @@ Describe 'Install-Msi' {
         $tryNum = 0
         do
         {
-            $item = Get-ProgramInstallInfo -Name '*Carbon*'
+            $item = Get-ProgramInstallInfo -Name 'Carbon Test Installer*'
             if( -not $item )
             {
                 break
