@@ -587,17 +587,14 @@ function Install-ScheduledTask
             $scheduleType = 'MONTHLY'
             $modifier = $WeekOfMonth
             [void]$parameters.Add( '/D' )
-            if( $DayOfWeek )
+            if( $DayOfWeek.Count -eq 1 -and [Enum]::IsDefined([DayOfWeek],$DayOfWeek[0]) )
             {
-                if( $DayOfWeek.Count -eq 1 )
-                {
-                    [void]$parameters.Add( (ConvertTo-SchtasksCalendarNameList $DayOfWeek) )
-                }
-                else
-                {
-                    Write-Error ('Tasks that run during a specific week of the month can only occur on a single weekday (received {0} days: {1}). Please pass one weekday with the `-DayOfWeek` parameter.' -f $DayOfWeek.Length,($DayOfWeek -join ','))
-                    return
-                }
+                [void]$parameters.Add( (ConvertTo-SchtasksCalendarNameList $DayOfWeek[0]) )
+            }
+            else
+            {
+                Write-Error ('Tasks that run during a specific week of the month can only occur on a single weekday (received {0} days: {1}). Please pass one weekday with the `-DayOfWeek` parameter.' -f $DayOfWeek.Length,($DayOfWeek -join ','))
+                return
             }
         }
         'OnIdle'

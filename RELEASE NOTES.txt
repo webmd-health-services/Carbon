@@ -26,6 +26,7 @@
  * Fixed: `Carbon_FirewallRule` fails when `Profile` property set to multiple values ([fixes issue #209](https://bitbucket.org/splatteredbits/carbon/issues/209/dsc-carbon_firewallrule-does-not-accept)).
  * Fixed: `Install-IisAppPool` can't set .NET framework version to `No Managed Code` ([fixes issue #210](https://bitbucket.org/splatteredbits/carbon/issues/210/install-iisapppool-need-to-be-able-to-set)).
  * Fixed: `Get-SslCertificateBinding` fails if the operating system's culture is not `en-US` ([fixes issue #171](https://bitbucket.org/splatteredbits/carbon/issues/171/get-sslcertificatebinding-fails-when-os)).
+ * Fixed: `Install-ScheduledTask` fails when creating a task that runs during a specific week of the month on Sundays. (You're going to love this: the underlying int value for `[DayOfWeek]::Sunday` is `0`, so when testing if a `DayOfWeek` typed variable set to `Sunday`, it returns `$false`. This made `Install-ScheduledTask` add the `/D` parameter without a value.
 
 
 # 2.2.0 (11 May 2016)
