@@ -37,17 +37,17 @@ function Invoke-PowerShell
     If using PowerShell v3.0 or later with a version of Carbon before 2.0, you can *only* run script blocks under a `v4.0` CLR.  PowerShell converts script blocks to an encoded command, and when running encoded commands, PowerShell doesn't allow the `-Version` parameter for running PowerShell under a different version.  To run code under a .NET 2.0 CLR from PowerShell 3, use the `FilePath` parameter to run a specfic script.
     
     .EXAMPLE
-    Invoke-PowerShell -Command { $PSVersionTable }
+    Invoke-PowerShell -ScriptBlock { $PSVersionTable }
     
     Runs a separate PowerShell process which matches the architecture of the operating system, returning the $PSVersionTable from that process.  This will fail under 32-bit PowerShell on a 64-bit operating system.
     
     .EXAMPLE
-    Invoke-PowerShell -Command { $PSVersionTable } -x86
+    Invoke-PowerShell -ScriptBlock { $PSVersionTable } -x86
     
     Runs a 32-bit PowerShell process, return the $PSVersionTable from that process.
     
     .EXAMPLE
-    Invoke-PowerShell -Command { $PSVersionTable } -Runtime v4.0
+    Invoke-PowerShell -ScriptBlock { $PSVersionTable } -Runtime v4.0
     
     Runs a separate PowerShell process under the v4.0 .NET CLR, returning the $PSVersionTable from that process.  Should return a CLRVersion of `4.0`.
     
@@ -72,6 +72,21 @@ function Invoke-PowerShell
     Invoke-PowerShell -FilePath Get-PsVersionTable.ps1 -Credential $cred
 
     Demonstrates that you can run PowerShell scripts as a specific user with the `Credential` parameter.
+
+    .EXAMPLE 
+    Invoke-PowerShell -Command '$PSVersionTable'
+    
+    Demonstrates how to run a PowerShell command contained in a string. You are responsible for quoting things correctly.
+
+    .EXAMPLE
+    Invoke-PowerShell -Command '$PSVersionTable' -Encode
+
+    Demonstrates how to run a base-64 encode then run PowerShell command contained in a string. This runs the command using PowerShell's `-EncodedCommand` parameter. `Invoke-PowerShell` does the base-64 encoding for you.
+
+    .EXAMPLE
+    Invoke-PowerShell -Command '$env:USERNAME' -Credential $credential
+
+    Demonstrates how to run a PowerShell command as another user. Uses `Start-Process` to launch `powershell.exe` as the user. 
     #>
     [CmdletBinding(DefaultParameterSetName='ScriptBlock')]
     param(
