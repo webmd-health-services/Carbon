@@ -10,7 +10,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-$ShareName = 'New Share Test'
+& (Join-Path -Path $PSScriptRoot -ChildPath '..\Import-CarbonForTest.ps1' -Resolve)
+
+$ShareName = $null
 $SharePath = $TestDir
 $fullAccessGroup = 'Carbon Share Full'
 $changeAccessGroup = 'CarbonShareChange'
@@ -18,16 +20,13 @@ $readAccessGroup = 'CarbonShareRead'
 $noAccessGroup = 'CarbonShareNone'
 $Remarks = [Guid]::NewGuid().ToString()
 
-function Start-TestFixture
-{
-    & (Join-Path -Path $PSScriptRoot -ChildPath '..\Import-CarbonForTest.ps1' -Resolve)
-}
+Install-Group -Name $fullAccessGroup -Description 'Carbon module group for testing full share permissions.'
+Install-Group -Name $changeAccessGroup -Description 'Carbon module group for testing change share permissions.'
+Install-Group -Name $readAccessGroup -Description 'Carbon module group for testing read share permissions.'
 
 function Start-Test
 {
-    Install-Group -Name $fullAccessGroup -Description 'Carbon module group for testing full share permissions.'
-    Install-Group -Name $changeAccessGroup -Description 'Carbon module group for testing change share permissions.'
-    Install-Group -Name $readAccessGroup -Description 'Carbon module group for testing read share permissions.'
+    $shareName = 'CarbonInstallShareTest{0}' -f [IO.Path]::GetRandomFileName()
     Remove-Share
 }
 

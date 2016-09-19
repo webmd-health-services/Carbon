@@ -13,7 +13,7 @@
 & (Join-Path -Path $PSScriptRoot -ChildPath 'Import-CarbonForTest.ps1' -Resolve)
 
 Describe 'Uninstall-FileShare' {
-    $shareName = 'CarbonUninstallFileShare'
+    $shareName = $null
     $sharePath = $null
     $shareDescription = 'Share for testing Carbon''s Uninstall-FileShare function.'
 
@@ -21,6 +21,7 @@ Describe 'Uninstall-FileShare' {
         $Global:Error.Clear()
 
         $sharePath = Get-Item -Path 'TestDrive:' 
+        $shareName = 'CarbonUninstallFileShare{0}' -f [IO.Path]::GetRandomFileName()
         Install-SmbShare -Path $sharePath -Name $shareName -Description $shareDescription
         (Test-FileShare -Name $shareName) | Should Be $true
     }
@@ -34,7 +35,7 @@ Describe 'Uninstall-FileShare' {
         $output | Should BeNullOrEmpty
         $Global:Error.Count | Should Be 0
         (Test-FileShare -Name $shareName) | Should Be $false
-        Assert-DirectoryExists -Path $sharePath
+        $sharePath | Should Exist
     }
     
     It 'should support should process' {
