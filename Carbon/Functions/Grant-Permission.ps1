@@ -148,6 +148,11 @@ function Grant-Permission
     Grant-Permission -Identity ENTERPRISE\Engineers -Permission FullControl -Path 'cert:\LocalMachine\My\1234567890ABCDEF1234567890ABCDEF12345678'
     
     Grants the Enterprise's engineering group full control on the `1234567890ABCDEF1234567890ABCDEF12345678` certificate's private key/key container.
+
+    .EXAMPLE
+    Grant-Permission -Identity BORG\Locutus -Permission FullControl -Path 'C:\EngineRoom' -Type Deny
+
+    Demonstrates how to grant deny permissions on an objecy with the `Type` parameter.
     #>
     [CmdletBinding(SupportsShouldProcess=$true)]
     [OutputType([Security.AccessControl.AccessRule])]
