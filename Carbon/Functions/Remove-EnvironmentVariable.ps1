@@ -23,7 +23,7 @@ function Remove-EnvironmentVariable
 
     Normally, you have to restart your PowerShell session/process to no longer see the variable in the `env:` drive. Use the `-Force` switch to also remove the variable from the `env:` drive. This functionality was added in Carbon 2.3.0.
 
-    Beginning with Carbon 2.3.0, you can set an environment variable for a specific user by specifying the `-ForUser` switch and passing the user's credentials with the `-Credential` parameter.
+    Beginning with Carbon 2.3.0, you can set an environment variable for a specific user by specifying the `-ForUser` switch and passing the user's credentials with the `-Credential` parameter. This runs a separate PowerShell process as that user to remove the variable.
 
     Beginning in Carbon 2.3.0, you can specify multiple scopes from which to remove an environment variable. In previous versions, you could only remove from one scope.
     
@@ -40,6 +40,11 @@ function Remove-EnvironmentVariable
     Remove-EnvironmentVariable -Name 'MyEnvironmentVariable' -ForProcess
     
     Removes the `MyEnvironmentVariable` from the process scope.
+
+    .EXAMPLE
+    Remove-EnvironmentVariable -Name 'SomeUsersVariable' -ForUser -Credential $credential
+
+    Demonstrates that you can remove another user's user-level environment variable by passing its credentials to the `Credential` parameter. This runs a separate PowerShell process as that user to remove the variable.
     #>
     [CmdletBinding(SupportsShouldProcess=$true)]
     param(

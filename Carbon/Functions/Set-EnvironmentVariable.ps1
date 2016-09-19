@@ -21,7 +21,7 @@ function Set-EnvironmentVariable
     
     Changes to environment variables in the User and Machine scope are not picked up by running processes.  Any running processes that use this environment variable should be restarted.
 
-    Beginning with Carbon 2.3.0, you can set an environment variable for a specific user by specifying the `-ForUser` switch and passing the user's credentials with the `-Credential` parameter.
+    Beginning with Carbon 2.3.0, you can set an environment variable for a specific user by specifying the `-ForUser` switch and passing the user's credentials with the `-Credential` parameter. This will run a PowerShell process as that user in order to set the environment variable.
 
     Normally, you have to restart your PowerShell session/process to see the variable in the `env:` drive. Use the `-Force` switch to also add the variable to the `env:` drive. This functionality was added in Carbon 2.3.0.
     
@@ -44,6 +44,10 @@ function Set-EnvironmentVariable
     
     Creates the `MyEnvironmentVariable` with an initial value of `Value1` in the machine scope, i.e. the variable is accessible in all newly launched processes.
     
+    .EXAMPLE
+    Set-EnvironmentVariable -Name 'SomeUsersEnvironmentVariable' -Value 'SomeValue' -ForUser -Credential $userCreds
+
+    Demonstrates that you can set a user-level environment variable for another user by passing its credentials to the `Credential` parameter. Starts a separate PowerShell process as that user to set the environment variable.
     #>
     [CmdletBinding(SupportsShouldProcess=$true)]
     param(
