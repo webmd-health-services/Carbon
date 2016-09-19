@@ -75,7 +75,12 @@ if( Test-Path -Path HKLM:\SOFTWARE\Microsoft\PowerShell\3 )
     }
     else
     {
-        Describe 'Invoke-PowerShell when in the console host and running a script blcok under PowerShell 2'{
+        Describe 'Invoke-PowerShell when in the console host and running a script blcok under PowerShell 2' {
+            if( (Test-Path -Path 'env:APPVEYOR') )
+            {
+                return
+            }
+
             It '(the test) should make sure .NET 2 is installed' {
                 (Test-DotNet -V2) | Should Be $true
             }
