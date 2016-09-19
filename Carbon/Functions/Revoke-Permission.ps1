@@ -74,10 +74,17 @@ function Revoke-Permission
         return
     }
 
+    $providerName = Get-PathProvider -Path $Path | Select-Object -ExpandProperty 'Name'
+    if( $providerName -eq 'Certificate' )
+    {
+        $providerName = 'CryptoKey'
+    }
+
     $ruleToRemove = Get-Permission -Path $Path -Identity $Identity
     if( $ruleToRemove )
     {
         $Identity = Resolve-IdentityName -Name $Identity
+        $ruleToRemove | ForEach-Object { Write-Verbose ('[{0}] [{1}]  {2} -> ' -f $Path,$Identity,$_."$($providerName)Rights") }
 
         Get-Item $Path -Force |
             ForEach-Object {
