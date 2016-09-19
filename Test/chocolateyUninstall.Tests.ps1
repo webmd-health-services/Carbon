@@ -53,7 +53,6 @@ function MockCarbonInstalled
     robocopy (Join-Path -Path $PSScriptRoot -ChildPath '..\Carbon' -Resolve) $carbonRoot2 /MIR | Write-Debug
 
     Mock 'Get-Item' -Verifiable -MockWith {
-        $DebugPreference = 'Continue'
         $testDriveRoot =  Microsoft.PowerShell.Management\Get-Item -Path 'TestDrive:'
         $modulesRoot = Join-Path -Path $testDriveRoot.FullName -ChildPath 'Modules'
         $modulesRoot2 = Join-Path -Path $testDriveRoot.FullName -ChildPath 'Modules2'
@@ -69,7 +68,7 @@ Describe 'chocolateyUninstall.ps1 when module is installed' {
 
     $carbonRoot = MockCarbonInstalled
     $paths = Get-Item 'env:PSModulePath'
-    & $chocolateyUninstall -Verbose
+    & $chocolateyUninstall
     Assert-CarbonRemoved $carbonRoot
     Assert-CarbonNotInstalled
 }

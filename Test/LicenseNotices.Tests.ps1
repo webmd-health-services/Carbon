@@ -120,7 +120,7 @@ Describe 'License Notices' {
                     }
                     default
                     {
-                        Write-Verbose -Verbose $fileInfo.FullName
+                        Write-Verbose $fileInfo.FullName
                         $false
                         break
                     }

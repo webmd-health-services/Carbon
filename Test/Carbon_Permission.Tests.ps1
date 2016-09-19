@@ -162,7 +162,7 @@ Describe 'Carbon_Permission' {
     
     It 'should test existing permission' {
         Set-TargetResource -Identity $UserName -Path $tempDir -Permission Read -ApplyTo Container -Ensure Present
-        (Test-TargetResource -Identity $UserName -Path $tempDir -Permission Read -Ensure Present -Verbose) | Should Be $true
+        (Test-TargetResource -Identity $UserName -Path $tempDir -Permission Read -Ensure Present) | Should Be $true
         (Test-TargetResource -Identity $UserName -Path $tempDir -Permission Read -ApplyTo Container -Ensure Present) | Should Be $true
         (Test-TargetResource -Identity $UserName -Path $tempDir -Permission Read -Ensure Absent) | Should Be $false
         (Test-TargetResource -Identity $UserName -Path $tempDir -Permission Read -ApplyTo Container -Ensure Absent) | Should Be $false

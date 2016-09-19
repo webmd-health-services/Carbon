@@ -287,7 +287,7 @@ Describe 'Install-Service' {
         }
         finally
         {
-            Uninstall-Service -Name $service2Name -Verbose
+            Uninstall-Service -Name $service2Name
         }
     }
     

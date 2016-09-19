@@ -24,7 +24,7 @@ function Stop-TestFixture
 {
     if( $installCarbonJunction )
     {
-        Install-Junction -Link $destinationDir -Target (Join-Path -Path $PSScriptRoot -ChildPath '..\Carbon' -Resolve) -Verbose
+        Install-Junction -Link $destinationDir -Target (Join-Path -Path $PSScriptRoot -ChildPath '..\Carbon' -Resolve)
     }
 }
 

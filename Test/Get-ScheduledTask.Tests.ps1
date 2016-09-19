@@ -21,7 +21,6 @@ Describe 'Get-ScheduledTask' {
             $Actual
         )
         
-        $DebugPreference = 'continue'
         Write-Debug ('{0} <=> {1}' -f $Expected.TaskName,$Actual.TaskName)
         $randomNextRunTimeTasks = @{
                                         '\Microsoft\Windows\Application Experience\Microsoft Compatibility Appraiser' = $true;

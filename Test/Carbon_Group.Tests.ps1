@@ -74,7 +74,6 @@ Describe 'Carbon_Group' {
         }
     
         It 'test target resource' {
-            $VerbosePreference = 'Continue'
     
             $result = Test-TargetResource -Name $groupName -Description $description -Members ($username1,$username2)
             $result | Should Not BeNullOrEmpty
@@ -216,7 +215,7 @@ Describe 'Carbon_Group' {
     
             # Test for group creation through DSC execution
             & ShouldCreateGroup -Ensure 'Present' -OutputPath $CarbonDscOutputRoot
-            Start-DscConfiguration -Wait -ComputerName 'localhost' -Path $CarbonDscOutputRoot -Force -Verbose
+            Start-DscConfiguration -Wait -ComputerName 'localhost' -Path $CarbonDscOutputRoot -Force
             $Global:Error.Count | Should Be 0
     
             $result = Test-TargetResource -Name $groupName -Description 'Carbon_Group DSC resource test group' -Members $username1
@@ -225,7 +224,7 @@ Describe 'Carbon_Group' {
     
             # Test for group deletion through DSC execution
             & ShouldCreateGroup -Ensure 'Absent' -OutputPath $CarbonDscOutputRoot
-            Start-DscConfiguration -Wait -ComputerName 'localhost' -Path $CarbonDscOutputRoot -Force -Verbose
+            Start-DscConfiguration -Wait -ComputerName 'localhost' -Path $CarbonDscOutputRoot -Force
             $Global:Error.Count | Should Be 0
     
             $result = Test-TargetResource -Name $groupName

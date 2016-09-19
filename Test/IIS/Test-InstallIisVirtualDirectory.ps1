@@ -127,7 +127,7 @@ function Test-ShouldDeleteIfForced
     $vdir.LogonMethod = 2
     $app.CommitChanges()
 
-    $output = Install-IisVirtualDirectory -SiteName $SiteName -VirtualPath $VDirName -PhysicalPath $PSScriptRoot -Force -Verbose
+    $output = Install-IisVirtualDirectory -SiteName $SiteName -VirtualPath $VDirName -PhysicalPath $PSScriptRoot -Force
     Assert-Null $output
 
     $app = Get-IisApplication -SiteName $SiteName 
