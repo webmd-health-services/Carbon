@@ -338,37 +338,31 @@ All functions are idempotent: when run multiple times with the same arguments, y
             ReleaseNotes = @'
 ## Enhancements
 
- * Aded a `LiteralPath` parameter to `Test-PathIsJunction` for testing paths that contain wildcard characters (e.g. `[`, `]`, etc.).
- * `Remove-Junction` now supports removing multiple junctions with wildcards.
- * Added a `LiteralPath` parameter to `Remove-Junction` for deleting junctions whose paths contain wildcard characters (e.g. `[`, `]`, etc.).
- * Added a `LiteralPath` parameter to `Uninstall-Junction` for deleting junctions whose paths contain wildcard characters (e.g. `[`, `]`, etc.).
- * Created `Remove-DotNetAppSetting` function for removing app settings from .NET framework machine.config files.
- * Created `Read-File` function for reading text files and retrying if the read fails. Good for reading files that get intermittently locked, like the Windows hosts file.
- * Created `Write-File` function for writing text files and retrying if the write fails. Good for writing files that get intermittently locked, like the Windows hosts file.
- * Made the following functions obsolete:
-   * `Get-WindowsFeature`
-   * `Install-Msmq`
-   * `Install-WindowsFeature`
-   * `Resolve-WindowsFeatureName`
-   * `Uninstall-WindowsFeature`
-
+ * `Protect-String` can now encrypt with a key, password, or passphrase (i.e. it can now encrypt with symmetric encryption).
+ * `Unprotect-String` can now decrypt with a key, password, or passphrase (i.e. it can now decrypt using symmetric encryption).
+ * `Set-HostsEntry` now supports IPv6 addresses ([fixes issue](https://bitbucket.org/splatteredbits/carbon/issues/181/community-set-hostsentry-add-support-for)).
+ * `Grant-Permission` now supports creating `Deny` access rules. Use the new `Type` parameter. [Fixes issue #152.](https://bitbucket.org/splatteredbits/carbon/issues/152)
+ * `Set-EnvironmentVariable`: 
+   * Added `-Force` switch to make all variable modifications immediately visible in the current PowerShell process's `env:` drive. Restarts are no longer required.
+   * You can now set an environment variable for other users. Use the `Credential` parameter to specify the user's credentials. [Fixes issue #151.](https://bitbucket.org/splatteredbits/carbon/issues/151)
+ * `Remove-EnvironmentVariable`: 
+   * Added `-Force` switch to make all variable removals immediately visible in the current PowerShell process's `env:` drive. Restarts are no longer required.
+   * You can now remove variables from multiple targets/scopes at once.
+   * You can now remove an environment variable for other users. Use the `Credential` parameter to specify the user's credentials.
+ * `Invoke-PowerShell`:
+   * It now runs PowerShell commands. Pass a string of PowerShell code with the `Command` parameter. 
+   * It now runs encoded PowerShell commands. Pass the string of PowerShell code with the `Command` parameter and use the `-Encode` switch.
+   * It now runs scripts and commands as another user. Use the `Credential` parameter to pass the user's credentials along with the `FilePath` and `Command` parameters to run scripts and commands, respectively.
+   
 ## Bug Fixes
 
- * Fixed: `Add-GroupMember`, over PowerShell remoting, fails to add a member to groups that have non-local users/groups (fixes [issue #187: Add-GroupMember fails when using PowerShell Remoting](https://bitbucket.org/splatteredbits/carbon/issues/187/add-groupmember-fails-when-using))
- * Fixed: `Remove-GroupMember`, over PowerShell remoting, fails to remove a member from groups that have non-local users/groups.
- * Fixed: `Test-PathIsJunction` returns multiple results if the `Path` parameter contains wildcards and matches multiple items.
- * Fixed: `Install-Junction` can't install a junction whose path contains wildcard characters (fixes [issue #190](https://bitbucket.org/splatteredbits/carbon/issues/190/install-junction-fails-when-the-path)).
- * Fixed: `New-Junction` writes wrong error when creating an existing junction whose path contains wildcard characters.
- * Fixed: `Install-Service` doesn't update/change an existing service's account when using the `Credential` parameter (fixes [issue #185](https://bitbucket.org/splatteredbits/carbon/issues/185/install-service-never-updates-logon-as-if)).
- * Fixed: `Uninstall-FileShare` fails if a share's physical path doesn't exist.
- * Fixed (hopefully): `Get-FileSharePermission` writes an error if a share's security information is corrupted (fixes [issue #188](https://bitbucket.org/splatteredbits/carbon/issues/188/get-filesharepermission-crashes-when-a)). I was unable to reproduce the error, and the error was reported anonyously, so I did my best.
- * Fixed: `Get-PowerShellModuleInstallPath` returns multiple paths if the standard PowerShell module path is listed twice in the `PSModulePath` environment variable.
- * Fixed: Chocolatey package fails if the standard PowerShell module path is listed twice in the`PSModulePath` environment (fixes [issue #192](https://bitbucket.org/splatteredbits/carbon/issues/192/installation-of-carbon-via-chocolatey)).
- * Fixed: `Get-PowerShellModuleInstallPath` doesn't return the module install path if it doesn't exist. Sometimes it doesn't yet.
- * Fixed: `Carbon_ScheduledTask` and `Carbon_IniFile` DSC resources' `Get-TargetResource` functions don't return correct resource properties and causes `Get-DscConfiguration` to fail (fixes [issue #193](https://bitbucket.org/splatteredbits/carbon/issues/193/get-targetresource-returns-taskname-in-its)).
- * Fixed: `Carbon_FirewallRule` DSC resource always re-installs a firewall rule if `Profile` property contains multiple values (i.e. it doesn't properly parse netsh output).
- * Fixed: `about_Carbon_Installation` help topic had a typo.
- * Fixed: `Set-HostsEntry` fails to stop when the hosts file is in use and can't be read.
+ * Fixed: `Set-RegistryKeyValue` fails when `-String` parameter's value is `$null` or empty ([fixes issue #211](https://bitbucket.org/splatteredbits/carbon/issues/211/set-registrykeyvalue-null-string-invalid)).
+ * Fixed: Can't import Carbon in a 32-bit PowerShell 4 session on a 64-bit operating system ([fixes issue #199](https://bitbucket.org/splatteredbits/carbon/issues/199/community-issue-importing-carbon-on-x64)).
+ * Fixed: Documentation for the `Install-ScheduledTask` function's `HighestAvailableRunLevel` is lying ([fixes issue #205](https://bitbucket.org/splatteredbits/carbon/issues/205/documentation-install-scheduledtask-typo)).
+ * Fixed: `Carbon_FirewallRule` fails when `Profile` property set to multiple values ([fixes issue #209](https://bitbucket.org/splatteredbits/carbon/issues/209/dsc-carbon_firewallrule-does-not-accept)).
+ * Fixed: `Install-IisAppPool` can't set .NET framework version to `No Managed Code` ([fixes issue #210](https://bitbucket.org/splatteredbits/carbon/issues/210/install-iisapppool-need-to-be-able-to-set)).
+ * Fixed: `Get-SslCertificateBinding` fails if the operating system's culture is not `en-US` ([fixes issue #171](https://bitbucket.org/splatteredbits/carbon/issues/171/get-sslcertificatebinding-fails-when-os)).
+ * Fixed: `Install-ScheduledTask` fails when creating a task that runs during a specific week of the month on Sundays. (You're going to love this: the underlying int value for `[DayOfWeek]::Sunday` is `0`, so when testing if a `DayOfWeek` typed variable set to `Sunday` has a value, it returns `$false`. This made `Install-ScheduledTask` add the `/D` parameter without a value.
 '@
         } # End of PSData hashtable
     
