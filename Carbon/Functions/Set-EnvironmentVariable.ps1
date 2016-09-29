@@ -47,7 +47,7 @@ function Set-EnvironmentVariable
     .EXAMPLE
     Set-EnvironmentVariable -Name 'SomeUsersEnvironmentVariable' -Value 'SomeValue' -ForUser -Credential $userCreds
 
-    Demonstrates that you can set a user-level environment variable for another user by passing its credentials to the `Credential` parameter. Starts a separate PowerShell process as that user to set the environment variable.
+    Demonstrates that you can set a user-level environment variable for another user by passing its credentials to the `Credential` parameter. Runs a separate PowerShell process as that user to set the environment variable.
     #>
     [CmdletBinding(SupportsShouldProcess=$true)]
     param(
