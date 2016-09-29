@@ -18,12 +18,14 @@
     </ul>
 
     <h1>Get-IisMimeMap</h1>
-<div><p>Gets the file extension to MIME type mappings.</p></div>
+<div class="Synopsis">
+<p>Gets the file extension to MIME type mappings.</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>Get-IisMimeMap [-FileExtension &lt;String&gt;] [-MimeType &lt;String&gt;] [&lt;CommonParameters&gt;]</code></pre>
 <pre class="Syntax"><code>Get-IisMimeMap -SiteName &lt;String&gt; [-VirtualPath &lt;String&gt;] [-FileExtension &lt;String&gt;] [-MimeType &lt;String&gt;] [&lt;CommonParameters&gt;]</code></pre>
-    
+
 <h2>Description</h2>
 <div class="Description">
 <p>IIS won't serve static content unless there is an entry for it in the web server or website's MIME map configuration. This function will return all the MIME maps for the current server.  The objects returned are instances of the <code>Carbon.Iis.MimeMap</code> class, and contain the following properties:</p>
@@ -35,10 +37,10 @@
 
 <p>Beginning with Carbon 2.0.1, this function is available only if IIS is installed.</p>
 </div>
-    
+
 <h2>Related Commands</h2>
 
-<ul>
+<ul class="RelatedCommands">
 <li><a href="Set-IisMimeMap.html">Set-IisMimeMap</a></li>
 </ul>
 
@@ -86,33 +88,36 @@
 </tr>
 
 </table>
-        
 
-        
 <h2>Return Values</h2>
+<div class="ReturnValues">
 <p>Carbon.Iis.MimeMap. </p>
-        
+</div>
 
-        
 <h2>EXAMPLE 1</h2>
 <pre><code>Get-IisMimeMap</code></pre>
 <p>Gets all the the file extension to MIME type mappings for the web server.</p>
+
 
 <h2>EXAMPLE 2</h2>
 <pre><code>Get-IisMimeMap -FileExtension .htm*</code></pre>
 <p>Gets all the file extension to MIME type mappings whose file extension matches the <code>.htm*</code> wildcard.</p>
 
+
 <h2>EXAMPLE 3</h2>
 <pre><code>Get-IisMimeMap -MimeType 'text/*'</code></pre>
 <p>Gets all the file extension to MIME type mappings whose MIME type matches the <code>text/*</code> wildcard.</p>
+
 
 <h2>EXAMPLE 4</h2>
 <pre><code>Get-IisMimeMap -SiteName DeathStar</code></pre>
 <p>Gets all the file extenstion to MIME type mappings for the <code>DeathStar</code> website.</p>
 
+
 <h2>EXAMPLE 5</h2>
 <pre><code>Get-IisMimeMap -SiteName DeathStar -VirtualPath ExhaustPort</code></pre>
 <p>Gets all the file extension to MIME type mappings for the <code>DeathStar</code>'s <code>ExhausePort</code> directory.</p>
+
 
 	<div class="Footer">
 		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.

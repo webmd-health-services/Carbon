@@ -18,11 +18,13 @@
     </ul>
 
     <h1>Get-IisHttpHeader</h1>
-<div><p>Gets the HTTP headers for a website or directory under a website.</p></div>
+<div class="Synopsis">
+<p>Gets the HTTP headers for a website or directory under a website.</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>Get-IisHttpHeader [-SiteName] &lt;String&gt; [[-VirtualPath] &lt;String&gt;] [[-Name] &lt;String&gt;] [&lt;CommonParameters&gt;]</code></pre>
-    
+
 <h2>Description</h2>
 <div class="Description">
 <p>For each custom HTTP header defined under a website and/or a sub-directory under a website, returns a <code>Carbon.Iis.HttpHeader</code> object.  This object has two properties:</p>
@@ -34,10 +36,10 @@
 
 <p>Beginning with Carbon 2.0.1, this function is available only if IIS is installed.</p>
 </div>
-    
+
 <h2>Related Commands</h2>
 
-<ul>
+<ul class="RelatedCommands">
 <li><a href="Set-IisHttpHeader.html">Set-IisHttpHeader</a></li>
 </ul>
 
@@ -77,25 +79,26 @@
 </tr>
 
 </table>
-        
 
-        
 <h2>Return Values</h2>
+<div class="ReturnValues">
 <p>Carbon.Iis.HttpHeader. </p>
-        
+</div>
 
-        
 <h2>EXAMPLE 1</h2>
 <pre><code>Get-IisHttpHeader -SiteName SopwithCamel</code></pre>
 <p>Returns the HTTP headers for the <code>SopwithCamel</code> website.</p>
+
 
 <h2>EXAMPLE 2</h2>
 <pre><code>Get-IisHttpHeader -SiteName SopwithCamel -Path Engine</code></pre>
 <p>Returns the HTTP headers for the <code>Engine</code> directory under the <code>SopwithCamel</code> website.</p>
 
+
 <h2>EXAMPLE 3</h2>
 <pre><code>Get-IisHttpHeader -SiteName SopwithCambel -Name 'X-*'</code></pre>
 <p>Returns all HTTP headers which match the <code>X-*</code> wildcard.</p>
+
 
 	<div class="Footer">
 		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.

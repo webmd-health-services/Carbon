@@ -18,22 +18,24 @@
     </ul>
 
     <h1>Install-WindowsFeature</h1>
-<div><p>Installs an optional Windows component/feature.</p></div>
+<div class="Synopsis">
+<p>Installs an optional Windows component/feature.</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>Install-WindowsFeature -Name &lt;String[]&gt; [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
 <pre class="Syntax"><code>Install-WindowsFeature [-Iis] [-IisHttpRedirection] [-Msmq] [-MsmqHttpSupport] [-MsmqActiveDirectoryIntegration] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
-    
+
 <h2>Description</h2>
 <div class="Description">
 <p>This function will install Windows features.  Note that the name of these features can differ between different versions of Windows. Use <code>Get-WindowsFeature</code> to get the list of features on your operating system.</p>
 
 <p><strong>This function is not available on Windows 8/2012.</strong></p>
 </div>
-    
+
 <h2>Related Commands</h2>
 
-<ul>
+<ul class="RelatedCommands">
 <li><a href="Get-WindowsFeature.html">Get-WindowsFeature</a></li>
 <li><a href="Test-WindowsFeature.html">Test-WindowsFeature</a></li>
 <li><a href="Uninstall-WindowsFeature.html">Uninstall-WindowsFeature</a></li>
@@ -122,24 +124,21 @@
     <td></td>
 </tr>
 </table>
-        
 
-        
-
-        
-
-        
 <h2>EXAMPLE 1</h2>
 <pre><code>Install-WindowsFeature -Name TelnetClient</code></pre>
 <p>Installs Telnet.</p>
+
 
 <h2>EXAMPLE 2</h2>
 <pre><code>Install-WindowsFeature -Name TelnetClient,TFTP</code></pre>
 <p>Installs Telnet and TFTP</p>
 
+
 <h2>EXAMPLE 3</h2>
 <pre><code>Install-WindowsFeature -Iis</code></pre>
 <p>Installs IIS.</p>
+
 
 	<div class="Footer">
 		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.

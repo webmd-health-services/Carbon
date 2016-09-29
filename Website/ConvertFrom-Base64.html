@@ -18,21 +18,23 @@
     </ul>
 
     <h1>ConvertFrom-Base64</h1>
-<div><p>Converts a base-64 encoded string back into its original string.</p></div>
+<div class="Synopsis">
+<p>Converts a base-64 encoded string back into its original string.</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>ConvertFrom-Base64 [-Value] &lt;String[]&gt; [[-Encoding] &lt;Encoding&gt;] [&lt;CommonParameters&gt;]</code></pre>
-    
+
 <h2>Description</h2>
 <div class="Description">
 <p>For some reason. .NET makes encoding a string a two-step process. This function makes it a one-step process.</p>
 
 <p>You're actually allowed to pass in <code>$null</code> and an empty string.  If you do, you'll get <code>$null</code> and an empty string back.</p>
 </div>
-    
+
 <h2>Related Commands</h2>
 
-<ul>
+<ul class="RelatedCommands">
 <li><a href="ConvertTo-Base64.html">ConvertTo-Base64</a></li>
 </ul>
 
@@ -64,24 +66,21 @@
 </tr>
 
 </table>
-        
 
-        
-
-        
-
-        
 <h2>EXAMPLE 1</h2>
 <pre><code>ConvertFrom-Base64 -Value 'RW5jb2RlIG1lLCBwbGVhc2Uh'</code></pre>
 <p>Decodes <code>RW5jb2RlIG1lLCBwbGVhc2Uh</code> back into its original string.</p>
+
 
 <h2>EXAMPLE 2</h2>
 <pre><code>ConvertFrom-Base64 -Value 'RW5jb2RlIG1lLCBwbGVhc2Uh' -Encoding ([Text.Encoding]::ASCII)</code></pre>
 <p>Shows how to specify a custom encoding in case your string isn't in Unicode text encoding.</p>
 
+
 <h2>EXAMPLE 3</h2>
 <pre><code>'RW5jb2RlIG1lIQ==' | ConvertTo-Base64</code></pre>
 <p>Shows how you can pipeline input into <code>ConvertFrom-Base64</code>.</p>
+
 
 	<div class="Footer">
 		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.

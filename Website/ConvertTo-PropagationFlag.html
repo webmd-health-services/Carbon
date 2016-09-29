@@ -18,19 +18,21 @@
     </ul>
 
     <h1>ConvertTo-PropagationFlag</h1>
-<div><p>Converts a <code>Carbon.Security.ContainerInheritanceFlags</code> value to a <code>System.Security.AccessControl.PropagationFlags</code> value.</p></div>
+<div class="Synopsis">
+<p>Converts a <code>Carbon.Security.ContainerInheritanceFlags</code> value to a <code>System.Security.AccessControl.PropagationFlags</code> value.</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>ConvertTo-PropagationFlag [-ContainerInheritanceFlag] {Container | SubContainers | ContainerAndSubContainers | Leaves | ContainerAndLeaves | SubContainersAndLeaves | ContainerAndSubContainersAndLeaves | ChildContainers | ContainerAndChildContainers | ChildLeaves | ContainerAndChildLeaves | ChildContainersAndChildLeaves | ContainerAndChildContainersAndChildLeaves} [&lt;CommonParameters&gt;]</code></pre>
-    
+
 <h2>Description</h2>
 <div class="Description">
 <p>The <code>Carbon.Security.ContainerInheritanceFlags</code> enumeration encapsulates oth <code>System.Security.AccessControl.PropagationFlags</code> and <code>System.Security.AccessControl.InheritanceFlags</code>.  Make sure you also call <code>ConvertTo-InheritancewFlags</code> to get the inheritance value.</p>
 </div>
-    
+
 <h2>Related Commands</h2>
 
-<ul>
+<ul class="RelatedCommands">
 <li><a href="ConvertTo-InheritanceFlag.html">ConvertTo-InheritanceFlag</a></li>
 <li><a href="Grant-Permission.html">Grant-Permission</a></li>
 </ul>
@@ -55,17 +57,16 @@
 </tr>
 
 </table>
-        
 
-        
 <h2>Return Values</h2>
+<div class="ReturnValues">
 <p><a href="http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.propagationflags.aspx">System.Security.AccessControl.PropagationFlags</a>. </p>
-        
+</div>
 
-        
 <h2>EXAMPLE 1</h2>
 <pre><code>ConvertTo-PropagationFlag -ContainerInheritanceFlag ContainerAndSubContainersAndLeaves</code></pre>
 <p>Returns <code>PropagationFlags.None</code>.</p>
+
 
 	<div class="Footer">
 		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.

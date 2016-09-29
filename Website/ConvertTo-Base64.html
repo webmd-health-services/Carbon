@@ -18,21 +18,23 @@
     </ul>
 
     <h1>ConvertTo-Base64</h1>
-<div><p>Converts a value to base-64 encoding.</p></div>
+<div class="Synopsis">
+<p>Converts a value to base-64 encoding.</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>ConvertTo-Base64 [-Value] &lt;String[]&gt; [[-Encoding] &lt;Encoding&gt;] [&lt;CommonParameters&gt;]</code></pre>
-    
+
 <h2>Description</h2>
 <div class="Description">
 <p>For some reason. .NET makes encoding a string a two-step process. This function makes it a one-step process.</p>
 
 <p>You're actually allowed to pass in <code>$null</code> and an empty string.  If you do, you'll get <code>$null</code> and an empty string back.</p>
 </div>
-    
+
 <h2>Related Commands</h2>
 
-<ul>
+<ul class="RelatedCommands">
 <li><a href="ConvertFrom-Base64.html">ConvertFrom-Base64</a></li>
 </ul>
 
@@ -64,24 +66,21 @@
 </tr>
 
 </table>
-        
 
-        
-
-        
-
-        
 <h2>EXAMPLE 1</h2>
 <pre><code>ConvertTo-Base64 -Value 'Encode me, please!'</code></pre>
 <p>Encodes <code>Encode me, please!</code> into a base-64 string.</p>
+
 
 <h2>EXAMPLE 2</h2>
 <pre><code>ConvertTo-Base64 -Value 'Encode me, please!' -Encoding ([Text.Encoding]::ASCII)</code></pre>
 <p>Shows how to specify a custom encoding in case your string isn't in Unicode text encoding.</p>
 
+
 <h2>EXAMPLE 3</h2>
 <pre><code>'Encode me!' | ConvertTo-Base64</code></pre>
 <p>Converts <code>Encode me!</code> into a base-64 string.</p>
+
 
 	<div class="Footer">
 		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.

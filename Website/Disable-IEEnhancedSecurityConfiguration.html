@@ -18,21 +18,23 @@
     </ul>
 
     <h1>Disable-IEEnhancedSecurityConfiguration</h1>
-<div><p>Disables Internet Explorer's Enhanced Security Configuration.</p></div>
+<div class="Synopsis">
+<p>Disables Internet Explorer's Enhanced Security Configuration.</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>Disable-IEEnhancedSecurityConfiguration [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
-    
+
 <h2>Description</h2>
 <div class="Description">
 <p>By default, Windows locks down Internet Explorer so that users can't visit certain sites.  This function disables that enhanced security.  This is necessary if you have automated processes that need to run and interact with Internet Explorer.</p>
 
 <p>You may also need to call <code>Enable-IEActivationPermission</code>, so that processes have permission to start Internet Explorer.</p>
 </div>
-    
+
 <h2>Related Commands</h2>
 
-<ul>
+<ul class="RelatedCommands">
 <li><a href="http://technet.microsoft.com/en-us/library/dd883248(v=WS.10).aspx">http://technet.microsoft.com/en-us/library/dd883248(v=WS.10).aspx</a></li>
 <li><a href="Enable-IEActivationPermission.html">Enable-IEActivationPermission</a></li>
 </ul>
@@ -72,15 +74,10 @@
     <td></td>
 </tr>
 </table>
-        
 
-        
-
-        
-
-        
 <h2>EXAMPLE 1</h2>
 <pre><code>Disable-IEEnhancedSecurityConfiguration</code></pre>
+
 
 
 	<div class="Footer">

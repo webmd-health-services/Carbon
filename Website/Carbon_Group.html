@@ -18,7 +18,9 @@
     </ul>
 
     <h1>Carbon_Group</h1>
-<div><p>DSC resource for configuring local Windows groups.</p></div>
+<div class="Synopsis">
+<p>DSC resource for configuring local Windows groups.</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>Carbon_Group [String] #ResourceName
@@ -31,7 +33,7 @@
     [PsDscRunAsCredential = [PSCredential]]
 }
 </code></pre>
-    
+
 <h2>Description</h2>
 <div class="Description">
 <p>The <code>Carbon_Group</code> resource installs and uninstalls groups. It also adds members to existing groups. </p>
@@ -42,10 +44,10 @@
 
 <p>The <code>Carbon_Group</code> resource was added in Carbon 2.1.0.</p>
 </div>
-    
+
 <h2>Related Commands</h2>
 
-<ul>
+<ul class="RelatedCommands">
 <li><a href="Add-GroupMember.html">Add-GroupMember</a></li>
 <li><a href="Install-Group.html">Install-Group</a></li>
 <li><a href="Remove-GroupMember.html">Remove-GroupMember</a></li>
@@ -122,13 +124,7 @@
     <td></td>
 </tr>
 </table>
-        
 
-        
-
-        
-
-        
 <h2>EXAMPLE 1</h2>
 
 <p>Demonstrates how to install a group and add members to it.</p>
@@ -142,6 +138,7 @@
 }
 </code></pre>
 
+
 <h2>EXAMPLE 2</h2>
 
 <p>Demonstrates how to uninstall a group.</p>
@@ -152,6 +149,7 @@
     Ensure = 'Absent';
 }
 </code></pre>
+
 
 	<div class="Footer">
 		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.

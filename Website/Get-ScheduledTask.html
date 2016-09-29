@@ -18,11 +18,13 @@
     </ul>
 
     <h1>Get-ScheduledTask</h1>
-<div><p>Gets the scheduled tasks for the current computer.</p></div>
+<div class="Synopsis">
+<p>Gets the scheduled tasks for the current computer.</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>Get-ScheduledTask [[-Name] &lt;String&gt;] [&lt;CommonParameters&gt;]</code></pre>
-    
+
 <h2>Description</h2>
 <div class="Description">
 <p>The <code>Get-ScheduledTask</code> function gets the scheduled tasks on the current computer. It returns <code>Carbon.TaskScheduler.TaskInfo</code> objects for each one.</p>
@@ -31,10 +33,10 @@
 
 <p>This function has the same name as the built-in <code>Get-ScheduledTask</code> function that comes on Windows 2012/8 and later. It returns objects with the same properties, but if you want to use the built-in function, use the <code>ScheduledTasks</code> qualifier, e.g. <code>ScheduledTasks\Get-ScheduledTask</code>.</p>
 </div>
-    
+
 <h2>Related Commands</h2>
 
-<ul>
+<ul class="RelatedCommands">
 <li><a href="Test-ScheduledTask.html">Test-ScheduledTask</a></li>
 </ul>
 
@@ -58,29 +60,31 @@
 </tr>
 
 </table>
-        
 
-        
 <h2>Return Values</h2>
+<div class="ReturnValues">
 <p>Carbon.TaskScheduler.TaskInfo. </p>
-        
+</div>
 
-        
 <h2>EXAMPLE 1</h2>
 <pre><code>Get-ScheduledTask</code></pre>
 <p>Demonstrates how to get all scheduled tasks.</p>
+
 
 <h2>EXAMPLE 2</h2>
 <pre><code>Get-ScheduledTask -Name 'AutoUpdateMyApp'</code></pre>
 <p>Demonstrates how to get a specific task.</p>
 
+
 <h2>EXAMPLE 3</h2>
 <pre><code>Get-ScheduledTask -Name '*Microsoft*'</code></pre>
 <p>Demonstrates how to get all tasks that match a wildcard pattern.</p>
 
+
 <h2>EXAMPLE 4</h2>
 <pre><code>ScheduledTasks\Get-ScheduledTask</code></pre>
 <p>Demonstrates how to call the <code>Get-ScheduledTask</code> function in the <code>ScheduledTasks</code> module which ships on Windows 2012/8 and later.</p>
+
 
 	<div class="Footer">
 		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.

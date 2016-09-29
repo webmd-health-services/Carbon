@@ -18,7 +18,9 @@
     </ul>
 
     <h1>Carbon_IniFile</h1>
-<div><p>DSC resource for managing settings in INI files.</p></div>
+<div class="Synopsis">
+<p>DSC resource for managing settings in INI files.</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>Carbon_IniFile [String] #ResourceName
@@ -34,17 +36,17 @@
     [Value = [string]]
 }
 </code></pre>
-    
+
 <h2>Description</h2>
 <div class="Description">
 <p>The <code>Carbon_IniFile</code> resource sets or removes settings from INI files.</p>
 
 <p><code>Carbon_IniFile</code> is new in Carbon 2.0.</p>
 </div>
-    
+
 <h2>Related Commands</h2>
 
-<ul>
+<ul class="RelatedCommands">
 <li><a href="Remove-IniEntry.html">Remove-IniEntry</a></li>
 <li><a href="Set-IniEntry.html">Set-IniEntry</a></li>
 <li><a href="Split-Ini.html">Split-Ini</a></li>
@@ -118,13 +120,7 @@
 </tr>
 
 </table>
-        
 
-        
-
-        
-
-        
 <h2>EXAMPLE 1</h2>
 
 <p>Demonstrates how to create/set a setting in sectionless INI file.</p>
@@ -144,6 +140,7 @@
 
 <pre><code>prefix = C:\node-global-modules
 </code></pre>
+
 
 <h2>EXAMPLE 2</h2>
 
@@ -165,6 +162,7 @@
 username = Build User &lt;builduser@example.com&gt;
 </code></pre>
 
+
 <h2>EXAMPLE 3</h2>
 
 <p>Demonstrates how to remove a setting from a case-sensitive INI file.</p>
@@ -178,6 +176,7 @@ username = Build User &lt;builduser@example.com&gt;
 }
 </code></pre>
 
+
 <h2>EXAMPLE 4</h2>
 
 <p>Demonstrates how to remove a setting from an INI file that organizes settings into sections.</p>
@@ -190,6 +189,7 @@ username = Build User &lt;builduser@example.com&gt;
     Ensure = 'Absent';
 }
 </code></pre>
+
 
 	<div class="Footer">
 		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.

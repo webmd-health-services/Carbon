@@ -18,23 +18,25 @@
     </ul>
 
     <h1>Disable-IisSecurityAuthentication</h1>
-<div><p>Disables anonymous or basic authentication for all or part of a website.</p></div>
+<div class="Synopsis">
+<p>Disables anonymous or basic authentication for all or part of a website.</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>Disable-IisSecurityAuthentication -SiteName &lt;String&gt; [-VirtualPath &lt;String&gt;] -Anonymous [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
 <pre class="Syntax"><code>Disable-IisSecurityAuthentication -SiteName &lt;String&gt; [-VirtualPath &lt;String&gt;] -Basic [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
 <pre class="Syntax"><code>Disable-IisSecurityAuthentication -SiteName &lt;String&gt; [-VirtualPath &lt;String&gt;] -Windows [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
-    
+
 <h2>Description</h2>
 <div class="Description">
 <p>By default, disables an authentication type for an entire website.  You can disable an authentication type at a specific path under a website by passing the virtual path (<em>not</em> the physical path) to that directory as the value of the <code>VirtualPath</code> parameter.</p>
 
 <p>Beginning with Carbon 2.0.1, this function is available only if IIS is installed.</p>
 </div>
-    
+
 <h2>Related Commands</h2>
 
-<ul>
+<ul class="RelatedCommands">
 <li><a href="Enable-IisSecurityAuthentication.html">Enable-IisSecurityAuthentication</a></li>
 <li><a href="Get-IisSecurityAuthentication.html">Get-IisSecurityAuthentication</a></li>
 <li><a href="Test-IisSecurityAuthentication.html">Test-IisSecurityAuthentication</a></li>
@@ -115,20 +117,16 @@
     <td></td>
 </tr>
 </table>
-        
 
-        
-
-        
-
-        
 <h2>EXAMPLE 1</h2>
 <pre><code>Disable-IisSecurityAuthentication -SiteName Peanuts -Anonymous</code></pre>
 <p>Turns off anonymous authentication for the <code>Peanuts</code> website.</p>
 
+
 <h2>EXAMPLE 2</h2>
 <pre><code>Disable-IisSecurityAuthentication -SiteName Peanuts Snoopy/DogHouse -Basic</code></pre>
 <p>Turns off basic authentication for the <code>Snoopy/DogHouse</code> directory under the <code>Peanuts</code> website.</p>
+
 
 	<div class="Footer">
 		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.

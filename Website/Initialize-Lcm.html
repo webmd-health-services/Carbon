@@ -18,13 +18,15 @@
     </ul>
 
     <h1>Initialize-Lcm</h1>
-<div><p>Configures a computer's DSC Local Configuration Manager (LCM).</p></div>
+<div class="Synopsis">
+<p>Configures a computer's DSC Local Configuration Manager (LCM).</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>Initialize-Lcm -Push -ComputerName &lt;String[]&gt; [-Credential &lt;PSCredential&gt;] [-CertificateID &lt;String&gt;] [-CertFile &lt;String&gt;] [-CertPassword &lt;Object&gt;] [-RebootIfNeeded] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
 <pre class="Syntax"><code>Initialize-Lcm -ServerUrl &lt;String&gt; [-AllowUnsecureConnection] -ConfigurationID &lt;Guid&gt; -ConfigurationMode &lt;String&gt; -ComputerName &lt;String[]&gt; [-Credential &lt;PSCredential&gt;] [-AllowModuleOverwrite] [-CertificateID &lt;String&gt;] [-CertFile &lt;String&gt;] [-CertPassword &lt;Object&gt;] [-RebootIfNeeded] [-RefreshIntervalMinutes &lt;Int32&gt;] [-ConfigurationFrequency &lt;Int32&gt;] [-LcmCredential &lt;PSCredential&gt;] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
 <pre class="Syntax"><code>Initialize-Lcm -SourcePath &lt;String&gt; -ConfigurationID &lt;Guid&gt; -ConfigurationMode &lt;String&gt; -ComputerName &lt;String[]&gt; [-Credential &lt;PSCredential&gt;] [-AllowModuleOverwrite] [-CertificateID &lt;String&gt;] [-CertFile &lt;String&gt;] [-CertPassword &lt;Object&gt;] [-RebootIfNeeded] [-RefreshIntervalMinutes &lt;Int32&gt;] [-ConfigurationFrequency &lt;Int32&gt;] [-LcmCredential &lt;PSCredential&gt;] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
-    
+
 <h2>Description</h2>
 <div class="Description">
 <p>The Local Configuration Manager (LCM) is the Windows PowerShell Desired State Configuration (DSC) engine. It runs on all target computers, and it is responsible for calling the configuration resources that are included in a DSC configuration script. It can be configured to receive changes (i.e. <code>Push</code> mode) or pull and apply changes its own changes (i.e. <code>Pull</code> mode).</p>
@@ -55,12 +57,14 @@
 
 <p>See <a href="http://technet.microsoft.com/en-us/library/dn249922.aspx">Windows PowerShell Desired State Configuration Local Configuration Manager</a> for more information.</p>
 
+<p>This function is not available in 32-bit PowerShell 4 processes on 64-bit operating systems.</p>
+
 <p><code>Initialize-Lcm</code> is new in Carbon 2.0.</p>
 </div>
-    
+
 <h2>Related Commands</h2>
 
-<ul>
+<ul class="RelatedCommands">
 <li><a href="New-RsaKeyPair.html">New-RsaKeyPair</a></li>
 <li><a href="Start-DscPullConfiguration.html">Start-DscPullConfiguration</a></li>
 <li><a href="Install-Certificate.html">Install-Certificate</a></li>
@@ -230,32 +234,31 @@
     <td></td>
 </tr>
 </table>
-        
 
-        
-
-        
-
-        
 <h2>EXAMPLE 1</h2>
 <pre><code>Initialize-Lcm -Push -ComputerName '1.2.3.4'</code></pre>
 <p>Demonstrates how to configure an LCM to use push mode.</p>
+
 
 <h2>EXAMPLE 2</h2>
 <pre><code>Initialize-Lcm -ConfigurationID 'fc2ffe50-13cd-4cd2-9942-d25ac66d6c13' -ComputerName '10.1.2.3' -ServerUrl 'https://10.4.5.6/PSDSCPullServer.dsc'</code></pre>
 <p>Demonstrates the minimum needed to configure a computer (in this case, <code>10.1.2.3</code>) to pull its configuration from a DSC web server.</p>
 
+
 <h2>EXAMPLE 3</h2>
 <pre><code>Initialize-Lcm -ConfigurationID 'fc2ffe50-13cd-4cd2-9942-d25ac66d6c13' -ComputerName '10.1.2.3' -SourcePath '\\10.4.5.6\DSCResources'</code></pre>
 <p>Demonstrates the minimum needed to configure a computer (in this case, <code>10.1.2.3</code>) to pull its configuration from an SMB file share.</p>
+
 
 <h2>EXAMPLE 4</h2>
 <pre><code>Initialize-Lcm -CertFile 'D:\Projects\Resources\PrivateKey.pfx' -CertPassword $secureStringPassword -ConfigurationID 'fc2ffe50-13cd-4cd2-9942-d25ac66d6c13' -ComputerName '10.1.2.3' -SourcePath '\\10.4.5.6\DSCResources'</code></pre>
 <p>Demonstrates how to upload the private key certificate on to the targer computer(s).</p>
 
+
 <h2>EXAMPLE 5</h2>
 <pre><code>Initialize-Lcm -RefreshIntervalMinutes 25 -ConfigurationFrequency 3 -ConfigurationID 'fc2ffe50-13cd-4cd2-9942-d25ac66d6c13' -ComputerName '10.1.2.3' -SourcePath '\\10.4.5.6\DSCResources'</code></pre>
 <p>Demonstrates how to use the <code>RefreshIntervalMinutes</code> and <code>ConfigurationFrequency</code> parameters to control when the LCM downloads new configuration and applies that configuration. In this case, new configuration is downloaded every 25 minutes, and apllied every 75 minutes (<code>RefreshIntervalMinutes * ConfigurationFrequency</code>).</p>
+
 
 	<div class="Footer">
 		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.

@@ -18,11 +18,13 @@
     </ul>
 
     <h1>Set-IisWebsiteID</h1>
-<div><p>Sets a website's ID to an explicit number.</p></div>
+<div class="Synopsis">
+<p>Sets a website's ID to an explicit number.</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>Set-IisWebsiteID [-SiteName] &lt;String&gt; [-ID] &lt;Int32&gt; [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
-    
+
 <h2>Description</h2>
 <div class="Description">
 <p>IIS handles assigning websites individual IDs.  This method will assign a website explicit ID you manage (e.g. to support session sharing in a web server farm).</p>
@@ -33,8 +35,6 @@
 
 <p>Beginning with Carbon 2.0.1, this function is available only if IIS is installed.</p>
 </div>
-    
-
 
 <h2> Parameters </h2>
 <table id="Parameters">
@@ -87,16 +87,11 @@
     <td></td>
 </tr>
 </table>
-        
 
-        
-
-        
-
-        
 <h2>EXAMPLE 1</h2>
 <pre><code>Set-IisWebsiteID -SiteName Holodeck -ID 483</code></pre>
 <p>Sets the <code>Holodeck</code> website's ID to <code>483</code>.</p>
+
 
 	<div class="Footer">
 		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.

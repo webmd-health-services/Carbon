@@ -18,21 +18,23 @@
     </ul>
 
     <h1>Enable-FirewallStatefulFtp</h1>
-<div><p>Enables the <code>StatefulFtp</code> Windows firewall setting.</p></div>
+<div class="Synopsis">
+<p>Enables the <code>StatefulFtp</code> Windows firewall setting.</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>Enable-FirewallStatefulFtp [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
-    
+
 <h2>Description</h2>
 <div class="Description">
 <p>Uses the <code>netsh</code> command to enable the <code>StatefulFtp</code> Windows firewall setting.</p>
 
 <p>If the firewall isn't configurable, writes an error and returns without making any changes.</p>
 </div>
-    
+
 <h2>Related Commands</h2>
 
-<ul>
+<ul class="RelatedCommands">
 <li><a href="Assert-FirewallConfigurable.html">Assert-FirewallConfigurable</a></li>
 </ul>
 
@@ -71,16 +73,11 @@
     <td></td>
 </tr>
 </table>
-        
 
-        
-
-        
-
-        
 <h2>EXAMPLE 1</h2>
 <pre><code>Enable-FirewallStatefulFtp</code></pre>
 <p>Enables the <code>StatefulFtp</code> Windows firewall setting.</p>
+
 
 	<div class="Footer">
 		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.

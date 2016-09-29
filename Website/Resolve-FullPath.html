@@ -18,19 +18,19 @@
     </ul>
 
     <h1>Resolve-FullPath</h1>
-<div><p>Converts a relative path to an absolute path.</p></div>
+<div class="Synopsis">
+<p>Converts a relative path to an absolute path.</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>Resolve-FullPath [-Path] &lt;String&gt; [&lt;CommonParameters&gt;]</code></pre>
-    
+
 <h2>Description</h2>
 <div class="Description">
 <p>Unlike <code>Resolve-Path</code>, this function does not check whether the path exists.  It just converts relative paths to absolute paths.</p>
 
 <p>Unrooted paths (e.g. <code>..\..\See\I\Do\Not\Have\A\Root</code>) are first joined with the current directory (as returned by <code>Get-Location</code>).</p>
 </div>
-    
-
 
 <h2> Parameters </h2>
 <table id="Parameters">
@@ -52,24 +52,21 @@
 </tr>
 
 </table>
-        
 
-        
-
-        
-
-        
 <h2>EXAMPLE 1</h2>
 <pre><code>Resolve-FullPath -Path 'C:\Projects\Carbon\Test\..\Carbon\FileSystem.ps1'</code></pre>
 <p>Returns <code>C:\Projects\Carbon\Carbon\FileSystem.ps1</code>.</p>
+
 
 <h2>EXAMPLE 2</h2>
 <pre><code>Resolve-FullPath -Path 'C:\Projects\Carbon\..\I\Do\Not\Exist'</code></pre>
 <p>Returns <code>C:\Projects\I\Do\Not\Exist</code>.</p>
 
+
 <h2>EXAMPLE 3</h2>
 <pre><code>Resolve-FullPath -Path ..\..\Foo\..\Bar</code></pre>
 <p>Because the <code>Path</code> isn't rooted, joins <code>Path</code> with the current directory (as returned by <code>Get-Location</code>), and returns the full path.  If the current directory is <code>C:\Projects\Carbon</code>, returns <code>C:\Bar</code>.</p>
+
 
 	<div class="Footer">
 		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.

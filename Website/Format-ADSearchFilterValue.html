@@ -18,19 +18,21 @@
     </ul>
 
     <h1>Format-ADSearchFilterValue</h1>
-<div><p>Escapes Active Directory special characters from a string.</p></div>
+<div class="Synopsis">
+<p>Escapes Active Directory special characters from a string.</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>Format-ADSearchFilterValue [-String] &lt;String&gt; [&lt;CommonParameters&gt;]</code></pre>
-    
+
 <h2>Description</h2>
 <div class="Description">
 <p>There are special characters in Active Directory queries/searches.  This function escapes them so they aren't treated as AD commands/characters.</p>
 </div>
-    
+
 <h2>Related Commands</h2>
 
-<ul>
+<ul class="RelatedCommands">
 <li><a href="http://msdn.microsoft.com/en-us/library/aa746475.aspx#special_characters">http://msdn.microsoft.com/en-us/library/aa746475.aspx#special_characters</a></li>
 </ul>
 
@@ -54,20 +56,19 @@
 </tr>
 
 </table>
-        
 
-        
 <h2>Return Values</h2>
+<div class="ReturnValues">
 <p><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">System.String</a>. The input string with any Active Directory-sensitive characters escaped.</p>
-        
+</div>
 
-        
 <h2>EXAMPLE 1</h2>
 <pre><code>Format-ADSearchFilterValue -String "I have AD special characters (I think)."</code></pre>
 <p>Returns </p>
 
 <pre><code>I have AD special characters \28I think\29.
 </code></pre>
+
 
 	<div class="Footer">
 		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.

@@ -18,11 +18,13 @@
     </ul>
 
     <h1>Install-Msi</h1>
-<div><p>Installs software from an MSI file.</p></div>
+<div class="Synopsis">
+<p>Installs software from an MSI file.</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>Install-Msi [-Path] &lt;String[]&gt; [-Quiet] [-Force] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
-    
+
 <h2>Description</h2>
 <div class="Description">
 <p><code>Install-Msi</code> installs software from an MSI file. If the install fails, it writes an error. Installation is always done in quiet mode, i.e. you won't see any UI.</p>
@@ -31,8 +33,6 @@
 
 <p>Beginning with Carbon 2.0, <code>Install-Msi</code> only runs the MSI if the software isn't installed. Use the <code>-Force</code> switch to always run the installer.</p>
 </div>
-    
-
 
 <h2> Parameters </h2>
 <table id="Parameters">
@@ -93,20 +93,16 @@
     <td></td>
 </tr>
 </table>
-        
 
-        
-
-        
-
-        
 <h2>EXAMPLE 1</h2>
 <pre><code>Install-Msi -Path Path\to\installer.msi</code></pre>
 <p>Runs installer.msi, and waits untils for the installer to finish.  If the installer has a UI, it is shown to the user.</p>
 
+
 <h2>EXAMPLE 2</h2>
 <pre><code>Get-ChildItem *.msi | Install-Msi</code></pre>
 <p>Demonstrates how to pipe MSI files into <code>Install-Msi</code> for installation.</p>
+
 
 	<div class="Footer">
 		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.

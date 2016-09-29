@@ -18,19 +18,19 @@
     </ul>
 
     <h1>Get-MsmqMessageQueue</h1>
-<div><p>Gets the MSMQ message queue by the given name</p></div>
+<div class="Synopsis">
+<p>Gets the MSMQ message queue by the given name</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>Get-MsmqMessageQueue [-Name] &lt;String&gt; [-Private] [&lt;CommonParameters&gt;]</code></pre>
-    
+
 <h2>Description</h2>
 <div class="Description">
 <p>Returns a <a href="http://msdn.microsoft.com/en-us/library/system.messaging.messagequeue.aspx">MessageQueue</a> object for the Message Queue with name <code>Name</code>.  If one doesn't exist, returns <code>$null</code>.</p>
 
 <p>Because MSMQ handles private queues differently than public queues, you must explicitly tell <code>Get-MsmqMessageQueue</code> the queue you want to get is private by using the <code>Private</code> switch.</p>
 </div>
-    
-
 
 <h2> Parameters </h2>
 <table id="Parameters">
@@ -60,21 +60,21 @@
 </tr>
 
 </table>
-        
 
-        
 <h2>Return Values</h2>
+<div class="ReturnValues">
 <p><a href="http://msdn.microsoft.com/en-us/library/system.messaging.messagequeue.aspx">System.Messaging.MessageQueue</a>. </p>
-        
+</div>
 
-        
 <h2>EXAMPLE 1</h2>
 <pre><code>Get-MsmqMessageQueue -Name LunchQueue</code></pre>
 <p>Returns the <a href="http://msdn.microsoft.com/en-us/library/system.messaging.messagequeue.aspx">MessageQueue</a> object for the queue named LunchQueue.  It's probably pretty full!</p>
 
+
 <h2>EXAMPLE 2</h2>
 <pre><code>Get-MsmqMessageQueue -Name TeacherLunchQueue -Private</code></pre>
 <p>Returns the <a href="http://msdn.microsoft.com/en-us/library/system.messaging.messagequeue.aspx">MessageQueue</a> object for the teacher's private LunchQueue.  They must be medical professors.</p>
+
 
 	<div class="Footer">
 		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.

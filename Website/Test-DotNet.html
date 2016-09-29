@@ -18,21 +18,23 @@
     </ul>
 
     <h1>Test-DotNet</h1>
-<div><p>Tests if .NET is installed.</p></div>
+<div class="Synopsis">
+<p>Tests if .NET is installed.</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>Test-DotNet -V2 [&lt;CommonParameters&gt;]</code></pre>
 <pre class="Syntax"><code>Test-DotNet -V4 -Full [&lt;CommonParameters&gt;]</code></pre>
 <pre class="Syntax"><code>Test-DotNet -V4 -Client [&lt;CommonParameters&gt;]</code></pre>
-    
+
 <h2>Description</h2>
 <div class="Description">
 <p>Currently, this function only tests if .NET 2 or 4 is installed.  Perhaps some friendly people out there will extend it to perform further checks?</p>
 </div>
-    
+
 <h2>Related Commands</h2>
 
-<ul>
+<ul class="RelatedCommands">
 <li><a href="http://msdn.microsoft.com/en-us/kb/kbarticle.aspx?id=318785">http://msdn.microsoft.com/en-us/kb/kbarticle.aspx?id=318785</a></li>
 </ul>
 
@@ -80,20 +82,16 @@
 </tr>
 
 </table>
-        
 
-        
-
-        
-
-        
 <h2>EXAMPLE 1</h2>
 <pre><code>Test-DotNet -v2</code></pre>
 <p>Demonstrates how to test if .NET 2 is installed.</p>
 
+
 <h2>EXAMPLE 2</h2>
 <pre><code>Test-DotNet -v4 -Full</code></pre>
 <p>Demonstrates how to test if the full .NET v4 is installed.</p>
+
 
 	<div class="Footer">
 		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.

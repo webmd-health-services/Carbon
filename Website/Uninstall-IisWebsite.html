@@ -18,21 +18,23 @@
     </ul>
 
     <h1>Uninstall-IisWebsite</h1>
-<div><p>Removes a website</p></div>
+<div class="Synopsis">
+<p>Removes a website</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>Uninstall-IisWebsite [-Name] &lt;String&gt; [&lt;CommonParameters&gt;]</code></pre>
-    
+
 <h2>Description</h2>
 <div class="Description">
 <p>Pretty simple: removes the website named <code>Name</code>.  If no website with that name exists, nothing happens.</p>
 
 <p>Beginning with Carbon 2.0.1, this function is not available if IIS isn't installed.</p>
 </div>
-    
+
 <h2>Related Commands</h2>
 
-<ul>
+<ul class="RelatedCommands">
 <li><a href="Get-IisWebsite.html">Get-IisWebsite</a></li>
 <li><a href="Install-IisWebsite.html">Install-IisWebsite</a></li>
 </ul>
@@ -57,20 +59,16 @@
 </tr>
 
 </table>
-        
 
-        
-
-        
-
-        
 <h2>EXAMPLE 1</h2>
 <pre><code>Uninstall-IisWebsite -Name 'MyWebsite'</code></pre>
 <p>Removes MyWebsite.</p>
 
+
 <h2>EXAMPLE 2</h2>
 <pre><code>Uninstall-IisWebsite 1</code></pre>
 <p>Removes the website whose ID is 1.</p>
+
 
 	<div class="Footer">
 		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.

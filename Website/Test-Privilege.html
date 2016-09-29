@@ -18,19 +18,21 @@
     </ul>
 
     <h1>Test-Privilege</h1>
-<div><p>Tests if an identity has a given privilege.</p></div>
+<div class="Synopsis">
+<p>Tests if an identity has a given privilege.</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>Test-Privilege [-Identity] &lt;String&gt; [-Privilege] &lt;String&gt; [&lt;CommonParameters&gt;]</code></pre>
-    
+
 <h2>Description</h2>
 <div class="Description">
 <p>Returns <code>true</code> if an identity has a privilege.  <code>False</code> otherwise.</p>
 </div>
-    
+
 <h2>Related Commands</h2>
 
-<ul>
+<ul class="RelatedCommands">
 <li>Carbon_Privilege</li>
 <li><a href="Get-Privilege.html">Get-Privilege</a></li>
 <li><a href="Grant-Privilege.html">Grant-Privilege</a></li>
@@ -65,16 +67,11 @@
 </tr>
 
 </table>
-        
 
-        
-
-        
-
-        
 <h2>EXAMPLE 1</h2>
 <pre><code>Test-Privilege -Identity Forrester -Privilege SeServiceLogonRight</code></pre>
 <p>Tests if <code>Forrester</code> has the <code>SeServiceLogonRight</code> privilege.</p>
+
 
 	<div class="Footer">
 		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.

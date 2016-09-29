@@ -18,19 +18,21 @@
     </ul>
 
     <h1>Get-ServiceAcl</h1>
-<div><p>Gets the discretionary access control list (i.e. DACL) for a service.</p></div>
+<div class="Synopsis">
+<p>Gets the discretionary access control list (i.e. DACL) for a service.</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>Get-ServiceAcl [-Name] &lt;String&gt; [&lt;CommonParameters&gt;]</code></pre>
-    
+
 <h2>Description</h2>
 <div class="Description">
 <p>You wanted it, you got it!  You probably want to use <code>Get-ServicePermission</code> instead.  If you want to chagne a service's permissions, use <code>Grant-ServicePermission</code> or <code>Revoke-ServicePermissions</code>.</p>
 </div>
-    
+
 <h2>Related Commands</h2>
 
-<ul>
+<ul class="RelatedCommands">
 <li><a href="Get-ServicePermission.html">Get-ServicePermission</a></li>
 <li><a href="Grant-ServicePermission.html">Grant-ServicePermission</a></li>
 <li><a href="Revoke-ServicePermission.html">Revoke-ServicePermission</a></li>
@@ -56,16 +58,11 @@
 </tr>
 
 </table>
-        
 
-        
-
-        
-
-        
 <h2>EXAMPLE 1</h2>
 <pre><code>Get-ServiceAcl -Name Hyperdrive</code></pre>
 <p>Gets the <code>Hyperdrive</code> service's DACL.</p>
+
 
 	<div class="Footer">
 		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.

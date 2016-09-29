@@ -18,19 +18,21 @@
     </ul>
 
     <h1>Revoke-ServicePermission</h1>
-<div><p>Removes all permissions an identity has to manage a service.</p></div>
+<div class="Synopsis">
+<p>Removes all permissions an identity has to manage a service.</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>Revoke-ServicePermission [-Name] &lt;String&gt; [-Identity] &lt;String&gt; [&lt;CommonParameters&gt;]</code></pre>
-    
+
 <h2>Description</h2>
 <div class="Description">
 <p>No permissions are left behind.  This is an all or nothing operation, baby!</p>
 </div>
-    
+
 <h2>Related Commands</h2>
 
-<ul>
+<ul class="RelatedCommands">
 <li><a href="Get-ServicePermission.html">Get-ServicePermission</a></li>
 <li><a href="Grant-ServicePermission.html">Grant-ServicePermission</a></li>
 </ul>
@@ -63,16 +65,11 @@
 </tr>
 
 </table>
-        
 
-        
-
-        
-
-        
 <h2>EXAMPLE 1</h2>
 <pre><code>Revoke-ServicePermission -Name 'Hyperdrive` -Identity 'CLOUDCITY\LCalrissian'</code></pre>
 <p>Removes all of Lando's permissions to control the <code>Hyperdrive</code> service.</p>
+
 
 	<div class="Footer">
 		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.

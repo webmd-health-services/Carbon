@@ -18,12 +18,14 @@
     </ul>
 
     <h1>Test-PathIsJunction</h1>
-<div><p>Tests if a path is a junction.</p></div>
+<div class="Synopsis">
+<p>Tests if a path is a junction.</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>Test-PathIsJunction [-Path] &lt;String&gt; [&lt;CommonParameters&gt;]</code></pre>
 <pre class="Syntax"><code>Test-PathIsJunction -LiteralPath &lt;String&gt; [&lt;CommonParameters&gt;]</code></pre>
-    
+
 <h2>Description</h2>
 <div class="Description">
 <p>The <code>Test-PathIsJunction</code> function tests if path is a junction (i.e. reparse point). If the path doesn't exist, returns <code>$false</code>.</p>
@@ -38,8 +40,6 @@
 
 <p>The <code>LiteralPath</code> parameter was added in Carbon 2.2.0. Use it to check paths that contain wildcard characters.</p>
 </div>
-    
-
 
 <h2> Parameters </h2>
 <table id="Parameters">
@@ -71,28 +71,26 @@
 </tr>
 
 </table>
-        
 
-        
-
-        
-
-        
 <h2>EXAMPLE 1</h2>
 <pre><code>Test-PathIsJunction -Path C:\I\Am\A\Junction</code></pre>
 <p>Returns <code>$true</code>.</p>
+
 
 <h2>EXAMPLE 2</h2>
 <pre><code>Test-PathIsJunction -Path C:\I\Am\Not\A\Junction</code></pre>
 <p>Returns <code>$false</code>.</p>
 
+
 <h2>EXAMPLE 3</h2>
 <pre><code>Get-ChildItem * | Where-Object { $_.PsIsContainer -and $_.IsJunction }</code></pre>
 <p>Demonstrates an alternative way of testing for junctions.  Uses Carbon's <code>IsJunction</code> extension method on the <code>DirectoryInfo</code> type to check if any directories under the current directory are junctions.</p>
 
+
 <h2>EXAMPLE 4</h2>
 <pre><code>Test-PathIsJunction -LiteralPath 'C:\PathWithWildcards[]'</code></pre>
 <p>Demonstrates how to test if a path with wildcards is a junction.</p>
+
 
 	<div class="Footer">
 		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.

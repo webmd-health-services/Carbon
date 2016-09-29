@@ -18,11 +18,13 @@
     </ul>
 
     <h1>Get-ServicePermission</h1>
-<div><p>Gets the permissions for a service.</p></div>
+<div class="Synopsis">
+<p>Gets the permissions for a service.</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>Get-ServicePermission [-Name] &lt;String&gt; [[-Identity] &lt;String&gt;] [&lt;CommonParameters&gt;]</code></pre>
-    
+
 <h2>Description</h2>
 <div class="Description">
 <p>Uses the Win32 advapi32 API to query the permissions for a service.  Returns <code>Carbon.ServiceAccessRule</code> objects for each.  The two relavant properties on this object are</p>
@@ -32,10 +34,10 @@
 <li>ServiceAccessRights - The permissions the user has.</li>
 </ul>
 </div>
-    
+
 <h2>Related Commands</h2>
 
-<ul>
+<ul class="RelatedCommands">
 <li>Grant-ServicePermissions</li>
 <li>Revoke-ServicePermissions</li>
 </ul>
@@ -68,21 +70,21 @@
 </tr>
 
 </table>
-        
 
-        
 <h2>Return Values</h2>
+<div class="ReturnValues">
 <p>Carbon.Security.ServiceAccessRule. </p>
-        
+</div>
 
-        
 <h2>EXAMPLE 1</h2>
 <pre><code>Get-ServicePermission -Name 'Hyperdrive'</code></pre>
 <p>Gets the access rules for the <code>Hyperdrive</code> service.</p>
 
+
 <h2>EXAMPLE 2</h2>
 <pre><code>Get-ServicePermission -Name 'Hyperdrive' -Identity FALCON\HSolo</code></pre>
 <p>Gets just Han's permissions to control the <code>Hyperdrive</code> service.</p>
+
 
 	<div class="Footer">
 		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.

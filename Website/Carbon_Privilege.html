@@ -18,7 +18,9 @@
     </ul>
 
     <h1>Carbon_Privilege</h1>
-<div><p>DSC resource for managing privileges.</p></div>
+<div class="Synopsis">
+<p>DSC resource for managing privileges.</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>Carbon_Privilege [String] #ResourceName
@@ -30,7 +32,7 @@
     [PsDscRunAsCredential = [PSCredential]]
 }
 </code></pre>
-    
+
 <h2>Description</h2>
 <div class="Description">
 <p>The <code>Carbon_Privilege</code> resource manages privileges, i.e. the system operations and logons a user or group can perform.</p>
@@ -91,10 +93,10 @@
 
 <p><code>Carbon_Privilege</code> is new in Carbon 2.0.</p>
 </div>
-    
+
 <h2>Related Commands</h2>
 
-<ul>
+<ul class="RelatedCommands">
 <li><a href="Get-Privilege.html">Get-Privilege</a></li>
 <li><a href="Grant-Privilege.html">Grant-Privilege</a></li>
 <li><a href="Revoke-Privilege.html">Revoke-Privilege</a></li>
@@ -162,13 +164,7 @@
     <td></td>
 </tr>
 </table>
-        
 
-        
-
-        
-
-        
 <h2>EXAMPLE 1</h2>
 
 <p>Demonstrates how to grant a service user the ability to log in as a service.</p>
@@ -180,6 +176,7 @@
 }
 </code></pre>
 
+
 <h2>EXAMPLE 2</h2>
 
 <p>Demonstrates how to revoke all a user/group's privileges. To revoke specific privileges, grant just the privileges you want. All other privileges are revoked.</p>
@@ -190,6 +187,7 @@
     Ensure = 'Absent'
 }
 </code></pre>
+
 
 	<div class="Footer">
 		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.

@@ -18,12 +18,14 @@
     </ul>
 
     <h1>Remove-IisMimeMap</h1>
-<div><p>Removes a file extension to MIME type map from an entire web server.</p></div>
+<div class="Synopsis">
+<p>Removes a file extension to MIME type map from an entire web server.</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>Remove-IisMimeMap -FileExtension &lt;String&gt; [&lt;CommonParameters&gt;]</code></pre>
 <pre class="Syntax"><code>Remove-IisMimeMap -SiteName &lt;String&gt; [-VirtualPath &lt;String&gt;] -FileExtension &lt;String&gt; [&lt;CommonParameters&gt;]</code></pre>
-    
+
 <h2>Description</h2>
 <div class="Description">
 <p>IIS won't serve static files unless they have an entry in the MIME map.  Use this function toremvoe an existing MIME map entry.  If one doesn't exist, nothing happens.  Not even an error.</p>
@@ -32,10 +34,10 @@
 
 <p>Beginning with Carbon 2.0.1, this function is available only if IIS is installed.</p>
 </div>
-    
+
 <h2>Related Commands</h2>
 
-<ul>
+<ul class="RelatedCommands">
 <li><a href="Get-IisMimeMap.html">Get-IisMimeMap</a></li>
 <li><a href="Set-IisMimeMap.html">Set-IisMimeMap</a></li>
 </ul>
@@ -76,16 +78,11 @@
 </tr>
 
 </table>
-        
 
-        
-
-        
-
-        
 <h2>EXAMPLE 1</h2>
 <pre><code>Remove-IisMimeMap -FileExtension '.m4v' -MimeType 'video/x-m4v'</code></pre>
 <p>Removes the <code>.m4v</code> file extension so that IIS will no longer serve those files.</p>
+
 
 	<div class="Footer">
 		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.

@@ -18,13 +18,15 @@
     </ul>
 
     <h1>Enable-IisSsl</h1>
-<div><p>Turns on and configures SSL for a website or part of a website.</p></div>
+<div class="Synopsis">
+<p>Turns on and configures SSL for a website or part of a website.</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>Enable-IisSsl -SiteName &lt;String&gt; [-VirtualPath &lt;String&gt;] [-RequireSsl] [-Require128BitSsl] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
 <pre class="Syntax"><code>Enable-IisSsl -SiteName &lt;String&gt; [-VirtualPath &lt;String&gt;] -RequireSsl [-Require128BitSsl] -RequireClientCertificates [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
 <pre class="Syntax"><code>Enable-IisSsl -SiteName &lt;String&gt; [-VirtualPath &lt;String&gt;] [-RequireSsl] [-Require128BitSsl] [-AcceptClientCertificates] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
-    
+
 <h2>Description</h2>
 <div class="Description">
 <p>This function enables SSL and optionally the site/directory to: </p>
@@ -43,10 +45,10 @@
 
 <p>Beginning with Carbon 2.0.1, this function is available only if IIS is installed.</p>
 </div>
-    
+
 <h2>Related Commands</h2>
 
-<ul>
+<ul class="RelatedCommands">
 <li><a href="http://support.microsoft.com/?id=907274">http://support.microsoft.com/?id=907274</a></li>
 <li><a href="Set-IisWebsiteSslCertificate.html">Set-IisWebsiteSslCertificate</a></li>
 </ul>
@@ -134,32 +136,31 @@
     <td></td>
 </tr>
 </table>
-        
 
-        
-
-        
-
-        
 <h2>EXAMPLE 1</h2>
 <pre><code>Enable-IisSsl -Site Peanuts</code></pre>
 <p>Enables SSL on the <code>Peanuts</code> website's, making makes SSL connections optional, ignoring client certificates, and making 128-bit SSL optional.</p>
+
 
 <h2>EXAMPLE 2</h2>
 <pre><code>Enable-IisSsl -Site Peanuts -VirtualPath Snoopy/DogHouse -RequireSsl</code></pre>
 <p>Configures the <code>/Snoopy/DogHouse</code> directory in the <code>Peanuts</code> site to require SSL.  It also turns off any client certificate settings and makes 128-bit SSL optional.</p>
 
+
 <h2>EXAMPLE 3</h2>
 <pre><code>Enable-IisSsl -Site Peanuts -AcceptClientCertificates</code></pre>
 <p>Enables SSL on the <code>Peanuts</code> website and configures it to accept client certificates, makes SSL optional, and makes 128-bit SSL optional.</p>
+
 
 <h2>EXAMPLE 4</h2>
 <pre><code>Enable-IisSsl -Site Peanuts -RequireSsl -RequireClientCertificates</code></pre>
 <p>Enables SSL on the <code>Peanuts</code> website and configures it to require SSL and client certificates.  You can't require client certificates without also requiring SSL.</p>
 
+
 <h2>EXAMPLE 5</h2>
 <pre><code>Enable-IisSsl -Site Peanuts -Require128BitSsl</code></pre>
 <p>Enables SSL on the <code>Peanuts</code> website and require 128-bit SSL.  Also, makes SSL connections optional and ignores client certificates.</p>
+
 
 	<div class="Footer">
 		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.

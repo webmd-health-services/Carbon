@@ -18,12 +18,14 @@
     </ul>
 
     <h1>Uninstall-Junction</h1>
-<div><p>Uninstall a junction.</p></div>
+<div class="Synopsis">
+<p>Uninstall a junction.</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>Uninstall-Junction [-Path] &lt;String&gt; [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
 <pre class="Syntax"><code>Uninstall-Junction -LiteralPath &lt;String&gt; [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
-    
+
 <h2>Description</h2>
 <div class="Description">
 <p>The <code>Uninstall-Junction</code> removes a junction that may or may not exist. If the junction exists, it is removed. If a junction doesn't exist, nothing happens.</p>
@@ -34,10 +36,10 @@
 
 <p>Beginning in Carbon 2.2.0, you can uninstall junctions whose paths contain wildcard characters with the <code>LiteralPath</code> parameter.</p>
 </div>
-    
+
 <h2>Related Commands</h2>
 
-<ul>
+<ul class="RelatedCommands">
 <li><a href="Install-Junction.html">Install-Junction</a></li>
 <li><a href="New-Junction.html">New-Junction</a></li>
 <li><a href="Remove-Junction.html">Remove-Junction</a></li>
@@ -98,16 +100,11 @@
     <td></td>
 </tr>
 </table>
-        
 
-        
-
-        
-
-        
 <h2>EXAMPLE 1</h2>
 <pre><code>Uninstall-Junction -Path 'C:\I\Am\A\Junction'</code></pre>
 <p>Uninstall the <code>C:\I\Am\A\Junction</code></p>
+
 
 	<div class="Footer">
 		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.

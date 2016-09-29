@@ -18,21 +18,23 @@
     </ul>
 
     <h1>Test-UncPath</h1>
-<div><p>Tests if a path is a UNC path.</p></div>
+<div class="Synopsis">
+<p>Tests if a path is a UNC path.</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>Test-UncPath [-Path] &lt;String&gt; [&lt;CommonParameters&gt;]</code></pre>
-    
+
 <h2>Description</h2>
 <div class="Description">
 <p>Converts the path to a URI and returns the value of its <code>IsUnc</code> property.</p>
 
 <p>This function does not test if path exists.  Use <code>Test-Path</code> for that.</p>
 </div>
-    
+
 <h2>Related Commands</h2>
 
-<ul>
+<ul class="RelatedCommands">
 <li><a href="http://go.microsoft.com/fwlink/?LinkID=113418.html">Test-Path</a></li>
 <li><a href="http://blogs.microsoft.co.il/blogs/ScriptFanatic//archive/2010/05/27/quicktip-how-to-validate-a-unc-path.aspx">http://blogs.microsoft.co.il/blogs/ScriptFanatic//archive/2010/05/27/quicktip-how-to-validate-a-unc-path.aspx</a></li>
 </ul>
@@ -57,20 +59,16 @@
 </tr>
 
 </table>
-        
 
-        
-
-        
-
-        
 <h2>EXAMPLE 1</h2>
 <pre><code>Test-UncPath -Path '\\computer\share'</code></pre>
 <p>Returns <code>true</code> since <code>\\computer\share</code> is a UNC path.  Note that <code>Test-UncPath</code> does not have to exist.</p>
 
+
 <h2>EXAMPLE 2</h2>
 <pre><code>Test-UncPath -Path 'C:\Windows'</code></pre>
 <p>Returns <code>false</code> since <code>C:\Windows</code> is not a UNC path.</p>
+
 
 	<div class="Footer">
 		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.

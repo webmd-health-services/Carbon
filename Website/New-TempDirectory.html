@@ -18,11 +18,13 @@
     </ul>
 
     <h1>New-TempDirectory</h1>
-<div><p>Creates a new temporary directory with a random name.</p></div>
+<div class="Synopsis">
+<p>Creates a new temporary directory with a random name.</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>New-TempDirectory [[-Prefix] &lt;String&gt;] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
-    
+
 <h2>Description</h2>
 <div class="Description">
 <p>A new temporary directory is created in the current user's <code>env:TEMP</code> directory.  The directory's name is created using the <code>Path</code> class's <a href="http://msdn.microsoft.com/en-us/library/system.io.path.getrandomfilename.aspx">GetRandomFileName method</a>.</p>
@@ -31,10 +33,10 @@
 
 <p>Added <code>-WhatIf</code> support in Carbon 2.0.</p>
 </div>
-    
+
 <h2>Related Commands</h2>
 
-<ul>
+<ul class="RelatedCommands">
 <li><a href="http://msdn.microsoft.com/en-us/library/system.io.path.getrandomfilename.aspx">http://msdn.microsoft.com/en-us/library/system.io.path.getrandomfilename.aspx</a></li>
 </ul>
 
@@ -81,29 +83,31 @@
     <td></td>
 </tr>
 </table>
-        
 
-        
 <h2>Return Values</h2>
+<div class="ReturnValues">
 <p><a href="http://msdn.microsoft.com/en-us/library/system.io.directoryinfo.aspx">System.IO.DirectoryInfo</a>. </p>
-        
+</div>
 
-        
 <h2>EXAMPLE 1</h2>
 <pre><code>New-TempDirectory</code></pre>
 <p>Demonstrates how to create a new temporary directory, e.g. <code>C:\Users\ajensen\AppData\Local\Temp\5pobd3tu.5rn</code>.</p>
+
 
 <h2>EXAMPLE 2</h2>
 <pre><code>New-TempDirectory -Prefix 'Carbon'</code></pre>
 <p>Demonstrates how to create a new temporary directory with a custom prefix for its name, e.g. <code>C:\Users\ajensen\AppData\Local\Temp\Carbon5pobd3tu.5rn</code>.</p>
 
+
 <h2>EXAMPLE 3</h2>
 <pre><code>New-TempDirectory -Prefix $MyInvocation.MyCommand.Definition</code></pre>
 <p>Demonstrates how you can use <code>$MyInvocation.MyCommand.Definition</code> in PowerShell 2 to create a new, temporary directory, named after the currently executing scripts, e.g. <code>C:\Users\ajensen\AppData\Local\Temp\New-TempDirectory.ps15pobd3tu.5rn</code>.</p>
 
+
 <h2>EXAMPLE 4</h2>
 <pre><code>New-TempDirectory -Prefix $PSCommandPath</code></pre>
 <p>Demonstrates how you can use <code>$PSCommandPath</code> in PowerShell 3+ to create a new, temporary directory, named after the currently executing scripts, e.g. <code>C:\Users\ajensen\AppData\Local\Temp\New-TempDirectory.ps15pobd3tu.5rn</code>.</p>
+
 
 	<div class="Footer">
 		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.

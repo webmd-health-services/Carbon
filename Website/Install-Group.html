@@ -18,19 +18,19 @@
     </ul>
 
     <h1>Install-Group</h1>
-<div><p>Creates a new local group, or updates the settings for an existing group.</p></div>
+<div class="Synopsis">
+<p>Creates a new local group, or updates the settings for an existing group.</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>Install-Group [-Name] &lt;String&gt; [[-Description] &lt;String&gt;] [[-Member] &lt;String[]&gt;] [-PassThru] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
-    
+
 <h2>Description</h2>
 <div class="Description">
 <p><code>Install-Group</code> creates a local group, or, updates a group that already exists.</p>
 
 <p>YOu can get a <code>System.DirectoryServices.AccountManagement.GroupPrincipal</code> object representing the group returned to you by using the <code>PassThru</code> switch. This object implements the <code>IDisposable</code> interface, which means it uses external resources that don't get garbage collected. When you're done using the object, make sure you call <code>Dispose()</code> to free those resources, otherwise you'll leak memory. All over the place.</p>
 </div>
-    
-
 
 <h2> Parameters </h2>
 <table id="Parameters">
@@ -101,17 +101,16 @@
     <td></td>
 </tr>
 </table>
-        
 
-        
 <h2>Return Values</h2>
+<div class="ReturnValues">
 <p><a href="http://msdn.microsoft.com/en-us/library/system.directoryservices.accountmanagement.groupprincipal.aspx">System.DirectoryServices.AccountManagement.GroupPrincipal</a>. </p>
-        
+</div>
 
-        
 <h2>EXAMPLE 1</h2>
 <pre><code>Install-Group -Name TIEFighters -Description 'Users allowed to be TIE fighter pilots.' -Members EMPIRE\Pilots,EMPIRE\DarthVader</code></pre>
 <p>If the TIE fighters group doesn't exist, it is created with the given description and default members.  If it already exists, its description is updated and the given members are added to it.</p>
+
 
 	<div class="Footer">
 		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.

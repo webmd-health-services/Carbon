@@ -18,11 +18,13 @@
     </ul>
 
     <h1>Get-Group</h1>
-<div><p>Gets <em>local</em> groups.</p></div>
+<div class="Synopsis">
+<p>Gets <em>local</em> groups.</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>Get-Group [[-Name] &lt;String&gt;] [&lt;CommonParameters&gt;]</code></pre>
-    
+
 <h2>Description</h2>
 <div class="Description">
 <p><code>Get-Group</code> gets all <em>local</em> groups or a specific group by its name.</p>
@@ -31,10 +33,10 @@
 
 <p><code>Get-Group</code> is new in Carbon 2.0.</p>
 </div>
-    
+
 <h2>Related Commands</h2>
 
-<ul>
+<ul class="RelatedCommands">
 <li><a href="Get-User.html">Get-User</a></li>
 </ul>
 
@@ -58,21 +60,21 @@
 </tr>
 
 </table>
-        
 
-        
 <h2>Return Values</h2>
+<div class="ReturnValues">
 <p><a href="http://msdn.microsoft.com/en-us/library/system.directoryservices.accountmanagement.groupprincipal.aspx">System.DirectoryServices.AccountManagement.GroupPrincipal</a>. </p>
-        
+</div>
 
-        
 <h2>EXAMPLE 1</h2>
 <pre><code>Get-Group</code></pre>
 <p>Demonstrates how to get all local groups.</p>
 
+
 <h2>EXAMPLE 2</h2>
 <pre><code>Get-Group -Name RebelAlliance</code></pre>
 <p>Demonstrates how to get a specific group.</p>
+
 
 	<div class="Footer">
 		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.

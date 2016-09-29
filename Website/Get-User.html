@@ -18,11 +18,13 @@
     </ul>
 
     <h1>Get-User</h1>
-<div><p>Gets <em>local</em> users.</p></div>
+<div class="Synopsis">
+<p>Gets <em>local</em> users.</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>Get-User [[-UserName] &lt;String&gt;] [&lt;CommonParameters&gt;]</code></pre>
-    
+
 <h2>Description</h2>
 <div class="Description">
 <p><code>Get-User</code> gets all <em>local</em> users. Use the <code>UserName</code> parameter to get  a specific user by its username.</p>
@@ -31,10 +33,10 @@
 
 <p><code>Get-User</code> is new in Carbon 2.0.</p>
 </div>
-    
+
 <h2>Related Commands</h2>
 
-<ul>
+<ul class="RelatedCommands">
 <li><a href="Install-User.html">Install-User</a></li>
 <li><a href="Test-User.html">Test-User</a></li>
 <li><a href="Uninstall-User.html">Uninstall-User</a></li>
@@ -60,21 +62,21 @@
 </tr>
 
 </table>
-        
 
-        
 <h2>Return Values</h2>
+<div class="ReturnValues">
 <p><a href="http://msdn.microsoft.com/en-us/library/system.directoryservices.accountmanagement.userprincipal.aspx">System.DirectoryServices.AccountManagement.UserPrincipal</a>. </p>
-        
+</div>
 
-        
 <h2>EXAMPLE 1</h2>
 <pre><code>Get-User</code></pre>
 <p>Demonstrates how to get all local users.</p>
 
+
 <h2>EXAMPLE 2</h2>
 <pre><code>Get-User -Username LSkywalker</code></pre>
 <p>Demonstrates how to get a specific user.</p>
+
 
 	<div class="Footer">
 		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.

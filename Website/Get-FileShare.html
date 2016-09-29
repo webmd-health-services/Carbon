@@ -18,11 +18,13 @@
     </ul>
 
     <h1>Get-FileShare</h1>
-<div><p>Gets the file/SMB shares on the local computer.</p></div>
+<div class="Synopsis">
+<p>Gets the file/SMB shares on the local computer.</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>Get-FileShare [[-Name] &lt;String&gt;] [&lt;CommonParameters&gt;]</code></pre>
-    
+
 <h2>Description</h2>
 <div class="Description">
 <p>The <code>Get-FileShare</code> function uses WMI to get the file/SMB shares on the current/local computer. The returned objects are <code>Win32_Share</code> WMI objects.</p>
@@ -33,10 +35,10 @@
 
 <p><code>Get-FileShare</code> was added in Carbon 2.0.</p>
 </div>
-    
+
 <h2>Related Commands</h2>
 
-<ul>
+<ul class="RelatedCommands">
 <li><a href="https://msdn.microsoft.com/en-us/library/aa394435.aspx">https://msdn.microsoft.com/en-us/library/aa394435.aspx</a></li>
 <li><a href="Get-FileSharePermission.html">Get-FileSharePermission</a></li>
 <li><a href="Install-FileShare.html">Install-FileShare</a></li>
@@ -64,24 +66,21 @@
 </tr>
 
 </table>
-        
 
-        
-
-        
-
-        
 <h2>EXAMPLE 1</h2>
 <pre><code>Get-FileShare</code></pre>
 <p>Demonstrates how to get all the file shares on the local computer.</p>
+
 
 <h2>EXAMPLE 2</h2>
 <pre><code>Get-FileShare -Name 'Build'</code></pre>
 <p>Demonstrates how to get a specific file share.</p>
 
+
 <h2>EXAMPLE 3</h2>
 <pre><code>Get-FileShare -Name 'Carbon*'</code></pre>
 <p>Demonstrates that you can use wildcards to find all shares that match a wildcard pattern.</p>
+
 
 	<div class="Footer">
 		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.

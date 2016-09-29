@@ -18,21 +18,23 @@
     </ul>
 
     <h1>Set-IisHttpRedirect</h1>
-<div><p>Turns on HTTP redirect for all or part of a website.</p></div>
+<div class="Synopsis">
+<p>Turns on HTTP redirect for all or part of a website.</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>Set-IisHttpRedirect [-SiteName] &lt;String&gt; [[-VirtualPath] &lt;String&gt;] [-Destination] &lt;String&gt; [[-HttpResponseStatus] {Permanent | Found | Temporary}] [-ExactDestination] [-ChildOnly] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
-    
+
 <h2>Description</h2>
 <div class="Description">
 <p>Configures all or part of a website to redirect all requests to another website/URL.  By default, it operates on a specific website.  To configure a directory under a website, set <code>VirtualPath</code> to the virtual path of that directory.</p>
 
 <p>Beginning with Carbon 2.0.1, this function is available only if IIS is installed.</p>
 </div>
-    
+
 <h2>Related Commands</h2>
 
-<ul>
+<ul class="RelatedCommands">
 <li><a href="http://www.iis.net/configreference/system.webserver/httpredirect#005">http://www.iis.net/configreference/system.webserver/httpredirect#005</a></li>
 <li><a href="http://technet.microsoft.com/en-us/library/cc732969(v=WS.10).aspx">http://technet.microsoft.com/en-us/library/cc732969(v=WS.10).aspx</a></li>
 </ul>
@@ -120,24 +122,21 @@
     <td></td>
 </tr>
 </table>
-        
 
-        
-
-        
-
-        
 <h2>EXAMPLE 1</h2>
 <pre><code>Set-IisHttpRedirect -SiteName Peanuts -Destination 'http://new.peanuts.com'</code></pre>
 <p>Redirects all requests to the <code>Peanuts</code> website to <code>http://new.peanuts.com</code>.</p>
+
 
 <h2>EXAMPLE 2</h2>
 <pre><code>Set-IisHttpRedirect -SiteName Peanuts -VirtualPath Snoopy/DogHouse -Destination 'http://new.peanuts.com'</code></pre>
 <p>Redirects all requests to the <code>/Snoopy/DogHouse</code> path on the <code>Peanuts</code> website to <code>http://new.peanuts.com</code>.</p>
 
+
 <h2>EXAMPLE 3</h2>
 <pre><code>Set-IisHttpRedirect -SiteName Peanuts -Destination 'http://new.peanuts.com' -StatusCode 'Temporary'</code></pre>
 <p>Redirects all requests to the <code>Peanuts</code> website to <code>http://new.peanuts.com</code> with a temporary HTTP status code.  You can also specify <code>Found</code> (HTTP 302), or <code>Permanent</code> (HTTP 301).</p>
+
 
 	<div class="Footer">
 		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.

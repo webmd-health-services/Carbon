@@ -18,19 +18,21 @@
     </ul>
 
     <h1>Grant-ServiceControlPermission</h1>
-<div><p>Grants a user/group permission to start/stop (i.e. use PowerShell's <code>*-Service</code> cmdlets) a service.</p></div>
+<div class="Synopsis">
+<p>Grants a user/group permission to start/stop (i.e. use PowerShell's <code>*-Service</code> cmdlets) a service.</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>Grant-ServiceControlPermission [-ServiceName] &lt;String&gt; [-Identity] &lt;String&gt; [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
-    
+
 <h2>Description</h2>
 <div class="Description">
 <p>By default, only Administrators are allowed to control a service. You may notice that when running the <code>Stop-Service</code>, <code>Start-Service</code>, or <code>Restart-Service</code> cmdlets as a non-Administrator, you get permissions errors. That's because you need to correct permissions.  This function grants just the permissions needed to use PowerShell's <code>Stop-Service</code>, <code>Start-Service</code>, and <code>Restart-Service</code> cmdlets to control a service.</p>
 </div>
-    
+
 <h2>Related Commands</h2>
 
-<ul>
+<ul class="RelatedCommands">
 <li><a href="Get-ServicePermission.html">Get-ServicePermission</a></li>
 <li><a href="Grant-ServicePermission.html">Grant-ServicePermission</a></li>
 <li><a href="Revoke-ServicePermission.html">Revoke-ServicePermission</a></li>
@@ -87,16 +89,11 @@
     <td></td>
 </tr>
 </table>
-        
 
-        
-
-        
-
-        
 <h2>EXAMPLE 1</h2>
 <pre><code>Grant-ServiceControlPermission -ServiceName CCService -Identity INITRODE\Builders</code></pre>
 <p>Grants the INITRODE\Builders group permission to control the CruiseControl.NET service.</p>
+
 
 	<div class="Footer">
 		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.

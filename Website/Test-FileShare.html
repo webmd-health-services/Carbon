@@ -18,21 +18,23 @@
     </ul>
 
     <h1>Test-FileShare</h1>
-<div><p>Tests if a file/SMB share exists on the local computer.</p></div>
+<div class="Synopsis">
+<p>Tests if a file/SMB share exists on the local computer.</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>Test-FileShare [-Name] &lt;String&gt; [&lt;CommonParameters&gt;]</code></pre>
-    
+
 <h2>Description</h2>
 <div class="Description">
 <p>The <code>Test-FileShare</code> function uses WMI to check if a file share exists on the local computer. If the share exists, <code>Test-FileShare</code> returns <code>$true</code>. Otherwise, it returns <code>$false</code>.</p>
 
 <p><code>Test-FileShare</code> was added in Carbon 2.0.</p>
 </div>
-    
+
 <h2>Related Commands</h2>
 
-<ul>
+<ul class="RelatedCommands">
 <li><a href="Get-FileShare.html">Get-FileShare</a></li>
 <li><a href="Get-FileSharePermission.html">Get-FileSharePermission</a></li>
 <li><a href="Install-FileShare.html">Install-FileShare</a></li>
@@ -59,16 +61,11 @@
 </tr>
 
 </table>
-        
 
-        
-
-        
-
-        
 <h2>EXAMPLE 1</h2>
 <pre><code>Test-FileShare -Name 'CarbonShare'</code></pre>
 <p>Demonstrates how to test of a file share exists.</p>
+
 
 	<div class="Footer">
 		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.

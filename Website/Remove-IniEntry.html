@@ -18,11 +18,13 @@
     </ul>
 
     <h1>Remove-IniEntry</h1>
-<div><p>Removes an entry/line/setting from an INI file.</p></div>
+<div class="Synopsis">
+<p>Removes an entry/line/setting from an INI file.</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>Remove-IniEntry [-Path] &lt;String&gt; [-Name] &lt;String&gt; [[-Section] &lt;String&gt;] [-CaseSensitive] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
-    
+
 <h2>Description</h2>
 <div class="Description">
 <p>A configuration file consists of sections, led by a <code>[section]</code> header and followed by <code>name = value</code> entries.  This function removes an entry in an INI file.  Something like this:</p>
@@ -41,10 +43,10 @@ extdiff =
 
 <p>Be default, operates on the INI file case-insensitively. If your INI is case-sensitive, use the <code>-CaseSensitive</code> switch.</p>
 </div>
-    
+
 <h2>Related Commands</h2>
 
-<ul>
+<ul class="RelatedCommands">
 <li><a href="Set-IniEntry.html">Set-IniEntry</a></li>
 <li><a href="Split-Ini.html">Split-Ini</a></li>
 </ul>
@@ -116,20 +118,16 @@ extdiff =
     <td></td>
 </tr>
 </table>
-        
 
-        
-
-        
-
-        
 <h2>EXAMPLE 1</h2>
 <pre><code>Remove-IniEntry -Path C:\Projects\Carbon\StupidStupid.ini -Section rat -Name tails</code></pre>
 <p>Removes the <code>tails</code> item in the <code>[rat]</code> section of the <code>C:\Projects\Carbon\StupidStupid.ini</code> file.</p>
 
+
 <h2>EXAMPLE 2</h2>
 <pre><code>Remove-IniEntry -Path C:\Users\me\npmrc -Name 'prefix' -CaseSensitive</code></pre>
 <p>Demonstrates how to remove an INI entry in an INI file that is case-sensitive.</p>
+
 
 	<div class="Footer">
 		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.

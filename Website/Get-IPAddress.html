@@ -18,12 +18,14 @@
     </ul>
 
     <h1>Get-IPAddress</h1>
-<div><p>Gets the IP addresses in use on the local computer.</p></div>
+<div class="Synopsis">
+<p>Gets the IP addresses in use on the local computer.</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>Get-IPAddress [&lt;CommonParameters&gt;]</code></pre>
 <pre class="Syntax"><code>Get-IPAddress [-V4] [-V6] [&lt;CommonParameters&gt;]</code></pre>
-    
+
 <h2>Description</h2>
 <div class="Description">
 <p>The .NET API for getting all the IP addresses in use on the current computer's network intefaces is pretty cumbersome.  If all you care about is getting the IP addresses in use on the current computer, and you don't care where/how they're used, use this function.</p>
@@ -33,10 +35,10 @@
 <pre><code>[Net.NetworkInformation.NetworkInterface]::GetNetworkInterfaces()
 </code></pre>
 </div>
-    
+
 <h2>Related Commands</h2>
 
-<ul>
+<ul class="RelatedCommands">
 <li><a href="http://stackoverflow.com/questions/1069103/how-to-get-my-own-ip-address-in-c">http://stackoverflow.com/questions/1069103/how-to-get-my-own-ip-address-in-c</a></li>
 </ul>
 
@@ -68,25 +70,26 @@
 </tr>
 
 </table>
-        
 
-        
 <h2>Return Values</h2>
+<div class="ReturnValues">
 <p><a href="http://msdn.microsoft.com/en-us/library/system.net.ipaddress.aspx">System.Net.IPAddress</a>. </p>
-        
+</div>
 
-        
 <h2>EXAMPLE 1</h2>
 <pre><code>Get-IPAddress</code></pre>
 <p>Returns all the IP addresses in use on the local computer, IPv4 <em>and</em> IPv6.</p>
+
 
 <h2>EXAMPLE 2</h2>
 <pre><code>Get-IPAddress -V4</code></pre>
 <p>Returns just the IPv4 addresses in use on the local computer.</p>
 
+
 <h2>EXAMPLE 3</h2>
 <pre><code>Get-IPADdress -V6</code></pre>
 <p>Retruns just the IPv6 addresses in use on the local computer.</p>
+
 
 	<div class="Footer">
 		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.

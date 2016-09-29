@@ -17,7 +17,47 @@
         <li><a href="http://bitbucket.org/splatteredbits/carbon">-Project</a></li>
     </ul>
 
-    <h1>2.2.0 (11 May 2016)</h1>
+    <h1>2.3.0 (29 September 2016)</h1>
+
+<h2>Enhancements</h2>
+
+<ul>
+<li><a href="Protect-String.html">Protect-String</a> can now encrypt with a key, password, or passphrase (i.e. it can now encrypt with symmetric encryption).</li>
+<li><a href="Unprotect-String.html">Unprotect-String</a> can now decrypt with a key, password, or passphrase (i.e. it can now decrypt using symmetric encryption).</li>
+<li><a href="Set-HostsEntry.html">Set-HostsEntry</a> now supports IPv6 addresses (<a href="https://bitbucket.org/splatteredbits/carbon/issues/181/community-set-hostsentry-add-support-for">fixes issue</a>).</li>
+<li><a href="Grant-Permission.html">Grant-Permission</a> now supports creating <code>Deny</code> access rules. Use the new <code>Type</code> parameter. <a href="https://bitbucket.org/splatteredbits/carbon/issues/152">Fixes issue #152.</a></li>
+<li><a href="Set-EnvironmentVariable.html">Set-EnvironmentVariable</a>: 
+<ul>
+<li>Added <code>-Force</code> switch to make all variable modifications immediately visible in the current PowerShell process's <code>env:</code> drive. Restarts are no longer required.</li>
+<li>You can now set an environment variable for other users. Use the <code>Credential</code> parameter to specify the user's credentials. <a href="https://bitbucket.org/splatteredbits/carbon/issues/151">Fixes issue #151.</a></li>
+</ul></li>
+<li><a href="Remove-EnvironmentVariable.html">Remove-EnvironmentVariable</a>: 
+<ul>
+<li>Added <code>-Force</code> switch to make all variable removals immediately visible in the current PowerShell process's <code>env:</code> drive. Restarts are no longer required.</li>
+<li>You can now remove variables from multiple targets/scopes at once.</li>
+<li>You can now remove an environment variable for other users. Use the <code>Credential</code> parameter to specify the user's credentials.</li>
+</ul></li>
+<li><a href="Invoke-PowerShell.html">Invoke-PowerShell</a>:
+<ul>
+<li>It now runs PowerShell commands. Pass a string of PowerShell code with the <code>Command</code> parameter. </li>
+<li>It now runs encoded PowerShell commands. Pass the string of PowerShell code with the <code>Command</code> parameter and use the <code>-Encode</code> switch.</li>
+<li>It now runs scripts and commands as another user. Use the <code>Credential</code> parameter to pass the user's credentials along with the <code>FilePath</code> and <code>Command</code> parameters to run scripts and commands, respectively.</li>
+</ul></li>
+</ul>
+
+<h2>Bug Fixes</h2>
+
+<ul>
+<li>Fixed: <a href="Set-RegistryKeyValue.html">Set-RegistryKeyValue</a> fails when <code>-String</code> parameter's value is <code>$null</code> or empty (<a href="https://bitbucket.org/splatteredbits/carbon/issues/211/set-registrykeyvalue-null-string-invalid">fixes issue #211</a>).</li>
+<li>Fixed: Can't import Carbon in a 32-bit PowerShell 4 session on a 64-bit operating system (<a href="https://bitbucket.org/splatteredbits/carbon/issues/199/community-issue-importing-carbon-on-x64">fixes issue #199</a>).</li>
+<li>Fixed: Documentation for the <a href="Install-ScheduledTask.html">Install-ScheduledTask</a> function's <code>HighestAvailableRunLevel</code> is lying (<a href="https://bitbucket.org/splatteredbits/carbon/issues/205/documentation-install-scheduledtask-typo">fixes issue #205</a>).</li>
+<li>Fixed: <code>Carbon_FirewallRule</code> fails when <code>Profile</code> property set to multiple values (<a href="https://bitbucket.org/splatteredbits/carbon/issues/209/dsc-carbon_firewallrule-does-not-accept">fixes issue #209</a>).</li>
+<li>Fixed: <a href="Install-IisAppPool.html">Install-IisAppPool</a> can't set .NET framework version to <code>No Managed Code</code> (<a href="https://bitbucket.org/splatteredbits/carbon/issues/210/install-iisapppool-need-to-be-able-to-set">fixes issue #210</a>).</li>
+<li>Fixed: <a href="Get-SslCertificateBinding.html">Get-SslCertificateBinding</a> fails if the operating system's culture is not <code>en-US</code> (<a href="https://bitbucket.org/splatteredbits/carbon/issues/171/get-sslcertificatebinding-fails-when-os">fixes issue #171</a>).</li>
+<li>Fixed: <a href="Install-ScheduledTask.html">Install-ScheduledTask</a> fails when creating a task that runs during a specific week of the month on Sundays. (You're going to love this: the underlying int value for <code>[DayOfWeek]::Sunday</code> is <code>0</code>, so when testing if a <code>DayOfWeek</code> typed variable set to <code>Sunday</code> has a value, it returns <code>$false</code>. This made <a href="Install-ScheduledTask.html">Install-ScheduledTask</a> add the <code>/D</code> parameter without a value.</li>
+</ul>
+
+<h1>2.2.0 (11 May 2016)</h1>
 
 <h2>Enhancements</h2>
 

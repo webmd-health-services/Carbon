@@ -18,19 +18,19 @@
     </ul>
 
     <h1>Get-PathProvider</h1>
-<div><p>Returns a path's PowerShell provider.</p></div>
+<div class="Synopsis">
+<p>Returns a path's PowerShell provider.</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>Get-PathProvider [-Path] &lt;String&gt; [&lt;CommonParameters&gt;]</code></pre>
-    
+
 <h2>Description</h2>
 <div class="Description">
 <p>When you want to do something with a path that depends on its provider, use this function.  The path doesn't have to exist.</p>
 
 <p>If you pass in a relative path, it is resolved relative to the current directory.  So make sure you're in the right place.</p>
 </div>
-    
-
 
 <h2> Parameters </h2>
 <table id="Parameters">
@@ -52,17 +52,16 @@
 </tr>
 
 </table>
-        
 
-        
 <h2>Return Values</h2>
+<div class="ReturnValues">
 <p><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.providerinfo.aspx">System.Management.Automation.ProviderInfo</a>. </p>
-        
+</div>
 
-        
 <h2>EXAMPLE 1</h2>
 <pre><code>Get-PathProvider -Path 'C:\Windows'</code></pre>
 <p>Demonstrates how to get the path provider for an NTFS path.</p>
+
 
 	<div class="Footer">
 		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.

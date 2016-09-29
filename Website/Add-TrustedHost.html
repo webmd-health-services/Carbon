@@ -18,21 +18,23 @@
     </ul>
 
     <h1>Add-TrustedHost</h1>
-<div><p>Adds an item to the computer's list of trusted hosts.</p></div>
+<div class="Synopsis">
+<p>Adds an item to the computer's list of trusted hosts.</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>Add-TrustedHost [-Entry] &lt;String[]&gt; [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
-    
+
 <h2>Description</h2>
 <div class="Description">
 <p>Adds an entry to this computer's list of trusted hosts.  If the item already exists, nothing happens.</p>
 
 <p>PowerShell Remoting needs to be turned on for this function to work.</p>
 </div>
-    
+
 <h2>Related Commands</h2>
 
-<ul>
+<ul class="RelatedCommands">
 <li><a href="http://go.microsoft.com/fwlink/?LinkID=144300.html">Enable-PSRemoting</a></li>
 </ul>
 
@@ -79,16 +81,11 @@
     <td></td>
 </tr>
 </table>
-        
 
-        
-
-        
-
-        
 <h2>EXAMPLE 1</h2>
 <pre><code>Add-TrustedHost -Entry example.com</code></pre>
 <p>Adds <code>example.com</code> to the list of this computer's trusted hosts.  If <code>example.com</code> is already on the list of trusted hosts, nothing happens.</p>
+
 
 	<div class="Footer">
 		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.

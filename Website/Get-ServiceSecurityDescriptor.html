@@ -18,19 +18,21 @@
     </ul>
 
     <h1>Get-ServiceSecurityDescriptor</h1>
-<div><p>Gets the raw security descriptor for a service.</p></div>
+<div class="Synopsis">
+<p>Gets the raw security descriptor for a service.</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>Get-ServiceSecurityDescriptor [-Name] &lt;String&gt; [&lt;CommonParameters&gt;]</code></pre>
-    
+
 <h2>Description</h2>
 <div class="Description">
 <p>You probably don't want to mess with the raw security descriptor.  Try <code>Get-ServicePermission</code> instead.  Much more useful.</p>
 </div>
-    
+
 <h2>Related Commands</h2>
 
-<ul>
+<ul class="RelatedCommands">
 <li><a href="Get-ServicePermission.html">Get-ServicePermission</a></li>
 <li>Grant-ServicePermissions</li>
 <li>Revoke-ServicePermissions</li>
@@ -56,17 +58,16 @@
 </tr>
 
 </table>
-        
 
-        
 <h2>Return Values</h2>
+<div class="ReturnValues">
 <p><a href="http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.rawsecuritydescriptor.aspx">System.Security.AccessControl.RawSecurityDescriptor</a>. </p>
-        
+</div>
 
-        
 <h2>EXAMPLE 1</h2>
 <pre><code>Get-ServiceSecurityDescriptor -Name 'Hyperdrive'</code></pre>
 <p>Gets the hyperdrive service's raw security descriptor.</p>
+
 
 	<div class="Footer">
 		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.

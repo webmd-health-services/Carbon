@@ -18,11 +18,13 @@
     </ul>
 
     <h1>Grant-Privilege</h1>
-<div><p>Grants an identity priveleges to perform system operations.</p></div>
+<div class="Synopsis">
+<p>Grants an identity priveleges to perform system operations.</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>Grant-Privilege [-Identity] &lt;String&gt; [-Privilege] &lt;String[]&gt; [&lt;CommonParameters&gt;]</code></pre>
-    
+
 <h2>Description</h2>
 <div class="Description">
 <p><em>Privilege names are <strong>case-sensitive</strong>.</em> Valid privileges are documented on Microsoft's website: <a href="http://msdn.microsoft.com/en-us/library/windows/desktop/bb530716.aspx">Privilege Constants</a> and <a href="http://msdn.microsoft.com/en-us/library/windows/desktop/bb545671.aspx">Account Right Constants</a>. Here is the most current list, as of August 2014:</p>
@@ -75,10 +77,10 @@
 <li>SeUnsolicitedInputPrivilege</li>
 </ul>
 </div>
-    
+
 <h2>Related Commands</h2>
 
-<ul>
+<ul class="RelatedCommands">
 <li><a href="Get-Privilege.html">Get-Privilege</a></li>
 <li><a href="Revoke-Privilege.html">Revoke-Privilege</a></li>
 <li><a href="Test-Privilege.html">Test-Privilege</a></li>
@@ -114,16 +116,11 @@
 </tr>
 
 </table>
-        
 
-        
-
-        
-
-        
 <h2>EXAMPLE 1</h2>
 <pre><code>Grant-Privilege -Identity Batcomputer -Privilege SeServiceLogonRight</code></pre>
 <p>Grants the Batcomputer account the ability to logon as a service. <em>Privilege names are <strong>case-sensitive</strong>.</em></p>
+
 
 	<div class="Footer">
 		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.

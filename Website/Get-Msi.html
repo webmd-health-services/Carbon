@@ -18,11 +18,13 @@
     </ul>
 
     <h1>Get-Msi</h1>
-<div><p>Gets details about an MSI file.</p></div>
+<div class="Synopsis">
+<p>Gets details about an MSI file.</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>Get-Msi [-Path] &lt;String[]&gt; [&lt;CommonParameters&gt;]</code></pre>
-    
+
 <h2>Description</h2>
 <div class="Description">
 <p>The <code>Get-Msi</code> function reads the installer properties from an MSI file and returns a <code>Carbon.Msi.MsiInfo</code> object representing an MSI's properties. <code>Carbon.Msi.MsiInfo</code> has properties for the following required MSI properties:</p>
@@ -41,10 +43,10 @@
 
 <p><code>Get-Msi</code> was introduced in Carbon 2.0.</p>
 </div>
-    
+
 <h2>Related Commands</h2>
 
-<ul>
+<ul class="RelatedCommands">
 <li><a href="https://msdn.microsoft.com/en-us/library/aa370905.aspx">https://msdn.microsoft.com/en-us/library/aa370905.aspx</a></li>
 </ul>
 
@@ -68,21 +70,21 @@
 </tr>
 
 </table>
-        
 
-        
 <h2>Return Values</h2>
+<div class="ReturnValues">
 <p>Carbon.Msi.MsiInfo. </p>
-        
+</div>
 
-        
 <h2>EXAMPLE 1</h2>
 <pre><code>Get-Msi -Path MyCool.msi</code></pre>
 <p>Demonstrates how to read the properties from <code>MyCool.msi</code> file.</p>
 
+
 <h2>EXAMPLE 2</h2>
 <pre><code>Get-ChildItem *.msi -Recurse | Get-Msi</code></pre>
 <p>Demonstrates how you can pipe file info objects into <code>Get-Msi</code>.</p>
+
 
 	<div class="Footer">
 		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.

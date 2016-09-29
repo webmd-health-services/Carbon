@@ -18,14 +18,16 @@
     </ul>
 
     <h1>Uninstall-Certificate</h1>
-<div><p>Removes a certificate from a store for the user or machine account.</p></div>
+<div class="Synopsis">
+<p>Removes a certificate from a store for the user or machine account.</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>Uninstall-Certificate -Thumbprint &lt;String&gt; -StoreLocation {CurrentUser | LocalMachine} -CustomStoreName &lt;String&gt; [-Session &lt;PSSession[]&gt;] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
 <pre class="Syntax"><code>Uninstall-Certificate -Thumbprint &lt;String&gt; -StoreLocation {CurrentUser | LocalMachine} -StoreName {AddressBook | AuthRoot | CertificateAuthority | Disallowed | My | Root | TrustedPeople | TrustedPublisher} [-Session &lt;PSSession[]&gt;] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
 <pre class="Syntax"><code>Uninstall-Certificate -Certificate &lt;X509Certificate2&gt; -StoreLocation {CurrentUser | LocalMachine} -CustomStoreName &lt;String&gt; [-Session &lt;PSSession[]&gt;] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
 <pre class="Syntax"><code>Uninstall-Certificate -Certificate &lt;X509Certificate2&gt; -StoreLocation {CurrentUser | LocalMachine} -StoreName {AddressBook | AuthRoot | CertificateAuthority | Disallowed | My | Root | TrustedPeople | TrustedPublisher} [-Session &lt;PSSession[]&gt;] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
-    
+
 <h2>Description</h2>
 <div class="Description">
 <p>The <code>Uninstall-Certificate</code> function uses .NET's certificates API to remove a certificate from a given store for the machine or current user. Use the thumbprint to identify which certificate to remove. The thumbprint is unique to each certificate. The user performing the removal must have read and write permission on the store where the certificate is located.</p>
@@ -34,8 +36,6 @@
 
 <p>To uninstall a certificate from a remote computer, use the <code>Session</code>parameter, which was added in Carbon 2.1.0. You can create a new session with the <code>New-PSSession</code> cmdlet.</p>
 </div>
-    
-
 
 <h2> Parameters </h2>
 <table id="Parameters">
@@ -122,16 +122,11 @@
     <td></td>
 </tr>
 </table>
-        
 
-        
-
-        
-
-        
 <h2>EXAMPLE 1</h2>
 <pre><code>Uninstall-Certificate -Thumbprint 570895470234023dsaaefdbcgbefa -StoreLocation CurrentUser -StoreName My</code></pre>
 <p>Removes the 570895470234023dsaaefdbcgbefa certificate from the current user's Personal certificate store.</p>
+
 
 <h2>EXAMPLE 2</h2>
 <pre><code>$cert = Get-Certificate -FriendlyName 'Carbon Testing Certificate' -StoreLocation LocalMachine -StoreName Root</code></pre>
@@ -141,13 +136,16 @@
 
 <p>Removes the certificate with friendly name 'Carbon Testing Certificate' from the local machine's Trusted Root Certification Authorities store.</p>
 
+
 <h2>EXAMPLE 3</h2>
 <pre><code>Uninstall-Certificate -Thumbprint 570895470234023dsaaefdbcgbefa -StoreLocation LocalMachine -StoreName 'SharePoint'</code></pre>
 <p>Demonstrates how to uninstall a certificate from a custom, non-standard store.</p>
 
+
 <h2>EXAMPLE 4</h2>
 <pre><code>Uninstall-Certificate -Thumbprint 570895470234023dsaaefdbcgbefa -StoreLocation CurrentUser -StoreName My -Session (New-PSSession -ComputerName remote1,remote2)</code></pre>
 <p>Demonstrates how to uninstall a certificate from a remote computer.</p>
+
 
 	<div class="Footer">
 		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.

@@ -18,21 +18,23 @@
     </ul>
 
     <h1>Set-IisHttpHeader</h1>
-<div><p>Sets an HTTP header for a website or a directory under a website.</p></div>
+<div class="Synopsis">
+<p>Sets an HTTP header for a website or a directory under a website.</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>Set-IisHttpHeader [-SiteName] &lt;String&gt; [[-VirtualPath] &lt;String&gt;] [-Name] &lt;String&gt; [-Value] &lt;String&gt; [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
-    
+
 <h2>Description</h2>
 <div class="Description">
 <p>If the HTTP header doesn't exist, it is created.  If a header exists, its value is replaced.</p>
 
 <p>Beginning with Carbon 2.0.1, this function is available only if IIS is installed.</p>
 </div>
-    
+
 <h2>Related Commands</h2>
 
-<ul>
+<ul class="RelatedCommands">
 <li><a href="Get-IisHttpHeader.html">Get-IisHttpHeader</a></li>
 </ul>
 
@@ -103,20 +105,16 @@
     <td></td>
 </tr>
 </table>
-        
 
-        
-
-        
-
-        
 <h2>EXAMPLE 1</h2>
 <pre><code>Set-IisHttpHeader -SiteName 'SopwithCamel' -Name 'X-Flown-By' -Value 'Snoopy'</code></pre>
 <p>Sets or creates the <code>SopwithCamel</code> website's <code>X-Flown-By</code> HTTP header to the value <code>Snoopy</code>.</p>
 
+
 <h2>EXAMPLE 2</h2>
 <pre><code>Set-IisHttpHeader -SiteName 'SopwithCamel' -VirtualPath 'Engine' -Name 'X-Powered-By' -Value 'Root Beer'</code></pre>
 <p>Sets or creates the <code>SopwithCamel</code> website's <code>Engine</code> sub-directory's <code>X-Powered-By</code> HTTP header to the value <code>Root Beer</code>.</p>
+
 
 	<div class="Footer">
 		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.

@@ -18,17 +18,17 @@
     </ul>
 
     <h1>Get-RegistryKeyValue</h1>
-<div><p>Gets the value from a registry key.</p></div>
+<div class="Synopsis">
+<p>Gets the value from a registry key.</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>Get-RegistryKeyValue [-Path] &lt;String&gt; [-Name] &lt;String&gt; [&lt;CommonParameters&gt;]</code></pre>
-    
+
 <h2>Description</h2>
 <div class="Description">
 <p>PowerShell's <code>Get-ItemProperty</code> cmdlet is a pain to use.  It doesn't actually return an object representing a registry key's value, but some other weird object that requires painful gyrations to get values from. This function returns just the value of a key.</p>
 </div>
-    
-
 
 <h2> Parameters </h2>
 <table id="Parameters">
@@ -58,16 +58,11 @@
 </tr>
 
 </table>
-        
 
-        
-
-        
-
-        
 <h2>EXAMPLE 1</h2>
 <pre><code>Get-RegistryKeyValue -Path 'hklm:\Software\Carbon\Test' -Name 'Title'</code></pre>
 <p>Returns the value of the 'hklm:\Software\Carbon\Test' key's <code>Title</code> value.</p>
+
 
 	<div class="Footer">
 		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.

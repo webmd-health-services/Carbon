@@ -18,21 +18,23 @@
     </ul>
 
     <h1>Enable-IEActivationPermission</h1>
-<div><p>Grants all users permission to start/launch Internet Explorer.</p></div>
+<div class="Synopsis">
+<p>Grants all users permission to start/launch Internet Explorer.</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>Enable-IEActivationPermission [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
-    
+
 <h2>Description</h2>
 <div class="Description">
 <p>By default, unprivileged users can't launch/start Internet Explorer. This prevents those users from using Internet Explorer to run automated, browser-based tests.  This function modifies Windows so that all users can launch Internet Explorer.</p>
 
 <p>You may also need to call Disable-IEEnhancedSecurityConfiguration, so that Internet Explorer is allowed to visit all websites.</p>
 </div>
-    
+
 <h2>Related Commands</h2>
 
-<ul>
+<ul class="RelatedCommands">
 <li><a href="Disable-IEEnhancedSecurityConfiguration.html">Disable-IEEnhancedSecurityConfiguration</a></li>
 </ul>
 
@@ -71,15 +73,10 @@
     <td></td>
 </tr>
 </table>
-        
 
-        
-
-        
-
-        
 <h2>EXAMPLE 1</h2>
 <pre><code>Enable-IEActivationPermission</code></pre>
+
 
 
 	<div class="Footer">

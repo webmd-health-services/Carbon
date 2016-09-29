@@ -18,12 +18,14 @@
     </ul>
 
     <h1>Get-DscError</h1>
-<div><p>Gets DSC errors from a computer's event log.</p></div>
+<div class="Synopsis">
+<p>Gets DSC errors from a computer's event log.</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>Get-DscError [-ComputerName &lt;String[]&gt;] [-StartTime &lt;DateTime&gt;] [-EndTime &lt;DateTime&gt;] [&lt;CommonParameters&gt;]</code></pre>
 <pre class="Syntax"><code>Get-DscError [-ComputerName &lt;String[]&gt;] [-StartTime &lt;DateTime&gt;] [-EndTime &lt;DateTime&gt;] -Wait [-WaitTimeoutSeconds &lt;UInt32&gt;] [&lt;CommonParameters&gt;]</code></pre>
-    
+
 <h2>Description</h2>
 <div class="Description">
 <p>The DSC Local Configuration Manager (LCM) writes any errors it encounters to the <code>Microsoft-Windows-DSC/Operational</code> event log, in addition to some error messages that report that encountered an error. This function gets just the important error log messages, skipping the superflous ones that won't help you track down where the problem is.</p>
@@ -44,10 +46,10 @@
 
 <p><code>Get-DscError</code> is new in Carbon 2.0.</p>
 </div>
-    
+
 <h2>Related Commands</h2>
 
-<ul>
+<ul class="RelatedCommands">
 <li><a href="Write-DscError.html">Write-DscError</a></li>
 </ul>
 
@@ -103,33 +105,36 @@
 </tr>
 
 </table>
-        
 
-        
 <h2>Return Values</h2>
+<div class="ReturnValues">
 <p><a href="http://msdn.microsoft.com/en-us/library/system.diagnostics.eventing.reader.eventlogrecord.aspx">System.Diagnostics.Eventing.Reader.EventLogRecord</a>. </p>
-        
+</div>
 
-        
 <h2>EXAMPLE 1</h2>
 <pre><code>Get-DscWinEvent</code></pre>
 <p>Demonstrates how to get all the DSC errors from the local computer.</p>
+
 
 <h2>EXAMPLE 2</h2>
 <pre><code>Get-DscError -ComputerName 10.1.2.3</code></pre>
 <p>Demonstrates how to get all the DSC errors from a specific computer.</p>
 
+
 <h2>EXAMPLE 3</h2>
 <pre><code>Get-DscError -StartTime '8/1/2014 0:00'</code></pre>
 <p>Demonstrates how to get errors that occurred <em>after</em> a given time.</p>
+
 
 <h2>EXAMPLE 4</h2>
 <pre><code>Get-DscError -EndTime '8/30/2014 11:59:59'</code></pre>
 <p>Demonstrates how to get errors that occurred <em>before</em> a given time.</p>
 
+
 <h2>EXAMPLE 5</h2>
 <pre><code>Get-DscError -StartTime '8/1/2014 2:58 PM' -Wait -WaitTimeoutSeconds 5</code></pre>
 <p>Demonstrates how to wait for entries that match the specified criteria to appear in the event log. It can take several seconds between the time a log entry is written to when you can read it.</p>
+
 
 	<div class="Footer">
 		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.

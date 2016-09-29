@@ -18,19 +18,19 @@
     </ul>
 
     <h1>Reset-HostsFile</h1>
-<div><p>Removes all custom host entries from this computer's hosts file.</p></div>
+<div class="Synopsis">
+<p>Removes all custom host entries from this computer's hosts file.</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>Reset-HostsFile [[-Path] &lt;String&gt;] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
-    
+
 <h2>Description</h2>
 <div class="Description">
 <p>Sometimes you want to start over.  This method removes all hosts entries from your hosts file after the default localhost entry.</p>
 
 <p>By default, the current computer's hosts file is reset.  You can operate on a custom hosts file by passing its path to the <code>Path</code> argument.</p>
 </div>
-    
-
 
 <h2> Parameters </h2>
 <table id="Parameters">
@@ -75,13 +75,7 @@
     <td></td>
 </tr>
 </table>
-        
 
-        
-
-        
-
-        
 <h2>EXAMPLE 1</h2>
 <pre><code>Reset-HostsFile</code></pre>
 <p>If your hosts file contains something like this:</p>
@@ -96,9 +90,11 @@
 <pre><code>127.0.0.1        localhost
 </code></pre>
 
+
 <h2>EXAMPLE 2</h2>
 <pre><code>Reset-HostsFile -Path my\custom\hosts</code></pre>
 <p>Resets the hosts file at <code>my\custom\hosts</code>.</p>
+
 
 	<div class="Footer">
 		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.

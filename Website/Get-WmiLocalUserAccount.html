@@ -18,21 +18,23 @@
     </ul>
 
     <h1>Get-WmiLocalUserAccount</h1>
-<div><p>Gets a WMI <code>Win32_UserAccount</code> object for a <em>local</em> user account.</p></div>
+<div class="Synopsis">
+<p>Gets a WMI <code>Win32_UserAccount</code> object for a <em>local</em> user account.</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>Get-WmiLocalUserAccount [-Username] &lt;String&gt; [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
-    
+
 <h2>Description</h2>
 <div class="Description">
 <p>Man, there are so many ways to get a user account in Windows.  This function uses WMI to get a local user account.  It returns a <code>Win32_UserAccount</code> object.  The username has to be less than 20 characters.  We don't remember why anymore, but it's probaly a restriction of WMI.  Or Windows.  Or both.</p>
 
 <p>You can do this with <code>Get-WmiObject</code>, but when you try to get a <code>Win32_UserAccount</code>, PowerShell reaches out to your domain and gets all the users it finds, even if you filter by name.  This is slow!  This function stops WMI from talking to your domain, so it is faster.</p>
 </div>
-    
+
 <h2>Related Commands</h2>
 
-<ul>
+<ul class="RelatedCommands">
 <li><a href="http://msdn.microsoft.com/en-us/library/windows/desktop/aa394507(v=vs.85).aspx">http://msdn.microsoft.com/en-us/library/windows/desktop/aa394507(v=vs.85).aspx</a></li>
 </ul>
 
@@ -79,16 +81,11 @@
     <td></td>
 </tr>
 </table>
-        
 
-        
-
-        
-
-        
 <h2>EXAMPLE 1</h2>
 <pre><code>Get-WmiLocalUserAccount -Username Administrator</code></pre>
 <p>Gets the local Administrator account as a <code>Win32_UserAccount</code> WMI object.</p>
+
 
 	<div class="Footer">
 		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.

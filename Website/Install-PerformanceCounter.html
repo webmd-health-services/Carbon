@@ -18,22 +18,24 @@
     </ul>
 
     <h1>Install-PerformanceCounter</h1>
-<div><p>Installs a performance counter.</p></div>
+<div class="Synopsis">
+<p>Installs a performance counter.</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>Install-PerformanceCounter -CategoryName &lt;String&gt; -Name &lt;String&gt; [-Description &lt;String&gt;] -Type {NumberOfItemsHEX32 | NumberOfItemsHEX64 | NumberOfItems32 | NumberOfItems64 | CounterDelta32 | CounterDelta64 | SampleCounter | CountPerTimeInterval32 | CountPerTimeInterval64 | RateOfCountsPerSecond32 | RateOfCountsPerSecond64 | RawFraction | CounterTimer | Timer100Ns | SampleFraction | CounterTimerInverse | Timer100NsInverse | CounterMultiTimer | CounterMultiTimer100Ns | CounterMultiTimerInverse | CounterMultiTimer100NsInverse | AverageTimer32 | ElapsedTime | AverageCount64 | SampleBase | AverageBase | RawBase | CounterMultiBase} [-Force] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
 <pre class="Syntax"><code>Install-PerformanceCounter -CategoryName &lt;String&gt; -Name &lt;String&gt; [-Description &lt;String&gt;] -Type {NumberOfItemsHEX32 | NumberOfItemsHEX64 | NumberOfItems32 | NumberOfItems64 | CounterDelta32 | CounterDelta64 | SampleCounter | CountPerTimeInterval32 | CountPerTimeInterval64 | RateOfCountsPerSecond32 | RateOfCountsPerSecond64 | RawFraction | CounterTimer | Timer100Ns | SampleFraction | CounterTimerInverse | Timer100NsInverse | CounterMultiTimer | CounterMultiTimer100Ns | CounterMultiTimerInverse | CounterMultiTimer100NsInverse | AverageTimer32 | ElapsedTime | AverageCount64 | SampleBase | AverageBase | RawBase | CounterMultiBase} -BaseName &lt;String&gt; [-BaseDescription &lt;String&gt;] -BaseType {NumberOfItemsHEX32 | NumberOfItemsHEX64 | NumberOfItems32 | NumberOfItems64 | CounterDelta32 | CounterDelta64 | SampleCounter | CountPerTimeInterval32 | CountPerTimeInterval64 | RateOfCountsPerSecond32 | RateOfCountsPerSecond64 | RawFraction | CounterTimer | Timer100Ns | SampleFraction | CounterTimerInverse | Timer100NsInverse | CounterMultiTimer | CounterMultiTimer100Ns | CounterMultiTimerInverse | CounterMultiTimer100NsInverse | AverageTimer32 | ElapsedTime | AverageCount64 | SampleBase | AverageBase | RawBase | CounterMultiBase} [-Force] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
-    
+
 <h2>Description</h2>
 <div class="Description">
 <p>Creates a new performance counter with a specific name, description, and type under a given category.  The counter's category is re-created: its current counters are retrieved, the category is removed, a the category is re-created.  Unfortunately, we haven't been able to find any .NET APIs that allow us to delete and create an existing counter.</p>
 
 <p>If you're creating a performance counter that relies on an accompanying base counter, use the <code>BaseName</code>, <code>BaseDescription</code>, and <code>BaseType</code> parameters to properly add the base counter.</p>
 </div>
-    
+
 <h2>Related Commands</h2>
 
-<ul>
+<ul class="RelatedCommands">
 <li><a href="http://msdn.microsoft.com/en-us/library/system.diagnostics.performancecountertype.aspx">http://msdn.microsoft.com/en-us/library/system.diagnostics.performancecountertype.aspx</a></li>
 </ul>
 
@@ -136,20 +138,16 @@
     <td></td>
 </tr>
 </table>
-        
 
-        
-
-        
-
-        
 <h2>EXAMPLE 1</h2>
 <pre><code>Install-PerformanceCounter -CategoryName ToyotaCamry -Name MilesPerGallon -Description 'The miles per gallon fuel efficiency.' -Type NumberOfItems32</code></pre>
 <p>Creates a new miles per gallon performance counter for the ToyotaCamry category.</p>
 
+
 <h2>EXAMPLE 2</h2>
 <pre><code>Install-PerformanceCounter -CategoryName "Dispatcher" -Name "Average Dispatch time" -Type AverageTimer32 -BaseName "Average Dispatch Base" -BaseType AverageBase -Force</code></pre>
 <p>Creates a counter to collect average timings, with a base counter.  Some counters require base counters, which have to be added a specific way to work properly.</p>
+
 
 	<div class="Footer">
 		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.

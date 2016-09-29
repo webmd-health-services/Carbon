@@ -18,19 +18,21 @@
     </ul>
 
     <h1>Uninstall-Service</h1>
-<div><p>Removes/deletes a service.</p></div>
+<div class="Synopsis">
+<p>Removes/deletes a service.</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>Uninstall-Service [-Name] &lt;String&gt; [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
-    
+
 <h2>Description</h2>
 <div class="Description">
 <p>Removes an existing Windows service.  If the service doesn't exist, nothing happens.  The service is stopped before being deleted, so that the computer doesn't need to be restarted for the removal to complete.  Even then, sometimes it won't go away until a reboot.  I don't get it either.</p>
 </div>
-    
+
 <h2>Related Commands</h2>
 
-<ul>
+<ul class="RelatedCommands">
 <li>Carbon_Service</li>
 <li><a href="Install-Service.html">Install-Service</a></li>
 </ul>
@@ -78,16 +80,11 @@
     <td></td>
 </tr>
 </table>
-        
 
-        
-
-        
-
-        
 <h2>EXAMPLE 1</h2>
 <pre><code>Uninstall-Service -Name DeathStar</code></pre>
 <p>Removes the Death Star Windows service.  It is destro..., er, stopped first, then destro..., er, deleted.  If only the rebels weren't using Linux!</p>
+
 
 	<div class="Footer">
 		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.

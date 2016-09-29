@@ -18,11 +18,13 @@
     </ul>
 
     <h1>Get-IisHttpRedirect</h1>
-<div><p>Gets the HTTP redirect settings for a website or virtual directory/application under a website.</p></div>
+<div class="Synopsis">
+<p>Gets the HTTP redirect settings for a website or virtual directory/application under a website.</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>Get-IisHttpRedirect [-SiteName] &lt;String&gt; [[-VirtualPath] &lt;String&gt;] [&lt;CommonParameters&gt;]</code></pre>
-    
+
 <h2>Description</h2>
 <div class="Description">
 <p>Returns a <code>Carbon.Iis.HttpRedirectConfigurationSection</code> object for the given HTTP redirect settings.  The object contains the following properties:</p>
@@ -37,10 +39,10 @@
 
 <p>Beginning with Carbon 2.0.1, this function is available only if IIS is installed.</p>
 </div>
-    
+
 <h2>Related Commands</h2>
 
-<ul>
+<ul class="RelatedCommands">
 <li><a href="http://www.iis.net/configreference/system.webserver/httpredirect">http://www.iis.net/configreference/system.webserver/httpredirect</a></li>
 </ul>
 
@@ -72,21 +74,21 @@
 </tr>
 
 </table>
-        
 
-        
 <h2>Return Values</h2>
+<div class="ReturnValues">
 <p>Carbon.Iis.HttpRedirectConfigurationSection. </p>
-        
+</div>
 
-        
 <h2>EXAMPLE 1</h2>
 <pre><code>Get-IisHttpRedirect -SiteName ExampleWebsite</code></pre>
 <p>Gets the redirect settings for ExampleWebsite.</p>
 
+
 <h2>EXAMPLE 2</h2>
 <pre><code>Get-IisHttpRedirect -SiteName ExampleWebsite -Path MyVirtualDirectory</code></pre>
 <p>Gets the redirect settings for the MyVirtualDirectory virtual directory under ExampleWebsite.</p>
+
 
 	<div class="Footer">
 		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.

@@ -18,11 +18,13 @@
     </ul>
 
     <h1>Test-GroupMember</h1>
-<div><p>Tests if a user or group is a member of a <em>local</em> group.</p></div>
+<div class="Synopsis">
+<p>Tests if a user or group is a member of a <em>local</em> group.</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>Test-GroupMember [-GroupName] &lt;String&gt; [-Member] &lt;String&gt; [&lt;CommonParameters&gt;]</code></pre>
-    
+
 <h2>Description</h2>
 <div class="Description">
 <p>The <code>Test-GroupMember</code> function tests if a user or group is a member of a <em>local</em> group using <a href="https://msdn.microsoft.com/en-us/library/system.directoryservices.accountmanagement.aspx">.NET's DirectoryServices.AccountManagement APIs</a>. If the group or member you want to check don't exist, you'll get errors and <code>$null</code> will be returned. If <code>Member</code> is in the group, <code>$true</code> is returned. If <code>Member</code> is not in the group, <code>$false</code> is returned.</p>
@@ -31,10 +33,10 @@
 
 <p>This function was added in Carbon 2.1.0.</p>
 </div>
-    
+
 <h2>Related Commands</h2>
 
-<ul>
+<ul class="RelatedCommands">
 <li><a href="Add-GroupMember.html">Add-GroupMember</a></li>
 <li><a href="Install-Group.html">Install-Group</a></li>
 <li><a href="Remove-GroupMember.html">Remove-GroupMember</a></li>
@@ -70,16 +72,11 @@
 </tr>
 
 </table>
-        
 
-        
-
-        
-
-        
 <h2>EXAMPLE 1</h2>
 <pre><code>Test-GroupMember -GroupName 'SithLords' -Member 'REBELS\LSkywalker'</code></pre>
 <p>Demonstrates how to test if a user is a member of a group. In this case, it tests if <code>REBELS\LSkywalker</code> is in the local <code>SithLords</code>, <em>which obviously he isn't</em>, so <code>$false</code> is returned.</p>
+
 
 	<div class="Footer">
 		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.

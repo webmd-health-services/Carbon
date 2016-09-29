@@ -18,11 +18,13 @@
     </ul>
 
     <h1>Get-Permission</h1>
-<div><p>Gets the permissions (access control rules) for a file, directory, registry key, or certificate's private key/key container.</p></div>
+<div class="Synopsis">
+<p>Gets the permissions (access control rules) for a file, directory, registry key, or certificate's private key/key container.</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>Get-Permission [-Path] &lt;String&gt; [[-Identity] &lt;String&gt;] [-Inherited] [&lt;CommonParameters&gt;]</code></pre>
-    
+
 <h2>Description</h2>
 <div class="Description">
 <p>Permissions for a specific identity can also be returned.  Access control entries are for a path's discretionary access control list.</p>
@@ -31,10 +33,10 @@
 
 <p>Certificate permissions are only returned if a certificate has a private key/key container. If a certificate doesn't have a private key, <code>$null</code> is returned.</p>
 </div>
-    
+
 <h2>Related Commands</h2>
 
-<ul>
+<ul class="RelatedCommands">
 <li>Carbon_Permission</li>
 <li><a href="Get-Permission.html">Get-Permission</a></li>
 <li><a href="Grant-Permission.html">Grant-Permission</a></li>
@@ -79,29 +81,31 @@
 </tr>
 
 </table>
-        
 
-        
 <h2>Return Values</h2>
+<div class="ReturnValues">
 <p><a href="http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.accessrule.aspx">System.Security.AccessControl.AccessRule</a>. </p>
-        
+</div>
 
-        
 <h2>EXAMPLE 1</h2>
 <pre><code>Get-Permission -Path 'C:\Windows'</code></pre>
 <p>Returns <code>System.Security.AccessControl.FileSystemAccessRule</code> objects for all the non-inherited rules on <code>C:\windows</code>.</p>
+
 
 <h2>EXAMPLE 2</h2>
 <pre><code>Get-Permission -Path 'hklm:\Software' -Inherited</code></pre>
 <p>Returns <code>System.Security.AccessControl.RegistryAccessRule</code> objects for all the inherited and non-inherited rules on <code>hklm:\software</code>.</p>
 
+
 <h2>EXAMPLE 3</h2>
 <pre><code>Get-Permission -Path 'C:\Windows' -Idenity Administrators</code></pre>
 <p>Returns <code>System.Security.AccessControl.FileSystemAccessRule</code> objects for all the <code>Administrators'</code> rules on <code>C:\windows</code>.</p>
 
+
 <h2>EXAMPLE 4</h2>
 <pre><code>Get-Permission -Path 'Cert:\LocalMachine\1234567890ABCDEF1234567890ABCDEF12345678'</code></pre>
 <p>Returns <code>System.Security.AccessControl.CryptoKeyAccesRule</code> objects for certificate's <code>Cert:\LocalMachine\1234567890ABCDEF1234567890ABCDEF12345678</code> private key/key container. If it doesn't have a private key, <code>$null</code> is returned.</p>
+
 
 	<div class="Footer">
 		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.

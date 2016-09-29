@@ -18,21 +18,23 @@
     </ul>
 
     <h1>ConvertTo-SecurityIdentifier</h1>
-<div><p>Converts a string or byte array security identifier into a <code>System.Security.Principal.SecurityIdentifier</code> object.</p></div>
+<div class="Synopsis">
+<p>Converts a string or byte array security identifier into a <code>System.Security.Principal.SecurityIdentifier</code> object.</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>ConvertTo-SecurityIdentifier [-SID] &lt;Object&gt; [&lt;CommonParameters&gt;]</code></pre>
-    
+
 <h2>Description</h2>
 <div class="Description">
 <p><code>ConvertTo-SecurityIdentifier</code> converts a SID in SDDL form (as a string), in binary form (as a byte array) into a <code>System.Security.Principal.SecurityIdentifier</code> object. It also accepts <code>System.Security.Principal.SecurityIdentifier</code> objects, and returns them back to you.</p>
 
 <p>If the string or byte array don't represent a SID, an error is written and nothing is returned.</p>
 </div>
-    
+
 <h2>Related Commands</h2>
 
-<ul>
+<ul class="RelatedCommands">
 <li><a href="Resolve-Identity.html">Resolve-Identity</a></li>
 <li><a href="Resolve-IdentityName.html">Resolve-IdentityName</a></li>
 </ul>
@@ -57,24 +59,21 @@
 </tr>
 
 </table>
-        
 
-        
-
-        
-
-        
 <h2>EXAMPLE 1</h2>
 <pre><code>Resolve-Identity -SID 'S-1-5-21-2678556459-1010642102-471947008-1017'</code></pre>
 <p>Demonstrates how to convert a a SID in SDDL into a <code>System.Security.Principal.SecurityIdentifier</code> object.</p>
+
 
 <h2>EXAMPLE 2</h2>
 <pre><code>Resolve-Identity -SID (New-Object 'Security.Principal.SecurityIdentifier' 'S-1-5-21-2678556459-1010642102-471947008-1017')</code></pre>
 <p>Demonstrates that you can pass a <code>SecurityIdentifier</code> object as the value of the SID parameter. The SID you passed in will be returned to you unchanged.</p>
 
+
 <h2>EXAMPLE 3</h2>
 <pre><code>Resolve-Identity -SID $sidBytes</code></pre>
 <p>Demonstrates that you can use a byte array that represents a SID as the value of the <code>SID</code> parameter.</p>
+
 
 	<div class="Footer">
 		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.

@@ -18,7 +18,9 @@
     </ul>
 
     <h1>Grant-ComPermission</h1>
-<div><p>Grants COM access permissions.</p></div>
+<div class="Synopsis">
+<p>Grants COM access permissions.</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>Grant-ComPermission -Identity &lt;String&gt; -Access -Limits -Deny [-Local] [-Remote] [-PassThru] [&lt;CommonParameters&gt;]</code></pre>
@@ -29,17 +31,17 @@
 <pre class="Syntax"><code>Grant-ComPermission -Identity &lt;String&gt; -LaunchAndActivation -Default -Deny [-LocalLaunch] [-RemoteLaunch] [-LocalActivation] [-RemoteActivation] [-PassThru] [&lt;CommonParameters&gt;]</code></pre>
 <pre class="Syntax"><code>Grant-ComPermission -Identity &lt;String&gt; -LaunchAndActivation -Limits -Allow [-LocalLaunch] [-RemoteLaunch] [-LocalActivation] [-RemoteActivation] [-PassThru] [&lt;CommonParameters&gt;]</code></pre>
 <pre class="Syntax"><code>Grant-ComPermission -Identity &lt;String&gt; -LaunchAndActivation -Default -Allow [-LocalLaunch] [-RemoteLaunch] [-LocalActivation] [-RemoteActivation] [-PassThru] [&lt;CommonParameters&gt;]</code></pre>
-    
+
 <h2>Description</h2>
 <div class="Description">
 <p>Calling this function is equivalent to opening Component Services (dcomcnfg), right-clicking <code>My Computer</code> under Component Services > Computers, choosing <code>Properties</code>, going to the <code>COM Security</code> tab, and modifying the permission after clicking the <code>Edit Limits...</code> or <code>Edit Default...</code> buttons under the <code>Access Permissions</code> section.</p>
 
 <p>You must set at least one of the <code>LocalAccess</code> or <code>RemoteAccess</code> switches.</p>
 </div>
-    
+
 <h2>Related Commands</h2>
 
-<ul>
+<ul class="RelatedCommands">
 <li><a href="Get-ComPermission.html">Get-ComPermission</a></li>
 <li><a href="Revoke-ComPermission.html">Revoke-ComPermission</a></li>
 </ul>
@@ -168,21 +170,21 @@
 </tr>
 
 </table>
-        
 
-        
 <h2>Return Values</h2>
+<div class="ReturnValues">
 <p>Carbon.Security.ComAccessRule. </p>
-        
+</div>
 
-        
 <h2>EXAMPLE 1</h2>
 <pre><code>Grant-ComPermission -Access -Identity 'Users' -Allow -Default -Local</code></pre>
 <p>Updates access permission default security to allow the local <code>Users</code> group local access permissions.</p>
 
+
 <h2>EXAMPLE 2</h2>
 <pre><code>Grant-ComPermission -LaunchAndActivation -Identity 'Users' -Limits -Deny -Local -Remote</code></pre>
 <p>Updates access permission security limits to deny the local <code>Users</code> group local and remote access permissions.</p>
+
 
 	<div class="Footer">
 		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.

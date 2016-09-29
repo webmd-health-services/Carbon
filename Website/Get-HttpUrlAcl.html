@@ -18,13 +18,15 @@
     </ul>
 
     <h1>Get-HttpUrlAcl</h1>
-<div><p>Gets HTTP URL security information.</p></div>
+<div class="Synopsis">
+<p>Gets HTTP URL security information.</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>Get-HttpUrlAcl [&lt;CommonParameters&gt;]</code></pre>
 <pre class="Syntax"><code>Get-HttpUrlAcl [-Url &lt;String&gt;] [&lt;CommonParameters&gt;]</code></pre>
 <pre class="Syntax"><code>Get-HttpUrlAcl [-LiteralUrl &lt;String&gt;] [&lt;CommonParameters&gt;]</code></pre>
-    
+
 <h2>Description</h2>
 <div class="Description">
 <p>The <code>Get-HttpUrlAcl</code> functions uses the HTTP Server API to get HTTP URL ACL information. With no parameters, it returns <code>Carbon.Security.HttpUrlSecurity</code> objects for all the HTTP URL ACLs. To get a specific HTTP URL ACL, use the <code>Name</code> parameter (wildcards supported).</p>
@@ -39,10 +41,10 @@
 
 <p><code>Get-HttpUrlAcl</code> was introduced in Carbon 2.1.0.</p>
 </div>
-    
+
 <h2>Related Commands</h2>
 
-<ul>
+<ul class="RelatedCommands">
 <li><a href="https://msdn.microsoft.com/en-us/library/aa364510.aspx">https://msdn.microsoft.com/en-us/library/aa364510.aspx</a></li>
 <li><a href="Grant-HttpUrlPermission.html">Grant-HttpUrlPermission</a></li>
 <li><a href="Revoke-HttpUrlPermission.html">Revoke-HttpUrlPermission</a></li>
@@ -80,21 +82,21 @@
 </tr>
 
 </table>
-        
 
-        
 <h2>Return Values</h2>
+<div class="ReturnValues">
 <p>Carbon.Security.HttpUrlSecurity. </p>
-        
+</div>
 
-        
 <h2>EXAMPLE 1</h2>
 <pre><code>Get-HttpUrlAcl</code></pre>
 <p>Demonstrates how to get security information for all HTTP URLs configured on the current computer.</p>
 
+
 <h2>EXAMPLE 2</h2>
 <pre><code>Get-HttpUrlAcl -Url 'http://+:8594/'</code></pre>
 <p>Demonstrates how to get security information for a specific HTTP URL.</p>
+
 
 <h2>EXAMPLE 3</h2>
 <pre><code>Get-HttpUrlAcl -Url 'htt://*:8599/'</code></pre>
@@ -102,9 +104,11 @@
 
 <p>When using wildcards, it is important that your URL end with a slash! The HTTP Server API adds a forward slash to the end of all its URLs.</p>
 
+
 <h2>EXAMPLE 4</h2>
 <pre><code>Get-HttpUrlAcl -LiteralUrl 'http://*:8599/'</code></pre>
 <p>Demonstrates how to use a literal URL to find security information. Will only return the ACL for the URL <code>http://*:8599/</code>.</p>
+
 
 	<div class="Footer">
 		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.

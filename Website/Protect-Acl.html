@@ -18,19 +18,21 @@
     </ul>
 
     <h1>Protect-Acl</h1>
-<div><p>Protects an ACL so that changes to its parent can't be inherited to it.</p></div>
+<div class="Synopsis">
+<p>Protects an ACL so that changes to its parent can't be inherited to it.</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>Protect-Acl [-Path] &lt;String&gt; [-Preserve] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
-    
+
 <h2>Description</h2>
 <div class="Description">
 <p>New items in the registry or file system will usually inherit ACLs from its parent.  This function stops an item from inheriting rules from its, and will optionally preserve the existing inherited rules.  Any existing, non-inherited access rules are left in place.</p>
 </div>
-    
+
 <h2>Related Commands</h2>
 
-<ul>
+<ul class="RelatedCommands">
 <li><a href="Grant-Permission.html">Grant-Permission</a></li>
 </ul>
 
@@ -85,20 +87,16 @@
     <td></td>
 </tr>
 </table>
-        
 
-        
-
-        
-
-        
 <h2>EXAMPLE 1</h2>
 <pre><code>Protect-Acl -Path C:\Projects\Carbon</code></pre>
 <p>Removes all inherited access rules from the <code>C:\Projects\Carbon</code> directory.  Non-inherited rules are preserved.</p>
 
+
 <h2>EXAMPLE 2</h2>
 <pre><code>Protect-Acl -Path hklm:\Software\Carbon -Preserve</code></pre>
 <p>Stops <code>HKLM:\Software\Carbon</code> from inheriting acces rules from its parent, but preserves the existing, inheritied access rules.</p>
+
 
 	<div class="Footer">
 		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.

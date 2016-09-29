@@ -18,11 +18,13 @@
     </ul>
 
     <h1>Compress-Item</h1>
-<div><p>Compresses a file/directory using the <code>DotNetZip</code> library.</p></div>
+<div class="Synopsis">
+<p>Compresses a file/directory using the <code>DotNetZip</code> library.</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>Compress-Item [-Path] &lt;String[]&gt; [[-OutFile] &lt;String&gt;] [-UseShell] [-Force] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
-    
+
 <h2>Description</h2>
 <div class="Description">
 <p>You can supply a destination file path, via the <code>OutFile</code> parameter. If the file doesn't exist, it is created. If it exists, use the <code>-Force</code> parameter to overwrite it.</p>
@@ -35,10 +37,10 @@
 
 <p>Microsoft's DSC Local Configuration Manager is unable to unzip files compressed with the <code>DotNetZip</code> library (or the <code>ZipFile</code> class in .NET 4.5), so as an alternative, if you specify the <code>UseShell</code> switch, the file will be compressed with the Windows COM shell API.</p>
 </div>
-    
+
 <h2>Related Commands</h2>
 
-<ul>
+<ul class="RelatedCommands">
 <li><a href="https://www.nuget.org/packages/DotNetZip">https://www.nuget.org/packages/DotNetZip</a></li>
 <li><a href="Expand-Item.html">Expand-Item</a></li>
 <li><a href="Test-ZipFile.html">Test-ZipFile</a></li>
@@ -111,25 +113,26 @@
     <td></td>
 </tr>
 </table>
-        
 
-        
 <h2>Return Values</h2>
+<div class="ReturnValues">
 <p><a href="http://msdn.microsoft.com/en-us/library/system.io.fileinfo.aspx">System.IO.FileInfo</a>. </p>
-        
+</div>
 
-        
 <h2>EXAMPLE 1</h2>
 <pre><code>Compress-Item -Path 'C:\Projects\Carbon' -OutFile 'C:\Carbon.zip'</code></pre>
 <p>Demonstrates how to create a ZIP file of the <code>C:\Projects\Carbon</code> directory.</p>
+
 
 <h2>EXAMPLE 2</h2>
 <pre><code>Get-ChildItem -Path 'C:\Projects\Carbon' | Where-Object { $_.PsIsContainer} | Compress-Item -OutFile 'C:\Projects\Carbon.zip'</code></pre>
 <p>Demonstrates how you can pipe items to <code>Compress-Item</code> for compressing.</p>
 
+
 <h2>EXAMPLE 3</h2>
 <pre><code>Compress-Item -Path 'C:\Projects\Carbon' -OutFile 'C:\Carbon.zip' -UseShell</code></pre>
 <p>Demonstrates how to create a ZIP file with the Windows shell COM APIs instead of the <code>DotNetZip</code> library.</p>
+
 
 	<div class="Footer">
 		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.

@@ -18,7 +18,9 @@
     </ul>
 
     <h1>Carbon_ScheduledTask</h1>
-<div><p>DSC resource for configuring scheduled tasks.</p></div>
+<div class="Synopsis">
+<p>DSC resource for configuring scheduled tasks.</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>Carbon_ScheduledTask [String] #ResourceName
@@ -31,7 +33,7 @@
     [TaskXml = [string]]
 }
 </code></pre>
-    
+
 <h2>Description</h2>
 <div class="Description">
 <p>The <code>Carbon_ScheduledTask</code> resource configures scheduled tasks using <code>schtasks.exe</code> with <a href="http://msdn.microsoft.com/en-us/library/windows/desktop/aa383609.aspx">Task Scheduler XML</a>.</p>
@@ -40,10 +42,10 @@
 
 <p><code>Carbon_ScheduledTask</code> is new in Carbon 2.0.</p>
 </div>
-    
+
 <h2>Related Commands</h2>
 
-<ul>
+<ul class="RelatedCommands">
 <li><a href="Get-ScheduledTask.html">Get-ScheduledTask</a></li>
 <li><a href="Install-ScheduledTask.html">Install-ScheduledTask</a></li>
 <li><a href="Test-ScheduledTask.html">Test-ScheduledTask</a></li>
@@ -96,13 +98,7 @@
 </tr>
 
 </table>
-        
 
-        
-
-        
-
-        
 <h2>EXAMPLE 1</h2>
 
 <p>Demonstrates how to install a new or update an existing scheduled task that runs as a built-in user. The user's SID should be declared in the task XML file.</p>
@@ -113,6 +109,7 @@
     TaskXml = (Get-Content -Path $clearApplicationCacheTaskPath.xml -Raw);
 }
 </code></pre>
+
 
 <h2>EXAMPLE 2</h2>
 
@@ -126,6 +123,7 @@
 }
 </code></pre>
 
+
 <h2>EXAMPLE 3</h2>
 
 <p>Demonstrates how to remove a scheduled task.</p>
@@ -136,6 +134,7 @@
     Ensure = 'Absent';
 }
 </code></pre>
+
 
 	<div class="Footer">
 		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.

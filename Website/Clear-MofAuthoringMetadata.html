@@ -18,11 +18,13 @@
     </ul>
 
     <h1>Clear-MofAuthoringMetadata</h1>
-<div><p>Removes authoring metadata from .mof files.</p></div>
+<div class="Synopsis">
+<p>Removes authoring metadata from .mof files.</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>Clear-MofAuthoringMetadata [-Path] &lt;String&gt; [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
-    
+
 <h2>Description</h2>
 <div class="Description">
 <p>Everytime PowerShell generates a .mof file, it includes authoring metadata: who created the file, on what computer, and at what date/time. This means a .mof file's checksum will change everytime a new one is generated, even if the configuration in that file didn't change. This makes it hard to know when a configuration in a .mof file has truly changed, and makes its change history noisy. This function strips/removes all authoring metadata from a .mof file.</p>
@@ -66,8 +68,6 @@ instance of OMI_ConfigurationDocument
 
 <p><code>Clear-MofAuthoringMetadata</code> is new in Carbon 2.0.</p>
 </div>
-    
-
 
 <h2> Parameters </h2>
 <table id="Parameters">
@@ -112,20 +112,16 @@ instance of OMI_ConfigurationDocument
     <td></td>
 </tr>
 </table>
-        
 
-        
-
-        
-
-        
 <h2>EXAMPLE 1</h2>
 <pre><code>Clear-MofAuthoringMetadata -Path 'C:\Projects\DSC\localhost.mof'</code></pre>
 <p>Demonstrates how to clear the authoring data from a specific file.</p>
 
+
 <h2>EXAMPLE 2</h2>
 <pre><code>Clear-MofAuthoringMetadata -Path 'C:\Projects\DSC'</code></pre>
 <p>Demonstrates how to clear the authoring data from all .mof files in a specific directory.</p>
+
 
 	<div class="Footer">
 		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.

@@ -18,17 +18,17 @@
     </ul>
 
     <h1>Remove-RegistryKeyValue</h1>
-<div><p>Removes a value from a registry key, if it exists.</p></div>
+<div class="Synopsis">
+<p>Removes a value from a registry key, if it exists.</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>Remove-RegistryKeyValue [-Path] &lt;String&gt; [-Name] &lt;String&gt; [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
-    
+
 <h2>Description</h2>
 <div class="Description">
 <p>If the given key doesn't exist, nothing happens.</p>
 </div>
-    
-
 
 <h2> Parameters </h2>
 <table id="Parameters">
@@ -81,16 +81,11 @@
     <td></td>
 </tr>
 </table>
-        
 
-        
-
-        
-
-        
 <h2>EXAMPLE 1</h2>
 <pre><code>Remove-RegistryKeyValue -Path hklm:\Software\Carbon\Test -Name 'InstallPath'</code></pre>
 <p>Removes the <code>InstallPath</code> value from the <code>hklm:\Software\Carbon\Test</code> registry key.</p>
+
 
 	<div class="Footer">
 		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.

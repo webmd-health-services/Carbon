@@ -18,19 +18,19 @@
     </ul>
 
     <h1>Join-IisVirtualPath</h1>
-<div><p>Combines a path and a child path for an IIS website, application, virtual directory into a single path.</p></div>
+<div class="Synopsis">
+<p>Combines a path and a child path for an IIS website, application, virtual directory into a single path.</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>Join-IisVirtualPath [-Path] &lt;String&gt; [[-ChildPath] &lt;String&gt;] [&lt;CommonParameters&gt;]</code></pre>
-    
+
 <h2>Description</h2>
 <div class="Description">
 <p>Removes extra slashes.  Converts backward slashes to forward slashes.  Relative portions are not removed.  Sorry.</p>
 
 <p>Beginning with Carbon 2.0.1, this function is available only if IIS is installed.</p>
 </div>
-    
-
 
 <h2> Parameters </h2>
 <table id="Parameters">
@@ -60,16 +60,11 @@
 </tr>
 
 </table>
-        
 
-        
-
-        
-
-        
 <h2>EXAMPLE 1</h2>
 <pre><code>Join-IisVirtualPath 'SiteName' 'Virtual/Path'</code></pre>
 <p>Demonstrates how to join two IIS paths together.  REturns <code>SiteName/Virtual/Path</code>.</p>
+
 
 	<div class="Footer">
 		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.

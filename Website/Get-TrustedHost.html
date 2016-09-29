@@ -18,27 +18,23 @@
     </ul>
 
     <h1>Get-TrustedHost</h1>
-<div><p>Returns the current computer's trusted hosts list.</p></div>
+<div class="Synopsis">
+<p>Returns the current computer's trusted hosts list.</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>Get-TrustedHost [&lt;CommonParameters&gt;]</code></pre>
-    
+
 <h2>Description</h2>
 <div class="Description">
 <p>PowerShell stores its trusted hosts list as a comma-separated list of hostnames in the <code>WSMan</code> drive.  That's not very useful.  This function reads that list, splits it, and returns each item.</p>
 </div>
-    
 
-
-
-        
-
-        
 <h2>Return Values</h2>
+<div class="ReturnValues">
 <p><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">System.String</a>. </p>
-        
+</div>
 
-        
 <h2>EXAMPLE 1</h2>
 <pre><code>Get-TrustedHost</code></pre>
 <p>If the trusted hosts lists contains <code>example.com</code>, <code>api.example.com</code>, and <code>docs.example.com</code>, returns the following:</p>
@@ -47,6 +43,7 @@
 api.example.com
 docs.example.com
 </code></pre>
+
 
 	<div class="Footer">
 		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.

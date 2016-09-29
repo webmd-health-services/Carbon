@@ -18,7 +18,9 @@
     </ul>
 
     <h1>Carbon_Permission</h1>
-<div><p>DSC resource for managing permissions on files, directories, registry keys, or a certificate's private key.</p></div>
+<div class="Synopsis">
+<p>DSC resource for managing permissions on files, directories, registry keys, or a certificate's private key.</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>Carbon_Permission [String] #ResourceName
@@ -33,7 +35,7 @@ ndChildLeaves | ChildLeaves | Container | ContainerAndChildContainers | Containe
     [PsDscRunAsCredential = [PSCredential]]
 }
 </code></pre>
-    
+
 <h2>Description</h2>
 <div class="Description">
 <p>The <code>Carbon_Permission</code> resource can grant or revoke permissions on a file, a directory, a registry key, or a certificate's private key.</p>
@@ -103,10 +105,10 @@ ndChildLeaves | ChildLeaves | Container | ContainerAndChildContainers | Containe
 
 <p><code>Carbon_Permission</code> is new in Carbon 2.0.</p>
 </div>
-    
+
 <h2>Related Commands</h2>
 
-<ul>
+<ul class="RelatedCommands">
 <li><a href="Get-Permission.html">Get-Permission</a></li>
 <li><a href="Grant-Permission.html">Grant-Permission</a></li>
 <li><a href="Revoke-Permission.html">Revoke-Permission</a></li>
@@ -169,13 +171,7 @@ ndChildLeaves | ChildLeaves | Container | ContainerAndChildContainers | Containe
 </tr>
 
 </table>
-        
 
-        
-
-        
-
-        
 <h2>EXAMPLE 1</h2>
 
 <p>Demonstrates how to grant permissions to an item on the file system.</p>
@@ -189,6 +185,7 @@ ndChildLeaves | ChildLeaves | Container | ContainerAndChildContainers | Containe
 </code></pre>
 
 <p>This will grant <code>ReadAndExecute</code> permission to the <code>CarbonServiceUser</code> on the <code>C:\Projects\Carbon</code> directory.</p>
+
 
 <h2>EXAMPLE 2</h2>
 
@@ -204,6 +201,7 @@ ndChildLeaves | ChildLeaves | Container | ContainerAndChildContainers | Containe
 
 <p>This will grant <code>ReadKey</code> permission to the <code>CarbonServiceUser</code> on the <code>C:\Projects\Carbon</code> directory.</p>
 
+
 <h2>EXAMPLE 3</h2>
 
 <p>Demonstrates how to grant permissions to a certificate's private key and how to grant multiple permissions.</p>
@@ -218,6 +216,7 @@ ndChildLeaves | ChildLeaves | Container | ContainerAndChildContainers | Containe
 
 <p>This will grant <code>GenericRead</code> and <code>ReadKey</code> permissions to the <code>CarbonServiceUser</code> on the <code>C:\Projects\Carbon</code> directory.</p>
 
+
 <h2>EXAMPLE 4</h2>
 
 <p>Demonstrates how to revoke permissions.</p>
@@ -231,6 +230,7 @@ ndChildLeaves | ChildLeaves | Container | ContainerAndChildContainers | Containe
 </code></pre>
 
 <p>This will revoke all of the <code>CarbonServiceUser</code> user's permissions on the <code>C:\Projects\Carbon</code>.</p>
+
 
 	<div class="Footer">
 		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.

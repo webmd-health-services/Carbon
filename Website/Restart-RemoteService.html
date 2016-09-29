@@ -18,11 +18,13 @@
     </ul>
 
     <h1>Restart-RemoteService</h1>
-<div><p>Restarts a service on a remote machine.</p></div>
+<div class="Synopsis">
+<p>Restarts a service on a remote machine.</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>Restart-RemoteService [-Name] &lt;String&gt; [-ComputerName] &lt;String&gt; [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
-    
+
 <h2>Description</h2>
 <div class="Description">
 <p>One of the annoying features of PowerShell is that the <code>Stop-Service</code>, <code>Start-Service</code> and <code>Restart-Service</code> cmdlets don't have <code>ComputerName</code> parameters to start/stop/restart a service on a remote computer.  You have to use <code>Get-Service</code> to get the remote service:</p>
@@ -40,8 +42,6 @@ Get-Service -Name DeathStar -ComputerName Yavin |
 
 <p>You'll get an error if you attempt to restart a non-existent service.</p>
 </div>
-    
-
 
 <h2> Parameters </h2>
 <table id="Parameters">
@@ -94,16 +94,11 @@ Get-Service -Name DeathStar -ComputerName Yavin |
     <td></td>
 </tr>
 </table>
-        
 
-        
-
-        
-
-        
 <h2>EXAMPLE 1</h2>
 <pre><code>Restart-RemoteService -Name DeathStar -ComputerName Yavin</code></pre>
 <p>Restarts the <code>DeathStar</code> service on Yavin.  If the DeathStar service doesn't exist, you'll get an error.</p>
+
 
 	<div class="Footer">
 		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.

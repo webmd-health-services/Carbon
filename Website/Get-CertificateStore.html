@@ -18,20 +18,20 @@
     </ul>
 
     <h1>Get-CertificateStore</h1>
-<div><p>Gets an <code>X509CertificateStore</code> object for the given location and store name.</p></div>
+<div class="Synopsis">
+<p>Gets an <code>X509CertificateStore</code> object for the given location and store name.</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>Get-CertificateStore -StoreLocation {CurrentUser | LocalMachine} -StoreName {AddressBook | AuthRoot | CertificateAuthority | Disallowed | My | Root | TrustedPeople | TrustedPublisher} [&lt;CommonParameters&gt;]</code></pre>
 <pre class="Syntax"><code>Get-CertificateStore -StoreLocation {CurrentUser | LocalMachine} -CustomStoreName &lt;String&gt; [&lt;CommonParameters&gt;]</code></pre>
-    
+
 <h2>Description</h2>
 <div class="Description">
 <p>Returns an <code>X509Store</code> for a given store location and store name.  The store must exist.  Before being retured, it is opened for writing.  If you don't have permission to write to the store, you'll get an error.</p>
 
 <p>If you just want to read a store, we recommend using PowerShell's <code>cert:</code> drive.</p>
 </div>
-    
-
 
 <h2> Parameters </h2>
 <table id="Parameters">
@@ -69,21 +69,21 @@
 </tr>
 
 </table>
-        
 
-        
 <h2>Return Values</h2>
+<div class="ReturnValues">
 <p><a href="http://msdn.microsoft.com/en-us/library/system.security.cryptography.x509certificates.x509store.aspx">Security.Cryptography.X509Certificates.X509Store</a>. </p>
-        
+</div>
 
-        
 <h2>EXAMPLE 1</h2>
 <pre><code>Get-CertificateStore -StoreLocation LocalMachine -StoreName My</code></pre>
 <p>Get the local computer's Personal certificate store.</p>
 
+
 <h2>EXAMPLE 2</h2>
 <pre><code>Get-CertificateStore -StoreLocation CurrentUser -StoreName Root</code></pre>
 <p>Get the current user's Trusted Root Certification Authorities certificate store.</p>
+
 
 	<div class="Footer">
 		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.

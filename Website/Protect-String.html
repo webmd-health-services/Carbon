@@ -18,7 +18,9 @@
     </ul>
 
     <h1>Protect-String</h1>
-<div><p>Encrypts a string.</p></div>
+<div class="Synopsis">
+<p>Encrypts a string.</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>Protect-String [-String] &lt;String&gt; -ForUser [&lt;CommonParameters&gt;]</code></pre>
@@ -26,11 +28,12 @@
 <pre class="Syntax"><code>Protect-String [-String] &lt;String&gt; -Credential &lt;PSCredential&gt; [&lt;CommonParameters&gt;]</code></pre>
 <pre class="Syntax"><code>Protect-String [-String] &lt;String&gt; -Certificate &lt;X509Certificate2&gt; [-UseDirectEncryptionPadding] [&lt;CommonParameters&gt;]</code></pre>
 <pre class="Syntax"><code>Protect-String [-String] &lt;String&gt; -Thumbprint &lt;String&gt; [-UseDirectEncryptionPadding] [&lt;CommonParameters&gt;]</code></pre>
-<pre class="Syntax"><code>Protect-String [-String] &lt;String&gt; -PublicKeyPath &lt;String&gt; [-UseDirectEncryptionPadding] [&lt;CommonParameters&gt;]</code></pre>
-    
+<pre class="Syntax"><code>Protect-String [-String] &lt;String&gt; -PublicKeyPath &lt;String&gt; [-UseDirectEncryptionPadding] [&lt;CommonParameters&gt;]</code></pre>
+<pre class="Syntax"><code>Protect-String [-String] &lt;String&gt; -Key &lt;Object&gt; [&lt;CommonParameters&gt;]</code></pre>
+
 <h2>Description</h2>
 <div class="Description">
-<p>Strings can be encrypted with the Data Protection API (DPAPI) or RSA.</p>
+<p>Strings can be encrypted with the Data Protection API (DPAPI), RSA, or AES.</p>
 
 <h2>DPAPI</h2>
 
@@ -38,7 +41,7 @@
 
 <h2>RSA</h2>
 
-<p>RSA is an assymetric encryption/decryption algorithm, which requires a public/private key pair. The secret is encrypted with the public key, and can only be decrypted with the corresponding private key. The secret being encrypted can't be larger than the RSA key pair's size/length, usually 1024, 2048, or 4096 bits (128, 256, and 512 bytes, respectively).</p>
+<p>RSA is an assymetric encryption/decryption algorithm, which requires a public/private key pair. The secret is encrypted with the public key, and can only be decrypted with the corresponding private key. The secret being encrypted can't be larger than the RSA key pair's size/length, usually 1024, 2048, or 4096 bits (128, 256, and 512 bytes, respectively). <code>Protect-String</code> encrypts with .NET's <code>System.Security.Cryptography.RSACryptoServiceProvider</code> class.</p>
 
 <p>You can specify the public key in three ways: </p>
 
@@ -47,11 +50,36 @@
 <li>with a certificate in one of the Windows certificate stores, passing its unique thumbprint via the <code>Thumbprint</code> parameter, or via the <code>PublicKeyPath</code> parameter cn be certificat provider path, e.g. it starts with <code>cert:\</code>.</li>
 <li>with a X509 certificate file, via the <code>PublicKeyPath</code> parameter</li>
 </ul>
+
+<p>You can generate an RSA public/private key pair with the <code>New-RsaKeyPair</code> function.</p>
+
+<h2>AES</h2>
+
+<p>AES is a symmetric encryption/decryption algorithm. You supply a 16-, 24-, or 32-byte key/password/passphrase with the <code>Key</code> parameter, and that key is used to encrypt. There is no limit on the size of the data you want to encrypt. <code>Protect-String</code> encrypts with .NET's <code>System.Security.Cryptography.AesCryptoServiceProvider</code> class.</p>
+
+<p>Symmetric encryption requires a random, unique initialization vector (i.e. IV) everytime you encrypt something. <code>Protect-String</code> generates one for you. This IV must be known to decrypt the secret, so it is pre-pendeded to the encrypted text.</p>
+
+<p>This code demonstrates how to generate a key:</p>
+
+<pre><code>$key = (New-Object 'Security.Cryptography.AesManaged').Key
+</code></pre>
+
+<p>You can save this key as a string by encoding it as a base-64 string:</p>
+
+<pre><code>$base64EncodedKey = [Convert]::ToBase64String($key)
+</code></pre>
+
+<p>If you base-64 encode your string, it must be converted back to bytes before passing it to <code>Protect-String</code>.</p>
+
+<pre><code>Protect-String -String 'the secret sauce' -Key ([Convert]::FromBase64String($base64EncodedKey))
+</code></pre>
+
+<p>The ability to encrypt with AES was added in Carbon 2.3.0.</p>
 </div>
-    
+
 <h2>Related Commands</h2>
 
-<ul>
+<ul class="RelatedCommands">
 <li><a href="New-RsaKeyPair.html">New-RsaKeyPair</a></li>
 <li><a href="Unprotect-String.html">Unprotect-String</a></li>
 <li><a href="http://msdn.microsoft.com/en-us/library/system.security.cryptography.protecteddata.aspx">http://msdn.microsoft.com/en-us/library/system.security.cryptography.protecteddata.aspx</a></li>
@@ -131,42 +159,66 @@
 	<td>false</td>
     <td>False</td>
 </tr>
+<tr valign='top'>
+	<td>Key</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.object.aspx">Object</a></td>
+	<td class="ParamDescription"><p>The key to use to encrypt the secret. Can be a <code>SecureString</code>, a <code>String</code>, or an array of bytes. Must be 16, 24, or 32 characters/bytes in length.</p></td>
+	<td>true</td>
+	<td>false</td>
+    <td></td>
+</tr>
 
 </table>
-        
 
-        
-
-        
-
-        
 <h2>EXAMPLE 1</h2>
 <pre><code>Protect-String -String 'TheStringIWantToEncrypt' -ForUser | Out-File MySecret.txt</code></pre>
 <p>Encrypts the given string and saves the encrypted string into MySecret.txt.  Only the user who encrypts the string can unencrypt it.</p>
+
 
 <h2>EXAMPLE 2</h2>
 <pre><code>$cipherText = Protect-String -String "MySuperSecretIdentity" -ForComputer</code></pre>
 <p>Encrypts the given string and stores the value in $cipherText.  Because the encryption scope is set to LocalMachine, any user logged onto the local computer can decrypt <code>$cipherText</code>.</p>
 
+
 <h2>EXAMPLE 3</h2>
 <pre><code>Protect-String -String 's0000p33333r s33333cr33333t' -Credential (Get-Credential 'builduser')</code></pre>
 <p>Demonstrates how to use <code>Protect-String</code> to encrypt a secret as a specific user. This is useful for situation where a secret needs to be encrypted by a user other than the user running <code>Protect-String</code>. Encrypting as a specific user won't work over PowerShell remoting.</p>
+
 
 <h2>EXAMPLE 4</h2>
 <pre><code>Protect-String -String 'the secret sauce' -Certificate $myCert</code></pre>
 <p>Demonstrates how to encrypt a secret using RSA with a <code>System.Security.Cryptography.X509Certificates.X509Certificate2</code> object. You're responsible for creating/loading it. The <code>New-RsaKeyPair</code> function will create a key pair for you, if you've got a Windows SDK installed.</p>
 
+
 <h2>EXAMPLE 5</h2>
 <pre><code>Protect-String -String 'the secret sauce' -Thumbprint '44A7C27F3353BC53F82318C14490D7E2500B6D9E'</code></pre>
 <p>Demonstrates how to encrypt a secret using RSA with a certificate in one of the Windows certificate stores. All local machine and user stores are searched.</p>
 
+
 <h2>EXAMPLE 6</h2>
-<pre><code>ProtectString -String 'the secret sauce' -PublicKeyPath 'C:\Projects\Security\publickey.cer'</code></pre>
+<pre><code>Protect-String -String 'the secret sauce' -PublicKeyPath 'C:\Projects\Security\publickey.cer'</code></pre>
 <p>Demonstrates how to encrypt a secret using RSA with a certificate file. The file must be loadable by the <code>System.Security.Cryptography.X509Certificates.X509Certificate</code> class.</p>
 
+
 <h2>EXAMPLE 7</h2>
-<pre><code>ProtectString -String 'the secret sauce' -PublicKeyPath 'cert:\LocalMachine\My\44A7C27F3353BC53F82318C14490D7E2500B6D9E'</code></pre>
+<pre><code>Protect-String -String 'the secret sauce' -PublicKeyPath 'cert:\LocalMachine\My\44A7C27F3353BC53F82318C14490D7E2500B6D9E'</code></pre>
 <p>Demonstrates how to encrypt a secret using RSA with a certificate in the store, giving its exact path.</p>
+
+
+<h2>EXAMPLE 8</h2>
+<pre><code>Protect-String -String 'the secret sauce' -Key 'gT4XPfvcJmHkQ5tYjY3fNgi7uwG4FB9j'</code></pre>
+<p>Demonstrates how to encrypt a secret with a key, password, or passphrase. In this case, we are encrypting with a plaintext password. This functionality was added in Carbon 2.3.0.</p>
+
+
+<h2>EXAMPLE 9</h2>
+<pre><code>Protect-String -String 'the secret sauce' -Key (Read-Host -Prompt 'Enter password (must be 16, 24, or 32 characters long):' -AsSecureString)</code></pre>
+<p>Demonstrates that you can use a <code>SecureString</code> as the key, password, or passphrase. This functionality was added in Carbon 2.3.0.</p>
+
+
+<h2>EXAMPLE 10</h2>
+<pre><code>Protect-String -String 'the secret sauce' -Key ([byte[]]@(163,163,185,174,205,55,157,219,121,146,251,116,43,203,63,38,73,154,230,112,82,112,151,29,189,135,254,187,164,104,45,30))</code></pre>
+<p>Demonstrates that you can use an array of bytes as the key, password, or passphrase. This functionality was added in Carbon 2.3.0.</p>
+
 
 	<div class="Footer">
 		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.

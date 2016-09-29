@@ -18,11 +18,13 @@
     </ul>
 
     <h1>Remove-DotNetAppSetting</h1>
-<div><p>Remove an app setting from the .NET machine.config file.</p></div>
+<div class="Synopsis">
+<p>Remove an app setting from the .NET machine.config file.</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>Remove-DotNetAppSetting [-Name] &lt;String&gt; [-Framework] [-Framework64] [-Clr2] [-Clr4] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
-    
+
 <h2>Description</h2>
 <div class="Description">
 <p>The <code>Remove-DotNetAppSetting</code> removes an app setting from one or more of the .NET machine.config file. The app setting can be removed from up to four different machine.config files:</p>
@@ -40,10 +42,10 @@
 
 <p><code>Remove-DotNetAppSetting</code> was added in Carbon 2.2.0.</p>
 </div>
-    
+
 <h2>Related Commands</h2>
 
-<ul>
+<ul class="RelatedCommands">
 <li><a href="Set-DotNetAppSetting.html">Set-DotNetAppSetting</a></li>
 <li><a href="Set-DotNetConnectionString.html">Set-DotNetConnectionString</a></li>
 </ul>
@@ -123,13 +125,7 @@
     <td></td>
 </tr>
 </table>
-        
 
-        
-
-        
-
-        
 <h2>EXAMPLE 1</h2>
 <pre><code>Remove-DotNetAppSetting -Name ExampleUrl -Framework -Framework64 -Clr2 -Clr4</code></pre>
 <p>Remvoes the <code>ExampleUrl</code> app setting from the following machine.config files:</p>
@@ -141,6 +137,7 @@
 <li><code>%SYSTEMROOT%\Microsoft.NET\Framework64\v4.0.30319\CONFIG\machine.config</code></li>
 </ul>
 
+
 <h2>EXAMPLE 2</h2>
 <pre><code>Remove-DotNetAppSetting -Name ExampleUrl -Framework64 -Clr4</code></pre>
 <p>Sets the ExampleUrl app setting in the following machine.config file:</p>
@@ -148,6 +145,7 @@
 <ul>
 <li><code>%SYSTEMROOT%\Microsoft.NET\Framework64\v4.0.30319\CONFIG\machine.config</code></li>
 </ul>
+
 
 	<div class="Footer">
 		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.

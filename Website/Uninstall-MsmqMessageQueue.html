@@ -18,17 +18,17 @@
     </ul>
 
     <h1>Uninstall-MsmqMessageQueue</h1>
-<div><p>Removes an MSMQ queue.</p></div>
+<div class="Synopsis">
+<p>Removes an MSMQ queue.</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>Uninstall-MsmqMessageQueue [-Name] &lt;String&gt; [-Private] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
-    
+
 <h2>Description</h2>
 <div class="Description">
 <p>Removes/deletes an existing MSMQ queue by name.  If a queue with that name doesn't exist, nothing happens.</p>
 </div>
-    
-
 
 <h2> Parameters </h2>
 <table id="Parameters">
@@ -81,20 +81,16 @@
     <td></td>
 </tr>
 </table>
-        
 
-        
-
-        
-
-        
 <h2>EXAMPLE 1</h2>
 <pre><code>Uninstall-MsmqMessageQueue -Name MovieQueue</code></pre>
 <p>Removes the public <code>MovieQueue</code> queue.</p>
 
+
 <h2>EXAMPLE 2</h2>
 <pre><code>Uninstall-MsmqMessageQueue -Name MovieCriticsQueue -Private</code></pre>
 <p>Removes the private <code>MovieCriticsQueue</code> queue.</p>
+
 
 	<div class="Footer">
 		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.

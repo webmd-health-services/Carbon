@@ -18,17 +18,17 @@
     </ul>
 
     <h1>Remove-HostsEntry</h1>
-<div><p>Removes entries from the hosts file by hostname.</p></div>
+<div class="Synopsis">
+<p>Removes entries from the hosts file by hostname.</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>Remove-HostsEntry [-HostName] &lt;String[]&gt; [-Path &lt;String&gt;] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
-    
+
 <h2>Description</h2>
 <div class="Description">
 <p>You can remove multiple entries or pipe entries into this function.</p>
 </div>
-    
-
 
 <h2> Parameters </h2>
 <table id="Parameters">
@@ -81,28 +81,26 @@
     <td></td>
 </tr>
 </table>
-        
 
-        
-
-        
-
-        
 <h2>EXAMPLE 1</h2>
 <pre><code>Remove-HostsEntry -HostName 'adadvisor.net'</code></pre>
 <p>Demonstrates how to remove hosts entry for <code>adadvisor.net</code>, which you probably don't want to do.</p>
+
 
 <h2>EXAMPLE 2</h2>
 <pre><code>Remove-HostsEntry -HostName 'adadvisor.net','www.adchimp.com'</code></pre>
 <p>Demonstrates how to remove multiple hosts entries.</p>
 
+
 <h2>EXAMPLE 3</h2>
 <pre><code>('adadvisor.net','www.adchimp.com') | Remove-HostsEntry</code></pre>
 <p>Demonstrates how to pipe hostnames into <code>Remove-HostsEntry</code>.</p>
 
+
 <h2>EXAMPLE 4</h2>
 <pre><code>Remove-HostsEntry -HostName 'adadvisor.net' -Path 'C:\Projects\Carbon\adblockhosts'</code></pre>
 <p>Demonstrates how to work with a file other than Windows' default hosts file.</p>
+
 
 	<div class="Footer">
 		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.

@@ -18,12 +18,14 @@
     </ul>
 
     <h1>Install-User</h1>
-<div><p>Installs a <em>local</em> user account.</p></div>
+<div class="Synopsis">
+<p>Installs a <em>local</em> user account.</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>Install-User -UserName &lt;String&gt; -Password &lt;String&gt; [-Description &lt;String&gt;] [-FullName &lt;String&gt;] [-UserCannotChangePassword] [-PasswordExpires] [-PassThru] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
 <pre class="Syntax"><code>Install-User -Credential &lt;PSCredential&gt; [-Description &lt;String&gt;] [-FullName &lt;String&gt;] [-UserCannotChangePassword] [-PasswordExpires] [-PassThru] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
-    
+
 <h2>Description</h2>
 <div class="Description">
 <p><code>Install-User</code> creates a new <em>local</em> user account, or updates an existing <em>local</em> user account. </p>
@@ -32,10 +34,10 @@
 
 <p>The <code>UserCannotChangePassword</code> and <code>PasswordExpires</code> switches were added in Carbon 2.0.</p>
 </div>
-    
+
 <h2>Related Commands</h2>
 
-<ul>
+<ul class="RelatedCommands">
 <li><a href="Get-User.html">Get-User</a></li>
 <li><a href="New-Credential.html">New-Credential</a></li>
 <li><a href="Test-User.html">Test-User</a></li>
@@ -143,21 +145,21 @@
     <td></td>
 </tr>
 </table>
-        
 
-        
 <h2>Return Values</h2>
+<div class="ReturnValues">
 <p><a href="http://msdn.microsoft.com/en-us/library/system.directoryservices.accountmanagement.userprincipal.aspx">System.DirectoryServices.AccountManagement.UserPrincipal</a>. </p>
-        
+</div>
 
-        
 <h2>EXAMPLE 1</h2>
 <pre><code>Install-User -Credential $lukeCredentials -Description "Luke Skywalker's account."</code></pre>
 <p>Creates a new <code>LSkywalker</code> user account with the given password and description.  Luke's password is set to never expire.</p>
 
+
 <h2>EXAMPLE 2</h2>
 <pre><code>Install-User -Credential $lukeCredentials -UserCannotChangePassword -PasswordExpires</code></pre>
 <p>Demonstrates how to create an account for a user who cannot change his password and whose password will expire.</p>
+
 
 	<div class="Footer">
 		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.

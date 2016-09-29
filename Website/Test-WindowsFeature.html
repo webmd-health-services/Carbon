@@ -18,21 +18,23 @@
     </ul>
 
     <h1>Test-WindowsFeature</h1>
-<div><p>Tests if an optional Windows component exists and, optionally, if it is installed.</p></div>
+<div class="Synopsis">
+<p>Tests if an optional Windows component exists and, optionally, if it is installed.</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>Test-WindowsFeature [-Name] &lt;String&gt; [-Installed] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
-    
+
 <h2>Description</h2>
 <div class="Description">
 <p>Feature names are different across different versions of Windows.  This function tests if a given feature exists.  You can also test if a feature is installed by setting the <code>Installed</code> switch.</p>
 
 <p>Feature names are case-sensitive and are different between different versions of Windows.  For a list, on Windows 2008, run <code>serveramanagercmd.exe -q</code>; on Windows 7, run <code>Get-WmiObject -Class Win32_OptionalFeature | Select-Object Name</code>.  On Windows 8/2012, use <code>Get-WindowsFeature</code>.</p>
 </div>
-    
+
 <h2>Related Commands</h2>
 
-<ul>
+<ul class="RelatedCommands">
 <li><a href="Get-WindowsFeature.html">Get-WindowsFeature</a></li>
 <li><a href="Install-WindowsFeature.html">Install-WindowsFeature</a></li>
 <li><a href="Uninstall-WindowsFeature.html">Uninstall-WindowsFeature</a></li>
@@ -89,20 +91,16 @@
     <td></td>
 </tr>
 </table>
-        
 
-        
-
-        
-
-        
 <h2>EXAMPLE 1</h2>
 <pre><code>Test-WindowsFeature -Name MSMQ-Server</code></pre>
 <p>Tests if the MSMQ-Server feature exists on the current computer.</p>
 
+
 <h2>EXAMPLE 2</h2>
 <pre><code>Test-WindowsFeature -Name IIS-WebServer -Installed</code></pre>
 <p>Tests if the IIS-WebServer features exists and is installed/enabled.</p>
+
 
 	<div class="Footer">
 		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.

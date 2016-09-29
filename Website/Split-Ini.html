@@ -18,11 +18,13 @@
     </ul>
 
     <h1>Split-Ini</h1>
-<div><p>Reads an INI file and returns its contents.</p></div>
+<div class="Synopsis">
+<p>Reads an INI file and returns its contents.</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>Split-Ini -Path &lt;String&gt; [-AsHashtable] [-CaseSensitive] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
-    
+
 <h2>Description</h2>
 <div class="Description">
 <p>A configuration file consists of sections, led by a "[section]" header and followed by "name = value" entries:</p>
@@ -89,10 +91,10 @@ bread=toasted
 
 <p>Be default, operates on the INI file case-insensitively. If your INI is case-sensitive, use the <code>-CaseSensitive</code> switch.</p>
 </div>
-    
+
 <h2>Related Commands</h2>
 
-<ul>
+<ul class="RelatedCommands">
 <li><a href="Set-IniEntry.html">Set-IniEntry</a></li>
 <li><a href="Remove-IniEntry.html">Remove-IniEntry</a></li>
 </ul>
@@ -156,13 +158,7 @@ bread=toasted
     <td></td>
 </tr>
 </table>
-        
 
-        
-
-        
-
-        
 <h2>EXAMPLE 1</h2>
 <pre><code>Split-Ini -Path C:\Users\rspektor\mercurial.ini</code></pre>
 <p>Given this INI file:</p>
@@ -183,6 +179,7 @@ extdiff =
    5 extensions.share   extensions share    
    6 extensions.extdiff extensions extdiff
 </code></pre>
+
 
 <h2>EXAMPLE 2</h2>
 <pre><code>Split-Ini -Path C:\Users\rspektor\mercurial.ini -AsHashtable</code></pre>
@@ -222,6 +219,7 @@ extdiff =
                           )
 }
 </code></pre>
+
 
 <h2>EXAMPLE 3</h2>
 <pre><code>Split-Ini -Path C:\Users\rspektor\mercurial.ini -AsHashtable -CaseSensitive</code></pre>
@@ -263,6 +261,7 @@ username = user3@example.com
                     );
 }
 </code></pre>
+
 
 	<div class="Footer">
 		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.

@@ -18,19 +18,19 @@
     </ul>
 
     <h1>Install-Directory</h1>
-<div><p>Creates a directory, if it doesn't exist.</p></div>
+<div class="Synopsis">
+<p>Creates a directory, if it doesn't exist.</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>Install-Directory [-Path] &lt;String&gt; [&lt;CommonParameters&gt;]</code></pre>
-    
+
 <h2>Description</h2>
 <div class="Description">
 <p>The <code>Install-Directory</code> function creates a directory. If the directory already exists, it does nothing. If any parent directories don't exist, they are created, too.</p>
 
 <p><code>Install-Directory</code> was added in Carbon 2.1.0.</p>
 </div>
-    
-
 
 <h2> Parameters </h2>
 <table id="Parameters">
@@ -52,16 +52,11 @@
 </tr>
 
 </table>
-        
 
-        
-
-        
-
-        
 <h2>EXAMPLE 1</h2>
 <pre><code>Install-Directory -Path 'C:\Projects\Carbon'</code></pre>
 <p>Demonstrates how to use create a directory. In this case, the directories <code>C:\Projects</code> and <code>C:\Projects\Carbon</code> will be created if they don't exist.</p>
+
 
 	<div class="Footer">
 		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.

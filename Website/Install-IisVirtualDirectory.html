@@ -18,19 +18,19 @@
     </ul>
 
     <h1>Install-IisVirtualDirectory</h1>
-<div><p>Installs a virtual directory.</p></div>
+<div class="Synopsis">
+<p>Installs a virtual directory.</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>Install-IisVirtualDirectory [-SiteName] &lt;String&gt; [-VirtualPath] &lt;String&gt; [-PhysicalPath] &lt;String&gt; [-Force] [&lt;CommonParameters&gt;]</code></pre>
-    
+
 <h2>Description</h2>
 <div class="Description">
 <p>The <code>Install-IisVirtualDirectory</code> function creates a virtual directory under website <code>SiteName</code> at <code>/VirtualPath</code>, serving files out of <code>PhysicalPath</code>.  If a virtual directory at <code>VirtualPath</code> already exists, it is updated in palce. (Before Carbon 2.0, the virtual directory was deleted before installation.)</p>
 
 <p>Beginning with Carbon 2.0.1, this function is available only if IIS is installed.</p>
 </div>
-    
-
 
 <h2> Parameters </h2>
 <table id="Parameters">
@@ -80,20 +80,16 @@
 </tr>
 
 </table>
-        
 
-        
-
-        
-
-        
 <h2>EXAMPLE 1</h2>
 <pre><code>Install-IisVirtualDirectory -SiteName 'Peanuts' -VirtualPath 'DogHouse' -PhysicalPath C:\Peanuts\Doghouse</code></pre>
 <p>Creates a /DogHouse virtual directory, which serves files from the C:\Peanuts\Doghouse directory.  If the Peanuts website responds to hostname <code>peanuts.com</code>, the virtual directory is accessible at <code>peanuts.com/DogHouse</code>.</p>
 
+
 <h2>EXAMPLE 2</h2>
 <pre><code>Install-IisVirtualDirectory -SiteName 'Peanuts' -VirtualPath 'Brown/Snoopy/DogHouse' -PhysicalPath C:\Peanuts\DogHouse</code></pre>
 <p>Creates a DogHouse virtual directory under the <code>Peanuts</code> website at <code>/Brown/Snoopy/DogHouse</code> serving files out of the <code>C:\Peanuts\DogHouse</code> directory.  If the Peanuts website responds to hostname <code>peanuts.com</code>, the virtual directory is accessible at <code>peanuts.com/Brown/Snoopy/DogHouse</code>.</p>
+
 
 	<div class="Footer">
 		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.

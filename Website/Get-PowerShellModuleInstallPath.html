@@ -18,32 +18,29 @@
     </ul>
 
     <h1>Get-PowerShellModuleInstallPath</h1>
-<div><p>Returns the path to the directory where you can install custom modules.</p></div>
+<div class="Synopsis">
+<p>Returns the path to the directory where you can install custom modules.</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>Get-PowerShellModuleInstallPath [&lt;CommonParameters&gt;]</code></pre>
-    
+
 <h2>Description</h2>
 <div class="Description">
 <p>Custom modules should be installed under the <code>Program Files</code> directory. This function looks at the <code>PSModulePath</code> environment variable to find the install location under <code>Program Files</code>. If that path isn't part of the <code>PSModulePath</code> environment variable, returns the module path under <code>$PSHOME</code>. If that isn't part of the <code>PSModulePath</code> environment variable, an error is written and nothing is returned.</p>
 
 <p><code>Get-PowerShellModuleInstallPath</code> is new in Carbon 2.0.</p>
 </div>
-    
 
-
-
-        
-
-        
 <h2>Return Values</h2>
+<div class="ReturnValues">
 <p><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">System.String</a>. </p>
-        
+</div>
 
-        
 <h2>EXAMPLE 1</h2>
 <pre><code>Get-PowerShellModuleInstallPath</code></pre>
 <p>Demonstrates how to get the path where modules should be installed.</p>
+
 
 	<div class="Footer">
 		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.

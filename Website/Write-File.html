@@ -18,11 +18,13 @@
     </ul>
 
     <h1>Write-File</h1>
-<div><p>Writes text to a file, retrying if the write fails.</p></div>
+<div class="Synopsis">
+<p>Writes text to a file, retrying if the write fails.</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>Write-File [-Path] &lt;Object&gt; [-InputObject] &lt;String[]&gt; [[-MaximumTries] &lt;Int32&gt;] [[-RetryDelayMilliseconds] &lt;Int32&gt;] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
-    
+
 <h2>Description</h2>
 <div class="Description">
 <p>The <code>Write-File</code> function writes text file to a file, and will retry if the write fails. Use this function if you need to write text files that can be intermittently locked, like the Windows hosts file. </p>
@@ -33,8 +35,6 @@
 
 <p>This function was introduced in Carbon 2.2.0.</p>
 </div>
-    
-
 
 <h2> Parameters </h2>
 <table id="Parameters">
@@ -103,28 +103,26 @@
     <td></td>
 </tr>
 </table>
-        
 
-        
-
-        
-
-        
 <h2>EXAMPLE 1</h2>
 <pre><code>$lines | Write-File -Path 'C:\Path\to\my\file'</code></pre>
 <p>Demonstrates how to write lines to a text file using the pipeline.</p>
+
 
 <h2>EXAMPLE 2</h2>
 <pre><code>Write-File -Path 'C:\Path\to\my\file' -InputObject $lines</code></pre>
 <p>Demonstrates how to write lines to a text file using a variable.</p>
 
+
 <h2>EXAMPLE 3</h2>
 <pre><code>$lines | Write-File -Path 'C:\Path\to\my\file' -MaximumRetries 10 -RetryDelayMilliseconds 1000</code></pre>
 <p>Demonstrates how to control how long to retry writing the text file. In this case, <code>Write-File</code> will try 10 times, waiting one second between tries.</p>
 
+
 <h2>EXAMPLE 4</h2>
 <pre><code>$lines | Write-File -Path 'C:\Path\to\my\file' -ErrorVariable 'writeErrors'</code></pre>
 <p>Demonstrates how to check if the write failed. In this case, errors are copied to a 'writeErrors' variable, so you would check if this error variable has any items.</p>
+
 
 	<div class="Footer">
 		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.

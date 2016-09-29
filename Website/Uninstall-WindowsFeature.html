@@ -18,12 +18,14 @@
     </ul>
 
     <h1>Uninstall-WindowsFeature</h1>
-<div><p>Uninstalls optional Windows components/features.</p></div>
+<div class="Synopsis">
+<p>Uninstalls optional Windows components/features.</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>Uninstall-WindowsFeature -Name &lt;String[]&gt; [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
 <pre class="Syntax"><code>Uninstall-WindowsFeature [-Iis] [-IisHttpRedirection] [-Msmq] [-MsmqHttpSupport] [-MsmqActiveDirectoryIntegration] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
-    
+
 <h2>Description</h2>
 <div class="Description">
 <p>The names of the features are different on different versions of Windows.  For a list, run <code>Get-WindowsService</code>.</p>
@@ -32,10 +34,10 @@
 
 <p><strong>This function is not available on Windows 8/2012.</strong></p>
 </div>
-    
+
 <h2>Related Commands</h2>
 
-<ul>
+<ul class="RelatedCommands">
 <li><a href="Get-WindowsFeature.html">Get-WindowsFeature</a></li>
 <li>Install-WindowsService</li>
 <li>Test-WindowsService</li>
@@ -124,20 +126,16 @@
     <td></td>
 </tr>
 </table>
-        
 
-        
-
-        
-
-        
 <h2>EXAMPLE 1</h2>
 <pre><code>Uninstall-WindowsFeature -Name TelnetClient,TFTP</code></pre>
 <p>Uninstalls Telnet and TFTP.</p>
 
+
 <h2>EXAMPLE 2</h2>
 <pre><code>Uninstall-WindowsFeature -Iis</code></pre>
 <p>Uninstalls IIS.</p>
+
 
 	<div class="Footer">
 		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.

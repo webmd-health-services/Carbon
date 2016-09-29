@@ -18,11 +18,13 @@
     </ul>
 
     <h1>Install-Junction</h1>
-<div><p>Creates a junction, or updates an existing junction if its target is different.</p></div>
+<div class="Synopsis">
+<p>Creates a junction, or updates an existing junction if its target is different.</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>Install-Junction [-Link] &lt;String&gt; [-Target] &lt;String&gt; [-PassThru] [-Force] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
-    
+
 <h2>Description</h2>
 <div class="Description">
 <p>Creates a junction given by <code>-Link</code> which points to the path given by <code>-Target</code>.  If <code>Link</code> exists, deletes it and re-creates it if it doesn't point to <code>Target</code>.</p>
@@ -31,10 +33,10 @@
 
 <p>Beginning with Carbon 2.0, returns a <code>System.IO.DirectoryInfo</code> object for the target path, if one is created.  Returns a <code>System.IO.DirectoryInfo</code> object for the junction, if it is created and/or updated.</p>
 </div>
-    
+
 <h2>Related Commands</h2>
 
-<ul>
+<ul class="RelatedCommands">
 <li><a href="New-Junction.html">New-Junction</a></li>
 <li><a href="Remove-Junction.html">Remove-Junction</a></li>
 </ul>
@@ -106,21 +108,21 @@
     <td></td>
 </tr>
 </table>
-        
 
-        
 <h2>Return Values</h2>
+<div class="ReturnValues">
 <p><a href="http://msdn.microsoft.com/en-us/library/system.io.directoryinfo.aspx">System.IO.DirectoryInfo</a>. To return a <code>DirectoryInfo</code> object for installed junction, use the <code>PassThru</code> switch.</p>
-        
+</div>
 
-        
 <h2>EXAMPLE 1</h2>
 <pre><code>Install-Junction -Link 'C:\Windows\system32Link' -Target 'C:\Windows\system32'</code></pre>
 <p>Creates the <code>C:\Windows\system32Link</code> directory, which points to <code>C:\Windows\system32</code>.</p>
 
+
 <h2>EXAMPLE 2</h2>
 <pre><code>Install-Junction -Link C:\Projects\Foobar -Target 'C:\Foo\bar' -Force</code></pre>
 <p>This example demonstrates how to create the target directory if it doesn't exist.  After this example runs, the directory <code>C:\Foo\bar</code> and junction <code>C:\Projects\Foobar</code> will be created.</p>
+
 
 	<div class="Footer">
 		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.

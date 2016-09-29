@@ -18,7 +18,9 @@
     </ul>
 
     <h1>Carbon_FirewallRule</h1>
-<div><p>DSC resource for managing firewall rules.</p></div>
+<div class="Synopsis">
+<p>DSC resource for managing firewall rules.</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>Carbon_FirewallRule [String] #ResourceName
@@ -34,7 +36,7 @@
     [InterfaceType = [string]{ Any | LAN | RAS | Wireless }]
     [LocalIPAddress = [string]]
     [LocalPort = [string]]
-    [Profile = [string]{ Any | Domain | Private | Public }]
+    [Profile = [string[]]{ Any | Domain | Private | Public }]
     [Program = [string]]
     [Protocol = [string]]
     [PsDscRunAsCredential = [PSCredential]]
@@ -44,7 +46,7 @@
     [Service = [string]]
 }
 </code></pre>
-    
+
 <h2>Description</h2>
 <div class="Description">
 <p>The <code>Carbon_FirewallRule</code> resource manages firewall rules. It uses the <code>netsh advfirewall firewall</code> command. Please see <a href="http://technet.microsoft.com/en-us/library/dd734783.aspx">Netsh AdvFirewall Firewall Commands</a> or run <code>netsh advfirewall firewall set rule</code> for documentation on how to configure the firewall.</p>
@@ -53,10 +55,10 @@
 
 <p><code>Carbon_FirewallRule</code> is new in Carbon 2.0.</p>
 </div>
-    
+
 <h2>Related Commands</h2>
 
-<ul>
+<ul class="RelatedCommands">
 <li><a href="Get-FirewallRule.html">Get-FirewallRule</a></li>
 <li><a href="http://technet.microsoft.com/en-us/library/dd734783.aspx">http://technet.microsoft.com/en-us/library/dd734783.aspx</a></li>
 </ul>
@@ -209,13 +211,7 @@
 </tr>
 
 </table>
-        
 
-        
-
-        
-
-        
 <h2>EXAMPLE 1</h2>
 
 <p>Demonstrates how to enable a firewall rule.</p>
@@ -227,6 +223,7 @@
     Ensure = 'Present'
 }
 </code></pre>
+
 
 <h2>EXAMPLE 2</h2>
 
@@ -240,6 +237,7 @@
 </code></pre>
 
 <p>There may be multiple rules with the same name, so we recommend disabling rules instead.</p>
+
 
 <h2>EXAMPLE 3</h2>
 
@@ -255,6 +253,7 @@
     Ensure = 'Present';
 }
 </code></pre>
+
 
 	<div class="Footer">
 		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.

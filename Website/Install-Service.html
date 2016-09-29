@@ -18,13 +18,15 @@
     </ul>
 
     <h1>Install-Service</h1>
-<div><p>Installs a Windows service.</p></div>
+<div class="Synopsis">
+<p>Installs a Windows service.</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>Install-Service -Name &lt;String&gt; -Path &lt;String&gt; [-ArgumentList &lt;String[]&gt;] [-StartupType {Boot | System | Automatic | Manual | Disabled}] [-OnFirstFailure {TakeNoAction | Restart | Reboot | RunCommand}] [-OnSecondFailure {TakeNoAction | Restart | Reboot | RunCommand}] [-OnThirdFailure {TakeNoAction | Restart | Reboot | RunCommand}] [-ResetFailureCount &lt;Int32&gt;] [-RestartDelay &lt;Int32&gt;] [-RebootDelay &lt;Int32&gt;] [-Dependency &lt;String[]&gt;] [-Command &lt;String&gt;] [-RunCommandDelay &lt;Int32&gt;] [-Description &lt;String&gt;] [-DisplayName &lt;String&gt;] [-Force] [-PassThru] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
 <pre class="Syntax"><code>Install-Service -Name &lt;String&gt; -Path &lt;String&gt; [-ArgumentList &lt;String[]&gt;] [-StartupType {Boot | System | Automatic | Manual | Disabled}] [-OnFirstFailure {TakeNoAction | Restart | Reboot | RunCommand}] [-OnSecondFailure {TakeNoAction | Restart | Reboot | RunCommand}] [-OnThirdFailure {TakeNoAction | Restart | Reboot | RunCommand}] [-ResetFailureCount &lt;Int32&gt;] [-RestartDelay &lt;Int32&gt;] [-RebootDelay &lt;Int32&gt;] [-Dependency &lt;String[]&gt;] [-Command &lt;String&gt;] [-RunCommandDelay &lt;Int32&gt;] [-Description &lt;String&gt;] [-DisplayName &lt;String&gt;] -UserName &lt;String&gt; [-Password &lt;String&gt;] [-Force] [-PassThru] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
 <pre class="Syntax"><code>Install-Service -Name &lt;String&gt; -Path &lt;String&gt; [-ArgumentList &lt;String[]&gt;] [-StartupType {Boot | System | Automatic | Manual | Disabled}] [-OnFirstFailure {TakeNoAction | Restart | Reboot | RunCommand}] [-OnSecondFailure {TakeNoAction | Restart | Reboot | RunCommand}] [-OnThirdFailure {TakeNoAction | Restart | Reboot | RunCommand}] [-ResetFailureCount &lt;Int32&gt;] [-RestartDelay &lt;Int32&gt;] [-RebootDelay &lt;Int32&gt;] [-Dependency &lt;String[]&gt;] [-Command &lt;String&gt;] [-RunCommandDelay &lt;Int32&gt;] [-Description &lt;String&gt;] [-DisplayName &lt;String&gt;] -Credential &lt;PSCredential&gt; [-Force] [-PassThru] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
-    
+
 <h2>Description</h2>
 <div class="Description">
 <p><code>Install-Service</code> uses <code>sc.exe</code> to install a Windows service. If a service with the given name already exists, it is stopped, its configuration is updated to match the parameters passed in, and then re-started. Settings whose parameters are omitted are reset to their default values.</p>
@@ -41,10 +43,10 @@
 
 <p>The ability to provide service arguments/parameters via the <code>ArgumentList</code> parameter was added in Carbon 2.0.</p>
 </div>
-    
+
 <h2>Related Commands</h2>
 
-<ul>
+<ul class="RelatedCommands">
 <li>Carbon_Service</li>
 <li><a href="New-Credential.html">New-Credential</a></li>
 <li><a href="Uninstall-Service.html">Uninstall-Service</a></li>
@@ -252,33 +254,36 @@
     <td></td>
 </tr>
 </table>
-        
 
-        
 <h2>Return Values</h2>
+<div class="ReturnValues">
 <p><a href="http://msdn.microsoft.com/en-us/library/system.serviceprocess.servicecontroller.aspx">System.ServiceProcess.ServiceController</a>. </p>
-        
+</div>
 
-        
 <h2>EXAMPLE 1</h2>
 <pre><code>Install-Service -Name DeathStar -Path C:\ALongTimeAgo\InAGalaxyFarFarAway\DeathStar.exe</code></pre>
 <p>Installs the Death Star service, which runs the service executable at <code>C:\ALongTimeAgo\InAGalaxyFarFarAway\DeathStar.exe</code>.  The service runs as <code>NetworkService</code> and will start automatically.</p>
+
 
 <h2>EXAMPLE 2</h2>
 <pre><code>Install-Service -Name DeathStar -Path C:\ALongTimeAgo\InAGalaxyFarFarAway\DeathStar.exe -StartupType Manual</code></pre>
 <p>Install the Death Star service to startup manually.  You certainly don't want the thing roaming the galaxy, destroying thing willy-nilly, do you?</p>
 
+
 <h2>EXAMPLE 3</h2>
 <pre><code>Install-Service -Name DeathStar -Path C:\ALongTimeAgo\InAGalaxyFarFarAway\DeathStar.exe -Credential $tarkinCredentials</code></pre>
 <p>Installs the Death Star service to run as Grand Moff Tarkin, who is given the log on as a service right.</p>
+
 
 <h2>EXAMPLE 4</h2>
 <pre><code>Install-Service -Name DeathStar -Path C:\ALongTimeAgo\InAGalaxyFarFarAway\DeathStar.exe -Username SYSTEM</code></pre>
 <p>Demonstrates how to install a service to run as a system account other than <code>NetworkService</code>. Installs the DeathStart service to run as the local <code>System</code> account.</p>
 
+
 <h2>EXAMPLE 5</h2>
 <pre><code>Install-Service -Name DeathStar -Path C:\ALongTimeAgo\InAGalaxyFarFarAway\DeathStar.exe -OnFirstFailure RunCommand -RunCommandDelay 5000 -Command 'engage_hyperdrive.exe "Corruscant"' -OnSecondFailure Restart -RestartDelay 30000 -OnThirdFailure Reboot -RebootDelay 120000 -ResetFailureCount (60*60*24)</code></pre>
 <p>Demonstrates how to control the service's failure actions. On the first failure, Windows will run the <code>engage-hyperdrive.exe "Corruscant"</code> command after 5 seconds (<code>5,000</code> milliseconds). On the second failure, Windows will restart the service after 30 seconds (<code>30,000</code> milliseconds). On the third failure, Windows will reboot after two minutes (<code>120,000</code> milliseconds). The failure count gets reset once a day (<code>60*60*24</code> seconds).</p>
+
 
 	<div class="Footer">
 		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.

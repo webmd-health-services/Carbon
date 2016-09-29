@@ -18,21 +18,23 @@
     </ul>
 
     <h1>Disable-NtfsCompression</h1>
-<div><p>Turns off NTFS compression on a file/directory.</p></div>
+<div class="Synopsis">
+<p>Turns off NTFS compression on a file/directory.</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>Disable-NtfsCompression [-Path] &lt;String[]&gt; [-Recurse] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
-    
+
 <h2>Description</h2>
 <div class="Description">
 <p>When disabling compression for a directory, any compressed files/directories in that directory will remain compressed.  To decompress everything, use the <code>-Recurse</code> switch.  This could take awhile.</p>
 
 <p>Uses Windows' <code>compact.exe</code> command line utility to compress the file/directory.  To see the output from <code>compact.exe</code>, set the <code>Verbose</code> switch.</p>
 </div>
-    
+
 <h2>Related Commands</h2>
 
-<ul>
+<ul class="RelatedCommands">
 <li><a href="Enable-NtfsCompression.html">Enable-NtfsCompression</a></li>
 <li><a href="Test-NtfsCompression.html">Test-NtfsCompression</a></li>
 </ul>
@@ -88,24 +90,21 @@
     <td></td>
 </tr>
 </table>
-        
 
-        
-
-        
-
-        
 <h2>EXAMPLE 1</h2>
 <pre><code>Disable-NtfsCompression -Path C:\Projects\Carbon</code></pre>
 <p>Turns off NTFS compression on and decompresses the <code>C:\Projects\Carbon</code> directory, but not its sub-directories/files.  New files/directories will get compressed.</p>
+
 
 <h2>EXAMPLE 2</h2>
 <pre><code>Disable-NtfsCompression -Path C:\Projects\Carbon -Recurse</code></pre>
 <p>Turns off NTFS compression on and decompresses the <code>C:\Projects\Carbon</code> directory and all its sub-directories/sub-files.</p>
 
+
 <h2>EXAMPLE 3</h2>
 <pre><code>Get-ChildItem * | Where-Object { $_.PsIsContainer } | Disable-NtfsCompression</code></pre>
 <p>Demonstrates that you can pipe the path to compress into <code>Disable-NtfsCompression</code>.</p>
+
 
 	<div class="Footer">
 		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.

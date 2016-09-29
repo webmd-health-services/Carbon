@@ -18,11 +18,13 @@
     </ul>
 
     <h1>Test-DscTargetResource</h1>
-<div><p>Tests that all the properties on a resource and object are the same.</p></div>
+<div class="Synopsis">
+<p>Tests that all the properties on a resource and object are the same.</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>Test-DscTargetResource [-TargetResource] &lt;Hashtable&gt; [-DesiredResource] &lt;Hashtable&gt; [-Target] &lt;String&gt; [&lt;CommonParameters&gt;]</code></pre>
-    
+
 <h2>Description</h2>
 <div class="Description">
 <p>DSC expects a resource's <code>Test-TargetResource</code> function to return <code>$false</code> if an object needs to be updated. Usually, you compare the current state of a resource with the desired state, and return <code>$false</code> if anything doesn't match.</p>
@@ -43,8 +45,6 @@ return Test-TargetResource -TargetResource $resource -DesiredResource $PSBoundPa
 
 <p><code>Test-DscTargetResource</code> is new in Carbon 2.0.</p>
 </div>
-    
-
 
 <h2> Parameters </h2>
 <table id="Parameters">
@@ -82,17 +82,16 @@ return Test-TargetResource -TargetResource $resource -DesiredResource $PSBoundPa
 </tr>
 
 </table>
-        
 
-        
 <h2>Return Values</h2>
+<div class="ReturnValues">
 <p><a href="http://msdn.microsoft.com/en-us/library/system.boolean.aspx">System.Boolean</a>. </p>
-        
+</div>
 
-        
 <h2>EXAMPLE 1</h2>
 <pre><code>Test-TargetResource -TargetResource (Get-TargetResource -Name 'fubar') -DesiredResource $PSBoundParameters -Target ('my resource ''fubar''')</code></pre>
 <p>Demonstrates how to test that all the properties on a DSC resource are the same was what's desired.</p>
+
 
 	<div class="Footer">
 		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.

@@ -18,11 +18,13 @@
     </ul>
 
     <h1>New-RsaKeyPair</h1>
-<div><p>Generates a public/private RSA key pair.</p></div>
+<div class="Synopsis">
+<p>Generates a public/private RSA key pair.</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>New-RsaKeyPair [-Subject] &lt;String&gt; [-Algorithm &lt;String&gt;] [-ValidFrom &lt;DateTime&gt;] [-ValidTo &lt;DateTime&gt;] [-Length &lt;Int32&gt;] [-Authority &lt;String&gt;] [-PublicKeyFile] &lt;String&gt; [-PrivateKeyFile] &lt;String&gt; [-Password &lt;SecureString&gt;] [-Force] [&lt;CommonParameters&gt;]</code></pre>
-    
+
 <h2>Description</h2>
 <div class="Description">
 <p>The <code>New-RsaKeyPair</code> function uses the <code>certreq.exe</code> program to generate an RSA public/private key pair suitable for use in encrypting/decrypting CMS messages, credentials in DSC resources, etc. It uses the following <code>.inf</code> file as input (taken from the first example in the help for the <code>Protect-CmsMessage</code> cmdlet):</p>
@@ -58,10 +60,10 @@ ValidityPeriodUnits =
 
 <p>Before Carbon 2.1, this function used the <code>makecert.exe</code> and <code>pvk2pfx.exe</code> programs, from the Windows SDK. These programs prompt multiple times for the private key password, so if you're using a version before 2.1, you can't run this function non-interactively.</p>
 </div>
-    
+
 <h2>Related Commands</h2>
 
-<ul>
+<ul class="RelatedCommands">
 <li><a href="Get-Certificate.html">Get-Certificate</a></li>
 <li><a href="Install-Certificate.html">Install-Certificate</a></li>
 </ul>
@@ -164,25 +166,26 @@ ValidityPeriodUnits =
 </tr>
 
 </table>
-        
 
-        
 <h2>Return Values</h2>
+<div class="ReturnValues">
 <p><a href="http://msdn.microsoft.com/en-us/library/system.io.fileinfo.aspx">System.IO.FileInfo</a>. </p>
-        
+</div>
 
-        
 <h2>EXAMPLE 1</h2>
 <pre><code>New-RsaKeyPair -Subject 'CN=MyName' -PublicKeyFile 'MyName.cer' -PrivateKeyFile 'MyName.pfx' -Password $secureString</code></pre>
 <p>Demonstrates the minimal parameters needed to generate a key pair. The key will use a sha512 signing algorithm, have a length of 4096 bits, and expire on <code>12/31/9999</code>. The public key will be saved in the current directory as <code>MyName.cer</code>. The private key will be saved to the current directory as <code>MyName.pfx</code> and protected with password in <code>$secureString</code>.</p>
+
 
 <h2>EXAMPLE 2</h2>
 <pre><code>New-RsaKeyPair -Subject 'CN=MyName' -PublicKeyFile 'MyName.cer' -PrivateKeyFile 'MyName.pfx' -Password $null</code></pre>
 <p>Demonstrates how to save the private key unprotected (i.e. without a password). You must set the password to <code>$null</code>. This functionality was introduced in Carbon 2.1.</p>
 
+
 <h2>EXAMPLE 3</h2>
 <pre><code>New-RsaKeyPair -Subject 'CN=MyName' -PublicKeyFile 'MyName.cer' -PrivateKeyFile 'MyName.pfx' -Algorithm 'sha1' -ValidTo (Get-Date -Year 2015 -Month 12 -Day 31) -Length 1024 -Password $secureString</code></pre>
 <p>Demonstrates how to use all the parameters to create a truly customized key pair. The generated certificate will use the sha1 signing algorithm, becomes effective 1/1/2015, expires 12/31/2015, and is 1024 bits in length.</p>
+
 
 	<div class="Footer">
 		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.

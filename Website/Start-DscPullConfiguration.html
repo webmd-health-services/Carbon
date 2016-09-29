@@ -18,12 +18,14 @@
     </ul>
 
     <h1>Start-DscPullConfiguration</h1>
-<div><p>Performs a configuration check on a computer that is using DSC's Pull refresh mode.</p></div>
+<div class="Synopsis">
+<p>Performs a configuration check on a computer that is using DSC's Pull refresh mode.</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>Start-DscPullConfiguration -ComputerName &lt;String[]&gt; [-Credential &lt;PSCredential&gt;] [-ModuleName &lt;String[]&gt;] [&lt;CommonParameters&gt;]</code></pre>
 <pre class="Syntax"><code>Start-DscPullConfiguration [-CimSession &lt;CimSession[]&gt;] [-ModuleName &lt;String[]&gt;] [&lt;CommonParameters&gt;]</code></pre>
-    
+
 <h2>Description</h2>
 <div class="Description">
 <p>The most frequently a computer's LCM will download new configuration is every 15 minutes; the most frequently it will apply it is every 30 minutes. This function contacts a computer's LCM and tells it to apply and download its configuration immediately.</p>
@@ -36,10 +38,10 @@
 
 <p><code>Start-DscPullConfiguration</code> is new in Carbon 2.0.</p>
 </div>
-    
+
 <h2>Related Commands</h2>
 
-<ul>
+<ul class="RelatedCommands">
 <li><a href="Get-DscError.html">Get-DscError</a></li>
 <li><a href="Initialize-Lcm.html">Initialize-Lcm</a></li>
 <li><a href="Get-DscWinEvent.html">Get-DscWinEvent</a></li>
@@ -89,28 +91,26 @@
 </tr>
 
 </table>
-        
 
-        
-
-        
-
-        
 <h2>EXAMPLE 1</h2>
 <pre><code>Start-DscPullConfiguration -ComputerName '10.1.2.3','10.4.5.6'</code></pre>
 <p>Demonstrates how to immedately download and apply a computer from its pull server.</p>
+
 
 <h2>EXAMPLE 2</h2>
 <pre><code>Start-DscPullConfiguration -ComputerName '10.1.2.3' -Credential (Get-Credential domain\username)</code></pre>
 <p>Demonstrates how to use custom credentials to contact the remote server.</p>
 
+
 <h2>EXAMPLE 3</h2>
 <pre><code>Start-DscPullConfiguration -CimSession $session</code></pre>
 <p>Demonstrates how to use one or more CIM sessions to invoke a configuration check.</p>
 
+
 <h2>EXAMPLE 4</h2>
 <pre><code>Start-DScPullConfiguration -ComputerName 'example.com' -ModuleName 'Carbon'</code></pre>
 <p>Demonstrates how to delete modules on the target computers, because sometimes the LCM does a really crappy job of it.</p>
+
 
 	<div class="Footer">
 		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.

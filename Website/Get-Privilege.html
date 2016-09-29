@@ -18,21 +18,23 @@
     </ul>
 
     <h1>Get-Privilege</h1>
-<div><p>Gets an identity's privileges.</p></div>
+<div class="Synopsis">
+<p>Gets an identity's privileges.</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>Get-Privilege [-Identity] &lt;String&gt; [&lt;CommonParameters&gt;]</code></pre>
-    
+
 <h2>Description</h2>
 <div class="Description">
 <p>These privileges are usually managed by Group Policy and control the system operations and types of logons a user/group can perform.</p>
 
 <p>Note: if a computer is not on a domain, this function won't work.</p>
 </div>
-    
+
 <h2>Related Commands</h2>
 
-<ul>
+<ul class="RelatedCommands">
 <li>Carbon_Privilege</li>
 <li><a href="Grant-Privilege.html">Grant-Privilege</a></li>
 <li>Revoke-Prvileges</li>
@@ -59,17 +61,16 @@
 </tr>
 
 </table>
-        
 
-        
 <h2>Return Values</h2>
+<div class="ReturnValues">
 <p><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">System.String</a>. </p>
-        
+</div>
 
-        
 <h2>EXAMPLE 1</h2>
 <pre><code>Get-Privilege -Identity TheBeast</code></pre>
 <p>Gets <code>TheBeast</code>'s privileges as an array of strings.</p>
+
 
 	<div class="Footer">
 		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.

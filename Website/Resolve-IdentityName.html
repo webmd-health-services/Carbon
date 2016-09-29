@@ -18,12 +18,14 @@
     </ul>
 
     <h1>Resolve-IdentityName</h1>
-<div><p>Determines the full, NT identity name for a user or group.</p></div>
+<div class="Synopsis">
+<p>Determines the full, NT identity name for a user or group.</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>Resolve-IdentityName [-Name] &lt;String&gt; [&lt;CommonParameters&gt;]</code></pre>
 <pre class="Syntax"><code>Resolve-IdentityName -SID &lt;Object&gt; [&lt;CommonParameters&gt;]</code></pre>
-    
+
 <h2>Description</h2>
 <div class="Description">
 <p><code>Resolve-IdentityName</code> resolves a user/group name into its full, canonical name, used by the operating system. For example, the local Administrators group is actually called BUILTIN\Administrators. With a canonical username, you can unambiguously compare principals on objects that contain user/group information.</p>
@@ -34,10 +36,10 @@
 
 <p>In Carbon 2.0, you can also resolve a SID into its identity name. The <code>SID</code> parameter accepts a SID in SDDL form as a <code>string</code>, a <code>System.Security.Principal.SecurityIdentifier</code> object, or a SID in binary form as an array of bytes. If the SID no longer maps to an active account, you'll get the original SID in SDDL form (as a string) returned to you.</p>
 </div>
-    
+
 <h2>Related Commands</h2>
 
-<ul>
+<ul class="RelatedCommands">
 <li><a href="ConvertTo-SecurityIdentifier.html">ConvertTo-SecurityIdentifier</a></li>
 <li><a href="Resolve-Identity.html">Resolve-Identity</a></li>
 <li><a href="Test-Identity.html">Test-Identity</a></li>
@@ -75,17 +77,16 @@
 </tr>
 
 </table>
-        
 
-        
 <h2>Return Values</h2>
+<div class="ReturnValues">
 <p><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">string</a>. </p>
-        
+</div>
 
-        
 <h2>EXAMPLE 1</h2>
 <pre><code>Resolve-IdentityName -Name 'Administrators'</code></pre>
 <p>Returns <code>BUILTIN\Administrators</code>, the canonical name for the local Administrators group.</p>
+
 
 	<div class="Footer">
 		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.

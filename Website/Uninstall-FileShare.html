@@ -18,21 +18,23 @@
     </ul>
 
     <h1>Uninstall-FileShare</h1>
-<div><p>Uninstalls/removes a file share from the local computer.</p></div>
+<div class="Synopsis">
+<p>Uninstalls/removes a file share from the local computer.</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>Uninstall-FileShare [-Name] &lt;String&gt; [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
-    
+
 <h2>Description</h2>
 <div class="Description">
 <p>The <code>Uninstall-FileShare</code> function uses WMI to uninstall/remove a file share from the local computer, if it exists. If the file shares does not exist, no errors are written and nothing happens. The directory on the file system the share points to is not removed.</p>
 
 <p><code>Uninstall-FileShare</code> was added in Carbon 2.0.</p>
 </div>
-    
+
 <h2>Related Commands</h2>
 
-<ul>
+<ul class="RelatedCommands">
 <li><a href="Get-FileShare.html">Get-FileShare</a></li>
 <li><a href="Get-FileSharePermission.html">Get-FileSharePermission</a></li>
 <li><a href="Install-FileShare.html">Install-FileShare</a></li>
@@ -82,16 +84,11 @@
     <td></td>
 </tr>
 </table>
-        
 
-        
-
-        
-
-        
 <h2>EXAMPLE 1</h2>
 <pre><code>Uninstall-FileShare -Name 'CarbonShare'</code></pre>
 <p>Demonstrates how to uninstall/remove a share from the local computer. If the share does not exist, <code>Uninstall-FileShare</code> silently does nothing (i.e. it doesn't write an error).</p>
+
 
 	<div class="Footer">
 		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.

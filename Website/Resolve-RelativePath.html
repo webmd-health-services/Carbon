@@ -18,22 +18,24 @@
     </ul>
 
     <h1>Resolve-RelativePath</h1>
-<div><p>Converts a path to a relative path from a given source.</p></div>
+<div class="Synopsis">
+<p>Converts a path to a relative path from a given source.</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>Resolve-RelativePath [-Path &lt;String&gt;] -FromDirectory &lt;String&gt; [&lt;CommonParameters&gt;]</code></pre>
 <pre class="Syntax"><code>Resolve-RelativePath [-Path &lt;String&gt;] -FromFile &lt;String&gt; [&lt;CommonParameters&gt;]</code></pre>
-    
+
 <h2>Description</h2>
 <div class="Description">
 <p>The .NET framework doesn't expose an API for getting a relative path to an item.  This function uses Win32 APIs to call <a href="http://msdn.microsoft.com/en-us/library/windows/desktop/bb773740.aspx">PathRelativePathTo</a>.</p>
 
 <p>Neither the <code>From</code> or <code>To</code> paths need to exist.</p>
 </div>
-    
+
 <h2>Related Commands</h2>
 
-<ul>
+<ul class="RelatedCommands">
 <li><a href="http://msdn.microsoft.com/en-us/library/windows/desktop/bb773740.aspx">http://msdn.microsoft.com/en-us/library/windows/desktop/bb773740.aspx</a></li>
 </ul>
 
@@ -73,28 +75,26 @@
 </tr>
 
 </table>
-        
 
-        
-
-        
-
-        
 <h2>EXAMPLE 1</h2>
 <pre><code>Resolve-RelativePath -Path 'C:\Program Files' -FromDirectory 'C:\Windows\system32'</code></pre>
 <p>Returns <code>..\..\Program Files</code>.</p>
+
 
 <h2>EXAMPLE 2</h2>
 <pre><code>Get-ChildItem * | Resolve-RelativePath -FromDirectory 'C:\Windows\system32'</code></pre>
 <p>Returns the relative path from the <code>C:\Windows\system32</code> directory to the current directory.</p>
 
+
 <h2>EXAMPLE 3</h2>
 <pre><code>Resolve-RelativePath -Path 'C:\I\do\not\exist\either' -FromDirectory 'C:\I\do\not\exist'</code></pre>
 <p>Returns <code>.\either</code>.</p>
 
+
 <h2>EXAMPLE 4</h2>
 <pre><code>Resolve-RelativePath -Path 'C:\I\do\not\exist\either' -FromFile 'C:\I\do\not\exist_file'</code></pre>
 <p>Treats <code>C:\I\do\not\exist_file</code> as a file, so returns a relative path of <code>.\exist\either</code>.</p>
+
 
 	<div class="Footer">
 		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.

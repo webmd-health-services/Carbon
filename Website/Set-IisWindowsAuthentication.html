@@ -18,11 +18,13 @@
     </ul>
 
     <h1>Set-IisWindowsAuthentication</h1>
-<div><p>Configures the settings for Windows authentication.</p></div>
+<div class="Synopsis">
+<p>Configures the settings for Windows authentication.</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>Set-IisWindowsAuthentication [-SiteName] &lt;String&gt; [[-VirtualPath] &lt;String&gt;] [-DisableKernelMode] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
-    
+
 <h2>Description</h2>
 <div class="Description">
 <p>By default, configures Windows authentication on a website.  You can configure Windows authentication at a specific path under a website by passing the virtual path (<em>not</em> the physical path) to that directory.</p>
@@ -31,10 +33,10 @@
 
 <p>Beginning with Carbon 2.0.1, this function is available only if IIS is installed.</p>
 </div>
-    
+
 <h2>Related Commands</h2>
 
-<ul>
+<ul class="RelatedCommands">
 <li><a href="http://blogs.msdn.com/b/webtopics/archive/2009/01/19/service-principal-name-spn-checklist-for-kerberos-authentication-with-iis-7-0.aspx">http://blogs.msdn.com/b/webtopics/archive/2009/01/19/service-principal-name-spn-checklist-for-kerberos-authentication-with-iis-7-0.aspx</a></li>
 <li><a href="Disable-IisSecurityAuthentication.html">Disable-IisSecurityAuthentication</a></li>
 <li><a href="Enable-IisSecurityAuthentication.html">Enable-IisSecurityAuthentication</a></li>
@@ -99,20 +101,16 @@
     <td></td>
 </tr>
 </table>
-        
 
-        
-
-        
-
-        
 <h2>EXAMPLE 1</h2>
 <pre><code>Set-IisWindowsAuthentication -SiteName Peanuts</code></pre>
 <p>Configures Windows authentication on the <code>Peanuts</code> site to use kernel mode.</p>
 
+
 <h2>EXAMPLE 2</h2>
 <pre><code>Set-IisWindowsAuthentication -SiteName Peanuts -VirtualPath Snoopy/DogHouse -DisableKernelMode</code></pre>
 <p>Configures Windows authentication on the <code>Doghouse</code> directory of the <code>Peanuts</code> site to not use kernel mode.</p>
+
 
 	<div class="Footer">
 		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.

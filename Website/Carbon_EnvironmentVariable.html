@@ -18,7 +18,9 @@
     </ul>
 
     <h1>Carbon_EnvironmentVariable</h1>
-<div><p>DSC resource for managing environment variables.</p></div>
+<div class="Synopsis">
+<p>DSC resource for managing environment variables.</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>Carbon_EnvironmentVariable [String] #ResourceName
@@ -30,17 +32,17 @@
     [Value = [string]]
 }
 </code></pre>
-    
+
 <h2>Description</h2>
 <div class="Description">
 <p>The Carbon_EnvironmentVariable resource will add, update, or remove environment variables. The environment variable is set/removed at both the computer <em>and</em> process level, so that the process applying the DSC configuration will have access to the variable in later resources.</p>
 
 <p><code>Carbon_EnvironmentVariable</code> is new in Carbon 2.0.</p>
 </div>
-    
+
 <h2>Related Commands</h2>
 
-<ul>
+<ul class="RelatedCommands">
 <li><a href="Set-EnvironmentVariable.html">Set-EnvironmentVariable</a></li>
 </ul>
 
@@ -80,13 +82,7 @@
 </tr>
 
 </table>
-        
 
-        
-
-        
-
-        
 <h2>EXAMPLE 1</h2>
 
 <p>Demonstrates how to create or update an environment variable:</p>
@@ -99,6 +95,7 @@
 }
 </code></pre>
 
+
 <h2>EXAMPLE 2</h2>
 
 <p>Demonstrates how to remove an environment variable.</p>
@@ -109,6 +106,7 @@
     Ensure = 'Absent';
 }
 </code></pre>
+
 
 	<div class="Footer">
 		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.

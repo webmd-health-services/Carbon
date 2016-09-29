@@ -18,12 +18,14 @@
     </ul>
 
     <h1>Convert-XmlFile</h1>
-<div><p>Transforms an XML document using XDT (XML Document Transformation).</p></div>
+<div class="Synopsis">
+<p>Transforms an XML document using XDT (XML Document Transformation).</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>Convert-XmlFile -Path &lt;String&gt; -XdtPath &lt;String&gt; -Destination &lt;String&gt; [-TransformAssemblyPath &lt;String[]&gt;] [-Force] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
 <pre class="Syntax"><code>Convert-XmlFile -Path &lt;String&gt; -XdtXml &lt;XmlDocument&gt; -Destination &lt;String&gt; [-TransformAssemblyPath &lt;String[]&gt;] [-Force] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
-    
+
 <h2>Description</h2>
 <div class="Description">
 <p>An XDT file specifies how to change an XML file from a <em>known</em> beginning state into a new state.  This is usually helpful when deploying IIS websites.  Usually, the website's default web.config file won't work in different environments, and needs to be changed during deployment to reflect settings needed for the target environment.</p>
@@ -50,10 +52,10 @@
 
 <p>When transforming a file, the XDT framework will write warnings and errors to the PowerShell error and warning stream.  Informational and debug messages are written to the verbose stream (i.e. use the <code>Verbose</code> switch to see all the XDT log messages).</p>
 </div>
-    
+
 <h2>Related Commands</h2>
 
-<ul>
+<ul class="RelatedCommands">
 <li><a href="http://msdn.microsoft.com/en-us/library/dd465326.aspx">http://msdn.microsoft.com/en-us/library/dd465326.aspx</a></li>
 <li><a href="http://stackoverflow.com/questions/2915329/advanced-tasks-using-web-config-transformation">http://stackoverflow.com/questions/2915329/advanced-tasks-using-web-config-transformation</a></li>
 <li><a href="Set-DotNetConnectionString.html">Set-DotNetConnectionString</a></li>
@@ -143,28 +145,26 @@
     <td></td>
 </tr>
 </table>
-        
 
-        
-
-        
-
-        
 <h2>EXAMPLE 1</h2>
 <pre><code>Convert-XmlFile -Path ".\web.config" -XdtPath ".\web.debug.config" -Destination '\\webserver\wwwroot\web.config'</code></pre>
 <p>Transforms <code>web.config</code> with the XDT in <code>web.debug.config</code> to a new file at <code>\\webserver\wwwroot\web.config</code>.</p>
+
 
 <h2>EXAMPLE 2</h2>
 <pre><code><connectionStrings><add name=""MyConn"" xdt:Transform=""Insert"" /></connectionStrings></configuration>" -Destination '\\webserver\wwwroot\web.config'</code></pre>
 <p>Transforms <code>web.config</code> with the given XDT XML to a new file at <code>\\webserver\wwwroot\web.config</code>.</p>
 
+
 <h2>EXAMPLE 3</h2>
 <pre><code>Convert-XmlFile -Path ".\web.config" -XdtPath ".\web.debug.config" -Destination '\\webserver\wwwroot\web.config' -Verbose</code></pre>
 <p>See that <code>Verbose</code> switch? It will show informational/debug messages written by the XDT framework.  Very helpful in debugging what XDT framework is doing.</p>
 
+
 <h2>EXAMPLE 4</h2>
 <pre><code>Convert-XmlFile -Path ".\web.config" -XdtPath ".\web.debug.config" -Destination '\\webserver\wwwroot\web.config' -TransformAssemblyPath C:\Projects\CustomTransforms.dll</code></pre>
 <p>Shows how to reference a custom transformation assembly.  It should also be loaded in your XDT file via the <code>xdt:Import</code>.</p>
+
 
 	<div class="Footer">
 		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.

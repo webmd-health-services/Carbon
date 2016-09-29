@@ -18,11 +18,13 @@
     </ul>
 
     <h1>Revoke-HttpUrlPermission</h1>
-<div><p>Revokes all a principal's permission to an HTTP URL.</p></div>
+<div class="Synopsis">
+<p>Revokes all a principal's permission to an HTTP URL.</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>Revoke-HttpUrlPermission [-Url] &lt;String&gt; [-Principal] &lt;String&gt; [&lt;CommonParameters&gt;]</code></pre>
-    
+
 <h2>Description</h2>
 <div class="Description">
 <p>The <code>Revoke-HttpUrlAclPermission</code> functions uses the HTTP Server API to revoke user/groups permissions to an HTTP URL.</p>
@@ -41,10 +43,10 @@
 
 <p><code>Revoke-HttpUrlAclPermission</code> was introduced in Carbon 2.1.0.</p>
 </div>
-    
+
 <h2>Related Commands</h2>
 
-<ul>
+<ul class="RelatedCommands">
 <li><a href="https://msdn.microsoft.com/en-us/library/aa364510.aspx">https://msdn.microsoft.com/en-us/library/aa364510.aspx</a></li>
 <li><a href="Get-HttpUrlAcl.html">Get-HttpUrlAcl</a></li>
 <li><a href="Grant-HttpUrlPermission.html">Grant-HttpUrlPermission</a></li>
@@ -78,16 +80,11 @@
 </tr>
 
 </table>
-        
 
-        
-
-        
-
-        
 <h2>EXAMPLE 1</h2>
 <pre><code>Revoke-HttpUrlAclPermission -Url 'http://+:4833' -Principal 'FALCON\HSolo'</code></pre>
 <p>Demonstrates how to revoke all a user's permissions to an HTTP URL. In this case Captain Solo will no longer be able to listen to URL <code>http://+:4833</code>.</p>
+
 
 	<div class="Footer">
 		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.

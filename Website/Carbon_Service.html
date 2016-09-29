@@ -18,7 +18,9 @@
     </ul>
 
     <h1>Carbon_Service</h1>
-<div><p>DSC resource for configuring Windows services.</p></div>
+<div class="Synopsis">
+<p>DSC resource for configuring Windows services.</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>Carbon_Service [String] #ResourceName
@@ -44,7 +46,7 @@
     [UserName = [string]{ LocalService | LocalSystem | NetworkService }]
 }
 </code></pre>
-    
+
 <h2>Description</h2>
 <div class="Description">
 <p>The <code>Carbon_Service</code> resource configures Windows services, including name, credentials, startup type, state, failure actions, and dependencies.</p>
@@ -57,10 +59,10 @@
 
 <p><code>Carbon_Service</code> is new in Carbon 2.0.</p>
 </div>
-    
+
 <h2>Related Commands</h2>
 
-<ul>
+<ul class="RelatedCommands">
 <li><a href="Grant-Privilege.html">Grant-Privilege</a></li>
 <li><a href="Install-Service.html">Install-Service</a></li>
 <li><a href="Uninstall-Service.html">Uninstall-Service</a></li>
@@ -214,13 +216,7 @@
 </tr>
 
 </table>
-        
 
-        
-
-        
-
-        
 <h2>EXAMPLE 1</h2>
 
 <p>Demonstrates how to install a service that runs as a custom account and has custom failure actions.</p>
@@ -239,6 +235,7 @@
 }
 </code></pre>
 
+
 <h2>EXAMPLE 2</h2>
 
 <p>Demonstrates how to install a service that runs as a built-in account.</p>
@@ -252,6 +249,7 @@
 }
 </code></pre>
 
+
 <h2>EXAMPLE 3</h2>
 
 <p>Demonstrates how to remove a service.</p>
@@ -262,6 +260,7 @@
     Ensure = 'Absent';
 }
 </code></pre>
+
 
 	<div class="Footer">
 		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.

@@ -18,19 +18,21 @@
     </ul>
 
     <h1>Uninstall-ScheduledTask</h1>
-<div><p>Uninstalls a scheduled task on the current computer.</p></div>
+<div class="Synopsis">
+<p>Uninstalls a scheduled task on the current computer.</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>Uninstall-ScheduledTask [-Name] &lt;String&gt; [&lt;CommonParameters&gt;]</code></pre>
-    
+
 <h2>Description</h2>
 <div class="Description">
 <p>The <code>Uninstall-ScheduledTask</code> function uses <code>schtasks.exe</code> to uninstall a scheduled task on the current computer. If the task doesn't exist, nothing happens.</p>
 </div>
-    
+
 <h2>Related Commands</h2>
 
-<ul>
+<ul class="RelatedCommands">
 <li><a href="Get-ScheduledTask.html">Get-ScheduledTask</a></li>
 <li><a href="Test-ScheduledTask.html">Test-ScheduledTask</a></li>
 <li><a href="Install-ScheduledTask.html">Install-ScheduledTask</a></li>
@@ -56,20 +58,16 @@
 </tr>
 
 </table>
-        
 
-        
-
-        
-
-        
 <h2>EXAMPLE 1</h2>
 <pre><code>Uninstall-ScheduledTask -Name 'doc'</code></pre>
 <p>Demonstrates how to delete a scheduled task named <code>doc</code>.</p>
 
+
 <h2>EXAMPLE 2</h2>
 <pre><code>Uninstall-ScheduledTask -Name 'doc' -Force</code></pre>
 <p>Demonstrates how to delete a scheduled task that is currently running.</p>
+
 
 	<div class="Footer">
 		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.

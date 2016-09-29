@@ -18,14 +18,16 @@
     </ul>
 
     <h1>Get-ComPermission</h1>
-<div><p>Gets the COM Access or Launch and Activation permissions for the current computer.</p></div>
+<div class="Synopsis">
+<p>Gets the COM Access or Launch and Activation permissions for the current computer.</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>Get-ComPermission -Access -Limits [-Identity &lt;String&gt;] [&lt;CommonParameters&gt;]</code></pre>
 <pre class="Syntax"><code>Get-ComPermission -Access -Default [-Identity &lt;String&gt;] [&lt;CommonParameters&gt;]</code></pre>
 <pre class="Syntax"><code>Get-ComPermission -LaunchAndActivation -Limits [-Identity &lt;String&gt;] [&lt;CommonParameters&gt;]</code></pre>
 <pre class="Syntax"><code>Get-ComPermission -LaunchAndActivation -Default [-Identity &lt;String&gt;] [&lt;CommonParameters&gt;]</code></pre>
-    
+
 <h2>Description</h2>
 <div class="Description">
 <p>COM access permissions ared used to "allow default access to application" or "set limits on applications that determine their own permissions".  Launch and Activation permissions are used "who is allowed to launch applications or activate objects" and to "set limits on applications that determine their own permissions."  Usually, these permissions are viewed and edited by opening dcomcnfg, right-clicking My Computer under Component Services > Computers, choosing Properties, going to the COM Security tab, and clicking <code>Edit Default...</code> or <code>Edit Limits...</code> buttons under the <strong>Access Permissions</strong> or <strong>Launch and Activation Permissions</strong> sections.  This function does all that, but does it much easier, and returns objects you can work with.</p>
@@ -34,10 +36,10 @@
 
 <p>Returns <code>Carbon.Security.ComAccessRule</code> objects, which inherit from `<a href="http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.accessrule.aspx">System.Security.AccessControl.AccessRule</a>.</p>
 </div>
-    
+
 <h2>Related Commands</h2>
 
-<ul>
+<ul class="RelatedCommands">
 <li><a href="Grant-ComPermission.html">Grant-ComPermission</a></li>
 <li><a href="Revoke-ComPermission.html">Revoke-ComPermission</a></li>
 </ul>
@@ -94,21 +96,21 @@
 </tr>
 
 </table>
-        
 
-        
 <h2>Return Values</h2>
+<div class="ReturnValues">
 <p>Carbon.Security.ComAccessRule. </p>
-        
+</div>
 
-        
 <h2>EXAMPLE 1</h2>
 <pre><code>Get-ComPermission -Access -Default</code></pre>
 <p>Gets the COM access default security permissions. Look how easy it is!</p>
 
+
 <h2>EXAMPLE 2</h2>
 <pre><code>Get-ComPermission -LaunchAndActivation -Identity 'Administrators' -Limits</code></pre>
 <p>Gets the security limits for COM Launch and Activation permissions for the local administrators group.</p>
+
 
 	<div class="Footer">
 		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.

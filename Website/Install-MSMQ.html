@@ -18,11 +18,13 @@
     </ul>
 
     <h1>Install-Msmq</h1>
-<div><p>Installs Microsoft's Message Queueing system/feature.</p></div>
+<div class="Synopsis">
+<p>Installs Microsoft's Message Queueing system/feature.</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>Install-Msmq [-HttpSupport] [-ActiveDirectoryIntegration] [-Dtc] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
-    
+
 <h2>Description</h2>
 <div class="Description">
 <p>Microsoft's MSMQ is <em>not</em> installed by default.  It has to be turned on manually.   This function will enable the MSMQ feature.  There are two sub-features: Active Directory integration and HTTP support.  These can also be enabled by setting the <code>ActiveDirectoryIntegration</code> and <code>HttpSupport</code> switches, respectively.  If MSMQ will be working with queues on other machines, you'll need to enable DTC (the Distributed Transaction Coordinator) by passing the <code>DTC</code> switch.</p>
@@ -31,8 +33,6 @@
 
 <p>If you know better ways of installing MSMQ or other Windows features, or can help us figure out why Microsoft's command line installation tools don't work consistently, we would appreciate it.</p>
 </div>
-    
-
 
 <h2> Parameters </h2>
 <table id="Parameters">
@@ -93,20 +93,16 @@
     <td></td>
 </tr>
 </table>
-        
 
-        
-
-        
-
-        
 <h2>EXAMPLE 1</h2>
 <pre><code>Install-Msmq</code></pre>
 <p>Installs MSMQ on this meachine.  In our experience, this may or may not work.  You'll want to check that the MSMQ service exists and is running after this.  Please help us make this better!</p>
 
+
 <h2>EXAMPLE 2</h2>
 <pre><code>Install-Msmq -HttpSupport -ActiveDirectoryIntegration -Dtc</code></pre>
 <p>Installs MSMQ with the HTTP support and Active Directory sub-features.  Enables and starts the Distributed Transaction Coordinator.</p>
+
 
 	<div class="Footer">
 		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.

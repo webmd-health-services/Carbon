@@ -18,11 +18,13 @@
     </ul>
 
     <h1>Get-PowershellPath</h1>
-<div><p>Gets the path to powershell.exe.</p></div>
+<div class="Synopsis">
+<p>Gets the path to powershell.exe.</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>Get-PowershellPath [-x86] [&lt;CommonParameters&gt;]</code></pre>
-    
+
 <h2>Description</h2>
 <div class="Description">
 <p>Returns the path to the powershell.exe binary for the machine's default architecture (i.e. x86 or x64).  If you're on a x64 machine and want to get the path to x86 PowerShell, set the <code>x86</code> switch.</p>
@@ -41,8 +43,6 @@
 +-----+-----+------+--------------------------------------------------------------+
 </code></pre>
 </div>
-    
-
 
 <h2> Parameters </h2>
 <table id="Parameters">
@@ -64,20 +64,16 @@
 </tr>
 
 </table>
-        
 
-        
-
-        
-
-        
 <h2>EXAMPLE 1</h2>
 <pre><code>Get-PowerShellPath</code></pre>
 <p>Returns the path to the version of PowerShell that matches the computer's architecture (i.e. x86 or x64).</p>
 
+
 <h2>EXAMPLE 2</h2>
 <pre><code>Get-PowerShellPath -x86</code></pre>
 <p>Returns the path to the x86 version of PowerShell.</p>
+
 
 	<div class="Footer">
 		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.

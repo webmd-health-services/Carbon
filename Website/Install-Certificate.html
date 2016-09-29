@@ -18,14 +18,16 @@
     </ul>
 
     <h1>Install-Certificate</h1>
-<div><p>Installs a certificate in a given store.</p></div>
+<div class="Synopsis">
+<p>Installs a certificate in a given store.</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>Install-Certificate [-Path] &lt;String&gt; -StoreLocation {CurrentUser | LocalMachine} -StoreName {AddressBook | AuthRoot | CertificateAuthority | Disallowed | My | Root | TrustedPeople | TrustedPublisher} [-Exportable] [-Password &lt;Object&gt;] [-Session &lt;PSSession[]&gt;] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
 <pre class="Syntax"><code>Install-Certificate [-Path] &lt;String&gt; -StoreLocation {CurrentUser | LocalMachine} -CustomStoreName &lt;String&gt; [-Exportable] [-Password &lt;Object&gt;] [-Session &lt;PSSession[]&gt;] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
 <pre class="Syntax"><code>Install-Certificate [-Certificate] &lt;X509Certificate2&gt; -StoreLocation {CurrentUser | LocalMachine} -CustomStoreName &lt;String&gt; [-Session &lt;PSSession[]&gt;] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
 <pre class="Syntax"><code>Install-Certificate [-Certificate] &lt;X509Certificate2&gt; -StoreLocation {CurrentUser | LocalMachine} -StoreName {AddressBook | AuthRoot | CertificateAuthority | Disallowed | My | Root | TrustedPeople | TrustedPublisher} [-Session &lt;PSSession[]&gt;] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
-    
+
 <h2>Description</h2>
 <div class="Description">
 <p>Uses the .NET certificates API to add a certificate to a store for the machine or current user.  The user performing the action must have permission to modify the store or the installation will fail.</p>
@@ -34,8 +36,6 @@
 
 <p>The ability to install a certificate on a remote computer was added in Carbon 2.1.0.</p>
 </div>
-    
-
 
 <h2> Parameters </h2>
 <table id="Parameters">
@@ -146,21 +146,21 @@
     <td></td>
 </tr>
 </table>
-        
 
-        
 <h2>Return Values</h2>
+<div class="ReturnValues">
 <p><a href="http://msdn.microsoft.com/en-us/library/system.security.cryptography.x509certificates.x509certificate2.aspx">System.Security.Cryptography.X509Certificates.X509Certificate2</a>. An X509Certificate2 object representing the newly installed certificate.</p>
-        
+</div>
 
-        
 <h2>EXAMPLE 1</h2>
 <pre><code>Install-Certificate -Path C:\Users\me\certificate.cer -StoreLocation LocalMachine -StoreName My -Exportable -Password My5up3r53cur3P@55w0rd</code></pre>
 <p>Installs the certificate (which is protected by a password) at C:\Users\me\certificate.cer into the local machine's Personal store.  The certificate is marked exportable.</p>
 
+
 <h2>EXAMPLE 2</h2>
 <pre><code>Install-Certificate -Path C:\Users\me\certificate.cer -StoreLocation LocalMachine -StoreName My -ComputerName remote1,remote2</code></pre>
 <p>Demonstrates how to install a certificate from a file on the local computer into the local machine's personal store on two remote cmoputers, remote1 and remote2. Use the <code>Credential</code> parameter to connect as a specific principal.</p>
+
 
 	<div class="Footer">
 		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.

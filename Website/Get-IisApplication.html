@@ -18,11 +18,13 @@
     </ul>
 
     <h1>Get-IisApplication</h1>
-<div><p>Gets an IIS application as an <code>Application</code> object.</p></div>
+<div class="Synopsis">
+<p>Gets an IIS application as an <code>Application</code> object.</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>Get-IisApplication [-SiteName] &lt;String&gt; [[-VirtualPath] &lt;String&gt;] [&lt;CommonParameters&gt;]</code></pre>
-    
+
 <h2>Description</h2>
 <div class="Description">
 <p>Uses the <code>Microsoft.Web.Administration</code> API to get an IIS application object.  If the application doesn't exist, <code>$null</code> is returned.</p>
@@ -37,8 +39,6 @@
 
 <p>Beginning with Carbon 2.0.1, this function is available only if IIS is installed.</p>
 </div>
-    
-
 
 <h2> Parameters </h2>
 <table id="Parameters">
@@ -68,25 +68,26 @@
 </tr>
 
 </table>
-        
 
-        
 <h2>Return Values</h2>
+<div class="ReturnValues">
 <p><a href="http://msdn.microsoft.com/en-us/library/microsoft.web.administration.application.aspx">Microsoft.Web.Administration.Application</a>. </p>
-        
+</div>
 
-        
 <h2>EXAMPLE 1</h2>
 <pre><code>Get-IisApplication -SiteName 'DeathStar`</code></pre>
 <p>Gets all the applications running under the <code>DeathStar</code> website.</p>
+
 
 <h2>EXAMPLE 2</h2>
 <pre><code>Get-IisApplication -SiteName 'DeathStar' -VirtualPath '/'</code></pre>
 <p>Demonstrates how to get the main application for a website: use <code>/</code> as the application name.</p>
 
+
 <h2>EXAMPLE 3</h2>
 <pre><code>Get-IisApplication -SiteName 'DeathStar' -VirtualPath 'MainPort/ExhaustPort'</code></pre>
 <p>Demonstrates how to get a nested application, i.e. gets the application at <code>/MainPort/ExhaustPort</code> under the <code>DeathStar</code> website.</p>
+
 
 	<div class="Footer">
 		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.

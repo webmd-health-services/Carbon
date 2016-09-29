@@ -18,11 +18,13 @@
     </ul>
 
     <h1>Add-IisDefaultDocument</h1>
-<div><p>Adds a default document name to a website.</p></div>
+<div class="Synopsis">
+<p>Adds a default document name to a website.</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>Add-IisDefaultDocument [-SiteName] &lt;String&gt; [-FileName] &lt;String&gt; [&lt;CommonParameters&gt;]</code></pre>
-    
+
 <h2>Description</h2>
 <div class="Description">
 <p>If you need a custom default document for your website, this function will add it.  The <code>FileName</code> argument should be a filename IIS should use for a default document, e.g. home.html.</p>
@@ -31,8 +33,6 @@
 
 <p>Beginning with Carbon 2.0.1, this function is available only if IIS is installed.</p>
 </div>
-    
-
 
 <h2> Parameters </h2>
 <table id="Parameters">
@@ -62,16 +62,11 @@
 </tr>
 
 </table>
-        
 
-        
-
-        
-
-        
 <h2>EXAMPLE 1</h2>
 <pre><code>Add-IisDefaultDocument -SiteName MySite -FileName home.html</code></pre>
 <p>Adds <code>home.html</code> to the list of default documents for the MySite website.</p>
+
 
 	<div class="Footer">
 		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.

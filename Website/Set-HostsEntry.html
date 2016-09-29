@@ -18,11 +18,13 @@
     </ul>
 
     <h1>Set-HostsEntry</h1>
-<div><p>Sets a hosts entry in a hosts file.</p></div>
+<div class="Synopsis">
+<p>Sets a hosts entry in a hosts file.</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>Set-HostsEntry [-IPAddress] &lt;IPAddress&gt; [-HostName] &lt;String&gt; [[-Description] &lt;String&gt;] [[-Path] &lt;String&gt;] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
-    
+
 <h2>Description</h2>
 <div class="Description">
 <p>Sets the IP address for a given hostname.  If the hostname doesn't exist in the hosts file, appends a new entry to the end.  If the hostname does exist, its IP address gets updated.  If you supply a description, it is appended to the line as a comment.</p>
@@ -35,8 +37,6 @@
 
 <p>Sometimes the system's hosts file is in use and locked when you try to update it. The <code>Set-HostsEntry</code> function tries 10 times to set a hosts entry before giving up and writing an error. It waits a random amount of time (from 0 to 1000 milliseconds) between each attempt.</p>
 </div>
-    
-
 
 <h2> Parameters </h2>
 <table id="Parameters">
@@ -105,13 +105,7 @@
     <td></td>
 </tr>
 </table>
-        
 
-        
-
-        
-
-        
 <h2>EXAMPLE 1</h2>
 <pre><code>Set-HostsEntry -IPAddress 10.2.3.4 -HostName 'myserver' -Description "myserver's IP address"</code></pre>
 <p>If your hosts file contains the following:</p>
@@ -124,6 +118,7 @@
 <pre><code>127.0.0.1        localhost
 10.2.3.4         myserver    # myserver's IP address
 </code></pre>
+
 
 <h2>EXAMPLE 2</h2>
 <pre><code>Set-HostsEntry -IPAddress 10.5.6.7 -HostName 'myserver'</code></pre>
@@ -138,6 +133,7 @@
 <pre><code>127.0.0.1        localhost
 10.5.6.7         myserver
 </code></pre>
+
 
 	<div class="Footer">
 		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.

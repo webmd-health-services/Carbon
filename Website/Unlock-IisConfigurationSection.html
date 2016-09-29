@@ -18,11 +18,13 @@
     </ul>
 
     <h1>Unlock-IisConfigurationSection</h1>
-<div><p>Unlocks a section in the IIS server configuration.</p></div>
+<div class="Synopsis">
+<p>Unlocks a section in the IIS server configuration.</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>Unlock-IisConfigurationSection [-SectionPath] &lt;String[]&gt; [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
-    
+
 <h2>Description</h2>
 <div class="Description">
 <p>Some sections/areas are locked by IIS, so that websites can't enable those settings, or have their own custom configurations.  This function will unlocks those locked sections.  You have to know the path to the section.  You can see a list of locked sections by running:</p>
@@ -32,8 +34,6 @@
 
 <p>Beginning with Carbon 2.0.1, this function is available only if IIS is installed.</p>
 </div>
-    
-
 
 <h2> Parameters </h2>
 <table id="Parameters">
@@ -81,16 +81,11 @@
     <td></td>
 </tr>
 </table>
-        
 
-        
-
-        
-
-        
 <h2>EXAMPLE 1</h2>
 <pre><code>Unlock-IisConfigSection -Name 'system.webServer/cgi'</code></pre>
 <p>Unlocks the CGI section so that websites can configure their own CGI settings.</p>
+
 
 	<div class="Footer">
 		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.

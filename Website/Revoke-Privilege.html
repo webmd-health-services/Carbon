@@ -18,11 +18,13 @@
     </ul>
 
     <h1>Revoke-Privilege</h1>
-<div><p>Revokes an identity's privileges to perform system operations and certain types of logons.</p></div>
+<div class="Synopsis">
+<p>Revokes an identity's privileges to perform system operations and certain types of logons.</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>Revoke-Privilege [-Identity] &lt;String&gt; [-Privilege] &lt;String[]&gt; [&lt;CommonParameters&gt;]</code></pre>
-    
+
 <h2>Description</h2>
 <div class="Description">
 <p>Valid privileges are documented on Microsoft's website: <a href="http://msdn.microsoft.com/en-us/library/windows/desktop/bb530716.aspx">Privilege Constants</a> and <a href="http://msdn.microsoft.com/en-us/library/windows/desktop/bb545671.aspx">Account Right Constants</a>. Known values as of August 2014 are:</p>
@@ -75,10 +77,10 @@
 <li>SeUnsolicitedInputPrivilege</li>
 </ul>
 </div>
-    
+
 <h2>Related Commands</h2>
 
-<ul>
+<ul class="RelatedCommands">
 <li>Carbon_Privilege</li>
 <li><a href="Get-Privilege.html">Get-Privilege</a></li>
 <li><a href="Grant-Privilege.html">Grant-Privilege</a></li>
@@ -115,16 +117,11 @@
 </tr>
 
 </table>
-        
 
-        
-
-        
-
-        
 <h2>EXAMPLE 1</h2>
 <pre><code>Revoke-Privilege -Identity Batcomputer -Privilege SeServiceLogonRight</code></pre>
 <p>Revokes the Batcomputer account's ability to logon as a service.  Don't restart that thing!</p>
+
 
 	<div class="Footer">
 		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.

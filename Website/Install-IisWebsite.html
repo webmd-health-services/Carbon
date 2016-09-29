@@ -18,11 +18,13 @@
     </ul>
 
     <h1>Install-IisWebsite</h1>
-<div><p>Installs a website.</p></div>
+<div class="Synopsis">
+<p>Installs a website.</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>Install-IisWebsite [-Name] &lt;String&gt; [-PhysicalPath] &lt;String&gt; [[-Binding] &lt;String[]&gt;] [-AppPoolName &lt;String&gt;] [-SiteID &lt;Int32&gt;] [-PassThru] [-Force] [&lt;CommonParameters&gt;]</code></pre>
-    
+
 <h2>Description</h2>
 <div class="Description">
 <p><code>Install-IisWebsite</code> installs an IIS website. Anonymous authentication is enabled, and the anonymous user is set to the website's application pool identity. Before Carbon 2.0, if a website already existed, it was deleted and re-created. Beginning with Carbon 2.0, existing websites are modified in place. </p>
@@ -55,10 +57,10 @@
 
 <p>Beginning with Carbon 2.0.1, this function is available only if IIS is installed.</p>
 </div>
-    
+
 <h2>Related Commands</h2>
 
-<ul>
+<ul class="RelatedCommands">
 <li><a href="Get-IisWebsite.html">Get-IisWebsite</a></li>
 <li><a href="Uninstall-IisWebsite.html">Uninstall-IisWebsite</a></li>
 </ul>
@@ -143,25 +145,26 @@
 </tr>
 
 </table>
-        
 
-        
 <h2>Return Values</h2>
+<div class="ReturnValues">
 <p><a href="http://msdn.microsoft.com/en-us/library/microsoft.web.administration.site.aspx">Microsoft.Web.Administration.Site</a>. </p>
-        
+</div>
 
-        
 <h2>EXAMPLE 1</h2>
 <pre><code>Install-IisWebsite -Name 'Peanuts' -PhysicalPath C:\Peanuts.com</code></pre>
 <p>Creates a website named <code>Peanuts</code> serving files out of the <code>C:\Peanuts.com</code> directory.  The website listens on all the computer's IP addresses on port 80.</p>
+
 
 <h2>EXAMPLE 2</h2>
 <pre><code>Install-IisWebsite -Name 'Peanuts' -PhysicalPath C:\Peanuts.com -Bindings 'http/*:80:peanuts.com:'</code></pre>
 <p>Creates a website named <code>Peanuts</code> which uses name-based hosting to respond to all requests to any of the machine's IP addresses for the <code>peanuts.com</code> domain.</p>
 
+
 <h2>EXAMPLE 3</h2>
 <pre><code>Install-IisWebsite -Name 'Peanuts' -PhysicalPath C:\Peanuts.com -AppPoolName 'PeanutsAppPool'</code></pre>
 <p>Creates a website named <code>Peanuts</code> that runs under the <code>PeanutsAppPool</code> app pool</p>
+
 
 	<div class="Footer">
 		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.

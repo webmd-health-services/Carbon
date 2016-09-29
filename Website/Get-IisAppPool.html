@@ -18,11 +18,13 @@
     </ul>
 
     <h1>Get-IisAppPool</h1>
-<div><p>Gets a <code>Microsoft.Web.Administration.ApplicationPool</code> object for an application pool.</p></div>
+<div class="Synopsis">
+<p>Gets a <code>Microsoft.Web.Administration.ApplicationPool</code> object for an application pool.</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>Get-IisAppPool [[-Name] &lt;String&gt;] [&lt;CommonParameters&gt;]</code></pre>
-    
+
 <h2>Description</h2>
 <div class="Description">
 <p>The <code>Get-IisAppPool</code> function returns an IIS application pools as a <code>Microsoft.Web.Administration.ApplicationPool</code> object. Use the <code>Name</code> parameter to return the application pool. If that application pool isn't found, <code>$null</code> is returned.</p>
@@ -33,10 +35,10 @@
 
 <p>Beginning with Carbon 2.0.1, this function is available only if IIS is installed.</p>
 </div>
-    
+
 <h2>Related Commands</h2>
 
-<ul>
+<ul class="RelatedCommands">
 <li><a href="http://msdn.microsoft.com/en-us/library/microsoft.web.administration.applicationpool(v=vs.90).aspx">http://msdn.microsoft.com/en-us/library/microsoft.web.administration.applicationpool(v=vs.90).aspx</a></li>
 </ul>
 
@@ -60,25 +62,26 @@
 </tr>
 
 </table>
-        
 
-        
 <h2>Return Values</h2>
+<div class="ReturnValues">
 <p><a href="http://msdn.microsoft.com/en-us/library/microsoft.web.administration.applicationpool.aspx">Microsoft.Web.Administration.ApplicationPool</a>. </p>
-        
+</div>
 
-        
 <h2>EXAMPLE 1</h2>
 <pre><code>Get-IisAppPool</code></pre>
 <p>Demonstrates how to get <em>all</em> application pools.</p>
+
 
 <h2>EXAMPLE 2</h2>
 <pre><code>Get-IisAppPool -Name 'Batcave'</code></pre>
 <p>Gets the <code>Batcave</code> application pool.</p>
 
+
 <h2>EXAMPLE 3</h2>
 <pre><code>Get-IisAppPool -Name 'Missing!'</code></pre>
 <p>Returns <code>null</code> since, for purposes of this example, there is no <code>Missing~</code> application pool.</p>
+
 
 	<div class="Footer">
 		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.

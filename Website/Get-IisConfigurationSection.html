@@ -18,20 +18,20 @@
     </ul>
 
     <h1>Get-IisConfigurationSection</h1>
-<div><p>Gets a Microsoft.Web.Adminisration configuration section for a given site and path.</p></div>
+<div class="Synopsis">
+<p>Gets a Microsoft.Web.Adminisration configuration section for a given site and path.</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>Get-IisConfigurationSection -SectionPath &lt;String&gt; [-Type &lt;Type&gt;] [&lt;CommonParameters&gt;]</code></pre>
 <pre class="Syntax"><code>Get-IisConfigurationSection -SiteName &lt;String&gt; [-VirtualPath &lt;String&gt;] -SectionPath &lt;String&gt; [-Type &lt;Type&gt;] [&lt;CommonParameters&gt;]</code></pre>
-    
+
 <h2>Description</h2>
 <div class="Description">
 <p>Uses the Microsoft.Web.Administration API to get a <code>Microsoft.Web.Administration.ConfigurationSection</code>.</p>
 
 <p>Beginning with Carbon 2.0.1, this function is available only if IIS is installed.</p>
 </div>
-    
-
 
 <h2> Parameters </h2>
 <table id="Parameters">
@@ -77,17 +77,16 @@
 </tr>
 
 </table>
-        
 
-        
 <h2>Return Values</h2>
+<div class="ReturnValues">
 <p><a href="http://msdn.microsoft.com/en-us/library/microsoft.web.administration.configurationsection.aspx">Microsoft.Web.Administration.ConfigurationSection</a>. </p>
-        
+</div>
 
-        
 <h2>EXAMPLE 1</h2>
 <pre><code>Get-IisConfigurationSection -SiteName Peanuts -Path Doghouse -Path 'system.webServer/security/authentication/anonymousAuthentication'</code></pre>
 <p>Returns a configuration section which represents the Peanuts site's Doghouse path's anonymous authentication settings.</p>
+
 
 	<div class="Footer">
 		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.

@@ -18,11 +18,13 @@
     </ul>
 
     <h1>Get-ServiceConfiguration</h1>
-<div><p>Gets a service's full configuration, e.g. username, path, failure actions, etc.</p></div>
+<div class="Synopsis">
+<p>Gets a service's full configuration, e.g. username, path, failure actions, etc.</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>Get-ServiceConfiguration [-Name] &lt;String&gt; [-ComputerName &lt;String&gt;] [&lt;CommonParameters&gt;]</code></pre>
-    
+
 <h2>Description</h2>
 <div class="Description">
 <p>The .NET <code>ServiceController</code> object only returns basic information about a service. This function returns a bunch of the missing configuration in the form of a <code>Carbon.Service.ServiceInfo</code> object:</p>
@@ -45,10 +47,10 @@
 
 <p>This function is new in Carbon 1.8.</p>
 </div>
-    
+
 <h2>Related Commands</h2>
 
-<ul>
+<ul class="RelatedCommands">
 <li><a href="Grant-ServicePermission.html">Grant-ServicePermission</a></li>
 </ul>
 
@@ -80,25 +82,26 @@
 </tr>
 
 </table>
-        
 
-        
 <h2>Return Values</h2>
+<div class="ReturnValues">
 <p>Carbon.Service.ServiceInfo. </p>
-        
+</div>
 
-        
 <h2>EXAMPLE 1</h2>
 <pre><code>Get-Service | Get-ServiceConfiguration</code></pre>
 <p>Demonstrates how you can pipe in a <code>ServiceController</code> object to load the service. This works for services on remote computers as well.</p>
+
 
 <h2>EXAMPLE 2</h2>
 <pre><code>Get-ServiceConfiguration -Name  'w3svc'</code></pre>
 <p>Demonstrates how you can get a specific service's configuration.</p>
 
+
 <h2>EXAMPLE 3</h2>
 <pre><code>Get-ServiceConfiguration -Name 'w3svc' -ComputerName 'enterprise'</code></pre>
 <p>Demonstrates how to get service configuration for a service on a remote computer.</p>
+
 
 	<div class="Footer">
 		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.

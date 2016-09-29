@@ -18,12 +18,14 @@
     </ul>
 
     <h1>Remove-Junction</h1>
-<div><p>Removes a junction.</p></div>
+<div class="Synopsis">
+<p>Removes a junction.</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>Remove-Junction [-Path] &lt;String&gt; [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
 <pre class="Syntax"><code>Remove-Junction -LiteralPath &lt;String&gt; [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
-    
+
 <h2>Description</h2>
 <div class="Description">
 <p><code>Remove-Junction</code> removes an existing junction. </p>
@@ -34,10 +36,10 @@
 
 <p>Carbon 2.2.0 also added the <code>LiteralPath</code> parameter. Use it to delete junctions whose path contains wildcard characters.</p>
 </div>
-    
+
 <h2>Related Commands</h2>
 
-<ul>
+<ul class="RelatedCommands">
 <li><a href="Install-Junction.html">Install-Junction</a></li>
 <li><a href="New-Junction.html">New-Junction</a></li>
 <li><a href="Test-PathIsJunction.html">Test-PathIsJunction</a></li>
@@ -99,24 +101,21 @@
     <td></td>
 </tr>
 </table>
-        
 
-        
-
-        
-
-        
 <h2>EXAMPLE 1</h2>
 <pre><code>Remove-Junction -Path 'C:\I\Am\A\Junction'</code></pre>
 <p>Removes the <code>C:\I\Am\A\Junction</code> path.</p>
+
 
 <h2>EXAMPLE 2</h2>
 <pre><code>Remove-Junction -path 'C:\Temp\*'</code></pre>
 <p>Demonstrates how to use wildcards to delete multiple junctions in a directory. Nothing happens if the wildcard doesn't match any junctions.</p>
 
+
 <h2>EXAMPLE 3</h2>
 <pre><code>Remove-Junction -LiteralPath 'C:\Temp\ContainsWildcards[]'</code></pre>
 <p>Demonstrates how to use the <code>Literalpath</code> parameter to delete a junction that contains wildcard characters.</p>
+
 
 	<div class="Footer">
 		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.

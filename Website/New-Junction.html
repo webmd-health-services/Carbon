@@ -18,21 +18,23 @@
     </ul>
 
     <h1>New-Junction</h1>
-<div><p>Creates a new junction.</p></div>
+<div class="Synopsis">
+<p>Creates a new junction.</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>New-Junction [-Link] &lt;String&gt; [-Target] &lt;String&gt; [&lt;CommonParameters&gt;]</code></pre>
-    
+
 <h2>Description</h2>
 <div class="Description">
 <p>Creates a junction given by <code>-Link</code> which points to the path given by <code>-Target</code>.  If something already exists at <code>Link</code>, an error is written.  </p>
 
 <p>Returns a <code>System.IO.DirectoryInfo</code> object for the junction, if one is created.</p>
 </div>
-    
+
 <h2>Related Commands</h2>
 
-<ul>
+<ul class="RelatedCommands">
 <li><a href="Install-Junction.html">Install-Junction</a></li>
 <li><a href="Remove-Junction.html">Remove-Junction</a></li>
 </ul>
@@ -65,17 +67,16 @@
 </tr>
 
 </table>
-        
 
-        
 <h2>Return Values</h2>
+<div class="ReturnValues">
 <p><a href="http://msdn.microsoft.com/en-us/library/system.io.directoryinfo.aspx">System.IO.DirectoryInfo</a>. </p>
-        
+</div>
 
-        
 <h2>EXAMPLE 1</h2>
 <pre><code>New-Junction -Link 'C:\Windows\system32Link' -Target 'C:\Windows\system32'</code></pre>
 <p>Creates the <code>C:\Windows\system32Link</code> directory, which points to <code>C:\Windows\system32</code>.</p>
+
 
 	<div class="Footer">
 		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.

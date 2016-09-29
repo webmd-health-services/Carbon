@@ -18,22 +18,24 @@
     </ul>
 
     <h1>Revoke-ComPermission</h1>
-<div><p>Revokes COM Access or Launch and Activation permissions.</p></div>
+<div class="Synopsis">
+<p>Revokes COM Access or Launch and Activation permissions.</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>Revoke-ComPermission -Identity &lt;String&gt; -Access -Limits [&lt;CommonParameters&gt;]</code></pre>
 <pre class="Syntax"><code>Revoke-ComPermission -Identity &lt;String&gt; -Access -Default [&lt;CommonParameters&gt;]</code></pre>
 <pre class="Syntax"><code>Revoke-ComPermission -Identity &lt;String&gt; -LaunchAndActivation -Limits [&lt;CommonParameters&gt;]</code></pre>
 <pre class="Syntax"><code>Revoke-ComPermission -Identity &lt;String&gt; -LaunchAndActivation -Default [&lt;CommonParameters&gt;]</code></pre>
-    
+
 <h2>Description</h2>
 <div class="Description">
 <p>Calling this function is equivalent to opening Component Services (dcomcnfg), right-clicking <code>My Computer</code> under Component Services > Computers, choosing <code>Properties</code>, going to the <code>COM Security</code> tab, and removing an identity from the permissions window that opens after clicking the <code>Edit Limits...</code> or <code>Edit Default...</code> buttons under <code>Access Permissions</code> or <code>Launch and Activation Permissions</code> section,</p>
 </div>
-    
+
 <h2>Related Commands</h2>
 
-<ul>
+<ul class="RelatedCommands">
 <li><a href="Get-ComPermission.html">Get-ComPermission</a></li>
 <li><a href="Grant-ComPermission.html">Grant-ComPermission</a></li>
 <li><a href="Revoke-ComPermission.html">Revoke-ComPermission</a></li>
@@ -91,20 +93,16 @@
 </tr>
 
 </table>
-        
 
-        
-
-        
-
-        
 <h2>EXAMPLE 1</h2>
 <pre><code>Revoke-ComPermission -Access -Identity 'Users' -Default</code></pre>
 <p>Removes all default security COM access permissions for the local <code>Users</code> group.</p>
 
+
 <h2>EXAMPLE 2</h2>
 <pre><code>Revoke-ComPermission -LaunchAndActivation -Identity 'Users' -Limits</code></pre>
 <p>Removes all security limit COM access permissions for the local <code>Users</code> group.</p>
+
 
 	<div class="Footer">
 		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.

@@ -18,19 +18,19 @@
     </ul>
 
     <h1>Set-SslCertificateBinding</h1>
-<div><p>Sets an SSL certificate binding for a given IP/port.</p></div>
+<div class="Synopsis">
+<p>Sets an SSL certificate binding for a given IP/port.</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>Set-SslCertificateBinding [[-IPAddress] &lt;IPAddress&gt;] [[-Port] &lt;UInt16&gt;] [-ApplicationID] &lt;Guid&gt; [-Thumbprint] &lt;String&gt; [-PassThru] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
-    
+
 <h2>Description</h2>
 <div class="Description">
 <p>Uses the netsh command line application to set the certificate for an IP address and port.  If a binding already exists for the IP/port, it is removed, and the new binding is created. </p>
 
 <p>Beginning with Carbon 2.0, returns a <code>Carbon.Certificates.SslCertificateBinding</code> object for the binding that was set.</p>
 </div>
-    
-
 
 <h2> Parameters </h2>
 <table id="Parameters">
@@ -107,21 +107,21 @@
     <td></td>
 </tr>
 </table>
-        
 
-        
 <h2>Return Values</h2>
+<div class="ReturnValues">
 <p>Carbon.Certificates.SslCertificateBinding. </p>
-        
+</div>
 
-        
 <h2>EXAMPLE 1</h2>
 <pre><code>Set-SslCertificateBinding -IPAddress 43.27.89.54 -Port 443 -ApplicationID 88d1f8da-aeb5-40a2-a5e5-0e6107825df7 -Thumbprint 4789073458907345907434789073458907345907</code></pre>
 <p>Configures the computer to use the 478907345890734590743 certificate on IP 43.27.89.54, port 443.</p>
 
+
 <h2>EXAMPLE 2</h2>
 <pre><code>Set-SslCertificateBinding -ApplicationID 88d1f8da-aeb5-40a2-a5e5-0e6107825df7 -Thumbprint 4789073458907345907434789073458907345907</code></pre>
 <p>Configures the compute to use the 478907345890734590743 certificate as the default certificate on all IP addresses, port 443.</p>
+
 
 	<div class="Footer">
 		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.

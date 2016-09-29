@@ -18,19 +18,19 @@
     </ul>
 
     <h1>Install-MsmqMessageQueue</h1>
-<div><p>Installs an MSMQ queue.</p></div>
+<div class="Synopsis">
+<p>Installs an MSMQ queue.</p>
+</div>
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>Install-MsmqMessageQueue [-Name] &lt;String&gt; [-Private] [-Transactional] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
-    
+
 <h2>Description</h2>
 <div class="Description">
 <p>Creates a new queue with name <code>Name</code>.  If a queue with that name already exists, it is deleted, and a new queue is created. </p>
 
 <p>If the queue needs to be private, pass the <code>Private</code> switch.  If it needs to be transactional, set the <code>Transactional</code> switch.</p>
 </div>
-    
-
 
 <h2> Parameters </h2>
 <table id="Parameters">
@@ -91,20 +91,16 @@
     <td></td>
 </tr>
 </table>
-        
 
-        
-
-        
-
-        
 <h2>EXAMPLE 1</h2>
 <pre><code>Install-MsmqMessageQueue -Name MovieQueue</code></pre>
 <p>Installs a public, non-transactional <code>MovieQueue</code>.</p>
 
+
 <h2>EXAMPLE 2</h2>
 <pre><code>Install-MsmqMessageQueue -Name CriticsQueue -Private -Transactional</code></pre>
 <p>Installs a private, transactional <code>CriticsQueue</code> queue.</p>
+
 
 	<div class="Footer">
 		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.
