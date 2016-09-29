@@ -220,17 +220,30 @@ foreach( $keySize in @( 128, 192, 256 ) )
         $Global:Error.Clear()
         # Generate a secret that is too long for asymmetric encryption
         $secret = [Guid]::NewGuid().ToString() * 20
-        $passphrase = [Guid]::NewGuid().ToString().Substring(0,($keySize / 8))
-        $ciphertext = Protect-String -String $secret -Key $passphrase
-        It 'should return ciphertext' {
-            $ciphertext | Should Not BeNullOrEmpty
-            ConvertFrom-Base64 -Value $ciphertext | Should Not BeNullOrEmpty
-            $Global:Error.Count | Should Be 0
+        $guid = [Guid]::NewGuid()
+        $passphrase = $guid.ToString().Substring(0,($keySize / 8))
+        $keyBytes = [Text.Encoding]::UTF8.GetBytes($passphrase)
+        $keySecureString = New-Object -TypeName 'Security.SecureString'
+        foreach( $char in $passphrase.ToCharArray() )
+        {
+            $keySecureString.AppendChar($char)
         }
 
-        It 'should encrypt ciphertext' {
-            $revealedSecret = Unprotect-String -ProtectedString $ciphertext -Key $passphrase
-            $revealedSecret | Should Be $secret
+        foreach( $key in @( $passphrase,$keyBytes,$keySecureString) )
+        {
+            Context ('key as {0}' -f $key.GetType().FullName) {
+                $ciphertext = Protect-String -String $secret -Key $key
+                It 'should return ciphertext' {
+                    $ciphertext | Should Not BeNullOrEmpty
+                    ConvertFrom-Base64 -Value $ciphertext | Should Not BeNullOrEmpty
+                    $Global:Error.Count | Should Be 0
+                }
+
+                It 'should encrypt ciphertext' {
+                    $revealedSecret = Unprotect-String -ProtectedString $ciphertext -Key $key
+                    $revealedSecret | Should Be $secret
+                }
+            }
         }
     }
 }
