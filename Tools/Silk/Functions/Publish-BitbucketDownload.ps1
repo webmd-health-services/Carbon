@@ -168,7 +168,7 @@ function Publish-BitbucketDownload
                         'next' = '';
                         }
         $resp = Invoke-WebRequest -Uri $loginUri -Method $form.Method -Body $body -Headers @{ Referer = $loginUri }
-        if( -not (Assert-Response -Response $resp -ExpectedUri 'https://bitbucket.org/') )
+        if( -not (Assert-Response -Response $resp -ExpectedUri 'https://bitbucket.org/dashboard/overview') )
         {
             exit 1
         }
