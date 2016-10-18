@@ -37,6 +37,7 @@
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
     <UseVSHostingProcess>true</UseVSHostingProcess>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -48,10 +49,11 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
-    <SignAssembly>true</SignAssembly>
+    <SignAssembly>false</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
-    <AssemblyOriginatorKeyFile>Carbon.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>
+    </AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -70,6 +72,7 @@
     <Compile Include="Firewall\RuleInterfaceType.cs" />
     <Compile Include="Firewall\RuleProfile.cs" />
     <Compile Include="Firewall\RuleSecurity.cs" />
+    <Compile Include="Security\SecureStringConverter.cs" />
     <Compile Include="Security\HttpUrlAccessRights.cs" />
     <Compile Include="Security\HttpUrlAccessRule.cs" />
     <Compile Include="Security\HttpUrlSecurity.cs" />
@@ -102,9 +105,6 @@
     <Compile Include="Security\Privilege.cs" />
     <Compile Include="IO\Path.cs" />
     <Compile Include="Win32\Win32ErrorCodes.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Carbon.snk" />
   </ItemGroup>
   <ItemGroup>
     <COMReference Include="WindowsInstaller">
