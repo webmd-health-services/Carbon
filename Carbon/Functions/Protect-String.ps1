@@ -17,7 +17,7 @@ filter Protect-String
     Encrypts a string.
     
     .DESCRIPTION
-    Strings can be encrypted with the Data Protection API (DPAPI), RSA, or AES.
+    The `Protect-String` function encrypts a string using the Data Protection API (DPAPI), RSA, or AES. In Carbon 2.3.0 or earlier, the plaintext string to encrypt is passed to the `String` parameter. Beginning in Carbon 2.4.0, you can also pass a `SecureString`. When encrypting a `SecureString`, it is converted to an array of bytes, encrypted, then the array of bytes is cleared from memory (i.e. the plaintext version of the `SecureString` is only in memory long enough to encrypt it).
     
     ##  DPAPI 
 
@@ -68,6 +68,11 @@ filter Protect-String
     Protect-String -String 'TheStringIWantToEncrypt' -ForUser | Out-File MySecret.txt
     
     Encrypts the given string and saves the encrypted string into MySecret.txt.  Only the user who encrypts the string can unencrypt it.
+
+    .EXAMPLE
+    Protect-String -String $credential.Password -ForUser | Out-File MySecret.txt
+
+    Demonstrates that `Protect-String` can encrypt a `SecureString`. This functionality was added in Carbon 2.4.0. 
     
     .EXAMPLE
     $cipherText = Protect-String -String "MySuperSecretIdentity" -ForComputer
@@ -118,7 +123,9 @@ filter Protect-String
     param(
         [Parameter(Mandatory = $true, Position=0, ValueFromPipeline = $true)]
         [object]
-        # The text to encrypt.
+        # The string to encrypt. Any non-string object you pass will be converted to a string before encrypting by calling the object's `ToString` method.
+        #
+        # Beginning in Carbon 2.4.0, this can also be a `SecureString` object. The `SecureString` is converted to an array of bytes, the bytes are encrypted, then the plaintext bytes are cleared from memory (i.e. the plaintext password is in memory for the amount of time it takes to encrypt it).
         $String,
         
         [Parameter(Mandatory=$true,ParameterSetName='DPAPICurrentUser')]
