@@ -4,6 +4,10 @@
 
  * `Protect-String` can now encrypt a `SecureString`. The `String` parameter's type was changed to `[object]`. When you pass in a `SecureString`, it is converted to an array of bytes, encrypted, and the array of bytes are cleared from memory.
 
+## Bug Fixes
+
+ * Fixed: `Get-ProgramInstallInfo` fails when a program's `Version` registry key value can't be converted into a `Version` object.
+
 
 # 2.3.0 (29 September 2016)
 

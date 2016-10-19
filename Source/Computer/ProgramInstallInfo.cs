@@ -88,20 +88,23 @@ namespace Carbon.Computer
 			}
 
 			var intVersion = GetValueAsInt("Version");
+			string rawVersion;
 			if (intVersion != 0)
 			{
 				var major = intVersion >> 24; // first 8 bits are major version number
 				var minor = (intVersion & 0x00ff0000) >> 16; // bits 9 - 16 are the minor version number
 				var build = intVersion & 0x0000ffff; // last 16 bits are the build number
-				Version = new Version(major, minor, build);
+				rawVersion = String.Format("{0}.{1}.{2}", major, minor, build);
 			}
 			else
 			{
-				Version version;
-				if (Version.TryParse(GetValueAsString("Version"), out version))
-				{
-					Version = version;
-				}
+				rawVersion = GetValueAsString("Version");
+			}
+
+			Version version;
+			if (Version.TryParse(rawVersion, out version))
+			{
+				Version = version;
 			}
 
 			VersionMajor = GetValueAsInt("VersionMajor");

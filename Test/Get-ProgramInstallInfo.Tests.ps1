@@ -158,5 +158,30 @@ Describe 'Get-ProgramInstallInfo when getting programs by wildcard' {
         $p2 | Should Not BeNullOrEmpty
         $p2 | Should Be $p
     }
+}
+
+Describe 'Get-ProgramInstallInfo should handle invalid integer versions' {
     
+    $program = Get-ProgramInstallInfo | Select-Object -First 1
+
+    $regKeyPath = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall\CarbonGetProgramInstallInfo'
+    Install-RegistryKey -Path $regKeyPath
+    try
+    {
+        $name = 'Carbon+Get-ProgramInstallInfo'
+        Set-RegistryKeyValue -Path $regKeyPath -Name 'DisplayName' -String $name
+        Set-RegistryKeyValue -Path $regKeyPath -Name 'Version' -DWord 0xff000000
+
+        $program = Get-ProgramInstallInfo -Name $name
+        
+        It 'should ignore the invalid version' {
+            $program.Version | Should BeNullOrEmpty
+        }
+    }
+    finally
+    {
+        Remove-Item -Path $regKeyPath -Recurse
+    }
+    
+
 }
