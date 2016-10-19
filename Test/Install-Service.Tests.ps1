@@ -38,18 +38,38 @@ function Assert-HasPermissionsOnServiceExecutable($Identity, $Path)
     ([Security.AccessControl.FileSystemRights]::ReadAndExecute) | Should Be ($access.FileSystemRights -band [Security.AccessControl.FileSystemRights]::ReadAndExecute)
 }
 
-function GivenTheServiceIsNotInstalled
+function Uninstall-TestService
 {
     Uninstall-Service $serviceName
 }
     
 Describe 'Install-Service when using the -WhatIf switch' {
-    GivenTheServiceIsNotInstalled
+    Uninstall-TestService
     Install-Service -Name $serviceName -Path $servicePath -WhatIf @installServiceParams
 
     It 'should not install the service ' {
         $service = Get-Service $serviceName -ErrorAction SilentlyContinue
         $service | Should BeNullOrEmpty
+    }
+ }
+
+ Describe 'Install-Service when a service depends on a device driver' {
+    Uninstall-TestService
+    $driver = [ServiceProcess.ServiceController]::GetDevices() | Select-Object -First 1
+    Install-Service -Name $serviceName -Path $servicePath -Dependency 'AppID' -StartupType Disabled -ErrorVariable 'errors' 
+    It 'should not write any errors' {
+        $errors | Should BeNullOrEmpty
+    }
+
+    $service = Get-Service -Name $serviceName
+    It 'should install the service' {
+        $service | Should Not BeNullOrEmpty
+    }
+
+    # Can't do this with sc.exe. Maybe it works with the services Win32 APIs?
+    It 'should set the service''s dependency' -Skip {
+        $service.DependentServices.Count | Should Be 1
+        $service.DependentServices[0].ServiceName | Should Be $driver.ServiceName
     }
  }
 
@@ -59,7 +79,7 @@ Describe 'Install-Service' {
         $Global:Error.Clear()
         $startedAt = Get-Date
         $startedAt = $startedAt.AddSeconds(-1)
-        GivenTheServiceIsNotInstalled
+        Uninstall-TestService
     }
     
     It 'should install service' {
@@ -570,4 +590,4 @@ Describe 'Install-Service' {
 
 }
 
-GivenTheServiceIsNotInstalled
+Uninstall-TestService

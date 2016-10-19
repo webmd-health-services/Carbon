@@ -48,8 +48,7 @@ function Test-Service
 
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
-    $service = Get-Service -Name "$Name*" |
-                    Where-Object { $_.Name -eq $Name }
+    $service = Get-Service -Name $Name -ErrorAction Ignore 
     if( $service )
     {
         return $true

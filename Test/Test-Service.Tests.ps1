@@ -17,10 +17,11 @@ Set-StrictMode -Version 'Latest'
 
 Describe 'Test-Service when testing an existing service' {
     $error.Clear()
-    $missingServices = Get-Service | Where-Object { -not (Test-Service -Name $_.Name) }
-    It 'should find existing services' {
-        $missingServices | Should BeNullOrEmpty
-        $error.Count | Should Be 0
+    Get-Service | ForEach-Object {
+        It ('should find the {0} {1} service' -f $_.ServiceName,$_.ServiceType) {
+            Test-Service -Name $_.ServiceName | Should Be $true
+            $Error.Count | Should Be 0
+        }
     }
 }
 
@@ -33,4 +34,14 @@ Describe 'Test-Service when testing for a non-existent service' {
         $error.Count | Should Be 0
     }
     
+}
+
+Describe 'Test-Service when testing for a device service' {
+    $Error.Clear()
+    [ServiceProcess.ServiceController]::GetDevices() | ForEach-Object {
+        It ('should find the {0} {1} service' -f $_.ServiceName,$_.ServiceType) {
+            Test-Service -Name $_.ServiceName | Should Be $true
+            $Error.Count | Should Be 0
+        }
+    }
 }
