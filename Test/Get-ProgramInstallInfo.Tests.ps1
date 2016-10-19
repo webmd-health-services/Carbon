@@ -10,142 +10,153 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Start-TestFixture
-{
-    & (Join-Path -Path $PSScriptRoot -ChildPath '..\Import-CarbonForTest.ps1' -Resolve)
-}
+#Requires -Version 4
+Set-StrictMode -Version 'Latest'
 
-function Test-ShouldGetInstalledPrograms
-{
-    foreach( $program in (Get-ProgramInstallInfo) )
+& (Join-Path -Path $PSScriptRoot -ChildPath 'Import-CarbonForTest.ps1' -Resolve)
+
+Describe 'Get-ProgramInstallInfo when getting all programs' {
+    $programs = Get-ProgramInstallInfo
+    It 'should get all installed programs' {
+        $programs | Should Not BeNullOrEmpty
+    }
+
+    foreach( $program in $programs )
     {
-        Assert-NotNull $program
-        [Microsoft.Win32.RegistryKey]$key = $program.Key
-        $valueNames = $key.GetValueNames()
-        foreach( $property in (Get-Member -InputObject $program -MemberType Property) )
-        {
-            $propertyName = $property.Name
-
-            if( $propertyName -eq 'Key' )
+        It ('should get information about {0}' -f $program.DisplayName) {
+            $program | Should Not BeNullOrEmpty
+            [Microsoft.Win32.RegistryKey]$key = $program.Key
+            $valueNames = $key.GetValueNames()
+            foreach( $property in (Get-Member -InputObject $program -MemberType Property) )
             {
-                continue
-            }
-
-            $keyValue = $key.GetValue( $propertyName )
-            $propertyValue = $program.$propertyName
-
-            if( $propertyName -eq 'ProductCode' )
-            {
-                $propertyValue = Split-Path -Leaf -Path $key.Name
-                [Guid]$guid = [Guid]::Empty
-                [Guid]::TryParse( $propertyValue, [ref]$guid )
-                $propertyValue = $guid
-                $keyValue = $guid
-            }
-            elseif( $propertyName -eq 'User' )
-            {
-                if( $key.Name -match 'HKEY_USERS\\([^\\]+)\\' )
+                $propertyName = $property.Name
+    
+                if( $propertyName -eq 'Key' )
                 {
-                    $sddl = $Matches[1]
-                    $sid = New-Object 'Security.Principal.SecurityIdentifier' $sddl
-                    $propertyValue = $sid.Translate([Security.Principal.NTAccount]).Value
-                    $keyValue = $propertyValue
+                    continue
                 }
-            }
-
-            $typeName = $program.GetType().GetProperty($propertyName).PropertyType.Name
-            if( $keyValue -eq $null )
-            {
-                if( $typeName -eq 'Int32' )
+    
+                $keyValue = $key.GetValue( $propertyName )
+                $propertyValue = $program.$propertyName
+    
+                if( $propertyName -eq 'ProductCode' )
                 {
-                    $keyValue = 0
+                    $propertyValue = Split-Path -Leaf -Path $key.Name
+                    [Guid]$guid = [Guid]::Empty
+                    [Guid]::TryParse( $propertyValue, [ref]$guid )
+                    $propertyValue = $guid
+                    $keyValue = $guid
                 }
-                elseif( $typeName -eq 'Version' )
+                elseif( $propertyName -eq 'User' )
                 {
-                    $keyValue = $null
-                }
-                elseif( $typeName -eq 'DateTime' )
-                {
-                    $keyValue = [DateTime]::MinValue
-                }
-                elseif( $typeName -eq 'Boolean' )
-                {
-                    $keyValue = $false
-                }
-                elseif( $typeName -eq 'Guid' )
-                {
-                    $keyValue = [Guid]::Empty
-                }
-                else
-                {
-                    $keyValue = ''
-                }
-            }
-            else
-            {
-                if( $typeName -eq 'DateTime' )
-                {
-                    [DateTime]$dateTime = [DateTime]::MinValue
-
-                    if( -not ([DateTime]::TryParse($keyValue,[ref]$dateTime)) )
+                    if( $key.Name -match 'HKEY_USERS\\([^\\]+)\\' )
                     {
-                        [DateTime]::TryParseExact( $keyValue, 'yyyyMMdd', [Globalization.CultureInfo]::CurrentCulture, [Globalization.DateTimeStyles]::None, [ref]$dateTime)
+                        $sddl = $Matches[1]
+                        $sid = New-Object 'Security.Principal.SecurityIdentifier' $sddl
+                        $propertyValue = $sid.Translate([Security.Principal.NTAccount]).Value
+                        $keyValue = $propertyValue
                     }
-                    $keyValue = $dateTime
                 }
-                elseif( $typeName -eq 'Int32' )
+    
+                $typeName = $program.GetType().GetProperty($propertyName).PropertyType.Name
+                if( $keyValue -eq $null )
                 {
-                    $intValue = 0
-                    $keyValue = [Int32]::TryParse($keyValue, [ref] $intValue)
-                    $keyValue = $intValue
-                }
-                elseif( $typeName -eq 'Version' )
-                {
-                    if( $keyValue -is [int32] )
+                    if( $typeName -eq 'Int32' )
                     {
-                        $major = $keyValue -shr 24   # First 8 bits
-                        $minor = ($keyValue -band 0x00ff0000) -shr 16  # bits 9 - 16
-                        $build = $keyValue -band 0x0000ffff   # last 8 bits
-                        $keyValue = New-Object 'Version' $major,$minor,$build
+                        $keyValue = 0
+                    }
+                    elseif( $typeName -eq 'Version' )
+                    {
+                        $keyValue = $null
+                    }
+                    elseif( $typeName -eq 'DateTime' )
+                    {
+                        $keyValue = [DateTime]::MinValue
+                    }
+                    elseif( $typeName -eq 'Boolean' )
+                    {
+                        $keyValue = $false
+                    }
+                    elseif( $typeName -eq 'Guid' )
+                    {
+                        $keyValue = [Guid]::Empty
                     }
                     else
                     {
-                        [Version]$version = $null
-                        if( [Version]::TryParse($keyValue, [ref]$version) )
+                        $keyValue = ''
+                    }
+                }
+                else
+                {
+                    if( $typeName -eq 'DateTime' )
+                    {
+                        [DateTime]$dateTime = [DateTime]::MinValue
+    
+                        if( -not ([DateTime]::TryParse($keyValue,[ref]$dateTime)) )
                         {
-                            $keyValue = $version
+                            [DateTime]::TryParseExact( $keyValue, 'yyyyMMdd', [Globalization.CultureInfo]::CurrentCulture, [Globalization.DateTimeStyles]::None, [ref]$dateTime)
+                        }
+                        $keyValue = $dateTime
+                    }
+                    elseif( $typeName -eq 'Int32' )
+                    {
+                        $intValue = 0
+                        $keyValue = [Int32]::TryParse($keyValue, [ref] $intValue)
+                        $keyValue = $intValue
+                    }
+                    elseif( $typeName -eq 'Version' )
+                    {
+                        if( $keyValue -is [int32] )
+                        {
+                            $major = $keyValue -shr 24   # First 8 bits
+                            $minor = ($keyValue -band 0x00ff0000) -shr 16  # bits 9 - 16
+                            $build = $keyValue -band 0x0000ffff   # last 8 bits
+                            $keyValue = New-Object 'Version' $major,$minor,$build
+                        }
+                        else
+                        {
+                            [Version]$version = $null
+                            if( [Version]::TryParse($keyValue, [ref]$version) )
+                            {
+                                $keyValue = $version
+                            }
                         }
                     }
                 }
-            }
-
-            if( $keyValue -eq $null )
-            {
-                Assert-Null $propertyValue
-            }
-            else
-            {
-                Assert-Equal $keyValue $propertyValue ('{0}: {1}' -f $program.Key.Name,$propertyName)
+    
+                if( $keyValue -eq $null )
+                {
+                    $propertyValue | Should BeNullOrEmpty
+                }
+                else
+                {
+                    $propertyValue | Should Be $keyValue
+                }
             }
         }
     }
 }
 
-function Test-ShouldGetSpecificProgram
-{
+Describe 'Get-ProgramInstallInfo when getting a program by name' {
     $p = Get-ProgramInstallInfo | Select-Object -First 1
     $p2 = Get-ProgramInstallInfo $p.DisplayName
-    Assert-NotNull $p2
-    Assert-Equal $p $p2
-}
+    It 'should get just that program' {
+        $p2 | Should Not BeNullOrEmpty
+        $p2 | Should Be $p
+    }
+}   
 
-function Test-ShouldSupportWildcardName
-{
+Describe 'Get-ProgramInstallInfo when getting programs by wildcard' {
+
     $p = Get-ProgramInstallInfo | Select-Object -First 1
+
     $wildcard = $p.DisplayName.Substring(0,$p.DisplayName.Length - 1)
     $wildcard = '{0}*' -f $wildcard
     $p2 = Get-ProgramInstallInfo $wildcard
-    Assert-NotNull $p2
-    Assert-Equal $p $p2
-}
 
+    It 'should find the program' {
+        $p2 | Should Not BeNullOrEmpty
+        $p2 | Should Be $p
+    }
+    
+}
