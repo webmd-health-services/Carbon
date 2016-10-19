@@ -10,24 +10,27 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Start-TestFixture
-{
-    & (Join-Path -Path $PSScriptRoot -ChildPath '..\Import-CarbonForTest.ps1' -Resolve)
-}
+#Requires -Version 1
+Set-StrictMode -Version 'Latest'
 
-function Test-ShouldFindExistingServices
-{
+& (Join-Path -Path $PSScriptRoot -ChildPath 'Import-CarbonForTest.ps1' -Resolve)
+
+Describe 'Test-Service when testing an existing service' {
     $error.Clear()
-    $missingServices = Get-Service | 
-                            Where-Object { -not (Test-Service -Name $_.Name) }
-    Assert-Null $missingServices
-    Assert-Equal 0 $error.Count
+    $missingServices = Get-Service | Where-Object { -not (Test-Service -Name $_.Name) }
+    It 'should find existing services' {
+        $missingServices | Should BeNullOrEmpty
+        $error.Count | Should Be 0
+    }
 }
 
-function Test-ShouldNotFindMissingService
-{
+Describe 'Test-Service when testing for a non-existent service' {
+    
     $error.Clear()
-    Assert-False (Test-Service -Name 'ISureHopeIDoNotExist')
-    Assert-Equal 0 $error.Count
-}
 
+    It 'should not find missing service' {
+        (Test-Service -Name 'ISureHopeIDoNotExist') | Should Be $false
+        $error.Count | Should Be 0
+    }
+    
+}
