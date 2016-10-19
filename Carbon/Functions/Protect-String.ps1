@@ -170,12 +170,13 @@ filter Protect-String
 
     if( $String -is [System.Security.SecureString] )
     {
-        $stringBytes = [Carbon.Security.SecureStringConverter]::toBytes($String)   
+        $stringBytes = [Carbon.Security.SecureStringConverter]::ToBytes($String)   
     }
     else
     {
         $stringBytes = [Text.Encoding]::UTF8.GetBytes( $String.ToString() )
     }
+    
     try
     {    
 
@@ -296,7 +297,6 @@ filter Protect-String
     finally
     {
         $stringBytes.Clear()
-        Remove-Variable -Name stringBytes
     }
 }
 

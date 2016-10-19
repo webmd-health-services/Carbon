@@ -1,27 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Security;
 using System.Runtime.InteropServices;
 
 namespace Carbon.Security
 {
     public sealed class SecureStringConverter
     {
-        public static byte[] toBytes(System.Security.SecureString pass)
+        public static byte[] ToBytes(SecureString secureString)
         {
-            IntPtr unmanagedBytes = Marshal.SecureStringToGlobalAllocUnicode(pass);
-            byte[] bValue = null;
-            try
+            var unmanagedBytes = Marshal.SecureStringToGlobalAllocUnicode(secureString);
+	        try
             {
-                unsafe
+	            byte[] bValue;
+	            unsafe
                 {
-                    byte* byteArray = (byte*)unmanagedBytes.ToPointer();
+                    var byteArray = (byte*)unmanagedBytes.ToPointer();
 
-                    bValue = new byte[pass.Length * 2];
+                    bValue = new byte[secureString.Length * 2];
 
-                    for (int i = 0; i < bValue.Length; ++i)
+                    for (var i = 0; i < bValue.Length; ++i)
                     {
                         bValue[i] = *byteArray++;
                     }

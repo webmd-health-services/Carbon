@@ -49,11 +49,10 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
-    <SignAssembly>false</SignAssembly>
+    <SignAssembly>true</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
-    <AssemblyOriginatorKeyFile>
-    </AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>Carbon.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -107,6 +106,9 @@
     <Compile Include="Win32\Win32ErrorCodes.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Carbon.snk" />
+  </ItemGroup>
+  <ItemGroup>
     <COMReference Include="WindowsInstaller">
       <Guid>{000C1092-0000-0000-C000-000000000046}</Guid>
       <VersionMajor>1</VersionMajor>
@@ -114,10 +116,9 @@
       <Lcid>1033</Lcid>
       <WrapperTool>tlbimp</WrapperTool>
       <Isolated>False</Isolated>
-      <EmbedInteropTypes>True</EmbedInteropTypes>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
     </COMReference>
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
