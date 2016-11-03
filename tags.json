@@ -480,6 +480,10 @@
         "Tags":  [ "Security", "File System", "NTFS" ]
     },
     {
+        "Name":  "Enable-AclInheritance",
+        "Tags":  [ "Security", "File System", "NTFS" ]
+    },
+    {
         "Name":  "Protect-String",
         "Tags":  [ "Cryptography", "Encryption" ]
     },
