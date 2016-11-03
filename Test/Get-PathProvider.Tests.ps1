@@ -10,41 +10,38 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Start-TestFixture
-{
-    & (Join-Path -Path $PSScriptRoot -ChildPath '..\Import-CarbonForTest.ps1' -Resolve)
-}
+& (Join-Path -Path $PSScriptRoot -ChildPath 'Import-CarbonForTest.ps1' -Resolve)
 
-function Test-ShouldGetFileSystemProvider
-{
-    Assert-Equal 'FileSystem' ((Get-PathProvider -Path 'C:\Windows').Name)
-}
-
-function Test-ShouldGetRelativePathProvider
-{
-    Assert-Equal 'FileSystem' ((Get-PathProvider -Path '..\').Name)
-}
-
-function Test-ShouldGetRegistryProvider
-{
-    Assert-Equal 'Registry' ((Get-PathProvider -Path 'hklm:\software').Name)
-}
-
-function Test-ShouldGetRelativePathProvider
-{
-    Push-Location 'hklm:\SOFTWARE\Microsoft'
-    try
-    {
-        Assert-Equal 'Registry' ((Get-PathProvider -Path '..\').Name)
+Describe 'Get-PathProvider' {
+    BeforeAll {
     }
-    finally
-    {
-        Pop-Location
+    
+    It 'should get file system provider' {
+        ((Get-PathProvider -Path 'C:\Windows').Name) | Should Be 'FileSystem'
     }
+    
+    It 'should get relative path provider' {
+        ((Get-PathProvider -Path '..\').Name) | Should Be 'FileSystem'
+    }
+    
+    It 'should get registry provider' {
+        ((Get-PathProvider -Path 'hklm:\software').Name) | Should Be 'Registry'
+    }
+    
+    It 'should get relative path provider' {
+        Push-Location 'hklm:\SOFTWARE\Microsoft'
+        try
+        {
+            ((Get-PathProvider -Path '..\').Name) | Should Be 'Registry'
+        }
+        finally
+        {
+            Pop-Location
+        }
+    }
+    
+    It 'should get no provider for bad path' {
+        ((Get-PathProvider -Path 'C:\I\Do\Not\Exist').Name) | Should Be 'FileSystem'
+    }
+    
 }
-
-function Test-ShouldGetNoProviderForBadPath
-{
-    Assert-Equal 'FileSystem' ((Get-PathProvider -Path 'C:\I\Do\Not\Exist').Name)
-}
-
