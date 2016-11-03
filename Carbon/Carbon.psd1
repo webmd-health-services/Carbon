@@ -123,6 +123,7 @@ All functions are idempotent: when run multiple times with the same arguments, y
                             'Disable-IEEnhancedSecurityConfiguration',
                             'Disable-IisSecurityAuthentication',
                             'Disable-NtfsCompression',
+                            'Enable-AclInheritance',
                             'Enable-FirewallStatefulFtp',
                             'Enable-IEActivationPermission',
                             'Enable-IisDirectoryBrowsing',
