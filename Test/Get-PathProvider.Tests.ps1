@@ -13,8 +13,6 @@
 & (Join-Path -Path $PSScriptRoot -ChildPath 'Import-CarbonForTest.ps1' -Resolve)
 
 Describe 'Get-PathProvider' {
-    BeforeAll {
-    }
     
     It 'should get file system provider' {
         ((Get-PathProvider -Path 'C:\Windows').Name) | Should Be 'FileSystem'
@@ -44,4 +42,10 @@ Describe 'Get-PathProvider' {
         ((Get-PathProvider -Path 'C:\I\Do\Not\Exist').Name) | Should Be 'FileSystem'
     }
     
+}
+
+Describe 'Get-PathProvider when passed a registry key PSPath' {
+    It 'should return Registry' {
+        Get-PathProvider -Path (Get-Item -Path 'hkcu:\software').PSPath | Select-Object -ExpandProperty 'Name' | Should Be 'Registry'
+    }
 }

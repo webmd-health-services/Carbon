@@ -13,6 +13,7 @@
  * Fixed: `Test-Service` failed to detect if a device driver service is installed.
  * Fixed: `Install-Service` fails if a service depends on a device driver. (Note: in our testing, we can't get a device driver set as a dependency. If you know what the secret sauce is to get this to work with sc.exe (or another means), please let us know.)
  * Fixed: `Disable-AclInheritance` (ne `Protect-Acl`) fails when piped a registry key.
+ * Fixed: `Get-PathProvider` fails when passed a fully-qualified registry key PowerShell path, e.g. `Microsoft.PowerShell.Core\Registry::HKEY_CURRENT_USER\Software`.
  
 
 # 2.3.0 (29 September 2016)
