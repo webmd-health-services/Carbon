@@ -19,12 +19,22 @@ function Enable-AclInheritance
     .DESCRIPTION
     Items in the registry or file system will usually inherit ACLs from its parent. This inheritance can be disabled, either via Carbon's `Protect-Acl` function or using .NET's securei API. The `Enable-AclInheritance` function re-enables inheritance on containers where it has been disabled. By default, any explicit permissions on the item are removed. Use the `-Preserve` switch to keep any existing, explicit permissions on the item.
     
+    This function is paired with `Disable-AclInheritance`. 
+
+    This function was added in Carbon 2.4.
+
+    .LINK
+    Disable-AclInheritance
+    
+    .LINK
+    Get-Permission
+
     .LINK
     Grant-Permission
 
     .LINK
-    Protect-Acl
-    
+    Revoke-Permission
+
     .EXAMPLE
     Enable-AclInheritance -Path C:\Projects\Carbon
     
@@ -38,6 +48,7 @@ function Enable-AclInheritance
     [CmdletBinding(SupportsShouldProcess=$true)]
     param(
         [Parameter(Mandatory=$true,ValueFromPipeline=$true,ValueFromPipelineByPropertyName=$true)]
+        [Alias('PSPath')]
         [string]
         # The file system or registry path who should start inheriting ACLs from its parent.
         $Path,

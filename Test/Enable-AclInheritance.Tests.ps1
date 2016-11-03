@@ -4,6 +4,19 @@ Set-StrictMode -Version 'Latest'
 
 & (Join-Path -Path $PSScriptRoot -ChildPath 'Import-CarbonForTest.ps1' -Resolve)
 
+function Assert-InheritanceEnabled
+{
+    param(
+        $Path
+    )
+
+    It 'should enable inheritance' {
+        $acl = Get-Acl -Path $path
+        $acl.AreAccessRulesProtected | Should Be $false
+        $acl = $null
+    }
+
+}
 
 function New-TestContainer
 {
@@ -48,12 +61,8 @@ foreach( $provider in @( "FileSystem", 'Registry' ) )
     Describe ('Enable-AclInheritance when ACL inheritance is disabled on the {0}' -f $provider) {
         $path = New-TestContainer -Provider $provider
         Enable-AclInheritance -Path $path
-
-        It 'should enable inheritance' {
-            $acl = Get-Acl -Path $path
-            $acl.AreAccessRulesProtected | Should Be $false
-            $acl = $null
-        }
+        
+        Assert-InheritanceEnabled -Path $path
 
         It 'should remove explicit access rules' {
             Get-Permission -Path $path | Should BeNullOrEmpty
@@ -65,9 +74,13 @@ foreach( $provider in @( "FileSystem", 'Registry' ) )
 
         Enable-AclInheritance -Path $path
 
+        Assert-InheritanceEnabled -Path $path
+
         Mock -CommandName 'Set-Acl' -ModuleName 'Carbon' -Verifiable
 
         Enable-AclInheritance -Path $path
+
+        Assert-InheritanceEnabled -Path $path
 
         It 'should not enable inheritance twice' {
             Assert-MockCalled -CommandName 'Set-Acl' -ModuleName 'Carbon' -Times 0
@@ -79,8 +92,23 @@ foreach( $provider in @( "FileSystem", 'Registry' ) )
 
         Enable-AclInheritance -Path $path -Preserve
 
+        Assert-InheritanceEnabled -Path $path
+
         It 'should preservice explicit access rules' {
             Get-Permission -Path $path | Should Not BeNullOrEmpty
         }
     }
+
+    Describe ('Enable-AclInheritance when part of a pipeline on the {0}' -f $provider) {
+        $path = New-TestContainer -Provider $provider
+        Get-Item -Path $path | Enable-AclInheritance
+        Assert-InheritanceEnabled -Path $path
+
+        $path = New-TestContainer -Provider $provider
+        $path | Enable-AclInheritance
+        Assert-InheritanceEnabled -Path $path
+    }
+
 }
+
+Get-ChildItem -Path 'hkcu:\Carbon+*' | Remove-Item -Recurse -ErrorAction Ignore
