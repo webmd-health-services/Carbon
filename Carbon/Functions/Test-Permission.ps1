@@ -37,13 +37,16 @@ function Test-Permission
     ConvertTo-ContainerInheritanceFlags
 
     .LINK
+    Disable-AclInheritance
+
+    .LINK
+    Enable-AclInheritance
+
+    .LINK
     Get-Permission
 
     .LINK
     Grant-Permission
-
-    .LINK
-    Protect-Acl
 
     .LINK
     Revoke-Permission

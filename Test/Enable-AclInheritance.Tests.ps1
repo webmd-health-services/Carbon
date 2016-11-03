@@ -28,7 +28,7 @@ function New-TestContainer
         throw $Provider
     }
 
-    Protect-Acl -Path $path -Preserve
+    Disable-AclInheritance -Path $path -Preserve
 
     It 'should have inheritance disabled' {
         $acl = Get-Acl -Path $path

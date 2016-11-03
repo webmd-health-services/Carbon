@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Protect-Acl
+function Disable-AclInheritance
 {
     <#
     .SYNOPSIS
@@ -54,5 +54,6 @@ function Protect-Acl
     $acl | Set-Acl -Path $Path
 }
 
-Set-Alias -Name Unprotect-AclAccessRules -Value Protect-Acl
+Set-Alias -Name 'Unprotect-AclAccessRules' -Value 'Disable-AclInheritance'
+Set-Alias -Name 'Protect-Acl' -Value 'Disable-AclInheritance'
 

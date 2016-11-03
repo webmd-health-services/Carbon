@@ -30,13 +30,16 @@ function Get-Permission
     Carbon_Permission
 
     .LINK
+    Disable-AclInheritance
+
+    .LINK
+    Enable-AclInheritance
+
+    .LINK
     Get-Permission
 
     .LINK
     Grant-Permission
-
-    .LINK
-    Protect-Acl
 
     .LINK
     Revoke-Permission

@@ -106,10 +106,13 @@ function Grant-Permission
     ConvertTo-ContainerInheritanceFlags
 
     .LINK
-    Get-Permission
+    Disable-AclInheritance
 
     .LINK
-    Protect-Acl
+    Enable-AclInheritance
+
+    .LINK
+    Get-Permission
 
     .LINK
     Revoke-Permission

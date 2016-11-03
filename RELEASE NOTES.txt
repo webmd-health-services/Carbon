@@ -3,7 +3,8 @@
 ## Enhancements
 
  * `Protect-String` can now encrypt a `SecureString`. The `String` parameter's type was changed to `[object]`. When you pass in a `SecureString`, it is converted to an array of bytes, encrypted, and the array of bytes are cleared from memory.
- * Created `Enable-AclInheritance` to re-enable access rule inheritance on file system and registry ACLs. This function is paired with `Protect-Acl`.
+ * Renamed `Protect-Acl` to `Disable-AclInheritance` to make it clearer what the function does. Created a `Protect-Acl` alias in place to preserve backwards-compatability.
+ * Created `Enable-AclInheritance` to re-enable access rule inheritance on file system and registry ACLs. This function is paired with `Disable-AclInheritance`.
 
 ## Bug Fixes
 
