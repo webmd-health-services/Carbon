@@ -110,6 +110,18 @@ foreach( $provider in @( 'FileSystem', 'Registry' ) )
         $path | Disable-AclInheritance
         Assert-AclInheritanceDisabled -Path $path
     }
+
+    Describe ('Disable-AclInheritandce on {0} when inheritance already disabled' -f $provider) {
+        $path = New-TestContainer -Provider $provider
+        Disable-AclInheritance -Path $path
+        Assert-AclInheritanceDisabled -Path $path
+
+        Mock -CommandName 'Set-Acl' -ModuleName 'Carbon' -Verifiable
+        Disable-AclInheritance -Path $path
+        It 'should not disable an already disabled ACL' {
+            Assert-MockCalled -CommandName 'Set-Acl' -ModuleName 'Carbon' -Times 0
+        }
+    }
 }
 
 Get-ChildItem -Path 'hkcu:\Carbon+*' | Remove-Item -Recurse -ErrorAction Ignore

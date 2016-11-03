@@ -17,18 +17,31 @@ function Disable-AclInheritance
     Protects an ACL so that changes to its parent can't be inherited to it.
     
     .DESCRIPTION
-    New items in the registry or file system will usually inherit ACLs from its parent.  This function stops an item from inheriting rules from its, and will optionally preserve the existing inherited rules.  Any existing, non-inherited access rules are left in place.
+    Items in the registry or file system will inherit permissions from its parent.  The `Disable-AclInheritnace` function disables inheritance, removing all inherited permissions. You can optionally preserve the currently inherited permission as explicit permissions using the `-Preserve` switch.
+    
+    This function is paired with `Enable-AclInheritance`.
+
+    Beginning in Carbon 2.4, this function will only disable inheritance if it is currently enabled. In previous versions, it always disabled inheritance.
+
+    .LINK
+    Disable-AclInheritance
     
     .LINK
+    Get-Permission
+
+    .LINK
     Grant-Permission
+
+    .LINK
+    Revoke-Permission
     
     .EXAMPLE
-    Protect-Acl -Path C:\Projects\Carbon
+    Disable-AclInheritance -Path C:\Projects\Carbon
     
     Removes all inherited access rules from the `C:\Projects\Carbon` directory.  Non-inherited rules are preserved.
     
     .EXAMPLE
-    Protect-Acl -Path hklm:\Software\Carbon -Preserve
+    Disable-AclInheritance -Path hklm:\Software\Carbon -Preserve
     
     Stops `HKLM:\Software\Carbon` from inheriting acces rules from its parent, but preserves the existing, inheritied access rules.
     #>
@@ -37,7 +50,7 @@ function Disable-AclInheritance
         [Parameter(Mandatory=$true,ValueFromPipeline=$true,ValueFromPipelineByPropertyName=$true)]
         [Alias('PSPath')]
         [string]
-        # The file system or registry path whose 
+        # The file system or registry path whose access rule should stop inheriting from its parent.
         $Path,
         
         [Switch]
@@ -49,10 +62,13 @@ function Disable-AclInheritance
 
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
-    Write-Verbose "Removing access rule inheritance on '$Path'."
     $acl = Get-Acl -Path $Path
-    $acl.SetAccessRuleProtection( $true, $Preserve )
-    $acl | Set-Acl -Path $Path
+    if( -not $acl.AreAccessRulesProtected )
+    {
+        Write-Verbose -Message ("[{0}] Disabling access rule inheritance." -f $Path)
+        $acl.SetAccessRuleProtection( $true, $Preserve )
+        $acl | Set-Acl -Path $Path
+    }
 }
 
 Set-Alias -Name 'Unprotect-AclAccessRules' -Value 'Disable-AclInheritance'
