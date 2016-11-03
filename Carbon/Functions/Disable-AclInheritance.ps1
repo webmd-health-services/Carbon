@@ -35,6 +35,7 @@ function Disable-AclInheritance
     [CmdletBinding(SupportsShouldProcess=$true)]
     param(
         [Parameter(Mandatory=$true,ValueFromPipeline=$true,ValueFromPipelineByPropertyName=$true)]
+        [Alias('PSPath')]
         [string]
         # The file system or registry path whose 
         $Path,
