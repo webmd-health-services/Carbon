@@ -476,7 +476,7 @@
         "Tags":  [ "File System", "Directory" ]
     },
     {
-        "Name":  "Protect-Acl",
+        "Name":  "Disable-AclInheritance",
         "Tags":  [ "Security", "File System", "NTFS" ]
     },
     {
