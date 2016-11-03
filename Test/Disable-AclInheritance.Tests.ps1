@@ -10,62 +10,106 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+#Requires -Version 4
+Set-StrictMode -Version 'Latest'
+
 $parentFSPath = $null 
 $childFSPath = $null
 $originalAcl = $null
 
-& (Join-Path -Path $PSScriptRoot -ChildPath '..\Import-CarbonForTest.ps1' -Resolve)
+& (Join-Path -Path $PSScriptRoot -ChildPath 'Import-CarbonForTest.ps1' -Resolve)
 
-function Start-Test
+function Assert-AclInheritanceDisabled
 {
-	$parentFSPath = New-TempDir
-	$childFSPath = Join-Path $parentFSPath 'TestUnprotectAclAccessRules'
-	
-    $null = New-Item $childFSPath -ItemType Container
-    Grant-Permission -Identity Everyone -Permission FullControl -Path $childFSPath
-    $originalAcl = Get-Acl $childFSPath
+    param(
+        $Path
+    )
+
+    It 'should disable access rule inheritance' {
+        (Get-Acl -Path $Path).AreAccessRulesProtected | Should Be $true
+    }
+
 }
 
-function Stop-Test
+function New-TestContainer
 {
-    Remove-Item $parentFSPath -Recurse -Force
-}
+    param(
+        [Parameter(Mandatory=$true)]
+        $Provider
+    )
 
-function Test-ShouldRemoveInheritedAccess
-{
-    Protect-Acl -Path $childFSPath
-    Assert-InheritedPermissionRemoved
-}
-
-function Test-ShouldPreserveInheritedAccessRules
-{
-    Protect-Acl -Path $childFSPath -Preserve
-    $acl = Get-Acl $childFSPath
-    Assert-True ($acl.Access.Count -le $originalAcl.Access.Count)
-    for( $idx = 0; $idx -lt $acl.Access.Count; $idx++ )
+    if( $Provider -eq 'FileSystem' )
     {
-        $expectedRule = $originalAcl.Access[$idx]
-        $actualRule = $originalAcl.Access[$idx]
-        Assert-Equal $expectedRule.FileSystemRights $actualRule.FileSystemRights
-        Assert-Equal $expectedRule.AccessControlType $actualRule.AccessControlType
-        Assert-Equal $expectedRule.IdentityReference.Value $actualRule.IdentityReference.Value
-        Assert-Equal $expectedRule.IsInherited $actualRule.IsInherited
-        Assert-Equal $expectedRule.InheritanceFlags $actualRule.InheritanceFlags
-        Assert-Equal $expectedRule.PropagationFlags $actualRule.PropagationFlags
+        $testRoot = (Get-Item -Path 'TestDrive:').FullName
+        $path = Join-Path -Path $testRoot -ChildPath ([IO.Path]::GetRandomFileName())
+        Install-Directory -Path $path
+    }
+    elseif( $Provider -eq 'Registry' )
+    {
+        $path = ('hkcu:\Carbon+{0}\Disable-AclInheritance.Tests' -f [IO.Path]::GetRandomFileName())
+        Install-RegistryKey -Path $path
+    }
+    else
+    {
+        throw $Provider
+    }
+
+    Grant-Permission -Path $path -Identity $env:USERNAME -Permission FullControl
+
+    It 'should have inheritance enabled' {
+        $acl = Get-Acl -Path $path
+        $acl.AreAccessRulesProtected | Should Be $false
+        $acl = $null
+    }
+
+    It 'should have inherited access rules' {
+        Get-Permission -Path $path -Inherited | Should Not BeNullOrEmpty
+    }
+
+    return $path
+}
+
+foreach( $provider in @( 'FileSystem', 'Registry' ) )
+{
+    
+    Describe ('Disable-AclInheritance on {0}' -f $provider) {
+        $path = New-TestContainer -Provider $provider
+        Protect-Acl -Path $path
+        Assert-AclInheritanceDisabled -Path $path
+        It 'should not preserve inherited access rules' {
+            [object[]]$perm = Get-Permission -Path $path -Inherited 
+            $perm.Count | Should Be 1
+            $perm[0].IdentityReference | Should Be (Resolve-IdentityName -Name $env:USERNAME)
+        }
+    }
+    
+    Describe ('Disable-AclInheritance on {0} when preserving inherited rules' -f $provider) {
+        $path = New-TestContainer -Provider $provider
+        [Security.AccessControl.AccessRule[]]$inheritedPermissions = Get-Permission -Path $path -Inherited | Where-Object { $_.IsInherited }
+        Protect-Acl -Path $path -Preserve
+        Assert-AclInheritanceDisabled -Path $path
+        It 'should preserve inherited access rules' {
+            [object[]]$currentPermissions = Get-Permission -Path $path -Inherited 
+            $currentPermissions.Count | Should Be $inheritedPermissions.Count
+            for( $idx = 0; $idx -lt $currentPermissions.Count; ++$idx )
+            {
+                $currentPermission = $currentPermissions[$idx]
+                $inheritedPermission = $inheritedPermissions | Where-Object { $_.IdentityReference -eq $currentPermission.IdentityReference }
+
+                $currentPermission.IdentityReference | Should Be $inheritedPermission.IdentityReference
+            }
+        }
+    }
+    
+    Describe ('Disable-AclInheritance on {0} when part of a pipeline' -f $provider) {
+        $path = New-TestContainer -Provider $provider
+        Get-Item -Path $path | Disable-AclInheritance 
+        Assert-AclInheritanceDisabled -Path $path
+
+        $path = New-TestContainer -Provider $provider
+        $path | Disable-AclInheritance
+        Assert-AclInheritanceDisabled -Path $path
     }
 }
 
-function Test-ShouldAcceptPathFromPipelineInput
-{
-    Get-Item $childFSPath | Protect-Acl
-    Assert-InheritedPermissionRemoved
-}
-
-function Assert-InheritedPermissionRemoved
-{
-    [object[]]$inherited = $originalAcl.Access | Where-Object { $_.IsInherited }
-    $acl = Get-Acl $childFSPath
-    Assert-Equal ($originalAcl.Access.Count - $inherited.Count) $acl.Access.Count
-    $acl.Access | 
-        ForEach-Object { Assert-False $_.IsInherited }
-}
+Get-ChildItem -Path 'hkcu:\Carbon+*' | Remove-Item -Recurse -ErrorAction Ignore
