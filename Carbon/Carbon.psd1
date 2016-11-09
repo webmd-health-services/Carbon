@@ -339,31 +339,18 @@ All functions are idempotent: when run multiple times with the same arguments, y
             ReleaseNotes = @'
 ## Enhancements
 
- * `Protect-String` can now encrypt with a key, password, or passphrase (i.e. it can now encrypt with symmetric encryption).
- * `Unprotect-String` can now decrypt with a key, password, or passphrase (i.e. it can now decrypt using symmetric encryption).
- * `Set-HostsEntry` now supports IPv6 addresses ([fixes issue](https://bitbucket.org/splatteredbits/carbon/issues/181/community-set-hostsentry-add-support-for)).
- * `Grant-Permission` now supports creating `Deny` access rules. Use the new `Type` parameter. [Fixes issue #152.](https://bitbucket.org/splatteredbits/carbon/issues/152)
- * `Set-EnvironmentVariable`: 
-   * Added `-Force` switch to make all variable modifications immediately visible in the current PowerShell process's `env:` drive. Restarts are no longer required.
-   * You can now set an environment variable for other users. Use the `Credential` parameter to specify the user's credentials. [Fixes issue #151.](https://bitbucket.org/splatteredbits/carbon/issues/151)
- * `Remove-EnvironmentVariable`: 
-   * Added `-Force` switch to make all variable removals immediately visible in the current PowerShell process's `env:` drive. Restarts are no longer required.
-   * You can now remove variables from multiple targets/scopes at once.
-   * You can now remove an environment variable for other users. Use the `Credential` parameter to specify the user's credentials.
- * `Invoke-PowerShell`:
-   * It now runs PowerShell commands. Pass a string of PowerShell code with the `Command` parameter. 
-   * It now runs encoded PowerShell commands. Pass the string of PowerShell code with the `Command` parameter and use the `-Encode` switch.
-   * It now runs scripts and commands as another user. Use the `Credential` parameter to pass the user's credentials along with the `FilePath` and `Command` parameters to run scripts and commands, respectively.
-   
+ * `Protect-String` can now encrypt a `SecureString`. The `String` parameter's type was changed to `[object]`. When you pass in a `SecureString`, it is converted to an array of bytes, encrypted, and the array of bytes are cleared from memory.
+ * Renamed `Protect-Acl` to `Disable-AclInheritance` to make it clearer what the function does. Created a `Protect-Acl` alias in place to preserve backwards-compatability.
+ * `Disable-AclInheritance` only disables inheritance if it is currently enabled.
+ * Created `Enable-AclInheritance` to re-enable access rule inheritance on file system and registry ACLs. This function is paired with `Disable-AclInheritance`.
+
 ## Bug Fixes
 
- * Fixed: `Set-RegistryKeyValue` fails when `-String` parameter's value is `$null` or empty ([fixes issue #211](https://bitbucket.org/splatteredbits/carbon/issues/211/set-registrykeyvalue-null-string-invalid)).
- * Fixed: Can't import Carbon in a 32-bit PowerShell 4 session on a 64-bit operating system ([fixes issue #199](https://bitbucket.org/splatteredbits/carbon/issues/199/community-issue-importing-carbon-on-x64)).
- * Fixed: Documentation for the `Install-ScheduledTask` function's `HighestAvailableRunLevel` is lying ([fixes issue #205](https://bitbucket.org/splatteredbits/carbon/issues/205/documentation-install-scheduledtask-typo)).
- * Fixed: `Carbon_FirewallRule` fails when `Profile` property set to multiple values ([fixes issue #209](https://bitbucket.org/splatteredbits/carbon/issues/209/dsc-carbon_firewallrule-does-not-accept)).
- * Fixed: `Install-IisAppPool` can't set .NET framework version to `No Managed Code` ([fixes issue #210](https://bitbucket.org/splatteredbits/carbon/issues/210/install-iisapppool-need-to-be-able-to-set)).
- * Fixed: `Get-SslCertificateBinding` fails if the operating system's culture is not `en-US` ([fixes issue #171](https://bitbucket.org/splatteredbits/carbon/issues/171/get-sslcertificatebinding-fails-when-os)).
- * Fixed: `Install-ScheduledTask` fails when creating a task that runs during a specific week of the month on Sundays. (You're going to love this: the underlying int value for `[DayOfWeek]::Sunday` is `0`, so when testing if a `DayOfWeek` typed variable set to `Sunday` has a value, it returns `$false`. This made `Install-ScheduledTask` add the `/D` parameter without a value.
+ * Fixed: `Get-ProgramInstallInfo` fails when a program's `Version` registry key value can't be converted into a `Version` object.
+ * Fixed: `Test-Service` failed to detect if a device driver service is installed.
+ * Fixed: `Install-Service` fails if a service depends on a device driver. (Note: in our testing, we can't get a device driver set as a dependency. If you know what the secret sauce is to get this to work with sc.exe (or another means), please let us know.)
+ * Fixed: `Disable-AclInheritance` (ne `Protect-Acl`) fails when piped a registry key.
+ * Fixed: `Get-PathProvider` fails when passed a fully-qualified registry key PowerShell path, e.g. `Microsoft.PowerShell.Core\Registry::HKEY_CURRENT_USER\Software`.
 '@
         } # End of PSData hashtable
     
