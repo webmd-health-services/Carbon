@@ -17,7 +17,28 @@
         <li><a href="http://bitbucket.org/splatteredbits/carbon">-Project</a></li>
     </ul>
 
-    <h1>2.3.0 (29 September 2016)</h1>
+    <h1>2.4.0 (9 November 2016)</h1>
+
+<h2>Enhancements</h2>
+
+<ul>
+<li><a href="Protect-String.html">Protect-String</a> can now encrypt a <code>SecureString</code>. The <code>String</code> parameter's type was changed to <code>[object]</code>. When you pass in a <code>SecureString</code>, it is converted to an array of bytes, encrypted, and the array of bytes are cleared from memory.</li>
+<li>Renamed <a href="Disable-AclInheritance.html">Protect-Acl</a> to <a href="Disable-AclInheritance.html">Disable-AclInheritance</a> to make it clearer what the function does. Created a <a href="Disable-AclInheritance.html">Protect-Acl</a> alias in place to preserve backwards-compatability.</li>
+<li><a href="Disable-AclInheritance.html">Disable-AclInheritance</a> only disables inheritance if it is currently enabled.</li>
+<li>Created <a href="Enable-AclInheritance.html">Enable-AclInheritance</a> to re-enable access rule inheritance on file system and registry ACLs. This function is paired with <a href="Disable-AclInheritance.html">Disable-AclInheritance</a>.</li>
+</ul>
+
+<h2>Bug Fixes</h2>
+
+<ul>
+<li>Fixed: <a href="Get-ProgramInstallInfo.html">Get-ProgramInstallInfo</a> fails when a program's <code>Version</code> registry key value can't be converted into a <code>Version</code> object.</li>
+<li>Fixed: <a href="Test-Service.html">Test-Service</a> failed to detect if a device driver service is installed.</li>
+<li>Fixed: <a href="Install-Service.html">Install-Service</a> fails if a service depends on a device driver. (Note: in our testing, we can't get a device driver set as a dependency. If you know what the secret sauce is to get this to work with sc.exe (or another means), please let us know.)</li>
+<li>Fixed: <a href="Disable-AclInheritance.html">Disable-AclInheritance</a> (ne <a href="Disable-AclInheritance.html">Protect-Acl</a>) fails when piped a registry key.</li>
+<li>Fixed: <a href="Get-PathProvider.html">Get-PathProvider</a> fails when passed a fully-qualified registry key PowerShell path, e.g. <code>Microsoft.PowerShell.Core\Registry::HKEY_CURRENT_USER\Software</code>.</li>
+</ul>
+
+<h1>2.3.0 (29 September 2016)</h1>
 
 <h2>Enhancements</h2>
 
@@ -695,7 +716,7 @@
 <li><a href="Install-Msi.html">Invoke-WindowsInstaller</a></li>
 <li><a href="Lock-IisConfigurationSection.html">Lock-IisConfigurationSection</a></li>
 <li><a href="New-Junction.html">New-Junction</a></li>
-<li><a href="Protect-Acl.html">Protect-Acl</a></li>
+<li><a href="Disable-AclInheritance.html">Protect-Acl</a></li>
 <li><a href="Remove-IniEntry.html">Remove-IniEntry</a> </li>
 <li><a href="Remove-Junction.html">Remove-Junction</a></li>
 <li><a href="Remove-SslCertificateBinding.html">Remove-SslCertificateBinding</a></li>
@@ -1358,8 +1379,8 @@
 <h3>Security</h3>
 
 <ul>
-<li>Added <a href="Protect-Acl.html">Unprotect-AclAccessRules</a> alias for <a href="Protect-Acl.html">Protect-Acl</a>, for backwards-compatibility with earlier releases.</li>
-<li>Added rename of <a href="Protect-Acl.html">Unprotect-AclAccessRules</a> to <a href="Protect-Acl.html">Protect-Acl</a> to v0.5.0.0 section of release notes.</li>
+<li>Added <a href="Disable-AclInheritance.html">Unprotect-AclAccessRules</a> alias for <a href="Disable-AclInheritance.html">Protect-Acl</a>, for backwards-compatibility with earlier releases.</li>
+<li>Added rename of <a href="Disable-AclInheritance.html">Unprotect-AclAccessRules</a> to <a href="Disable-AclInheritance.html">Protect-Acl</a> to v0.5.0.0 section of release notes.</li>
 </ul>
 
 <h3>Services</h3>
@@ -1767,7 +1788,7 @@
 
 <ul>
 <li><a href="Assert-AdminPrivilege.html">Assert-AdminPrivileges</a> no longer throws an exception if the user doesn't have administrative privileges.  Instead, it writes an error and returns <code>False</code>.  It returns <code>True</code> if the user has privileges.</li>
-<li>Renamed <a href="Protect-Acl.html">Unprotect-AclAccessRules</a> to <a href="Protect-Acl.html">Protect-Acl</a> (added backwards-compatible alias in v1.0.0).</li>
+<li>Renamed <a href="Disable-AclInheritance.html">Unprotect-AclAccessRules</a> to <a href="Disable-AclInheritance.html">Protect-Acl</a> (added backwards-compatible alias in v1.0.0).</li>
 </ul>
 
 <h3>Shares</h3>
@@ -1934,7 +1955,7 @@
 <li><a href="Set-RegistryKeyValue.html">Set-RegistryKeyValue</a>: Set/create a value in a registry key.</li>
 <li><a href="Test-RegistryKeyValue.html">Test-RegistryKeyValue</a>: Test if a value exists in a registry key.</li>
 </ul></li>
-<li><a href="Protect-Acl.html">Unprotect-AclAccessRules</a>: Turns off inherited access rules on an item in the file system or registry.</li>
+<li><a href="Disable-AclInheritance.html">Unprotect-AclAccessRules</a>: Turns off inherited access rules on an item in the file system or registry.</li>
 <li>Added a <code>Clear</code> parameter to the <a href="Grant-Permission.html">Grant-Permissions</a> function for clearing any non-inherited permissions on a file system/registry item.</li>
 </ul>
 

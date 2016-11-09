@@ -23,17 +23,17 @@
 </div>
 
 <h2>Syntax</h2>
-<pre class="Syntax"><code>Protect-String [-String] &lt;String&gt; -ForUser [&lt;CommonParameters&gt;]</code></pre>
-<pre class="Syntax"><code>Protect-String [-String] &lt;String&gt; -ForComputer [&lt;CommonParameters&gt;]</code></pre>
-<pre class="Syntax"><code>Protect-String [-String] &lt;String&gt; -Credential &lt;PSCredential&gt; [&lt;CommonParameters&gt;]</code></pre>
-<pre class="Syntax"><code>Protect-String [-String] &lt;String&gt; -Certificate &lt;X509Certificate2&gt; [-UseDirectEncryptionPadding] [&lt;CommonParameters&gt;]</code></pre>
-<pre class="Syntax"><code>Protect-String [-String] &lt;String&gt; -Thumbprint &lt;String&gt; [-UseDirectEncryptionPadding] [&lt;CommonParameters&gt;]</code></pre>
-<pre class="Syntax"><code>Protect-String [-String] &lt;String&gt; -PublicKeyPath &lt;String&gt; [-UseDirectEncryptionPadding] [&lt;CommonParameters&gt;]</code></pre>
-<pre class="Syntax"><code>Protect-String [-String] &lt;String&gt; -Key &lt;Object&gt; [&lt;CommonParameters&gt;]</code></pre>
+<pre class="Syntax"><code>Protect-String [-String] &lt;Object&gt; -ForUser [&lt;CommonParameters&gt;]</code></pre>
+<pre class="Syntax"><code>Protect-String [-String] &lt;Object&gt; -ForComputer [&lt;CommonParameters&gt;]</code></pre>
+<pre class="Syntax"><code>Protect-String [-String] &lt;Object&gt; -Credential &lt;PSCredential&gt; [&lt;CommonParameters&gt;]</code></pre>
+<pre class="Syntax"><code>Protect-String [-String] &lt;Object&gt; -Certificate &lt;X509Certificate2&gt; [-UseDirectEncryptionPadding] [&lt;CommonParameters&gt;]</code></pre>
+<pre class="Syntax"><code>Protect-String [-String] &lt;Object&gt; -Thumbprint &lt;String&gt; [-UseDirectEncryptionPadding] [&lt;CommonParameters&gt;]</code></pre>
+<pre class="Syntax"><code>Protect-String [-String] &lt;Object&gt; -PublicKeyPath &lt;String&gt; [-UseDirectEncryptionPadding] [&lt;CommonParameters&gt;]</code></pre>
+<pre class="Syntax"><code>Protect-String [-String] &lt;Object&gt; -Key &lt;Object&gt; [&lt;CommonParameters&gt;]</code></pre>
 
 <h2>Description</h2>
 <div class="Description">
-<p>Strings can be encrypted with the Data Protection API (DPAPI), RSA, or AES.</p>
+<p>The <code>Protect-String</code> function encrypts a string using the Data Protection API (DPAPI), RSA, or AES. In Carbon 2.3.0 or earlier, the plaintext string to encrypt is passed to the <code>String</code> parameter. Beginning in Carbon 2.4.0, you can also pass a <code>SecureString</code>. When encrypting a <code>SecureString</code>, it is converted to an array of bytes, encrypted, then the array of bytes is cleared from memory (i.e. the plaintext version of the <code>SecureString</code> is only in memory long enough to encrypt it).</p>
 
 <h2>DPAPI</h2>
 
@@ -97,8 +97,10 @@
 </tr>
 <tr valign='top'>
 	<td>String</td>
-	<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
-	<td class="ParamDescription"><p>The text to encrypt.</p></td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.object.aspx">Object</a></td>
+	<td class="ParamDescription"><p>The string to encrypt. Any non-string object you pass will be converted to a string before encrypting by calling the object's <code>ToString</code> method.</p>
+
+<p>Beginning in Carbon 2.4.0, this can also be a <code>SecureString</code> object. The <code>SecureString</code> is converted to an array of bytes, the bytes are encrypted, then the plaintext bytes are cleared from memory (i.e. the plaintext password is in memory for the amount of time it takes to encrypt it).</p></td>
 	<td>true</td>
 	<td>true (ByValue)</td>
     <td></td>
@@ -176,46 +178,51 @@
 
 
 <h2>EXAMPLE 2</h2>
+<pre><code>Protect-String -String $credential.Password -ForUser | Out-File MySecret.txt</code></pre>
+<p>Demonstrates that <code>Protect-String</code> can encrypt a <code>SecureString</code>. This functionality was added in Carbon 2.4.0.</p>
+
+
+<h2>EXAMPLE 3</h2>
 <pre><code>$cipherText = Protect-String -String "MySuperSecretIdentity" -ForComputer</code></pre>
 <p>Encrypts the given string and stores the value in $cipherText.  Because the encryption scope is set to LocalMachine, any user logged onto the local computer can decrypt <code>$cipherText</code>.</p>
 
 
-<h2>EXAMPLE 3</h2>
+<h2>EXAMPLE 4</h2>
 <pre><code>Protect-String -String 's0000p33333r s33333cr33333t' -Credential (Get-Credential 'builduser')</code></pre>
 <p>Demonstrates how to use <code>Protect-String</code> to encrypt a secret as a specific user. This is useful for situation where a secret needs to be encrypted by a user other than the user running <code>Protect-String</code>. Encrypting as a specific user won't work over PowerShell remoting.</p>
 
 
-<h2>EXAMPLE 4</h2>
+<h2>EXAMPLE 5</h2>
 <pre><code>Protect-String -String 'the secret sauce' -Certificate $myCert</code></pre>
 <p>Demonstrates how to encrypt a secret using RSA with a <code>System.Security.Cryptography.X509Certificates.X509Certificate2</code> object. You're responsible for creating/loading it. The <code>New-RsaKeyPair</code> function will create a key pair for you, if you've got a Windows SDK installed.</p>
 
 
-<h2>EXAMPLE 5</h2>
+<h2>EXAMPLE 6</h2>
 <pre><code>Protect-String -String 'the secret sauce' -Thumbprint '44A7C27F3353BC53F82318C14490D7E2500B6D9E'</code></pre>
 <p>Demonstrates how to encrypt a secret using RSA with a certificate in one of the Windows certificate stores. All local machine and user stores are searched.</p>
 
 
-<h2>EXAMPLE 6</h2>
+<h2>EXAMPLE 7</h2>
 <pre><code>Protect-String -String 'the secret sauce' -PublicKeyPath 'C:\Projects\Security\publickey.cer'</code></pre>
 <p>Demonstrates how to encrypt a secret using RSA with a certificate file. The file must be loadable by the <code>System.Security.Cryptography.X509Certificates.X509Certificate</code> class.</p>
 
 
-<h2>EXAMPLE 7</h2>
+<h2>EXAMPLE 8</h2>
 <pre><code>Protect-String -String 'the secret sauce' -PublicKeyPath 'cert:\LocalMachine\My\44A7C27F3353BC53F82318C14490D7E2500B6D9E'</code></pre>
 <p>Demonstrates how to encrypt a secret using RSA with a certificate in the store, giving its exact path.</p>
 
 
-<h2>EXAMPLE 8</h2>
+<h2>EXAMPLE 9</h2>
 <pre><code>Protect-String -String 'the secret sauce' -Key 'gT4XPfvcJmHkQ5tYjY3fNgi7uwG4FB9j'</code></pre>
 <p>Demonstrates how to encrypt a secret with a key, password, or passphrase. In this case, we are encrypting with a plaintext password. This functionality was added in Carbon 2.3.0.</p>
 
 
-<h2>EXAMPLE 9</h2>
+<h2>EXAMPLE 10</h2>
 <pre><code>Protect-String -String 'the secret sauce' -Key (Read-Host -Prompt 'Enter password (must be 16, 24, or 32 characters long):' -AsSecureString)</code></pre>
 <p>Demonstrates that you can use a <code>SecureString</code> as the key, password, or passphrase. This functionality was added in Carbon 2.3.0.</p>
 
 
-<h2>EXAMPLE 10</h2>
+<h2>EXAMPLE 11</h2>
 <pre><code>Protect-String -String 'the secret sauce' -Key ([byte[]]@(163,163,185,174,205,55,157,219,121,146,251,116,43,203,63,38,73,154,230,112,82,112,151,29,189,135,254,187,164,104,45,30))</code></pre>
 <p>Demonstrates that you can use an array of bytes as the key, password, or passphrase. This functionality was added in Carbon 2.3.0.</p>
 

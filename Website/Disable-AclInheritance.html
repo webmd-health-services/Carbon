@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-    <title>PowerShell - Revoke-Permission - Carbon</title>
+    <title>PowerShell - Disable-AclInheritance - Carbon</title>
     <link href="silk.css" type="text/css" rel="stylesheet" />
 	<link href="styles.css" type="text/css" rel="stylesheet" />
 </head>
@@ -17,30 +17,30 @@
         <li><a href="http://bitbucket.org/splatteredbits/carbon">-Project</a></li>
     </ul>
 
-    <h1>Revoke-Permission</h1>
+    <h1>Disable-AclInheritance</h1>
 <div class="Synopsis">
-<p>Revokes <em>explicit</em> permissions on a file, directory, registry key, or certificate's private key/key container.</p>
+<p>Protects an ACL so that changes to its parent can't be inherited to it.</p>
 </div>
 
 <h2>Syntax</h2>
-<pre class="Syntax"><code>Revoke-Permission [-Path] &lt;String&gt; [-Identity] &lt;String&gt; [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
+<pre class="Syntax"><code>Disable-AclInheritance [-Path] &lt;String&gt; [-Preserve] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
 
 <h2>Description</h2>
 <div class="Description">
-<p>Revokes all of an identity's <em>explicit</em> permissions on a file, directory, registry key, or certificate's private key/key container. Only explicit permissions are considered; inherited permissions are ignored.</p>
+<p>Items in the registry or file system will inherit permissions from its parent.  The <code>Disable-AclInheritnace</code> function disables inheritance, removing all inherited permissions. You can optionally preserve the currently inherited permission as explicit permissions using the <code>-Preserve</code> switch.</p>
 
-<p>If the identity doesn't have permission, nothing happens, not even errors written out.</p>
+<p>This function is paired with <code>Enable-AclInheritance</code>.</p>
+
+<p>Beginning in Carbon 2.4, this function will only disable inheritance if it is currently enabled. In previous versions, it always disabled inheritance.</p>
 </div>
 
 <h2>Related Commands</h2>
 
 <ul class="RelatedCommands">
-<li>Carbon_Permission</li>
 <li><a href="Disable-AclInheritance.html">Disable-AclInheritance</a></li>
-<li><a href="Enable-AclInheritance.html">Enable-AclInheritance</a></li>
 <li><a href="Get-Permission.html">Get-Permission</a></li>
 <li><a href="Grant-Permission.html">Grant-Permission</a></li>
-<li><a href="Test-Permission.html">Test-Permission</a></li>
+<li><a href="Revoke-Permission.html">Revoke-Permission</a></li>
 </ul>
 
 <h2> Parameters </h2>
@@ -56,18 +56,18 @@
 <tr valign='top'>
 	<td>Path</td>
 	<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
-	<td class="ParamDescription"><p>The path on which the permissions should be revoked.  Can be a file system, registry, or certificate path.</p></td>
+	<td class="ParamDescription"><p>The file system or registry path whose access rule should stop inheriting from its parent.</p></td>
 	<td>true</td>
-	<td>false</td>
+	<td>true (ByValue, ByPropertyName)</td>
     <td></td>
 </tr>
 <tr valign='top'>
-	<td>Identity</td>
-	<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
-	<td class="ParamDescription"><p>The identity losing permissions.</p></td>
-	<td>true</td>
+	<td>Preserve</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+	<td class="ParamDescription"><p>Keep the inherited access rules on this item.</p></td>
 	<td>false</td>
-    <td></td>
+	<td>false</td>
+    <td>False</td>
 </tr>
 <tr valign='top'>
 	<td>WhatIf</td>
@@ -96,18 +96,13 @@
 </table>
 
 <h2>EXAMPLE 1</h2>
-<pre><code>Revoke-Permission -Identity ENTERPRISE\Engineers -Path 'C:\EngineRoom'</code></pre>
-<p>Demonstrates how to revoke all of the 'Engineers' permissions on the <code>C:\EngineRoom</code> directory.</p>
+<pre><code>Disable-AclInheritance -Path C:\Projects\Carbon</code></pre>
+<p>Removes all inherited access rules from the <code>C:\Projects\Carbon</code> directory.  Non-inherited rules are preserved.</p>
 
 
 <h2>EXAMPLE 2</h2>
-<pre><code>Revoke-Permission -Identity ENTERPRISE\Interns -Path 'hklm:\system\WarpDrive'</code></pre>
-<p>Demonstrates how to revoke permission on a registry key.</p>
-
-
-<h2>EXAMPLE 3</h2>
-<pre><code>Revoke-Permission -Identity ENTERPRISE\Officers -Path 'cert:\LocalMachine\My\1234567890ABCDEF1234567890ABCDEF12345678'</code></pre>
-<p>Demonstrates how to revoke the Officers' permission to the <code>cert:\LocalMachine\My\1234567890ABCDEF1234567890ABCDEF12345678</code> certificate's private key/key container.</p>
+<pre><code>Disable-AclInheritance -Path hklm:\Software\Carbon -Preserve</code></pre>
+<p>Stops <code>HKLM:\Software\Carbon</code> from inheriting acces rules from its parent, but preserves the existing, inheritied access rules.</p>
 
 
 	<div class="Footer">
