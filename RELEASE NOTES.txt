@@ -1,4 +1,4 @@
-# 2.4.0
+# 2.4.0 (9 November 2016)
 
 ## Enhancements
 
