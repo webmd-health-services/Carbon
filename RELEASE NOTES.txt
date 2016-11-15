@@ -1,3 +1,10 @@
+# 2.4.1 
+
+## Bug Fixes
+
+ * Fixed: `Carbon_Permission` fails when revoking permissions and the `Permissions` property doesn''t have a value.
+
+
 # 2.4.0 (9 November 2016)
 
 ## Enhancements

@@ -12,21 +12,65 @@
 
 Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'CarbonDscTest' -Resolve) -Force
 
-Describe 'Carbon_Permission' {
-    $UserName = 'CarbonDscTestUser'
-    $Password = [Guid]::NewGuid().ToString()
-    $tempDir = $null
-    Install-User -UserName $UserName -Password $Password
+$UserName = 'CarbonDscTestUser'
+$Password = [Guid]::NewGuid().ToString()
+$tempDir = $null
+Install-User -Credential (New-Credential -UserName $UserName -Password $Password)
 
+function New-MockDir
+{
+    $path = (Join-Path -Path (Get-Item -Path 'TestDrive:').FullName -ChildPath ([Guid]::NewGuid().ToString()))
+    Install-Directory -Path $path
+    return $path
+}
+
+
+Describe 'Carbon_Permission when non-existent permissions should be absent' {
+
+    Start-CarbonDscTestFixture 'Permission'
+
+    $tempDir = New-MockDir
+
+    Context 'the user' {
+        It 'should not have access to the directory' {
+            Get-Permission -Path $tempDir -Identity $UserName -Inherited | Should BeNullOrEmpty
+        }
+    }
+    Test-TargetResource -Identity $UserName -Path $tempDir -Ensure Absent -ErrorVariable 'errors'
+
+    It 'should not throw any errors' {
+        $errors | Should BeNullOrEmpty
+    }
+}
+
+Describe 'Carbon_Permission when no permissions should be present' {
+
+    Start-CarbonDscTestFixture 'Permission'
+
+    $tempDir = New-MockDir
+    Grant-Permission -Path $tempDir -Identity $UserName -Permission FullControl 
+
+    Context 'the user' {
+        It 'should have access to the directory' {
+            Get-Permission -Path $tempDir -Identity $UserName -Inherited | Should Not BeNullOrEmpty
+        }
+    }
+    Test-TargetResource -Identity $UserName -Path $tempDir -Ensure Present -Verbose -ErrorVariable 'errors' -ErrorAction SilentlyContinue
+
+    It 'should throw an error' {
+        $errors | Should Not BeNullOrEmpty
+        $errors | Should Match 'is mandatory'
+    }
+}
+
+Describe 'Carbon_Permission' {
     BeforeAll {
         Start-CarbonDscTestFixture 'Permission'
     }
     
     BeforeEach {
         $Global:Error.Clear()
-        $tempDir = 'Carbon+{0}+{1}' -f ((Split-Path -Leaf -Path $PSCommandPath),([IO.Path]::GetRandomFileName()))
-        $tempDir = Join-Path -Path $env:TEMP -ChildPath $tempDir
-        New-Item -Path $tempDir -ItemType 'Directory' | Out-Null
+        $tempDir = New-MockDir
     }
     
     AfterEach {
@@ -35,11 +79,7 @@ Describe 'Carbon_Permission' {
             Remove-Item -Path $tempDir -Recurse
         }
     }
-    
-    AfterAll {
-        Stop-CarbonDscTestFixture
-    }
-    
+
     It 'should grant permission on file system' {
         Set-TargetResource -Identity $UserName -Path $tempDir -Permission FullControl -Ensure Present
         $Global:Error.Count | Should Be 0
@@ -216,5 +256,35 @@ Describe 'Carbon_Permission' {
         $result | Should BeOfType ([Microsoft.Management.Infrastructure.CimInstance])
         $result.PsTypeNames | Where-Object { $_ -like '*Carbon_Permission' } | Should Not BeNullOrEmpty
     }
+
+    configuration DscConfiguration2
+    {
+        param(
+            $Ensure
+        )
+    
+        Set-StrictMode -Off
+    
+        Import-DscResource -Name '*' -Module 'Carbon'
+    
+        node 'localhost'
+        {
+            Carbon_Permission set
+            {
+                Identity = $UserName;
+                Path = $tempDir;
+                Ensure = 'Absent';
+            }
+        }
+    }
+    
+    It 'should not fail when user doesn''t have permission' {
+        Revoke-Permission -Path $tempDir -Identity $UserName
+        & DscConfiguration2 -Ensure 'Present' -OutputPath $CarbonDscOutputRoot -Verbose
+        Start-DscConfiguration -Wait -ComputerName 'localhost' -Path $CarbonDscOutputRoot -Force -Verbose
+        $Global:Error.Count | Should Be 0
+    }
     
 }
+
+Stop-CarbonDscTestFixture

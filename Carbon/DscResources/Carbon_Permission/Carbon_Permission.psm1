@@ -262,7 +262,7 @@ function Set-TargetResource
     {
         if( -not $Permission )
         {
-            Write-Error ('Permission parameter is mandatory when granting permissions.')
+            Write-Error ('Permission parameter is mandatory when granting permissions. If you want to revoke a user''s permission(s), set the `Ensure` property to `Absent`.')
             return
         }
 
@@ -287,7 +287,6 @@ function Test-TargetResource
         # The user or group getting the permissions.
         $Identity,
         
-        [Parameter(Mandatory=$true)]
         [ValidateSet("CreateFiles","AppendData","CreateSubKey","EnumerateSubKeys","CreateLink","Delete","ChangePermissions","ExecuteFile","DeleteSubdirectoriesAndFiles","FullControl","GenericRead","GenericAll","GenericExecute","QueryValues","ReadAttributes","ReadData","ReadExtendedAttributes","GenericWrite","Notify","ReadPermissions","Read","ReadAndExecute","Modify","SetValue","ReadKey","TakeOwnership","WriteAttributes","Write","Synchronize","WriteData","WriteExtendedAttributes","WriteKey")]
         [string[]]
         # The permission: e.g. FullControl, Read, etc.  For file system items, use values from [System.Security.AccessControl.FileSystemRights](http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.filesystemrights.aspx).  For registry items, use values from [System.Security.AccessControl.RegistryRights](http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.registryrights.aspx).
@@ -320,6 +319,12 @@ function Test-TargetResource
         
         Write-Verbose ('Identity ''{0}'' has permission to ''{1}'': {2}' -f $Identity,$Path,$currentRights)
         return $false
+    }
+
+    if( -not $Permission )
+    {
+        Write-Error ('Permission parameter is mandatory when granting permissions. If you want to revoke a user''s permission(s), set the `Ensure` property to `Absent`.')
+        return
     }
 
     if( -not $currentRights )
