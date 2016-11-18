@@ -12,6 +12,7 @@
 
 using System.Security;
 using System.Runtime.InteropServices;
+using System.Text;
 
 namespace Carbon.Security
 {
@@ -19,26 +20,33 @@ namespace Carbon.Security
     {
         public static byte[] ToBytes(SecureString secureString)
         {
-            var unmanagedBytes = Marshal.SecureStringToGlobalAllocUnicode(secureString);
+            var pUnicodeBytes = Marshal.SecureStringToGlobalAllocUnicode(secureString);
 	        try
             {
-	            byte[] bValue;
-	            unsafe
+	            byte[] unicodeBytes = new byte[secureString.Length * 2]; ;
+                try
                 {
-                    var byteArray = (byte*)unmanagedBytes.ToPointer();
-
-                    bValue = new byte[secureString.Length * 2];
-
-                    for (var i = 0; i < bValue.Length; ++i)
+                    unsafe
                     {
-                        bValue[i] = *byteArray++;
+                        var byteArray = (byte*)pUnicodeBytes.ToPointer();
+
+    
+                        for (var i = 0; i < unicodeBytes.Length; ++i)
+                        {
+                            unicodeBytes[i] = *byteArray++;
+                        }
                     }
+
+                    return Encoding.Convert(Encoding.Unicode, Encoding.UTF8, unicodeBytes, 0, unicodeBytes.Length);
                 }
-                return bValue;
+                finally
+                {
+                    System.Array.Clear(unicodeBytes, 0, unicodeBytes.Length);
+                }
             }
             finally
             {
-                Marshal.ZeroFreeGlobalAllocUnicode(unmanagedBytes);
+                Marshal.ZeroFreeGlobalAllocUnicode(pUnicodeBytes);
             }
 
         }

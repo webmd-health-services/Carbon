@@ -203,7 +203,15 @@ Describe 'Protect-String' {
         $ciphertext | Should Not BeNullOrEmpty
         $ciphertext | Should Not Be $secret
         $privateKey = Get-Certificate -Path $privateKeyFilePath 
-        (Unprotect-String -ProtectedString $ciphertext -Certificate $privateKey) | Should Be $password
+        $decryptedPassword = Unprotect-String -ProtectedString $ciphertext -Certificate $privateKey
+        $decryptedPassword | Should Be $password
+        $passwordBytes = [Text.Encoding]::UTF8.GetBytes($password)
+        $decryptedBytes = [Text.Encoding]::UTF8.GetBytes($decryptedPassword)
+        $decryptedBytes.Length | Should Be $passwordBytes.Length
+        for( $idx = 0; $idx -lt $passwordBytes.Length; ++$idx )
+        {
+            $passwordBytes[$idx] | Should Be $decryptedPassword[$idx]
+        }
     }
 
     It 'should convert passed objects to string' {
