@@ -25,10 +25,19 @@ INSTALL FROM ZIP ARCHIVE
         PS> Import-Module 'Carbon'
 
 INSTALL FROM POWERSHELL GALLERY
-    To install from the PowerShell Gallery, you must be running PowerShell 5. If so,
-    run:
+    To install from the PowerShell Gallery, you must be running PowerShell 5 or
+    PowerShell 4 with the [Package Management PowerShell Modules
+    Preview](https://www.microsoft.com/en-us/download/details.aspx?id=51451)
+    installed.
+
     
-        PS> Install-Module -Name 'Carbon'
+    To install, run:
+                                                                                   
+        PS> Install-Module -Name 'Carbon' -AllowClobber
+    
+    Note: You need the `-AllowClobber` switch because Windows 10/2016 ships with
+    modules that contain functions with the same name as some of Carbon's
+    functions.
     
     You can now import Carbon by running:
     
