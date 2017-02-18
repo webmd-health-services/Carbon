@@ -97,7 +97,7 @@ try
     Get-Module -ListAvailable -FullyQualifiedName Carbon | Format-List | Out-String | Write-Host
 
     $xmlLogPath = Join-Path -Path (Split-Path -Parent -Path $xmlLogPath) -ChildPath 'Carbon.pester.xml'
-    Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'Tools\Pester\3.3.14\Pester.psd1' -Resolve)
+    Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'Tools\Pester\Pester.psd1' -Resolve)
     $result = Invoke-Pester -Script $Path -OutputFile $xmlLogPath -OutputFormat LegacyNUnitXml -PassThru |
                     Select-Object -Last 1
 
