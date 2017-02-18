@@ -119,7 +119,7 @@ function Test-ShouldUpdateExistingUsersProperties
     
         $newFullName = 'New {0}' -f $fullName
         $newDescription = "New description"
-        $newPassword = [Guid]::NewGuid().ToString().Substring(0,14)
+        $newPassword = 'IM33tRequ!re$2'
         $result = Install-User -Username $username `
                                -Password $newPassword `
                                -Description $newDescription `
