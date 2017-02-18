@@ -54,7 +54,7 @@ function Install-IisWebsite
     Creates a website named `Peanuts` serving files out of the `C:\Peanuts.com` directory.  The website listens on all the computer's IP addresses on port 80.
 
     .EXAMPLE
-    Install-IisWebsite -Name 'Peanuts' -PhysicalPath C:\Peanuts.com -Bindings 'http/*:80:peanuts.com:'
+    Install-IisWebsite -Name 'Peanuts' -PhysicalPath C:\Peanuts.com -Binding 'http/*:80:peanuts.com'
 
     Creates a website named `Peanuts` which uses name-based hosting to respond to all requests to any of the machine's IP addresses for the `peanuts.com` domain.
 
