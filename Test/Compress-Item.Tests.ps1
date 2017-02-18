@@ -62,6 +62,17 @@ function Assert-ZipFileExists
         (Test-ZipFile -Path $item) | Should Be $true
     }
 }
+
+Describe 'Compress-Item.when using WhatIf switch' {
+    $Global:Error.Clear()
+    $item = Compress-Item -Path $PSScriptRoot -WhatIf
+    It 'should return nothing' {
+        $item | Should BeNullOrEmpty
+    }
+    It 'should write no errors' {
+        $Global:Error | Should BeNullorEmpty
+    }
+}
     
 Describe 'Compress-Item' {
     

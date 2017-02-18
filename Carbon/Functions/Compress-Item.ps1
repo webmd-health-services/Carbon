@@ -23,7 +23,7 @@ function Compress-Item
 
     If you don't supply an output file path, one will be created in the current user's TEMP directory.
 
-    A `System.IO.FileInfo` object is returned representing the ZIP file.
+    A `System.IO.FileInfo` object is returned representing the ZIP file. If you're using the `WhatIf` switch, nothing is returned.
 
     Microsoft's DSC Local Configuration Manager is unable to unzip files compressed with the `DotNetZip` library (or the `ZipFile` class in .NET 4.5), so as an alternative, if you specify the `UseShell` switch, the file will be compressed with the Windows COM shell API.
 
@@ -80,6 +80,7 @@ function Compress-Item
         Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
         $zipFile = $null
+        $fullPaths = New-Object -TypeName 'Collections.Generic.List[string]'
 
         if( $OutFile )
         {
@@ -132,9 +133,25 @@ function Compress-Item
             return
         }
 
-        $Path | Resolve-Path | Select-Object -ExpandProperty 'ProviderPath' | ForEach-Object { 
+        $Path | Resolve-Path | Select-Object -ExpandProperty 'ProviderPath' | ForEach-Object { $fullPaths.Add( $_ ) }
+    }
+
+    end
+    {
+        if( -not $zipFile )
+        {
+            return
+        }
+
+        $shouldProcessCaption = ('creating compressed file ''{0}''' -f $outFile)
+        $maxPathLength = $fullPaths | Select-Object -ExpandProperty 'Length' | Measure-Object -Maximum
+        $maxPathLength = $maxPathLength.Maximum
+        $shouldProcessFormat = 'compressing {{0,-{0}}} to {{1}}@{{2}}' -f $maxPathLength
+        
+        $fullPaths | ForEach-Object { 
             $zipEntryName = Split-Path -Leaf -Path $_
-            if( $PSCmdlet.ShouldProcess( $_, ('compress to {0} as {1}' -f $OutFile,$zipEntryName)) )
+            $operation = $shouldProcessFormat -f $_,$OutFile,$zipEntryName
+            if( $PSCmdlet.ShouldProcess($operation,$operation,$shouldProcessCaption) )
             {
                 if( $UseShell )
                 {
@@ -154,15 +171,6 @@ function Compress-Item
                     }
                 }
             }
-        }
-
-    }
-
-    end
-    {
-        if( -not $zipFile )
-        {
-            return
         }
 
         if( $UseShell )
@@ -201,13 +209,18 @@ function Compress-Item
         }
         else
         {
-            if( $PSCmdlet.ShouldProcess( $OutFile, 'saving' ) )
+            $operation = 'saving {0}' -f $OutFile
+            if( $PSCmdlet.ShouldProcess( $operation, $operation, $shouldProcessCaption ) )
             {
                 $zipFile.Save( $OutFile )
             }
             $zipFile.Dispose()
         }
 
-        Get-Item -Path $OutFile
+        $operation = 'returning {0}' -f $OutFile
+        if( $PSCmdlet.ShouldProcess($operation,$operation,$shouldProcessCaption) )
+        {
+            Get-Item -Path $OutFile
+        }
     }
 }
