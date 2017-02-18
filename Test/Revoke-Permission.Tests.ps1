@@ -19,6 +19,25 @@ $privateKeyPath = Join-Path -Path $PSScriptRoot -ChildPath 'Cryptography\CarbonT
 $credential = New-Credential -UserName $user -Password 'a1b2c3d4!'
 Install-User -Credential $credential -Description 'User for Carbon Grant-Permission tests.'
 
+Describe 'Revoke-Permission.when user has multiple access control entries on an item' {
+    $path = $TestDrive.FullName
+    Grant-Permission -Path $path -Identity $credential.UserName -Permission 'Read'
+    $perm = Get-Permission -Path $path -Identity $credential.UserName
+    Mock -CommandName 'Get-Permission' -ModuleName 'Carbon' -MockWith { $perm ; $perm }.GetNewClosure()
+
+    $Global:Error.Clear()
+
+    Revoke-Permission -Path $path -Identity $credential.UserName
+
+    It 'should not write any errors' {
+        $Global:Error | Should BeNullOrEmpty
+    }
+
+    It 'should remove permission' {
+        Carbon\Get-Permission -Path $path -Identity $credential.UserName | Should BeNullOrEmpty
+    }
+}
+
 Describe 'Revoke-Permission' {
     BeforeEach {
         $Path = @([IO.Path]::GetTempFileName())[0]
