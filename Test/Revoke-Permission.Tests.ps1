@@ -13,144 +13,132 @@
 $Path = $null
 $user = 'CarbonGrantPerms'
 $containerPath = $null
-$privateKeyPath = Join-Path -Path $PSScriptRoot -ChildPath '..\Cryptography\CarbonTestPrivateKey.pfx' -Resolve
+$privateKeyPath = Join-Path -Path $PSScriptRoot -ChildPath 'Cryptography\CarbonTestPrivateKey.pfx' -Resolve
+& (Join-Path -Path $PSScriptRoot -ChildPath 'Import-CarbonForTest.ps1' -Resolve)
 
-function Start-TestFixture
-{
-    & (Join-Path -Path $TestDir -ChildPath '..\Import-CarbonForTest.ps1' -Resolve)
-    Install-User -Username $user -Password 'a1b2c3d4!' -Description 'User for Carbon Grant-Permission tests.'
-}
+$credential = New-Credential -UserName $user -Password 'a1b2c3d4!'
+Install-User -Credential $credential -Description 'User for Carbon Grant-Permission tests.'
 
-function Start-Test
-{
-    
-    $Path = @([IO.Path]::GetTempFileName())[0]
-    Grant-Permission -Path $Path -Identity $user -Permission 'FullControl'
-}
-
-function Stop-Test
-{
-    if( Test-Path $Path )
-    {
-        Remove-Item $Path -Force
+Describe 'Revoke-Permission' {
+    BeforeEach {
+        $Path = @([IO.Path]::GetTempFileName())[0]
+        Grant-Permission -Path $Path -Identity $user -Permission 'FullControl'
     }
-}
-
-function Test-ShouldRevokePermission
-{
-    Revoke-Permission -Path $Path -Identity $user
-    Assert-NoError
-    Assert-False (Test-Permission -Path $Path -Identity $user -Permission 'FullControl')
-}
-
-function Test-ShouldNotRevokeInheritedPermissions
-{
-    Get-Permission -Path $Path -Inherited | 
-        Where-Object { $_.IdentityReference -notlike ('*{0}*' -f $user) } |
-        ForEach-Object {
-            $result = Revoke-Permission -Path $Path -Identity $_.IdentityReference
-            Assert-NoError
-            Assert-Null $result
-            Assert-True (Test-Permission -Identity $_.IdentityReference -Path $Path -Inherited -Permission $_.FileSystemRights)
+    
+    AfterEach {
+        if( Test-Path $Path )
+        {
+            Remove-Item $Path -Force
         }
-}
-
-function Test-ShouldHandleRevokingNonExistentPermission
-{
-    Revoke-Permission -Path $Path -Identity $user
-    Assert-False (Test-Permission -Path $Path -Identity $user -Permission 'FullControl')
-    Revoke-Permission -Path $Path -Identity $user
-    Assert-NoError
-    Assert-False (Test-Permission -Path $Path -Identity $user -Permission 'FullControl')
-}
-
-function Test-ShouldResolveRelativePath
-{
-    Push-Location -Path (Split-Path -Parent -Path $Path)
-    try
-    {
-        Revoke-Permission -Path ('.\{0}' -f (Split-Path -Leaf -Path $Path)) -Identity $user
-        Assert-False (Test-Permission -Path $Path -Identity $user -Permission 'FullControl')
     }
-    finally
-    {
-        Pop-Location
+  
+    It 'should revoke permission' {
+        Revoke-Permission -Path $Path -Identity $user
+        $Global:Error.Count | Should Be 0
+        (Test-Permission -Path $Path -Identity $user -Permission 'FullControl') | Should Be $false
     }
-}
-
-function Test-ShouldSupportWhatIf
-{
-    Revoke-Permission -Path $Path -Identity $user -WhatIf
-    Assert-True (Test-Permission -Path $Path -Identity $user -Permission 'FullControl')
-}
-
-function Test-ShouldRevokePermissionOnRegistry
-{
-    $regKey = 'hkcu:\TestRevokePermissions'
-    New-Item $regKey
     
-    try
-    {
-        Grant-Permission -Identity $user -Permission 'ReadKey' -Path $regKey
-        $result = Revoke-Permission -Path $regKey -Identity $user
-        Assert-Null $result
-        Assert-False (Test-Permission -Path $regKey -Identity $user -Permission 'ReadKey')
+    It 'should not revoke inherited permissions' {
+        Get-Permission -Path $Path -Inherited | 
+            Where-Object { $_.IdentityReference -notlike ('*{0}*' -f $user) } |
+            ForEach-Object {
+                $result = Revoke-Permission -Path $Path -Identity $_.IdentityReference
+                $Global:Error.Count | Should Be 0
+                $result | Should BeNullOrEmpty
+                (Test-Permission -Identity $_.IdentityReference -Path $Path -Inherited -Permission $_.FileSystemRights) | Should Be $true
+            }
     }
-    finally
-    {
-        Remove-Item $regKey
+    
+    It 'should handle revoking non existent permission' {
+        Revoke-Permission -Path $Path -Identity $user
+        (Test-Permission -Path $Path -Identity $user -Permission 'FullControl') | Should Be $false
+        Revoke-Permission -Path $Path -Identity $user
+        $Global:Error.Count | Should Be 0
+        (Test-Permission -Path $Path -Identity $user -Permission 'FullControl') | Should Be $false
     }
+    
+    It 'should resolve relative path' {
+        Push-Location -Path (Split-Path -Parent -Path $Path)
+        try
+        {
+            Revoke-Permission -Path ('.\{0}' -f (Split-Path -Leaf -Path $Path)) -Identity $user
+            (Test-Permission -Path $Path -Identity $user -Permission 'FullControl') | Should Be $false
+        }
+        finally
+        {
+            Pop-Location
+        }
+    }
+    
+    It 'should support what if' {
+        Revoke-Permission -Path $Path -Identity $user -WhatIf
+        (Test-Permission -Path $Path -Identity $user -Permission 'FullControl') | Should Be $true
+    }
+    
+    It 'should revoke permission on registry' {
+        $regKey = 'hkcu:\TestRevokePermissions'
+        New-Item $regKey
+        
+        try
+        {
+            Grant-Permission -Identity $user -Permission 'ReadKey' -Path $regKey
+            $result = Revoke-Permission -Path $regKey -Identity $user
+            $result | Should BeNullOrEmpty
+            (Test-Permission -Path $regKey -Identity $user -Permission 'ReadKey') | Should Be $false
+        }
+        finally
+        {
+            Remove-Item $regKey
+        }
+    }
+    
+    It 'should revoke local machine private key permissions' {
+        $cert = Install-Certificate -Path $privateKeyPath -StoreLocation LocalMachine -StoreName My
+        try
+        {
+            $certPath = Join-Path -Path 'cert:\LocalMachine\My' -ChildPath $cert.Thumbprint
+            Grant-Permission -Path $certPath -Identity $user -Permission 'FullControl'
+            (Get-Permission -Path $certPath -Identity $user) | Should Not BeNullOrEmpty
+            Revoke-Permission -Path $certPath -Identity $user
+            $Global:Error.Count | Should Be 0
+            (Get-Permission -Path $certPath -Identity $user) | Should BeNullOrEmpty
+        }
+        finally
+        {
+            Uninstall-Certificate -Thumbprint $cert.Thumbprint -StoreLocation LocalMachine -StoreName My
+        }
+    }
+    
+    It 'should revoke current user private key permissions' {
+        $cert = Install-Certificate -Path $privateKeyPath -StoreLocation CurrentUser -StoreName My
+        try
+        {
+            $certPath = Join-Path -Path 'cert:\CurrentUser\My' -ChildPath $cert.Thumbprint
+            Grant-Permission -Path $certPath -Identity $user -Permission 'FullControl' -WhatIf
+            $Global:Error.Count | Should Be 0
+            (Get-Permission -Path $certPath -Identity $user) | Should BeNullOrEmpty
+        }
+        finally
+        {
+            Uninstall-Certificate -Thumbprint $cert.Thumbprint -StoreLocation CurrentUser -StoreName My
+        }
+    }
+    
+    It 'should support what if when revoking private key permissions' {
+        $cert = Install-Certificate -Path $privateKeyPath -StoreLocation LocalMachine -StoreName My
+        try
+        {
+            $certPath = Join-Path -Path 'cert:\LocalMachine\My' -ChildPath $cert.Thumbprint
+            Grant-Permission -Path $certPath -Identity $user -Permission 'FullControl'
+            (Get-Permission -Path $certPath -Identity $user) | Should Not BeNullOrEmpty
+            Revoke-Permission -Path $certPath -Identity $user -WhatIf
+            $Global:Error.Count | Should Be 0
+            (Get-Permission -Path $certPath -Identity $user) | Should Not BeNullOrEmpty
+        }
+        finally
+        {
+            Uninstall-Certificate -Thumbprint $cert.Thumbprint -StoreLocation LocalMachine -StoreName My
+        }
+    }
+    
 }
-
-function Test-ShouldRevokeLocalMachinePrivateKeyPermissions
-{
-    $cert = Install-Certificate -Path $privateKeyPath -StoreLocation LocalMachine -StoreName My
-    try
-    {
-        $certPath = Join-Path -Path 'cert:\LocalMachine\My' -ChildPath $cert.Thumbprint
-        Grant-Permission -Path $certPath -Identity $user -Permission 'FullControl'
-        Assert-NotNull (Get-Permission -Path $certPath -Identity $user)
-        Revoke-Permission -Path $certPath -Identity $user
-        Assert-NoError
-        Assert-Null (Get-Permission -Path $certPath -Identity $user)
-    }
-    finally
-    {
-        Uninstall-Certificate -Thumbprint $cert.Thumbprint -StoreLocation LocalMachine -StoreName My
-    }
-}
-
-function Test-ShouldRevokeCurrentUserPrivateKeyPermissions
-{
-    $cert = Install-Certificate -Path $privateKeyPath -StoreLocation CurrentUser -StoreName My
-    try
-    {
-        $certPath = Join-Path -Path 'cert:\CurrentUser\My' -ChildPath $cert.Thumbprint
-        Grant-Permission -Path $certPath -Identity $user -Permission 'FullControl' -WhatIf
-        Assert-NoError
-        Assert-Null (Get-Permission -Path $certPath -Identity $user)
-    }
-    finally
-    {
-        Uninstall-Certificate -Thumbprint $cert.Thumbprint -StoreLocation CurrentUser -StoreName My
-    }
-}
-
-function Test-ShouldSupportWhatIfWhenRevokingPrivateKeyPermissions
-{
-    $cert = Install-Certificate -Path $privateKeyPath -StoreLocation LocalMachine -StoreName My
-    try
-    {
-        $certPath = Join-Path -Path 'cert:\LocalMachine\My' -ChildPath $cert.Thumbprint
-        Grant-Permission -Path $certPath -Identity $user -Permission 'FullControl'
-        Assert-NotNull (Get-Permission -Path $certPath -Identity $user)
-        Revoke-Permission -Path $certPath -Identity $user -WhatIf
-        Assert-NoError
-        Assert-NotNull (Get-Permission -Path $certPath -Identity $user)
-    }
-    finally
-    {
-        Uninstall-Certificate -Thumbprint $cert.Thumbprint -StoreLocation LocalMachine -StoreName My
-    }
-}
-
