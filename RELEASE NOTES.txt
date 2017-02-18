@@ -4,6 +4,9 @@
 
  * Fixed: `Carbon_Permission` fails when revoking permissions and the `Permissions` property doesn''t have a value.
  * Fixed: `Protect-String` doesn't convert secure strings properly so they get encrypted with extra bytes in them.
+ * Fixed: `Revoke-Permission' fails when an identity has multiple access control entries on an item. Thanks to [bozho_](https://bitbucket.org/bozho_/) for reporting [issue #221](https://bitbucket.org/splatteredbits/carbon/issues/221/community-revoke-permission-fails-if-the) and contributing the fix.
+ * Fixed: `Compress-Item`' writes an error when using the `WhatIf` switch.
+ * Fixed: `Install-IisWebsite` help examples contain invalid/broken code (thanks to John Mitchell for reporting).
  * Fixed: `Install-Service` fails when password contains double quote character, i.e. `"` (fixes [issue #219](https://bitbucket.org/splatteredbits/carbon/issues/219/community-install-service-fails-to)).
 
 
