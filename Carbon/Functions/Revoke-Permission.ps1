@@ -83,11 +83,11 @@ function Revoke-Permission
         $providerName = 'CryptoKey'
     }
 
-    $ruleToRemove = Get-Permission -Path $Path -Identity $Identity
-    if( $ruleToRemove )
+    $rulesToRemove = Get-Permission -Path $Path -Identity $Identity
+    if( $rulesToRemove )
     {
         $Identity = Resolve-IdentityName -Name $Identity
-        $ruleToRemove | ForEach-Object { Write-Verbose ('[{0}] [{1}]  {2} -> ' -f $Path,$Identity,$_."$($providerName)Rights") }
+        $rulesToRemove | ForEach-Object { Write-Verbose ('[{0}] [{1}]  {2} -> ' -f $Path,$Identity,$_."$($providerName)Rights") }
 
         Get-Item $Path -Force |
             ForEach-Object {
@@ -97,7 +97,7 @@ function Revoke-Permission
 
                     [Security.AccessControl.CryptoKeySecurity]$keySecurity = $certificate.PrivateKey.CspKeyContainerInfo.CryptoKeySecurity
 
-                    [void] $keySecurity.RemoveAccessRule( $ruleToRemove)
+                    $rulesToRemove | ForEach-Object { [void] $keySecurity.RemoveAccessRule($_) }
 
                     Set-CryptoKeySecurity -Certificate $certificate -CryptoKeySecurity $keySecurity -Action ('revoke {0}''s permissions' -f $Identity)
                 }
@@ -107,7 +107,7 @@ function Revoke-Permission
                     # When passed to Set-Acl, this causes intermittent errors.  So, we just grab the ACL portion of the security descriptor.
                     # See http://www.bilalaslam.com/2010/12/14/powershell-workaround-for-the-security-identifier-is-not-allowed-to-be-the-owner-of-this-object-with-set-acl/
                     $currentAcl = $_.GetAccessControl('Access')
-                    [void]$currentAcl.RemoveAccessRule($ruleToRemove)
+                    $rulesToRemove | ForEach-Object { [void]$currentAcl.RemoveAccessRule($_) }
                     if( $PSCmdlet.ShouldProcess( $Path, ('revoke {0}''s permissions' -f $Identity)) )
                     {
                         Set-Acl -Path $Path -AclObject $currentAcl
