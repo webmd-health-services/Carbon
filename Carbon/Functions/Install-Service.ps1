@@ -412,7 +412,7 @@ function Install-Service
         if( $Credential )
         {
             $passwordArgName = 'password='
-            $passwordArgValue = $Credential.GetNetworkCredential().Password
+            $passwordArgValue = $Credential.GetNetworkCredential().Password -replace '"', '\"'
         }
         
         if( $PSCmdlet.ShouldProcess( $identity.FullName, "grant the log on as a service right" ) )

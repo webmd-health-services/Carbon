@@ -13,9 +13,9 @@
 & (Join-Path -Path $PSScriptRoot -ChildPath 'Import-CarbonForTest.ps1' -Resolve)
 
 $servicePath = Join-Path -Path $PSScriptRoot -ChildPath 'Service\NoOpService.exe' -Resolve
-$serviceName = 'CarbonTestService'
+$serviceName = 'CarbonTestService3'
 $serviceAcct = 'CrbnInstllSvcTstAcct'
-$servicePassword = [Guid]::NewGuid().ToString().Substring(0,14)
+$servicePassword = "a1""'~!@#$%^&*("  # sc.exe needs to have certain characters escaped.
 $installServiceParams = @{ 
                             #Verbose = $true 
                             }
@@ -42,7 +42,7 @@ function Uninstall-TestService
 {
     Uninstall-Service $serviceName
 }
-    
+
 Describe 'Install-Service when using the -WhatIf switch' {
     Uninstall-TestService
     Install-Service -Name $serviceName -Path $servicePath -WhatIf @installServiceParams
@@ -71,7 +71,7 @@ Describe 'Install-Service when using the -WhatIf switch' {
         $service.DependentServices.Count | Should Be 1
         $service.DependentServices[0].ServiceName | Should Be $driver.ServiceName
     }
- }
+}
 
 Describe 'Install-Service' {
 

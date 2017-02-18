@@ -4,6 +4,7 @@
 
  * Fixed: `Carbon_Permission` fails when revoking permissions and the `Permissions` property doesn''t have a value.
  * Fixed: `Protect-String` doesn't convert secure strings properly so they get encrypted with extra bytes in them.
+ * Fixed: `Install-Service` fails when password contains double quote character, i.e. `"` (fixes [issue #219](https://bitbucket.org/splatteredbits/carbon/issues/219/community-install-service-fails-to)).
 
 
 # 2.4.0 (9 November 2016)
