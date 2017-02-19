@@ -84,6 +84,7 @@ function Read-File
             $errorAction = @{}
         }
 
+        $cmdErrors = @()
         $numErrorsAtStart = $Global:Error.Count
         try
         {
@@ -124,7 +125,8 @@ function Read-File
             }
         }
 
-        if( $numErrors )
+        # If $Global:Error is full, $numErrors will be 0
+        if( $cmdErrors -or $numErrors )
         {
             if( -not $lastTry )
             {

@@ -51,7 +51,7 @@ Describe 'Read-File' {
         New-Item -Path $file -ItemType 'File'
         $file = Get-Item -Path $file | Select-Object -ExpandProperty 'FullName'
     }
-
+    
     It 'should read multiple lines' {
         @( 'a', 'b' ) | Set-Content -Path $file
 
@@ -79,13 +79,14 @@ Describe 'Read-File' {
         $content = Read-File -Path $file -Raw
         $content | Should Be ("a{0}b{0}" -f [Environment]::NewLine)
     }
-
+    
     It 'should wait while file is in use' {
         'b' | Set-Content -Path $file
         $job = Lock-File -Seconds 1
 
         try
         {
+            # Simulate a full error buffer
             Read-File -Path $file | Should Be 'b'
             $Global:Error.Count | Should Be 0
         }
@@ -94,7 +95,24 @@ Describe 'Read-File' {
             $job | Wait-Job | Receive-Job | Write-Debug
         }
     }
-  
+
+    It 'should wait while file is in use and $Global:Error is full' {
+        'b' | Set-Content -Path $file
+        $job = Lock-File -Seconds 1
+
+        try
+        {
+            # Simulate a full error buffer
+            1..256 | ForEach-Object { Write-Error -Message $_ -ErrorAction SilentlyContinue }
+            Read-File -Path $file | Should Be 'b'
+            $Global:Error.Count | Should Be 256
+        }
+        finally
+        {
+            $job | Wait-Job | Receive-Job | Write-Debug
+        }
+    }
+    return
     It 'should control how long to wait for file to be released and report final error' {
         'b' | Set-Content -Path $file
         $job = Lock-File -Seconds 1

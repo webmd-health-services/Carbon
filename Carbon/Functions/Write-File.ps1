@@ -113,7 +113,7 @@ function Write-File
             $numErrorsAtStart = $Global:Error.Count
             try
             {
-                Set-Content -Path $Path -Value $content @errorAction
+                Set-Content -Path $Path -Value $content @errorAction -ErrorVariable 'cmdErrors'
             }
             catch
             {
@@ -133,7 +133,8 @@ function Write-File
                 }
             }
 
-            if( $numErrors )
+            # If $Global:Error is full, $numErrors will be 0
+            if( $cmdErrors -or $numErrors )
             {
                 if( -not $lastTry )
                 {

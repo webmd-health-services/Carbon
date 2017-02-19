@@ -8,6 +8,7 @@
  * Fixed: `Compress-Item`' writes an error when using the `WhatIf` switch.
  * Fixed: `Install-IisWebsite` help examples contain invalid/broken code (thanks to John Mitchell for reporting).
  * Fixed: `Install-Service` fails when password contains double quote character, i.e. `"` (fixes [issue #219](https://bitbucket.org/splatteredbits/carbon/issues/219/community-install-service-fails-to)).
+ * Fixed: `Read-File` and `Write-File` fail to retry writing to a locked file when `$Global:Error` is full. Fixes [issue #217](https://bitbucket.org/splatteredbits/carbon/issues/217/community-error-handling-in-read-file-and). 
 
 
 # 2.4.0 (9 November 2016)

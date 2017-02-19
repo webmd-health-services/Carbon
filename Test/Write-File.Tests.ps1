@@ -134,6 +134,23 @@ Describe 'Write-File' {
         [IO.File]::ReadAllText($file) | Should Be ("a{0}" -f [Environment]::NewLine)
     }
   
+    It 'should wait while file is in use and $Global:Error is full' {
+        'b' | Set-Content -Path $file
+        $job = Lock-File -Seconds 1
+        try
+        {
+            1..256 | ForEach-Object { Write-Error -Message $_ -ErrorAction SilentlyContinue }
+            'a' | Write-File -Path $file
+            $Global:Error.Count | Should Be 256
+        }
+        finally
+        {
+            $job | Wait-Job | Receive-Job | Write-Debug
+        }
+
+        [IO.File]::ReadAllText($file) | Should Be ("a{0}" -f [Environment]::NewLine)
+    }
+  
     It 'should control how long to wait for file to be released and report final error' {
         'b' | Set-Content -Path $file
         $job = Lock-File -Seconds 1
