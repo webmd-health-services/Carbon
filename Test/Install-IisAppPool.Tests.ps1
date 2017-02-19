@@ -12,7 +12,7 @@
 
 $appPoolName = 'CarbonInstallIisAppPool'
 $username = 'CarbonInstallIisAppP'
-$password = '!QAZ2wsx'
+$password = '!QAZ2wsx8fk3'
 
 & (Join-Path -Path $PSScriptRoot 'Import-CarbonForTest.ps1' -Resolve)
 
