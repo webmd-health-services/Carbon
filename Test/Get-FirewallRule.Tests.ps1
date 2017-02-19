@@ -77,6 +77,11 @@ Describe 'Get-FirewallRule.when getting all rules' {
             {
                 $value = $value -replace ':.*$',''
             }
+
+            if( $propname -eq 'Description' )
+            {
+                $value = $value -replace "’","'"
+            }
     
             ($format -f ('{0}:' -f $fieldName),$value) | Should Be $line
         }

@@ -19,13 +19,19 @@ function Get-FirewallRule
     .DESCRIPTION
     Returns a `Carbon.Firewall.Rule` object for each firewall rule on the local computer. 
     
-    This data is parsed from the output of:
+    In Carbon 2.4.0 and earlier, this data is parsed from the output of:
     
-        netsh advfirewall firewall show rule name=all.
+        netsh advfirewall firewall show rule name=all
+
+    which only works on english-speaking computers.
+
+    Beginningn with Carbon 2.4.1, firewall rules are read using the Windows Firewall with Advanced Security API's `HNetCfg.FwPolicy2` object.
 
     You can return specific rule(s) using the `Name` or `LiteralName` parameters. The `Name` parameter accepts wildcards; `LiteralName` does not. There can be multiple firewall rules with the same name.
 
     If the firewall isn't configurable/running, writes an error and returns without returning any objects.
+
+    This function requires administrative privileges.
 
     .OUTPUTS
     Carbon.Firewall.Rule.
@@ -71,7 +77,6 @@ function Get-FirewallRule
     )
 
     Set-StrictMode -Version 'Latest'
-
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
     
     if( -not (Assert-FirewallConfigurable) )
@@ -79,132 +84,176 @@ function Get-FirewallRule
         return
     }
 
-    $containsWildcards = $false
-    $nameArgValue = 'all'
-    if( $PSCmdlet.ParameterSetName -eq 'ByName' )
-    {
-        $containsWildcards = [Management.Automation.WildcardPattern]::ContainsWildcardCharacters($Name) 
-        if( -not $containsWildcards )
-        {
-            $nameArgValue = $Name
-        }
-    }
-    elseif( $PSCmdlet.ParameterSetName -eq 'ByLiteralName' )
-    {
-        $nameArgValue = $LiteralName
-    }
+    $fw = New-Object -ComObject 'HNetCfg.FwPolicy2'
+    $fw.Rules |
+        Where-Object { 
+            if( $PSCmdlet.ParameterSetName -eq 'ByLiteralName' )
+            {
+                return $_.Name -eq $LiteralName
+            }
 
-    # Don't change/move this. It's so we can detect if we've parsed a rule.
-    $rule = $null
+            if( -not $Name )
+            {
+                return $true
+            }
 
-    $fieldMap = @{
-                    'Rule name' = 'Name';
-                    'Enabled' = 'Enabled';
-                    'Direction' = 'Direction';
-                    'Profiles' = 'Profiles';
-                    'Grouping' = 'Grouping';
-                    'LocalIP' = 'LocalIPAddress';
-                    'RemoteIP' = 'RemoteIPAddress';
-                    'Protocol' = 'Protocol';
-                    'LocalPort' = 'LocalPort';
-                    'RemotePort' = 'RemotePort';
-                    'Edge traversal' = 'EdgeTraversal';
-                    'InterfaceTypes' = 'InterfaceType';
-                    'Security' = 'Security';
-                    'Rule source' = 'Source';
-                    'Action' = 'Action';
-                    'Description' = 'Description';
-                    'Program' = 'Program';
-                    'Service' = 'Service';
-                }
+            return $_.Name -like $Name 
+        } | ForEach-Object {
+    
+            $rule = $_
 
-    $parsingProtocolTypeCode = $false
-    netsh advfirewall firewall show rule name=$nameArgValue verbose | ForEach-Object {
-        $line = $_
-        
-        Write-Verbose $line
+            Write-Debug -Message $rule.Name
 
-        if( -not $line -and $rule )
-        {
             $profiles = [Carbon.Firewall.RuleProfile]::Any
-            $rule.Profiles -split ',' | ForEach-Object { $profiles = $profiles -bor ([Carbon.Firewall.RuleProfile]$_) }
+            if( $rule.Profiles -eq 0x7FFFFFFF )
+            {
+                $profiles = [Carbon.Firewall.RuleProfile]::Domain -bor [Carbon.Firewall.RuleProfile]::Private -bor [Carbon.Firewall.RuleProfile]::Public
+            }
+            else
+            {
+                if( ($rule.Profiles -band 1) -eq 1 )
+                {
+                    $profiles = $profiles -bor [Carbon.Firewall.RuleProfile]::Domain
+                }
+                if( ($rule.Profiles -band 2) -eq 2 )
+                {
+                    $profiles = $profiles -bor [Carbon.Firewall.RuleProfile]::Private
+                }
+                if( ($rule.Profiles -band 4) -eq 4 )
+                {
+                    $profiles = $profiles -bor [Carbon.Firewall.RuleProfile]::Public
+                }
+            }
+            Write-Debug -Message ('  Profiles          {0,10} -> {1}' -f $rule.Profiles,$profiles)
+            $protocol = switch( $rule.Protocol ) 
+            {
+                6 { 'TCP' }
+                17 { 'UDP' }
+                1 { 'ICMPv4' }
+                58 { 'ICMPv6' }
+                256 { 'Any' }
+                default { $_ }
+            }
+
+            if( ($rule | Get-Member -Name 'IcmpTypesAndCodes') -and $rule.IcmpTypesAndCodes )
+            {
+                $type,$code = $rule.IcmpTypesAndCodes -split ':'
+                if( $code -eq '*' )
+                {
+                    $code = 'Any'
+                }
+                $protocol = '{0}:{1},{2}' -f $protocol,$type,$code
+                Write-Debug -Message ('  IcmpTypesAndCode  {0,10} -> {1},{2}' -f $rule.IcmpTypesAndCodes,$type,$code)
+            }
+            Write-Debug -Message ('  Protocol          {0,10} -> {1}' -f $rule.Protocol,$protocol)
+
+            $direction = switch( $rule.Direction )
+            {
+                1 { [Carbon.Firewall.RuleDirection]::In }
+                2 { [Carbon.Firewall.RuleDirection]::Out }
+            }
+
+            $action = switch( $rule.Action )
+            {
+                0 { [Carbon.Firewall.RuleAction]::Block }
+                1 { [Carbon.Firewall.RuleAction]::Allow }
+                default { throw ('Unknown action ''{0}''.' -f $_) }
+            }
+
+            $interfaceType = switch( $rule.InterfaceTypes )
+            {
+                'All' { [Carbon.Firewall.RuleInterfaceType]::Any }
+                default { throw ('Unknown interface type ''{0}''.' -f $_) }
+            }
+
+            function ConvertTo-Any
+            {
+                param(
+                    [Parameter(ValueFromPipeline=$true)]
+                    $InputObject
+                )
+
+                process
+                {
+                    if( $InputObject -eq '*' )
+                    {
+                        return 'Any'
+                    }
+
+                    $InputObject = $InputObject -split ',' |
+                                        ForEach-Object { 
+                                            $ipAddress,$mask = $_ -split '/'
+                                            [ipaddress]$maskAddress = $null
+                                            if( $mask -match '^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$' -and [ipaddress]::TryParse($mask, [ref]$maskAddress) )
+                                            {
+                                                $cidr = $maskAddress.GetAddressBytes() | 
+                                                            ForEach-Object { [Convert]::ToString($_, 2) -replace '[s0]' } |
+                                                            Select-Object -ExpandProperty 'Length' |
+                                                            Measure-Object -Sum | 
+                                                            Select-Object -ExpandProperty 'Sum'
+                                                return '{0}/{1}' -f $ipAddress,$cidr
+                                            }
+                                            return $_
+                                        }
+                    return $InputObject -join ','
+                }
+            }
+
+            $localAddresses = $rule.LocalAddresses | ConvertTo-Any
+            Write-Debug -Message ('  LocalAddresses    {0,10} -> {1}' -f $rule.LocalAddresses,$localAddresses)
+            $remoteAddresses = $rule.RemoteAddresses | ConvertTo-Any
+            Write-Debug -Message ('  RemoteAddresses   {0,10} -> {1}' -f $rule.RemoteAddresses,$remoteAddresses)
+            $localPorts = $rule.LocalPorts | ConvertTo-Any
+            Write-Debug -Message ('  LocalPorts        {0,10} -> {1}' -f $rule.LocalPorts,$localPorts)
+            $remotePorts = $rule.RemotePorts | ConvertTo-Any
+            Write-Debug -Message ('  RemotePorts       {0,10} -> {1}' -f $rule.RemotePorts,$remotePorts)
+
+            $edgeTraversal = switch( $rule.EdgeTraversalOptions ) 
+            {
+                0 { 'No' }
+                1 { 'Yes' }
+                2 { 'Defer to application' }
+                3 { 'Defer to user' }
+            }
+
+            $security = [Carbon.Firewall.RuleSecurity]::NotRequired
+            if( $rule | Get-Member -Name 'SecureFlags' )
+            {
+                $security = switch( $rule.SecureFlags )
+                {
+                    1 { [Carbon.Firewall.RuleSecurity]::AuthNoEncap }
+                    2 { [Carbon.Firewall.RuleSecurity]::Authenticate }
+                    3 { [Carbon.Firewall.RuleSecurity]::AuthDynEnc }
+                    4 { [Carbon.Firewall.RuleSecurity]::AuthEnc }
+                }
+            }
+
+            $serviceName = $rule.ServiceName | ConvertTo-Any
+            Write-Debug -Message ('  Service           {0,10} -> {1}' -f $rule.ServiceName,$serviceName)
+
+
             $constructorArgs = @(
-                                    $rule.Name,
+                                    $rule.Name, 
                                     $rule.Enabled,
-                                    $rule.Direction,
+                                    $direction,
                                     $profiles,
                                     $rule.Grouping,
-                                    $rule.LocalIPAddress,
-                                    $rule.LocalPort,
-                                    $rule.RemoteIPAddress,
-                                    $rule.RemotePort,
-                                    $rule.Protocol,
-                                    $rule.EdgeTraversal,
-                                    $rule.Action,
-                                    $rule.InterfaceType,
-                                    $rule.Security,
-                                    $rule.Source,
+                                    $localAddresses,
+                                    $localPorts,
+                                    $remoteAddresses,
+                                    $remotePorts,
+                                    $protocol,
+                                    $edgeTraversal,
+                                    $action,
+                                    $interfaceType,
+                                    $security,
+                                    'Local Setting', 
                                     $rule.Description,
-                                    $rule.Program,
-                                    $rule.Service
+                                    $rule.ApplicationName,
+                                    $serviceName
                                 )
             New-Object -TypeName 'Carbon.Firewall.Rule' -ArgumentList $constructorArgs
-            return
-        }
-
-        if( $line -match '^ +Type +Code *$' )
-        {
-            $parsingProtocolTypeCode = $true
-            return
-        }
-
-        if( $parsingProtocolTypeCode )
-        {
-            $parsingProtocolTypeCode = $false
-            if( $line -notmatch '^ +?([^ ]+) +?([^ ]+) *$' )
-            {
-                Write-Warning ('Failed to parse protocol type/code for rule {0}' -f $rule.Name)
-                return
-            }
-            $rule.Protocol = '{0}:{1},{2}' -f $rule.Protocol,$Matches[1],$Matches[2]
-        }
-        
-        if( $line -notmatch '^([^:]+): +(.*)$' )
-        {
-            return
-        }
-        
-        $propName = $matches[1]
-        $value = $matches[2]
-        if( -not $fieldMap.ContainsKey( $propName ) )
-        {
-            Write-Warning ('Unknown field ''{0}'' for rule ''{1}'' in `netsh advfirewall firewall show rule` output.' -f $propName,$rule.Name)
-            return
-        }
-        
-        $propName = $fieldMap[$propName]
-        if( $propName -eq 'Name' )
-        {
-            $rule = New-Object 'PsObject'
-            foreach( $item in $fieldMap.Values )
-            {
-                Add-Member -InputObject $rule -MemberType NoteProperty -Name $item -Value $null
-            }
-            $rule.InterfaceType = [Carbon.Firewall.RuleInterfaceType]::Any
-            $rule.Security = [Carbon.Firewall.RuleSecurity]::NotRequired
-        }
-
-        if( $propName -eq 'Enabled' )
-        {
-            $value = if( $value -eq 'No' ) { $false } else { $value }
-            $value = if( $value -eq 'Yes' ) { $true } else { $value }
-        }
-        
-        $rule.$propName = $value
-    } |
-    Where-Object { 
-        -not $containsWildcards -or $_.Name -like $Name 
-    }
+        } 
 }
 
 Set-Alias -Name 'Get-FirewallRules' -Value 'Get-FirewallRule'
