@@ -45,7 +45,7 @@ Describe 'Get-FirewallRule.when getting all rules' {
                 {
                     Fail ('Failed to parse protocol details on line {0}: {1}' -f $idx,$line)
                 }
-                ($actualRule.Protocol -like ('*:{0},{1}' -f $Matches[1],$Matches[2])) | Should Be $true
+                $actualRule.Protocol | Should BeLike ('*:{0},{1}' -f $Matches[1],$Matches[2])
                 continue
             }
     
@@ -68,6 +68,10 @@ Describe 'Get-FirewallRule.when getting all rules' {
     
             ($actualRule | Get-Member $propName) | Should Not BeNullOrEmpty
             $value = $actualRule.$propName
+            if( $propName -eq 'Name' )
+            {
+                Write-Debug -Message $value
+            }
             if( $value -is [bool] )
             {
                 $value = if( $value ) { 'Yes' } else { 'No' }

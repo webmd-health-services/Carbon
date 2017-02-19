@@ -137,8 +137,8 @@ function Get-FirewallRule
 
             if( ($rule | Get-Member -Name 'IcmpTypesAndCodes') -and $rule.IcmpTypesAndCodes )
             {
-                $type,$code = $rule.IcmpTypesAndCodes -split ':'
-                if( $code -eq '*' )
+                $type,$code = $rule.IcmpTypesAndCodes -split ':' | ConvertTo-Any
+                if( -not $code )
                 {
                     $code = 'Any'
                 }
