@@ -225,6 +225,7 @@ function Get-FirewallRule
                     2 { [Carbon.Firewall.RuleSecurity]::Authenticate }
                     3 { [Carbon.Firewall.RuleSecurity]::AuthDynEnc }
                     4 { [Carbon.Firewall.RuleSecurity]::AuthEnc }
+                    default { [Carbon.Firewall.RuleSecurity]::NotRequired }
                 }
             }
 
