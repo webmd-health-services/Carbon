@@ -65,7 +65,7 @@ namespace Carbon.Firewall
 					EdgeTraversalPolicy = RuleEdgeTraversalPolicy.DeferUser;
 					break;
 				case "defer to application":
-					EdgeTraversalPolicy = RuleEdgeTraversalPolicy.DeferUser;
+					EdgeTraversalPolicy = RuleEdgeTraversalPolicy.DeferApp;
 					break;
 			}
 			Action = action;
