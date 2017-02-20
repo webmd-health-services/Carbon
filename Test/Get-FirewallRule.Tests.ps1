@@ -86,6 +86,13 @@ Describe 'Get-FirewallRule.when getting all rules' {
             {
                 $value = $value -replace "’","'"
             }
+
+            if( $fieldName -eq 'InterfaceTypes' )
+            {
+                $value -split ',' | 
+                    ForEach-Object { $line | Should Match ('\b{0}\b' -f $_.Trim()) }
+                continue
+            }
     
             ($format -f ('{0}:' -f $fieldName),$value) | Should Be $line
         }

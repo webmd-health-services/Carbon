@@ -10,14 +10,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+
 namespace Carbon.Firewall
 {
+	[Flags]
 	public enum RuleInterfaceType
 	{
 		Any = 0,
-		Wireless,
-		Lan,
-		Ras
+		Wireless = 0x1,
+		Lan = 0x2,
+		Ras = 0x4
 	}
 }
 

@@ -11,6 +11,7 @@
  * Fixed: `Read-File` and `Write-File` fail to retry writing to a locked file when `$Global:Error` is full. Fixes [issue #217](https://bitbucket.org/splatteredbits/carbon/issues/217/community-error-handling-in-read-file-and). 
  * Fixed: `Get-FirewallRule` sets the `EdgeTraversalPolicy` to `DeferUser` on rules whose policy is "defer to application". 
  * Fixed: `Get-FirewallRule` fails on non-english-speaking computers. (It was parsing the output of `netsh advfirewall`. Now it uses the Windows Firewall with Advanced Security API.) [Fixes [issue #208](https://bitbucket.org/splatteredbits/carbon/issues/208/community-get-firewallrule-could-not-find).
+ * Fixed: `Get-FirewallRule` incorrectly parsed interface types. It assumed interface type was one of multiple values. In reality, it can be set to one or more different values. The underlying enumeration and its values have been updated to be a set of flags (i.e. a bit field).
 
 
 # 2.4.0 (9 November 2016)

@@ -124,7 +124,7 @@ function Get-FirewallRule
                     $profiles = $profiles -bor [Carbon.Firewall.RuleProfile]::Public
                 }
             }
-            Write-Debug -Message ('  Profiles          {0,10} -> {1}' -f $rule.Profiles,$profiles)
+            Write-Debug -Message ('  Profiles          {0,25} -> {1}' -f $rule.Profiles,$profiles)
             $protocol = switch( $rule.Protocol ) 
             {
                 6 { 'TCP' }
@@ -143,9 +143,9 @@ function Get-FirewallRule
                     $code = 'Any'
                 }
                 $protocol = '{0}:{1},{2}' -f $protocol,$type,$code
-                Write-Debug -Message ('  IcmpTypesAndCode  {0,10} -> {1},{2}' -f $rule.IcmpTypesAndCodes,$type,$code)
+                Write-Debug -Message ('  IcmpTypesAndCode  {0,25} -> {1},{2}' -f $rule.IcmpTypesAndCodes,$type,$code)
             }
-            Write-Debug -Message ('  Protocol          {0,10} -> {1}' -f $rule.Protocol,$protocol)
+            Write-Debug -Message ('  Protocol          {0,25} -> {1}' -f $rule.Protocol,$protocol)
 
             $direction = switch( $rule.Direction )
             {
@@ -160,11 +160,17 @@ function Get-FirewallRule
                 default { throw ('Unknown action ''{0}''.' -f $_) }
             }
 
-            $interfaceType = switch( $rule.InterfaceTypes )
-            {
-                'All' { [Carbon.Firewall.RuleInterfaceType]::Any }
-                default { throw ('Unknown interface type ''{0}''.' -f $_) }
-            }
+            $interfaceType = [Carbon.Firewall.RuleInterfaceType]::Any
+            $rule.InterfaceTypes -split ',' |
+                Where-Object { $_ -ne 'All' } |
+                ForEach-Object {
+                    if( $_ -eq 'RemoteAccess' )
+                    {
+                        $_ = 'Ras'
+                    }
+                    $interfaceType = $interfaceType -bor [Carbon.Firewall.RuleInterfaceType]::$_
+                }
+            Write-Debug -Message ('  InterfaceType     {0,25} -> {1}' -f $rule.InterfaceTypes,$interfaceType)
 
             function ConvertTo-Any
             {
@@ -200,13 +206,13 @@ function Get-FirewallRule
             }
 
             $localAddresses = $rule.LocalAddresses | ConvertTo-Any
-            Write-Debug -Message ('  LocalAddresses    {0,10} -> {1}' -f $rule.LocalAddresses,$localAddresses)
+            Write-Debug -Message ('  LocalAddresses    {0,25} -> {1}' -f $rule.LocalAddresses,$localAddresses)
             $remoteAddresses = $rule.RemoteAddresses | ConvertTo-Any
-            Write-Debug -Message ('  RemoteAddresses   {0,10} -> {1}' -f $rule.RemoteAddresses,$remoteAddresses)
+            Write-Debug -Message ('  RemoteAddresses   {0,25} -> {1}' -f $rule.RemoteAddresses,$remoteAddresses)
             $localPorts = $rule.LocalPorts | ConvertTo-Any
-            Write-Debug -Message ('  LocalPorts        {0,10} -> {1}' -f $rule.LocalPorts,$localPorts)
+            Write-Debug -Message ('  LocalPorts        {0,25} -> {1}' -f $rule.LocalPorts,$localPorts)
             $remotePorts = $rule.RemotePorts | ConvertTo-Any
-            Write-Debug -Message ('  RemotePorts       {0,10} -> {1}' -f $rule.RemotePorts,$remotePorts)
+            Write-Debug -Message ('  RemotePorts       {0,25} -> {1}' -f $rule.RemotePorts,$remotePorts)
 
             $edgeTraversal = switch( $rule.EdgeTraversalOptions ) 
             {
@@ -230,7 +236,7 @@ function Get-FirewallRule
             }
 
             $serviceName = $rule.ServiceName | ConvertTo-Any
-            Write-Debug -Message ('  Service           {0,10} -> {1}' -f $rule.ServiceName,$serviceName)
+            Write-Debug -Message ('  Service           {0,25} -> {1}' -f $rule.ServiceName,$serviceName)
 
 
             $constructorArgs = @(
