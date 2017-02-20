@@ -25,7 +25,7 @@ function Get-FirewallRule
 
     which only works on english-speaking computers.
 
-    Beginningn with Carbon 2.4.1, firewall rules are read using the Windows Firewall with Advanced Security API's `HNetCfg.FwPolicy2` object.
+    Beginning with Carbon 2.4.1, firewall rules are read using the Windows Firewall with Advanced Security API's `HNetCfg.FwPolicy2` object.
 
     You can return specific rule(s) using the `Name` or `LiteralName` parameters. The `Name` parameter accepts wildcards; `LiteralName` does not. There can be multiple firewall rules with the same name.
 
@@ -233,6 +233,7 @@ function Get-FirewallRule
                     4 { [Carbon.Firewall.RuleSecurity]::AuthEnc }
                     default { [Carbon.Firewall.RuleSecurity]::NotRequired }
                 }
+                Write-Debug -Message ('  Security          {0,25} -> {1}' -f $rule.SecureFlags,$security)
             }
 
             $serviceName = $rule.ServiceName | ConvertTo-Any

@@ -44,9 +44,11 @@ Update-FormatData -PrependPath $prependFormats
 
 
 $bladeTestParam = @{ }
+$pesterTestParam = @{}
 if( $Test )
 {
     $bladeTestParam.Test = $Test
+    $pesterTestParam['TestName'] = $Test
 }
 
 try
@@ -98,7 +100,7 @@ try
 
     $xmlLogPath = Join-Path -Path (Split-Path -Parent -Path $xmlLogPath) -ChildPath 'Carbon.pester.xml'
     Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'Tools\Pester\Pester.psd1' -Resolve)
-    $result = Invoke-Pester -Script $Path -OutputFile $xmlLogPath -OutputFormat LegacyNUnitXml -PassThru |
+    $result = Invoke-Pester -Script $Path -OutputFile $xmlLogPath -OutputFormat LegacyNUnitXml -PassThru @pesterTestParam |
                     Select-Object -Last 1
 
     if( $uploadTestResults )
