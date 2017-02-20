@@ -16,5 +16,10 @@ param(
 
 Set-StrictMode -Version 'Latest'
 
+if( $env:COMPUTERNAME -eq $env:USERNAME )
+{
+    throw ('Can''t run Carbon tests. The current user''s username ({0}) is the same as the computer name ({1}). This causes problems with resolving identities, getting items from the registry, etc. Please re-run these tests using a different account.')
+}
+
 $carbonRoot = Join-Path -Path $PSScriptRoot -ChildPath '..\Carbon' -Resolve
 & (Join-Path -Path $carbonRoot -ChildPath 'Import-Carbon.ps1' -Resolve)
