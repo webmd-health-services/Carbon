@@ -329,8 +329,8 @@ function Test-ShouldClearPullValuesWhenSwitchingToPush
     Assert-Equal 'False' $lcm.AllowModuleOverwrite
     Assert-Equal 'False' $lcm.RebootNodeIfNeeded
     Assert-Equal 'ApplyAndMonitor' $lcm.ConfigurationMode
-    Assert-Equal 30 $lcm.RefreshFrequencyMins
-    Assert-Equal 15 $lcm.ConfigurationModeFrequencyMins
+    Assert-NotEqual (45 * 3) $lcm.RefreshFrequencyMins
+    Assert-NotEqual 45 $lcm.ConfigurationModeFrequencyMins
     Assert-Null $lcm.DownloadManagerName
     Assert-Null $lcm.DownloadManagerCustomData
     Assert-Null $lcm.Credential
