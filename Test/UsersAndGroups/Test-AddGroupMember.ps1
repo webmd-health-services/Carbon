@@ -49,7 +49,8 @@ function Remove-Group
 
 function Get-LocalUsers
 {
-    return Get-WmiObject Win32_UserAccount -Filter "LocalAccount=True"
+    return Get-WmiObject Win32_UserAccount -Filter "LocalAccount=True" |
+                Where-Object { $_.Name -ne $env:COMPUTERNAME }
 }
 
 function Invoke-AddMembersToGroup($Members = @())

@@ -17,9 +17,15 @@ function Start-TestFixture
     & (Join-Path -Path $PSScriptRoot -ChildPath '..\..\Carbon\Import-Carbon.ps1' -Resolve)
 }
 
+function Get-Member
+{
+    Get-User | 
+        Where-Object { $_.SamAccountName -ne $env:COMPUTERNAME }
+}
+
 function Start-Test
 {
-    $users = Get-User
+    $users = Get-Member
     try
     {
         Remove-Group
@@ -66,7 +72,7 @@ function Remove-Group
 
 function Test-ShouldRemoveIndividualMembers
 {
-    Get-User | ForEach-Object { Remove-GroupMember -Name $GroupName -Member $_.SamAccountName ; $_.Dispose() }
+    Get-Member | ForEach-Object { Remove-GroupMember -Name $GroupName -Member $_.SamAccountName ; $_.Dispose() }
     Assert-NoError
     $group = Get-Group -Name $GroupName
     try
@@ -81,7 +87,7 @@ function Test-ShouldRemoveIndividualMembers
 
 function Test-ShouldRemoveBulkMembers
 {
-    $users = Get-User
+    $users = Get-Member
     try
     {
         Remove-GroupMember -Name $GroupName -Member $users
@@ -105,7 +111,7 @@ function Test-ShouldRemoveBulkMembers
 
 function Test-ShouldSupportWhatIf
 {
-    $users = Get-User
+    $users = Get-Member
     $users | ForEach-Object { Remove-GroupMember -Name $GroupName -Member $_.SamAccountName -WhatIf; $_.Dispose() }
     $group = Get-Group -Name $GroupName
     try
