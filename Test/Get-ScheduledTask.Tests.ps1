@@ -188,10 +188,18 @@ Describe 'Get-ScheduledTask' {
         $actualTasks.Count | Should Be $expectedTasks.Count
     }
     
-    It 'should get non existent task' {
-        Get-ScheduledTask -Name 'fjdskfjsdflkjdskfjsdklfjskadljfksdljfklsdjf' -ErrorAction SilentlyContinue
+}
+
+Describe 'Get-ScheduledTask.when task does not exist' {
+    $Global:Error.Clear()
+    $result = Get-ScheduledTask -Name 'fjdskfjsdflkjdskfjsdklfjskadljfksdljfklsdjf' -ErrorAction SilentlyContinue
+    It 'write no errors' {
         $Global:Error.Count | Should BeGreaterThan 0
         $Global:Error[0] | Should Match 'not found'
     }
-    
+
+    It 'should return nothing' {
+        $result | Should BeNullOrEmpty
+    }
 }
+    

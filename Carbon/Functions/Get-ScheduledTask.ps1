@@ -169,7 +169,7 @@ function Get-ScheduledTask
             $error = (Get-Content -Path $errFile) -join ([Environment]::NewLine)
             try
             {
-                if( $error -like '*The system cannot find the file specified.*' )
+                if( $error -match 'The\ system\ cannot\ find\ the\ (file|path)\ specified\.' )
                 {
                     Write-Error ('Scheduled task ''{0}'' not found.' -f $Name)
                 }

@@ -13,7 +13,7 @@
  * Fixed: `Get-FirewallRule` fails on non-english-speaking computers. (It was parsing the output of `netsh advfirewall`. Now it uses the Windows Firewall with Advanced Security API.) [Fixes [issue #208](https://bitbucket.org/splatteredbits/carbon/issues/208/community-get-firewallrule-could-not-find).
  * Fixed: `Get-FirewallRule` incorrectly parsed interface types. It assumed interface type was one of multiple values. In reality, it can be set to one or more different values. The underlying enumeration and its values have been updated to be a set of flags (i.e. a bit field).
  * Fixed: `Carbon_FirewallRule` fails when Profile property has more than one value.
-
+ * Fixed: `Get-ScheduledTask` doesn't handle when a scheduled task doesn't exist on Windows 2008.
 
 # 2.4.0 (9 November 2016)
 
