@@ -89,7 +89,10 @@ All functions are idempotent: when run multiple times with the same arguments, y
     ScriptsToProcess = @()
 
     # Type files (.ps1xml) to be loaded when importing this module
-    TypesToProcess = 'Carbon.types.ps1xml'
+    TypesToProcess = @(
+                        'Carbon.types.ps1xml',
+                        'Types\System.ServiceProcess.ServiceController.types.ps1xml'
+                      )
 
     # Format files (.ps1xml) to be loaded when importing this module
     FormatsToProcess = @( 'Carbon.format.ps1xml', 'Formats\Carbon.Security.HttpUrlAcl.format.ps1xml' )
