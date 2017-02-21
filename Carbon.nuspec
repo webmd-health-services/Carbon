@@ -44,21 +44,20 @@
 All functions are idempotent: when run multiple times with the same arguments, your system will be in the same state without failing or producing errors.</description>
     <language>en-us</language>
     <releaseNotes>
-## Enhancements
-
- * `Protect-String` can now encrypt a `SecureString`. The `String` parameter's type was changed to `[object]`. When you pass in a `SecureString`, it is converted to an array of bytes, encrypted, and the array of bytes are cleared from memory.
- * Renamed `Protect-Acl` to `Disable-AclInheritance` to make it clearer what the function does. Created a `Protect-Acl` alias in place to preserve backwards-compatability.
- * `Disable-AclInheritance` only disables inheritance if it is currently enabled.
- * Created `Enable-AclInheritance` to re-enable access rule inheritance on file system and registry ACLs. This function is paired with `Disable-AclInheritance`.
-
 ## Bug Fixes
 
- * Fixed: `Get-ProgramInstallInfo` fails when a program's `Version` registry key value can't be converted into a `Version` object.
- * Fixed: `Test-Service` failed to detect if a device driver service is installed.
- * Fixed: `Install-Service` fails if a service depends on a device driver. (Note: in our testing, we can't get a device driver set as a dependency. If you know what the secret sauce is to get this to work with sc.exe (or another means), please let us know.)
- * Fixed: `Disable-AclInheritance` (ne `Protect-Acl`) fails when piped a registry key.
- * Fixed: `Get-PathProvider` fails when passed a fully-qualified registry key PowerShell path, e.g. `Microsoft.PowerShell.Core\Registry::HKEY_CURRENT_USER\Software`.
- 
+ * Fixed: `Carbon_Permission` fails when revoking permissions and the `Permissions` property doesn''t have a value.
+ * Fixed: `Protect-String` doesn't convert secure strings properly so they get encrypted with extra bytes in them.
+ * Fixed: `Revoke-Permission' fails when an identity has multiple access control entries on an item. Thanks to [bozho_](https://bitbucket.org/bozho_/) for reporting [issue #221](https://bitbucket.org/splatteredbits/carbon/issues/221/community-revoke-permission-fails-if-the) and contributing the fix.
+ * Fixed: `Compress-Item`' writes an error when using the `WhatIf` switch.
+ * Fixed: `Install-IisWebsite` help examples contain invalid/broken code (thanks to John Mitchell for reporting).
+ * Fixed: `Install-Service` fails when password contains double quote character, i.e. `"` (fixes [issue #219](https://bitbucket.org/splatteredbits/carbon/issues/219/community-install-service-fails-to)).
+ * Fixed: `Read-File` and `Write-File` fail to retry writing to a locked file when `$Global:Error` is full. Fixes [issue #217](https://bitbucket.org/splatteredbits/carbon/issues/217/community-error-handling-in-read-file-and). 
+ * Fixed: `Get-FirewallRule` sets the `EdgeTraversalPolicy` to `DeferUser` on rules whose policy is "defer to application". 
+ * Fixed: `Get-FirewallRule` fails on non-english-speaking computers. (It was parsing the output of `netsh advfirewall`. Now it uses the Windows Firewall with Advanced Security API.) [Fixes [issue #208](https://bitbucket.org/splatteredbits/carbon/issues/208/community-get-firewallrule-could-not-find).
+ * Fixed: `Get-FirewallRule` incorrectly parsed interface types. It assumed interface type was one of multiple values. In reality, it can be set to one or more different values. The underlying enumeration and its values have been updated to be a set of flags (i.e. a bit field).
+ * Fixed: `Carbon_FirewallRule` fails when Profile property has more than one value.
+ * Fixed: `Get-ScheduledTask` doesn't handle when a scheduled task doesn't exist on Windows 2008.
 </releaseNotes>
     <copyright>Copyright 2011 - 2016 Aaron Jensen.</copyright>
     <tags>.net acl active-directory certificates com compression computer credential cryptography directory dsc dsc-resources encryption environment file-system firewall groups hosts-file http identity iis ini installers internet-explorer ip junctions msi msmq netsh networking ntfs operating-system os path performance-counters powershell principal privileges programs registry rsa scheduled-tasks security service shares sid smb ssl text trusted-host users wcf windows windows-features xml zip PSModule DscResources setup automation admin</tags>
