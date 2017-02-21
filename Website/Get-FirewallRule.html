@@ -31,14 +31,20 @@
 <div class="Description">
 <p>Returns a <code>Carbon.Firewall.Rule</code> object for each firewall rule on the local computer. </p>
 
-<p>This data is parsed from the output of:</p>
+<p>In Carbon 2.4.0 and earlier, this data is parsed from the output of:</p>
 
-<pre><code>netsh advfirewall firewall show rule name=all.
+<pre><code>netsh advfirewall firewall show rule name=all
 </code></pre>
+
+<p>which only works on english-speaking computers.</p>
+
+<p>Beginning with Carbon 2.4.1, firewall rules are read using the Windows Firewall with Advanced Security API's <code>HNetCfg.FwPolicy2</code> object.</p>
 
 <p>You can return specific rule(s) using the <code>Name</code> or <code>LiteralName</code> parameters. The <code>Name</code> parameter accepts wildcards; <code>LiteralName</code> does not. There can be multiple firewall rules with the same name.</p>
 
 <p>If the firewall isn't configurable/running, writes an error and returns without returning any objects.</p>
+
+<p>This function requires administrative privileges.</p>
 </div>
 
 <h2>Related Commands</h2>
@@ -103,7 +109,7 @@
 
 
 	<div class="Footer">
-		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.
+		Copyright 2012 - 2017 <a href="http://pshdo.com">Aaron Jensen</a>.
 	</div>
 
 </body>

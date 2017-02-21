@@ -17,7 +17,26 @@
         <li><a href="http://bitbucket.org/splatteredbits/carbon">-Project</a></li>
     </ul>
 
-    <h1>2.4.0 (9 November 2016)</h1>
+    <h1>2.4.1 (21 February 2017)</h1>
+
+<h2>Bug Fixes</h2>
+
+<ul>
+<li>Fixed: <code>Carbon_Permission</code> fails when revoking permissions and the <code>Permissions</code> property doesn''t have a value.</li>
+<li>Fixed: <a href="Protect-String.html">Protect-String</a> doesn't convert secure strings properly so they get encrypted with extra bytes in them.</li>
+<li>Fixed: `Revoke-Permission' fails when an identity has multiple access control entries on an item. Thanks to <a href="https://bitbucket.org/bozho_/">bozho_</a> for reporting <a href="https://bitbucket.org/splatteredbits/carbon/issues/221/community-revoke-permission-fails-if-the">issue #221</a> and contributing the fix.</li>
+<li>Fixed: <a href="Compress-Item.html">Compress-Item</a>' writes an error when using the <code>WhatIf</code> switch.</li>
+<li>Fixed: <a href="Install-IisWebsite.html">Install-IisWebsite</a> help examples contain invalid/broken code (thanks to John Mitchell for reporting).</li>
+<li>Fixed: <a href="Install-Service.html">Install-Service</a> fails when password contains double quote character, i.e. <code>"</code> (fixes <a href="https://bitbucket.org/splatteredbits/carbon/issues/219/community-install-service-fails-to">issue #219</a>).</li>
+<li>Fixed: <a href="Read-File.html">Read-File</a> and <a href="Write-File.html">Write-File</a> fail to retry writing to a locked file when <code>$Global:Error</code> is full. Fixes <a href="https://bitbucket.org/splatteredbits/carbon/issues/217/community-error-handling-in-read-file-and">issue #217</a>. </li>
+<li>Fixed: <a href="Get-FirewallRule.html">Get-FirewallRule</a> sets the <code>EdgeTraversalPolicy</code> to <code>DeferUser</code> on rules whose policy is "defer to application". </li>
+<li>Fixed: <a href="Get-FirewallRule.html">Get-FirewallRule</a> fails on non-english-speaking computers. (It was parsing the output of <code>netsh advfirewall</code>. Now it uses the Windows Firewall with Advanced Security API.) [Fixes <a href="https://bitbucket.org/splatteredbits/carbon/issues/208/community-get-firewallrule-could-not-find">issue #208</a>.</li>
+<li>Fixed: <a href="Get-FirewallRule.html">Get-FirewallRule</a> incorrectly parsed interface types. It assumed interface type was one of multiple values. In reality, it can be set to one or more different values. The underlying enumeration and its values have been updated to be a set of flags (i.e. a bit field).</li>
+<li>Fixed: <code>Carbon_FirewallRule</code> fails when Profile property has more than one value.</li>
+<li>Fixed: <a href="Get-ScheduledTask.html">Get-ScheduledTask</a> doesn't handle when a scheduled task doesn't exist on Windows 2008.</li>
+</ul>
+
+<h1>2.4.0 (9 November 2016)</h1>
 
 <h2>Enhancements</h2>
 
@@ -2161,7 +2180,7 @@
 </ul>
 
 	<div class="Footer">
-		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.
+		Copyright 2012 - 2017 <a href="http://pshdo.com">Aaron Jensen</a>.
 	</div>
 
 </body>

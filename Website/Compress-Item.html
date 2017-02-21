@@ -33,7 +33,7 @@
 
 <p>If you don't supply an output file path, one will be created in the current user's TEMP directory.</p>
 
-<p>A <code>System.IO.FileInfo</code> object is returned representing the ZIP file.</p>
+<p>A <code>System.IO.FileInfo</code> object is returned representing the ZIP file. If you're using the <code>WhatIf</code> switch, nothing is returned.</p>
 
 <p>Microsoft's DSC Local Configuration Manager is unable to unzip files compressed with the <code>DotNetZip</code> library (or the <code>ZipFile</code> class in .NET 4.5), so as an alternative, if you specify the <code>UseShell</code> switch, the file will be compressed with the Windows COM shell API.</p>
 </div>
@@ -135,7 +135,7 @@
 
 
 	<div class="Footer">
-		Copyright 2012 - 2016 <a href="http://pshdo.com">Aaron Jensen</a>.
+		Copyright 2012 - 2017 <a href="http://pshdo.com">Aaron Jensen</a>.
 	</div>
 
 </body>
