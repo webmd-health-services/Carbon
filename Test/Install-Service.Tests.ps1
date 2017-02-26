@@ -73,6 +73,56 @@ Describe 'Install-Service when using the -WhatIf switch' {
     }
 }
 
+Describe 'Install-Service when startup type is automatic delayed' {
+    Install-Service -Name $serviceName -Path $servicePath -StartupType Automatic -Delayed
+    $svc = Get-Service -Name $serviceName
+    It 'startup type should be automatic' {
+        $svc.StartMode | Should Be 'Automatic'
+    }
+    It 'delayed auto start should be true' {
+        $svc.DelayedAutoStart | Should Be $true
+    }
+}
+
+Describe 'Install-Service when startup type is changed to automatic delayed' {
+    Install-Service -Name $serviceName -Path $servicePath -StartupType Automatic
+    $svc = Get-Service -Name $serviceName
+    It 'delayed auto start should be false' {
+        $svc.DelayedAutoStart | Should Be $false
+    }
+
+    Install-Service -Name $serviceName -Path $servicePath -StartupType Automatic -Delayed -Verbose
+    $svc = Get-Service -Name $serviceName
+    It 'startup type should be automatic' {
+        $svc.StartMode | Should Be 'Automatic'
+    }
+    It 'delayed auto start should be true' {
+        $svc.DelayedAutoStart | Should Be $true
+    }
+}
+
+
+Describe 'Install-Service when startup type is changed' {
+    Install-Service -Name $serviceName -Path $servicePath -StartupType Automatic -Delayed 
+
+    $Global:Error.Clear()
+    Install-Service -Name $serviceName -Path $servicePath -StartupType Disabled -Verbose
+
+    $svc = Get-Service -Name $serviceName
+    # Regression. When switching from automatic delayed to disabled, error starting the service.
+    It 'should not write any errors' {
+        $Global:Error.Count | Should Be 0
+    }
+    It 'startup type should be disabled' {
+        $svc.StartMode | Should Be 'Disabled'
+    }
+    It 'delayed auto start should be false' {
+        $svc.DelayedAutoStart | Should Be $false
+    }
+    It 'should leave service stopped' {
+        $svc.Status | Should Be ([ServiceProcess.ServiceControllerStatus]::Stopped)
+    }
+}
 Describe 'Install-Service' {
 
     BeforeEach {

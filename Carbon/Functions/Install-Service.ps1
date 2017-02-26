@@ -54,6 +54,11 @@ function Install-Service
     Install the Death Star service to startup manually.  You certainly don't want the thing roaming the galaxy, destroying thing willy-nilly, do you?
 
     .EXAMPLE
+    Install-Service -Name DeathStar -Path C:\ALongTimeAgo\InAGalaxyFarFarAway\DeathStar.exe -StartupType Automatic -Delayed
+
+    Demonstrates how to set a service startup typemode to automatic delayed. Set the `StartupType` parameter to `Automatic` and provide the `Delayed` switch. This behavior was added in Carbon 2.5.
+
+    .EXAMPLE
     Install-Service -Name DeathStar -Path C:\ALongTimeAgo\InAGalaxyFarFarAway\DeathStar.exe -Credential $tarkinCredentials
 
     Installs the Death Star service to run as Grand Moff Tarkin, who is given the log on as a service right.
@@ -88,7 +93,15 @@ function Install-Service
         
         [ServiceProcess.ServiceStartMode]
         # The startup type: automatic, manual, or disabled.  Default is automatic.
+        #
+        # To start the service as automatic delayed, use the `-Delayed` switch and set this parameter to `Automatic`. The ability to set a service's startup type to automatic delayed was added in Carbon 2.5.
         $StartupType = [ServiceProcess.ServiceStartMode]::Automatic,
+
+        [Switch]
+        # When the startup type is automatic, further configure the service start type to be automatic delayed. This parameter is ignored unless `StartupType` is `Automatic`.
+        #
+        # This switch was added in Carbon 2.5.
+        $Delayed,
         
         [Carbon.Service.FailureAction]
         # What to do on the service's first failure.  Default is to take no action.
@@ -342,6 +355,12 @@ function Install-Service
             $doInstall = $true
         }
 
+        if( $StartupType -eq [ServiceProcess.ServiceStartMode]::Automatic -and $Delayed -ne $serviceConfig.DelayedAutoStart )
+        {
+            Write-Verbose ('[{0}] DelayedAutoStart  {1} -> {2}' -f $Name,$service.DelayedAutoStart,$Delayed)
+            $doInstall = $true
+        }
+
         if( ($Dependency | Where-Object { $dependedOnServiceNames -notcontains $_ }) -or `
             ($dependedOnServiceNames | Where-Object { $Dependency -notcontains $_ })  )
         {
@@ -396,11 +415,15 @@ function Install-Service
     $sc = Join-Path $env:WinDir system32\sc.exe -Resolve
     
     $startArg = 'auto'
-    if( $StartupType -eq 'Manual' )
+    if( $StartupType -eq [ServiceProcess.ServiceStartMode]::Automatic -and $Delayed )
+    {
+        $startArg = 'delayed-auto'
+    }
+    elseif( $StartupType -eq [ServiceProcess.ServiceStartMode]::Manual )
     {
         $startArg = 'demand'
     }
-    elseif( $StartupType -eq 'Disabled' )
+    elseif( $StartupType -eq [ServiceProcess.ServiceStartMode]::Disabled )
     {
         $startArg = 'disabled'
     }
@@ -437,7 +460,12 @@ function Install-Service
     $restartService = ($StartupType -eq [ServiceProcess.ServiceStartMode]::Automatic)
     if( $service )
     {
-        $restartService = ( $restartService -or ($serviceIsRunningStatus -contains $service.Status) )
+        $restartService = ( $restartService -or `
+                            ($serviceIsRunningStatus -contains $service.Status) )
+        if( $StartupType -eq [ServiceProcess.ServiceStartMode]::Disabled )
+        {
+            $restartService = $false
+        }
 
         if( $service.CanStop )
         {
