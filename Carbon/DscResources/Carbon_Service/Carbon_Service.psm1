@@ -30,6 +30,9 @@ function Get-TargetResource
         [string]
         # The startup type: automatic, manual, or disabled.  Default is automatic.
         $StartupType,
+
+        [Switch]
+        $Delayed,
         
         [Carbon.Service.FailureAction]
         # What to do on the service's first failure.  Default is to take no action.
@@ -96,6 +99,7 @@ function Get-TargetResource
                     Name = $Name;
                     Path = $null;
                     StartupType = $null;
+                    Delayed = $null;
                     OnFirstFailure = $null;
                     OnSecondFailure = $null;
                     OnThirdFailure = $null;
@@ -117,6 +121,7 @@ function Get-TargetResource
         $service = Get-Service -Name $Name
         $resource.Path = $service.Path
         $resource.StartupType = $service.StartMode
+        $resource.Delayed = $service.DelayedAutoStart
         $resource.OnFirstFailure = $service.FirstFailure
         $resource.OnSecondFailure = $service.SecondFailure
         $resource.OnThirdFailure = $service.ThirdFailure
@@ -204,6 +209,19 @@ function Set-TargetResource
             Name = 'CarbonNoOpService';
             Ensure = 'Absent';
         }
+
+    .EXAMPLE
+    >
+    Demonstrates how to set a service's start type `Automatic (Delayed)`. This functionality was added in Carbon 2.5.
+
+        Carbon_Service InstallNoOpService
+        {
+            Name = 'CarbonNoOpService';
+            Path = 'C:\Projects\Carbon\bin\NoOpService.bin';
+            StartupType = 'Automatic';
+            Delayed = $true;
+            Ensure = 'Present';
+        }
     #>
     [CmdletBinding()]
     param(
@@ -220,6 +238,18 @@ function Set-TargetResource
         [string]
         # The startup type: automatic, manual, or disabled.  Default is automatic.
         $StartupType,
+
+        [Switch]
+        # Used in combination with the `StartupType` parameter to set a service's startup type to `Automatic (Delayed)`.
+        #
+        # If `Delayed` is true true, and `StartupType` is `Automatic` sets the service's startup type to `Automatic (Delayed)`. 
+        #
+        # If `Delayed` is false and `StartupType` is `Automatic, sets the service's startup type to `Automatic`.
+        #
+        # For all other values of `StartupType`, this parameter is ignored.
+        #
+        # This parameter was added in Carbon 2.5.
+        $Delayed,
         
         [Carbon.Service.FailureAction]
         # What to do on the service's first failure.  Default is to take no action.
@@ -337,6 +367,9 @@ function Test-TargetResource
         [string]
         # The startup type: automatic, manual, or disabled.  Default is automatic.
         $StartupType,
+
+        [Switch]
+        $Delayed,
         
         [Carbon.Service.FailureAction]
         # What to do on the service's first failure.  Default is to take no action.

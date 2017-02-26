@@ -52,6 +52,7 @@ Describe 'Carbon_Service' {
             $resource.Name | Should Be $_.Name
             $resource.Path | Should Be $_.Path
             $resource.StartupType | Should Be $_.StartMode
+            $resource.Delayed | Should Be $_.DelayedAutoStart
             $resource.OnFirstFailure | Should Be $_.FirstFailure
             $resource.OnSecondFailure | Should Be $_.SecondFailure
             $resource.OnThirdFailure | Should Be $_.ThirdFailure
@@ -85,6 +86,7 @@ Describe 'Carbon_Service' {
         $resource.Name | Should Be $name
         $resource.Path | Should BeNullOrEmpty
         $resource.StartupType | Should BeNullOrEmpty
+        $resource.Delayed | Should BeNullOrEmpty
         $resource.OnFirstFailure | Should BeNullOrEmpty
         $resource.OnSecondFailure | Should BeNullOrEmpty
         $resource.OnThirdFailure | Should BeNullOrEmpty
@@ -109,6 +111,7 @@ Describe 'Carbon_Service' {
         $resource.Name | Should Be $serviceName
         $resource.Path | Should Be $servicePath
         $resource.StartupType | Should Be 'Automatic'
+        $resource.Delayed | Should Be $false
         $resource.OnFirstFailure | Should Be 'TakeNoAction'
         $resource.OnSecondFailure | Should Be 'TakeNoAction'
         $resource.OnThirdFailure | Should Be 'TakeNoAction'
@@ -148,6 +151,7 @@ Describe 'Carbon_Service' {
         $resource.Name | Should Be $serviceName
         $resource.Path | Should Be $servicePath
         $resource.StartupType | Should Be 'Manual'
+        $resource.Delayed | Should Be $false
         $resource.OnFirstFailure | Should Be 'RunCommand'
         $resource.OnSecondFailure | Should Be 'Restart'
         $resource.OnThirdFailure | Should Be 'Reboot'
@@ -162,6 +166,31 @@ Describe 'Carbon_Service' {
         $resource.UserName | Should Be (Resolve-Identity -Name $credential.UserName).FullName
         $resource.Credential | Should BeNullOrEmpty
         Assert-DscResourcePresent $resource    
+    }
+    
+    It 'should install service as automatic delayed' {
+        Set-TargetResource -Path $servicePath -Name $serviceName -StartupType Automatic -Delayed  -Ensure Present
+        $Global:Error.Count | Should Be 0
+        $resource = Get-TargetResource -Name $serviceName
+        $resource | Should Not BeNullOrEmpty
+        $resource.Name | Should Be $serviceName
+        $resource.Path | Should Be $servicePath
+        $resource.StartupType | Should Be 'Automatic'
+        $resource.Delayed | Should Be $true
+        $resource.OnFirstFailure | Should Be 'TakeNoAction'
+        $resource.OnSecondFailure | Should Be 'TakeNoAction'
+        $resource.OnThirdFailure | Should Be 'TakeNoAction'
+        $resource.ResetFailureCount | Should Be 0
+        $resource.RestartDelay | Should Be 0
+        $resource.RebootDelay | Should Be 0
+        $resource.Dependency | Should BeNullOrEmpty
+        $resource.Command | Should BeNullOrEmpty
+        $resource.RunCommandDelay | Should Be 0
+        $resource.UserName | Should Be 'NT AUTHORITY\NETWORK SERVICE'
+        $resource.Credential | Should BeNullOrEmpty
+        $resource.DisplayName | Should Be $serviceName
+        $resource.Description | Should BeNullOrEmpty
+        Assert-DscResourcePresent $resource
     }
     
     It 'should uninstall service' {
@@ -197,7 +226,7 @@ Describe 'Carbon_Service' {
         (Test-TargetResource -Name $serviceName -Path $servicePath -Credential $credential -Ensure Present) | Should Be $true
     }
     
-    It 'should not allowboth user name and credentials' {
+    It 'should not allow both username and credentials' {
         Set-TargetResource -Name $serviceName -Path $servicePath -Credential $credential -username LocalService -Ensure Present -ErrorAction SilentlyContinue
         $Global:Error.Count | Should BeGreaterThan 0
         (Test-Service -Name $serviceName) | Should Be $false
@@ -211,6 +240,9 @@ Describe 'Carbon_Service' {
     
         (Test-TargetResource @testParams -StartupType Automatic -Ensure Present) | Should Be $true
         (Test-TargetResource @testParams -StartupType Manual -Ensure Present) | Should Be $false
+
+        (Test-TargetResource @testParams -Delayed -Ensure Present) | Should Be $false
+        (Test-TargetResource @testParams -Delayed:$false -Ensure Present) | Should Be $true
     
         (Test-TargetResource @testParams -OnFirstFailure TakeNoAction -Ensure Present) | Should Be $true
         (Test-TargetResource @testParams -OnFirstFailure Restart -Ensure Present) | Should Be $false
