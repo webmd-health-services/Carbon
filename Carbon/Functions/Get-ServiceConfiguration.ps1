@@ -17,12 +17,28 @@ function Get-ServiceConfiguration
     Gets a service's full configuration, e.g. username, path, failure actions, etc.
 
     .DESCRIPTION
-    The .NET `ServiceController` object only returns basic information about a service. This function returns a bunch of the missing configuration in the form of a `Carbon.Service.ServiceInfo` object:
+    The .NET `ServiceController` object only returns basic information about a service. This function returns all the other service configuration as a `Carbon.Service.ServiceInfo` object, which has the following properties:
     
-     * Account name/user name
-     * Path
-     * Description
-     * Failure actions
+    * `Description`: The service's description.
+    * `ErrorControl`: A `Carbon.Service.ErrorControl` value that indicates the severity of the error when the service fails to start.
+    * `FailureProgram`: The program to run when the service fails.
+    * `FirstFailure`: A `Carbon.Service.FailureAction` value indicating what will happen after the service's first failure.
+    * `LoadOrderGroup`: The name of the load order group this service loads in.
+    * `Name`: The name of the service.
+    * `Path`: The path to the service executable (with arguments).
+    * `RebootDelay`: The number of milliseconds after boot to wait before the service starts.
+    * `RebootDelayMinutes`: `RebootDelay` expressed in minutes.
+    * `ResetPeriod`: How often, in seconds, to reset the service's failure count to 0.
+    * `ResetPeriodDays`: `ResetPeriod` expressed in number of days.
+    * `RestartDelay`: The number of milliseconds to wait before restarting the service after it fails.
+    * `RestartDelayMinutes`: `RestartDelay` expressed in minutes.
+    * `RunCommandDelay`: The number of milliseconds to wait after a service fails before running the failure program.
+    * `RunCommandDelayMinutes`: `RunCommandDelay` as expressed/converted in minutes.
+    * `SecondFailure`: A `Carbon.Service.FailureAction` value indicating what will happen after the service's second failure.
+    * `StartType`: A `Carbon.Service.StartType` value indicating how and when the service should be started.
+    * `TagID`: The service's tag ID. This is the order the service will start in its load group.
+    * `ThirdFailure`: A `Carbon.Service.FailureAction` value indicating what will happen after the service's third failure.
+    * `UserName`: The name of the identity the service runs as.
 
     You can load a specific service using its name, or pipe in `ServiceController` objects.
 
