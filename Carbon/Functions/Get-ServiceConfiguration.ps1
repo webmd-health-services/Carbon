@@ -19,6 +19,7 @@ function Get-ServiceConfiguration
     .DESCRIPTION
     The .NET `ServiceController` object only returns basic information about a service. This function returns all the other service configuration as a `Carbon.Service.ServiceInfo` object, which has the following properties:
     
+    * `DelayedAutoStart`: A boolean value indicating if the service starts automically delayed. This property was added in Carbon 2.5.
     * `Description`: The service's description.
     * `ErrorControl`: A `Carbon.Service.ErrorControl` value that indicates the severity of the error when the service fails to start.
     * `FailureProgram`: The program to run when the service fails.

@@ -40,6 +40,7 @@ namespace Carbon.Service
 
 			Name = name;
 			SetServiceInfo(serviceHandle);
+			SetDelayedAutoStart(serviceHandle);
 			SetDescription(serviceHandle);
 			SetFailureActions(serviceHandle);
 
@@ -71,6 +72,7 @@ namespace Carbon.Service
 			StartType = (StartType) config.dwStartType;
 		}
 
+		public bool DelayedAutoStart { get; private set; }
 		public string Description { get; private set; }
 		public string FailureProgram { get; private set; }
 		public ErrorControl ErrorControl { get; private set; }
@@ -125,6 +127,22 @@ namespace Carbon.Service
 				return 0;
 
 			return restartDelay / 1000 / 60;
+		}
+
+		private void SetDelayedAutoStart(IntPtr serviceHandle)
+		{
+			UInt32 dwBytesNeeded;
+
+			// Determine the buffer size needed
+			QueryServiceConfig2(serviceHandle, SERVICE_CONFIG_DELAYED_AUTO_START, IntPtr.Zero, 0, out dwBytesNeeded);
+			var ptr = Marshal.AllocHGlobal((int)dwBytesNeeded);
+
+			QueryServiceConfig2(serviceHandle, SERVICE_CONFIG_DELAYED_AUTO_START, ptr, dwBytesNeeded, out dwBytesNeeded);
+			var delayedAutoStartStruct = new SERVICE_DELAYED_AUTO_START_INFO();
+			Marshal.PtrToStructure(ptr, delayedAutoStartStruct);
+			Marshal.FreeHGlobal(ptr);
+
+			DelayedAutoStart = delayedAutoStartStruct.fDelayedAutostart;
 		}
 
 		private void SetDescription(IntPtr serviceHandle)
@@ -202,6 +220,12 @@ namespace Carbon.Service
 
 #pragma warning disable 649
 #pragma warning disable 169
+		[StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
+		private class SERVICE_DELAYED_AUTO_START_INFO
+		{
+			public bool fDelayedAutostart;
+		}
+		
 		[StructLayout(LayoutKind.Sequential)]
 		private class SERVICE_DESCRIPTION
 		{
@@ -239,6 +263,7 @@ namespace Carbon.Service
 		private const Int32 SERVICE_QUERY_CONFIG = 0x00000001;
 		private const UInt32 SERVICE_CONFIG_DESCRIPTION = 0x01;
 		private const UInt32 SERVICE_CONFIG_FAILURE_ACTIONS = 0x02;
+		private const UInt32 SERVICE_CONFIG_DELAYED_AUTO_START = 0x3;
 
 		[StructLayout(LayoutKind.Sequential)]
 		private class QUERY_SERVICE_CONFIG

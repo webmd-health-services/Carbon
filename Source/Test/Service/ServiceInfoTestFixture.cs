@@ -28,6 +28,8 @@ namespace Carbon.Test.Service
 			foreach (var service in ServiceController.GetServices())
 			{
 				var info = new ServiceInfo(service.ServiceName, "");
+				Console.WriteLine(info.Name);
+				Console.WriteLine(string.Format("  DelayedAutoStart  {0}", info.DelayedAutoStart));
 				Assert.That(info, Is.Not.Null);
 			}
 		}
@@ -37,6 +39,14 @@ namespace Carbon.Test.Service
 		public void ShouldNotGetInvalidService()
 		{
 			new ServiceInfo(Guid.NewGuid().ToString(), "");
+		}
+
+		[Test]
+		public void ShouldSetDelayedAutoStart()
+		{
+			var info = new ServiceInfo("BITS");
+			Assert.That(info, Is.Not.Null);
+			Assert.That(info.DelayedAutoStart, Is.True);
 		}
 	}
 }

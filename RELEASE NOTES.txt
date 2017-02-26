@@ -1,3 +1,9 @@
+# 2.5.0
+
+## Enhancements
+
+ * Added `DelayedAutoStart` boolean property to objects returned by `Get-ServiceConfiguration`. This flag is `true` when a service is set to start automatically, delayed. `False` otherwise. Added extended 
+
 # 2.4.1 (21 February 2017)
 
 ## Bug Fixes

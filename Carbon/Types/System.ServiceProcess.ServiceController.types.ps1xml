@@ -65,6 +65,12 @@
                 </Script>
             </ScriptMethod>
             <ScriptProperty>
+                <Name>DelayedAutoStart</Name>
+                <GetScriptBlock>
+                    $this.GetServiceConfigProperty( 'DelayedAutoStart' )
+                </GetScriptBlock>
+            </ScriptProperty>
+            <ScriptProperty>
                 <Name>Description</Name>
                 <GetScriptBlock>
                     $this.GetServiceConfigProperty( 'Description' )
