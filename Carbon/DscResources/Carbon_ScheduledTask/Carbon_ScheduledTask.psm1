@@ -271,7 +271,7 @@ function Test-TargetResource
 
         if( $TaskCredential -and $resource.TaskCredential -ne $TaskCredential.UserName )
         {
-            Write-Verbose ('[{0}] [TaskCredential] {0} != {1}' -f $Name,$resource.TaskCredential,$TaskCredential.UserName)
+            Write-Verbose ('[{0}] [TaskCredential] {1} != {2}' -f $Name,$resource.TaskCredential,$TaskCredential.UserName)
             return $false
         }
 

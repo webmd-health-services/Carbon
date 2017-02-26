@@ -122,6 +122,10 @@ Describe 'Carbon_ScheduledTask' {
             (Test-TargetResource -Name $taskName -Ensure Absent) | Should Be $false
         }
     
+        It 'should test task credential changes' {
+            Set-TargetResource -Name $taskName -TaskXml $taskForSystem
+            Test-TargetResource -Name $taskName -TaskXml $taskForSystem -TaskCredential $credential | Should Be $false            
+        }
     
         configuration DscConfiguration
         {
