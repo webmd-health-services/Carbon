@@ -127,6 +127,12 @@ Describe 'Carbon_ScheduledTask' {
             Test-TargetResource -Name $taskName -TaskXml $taskForSystem -TaskCredential $credential | Should Be $false            
         }
     
+        It 'should test task credential canonical versus short username' {
+            Set-TargetResource -Name $taskName -TaskXml $taskForUser -TaskCredential $credential
+            $credWithFullUserName = New-Credential -UserName ('{0}\{1}' -f $env:COMPUTERNAME,$credential.UserName) -Password 'snafu'
+            Test-TargetResource -Name $taskName -TaskXml $taskForUser -TaskCredential $credWithFullUserName | Should Be $true            
+        }
+    
         configuration DscConfiguration
         {
             param(

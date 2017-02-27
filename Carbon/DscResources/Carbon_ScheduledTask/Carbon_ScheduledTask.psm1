@@ -136,7 +136,7 @@ function Set-TargetResource
         $TaskXml,
 
         [Management.Automation.PSCredential]
-        # The principal the task should run as. Use `Principal` parameter to run as a built-in security principal. Required if `Interactive` or `NoPassword` switches are used.
+        # The identity that should run the task. The default is `SYSTEM`.
         $TaskCredential,
 
         [ValidateSet('Present','Absent')]
@@ -158,7 +158,7 @@ function Set-TargetResource
             $installParams['Force'] = $true
         }
         else
-        {
+        {help r
             Write-Verbose ('[{0}] Installing' -f $Name)
         }
         Install-ScheduledTask @PSBoundParameters @installParams
@@ -269,10 +269,15 @@ function Test-TargetResource
             Write-Verbose ('[{0}] Task XML unchanged' -f $Name)
         }
 
-        if( $TaskCredential -and $resource.TaskCredential -ne $TaskCredential.UserName )
+        if( $TaskCredential )
         {
-            Write-Verbose ('[{0}] [TaskCredential] {1} != {2}' -f $Name,$resource.TaskCredential,$TaskCredential.UserName)
-            return $false
+            $resourceUserName = $resource.TaskCredential | ForEach-Object { Resolve-IdentityName -Name $_ }
+            $desiredUserName = $TaskCredential.UserName | ForEach-Object { Resolve-IdentityName -Name $_ }
+            if( $resourceUserName -ne $desiredUserName )
+            {
+                Write-Verbose ('[{0}] [TaskCredential] {1} != {2}' -f $Name,$resourceUserName,$desiredUserName) -Verbose
+                return $false
+            }
         }
 
         return $true
