@@ -158,7 +158,7 @@ function Set-TargetResource
             $installParams['Force'] = $true
         }
         else
-        {help r
+        {
             Write-Verbose ('[{0}] Installing' -f $Name)
         }
         Install-ScheduledTask @PSBoundParameters @installParams
