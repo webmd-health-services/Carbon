@@ -13,7 +13,7 @@
 & (Join-Path -Path $PSScriptRoot -ChildPath 'Import-CarbonForTest.ps1' -Resolve)
 
 $servicePath = Join-Path -Path $PSScriptRoot -ChildPath 'Service\NoOpService.exe' -Resolve
-$serviceName = 'CarbonTestService3'
+$serviceName = 'CarbonTestService4'
 $serviceAcct = 'CrbnInstllSvcTstAcct'
 $servicePassword = "a1""'~!@#$%^&*("  # sc.exe needs to have certain characters escaped.
 $installServiceParams = @{ 
@@ -123,6 +123,17 @@ Describe 'Install-Service when startup type is changed' {
         $svc.Status | Should Be ([ServiceProcess.ServiceControllerStatus]::Stopped)
     }
 }
+
+Describe 'Install-Service when service is stopped and service should be started' {
+    Install-Service -Name $serviceName -Path $servicePath -StartupType Automatic
+    Stop-Service -Name $serviceName
+    $Global:Error.Clear()
+    Install-Service -Name $serviceName -Path $servicePath -StartupType Automatic -EnsureRunning
+    It 'should start the service' {
+        Get-Service -Name $serviceName | Select-Object -ExpandProperty 'Status' | Should Be 'Running'
+    }
+}
+
 Describe 'Install-Service' {
 
     BeforeEach {

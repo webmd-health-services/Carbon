@@ -27,7 +27,7 @@ function Install-Service
 
     [Managed service accounts and virtual accounts](http://technet.microsoft.com/en-us/library/dd548356.aspx) should be supported (we don't know how to test, so can't be sure).  Simply omit the `-Password` parameter when providing a custom account name with the `-Username` parameter.
 
-    `Manual` services are not started. `Automatic` services are started after installation. If an existing manual service is running when configuration begins, it is re-started after re-configured.
+    `Manual` services are not started. `Automatic` services are started after installation. If an existing manual service is running when configuration begins, it is re-started after re-configured. If a service is stopped when configuration begins, it remains stopped when configuration ends. To start the service if it is stopped, use the `-EnsureRunning` switch (which was added in version 2.5.0).
 
     The ability to provide service arguments/parameters via the `ArgumentList` parameter was added in Carbon 2.0.
 
@@ -72,6 +72,11 @@ function Install-Service
     Install-Service -Name DeathStar -Path C:\ALongTimeAgo\InAGalaxyFarFarAway\DeathStar.exe -OnFirstFailure RunCommand -RunCommandDelay 5000 -Command 'engage_hyperdrive.exe "Corruscant"' -OnSecondFailure Restart -RestartDelay 30000 -OnThirdFailure Reboot -RebootDelay 120000 -ResetFailureCount (60*60*24)
 
     Demonstrates how to control the service's failure actions. On the first failure, Windows will run the `engage-hyperdrive.exe "Corruscant"` command after 5 seconds (`5,000` milliseconds). On the second failure, Windows will restart the service after 30 seconds (`30,000` milliseconds). On the third failure, Windows will reboot after two minutes (`120,000` milliseconds). The failure count gets reset once a day (`60*60*24` seconds).
+
+    .EXAMPLE
+    Install-Service -Name DeathStar -Path C:\ALongTimeAgo\InAGalaxyFarFarAway\DeathStar.exe -EnsureRunning
+
+    Demonstrates how to ensure a service gets started after installation/configuration. Normally, `Install-Service` leaves the service in whatever state the service was in. The `EnsureRunnnig` switch will attempt to start the service even if it was stopped to begin with.
     #>
     [CmdletBinding(SupportsShouldProcess=$true,DefaultParameterSetName='NetworkServiceAccount')]
     [OutputType([ServiceProcess.ServiceController])]
@@ -175,7 +180,11 @@ function Install-Service
 
         [Switch]
         # Return a `System.ServiceProcess.ServiceController` object for the configured service.
-        $PassThru
+        $PassThru,
+
+        [Switch]
+        # Start the service after install/configuration if it is not running. This parameter was added in Carbon 2.5.0.
+        $EnsureRunning
     )
 
     Set-StrictMode -Version 'Latest'
@@ -385,191 +394,195 @@ function Install-Service
         $doInstall = $true
     }
 
-    if( -not $doInstall )
+    try
     {
-        Write-Debug -Message ('Skipping {0} service configuration: settings unchanged.' -f $Name)
-        if( $PassThru )
+        if( -not $doInstall )
         {
-            Get-Service -Name $Name -ErrorAction Ignore
+            Write-Debug -Message ('Skipping {0} service configuration: settings unchanged.' -f $Name)
+            return
         }
-        return
-    }
 
-    if( $Dependency )
-    {
-        $missingDependencies = $false
-        $Dependency | 
-            ForEach-Object {
-                if( -not (Test-Service -Name $_) )
+        if( $Dependency )
+        {
+            $missingDependencies = $false
+            $Dependency | 
+                ForEach-Object {
+                    if( -not (Test-Service -Name $_) )
+                    {
+                        Write-Error ('Dependent service {0} not found.' -f $_)
+                        $missingDependencies = $true
+                    }
+                }
+            if( $missingDependencies )
+            {
+                return
+            }
+        }
+    
+        $sc = Join-Path $env:WinDir system32\sc.exe -Resolve
+    
+        $startArg = 'auto'
+        if( $StartupType -eq [ServiceProcess.ServiceStartMode]::Automatic -and $Delayed )
+        {
+            $startArg = 'delayed-auto'
+        }
+        elseif( $StartupType -eq [ServiceProcess.ServiceStartMode]::Manual )
+        {
+            $startArg = 'demand'
+        }
+        elseif( $StartupType -eq [ServiceProcess.ServiceStartMode]::Disabled )
+        {
+            $startArg = 'disabled'
+        }
+    
+        $passwordArgName = ''
+        $passwordArgValue = ''
+        if( $PSCmdlet.ParameterSetName -like 'CustomAccount*' )
+        {
+            if( $Credential )
+            {
+                $passwordArgName = 'password='
+                $passwordArgValue = $Credential.GetNetworkCredential().Password -replace '"', '\"'
+            }
+        
+            if( $PSCmdlet.ShouldProcess( $identity.FullName, "grant the log on as a service right" ) )
+            {
+                Grant-Privilege -Identity $identity.FullName -Privilege SeServiceLogonRight
+            }
+        }
+    
+        if( $PSCmdlet.ShouldProcess( $Path, ('grant {0} ReadAndExecute permissions' -f $identity.FullName) ) )
+        {
+            Grant-Permission -Identity $identity.FullName -Permission ReadAndExecute -Path $Path
+        }
+    
+        $service = Get-Service -Name $Name -ErrorAction Ignore
+    
+        $operation = 'create'
+        $serviceIsRunningStatus = @(
+                                      [ServiceProcess.ServiceControllerStatus]::Running,
+                                      [ServiceProcess.ServiceControllerStatus]::StartPending
+                                   )
+
+        if( -not $EnsureRunning )
+        {
+            $EnsureRunning = ($StartupType -eq [ServiceProcess.ServiceStartMode]::Automatic)
+        }
+
+        if( $service )
+        {
+            $EnsureRunning = ( $EnsureRunning -or ($serviceIsRunningStatus -contains $service.Status) )
+            if( $StartupType -eq [ServiceProcess.ServiceStartMode]::Disabled )
+            {
+                $EnsureRunning = $false
+            }
+
+            if( $service.CanStop )
+            {
+                Stop-Service -Name $Name -Force -ErrorAction Ignore
+                if( $? )
                 {
-                    Write-Error ('Dependent service {0} not found.' -f $_)
-                    $missingDependencies = $true
+                    $service.WaitForStatus( 'Stopped' )
                 }
             }
-        if( $missingDependencies )
-        {
-            return
-        }
-    }
-    
-    $sc = Join-Path $env:WinDir system32\sc.exe -Resolve
-    
-    $startArg = 'auto'
-    if( $StartupType -eq [ServiceProcess.ServiceStartMode]::Automatic -and $Delayed )
-    {
-        $startArg = 'delayed-auto'
-    }
-    elseif( $StartupType -eq [ServiceProcess.ServiceStartMode]::Manual )
-    {
-        $startArg = 'demand'
-    }
-    elseif( $StartupType -eq [ServiceProcess.ServiceStartMode]::Disabled )
-    {
-        $startArg = 'disabled'
-    }
-    
-    $passwordArgName = ''
-    $passwordArgValue = ''
-    if( $PSCmdlet.ParameterSetName -like 'CustomAccount*' )
-    {
-        if( $Credential )
-        {
-            $passwordArgName = 'password='
-            $passwordArgValue = $Credential.GetNetworkCredential().Password -replace '"', '\"'
-        }
-        
-        if( $PSCmdlet.ShouldProcess( $identity.FullName, "grant the log on as a service right" ) )
-        {
-            Grant-Privilege -Identity $identity.FullName -Privilege SeServiceLogonRight
-        }
-    }
-    
-    if( $PSCmdlet.ShouldProcess( $Path, ('grant {0} ReadAndExecute permissions' -f $identity.FullName) ) )
-    {
-        Grant-Permission -Identity $identity.FullName -Permission ReadAndExecute -Path $Path
-    }
-    
-    $service = Get-Service -Name $Name -ErrorAction Ignore
-    
-    $operation = 'create'
-    $serviceIsRunningStatus = @(
-                                  [ServiceProcess.ServiceControllerStatus]::Running,
-                                  [ServiceProcess.ServiceControllerStatus]::StartPending
-                               )
 
-    $restartService = ($StartupType -eq [ServiceProcess.ServiceStartMode]::Automatic)
-    if( $service )
-    {
-        $restartService = ( $restartService -or `
-                            ($serviceIsRunningStatus -contains $service.Status) )
-        if( $StartupType -eq [ServiceProcess.ServiceStartMode]::Disabled )
-        {
-            $restartService = $false
-        }
-
-        if( $service.CanStop )
-        {
-            Stop-Service -Name $Name -Force -ErrorAction Ignore
-            if( $? )
+            if( -not ($service.Status -eq [ServiceProcess.ServiceControllerStatus]::Stopped) )
             {
-                $service.WaitForStatus( 'Stopped' )
+                Write-Warning "Unable to stop service '$Name' before applying config changes.  You may need to restart this service manually for any changes to take affect."
             }
+            $operation = 'config'
         }
-
-        if( -not ($service.Status -eq [ServiceProcess.ServiceControllerStatus]::Stopped) )
-        {
-            Write-Warning "Unable to stop service '$Name' before applying config changes.  You may need to restart this service manually for any changes to take affect."
-        }
-        $operation = 'config'
-    }
     
-    $dependencyArgValue = '""'
-    if( $Dependency )
-    {
-        $dependencyArgValue = $Dependency -join '/'
-    }
-
-    $displayNameArgName = 'DisplayName='
-    $displayNameArgValue = '""'
-    if( $DisplayName )
-    {
-        $displayNameArgValue = $DisplayName
-    }
-
-    $binPathArg = $binPathArg -replace '"','\"'
-    if( $PSCmdlet.ShouldProcess( "$Name [$Path]", "$operation service" ) )
-    {
-        & $sc $operation $Name binPath= $binPathArg start= $startArg obj= $identity.FullName $passwordArgName $passwordArgValue depend= $dependencyArgValue $displayNameArgName $displayNameArgValue |
-            Write-Verbose
-        $scExitCode = $LastExitCode
-        if( $scExitCode -ne 0 )
+        $dependencyArgValue = '""'
+        if( $Dependency )
         {
-            $reason = net helpmsg $scExitCode 2>$null | Where-Object { $_ }
-            Write-Error ("Falied to {0} service '{1}'. {2} returned exit code {3}: {4}" -f $operation,$Name,$sc,$scExitCode,$reason)
-            return
+            $dependencyArgValue = $Dependency -join '/'
         }
 
-        if( $Description )
+        $displayNameArgName = 'DisplayName='
+        $displayNameArgValue = '""'
+        if( $DisplayName )
         {
-            & $sc 'description' $Name $Description | Write-Verbose
+            $displayNameArgValue = $DisplayName
+        }
+
+        $binPathArg = $binPathArg -replace '"','\"'
+        if( $PSCmdlet.ShouldProcess( "$Name [$Path]", "$operation service" ) )
+        {
+            & $sc $operation $Name binPath= $binPathArg start= $startArg obj= $identity.FullName $passwordArgName $passwordArgValue depend= $dependencyArgValue $displayNameArgName $displayNameArgValue |
+                Write-Verbose
             $scExitCode = $LastExitCode
             if( $scExitCode -ne 0 )
             {
                 $reason = net helpmsg $scExitCode 2>$null | Where-Object { $_ }
-                Write-Error ("Falied to set {0} service's description. {1} returned exit code {2}: {3}" -f $Name,$sc,$scExitCode,$reason)
+                Write-Error ("Failed to {0} service '{1}'. {2} returned exit code {3}: {4}" -f $operation,$Name,$sc,$scExitCode,$reason)
+                return
+            }
+
+            if( $Description )
+            {
+                & $sc 'description' $Name $Description | Write-Verbose
+                $scExitCode = $LastExitCode
+                if( $scExitCode -ne 0 )
+                {
+                    $reason = net helpmsg $scExitCode 2>$null | Where-Object { $_ }
+                    Write-Error ("Failed to set {0} service's description. {1} returned exit code {2}: {3}" -f $Name,$sc,$scExitCode,$reason)
+                    return
+                }
+            }
+        }
+    
+        $firstAction = ConvertTo-FailureActionArg $OnFirstFailure
+        $secondAction = ConvertTo-FailureActionArg $OnSecondFailure
+        $thirdAction = ConvertTo-FailureActionArg $OnThirdFailure
+
+        if( -not $Command )
+        {
+            $Command = '""'
+        }
+
+        if( $PSCmdlet.ShouldProcess( $Name, "setting service failure actions" ) )
+        {
+            & $sc failure $Name reset= $ResetFailureCount actions= $firstAction/$secondAction/$thirdAction command= $Command |
+                Write-Verbose
+            $scExitCode = $LastExitCode
+            if( $scExitCode -ne 0 )
+            {
+                $reason = net helpmsg $scExitCode 2>$null | Where-Object { $_ }
+                Write-Error ("Failed to set {0} service's failure actions. {1} returned exit code {2}: {3}" -f $Name,$sc,$scExitCode,$reason)
                 return
             }
         }
     }
-    
-    $firstAction = ConvertTo-FailureActionArg $OnFirstFailure
-    $secondAction = ConvertTo-FailureActionArg $OnSecondFailure
-    $thirdAction = ConvertTo-FailureActionArg $OnThirdFailure
-
-    if( -not $Command )
+    finally
     {
-        $Command = '""'
-    }
-
-    if( $PSCmdlet.ShouldProcess( $Name, "setting service failure actions" ) )
-    {
-        & $sc failure $Name reset= $ResetFailureCount actions= $firstAction/$secondAction/$thirdAction command= $Command |
-            Write-Verbose
-        $scExitCode = $LastExitCode
-        if( $scExitCode -ne 0 )
+        if( $EnsureRunning )
         {
-            $reason = net helpmsg $scExitCode 2>$null | Where-Object { $_ }
-            Write-Error ("Failed to set {0} service's failure actions. {1} returned exit code {2}: {3}" -f $Name,$sc,$scExitCode,$reason)
-            return
-        }
-    }
-
-    if( $restartService )
-    {
-        if( $PSCmdlet.ShouldProcess( $Name, 'start service' ) )
-        {
-            Start-Service -Name $Name -ErrorAction $ErrorActionPreference
-            if( (Get-Service -Name $Name).Status -ne [ServiceProcess.ServiceControllerStatus]::Running )
+            if( $PSCmdlet.ShouldProcess( $Name, 'start service' ) )
             {
-                if( $PSCmdlet.ParameterSetName -like 'CustomAccount*' -and -not $Credential )
+                Start-Service -Name $Name -ErrorAction $ErrorActionPreference
+                if( (Get-Service -Name $Name).Status -ne [ServiceProcess.ServiceControllerStatus]::Running )
                 {
-                    Write-Warning ('Service ''{0}'' didn''t start and you didn''t supply a password to Install-Service.  Is ''{1}'' a managed service account or virtual account? (See http://technet.microsoft.com/en-us/library/dd548356.aspx.)  If not, please use the `Credential` parameter to pass the account''s credentials.' -f $Name,$UserName)
-                }
-                else
-                {
-                    Write-Warning ('Failed to re-start service ''{0}''.' -f $Name)
+                    if( $PSCmdlet.ParameterSetName -like 'CustomAccount*' -and -not $Credential )
+                    {
+                        Write-Warning ('Service ''{0}'' didn''t start and you didn''t supply a password to Install-Service.  Is ''{1}'' a managed service account or virtual account? (See http://technet.microsoft.com/en-us/library/dd548356.aspx.)  If not, please use the `Credential` parameter to pass the account''s credentials.' -f $Name,$UserName)
+                    }
+                    else
+                    {
+                        Write-Warning ('Failed to re-start service ''{0}''.' -f $Name)
+                    }
                 }
             }
         }
-    }
-    else
-    {
-        Write-Verbose ('Not re-starting {0} service. Its startup type is {1} and it wasn''t running when configuration began.' -f $Name,$StartupType)
-    }
+        else
+        {
+            Write-Verbose ('Not re-starting {0} service. Its startup type is {1} and it wasn''t running when configuration began. To always start a service after configuring it, use the -EnsureRunning switch.' -f $Name,$StartupType)
+        }
 
-    if( $PassThru )
-    {
-        Get-Service -Name $Name -ErrorAction Ignore
+        if( $PassThru )
+        {
+            Get-Service -Name $Name -ErrorAction Ignore
+        }
     }
 }
 
