@@ -84,3 +84,89 @@ Describe 'Uninstall-Certificate' {
         }
     }
 }
+
+function GivenARemotingSession
+{
+    $script:session = New-PSSession -ComputerName $env:COMPUTERNAME
+}
+
+function GivenAnInstalledCertificate
+{
+    param(
+        $StoreLocation = 'CurrentUser',
+        $StoreName = 'My'
+    )
+    Install-Certificate -Path $TestCertPath -StoreLocation $StoreLocation -StoreName $StoreName
+}
+
+function WhenPipedMultipleThumbprints
+{
+    $TestCert.Thumbprint,$TestCert.Thumbprint | Uninstall-Certificate
+}
+
+function WhenUninstallingViaRemoting
+{
+    try
+    {
+        $TestCert | Uninstall-Certificate -Session $session
+    }
+    finally
+    {
+        $session | Remove-PSSession
+    }
+}
+
+function WhenUninstallPipedCertificate
+{
+    $TestCert | Uninstall-Certificate
+}
+
+function WhenUninstallingByThumbprint
+{
+    Uninstall-Certificate -Thumbprint $TestCert.Thumbprint
+}
+
+function WhenUninstallPipedThumbprint
+{
+    $TestCert.Thumbprint | Uninstall-Certificate
+}
+
+function ThenCertificateUninstalled
+{
+    It 'should uninstall the certificate' {
+        Join-Path -Path 'cert:\*\*' -ChildPath $TestCert.Thumbprint | Should Not Exist
+    }   
+}
+
+Describe 'Uninstall-Certificate.when given just the certificate thumbprint' {
+    GivenAnInstalledCertificate
+    WhenUninstallingByThumbprint
+    ThenCertificateUninstalled
+}
+
+Describe 'Uninstall-Certificate.when given just the certificate thumbprint and installed in multiple stores' {
+    GivenAnInstalledCertificate
+    GivenAnInstalledCertificate -StoreLocation 'CurrentUser' -StoreName 'My'
+    GivenAnInstalledCertificate -StoreLocation 'LocalMachine' -StoreName 'My'
+    GivenAnInstalledCertificate -StoreLocation 'LocalMachine' -StoreName 'Root'
+    WhenUninstallingByThumbprint
+    ThenCertificateUninstalled
+}
+
+Describe 'Uninstall-Certificate.when piped thumbprint' {
+    GivenAnInstalledCertificate
+    WhenUninstallPipedThumbprint
+    ThenCertificateUninstalled
+}
+
+Describe 'Uninstall-Certificate.when piped certificate object' {
+    GivenAnInstalledCertificate
+    WhenUninstallPipedCertificate
+    ThenCertificateUninstalled
+}
+
+Describe 'Uninstall-Certificate.when piped multiple thumbprints' {
+    GivenAnInstalledCertificate
+    WhenPipedMultipleThumbprints
+    ThenCertificateUninstalled
+}
