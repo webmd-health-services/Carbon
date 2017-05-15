@@ -12,6 +12,7 @@
  * `Install-Service` and the `Carbon_Service` DSC resource write errors when a service is running and its startup type is changed to `Disabled`.
  * The `Carbon_ScheduledTask` DSC resource writes incorrect information to verbose log when the current and desired credential for the scheduled task are different.
  * The `Carbon_ScheduledTask` DSC resource doesn't correctly detect when a task's identity has changed (it wasn't converting usernames to their canonical representation before comparing the existing identity with the desired identity).
+ * Fixed: Importing Carbon in 32-bit PowerShell fails on a 64-bit operating system. DSC isn't available so the `Initialize-Lcm` function can't be exported. Thanks to [Anders Andersson](https://bitbucket.org/McAndersDK/) for contribuging the fix.
  
 
 # 2.4.1 (21 February 2017)
