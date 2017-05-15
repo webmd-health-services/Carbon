@@ -26,16 +26,26 @@ LONG DESCRIPTION
      * `[bool] IsJunction { get; }`: returns `$true` if the directory is a junction, 
        `$false` otherwise. Uses the `DirectoryInfo`'s `Attributes` properties to make 
        this determination.
-     * `[string] TargetPath { get; }`: if the `DirectoryInfo` represents a junction, 
-       returns the junction's target path (i.e. the path it points to).
+     * `[bool] IsSymbolicLink { get; }`: returns `$true` if the directory is a symbolic
+       link, `$false` otherwise. Uses the Win32 API to make this determination. This 
+       function was added in Carbon 2.5.0.
+     * `[string] TargetPath { get; }`: if the `DirectoryInfo` is a junction or symbolic 
+       link,returns the junction's/symbolic link's target path (i.e. the path it points 
+       to). Retrieving the target path for symbolic links was added in Carbon 2.5.0.
     
     ## System.IO.FileInfo
      * `[uint64] FileIndex { get; }`: the file's index. This is the file's unique 
        identifier.
+     * `[bool] IsSymbolicLink { get; }`: returns `$true` if the file is a symbolic link,
+       `$false` otherwise. Uses the Win32 API to make this determination. This function 
+       was added in Carbon 2.5.0.
      * `[uint32] LinkCount { get; }`: the number of links to the file. Each unique file
        can be linked to at different paths on the file system.
      * `[uint32] VolumeSerialNumber { get; }`: the serial number of the volume the file
        is on.
+     * `[string] TargetPath { get; }`: if the `FileInfo` is a symbolic link, returns the 
+       symbolic link's target path (i.e. the path it points to). This property was added
+       in Carbon 2.5.0.
     
     ## System.Security.Cryptography.X509Certificates.X509Certificate2
      * `[string] IssueTo { get; }`: gets the Issued To information from the certificate.

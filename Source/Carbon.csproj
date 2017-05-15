@@ -71,6 +71,9 @@
     <Compile Include="Firewall\RuleInterfaceType.cs" />
     <Compile Include="Firewall\RuleProfile.cs" />
     <Compile Include="Firewall\RuleSecurity.cs" />
+    <Compile Include="IO\ReparseData.cs" />
+    <Compile Include="IO\ReparsePoint.cs" />
+    <Compile Include="IO\SymbolicLink.cs" />
     <Compile Include="Security\SecureStringConverter.cs" />
     <Compile Include="Security\HttpUrlAccessRights.cs" />
     <Compile Include="Security\HttpUrlAccessRule.cs" />

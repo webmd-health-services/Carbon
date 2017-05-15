@@ -91,6 +91,8 @@ All functions are idempotent: when run multiple times with the same arguments, y
     # Type files (.ps1xml) to be loaded when importing this module
     TypesToProcess = @(
                         'Carbon.types.ps1xml',
+                        'Types\System.IO.DirectoryInfo.types.ps1xml'
+                        'Types\System.IO.FileInfo.types.ps1xml'
                         'Types\System.ServiceProcess.ServiceController.types.ps1xml'
                       )
 

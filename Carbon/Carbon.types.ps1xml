@@ -70,28 +70,6 @@
         </Members>
     </Type>
     <Type>
-        <Name>System.IO.DirectoryInfo</Name>
-        <Members>
-            <ScriptProperty>
-                <Name>IsJunction</Name>
-                <GetScriptBlock>
-                    (($this.Attributes -band [IO.FileAttributes]::ReparsePoint) -eq [IO.FileAttributes]::ReparsePoint)
-                </GetScriptBlock>
-            </ScriptProperty>
-            <ScriptProperty>
-                <Name>TargetPath</Name>
-                <GetScriptBlock>
-                    if( -not $this.IsJunction )
-                    {
-                        return
-                    }
-                    
-                    [Carbon.IO.JunctionPoint]::GetTarget( $this.FullName )
-                </GetScriptBlock>
-            </ScriptProperty>
-        </Members>
-    </Type>
-    <Type>
         <Name>System.Security.Cryptography.X509Certificates.X509Certificate2</Name>
         <Members>
             <ScriptProperty>
