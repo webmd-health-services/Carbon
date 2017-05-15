@@ -21,7 +21,7 @@ $doNotImport = @{ }
 
 if( [Environment]::Is64BitOperatingSystem -and -not [Environment]::Is64BitProcess ) 
 {
-    $doNotImport = 'Initialize-Lcm.ps1'
+    $doNotImport['Initialize-Lcm.ps1'] = $true
 }
 
 $functionRoot = Join-Path -Path $PSScriptRoot -ChildPath 'Functions' -Resolve
