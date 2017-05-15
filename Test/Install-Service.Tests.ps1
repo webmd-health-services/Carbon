@@ -91,7 +91,7 @@ Describe 'Install-Service when startup type is changed to automatic delayed' {
         $svc.DelayedAutoStart | Should Be $false
     }
 
-    Install-Service -Name $serviceName -Path $servicePath -StartupType Automatic -Delayed -Verbose
+    Install-Service -Name $serviceName -Path $servicePath -StartupType Automatic -Delayed
     $svc = Get-Service -Name $serviceName
     It 'startup type should be automatic' {
         $svc.StartMode | Should Be 'Automatic'
@@ -106,7 +106,7 @@ Describe 'Install-Service when startup type is changed' {
     Install-Service -Name $serviceName -Path $servicePath -StartupType Automatic -Delayed 
 
     $Global:Error.Clear()
-    Install-Service -Name $serviceName -Path $servicePath -StartupType Disabled -Verbose
+    Install-Service -Name $serviceName -Path $servicePath -StartupType Disabled
 
     $svc = Get-Service -Name $serviceName
     # Regression. When switching from automatic delayed to disabled, error starting the service.
@@ -135,12 +135,21 @@ Describe 'Install-Service when service is stopped and service should be started'
 }
 
 Describe 'Install-Service when service changing from custom account to default account' {
-    Install-Service -Name $serviceName -Path $servicePath -StartupType Automatic -Credential $serviceCredential -Verbose
+    Install-Service -Name $serviceName -Path $servicePath -StartupType Automatic -Credential $serviceCredential
     Mock -CommandName 'Write-Debug' -ModuleName 'Carbon' -Verifiable
-    Install-Service -Name $serviceName -Path $servicePath -StartupType Automatic -Verbose
+    Install-Service -Name $serviceName -Path $servicePath -StartupType Automatic
     $svc = Get-Service -Name $serviceName
     It 'should be running as NetworkService' {
         $svc.UserName | Should Be (Resolve-IdentityName 'NetworkService')
+    }
+}
+
+Describe 'Install-Service when service is a local account and installed multiple times' {
+    Install-Service -Name $serviceName -Path $servicePath -StartupType Automatic -Credential $serviceCredential
+    Mock -CommandName 'Write-Debug' -ModuleName 'Carbon' -Verifiable
+    Install-Service -Name $serviceName -Path $servicePath -StartupType Automatic -Credential $serviceCredential
+    It 'should not re-install service' {
+        Assert-MockCalled -CommandName 'Write-Debug' -ModuleName 'Carbon' -Times 1 -ParameterFilter { $Message -like '*settings unchanged*' }
     }
 }
 

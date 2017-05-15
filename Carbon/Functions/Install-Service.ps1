@@ -383,9 +383,10 @@ function Install-Service
             $doInstall = $true
         }
 
-        if( $serviceConfig.UserName -ne $identity.FullName )
+        $currentIdentity = Resolve-Identity $serviceConfig.UserName
+        if( $currentIdentity.FullName -ne $identity.FullName )
         {
-            Write-Verbose ('[{0}] UserName          {1} -> {2}' -f $Name,$serviceConfig.UserName,$identity.FullName)
+            Write-Verbose ('[{0}] UserName          {1} -> {2}' -f $Name,$currentIdentity.FullName,$identity.FullName)
             $doinstall = $true
         }
     }
