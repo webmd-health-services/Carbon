@@ -32,7 +32,7 @@ INSTALL FROM POWERSHELL GALLERY
 
     
     To install, run:
-                                                                                   
+    
         PS> Install-Module -Name 'Carbon' -AllowClobber
     
     Note: You need the `-AllowClobber` switch because Windows 10/2016 ships with

@@ -29,6 +29,9 @@ SYSTEM REQUIREMENTS
 
     Windows 7, 8, 2008, or 2012.
 
+    To use IIS functions, IIS  must be installed/enabled, including the 
+    `Web-Scripting-Tools` feature.
+
 INSTALLATION
     See the `about_Carbon_Installation` help topic for installation instructions.
 
