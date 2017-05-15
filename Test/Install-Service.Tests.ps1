@@ -134,6 +134,16 @@ Describe 'Install-Service when service is stopped and service should be started'
     }
 }
 
+Describe 'Install-Service when service changing from custom account to default account' {
+    Install-Service -Name $serviceName -Path $servicePath -StartupType Automatic -Credential $serviceCredential -Verbose
+    Mock -CommandName 'Write-Debug' -ModuleName 'Carbon' -Verifiable
+    Install-Service -Name $serviceName -Path $servicePath -StartupType Automatic -Verbose
+    $svc = Get-Service -Name $serviceName
+    It 'should be running as NetworkService' {
+        $svc.UserName | Should Be (Resolve-IdentityName 'NetworkService')
+    }
+}
+
 Describe 'Install-Service' {
 
     BeforeEach {

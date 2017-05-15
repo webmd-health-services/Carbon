@@ -383,7 +383,7 @@ function Install-Service
             $doInstall = $true
         }
 
-        if( $PSCmdlet.ParameterSetName -like 'CustomAccount*' -and $serviceConfig.UserName -ne $identity.FullName )
+        if( $serviceConfig.UserName -ne $identity.FullName )
         {
             Write-Verbose ('[{0}] UserName          {1} -> {2}' -f $Name,$serviceConfig.UserName,$identity.FullName)
             $doinstall = $true
