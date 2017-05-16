@@ -76,6 +76,8 @@
     <Compile Include="Certificates\SslCertificateBindingTestFixture.cs" />
     <Compile Include="Firewall\RuleTests.cs" />
     <Compile Include="IO\FileTestFixture.cs" />
+    <Compile Include="IO\JunctionPointTestFixture.cs" />
+    <Compile Include="IO\ReparsePointTestFixture.cs" />
     <Compile Include="Security\SecureStringConverter.cs" />
     <Compile Include="Security\UrlSecurityTests.cs" />
     <Compile Include="IdentityTest.cs" />

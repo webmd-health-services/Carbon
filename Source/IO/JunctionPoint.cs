@@ -118,7 +118,7 @@ namespace Carbon.IO
 			FirstPipeInstance = 0x00080000
 		}
 
-		[DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
 		private static extern bool DeviceIoControl(IntPtr hDevice, uint dwIoControlCode,
 				IntPtr InBuffer, int nInBufferSize,
 				IntPtr OutBuffer, int nOutBufferSize,
@@ -156,16 +156,18 @@ namespace Carbon.IO
 			{
 				byte[] targetDirBytes = Encoding.Unicode.GetBytes(NonInterpretedPathPrefix + System.IO.Path.GetFullPath(targetDir));
 
-				ReparseData reparseDataBuffer = new ReparseData();
+                var reparseDataBuffer = new ReparseData
+                {
+                    ReparseTag = IO_REPARSE_TAG_MOUNT_POINT,
+                    ReparseDataLength = (ushort) (targetDirBytes.Length + 12),
+                    SubstituteNameOffset = 0,
+                    SubstituteNameLength = (ushort) targetDirBytes.Length,
+                    PrintNameOffset = (ushort) (targetDirBytes.Length + 2),
+                    PrintNameLength = 0,
+                    PathBuffer = new byte[0x3ff0]
+                };
 
-                reparseDataBuffer.ReparseTag = IO_REPARSE_TAG_MOUNT_POINT;
-				reparseDataBuffer.ReparseDataLength = (ushort)(targetDirBytes.Length + 12);
-				reparseDataBuffer.SubstituteNameOffset = 0;
-				reparseDataBuffer.SubstituteNameLength = (ushort)targetDirBytes.Length;
-				reparseDataBuffer.PrintNameOffset = (ushort)(targetDirBytes.Length + 2);
-				reparseDataBuffer.PrintNameLength = 0;
-				reparseDataBuffer.PathBuffer = new byte[0x3ff0];
-				Array.Copy(targetDirBytes, reparseDataBuffer.PathBuffer, targetDirBytes.Length);
+			    Array.Copy(targetDirBytes, reparseDataBuffer.PathBuffer, targetDirBytes.Length);
 
 				int inBufferSize = Marshal.SizeOf(reparseDataBuffer);
 				IntPtr inBuffer = Marshal.AllocHGlobal(inBufferSize);
@@ -209,13 +211,14 @@ namespace Carbon.IO
 
 			using (SafeFileHandle handle = ReparsePoint.OpenReparsePoint(junctionPoint, ReparsePoint.EFileAccess.GenericWrite))
 			{
-				ReparseData reparseDataBuffer = new ReparseData();
+                var reparseDataBuffer = new ReparseData
+                {
+                    ReparseTag = IO_REPARSE_TAG_MOUNT_POINT,
+                    ReparseDataLength = 0,
+                    PathBuffer = new byte[0x3ff0]
+                };
 
-				reparseDataBuffer.ReparseTag = IO_REPARSE_TAG_MOUNT_POINT;
-				reparseDataBuffer.ReparseDataLength = 0;
-				reparseDataBuffer.PathBuffer = new byte[0x3ff0];
-
-				int inBufferSize = Marshal.SizeOf(reparseDataBuffer);
+			    int inBufferSize = Marshal.SizeOf(reparseDataBuffer);
 				IntPtr inBuffer = Marshal.AllocHGlobal(inBufferSize);
 				try
 				{

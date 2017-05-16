@@ -44,8 +44,6 @@ namespace Carbon.IO
         /// </summary>
         public ushort PrintNameLength;
 
-        public uint Flags;
-
         /// <summary>
         /// A buffer containing the unicode-encoded path string. The path string contains
         /// the substitute name string and print name string.

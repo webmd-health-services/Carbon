@@ -31,19 +31,9 @@ namespace Carbon.IO
         private const int ERROR_NOT_A_REPARSE_POINT = 4390;
 
         /// <summary>
-        /// Command to set the reparse point data block.
-        /// </summary>
-        private const int FSCTL_SET_REPARSE_POINT = 0x000900A4;
-
-        /// <summary>
         /// Command to get the reparse point data block.
         /// </summary>
         private const int FSCTL_GET_REPARSE_POINT = 0x000900A8;
-
-        /// <summary>
-        /// Command to delete the reparse point data base.
-        /// </summary>
-        private const int FSCTL_DELETE_REPARSE_POINT = 0x000900AC;
 
         /// <summary>
         /// Reparse point tag used to identify mount points and junction points.
@@ -196,11 +186,12 @@ namespace Carbon.IO
                 reparseDataBuffer.ReparseTag != IO_SYMOBOLIC_LINK_TAG)
                 return null;
 
-            var offset = reparseDataBuffer.SubstituteNameLength;
+            var offset = reparseDataBuffer.SubstituteNameOffset;
             var length = reparseDataBuffer.SubstituteNameLength;
             if (reparseDataBuffer.ReparseTag == IO_SYMOBOLIC_LINK_TAG)
             {
-                offset = reparseDataBuffer.PrintNameOffset;
+                // Offset should include the two NULL terminators that come before it in the buffer. Not sure why there are two.
+                offset = (ushort)(reparseDataBuffer.PrintNameOffset + (sizeof(char) * 2));
                 length = reparseDataBuffer.PrintNameLength;
             }
 
