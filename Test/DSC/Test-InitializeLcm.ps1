@@ -212,6 +212,8 @@ function Test-ShouldSupportWhatIf
 
 function Test-ShouldConfigureFileDownloadManager
 {
+    $Global:Error.Clear()
+
     $configID = [Guid]::NewGuid()
     $lcm = Initialize-Lcm -SourcePath $PSScriptRoot `
                           -ConfigurationID $configID `
@@ -222,7 +224,14 @@ function Test-ShouldConfigureFileDownloadManager
                           -RebootIfNeeded `
                           -RefreshIntervalMinutes 35 `
                           -ConfigurationFrequency 3 `
-                          -LcmCredential (New-Credential -User $username -Password $password)
+                          -LcmCredential (New-Credential -User $username -Password $password) `
+                          -ErrorAction SilentlyContinue
+
+    if( [Environment]::OSVersion.Version.Major -ge 10 )
+    {
+        Assert-Error ('can''t configure\b.*\bmanager')
+        return
+    }
 
     Assert-NoError 
     Assert-NotNull $lcm
@@ -259,6 +268,8 @@ function Test-ShouldConfigureFileDownloadManager
 
 function Test-ShouldConfigureWebDownloadManager
 {
+    $Global:Error.Clear()
+
     $configID = [Guid]::NewGuid()
     $lcm = Initialize-Lcm -ServerUrl 'http://localhost:8976' `
                           -AllowUnsecureConnection `
@@ -270,7 +281,14 @@ function Test-ShouldConfigureWebDownloadManager
                           -RebootIfNeeded `
                           -RefreshIntervalMinutes 40 `
                           -ConfigurationFrequency 3 `
-                          -LcmCredential (New-Credential -User $username -Password $password)
+                          -LcmCredential (New-Credential -User $username -Password $password) `
+                          -ErrorAction SilentlyContinue
+
+    if( [Environment]::OSVersion.Version.Major -ge 10 )
+    {
+        Assert-Error ('can''t configure\b.*\bmanager')
+        return
+    }
 
     Assert-NoError 
     Assert-NotNull $lcm
@@ -306,34 +324,37 @@ function Test-ShouldConfigureWebDownloadManager
     Assert-Equal 'Pull' $lcm.RefreshMode
 }
 
-function Test-ShouldClearPullValuesWhenSwitchingToPush
+if( [Environment]::OSVersion.Version.Major -lt 10 )
 {
-    $configID = [Guid]::NewGuid()
-    $lcm = Initialize-Lcm -SourcePath $PSScriptRoot `
-                          -ConfigurationID $configID `
-                          -ComputerName 'localhost' `
-                          -AllowModuleOverwrite `
-                          -CertFile $privateKeyPath `
-                          -ConfigurationMode ApplyOnly `
-                          -RebootIfNeeded `
-                          -RefreshIntervalMinutes 45 `
-                          -ConfigurationFrequency 3 `
-                          -LcmCredential (New-Credential -User $username -Password $password)
-    Assert-NoError    
-    Assert-NotNull $lcm
+    function Test-ShouldClearPullValuesWhenSwitchingToPush
+    {
+        $configID = [Guid]::NewGuid()
+        $lcm = Initialize-Lcm -SourcePath $PSScriptRoot `
+                              -ConfigurationID $configID `
+                              -ComputerName 'localhost' `
+                              -AllowModuleOverwrite `
+                              -CertFile $privateKeyPath `
+                              -ConfigurationMode ApplyOnly `
+                              -RebootIfNeeded `
+                              -RefreshIntervalMinutes 45 `
+                              -ConfigurationFrequency 3 `
+                              -LcmCredential (New-Credential -User $username -Password $password)
+        Assert-NoError    
+        Assert-NotNull $lcm
 
-    $lcm = Initialize-Lcm -Push -ComputerName 'localhost'
-    Assert-NoError 
-    Assert-NotNull $lcm
-    Assert-Null $lcm.ConfigurationID
-    Assert-Equal 'False' $lcm.AllowModuleOverwrite
-    Assert-Equal 'False' $lcm.RebootNodeIfNeeded
-    Assert-Equal 'ApplyAndMonitor' $lcm.ConfigurationMode
-    Assert-NotEqual (45 * 3) $lcm.RefreshFrequencyMins
-    Assert-NotEqual 45 $lcm.ConfigurationModeFrequencyMins
-    Assert-Null $lcm.DownloadManagerName
-    Assert-Null $lcm.DownloadManagerCustomData
-    Assert-Null $lcm.Credential
-    Assert-Null $lcm.CertificateID
-    Assert-Equal 'Push' $lcm.RefreshMode
+        $lcm = Initialize-Lcm -Push -ComputerName 'localhost'
+        Assert-NoError 
+        Assert-NotNull $lcm
+        Assert-Null $lcm.ConfigurationID
+        Assert-Equal 'False' $lcm.AllowModuleOverwrite
+        Assert-Equal 'False' $lcm.RebootNodeIfNeeded
+        Assert-Equal 'ApplyAndMonitor' $lcm.ConfigurationMode
+        Assert-NotEqual (45 * 3) $lcm.RefreshFrequencyMins
+        Assert-NotEqual 45 $lcm.ConfigurationModeFrequencyMins
+        Assert-Null $lcm.DownloadManagerName
+        Assert-Null $lcm.DownloadManagerCustomData
+        Assert-Null $lcm.Credential
+        Assert-Null $lcm.CertificateID
+        Assert-Equal 'Push' $lcm.RefreshMode
+    }
 }

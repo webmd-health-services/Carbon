@@ -24,6 +24,8 @@ function Initialize-Lcm
     Push mode is simplest. The LCM only applies configurations that are pushed to it via `Start-DscConfiguration`. It is expected that all resources needed by the LCM are installed and available on the computer. To use `Push` mode, use the `Push` switch.
 
     ## Pull Mode
+
+    ***NOTE: You can't use `Initialize-Lcm` to put the local configuration manager in pull mode on Windows 2016 or later.***
     
     In order to get a computer to pulls its configuration automatically, you need to configure its LCM so it knows where and how to find its DSC pull server. The pull server holds all the resources and modules needed by the computer's configuration.
 
@@ -47,6 +49,8 @@ function Initialize-Lcm
 
     `Initialize-Lcm` is new in Carbon 2.0.
 
+    You cannot use `Initialize-Lcm
+
     .LINK
     New-RsaKeyPair
 
@@ -67,12 +71,12 @@ function Initialize-Lcm
     .EXAMPLE
     Initialize-Lcm -ConfigurationID 'fc2ffe50-13cd-4cd2-9942-d25ac66d6c13' -ComputerName '10.1.2.3' -ServerUrl 'https://10.4.5.6/PSDSCPullServer.dsc'
 
-    Demonstrates the minimum needed to configure a computer (in this case, `10.1.2.3`) to pull its configuration from a DSC web server.
+    Demonstrates the minimum needed to configure a computer (in this case, `10.1.2.3`) to pull its configuration from a DSC web server. You can't do this on Windows 2016 or later.
 
     .EXAMPLE
     Initialize-Lcm -ConfigurationID 'fc2ffe50-13cd-4cd2-9942-d25ac66d6c13' -ComputerName '10.1.2.3' -SourcePath '\\10.4.5.6\DSCResources'
 
-    Demonstrates the minimum needed to configure a computer (in this case, `10.1.2.3`) to pull its configuration from an SMB file share.
+    Demonstrates the minimum needed to configure a computer (in this case, `10.1.2.3`) to pull its configuration from an SMB file share. You can't do this on Windows 2016 or later.
 
     .EXAMPLE
     Initialize-Lcm -CertFile 'D:\Projects\Resources\PrivateKey.pfx' -CertPassword $secureStringPassword -ConfigurationID 'fc2ffe50-13cd-4cd2-9942-d25ac66d6c13' -ComputerName '10.1.2.3' -SourcePath '\\10.4.5.6\DSCResources'
@@ -175,8 +179,16 @@ function Initialize-Lcm
     )
 
     Set-StrictMode -Version 'Latest'
-
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
+    if( $PSCmdlet.ParameterSetName -match '^Pull(File|Web)DownloadManager' )
+    {
+        if( [Environment]::OSVersion.Version.Major -ge 10 )
+        {
+            Write-Error -Message ('Initialize-Lcm can''t configure the local configuration manager to use the file or web download manager on Windows Server 2016 or later.')
+            return
+        }
+    }
 
     if( $CertPassword -and $CertPassword -isnot [securestring] )
     {
