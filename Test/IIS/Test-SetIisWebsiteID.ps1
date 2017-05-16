@@ -35,7 +35,7 @@ function Test-ShouldChangeID
     $currentSite = Get-IisWebsite -SiteName $siteName
     Assert-NotNull $currentSite
 
-    $newID = $currentSite.ID * 3571
+    $newID = [int32](Get-Random -Maximum ([int32]::MaxValue) -Minimum 1)
     Set-IisWebsiteID -SiteName $siteName -ID $newID -ErrorAction SilentlyContinue
 
     $updatedSite = Get-IisWebsite -SiteName $siteName
@@ -81,7 +81,8 @@ function Test-ShouldHandleNonExistentWebsite
 function Test-ShouldSupportWhatIf
 {
     $currentSite = Get-IisWebsite -SiteName $siteName
-    Set-IisWebsiteID -SiteName $siteName -ID ($currentSite.ID * 3571) -WhatIf -ErrorAction SilentlyContinue
+    $newID = [int32](Get-Random -Maximum ([int32]::MaxValue) -Minimum 1)
+    Set-IisWebsiteID -SiteName $siteName -ID $newID -WhatIf -ErrorAction SilentlyContinue
     $updatedsite = Get-IisWebsite -SiteName $siteName
     Assert-Equal $currentSite.ID $updatedsite.ID
 }
