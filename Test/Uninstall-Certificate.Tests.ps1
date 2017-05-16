@@ -170,3 +170,14 @@ Describe 'Uninstall-Certificate.when piped multiple thumbprints' {
     WhenPipedMultipleThumbprints
     ThenCertificateUninstalled
 }
+
+# This test ensures that certificates are uninstalled from LocalMachine stores *first*, since they will also show up in CurrentUser stores and if SYSTEM deletes the certificate in a headless process from the CurrentUser stores first, it will fail.
+
+Describe 'Uninstall-Certificate.when local machine cert shows up in current user store' {
+    GivenAnInstalledCertificate
+    Mock -CommandName 'Get-ChildItem' -ModuleName 'Carbon' -ParameterFilter { $Path.Count -eq 2 -and $Path[0] -eq 'Cert:\LocalMachine' -and $Path[1] -eq 'Cert:\CurrentUser' } 
+    WhenUninstallingByThumbprint
+    It 'should get certificates from LocalMachine stores first' {
+        Assert-MockCalled -CommandName 'Get-ChildItem' -ModuleName 'Carbon' -Times 1
+    }
+}

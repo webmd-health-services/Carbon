@@ -130,7 +130,11 @@ function Uninstall-Certificate
 
         if( $PSCmdlet.ParameterSetName -eq 'ByThumbprint' )
         {
-            Get-ChildItem -Path 'cert:' -Recurse |
+            # Must be in this order. Delete LocalMachine certs *first* so they don't show
+            # up in CurrentUser stores. If you delete a certificate that "cascades" into 
+            # the CurrentUser store first, you'll get errors when running non-
+            # interactively as SYSTEM.
+            Get-ChildItem -Path 'Cert:\LocalMachine','Cert:\CurrentUser' -Recurse |
                 Where-Object { -not $_.PsIsContainer } |
                 Where-Object { $_.Thumbprint -eq $Thumbprint } |
                 ForEach-Object {
