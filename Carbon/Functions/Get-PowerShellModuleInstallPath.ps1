@@ -38,6 +38,11 @@ function Get-PowerShellModuleInstallPath
     $modulePaths = $env:PSModulePath -split ';'
 
     $programFileModulePath = Join-Path -Path $env:ProgramFiles -ChildPath 'WindowsPowerShell\Modules'
+    if( (Test-Path -Path 'Env:\ProgramW6432') )
+    {
+        $programFileModulePath = Join-Path -Path $env:ProgramW6432 -ChildPath 'WindowsPowerShell\Modules'
+    }
+
     $installRoot = $modulePaths | 
                         Where-Object { $_.TrimEnd('\') -eq $programFileModulePath } |
                         Select-Object -First 1
@@ -46,7 +51,7 @@ function Get-PowerShellModuleInstallPath
         return $programFileModulePath
     }
 
-    $psHomeModulePath = Join-Path -Path $PSHOME -ChildPath 'Modules'
+    $psHomeModulePath = Join-Path -Path $env:SystemRoot -ChildPath 'system32\WindowsPowerShell\v1.0\Modules'
 
     $installRoot = $modulePaths | 
                         Where-Object { $_.TrimEnd('\') -eq $psHomeModulePath } |

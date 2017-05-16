@@ -16,6 +16,10 @@ Set-StrictMode -Version 'Latest'
 
 describe 'Get-PowerShellModuleInstallPath' {
     $programFilesModulePath = Join-Path -Path $env:ProgramFiles -ChildPath 'WindowsPowerShell\Modules'
+    if( (Test-Path -Path 'Env:\ProgramW6432') )
+    {
+        $programFilesModulePath = Join-Path -Path $env:ProgramW6432 -ChildPath 'WindowsPowerShell\Modules'
+    }
     $psHomeModulePath = Join-Path -Path $env:SystemRoot -ChildPath 'system32\WindowsPowerShell\v1.0\Modules'
 
     BeforeEach {

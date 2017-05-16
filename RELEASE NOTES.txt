@@ -17,6 +17,7 @@
  * The `Carbon_ScheduledTask` DSC resource doesn't correctly detect when a task's identity has changed (it wasn't converting usernames to their canonical representation before comparing the existing identity with the desired identity).
  * Fixed: Importing Carbon in 32-bit PowerShell fails on a 64-bit operating system. DSC isn't available so the `Initialize-Lcm` function can't be exported. Thanks to [Anders Andersson](https://bitbucket.org/McAndersDK/) for contribuging the fix.
  * Fixed: `Install-Service` and `Carbon_Service` DSC resource fail to change the identity a service runs as if switching from a custom account to the default `NetworkService` account.
+ * Fixed: `Get-PowerShellModuleInstallPath` returns nothing when run under 32-bit (x86) PowerShell on 64-bit Windows.
  
 
 # 2.4.1 (21 February 2017)
