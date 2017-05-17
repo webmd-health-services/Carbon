@@ -102,12 +102,14 @@ function Install-Certificate
     
     if( $PSCmdlet.ParameterSetName -like 'FromFile*' )
     {   
-        $Path = Resolve-Path -Path $Path
-        if( -not $Path )
+        $resolvedPath = Resolve-Path -Path $Path        
+        if( -not $resolvedPath )
         {
             return
         }
 
+        $Path = $resolvedPath.ProviderPath
+        
         $fileBytes = [IO.File]::ReadAllBytes($Path)
         $encodedCert = [Convert]::ToBase64String( $fileBytes )
 
