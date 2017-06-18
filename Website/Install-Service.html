@@ -23,9 +23,11 @@
 </div>
 
 <h2>Syntax</h2>
-<pre class="Syntax"><code>Install-Service -Name &lt;String&gt; -Path &lt;String&gt; [-ArgumentList &lt;String[]&gt;] [-StartupType {Boot | System | Automatic | Manual | Disabled}] [-OnFirstFailure {TakeNoAction | Restart | Reboot | RunCommand}] [-OnSecondFailure {TakeNoAction | Restart | Reboot | RunCommand}] [-OnThirdFailure {TakeNoAction | Restart | Reboot | RunCommand}] [-ResetFailureCount &lt;Int32&gt;] [-RestartDelay &lt;Int32&gt;] [-RebootDelay &lt;Int32&gt;] [-Dependency &lt;String[]&gt;] [-Command &lt;String&gt;] [-RunCommandDelay &lt;Int32&gt;] [-Description &lt;String&gt;] [-DisplayName &lt;String&gt;] [-Force] [-PassThru] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
-<pre class="Syntax"><code>Install-Service -Name &lt;String&gt; -Path &lt;String&gt; [-ArgumentList &lt;String[]&gt;] [-StartupType {Boot | System | Automatic | Manual | Disabled}] [-OnFirstFailure {TakeNoAction | Restart | Reboot | RunCommand}] [-OnSecondFailure {TakeNoAction | Restart | Reboot | RunCommand}] [-OnThirdFailure {TakeNoAction | Restart | Reboot | RunCommand}] [-ResetFailureCount &lt;Int32&gt;] [-RestartDelay &lt;Int32&gt;] [-RebootDelay &lt;Int32&gt;] [-Dependency &lt;String[]&gt;] [-Command &lt;String&gt;] [-RunCommandDelay &lt;Int32&gt;] [-Description &lt;String&gt;] [-DisplayName &lt;String&gt;] -UserName &lt;String&gt; [-Password &lt;String&gt;] [-Force] [-PassThru] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
-<pre class="Syntax"><code>Install-Service -Name &lt;String&gt; -Path &lt;String&gt; [-ArgumentList &lt;String[]&gt;] [-StartupType {Boot | System | Automatic | Manual | Disabled}] [-OnFirstFailure {TakeNoAction | Restart | Reboot | RunCommand}] [-OnSecondFailure {TakeNoAction | Restart | Reboot | RunCommand}] [-OnThirdFailure {TakeNoAction | Restart | Reboot | RunCommand}] [-ResetFailureCount &lt;Int32&gt;] [-RestartDelay &lt;Int32&gt;] [-RebootDelay &lt;Int32&gt;] [-Dependency &lt;String[]&gt;] [-Command &lt;String&gt;] [-RunCommandDelay &lt;Int32&gt;] [-Description &lt;String&gt;] [-DisplayName &lt;String&gt;] -Credential &lt;PSCredential&gt; [-Force] [-PassThru] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
+<pre class="Syntax"><code>Install-Service -Name &lt;String&gt; -Path &lt;String&gt; [-ArgumentList &lt;String[]&gt;] [-StartupType {Boot | System | Automatic | Manual | Disabled}] [-Delayed] [-OnFirstFailure {TakeNoAction | Restart | Reboot | RunCommand}] [-OnSecondFailure {TakeNoAction | Restart | Reboot | RunCommand}] [-OnThirdFailure {TakeNoAction | Restart | Reboot | RunCommand}] [-ResetFailureCount &lt;Int32&gt;] [-RestartDelay &lt;Int32&gt;] [-RebootDelay &lt;Int32&gt;] [-Dependency &lt;String[]&gt;] [-Command &lt;String&gt;] [-RunCommandDelay &lt;Int32&gt;] [-Description &lt;String&gt;] [-DisplayName &lt;String&gt;] [-Force] [-PassThru] [-EnsureRunning] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
+<pre class="Syntax"><code></code></pre>
+<pre class="Syntax"><code>Install-Service -Name &lt;String&gt; -Path &lt;String&gt; [-ArgumentList &lt;String[]&gt;] [-StartupType {Boot | System | Automatic | Manual | Disabled}] [-Delayed] [-OnFirstFailure {TakeNoAction | Restart | Reboot | RunCommand}] [-OnSecondFailure {TakeNoAction | Restart | Reboot | RunCommand}] [-OnThirdFailure {TakeNoAction | Restart | Reboot | RunCommand}] [-ResetFailureCount &lt;Int32&gt;] [-RestartDelay &lt;Int32&gt;] [-RebootDelay &lt;Int32&gt;] [-Dependency &lt;String[]&gt;] [-Command &lt;String&gt;] [-RunCommandDelay &lt;Int32&gt;] [-Description &lt;String&gt;] [-DisplayName &lt;String&gt;] -UserName &lt;String&gt; [-Password &lt;String&gt;] [-Force] [-PassThru] [-EnsureRunning] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
+<pre class="Syntax"><code></code></pre>
+<pre class="Syntax"><code>Install-Service -Name &lt;String&gt; -Path &lt;String&gt; [-ArgumentList &lt;String[]&gt;] [-StartupType {Boot | System | Automatic | Manual | Disabled}] [-Delayed] [-OnFirstFailure {TakeNoAction | Restart | Reboot | RunCommand}] [-OnSecondFailure {TakeNoAction | Restart | Reboot | RunCommand}] [-OnThirdFailure {TakeNoAction | Restart | Reboot | RunCommand}] [-ResetFailureCount &lt;Int32&gt;] [-RestartDelay &lt;Int32&gt;] [-RebootDelay &lt;Int32&gt;] [-Dependency &lt;String[]&gt;] [-Command &lt;String&gt;] [-RunCommandDelay &lt;Int32&gt;] [-Description &lt;String&gt;] [-DisplayName &lt;String&gt;] -Credential &lt;PSCredential&gt; [-Force] [-PassThru] [-EnsureRunning] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
 
 <h2>Description</h2>
 <div class="Description">
@@ -39,7 +41,7 @@
 
 <p><a href="http://technet.microsoft.com/en-us/library/dd548356.aspx">Managed service accounts and virtual accounts</a> should be supported (we don't know how to test, so can't be sure).  Simply omit the <code>-Password</code> parameter when providing a custom account name with the <code>-Username</code> parameter.</p>
 
-<p><code>Manual</code> services are not started. <code>Automatic</code> services are started after installation. If an existing manual service is running when configuration begins, it is re-started after re-configured.</p>
+<p><code>Manual</code> services are not started. <code>Automatic</code> services are started after installation. If an existing manual service is running when configuration begins, it is re-started after re-configured. If a service is stopped when configuration begins, it remains stopped when configuration ends. To start the service if it is stopped, use the <code>-EnsureRunning</code> switch (which was added in version 2.5.0).</p>
 
 <p>The ability to provide service arguments/parameters via the <code>ArgumentList</code> parameter was added in Carbon 2.0.</p>
 </div>
@@ -90,10 +92,22 @@
 <tr valign='top'>
 	<td>StartupType</td>
 	<td><a href="http://msdn.microsoft.com/en-us/library/system.serviceprocess.servicestartmode.aspx">ServiceStartMode</a></td>
-	<td class="ParamDescription"><p>The startup type: automatic, manual, or disabled.  Default is automatic.</p></td>
+	<td class="ParamDescription"><p>The startup type: automatic, manual, or disabled.  Default is automatic.</p>
+
+<p>To start the service as automatic delayed, use the <code>-Delayed</code> switch and set this parameter to <code>Automatic</code>. The ability to set a service's startup type to automatic delayed was added in Carbon 2.5.</p></td>
 	<td>false</td>
 	<td>false</td>
     <td>Automatic</td>
+</tr>
+<tr valign='top'>
+	<td>Delayed</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+	<td class="ParamDescription"><p>When the startup type is automatic, further configure the service start type to be automatic delayed. This parameter is ignored unless <code>StartupType</code> is <code>Automatic</code>.</p>
+
+<p>This switch was added in Carbon 2.5.</p></td>
+	<td>false</td>
+	<td>false</td>
+    <td>False</td>
 </tr>
 <tr valign='top'>
 	<td>OnFirstFailure</td>
@@ -230,6 +244,14 @@
     <td>False</td>
 </tr>
 <tr valign='top'>
+	<td>EnsureRunning</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+	<td class="ParamDescription"><p>Start the service after install/configuration if it is not running. This parameter was added in Carbon 2.5.0.</p></td>
+	<td>false</td>
+	<td>false</td>
+    <td>False</td>
+</tr>
+<tr valign='top'>
 	<td>WhatIf</td>
 	<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
 	<td class="ParamDescription"></td>
@@ -271,18 +293,28 @@
 
 
 <h2>EXAMPLE 3</h2>
+<pre><code>Install-Service -Name DeathStar -Path C:\ALongTimeAgo\InAGalaxyFarFarAway\DeathStar.exe -StartupType Automatic -Delayed</code></pre>
+<p>Demonstrates how to set a service startup typemode to automatic delayed. Set the <code>StartupType</code> parameter to <code>Automatic</code> and provide the <code>Delayed</code> switch. This behavior was added in Carbon 2.5.</p>
+
+
+<h2>EXAMPLE 4</h2>
 <pre><code>Install-Service -Name DeathStar -Path C:\ALongTimeAgo\InAGalaxyFarFarAway\DeathStar.exe -Credential $tarkinCredentials</code></pre>
 <p>Installs the Death Star service to run as Grand Moff Tarkin, who is given the log on as a service right.</p>
 
 
-<h2>EXAMPLE 4</h2>
+<h2>EXAMPLE 5</h2>
 <pre><code>Install-Service -Name DeathStar -Path C:\ALongTimeAgo\InAGalaxyFarFarAway\DeathStar.exe -Username SYSTEM</code></pre>
 <p>Demonstrates how to install a service to run as a system account other than <code>NetworkService</code>. Installs the DeathStart service to run as the local <code>System</code> account.</p>
 
 
-<h2>EXAMPLE 5</h2>
+<h2>EXAMPLE 6</h2>
 <pre><code>Install-Service -Name DeathStar -Path C:\ALongTimeAgo\InAGalaxyFarFarAway\DeathStar.exe -OnFirstFailure RunCommand -RunCommandDelay 5000 -Command 'engage_hyperdrive.exe "Corruscant"' -OnSecondFailure Restart -RestartDelay 30000 -OnThirdFailure Reboot -RebootDelay 120000 -ResetFailureCount (60*60*24)</code></pre>
 <p>Demonstrates how to control the service's failure actions. On the first failure, Windows will run the <code>engage-hyperdrive.exe "Corruscant"</code> command after 5 seconds (<code>5,000</code> milliseconds). On the second failure, Windows will restart the service after 30 seconds (<code>30,000</code> milliseconds). On the third failure, Windows will reboot after two minutes (<code>120,000</code> milliseconds). The failure count gets reset once a day (<code>60*60*24</code> seconds).</p>
+
+
+<h2>EXAMPLE 7</h2>
+<pre><code>Install-Service -Name DeathStar -Path C:\ALongTimeAgo\InAGalaxyFarFarAway\DeathStar.exe -EnsureRunning</code></pre>
+<p>Demonstrates how to ensure a service gets started after installation/configuration. Normally, <code>Install-Service</code> leaves the service in whatever state the service was in. The <code>EnsureRunnnig</code> switch will attempt to start the service even if it was stopped to begin with.</p>
 
 
 	<div class="Footer">

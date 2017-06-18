@@ -17,7 +17,33 @@
         <li><a href="http://bitbucket.org/splatteredbits/carbon">-Project</a></li>
     </ul>
 
-    <h1>2.4.1 (21 February 2017)</h1>
+    <h1>2.5.0 (18 June 2017)</h1>
+
+<h2>Enhancements</h2>
+
+<ul>
+<li>Added <code>DelayedAutoStart</code> boolean property to objects returned by <a href="Get-ServiceConfiguration.html">Get-ServiceConfiguration</a>. This flag is <code>true</code> when a service is set to start automatically, delayed. <code>False</code> otherwise. Added extended </li>
+<li>The <a href="Install-Service.html">Install-Service</a> function and the <code>Carbon_Service</code> DSC resource can now set a service's startup type to <code>Automatic (Delayed)</code>. Pass <code>Automatic</code> to the <code>StartupType</code> parameter and use the new <code>Delayed</code> switch. The <code>Delayed</code> switch is ignored unless <code>StartupType</code> is <code>Automatic</code>. Fixes <a href="https://bitbucket.org/splatteredbits/carbon/issues/216/community-add-automaticdelayed-in">issue #216</a>.</li>
+<li>The <a href="Uninstall-Certificate.html">Uninstall-Certificate</a> function can now delete a certificate by just its thumbprint. The certificate will be uninstalled from <em>all</em> stores. You can pipe the thumbprint or a certificate object to <a href="Uninstall-Certificate.html">Uninstall-Certificate</a>.</li>
+<li>Added an <code>EnsureRunning</code> switch to <a href="Install-Service.html">Install-Service</a> function to ensure that any service is started after configuring. (By default, <a href="Install-Service.html">Install-Service</a> leaves a service stopped if it was stopped when <a href="Install-Service.html">Install-Service</a> begins.)</li>
+<li>Added <code>IsSymbolicLink</code> extended type property to directory and file objects (i.e. <code>System.IO.DirectoryInfo</code> and <code>System.IO.FileInfo</code> objects).</li>
+<li>Added <code>TargetPath</code> extended type property to file (i.e. <code>System.IO.FileInfo</code>) objects. If a file is a symbolic link, this property will return the file the link points to.</li>
+<li>The <code>TargetPath</code> extended type property on directory (i.e. `System.IO.DirectoryInfo) objects now returns target paths when a directory is a symbolic link.</li>
+<li><code>Initiazlie-Lcm</code> can't be used on Windows Server 2016 and later to put the DSC local configuration manager into pull mode. <a href="Initialize-Lcm.html">Initialize-Lcm</a> now writes an error when you try.</li>
+</ul>
+
+<h2>Bug Fixes</h2>
+
+<ul>
+<li><a href="Install-Service.html">Install-Service</a> and the <code>Carbon_Service</code> DSC resource write errors when a service is running and its startup type is changed to <code>Disabled</code>.</li>
+<li>The <code>Carbon_ScheduledTask</code> DSC resource writes incorrect information to verbose log when the current and desired credential for the scheduled task are different.</li>
+<li>The <code>Carbon_ScheduledTask</code> DSC resource doesn't correctly detect when a task's identity has changed (it wasn't converting usernames to their canonical representation before comparing the existing identity with the desired identity).</li>
+<li>Fixed: Importing Carbon in 32-bit PowerShell fails on a 64-bit operating system. DSC isn't available so the <a href="Initialize-Lcm.html">Initialize-Lcm</a> function can't be exported. Thanks to <a href="https://bitbucket.org/McAndersDK/">Anders Andersson</a> for contribuging the fix.</li>
+<li>Fixed: <a href="Install-Service.html">Install-Service</a> and <code>Carbon_Service</code> DSC resource fail to change the identity a service runs as if switching from a custom account to the default <code>NetworkService</code> account.</li>
+<li>Fixed: <a href="Get-PowerShellModuleInstallPath.html">Get-PowerShellModuleInstallPath</a> returns nothing when run under 32-bit (x86) PowerShell on 64-bit Windows.Fixed: <a href="Get-PowerShellModuleInstallPath.html">Get-PowerShellModuleInstallPath</a> returns nothing when run under 32-bit (x86) PowerShell on 64-bit Windows.</li>
+</ul>
+
+<h1>2.4.1 (21 February 2017)</h1>
 
 <h2>Bug Fixes</h2>
 
@@ -26,7 +52,7 @@
 <li>Fixed: <a href="Protect-String.html">Protect-String</a> doesn't convert secure strings properly so they get encrypted with extra bytes in them.</li>
 <li>Fixed: `Revoke-Permission' fails when an identity has multiple access control entries on an item. Thanks to <a href="https://bitbucket.org/bozho_/">bozho_</a> for reporting <a href="https://bitbucket.org/splatteredbits/carbon/issues/221/community-revoke-permission-fails-if-the">issue #221</a> and contributing the fix.</li>
 <li>Fixed: <a href="Compress-Item.html">Compress-Item</a>' writes an error when using the <code>WhatIf</code> switch.</li>
-<li>Fixed: <a href="Install-IisWebsite.html">Install-IisWebsite</a> help examples contain invalid/broken code (thanks to John Mitchell for reporting).</li>
+<li>Fixed: <code>Install-IisWebsite</code> help examples contain invalid/broken code (thanks to John Mitchell for reporting).</li>
 <li>Fixed: <a href="Install-Service.html">Install-Service</a> fails when password contains double quote character, i.e. <code>"</code> (fixes <a href="https://bitbucket.org/splatteredbits/carbon/issues/219/community-install-service-fails-to">issue #219</a>).</li>
 <li>Fixed: <a href="Read-File.html">Read-File</a> and <a href="Write-File.html">Write-File</a> fail to retry writing to a locked file when <code>$Global:Error</code> is full. Fixes <a href="https://bitbucket.org/splatteredbits/carbon/issues/217/community-error-handling-in-read-file-and">issue #217</a>. </li>
 <li>Fixed: <a href="Get-FirewallRule.html">Get-FirewallRule</a> sets the <code>EdgeTraversalPolicy</code> to <code>DeferUser</code> on rules whose policy is "defer to application". </li>
@@ -92,7 +118,7 @@
 <li>Fixed: Can't import Carbon in a 32-bit PowerShell 4 session on a 64-bit operating system (<a href="https://bitbucket.org/splatteredbits/carbon/issues/199/community-issue-importing-carbon-on-x64">fixes issue #199</a>).</li>
 <li>Fixed: Documentation for the <a href="Install-ScheduledTask.html">Install-ScheduledTask</a> function's <code>HighestAvailableRunLevel</code> is lying (<a href="https://bitbucket.org/splatteredbits/carbon/issues/205/documentation-install-scheduledtask-typo">fixes issue #205</a>).</li>
 <li>Fixed: <code>Carbon_FirewallRule</code> fails when <code>Profile</code> property set to multiple values (<a href="https://bitbucket.org/splatteredbits/carbon/issues/209/dsc-carbon_firewallrule-does-not-accept">fixes issue #209</a>).</li>
-<li>Fixed: <a href="Install-IisAppPool.html">Install-IisAppPool</a> can't set .NET framework version to <code>No Managed Code</code> (<a href="https://bitbucket.org/splatteredbits/carbon/issues/210/install-iisapppool-need-to-be-able-to-set">fixes issue #210</a>).</li>
+<li>Fixed: <code>Install-IisAppPool</code> can't set .NET framework version to <code>No Managed Code</code> (<a href="https://bitbucket.org/splatteredbits/carbon/issues/210/install-iisapppool-need-to-be-able-to-set">fixes issue #210</a>).</li>
 <li>Fixed: <a href="Get-SslCertificateBinding.html">Get-SslCertificateBinding</a> fails if the operating system's culture is not <code>en-US</code> (<a href="https://bitbucket.org/splatteredbits/carbon/issues/171/get-sslcertificatebinding-fails-when-os">fixes issue #171</a>).</li>
 <li>Fixed: <a href="Install-ScheduledTask.html">Install-ScheduledTask</a> fails when creating a task that runs during a specific week of the month on Sundays. (You're going to love this: the underlying int value for <code>[DayOfWeek]::Sunday</code> is <code>0</code>, so when testing if a <code>DayOfWeek</code> typed variable set to <code>Sunday</code> has a value, it returns <code>$false</code>. This made <a href="Install-ScheduledTask.html">Install-ScheduledTask</a> add the <code>/D</code> parameter without a value.</li>
 </ul>
@@ -284,8 +310,8 @@
 <li><a href="Grant-Permission.html">Grant-Permission</a> now writes an error if you don't have access to a private key. Previously, it would skip the key without any messages.</li>
 <li><a href="Install-Msi.html">Install-Msi</a> (fka <a href="Install-Msi.html">Invoke-WindowsInstaller</a>) now only installs the MSI if it isn't already installed. To preserve the previous behavior and always install, add the <code>-Force</code> switch to all <a href="Install-Msi.html">Invoke-WindowsInstaller</a>[Install-Msi](Install-Msi.html) usages.</li>
 <li>All IIS functions were re-written to use the <code>Microsoft.Web.Administration</code> API instead of <code>appcmd.exe</code>.</li>
-<li><a href="Install-IisWebsite.html">Install-IisWebsite</a> no longer deletes and re-creates websites. If a website exists, it updates its configuration to match parameters passed in. To preserve previous behavior and delete the website before installing, use the <code>-Force</code> switch.</li>
-<li><a href="Install-IisVirtualDirectory.html">Install-IisVirtualDirectory</a> no longer deletes and re-creates virtual directories. If a virtual directory exists, its configuration is updated in place. To preserve previous behavior and delete the virtual directory before installing, use the <code>Force</code> switch.</li>
+<li><code>Install-IisWebsite</code> no longer deletes and re-creates websites. If a website exists, it updates its configuration to match parameters passed in. To preserve previous behavior and delete the website before installing, use the <code>-Force</code> switch.</li>
+<li><code>Install-IisVirtualDirectory</code> no longer deletes and re-creates virtual directories. If a virtual directory exists, its configuration is updated in place. To preserve previous behavior and delete the virtual directory before installing, use the <code>Force</code> switch.</li>
 <li><a href="Install-FileShare.html">Install-FileShare</a> (fka <a href="Install-FileShare.html">Install-SmbShare</a>) no longer deletes and re-creates the share, instead it modifies existing shares in place. To preserve previous behavior and delete existing shares before re-creating, use the <code>Force</code> switch.</li>
 <li><a href="Set-RegistryKeyValue.html">Set-RegistryKeyValue</a> only sets the value if the value doesn't exist or the current value is different than the desired value.</li>
 </ul>
@@ -389,8 +415,8 @@
 <li><a href="Grant-ComPermission.html">Grant-ComPermission</a>: <code>Carbon.Security.ComAccessRule</code>, representing the granted permission.</li>
 <li><a href="Grant-Permission.html">Grant-Permission</a>: <code>System.Security.AccessControl.AccessRule</code>, representing the granted permission.</li>
 <li><a href="Install-Group.html">Install-Group</a>: <code>System.DirectoryServices.AccountManagement.GroupPrincipal</code>, representing the group. </li>
-<li><a href="Install-IisApplication.html">Install-IisApplication</a>: <code>Microsoft.Web.Administration.Application</code>, representing the application.</li>
-<li><a href="Install-IisWebsite.html">Install-IisWebsite</a>: <code>Microsoft.Web.Administration.Site</code>, representing the website.</li>
+<li><code>Install-IisApplication</code>: <code>Microsoft.Web.Administration.Application</code>, representing the application.</li>
+<li><code>Install-IisWebsite</code>: <code>Microsoft.Web.Administration.Site</code>, representing the website.</li>
 <li><a href="Install-Junction.html">Install-Junction</a>: <code>System.IO.DirectoryInfo</code>, representing new target directories and any new/updated junctions.</li>
 <li><a href="Install-Service.html">Install-Service</a>: <code>System.ServiceProcess.ServiceController</code>, representing the service.</li>
 <li><a href="Install-User.html">Install-User</a>: <code>System.DirectoryServices.AccountManagement.UserPrincipal</code>, representing the user.</li>
@@ -416,7 +442,7 @@
 
 <ul>
 <li><a href="Complete-Job.html">Complete-Job</a>: It's total crap. Use PowerShell's <code>Wait-Job</code> cmdlet instead.</li>
-<li><a href="Invoke-AppCmd.html">Invoke-AppCmd</a>: Switch to Carbon's IIS functions, or use <a href="Get-IisConfigurationSection.html">Get-IisConfigurationSection</a> to get <code>ConfigurationElement</code> objects from the <code>Microsoft.Web.Administration</code> API that you can modify.</li>
+<li><a href="Invoke-AppCmd.html">Invoke-AppCmd</a>: Switch to Carbon's IIS functions, or use <code>Get-IisConfigurationSection</code> to get <code>ConfigurationElement</code> objects from the <code>Microsoft.Web.Administration</code> API that you can modify.</li>
 <li><a href="Resolve-NetPath.html">Resolve-NetPath</a>: Switch to something else. Carbon doesn't use <code>net.exe</code> anymore.</li>
 </ul>
 
@@ -454,7 +480,7 @@
 <h3>Miscellaneous Changes</h3>
 
 <ul>
-<li><a href="Get-IisAppPool.html">Get-IisAppPool</a>
+<li><code>Get-IisAppPool</code>
 <ul>
 <li>Now return all application pools installed on the local computer when called with no parameters.</li>
 <li>Added a default table format for <code>Microsoft.Web.Administration.ApplicationPool</code> objects.</li>
@@ -468,9 +494,9 @@
 <li><a href="Grant-Permission.html">Grant-Permission</a> now only grants permissions on an object if those permissions aren't present.  To preserve previous behavior, add the <code>-Force</code> switch to all <a href="Grant-Permission.html">Grant-Permission</a> usages.</li>
 <li><code>Install-Certificate's</code> <code>Exportable</code> switch is now only allowed when installing a certificate from a file. Previously, you could supply the switch when installing from an X509Certificate2 object but it was ignored.</li>
 <li><code>Install-Group's</code> <code>Members</code> parameter renamed to <code>Member</code> (with backwards-compatible alias).</li>
-<li>Added <code>Credential</code> parameter to <a href="Install-IisAppPool.html">Install-IisAppPool</a> for increased security and to follow PowerShell guidelines.</li>
-<li><a href="Install-IisVirtualDirectory.html">Install-IisVirtualDirectory</a> no longer deletes and re-creates existing virtual directories, but modifies existing virtual directories in place.</li>
-<li><a href="Install-IisWebsite.html">Install-IisWebsite</a>
+<li>Added <code>Credential</code> parameter to <code>Install-IisAppPool</code> for increased security and to follow PowerShell guidelines.</li>
+<li><code>Install-IisVirtualDirectory</code> no longer deletes and re-creates existing virtual directories, but modifies existing virtual directories in place.</li>
+<li><code>Install-IisWebsite</code>
 <ul>
 <li>Added <code>SiteID</code> parameter tfor setting a website's IIS ID.</li>
 <li>No longer deletes and re-creates websites, but modifies existing websites in place. This may or may not be a breaking change in your environment.</li>
@@ -573,23 +599,23 @@
 <li>Starting the service now respects caller's error action preference. Before, <code>Start-Service</code> would write an error even if somone called <a href="Install-Service.html">Install-Service</a> with an <code>Ignore</code> or <code>SilentlyContinue</code> error action preference.</li>
 </ul></li>
 <li>New <a href="Test-TypeDataMember.html">Test-TypeDataMember</a> for testing if a type has an extended type member defined.</li>
-<li><a href="Install-IisAppPool.html">Install-IisAppPool</a> no longer returns appcmd.exe output.</li>
-<li>Added <code>PassThru</code> parameter to <a href="Install-IisAppPool.html">Install-IisAppPool</a> to control when a <code>Microsoft.Web.Administration.ApplicationPool</code> for the installed app pool is returned.</li>
+<li><code>Install-IisAppPool</code> no longer returns appcmd.exe output.</li>
+<li>Added <code>PassThru</code> parameter to <code>Install-IisAppPool</code> to control when a <code>Microsoft.Web.Administration.ApplicationPool</code> for the installed app pool is returned.</li>
 <li><a href="Get-ServiceConfiguration.html">Get-ServiceConfiguration</a> and Carbon's extended type data for <code>System.ServiceProcess.ServiceController</code> objects now supports services from remote computers.</li>
 <li><a href="Uninstall-ScheduledTask.html">Uninstall-ScheduledTask</a> now retries when un-installing a task fails with "The function attempted to use a name that is reserved for use by another transaction." error.</li>
 <li>Added new <code>FileIndex</code>, <code>LinkCount</code>, and <code>VolumeSerialNumber</code> extended type data on <code>System.IO.FileInfo</code> objects for getting a file's index, its hard link count, and volume serial number, respectively.</li>
 <li><a href="Grant-Permission.html">Grant-Permission</a> now only returns an access rule object when the new <code>PassThru</code> switch is used. In previous 2.0 alpha releases, it only returned something when permissions on an object were added or changed.</li>
 <li><a href="Install-User.html">Install-User</a> only returns a user object when the new <code>PassThru</code> switch is used. In previous 2.0 alpha releases, it only returned an object if a user was created or updated.</li>
 <li><a href="Grant-ComPermission.html">Grant-ComPermissions</a> only returns an access rule object when the new <code>PassThru</code> switch is used. In previous 2.0 alpha releases, it only returned an object if permissions were changed.</li>
-<li><a href="Install-IisApplication.html">Install-IisApplication</a> only returns an IIS application object when the new <code>PassThru</code> switch is used. In previous 2.0 alpha releases, it only returned an object if the application was created or modified.</li>
+<li><code>Install-IisApplication</code> only returns an IIS application object when the new <code>PassThru</code> switch is used. In previous 2.0 alpha releases, it only returned an object if the application was created or modified.</li>
 <li>Created <a href="Get-Msi.html">Get-Msi</a> function for reading MSI information and properties from an MSI file.</li>
 <li><code>Carbon.Computer.ProgramInstallInfo</code> objects (returned from <a href="Get-ProgramInstallInfo.html">Get-ProgramInstallInfo</a>) now have <code>ProductCode</code> and <code>User</code> properties. If a program doesn't have a product code, it is set to <code>[Guid]::Empty</code>. The <code>User</code> property is only set for per-user software installs.</li>
 <li><a href="Install-Msi.html">Invoke-WindowsInstaller</a> renamed <a href="Install-Msi.html">Install-Msi</a>, with a backwards-compatibility-preserving alias.</li>
 <li><a href="Install-Msi.html">Install-Msi</a> now supports wildcards for MSI path to install.</li>
 <li><a href="Install-Msi.html">Install-Msi</a> now only installs an MSI if it isn't already installed. To preserve the previous behavior and always install, add the <code>-Force</code> switch to all <a href="Install-Msi.html">Invoke-WindowsInstaller</a>[Install-Msi](Install-Msi.html) usages.</li>
-<li>Added <code>SiteID</code> parameter to <a href="Install-IisWebsite.html">Install-IisWebsite</a> for setting a website's IIS ID.</li>
+<li>Added <code>SiteID</code> parameter to <code>Install-IisWebsite</code> for setting a website's IIS ID.</li>
 <li>Put the <a href="Resolve-IdentityName.html">Resolve-IdentityName</a> function back. It was removed from previous alpha releases.</li>
-<li><a href="Install-IisWebsite.html">Install-IisWebsite</a> no longer deletes and re-creates websites. This may or may not be a breaking change in your environment.</li>
+<li><code>Install-IisWebsite</code> no longer deletes and re-creates websites. This may or may not be a breaking change in your environment.</li>
 <li><a href="Install-FileShare.html">Install-SmbShare</a> no longer returns net.exe output, instead writing it to the verbose stream. To see previous output, use the <code>-Verbose</code> switch.</li>
 <li>Changed <code>-PasswordNeverExpires</code> switch to  <code>PasswordExpires</code> on <a href="Install-User.html">Install-User</a> for improved backwards-compatability.</li>
 <li><a href="Set-SslCertificateBinding.html">Set-SslCertificateBinding</a> no longer returns binding objects by default. Use new <code>PassThru</code> switch to get the old behavior.</li>
@@ -597,10 +623,10 @@
 <li>The Carbon NuGet package now supports installing and uninstalling using Chocolatey.</li>
 <li>Added <code>AsSecureString</code> switch to <a href="Unprotect-String.html">Unprotect-String</a> which causes <a href="Unprotect-String.html">Unprotect-String</a> to return a secure string instead of a normal string.</li>
 <li><a href="Unprotect-String.html">Unprotect-String</a> now accepts a <code>SecureString</code> as the value for the <code>Password</code> parameter, which is the password for the private key used to decrypt from password-protected RSA certificate file.</li>
-<li>Added <code>Credential</code> parameter to <a href="Install-IisAppPool.html">Install-IisAppPool</a> for increased security and to follow PowerShell guidelines.</li>
+<li>Added <code>Credential</code> parameter to <code>Install-IisAppPool</code> for increased security and to follow PowerShell guidelines.</li>
 <li>Added <code>Credential</code> parameter to <a href="Install-User.html">Install-User</a> for increased security and to follow PowerShell guidelines.</li>
-<li><a href="Install-IisVirtualDirectory.html">Install-IisVirtualDirectory</a> now modifies existing virtual directories in place, instead of deleting and re-creating.</li>
-<li><a href="Invoke-AppCmd.html">Invoke-AppCmd</a> is now obsolete and will be removed from a future version of Carbon. Switch to Carbon's IIS functions, or use <a href="Get-IisConfigurationSection.html">Get-IisConfigurationSection</a> to get <code>ConfigurationElement</code> objects from the <code>Microsoft.Web.Administration</code> API that you can modify.</li>
+<li><code>Install-IisVirtualDirectory</code> now modifies existing virtual directories in place, instead of deleting and re-creating.</li>
+<li><a href="Invoke-AppCmd.html">Invoke-AppCmd</a> is now obsolete and will be removed from a future version of Carbon. Switch to Carbon's IIS functions, or use <code>Get-IisConfigurationSection</code> to get <code>ConfigurationElement</code> objects from the <code>Microsoft.Web.Administration</code> API that you can modify.</li>
 <li>Added <code>Description</code> and <code>DisplayName</code> properties to <code>Carbon_Service</code> for setting a service's description and display name.</li>
 <li><a href="Grant-Permission.html">Grant-Permission</a> now writes an error if you don't have access to a private key. Previously, it would skip the key without any messages.</li>
 <li><a href="Resolve-Identity.html">Resolve-Identity</a> now converts SIDs to a <code>Carbon.Identity</code> object. The SID may be a string (SID in SDDL form), byte array, or a <code>SecurityIdentifier</code> object.</li>
@@ -645,7 +671,7 @@
 <h3>IIS</h3>
 
 <ul>
-<li><a href="Get-IisMimeMap.html">Get-IisMimeMap</a>, <a href="Remove-IisMimeMap.html">Remove-IisMimeMap</a>, and <a href="Set-IisMimeMap.html">Set-IisMimeMap</a> now support managing MIME types for websites, virtual directories, and applications.</li>
+<li><code>Get-IisMimeMap</code>, <code>Remove-IisMimeMap</code>, and <code>Set-IisMimeMap</code> now support managing MIME types for websites, virtual directories, and applications.</li>
 </ul>
 
 <h3>Scheduled Tasks</h3>
@@ -714,18 +740,18 @@
 <li><a href="Convert-XmlFile.html">Convert-XmlFile</a></li>
 <li><a href="Disable-FirewallStatefulFtp.html">Disable-FirewallStatefulFtp</a></li>
 <li><a href="Disable-IEEnhancedSecurityConfiguration.html">Disable-IEEnhancedSecurityConfiguration</a></li>
-<li><a href="Disable-IisSecurityAuthentication.html">Disable-IisSecurityAuthentication</a></li>
+<li><code>Disable-IisSecurityAuthentication</code></li>
 <li><a href="Disable-NtfsCompression.html">Disable-NtfsCompression</a></li>
 <li><a href="Enable-FirewallStatefulFtp.html">Enable-FirewallStatefulFtp</a></li>
 <li><a href="Enable-IEActivationPermission.html">Enable-IEActivationPermission</a></li>
-<li><a href="Enable-IisSecurityAuthentication.html">Enable-IisSecurityAuthentication</a></li>
+<li><code>Enable-IisSecurityAuthentication</code></li>
 <li><a href="Enable-NtfsCompression.html">Enable-NtfsCompression</a></li>
 <li><a href="Grant-ComPermission.html">Grant-ComPermission</a></li>
 <li><a href="Grant-MsmqMessageQueuePermission.html">Grant-MsmqMessageQueuePermission</a></li>
 <li><a href="Grant-Permission.html">Grant-Permission</a></li>
 <li><a href="Grant-ServiceControlPermission.html">Grant-ServiceControlPermission</a></li>
 <li><a href="Install-Group.html">Install-Group</a></li>
-<li><a href="Install-IisApplication.html">Install-IisApplication</a></li>
+<li><code>Install-IisApplication</code></li>
 <li><a href="Install-MsmqMessageQueue.html">Install-MsmqMessageQueue</a></li>
 <li><a href="Install-PerformanceCounter.html">Install-PerformanceCounter</a></li>
 <li><a href="Install-RegistryKey.html">Install-RegistryKey</a></li>
@@ -733,7 +759,7 @@
 <li><a href="Install-User.html">Install-User</a></li>
 <li><a href="Install-WindowsFeature.html">Install-WindowsFeature</a></li>
 <li><a href="Install-Msi.html">Invoke-WindowsInstaller</a></li>
-<li><a href="Lock-IisConfigurationSection.html">Lock-IisConfigurationSection</a></li>
+<li><code>Lock-IisConfigurationSection</code></li>
 <li><a href="New-Junction.html">New-Junction</a></li>
 <li><a href="Disable-AclInheritance.html">Protect-Acl</a></li>
 <li><a href="Remove-IniEntry.html">Remove-IniEntry</a> </li>
@@ -743,16 +769,16 @@
 <li><a href="Reset-MsmqQueueManagerID.html">Reset-MsmqQueueManagerID</a></li>
 <li><a href="Revoke-ComPermission.html">Revoke-ComPermission</a></li>
 <li><a href="Revoke-ServicePermission.html">Revoke-ServicePermission</a></li>
-<li><a href="Set-IisHttpHeader.html">Set-IisHttpHeader</a></li>
-<li><a href="Set-IisMimeMap.html">Set-IisMimeMap</a></li>
-<li><a href="Set-IisWebsiteID.html">Set-IisWebsiteID</a></li>
-<li><a href="Set-IisWindowsAuthentication.html">Set-IisWindowsAuthentication</a></li>
+<li><code>Set-IisHttpHeader</code></li>
+<li><code>Set-IisMimeMap</code></li>
+<li><code>Set-IisWebsiteID</code></li>
+<li><code>Set-IisWindowsAuthentication</code></li>
 <li><a href="Set-IniEntry.html">Set-IniEntry</a></li>
 <li><a href="Set-RegistryKeyValue.html">Set-RegistryKeyValue</a></li>
 <li><a href="Set-SslCertificateBinding.html">Set-SslCertificateBinding</a></li>
-<li><a href="Uninstall-IisAppPool.html">Uninstall-IisAppPool</a></li>
+<li><code>Uninstall-IisAppPool</code></li>
 <li><a href="Uninstall-WindowsFeature.html">Uninstall-WindowsFeature</a></li>
-<li><a href="Unlock-IisConfigurationSection.html">Unlock-IisConfigurationSection</a></li>
+<li><code>Unlock-IisConfigurationSection</code></li>
 </ul></li>
 <li>The following internal functions (which we warned you not to use!) are no longer exported:
 <ul>
@@ -1002,36 +1028,36 @@
 <h3>IIS</h3>
 
 <ul>
-<li>Created <a href="Join-IisVirtualPath.html">Join-IisVirtualPath</a> for joining paths used by the IIS APIs.</li>
+<li>Created <code>Join-IisVirtualPath</code> for joining paths used by the IIS APIs.</li>
 <li>Renamed all IIS <code>Path</code> parameters which represented virtual paths to <code>VirtualPath</code> (with backwards-compatible aliases):
 <ul>
-<li><a href="Disable-IisSecurityAuthentication.html">Disable-IisSecurityAuthentication</a></li>
-<li><a href="Enable-IisDirectoryBrowsing.html">Enable-IisDirectoryBrowsing</a></li>
-<li><a href="Enable-IisSecurityAuthentication.html">Enable-IisSecurityAuthentication</a></li>
-<li><a href="Enable-IisSsl.html">Enable-IisSsl</a></li>
-<li><a href="Get-IisApplication.html">Get-IisApplication</a></li>
-<li><a href="Get-IisConfigurationSection.html">Get-IisConfigurationSection</a></li>
-<li><a href="Get-IisHttpHeader.html">Get-IisHttpHeader</a></li>
-<li><a href="Get-IisHttpRedirect.html">Get-IisHttpRedirect</a></li>
-<li><a href="Get-IisMimeMap.html">Get-IisMimeMap</a></li>
-<li><a href="Get-IisSecurityAuthentication.html">Get-IisSecurityAuthentication</a></li>
-<li><a href="Set-IisHttpHeader.html">Set-IisHttpHeader</a></li>
-<li><a href="Set-IisHttpRedirect.html">Set-IisHttpRedirect</a></li>
-<li><a href="Set-IisWindowsAuthentication.html">Set-IisWindowsAuthentication</a></li>
-<li><a href="Test-IisConfigurationSection.html">Test-IisConfigurationSection</a></li>
-<li><a href="Test-IisSecurityAuthentication.html">Test-IisSecurityAuthentication</a></li>
+<li><code>Disable-IisSecurityAuthentication</code></li>
+<li><code>Enable-IisDirectoryBrowsing</code></li>
+<li><code>Enable-IisSecurityAuthentication</code></li>
+<li><code>Enable-IisSsl</code></li>
+<li><code>Get-IisApplication</code></li>
+<li><code>Get-IisConfigurationSection</code></li>
+<li><code>Get-IisHttpHeader</code></li>
+<li><code>Get-IisHttpRedirect</code></li>
+<li><code>Get-IisMimeMap</code></li>
+<li><code>Get-IisSecurityAuthentication</code></li>
+<li><code>Set-IisHttpHeader</code></li>
+<li><code>Set-IisHttpRedirect</code></li>
+<li><code>Set-IisWindowsAuthentication</code></li>
+<li><code>Test-IisConfigurationSection</code></li>
+<li><code>Test-IisSecurityAuthentication</code></li>
 </ul></li>
-<li>Renamed <a href="Get-IisWebsite.html">Get-IisWebsite</a>'s <code>SiteName</code> parameter to <code>Name</code> (with a backwards-compatible alias).</li>
+<li>Renamed <code>Get-IisWebsite</code>'s <code>SiteName</code> parameter to <code>Name</code> (with a backwards-compatible alias).</li>
 <li>Renamed all IIS <code>Name</code> parameters which represented virtual paths to <code>VirtualPath</code> (with backwards-compatible aliases):
 <ul>
-<li><a href="Install-IisApplication.html">Install-IisApplication</a></li>
-<li><a href="Install-IisVirtualDirectory.html">Install-IisVirtualDirectory</a></li>
+<li><code>Install-IisApplication</code></li>
+<li><code>Install-IisVirtualDirectory</code></li>
 </ul></li>
 <li>Renamed all IIS <code>Path</code> parameters which represented physical paths to <code>PhysicalPath</code> (with backwards-compatible aliases):
 <ul>
-<li><a href="Install-IisApplication.html">Install-IisApplication</a></li>
-<li><a href="Install-IisVirtualDirectory.html">Install-IisVirtualDirectory</a></li>
-<li><a href="Install-IisWebsite.html">Install-IisWebsite</a></li>
+<li><code>Install-IisApplication</code></li>
+<li><code>Install-IisVirtualDirectory</code></li>
+<li><code>Install-IisWebsite</code></li>
 </ul></li>
 </ul>
 
@@ -1089,7 +1115,7 @@
 <h3>IIS</h3>
 
 <ul>
-<li><a href="Set-IisWebsiteID.html">Set-IisWebsiteID</a> wasn't consistently starting a website after changing its ID.</li>
+<li><code>Set-IisWebsiteID</code> wasn't consistently starting a website after changing its ID.</li>
 </ul>
 
 <h3>Shares</h3>
@@ -1105,7 +1131,7 @@
 <h3>IIS</h3>
 
 <ul>
-<li><a href="Set-IisWebsiteID.html">Set-IisWebsiteID</a> now attempts to start a website whose ID has changed, since IIS stops a website whenever its ID changes.</li>
+<li><code>Set-IisWebsiteID</code> now attempts to start a website whose ID has changed, since IIS stops a website whenever its ID changes.</li>
 </ul>
 
 <h3>Network</h3>
@@ -1160,10 +1186,10 @@
 <h3>IIS</h3>
 
 <ul>
-<li>Objects returned by <a href="Get-IisWebsite.html">Get-IisWebsite</a> now have a dynamic <code>PhysicalPath</code> script property, so you don't have to traverse down into the default application's default virtual directory object to get it.</li>
-<li><a href="Install-IisApplication.html">Install-IisApplication</a>, <a href="Install-IisWebsite.html">Install-IisWebsite</a>, and <a href="Install-IisVirtualDirectory.html">Install-IisVirtualDirectory</a> now canonicalize physical paths, i.e. they convert any path with a relative part (e.g. '..') to a full path.  It turns out IIS doesn't like paths with relative parts.</li>
-<li>Created <a href="Get-IisApplication.html">Get-IisApplication</a> function to get <code>Microsoft.Web.Administration.Application</code> objects for all or specific applications under a website.</li>
-<li><a href="Install-IisApplication.html">Install-IisApplication</a> now uses the <code>Microsoft.Web.Administration</code> API instead of <code>appcmd.exe</code>.</li>
+<li>Objects returned by <code>Get-IisWebsite</code> now have a dynamic <code>PhysicalPath</code> script property, so you don't have to traverse down into the default application's default virtual directory object to get it.</li>
+<li><code>Install-IisApplication</code>, <code>Install-IisWebsite</code>, and <code>Install-IisVirtualDirectory</code> now canonicalize physical paths, i.e. they convert any path with a relative part (e.g. '..') to a full path.  It turns out IIS doesn't like paths with relative parts.</li>
+<li>Created <code>Get-IisApplication</code> function to get <code>Microsoft.Web.Administration.Application</code> objects for all or specific applications under a website.</li>
+<li><code>Install-IisApplication</code> now uses the <code>Microsoft.Web.Administration</code> API instead of <code>appcmd.exe</code>.</li>
 </ul>
 
 <h3>PowerShell</h3>
@@ -1177,7 +1203,7 @@
 <h3>IIS</h3>
 
 <ul>
-<li><a href="Install-IisApplication.html">Install-IisApplication</a> not updating/changing physical path on existing application.</li>
+<li><code>Install-IisApplication</code> not updating/changing physical path on existing application.</li>
 </ul>
 
 <h3>.NET</h3>
@@ -1249,9 +1275,9 @@
 <h3>IIS</h3>
 
 <ul>
-<li>The <a href="http://msdn.microsoft.com/en-us/library/microsoft.web.administration.site.aspx">site object</a> returned by <a href="Get-IisWebsite.html">Get-IisWebsite</a> now as a <code>CommitChanges</code> method so you can persist modifications you make to the site.</li>
-<li><a href="Get-IisWebsite.html">Get-IisWebsite</a> now returns all websites if no <code>SiteName</code> is given.</li>
-<li>Created <a href="Set-IisWebsiteID.html">Set-IisWebsiteID</a> function for explicitly setting a website's ID.</li>
+<li>The <a href="http://msdn.microsoft.com/en-us/library/microsoft.web.administration.site.aspx">site object</a> returned by <code>Get-IisWebsite</code> now as a <code>CommitChanges</code> method so you can persist modifications you make to the site.</li>
+<li><code>Get-IisWebsite</code> now returns all websites if no <code>SiteName</code> is given.</li>
+<li>Created <code>Set-IisWebsiteID</code> function for explicitly setting a website's ID.</li>
 </ul>
 
 <h3>INI</h3>
@@ -1313,7 +1339,7 @@
 <h2>Upgrade Instructions</h2>
 
 <ul>
-<li>On Windows 2008 R2, custom identies that run IIS app pools need the <code>SeBatchLogonRight</code>.  <a href="Install-IisAppPool.html">Install-IisAppPool</a> now grants this privilege on all operating systems.  If this won't work in your environment, you can remove these privileges with <a href="Revoke-Privilege.html">Revoke-Privilege</a>.</li>
+<li>On Windows 2008 R2, custom identies that run IIS app pools need the <code>SeBatchLogonRight</code>.  <code>Install-IisAppPool</code> now grants this privilege on all operating systems.  If this won't work in your environment, you can remove these privileges with <a href="Revoke-Privilege.html">Revoke-Privilege</a>.</li>
 </ul>
 
 <h2>Enhancements</h2>
@@ -1341,13 +1367,13 @@
 <h3>IIS</h3>
 
 <ul>
-<li>Created <a href="Get-IisHttpHeader.html">Get-IisHttpHeader</a> for getting the custom HTTP headers for a website or one of its sub-directories.</li>
-<li>Created <a href="Set-IisHttpHeader.html">Set-IisHttpHeader</a> for creating/setting a custom HTTP header for a website or one of its sub-directories.</li>
-<li>Created <a href="Get-IisMimeMap.html">Get-IisMimeMap</a> for getting the file extension to MIME type mappings for the IIS web server.</li>
-<li>Created <a href="Remove-IisMimeMap.html">Remove-IisMimeMap</a> for removing a file extension to MIME type mapping for the IIS web server.</li>
-<li>Created <a href="Set-IisMimeMap.html">Set-IisMimeMap</a> for creating/setting a file extension to MIME type mapping for the IIS web server.</li>
-<li>When creating an app pool that runs under a custom, non-service account, <a href="Install-IisAppPool.html">Install-IisAppPool</a> grants that user the <code>SeBatchLogonRight</code>.</li>
-<li><a href="Install-IisAppPool.html">Install-IisAppPool</a> writes an error if its user account doesn't exist (i.e. if the value of the <code>Username</code> parameter doesn't exist).</li>
+<li>Created <code>Get-IisHttpHeader</code> for getting the custom HTTP headers for a website or one of its sub-directories.</li>
+<li>Created <code>Set-IisHttpHeader</code> for creating/setting a custom HTTP header for a website or one of its sub-directories.</li>
+<li>Created <code>Get-IisMimeMap</code> for getting the file extension to MIME type mappings for the IIS web server.</li>
+<li>Created <code>Remove-IisMimeMap</code> for removing a file extension to MIME type mapping for the IIS web server.</li>
+<li>Created <code>Set-IisMimeMap</code> for creating/setting a file extension to MIME type mapping for the IIS web server.</li>
+<li>When creating an app pool that runs under a custom, non-service account, <code>Install-IisAppPool</code> grants that user the <code>SeBatchLogonRight</code>.</li>
+<li><code>Install-IisAppPool</code> writes an error if its user account doesn't exist (i.e. if the value of the <code>Username</code> parameter doesn't exist).</li>
 </ul>
 
 <h3>Privileges</h3>
@@ -1392,7 +1418,7 @@
 <h3>IIS</h3>
 
 <ul>
-<li>Added <a href="Test-IisWebsite.html">Test-IisWebsiteExists</a> alias for <a href="Test-IisWebsite.html">Test-IisWebsite</a>, for backwards-compatibility with earlier releases.</li>
+<li>Added <code>Test-IisWebsiteExists</code> alias for <code>Test-IisWebsite</code>, for backwards-compatibility with earlier releases.</li>
 </ul>
 
 <h3>Security</h3>
@@ -1476,8 +1502,8 @@
 <ul>
 <li>Renamed <code>Add-IisServerManagerMembers</code> to <code>Add-IisServerManagerMembers</code>, with backwards-compatible alias.</li>
 <li>Added <code>StatusCode</code> alias for <code>Set-IisHttpRedirect's</code> <code>HttpResponseStatus</code> parameter, for backwards-compatibility with earlier releases.</li>
-<li>Added <a href="Test-IisAppPool.html">Test-IisAppPoolExists</a> alias for <a href="Test-IisAppPool.html">Test-IisAppPool</a>, for backwards-compatibility with earlier releases.</li>
-<li>Added <a href="Uninstall-IisWebsite.html">Remove-IisWebsite</a> alias for <a href="Uninstall-IisWebsite.html">Uninstall-IisWebsite</a>, for backwards-compatibility with earlier releases.</li>
+<li>Added <code>Test-IisAppPoolExists</code> alias for <code>Test-IisAppPool</code>, for backwards-compatibility with earlier releases.</li>
+<li>Added <code>Remove-IisWebsite</code> alias for <code>Uninstall-IisWebsite</code>, for backwards-compatibility with earlier releases.</li>
 </ul>
 
 <h3>Internet Explorer</h3>
@@ -1604,8 +1630,8 @@
 <h3>IIS</h3>
 
 <ul>
-<li>Renamed the <code>StatusCode</code> property on the object returned by <a href="Get-IisHttpRedirect.html">Get-IisHttpRedirect</a> to <code>HttpResponseStatus</code>.  Update usages accordingly.</li>
-<li>The <code>Bindings</code> property returned by <a href="Get-IisWebsite.html">Get-IisWebsite</a> is now a collection of <code>Microsoft.Web.Administration.Binding</code> objects.  Update usages of <code>$site.Bindings[$idx].IPAddress</code> and <code>$site.Bindings[$idx].Port</code> to <code>$site.Bindings[$idx].Endpoint.Address</code> and <code>$site.Bindings[$idx].Endpoint.Port</code>, respectively.</li>
+<li>Renamed the <code>StatusCode</code> property on the object returned by <code>Get-IisHttpRedirect</code> to <code>HttpResponseStatus</code>.  Update usages accordingly.</li>
+<li>The <code>Bindings</code> property returned by <code>Get-IisWebsite</code> is now a collection of <code>Microsoft.Web.Administration.Binding</code> objects.  Update usages of <code>$site.Bindings[$idx].IPAddress</code> and <code>$site.Bindings[$idx].Port</code> to <code>$site.Bindings[$idx].Endpoint.Address</code> and <code>$site.Bindings[$idx].Endpoint.Port</code>, respectively.</li>
 </ul>
 
 <p>Replace usages of:</p>
@@ -1615,8 +1641,8 @@
 <li><code>Set-IisAnonymousAuthentication -Disabled</code> with <code>Disable-IisSecurityAuthentication -Anonymous</code></li>
 <li><code>Set-IisBasicAuthentication</code> with <code>Enable-IisSecurityAuthentication -Basic</code></li>
 <li><code>Set-IisBasicAuthentication -Disabled</code> with <code>Disable-IisSecurityAuthentication -Basic</code></li>
-<li><a href="Set-IisWindowsAuthentication.html">Set-IisWindowsAuthentication</a> with <code>Enable-IisSecurityAuthentication -Windows</code> and <code>Set-IisWindowsAuthentication -DisableKernelMode</code></li>
-<li><code>Set-IisWindowsAuthentication -UseKernelMode</code> with <a href="Set-IisWindowsAuthentication.html">Set-IisWindowsAuthentication</a></li>
+<li><code>Set-IisWindowsAuthentication</code> with <code>Enable-IisSecurityAuthentication -Windows</code> and <code>Set-IisWindowsAuthentication -DisableKernelMode</code></li>
+<li><code>Set-IisWindowsAuthentication -UseKernelMode</code> with <code>Set-IisWindowsAuthentication</code></li>
 <li><code>Set-IisWindowsAuthentication -Disabled</code> with <code>Disable-IisSecurityAuthentication -Windows</code></li>
 <li><code>Unlock-IisConfigSection -Name &lt;string&gt;</code> with <code>Unlock-IisConfigurationSection -SectionPath &lt;string&gt;</code> (run <code>appcmd.exe lock config -section:?</code> for values to the new <code>SectionPath</code> parameter)</li>
 <li><code>Unlock-IisBasicAuthentication</code> with <code>Unlock-IisConfigurationSection -SectionPath 'system.webServer/security/authentication/basicAuthentication'</code></li>
@@ -1686,14 +1712,14 @@
 <h3>IIS</h3>
 
 <ul>
-<li>Created <a href="Get-IisConfigurationSection.html">Get-IisConfigurationSection</a> function for getting a site's (and optional sub-directory's) <a href="http://msdn.microsoft.com/en-us/library/microsoft.web.administration.configurationsection(v=vs.90).aspx">Microsoft.Web.Administration.ConfigurationSection</a> objects for an arbitrary IIS configuration section.</li>
-<li>Created <a href="Get-IisSecurityAuthentication.html">Get-IisSecurityAuthentication</a> function for getting a site's (and optional sub-directory's)  <a href="http://msdn.microsoft.com/en-us/library/microsoft.web.administration.configurationsection(v=vs.90).aspx">anonymous, basic, digest, or Windows authentication configuration section</a>.</li>
-<li>Created <a href="Test-IisSecurityAuthentication.html">Test-IisSecurityAuthentication</a> function for testing if anonymous, basic, digest, or Windows authentication is enabled for a website (and optional sub-directory).</li>
-<li>Created <a href="Get-IisConfigurationSection.html">Get-IisConfigurationSection</a> function for returning an arbitrary IIS configuration section using the Microsoft.Web.Administration API.</li>
-<li>Created <a href="Lock-IisConfigurationSection.html">Lock-IisConfigurationSection</a> function for locking arbitrary global IIS configuration sections.</li>
-<li>Created <a href="Test-IisConfigurationSection.html">Test-IisConfigurationSection</a> function for testing if an configuration section exists or is locked or not.</li>
-<li>Created function <a href="Get-IisAppPool.html">Get-IisAppPool</a> for getting a <code>Microsoft.Web.Administration.AppPool</code> object for an application pool.</li>
-<li>Created function <a href="Uninstall-IisAppPool.html">Uninstall-IisAppPool</a> for removing an IIS application pool.</li>
+<li>Created <code>Get-IisConfigurationSection</code> function for getting a site's (and optional sub-directory's) <a href="http://msdn.microsoft.com/en-us/library/microsoft.web.administration.configurationsection(v=vs.90).aspx">Microsoft.Web.Administration.ConfigurationSection</a> objects for an arbitrary IIS configuration section.</li>
+<li>Created <code>Get-IisSecurityAuthentication</code> function for getting a site's (and optional sub-directory's)  <a href="http://msdn.microsoft.com/en-us/library/microsoft.web.administration.configurationsection(v=vs.90).aspx">anonymous, basic, digest, or Windows authentication configuration section</a>.</li>
+<li>Created <code>Test-IisSecurityAuthentication</code> function for testing if anonymous, basic, digest, or Windows authentication is enabled for a website (and optional sub-directory).</li>
+<li>Created <code>Get-IisConfigurationSection</code> function for returning an arbitrary IIS configuration section using the Microsoft.Web.Administration API.</li>
+<li>Created <code>Lock-IisConfigurationSection</code> function for locking arbitrary global IIS configuration sections.</li>
+<li>Created <code>Test-IisConfigurationSection</code> function for testing if an configuration section exists or is locked or not.</li>
+<li>Created function <code>Get-IisAppPool</code> for getting a <code>Microsoft.Web.Administration.AppPool</code> object for an application pool.</li>
+<li>Created function <code>Uninstall-IisAppPool</code> for removing an IIS application pool.</li>
 </ul>
 
 <h3>Windows Features</h3>
@@ -1754,12 +1780,12 @@
 <h3>IIS</h3>
 
 <ul>
-<li>Replaced <code>Set-IisAnonymousAuthentication</code> with <a href="Enable-IisSecurityAuthentication.html">Enable-IisSecurityAuthentication</a> and <a href="Disable-IisSecurityAuthentication.html">Disable-IisSecurityAuthentication</a>.</li>
-<li>Replaced <code>Set-IisBasicAuthentication</code> with <a href="Enable-IisSecurityAuthentication.html">Enable-IisSecurityAuthentication</a> and <a href="Disable-IisSecurityAuthentication.html">Disable-IisSecurityAuthentication</a>.</li>
-<li>Moved code to enable/disable Windows authentication from <a href="Set-IisWindowsAuthentication.html">Set-IisWindowsAuthentication</a> to  <a href="Enable-IisSecurityAuthentication.html">Enable-IisSecurityAuthentication</a> and <a href="Disable-IisSecurityAuthentication.html">Disable-IisSecurityAuthentication</a>.</li>
-<li>Switched the default behavior of <a href="Set-IisWindowsAuthentication.html">Set-IisWindowsAuthentication</a> to enable kernel mode.  To disable kernel mode, use the <code>DisableKernelMode</code> switch.</li>
-<li>Renamed <code>Unlock-IisConfigSection</code> to <a href="Unlock-IisConfigurationSection.html">Unlock-IisConfigurationSection</a>.</li>
-<li>Removed <a href="Unlock-IisConfigurationSection.html">Unlock-IisConfigurationSection</a>'s <code>Name</code> parameter and replaced it with <code>SectionPath</code>, which takes a list of full path to the configuration section(s) to unlock.</li>
+<li>Replaced <code>Set-IisAnonymousAuthentication</code> with <code>Enable-IisSecurityAuthentication</code> and <code>Disable-IisSecurityAuthentication</code>.</li>
+<li>Replaced <code>Set-IisBasicAuthentication</code> with <code>Enable-IisSecurityAuthentication</code> and <code>Disable-IisSecurityAuthentication</code>.</li>
+<li>Moved code to enable/disable Windows authentication from <code>Set-IisWindowsAuthentication</code> to  <code>Enable-IisSecurityAuthentication</code> and <code>Disable-IisSecurityAuthentication</code>.</li>
+<li>Switched the default behavior of <code>Set-IisWindowsAuthentication</code> to enable kernel mode.  To disable kernel mode, use the <code>DisableKernelMode</code> switch.</li>
+<li>Renamed <code>Unlock-IisConfigSection</code> to <code>Unlock-IisConfigurationSection</code>.</li>
+<li>Removed <code>Unlock-IisConfigurationSection</code>'s <code>Name</code> parameter and replaced it with <code>SectionPath</code>, which takes a list of full path to the configuration section(s) to unlock.</li>
 <li>Removed <code>Unlock-IisBasicAuthentication</code> in favor of <code>Unlock-IisConfigurationSection -SectionPath 'system.webServer/security/authentication/basicAuthentication'</code>.</li>
 <li>Removed <code>Unlock-IisCgi</code> in favor of <code>Unlock-IisConfigurationSection -SectionPath 'system.webServer/cgi'</code>.</li>
 <li>Removed <code>Unlock-IisWindowsAuthentication</code> in favor of <code>Unlock-IisConfigurationSection -SectionPath 'system.webServer/security/authentication/windowsAuthentication'</code>.</li>
@@ -1767,13 +1793,13 @@
 <li><a href="Install-Service.html">Install-Service</a> writes errors instead of throwing exceptions.</li>
 <li><a href="Install-Service.html">Install-Service</a> grants <code>ReadAndExecute</code> file system permissions on the service executable to the service identity instead of <code>FullControl</code>.</li>
 <li>Improved <a href="Install-Service.html">Install-Service</a>'s <code>WhatIf</code> support.</li>
-<li>Renamed <a href="Test-IisAppPool.html">Test-IisAppPoolExists</a> to <a href="Test-IisAppPool.html">Test-IisAppPool</a> (added backwards-compatible alias in v0.5.0.1).</li>
-<li>Renamed <a href="Uninstall-IisWebsite.html">Remove-IisWebsite</a> with <a href="Uninstall-IisWebsite.html">Uninstall-IisWebsite</a> (added backwards-compatible alias in v0.5.0.1).</li>
-<li><a href="Install-IisAppPool.html">Install-IisAppPool</a> now always sets the application pool to run as the system's default application pool identity if the <code>ServiceAccount</code> parameter isn't given.</li>
-<li><a href="Install-IisAppPool.html">Install-IisAppPool</a> now starts an IIS application pool if it is stoppped.</li>
-<li><a href="Get-IisHttpRedirect.html">Get-IisHttpRedirect</a> now returns a <code>Carbon.Iis.HttpRedirectConfigurationSection</code> object.  The <code>StatusCode</code> property on the old object is now named <code>HttpResponseStatus</code>.</li>
-<li>Renamed the <code>StatusCode</code> parameter on <a href="Set-IisHttpRedirect.html">Set-IisHttpRedirect</a> to <code>HttpResponseStatus</code> (added backwards-compatible alias in v0.5.0.1).</li>
-<li><a href="Get-IisWebsite.html">Get-IisWebsite</a> now returns a <code>Microsoft.Web.Administration.Site</code> object.</li>
+<li>Renamed <code>Test-IisAppPoolExists</code> to <code>Test-IisAppPool</code> (added backwards-compatible alias in v0.5.0.1).</li>
+<li>Renamed <code>Remove-IisWebsite</code> with <code>Uninstall-IisWebsite</code> (added backwards-compatible alias in v0.5.0.1).</li>
+<li><code>Install-IisAppPool</code> now always sets the application pool to run as the system's default application pool identity if the <code>ServiceAccount</code> parameter isn't given.</li>
+<li><code>Install-IisAppPool</code> now starts an IIS application pool if it is stoppped.</li>
+<li><code>Get-IisHttpRedirect</code> now returns a <code>Carbon.Iis.HttpRedirectConfigurationSection</code> object.  The <code>StatusCode</code> property on the old object is now named <code>HttpResponseStatus</code>.</li>
+<li>Renamed the <code>StatusCode</code> parameter on <code>Set-IisHttpRedirect</code> to <code>HttpResponseStatus</code> (added backwards-compatible alias in v0.5.0.1).</li>
+<li><code>Get-IisWebsite</code> now returns a <code>Microsoft.Web.Administration.Site</code> object.</li>
 </ul>
 
 <h3>MSMQ</h3>
@@ -1849,7 +1875,7 @@
 <h2>Bug fixes</h2>
 
 <ul>
-<li><a href="Enable-IisSsl.html">Enable-IisSsl</a> not setting SSL flags correctly when requiring client certificates.</li>
+<li><code>Enable-IisSsl</code> not setting SSL flags correctly when requiring client certificates.</li>
 </ul>
 
 <h1>0.4.0.0 (17 November 2012)</h1>
@@ -1860,7 +1886,7 @@
 <li>If you install a manual or disabled Windows service with <a href="Install-Service.html">Install-Service</a>, you now have to call <code>Start-Service</code> yourself.  <a href="Install-Service.html">Install-Service</a> only starts services whose startup type is set to <code>Automatic</code> (which is the default).</li>
 <li>We've stopped distributing Microsoft's <code>subinacl.exe</code> program. We didn't have permission to distribute.  Plus its no longer supported. If any of your scripts used <code>Invoke-SubInAcl</code>, you'll want to <a href="http://www.microsoft.com/en-us/download/details.aspx?id=23510">download <code>subinacl.exe</code> yourself</a> and copy <code>Invoke-SubInAcl</code> before upgrading (you can find it in the Carbon directory in the <code>Services.ps1</code> file.</li>
 <li>If you're using <a href="Grant-Permission.html">Grant-Permission</a> without named parameters, the <code>Path</code> parameter moved from position 3 to position 1.  Re-order your parameters accordingly.</li>
-<li>Rename usages of <code>Set-IisDirectoryBrowsing</code> to <a href="Enable-IisDirectoryBrowsing.html">Enable-IisDirectoryBrowsing</a>.  If you use named parameters, rename its <code>Directory</code> paremter to <code>Path</code>.</li>
+<li>Rename usages of <code>Set-IisDirectoryBrowsing</code> to <code>Enable-IisDirectoryBrowsing</code>.  If you use named parameters, rename its <code>Directory</code> paremter to <code>Path</code>.</li>
 <li>Replace usages of <code>Set-HgrcDefaultPushUrl</code> with <a href="Set-IniEntry.html">Set-IniEntry</a> instead, e.g. <code>Set-IniEntry -Path 'Path\to\repo\.hg\hgrc' -Section paths -Name 'default.push' -Value 'DefaultPushUrl'</code></li>
 <li>Rename usages of <code>Get-FullPath</code> with <a href="Resolve-FullPath.html">ConvertTo-FullPath</a>.</li>
 </ul>
@@ -1883,9 +1909,9 @@
 <li>Created <a href="ConvertTo-InheritanceFlag.html">ConvertTo-InheritanceFlags</a> function for converting a <code>Carbon.Security.ContainerInheritanceFlags</code> to the necessary/applicable <code>System.Security.AccessControl.InheritanceFlags</code>.</li>
 <li>Created <a href="ConvertTo-PropagationFlag.html">ConvertTo-PropagationFlags</a> function for converting a <code>Carbon.Security.ContainerInheritanceFlags</code> to the necessary/applicable <code>System.Security.AccessControl.PropagationFlags</code>.</li>
 <li>Created <a href="Get-Permission.html">Get-Permissions</a> function for getting the non-inherited permissions on a file, directory, registry key, or registry value with the ability to return a specific identity's permissions and/or inherited permissions.</li>
-<li>Renamed <code>Set-IisDirectoryBrowsing</code> to <a href="Enable-IisDirectoryBrowsing.html">Enable-IisDirectoryBrowsing</a> and renamed its <code>Directory</code> parameter to <code>Path</code>.</li>
+<li>Renamed <code>Set-IisDirectoryBrowsing</code> to <code>Enable-IisDirectoryBrowsing</code> and renamed its <code>Directory</code> parameter to <code>Path</code>.</li>
 <li>Removed <code>Set-HgrcDefaultPushUrl</code>.  Use <a href="Set-IniEntry.html">Set-IniEntry</a> instead.</li>
-<li>Renamed <a href="Test-IisWebsite.html">Test-IisWebsiteExists</a> to <a href="Test-IisWebsite.html">Test-IisWebsite</a> to adhere to PowerShell naming conventions (added backwards-compatible alias in v1.0.0).</li>
+<li>Renamed <code>Test-IisWebsiteExists</code> to <code>Test-IisWebsite</code> to adhere to PowerShell naming conventions (added backwards-compatible alias in v1.0.0).</li>
 <li>Renamed <code>Get-FullPath</code> to <a href="Resolve-FullPath.html">ConvertTo-FullPath</a> to adhere to PowerShell naming conventions.</li>
 </ul>
 
@@ -1930,7 +1956,7 @@
 
 <h3>Set-IisSslFlags</h3>
 
-<p>This function was renamed to <a href="Enable-IisSsl.html">Enable-IisSsl</a>.  Its <code>Enable128BitSsl</code> parameter was renamed to <code>Require128BitSsl</code>.</p>
+<p>This function was renamed to <code>Enable-IisSsl</code>.  Its <code>Enable128BitSsl</code> parameter was renamed to <code>Require128BitSsl</code>.</p>
 
 <p>Configuring client certificates is now a little stricter/clearer.  You can no longer specify both <code>AcceptClientCertificates</code> and <code>RequireClientCertificates</code>.  Also, if you specify <code>RequireClientCertificates</code>, you must now also supply the <code>RequireSsl</code> switch (before, setting the <code>RequireClientCertificates</code> switch implicitly set the <code>RequireSsl</code> switch).</p>
 
@@ -1945,7 +1971,7 @@
 <h2>Enhancements</h2>
 
 <ul>
-<li>Renamed <code>Set-IisSslFlags</code> to <a href="Enable-IisSsl.html">Enable-IisSsl</a> to better reflect what it does.  Also, created parameter sets around client certificate settings so you can't configure them incorrectly.  (<a href="https://bitbucket.org/splatteredbits/carbon/issue/25/set-iissslflags-create-parameter-sets-to">Fixes #25: Set-IisSslFlags: Create parameter sets to accurately reflect what flags are allowed to be set simultaneously.</a>)</li>
+<li>Renamed <code>Set-IisSslFlags</code> to <code>Enable-IisSsl</code> to better reflect what it does.  Also, created parameter sets around client certificate settings so you can't configure them incorrectly.  (<a href="https://bitbucket.org/splatteredbits/carbon/issue/25/set-iissslflags-create-parameter-sets-to">Fixes #25: Set-IisSslFlags: Create parameter sets to accurately reflect what flags are allowed to be set simultaneously.</a>)</li>
 <li>Added <code>WhatIf</code> support to <a href="Install-MsmqMessageQueue.html">Install-MsmqMessageQueue</a>.</li>
 <li>Created new <a href="Clear-TrustedHost.html">Clear-TrustedHosts</a> for clearing PowerShell's trusted hosts list.</li>
 </ul>
@@ -1954,7 +1980,7 @@
 
 <ul>
 <li>Rename <code>Enable-IisSsl/Set-IisSslFlags's</code> <code>Enable128BitSsl</code> parameter to <code>Require128BitSsl</code>] (<a href="https://bitbucket.org/splatteredbits/carbon/issue/24/set-iissslflags-rename-the-enable128bitssl">Fix #24 Set-IisSslFlags: Rename the Enable128BitSsl parameter to Require128BitSsl</a>).</li>
-<li><a href="https://bitbucket.org/splatteredbits/carbon/issue/19/install-iisapppool-doesnt-change-an">Fix issue #19</a>: <a href="Install-IisAppPool.html">Install-IisAppPool</a> doesn't change an existing 32-bit app pool to be a 64-bit app pool.</li>
+<li><a href="https://bitbucket.org/splatteredbits/carbon/issue/19/install-iisapppool-doesnt-change-an">Fix issue #19</a>: <code>Install-IisAppPool</code> doesn't change an existing 32-bit app pool to be a 64-bit app pool.</li>
 <li><a href="https://bitbucket.org/splatteredbits/carbon/issue/33/install-msmqmessagequeue-can-wait-forever">Fix issue #33</a>: <a href="Install-MsmqMessageQueue.html">Install-MsmqMessageQueue</a>: Can wait forever for a queue to get created.  It now waits 10 seconds.</li>
 <li><a href="https://bitbucket.org/splatteredbits/carbon/issue/36/get-powershellpath-returns-the-wrong-path">Fix issue #36</a>: <a href="Get-PowerShellPath.html">Get-PowerShellPath</a> returns the wrong path when running x86 PowerShell on x64 computers.</li>
 <li><a href="https://bitbucket.org/splatteredbits/carbon/issue/37/invoke-powershell-should-write-an-error">Fix issue #37</a>: <a href="Invoke-PowerShell.html">Invoke-PowerShell</a> should write an error when running as x86 on Windows x64 without the x86 flag (i.e. 32-bit PowerShell can't launch a 64-bit PowerShell, so throw an error in that situation).</li>
@@ -2020,7 +2046,7 @@
 <h2>Bug fixes</h2>
 
 <ul>
-<li><a href="Install-IisWebsite.html">Install-IisWebsite</a> now validates website bindings</li>
+<li><code>Install-IisWebsite</code> now validates website bindings</li>
 </ul>
 
 <h1>0.2.5 (29 June 2012)</h1>
@@ -2030,8 +2056,8 @@
 <ul>
 <li>Improved documentation for:
 <ul>
-<li><a href="Test-IisAppPool.html">Test-IisAppPool</a></li>
-<li><a href="Test-IisWebsite.html">Test-IisWebsiteExists</a></li>
+<li><code>Test-IisAppPool</code></li>
+<li><code>Test-IisWebsiteExists</code></li>
 <li><code>Unlock-IisBasicAuthentication</code></li>
 <li><code>Unlock-IisCgi</code></li>
 <li><code>Unlock-IisConfigSection</code></li>

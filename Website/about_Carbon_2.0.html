@@ -98,11 +98,11 @@ isn't already installed. To preserve the previous behavior and always install,
 add the <code>-Force</code> switch to all <a href="Install-Msi.html">Invoke-WindowsInstaller</a>[Install-Msi](Install-Msi.html) usages.</li>
 <li>All IIS functions were re-written to use the <code>Microsoft.Web.Administration</code> API 
 instead of <code>appcmd.exe</code>.</li>
-<li><a href="Install-IisWebsite.html">Install-IisWebsite</a> no longer deletes and re-creates websites. If a website 
+<li><code>Install-IisWebsite</code> no longer deletes and re-creates websites. If a website 
 exists, it updates its configuration to match parameters passed in. To preserve 
 previous behavior and delete the website before installing, use the <code>-Force</code> 
 switch.</li>
-<li><a href="Install-IisVirtualDirectory.html">Install-IisVirtualDirectory</a> no longer deletes and re-creates virtual 
+<li><code>Install-IisVirtualDirectory</code> no longer deletes and re-creates virtual 
 directories. If a virtual directory exists, its configuration is updated in 
 place. To preserve previous behavior and delete the virtual directory before 
 installing, use the <code>Force</code> switch.</li>
@@ -249,9 +249,9 @@ permission.</li>
 granted permission.</li>
 <li><a href="Install-Group.html">Install-Group</a>: <code>System.DirectoryServices.AccountManagement.GroupPrincipal</code>, 
 representing the group. </li>
-<li><a href="Install-IisApplication.html">Install-IisApplication</a>: <code>Microsoft.Web.Administration.Application</code>, 
+<li><code>Install-IisApplication</code>: <code>Microsoft.Web.Administration.Application</code>, 
 representing the application.</li>
-<li><a href="Install-IisWebsite.html">Install-IisWebsite</a>: <code>Microsoft.Web.Administration.Site</code>, representing the 
+<li><code>Install-IisWebsite</code>: <code>Microsoft.Web.Administration.Site</code>, representing the 
 website.</li>
 <li><a href="Install-Junction.html">Install-Junction</a>: <code>System.IO.DirectoryInfo</code>, representing new target 
 directories and any new/updated junctions.</li>
@@ -282,7 +282,7 @@ warnings if you use them.</p>
 <ul>
 <li><a href="Complete-Job.html">Complete-Job</a>: It's total crap. Use PowerShell's <code>Wait-Job</code> cmdlet instead.</li>
 <li><a href="Invoke-AppCmd.html">Invoke-AppCmd</a>: Switch to Carbon's IIS functions, or use 
-<a href="Get-IisConfigurationSection.html">Get-IisConfigurationSection</a> to get <code>ConfigurationElement</code> objects from the 
+<code>Get-IisConfigurationSection</code> to get <code>ConfigurationElement</code> objects from the 
 <code>Microsoft.Web.Administration</code> API that you can modify.</li>
 <li><a href="Resolve-NetPath.html">Resolve-NetPath</a>: Switch to something else. Carbon doesn't use <code>net.exe</code> anymore.</li>
 </ul>
@@ -321,7 +321,7 @@ place, so you shouldn't have to change any code.</p>
 </ul>
 <h2>Miscellaneous Changes</h2>
 <ul>
-<li><a href="Get-IisAppPool.html">Get-IisAppPool</a>
+<li><code>Get-IisAppPool</code>
 <ul>
 <li>Now return all application pools installed on the local computer when called 
 with no parameters.</li>
@@ -345,11 +345,11 @@ a certificate from a file. Previously, you could supply the switch when installi
 from an X509Certificate2 object but it was ignored.</li>
 <li><code>Install-Group's</code> <code>Members</code> parameter renamed to <code>Member</code> (with 
 backwards-compatible alias).</li>
-<li>Added <code>Credential</code> parameter to <a href="Install-IisAppPool.html">Install-IisAppPool</a> for increased security and 
+<li>Added <code>Credential</code> parameter to <code>Install-IisAppPool</code> for increased security and 
 to follow PowerShell guidelines.</li>
-<li><a href="Install-IisVirtualDirectory.html">Install-IisVirtualDirectory</a> no longer deletes and re-creates existing virtual 
+<li><code>Install-IisVirtualDirectory</code> no longer deletes and re-creates existing virtual 
 directories, but modifies existing virtual directories in place.</li>
-<li><a href="Install-IisWebsite.html">Install-IisWebsite</a>
+<li><code>Install-IisWebsite</code>
 <ul>
 <li>Added <code>SiteID</code> parameter tfor setting a website's IIS ID.</li>
 <li>No longer deletes and re-creates websites, but modifies existing websites in 

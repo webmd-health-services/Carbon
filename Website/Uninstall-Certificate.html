@@ -23,9 +23,14 @@
 </div>
 
 <h2>Syntax</h2>
+<pre class="Syntax"><code>Uninstall-Certificate -Thumbprint &lt;String&gt; [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
+<pre class="Syntax"><code></code></pre>
 <pre class="Syntax"><code>Uninstall-Certificate -Thumbprint &lt;String&gt; -StoreLocation {CurrentUser | LocalMachine} -CustomStoreName &lt;String&gt; [-Session &lt;PSSession[]&gt;] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
+<pre class="Syntax"><code></code></pre>
 <pre class="Syntax"><code>Uninstall-Certificate -Thumbprint &lt;String&gt; -StoreLocation {CurrentUser | LocalMachine} -StoreName {AddressBook | AuthRoot | CertificateAuthority | Disallowed | My | Root | TrustedPeople | TrustedPublisher} [-Session &lt;PSSession[]&gt;] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
+<pre class="Syntax"><code></code></pre>
 <pre class="Syntax"><code>Uninstall-Certificate -Certificate &lt;X509Certificate2&gt; -StoreLocation {CurrentUser | LocalMachine} -CustomStoreName &lt;String&gt; [-Session &lt;PSSession[]&gt;] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
+<pre class="Syntax"><code></code></pre>
 <pre class="Syntax"><code>Uninstall-Certificate -Certificate &lt;X509Certificate2&gt; -StoreLocation {CurrentUser | LocalMachine} -StoreName {AddressBook | AuthRoot | CertificateAuthority | Disallowed | My | Root | TrustedPeople | TrustedPublisher} [-Session &lt;PSSession[]&gt;] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
 
 <h2>Description</h2>
@@ -35,6 +40,8 @@
 <p>If the certificate isn't in the store, nothing happens, not even an error.</p>
 
 <p>To uninstall a certificate from a remote computer, use the <code>Session</code>parameter, which was added in Carbon 2.1.0. You can create a new session with the <code>New-PSSession</code> cmdlet.</p>
+
+<p>You can uninstall a certificate using just its thumbprint (this functionality is new in Carbon 2.5.0). <code>Uninstall-Certificate</code> will search through all certificate locations and stores and uninstall all certificates that have the thumbprint. When you enumerate all certificates over a remoting session, you get a terminating <code>The system cannot open the device or file specified</code> error, so you can't delete a certificate with just a thumbprint over remoting.</p>
 </div>
 
 <h2> Parameters </h2>
@@ -50,9 +57,11 @@
 <tr valign='top'>
 	<td>Thumbprint</td>
 	<td><a href="http://msdn.microsoft.com/en-us/library/system.string.aspx">String</a></td>
-	<td class="ParamDescription"><p>The thumbprint of the certificate to remove.</p></td>
+	<td class="ParamDescription"><p>The thumbprint of the certificate to remove.</p>
+
+<p>If you want to uninstall the certificate from all stores it is installed in, you can pipe the thumbprint to this parameter or you can pipe a certificate object. (This functionality was added in Carbon 2.5.0.)</p></td>
 	<td>true</td>
-	<td>false</td>
+	<td>true (ByValue, ByPropertyName)</td>
     <td></td>
 </tr>
 <tr valign='top'>
@@ -92,6 +101,8 @@
 	<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.runspaces.pssession.aspx">PSSession[]</a></td>
 	<td class="ParamDescription"><p>Use the <code>Session</code> parameter to uninstall a certificate on remote computer(s) using PowerShell remoting. Use <code>New-PSSession</code> to create a session.</p>
 
+<p>Due to a bug in PowerShell, you can't remove a certificate by just its thumbprint over remoting. Using just a thumbprint requires us to enumerate through all installed certificates. When you do this over remoting, PowerShell throws a terminating <code>The system cannot open the device or file specified</code> error.</p>
+
 <p>This parameter was added in Carbon 2.1.0.</p></td>
 	<td>false</td>
 	<td>false</td>
@@ -124,11 +135,26 @@
 </table>
 
 <h2>EXAMPLE 1</h2>
+<pre><code>Uninstall-Certificate -Thumbprint 570895470234023dsaaefdbcgbefa</code></pre>
+<p>Demonstrates how to delete a certificate from all stores it is installed in. <code>Uninstall-Certificate</code> searches every certificate stores and deletes all certificates with the given thumbprint. This functionality was added in Carbon 2.5.0.</p>
+
+
+<h2>EXAMPLE 2</h2>
+<pre><code>'570895470234023dsaaefdbcgbefa' | Uninstall-Certificate</code></pre>
+<p>Demonstrates that you can pipe a thumbprint to <code>Uninstall-Certificate</code>. The certificate is uninstall from all stores it is in. This functionality was added in Carbon 2.5.0.</p>
+
+
+<h2>EXAMPLE 3</h2>
+<pre><code>Get-Item -Path 'cert:\LocalMachine\My\570895470234023dsaaefdbcgbefa' | Uninstall-Certificate</code></pre>
+<p>Demonstrates that you can pipe a certificate <code>Uninstall-Certificate</code>. The certificate is uninstalled from all stores it is in. This functionality was added in Carbon 2.5.0.</p>
+
+
+<h2>EXAMPLE 4</h2>
 <pre><code>Uninstall-Certificate -Thumbprint 570895470234023dsaaefdbcgbefa -StoreLocation CurrentUser -StoreName My</code></pre>
 <p>Removes the 570895470234023dsaaefdbcgbefa certificate from the current user's Personal certificate store.</p>
 
 
-<h2>EXAMPLE 2</h2>
+<h2>EXAMPLE 5</h2>
 <pre><code>$cert = Get-Certificate -FriendlyName 'Carbon Testing Certificate' -StoreLocation LocalMachine -StoreName Root</code></pre>
 <blockquote>
   <p>Uninstall-Certificate -Certificate $cert -StoreLocation LocalMachine -StoreName Root</p>
@@ -137,12 +163,12 @@
 <p>Removes the certificate with friendly name 'Carbon Testing Certificate' from the local machine's Trusted Root Certification Authorities store.</p>
 
 
-<h2>EXAMPLE 3</h2>
+<h2>EXAMPLE 6</h2>
 <pre><code>Uninstall-Certificate -Thumbprint 570895470234023dsaaefdbcgbefa -StoreLocation LocalMachine -StoreName 'SharePoint'</code></pre>
 <p>Demonstrates how to uninstall a certificate from a custom, non-standard store.</p>
 
 
-<h2>EXAMPLE 4</h2>
+<h2>EXAMPLE 7</h2>
 <pre><code>Uninstall-Certificate -Thumbprint 570895470234023dsaaefdbcgbefa -StoreLocation CurrentUser -StoreName My -Session (New-PSSession -ComputerName remote1,remote2)</code></pre>
 <p>Demonstrates how to uninstall a certificate from a remote computer.</p>
 

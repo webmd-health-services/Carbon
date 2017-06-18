@@ -24,7 +24,9 @@
 
 <h2>Syntax</h2>
 <pre class="Syntax"><code>Initialize-Lcm -Push -ComputerName &lt;String[]&gt; [-Credential &lt;PSCredential&gt;] [-CertificateID &lt;String&gt;] [-CertFile &lt;String&gt;] [-CertPassword &lt;Object&gt;] [-RebootIfNeeded] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
+<pre class="Syntax"><code></code></pre>
 <pre class="Syntax"><code>Initialize-Lcm -ServerUrl &lt;String&gt; [-AllowUnsecureConnection] -ConfigurationID &lt;Guid&gt; -ConfigurationMode &lt;String&gt; -ComputerName &lt;String[]&gt; [-Credential &lt;PSCredential&gt;] [-AllowModuleOverwrite] [-CertificateID &lt;String&gt;] [-CertFile &lt;String&gt;] [-CertPassword &lt;Object&gt;] [-RebootIfNeeded] [-RefreshIntervalMinutes &lt;Int32&gt;] [-ConfigurationFrequency &lt;Int32&gt;] [-LcmCredential &lt;PSCredential&gt;] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
+<pre class="Syntax"><code></code></pre>
 <pre class="Syntax"><code>Initialize-Lcm -SourcePath &lt;String&gt; -ConfigurationID &lt;Guid&gt; -ConfigurationMode &lt;String&gt; -ComputerName &lt;String[]&gt; [-Credential &lt;PSCredential&gt;] [-AllowModuleOverwrite] [-CertificateID &lt;String&gt;] [-CertFile &lt;String&gt;] [-CertPassword &lt;Object&gt;] [-RebootIfNeeded] [-RefreshIntervalMinutes &lt;Int32&gt;] [-ConfigurationFrequency &lt;Int32&gt;] [-LcmCredential &lt;PSCredential&gt;] [-WhatIf] [-Confirm] [&lt;CommonParameters&gt;]</code></pre>
 
 <h2>Description</h2>
@@ -36,6 +38,8 @@
 <p>Push mode is simplest. The LCM only applies configurations that are pushed to it via <code>Start-DscConfiguration</code>. It is expected that all resources needed by the LCM are installed and available on the computer. To use <code>Push</code> mode, use the <code>Push</code> switch.</p>
 
 <h2>Pull Mode</h2>
+
+<p><strong><em>NOTE: You can't use <code>Initialize-Lcm</code> to put the local configuration manager in pull mode on Windows 2016 or later.</em></strong></p>
 
 <p>In order to get a computer to pulls its configuration automatically, you need to configure its LCM so it knows where and how to find its DSC pull server. The pull server holds all the resources and modules needed by the computer's configuration.</p>
 
@@ -60,6 +64,8 @@
 <p>This function is not available in 32-bit PowerShell 4 processes on 64-bit operating systems.</p>
 
 <p><code>Initialize-Lcm</code> is new in Carbon 2.0.</p>
+
+<p>You cannot use `Initialize-Lcm</p>
 </div>
 
 <h2>Related Commands</h2>
@@ -242,12 +248,12 @@
 
 <h2>EXAMPLE 2</h2>
 <pre><code>Initialize-Lcm -ConfigurationID 'fc2ffe50-13cd-4cd2-9942-d25ac66d6c13' -ComputerName '10.1.2.3' -ServerUrl 'https://10.4.5.6/PSDSCPullServer.dsc'</code></pre>
-<p>Demonstrates the minimum needed to configure a computer (in this case, <code>10.1.2.3</code>) to pull its configuration from a DSC web server.</p>
+<p>Demonstrates the minimum needed to configure a computer (in this case, <code>10.1.2.3</code>) to pull its configuration from a DSC web server. You can't do this on Windows 2016 or later.</p>
 
 
 <h2>EXAMPLE 3</h2>
 <pre><code>Initialize-Lcm -ConfigurationID 'fc2ffe50-13cd-4cd2-9942-d25ac66d6c13' -ComputerName '10.1.2.3' -SourcePath '\\10.4.5.6\DSCResources'</code></pre>
-<p>Demonstrates the minimum needed to configure a computer (in this case, <code>10.1.2.3</code>) to pull its configuration from an SMB file share.</p>
+<p>Demonstrates the minimum needed to configure a computer (in this case, <code>10.1.2.3</code>) to pull its configuration from an SMB file share. You can't do this on Windows 2016 or later.</p>
 
 
 <h2>EXAMPLE 4</h2>

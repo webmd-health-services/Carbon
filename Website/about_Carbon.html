@@ -47,6 +47,9 @@ errors.</p>
 <p>PowerShell 4.0/5.0 and .NET Framework 4.5 </p>
 
 <p>Windows 7, 8, 2008, or 2012.</p>
+
+<p>To use IIS functions, IIS  must be installed/enabled, including the 
+<code>Web-Scripting-Tools</code> feature.</p>
 <h2>Installation</h2>
 <p>See the <a href="about_Carbon_Installation.html">about_Carbon_Installation</a> help topic for installation instructions.</p>
 <h2>Support</h2>
@@ -59,7 +62,7 @@ are used for command names. Carbon assigns special meaning to these verbs:</p>
 <ul>
 <li>Format: Escape (e.g. <a href="Format-ADSearchFilterValue.html">Format-ADSearchFilterValue</a>).</li>
 <li>Install: Create a resource if it doesn't exist. If it does exist, update its 
-configuration to your desired state (e.g. <a href="Install-User.html">Install-User</a>, <a href="Install-IisWebsite.html">Install-IisWebsite</a>,
+configuration to your desired state (e.g. <a href="Install-User.html">Install-User</a>, <code>Install-IisWebsite</code>,
 etc.).</li>
 <li>Split: Parse (e.g. Split-Ini)</li>
 <li>Uninstall: Remove a resource if it exists. If it doesn't exist, do nothing.</li>

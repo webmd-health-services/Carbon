@@ -28,6 +28,7 @@
     Name = [string]
     [Command = [string]]
     [Credential = [PSCredential]]
+    [Delayed = [bool]]
     [Dependency = [string[]]]
     [DependsOn = [string[]]]
     [Description = [string]]
@@ -101,6 +102,22 @@
 	<td>false</td>
 	<td>false</td>
     <td></td>
+</tr>
+<tr valign='top'>
+	<td>Delayed</td>
+	<td><a href="http://msdn.microsoft.com/en-us/library/system.management.automation.switchparameter.aspx">SwitchParameter</a></td>
+	<td class="ParamDescription"><p>Used in combination with the <code>StartupType</code> parameter to set a service's startup type to <code>Automatic (Delayed)</code>.</p>
+
+<p>If <code>Delayed</code> is true true, and <code>StartupType</code> is <code>Automatic</code> sets the service's startup type to <code>Automatic (Delayed)</code>. </p>
+
+<p>If <code>Delayed</code> is false and <code>StartupType</code> is <code>Automatic, sets the service's startup type to</code>Automatic`.</p>
+
+<p>For all other values of <code>StartupType</code>, this parameter is ignored.</p>
+
+<p>This parameter was added in Carbon 2.5.</p></td>
+	<td>false</td>
+	<td>false</td>
+    <td>False</td>
 </tr>
 <tr valign='top'>
 	<td>OnFirstFailure</td>
@@ -258,6 +275,21 @@
 {
     Name = 'CarbonNoOpService';
     Ensure = 'Absent';
+}
+</code></pre>
+
+
+<h2>EXAMPLE 4</h2>
+
+<p>Demonstrates how to set a service's start type <code>Automatic (Delayed)</code>. This functionality was added in Carbon 2.5.</p>
+
+<pre><code>Carbon_Service InstallNoOpService
+{
+    Name = 'CarbonNoOpService';
+    Path = 'C:\Projects\Carbon\bin\NoOpService.bin';
+    StartupType = 'Automatic';
+    Delayed = $true;
+    Ensure = 'Present';
 }
 </code></pre>
 

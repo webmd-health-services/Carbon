@@ -57,8 +57,12 @@ lazy so added this member.</li>
 <li><code>[bool] IsJunction { get; }</code>: returns <code>$true</code> if the directory is a junction, 
 <code>$false</code> otherwise. Uses the <code>DirectoryInfo</code>'s <code>Attributes</code> properties to make 
 this determination.</li>
-<li><code>[string] TargetPath { get; }</code>: if the <code>DirectoryInfo</code> represents a junction, 
-returns the junction's target path (i.e. the path it points to).</li>
+<li><code>[bool] IsSymbolicLink { get; }</code>: returns <code>$true</code> if the directory is a symbolic
+link, <code>$false</code> otherwise. Uses the Win32 API to make this determination. This 
+function was added in Carbon 2.5.0.</li>
+<li><code>[string] TargetPath { get; }</code>: if the <code>DirectoryInfo</code> is a junction or symbolic 
+link,returns the junction's/symbolic link's target path (i.e. the path it points 
+to). Retrieving the target path for symbolic links was added in Carbon 2.5.0.</li>
 </ul>
 
 <h2>System.IO.FileInfo</h2>
@@ -66,10 +70,16 @@ returns the junction's target path (i.e. the path it points to).</li>
 <ul>
 <li><code>[uint64] FileIndex { get; }</code>: the file's index. This is the file's unique 
 identifier.</li>
+<li><code>[bool] IsSymbolicLink { get; }</code>: returns <code>$true</code> if the file is a symbolic link,
+<code>$false</code> otherwise. Uses the Win32 API to make this determination. This function 
+was added in Carbon 2.5.0.</li>
 <li><code>[uint32] LinkCount { get; }</code>: the number of links to the file. Each unique file
 can be linked to at different paths on the file system.</li>
 <li><code>[uint32] VolumeSerialNumber { get; }</code>: the serial number of the volume the file
 is on.</li>
+<li><code>[string] TargetPath { get; }</code>: if the <code>FileInfo</code> is a symbolic link, returns the 
+symbolic link's target path (i.e. the path it points to). This property was added
+in Carbon 2.5.0.</li>
 </ul>
 
 <h2>System.Security.Cryptography.X509Certificates.X509Certificate2</h2>
