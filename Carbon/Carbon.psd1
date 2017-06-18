@@ -342,20 +342,25 @@ All functions are idempotent: when run multiple times with the same arguments, y
 
             # ReleaseNotes of this module
             ReleaseNotes = @'
+## Enhancements
+
+ * Added `DelayedAutoStart` boolean property to objects returned by `Get-ServiceConfiguration`. This flag is `true` when a service is set to start automatically, delayed. `False` otherwise. Added extended 
+ * The `Install-Service` function and the `Carbon_Service` DSC resource can now set a service's startup type to `Automatic (Delayed)`. Pass `Automatic` to the `StartupType` parameter and use the new `Delayed` switch. The `Delayed` switch is ignored unless `StartupType` is `Automatic`. Fixes [issue #216](https://bitbucket.org/splatteredbits/carbon/issues/216/community-add-automaticdelayed-in).
+ * The `Uninstall-Certificate` function can now delete a certificate by just its thumbprint. The certificate will be uninstalled from *all* stores. You can pipe the thumbprint or a certificate object to `Uninstall-Certificate`.
+ * Added an `EnsureRunning` switch to `Install-Service` function to ensure that any service is started after configuring. (By default, `Install-Service` leaves a service stopped if it was stopped when `Install-Service` begins.)
+ * Added `IsSymbolicLink` extended type property to directory and file objects (i.e. `System.IO.DirectoryInfo` and `System.IO.FileInfo` objects).
+ * Added `TargetPath` extended type property to file (i.e. `System.IO.FileInfo`) objects. If a file is a symbolic link, this property will return the file the link points to.
+ * The `TargetPath` extended type property on directory (i.e. `System.IO.DirectoryInfo) objects now returns target paths when a directory is a symbolic link.
+ * `Initiazlie-Lcm` can't be used on Windows Server 2016 and later to put the DSC local configuration manager into pull mode. `Initialize-Lcm` now writes an error when you try.
+ 
 ## Bug Fixes
 
- * Fixed: `Carbon_Permission` fails when revoking permissions and the `Permissions` property doesn''t have a value.
- * Fixed: `Protect-String` doesn't convert secure strings properly so they get encrypted with extra bytes in them.
- * Fixed: `Revoke-Permission' fails when an identity has multiple access control entries on an item. Thanks to [bozho_](https://bitbucket.org/bozho_/) for reporting [issue #221](https://bitbucket.org/splatteredbits/carbon/issues/221/community-revoke-permission-fails-if-the) and contributing the fix.
- * Fixed: `Compress-Item`' writes an error when using the `WhatIf` switch.
- * Fixed: `Install-IisWebsite` help examples contain invalid/broken code (thanks to John Mitchell for reporting).
- * Fixed: `Install-Service` fails when password contains double quote character, i.e. `"` (fixes [issue #219](https://bitbucket.org/splatteredbits/carbon/issues/219/community-install-service-fails-to)).
- * Fixed: `Read-File` and `Write-File` fail to retry writing to a locked file when `$Global:Error` is full. Fixes [issue #217](https://bitbucket.org/splatteredbits/carbon/issues/217/community-error-handling-in-read-file-and). 
- * Fixed: `Get-FirewallRule` sets the `EdgeTraversalPolicy` to `DeferUser` on rules whose policy is "defer to application". 
- * Fixed: `Get-FirewallRule` fails on non-english-speaking computers. (It was parsing the output of `netsh advfirewall`. Now it uses the Windows Firewall with Advanced Security API.) [Fixes [issue #208](https://bitbucket.org/splatteredbits/carbon/issues/208/community-get-firewallrule-could-not-find).
- * Fixed: `Get-FirewallRule` incorrectly parsed interface types. It assumed interface type was one of multiple values. In reality, it can be set to one or more different values. The underlying enumeration and its values have been updated to be a set of flags (i.e. a bit field).
- * Fixed: `Carbon_FirewallRule` fails when Profile property has more than one value.
- * Fixed: `Get-ScheduledTask` doesn't handle when a scheduled task doesn't exist on Windows 2008.
+ * `Install-Service` and the `Carbon_Service` DSC resource write errors when a service is running and its startup type is changed to `Disabled`.
+ * The `Carbon_ScheduledTask` DSC resource writes incorrect information to verbose log when the current and desired credential for the scheduled task are different.
+ * The `Carbon_ScheduledTask` DSC resource doesn't correctly detect when a task's identity has changed (it wasn't converting usernames to their canonical representation before comparing the existing identity with the desired identity).
+ * Fixed: Importing Carbon in 32-bit PowerShell fails on a 64-bit operating system. DSC isn't available so the `Initialize-Lcm` function can't be exported. Thanks to [Anders Andersson](https://bitbucket.org/McAndersDK/) for contribuging the fix.
+ * Fixed: `Install-Service` and `Carbon_Service` DSC resource fail to change the identity a service runs as if switching from a custom account to the default `NetworkService` account.
+ * Fixed: `Get-PowerShellModuleInstallPath` returns nothing when run under 32-bit (x86) PowerShell on 64-bit Windows.Fixed: `Get-PowerShellModuleInstallPath` returns nothing when run under 32-bit (x86) PowerShell on 64-bit Windows.
 '@
         } # End of PSData hashtable
     
