@@ -56,12 +56,7 @@ if( -not $SkipWebsite )
 {
     Write-Verbose -Message ('Generating website.')
     & (Join-Path -Path $PSScriptRoot -ChildPath 'New-Website.ps1' -Resolve)
-    hg addremove 'Website'
-    if( (hg status 'Website') )
-    {
-        hg commit -m ('[{0}] Updating website.' -f $manifest.Version) 'Website'
-        hg log -rtip
-    }
+    Write-Warning -Message ('Website updated. Make sure to commit and push all the changes.')
 }
 
 $tags = Get-Content -Raw -Path (Join-Path -Path $PSScriptRoot -ChildPath 'tags.json') |
@@ -138,10 +133,10 @@ Copy-Item -Path (Join-Path -Path $PSScriptRoot -ChildPath $noticeFileName) `
 Copy-Item -Path (Join-Path -Path $PSScriptRoot -ChildPath $licenseFileName) `
             -Destination (Join-Path -Path $zipRoot -ChildPath 'Carbon')
 
-Publish-BitbucketDownload -Username 'splatteredbits' `
-                          -ProjectName 'carbon' `
-                          -Path (Get-ChildItem -Path $zipRoot) `
-                          -ManifestPath $manifestPath
+#Publish-BitbucketDownload -Username 'splatteredbits' `
+#                          -ProjectName 'carbon' `
+#                          -Path (Get-ChildItem -Path $zipRoot) `
+#                          -ManifestPath $manifestPath
 
 Publish-NuGetPackage -ManifestPath $manifestPath `
                      -NuspecPath (Join-Path -Path $cloneDir -ChildPath 'Carbon.nuspec') `

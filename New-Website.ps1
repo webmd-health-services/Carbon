@@ -53,7 +53,7 @@ function Out-HtmlPage
     process
     {
 
-        $webRoot = Join-Path -Path $PSScriptRoot -ChildPath 'Website'
+        $webRoot = Join-Path -Path $PSScriptRoot -ChildPath 'get-carbon.org'
         $path = Join-Path -Path $webRoot -ChildPath $VirtualPath
         $templateArgs = @(
                             $Title,
