@@ -83,7 +83,7 @@ VERSIONING
     
 SEE ALSO
     http://get-carbon.org
-    https://bitbucket.org/splatteredbits/carbon
+    https://github.com/pshdo/Carbon/
     about_Carbon_Installation
     about_Carbon_Support
     about_Carbon_Extended_Type_Data

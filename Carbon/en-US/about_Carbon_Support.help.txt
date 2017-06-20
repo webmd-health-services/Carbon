@@ -26,11 +26,10 @@ E-MAIL
 REPORTING BUGS AND REQUESTING NEW FEATURES AND ENHANCEMENTS
     If you've found a bug or want to request an enhancement, create an issue on the 
     project's [Bitbucket 
-    site](https://bitbucket.org/splatteredbits/carbon/issues?status=new&status=open).     
+    site](https://github.com/pshdo/Carbon/issues/new).     
 
 SEE ALSO
     https://powershell.slack.com/
-    http://slack.poshcode.org/
     carbonps@googlegroups.com
     https://groups.google.com/forum/#!forum/carbonps
-    https://bitbucket.org/splatteredbits/carbon/issues?status=new&status=open
+    https://github.com/pshdo/Carbon/issues/new

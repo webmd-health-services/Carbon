@@ -6,7 +6,7 @@ SHORT DESCRIPTION
     Chocolatey, and NuGet.
     
 INSTALL FROM ZIP ARCHIVE
-    1. [Download the ZIP file from Bitbucket.](https://bitbucket.org/splatteredbits/carbon/downloads/)
+    1. [Download the ZIP file from GitHub.](https://github.com/pshdo/Carbon/releases)
     2. Unblock the zip file (right-click the .zip file, choose Properties, click 
        "Unblock", then click "OK").
     3. Unzip the Carbon module anywhere on your file system. 
@@ -80,4 +80,4 @@ SEE ALSO
     http://chocolatey.org
     http://www.nuget.org
     https://www.powershellgallery.com/
-    https://bitbucket.org/splatteredbits/carbon/downloads/
+    https://github.com/pshdo/Carbon/releases

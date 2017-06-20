@@ -77,7 +77,7 @@ function Out-HtmlPage
         <li><a href="about_Carbon_Support.html">-Support</a></li>
         <li><a href="releasenotes.html">-ReleaseNotes</a></li>
 		<li><a href="http://pshdo.com">-Blog</a></li>
-        <li><a href="http://bitbucket.org/splatteredbits/carbon">-Project</a></li>
+        <li><a href="https://github.com/pshdo/Carbon/">-Project</a></li>
     </ul>
 
     {1}

@@ -7,28 +7,11 @@ SHORT DESCRIPTION
 LONG DESCRIPTION
     We welcome your feedback and contributions!  
     
-    We use Mercurial for source control. To get the Carbon source code onto your computer,
-    run:
-    
-        PS> hg clone https://bitbucket.org/splatteredbits/carbon
+    [Clone the repo from GitHub.](https://github.com/pshdo/Carbon/)
 
-    We belive in Test-Driven Development (TDD)! If you don't, you won't be happy 
-    contributing. Anything you want to submit back to the project must have good tests. 
-    If not, it will take longer to accept your contribution, because we'll have to take 
-    time to write tests. TDD enables us to release new versions of Carbon as soon changes 
-    are committed, pushed, and the tests pass. If the code is ready and works, we want to 
-    release it. No waiting! 
-
-    Blade is our testing framework. It uses NUnit-inspired assertions, e.g. Assert-True, 
-    Assert-Equal, etc. See http://bitbucket.org/splatteredbits/blade for more information.
-    
-    To run Carbon's tests (the full suite takes about 45 minutes), run this command in the 
-    root of your Carbon working directory:
-    
-        PS> .\Invoke-CarbonTest.ps1 -Path .\Test
-        
-    Tests should always clean-up after themselves and strive to leave an operating system 
-    in the exact state it was in before the test fixture ran. 
+    Write tests with Pester. Tests go in the `Tests` directory. Tests should always 
+    clean-up after themselves and strive to leave an operating system in the exact state 
+    it was in before the test fixture ran. 
     
     Unfortunately, we only have the resources to run our tests on a 64-bit Windows 2012 R2
     and 7 computer. Any donations to the project would be used to purchase licenses and 
@@ -70,7 +53,5 @@ STYLE GUIDE
     All functions must have synopsis, description, and example documentation.
     
 SEE ALSO
-    https://bitbucket.org/splatteredbits/carbon
-    https://bitbucket.org/splatteredbits/blade
-    http://mercurial.selenic.com
+    https://github.com/pshdo/Carbon/
     
