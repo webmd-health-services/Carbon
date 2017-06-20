@@ -1,40 +1,106 @@
-﻿$authToken = '52c4cd9eae04878f7fa0ae216e4b92a71345979a'
+﻿[CmdletBinding()]
+param(
+    [Parameter(Mandatory=$true)]
+    [string]
+    # The Github authentication token to use.
+    $GitHubAuthToken,
 
-$credential = 'splatteredbits:{1}' -f $credential.UserName,$authToken
+    [Parameter(Mandatory=$true)]
+    [string]
+    # Your Github username.
+    $GitHubUsername,
 
-    $authHeaderValue = 'Basic {0}' -f [Convert]::ToBase64String( [Text.Encoding]::UTF8.GetBytes($credential) )
-    $headers = @{ 'Authorization' = $authHeaderValue }
-    $authHeader = 
+    [Parameter(Mandatory=$true)]
+    [string]
+    $BitbucketExportJsonPath,
 
-$issueData = Get-Content C:\Users\Aaron\Documents\CarbonBitbucketIssues.json -Raw |
-                ConvertFrom-Json 
+    [int]
+    $Count = 1
+)
+
+#Requires -Version 4
+Set-StrictMode -Version 'Latest'
+
+$credential = '{0}:{1}' -f $GitHubUsername,$GitHubAuthToken
+
+$authHeaderValue = 'Basic {0}' -f [Convert]::ToBase64String( [Text.Encoding]::UTF8.GetBytes($credential) )
+$headers = @{ 
+                'Authorization' = $authHeaderValue;
+                'Accept' = 'application/vnd.github.v3+json';
+            }
+
+$issuesUri = 'https://api.github.com/repos/pshdo/Carbon/issues'
+$githubIssues = Invoke-RestMethod -Method Get -UseBasicParsing -Uri $issuesUri -Headers $headers
+
+$issueData = Get-Content -Path $BitbucketExportJsonPath -Raw | ConvertFrom-Json 
 
 $issueData.issues |
     Where-Object { $_.status -eq 'open' -or $_.status -eq 'new' } |
+    Select-Object -First $Count |
     ForEach-Object {
-        $issue = $_
-        #Write-Host $issue.id
-        $body = $_.content
-        if( $_.user -ne 'splatteredbits' )
+        $bbIssue = $_
+        #Write-Host $bbIssue.id
+        $issueTag = 'bb-issue-{0}' -f $bbIssue.id
+        $githubIssue = $githubIssues | Where-Object { ($_.body -match '\b{0}\b' -f [regex]::Escape($issueTag)) }
+        if( -not $githubIssue )
         {
-            $body = ("{0}{1}{1}Originally submitted by [{2}](https://bitbucket.org/{2}) as [Bitbucket issue #{3}](https://bitbucket.org/splatteredbits/carbon/issues/{3}/)" -f $_.content,[Environment]::NewLine,$issue.reporter,$issue.id)
-        }
-        [pscustomobject]@{
-                            title = $_.title;
-                            body = $body;
-                            labels = @( $_.priority, $_.kind );
-                         } | ConvertTo-Json -Depth 100 #| Out-Null
-        $issueData.comments |
-            Where-Object { $_.issue -eq $issue.id -and $_.content } |
-            foreach {
-                $commentBody = $_.content
-                if( $_.user -ne 'splatteredbits' )
-                {
-                    $commentBody = ('{0}{1}{1}Originally made by [{2}](https://bitbucket.org/{2}).' -f $_.content,[Environment]::NewLine,$_.user)
-                }
+            $bbIssueUri = 'https://bitbucket.org/splatteredbits/carbon/issues/{0}' -f $bbIssue.id
+            $author = ''
+            $authorMention = ''
+            $createdOn = [datetime]$bbIssue.created_on
+            $issueImportTitle = 'Imported from [Bitbucket issue #{0}]({1})' -f $bbIssue.id,$bbIssueUri
+            if( $bbIssue.reporter -ne $GitHubUsername )
+            {
+                $author = ' by [{0}](https://bitbucket.org/{0})' -f $bbIssue.reporter
+                $authorMention = " / @$($bbIssue.reporter)"
+            }
+            $body = @"
+#### $($issueImportTitle), created$($author) on $($created_on.ToString('yyyy-MM-dd'))
+-----
+$($bbIssue.content)
 
-                [pscustomobject]@{
-                                    body = $commentBody
-                                 } | ConvertTo-Json
+###### [$($issueTag)]($bbIssueUri)$($authorMention)
+"@
+            $githubIssueJson = [pscustomobject]@{
+                                                    title = $_.title;
+                                                    body = $body;
+                                                    labels = @( $_.priority, $_.kind, 'from-bitbucket' );
+                                                } | ConvertTo-Json -Depth 100
+            $githubIssue = Invoke-RestMethod -Method Post -Uri $issuesUri -Headers $headers -Body $githubIssueJson -UseBasicParsing
+        }
+
+        $githubComments = Invoke-RestMethod -Method Get -Uri $githubIssue.comments_url -Headers $headers
+
+        $issueData.comments |
+            Where-Object { $_.issue -eq $bbIssue.id -and $_.content } |
+            Sort-Object -Property { [int]$_.id } |
+            ForEach-Object {
+                $comment = $_
+
+                $commentTag = 'bb-issue-comment-{0}' -f $comment.id
+                $gitHubComment = $githubComments | Where-Object { $_.body -match ('\b{0}\b' -f [regex]::Escape($commentTag)) }
+
+                $author = ''
+                $authorMention = ''
+                $created_on = [datetime]$comment.created_on
+                if( $comment.user -ne $GitHubUsername )
+                {
+                    $author = ' by [{0}](https://bitbucket.org/{0})' -f $comment.user
+                    $authorMention = ' / @{0}' -f $comment.user
+                }
+                if( -not $githubComment )
+                {
+                    $commentBody = @"
+#### Originally created$($author) on $($created_on.ToString('yyyy-MM-dd'))
+
+$($comment.content)
+
+###### $($commentTag)$($authorMention)
+"@
+                    $commentJson = [pscustomobject]@{
+                                                        body = $commentBody
+                                                    } | ConvertTo-Json
+                    Invoke-RestMethod -Method Post -Uri $githubIssue.comments_url -Headers $headers -Body $commentJson -UseBasicParsing
+                }
             }
     }
