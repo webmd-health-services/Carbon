@@ -45,36 +45,39 @@ Describe 'Carbon_Service' {
     }
     
     It 'should get existing services' {
-        Get-Service | ForEach-Object {
-            $resource = Get-TargetResource -Name $_.Name
-            $Global:Error.Count | Should Be 0
-            $resource | Should Not BeNullOrEmpty
-            $resource.Name | Should Be $_.Name
-            $resource.Path | Should Be $_.Path
-            $resource.StartupType | Should Be $_.StartMode
-            $resource.Delayed | Should Be $_.DelayedAutoStart
-            $resource.OnFirstFailure | Should Be $_.FirstFailure
-            $resource.OnSecondFailure | Should Be $_.SecondFailure
-            $resource.OnThirdFailure | Should Be $_.ThirdFailure
-            $resource.ResetFailureCount | Should Be $_.ResetPeriod
-            $resource.RestartDelay | Should Be $_.RestartDelay
-            $resource.RebootDelay | Should Be $_.RebootDelay
-            $resource.Command | Should Be $_.FailureProgram
-            $resource.RunCommandDelay | Should Be $_.RunCommandDelay
-            $resource.DisplayName | Should Be $_.DisplayName
-            $resource.Description | Should Be $_.Description
-            ($resource.Dependency -join ',') | Should Be (($_.ServicesDependedOn | Select-Object -ExpandProperty 'Name') -join ',')
-            if( (Test-Identity -Name $_.UserName) )
-            {
-                $resource.UserName | Should Be (Resolve-IdentityName -Name $_.UserName)
+        Get-Service |
+            # Some services can't be retrieved di-rectly.
+            Where-Object { Get-Service -Name $_.Name -ErrorAction Ignore } |
+            ForEach-Object {
+                $resource = Get-TargetResource -Name $_.Name
+                $Global:Error.Count | Should Be 0
+                $resource | Should Not BeNullOrEmpty
+                $resource.Name | Should Be $_.Name
+                $resource.Path | Should Be $_.Path
+                $resource.StartupType | Should Be $_.StartMode
+                $resource.Delayed | Should Be $_.DelayedAutoStart
+                $resource.OnFirstFailure | Should Be $_.FirstFailure
+                $resource.OnSecondFailure | Should Be $_.SecondFailure
+                $resource.OnThirdFailure | Should Be $_.ThirdFailure
+                $resource.ResetFailureCount | Should Be $_.ResetPeriod
+                $resource.RestartDelay | Should Be $_.RestartDelay
+                $resource.RebootDelay | Should Be $_.RebootDelay
+                $resource.Command | Should Be $_.FailureProgram
+                $resource.RunCommandDelay | Should Be $_.RunCommandDelay
+                $resource.DisplayName | Should Be $_.DisplayName
+                $resource.Description | Should Be $_.Description
+                ($resource.Dependency -join ',') | Should Be (($_.ServicesDependedOn | Select-Object -ExpandProperty 'Name') -join ',')
+                if( (Test-Identity -Name $_.UserName) )
+                {
+                    $resource.UserName | Should Be (Resolve-IdentityName -Name $_.UserName)
+                }
+                else
+                {
+                    $resource.UserName | Should Be $_.UserName
+                }
+                $resource.Credential | Should BeNullOrEmpty
+                Assert-DscResourcePresent $resource
             }
-            else
-            {
-                $resource.UserName | Should Be $_.UserName
-            }
-            $resource.Credential | Should BeNullOrEmpty
-            Assert-DscResourcePresent $resource
-        }
     }
     
     It 'should get non existent service' {
