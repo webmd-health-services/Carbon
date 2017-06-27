@@ -49,6 +49,7 @@ Describe 'Carbon_Service' {
             # Some services can't be retrieved di-rectly.
             Where-Object { Get-Service -Name $_.Name -ErrorAction Ignore } |
             ForEach-Object {
+                Write-Verbose -Message ($_.Name) -Verbose
                 $resource = Get-TargetResource -Name $_.Name
                 $Global:Error.Count | Should Be 0
                 $resource | Should Not BeNullOrEmpty
