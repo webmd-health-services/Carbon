@@ -355,7 +355,7 @@ function Grant-Permission
         $setAccessRule = ($Force -or $missingPermission)
         if( $setAccessRule )
         {
-            $currentAcl.SetAccessRule( $accessRule )
+            $currentAcl.AddAccessRule( $accessRule )
         }
 
         if( $rulesToRemove -or $setAccessRule )
