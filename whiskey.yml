@@ -21,8 +21,6 @@ BuildTasks:
 - Delete:
     OnlyBy: BuildServer
     Path: Carbon\bin\*.pdb
-
-Stop:
 - PowerShell:
     Path: Start-CarbonTest.ps1
 - Pester3:
