@@ -12,33 +12,19 @@
 
 & (Join-Path -Path $PSScriptRoot -ChildPath 'Import-CarbonForTest.ps1' -Resolve)
 
+$manifest = Test-ModuleManifest -Path (Join-Path -Path $PSScriptRoot -ChildPath '..\Carbon\Carbon.psd1' -Resolve)
 Describe 'CarbonVersion' {
     $expectedVersion = $null
     
     BeforeEach {
-        $line = Get-Content -Path (Join-Path $PSScriptRoot '..\RELEASE NOTES.txt' -Resolve) | 
-                    Where-Object { $_ -match '^# (\d+)\.(\d+)\.(\d+)\s*' } |
-                    Select-Object -First 1
-        
-        $expectedVersion = New-Object Version $matches[1],$matches[2],$matches[3]
-    }
-    
-    It 'carbon module version is correct' {
-        $moduleInfo = Get-Module -Name Carbon
-        $moduleInfo | Should Not BeNullOrEmpty
-        $moduleInfo.Version.Major | Should Be $expectedVersion.Major
-        $moduleInfo.Version.Minor | Should Be $expectedVersion.Minor
-        $moduleInfo.Version.Build | Should Be $expectedVersion.Build
     }
     
     It 'carbon assembly version is correct' {
         $binPath = Join-Path -Path $PSScriptRoot -ChildPath '..\Carbon\bin\*'
         Get-ChildItem -Path $binPath -Include 'Carbon*.dll' | ForEach-Object {
     
-            $_.VersionInfo.FileVersion | Should Be $expectedVersion
-            $_.VersionInfo.ProductVersion.ToString().StartsWith($expectedVersion.ToString()) | Should Be $true
-    
+            $_.VersionInfo.FileVersion | Should Be $manifest.Version
+            $_.VersionInfo.ProductVersion.ToString().StartsWith($manifest.Version.ToString()) | Should Be $true
         }
     }
-    
 }

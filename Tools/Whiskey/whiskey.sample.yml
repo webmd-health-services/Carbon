@@ -1,0 +1,105 @@
+# The version being built. It must be a [Semantic Version](http://semver.org). 
+# Pre-release metadata is allowed. Build metadata is removed. When running on a build 
+# server, the build metadata is replaced with information provided by the build server. 
+# The build metadata uses this format `BUILD_NUMBER.BRANCH.COMMIT_ID`. For example, if 
+# the current build number is `93`, the branch is `release/2.0`, and the commit ID is 
+# `d3833712a970a7b5015725d3e1d0577f7e6475fa`, the build metadata will be 
+# `93.release-2.0.d383371`.
+#
+# If you omit the Version property, a version number is created using this format: 
+# `YEAR.MONTHDAY.BUILD_NUMBER`. For example, if today is 3/9/2017 and the build number 
+# is `93`, the version number would be `2017.309.93`. When running on a build server, 
+# the build metadata is replaced with information provided by the build server. The 
+# build metadaa use the format `BRANCH.COMMIT_ID`. For example, if tthe branch is 
+# `release/2.0`, and the commit ID is `d3833712a970a7b5015725d3e1d0577f7e6475fa`, the 
+# build metadata will be `release-2.0.d383371`.
+#
+# The version to build may also be taken from a file. See the documentation for the 
+# `VersionFrom` property below. If your `whiskey.yml` has both `Version` and 
+# `VersionFrom` properties, the `Version` property is used.
+Version: 0.0.0
+
+# The `VersionFrom` property is the path to a file that contains the version being 
+# built. You may use the path to a:
+#
+# * Node.js `package.json` file;
+# * a PowerShell module manifest (e.g. `.psd1` file)
+#
+# The `package.json` file must have a `version` property, e.g.
+#
+#    {
+#        "version": "1.0.0"
+#    }
+#
+# The PowerShell module manifest file must contain a `ModuleVersion` property, e.g.
+#
+#    @{
+#        ModuleVersion = '0.14.0';
+#    }
+# 
+# If your `whiskey.yml` has both `Version` and `VersionFrom` properties, the `Version` 
+# property is used.
+# VersionFrom: 'Whiskey/Whiskey.ps1'
+
+# The `PublishOn` property is a list of branch names. After a successful build on a 
+# branch that matches any name in this list, the `PublishTasks` pipeline will run. With 
+# an empty `PublishOn` property, your `PublishTasks` pipeline will never run.
+#
+# Wildcards are supported. For example, if `release/*` is in the list, the 
+# `PublishTasks` pipeline would run on the `release/6.3` branch but not the `release`
+# branch.
+PublishOn:
+ - master
+ 
+# The `PrereleaseMap` property is used to add a prerelease identifiers to your version 
+# during builds on specific branches. It is a list of key/value pairs, where each key is the 
+# name of a branch and the value is the prerelease identifier to use in builds on that
+# branch. The branch name may contain wildcards to match multiple branches. A unique
+# prerelease number is appended to the end of the identifier, e.g. `alpha.300`. You have
+# no control over the prerelease version number. It will not be duplicated across 
+# builds/branches. It is not guaranteed to increment by one between builds or start at 
+# one. 
+#
+# If a branch matches multiple keys, the first match/prerelease identifer is used. 
+#PrereleaseMap:
+#- "develop": beta
+#- "feature/*": alpha
+
+# The `PublishBuildStatusTo` is a list of publishers where you wnat build status
+# information published. Status is published when a build starts, succeeds, and fails. 
+# Build statuses are only published when running under a build server. You can only
+# report this information to Bitbucket Server.
+#
+# The BitbucketServer publisher requires two properties:
+#
+# * Uri: the URI to the Bitbucket Server.
+# * CredentialID: the ID of the credential to use when connecting. Credentials are added
+#   to the context object returned by `New-WhsCITestContext`, e.g. 
+#   `$context.Credentials.Add( 'CREDENTIAL_ID', $credential )
+PublishBuildStatusTo:
+- BitbucketServer:
+    Uri: https://bitbucket.example.com
+    CredentialID: BBServer
+
+# An array of build tasks you want to run during a build, e.g.
+# 
+#     BuildTasks:
+#     - TASK_NAME:
+#         PROPERTY_ONE: VALUE_ONE
+#         PROPERTY_TWO: VALUE_TWO
+#
+# See the documentation for each individual task for YML samples.
+BuildTasks:
+
+# An array of tasks you want to run when publishing, e.g.
+# 
+#     BuildTasks:
+#     - TASK_NAME:
+#         PROPERTY_ONE: VALUE_ONE
+#         PROPERTY_TWO: VALUE_TWO
+#
+# Publishing happens when run under a build server and building on a publishing branch.
+# Publishing branches are configured with the `PublishOn` property.
+#
+# See the documentation for each individual task for YML samples.
+PublishTasks:

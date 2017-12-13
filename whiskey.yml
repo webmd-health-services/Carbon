@@ -1,0 +1,43 @@
+
+VersionFrom: Carbon\Carbon.psd1
+
+PublishOn:
+ - master
+ 
+BuildTasks:
+- MSBuild:
+    Path: Source\Carbon.sln
+# - NUnit2:
+#    Path: Source\Test\bin\$(WHISKEY_MSBUILD_CONFIGURATION)\Carbon.Test.dll
+- PowerShell:
+    Path: Start-CarbonTest.ps1
+#- Pester3:
+#    OnlyBy: Developer
+#    Path: 
+#    - Test\LicenseNotices.Tests.ps1
+#    - Test\*.ps1xml.Tests.ps1
+#    - Test\Website.Tests.ps1
+- PowerShell:
+    OnlyBy: Developer
+    Path: Tools\Blade\blade.ps1
+    Argument:
+        Path: 
+        - Test\Test-Documentation.ps1
+        - Test\Test-ImportCarbon.ps1
+        - Test\Test-UsesUseCallerPreference.ps1
+        - Test\Test-ParentProcessID.ps1
+- Pester3:
+    OnlyBy: BuildServer
+    Path: Test\*.Tests.ps1
+- PowerShell:
+    OnlyBy: BuildServer
+    Path: Invoke-CarbonBladeTest.ps1
+    Argument:
+        Recurse: true
+        Path: Test
+- PowerShell:
+    Path: Complete-CarbonTest.ps1
+- NuGetPack:
+    Path: Carbon.nuspec
+
+PublishTasks:

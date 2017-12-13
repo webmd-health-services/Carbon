@@ -33,8 +33,15 @@ param(
 #Requires -Version 4
 Set-StrictMode -Version Latest
 
-& (Join-Path -Path $PSScriptRoot -ChildPath 'Tools\Silk\Import-Silk.ps1' -Resolve)
+& (Join-Path -Path $PSScriptRoot -ChildPath 'Tools\Whiskey\Import-Whiskey.ps1' -Resolve)
 
+$whiskeyYmlPath = Join-Path -Path $PSScriptRoot -ChildPath 'whiskey.yml'
+$context = New-WhiskeyContext -Environment 'Dev' -ConfigurationPath $whiskeyYmlPath
+Invoke-WhiskeyBuild -Context $context
+
+return
+
+& (Join-Path -Path $PSScriptRoot -ChildPath 'Tools\Silk\Import-Silk.ps1' -Resolve)
 Set-ModuleVersion -ManifestPath (Join-Path -Path $PSScriptRoot -ChildPath 'Carbon\Carbon.psd1') `
                   -SolutionPath (Join-Path -Path $PSScriptRoot -ChildPath 'Source\Carbon.sln') `
                   -AssemblyInfoPath (Join-Path -Path $PSScriptRoot -ChildPath 'Source\Properties\AssemblyVersion.cs') `

@@ -12,3 +12,8 @@ Source\**\*.user
 Test\MSI\setup.exe
 *.snk
 *.nupkg
+.output
+Modules
+packages
+Website
+Test/Xml/*.dll

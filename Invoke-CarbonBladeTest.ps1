@@ -15,7 +15,6 @@ Runs Carbon tests.
 # limitations under the License.
 [CmdletBinding()]
 param(
-    [Parameter(Mandatory=$true)]
     [string[]]
     $Path,
 
@@ -40,89 +39,37 @@ $prependFormats = @(
                     )
 Update-FormatData -PrependPath $prependFormats
 
-& (Join-Path -Path $PSScriptRoot -ChildPath 'Carbon\Import-Carbon.ps1' -Resolve)
-
-
 $bladeTestParam = @{ }
-$pesterTestParam = @{}
 if( $Test )
 {
-    $bladeTestParam.Test = $Test
-    $pesterTestParam['TestName'] = $Test
+    $bladeTestParam['Test'] = $Test
 }
 
-try
+$uploadTestResults = $false 
+$uploadUri = ''
+if( Test-Path -Path 'env:APPVEYOR' )
 {
-    $uploadTestResults = $false 
-    $uploadUri = ''
-    if( Test-Path -Path 'env:APPVEYOR' )
-    {
-        $uploadTestResults = $true
-        $uploadUri = 'https://ci.appveyor.com/api/testresults/nunit/{0}' -f $env:APPVEYOR_JOB_ID 
+    $uploadTestResults = $true
+    $uploadUri = 'https://ci.appveyor.com/api/testresults/nunit/{0}' -f $env:APPVEYOR_JOB_ID 
+}
 
-        # On AppVeyor, VMs have duplicate PSModulePaths.
-        $modulePaths = Invoke-Command -ScriptBlock {
-                                                         $env:PSModulePath -split ';' | Select-Object -Unique
-                                                         $PSScriptRoot
-                                                   }
-        $env:PSModulePath = $modulePaths -join ';'
-        [Environment]::SetEnvironmentVariable('PSModulePath',$env:PSModulePath,[EnvironmentVariableTarget]::Machine)
-        $env:PSModulePath
-    }
-    else
-    {
-        $installRoot = Get-PowerShellModuleInstallPath
-        $carbonModuleRoot = Join-Path -Path $installRoot -ChildPath 'Carbon'
-        Install-Junction -Link $carbonModuleRoot -Target (Join-Path -Path $PSScriptRoot -ChildPath 'Carbon' -Resolve) | Format-Table | Out-String | Write-Verbose
-    }
-    Clear-DscLocalResourceCache
+$testsFailed = $false
 
-    
+$xmlLogPath = Join-Path -Path $PSScriptRoot -ChildPath '.output\Carbon.blade.xml'
+$bladePath = Join-Path -Path $PSScriptRoot -ChildPath '.\Tools\Blade\blade.ps1' -Resolve
+& $bladePath -Path $Path -XmlLogPath $xmlLogPath @bladeTestParam -Recurse:$Recurse -PassThru:$PassThru
+if( $LastBladeResult.Errors -or $LastBladeResult.Failures )
+{
+    $testsFailed = $true
+}
 
-    $testsFailed = $false
-
-    $xmlLogPath = Split-Path -Qualifier -Path $PSScriptRoot
-    $xmlLogPath = Join-Path -Path $xmlLogPath -ChildPath 'BuildOutput\Carbon\CodeQuality\Carbon.blade.xml'
-    & (Join-Path -Path $PSScriptRoot -ChildPath '.\Tools\Blade\blade.ps1' -Resolve) -Path $Path -XmlLogPath $xmlLogPath @bladeTestParam -Recurse:$Recurse -PassThru:$PassThru
-    if( $LastBladeResult.Errors -or $LastBladeResult.Failures )
-    {
-        $testsFailed = $true
-    }
-    
+if( $uploadTestResults )
+{
     $webClient = New-Object 'Net.WebClient'
-
-    if( $uploadTestResults )
-    {
-        $webClient.UploadFile($uploadUri, $xmlLogPath)
-    }
-
-    Get-Module -ListAvailable -FullyQualifiedName Carbon | Format-List | Out-String | Write-Host
-
-    $xmlLogPath = Join-Path -Path (Split-Path -Parent -Path $xmlLogPath) -ChildPath 'Carbon.pester.xml'
-    Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'Tools\Pester\Pester.psd1' -Resolve)
-    $result = Invoke-Pester -Script $Path -OutputFile $xmlLogPath -OutputFormat LegacyNUnitXml -PassThru @pesterTestParam |
-                    Select-Object -Last 1
-
-    if( $uploadTestResults )
-    {
-        $webClient.UploadFile($uploadUri, $xmlLogPath)
-    }
-
-    if( $result.FailedCount )
-    {
-        $testsFailed =$true
-        Write-Error -Message ('{0} Pester tests failed. Check the NUnit reports for more details.' -f $result.FailedCount)
-    }
-
-    if( $testsFailed )
-    {
-        throw 'Some tests failed.'
-    }
+    $webClient.UploadFile($uploadUri, $xmlLogPath)
 }
-finally
+
+if( $testsFailed )
 {
-    if( -not (Test-Path -Path 'env:APPVEYOR') )
-    {
-        Uninstall-Junction -Path $carbonModuleRoot
-    }
+    throw 'Blade tests failed.'
 }
