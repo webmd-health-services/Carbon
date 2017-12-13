@@ -5,6 +5,9 @@ PublishOn:
  - master
  
 BuildTasks:
+- PowerShell:
+    OnlyBy: BuildServer
+    Path: Save-CarbonSigningKey.ps1
 - MSBuild:
     Path: Source\Carbon.sln
 # - NUnit2:
