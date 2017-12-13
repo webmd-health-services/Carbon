@@ -106,12 +106,35 @@ namespace Carbon.Test
 
 	    [Test]
 	    public void ShouldAddUserToGroup()
-	    {
-		    var id = Identity.FindByName(string.Format("{0}\\{1}", Environment.UserDomainName, Environment.UserName));
-		    id.AddToLocalGroup("CarbonShareRead");
-	    }
+        {
+            using (var ctx = new PrincipalContext(ContextType.Machine))
+            {
+                using (var group = GroupPrincipal.FindByIdentity(ctx, "CIdentityTest"))
+                {
+                    if (group == null)
+                    {
+                        using (var newGroup = new GroupPrincipal(ctx, "CIdentityTest"))
+                        {
+                            newGroup.Description = string.Format("Group created by {0} test fixture.", typeof(IdentityTest).FullName);
+                            newGroup.Save();
+                        }
+                    }
+                }
 
-	    [Test]
+                try
+                {
+                    var id = Identity.FindByName(string.Format("{0}\\{1}", Environment.UserDomainName, Environment.UserName));
+                    id.AddToLocalGroup("CarbonShareRead");
+                }
+                finally
+                {
+                    using (var group = GroupPrincipal.FindByIdentity(ctx, "CIdentityTest"))
+                        group.Delete();
+                }
+            }
+        }
+
+        [Test]
 	    public void ShouldFindUserInGroup()
 	    {
 			var id = Identity.FindByName(string.Format("{0}\\{1}", Environment.UserDomainName, Environment.UserName));

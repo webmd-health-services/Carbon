@@ -10,8 +10,8 @@ BuildTasks:
     Path: Save-CarbonSigningKey.ps1
 - MSBuild:
     Path: Source\Carbon.sln
-# - NUnit2:
-#    Path: Source\Test\bin\$(WHISKEY_MSBUILD_CONFIGURATION)\Carbon.Test.dll
+- NUnit2:
+    Path: Source\Test\bin\$(WHISKEY_MSBUILD_CONFIGURATION)\Carbon.Test.dll
 - CopyFile:
     Path: 
     - Source\bin\$(WHISKEY_MSBUILD_CONFIGURATION)\*
