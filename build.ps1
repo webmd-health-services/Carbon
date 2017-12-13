@@ -41,7 +41,7 @@ Invoke-WhiskeyBuild -Context $context
 
 return
 
-& (Join-Path -Path $PSScriptRoot -ChildPath 'Tools\Silk\Import-Silk.ps1' -Resolve)
+<#& (Join-Path -Path $PSScriptRoot -ChildPath 'Tools\Silk\Import-Silk.ps1' -Resolve)
 Set-ModuleVersion -ManifestPath (Join-Path -Path $PSScriptRoot -ChildPath 'Carbon\Carbon.psd1') `
                   -SolutionPath (Join-Path -Path $PSScriptRoot -ChildPath 'Source\Carbon.sln') `
                   -AssemblyInfoPath (Join-Path -Path $PSScriptRoot -ChildPath 'Source\Properties\AssemblyVersion.cs') `
@@ -51,3 +51,4 @@ Set-ModuleVersion -ManifestPath (Join-Path -Path $PSScriptRoot -ChildPath 'Carbo
                   -ReleaseNotesPath (Join-Path -Path $PSScriptRoot -ChildPath 'RELEASE NOTES.txt' -Resolve) `
                   -NuspecPath (Join-Path -Path $PSScriptRoot -ChildPath 'Carbon.nuspec' -Resolve)
 
+#>

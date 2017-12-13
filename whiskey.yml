@@ -1,5 +1,5 @@
 
-VersionFrom: Carbon\Carbon.psd1
+Version: 2.5.1
 
 PublishOn:
  - master
@@ -12,6 +12,17 @@ BuildTasks:
     Path: Source\Carbon.sln
 # - NUnit2:
 #    Path: Source\Test\bin\$(WHISKEY_MSBUILD_CONFIGURATION)\Carbon.Test.dll
+- CopyFile:
+    Path: 
+    - Source\bin\$(WHISKEY_MSBUILD_CONFIGURATION)\*
+    - Source\Iis\bin\$(WHISKEY_MSBUILD_CONFIGURATION)\*
+    - Source\Xdt\bin\$(WHISKEY_MSBUILD_CONFIGURATION)\*
+    DestinationDirectory: Carbon\bin
+- Delete:
+    OnlyBy: BuildServer
+    Path: Carbon\bin\*.pdb
+
+Stop:
 - PowerShell:
     Path: Start-CarbonTest.ps1
 - Pester3:
