@@ -86,14 +86,25 @@ if( $Prefix )
     $importModuleParams.Prefix = $Prefix
 }
 
-if( $Force -and $loadedModule )
-{
-    # Remove so we don't get errors about conflicting type data.
-    Remove-Module -Name 'Carbon' -Verbose:$false -WhatIf:$false
-}
-
 Write-Verbose -Message ('Importing Carbon ({0}).' -f $carbonPsd1Path)
-Import-Module $carbonPsd1Path -ErrorAction Stop -Verbose:$false @importModuleParams
+& {
+    $originalVerbosePreference = $Global:VerbosePreference
+    $Global:VerbosePreference = [Management.Automation.ActionPreference]::SilentlyContinue
+    try 
+    {
+        if( $Force -and $loadedModule )
+        {
+            # Remove so we don't get errors about conflicting type data.
+            Remove-Module -Name 'Carbon' -WhatIf:$false
+        }
+
+        Import-Module $carbonPsd1Path -ErrorAction Stop @importModuleParams
+    }
+    finally
+    {
+        $Global:VerbosePreference = $originalVerbosePreference
+    }
+}
 
 if( -not (Get-Module -Name 'Carbon' | Get-Member -Name 'ImportedAt') )
 {

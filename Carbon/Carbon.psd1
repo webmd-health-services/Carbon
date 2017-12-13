@@ -345,6 +345,7 @@ All functions are idempotent: when run multiple times with the same arguments, y
 ## Bug Fixes
 
 * Fixed: Carbon takes 10 to 20 seconds to load. In trying to detect if the Win32_OptionalFeature class is available on the current operating system, it was actually loading all the Win32_OptionalFeature instances. Oops. Now, it just checks for the existence of the Win32_OptionalFeature class. Load times should now be about two to three seconds. ([Fixes issue #35.](https://github.com/pshdo/Carbon/issues/35))
+* Import-Carbon.ps1 now hides verbose messages typically shown by Import-Module and Remove-Module cmdlets.
 '@
         } # End of PSData hashtable
     
