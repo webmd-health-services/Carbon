@@ -18,9 +18,14 @@ param(
 #Requires -Version 3
 Set-StrictMode -Version 'Latest'
 
-if( (Get-Module -Name 'Blade') )
-{
-    Remove-Module 'Blade' -Verbose:$false
-}
+& {
+    $originalVerbosePreference = $Global:VerbosePreference
+    $Global:VerbosePreference = [Management.Automation.ActionPreference]::SilentlyContinue
 
-Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'Blade.psd1' -Resolve) -Verbose:$false
+    if( (Get-Module -Name 'Blade') )
+    {
+        Remove-Module 'Blade'
+    }
+
+    Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'Blade.psd1' -Resolve)
+}
