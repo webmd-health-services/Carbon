@@ -11,12 +11,12 @@ BuildTasks:
 #    Path: Source\Test\bin\$(WHISKEY_MSBUILD_CONFIGURATION)\Carbon.Test.dll
 - PowerShell:
     Path: Start-CarbonTest.ps1
-#- Pester3:
-#    OnlyBy: Developer
-#    Path: 
-#    - Test\LicenseNotices.Tests.ps1
-#    - Test\*.ps1xml.Tests.ps1
-#    - Test\Website.Tests.ps1
+- Pester3:
+    OnlyBy: Developer
+    Path: 
+    - Test\LicenseNotices.Tests.ps1
+    - Test\*.ps1xml.Tests.ps1
+    - Test\Website.Tests.ps1
 - PowerShell:
     OnlyBy: Developer
     Path: Tools\Blade\blade.ps1
