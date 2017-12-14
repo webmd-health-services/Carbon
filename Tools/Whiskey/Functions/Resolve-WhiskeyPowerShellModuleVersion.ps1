@@ -17,23 +17,26 @@ function Resolve-WhiskeyPowerShellModuleVersion
 
     if( $Version )
     {
-        if( -not [Management.Automation.WildcardPattern]::ContainsWildcardCharacters($version) )
+        if( [Management.Automation.WildcardPattern]::ContainsWildcardCharacters($version) )
+        {
+            $Version = Find-Module -Name $ModuleName -AllVersions | 
+                            Where-Object { $_.Version.ToString() -like $Version } | 
+                            Sort-Object -Property 'Version' -Descending | 
+                            Select-Object -First 1 | 
+                            Select-Object -ExpandProperty 'Version'
+            if( -not $Version )
+            {
+                Write-Error -Message ('Failed to find module {0} version {1} on the PowerShell Gallery. Either the {0} module does not exist, or it does but version {1} does not exist. Browse the PowerShell Gallery at https://www.powershellgallery.com/' -f $ModuleName, $tempVersion)
+                return
+            }
+        }
+        else
         {
             $tempVersion = [Version]$Version
-            if( $TempVersion -and ($TempVersion.Build -lt 0) )
+            if( $TempVersion -and ($tempVersion.Build -lt 0) )
             {
                 $Version = [version]('{0}.{1}.0' -f $TempVersion.Major,$TempVersion.Minor)
             }
-        }
-        $Version = Find-Module -Name $ModuleName -AllVersions | 
-                        Where-Object { $_.Version.ToString() -like $Version } | 
-                        Sort-Object -Property 'Version' -Descending | 
-                        Select-Object -First 1 | 
-                        Select-Object -ExpandProperty 'Version'
-        if( -not $Version )
-        {
-            Write-Error -Message ('Failed to find module {0} version {1} on the PowerShell Gallery. Either the {0} module does not exist, or it does but version {1} does not exist. Browse the PowerShell Gallery at https://www.powershellgallery.com/' -f $ModuleName, $tempVersion)
-            return
         }
     }
     else
