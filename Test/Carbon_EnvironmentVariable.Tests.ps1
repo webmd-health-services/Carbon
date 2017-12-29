@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-$env:PSModulePath
+Write-Host -Object $env:PSModulePath -ForegroundColor DarkYellow
 
 Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'CarbonDscTest' -Resolve) -Force
 
