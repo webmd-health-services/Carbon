@@ -12,18 +12,33 @@ BuildTasks:
     Path: Source\Carbon.sln
 - NUnit2:
     Path: Source\Test\bin\$(WHISKEY_MSBUILD_CONFIGURATION)\Carbon.Test.dll
-- CopyFile:
-    Path: 
-    - Source\bin\$(WHISKEY_MSBUILD_CONFIGURATION)\*
-    - Source\Iis\bin\$(WHISKEY_MSBUILD_CONFIGURATION)\*
-    - Source\Xdt\bin\$(WHISKEY_MSBUILD_CONFIGURATION)\*
-    DestinationDirectory: Carbon\bin
+- Exec:
+    Path: robocopy
+    Argument:
+        - Source\bin\$(WHISKEY_MSBUILD_CONFIGURATION)
+        - Carbon\bin
+    SuccessExitCode: <8
+- Exec:
+    Path: robocopy
+    Argument:
+        - Source\Iis\bin\$(WHISKEY_MSBUILD_CONFIGURATION)
+        - Carbon\bin
+    SuccessExitCode: <8
+- Exec:
+    Path: robocopy
+    Argument:
+        - Source\Xdt\bin\$(WHISKEY_MSBUILD_CONFIGURATION)
+        - Carbon\bin
+    SuccessExitCode: <8
 - Delete:
     OnlyBy: BuildServer
     Path: Carbon\bin\*.pdb
 - EnvironmentVariable:
     OnlyBy: BuildServer
     PSModulePath: "$(PSModulePath);$(WHISKEY_BUILD_ROOT)"
+    Scope:
+    - Process
+    - Machine
 - PowerShell:
     OnlyBy: Developer
     Path: Start-CarbonTest.ps1

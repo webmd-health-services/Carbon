@@ -103,6 +103,7 @@ function Invoke-WhiskeyPester3Task
                                         Import-Module -Name $pesterModulePath
                                     }
 
+        $env:PSModulePath | Write-Verbose -Verbose
         Invoke-Pester -Script $script -OutputFile $outputFile -OutputFormat NUnitXml -PassThru
     } 
     

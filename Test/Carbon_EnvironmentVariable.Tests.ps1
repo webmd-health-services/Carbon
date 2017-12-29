@@ -10,13 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-Write-Verbose $env:PSModulePath -Verbose
-
-Get-Module -ListAvailable -FullyQualifiedName Carbon | Format-List | Out-String | Write-Verbose -Verbose
-
-<#Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'CarbonDscTest' -Resolve) -Force
-
-Get-Module -ListAvailable -FullyQualifiedName Carbon | Format-List | Out-String | Write-Host
+Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'CarbonDscTest' -Resolve) -Force
 
 Describe 'Carbon_EnvironmentVariable' {
     function Assert-EnvironmentVariable
@@ -143,4 +137,3 @@ Describe 'Carbon_EnvironmentVariable' {
         $result.PsTypeNames | Where-Object { $_ -like '*Carbon_EnvironmentVariable' } | Should Not BeNullOrEmpty
     }
 }
-#>
