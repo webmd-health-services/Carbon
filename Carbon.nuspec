@@ -71,13 +71,10 @@ All functions are idempotent: when run multiple times with the same arguments, y
   <files>
     <file src=".\Carbon\**\*" target="Carbon" exclude="**\*.pdb" />
     <file src=".\examples\**\*" target="Examples" />
-    <file src=".\Website\**\*" target="Website" />
     <file src=".\Tools\chocolateyInstall.ps1" target="Tools" />
     <file src=".\Tools\chocolateyUninstall.ps1" target="Tools" />
     <file src=".\LICENSE.txt" target="" />
     <file src=".\NOTICE.txt" target="" />
-    <file src=".\LICENSE.txt" target="Carbon" />
-    <file src=".\NOTICE.txt" target="Carbon" />
     <file src=".\RELEASE NOTES.txt" target="" />
   </files>
 </package>
