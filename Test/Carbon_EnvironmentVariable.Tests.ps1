@@ -12,7 +12,7 @@
 
 Write-Host -Object $env:PSModulePath -ForegroundColor DarkYellow
 
-Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'CarbonDscTest' -Resolve) -Force
+<#Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'CarbonDscTest' -Resolve) -Force
 
 Get-Module -ListAvailable -FullyQualifiedName Carbon | Format-List | Out-String | Write-Host
 
@@ -141,3 +141,4 @@ Describe 'Carbon_EnvironmentVariable' {
         $result.PsTypeNames | Where-Object { $_ -like '*Carbon_EnvironmentVariable' } | Should Not BeNullOrEmpty
     }
 }
+#>
