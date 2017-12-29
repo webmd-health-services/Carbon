@@ -21,7 +21,11 @@ BuildTasks:
 - Delete:
     OnlyBy: BuildServer
     Path: Carbon\bin\*.pdb
+- EnvironmentVariable:
+    OnlyBy: BuildServer
+    PSModulePath: "$(PSModulePath);$(WHISKEY_BUILD_ROOT)"
 - PowerShell:
+    OnlyBy: Developer
     Path: Start-CarbonTest.ps1
 - Pester3:
     OnlyBy: Developer
@@ -50,6 +54,7 @@ BuildTasks:
         Recurse: true
         Path: Test
 - PowerShell:
+    OnlyBy: Developer
     Path: Complete-CarbonTest.ps1
 - NuGetPack:
     Path: Carbon.nuspec
