@@ -10,7 +10,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-Write-Host -Object $env:PSModulePath -ForegroundColor DarkYellow
+Write-Verbose $env:PSModulePath -Verbose
+
+Get-Module -ListAvailable -FullyQualifiedName Carbon | Format-List | Out-String | Write-Verbose -Verbose
 
 <#Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'CarbonDscTest' -Resolve) -Force
 
