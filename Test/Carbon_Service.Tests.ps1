@@ -47,7 +47,7 @@ Describe 'Carbon_Service' {
     It 'should get existing services' {
         Get-Service |
             # Some services can't be retrieved di-rectly.
-            Where-Object { (Get-Service -Name $_.Name -ErrorAction Ignore) -and (@('lltdsvc') -notcontains $_.Name) } |
+            Where-Object { (Get-Service -Name $_.Name -ErrorAction Ignore) -and (@('lltdsvc','lltdio') -notcontains $_.Name) } |
             ForEach-Object {
                 Write-Verbose -Message ($_.Name) -Verbose
                 $resource = Get-TargetResource -Name $_.Name
