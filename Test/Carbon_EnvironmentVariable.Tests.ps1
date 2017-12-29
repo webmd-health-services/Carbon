@@ -10,6 +10,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+$env:PSModulePath
+
 Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'CarbonDscTest' -Resolve) -Force
 
 Get-Module -ListAvailable -FullyQualifiedName Carbon | Format-List | Out-String | Write-Host
