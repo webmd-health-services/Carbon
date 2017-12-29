@@ -32,7 +32,6 @@ param(
 
 #Requires -Version 4
 Set-StrictMode -Version Latest
-$ErrorActionPreference = 'Stop'
 
 & (Join-Path -Path $PSScriptRoot -ChildPath 'Tools\Whiskey\Import-Whiskey.ps1' -Resolve)
 
