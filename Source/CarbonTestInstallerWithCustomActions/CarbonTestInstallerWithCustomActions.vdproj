@@ -15,38 +15,14 @@
     {
         "Entry"
         {
-        "MsmKey" = "8:_10D3F2C21DE14E29BB097757827D5B32"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_C48D0A1A07244362941C815D6A9683AA"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_CC0A2D32D0DD4E40977A367D421E8965"
+        "MsmKey" = "8:_B8F0BD8399864520B77B80351C914B4C"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_CC0A2D32D0DD4E40977A367D421E8965"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_C48D0A1A07244362941C815D6A9683AA"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_10D3F2C21DE14E29BB097757827D5B32"
+        "OwnerKey" = "8:_B8F0BD8399864520B77B80351C914B4C"
         "MsmSig" = "8:_UNDEFINED"
         }
     }
@@ -121,45 +97,45 @@
     {
         "CustomAction"
         {
-            "{4AA51A2D-7D85-4A59-BA75-B0809FC8B380}:_907703A3BE0C46CBA6E0D39B0FF1490A"
+            "{4AA51A2D-7D85-4A59-BA75-B0809FC8B380}:_0EA58D118CAB44379FB39A451F743924"
             {
             "Name" = "8:Primary output from Carbon.Test.Installer (Active)"
             "Condition" = "8:"
-            "Object" = "8:_C48D0A1A07244362941C815D6A9683AA"
+            "Object" = "8:_B8F0BD8399864520B77B80351C914B4C"
             "FileType" = "3:1"
             "InstallAction" = "3:4"
             "Arguments" = "8:"
             "EntryPoint" = "8:"
             "Sequence" = "3:1"
-            "Identifier" = "8:_5259356E_3707_48CC_AAE0_70644B3DA1AD"
+            "Identifier" = "8:_F8F6D891_F0F0_4929_903B_7718A097B181"
             "InstallerClass" = "11:TRUE"
             "CustomActionData" = "8:"
             }
-            "{4AA51A2D-7D85-4A59-BA75-B0809FC8B380}:_A7EF79FE69AC41F9A6B395FF075AB2CB"
+            "{4AA51A2D-7D85-4A59-BA75-B0809FC8B380}:_1CA730EB40BC4D4B8E4845E849036972"
             {
             "Name" = "8:Primary output from Carbon.Test.Installer (Active)"
             "Condition" = "8:"
-            "Object" = "8:_CC0A2D32D0DD4E40977A367D421E8965"
+            "Object" = "8:_B8F0BD8399864520B77B80351C914B4C"
             "FileType" = "3:1"
             "InstallAction" = "3:1"
             "Arguments" = "8:"
             "EntryPoint" = "8:"
             "Sequence" = "3:1"
-            "Identifier" = "8:_23903FA9_5405_4FCF_867F_ED97C226B7DE"
+            "Identifier" = "8:_4AB380EB_3C5C_4FD6_AD39_0CE67173263E"
             "InstallerClass" = "11:TRUE"
             "CustomActionData" = "8:"
             }
-            "{4AA51A2D-7D85-4A59-BA75-B0809FC8B380}:_CD0A8052F1CC4DD2ACF6DA1A3D690222"
+            "{4AA51A2D-7D85-4A59-BA75-B0809FC8B380}:_6CAD561D3A9A4453B01D8119F40A85C0"
             {
             "Name" = "8:Primary output from Carbon.Test.Installer (Active)"
             "Condition" = "8:"
-            "Object" = "8:_CC0A2D32D0DD4E40977A367D421E8965"
+            "Object" = "8:_B8F0BD8399864520B77B80351C914B4C"
             "FileType" = "3:1"
             "InstallAction" = "3:2"
             "Arguments" = "8:"
             "EntryPoint" = "8:"
             "Sequence" = "3:1"
-            "Identifier" = "8:_746F768A_A32C_4230_95C2_AC553791CCCE"
+            "Identifier" = "8:_7BE486B0_0B92_4838_8A9A_357C05495D32"
             "InstallerClass" = "11:TRUE"
             "CustomActionData" = "8:"
             }
@@ -762,65 +738,9 @@
         }
         "ProjectOutput"
         {
-            "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_10D3F2C21DE14E29BB097757827D5B32"
+            "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_B8F0BD8399864520B77B80351C914B4C"
             {
-            "SourcePath" = "8:..\\ThrowInstallException\\obj\\Debug\\Carbon.Test.Installer.dll"
-            "TargetName" = "8:"
-            "Tag" = "8:"
-            "Folder" = "8:_E89DD5DD809849A6A340ED3E5E715E13"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            "ProjectOutputGroupRegister" = "3:1"
-            "OutputConfiguration" = "8:"
-            "OutputGroupCanonicalName" = "8:Built"
-            "OutputProjectGuid" = "8:{D3F2D40C-A985-46D4-A317-03D7CF6B10E0}"
-            "ShowKeyOutput" = "11:TRUE"
-                "ExcludeFilters"
-                {
-                }
-            }
-            "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_C48D0A1A07244362941C815D6A9683AA"
-            {
-            "SourcePath" = "8:..\\ThrowInstallException\\obj\\Debug\\Carbon.Test.Installer.dll"
-            "TargetName" = "8:"
-            "Tag" = "8:"
-            "Folder" = "8:_E89DD5DD809849A6A340ED3E5E715E13"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            "ProjectOutputGroupRegister" = "3:1"
-            "OutputConfiguration" = "8:"
-            "OutputGroupCanonicalName" = "8:Built"
-            "OutputProjectGuid" = "8:{D3F2D40C-A985-46D4-A317-03D7CF6B10E0}"
-            "ShowKeyOutput" = "11:TRUE"
-                "ExcludeFilters"
-                {
-                }
-            }
-            "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_CC0A2D32D0DD4E40977A367D421E8965"
-            {
-            "SourcePath" = "8:..\\ThrowInstallException\\obj\\Debug\\Carbon.Test.Installer.dll"
+            "SourcePath" = "8:..\\Test\\Installer\\obj\\Debug\\Carbon.Test.Installer.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_E89DD5DD809849A6A340ED3E5E715E13"
