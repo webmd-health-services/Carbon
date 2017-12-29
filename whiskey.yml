@@ -72,5 +72,10 @@ BuildTasks:
     Path: Complete-CarbonTest.ps1
 - NuGetPack:
     Path: Carbon.nuspec
+- CopyFile:
+    Path:
+    - LICENSE.txt
+    - NOTICE.txt
+    DestinationDirectory: Carbon
 
 PublishTasks:
