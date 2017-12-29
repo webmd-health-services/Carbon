@@ -24,11 +24,8 @@ param(
 #Requires -Version 4
 Set-StrictMode -Version 'Latest'
 
-if( -not (Test-Path -Path 'env:APPVEYOR') )
-{
-    & (Join-Path -Path $PSScriptRoot -ChildPath 'Carbon\Import-Carbon.ps1' -Resolve)
+& (Join-Path -Path $PSScriptRoot -ChildPath 'Carbon\Import-Carbon.ps1' -Resolve)
 
-    $installRoot = Get-PowerShellModuleInstallPath
-    $carbonModuleRoot = Join-Path -Path $installRoot -ChildPath 'Carbon'
-    Uninstall-Junction -Path $carbonModuleRoot
-}
+$installRoot = Get-PowerShellModuleInstallPath
+$carbonModuleRoot = Join-Path -Path $installRoot -ChildPath 'Carbon'
+Uninstall-Junction -Path $carbonModuleRoot

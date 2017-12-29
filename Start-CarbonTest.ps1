@@ -27,21 +27,8 @@ Set-StrictMode -Version 'Latest'
 
 & (Join-Path -Path $PSScriptRoot -ChildPath 'Carbon\Import-Carbon.ps1' -Resolve)
 
-if( Test-Path -Path 'env:APPVEYOR' )
-{
-    # On AppVeyor, VMs have duplicate PSModulePaths.
-    $modulePaths = Invoke-Command -ScriptBlock {
-                                                        $env:PSModulePath -split ';' | Select-Object -Unique
-                                                        $PSScriptRoot
-                                                }
-    $env:PSModulePath = $modulePaths -join ';'
-    [Environment]::SetEnvironmentVariable('PSModulePath',$env:PSModulePath,[EnvironmentVariableTarget]::Machine)
-    $env:PSModulePath
-}
-else
-{
-    $installRoot = Get-PowerShellModuleInstallPath
-    $carbonModuleRoot = Join-Path -Path $installRoot -ChildPath 'Carbon'
-    Install-Junction -Link $carbonModuleRoot -Target (Join-Path -Path $PSScriptRoot -ChildPath 'Carbon' -Resolve) | Format-Table | Out-String | Write-Verbose
-}
+$installRoot = Get-PowerShellModuleInstallPath
+$carbonModuleRoot = Join-Path -Path $installRoot -ChildPath 'Carbon'
+Install-Junction -Link $carbonModuleRoot -Target (Join-Path -Path $PSScriptRoot -ChildPath 'Carbon' -Resolve) | Format-Table | Out-String | Write-Verbose
+
 Clear-DscLocalResourceCache
