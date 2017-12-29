@@ -80,18 +80,7 @@ function Invoke-WhiskeyPester4Task
     }
     else
     {
-        & {
-                $VerbosePreference = 'SilentlyContinue'
-                Import-Module -Name 'PackageManagement'
-          }
-
-        $latestPester = ( Find-Module -Name 'Pester' -AllVersions | Where-Object { $_.Version -like '4.*' } ) 
-        if( -not $latestPester )
-        {
-            Stop-WhiskeyTask -TaskContext $TaskContext -Message ('Unable to find a version of Pester 4 to install. This usually happens if the Find-Module function can''t communicate with the PowerShell Gallery or whatever PowerShell package repositories you have configured. Make sure you have a network connection and that you''ve got a package source installed that has Pester 4. The Register-PackageSource cmdlet installs new package sources.')
-        }
-        $latestPester = $latestPester | Sort-Object -Property Version -Descending | Select-Object -First 1
-        $version = $latestPester.Version 
+        $version = '4.*'
     }
 
     if( $TaskContext.ShouldClean() )

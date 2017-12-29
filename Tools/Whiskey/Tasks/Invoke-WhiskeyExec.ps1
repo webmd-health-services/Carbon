@@ -18,7 +18,7 @@ function Invoke-WhiskeyExec
     * `Path` (*mandatory*): the path to the executable to run. This can be the name of an executable if it is in your PATH environment variable, a path relative to the `whiskey.yml` file, or an absolute path.
     * `Argument`: a list of arguments to pass to the executable. Read the documentation above for notes on how to properly escape arguments.
     * `WorkingDirectory`: the directory the executable will run in/from. By default, this is the build root, i.e. the `whiskey.yml` file's directory.
-    * `SuccessExitCode`: a list of exit codes that the `Exec` task should interpret to mean the executable's process exited successfully. The default is `0`.
+    * `SuccessExitCode`: a list of exit codes that the `Exec` task should interpret to mean the executable's process exited successfully. The list can include individual exit codes and certain range operators (ie. '>=1', '<=2', '>3', '<4', '5..10' ). An exit code only needs to match a single code or range to be evaluated as successful. The default is `0`
 
     # Examples
 
@@ -43,16 +43,12 @@ function Invoke-WhiskeyExec
                 - C:\Desitination
                 - /MIR    
                 SuccessExitCode:
-                - 0
-                - 1
-                - 2
-                - 3
-                - 4
-                - 5
-                - 6
-                - 7
+                - 10
+                - 12
+                - <8
+                - >=28
 
-    This example demonstrates how to configure the `Exec` task to fail when an executable can return multiple success exit codes. In this case, `robocopy.exe` can return any value less than 8 to report a successful copy.
+    This example demonstrates how to configure the `Exec` task to fail when an executable can return multiple success exit codes. In this case, `robocopy.exe` can return any value less than 8, greater than or equal to 28, 10, or 12, to report a successful copy.
     #>      
 
     [CmdletBinding()]
@@ -118,21 +114,77 @@ function Invoke-WhiskeyExec
     {
         $argumentListParam['ArgumentList'] = $TaskParameter['Argument']
     }
-
-
-    $successExitCode = 0
-    if ( $TaskParameter['SuccessExitCode'] )
-    {
-        $successExitCode = $TaskParameter['SuccessExitCode']
-    }
-
-
+    
     $process = Start-Process -FilePath $path @argumentListParam -WorkingDirectory $workingDirectory -NoNewWindow -Wait -PassThru
-
     $exitCode = $process.ExitCode
-    if ( $exitCode -notin $successExitCode )
+    
+    $successExitCodes = $TaskParameter['SuccessExitCode']
+    if( -not $successExitCodes )
     {
-        Stop-WhiskeyTask -TaskContext $TaskContext -Message ('''{0}'' returned with an exit code of ''{1}'', which is not one of the expected ''SuccessExitCode'' of ''{2}''. View the build output to see why the executable''s process failed.' -F $TaskParameter['Path'],$exitCode,$successExitCode -join ',')
+        $successExitCodes = '0'
     }
 
+    foreach( $successExitCode in $successExitCodes )
+    {
+        if( $successExitCode -match '^(\d+)$' )
+        {
+            if( $exitCode -eq [int]$Matches[0] )
+            {
+                Write-Verbose -Message ('  Exit code {0} = {1}' -f $exitCode,$Matches[0])
+                return
+            }
+        }
+        
+        if( $successExitCode -match '^(<|<=|>=|>)\s*(\d+)$' )
+        {
+            $operator = $Matches[1]
+            $successExitCode = [int]$Matches[2]
+            switch( $operator )
+            {
+                '<'
+                {
+                    if( $exitCode -lt $successExitCode )
+                    {
+                        Write-Verbose -Message ('  Exit code {0} < {1}' -f $exitCode,$successExitCode)
+                        return
+                    }
+                }
+                '<='
+                {
+                    if( $exitCode -le $successExitCode )
+                    {
+                        Write-Verbose -Message ('  Exit code {0} <= {1}' -f $exitCode,$successExitCode)
+                        return
+                    }
+                }
+                '>'
+                {
+                    if( $exitCode -gt $successExitCode )
+                    {
+                        Write-Verbose -Message ('  Exit code {0} > {1}' -f $exitCode,$successExitCode)
+                        return
+                    }
+                }
+                '>='
+                {
+                    if( $exitCode -ge $successExitCode )
+                    {
+                        Write-Verbose -Message ('  Exit code {0} >= {1}' -f $exitCode,$successExitCode)
+                        return
+                    }
+                }
+            }
+        }
+        
+        if( $successExitCode -match '^(\d+)\.\.(\d+)$' )
+        {
+            if( $exitCode -ge [int]$Matches[1] -and $exitCode -le [int]$Matches[2] )
+            {
+                Write-Verbose -Message ('  Exit code {0} <= {1} <= {2}' -f $Matches[1],$exitCode,$Matches[2])
+                return
+            }
+        }
+    }
+    
+    Stop-WhiskeyTask -TaskContext $TaskContext -Message ('''{0}'' returned with an exit code of ''{1}''. View the build output to see why the executable''s process failed.' -F $TaskParameter['Path'],$exitCode)
 }

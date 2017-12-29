@@ -56,14 +56,14 @@ function Uninstall-WhiskeyTool
     
     if( $PSCmdlet.ParameterSetName -eq 'PowerShell' )
     {
-        $Version = Resolve-WhiskeyPowerShellModuleVersion -ModuleName $ModuleName -Version $Version
-        if( -not $Version )
+        $module = Resolve-WhiskeyPowerShellModule -Name $ModuleName -Version $Version
+        if( -not $module )
         {
             return
         }
         $modulesRoot = Join-Path -Path $BuildRoot -ChildPath 'Modules'
         #Remove modules saved by either PowerShell4 or PowerShell5
-        $moduleRoots = @( ('{0}\{1}' -f $ModuleName, $Version), ('{0}' -f $ModuleName)  )
+        $moduleRoots = @( ('{0}\{1}' -f $ModuleName, $module.Version), ('{0}' -f $ModuleName)  )
         foreach ($item in $moduleRoots)
         {
             $removeModule = (Join-Path -Path $modulesRoot -ChildPath $item )

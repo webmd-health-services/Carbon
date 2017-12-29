@@ -24,6 +24,7 @@ Version: 0.0.0
 #
 # * Node.js `package.json` file;
 # * a PowerShell module manifest (e.g. `.psd1` file)
+# * .NET csproj files (e.g. `.csproj` file)
 #
 # The `package.json` file must have a `version` property, e.g.
 #
@@ -36,6 +37,14 @@ Version: 0.0.0
 #    @{
 #        ModuleVersion = '0.14.0';
 #    }
+# 
+# The .NET C# project file `.csproj` must contain a /Project/PropertyGroup/Version element, e.g.
+#
+#    <Project Sdk="Microsoft.NET.Sdk">
+#        <PropertyGroup>
+#            <Version>1.2.3</Version>
+#        </PropertyGroup>
+#    </Project>
 # 
 # If your `whiskey.yml` has both `Version` and `VersionFrom` properties, the `Version` 
 # property is used.

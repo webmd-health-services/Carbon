@@ -16,6 +16,7 @@ function Invoke-WhiskeyNspCheck
 
     # * `NpmRegistryUri` (mandatory): the uri to set a custom npm registry.
     # * `WorkingDirectory`: the directory where the `package.json` exists. Defaults to the directory where the build's `whiskey.yml` file was found. Must be relative to the `whiskey.yml` file.
+    # * `Version`: the version of NSP to install and utilize for security checks. Defaults to the latest stable version of NSP.
 
     # Examples
 
@@ -35,6 +36,15 @@ function Invoke-WhiskeyNspCheck
             WorkingDirectory: app
     
     This example will run `node.exe nsp check` against the modules listed in the `package.json` file that is located in the `(BUILD_ROOT)\app` directory.
+
+    ## Example 3
+
+        BuildTasks:
+        - NspCheck:
+            NpmRegistryUri: "http://registry.npmjs.org"
+            Version: 2.7.0
+    
+    This example will run `node.exe nsp check` by installing and running NSP version 2.7.0.
     #>
 
     [Whiskey.Task("NspCheck", SupportsClean=$true, SupportsInitialize=$true)]
@@ -91,9 +101,19 @@ function Invoke-WhiskeyNspCheck
     }
 
     Write-Timing -Message 'Installing NSP'
-    $nspModuleRoot = Install-WhiskeyNodeModule -Name 'nsp' -Version '2.7.0' -ApplicationRoot $workingDirectory -RegistryUri $npmRegistryUri -ForDeveloper:$TaskContext.ByDeveloper
+
+    if( $TaskParameter['Version'] )
+    {
+        $nspVersion = ConvertTo-WhiskeySemanticVersion -InputObject $TaskParameter['Version']
+        $nspModuleRoot = Install-WhiskeyNodeModule -Name 'nsp' -Version $nspVersion -ApplicationRoot $workingDirectory -RegistryUri $npmRegistryUri -ForDeveloper:$TaskContext.ByDeveloper
+    }
+    else
+    {
+        $nspVersion = $null
+        $nspModuleRoot = Install-WhiskeyNodeModule -Name 'nsp' -ApplicationRoot $workingDirectory -RegistryUri $npmRegistryUri -ForDeveloper:$TaskContext.ByDeveloper
+    }
+
     $nspPath = Join-Path -Path $nspModuleRoot -ChildPath 'bin\nsp' -Resolve -ErrorAction Ignore
-    
     if (-not $nspPath)
     {
         Stop-WhiskeyTask -TaskContext $TaskContext -Message ('Failed to download the ''nsp'' module to ''{0}''.' -f (Join-Path -Path $workingDirectory -ChildPath 'node_modules'))
@@ -113,12 +133,32 @@ function Invoke-WhiskeyNspCheck
 
         Write-Timing -Message 'Running NSP security check'
 
-        $output = Invoke-Command -NoNewScope -ScriptBlock {
-            & $nodePath $nspPath 'check' '--output' 'json'
+        $formattingArg = '--output'
+        if( !$nspVersion -or $nspVersion -gt (ConvertTo-WhiskeySemanticVersion -InputObject '2.7.0') )
+        {
+            $formattingArg = '--reporter'
         }
+
+        $output = Invoke-Command -NoNewScope -ScriptBlock {
+            param(
+                $JsonOutputFormat
+            )
+
+            & $nodePath $nspPath 'check' $JsonOutputFormat 'json' 2>&1 |
+                ForEach-Object { if( $_ -is [Management.Automation.ErrorRecord]) { $_.Exception.Message } else { $_ } }
+        } -ArgumentList $formattingArg
+
         Write-Timing -Message 'COMPLETE'
 
-        $results = ($output -join [Environment]::NewLine) | ConvertFrom-Json
+        try
+        {
+            $results = ($output -join [Environment]::NewLine) | ConvertFrom-Json
+        }
+        catch
+        {
+            Stop-WhiskeyTask -TaskContext $TaskContext -Message ('NSP, the Node Security Platform, did not run successfully as it did not return valid JSON (exit code: {0}):{1}{2}' -f $LASTEXITCODE,[Environment]::NewLine,$output)
+        }
+
         if ($Global:LASTEXITCODE -ne 0)
         {
             $summary = $results | Format-List | Out-String

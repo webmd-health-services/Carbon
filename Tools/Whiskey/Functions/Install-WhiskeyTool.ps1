@@ -70,18 +70,13 @@ function Install-WhiskeyTool
             return
         }
 
-        Invoke-Command -ScriptBlock {
-                                        $VerbosePreference = 'SilentlyContinue'
-                                        Import-Module -Name 'PackageManagement'
-                                    }
-
-        $Version = Resolve-WhiskeyPowerShellModuleVersion -ModuleName $ModuleName -Version $Version
-        if( -not $Version )
+        $module = Resolve-WhiskeyPowerShellModule -Name $ModuleName -Version $Version
+        if( -not $module )
         {
             return
         }
 
-        Save-Module -Name $ModuleName -RequiredVersion $Version -Path $modulesRoot -ErrorVariable 'errors' -ErrorAction $ErrorActionPreference
+        Save-Module -Name $ModuleName -RequiredVersion $module.Version -Repository $module.Repository -Path $modulesRoot -ErrorVariable 'errors' -ErrorAction $ErrorActionPreference
 
         if( -not (Test-Path -Path $expectedPath -PathType Container) )
         {

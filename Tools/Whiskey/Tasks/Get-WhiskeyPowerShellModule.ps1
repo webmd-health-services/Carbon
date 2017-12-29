@@ -60,7 +60,7 @@ function Get-WhiskeyPowerShellModule
     {
         try
         {
-            $TaskParameter['Version'] = Resolve-WhiskeyPowerShellModuleVersion -ModuleName $TaskParameter['Name']
+            $TaskParameter['Version'] = Resolve-WhiskeyPowerShellModule -Name $TaskParameter['Name'] | Select-Object -ExpandProperty 'Version'
         }
         catch
         {
