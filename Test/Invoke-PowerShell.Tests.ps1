@@ -338,5 +338,3 @@ Describe 'Invoke-PowerShell when running non-interactively' {
             Should Not BeNullOrEmpty
     }
 }
-
-Start-Sleep -Seconds 7200

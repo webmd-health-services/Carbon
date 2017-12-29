@@ -30,6 +30,7 @@ Set-StrictMode -Version 'Latest'
 if( (Test-Path -Path 'env:APPVEYOR') )
 {
     Grant-Permission -Path ($PSScriptRoot | Split-Path) -Identity 'Everyone' -Permission 'FullControl'
+    Grant-Permission -Path ('C:\Users\appveyor\Documents') -Identity 'Everyone' -Permission 'FullControl'
 }
 else
 {

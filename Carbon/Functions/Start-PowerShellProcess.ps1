@@ -38,7 +38,7 @@ function Start-PowerShellProcess
 
     try
     {
-        Write-Verbose -Message ('{0} # powershell.exe {1}' -f (Get-Location).ProviderPath,$CommandLine) -Verbose
+        Write-Debug -Message ('{0} > powershell.exe {1}' -f (Get-Location).ProviderPath,$CommandLine)
         $p = Start-Process -FilePath "powershell.exe" `
                            -ArgumentList $CommandLine `
                            -Credential $Credential `
