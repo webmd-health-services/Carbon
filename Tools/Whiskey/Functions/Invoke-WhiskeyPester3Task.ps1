@@ -32,6 +32,11 @@ function Invoke-WhiskeyPester3Task
     Set-StrictMode -Version 'Latest'
     Use-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState
 
+    if( $ErrorActionPreference -eq [Management.Automation.ActionPreference]::Stop )
+    {
+        Write-Warning -Message ('The ErrorActionPreference variable is set to ''Stop''. This will cause Pester tests to stop at the first error. We recommend running builds with the ErrorActionPreference set to ''Continue''.')
+    }
+
     if( $TaskParameter.ContainsKey('Version') )
     {
         $version = $TaskParameter['Version'] | ConvertTo-WhiskeySemanticVersion
