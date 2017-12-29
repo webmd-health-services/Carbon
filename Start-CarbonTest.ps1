@@ -27,8 +27,15 @@ Set-StrictMode -Version 'Latest'
 
 & (Join-Path -Path $PSScriptRoot -ChildPath 'Carbon\Import-Carbon.ps1' -Resolve)
 
-$installRoot = Get-PowerShellModuleInstallPath
-$carbonModuleRoot = Join-Path -Path $installRoot -ChildPath 'Carbon'
-Install-Junction -Link $carbonModuleRoot -Target (Join-Path -Path $PSScriptRoot -ChildPath 'Carbon' -Resolve) | Format-Table | Out-String | Write-Verbose
+if( (Test-Path -Path 'env:APPVEYOR') )
+{
+    Grant-Permission -Path ($PSScriptRoot | Split-Path) -Identity 'Everyone' -Permission 'FullControl'
+}
+else
+{
+    $installRoot = Get-PowerShellModuleInstallPath
+    $carbonModuleRoot = Join-Path -Path $installRoot -ChildPath 'Carbon'
+    Install-Junction -Link $carbonModuleRoot -Target (Join-Path -Path $PSScriptRoot -ChildPath 'Carbon' -Resolve) | Format-Table | Out-String | Write-Verbose
+}
 
 Clear-DscLocalResourceCache

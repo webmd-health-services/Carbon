@@ -40,7 +40,6 @@ BuildTasks:
     - Process
     - Machine
 - PowerShell:
-    OnlyBy: Developer
     Path: Start-CarbonTest.ps1
 - Pester3:
     OnlyBy: Developer
