@@ -48,6 +48,7 @@ Describe 'Carbon_Service' {
         Get-Service |
             # Some services can't be retrieved di-rectly.
             Where-Object { (Get-Service -Name $_.Name -ErrorAction Ignore) -and (@('lltdsvc','lltdio') -notcontains $_.Name) } |
+            Where-Object { (-Not [string]::IsNullOrWhitespace($_.Name)) } |
             ForEach-Object {
                 Write-Verbose -Message ($_.Name) -Verbose
                 $resource = Get-TargetResource -Name $_.Name
@@ -104,6 +105,7 @@ Describe 'Carbon_Service' {
         $resource.Description | Should BeNullOrEmpty
         $resource.UserName | Should BeNullOrEmpty
         $resource.Credential | Should BeNullOrEmpty
+        $resource.ArgumentList | Should Be $null
         Assert-DscResourceAbsent $resource
     }
         
@@ -129,6 +131,7 @@ Describe 'Carbon_Service' {
         $resource.Credential | Should BeNullOrEmpty
         $resource.DisplayName | Should Be $serviceName
         $resource.Description | Should BeNullOrEmpty
+        $resource.ArgumentList | Should Be $null
         Assert-DscResourcePresent $resource
     }
     
@@ -169,6 +172,7 @@ Describe 'Carbon_Service' {
         $resource.Description | Should Be 'Description description description'
         $resource.UserName | Should Be (Resolve-Identity -Name $credential.UserName).FullName
         $resource.Credential | Should BeNullOrEmpty
+        $resource.ArgumentList | Should Be $null
         Assert-DscResourcePresent $resource    
     }
     
@@ -194,6 +198,33 @@ Describe 'Carbon_Service' {
         $resource.Credential | Should BeNullOrEmpty
         $resource.DisplayName | Should Be $serviceName
         $resource.Description | Should BeNullOrEmpty
+        $resource.ArgumentList | Should Be $null
+        Assert-DscResourcePresent $resource
+    }
+
+    It 'should install service with argumentlist' {
+        Set-TargetResource -Path $servicePath -Name $serviceName -StartupType Automatic -Delayed  -Ensure Present -ArgumentList @('arg1', 'arg2')
+        $Global:Error.Count | Should Be 0
+        $resource = Get-TargetResource -Name $serviceName -ArgumentList @('arg1', 'arg2')
+        $resource | Should Not BeNullOrEmpty
+        $resource.Name | Should Be $serviceName
+        $resource.Path | Should Be $servicePath
+        $resource.StartupType | Should Be 'Automatic'
+        $resource.Delayed | Should Be $true
+        $resource.OnFirstFailure | Should Be 'TakeNoAction'
+        $resource.OnSecondFailure | Should Be 'TakeNoAction'
+        $resource.OnThirdFailure | Should Be 'TakeNoAction'
+        $resource.ResetFailureCount | Should Be 0
+        $resource.RestartDelay | Should Be 0
+        $resource.RebootDelay | Should Be 0
+        $resource.Dependency | Should BeNullOrEmpty
+        $resource.Command | Should BeNullOrEmpty
+        $resource.RunCommandDelay | Should Be 0
+        $resource.UserName | Should Be 'NT AUTHORITY\NETWORK SERVICE'
+        $resource.Credential | Should BeNullOrEmpty
+        $resource.DisplayName | Should Be $serviceName
+        $resource.Description | Should BeNullOrEmpty
+        $resource.ArgumentList | Should Be @('arg1', 'arg2')
         Assert-DscResourcePresent $resource
     }
     

@@ -87,10 +87,14 @@ function Get-TargetResource
         # The credentials of the custom account the service should run as.
         $Credential,
         
+        [string[]]
+        # The arguments/startup parameters for the service
+        $ArgumentList,
+
         [ValidateSet('Present','Absent')]
         [string]
         # If `Present`, the service is installed/updated. If `Absent`, the service is removed.
-        $Ensure = 'Present'
+        $Ensure = 'Present'        
     )
 
     Set-StrictMode -Version 'Latest'
@@ -114,12 +118,14 @@ function Get-TargetResource
                     UserName = $null;
                     Credential = $null;
                     Ensure = 'Absent';
+                    ArgumentList = $null;
                 }
 
     if( Test-Service -Name $Name )
     {
         $service = Get-Service -Name $Name
-        $resource.Path = $service.Path
+        
+        $resource.Path,$resource.ArgumentList = Split-CommandLine $service.Path
         $resource.StartupType = $service.StartMode
         $resource.Delayed = $service.DelayedAutoStart
         $resource.OnFirstFailure = $service.FirstFailure
@@ -304,6 +310,10 @@ function Set-TargetResource
         # The credentials of the custom account the service should run as.
         $Credential,
         
+        [string[]]
+        # The arguments/startup parameters for the service
+        $ArgumentList,
+
         [ValidateSet('Present','Absent')]
         [string]
         # If `Present`, the service is installed/updated. If `Absent`, the service is removed.
@@ -424,6 +434,10 @@ function Test-TargetResource
         # The custom account the service should run as.
         $Credential,
         
+        [string[]]
+        # The arguments/startup parameters for the service
+        $ArgumentList,
+
         [ValidateSet('Present','Absent')]
         [string]
         # If `Present`, the service is installed/updated. If `Absent`, the service is removed.

@@ -255,25 +255,7 @@ function Install-Service
         $Path = Resolve-Path -Path $Path | Select-Object -ExpandProperty ProviderPath
     }
 
-    if( $ArgumentList )
-    {
-        $binPathArg = Invoke-Command -ScriptBlock {
-                            $Path
-                            $ArgumentList 
-                        } |
-                        ForEach-Object { 
-                            if( $_.Contains(' ') )
-                            {
-                                return '"{0}"' -f $_.Trim('"')
-                            }
-                            return $_
-                        }
-        $binPathArg = $binPathArg -join ' '
-    }
-    else
-    {
-        $binPathArg = $Path
-    }
+    $binPathArg = Join-ServiceArgumentList $Path $ArgumentList
 
     $doInstall = $false
     if( -not $Force -and (Test-Service -Name $Name) )
@@ -586,4 +568,3 @@ function Install-Service
         }
     }
 }
-
