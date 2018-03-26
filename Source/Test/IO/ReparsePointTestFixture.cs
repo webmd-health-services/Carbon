@@ -24,7 +24,7 @@ namespace Carbon.Test.IO
         [Test]
         public void ShouldGetTargetPathForJunction()
         {
-            var path = IOPath.Combine(Environment.GetEnvironmentVariable("TEMP"), IOPath.GetRandomFileName());
+            var path = IOPath.Combine(IOPath.GetTempPath(), IOPath.GetRandomFileName());
             Directory.CreateDirectory(path);
             var junctionPath = string.Format("{0}+junction", path);
             JunctionPoint.Create(junctionPath, path, true);
