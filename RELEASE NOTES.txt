@@ -1,3 +1,9 @@
+# 2.5.1
+
+## Bug Fixes
+
+ * Fixed: `Assert-FirewallConfigurable` fails on Windows 10 due to firewall service display name change.
+
 # 2.5.0 (18 June 2017)
 
 ## Enhancements
