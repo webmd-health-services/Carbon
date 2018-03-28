@@ -35,7 +35,7 @@ function Assert-FirewallConfigurable
 
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
-    if( (Get-Service -DisplayName 'Windows Firewall' -ErrorAction Ignore).Status -eq 'Running' )
+    if( (Get-Service 'Windows Firewall' -ErrorAction Ignore).Status -eq 'Running' )
     {
         return $true
     }
