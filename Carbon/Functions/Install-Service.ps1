@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-& (Join-Path -Path $PSScriptRoot -ChildPath 'Join-ServiceArgumentList.ps1' -Resolve)
+. (Join-Path -Path $PSScriptRoot -ChildPath 'Join-ServiceArgumentList.ps1' -Resolve)
 
 function Install-Service
 {
@@ -258,6 +258,7 @@ function Install-Service
     }
 
     $binPathArg = Join-ServiceArgumentList $Path $ArgumentList
+    Write-Verbose "Service path will be $binPathArg"
 
     $doInstall = $false
     if( -not $Force -and (Test-Service -Name $Name) )
