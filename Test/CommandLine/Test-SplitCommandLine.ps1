@@ -14,6 +14,7 @@
 Describe 'Test-SplitCommandLine' {
     BeforeAll {
         & (Join-Path -Path $PSScriptRoot -ChildPath '..\Import-CarbonForTest.ps1' -Resolve)
+        & (Join-Path -Path $PSScriptRoot -ChildPath '..\..\Carbon\Functions\Split-CommandLine.ps1' -Resolve)
     }
     
     It 'simple split' {

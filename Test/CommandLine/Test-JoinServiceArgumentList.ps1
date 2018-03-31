@@ -14,6 +14,7 @@
 Describe 'Test-JoinServiceArgumentList' {
     BeforeAll {
         & (Join-Path -Path $PSScriptRoot -ChildPath '..\Import-CarbonForTest.ps1' -Resolve)
+        & (Join-Path -Path $PSScriptRoot -ChildPath '..\..\Carbon\Functions\Join-ServiceArgumentList.ps1' -Resolve)
     }
     
     It 'simple join' {

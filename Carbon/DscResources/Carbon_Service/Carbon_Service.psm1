@@ -11,6 +11,7 @@
 # limitations under the License.
 
 & (Join-Path -Path $PSScriptRoot -ChildPath '..\Initialize-CarbonDscResource.ps1' -Resolve)
+& (Join-Path -Path $PSScriptRoot -ChildPath '..\..\Functions\Split-CommandLine.ps1' -Resolve)
 
 function Get-TargetResource
 {
