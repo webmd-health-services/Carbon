@@ -1,5 +1,5 @@
 
-Publish:
+PublishOn:
  - master
  
 Build:
@@ -78,4 +78,4 @@ Build:
 - NuGetPack:
     Path: Carbon.nuspec
 
-PublishTasks:
+Publish:
