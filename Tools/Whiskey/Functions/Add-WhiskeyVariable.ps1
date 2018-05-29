@@ -27,7 +27,7 @@ function Add-WhiskeyVariable
 
         [Parameter(Mandatory=$true)]
         [AllowEmptyString()]
-        [string]
+        [object]
         $Value
     )
 

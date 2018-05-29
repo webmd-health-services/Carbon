@@ -8,40 +8,39 @@ function Invoke-WhiskeyNodeLicenseChecker
     .DESCRIPTION
     The `NodeLicenseChecker` task runs the node module `license-checker` against all the modules listed in the `dependencies` and `devDepenendencies` properties of the `package.json` file for this application. The task will create a JSON report file named `node-license-checker-report.json` located in the `.output` directory of the build root.
 
-    You must specify what version of Node.js you want in the engines field of your package.json file. (See https://docs.npmjs.com/files/package.json#engines for more information.) The version of Node is installed for you using NVM. 
+    This task installs the latest LTS version of Node into a `.node` directory (in the same directory as your whiskey.yml file). To use a specific version, set the `engines.node` property in your package.json file to the version you want. (See https://docs.npmjs.com/files/package.json#engines for more information.)
 
     If the application's `package.json` file does not exist in the build root next to the `whiskey.yml` file, specify a `WorkingDirectory` where it can be found.
 
     # Properties
 
-    # * `NpmRegistryUri` (mandatory): the uri to set a custom npm registry.
-    # * `WorkingDirectory`: the directory where the `package.json` exists. Defaults to the directory where the build's `whiskey.yml` file was found. Must be relative to the `whiskey.yml` file.
+    * `Version`: the version of the license checker to use. The default is the latest version.
+    * `NodeVersion`: the version of Node to use. By default, the version in the `engines.node` property of your package.json file is used. If that is missing, the latest LTS version of Node is used. 
 
     # Examples
 
     ## Example 1
 
-        BuildTasks:
-        - NodeLicenseChecker:
-            NpmRegistryUri: "http://registry.npmjs.org"
+        Build:
+        - NodeLicenseChecker
     
     This example will run `license-checker` against the modules listed in the `package.json` file located in the build root.
 
     ## Example 2
 
-        BuildTasks:
+        Build:
         - NodeLicenseChecker:
-            NpmRegistryUri: "http://registry.npmjs.org"
-            WorkingDirectory: app
+            Version: 13.0.1
     
-    This example will run `license-checker` against the modules listed in the `package.json` file that is located in the `(BUILD_ROOT)\app` directory.
+    This example will install and use version 13.0.1 of the license checker.
     #>
-
-    [Whiskey.Task("NodeLicenseChecker", SupportsClean=$true, SupportsInitialize=$true)]
     [CmdletBinding()]
+    [Whiskey.Task('NodeLicenseChecker')]
+    [Whiskey.RequiresTool('Node', 'NodePath',VersionParameterName='NodeVersion')]
+    [Whiskey.RequiresTool('NodeModule::license-checker', 'LicenseCheckerPath', VersionParameterName='Version')]
     param(
         [Parameter(Mandatory=$true)]
-        [object]
+        [Whiskey.Context]
         $TaskContext,
 
         [Parameter(Mandatory=$true)]
@@ -52,97 +51,37 @@ function Invoke-WhiskeyNodeLicenseChecker
     Set-StrictMode -Version 'Latest'
     Use-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState
 
-    $startedAt = Get-Date
-    function Write-Timing
-    {
-        param(
-            $Message
-        )
+    $licenseCheckerPath = Assert-WhiskeyNodeModulePath -Path $TaskParameter['LicenseCheckerPath'] -CommandPath 'bin\license-checker' -ErrorAction Stop
 
-        $now = Get-Date
-        Write-Debug -Message ('[{0}]  [{1}]  {2}' -f $now,($now - $startedAt),$Message)
+    $nodePath = Assert-WhiskeyNodePath -Path $TaskParameter['NodePath'] -ErrorAction Stop
+
+    Write-WhiskeyTiming -Message ('Generating license report')
+    $reportJson = Invoke-Command -NoNewScope -ScriptBlock {
+        & $nodePath $licenseCheckerPath '--json'
+    }
+    Write-WhiskeyTiming -Message ('COMPLETE')
+
+    $report = Invoke-Command -NoNewScope -ScriptBlock {
+        ($reportJson -join [Environment]::NewLine) | ConvertFrom-Json
+    }
+    if (-not $report)
+    {
+        Stop-WhiskeyTask -TaskContext $TaskContext -Message 'License Checker failed to output a valid JSON report.'
     }
 
-    $npmRegistryUri = $TaskParameter['NpmRegistryUri']
-    if (-not $npmRegistryUri) 
-    {
-        Stop-WhiskeyTask -TaskContext $TaskContext -Message 'Property ''NpmRegistryUri'' is mandatory. It should be the URI to the registry from which Node.js packages should be downloaded, e.g.,
-        
-        BuildTasks:
-        - NodeLicenseChecker:
-            NpmRegistryUri: https://registry.npmjs.org/
+    Write-WhiskeyTiming -Message 'Converting license report.'
+    # The default license checker report has a crazy format. It is an object with properties for each module.
+    # Let's transform it to a more sane format: an array of objects.
+    [object[]]$newReport = $report | 
+                                Get-Member -MemberType NoteProperty | 
+                                Select-Object -ExpandProperty 'Name' | 
+                                ForEach-Object { $report.$_ | Add-Member -MemberType NoteProperty -Name 'name' -Value $_ -PassThru }
 
-        '
-    }
+    # show the report
+    $newReport | Sort-Object -Property 'licenses','name' | Format-Table -Property 'licenses','name' -AutoSize | Out-String | Write-WhiskeyVerbose -Context $TaskContext
 
-    $workingDirectory = $TaskContext.BuildRoot
-    if ($TaskParameter['WorkingDirectory'])
-    {
-        $workingDirectory = $TaskParameter['WorkingDirectory'] | Resolve-WhiskeyTaskPath -TaskContext $TaskContext -PropertyName 'WorkingDirectory'
-    }
-
-    if ($TaskContext.ShouldClean())
-    {
-        Write-Timing -Message 'Cleaning'
-        Uninstall-WhiskeyNodeModule -Name 'npm' -ApplicationRoot $workingDirectory -RegistryUri $npmRegistryUri -ForDeveloper:$TaskContext.ByDeveloper -Force
-        Uninstall-WhiskeyNodeModule -Name 'license-checker' -ApplicationRoot $workingDirectory -RegistryUri $npmRegistryUri -ForDeveloper:$TaskContext.ByDeveloper -Force
-        Write-Timing -Message 'COMPLETE'
-        return
-    }
-
-    Write-Timing -Message 'Installing license-checker'
-    $licenseCheckerModuleRoot = Install-WhiskeyNodeModule -Name 'license-checker' -ApplicationRoot $workingDirectory -RegistryUri $npmRegistryUri -ForDeveloper:$TaskContext.ByDeveloper
-    $licenseCheckerPath = Join-Path -Path $licenseCheckerModuleRoot -ChildPath 'bin\license-checker' -Resolve -ErrorAction Ignore
-    
-    if (-not $licenseCheckerPath)
-    {
-        Stop-WhiskeyTask -TaskContext $TaskContext -Message ('Failed to download the ''license-checker'' module to ''{0}''.' -f (Join-Path -Path $workingDirectory -ChildPath 'node_modules'))
-    }
-    Write-Timing -Message 'COMPLETE'
-
-    if ($TaskContext.ShouldInitialize())
-    {
-        Write-Timing -Message 'Initialization Complete'
-        return
-    }
-
-    Push-Location -Path $workingDirectory
-    try
-    {
-        $nodePath = Install-WhiskeyNodeJs -RegistryUri $npmRegistryUri -ApplicationRoot $workingDirectory -ForDeveloper:$TaskContext.ByDeveloper
-
-        Write-Timing -Message ('Generating license report')
-        $reportJson = Invoke-Command -NoNewScope -ScriptBlock {
-            & $nodePath $licenseCheckerPath '--json'
-        }
-        Write-Timing -Message ('COMPLETE')
-
-        $report = Invoke-Command -NoNewScope -ScriptBlock {
-            ($reportJson -join [Environment]::NewLine) | ConvertFrom-Json
-        }
-        if (-not $report)
-        {
-            Stop-WhiskeyTask -TaskContext $TaskContext -Message 'License Checker failed to output a valid JSON report.'
-        }
-
-        Write-Timing -Message 'Converting license report.'
-        # The default license checker report has a crazy format. It is an object with properties for each module.
-        # Let's transform it to a more sane format: an array of objects.
-        [object[]]$newReport = $report | 
-                                    Get-Member -MemberType NoteProperty | 
-                                    Select-Object -ExpandProperty 'Name' | 
-                                    ForEach-Object { $report.$_ | Add-Member -MemberType NoteProperty -Name 'name' -Value $_ -PassThru }
-
-        # show the report
-        $newReport | Sort-Object -Property 'licenses','name' | Format-Table -Property 'licenses','name' -AutoSize | Out-String | Write-Verbose
-
-        $licensePath = 'node-license-checker-report.json'
-        $licensePath = Join-Path -Path $TaskContext.OutputDirectory -ChildPath $licensePath
-        ConvertTo-Json -InputObject $newReport -Depth 100 | Set-Content -Path $licensePath
-        Write-Timing -Message ('COMPLETE')
-    }
-    finally
-    {
-        Pop-Location
-    }
+    $licensePath = 'node-license-checker-report.json'
+    $licensePath = Join-Path -Path $TaskContext.OutputDirectory -ChildPath $licensePath
+    ConvertTo-Json -InputObject $newReport -Depth 100 | Set-Content -Path $licensePath
+    Write-WhiskeyTiming -Message ('COMPLETE')
 }

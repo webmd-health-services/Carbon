@@ -1,11 +1,69 @@
 
 function Invoke-WhiskeyPowerShell
 {
-    [Whiskey.Task("PowerShell")]
+    <#
+    .SYNOPSIS
+    Executes PowerShell tasks.
+
+    .DESCRIPTION
+    The PowerShell task runs PowerShell scripts. You specify the scripts to run via the `Path` property. Paths must be relative to the whiskey.yml file. Pass arguments to the scripts with the `Argument` property, which is a hash table of parameter names and values. PowerShell scripts are run in new, background processes.
+
+    The PowerShell task runs your script in *all* build modes: during builds, during initialization, and during clean. If you want your script to only run in one mode, use the `OnlyDuring` property to specify the mode you want it to run in or the `ExceptDuring` property to specify the run mode you don't want it to run in.
+
+    The PowerShell task will fail a build if the script it runs returns a non-zero exit code or sets the `$?` variable to `$false`.
+
+    To receive the current build context as a parameter to your PowerShell script, add a `$TaskContext` parameter, e.g.
+
+        param(
+            [object]
+            $TaskContext
+        )
+
+    This is *not* recommended.
+
+    ## Properties
+    * **Path** (mandatory): the paths to the PowerShell scripts to run. Paths must be relative to the  whiskey.yml file. Script arguments are not supported.
+    * **Argument**: a hash table of name/value pairs that are passed to your script as arguments. The hash table is actually splatted when passed to your script.
+
+    ## Examples
+
+    ### Example 1
+
+        Build:
+        - PowerShell:
+            Path: init.ps1
+            Argument:
+                Environment: "Dev"
+                Verbose: true
+
+    Demonstrates how to run a PowerShell script during your build. In this case, Whiskey will run `.\init.ps1 -Environment "Dev" -Verbose`.
+
+    ### Example 2
+
+        Build:
+        - PowerShell:
+            ExceptDuring: Clean
+            Path: init.ps1
+            Argument:
+                Environment: "Dev"
+                Verbose: true
+
+    Demonstrates how to run a PowerShell script except when it is cleaning. If you have a script you want to use to initialize your build environment, it should run during the build and initialize modes. Set the `ExceptDuring` property to `Clean` to make that happen.
+
+    ### Example 3
+
+        Build:
+        - PowerShell:
+            OnlyDuring: Clean
+            Path: clean.ps1
+
+    Demonstrates how to run a PowerShell script only when running in clean mode. 
+    #>
+    [Whiskey.Task("PowerShell",SupportsClean=$true,SupportsInitialize=$true)]
     [CmdletBinding()]
     param(
         [Parameter(Mandatory=$true)]
-        [object]
+        [Whiskey.Context]
         $TaskContext,
 
         [Parameter(Mandatory=$true)]
@@ -16,35 +74,21 @@ function Invoke-WhiskeyPowerShell
     Set-StrictMode -Version 'Latest'
     Use-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState
     
-    if( -not ($TaskParameter.ContainsKey('Path')))
-        {
-            Stop-WhiskeyTask -TaskContext $TaskContext -Message ('Element ''Path'' is mandatory. It should be one or more paths, which should be a list of PowerShell Scripts to run, e.g. 
+    if( -not ($TaskParameter.ContainsKey('Path')) )
+    {
+        Stop-WhiskeyTask -TaskContext $TaskContext -Message ('Property ''Path'' is mandatory. It should be one or more paths, which should be a list of PowerShell Scripts to run, e.g. 
         
-            BuildTasks:
-            - PowerShell:
-                Path:
-                - myscript.ps1
-                - myotherscript.ps1
-                WorkingDirectory: bin')
-        }
+        Build:
+        - PowerShell:
+            Path:
+            - myscript.ps1
+            - myotherscript.ps1
+            WorkingDirectory: bin')
+    }
     
     $path = $TaskParameter['Path'] | Resolve-WhiskeyTaskPath -TaskContext $TaskContext -PropertyName 'Path'
 
-    if( $TaskParameter.ContainsKey('WorkingDirectory') )
-    {
-        if( -not [IO.Path]::IsPathRooted($TaskParameter['WorkingDirectory']))
-        {
-            $workingDirectory = $TaskParameter['WorkingDirectory'] | Resolve-WhiskeyTaskPath -TaskContext $TaskContext -PropertyName 'WorkingDirectory'
-        } 
-        else
-        {
-            $workingDirectory = $TaskParameter['WorkingDirectory']
-        }       
-    }
-    else
-    {
-        $WorkingDirectory = $TaskContext.BuildRoot
-    }
+    $workingDirectory = (Get-Location).ProviderPath
 
     $argument = $TaskParameter['Argument']
     if( -not $argument )
@@ -79,7 +123,7 @@ function Invoke-WhiskeyPowerShell
                 ForEach-Object { $argument[$_.Name] = $argument[$_.Name] | ConvertFrom-WhiskeyYamlScalar }
         }
 
-        $resultPath = Join-Path -Path $TaskContext.OutputDirectory -ChildPath ('PowerShell-{0}-ExitCode-{1}' -f ($scriptPath | Split-Path -Leaf),([IO.Path]::GetRandomFileName()))
+        $resultPath = Join-Path -Path $TaskContext.OutputDirectory -ChildPath ('PowerShell-{0}-RunResult-{1}' -f ($scriptPath | Split-Path -Leaf),([IO.Path]::GetRandomFileName()))
         $job = Start-Job -ScriptBlock {
             $workingDirectory = $using:WorkingDirectory
             $scriptPath = $using:ScriptPath
@@ -91,7 +135,7 @@ function Invoke-WhiskeyPowerShell
 
             Invoke-Command -ScriptBlock { 
                                             $VerbosePreference = 'SilentlyContinue';
-                                            Import-Module -Name $moduleRoot
+                                            & (Join-Path -Path $moduleRoot -ChildPath 'Import-Whiskey.ps1' -Resolve -ErrorAction Stop)
                                         }
 
             $VerbosePreference = $using:VerbosePreference
@@ -104,8 +148,15 @@ function Invoke-WhiskeyPowerShell
 
             Set-Location $workingDirectory
             $Global:LASTEXITCODE = 0
+
             & $scriptPath @contextArgument @argument
-            $Global:LASTEXITCODE | Set-Content -Path $resultPath
+
+            $result = @{
+                'ExitCode'   = $Global:LASTEXITCODE
+                'Successful' = $?
+            }
+
+            $result | ConvertTo-Json | Set-Content -Path $resultPath
         }
 
         do
@@ -116,16 +167,22 @@ function Invoke-WhiskeyPowerShell
 
         $job | Receive-Job
 
-        if( -not (Test-Path -Path $resultPath -PathType Leaf) )
+        if( (Test-Path -Path $resultPath -PathType Leaf) )
+        {
+            $runResult = Get-Content -Path $resultPath -Raw | ConvertFrom-Json
+        }
+        else
         {
             Stop-WhiskeyTask -TaskContext $TaskContext -Message ('PowerShell script ''{0}'' threw a terminating exception.' -F $scriptPath)
         }
-                    
-        [int]$exitCode = Get-Content -Path $resultPath | Select-Object -First 1
-        
-        if( $exitCode )
+
+        if( $runResult.ExitCode -ne 0 )
         {
-            Stop-WhiskeyTask -TaskContext $TaskContext -Message ('PowerShell script ''{0}'' failed, exited with code {1}.' -F $scriptPath,$exitCode)
+            Stop-WhiskeyTask -TaskContext $TaskContext -Message ('PowerShell script ''{0}'' failed, exited with code {1}.' -F $scriptPath,$runResult.ExitCode)
+        }
+        elseif( $runResult.Successful -eq $false )
+        {
+            Stop-WhiskeyTask -TaskContext $TaskContext -Message ('PowerShell script ''{0}'' threw a terminating exception.' -F $scriptPath)
         }
 
     }

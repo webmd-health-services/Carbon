@@ -45,7 +45,7 @@ function Get-WhiskeyBuildMetadata
         $buildInfo.ScmCommitID = Get-EnvironmentVariable 'GIT_COMMIT'
         $buildInfo.ScmBranch = Get-EnvironmentVariable 'GIT_BRANCH'
         $buildInfo.ScmBranch = $buildInfo.ScmBranch -replace '^origin/',''
-        $buildInfo.BuildServerName = 'Jenkins'
+        $buildInfo.BuildServer = [Whiskey.BuildServer]::Jenkins
     }
     elseif( (Test-Path -Path 'env:APPVEYOR') )
     {
@@ -75,7 +75,7 @@ function Get-WhiskeyBuildMetadata
         $buildInfo.ScmUri = '{0}/{1}.git' -f $baseUri,$repoName
         $buildInfo.ScmCommitID = Get-EnvironmentVariable 'APPVEYOR_REPO_COMMIT'
         $buildInfo.ScmBranch = Get-EnvironmentVariable 'APPVEYOR_REPO_BRANCH'
-        $buildInfo.BuildServerName = 'AppVeyor'
+        $buildInfo.BuildServer = [Whiskey.BuildServer]::AppVeyor
     }
     elseif( (Test-Path -Path 'env:TEAMCITY_BUILD_PROPERTIES_FILE') )
     {
@@ -104,7 +104,7 @@ function Get-WhiskeyBuildMetadata
         $configProperties = Import-TeamCityProperty -Path $buildProperties['teamcity.configuration.properties.file']
         $buildInfo.ScmBranch = $configProperties['teamcity.build.branch'] -replace '^refs/heads/',''
         $buildInfo.ScmUri = $configProperties['vcsroot.url']
-        $buildInfo.BuildServerName = 'TeamCity'
+        $buildInfo.BuildServer = [Whiskey.BuildServer]::TeamCity
 
         $serverUri = $configProperties['teamcity.serverUrl']
         $buildInfo.JobUri = '{0}/viewType.html?buildTypeId={1}' -f $serverUri,$buildInfo.JobName
