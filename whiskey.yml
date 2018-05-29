@@ -51,13 +51,23 @@ Build:
         - Test\Test-ImportCarbon.ps1
         - Test\Test-UsesUseCallerPreference.ps1
         - Test\Test-ParentProcessID.ps1
+- Pester3:
+    OnlyBy: BuildServer
+    Path:
+    - Test\Install-Certificate.Tests.ps1
+    - Test\Uninstall-Certificate.Tests.ps1
+    - Test\Get-ScheduledTask.Tests.ps1
 - Parallel:
     OnlyBy: BuildServer
     Queues:
     - Tasks:
-        - Pester3:
+        - Pester4:
             Path: Test\*.Tests.ps1
-            Version: 3.4.6
+            Exclude:
+            - "*\Install-Certificate.Tests.ps1"
+            - "*\Uninstall-Certificate.Tests.ps1"
+            - "*\Get-ScheduledTask.Tests.ps1"
+            DescribeDurationReportCount: 20
     - Tasks:
         - PowerShell:
             Path: Invoke-CarbonBladeTest.ps1
@@ -76,3 +86,9 @@ Build:
     Path: Carbon.nuspec
 
 Publish:
+- PublishPowerShellModule:
+    Path: Carbon
+    RepositoryName: PSGallery
+    RepositoryUri: https://www.powershellgallery.com/api/v2/
+    ApiKeyID: PowerShellGalleryApiKey
+- Publish   
