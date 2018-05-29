@@ -33,5 +33,5 @@ using System.Runtime.InteropServices;
 // The following GUID is for the ID of the typelib if this project is exposed to COM
 [assembly: Guid("93195104-8447-4c5f-91cb-8255a9a76b01")]
 
-[assembly: InternalsVisibleTo("Carbon.Test")]
+[assembly: InternalsVisibleTo("Carbon.Test,PublicKey=0024000004800000940000000602000000240000525341310004000001000100a3d2a6d2d3764691c47ee02daeb68fed39fe5a5bdb07b72568d4febe8a37cc3468bb3fc0a2dae7ccd305d436c1ab8a00d063268332d6bb179303003ee8d8c01d96a3acf3a0ee61a146ae96f55ecc0f0b18f732c920ba0143ece0b403e9b92b41f58bd69ec12277507835fb4788a8f37652c5184b2757d81b0ad3b50457ae5b90")")]
 
