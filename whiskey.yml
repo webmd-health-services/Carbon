@@ -33,12 +33,6 @@ Build:
 - Delete:
     OnlyBy: BuildServer
     Path: Carbon\bin\*.pdb
-- EnvironmentVariable:
-    OnlyBy: BuildServer
-    PSModulePath: "$(PSModulePath);$(WHISKEY_BUILD_ROOT)"
-    Scope:
-    - Process
-    - Machine
 - PowerShell:
     Path: Start-CarbonTest.ps1
 - Pester3:
