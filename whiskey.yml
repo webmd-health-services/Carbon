@@ -51,16 +51,19 @@ Build:
         - Test\Test-ImportCarbon.ps1
         - Test\Test-UsesUseCallerPreference.ps1
         - Test\Test-ParentProcessID.ps1
-- Pester3:
+- Parallel:
     OnlyBy: BuildServer
-    Path: Test\*.Tests.ps1
-    Version: 3.4.6
-- PowerShell:
-    OnlyBy: BuildServer
-    Path: Invoke-CarbonBladeTest.ps1
-    Argument:
-        Recurse: true
-        Path: Test
+    Queues:
+    - Tasks:
+        - Pester3:
+            Path: Test\*.Tests.ps1
+            Version: 3.4.6
+    - Tasks:
+        - PowerShell:
+            Path: Invoke-CarbonBladeTest.ps1
+            Argument:
+                Recurse: true
+                Path: Test
 - PowerShell:
     OnlyBy: Developer
     Path: Complete-CarbonTest.ps1
