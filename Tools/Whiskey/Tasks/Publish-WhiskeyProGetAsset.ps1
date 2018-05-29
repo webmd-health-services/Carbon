@@ -23,7 +23,7 @@ function Publish-WhiskeyProGetAsset
         ## Examples
         
         ### Example 1
-        BuildTasks:
+        Build:
         - PublishProGetAsset:
             CredentialID: ProGetCredential
             Path: 'path/to/file.txt'
@@ -34,7 +34,7 @@ function Publish-WhiskeyProGetAsset
         Example of adding an asset named `exampleAsset` to ProGet in the `versions` directory.       
 
         ### Example 2
-        BuildTasks:
+        Build:
         - PublishProGetAsset:
             CredentialID: ProGetCredential
             Path: 
@@ -52,7 +52,7 @@ function Publish-WhiskeyProGetAsset
     [Whiskey.Task("PublishProGetAsset")]
     [CmdletBinding()]
     param(
-        [object]
+        [Whiskey.Context]
         # The context this task is operating in. Use `New-WhiskeyContext` to create context objects.
         $TaskContext,
         
@@ -65,7 +65,7 @@ function Publish-WhiskeyProGetAsset
     Set-StrictMode -Version 'Latest'
     Use-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState
     $message = "
-    BuildTasks:
+    Build:
     - PublishProGetAsset:
         CredentialID: ProGetCredential
         Path: 

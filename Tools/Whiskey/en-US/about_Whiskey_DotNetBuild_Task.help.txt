@@ -1,0 +1,63 @@
+TOPIC
+    about_Whiskey_DotNetBuild_Task
+
+SUMMARY
+    Builds .NET Core SDK projects.
+
+DESCRIPTION
+    The `DotNetBuild` tasks runs the `dotnet.exe build` command for building .NET projects targeting .NET Core and .NET Standard. Pass a list of solutions files or .NET Core project files to the `Path` property. If no files are provided to `Path`, then the .NET Core SDK will search for any solution or project files in the working directory and build those. If the `dotnet.exe build` command returns a non-zero exit code the build will fail.
+
+    The task will automatically apply the following switches to the `dotnet.exe build` command and are not modifiable:
+
+        * `--configuration=(Debug|Release)`: `Debug` when build run by a developer and `Release` when build run by a build server.
+        * `-p:Version=$(WHISKEY_VERSION_SEMVER1)`: the semver version 1 version for the current build. Use a `Version` task in your whiskey.yml file to set the version number.
+
+PROPERTIES
+    * `Argument`: a list of additional arguments to pass to the `dotnet.exe build` command.
+    * `Path`: a list of paths to .NET Core solution or project files to build. If not specified, any solution or project files in the task working directory will be built.
+    * `OutputDirectory`: the directory where assemblies should be compiled to. The default is the location specified in each project file.
+    * `SdkVersion`: the version of the .NET Core SDK to use to build the project. Supports wildcard values. If not specified, the task will look for the SDK version from the `global.json` file if it is found in the task working directory or the Whiskey build root. If no SDK version can be located, the task will default to using the SDK version that comes with the latest LTS release of the .NET Core runtime. Whiskey will *always* update the SDK version property in the `global.json` file with the SDK version that task is running with. If no `global.json` file exists, one will be created in the Whiskey build root.
+    * `Verbosity`: sets the verbosity level of dotnet.exe's output. For developers, the default is dotnet.exe's default verbosity. On build servers, the default is `detailed`. Allowed values are `q[uiet]`, `m[inimal]`, `n[ormal]`, `d[etailed]`, and `diag[nostic]`.
+
+EXAMPLES
+    Example 1
+
+        Build:
+        - DotNetBuild:
+            Path:
+            - DotNetCoreSolution.sln
+
+    Demonstrates building the DotNetCoreSolution.sln file with the `dotnet build` command.
+
+    Example 2
+
+        Build:
+        - DotNetBuild:
+            Path:
+            - DotNetCoreSolution.sln
+            Verbosity: normal
+            OutputDirectory: bin
+
+    Demonstrates build a solution file with normal verbosity and compiling the assemblies to the '$(WHISKEY_BUILD_ROOT)\bin' directory.
+
+    Example 3
+
+        Build:
+        - DotNetBuild:
+            Path:
+            - src\DotNetStandardLibrary.csproj
+            - src\DotNetCoreApp.csproj
+            Argument:
+            - --no-dependencies
+
+    Demonstrates building multiple .NET Core csproj files with an additional argument, `--no-dependencies`, passed to the `dotnet build` command.
+
+    Example 4
+
+        Build:
+        - DotNetBuild:
+            Path:
+            - DotNetCoreSolution.sln
+            SdkVersion: 2.*
+
+    Demonstrates building a .NET Core solution with the latest `2.*` version of the .NET Core SDK.

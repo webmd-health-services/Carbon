@@ -1,0 +1,52 @@
+TOPIC
+    about_Whiskey_SetVariableFromXml_Task
+
+SUMMARY
+    Sets Whiskey variables by reading values from XML files.
+
+DESCRIPTION
+    The `SetVariableFromXml` task sets Whiskey variables by reading values from XML files. The path to the XML file to read is set with the `Path` property. Variable values are selected using XPath expressions. The names of the variables along with their XPath expressions are set with the `Variables` property. Every property under `Variables` is the name of the variable to set. Its value is the XPath expression to use. The inner text of the selected XML element or attribute is used as the value of the variable. If the XPath expression matches multiple elements/attributes, the value of the variable will be a list/array of inner text values.
+
+    If an element/attribute doesn't exist at a given XPath, the task (and your build) will fail. To allow an XPath expression to match non-existent nodes, set the `AllowMissingNodes` property to `true`. In this case, the variable's value will be set to an empty string.
+
+    If an XML document is namespaced (i.e. its root element has an "xmlns" attribute), you must use the "NamespacePrefixes" property to give the namespace a prefix and your XPath expression must prefix each element in that namespace with that prefix. See "Example 3" for sample code.
+
+PROPERTIES
+    * `Path` (***mandatory***): the path to the XML file to read.
+    * `Variables` (***mandatory***): name/value mappings of variables names to XPath expressions. See "Examples" below.
+    * `NamespacePrefixes`: sets the prefixes used in a variable's XPath expression for elements in a particular namespace. The value of this property are name/value mappings, where the names are the prefixes and the values are the namespace URIs. See "Example 3" for sample code.
+    * `AllowMissingNodes`: controls what happens if a variable's XPath expression matches no nodes. By default, the task (and your build) will fail. Set to `true` to instead set the variable's value to an empty string.
+
+EXAMPLES
+    Example 1
+
+        Build:
+        - SetVariableFromXml:
+            Path: Assembly\Whiskey\Whiskey.csproj
+            Variables:
+                TargetFramework: /Project/PropertyGroup/TargetFramework
+
+    Demonstrates how to read variables from XML files. In this case, the `TargetFramework` variable will be set with a value read from the `/Project/PropertyGroup/TargetFramework` element.
+
+    Example 2
+
+        Build:
+        - SetVariableFromXml:
+            Path: Assembly\Whiskey\Whiskey.csproj
+            Variables:
+                References: /Project/ItemGroup/PackageReference/@Include
+
+    Demonstrates how to read attribute from XML files and how to read multiple values. In this case, the `References` variable will be an array of all the package references in `Assembly\Whiskey\Whiskey.csproj`.
+
+
+    Example 3
+
+        Build:
+        - SetVariableFromXml:
+            Path: Assembly\Whiskey\Whiskey.csproj
+            NamespacePrefixes:
+                msbuild: http://schemas.microsoft.com/developer/msbuild/2003
+            Variables:
+                OutputPath: /msbuild:Project/msbuild:PropertyGroup[@Condition = " '$$(Configuration)|$$(Platform)' == '$(WHISKEY_MSBUILD_CONFIGURATION)|AnyCPU' "]/msbuild:OutputPath
+
+    Demonstrates how to read values from XML files that have namespaces. In this example, the output path for the current build is being read from a .NET project's .csproj file.

@@ -1,10 +1,10 @@
 
-Version: 2.5.1
-
-PublishOn:
+Publish:
  - master
  
-BuildTasks:
+Build:
+- Version:
+    Path: Carbon\Carbon.psd1
 - PowerShell:
     OnlyBy: BuildServer
     Path: Save-CarbonSigningKey.ps1

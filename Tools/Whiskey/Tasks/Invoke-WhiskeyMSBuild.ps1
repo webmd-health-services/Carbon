@@ -2,25 +2,58 @@ function Invoke-WhiskeyMSBuild
 {
     <#
     .SYNOPSIS
-    Invoke-WhiskeyMSBuild builds .NET projects with MSBuild
+    The MSBuild task runs msbuild.exe, the Microsoft Build tool.
 
     .DESCRIPTION
-    The MSBuild task is used to build .NET projects with MSBuild from the version of .NET 4 that is installed. Items are built by running the `clean` and `build` target against each file. The TaskParameter should contain a `Path` element that is a list of projects, solutions, or other files to build.  
+    The MSBuild task runs the "build" target against one or more files, specified with the `Path` property. (In clean mode, it runs the "clean" target instead.) These files must be in formats that MSBuild recognizes (e.g. *.sln, *.csproj, etc.). You can change what build targets to run using the `Target` property.
+
+    When run by a developers, this task builds using Debug configuration. When run by a build server, it builds using Release configuration.
+
+    For each solution file in the `Path` property (i.e. a file whose extension is .sln), the MSBuild task will restore that solutions's NuGet packages before the build begins, i.e. it runs `nuget.exe restore PATH_TO.sln`.
+
+    When run on the build server, the MSBuild task adds the current version being built to all AsssemblyInfo.cs files in or under the same directory as the file being built.
+
+    Specifically, these assembly attributes are addded:
+
+        [assembly: System.Reflection.AssemblyVersion("VERSION_NUMBER")]
+        [assembly: System.Reflection.AssemblyFileVersion("VERSION_NUMBER")]
+        [assembly: System.Reflection.AssemblyInformationalVersion("VERSION_NUMBER+BUILD_METADATA")]
+
+    If an AssemblyInfo.cs file already has one of these attributes, the existing attribute is replaced. Build metadata is added to the end of the version in the AssemblyInformationalVersion attribute's value.
+
+    The build fails if msbuild.exe returns a non-zero exist code.
+
+    The MSBuild task looks up installed versions of MSBuild in the "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\MSBuild\ToolsVersions' registry key. For each key it finds, it uses the "MSBuildToolsPath" property to locate that version's MSBuild.exe executable.
     
-    The build fails if any MSBuild target fails. If your `whiskey.yml` file defines a `Version` element and the build is running under a build server, all AssemblyInfo.cs files under each path is updated with appropriate `AssemblyVersion`, `AssemblyFileVersion`, and `AssemblyInformationalVersion` attributes. The `AssemblyInformationalVersion` attribute will contain the full semantic version from `whiskey.yml` plus some build metadata: the build server's build number, the Git branch, and the Git commit ID.
+    Versions of MSBuild that ship with Visual Studio 2017 and later don't appear in the registry, so the MSBuild task also uses the `Get-VSSetupInstance` function in the VSSetup PowerShell module to find installed instances of Visual Studio 2017 (and later). The task looks for versions of MSBuild in the "MSBuild" directory under each Visual Studio instance's installation path. Under each version, it looks for 64-bit MSBuild.exe at "Bin\amd64\MSBuild.exe" and 32-bit MSBuild.exe at "Bin\MSBuild.exe".
 
-    You *must* include paths to build with the `Path` parameter.
+    ## Property
 
-    .EXAMPLE
-    Invoke-WhiskeyMSBuild -TaskContext $TaskContext -TaskParameter $TaskParameter
+    * **Path** (*mandatory*): A list of one or more paths to files that MSBuild can build. Files are built in the order they appear in this list. Wildcards are permitted.
+    * **Verbosity**: Controls the verbosity level of MSBuild's output. The default is minimal. On build servers, the default is debug. Should be one of quiet, minimal, normal, debug, or diagnostic.
+    * **Property**: A list of additional MSBuild properties to pass to MSBuild, e.g. Disable_CopyWebApplication=True. Must be of the form NAME=VALUE.
+    * **OutputDirectory**: The directory where assemblies should be compiled to. The default is the location specified in each .csproj file.
+    * **CpuCount**: The number of MSBuild processes to use when building. The default is the number of cores/CPUs on the current computer. Setting this to 1 disables parallel builds.
+    * **NoMaxCpuCountArgument**: This disables multi-CPU builds by not passing the /maxcpucount argument to MSBuild. Useful if you're building with versions of MSBuild that don't support /maxcpucount.
+    * **NoFileLogger**: Disables logging debug output to a log file in the output directory.
+    * **Argument**: A list of arguments to pass to msbuild.exe.
+    * **Target**: A list of build targets to run. The default is build.
+    * **Version**: The version of MSBuild to use. By default, uses the most recent/latest version of MSBuild installed. You usually will want to pin this to a specific version. Valid values are 15.0 (Visual Studio 2017), 14.0 (Visual Studio 2015) 12.0 (Visual Studio 2013), 4.0, 3.5, or 2.0.
+    * **NuGetVersion**: The version of NuGet to use to restore packages. The default is to use the latest version.
+    * **Use32Bit**: Set to `true` to use a 32-bit version of MSBuild.exe. The default is to use a version that matches the processor architecture of the current computer.
 
-    Demonstrates how to call the `WhiskeyMSBuildTask`. In this case each path in the `Path` element in $TaskParameter relative to your whiskey.yml file, will be built with MSBuild.exe given the build configuration contained in $TaskContext.
+    ## Examples
 
+        Build:
+        - MSBuild:
+            Path: MySolution.sln
+
+    Demonstrates how to use the MSBuild task to build a Visual Studio solution file.
     #>
     [Whiskey.Task("MSBuild",SupportsClean=$true)]
     [CmdletBinding()]
     param(
-        [object]
+        [Whiskey.Context]
         # The context this task is operating in. Use `New-WhiskeyContext` to create context objects.
         $TaskContext,
         
@@ -42,7 +75,7 @@ function Invoke-WhiskeyMSBuild
     {
         Stop-WhiskeyTask -TaskContext $TaskContext -Message ('Element ''Path'' is mandatory. It should be one or more paths, relative to your whiskey.yml file, to build with MSBuild.exe, e.g. 
         
-        BuildTasks:
+        Build:
         - MSBuild:
             Path:
             - MySolution.sln
@@ -69,10 +102,18 @@ function Invoke-WhiskeyMSBuild
     }
 
     $msbuildExePath = $msbuildInfo.Path
-    Write-Verbose -Message ('{0}' -f $msbuildExePath)
+    if( $TaskParameter.ContainsKey('Use32Bit') -and ($TaskParameter['Use32Bit'] | ConvertFrom-WhiskeyYamlScalar) )
+    {
+        $msbuildExePath = $msbuildInfo.Path32
+        if( -not $msbuildExePath )
+        {
+            Stop-WhiskeyTask -TaskContext $TaskContext -Message ('A 32-bit version of MSBuild {0} does not exist.' -f $version)
+        }
+    }
+    Write-WhiskeyVerbose -Context $TaskContext -Message ('{0}' -f $msbuildExePath)
     
     $target = @( 'build' )
-    if( $TaskContext.ShouldClean() )
+    if( $TaskContext.ShouldClean )
     {
         $target = 'clean'
     }
@@ -86,22 +127,22 @@ function Invoke-WhiskeyMSBuild
 
     foreach( $projectPath in $path )
     {
-        Write-Verbose -Message ('  {0}' -f $projectPath)
+        Write-WhiskeyVerbose -Context $TaskContext -Message ('  {0}' -f $projectPath)
         $errors = $null
         if( $projectPath -like '*.sln' )
         {
-            if( $TaskContext.ShouldClean() )
+            if( $TaskContext.ShouldClean )
             {
                 $packageDirectoryPath = Join-Path -path ( Split-Path -Path $projectPath -Parent ) -ChildPath 'packages'
                 if( Test-Path -Path $packageDirectoryPath -PathType Container )
                 {
-                    Write-Verbose -Message ('  Removing NuGet packages at {0}.' -f $packageDirectoryPath)
+                    Write-WhiskeyVerbose -Context $TaskContext -Message ('  Removing NuGet packages at {0}.' -f $packageDirectoryPath)
                     Remove-Item $packageDirectoryPath -Recurse -Force
                 }
             }
             else
             {
-                Write-Verbose -Message ('  Restoring NuGet packages.')
+                Write-WhiskeyVerbose -Context $TaskContext -Message ('  Restoring NuGet packages.')
                 & $nugetPath restore $projectPath
             }
         }
@@ -116,7 +157,7 @@ function Invoke-WhiskeyMSBuild
                     $assemblyInfoPath = $assemblyInfo.FullName
                     $newContent = Get-Content -Path $assemblyInfoPath | Where-Object { $_ -notmatch '\bAssembly(File|Informational)?Version\b' }
                     $newContent | Set-Content -Path $assemblyInfoPath
-                    Write-Verbose -Message ('    Updating version in {0}.' -f $assemblyInfoPath)
+                    Write-WhiskeyVerbose -Context $TaskContext -Message ('    Updating version in {0}.' -f $assemblyInfoPath)
     @"
 [assembly: System.Reflection.AssemblyVersion("{0}")]
 [assembly: System.Reflection.AssemblyFileVersion("{0}")]
@@ -174,9 +215,9 @@ function Invoke-WhiskeyMSBuild
                                             }
                                       } | Where-Object { $_ }
         $separator = '{0}VERBOSE:               ' -f [Environment]::NewLine
-        Write-Verbose -Message ('  Target      {0}' -f ($target -join $separator))
-        Write-Verbose -Message ('  Property    {0}' -f ($property -join $separator))
-        Write-Verbose -Message ('  Argument    {0}' -f ($msbuildArgs -join $separator))
+        Write-WhiskeyVerbose -Context $TaskContext -Message ('  Target      {0}' -f ($target -join $separator))
+        Write-WhiskeyVerbose -Context $TaskContext -Message ('  Property    {0}' -f ($property -join $separator))
+        Write-WhiskeyVerbose -Context $TaskContext -Message ('  Argument    {0}' -f ($msbuildArgs -join $separator))
 
         $propertyArgs = $property | ForEach-Object { 
             $item = $_

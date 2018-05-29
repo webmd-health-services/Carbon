@@ -23,7 +23,7 @@ function Stop-WhiskeyTask
 
     if( -not ($PropertyDescription) )
     {
-        $PropertyDescription = 'BuildTasks[{0}]: {1}' -f $TaskContext.TaskIndex,$TaskContext.TaskName
+        $PropertyDescription = 'Build[{0}]: {1}' -f $TaskContext.TaskIndex,$TaskContext.TaskName
     }
 
     if( $PropertyName )

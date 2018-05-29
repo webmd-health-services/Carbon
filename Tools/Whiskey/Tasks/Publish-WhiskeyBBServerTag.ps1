@@ -5,7 +5,7 @@ function Publish-WhiskeyBBServerTag
     [Whiskey.Task("PublishBitbucketServerTag")]
     param(
         [Parameter(Mandatory=$true)]
-        [object]
+        [Whiskey.Context]
         $TaskContext,
 
         [Parameter(Mandatory=$true)]
@@ -16,7 +16,7 @@ function Publish-WhiskeyBBServerTag
     Set-StrictMode -Version 'Latest'
     Use-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState
 
-    $exampleTask = 'PublishTasks:
+    $exampleTask = 'Publish:
         - PublishBitbucketServerTag:
             CredentialID: BitbucketServerCredential
             Uri: https://bitbucketserver.example.com'
@@ -50,7 +50,7 @@ function Publish-WhiskeyBBServerTag
         $projectKey = $TaskParameter['ProjectKey']
         $repoKey = $TaskParameter['RepositoryKey']
     }
-    elseif( $TaskContext.BuildMetadata.ScmUri )
+    elseif( $TaskContext.BuildMetadata.ScmUri -and $TaskContext.BuildMetadata.ScmUri.Segments )
     {
         $uri = [uri]$TaskContext.BuildMetadata.ScmUri
         $projectKey = $uri.Segments[-2].Trim('/')
@@ -60,7 +60,7 @@ function Publish-WhiskeyBBServerTag
     {
         Stop-WhiskeyTask -TaskContext $TaskContext -PropertyDescription '' -Message ("Unable to determine the repository where we should create the tag. Either create a `GIT_URL` environment variable that is the URI used to clone your repository, or add your repository''s project and repository keys as `ProjectKey` and `RepositoryKey` properties, respectively, on this task:
         
-        PublishTasks:
+        Publish:
         - PublishBitbucketServerTag:
             CredentialID: $($TaskParameter['CredentialID'])
             Uri: $($TaskParameter['Uri'])
@@ -73,6 +73,6 @@ function Publish-WhiskeyBBServerTag
     $credential = Get-WhiskeyCredential -Context $TaskContext -ID $credentialID -PropertyName 'CredentialID'
     $connection = New-BBServerConnection -Credential $credential -Uri $TaskParameter['Uri']
     $tag = $TaskContext.Version.SemVer2NoBuildMetadata
-    Write-Verbose -Message ('[PublishBitbucketServerTag]  [{0}]  [{1}]  [{2}]  {3} -> {4}' -f $TaskParameter['Uri'],$projectKey,$repoKey,$commitHash,$tag)
+    Write-WhiskeyVerbose -Context $TaskContext -Message ('[{0}]  [{1}]  [{2}]  {3} -> {4}' -f $TaskParameter['Uri'],$projectKey,$repoKey,$commitHash,$tag)
     New-BBServerTag -Connection $connection -ProjectKey $projectKey -force -RepositoryKey $repoKey -Name $tag -CommitID $commitHash -ErrorAction Stop
 }

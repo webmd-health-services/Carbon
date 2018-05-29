@@ -18,7 +18,7 @@ function Get-WhiskeyPowerShellModule
 
     ## Example 1
 
-        BuildTasks:
+        Build:
         - GetPowerShellModule:
             Name: Whiskey
 
@@ -26,7 +26,7 @@ function Get-WhiskeyPowerShellModule
 
     ## Example 2
 
-        BuildTasks:
+        Build:
         - GetPowerShellModule:
             Name: Whiskey
             Version: "0.14.*"
@@ -39,7 +39,7 @@ function Get-WhiskeyPowerShellModule
     [Whiskey.Task("GetPowerShellModule",SupportsClean=$true, SupportsInitialize=$true)]
     param(
         [Parameter(Mandatory=$true)]
-        [object]
+        [Whiskey.Context]
         $TaskContext,
 
         [Parameter(Mandatory=$true)]
@@ -68,7 +68,7 @@ function Get-WhiskeyPowerShellModule
         }
     }
 
-    if( $TaskContext.ShouldClean() )
+    if( $TaskContext.ShouldClean )
     {
         Uninstall-WhiskeyTool -ModuleName $TaskParameter['Name'] -BuildRoot $TaskContext.BuildRoot
         return

@@ -18,7 +18,7 @@ function Restore-WhiskeyNuGetPackage
 
     This demonstrates how to restore the NuGet packages for a Visual Studio solution.
 
-        BuildTasks:
+        Build:
         - NuGetRestore:
             Path: MySolution.sln
 
@@ -26,7 +26,7 @@ function Restore-WhiskeyNuGetPackage
 
     This demonstrates how to pin the task to use a specific version of NuGet, in this case, `4.1.0`. Without the `Version` attribute, the latest version of NuGet is used.
 
-        BuildTasks:
+        Build:
         -NuGetRestore:
             Path: MySolution.sln
             Version: 4.1.0
@@ -35,7 +35,7 @@ function Restore-WhiskeyNuGetPackage
 
     This demonstrates how to pass custom arguments to NuGet.exe with the `Argument` property. In this example, packages will be put in a `packages` directory in the build root (i.e. the same directory as your `whiskey.yml` file).
 
-        BuildTasks:
+        Build:
         -NuGetRestore:
             Path: packages.config
             Argument:
@@ -48,7 +48,7 @@ function Restore-WhiskeyNuGetPackage
     [Whiskey.TaskAttribute("NuGetRestore")]
     param(
         [Parameter(Mandatory=$true)]
-        [object]
+        [Whiskey.Context]
         $TaskContext,
 
         [Parameter(Mandatory=$true)]

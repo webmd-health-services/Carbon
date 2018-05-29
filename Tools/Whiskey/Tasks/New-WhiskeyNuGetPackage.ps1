@@ -5,7 +5,7 @@ function New-WhiskeyNuGetPackage
     [CmdletBinding()]
     param(
         [Parameter(Mandatory=$true)]
-        [object]
+        [Whiskey.Context]
         $TaskContext,
     
         [Parameter(Mandatory=$true)]
@@ -20,7 +20,7 @@ function New-WhiskeyNuGetPackage
     {
         Stop-WhiskeyTask -TaskContext $TaskContext -Message ('Property ''Path'' is mandatory. It should be one or more paths to .csproj or .nuspec files to pack, e.g. 
             
-    BuildTasks:
+    Build:
     - PublishNuGetPackage:
         Path:
         - MyProject.csproj

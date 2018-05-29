@@ -8,19 +8,19 @@ function Invoke-WhiskeyPipeline
     .DESCRIPTION
     The `Invoke-WhiskeyPipeline` function runs the tasks in a pipeline. Pipelines are properties in a `whiskey.yml` under which one or more tasks are defined. For example, this `whiskey.yml` file:
 
-        BuildTasks:
+        Build:
         - TaskOne
         - TaskTwo
-        PublishTasks:
+        Publish:
         - TaskOne
         - Task
 
-    Defines two pipelines: `BuildTasks` and `PublishTasks`.
+    Defines two pipelines: `Build` and `Publish`.
 
     .EXAMPLE
-    Invoke-WhiskeyPipeline -Context $context -Name 'BuildTasks'
+    Invoke-WhiskeyPipeline -Context $context -Name 'Build'
 
-    Demonstrates how to run the tasks in a `BuildTasks` pipeline. The `$context` object is created by calling `New-WhiskeyContext`.
+    Demonstrates how to run the tasks in a `Build` pipeline. The `$context` object is created by calling `New-WhiskeyContext`.
     #>
     [CmdletBinding()]
     param(
@@ -31,7 +31,7 @@ function Invoke-WhiskeyPipeline
 
         [Parameter(Mandatory=$true)]
         [string]
-        # The name of pipeline to run, e.g. `BuildTasks` would run all the tasks under a property named `BuildTasks`. Pipelines are properties in your `whiskey.yml` file that are lists of Whiskey tasks to run.
+        # The name of pipeline to run, e.g. `Build` would run all the tasks under a property named `Build`. Pipelines are properties in your `whiskey.yml` file that are lists of Whiskey tasks to run.
         $Name
     )
 
@@ -63,27 +63,15 @@ function Invoke-WhiskeyPipeline
     foreach( $taskItem in $config[$Name] )
     {
         $taskIdx++
-        if( $taskItem -is [string] )
-        {
-            $taskName = $taskItem
-            $taskItem = @{ }
-        }
-        elseif( ($taskItem | Get-Member -Name 'Keys') )
-        {
-            $taskName = $taskItem.Keys | Select-Object -First 1
-            $taskItem = $taskItem[$taskName]
-            if( -not $taskItem )
-            {
-                $taskItem = @{ }
-            }
-        }
-        else
+
+        $taskName,$taskParameter = ConvertTo-WhiskeyTask -InputObject $taskItem -ErrorAction Stop
+        if( -not $taskName )
         {
             continue
         }
 
         $Context.TaskIndex = $taskIdx
 
-        Invoke-WhiskeyTask -TaskContext $Context -Name $taskName -Parameter $taskItem
+        Invoke-WhiskeyTask -TaskContext $Context -Name $taskName -Parameter $taskParameter
     }
 }

@@ -1,0 +1,165 @@
+TOPIC
+    about_Whiskey_Writing_Tasks
+
+SHORT DESCRIPTION
+    This help topic describes how to write your own Whiskey tasks.
+
+LONG DESCRIPTION
+
+    A Whiskey task is a PowerShell function that has:
+
+    * the `Whiskey.Task` attribute
+    * a `TaskContext` parameter
+    * a `TaskParameter` parameter that's a hashtable
+
+    Whiskey will find your task if it is in the global scope when you run your build (i.e. when `Invoke-WhiskeyBuild` is called).
+
+    You can run `Get-WhiskeyTask` to see all the tasks that Whiskey can find.
+
+    Here is a stub function to get you started:
+
+        function FUNCTION_NAME
+        {
+            [Whiskey.Task('TASK_NAME')]
+            [CmdletBinding()]
+            param(
+                [Parameter(Mandatory=$true)]
+                [object]
+                $TaskContext,
+
+                [Parameter(Mandatory=$true)]
+                [hashtable]
+                $TaskParameter
+            )
+
+            Set-StrictMode -Version 'Latest'
+        }
+
+
+    To use your task in a whiskey.yml file, use the name from the `Whiskey.Task` attribute, e.g.
+
+        Build:
+        - TASK_NAME:
+            Property: Value
+            Property2:
+            - One
+            - Two
+
+    Everything under your task in the whiskey.yml file is passed to your function to the `$TaskParameter` hashtable parameter. For example, given the whiskey.yml above, your task would receive this hashtable:
+
+        @{
+            Property = 'Value';
+            Property2 = @( 'One', 'Two' )
+        }
+
+    Whiskey supports these global task properties. They are *not* in the `TaskParameter` hashtable.
+
+    * OnlyDuring
+    * ExceptDuring
+    * OnlyOnBranch
+    * ExceptOnBranch
+    * OnlyBy
+    * ExceptBy
+    * WorkingDirectory
+
+    In other words, your task isn't allowed to have these properties.
+
+    # Tools
+
+    Whiskey can automatically install some tools for your task. The path to that tool is passed to your task in the `TaskParameter` parameter.
+
+    To tell Whiskey what tools you depend on, add a `Whiskey.RequiresTool` attribute. It has two parameters: the name of the tool, and the name of the key to use in the `TaskParameter` hashtable where the path to your tool is saved.
+
+    For example, given this task:
+
+        function FUNCTION_NAME
+        {
+            [Whiskey.Task(''TASK_NAME'')]
+            # The second parameter is the name of the key in the $TaskParamter hashtable where Whiskey should put the path to the Node executable it installs.
+            [Whiskey.RequiresTool(''Node'',''NodePath'')]
+            [CmdletBinding()]
+            param(
+                $TaskContext,
+
+                [hashtable]
+                $TaskParameter
+            )
+
+            $nodePath = Assert-WhiskeyNodePath -Path $TaskParameter[''NodePath''] -ErrorAction Stop
+        }
+
+    Whiskey will install the latest version of Node, and put the path to the Node executable in the `NodePath` key in the `TaskParameter` hasthable. You can see that the task is using `Assert-WhiskeyPath` to ensure the `NodePath` parameter points to an existing path.
+
+    ## Installing a Specific Tool Version
+
+    If your task requires a specific version of a tool, use the `Whiskey.RequiresTool` attribute's `Version` property:
+
+        [Whiskey.RequiresTool('NodeModule::nsp', 'NspPath', Version='2.7.0')]
+
+    If you want the user to be able to control what version of a tool to use, the `Whiskey.RequiresTool` attribute has a `VersionParameterName` property that should be set to a property name users can use in their whiskey.yml file to control what version of a tool to use. The default name is `Version`. For example, if your `Whiskey.RequiresTool` attribute looks like this:
+
+         [Whiskey.RequiresTool('NodeModule::nsp', 'NspPath', VersionParameterName='NspVersion')]
+
+    A user could use the `NspVersion` property to control what version of Node they want to use:
+
+         Build:
+         - TASK_NAME:
+            NspVersion: 8.9.4
+
+    In the example above, Whiskey would install version 8.9.4 of ths NSP node module.
+
+    Whiskey supports installing:
+
+    * Node
+    * Node Modules
+    * .NET Core SDK
+
+    ## Node
+
+    To install Node, add this to your task:
+
+         [Whiskey.RequiresTool('Node','NodePath')]
+
+    The `NodePath` string is the name of the key where the path to Node should be saved in the `TaskParameter` hashtable when calling your task.
+
+    If the user doesn't use the version parameter to control what version of Node to use, Whiskey also looks in the user's package.json file at the `engines.node` property, e.g.
+
+       {
+            "engines": {
+                "node": "^8.9.4"
+            }
+       }
+
+    Node is installed to a `.node` directory in the build root. This gives every project its own version of Node to use.
+
+    ## Node Modules
+
+    To install a Node module, pass the name of the module (case-sensitive) to the `Whiskey.RequiresTool` attribute, prefixed with `NodeModule::`. For example,
+
+        [Whiskey.Requirestool('NodeModule::nsp', 'NspPath')]
+
+    would cause Whiskey to install the NSP module and send the path to its directory in the `NspPath` key of the `TaskParameter` hashtable when calling your task. The path will always be to the Node module's directory in the `node_modules` directory.
+
+    Whiskey does not install these Node modules in your project's node_modules directory. It installs them to `.node\node_modules`, your project's dedicated "global" Node environment.
+
+    ## .NET Core SDK
+
+    To install the .NET Core SDK, add this to your task:
+
+        [Whiskey.RequiresTool('DotNet','DotNetPath')]
+
+    The `DotNetPath` string is the name of the key where the path to the `dotnet.exe` command should be saved in the `$TaskParameter` hashtable when calling your task.
+
+    If the SDK version to install is not defined in the `whiskey.yml` file, then Whiskey will look for a .NET Core `global.json` file first in the task's working directory and then in the same directory as the `whiskey.yml` file. The `global.json` file defines the SDK version with the `sdk.version` property, e.g.
+
+        {
+            "sdk": {
+                "version": "2.1.4"
+            }
+        }
+
+    If no SDK version is found in the `whiskey.yml` or `global.json`, Whiskey will use the latest LTS release of the .NET Core SDK.
+
+    Before installing the .NET Core SDK to the build root, Whiskey will first search for global .NET Core installs containing the desired version. If a global install is found with the correct version, that path is used and the install to the local build root is skipped.
+
+    Whiskey will *always* update the `sdk.version` property within the `global.json` file found in the task working directory or the Whiskey build root with the version of the SDK that task is using. If a `global.json` file does not exist in either the working directory or build root, one is created in the build root.

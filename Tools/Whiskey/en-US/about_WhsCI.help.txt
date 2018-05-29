@@ -1,8 +1,0 @@
-TOPIC
-    about_Whiskey
-    
-SHORT DESCRIPTION
-    Whiskey is the a build platform. It builds, tests, packages, and publishes applications and PowerShell modules. You specify what and how to build something via a YAML configuration file.
-    
-SEE_ALSO
-    https://github.com/webmd-health-services/Whiskey

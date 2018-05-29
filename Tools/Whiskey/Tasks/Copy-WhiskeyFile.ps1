@@ -5,7 +5,7 @@ function Copy-WhiskeyFile
     [CmdletBinding()]
     param(
         [Parameter(Mandatory=$true)]
-        [object]
+        [Whiskey.Context]
         $TaskContext,
 
         [Parameter(Mandatory=$true)]
@@ -19,7 +19,7 @@ function Copy-WhiskeyFile
     $pathErrorMessage = @'
 'Path' property is missing. Please set it to the list of files to copy, e.g.
 
-BuildTasks:
+Build:
 - CopyFile:
     Path: myfile.txt
     Destination: \\computer\share
@@ -27,7 +27,7 @@ BuildTasks:
     $destDirErrorMessage = @'
 'DestinationDirectory' property is missing. Please set it to the list of target locations to copy to, e.g.
 
-BuildTasks:
+Build:
 - CopyFile:
     Path: myfile.txt
     DestinationDirectory: \\computer\share
@@ -108,7 +108,7 @@ BuildTasks:
     {
         foreach($sourceFile in $sourceFiles)
         {
-            Write-Verbose ('{0} -> {1}' -f $sourceFile,$destDir)
+            Write-WhiskeyVerbose -Context $TaskContext ('{0} -> {1}' -f $sourceFile,$destDir)
             Copy-Item -Path $sourceFile -Destination $destDir
         }
     }

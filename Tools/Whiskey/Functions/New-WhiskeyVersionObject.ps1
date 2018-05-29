@@ -2,17 +2,14 @@
 function New-WhiskeyVersionObject
 {
     [CmdletBinding()]
+    [OutputType([Whiskey.BuildVersion])]
     param(
         [SemVersion.SemanticVersion]
         $SemVer
     )
 
-    $whiskeyVersion = [pscustomobject]@{
-                                            SemVer2 = $null;
-                                            SemVer2NoBuildMetadata = $null;
-                                            Version = $null;
-                                            SemVer1 = $null;
-                                        }
+    $whiskeyVersion = New-Object -TypeName 'Whiskey.BuildVersion'
+    
     if( $SemVer )
     {
         $major = $SemVer.Major

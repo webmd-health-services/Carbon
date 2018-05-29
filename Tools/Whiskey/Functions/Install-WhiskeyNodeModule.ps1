@@ -6,16 +6,19 @@ function Install-WhiskeyNodeModule
     Installs Node.js modules
     
     .DESCRIPTION
-    The `Install-WhiskeyNodeModule` function installs Node.js modules to the `node_modules` directory located in the given `ApplicationRoot` parameter and returns the path to the installed module.
-    
-    The function will use `Invoke-WhiskeyNpmCommand` to execute `npm install` with the given module `Name` to install the Node module.
-    
-    If `Invoke-WhiskeyNpmCommand` returns a non-zero exit code an error will be written and the function will return nothing. If NPM executes successfully but the module to be installed cannot be found then an error will be written and nothing will be returned.
+    The `Install-WhiskeyNodeModule` function installs Node.js modules to the `node_modules` directory located in the current working directory. The path to the module's directory is returned.
+
+    Failing to install a module does not cause a bulid to fail. If you want a build to fail if the module fails to install, you must pass `-ErrorAction Stop`.
     
     .EXAMPLE
-    Install-WhiskeyNodeModule -Name 'rimraf' -Version '^2.0.0' -ApplicationRoot 'C:\build\app' -RegistryUri 'http://registry.npmjs.org'
+    Install-WhiskeyNodeModule -Name 'rimraf' -Version '^2.0.0' -NodePath $TaskParameter['NodePath']
 
-    This example will install the Node module `rimraf` at the latest `2.x.x` version in the `node_modules` directory located in `C:\build\app`.
+    This example will install the Node module `rimraf` at the latest `2.x.x` version in the `node_modules` directory located in the current directory.
+    
+    .EXAMPLE
+    Install-WhiskeyNodeModule -Name 'rimraf' -Version '^2.0.0' -NodePath $TaskParameter['NodePath -ErrorAction Stop
+
+    Demonstrates how to fail a build if installing the module fails by setting the `ErrorAction` parameter to `Stop`.
     #>
     
     [CmdletBinding()]
@@ -29,42 +32,67 @@ function Install-WhiskeyNodeModule
         # The version of the module to install.
         $Version,
 
-        [Parameter(Mandatory=$true)]
-        [string]
-        # The root directory of the target Node.js application. This directory will contain the application's `package.json` config file and will be where Node modules are installed.
-        $ApplicationRoot,
-
-        [Parameter(Mandatory=$true)]
-        # The URI to the registry from which Node modules should be downloaded.
-        $RegistryUri,
-
         [switch]
         # Node modules are being installed on a developer computer.
-        $ForDeveloper
+        $ForDeveloper,
+
+        [Parameter(Mandatory=$true)]
+        [string]
+        # The path to the node executable.
+        $NodePath,
+
+        [Switch]
+        # Whether or not to install the module globally.
+        $Global,
+
+        [Switch]
+        # Are we running in clean mode?
+        $InCleanMode
     )
 
     Set-StrictMode -Version 'Latest'
     Use-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState
 
-    $npmArgument = $Name
-    if ($version)
+    $npmArgument = & {
+                        if( $Version )
+                        {
+                            ('{0}@{1}' -f $Name,$Version)
+                        }
+                        else
+                        {
+                            $Name
+                        }
+                        if( $Global )
+                        {
+                            '-g'
+                        }
+                    }
+
+    $nodeRoot = (Get-Location).ProviderPath
+    if( $Global )
     {
-        $npmArgument = ('{0}@{1}' -f $Name,$Version)
+        $nodeRoot = $NodePath | Split-Path
     }
 
-    Invoke-WhiskeyNpmCommand -NpmCommand 'install' -Argument $npmArgument -ApplicationRoot $ApplicationRoot -RegistryUri $RegistryUri -ForDeveloper:$ForDeveloper | Write-Verbose
-
-    if ($Global:LASTEXITCODE -ne 0)
+    $modulePath = Join-Path -Path $nodeRoot -ChildPath ('node_modules\{0}' -f $Name)
+    if( (Test-Path -Path $modulePath -PathType Container) )
     {
-        Write-Error -Message ('Failed to install Node module ''{0}''. See previous errors for more details.' -f $npmArgument)
+        return $modulePath
+    }
+    elseif( $InCleanMode )
+    {
         return
     }
 
-    $modulePath = Join-Path -Path $ApplicationRoot -ChildPath ('node_modules\{0}' -f $Name)
-
-    if (-not (Test-Path -Path $modulePath -PathType Container))
+    Invoke-WhiskeyNpmCommand -Name 'install' -ArgumentList $npmArgument -NodePath $NodePath -ForDeveloper:$ForDeveloper | Write-Verbose
+    if( $LASTEXITCODE )
     {
-        Write-Error -Message ('NPM executed successfully when attempting to install ''{0}'' but the module was not found at ''{1}''' -f $npmArgument,$modulePath)
+        return
+    }
+
+    if( -not (Test-Path -Path $modulePath -PathType Container))
+    {
+        Write-Error -Message ('NPM executed successfully when attempting to install ''{0}'' but the module was not found at ''{1}''' -f ($npmArgument -join ' '),$modulePath)
         return
     }
 

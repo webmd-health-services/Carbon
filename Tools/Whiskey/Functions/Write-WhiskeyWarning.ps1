@@ -15,5 +15,5 @@ function Write-WhiskeyWarning
 
     Set-StrictMode -Version 'Latest'
 
-    Write-Warning -Message ('{0}: BuildTasks[{1}]: {2}: {3}' -f $TaskContext.ConfigurationPath,$TaskContext.TaskIndex,$TaskContext.TaskName,$Message)
+    Write-Warning -Message ('{0}: Build[{1}]: {2}: {3}' -f $TaskContext.ConfigurationPath,$TaskContext.TaskIndex,$TaskContext.TaskName,$Message)
 }
