@@ -57,6 +57,7 @@ Build:
     - Test\Install-Certificate.Tests.ps1
     - Test\Uninstall-Certificate.Tests.ps1
     - Test\Get-ScheduledTask.Tests.ps1
+    - Test\*Iis*.ps1
 - Parallel:
     OnlyBy: BuildServer
     Queues:
@@ -67,6 +68,7 @@ Build:
             - "*\\Install-Certificate.Tests.ps1"
             - "*\\Uninstall-Certificate.Tests.ps1"
             - "*\\Get-ScheduledTask.Tests.ps1"
+            - "*\\*Iis*.ps1"
             DescribeDurationReportCount: 20
     - Tasks:
         - PowerShell:
