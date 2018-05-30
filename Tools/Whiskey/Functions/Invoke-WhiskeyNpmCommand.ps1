@@ -6,47 +6,39 @@ function Invoke-WhiskeyNpmCommand
     Runs `npm` with given command and argument.
     
     .DESCRIPTION
-    The `Invoke-WhiskeyNpmCommand` function runs `npm` commands with given arguments in a Node.js project. The function will first call `Install-WhiskeyNodeJs` and `Get-WhiskeyNPMPath` to download and install the desired versions of Node.js and npm listed in the project's `package.json` `engines` field. Then `npm` will be invoked with the given `NpmCommand` and `Argument` in the `ApplicationRoot` directory. If `npm` returns a non-zero exit code this function will write an error indicating that the npm command failed.
+    The `Invoke-WhiskeyNpmCommand` function runs `npm` commands in the current workding directory. Pass the path to the node executable (e.g. `node.exe`) to the `NodePath` parameter. The path to NPM is assumed to be at `node_modules\npm\bin\npm-cli.js`, starting in the Node executable's directory.
 
-    You must specify the `npm` command you would like to run with the `NpmCommand` parameter. Optionally, you may specify arguments for the `npm command` with the `Argument` parameter.
+    Pass the name of the NPM command to run with the `Name` parameter. Pass any arguments to pass to the command with the `ArgumentList`.
 
-    The `ApplicationRoot` parameter must contain the path to the directory where the Node.js module's `package.json` can be found.
+    Task authors should add the `RequiresTool` attribute to their task functions to ensure that Whiskey installs Node and NPM, e.g.
+
+        function MyTask
+        {
+            [Whiskey.Task('MyTask')]
+            [Whiskey.RequiresTool('Node', 'NodePath')]
+            param(
+            )
+        }
 
     .EXAMPLE
-    Invoke-WhiskeyNpmCommand -NpmCommand 'install' -ApplicationRoot 'src\app' -RegistryUri 'http://registry.npmjs.org' -ForDeveloper
+    Invoke-WhiskeyNpmCommand -Name 'install' -NodePath $TaskParameter['NodePath'] -ForDeveloper:$Context.ByDeveloper
 
-    Runs the `npm install' command without any arguments in the 'src\app' directory as a developer.
-
-    .EXAMPLE
-    Invoke-WhiskeyNpmCommand -NpmCommand 'run' -Argument 'test --silent' -ApplicationRoot 'src\app' -RegistryUri 'http://registry.npmjs.org'
-
-    Executes `npm run test --silent` in the 'src\app' directory.
+    Demonstrates how to run the `npm install` command from a task. 
     #>
-
     [CmdletBinding()]
     param(
-        [Parameter(Mandatory=$true,ParameterSetName='InvokeNpm')]
+        [Parameter(Mandatory=$true)]
         [string]
-        # The NPM command to execute.
-        $NpmCommand,
+        # The NPM command to execute, e.g. `install`, `prune`, `run-script`, etc.
+        $Name,
         
-        [Parameter(ParameterSetName='InvokeNpm')]
         [string[]]
         # An array of arguments to be given to the NPM command being executed.
-        $Argument,
-
-        [Parameter(ParameterSetName='InitializeOnly')]
-        [switch]
-        $InitializeOnly,
+        $ArgumentList,
 
         [Parameter(Mandatory=$true)]
         [string]
-        # The root directory of the target Node.js application. This directory will contain the application's `package.json` config file and will be where NPM will be executed from.
-        $ApplicationRoot,
-
-        [Parameter(Mandatory=$true)]
-        # The URI to the registry from which NPM packages should be downloaded.
-        $RegistryUri,
+        $NodePath,
 
         [switch]
         # NPM commands are being run on a developer computer.
@@ -56,88 +48,58 @@ function Invoke-WhiskeyNpmCommand
     Set-StrictMode -Version 'Latest'
     Use-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState
 
-    $startedAt = Get-Date
-    function Write-Timing
+    $NodePath = Assert-WhiskeyNodePath -Path $NodePath
+    if( -not $NodePath )
     {
-        param(
-            $Message
-        )
-
-        $now = Get-Date
-        Write-Debug -Message ('[{0}]  [{1}]  {2}' -f $now,($now - $startedAt),$Message)
-    }
-
-    $activity = ('Invoke npm command ''{0}''' -f $NpmCommand)
-    Write-Progress -Activity $activity -Status 'Validating package.json and starting installation of Node.js version required for this package (if required)'
-
-    Write-Timing -Message 'Installing Node.js'
-    $nodePath = Install-WhiskeyNodeJs -RegistryUri $RegistryUri -ApplicationRoot $ApplicationRoot -ForDeveloper:$ForDeveloper
-    Write-Timing -Message ('COMPLETE')
-
-    if (-not $nodePath)
-    {
-        Write-Error -Message 'Node.js version required for this package failed to install. Please see previous errors for details.'
-        $Global:LASTEXITCODE = 1
-        return
-    }
-    
-    $nodeRoot = $nodePath | Split-Path
-    $npmGlobalPath = Join-Path -Path $nodeRoot -ChildPath 'node_modules\npm\bin\npm-cli.js' -Resolve
-    if (-not $npmGlobalPath)
-    {
-        Write-Error -Message 'NPM didn''t get installed by NVM when installing Node. Please use NVM to uninstall this version of Node.'
-        $Global:LASTEXITCODE = 2
         return
     }
 
-    Write-Progress -Activity $activity -Status 'Getting path to the version of NPM required for this package'
+    $nodeRoot = $NodePath | Split-Path
+        
+    $npmPath = Join-Path -Path $nodeRoot -ChildPath 'node_modules\npm\bin\npm-cli.js'
 
-    Write-Timing -Message 'Resolving path to NPM.'
-    $npmPath = Get-WhiskeyNPMPath -NodePath $nodePath -ApplicationRoot $ApplicationRoot
-    Write-Timing -Message ('COMPLETE')
-    
-    if (-not $npmPath)
+    if( -not $npmPath -or -not (Test-Path -Path $npmPath -PathType Leaf) )
     {
-        Write-Error -Message ('Could not locate version of NPM that is required for this package. Please see previous errors for details.')
-        $Global:LASTEXITCODE = 3
+        Write-Error -Message ('Whiskey failed to install NPM. Something pretty serious has gone wrong.')
         return
     }
 
-    if ($InitializeOnly)
-    {
-        $Global:LASTEXITCODE = 0
-        Write-Timing -Message 'Initialization complete.'
-        return
-    }
+    # Assign to new variables otherwise Invoke-Command can't find them.
+    $commandName = $Name
+    $commandArgs = & {
+                        $ArgumentList
+                        '--scripts-prepend-node-path=auto'
+                        if( -not $ForDeveloper )
+                        {
+                            '--no-color'
+                        }
+                    }
+
+    $npmCommandString = ('npm {0} {1}' -f $commandName,($commandArgs -join ' '))
 
     $originalPath = $env:PATH
-
-    Push-Location -Path $ApplicationRoot
+    Set-Item -Path 'env:PATH' -Value ('{0};{1}' -f $nodeRoot,$env:Path)
     try
     {
-        Set-Item -Path 'env:PATH' -Value ('{0};{1}' -f $nodeRoot,$env:Path)
-
-        $defaultArguments = @('--scripts-prepend-node-path=auto')
-        if (-not $ForDeveloper)
-        {
-            $defaultArguments += '--no-color'
+        Write-Progress -Activity $npmCommandString
+        Invoke-Command -ScriptBlock {
+            # The ISE bails if processes write anything to STDERR. Node writes notices and warnings to
+            # STDERR. We only want to stop a build if the command actually fails.
+            if( $ErrorActionPreference -ne 'SilentlyContinue' -and $ErrorActionPreference -ne 'Ignore' )
+            {
+                $ErrorActionPreference = 'Continue'
+            }
+            Write-Verbose ('{0} {1} {2} {3}' -f $NodePath,$npmPath,$commandName,($commandArgs -join ' '))
+            & $nodePath $npmPath $commandName $commandArgs
         }
-
-        $npmCommandString = ('npm {0} {1} {2}' -f $NpmCommand,($Argument -join ' '),($defaultArguments -join ' '))
-        Write-Progress -Activity $activity -Status ('Executing ''{0}''' -f $npmCommandString)
-        Invoke-Command -NoNewScope -ScriptBlock {
-            & $nodePath $npmPath $NpmCommand $Argument $defaultArguments
-        }
-
-        if ($LASTEXITCODE -ne 0)
+        if( $LASTEXITCODE -ne 0 )
         {
-            Write-Error -Message ('NPM command ''{0}'' failed with exit code {1}.' -f $npmCommandString,$LASTEXITCODE)
+            Write-Error -Message ('NPM command ''{0}'' failed with exit code {1}. Please see previous output for more details.' -f $npmCommandString,$LASTEXITCODE)
         }
     }
     finally
     {
         Set-Item -Path 'env:PATH' -Value $originalPath
-
-        Pop-Location
+        Write-Progress -Activity $npmCommandString -Completed -PercentComplete 100
     }
 }

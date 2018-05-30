@@ -5,9 +5,9 @@
     Runs the tasks in a Whiskey pipeline.
 
     .DESCRIPTION
-    The `Pipeline` task runs pipelines defined in your `whiskey.yml` file. Pipelines are properties that contain a list of tasks. You are required to have a default `BuildTasks` pipeline. Other pipelines exist side-by-side with your `BuildTasks` pipeline, e.g.
+    The `Pipeline` task runs pipelines defined in your `whiskey.yml` file. Pipelines are properties that contain a list of tasks. You are required to have a default `Build` pipeline. Other pipelines exist side-by-side with your `Build` pipeline, e.g.
 
-        BuildTasks:
+        Build:
         - Pipeline:
             Name: BuildASpecificThing
 
@@ -15,7 +15,7 @@
         - MSBuild:
             Path: SpecificThing.sln
 
-    In this example, the default `BuildTasks` pipeline runs the `BuildASpecificThing` pipeline. 
+    In this example, the default `Build` pipeline runs the `BuildASpecificThing` pipeline. 
 
     Use the `Pipeline` task if you want the ability to run parts of your builds in isolation, e.g. if you have multiple applications to build, you can declare a dedicated pipeline for each. Your default build runs them all, but you can run a specific pipeline by passing that pipeline's name to the `Invoke-WhiskeyBuild` function.
 
@@ -27,7 +27,7 @@
 
     ### Example 1
 
-        BuildTasks:
+        Build:
         - Pipeline:
             Name: BuildASpecificThing
 
@@ -35,12 +35,12 @@
         - MSBuild:
             Path SpecificThing.sln
             
-    This example declares two pipelines: `BuildTasks` and `BuildASpecificThing`. The `BuildTasks` pipeline runs the `BuildASpecificThing` pipeline.           
+    This example declares two pipelines: `Build` and `BuildASpecificThing`. The `Build` pipeline runs the `BuildASpecificThing` pipeline.           
 
 
     ### Example 2
 
-        BuildTasks:
+        Build:
         - Pipeline:
             Name: 
             - BuildASpecificThing
@@ -60,7 +60,7 @@
     [Whiskey.Task("Pipeline", SupportsClean=$true, SupportsInitialize=$true)]
     param(
         [Parameter(Mandatory=$true)]
-        [object]
+        [Whiskey.Context]
         $TaskContext,
 
         [Parameter(Mandatory=$true)]
@@ -75,7 +75,7 @@
     {
         Stop-WhiskeyTask -TaskContext $TaskContext -Message ('Name is a mandatory property, but is missing or doesn''t have a value. It should be set to a list of pipeline names you want to run as part of another pipeline, e.g.
         
-    BuildTasks:
+    Build:
     - Pipeline:
         Name:
         - One

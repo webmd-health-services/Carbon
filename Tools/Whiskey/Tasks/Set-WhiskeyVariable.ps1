@@ -9,7 +9,7 @@
 
     All the task's properties are variable names. Each property's value becomes that variables value. You may reference other variables in a value. They will be replaced with values when they are used, not when they are added by this task.
 
-        BuildTasks:
+        Build:
         - SetVariable:
             ReleaseName: 6.8
             BuildMasterPackageName: $(WHISKEY_BUILD_NUMBER)@$(WHISKEY_SCM_BRANCH)
@@ -20,7 +20,7 @@
     [Whiskey.Task("SetVariable",SupportsClean=$true,SupportsInitialize=$true)]
     param(
         [Parameter(Mandatory=$true)]
-        [object]
+        [Whiskey.Context]
         $TaskContext,
 
         [Parameter(Mandatory=$true)]

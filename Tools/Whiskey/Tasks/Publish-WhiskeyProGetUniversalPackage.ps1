@@ -25,7 +25,7 @@ function Publish-WhiskeyProGetUniversalPackage
 
     ### Example 1
 
-        PublishTasks:
+        Publish:
         - PublishProGetUniversalPackage:
             Uri: https://proget.example.com
             FeedName: Apps
@@ -48,7 +48,7 @@ function Publish-WhiskeyProGetUniversalPackage
     [Whiskey.Task("PublishProGetUniversalPackage")]
     param(
         [Parameter(Mandatory=$true)]
-        [object]
+        [Whiskey.Context]
         $TaskContext,
 
         [Parameter(Mandatory=$true)]
@@ -59,7 +59,7 @@ function Publish-WhiskeyProGetUniversalPackage
     Set-StrictMode -Version 'Latest'
     Use-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState
 
-    $exampleTask = 'PublishTasks:
+    $exampleTask = 'Publish:
         - PublishProGetUniversalPackage:
             CredentialID: ProGetCredential
             Uri: https://proget.example.com
@@ -121,10 +121,10 @@ function Publish-WhiskeyProGetUniversalPackage
         $optionalParam['Force'] = $TaskParameter['Overwrite'] | ConvertFrom-WhiskeyYamlScalar
     }
 
-    Write-Verbose -Message ('[PublishProGetUniversalPackage]  {0}' -f $taskPrefix)
+    Write-WhiskeyVerbose -Context $TaskContext -Message ('{0}' -f $taskPrefix)
     foreach( $package in $packages )
     {
-        Write-Verbose -Message ('[PublishProGetUniversalPackage]  {0}  {1}' -f (' ' * $taskPrefix.Length),$package)
+        Write-WhiskeyVerbose -Context $TaskContext -Message ('{0}  {1}' -f (' ' * $taskPrefix.Length),$package)
         Publish-ProGetUniversalPackage -Session $session -FeedName $feedName -PackagePath $package @optionalParam -ErrorAction Stop
     }
 }

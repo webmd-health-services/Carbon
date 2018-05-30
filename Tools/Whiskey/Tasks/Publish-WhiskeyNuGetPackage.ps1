@@ -1,29 +1,13 @@
 
 function Publish-WhiskeyNuGetPackage
 {
-    <#
-    .SYNOPSIS
-    Creates a NuGet package from .NET .csproj files.
-
-    .DESCRIPTION
-    The `Invoke-WhiskeyNuGetPackTask` runs `nuget.exe` against a list of .csproj files, which create a .nupkg file from that project's build output. The package can be uploaded to NuGet, ProGet, or other package management repository that supports NuGet.
-
-    You must supply the path to the .csproj files to pack with the `$TaskParameter.Path` parameter, the directory where the packaged .nupkg files go with the `$Context.OutputDirectory` parameter, and the version being packaged with the `$Context.Version` parameter.
-
-    You *must* include paths to build with the `Path` parameter.
-
-    .EXAMPLE
-    Invoke-WhiskeyNuGetPackageTask -Context $TaskContext -TaskParameter $TaskParameter
-
-    Demonstrates how to package the assembly built by `TaskParameter.Path` into a .nupkg file in the `$Context.OutputDirectory` directory. It will generate a package at version `$Context.ReleaseVersion`.
-    #>
     [Whiskey.Task("PublishNuGetLibrary")]
     [Whiskey.Task("PublishNuGetPackage")]
     [Whiskey.Task("NuGetPush")]
     [CmdletBinding()]
     param(
         [Parameter(Mandatory=$true)]
-        [object]
+        [Whiskey.Context]
         $TaskContext,
     
         [Parameter(Mandatory=$true)]
@@ -65,7 +49,7 @@ function Publish-WhiskeyNuGetPackage
     {
         Stop-WhiskeyTask -TaskContext $TaskContext -Message ('Property ''Uri'' is mandatory. It should be the URI where NuGet packages should be published, e.g. 
             
-    BuildTasks:
+    Build:
     - PublishNuGetPackage:
         Uri: https://nuget.org
     ')
@@ -76,7 +60,7 @@ function Publish-WhiskeyNuGetPackage
     {
         Stop-WhiskeyTask -TaskContext $TaskContext -Message ('Property ''ApiKeyID'' is mandatory. It should be the ID/name of the API key to use when publishing NuGet packages to {0}, e.g.:
             
-    BuildTasks:
+    Build:
     - PublishNuGetPackage:
         Uri: {0}
         ApiKeyID: API_KEY_ID
@@ -95,10 +79,13 @@ Use the `Add-WhiskeyApiKey` function to add the API key to the build.
 
     foreach ($path in $paths)
     {
-        $projectName = [IO.Path]::GetFileNameWithoutExtension(($path | Split-Path -Leaf))
-        $projectName = $projectName -replace '\.\d+\.\d+\.\d+(-.*)?(\.symbols)?',''
-        $packageVersion = $TaskContext.Version.SemVer1
-        $packageUri = '{0}/package/{1}/{2}' -f $source,$projectName,$packageVersion
+        $packageFilename = [IO.Path]::GetFileNameWithoutExtension(($path | Split-Path -Leaf))
+        $packageName = $packageFilename -replace '\.\d+\.\d+\.\d+(-.*)?(\.symbols)?',''
+
+        $packageFilename -match '(\d+\.\d+\.\d+(?:-[0-9a-z]+)?)'
+        $packageVersion = $Matches[1]
+
+        $packageUri = '{0}/package/{1}/{2}' -f $source,$packageName,$packageVersion
             
         # Make sure this version doesn't exist.
         $packageExists = $false
@@ -119,7 +106,7 @@ Use the `Add-WhiskeyApiKey` function to add the API key to the build.
                 $error = $reader.ReadToEnd() -replace '<[^>]+?>',''
                 $reader.Close()
                 $response.Close()
-                Stop-WhiskeyTask -TaskContext $TaskContext -Message ('Failure checking if {0} {1} package already exists at {2}. The web request returned a {3} ({4}) status code:{5} {5}{6}' -f $projectName,$packageVersion,$packageUri,$response.StatusCode,[int]$response.StatusCode,[Environment]::NewLine,$error)
+                Stop-WhiskeyTask -TaskContext $TaskContext -Message ('Failure checking if {0} {1} package already exists at {2}. The web request returned a {3} ({4}) status code:{5} {5}{6}' -f $packageName,$packageVersion,$packageUri,$response.StatusCode,[int]$response.StatusCode,[Environment]::NewLine,$error)
             }
 
             for( $idx = 0; $idx -lt ($Global:Error.Count - $numErrorsAtStart); ++$idx )
@@ -130,19 +117,22 @@ Use the `Add-WhiskeyApiKey` function to add the API key to the build.
 
         if( $packageExists )
         {
-            Stop-WhiskeyTask -TaskContext $TaskContext -Message ('{0} {1} already exists. Please increment your library''s version number in ''{2}''.' -f $projectName,$packageVersion,$TaskContext.ConfigurationPath)
+            Stop-WhiskeyTask -TaskContext $TaskContext -Message ('{0} {1} already exists. Please increment your library''s version number in ''{2}''.' -f $packageName,$packageVersion,$TaskContext.ConfigurationPath)
         }
 
         # Publish package and symbols to NuGet
         Invoke-WhiskeyNuGetPush -Path $path -Uri $source -ApiKey $apiKey -NuGetPath $nuGetPath
-            
-        try
-        {
-            Invoke-WebRequest -Uri $packageUri -UseBasicParsing | Out-Null
-        }
-        catch [Net.WebException]
-        {
-            Stop-WhiskeyTask -TaskContext $TaskContext -Message ('Failed to publish NuGet package {0} {1} to {2}. When we checked if that package existed, we got a {3} HTTP status code. Please see build output for more information.' -f $projectName,$packageVersion,$packageUri,$_.Exception.Response.StatusCode)
+        
+        if( -not ($TaskParameter['SkipUploadedCheck'] | ConvertFrom-WhiskeyYamlScalar) )
+        { 
+            try
+            {
+                Invoke-WebRequest -Uri $packageUri -UseBasicParsing | Out-Null
+            }
+            catch [Net.WebException]
+            {
+                Stop-WhiskeyTask -TaskContext $TaskContext -Message ('Failed to publish NuGet package {0} {1} to {2}. When we checked if that package existed, we got a {3} HTTP status code. Please see build output for more information.' -f $packageName,$packageVersion,$packageUri,$_.Exception.Response.StatusCode)
+            }
         }
     }
 } 

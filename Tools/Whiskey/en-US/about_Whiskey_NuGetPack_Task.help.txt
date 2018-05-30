@@ -1,0 +1,60 @@
+TOPIC
+    about_Whiskey_NuGetPack_Task
+    
+SUMMARY
+    Creates a NuGet package.
+    
+DESCRIPTION
+    The `NuGetPack` task create a NuGet package using the `nuget.exe pack` command. Pass the path to the .nuspec or .csproj file to use to the `Path` property. The package will be saved to Whiskey's output directory. You may use wildcards and/or multiple paths. A package is created for each unique path.
+
+    To create a `Symbols` package, set the `Symbols` property to `true`. This will use the `-Symbols` switch when calling `nuget.exe`.
+
+    By default, this task downloads and uses the latest version of NuGet. To use a specific version of NuGet, set the `Version` property to the version you want to use.
+
+    The task passes the version of the current build to the nuget.exe executable's `-Version` parameter.
+
+    Nuspec files allow token replacements in nodes under its `metadata` element. Tokens follow the pattern `$TOKEN_NAME$`. If elements under the `metadata` element in your .nuspec file contains tokens, you pass the value of those tokens to the `Properties` property.
+
+    Since nuget.exe doesn't return any exit codes that denote success or failure, the task fails if an expected .nupkg was not created in the output directory. It looks for a filename with the same base name as the source file, plus the version, plus a "-symbols" switch (if the "Symbols" property is "true"). If your package's ID doesn't match the source file name (without extension), set the "PackageID" property to your package's ID.
+
+    Use the "PackageVersion" property to customize the version of your package. The default is the `WHISKEY_SEMVER1_VERSION` variable.
+
+PROPERTIES
+    * Path (***mandatory***): the path to the .nuspec or .csproj file to package. Wildcards and multiple paths supported. `nuget.exe pack` is run for each path.
+    * Symbols: whether or not to create a symbols package. If this is `true`, uses the nuget.exe executable's `-Symbols` switch.
+    * Version: the version of nuget.exe to use to publish. The default is to use the latest version of NuGet.
+    * Properties: name/value pairs to pass to the pack command's `-Properties` parameter. Each name/value pair is passed as a separate parameter.
+    * PackageID: the package ID. The default is the Path property's file name, without its extension. This property is used to check that the .nupkg file was created by nuget.exe.
+    * PackageVersion: the version of the package to use. The defalt is the value of the `WHISKEY_SEMVER1_VERSION` variable.
+
+EXAMPLES
+
+    ## Example 1
+
+      Build:
+      - NuGetPack:
+          Path: Whiskey.nuspec
+
+    Demonstrates how to build a NuGet package using a .nuspec file.
+
+
+    ## Example 2
+
+      Build:
+      - NuGetPack:
+          Path: Assembly\Whiskey\Whiskey.csproj
+          Symbols: true
+
+    Demonstrates how to create a symbols package.
+
+
+    ## Example 3
+
+      Build:
+      - NuGetPack:
+          Path: Assembly\Whiskey\Whiskey.nuspec
+          Properties:
+            ReleaseNotes: Release notes.
+            Tags: "tag1 tag2 tag3"
+
+    Demonstrates how to pass properties to the pack command's `-Properties` parameter. Any $-delimited tokens in element in a .nupsec file under the `metadata` element would get replaced with the values passed here. In this case, token `$ReleaseNotes$` would get replaced with `Release notes.` and token `$Tags$` would get replaced with `tag1 tag2 tag3`.

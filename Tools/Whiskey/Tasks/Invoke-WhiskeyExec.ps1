@@ -1,61 +1,10 @@
 function Invoke-WhiskeyExec
 {
-    <#
-    .SYNOPSIS
-    Runs an executable.
-    
-    .DESCRIPTION
-    The `Exec` task runs an executable. Specify the path to the executable to run with the task's `Path` property. The `Path` can be the name of an executable that can be found in the `PATH` environment variable, a path relative to your `whiskey.yml` file's directory, or an absolute path.
-
-    The task will fail if the executable returns a non-zero exit code. Use the `SuccessExitCode` property to configure the task to interpret other exit codes as "success". 
-
-    Pass arguments to the executable via the `Argument` property. The `Exec` task uses PowerShell's `Start-Process` cmdlet to run the executable, so that arguments will be passes as-is, with no escaping. YAML strings, however, are usually single-quoted (e.g. `'Value'`) or double-quoted (e.g. `"Value"`). If you're using a single quoted string and need to insert a single quote, escape it by using two single quotes, e.g. `'escape: '''` is converted to `escape '`. If you're using a double-quoted string and need to insert a double quote, escape it with `\`, e.g. `"escape: \""` is converted to `escape: "`. YAML supports other escape sequences in double-quoted strings. The full list of escape sequences is in the [YAML specification](http://yaml.org/spec/current.html#escaping in double quoted style/).
-
-    By default, the executable is run from your `whiskey.yml` file's directory (i.e. the build root). Change the working directory with the `WorkingDirectory` property.
-
-    # Properties
-
-    * `Path` (*mandatory*): the path to the executable to run. This can be the name of an executable if it is in your PATH environment variable, a path relative to the `whiskey.yml` file, or an absolute path.
-    * `Argument`: a list of arguments to pass to the executable. Read the documentation above for notes on how to properly escape arguments.
-    * `WorkingDirectory`: the directory the executable will run in/from. By default, this is the build root, i.e. the `whiskey.yml` file's directory.
-    * `SuccessExitCode`: a list of exit codes that the `Exec` task should interpret to mean the executable's process exited successfully. The list can include individual exit codes and certain range operators (ie. '>=1', '<=2', '>3', '<4', '5..10' ). An exit code only needs to match a single code or range to be evaluated as successful. The default is `0`
-
-    # Examples
-
-    ## Example 1
-
-            BuildTasks:
-            - Exec:
-                Path: cmd.exe
-                Argument:
-                - /C
-                - dir C:\
-
-    This example demonstrates how to call an executable whose arguments have to be quoted a specific way. In this case, we're using `cmd.exe` to get a directory listing of the `C:\` directory. This example will run `cmd.exe /C dir C:\.
-
-    ## Example 2
-
-            BuildTasks:
-            - Exec:
-                Path: robocopy.exe
-                Argument:
-                - C:\Source
-                - C:\Desitination
-                - /MIR    
-                SuccessExitCode:
-                - 10
-                - 12
-                - <8
-                - >=28
-
-    This example demonstrates how to configure the `Exec` task to fail when an executable can return multiple success exit codes. In this case, `robocopy.exe` can return any value less than 8, greater than or equal to 28, 10, or 12, to report a successful copy.
-    #>      
-
     [CmdletBinding()]
-    [Whiskey.Task("Exec")]
+    [Whiskey.Task("Exec",SupportsClean=$true,SupportsInitialize=$true)]
     param(
         [Parameter(Mandatory=$true)]
-        [object]
+        [Whiskey.Context]
         $TaskContext,
 
         [Parameter(Mandatory=$true)]
@@ -66,12 +15,24 @@ function Invoke-WhiskeyExec
     Set-StrictMode -Version 'Latest'
     Use-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState
 
+    if( $TaskParameter.ContainsKey('') )
+    {
+        $regExMatches = Select-String -InputObject $TaskParameter[''] -Pattern '([^\s"'']+)|("[^"]*")|(''[^'']*'')' -AllMatches
+        $defaultProperty = @($regExMatches.Matches.Groups | Where-Object { $_.Name -ne '0' -and $_.Success -eq $true } | Select-Object -ExpandProperty 'Value')
+
+        $TaskParameter['Path'] = $defaultProperty[0]
+        if( $defaultProperty.Count -gt 1 )
+        {
+            $TaskParameter['Argument'] = $defaultProperty[1..($defaultProperty.Count - 1)] | ForEach-Object { $_.Trim("'",'"') }
+        }
+    }
+
     $path = $TaskParameter['Path']
     if ( -not $path )
     {
         Stop-WhiskeyTask -TaskContext $TaskContext -Message ('Property ''Path'' is mandatory. It should be the Path to the executable you want the Exec task to run, e.g.
         
-            BuildTasks:
+            Build:
             - Exec:
                 Path: cmd.exe
             
@@ -96,27 +57,11 @@ function Invoke-WhiskeyExec
         }
     }
 
+    Write-WhiskeyCommand -Context $TaskContext -Path $path -ArgumentList $TaskParameter['Argument']
 
-    $workingDirectory = $TaskContext.BuildRoot
-    if ( $TaskParameter['WorkingDirectory'] )
-    {
-        $workingDirectory = $TaskParameter['WorkingDirectory']
-
-        if ( -not (Test-Path -Path $workingDirectory -PathType Container) )
-        {
-            Stop-WhiskeyTask -TaskContext $TaskContext -Message ('Could not locate the directory ''{0}'' specified in the ''WorkingDirectory'' property.' -f $workingDirectory)
-        }
-    }
-
-
-    $argumentListParam = @{}
-    if ( $TaskParameter['Argument'] )
-    {
-        $argumentListParam['ArgumentList'] = $TaskParameter['Argument']
-    }
-    
-    $process = Start-Process -FilePath $path @argumentListParam -WorkingDirectory $workingDirectory -NoNewWindow -Wait -PassThru
-    $exitCode = $process.ExitCode
+    # Don't use Start-Process. If/when a build runs in a background job, when Start-Process finishes, it immediately terminates the build. Full stop.
+    & $path $TaskParameter['Argument']
+    $exitCode = $LASTEXITCODE
     
     $successExitCodes = $TaskParameter['SuccessExitCode']
     if( -not $successExitCodes )
@@ -130,7 +75,7 @@ function Invoke-WhiskeyExec
         {
             if( $exitCode -eq [int]$Matches[0] )
             {
-                Write-Verbose -Message ('  Exit code {0} = {1}' -f $exitCode,$Matches[0])
+                Write-WhiskeyVerbose -Context $TaskContext -Message ('Exit Code {0} = {1}' -f $exitCode,$Matches[0])
                 return
             }
         }
@@ -145,7 +90,7 @@ function Invoke-WhiskeyExec
                 {
                     if( $exitCode -lt $successExitCode )
                     {
-                        Write-Verbose -Message ('  Exit code {0} < {1}' -f $exitCode,$successExitCode)
+                        Write-WhiskeyVerbose -Context $TaskContext -Message ('Exit Code {0} < {1}' -f $exitCode,$successExitCode)
                         return
                     }
                 }
@@ -153,7 +98,7 @@ function Invoke-WhiskeyExec
                 {
                     if( $exitCode -le $successExitCode )
                     {
-                        Write-Verbose -Message ('  Exit code {0} <= {1}' -f $exitCode,$successExitCode)
+                        Write-WhiskeyVerbose -Context $TaskContext -Message ('Exit Code {0} <= {1}' -f $exitCode,$successExitCode)
                         return
                     }
                 }
@@ -161,7 +106,7 @@ function Invoke-WhiskeyExec
                 {
                     if( $exitCode -gt $successExitCode )
                     {
-                        Write-Verbose -Message ('  Exit code {0} > {1}' -f $exitCode,$successExitCode)
+                        Write-WhiskeyVerbose -Context $TaskContext -Message ('Exit Code {0} > {1}' -f $exitCode,$successExitCode)
                         return
                     }
                 }
@@ -169,7 +114,7 @@ function Invoke-WhiskeyExec
                 {
                     if( $exitCode -ge $successExitCode )
                     {
-                        Write-Verbose -Message ('  Exit code {0} >= {1}' -f $exitCode,$successExitCode)
+                        Write-WhiskeyVerbose -Context $TaskContext -Message ('Exit Code {0} >= {1}' -f $exitCode,$successExitCode)
                         return
                     }
                 }
@@ -180,7 +125,7 @@ function Invoke-WhiskeyExec
         {
             if( $exitCode -ge [int]$Matches[1] -and $exitCode -le [int]$Matches[2] )
             {
-                Write-Verbose -Message ('  Exit code {0} <= {1} <= {2}' -f $Matches[1],$exitCode,$Matches[2])
+                Write-WhiskeyVerbose -Context $TaskContext -Message ('Exit Code {0} <= {1} <= {2}' -f $Matches[1],$exitCode,$Matches[2])
                 return
             }
         }

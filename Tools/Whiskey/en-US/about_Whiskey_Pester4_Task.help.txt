@@ -1,0 +1,69 @@
+TOPIC
+    about_Whiskey_Pester4_Task
+
+SUMMARY
+    Runs Pester tests using Pester 4.
+
+DESCRIPTION
+    The `Pester4` task runs tests using Pester 4. You pass the path(s) to test to the `Path` property. If any test fails, the build will fail.
+
+    Wildcard patterns are allowed in the `Path` property and are resolved before being passed to Pester. You can filter out items from this list with the `Exclude` property, which is a list of wildcard patterns. Any path whose full path matches any filter in the exclude list is not run.
+
+    Pester is installed using the PowerShellGet module's `Save-Module` function. The module is installed to the `Modules` directory in your build root.
+
+    Test reports are saved to the output directory in NUnit XML format. The report files are named `pester+RANDOM_STRING.xml`, where `RANDOM_STRING` is a random strings of characters.
+
+    When running under AppVeyor, test results are also automatically posted to your build's test results.
+
+    It is hard, in some build tools, to track down your longest running tests and Describe blocks. The `Pester4` task can output two reports that will show you the longest running It and Describe blocks. The `DescribeDurationReportCount` property controls how many rows to show in the Describe Duration Report, which shows the duration of every Describe block that was run, from longest to shortest duration. The `ItDurationReportCount` property controls how many rows to show in the It Duration Report, which shows the duration of all It blocks that were run, from longest to shortest durations.
+
+PROPERTIES
+
+    * `Path` (mandatory): the path to the test scripts to run. These paths are passed to the `Invoke-Pester` function's `Script` parameter. Wildcards are supported, but they are resolved by the `Pester4` task *before* getting passed to Pester.
+    * `Exclude`: wildcard patterns to exclude paths matched by wildcard patterns in the `Path` property. Patterns are matched against the full path of items in the `Path` property. Verbose output will show 
+    * `Version`: the version of Pester 4 to use. Defaults to the latest version of Pester 4. Wildcards are supported if you want to pin to a specific minor version, e.g. `4.0.*` will use the latest `4.0` version, but never `4.1` or later.
+    * `DescribeDurationReportCount`: the number of rows to show in the Describe Duration Report. The default is `0`. The Describe Duration Report shows Describe block execution durations in your build output, sorted by longest running to shortest running. This property controls how many rows to show in the report.
+    * `ItDurationReportCount`: the number of rows to show in the It Duration Report. The default is `0`. The It Duration Report shows It block execution durations in your build output, sorted by longest running to shortest running. This property controls how many rows to show in the report.
+
+EXAMPLE
+
+## Example 1
+
+        Build:
+        - Pester4:
+            Path: Test\*.ps1
+
+    Demonstrates how to run Pester tests using Pester 4. In this case, all the tests in files that match the wildcard `Test\*.ps1` are run.
+
+## Example 2
+
+        Build:
+        - Pester4:
+            Path: Test\*.ps1
+            Version: 4.0.6
+
+    Demonstrates how to pin to a specific version of Pester 4. In this case, Pester 4.0.6 will always be used.
+
+## Example 3
+
+        Build:
+        - Pester4:
+            Path: Test\*.ps1
+            DescribeDurationReportCount: 20
+            ItDurationReportCount: 20
+
+    Demonstrates how to show the Describe Duration Report and It Duration Report after the task finishes. These reports show the duration of all Describe and It blocks that were run. In this example, the top 20 longest Describe and It blocks will be sho
+
+## Example 3
+
+        Build:
+        - Pester4:
+            Path: Tests\*.Tests.ps1
+            Exclude:
+            - "*\\*Pester*.ps1"
+            - "*\\*NUnit*.ps1"
+            - "*\\*Node*.ps1"
+
+    Demonstrates how to use the Pester task's "Exclude" property to exclude tests from running. In this example, all tests in the Tests directory that end in ".Tests.ps1" except files whose base names contain "Pester", "NUnit", or "Node" will be run.
+
+    Each exclusion pattern that begins with an asterisk must be quoted. All backslashes in paths must be escaped.

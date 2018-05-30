@@ -1,10 +1,10 @@
 
-Version: 2.5.1
-
 PublishOn:
  - master
  
-BuildTasks:
+Build:
+- Version:
+    Path: Carbon\Carbon.psd1
 - PowerShell:
     OnlyBy: BuildServer
     Path: Save-CarbonSigningKey.ps1
@@ -33,12 +33,6 @@ BuildTasks:
 - Delete:
     OnlyBy: BuildServer
     Path: Carbon\bin\*.pdb
-- EnvironmentVariable:
-    OnlyBy: BuildServer
-    PSModulePath: "$(PSModulePath);$(WHISKEY_BUILD_ROOT)"
-    Scope:
-    - Process
-    - Machine
 - PowerShell:
     Path: Start-CarbonTest.ps1
 - Pester3:
@@ -59,10 +53,25 @@ BuildTasks:
         - Test\Test-ParentProcessID.ps1
 - Pester3:
     OnlyBy: BuildServer
+    Path:
+    - Test\Install-Certificate.Tests.ps1
+    - Test\Uninstall-Certificate.Tests.ps1
+    - Test\Get-ScheduledTask.Tests.ps1
+    - Test\*Iis*.ps1
+#- Parallel:
+#    OnlyBy: BuildServer
+#    Queues:
+#    - Tasks:
+- Pester4:
     Path: Test\*.Tests.ps1
-    Version: 3.4.6
+    Exclude:
+    - "*\\Install-Certificate.Tests.ps1"
+    - "*\\Uninstall-Certificate.Tests.ps1"
+    - "*\\Get-ScheduledTask.Tests.ps1"
+    - "*\\*Iis*.ps1"
+    DescribeDurationReportCount: 20
+#    - Tasks:
 - PowerShell:
-    OnlyBy: BuildServer
     Path: Invoke-CarbonBladeTest.ps1
     Argument:
         Recurse: true
@@ -75,7 +84,29 @@ BuildTasks:
     - LICENSE.txt
     - NOTICE.txt
     DestinationDirectory: Carbon
+- SetVariableFromPowerShellDataFile:
+    Path: Carbon\Carbon.psd1
+    Variables:
+        PrivateData:
+            PSData:
+                ReleaseNotes: RELEASE_NOTES
+                Tags: TAGS
 - NuGetPack:
     Path: Carbon.nuspec
+    Properties:
+        ReleaseNotes: $(RELEASE_NOTES)
+        Tags: $(TAGS)
 
-PublishTasks:
+Publish:
+- PublishPowerShellModule:
+    Path: Carbon
+    RepositoryName: PSGallery
+    RepositoryUri: https://www.powershellgallery.com/api/v2/
+    ApiKeyID: powershellgallery.com
+- NuGetPush:
+    Uri: https://nuget.org/api/v2/package
+    ApiKeyID: nuget.org
+    SkipUploadCheck: true
+- NuGetPush:
+    Uri: https://chocolatey.org/api/v2/package
+    ApiKeyID: chocolatey.org

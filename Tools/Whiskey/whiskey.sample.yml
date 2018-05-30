@@ -1,79 +1,13 @@
-# The version being built. It must be a [Semantic Version](http://semver.org). 
-# Pre-release metadata is allowed. Build metadata is removed. When running on a build 
-# server, the build metadata is replaced with information provided by the build server. 
-# The build metadata uses this format `BUILD_NUMBER.BRANCH.COMMIT_ID`. For example, if 
-# the current build number is `93`, the branch is `release/2.0`, and the commit ID is 
-# `d3833712a970a7b5015725d3e1d0577f7e6475fa`, the build metadata will be 
-# `93.release-2.0.d383371`.
-#
-# If you omit the Version property, a version number is created using this format: 
-# `YEAR.MONTHDAY.BUILD_NUMBER`. For example, if today is 3/9/2017 and the build number 
-# is `93`, the version number would be `2017.309.93`. When running on a build server, 
-# the build metadata is replaced with information provided by the build server. The 
-# build metadaa use the format `BRANCH.COMMIT_ID`. For example, if tthe branch is 
-# `release/2.0`, and the commit ID is `d3833712a970a7b5015725d3e1d0577f7e6475fa`, the 
-# build metadata will be `release-2.0.d383371`.
-#
-# The version to build may also be taken from a file. See the documentation for the 
-# `VersionFrom` property below. If your `whiskey.yml` has both `Version` and 
-# `VersionFrom` properties, the `Version` property is used.
-Version: 0.0.0
-
-# The `VersionFrom` property is the path to a file that contains the version being 
-# built. You may use the path to a:
-#
-# * Node.js `package.json` file;
-# * a PowerShell module manifest (e.g. `.psd1` file)
-# * .NET csproj files (e.g. `.csproj` file)
-#
-# The `package.json` file must have a `version` property, e.g.
-#
-#    {
-#        "version": "1.0.0"
-#    }
-#
-# The PowerShell module manifest file must contain a `ModuleVersion` property, e.g.
-#
-#    @{
-#        ModuleVersion = '0.14.0';
-#    }
-# 
-# The .NET C# project file `.csproj` must contain a /Project/PropertyGroup/Version element, e.g.
-#
-#    <Project Sdk="Microsoft.NET.Sdk">
-#        <PropertyGroup>
-#            <Version>1.2.3</Version>
-#        </PropertyGroup>
-#    </Project>
-# 
-# If your `whiskey.yml` has both `Version` and `VersionFrom` properties, the `Version` 
-# property is used.
-# VersionFrom: 'Whiskey/Whiskey.ps1'
-
 # The `PublishOn` property is a list of branch names. After a successful build on a 
-# branch that matches any name in this list, the `PublishTasks` pipeline will run. With 
-# an empty `PublishOn` property, your `PublishTasks` pipeline will never run.
+# branch that matches any name in this list, the `Publish` pipeline will run. With 
+# an empty `PublishOn` property, your `Publish` pipeline will never run.
 #
 # Wildcards are supported. For example, if `release/*` is in the list, the 
-# `PublishTasks` pipeline would run on the `release/6.3` branch but not the `release`
+# `Publish` pipeline would run on the `release/6.3` branch but not the `release`
 # branch.
 PublishOn:
  - master
  
-# The `PrereleaseMap` property is used to add a prerelease identifiers to your version 
-# during builds on specific branches. It is a list of key/value pairs, where each key is the 
-# name of a branch and the value is the prerelease identifier to use in builds on that
-# branch. The branch name may contain wildcards to match multiple branches. A unique
-# prerelease number is appended to the end of the identifier, e.g. `alpha.300`. You have
-# no control over the prerelease version number. It will not be duplicated across 
-# builds/branches. It is not guaranteed to increment by one between builds or start at 
-# one. 
-#
-# If a branch matches multiple keys, the first match/prerelease identifer is used. 
-#PrereleaseMap:
-#- "develop": beta
-#- "feature/*": alpha
-
 # The `PublishBuildStatusTo` is a list of publishers where you wnat build status
 # information published. Status is published when a build starts, succeeds, and fails. 
 # Build statuses are only published when running under a build server. You can only
@@ -92,17 +26,47 @@ PublishBuildStatusTo:
 
 # An array of build tasks you want to run during a build, e.g.
 # 
-#     BuildTasks:
+#     Build:
 #     - TASK_NAME:
 #         PROPERTY_ONE: VALUE_ONE
 #         PROPERTY_TWO: VALUE_TWO
 #
 # See the documentation for each individual task for YML samples.
-BuildTasks:
+Build:
+# The Version task sets the current build's version number. You should almost always 
+# have one of these.
+- Version:
+    Version: 0.0.0
+
+    # You can also pull the version from files that store version numbers. Whiskey 
+    # supports:
+    #
+    # * PowerShell module manifests (the ModuleVersion property)
+    # * Node package.json files (the Version property)
+    # * .NET Core .csproj files (the /Project/PropertyGroup/Version element)
+    #
+    # Path: Path\to\file
+
+    # The prerelease version to use. Usually you only use this if you're also using the
+    # Path property.
+    # Prerelease: rc.$(WHISKEY_BUILD_NUMBER)
+
+    # You can also have different prerelease versions for different branches. Set the 
+    # property to a list of key/value pairs. The key should be a wildcard pattern that
+    # matches a branch, the value should be the prerelease label to use.
+    # 
+    # Prelease
+    # - feature/*: alpha.$(WHISKEY_BUILD_NUMBER)
+    # - develop: rc.$(WHISKEY_BUILD_NUMBER)
+
+    # Any build metadata to add. Usually you only use this if you're using the Prerelease
+    # and/or Path properties.
+    #
+    # Build: $(WHISKEY_SCM_BRANCH).$(WHISKEY_SCM_COMMIT_ID)
 
 # An array of tasks you want to run when publishing, e.g.
 # 
-#     BuildTasks:
+#     Build:
 #     - TASK_NAME:
 #         PROPERTY_ONE: VALUE_ONE
 #         PROPERTY_TWO: VALUE_TWO
@@ -111,4 +75,4 @@ BuildTasks:
 # Publishing branches are configured with the `PublishOn` property.
 #
 # See the documentation for each individual task for YML samples.
-PublishTasks:
+Publish:

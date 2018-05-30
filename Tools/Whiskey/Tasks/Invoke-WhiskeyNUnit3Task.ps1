@@ -1,96 +1,11 @@
 
 function Invoke-WhiskeyNUnit3Task
 {
-    <#
-    .SYNOPSIS
-    Runs NUnit3 tests.
-
-    .DESCRIPTION
-    The NUnit3 task runs NUnit tests. The latest version of NUnit 3 is downloaded from nuget.org for you (into a `packages` directory in your build root).
-    
-    The `Path` parameter is mandatory and must contain a list of paths, relative to your `whiskey.yml` file, to the assemblies for which NUnit tests should be run.
-
-    By default, OpenCover runs NUnit and gathers test code coverage, saving its report to '.output\openCover\openCover.xml'. ReporterGenerator is used to convert the OpenCover report into an HTML report, viewable to '.output\openCover\index.html'. If you wish to **only** run NUnit tests, then specify the `DisableCodeCoverage` parameter with the value of `true`.
-    
-    The task will run NUnit tests with .NET framework `4.0` by default. You may override this setting with the `Framework` parameter.
-        
-    The task will fail if any of the NUnit tests fail (i.e. if the NUnit console returns a non-zero exit code).
-
-    # Properties
-
-    * `Path` (*mandatory*): the path, relative to your `whiskey.yml` file, to the assemblies for which you want to run NUnit tests for.
-    * `TestFilter`: a list of expressions indicating which tests to run. It may specify test names, classes, methods, categories, or properties comparing them with the actual values with the operators ==, !=, =~, and !=. The documentation for this expression language can be found here: https://github.com/nunit/docs/wiki/Test-Selection-Language If multiple `TestFilter` are given then they will be joined with a logical `or` operator.
-    * `Framework`: framework type/version to use for tests. e.g. 4.0, 4.5, mono-4.0. The default is `4.0`.
-    * `Argument`: a list of additional arguments to pass to the NUnit3 console.
-    * `DisableCodeCoverage`: boolean value indicating whether or to run the NUnit test results against OpenCover and ReportGenerator.
-    * `CoverageFilter`: a list of OpenCover filters to apply to selectively include or exclude assemblies and classes from OpenCover coverage results.
-    * `OpenCoverVersion`: the version of OpenCover to use. Defaults to the latest version available.
-    * `OpenCoverArgument`: a list of additional arguments to pass to the OpenCover console.
-    * `ReportGeneratorVersion`: the version of ReportGenerator to use. Defaults to the latest version available.
-    * `ReportGeneratorArgument`: a list of additional arguments to pass to the ReportGenerator console.
-
-    .EXAMPLE
-
-    # Example 1
-
-        BuildTasks:
-        - NUnit3:
-            Path:
-            - RootAssembly.dll
-            - subfolder\subAssembly.dll
-
-    This example will run the NUnit tests for both the `RootAssembly.dll` and the `<build root>\subfolder\subAssembly.dll` with the default .NET framework version `4.0`. OpenCover and ReportGenerator will also be run against the results of the NUnit tests.
-
-    # Example 2
-
-        BuildTasks:
-        - NUnit3:
-            Path:
-            - Assembly.dll
-            Framework: 4.5
-            DisableCodeCoverage: true
-
-    This example will run the NUnit tests for the `Assembly.dll` file using .NET framework 4.5. OpenCover and ReportGenerator will not be run after the NUnit tests have completed since `DisableCodeCoverage` was `true`.
-
-    # Example 3
-
-        BuildTasks:
-        - NUnit3:
-            Path:
-            - Assembly.dll
-            TestFilter:
-            - "cat == 'Slow Data Tests' && Priority == High"
-            - "cat == 'Standard Tests'"
-            Argument:
-            - "--debug"
-
-    This example will run the NUnit tests for the `Assembly.dll` file using the TestFilter of `(cat == 'Slow Data Tests' && Priority == High) or (cat == 'Standard Tests')` to select which tests to run. The NUnit console will be executed with the additional given argument `--debug`.
-
-    # Example 4
-
-        BuildTasks:
-        - NUnit3:
-            Path:
-            - Assembly.dll
-            CoverageFilter:
-            - "+[Open*]*"
-            - "-[Open.Test]*"
-            OpenCoverVersion: 4.6.519
-            OpenCoverArgument:
-            - "-showunvisited"
-            ReportGeneratorVersion: 2.5.11
-            ReportGeneratorArgument:
-            - "-reporttypes: Latex"
-            - "-verbosity:Verbose"
-
-    This example will run all tests located in the `Assembly.dll` file using the default .NET framework version `4.0`. OpenCover version `4.6.519` will be run against against the NUnit test results with the `CoverageFilter` `+[Open*]* -[Open.Test]*` and with the argument `-showunvisited`. ReportGenerator version `2.5.11` will be run against the OpenCover results using the arguments `-reporttypes:Latex` and `-verbosity:Verbose`.
-    #>
-
     [CmdletBinding()]
     [Whiskey.Task("NUnit3",SupportsClean=$true,SupportsInitialize=$true)]
     param(
         [Parameter(Mandatory=$true)]
-        [object]
+        [Whiskey.Context]
         $TaskContext,
     
         [Parameter(Mandatory=$true)]
@@ -113,7 +28,7 @@ function Invoke-WhiskeyNUnit3Task
         }
     }
 
-    $nunitReport = Join-Path -Path $TaskContext.OutputDirectory -ChildPath ('nunit3-{0:00}.xml' -f $TaskContext.TaskIndex)
+    $nunitReport = Join-Path -Path $TaskContext.OutputDirectory -ChildPath ('nunit3+{0}.xml' -f [IO.Path]::GetRandomFileName())
     $nunitReportParam = '--result={0}' -f $nunitReport
 
     $openCoverVersionParam = @{}
@@ -128,7 +43,7 @@ function Invoke-WhiskeyNUnit3Task
         $reportGeneratorVersionParam['Version'] = $TaskParameter['ReportGeneratorVersion']
     }
 
-    if ($TaskContext.ShouldClean())
+    if( $TaskContext.ShouldClean )
     {
         Uninstall-WhiskeyTool -NuGetPackageName $nunitPackage -BuildRoot $TaskContext.BuildRoot -Version $nunitVersion
         Uninstall-WhiskeyTool -NuGetPackageName 'OpenCover' -BuildRoot $TaskContext.BuildRoot @openCoverVersionParam
@@ -154,7 +69,7 @@ function Invoke-WhiskeyNUnit3Task
         Stop-WhiskeyTask -TaskContext $TaskContext -Message 'Package ''ReportGenerator'' failed to install.'
     }
 
-    if ($TaskContext.ShouldInitialize())
+    if( $TaskContext.ShouldInitialize )
     {
         return
     }
@@ -217,7 +132,7 @@ function Invoke-WhiskeyNUnit3Task
     {
         Stop-WhiskeyTask -TaskContext $TaskContext -Message ('Property ''Path'' is mandatory. It should be one or more paths to the assemblies whose tests should be run, e.g.
 
-            BuildTasks:
+            Build:
             - NUnit3:
                 Path:
                 - Assembly.dll
@@ -239,16 +154,16 @@ function Invoke-WhiskeyNUnit3Task
     $openCoverReport = Join-Path -Path $coverageReportDir -ChildPath 'openCover.xml'
     
     $separator = '{0}VERBOSE:                       ' -f [Environment]::NewLine
-    Write-Verbose -Message ('  Path                {0}' -f ($Path -join $separator))
-    Write-Verbose -Message ('  Framework           {0}' -f $framework)
-    Write-Verbose -Message ('  TestFilter          {0}' -f $testFilter)
-    Write-Verbose -Message ('  Argument            {0}' -f ($nunitExtraArgument -join $separator))
-    Write-Verbose -Message ('  NUnit Report        {0}' -f $nunitReport)
-    Write-Verbose -Message ('  CoverageFilter      {0}' -f $coverageFilter)
-    Write-Verbose -Message ('  OpenCover Report    {0}' -f $openCoverReport)
-    Write-Verbose -Message ('  DisableCodeCoverage {0}' -f $disableCodeCoverage)
-    Write-Verbose -Message ('  OpenCoverArgs       {0}' -f ($openCoverArgument -join ' '))
-    Write-Verbose -Message ('  ReportGeneratorArgs {0}' -f ($reportGeneratorArgument -join ' '))
+    Write-WhiskeyVerbose -Context $TaskContext -Message ('  Path                {0}' -f ($Path -join $separator))
+    Write-WhiskeyVerbose -Context $TaskContext -Message ('  Framework           {0}' -f $framework)
+    Write-WhiskeyVerbose -Context $TaskContext -Message ('  TestFilter          {0}' -f $testFilter)
+    Write-WhiskeyVerbose -Context $TaskContext -Message ('  Argument            {0}' -f ($nunitExtraArgument -join $separator))
+    Write-WhiskeyVerbose -Context $TaskContext -Message ('  NUnit Report        {0}' -f $nunitReport)
+    Write-WhiskeyVerbose -Context $TaskContext -Message ('  CoverageFilter      {0}' -f $coverageFilter)
+    Write-WhiskeyVerbose -Context $TaskContext -Message ('  OpenCover Report    {0}' -f $openCoverReport)
+    Write-WhiskeyVerbose -Context $TaskContext -Message ('  DisableCodeCoverage {0}' -f $disableCodeCoverage)
+    Write-WhiskeyVerbose -Context $TaskContext -Message ('  OpenCoverArgs       {0}' -f ($openCoverArgument -join ' '))
+    Write-WhiskeyVerbose -Context $TaskContext -Message ('  ReportGeneratorArgs {0}' -f ($reportGeneratorArgument -join ' '))
     
     $nunitExitCode = 0
     $reportGeneratorExitCode = 0

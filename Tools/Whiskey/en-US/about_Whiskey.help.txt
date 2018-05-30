@@ -1,0 +1,142 @@
+TOPIC
+    about_Whiskey
+    
+SHORT DESCRIPTION
+    Whiskey is a Continuous Integration/Continuous Delivery build platform.
+    
+LONG DESCRIPTION
+        
+    ## Overview
+
+    Think of Whiskey as a build server you can run from the command line. 
+    Instead of writing a bunch of PowerShell/batch/whatever scripts, what you 
+    want to happen during your build is written as [YAML](http://yaml.org/) 
+    into a "whiskey.yml" text file and committed into the root of your 
+    source code repository.
+
+    ## System Requirements
+
+    * PowerShell 4
+    * A build server. Jenkins, TeamCity, or Appveyor are supported.
+
+    ## Getting Started
+
+    1. Create a `.whiskey` directory in the root of your source code 
+       repository.
+    2. [Download Whiskey](https://www.powershellgallery.com/packages/Whiskey)
+       from the PowerShell Gallery and put it in the ".whiskey" directory. 
+    3. Copy the ".whiskey\build.ps1" script into the root of your repository.
+    4. Copy the ".whiskey\whiskey.sample.yml" file into the root of your 
+       repository. Rename it to "whiskey.yml".
+    5. Add the .whiskey directory and the build.ps1 and whiskey.yml files to 
+       your repository. If you're using Git, run:
+           
+           > git add .whiskey build.ps1 whiskey.yml
+           > git commit -m "Adding Whiskey."
+           
+    6. Run your build:
+        
+           > .\build.ps1
+
+    ## Configuring Your Build
+
+    ### Overview
+
+    A Whiskey build has two phases: building and publishing (i.e. 
+    promoting). These are handled by the `Build` and `Publish` 
+    pipelines in your whiskey.yml file. A pipeline is a list of tasks to 
+    perform when running that pipeline. Your first pipelines are empty:
+
+       Build:
+       
+       Publish:
+    
+    A pipeline is a list of tasks. Each task has properties that control what
+    the task does. In Yaml, you create a list by prefixing each item with 
+    `- `. Task properties should start on the next line and be indented four 
+    spaces. If a task has properties, the task name must end with a `:`. For 
+    example:
+
+        Build:
+        - TaskOne:
+            Property1: Value
+            Property2: Value2
+        - TaskTwo:
+            Property: Value
+        # This task has no properties, so the ":" may be ommitted.
+        - TaskThree
+
+    YAML must be indented with spaces, not tabs. 
+
+    See the `about_Whiskey_Tasks` help topic to see Whiskey's tasks.
+
+    ### Building
+
+    Under the "Build" pipeline in your whiskey.yml file, add tasks you 
+    want to run when building. For example, Whiskey's build process looks 
+    like this:
+
+        Build:
+        - Pester4:
+            Path: Test\*.Tests.ps1
+
+    In this example, Whiskey will run the "Pester4" task, which in this 
+    example, will run all the Pester tests that match the "Test\*.Tests.ps1" 
+    wildcard path.
+
+    ### Publishing
+
+    Publishing only happens after a successful build when the build is 
+    running under a build server. Publishing never happens when run by a 
+    developer. Additionally, publishing only happens when a build runs on a 
+    publishing branch, which are set with the `PublishOn` property in the 
+    root of your whiskey.yml file. The default whiskey.yml file publishes on 
+    the master branch:
+
+        PublishOn:
+        - master
+
+    The "PublishOn" property is a list of branch names. Wildcards are allowed.
+
+    When publishing, Whiskey runs all the tasks in the "Publish" 
+    pipeline. For example, Whiskey's publish process looks like this:
+
+        Publish:
+        - PublishPowerShellModule:
+            RepositoryName: PSGallery
+            RepositoryUri: https://powershellgallery.com/
+            Path: Whiskey
+            ApiKeyID: PowerShellGallery
+
+    The "PublishPowerShellModule" task publishes a PowerShell module to  
+    PowerShell repository. In this example, the module is published to the 
+    PowerShell Gallery.
+
+    ### API Keys and Credentials
+
+    Some tasks, especially those used when publishing, need API keys or 
+    credentials. Whiskey does not let you add this sensitive information to 
+    your whiskey.yml file. If a publishing tool doesn't support some way of 
+    caching/saving and using credentials securely, you can add them to your 
+    build using the Whiskey API. 
+
+    Every task that needs a secret will have an `ApiKeyID` or `CredentialID` 
+    property. In your build.ps1 script, use this ID when calling Whiskey's 
+    `Add-WhiskeyApiKey` or `Add-WhiskeyCredential` functions to add the 
+    value of that API key or credential.
+
+    For example, here is how Whiskey's own build process adds its PowerShell 
+    API key to Whiskey, which builds under [Appveyor](
+    https://www.appveyor.com/), which exposes the API key as an environment 
+    variable:
+
+        if( (Test-Path -Path 'env:POWERSHELL_GALLERY_API_KEY') )
+        {
+            Add-WhiskeyApiKey -Context $context -ID 'PowerShellGallery' -Value $env:POWERSHELL_GALLERY_API_KEY
+        }
+
+
+SEE_ALSO
+    about_Whiskey_Tasks
+    about_Whiskey_Variables
+    about_Whiskey_Writing_Tasks

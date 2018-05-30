@@ -27,7 +27,10 @@ param(
 
     [string]
     # Build metadata.
-    $BuildMetadata
+    $BuildMetadata,
+
+    [string]
+    $PipelineName
 )
 
 #Requires -Version 4
@@ -35,9 +38,25 @@ Set-StrictMode -Version Latest
 
 & (Join-Path -Path $PSScriptRoot -ChildPath 'Tools\Whiskey\Import-Whiskey.ps1' -Resolve)
 
+$optionalParams = @{ }
+if( $PipelineName )
+{
+    $optionalParams['PipelineName'] = $PipelineName
+}
+
 $whiskeyYmlPath = Join-Path -Path $PSScriptRoot -ChildPath 'whiskey.yml'
 $context = New-WhiskeyContext -Environment 'Dev' -ConfigurationPath $whiskeyYmlPath
-Invoke-WhiskeyBuild -Context $context
+
+$apiKeys = @{
+                'powershellgallery.com' = 'env:';
+                'nuget.org' = 'env:';
+                'chocolatey.org' = 'env:'
+            }
+foreach( $apiKeyID in $apiKeys.Keys )
+{
+    Add-WhiskeyApiKey -Context $context -ID $apiKeyID -Value $apiKeys[$apiKeyID]
+}
+Invoke-WhiskeyBuild -Context $context @optionalParams
 
 return
 

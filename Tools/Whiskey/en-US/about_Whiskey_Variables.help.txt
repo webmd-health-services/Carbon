@@ -1,0 +1,92 @@
+TOPIC
+    about_Whiskey_Variables
+
+SHORT DESCRIPTION
+    This topic describes how to use Whiskey variables in your whiskey.yml file
+    and what built-in variables are available.
+
+LONG DESCRIPTION
+
+    ## Using Variables
+
+    You can define and use variables in your whiskey.yml file. Use variables 
+    with  this syntax: `$(VARIABLE_NAME)`. The variable name must be enclosed in
+    `$()`. if you want to include a literal `$(` in your whiskey.yml file, 
+    escape the dollar-sign by adding using two dollar signs, e.g. `$$(`.
+
+    You can add variables to your build using Whiskey's `Add-WhiskeyVariable` 
+    function. The object retains its type until the task that uses the 
+    variable begins, at which point it is converted to a string.
+
+    You can also add variables with the `SetVariable` Whiskey task. All 
+    variables added by the `SetVariable` task are strings.
+
+    All enviroment variables may be used as variables. For example. 
+    `$(COMPUTERNAME)` would resolve to the current computer's name.
+
+    ## Invoking Variable Members
+
+    You are allowed to call object members on variables. Use the dot syntax, 
+    e.g. `$(WHISKEY_SCM_URI.Host)`, `$(WHISKEY_SCM_COMMIT_ID.Substring(0,7))`. 
+    When calling methods, separate parameters with commas. If you want to use a
+    comma as or in the value of a parameter, quote it with double or single 
+    quotes. Whitespace is ignored unless it is quoted by either single or double 
+    quotes, e.g.
+
+        $(Variable.Replace(  " some string ",    " another string "  ))
+
+    To use a double or single quote inside a double or single quoted string, 
+    double the quote character, e.g.
+
+        $(Variable.Replace(" ""quote"" ", " ""another quote"" "))
+
+    ## Built-in Variables
+
+    Whiskey has the following built-in variables.
+
+     * [string] WHISKEY_BUILD_ID: the unique ID for the current build across 
+       all builds.
+     * [int] WHISKEY_BUILD_NUMBER: the unique number/ID for the current build.
+       Unique to the current build only. Build servers usually increment this 
+       number every time a new build runs.
+     * [System.IO.DirectoryInfo] WHISKEY_BUILD_ROOT: the directory where your 
+       whiskey.yml file is.
+     * [string] WHISKEY_BUILD_SERVER_NAME: the computer name of the current 
+       build server.
+     * [datetime] WHISKEY_BUILD_STARTED_AT: the date/time the build started.
+     * [uri] WHISKEY_BUILD_URI: the URI to the current build. This is where
+       you can find build results.
+     * [string] WHISKEY_ENVIRONMENT: the environment of the current build. 
+       This is the same environment passed to Whiskey's `New-WhiskeyContext`.
+     * [uri] WHISKEY_JOB_URI: the URI to the project/job. This is the URI 
+       where you can see all the builds for a given project/job.
+     * [string] WHISKEY_MSBUILD_CONFIGURATION: the configuration used when 
+       running any MSBuild task. This is always `Debug` when run by developers 
+       and `Release` otherwise.
+     * [string] WHISKEY_OUTPUT_DIRECTORY: the path to the directory where 
+       build results, packages, and other output is put. Usually it is in a
+       .output directory in the build root 
+     * [string] WHISKEY_PIPELINE_NAME: the name of the Whiskey pipeline that is 
+       currently running.
+     * [string] WHISKEY_SCM_BRANCH: the branch on which the current build is 
+       running.
+     * [string] WHISKEY_SCM_COMMIT_ID: the commit ID/hash that is currently 
+       building.
+     * [uri] WHISKEY_SCM_URI: the URI to the source control management 
+       repository where the source code for the current build came from.
+     * [SemVersion.SemanticVersion] WHISKEY_SEMVER1: the semver version 1 
+       compatible version for the current build.
+     * [string] WHISKEY_SEMVER1_VERSION: the MAJOR.MINOR.PATCH portion of the 
+       semver version 1 compatible version for the current build.
+     * [SemVersion.SemanticVersion] WHISKEY_SEMVER2: the semver version 2 
+       compatible version for the current build.
+     * [SemVersion.SemanticVersion] WHISKEY_SEMVER2_NO_BUILD_METADATA: the 
+       semver version 2 compatible version for the current build, without any 
+       build metadata.
+     * [string] WHISKEY_SEMVER2_VERSION: the MAJOR.MINOR.PATCH portion of the 
+       semver version 2 compatible version for the current build.
+     * [string] WHISKEY_TASK_NAME: the name of the currently executing task.
+     * [string] WHISKEY_VERSION: a `System.Version` compatible version for 
+       the current build (i.e. a semantic version without any prerelease or 
+       build metadata).
+
