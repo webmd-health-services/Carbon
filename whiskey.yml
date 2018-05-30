@@ -58,24 +58,24 @@ Build:
     - Test\Uninstall-Certificate.Tests.ps1
     - Test\Get-ScheduledTask.Tests.ps1
     - Test\*Iis*.ps1
-- Parallel:
-    OnlyBy: BuildServer
-    Queues:
-    - Tasks:
-        - Pester4:
-            Path: Test\*.Tests.ps1
-            Exclude:
-            - "*\\Install-Certificate.Tests.ps1"
-            - "*\\Uninstall-Certificate.Tests.ps1"
-            - "*\\Get-ScheduledTask.Tests.ps1"
-            - "*\\*Iis*.ps1"
-            DescribeDurationReportCount: 20
-    - Tasks:
-        - PowerShell:
-            Path: Invoke-CarbonBladeTest.ps1
-            Argument:
-                Recurse: true
-                Path: Test
+#- Parallel:
+#    OnlyBy: BuildServer
+#    Queues:
+#    - Tasks:
+- Pester4:
+    Path: Test\*.Tests.ps1
+    Exclude:
+    - "*\\Install-Certificate.Tests.ps1"
+    - "*\\Uninstall-Certificate.Tests.ps1"
+    - "*\\Get-ScheduledTask.Tests.ps1"
+    - "*\\*Iis*.ps1"
+    DescribeDurationReportCount: 20
+#    - Tasks:
+- PowerShell:
+    Path: Invoke-CarbonBladeTest.ps1
+    Argument:
+        Recurse: true
+        Path: Test
 - PowerShell:
     OnlyBy: Developer
     Path: Complete-CarbonTest.ps1
