@@ -37,4 +37,13 @@ $installRoot = Get-PowerShellModuleInstallPath
 $carbonModuleRoot = Join-Path -Path $installRoot -ChildPath 'Carbon'
 Install-Junction -Link $carbonModuleRoot -Target (Join-Path -Path $PSScriptRoot -ChildPath 'Carbon' -Resolve) | Format-Table | Out-String | Write-Verbose
 
+Get-Module -ListAvailable
+
+$modulePaths = $env:PSModulePath -split ';'
+$modulePaths
+
+Get-ChildItem $modulePaths | Format-Table
+
+Get-DscResource | Format-Table
+
 Clear-DscLocalResourceCache
