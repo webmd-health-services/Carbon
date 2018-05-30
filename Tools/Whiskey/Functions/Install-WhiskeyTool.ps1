@@ -89,7 +89,7 @@ function Install-WhiskeyTool
     $startedWaitingAt = Get-Date
     $startedUsingAt = Get-Date
     $installLock = New-Object 'Threading.Mutex' $false,$mutexName
-    $DebugPreference = 'Continue'
+    #$DebugPreference = 'Continue'
     Write-Debug -Message ('[{0:yyyy-MM-dd HH:mm:ss}]  Process "{1}" is waiting for mutex "{2}".' -f (Get-Date),$PID,$mutexName)
 
     try
