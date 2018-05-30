@@ -42,6 +42,36 @@ if( (Test-Path -Path 'env:APPVEYOR') )
     Get-Process -Name 'wmiprvse' | Format-Table
 }
 
+configuration Yolo
+{
+    node 'localhost'
+    {
+        Script AvailableModules
+        {
+            GetScript = {
+                return @{ PID = $PID }
+
+            }
+
+            SetScript = {
+            
+            }
+
+            TestScript =  {
+                $PID | Write-Verbose
+                Get-Module -ListAvailable | Format-Table | Out-String | Write-Verbose
+                Get-DscResource | Format-Table | Out-String | Write-Verbose
+                return $true
+            }
+
+        }
+    }
+}
+
+$dscOutputRoot = Join-Path -Path $PSScriptRoot -ChildPath '.output\Yolo'
+& Yolo -OutputPath $dscOutputRoot
+Start-DscConfiguration -Wait -Verbose -Path $dscOutputRoot -ComputerName 'localhost'
+
 Get-Module -ListAvailable | Format-Table
 
 $modulePaths = $env:PSModulePath -split ';'
