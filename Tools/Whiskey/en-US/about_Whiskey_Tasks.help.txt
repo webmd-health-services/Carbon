@@ -46,6 +46,9 @@ LONG DESCRIPTION
       ProGet.
     * `SetVariable`: creates a variable that you can use in your whiskey.yml
       file.
+    * `SetVariableFromPowerShellDataFile`: creates variables that you can use in
+      in your whiskey.yml file by reading them from a PowerShell data file (i.e. 
+      .psd1 file or module manifest).
     * `SetVariableFromXml`: creates variables that you can use in your 
       whiskey.yml file by reading their values from an XML file.
     * `TaskDefaults`: sets default task properties.

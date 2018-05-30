@@ -84,13 +84,29 @@ Build:
     - LICENSE.txt
     - NOTICE.txt
     DestinationDirectory: Carbon
+- SetVariableFromPowerShellDataFile:
+    Path: Carbon\Carbon.psd1
+    Variables:
+        PrivateData:
+            PSData:
+                ReleaseNotes: RELEASE_NOTES
+                Tags: TAGS
 - NuGetPack:
     Path: Carbon.nuspec
+    Properties:
+        ReleaseNotes: $(RELEASE_NOTES)
+        Tags: $(TAGS)
 
 Publish:
 - PublishPowerShellModule:
     Path: Carbon
     RepositoryName: PSGallery
     RepositoryUri: https://www.powershellgallery.com/api/v2/
-    ApiKeyID: PowerShellGalleryApiKey
-- Publish   
+    ApiKeyID: powershellgallery.com
+- NuGetPush:
+    Uri: https://nuget.org/api/v2/package
+    ApiKeyID: nuget.org
+    SkipUploadCheck: true
+- NuGetPush:
+    Uri: https://chocolatey.org/api/v2/package
+    ApiKeyID: chocolatey.org

@@ -45,15 +45,40 @@ function New-WhiskeyNuGetPackage
         return
     }
 
+    $properties = $TaskParameter['Properties']
+    $propertiesArgs = @()
+    if( $properties )
+    {
+        if( -not (Get-Member -InputObject $properties -Name 'Keys') )
+        {
+            Stop-WhiskeyTask -TaskContext $TaskContext -PropertyName 'Properties' -Message ('Property is invalid. This property must be a name/value mapping of properties to pass to nuget.exe pack command''s "-Properties" parameter.')
+            return
+        }
+
+        $propertiesArgs = $properties.Keys | 
+                                ForEach-Object {
+                                    '-Properties'
+                                    '{0}={1}' -f $_,$properties[$_]
+                                }
+    }
+
     foreach ($path in $paths)
     {
-        $projectName = [IO.Path]::GetFileNameWithoutExtension(($path | Split-Path -Leaf))
-        $packageVersion = $TaskContext.Version.SemVer1
+        $projectName = $TaskParameter['PackageID']
+        if( -not $projectName )
+        {
+            $projectName = [IO.Path]::GetFileNameWithoutExtension(($path | Split-Path -Leaf))
+        }
+        $packageVersion = $TaskParameter['PackageVersion']
+        if( -not $packageVersion )
+        {
+            $packageVersion = $TaskContext.Version.SemVer1
+        }
                     
         # Create NuGet package
         $configuration = Get-WhiskeyMSBuildConfiguration -Context $TaskContext
 
-        & $nugetPath pack -Version $packageVersion -OutputDirectory $TaskContext.OutputDirectory $symbolsArg -Properties ('Configuration={0}' -f $configuration) $path
+        & $nugetPath pack -Version $packageVersion -OutputDirectory $TaskContext.OutputDirectory $symbolsArg -Properties ('Configuration={0}' -f $configuration) $propertiesArgs $path
 
         # Make sure package was created.
         $filename = '{0}.{1}{2}.nupkg' -f $projectName,$packageVersion,$symbolsFileNameSuffix

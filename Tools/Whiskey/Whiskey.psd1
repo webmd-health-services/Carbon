@@ -12,7 +12,7 @@
     RootModule = 'Whiskey.psm1'
 
     # Version number of this module.
-    ModuleVersion = '0.34.0'
+    ModuleVersion = '0.35.0'
 
     # ID used to uniquely identify this module
     GUID = '93bd40f1-dee5-45f7-ba98-cb38b7f5b897'
@@ -147,14 +147,12 @@
 
             # ReleaseNotes of this module
             ReleaseNotes = @'
-# 0.34.0
+# 0.35.0
 
-* Fixed: "Pester3" and "Pester4" tasks overwrite test results when run in parallel.
-* ***Breaking Change***: "Pester4" and "Pester3" tasks XML output file names changed. They used to be named "pester-NUMBER.xml". They now use the pattern "pester+RANDOM_STRING.xml", where "RANDOM_STRING" is a random string of ASCII characters.
-* Added "Exclude" property to "Pester4" task for filtering out tests that match any wildcards in the task's "Path" property.
-* Default "BuildTasks" and "PublishTasks" pipelines have been renamed to "Build" and "Publish". Backwards compatibility with the deprecated "BuildTasks" and "PublishTasks" pipelines will be removed in the next major version of Whiskey.
-* Added "SetVariableFromXML" task that creates Whiskey variables from values in XML files.
-* Added "ManifestProperties" property to "ProGetUniversalPackageTask" for setting custom upack.json metadata.
+* Created "SetVariableFromPowerShellDataFile" task for creating variables from values in PowerShell data files (e.g. .psd1 files, module manifests, etc.).
+* Added "Properties" property to "NuGetPack" task so that tokens inside .nuspec files can be replaced. The "Properties" property should be a name/value mapping. Each name/value is passed to nuget.exe pack command's "-Properties" parameter.
+* Added "PackageID" property to "NuGetPack" task to handle situations where a package's ID doesn't match the source .nuspec/.csproj file.
+* Added "PackageVersion" property to "NuGetPack" task to allow customizing the package's version number.
 '@
         } # End of PSData hashtable
 
