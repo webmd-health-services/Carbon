@@ -64,9 +64,9 @@ Build:
         - Pester4:
             Path: Test\*.Tests.ps1
             Exclude:
-            - "*\Install-Certificate.Tests.ps1"
-            - "*\Uninstall-Certificate.Tests.ps1"
-            - "*\Get-ScheduledTask.Tests.ps1"
+            - "*\\Install-Certificate.Tests.ps1"
+            - "*\\Uninstall-Certificate.Tests.ps1"
+            - "*\\Get-ScheduledTask.Tests.ps1"
             DescribeDurationReportCount: 20
     - Tasks:
         - PowerShell:
