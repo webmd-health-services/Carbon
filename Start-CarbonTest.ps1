@@ -27,17 +27,22 @@ Set-StrictMode -Version 'Latest'
 
 & (Join-Path -Path $PSScriptRoot -ChildPath 'Carbon\Import-Carbon.ps1' -Resolve)
 
-if( (Test-Path -Path 'env:APPVEYOR') )
-{
-    Grant-Permission -Path ($PSScriptRoot | Split-Path) -Identity 'Everyone' -Permission 'FullControl'
-    Grant-Permission -Path ('C:\Users\appveyor\Documents') -Identity 'Everyone' -Permission 'FullControl'
-}
-
 $installRoot = Get-PowerShellModuleInstallPath
 $carbonModuleRoot = Join-Path -Path $installRoot -ChildPath 'Carbon'
 Install-Junction -Link $carbonModuleRoot -Target (Join-Path -Path $PSScriptRoot -ChildPath 'Carbon' -Resolve) | Format-Table | Out-String | Write-Verbose
 
-Get-Module -ListAvailable
+if( (Test-Path -Path 'env:APPVEYOR') )
+{
+    Grant-Permission -Path ($PSScriptRoot | Split-Path) -Identity 'Everyone' -Permission 'FullControl'
+    Grant-Permission -Path ('C:\Users\appveyor\Documents') -Identity 'Everyone' -Permission 'FullControl'
+
+    $wmiprvse = Get-Process -Name 'wmiprvse'
+    $wmiprvse | Format-Table
+    $wmiprvse | Stop-Process -Force
+    Get-Process -Name 'wmiprvse' | Format-Table
+}
+
+Get-Module -ListAvailable | Format-Table
 
 $modulePaths = $env:PSModulePath -split ';'
 $modulePaths
