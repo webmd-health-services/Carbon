@@ -64,26 +64,26 @@ function New-TestHostsFile
     }
 }
 
-Describe 'Set-HostsEntry when passed a new IPv6 address' {
+Describe 'Set-HostsEntry.when passed a new IPv6 address' {
     $hostsPath = New-TestHostsFile
     Set-HostsEntry -IPAddress  'cc1a:2078:ec06:4f32:8ea8:7119:663a:f2d2' -HostName 'ipv6' -Path $hostsPath
     Assert-HostsFileContains -IPAddress 'cc1a:2078:ec06:4f32:8ea8:7119:663a:f2d2' -HostName 'ipv6' -Path $hostsPath
 }
 
-Describe 'Set-HostsEntry when IPv6 address contains IP tunnel' {
+Describe 'Set-HostsEntry.when IPv6 address contains IP tunnel' {
     $hostsPath = New-TestHostsFile
     Set-HostsEntry -IPAddress '2001:4860:4860::8888:255.255.255.255' -HostName 'ipv6' -Path $hostsPath
     Assert-HostsFileContains -IPAddress '2001:4860:4860::8888:255.255.255.255' -HostName 'ipv6' -Path $hostsPath
 }
 
-Describe 'Set-HostsEntry when updating an existing IPv6 address' {
+Describe 'Set-HostsEntry.when updating an existing IPv6 address' {
     $hostsPath = New-TestHostsFile
     Set-HostsEntry -IPAddress '2001:4860:4860::8888' -HostName 'ipv6' -Path $hostsPath
     Set-HostsEntry -IPAddress '2001:4860:4860::8844' -HostName 'ipv6' -Path $hostsPath
     Assert-HostsFileContains -IPAddress '2001:4860:4860::8844' -HostName 'ipv6' -Path $hostsPath
 }
 
-Describe 'Set-HostsEntry when no path parameter provided' {
+Describe 'Set-HostsEntry.when no path parameter provided' {
     Mock -CommandName 'Write-File' -Verifiable -ModuleName 'Carbon'
 
     Set-HostsEntry -IPAddress '5.6.7.8' -HostName 'example.com' -Description 'Customizing example.com'
@@ -98,14 +98,14 @@ Describe 'Set-HostsEntry when no path parameter provided' {
     }
 }
 
-Describe 'Set-HostsEntry when setting an existin IPv4 entry' {
+Describe 'Set-HostsEntry.when setting an existin IPv4 entry' {
     $hostsFile = '1.2.3.4  example.com' | New-TestHostsFile
     
     Set-HostsEntry -IPAddress '5.6.7.8' -HostName 'example.com' -Description 'Customizing example.com' -Path $hostsFile
     Assert-HostsFileContains -IPAddress "5.6.7.8" -HostName 'example.com' -Description 'Customizing example.com' -Path $hostsFile
 }
 
-Describe 'Set-HostsEntry when adding a new IPv4 entry' {    
+Describe 'Set-HostsEntry.when adding a new IPv4 entry' {    
     $hostsFile = New-TestHostsFile
     $ip = '255.255.255.255'
     $hostname = 'shouldaddnewhostsentry.example.com'
@@ -116,7 +116,7 @@ Describe 'Set-HostsEntry when adding a new IPv4 entry' {
     Assert-HostsFileContains -IPAddress $ip -HostName $hostname -Description $description -Path $hostsFile
 }
 
-Describe 'Set-HostsEntry when an existing entry has a comment but is updated without a comment' {    
+Describe 'Set-HostsEntry.when an existing entry has a comment but is updated without a comment' {    
     $ip = '1.1.1.1'
     $hostname = 'shouldremovecomment.example.com'
 
@@ -127,7 +127,7 @@ Describe 'Set-HostsEntry when an existing entry has a comment but is updated wit
     Assert-HostsFileContains -IPAddress $ip -HostName $hostname -Path $hostsFile
 }
     
-Describe 'Set-HostsEntry when there are duplicate hostnames' {
+Describe 'Set-HostsEntry.when there are duplicate hostnames' {
     $ip = '3.3.3.3'
     $hostname = 'shouldcommentoutduplicates.example.com'
     $line = "$ip $hostname"
@@ -146,7 +146,7 @@ Describe 'Set-HostsEntry when there are duplicate hostnames' {
     }
 }
 
-Describe 'Set-HostsEntry when using -WhatIf switch' {
+Describe 'Set-HostsEntry.when using -WhatIf switch' {
     $hostsFile = New-TestHostsFile
         
     Set-HostsEntry -IPAddress '127.0.0.1' -Hostname 'example.com' -WhatIf -Path $hostsFile
@@ -156,7 +156,7 @@ Describe 'Set-HostsEntry when using -WhatIf switch' {
     }
 }
 
-Describe 'Set-HostsEntry when hosts file exists and is empty' {
+Describe 'Set-HostsEntry.when hosts file exists and is empty' {
     $hostsFile = New-TestHostsFile
     Remove-Item -Path $hostsFile
     New-Item -Path $hostsFile -ItemType File
@@ -164,7 +164,7 @@ Describe 'Set-HostsEntry when hosts file exists and is empty' {
     Assert-HostsFileContains -IPAddress '127.0.0.1' -Hostname 'example.com' -Path $hostsFile
 }    
 
-Describe 'Set-HostsEntry when hosts file does not exist' {
+Describe 'Set-HostsEntry.when hosts file does not exist' {
     $Global:Error.Clear()
     $hostsFile = New-TestHostsFile
     Remove-Item -Path $hostsFile
@@ -179,7 +179,7 @@ Describe 'Set-HostsEntry when hosts file does not exist' {
     Assert-HostsFileContains -IPAddress '127.0.0.1' -HostName 'example.com' -Path $hostsFile
 }
 
-Describe 'Set-HostsEntry when hosts file contains invalid entries' {
+Describe 'Set-HostsEntry.when hosts file contains invalid entries' {
     $hostsFile = 'Invalid Line' | New-TestHostsFile
         
     Set-HostsEntry -IPAddress '4.3.2.1' -Hostname 'example.com' -Path $hostsFile
@@ -187,7 +187,7 @@ Describe 'Set-HostsEntry when hosts file contains invalid entries' {
     Assert-HostsFileContains -Line '# Invalid line' -Path $hostsFile
 }
     
-Describe 'Set-HostsEntry when the hosts file is in use' {
+Describe 'Set-HostsEntry.when the hosts file is in use' {
     $Global:Error.Clear()
 
     $line1 = '0.3.2.1 example1.com'
@@ -266,7 +266,7 @@ $line2
 }
 
 # This test check case from Issue #148 
-Describe 'Set-HostsEnty when updating entries with descriptions' {
+Describe 'Set-HostsEntry.when updating entries with descriptions' {
     $hostsFile = New-TestHostsFile
 
     Set-HostsEntry -IPAddress 127.0.0.1 -HostName 'test' -Description 'Test' -Path $hostsFile
@@ -278,7 +278,7 @@ Describe 'Set-HostsEnty when updating entries with descriptions' {
     Assert-HostsFileContains -IPAddress "127.0.0.1" -HostName 'test3' -Path $hostsFile
 }
 
-Describe 'Set-HostsEntry when the hosts file contains trailing empty lines' {
+Describe 'Set-HostsEntry.when the hosts file contains trailing empty lines' {
         $line = @"
 {0,-45}  fubarsnafu
 {0,-45}  snafufubar
