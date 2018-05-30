@@ -96,6 +96,7 @@ Build:
     Properties:
         ReleaseNotes: $(RELEASE_NOTES)
         Tags: $(TAGS)
+- Exec: Tools\Whiskey\bin\7-Zip\7z.exe a $(WHISKEY_OUTPUT_DIRECTORY)\Carbon.zip .\Carbon .\examples .\LICENSE.txt .\NOTICE.txt '-xr!*.pdb' '-xr!*.orig
 
 Publish:
 - PublishPowerShellModule:
