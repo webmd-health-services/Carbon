@@ -1,10 +1,10 @@
 TOPIC
-    about_Whiskey_about_Whiskey_SetVariableFromPowerShellDataFile_Task
+    about_Whiskey_SetVariableFromPowerShellDataFile_Task
 
 DESCRIPTION
     The `SetVariableFromPowerShellDataFile` task creates variables from data in a PowerShell data file (e.g. a .psd1 file, a module manifest, etc.). It uses the `Import-PowerShellDataFile` cmdlet, which was introduced in PowerShell 5. Set the `Path` property to the path to the PowerShell data file/manifest to read. 
     
-    Set the `Variables` property to a key/value mapping of properties from the manifest file you want as variables. The key of each mapping should be the name of the property from the data file. The value of each mapping should be a variable name. A variable with that name will be created with that property's value. 
+    Set the `Variables` property to a key/value mapping of properties from the manifest file you want as variables. The name of each mapping should be the name of the property from the data file. The value of each mapping should be a variable name. A variable with that name will be created with that property's value. 
 
     Data files can have nested properties. For example, some module manifests contain metadata used when publishing that module to a remote repository:
 
@@ -35,7 +35,7 @@ DESCRIPTION
 PROPERTIES
 
 * `Path` (***mandatory***): the path (relative to the whiskey.yml file) of the data file to read.
-* `Variables` (***mandatory***): A key/value mapping of properties names from the data file. The keys are property names. The values are variable names. Values may also be mappings. The task will look for corresponding mappings in the source data file.
+* `Variables` (***mandatory***): A name/value mapping of properties names from the data file. The names are property names. The values are variable names. Values may also be mappings. The task will look for corresponding mappings in the source data file.
 
 EXAMPLES
     ## Example 1

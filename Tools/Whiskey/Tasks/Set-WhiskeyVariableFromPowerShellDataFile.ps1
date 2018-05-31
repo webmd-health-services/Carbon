@@ -25,7 +25,7 @@ function Set-WhiskeyVariableFromPowerShellDataFile
         return
     }
 
-    function Set-Variable
+    function Set-VariableFromData
     {
         param(
             [object]
@@ -50,7 +50,7 @@ function Set-WhiskeyVariableFromPowerShellDataFile
             $variableValue = $Data[$propertyName]
             if( $variableName | Get-Member 'Keys' )
             {
-                Set-Variable -Variable $variableName -Data $variableValue -ParentPropertyName ('{0}{1}.' -f $ParentPropertyName,$propertyName)
+                Set-VariableFromData -Variable $variableName -Data $variableValue -ParentPropertyName ('{0}{1}.' -f $ParentPropertyName,$propertyName)
                 continue
             }
 
@@ -58,5 +58,5 @@ function Set-WhiskeyVariableFromPowerShellDataFile
         }
     }
 
-    Set-Variable -Variable $TaskParameter['Variables'] -Data $data
+    Set-VariableFromData -Variable $TaskParameter['Variables'] -Data $data
 }
