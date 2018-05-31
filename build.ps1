@@ -48,13 +48,22 @@ $whiskeyYmlPath = Join-Path -Path $PSScriptRoot -ChildPath 'whiskey.yml'
 $context = New-WhiskeyContext -Environment 'Dev' -ConfigurationPath $whiskeyYmlPath
 
 $apiKeys = @{
-                'powershellgallery.com' = 'env:';
-                'nuget.org' = 'env:';
-                'chocolatey.org' = 'env:'
+                'powershellgallery.com' = 'POWERSHELL_GALLERY_API_KEY';
+                'nuget.org' = 'NUGET_ORG_API_KEY';
+                'chocolatey.org' = 'CHOCOLATEY_ORG_API_KEY';
+                'github.com' = 'GITHUB_ACCESS_TOKEN'
             }
 foreach( $apiKeyID in $apiKeys.Keys )
 {
-    Add-WhiskeyApiKey -Context $context -ID $apiKeyID -Value $apiKeys[$apiKeyID]
+    $envVarName = $apiKeys[$apiKeyID]
+    $envVarPath = 'env:{0}' -f $envVarName
+    if( -not (Test-Path -Path $envVarPath) )
+    {
+        continue
+    }
+
+    Write-Verbose ('Adding API key "{0}" from environment variable "{1}".' -f $apiKeyID,$envVarName)
+    Add-WhiskeyApiKey -Context $context -ID $apiKeyID -Value (Get-Item -Path $envVarPath).Value
 }
 Invoke-WhiskeyBuild -Context $context @optionalParams
 
