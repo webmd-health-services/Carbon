@@ -46,21 +46,29 @@ Describe 'Carbon.when getting symoblic link directories' {
     $symDirPath = Join-Path -Path $TestDrive.FullName -ChildPath 'destination'
     [Carbon.IO.SymbolicLink]::Create($symDirPath, $sourceDir.FullName, $true)
 
-    $dirInfo = Get-Item -Path $symDirPath
+    try 
+    {
+            
+        $dirInfo = Get-Item -Path $symDirPath
 
-    It 'should be a junction' {
-        $dirInfo.IsJunction | Should Be $true
+        It 'should be a junction' {
+            $dirInfo.IsJunction | Should Be $true
+        }
+
+        It 'should be a symbolic link' {
+            $dirInfo.IsSymbolicLink | Should Be $true
+        }
+
+        It 'should have a target path' {
+            $dirInfo.TargetPath | Should Be $sourceDir.FullName
+        }
+
+        It 'should write no errors' {
+            $Global:Error | Should BeNullOrEmpty
+        }
     }
-
-    It 'should be a symbolic link' {
-        $dirInfo.IsSymbolicLink | Should Be $true
-    }
-
-    It 'should have a target path' {
-        $dirInfo.TargetPath | Should Be $sourceDir.FullName
-    }
-
-    It 'should write no errors' {
-        $Global:Error | Should BeNullOrEmpty
+    finally
+    {
+        cmd /C rmdir $symDirPath
     }
 }

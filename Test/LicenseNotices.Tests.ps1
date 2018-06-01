@@ -51,10 +51,12 @@ Describe 'License Notices' {
                             '*.pshproj',
                             '*.nuspec',
                             'Publish-Carbon.ps1',
-                            '*.pdn'
+                            '*.pdn',
+                            '.gitignore',
+                            'whiskey.yml'
                         )
     
-        [object[]]$filesMissingLicense = Get-ChildItem -Path $projectRoot -Exclude 'Tools','Website','.hg','pshdo.com' |
+        [object[]]$filesMissingLicense = Get-ChildItem -Path $projectRoot -Exclude 'Tools','Website','.hg','pshdo.com','.output','Modules','packages' |
             Get-ChildItem -Recurse -File -Exclude $filesToSkip |
             Where-Object { $_.FullName -notlike '*\obj\*' } |
             Where-Object { $name = $_.Name; -not ($filesToSkip | Where-Object { $name -like $_ }) } |

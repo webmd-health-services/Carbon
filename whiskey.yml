@@ -1,0 +1,125 @@
+
+PublishOn:
+ - master
+ 
+Build:
+- Version:
+    Path: Carbon\Carbon.psd1
+- PowerShell:
+    OnlyBy: BuildServer
+    Path: Save-CarbonSigningKey.ps1
+- MSBuild:
+    Path: Source\Carbon.sln
+- NUnit2:
+    Path: Source\Test\bin\$(WHISKEY_MSBUILD_CONFIGURATION)\Carbon.Test.dll
+- Exec:
+    Path: robocopy
+    Argument:
+        - Source\bin\$(WHISKEY_MSBUILD_CONFIGURATION)
+        - Carbon\bin
+    SuccessExitCode: <8
+- Exec:
+    Path: robocopy
+    Argument:
+        - Source\Iis\bin\$(WHISKEY_MSBUILD_CONFIGURATION)
+        - Carbon\bin
+    SuccessExitCode: <8
+- Exec:
+    Path: robocopy
+    Argument:
+        - Source\Xdt\bin\$(WHISKEY_MSBUILD_CONFIGURATION)
+        - Carbon\bin
+    SuccessExitCode: <8
+- Delete:
+    OnlyBy: BuildServer
+    Path: Carbon\bin\*.pdb
+- PowerShell:
+    Path: Start-CarbonTest.ps1
+- Pester3:
+    OnlyBy: Developer
+    Path: 
+    - Test\LicenseNotices.Tests.ps1
+    - Test\*.ps1xml.Tests.ps1
+    - Test\Website.Tests.ps1
+    Version: 3.4.6
+- PowerShell:
+    OnlyBy: Developer
+    Path: Tools\Blade\blade.ps1
+    Argument:
+        Path: 
+        - Test\Test-Documentation.ps1
+        - Test\Test-ImportCarbon.ps1
+        - Test\Test-UsesUseCallerPreference.ps1
+        - Test\Test-ParentProcessID.ps1
+- Pester3:
+    OnlyBy: BuildServer
+    Path:
+    - Test\Install-Certificate.Tests.ps1
+    - Test\Uninstall-Certificate.Tests.ps1
+    - Test\Get-ScheduledTask.Tests.ps1
+    - Test\*Iis*.ps1
+#- Parallel:
+#    OnlyBy: BuildServer
+#    Queues:
+#    - Tasks:
+- Pester4:
+    Path: Test\*.Tests.ps1
+    Exclude:
+    - "*\\Install-Certificate.Tests.ps1"
+    - "*\\Uninstall-Certificate.Tests.ps1"
+    - "*\\Get-ScheduledTask.Tests.ps1"
+    - "*\\*Iis*.ps1"
+    DescribeDurationReportCount: 20
+#    - Tasks:
+- PowerShell:
+    Path: Invoke-CarbonBladeTest.ps1
+    Argument:
+        Recurse: true
+        Path: Test
+- PowerShell:
+    OnlyBy: Developer
+    Path: Complete-CarbonTest.ps1
+- CopyFile:
+    Path:
+    - LICENSE.txt
+    - NOTICE.txt
+    DestinationDirectory: Carbon
+- SetVariableFromPowerShellDataFile:
+    Path: Carbon\Carbon.psd1
+    Variables:
+        PrivateData:
+            PSData:
+                ReleaseNotes: RELEASE_NOTES
+                Tags: TAGS
+- NuGetPack:
+    Path: Carbon.nuspec
+    Properties:
+        ReleaseNotes: $(RELEASE_NOTES)
+        Tags: $(TAGS)
+- Exec: Tools\Whiskey\bin\7-Zip\7z.exe a $(WHISKEY_OUTPUT_DIRECTORY)\Carbon.zip .\Carbon .\examples .\LICENSE.txt .\NOTICE.txt '-xr!*.pdb' '-xr!*.orig
+
+Publish:
+- PublishPowerShellModule:
+    Path: Carbon
+    RepositoryName: PSGallery
+    RepositoryUri: https://www.powershellgallery.com/api/v2/
+    ApiKeyID: powershellgallery.com
+- NuGetPush:
+    Uri: https://nuget.org/api/v2/package
+    ApiKeyID: nuget.org
+    SkipUploadCheck: true
+- NuGetPush:
+    Uri: https://chocolatey.org/api/v2/package
+    ApiKeyID: chocolatey.org
+- GitHubRelease:
+    RepositoryName: webmd-health-services/Whiskey
+    ApiKeyID: github.com
+    Tag: $(WHISKEY_SEMVER2_NO_BUILD_METADATA)
+    Commitish: $(WHISKEY_SCM_COMMIT_ID)
+    Name: $(WHISKEY_SEMVER2_NO_BUILD_METADATA)
+    Description: $(RELEASE_NOTES)
+    Assets:
+    - Path: .output\Whiskey.zip
+      ContentType: application/zip
+      Name: Whiskey-$(WHISKEY_SEMVER2_NO_BUILD_METADATA).zip
+    

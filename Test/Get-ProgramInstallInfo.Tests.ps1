@@ -15,7 +15,7 @@ Set-StrictMode -Version 'Latest'
 
 & (Join-Path -Path $PSScriptRoot -ChildPath 'Import-CarbonForTest.ps1' -Resolve)
 
-Describe 'Get-ProgramInstallInfo when getting all programs' {
+Describe 'Get-ProgramInstallInfo.when getting all programs' {
     $programs = Get-ProgramInstallInfo
     It 'should get all installed programs' {
         $programs | Should Not BeNullOrEmpty
@@ -137,7 +137,7 @@ Describe 'Get-ProgramInstallInfo when getting all programs' {
     }
 }
 
-Describe 'Get-ProgramInstallInfo when getting a program by name' {
+Describe 'Get-ProgramInstallInfo.when getting a program by name' {
     $p = Get-ProgramInstallInfo | Select-Object -First 1
     $p2 = Get-ProgramInstallInfo $p.DisplayName
     It 'should get just that program' {
@@ -146,7 +146,7 @@ Describe 'Get-ProgramInstallInfo when getting a program by name' {
     }
 }   
 
-Describe 'Get-ProgramInstallInfo when getting programs by wildcard' {
+Describe 'Get-ProgramInstallInfo.when getting programs by wildcard' {
 
     $p = Get-ProgramInstallInfo | Select-Object -First 1
 
@@ -160,7 +160,7 @@ Describe 'Get-ProgramInstallInfo when getting programs by wildcard' {
     }
 }
 
-Describe 'Get-ProgramInstallInfo should handle invalid integer versions' {
+Describe 'Get-ProgramInstallInfo.when there are invalid integer versions' {
     
     $program = Get-ProgramInstallInfo | Select-Object -First 1
 

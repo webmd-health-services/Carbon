@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.31101.0
+# Visual Studio 15
+VisualStudioVersion = 15.0.26730.16
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Carbon", "Carbon.csproj", "{FAC30031-F36B-4A7F-B887-114D0B3DFD7D}"
 EndProject
@@ -49,7 +49,6 @@ Global
 		{AFF68EB7-57D4-4D47-971C-F0BCA2149B04}.Release|Any CPU.ActiveCfg = Release
 		{AFF68EB7-57D4-4D47-971C-F0BCA2149B04}.Release|Any CPU.Build.0 = Release
 		{F75D4E03-F601-48F9-9858-4CFAD6A4AED4}.Debug|Any CPU.ActiveCfg = Debug
-		{F75D4E03-F601-48F9-9858-4CFAD6A4AED4}.Debug|Any CPU.Build.0 = Debug
 		{F75D4E03-F601-48F9-9858-4CFAD6A4AED4}.Release|Any CPU.ActiveCfg = Release
 		{F75D4E03-F601-48F9-9858-4CFAD6A4AED4}.Release|Any CPU.Build.0 = Release
 		{D3F2D40C-A985-46D4-A317-03D7CF6B10E0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -58,5 +57,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {BD04E1B1-78FE-4A1D-B68A-824002C0D47A}
 	EndGlobalSection
 EndGlobal

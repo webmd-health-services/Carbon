@@ -35,11 +35,15 @@ function Assert-FirewallConfigurable
 
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
-    if( (Get-Service 'Windows Firewall').Status -ne 'Running' ) 
+    if( (Get-Service 'Windows Firewall' -ErrorAction Ignore | Select-Object -ExpandProperty 'Status' -ErrorAction Ignore) -eq 'Running' )
     {
-        Write-Error "Unable to configure firewall: Windows Firewall service isn't running."
-        return $false
+        return $true
     }
-    return $true
-}
+    elseif( (Get-Service -Name 'MpsSvc').Status -eq 'Running' )
+    {
+        return $true
+    }
 
+    Write-Error "Unable to configure firewall: Windows Firewall service isn't running."
+    return $false
+}

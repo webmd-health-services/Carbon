@@ -1,0 +1,90 @@
+TOPIC
+    about_Whiskey_SetVariableFromPowerShellDataFile_Task
+
+DESCRIPTION
+    The `SetVariableFromPowerShellDataFile` task creates variables from data in a PowerShell data file (e.g. a .psd1 file, a module manifest, etc.). It uses the `Import-PowerShellDataFile` cmdlet, which was introduced in PowerShell 5. Set the `Path` property to the path to the PowerShell data file/manifest to read. 
+    
+    Set the `Variables` property to a key/value mapping of properties from the manifest file you want as variables. The name of each mapping should be the name of the property from the data file. The value of each mapping should be a variable name. A variable with that name will be created with that property's value. 
+
+    Data files can have nested properties. For example, some module manifests contain metadata used when publishing that module to a remote repository:
+
+        @{
+            PrivateData = @{
+                PSData = @{
+                    ReleaseNotes = 'ReleaseNotes'
+                    Tags = @( 'tag1' )
+                }
+            }
+        }
+
+    To set variables from nested data element in your data file, create a mapping whose value is also a nested mapping. The nesting should match the nesting in the data file. For example, given the data file above, to create variables for the `ReleaseNotes` and `Tags` properties, your whiskey.yml file would look like this:
+
+        Build:
+        - SetVariableFromPowerShellDataFile:
+            Path: Whiskey\Whiskey.psd1
+            Variables:
+                PrivateData:
+                    PSData:
+                        ReleaseNotes: RELEASE_NOTES
+                        Tags: TAGS
+
+    If the `Variables` property contains properties that don't exist in the data file, you'll get an error and your build will fail.
+
+    This task requires PowerShell 5.
+
+PROPERTIES
+
+* `Path` (***mandatory***): the path (relative to the whiskey.yml file) of the data file to read.
+* `Variables` (***mandatory***): A name/value mapping of properties names from the data file. The names are property names. The values are variable names. Values may also be mappings. The task will look for corresponding mappings in the source data file.
+
+EXAMPLES
+    ## Example 1
+
+    Given this data file:
+
+        @{
+            # Script module or binary module file associated with this manifest.
+            RootModule = 'Whiskey.psm1'
+            # Version number of this module.
+            ModuleVersion = '0.34.0'
+        }
+    
+    With this whiskey.yml file:
+
+        Build:
+        - SetVariableFromPowerShellDataFile:
+            Path: Whiskey\Whiskey.psd1
+            Variables:
+                RootModule: ROOT_MODULE
+                ModuleVersion: MODULE_VERSION
+
+    Whiskey will create a `ROOT_MODULE` variable whose value is `Whiskey.psm1' and a `MODULE_VERSION` variable whose value is `0.34.0`.
+
+
+    ## Example 2
+
+    Demonstrates how to create variables from nested values.
+
+    Given this data file:
+
+        @{
+            # Version number of this module.
+            ModuleVersion = '0.34.0',
+            PrivateData = @{
+                PSData = @{
+                    ReleaseNotes = 'Release notes'
+                }
+            }
+        }
+    
+    With this whiskey.yml file:
+
+        Build:
+        - SetVariableFromPowerShellDataFile:
+            Path: Whiskey\Whiskey.psd1
+            Variables:
+                PrivateData:
+                    PSData:
+                        ReleaseNotes: RELEASE_NOTES
+
+    Whiskey will create a `RELEASE_NOTES` variable whose value is `Release notes'.

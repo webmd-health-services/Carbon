@@ -1,0 +1,67 @@
+TOPIC
+    about_Whiskey_NUnit2_Task
+
+SUMMARY
+    Runs NUnit 2 tests.
+
+DESCRIPTION
+
+    Runs NUnit unit tests using the latest version of NUnit 2, currently 2.6.4. An XML report of the test results is saved to `.output\nunit-XX.xml` (where XX are numbers). The .output directory is in the same directory as your whiskey.yml file. The task installs the NUNit.Runners NuGet package from nuget.org into a `packages` directory in your repository root and uses the nunit-console.exe application from that package. 
+
+    Tests are run through OpenCover, a code coverage tool. An OpenCover XML report is saved to `.output\opencover\openCover.xml`. OpenCover is installed with NuGet from nuget.org into a `packages` directory in the root of your repository. 
+
+    An HTML code coverage report is generated from the openCover.xml file using Report Generator. Report Generator is installed with NuGet from nuget.org into a packages directory in the root of your repository. The HTML reports are saved to `.output\opencover`. The `.output` directory is in the same directory as your whiskey.yml file.
+
+    You can disable code coverage with the `DisableCodeCoverage` property.
+
+    Test results are output as XML files into the build's output directory. Files are named "nunit2+RANDOM_STRING.xml", where "RANDOM_STRING" is random file name.
+
+PROPERTIES
+
+    * **Path** (mandatory): the paths to the assemblies to test. Wildcards are allowed.
+    * **Include**: The categories to run. Only tests and test fixtures with a Category attribute whose name matches a name from this list will be run. The default is to run all tests.  The value of this property is passed to the nunit-console.exe program's `/include` parameter as-is.
+    * **Exclude**: A list of categories that shouldn't run. Tests and test fixtures with a Category attribute that matches an item in this list will not be run. The default is to run all tests.  The value of this property is passed to the nunit-console.exe program's `/exclude` parameter as-is.
+    * **Framework**: The .NET framework to use when running tests. The default is 4.0. We're not sure what values are supported. NUnit's documentation doesn't list possible values.
+    * **Argument**: Extra command-line arguments to pass to nunit-console.exe.
+    * **OpenCoverVersion**: the version of OpenCover to use. The default is the latest version.
+    * **ReportGeneratorVersion**: the version of ReportGenerator to use. The default is the latest version.
+    * **DisableCodeCoverage**: doesn't run tests with OpenCover. No code coverage reports are generated.
+    * **CoverageFilter**: A list of filters to apply to selectively include or exclude assemblies and classes from coverage results. The default is to include all assemblies. The OpenCover Usage page explains the filter syntax.
+    * **OpenCoverArgument**: Extra command-line arguments to pass to OpenCover.Console.exe. The OpenCover Usage page details all available arguments.
+    * **ReportGeneratorArgument**: Extra command-line arguments to pass to ReportGenerator.exe. The Report Generator Usage page details all available arguments.
+
+EXAMPLES
+
+    ## Example 1
+    
+        Build:
+        - NUnit2:
+            Path:
+            - UnitTests\bin\Whiskey.*.Tests.dll
+            CoverageFilter: "+[Whiskey*]*"
+    
+    This example demonstrates how to call gather code coverage information using a coverage filter. In this case, all assemblies matching 'Whiskey*' will be part of the coverage report. The tests in all the assemblies in `UnitTests\bin` that match the wildcard `Whiskey.*.Tests.dll` would be run.
+
+    ## Example 2
+    
+        Build:
+        - NUnit2:
+            Path:
+            - UnitTests\bin\Whiskey.*.Tests.dll
+            Include: Category 1,Category 2
+            Exclude: Category 3,Category 4
+            DisableCodeCoverage: true
+    
+    This example demonstrates how to only run tests from multiple categories and exclude tests from multiple categories when categories have spaces in their names and tests *are not* run with OpenCover. In this case, only tests with `Category 1` and `Category 2` categories will be run. If any of these tests also have categories `Category 3` or `Category 4`, they will not be run.
+
+    ## Example 3
+    
+        Build:
+        - NUnit2:
+            Path:
+            - UnitTests\bin\Whiskey.*.Tests.dll
+            Include: '"Category 1,Category 2"'
+            Exclude: '"Category 3,Category 4"'
+            DisableCodeCoverage: true
+    
+    This example demonstrates how to only run tests from multiple categories and exclude tests from multiple categories when categories have spaces in their names and tests are run with OpenCover. You need to put double-quotes around the categories. In this case, only tests with `Category 1` and `Category 2` categories will be run. If any of these tests also have categories `Category 3` or `Category 4`, they will not be run.

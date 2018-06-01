@@ -17,30 +17,40 @@ Packages and publishes Carbon packages.
 
 [CmdletBinding()]
 param(
-    [Version]
-    # The version to build. If not supplied, build the version as currently defined.
-    $Version,
-
     [string]
-    # The pre-release version, e.g. alpha.39, rc.1, etc.
-    $PreReleaseVersion,
-
-    [string]
-    # Build metadata.
-    $BuildMetadata
+    $PipelineName
 )
 
 #Requires -Version 4
 Set-StrictMode -Version Latest
 
-& (Join-Path -Path $PSScriptRoot -ChildPath 'Tools\Silk\Import-Silk.ps1' -Resolve)
+& (Join-Path -Path $PSScriptRoot -ChildPath 'Tools\Whiskey\Import-Whiskey.ps1' -Resolve)
 
-Set-ModuleVersion -ManifestPath (Join-Path -Path $PSScriptRoot -ChildPath 'Carbon\Carbon.psd1') `
-                  -SolutionPath (Join-Path -Path $PSScriptRoot -ChildPath 'Source\Carbon.sln') `
-                  -AssemblyInfoPath (Join-Path -Path $PSScriptRoot -ChildPath 'Source\Properties\AssemblyVersion.cs') `
-                  -Version $Version `
-                  -PreReleaseVersion $PreReleaseVersion `
-                  -BuildMetadata $BuildMetadata `
-                  -ReleaseNotesPath (Join-Path -Path $PSScriptRoot -ChildPath 'RELEASE NOTES.txt' -Resolve) `
-                  -NuspecPath (Join-Path -Path $PSScriptRoot -ChildPath 'Carbon.nuspec' -Resolve)
+$optionalParams = @{ }
+if( $PipelineName )
+{
+    $optionalParams['PipelineName'] = $PipelineName
+}
 
+$whiskeyYmlPath = Join-Path -Path $PSScriptRoot -ChildPath 'whiskey.yml'
+$context = New-WhiskeyContext -Environment 'Dev' -ConfigurationPath $whiskeyYmlPath
+
+$apiKeys = @{
+                'powershellgallery.com' = 'POWERSHELL_GALLERY_API_KEY';
+                'nuget.org' = 'NUGET_ORG_API_KEY';
+                'chocolatey.org' = 'CHOCOLATEY_ORG_API_KEY';
+                'github.com' = 'GITHUB_ACCESS_TOKEN'
+            }
+foreach( $apiKeyID in $apiKeys.Keys )
+{
+    $envVarName = $apiKeys[$apiKeyID]
+    $envVarPath = 'env:{0}' -f $envVarName
+    if( -not (Test-Path -Path $envVarPath) )
+    {
+        continue
+    }
+
+    Write-Verbose ('Adding API key "{0}" from environment variable "{1}".' -f $apiKeyID,$envVarName)
+    Add-WhiskeyApiKey -Context $context -ID $apiKeyID -Value (Get-Item -Path $envVarPath).Value
+}
+Invoke-WhiskeyBuild -Context $context @optionalParams

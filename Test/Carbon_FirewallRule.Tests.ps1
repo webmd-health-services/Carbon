@@ -317,7 +317,7 @@ Describe 'Carbon_FirewallRule' {
     }
 }
 
-Describe 'Carbon_FirewallRule when run as a DSC resource' {
+Describe 'Carbon_FirewallRule.when run as a DSC resource' {
     
     $Global:Error.Clear()
 
@@ -369,7 +369,7 @@ Describe 'Carbon_FirewallRule when run as a DSC resource' {
     }
 }
 
-Describe 'Carbon_FirewallRule when run through DSC with multiple profiles' {
+Describe 'Carbon_FirewallRule.when run through DSC with multiple profiles' {
 
     $Global:Error.Clear()
     $RuleName = 'SupportMultiplePRofiles'

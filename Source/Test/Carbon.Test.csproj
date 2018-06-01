@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <!--
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -48,20 +48,16 @@
   </PropertyGroup>
   <PropertyGroup>
     <SignAssembly>true</SignAssembly>
-  </PropertyGroup>
-  <PropertyGroup>
     <AssemblyOriginatorKeyFile>..\Carbon.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
-    <Reference Include="Microsoft.Web.XmlTransform">
-      <HintPath>..\..\Carbon\bin\Microsoft.Web.XmlTransform.dll</HintPath>
-    </Reference>
     <Reference Include="nunit.framework">
       <HintPath>..\..\Tools\NUnit\2.6.2\nunit.framework.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.DirectoryServices" />
     <Reference Include="System.DirectoryServices.AccountManagement" />
     <Reference Include="System.ServiceProcess" />
     <Reference Include="System.Xml.Linq" />
@@ -70,9 +66,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\Properties\AssemblyVersion.cs">
-      <Link>AssemblyVersion.cs</Link>
-    </Compile>
     <Compile Include="Certificates\SslCertificateBindingTestFixture.cs" />
     <Compile Include="Firewall\RuleTests.cs" />
     <Compile Include="IO\FileTestFixture.cs" />
@@ -88,8 +81,8 @@
     <Compile Include="Service\ServiceSecurityTests.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Source\Carbon.csproj">
-      <Project>{FAC30031-F36B-4A7F-B887-114D0B3DFD7D}</Project>
+    <ProjectReference Include="..\Carbon.csproj">
+      <Project>{fac30031-f36b-4a7f-b887-114d0b3dfd7d}</Project>
       <Name>Carbon</Name>
     </ProjectReference>
     <ProjectReference Include="..\Iis\Carbon.Iis.csproj">
@@ -100,12 +93,6 @@
       <Project>{d1d7ae6d-e489-43f2-9716-d0fb0774851a}</Project>
       <Name>Carbon.Xdt</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Carbon.snk" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Http\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

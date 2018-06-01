@@ -53,7 +53,7 @@ Describe 'New-RsaKeyPair' {
         $keyUsage.KeyUsages.HasFlag([Security.Cryptography.X509Certificates.X509KeyUsageFlags]::KeyEncipherment) | Should Be $true
         $enhancedKeyUsage = $cert.Extensions | Where-Object { $_ -is [Security.Cryptography.X509Certificates.X509EnhancedKeyUsageExtension] }
         $enhancedKeyUsage | Should Not BeNullOrEmpty
-        
+
         # I don't think Windows 2008 supports Enhanced Key Usages.
         $osVersion = (Get-WmiObject -Class 'Win32_OperatingSystem').Version
         if( $osVersion -notmatch '6.1\b' )
@@ -114,9 +114,9 @@ Describe 'New-RsaKeyPair' {
         {
             Set-StrictMode -Off
 
-            Import-DscResource –ModuleName 'PSDesiredStateConfiguration'
+            Import-DscResource -ModuleName 'PSDesiredStateConfiguration'
 
-            node $AllNodes.NodeName 
+            node $AllNodes.NodeName
             {
                 User 'CreateDummyUser'
                 {
@@ -128,10 +128,21 @@ Describe 'New-RsaKeyPair' {
 
         & TestEncryption -ConfigurationData $configData -OutputPath $tempDir
 
+        # DSC will silently write errors if this key doesn't exist even though no functionality is impacted by the missing key.
+        $dscRegKey = 'HKLM:\SOFTWARE\Microsoft\PowerShell\3\DSC'
+        $dscRegKeyErrorMessages = $Global:Error |
+                                  Where-Object { $_ -is [System.Management.Automation.ErrorRecord] } |
+                                  Where-Object { $_.Exception.Message -like ('*Cannot find path ''{0}''*' -f $dscRegKey) }
+
+        foreach ($error in $dscRegKeyErrorMessages)
+        {
+            $Global:Error.Remove($error)
+        }
+
         $Global:Error.Count | Should Be 0
         Join-Path -Path $tempDir -ChildPath 'localhost.mof' | Should Not Contain 'Password1'
     }
-    
+
     if( Get-Command -Name 'Protect-CmsMessage' -ErrorAction Ignore )
     {
         # Make sure we can protect CMS messages with it
@@ -167,7 +178,7 @@ Describe 'New-RsaKeyPair' {
                                  -Algorithm sha1
 
         Assert-KeyProperty -Length $length -ValidTo $validTo -Algorithm 'sha1RSA'
-        
+
     }
 
     It 'should reject subjects that don''t begin with CN=' {

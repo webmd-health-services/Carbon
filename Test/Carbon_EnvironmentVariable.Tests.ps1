@@ -12,8 +12,6 @@
 
 Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'CarbonDscTest' -Resolve) -Force
 
-Get-Module -ListAvailable -FullyQualifiedName Carbon | Format-List | Out-String | Write-Host
-
 Describe 'Carbon_EnvironmentVariable' {
     function Assert-EnvironmentVariable
     {

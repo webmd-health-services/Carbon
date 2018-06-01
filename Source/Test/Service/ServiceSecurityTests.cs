@@ -12,6 +12,8 @@
 
 using Carbon.Service;
 using NUnit.Framework;
+using System.DirectoryServices.AccountManagement;
+using System.ServiceProcess;
 
 namespace Carbon.Test.Service
 {
@@ -21,7 +23,8 @@ namespace Carbon.Test.Service
         [Test]
         public void ShouldGetPermissions()
         {
-            ServiceSecurity.GetServiceSecurityDescriptor("CarbonGrantPrivilege");
+            var service = ServiceController.GetServices()[0];
+            ServiceSecurity.GetServiceSecurityDescriptor(service.ServiceName);
         }
     }
 }

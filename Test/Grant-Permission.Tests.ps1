@@ -194,7 +194,7 @@ function New-TestFile
     return $leafPath
 }
 
-Describe 'Grant-Permission when changing permissions on a file' {
+Describe 'Grant-Permission.when changing permissions on a file' {
     $file = New-TestFile
     $identity = 'BUILTIN\Administrators'
     $permissions = 'Read','Write'
@@ -202,7 +202,7 @@ Describe 'Grant-Permission when changing permissions on a file' {
     Invoke-GrantPermissions -Identity $identity -Permissions $permissions -Path $file
 }
     
-Describe 'Grant-Permission when changing permissions on a directory' {
+Describe 'Grant-Permission.when changing permissions on a directory' {
     $dir = New-TestContainer -FileSystem
     $identity = 'BUILTIN\Administrators'
     $permissions = 'Read','Write'
@@ -210,13 +210,13 @@ Describe 'Grant-Permission when changing permissions on a directory' {
     Invoke-GrantPermissions -Identity $identity -Permissions $permissions -Path $dir
 }
     
-Describe 'Grant-Permission when changing permissions on registry key' {
+Describe 'Grant-Permission.when changing permissions on registry key' {
     $regKey = New-TestContainer -Registry
 
     Invoke-GrantPermissions -Identity 'BUILTIN\Administrators' -Permission 'ReadKey' -Path $regKey -ExpectedRuleType 'Registry'
 }
     
-Describe 'Grant-Permission when passing an invalid permission' {
+Describe 'Grant-Permission.when passing an invalid permission' {
     $path = New-TestFile
     $failed = $false
     $error.Clear()
@@ -230,7 +230,7 @@ Describe 'Grant-Permission when passing an invalid permission' {
     }
 }
     
-Describe 'Grant-Permission when clearing existing permissions' {
+Describe 'Grant-Permission.when clearing existing permissions' {
     $path = New-TestFile
     Invoke-GrantPermissions $user 'FullControl' -Path $path
     Invoke-GrantPermissions $user2 'FullControl' -Path $path
@@ -251,7 +251,7 @@ Describe 'Grant-Permission when clearing existing permissions' {
     }
 }
     
-Describe 'Grant-Permission when there are no existing permissions to clear' {
+Describe 'Grant-Permission.when there are no existing permissions to clear' {
     $Global:Error.Clear()
 
     $path = New-TestFile
@@ -283,7 +283,7 @@ Describe 'Grant-Permission when there are no existing permissions to clear' {
     }
 }
 
-Describe 'Grant-Permission when setting inheritance flags' {
+Describe 'Grant-Permission.when setting inheritance flags' {
     function New-FlagsObject
     {
         param(
@@ -339,7 +339,7 @@ Describe 'Grant-Permission when setting inheritance flags' {
     }
 }
 
-Describe 'Grant-Permission when setting inheritance flags on a file' {
+Describe 'Grant-Permission.when setting inheritance flags on a file' {
     $path = New-TestFile
     $warnings = @()
     $result = Grant-Permission -Identity $user -Permission Read -Path $path -ApplyTo Container -WarningAction SilentlyContinue -WarningVariable 'warnings'
@@ -349,13 +349,13 @@ Describe 'Grant-Permission when setting inheritance flags on a file' {
     }
 }
 
-Describe 'Grant-Permission when a user already has a different permission' {
+Describe 'Grant-Permission.when a user already has a different permission' {
     $containerPath = New-TestContainer -FileSystem
     Invoke-GrantPermissions -Identity $user -Permission FullControl -Path $containerPath -ApplyTo Container
     Invoke-GrantPermissions -Identity $user -Permission Read -Path $containerPath -Apply Container
 }
     
-Describe 'Grant-Permission when a user already has the permissions' {
+Describe 'Grant-Permission.when a user already has the permissions' {
     $containerPath = New-TestContainer -FileSystem
     
     Invoke-GrantPermissions -Identity $user -Permission FullControl -Path $containerPath
@@ -368,13 +368,13 @@ Describe 'Grant-Permission when a user already has the permissions' {
     }
 }
     
-Describe 'Grant-Permission when changing inheritance flags' {
+Describe 'Grant-Permission.when changing inheritance flags' {
     $containerPath = New-TestContainer -FileSystem
     Invoke-GrantPermissions -Identity $user -Permission FullControl -Path $containerPath -ApplyTo ContainerAndLeaves
     Invoke-GrantPermissions -Identity $user -Permission Read -Path $containerPath -ApplyTo Container
 }
     
-Describe 'Grant-Permission when forcing a permission change and the user already has the permissions' {
+Describe 'Grant-Permission.when forcing a permission change and the user already has the permissions' {
     $containerPath = New-TestContainer -FileSystem
 
     Invoke-GrantPermissions -Identity $user -Permission FullControl -Path $containerPath -ApplyTo ContainerAndLeaves
@@ -388,7 +388,7 @@ Describe 'Grant-Permission when forcing a permission change and the user already
     }
 }
 
-Describe 'Grant-Permission when an item is hidden' {
+Describe 'Grant-Permission.when an item is hidden' {
     $Global:Error.Clear()
 
     $path = New-TestFile
@@ -401,7 +401,7 @@ Describe 'Grant-Permission when an item is hidden' {
     }
 }
     
-Describe 'Grant-Permission when the path does not exist' {
+Describe 'Grant-Permission.when the path does not exist' {
     $Global:Error.Clear()
 
     $result = Grant-Permission -Identity $user -Permission Read -Path 'C:\I\Do\Not\Exist' -PassThru -ErrorAction SilentlyContinue
@@ -415,7 +415,7 @@ Describe 'Grant-Permission when the path does not exist' {
     }
 }
     
-Describe 'Grant-Permission when clearing a permission that already exists on a file' {
+Describe 'Grant-Permission.when clearing a permission that already exists on a file' {
     $Global:Error.Clear()
     $path = New-TestFile
     Invoke-GrantPermissions -Identity $user -Permission Read -Path $Path 
@@ -425,7 +425,7 @@ Describe 'Grant-Permission when clearing a permission that already exists on a f
     }
 }
 
-Describe 'Grant-Permission when clearing permissions that already exist on a directory' {
+Describe 'Grant-Permission.when clearing permissions that already exist on a directory' {
     $Global:Error.Clear()
 
     $containerPath = New-TestContainer -FileSystem
@@ -438,7 +438,7 @@ Describe 'Grant-Permission when clearing permissions that already exist on a dir
     }
 }
     
-Describe 'Grant-Permission when clearing permissions that already exist on a registry key' {
+Describe 'Grant-Permission.when clearing permissions that already exist on a registry key' {
     $Global:Error.Clear()
     $regContainerPath = New-TestContainer -Registry
     Invoke-GrantPermissions -Identity $user -Permission QueryValues -Path $regContainerPath -ExpectedRuleType 'Registry'
@@ -450,7 +450,7 @@ Describe 'Grant-Permission when clearing permissions that already exist on a reg
     }
 }
     
-Describe 'Grant-Permission when clearing permissions on the file system and verbose preference is continue' {
+Describe 'Grant-Permission.when clearing permissions on the file system and verbose preference is continue' {
     $containerPath = New-TestContainer -FileSystem
 
     $result = Grant-Permission -Identity $user -Permission Read -Path $containerPath -Verbose 4>&1
@@ -470,7 +470,7 @@ Describe 'Grant-Permission when clearing permissions on the file system and verb
     }
 }
 
-Describe 'Grant-Permission when clearing permissions on a registry key and verbose preference is continue' {
+Describe 'Grant-Permission.when clearing permissions on a registry key and verbose preference is continue' {
     $regContainerPath = New-TestContainer -Registry
     $result = Grant-Permission -Identity $user -Permission QueryValues -Path $regContainerPath -Verbose 4>&1
     it 'should write verbose messages' {
@@ -490,7 +490,7 @@ Describe 'Grant-Permission when clearing permissions on a registry key and verbo
 
 foreach( $location in @( 'LocalMachine','CurrentUser' ) )
 {
-    Describe ('Grant-Permission when setting permissions on a private key in the {0} location' -f $location) {
+    Describe ('Grant-Permission.when setting permissions on a private key in the {0} location' -f $location) {
         $cert = Install-Certificate -Path $privateKeyPath -StoreLocation $location -StoreName My
         try
         {
@@ -558,12 +558,12 @@ foreach( $location in @( 'LocalMachine','CurrentUser' ) )
     }
 }
 
-Describe 'Grant-Permission when setting Deny rule on file system' {
+Describe 'Grant-Permission.when setting Deny rule on file system' {
     $filePath = New-TestFile
     Invoke-GrantPermissions -Identity $user -Permissions 'Write' -Path $filePath -Type 'Deny'
 }
 
-Describe 'Grant-Permission when setting Deny rule on registry' {
+Describe 'Grant-Permission.when setting Deny rule on registry' {
     $path = New-TestContainer -Registry
     Invoke-GrantPermissions -Identity $user -Permissions 'Write' -Path $path -Type 'Deny' -ExpectedRuleType 'Registry'
 }
