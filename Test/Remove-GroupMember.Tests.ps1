@@ -12,7 +12,7 @@
 
 $GroupName = 'CarbonRemoveGroupMember'
 
-& (Join-Path -Path $PSScriptRoot -ChildPath '..\Import-CarbonForTest.ps1' -Resolve)
+& (Join-Path -Path $PSScriptRoot -ChildPath 'Import-CarbonForTest.ps1' -Resolve)
 
 function Get-Member
 {
@@ -20,103 +20,101 @@ function Get-Member
         Where-Object { $_.SamAccountName -ne $env:COMPUTERNAME }
 }
 
-function Start-Test
-{
-    $users = Get-Member
-    try
-    {
+Describe 'Remove-GroupMember' {
+    BeforeEach {
+        $Global:Error.Clear()
+        $users = Get-Member
+        try
+        {
+            Remove-Group
+            Install-Group -Name $GroupName -Description "Group for testing the Remvoe-GroupMember Carbon function." -Member $users
+            $group = Get-Group -Name $GroupName
+            try
+            {
+                $group.Members.Count | Should Be $users.Count
+            }
+            finally
+            {
+                $group.Dispose()
+            }
+        }
+        finally
+        {
+            $users | ForEach-Object { $_.Dispose() }
+        }
+    }
+    
+    AfterEach {
         Remove-Group
-        Install-Group -Name $GroupName -Description "Group for testing the Remvoe-GroupMember Carbon function." -Member $users
+    }
+    
+    function Remove-Group
+    {
+        $group = Get-Group -Name $GroupName -ErrorAction Ignore
+        try
+        {
+            if( $group -ne $null )
+            {
+                net localgroup `"$GroupName`" /delete
+            }
+        }
+        finally
+        {
+            if( $group )
+            {
+                $group.Dispose()
+            }
+        }
+    }
+    
+    It 'should remove individual members' {
+        Get-Member | ForEach-Object { Remove-GroupMember -Name $GroupName -Member $_.SamAccountName ; $_.Dispose() }
+        $Global:Error.Count | Should Be 0
         $group = Get-Group -Name $GroupName
         try
         {
-            Assert-Equal $users.Count $group.Members.Count
+            $group.Members.Count | Should Be 0
         }
         finally
         {
             $group.Dispose()
         }
     }
-    finally
-    {
-        $users | ForEach-Object { $_.Dispose() }
-    }
-}
-
-function Stop-Test
-{
-    Remove-Group
-}
-
-function Remove-Group
-{
-    $group = Get-Group -Name $GroupName -ErrorAction Ignore
-    try
-    {
-        if( $group -ne $null )
+    
+    It 'should remove bulk members' {
+        $users = Get-Member
+        try
         {
-            net localgroup `"$GroupName`" /delete
+            Remove-GroupMember -Name $GroupName -Member $users
+            $Global:Error.Count | Should Be 0
         }
-    }
-    finally
-    {
-        if( $group )
+        finally
+        {
+            $users | ForEach-Object { $_.Dispose() }
+        }
+    
+        $group = Get-Group -Name $GroupName
+        try
+        {
+            $group.Members.Count | Should Be 0
+        }
+        finally
         {
             $group.Dispose()
         }
     }
-}
-
-function Test-ShouldRemoveIndividualMembers
-{
-    Get-Member | ForEach-Object { Remove-GroupMember -Name $GroupName -Member $_.SamAccountName ; $_.Dispose() }
-    Assert-NoError
-    $group = Get-Group -Name $GroupName
-    try
-    {
-        Assert-Equal 0 $group.Members.Count
-    }
-    finally
-    {
-        $group.Dispose()
-    }
-}
-
-function Test-ShouldRemoveBulkMembers
-{
-    $users = Get-Member
-    try
-    {
-        Remove-GroupMember -Name $GroupName -Member $users
-        Assert-NoError
-    }
-    finally
-    {
-        $users | ForEach-Object { $_.Dispose() }
-    }
-
-    $group = Get-Group -Name $GroupName
-    try
-    {
-        Assert-Equal 0 $group.Members.Count
-    }
-    finally
-    {
-        $group.Dispose()
-    }
-}
-
-function Test-ShouldSupportWhatIf
-{
-    $users = Get-Member
-    $users | ForEach-Object { Remove-GroupMember -Name $GroupName -Member $_.SamAccountName -WhatIf; $_.Dispose() }
-    $group = Get-Group -Name $GroupName
-    try
-    {
-        Assert-Equal $users.Count $group.Members.Count
-    }
-    finally
-    {
-        $group.Dispose()
+    
+    It 'should support what if' {
+        $users = Get-Member
+        $users | ForEach-Object { Remove-GroupMember -Name $GroupName -Member $_.SamAccountName -WhatIf; $_.Dispose() }
+        $group = Get-Group -Name $GroupName
+        try
+        {
+            $group.Members.Count | Should Be $users.Count
+        }
+        finally
+        {
+            $group.Dispose()
+        }
     }
 }
