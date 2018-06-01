@@ -112,7 +112,7 @@ Publish:
 - NuGetPush:
     Uri: https://nuget.org/api/v2/package
     ApiKeyID: nuget.org
-    SkipUploadCheck: true
+    SkipUploadedCheck: true
 - NuGetPush:
     Uri: https://chocolatey.org/api/v2/package
     ApiKeyID: chocolatey.org
