@@ -111,6 +111,7 @@ Publish:
 - NuGetPush:
     Uri: https://chocolatey.org/api/v2/package
     ApiKeyID: chocolatey.org
+    SkipUploadedCheck: true
 - GitHubRelease:
     RepositoryName: webmd-health-services/Whiskey
     ApiKeyID: github.com
