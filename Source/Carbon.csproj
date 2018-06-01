@@ -48,9 +48,9 @@
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <SignAssembly>true</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
+    <SignAssembly>false</SignAssembly>
     <AssemblyOriginatorKeyFile>Carbon.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>

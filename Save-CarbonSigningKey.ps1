@@ -37,9 +37,11 @@ $signAssemblyRegex = ([regex]::Escape('<SignAssembly>false</SignAssembly>'))
 Get-ChildItem -Path $PSScriptRoot -Filter '*.csproj' -Recurse |
     Where-Object { Select-String -Pattern $signAssemblyRegex -InputObject $_ } |
     ForEach-Object {
+        Write-Verbose -Message ('Enabling assembly signing in "{0}".' -f $_.FullName)
         $xml = Get-Content -Path $_.FullName | ForEach-Object { $_ -replace $signAssemblyRegex,'<SignAssembly>true</SignAssembly>' }
         $xml | Set-Content -Path $_.FullName
     }
 
 $snkPath = Join-Path -Path $PSScriptRoot -ChildPath 'Source\Carbon.snk'
+Write-Verbose -Message ('Saving signing key to "{0}".' -f $snkPath)
 [IO.File]::WriteAllBytes($snkPath, [Convert]::FromBase64String($base64Snk))

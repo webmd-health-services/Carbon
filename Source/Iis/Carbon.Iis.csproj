@@ -48,8 +48,6 @@
   </PropertyGroup>
   <PropertyGroup>
     <SignAssembly>false</SignAssembly>
-  </PropertyGroup>
-  <PropertyGroup>
     <AssemblyOriginatorKeyFile>..\Carbon.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
