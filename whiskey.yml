@@ -111,3 +111,15 @@ Publish:
 - NuGetPush:
     Uri: https://chocolatey.org/api/v2/package
     ApiKeyID: chocolatey.org
+- GitHubRelease:
+    RepositoryName: webmd-health-services/Whiskey
+    ApiKeyID: github.com
+    Tag: $(WHISKEY_SEMVER2_NO_BUILD_METADATA)
+    Commitish: $(WHISKEY_SCM_COMMIT_ID)
+    Name: $(WHISKEY_SEMVER2_NO_BUILD_METADATA)
+    Description: $(RELEASE_NOTES)
+    Assets:
+    - Path: .output\Whiskey.zip
+      ContentType: application/zip
+      Name: Whiskey-$(WHISKEY_SEMVER2_NO_BUILD_METADATA).zip
+    
