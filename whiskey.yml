@@ -35,13 +35,12 @@ Build:
     Path: Carbon\bin\*.pdb
 - PowerShell:
     Path: Start-CarbonTest.ps1
-- Pester3:
+- Pester4:
     OnlyBy: Developer
     Path: 
     - Test\LicenseNotices.Tests.ps1
     - Test\*.ps1xml.Tests.ps1
     - Test\Website.Tests.ps1
-    Version: 3.4.6
 - PowerShell:
     OnlyBy: Developer
     Path: Tools\Blade\blade.ps1
@@ -51,31 +50,23 @@ Build:
         - Test\Test-ImportCarbon.ps1
         - Test\Test-UsesUseCallerPreference.ps1
         - Test\Test-ParentProcessID.ps1
-- Pester3:
+- Parallel:
     OnlyBy: BuildServer
-    Path:
-    - Test\Install-Certificate.Tests.ps1
-    - Test\Uninstall-Certificate.Tests.ps1
-    - Test\Get-ScheduledTask.Tests.ps1
-    - Test\*Iis*.ps1
-#- Parallel:
-#    OnlyBy: BuildServer
-#    Queues:
-#    - Tasks:
-- Pester4:
-    Path: Test\*.Tests.ps1
-    Exclude:
-    - "*\\Install-Certificate.Tests.ps1"
-    - "*\\Uninstall-Certificate.Tests.ps1"
-    - "*\\Get-ScheduledTask.Tests.ps1"
-    - "*\\*Iis*.ps1"
-    DescribeDurationReportCount: 20
-#    - Tasks:
-- PowerShell:
-    Path: Invoke-CarbonBladeTest.ps1
-    Argument:
-        Recurse: true
-        Path: Test
+    Queues:
+    - Tasks:
+        - Pester4:
+            Path: Test\Install-ScheduledTask.Tests.ps1
+    - Tasks:
+        - Pester4:
+            OnlyBy: BuildServer
+            Path: Test\*.Tests.ps1
+            Exclude:
+            - "*\\Install-ScheduledTask.Tests.ps1"
+        - PowerShell:
+            Path: Invoke-CarbonBladeTest.ps1
+            Argument:
+                Recurse: true
+                Path: Test
 - PowerShell:
     OnlyBy: Developer
     Path: Complete-CarbonTest.ps1
