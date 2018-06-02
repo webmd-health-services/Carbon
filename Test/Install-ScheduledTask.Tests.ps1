@@ -455,7 +455,7 @@ Describe 'Install-ScheduledTask' {
             ForEach-Object { Uninstall-ScheduledTask -Name $_.TaskName }
         $Global:Error.Count | Should Be 0
     }
-    <#
+
     It 'should create scheduled task with path' {
         $fullName = 'PARENT\{0}' -f $taskName
         $result = Install-ScheduledTask -Name $fullName -TaskToRun 'notepad' -Monthly -Force
@@ -581,7 +581,6 @@ Describe 'Install-ScheduledTask' {
     It 'should schedule task to run on event' {
         Assert-TaskScheduled -InstallArguments @{ OnEvent = $true ; EventChannelName = 'System' ; EventXPathQuery = '*[System/EventID=101]'; } -AssertArguments @{ ScheduleType = 'OnEvent'; Modifier = '*[System/EventID=101]'; EventChannelName = 'System'; }
     }
-    #>
     function Assert-TaskScheduledFromXml
     {
         [CmdletBinding()]
