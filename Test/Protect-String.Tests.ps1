@@ -44,7 +44,7 @@ Describe 'Protect-String' {
     It 'should protect string with scope' {
         $user = Protect-String -String 'Hello World' -ForUser 
         $machine = Protect-String -String 'Hello World' -ForComputer
-        $machine | Should Not Be $user 'encrypting at different scopes resulted in the same string'
+        $machine | Should Not Be $user 
     }
     
     It 'should protect strings in pipeline' {
