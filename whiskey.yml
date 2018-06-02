@@ -55,13 +55,16 @@ Build:
     Queues:
     - Tasks:
         - Pester4:
-            Path: Test\Install-ScheduledTask.Tests.ps1
+            Path: 
+            - Test\Carbon_ScheduledTask.Tests.ps1
+            - Test\Get-Scheduledtask.Tests.ps1
+            - Test\Install-ScheduledTask.Tests.ps1
     - Tasks:
         - Pester4:
             OnlyBy: BuildServer
             Path: Test\*.Tests.ps1
             Exclude:
-            - "*\\Install-ScheduledTask.Tests.ps1"
+            - "*\\*ScheduledTask.Tests.ps1"
         - PowerShell:
             Path: Invoke-CarbonBladeTest.ps1
             Argument:
