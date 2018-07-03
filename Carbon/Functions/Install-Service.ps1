@@ -510,6 +510,7 @@ function Install-Service
         $binPathArg = $binPathArg -replace '"','\"'
         if( $PSCmdlet.ShouldProcess( "$Name [$Path]", "$operation service" ) )
         {
+            Write-Verbose "$sc $operation $Name binPath= $binPathArg start= $startArg obj= $($identity.FullName) $passwordArgName $('*' * $passwordArgValue.Length) depend= $dependencyArgValue $displayNameArgName $displayNameArgValue" -Verbose
             & $sc $operation $Name binPath= $binPathArg start= $startArg obj= $identity.FullName $passwordArgName $passwordArgValue depend= $dependencyArgValue $displayNameArgName $displayNameArgValue |
                 Write-Verbose
             $scExitCode = $LastExitCode
