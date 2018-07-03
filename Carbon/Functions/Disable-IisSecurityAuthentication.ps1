@@ -75,6 +75,12 @@ function Disable-IisSecurityAuthentication
     $authType = $pscmdlet.ParameterSetName
     $getArgs = @{ $authType = $true; }
     $authSettings = Get-IisSecurityAuthentication -SiteName $SiteName -VirtualPath $VirtualPath @getArgs
+    
+    if( -not $authSettings.GetAttributeValue('enabled') )
+    {
+        return
+    }
+
     $authSettings.SetAttributeValue('enabled', 'False')
     $fullPath = Join-IisVirtualPath $SiteName $VirtualPath
     if( $pscmdlet.ShouldProcess( $fullPath, ("disable {0} authentication" -f $authType) ) )

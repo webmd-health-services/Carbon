@@ -76,6 +76,11 @@ function Enable-IisSecurityAuthentication
     $authType = $pscmdlet.ParameterSetName
     $getArgs = @{ $authType = $true; }
     $authSettings = Get-IisSecurityAuthentication -SiteName $SiteName -VirtualPath $VirtualPath @getArgs
+    
+    if( $authSettings.GetAttributeValue('enabled') )
+    {
+        return
+    }
     $authSettings.SetAttributeValue('enabled', 'true')
     
     $fullPath = Join-IisVirtualPath $SiteName $VirtualPath
