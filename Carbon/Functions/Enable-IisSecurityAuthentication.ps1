@@ -81,6 +81,7 @@ function Enable-IisSecurityAuthentication
     {
         return
     }
+    
     $authSettings.SetAttributeValue('enabled', 'true')
     
     $fullPath = Join-IisVirtualPath $SiteName $VirtualPath
