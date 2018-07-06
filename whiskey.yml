@@ -8,8 +8,18 @@ Build:
 - PowerShell:
     OnlyBy: BuildServer
     Path: Save-CarbonSigningKey.ps1
+- SetVariable:
+    SignAssembly: False
+- SetVariable:
+    OnlyOnBranch: 
+    - master
+    - develop
+    OnlyBy: BuildServer
+    SignAssembly: True
 - MSBuild:
     Path: Source\Carbon.sln
+    Property:
+        SignAssembly=$(SignAssembly)
 - NUnit2:
     Path: Source\Test\bin\$(WHISKEY_MSBUILD_CONFIGURATION)\Carbon.Test.dll
 - Exec:
@@ -35,13 +45,12 @@ Build:
     Path: Carbon\bin\*.pdb
 - PowerShell:
     Path: Start-CarbonTest.ps1
-- Pester3:
+- Pester4:
     OnlyBy: Developer
     Path: 
     - Test\LicenseNotices.Tests.ps1
     - Test\*.ps1xml.Tests.ps1
     - Test\Website.Tests.ps1
-    Version: 3.4.6
 - PowerShell:
     OnlyBy: Developer
     Path: Tools\Blade\blade.ps1
@@ -51,7 +60,7 @@ Build:
         - Test\Test-ImportCarbon.ps1
         - Test\Test-UsesUseCallerPreference.ps1
         - Test\Test-ParentProcessID.ps1
-- Pester3:
+- Pester4:
     OnlyBy: BuildServer
     Path:
     - Test\Install-Certificate.Tests.ps1
