@@ -8,8 +8,18 @@ Build:
 - PowerShell:
     OnlyBy: BuildServer
     Path: Save-CarbonSigningKey.ps1
+- SetVariable:
+    SignAssembly: False
+- SetVariable:
+    OnlyOnBranch: 
+    - master
+    - develop
+    OnlyBy: BuildServer
+    SignAssembly: True
 - MSBuild:
     Path: Source\Carbon.sln
+    Property:
+        SignAssembly=$(SignAssembly)
 - NUnit2:
     Path: Source\Test\bin\$(WHISKEY_MSBUILD_CONFIGURATION)\Carbon.Test.dll
 - Exec:
