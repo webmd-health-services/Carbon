@@ -25,7 +25,7 @@
     RootModule = 'Carbon.psm1'
 
     # Version number of this module.
-    ModuleVersion = '2.5.4'
+    ModuleVersion = '2.6.0'
 
     # ID used to uniquely identify this module
     GUID = '075d9444-c01b-48c3-889a-0b3490716fa2'
@@ -342,12 +342,7 @@ All functions are idempotent: when run multiple times with the same arguments, y
 
             # ReleaseNotes of this module
             ReleaseNotes = @'
-## Bug Fixes
-
-* Fixed: Carbon takes 10 to 20 seconds to load. In trying to detect if the Win32_OptionalFeature class is available on the current operating system, it was actually loading all the Win32_OptionalFeature instances. Oops. Now, it just checks for the existence of the Win32_OptionalFeature class. Load times should now be about two to three seconds. ([Fixes issue #35.](https://github.com/pshdo/Carbon/issues/35))
-* Import-Carbon.ps1 now hides verbose messages typically shown by Import-Module and Remove-Module cmdlets.
-* Fixed: `Assert-FirewallConfigurable` fails on Windows 10.
-
+* Fixed: `Get-HttpUrlAcl` returns no ACLs if any ACLs exist whose identities no longer exist.
 '@
         } # End of PSData hashtable
     

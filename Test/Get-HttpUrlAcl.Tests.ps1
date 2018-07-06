@@ -52,9 +52,15 @@ Describe 'Get-HttpUrlAcl' {
         foreach( $acl in $acls )
         {
             $header = '' -f $acl.Url
-    
+
             if( $acl.Access.Count -eq 1 )
             {
+                # The ACL has a SID for a dead/deleted identity. Skip those.
+                if( $acl.Access[0].IdentityReference -is [Security.Principal.SecurityIdentifier] )
+                {
+                    continue
+                }
+
                 $rule = $acl.Access[0]
                 $identity = $rule.IdentityReference.ToString()
                 if( $identity -eq 'Everyone' )
@@ -117,5 +123,47 @@ Describe 'Get-HttpUrlAcl' {
         $acl = Get-HttpUrlAcl -Url 'fubar*' 
         $acl | Should -BeNullOrEmpty
         $Global:Error.Count | Should Be 0
+    }
+}
+
+function Init
+{
+    $script:user = $null
+}
+
+function GivenUser
+{
+    param(
+        $UserName,
+        $Description
+    )
+
+    $script:user = Install-User -Credential (New-Credential -UserName $UserName -Password 'Password1') -Description $Description -PassThru
+}
+
+function GivenUrlAcl
+{
+    param(
+        $Uri,
+        $UserName
+    )
+
+    netsh http add urlacl ('url={0}' -f $url) ('user={0}\{1}' -f $env:COMPUTERNAME,$UserName) | Write-Debug
+}
+
+Describe 'Get-HttpUrlAcl.when ACL identity no longer exists' {
+    Init
+    $url = 'http://+:8999/'
+    netsh http delete urlacl ('url={0}' -f $url)
+    $existingUrlAcls = Get-HttpUrlAcl
+    GivenUser 'cgethttpurlacl' 'Carbon test user for Get-HttpUrlAcl'
+    GivenUrlAcl $url 'cgethttpurlacl'
+    Uninstall-User 'cgethttpurlacl'
+    $urlAclsNow = Get-HttpUrlAcl
+    It ('should return all ACLs') {
+        ($urlAclsNow | Measure-Object).Count | Should -Be (($existingUrlAcls | Measure-Object).Count + 1)
+        $badSidAcl = $urlAclsNow | Where-Object { $_.Url -eq $url } 
+        $badSidAcl | Should -Not -BeNullOrEmpty
+        $badSidAcl.Access | Where-Object { $_.IdentityReference.Value -eq $user.Sid.Value } | Should -Not -BeNullOrEmpty
     }
 }
