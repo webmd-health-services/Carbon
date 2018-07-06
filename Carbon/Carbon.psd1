@@ -344,7 +344,7 @@ All functions are idempotent: when run multiple times with the same arguments, y
             ReleaseNotes = @'
 * `Enable-IisSecurityAuthentication` and `Disable-IisSecurityAuthentication` sometimes hang. We don't know why, but we're working around the problem. These functions no longer always apply a configuration change. Instead, they only enable/disable security authentication if its not already enabled/disabled.
 * `Install-Service` now outputs a verbose message showing the command line arguments used when calling `sc.exe` to install/update a service.
-* Added `ArgumentList` property/parameter to `Carbon_Service` DSC resource.
+* Added `ArgumentList` property/parameter to `Carbon_Service` DSC resource. Thanks to [Luigi Grilli](https://github.com/gigi81) for the contribution.
 '@
         } # End of PSData hashtable
     
