@@ -26,13 +26,13 @@ PROPERTIES
     * `Commitish`: the commitish that identifies the commit you're releasing. By default, the GitHub API uses the head (i.e. most recent commit) of the master branch. We recommend using the `$(WHISKEY_SCM_COMMIT_ID)` variable, which is the commit ID currently building.
     * `Name`: the name of the release. By default, the GitHub API uses the commit message of the commit you're releasing.
     * `Description`: a description of the release. This is a good place to put release notes.
-    * `Assets`: a list of files to upload. These files will show on the release's page in GitHub and users will be able to download them. This is a good place to upload a ZIP file or your application. Each asset is a mapping with these properties:
+    * `Assets`: a list of files to upload. These files will show on the release's page in GitHub and users will be able to download them. This is a good place to upload a ZIP file of your application. Each asset is a mapping with these properties:
         * `Path` (***mandatory***): the path to the file to upload. The path must exist. The path must be relative to the whiskey.yml file.
         * `ContentType` (***mandatory***): the file's [media type](https://www.iana.org/assignments/media-types/media-types.xhtml) (e.g. `application/json`). 
         * `Name`: the file's name when viewing in GitHub and downloading. The default is the file's actual name.
 
 EXAMPLES
-    Example 1
+    ## Example 1
 
         Publish:
         - GitHubRelease:

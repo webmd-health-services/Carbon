@@ -1,0 +1,38 @@
+TOPIC
+    about_Whiskey_NodeLicenseChecker_Task
+
+
+SUMMARY
+    Generates a report of each dependency's license.
+    
+
+DESCRIPTION
+    The `NodeLicenseChecker` task runs the node module `license-checker` against all the modules listed in the `dependencies` and `devDepenendencies` properties of the `package.json` file for this application. The task will create a JSON report file named `node-license-checker-report.json` located in the `.output` directory of the build root.
+
+    This task installs the latest LTS version of Node into a `.node` directory (in the same directory as your whiskey.yml file). To use a specific version, set the `engines.node` property in your package.json file to the version you want. (See https://docs.npmjs.com/files/package.json#engines for more information.)
+
+    If the application's `package.json` file does not exist in the build root next to the `whiskey.yml` file, specify a `WorkingDirectory` where it can be found.
+
+
+PROPERTIES
+
+    * `Version`: the version of the license checker to use. The default is the latest version.
+    * `NodeVersion`: the version of Node to use. By default, the version in the `engines.node` property of your package.json file is used. If that is missing, the latest LTS version of Node is used. 
+
+
+EXAMPLES
+
+    ## Example 1
+
+        Build:
+        - NodeLicenseChecker
+    
+    This example will run `license-checker` against the modules listed in the `package.json` file located in the build root.
+
+    ## Example 2
+
+        Build:
+        - NodeLicenseChecker:
+            Version: 13.0.1
+    
+    This example will install and use version 13.0.1 of the license checker.

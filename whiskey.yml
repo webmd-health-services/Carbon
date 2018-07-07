@@ -10,16 +10,17 @@ Build:
     Path: Save-CarbonSigningKey.ps1
 - SetVariable:
     SignAssembly: False
+    Constants: ""
 - SetVariable:
-    OnlyOnBranch: 
-    - master
-    - develop
-    OnlyBy: BuildServer
+    IfExists: Source\Carbon.snk
     SignAssembly: True
+    Constants: SIGNED
 - MSBuild:
     Path: Source\Carbon.sln
     Property:
-        SignAssembly=$(SignAssembly)
+    - SignAssembly=$(SignAssembly)
+    - DefineConstants=$(Constants)
+Blah:
 - NUnit2:
     Path: Source\Test\bin\$(WHISKEY_MSBUILD_CONFIGURATION)\Carbon.Test.dll
 - Exec:

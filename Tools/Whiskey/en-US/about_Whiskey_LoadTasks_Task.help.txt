@@ -1,0 +1,47 @@
+TOPIC
+    about_Whiskey_LoadTask_Task
+
+
+SUMMARY
+    Loads custom tasks so you can use them in your build.
+
+
+DESCRIPTION
+    The `LoadTask` task loads custom tasks into your build. Set the `Path` parameter to a list of paths to PowerShell script files that contain tasks. Wildcards are allowed.
+
+    If any file contains no tasks, the build build will fail. If Whiskey has already loaded tasks from a file during the current build, it is skipped.
+
+    In order for Whiskey to find and run your tasks, they must be scoped at the script level, i.e. prefix all your task functions with the `script:` scope, e.g.
+
+        function script:MyTask
+        {
+            [Whiskey.Task('MyTask')]
+            param(
+                [Parameter(Mandatory=$true)]
+                [Whiskey.Context]
+                $TaskContext,
+
+                [Parameter(Mandatory=$true)]
+                [hashtable]
+                $TaskParameter        
+            )
+        }
+        
+
+    See `about_Whiskey_Writing_Tasks` for documentation on how to write your own tasks.
+
+
+PROPERTIES
+
+    * `Path` (***mandatory***): a list of paths to PowerShell script files, each containing task functions.
+
+
+EXAMPLES
+
+    ## Example 1
+
+        Build:
+        - LoadTask:
+            Path: Build\Whiskey\*.ps1
+
+    Demonstrates how to load tasks. In this example, all the tasks in all the `*.ps1` files the `Build\Whiskey` directory are loaded.

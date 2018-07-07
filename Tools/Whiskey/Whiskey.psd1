@@ -12,7 +12,7 @@
     RootModule = 'Whiskey.psm1'
 
     # Version number of this module.
-    ModuleVersion = '0.35.0'
+    ModuleVersion = '0.37.0'
 
     # ID used to uniquely identify this module
     GUID = '93bd40f1-dee5-45f7-ba98-cb38b7f5b897'
@@ -88,6 +88,7 @@
                             'Get-WhiskeyApiKey',
                             'Get-WhiskeyTask',
                             'Get-WhiskeyCredential',
+                            'Get-WhiskeyMSBuildConfiguration',
                             'Install-WhiskeyTool',
                             'Invoke-WhiskeyNodeTask',
                             'Invoke-WhiskeyNpmCommand',
@@ -105,6 +106,7 @@
                             'Resolve-WhiskeyTaskPath',
                             'Resolve-WhiskeyVariable',
                             'Set-WhiskeyBuildStatus',
+                            'Set-WhiskeyMSBuildConfiguration',
                             'Stop-WhiskeyTask',
                             'Uninstall-WhiskeyTool',
                             'Unregister-WhiskeyEvent'
@@ -147,11 +149,7 @@
 
             # ReleaseNotes of this module
             ReleaseNotes = @'
-* Created "SetVariableFromPowerShellDataFile" task for creating variables from values in PowerShell data files (e.g. .psd1 files, module manifests, etc.).
-* Added "Properties" property to "NuGetPack" task so that tokens inside .nuspec files can be replaced. The "Properties" property should be a name/value mapping. Each name/value is passed to nuget.exe pack command's "-Properties" parameter.
-* Added "PackageID" property to "NuGetPack" task to handle situations where a package's ID doesn't match the source .nuspec/.csproj file.
-* Added "PackageVersion" property to "NuGetPack" task to allow customizing the package's version number.
-* Added `GitHubRelease` task for creating a release in GitHub. The task supports uploading files into the release.
+* Created `Get-WhiskeyMSBuildConfiguration` and `Set-WhiskeyMSBuildConfiguration` functions to allow for customizing the configuration to use when running MSBuild tasks/tools.
 '@
         } # End of PSData hashtable
 

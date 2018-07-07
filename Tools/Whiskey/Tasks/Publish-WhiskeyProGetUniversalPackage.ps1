@@ -1,49 +1,6 @@
 
 function Publish-WhiskeyProGetUniversalPackage
 {
-    <#
-    .SYNOPSIS
-    Uploads a universal package to ProGet.
-
-    .DESCRIPTION
-    The `PublishProGetUniversalPackage` task uploads a universal package to ProGet. By default, it uploads all `*.upack` files in the `.output` directory. Pass paths to specific upack files to the `Path` property. It uses the `Publish-ProGetUniversalPackage` function from the `ProGetAutomation` module to upload the file. If a upack file is invalid, you'll get an error and nothing will upload.
-
-    If uploading requires authentication, set the `CredentialID` property to the ID of the credential to use when uploading. Add the credential with the `Add-WhiskeyCredential` function.
-
-    Set the `Uri` property to the base URI to ProGet. Set the `FeedName` property to the name of the universal feed to which you want to upload. By default, the upload will time out after 100 seconds. To change the default timeout, set the `Timeout` property to the number of seconds to wait before cancelling and timing out the upload.
-
-    ## Property
-
-    * `Uri` (mandatory): the base URI to the instance of ProGet where the package should be uploaded.
-    * `FeedName` (mandatory): the name of the universal feed in ProGet where the package should be uploaded.
-    * `CredentialID`: if ProGet requires authentication when uploading universal packages, this should be the ID of the credential to use. Add credentials to your build with the `Add-WhiskeyCredential` function.
-    * `Path`: the path to any upack files to upload. By default, all `*.upack` files in the `.output` directory are uploaded.
-    * `Timeout`: the timeout, in seconds, to use when uploading the file. If the upload request takes longer than this, it will be cancelled and the build will fail.
-    * `Overwrite`: replace/overwrite the package if it already exists in ProGet. The default behavior is to fail/stop if the package exists.
-
-    ## Examples
-
-    ### Example 1
-
-        Publish:
-        - PublishProGetUniversalPackage:
-            Uri: https://proget.example.com
-            FeedName: Apps
-
-    Demonstrates the minimal configuration needed to upload a package. In this case, all `*.upack` files in the `.output` directory will be uploaded to `http://proget.example.com/upack/Apps`. No authenticaton will be used.
-
-    ### Example 2
-
-        - PublishProGetUniversalPackage:
-            Uri: https://proget.example.com
-            FeedName: Apps
-            Path:
-            - .output\App-*.upack
-            CredentialID: proget.example.com
-            Timeout: 600
-
-    Demonstrates the full configuration available to upload a packae. In this example, only the `App-*.upack` file(s) will be uploaded to `http://proget.example.com/upack/Apps` using the credential with the `proget.example.com` ID. The upload will be allowed to take ten minutes, then will be cancelled.
-    #>
     [CmdletBinding()]
     [Whiskey.Task("PublishProGetUniversalPackage")]
     param(
@@ -95,17 +52,33 @@ function Publish-WhiskeyProGetUniversalPackage
 
     $session = New-ProGetSession -Uri $TaskParameter['Uri'] -Credential $credential
 
-    if( $TaskParameter.ContainsKey('Path') )
+    if( -not ($TaskParameter.ContainsKey('Path')) )
     {
-        $packages = $TaskParameter['Path'] | Resolve-WhiskeyTaskPath -TaskContext $TaskContext -PropertyName 'Path'
+        $TaskParameter['Path'] = Join-Path -Path ($TaskContext.OutputDirectory | Split-Path -Leaf) -ChildPath '*.upack'
     }
-    else
+    
+    $errorActionParam = @{ }
+    $allowMissingPackages = $false
+    if( $TaskParameter.ContainsKey('AllowMissingPackage') )
     {
-        $packages = Get-ChildItem -Path $TaskContext.OutputDirectory -Filter '*.upack' -ErrorAction Ignore | Select-Object -ExpandProperty 'FullName'
-        if( -not $packages )
-        {
-            Stop-WhiskeyTask -TaskContext $TaskContext -PropertyDescription '' -Message ('There are no packages to publish in the output directory ''{0}''. By default, the PublishProGetUniversalPackage task publishes all .upack files in the output directory. Check your whiskey.yml file to make sure you''re running the `ProGetUniversalPackage` task before this task (or some other task that creates universal ProGet packages). To publish other .upack files, set this task''s `Path` property to the path to those files.' -f $TaskContext.OutputDirectory)
-        }
+        $allowMissingPackages = $TaskParameter['AllowMissingPackage'] | ConvertFrom-WhiskeyYamlScalar
+    }
+
+    if( $allowMissingPackages )
+    {
+        $errorActionParam['ErrorAction'] = 'Ignore'
+    }
+    $packages = $TaskParameter['Path'] | Resolve-WhiskeyTaskPath -TaskContext $TaskContext -PropertyName 'Path' @errorActionParam
+
+    if( $allowMissingPackages -and -not $packages )
+    {
+        Write-WhiskeyVerbose -Context $TaskContext -Message ('There are no packages to publish.')
+        return
+    }
+
+    if( -not $packages )
+    {
+        Stop-WhiskeyTask -TaskContext $TaskContext -PropertyDescription '' -Message ('Found no packages to publish. By default, the PublishProGetUniversalPackage task publishes all files with a .upack extension in the output directory. Check your whiskey.yml file to make sure you''re running the `ProGetUniversalPackage` task before this task (or some other task that creates universal ProGet packages). To publish other .upack files, set this task''s `Path` property to the path to those files. If you don''t want your build to fail when there are missing packages, then set this task''s `AllowMissingPackage` property to `true`.' -f $TaskContext.OutputDirectory)
     }
 
     $feedName = $TaskParameter['FeedName']
