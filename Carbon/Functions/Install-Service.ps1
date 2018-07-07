@@ -10,8 +10,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-. (Join-Path -Path $PSScriptRoot -ChildPath 'Join-ServiceArgumentList.ps1' -Resolve)
-
 function Install-Service
 {
     <#
@@ -257,8 +255,26 @@ function Install-Service
         $Path = Resolve-Path -Path $Path | Select-Object -ExpandProperty ProviderPath
     }
 
-    $binPathArg = Join-ServiceArgumentList $Path $ArgumentList
-    Write-Verbose "Service path will be $binPathArg"
+
+    if( $ArgumentList )	
+    {	
+        $binPathArg = Invoke-Command -ScriptBlock {	
+                            $Path	
+                            $ArgumentList 	
+                        } |	
+                        ForEach-Object { 	
+                            if( $_.Contains(' ') )	
+                            {	
+                                return '"{0}"' -f $_.Trim('"')	
+                            }	
+                            return $_	
+                        }	
+        $binPathArg = $binPathArg -join ' '	
+    }	
+    else	
+    {	
+        $binPathArg = $Path	
+    }
 
     $doInstall = $false
     if( -not $Force -and (Test-Service -Name $Name) )
