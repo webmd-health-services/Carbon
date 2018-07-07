@@ -96,6 +96,7 @@
     <Compile Include="Service\ServiceInfo.cs" />
     <Compile Include="Service\ServiceSecurity.cs" />
     <Compile Include="Service\StartType.cs" />
+    <Compile Include="Shell\Command.cs" />
     <Compile Include="TaskScheduler\Months.cs" />
     <Compile Include="TaskScheduler\ScheduleInfo.cs" />
     <Compile Include="TaskScheduler\ScheduleType.cs" />

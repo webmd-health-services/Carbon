@@ -11,7 +11,6 @@
 # limitations under the License.
 
 & (Join-Path -Path $PSScriptRoot -ChildPath '..\Initialize-CarbonDscResource.ps1' -Resolve)
-. (Join-Path -Path $PSScriptRoot -ChildPath '..\..\Functions\Split-CommandLine.ps1' -Resolve)
 
 function Get-TargetResource
 {
@@ -126,7 +125,7 @@ function Get-TargetResource
     {
         $service = Get-Service -Name $Name
         
-        $resource.Path,$resource.ArgumentList = Split-CommandLine $service.Path
+        $resource.Path,$resource.ArgumentList = [Carbon.Shell.Command]::Split($service.Path)
         $resource.StartupType = $service.StartMode
         $resource.Delayed = $service.DelayedAutoStart
         $resource.OnFirstFailure = $service.FirstFailure
