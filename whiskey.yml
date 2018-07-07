@@ -20,7 +20,6 @@ Build:
     Property:
     - SignAssembly=$(SignAssembly)
     - DefineConstants=$(Constants)
-Blah:
 - NUnit2:
     Path: Source\Test\bin\$(WHISKEY_MSBUILD_CONFIGURATION)\Carbon.Test.dll
 - Exec:
