@@ -18,7 +18,7 @@ function Publish-WhiskeyPowerShellModule
     
     if( -not $TaskParameter.ContainsKey('RepositoryName') )
     {
-        Stop-WhiskeyTask -TaskContext $TaskContext -Message ('Property ''RepositoryName'' is mandatory. It should be the name of the PowerShell repository you want to publish to, e.g.
+        Stop-WhiskeyTask -TaskContext $TaskContext -Message ('Property "RepositoryName" is mandatory. It should be the name of the PowerShell repository you want to publish to, e.g.
             
         Build:
         - PublishPowerShellModule:
@@ -30,7 +30,7 @@ function Publish-WhiskeyPowerShellModule
 
     if( -not ($TaskParameter.ContainsKey('Path')))
     {
-        Stop-WhiskeyTask -TaskContext $TaskContext -Message ('Element ''Path'' is mandatory. It should a path relative to your whiskey.yml file, to the module directory of the module to publish, e.g. 
+        Stop-WhiskeyTask -TaskContext $TaskContext -Message ('Property "Path" is mandatory. It should a path relative to your whiskey.yml file, to the module directory of the module to publish, e.g. 
         
         Build:
         - PublishPowerShellModule:
@@ -42,19 +42,19 @@ function Publish-WhiskeyPowerShellModule
     $path = $TaskParameter['Path'] | Resolve-WhiskeyTaskPath -TaskContext $TaskContext -PropertyName 'Path'        
     if( -not (Test-Path $path -PathType Container) )
     {
-        Stop-WhiskeyTask -TaskContext $TaskContext -Message ('Path ''{0}'' isn''t a directory. It must be the path to the root directory of a Powershell module. The directory name must match the name of the module.' -f $path)
+        Stop-WhiskeyTask -TaskContext $TaskContext -Message ('Path "{0}" isn''t a directory. It must be the path to the root directory of a Powershell module. The directory name must match the name of the module.' -f $path)
     }
                 
     $publishLocation = $TaskParameter['RepositoryUri']
     if( -not $publishLocation )
     {
-        Stop-WhiskeyTask -TaskContext $TaskContext -Message ('Property ''RepositoryUri'' is mandatory. It must be the URI to the PowerShall repository to publish to.')
+        Stop-WhiskeyTask -TaskContext $TaskContext -Message ('Property "RepositoryUri" is mandatory. It must be the URI to the PowerShall repository to publish to.')
     }
 
     $apiKeyID = $TaskParameter['ApiKeyID']
     if( -not $apiKeyID )
     {
-        Stop-WhiskeyTask -TaskContext $TaskContext -Message ('Property ''ApiKeyID'' is mandatory. It must be the ID of the API key to use when publishing to ''{0}''. Use the `Add-WhiskeyApiKey` function to add API keys to the build.' -f $publishLocation)
+        Stop-WhiskeyTask -TaskContext $TaskContext -Message ('Property "ApiKeyID" is mandatory. It must be the ID of the API key to use when publishing to "{0}". Use the `Add-WhiskeyApiKey` function to add API keys to the build.' -f $publishLocation)
     }
 
     $apiKey = Get-WhiskeyApiKey -Context $TaskContext -ID $apiKeyID -PropertyName 'ApiKeyID'

@@ -20,5 +20,15 @@ if( -not ($attr | Get-Member 'SupportsClean') )
     Write-Error -Message ('You''ve got an old version of Whiskey loaded. Please open a new PowerShell session.') -ErrorAction Stop
 }
 
+$context = New-Object -TypeName 'Whiskey.Context'
+$propertiesToCheck = @( 'TaskPaths', 'MSBuildConfiguration' )
+foreach( $propertyToCheck in $propertiesToCheck )
+{
+    if( -not ($context | Get-Member $propertyToCheck) )
+    {
+        Write-Error -Message ('You''ve got an old version of Whiskey loaded. Please open a new PowerShell session.') -ErrorAction Stop
+    }
+}
+
 Get-ChildItem -Path (Join-Path -Path $PSScriptRoot -ChildPath 'Functions'),(Join-Path -Path $PSScriptRoot -ChildPath 'Tasks') -Filter '*.ps1' |
     ForEach-Object { . $_.FullName }

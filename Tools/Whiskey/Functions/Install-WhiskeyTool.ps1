@@ -106,7 +106,7 @@ function Install-WhiskeyTool
 
         $waitedFor = (Get-Date) - $startedWaitingAt
         Write-Debug -Message ('[{0:yyyy-MM-dd HH:mm:ss}]  Process "{1}" obtained mutex "{2}" in {3}.' -f (Get-Date),$PID,$mutexName,$waitedFor)
-        $DebugPreference = 'SilentlyContinue'
+        #$DebugPreference = 'SilentlyContinue'
         $startedUsingAt = Get-Date
 
         if( $PSCmdlet.ParameterSetName -eq 'PowerShell' )
@@ -346,7 +346,7 @@ function Install-WhiskeyTool
     }
     finally
     {
-        $DebugPreference = 'Continue'
+        #$DebugPreference = 'Continue'
         $usedFor = (Get-Date) - $startedUsingAt
         Write-Debug -Message ('[{0:yyyy-MM-dd HH:mm:ss}]  Process "{1}" releasing mutex "{2}" after using it for {3}.' -f (Get-Date),$PID,$mutexName,$usedFor)
         $startedReleasingAt = Get-Date
@@ -356,6 +356,6 @@ function Install-WhiskeyTool
         $installLock = $null
         $releasedDuration = (Get-Date) - $startedReleasingAt
         Write-Debug -Message ('[{0:yyyy-MM-dd HH:mm:ss}]  Process "{1}" released mutex "{2}" in {3}.' -f (Get-Date),$PID,$mutexName,$releasedDuration)
-        $DebugPreference = 'SilentlyContinue'
+        #$DebugPreference = 'SilentlyContinue'
     }
 }

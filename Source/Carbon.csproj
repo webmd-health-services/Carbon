@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <!--
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -50,7 +50,7 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup>
-    <SignAssembly>true</SignAssembly>
+    <SignAssembly>false</SignAssembly>
     <AssemblyOriginatorKeyFile>Carbon.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
@@ -96,6 +96,7 @@
     <Compile Include="Service\ServiceInfo.cs" />
     <Compile Include="Service\ServiceSecurity.cs" />
     <Compile Include="Service\StartType.cs" />
+    <Compile Include="Shell\Command.cs" />
     <Compile Include="TaskScheduler\Months.cs" />
     <Compile Include="TaskScheduler\ScheduleInfo.cs" />
     <Compile Include="TaskScheduler\ScheduleType.cs" />

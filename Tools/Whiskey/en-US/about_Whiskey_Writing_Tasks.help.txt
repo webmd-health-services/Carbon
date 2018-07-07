@@ -11,14 +11,13 @@ LONG DESCRIPTION
     * the `Whiskey.Task` attribute
     * a `TaskContext` parameter
     * a `TaskParameter` parameter that's a hashtable
+    * a `script` scope
 
-    Whiskey will find your task if it is in the global scope when you run your build (i.e. when `Invoke-WhiskeyBuild` is called).
-
-    You can run `Get-WhiskeyTask` to see all the tasks that Whiskey can find.
+    Tasks should be loaded into your build using the `LoadTask` task. 
 
     Here is a stub function to get you started:
 
-        function FUNCTION_NAME
+        function script:FUNCTION_NAME
         {
             [Whiskey.Task('TASK_NAME')]
             [CmdletBinding()]
@@ -36,9 +35,11 @@ LONG DESCRIPTION
         }
 
 
-    To use your task in a whiskey.yml file, use the name from the `Whiskey.Task` attribute, e.g.
+    To use your task in a whiskey.yml file, make sure the task is loaded first, then use the name from the `Whiskey.Task` attribute, e.g.
 
         Build:
+        - LoadTask:
+            Path: path\to\task\file.ps1
         - TASK_NAME:
             Property: Value
             Property2:
@@ -61,6 +62,8 @@ LONG DESCRIPTION
     * OnlyBy
     * ExceptBy
     * WorkingDirectory
+    * IfExists
+    * UnlessExists
 
     In other words, your task isn't allowed to have these properties.
 

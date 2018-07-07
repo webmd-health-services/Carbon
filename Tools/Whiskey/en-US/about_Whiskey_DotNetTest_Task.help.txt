@@ -1,0 +1,73 @@
+TOPIC
+    about_Whiskey_DotNetTest_Task
+
+SUMMARY
+    Runs unit tests for a .NET Core project.
+
+DESCRIPTION
+    The `DotNetTest` tasks runs the `dotnet test` command to run unit tests for a .NET Core project. Pass a list of solution files or .NET Core project files to the `Path` property. If no files are provided to `Path`, then the .NET Core SDK will search for any solution or project files in the working directory. If the `dotnet test` command returns a non-zero exit code (i.e. tests failed), the build will fail.
+
+    The task will automatically use the following options with the `dotnet test` command and are not modifiable:
+
+        * `--configuration=(Debug|Release)`: `Debug` when build run by a developer and `Release` when build run by a build server.
+        * `--no-build`: Skip building the project prior to testing. Use Whiskey's `DotNetBuild` task to build the test project.
+        * `--results-directory=$(WHISKEY_OUTPUT_DIRECTORY)`: By default, test results are not saved to a file. Use the `Logger` property to specify the logger URI/friendly name (e.g. `trx`). The results will be saved to a file in Whiskey's ".output" directory.
+
+    The task writes a detailed build log to the build output directory. If the `Path` property has no value, the file is named `dotnet.test.log`. Otherwise, there will be a log file for each path named `dotnet.test.FILE_NAME.log`, where `FILE_NAME` is the name of the file built.
+
+PROPERTIES
+    * `Argument`: a list of additional arguments to pass to the `dotnet test` command.
+    * `Filter`: an expression indicating which tests to be run. See the [Filter option documentation](https://docs.microsoft.com/en-us/dotnet/core/tools/dotnet-test#filter-option-details) for info on the expression syntax.
+    * `Logger`: specifies a logger for test results.
+    * `Path`: a list of paths to .NET Core solution or project files that contain tests. If not specified, the .NET Core SDK will use the solution or project file in the task working directory.
+    * `SdkVersion`: the version of the .NET Core SDK to use when running the `dotnet test` command. Supports wildcard values. If not specified, the task will look for the SDK version from the `global.json` file if it is found in the task working directory or the Whiskey build root. If no SDK version can be located, the task will default to using the SDK version that comes with the latest LTS release of the .NET Core runtime. Whiskey will *always* update the SDK version property in the `global.json` file with the SDK version that task is running with. If no `global.json` file exists, one will be created in the Whiskey build root.
+    * `Verbosity`: sets the verbosity level of dotnet's output. For developers, the default is dotnet's default verbosity. On build servers, the default is `detailed`. Allowed values are `q[uiet]`, `m[inimal]`, `n[ormal]`, `d[etailed]`, and `diag[nostic]`.
+
+EXAMPLES
+
+    ## Example 1
+
+        Build:
+        - DotNetTest
+
+    Demonstrates running the `dotnet test` command with no arguments which builds any .NET Core solution or project files found in the same directory as the whiskey.yml.
+
+    ## Example 2
+
+        Build:
+        - DotNetTest:
+            Path:
+            - Test\Unit\UnitTests.csproj
+            - Test\Integration\IntegrationTests.csproj
+            Verbosity: diagnostic
+
+    Demonstrates running tests for multiple projects located in various subdirectories with "diagnostic" verbosity.
+
+    ## Example 3
+
+        Build:
+        - DotNetTest:
+            Path: Test\DotNetCoreTests.csproj
+            Filter: TestCategory=CategoryA
+
+    Demonstrates running tests in the "Test\DotNetCoreTests.csproj" project using a filter to only run tests whose category is "CategoryA".
+
+    ## Example 4
+
+        Build:
+        - DotNetTest:
+            Path: Test\DotNetCoreTests.csproj
+            Logger: trx
+            Argument:
+            --test-adapter-path
+            TestAdapters\NUnit3.TestAdapter.dll
+
+    Demonstrates running tests using a custom test adapter and specifying the "trx" format logger for test results.
+
+    ## Example 5
+
+        Build:
+        - DotNetTest:
+            SdkVersion: 2.*
+
+    Demonstrates running tests using the latest "2.*" version of the .NET Core SDK.
