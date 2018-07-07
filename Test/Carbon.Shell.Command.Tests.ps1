@@ -12,7 +12,7 @@
 
 & (Join-Path -Path $PSScriptRoot -ChildPath 'Import-CarbonForTest.ps1' -Resolve)
 
-Describe 'Test-SplitCommandLine' {
+Describe 'Carbon.Shell.Command.Split' {
     
     It 'simple split' {
         $path,$args = [Carbon.Shell.Command]::Split('test.exe arg1 arg2')
@@ -37,8 +37,8 @@ Describe 'Test-SplitCommandLine' {
         $expectedPath = ''
         $expectedArgs = $null
         
-        $path | Should -BeNullOrEmpty
-        $args | Should -BeNullOrEmpty
+        $path | Should BeNullOrEmpty
+        $args | Should BeNullOrEmpty
     }
     
     It 'empty exe' {
@@ -46,8 +46,8 @@ Describe 'Test-SplitCommandLine' {
         $expectedPath = ''
         $expectedArgs = $null
         
-        $path | Should -BeNullOrEmpty
-        $args | Should -BeNullOrEmpty
+        $path | Should BeNullOrEmpty
+        $args | Should BeNullOrEmpty
     }
     
     It 'exe only with spaces' {
