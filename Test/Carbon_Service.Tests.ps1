@@ -55,7 +55,9 @@ Describe 'Carbon_Service' {
                 $Global:Error.Count | Should Be 0
                 $resource | Should Not BeNullOrEmpty
                 $resource.Name | Should Be $_.Name
-                $resource.Path | Should Be $_.Path
+                $path,$argumentList = [Carbon.Shell.Command]::Split($_.Path)
+                $resource.Path | Should Be $path
+                $resource.ArgumentList | Should -Be $argumentList
                 $resource.StartupType | Should Be $_.StartMode
                 $resource.Delayed | Should Be $_.DelayedAutoStart
                 $resource.OnFirstFailure | Should Be $_.FirstFailure
