@@ -57,7 +57,7 @@ Describe 'Carbon_Service' {
                 $resource.Name | Should Be $_.Name
                 $path,$argumentList = [Carbon.Shell.Command]::Split($_.Path)
                 $resource.Path | Should Be $path
-                $resource.ArgumentList | Should -Be $argumentList
+                $resource.ArgumentList | Should Be $argumentList
                 $resource.StartupType | Should Be $_.StartMode
                 $resource.Delayed | Should Be $_.DelayedAutoStart
                 $resource.OnFirstFailure | Should Be $_.FirstFailure
