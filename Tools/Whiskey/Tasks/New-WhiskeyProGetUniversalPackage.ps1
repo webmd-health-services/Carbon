@@ -84,27 +84,29 @@ function New-WhiskeyProGetUniversalPackage
         $parentPathParam['ParentPath'] = $sourceRoot
     }
 
-    if( -not $manifestProperties.ContainsKey('Name') )
+    if( -not $manifestProperties.ContainsKey('name') )
     {
-        $manifestProperties['Name'] = $name
+        $manifestProperties['name'] = $name
     }
 
-    if( -not $manifestProperties.ContainsKey('Title') )
+    if( -not $manifestProperties.ContainsKey('title') )
     {
-        $manifestProperties['Title'] = $name
+        $manifestProperties['title'] = $name
     }
 
-    if( -not $manifestProperties.ContainsKey('Description') )
+    if( -not $manifestProperties.ContainsKey('description') )
     {
-        $manifestProperties['Description'] = $TaskParameter['Description']
+        $manifestProperties['description'] = $TaskParameter['Description']
     }
 
-    if( -not $manifestProperties.ContainsKey('Version') )
+    if( -not $manifestProperties.ContainsKey('version') )
     {
-        $manifestProperties['Version'] = $version.SemVer2NoBuildMetadata.ToString()
+        $manifestProperties['version'] = $version.SemVer2NoBuildMetadata.ToString()
     }
 
-    $tempRoot = $TaskContext.Temp
+    $tempRoot = Join-Path -Path $TaskContext.Temp -ChildPath 'upack'
+    New-Item -Path $tempRoot -ItemType 'Directory' | Out-Null
+
     $tempPackageRoot = Join-Path -Path $tempRoot -ChildPath 'package'
     New-Item -Path $tempPackageRoot -ItemType 'Directory' | Out-Null
 

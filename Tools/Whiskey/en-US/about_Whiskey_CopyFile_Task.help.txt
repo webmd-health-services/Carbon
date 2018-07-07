@@ -1,0 +1,38 @@
+TOPIC
+    about_Whiskey_CopyFile_Task
+
+
+SUMMARY
+    Copies files.
+
+
+DESCRIPTION
+    The `CopyFile` task copies files to one or more destination directories. Pass the paths to the files to copy to the `Path` property. Pass the paths to one or more directories to copy the files to with the `DestinationDirectory` property. If a directory doesn't exist, it is created. Uses PowerShell's `Copy-Item` cmdlet.
+
+
+PROPERTIES
+
+    * `Path` (**mandatory**): the path to the files to copy. Directories are not supported. Paths must be relative to your whiskey.yml file. Wildcards supported.
+    * `DestinationDirectory (**mandatory**): the paths to directories where the files should be copied to. If the path is relative, it is resolved relative to your whiskey.yml file. If the directory doesn't exist, it is created. You may use wildcards in the path, as long as the path points to a directory that exists. If the wildcard doesn't match anthing, the build will fail.
+
+EXAMPLES
+
+    ## Example 1
+
+        Build:
+        - CopyFile:
+            Path: 
+            - LICENSE.txt
+            - NOTICE.txt
+            DestinationDirectory: Whiskey
+
+    In this example, the "LICENSE.txt" and "NOTICE.txt" are copied into the "Whiskey" directory.
+
+    ## Example 2
+
+        Build:
+        - CopyFile:
+            Path: whiskey.config
+            DestinationDirectory: Whiskey\bin\*
+
+    Demonstrates how to use wildcards characters in the "DestinationDirectory" property to match multiple directories. In this case, every directory in the "Whiskey\bin" directory will get a copy of the "whiskey.config" file.
