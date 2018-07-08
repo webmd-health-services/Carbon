@@ -1,13 +1,6 @@
 
 function Invoke-WhiskeyNodeTask
 {
-    <#
-    .SYNOPSIS
-    ** OBSOLETE ** Use the `NpmInstall`, `NpmRunScript`, `NodeNspCheck`, and `NodeLicenseChecker` tasks instead.
-    
-    .DESCRIPTION
-    ** OBSOLETE ** Use the `NpmInstall`, `NpmRunScript`, `NodeNspCheck`, and `NodeLicenseChecker` tasks instead.
-    #>
     [Whiskey.Task('Node',SupportsClean=$true,SupportsInitialize=$true)]
     [Whiskey.RequiresTool('Node','NodePath')]
     [Whiskey.RequiresTool('NodeModule::license-checker','LicenseCheckerPath',VersionParameterName='LicenseCheckerVersion')]

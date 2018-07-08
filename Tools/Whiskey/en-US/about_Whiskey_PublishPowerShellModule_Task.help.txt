@@ -1,0 +1,42 @@
+TOPIC
+    about_Whiskey_PublishPowerShellModule_Task
+
+
+SUMMARY
+    Publishes a PowerShell module to a PowerShell repository.
+
+
+DESCRIPTION
+    The `PublishPowerShellModule` task publishes a PowerShell module to a NuGet-based PowerShell repository (e.g. the PowerShell Gallery, ProGet, etc.). It uses the `Publish-Module` function from the `PowerShellGet` module.
+    
+    You must supply the the path to the module's directory with the `Path` property, the URI of the repository with the `RepositoryUri` property, the name of the repository with the `RepositoryName` property, and the ID of the API key to use with the `ApiKeyID`.
+
+    If a repository named `RepositoryName`, doesn't exist, one is registered and its source and publish locations are both set to `RepositoryUri` (using the `PowerShellGet` modules's `Register-PSRepository` function.
+
+    Before publishing, the `ModuleVersion` property in the module manifest is updated to be the version of the current build, minus any prerelease or build metadata.
+
+
+PROPERTIES
+
+    * `Path` (**mandatory**): the path to the module root, i.e. the directory where the module's ".psd1" file is.
+    * `RepositoryName` (**mandatory**): the name of the PowerShell repository. If a repository by this name isn't currently registerd, the task will register it.
+    * `RepositoryUri` (**mandatory**): the URI to which the module should be published.
+    * `ApiKeyID` (**mandatory**): the ID of the API key to use. API keys are added to your build with the `Add-WhiskeyApiKey` function.
+    * `ModuleManifestPath`: the path to the module's manifest (i.e. ".psd1" file). The default is to look for a manifest with the same name as the directory given by the `Path` property.
+
+
+EXAMPLES
+
+    ## Example 1
+
+        Publish:
+        - PublishPowerShellModule:
+            RepositoryName: PSGallery
+            RepositoryUri: https://powershellgallery.com/api/v2/
+            Path: Whiskey
+            ApiKeyID: PowerShellGallery
+
+    This example demonstrates how to publish to the PowerShell Gallery. It is how Whiskey itself gets published. The `PowerShellGallery` is added in Whiskey's build.ps1 build script like this:
+
+        Add-WhiskeyApiKey -Context $context -ID 'PowerShellGallery' -Value $apiKey
+

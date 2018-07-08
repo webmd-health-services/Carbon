@@ -255,24 +255,25 @@ function Install-Service
         $Path = Resolve-Path -Path $Path | Select-Object -ExpandProperty ProviderPath
     }
 
-    if( $ArgumentList )
-    {
-        $binPathArg = Invoke-Command -ScriptBlock {
-                            $Path
-                            $ArgumentList 
-                        } |
-                        ForEach-Object { 
-                            if( $_.Contains(' ') )
-                            {
-                                return '"{0}"' -f $_.Trim('"')
-                            }
-                            return $_
-                        }
-        $binPathArg = $binPathArg -join ' '
-    }
-    else
-    {
-        $binPathArg = $Path
+
+    if( $ArgumentList )	
+    {	
+        $binPathArg = Invoke-Command -ScriptBlock {	
+                            $Path	
+                            $ArgumentList 	
+                        } |	
+                        ForEach-Object { 	
+                            if( $_.Contains(' ') )	
+                            {	
+                                return '"{0}"' -f $_.Trim('"')	
+                            }	
+                            return $_	
+                        }	
+        $binPathArg = $binPathArg -join ' '	
+    }	
+    else	
+    {	
+        $binPathArg = $Path	
     }
 
     $doInstall = $false
@@ -510,6 +511,7 @@ function Install-Service
         $binPathArg = $binPathArg -replace '"','\"'
         if( $PSCmdlet.ShouldProcess( "$Name [$Path]", "$operation service" ) )
         {
+            Write-Verbose "$sc $operation $Name binPath= $binPathArg start= $startArg obj= $($identity.FullName) $passwordArgName $('*' * $passwordArgValue.Length) depend= $dependencyArgValue $displayNameArgName $displayNameArgValue" -Verbose
             & $sc $operation $Name binPath= $binPathArg start= $startArg obj= $identity.FullName $passwordArgName $passwordArgValue depend= $dependencyArgValue $displayNameArgName $displayNameArgValue |
                 Write-Verbose
             $scExitCode = $LastExitCode
@@ -586,4 +588,3 @@ function Install-Service
         }
     }
 }
-

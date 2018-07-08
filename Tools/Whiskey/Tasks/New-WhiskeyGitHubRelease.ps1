@@ -25,7 +25,7 @@ function New-WhiskeyGitHubRelease
 
     $apiKey = Get-WhiskeyApiKey -Context $TaskContext -ID $apiKeyID -PropertyName 'ApiKeyID'
     $headers = @{
-	                Authorization = 'Basic ' + [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($apiKey + ":x-oauth-basic"))
+                    Authorization = 'Basic ' + [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($apiKey + ":x-oauth-basic"))
                 }
     $repositoryName = $TaskParameter['RepositoryName']
     if( -not $repositoryName )
@@ -73,7 +73,7 @@ function New-WhiskeyGitHubRelease
             if( $Parameter )
             {
                 $optionalParams['Body'] = $Parameter | ConvertTo-Json
-    	        Write-WhiskeyVerbose -Context $TaskContext -Message $optionalParams['Body']
+                Write-WhiskeyVerbose -Context $TaskContext -Message $optionalParams['Body']
             }
             $ContentType = 'application/json'
         }
@@ -84,7 +84,7 @@ function New-WhiskeyGitHubRelease
 
         try
         {
-	        Invoke-RestMethod -Uri $Uri -Method $Method -Headers $headers -ContentType $ContentType @optionalParams
+            Invoke-RestMethod -Uri $Uri -Method $Method -Headers $headers -ContentType $ContentType @optionalParams
         }
         catch
         {
@@ -114,9 +114,9 @@ function New-WhiskeyGitHubRelease
         $createOrEditUri = $release.url
     }
 
-	$releaseData = @{
-			            tag_name = $tag
-		            }
+    $releaseData = @{
+                        tag_name = $tag
+                    }
 
     if( $TaskParameter['Commitish'] )
     {
@@ -125,7 +125,7 @@ function New-WhiskeyGitHubRelease
 
     if( $TaskParameter['Name'] )
     {
-	    $releaseData['name'] = $TaskParameter['Name']
+        $releaseData['name'] = $TaskParameter['Name']
     }
 
     if( $TaskParameter['Description'] )
