@@ -240,8 +240,14 @@ namespace Carbon.Security
 							IdentityReference id = rule.SecurityIdentifier;
 							if (id.IsValidTargetType(typeof(NTAccount)))
 							{
-								id = id.Translate(typeof(NTAccount));
-							}
+                                try
+                                {
+                                    id = id.Translate(typeof(NTAccount));
+                                }
+                                catch
+                                {
+                                }
+                            }
 							urlAcl.AddAccessRule(new HttpUrlAccessRule(id, (HttpUrlAccessRights)rule.AccessMask));
 						}
 						urls.Add(urlAcl);

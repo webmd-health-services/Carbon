@@ -45,13 +45,12 @@ Build:
     Path: Carbon\bin\*.pdb
 - PowerShell:
     Path: Start-CarbonTest.ps1
-- Pester3:
+- Pester4:
     OnlyBy: Developer
     Path: 
     - Test\LicenseNotices.Tests.ps1
     - Test\*.ps1xml.Tests.ps1
     - Test\Website.Tests.ps1
-    Version: 3.4.6
 - PowerShell:
     OnlyBy: Developer
     Path: Tools\Blade\blade.ps1
@@ -61,7 +60,7 @@ Build:
         - Test\Test-ImportCarbon.ps1
         - Test\Test-UsesUseCallerPreference.ps1
         - Test\Test-ParentProcessID.ps1
-- Pester3:
+- Pester4:
     OnlyBy: BuildServer
     Path:
     - Test\Install-Certificate.Tests.ps1
