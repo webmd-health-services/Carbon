@@ -25,7 +25,7 @@
     RootModule = 'Carbon.psm1'
 
     # Version number of this module.
-    ModuleVersion = '2.6.0'
+    ModuleVersion = '2.7.0'
 
     # ID used to uniquely identify this module
     GUID = '075d9444-c01b-48c3-889a-0b3490716fa2'
@@ -342,10 +342,7 @@ All functions are idempotent: when run multiple times with the same arguments, y
 
             # ReleaseNotes of this module
             ReleaseNotes = @'
-* `Enable-IisSecurityAuthentication` and `Disable-IisSecurityAuthentication` sometimes hang. We don't know why, but we're working around the problem. These functions no longer always apply a configuration change. Instead, they only enable/disable security authentication if its not already enabled/disabled.
-* `Install-Service` now outputs a verbose message showing the command line arguments used when calling `sc.exe` to install/update a service.
-* Added `ArgumentList` property/parameter to `Carbon_Service` DSC resource. Thanks to [Luigi Grilli](https://github.com/gigi81) for the contribution.
-* Fixed: `Get-HttpUrlAcl` returns no ACLs if any ACLs exist whose identities no longer exist.
+* Uninstall-Service now kills a service's process when that service stops but is actually still running. This should decrease the frequency of needing to reboot a computer when uninstalling a service.
 '@
         } # End of PSData hashtable
     

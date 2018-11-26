@@ -12,20 +12,10 @@
 
 $serviceBaseName = 'CarbonGrantControlServiceTest'
 $serviceName = $serviceBaseName
-$servicePath = Join-Path $TestDir NoOpService.exe
+$servicePath = Join-Path -Path $PSScriptRoot -ChildPath 'Service\NoOpService.exe' -Resolve
+& (Join-Path -Path $PSScriptRoot -ChildPath 'Import-CarbonForTest.ps1' -Resolve)
 
-function Start-TestFixture
-{
-    & (Join-Path -Path $PSScriptRoot -ChildPath '..\Import-CarbonForTest.ps1' -Resolve)
-}
-
-function Start-Test
-{
-    $serviceName = $serviceBaseName + ([Guid]::NewGuid().ToString())
-    Install-Service -Name $serviceName -Path $servicePath
-}
-
-function Stop-Test
+function Uninstall-TestService
 {
     if( (Get-Service $serviceName -ErrorAction SilentlyContinue) )
     {
@@ -34,27 +24,87 @@ function Stop-Test
     }
 }
 
-function Test-ShouldRemoveService
+function GivenServiceStillRunsAfterStop
 {
-    $service = Get-Service -Name $serviceName
-    Assert-NotNull $service
-    $output = Uninstall-Service -Name $serviceName
-    Assert-Null $output
-    $service = Get-Service -Name $serviceName -ErrorAction SilentlyContinue
-    Assert-Null $service
+    Mock -CommandName 'Stop-Service' -ModuleName 'Carbon'
 }
 
-function Test-ShouldNotRemoveNonExistentService
+function Init
 {
-    $error.Clear()
-    Uninstall-Service -Name "IDoNotExist"
-    Assert-Null $error
+    Uninstall-TestService
+    Install-Service -Name $serviceName -Path $servicePath
 }
 
-function Test-ShouldSupportWhatIf
+function ThenServiceUninstalled
 {
-    Uninstall-Service -Name $serviceName -WhatIf
-    $service = Get-Service -Name $serviceName
-    Assert-NotNull $service
+    param(
+        [Parameter(Mandatory)]
+        [string]
+        $Named
+    )
+
+    It ('should uninstall service') {
+        Get-Service $Named -ErrorAction Ignore | Should -BeNullOrEmpty
+    }
 }
 
+function WhenUninstalling
+{
+    param(
+        [Parameter(Mandatory)]
+        [string]
+        $Named,
+
+        $WithTimeout
+    )
+
+    $optionalParams = @{ }
+    if( $WithTimeout )
+    {
+        $optionalParams['StopTimeout'] = $WithTimeout
+    }
+
+    Uninstall-Service -Name $Named @optionalParams
+}
+
+Describe 'Uninstall-Service' {
+    It 'should remove service' {
+        Init
+        $service = Get-Service -Name $serviceName
+        $service | Should Not BeNullOrEmpty
+        $output = Uninstall-Service -Name $serviceName
+        $output | Should BeNullOrEmpty
+        $service = Get-Service -Name $serviceName -ErrorAction SilentlyContinue
+        $service | Should BeNullOrEmpty
+    }
+    
+    It 'should not remove non existent service' {
+        Init
+        $error.Clear()
+        Uninstall-Service -Name "IDoNotExist"
+        $error | Should BeNullOrEmpty
+    }
+    
+    It 'should support what if' {
+        Init
+        Uninstall-Service -Name $serviceName -WhatIf
+        $service = Get-Service -Name $serviceName
+        $service | Should Not BeNullOrEmpty
+    }
+}
+
+Describe 'Uninstall-Service.when service doesn''t stop' {
+    Init
+    GivenServiceStillRunsAfterStop
+    WhenUninstalling $serviceName
+    ThenServiceUninstalled $serviceName
+}
+
+Describe 'Uninstall-Service.when waiting for service to really stop' {
+    Init
+    GivenServiceStillRunsAfterStop
+    WhenUninstalling $serviceName -WithTimeout (New-TimeSpan -Seconds 1)
+    ThenServiceUninstalled $serviceName
+}
+
+Uninstall-TestService

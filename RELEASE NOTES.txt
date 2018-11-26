@@ -1,3 +1,14 @@
+# 2.7.0
+
+* Uninstall-Service now kills a service's process when that service stops but is actually still running. This should decrease the frequency of needing to reboot a computer when uninstalling a service.
+
+# 2.6.0
+
+* `Enable-IisSecurityAuthentication` and `Disable-IisSecurityAuthentication` sometimes hang. We don't know why, but we're working around the problem. These functions no longer always apply a configuration change. Instead, they only enable/disable security authentication if its not already enabled/disabled. 
+* `Install-Service` now outputs a verbose message showing the command line arguments used when calling `sc.exe` to install/update a service. 
+* Added `ArgumentList` property/parameter to `Carbon_Service` DSC resource. Thanks to [Luigi Grilli](https://github.com/gigi81) for the contribution. 
+* Fixed: `Get-HttpUrlAcl` returns no ACLs if any ACLs exist whose identities no longer exist.
+
 # 2.5.1, 2.5.2, 2.5.3, and 2.5.4 (3 June 2018)
 
 *Note*: 2.5.1 through 2.5.4 contain the same code and changes. We created new build and deployment automation that, due to bugs, required us to publish multiple versions.
