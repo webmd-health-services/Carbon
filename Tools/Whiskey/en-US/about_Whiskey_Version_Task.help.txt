@@ -6,7 +6,7 @@ SUMMARY
 
 DESCRIPTION
     The `Version` task sets the version for the current build. Whiskey only supports [semantic versions](http://semver.org).
-    
+
     You can set the version explicitly with the `Version` property. Whiskey can read the version from a .NET Core .csproj file, a PowerShell module manifest, or a Node package.json file. Set the `Path` property to the path to the file to read from. If it is unsupported or doesn't contain a version, the build will fail.
 
     You can set custom prerelease metadata with the `Prerelease` property and custom build metadata with the `Build` property. These properties ovewrite any existing prereleaes version of build metadata from the `Version` property or the version read from a file. Prerelease metadata must only consist of letters, numbers, periods, or hyphens. Build metadata has the same restriction, but Whiskey replaces all non letters, numbers, and periods with hyphens (since build metadata typically comes from systems that don't have these restrictions).
@@ -64,12 +64,20 @@ DESCRIPTION
             <!-- ...snip... -->
         </Project>
 
+    ### Chef Cookbook metadata.rb
+
+    Whiskey looks for a "version '0.0.0'" at the beginning of a line in the metadata.rb file, e.g.
+
+        name 'cookbook_name'
+        description 'Installs/Configures cookbook_name'
+        version '0.1.0'
+        chef_version '>= 12.14' if respond_to?(:chef_version)
 
 PROPERTIES
 
     * `Version`: The version for the current build.
     * `Path`: The path to a file from which Whiskey will read the current version. Whiskey supports .NET Core .csproj files, PowerShell module manifests, or Node package.json files.
-    * `Prerelease`: Any custom pre-release metadata to add to the version. This will overwrite any existing prerelease metadata. You usually only use this property when reading a version from a file with the `Path` property since some platforms don't natively support prerelease metadata. 
+    * `Prerelease`: Any custom pre-release metadata to add to the version. This will overwrite any existing prerelease metadata. You usually only use this property when reading a version from a file with the `Path` property since some platforms don't natively support prerelease metadata.
     * `Build`: Any custom build metadata to add to the version. This will overwrite any existing build metadata. You usually only use this property when reading a version from a file with the `Path` property since some platforms don't natively support prerelease metadata.
 
 
@@ -86,15 +94,15 @@ EXAMPLES
     ## Example 2
 
         Build:
-        - Version: 
+        - Version:
             Version: 5.6.3
             OnlyBy: BuildServer
 
     Demonstrates the standard syntax to set the version for the current build. Do this if you want to use other properties.
-    
+
 
     ## Example 3
-    
+
         Build:
         - Version: $(WHISKEY_BUILD_STARTED_AT.ToString('yyyy.M.d'))+$(WHISKEY_BUILD_NUMBER).$(WHISKEY_SCM_BRANCH).$(WHISKEY_SCM_COMMIT_ID.Substring(0,7))
 
@@ -102,7 +110,7 @@ EXAMPLES
 
     This is a useful strategy for versioning applications that don't expose an API so don't technically need to be semantically versioned.
 
- 
+
     ## Example 4
 
         Build:
@@ -111,15 +119,15 @@ EXAMPLES
             Prerelease: alpha.$(WHISKEY_BUILD_NUMBER)
             Build: $(WHISKEY_SCM_BRANCH).$(WHISKEY_SCM_COMMIT_ID.Substring(0,7))
 
-    Demonstrates how to read the version from a file, in this case a PowerShell module manifest. Since PowerShell doesn't support semantic versions, it uses the `Prerelease` and `Build` properties to add that metadata to the version. This metadata may or may not be used by other tasks in your build. 
+    Demonstrates how to read the version from a file, in this case a PowerShell module manifest. Since PowerShell doesn't support semantic versions, it uses the `Prerelease` and `Build` properties to add that metadata to the version. This metadata may or may not be used by other tasks in your build.
 
- 
+
     ## Example 5
 
         Build:
         - Version:
             Path: Assembly\Whiskey.csproj
-            Prerelease: 
+            Prerelease:
             - feature/*: alpha.$(WHISKEY_BUILD_NUMBER)
             - bugfix/*: beta.$(WHISKEY_BUILD_NUMBER)
             - develop: beta.$(WHISKEY_BUILD_NUMBER)
@@ -130,9 +138,9 @@ EXAMPLES
 
     In this example, if the current build number is 43, all builds on branches that match the wildcard pattern "feature/*" would have prerelease be "alpha.43", branches that matched pattern "bugfix/*" would have prerelease "beta.43", etc.
 
- 
+
     ## Example 6
-        
+
         Build:
         - Version:
             Version: 4.5.6

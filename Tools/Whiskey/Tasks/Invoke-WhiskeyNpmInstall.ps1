@@ -17,6 +17,8 @@ function Invoke-WhiskeyNpmInstall
     Set-StrictMode -Version 'Latest'
     Use-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState
 
+    Write-Warning -Message ('The "NpmInstall" task is obsolete. It will be removed in a future version of Whiskey. Please use the "Npm" task instead.')
+
     $workingDirectory = (Get-Location).ProviderPath
 
     if( -not $TaskParameter['Package'] )

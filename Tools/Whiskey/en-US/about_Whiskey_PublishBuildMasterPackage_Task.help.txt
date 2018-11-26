@@ -13,6 +13,8 @@ DESCRIPTION
 
     Set the `DeployTo` property to map an SCM branch to its corresponding BuildMaster release where packages should be created and deployed. `BranchName` and `ReleaseName` are required. The task will fail if the current branch is not mapped to an existing release. `StartAtStage` and `SkipDeploy` are optional. By default, a deployment will start at the first stage of a release pipeline and will not be skipped.
 
+    This task downloads and uses the [BuildMasterAutomation PowerShell module](https://www.powershellgallery.com/packages/BuildMasterAutomation).
+
 
 PROPERTIES
 
@@ -24,6 +26,7 @@ PROPERTIES
     * `PackageName`: the name of the package that will be created in BuildMaster. By default, the package will be named "MajorVersion.MinorVersion.PatchVersion"
     * `StartAtStage`: the stage of the release pipeline where the package should start its deployment. By default, the package will be released to the first stage of the pipeline.
     * `SkipDeploy`: the release package should be created, but not automatically deployed. By default, the package deployment will be started.
+    * `BuildMasterAutomationVersion`: the version of the BuildMasterAutomation PowerShell module to use. The default is the latest 0.5.* version. Be careful about changing the version. The task may not support newer/olders versions.
     
 
 EXAMPLES

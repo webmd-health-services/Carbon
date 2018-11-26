@@ -11,7 +11,7 @@ function Get-WhiskeyPowerShellModule
 
     ## Property
 
-    * `Name` (mandatory): the name of the module to download.
+    * `Name` (mandatory): a list of module names you want installed.
     * `Version`: the version number to download. The default behavior is to download the latest version. Wildcards allowed, e.g. use `2.*` to pin to major version `2`.
 
     .EXAMPLE
@@ -34,7 +34,6 @@ function Get-WhiskeyPowerShellModule
     This example demonstrates how to pin to a specific version of a module. In this case, the latest `0.14.x` version will be downloaded. When version 0.15.0 comes out, you'll still download the latest `0.14.x` version.
 
     #>
-    
     [CmdletBinding()]
     [Whiskey.Task("GetPowerShellModule",SupportsClean=$true, SupportsInitialize=$true)]
     param(
@@ -52,26 +51,22 @@ function Get-WhiskeyPowerShellModule
 
     if( -not $TaskParameter['Name'] )
     {
-        Stop-WhiskeyTask -TaskContext $TaskContext -Message "Please Add a Name Property for which PowerShell Module you would like to get."
-    }
-    $TaskParameter['Path'] = $TaskContext.BuildRoot
-
-    if( -not $TaskParameter['Version'])
-    {
-        try
-        {
-            $TaskParameter['Version'] = Resolve-WhiskeyPowerShellModule -Name $TaskParameter['Name'] | Select-Object -ExpandProperty 'Version'
-        }
-        catch
-        {
-            Write-Error 'Cannot Find Version from PowerShell Module ''{0}''.' -f $TaskParameter['Name']
-        }
+        Stop-WhiskeyTask -TaskContext $TaskContext -Message 'Property "Name" is mandatory. It should be set to the name of the PowerShell module you want installed.'
     }
 
     if( $TaskContext.ShouldClean )
     {
-        Uninstall-WhiskeyTool -ModuleName $TaskParameter['Name'] -BuildRoot $TaskContext.BuildRoot
+        Uninstall-WhiskeyPowerShellModule -Name $TaskParameter['Name']
         return
     }
-    return Install-WhiskeyTool -ModuleName $TaskParameter['Name'] -Version $TaskParameter['Version'] -DownloadRoot $TaskContext.BuildRoot
+
+    $module = Resolve-WhiskeyPowerShellModule -Name $TaskParameter['Name'] -Version $TaskParameter['Version'] -ErrorAction Stop
+    if( -not $module )
+    {
+        return
+    }
+
+    Write-WhiskeyInfo -Context $TaskContext -Message ('Installing PowerShell module {0} {1}.' -f $TaskParameter['Name'],$module.Version)
+    $moduleRoot = Install-WhiskeyPowerShellModule -Name $TaskParameter['Name'] -Version $module.Version -ErrorAction Stop
+    Write-WhiskeyVerbose -Context $TaskContext -Message ('  {0}' -f $moduleRoot)
 }

@@ -13,10 +13,7 @@ LONG DESCRIPTION
 
     * `CopyFile`: copies files.
     * `Delete`: deletes files.
-    * `DotNetBuild`: runs the `dotnet build` command.
-    * `DotNetPack`: runs the `dotnet pack` command.
-    * `DotNetPublish`: runs the `dotnet publish` command.
-    * `DotNetTest`: runs the `dotnet test` command.
+    * `DotNet`: runs `dotnet` commands.
     * `Exec`: runs an executable/program.
     * `GetPowerShellModule`: installs a PowerShell module.
     * `GitHubRelease`: creates a release in GitHub and uploads files for that
@@ -25,11 +22,7 @@ LONG DESCRIPTION
     * `MSBuild`: runs MSBuild, the Microsoft build engine.
     * `NodeLicenseChecker`: runs license checker, a Node module/command that
       scans and reports on Node module license metadata.
-    * `NodeNspCheck`: runs NSP, a vulnerability scanner for Node projects.
-    * `NpmConfig`: runs the Node `npm config` command.
-    * `NpmInstall`: runs the Node `npm install` command.
-    * `NpmPrune`: runs the Node `npm prune` command.
-    * `NpmRunScript`: runs the Node `npm run-script` command.
+    * `Npm`: runs NPM commands.
     * `NuGetPack`: runs the `nuget.exe pack` command.
     * `NuGetPush`: runs the `nuget.exe push` command.
     * `NuGetRestore`: runs the `nuget.exe restore` command.

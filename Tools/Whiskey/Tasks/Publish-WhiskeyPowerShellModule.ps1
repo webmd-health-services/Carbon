@@ -74,31 +74,14 @@ function Publish-WhiskeyPowerShellModule
     $manifest = $manifest -replace "ModuleVersion\s*=\s*('|"")[^'""]*('|"")", $versionString 
     $manifest | Set-Content $manifestPath
 
-    $whiskeyRoot = Join-Path -Path $PSScriptRoot -ChildPath '..' -Resolve
-    Start-Job -ScriptBlock {
-                param(
-                    $RepositoryName,
-                    $PublishLocation,
-                    $ApiKey,
-                    $WhiskeyRoot,
-                    $Path
-                )
+    Import-WhiskeyPowerShellModule -Name 'PackageManagement','PowerShellGet'
 
-                Import-Module -Name (Join-Path -Path $whiskeyRoot -ChildPath 'Whiskey.psd1')
-                Import-Module -Name (Join-Path -Path $whiskeyRoot -ChildPath 'PackageManagement' -Resolve)
-                Import-Module -Name (Join-Path -Path $whiskeyRoot -ChildPath 'PowerShellGet' -Resolve)
+    Get-PackageProvider -Name 'NuGet' -ForceBootstrap | Out-Null
 
-                if( -not (Get-PSRepository -Name $repositoryName -ErrorAction Ignore) )
-                {
-                    Register-PSRepository -Name $repositoryName -SourceLocation $publishLocation -PublishLocation $publishLocation -InstallationPolicy Trusted -PackageManagementProvider NuGet  -Verbose
-                }
+    if( -not (Get-PSRepository -Name $repositoryName -ErrorAction Ignore) )
+    {
+        Register-PSRepository -Name $repositoryName -SourceLocation $publishLocation -PublishLocation $publishLocation -InstallationPolicy Trusted -PackageManagementProvider NuGet
+    }
   
-                # Publish-Module needs nuget.exe. If it isn't in the PATH, it tries to install it, which doesn't work when running non-interactively.
-                $binPath = Join-Path -Path $whiskeyRoot -ChildPath 'bin' -Resolve
-                Set-Item -Path 'env:PATH' -Value ('{0};{1}' -f $binPath,$env:PATH)
-                Publish-Module -Path $path -Repository $repositoryName -Verbose -NuGetApiKey $apiKey
-
-            } -ArgumentList $repositoryName,$publishLocation,$apiKey,$whiskeyRoot,$path |
-        Wait-Job | 
-        Receive-Job
+    Publish-Module -Path $path -Repository $repositoryName -NuGetApiKey $apiKey
 }

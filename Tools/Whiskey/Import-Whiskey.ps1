@@ -7,4 +7,3 @@ if( (Get-Module -Name 'Whiskey') )
 }
 
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'Whiskey.psd1' -Resolve)
-

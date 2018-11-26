@@ -1,5 +1,5 @@
 
- function Set-WhiskeyVersion 
+ function Set-WhiskeyVersion
 {
     [CmdletBinding()]
     [Whiskey.Task("Version")]
@@ -119,6 +119,30 @@
             Write-WhiskeyVerbose -Context $TaskContext -Message ('Read version ''{0}'' from .NET Core .csproj ''{1}''.' -f $rawVersion,$path)
             $semver = $rawVersion | ConvertTo-SemVer -VersionSource ('from .NET .csproj file ''{0}''' -f $path)
         }
+        elseif( $fileInfo.Name -eq 'metadata.rb' )
+        {
+            $metadataContent = Get-Content -Path $path -Raw
+            $metadataContent = $metadataContent.Split([Environment]::NewLine) | Where-Object { $_ -ne '' }
+
+            $rawVersion = $null
+            foreach( $line in $metadataContent )
+            {
+                if( $line -match '^\s*version\s+[''"](\d+\.\d+\.\d+)[''"]' )
+                {
+                    $rawVersion = $Matches[1]
+                    break
+                }
+            }
+
+            if( -not $rawVersion )
+            {
+                Stop-WhiskeyTask -TaskContext $TaskContext -Message ('Unable to locate property "version ''x.x.x''" in metadata.rb file "{0}"' -f $path )
+                return
+            }
+
+            Write-WhiskeyVerbose -Context $TaskContext -Message ('Read version "{0}" from metadata.rb file "{1}".' -f $rawVersion,$path)
+            $semver = $rawVersion | ConvertTo-SemVer -VersionSource ('from metadata.rb file "{0}"' -f $path)
+        }
     }
 
     $prerelease = $TaskParameter['Prerelease']
@@ -132,13 +156,13 @@
                 if( -not ($map | Get-Member -Name 'Keys') )
                 {
                     Stop-WhiskeyTask -TaskContext $TaskContext -PropertyName 'Prerelease' -Message ('Unable to find keys in ''[{1}]{0}''. It looks like you''re trying use the Prerelease property to map branches to prerelease versions. If you want a static prerelease version, the syntax should be:
-    
+
     Build:
     - Version:
         Prerelease: {0}
-        
+
 If you want certain branches to always have certain prerelease versions, set Prerelease to a list of key/value pairs:
-    
+
     Build:
     - Version:
         Prerelease:
@@ -192,7 +216,7 @@ If you want certain branches to always have certain prerelease versions, set Pre
         {
             $prereleaseSuffix = '-{0}' -f $semver.Prerelease
         }
-        
+
         $build = $build -replace '[^A-Za-z0-9\.-]','-'
         $rawVersion = '{0}.{1}.{2}{3}+{4}' -f $semver.Major,$semver.Minor,$semver.Patch,$prereleaseSuffix,$build
         if( -not [SemVersion.SemanticVersion]::TryParse($rawVersion,[ref]$semver) )

@@ -7,12 +7,12 @@ function Invoke-WhiskeyNUnit3Task
         [Parameter(Mandatory=$true)]
         [Whiskey.Context]
         $TaskContext,
-    
+
         [Parameter(Mandatory=$true)]
         [hashtable]
         $TaskParameter
     )
-    
+
     Set-StrictMode -Version 'Latest'
     Use-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState
 
@@ -54,19 +54,19 @@ function Invoke-WhiskeyNUnit3Task
     $nunitPath = Install-WhiskeyTool -NuGetPackageName $nunitPackage -Version $nunitVersion -DownloadRoot $TaskContext.BuildRoot
     if (-not $nunitPath)
     {
-        Stop-WhiskeyTask -TaskContext $TaskContext -Message ('Package ''{0}'' failed to install.' -f $nunitPackage)
+        Stop-WhiskeyTask -TaskContext $TaskContext -Message ('Package "{0}" failed to install.' -f $nunitPackage)
     }
 
     $openCoverPath = Install-WhiskeyTool -NuGetPackageName 'OpenCover' -DownloadRoot $TaskContext.BuildRoot @openCoverVersionParam
     if (-not $openCoverPath)
     {
-        Stop-WhiskeyTask -TaskContext $TaskContext -Message 'Package ''OpenCover'' failed to install.'
+        Stop-WhiskeyTask -TaskContext $TaskContext -Message 'Package "OpenCover" failed to install.'
     }
 
     $reportGeneratorPath = Install-WhiskeyTool -NuGetPackageName 'ReportGenerator' -DownloadRoot $TaskContext.BuildRoot @reportGeneratorVersionParam
     if (-not $reportGeneratorPath)
     {
-        Stop-WhiskeyTask -TaskContext $TaskContext -Message 'Package ''ReportGenerator'' failed to install.'
+        Stop-WhiskeyTask -TaskContext $TaskContext -Message 'Package "ReportGenerator" failed to install.'
     }
 
     if( $TaskContext.ShouldInitialize )
@@ -79,7 +79,7 @@ function Invoke-WhiskeyNUnit3Task
     {
         $openCoverArgument = $TaskParameter['OpenCoverArgument']
     }
-    
+
     $reportGeneratorArgument = @()
     if ($TaskParameter['ReportGeneratorArgument'])
     {
@@ -116,16 +116,33 @@ function Invoke-WhiskeyNUnit3Task
         $coverageFilter = $TaskParameter['CoverageFilter'] -join ' '
     }
 
-    $nunitConsolePath = Join-Path -Path $nunitPath -ChildPath 'tools\nunit3-console.exe'
-    $openCoverConsolePath = Join-Path $openCoverPath -ChildPath 'tools\OpenCover.Console.exe'
-    $reportGeneratorConsolePath = Join-Path -Path $reportGeneratorPath -ChildPath 'tools\ReportGenerator.exe'
+    $nunitConsolePath = Get-ChildItem -Path $nunitPath -Filter 'nunit3-console.exe' -Recurse |
+                            Select-Object -First 1 |
+                            Select-Object -ExpandProperty 'FullName'
 
-    foreach ($consolePath in @($nunitConsolePath, $openCoverConsolePath, $reportGeneratorConsolePath))
+    if( -not $nunitConsolePath )
     {
-        if (-not(Test-Path -Path $consolePath -PathType Leaf))
-        {
-            Stop-WhiskeyTask -TaskContext $TaskContext -Message ('Package ''{0}'' was installed, but could not locate ''{1}'' at {2}''.'-f ($consolePath | Split-Path | Split-Path -Leaf), ($consolePath | Split-Path -Leaf), $consolePath)
-        }
+        Stop-WhiskeyTask -TaskContext $TaskContext -Message ('Unable to find "nunit3-console.exe" in NUnit3 NuGet package at "{0}".' -f $nunitPath)
+    }
+
+
+    $openCoverConsolePath = Get-ChildItem -Path $openCoverPath -Filter 'OpenCover.Console.exe' -Recurse |
+                                Select-Object -First 1 |
+                                Select-Object -ExpandProperty 'FullName'
+
+    if( -not $openCoverConsolePath )
+    {
+        Stop-WhiskeyTask -TaskContext $TaskContext -Message ('Unable to find "OpenCover.Console.exe" in OpenCover NuGet package at "{0}".' -f $openCoverPath)
+    }
+
+
+    $reportGeneratorConsolePath = Get-ChildItem -Path $reportGeneratorPath -Filter 'ReportGenerator.exe' -Recurse |
+                                      Select-Object -First 1 |
+                                      Select-Object -ExpandProperty 'FullName'
+
+    if( -not $reportGeneratorConsolePath )
+    {
+        Stop-WhiskeyTask -TaskContext $TaskContext -Message ('Unable to find "ReportGenerator.exe" in ReportGenerator NuGet package at "{0}".' -f $reportGeneratorPath)
     }
 
     if (-not $TaskParameter['Path'])
@@ -152,7 +169,7 @@ function Invoke-WhiskeyNUnit3Task
     $coverageReportDir = Join-Path -Path $TaskContext.outputDirectory -ChildPath "opencover"
     New-Item -Path $coverageReportDir -ItemType 'Directory' -Force | Out-Null
     $openCoverReport = Join-Path -Path $coverageReportDir -ChildPath 'openCover.xml'
-    
+
     $separator = '{0}VERBOSE:                       ' -f [Environment]::NewLine
     Write-WhiskeyVerbose -Context $TaskContext -Message ('  Path                {0}' -f ($Path -join $separator))
     Write-WhiskeyVerbose -Context $TaskContext -Message ('  Framework           {0}' -f $framework)
@@ -164,7 +181,7 @@ function Invoke-WhiskeyNUnit3Task
     Write-WhiskeyVerbose -Context $TaskContext -Message ('  DisableCodeCoverage {0}' -f $disableCodeCoverage)
     Write-WhiskeyVerbose -Context $TaskContext -Message ('  OpenCoverArgs       {0}' -f ($openCoverArgument -join ' '))
     Write-WhiskeyVerbose -Context $TaskContext -Message ('  ReportGeneratorArgs {0}' -f ($reportGeneratorArgument -join ' '))
-    
+
     $nunitExitCode = 0
     $reportGeneratorExitCode = 0
     $openCoverExitCode = 0
@@ -209,7 +226,7 @@ function Invoke-WhiskeyNUnit3Task
         & $reportGeneratorConsolePath "-reports:$openCoverReport" "-targetdir:$coverageReportDir" $reportGeneratorArgument
         $reportGeneratorExitCode = $LASTEXITCODE
     }
-    else 
+    else
     {
         & $nunitConsolePath $path $frameworkParam $testFilterParam $nunitReportParam $nunitExtraArgument
         $nunitExitCode = $LASTEXITCODE

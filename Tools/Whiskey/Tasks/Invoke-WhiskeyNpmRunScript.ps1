@@ -17,6 +17,8 @@ function Invoke-WhiskeyNpmRunScript
     Set-StrictMode -Version 'Latest'
     Use-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState
 
+    Write-Warning -Message ('The "NpmRunScript" task is obsolete. It will be removed in a future version of Whiskey. Please use the "Npm" task instead.')
+
     $npmScripts = $TaskParameter['Script']
     if (-not $npmScripts)
     {

@@ -23,27 +23,32 @@ Build:
 - NUnit2:
     Path: Source\Test\bin\$(WHISKEY_MSBUILD_CONFIGURATION)\Carbon.Test.dll
 - Exec:
+    OnlyDuring: Build
     Path: robocopy
     Argument:
         - Source\bin\$(WHISKEY_MSBUILD_CONFIGURATION)
         - Carbon\bin
     SuccessExitCode: <8
 - Exec:
+    OnlyDuring: Build
     Path: robocopy
     Argument:
         - Source\Iis\bin\$(WHISKEY_MSBUILD_CONFIGURATION)
         - Carbon\bin
     SuccessExitCode: <8
 - Exec:
+    OnlyDuring: Build
     Path: robocopy
     Argument:
         - Source\Xdt\bin\$(WHISKEY_MSBUILD_CONFIGURATION)
         - Carbon\bin
     SuccessExitCode: <8
 - Delete:
+    OnlyDuring: Build
     OnlyBy: BuildServer
     Path: Carbon\bin\*.pdb
 - PowerShell:
+    OnlyDuring: Build
     Path: Start-CarbonTest.ps1
 - Pester4:
     OnlyBy: Developer
@@ -52,6 +57,7 @@ Build:
     - Test\*.ps1xml.Tests.ps1
     - Test\Website.Tests.ps1
 - PowerShell:
+    OnlyDuring: Build
     OnlyBy: Developer
     Path: Tools\Blade\blade.ps1
     Argument:
@@ -81,11 +87,13 @@ Build:
     DescribeDurationReportCount: 20
 #    - Tasks:
 - PowerShell:
+    OnlyDuring: Build
     Path: Invoke-CarbonBladeTest.ps1
     Argument:
         Recurse: true
         Path: Test
 - PowerShell:
+    OnlyDuring: Build
     OnlyBy: Developer
     Path: Complete-CarbonTest.ps1
 - CopyFile:

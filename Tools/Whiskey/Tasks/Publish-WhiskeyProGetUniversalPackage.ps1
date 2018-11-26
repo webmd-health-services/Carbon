@@ -3,6 +3,7 @@ function Publish-WhiskeyProGetUniversalPackage
 {
     [CmdletBinding()]
     [Whiskey.Task("PublishProGetUniversalPackage")]
+    [Whiskey.RequiresTool('PowerShellModule::ProGetAutomation','ProGetAutomationPath',Version='0.4.*',VersionParameterName='ProGetAutomationVersion')]
     param(
         [Parameter(Mandatory=$true)]
         [Whiskey.Context]
@@ -15,6 +16,8 @@ function Publish-WhiskeyProGetUniversalPackage
 
     Set-StrictMode -Version 'Latest'
     Use-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState
+
+    Import-WhiskeyPowerShellModule -Name 'ProGetAutomation'
 
     $exampleTask = 'Publish:
         - PublishProGetUniversalPackage:
@@ -68,7 +71,25 @@ function Publish-WhiskeyProGetUniversalPackage
     {
         $errorActionParam['ErrorAction'] = 'Ignore'
     }
-    $packages = $TaskParameter['Path'] | Resolve-WhiskeyTaskPath -TaskContext $TaskContext -PropertyName 'Path' @errorActionParam
+    $packages = $TaskParameter['Path'] | 
+                    Resolve-WhiskeyTaskPath -TaskContext $TaskContext -PropertyName 'Path' @errorActionParam |
+                    Where-Object {
+                        if( -not $TaskParameter.ContainsKey('Exclude') )
+                        {
+                            return $true
+                        }
+
+                        foreach( $exclusion in $TaskParameter['Exclude'] )
+                        {
+                            if( $_ -like $exclusion )
+                            {
+                                return $false
+                            }
+                        }
+
+                        return $true
+                    }
+
 
     if( $allowMissingPackages -and -not $packages )
     {
