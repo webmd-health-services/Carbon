@@ -567,3 +567,13 @@ Describe 'Grant-Permission.when setting Deny rule on registry' {
     $path = New-TestContainer -Registry
     Invoke-GrantPermissions -Identity $user -Permissions 'Write' -Path $path -Type 'Deny' -ExpectedRuleType 'Registry'
 }
+
+Describe 'Grant-Permission.when granting multiple different rules to a user on the file system' {
+    $dirPath = New-TestContainer -FileSystem
+    Grant-CPermission -Path $dirPath -Identity $user -Permission 'Read' -ApplyTo ContainerAndSubContainersAndLeaves -Append
+    Grant-CPermission -Path $dirPath -Identity $user -Permission 'Write' -ApplyTo ContainerAndLeaves -Append
+    $perm = Get-CPermission -Path $dirPath -Identity $user
+    It ('should grant multiple permissions') {
+        $perm | Should -HaveCount 2
+    }
+}

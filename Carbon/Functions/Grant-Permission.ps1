@@ -31,6 +31,8 @@ function Grant-CPermission
 
     By default, permissions allowing access are granted. Beginning in Carbon 2.3.0, you can grant permissions denying access by passing `Deny` as the value of the `Type` parameter.
 
+    Beginning in Carbon 2.7, you can append/add rules instead or replacing existing rules on files, directories, or registry items with the `Append` switch. 
+
     ## Directories and Registry Keys
 
     When setting permissions on a container (directory/registry key) you can control inheritance and propagation flags using the `ApplyTo` parameter. This parameter is designed to hide the complexities of the Windows' inheritance and propagation flags. There are 13 possible combinations.
@@ -156,6 +158,12 @@ function Grant-CPermission
     Grant-CPermission -Identity BORG\Locutus -Permission FullControl -Path 'C:\EngineRoom' -Type Deny
 
     Demonstrates how to grant deny permissions on an objecy with the `Type` parameter.
+
+    .EXAMPLE
+    Grant-CPermission -Path C:\Bridge -Identity ENTERPRISE\Wesley -Permission 'Read' -ApplyTo ContainerAndSubContainersAndLeaves -Append
+    Grant-CPermission -Path C:\Bridge -Identity ENTERPRISE\Wesley -Permission 'Write' -ApplyTo ContainerAndLeaves -Append
+
+    Demonstrates how to grant multiple access rules to a single identity with the `Append` switch. In this case, `ENTERPRISE\Wesley` will be able to read everything in `C:\Bridge` and write only in the `C:\Bridge` directory, not to any sub-directory.
     #>
     [CmdletBinding(SupportsShouldProcess=$true)]
     [OutputType([Security.AccessControl.AccessRule])]
@@ -198,11 +206,16 @@ function Grant-CPermission
 
         [Switch]
         # Grants permissions, even if they are already present.
-        $Force
+        $Force,
+
+        [Switch]
+        # When granting permissions on files, directories, or registry items, add the permissions as a new access rule instead of replacing any existing access rules. This switch is ignored when setting permissions on certificates.
+        #
+        # This switch was added in Carbon 2.7.
+        $Append
     )
 
     Set-StrictMode -Version 'Latest'
-
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
     
     $Path = Resolve-Path -Path $Path
@@ -355,7 +368,14 @@ function Grant-CPermission
         $setAccessRule = ($Force -or $missingPermission)
         if( $setAccessRule )
         {
-            $currentAcl.SetAccessRule( $accessRule )
+            if( $Append )
+            {
+                $currentAcl.AddAccessRule( $accessRule )
+            }
+            else
+            {
+                $currentAcl.SetAccessRule( $accessRule )
+            }
         }
 
         if( $rulesToRemove -or $setAccessRule )
@@ -365,7 +385,14 @@ function Grant-CPermission
             {
                 $currentPerm = $currentPerm."$($providerName)Rights"
             }
-            Write-Verbose -Message ('[{0}] [{1}]  {2} -> {3}' -f $Path,$accessRule.IdentityReference,$currentPerm,$accessRule."$($providerName)Rights")
+            if( $Append )
+            {
+                Write-Verbose -Message ('[{0}] [{1}]  + {2}' -f $Path,$accessRule.IdentityReference,$accessRule."$($providerName)Rights")
+            }
+            else
+            {
+                Write-Verbose -Message ('[{0}] [{1}]  {2} -> {3}' -f $Path,$accessRule.IdentityReference,$currentPerm,$accessRule."$($providerName)Rights")
+            }
             Set-Acl -Path $Path -AclObject $currentAcl
         }
 
