@@ -10,38 +10,38 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Enable-AclInheritance
+function Enable-CAclInheritance
 {
     <#
     .SYNOPSIS
     Enables ACL inheritance on an item.
     
     .DESCRIPTION
-    Items in the registry or file system will usually inherit ACLs from its parent. This inheritance can be disabled, either via Carbon's `Protect-Acl` function or using .NET's securei API. The `Enable-AclInheritance` function re-enables inheritance on containers where it has been disabled. By default, any explicit permissions on the item are removed. Use the `-Preserve` switch to keep any existing, explicit permissions on the item.
+    Items in the registry or file system will usually inherit ACLs from its parent. This inheritance can be disabled, either via Carbon's `Protect-Acl` function or using .NET's securei API. The `Enable-CAclInheritance` function re-enables inheritance on containers where it has been disabled. By default, any explicit permissions on the item are removed. Use the `-Preserve` switch to keep any existing, explicit permissions on the item.
     
-    This function is paired with `Disable-AclInheritance`. 
+    This function is paired with `Disable-CAclInheritance`. 
 
     This function was added in Carbon 2.4.
 
     .LINK
-    Disable-AclInheritance
+    Disable-CAclInheritance
     
     .LINK
-    Get-Permission
+    Get-CPermission
 
     .LINK
-    Grant-Permission
+    Grant-CPermission
 
     .LINK
-    Revoke-Permission
+    Revoke-CPermission
 
     .EXAMPLE
-    Enable-AclInheritance -Path C:\Projects\Carbon
+    Enable-CAclInheritance -Path C:\Projects\Carbon
     
     Re-enables ACL inheritance on `C:\Projects\Carbon`. ACLs on `C:\Projects` will be inherited to and affect `C:\Projects\Carbon`. Any explicit ACLs on `C:\Projects\Carbon` are removed.
     
     .EXAMPLE
-    Enable-AclInheritance -Path hklm:\Software\Carbon -Preserve
+    Enable-CAclInheritance -Path hklm:\Software\Carbon -Preserve
     
     Re-enables ACL inheritance on `hklm:\Software\Carbon`. ACLs on `hklm:\Software` will be inherited to and affect `hklm:\Software\Carbon`. Any explicit ACLs on `C:\Projects\Carbon` are kept.
     #>
@@ -70,7 +70,7 @@ function Enable-AclInheritance
 
         if( -not $Preserve )
         {
-            Get-Permission -Path $Path | ForEach-Object { Revoke-Permission -Path $Path -Identity $_.IdentityReference }
+            Get-CPermission -Path $Path | ForEach-Object { Revoke-CPermission -Path $Path -Identity $_.IdentityReference }
         }
     }
 }

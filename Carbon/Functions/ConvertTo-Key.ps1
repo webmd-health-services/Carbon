@@ -24,7 +24,7 @@ function ConvertTo-Key
     {
         if( $InputObject -is [SecureString] )
         {
-            $InputObject = Convert-SecureStringToString -SecureString $InputObject
+            $InputObject = Convert-CSecureStringToString -SecureString $InputObject
         }
         elseif( $InputObject -isnot [string] )
         {

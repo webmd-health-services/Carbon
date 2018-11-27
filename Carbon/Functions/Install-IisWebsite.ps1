@@ -10,16 +10,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Install-IisWebsite
+function Install-CIisWebsite
 {
     <# 
     .SYNOPSIS
     Installs a website.
 
     .DESCRIPTION
-    `Install-IisWebsite` installs an IIS website. Anonymous authentication is enabled, and the anonymous user is set to the website's application pool identity. Before Carbon 2.0, if a website already existed, it was deleted and re-created. Beginning with Carbon 2.0, existing websites are modified in place. 
+    `Install-CIisWebsite` installs an IIS website. Anonymous authentication is enabled, and the anonymous user is set to the website's application pool identity. Before Carbon 2.0, if a website already existed, it was deleted and re-created. Beginning with Carbon 2.0, existing websites are modified in place. 
     
-    If you don't set the website's app pool, IIS will pick one for you (usually `DefaultAppPool`), and `Install-IisWebsite` will never manage the app pool for you (i.e. if someone changes it manually, this function won't set it back to the default). We recommend always supplying an app pool name, even if it is `DefaultAppPool`.
+    If you don't set the website's app pool, IIS will pick one for you (usually `DefaultAppPool`), and `Install-CIisWebsite` will never manage the app pool for you (i.e. if someone changes it manually, this function won't set it back to the default). We recommend always supplying an app pool name, even if it is `DefaultAppPool`.
 
     By default, the site listens on (i.e. is bound to) all IP addresses on port 80 (binding `http/*:80:`). Set custom bindings with the `Bindings` argument. Multiple bindings are allowed. Each binding must be in this format (in BNF):
 
@@ -38,28 +38,28 @@ function Install-IisWebsite
 
      ## Troubleshooting
 
-     In some situations, when you add a website to an application pool that another website/application is part of, the new website will fail to load in a browser with a 500 error saying `Failed to map the path '/'.`. We've been unable to track down the root cause. The solution is to recycle the app pool, e.g. `(Get-IisAppPool -Name 'AppPoolName').Recycle()`.
+     In some situations, when you add a website to an application pool that another website/application is part of, the new website will fail to load in a browser with a 500 error saying `Failed to map the path '/'.`. We've been unable to track down the root cause. The solution is to recycle the app pool, e.g. `(Get-CIisAppPool -Name 'AppPoolName').Recycle()`.
 
     Beginning with Carbon 2.0.1, this function is available only if IIS is installed.
 
     .LINK
-    Get-IisWebsite
+    Get-CIisWebsite
     
     .LINK
-    Uninstall-IisWebsite
+    Uninstall-CIisWebsite
 
     .EXAMPLE
-    Install-IisWebsite -Name 'Peanuts' -PhysicalPath C:\Peanuts.com
+    Install-CIisWebsite -Name 'Peanuts' -PhysicalPath C:\Peanuts.com
 
     Creates a website named `Peanuts` serving files out of the `C:\Peanuts.com` directory.  The website listens on all the computer's IP addresses on port 80.
 
     .EXAMPLE
-    Install-IisWebsite -Name 'Peanuts' -PhysicalPath C:\Peanuts.com -Binding 'http/*:80:peanuts.com'
+    Install-CIisWebsite -Name 'Peanuts' -PhysicalPath C:\Peanuts.com -Binding 'http/*:80:peanuts.com'
 
     Creates a website named `Peanuts` which uses name-based hosting to respond to all requests to any of the machine's IP addresses for the `peanuts.com` domain.
 
     .EXAMPLE
-    Install-IisWebsite -Name 'Peanuts' -PhysicalPath C:\Peanuts.com -AppPoolName 'PeanutsAppPool'
+    Install-CIisWebsite -Name 'Peanuts' -PhysicalPath C:\Peanuts.com -AppPoolName 'PeanutsAppPool'
 
     Creates a website named `Peanuts` that runs under the `PeanutsAppPool` app pool
     #>
@@ -136,7 +136,7 @@ function Install-IisWebsite
                             Add-Member -MemberType ScriptProperty -Name 'BindingInformation' -Value { '{0}:{1}:{2}' -f $this.IPAddress,$this.Port,$this.HostName } -PassThru
     }
 
-    $PhysicalPath = Resolve-FullPath -Path $PhysicalPath
+    $PhysicalPath = Resolve-CFullPath -Path $PhysicalPath
     if( -not (Test-Path $PhysicalPath -PathType Container) )
     {
         New-Item $PhysicalPath -ItemType Directory | Out-String | Write-Verbose
@@ -154,12 +154,12 @@ function Install-IisWebsite
 
     if( $Force )
     {
-        Uninstall-IisWebsite -Name $Name
+        Uninstall-CIisWebsite -Name $Name
     }
 
     [Microsoft.Web.Administration.Site]$site = $null
     $modified = $false
-    if( -not (Test-IisWebsite -Name $Name) )
+    if( -not (Test-CIisWebsite -Name $Name) )
     {
         Write-Verbose -Message ('Creating website ''{0}'' ({1}).' -f $Name,$PhysicalPath)
         $firstBinding = $Binding | Select-Object -First 1 | ConvertTo-Binding
@@ -168,7 +168,7 @@ function Install-IisWebsite
         $mgr.CommitChanges()
     }
 
-    $site = Get-IisWebsite -Name $Name
+    $site = Get-CIisWebsite -Name $Name
 
     $expectedBindings = New-Object 'Collections.Generic.Hashset[string]'
     $Binding | ConvertTo-Binding | ForEach-Object { [void]$expectedBindings.Add( ('{0}/{1}' -f $_.Protocol,$_.BindingInformation) ) }
@@ -227,11 +227,11 @@ function Install-IisWebsite
     
     if( $SiteID )
     {
-        Set-IisWebsiteID -SiteName $Name -ID $SiteID
+        Set-CIisWebsiteID -SiteName $Name -ID $SiteID
     }
     
     # Make sure anonymous authentication is enabled and uses the application pool identity
-    $security = Get-IisSecurityAuthentication -SiteName $Name -VirtualPath '/' -Anonymous
+    $security = Get-CIisSecurityAuthentication -SiteName $Name -VirtualPath '/' -Anonymous
     Write-IisVerbose $Name 'Anonymous Authentication UserName' $security['username'] ''
     $security['username'] = ''
     $security.CommitChanges()
@@ -241,7 +241,7 @@ function Install-IisWebsite
     $website = $null
     do
     {
-        $website = Get-IisWebsite -SiteName $Name
+        $website = Get-CIisWebsite -SiteName $Name
         $tries += 1
         if($website.State -ne 'Unknown')
         {

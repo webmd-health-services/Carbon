@@ -10,14 +10,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Read-File
+function Read-CFile
 {
     <#
     .SYNOPSIS
     Reads the contents of a text file, retrying if the read fails.
 
     .DESCRIPTION
-    The `Read-File` function reads the contents of a text file, and will retry if the read fails. Use this function if you need to read files that can be intermittently locked, like the Windows hosts file. The file is returned line-by-line. Use the `Raw` switch to return the entrie file as a single string.
+    The `Read-CFile` function reads the contents of a text file, and will retry if the read fails. Use this function if you need to read files that can be intermittently locked, like the Windows hosts file. The file is returned line-by-line. Use the `Raw` switch to return the entrie file as a single string.
     
     By default, it will retry 30 times, waiting 100 milliseconds between each try. YOu can control the number of retries and the wait between retries with the `MaximumTries` and `RetryDelayMilliseconds` parameters. 
 
@@ -26,22 +26,22 @@ function Read-File
     This function was introduced in Carbon 2.2.0.
 
     .EXAMPLE
-    Read-File -Path 'C:\Path\to\my\file'
+    Read-CFile -Path 'C:\Path\to\my\file'
 
     Demonstrates how to read each line from a text file.
 
     .EXAMPLE
-    Read-File -Path 'C:\Path\to\my\file' -Raw
+    Read-CFile -Path 'C:\Path\to\my\file' -Raw
 
     Demonstrates how to read the entire contents of a text file into a single string.
 
     .EXAMPLE
-    Read-File -Path 'C:\Path\to\my\file' -MaximumRetries 10 -RetryDelayMilliseconds 1000
+    Read-CFile -Path 'C:\Path\to\my\file' -MaximumRetries 10 -RetryDelayMilliseconds 1000
 
-    Demonstrates how to control how long to retry reading the text file. In this case, `Read-File` will try 10 times, waiting one second between tries.
+    Demonstrates how to control how long to retry reading the text file. In this case, `Read-CFile` will try 10 times, waiting one second between tries.
 
     .EXAMPLE
-    Read-File -Path 'C:\Path\to\my\file' -ErrorVariable 'readErrors'
+    Read-CFile -Path 'C:\Path\to\my\file' -ErrorVariable 'readErrors'
 
     Demonstrates how to check if the read failed. In this case, errors are copied to a 'readErrors' variable, so you would check if this error variable has any items.
     #>

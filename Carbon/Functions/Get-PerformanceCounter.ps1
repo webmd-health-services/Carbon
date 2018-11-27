@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Get-PerformanceCounter
+function Get-CPerformanceCounter
 {
     <#
     .SYNOPSIS
@@ -23,7 +23,7 @@ function Get-PerformanceCounter
     System.Diagnostics.PerformanceCounterCategory.
 
     .EXAMPLE
-    Get-PerformanceCounter -CategoryName Processor
+    Get-CPerformanceCounter -CategoryName Processor
 
     Gets all the `Processor` performance counters.
     #>
@@ -39,12 +39,12 @@ function Get-PerformanceCounter
 
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
-    if( (Test-PerformanceCounterCategory -CategoryName $CategoryName) )
+    if( (Test-CPerformanceCounterCategory -CategoryName $CategoryName) )
     {
         $category = New-Object Diagnostics.PerformanceCounterCategory $CategoryName
         return $category.GetCounters("")
     }
 }
 
-Set-Alias -Name 'Get-PerformanceCounters' -Value 'Get-PerformanceCounter'
+Set-Alias -Name 'Get-PerformanceCounters' -Value 'Get-CPerformanceCounter'
 

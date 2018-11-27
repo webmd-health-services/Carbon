@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Install-Msmq
+function Install-CMsmq
 {
     <#
     .SYNOPSIS
@@ -24,12 +24,12 @@ function Install-Msmq
     If you know better ways of installing MSMQ or other Windows features, or can help us figure out why Microsoft's command line installation tools don't work consistently, we would appreciate it.
 
     .EXAMPLE
-    Install-Msmq
+    Install-CMsmq
 
     Installs MSMQ on this meachine.  In our experience, this may or may not work.  You'll want to check that the MSMQ service exists and is running after this.  Please help us make this better!
 
     .EXAMPLE
-    Install-Msmq -HttpSupport -ActiveDirectoryIntegration -Dtc
+    Install-CMsmq -HttpSupport -ActiveDirectoryIntegration -Dtc
 
     Installs MSMQ with the HTTP support and Active Directory sub-features.  Enables and starts the Distributed Transaction Coordinator.
     #>
@@ -52,7 +52,7 @@ function Install-Msmq
 
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
-    Write-Warning -Message ('Install-Msmq is obsolete and will be removed in a future major version of Carbon.')
+    Write-Warning -Message ('Install-CMsmq is obsolete and will be removed in a future major version of Carbon.')
 
     $optionalArgs = @{ }
     if( $HttpSupport )
@@ -65,7 +65,7 @@ function Install-Msmq
         $optionalArgs.MsmqActiveDirectoryIntegration = $true
     }
     
-    Install-WindowsFeature -Msmq @optionalArgs
+    Install-CWindowsFeature -Msmq @optionalArgs
     
     if( $Dtc )
     {

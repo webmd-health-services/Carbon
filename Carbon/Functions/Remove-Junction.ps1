@@ -10,14 +10,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Remove-Junction
+function Remove-CJunction
 {
     <#
     .SYNOPSIS
     Removes a junction.
     
     .DESCRIPTION
-    `Remove-Junction` removes an existing junction. 
+    `Remove-CJunction` removes an existing junction. 
     
     In Carbon 2.1.1 and earlier, the `Path` paramater does not support wildcard characters, nor can it delete junctions that contained wildcards.
 
@@ -26,29 +26,29 @@ function Remove-Junction
     Carbon 2.2.0 also added the `LiteralPath` parameter. Use it to delete junctions whose path contains wildcard characters.
     
     .LINK
-    Install-Junction
+    Install-CJunction
 
     .LINK
-    New-Junction
+    New-CJunction
 
     .LINK
-    Test-PathIsJunction
+    Test-CPathIsJunction
 
     .LINK
-    Uninstall-Junction
+    Uninstall-CJunction
 
     .EXAMPLE
-    Remove-Junction -Path 'C:\I\Am\A\Junction'
+    Remove-CJunction -Path 'C:\I\Am\A\Junction'
     
     Removes the `C:\I\Am\A\Junction` path.
 
     .EXAMPLE
-    Remove-Junction -path 'C:\Temp\*'
+    Remove-CJunction -path 'C:\Temp\*'
 
     Demonstrates how to use wildcards to delete multiple junctions in a directory. Nothing happens if the wildcard doesn't match any junctions.
 
     .EXAMPLE
-    Remove-Junction -LiteralPath 'C:\Temp\ContainsWildcards[]'
+    Remove-CJunction -LiteralPath 'C:\Temp\ContainsWildcards[]'
 
     Demonstrates how to use the `Literalpath` parameter to delete a junction that contains wildcard characters.
     #>
@@ -79,11 +79,11 @@ function Remove-Junction
         {
             Get-Item -Path $Path |
                 Where-Object { $_.PsIsContainer -and $_.IsJunction } |
-                ForEach-Object { Remove-Junction -Path $_.FullName }
+                ForEach-Object { Remove-CJunction -Path $_.FullName }
         }
         else
         {
-            Remove-Junction -LiteralPath $Path
+            Remove-CJunction -LiteralPath $Path
         }
         return
     }
@@ -100,7 +100,7 @@ function Remove-Junction
         return
     }
     
-    if( Test-PathIsJunction -LiteralPath $LiteralPath  )
+    if( Test-CPathIsJunction -LiteralPath $LiteralPath  )
     {
         $LiteralPath = Resolve-Path -LiteralPath $LiteralPath | 
                             Select-Object -ExpandProperty ProviderPath

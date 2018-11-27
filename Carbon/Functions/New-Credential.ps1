@@ -10,41 +10,41 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function New-Credential
+function New-CCredential
 {
     <#
     .SYNOPSIS
     Creates a new `PSCredential` object from a given username and password.
 
     .DESCRIPTION
-    `New-Credential` will create a credential for you from a username and password, converting a password stored as a `String` into a `SecureString`.
+    `New-CCredential` will create a credential for you from a username and password, converting a password stored as a `String` into a `SecureString`.
 
     PowerShell commands use `PSCredential` objects instead of username/password. Although Microsoft recommends using `Get-Credential` to get credentials, when automating installs, there's usually no one around to answer that prompt, so secrets are often pulled from encrypted stores. 
 
     Beginning with Carbon 2.0, you can pass a `SecureString` as the value for the `Password` parameter.
 
-    Beginning with Carbon 2.0, you can pipe passwords to `New-Credential`, e.g.
+    Beginning with Carbon 2.0, you can pipe passwords to `New-CCredential`, e.g.
 
-        Read-EncrptedPassword | Unprotect-String | New-Credential -Username 'fubar'
+        Read-EncrptedPassword | Unprotect-CString | New-CCredential -Username 'fubar'
 
-    We do *not* recommend passing plaintext passwords around. Beginning ing with Carbon 2.0, you can use `Unprotect-String` to decrypt secrets securely to `SecureStrings` and then use those secure strings with `New-Credential` to create a credential.
-
-    .LINK
-    Protect-String
+    We do *not* recommend passing plaintext passwords around. Beginning ing with Carbon 2.0, you can use `Unprotect-CString` to decrypt secrets securely to `SecureStrings` and then use those secure strings with `New-CCredential` to create a credential.
 
     .LINK
-    Unprotect-String
+    Protect-CString
+
+    .LINK
+    Unprotect-CString
 
     .OUTPUTS
     System.Management.Automation.PSCredential.
 
     .EXAMPLE
-    New-Credential -User ENTERPRISE\picard -Password 'earlgrey'
+    New-CCredential -User ENTERPRISE\picard -Password 'earlgrey'
 
     Creates a new credential object for Captain Picard.
 
     .EXAMPLE
-    Read-EncryptedPassword | Unprotect-String | New-Credential -UserName 'ENTERPRISE\picard'
+    Read-EncryptedPassword | Unprotect-CString | New-CCredential -UserName 'ENTERPRISE\picard'
 
     Demonstrates how to securely decrypt a secret into a new credential object.
     #>

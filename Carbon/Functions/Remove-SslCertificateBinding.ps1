@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Remove-SslCertificateBinding
+function Remove-CSslCertificateBinding
 {
     <#
     .SYNOPSIS
@@ -20,12 +20,12 @@ function Remove-SslCertificateBinding
     Uses the netsh command line application to remove an SSL certificate binding for an IP/port combination.  If the binding doesn't exist, nothing is changed.
     
     .EXAMPLE
-    > Remove-SslCertificateBinding -IPAddress '45.72.89.57' -Port 443
+    > Remove-CSslCertificateBinding -IPAddress '45.72.89.57' -Port 443
     
     Removes the SSL certificate bound to IP 45.72.89.57 on port 443.
     
     .EXAMPLE
-    > Remove-SslCertificateBinding 
+    > Remove-CSslCertificateBinding 
     
     Removes the default SSL certificate from port 443.  The default certificate is bound to all IP addresses.
     #>
@@ -44,7 +44,7 @@ function Remove-SslCertificateBinding
 
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
     
-    if( -not (Test-SslCertificateBinding -IPAddress $IPAddress -Port $Port) )
+    if( -not (Test-CSslCertificateBinding -IPAddress $IPAddress -Port $Port) )
     {
         return
     }

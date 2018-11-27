@@ -55,7 +55,7 @@ function Get-TargetResource
     $ini = @{ }
     if( (Test-Path -Path $Path -PathType Leaf) )
     {
-        $ini = Split-Ini -Path $Path -AsHashtable -CaseSensitive:$CaseSensitive
+        $ini = Split-CIni -Path $Path -AsHashtable -CaseSensitive:$CaseSensitive
     }
     else
     {
@@ -103,13 +103,13 @@ function Set-TargetResource
     `Carbon_IniFile` is new in Carbon 2.0.
 
     .LINK
-    Remove-IniEntry
+    Remove-CIniEntry
 
     .LINK
-    Set-IniEntry
+    Set-CIniEntry
 
     .LINK
-    Split-Ini
+    Split-CIni
 
     .EXAMPLE
     >
@@ -228,14 +228,14 @@ function Set-TargetResource
     if( $resource.Ensure -eq 'Present' -and $Ensure -eq 'Absent' )
     {
         Write-Verbose ('{0}: {1}: removing' -f $Path,$fullName)
-        Remove-IniEntry -Path $Path -Section $Section -Name $Name -CaseSensitive:$CaseSensitive
+        Remove-CIniEntry -Path $Path -Section $Section -Name $Name -CaseSensitive:$CaseSensitive
         return
     }
 
     if( $Ensure -eq 'Present' )
     {
         Write-Verbose ('{0}: {1}: setting' -f $Path,$fullName)
-        Set-IniEntry -Path $Path -Section $Section -Name $Name -Value $Value -CaseSensitive:$CaseSensitive
+        Set-CIniEntry -Path $Path -Section $Section -Name $Name -Value $Value -CaseSensitive:$CaseSensitive
     }
 }
 

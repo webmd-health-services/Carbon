@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Get-ComPermission
+function Get-CComPermission
 {
     <#
     .SYNOPSIS
@@ -24,21 +24,21 @@ function Get-ComPermission
     Returns `Carbon.Security.ComAccessRule` objects, which inherit from `[System.Security.AccessControl.AccessRule](http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.accessrule.aspx).
     
     .LINK
-    Grant-ComPermission
+    Grant-CComPermission
 
     .LINK
-    Revoke-ComPermission
+    Revoke-CComPermission
     
     .OUTPUTS
     Carbon.Security.ComAccessRule.
      
     .EXAMPLE
-    Get-ComPermission -Access -Default
+    Get-CComPermission -Access -Default
     
     Gets the COM access default security permissions. Look how easy it is!
 
     .EXAMPLE
-    Get-ComPermission -LaunchAndActivation -Identity 'Administrators' -Limits
+    Get-CComPermission -LaunchAndActivation -Identity 'Administrators' -Limits
     
     Gets the security limits for COM Launch and Activation permissions for the local administrators group.
     #>
@@ -97,11 +97,11 @@ function Get-ComPermission
         $comArgs.LaunchAndActivation = $true
     }
     
-    Get-ComSecurityDescriptor @comArgs -AsComAccessRule |
+    Get-CComSecurityDescriptor @comArgs -AsComAccessRule |
         Where-Object {
             if( $Identity )
             {
-                $account = Resolve-Identity -Name $Identity
+                $account = Resolve-CIdentity -Name $Identity
                 if( -not $account )
                 {
                     return $false
@@ -113,4 +113,4 @@ function Get-ComPermission
         }
 }
 
-Set-Alias -Name 'Get-ComPermissions' -Value 'Get-ComPermission'
+Set-Alias -Name 'Get-ComPermissions' -Value 'Get-CComPermission'

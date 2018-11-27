@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Compress-Item
+function Compress-CItem
 {
     <#
     .SYNOPSIS
@@ -31,23 +31,23 @@ function Compress-Item
     https://www.nuget.org/packages/DotNetZip
 
     .LINK
-    Expand-Item
+    Expand-CItem
 
     .LINK
-    Test-ZipFile
+    Test-CZipFile
 
     .EXAMPLE
-    Compress-Item -Path 'C:\Projects\Carbon' -OutFile 'C:\Carbon.zip'
+    Compress-CItem -Path 'C:\Projects\Carbon' -OutFile 'C:\Carbon.zip'
 
     Demonstrates how to create a ZIP file of the `C:\Projects\Carbon` directory.
 
     .EXAMPLE
-    Get-ChildItem -Path 'C:\Projects\Carbon' | Where-Object { $_.PsIsContainer} | Compress-Item -OutFile 'C:\Projects\Carbon.zip'
+    Get-ChildItem -Path 'C:\Projects\Carbon' | Where-Object { $_.PsIsContainer} | Compress-CItem -OutFile 'C:\Projects\Carbon.zip'
 
-    Demonstrates how you can pipe items to `Compress-Item` for compressing.
+    Demonstrates how you can pipe items to `Compress-CItem` for compressing.
 
     .EXAMPLE
-    Compress-Item -Path 'C:\Projects\Carbon' -OutFile 'C:\Carbon.zip' -UseShell
+    Compress-CItem -Path 'C:\Projects\Carbon' -OutFile 'C:\Carbon.zip' -UseShell
 
     Demonstrates how to create a ZIP file with the Windows shell COM APIs instead of the `DotNetZip` library.
     #>
@@ -84,7 +84,7 @@ function Compress-Item
 
         if( $OutFile )
         {
-            $OutFile = Resolve-FullPath -Path $OutFile
+            $OutFile = Resolve-CFullPath -Path $OutFile
             if( (Test-Path -Path $OutFile -PathType Leaf) )
             {
                 if( -not $Force )
@@ -96,7 +96,7 @@ function Compress-Item
         }
         else
         {
-            $OutFile = 'Carbon+Compress-Item-{0}.zip' -f ([IO.Path]::GetRandomFileName())
+            $OutFile = 'Carbon+Compress-CItem-{0}.zip' -f ([IO.Path]::GetRandomFileName())
             $OutFile = Join-Path -Path $env:TEMP -ChildPath $OutFile
         }
 

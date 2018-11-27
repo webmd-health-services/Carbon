@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Restart-RemoteService
+function Restart-CRemoteService
 {
     <#
     .SYNOPSIS
@@ -32,7 +32,7 @@ function Restart-RemoteService
     You'll get an error if you attempt to restart a non-existent service.
 
     .EXAMPLE
-    Restart-RemoteService -Name DeathStar -ComputerName Yavin
+    Restart-CRemoteService -Name DeathStar -ComputerName Yavin
 
     Restarts the `DeathStar` service on Yavin.  If the DeathStar service doesn't exist, you'll get an error.
     #>

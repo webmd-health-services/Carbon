@@ -35,7 +35,7 @@ function Get-TargetResource
 
     Set-StrictMode -Version 'Latest'
 
-    [string[]]$currentPrivileges = Get-Privilege -Identity $Identity
+    [string[]]$currentPrivileges = Get-CPrivilege -Identity $Identity
     $Ensure = 'Present'
     if( -not $currentPrivileges )
     {
@@ -135,16 +135,16 @@ function Set-TargetResource
     `Carbon_Privilege` is new in Carbon 2.0.
 
     .LINK
-    Get-Privilege
+    Get-CPrivilege
 
     .LINK
-    Grant-Privilege
+    Grant-CPrivilege
 
     .LINK
-    Revoke-Privilege
+    Revoke-CPrivilege
 
     .LINK
-    Test-Privilege
+    Test-CPrivilege
 
     .LINK
     http://msdn.microsoft.com/en-us/library/windows/desktop/bb530716.aspx
@@ -192,17 +192,17 @@ function Set-TargetResource
 
     Set-StrictMode -Version 'Latest'
 
-    $currentPrivileges = Get-Privilege -Identity $Identity
+    $currentPrivileges = Get-CPrivilege -Identity $Identity
     if( $currentPrivileges )
     {
         Write-Verbose ('Revoking ''{0}'' privileges: {1}' -f $Identity,($currentPrivileges -join ','))
-        Revoke-Privilege -Identity $Identity -Privilege $currentPrivileges
+        Revoke-CPrivilege -Identity $Identity -Privilege $currentPrivileges
     }
 
     if( $Ensure -eq 'Present' -and $Privilege )
     {
         Write-Verbose ('Granting ''{0}'' privileges: {1}' -f $Identity,($Privilege -join ','))
-        Grant-Privilege -Identity $Identity -Privilege $Privilege
+        Grant-CPrivilege -Identity $Identity -Privilege $Privilege
     }
 }
 

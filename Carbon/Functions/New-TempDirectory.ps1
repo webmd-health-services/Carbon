@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function New-TempDirectory
+function New-CTempDirectory
 {
     <#
     .SYNOPSIS
@@ -27,24 +27,24 @@ function New-TempDirectory
     http://msdn.microsoft.com/en-us/library/system.io.path.getrandomfilename.aspx
     
     .EXAMPLE
-    New-TempDirectory
+    New-CTempDirectory
 
     Demonstrates how to create a new temporary directory, e.g. `C:\Users\ajensen\AppData\Local\Temp\5pobd3tu.5rn`.
 
     .EXAMPLE
-    New-TempDirectory -Prefix 'Carbon'
+    New-CTempDirectory -Prefix 'Carbon'
 
     Demonstrates how to create a new temporary directory with a custom prefix for its name, e.g. `C:\Users\ajensen\AppData\Local\Temp\Carbon5pobd3tu.5rn`.
 
     .EXAMPLE
-    New-TempDirectory -Prefix $MyInvocation.MyCommand.Definition
+    New-CTempDirectory -Prefix $MyInvocation.MyCommand.Definition
 
-    Demonstrates how you can use `$MyInvocation.MyCommand.Definition` in PowerShell 2 to create a new, temporary directory, named after the currently executing scripts, e.g. `C:\Users\ajensen\AppData\Local\Temp\New-TempDirectory.ps15pobd3tu.5rn`. 
+    Demonstrates how you can use `$MyInvocation.MyCommand.Definition` in PowerShell 2 to create a new, temporary directory, named after the currently executing scripts, e.g. `C:\Users\ajensen\AppData\Local\Temp\New-CTempDirectory.ps15pobd3tu.5rn`. 
 
     .EXAMPLE
-    New-TempDirectory -Prefix $PSCommandPath
+    New-CTempDirectory -Prefix $PSCommandPath
 
-    Demonstrates how you can use `$PSCommandPath` in PowerShell 3+ to create a new, temporary directory, named after the currently executing scripts, e.g. `C:\Users\ajensen\AppData\Local\Temp\New-TempDirectory.ps15pobd3tu.5rn`. 
+    Demonstrates how you can use `$PSCommandPath` in PowerShell 3+ to create a new, temporary directory, named after the currently executing scripts, e.g. `C:\Users\ajensen\AppData\Local\Temp\New-CTempDirectory.ps15pobd3tu.5rn`. 
     #>
     [CmdletBinding(SupportsShouldProcess=$true)]
     [OutputType([IO.DirectoryInfo])]
@@ -69,4 +69,4 @@ function New-TempDirectory
     New-Item -Path $tempDir -ItemType 'Directory' -Verbose:$VerbosePreference
 }
 
-Set-Alias -Name 'New-TempDir' -Value 'New-TempDirectory'
+Set-Alias -Name 'New-TempDir' -Value 'New-CTempDirectory'

@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Get-PathProvider
+function Get-CPathProvider
 {
     <#
     .SYNOPSIS
@@ -25,7 +25,7 @@ function Get-PathProvider
     System.Management.Automation.ProviderInfo.
 
     .EXAMPLE
-    Get-PathProvider -Path 'C:\Windows'
+    Get-CPathProvider -Path 'C:\Windows'
 
     Demonstrates how to get the path provider for an NTFS path.
     #>

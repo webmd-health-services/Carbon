@@ -10,14 +10,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Get-DscWinEvent
+function Get-CDscWinEvent
 {
     <#
     .SYNOPSIS
     Gets events from the DSC Windows event log.
 
     .DESCRIPTION
-    Thie `Get-DscWinEvent` function gets log entries from the `Microsoft-Windows-DSC/Operational` event log, where the Local Configuration Manager writes events. By default, entries on the local computer are returned. You can return entries from another computer via the `ComputerName` parameter.
+    Thie `Get-CDscWinEvent` function gets log entries from the `Microsoft-Windows-DSC/Operational` event log, where the Local Configuration Manager writes events. By default, entries on the local computer are returned. You can return entries from another computer via the `ComputerName` parameter.
 
     You can filter the results further with the `ID`, `Level`, `StartTime` and `EndTime` parameters. `ID` will get events with the specific ID. `Level` will get events at the specified level. `StartTime` will return entries after the given time. `EndTime` will return entries before the given time.
 
@@ -27,52 +27,52 @@ function Get-DscWinEvent
 
     When getting errors on a remote computer, that computer must have Remote Event Log Management firewall rules enabled. To enable them, run
 
-        Get-FirewallRule -Name '*Remove Event Log Management*' |
+        Get-CFirewallRule -Name '*Remove Event Log Management*' |
             ForEach-Object { netsh advfirewall firewall set rule name= $_.Name new enable=yes }
 
-    `Get-DscWinEvent` is new in Carbon 2.0.
+    `Get-CDscWinEvent` is new in Carbon 2.0.
 
     .OUTPUTS
     System.Diagnostics.Eventing.Reader.EventLogRecord
 
     .LINK
-    Write-DscError
+    Write-CDscError
 
     .LINK
-    Get-DscWinEvent
+    Get-CDscWinEvent
 
     .EXAMPLE
-    Get-DscWinEvent
+    Get-CDscWinEvent
 
     Demonstrates how to get all the DSC errors from the local computer.
 
     .EXAMPLE
-    Get-DscWinEvent -ComputerName 10.1.2.3
+    Get-CDscWinEvent -ComputerName 10.1.2.3
 
     Demonstrates how to get all the DSC errors from a specific computer.
 
     .EXAMPLE
-    Get-DscWinEvent -StartTime '8/1/2014 0:00'
+    Get-CDscWinEvent -StartTime '8/1/2014 0:00'
 
     Demonstrates how to get errors that occurred *after* a given time.
 
     .EXAMPLE
-    Get-DscWinEvent -EndTime '8/30/2014 11:59:59'
+    Get-CDscWinEvent -EndTime '8/30/2014 11:59:59'
 
     Demonstrates how to get errors that occurred *before* a given time.
 
     .EXAMPLE
-    Get-DscWinEvent -StartTime '8/1/2014 2:58 PM' -Wait -WaitTimeoutSeconds 5
+    Get-CDscWinEvent -StartTime '8/1/2014 2:58 PM' -Wait -WaitTimeoutSeconds 5
 
     Demonstrates how to wait for entries that match the specified criteria to appear in the event log. It can take several seconds between the time a log entry is written to when you can read it.
 
     .EXAMPLE
-    Get-DscWinEvent -Level ([Diagnostics.Eventing.Reader.StandardEventLevel]::Error)
+    Get-CDscWinEvent -Level ([Diagnostics.Eventing.Reader.StandardEventLevel]::Error)
 
     Demonstrates how to get events at a specific level, in this case, only error level entries will be returned.
 
     .EXAMPLE
-    Get-DscWinEvent -ID 4103
+    Get-CDscWinEvent -ID 4103
 
     Demonstrates how to get events with a specific ID, in this case `4103`.
     #>

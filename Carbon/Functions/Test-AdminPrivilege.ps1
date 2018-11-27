@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Test-AdminPrivilege
+function Test-CAdminPrivilege
 {
     <#
     .SYNOPSIS
@@ -22,7 +22,7 @@ function Test-AdminPrivilege
     This function handles UAC and computers where UAC is disabled.
 
     .EXAMPLE
-    Test-AdminPrivilege
+    Test-CAdminPrivilege
 
     Returns `True` if the current user has administrative privileges, or `False` if the user doesn't.
     #>
@@ -53,5 +53,5 @@ function Test-AdminPrivilege
     return $false
 }
 
-Set-Alias -Name 'Test-AdminPrivileges' -Value 'Test-AdminPrivilege'
+Set-Alias -Name 'Test-AdminPrivileges' -Value 'Test-CAdminPrivilege'
 

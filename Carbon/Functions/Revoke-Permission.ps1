@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Revoke-Permission
+function Revoke-CPermission
 {
     <#
     .SYNOPSIS
@@ -25,32 +25,32 @@ function Revoke-Permission
     Carbon_Permission
 
     .LINK
-    Disable-AclInheritance
+    Disable-CAclInheritance
 
     .LINK
-    Enable-AclInheritance
+    Enable-CAclInheritance
 
     .LINK
-    Get-Permission
+    Get-CPermission
 
     .LINK
-    Grant-Permission
+    Grant-CPermission
 
     .LINK
-    Test-Permission
+    Test-CPermission
 
     .EXAMPLE
-    Revoke-Permission -Identity ENTERPRISE\Engineers -Path 'C:\EngineRoom'
+    Revoke-CPermission -Identity ENTERPRISE\Engineers -Path 'C:\EngineRoom'
 
     Demonstrates how to revoke all of the 'Engineers' permissions on the `C:\EngineRoom` directory.
 
     .EXAMPLE
-    Revoke-Permission -Identity ENTERPRISE\Interns -Path 'hklm:\system\WarpDrive'
+    Revoke-CPermission -Identity ENTERPRISE\Interns -Path 'hklm:\system\WarpDrive'
 
     Demonstrates how to revoke permission on a registry key.
 
     .EXAMPLE
-    Revoke-Permission -Identity ENTERPRISE\Officers -Path 'cert:\LocalMachine\My\1234567890ABCDEF1234567890ABCDEF12345678'
+    Revoke-CPermission -Identity ENTERPRISE\Officers -Path 'cert:\LocalMachine\My\1234567890ABCDEF1234567890ABCDEF12345678'
 
     Demonstrates how to revoke the Officers' permission to the `cert:\LocalMachine\My\1234567890ABCDEF1234567890ABCDEF12345678` certificate's private key/key container.
     #>
@@ -77,16 +77,16 @@ function Revoke-Permission
         return
     }
 
-    $providerName = Get-PathProvider -Path $Path | Select-Object -ExpandProperty 'Name'
+    $providerName = Get-CPathProvider -Path $Path | Select-Object -ExpandProperty 'Name'
     if( $providerName -eq 'Certificate' )
     {
         $providerName = 'CryptoKey'
     }
 
-    $rulesToRemove = Get-Permission -Path $Path -Identity $Identity
+    $rulesToRemove = Get-CPermission -Path $Path -Identity $Identity
     if( $rulesToRemove )
     {
-        $Identity = Resolve-IdentityName -Name $Identity
+        $Identity = Resolve-CIdentityName -Name $Identity
         $rulesToRemove | ForEach-Object { Write-Verbose ('[{0}] [{1}]  {2} -> ' -f $Path,$Identity,$_."$($providerName)Rights") }
 
         Get-Item $Path -Force |

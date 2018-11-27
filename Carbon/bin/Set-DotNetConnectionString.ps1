@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-Internal.  Use `Set-DotNetConnectionString` function instead.
+Internal.  Use `Set-CDotNetConnectionString` function instead.
 #>
 
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -38,9 +38,9 @@ $PSScriptRoot = Split-Path -Parent -Path $MyInvocation.MyCommand.Definition
 . (Join-Path -Path $PSScriptRoot -ChildPath '..\Functions\Use-CallerPreference.ps1' -Resolve)
 . (Join-Path -Path $PSScriptRoot -ChildPath '..\Functions\ConvertFrom-Base64.ps1' -Resolve)
 
-$Name = $Name | ConvertFrom-Base64
-$Value = $Value | ConvertFrom-Base64
-$ProviderName = $ProviderName | ConvertFrom-Base64
+$Name = $Name | ConvertFrom-CBase64
+$Value = $Value | ConvertFrom-CBase64
+$ProviderName = $ProviderName | ConvertFrom-CBase64
 
 Add-Type -AssemblyName System.Configuration
 

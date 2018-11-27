@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Install-RegistryKey
+function Install-CRegistryKey
 {
     <#
     .SYNOPSIS
@@ -20,7 +20,7 @@ function Install-RegistryKey
     Given the path to a registry key, creates the key and all its parents.  If the key already exists, nothing happens.
     
     .EXAMPLE
-    Install-RegistryKey -Path 'hklm:\Software\Carbon\Test'
+    Install-CRegistryKey -Path 'hklm:\Software\Carbon\Test'
     
     Creates the `hklm:\Software\Carbon\Temp` registry key if it doesn't already exist.
     #>

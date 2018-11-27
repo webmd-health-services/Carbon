@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Set-DotNetConnectionString
+function Set-CDotNetConnectionString
 {
     <#
     .SYNOPSIS
@@ -27,13 +27,13 @@ function Set-DotNetConnectionString
     Any combination of Framework and Clr switch can be used, but you MUST supply one of each.
 
     .LINK
-    Set-DotNetAppSetting
+    Set-CDotNetAppSetting
 
     .LINK
-    Remove-DotNetAppSetting
+    Remove-CDotNetAppSetting
 
     .EXAMPLE
-    > Set-DotNetConnectionString -Name DevDB -Value "data source=.\DevDB;Integrated Security=SSPI;" -Framework -Framework64 -Clr2 -Clr4
+    > Set-CDotNetConnectionString -Name DevDB -Value "data source=.\DevDB;Integrated Security=SSPI;" -Framework -Framework64 -Clr2 -Clr4
     
     Sets the DevDB connection string in the following machine.config files:
      
@@ -43,7 +43,7 @@ function Set-DotNetConnectionString
      * `%SYSTEMROOT%\Microsoft.NET\Framework64\v4.0.30319\CONFIG\machine.config`
 
     .EXAMPLE
-    > Set-DotNetConnectionString -Name DevDB -Value "data source=.\DevDB;Integrated Security=SSPI;" -Framework64 -Clr4
+    > Set-CDotNetConnectionString -Name DevDB -Value "data source=.\DevDB;Integrated Security=SSPI;" -Framework64 -Clr4
     
     Sets the DevDB connection string in the `%SYSTEMROOT%\Microsoft.NET\Framework64\v4.0.30319\CONFIG\machine.config` machine.config file to:
      
@@ -51,7 +51,7 @@ function Set-DotNetConnectionString
 
 
     .EXAMPLE
-    Set-DotNetConnectionString -Name Prod -Value "data source=proddb\Prod;Integrated Security=SSPI" -ProviderName 'System.Data.SqlClient' -Framework -Clr2
+    Set-CDotNetConnectionString -Name Prod -Value "data source=proddb\Prod;Integrated Security=SSPI" -ProviderName 'System.Data.SqlClient' -Framework -Clr2
 
     Creates the following connection string in the `%SYSTEMROOT%\Microsoft.NET\Framework\v2.0.50727\CONFIG\machine.config` file:
 
@@ -119,11 +119,11 @@ function Set-DotNetConnectionString
 
     $runtimes | ForEach-Object {
         $params = @{
-            FilePath = (Join-Path $CarbonBinDir 'Set-DotNetConnectionString.ps1' -Resolve);
+            FilePath = (Join-Path $CarbonBinDir 'Set-CDotNetConnectionString.ps1' -Resolve);
             ArgumentList = @(
-                                (ConvertTo-Base64 -Value $Name),
-                                (ConvertTo-Base64 -Value $Value),
-                                (ConvertTo-Base64 -Value $ProviderName) 
+                                (ConvertTo-CBase64 -Value $Name),
+                                (ConvertTo-CBase64 -Value $Value),
+                                (ConvertTo-CBase64 -Value $ProviderName) 
                             );
             Runtime = $_;
             ExecutionPolicy = [Microsoft.PowerShell.ExecutionPolicy]::RemoteSigned;
@@ -131,12 +131,12 @@ function Set-DotNetConnectionString
 
         if( $Framework )
         {    
-            Invoke-PowerShell @params -x86
+            Invoke-CPowerShell @params -x86
         }
         
         if( $Framework64 )
         {
-            Invoke-PowerShell @params
+            Invoke-CPowerShell @params
         }
     }
 }

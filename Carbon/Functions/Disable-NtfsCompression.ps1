@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Disable-NtfsCompression
+function Disable-CNtfsCompression
 {
     <#
     .SYNOPSIS
@@ -22,25 +22,25 @@ function Disable-NtfsCompression
     Uses Windows' `compact.exe` command line utility to compress the file/directory.  To see the output from `compact.exe`, set the `Verbose` switch.
 
     .LINK
-    Enable-NtfsCompression
+    Enable-CNtfsCompression
 
     .LINK
-    Test-NtfsCompression
+    Test-CNtfsCompression
 
     .EXAMPLE
-    Disable-NtfsCompression -Path C:\Projects\Carbon
+    Disable-CNtfsCompression -Path C:\Projects\Carbon
 
     Turns off NTFS compression on and decompresses the `C:\Projects\Carbon` directory, but not its sub-directories/files.  New files/directories will get compressed.
 
     .EXAMPLE
-    Disable-NtfsCompression -Path C:\Projects\Carbon -Recurse
+    Disable-CNtfsCompression -Path C:\Projects\Carbon -Recurse
 
     Turns off NTFS compression on and decompresses the `C:\Projects\Carbon` directory and all its sub-directories/sub-files.
 
     .EXAMPLE
-    Get-ChildItem * | Where-Object { $_.PsIsContainer } | Disable-NtfsCompression
+    Get-ChildItem * | Where-Object { $_.PsIsContainer } | Disable-CNtfsCompression
 
-    Demonstrates that you can pipe the path to compress into `Disable-NtfsCompression`.
+    Demonstrates that you can pipe the path to compress into `Disable-CNtfsCompression`.
     #>
     [CmdletBinding(SupportsShouldProcess=$true)]
     param(

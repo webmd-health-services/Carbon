@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Remove-IisMimeMap
+function Remove-CIisMimeMap
 {
     <#
     .SYNOPSIS
@@ -24,13 +24,13 @@ function Remove-IisMimeMap
     Beginning with Carbon 2.0.1, this function is available only if IIS is installed.
 
     .LINK
-    Get-IisMimeMap
+    Get-CIisMimeMap
     
     .LINK
-    Set-IisMimeMap
+    Set-CIisMimeMap
     
     .EXAMPLE
-    Remove-IisMimeMap -FileExtension '.m4v' -MimeType 'video/x-m4v'
+    Remove-CIisMimeMap -FileExtension '.m4v' -MimeType 'video/x-m4v'
     
     Removes the `.m4v` file extension so that IIS will no longer serve those files.
     #>
@@ -63,7 +63,7 @@ function Remove-IisMimeMap
         $getIisConfigSectionParams['VirtualPath'] = $VirtualPath
     }
     
-    $staticContent = Get-IisConfigurationSection -SectionPath 'system.webServer/staticContent' @getIisConfigSectionParams
+    $staticContent = Get-CIisConfigurationSection -SectionPath 'system.webServer/staticContent' @getIisConfigSectionParams
     $mimeMapCollection = $staticContent.GetCollection()
     $mimeMapToRemove = $mimeMapCollection |
                             Where-Object { $_['fileExtension'] -eq $FileExtension }

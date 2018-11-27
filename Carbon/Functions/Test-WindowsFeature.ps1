@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Test-WindowsFeature
+function Test-CWindowsFeature
 {
     <#
     .SYNOPSIS
@@ -19,24 +19,24 @@ function Test-WindowsFeature
     .DESCRIPTION
     Feature names are different across different versions of Windows.  This function tests if a given feature exists.  You can also test if a feature is installed by setting the `Installed` switch.
 
-    Feature names are case-sensitive and are different between different versions of Windows.  For a list, on Windows 2008, run `serveramanagercmd.exe -q`; on Windows 7, run `Get-WmiObject -Class Win32_OptionalFeature | Select-Object Name`.  On Windows 8/2012, use `Get-WindowsFeature`.
+    Feature names are case-sensitive and are different between different versions of Windows.  For a list, on Windows 2008, run `serveramanagercmd.exe -q`; on Windows 7, run `Get-WmiObject -Class Win32_OptionalFeature | Select-Object Name`.  On Windows 8/2012, use `Get-CWindowsFeature`.
 
     .LINK
-    Get-WindowsFeature
+    Get-CWindowsFeature
     
     .LINK
-    Install-WindowsFeature
+    Install-CWindowsFeature
     
     .LINK
-    Uninstall-WindowsFeature
+    Uninstall-CWindowsFeature
     
     .EXAMPLE
-    Test-WindowsFeature -Name MSMQ-Server
+    Test-CWindowsFeature -Name MSMQ-Server
 
     Tests if the MSMQ-Server feature exists on the current computer.
 
     .EXAMPLE
-    Test-WindowsFeature -Name IIS-WebServer -Installed
+    Test-CWindowsFeature -Name IIS-WebServer -Installed
 
     Tests if the IIS-WebServer features exists and is installed/enabled.
     #>
@@ -44,7 +44,7 @@ function Test-WindowsFeature
     param(
         [Parameter(Mandatory=$true)]
         [string]
-        # The name of the feature to test.  Feature names are case-sensitive and are different between different versions of Windows.  For a list, on Windows 2008, run `serveramanagercmd.exe -q`; on Windows 7, run `Get-WmiObject -Class Win32_OptionalFeature | Select-Object Name`.  On Windows 8/2012, use `Get-WindowsFeature`.
+        # The name of the feature to test.  Feature names are case-sensitive and are different between different versions of Windows.  For a list, on Windows 2008, run `serveramanagercmd.exe -q`; on Windows 7, run `Get-WmiObject -Class Win32_OptionalFeature | Select-Object Name`.  On Windows 8/2012, use `Get-CWindowsFeature`.
         $Name,
         
         [Switch]
@@ -61,7 +61,7 @@ function Test-WindowsFeature
         return
     }
     
-    $feature = Get-WindowsFeature -Name $Name 
+    $feature = Get-CWindowsFeature -Name $Name 
     
     if( $feature )
     {

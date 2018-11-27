@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Uninstall-IisAppPool
+function Uninstall-CIisAppPool
 {
     <#
     .SYNOPSIS
@@ -22,7 +22,7 @@ function Uninstall-IisAppPool
     Beginning with Carbon 2.0.1, this function is available only if IIS is installed.
 
     .EXAMPLE
-    Uninstall-IisAppPool -Name Batcave
+    Uninstall-CIisAppPool -Name Batcave
     
     Removes/uninstalls the `Batcave` app pool.
     #>
@@ -38,7 +38,7 @@ function Uninstall-IisAppPool
 
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
-    $appPool = Get-IisAppPool -Name $Name
+    $appPool = Get-CIisAppPool -Name $Name
     if( $appPool )
     {
         if( $pscmdlet.ShouldProcess( ('IIS app pool {0}' -f $Name), 'remove' ) )

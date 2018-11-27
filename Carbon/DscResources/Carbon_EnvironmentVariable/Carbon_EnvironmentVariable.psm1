@@ -63,7 +63,7 @@ function Set-TargetResource
     `Carbon_EnvironmentVariable` is new in Carbon 2.0.
 
     .LINK
-    Set-EnvironmentVariable
+    Set-CEnvironmentVariable
 
     .EXAMPLE
     > 
@@ -118,7 +118,7 @@ function Set-TargetResource
     if( $Ensure -eq 'Present' )
     {
         Write-Verbose ('{0}: setting' -f $Name)
-        Set-EnvironmentVariable -Name $Name -Value $Value -ForComputer -ForProcess
+        Set-CEnvironmentVariable -Name $Name -Value $Value -ForComputer -ForProcess
     }
 
 }

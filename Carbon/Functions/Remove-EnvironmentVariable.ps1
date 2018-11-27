@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Remove-EnvironmentVariable
+function Remove-CEnvironmentVariable
 {
     <#
     .SYNOPSIS
@@ -31,18 +31,18 @@ function Remove-EnvironmentVariable
     Carbon_EnvironmentVariable
 
     .LINK
-    Set-EnvironmentVariable
+    Set-CEnvironmentVariable
     
     .LINK
     http://msdn.microsoft.com/en-us/library/z8te35sa
 
     .EXAMPLE
-    Remove-EnvironmentVariable -Name 'MyEnvironmentVariable' -ForProcess
+    Remove-CEnvironmentVariable -Name 'MyEnvironmentVariable' -ForProcess
     
     Removes the `MyEnvironmentVariable` from the process scope.
 
     .EXAMPLE
-    Remove-EnvironmentVariable -Name 'SomeUsersVariable' -ForUser -Credential $credential
+    Remove-CEnvironmentVariable -Name 'SomeUsersVariable' -ForUser -Credential $credential
 
     Demonstrates that you can remove another user's user-level environment variable by passing its credentials to the `Credential` parameter. This runs a separate PowerShell process as that user to remove the variable.
     #>
@@ -88,9 +88,9 @@ function Remove-EnvironmentVariable
 
     if( $PSCmdlet.ParameterSetName -eq 'ForSpecificUser' )
     {
-        Invoke-PowerShell -FilePath (Join-Path -Path $PSScriptRoot -ChildPath '..\bin\Remove-EnvironmentVariable.ps1' -Resolve) `
+        Invoke-CPowerShell -FilePath (Join-Path -Path $PSScriptRoot -ChildPath '..\bin\Remove-CEnvironmentVariable.ps1' -Resolve) `
                           -Credential $credential `
-                          -ArgumentList ('-Name {0}' -f (ConvertTo-Base64 $Name)) `
+                          -ArgumentList ('-Name {0}' -f (ConvertTo-CBase64 $Name)) `
                           -NonInteractive `
                           -OutputFormat 'text'
         return

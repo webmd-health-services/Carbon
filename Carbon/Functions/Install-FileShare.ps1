@@ -10,33 +10,33 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Install-FileShare
+function Install-CFileShare
 {
     <#
     .SYNOPSIS
     Installs a file/SMB share.
 
     .DESCRIPTION
-    The `Install-FileShare` function installs a new file/SMB share. If the share doesn't exist, it is created. In Carbon 2.0, if a share does exist, its properties and permissions are updated in place, unless the share's path needs to change. Changing a share's path requires deleting and re-creating. Before Carbon 2.0, shares were always deleted and re-created.
+    The `Install-CFileShare` function installs a new file/SMB share. If the share doesn't exist, it is created. In Carbon 2.0, if a share does exist, its properties and permissions are updated in place, unless the share's path needs to change. Changing a share's path requires deleting and re-creating. Before Carbon 2.0, shares were always deleted and re-created.
 
-    Use the `FullAccess`, `ChangeAccess`, and `ReadAccess` parameters to grant full, change, and read sharing permissions on the share. Each parameter takes a list of user/group names. If you don't supply any permissions, `Everyone` will get `Read` access. Permissions on existing shares are cleared before permissions are granted. Permissions don't apply to the file system, only to the share. Use `Grant-Permission` to grant file system permissions. 
+    Use the `FullAccess`, `ChangeAccess`, and `ReadAccess` parameters to grant full, change, and read sharing permissions on the share. Each parameter takes a list of user/group names. If you don't supply any permissions, `Everyone` will get `Read` access. Permissions on existing shares are cleared before permissions are granted. Permissions don't apply to the file system, only to the share. Use `Grant-CPermission` to grant file system permissions. 
 
     Before Carbon 2.0, this function was called `Install-SmbShare`.
 
     .LINK
-    Get-FileShare
+    Get-CFileShare
 
     .LINK
-    Get-FileSharePermission
+    Get-CFileSharePermission
 
     .LINK
-    Grant-Permission
+    Grant-CPermission
 
     .LINK
-    Test-FileShare
+    Test-CFileShare
 
     .LINK
-    Uninstall-FileShare
+    Uninstall-CFileShare
 
     .EXAMPLE
     Install-Share -Name TopSecretDocuments -Path C:\TopSecret -Description 'Share for our top secret documents.' -ReadAccess "Everyone" -FullAccess "Analysts"
@@ -101,7 +101,7 @@ function Install-FileShare
         foreach( $identityName in $Identity )
         {
             $trustee = ([wmiclass]'Win32_Trustee').CreateInstance()
-            [Security.Principal.SecurityIdentifier]$sid = Resolve-Identity -Name $identityName | Select-Object -ExpandProperty 'Sid'
+            [Security.Principal.SecurityIdentifier]$sid = Resolve-CIdentity -Name $identityName | Select-Object -ExpandProperty 'Sid'
             if( -not $sid )
             {
                 continue
@@ -134,7 +134,7 @@ function Install-FileShare
                 [uint32]25 = 'Net Name Not Found';
             }
 
-    $Path = Resolve-FullPath -Path $Path
+    $Path = Resolve-CFullPath -Path $Path
     $Path = $Path.Trim('\\')
     # When sharing drives, path must end with \. Otherwise, it shouldn't.
     if( $Path -eq (Split-Path -Qualifier -Path $Path ) )
@@ -142,9 +142,9 @@ function Install-FileShare
         $Path = Join-Path -Path $Path -ChildPath '\'
     }
 
-    if( (Test-FileShare -Name $Name) )
+    if( (Test-CFileShare -Name $Name) )
     {
-        $share = Get-FileShare -Name $Name
+        $share = Get-CFileShare -Name $Name
         [bool]$delete = $false
         
         if( $Force )
@@ -160,7 +160,7 @@ function Install-FileShare
 
         if( $delete )
         {
-            Uninstall-FileShare -Name $Name
+            Uninstall-CFileShare -Name $Name
         }
     }
 
@@ -179,7 +179,7 @@ function Install-FileShare
     $shareSecurityDescriptor.DACL = $shareAces
     $shareSecurityDescriptor.ControlFlags = "0x4"
 
-    if( -not (Test-FileShare -Name $Name) )
+    if( -not (Test-CFileShare -Name $Name) )
     {
         if( -not (Test-Path -Path $Path -PathType Container) )
         {
@@ -197,7 +197,7 @@ function Install-FileShare
     }
     else
     {
-        $share = Get-FileShare -Name $Name
+        $share = Get-CFileShare -Name $Name
         $updateShare = $false
         if( $share.Description -ne $Description )
         {
@@ -208,8 +208,8 @@ function Install-FileShare
         # Check if the share is missing any of the new ACEs.
         foreach( $ace in $shareAces )
         {
-            $identityName = Resolve-IdentityName -SID $ace.Trustee.SID
-            $permission = Get-FileSharePermission -Name $Name -Identity $identityName
+            $identityName = Resolve-CIdentityName -SID $ace.Trustee.SID
+            $permission = Get-CFileSharePermission -Name $Name -Identity $identityName
 
             if( -not $permission )
             {
@@ -224,7 +224,7 @@ function Install-FileShare
         }
 
         # Now, check that there aren't any existing ACEs that need to get deleted.
-        $existingAces = Get-FileSharePermission -Name $Name
+        $existingAces = Get-CFileSharePermission -Name $Name
         foreach( $ace in $existingAces )
         {
             $identityName = $ace.IdentityReference.Value
@@ -233,7 +233,7 @@ function Install-FileShare
             if( $shareAces )
             {
                 $existingAce = $shareAces | Where-Object { 
-                                                        $newIdentityName = Resolve-IdentityName -SID $_.Trustee.SID
+                                                        $newIdentityName = Resolve-CIdentityName -SID $_.Trustee.SID
                                                         return ( $newIdentityName -eq $ace.IdentityReference.Value )
                                                     }
             }
@@ -257,4 +257,4 @@ function Install-FileShare
     }
 }
 
-Set-Alias -Name 'Install-SmbShare' -Value 'Install-FileShare'
+Set-Alias -Name 'Install-SmbShare' -Value 'Install-CFileShare'

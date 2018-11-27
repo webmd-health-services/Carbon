@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Test-OSIs32Bit
+function Test-COSIs32Bit
 {
     <#
     .SYNOPSIS
@@ -26,7 +26,7 @@ function Test-OSIs32Bit
     http://msdn.microsoft.com/en-us/library/system.environment.is64bitoperatingsystem.aspx
     
     .EXAMPLE
-    Test-OSIs32Bit
+    Test-COSIs32Bit
     
     Returns `True` if the current operating system is 32-bit, and `False` otherwise.
     #>
@@ -38,6 +38,6 @@ function Test-OSIs32Bit
 
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
-    return -not (Test-OSIs64Bit)
+    return -not (Test-COSIs64Bit)
 }
 

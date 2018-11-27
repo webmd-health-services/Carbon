@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Add-TrustedHost
+function Add-CTrustedHost
 {
     <#
     .SYNOPSIS
@@ -25,7 +25,7 @@ function Add-TrustedHost
     Enable-PSRemoting
 
     .EXAMPLE
-    Add-TrustedHost -Entry example.com
+    Add-CTrustedHost -Entry example.com
 
     Adds `example.com` to the list of this computer's trusted hosts.  If `example.com` is already on the list of trusted hosts, nothing happens.
     #>
@@ -42,7 +42,7 @@ function Add-TrustedHost
 
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
-    $trustedHosts = @( Get-TrustedHost )
+    $trustedHosts = @( Get-CTrustedHost )
     $newEntries = @()
     
 	$Entry | ForEach-Object {
@@ -55,8 +55,8 @@ function Add-TrustedHost
     
     if( $pscmdlet.ShouldProcess( "trusted hosts", "adding $( ($newEntries -join ',') )" ) )
     {
-        Set-TrustedHost -Entry $trustedHosts
+        Set-CTrustedHost -Entry $trustedHosts
     }
 }
 
-Set-Alias -Name 'Add-TrustedHosts' -Value 'Add-TrustedHost'
+Set-Alias -Name 'Add-TrustedHosts' -Value 'Add-CTrustedHost'

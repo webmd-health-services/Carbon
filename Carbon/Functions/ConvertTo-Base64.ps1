@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function ConvertTo-Base64
+function ConvertTo-CBase64
 {
     <#
     .SYNOPSIS
@@ -22,20 +22,20 @@ function ConvertTo-Base64
     You're actually allowed to pass in `$null` and an empty string.  If you do, you'll get `$null` and an empty string back.
 
     .LINK
-    ConvertFrom-Base64
+    ConvertFrom-CBase64
     
     .EXAMPLE
-    ConvertTo-Base64 -Value 'Encode me, please!'
+    ConvertTo-CBase64 -Value 'Encode me, please!'
     
     Encodes `Encode me, please!` into a base-64 string.
     
     .EXAMPLE
-    ConvertTo-Base64 -Value 'Encode me, please!' -Encoding ([Text.Encoding]::ASCII)
+    ConvertTo-CBase64 -Value 'Encode me, please!' -Encoding ([Text.Encoding]::ASCII)
     
     Shows how to specify a custom encoding in case your string isn't in Unicode text encoding.
     
     .EXAMPLE
-    'Encode me!' | ConvertTo-Base64
+    'Encode me!' | ConvertTo-CBase64
     
     Converts `Encode me!` into a base-64 string.
     #>

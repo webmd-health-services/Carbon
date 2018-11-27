@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Add-IisDefaultDocument
+function Add-CIisDefaultDocument
 {
     <#
     .SYNOPSIS
@@ -24,7 +24,7 @@ function Add-IisDefaultDocument
     Beginning with Carbon 2.0.1, this function is available only if IIS is installed.
 
     .EXAMPLE
-    Add-IisDefaultDocument -SiteName MySite -FileName home.html
+    Add-CIisDefaultDocument -SiteName MySite -FileName home.html
     
     Adds `home.html` to the list of default documents for the MySite website.
     #>
@@ -45,7 +45,7 @@ function Add-IisDefaultDocument
 
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
-    $section = Get-IisConfigurationSection -SiteName $SiteName -SectionPath 'system.webServer/defaultDocument'
+    $section = Get-CIisConfigurationSection -SiteName $SiteName -SectionPath 'system.webServer/defaultDocument'
     if( -not $section )
     {
         return

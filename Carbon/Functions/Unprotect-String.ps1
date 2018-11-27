@@ -10,18 +10,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-filter Unprotect-String
+filter Unprotect-CString
 {
     <#
     .SYNOPSIS
     Decrypts a string.
     
     .DESCRIPTION
-    `Unprotect-String` decrypts a string encrypted via the Data Protection API (DPAPI), RSA, or AES. It uses the DP/RSA APIs to decrypted the secret into an array of bytes, which is then converted to a UTF8 string. Beginning with Carbon 2.0, after conversion, the decrypted array of bytes is cleared in memory.
+    `Unprotect-CString` decrypts a string encrypted via the Data Protection API (DPAPI), RSA, or AES. It uses the DP/RSA APIs to decrypted the secret into an array of bytes, which is then converted to a UTF8 string. Beginning with Carbon 2.0, after conversion, the decrypted array of bytes is cleared in memory.
 
-    Also beginning in Carbon 2.0, use the `AsSecureString` switch to cause `Unprotect-String` to return the decrypted string as a `System.Security.SecureString`, thus preventing your secret from hanging out in memory. When converting to a secure string, the secret is decrypted to an array of bytes, and then converted to an array of characters. Each character is appended to the secure string, after which it is cleared in memory. When the conversion is complete, the decrypted byte array is also cleared out in memory.
+    Also beginning in Carbon 2.0, use the `AsSecureString` switch to cause `Unprotect-CString` to return the decrypted string as a `System.Security.SecureString`, thus preventing your secret from hanging out in memory. When converting to a secure string, the secret is decrypted to an array of bytes, and then converted to an array of characters. Each character is appended to the secure string, after which it is cleared in memory. When the conversion is complete, the decrypted byte array is also cleared out in memory.
 
-    `Unprotect-String` can decrypt using the following techniques.
+    `Unprotect-CString` can decrypt using the following techniques.
 
     ## DPAPI
 
@@ -29,7 +29,7 @@ filter Unprotect-String
 
     ## RSA
 
-    RSA is an assymetric encryption/decryption algorithm, which requires a public/private key pair. It uses a private key to decrypt a secret encrypted with the public key. Only the private key can decrypt secrets. `Protect-String` decrypts with .NET's `System.Security.Cryptography.RSACryptoServiceProvider` class.
+    RSA is an assymetric encryption/decryption algorithm, which requires a public/private key pair. It uses a private key to decrypt a secret encrypted with the public key. Only the private key can decrypt secrets. `Protect-CString` decrypts with .NET's `System.Security.Cryptography.RSACryptoServiceProvider` class.
 
     You can specify the private key in three ways: 
     
@@ -39,40 +39,40 @@ filter Unprotect-String
    
     ## AES
 
-    AES is a symmetric encryption/decryption algorithm. You supply a 16-, 24-, or 32-byte key, password, or passphrase with the `Key` parameter, and that key is used to decrypt. You must decrypt with the same key you used to encrypt. `Unprotect-String` decrypts with .NET's `System.Security.Cryptography.AesCryptoServiceProvider` class.
+    AES is a symmetric encryption/decryption algorithm. You supply a 16-, 24-, or 32-byte key, password, or passphrase with the `Key` parameter, and that key is used to decrypt. You must decrypt with the same key you used to encrypt. `Unprotect-CString` decrypts with .NET's `System.Security.Cryptography.AesCryptoServiceProvider` class.
 
-    Symmetric encryption requires a random, unique initialization vector (i.e. IV) everytime you encrypt something. If you encrypted your original string with Carbon's `Protect-String` function, that IV was pre-pended to the encrypted secret. If you encrypted the secret yourself, you'll need to ensure the original IV is pre-pended to the protected string.
+    Symmetric encryption requires a random, unique initialization vector (i.e. IV) everytime you encrypt something. If you encrypted your original string with Carbon's `Protect-CString` function, that IV was pre-pended to the encrypted secret. If you encrypted the secret yourself, you'll need to ensure the original IV is pre-pended to the protected string.
 
-    The help topic for `Protect-String` demonstrates how to generate an AES key and how to encode it as a base-64 string.
+    The help topic for `Protect-CString` demonstrates how to generate an AES key and how to encode it as a base-64 string.
 
     The ability to decrypt with AES was added in Carbon 2.3.0.
     
     .LINK
-    New-RsaKeyPair
+    New-CRsaKeyPair
         
     .LINK
-    Protect-String
+    Protect-CString
 
     .LINK
     http://msdn.microsoft.com/en-us/library/system.security.cryptography.protecteddata.aspx
 
     .EXAMPLE
-    PS> $password = Unprotect-String -ProtectedString  $encryptedPassword
+    PS> $password = Unprotect-CString -ProtectedString  $encryptedPassword
     
     Decrypts a protected string which was encrypted at the current user or default scopes using the DPAPI. The secret must have been encrypted at the current user's scope or at the local computer's scope.
     
     .EXAMPLE
-    Protect-String -String 'NotSoSecretSecret' -ForUser | Unprotect-String
+    Protect-CString -String 'NotSoSecretSecret' -ForUser | Unprotect-CString
     
-    Demonstrates how Unprotect-String takes input from the pipeline.  Adds 'NotSoSecretSecret' to the pipeline.
+    Demonstrates how Unprotect-CString takes input from the pipeline.  Adds 'NotSoSecretSecret' to the pipeline.
 
     .EXAMPLE
-    Unprotect-String -ProtectedString $ciphertext -Certificate $myCert
+    Unprotect-CString -ProtectedString $ciphertext -Certificate $myCert
 
-    Demonstrates how to encrypt a secret using RSA with a `System.Security.Cryptography.X509Certificates.X509Certificate2` object. You're responsible for creating/loading it. The `New-RsaKeyPair` function will create a key pair for you, if you've got a Windows SDK installed.
+    Demonstrates how to encrypt a secret using RSA with a `System.Security.Cryptography.X509Certificates.X509Certificate2` object. You're responsible for creating/loading it. The `New-CRsaKeyPair` function will create a key pair for you, if you've got a Windows SDK installed.
 
     .EXAMPLE
-    Unprotect-String -ProtectedString $ciphertext -Thumbprint '44A7C27F3353BC53F82318C14490D7E2500B6D9E'
+    Unprotect-CString -ProtectedString $ciphertext -Thumbprint '44A7C27F3353BC53F82318C14490D7E2500B6D9E'
 
     Demonstrates how to decrypt a secret using RSA with a certificate in one of the Windows certificate stores. All local machine and user stores are searched. The current user must have permission/access to the certificate's private key.
 
@@ -87,17 +87,17 @@ filter Unprotect-String
     Demonstrates how to encrypt a secret using RSA with a certificate in the store, giving its exact path.
 
     .EXAMPLE
-    Unprotect-String -ProtectedString 'dNC+yiKdSMAsG2Y3DA6Jzozesie3ZToQT24jB4CU/9eCGEozpiS5MR7R8s3L+PWV' -Key 'gT4XPfvcJmHkQ5tYjY3fNgi7uwG4FB9j'
+    Unprotect-CString -ProtectedString 'dNC+yiKdSMAsG2Y3DA6Jzozesie3ZToQT24jB4CU/9eCGEozpiS5MR7R8s3L+PWV' -Key 'gT4XPfvcJmHkQ5tYjY3fNgi7uwG4FB9j'
 
     Demonstrates how to decrypt a secret that was encrypted with a key, password, or passphrase. In this case, we are decrypting with a plaintext password. This functionality was added in Carbon 2.3.0.
 
     .EXAMPLE
-    Unprotect-String -ProtectedString '19hNiwW0mmYHRlbk65GnSH2VX7tEziazZsEXvOzZIyCT69pp9HLf03YBVYGfg788' -Key (Read-Host -Prompt 'Enter password (must be 16, 24, or 32 characters long):' -AsSecureString)
+    Unprotect-CString -ProtectedString '19hNiwW0mmYHRlbk65GnSH2VX7tEziazZsEXvOzZIyCT69pp9HLf03YBVYGfg788' -Key (Read-Host -Prompt 'Enter password (must be 16, 24, or 32 characters long):' -AsSecureString)
 
     Demonstrates how to decrypt a secret that was encrypted with a key, password, or passphrase. In this case, we are prompting the user for the password. This functionality was added in Carbon 2.3.0.
 
     .EXAMPLE
-    Unprotect-String -ProtectedString 'Mpu90IhBq9NseOld7VO3akcJX+nCIZmJv8rz8qfyn7M9m26owetJVzAfhFr0w0Vj' -Key ([byte[]]@(163,163,185,174,205,55,157,219,121,146,251,116,43,203,63,38,73,154,230,112,82,112,151,29,189,135,254,187,164,104,45,30))
+    Unprotect-CString -ProtectedString 'Mpu90IhBq9NseOld7VO3akcJX+nCIZmJv8rz8qfyn7M9m26owetJVzAfhFr0w0Vj' -Key ([byte[]]@(163,163,185,174,205,55,157,219,121,146,251,116,43,203,63,38,73,154,230,112,82,112,151,29,189,135,254,187,164,104,45,30))
 
     Demonstrates how to decrypt a secret that was encrypted with a key, password, or passphrase as an array of bytes. This functionality was added in Carbon 2.3.0.
     #>
@@ -162,7 +162,7 @@ filter Unprotect-String
             {
                 $passwordParam = @{ Password = $Password }
             }
-            $Certificate = Get-Certificate -Path $PrivateKeyPath @passwordParam
+            $Certificate = Get-CCertificate -Path $PrivateKeyPath @passwordParam
             if( -not $Certificate )
             {
                 return
@@ -227,7 +227,7 @@ Failed to decrypt string using certificate '{0}' ({1}). This can happen when:
             elseif( $_.Exception.Message -match '(Bad Data|The parameter is incorrect)\.' )
             {
                 Write-Error (@'
-Failed to decrypt string using certificate '{0}' ({1}). This usually happens when the padding algorithm used when encrypting/decrypting is different. Check the `-UseDirectEncryptionPadding` switch is the same for both calls to `Protect-String` and `Unprotect-String`.
+Failed to decrypt string using certificate '{0}' ({1}). This usually happens when the padding algorithm used when encrypting/decrypting is different. Check the `-UseDirectEncryptionPadding` switch is the same for both calls to `Protect-CString` and `Unprotect-CString`.
 
 {2}: {3}
 '@ -f $Certificate.Subject,$Certificate.Thumbprint,$_.Exception.GetType().FullName,$_.Exception.Message)
@@ -239,7 +239,7 @@ Failed to decrypt string using certificate '{0}' ({1}). This usually happens whe
     }
     elseif( $PSCmdlet.ParameterSetName -eq 'Symmetric' )
     {
-        $Key = ConvertTo-Key -InputObject $Key -From 'Unprotect-String'
+        $Key = ConvertTo-Key -InputObject $Key -From 'Unprotect-CString'
         if( -not $Key )
         {
             return

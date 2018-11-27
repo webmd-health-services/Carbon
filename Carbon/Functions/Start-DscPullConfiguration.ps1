@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Start-DscPullConfiguration
+function Start-CDscPullConfiguration
 {
     <#
     .SYNOPSIS
@@ -21,38 +21,38 @@ function Start-DscPullConfiguration
 
     If a computer's LCM isn't configured to pull its configuration, an error is written, and nothing happens.
 
-    If a configuration check fails, the errors are retrieved from the computer's event log and written out as errors. The `Remote Event Log Management` firewall rules must be enabled on the computer for this to work. If they aren't, you'll see an error explaining this. The `Get-DscError` help topic shows how to enable these firewall rules.
+    If a configuration check fails, the errors are retrieved from the computer's event log and written out as errors. The `Remote Event Log Management` firewall rules must be enabled on the computer for this to work. If they aren't, you'll see an error explaining this. The `Get-CDscError` help topic shows how to enable these firewall rules.
 
-    Sometimes, the LCM does a really crappy job of updating to the latest version of a module. `Start-DscPullConfiguration` will delete modules on the target computers. Specify the names of the modules to delete with the `ModuleName` parameter. Make sure you only delete modules that will get installed by the LCM. Only modules installed in the `$env:ProgramFiles\WindowsPowerShell\Modules` directory are removed.
+    Sometimes, the LCM does a really crappy job of updating to the latest version of a module. `Start-CDscPullConfiguration` will delete modules on the target computers. Specify the names of the modules to delete with the `ModuleName` parameter. Make sure you only delete modules that will get installed by the LCM. Only modules installed in the `$env:ProgramFiles\WindowsPowerShell\Modules` directory are removed.
 
-    `Start-DscPullConfiguration` is new in Carbon 2.0.
-
-    .LINK
-    Get-DscError
+    `Start-CDscPullConfiguration` is new in Carbon 2.0.
 
     .LINK
-    Initialize-Lcm
+    Get-CDscError
 
     .LINK
-    Get-DscWinEvent
+    Initialize-CLcm
+
+    .LINK
+    Get-CDscWinEvent
 
     .EXAMPLE
-    Start-DscPullConfiguration -ComputerName '10.1.2.3','10.4.5.6'
+    Start-CDscPullConfiguration -ComputerName '10.1.2.3','10.4.5.6'
 
     Demonstrates how to immedately download and apply a computer from its pull server.
 
     .EXAMPLE
-    Start-DscPullConfiguration -ComputerName '10.1.2.3' -Credential (Get-Credential domain\username)
+    Start-CDscPullConfiguration -ComputerName '10.1.2.3' -Credential (Get-Credential domain\username)
 
     Demonstrates how to use custom credentials to contact the remote server.
 
     .EXAMPLE
-    Start-DscPullConfiguration -CimSession $session
+    Start-CDscPullConfiguration -CimSession $session
 
     Demonstrates how to use one or more CIM sessions to invoke a configuration check.
 
     .EXAMPLE
-    Start-DScPullConfiguration -ComputerName 'example.com' -ModuleName 'Carbon'
+    Start-CDscPullConfiguration -ComputerName 'example.com' -ModuleName 'Carbon'
 
     Demonstrates how to delete modules on the target computers, because sometimes the LCM does a really crappy job of it.
     #>
@@ -163,8 +163,8 @@ function Start-DscPullConfiguration
         ForEach-Object { 
             $session = $_
             $startedAt= $win32OS | Where-Object { $_.PSComputerName -eq $session.ComputerName } | Select-Object -ExpandProperty 'LocalDateTime'
-            Get-DscError -ComputerName $session.ComputerName -StartTime $startedAt -Wait 
+            Get-CDscError -ComputerName $session.ComputerName -StartTime $startedAt -Wait 
         } | 
-        Write-DscError
+        Write-CDscError
 }
 

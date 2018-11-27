@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Uninstall-Service
+function Uninstall-CService
 {
     <#
     .SYNOPSIS
@@ -19,16 +19,16 @@ function Uninstall-Service
     .DESCRIPTION
     Removes an existing Windows service.  If the service doesn't exist, nothing happens.  The service is stopped before being deleted, so that the computer doesn't need to be restarted for the removal to complete. 
 
-    Beginning in Carbon 2.7, if the service's process is still running after the service is stopped (some services don't behave nicely) and the service is only running one process, `Uninstall-Service` will kill the service's process. This helps prevent requiring a reboot. If you want to give the service time to 
+    Beginning in Carbon 2.7, if the service's process is still running after the service is stopped (some services don't behave nicely) and the service is only running one process, `Uninstall-CService` will kill the service's process. This helps prevent requiring a reboot. If you want to give the service time to 
 
     .LINK
     Carbon_Service
 
     .LINK
-    Install-Service
+    Install-CService
 
     .EXAMPLE
-    Uninstall-Service -Name DeathStar
+    Uninstall-CService -Name DeathStar
 
     Removes the Death Star Windows service.  It is destro..., er, stopped first, then destro..., er, deleted.  If only the rebels weren't using Linux!
     #>
@@ -83,19 +83,19 @@ function Uninstall-Service
             $killService = $true
             if( $StopTimeout )
             {
-                Write-Verbose -Message ('[Uninstall-Service]  [{0}]  Waiting "{1}" second(s) for service process "{2}" to exit.' -f $Name,$StopTimeout.TotalSeconds,$process.Id)
+                Write-Verbose -Message ('[Uninstall-CService]  [{0}]  Waiting "{1}" second(s) for service process "{2}" to exit.' -f $Name,$StopTimeout.TotalSeconds,$process.Id)
                 $killService = -not $process.WaitForExit($StopTimeout.TotalMilliseconds)
             }
 
             if( $killService )
             {
-                Write-Verbose -Message ('[Uninstall-Service]  [{0}]  Killing service process "{1}".' -f $Name,$process.Id)
+                Write-Verbose -Message ('[Uninstall-CService]  [{0}]  Killing service process "{1}".' -f $Name,$process.Id)
                 Stop-Process -Id $process.Id -Force
             }
         }
     }
 
-    Write-Verbose -Message ('[Uninstall-Service]  [{0}]  {1} delete {0}' -f $Name,$sc)
+    Write-Verbose -Message ('[Uninstall-CService]  [{0}]  {1} delete {0}' -f $Name,$sc)
     $output = & $sc delete $Name
     if( $LASTEXITCODE )
     {
@@ -114,5 +114,5 @@ function Uninstall-Service
     }
 }
 
-Set-Alias -Name 'Remove-Service' -Value 'Uninstall-Service'
+Set-Alias -Name 'Remove-Service' -Value 'Uninstall-CService'
 

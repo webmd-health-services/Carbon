@@ -10,19 +10,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Install-Directory
+function Install-CDirectory
 {
     <#
     .SYNOPSIS
     Creates a directory, if it doesn't exist.
 
     .DESCRIPTION
-    The `Install-Directory` function creates a directory. If the directory already exists, it does nothing. If any parent directories don't exist, they are created, too.
+    The `Install-CDirectory` function creates a directory. If the directory already exists, it does nothing. If any parent directories don't exist, they are created, too.
 
-    `Install-Directory` was added in Carbon 2.1.0.
+    `Install-CDirectory` was added in Carbon 2.1.0.
 
     .EXAMPLE
-    Install-Directory -Path 'C:\Projects\Carbon'
+    Install-CDirectory -Path 'C:\Projects\Carbon'
 
     Demonstrates how to use create a directory. In this case, the directories `C:\Projects` and `C:\Projects\Carbon` will be created if they don't exist.
     #>

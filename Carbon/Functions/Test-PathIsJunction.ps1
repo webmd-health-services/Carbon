@@ -10,14 +10,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Test-PathIsJunction
+function Test-CPathIsJunction
 {
     <#
     .SYNOPSIS
     Tests if a path is a junction.
     
     .DESCRIPTION
-    The `Test-PathIsJunction` function tests if path is a junction (i.e. reparse point). If the path doesn't exist, returns `$false`.
+    The `Test-CPathIsJunction` function tests if path is a junction (i.e. reparse point). If the path doesn't exist, returns `$false`.
     
     Carbon adds an `IsJunction` extension method on `DirectoryInfo` objects, which you can use instead e.g.
     
@@ -29,12 +29,12 @@ function Test-PathIsJunction
     The `LiteralPath` parameter was added in Carbon 2.2.0. Use it to check paths that contain wildcard characters.
     
     .EXAMPLE
-    Test-PathIsJunction -Path C:\I\Am\A\Junction
+    Test-CPathIsJunction -Path C:\I\Am\A\Junction
     
     Returns `$true`.
     
     .EXAMPLE
-    Test-PathIsJunction -Path C:\I\Am\Not\A\Junction
+    Test-CPathIsJunction -Path C:\I\Am\Not\A\Junction
     
     Returns `$false`.
     
@@ -44,7 +44,7 @@ function Test-PathIsJunction
     Demonstrates an alternative way of testing for junctions.  Uses Carbon's `IsJunction` extension method on the `DirectoryInfo` type to check if any directories under the current directory are junctions.
 
     .EXAMPLE
-    Test-PathIsJunction -LiteralPath 'C:\PathWithWildcards[]'
+    Test-CPathIsJunction -LiteralPath 'C:\PathWithWildcards[]'
 
     Demonstrates how to test if a path with wildcards is a junction.
     #>
@@ -77,7 +77,7 @@ function Test-PathIsJunction
             return ($junctions -ne $null)        
         }
 
-        return Test-PathIsJunction -LiteralPath $Path
+        return Test-CPathIsJunction -LiteralPath $Path
     }
 
     if( Test-Path -LiteralPath $LiteralPath -PathType Container )

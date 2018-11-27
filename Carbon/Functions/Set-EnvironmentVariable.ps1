@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Set-EnvironmentVariable
+function Set-CEnvironmentVariable
 {
     <#
     .SYNOPSIS
@@ -29,23 +29,23 @@ function Set-EnvironmentVariable
     Carbon_EnvironmentVariable
 
     .LINK
-    Remove-EnvironmentVariable
+    Remove-CEnvironmentVariable
 
     .LINK
     http://msdn.microsoft.com/en-us/library/z8te35sa
 
     .EXAMPLE
-    Set-EnvironmentVariable -Name 'MyEnvironmentVariable' -Value 'Value1' -ForProcess
+    Set-CEnvironmentVariable -Name 'MyEnvironmentVariable' -Value 'Value1' -ForProcess
     
     Creates the `MyEnvironmentVariable` with an initial value of `Value1` in the process scope, i.e. the variable is only accessible in the current process.
     
     .EXAMPLE
-    Set-EnvironmentVariable -Name 'MyEnvironmentVariable' -Value 'Value1' -ForComputer
+    Set-CEnvironmentVariable -Name 'MyEnvironmentVariable' -Value 'Value1' -ForComputer
     
     Creates the `MyEnvironmentVariable` with an initial value of `Value1` in the machine scope, i.e. the variable is accessible in all newly launched processes.
     
     .EXAMPLE
-    Set-EnvironmentVariable -Name 'SomeUsersEnvironmentVariable' -Value 'SomeValue' -ForUser -Credential $userCreds
+    Set-CEnvironmentVariable -Name 'SomeUsersEnvironmentVariable' -Value 'SomeValue' -ForUser -Credential $userCreds
 
     Demonstrates that you can set a user-level environment variable for another user by passing its credentials to the `Credential` parameter. Runs a separate PowerShell process as that user to set the environment variable.
     #>
@@ -96,9 +96,9 @@ function Set-EnvironmentVariable
 
     if( $PSCmdlet.ParameterSetName -eq 'ForSpecificUser' )
     {
-        Invoke-PowerShell -FilePath (Join-Path -Path $PSScriptRoot -ChildPath '..\bin\Set-EnvironmentVariable.ps1' -Resolve) `
+        Invoke-CPowerShell -FilePath (Join-Path -Path $PSScriptRoot -ChildPath '..\bin\Set-CEnvironmentVariable.ps1' -Resolve) `
                           -Credential $credential `
-                          -ArgumentList ('-Name {0} -Value {1}' -f (ConvertTo-Base64 $Name),(ConvertTo-Base64 $Value)) `
+                          -ArgumentList ('-Name {0} -Value {1}' -f (ConvertTo-CBase64 $Name),(ConvertTo-CBase64 $Value)) `
                           -NonInteractive `
                           -OutputFormat 'text'
         return

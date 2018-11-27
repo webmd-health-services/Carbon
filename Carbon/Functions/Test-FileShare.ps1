@@ -10,31 +10,31 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Test-FileShare
+function Test-CFileShare
 {
     <#
     .SYNOPSIS
     Tests if a file/SMB share exists on the local computer.
 
     .DESCRIPTION
-    The `Test-FileShare` function uses WMI to check if a file share exists on the local computer. If the share exists, `Test-FileShare` returns `$true`. Otherwise, it returns `$false`.
+    The `Test-CFileShare` function uses WMI to check if a file share exists on the local computer. If the share exists, `Test-CFileShare` returns `$true`. Otherwise, it returns `$false`.
 
-    `Test-FileShare` was added in Carbon 2.0.
-
-    .LINK
-    Get-FileShare
+    `Test-CFileShare` was added in Carbon 2.0.
 
     .LINK
-    Get-FileSharePermission
+    Get-CFileShare
 
     .LINK
-    Install-FileShare
+    Get-CFileSharePermission
 
     .LINK
-    Uninstall-FileShare
+    Install-CFileShare
+
+    .LINK
+    Uninstall-CFileShare
 
     .EXAMPLE
-    Test-FileShare -Name 'CarbonShare'
+    Test-CFileShare -Name 'CarbonShare'
 
     Demonstrates how to test of a file share exists.
     #>
@@ -50,7 +50,7 @@ function Test-FileShare
 
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
-    $share = Get-FileShare -Name ('{0}*' -f $Name) |
+    $share = Get-CFileShare -Name ('{0}*' -f $Name) |
                 Where-Object { $_.Name -eq $Name }
 
     return ($share -ne $null)

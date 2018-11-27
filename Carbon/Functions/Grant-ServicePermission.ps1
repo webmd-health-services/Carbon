@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Grant-ServicePermission
+function Grant-CServicePermission
 {
     <#
     .SYNOPSIS
@@ -24,13 +24,13 @@ function Grant-ServicePermission
     Any previous permissions are replaced.
     
     .LINK
-    Get-ServicePermission
+    Get-CServicePermission
     
     .LINK
     Grant-ServiceControlPermissions
     
     .EXAMPLE
-    Grant-ServicePermission -Identity FALCON\Chewbacca -Name Hyperdrive -QueryStatus -EnumerateDependents -Start -Stop
+    Grant-CServicePermission -Identity FALCON\Chewbacca -Name Hyperdrive -QueryStatus -EnumerateDependents -Start -Stop
     
     Grants Chewbacca the permissions to query, enumerate dependents, start, and stop the `Hyperdrive` service.  Coincedentally, these are the permissions that Chewbacca nees to run `Start-Service`, `Stop-Service`, `Restart-Service`, and `Get-Service` cmdlets against the `Hyperdrive` service.
     #>
@@ -121,13 +121,13 @@ function Grant-ServicePermission
 
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
-    $account = Resolve-Identity -Name $Identity
+    $account = Resolve-CIdentity -Name $Identity
     if( -not $account )
     {
         return
     }
     
-    if( -not (Assert-Service -Name $Name) )
+    if( -not (Assert-CService -Name $Name) )
     {
         return
     }
@@ -141,10 +141,10 @@ function Grant-ServicePermission
             ForEach-Object { $accessRights = $accessRights -bor [Carbon.Security.ServiceAccessRights]::$_ }
     }
     
-    $dacl = Get-ServiceAcl -Name $Name
+    $dacl = Get-CServiceAcl -Name $Name
     $dacl.SetAccess( [Security.AccessControl.AccessControlType]::Allow, $account.Sid, $accessRights, 'None', 'None' )
     
-    Set-ServiceAcl -Name $Name -DACL $dacl
+    Set-CServiceAcl -Name $Name -DACL $dacl
 }
 
 

@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Disable-IEEnhancedSecurityConfiguration
+function Disable-CIEEnhancedSecurityConfiguration
 {
     <#
     .SYNOPSIS
@@ -18,14 +18,14 @@ function Disable-IEEnhancedSecurityConfiguration
     .DESCRIPTION
     By default, Windows locks down Internet Explorer so that users can't visit certain sites.  This function disables that enhanced security.  This is necessary if you have automated processes that need to run and interact with Internet Explorer.
     
-    You may also need to call `Enable-IEActivationPermission`, so that processes have permission to start Internet Explorer.
+    You may also need to call `Enable-CIEActivationPermission`, so that processes have permission to start Internet Explorer.
     
     .EXAMPLE
-    Disable-IEEnhancedSecurityConfiguration
+    Disable-CIEEnhancedSecurityConfiguration
     .LINK
     http://technet.microsoft.com/en-us/library/dd883248(v=WS.10).aspx
     .LINK
-    Enable-IEActivationPermission
+    Enable-CIEActivationPermission
     #>
     [CmdletBinding(SupportsShouldProcess=$true)]
     param(
@@ -51,7 +51,7 @@ function Disable-IEEnhancedSecurityConfiguration
                 Write-Warning ('Applying Enhanced Security Configuration registry key ''{0}'' not found.' -f $hklmPath)
                 return
             }
-            Set-RegistryKeyValue -Path $hklmPath -Name 'IsInstalled' -DWord 0
+            Set-CRegistryKeyValue -Path $hklmPath -Name 'IsInstalled' -DWord 0
         }
 
         Write-Verbose ('Calling iesetup.dll hardening methods.')

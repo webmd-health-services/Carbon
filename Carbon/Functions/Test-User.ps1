@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Test-User
+function Test-CUser
 {
     <#
     .SYNOPSIS
@@ -23,16 +23,16 @@ function Test-User
     System.Boolean
 
     .LINK
-    Get-User
+    Get-CUser
 
     .LINK
-    Install-User
+    Install-CUser
 
     .LINK
-    Uninstall-User
+    Uninstall-CUser
 
     .EXAMPLE
-    Test-User -Username HSolo
+    Test-CUser -Username HSolo
 
     Checks if the HSolo *local* account exists.  Returns `True` if it does, `False` if it doesn't or its encased in carbonite.
     #>

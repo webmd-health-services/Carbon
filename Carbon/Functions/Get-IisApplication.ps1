@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Get-IisApplication
+function Get-CIisApplication
 {
     <#
     .SYNOPSIS
@@ -31,17 +31,17 @@ function Get-IisApplication
     Microsoft.Web.Administration.Application.
 
     .EXAMPLE
-    Get-IisApplication -SiteName 'DeathStar`
+    Get-CIisApplication -SiteName 'DeathStar`
 
     Gets all the applications running under the `DeathStar` website.
 
     .EXAMPLE
-    Get-IisApplication -SiteName 'DeathStar' -VirtualPath '/'
+    Get-CIisApplication -SiteName 'DeathStar' -VirtualPath '/'
 
     Demonstrates how to get the main application for a website: use `/` as the application name.
 
     .EXAMPLE
-    Get-IisApplication -SiteName 'DeathStar' -VirtualPath 'MainPort/ExhaustPort'
+    Get-CIisApplication -SiteName 'DeathStar' -VirtualPath 'MainPort/ExhaustPort'
 
     Demonstrates how to get a nested application, i.e. gets the application at `/MainPort/ExhaustPort` under the `DeathStar` website.
     #>
@@ -64,7 +64,7 @@ function Get-IisApplication
 
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
-    $site = Get-IisWebsite -SiteName $SiteName
+    $site = Get-CIisWebsite -SiteName $SiteName
     if( -not $site )
     {
         return

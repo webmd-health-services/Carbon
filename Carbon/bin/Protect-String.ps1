@@ -30,6 +30,6 @@ Add-Type -AssemblyName 'System.Security'
 . (Join-Path -Path $PSScriptRoot -ChildPath '..\Functions\Protect-String.ps1' -Resolve)
 . (Join-Path -Path $PSScriptRoot -ChildPath '..\Functions\Unprotect-String.ps1' -Resolve)
 
-$string = Unprotect-String -ProtectedString $ProtectedString
-Protect-String -String $string -ForUser
+$string = Unprotect-CString -ProtectedString $ProtectedString
+Protect-CString -String $string -ForUser
 

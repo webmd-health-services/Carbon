@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Test-IisConfigurationSection
+function Test-CIisConfigurationSection
 {
     <#
     .SYNOPSIS
@@ -25,17 +25,17 @@ function Test-IisConfigurationSection
     System.Boolean.
     
     .EXAMPLE
-    Test-IisConfigurationSection -SectionPath 'system.webServer/I/Do/Not/Exist'
+    Test-CIisConfigurationSection -SectionPath 'system.webServer/I/Do/Not/Exist'
     
     Tests if a configuration section exists.  Returns `False`, because the given configuration section doesn't exist.
     
     .EXAMPLE
-    Test-IisConfigurationSection -SectionPath 'system.webServer/cgi' -Locked
+    Test-CIisConfigurationSection -SectionPath 'system.webServer/cgi' -Locked
     
     Returns `True` if the global CGI section is locked.  Otherwise `False`.
     
     .EXAMPLE
-    Test-IisConfigurationSection -SectionPath 'system.webServer/security/authentication/basicAuthentication' -SiteName `Peanuts` -VirtualPath 'SopwithCamel' -Locked
+    Test-CIisConfigurationSection -SectionPath 'system.webServer/security/authentication/basicAuthentication' -SiteName `Peanuts` -VirtualPath 'SopwithCamel' -Locked
 
     Returns `True` if the `Peanuts` website's `SopwithCamel` sub-directory's `basicAuthentication` security authentication section is locked.  Otherwise, returns `False`.
     #>
@@ -80,7 +80,7 @@ function Test-IisConfigurationSection
         $getArgs.VirtualPath = $VirtualPath
     }
     
-    $section = Get-IisConfigurationSection @getArgs -ErrorAction SilentlyContinue
+    $section = Get-CIisConfigurationSection @getArgs -ErrorAction SilentlyContinue
     
     if( $pscmdlet.ParameterSetName -eq 'CheckExists' )
     {
@@ -96,7 +96,7 @@ function Test-IisConfigurationSection
         
     if( -not $section )
     {
-        Write-Error ('IIS:{0}: section {1} not found.' -f (Join-IisVirtualPath $SiteName $VirtualPath),$SectionPath)
+        Write-Error ('IIS:{0}: section {1} not found.' -f (Join-CIisVirtualPath $SiteName $VirtualPath),$SectionPath)
         return
     }
     

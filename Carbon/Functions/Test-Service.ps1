@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Test-Service
+function Test-CService
 {
     <#
     .SYNOPSIS
@@ -26,13 +26,13 @@ function Test-Service
     Carbon_Service
 
     .LINK
-    Install-Service
+    Install-CService
 
     .LINK
-    Uninstall-Service
+    Uninstall-CService
 
     .EXAMPLE
-    Test-Service -Name 'Drive'
+    Test-CService -Name 'Drive'
     
     Returns `true` if the `Drive` service exists.  `False` otherwise.
     #>

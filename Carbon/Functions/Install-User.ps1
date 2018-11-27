@@ -10,14 +10,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Install-User
+function Install-CUser
 {
     <#
     .SYNOPSIS
     Installs a *local* user account.
 
     .DESCRIPTION
-    `Install-User` creates a new *local* user account, or updates an existing *local* user account. 
+    `Install-CUser` creates a new *local* user account, or updates an existing *local* user account. 
     
     Returns the user if `-PassThru` switch is used. The object returned, an instance of `System.DirectoryServices.AccountManagement.UserPrincipal`, uses external resources, which means it can leak memory when garbage collected. When you're done using the user object you get, call its `Dispose()` method so its external resources are cleaned up properly.
 
@@ -27,24 +27,24 @@ function Install-User
     System.DirectoryServices.AccountManagement.UserPrincipal.
 
     .LINK
-    Get-User
+    Get-CUser
 
     .LINK
-    New-Credential
+    New-CCredential
 
     .LINK
-    Test-User
+    Test-CUser
 
     .LINK
-    Uninstall-User
+    Uninstall-CUser
 
     .EXAMPLE
-    Install-User -Credential $lukeCredentials -Description "Luke Skywalker's account."
+    Install-CUser -Credential $lukeCredentials -Description "Luke Skywalker's account."
 
     Creates a new `LSkywalker` user account with the given password and description.  Luke's password is set to never expire.  
 
     .EXAMPLE
-    Install-User -Credential $lukeCredentials -UserCannotChangePassword -PasswordExpires
+    Install-CUser -Credential $lukeCredentials -UserCannotChangePassword -PasswordExpires
 
     Demonstrates how to create an account for a user who cannot change his password and whose password will expire.
     #>
@@ -120,7 +120,7 @@ function Install-User
 
         if( $PSCmdlet.ParameterSetName -eq 'WithUserNameAndPassword' )
         {
-            Write-Warning ('Install-User function''s `UserName` and `Password` parameters are obsolete and will be removed in a future version of Carbon. Please use the `Credential` parameter instead.')
+            Write-Warning ('Install-CUser function''s `UserName` and `Password` parameters are obsolete and will be removed in a future version of Carbon. Please use the `Credential` parameter instead.')
             $user.SetPassword( $Password )
         }
         else

@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Find-ADUser
+function Find-CADUser
 {
     <#
     .SYNOPSIS
@@ -26,7 +26,7 @@ function Find-ADUser
     http://msdn.microsoft.com/en-us/library/aa746475.aspx
     
     .EXAMPLE
-    Find-ADUser -DomainUrl LDAP://dc.example.com:389 -sAMAccountName $env:USERNAME
+    Find-CADUser -DomainUrl LDAP://dc.example.com:389 -sAMAccountName $env:USERNAME
     
     Finds the AD user whose Windows username (sAMAccountName) is equal to thecurrently logged on user's username.
     #>
@@ -54,7 +54,7 @@ function Find-ADUser
     $filterPropertyName = 'sAMAccountName'
     $filterPropertyValue = $sAMAccountName
     
-    $filterPropertyValue = Format-ADSearchFilterValue $filterPropertyValue
+    $filterPropertyValue = Format-CADSearchFilterValue $filterPropertyValue
     
     $searcher.Filter = "(&(objectClass=User) ($filterPropertyName=$filterPropertyValue))"
     try

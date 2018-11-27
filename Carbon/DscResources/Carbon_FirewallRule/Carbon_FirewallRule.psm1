@@ -79,7 +79,7 @@ function Get-TargetResource
 
     Set-StrictMode -Version 'Latest'
 
-    $rule = Get-FirewallRule -LiteralName $Name
+    $rule = Get-CFirewallRule -LiteralName $Name
     if( $rule -is [object[]] )
     {
         Write-Error ('Found {0} firewall rules named ''{1}''.' -f $rule.Count,$Name)
@@ -145,7 +145,7 @@ function Set-TargetResource
     `Carbon_FirewallRule` is new in Carbon 2.0.
 
     .LINK
-    Get-FirewallRule
+    Get-CFirewallRule
 
     .LINK
     http://technet.microsoft.com/en-us/library/dd734783.aspx
@@ -441,7 +441,7 @@ function Test-TargetResource
         return $false
     }
 
-    return Test-DscTargetResource -TargetResource $resource -DesiredResource $PSBoundParameters -Target ('Firewall rule ''{0}''' -f $Name)
+    return Test-CDscTargetResource -TargetResource $resource -DesiredResource $PSBoundParameters -Target ('Firewall rule ''{0}''' -f $Name)
 }
 
 

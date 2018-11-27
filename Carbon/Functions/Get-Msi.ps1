@@ -10,14 +10,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Get-Msi
+function Get-CMsi
 {
     <#
     .SYNOPSIS
     Gets details about an MSI file.
 
     .DESCRIPTION
-    The `Get-Msi` function reads the installer properties from an MSI file and returns a `Carbon.Msi.MsiInfo` object representing an MSI's properties. `Carbon.Msi.MsiInfo` has properties for the following required MSI properties:
+    The `Get-CMsi` function reads the installer properties from an MSI file and returns a `Carbon.Msi.MsiInfo` object representing an MSI's properties. `Carbon.Msi.MsiInfo` has properties for the following required MSI properties:
 
      * ProductName
      * ProductCode
@@ -29,20 +29,20 @@ function Get-Msi
 
     There is an additioanl `Path` property to capture the path of the MSI the properties came from.
 
-    `Get-Msi` was introduced in Carbon 2.0.
+    `Get-CMsi` was introduced in Carbon 2.0.
 
     .LINK
     https://msdn.microsoft.com/en-us/library/aa370905.aspx
 
     .EXAMPLE
-    Get-Msi -Path MyCool.msi
+    Get-CMsi -Path MyCool.msi
 
     Demonstrates how to read the properties from `MyCool.msi` file.
 
     .EXAMPLE
-    Get-ChildItem *.msi -Recurse | Get-Msi
+    Get-ChildItem *.msi -Recurse | Get-CMsi
 
-    Demonstrates how you can pipe file info objects into `Get-Msi`.
+    Demonstrates how you can pipe file info objects into `Get-CMsi`.
     #>
     [CmdletBinding()]
     [OutputType('Carbon.Msi.MsiInfo')]

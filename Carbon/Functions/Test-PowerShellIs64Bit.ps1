@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Test-PowerShellIs64Bit
+function Test-CPowerShellIs64Bit
 {
     <#
     .SYNOPSIS
@@ -26,7 +26,7 @@ function Test-PowerShellIs64Bit
     http://msdn.microsoft.com/en-us/library/system.environment.is64bitprocess.aspx
 
     .EXAMPLE
-    Test-PowerShellIs64Bit
+    Test-CPowerShellIs64Bit
 
     Returns `True` if PowerShell is 64-bit/x64, `False` if it is 32-bit/x86.
     #>

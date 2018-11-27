@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Get-Certificate
+function Get-CCertificate
 {
     <#
     .SYNOPSIS
@@ -25,27 +25,27 @@ function Get-Certificate
     System.Security.Cryptography.x509Certificates.X509Certificate2. The X509Certificate2 certificates that were found, or `$null`.
 
     .EXAMPLE
-    Get-Certificate -Path C:\Certificates\certificate.cer -Password MySuperSecurePassword
+    Get-CCertificate -Path C:\Certificates\certificate.cer -Password MySuperSecurePassword
     
     Gets an X509Certificate2 object representing the certificate.cer file. Wildcards *not* supported when using a file system path.
     
     .EXAMPLE
-    Get-Certificate -Thumbprint a909502dd82ae41433e6f83886b00d4277a32a7b -StoreName My -StoreLocation LocalMachine
+    Get-CCertificate -Thumbprint a909502dd82ae41433e6f83886b00d4277a32a7b -StoreName My -StoreLocation LocalMachine
     
     Gets an X509Certificate2 object for the certificate in the Personal store with a specific thumbprint under the Local Machine.
     
     .EXAMPLE
-    Get-Certificate -FriendlyName 'Development Certificate' -StoreLocation CurrentUser -StoreName TrustedPeople
+    Get-CCertificate -FriendlyName 'Development Certificate' -StoreLocation CurrentUser -StoreName TrustedPeople
     
     Gets the X509Certificate2 whose friendly name is Development Certificate from the Current User's Trusted People certificate store.
     
     .EXAMPLE
-    Get-Certificate -Thumbprint a909502dd82ae41433e6f83886b00d4277a32a7b -CustomStoreName 'SharePoint' -StoreLocation LocalMachine
+    Get-CCertificate -Thumbprint a909502dd82ae41433e6f83886b00d4277a32a7b -CustomStoreName 'SharePoint' -StoreLocation LocalMachine
 
     Demonstrates how to get a certificate from a custom store, i.e. one that is not part of the standard `StoreName` enumeration.
 
     .EXAMPLE
-    Get-Certificate -Path 'cert:\CurrentUser\a909502dd82ae41433e6f83886b00d4277a32a7b'
+    Get-CCertificate -Path 'cert:\CurrentUser\a909502dd82ae41433e6f83886b00d4277a32a7b'
 
     Demonstrates how to get a certificate out of a Windows certificate store with its certificate path. Wildcards supported.
     #>

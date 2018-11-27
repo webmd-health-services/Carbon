@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Enable-IisSecurityAuthentication
+function Enable-CIisSecurityAuthentication
 {
     <#
     .SYNOPSIS
@@ -22,21 +22,21 @@ function Enable-IisSecurityAuthentication
     Beginning with Carbon 2.0.1, this function is available only if IIS is installed.
 
     .LINK
-    Disable-IisSecurityAuthentication
+    Disable-CIisSecurityAuthentication
     
     .LINK
-    Get-IisSecurityAuthentication
+    Get-CIisSecurityAuthentication
     
     .LINK
-    Test-IisSecurityAuthentication
+    Test-CIisSecurityAuthentication
     
     .EXAMPLE
-    Enable-IisSecurityAuthentication -SiteName Peanuts -Anonymous
+    Enable-CIisSecurityAuthentication -SiteName Peanuts -Anonymous
 
     Turns on anonymous authentication for the `Peanuts` website.
 
     .EXAMPLE
-    Enable-IisSecurityAuthentication -SiteName Peanuts Snoopy/DogHouse -Basic
+    Enable-CIisSecurityAuthentication -SiteName Peanuts Snoopy/DogHouse -Basic
 
     Turns on anonymous authentication for the `Snoopy/DogHouse` directory under the `Peanuts` website.
 
@@ -75,7 +75,7 @@ function Enable-IisSecurityAuthentication
 
     $authType = $pscmdlet.ParameterSetName
     $getArgs = @{ $authType = $true; }
-    $authSettings = Get-IisSecurityAuthentication -SiteName $SiteName -VirtualPath $VirtualPath @getArgs
+    $authSettings = Get-CIisSecurityAuthentication -SiteName $SiteName -VirtualPath $VirtualPath @getArgs
     
     if( $authSettings.GetAttributeValue('enabled') )
     {
@@ -84,7 +84,7 @@ function Enable-IisSecurityAuthentication
     
     $authSettings.SetAttributeValue('enabled', 'true')
     
-    $fullPath = Join-IisVirtualPath $SiteName $VirtualPath
+    $fullPath = Join-CIisVirtualPath $SiteName $VirtualPath
     if( $pscmdlet.ShouldProcess( $fullPath, ("enable {0}" -f $authType) ) )
     {
         $authSettings.CommitChanges()

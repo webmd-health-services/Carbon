@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Convert-XmlFile
+function Convert-CXmlFile
 {
     <#
     .SYNOPSIS
@@ -19,7 +19,7 @@ function Convert-XmlFile
     .DESCRIPTION
     An XDT file specifies how to change an XML file from a *known* beginning state into a new state.  This is usually helpful when deploying IIS websites.  Usually, the website's default web.config file won't work in different environments, and needs to be changed during deployment to reflect settings needed for the target environment.
 
-    XDT was designed to apply a tranformation against an XML file in a *known* state.  **Do not use this method to transform an XML file in-place.**  There lies madness, and you will never get that square peg into XDT's round hole.  If you *really* want to transform in-place, you're responsible for checking if the source/destination file has already been transformed, and if it hasn't, calling `Convert-XmlFile` to transform to a temporary file, then copying the temporary file onto the source/destination file.
+    XDT was designed to apply a tranformation against an XML file in a *known* state.  **Do not use this method to transform an XML file in-place.**  There lies madness, and you will never get that square peg into XDT's round hole.  If you *really* want to transform in-place, you're responsible for checking if the source/destination file has already been transformed, and if it hasn't, calling `Convert-CXmlFile` to transform to a temporary file, then copying the temporary file onto the source/destination file.
     
     You can load custom transformations.  In your XDT XML, use the `xdt:Import` element to import your transformations.  In your XDT file:
     
@@ -47,28 +47,28 @@ function Convert-XmlFile
     http://stackoverflow.com/questions/2915329/advanced-tasks-using-web-config-transformation
     
     .LINK
-    Set-DotNetConnectionString
+    Set-CDotNetConnectionString
     
     .LINK
-    Set-DotNetAppSetting
+    Set-CDotNetAppSetting
 
     .EXAMPLE
-    Convert-XmlFile -Path ".\web.config" -XdtPath ".\web.debug.config" -Destination '\\webserver\wwwroot\web.config'
+    Convert-CXmlFile -Path ".\web.config" -XdtPath ".\web.debug.config" -Destination '\\webserver\wwwroot\web.config'
     
     Transforms `web.config` with the XDT in `web.debug.config` to a new file at `\\webserver\wwwroot\web.config`.
 
     .EXAMPLE
-    Convert-XmlFile -Path ".\web.config" -XdtXml "<configuration><connectionStrings><add name=""MyConn"" xdt:Transform=""Insert"" /></connectionStrings></configuration>" -Destination '\\webserver\wwwroot\web.config'
+    Convert-CXmlFile -Path ".\web.config" -XdtXml "<configuration><connectionStrings><add name=""MyConn"" xdt:Transform=""Insert"" /></connectionStrings></configuration>" -Destination '\\webserver\wwwroot\web.config'
     
     Transforms `web.config` with the given XDT XML to a new file at `\\webserver\wwwroot\web.config`.
     
     .EXAMPLE
-    Convert-XmlFile -Path ".\web.config" -XdtPath ".\web.debug.config" -Destination '\\webserver\wwwroot\web.config' -Verbose
+    Convert-CXmlFile -Path ".\web.config" -XdtPath ".\web.debug.config" -Destination '\\webserver\wwwroot\web.config' -Verbose
     
     See that `Verbose` switch? It will show informational/debug messages written by the XDT framework.  Very helpful in debugging what XDT framework is doing.
 
     .EXAMPLE
-    Convert-XmlFile -Path ".\web.config" -XdtPath ".\web.debug.config" -Destination '\\webserver\wwwroot\web.config' -TransformAssemblyPath C:\Projects\CustomTransforms.dll
+    Convert-CXmlFile -Path ".\web.config" -XdtPath ".\web.debug.config" -Destination '\\webserver\wwwroot\web.config' -TransformAssemblyPath C:\Projects\CustomTransforms.dll
     
     Shows how to reference a custom transformation assembly.  It should also be loaded in your XDT file via the `xdt:Import`.
     #>
@@ -128,14 +128,14 @@ function Convert-XmlFile
 		    Write-Error ("XdtPath '{0}' not found." -f $XdtPath)
             return
 	    }
-        $XdtPath = Resolve-FullPath -Path $XdtPath
+        $XdtPath = Resolve-CFullPath -Path $XdtPath
         $xdtPathForShouldProcess = $XdtPath
         $xdtPathForInfoMsg = 'with ''{0}'' ' -f $XdtPath
     }
     
-    $Path = Resolve-FullPath -Path $Path
-    $Destination = Resolve-FullPath -Path $Destination
-    $TransformAssemblyPath = $TransformAssemblyPath | ForEach-Object { Resolve-FullPath -path $_ }
+    $Path = Resolve-CFullPath -Path $Path
+    $Destination = Resolve-CFullPath -Path $Destination
+    $TransformAssemblyPath = $TransformAssemblyPath | ForEach-Object { Resolve-CFullPath -path $_ }
     if( $TransformAssemblyPath )
     {
         $badPaths = $TransformAssemblyPath | Where-Object { -not (Test-Path -Path $_ -PathType Leaf) }
@@ -193,7 +193,7 @@ function Convert-XmlFile
             $TransformAssemblyPath | ForEach-Object { Add-Type -Path $_ }
         }
                 
-        function Convert-XmlFile
+        function Convert-CXmlFile
         {
             [CmdletBinding()]
             param(
@@ -238,7 +238,7 @@ function Convert-XmlFile
         
         $PsBoundParameters.Remove( 'CarbonBinDir' )
         $PSBoundParameters.Remove( 'TransformAssemblyPath' )
-        Convert-XmlFile @PSBoundParameters
+        Convert-CXmlFile @PSBoundParameters
     }
 
     try
@@ -252,7 +252,7 @@ function Convert-XmlFile
             }
             else
             {
-                Invoke-PowerShell -Command $scriptBlock -Args $argumentList -Runtime 'v4.0'
+                Invoke-CPowerShell -Command $scriptBlock -Args $argumentList -Runtime 'v4.0'
             }
         }
     }

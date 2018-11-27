@@ -10,14 +10,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function New-RsaKeyPair
+function New-CRsaKeyPair
 {
     <#
     .SYNOPSIS
     Generates a public/private RSA key pair.
 
     .DESCRIPTION
-    The `New-RsaKeyPair` function uses the `certreq.exe` program to generate an RSA public/private key pair suitable for use in encrypting/decrypting CMS messages, credentials in DSC resources, etc. It uses the following `.inf` file as input (taken from the first example in the help for the `Protect-CmsMessage` cmdlet):
+    The `New-CRsaKeyPair` function uses the `certreq.exe` program to generate an RSA public/private key pair suitable for use in encrypting/decrypting CMS messages, credentials in DSC resources, etc. It uses the following `.inf` file as input (taken from the first example in the help for the `Protect-CmsMessage` cmdlet):
 
         [Version]
         Signature = "$Windows NT$"
@@ -53,23 +53,23 @@ function New-RsaKeyPair
     System.IO.FileInfo
 
     .LINK
-    Get-Certificate
+    Get-CCertificate
 
     .LINK
-    Install-Certificate
+    Install-CCertificate
 
     .EXAMPLE
-    New-RsaKeyPair -Subject 'CN=MyName' -PublicKeyFile 'MyName.cer' -PrivateKeyFile 'MyName.pfx' -Password $secureString
+    New-CRsaKeyPair -Subject 'CN=MyName' -PublicKeyFile 'MyName.cer' -PrivateKeyFile 'MyName.pfx' -Password $secureString
 
     Demonstrates the minimal parameters needed to generate a key pair. The key will use a sha512 signing algorithm, have a length of 4096 bits, and expire on `12/31/9999`. The public key will be saved in the current directory as `MyName.cer`. The private key will be saved to the current directory as `MyName.pfx` and protected with password in `$secureString`.
 
     .EXAMPLE
-    New-RsaKeyPair -Subject 'CN=MyName' -PublicKeyFile 'MyName.cer' -PrivateKeyFile 'MyName.pfx' -Password $null
+    New-CRsaKeyPair -Subject 'CN=MyName' -PublicKeyFile 'MyName.cer' -PrivateKeyFile 'MyName.pfx' -Password $null
 
     Demonstrates how to save the private key unprotected (i.e. without a password). You must set the password to `$null`. This functionality was introduced in Carbon 2.1.
 
     .EXAMPLE
-    New-RsaKeyPair -Subject 'CN=MyName' -PublicKeyFile 'MyName.cer' -PrivateKeyFile 'MyName.pfx' -Algorithm 'sha1' -ValidTo (Get-Date -Year 2015 -Month 12 -Day 31) -Length 1024 -Password $secureString
+    New-CRsaKeyPair -Subject 'CN=MyName' -PublicKeyFile 'MyName.cer' -PrivateKeyFile 'MyName.pfx' -Algorithm 'sha1' -ValidTo (Get-Date -Year 2015 -Month 12 -Day 31) -Length 1024 -Password $secureString
 
     Demonstrates how to use all the parameters to create a truly customized key pair. The generated certificate will use the sha1 signing algorithm, becomes effective 1/1/2015, expires 12/31/2015, and is 1024 bits in length.
     #>
@@ -138,12 +138,12 @@ function New-RsaKeyPair
 
     if( $PSBoundParameters.ContainsKey('ValidFrom') )
     {
-        Write-Warning -Message ('New-RsaKeyPair: The -ValidFrom parameter is obsolete and will be removed in a future version of Carbon. Please remove usages of this parameter.')
+        Write-Warning -Message ('New-CRsaKeyPair: The -ValidFrom parameter is obsolete and will be removed in a future version of Carbon. Please remove usages of this parameter.')
     }
 
     if( $PSBoundParameters.ContainsKey('Authority') )
     {
-        Write-Warning -Message ('New-RsaKeyPair: The -Authority parameter is obsolete and will be removed in a future version of Carbon. Please remove usages of this parameter.')
+        Write-Warning -Message ('New-CRsaKeyPair: The -Authority parameter is obsolete and will be removed in a future version of Carbon. Please remove usages of this parameter.')
     }
 
     function Resolve-KeyPath
@@ -156,7 +156,7 @@ function New-RsaKeyPair
 
         Set-StrictMode -Version 'Latest'
 
-        $Path = Resolve-FullPath -Path $Path
+        $Path = Resolve-CFullPath -Path $Path
 
         if( (Test-Path -Path $Path -PathType Leaf) )
         {
@@ -259,7 +259,7 @@ ValidityPeriodUnits = {3}
             $output | Write-Debug
         }
 
-        $publicKey = Get-Certificate -Path $PublicKeyFile
+        $publicKey = Get-CCertificate -Path $PublicKeyFile
         if( -not $publicKey )
         {
             Write-Error ('Failed to load public key ''{0}'':{1}{2}' -f $PublicKeyFile,([Environment]::NewLine),($output -join ([Environment]::NewLine)))

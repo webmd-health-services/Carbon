@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Test-PerformanceCounterCategory
+function Test-CPerformanceCounterCategory
 {
     <#
     .SYNOPSIS
@@ -20,7 +20,7 @@ function Test-PerformanceCounterCategory
     Returns `True` if category `CategoryName` exists.  `False` if it does not exist.
 
     .EXAMPLE
-    Test-PerformanceCounterCategory -CategoryName 'ToyotaCamry'
+    Test-CPerformanceCounterCategory -CategoryName 'ToyotaCamry'
 
     Returns `True` if the `ToyotaCamry` performance counter category exists.  `False` if the category doesn't exist.
     #>

@@ -10,14 +10,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-filter Protect-String
+filter Protect-CString
 {
     <#
     .SYNOPSIS
     Encrypts a string.
     
     .DESCRIPTION
-    The `Protect-String` function encrypts a string using the Data Protection API (DPAPI), RSA, or AES. In Carbon 2.3.0 or earlier, the plaintext string to encrypt is passed to the `String` parameter. Beginning in Carbon 2.4.0, you can also pass a `SecureString`. When encrypting a `SecureString`, it is converted to an array of bytes, encrypted, then the array of bytes is cleared from memory (i.e. the plaintext version of the `SecureString` is only in memory long enough to encrypt it).
+    The `Protect-CString` function encrypts a string using the Data Protection API (DPAPI), RSA, or AES. In Carbon 2.3.0 or earlier, the plaintext string to encrypt is passed to the `String` parameter. Beginning in Carbon 2.4.0, you can also pass a `SecureString`. When encrypting a `SecureString`, it is converted to an array of bytes, encrypted, then the array of bytes is cleared from memory (i.e. the plaintext version of the `SecureString` is only in memory long enough to encrypt it).
     
     ##  DPAPI 
 
@@ -25,7 +25,7 @@ filter Protect-String
 
     ## RSA
 
-    RSA is an assymetric encryption/decryption algorithm, which requires a public/private key pair. The secret is encrypted with the public key, and can only be decrypted with the corresponding private key. The secret being encrypted can't be larger than the RSA key pair's size/length, usually 1024, 2048, or 4096 bits (128, 256, and 512 bytes, respectively). `Protect-String` encrypts with .NET's `System.Security.Cryptography.RSACryptoServiceProvider` class.
+    RSA is an assymetric encryption/decryption algorithm, which requires a public/private key pair. The secret is encrypted with the public key, and can only be decrypted with the corresponding private key. The secret being encrypted can't be larger than the RSA key pair's size/length, usually 1024, 2048, or 4096 bits (128, 256, and 512 bytes, respectively). `Protect-CString` encrypts with .NET's `System.Security.Cryptography.RSACryptoServiceProvider` class.
 
     You can specify the public key in three ways: 
     
@@ -33,13 +33,13 @@ filter Protect-String
      * with a certificate in one of the Windows certificate stores, passing its unique thumbprint via the `Thumbprint` parameter, or via the `PublicKeyPath` parameter cn be certificat provider path, e.g. it starts with `cert:\`.
      * with a X509 certificate file, via the `PublicKeyPath` parameter
 
-    You can generate an RSA public/private key pair with the `New-RsaKeyPair` function.
+    You can generate an RSA public/private key pair with the `New-CRsaKeyPair` function.
 
     ## AES
 
-    AES is a symmetric encryption/decryption algorithm. You supply a 16-, 24-, or 32-byte key/password/passphrase with the `Key` parameter, and that key is used to encrypt. There is no limit on the size of the data you want to encrypt. `Protect-String` encrypts with .NET's `System.Security.Cryptography.AesCryptoServiceProvider` class.
+    AES is a symmetric encryption/decryption algorithm. You supply a 16-, 24-, or 32-byte key/password/passphrase with the `Key` parameter, and that key is used to encrypt. There is no limit on the size of the data you want to encrypt. `Protect-CString` encrypts with .NET's `System.Security.Cryptography.AesCryptoServiceProvider` class.
 
-    Symmetric encryption requires a random, unique initialization vector (i.e. IV) everytime you encrypt something. `Protect-String` generates one for you. This IV must be known to decrypt the secret, so it is pre-pendeded to the encrypted text.
+    Symmetric encryption requires a random, unique initialization vector (i.e. IV) everytime you encrypt something. `Protect-CString` generates one for you. This IV must be known to decrypt the secret, so it is pre-pendeded to the encrypted text.
 
     This code demonstrates how to generate a key:
 
@@ -49,73 +49,73 @@ filter Protect-String
 
         $base64EncodedKey = [Convert]::ToBase64String($key)
 
-    If you base-64 encode your string, it must be converted back to bytes before passing it to `Protect-String`.
+    If you base-64 encode your string, it must be converted back to bytes before passing it to `Protect-CString`.
 
-        Protect-String -String 'the secret sauce' -Key ([Convert]::FromBase64String($base64EncodedKey))
+        Protect-CString -String 'the secret sauce' -Key ([Convert]::FromBase64String($base64EncodedKey))
 
     The ability to encrypt with AES was added in Carbon 2.3.0.
    
     .LINK
-    New-RsaKeyPair
+    New-CRsaKeyPair
 
     .LINK
-    Unprotect-String
+    Unprotect-CString
     
     .LINK
     http://msdn.microsoft.com/en-us/library/system.security.cryptography.protecteddata.aspx
 
     .EXAMPLE
-    Protect-String -String 'TheStringIWantToEncrypt' -ForUser | Out-File MySecret.txt
+    Protect-CString -String 'TheStringIWantToEncrypt' -ForUser | Out-File MySecret.txt
     
     Encrypts the given string and saves the encrypted string into MySecret.txt.  Only the user who encrypts the string can unencrypt it.
 
     .EXAMPLE
-    Protect-String -String $credential.Password -ForUser | Out-File MySecret.txt
+    Protect-CString -String $credential.Password -ForUser | Out-File MySecret.txt
 
-    Demonstrates that `Protect-String` can encrypt a `SecureString`. This functionality was added in Carbon 2.4.0. 
+    Demonstrates that `Protect-CString` can encrypt a `SecureString`. This functionality was added in Carbon 2.4.0. 
     
     .EXAMPLE
-    $cipherText = Protect-String -String "MySuperSecretIdentity" -ForComputer
+    $cipherText = Protect-CString -String "MySuperSecretIdentity" -ForComputer
     
     Encrypts the given string and stores the value in $cipherText.  Because the encryption scope is set to LocalMachine, any user logged onto the local computer can decrypt `$cipherText`.
 
     .EXAMPLE
-    Protect-String -String 's0000p33333r s33333cr33333t' -Credential (Get-Credential 'builduser')
+    Protect-CString -String 's0000p33333r s33333cr33333t' -Credential (Get-Credential 'builduser')
 
-    Demonstrates how to use `Protect-String` to encrypt a secret as a specific user. This is useful for situation where a secret needs to be encrypted by a user other than the user running `Protect-String`. Encrypting as a specific user won't work over PowerShell remoting.
-
-    .EXAMPLE
-    Protect-String -String 'the secret sauce' -Certificate $myCert
-
-    Demonstrates how to encrypt a secret using RSA with a `System.Security.Cryptography.X509Certificates.X509Certificate2` object. You're responsible for creating/loading it. The `New-RsaKeyPair` function will create a key pair for you, if you've got a Windows SDK installed.
+    Demonstrates how to use `Protect-CString` to encrypt a secret as a specific user. This is useful for situation where a secret needs to be encrypted by a user other than the user running `Protect-CString`. Encrypting as a specific user won't work over PowerShell remoting.
 
     .EXAMPLE
-    Protect-String -String 'the secret sauce' -Thumbprint '44A7C27F3353BC53F82318C14490D7E2500B6D9E'
+    Protect-CString -String 'the secret sauce' -Certificate $myCert
+
+    Demonstrates how to encrypt a secret using RSA with a `System.Security.Cryptography.X509Certificates.X509Certificate2` object. You're responsible for creating/loading it. The `New-CRsaKeyPair` function will create a key pair for you, if you've got a Windows SDK installed.
+
+    .EXAMPLE
+    Protect-CString -String 'the secret sauce' -Thumbprint '44A7C27F3353BC53F82318C14490D7E2500B6D9E'
 
     Demonstrates how to encrypt a secret using RSA with a certificate in one of the Windows certificate stores. All local machine and user stores are searched.
 
     .EXAMPLE
-    Protect-String -String 'the secret sauce' -PublicKeyPath 'C:\Projects\Security\publickey.cer'
+    Protect-CString -String 'the secret sauce' -PublicKeyPath 'C:\Projects\Security\publickey.cer'
 
     Demonstrates how to encrypt a secret using RSA with a certificate file. The file must be loadable by the `System.Security.Cryptography.X509Certificates.X509Certificate` class.
 
     .EXAMPLE
-    Protect-String -String 'the secret sauce' -PublicKeyPath 'cert:\LocalMachine\My\44A7C27F3353BC53F82318C14490D7E2500B6D9E'
+    Protect-CString -String 'the secret sauce' -PublicKeyPath 'cert:\LocalMachine\My\44A7C27F3353BC53F82318C14490D7E2500B6D9E'
 
     Demonstrates how to encrypt a secret using RSA with a certificate in the store, giving its exact path.
 
     .EXAMPLE
-    Protect-String -String 'the secret sauce' -Key 'gT4XPfvcJmHkQ5tYjY3fNgi7uwG4FB9j'
+    Protect-CString -String 'the secret sauce' -Key 'gT4XPfvcJmHkQ5tYjY3fNgi7uwG4FB9j'
 
     Demonstrates how to encrypt a secret with a key, password, or passphrase. In this case, we are encrypting with a plaintext password. This functionality was added in Carbon 2.3.0.
 
     .EXAMPLE
-    Protect-String -String 'the secret sauce' -Key (Read-Host -Prompt 'Enter password (must be 16, 24, or 32 characters long):' -AsSecureString)
+    Protect-CString -String 'the secret sauce' -Key (Read-Host -Prompt 'Enter password (must be 16, 24, or 32 characters long):' -AsSecureString)
 
     Demonstrates that you can use a `SecureString` as the key, password, or passphrase. This functionality was added in Carbon 2.3.0.
 
     .EXAMPLE
-    Protect-String -String 'the secret sauce' -Key ([byte[]]@(163,163,185,174,205,55,157,219,121,146,251,116,43,203,63,38,73,154,230,112,82,112,151,29,189,135,254,187,164,104,45,30))
+    Protect-CString -String 'the secret sauce' -Key ([byte[]]@(163,163,185,174,205,55,157,219,121,146,251,116,43,203,63,38,73,154,230,112,82,112,151,29,189,135,254,187,164,104,45,30))
 
     Demonstrates that you can use an array of bytes as the key, password, or passphrase. This functionality was added in Carbon 2.3.0.
     #>
@@ -191,10 +191,10 @@ filter Protect-String
         {
             if( $PSCmdlet.ParameterSetName -eq 'DPAPIForUser' ) 
             {
-                $protectStringPath = Join-Path -Path $CarbonBinDir -ChildPath 'Protect-String.ps1' -Resolve
-                $encodedString = Protect-String -String $String -ForComputer
+                $protectStringPath = Join-Path -Path $CarbonBinDir -ChildPath 'Protect-CString.ps1' -Resolve
+                $encodedString = Protect-CString -String $String -ForComputer
                 $argumentList = '-ProtectedString {0}' -f $encodedString
-                Invoke-PowerShell -ExecutionPolicy 'ByPass' -NonInteractive -FilePath $protectStringPath -ArgumentList $argumentList -Credential $Credential |
+                Invoke-CPowerShell -ExecutionPolicy 'ByPass' -NonInteractive -FilePath $protectStringPath -ArgumentList $argumentList -Credential $Credential |
                     Select-Object -First 1
                 return
             }
@@ -222,7 +222,7 @@ filter Protect-String
             }
             elseif( $PSCmdlet.ParameterSetName -eq 'RSAByPath' )
             {
-                $Certificate = Get-Certificate -Path $PublicKeyPath
+                $Certificate = Get-CCertificate -Path $PublicKeyPath
                 if( -not $Certificate )
                 {
                     return
@@ -257,7 +257,7 @@ filter Protect-String
         }
         elseif( $PSCmdlet.ParameterSetName -eq 'Symmetric' )
         {
-            $Key = ConvertTo-Key -InputObject $Key -From 'Protect-String'
+            $Key = ConvertTo-Key -InputObject $Key -From 'Protect-CString'
             if( -not $Key )
             {
                 return

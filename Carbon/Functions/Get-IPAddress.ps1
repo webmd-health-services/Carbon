@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Get-IPAddress
+function Get-CIPAddress
 {
     <#
     .SYNOPSIS
@@ -30,17 +30,17 @@ function Get-IPAddress
     System.Net.IPAddress.
 
     .EXAMPLE
-    Get-IPAddress
+    Get-CIPAddress
 
     Returns all the IP addresses in use on the local computer, IPv4 *and* IPv6.
 
     .EXAMPLE
-    Get-IPAddress -V4
+    Get-CIPAddress -V4
 
     Returns just the IPv4 addresses in use on the local computer.
 
     .EXAMPLE
-    Get-IPADdress -V6
+    Get-CIPAddress -V6
 
     Retruns just the IPv6 addresses in use on the local computer.
     #>

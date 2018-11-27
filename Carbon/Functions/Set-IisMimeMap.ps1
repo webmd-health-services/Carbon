@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Set-IisMimeMap
+function Set-CIisMimeMap
 {
     <#
     .SYNOPSIS
@@ -22,13 +22,13 @@ function Set-IisMimeMap
     Beginning with Carbon 2.0.1, this function is available only if IIS is installed.
 
     .LINK
-    Get-IisMimeMap
+    Get-CIisMimeMap
     
     .LINK
-    Remove-IisMimeMap
+    Remove-CIisMimeMap
     
     .EXAMPLE
-    Set-IisMimeMap -FileExtension '.m4v' -MimeType 'video/x-m4v'
+    Set-CIisMimeMap -FileExtension '.m4v' -MimeType 'video/x-m4v'
     
     Adds a MIME map so that IIS will serve `.m4v` files as `video/x-m4v`.
     
@@ -67,7 +67,7 @@ function Set-IisMimeMap
         $getIisConfigSectionParams['VirtualPath'] = $VirtualPath
     }
     
-    $staticContent = Get-IisConfigurationSection -SectionPath 'system.webServer/staticContent' @getIisConfigSectionParams
+    $staticContent = Get-CIisConfigurationSection -SectionPath 'system.webServer/staticContent' @getIisConfigSectionParams
     $mimeMapCollection = $staticContent.GetCollection()
     
     $mimeMap = $mimeMapCollection | Where-Object { $_['fileExtension'] -eq $FileExtension }

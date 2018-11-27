@@ -53,7 +53,7 @@ function Get-TargetResource
                     Ensure = 'Absent';
                 }
 
-    $perm = Get-Permission -Path $Path -Identity $Identity
+    $perm = Get-CPermission -Path $Path -Identity $Identity
     if( $perm )
     {
         [string[]]$resource.Permission = $perm | 
@@ -62,7 +62,7 @@ function Get-TargetResource
                                             ForEach-Object { $_.Trim() } | 
                                             Where-Object { $_ -ne 'Synchronize' }
 
-        $resource.ApplyTo = ConvertTo-ContainerInheritanceFlags -InheritanceFlags $perm.InheritanceFlags -PropagationFlags $perm.PropagationFlags
+        $resource.ApplyTo = ConvertTo-CContainerInheritanceFlags -InheritanceFlags $perm.InheritanceFlags -PropagationFlags $perm.PropagationFlags
         $resource.Ensure = 'Present'
     }
 
@@ -141,16 +141,16 @@ function Set-TargetResource
     `Carbon_Permission` is new in Carbon 2.0.
 
     .LINK
-    Get-Permission
+    Get-CPermission
 
     .LINK
-    Grant-Permission
+    Grant-CPermission
 
     .LINK
-    Revoke-Permission
+    Revoke-CPermission
 
     .LINK
-    Test-Permission
+    Test-CPermission
 
     .LINK
     http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.filesystemrights.aspx
@@ -256,7 +256,7 @@ function Set-TargetResource
     if( $Ensure -eq 'Absent' )
     {
         Write-Verbose ('Revoking permission for ''{0}'' to ''{1}''' -f $Identity,$Path)
-        Revoke-Permission -Path $Path -Identity $Identity
+        Revoke-CPermission -Path $Path -Identity $Identity
     }
     else
     {
@@ -267,7 +267,7 @@ function Set-TargetResource
         }
 
         Write-Verbose ('Granting permission for ''{0}'' to ''{1}'': {2}' -f $Identity,$Path,($Permission -join ','))
-        Grant-Permission @PSBoundParameters
+        Grant-CPermission @PSBoundParameters
     }
 }
 

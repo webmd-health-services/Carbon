@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Enable-IEActivationPermission
+function Enable-CIEActivationPermission
 {
     <#
     .SYNOPSIS
@@ -19,13 +19,13 @@ function Enable-IEActivationPermission
     .DESCRIPTION
     By default, unprivileged users can't launch/start Internet Explorer. This prevents those users from using Internet Explorer to run automated, browser-based tests.  This function modifies Windows so that all users can launch Internet Explorer.
     
-    You may also need to call Disable-IEEnhancedSecurityConfiguration, so that Internet Explorer is allowed to visit all websites.
+    You may also need to call Disable-CIEEnhancedSecurityConfiguration, so that Internet Explorer is allowed to visit all websites.
     
     .EXAMPLE
-    Enable-IEActivationPermission
+    Enable-CIEActivationPermission
 
     .LINK
-    Disable-IEEnhancedSecurityConfiguration
+    Disable-CIEEnhancedSecurityConfiguration
     #>
     [CmdletBinding(SupportsShouldProcess=$true)]
     param(
@@ -47,12 +47,12 @@ function Enable-IEActivationPermission
 
     if( $PSCmdlet.ShouldProcess( 'Internet Explorer', 'enabling launch and activation permission' ) )
     {
-        Set-RegistryKeyValue -Path $ieRegPath -Name '(Default)' -String "Internet Explorer(Ver 1.0)"
-        Set-RegistryKeyValue -Path $ieRegPath64 -Name '(Default)' -String "Internet Explorer(Ver 1.0)"
+        Set-CRegistryKeyValue -Path $ieRegPath -Name '(Default)' -String "Internet Explorer(Ver 1.0)"
+        Set-CRegistryKeyValue -Path $ieRegPath64 -Name '(Default)' -String "Internet Explorer(Ver 1.0)"
 
-        Set-RegistryKeyValue -Path $ieRegPath -Name 'LaunchPermission' -Binary $binarySD.binarySD
-        Set-RegistryKeyValue -Path $ieRegPath64 -Name 'LaunchPermission' -Binary $binarySD.binarySD
+        Set-CRegistryKeyValue -Path $ieRegPath -Name 'LaunchPermission' -Binary $binarySD.binarySD
+        Set-CRegistryKeyValue -Path $ieRegPath64 -Name 'LaunchPermission' -Binary $binarySD.binarySD
     }
 }
 
-Set-Alias -Name 'Enable-IEActivationPermissions' -Value 'Enable-IEActivationPermission'
+Set-Alias -Name 'Enable-IEActivationPermissions' -Value 'Enable-CIEActivationPermission'

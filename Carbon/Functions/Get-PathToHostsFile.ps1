@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Get-PathToHostsFile
+function Get-CPathToHostsFile
 {
     <#
     .SYNOPSIS
@@ -20,7 +20,7 @@ function Get-PathToHostsFile
     This is a convenience method so you don't have to have the path to the hosts file hard-coded in your scripts.
     
     .EXAMPLE
-    Get-PathToHostsFile
+    Get-CPathToHostsFile
     
     Returns `C:\Windows\system32\drivers\etc\hosts`.  Uses the environment variable to find the root to the Windows directory.
     #>

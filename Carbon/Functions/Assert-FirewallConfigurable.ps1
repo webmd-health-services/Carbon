@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Assert-FirewallConfigurable
+function Assert-CFirewallConfigurable
 {
     <#
     .SYNOPSIS
@@ -23,7 +23,7 @@ function Assert-FirewallConfigurable
     System.Boolean.
 
     .EXAMPLE
-    Assert-FirewallConfigurable
+    Assert-CFirewallConfigurable
 
     Returns `True` if the Windows firewall can be configured, `False` if it can't.
     #>

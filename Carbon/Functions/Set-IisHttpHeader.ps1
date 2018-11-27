@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Set-IisHttpHeader
+function Set-CIisHttpHeader
 {
     <#
     .SYNOPSIS
@@ -22,15 +22,15 @@ function Set-IisHttpHeader
     Beginning with Carbon 2.0.1, this function is available only if IIS is installed.
 
     .LINK
-    Get-IisHttpHeader
+    Get-CIisHttpHeader
     
     .EXAMPLE
-    Set-IisHttpHeader -SiteName 'SopwithCamel' -Name 'X-Flown-By' -Value 'Snoopy'
+    Set-CIisHttpHeader -SiteName 'SopwithCamel' -Name 'X-Flown-By' -Value 'Snoopy'
     
     Sets or creates the `SopwithCamel` website's `X-Flown-By` HTTP header to the value `Snoopy`.
     
     .EXAMPLE
-    Set-IisHttpHeader -SiteName 'SopwithCamel' -VirtualPath 'Engine' -Name 'X-Powered-By' -Value 'Root Beer'
+    Set-CIisHttpHeader -SiteName 'SopwithCamel' -VirtualPath 'Engine' -Name 'X-Powered-By' -Value 'Root Beer'
     
     Sets or creates the `SopwithCamel` website's `Engine` sub-directory's `X-Powered-By` HTTP header to the value `Root Beer`.
     #>
@@ -61,7 +61,7 @@ function Set-IisHttpHeader
 
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
-    $httpProtocol = Get-IisConfigurationSection -SiteName $SiteName `
+    $httpProtocol = Get-CIisConfigurationSection -SiteName $SiteName `
                                                 -VirtualPath $VirtualPath `
                                                 -SectionPath 'system.webServer/httpProtocol'
     $headers = $httpProtocol.GetCollection('customHeaders') 
@@ -82,7 +82,7 @@ function Set-IisHttpHeader
         [void] $headers.Add( $addElement )
     }
     
-    $fullPath = Join-IisVirtualPath $SiteName $VirtualPath
+    $fullPath = Join-CIisVirtualPath $SiteName $VirtualPath
     if( $pscmdlet.ShouldProcess( $fullPath, ('{0} HTTP header {1}' -f $action,$Name) ) )
     {
         $httpProtocol.CommitChanges()

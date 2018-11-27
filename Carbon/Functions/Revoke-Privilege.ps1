@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Revoke-Privilege
+function Revoke-CPrivilege
 {
     <#
     .SYNOPSIS
@@ -69,13 +69,13 @@ function Revoke-Privilege
     Carbon_Privilege
 
     .LINK
-    Get-Privilege
+    Get-CPrivilege
     
     .LINK
-    Grant-Privilege
+    Grant-CPrivilege
     
     .LINK
-    Test-Privilege
+    Test-CPrivilege
     
     .LINK
     http://msdn.microsoft.com/en-us/library/windows/desktop/bb530716.aspx
@@ -84,7 +84,7 @@ function Revoke-Privilege
     http://msdn.microsoft.com/en-us/library/windows/desktop/bb545671.aspx
     
     .EXAMPLE
-    Revoke-Privilege -Identity Batcomputer -Privilege SeServiceLogonRight
+    Revoke-CPrivilege -Identity Batcomputer -Privilege SeServiceLogonRight
     
     Revokes the Batcomputer account's ability to logon as a service.  Don't restart that thing!
     #>
@@ -105,14 +105,14 @@ function Revoke-Privilege
 
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
     
-    $account = Resolve-Identity -Name $Identity
+    $account = Resolve-CIdentity -Name $Identity
     if( -not $account )
     {
         return
     }
     
     # Convert the privileges from the user into their canonical names.
-    $cPrivileges = Get-Privilege -Identity $account.FullName |
+    $cPrivileges = Get-CPrivilege -Identity $account.FullName |
                         Where-Object { $Privilege -contains $_ }
     if( -not $cPrivileges )
     {

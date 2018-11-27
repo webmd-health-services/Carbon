@@ -10,19 +10,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Invoke-AppCmd
+function Invoke-CAppCmd
 {
     <#
     .SYNOPSIS
-    OBSOLETE. Will be removed in a future major version of Carbon. Use `Get-IisConfigurationSection` with the `Microsoft.Web.Administration` API instead.
+    OBSOLETE. Will be removed in a future major version of Carbon. Use `Get-CIisConfigurationSection` with the `Microsoft.Web.Administration` API instead.
 
     .DESCRIPTION
-    OBSOLETE. Will be removed in a future major version of Carbon. Use `Get-IisConfigurationSection` with the `Microsoft.Web.Administration` API instead.
+    OBSOLETE. Will be removed in a future major version of Carbon. Use `Get-CIisConfigurationSection` with the `Microsoft.Web.Administration` API instead.
 
     .EXAMPLE
-    Get-IisConfigurationSection -SiteName 'Peanuts' -Section 'system.webServer'
+    Get-CIisConfigurationSection -SiteName 'Peanuts' -Section 'system.webServer'
 
-    Demonstrates the `Invoke-AppCmd` is OBSOLETE and will be removed in a future major version of Carbon. Use `Get-IisConfigurationSection` with the `Microsoft.Web.Administration` API instead.
+    Demonstrates the `Invoke-CAppCmd` is OBSOLETE and will be removed in a future major version of Carbon. Use `Get-CIisConfigurationSection` with the `Microsoft.Web.Administration` API instead.
     #>
     [CmdletBinding()]
     param(
@@ -35,7 +35,7 @@ function Invoke-AppCmd
 
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
-    Write-Warning ('Invoke-AppCmd is obsolete and will be removed in a future major version of Carbon. Use Carbon''s IIS functions, or `Get-IisConfigurationSection` to get `ConfigurationElement` objects to manipulate using the `Microsoft.Web.Administration` API.')
+    Write-Warning ('Invoke-CAppCmd is obsolete and will be removed in a future major version of Carbon. Use Carbon''s IIS functions, or `Get-CIisConfigurationSection` to get `ConfigurationElement` objects to manipulate using the `Microsoft.Web.Administration` API.')
 
     Write-Verbose ($AppCmdArgs -join " ")
     & (Join-Path $env:SystemRoot 'System32\inetsrv\appcmd.exe') $AppCmdArgs

@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Install-IisApplication
+function Install-CIisApplication
 {
     <#
     .SYNOPSIS
@@ -26,12 +26,12 @@ function Install-IisApplication
     Beginning with Carbon 2.0.1, this function is available only if IIS is installed.
 
     .EXAMPLE
-    Install-IisApplication -SiteName Peanuts -VirtualPath CharlieBrown -PhysicalPath C:\Path\To\CharlieBrown -AppPoolName CharlieBrownPool
+    Install-CIisApplication -SiteName Peanuts -VirtualPath CharlieBrown -PhysicalPath C:\Path\To\CharlieBrown -AppPoolName CharlieBrownPool
     
     Creates an application at `Peanuts/CharlieBrown` which runs from `Path/To/CharlieBrown`.  The application runs under the `CharlieBrownPool`.
     
     .EXAMPLE
-    Install-IisApplication -SiteName Peanuts -VirtualPath Snoopy -PhysicalPath C:\Path\To\Snoopy
+    Install-CIisApplication -SiteName Peanuts -VirtualPath Snoopy -PhysicalPath C:\Path\To\Snoopy
     
     Create an application at Peanuts/Snoopy, which runs from C:\Path\To\Snoopy.  It uses the same application as the Peanuts website.
     #>
@@ -68,16 +68,16 @@ function Install-IisApplication
 
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
-    $site = Get-IisWebsite -SiteName $SiteName
+    $site = Get-CIisWebsite -SiteName $SiteName
     if( -not $site )
     {
         Write-Error ('[IIS] Website ''{0}'' not found.' -f $SiteName)
         return
     }
 
-    $iisAppPath = Join-IisVirtualPath $SiteName $VirtualPath
+    $iisAppPath = Join-CIisVirtualPath $SiteName $VirtualPath
 
-    $PhysicalPath = Resolve-FullPath -Path $PhysicalPath
+    $PhysicalPath = Resolve-CFullPath -Path $PhysicalPath
     if( -not (Test-Path $PhysicalPath -PathType Container) )
     {
         Write-Verbose ('IIS://{0}: creating physical path {1}' -f $iisAppPath,$PhysicalPath)
@@ -93,7 +93,7 @@ function Install-IisApplication
     $apps = $site.GetCollection()
 
     $appPath = "/{0}" -f $VirtualPath
-    $app = Get-IisApplication -SiteName $SiteName -VirtualPath $VirtualPath
+    $app = Get-CIisApplication -SiteName $SiteName -VirtualPath $VirtualPath
     $modified = $false
     if( -not $app )
     {
@@ -149,7 +149,7 @@ function Install-IisApplication
 
     if( $PassThru )
     {
-        return Get-IisApplication -SiteName $SiteName -VirtualPath $VirtualPath
+        return Get-CIisApplication -SiteName $SiteName -VirtualPath $VirtualPath
     }
 
 }
