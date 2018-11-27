@@ -10,129 +10,132 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-$TestCertPath = JOin-Path $TestDir CarbonTestCertificate.cer -Resolve
+$TestCertPath = JOin-Path -Path $PSScriptRoot -ChildPath 'Certificates\CarbonTestCertificate.cer' -Resolve
 $TestCert = New-Object Security.Cryptography.X509Certificates.X509Certificate2 $TestCertPath
 
-function Start-TestFixture
+& (Join-Path -Path $PSScriptRoot -ChildPath 'Import-CarbonForTest.ps1' -Resolve)
+
+function Assert-TestCert
 {
-    & (Join-Path -Path $PSScriptRoot -ChildPath '..\Import-CarbonForTest.ps1' -Resolve)
+    param(
+        $actualCert
+    )
+        
+    $actualCert | Should Not BeNullOrEmpty
+    $actualCert.Thumbprint | Should Be $TestCert.Thumbprint
 }
 
-function Start-Test
+function Init
 {
+    $Global:Error.Clear()
     if( -not (Get-Certificate -Thumbprint $TestCert.Thumbprint -StoreLocation CurrentUser -StoreName My) ) 
     {
         Install-Certificate -Path $TestCertPath -StoreLocation CurrentUser -StoreName My
     }
 }
 
-function Stop-Test
-{
-    Uninstall-Certificate -Certificate $TestCert -storeLocation CurrentUser -StoreName My
-}
-
-function Test-ShouldFindCertificatesByFriendlyName
-{
-    $cert = Get-Certificate -FriendlyName $TestCert.friendlyName -StoreLocation CurrentUser -StoreName My
-    Assert-TestCert $cert
-}
-
-
-function Test-ShouldFindCertificateByPath
-{
-    $cert = Get-Certificate -Path $TestCertPath
-    Assert-TestCert $cert
-}
-
-function Test-ShouldFindCertificateByRelativePath
-{
-    Push-Location -Path $PSScriptRoot
-    try
-    {
-        $cert = Get-Certificate -Path ('.\{0}' -f (Split-Path -Leaf -Path $TestCertPath))
+Describe 'Get-Certificate' {
+    AfterEach {
+    }
+    
+    It 'should find certificates by friendly name' {
+        Init
+        $cert = Get-Certificate -FriendlyName $TestCert.friendlyName -StoreLocation CurrentUser -StoreName My
         Assert-TestCert $cert
     }
-    finally
-    {
-        Pop-Location
-    }
-}
-
-function Test-ShouldFindCertificateByThumbprint
-{
-    $cert = Get-Certificate -Thumbprint $TestCert.Thumbprint -StoreLocation CurrentUser -StoreName My
-    Assert-TestCert $cert
-}
-
-function Test-ShouldNotThrowErrorWhenCertificateDoesNotExist
-{
-    $cert = Get-Certificate -Thumbprint '1234567890abcdef1234567890abcdef12345678' -StoreLocation CurrentUser -StoreName My -ErrorAction SilentlyContinue
-    Assert-NoError
-    Assert-Null $cert
-}
-
-function Test-ShouldFindCertificateInCustomStoreByThumbprint
-{
-    $expectedCert = Install-Certificate -Path $TestCertPath -StoreLocation CurrentUser -CustomStoreName 'Carbon'
-    try
-    {
-        $cert = Get-Certificate -Thumbprint $expectedCert.Thumbprint -StoreLocation CurrentUser -CustomStoreName 'Carbon'
-        Assert-NotNull $cert
-        Assert-Equal $expectedCert.Thumbprint $cert.Thumbprint
-    }
-    finally
-    {
-        Uninstall-Certificate -Certificate $expectedCert -StoreLocation CurrentUser -CustomStoreName 'Carbon'
-    }
-}
-
-function Test-ShouldFindCertificateInCustomStoreByFriendlyName
-{
-    $expectedCert = Install-Certificate -Path $TestCertPath -StoreLocation CurrentUser -CustomStoreName 'Carbon'
-    try
-    {
-        $cert = Get-Certificate -FriendlyName $expectedCert.FriendlyName -StoreLocation CurrentUser -CustomStoreName 'Carbon'
-        Assert-NotNull $cert
-        Assert-Equal $expectedCert.Thumbprint $cert.Thumbprint
-    }
-    finally
-    {
-        Uninstall-Certificate -Certificate $expectedCert -StoreLocation CurrentUser -CustomStoreName 'Carbon'
-    }
-}
-
-function Test-ShouldGetPasswordProtectedCertificate
-{
-    [Security.Cryptography.X509Certificates.X509Certificate2]$cert = Get-Certificate -Path (Join-Path -Path $PSScriptRoot -ChildPath 'CarbonTestCertificateWithPassword.cer') -Password 'password'
-    Assert-NoError
-    Assert-NotNull $cert
-    Assert-Equal 'DE32D78122C2B5136221DE51B33A2F65A98351D2' $cert.Thumbprint
-    Assert-Equal 'Carbon Test Certificate - Password Protected' $cert.FriendlyName
-}
-
-function Test-ShouldIncludeExceptionWhenFailingToLoadCertificate
-{
-    $cert = Get-Certificate -Path (Join-Path -Path $PSScriptRoot -ChildPath 'CarbonTestCertificateWithPassword.cer') -ErrorAction SilentlyContinue
-    Assert-Error -Last -Regex 'password'
-    Assert-Null $cert
-    Assert-NotNull $Error[1].Exception
-    Assert-Is $Error[1].Exception ([Management.Automation.MethodInvocationException])
-}
-
-function Test-ShouldGetCertificatesInCAStore
-{
-    $foundACert = $false
-    dir Cert:\CurrentUser\CA | ForEach-Object {
-        $cert = Get-Certificate -Thumbprint $_.Thumbprint -StoreLocation CurrentUser -StoreName CertificateAuthority
-        Assert-NotNull $cert
-        $foundACert = $true
-    }
-}
-
-function Assert-TestCert($actualCert)
-{
     
-    Assert-NotNull $actualCert
-    Assert-Equal $TestCert.Thumbprint $actualCert.Thumbprint
+    
+    It 'should find certificate by path' {
+        Init
+        $cert = Get-Certificate -Path $TestCertPath
+        Assert-TestCert $cert
+    }
+    
+    It 'should find certificate by relative path' {
+        Init
+        Push-Location -Path $PSScriptRoot
+        try
+        {
+            $cert = Get-Certificate -Path ('.\Certificates\{0}' -f (Split-Path -Leaf -Path $TestCertPath))
+            Assert-TestCert $cert
+        }
+        finally
+        {
+            Pop-Location
+        }
+    }
+    
+    It 'should find certificate by thumbprint' {
+        Init
+        $cert = Get-Certificate -Thumbprint $TestCert.Thumbprint -StoreLocation CurrentUser -StoreName My
+        Assert-TestCert $cert
+    }
+    
+    It 'should not throw error when certificate does not exist' {
+        Init
+        $cert = Get-Certificate -Thumbprint '1234567890abcdef1234567890abcdef12345678' -StoreLocation CurrentUser -StoreName My -ErrorAction SilentlyContinue
+        $Global:Error.Count | Should Be 0
+        $cert | Should BeNullOrEmpty
+    }
+    
+    It 'should find certificate in custom store by thumbprint' {
+        Init
+        $expectedCert = Install-Certificate -Path $TestCertPath -StoreLocation CurrentUser -CustomStoreName 'Carbon'
+        try
+        {
+            $cert = Get-Certificate -Thumbprint $expectedCert.Thumbprint -StoreLocation CurrentUser -CustomStoreName 'Carbon'
+            $cert | Should Not BeNullOrEmpty
+            $cert.Thumbprint | Should Be $expectedCert.Thumbprint
+        }
+        finally
+        {
+            Uninstall-Certificate -Certificate $expectedCert -StoreLocation CurrentUser -CustomStoreName 'Carbon'
+        }
+    }
+    
+    It 'should find certificate in custom store by friendly name' {
+        Init
+        $expectedCert = Install-Certificate -Path $TestCertPath -StoreLocation CurrentUser -CustomStoreName 'Carbon'
+        try
+        {
+            $cert = Get-Certificate -FriendlyName $expectedCert.FriendlyName -StoreLocation CurrentUser -CustomStoreName 'Carbon'
+            $cert | Should Not BeNullOrEmpty
+            $cert.Thumbprint | Should Be $expectedCert.Thumbprint
+        }
+        finally
+        {
+            Uninstall-Certificate -Certificate $expectedCert -StoreLocation CurrentUser -CustomStoreName 'Carbon'
+        }
+    }
+    
+    It 'should get password protected certificate' {
+        Init
+        [Security.Cryptography.X509Certificates.X509Certificate2]$cert = Get-Certificate -Path (Join-Path -Path $PSScriptRoot -ChildPath 'Certificates\CarbonTestCertificateWithPassword.cer') -Password 'password'
+        $Global:Error.Count | Should Be 0
+        $cert | Should Not BeNullOrEmpty
+        $cert.Thumbprint | Should Be 'DE32D78122C2B5136221DE51B33A2F65A98351D2'
+        $cert.FriendlyName | Should Be 'Carbon Test Certificate - Password Protected'
+    }
+    
+    It 'should include exception when failing to load certificate' {
+        Init
+        $cert = Get-Certificate -Path (Join-Path -Path $PSScriptRoot -ChildPath 'Certificates\CarbonTestCertificateWithPassword.cer') -ErrorAction SilentlyContinue
+        $Global:Error.Count | Should BeGreaterThan 0
+        $Global:Error[0] | Should Match 'password'
+        $cert | Should BeNullOrEmpty
+        $Error[1].Exception | Should Not BeNullOrEmpty
+        $Error[1].Exception | Should BeOfType ([Management.Automation.MethodInvocationException])
+    }
+    
+    It 'should get certificates in CA store' {
+        Init
+        $foundACert = $false
+        dir Cert:\CurrentUser\CA | ForEach-Object {
+            $cert = Get-Certificate -Thumbprint $_.Thumbprint -StoreLocation CurrentUser -StoreName CertificateAuthority
+            $cert | Should Not BeNullOrEmpty
+            $foundACert = $true
+        }
+    }    
 }
 
+Uninstall-Certificate -Certificate $TestCert -storeLocation CurrentUser -StoreName My
