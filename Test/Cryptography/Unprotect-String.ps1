@@ -27,5 +27,5 @@ Add-Type -AssemblyName 'System.Security'
 . (Join-Path -Path $PSScriptRoot -ChildPath '..\..\Carbon\Functions\Use-CallerPreference.ps1' -Resolve)
 . (Join-Path -Path $PSScriptRoot -ChildPath '..\..\Carbon\Functions\Unprotect-String.ps1' -Resolve)
 
-Unprotect-String -ProtectedString $ProtectedString
+Unprotect-CString -ProtectedString $ProtectedString
 

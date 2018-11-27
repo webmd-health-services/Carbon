@@ -105,7 +105,7 @@ function Remove-CDotNetAppSetting
 
     $runtimes | ForEach-Object {
         $params = @{
-            FilePath = (Join-Path $CarbonBinDir 'Remove-CDotNetAppSetting.ps1' -Resolve);
+            FilePath = (Join-Path $CarbonBinDir 'Remove-DotNetAppSetting.ps1' -Resolve);
             ArgumentList = @( 
                                 (ConvertTo-CBase64 -Value $Name)
                             );

@@ -88,11 +88,11 @@ function Remove-CEnvironmentVariable
 
     if( $PSCmdlet.ParameterSetName -eq 'ForSpecificUser' )
     {
-        Invoke-CPowerShell -FilePath (Join-Path -Path $PSScriptRoot -ChildPath '..\bin\Remove-CEnvironmentVariable.ps1' -Resolve) `
-                          -Credential $credential `
-                          -ArgumentList ('-Name {0}' -f (ConvertTo-CBase64 $Name)) `
-                          -NonInteractive `
-                          -OutputFormat 'text'
+        Invoke-CPowerShell -FilePath (Join-Path -Path $PSScriptRoot -ChildPath '..\bin\Remove-EnvironmentVariable.ps1' -Resolve) `
+                           -Credential $credential `
+                           -ArgumentList ('-Name {0}' -f (ConvertTo-CBase64 $Name)) `
+                           -NonInteractive `
+                           -OutputFormat 'text'
         return
     }
 
