@@ -35,6 +35,7 @@ function Assert-CarbonNotInstalled
         Get-Item -Path 'env:PSModulePath' |
             Select-Object -ExpandProperty 'Value' -ErrorAction Ignore |
             ForEach-Object { $_ -split ';' } |
+            Where-Object { $_ } |
             Join-Path -ChildPath 'Carbon*' |
             Should Not Exist
         }
@@ -56,7 +57,7 @@ function MockCarbonInstalled
         $testDriveRoot =  Microsoft.PowerShell.Management\Get-Item -Path 'TestDrive:'
         $modulesRoot = Join-Path -Path $testDriveRoot.FullName -ChildPath 'Modules'
         $modulesRoot2 = Join-Path -Path $testDriveRoot.FullName -ChildPath 'Modules2'
-        return [pscustomobject]@{ Name = 'PSModulePath'; Value = ('{0};{1}'-f $modulesRoot,$modulesRoot2) }
+        return [pscustomobject]@{ Name = 'PSModulePath'; Value = ('{0};{1};;;'-f $modulesRoot,$modulesRoot2) }
     } -ParameterFilter {
         $Path -eq 'env:PSModulePath'
     }
