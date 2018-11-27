@@ -55,11 +55,96 @@ Describe 'Carbon_Permission when no permissions should be present' {
             Get-Permission -Path $tempDir -Identity $UserName -Inherited | Should Not BeNullOrEmpty
         }
     }
-    Test-TargetResource -Identity $UserName -Path $tempDir -Ensure Present -Verbose -ErrorVariable 'errors' -ErrorAction SilentlyContinue
+    Test-TargetResource -Identity $UserName -Path $tempDir -Ensure Present -ErrorVariable 'errors' -ErrorAction SilentlyContinue
 
     It 'should throw an error' {
         $errors | Should Not BeNullOrEmpty
         $errors | Should Match 'is mandatory'
+    }
+}
+
+Describe 'Carbon_Permission.when appending permissions' {
+
+    Start-CarbonDscTestFixture 'Permission'
+
+    $tempDir = New-MockDir
+
+    $rule1 = @{
+                    Identity = $UserName;
+                    Path = $tempDir;
+                    Permission = 'ReadAndExecute';
+                    ApplyTo = 'ContainerAndSubContainersAndLeaves';
+                    Append = $true;
+                    Ensure = 'Present';
+               }
+
+    $rule2 = @{
+                    Identity = $UserName;
+                    Path = $tempDir;
+                    Permission = 'Write';
+                    ApplyTo = 'ContainerAndLeaves';
+                    Append = $true;
+                    Ensure = 'Present';
+               }
+
+    It ('should report correct resource state') {
+        $result = Test-TargetResource @rule1
+        $result | Should -BeFalse
+        $result = Test-TargetResource @rule2
+        $result | Should -BeFalse
+    }
+
+    Set-TargetResource @rule1
+
+    It ('should report correct resource state') {
+        $result = Test-TargetResource @rule1
+        $result | Should -BeTrue
+        $result = Test-TargetResource @rule2
+        $result | Should -BeFalse
+    }
+
+    Set-TargetResource @rule2
+
+    It ('should report correct resource state') {
+        $result = Test-TargetResource @rule1
+        $result | Should -BeTrue
+        $result = Test-TargetResource @rule2
+        $result | Should -BeTrue
+    }
+
+
+    It 'should add two rules to directory' {
+        $perm = Get-Permission -Path $tempDir -Identity $UserName #-Inherited 
+        $perm | Should -HaveCount 2
+    }
+}
+
+Describe 'Carbon_Permission.when granting permissions on registry' {
+    Start-CarbonDscTestFixture 'Permission'
+    $tempDir = New-MockDir
+    $Global:Error.Clear()
+    It 'should grant permission on registry' {
+        $keyPath = 'hkcu:\{0}' -f (Split-Path -Leaf -Path $tempDir)
+        New-Item -Path $keyPath
+        try
+        {
+            (Test-Permission -Identity $UserName -Path $keyPath -Permission ReadKey -ApplyTo Container -Exact) | Should Be $false
+            (Test-TargetResource -Identity $UserName -Path $keyPath -Permission ReadKey -Ensure Present) | Should Be $false
+    
+            Set-TargetResource -Identity $UserName -Path $keyPath -Permission ReadKey -ApplyTo Container -Ensure Present
+            $Global:Error.Count | Should Be 0
+            (Test-Permission -Identity $UserName -Path $keyPath -Permission ReadKey -ApplyTo Container -Exact) | Should Be $true
+            (Test-TargetResource -Identity $UserName -Path $keyPath -Permission ReadKey -Ensure Present) | Should Be $true
+    
+            Set-TargetResource -Identity $UserName -Path $keyPath -Permission ReadKey -ApplyTo Container -Ensure Absent
+            $Global:Error.Count | Should Be 0
+            (Test-Permission -Identity $UserName -Path $keyPath -Permission ReadKey -ApplyTo Container -Exact) | Should Be $false
+            (Test-TargetResource -Identity $UserName -Path $keyPath -Permission ReadKey -Ensure Absent) | Should Be $true
+        }
+        finally
+        {
+            Remove-Item -Path $keyPath
+        }
     }
 }
 
@@ -90,30 +175,6 @@ Describe 'Carbon_Permission' {
         Set-TargetResource -Identity $UserName -Path $tempDir -Permission FullControl -ApplyTo Container -Ensure Present
         $Global:Error.Count | Should Be 0
         (Test-Permission -Identity $UserName -Path $tempDir -Permission FullControl -ApplyTo Container -Exact) | Should Be $true
-    }
-    
-    It 'should grant permission on registry' {
-        $keyPath = 'hkcu:\{0}' -f (Split-Path -Leaf -Path $tempDir)
-        New-Item -Path $keyPath
-        try
-        {
-            (Test-Permission -Identity $UserName -Path $keyPath -Permission ReadKey -ApplyTo Container -Exact) | Should Be $false
-            (Test-TargetResource -Identity $UserName -Path $keyPath -Permission ReadKey -Ensure Present) | Should Be $false
-    
-            Set-TargetResource -Identity $UserName -Path $keyPath -Permission ReadKey -ApplyTo Container -Ensure Present
-            $Global:Error.Count | Should Be 0
-            (Test-Permission -Identity $UserName -Path $keyPath -Permission ReadKey -ApplyTo Container -Exact) | Should Be $true
-            (Test-TargetResource -Identity $UserName -Path $keyPath -Permission ReadKey -Ensure Present) | Should Be $true
-    
-            Set-TargetResource -Identity $UserName -Path $keyPath -Permission ReadKey -ApplyTo Container -Ensure Absent
-            $Global:Error.Count | Should Be 0
-            (Test-Permission -Identity $UserName -Path $keyPath -Permission ReadKey -ApplyTo Container -Exact) | Should Be $false
-            (Test-TargetResource -Identity $UserName -Path $keyPath -Permission ReadKey -Ensure Absent) | Should Be $true
-        }
-        finally
-        {
-            Remove-Item -Path $keyPath
-        }
     }
     
     It 'should grant permission on private key' {
@@ -280,9 +341,50 @@ Describe 'Carbon_Permission' {
     
     It 'should not fail when user doesn''t have permission' {
         Revoke-Permission -Path $tempDir -Identity $UserName
-        & DscConfiguration2 -Ensure 'Present' -OutputPath $CarbonDscOutputRoot -Verbose
-        Start-DscConfiguration -Wait -ComputerName 'localhost' -Path $CarbonDscOutputRoot -Force -Verbose
+        & DscConfiguration2 -Ensure 'Present' -OutputPath $CarbonDscOutputRoot
+        Start-DscConfiguration -Wait -ComputerName 'localhost' -Path $CarbonDscOutputRoot -Force
         $Global:Error.Count | Should Be 0
+    }
+    
+    configuration DscConfiguration3
+    {
+        param(
+            $Ensure
+        )
+    
+        Set-StrictMode -Off
+    
+        Import-DscResource -Name '*' -Module 'Carbon'
+    
+        node 'localhost'
+        {
+            Carbon_Permission SetRead
+            {
+                Identity = $UserName;
+                Path = $tempDir;
+                Permission = 'ReadAndExecute'
+                ApplyTo = 'ContainerAndSubContainersAndLeaves';
+                Append = $true;
+                Ensure = 'Present';
+            }
+            Carbon_Permission SetWrite
+            {
+                Identity = ('.\{0}' -f $UserName);
+                Path = $tempDir;
+                Permission = 'Write'
+                ApplyTo = 'ContainerAndLeaves';
+                Append = $true;
+                Ensure = 'Present';
+            }
+        }
+    }
+    
+    It 'should apply multiple permissions' {
+        Revoke-Permission -Path $tempDir -Identity $UserName
+        & DscConfiguration3 -Ensure 'Present' -OutputPath $CarbonDscOutputRoot
+        Start-DscConfiguration -Wait -ComputerName 'localhost' -Path $CarbonDscOutputRoot -Force
+        $Global:Error.Count | Should Be 0
+        Get-CPermission -Path $tempDir -Identity $UserName | Should -HaveCount 2
     }
     
 }

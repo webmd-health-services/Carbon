@@ -36,6 +36,9 @@ function Get-TargetResource
         [string]
         # How to apply container permissions.  This controls the inheritance and propagation flags.  Default is full inheritance, e.g. `ContainersAndSubContainersAndLeaves`. This parameter is ignored if `Path` is to a leaf item.
         $ApplyTo,
+
+        [bool]
+        $Append,
         
         [ValidateSet('Present','Absent')]
         [string]
@@ -45,17 +48,23 @@ function Get-TargetResource
 
     Set-StrictMode -Version 'Latest'
 
-    $resource = @{
-                    Path = $Path;
-                    Identity = $Identity;
-                    Permission = @();
-                    ApplyTo = $null;
-                    Ensure = 'Absent';
-                }
+    $defaultState = @{
+                        Path = $Path;
+                        Identity = $Identity;
+                        Permission = @();
+                        ApplyTo = $null;
+                        Ensure = 'Absent';
+                    }
 
-    $perm = Get-CPermission -Path $Path -Identity $Identity
-    if( $perm )
+    $perms = Get-CPermission -Path $Path -Identity $Identity
+    if( -not $perms )
     {
+        return $defaultState
+    }
+
+    foreach( $perm in $perms )
+    {
+        $resource = $defaultState.Clone()
         [string[]]$resource.Permission = $perm | 
                                             Get-Member -Name '*Rights' -MemberType Property | 
                                             ForEach-Object { ($perm.($_.Name)).ToString() -split ',' } |
@@ -64,9 +73,8 @@ function Get-TargetResource
 
         $resource.ApplyTo = ConvertTo-CContainerInheritanceFlags -InheritanceFlags $perm.InheritanceFlags -PropagationFlags $perm.PropagationFlags
         $resource.Ensure = 'Present'
+        $resource
     }
-
-    return $resource
 }
 
 
@@ -133,6 +141,8 @@ function Set-TargetResource
      * ContainerAndChildLeaves
      * ChildContainersAndChildLeaves
      * ContainerAndChildContainersAndChildLeaves
+
+    Beginning in Carbon 2.7, you can add multiple permissions to an identity with the `Append` property. When set to true, it will add the permission instead of replacing an identity's current permissions. Note that DSC won't let you have two `Carbon_Permission` resources in your configuration where the identity and path properties are the same. Every `Carbon_Permission` resource must have unique identity and path properties. You may be able to work around this by using different values for the `Identity` property that resolve to the same identity, e.g. `Administrators` vs. `.\Administrators`.
 
     ### Revoking Permission
         
@@ -216,6 +226,32 @@ function Set-TargetResource
 
     This will revoke all of the `CarbonServiceUser` user's permissions on the `C:\Projects\Carbon`.
 
+
+    .EXAMPLE
+    >
+    Demonstrates how to grant multiple permissions to the same local user:
+
+        Carbon_Permission GrantReadAndExecute
+        {
+            Path = 'C:\Projects\Carbon';
+            Identity = 'CarbonServiceUser';
+            Permission = 'ReadAndExecute';
+            ApplyTo = 'ContainerAndSubContainersAndLeaves';
+            Append = $true;
+            Ensure = 'Present';
+        }
+
+        Carbon_Permission GrantWrite
+        {
+            Path = 'C:\Projects\Carbon';
+            Identity = '.\CarbonServiceUser';
+            Permission = 'Write';
+            ApplyTo = 'ContainerAndLeaves';
+            Append = $true;
+            Ensure = 'Present';
+        }
+
+    Demonstrates how grant to multiple permission to a user with the `Append` property. Note the `Append` property in both resources. If you omit one, permissions will always get ovewritten. Note the unique values on the `Identity` properties that resolve to the same user. This is due to the DSC requirement that a DSC resource must have unique key values and `Path` and `Identity` are the `Carbon_Permission` key values.
     #>
     [CmdletBinding()]
     param(
@@ -238,6 +274,12 @@ function Set-TargetResource
         [string]
         # How to apply container permissions.  This controls the inheritance and propagation flags.  Default is full inheritance, e.g. `ContainersAndSubContainersAndLeaves`. This parameter is only used when `Path` is a directory or registry key. Valid values are `Container`, `SubContainers`, `ContainerAndSubContainers`, `Leaves`, `ContainerAndLeaves`, `SubContainersAndLeaves`, `ContainerAndSubContainersAndLeaves`, `ChildContainers`, `ContainerAndChildContainers`, `ChildLeaves`, `ContainerAndChildLeaves`, `ChildContainersAndChildLeaves`, `ContainerAndChildContainersAndChildLeaves`.
         $ApplyTo,
+
+        [bool]
+        # When granting permissions on files, directories, or registry items, add the permissions as a new access rule instead of replacing any existing access rules. This parameter is ignored when setting permissions on certificates.
+        #
+        # This parameter was added in Carbon 2.7.
+        $Append,
         
         [ValidateSet('Present','Absent')]
         [string]
@@ -255,18 +297,18 @@ function Set-TargetResource
     
     if( $Ensure -eq 'Absent' )
     {
-        Write-Verbose ('Revoking permission for ''{0}'' to ''{1}''' -f $Identity,$Path)
+        Write-Verbose ('Revoking permission for "{0}" to "{1}"' -f $Identity,$Path)
         Revoke-CPermission -Path $Path -Identity $Identity
     }
     else
     {
         if( -not $Permission )
         {
-            Write-Error ('Permission parameter is mandatory when granting permissions. If you want to revoke a user''s permission(s), set the `Ensure` property to `Absent`.')
+            Write-Error ('Permission parameter is mandatory when granting permissions. If you want to revoke a user"s permission(s), set the `Ensure` property to `Absent`.')
             return
         }
 
-        Write-Verbose ('Granting permission for ''{0}'' to ''{1}'': {2}' -f $Identity,$Path,($Permission -join ','))
+        Write-Verbose ('Granting permission for "{0}" to "{1}": {2}' -f $Identity,$Path,($Permission -join ','))
         Grant-CPermission @PSBoundParameters
     }
 }
@@ -296,6 +338,9 @@ function Test-TargetResource
         [string]
         # How to apply container permissions.  This controls the inheritance and propagation flags.  Default is full inheritance, e.g. `ContainersAndSubContainersAndLeaves`. This parameter is ignored if `Path` is to a leaf item.
         $ApplyTo,
+
+        [bool]
+        $Append,
         
         [ValidateSet('Present','Absent')]
         [string]
@@ -305,45 +350,64 @@ function Test-TargetResource
 
     Set-StrictMode -Version 'Latest'
 
-    $resource = Get-TargetResource -Identity $Identity -Path $Path
+    $resources = Get-TargetResource -Identity $Identity -Path $Path
     $desiredRights = ($Permission | Sort-Object) -join ','
-    $currentRights = ($resource.Permission | Sort-Object) -join ','
     
     if( $Ensure -eq 'Absent' )
     {
-        if( $resource.Ensure -eq 'Absent' )
+        if( -not ($resources | Where-Object { $_.Ensure -eq 'Present' }) )
         {
-            Write-Verbose ('Identity ''{0}'' has no permission to ''{1}''' -f $Identity,$Path)
+            Write-Verbose ('[{0}]  [{1}]  No Permissions' -f $Path,$Identity)
             return $true
         }
         
-        Write-Verbose ('Identity ''{0}'' has permission to ''{1}'': {2}' -f $Identity,$Path,$currentRights)
+        foreach( $resource in $resources )
+        {
+            $currentRights = ($resource.Permission | Sort-Object) -join ','
+            Write-Verbose ('[{0}]  [{1}]  {2}' -f $Path,$Identity,$currentRights)
+        }
         return $false
     }
 
     if( -not $Permission )
     {
-        Write-Error ('Permission parameter is mandatory when granting permissions. If you want to revoke a user''s permission(s), set the `Ensure` property to `Absent`.')
+        Write-Error ('Permission parameter is mandatory when granting permissions. If you want to revoke a user"s permission(s), set the `Ensure` property to `Absent`.')
         return
     }
 
-    if( -not $currentRights )
+    $upToDate = $false
+    $idx = -1
+    foreach( $resource in $resources )
     {
-        Write-Verbose ('Identity ''{0} has no permission to ''{1}''' -f $Identity,$Path,$currentRights)
-        return $false
+        ++$idx
+        $currentRights = ($resource.Permission | Sort-Object) -join ','
+        if( $desiredRights -ne $currentRights )
+        {
+            Write-Verbose ('[{0}]  [{1}]  Rule[{2}]  Permission  "{3}" != "{4}"' -f $Path,$Identity,$idx,$currentRights,$desiredRights)
+            continue
+        }
+        else
+        {
+            Write-Verbose ('[{0}]  [{1}]  Rule[{2}]  Permission  "{3}" == "{4}"' -f $Path,$Identity,$idx,$currentRights,$desiredRights)
+        }
+
+        if( $ApplyTo )
+        {
+            if( $ApplyTo -ne $resource.ApplyTo )
+            {
+                Write-Verbose ('[{0}]  [{1}]  Rule[{2}]  ApplyTo  "{3}" != "{4}"' -f $Path,$Identity,$idx,$ApplyTo,$resource.ApplyTo)
+                continue
+            }
+            else
+            {
+                Write-Verbose ('[{0}]  [{1}]  Rule[{2}]  ApplyTo  "{3}" == "{4}"' -f $Path,$Identity,$idx,$ApplyTo,$resource.ApplyTo)
+            }
+        }
+
+        # We found one access rule that matches. It's up-to-date.
+        $upToDate = $true
+        break
     }
 
-    if( $desiredRights -ne $currentRights )
-    {
-        Write-Verbose ('Identity ''{0} has stale permission to ''{1}'': {2}' -f $Identity,$Path,$currentRights)
-        return $false
-    }
-
-    if( $ApplyTo -and $ApplyTo -ne $resource.ApplyTo )
-    {
-        Write-Verbose ('Identity ''{0}'' has stale inheritance/propagation flags to ''{1}'': {2}' -f $Identity,$Path,$resource.ApplyTo)
-        return $false
-    }
-
-    return $true
+    return $upToDate
 }
