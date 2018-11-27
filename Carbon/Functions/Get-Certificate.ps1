@@ -16,6 +16,8 @@ function Get-CCertificate
     .SYNOPSIS
     Gets a certificate from a file on the file system or from a Windows certificate store by thumbprint or friendly name.
 
+    Beginning in Carbon 2.7, the returned object will have a `Path` property that is the full path to either the file or certificate in the certificate store.
+
     .DESCRIPTION
     Certificates can be files or they can be in a Windows certificate store.  This function returns an `X509Certificate2` object for a script that's a file on the file system or a cert stored in Microsoft's certificate store.  You can get a certificate from a certificate store with its unique thumbprint or its friendly name.  Friendly names are *not* required to be unique, so you may get multiple certificates when using that search method.
     
@@ -101,8 +103,45 @@ function Get-CCertificate
     )
 
     Set-StrictMode -Version 'Latest'
-
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
+    function Add-PathMember
+    {
+        param(
+            [Parameter(Mandatory,VAlueFromPipeline=$true)]
+            [Security.Cryptography.X509Certificates.X509Certificate2]
+            $Certificate,
+
+            [Parameter(Mandatory)]
+            [string]
+            $Path
+        )
+
+        process
+        {
+            $Certificate | Add-Member -MemberType NoteProperty -Name 'Path' -Value $Path -PassThru
+        }
+    }
+
+    function Resolve-CertificateProviderFriendlyPath
+    {
+        param(
+            [Parameter(Mandatory,ValueFromPipelineByPropertyName)]
+            [string]
+            $PSPath,
+
+            [Parameter(Mandatory,ValueFromPipelineByPropertyName)]
+            [Management.Automation.PSDriveInfo]
+            $PSDrive
+        )
+
+        process
+        {
+            $qualifier = '{0}:' -f $PSDrive.Name
+            $path = $PSPath | Split-Path -NoQualifier
+            Join-Path -Path $qualifier -ChildPath $path
+        }
+    }
     
     if( $PSCmdlet.ParameterSetName -eq 'ByPath' )
     {
@@ -117,7 +156,8 @@ function Get-CCertificate
                 $item = $_
                 if( $item -is [Security.Cryptography.X509Certificates.X509Certificate2] )
                 {
-                    return $item
+                    $certFriendlyPath = $item | Resolve-CertificateProviderFriendlyPath
+                    return $item | Add-PathMember -Path $certFriendlyPath
                 }
                 elseif( $item -is [IO.FileInfo] )
                 {
@@ -128,7 +168,7 @@ function Get-CCertificate
                         {
                             $ctorParams += $KeyStorageFlags
                         }
-                        return New-Object 'Security.Cryptography.X509Certificates.X509Certificate2' $ctorParams
+                        return New-Object 'Security.Cryptography.X509Certificates.X509Certificate2' $ctorParams | Add-PathMember -Path $item.FullName
                     }
                     catch
                     {
@@ -169,13 +209,25 @@ function Get-CCertificate
             $certPath = 'cert:\{0}\{1}\{2}' -f $storeLocationPath,$storeNamePath,$Thumbprint
             if( (Test-Path -Path $certPath) )
             {
-                return Get-ChildItem -Path $certPath
+                foreach( $certPathItem in (Get-ChildItem -Path $certPath) )
+                {
+                    $path = $certPathItem | Resolve-CertificateProviderFriendlyPath
+                    $certPathItem | Add-PathMember -Path $path
+                }
             }
             return
         }
         elseif( $PSCmdlet.ParameterSetName -like 'ByFriendlyName*' )
         {
-            return Get-ChildItem cert:\$storeLocationPath\$storeNamePath\* | Where-Object { $_.FriendlyName -eq $FriendlyName }
+            $certPath = Join-Path -Path 'cert:' -ChildPath $storeLocationPath
+            $certPath = Join-Path -Path $certPath -ChildPath $storeNamePath
+            $certPath = Join-Path -Path $certPath -ChildPath '*'
+            return Get-ChildItem -Path $certPath | 
+                        Where-Object { $_.FriendlyName -eq $FriendlyName } |
+                        ForEach-Object {
+                            $friendlyPath = $_ | Resolve-CertificateProviderFriendlyPath
+                            $_ | Add-PathMember -Path $friendlyPath
+                        }
         }
         Write-Error "Unknown parameter set '$($pscmdlet.ParameterSetName)'."
     }

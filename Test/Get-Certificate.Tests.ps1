@@ -12,6 +12,9 @@
 
 $TestCertPath = JOin-Path -Path $PSScriptRoot -ChildPath 'Certificates\CarbonTestCertificate.cer' -Resolve
 $TestCert = New-Object Security.Cryptography.X509Certificates.X509Certificate2 $TestCertPath
+$testCertificateThumbprint = '7D5CE4A8A5EC059B829ED135E9AD8607977691CC'
+$testCertFriendlyName = 'Pup Test Certificate'
+$testCertCertProviderPath = 'cert:\CurrentUser\My\{0}' -f $testCertificateThumbprint
 
 & (Join-Path -Path $PSScriptRoot -ChildPath 'Import-CarbonForTest.ps1' -Resolve)
 
@@ -34,10 +37,39 @@ function Init
     }
 }
 
-Describe 'Get-Certificate' {
-    AfterEach {
+Describe 'Get-Certificate.when getting certificate from a file' {
+    Init
+    $cert = Get-CCertificate -Path $TestCertPath
+    It ('should have Path property') {
+        $cert.Path | Should -Be $TestCertPath
     }
-    
+}
+
+Describe 'Get-Certificate.when getting certificate by path from certificate store' {
+    Init
+    $cert = Get-CCertificate -Path $testCertCertProviderPath
+    It ('should have Path property') {
+        $cert.Path | Should -Be $testCertCertProviderPath
+    }
+}
+
+Describe 'Get-Certificate.when getting certificate by thumbprint' {
+    Init
+    $cert = Get-CCertificate -Thumbprint $testCertificateThumbprint -StoreLocation CurrentUser -StoreName My
+    It ('should have Path property') {
+        $cert.Path | Should -Be $testCertCertProviderPath
+    }
+}
+
+Describe 'Get-Certificate.when getting certificate by friendly name' {
+    Init
+    $cert = Get-CCertificate -FriendlyName $testCertFriendlyName -StoreLocation CurrentUser -StoreName My
+    It ('should have Path property') {
+        $cert.Path | Should -Be $testCertCertProviderPath
+    }
+}
+
+Describe 'Get-Certificate' {
     It 'should find certificates by friendly name' {
         Init
         $cert = Get-Certificate -FriendlyName $TestCert.friendlyName -StoreLocation CurrentUser -StoreName My
