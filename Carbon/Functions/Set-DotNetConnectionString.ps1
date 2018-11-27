@@ -119,7 +119,7 @@ function Set-CDotNetConnectionString
 
     $runtimes | ForEach-Object {
         $params = @{
-            FilePath = (Join-Path $CarbonBinDir 'Set-CDotNetConnectionString.ps1' -Resolve);
+            FilePath = (Join-Path $CarbonBinDir 'Set-DotNetConnectionString.ps1' -Resolve);
             ArgumentList = @(
                                 (ConvertTo-CBase64 -Value $Name),
                                 (ConvertTo-CBase64 -Value $Value),

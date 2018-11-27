@@ -106,7 +106,7 @@ function Set-CDotNetAppSetting
 
     $runtimes | ForEach-Object {
         $params = @{
-            FilePath = (Join-Path $CarbonBinDir 'Set-CDotNetAppSetting.ps1' -Resolve);
+            FilePath = (Join-Path $CarbonBinDir 'Set-DotNetAppSetting.ps1' -Resolve);
             ArgumentList = @( 
                                 (ConvertTo-CBase64 -Value $Name),
                                 (ConvertTo-CBase64 -Value $Value)

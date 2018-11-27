@@ -191,7 +191,7 @@ filter Protect-CString
         {
             if( $PSCmdlet.ParameterSetName -eq 'DPAPIForUser' ) 
             {
-                $protectStringPath = Join-Path -Path $CarbonBinDir -ChildPath 'Protect-CString.ps1' -Resolve
+                $protectStringPath = Join-Path -Path $CarbonBinDir -ChildPath 'Protect-String.ps1' -Resolve
                 $encodedString = Protect-CString -String $String -ForComputer
                 $argumentList = '-ProtectedString {0}' -f $encodedString
                 Invoke-CPowerShell -ExecutionPolicy 'ByPass' -NonInteractive -FilePath $protectStringPath -ArgumentList $argumentList -Credential $Credential |

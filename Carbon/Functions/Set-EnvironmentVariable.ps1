@@ -96,7 +96,7 @@ function Set-CEnvironmentVariable
 
     if( $PSCmdlet.ParameterSetName -eq 'ForSpecificUser' )
     {
-        Invoke-CPowerShell -FilePath (Join-Path -Path $PSScriptRoot -ChildPath '..\bin\Set-CEnvironmentVariable.ps1' -Resolve) `
+        Invoke-CPowerShell -FilePath (Join-Path -Path $PSScriptRoot -ChildPath '..\bin\Set-EnvironmentVariable.ps1' -Resolve) `
                           -Credential $credential `
                           -ArgumentList ('-Name {0} -Value {1}' -f (ConvertTo-CBase64 $Name),(ConvertTo-CBase64 $Value)) `
                           -NonInteractive `
