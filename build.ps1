@@ -15,7 +15,7 @@ Packages and publishes Carbon packages.
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-[CmdletBinding()]
+[CmdletBinding(DefaultParameterSetName='Build')]
 param(
     [Parameter(Mandatory=$true,ParameterSetName='Clean')]
     [Switch]
