@@ -346,6 +346,7 @@ All functions are idempotent: when run multiple times with the same arguments, y
 * Added `C` prefix to all Carbon commands, with aliases from old command names to new ones to maintain backwards compatability. 
 * Added `bin\Use-CarbonPrefix.ps1` script to Carbon that will update files to use the new Carbon function names.
 * `Get-CCertificate`: Added `Path` note property to returned objects.
+* Fixed: Chocolatey uninstaller fails if the `PSModulePath` environment variable contains trailing or sequential semicolons.
 '@
         } # End of PSData hashtable
     
