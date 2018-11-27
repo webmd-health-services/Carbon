@@ -59,7 +59,12 @@ Describe 'Uninstall-Certificate' {
         $cert | Should Not BeNullOrEmpty
         $certPath = 'Cert:\CurrentUser\Carbon\{0}' -f $cert.Thumbprint
         $certPath | Should Exist
-        Uninstall-Certificate -Thumbprint $cert.Thumbprint -StoreLocation CurrentUser -CustomStoreName 'Carbon'
+        Uninstall-Certificate -Thumbprint $cert.Thumbprint -StoreLocation CurrentUser -CustomStoreName 'Carbon' -Verbose
+        while( (Test-Path -Path $certPath) )
+        {
+            Write-Verbose -Message ('Waiting for "{0}" to get deleted.' -f $certPath)
+            Start-Sleep -Seconds 1
+        }
         $certPath | Should Not Exist   
     }
 
