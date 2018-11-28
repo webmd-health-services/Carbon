@@ -43,6 +43,12 @@ function ThenServiceUninstalled
         $Named
     )
 
+    while( (Get-Service $Named -ErrorAction Ignore) )
+    {
+        Write-Verbose -Message ('Waiting for "{0}" to get uninstalled.' -f $Named) -Verbose
+        Start-Sleep -Seconds 1
+    }
+
     It ('should uninstall service') {
         Get-Service $Named -ErrorAction Ignore | Should -BeNullOrEmpty
     }
