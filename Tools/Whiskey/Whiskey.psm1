@@ -5,7 +5,11 @@ $events = @{ }
 
 $7z = Join-Path -Path $PSScriptRoot -ChildPath 'bin\7-Zip\7z.exe' -Resolve
 
+$powerShellModulesDirectoryName = 'PSModules'
+
 $buildStartedAt = [DateTime]::MinValue
+
+$PSModuleAutoLoadingPreference = 'None'
 
 $supportsWriteInformation = Get-Command -Name 'Write-Information' -ErrorAction Ignore
 

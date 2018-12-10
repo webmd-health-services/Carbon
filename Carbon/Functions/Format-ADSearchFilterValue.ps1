@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Format-ADSearchFilterValue
+function Format-CADSearchFilterValue
 {
     <#
     .SYNOPSIS
@@ -26,7 +26,7 @@ function Format-ADSearchFilterValue
     http://msdn.microsoft.com/en-us/library/aa746475.aspx#special_characters
 
     .EXAMPLE
-    Format-ADSearchFilterValue -String "I have AD special characters (I think)."
+    Format-CADSearchFilterValue -String "I have AD special characters (I think)."
 
     Returns 
 
@@ -52,5 +52,5 @@ function Format-ADSearchFilterValue
     $string.Replace("`0", '\00')
 }
 
-Set-Alias -Name 'Format-ADSpecialCharacters' -Value 'Format-ADSearchFilterValue'
+Set-Alias -Name 'Format-ADSpecialCharacters' -Value 'Format-CADSearchFilterValue'
 

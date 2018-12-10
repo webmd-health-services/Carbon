@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Grant-MsmqMessageQueuePermission
+function Grant-CMsmqMessageQueuePermission
 {
     <#
     .SYNOPSIS
@@ -27,12 +27,12 @@ function Grant-MsmqMessageQueuePermission
     http://msdn.microsoft.com/en-us/library/system.messaging.messagequeueaccessrights.aspx
 
     .EXAMPLE
-    Grant-MsmqMessageQueuePermission -Name MovieQueue -Username REGAL\Employees -AccessRights FullControl
+    Grant-CMsmqMessageQueuePermission -Name MovieQueue -Username REGAL\Employees -AccessRights FullControl
 
     Grants Regal Cinema employees full control over the MovieQueue.
 
     .EXAMPLE
-    Grant-MsmqMessageQueuePermission -Name MovieQueue -Private -Username REGAL\Critics -AccessRights WriteMessage    
+    Grant-CMsmqMessageQueuePermission -Name MovieQueue -Private -Username REGAL\Critics -AccessRights WriteMessage    
 
     Grants all of Regal's approved movie critics permission to write to the private critic's `MovieQueue`.  Lucky!
     #>
@@ -63,7 +63,7 @@ function Grant-MsmqMessageQueuePermission
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
     
     $queueArgs = @{ Name = $Name ; Private = $Private }
-    $queue = Get-MsmqMessageQueue @queueArgs
+    $queue = Get-CMsmqMessageQueue @queueArgs
     if( -not $queue )
     {
         Write-Error "MSMQ queue '$Name' not found."
@@ -76,5 +76,5 @@ function Grant-MsmqMessageQueuePermission
     }
 }
 
-Set-Alias -Name 'Grant-MsmqMessageQueuePermissions' -Value 'Grant-MsmqMessageQueuePermission'
+Set-Alias -Name 'Grant-MsmqMessageQueuePermissions' -Value 'Grant-CMsmqMessageQueuePermission'
 

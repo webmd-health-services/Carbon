@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Grant-ServiceControlPermission
+function Grant-CServiceControlPermission
 {
     <#
     .SYNOPSIS
@@ -20,16 +20,16 @@ function Grant-ServiceControlPermission
     By default, only Administrators are allowed to control a service. You may notice that when running the `Stop-Service`, `Start-Service`, or `Restart-Service` cmdlets as a non-Administrator, you get permissions errors. That's because you need to correct permissions.  This function grants just the permissions needed to use PowerShell's `Stop-Service`, `Start-Service`, and `Restart-Service` cmdlets to control a service.
 
     .LINK
-    Get-ServicePermission
+    Get-CServicePermission
     
     .LINK
-    Grant-ServicePermission
+    Grant-CServicePermission
     
     .LINK
-    Revoke-ServicePermission
+    Revoke-CServicePermission
     
     .EXAMPLE
-    Grant-ServiceControlPermission -ServiceName CCService -Identity INITRODE\Builders
+    Grant-CServiceControlPermission -ServiceName CCService -Identity INITRODE\Builders
 
     Grants the INITRODE\Builders group permission to control the CruiseControl.NET service.
     #>
@@ -52,7 +52,7 @@ function Grant-ServiceControlPermission
 
     if( $pscmdlet.ShouldProcess( $ServiceName, "grant control service permissions to '$Identity'" ) )
     {
-        Grant-ServicePermission -Name $ServiceName -Identity $Identity -QueryStatus -EnumerateDependents -Start -Stop
+        Grant-CServicePermission -Name $ServiceName -Identity $Identity -QueryStatus -EnumerateDependents -Start -Stop
     }
 }
 

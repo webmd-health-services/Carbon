@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Copy-DscResource
+function Copy-CDscResource
 {
     <#
     .SYNOPSIS
@@ -23,30 +23,30 @@ function Copy-DscResource
     
     Only new files, or files whose checksums have changed, are copied. You can force all files to be copied with the `Force` switch.
 
-    `Copy-DscResource` is new in Carbon 2.0.
+    `Copy-CDscResource` is new in Carbon 2.0.
 
     .EXAMPLE
-    Copy-DscResource -Path 'localhost.mof' -Destination '\\dscserver\DscResources'
+    Copy-CDscResource -Path 'localhost.mof' -Destination '\\dscserver\DscResources'
 
     Demonstrates how to copy a single resource to a resources SMB share. `localhost.mof` will only be copied if its checksum is different than what is in `\\dscserver\DscResources`.
 
     .EXAMPLE
-    Copy-DscResource -Path 'C:\Projects\DscResources' -Destination '\\dscserver\DscResources'
+    Copy-CDscResource -Path 'C:\Projects\DscResources' -Destination '\\dscserver\DscResources'
 
     Demonstrates how to copy a directory of resources. Only files in the directory are copied. Every file in the source must have a `.checksum` file. Only files whose checksums are different between source and destination will be copied.
 
     .EXAMPLE
-    Copy-DscResource -Path 'C:\Projects\DscResources' -Destination '\\dscserver\DscResources' -Recurse
+    Copy-CDscResource -Path 'C:\Projects\DscResources' -Destination '\\dscserver\DscResources' -Recurse
 
     Demonstrates how to recursively copy files.
 
     .EXAMPLE
-    Copy-DscResource -Path 'C:\Projects\DscResources' -Destination '\\dscserver\DscResources' -Force
+    Copy-CDscResource -Path 'C:\Projects\DscResources' -Destination '\\dscserver\DscResources' -Force
 
     Demonstrates how to copy all files, even if their `.checksum` files are the  same.
 
     .EXAMPLE
-    Copy-DscResource -Path 'C:\Projects\DscResources' -Destination '\\dscserver\DscResources' -PassThru
+    Copy-CDscResource -Path 'C:\Projects\DscResources' -Destination '\\dscserver\DscResources' -PassThru
 
     Demonstrates how to get `System.IO.FileInfo` objects for all resources copied to the destination. If all files are up-to-date, nothing is copied, and no objects are returned.
     #>
@@ -80,7 +80,7 @@ function Copy-DscResource
 
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
-    $tempDir = New-TempDirectory -Prefix 'Carbon+Copy-DscResource+'
+    $tempDir = New-CTempDirectory -Prefix 'Carbon+Copy-CDscResource+'
 
     try
     {
@@ -95,7 +95,7 @@ function Copy-DscResource
                     {
                         New-Item -Path $destinationPath -ItemType 'Directory' | Out-Null
                     }
-                    Copy-DscResource -Path $item.FullName -Destination $destinationPath -Recurse -Force:$Force -PassThru:$PassThru
+                    Copy-CDscResource -Path $item.FullName -Destination $destinationPath -Recurse -Force:$Force -PassThru:$PassThru
                 }
                 continue
             }

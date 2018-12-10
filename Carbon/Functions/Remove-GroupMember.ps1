@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Remove-GroupMember
+function Remove-CGroupMember
 {
     <#
     .SYNOPSIS
@@ -23,15 +23,15 @@ function Remove-GroupMember
 
     If the user or group is not a member, nothing happens.
 
-    `Remove-GroupMember` is new in Carbon 2.0.
+    `Remove-CGroupMember` is new in Carbon 2.0.
 
     .EXAMPLE
-    Remove-GroupMember -Name Administrators -Member EMPIRE\DarthVader,EMPIRE\EmperorPalpatine,REBELS\LSkywalker
+    Remove-CGroupMember -Name Administrators -Member EMPIRE\DarthVader,EMPIRE\EmperorPalpatine,REBELS\LSkywalker
 
     Removes Darth Vader, Emperor Palpatine and Luke Skywalker from the local administrators group.
 
     .EXAMPLE
-    Remove-GroupMember -Name TieFighters -Member NetworkService
+    Remove-CGroupMember -Name TieFighters -Member NetworkService
 
     Removes the local NetworkService account from the local TieFighters group.
     #>
@@ -53,7 +53,7 @@ function Remove-GroupMember
 
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
     
-    [DirectoryServices.AccountManagement.GroupPrincipal]$group = Get-Group -Name $Name
+    [DirectoryServices.AccountManagement.GroupPrincipal]$group = Get-CGroup -Name $Name
     if( -not $group )
     {
         return
@@ -63,13 +63,13 @@ function Remove-GroupMember
     {
         foreach( $_member in $Member )
         {
-            $identity = Resolve-Identity -Name $_member
+            $identity = Resolve-CIdentity -Name $_member
             if( -not $identity )
             {
                 continue
             }
 
-            if( -not (Test-GroupMember -GroupName $group.Name -Member $_member) )
+            if( -not (Test-CGroupMember -GroupName $group.Name -Member $_member) )
             {
                 continue
             }

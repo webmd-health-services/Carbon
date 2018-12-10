@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Test-OSIs64Bit
+function Test-COSIs64Bit
 {
     <#
     .SYNOPSIS
@@ -26,7 +26,7 @@ function Test-OSIs64Bit
     http://msdn.microsoft.com/en-us/library/system.environment.is64bitoperatingsystem.aspx
     
     .EXAMPLE
-    Test-OSIs64Bit
+    Test-COSIs64Bit
     
     Returns `True` if the current operating system is 64-bit, and `False` otherwise.
     #>

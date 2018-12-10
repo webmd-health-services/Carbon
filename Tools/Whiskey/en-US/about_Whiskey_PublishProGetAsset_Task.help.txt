@@ -13,6 +13,8 @@ DESCRIPTION
 
     If publishing to your asset directory requires credentials, pass the credential ID to the `CredentialID` parameter. Use the `Add-WhiskeyCredential` function to add the credential to your build.
 
+    This task downloads and uses the [ProGetAutomation PowerShell module from the PowerShell Gallery](https://www.powershellgallery.com/packages/ProGetAutomation).
+
 
 PROPERTIES
     * `CredentialID`: The ID to the ProGet Credential. Set the `CredentialID` property to the ID of the credential to use when uploading. Add the credential with the `Add-WhiskeyCredential` function.
@@ -20,6 +22,7 @@ PROPERTIES
     * `Uri` (Mandatory): The uri to the ProGet instance.
     * `AssetPath` (Mandatory): The desired Paths to the location you wish the file to be uploaded to in ProGet. The last item in the path is the asset name. The number of names provided must equal the number of file paths.
     * `AssetDirectory` (Mandatory): The root asset Directory you wish to upload the asset to.
+    * `ProGetAutomationVersion`: the version of the ProGetAutomation PowerShell module to download and use. The default is the latest 0.4.* version. Be careful about changing the version. The task may not support newer/olders versions.
 
 
 EXAMPLES

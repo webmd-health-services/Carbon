@@ -38,6 +38,9 @@ function Set-WhiskeyBuildStatus
         {
             'BitbucketServer'
             {
+                Install-WhiskeyPowerShellModule -Name 'BitbucketServerAutomation' -Version '0.3.*'
+                Import-WhiskeyPowerShellModule -Name 'BitbucketServerAutomation'
+
                 $uri = $reporterConfig['Uri']
                 if( -not $uri )
                 {

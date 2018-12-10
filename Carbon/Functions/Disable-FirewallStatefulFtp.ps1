@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Disable-FirewallStatefulFtp
+function Disable-CFirewallStatefulFtp
 {
     <#
     .SYNOPSIS
@@ -22,10 +22,10 @@ function Disable-FirewallStatefulFtp
     If the firewall isn't configurable, writes an error and returns without making any changes.
 
     .LINK
-    Assert-FirewallConfigurable
+    Assert-CFirewallConfigurable
 
     .EXAMPLE
-    Disable-FirewallStatefulFtp
+    Disable-CFirewallStatefulFtp
 
     Disables the `StatefulFtp` Windows firewall setting.
     #>
@@ -37,7 +37,7 @@ function Disable-FirewallStatefulFtp
 
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
-    if( -not (Assert-FirewallConfigurable) )
+    if( -not (Assert-CFirewallConfigurable) )
     {
         return
     }

@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Set-IisWebsiteID
+function Set-CIisWebsiteID
 {
     <#
     .SYNOPSIS
@@ -26,7 +26,7 @@ function Set-IisWebsiteID
     Beginning with Carbon 2.0.1, this function is available only if IIS is installed.
 
     .EXAMPLE
-    Set-IisWebsiteID -SiteName Holodeck -ID 483
+    Set-CIisWebsiteID -SiteName Holodeck -ID 483
 
     Sets the `Holodeck` website's ID to `483`.
     #>
@@ -47,20 +47,20 @@ function Set-IisWebsiteID
 
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
-    if( -not (Test-IisWebsite -Name $SiteName) )
+    if( -not (Test-CIisWebsite -Name $SiteName) )
     {
         Write-Error ('Website {0} not found.' -f $SiteName)
         return
     }
 
-    $websiteWithID = Get-IisWebsite | Where-Object { $_.ID -eq $ID -and $_.Name -ne $SiteName }
+    $websiteWithID = Get-CIisWebsite | Where-Object { $_.ID -eq $ID -and $_.Name -ne $SiteName }
     if( $websiteWithID )
     {
         Write-Error -Message ('ID {0} already in use for website {1}.' -f $ID,$SiteName) -Category ResourceExists
         return
     }
 
-    $website = Get-IisWebsite -SiteName $SiteName
+    $website = Get-CIisWebsite -SiteName $SiteName
     $startWhenDone = $false
     if( $website.ID -ne $ID )
     {
@@ -84,7 +84,7 @@ function Set-IisWebsiteID
     do
     {
         Start-Sleep -Milliseconds 100
-        $website = Get-IisWebsite -SiteName $SiteName
+        $website = Get-CIisWebsite -SiteName $SiteName
         if( $website -and $website.ID -eq $ID )
         {
             break
@@ -121,7 +121,7 @@ function Set-IisWebsiteID
         }
 
         Start-Sleep -Milliseconds 100
-        $website = Get-IisWebsite -SiteName $SiteName
+        $website = Get-CIisWebsite -SiteName $SiteName
         if( $website -and $website.State -eq 'Started' )
         {
             break

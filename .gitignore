@@ -13,10 +13,10 @@ Source/**/*.user
 Test\MSI\setup.exe
 *.snk
 *.nupkg
-.output
-Modules
-packages
-Website
+.output/**
+PSModules/**
+packages/**
+Website/**
 Test/Xml/*.dll
 Test/MSI/*.tmp
 Test/MSI/setup.exe

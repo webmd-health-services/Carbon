@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Install-PerformanceCounter
+function Install-CPerformanceCounter
 {
     <#
     .SYNOPSIS
@@ -25,12 +25,12 @@ function Install-PerformanceCounter
     http://msdn.microsoft.com/en-us/library/system.diagnostics.performancecountertype.aspx
 
     .EXAMPLE
-    Install-PerformanceCounter -CategoryName ToyotaCamry -Name MilesPerGallon -Description 'The miles per gallon fuel efficiency.' -Type NumberOfItems32
+    Install-CPerformanceCounter -CategoryName ToyotaCamry -Name MilesPerGallon -Description 'The miles per gallon fuel efficiency.' -Type NumberOfItems32
 
     Creates a new miles per gallon performance counter for the ToyotaCamry category.
     
     .EXAMPLE
-    Install-PerformanceCounter -CategoryName "Dispatcher" -Name "Average Dispatch time" -Type AverageTimer32 -BaseName "Average Dispatch Base" -BaseType AverageBase -Force
+    Install-CPerformanceCounter -CategoryName "Dispatcher" -Name "Average Dispatch time" -Type AverageTimer32 -BaseName "Average Dispatch Base" -BaseType AverageBase -Force
     
     Creates a counter to collect average timings, with a base counter.  Some counters require base counters, which have to be added a specific way to work properly.
     #>
@@ -81,7 +81,7 @@ function Install-PerformanceCounter
 
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
-    $currentCounters = @( Get-PerformanceCounter -CategoryName $CategoryName )
+    $currentCounters = @( Get-CPerformanceCounter -CategoryName $CategoryName )
     
     $counter = $currentCounters | 
                     Where-Object { 
@@ -137,7 +137,7 @@ function Install-PerformanceCounter
     
     if( $pscmdlet.ShouldProcess( $CategoryName, "install performance counter '$Name'" ) )
     {
-        Uninstall-PerformanceCounterCategory -CategoryName $CategoryName
+        Uninstall-CPerformanceCounterCategory -CategoryName $CategoryName
 
         [void] [Diagnostics.PerformanceCounterCategory]::Create( $CategoryName, '', $counters )
     }

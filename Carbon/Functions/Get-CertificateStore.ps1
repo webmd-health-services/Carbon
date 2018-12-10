@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Get-CertificateStore
+function Get-CCertificateStore
 {
     <#
     .SYNOPSIS
@@ -25,12 +25,12 @@ function Get-CertificateStore
     Security.Cryptography.X509Certificates.X509Store.
 
     .EXAMPLE
-    Get-CertificateStore -StoreLocation LocalMachine -StoreName My
+    Get-CCertificateStore -StoreLocation LocalMachine -StoreName My
 
     Get the local computer's Personal certificate store.
 
     .EXAMPLE
-    Get-CertificateStore -StoreLocation CurrentUser -StoreName Root
+    Get-CCertificateStore -StoreLocation CurrentUser -StoreName Root
 
     Get the current user's Trusted Root Certification Authorities certificate store.
     #>

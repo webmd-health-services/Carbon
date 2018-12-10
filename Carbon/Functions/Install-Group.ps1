@@ -10,19 +10,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Install-Group
+function Install-CGroup
 {
     <#
     .SYNOPSIS
     Creates a new local group, or updates the settings for an existing group.
 
     .DESCRIPTION
-    `Install-Group` creates a local group, or, updates a group that already exists.
+    `Install-CGroup` creates a local group, or, updates a group that already exists.
 
     YOu can get a `System.DirectoryServices.AccountManagement.GroupPrincipal` object representing the group returned to you by using the `PassThru` switch. This object implements the `IDisposable` interface, which means it uses external resources that don't get garbage collected. When you're done using the object, make sure you call `Dispose()` to free those resources, otherwise you'll leak memory. All over the place.
 
     .EXAMPLE
-    Install-Group -Name TIEFighters -Description 'Users allowed to be TIE fighter pilots.' -Members EMPIRE\Pilots,EMPIRE\DarthVader
+    Install-CGroup -Name TIEFighters -Description 'Users allowed to be TIE fighter pilots.' -Members EMPIRE\Pilots,EMPIRE\DarthVader
 
     If the TIE fighters group doesn't exist, it is created with the given description and default members.  If it already exists, its description is updated and the given members are added to it.
     #>
@@ -94,7 +94,7 @@ function Install-Group
 
         if( $Member -and $PSCmdlet.ShouldProcess( ('local group {0}' -f $Name), 'adding members' ) )
         {
-            Add-GroupMember -Name $Name -Member $Member
+            Add-CGroupMember -Name $Name -Member $Member
         }
     
         if( $PassThru )

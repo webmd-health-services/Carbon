@@ -10,26 +10,26 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function ConvertTo-InheritanceFlag
+function ConvertTo-CInheritanceFlag
 {
     <#
     .SYNOPSIS
     Converts a `Carbon.Security.ContainerInheritanceFlags` value to a `System.Security.AccessControl.InheritanceFlags` value.
     
     .DESCRIPTION
-    The `Carbon.Security.ContainerInheritanceFlags` enumeration encapsulates oth `System.Security.AccessControl.InheritanceFlags` and `System.Security.AccessControl.PropagationFlags`.  Make sure you also call `ConvertTo-PropagationFlag` to get the propagation value.
+    The `Carbon.Security.ContainerInheritanceFlags` enumeration encapsulates oth `System.Security.AccessControl.InheritanceFlags` and `System.Security.AccessControl.PropagationFlags`.  Make sure you also call `ConvertTo-CPropagationFlag` to get the propagation value.
     
     .OUTPUTS
     System.Security.AccessControl.InheritanceFlags.
     
     .LINK
-    ConvertTo-PropagationFlag
+    ConvertTo-CPropagationFlag
     
     .LINK
-    Grant-Permission
+    Grant-CPermission
     
     .EXAMPLE
-    ConvertTo-InheritanceFlag -ContainerInheritanceFlag ContainerAndSubContainersAndLeaves
+    ConvertTo-CInheritanceFlag -ContainerInheritanceFlag ContainerAndSubContainersAndLeaves
     
     Returns `InheritanceFlags.ContainerInherit|InheritanceFlags.ObjectInherit`.
     #>
@@ -71,5 +71,5 @@ function ConvertTo-InheritanceFlag
     Write-Error ('Unknown Carbon.Security.ContainerInheritanceFlags enumeration value {0}.' -f $ContainerInheritanceFlag) 
 }
 
-Set-Alias -Name 'ConvertTo-InheritanceFlags' -Value 'ConvertTo-InheritanceFlag'
+Set-Alias -Name 'ConvertTo-InheritanceFlags' -Value 'ConvertTo-CInheritanceFlag'
 

@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function New-Junction
+function New-CJunction
 {
     <#
     .SYNOPSIS
@@ -25,13 +25,13 @@ function New-Junction
     System.IO.DirectoryInfo.
     
     .LINK
-    Install-Junction
+    Install-CJunction
 
     .LINK
-    Remove-Junction
+    Remove-CJunction
 
     .EXAMPLE
-    New-Junction -Link 'C:\Windows\system32Link' -Target 'C:\Windows\system32'
+    New-CJunction -Link 'C:\Windows\system32Link' -Target 'C:\Windows\system32'
     
     Creates the `C:\Windows\system32Link` directory, which points to `C:\Windows\system32`.
     #>

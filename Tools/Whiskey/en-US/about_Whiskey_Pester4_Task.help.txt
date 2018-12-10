@@ -17,6 +17,8 @@ DESCRIPTION
 
     It is hard, in some build tools, to track down your longest running tests and Describe blocks. The `Pester4` task can output two reports that will show you the longest running It and Describe blocks. The `DescribeDurationReportCount` property controls how many rows to show in the Describe Duration Report, which shows the duration of every Describe block that was run, from longest to shortest duration. The `ItDurationReportCount` property controls how many rows to show in the It Duration Report, which shows the duration of all It blocks that were run, from longest to shortest durations.
 
+    This task downloads Pester from the PowerShell Gallery.
+
 PROPERTIES
 
     * `Path` (mandatory): the path to the test scripts to run. These paths are passed to the `Invoke-Pester` function's `Script` parameter. Wildcards are supported, but they are resolved by the `Pester4` task *before* getting passed to Pester.

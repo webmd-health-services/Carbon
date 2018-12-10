@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Get-Permission
+function Get-CPermission
 {
     <#
     .SYNOPSIS
@@ -30,40 +30,40 @@ function Get-Permission
     Carbon_Permission
 
     .LINK
-    Disable-AclInheritance
+    Disable-CAclInheritance
 
     .LINK
-    Enable-AclInheritance
+    Enable-CAclInheritance
 
     .LINK
-    Get-Permission
+    Get-CPermission
 
     .LINK
-    Grant-Permission
+    Grant-CPermission
 
     .LINK
-    Revoke-Permission
+    Revoke-CPermission
 
     .LINK
-    Test-Permission
+    Test-CPermission
 
     .EXAMPLE
-    Get-Permission -Path 'C:\Windows'
+    Get-CPermission -Path 'C:\Windows'
     
     Returns `System.Security.AccessControl.FileSystemAccessRule` objects for all the non-inherited rules on `C:\windows`.
     
     .EXAMPLE
-    Get-Permission -Path 'hklm:\Software' -Inherited
+    Get-CPermission -Path 'hklm:\Software' -Inherited
     
     Returns `System.Security.AccessControl.RegistryAccessRule` objects for all the inherited and non-inherited rules on `hklm:\software`.
     
     .EXAMPLE
-    Get-Permission -Path 'C:\Windows' -Idenity Administrators
+    Get-CPermission -Path 'C:\Windows' -Idenity Administrators
     
     Returns `System.Security.AccessControl.FileSystemAccessRule` objects for all the `Administrators'` rules on `C:\windows`.
 
     .EXAMPLE
-    Get-Permission -Path 'Cert:\LocalMachine\1234567890ABCDEF1234567890ABCDEF12345678'
+    Get-CPermission -Path 'Cert:\LocalMachine\1234567890ABCDEF1234567890ABCDEF12345678'
 
     Returns `System.Security.AccessControl.CryptoKeyAccesRule` objects for certificate's `Cert:\LocalMachine\1234567890ABCDEF1234567890ABCDEF12345678` private key/key container. If it doesn't have a private key, `$null` is returned.
     #>
@@ -91,7 +91,7 @@ function Get-Permission
     $account = $null
     if( $Identity )
     {
-        $account = Test-Identity -Name $Identity -PassThru
+        $account = Test-CIdentity -Name $Identity -PassThru
         if( $account )
         {
             $Identity = $account.FullName
@@ -138,5 +138,5 @@ function Get-Permission
         }    
 }
 
-Set-Alias -Name 'Get-Permissions' -Value 'Get-Permission'
+Set-Alias -Name 'Get-Permissions' -Value 'Get-CPermission'
 

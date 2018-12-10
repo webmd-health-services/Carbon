@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Enable-IisSsl
+function Enable-CIisSsl
 {
     <#
     .SYNOPSIS
@@ -35,32 +35,32 @@ function Enable-IisSsl
     http://support.microsoft.com/?id=907274
 
     .EXAMPLE
-    Enable-IisSsl -Site Peanuts
+    Enable-CIisSsl -Site Peanuts
 
     Enables SSL on the `Peanuts` website's, making makes SSL connections optional, ignoring client certificates, and making 128-bit SSL optional.
 
     .EXAMPLE
-    Enable-IisSsl -Site Peanuts -VirtualPath Snoopy/DogHouse -RequireSsl
+    Enable-CIisSsl -Site Peanuts -VirtualPath Snoopy/DogHouse -RequireSsl
     
     Configures the `/Snoopy/DogHouse` directory in the `Peanuts` site to require SSL.  It also turns off any client certificate settings and makes 128-bit SSL optional.
 
     .EXAMPLE
-    Enable-IisSsl -Site Peanuts -AcceptClientCertificates
+    Enable-CIisSsl -Site Peanuts -AcceptClientCertificates
 
     Enables SSL on the `Peanuts` website and configures it to accept client certificates, makes SSL optional, and makes 128-bit SSL optional.
 
     .EXAMPLE
-    Enable-IisSsl -Site Peanuts -RequireSsl -RequireClientCertificates
+    Enable-CIisSsl -Site Peanuts -RequireSsl -RequireClientCertificates
 
     Enables SSL on the `Peanuts` website and configures it to require SSL and client certificates.  You can't require client certificates without also requiring SSL.
 
     .EXAMPLE
-    Enable-IisSsl -Site Peanuts -Require128BitSsl
+    Enable-CIisSsl -Site Peanuts -Require128BitSsl
 
     Enables SSL on the `Peanuts` website and require 128-bit SSL.  Also, makes SSL connections optional and ignores client certificates.
 
     .LINK
-    Set-IisWebsiteSslCertificate
+    Set-CIisWebsiteSslCertificate
     #>
     [CmdletBinding(SupportsShouldProcess=$true,DefaultParameterSetName='IgnoreClientCertificates')]
     param(
@@ -132,7 +132,7 @@ function Enable-IisSsl
         $intFlag = $intFlag -bor $SslFlags_Ssl128
     }
 
-    $section = Get-IisConfigurationSection -SiteName $SiteName -VirtualPath $VirtualPath -SectionPath 'system.webServer/security/access'
+    $section = Get-CIisConfigurationSection -SiteName $SiteName -VirtualPath $VirtualPath -SectionPath 'system.webServer/security/access'
     if( -not $section )
     {
         return
@@ -174,7 +174,7 @@ function Enable-IisSsl
     {
         Write-IisVerbose $SiteName 'SslFlags' ('{0} ({1})' -f $currentIntFlag,$currentFlags) ('{0} ({1})' -f $intFlag,$flags) -VirtualPath $VirtualPath
         $section['sslFlags'] = $flags
-        if( $pscmdlet.ShouldProcess( (Join-IisVirtualPath $SiteName $VirtualPath), "enable SSL" ) )
+        if( $pscmdlet.ShouldProcess( (Join-CIisVirtualPath $SiteName $VirtualPath), "enable SSL" ) )
         {
             $section.CommitChanges()
         }

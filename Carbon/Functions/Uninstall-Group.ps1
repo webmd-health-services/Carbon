@@ -10,31 +10,31 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Uninstall-Group
+function Uninstall-CGroup
 {
     <#
     .SYNOPSIS
     Removes a *local* group.
     
     .DESCRIPTION
-    The `Uninstall-Group` function removes a *local* group using .NET's [DirectoryServices.AccountManagement API](https://msdn.microsoft.com/en-us/library/system.directoryservices.accountmanagement.aspx). If the group doesn't exist, returns without doing any work or writing any errors.
+    The `Uninstall-CGroup` function removes a *local* group using .NET's [DirectoryServices.AccountManagement API](https://msdn.microsoft.com/en-us/library/system.directoryservices.accountmanagement.aspx). If the group doesn't exist, returns without doing any work or writing any errors.
     
     This function was added in Carbon 2.1.0.
 
     .LINK
-    Add-GroupMember
+    Add-CGroupMember
 
     .LINK
-    Install-Group
+    Install-CGroup
 
     .LINK
-    Remove-GroupMember
+    Remove-CGroupMember
 
     .LINK
-    Test-Group
+    Test-CGroup
 
     .LINK
-    Test-GroupMember
+    Test-CGroupMember
 
     .INPUTS
     System.String
@@ -57,12 +57,12 @@ function Uninstall-Group
 	Set-StrictMode -Version 'Latest'
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
-    if( -not (Test-Group -Name $Name) )
+    if( -not (Test-CGroup -Name $Name) )
     {
         return
     }
 
-    $group = Get-Group -Name $Name
+    $group = Get-CGroup -Name $Name
     if( -not $group )
     {
         return

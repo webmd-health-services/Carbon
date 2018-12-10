@@ -10,20 +10,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Get-ServiceSecurityDescriptor
+function Get-CServiceSecurityDescriptor
 {
     <#
     .SYNOPSIS
     Gets the raw security descriptor for a service.
     
     .DESCRIPTION
-    You probably don't want to mess with the raw security descriptor.  Try `Get-ServicePermission` instead.  Much more useful.
+    You probably don't want to mess with the raw security descriptor.  Try `Get-CServicePermission` instead.  Much more useful.
     
     .OUTPUTS
     System.Security.AccessControl.RawSecurityDescriptor.
     
     .LINK
-    Get-ServicePermission
+    Get-CServicePermission
     
     .LINK
     Grant-ServicePermissions
@@ -32,7 +32,7 @@ function Get-ServiceSecurityDescriptor
     Revoke-ServicePermissions
     
     .EXAMPLE
-    Get-ServiceSecurityDescriptor -Name 'Hyperdrive'
+    Get-CServiceSecurityDescriptor -Name 'Hyperdrive'
     
     Gets the hyperdrive service's raw security descriptor.
     #>

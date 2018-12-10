@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Split-Ini
+function Split-CIni
 {
     <#
     .SYNOPSIS
@@ -46,7 +46,7 @@ function Split-Ini
 
     Each line of an INI file contains one entry. If the lines that follow are indented, they are treated as continuations of that entry. Leading whitespace is removed from values. Empty lines are skipped. Lines beginning with "#" or ";" are ignored and may be used to provide comments.
 
-    Configuration keys can be set multiple times, in which case Split-Ini will use the value that was configured last. As an example:
+    Configuration keys can be set multiple times, in which case Split-CIni will use the value that was configured last. As an example:
 
         [spam]
         eggs=large
@@ -77,13 +77,13 @@ function Split-Ini
     Be default, operates on the INI file case-insensitively. If your INI is case-sensitive, use the `-CaseSensitive` switch.
 
     .LINK
-    Set-IniEntry
+    Set-CIniEntry
 
     .LINK
-    Remove-IniEntry
+    Remove-CIniEntry
 
     .EXAMPLE
-    Split-Ini -Path C:\Users\rspektor\mercurial.ini 
+    Split-CIni -Path C:\Users\rspektor\mercurial.ini 
 
     Given this INI file:
 
@@ -94,7 +94,7 @@ function Split-Ini
         share = 
         extdiff =
 
-    `Split-Ini` returns the following objects to the pipeline:
+    `Split-CIni` returns the following objects to the pipeline:
 
         Line FullName           Section    Name     Value
         ---- --------           -------    ----     -----
@@ -103,7 +103,7 @@ function Split-Ini
            6 extensions.extdiff extensions extdiff  
 
     .EXAMPLE
-    Split-Ini -Path C:\Users\rspektor\mercurial.ini -AsHashtable
+    Split-CIni -Path C:\Users\rspektor\mercurial.ini -AsHashtable
 
     Given this INI file:
 
@@ -114,7 +114,7 @@ function Split-Ini
         share = 
         extdiff =
 
-    `Split-Ini` returns the following hashtable:
+    `Split-CIni` returns the following hashtable:
 
         @{
             ui.username = Carbon.Ini.IniNode (
@@ -141,7 +141,7 @@ function Split-Ini
         }
 
     .EXAMPLE
-    Split-Ini -Path C:\Users\rspektor\mercurial.ini -AsHashtable -CaseSensitive
+    Split-CIni -Path C:\Users\rspektor\mercurial.ini -AsHashtable -CaseSensitive
 
     Demonstrates how to parse a case-sensitive INI file.
 
@@ -155,7 +155,7 @@ function Split-Ini
         username = user3@example.com
 
 
-    `Split-Ini -CaseSensitive` returns the following hashtable:
+    `Split-CIni -CaseSensitive` returns the following hashtable:
 
         @{
             ui.username = Carbon.Ini.IniNode (

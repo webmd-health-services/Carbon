@@ -27,7 +27,7 @@ function Write-WhiskeyInfo
         $Message = '[{0}][{1}][{2}]  {3}{4}' -f $Context.PipelineName,$Context.TaskIndex,$Context.TaskName,(' ' * ($Indent * 2)),$Message
         if( $supportsWriteInformation )
         {
-            Write-Information -MessageData $Message
+            Write-Information -MessageData $Message -InformationAction Continue
         }
         else
         {

@@ -20,6 +20,10 @@ The `New-Website.ps1` script generates the get-carbon.org website. It uses the S
 
 [CmdletBinding()]
 param(
+    [Parameter(Mandatory=$true)]
+    [string]
+    $WebRoot,
+
     [Switch]
     # Skips generating the command help.
     $SkipCommandHelp
@@ -53,8 +57,7 @@ function Out-HtmlPage
     process
     {
 
-        $webRoot = Join-Path -Path $PSScriptRoot -ChildPath 'get-carbon.org'
-        $path = Join-Path -Path $webRoot -ChildPath $VirtualPath
+        $path = Join-Path -Path $WebRoot -ChildPath $VirtualPath
         $templateArgs = @(
                             $Title,
                             $Content,
@@ -146,4 +149,4 @@ Get-Content -Path (Join-Path -Path $PSScriptRoot -ChildPath 'RELEASE NOTES.txt')
     Out-HtmlPage -Title ('Release Notes - {0}' -f $carbonTitle) -VirtualPath '/releasenotes.html'
 
 Copy-Item -Path (Join-Path -Path $PSScriptRoot -ChildPath 'Tools\Silk\Resources\silk.css' -Resolve) `
-          -Destination (Join-Path -Path $PSScriptRoot -ChildPath 'Website') -Verbose
+          -Destination $WebRoot -Verbose

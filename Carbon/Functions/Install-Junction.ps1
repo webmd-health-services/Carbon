@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Install-Junction
+function Install-CJunction
 {
     <#
     .SYNOPSIS
@@ -27,18 +27,18 @@ function Install-Junction
     System.IO.DirectoryInfo. To return a `DirectoryInfo` object for installed junction, use the `PassThru` switch.
     
     .LINK
-    New-Junction
+    New-CJunction
 
     .LINK
-    Remove-Junction
+    Remove-CJunction
 
     .EXAMPLE
-    Install-Junction -Link 'C:\Windows\system32Link' -Target 'C:\Windows\system32'
+    Install-CJunction -Link 'C:\Windows\system32Link' -Target 'C:\Windows\system32'
     
     Creates the `C:\Windows\system32Link` directory, which points to `C:\Windows\system32`.
 
     .EXAMPLE
-    Install-Junction -Link C:\Projects\Foobar -Target 'C:\Foo\bar' -Force
+    Install-CJunction -Link C:\Projects\Foobar -Target 'C:\Foo\bar' -Force
 
     This example demonstrates how to create the target directory if it doesn't exist.  After this example runs, the directory `C:\Foo\bar` and junction `C:\Projects\Foobar` will be created.
     #>
@@ -69,8 +69,8 @@ function Install-Junction
 
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
-    $Link = Resolve-FullPath -Path $Link
-    $Target = Resolve-FullPath -Path $Target
+    $Link = Resolve-CFullPath -Path $Link
+    $Target = Resolve-CFullPath -Path $Target
 
     if( Test-Path -LiteralPath $Target -PathType Leaf )
     {
@@ -105,12 +105,12 @@ function Install-Junction
             return
         }
 
-        Remove-Junction -LiteralPath $Link
+        Remove-CJunction -LiteralPath $Link
     }
 
     if( $PSCmdlet.ShouldProcess( $Target, ("creating '{0}' junction" -f $Link) ) )
     {
-        $result = New-Junction -Link $Link -Target $target -Verbose:$false
+        $result = New-CJunction -Link $Link -Target $target -Verbose:$false
         if( $PassThru )
         {
             return $result

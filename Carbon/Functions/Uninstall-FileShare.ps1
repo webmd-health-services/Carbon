@@ -10,33 +10,33 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Uninstall-FileShare
+function Uninstall-CFileShare
 {
     <#
     .SYNOPSIS
     Uninstalls/removes a file share from the local computer.
 
     .DESCRIPTION
-    The `Uninstall-FileShare` function uses WMI to uninstall/remove a file share from the local computer, if it exists. If the file shares does not exist, no errors are written and nothing happens. The directory on the file system the share points to is not removed.
+    The `Uninstall-CFileShare` function uses WMI to uninstall/remove a file share from the local computer, if it exists. If the file shares does not exist, no errors are written and nothing happens. The directory on the file system the share points to is not removed.
 
-    `Uninstall-FileShare` was added in Carbon 2.0.
-
-    .LINK
-    Get-FileShare
+    `Uninstall-CFileShare` was added in Carbon 2.0.
 
     .LINK
-    Get-FileSharePermission
+    Get-CFileShare
 
     .LINK
-    Install-FileShare
+    Get-CFileSharePermission
 
     .LINK
-    Test-FileShare
+    Install-CFileShare
+
+    .LINK
+    Test-CFileShare
 
     .EXAMPLE
-    Uninstall-FileShare -Name 'CarbonShare'
+    Uninstall-CFileShare -Name 'CarbonShare'
 
-    Demonstrates how to uninstall/remove a share from the local computer. If the share does not exist, `Uninstall-FileShare` silently does nothing (i.e. it doesn't write an error).
+    Demonstrates how to uninstall/remove a share from the local computer. If the share does not exist, `Uninstall-CFileShare` silently does nothing (i.e. it doesn't write an error).
     #>
     [CmdletBinding(SupportsShouldProcess=$true)]
     param(
@@ -62,12 +62,12 @@ function Uninstall-FileShare
                 [uint32]25 = 'Net Name Not Found';
             }
 
-    if( -not (Test-FileShare -Name $Name) )
+    if( -not (Test-CFileShare -Name $Name) )
     {
         return
     }
 
-    Get-FileShare -Name $Name |
+    Get-CFileShare -Name $Name |
         ForEach-Object { 
             $share = $_
             $deletePhysicalPath = $false

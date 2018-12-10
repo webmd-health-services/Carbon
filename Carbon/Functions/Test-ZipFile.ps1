@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Test-ZipFile
+function Test-CZipFile
 {
     <#
     .SYNOPSIS
@@ -25,13 +25,13 @@ function Test-ZipFile
     https://www.nuget.org/packages/DotNetZip
 
     .LINK
-    Compress-Item
+    Compress-CItem
     
     .LINK
-    Expand-Item
+    Expand-CItem
     
     .EXAMPLE
-    Test-ZipFile -Path 'MyCoolZip.zip'
+    Test-CZipFile -Path 'MyCoolZip.zip'
     
     Demonstrates how to check the current directory if MyCoolZip.zip is really a ZIP file.  
     #>
@@ -49,7 +49,7 @@ function Test-ZipFile
 
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
-    $Path = Resolve-FullPath -Path $Path
+    $Path = Resolve-CFullPath -Path $Path
     if( -not (Test-Path -Path $Path -PathType Leaf) )
     {
         Write-Error ('File ''{0}'' not found.' -f $Path)

@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Get-IisWebsite
+function Get-CIisWebsite
 {
     <#
     .SYNOPSIS
@@ -30,12 +30,12 @@ function Get-IisWebsite
     http://msdn.microsoft.com/en-us/library/microsoft.web.administration.site.aspx
 
     .EXAMPLE
-    Get-IisWebsite
+    Get-CIisWebsite
 
     Returns all installed websites.
      
     .EXAMPLE
-    Get-IisWebsite -SiteName 'WebsiteName'
+    Get-CIisWebsite -SiteName 'WebsiteName'
      
     Returns the details for the site named `WebsiteName`.
     #>
@@ -52,7 +52,7 @@ function Get-IisWebsite
 
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
-    if( $Name -and -not (Test-IisWebsite -Name $Name) )
+    if( $Name -and -not (Test-CIisWebsite -Name $Name) )
     {
         return $null
     }

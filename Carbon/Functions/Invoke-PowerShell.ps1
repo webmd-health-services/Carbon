@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Invoke-PowerShell
+function Invoke-CPowerShell
 {
     <#
     .SYNOPSIS
@@ -18,7 +18,7 @@ function Invoke-PowerShell
     
     .DESCRIPTION
 
-    The `Invoke-PowerShell` scripts executes `powershell.exe`. All processes are started with powershell.exe's `-NoProfile` paramter. You can specify values for powershell.exe's `OutputFormat`, `ExecutionPolicy`, and `NonInteractive` paramters via parameters of the same name on the `Invoke-PowerShell` function. Use the `Runtime` parameter to run `powershell.exe` version 2.
+    The `Invoke-CPowerShell` scripts executes `powershell.exe`. All processes are started with powershell.exe's `-NoProfile` paramter. You can specify values for powershell.exe's `OutputFormat`, `ExecutionPolicy`, and `NonInteractive` paramters via parameters of the same name on the `Invoke-CPowerShell` function. Use the `Runtime` parameter to run `powershell.exe` version 2.
     
     To run a script, pass the path to the script with the `-FilePath` paramter. Pass any script arguments with the `ArgumentList` parameter. You must escape any parameters. They are passed to `powershell.exe` as-is.
     
@@ -26,65 +26,65 @@ function Invoke-PowerShell
     
     To run a command (Carbon 2.3.0 and later only), pass the command (i.e. string of PowerShell code) with the `Command` parameter. Any arguments to your command must be in the command itself. You must do any escaping.
     
-    To run an encoded command (Carbon 2.3.0 and later only), pass the command (i.e. string of PowerShell code) with the `Command` parameter and the `-Encode` switch. `Invoke-PowerShell` will base-64 encode your command for you and pass it to `powershell.exe` with its `-EncodedCommand` parameter.
+    To run an encoded command (Carbon 2.3.0 and later only), pass the command (i.e. string of PowerShell code) with the `Command` parameter and the `-Encode` switch. `Invoke-CPowerShell` will base-64 encode your command for you and pass it to `powershell.exe` with its `-EncodedCommand` parameter.
     
     Beginning in Carbon 2.3.0, you can run scripts, commands, and encoded commands as another user. Pass that user's credentials with the `Credential` parameter.
     
     On 64-bit operating systems, use the `-x86` switch to run the new `powershell.exe` process under 32-bit PowerShell. If this switch is ommitted, `powershell.exe` will be run under a 64-bit PowerShell process (even if called from a 32-bit process). On 32-bit operating systems, this switch is ignored.
     
-    The `Runtime` paramter controls what version of the .NET framework `powershell.exe` should use. Pass `v2.0` and `v4.0` to run under .NET versions 2.0 or 4.0, respectivey. Those frameworks must be installed. When running under PowerShell 2, `Invoke-PowerShell` uses a temporary [activation configuration file](https://msdn.microsoft.com/en-us/library/ff361644(v=vs.100).aspx) to force PowerShell 2 to use .NET 4. When run under PowerShell 3 and later, `powershell.exe` is run with the `-Version` switch set to `2.0` to run `powershell.exe` under .NET 2.
+    The `Runtime` paramter controls what version of the .NET framework `powershell.exe` should use. Pass `v2.0` and `v4.0` to run under .NET versions 2.0 or 4.0, respectivey. Those frameworks must be installed. When running under PowerShell 2, `Invoke-CPowerShell` uses a temporary [activation configuration file](https://msdn.microsoft.com/en-us/library/ff361644(v=vs.100).aspx) to force PowerShell 2 to use .NET 4. When run under PowerShell 3 and later, `powershell.exe` is run with the `-Version` switch set to `2.0` to run `powershell.exe` under .NET 2.
 
     If using PowerShell v3.0 or later with a version of Carbon before 2.0, you can *only* run script blocks under a `v4.0` CLR.  PowerShell converts script blocks to an encoded command, and when running encoded commands, PowerShell doesn't allow the `-Version` parameter for running PowerShell under a different version.  To run code under a .NET 2.0 CLR from PowerShell 3, use the `FilePath` parameter to run a specfic script.
     
     .EXAMPLE
-    Invoke-PowerShell -ScriptBlock { $PSVersionTable }
+    Invoke-CPowerShell -ScriptBlock { $PSVersionTable }
     
     Runs a separate PowerShell process which matches the architecture of the operating system, returning the $PSVersionTable from that process.  This will fail under 32-bit PowerShell on a 64-bit operating system.
     
     .EXAMPLE
-    Invoke-PowerShell -ScriptBlock { $PSVersionTable } -x86
+    Invoke-CPowerShell -ScriptBlock { $PSVersionTable } -x86
     
     Runs a 32-bit PowerShell process, return the $PSVersionTable from that process.
     
     .EXAMPLE
-    Invoke-PowerShell -ScriptBlock { $PSVersionTable } -Runtime v4.0
+    Invoke-CPowerShell -ScriptBlock { $PSVersionTable } -Runtime v4.0
     
     Runs a separate PowerShell process under the v4.0 .NET CLR, returning the $PSVersionTable from that process.  Should return a CLRVersion of `4.0`.
     
     .EXAMPLE
-    Invoke-PowerShell -FilePath C:\Projects\Carbon\bin\Set-DotNetConnectionString.ps1 -ArgumentList '-Name','myConn','-Value',"'data source=.\DevDB;Integrated Security=SSPI;'"
+    Invoke-CPowerShell -FilePath C:\Projects\Carbon\bin\Set-CDotNetConnectionString.ps1 -ArgumentList '-Name','myConn','-Value',"'data source=.\DevDB;Integrated Security=SSPI;'"
     
-    Runs the `Set-DotNetConnectionString.ps1` script with `ArgumentList` as arguments/parameters.
+    Runs the `Set-CDotNetConnectionString.ps1` script with `ArgumentList` as arguments/parameters.
     
     Note that you have to double-quote any arguments with spaces.  Otherwise, the argument gets interpreted as multiple arguments.
 
     .EXAMPLE
-    Invoke-PowerShell -FilePath Get-PsVersionTable.ps1 -x86 -ExecutionPolicy RemoteSigned
+    Invoke-CPowerShell -FilePath Get-PsVersionTable.ps1 -x86 -ExecutionPolicy RemoteSigned
 
     Shows how to run powershell.exe with a custom executin policy, in case the running of scripts is disabled.
 
     .EXAMPLE
-    Invoke-PowerShell -FilePath Get-PsVersionTable.ps1 -Credential $cred
+    Invoke-CPowerShell -FilePath Get-PsVersionTable.ps1 -Credential $cred
 
     Demonstrates that you can run PowerShell scripts as a specific user with the `Credential` parameter.
 
     .EXAMPLE
-    Invoke-PowerShell -FilePath Get-PsVersionTable.ps1 -Credential $cred
+    Invoke-CPowerShell -FilePath Get-PsVersionTable.ps1 -Credential $cred
 
     Demonstrates that you can run PowerShell scripts as a specific user with the `Credential` parameter.
 
     .EXAMPLE 
-    Invoke-PowerShell -Command '$PSVersionTable'
+    Invoke-CPowerShell -Command '$PSVersionTable'
     
     Demonstrates how to run a PowerShell command contained in a string. You are responsible for quoting things correctly.
 
     .EXAMPLE
-    Invoke-PowerShell -Command '$PSVersionTable' -Encode
+    Invoke-CPowerShell -Command '$PSVersionTable' -Encode
 
-    Demonstrates how to run a base-64 encode then run PowerShell command contained in a string. This runs the command using PowerShell's `-EncodedCommand` parameter. `Invoke-PowerShell` does the base-64 encoding for you.
+    Demonstrates how to run a base-64 encode then run PowerShell command contained in a string. This runs the command using PowerShell's `-EncodedCommand` parameter. `Invoke-CPowerShell` does the base-64 encoding for you.
 
     .EXAMPLE
-    Invoke-PowerShell -Command '$env:USERNAME' -Credential $credential
+    Invoke-CPowerShell -Command '$env:USERNAME' -Credential $credential
 
     Demonstrates how to run a PowerShell command as another user. Uses `Start-Process` to launch `powershell.exe` as the user. 
     #>
@@ -99,9 +99,9 @@ function Invoke-PowerShell
         [object]
         # The command to run, as a string. Passed to PowerShell.exe as the value to the `-Command` parameter. 
         #
-        # Use the `-Encode` switch to avoid complicated quoting, and have `Invoke-PowerShell` encode this command for you and pass it to powershell.exe's `-EncodedCommand parameter.
+        # Use the `-Encode` switch to avoid complicated quoting, and have `Invoke-CPowerShell` encode this command for you and pass it to powershell.exe's `-EncodedCommand parameter.
         #
-        # This parameter was introduced in Carbon 2.3.0. In previous versions, this parameter was an alias to the `ScriptBlock` parameter. To maintain backwards-compatibility, if you pass a `ScriptBlock` to this parameter, `Invoke-PowerShell` will run the script block as a script block. In the next major version of Carbon, this parameter will stop accepting `ScriptBlock` objects.
+        # This parameter was introduced in Carbon 2.3.0. In previous versions, this parameter was an alias to the `ScriptBlock` parameter. To maintain backwards-compatibility, if you pass a `ScriptBlock` to this parameter, `Invoke-CPowerShell` will run the script block as a script block. In the next major version of Carbon, this parameter will stop accepting `ScriptBlock` objects.
         $Command,
 
         [Parameter(Mandatory=$true,ParameterSetName='FilePath')]
@@ -174,8 +174,8 @@ function Invoke-PowerShell
     {
         $runtimeInstalled = switch( $Runtime )
         {
-            'v2.0' { Test-DotNet -V2 }
-            'v4.0' { Test-DotNet -V4 -Full }
+            'v2.0' { Test-CDotNet -V2 }
+            'v4.0' { Test-CDotNet -V4 -Full }
             default { Write-Error ('Unknown runtime value ''{0}''.' -f $Runtime) }
         }
 
@@ -197,7 +197,7 @@ function Invoke-PowerShell
          $Runtime -eq 'v2.0' -and `
          $powerShellv3Installed )
     {
-        Write-Error ('The PowerShell ISE v{0} can''t run script blocks under .NET {1}. Please run from the PowerShell console, or save your script block into a file and re-run Invoke-PowerShell using the `FilePath` parameter.' -f `
+        Write-Error ('The PowerShell ISE v{0} can''t run script blocks under .NET {1}. Please run from the PowerShell console, or save your script block into a file and re-run Invoke-CPowerShell using the `FilePath` parameter.' -f `
                         $PSVersionTable.PSVersion,$Runtime)
         return
     }
@@ -217,7 +217,7 @@ function Invoke-PowerShell
   </startup>
 </configuration>
 "@ -f $Runtime | Out-File -FilePath $activationConfigPath -Encoding OEM
-        Set-EnvironmentVariable -Name $comPlusAppConfigEnvVarName -Value $activationConfigDir -ForProcess
+        Set-CEnvironmentVariable -Name $comPlusAppConfigEnvVarName -Value $activationConfigDir -ForProcess
     }
     
     $params = @{ }
@@ -228,7 +228,7 @@ function Invoke-PowerShell
     
     try
     {
-        $psPath = Get-PowerShellPath @params
+        $psPath = Get-CPowerShellPath @params
         if( $ArgumentList -eq $null )
         {
             $ArgumentList = @()
@@ -305,7 +305,7 @@ function Invoke-PowerShell
             $argName = '-Command'
             if( $Encode )
             {
-                $Command = ConvertTo-Base64 -Value $Command
+                $Command = ConvertTo-CBase64 -Value $Command
                 $argName = '-EncodedCommand'
             }
             if( $Credential )
@@ -331,11 +331,11 @@ function Invoke-PowerShell
         {
             if( $originalCOMAppConfigEnvVar )
             {
-                Set-EnvironmentVariable -Name $comPlusAppConfigEnvVarName -Value $originalCOMAppConfigEnvVar -ForProcess
+                Set-CEnvironmentVariable -Name $comPlusAppConfigEnvVarName -Value $originalCOMAppConfigEnvVar -ForProcess
             }
             else
             {
-                Remove-EnvironmentVariable -Name $comPlusAppConfigEnvVarName -ForProcess
+                Remove-CEnvironmentVariable -Name $comPlusAppConfigEnvVarName -ForProcess
             }
         }
     }

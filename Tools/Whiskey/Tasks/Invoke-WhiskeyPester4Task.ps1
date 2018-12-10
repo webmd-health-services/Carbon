@@ -1,7 +1,8 @@
 
 function Invoke-WhiskeyPester4Task
 {
-    [Whiskey.Task("Pester4",SupportsClean=$true, SupportsInitialize=$true)]
+    [Whiskey.Task("Pester4")]
+    [Whiskey.RequiresTool('PowerShellModule::Pester','PesterPath',Version='4.*',VersionParameterName='Version')]
     [CmdletBinding()]
     param(
         [Parameter(Mandatory=$true)]
@@ -15,39 +16,6 @@ function Invoke-WhiskeyPester4Task
     
     Set-StrictMode -Version 'Latest'
     Use-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState
-    
-    if( $TaskParameter.ContainsKey('Version') )
-    {
-        $version = $TaskParameter['Version'] | ConvertTo-WhiskeySemanticVersion
-        if( -not $version )
-        {
-            Stop-WhiskeyTask -TaskContext $TaskContext -message ('Property ''Version'' isn''t a valid version number. It must be a version number of the form MAJOR.MINOR.PATCH.')
-        }
-
-        if( $version.Major -ne 4)
-        {
-            Stop-WhiskeyTask -TaskContext $TaskContext -Message ('Version property''s value ''{0}'' is invalid. It must start with ''4.'' (i.e. the major version number must always be ''4'')."' -f $version)
-        }
-        
-        $version = [version]('{0}.{1}.{2}' -f $version.Major,$version.Minor,$version.Patch)
-    }
-    else
-    {
-        $version = '4.*'
-    }
-
-    if( $TaskContext.ShouldClean )
-    {
-        Uninstall-WhiskeyTool -ModuleName 'Pester' -BuildRoot $TaskContext.BuildRoot -Version $version
-        return
-    }
-    
-    $pesterModulePath = Install-WhiskeyTool -DownloadRoot $TaskContext.BuildRoot -ModuleName 'Pester' -Version $version
-    
-    if( $TaskContext.ShouldInitialize )
-    {
-        return
-    }
 
     if( -not ($TaskParameter.ContainsKey('Path')))
     {
@@ -70,12 +38,12 @@ function Invoke-WhiskeyPester4Task
                         {
                             if( $_ -like $exclusion )
                             {
-                                Write-WhiskeyVerbose -Context $TaskContext -Message ('EXCLUDE  {0} -like    {1}' -f $_,$exclusion) -Verbose
+                                Write-WhiskeyVerbose -Context $TaskContext -Message ('EXCLUDE  {0} -like    {1}' -f $_,$exclusion)
                                 return $false
                             }
                             else
                             {
-                                Write-WhiskeyVerbose -Context $TaskContext -Message ('         {0} -notlike {1}' -f $_,$exclusion) -Verbose
+                                Write-WhiskeyVerbose -Context $TaskContext -Message ('         {0} -notlike {1}' -f $_,$exclusion)
                             }
                         }
                         return $true
@@ -86,11 +54,6 @@ function Invoke-WhiskeyPester4Task
         }
     }
     
-    if( -not $pesterModulePath )
-    {
-        Stop-WhiskeyTask -TaskContext $TaskContext -Message ('Failed to download or install Pester {0}, most likely because version {0} does not exist. Available version numbers can be found at https://www.powershellgallery.com/packages/Pester' -f $version)
-    }
-
     [int]$describeDurationCount = 0
     $describeDurationCount = $TaskParameter['DescribeDurationReportCount']
     [int]$itDurationCount = 0
@@ -98,14 +61,14 @@ function Invoke-WhiskeyPester4Task
 
     $outputFile = Join-Path -Path $TaskContext.OutputDirectory -ChildPath ('pester+{0}.xml' -f [IO.Path]::GetRandomFileName())
 
-    Write-WhiskeyVerbose -Context $TaskContext -Message $pesterModulePath
+    Write-WhiskeyVerbose -Context $TaskContext -Message $TaskParameter['PesterPath']
     Write-WhiskeyVerbose -Context $TaskContext -Message ('  Script      {0}' -f ($Path | Select-Object -First 1))
     $Path | Select-Object -Skip 1 | ForEach-Object { Write-WhiskeyVerbose -Context $TaskContext -Message ('              {0}' -f $_) }
     Write-Verbose -Message ('  OutputFile  {0}' -f $outputFile)
     # We do this in the background so we can test this with Pester.
     $job = Start-Job -ScriptBlock {
         $script = $using:Path
-        $pesterModulePath = $using:pesterModulePath
+        $pesterModulePath = $using:TaskParameter['PesterPath']
         $outputFile = $using:outputFile
         [int]$describeCount = $using:describeDurationCount
         [int]$itCount = $using:itDurationCount
@@ -136,13 +99,21 @@ function Invoke-WhiskeyPester4Task
             Format-Table -AutoSize -Property 'Describe','Name','Time'
     } 
     
+    # There's a bug where Write-Host output gets duplicated by Receive-Job if $InformationPreference is set to "Continue".
+    # Since Pester uses Write-Host, this is a workaround to avoid seeing duplicate Pester output.
+    $informationActionParameter = @{ }
+    if( (Get-Command -Name 'Receive-Job' -ParameterName 'InformationAction') )
+    {
+        $informationActionParameter['InformationAction'] = 'SilentlyContinue'
+    }
+
     do
     {
-        $job | Receive-Job
+        $job | Receive-Job @informationActionParameter
     }
     while( -not ($job | Wait-Job -Timeout 1) )
 
-    $job | Receive-Job
+    $job | Receive-Job @informationActionParameter
 
     Publish-WhiskeyPesterTestResult -Path $outputFile
 

@@ -10,54 +10,54 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Uninstall-Certificate
+function Uninstall-CCertificate
 {
     <#
     .SYNOPSIS
     Removes a certificate from a store for the user or machine account.
     
     .DESCRIPTION
-    The `Uninstall-Certificate` function uses .NET's certificates API to remove a certificate from a given store for the machine or current user. Use the thumbprint to identify which certificate to remove. The thumbprint is unique to each certificate. The user performing the removal must have read and write permission on the store where the certificate is located.
+    The `Uninstall-CCertificate` function uses .NET's certificates API to remove a certificate from a given store for the machine or current user. Use the thumbprint to identify which certificate to remove. The thumbprint is unique to each certificate. The user performing the removal must have read and write permission on the store where the certificate is located.
 
     If the certificate isn't in the store, nothing happens, not even an error.
 
     To uninstall a certificate from a remote computer, use the `Session`parameter, which was added in Carbon 2.1.0. You can create a new session with the `New-PSSession` cmdlet.
 
-    You can uninstall a certificate using just its thumbprint (this functionality is new in Carbon 2.5.0). `Uninstall-Certificate` will search through all certificate locations and stores and uninstall all certificates that have the thumbprint. When you enumerate all certificates over a remoting session, you get a terminating `The system cannot open the device or file specified` error, so you can't delete a certificate with just a thumbprint over remoting.
+    You can uninstall a certificate using just its thumbprint (this functionality is new in Carbon 2.5.0). `Uninstall-CCertificate` will search through all certificate locations and stores and uninstall all certificates that have the thumbprint. When you enumerate all certificates over a remoting session, you get a terminating `The system cannot open the device or file specified` error, so you can't delete a certificate with just a thumbprint over remoting.
 
     .EXAMPLE
-    Uninstall-Certificate -Thumbprint 570895470234023dsaaefdbcgbefa
+    Uninstall-CCertificate -Thumbprint 570895470234023dsaaefdbcgbefa
 
-    Demonstrates how to delete a certificate from all stores it is installed in. `Uninstall-Certificate` searches every certificate stores and deletes all certificates with the given thumbprint. This functionality was added in Carbon 2.5.0.
-
-    .EXAMPLE
-    '570895470234023dsaaefdbcgbefa' | Uninstall-Certificate
-
-    Demonstrates that you can pipe a thumbprint to `Uninstall-Certificate`. The certificate is uninstall from all stores it is in. This functionality was added in Carbon 2.5.0.
+    Demonstrates how to delete a certificate from all stores it is installed in. `Uninstall-CCertificate` searches every certificate stores and deletes all certificates with the given thumbprint. This functionality was added in Carbon 2.5.0.
 
     .EXAMPLE
-    Get-Item -Path 'cert:\LocalMachine\My\570895470234023dsaaefdbcgbefa' | Uninstall-Certificate
+    '570895470234023dsaaefdbcgbefa' | Uninstall-CCertificate
 
-    Demonstrates that you can pipe a certificate `Uninstall-Certificate`. The certificate is uninstalled from all stores it is in. This functionality was added in Carbon 2.5.0.
+    Demonstrates that you can pipe a thumbprint to `Uninstall-CCertificate`. The certificate is uninstall from all stores it is in. This functionality was added in Carbon 2.5.0.
 
     .EXAMPLE
-    > Uninstall-Certificate -Thumbprint 570895470234023dsaaefdbcgbefa -StoreLocation CurrentUser -StoreName My
+    Get-Item -Path 'cert:\LocalMachine\My\570895470234023dsaaefdbcgbefa' | Uninstall-CCertificate
+
+    Demonstrates that you can pipe a certificate `Uninstall-CCertificate`. The certificate is uninstalled from all stores it is in. This functionality was added in Carbon 2.5.0.
+
+    .EXAMPLE
+    > Uninstall-CCertificate -Thumbprint 570895470234023dsaaefdbcgbefa -StoreLocation CurrentUser -StoreName My
     
     Removes the 570895470234023dsaaefdbcgbefa certificate from the current user's Personal certificate store.
     
     .EXAMPLE
-    > $cert = Get-Certificate -FriendlyName 'Carbon Testing Certificate' -StoreLocation LocalMachine -StoreName Root
-    > Uninstall-Certificate -Certificate $cert -StoreLocation LocalMachine -StoreName Root
+    > $cert = Get-CCertificate -FriendlyName 'Carbon Testing Certificate' -StoreLocation LocalMachine -StoreName Root
+    > Uninstall-CCertificate -Certificate $cert -StoreLocation LocalMachine -StoreName Root
     
     Removes the certificate with friendly name 'Carbon Testing Certificate' from the local machine's Trusted Root Certification Authorities store.
 
     .EXAMPLE
-    Uninstall-Certificate -Thumbprint 570895470234023dsaaefdbcgbefa -StoreLocation LocalMachine -StoreName 'SharePoint'
+    Uninstall-CCertificate -Thumbprint 570895470234023dsaaefdbcgbefa -StoreLocation LocalMachine -StoreName 'SharePoint'
 
     Demonstrates how to uninstall a certificate from a custom, non-standard store.
 
     .EXAMPLE
-    > Uninstall-Certificate -Thumbprint 570895470234023dsaaefdbcgbefa -StoreLocation CurrentUser -StoreName My -Session (New-PSSession -ComputerName remote1,remote2)
+    > Uninstall-CCertificate -Thumbprint 570895470234023dsaaefdbcgbefa -StoreLocation CurrentUser -StoreName My -Session (New-PSSession -ComputerName remote1,remote2)
     
     Demonstrates how to uninstall a certificate from a remote computer.
     #>
@@ -232,5 +232,5 @@ function Uninstall-Certificate
     }
 }
 
-Set-Alias -Name 'Remove-Certificate' -Value 'Uninstall-Certificate'
+Set-Alias -Name 'Remove-Certificate' -Value 'Uninstall-CCertificate'
 

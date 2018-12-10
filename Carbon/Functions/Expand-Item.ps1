@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Expand-Item
+function Expand-CItem
 {
     <#
     .SYNOPSIS
@@ -27,23 +27,23 @@ function Expand-Item
     https://www.nuget.org/packages/DotNetZip
 
     .LINK
-    Compress-Item
+    Compress-CItem
 
     .LINK
-    Test-ZipFile
+    Test-CZipFile
 
     .EXAMPLE
-    $unzipRoot = Expand-Item -Path 'C:\Carbon.zip' 
+    $unzipRoot = Expand-CItem -Path 'C:\Carbon.zip' 
 
     Demonstrates how to unzip a file into a temporary directory. You are responsible for deleting that directory.
 
     .EXAMPLE
-    Expand-Item -Path 'C:\Carbon.zip' -OutDirectory 'C:\Modules\Carbon'
+    Expand-CItem -Path 'C:\Carbon.zip' -OutDirectory 'C:\Modules\Carbon'
 
     Demonstrates how to unzip a file into a specific directory.
 
     .EXAMPLE
-    Expand-Item -Path 'C:\Carbon.zip' -OutDirectory 'C:\Modules\Carbon' -Force
+    Expand-CItem -Path 'C:\Carbon.zip' -OutDirectory 'C:\Modules\Carbon' -Force
 
     Demonstrates how to decompress to an existing, non-empty directory with the `-Force` parameter. Existing files are overwritten.
     #>
@@ -74,7 +74,7 @@ function Expand-Item
         return
     }
 
-    if( -not (Test-ZipFile -Path $Path) )
+    if( -not (Test-CZipFile -Path $Path) )
     {
         Write-Error ('File ''{0}'' is not a ZIP file.' -f $Path)
         return
@@ -82,7 +82,7 @@ function Expand-Item
 
     if( $OutDirectory )
     {
-        $OutDirectory = Resolve-FullPath -Path $OutDirectory
+        $OutDirectory = Resolve-CFullPath -Path $OutDirectory
         if( (Test-Path -Path $OutDirectory -PathType Container) )
         {
             if( -not $Force -and (Get-ChildItem -LiteralPath $OutDirectory | Measure-Object | Select-Object -ExpandProperty Count) )
@@ -94,7 +94,7 @@ function Expand-Item
     }
     else
     {
-        $OutDirectory = 'Carbon+Expand-Item+{0}+{1}' -f (Split-Path -Leaf -Path $Path),([IO.Path]::GetRandomFileName())
+        $OutDirectory = 'Carbon+Expand-CItem+{0}+{1}' -f (Split-Path -Leaf -Path $Path),([IO.Path]::GetRandomFileName())
         $OutDirectory = Join-Path -Path $env:TEMP -ChildPath $OutDirectory
         $null = New-Item -Path $OutDirectory -ItemType 'Directory'
     }

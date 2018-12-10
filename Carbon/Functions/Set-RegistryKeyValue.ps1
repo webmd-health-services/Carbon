@@ -10,14 +10,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Set-RegistryKeyValue
+function Set-CRegistryKeyValue
 {
     <#
     .SYNOPSIS
     Sets a value in a registry key.
     
     .DESCRIPTION
-    The `Set-RegistryKeyValue` function sets the value of a registry key. If the key doesn't exist, it is created first. Uses PowerShell's `New-ItemPropery` to create the value if doesn't exist. Otherwise uses `Set-ItemProperty` to set the value.
+    The `Set-CRegistryKeyValue` function sets the value of a registry key. If the key doesn't exist, it is created first. Uses PowerShell's `New-ItemPropery` to create the value if doesn't exist. Otherwise uses `Set-ItemProperty` to set the value.
 
     `DWord` and `QWord` values are stored in the registry as unsigned integers. If you pass a negative integer for the `DWord` and `QWord` parameters, PowerShell will convert it to an unsigned integer before storing. You won't get the same negative number back.
 
@@ -28,49 +28,49 @@ function Set-RegistryKeyValue
         # Carbon 1.0
         $bytes = [BitConverter]::GetBytes( $unsignedInt )
         $signedInt = [BitConverter]::ToInt32( $bytes, 0 )  # Or use `ToInt64` if you're working with 64-bit/QWord values
-        Set-RegistryKeyValue -Path $Path -Name 'MyUnsignedDWord' -DWord $signedInt
+        Set-CRegistryKeyValue -Path $Path -Name 'MyUnsignedDWord' -DWord $signedInt
 
         # Carbon 2.0
-        Set-RegistryKeyValue -Path $Path -Name 'MyUnsignedDWord' -UDWord $unsignedInt
+        Set-CRegistryKeyValue -Path $Path -Name 'MyUnsignedDWord' -UDWord $unsignedInt
     
     .LINK
-    Get-RegistryKeyValue
+    Get-CRegistryKeyValue
     
     .LINK
-    Test-RegistryKeyValue
+    Test-CRegistryKeyValue
     
     .EXAMPLE
-    Set-RegistryKeyValue -Path 'hklm:\Software\Carbon\Test -Name Status -String foobar 
+    Set-CRegistryKeyValue -Path 'hklm:\Software\Carbon\Test -Name Status -String foobar 
     
     Creates the `Status` string value under the `hklm:\Software\Carbon\Test` key and sets its value to `foobar`.
     
     .EXAMPLE
-    Set-RegistryKeyValue -Path 'hklm:\Software\Carbon\Test -Name ComputerName -String '%ComputerName%' -Expand
+    Set-CRegistryKeyValue -Path 'hklm:\Software\Carbon\Test -Name ComputerName -String '%ComputerName%' -Expand
     
     Creates an expandable string.  When retrieving this value, environment variables will be expanded.
     
     .EXAMPLE
-    Set-RegistryKeyValue -Path 'hklm:\Software\Carbon\Test -Name Movies -String ('Signs','Star Wars','Raiders of the Lost Ark')
+    Set-CRegistryKeyValue -Path 'hklm:\Software\Carbon\Test -Name Movies -String ('Signs','Star Wars','Raiders of the Lost Ark')
     
     Sets a multi-string (i.e. array) value.
     
     .EXAMPLE
-    Set-RegistryKeyValue -Path hklm:\Software\Carbon\Test -Name 'SomeBytes' -Binary ([byte[]]@( 1, 2, 3, 4)) 
+    Set-CRegistryKeyValue -Path hklm:\Software\Carbon\Test -Name 'SomeBytes' -Binary ([byte[]]@( 1, 2, 3, 4)) 
     
     Sets a binary value (i.e. `REG_BINARY`).
     
     .EXAMPLE
-    Set-RegistryKeyValue -Path hklm:\Software\Carbon\Test -Name 'AnInt' -DWord 48043
+    Set-CRegistryKeyValue -Path hklm:\Software\Carbon\Test -Name 'AnInt' -DWord 48043
     
     Sets a binary value (i.e. `REG_DWORD`).
     
     .EXAMPLE
-    Set-RegistryKeyValue -Path hklm:\Software\Carbon\Test -Name 'AnInt64' -QWord 9223372036854775807
+    Set-CRegistryKeyValue -Path hklm:\Software\Carbon\Test -Name 'AnInt64' -QWord 9223372036854775807
     
     Sets a binary value (i.e. `REG_QWORD`).
     
     .EXAMPLE
-    Set-RegistryKeyValue -Path hklm:\Software\Carbon\Test -Name 'AnUnsignedInt' -UDWord [uint32]::MaxValue
+    Set-CRegistryKeyValue -Path hklm:\Software\Carbon\Test -Name 'AnUnsignedInt' -UDWord [uint32]::MaxValue
     
     Demonstrates how to set a registry value with an unsigned integer or an integer bigger than `[int]::MaxValue`.
 
@@ -78,10 +78,10 @@ function Set-RegistryKeyValue
 
         $bytes = [BitConverter]::GetBytes( $unsignedInt )
         $signedInt = [BitConverter]::ToInt32( $bytes, 0 )
-        Set-RegistryKeyValue -Path $Path -Name 'MyUnsignedDWord' -DWord $signedInt
+        Set-CRegistryKeyValue -Path $Path -Name 'MyUnsignedDWord' -DWord $signedInt
         
     .EXAMPLE
-    Set-RegistryKeyValue -Path hklm:\Software\Carbon\Test -Name 'AnUnsignedInt64' -UQWord [uint64]::MaxValue
+    Set-CRegistryKeyValue -Path hklm:\Software\Carbon\Test -Name 'AnUnsignedInt64' -UQWord [uint64]::MaxValue
     
     Demonstrates how to set a registry value with an unsigned 64-bit integer or a 64-bit integer bigger than `[long]::MaxValue`.
 
@@ -89,10 +89,10 @@ function Set-RegistryKeyValue
 
         $bytes = [BitConverter]::GetBytes( $unsignedInt )
         $signedInt = [BitConverter]::ToInt64( $bytes, 0 )
-        Set-RegistryKeyValue -Path $Path -Name 'MyUnsignedDWord' -DWord $signedInt
+        Set-CRegistryKeyValue -Path $Path -Name 'MyUnsignedDWord' -DWord $signedInt
     
     .EXAMPLE
-    Set-RegistryKeyValue -Path hklm:\Software\Carbon\Test -Name 'UsedToBeAStringNowShouldBeDWord' -DWord 1 -Force
+    Set-CRegistryKeyValue -Path hklm:\Software\Carbon\Test -Name 'UsedToBeAStringNowShouldBeDWord' -DWord 1 -Force
     
     Uses the `Force` parameter to delete the existing `UsedToBeAStringNowShouldBeDWord` before re-creating it.  This flag is useful if you need to change the type of a registry value.
     #>
@@ -166,7 +166,7 @@ function Set-RegistryKeyValue
 
     if( $PSBoundParameters.ContainsKey('Quiet') )
     {
-        Write-Warning ('Set-RegistryKeyValue''s -Quiet switch is obsolete and will be removed in a future version of Carbon. Please remove usages.')
+        Write-Warning ('Set-CRegistryKeyValue''s -Quiet switch is obsolete and will be removed in a future version of Carbon. Please remove usages.')
     }
 
     $value = $null
@@ -197,16 +197,16 @@ function Set-RegistryKeyValue
         'MultiString' { $value = $Strings }
     }
     
-    Install-RegistryKey -Path $Path
+    Install-CRegistryKey -Path $Path
     
     if( $Force )
     {
-        Remove-RegistryKeyValue -Path $Path -Name $Name
+        Remove-CRegistryKeyValue -Path $Path -Name $Name
     }
 
-    if( Test-RegistryKeyValue -Path $Path -Name $Name )
+    if( Test-CRegistryKeyValue -Path $Path -Name $Name )
     {
-        $currentValue = Get-RegistryKeyValue -Path $Path -Name $Name
+        $currentValue = Get-CRegistryKeyValue -Path $Path -Name $Name
         if( $currentValue -ne $value )
         {
             Write-Verbose -Message ("[{0}@{1}] {2} -> {3}'" -f $Path,$Name,$currentValue,$value)

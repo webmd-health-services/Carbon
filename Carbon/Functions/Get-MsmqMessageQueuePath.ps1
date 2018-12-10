@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Get-MsmqMessageQueuePath
+function Get-CMsmqMessageQueuePath
 {
     <#
     .SYNOPSIS
@@ -25,12 +25,12 @@ function Get-MsmqMessageQueuePath
     System.String.
 
     .EXAMPLE
-    Get-MsmqMessageQueuePath -Name MovieQueue
+    Get-CMsmqMessageQueuePath -Name MovieQueue
 
     Returns the path to the `MovieQueue` queue.
 
     .EXAMPLE
-    Get-MsmqMessageQueuePath -Name MovieQueue -Private
+    Get-CMsmqMessageQueuePath -Name MovieQueue -Private
 
     Returns the path to the private `MovieQueue`.  Must be for the critics.  Early access for the win!
     #>

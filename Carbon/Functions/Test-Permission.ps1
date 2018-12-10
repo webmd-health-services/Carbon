@@ -10,16 +10,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Test-Permission
+function Test-CPermission
 {
     <#
     .SYNOPSIS
     Tests if permissions are set on a file, directory, registry key, or certificate's private key/key container.
 
     .DESCRIPTION
-    Sometimes, you don't want to use `Grant-Permission` on a big tree.  In these situations, use `Test-Permission` to see if permissions are set on a given path.
+    Sometimes, you don't want to use `Grant-CPermission` on a big tree.  In these situations, use `Test-CPermission` to see if permissions are set on a given path.
 
-    This function supports file system, registry, and certificate private key/key container permissions.  You can also test the inheritance and propogation flags on containers, in addition to the permissions, with the `ApplyTo` parameter.  See [Grant-Permission](Grant-Permission.html) documentation for an explanation of the `ApplyTo` parameter.
+    This function supports file system, registry, and certificate private key/key container permissions.  You can also test the inheritance and propogation flags on containers, in addition to the permissions, with the `ApplyTo` parameter.  See [Grant-CPermission](Grant-CPermission.html) documentation for an explanation of the `ApplyTo` parameter.
 
     Inherited permissions on *not* checked by default.  To check inherited permission, use the `-Inherited` switch.
 
@@ -34,22 +34,22 @@ function Test-Permission
     Carbon_Permission
 
     .LINK
-    ConvertTo-ContainerInheritanceFlags
+    ConvertTo-CContainerInheritanceFlags
 
     .LINK
-    Disable-AclInheritance
+    Disable-CAclInheritance
 
     .LINK
-    Enable-AclInheritance
+    Enable-CAclInheritance
 
     .LINK
-    Get-Permission
+    Get-CPermission
 
     .LINK
-    Grant-Permission
+    Grant-CPermission
 
     .LINK
-    Revoke-Permission
+    Revoke-CPermission
 
     .LINK
     http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.filesystemrights.aspx
@@ -61,22 +61,22 @@ function Test-Permission
     http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.cryptokeyrights.aspx
     
     .EXAMPLE
-    Test-Permission -Identity 'STARFLEET\JLPicard' -Permission 'FullControl' -Path 'C:\Enterprise\Bridge'
+    Test-CPermission -Identity 'STARFLEET\JLPicard' -Permission 'FullControl' -Path 'C:\Enterprise\Bridge'
 
     Demonstrates how to check that Jean-Luc Picard has `FullControl` permission on the `C:\Enterprise\Bridge`.  
 
     .EXAMPLE
-    Test-Permission -Identity 'STARFLEET\GLaForge' -Permission 'WriteKey' -Path 'HKLM:\Software\Enterprise\Engineering'
+    Test-CPermission -Identity 'STARFLEET\GLaForge' -Permission 'WriteKey' -Path 'HKLM:\Software\Enterprise\Engineering'
 
     Demonstrates how to check that Geordi LaForge can write registry keys at `HKLM:\Software\Enterprise\Engineering`.
 
     .EXAMPLE
-    Test-Permission -Identity 'STARFLEET\Worf' -Permission 'Write' -ApplyTo 'Container' -Path 'C:\Enterprise\Brig'
+    Test-CPermission -Identity 'STARFLEET\Worf' -Permission 'Write' -ApplyTo 'Container' -Path 'C:\Enterprise\Brig'
 
     Demonstrates how to test for inheritance/propogation flags, in addition to permissions.
 
     .EXAMPLE
-    Test-Permission -Identity 'STARFLEET\Data' -Permission 'GenericWrite' -Path 'cert:\LocalMachine\My\1234567890ABCDEF1234567890ABCDEF12345678'
+    Test-CPermission -Identity 'STARFLEET\Data' -Permission 'GenericWrite' -Path 'cert:\LocalMachine\My\1234567890ABCDEF1234567890ABCDEF12345678'
 
     Demonstrates how to test for permissions on a certificate's private key/key container. If the certificate doesn't have a private key, returns `$true`.
     #>
@@ -98,7 +98,7 @@ function Test-Permission
         $Permission,
         
         [Carbon.Security.ContainerInheritanceFlags]
-        # The container and inheritance flags to check. Ignored if `Path` is a file. These are ignored if not supplied. See `Grant-Permission` for detailed explanation of this parameter. This controls the inheritance and propagation flags.  Default is full inheritance, e.g. `ContainersAndSubContainersAndLeaves`. This parameter is ignored if `Path` is to a leaf item.
+        # The container and inheritance flags to check. Ignored if `Path` is a file. These are ignored if not supplied. See `Grant-CPermission` for detailed explanation of this parameter. This controls the inheritance and propagation flags.  Default is full inheritance, e.g. `ContainersAndSubContainersAndLeaves`. This parameter is ignored if `Path` is to a leaf item.
         $ApplyTo,
 
         [Switch]
@@ -126,7 +126,7 @@ function Test-Permission
         return
     }
 
-    $providerName = Get-PathProvider -Path $Path | Select-Object -ExpandProperty 'Name'
+    $providerName = Get-CPathProvider -Path $Path | Select-Object -ExpandProperty 'Name'
     if( $providerName -eq 'Certificate' )
     {
         $providerName = 'CryptoKey'
@@ -144,7 +144,7 @@ function Test-Permission
         return
     }
 
-    $account = Resolve-Identity -Name $Identity
+    $account = Resolve-CIdentity -Name $Identity
     if( -not $account)
     {
         return
@@ -163,8 +163,8 @@ function Test-Permission
         else
         {
             $testApplyTo = $true
-            $inheritanceFlags = ConvertTo-InheritanceFlag -ContainerInheritanceFlag $ApplyTo
-            $propagationFlags = ConvertTo-PropagationFlag -ContainerInheritanceFlag $ApplyTo
+            $inheritanceFlags = ConvertTo-CInheritanceFlag -ContainerInheritanceFlag $ApplyTo
+            $propagationFlags = ConvertTo-CPropagationFlag -ContainerInheritanceFlag $ApplyTo
         }
     }
 
@@ -177,7 +177,7 @@ function Test-Permission
         }
     }
 
-    $acl = Get-Permission -Path $Path -Identity $Identity -Inherited:$Inherited | 
+    $acl = Get-CPermission -Path $Path -Identity $Identity -Inherited:$Inherited | 
                 Where-Object { $_.AccessControlType -eq 'Allow' } |
                 Where-Object { $_.IsInherited -eq $Inherited } |
                 Where-Object { 

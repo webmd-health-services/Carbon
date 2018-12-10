@@ -27,20 +27,23 @@ DESCRIPTION
 
     A detailed log of the build is saved to the build output directory named "msbuild.FILE_NAME.log" file, where `FILE_NAME` is replaced by the name of the file being built.
 
+    This task downloads and uses the [VSSetup PowerShell module from the PowerShell Gallery](https://www.powershellgallery.com/packages/VSSetup) to detect find versions of MSBuild that ship with Visual Studio 2017 (and later).
+
 PROPERTY
 
-    * **Path** (*mandatory*): A list of one or more paths to files that MSBuild can build. Files are built in the order they appear in this list. Wildcards are permitted.
-    * **Verbosity**: Controls the verbosity level of MSBuild's output. The default is minimal. On build servers, the default is debug. Should be one of quiet, minimal, normal, debug, or diagnostic.
-    * **Property**: A list of additional MSBuild properties to pass to MSBuild, e.g. Disable_CopyWebApplication=True. Must be of the form NAME=VALUE.
-    * **OutputDirectory**: The directory where assemblies should be compiled to. The default is the location specified in each .csproj file.
-    * **CpuCount**: The number of MSBuild processes to use when building. The default is the number of cores/CPUs on the current computer. Setting this to 1 disables parallel builds.
-    * **NoMaxCpuCountArgument**: This disables multi-CPU builds by not passing the /maxcpucount argument to MSBuild. Useful if you're building with versions of MSBuild that don't support /maxcpucount.
-    * **NoFileLogger**: Disables logging debug output to a log file in the output directory.
-    * **Argument**: A list of arguments to pass to msbuild.exe.
-    * **Target**: A list of build targets to run. The default is build.
-    * **Version**: The version of MSBuild to use. By default, uses the most recent/latest version of MSBuild installed. You usually will want to pin this to a specific version. Valid values are 15.0 (Visual Studio 2017), 14.0 (Visual Studio 2015) 12.0 (Visual Studio 2013), 4.0, 3.5, or 2.0.
-    * **NuGetVersion**: The version of NuGet to use to restore packages. The default is to use the latest version.
-    * **Use32Bit**: Set to `true` to use a 32-bit version of MSBuild.exe. The default is to use a version that matches the processor architecture of the current computer.
+    * `Path` (*mandatory*): A list of one or more paths to files that MSBuild can build. Files are built in the order they appear in this list. Wildcards are permitted.
+    * `Verbosity`: Controls the verbosity level of MSBuild's output. The default is minimal. On build servers, the default is debug. Should be one of quiet, minimal, normal, debug, or diagnostic.
+    * `Property`: A list of additional MSBuild properties to pass to MSBuild, e.g. Disable_CopyWebApplication=True. Must be of the form NAME=VALUE.
+    * `OutputDirectory`: The directory where assemblies should be compiled to. The default is the location specified in each .csproj file.
+    * `CpuCount`: The number of MSBuild processes to use when building. The default is the number of cores/CPUs on the current computer. Setting this to 1 disables parallel builds.
+    * `NoMaxCpuCountArgument`: This disables multi-CPU builds by not passing the /maxcpucount argument to MSBuild. Useful if you're building with versions of MSBuild that don't support /maxcpucount.
+    * `NoFileLogger`: Disables logging debug output to a log file in the output directory.
+    * `Argument`: A list of arguments to pass to msbuild.exe.
+    * `Target`: A list of build targets to run. The default is build.
+    * `Version`: The version of MSBuild to use. By default, uses the most recent/latest version of MSBuild installed. You usually will want to pin this to a specific version. Valid values are 15.0 (Visual Studio 2017), 14.0 (Visual Studio 2015) 12.0 (Visual Studio 2013), 4.0, 3.5, or 2.0.
+    * `NuGetVersion`: The version of NuGet to use to restore packages. The default is to use the latest version.
+    * `Use32Bit`: Set to `true` to use a 32-bit version of MSBuild.exe. The default is to use a version that matches the processor architecture of the current computer.
+    * `VSSetupVersion`: the version of the `VSSetup` PowerShell module to download and use. The default is the latest 2.* version. This module is used to find versions of MSBuild that ship with Visual Studio 2017 (and later). Be careful about changing the version. The task may not support newer/olders versions.
 
 EXAMPLES
 

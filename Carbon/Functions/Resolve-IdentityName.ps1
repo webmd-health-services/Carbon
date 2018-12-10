@@ -10,29 +10,29 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Resolve-IdentityName
+function Resolve-CIdentityName
 {
     <#
     .SYNOPSIS
     Determines the full, NT identity name for a user or group.
     
     .DESCRIPTION
-    `Resolve-IdentityName` resolves a user/group name into its full, canonical name, used by the operating system. For example, the local Administrators group is actually called BUILTIN\Administrators. With a canonical username, you can unambiguously compare principals on objects that contain user/group information.
+    `Resolve-CIdentityName` resolves a user/group name into its full, canonical name, used by the operating system. For example, the local Administrators group is actually called BUILTIN\Administrators. With a canonical username, you can unambiguously compare principals on objects that contain user/group information.
 
-    If unable to resolve a name into an identity, `Resolve-IdentityName` returns nothing.
+    If unable to resolve a name into an identity, `Resolve-CIdentityName` returns nothing.
 
-    If you want to get full identity information (domain, type, sid, etc.), use `Resolve-Identity`.
+    If you want to get full identity information (domain, type, sid, etc.), use `Resolve-CIdentity`.
 
     In Carbon 2.0, you can also resolve a SID into its identity name. The `SID` parameter accepts a SID in SDDL form as a `string`, a `System.Security.Principal.SecurityIdentifier` object, or a SID in binary form as an array of bytes. If the SID no longer maps to an active account, you'll get the original SID in SDDL form (as a string) returned to you.
 
     .LINK
-    ConvertTo-SecurityIdentifier
+    ConvertTo-CSecurityIdentifier
 
     .LINK
-    Resolve-Identity
+    Resolve-CIdentity
 
     .LINK
-    Test-Identity
+    Test-CIdentity
 
     .LINK
     http://msdn.microsoft.com/en-us/library/system.security.principal.securityidentifier.aspx
@@ -44,7 +44,7 @@ function Resolve-IdentityName
     string
     
     .EXAMPLE
-    Resolve-IdentityName -Name 'Administrators'
+    Resolve-CIdentityName -Name 'Administrators'
     
     Returns `BUILTIN\Administrators`, the canonical name for the local Administrators group.
     #>
@@ -69,11 +69,11 @@ function Resolve-IdentityName
     
     if( $PSCmdlet.ParameterSetName -eq 'ByName' )
     {
-        return Resolve-Identity -Name $Name -ErrorAction Ignore | Select-Object -ExpandProperty 'FullName'
+        return Resolve-CIdentity -Name $Name -ErrorAction Ignore | Select-Object -ExpandProperty 'FullName'
     }
     elseif( $PSCmdlet.ParameterSetName -eq 'BySid' )
     {
-        $SID = ConvertTo-SecurityIdentifier -SID $SID
+        $SID = ConvertTo-CSecurityIdentifier -SID $SID
         if( -not $SID )
         {
             return

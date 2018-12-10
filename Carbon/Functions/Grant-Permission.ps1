@@ -10,14 +10,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Grant-Permission
+function Grant-CPermission
 {
     <#
     .SYNOPSIS
     Grants permission on a file, directory, registry key, or certificate's private key/key container.
 
     .DESCRIPTION
-    The `Grant-Permission` functions grants permissions to files, directories, registry keys, and certificate private key/key containers. It detects what you are setting permissions on by inspecting the path of the item. If the path is relative, it uses the current location to determine if file system, registry, or private keys permissions should be set.
+    The `Grant-CPermission` functions grants permissions to files, directories, registry keys, and certificate private key/key containers. It detects what you are setting permissions on by inspecting the path of the item. If the path is relative, it uses the current location to determine if file system, registry, or private keys permissions should be set.
     
     The `Permissions` attribute should be a list of [FileSystemRights](http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.filesystemrights.aspx), [RegistryRights](http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.registryrights.aspx), or [CryptoKeyRights](http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.cryptokeyrights.aspx), for files/directories, registry keys, and certificate private keys, respectively. These commands will show you the values for the appropriate permissions for your object:
 
@@ -30,6 +30,8 @@ function Grant-Permission
     Before Carbon 2.0, this function returned any new/updated access rules set on `Path`. In Carbon 2.0 and later, use the `PassThru` switch to get an access rule object back (you'll always get one regardless if the permissions changed or not).
 
     By default, permissions allowing access are granted. Beginning in Carbon 2.3.0, you can grant permissions denying access by passing `Deny` as the value of the `Type` parameter.
+
+    Beginning in Carbon 2.7, you can append/add rules instead or replacing existing rules on files, directories, or registry items with the `Append` switch. 
 
     ## Directories and Registry Keys
 
@@ -103,22 +105,22 @@ function Grant-Permission
     Carbon_Permission
 
     .LINK
-    ConvertTo-ContainerInheritanceFlags
+    ConvertTo-CContainerInheritanceFlags
 
     .LINK
-    Disable-AclInheritance
+    Disable-CAclInheritance
 
     .LINK
-    Enable-AclInheritance
+    Enable-CAclInheritance
 
     .LINK
-    Get-Permission
+    Get-CPermission
 
     .LINK
-    Revoke-Permission
+    Revoke-CPermission
 
     .LINK
-    Test-Permission
+    Test-CPermission
 
     .LINK
     http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.filesystemrights.aspx
@@ -133,29 +135,35 @@ function Grant-Permission
     http://msdn.microsoft.com/en-us/magazine/cc163885.aspx#S3    
     
     .EXAMPLE
-    Grant-Permission -Identity ENTERPRISE\Engineers -Permission FullControl -Path C:\EngineRoom
+    Grant-CPermission -Identity ENTERPRISE\Engineers -Permission FullControl -Path C:\EngineRoom
 
     Grants the Enterprise's engineering group full control on the engine room.  Very important if you want to get anywhere.
 
     .EXAMPLE
-    Grant-Permission -Identity ENTERPRISE\Interns -Permission ReadKey,QueryValues,EnumerateSubKeys -Path rklm:\system\WarpDrive
+    Grant-CPermission -Identity ENTERPRISE\Interns -Permission ReadKey,QueryValues,EnumerateSubKeys -Path rklm:\system\WarpDrive
 
     Grants the Enterprise's interns access to read about the warp drive.  They need to learn someday, but at least they can't change anything.
     
     .EXAMPLE
-    Grant-Permission -Identity ENTERPRISE\Engineers -Permission FullControl -Path C:\EngineRoom -Clear
+    Grant-CPermission -Identity ENTERPRISE\Engineers -Permission FullControl -Path C:\EngineRoom -Clear
     
     Grants the Enterprise's engineering group full control on the engine room.  Any non-inherited, existing access rules are removed from `C:\EngineRoom`.
     
     .EXAMPLE
-    Grant-Permission -Identity ENTERPRISE\Engineers -Permission FullControl -Path 'cert:\LocalMachine\My\1234567890ABCDEF1234567890ABCDEF12345678'
+    Grant-CPermission -Identity ENTERPRISE\Engineers -Permission FullControl -Path 'cert:\LocalMachine\My\1234567890ABCDEF1234567890ABCDEF12345678'
     
     Grants the Enterprise's engineering group full control on the `1234567890ABCDEF1234567890ABCDEF12345678` certificate's private key/key container.
 
     .EXAMPLE
-    Grant-Permission -Identity BORG\Locutus -Permission FullControl -Path 'C:\EngineRoom' -Type Deny
+    Grant-CPermission -Identity BORG\Locutus -Permission FullControl -Path 'C:\EngineRoom' -Type Deny
 
     Demonstrates how to grant deny permissions on an objecy with the `Type` parameter.
+
+    .EXAMPLE
+    Grant-CPermission -Path C:\Bridge -Identity ENTERPRISE\Wesley -Permission 'Read' -ApplyTo ContainerAndSubContainersAndLeaves -Append
+    Grant-CPermission -Path C:\Bridge -Identity ENTERPRISE\Wesley -Permission 'Write' -ApplyTo ContainerAndLeaves -Append
+
+    Demonstrates how to grant multiple access rules to a single identity with the `Append` switch. In this case, `ENTERPRISE\Wesley` will be able to read everything in `C:\Bridge` and write only in the `C:\Bridge` directory, not to any sub-directory.
     #>
     [CmdletBinding(SupportsShouldProcess=$true)]
     [OutputType([Security.AccessControl.AccessRule])]
@@ -198,11 +206,16 @@ function Grant-Permission
 
         [Switch]
         # Grants permissions, even if they are already present.
-        $Force
+        $Force,
+
+        [Switch]
+        # When granting permissions on files, directories, or registry items, add the permissions as a new access rule instead of replacing any existing access rules. This switch is ignored when setting permissions on certificates.
+        #
+        # This switch was added in Carbon 2.7.
+        $Append
     )
 
     Set-StrictMode -Version 'Latest'
-
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
     
     $Path = Resolve-Path -Path $Path
@@ -211,7 +224,7 @@ function Grant-Permission
         return
     }
 
-    $providerName = Get-PathProvider -Path $Path | Select-Object -ExpandProperty 'Name'
+    $providerName = Get-CPathProvider -Path $Path | Select-Object -ExpandProperty 'Name'
     if( $providerName -eq 'Certificate' )
     {
         $providerName = 'CryptoKey'
@@ -230,13 +243,13 @@ function Grant-Permission
         return
     }
 
-    if( -not (Test-Identity -Name $Identity ) )
+    if( -not (Test-CIdentity -Name $Identity ) )
     {
         Write-Error ('Identity ''{0}'' not found.' -f $Identity)
         return
     }
 
-    $Identity = Resolve-IdentityName -Name $Identity
+    $Identity = Resolve-CIdentityName -Name $Identity
     
     if( $providerName -eq 'CryptoKey' )
     {
@@ -287,9 +300,9 @@ function Grant-Permission
                 $accessRule = New-Object 'Security.AccessControl.CryptoKeyAccessRule' ($Identity,$rights,$Type) |
                                 Add-Member -MemberType NoteProperty -Name 'Path' -Value $certPath -PassThru
 
-                if( $Force -or $rulesToRemove -or -not (Test-Permission -Path $certPath -Identity $Identity -Permission $Permission -Exact) )
+                if( $Force -or $rulesToRemove -or -not (Test-CPermission -Path $certPath -Identity $Identity -Permission $Permission -Exact) )
                 {
-                    $currentPerm = Get-Permission -Path $certPath -Identity $Identity
+                    $currentPerm = Get-CPermission -Path $certPath -Identity $Identity
                     if( $currentPerm )
                     {
                         $currentPerm = $currentPerm."$($providerName)Rights"
@@ -317,8 +330,8 @@ function Grant-Permission
         $testPermissionParams = @{ }
         if( Test-Path $Path -PathType Container )
         {
-            $inheritanceFlags = ConvertTo-InheritanceFlag -ContainerInheritanceFlag $ApplyTo
-            $propagationFlags = ConvertTo-PropagationFlag -ContainerInheritanceFlag $ApplyTo
+            $inheritanceFlags = ConvertTo-CInheritanceFlag -ContainerInheritanceFlag $ApplyTo
+            $propagationFlags = ConvertTo-CPropagationFlag -ContainerInheritanceFlag $ApplyTo
             $testPermissionParams.ApplyTo = $ApplyTo
         }
         else
@@ -330,7 +343,7 @@ function Grant-Permission
         }
     
         $rulesToRemove = $null
-        $Identity = Resolve-Identity -Name $Identity
+        $Identity = Resolve-CIdentity -Name $Identity
         if( $Clear )
         {
             $rulesToRemove = $currentAcl.Access |
@@ -350,22 +363,36 @@ function Grant-Permission
         $accessRule = New-Object "Security.AccessControl.$($providerName)AccessRule" $Identity,$rights,$inheritanceFlags,$propagationFlags,$Type |
                         Add-Member -MemberType NoteProperty -Name 'Path' -Value $Path -PassThru
 
-        $missingPermission = -not (Test-Permission -Path $Path -Identity $Identity -Permission $Permission @testPermissionParams -Exact)
+        $missingPermission = -not (Test-CPermission -Path $Path -Identity $Identity -Permission $Permission @testPermissionParams -Exact)
 
         $setAccessRule = ($Force -or $missingPermission)
         if( $setAccessRule )
         {
-            $currentAcl.SetAccessRule( $accessRule )
+            if( $Append )
+            {
+                $currentAcl.AddAccessRule( $accessRule )
+            }
+            else
+            {
+                $currentAcl.SetAccessRule( $accessRule )
+            }
         }
 
         if( $rulesToRemove -or $setAccessRule )
         {
-            $currentPerm = Get-Permission -Path $Path -Identity $Identity
+            $currentPerm = Get-CPermission -Path $Path -Identity $Identity
             if( $currentPerm )
             {
                 $currentPerm = $currentPerm."$($providerName)Rights"
             }
-            Write-Verbose -Message ('[{0}] [{1}]  {2} -> {3}' -f $Path,$accessRule.IdentityReference,$currentPerm,$accessRule."$($providerName)Rights")
+            if( $Append )
+            {
+                Write-Verbose -Message ('[{0}] [{1}]  + {2}' -f $Path,$accessRule.IdentityReference,$accessRule."$($providerName)Rights")
+            }
+            else
+            {
+                Write-Verbose -Message ('[{0}] [{1}]  {2} -> {3}' -f $Path,$accessRule.IdentityReference,$currentPerm,$accessRule."$($providerName)Rights")
+            }
             Set-Acl -Path $Path -AclObject $currentAcl
         }
 
@@ -376,5 +403,5 @@ function Grant-Permission
     }
 }
 
-Set-Alias -Name 'Grant-Permissions' -Value 'Grant-Permission'
+Set-Alias -Name 'Grant-Permissions' -Value 'Grant-CPermission'
 

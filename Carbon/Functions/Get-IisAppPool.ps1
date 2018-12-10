@@ -10,18 +10,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Get-IisAppPool
+function Get-CIisAppPool
 {
     <#
     .SYNOPSIS
     Gets a `Microsoft.Web.Administration.ApplicationPool` object for an application pool.
     
     .DESCRIPTION
-    The `Get-IisAppPool` function returns an IIS application pools as a `Microsoft.Web.Administration.ApplicationPool` object. Use the `Name` parameter to return the application pool. If that application pool isn't found, `$null` is returned.
+    The `Get-CIisAppPool` function returns an IIS application pools as a `Microsoft.Web.Administration.ApplicationPool` object. Use the `Name` parameter to return the application pool. If that application pool isn't found, `$null` is returned.
 
     Carbon adds a `CommitChanges` method on each object returned that you can use to save configuration changes.
 
-    Beginning in Carbon 2.0, `Get-IisAppPool` will return all application pools installed on the current computer.
+    Beginning in Carbon 2.0, `Get-CIisAppPool` will return all application pools installed on the current computer.
     
     Beginning with Carbon 2.0.1, this function is available only if IIS is installed.
 
@@ -32,17 +32,17 @@ function Get-IisAppPool
     Microsoft.Web.Administration.ApplicationPool.
 
     .EXAMPLE
-    Get-IisAppPool
+    Get-CIisAppPool
 
     Demonstrates how to get *all* application pools.
     
     .EXAMPLE
-    Get-IisAppPool -Name 'Batcave'
+    Get-CIisAppPool -Name 'Batcave'
     
     Gets the `Batcave` application pool.
     
     .EXAMPLE
-    Get-IisAppPool -Name 'Missing!'
+    Get-CIisAppPool -Name 'Missing!'
     
     Returns `null` since, for purposes of this example, there is no `Missing~` application pool.
     #>

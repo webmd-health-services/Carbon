@@ -15,8 +15,18 @@ Packages and publishes Carbon packages.
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-[CmdletBinding()]
+[CmdletBinding(DefaultParameterSetName='Build')]
 param(
+    [Parameter(Mandatory=$true,ParameterSetName='Clean')]
+    [Switch]
+    # Runs the build in clean mode, which removes any files, tools, packages created by previous builds.
+    $Clean,
+
+    [Parameter(Mandatory=$true,ParameterSetName='Initialize')]
+    [Switch]
+    # Initializes the repository.
+    $Initialize,
+    
     [string]
     $PipelineName
 )
@@ -30,6 +40,16 @@ $optionalParams = @{ }
 if( $PipelineName )
 {
     $optionalParams['PipelineName'] = $PipelineName
+}
+
+if( $Clean )
+{
+    $optionalParams['Clean'] = $true
+}
+
+if( $Initialize )
+{
+    $optionalParams['Initialize'] = $true
 }
 
 $whiskeyYmlPath = Join-Path -Path $PSScriptRoot -ChildPath 'whiskey.yml'

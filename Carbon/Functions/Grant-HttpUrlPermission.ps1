@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Grant-HttpUrlPermission
+function Grant-CHttpUrlPermission
 {
     <#
     .SYNOPSIS
@@ -38,10 +38,10 @@ function Grant-HttpUrlPermission
     https://msdn.microsoft.com/en-us/library/aa364653.aspx
 
     .LINK
-    Get-HttpUrlAcl
+    Get-CHttpUrlAcl
 
     .LINK
-    Revoke-HttpUrlPermission
+    Revoke-CHttpUrlPermission
 
     .EXAMPLE
     Grant-HttpUrlAclPermission -Url 'http://+:4833' -Principal 'FALCON\HSolo' -Permission [Carbon.Security.HttpUrlAccessRights]::Listen
@@ -90,13 +90,13 @@ function Grant-HttpUrlPermission
         $Url = '{0}/' -f $Url
     }
 
-    $acl = Get-HttpUrlAcl -LiteralUrl $Url -ErrorAction Ignore
+    $acl = Get-CHttpUrlAcl -LiteralUrl $Url -ErrorAction Ignore
     if( -not $acl )
     {
         $acl = New-Object 'Carbon.Security.HttpUrlSecurity' $Url
     }
 
-    $id = Resolve-Identity -Name $Principal
+    $id = Resolve-CIdentity -Name $Principal
     if( -not $id )
     {
         return

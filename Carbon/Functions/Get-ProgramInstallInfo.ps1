@@ -10,16 +10,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Get-ProgramInstallInfo
+function Get-CProgramInstallInfo
 {
     <#
     .SYNOPSIS
     Gets information about the programs installed on the computer.
     
     .DESCRIPTION
-    The `Get-ProgramInstallInfo` function is the PowerShell equivalent of the Programs and Features UI in the Control Panel. It inspects the registry to determine what programs are installed. It will return programs installed for *all* users, not just the current user. 
+    The `Get-CProgramInstallInfo` function is the PowerShell equivalent of the Programs and Features UI in the Control Panel. It inspects the registry to determine what programs are installed. It will return programs installed for *all* users, not just the current user. 
     
-    `Get-ProgramInstallInfo` tries its best to get accurate data. The following properties either isn't stored consistently, is in strange formats, can't be parsed, etc.
+    `Get-CProgramInstallInfo` tries its best to get accurate data. The following properties either isn't stored consistently, is in strange formats, can't be parsed, etc.
 
      * The `ProductCode` property is set to `[Guid]::Empty` if the software doesn't have a product code.
      * The `User` property will only be set for software installed for specific users. For global software, the `User` property will be `[String]::Empty`.
@@ -30,17 +30,17 @@ function Get-ProgramInstallInfo
     Carbon.Computer.ProgramInstallInfo.
 
     .EXAMPLE
-    Get-ProgramInstallInfo
+    Get-CProgramInstallInfo
 
     Demonstrates how to get a list of all the installed programs, similar to what the Programs and Features UI shows.
 
     .EXAMPLE
-    Get-ProgramInstallInfo -Name 'Google Chrome'
+    Get-CProgramInstallInfo -Name 'Google Chrome'
 
     Demonstrates how to get a specific program. If the specific program isn't found, `$null` is returned.
 
     .EXAMPLE
-    Get-ProgramInstallInfo -Name 'Microsoft*'
+    Get-CProgramInstallInfo -Name 'Microsoft*'
 
     Demonstrates how to use wildcards to search for multiple programs.
     #>

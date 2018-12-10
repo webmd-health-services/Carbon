@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Test-RegistryKeyValue
+function Test-CRegistryKeyValue
 {
     <#
     .SYNOPSIS
@@ -20,7 +20,7 @@ function Test-RegistryKeyValue
     The usual ways for checking if a registry value exists don't handle when a value simply has an empty or null value.  This function actually checks if a key has a value with a given name.
     
     .EXAMPLE
-    Test-RegistryKeyValue -Path 'hklm:\Software\Carbon\Test' -Name 'Title'
+    Test-CRegistryKeyValue -Path 'hklm:\Software\Carbon\Test' -Name 'Title'
     
     Returns `True` if `hklm:\Software\Carbon\Test` contains a value named 'Title'.  `False` otherwise.
     #>

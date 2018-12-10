@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Reset-HostsFile
+function Reset-CHostsFile
 {
     <#
     .SYNOPSIS
@@ -22,7 +22,7 @@ function Reset-HostsFile
     By default, the current computer's hosts file is reset.  You can operate on a custom hosts file by passing its path to the `Path` argument.
     
     .EXAMPLE
-    Reset-HostsFile
+    Reset-CHostsFile
     
     If your hosts file contains something like this:
     
@@ -30,13 +30,13 @@ function Reset-HostsFile
         10.1.2.3         myserver
         10.5.6.7         myserver2
         
-    After calling `Reset-HostsFile`, your hosts will contain:
+    After calling `Reset-CHostsFile`, your hosts will contain:
     
         127.0.0.1        localhost
       
     
     .EXAMPLE
-    Reset-HostsFile -Path my\custom\hosts
+    Reset-CHostsFile -Path my\custom\hosts
     
     Resets the hosts file at `my\custom\hosts`.
     #>
@@ -44,7 +44,7 @@ function Reset-HostsFile
     param(
        [string]
        # The path to the hosts file to modify.  Defaults to the local computer's hosts file.
-       $Path = (Get-PathToHostsFile)
+       $Path = (Get-CPathToHostsFile)
     )
 
     Set-StrictMode -Version 'Latest'
@@ -58,7 +58,7 @@ function Reset-HostsFile
     }
     
     $cmdErrors = @()
-    [string[]]$lines = Read-File -Path $Path -ErrorVariable 'cmdErrors'
+    [string[]]$lines = Read-CFile -Path $Path -ErrorVariable 'cmdErrors'
     if( $cmdErrors )
     {
         return
@@ -79,9 +79,9 @@ function Reset-HostsFile
     
     [void] $outlines.Add("127.0.0.1       localhost")
     
-    if( $PSCmdlet.ShouldProcess( $Path, "Reset-HostsFile" ) )
+    if( $PSCmdlet.ShouldProcess( $Path, "Reset-CHostsFile" ) )
     {
-        $outlines | Write-File -Path $Path
+        $outlines | Write-CFile -Path $Path
     }     
 }
 

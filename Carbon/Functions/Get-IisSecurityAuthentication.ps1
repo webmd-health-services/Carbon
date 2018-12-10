@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Get-IisSecurityAuthentication
+function Get-CIisSecurityAuthentication
 {
     <#
     .SYNOPSIS
@@ -25,12 +25,12 @@ function Get-IisSecurityAuthentication
     Microsoft.Web.Administration.ConfigurationSection.
     
     .EXAMPLE
-    Get-IisSecurityAuthentication -SiteName Peanuts -Anonymous
+    Get-CIisSecurityAuthentication -SiteName Peanuts -Anonymous
     
     Gets the `Peanuts` site's anonymous authentication configuration section.
     
     .EXAMPLE
-    Get-IisSecurityAuthentication -SiteName Peanuts -VirtualPath Doghouse -Basic
+    Get-CIisSecurityAuthentication -SiteName Peanuts -VirtualPath Doghouse -Basic
     
     Gets the `Peanuts` site's `Doghouse` sub-directory's basic authentication configuration section.
     #>
@@ -73,6 +73,6 @@ function Get-IisSecurityAuthentication
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
     $sectionPath = 'system.webServer/security/authentication/{0}' -f $pscmdlet.ParameterSetName
-    Get-IisConfigurationSection -SiteName $SiteName -VirtualPath $VirtualPath -SectionPath $sectionPath
+    Get-CIisConfigurationSection -SiteName $SiteName -VirtualPath $VirtualPath -SectionPath $sectionPath
 }
 

@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Test-IisWebsite
+function Test-CIisWebsite
 {
     <#
     .SYNOPSIS
@@ -22,7 +22,7 @@ function Test-IisWebsite
     Beginning with Carbon 2.0.1, this function is available only if IIS is installed.
 
     .EXAMPLE
-    Test-IisWebsite -Name 'Peanuts'
+    Test-CIisWebsite -Name 'Peanuts'
 
     Returns `True` if the `Peanuts` website exists.  `False` if it doesn't.
     #>
@@ -54,5 +54,5 @@ function Test-IisWebsite
     }
 }
 
-Set-Alias -Name Test-IisWebsiteExists -Value Test-IisWebsite
+Set-Alias -Name Test-IisWebsiteExists -Value Test-CIisWebsite
 

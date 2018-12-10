@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Set-SslCertificateBinding
+function Set-CSslCertificateBinding
 {
     <#
     .SYNOPSIS
@@ -25,12 +25,12 @@ function Set-SslCertificateBinding
     Carbon.Certificates.SslCertificateBinding.
 
     .EXAMPLE
-    Set-SslCertificateBinding -IPAddress 43.27.89.54 -Port 443 -ApplicationID 88d1f8da-aeb5-40a2-a5e5-0e6107825df7 -Thumbprint 4789073458907345907434789073458907345907
+    Set-CSslCertificateBinding -IPAddress 43.27.89.54 -Port 443 -ApplicationID 88d1f8da-aeb5-40a2-a5e5-0e6107825df7 -Thumbprint 4789073458907345907434789073458907345907
     
     Configures the computer to use the 478907345890734590743 certificate on IP 43.27.89.54, port 443.
     
     .EXAMPLE
-    Set-SslCertificateBinding -ApplicationID 88d1f8da-aeb5-40a2-a5e5-0e6107825df7 -Thumbprint 4789073458907345907434789073458907345907
+    Set-CSslCertificateBinding -ApplicationID 88d1f8da-aeb5-40a2-a5e5-0e6107825df7 -Thumbprint 4789073458907345907434789073458907345907
     
     Configures the compute to use the 478907345890734590743 certificate as the default certificate on all IP addresses, port 443.
     #>
@@ -74,7 +74,7 @@ function Set-SslCertificateBinding
         $ipPort = '{0}:{1}' -f $IPAddress,$Port
     }
 
-    Remove-SslCertificateBinding -IPAddress $IPAddress -Port $Port
+    Remove-CSslCertificateBinding -IPAddress $IPAddress -Port $Port
     
     $action = 'creating SSL certificate binding'
     if( $pscmdlet.ShouldProcess( $IPPort, $action ) )
@@ -86,7 +86,7 @@ function Set-SslCertificateBinding
 
         if( $PassThru )
         {
-            Get-SslCertificateBinding -IPAddress $IPAddress -Port $Port
+            Get-CSslCertificateBinding -IPAddress $IPAddress -Port $Port
         }
     }
 }

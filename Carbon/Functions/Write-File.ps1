@@ -10,14 +10,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Write-File
+function Write-CFile
 {
     <#
     .SYNOPSIS
     Writes text to a file, retrying if the write fails.
 
     .DESCRIPTION
-    The `Write-File` function writes text file to a file, and will retry if the write fails. Use this function if you need to write text files that can be intermittently locked, like the Windows hosts file. 
+    The `Write-CFile` function writes text file to a file, and will retry if the write fails. Use this function if you need to write text files that can be intermittently locked, like the Windows hosts file. 
     
     By default, it will retry 30 times, waiting 100 milliseconds between each try. You can control the number of retries and the wait between retries with the `MaximumTries` and `RetryDelayMilliseconds` parameters, respectively.
 
@@ -26,22 +26,22 @@ function Write-File
     This function was introduced in Carbon 2.2.0.
 
     .EXAMPLE
-    $lines | Write-File -Path 'C:\Path\to\my\file'
+    $lines | Write-CFile -Path 'C:\Path\to\my\file'
 
     Demonstrates how to write lines to a text file using the pipeline.
 
     .EXAMPLE
-    Write-File -Path 'C:\Path\to\my\file' -InputObject $lines
+    Write-CFile -Path 'C:\Path\to\my\file' -InputObject $lines
 
     Demonstrates how to write lines to a text file using a variable.
 
     .EXAMPLE
-    $lines | Write-File -Path 'C:\Path\to\my\file' -MaximumRetries 10 -RetryDelayMilliseconds 1000
+    $lines | Write-CFile -Path 'C:\Path\to\my\file' -MaximumRetries 10 -RetryDelayMilliseconds 1000
 
-    Demonstrates how to control how long to retry writing the text file. In this case, `Write-File` will try 10 times, waiting one second between tries.
+    Demonstrates how to control how long to retry writing the text file. In this case, `Write-CFile` will try 10 times, waiting one second between tries.
 
     .EXAMPLE
-    $lines | Write-File -Path 'C:\Path\to\my\file' -ErrorVariable 'writeErrors'
+    $lines | Write-CFile -Path 'C:\Path\to\my\file' -ErrorVariable 'writeErrors'
 
     Demonstrates how to check if the write failed. In this case, errors are copied to a 'writeErrors' variable, so you would check if this error variable has any items.
     #>

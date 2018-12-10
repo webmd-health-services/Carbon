@@ -116,6 +116,7 @@ LONG DESCRIPTION
     * Node
     * Node Modules
     * .NET Core SDK
+    * PowerShell modules
 
     ## Node
 
@@ -166,3 +167,15 @@ LONG DESCRIPTION
     Before installing the .NET Core SDK to the build root, Whiskey will first search for global .NET Core installs containing the desired version. If a global install is found with the correct version, that path is used and the install to the local build root is skipped.
 
     Whiskey will *always* update the `sdk.version` property within the `global.json` file found in the task working directory or the Whiskey build root with the version of the SDK that task is using. If a `global.json` file does not exist in either the working directory or build root, one is created in the build root.
+
+    ## PowerShell Modules
+
+    To install a PowerShell module, add this to your task:
+
+        [Whiskey.RequiresTol('PowerShellModule::Whiskey','WhiskeyPath')]
+
+    The `WhiskeyPath` string is the name of the key where the path to the module root should be saved in the `$TaskParameter` hashtable passed to your task.
+
+    Use the `Import-WhiskeyPowerShellModule` function in your task to import the module. Pass the name (or names) of the module to the `Import-WhiskeyPowerShellModule` function's `Name` parameter.
+
+    Modules are saved to a directory in working directory of the task that requires it. The exact directory is an implementation detail, and is subject to change. Use the path as passed to your task.

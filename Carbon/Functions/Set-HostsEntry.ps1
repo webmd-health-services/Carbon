@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Set-HostsEntry
+function Set-CHostsEntry
 {
     <#
     .SYNOPSIS
@@ -25,10 +25,10 @@ function Set-HostsEntry
     
     You can operate on a custom hosts file, too.  Pass its path with the `Path` parameter.
 
-    Sometimes the system's hosts file is in use and locked when you try to update it. The `Set-HostsEntry` function tries 10 times to set a hosts entry before giving up and writing an error. It waits a random amount of time (from 0 to 1000 milliseconds) between each attempt.
+    Sometimes the system's hosts file is in use and locked when you try to update it. The `Set-CHostsEntry` function tries 10 times to set a hosts entry before giving up and writing an error. It waits a random amount of time (from 0 to 1000 milliseconds) between each attempt.
     
     .EXAMPLE
-    Set-HostsEntry -IPAddress 10.2.3.4 -HostName 'myserver' -Description "myserver's IP address"
+    Set-CHostsEntry -IPAddress 10.2.3.4 -HostName 'myserver' -Description "myserver's IP address"
     
     If your hosts file contains the following:
     
@@ -40,7 +40,7 @@ function Set-HostsEntry
         10.2.3.4         myserver	# myserver's IP address
 
     .EXAMPLE        
-    Set-HostsEntry -IPAddress 10.5.6.7 -HostName 'myserver'
+    Set-CHostsEntry -IPAddress 10.5.6.7 -HostName 'myserver'
     
     If your hosts file contains the following:
     
@@ -71,7 +71,7 @@ function Set-HostsEntry
 
         [string]
         # The path to the hosts file where the entry should be set. Defaults to the local computer's hosts file.
-        $Path = (Get-PathToHostsFile)
+        $Path = (Get-CPathToHostsFile)
     )
 
     Set-StrictMode -Version 'Latest'
@@ -87,7 +87,7 @@ function Set-HostsEntry
         New-Item $Path -ItemType File
     }
     
-    [string[]]$lines = Read-File -Path $Path -ErrorVariable 'cmdErrors'
+    [string[]]$lines = Read-CFile -Path $Path -ErrorVariable 'cmdErrors'
     if( $cmdErrors )
     {
         return
@@ -173,6 +173,6 @@ function Set-HostsEntry
     }
     
     Write-Verbose -Message ('[HOSTS]  [{0}]  {1,-45}  {2}' -f $Path,$IPAddress,$HostName)
-    $outLines | Write-File -Path $Path
+    $outLines | Write-CFile -Path $Path
 }
 

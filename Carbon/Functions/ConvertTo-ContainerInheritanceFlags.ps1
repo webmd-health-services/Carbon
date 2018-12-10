@@ -10,30 +10,30 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function ConvertTo-ContainerInheritanceFlags
+function ConvertTo-CContainerInheritanceFlags
 {
     <#
     .SYNOPSIS
     Converts a combination of InheritanceFlags Propagation Flags into a Carbon.Security.ContainerInheritanceFlags enumeration value.
 
     .DESCRIPTION
-    `Grant-Permission`, `Test-Permission`, and `Get-Permission` all take an `ApplyTo` parameter, which is a `Carbon.Security.ContainerInheritanceFlags` enumeration value. This enumeration is then converted to the appropriate `System.Security.AccessControl.InheritanceFlags` and `System.Security.AccessControl.PropagationFlags` values for getting/granting/testing permissions. If you prefer to speak in terms of `InheritanceFlags` and `PropagationFlags`, use this function to convert them to a `ContainerInheritanceFlags` value.
+    `Grant-CPermission`, `Test-CPermission`, and `Get-CPermission` all take an `ApplyTo` parameter, which is a `Carbon.Security.ContainerInheritanceFlags` enumeration value. This enumeration is then converted to the appropriate `System.Security.AccessControl.InheritanceFlags` and `System.Security.AccessControl.PropagationFlags` values for getting/granting/testing permissions. If you prefer to speak in terms of `InheritanceFlags` and `PropagationFlags`, use this function to convert them to a `ContainerInheritanceFlags` value.
 
     If your combination doesn't result in a valid combination, `$null` is returned.
 
-    For detailed description of inheritance and propagation flags, see the help for `Grant-Permission`.
+    For detailed description of inheritance and propagation flags, see the help for `Grant-CPermission`.
 
     .OUTPUTS
     Carbon.Security.ContainerInheritanceFlags.
 
     .LINK
-    Grant-Permission
+    Grant-CPermission
 
     .LINK
-    Test-Permission
+    Test-CPermission
 
     .EXAMPLE
-    ConvertTo-ContainerInheritanceFlags -InheritanceFlags 'ContainerInherit' -PropagationFlags 'None'
+    ConvertTo-CContainerInheritanceFlags -InheritanceFlags 'ContainerInherit' -PropagationFlags 'None'
 
     Demonstrates how to convert `InheritanceFlags` and `PropagationFlags` enumeration values into a `ContainerInheritanceFlags`. In this case, `[Carbon.Security.ContainerInheritanceFlags]::ContainerAndSubContainers` is returned.
     #>

@@ -1,26 +1,26 @@
 [
     {
-        "Name":  "Add-GroupMember",
+        "Name":  "Add-CGroupMember",
         "Tags":  [ "Groups", "Identity", "Principal" ]
     },
     {
-        "Name":  "Add-IisDefaultDocument",
+        "Name":  "Add-CIisDefaultDocument",
         "Tags":  [ "IIS" ]
     },
     {
-        "Name":  "Add-TrustedHost",
+        "Name":  "Add-CTrustedHost",
         "Tags":  [ "PowerShell", "Trusted Host" ]
     },
     {
-        "Name":  "Assert-AdminPrivilege",
+        "Name":  "Assert-CAdminPrivilege",
         "Tags":  [ "Security" ]
     },
     {
-        "Name":  "Assert-FirewallConfigurable",
+        "Name":  "Assert-CFirewallConfigurable",
         "Tags":  [ "Firewall" ]
     },
     {
-        "Name":  "Assert-Service",
+        "Name":  "Assert-CService",
         "Tags":  [ "Service" ]
     },
     {
@@ -56,799 +56,799 @@
         "Tags": [ "DSC", "DSC Resources", "Service" ]
     },
     {
-        "Name":  "Clear-DscLocalResourceCache",
+        "Name":  "Clear-CDscLocalResourceCache",
         "Tags":  [ "DSC" ]
     },
     {
-        "Name":  "Clear-MofAuthoringMetadata",
+        "Name":  "Clear-CMofAuthoringMetadata",
         "Tags":  [ "DSC" ]
     },
     {
-        "Name":  "Clear-TrustedHost",
+        "Name":  "Clear-CTrustedHost",
         "Tags":  [ "PowerShell", "Trusted Host" ]
     },
     {
-        "Name":  "Complete-Job",
+        "Name":  "Complete-CJob",
         "Tags":  [ "PowerShell" ]
     },
     {
-        "Name":  "Compress-Item",
+        "Name":  "Compress-CItem",
         "Tags":  [ "File System", "ZIP", "Compression" ]
     },
     {
-        "Name":  "ConvertFrom-Base64",
+        "Name":  "ConvertFrom-CBase64",
         "Tags":  [ "Text" ]
     },
     {
-        "Name":  "Convert-SecureStringToString",
+        "Name":  "Convert-CSecureStringToString",
         "Tags":  [ "Security" ]
     },
     {
-        "Name":  "ConvertTo-Base64",
+        "Name":  "ConvertTo-CBase64",
         "Tags":  [ "Text" ]
     },
     {
-        "Name":  "ConvertTo-ContainerInheritanceFlags",
+        "Name":  "ConvertTo-CContainerInheritanceFlags",
         "Tags":  [ "Security", "ACL" ]
     },
     {
-        "Name":  "ConvertTo-InheritanceFlag",
+        "Name":  "ConvertTo-CInheritanceFlag",
         "Tags":  [ "Security", "ACL" ]
     },
     {
-        "Name":  "ConvertTo-PropagationFlag",
+        "Name":  "ConvertTo-CPropagationFlag",
         "Tags":  [ "Security", "ACL" ]
     },
     {
-        "Name":  "ConvertTo-SecurityIdentifier",
+        "Name":  "ConvertTo-CSecurityIdentifier",
         "Tags":  [ "Users", "Groups", "SID", "Identity", "Principal" ]
     },
     {
-        "Name":  "Convert-XmlFile",
+        "Name":  "Convert-CXmlFile",
         "Tags":  [ "Xml", "Text" ]
     },
     {
-        "Name":  "Copy-DscResource",
+        "Name":  "Copy-CDscResource",
         "Tags":  [ "DSC" ]
     },
     {
-        "Name":  "Disable-FirewallStatefulFtp",
+        "Name":  "Disable-CFirewallStatefulFtp",
         "Tags":  [ "Firewall" ]
     },
     {
-        "Name":  "Disable-IEEnhancedSecurityConfiguration",
+        "Name":  "Disable-CIEEnhancedSecurityConfiguration",
         "Tags":  [ "Internet Explorer", "COM" ]
     },
     {
-        "Name":  "Disable-IisSecurityAuthentication",
+        "Name":  "Disable-CIisSecurityAuthentication",
         "Tags":  [ "IIS" ]
     },
     {
-        "Name":  "Disable-NtfsCompression",
+        "Name":  "Disable-CNtfsCompression",
         "Tags":  [ "File System", "NTFS" ]
     },
     {
-        "Name":  "Enable-FirewallStatefulFtp",
+        "Name":  "Enable-CFirewallStatefulFtp",
         "Tags":  [ "Firewall" ]
     },
     {
-        "Name":  "Enable-IEActivationPermission",
+        "Name":  "Enable-CIEActivationPermission",
         "Tags":  [ "Internet Explorer", "COM" ]
     },
     {
-        "Name":  "Enable-IisDirectoryBrowsing",
+        "Name":  "Enable-CIisDirectoryBrowsing",
         "Tags":  [ "IIS" ]
     },
     {
-        "Name":  "Enable-IisSecurityAuthentication",
+        "Name":  "Enable-CIisSecurityAuthentication",
         "Tags":  [ "IIS" ]
     },
     {
-        "Name":  "Enable-IisSsl",
+        "Name":  "Enable-CIisSsl",
         "Tags":  [ "IIS" ]
     },
     {
-        "Name":  "Enable-NtfsCompression",
+        "Name":  "Enable-CNtfsCompression",
         "Tags":  [ "File System", "NTFS" ]
     },
     {
-        "Name":  "Expand-Item",
+        "Name":  "Expand-CItem",
         "Tags":  [ "File System", "ZIP", "Compression" ]
     },
     {
-        "Name":  "Find-ADUser",
+        "Name":  "Find-CADUser",
         "Tags":  [ "Users", "Active Directory" ]
     },
     {
-        "Name":  "Format-ADSearchFilterValue",
+        "Name":  "Format-CADSearchFilterValue",
         "Tags":  [ "Active Directory" ]
     },
     {
-        "Name":  "Get-ADDomainController",
+        "Name":  "Get-CADDomainController",
         "Tags":  [ "Active Directory" ]
     },
     {
-        "Name":  "Get-Certificate",
+        "Name":  "Get-CCertificate",
         "Tags":  [ "Certificates" ]
     },
     {
-        "Name":  "Get-CertificateStore",
+        "Name":  "Get-CCertificateStore",
         "Tags":  [ "Certificates" ]
     },
     {
-        "Name":  "Get-ComPermission",
+        "Name":  "Get-CComPermission",
         "Tags":  [ "COM", "Security", "ACL" ]
     },
     {
-        "Name":  "Get-ComSecurityDescriptor",
+        "Name":  "Get-CComSecurityDescriptor",
         "Tags":  [ "COM", "Security", "ACL" ]
     },
     {
-        "Name":  "Get-DscError",
+        "Name":  "Get-CDscError",
         "Tags":  [ "DSC" ]
     },
     {
-        "Name":  "Get-DscWinEvent",
+        "Name":  "Get-CDscWinEvent",
         "Tags":  [ "DSC" ]
     },
     {
-        "Name":  "Get-FileShare",
+        "Name":  "Get-CFileShare",
         "Tags":  [ "Shares", "SMB" ]
     },
     {
-        "Name":  "Get-FileSharePermission",
+        "Name":  "Get-CFileSharePermission",
         "Tags":  [ "Shares", "SMB", "Security" ]
     },
     {
-        "Name":  "Get-FirewallRule",
+        "Name":  "Get-CFirewallRule",
         "Tags":  [ "Firewall" ]
     },
     {
-        "Name":  "Get-Group",
+        "Name":  "Get-CGroup",
         "Tags":  [ "Groups" ]
     },
     {
-        "Name": "Get-HttpUrlAcl",
+        "Name": "Get-CHttpUrlAcl",
         "Tags": [ "Security", "HTTP", "WCF", "netsh", "ACL" ]
     },
     {
-        "Name":  "Get-IisApplication",
+        "Name":  "Get-CIisApplication",
         "Tags":  [ "IIS" ]
     },
     {
-        "Name":  "Get-IisAppPool",
+        "Name":  "Get-CIisAppPool",
         "Tags":  [ "IIS" ]
     },
     {
-        "Name":  "Get-IisConfigurationSection",
+        "Name":  "Get-CIisConfigurationSection",
         "Tags":  [ "IIS" ]
     },
     {
-        "Name":  "Get-IisHttpHeader",
+        "Name":  "Get-CIisHttpHeader",
         "Tags":  [ "IIS" ]
     },
     {
-        "Name":  "Get-IisHttpRedirect",
+        "Name":  "Get-CIisHttpRedirect",
         "Tags":  [ "IIS" ]
     },
     {
-        "Name":  "Get-IisMimeMap",
+        "Name":  "Get-CIisMimeMap",
         "Tags":  [ "IIS" ]
     },
     {
-        "Name":  "Get-IisSecurityAuthentication",
+        "Name":  "Get-CIisSecurityAuthentication",
         "Tags":  [ "IIS" ]
     },
     {
-        "Name":  "Get-IisVersion",
+        "Name":  "Get-CIisVersion",
         "Tags":  [ "IIS" ]
     },
     {
-        "Name":  "Get-IisWebsite",
+        "Name":  "Get-CIisWebsite",
         "Tags":  [ "IIS" ]
     },
     {
-        "Name":  "Get-IPAddress",
+        "Name":  "Get-CIPAddress",
         "Tags":  [ "Networking", "IP" ]
     },
     {
-        "Name":  "Get-Msi",
+        "Name":  "Get-CMsi",
         "Tags":  [ "MSI", "Installers" ]
     },
     {
-        "Name":  "Get-MsmqMessageQueue",
+        "Name":  "Get-CMsmqMessageQueue",
         "Tags":  [ "MSMQ" ]
     },
     {
-        "Name":  "Get-MsmqMessageQueuePath",
+        "Name":  "Get-CMsmqMessageQueuePath",
         "Tags":  [ "MSMQ" ]
     },
     {
-        "Name":  "Get-PathProvider",
+        "Name":  "Get-CPathProvider",
         "Tags":  [ "Path", "PowerShell" ]
     },
     {
-        "Name":  "Get-PathToHostsFile",
+        "Name":  "Get-CPathToHostsFile",
         "Tags":  [ "Hosts File" ]
     },
     {
-        "Name":  "Get-PerformanceCounter",
+        "Name":  "Get-CPerformanceCounter",
         "Tags":  [ "Performance Counters" ]
     },
     {
-        "Name":  "Get-Permission",
+        "Name":  "Get-CPermission",
         "Tags":  [ "Security", "File System", "NTFS", "Registry", "Certificates", "ACL" ]
     },
     {
-        "Name":  "Get-PowerShellModuleInstallPath",
+        "Name":  "Get-CPowerShellModuleInstallPath",
         "Tags":  [ "PowerShell" ]
     },
     {
-        "Name":  "Get-PowershellPath",
+        "Name":  "Get-CPowershellPath",
         "Tags":  [ "PowerShell" ]
     },
     {
-        "Name":  "Get-Privilege",
+        "Name":  "Get-CPrivilege",
         "Tags":  [ "Privileges" ]
     },
     {
-        "Name":  "Get-ProgramInstallInfo",
+        "Name":  "Get-CProgramInstallInfo",
         "Tags":  [ "Computer", "Programs", "Installers", "MSI" ]
     },
     {
-        "Name":  "Get-RegistryKeyValue",
+        "Name":  "Get-CRegistryKeyValue",
         "Tags":  [ "Registry" ]
     },
     {
-        "Name":  "Get-ScheduledTask",
+        "Name":  "Get-CScheduledTask",
         "Tags":  [ "Scheduled Tasks" ]
     },
     {
-        "Name":  "Get-ServiceAcl",
+        "Name":  "Get-CServiceAcl",
         "Tags":  [ "Service" ]
     },
     {
-        "Name":  "Get-ServiceConfiguration",
+        "Name":  "Get-CServiceConfiguration",
         "Tags":  [ "Service" ]
     },
     {
-        "Name":  "Get-ServicePermission",
+        "Name":  "Get-CServicePermission",
         "Tags":  [ "Service", "Security", "ACL" ]
     },
     {
-        "Name":  "Get-ServiceSecurityDescriptor",
+        "Name":  "Get-CServiceSecurityDescriptor",
         "Tags":  [ "Service" ]
     },
     {
-        "Name":  "Get-SslCertificateBinding",
+        "Name":  "Get-CSslCertificateBinding",
         "Tags":  [ "Certificates" ]
     },
     {
-        "Name":  "Get-TrustedHost",
+        "Name":  "Get-CTrustedHost",
         "Tags":  [ "PowerShell" ]
     },
     {
-        "Name":  "Get-User",
+        "Name":  "Get-CUser",
         "Tags":  [ "Users", "Identity", "Principal" ]
     },
     {
-        "Name":  "Get-WindowsFeature",
+        "Name":  "Get-CWindowsFeature",
         "Tags":  [ "Windows Features" ]
     },
     {
-        "Name":  "Get-WmiLocalUserAccount",
+        "Name":  "Get-CWmiLocalUserAccount",
         "Tags":  [ "Users", "Identity", "Principal" ]
     },
     {
-        "Name":  "Grant-ComPermission",
+        "Name":  "Grant-CComPermission",
         "Tags":  [ "COM" ]
     },
     {
-        "Name":  "Grant-MsmqMessageQueuePermission",
+        "Name":  "Grant-CMsmqMessageQueuePermission",
         "Tags":  [ "MSMQ" ]
     },
     {
-        "Name": "Grant-HttpUrlPermission",
+        "Name": "Grant-CHttpUrlPermission",
         "Tags": [ "Security", "HTTP", "WCF", "netsh", "ACL" ]
     },
     {
-        "Name":  "Grant-Permission",
+        "Name":  "Grant-CPermission",
         "Tags":  [ "Security", "File System", "NTFS", "Registry", "Certificates", "ACL" ]
     },
     {
-        "Name":  "Grant-Privilege",
+        "Name":  "Grant-CPrivilege",
         "Tags":  [ "Privileges", "Security" ]
     },
     {
-        "Name":  "Grant-ServiceControlPermission",
+        "Name":  "Grant-CServiceControlPermission",
         "Tags":  [ "Service", "Security", "ACL" ]
     },
     {
-        "Name":  "Grant-ServicePermission",
+        "Name":  "Grant-CServicePermission",
         "Tags":  [ "Service", "Security", "ACL" ]
     },
     {
-        "Name":  "Initialize-Lcm",
+        "Name":  "Initialize-CLcm",
         "Tags":  [ "DSC" ]
     },
     {
-        "Name":  "Install-Certificate",
+        "Name":  "Install-CCertificate",
         "Tags":  [ "Certificates" ]
     },
     {
-        "Name":  "Install-Directory",
+        "Name":  "Install-CDirectory",
         "Tags":  [ "File System", "NTFS", "Directory" ]
     },
     {
-        "Name":  "Install-FileShare",
+        "Name":  "Install-CFileShare",
         "Tags":  [ "Shares", "SMB" ]
     },
     {
-        "Name":  "Install-Group",
+        "Name":  "Install-CGroup",
         "Tags":  [ "Groups", "Identity", "Principal" ]
     },
     {
-        "Name":  "Install-IisApplication",
+        "Name":  "Install-CIisApplication",
         "Tags":  [ "IIS" ]
     },
     {
-        "Name":  "Install-IisAppPool",
+        "Name":  "Install-CIisAppPool",
         "Tags":  [ "IIS" ]
     },
     {
-        "Name":  "Install-IisVirtualDirectory",
+        "Name":  "Install-CIisVirtualDirectory",
         "Tags":  [ "IIS" ]
     },
     {
-        "Name":  "Install-IisWebsite",
+        "Name":  "Install-CIisWebsite",
         "Tags":  [ "IIS" ]
     },
     {
-        "Name":  "Install-Junction",
+        "Name":  "Install-CJunction",
         "Tags":  [ "File System", "NTFS", "Junctions" ]
     },
     {
-        "Name":  "Install-Msi",
+        "Name":  "Install-CMsi",
         "Tags":  [ "MSI", "Installers", "Programs" ]
     },
     {
-        "Name":  "Install-Msmq",
+        "Name":  "Install-CMsmq",
         "Tags":  [ "MSMQ" ]
     },
     {
-        "Name":  "Install-MsmqMessageQueue",
+        "Name":  "Install-CMsmqMessageQueue",
         "Tags":  [ "MSMQ" ]
     },
     {
-        "Name":  "Install-PerformanceCounter",
+        "Name":  "Install-CPerformanceCounter",
         "Tags":  [ "Performance Counters" ]
     },
     {
-        "Name":  "Install-RegistryKey",
+        "Name":  "Install-CRegistryKey",
         "Tags":  [ "Registry" ]
     },
     {
-        "Name":  "Install-ScheduledTask",
+        "Name":  "Install-CScheduledTask",
         "Tags":  [ "Scheduled Tasks" ]
     },
     {
-        "Name":  "Install-Service",
+        "Name":  "Install-CService",
         "Tags":  [ "Service" ]
     },
     {
-        "Name":  "Install-User",
+        "Name":  "Install-CUser",
         "Tags":  [ "Users", "Identity", "Principal" ]
     },
     {
-        "Name":  "Install-WindowsFeature",
+        "Name":  "Install-CWindowsFeature",
         "Tags":  [ "Windows Features", "Programs" ]
     },
     {
-        "Name":  "Invoke-AppCmd",
+        "Name":  "Invoke-CAppCmd",
         "Tags":  [ "IIS" ]
     },
     {
-        "Name":  "Invoke-PowerShell",
+        "Name":  "Invoke-CPowerShell",
         "Tags":  [ "PowerShell" ]
     },
     {
-        "Name":  "Join-IisVirtualPath",
+        "Name":  "Join-CIisVirtualPath",
         "Tags":  [ "IIS" ]
     },
     {
-        "Name":  "Lock-IisConfigurationSection",
+        "Name":  "Lock-CIisConfigurationSection",
         "Tags":  [ "IIS" ]
     },
     {
-        "Name":  "New-Credential",
+        "Name":  "New-CCredential",
         "Tags":  [ "Security", "Credential" ]
     },
     {
-        "Name":  "New-Junction",
+        "Name":  "New-CJunction",
         "Tags":  [ "File System", "NTFS", "Junctions" ]
     },
     {
-        "Name":  "New-RsaKeyPair",
+        "Name":  "New-CRsaKeyPair",
         "Tags":  [ "Cryptography", "Encryption", "RSA" ]
     },
     {
-        "Name":  "New-TempDirectory",
+        "Name":  "New-CTempDirectory",
         "Tags":  [ "File System", "Directory" ]
     },
     {
-        "Name":  "Disable-AclInheritance",
+        "Name":  "Disable-CAclInheritance",
         "Tags":  [ "Security", "File System", "NTFS" ]
     },
     {
-        "Name":  "Enable-AclInheritance",
+        "Name":  "Enable-CAclInheritance",
         "Tags":  [ "Security", "File System", "NTFS" ]
     },
     {
-        "Name":  "Protect-String",
+        "Name":  "Protect-CString",
         "Tags":  [ "Cryptography", "Encryption" ]
     },
     {
-        "Name":  "Read-File",
+        "Name":  "Read-CFile",
         "Tags":  [ "File System", "NTFS", "Text" ]
     },
     {
-        "Name":  "Remove-DotNetAppSetting",
+        "Name":  "Remove-CDotNetAppSetting",
         "Tags":  [ ".NET" ]
     },
     {
-        "Name":  "Remove-EnvironmentVariable",
+        "Name":  "Remove-CEnvironmentVariable",
         "Tags":  [ "Computer", "Environment" ]
     },
     {
-        "Name":  "Remove-GroupMember",
+        "Name":  "Remove-CGroupMember",
         "Tags":  [ "Groups", "Identity", "Principal" ]
     },
     {
-        "Name":  "Remove-HostsEntry",
+        "Name":  "Remove-CHostsEntry",
         "Tags":  [ "Hosts File" ]
     },
     {
-        "Name":  "Remove-IisMimeMap",
+        "Name":  "Remove-CIisMimeMap",
         "Tags":  [ "IIS" ]
     },
     {
-        "Name":  "Remove-IniEntry",
+        "Name":  "Remove-CIniEntry",
         "Tags":  [ "INI", "Text" ]
     },
     {
-        "Name":  "Remove-Junction",
+        "Name":  "Remove-CJunction",
         "Tags":  [ "File System", "NTFS", "Junctions" ]
     },
     {
-        "Name":  "Remove-RegistryKeyValue",
+        "Name":  "Remove-CRegistryKeyValue",
         "Tags":  [ "Registry" ]
     },
     {
-        "Name":  "Remove-SslCertificateBinding",
+        "Name":  "Remove-CSslCertificateBinding",
         "Tags":  [ "Certificates", "SSL", "IIS" ]
     },
     {
-        "Name":  "Reset-HostsFile",
+        "Name":  "Reset-CHostsFile",
         "Tags":  [ "Hosts File" ]
     },
     {
-        "Name":  "Reset-MsmqQueueManagerID",
+        "Name":  "Reset-CMsmqQueueManagerID",
         "Tags":  [ "MSMQ" ]
     },
     {
-        "Name":  "Resolve-FullPath",
+        "Name":  "Resolve-CFullPath",
         "Tags":  [ "Path" ]
     },
     {
-        "Name":  "Resolve-Identity",
+        "Name":  "Resolve-CIdentity",
         "Tags":  [ "Users", "Groups", "SID", "Security", "Identity", "Principal" ]
     },
     {
-        "Name":  "Resolve-IdentityName",
+        "Name":  "Resolve-CIdentityName",
         "Tags":  [ "Users", "Groups", "SID", "Security", "Identity", "Principal" ]
     },
     {
-        "Name":  "Resolve-NetPath",
+        "Name":  "Resolve-CNetPath",
         "Tags":  [ "Computer" ]
     },
     {
-        "Name":  "Resolve-PathCase",
+        "Name":  "Resolve-CPathCase",
         "Tags":  [ "Path" ]
     },
     {
-        "Name":  "Resolve-RelativePath",
+        "Name":  "Resolve-CRelativePath",
         "Tags":  [ "Path" ]
     },
     {
-        "Name":  "Restart-RemoteService",
+        "Name":  "Restart-CRemoteService",
         "Tags":  [ "Service" ]
     },
     {
-        "Name":  "Revoke-ComPermission",
+        "Name":  "Revoke-CComPermission",
         "Tags":  [ "COM", "Security" ]
     },
     {
-        "Name": "Revoke-HttpUrlPermission",
+        "Name": "Revoke-CHttpUrlPermission",
         "Tags": [ "Security", "HTTP", "WCF", "netsh", "ACL" ]
     },
     {
-        "Name":  "Revoke-Permission",
+        "Name":  "Revoke-CPermission",
         "Tags":  [ "Security", "NTFS", "File System", "Registry", "Certificates", "ACL" ]
     },
     {
-        "Name":  "Revoke-Privilege",
+        "Name":  "Revoke-CPrivilege",
         "Tags":  [ "Privileges", "Security" ]
     },
     {
-        "Name":  "Revoke-ServicePermission",
+        "Name":  "Revoke-CServicePermission",
         "Tags":  [ "Service", "Security", "ACL" ]
     },
     {
-        "Name":  "Set-DotNetAppSetting",
+        "Name":  "Set-CDotNetAppSetting",
         "Tags":  [ ".NET" ]
     },
     {
-        "Name":  "Set-DotNetConnectionString",
+        "Name":  "Set-CDotNetConnectionString",
         "Tags":  [ ".NET" ]
     },
     {
-        "Name":  "Set-EnvironmentVariable",
+        "Name":  "Set-CEnvironmentVariable",
         "Tags":  [ "Computer" ]
     },
     {
-        "Name":  "Set-HostsEntry",
+        "Name":  "Set-CHostsEntry",
         "Tags":  [ "Hosts File" ]
     },
     {
-        "Name":  "Set-IisHttpHeader",
+        "Name":  "Set-CIisHttpHeader",
         "Tags":  [ "IIS" ]
     },
     {
-        "Name":  "Set-IisHttpRedirect",
+        "Name":  "Set-CIisHttpRedirect",
         "Tags":  [ "IIS" ]
     },
     {
-        "Name":  "Set-IisMimeMap",
+        "Name":  "Set-CIisMimeMap",
         "Tags":  [ "IIS" ]
     },
     {
-        "Name":  "Set-IisWebsiteID",
+        "Name":  "Set-CIisWebsiteID",
         "Tags":  [ "IIS" ]
     },
     {
-        "Name":  "Set-IisWebsiteSslCertificate",
+        "Name":  "Set-CIisWebsiteSslCertificate",
         "Tags":  [ "IIS" ]
     },
     {
-        "Name":  "Set-IisWindowsAuthentication",
+        "Name":  "Set-CIisWindowsAuthentication",
         "Tags":  [ "IIS" ]
     },
     {
-        "Name":  "Set-IniEntry",
+        "Name":  "Set-CIniEntry",
         "Tags":  [ "INI", "Text" ]
     },
     {
-        "Name":  "Set-RegistryKeyValue",
+        "Name":  "Set-CRegistryKeyValue",
         "Tags":  [ "Registry" ]
     },
     {
-        "Name":  "Set-ServiceAcl",
+        "Name":  "Set-CServiceAcl",
         "Tags":  [ "Service", "ACL", "Security" ]
     },
     {
-        "Name":  "Set-SslCertificateBinding",
+        "Name":  "Set-CSslCertificateBinding",
         "Tags":  [ "Certificates", "SSL", "IIS" ]
     },
     {
-        "Name":  "Set-TrustedHost",
+        "Name":  "Set-CTrustedHost",
         "Tags":  [ "PowerShell", "Trusted Host" ]
     },
     {
-        "Name":  "Split-Ini",
+        "Name":  "Split-CIni",
         "Tags":  [ "INI", "Text" ]
     },
     {
-        "Name":  "Start-DscPullConfiguration",
+        "Name":  "Start-CDscPullConfiguration",
         "Tags":  [ "DSC" ]
     },
     {
-        "Name":  "Test-AdminPrivilege",
+        "Name":  "Test-CAdminPrivilege",
         "Tags":  [ "Security" ]
     },
     {
-        "Name":  "Test-DotNet",
+        "Name":  "Test-CDotNet",
         "Tags":  [ ".NET" ]
     },
     {
-        "Name":  "Test-DscTargetResource",
+        "Name":  "Test-CDscTargetResource",
         "Tags":  [ "DSC" ]
     },
     {
-        "Name":  "Test-FileShare",
+        "Name":  "Test-CFileShare",
         "Tags":  [ "Shares", "SMB" ]
     },
     {
-        "Name":  "Test-FirewallStatefulFtp",
+        "Name":  "Test-CFirewallStatefulFtp",
         "Tags":  [ "Firewall" ]
     },
     {
-        "Name":  "Test-Group",
+        "Name":  "Test-CGroup",
         "Tags":  [ "Groups", "Identity", "Principal" ]
     },
     {
-        "Name":  "Test-GroupMember",
+        "Name":  "Test-CGroupMember",
         "Tags":  [ "Groups", "Identity", "Principal" ]
     },
     {
-        "Name":  "Test-Identity",
+        "Name":  "Test-CIdentity",
         "Tags":  [ "Users", "Groups", "Security", "Identity", "Principal", "SID" ]
     },
     {
-        "Name":  "Test-IisAppPool",
+        "Name":  "Test-CIisAppPool",
         "Tags":  [ "IIS" ]
     },
     {
-        "Name":  "Test-IisConfigurationSection",
+        "Name":  "Test-CIisConfigurationSection",
         "Tags":  [ "IIS" ]
     },
     {
-        "Name":  "Test-IisSecurityAuthentication",
+        "Name":  "Test-CIisSecurityAuthentication",
         "Tags":  [ "IIS" ]
     },
     {
-        "Name":  "Test-IisWebsite",
+        "Name":  "Test-CIisWebsite",
         "Tags":  [ "IIS" ]
     },
     {
-        "Name":  "Test-IPAddress",
+        "Name":  "Test-CIPAddress",
         "Tags":  [ "Networking", "IP" ]
     },
     {
-        "Name":  "Test-MsmqMessageQueue",
+        "Name":  "Test-CMsmqMessageQueue",
         "Tags":  [ "MSMQ" ]
     },
     {
-        "Name":  "Test-NtfsCompression",
+        "Name":  "Test-CNtfsCompression",
         "Tags":  [ "File System", "NTFS" ]
     },
     {
-        "Name":  "Test-OSIs32Bit",
+        "Name":  "Test-COSIs32Bit",
         "Tags":  [ "Computer", "Windows", "Operating System", "OS" ]
     },
     {
-        "Name":  "Test-OSIs64Bit",
+        "Name":  "Test-COSIs64Bit",
         "Tags":  [ "Computer", "Windows", "Operating System", "OS" ]
     },
     {
-        "Name":  "Test-PathIsJunction",
+        "Name":  "Test-CPathIsJunction",
         "Tags":  [ "File System", "Path", "Junctions", "NTFS" ]
     },
     {
-        "Name":  "Test-PerformanceCounter",
+        "Name":  "Test-CPerformanceCounter",
         "Tags":  [ "Performance Counters" ]
     },
     {
-        "Name":  "Test-PerformanceCounterCategory",
+        "Name":  "Test-CPerformanceCounterCategory",
         "Tags":  [ "Performance Counters" ]
     },
     {
-        "Name":  "Test-Permission",
+        "Name":  "Test-CPermission",
         "Tags":  [ "Security", "File System", "NTFS", "Registry", "Certificates", "ACL" ]
     },
     {
-        "Name":  "Test-PowerShellIs32Bit",
+        "Name":  "Test-CPowerShellIs32Bit",
         "Tags":  [ "PowerShell" ]
     },
     {
-        "Name":  "Test-PowerShellIs64Bit",
+        "Name":  "Test-CPowerShellIs64Bit",
         "Tags":  [ "PowerShell" ]
     },
     {
-        "Name":  "Test-Privilege",
+        "Name":  "Test-CPrivilege",
         "Tags":  [ "Privileges", "Security" ]
     },
     {
-        "Name":  "Test-RegistryKeyValue",
+        "Name":  "Test-CRegistryKeyValue",
         "Tags":  [ "Registry" ]
     },
     {
-        "Name":  "Test-ScheduledTask",
+        "Name":  "Test-CScheduledTask",
         "Tags":  [ "Scheduled Tasks" ]
     },
     {
-        "Name":  "Test-Service",
+        "Name":  "Test-CService",
         "Tags":  [ "Service" ]
     },
     {
-        "Name":  "Test-SslCertificateBinding",
+        "Name":  "Test-CSslCertificateBinding",
         "Tags":  [ "Certificates", "SSL", "IIS" ]
     },
     {
-        "Name":  "Test-TypeDataMember",
+        "Name":  "Test-CTypeDataMember",
         "Tags":  [ "PowerShell" ]
     },
     {
-        "Name":  "Test-UncPath",
+        "Name":  "Test-CUncPath",
         "Tags":  [ "Path" ]
     },
     {
-        "Name":  "Test-User",
+        "Name":  "Test-CUser",
         "Tags":  [ "Users", "Identity", "Principal" ]
     },
     {
-        "Name":  "Test-WindowsFeature",
+        "Name":  "Test-CWindowsFeature",
         "Tags":  [ "Windows Features" ]
     },
     {
-        "Name":  "Test-ZipFile",
+        "Name":  "Test-CZipFile",
         "Tags":  [ "File System" ]
     },
     {
-        "Name":  "Uninstall-Certificate",
+        "Name":  "Uninstall-CCertificate",
         "Tags":  [ "Certificates" ]
     },
     {
-        "Name":  "Uninstall-Directory",
+        "Name":  "Uninstall-CDirectory",
         "Tags":  [ "File System", "NTFS", "Directory" ]
     },
     {
-        "Name":  "Uninstall-FileShare",
+        "Name":  "Uninstall-CFileShare",
         "Tags":  [ "Shares" ]
     },
     {
-        "Name":  "Uninstall-Group",
+        "Name":  "Uninstall-CGroup",
         "Tags":  [ "Groups", "Identity", "Principal" ]
     },
     {
-        "Name":  "Uninstall-IisAppPool",
+        "Name":  "Uninstall-CIisAppPool",
         "Tags":  [ "IIS" ]
     },
     {
-        "Name":  "Uninstall-IisWebsite",
+        "Name":  "Uninstall-CIisWebsite",
         "Tags":  [ "IIS" ]
     },
     {
-        "Name":  "Uninstall-Junction",
+        "Name":  "Uninstall-CJunction",
         "Tags":  [ "File System" ]
     },
     {
-        "Name":  "Uninstall-MsmqMessageQueue",
+        "Name":  "Uninstall-CMsmqMessageQueue",
         "Tags":  [ "MSMQ" ]
     },
     {
-        "Name":  "Uninstall-PerformanceCounterCategory",
+        "Name":  "Uninstall-CPerformanceCounterCategory",
         "Tags":  [ "Performance Counters" ]
     },
     {
-        "Name":  "Uninstall-ScheduledTask",
+        "Name":  "Uninstall-CScheduledTask",
         "Tags":  [ "Scheduled Tasks" ]
     },
     {
-        "Name":  "Uninstall-Service",
+        "Name":  "Uninstall-CService",
         "Tags":  [ "Service" ]
     },
     {
-        "Name":  "Uninstall-User",
+        "Name":  "Uninstall-CUser",
         "Tags":  [ "Users", "Identity", "Principal" ]
     },
     {
-        "Name":  "Uninstall-WindowsFeature",
+        "Name":  "Uninstall-CWindowsFeature",
         "Tags":  [ "Windows Features", "Programs" ]
     },
     {
-        "Name":  "Unlock-IisConfigurationSection",
+        "Name":  "Unlock-CIisConfigurationSection",
         "Tags":  [ "IIS" ]
     },
     {
-        "Name":  "Unprotect-String",
+        "Name":  "Unprotect-CString",
         "Tags":  [ "Cryptography", "Security", "Encryption" ]
     },
     {
-        "Name":  "Write-DscError",
+        "Name":  "Write-CDscError",
         "Tags":  [ "DSC" ]
     },
     {
-        "Name":  "Write-File",
+        "Name":  "Write-CFile",
         "Tags":  [ "File System", "NTFS", "Text" ]
     }
 ]

@@ -56,7 +56,7 @@ Describe 'License Notices' {
                             'whiskey.yml'
                         )
     
-        [object[]]$filesMissingLicense = Get-ChildItem -Path $projectRoot -Exclude 'Tools','Website','.hg','pshdo.com','.output','Modules','packages' |
+        [object[]]$filesMissingLicense = Get-ChildItem -Path $projectRoot -Exclude 'Tools','Website','.git','pshdo.com','.output','PSModules','packages' |
             Get-ChildItem -Recurse -File -Exclude $filesToSkip |
             Where-Object { $_.FullName -notlike '*\obj\*' } |
             Where-Object { $name = $_.Name; -not ($filesToSkip | Where-Object { $name -like $_ }) } |

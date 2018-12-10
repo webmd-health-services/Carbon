@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Lock-IisConfigurationSection
+function Lock-CIisConfigurationSection
 {
     <#
     .SYNOPSIS
@@ -24,7 +24,7 @@ function Lock-IisConfigurationSection
     Beginning with Carbon 2.0.1, this function is available only if IIS is installed.
 
     .EXAMPLE
-    Lock-IisConfigurationSection -SectionPath 'system.webServer/security/authentication/basicAuthentication'
+    Lock-CIisConfigurationSection -SectionPath 'system.webServer/security/authentication/basicAuthentication'
     
     Locks the `basicAuthentication` configuration so that sites can't override/modify those settings.
     #>
@@ -44,7 +44,7 @@ function Lock-IisConfigurationSection
 
     $SectionPath |
         ForEach-Object {
-            $section = Get-IisConfigurationSection -SectionPath $_
+            $section = Get-CIisConfigurationSection -SectionPath $_
             $section.OverrideMode = 'Deny'
             if( $pscmdlet.ShouldProcess( $_, 'locking IIS configuration section' ) )
             {

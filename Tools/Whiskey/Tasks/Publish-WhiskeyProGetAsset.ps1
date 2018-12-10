@@ -3,6 +3,7 @@
 function Publish-WhiskeyProGetAsset
 {
     [Whiskey.Task("PublishProGetAsset")]
+    [Whiskey.RequiresTool('PowerShellModule::ProGetAutomation','ProGetAutomationPath',Version='0.4.*',VersionParameterName='ProGetAutomationVersion')]
     [CmdletBinding()]
     param(
         [Whiskey.Context]
@@ -17,17 +18,20 @@ function Publish-WhiskeyProGetAsset
 
     Set-StrictMode -Version 'Latest'
     Use-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState
+
+    Import-WhiskeyPowerShellModule -Name 'ProGetAutomation'
+
     $message = "
     Build:
     - PublishProGetAsset:
         CredentialID: ProGetCredential
         Path: 
-        -'path/to/file.txt'
-        -'path/to/anotherfile.txt'
+        - ""path/to/file.txt""
+        - ""path/to/anotherfile.txt""
         Uri: http://proget.dev.webmd.com/
         AssetPath: 
-        -'path/to/exampleAsset'
-        -'path/toanother/file.txt'
+        - ""path/to/exampleAsset""
+        - ""path/toanother/file.txt""
         AssetDirectory: 'versions'
         "
     if( -not $TaskParameter['Path'] )

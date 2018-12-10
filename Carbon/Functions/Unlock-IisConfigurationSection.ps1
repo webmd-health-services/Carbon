@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Unlock-IisConfigurationSection
+function Unlock-CIisConfigurationSection
 {
     <#
     .SYNOPSIS
@@ -44,7 +44,7 @@ function Unlock-IisConfigurationSection
 
     $SectionPath |
         ForEach-Object {
-            $section = Get-IisConfigurationSection -SectionPath $_
+            $section = Get-CIisConfigurationSection -SectionPath $_
             $section.OverrideMode = 'Allow'
             if( $pscmdlet.ShouldProcess( $_, 'unlocking IIS configuration section' ) )
             {

@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Add-GroupMember
+function Add-CGroupMember
 {
     <#
     .SYNOPSIS
@@ -26,12 +26,12 @@ function Add-GroupMember
     The user running this function must have access to the directory where each principal in the `Member` parameter and the directory where each of the group's current members are located.
 
     .EXAMPLE
-    Add-GroupMember -Name Administrators -Member EMPIRE\DarthVader,EMPIRE\EmperorPalpatine,REBELS\LSkywalker
+    Add-CGroupMember -Name Administrators -Member EMPIRE\DarthVader,EMPIRE\EmperorPalpatine,REBELS\LSkywalker
 
     Adds Darth Vader, Emperor Palpatine and Luke Skywalker to the local administrators group.
 
     .EXAMPLE
-    Add-GroupMember -Name TieFighters -Member NetworkService
+    Add-CGroupMember -Name TieFighters -Member NetworkService
 
     Adds the local NetworkService account to the local TieFighters group.
     #>
@@ -53,7 +53,7 @@ function Add-GroupMember
 
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
     
-    [DirectoryServices.AccountManagement.GroupPrincipal]$group = Get-Group -Name $Name
+    [DirectoryServices.AccountManagement.GroupPrincipal]$group = Get-CGroup -Name $Name
     if( -not $group )
     {
         return
@@ -63,13 +63,13 @@ function Add-GroupMember
     {
         foreach( $_member in $Member )
         {
-            $identity = Resolve-Identity -Name $_member
+            $identity = Resolve-CIdentity -Name $_member
             if( -not $identity )
             {
                 continue
             }
 
-            if( (Test-GroupMember -GroupName $group.Name -Member $_member) )
+            if( (Test-CGroupMember -GroupName $group.Name -Member $_member) )
             {
                 continue
             }
@@ -96,5 +96,5 @@ function Add-GroupMember
     }
 }
 
-Set-Alias -Name 'Add-GroupMembers' -Value 'Add-GroupMember'
+Set-Alias -Name 'Add-GroupMembers' -Value 'Add-CGroupMember'
 

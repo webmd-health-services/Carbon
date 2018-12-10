@@ -24,7 +24,7 @@ $PSScriptRoot = Split-Path -Parent -Path $MyInvocation.MyCommand.Definition
 . (Join-Path -Path $PSScriptRoot -ChildPath '..\Functions\Use-CallerPreference.ps1' -Resolve)
 . (Join-Path -Path $PSScriptRoot -ChildPath '..\Functions\ConvertFrom-Base64.ps1' -Resolve)
 
-$Name = $Name | ConvertFrom-Base64
+$Name = $Name | ConvertFrom-CBase64
 
 Add-Type -AssemblyName System.Configuration
 

@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Set-IisWindowsAuthentication
+function Set-CIisWindowsAuthentication
 {
     <#
     .SYNOPSIS
@@ -19,7 +19,7 @@ function Set-IisWindowsAuthentication
     .DESCRIPTION
     By default, configures Windows authentication on a website.  You can configure Windows authentication at a specific path under a website by passing the virtual path (*not* the physical path) to that directory.
     
-    The changes only take effect if Windows authentication is enabled (see `Enable-IisSecurityAuthentication`).
+    The changes only take effect if Windows authentication is enabled (see `Enable-CIisSecurityAuthentication`).
 
     Beginning with Carbon 2.0.1, this function is available only if IIS is installed.
 
@@ -27,18 +27,18 @@ function Set-IisWindowsAuthentication
     http://blogs.msdn.com/b/webtopics/archive/2009/01/19/service-principal-name-spn-checklist-for-kerberos-authentication-with-iis-7-0.aspx
     
     .LINK
-    Disable-IisSecurityAuthentication
+    Disable-CIisSecurityAuthentication
     
     .LINK
-    Enable-IisSecurityAuthentication
+    Enable-CIisSecurityAuthentication
 
     .EXAMPLE
-    Set-IisWindowsAuthentication -SiteName Peanuts
+    Set-CIisWindowsAuthentication -SiteName Peanuts
 
     Configures Windows authentication on the `Peanuts` site to use kernel mode.
 
     .EXAMPLE
-    Set-IisWindowsAuthentication -SiteName Peanuts -VirtualPath Snoopy/DogHouse -DisableKernelMode
+    Set-CIisWindowsAuthentication -SiteName Peanuts -VirtualPath Snoopy/DogHouse -DisableKernelMode
 
     Configures Windows authentication on the `Doghouse` directory of the `Peanuts` site to not use kernel mode.
     #>
@@ -69,10 +69,10 @@ function Set-IisWindowsAuthentication
         $useKernelMode = 'False'
     }
     
-    $authSettings = Get-IisSecurityAuthentication -SiteName $SiteName -VirtualPath $VirtualPath -Windows
+    $authSettings = Get-CIisSecurityAuthentication -SiteName $SiteName -VirtualPath $VirtualPath -Windows
     $authSettings.SetAttributeValue( 'useKernelMode', $useKernelMode )
 
-    $fullPath = Join-IisVirtualPath $SiteName $VirtualPath
+    $fullPath = Join-CIisVirtualPath $SiteName $VirtualPath
     if( $pscmdlet.ShouldProcess( $fullPath, "set Windows authentication" ) )
     {
         $authSettings.CommitChanges()

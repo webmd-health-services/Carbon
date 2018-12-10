@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Get-DscError
+function Get-CDscError
 {
     <#
     .SYNOPSIS
@@ -29,39 +29,39 @@ function Get-DscError
 
     When getting errors on a remote computer, that computer must have Remote Event Log Management firewall rules enabled. To enable them, run
 
-        Get-FirewallRule -Name '*Remove Event Log Management*' |
+        Get-CFirewallRule -Name '*Remove Event Log Management*' |
             ForEach-Object { netsh advfirewall firewall set rule name= $_.Name new enable=yes }
 
-    `Get-DscError` is new in Carbon 2.0.
+    `Get-CDscError` is new in Carbon 2.0.
 
     .OUTPUTS
     System.Diagnostics.Eventing.Reader.EventLogRecord
 
     .LINK
-    Write-DscError
+    Write-CDscError
 
     .EXAMPLE
-    Get-DscWinEvent
+    Get-CDscWinEvent
 
     Demonstrates how to get all the DSC errors from the local computer.
 
     .EXAMPLE
-    Get-DscError -ComputerName 10.1.2.3
+    Get-CDscError -ComputerName 10.1.2.3
 
     Demonstrates how to get all the DSC errors from a specific computer.
 
     .EXAMPLE
-    Get-DscError -StartTime '8/1/2014 0:00'
+    Get-CDscError -StartTime '8/1/2014 0:00'
 
     Demonstrates how to get errors that occurred *after* a given time.
 
     .EXAMPLE
-    Get-DscError -EndTime '8/30/2014 11:59:59'
+    Get-CDscError -EndTime '8/30/2014 11:59:59'
 
     Demonstrates how to get errors that occurred *before* a given time.
 
     .EXAMPLE
-    Get-DscError -StartTime '8/1/2014 2:58 PM' -Wait -WaitTimeoutSeconds 5
+    Get-CDscError -StartTime '8/1/2014 2:58 PM' -Wait -WaitTimeoutSeconds 5
 
     Demonstrates how to wait for entries that match the specified criteria to appear in the event log. It can take several seconds between the time a log entry is written to when you can read it.
     #>
@@ -95,5 +95,5 @@ function Get-DscError
 
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
-    Get-DscWinEvent @PSBoundParameters -ID 4103 -Level ([Diagnostics.Eventing.Reader.StandardEventLevel]::Error)
+    Get-CDscWinEvent @PSBoundParameters -ID 4103 -Level ([Diagnostics.Eventing.Reader.StandardEventLevel]::Error)
 }

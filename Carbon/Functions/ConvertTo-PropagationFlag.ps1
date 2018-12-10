@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function ConvertTo-PropagationFlag
+function ConvertTo-CPropagationFlag
 {
     <#
     .SYNOPSIS
@@ -23,13 +23,13 @@ function ConvertTo-PropagationFlag
     System.Security.AccessControl.PropagationFlags.
     
     .LINK
-    ConvertTo-InheritanceFlag
+    ConvertTo-CInheritanceFlag
     
     .LINK
-    Grant-Permission
+    Grant-CPermission
     
     .EXAMPLE
-    ConvertTo-PropagationFlag -ContainerInheritanceFlag ContainerAndSubContainersAndLeaves
+    ConvertTo-CPropagationFlag -ContainerInheritanceFlag ContainerAndSubContainersAndLeaves
     
     Returns `PropagationFlags.None`.
     #>
@@ -71,5 +71,5 @@ function ConvertTo-PropagationFlag
     Write-Error ('Unknown Carbon.Security.ContainerInheritanceFlags enumeration value {0}.' -f $ContainerInheritanceFlag) 
 }
 
-Set-Alias -Name 'ConvertTo-PropagationFlags' -Value 'ConvertTo-PropagationFlag'
+Set-Alias -Name 'ConvertTo-PropagationFlags' -Value 'ConvertTo-CPropagationFlag'
 

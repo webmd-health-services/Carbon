@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Set-IisWebsiteSslCertificate
+function Set-CIisWebsiteSslCertificate
 {
     <#
     .SYNOPSIS
@@ -22,7 +22,7 @@ function Set-IisWebsiteSslCertificate
     Beginning with Carbon 2.0.1, this function is available only if IIS is installed.
 
     .EXAMPLE
-    Set-IisWebsiteSslCertificate -SiteName Peanuts -Thumbprint 'a909502dd82ae41433e6f83886b00d4277a32a7b' -ApplicationID $PeanutsAppID
+    Set-CIisWebsiteSslCertificate -SiteName Peanuts -Thumbprint 'a909502dd82ae41433e6f83886b00d4277a32a7b' -ApplicationID $PeanutsAppID
 
     Binds the certificate whose thumbprint is `a909502dd82ae41433e6f83886b00d4277a32a7b` to the `Peanuts` website.  It's a good idea to re-use the same GUID for each distinct application.
     #>
@@ -48,7 +48,7 @@ function Set-IisWebsiteSslCertificate
 
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
-    $site = Get-IisWebsite -SiteName $SiteName
+    $site = Get-CIisWebsite -SiteName $SiteName
     if( -not $site ) 
     {
         Write-Error "Unable to find website '$SiteName'."
@@ -65,7 +65,7 @@ function Set-IisWebsiteSslCertificate
         {
             $installArgs.Port = $_.Endpoint.Port
         }
-        Set-SslCertificateBinding @installArgs -ApplicationID $ApplicationID -Thumbprint $Thumbprint
+        Set-CSslCertificateBinding @installArgs -ApplicationID $ApplicationID -Thumbprint $Thumbprint
     }
 }
 

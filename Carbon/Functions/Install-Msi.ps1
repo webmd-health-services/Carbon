@@ -10,28 +10,28 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Install-Msi
+function Install-CMsi
 {
     <#
     .SYNOPSIS
     Installs software from an MSI file.
 
     .DESCRIPTION
-    `Install-Msi` installs software from an MSI file. If the install fails, it writes an error. Installation is always done in quiet mode, i.e. you won't see any UI.
+    `Install-CMsi` installs software from an MSI file. If the install fails, it writes an error. Installation is always done in quiet mode, i.e. you won't see any UI.
 
     In Carbon 1.9 and earlier, this function was called `Invoke-WindowsInstaller`.
 
-    Beginning with Carbon 2.0, `Install-Msi` only runs the MSI if the software isn't installed. Use the `-Force` switch to always run the installer.
+    Beginning with Carbon 2.0, `Install-CMsi` only runs the MSI if the software isn't installed. Use the `-Force` switch to always run the installer.
     
     .EXAMPLE
-    Install-Msi -Path Path\to\installer.msi
+    Install-CMsi -Path Path\to\installer.msi
     
     Runs installer.msi, and waits untils for the installer to finish.  If the installer has a UI, it is shown to the user.
 
     .EXAMPLE
-    Get-ChildItem *.msi | Install-Msi
+    Get-ChildItem *.msi | Install-CMsi
 
-    Demonstrates how to pipe MSI files into `Install-Msi` for installation.
+    Demonstrates how to pipe MSI files into `Install-CMsi` for installation.
     #>
     [CmdletBinding(SupportsShouldProcess=$true)]
     param(
@@ -57,17 +57,17 @@ function Install-Msi
 
     if( $PSBoundParameters.ContainsKey( 'Quiet' ) )
     {
-        Write-Warning ('Install-Msi''s `Quiet` switch is obsolete and will be removed in a future major version of Carbon. Installers are run in quiet mode by default. Please remove usages of the `Quiet` switch.')
+        Write-Warning ('Install-CMsi''s `Quiet` switch is obsolete and will be removed in a future major version of Carbon. Installers are run in quiet mode by default. Please remove usages of the `Quiet` switch.')
     }
 
-    Get-Msi -Path $Path |
+    Get-CMsi -Path $Path |
         Where-Object {
             if( $Force )
             {
                 return $true
             }
 
-            $installInfo = Get-ProgramInstallInfo -Name $_.ProductName -ErrorAction Ignore
+            $installInfo = Get-CProgramInstallInfo -Name $_.ProductName -ErrorAction Ignore
             if( -not $installInfo )
             {
                 return $true
@@ -95,4 +95,4 @@ function Install-Msi
         }
 }
 
-Set-Alias -Name 'Invoke-WindowsInstaller' -Value 'Install-Msi'
+Set-Alias -Name 'Invoke-WindowsInstaller' -Value 'Install-CMsi'

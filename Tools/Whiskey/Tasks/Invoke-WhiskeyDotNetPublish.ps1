@@ -17,6 +17,8 @@ function Invoke-WhiskeyDotNetPublish
     Set-StrictMode -Version 'Latest'
     Use-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState
 
+    Write-Warning -Message ('The "DotNetPublish" task is obsolete and will be removed in a future version of Whiskey. Please use the "DotNet" task instead.')
+
     $dotnetExe = $TaskParameter['DotNetPath']
 
     $projectPaths = ''

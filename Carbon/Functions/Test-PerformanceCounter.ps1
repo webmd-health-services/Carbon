@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Test-PerformanceCounter
+function Test-CPerformanceCounter
 {
     <#
     .SYNOPSIS
@@ -20,7 +20,7 @@ function Test-PerformanceCounter
     Returns `True` if counter `Name` exists in category `CategoryName`.  `False` if it does not exist or the category doesn't exist.
 
     .EXAMPLE
-    Test-PerformanceCounter -CategoryName 'ToyotaCamry' -Name 'MilesPerGallon'
+    Test-CPerformanceCounter -CategoryName 'ToyotaCamry' -Name 'MilesPerGallon'
 
     Returns `True` if the `ToyotaCamry` performance counter category has a `MilesPerGallon` counter.  `False` if the counter doesn't exist.
     #>
@@ -41,7 +41,7 @@ function Test-PerformanceCounter
 
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
-    if( (Test-PerformanceCounterCategory -CategoryName $CategoryName) )
+    if( (Test-CPerformanceCounterCategory -CategoryName $CategoryName) )
     {
         return [Diagnostics.PerformanceCounterCategory]::CounterExists( $Name, $CategoryName )
     }

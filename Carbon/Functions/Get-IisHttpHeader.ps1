@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Get-IisHttpHeader
+function Get-CIisHttpHeader
 {
     <#
     .SYNOPSIS
@@ -28,20 +28,20 @@ function Get-IisHttpHeader
     Carbon.Iis.HttpHeader.
     
     .LINK
-    Set-IisHttpHeader
+    Set-CIisHttpHeader
     
     .EXAMPLE
-    Get-IisHttpHeader -SiteName SopwithCamel
+    Get-CIisHttpHeader -SiteName SopwithCamel
     
     Returns the HTTP headers for the `SopwithCamel` website.
     
     .EXAMPLE
-    Get-IisHttpHeader -SiteName SopwithCamel -Path Engine
+    Get-CIisHttpHeader -SiteName SopwithCamel -Path Engine
     
     Returns the HTTP headers for the `Engine` directory under the `SopwithCamel` website.
     
     .EXAMPLE
-    Get-IisHttpHeader -SiteName SopwithCambel -Name 'X-*'
+    Get-CIisHttpHeader -SiteName SopwithCambel -Name 'X-*'
     
     Returns all HTTP headers which match the `X-*` wildcard.
     #>
@@ -66,7 +66,7 @@ function Get-IisHttpHeader
 
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
-    $httpProtocol = Get-IisConfigurationSection -SiteName $SiteName `
+    $httpProtocol = Get-CIisConfigurationSection -SiteName $SiteName `
                                                 -VirtualPath $VirtualPath `
                                                 -SectionPath 'system.webServer/httpProtocol'
     $httpProtocol.GetCollection('customHeaders') |

@@ -10,14 +10,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Get-FileSharePermission
+function Get-CFileSharePermission
 {
     <#
     .SYNOPSIS
     Gets the sharing permissions on a file/SMB share.
 
     .DESCRIPTION
-    The `Get-FileSharePermission` function uses WMI to get the sharing permission on a file/SMB share. It returns the permissions as a `Carbon.Security.ShareAccessRule` object, which has the following properties:
+    The `Get-CFileSharePermission` function uses WMI to get the sharing permission on a file/SMB share. It returns the permissions as a `Carbon.Security.ShareAccessRule` object, which has the following properties:
 
      * ShareRights: the rights the user/group has on the share.
      * IdentityReference: an `Security.Principal.NTAccount` for the user/group who has permission.
@@ -34,22 +34,22 @@ function Get-FileSharePermission
 
     Use the `Identity` parameter to get a specific user/group's permissions. Wildcards are supported.
 
-    `Get-FileSharePermission` was added in Carbon 2.0.
+    `Get-CFileSharePermission` was added in Carbon 2.0.
 
     .LINK
-    Get-FileShare
+    Get-CFileShare
 
     .LINK
-    Install-FileShare
+    Install-CFileShare
 
     .LINK
-    Test-FileShare
+    Test-CFileShare
 
     .LINK
-    Uninstall-FileShare
+    Uninstall-CFileShare
 
     .EXAMPLE
-    Get-FileSharePermission -Name 'Build'
+    Get-CFileSharePermission -Name 'Build'
 
     Demonstrates how to get all the permissions on the `Build` share.
     #>
@@ -70,7 +70,7 @@ function Get-FileSharePermission
 
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
-    $share = Get-FileShare -Name $Name
+    $share = Get-CFileShare -Name $Name
     if( -not $share )
     {
         return
@@ -80,7 +80,7 @@ function Get-FileSharePermission
     {
         if( -not [System.Management.Automation.WildcardPattern]::ContainsWildcardCharacters( $Identity ) )
         {
-            $Identity = Resolve-IdentityName -Name $Identity -ErrorAction $ErrorActionPreference
+            $Identity = Resolve-CIdentityName -Name $Identity -ErrorAction $ErrorActionPreference
             if( -not $Identity )
             {
                 return

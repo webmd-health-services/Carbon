@@ -10,14 +10,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Remove-DotNetAppSetting
+function Remove-CDotNetAppSetting
 {
     <#
     .SYNOPSIS
     Remove an app setting from the .NET machine.config file.
     
     .DESCRIPTION
-    The `Remove-DotNetAppSetting` removes an app setting from one or more of the .NET machine.config file. The app setting can be removed from up to four different machine.config files:
+    The `Remove-CDotNetAppSetting` removes an app setting from one or more of the .NET machine.config file. The app setting can be removed from up to four different machine.config files:
     
      * .NET 2.0 32-bit (switches -Clr2 -Framework)
      * .NET 2.0 64-bit (switches -Clr2 -Framework64)
@@ -28,16 +28,16 @@ function Remove-DotNetAppSetting
 
     If the app setting doesn't exist in the machine.config, nothing happens.
 
-    `Remove-DotNetAppSetting` was added in Carbon 2.2.0.
+    `Remove-CDotNetAppSetting` was added in Carbon 2.2.0.
     
     .LINK
-    Set-DotNetAppSetting
+    Set-CDotNetAppSetting
 
     .LINK
-    Set-DotNetConnectionString
+    Set-CDotNetConnectionString
 
     .EXAMPLE
-    > Remove-DotNetAppSetting -Name ExampleUrl -Framework -Framework64 -Clr2 -Clr4
+    > Remove-CDotNetAppSetting -Name ExampleUrl -Framework -Framework64 -Clr2 -Clr4
     
     Remvoes the `ExampleUrl` app setting from the following machine.config files:
     
@@ -47,7 +47,7 @@ function Remove-DotNetAppSetting
      * `%SYSTEMROOT%\Microsoft.NET\Framework64\v4.0.30319\CONFIG\machine.config`
 
     .EXAMPLE
-    > Remove-DotNetAppSetting -Name ExampleUrl -Framework64 -Clr4
+    > Remove-CDotNetAppSetting -Name ExampleUrl -Framework64 -Clr4
     
     Sets the ExampleUrl app setting in the following machine.config file:
     
@@ -107,7 +107,7 @@ function Remove-DotNetAppSetting
         $params = @{
             FilePath = (Join-Path $CarbonBinDir 'Remove-DotNetAppSetting.ps1' -Resolve);
             ArgumentList = @( 
-                                (ConvertTo-Base64 -Value $Name)
+                                (ConvertTo-CBase64 -Value $Name)
                             );
             Runtime = $_;
             ExecutionPolicy = [Microsoft.PowerShell.ExecutionPolicy]::RemoteSigned;
@@ -115,12 +115,12 @@ function Remove-DotNetAppSetting
         
         if( $Framework )
         {    
-            Invoke-PowerShell @params -x86
+            Invoke-CPowerShell @params -x86
         }
         
         if( $Framework64 )
         {
-            Invoke-PowerShell @params
+            Invoke-CPowerShell @params
         }
     }
 }

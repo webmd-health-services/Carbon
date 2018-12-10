@@ -10,32 +10,32 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Get-Group
+function Get-CGroup
 {
     <#
     .SYNOPSIS
     Gets *local* groups.
 
     .DESCRIPTION
-    `Get-Group` gets all *local* groups or a specific group by its name.
+    `Get-CGroup` gets all *local* groups or a specific group by its name.
 
     The objects returned, `DirectoryServices.AccountManagement.GroupPrincipal`, use external resources, which means they don't clean up propertly when garbage collected, resulting in memory leaks. You should call `Dispose()` on the objects you receieve from this function when you're done using them so these external resources can be cleaned up correctly.
 
-    `Get-Group` is new in Carbon 2.0.
+    `Get-CGroup` is new in Carbon 2.0.
 
     .OUTPUTS
     System.DirectoryServices.AccountManagement.GroupPrincipal.
 
     .LINK
-    Get-User
+    Get-CUser
 
     .EXAMPLE
-    Get-Group
+    Get-CGroup
 
     Demonstrates how to get all local groups.
 
     .EXAMPLE
-    Get-Group -Name RebelAlliance
+    Get-CGroup -Name RebelAlliance
 
     Demonstrates how to get a specific group.
     #>

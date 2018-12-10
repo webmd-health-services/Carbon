@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function ConvertFrom-Base64
+function ConvertFrom-CBase64
 {
     <#
     .SYNOPSIS
@@ -22,22 +22,22 @@ function ConvertFrom-Base64
     You're actually allowed to pass in `$null` and an empty string.  If you do, you'll get `$null` and an empty string back.
 
     .LINK
-    ConvertTo-Base64
+    ConvertTo-CBase64
     
     .EXAMPLE
-    ConvertFrom-Base64 -Value 'RW5jb2RlIG1lLCBwbGVhc2Uh'
+    ConvertFrom-CBase64 -Value 'RW5jb2RlIG1lLCBwbGVhc2Uh'
     
     Decodes `RW5jb2RlIG1lLCBwbGVhc2Uh` back into its original string.
     
     .EXAMPLE
-    ConvertFrom-Base64 -Value 'RW5jb2RlIG1lLCBwbGVhc2Uh' -Encoding ([Text.Encoding]::ASCII)
+    ConvertFrom-CBase64 -Value 'RW5jb2RlIG1lLCBwbGVhc2Uh' -Encoding ([Text.Encoding]::ASCII)
     
     Shows how to specify a custom encoding in case your string isn't in Unicode text encoding.
     
     .EXAMPLE
-    'RW5jb2RlIG1lIQ==' | ConvertTo-Base64
+    'RW5jb2RlIG1lIQ==' | ConvertTo-CBase64
     
-    Shows how you can pipeline input into `ConvertFrom-Base64`.
+    Shows how you can pipeline input into `ConvertFrom-CBase64`.
     #>
     [CmdletBinding()]
     param(

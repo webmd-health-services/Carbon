@@ -10,27 +10,27 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Write-DscError
+function Write-CDscError
 {
     <#
     .SYNOPSIS
     Writes DSC errors out as errors.
 
     .DESCRIPTION
-    The Local Configuration Manager (LCM) applies configuration in a separate process space as a background service which writes its errors to the `Microsoft-Windows-DSC/Operational` event log. This function is intended to be used with `Get-DscError`, and will write errors returned by that function as PowerShell errors.
+    The Local Configuration Manager (LCM) applies configuration in a separate process space as a background service which writes its errors to the `Microsoft-Windows-DSC/Operational` event log. This function is intended to be used with `Get-CDscError`, and will write errors returned by that function as PowerShell errors.
 
-    `Write-DscError` is new in Carbon 2.0.
+    `Write-CDscError` is new in Carbon 2.0.
 
     .OUTPUTS
     System.Diagnostics.Eventing.Reader.EventLogRecord
 
     .LINK
-    Get-DscError
+    Get-CDscError
 
     .EXAMPLE
-    Get-DscError | Write-DscError
+    Get-CDscError | Write-CDscError
 
-    Demonstrates how `Write-DscError` is intended to be used. `Get-DscError` gets the appropriate event objects that `Write-DscError` writes out.
+    Demonstrates how `Write-CDscError` is intended to be used. `Get-CDscError` gets the appropriate event objects that `Write-CDscError` writes out.
     #>
     [CmdletBinding()]
     [OutputType([Diagnostics.Eventing.Reader.EventLogRecord])]

@@ -18,6 +18,8 @@ function Invoke-WhiskeyNodeNspCheck
     Set-StrictMode -Version 'Latest'
     Use-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState
 
+    Write-Warning -Message ('The "NodeNspCheck" task is obsolete and will be removed in a future version of Whiskey. Please use the "NpmAudit" task instead. The NSP project died in September 2018 and was replaced with the `npm audit` command.')
+
     $nspPath = Assert-WhiskeyNodeModulePath -Path $TaskParameter['NspPath'] -CommandPath 'bin\nsp' -ErrorAction Stop
 
     $nodePath = Assert-WhiskeyNodePath -Path $TaskParameter['NodePath'] -ErrorAction Stop

@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Test-PowerShellIs32Bit
+function Test-CPowerShellIs32Bit
 {
     <#
     .SYNOPSIS
@@ -26,7 +26,7 @@ function Test-PowerShellIs32Bit
     http://msdn.microsoft.com/en-us/library/system.environment.is64bitprocess.aspx
 
     .EXAMPLE
-    Test-PowerShellIs32Bit
+    Test-CPowerShellIs32Bit
 
     Returns `True` if PowerShell is 32-bit/x86, `False` if it is 64-bit/x64.
     #>
@@ -38,5 +38,5 @@ function Test-PowerShellIs32Bit
 
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
-    return -not (Test-PowerShellIs64Bit)
+    return -not (Test-CPowerShellIs64Bit)
 }

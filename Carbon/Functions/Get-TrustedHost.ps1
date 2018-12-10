@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Get-TrustedHost
+function Get-CTrustedHost
 {
     <#
     .SYNOPSIS
@@ -23,7 +23,7 @@ function Get-TrustedHost
     System.String.
 
     .EXAMPLE
-    Get-TrustedHost
+    Get-CTrustedHost
 
     If the trusted hosts lists contains `example.com`, `api.example.com`, and `docs.example.com`, returns the following:
 
@@ -46,4 +46,4 @@ function Get-TrustedHost
     }
 }
 
-Set-Alias -Name 'Get-TrustedHosts' -Value 'Get-TrustedHost'
+Set-Alias -Name 'Get-TrustedHosts' -Value 'Get-CTrustedHost'

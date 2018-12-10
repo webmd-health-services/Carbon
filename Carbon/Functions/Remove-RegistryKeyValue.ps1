@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Remove-RegistryKeyValue
+function Remove-CRegistryKeyValue
 {
     <#
     .SYNOPSIS
@@ -20,7 +20,7 @@ function Remove-RegistryKeyValue
     If the given key doesn't exist, nothing happens.
     
     .EXAMPLE
-    Remove-RegistryKeyValue -Path hklm:\Software\Carbon\Test -Name 'InstallPath'
+    Remove-CRegistryKeyValue -Path hklm:\Software\Carbon\Test -Name 'InstallPath'
     
     Removes the `InstallPath` value from the `hklm:\Software\Carbon\Test` registry key.
     #>
@@ -41,7 +41,7 @@ function Remove-RegistryKeyValue
 
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
-    if( (Test-RegistryKeyValue -Path $Path -Name $Name) )
+    if( (Test-CRegistryKeyValue -Path $Path -Name $Name) )
     {
         if( $pscmdlet.ShouldProcess( ('Item: {0} Property: {1}' -f $Path,$Name), 'Remove Property' ) )
         {

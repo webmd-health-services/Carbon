@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Install-MsmqMessageQueue
+function Install-CMsmqMessageQueue
 {
     <#
     .SYNOPSIS
@@ -22,12 +22,12 @@ function Install-MsmqMessageQueue
     If the queue needs to be private, pass the `Private` switch.  If it needs to be transactional, set the `Transactional` switch.
     
     .EXAMPLE
-    Install-MsmqMessageQueue -Name MovieQueue
+    Install-CMsmqMessageQueue -Name MovieQueue
 
     Installs a public, non-transactional `MovieQueue`.
 
     .EXAMPLE
-    Install-MsmqMessageQueue -Name CriticsQueue -Private -Transactional
+    Install-CMsmqMessageQueue -Name CriticsQueue -Private -Transactional
 
     Installs a private, transactional `CriticsQueue` queue.
     #>
@@ -52,7 +52,7 @@ function Install-MsmqMessageQueue
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
     $queueArgs = @{ Name = $Name ; Private = $Private }
-    $path = Get-MsmqMessageQueuePath @queueArgs 
+    $path = Get-CMsmqMessageQueuePath @queueArgs 
     
     $cmdletArgs = @{ }
     if( $PSBoundParameters.ContainsKey( 'WhatIf' ) )
@@ -61,10 +61,10 @@ function Install-MsmqMessageQueue
     }
     
     $logMessage = "MSMQ message queue '$Name'."
-    if( Test-MsmqMessageQueue @queueArgs )
+    if( Test-CMsmqMessageQueue @queueArgs )
     {
         Write-Verbose "Re-creating $logMessage"
-        Uninstall-MsmqMessageQueue @queueArgs @cmdletArgs
+        Uninstall-CMsmqMessageQueue @queueArgs @cmdletArgs
     }
     else
     {
@@ -109,7 +109,7 @@ function Install-MsmqMessageQueue
         do
         {
             Start-Sleep -Milliseconds 100
-            if( (Test-MsmqMessageQueue @queueArgs) )
+            if( (Test-CMsmqMessageQueue @queueArgs) )
             {
                 $exists = $true
                 break

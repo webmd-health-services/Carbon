@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Get-RegistryKeyValue
+function Get-CRegistryKeyValue
 {
     <#
     .SYNOPSIS
@@ -20,7 +20,7 @@ function Get-RegistryKeyValue
     PowerShell's `Get-ItemProperty` cmdlet is a pain to use.  It doesn't actually return an object representing a registry key's value, but some other weird object that requires painful gyrations to get values from. This function returns just the value of a key.
     
     .EXAMPLE
-    Get-RegistryKeyValue -Path 'hklm:\Software\Carbon\Test' -Name 'Title'
+    Get-CRegistryKeyValue -Path 'hklm:\Software\Carbon\Test' -Name 'Title'
     
     Returns the value of the 'hklm:\Software\Carbon\Test' key's `Title` value.  
     #>
@@ -41,7 +41,7 @@ function Get-RegistryKeyValue
 
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
-    if( -not (Test-RegistryKeyValue -Path $Path -Name $Name) )
+    if( -not (Test-CRegistryKeyValue -Path $Path -Name $Name) )
     {
         return $null
     }

@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Test-FirewallStatefulFtp
+function Test-CFirewallStatefulFtp
 {
     <#
     .SYNOPSIS
@@ -25,10 +25,10 @@ function Test-FirewallStatefulFtp
     System.Boolean.
 
     .LINK
-    Assert-FirewallConfigurable
+    Assert-CFirewallConfigurable
 
     .EXAMPLE
-    Test-FirewallStatefulFtp
+    Test-CFirewallStatefulFtp
     
     Returns `True` if the firewall's `StatefulFtp` setting is enabled, `False` otherwise.
     #>
@@ -39,7 +39,7 @@ function Test-FirewallStatefulFtp
 
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
-    if( -not (Assert-FirewallConfigurable) )
+    if( -not (Assert-CFirewallConfigurable) )
     {
         return
     }

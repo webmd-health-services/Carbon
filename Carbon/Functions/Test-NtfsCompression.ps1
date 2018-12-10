@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Test-NtfsCompression
+function Test-CNtfsCompression
 {
     <#
     .SYNOPSIS
@@ -20,13 +20,13 @@ function Test-NtfsCompression
     Returns `$true` if compression is enabled, `$false` otherwise.
 
     .LINK
-    Disable-NtfsCompression
+    Disable-CNtfsCompression
 
     .LINK
-    Enable-NtfsCompression
+    Enable-CNtfsCompression
 
     .EXAMPLE
-    Test-NtfsCompression -Path C:\Projects\Carbon
+    Test-CNtfsCompression -Path C:\Projects\Carbon
 
     Returns `$true` if NTFS compression is enabled on `C:\Projects\CArbon`.  If it is disabled, returns `$false`.
     #>

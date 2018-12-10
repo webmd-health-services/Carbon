@@ -10,36 +10,36 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Test-GroupMember
+function Test-CGroupMember
 {
     <#
     .SYNOPSIS
     Tests if a user or group is a member of a *local* group.
 
     .DESCRIPTION
-    The `Test-GroupMember` function tests if a user or group is a member of a *local* group using [.NET's DirectoryServices.AccountManagement APIs](https://msdn.microsoft.com/en-us/library/system.directoryservices.accountmanagement.aspx). If the group or member you want to check don't exist, you'll get errors and `$null` will be returned. If `Member` is in the group, `$true` is returned. If `Member` is not in the group, `$false` is returned.
+    The `Test-CGroupMember` function tests if a user or group is a member of a *local* group using [.NET's DirectoryServices.AccountManagement APIs](https://msdn.microsoft.com/en-us/library/system.directoryservices.accountmanagement.aspx). If the group or member you want to check don't exist, you'll get errors and `$null` will be returned. If `Member` is in the group, `$true` is returned. If `Member` is not in the group, `$false` is returned.
 
     The user running this function must have permission to access whatever directory the `Member` is in and whatever directory current members of the group are in.
 
     This function was added in Carbon 2.1.0.
 
     .LINK
-    Add-GroupMember
+    Add-CGroupMember
 
     .LINK
-    Install-Group
+    Install-CGroup
 
     .LINK
-    Remove-GroupMember
+    Remove-CGroupMember
 
     .LINK
-    Test-Group
+    Test-CGroup
 
     .LINK
-    Uninstall-Group
+    Uninstall-CGroup
 
     .EXAMPLE
-    Test-GroupMember -GroupName 'SithLords' -Member 'REBELS\LSkywalker'
+    Test-CGroupMember -GroupName 'SithLords' -Member 'REBELS\LSkywalker'
 
     Demonstrates how to test if a user is a member of a group. In this case, it tests if `REBELS\LSkywalker` is in the local `SithLords`, *which obviously he isn't*, so `$false` is returned.
     #>
@@ -59,19 +59,19 @@ function Test-GroupMember
     Set-StrictMode -Version 'Latest'
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
-    if( -not (Test-Group -Name $GroupName) )
+    if( -not (Test-CGroup -Name $GroupName) )
     {
         Write-Error -Message ('Group ''{0}'' not found.' -f $GroupName)
         return
     }
 
-    $group = Get-Group -Name $GroupName
+    $group = Get-CGroup -Name $GroupName
     if( -not $group )
     {
         return
     }
     
-    $principal = Resolve-Identity -Name $Member
+    $principal = Resolve-CIdentity -Name $Member
     if( -not $principal )
     {
         return

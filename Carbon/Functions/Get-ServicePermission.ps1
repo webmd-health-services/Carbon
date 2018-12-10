@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Get-ServicePermission
+function Get-CServicePermission
 {
     <#
     .SYNOPSIS
@@ -32,12 +32,12 @@ function Get-ServicePermission
     Revoke-ServicePermissions
     
     .EXAMPLE
-    Get-ServicePermission -Name 'Hyperdrive'
+    Get-CServicePermission -Name 'Hyperdrive'
     
     Gets the access rules for the `Hyperdrive` service.
     
     .EXAMPLE
-    Get-ServicePermission -Name 'Hyperdrive' -Identity FALCON\HSolo
+    Get-CServicePermission -Name 'Hyperdrive' -Identity FALCON\HSolo
     
     Gets just Han's permissions to control the `Hyperdrive` service.
     #>
@@ -57,12 +57,12 @@ function Get-ServicePermission
 
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
-    $dacl = Get-ServiceAcl -Name $Name
+    $dacl = Get-CServiceAcl -Name $Name
     
     $account = $null
     if( $Identity )
     {
-        $account = Resolve-Identity -Name $Identity
+        $account = Resolve-CIdentity -Name $Identity
         if( -not $account )
         {
             return
@@ -110,5 +110,5 @@ function Get-ServicePermission
         }
 }
 
-Set-Alias -Name 'Get-ServicePermissions' -Value 'Get-ServicePermission'
+Set-Alias -Name 'Get-ServicePermissions' -Value 'Get-CServicePermission'
 
