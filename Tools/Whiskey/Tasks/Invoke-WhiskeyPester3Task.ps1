@@ -1,7 +1,8 @@
 
 function Invoke-WhiskeyPester3Task
 {
-    [Whiskey.Task("Pester3",SupportsClean=$true, SupportsInitialize=$true)]
+    [Whiskey.Task('Pester3')]
+    [Whiskey.RequiresTool('PowerShellModule::Pester','PesterPath',Version='3.*',VersionParameterName='Version')]
     [CmdletBinding()]
     param(
         [Parameter(Mandatory=$true)]
@@ -16,39 +17,6 @@ function Invoke-WhiskeyPester3Task
     Set-StrictMode -Version 'Latest'
     Use-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState
 
-    if( $TaskParameter.ContainsKey('Version') )
-    {
-        $version = $TaskParameter['Version'] | ConvertTo-WhiskeySemanticVersion
-        if( -not $version )
-        {
-            Stop-WhiskeyTask -TaskContext $TaskContext -message ('Property ''Version'' isn''t a valid version number. It must be a version number of the form MAJOR.MINOR.PATCH.')
-        }
-
-        if( $version.Major -ne 3)
-        {
-            Stop-WhiskeyTask -TaskContext $TaskContext -Message ('Version property''s value ''{0}'' is invalid. It must start with ''3.'' (i.e. the major version number must always be ''3'')."' -f $version)
-        }
-        
-        $version = [version]('{0}.{1}.{2}' -f $version.Major,$version.Minor,$version.Patch)
-    }
-    else
-    {
-        $version = '3.*'
-    }
-
-    if( $TaskContext.ShouldClean )
-    {
-        Uninstall-WhiskeyTool -ModuleName 'Pester' -BuildRoot $TaskContext.BuildRoot -Version $version
-        return
-    }
-    
-    $pesterModulePath = Install-WhiskeyTool -ModuleName 'Pester' -Version $version -DownloadRoot $TaskContext.BuildRoot
-
-    if( $TaskContext.ShouldInitialize )
-    {
-        return
-    }
-
     if( -not ($TaskParameter.ContainsKey('Path')))
     {
         Stop-WhiskeyTask -TaskContext $TaskContext -Message ('Element ''Path'' is mandatory. It should be one or more paths, which should be a list of Pester Tests to run with Pester3, e.g. 
@@ -62,17 +30,12 @@ function Invoke-WhiskeyPester3Task
 
     $path = $TaskParameter['Path'] | Resolve-WhiskeyTaskPath -TaskContext $TaskContext -PropertyName 'Path'
     
-    if( -not $pesterModulePath )
-    {
-        Stop-WhiskeyTask -TaskContext $TaskContext -Message ('Failed to download or install Pester {0}, most likely because version {0} does not exist. Available version numbers can be found at https://www.powershellgallery.com/packages/Pester' -f $version)
-    }
-
     $outputFile = Join-Path -Path $TaskContext.OutputDirectory -ChildPath ('pester+{0}.xml' -f [IO.Path]::GetRandomFileName())
 
     # We do this in the background so we can test this with Pester.
     $job = Start-Job -ScriptBlock {
         $script = $using:Path
-        $pesterModulePath = $using:pesterModulePath
+        $pesterModulePath = $using:TaskParameter['PesterPath']
         $outputFile = $using:outputFile
 
         Invoke-Command -ScriptBlock {
@@ -83,13 +46,21 @@ function Invoke-WhiskeyPester3Task
         Invoke-Pester -Script $script -OutputFile $outputFile -OutputFormat NUnitXml -PassThru
     } 
     
+    # There's a bug where Write-Host output gets duplicated by Receive-Job if $InformationPreference is set to "Continue".
+    # Since Pester uses Write-Host, this is a workaround to avoid seeing duplicate Pester output.
+    $informationActionParameter = @{ }
+    if( (Get-Command -Name 'Receive-Job' -ParameterName 'InformationAction') )
+    {
+        $informationActionParameter['InformationAction'] = 'SilentlyContinue'
+    }
+
     do
     {
-        $job | Receive-Job
+        $job | Receive-Job @informationActionParameter
     }
     while( -not ($job | Wait-Job -Timeout 1) )
 
-    $job | Receive-Job
+    $job | Receive-Job @informationActionParameter
 
     Publish-WhiskeyPesterTestResult -Path $outputFile
 

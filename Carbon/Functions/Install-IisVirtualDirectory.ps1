@@ -10,24 +10,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Install-IisVirtualDirectory
+function Install-CIisVirtualDirectory
 {
     <#
     .SYNOPSIS
     Installs a virtual directory.
 
     .DESCRIPTION
-    The `Install-IisVirtualDirectory` function creates a virtual directory under website `SiteName` at `/VirtualPath`, serving files out of `PhysicalPath`.  If a virtual directory at `VirtualPath` already exists, it is updated in palce. (Before Carbon 2.0, the virtual directory was deleted before installation.)
+    The `Install-CIisVirtualDirectory` function creates a virtual directory under website `SiteName` at `/VirtualPath`, serving files out of `PhysicalPath`.  If a virtual directory at `VirtualPath` already exists, it is updated in palce. (Before Carbon 2.0, the virtual directory was deleted before installation.)
 
     Beginning with Carbon 2.0.1, this function is available only if IIS is installed.
 
     .EXAMPLE
-    Install-IisVirtualDirectory -SiteName 'Peanuts' -VirtualPath 'DogHouse' -PhysicalPath C:\Peanuts\Doghouse
+    Install-CIisVirtualDirectory -SiteName 'Peanuts' -VirtualPath 'DogHouse' -PhysicalPath C:\Peanuts\Doghouse
 
     Creates a /DogHouse virtual directory, which serves files from the C:\Peanuts\Doghouse directory.  If the Peanuts website responds to hostname `peanuts.com`, the virtual directory is accessible at `peanuts.com/DogHouse`.
 
     .EXAMPLE
-    Install-IisVirtualDirectory -SiteName 'Peanuts' -VirtualPath 'Brown/Snoopy/DogHouse' -PhysicalPath C:\Peanuts\DogHouse
+    Install-CIisVirtualDirectory -SiteName 'Peanuts' -VirtualPath 'Brown/Snoopy/DogHouse' -PhysicalPath C:\Peanuts\DogHouse
 
     Creates a DogHouse virtual directory under the `Peanuts` website at `/Brown/Snoopy/DogHouse` serving files out of the `C:\Peanuts\DogHouse` directory.  If the Peanuts website responds to hostname `peanuts.com`, the virtual directory is accessible at `peanuts.com/Brown/Snoopy/DogHouse`.
     #>
@@ -63,7 +63,7 @@ function Install-IisVirtualDirectory
 
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
-    $site = Get-IisWebsite -Name $SiteName
+    $site = Get-CIisWebsite -Name $SiteName
     [Microsoft.Web.Administration.Application]$rootApp = $site.Applications | Where-Object { $_.Path -eq '/' }
     if( -not $rootApp )
     {
@@ -71,7 +71,7 @@ function Install-IisVirtualDirectory
         return
     }
 
-    $PhysicalPath = Resolve-FullPath -Path $PhysicalPath
+    $PhysicalPath = Resolve-CFullPath -Path $PhysicalPath
 
     $VirtualPath = $VirtualPath.Trim('/')
     $VirtualPath = '/{0}' -f $VirtualPath
@@ -84,7 +84,7 @@ function Install-IisVirtualDirectory
         $site.CommitChanges()
         $vdir = $null
 
-        $site = Get-IisWebsite -Name $SiteName
+        $site = Get-CIisWebsite -Name $SiteName
         $rootApp = $site.Applications | Where-Object { $_.Path -eq '/' }
     }
 

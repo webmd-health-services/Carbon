@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Get-ComSecurityDescriptor
+function Get-CComSecurityDescriptor
 {
     <#
     .SYNOPSIS
@@ -25,30 +25,30 @@ function Get-ComSecurityDescriptor
     http://msdn.microsoft.com/en-us/library/windows/desktop/aa394402.aspx
     
     .LINK
-    Get-ComPermission
+    Get-CComPermission
     
     .EXAMPLE
-    Get-ComSecurityDescriptor -Access -Default
+    Get-CComSecurityDescriptor -Access -Default
     
     Gets the default security descriptor for COM Access Permissions.
     
     .EXAMPLE
-    Get-ComSecurityDescriptor -Access -Limits
+    Get-CComSecurityDescriptor -Access -Limits
     
     Gets the security limits descriptor for COM Access Permissions.
     
     .EXAMPLE
-    Get-ComSecurityDescriptor -LaunchAndActivation -Default
+    Get-CComSecurityDescriptor -LaunchAndActivation -Default
     
     Gets the default security descriptor for COM Launch and Activation Permissions.
     
     .EXAMPLE
-    Get-ComSecurityDescriptor -LaunchAndActivation -Limits
+    Get-CComSecurityDescriptor -LaunchAndActivation -Limits
     
     Gets the security limits descriptor for COM Launch and Activation Permissions.
 
     .EXAMPLE
-    Get-ComSecurityDescriptor -Access -Default -AsComAccessRule
+    Get-CComSecurityDescriptor -Access -Default -AsComAccessRule
     
     Returns a `Carbon.Security.ComAccessRule` object for each of the access control entries in the Access Permissions's default security descriptor.
     #>
@@ -89,7 +89,7 @@ function Get-ComSecurityDescriptor
 
     $regValueName = $pscmdlet.ParameterSetName
     
-    $bytes = Get-RegistryKeyValue -Path $ComRegKeyPath -Name $regValueName
+    $bytes = Get-CRegistryKeyValue -Path $ComRegKeyPath -Name $regValueName
     
     $converter = New-Object Management.ManagementClass 'Win32_SecurityDescriptorHelper'
 

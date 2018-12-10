@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Complete-Job
+function Complete-CJob
 {
     <#
     .SYNOPSIS
@@ -22,7 +22,7 @@ function Complete-Job
     .EXAMPLE
     Get-Job | Wait-Job
 
-    Demonstrates that `Complete-Job` is OBSOLETE and you should use PowerShell's `Wait-Job` cmdlet instead.
+    Demonstrates that `Complete-CJob` is OBSOLETE and you should use PowerShell's `Wait-Job` cmdlet instead.
     #>
     [CmdletBinding()]
     param(
@@ -40,7 +40,7 @@ function Complete-Job
 
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
-    Write-Warning ('Complete-Job is obsolete and will be removed in a future major version of Carbon. Use PowerShell''s `Wait-Job` cmdlet instead.')
+    Write-Warning ('Complete-CJob is obsolete and will be removed in a future major version of Carbon. Use PowerShell''s `Wait-Job` cmdlet instead.')
     
     $errorAction = 'Continue'
     $params = $PSBoundParameters
@@ -119,4 +119,4 @@ function Complete-Job
      return $numFailed
 }
 
-Set-Alias -Name 'Complete-Jobs' -Value 'Complete-Job'
+Set-Alias -Name 'Complete-Jobs' -Value 'Complete-CJob'

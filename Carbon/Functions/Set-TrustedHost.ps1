@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Set-TrustedHost
+function Set-CTrustedHost
 {
     <#
     .SYNOPSIS
@@ -19,13 +19,13 @@ function Set-TrustedHost
     .DESCRIPTION
     Clears the current trusted hosts list, and sets it to contain only the entries given by the `Entries` parameter.
     
-    To clear the trusted hosts list, use `Clear-TrustedHost`.
+    To clear the trusted hosts list, use `Clear-CTrustedHost`.
     
     .LINK
-    Clear-TrustedHost
+    Clear-CTrustedHost
 
     .EXAMPLE
-    Set-TrustedHost -Entry example.com,api.example.com,docs.example.com
+    Set-CTrustedHost -Entry example.com,api.example.com,docs.example.com
 
     Sets the trusted hosts list to contain just the values `example.com`, `api.example.com`, and `docs.example.com`.
     #>
@@ -49,5 +49,5 @@ function Set-TrustedHost
     }
 }
 
-Set-Alias -Name 'Set-TrustedHosts' -Value 'Set-TrustedHost'
+Set-Alias -Name 'Set-TrustedHosts' -Value 'Set-CTrustedHost'
 

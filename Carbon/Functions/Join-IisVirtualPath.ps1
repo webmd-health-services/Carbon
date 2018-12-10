@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Join-IisVirtualPath
+function Join-CIisVirtualPath
 {
     <#
     .SYNOPSIS
@@ -22,7 +22,7 @@ function Join-IisVirtualPath
     Beginning with Carbon 2.0.1, this function is available only if IIS is installed.
 
     .EXAMPLE
-    Join-IisVirtualPath 'SiteName' 'Virtual/Path'
+    Join-CIisVirtualPath 'SiteName' 'Virtual/Path'
 
     Demonstrates how to join two IIS paths together.  REturns `SiteName/Virtual/Path`.
     #>

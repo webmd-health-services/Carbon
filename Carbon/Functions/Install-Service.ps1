@@ -10,14 +10,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Install-Service
+function Install-CService
 {
     <#
     .SYNOPSIS
     Installs a Windows service.
 
     .DESCRIPTION
-    `Install-Service` uses `sc.exe` to install a Windows service. If a service with the given name already exists, it is stopped, its configuration is updated to match the parameters passed in, and then re-started. Settings whose parameters are omitted are reset to their default values.
+    `Install-CService` uses `sc.exe` to install a Windows service. If a service with the given name already exists, it is stopped, its configuration is updated to match the parameters passed in, and then re-started. Settings whose parameters are omitted are reset to their default values.
     
     Beginning in Carbon 2.0, use the `PassThru` switch to return a `ServiceController` object for the new/updated service.
 
@@ -35,48 +35,48 @@ function Install-Service
     Carbon_Service
 
     .LINK
-    New-Credential
+    New-CCredential
 
     .LINK
-    Uninstall-Service
+    Uninstall-CService
 
     .LINK
     http://technet.microsoft.com/en-us/library/dd548356.aspx
 
     .EXAMPLE
-    Install-Service -Name DeathStar -Path C:\ALongTimeAgo\InAGalaxyFarFarAway\DeathStar.exe
+    Install-CService -Name DeathStar -Path C:\ALongTimeAgo\InAGalaxyFarFarAway\DeathStar.exe
 
     Installs the Death Star service, which runs the service executable at `C:\ALongTimeAgo\InAGalaxyFarFarAway\DeathStar.exe`.  The service runs as `NetworkService` and will start automatically.
 
     .EXAMPLE
-    Install-Service -Name DeathStar -Path C:\ALongTimeAgo\InAGalaxyFarFarAway\DeathStar.exe -StartupType Manual
+    Install-CService -Name DeathStar -Path C:\ALongTimeAgo\InAGalaxyFarFarAway\DeathStar.exe -StartupType Manual
 
     Install the Death Star service to startup manually.  You certainly don't want the thing roaming the galaxy, destroying thing willy-nilly, do you?
 
     .EXAMPLE
-    Install-Service -Name DeathStar -Path C:\ALongTimeAgo\InAGalaxyFarFarAway\DeathStar.exe -StartupType Automatic -Delayed
+    Install-CService -Name DeathStar -Path C:\ALongTimeAgo\InAGalaxyFarFarAway\DeathStar.exe -StartupType Automatic -Delayed
 
     Demonstrates how to set a service startup typemode to automatic delayed. Set the `StartupType` parameter to `Automatic` and provide the `Delayed` switch. This behavior was added in Carbon 2.5.
 
     .EXAMPLE
-    Install-Service -Name DeathStar -Path C:\ALongTimeAgo\InAGalaxyFarFarAway\DeathStar.exe -Credential $tarkinCredentials
+    Install-CService -Name DeathStar -Path C:\ALongTimeAgo\InAGalaxyFarFarAway\DeathStar.exe -Credential $tarkinCredentials
 
     Installs the Death Star service to run as Grand Moff Tarkin, who is given the log on as a service right.
 
     .EXAMPLE
-    Install-Service -Name DeathStar -Path C:\ALongTimeAgo\InAGalaxyFarFarAway\DeathStar.exe -Username SYSTEM
+    Install-CService -Name DeathStar -Path C:\ALongTimeAgo\InAGalaxyFarFarAway\DeathStar.exe -Username SYSTEM
 
     Demonstrates how to install a service to run as a system account other than `NetworkService`. Installs the DeathStart service to run as the local `System` account.
 
     .EXAMPLE
-    Install-Service -Name DeathStar -Path C:\ALongTimeAgo\InAGalaxyFarFarAway\DeathStar.exe -OnFirstFailure RunCommand -RunCommandDelay 5000 -Command 'engage_hyperdrive.exe "Corruscant"' -OnSecondFailure Restart -RestartDelay 30000 -OnThirdFailure Reboot -RebootDelay 120000 -ResetFailureCount (60*60*24)
+    Install-CService -Name DeathStar -Path C:\ALongTimeAgo\InAGalaxyFarFarAway\DeathStar.exe -OnFirstFailure RunCommand -RunCommandDelay 5000 -Command 'engage_hyperdrive.exe "Corruscant"' -OnSecondFailure Restart -RestartDelay 30000 -OnThirdFailure Reboot -RebootDelay 120000 -ResetFailureCount (60*60*24)
 
     Demonstrates how to control the service's failure actions. On the first failure, Windows will run the `engage-hyperdrive.exe "Corruscant"` command after 5 seconds (`5,000` milliseconds). On the second failure, Windows will restart the service after 30 seconds (`30,000` milliseconds). On the third failure, Windows will reboot after two minutes (`120,000` milliseconds). The failure count gets reset once a day (`60*60*24` seconds).
 
     .EXAMPLE
-    Install-Service -Name DeathStar -Path C:\ALongTimeAgo\InAGalaxyFarFarAway\DeathStar.exe -EnsureRunning
+    Install-CService -Name DeathStar -Path C:\ALongTimeAgo\InAGalaxyFarFarAway\DeathStar.exe -EnsureRunning
 
-    Demonstrates how to ensure a service gets started after installation/configuration. Normally, `Install-Service` leaves the service in whatever state the service was in. The `EnsureRunnnig` switch will attempt to start the service even if it was stopped to begin with.
+    Demonstrates how to ensure a service gets started after installation/configuration. Normally, `Install-CService` leaves the service in whatever state the service was in. The `EnsureRunnnig` switch will attempt to start the service even if it was stopped to begin with.
     #>
     [CmdletBinding(SupportsShouldProcess=$true,DefaultParameterSetName='NetworkServiceAccount')]
     [OutputType([ServiceProcess.ServiceController])]
@@ -224,8 +224,8 @@ function Install-Service
         }
         elseif( $Password )
         {
-            Write-Warning ('`Install-Service` function''s `Password` parameter is obsolete and will be removed in a future major version of Carbon. Please use the `Credential` parameter instead.')
-            $Credential = New-Credential -UserName $UserName -Password $Password
+            Write-Warning ('`Install-CService` function''s `Password` parameter is obsolete and will be removed in a future major version of Carbon. Please use the `Credential` parameter instead.')
+            $Credential = New-CCredential -UserName $UserName -Password $Password
         }
         else
         {
@@ -233,7 +233,7 @@ function Install-Service
         }
 
 
-        $identity = Resolve-Identity -Name $UserName
+        $identity = Resolve-CIdentity -Name $UserName
 
         if( -not $identity )
         {
@@ -243,7 +243,7 @@ function Install-Service
     }
     else
     {
-        $identity = Resolve-Identity "NetworkService"
+        $identity = Resolve-CIdentity "NetworkService"
     }
     
     if( -not (Test-Path -Path $Path -PathType Leaf) )
@@ -255,32 +255,33 @@ function Install-Service
         $Path = Resolve-Path -Path $Path | Select-Object -ExpandProperty ProviderPath
     }
 
-    if( $ArgumentList )
-    {
-        $binPathArg = Invoke-Command -ScriptBlock {
-                            $Path
-                            $ArgumentList 
-                        } |
-                        ForEach-Object { 
-                            if( $_.Contains(' ') )
-                            {
-                                return '"{0}"' -f $_.Trim('"')
-                            }
-                            return $_
-                        }
-        $binPathArg = $binPathArg -join ' '
-    }
-    else
-    {
-        $binPathArg = $Path
+
+    if( $ArgumentList )	
+    {	
+        $binPathArg = Invoke-Command -ScriptBlock {	
+                            $Path	
+                            $ArgumentList 	
+                        } |	
+                        ForEach-Object { 	
+                            if( $_.Contains(' ') )	
+                            {	
+                                return '"{0}"' -f $_.Trim('"')	
+                            }	
+                            return $_	
+                        }	
+        $binPathArg = $binPathArg -join ' '	
+    }	
+    else	
+    {	
+        $binPathArg = $Path	
     }
 
     $doInstall = $false
-    if( -not $Force -and (Test-Service -Name $Name) )
+    if( -not $Force -and (Test-CService -Name $Name) )
     {
         Write-Debug -Message ('Service {0} exists. Checking if configuration has changed.' -f $Name)
         $service = Get-Service -Name $Name
-        $serviceConfig = Get-ServiceConfiguration -Name $Name
+        $serviceConfig = Get-CServiceConfiguration -Name $Name
         $dependedOnServiceNames = $service.ServicesDependedOn | Select-Object -ExpandProperty 'Name'
 
         if( $service.Path -ne $binPathArg )
@@ -383,7 +384,7 @@ function Install-Service
             $doInstall = $true
         }
 
-        $currentIdentity = Resolve-Identity $serviceConfig.UserName
+        $currentIdentity = Resolve-CIdentity $serviceConfig.UserName
         if( $currentIdentity.FullName -ne $identity.FullName )
         {
             Write-Verbose ('[{0}] UserName          {1} -> {2}' -f $Name,$currentIdentity.FullName,$identity.FullName)
@@ -408,7 +409,7 @@ function Install-Service
             $missingDependencies = $false
             $Dependency | 
                 ForEach-Object {
-                    if( -not (Test-Service -Name $_) )
+                    if( -not (Test-CService -Name $_) )
                     {
                         Write-Error ('Dependent service {0} not found.' -f $_)
                         $missingDependencies = $true
@@ -448,13 +449,13 @@ function Install-Service
         
             if( $PSCmdlet.ShouldProcess( $identity.FullName, "grant the log on as a service right" ) )
             {
-                Grant-Privilege -Identity $identity.FullName -Privilege SeServiceLogonRight
+                Grant-CPrivilege -Identity $identity.FullName -Privilege SeServiceLogonRight
             }
         }
     
         if( $PSCmdlet.ShouldProcess( $Path, ('grant {0} ReadAndExecute permissions' -f $identity.FullName) ) )
         {
-            Grant-Permission -Identity $identity.FullName -Permission ReadAndExecute -Path $Path
+            Grant-CPermission -Identity $identity.FullName -Permission ReadAndExecute -Path $Path
         }
     
         $service = Get-Service -Name $Name -ErrorAction Ignore
@@ -510,6 +511,7 @@ function Install-Service
         $binPathArg = $binPathArg -replace '"','\"'
         if( $PSCmdlet.ShouldProcess( "$Name [$Path]", "$operation service" ) )
         {
+            Write-Verbose "$sc $operation $Name binPath= $binPathArg start= $startArg obj= $($identity.FullName) $passwordArgName $('*' * $passwordArgValue.Length) depend= $dependencyArgValue $displayNameArgName $displayNameArgValue" -Verbose
             & $sc $operation $Name binPath= $binPathArg start= $startArg obj= $identity.FullName $passwordArgName $passwordArgValue depend= $dependencyArgValue $displayNameArgName $displayNameArgValue |
                 Write-Verbose
             $scExitCode = $LastExitCode
@@ -566,7 +568,7 @@ function Install-Service
                 {
                     if( $PSCmdlet.ParameterSetName -like 'CustomAccount*' -and -not $Credential )
                     {
-                        Write-Warning ('Service ''{0}'' didn''t start and you didn''t supply a password to Install-Service.  Is ''{1}'' a managed service account or virtual account? (See http://technet.microsoft.com/en-us/library/dd548356.aspx.)  If not, please use the `Credential` parameter to pass the account''s credentials.' -f $Name,$UserName)
+                        Write-Warning ('Service ''{0}'' didn''t start and you didn''t supply a password to Install-CService.  Is ''{1}'' a managed service account or virtual account? (See http://technet.microsoft.com/en-us/library/dd548356.aspx.)  If not, please use the `Credential` parameter to pass the account''s credentials.' -f $Name,$UserName)
                     }
                     else
                     {
@@ -586,4 +588,3 @@ function Install-Service
         }
     }
 }
-

@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Get-WmiLocalUserAccount
+function Get-CWmiLocalUserAccount
 {
     <#
     .SYNOPSIS
@@ -25,7 +25,7 @@ function Get-WmiLocalUserAccount
     http://msdn.microsoft.com/en-us/library/windows/desktop/aa394507(v=vs.85).aspx
 
     .EXAMPLE
-    Get-WmiLocalUserAccount -Username Administrator
+    Get-CWmiLocalUserAccount -Username Administrator
 
     Gets the local Administrator account as a `Win32_UserAccount` WMI object.
     #>

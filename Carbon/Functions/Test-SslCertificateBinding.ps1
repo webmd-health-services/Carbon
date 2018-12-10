@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Test-SslCertificateBinding
+function Test-CSslCertificateBinding
 {
     <#
     .SYNOPSIS
@@ -20,17 +20,17 @@ function Test-SslCertificateBinding
 	SSL certificates are bound to IP addresses and ports.  This function tests if one exists on a given IP address/port.
 	
 	.EXAMPLE
-	Test-SslCertificateBinding -Port 443
+	Test-CSslCertificateBinding -Port 443
 	
 	Tests if there is a default SSL certificate bound to all a machine's IP addresses on port 443.
 	
 	.EXAMPLE
-	Test-SslCertificateBinding -IPAddress 10.0.1.1 -Port 443
+	Test-CSslCertificateBinding -IPAddress 10.0.1.1 -Port 443
 	
 	Tests if there is an SSL certificate bound to IP address 10.0.1.1 on port 443.
 	
 	.EXAMPLE
-	Test-SslCertificateBinding
+	Test-CSslCertificateBinding
 	
 	Tests if there are any SSL certificates bound to any IP address/port on the machine.
     #>
@@ -60,7 +60,7 @@ function Test-SslCertificateBinding
         $getArgs.Port = $Port
     }
     
-    $binding = Get-SslCertificateBinding @getArgs
+    $binding = Get-CSslCertificateBinding @getArgs
     if( $binding )
     {
         return $True

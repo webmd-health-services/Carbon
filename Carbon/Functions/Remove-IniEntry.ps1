@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Remove-IniEntry
+function Remove-CIniEntry
 {
     <#
     .SYNOPSIS
@@ -26,25 +26,25 @@ function Remove-IniEntry
         share = 
         extdiff =
 
-    Names are not allowed to contains the equal sign, `=`.  Values can contain any character.  The INI file is parsed using `Split-Ini`.  [See its documentation for more examples.](Split-Ini.html)
+    Names are not allowed to contains the equal sign, `=`.  Values can contain any character.  The INI file is parsed using `Split-CIni`.  [See its documentation for more examples.](Split-CIni.html)
     
     If the entry doesn't exist, does nothing.
 
     Be default, operates on the INI file case-insensitively. If your INI is case-sensitive, use the `-CaseSensitive` switch.
 
     .LINK
-    Set-IniEntry
+    Set-CIniEntry
 
     .LINK
-    Split-Ini
+    Split-CIni
 
     .EXAMPLE
-    Remove-IniEntry -Path C:\Projects\Carbon\StupidStupid.ini -Section rat -Name tails
+    Remove-CIniEntry -Path C:\Projects\Carbon\StupidStupid.ini -Section rat -Name tails
 
     Removes the `tails` item in the `[rat]` section of the `C:\Projects\Carbon\StupidStupid.ini` file.
 
     .EXAMPLE
-    Remove-IniEntry -Path C:\Users\me\npmrc -Name 'prefix' -CaseSensitive
+    Remove-CIniEntry -Path C:\Users\me\npmrc -Name 'prefix' -CaseSensitive
 
     Demonstrates how to remove an INI entry in an INI file that is case-sensitive.
     #>
@@ -78,7 +78,7 @@ function Remove-IniEntry
     
     if( Test-Path $Path -PathType Leaf )
     {
-        $settings = Split-Ini -Path $Path -AsHashtable -CaseSensitive:$CaseSensitive
+        $settings = Split-CIni -Path $Path -AsHashtable -CaseSensitive:$CaseSensitive
     }
     else
     {

@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Test-DscTargetResource
+function Test-CDscTargetResource
 {
     <#
     .SYNOPSIS
@@ -31,7 +31,7 @@ function Test-DscTargetResource
         $resource.Remove( 'PropertyThatDoesNotMatter' )
         return Test-TargetResource -TargetResource $resource -DesiredResource $PSBoundParameters -Target ('my resource ''fubar''')
     
-    `Test-DscTargetResource` is new in Carbon 2.0.
+    `Test-CDscTargetResource` is new in Carbon 2.0.
 
     .OUTPUTS
     System.Boolean.

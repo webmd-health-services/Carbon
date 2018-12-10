@@ -35,8 +35,8 @@ STYLE GUIDE
     This is default in the PowerShell ISE.
     
     Use camel-casing for all function names, including abbreviations three letters or 
-    longer, e.g. Install-Msmq, Install-IisWebsite. Capitalize all letters in one or two 
-    letter abbreviations, e.g. Test-OSIs32Bit.
+    longer, e.g. Install-CMsmq, Install-CIisWebsite. Capitalize all letters in one or two 
+    letter abbreviations, e.g. Test-COSIs32Bit.
     
     All function parameter and module variables names must be capitalized, e.g. `$Path`, 
     `$Name`, etc. All variable names should be lowercase, e.g. `$result`, `$csprojXml`.

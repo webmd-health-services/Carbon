@@ -11,9 +11,9 @@
 # limitations under the License.
 
 # This function should only be available if the Windows PowerShell v3.0 Server Manager cmdlets aren't already installed.
-if( -not (Get-Command -Name 'Get-WindowsFeature*' | Where-Object { $_.ModuleName -ne 'Carbon' }) )
+if( -not (Get-Command -Name 'Get-CWindowsFeature*' | Where-Object { $_.ModuleName -ne 'Carbon' }) )
 {
-    function Get-WindowsFeature
+    function Get-CWindowsFeature
     {
         <#
         .SYNOPSIS
@@ -30,26 +30,26 @@ if( -not (Get-Command -Name 'Get-WindowsFeature*' | Where-Object { $_.ModuleName
         PsObject.  A generic PsObject with properties DisplayName, Name, and Installed.
         
         .LINK
-        Install-WindowsFeature
+        Install-CWindowsFeature
         
         .LINK
-        Test-WindowsFeature
+        Test-CWindowsFeature
         
         .LINK
-        Uninstall-WindowsFeature
+        Uninstall-CWindowsFeature
         
         .EXAMPLE
-        Get-WindowsFeature
+        Get-CWindowsFeature
         
         Returns a list of all available Windows features.
         
         .EXAMPLE
-        Get-WindowsFeature -Name MSMQ
+        Get-CWindowsFeature -Name MSMQ
         
         Returns the MSMQ feature.
         
         .EXAMPLE
-        Get-WindowsFeature -Name *msmq*
+        Get-CWindowsFeature -Name *msmq*
         
         Returns any Windows feature whose name matches the wildcard `*msmq*`.
         #>
@@ -65,7 +65,7 @@ if( -not (Get-Command -Name 'Get-WindowsFeature*' | Where-Object { $_.ModuleName
 
         Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
     
-        Write-Warning -Message ('Get-WindowsFeature is obsolete and will be removed in a future major version of Carbon.')
+        Write-Warning -Message ('Get-CWindowsFeature is obsolete and will be removed in a future major version of Carbon.')
 
         if( -not (Assert-WindowsFeatureFunctionsSupported) )
         {

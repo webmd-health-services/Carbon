@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Set-IniEntry
+function Set-CIniEntry
 {
     <#
     .SYNOPSIS
@@ -26,18 +26,18 @@ function Set-IniEntry
         share = 
         extdiff =
 
-    Names are not allowed to contains the equal sign, `=`.  Values can contain any character.  The INI file is parsed using `Split-Ini`.  [See its documentation for more examples.](Split-Ini.html)
+    Names are not allowed to contains the equal sign, `=`.  Values can contain any character.  The INI file is parsed using `Split-CIni`.  [See its documentation for more examples.](Split-CIni.html)
 
     Be default, operates on the INI file case-insensitively. If your INI is case-sensitive, use the `-CaseSensitive` switch.
 
     .LINK
-    Split-Ini
+    Split-CIni
 
     LINK
-    Remove-IniEntry
+    Remove-CIniEntry
 
     .EXAMPLE
-    Set-IniEntry -Path C:\Users\rspektor\mercurial.ini -Section extensions -Name share -Value ''
+    Set-CIniEntry -Path C:\Users\rspektor\mercurial.ini -Section extensions -Name share -Value ''
 
     If the `C:\Users\rspektor\mercurial.ini` file is empty, adds the following to it:
 
@@ -45,14 +45,14 @@ function Set-IniEntry
         share =
     
     .EXAMPLE
-    Set-IniEntry -Path C:\Users\rspektor\music.ini -Name genres -Value 'alternative,rock'
+    Set-CIniEntry -Path C:\Users\rspektor\music.ini -Name genres -Value 'alternative,rock'
 
     If the `music.ini` file is empty, adds the following to it:
 
         genres = alternative,rock
 
     .EXAMPLE
-    Set-IniEntry -Path C:\Users\rspektor\music.ini -Name genres -Value 'alternative,rock,world'
+    Set-CIniEntry -Path C:\Users\rspektor\music.ini -Name genres -Value 'alternative,rock,world'
 
     If the `music.ini` file contains the following:
 
@@ -63,7 +63,7 @@ function Set-IniEntry
         genres = alternative,rock,world
 
     .EXAMPLE
-    Set-IniEntry -Path C:\users\me\npmrc -Name prefix -Value 'C:\Users\me\npm_modules' -CaseSensitive
+    Set-CIniEntry -Path C:\users\me\npmrc -Name prefix -Value 'C:\Users\me\npm_modules' -CaseSensitive
 
     Demonstrates how to set an INI entry in a case-sensitive file.
     #>
@@ -108,7 +108,7 @@ function Set-IniEntry
     
     if( Test-Path $Path -PathType Leaf )
     {
-        $settings = Split-Ini -Path $Path -AsHashtable -CaseSensitive:$CaseSensitive
+        $settings = Split-CIni -Path $Path -AsHashtable -CaseSensitive:$CaseSensitive
         Get-Content -Path $Path | ForEach-Object { [void] $lines.Add( $_ ) }
     }
     

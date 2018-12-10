@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Get-IisHttpRedirect
+function Get-CIisHttpRedirect
 {
     <#
     .SYNOPSIS
@@ -34,12 +34,12 @@ function Get-IisHttpRedirect
     Carbon.Iis.HttpRedirectConfigurationSection.
      
     .EXAMPLE
-    Get-IisHttpRedirect -SiteName ExampleWebsite 
+    Get-CIisHttpRedirect -SiteName ExampleWebsite 
     
     Gets the redirect settings for ExampleWebsite.
     
     .EXAMPLE
-    Get-IisHttpRedirect -SiteName ExampleWebsite -Path MyVirtualDirectory
+    Get-CIisHttpRedirect -SiteName ExampleWebsite -Path MyVirtualDirectory
     
     Gets the redirect settings for the MyVirtualDirectory virtual directory under ExampleWebsite.
     #>
@@ -60,7 +60,7 @@ function Get-IisHttpRedirect
 
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
-    Get-IisConfigurationSection -SiteName $SiteName `
+    Get-CIisConfigurationSection -SiteName $SiteName `
                                 -VirtualPath $VirtualPath `
                                 -SectionPath 'system.webServer/httpRedirect' `
                                 -Type ([Carbon.Iis.HttpRedirectConfigurationSection])

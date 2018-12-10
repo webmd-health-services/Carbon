@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Grant-Privilege
+function Grant-CPrivilege
 {
     <#
     .SYNOPSIS
@@ -66,13 +66,13 @@ function Grant-Privilege
      * SeUnsolicitedInputPrivilege
 
     .LINK
-    Get-Privilege
+    Get-CPrivilege
     
     .LINK
-    Revoke-Privilege
+    Revoke-CPrivilege
     
     .LINK
-    Test-Privilege
+    Test-CPrivilege
     
     .LINK
     http://msdn.microsoft.com/en-us/library/windows/desktop/bb530716.aspx
@@ -81,7 +81,7 @@ function Grant-Privilege
     http://msdn.microsoft.com/en-us/library/windows/desktop/bb545671.aspx
     
     .EXAMPLE
-    Grant-Privilege -Identity Batcomputer -Privilege SeServiceLogonRight
+    Grant-CPrivilege -Identity Batcomputer -Privilege SeServiceLogonRight
     
     Grants the Batcomputer account the ability to logon as a service. *Privilege names are **case-sensitive**.*
     #>
@@ -102,7 +102,7 @@ function Grant-Privilege
 
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
     
-    $account = Resolve-Identity -Name $Identity
+    $account = Resolve-CIdentity -Name $Identity
     if( -not $account )
     {
         return

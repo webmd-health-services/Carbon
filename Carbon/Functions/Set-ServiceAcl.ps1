@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Set-ServiceAcl
+function Set-CServiceAcl
 {
     <#
     .SYNOPSIS
@@ -19,16 +19,16 @@ function Set-ServiceAcl
     .DESCRIPTION
     The existing DACL is replaced with the new DACL.  No previous permissions are preserved.  That's your job.  You're warned!
     
-    You probably want `Grant-ServicePermission` or `Revoke-ServicePermission` instead.
+    You probably want `Grant-CServicePermission` or `Revoke-CServicePermission` instead.
     
     .LINK
-    Get-ServicePermission
+    Get-CServicePermission
     
     .LINK
-    Grant-ServicePermission
+    Grant-CServicePermission
     
     .LINK
-    Revoke-ServicePermission
+    Revoke-CServicePermission
     
     .EXAMPLE
     Set-ServiceDacl -Name 'Hyperdrive' -Dacl $dacl
@@ -52,7 +52,7 @@ function Set-ServiceAcl
 
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
-    $rawSD = Get-ServiceSecurityDescriptor -Name $Name
+    $rawSD = Get-CServiceSecurityDescriptor -Name $Name
     $daclBytes = New-Object byte[] $Dacl.BinaryLength 
     $Dacl.GetBinaryForm($daclBytes, 0);
     $rawSD.DiscretionaryAcl = New-Object Security.AccessControl.RawAcl $daclBytes,0

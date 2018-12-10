@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Install-Certificate
+function Install-CCertificate
 {
     <#
     .SYNOPSIS
@@ -27,12 +27,12 @@ function Install-Certificate
     System.Security.Cryptography.X509Certificates.X509Certificate2. An X509Certificate2 object representing the newly installed certificate.
     
     .EXAMPLE
-    > Install-Certificate -Path C:\Users\me\certificate.cer -StoreLocation LocalMachine -StoreName My -Exportable -Password My5up3r53cur3P@55w0rd
+    > Install-CCertificate -Path C:\Users\me\certificate.cer -StoreLocation LocalMachine -StoreName My -Exportable -Password My5up3r53cur3P@55w0rd
     
     Installs the certificate (which is protected by a password) at C:\Users\me\certificate.cer into the local machine's Personal store.  The certificate is marked exportable.
     
     .EXAMPLE
-    Install-Certificate -Path C:\Users\me\certificate.cer -StoreLocation LocalMachine -StoreName My -ComputerName remote1,remote2
+    Install-CCertificate -Path C:\Users\me\certificate.cer -StoreLocation LocalMachine -StoreName My -ComputerName remote1,remote2
     
     Demonstrates how to install a certificate from a file on the local computer into the local machine's personal store on two remote cmoputers, remote1 and remote2. Use the `Credential` parameter to connect as a specific principal.
     #>
@@ -96,7 +96,7 @@ function Install-Certificate
 
     if( $Password -and $Password -isnot [securestring] )
     {
-        Write-Warning -Message ('You passed a plain text password to `Install-Certificate`. A future version of Carbon will remove support for plain-text passwords. Please pass a `SecureString` instead.')
+        Write-Warning -Message ('You passed a plain text password to `Install-CCertificate`. A future version of Carbon will remove support for plain-text passwords. Please pass a `SecureString` instead.')
         $Password = ConvertTo-SecureString -String $Password -AsPlainText -Force
     }
     
@@ -125,7 +125,7 @@ function Install-Certificate
             $keyFlags = $keyFlags -bor [Security.Cryptography.X509Certificates.X509KeyStorageFlags]::Exportable
         }
 
-        $Certificate = Get-Certificate -Path $Path -Password $Password -KeyStorageFlags $keyFlags
+        $Certificate = Get-CCertificate -Path $Path -Password $Password -KeyStorageFlags $keyFlags
         $fromFile = $true
     }
     else
@@ -178,7 +178,7 @@ function Install-Certificate
         $WhatIfPreference = $WhatIf
         $VerbosePreference = $Verbosity
 
-        $tempDir = 'Carbon+Install-Certificate+{0}' -f [IO.Path]::GetRandomFileName()
+        $tempDir = 'Carbon+Install-CCertificate+{0}' -f [IO.Path]::GetRandomFileName()
         $tempDir = Join-Path -Path $env:TEMP -ChildPath $tempDir
         New-Item -Path $tempDir -ItemType 'Directory' -WhatIf:$false | Out-Null
 

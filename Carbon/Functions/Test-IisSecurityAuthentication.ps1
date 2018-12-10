@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Test-IisSecurityAuthentication
+function Test-CIisSecurityAuthentication
 {
     <#
     .SYNOPSIS
@@ -25,12 +25,12 @@ function Test-IisSecurityAuthentication
     System.Boolean.
     
     .EXAMPLE
-    Test-IisSecurityAuthentication -SiteName Peanuts -Anonymous
+    Test-CIisSecurityAuthentication -SiteName Peanuts -Anonymous
     
     Returns `true` if anonymous authentication is enabled for the `Peanuts` site.  `False` if it isn't.
     
     .EXAMPLE
-    Test-IisSecurityAuthentication -SiteName Peanuts -VirtualPath Doghouse -Basic
+    Test-CIisSecurityAuthentication -SiteName Peanuts -VirtualPath Doghouse -Basic
     
     Returns `true` if basic authentication is enabled for`Doghouse` directory under  the `Peanuts` site.  `False` if it isn't.
     #>
@@ -72,7 +72,7 @@ function Test-IisSecurityAuthentication
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
     
     $getConfigArgs = @{ $pscmdlet.ParameterSetName = $true }
-    $authSettings = Get-IisSecurityAuthentication -SiteName $SiteName -VirtualPath $VirtualPath @getConfigArgs
+    $authSettings = Get-CIisSecurityAuthentication -SiteName $SiteName -VirtualPath $VirtualPath @getConfigArgs
     return ($authSettings.GetAttributeValue('enabled') -eq 'true')
 }
 

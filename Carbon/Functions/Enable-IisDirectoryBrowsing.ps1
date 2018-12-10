@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Enable-IisDirectoryBrowsing
+function Enable-CIisDirectoryBrowsing
 {
     <#
     .SYNOPSIS
@@ -22,12 +22,12 @@ function Enable-IisDirectoryBrowsing
     Beginning with Carbon 2.0.1, this function is available only if IIS is installed.
 
     .EXAMPLE
-    Enable-IisDirectoryBrowsing -SiteName Peanuts
+    Enable-CIisDirectoryBrowsing -SiteName Peanuts
 
     Enables directory browsing on the `Peanuts` website.
 
     .EXAMPLE
-    Enable-IisDirectoryBrowsing -SiteName Peanuts -Directory Snoopy/DogHouse
+    Enable-CIisDirectoryBrowsing -SiteName Peanuts -Directory Snoopy/DogHouse
 
     Enables directory browsing on the `/Snoopy/DogHouse` directory under the `Peanuts` website.
     #>
@@ -48,7 +48,7 @@ function Enable-IisDirectoryBrowsing
 
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
-    $section = Get-IisConfigurationSection -SiteName $SiteName -SectionPath 'system.webServer/directoryBrowse'
+    $section = Get-CIisConfigurationSection -SiteName $SiteName -SectionPath 'system.webServer/directoryBrowse'
 
     if( $section['enabled'] -ne 'true' )
     {

@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Install-IisAppPool
+function Install-CIisAppPool
 {
     <#
     .SYNOPSIS
@@ -41,20 +41,20 @@ function Install-IisAppPool
     http://learn.iis.net/page.aspx/624/application-pool-identities/
 
     .LINK
-    New-Credential
+    New-CCredential
     
     .EXAMPLE
-    Install-IisAppPool -Name Cyberdyne -ServiceAccount NetworkService
+    Install-CIisAppPool -Name Cyberdyne -ServiceAccount NetworkService
 
     Creates a new Cyberdyne application pool, running as NetworkService, using .NET 4.0 and an integrated pipeline.  If the Cyberdyne app pool already exists, it is modified to run as NetworkService, to use .NET 4.0 and to use an integrated pipeline.
 
     .EXAMPLE
-    Install-IisAppPool -Name Cyberdyne -ServiceAccount NetworkService -Enable32BitApps -ClassicPipelineMode
+    Install-CIisAppPool -Name Cyberdyne -ServiceAccount NetworkService -Enable32BitApps -ClassicPipelineMode
 
     Creates or sets the Cyberdyne app pool to run as NetworkService, in 32-bit mode (i.e. 32-bit applications are enabled), using the classic IIS request pipeline.
 
     .EXAMPLE
-    Install-IisAppPool -Name Cyberdyne -Credential $charlieBrownCredential
+    Install-CIisAppPool -Name Cyberdyne -Credential $charlieBrownCredential
 
     Creates or sets the Cyberdyne app pool to run as the `PEANUTS\charliebrown` domain account, under .NET 4.0, with an integrated pipeline.
     #>
@@ -119,17 +119,17 @@ function Install-IisAppPool
     {
         if( $PSCmdlet.ParameterSetName -notlike '*WithCredential' ) 
         {
-            Write-Warning ('`Install-IisAppPool` function''s `UserName` and `Password` parameters are obsolete and will be removed in a future major version of Carbon. Please use the `Credential` parameter instead.')
-            $Credential = New-Credential -UserName $UserName -Password $Password
+            Write-Warning ('`Install-CIisAppPool` function''s `UserName` and `Password` parameters are obsolete and will be removed in a future major version of Carbon. Please use the `Credential` parameter instead.')
+            $Credential = New-CCredential -UserName $UserName -Password $Password
         }
     }
 
-    if( $PSCmdlet.ParameterSetName -eq 'AsSpecificUser' -and -not (Test-Identity -Name $Credential.UserName) )
+    if( $PSCmdlet.ParameterSetName -eq 'AsSpecificUser' -and -not (Test-CIdentity -Name $Credential.UserName) )
     {
         Write-Error ('Identity {0} not found. {0} IIS websites and applications assigned to this app pool won''t run.' -f $Credential.UserName,$Name)
     }
     
-    if( -not (Test-IisAppPool -Name $Name) )
+    if( -not (Test-CIisAppPool -Name $Name) )
     {
         Write-Verbose ('Creating IIS Application Pool {0}' -f $Name)
         $mgr = New-Object 'Microsoft.Web.Administration.ServerManager'
@@ -137,7 +137,7 @@ function Install-IisAppPool
         $mgr.CommitChanges()
     }
 
-    $appPool = Get-IisAppPool -Name $Name
+    $appPool = Get-CIisAppPool -Name $Name
     
     $updated = $false
 
@@ -185,7 +185,7 @@ function Install-IisAppPool
             $appPool.ProcessModel.Password = $Credential.GetNetworkCredential().Password
 
             # On Windows Server 2008 R2, custom app pool users need this privilege.
-            Grant-Privilege -Identity $Credential.UserName -Privilege SeBatchLogonRight -Verbose:$VerbosePreference
+            Grant-CPrivilege -Identity $Credential.UserName -Privilege SeBatchLogonRight -Verbose:$VerbosePreference
             $updated = $true
         }
     }
@@ -211,7 +211,7 @@ function Install-IisAppPool
     }
     
     # TODO: Pull this out into its own Start-IisAppPool function.  I think.
-    $appPool = Get-IisAppPool -Name $Name
+    $appPool = Get-CIisAppPool -Name $Name
     if($appPool -and $appPool.state -eq [Microsoft.Web.Administration.ObjectState]::Stopped )
     {
         try

@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Disable-AclInheritance
+function Disable-CAclInheritance
 {
     <#
     .SYNOPSIS
@@ -19,29 +19,29 @@ function Disable-AclInheritance
     .DESCRIPTION
     Items in the registry or file system will inherit permissions from its parent.  The `Disable-AclInheritnace` function disables inheritance, removing all inherited permissions. You can optionally preserve the currently inherited permission as explicit permissions using the `-Preserve` switch.
     
-    This function is paired with `Enable-AclInheritance`.
+    This function is paired with `Enable-CAclInheritance`.
 
     Beginning in Carbon 2.4, this function will only disable inheritance if it is currently enabled. In previous versions, it always disabled inheritance.
 
     .LINK
-    Disable-AclInheritance
+    Disable-CAclInheritance
     
     .LINK
-    Get-Permission
+    Get-CPermission
 
     .LINK
-    Grant-Permission
+    Grant-CPermission
 
     .LINK
-    Revoke-Permission
+    Revoke-CPermission
     
     .EXAMPLE
-    Disable-AclInheritance -Path C:\Projects\Carbon
+    Disable-CAclInheritance -Path C:\Projects\Carbon
     
     Removes all inherited access rules from the `C:\Projects\Carbon` directory.  Non-inherited rules are preserved.
     
     .EXAMPLE
-    Disable-AclInheritance -Path hklm:\Software\Carbon -Preserve
+    Disable-CAclInheritance -Path hklm:\Software\Carbon -Preserve
     
     Stops `HKLM:\Software\Carbon` from inheriting acces rules from its parent, but preserves the existing, inheritied access rules.
     #>
@@ -71,6 +71,6 @@ function Disable-AclInheritance
     }
 }
 
-Set-Alias -Name 'Unprotect-AclAccessRules' -Value 'Disable-AclInheritance'
-Set-Alias -Name 'Protect-Acl' -Value 'Disable-AclInheritance'
+Set-Alias -Name 'Unprotect-AclAccessRules' -Value 'Disable-CAclInheritance'
+Set-Alias -Name 'Protect-Acl' -Value 'Disable-CAclInheritance'
 

@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Convert-SecureStringToString
+function Convert-CSecureStringToString
 {
     <#
     .SYNOPSIS
@@ -23,7 +23,7 @@ function Convert-SecureStringToString
     System.String.
 
     .EXAMPLE
-    Convert-SecureStringToString -SecureString $mySuperSecretPasswordIAmAboutToExposeToEveryone
+    Convert-CSecureStringToString -SecureString $mySuperSecretPasswordIAmAboutToExposeToEveryone
 
     Returns the plain text/decrypted value of the secure string.
     #>

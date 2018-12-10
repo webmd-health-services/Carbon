@@ -1,0 +1,35 @@
+TOPIC
+    about_Whiskey_PublishBitbucketServerTag_Task
+
+
+SUMMARY
+    Adds/updates a tag in a Bitbucket Server repository.
+
+
+DESCRIPTION
+    The `PublishBitbucketServerTag` function uses the Bitbucket Server API to add/update a tag in a repository. You must pass the URI to your Bitbucket Server to the `Uri` property and the credential ID to use to the `CredentialID` property. The task infers the repository's key and project key from the URI provided by the build server. The task uses the build's version 2 semantic version (without build metadat) as the tag name.
+
+    This task downloads and uses the [BitbucketServerAutomation PowerShell module from the PowerShell Gallery](https://www.powershellgallery.com/packages/BitbucketServerAutomation).
+
+PROPERTIES
+    
+    * `CredentialID` (**mandatory**): The credential ID of the credentials to use when connecting to Bitbucket Server. Use the `Add-WhiskeyCredential` function to add credentials to your build.
+    * `Uri` (**mandatory**): the URI to your Bitbucket Serer instance, with no path or query string.
+    * `ProjectKey`: the repository's project key in Bitbucket Server. If not given, it is read from the repository's URI.
+    * `RepositoryKey`: the repository's key in Bitbucket Server. If not given, it is read from the repository's URI.
+    * `BitbucketServerAutomationVersion`: the version of the BitbucketServerAutomation PowerShell module to download and use. The default is latest 0.3.* version. Be careful about changing the version. The task may not support newer/olders versions.
+
+
+EXAMPLES
+
+    ## Example 1
+
+        Publish:
+        - PublishBitbucketServerTag:
+            CredentialID: bitbucketserver.example.com
+            Uri: https://bitbucketserver.example.com
+
+    Demonstrates how to create a tag using the current build's version number. The credential is added to the build like this:
+
+        Add-WhiskeyCredential -Context $context -ID 'bitbucketserver.example.com' -Credential $credential
+

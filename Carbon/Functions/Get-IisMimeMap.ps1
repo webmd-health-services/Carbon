@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Get-IisMimeMap
+function Get-CIisMimeMap
 {
     <#
     .SYNOPSIS
@@ -28,30 +28,30 @@ function Get-IisMimeMap
     Carbon.Iis.MimeMap.
     
     .LINK
-    Set-IisMimeMap
+    Set-CIisMimeMap
     
     .EXAMPLE
-    Get-IisMimeMap
+    Get-CIisMimeMap
     
     Gets all the the file extension to MIME type mappings for the web server.
     
     .EXAMPLE
-    Get-IisMimeMap -FileExtension .htm*
+    Get-CIisMimeMap -FileExtension .htm*
     
     Gets all the file extension to MIME type mappings whose file extension matches the `.htm*` wildcard.
     
     .EXAMPLE
-    Get-IisMimeMap -MimeType 'text/*'
+    Get-CIisMimeMap -MimeType 'text/*'
     
     Gets all the file extension to MIME type mappings whose MIME type matches the `text/*` wildcard.
     
     .EXAMPLE
-    Get-IisMimeMap -SiteName DeathStar
+    Get-CIisMimeMap -SiteName DeathStar
     
     Gets all the file extenstion to MIME type mappings for the `DeathStar` website.
     
     .EXAMPLE
-    Get-IisMimeMap -SiteName DeathStar -VirtualPath ExhaustPort
+    Get-CIisMimeMap -SiteName DeathStar -VirtualPath ExhaustPort
     
     Gets all the file extension to MIME type mappings for the `DeathStar`'s `ExhausePort` directory.
     #>
@@ -89,7 +89,7 @@ function Get-IisMimeMap
         $getIisConfigSectionParams['VirtualPath'] = $VirtualPath
     }
 
-    $staticContent = Get-IisConfigurationSection -SectionPath 'system.webServer/staticContent' @getIisConfigSectionParams
+    $staticContent = Get-CIisConfigurationSection -SectionPath 'system.webServer/staticContent' @getIisConfigSectionParams
     $staticContent.GetCollection() | 
         Where-Object { $_['fileExtension'] -like $FileExtension -and $_['mimeType'] -like $MimeType } |
         ForEach-Object {

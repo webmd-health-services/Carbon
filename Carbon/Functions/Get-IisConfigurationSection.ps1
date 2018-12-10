@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Get-IisConfigurationSection
+function Get-CIisConfigurationSection
 {
     <#
     .SYNOPSIS
@@ -25,7 +25,7 @@ function Get-IisConfigurationSection
     Microsoft.Web.Administration.ConfigurationSection.
     
     .EXAMPLE
-    Get-IisConfigurationSection -SiteName Peanuts -Path Doghouse -Path 'system.webServer/security/authentication/anonymousAuthentication'
+    Get-CIisConfigurationSection -SiteName Peanuts -Path Doghouse -Path 'system.webServer/security/authentication/anonymousAuthentication'
 
     Returns a configuration section which represents the Peanuts site's Doghouse path's anonymous authentication settings.    
     #>
@@ -67,7 +67,7 @@ function Get-IisConfigurationSection
     {
         if( $PSCmdlet.ParameterSetName -eq 'ForSite' )
         {
-            $qualifier = Join-IisVirtualPath $SiteName $VirtualPath
+            $qualifier = Join-CIisVirtualPath $SiteName $VirtualPath
             $section = $config.GetSection( $SectionPath, $Type, $qualifier )
         }
         else

@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Get-SslCertificateBinding
+function Get-CSslCertificateBinding
 {
     <#
     .SYNOPSIS
@@ -23,17 +23,17 @@ function Get-SslCertificateBinding
     Carbon.Certificates.SslCertificateBinding.
 
     .EXAMPLE
-    > Get-SslCertificateBinding
+    > Get-CSslCertificateBinding
     
     Gets all the SSL certificate bindings on the local computer.
 
     .EXAMPLE
-    > Get-SslCertificateBinding -IPAddress 42.37.80.47 -Port 443
+    > Get-CSslCertificateBinding -IPAddress 42.37.80.47 -Port 443
    
     Gets the SSL certificate bound to 42.37.80.47, port 443.
    
     .EXAMPLE
-    > Get-SslCertificateBinding -Port 443
+    > Get-CSslCertificateBinding -Port 443
    
     Gets the default SSL certificate bound to ALL the computer's IP addresses on port 443.
     #>
@@ -76,4 +76,4 @@ function Get-SslCertificateBinding
     
 }
 
-Set-Alias -Name 'Get-SslCertificateBindings' -Value 'Get-SslCertificateBinding'
+Set-Alias -Name 'Get-SslCertificateBindings' -Value 'Get-CSslCertificateBinding'

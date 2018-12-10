@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Get-FirewallRule
+function Get-CFirewallRule
 {
     <#
     .SYNOPSIS
@@ -37,28 +37,28 @@ function Get-FirewallRule
     Carbon.Firewall.Rule.
 
     .LINK
-    Assert-FirewallConfigurable
+    Assert-CFirewallConfigurable
 
     .LINK
     Carbon_FirewallRule
 
     .EXAMPLE
-    Get-FirewallRule
+    Get-CFirewallRule
 
     Demonstrates how to get the firewall rules running on the current computer.
 
     .EXAMPLE
-    Get-FirewallRule -Name 'World Wide Web Services (HTTP Traffic-In)'
+    Get-CFirewallRule -Name 'World Wide Web Services (HTTP Traffic-In)'
 
     Demonstrates how to get a specific rule.
 
     .EXAMPLE
-    Get-FirewallRule -Name '*HTTP*'
+    Get-CFirewallRule -Name '*HTTP*'
 
     Demonstrates how to use wildcards to find rules whose names match a wildcard pattern, in this case any rule whose name contains the text 'HTTP' is returned.
 
     .EXAMPLE
-    Get-FirewallRule -LiteralName 'Custom Rule **CREATED BY AUTOMATED PROCES'
+    Get-CFirewallRule -LiteralName 'Custom Rule **CREATED BY AUTOMATED PROCES'
 
     Demonstrates how to find a specific firewall rule by name if that name has wildcard characters in it.
     #>
@@ -79,7 +79,7 @@ function Get-FirewallRule
     Set-StrictMode -Version 'Latest'
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
     
-    if( -not (Assert-FirewallConfigurable) )
+    if( -not (Assert-CFirewallConfigurable) )
     {
         return
     }
@@ -264,4 +264,4 @@ function Get-FirewallRule
         } 
 }
 
-Set-Alias -Name 'Get-FirewallRules' -Value 'Get-FirewallRule'
+Set-Alias -Name 'Get-FirewallRules' -Value 'Get-CFirewallRule'

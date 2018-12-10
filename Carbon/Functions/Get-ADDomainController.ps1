@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Get-ADDomainController
+function Get-CADDomainController
 {
     <#
     .SYNOPSIS
@@ -28,13 +28,13 @@ function Get-ADDomainController
     controller is not found, $null is returned.
     
     .EXAMPLE
-    > Get-ADDomainController
+    > Get-CADDomainController
     Returns the domain controller for the current computer's domain.  
     Approximately equivialent to the hostname given in the LOGONSERVER 
     environment variable.
     
     .EXAMPLE
-    > Get-ADDomainController -Domain MYDOMAIN
+    > Get-CADDomainController -Domain MYDOMAIN
     Returns the domain controller for the MYDOMAIN domain.
     #>
     [CmdletBinding()]

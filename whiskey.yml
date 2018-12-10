@@ -8,32 +8,47 @@ Build:
 - PowerShell:
     OnlyBy: BuildServer
     Path: Save-CarbonSigningKey.ps1
+- SetVariable:
+    SignAssembly: False
+    Constants: ""
+- SetVariable:
+    IfExists: Source\Carbon.snk
+    SignAssembly: True
+    Constants: SIGNED
 - MSBuild:
     Path: Source\Carbon.sln
+    Property:
+    - SignAssembly=$(SignAssembly)
+    - DefineConstants=$(Constants)
 - NUnit2:
     Path: Source\Test\bin\$(WHISKEY_MSBUILD_CONFIGURATION)\Carbon.Test.dll
 - Exec:
+    OnlyDuring: Build
     Path: robocopy
     Argument:
         - Source\bin\$(WHISKEY_MSBUILD_CONFIGURATION)
         - Carbon\bin
     SuccessExitCode: <8
 - Exec:
+    OnlyDuring: Build
     Path: robocopy
     Argument:
         - Source\Iis\bin\$(WHISKEY_MSBUILD_CONFIGURATION)
         - Carbon\bin
     SuccessExitCode: <8
 - Exec:
+    OnlyDuring: Build
     Path: robocopy
     Argument:
         - Source\Xdt\bin\$(WHISKEY_MSBUILD_CONFIGURATION)
         - Carbon\bin
     SuccessExitCode: <8
 - Delete:
+    OnlyDuring: Build
     OnlyBy: BuildServer
     Path: Carbon\bin\*.pdb
 - PowerShell:
+    OnlyDuring: Build
     Path: Start-CarbonTest.ps1
 - Pester4:
     OnlyBy: Developer
@@ -42,6 +57,7 @@ Build:
     - Test\*.ps1xml.Tests.ps1
     - Test\Website.Tests.ps1
 - PowerShell:
+    OnlyDuring: Build
     OnlyBy: Developer
     Path: Tools\Blade\blade.ps1
     Argument:
@@ -61,7 +77,6 @@ Build:
             - Test\Install-ScheduledTask.Tests.ps1
     - Tasks:
         - Pester4:
-            OnlyBy: BuildServer
             Path: Test\*.Tests.ps1
             Exclude:
             - "*\\*ScheduledTask.Tests.ps1"

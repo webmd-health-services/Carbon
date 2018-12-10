@@ -11,14 +11,14 @@
 # limitations under the License.
 
 
-function Resolve-Identity
+function Resolve-CIdentity
 {
     <#
     .SYNOPSIS
     Gets domain, name, type, and SID information about a user or group.
     
     .DESCRIPTION
-    The `Resolve-Identity` function takes an identity name or security identifier (SID) and gets its canonical representation. It returns a `Carbon.Identity` object, which contains the following information about the identity:
+    The `Resolve-CIdentity` function takes an identity name or security identifier (SID) and gets its canonical representation. It returns a `Carbon.Identity` object, which contains the following information about the identity:
 
      * Domain - the domain the user was found in
      * FullName - the users full name, e.g. Domain\Name
@@ -33,10 +33,10 @@ function Resolve-Identity
     If the name or security identifier doesn't represent an actual user or group, an error is written and nothing is returned.
 
     .LINK
-    Test-Identity
+    Test-CIdentity
 
     .LINK
-    Resolve-IdentityName
+    Resolve-CIdentityName
 
     .LINK
     http://msdn.microsoft.com/en-us/library/system.security.principal.securityidentifier.aspx
@@ -45,34 +45,34 @@ function Resolve-Identity
     http://msdn.microsoft.com/en-us/library/windows/desktop/aa379601.aspx
     
     .LINK
-    ConvertTo-SecurityIdentifier
+    ConvertTo-CSecurityIdentifier
 
     .LINK
-    Resolve-IdentityName
+    Resolve-CIdentityName
 
     .LINK
-    Test-Identity
+    Test-CIdentity
 
     .OUTPUTS
     Carbon.Identity.
     
     .EXAMPLE
-    Resolve-Identity -Name 'Administrators'
+    Resolve-CIdentity -Name 'Administrators'
     
     Returns an object representing the `Administrators` group.
 
     .EXAMPLE
-    Resolve-Identity -SID 'S-1-5-21-2678556459-1010642102-471947008-1017'
+    Resolve-CIdentity -SID 'S-1-5-21-2678556459-1010642102-471947008-1017'
 
     Demonstrates how to use a SID in SDDL form to convert a SID into an identity.
 
     .EXAMPLE
-    Resolve-Identity -SID (New-Object 'Security.Principal.SecurityIdentifier' 'S-1-5-21-2678556459-1010642102-471947008-1017')
+    Resolve-CIdentity -SID (New-Object 'Security.Principal.SecurityIdentifier' 'S-1-5-21-2678556459-1010642102-471947008-1017')
 
     Demonstrates that you can pass a `SecurityIdentifier` object as the value of the SID parameter.
 
     .EXAMPLE
-    Resolve-Identity -SID $sidBytes
+    Resolve-CIdentity -SID $sidBytes
 
     Demonstrates that you can use a byte array that represents a SID as the value of the `SID` parameter.
     #>
@@ -95,7 +95,7 @@ function Resolve-Identity
     
     if( $PSCmdlet.ParameterSetName -eq 'BySid' )
     {
-        $SID = ConvertTo-SecurityIdentifier -SID $SID
+        $SID = ConvertTo-CSecurityIdentifier -SID $SID
         if( -not $SID )
         {
             return
@@ -109,7 +109,7 @@ function Resolve-Identity
         return $id
     }
     
-    if( -not (Test-Identity -Name $Name) )
+    if( -not (Test-CIdentity -Name $Name) )
     {
         Write-Error ('Identity ''{0}'' not found.' -f $Name) -ErrorAction $ErrorActionPreference
         return

@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Get-MsmqMessageQueue
+function Get-CMsmqMessageQueue
 {
     <#
     .SYNOPSIS
@@ -19,18 +19,18 @@ function Get-MsmqMessageQueue
     .DESCRIPTION 
     Returns a [MessageQueue](http://msdn.microsoft.com/en-us/library/system.messaging.messagequeue.aspx) object for the Message Queue with name `Name`.  If one doesn't exist, returns `$null`.
 
-    Because MSMQ handles private queues differently than public queues, you must explicitly tell `Get-MsmqMessageQueue` the queue you want to get is private by using the `Private` switch.
+    Because MSMQ handles private queues differently than public queues, you must explicitly tell `Get-CMsmqMessageQueue` the queue you want to get is private by using the `Private` switch.
 
     .OUTPUTS
     System.Messaging.MessageQueue.
 
     .EXAMPLE
-    Get-MsmqMessageQueue -Name LunchQueue
+    Get-CMsmqMessageQueue -Name LunchQueue
 
     Returns the [MessageQueue](http://msdn.microsoft.com/en-us/library/system.messaging.messagequeue.aspx) object for the queue named LunchQueue.  It's probably pretty full!
 
     .EXAMPLE
-    Get-MsmqMessageQueue -Name TeacherLunchQueue -Private
+    Get-CMsmqMessageQueue -Name TeacherLunchQueue -Private
 
     Returns the [MessageQueue](http://msdn.microsoft.com/en-us/library/system.messaging.messagequeue.aspx) object for the teacher's private LunchQueue.  They must be medical professors.
     #>
@@ -52,9 +52,9 @@ function Get-MsmqMessageQueue
 
     $privateArg = @{ Private = $Private }
     
-    if( Test-MsmqMessageQueue -Name $Name @privateArg )
+    if( Test-CMsmqMessageQueue -Name $Name @privateArg )
     {
-        $path = Get-MsmqMessageQueuePath -Name $Name @privateArg 
+        $path = Get-CMsmqMessageQueuePath -Name $Name @privateArg 
         New-Object -TypeName Messaging.MessageQueue -ArgumentList ($path)
     }
     else

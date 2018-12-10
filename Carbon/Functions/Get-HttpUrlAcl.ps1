@@ -10,14 +10,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Get-HttpUrlAcl
+function Get-CHttpUrlAcl
 {
     <#
     .SYNOPSIS
     Gets HTTP URL security information.
 
     .DESCRIPTION
-    The `Get-HttpUrlAcl` functions uses the HTTP Server API to get HTTP URL ACL information. With no parameters, it returns `Carbon.Security.HttpUrlSecurity` objects for all the HTTP URL ACLs. To get a specific HTTP URL ACL, use the `Name` parameter (wildcards supported).
+    The `Get-CHttpUrlAcl` functions uses the HTTP Server API to get HTTP URL ACL information. With no parameters, it returns `Carbon.Security.HttpUrlSecurity` objects for all the HTTP URL ACLs. To get a specific HTTP URL ACL, use the `Name` parameter (wildcards supported).
 
     [The HTTP Server API](https://msdn.microsoft.com/en-us/library/aa364510.aspx)
 
@@ -25,39 +25,39 @@ function Get-HttpUrlAcl
 
     An application that uses the HTTP Server API must register all URLs it listens (i.e. binds, registers) to. When registering, the user who will listen to the URL must also be provided. Typically, this is done with the `netsh http (show|add|remove) urlacl` command(s). This function replaces the `netsh http show urlacl` command.
 
-    `Get-HttpUrlAcl` was introduced in Carbon 2.1.0.
+    `Get-CHttpUrlAcl` was introduced in Carbon 2.1.0.
 
     .LINK
     https://msdn.microsoft.com/en-us/library/aa364510.aspx
 
     .LINK
-    Grant-HttpUrlPermission
+    Grant-CHttpUrlPermission
 
     .LINK
-    Revoke-HttpUrlPermission
+    Revoke-CHttpUrlPermission
 
     .OUTPUTS
     Carbon.Security.HttpUrlSecurity.
 
     .EXAMPLE
-    Get-HttpUrlAcl
+    Get-CHttpUrlAcl
 
     Demonstrates how to get security information for all HTTP URLs configured on the current computer.
 
     .EXAMPLE
-    Get-HttpUrlAcl -Url 'http://+:8594/'
+    Get-CHttpUrlAcl -Url 'http://+:8594/'
 
     Demonstrates how to get security information for a specific HTTP URL.
 
     .EXAMPLE
-    Get-HttpUrlAcl -Url 'htt://*:8599/'
+    Get-CHttpUrlAcl -Url 'htt://*:8599/'
 
     Demonstrates how to use wildcards to find security information. In this case, all URLs that use port 8599 will be returned.
     
     When using wildcards, it is important that your URL end with a slash! The HTTP Server API adds a forward slash to the end of all its URLs.
 
     .EXAMPLE
-    Get-HttpUrlAcl -LiteralUrl 'http://*:8599/'
+    Get-CHttpUrlAcl -LiteralUrl 'http://*:8599/'
 
     Demonstrates how to use a literal URL to find security information. Will only return the ACL for the URL `http://*:8599/`.
     #>

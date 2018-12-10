@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Clear-MofAuthoringMetadata
+function Clear-CMofAuthoringMetadata
 {
     <#
     .SYNOPSIS
@@ -55,15 +55,15 @@ function Clear-MofAuthoringMetadata
         };
 
 
-    `Clear-MofAuthoringMetadata` is new in Carbon 2.0.
+    `Clear-CMofAuthoringMetadata` is new in Carbon 2.0.
 
     .EXAMPLE
-    Clear-MofAuthoringMetadata -Path 'C:\Projects\DSC\localhost.mof'
+    Clear-CMofAuthoringMetadata -Path 'C:\Projects\DSC\localhost.mof'
 
     Demonstrates how to clear the authoring data from a specific file.
 
     .EXAMPLE
-    Clear-MofAuthoringMetadata -Path 'C:\Projects\DSC'
+    Clear-CMofAuthoringMetadata -Path 'C:\Projects\DSC'
 
     Demonstrates how to clear the authoring data from all .mof files in a specific directory.
     #>
@@ -79,7 +79,7 @@ function Clear-MofAuthoringMetadata
 
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
-    $tempDir = New-TempDirectory -Prefix ('Carbon+ClearMofAuthoringMetadata+') -WhatIf:$false
+    $tempDir = New-CTempDirectory -Prefix ('Carbon+ClearMofAuthoringMetadata+') -WhatIf:$false
 
     foreach( $item in (Get-ChildItem -Path $Path -Filter '*.mof') )
     {

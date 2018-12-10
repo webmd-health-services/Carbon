@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Assert-Service
+function Assert-CService
 {
     <#
     .SYNOPSIS
@@ -23,10 +23,10 @@ function Assert-Service
     System.Boolean.
     
     .LINK
-    Test-Service
+    Test-CService
     
     .EXAMPLE
-    Assert-Service -Name 'Drivetrain'
+    Assert-CService -Name 'Drivetrain'
     
     Writes an error if the `Drivetrain` service doesn't exist.
     #>
@@ -42,7 +42,7 @@ function Assert-Service
 
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
-    if( -not (Test-Service $Name) )
+    if( -not (Test-CService $Name) )
     {
         Write-Error ('Service {0} not found.' -f $Name)
         return $false

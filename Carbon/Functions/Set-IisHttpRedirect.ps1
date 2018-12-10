@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Set-IisHttpRedirect
+function Set-CIisHttpRedirect
 {
     <#
     .SYNOPSIS
@@ -28,17 +28,17 @@ function Set-IisHttpRedirect
     http://technet.microsoft.com/en-us/library/cc732969(v=WS.10).aspx
 
     .EXAMPLE
-    Set-IisHttpRedirect -SiteName Peanuts -Destination 'http://new.peanuts.com'
+    Set-CIisHttpRedirect -SiteName Peanuts -Destination 'http://new.peanuts.com'
 
     Redirects all requests to the `Peanuts` website to `http://new.peanuts.com`.
 
     .EXAMPLE
-    Set-IisHttpRedirect -SiteName Peanuts -VirtualPath Snoopy/DogHouse -Destination 'http://new.peanuts.com'
+    Set-CIisHttpRedirect -SiteName Peanuts -VirtualPath Snoopy/DogHouse -Destination 'http://new.peanuts.com'
 
     Redirects all requests to the `/Snoopy/DogHouse` path on the `Peanuts` website to `http://new.peanuts.com`.
 
     .EXAMPLE
-    Set-IisHttpRedirect -SiteName Peanuts -Destination 'http://new.peanuts.com' -StatusCode 'Temporary'
+    Set-CIisHttpRedirect -SiteName Peanuts -Destination 'http://new.peanuts.com' -StatusCode 'Temporary'
 
     Redirects all requests to the `Peanuts` website to `http://new.peanuts.com` with a temporary HTTP status code.  You can also specify `Found` (HTTP 302), or `Permanent` (HTTP 301).
     #>
@@ -77,14 +77,14 @@ function Set-IisHttpRedirect
 
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
-    $settings = Get-IisHttpRedirect -SiteName $SiteName -Path $VirtualPath
+    $settings = Get-CIisHttpRedirect -SiteName $SiteName -Path $VirtualPath
     $settings.Enabled = $true
     $settings.Destination = $destination
     $settings.HttpResponseStatus = $HttpResponseStatus
     $settings.ExactDestination = $ExactDestination
     $settings.ChildOnly = $ChildOnly
     	
-    if( $pscmdlet.ShouldProcess( (Join-IisVirtualPath $SiteName $VirtualPath), "set HTTP redirect settings" ) ) 
+    if( $pscmdlet.ShouldProcess( (Join-CIisVirtualPath $SiteName $VirtualPath), "set HTTP redirect settings" ) ) 
     {
         $settings.CommitChanges()
     }

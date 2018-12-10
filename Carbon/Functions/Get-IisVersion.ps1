@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Get-IisVersion
+function Get-CIisVersion
 {
     <#
     .SYNOPSIS
@@ -22,7 +22,7 @@ function Get-IisVersion
     Beginning with Carbon 2.0.1, this function is available only if IIS is installed.
 
     .EXAMPLE
-    Get-IisVersion
+    Get-CIisVersion
     
     Returns `7.0` on Windows 2008, and `7.5` on Windows 7 and Windows 2008 R2.
     #>

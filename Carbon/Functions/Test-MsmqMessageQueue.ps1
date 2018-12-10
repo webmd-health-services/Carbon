@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Test-MsmqMessageQueue
+function Test-CMsmqMessageQueue
 {
     <#
     .SYNOPSIS
@@ -23,12 +23,12 @@ function Test-MsmqMessageQueue
     System.Boolean.
 
     .EXAMPLE
-    Test-MsmqMessageQueue -Name 'MovieQueue'
+    Test-CMsmqMessageQueue -Name 'MovieQueue'
 
     Returns `True` if public queue `MovieQueue` exists, `False` otherwise.
 
     .EXAMPLE
-    Test-MsmqMessageQueue -Name 'MovieCriticsQueue' -Private
+    Test-CMsmqMessageQueue -Name 'MovieCriticsQueue' -Private
 
     Returns `True` if private queue `MovieCriticsQueue` exists, `False` otherwise.
     #>
@@ -49,7 +49,7 @@ function Test-MsmqMessageQueue
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
     $queueArgs = @{ Name = $Name ; Private = $Private }
-    $path = Get-MsmqMessageQueuePath @queueArgs 
+    $path = Get-CMsmqMessageQueuePath @queueArgs 
     return ( [Messaging.MessageQueue]::Exists( $path ) )
 }
 

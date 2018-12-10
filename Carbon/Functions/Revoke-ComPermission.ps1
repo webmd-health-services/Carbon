@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Revoke-ComPermission
+function Revoke-CComPermission
 {
     <#
     .SYNOPSIS
@@ -20,21 +20,21 @@ function Revoke-ComPermission
     Calling this function is equivalent to opening Component Services (dcomcnfg), right-clicking `My Computer` under Component Services > Computers, choosing `Properties`, going to the `COM Security` tab, and removing an identity from the permissions window that opens after clicking the `Edit Limits...` or `Edit Default...` buttons under `Access Permissions` or `Launch and Activation Permissions` section, 
     
     .LINK
-    Get-ComPermission
+    Get-CComPermission
 
     .LINK
-    Grant-ComPermission
+    Grant-CComPermission
     
     .LINK
-    Revoke-ComPermission
+    Revoke-CComPermission
     
     .EXAMPLE
-    Revoke-ComPermission -Access -Identity 'Users' -Default
+    Revoke-CComPermission -Access -Identity 'Users' -Default
     
     Removes all default security COM access permissions for the local `Users` group.
 
     .EXAMPLE
-    Revoke-ComPermission -LaunchAndActivation -Identity 'Users' -Limits
+    Revoke-CComPermission -LaunchAndActivation -Identity 'Users' -Limits
     
     Removes all security limit COM access permissions for the local `Users` group.
     #>
@@ -96,14 +96,14 @@ function Revoke-ComPermission
         $comArgs.LaunchAndActivation = $true
     }
     
-    $account = Resolve-Identity -Name $Identity
+    $account = Resolve-CIdentity -Name $Identity
     if( -not $account )
     {
         return
     }
 
     Write-Verbose ("Revoking {0}'s COM {1} {2}." -f $Identity,$permissionsDesc,$typeDesc)
-    $currentSD = Get-ComSecurityDescriptor @comArgs
+    $currentSD = Get-CComSecurityDescriptor @comArgs
 
     $newSd = ([wmiclass]'win32_securitydescriptor').CreateInstance()
     $newSd.ControlFlags = $currentSD.ControlFlags
@@ -119,8 +119,8 @@ function Revoke-ComPermission
     $sdBytes = $converter.Win32SDToBinarySD( $newSd )
 
     $regValueName = $pscmdlet.ParameterSetName
-    Set-RegistryKeyValue -Path $ComRegKeyPath -Name $regValueName -Binary $sdBytes.BinarySD -Quiet
+    Set-CRegistryKeyValue -Path $ComRegKeyPath -Name $regValueName -Binary $sdBytes.BinarySD -Quiet
 }
 
-Set-Alias -Name 'Revoke-ComPermissions' -Value 'Revoke-ComPermission'
+Set-Alias -Name 'Revoke-ComPermissions' -Value 'Revoke-CComPermission'
 

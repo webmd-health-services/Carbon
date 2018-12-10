@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Test-UncPath
+function Test-CUncPath
 {
     <#
     .SYNOPSIS
@@ -28,12 +28,12 @@ function Test-UncPath
     http://blogs.microsoft.co.il/blogs/ScriptFanatic//archive/2010/05/27/quicktip-how-to-validate-a-unc-path.aspx
 
     .EXAMPLE
-    Test-UncPath -Path '\\computer\share'
+    Test-CUncPath -Path '\\computer\share'
 
-    Returns `true` since `\\computer\share` is a UNC path.  Note that `Test-UncPath` does not have to exist.
+    Returns `true` since `\\computer\share` is a UNC path.  Note that `Test-CUncPath` does not have to exist.
 
     .EXAMPLE
-    Test-UncPath -Path 'C:\Windows'
+    Test-CUncPath -Path 'C:\Windows'
 
     Returns `false` since `C:\Windows` is not a UNC path.
     #>

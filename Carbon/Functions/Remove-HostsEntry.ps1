@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Remove-HostsEntry
+function Remove-CHostsEntry
 {
     <#
     .SYNOPSIS
@@ -20,22 +20,22 @@ function Remove-HostsEntry
     You can remove multiple entries or pipe entries into this function.
 
     .EXAMPLE
-    Remove-HostsEntry -HostName 'adadvisor.net'
+    Remove-CHostsEntry -HostName 'adadvisor.net'
 
     Demonstrates how to remove hosts entry for `adadvisor.net`, which you probably don't want to do.
 
     .EXAMPLE
-    Remove-HostsEntry -HostName 'adadvisor.net','www.adchimp.com'
+    Remove-CHostsEntry -HostName 'adadvisor.net','www.adchimp.com'
 
     Demonstrates how to remove multiple hosts entries.
 
     .EXAMPLE
-    ('adadvisor.net','www.adchimp.com') | Remove-HostsEntry
+    ('adadvisor.net','www.adchimp.com') | Remove-CHostsEntry
 
-    Demonstrates how to pipe hostnames into `Remove-HostsEntry`.
+    Demonstrates how to pipe hostnames into `Remove-CHostsEntry`.
 
     .EXAMPLE
-    Remove-HostsEntry -HostName 'adadvisor.net' -Path 'C:\Projects\Carbon\adblockhosts'
+    Remove-CHostsEntry -HostName 'adadvisor.net' -Path 'C:\Projects\Carbon\adblockhosts'
 
     Demonstrates how to work with a file other than Windows' default hosts file.
     #>
@@ -48,7 +48,7 @@ function Remove-HostsEntry
 
         [string]
         # The hosts file to modify.  Defaults to the Windows hosts file.
-        $Path = (Get-PathToHostsFile)
+        $Path = (Get-CPathToHostsFile)
     )
 
     begin
@@ -73,7 +73,7 @@ function Remove-HostsEntry
         $regex = '^[0-9a-f.:]+\s+\b({0})\b.*$' -f $regex 
 
         $cmdErrors = @()
-        $newHostsFile = Read-File -Path $Path -ErrorVariable 'cmdErrors' |
+        $newHostsFile = Read-CFile -Path $Path -ErrorVariable 'cmdErrors' |
                             Where-Object { $_ -notmatch $regex }
         if( $cmdErrors )
         {
@@ -88,7 +88,7 @@ function Remove-HostsEntry
 
         if( $PSCmdlet.ShouldProcess( $Path, ('removing hosts {0} {1}' -f $entryNoun,($HostName -join ', ')) ) )
         {
-            $newHostsFile | Write-File -Path $Path
+            $newHostsFile | Write-CFile -Path $Path
         }
     }
 }

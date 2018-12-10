@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Test-DotNet
+function Test-CDotNet
 {
     <#
     .SYNOPSIS
@@ -23,12 +23,12 @@ function Test-DotNet
     http://msdn.microsoft.com/en-us/kb/kbarticle.aspx?id=318785
 
     .EXAMPLE
-    Test-DotNet -v2
+    Test-CDotNet -v2
 
     Demonstrates how to test if .NET 2 is installed.
 
     .EXAMPLE
-    Test-DotNet -v4 -Full
+    Test-CDotNet -v4 -Full
 
     Demonstrates how to test if the full .NET v4 is installed.
     #>
@@ -73,11 +73,11 @@ function Test-DotNet
         return
     }
 
-    if( -not (Test-RegistryKeyValue -Path $runtimeSetupRegPath -Name 'Install') )
+    if( -not (Test-CRegistryKeyValue -Path $runtimeSetupRegPath -Name 'Install') )
     {
         return $false
     }
 
-    $value = Get-RegistryKeyValue -Path $runtimeSetupRegPath -Name 'Install'
+    $value = Get-CRegistryKeyValue -Path $runtimeSetupRegPath -Name 'Install'
     return ($value -eq 1)
 }

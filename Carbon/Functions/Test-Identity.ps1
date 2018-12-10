@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Test-Identity
+function Test-CIdentity
 {
     <#
     .SYNOPSIS
@@ -22,23 +22,23 @@ function Test-Identity
     Use the `PassThru` switch to return a `Carbon.Identity` object (instead of `$true` if the identity exists.
 
     .LINK
-    Resolve-Identity
+    Resolve-CIdentity
 
     .LINK
-    Resolve-IdentityName
+    Resolve-CIdentityName
 
     .EXAMPLE
-    Test-Identity -Name 'Administrators
+    Test-CIdentity -Name 'Administrators
     
     Tests that a user or group called `Administrators` exists on the local computer.
     
     .EXAMPLE
-    Test-Identity -Name 'CARBON\Testers'
+    Test-CIdentity -Name 'CARBON\Testers'
     
     Tests that a group called `Testers` exists in the `CARBON` domain.
     
     .EXAMPLE
-    Test-Identity -Name 'Tester' -PassThru
+    Test-CIdentity -Name 'Tester' -PassThru
     
     Tests that a user or group named `Tester` exists and returns a `System.Security.Principal.SecurityIdentifier` object if it does.
     #>

@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Revoke-ServicePermission
+function Revoke-CServicePermission
 {
     <#
     .SYNOPSIS
@@ -20,13 +20,13 @@ function Revoke-ServicePermission
     No permissions are left behind.  This is an all or nothing operation, baby!
     
     .LINK
-    Get-ServicePermission
+    Get-CServicePermission
     
     .LINK
-    Grant-ServicePermission
+    Grant-CServicePermission
     
     .EXAMPLE
-    Revoke-ServicePermission -Name 'Hyperdrive` -Identity 'CLOUDCITY\LCalrissian'
+    Revoke-CServicePermission -Name 'Hyperdrive` -Identity 'CLOUDCITY\LCalrissian'
     
     Removes all of Lando's permissions to control the `Hyperdrive` service.
     #>
@@ -47,25 +47,25 @@ function Revoke-ServicePermission
 
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
-    $account = Resolve-Identity -Name $Identity
+    $account = Resolve-CIdentity -Name $Identity
     if( -not $account )
     {
         return
     }
     
-    if( -not (Assert-Service -Name $Name) )
+    if( -not (Assert-CService -Name $Name) )
     {
         return
     }
     
-    if( (Get-ServicePermission -Name $Name -Identity $account.FullName) )
+    if( (Get-CServicePermission -Name $Name -Identity $account.FullName) )
     {
         Write-Verbose ("Revoking {0}'s {1} service permissions." -f $account.FullName,$Name)
         
-        $dacl = Get-ServiceAcl -Name $Name
+        $dacl = Get-CServiceAcl -Name $Name
         $dacl.Purge( $account.Sid )
         
-        Set-ServiceAcl -Name $Name -Dacl $dacl
+        Set-CServiceAcl -Name $Name -Dacl $dacl
     }
  }
  

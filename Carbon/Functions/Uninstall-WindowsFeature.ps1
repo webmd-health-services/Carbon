@@ -11,9 +11,9 @@
 # limitations under the License.
 
 # This function should only be available if the Windows PowerShell v3.0 Server Manager cmdlets aren't already installed.
-if( -not (Get-Command -Name 'Get-WindowsFeature*' | Where-Object { $_.ModuleName -ne 'Carbon' }) )
+if( -not (Get-Command -Name 'Get-CWindowsFeature*' | Where-Object { $_.ModuleName -ne 'Carbon' }) )
 {
-    function Uninstall-WindowsFeature
+    function Uninstall-CWindowsFeature
     {
         <#
         .SYNOPSIS
@@ -27,7 +27,7 @@ if( -not (Get-Command -Name 'Get-WindowsFeature*' | Where-Object { $_.ModuleName
         **This function is not available on Windows 8/2012.**
         
         .LINK
-        Get-WindowsFeature
+        Get-CWindowsFeature
         
         .LINK
         Install-WindowsService
@@ -36,12 +36,12 @@ if( -not (Get-Command -Name 'Get-WindowsFeature*' | Where-Object { $_.ModuleName
         Test-WindowsService
 
         .EXAMPLE
-        Uninstall-WindowsFeature -Name TelnetClient,TFTP
+        Uninstall-CWindowsFeature -Name TelnetClient,TFTP
 
         Uninstalls Telnet and TFTP.
 
         .EXAMPLE
-        Uninstall-WindowsFeature -Iis
+        Uninstall-CWindowsFeature -Iis
 
         Uninstalls IIS.
         #>
@@ -49,7 +49,7 @@ if( -not (Get-Command -Name 'Get-WindowsFeature*' | Where-Object { $_.ModuleName
         param(
             [Parameter(Mandatory=$true,ParameterSetName='ByName')]
             [string[]]
-            # The names of the components to uninstall/disable.  Feature names are case-sensitive.  To get a list, run `Get-WindowsFeature`.
+            # The names of the components to uninstall/disable.  Feature names are case-sensitive.  To get a list, run `Get-CWindowsFeature`.
             [Alias('Features')]
             $Name,
             
@@ -83,7 +83,7 @@ if( -not (Get-Command -Name 'Get-WindowsFeature*' | Where-Object { $_.ModuleName
 
         Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
-        Write-Warning -Message ('Uninstall-WindowsFeature is obsolete and will be removed in a future major version of Carbon.')
+        Write-Warning -Message ('Uninstall-CWindowsFeature is obsolete and will be removed in a future major version of Carbon.')
     
         if( -not (Assert-WindowsFeatureFunctionsSupported) )
         {
@@ -97,7 +97,7 @@ if( -not (Get-Command -Name 'Get-WindowsFeature*' | Where-Object { $_.ModuleName
         
         $featuresToUninstall = $Name | 
                                     ForEach-Object {
-                                        if( (Test-WindowsFeature -Name $_) )
+                                        if( (Test-CWindowsFeature -Name $_) )
                                         {
                                             $_
                                         }
@@ -106,7 +106,7 @@ if( -not (Get-Command -Name 'Get-WindowsFeature*' | Where-Object { $_.ModuleName
                                             Write-Error ('Windows feature ''{0}'' not found.' -f $_)
                                         }
                                     } |
-                                    Where-Object { Test-WindowsFeature -Name $_ -Installed }
+                                    Where-Object { Test-CWindowsFeature -Name $_ -Installed }
         
         if( -not $featuresToUninstall -or $featuresToUninstall.Length -eq 0 )
         {
@@ -134,5 +134,5 @@ if( -not (Get-Command -Name 'Get-WindowsFeature*' | Where-Object { $_.ModuleName
         }
     }
 
-    Set-Alias -Name 'Uninstall-WindowsFeatures' -Value 'Uninstall-WindowsFeature'
+    Set-Alias -Name 'Uninstall-WindowsFeatures' -Value 'Uninstall-CWindowsFeature'
 }

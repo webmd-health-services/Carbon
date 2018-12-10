@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Uninstall-PerformanceCounterCategory
+function Uninstall-CPerformanceCounterCategory
 {
     <#
     .SYNOPSIS
@@ -20,7 +20,7 @@ function Uninstall-PerformanceCounterCategory
     Removes, with extreme prejudice, the performance counter category `CategoryName`.  All its performance counters are also deleted.  If the performance counter category doesn't exist, nothing happens.  I hope you have good backups!  
 
     .EXAMPLE
-    Uninstall-PerformanceCounterCategory -CategoryName 'ToyotaCamry'
+    Uninstall-CPerformanceCounterCategory -CategoryName 'ToyotaCamry'
 
     Removes the `ToyotaCamry` performance counter category and all its performance counters.  So sad!
     #>
@@ -36,7 +36,7 @@ function Uninstall-PerformanceCounterCategory
 
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
-    if( (Test-PerformanceCounterCategory -CategoryName $CategoryName) )
+    if( (Test-CPerformanceCounterCategory -CategoryName $CategoryName) )
     {
         if( $pscmdlet.ShouldProcess( $CategoryName, 'uninstall performance counter category' ) )
         {

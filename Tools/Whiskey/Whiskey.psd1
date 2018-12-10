@@ -12,7 +12,7 @@
     RootModule = 'Whiskey.psm1'
 
     # Version number of this module.
-    ModuleVersion = '0.35.0'
+    ModuleVersion = '0.38.2'
 
     # ID used to uniquely identify this module
     GUID = '93bd40f1-dee5-45f7-ba98-cb38b7f5b897'
@@ -24,7 +24,7 @@
     CompanyName = 'WebMD Health Services'
 
     # Copyright statement for this module
-    Copyright = '(c) 2016 WebMD Health Services. All rights reserved.'
+    Copyright = '(c) 2016 - 2018 WebMD Health Services. All rights reserved.'
 
     # Description of the functionality provided by this module
     Description = 'Continuous Integration/Continuous Delivery module.'
@@ -68,12 +68,7 @@
                         )
 
     # Modules to import as nested modules of the module specified in RootModule/ModuleToProcess
-    NestedModules = @(
-                        'BitbucketServerAutomation',
-                        'BuildMasterAutomation',
-                        'ProGetAutomation',
-                        'VSSetup'
-                     )
+    NestedModules = @( )
 
     # Functions to export from this module
     FunctionsToExport = @(
@@ -88,6 +83,8 @@
                             'Get-WhiskeyApiKey',
                             'Get-WhiskeyTask',
                             'Get-WhiskeyCredential',
+                            'Get-WhiskeyMSBuildConfiguration',
+                            'Import-WhiskeyPowerShellModule',
                             'Install-WhiskeyTool',
                             'Invoke-WhiskeyNodeTask',
                             'Invoke-WhiskeyNpmCommand',
@@ -101,10 +98,10 @@
                             'Publish-WhiskeyBBServerTag',
                             'Register-WhiskeyEvent',
                             'Resolve-WhiskeyNuGetPackageVersion',
-                            'Resolve-WhiskeyPowerShellModule',
                             'Resolve-WhiskeyTaskPath',
                             'Resolve-WhiskeyVariable',
                             'Set-WhiskeyBuildStatus',
+                            'Set-WhiskeyMSBuildConfiguration',
                             'Stop-WhiskeyTask',
                             'Uninstall-WhiskeyTool',
                             'Unregister-WhiskeyEvent'
@@ -147,11 +144,7 @@
 
             # ReleaseNotes of this module
             ReleaseNotes = @'
-* Created "SetVariableFromPowerShellDataFile" task for creating variables from values in PowerShell data files (e.g. .psd1 files, module manifests, etc.).
-* Added "Properties" property to "NuGetPack" task so that tokens inside .nuspec files can be replaced. The "Properties" property should be a name/value mapping. Each name/value is passed to nuget.exe pack command's "-Properties" parameter.
-* Added "PackageID" property to "NuGetPack" task to handle situations where a package's ID doesn't match the source .nuspec/.csproj file.
-* Added "PackageVersion" property to "NuGetPack" task to allow customizing the package's version number.
-* Added `GitHubRelease` task for creating a release in GitHub. The task supports uploading files into the release.
+* Fixed: `Install-WhiskeyPowerShellModule` and `Resolve-WhiskeyPowerShellModule` functions may fail when NuGet package provider is not initialized.
 '@
         } # End of PSData hashtable
 

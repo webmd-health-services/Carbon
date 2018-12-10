@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Test-Group
+function Test-CGroup
 {
     <#
     .SYNOPSIS
@@ -23,16 +23,16 @@ function Test-Group
     System.Boolean
 
     .LINK
-    Get-Group
+    Get-CGroup
 
     .LINK
-    Install-Group
+    Install-CGroup
 
     .LINK
-    Uninstall-Group
+    Uninstall-CGroup
 
     .EXAMPLE
-    Test-Group -Name RebelAlliance
+    Test-CGroup -Name RebelAlliance
 
     Checks if the `RebelAlliance` *local* group exists.  Returns `True` if it does, `False` if it doesn't.
     #>

@@ -13,7 +13,10 @@ function Write-WhiskeyInfo
         [AllowNull()]
         [string]
         # The message to write.
-        $Message
+        $Message,
+
+        [int]
+        $Indent = 0
     )
 
     process
@@ -21,6 +24,14 @@ function Write-WhiskeyInfo
         Set-StrictMode -Version 'Latest'
         Use-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState
 
-        Write-Output -InputObject ('[{0}][{1}][{2}]  {3}' -f $Context.PipelineName,$Context.TaskIndex,$Context.TaskName,$Message)
+        $Message = '[{0}][{1}][{2}]  {3}{4}' -f $Context.PipelineName,$Context.TaskIndex,$Context.TaskName,(' ' * ($Indent * 2)),$Message
+        if( $supportsWriteInformation )
+        {
+            Write-Information -MessageData $Message -InformationAction Continue
+        }
+        else
+        {
+            Write-Output -InputObject $Message
+        }
     }
 }

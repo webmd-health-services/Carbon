@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Grant-ComPermission
+function Grant-CComPermission
 {
     <#
     .SYNOPSIS
@@ -25,18 +25,18 @@ function Grant-ComPermission
     Carbon.Security.ComAccessRule.
 
     .LINK
-    Get-ComPermission
+    Get-CComPermission
 
     .LINK
-    Revoke-ComPermission
+    Revoke-CComPermission
     
     .EXAMPLE
-    Grant-ComPermission -Access -Identity 'Users' -Allow -Default -Local
+    Grant-CComPermission -Access -Identity 'Users' -Allow -Default -Local
     
     Updates access permission default security to allow the local `Users` group local access permissions.
 
     .EXAMPLE
-    Grant-ComPermission -LaunchAndActivation -Identity 'Users' -Limits -Deny -Local -Remote
+    Grant-CComPermission -LaunchAndActivation -Identity 'Users' -Limits -Deny -Local -Remote
     
     Updates access permission security limits to deny the local `Users` group local and remote access permissions.
     #>
@@ -151,7 +151,7 @@ function Grant-ComPermission
 
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
     
-    $account = Resolve-Identity -Name $Identity -ErrorAction:$ErrorActionPreference
+    $account = Resolve-CIdentity -Name $Identity -ErrorAction:$ErrorActionPreference
     if( -not $account )
     {
         return
@@ -180,7 +180,7 @@ function Grant-ComPermission
         $comArgs.LaunchAndActivation = $true
     }
     
-    $currentSD = Get-ComSecurityDescriptor @comArgs -ErrorAction:$ErrorActionPreference
+    $currentSD = Get-CComSecurityDescriptor @comArgs -ErrorAction:$ErrorActionPreference
 
     $newSd = ([wmiclass]'win32_securitydescriptor').CreateInstance()
     $newSd.ControlFlags = $currentSD.ControlFlags
@@ -225,12 +225,12 @@ function Grant-ComPermission
     $sdBytes = $converter.Win32SDToBinarySD( $newSd )
 
     $regValueName = $pscmdlet.ParameterSetName -replace '(Allow|Deny)$',''
-    Set-RegistryKeyValue -Path $ComRegKeyPath -Name $regValueName -Binary $sdBytes.BinarySD -Quiet -ErrorAction:$ErrorActionPreference
+    Set-CRegistryKeyValue -Path $ComRegKeyPath -Name $regValueName -Binary $sdBytes.BinarySD -Quiet -ErrorAction:$ErrorActionPreference
     
     if( $PassThru )
     {
-        Get-ComPermission -Identity $Identity @comArgs -ErrorAction:$ErrorActionPreference
+        Get-CComPermission -Identity $Identity @comArgs -ErrorAction:$ErrorActionPreference
     }
 }
 
-Set-Alias -Name 'Grant-ComPermissions' -Value 'Grant-ComPermission'
+Set-Alias -Name 'Grant-ComPermissions' -Value 'Grant-CComPermission'

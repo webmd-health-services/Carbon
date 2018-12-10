@@ -10,20 +10,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Test-ScheduledTask
+function Test-CScheduledTask
 {
     <#
     .SYNOPSIS
     Tests if a scheduled task exists on the current computer.
 
     .DESCRIPTION
-    The `Test-ScheduledTask` function uses `schtasks.exe` to tests if a task with a given name exists on the current computer. If it does, `$true` is returned. Otherwise, `$false` is returned. This name must be the *full task name*, i.e. the task's path/location and its name.
+    The `Test-CScheduledTask` function uses `schtasks.exe` to tests if a task with a given name exists on the current computer. If it does, `$true` is returned. Otherwise, `$false` is returned. This name must be the *full task name*, i.e. the task's path/location and its name.
 
     .LINK
-    Get-ScheduledTask
+    Get-CScheduledTask
 
     .EXAMPLE
-    Test-ScheduledTask -Name 'AutoUpdateMyApp'
+    Test-CScheduledTask -Name 'AutoUpdateMyApp'
 
     Demonstrates how to test if a scheduled tasks exists.
     #>

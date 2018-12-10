@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Uninstall-User
+function Uninstall-CUser
 {
     <#
     .SYNOPSIS
@@ -20,19 +20,19 @@ function Uninstall-User
     Removes a *local* user account.  If the account doesn't exist, nothing happens.
 
     .LINK
-    Get-User
+    Get-CUser
 
     .LINK
-    Install-User
+    Install-CUser
 
     .LINK
-    Test-User
+    Test-CUser
 
     .LINK
-    Uninstall-User
+    Uninstall-CUser
 
     .EXAMPLE
-    Uninstall-User -Username WTarkin
+    Uninstall-CUser -Username WTarkin
 
     Removes the `WTarkin` *local* user account.
     #>
@@ -49,9 +49,9 @@ function Uninstall-User
 
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
     
-    if( Test-User -Username $username )
+    if( Test-CUser -Username $username )
     {
-        $user = Get-User -Username $Username
+        $user = Get-CUser -Username $Username
         try
         {
             if( $pscmdlet.ShouldProcess( $Username, "remove local user" ) )
@@ -66,5 +66,5 @@ function Uninstall-User
     }
 }
 
-Set-Alias -Name 'Remove-User' -Value 'Uninstall-User'
+Set-Alias -Name 'Remove-User' -Value 'Uninstall-CUser'
 

@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Resolve-RelativePath
+function Resolve-CRelativePath
 {
     <#
     .SYNOPSIS
@@ -22,22 +22,22 @@ function Resolve-RelativePath
     Neither the `From` or `To` paths need to exist.
     
     .EXAMPLE
-    Resolve-RelativePath -Path 'C:\Program Files' -FromDirectory 'C:\Windows\system32' 
+    Resolve-CRelativePath -Path 'C:\Program Files' -FromDirectory 'C:\Windows\system32' 
     
     Returns `..\..\Program Files`.
     
     .EXAMPLE
-    Get-ChildItem * | Resolve-RelativePath -FromDirectory 'C:\Windows\system32'
+    Get-ChildItem * | Resolve-CRelativePath -FromDirectory 'C:\Windows\system32'
     
     Returns the relative path from the `C:\Windows\system32` directory to the current directory.
     
     .EXAMPLE
-    Resolve-RelativePath -Path 'C:\I\do\not\exist\either' -FromDirectory 'C:\I\do\not\exist' 
+    Resolve-CRelativePath -Path 'C:\I\do\not\exist\either' -FromDirectory 'C:\I\do\not\exist' 
     
     Returns `.\either`.
     
     .EXAMPLE
-    Resolve-RelativePath -Path 'C:\I\do\not\exist\either' -FromFile 'C:\I\do\not\exist_file' 
+    Resolve-CRelativePath -Path 'C:\I\do\not\exist\either' -FromFile 'C:\I\do\not\exist_file' 
     
     Treats `C:\I\do\not\exist_file` as a file, so returns a relative path of `.\exist\either`.
     

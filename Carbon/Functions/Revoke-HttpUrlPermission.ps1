@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Revoke-HttpUrlPermission
+function Revoke-CHttpUrlPermission
 {
     <#
     .SYNOPSIS
@@ -25,7 +25,7 @@ function Revoke-HttpUrlPermission
 
     An application that uses the HTTP Server API must register all URLs it listens (i.e. binds, registers) to. This function removes all permissions to a URL for a specific user or group. If a user or group doesn't have permission, this function does nothing.
 
-    If you want to *change* a user's permissions, use `Grant-HttpUrlPermission` instead.
+    If you want to *change* a user's permissions, use `Grant-CHttpUrlPermission` instead.
 
     This command replaces the `netsh http delete urlacl` command.
 
@@ -35,10 +35,10 @@ function Revoke-HttpUrlPermission
     https://msdn.microsoft.com/en-us/library/aa364510.aspx
 
     .LINK
-    Get-HttpUrlAcl
+    Get-CHttpUrlAcl
 
     .LINK
-    Grant-HttpUrlPermission
+    Grant-CHttpUrlPermission
 
     .EXAMPLE
     Revoke-HttpUrlAclPermission -Url 'http://+:4833' -Principal 'FALCON\HSolo'
@@ -63,7 +63,7 @@ function Revoke-HttpUrlPermission
 
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
-    $id = Resolve-Identity -Name $Principal
+    $id = Resolve-CIdentity -Name $Principal
     if( -not $id )
     {
         return
@@ -74,7 +74,7 @@ function Revoke-HttpUrlPermission
         $Url = '{0}/' -f $Url
     }
 
-    $acl = Get-HttpUrlAcl -LiteralUrl $Url -ErrorAction Ignore
+    $acl = Get-CHttpUrlAcl -LiteralUrl $Url -ErrorAction Ignore
     if( -not $acl )
     {
         return

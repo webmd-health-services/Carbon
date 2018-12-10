@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Uninstall-MsmqMessageQueue
+function Uninstall-CMsmqMessageQueue
 {
     <#
     .SYNOPSIS
@@ -20,12 +20,12 @@ function Uninstall-MsmqMessageQueue
     Removes/deletes an existing MSMQ queue by name.  If a queue with that name doesn't exist, nothing happens.
 
     .EXAMPLE
-    Uninstall-MsmqMessageQueue -Name MovieQueue
+    Uninstall-CMsmqMessageQueue -Name MovieQueue
 
     Removes the public `MovieQueue` queue.
 
     .EXAMPLE
-    Uninstall-MsmqMessageQueue -Name MovieCriticsQueue -Private
+    Uninstall-CMsmqMessageQueue -Name MovieCriticsQueue -Private
 
     Removes the private `MovieCriticsQueue` queue.
     #>
@@ -47,7 +47,7 @@ function Uninstall-MsmqMessageQueue
 
     $commonArgs = @{ 'Name' = $Name ; 'Private' = $Private }
     
-    if( -not (Test-MsmqMessageQueue @commonArgs) )
+    if( -not (Test-CMsmqMessageQueue @commonArgs) )
     {
         return
     }
@@ -56,19 +56,19 @@ function Uninstall-MsmqMessageQueue
     {
         try
         {
-            [Messaging.MessageQueue]::Delete( (Get-MsmqMessageQueuePath @commonArgs) )
+            [Messaging.MessageQueue]::Delete( (Get-CMsmqMessageQueuePath @commonArgs) )
         }
         catch
         {
             Write-Error $_
             return
         }
-        while( Test-MsmqMessageQueue @commonArgs )
+        while( Test-CMsmqMessageQueue @commonArgs )
         {
             Start-Sleep -Milliseconds 100
         }
     }
 }
 
-Set-Alias -Name 'Remove-MsmqMessageQueue' -Value 'Uninstall-MsmqMessageQueue'
+Set-Alias -Name 'Remove-MsmqMessageQueue' -Value 'Uninstall-CMsmqMessageQueue'
 

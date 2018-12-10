@@ -11,14 +11,13 @@ LONG DESCRIPTION
     * the `Whiskey.Task` attribute
     * a `TaskContext` parameter
     * a `TaskParameter` parameter that's a hashtable
+    * a `script` scope
 
-    Whiskey will find your task if it is in the global scope when you run your build (i.e. when `Invoke-WhiskeyBuild` is called).
-
-    You can run `Get-WhiskeyTask` to see all the tasks that Whiskey can find.
+    Tasks should be loaded into your build using the `LoadTask` task. 
 
     Here is a stub function to get you started:
 
-        function FUNCTION_NAME
+        function script:FUNCTION_NAME
         {
             [Whiskey.Task('TASK_NAME')]
             [CmdletBinding()]
@@ -36,9 +35,11 @@ LONG DESCRIPTION
         }
 
 
-    To use your task in a whiskey.yml file, use the name from the `Whiskey.Task` attribute, e.g.
+    To use your task in a whiskey.yml file, make sure the task is loaded first, then use the name from the `Whiskey.Task` attribute, e.g.
 
         Build:
+        - LoadTask:
+            Path: path\to\task\file.ps1
         - TASK_NAME:
             Property: Value
             Property2:
@@ -61,6 +62,8 @@ LONG DESCRIPTION
     * OnlyBy
     * ExceptBy
     * WorkingDirectory
+    * IfExists
+    * UnlessExists
 
     In other words, your task isn't allowed to have these properties.
 
@@ -113,6 +116,7 @@ LONG DESCRIPTION
     * Node
     * Node Modules
     * .NET Core SDK
+    * PowerShell modules
 
     ## Node
 
@@ -163,3 +167,15 @@ LONG DESCRIPTION
     Before installing the .NET Core SDK to the build root, Whiskey will first search for global .NET Core installs containing the desired version. If a global install is found with the correct version, that path is used and the install to the local build root is skipped.
 
     Whiskey will *always* update the `sdk.version` property within the `global.json` file found in the task working directory or the Whiskey build root with the version of the SDK that task is using. If a `global.json` file does not exist in either the working directory or build root, one is created in the build root.
+
+    ## PowerShell Modules
+
+    To install a PowerShell module, add this to your task:
+
+        [Whiskey.RequiresTol('PowerShellModule::Whiskey','WhiskeyPath')]
+
+    The `WhiskeyPath` string is the name of the key where the path to the module root should be saved in the `$TaskParameter` hashtable passed to your task.
+
+    Use the `Import-WhiskeyPowerShellModule` function in your task to import the module. Pass the name (or names) of the module to the `Import-WhiskeyPowerShellModule` function's `Name` parameter.
+
+    Modules are saved to a directory in working directory of the task that requires it. The exact directory is an implementation detail, and is subject to change. Use the path as passed to your task.

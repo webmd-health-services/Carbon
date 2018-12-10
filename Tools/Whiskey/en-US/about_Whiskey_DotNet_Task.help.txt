@@ -1,0 +1,136 @@
+TOPIC
+    about_Whiskey_DotNet_Task
+
+SUMMARY
+    Runs dotnet.exe commands.
+
+DESCRIPTION
+    The `DotNet` tasks runs dotnet.exe commands. .NET Core is installed for you into a ".dotnet" directory (in the directory of your whiskey.yml file). You can control what version of the .NET Core SDK to download and use with the "SdkVersion" parameter.
+    
+    If a command accepts any paths to files, pass them to the `Path` property. Wildcards are allowed and the `DotNet` task will run the dotnet.exe command once for each path.
+
+    Pass any command arguments with the `Argument` property.
+
+    The task writes a detailed build log to the build output directory. If the `Path` property has no value, the file is named `dotnet.COMMAND.log`. Otherwise, there will be a log file for each path named `dotnet.COMMAND.FILE_NAME.log`, where `FILE_NAME` is the name portion of the path.
+
+    If a command returns a non-zero exit code, the build will fail.
+
+PROPERTIES
+    * `Argument`: a list of additional arguments to pass to the dotnet.exe command.
+    * `Path`: a list of paths to pass to the dotnet.exe command. Wildcards are supported. If there are multiple paths, the command is run for each path.
+    * `SdkVersion`: the version of the .NET Core SDK to use to build the project. Supports wildcard values. If not specified, the task will look for the SDK version from the `global.json` file if it is found in the task working directory or the Whiskey build root. If no SDK version can be located, the task will default to using the SDK version that comes with the latest LTS release of the .NET Core runtime. Whiskey will *always* update the SDK version property in the `global.json` file with the SDK version that task is running with. If no `global.json` file exists, one will be created in the Whiskey build root.
+
+EXAMPLES
+
+    ## Example 1
+
+        Build:
+        - DotNet:
+            Command: build
+            Path:
+            - DotNetCoreSolution.sln
+
+    Demonstrates building the DotNetCoreSolution.sln file with the `dotnet build` command.
+
+    ## Example 2
+
+        Build:
+        - DotNet:
+            Command: build
+            Path:
+            - DotNetCoreSolution.sln
+            Argument:
+            - --verbosity=n
+            - --output=bin
+
+    Demonstrates how to pass additional arguments to the dotnet.exe command. In this case, the `--verbosity` and `--output` parameters are passed.
+
+    ## Example 3
+
+        Build:
+        - DotNet:
+            Command: build
+            Path:
+            - src\DotNetStandardLibrary.csproj
+            - src\DotNetCoreApp.csproj
+
+    Demonstrates how to run a command against multiple paths/projects.
+
+    ## Example 4
+
+        Build:
+        - DotNet:
+            Command: build
+            Path:
+            - DotNetCoreSolution.sln
+            SdkVersion: 2.*
+
+    Demonstrates how to customize the version of the .NET Core SDK to use to build. Whiskey installs the specified version of .NET Core into a ".dotnet" directory in the same directory as your whiskey.yml file.
+
+    ## Example 5
+
+        Build:
+        - DotNet:
+            Command: build
+            Argument:
+            - --configuration=$(WHISKEY_MSBUILD_CONFIGURATION)
+
+    Demonstrates how to build using Whiskey's MSBuild configuration. When run by a developer, code is compiled in Debug mode. Otherwise, it is compiled in Release mode.
+
+    ## Example 6
+
+        Build:
+        - DotNet:
+            Command: build
+            Argument:
+            - -p:Version=$(WHISKEY_SEMVER2)
+        
+    Demonstrates how to get your code compiled using the version created by Whiskey and/or specified in your whiskey.yml file. See `about_Whiskey_Variables` for a list of all version-related variables you could use.
+
+    ## Example 7
+
+        Build:
+        - DotNet:
+            Command: build
+            Argument:
+            - --output=bin
+
+    Demonstrates how to customize the path to the output directory (when building). If the path is absolute, code is compiled there. If it is relative, it is evaluated from the directory of the project being built.
+
+    ## Examle 8
+
+        Build:
+        - DotNet:
+            Command: pack
+            Argument:
+            - -p:PackageVersion=$(WHISKEY_SEMVER2)
+
+    Demonstrates how to package using the version number created by Whiskey and/or specified in your whiskey.yml file.
+
+    ## Example 9
+
+        Build:
+        - DotNet:
+            Command: pack
+            Path:
+            - DotNetCoreSolution.sln
+            Argument:
+            - --include-symbols
+            - --include-source
+
+    Demonstrates how to create a NuGet package with the `pack` command that includes symbols and source.
+
+    ## Example 10
+
+        Build:
+        - DotNet:
+            Command: test
+            Path: Test\DotNetCoreTests.csproj
+            Argument:
+            - --logger=trx
+            - --test-adapter-path=TestAdapters\NUnit3.TestAdapter.dll
+            - --results-directory=$(WHISKEY_OUTPUT_DIRECTORY)
+
+    Demonstrates running the `test` command to run tests using a custom test adapter (in this case, NUnit3), logging in a custom format, and specifying that the results should go into Whiskey's output directory.
+
+

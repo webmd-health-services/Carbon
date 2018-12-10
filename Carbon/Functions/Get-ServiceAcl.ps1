@@ -10,26 +10,26 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Get-ServiceAcl
+function Get-CServiceAcl
 {
     <#
     .SYNOPSIS
     Gets the discretionary access control list (i.e. DACL) for a service.
     
     .DESCRIPTION
-    You wanted it, you got it!  You probably want to use `Get-ServicePermission` instead.  If you want to chagne a service's permissions, use `Grant-ServicePermission` or `Revoke-ServicePermissions`.
+    You wanted it, you got it!  You probably want to use `Get-CServicePermission` instead.  If you want to chagne a service's permissions, use `Grant-CServicePermission` or `Revoke-ServicePermissions`.
     
     .LINK
-    Get-ServicePermission
+    Get-CServicePermission
     
     .LINK
-    Grant-ServicePermission
+    Grant-CServicePermission
     
     .LINK
-    Revoke-ServicePermission
+    Revoke-CServicePermission
     
     .EXAMPLE
-    Get-ServiceAcl -Name Hyperdrive
+    Get-CServiceAcl -Name Hyperdrive
     
     Gets the `Hyperdrive` service's DACL.
     #>
@@ -45,7 +45,7 @@ function Get-ServiceAcl
 
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
-    $rawSD = Get-ServiceSecurityDescriptor -Name $Name
+    $rawSD = Get-CServiceSecurityDescriptor -Name $Name
     $rawDacl = $rawSD.DiscretionaryAcl
     New-Object Security.AccessControl.DiscretionaryAcl $false,$false,$rawDacl
 }

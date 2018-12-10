@@ -67,7 +67,7 @@ if( (Test-Path -Path $microsoftWebAdministrationPath -PathType Leaf) )
     Write-Timing ('Adding Carbon.Iis assembly.')
     Add-Type -Path (Join-Path -Path $CarbonBinDir -ChildPath 'Carbon.Iis.dll' -Resolve)
 
-    if( -not (Test-TypeDataMember -TypeName 'Microsoft.Web.Administration.Site' -MemberName 'PhysicalPath') )
+    if( -not (Test-CTypeDataMember -TypeName 'Microsoft.Web.Administration.Site' -MemberName 'PhysicalPath') )
     {
         Write-Timing ('Updating Microsoft.Web.Administration.Site type data.')
         Update-TypeData -TypeName 'Microsoft.Web.Administration.Site' -MemberType ScriptProperty -MemberName 'PhysicalPath' -Value { 
@@ -79,7 +79,7 @@ if( (Test-Path -Path $microsoftWebAdministrationPath -PathType Leaf) )
             }
     }
 
-    if( -not (Test-TypeDataMember -TypeName 'Microsoft.Web.Administration.Application' -MemberName 'PhysicalPath') )
+    if( -not (Test-CTypeDataMember -TypeName 'Microsoft.Web.Administration.Application' -MemberName 'PhysicalPath') )
     {
         Write-Timing ('Updating Microsoft.Web.Administration.Application type data.')
         Update-TypeData -TypeName 'Microsoft.Web.Administration.Application' -MemberType ScriptProperty -MemberName 'PhysicalPath' -Value { 
@@ -140,7 +140,7 @@ $supportNotFoundErrorMessage = 'Unable to find support for managing Windows feat
 
 
 # Extended Type
-if( -not (Test-TypeDataMember -TypeName 'System.IO.FileInfo' -MemberName 'GetCarbonFileInfo') )
+if( -not (Test-CTypeDataMember -TypeName 'System.IO.FileInfo' -MemberName 'GetCarbonFileInfo') )
 {
     Write-Timing ('Updating System.IO.FileInfo type data (GetCarbonFileInfo).')
     Update-TypeData -TypeName 'System.IO.FileInfo' -MemberType ScriptMethod -MemberName 'GetCarbonFileInfo' -Value {
@@ -170,7 +170,7 @@ if( -not (Test-TypeDataMember -TypeName 'System.IO.FileInfo' -MemberName 'GetCar
     }
 }
 
-if( -not (Test-TypeDataMember -TypeName 'System.IO.FileInfo' -MemberName 'FileIndex') )
+if( -not (Test-CTypeDataMember -TypeName 'System.IO.FileInfo' -MemberName 'FileIndex') )
 {
     Write-Timing ('Updating System.IO.FileInfo type data (FileIndex).')
     Update-TypeData -TypeName 'System.IO.FileInfo' -MemberType ScriptProperty -MemberName 'FileIndex' -Value {
@@ -179,7 +179,7 @@ if( -not (Test-TypeDataMember -TypeName 'System.IO.FileInfo' -MemberName 'FileIn
     }
 }
 
-if( -not (Test-TypeDataMember -TypeName 'System.IO.FileInfo' -MemberName 'LinkCount') )
+if( -not (Test-CTypeDataMember -TypeName 'System.IO.FileInfo' -MemberName 'LinkCount') )
 {
     Write-Timing ('Updating System.IO.FileInfo type data (LinkCount).')
     Update-TypeData -TypeName 'System.IO.FileInfo' -MemberType ScriptProperty -MemberName 'LinkCount' -Value {
@@ -188,7 +188,7 @@ if( -not (Test-TypeDataMember -TypeName 'System.IO.FileInfo' -MemberName 'LinkCo
     }
 }
 
-if( -not (Test-TypeDataMember -TypeName 'System.IO.FileInfo' -MemberName 'VolumeSerialNumber') )
+if( -not (Test-CTypeDataMember -TypeName 'System.IO.FileInfo' -MemberName 'VolumeSerialNumber') )
 {
     Write-Timing ('Updating System.IO.FileInfo type data (ColumeSerialNumber).')
     Update-TypeData -TypeName 'System.IO.FileInfo' -MemberType ScriptProperty -MemberName 'VolumeSerialNumber' -Value {
@@ -214,8 +214,16 @@ try
         return
     }
 
+    Write-Timing ('Creating aliases.')
+    [string[]]$functionNames = $module.ExportedFunctions.Keys
+    foreach( $functionName in $functionNames )
+    {
+        $oldFunctionName = $functionName -replace '-C','-'
+        Set-Alias -Name $oldFunctionName -Value $functionName
+    }
+
     Write-Timing ('Exporting module members.')
-    Export-ModuleMember -Alias '*' -Function ([string[]]$module.ExportedFunctions.Keys)
+    Export-ModuleMember -Alias '*' -Function $functionNames
 }
 finally
 {

@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Get-PowershellPath
+function Get-CPowershellPath
 {
     <#
     .SYNOPSIS
@@ -33,12 +33,12 @@ function Get-PowershellPath
         +-----+-----+------+--------------------------------------------------------------+
     
     .EXAMPLE
-    Get-PowerShellPath
+    Get-CPowerShellPath
 
     Returns the path to the version of PowerShell that matches the computer's architecture (i.e. x86 or x64).
 
     .EXAMPLE
-    Get-PowerShellPath -x86
+    Get-CPowerShellPath -x86
 
     Returns the path to the x86 version of PowerShell.
     #>
@@ -54,9 +54,9 @@ function Get-PowershellPath
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
     $psPath = $PSHOME
-    if( Test-OSIs64Bit )
+    if( Test-COSIs64Bit )
     {
-        if( Test-PowerShellIs64Bit )
+        if( Test-CPowerShellIs64Bit )
         {
             if( $x86 )
             {

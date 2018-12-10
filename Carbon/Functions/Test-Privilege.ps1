@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Test-Privilege
+function Test-CPrivilege
 {
     <#
     .SYNOPSIS
@@ -23,16 +23,16 @@ function Test-Privilege
     Carbon_Privilege
 
     .LINK
-    Get-Privilege
+    Get-CPrivilege
 
     .LINK
-    Grant-Privilege
+    Grant-CPrivilege
 
     .LINK
-    Revoke-Privilege
+    Revoke-CPrivilege
     
     .EXAMPLE
-    Test-Privilege -Identity Forrester -Privilege SeServiceLogonRight
+    Test-CPrivilege -Identity Forrester -Privilege SeServiceLogonRight
     
     Tests if `Forrester` has the `SeServiceLogonRight` privilege.
     #>
@@ -53,7 +53,7 @@ function Test-Privilege
 
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
-    $matchingPrivilege = Get-Privilege -Identity $Identity |
+    $matchingPrivilege = Get-CPrivilege -Identity $Identity |
                             Where-Object { $_ -eq $Privilege }
     return ($matchingPrivilege -ne $null)
 }

@@ -6,7 +6,7 @@ function Invoke-WhiskeyDotNetBuild
     [Whiskey.RequiresTool('DotNet','DotNetPath',VersionParameterName='SdkVersion')]
     param(
         [Parameter(Mandatory=$true)]
-        [object]
+        [Whiskey.Context]
         $TaskContext,
 
         [Parameter(Mandatory=$true)]
@@ -17,6 +17,8 @@ function Invoke-WhiskeyDotNetBuild
     Set-StrictMode -Version 'Latest'
     Use-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState
 
+    Write-Warning -Message ('The "DotNetTest" task is obsolete and will be removed in a future version of Whiskey. Please use the "DotNet" task instead.')
+
     $dotnetExe = $TaskParameter['DotNetPath']
 
     $projectPaths = ''
@@ -26,15 +28,9 @@ function Invoke-WhiskeyDotNetBuild
     }
 
     $verbosity = $TaskParameter['Verbosity']
-    if (-not $verbosity -and $TaskContext.ByBuildServer)
+    if( -not $verbosity )
     {
-        $verbosity = 'detailed'
-    }
-
-    $outputDirectory = $TaskParameter['OutputDirectory']
-    if ($outputDirectory)
-    {
-        $outputDirectory = $outputDirectory | Resolve-WhiskeyTaskPath -TaskContext $TaskContext -PropertyName 'OutputDirectory' -Force
+        $verbosity = 'minimal'
     }
 
     $dotnetArgs = & {
@@ -46,9 +42,9 @@ function Invoke-WhiskeyDotNetBuild
             '--verbosity={0}' -f $verbosity
         }
 
-        if ($outputDirectory)
+        if ($TaskParameter['OutputDirectory'])
         {
-            '--output={0}' -f $outputDirectory
+            '--output={0}' -f $TaskParameter['OutputDirectory']
         }
 
         if ($TaskParameter['Argument'])
@@ -61,19 +57,6 @@ function Invoke-WhiskeyDotNetBuild
 
     foreach($project in $projectPaths)
     {
-        $fullArgumentList = & {
-            'build'
-            $dotnetArgs
-            $project
-        }
-
-        Write-WhiskeyCommand -Context $TaskContext -Path $dotnetExe -ArgumentList $fullArgumentList
-
-        & $dotnetExe build $dotnetArgs $project
-
-        if ($LASTEXITCODE -ne 0)
-        {
-            Stop-WhiskeyTask -TaskContext $TaskContext -Message ('dotnet.exe failed with exit code ''{0}''' -f $LASTEXITCODE)
-        }
+        Invoke-WhiskeyDotNetCommand -TaskContext $TaskContext -DotNetPath $dotnetExe -Name 'build' -ArgumentList $dotnetArgs -ProjectPath $project
     }
 }

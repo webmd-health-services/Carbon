@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Test-IisAppPool
+function Test-CIisAppPool
 {
     <# 
     .SYNOPSIS
@@ -22,7 +22,7 @@ function Test-IisAppPool
     Beginning with Carbon 2.0.1, this function is available only if IIS is installed.
 
     .EXAMPLE
-    Test-IisAppPool -Name Peanuts
+    Test-CIisAppPool -Name Peanuts
 
     Returns `True` if the Peanuts app pool exists, `False` if it doesn't.
     #>
@@ -38,7 +38,7 @@ function Test-IisAppPool
 
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
-    $appPool = Get-IisAppPool -Name $Name
+    $appPool = Get-CIisAppPool -Name $Name
     if( $appPool )
     {
         return $true
@@ -47,4 +47,4 @@ function Test-IisAppPool
     return $false
 }
 
-Set-Alias -Name 'Test-IisAppPoolExists' -Value 'Test-IisAppPool'
+Set-Alias -Name 'Test-IisAppPoolExists' -Value 'Test-CIisAppPool'

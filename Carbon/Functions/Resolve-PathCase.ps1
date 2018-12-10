@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Resolve-PathCase
+function Resolve-CPathCase
 {
     <#
     .SYNOPSIS
@@ -22,12 +22,12 @@ function Resolve-PathCase
     If the path doesn't an exist, an error is written and nothing is returned.
 
     .EXAMPLE
-    Resolve-PathCase -Path "C:\WINDOWS\SYSTEM32"
+    Resolve-CPathCase -Path "C:\WINDOWS\SYSTEM32"
     
     Returns `C:\Windows\system32`.
     
     .EXAMPLE
-    Resolve-PathCase -Path 'c:\projects\carbon' 
+    Resolve-CPathCase -Path 'c:\projects\carbon' 
     
     Returns `C:\Projects\Carbon`.
     #>
@@ -84,5 +84,5 @@ function Resolve-PathCase
     return Join-Path -Path $qualifier -ChildPath $canonicalPath
 }
 
-Set-Alias -Name 'Get-PathCanonicalCase' -Value 'Resolve-PathCase'
+Set-Alias -Name 'Get-PathCanonicalCase' -Value 'Resolve-CPathCase'
 

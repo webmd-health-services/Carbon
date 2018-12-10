@@ -43,11 +43,11 @@ OVERVIEW
     Only PowerShell [approved verbs](http://msdn.microsoft.com/en-us/library/windows/desktop/ms714428.aspx)
     are used for command names. Carbon assigns special meaning to these verbs:
     
-    * Format: Escape (e.g. `Format-ADSearchFilterValue`).
+    * Format: Escape (e.g. `Format-CADSearchFilterValue`).
     * Install: Create a resource if it doesn't exist. If it does exist, update its 
-      configuration to your desired state (e.g. `Install-User`, `Install-IisWebsite`,
+      configuration to your desired state (e.g. `Install-CUser`, `Install-CIisWebsite`,
       etc.).
-    * Split: Parse (e.g. Split-Ini)
+    * Split: Parse (e.g. Split-CIni)
     * Uninstall: Remove a resource if it exists. If it doesn't exist, do nothing.
     
     Carbon has no dependencies and is designed to work on a computer running a fresh

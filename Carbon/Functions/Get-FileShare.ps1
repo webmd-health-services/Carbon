@@ -10,48 +10,48 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Get-FileShare
+function Get-CFileShare
 {
     <#
     .SYNOPSIS
     Gets the file/SMB shares on the local computer.
 
     .DESCRIPTION
-    The `Get-FileShare` function uses WMI to get the file/SMB shares on the current/local computer. The returned objects are `Win32_Share` WMI objects.
+    The `Get-CFileShare` function uses WMI to get the file/SMB shares on the current/local computer. The returned objects are `Win32_Share` WMI objects.
 
     Use the `Name` paramter to get a specific file share by its name. If a share with the given name doesn't exist, an error is written and nothing is returned.
     
     The `Name` parameter supports wildcards. If you're using wildcards to find a share, and no shares are found, no error is written and nothing is returned.
 
-    `Get-FileShare` was added in Carbon 2.0.
+    `Get-CFileShare` was added in Carbon 2.0.
 
     .LINK
     https://msdn.microsoft.com/en-us/library/aa394435.aspx
 
     .LINK
-    Get-FileSharePermission
+    Get-CFileSharePermission
 
     .LINK
-    Install-FileShare
+    Install-CFileShare
 
     .LINK
-    Test-FileShare
+    Test-CFileShare
 
     .LINK
-    Uninstall-FileShare
+    Uninstall-CFileShare
 
     .EXAMPLE
-    Get-FileShare
+    Get-CFileShare
 
     Demonstrates how to get all the file shares on the local computer.
 
     .EXAMPLE
-    Get-FileShare -Name 'Build'
+    Get-CFileShare -Name 'Build'
 
     Demonstrates how to get a specific file share.
 
     .EXAMPLE
-    Get-FileShare -Name 'Carbon*'
+    Get-CFileShare -Name 'Carbon*'
 
     Demonstrates that you can use wildcards to find all shares that match a wildcard pattern.
     #>

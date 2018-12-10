@@ -10,31 +10,31 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Uninstall-ScheduledTask
+function Uninstall-CScheduledTask
 {
     <#
     .SYNOPSIS
     Uninstalls a scheduled task on the current computer.
 
     .DESCRIPTION
-    The `Uninstall-ScheduledTask` function uses `schtasks.exe` to uninstall a scheduled task on the current computer. If the task doesn't exist, nothing happens.
+    The `Uninstall-CScheduledTask` function uses `schtasks.exe` to uninstall a scheduled task on the current computer. If the task doesn't exist, nothing happens.
 
     .LINK
-    Get-ScheduledTask
+    Get-CScheduledTask
 
     .LINK
-    Test-ScheduledTask
+    Test-CScheduledTask
 
     .LINK
-    Install-ScheduledTask
+    Install-CScheduledTask
 
     .EXAMPLE
-    Uninstall-ScheduledTask -Name 'doc' 
+    Uninstall-CScheduledTask -Name 'doc' 
 
     Demonstrates how to delete a scheduled task named `doc`.
 
     .EXAMPLE
-    Uninstall-ScheduledTask -Name 'doc' -Force
+    Uninstall-CScheduledTask -Name 'doc' -Force
 
     Demonstrates how to delete a scheduled task that is currently running.
     #>
@@ -57,7 +57,7 @@ function Uninstall-ScheduledTask
     $tryNum = 0
     do
     {
-        if( -not (Test-ScheduledTask -Name $Name) )
+        if( -not (Test-CScheduledTask -Name $Name) )
         {
             Write-Verbose ('Scheduled task ''{0}'' not found.' -f $Name)
             return
@@ -65,7 +65,7 @@ function Uninstall-ScheduledTask
 
         $lastTry = (++$tryNum -ge $MAX_TRIES)
         Write-Verbose ('Deleting scheduled task ''{0}''.' -f $Name)
-        $errFile = Join-Path -Path $env:TEMP -ChildPath ('Carbon+Uninstall-ScheduledTask+{0}' -f ([IO.Path]::GetRandomFileName()))
+        $errFile = Join-Path -Path $env:TEMP -ChildPath ('Carbon+Uninstall-CScheduledTask+{0}' -f ([IO.Path]::GetRandomFileName()))
         schtasks.exe /delete /tn $Name '/F' 2> $errFile | ForEach-Object { 
             if( $_ -match '\bERROR\b' )
             {

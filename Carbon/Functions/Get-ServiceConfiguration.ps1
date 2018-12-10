@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Get-ServiceConfiguration
+function Get-CServiceConfiguration
 {
     <#
     .SYNOPSIS
@@ -47,25 +47,25 @@ function Get-ServiceConfiguration
 
         Get-Service | Get-Member
 
-    The user running this function must have `QueryConfig`, `QueryStatus`, and `EnumerateDependents` permissions on the service. Use `Grant-ServicePermission` to grant these permissions.
+    The user running this function must have `QueryConfig`, `QueryStatus`, and `EnumerateDependents` permissions on the service. Use `Grant-CServicePermission` to grant these permissions.
 
     This function is new in Carbon 1.8.
 
     .LINK
-    Grant-ServicePermission
+    Grant-CServicePermission
 
     .EXAMPLE
-    Get-Service | Get-ServiceConfiguration
+    Get-Service | Get-CServiceConfiguration
 
     Demonstrates how you can pipe in a `ServiceController` object to load the service. This works for services on remote computers as well.
     
     .EXAMPLE
-    Get-ServiceConfiguration -Name  'w3svc'
+    Get-CServiceConfiguration -Name  'w3svc'
 
     Demonstrates how you can get a specific service's configuration.
 
     .EXAMPLE
-    Get-ServiceConfiguration -Name 'w3svc' -ComputerName 'enterprise'
+    Get-CServiceConfiguration -Name 'w3svc' -ComputerName 'enterprise'
 
     Demonstrates how to get service configuration for a service on a remote computer.
     #>

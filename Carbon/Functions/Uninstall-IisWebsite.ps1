@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Uninstall-IisWebsite
+function Uninstall-CIisWebsite
 {
     <#
     .SYNOPSIS
@@ -22,18 +22,18 @@ function Uninstall-IisWebsite
     Beginning with Carbon 2.0.1, this function is not available if IIS isn't installed.
 
     .LINK
-    Get-IisWebsite
+    Get-CIisWebsite
     
     .LINK
-    Install-IisWebsite
+    Install-CIisWebsite
     
     .EXAMPLE
-    Uninstall-IisWebsite -Name 'MyWebsite'
+    Uninstall-CIisWebsite -Name 'MyWebsite'
     
     Removes MyWebsite.
 
     .EXAMPLE
-    Uninstall-IisWebsite 1
+    Uninstall-CIisWebsite 1
 
     Removes the website whose ID is 1.
     #>
@@ -49,7 +49,7 @@ function Uninstall-IisWebsite
 
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
     
-    if( Test-IisWebsite -Name $Name )
+    if( Test-CIisWebsite -Name $Name )
     {
         $manager = New-Object 'Microsoft.Web.Administration.ServerManager'
         try
@@ -65,5 +65,5 @@ function Uninstall-IisWebsite
     }
 }
 
-Set-Alias -Name 'Remove-IisWebsite' -Value 'Uninstall-IisWebsite'
+Set-Alias -Name 'Remove-IisWebsite' -Value 'Uninstall-CIisWebsite'
 

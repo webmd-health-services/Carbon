@@ -5,7 +5,11 @@ $events = @{ }
 
 $7z = Join-Path -Path $PSScriptRoot -ChildPath 'bin\7-Zip\7z.exe' -Resolve
 
+$powerShellModulesDirectoryName = 'PSModules'
+
 $buildStartedAt = [DateTime]::MinValue
+
+$PSModuleAutoLoadingPreference = 'None'
 
 $supportsWriteInformation = Get-Command -Name 'Write-Information' -ErrorAction Ignore
 
@@ -18,6 +22,16 @@ $attr = New-Object -TypeName 'Whiskey.TaskAttribute' -ArgumentList 'Whiskey' -Er
 if( -not ($attr | Get-Member 'SupportsClean') )
 {
     Write-Error -Message ('You''ve got an old version of Whiskey loaded. Please open a new PowerShell session.') -ErrorAction Stop
+}
+
+$context = New-Object -TypeName 'Whiskey.Context'
+$propertiesToCheck = @( 'TaskPaths', 'MSBuildConfiguration' )
+foreach( $propertyToCheck in $propertiesToCheck )
+{
+    if( -not ($context | Get-Member $propertyToCheck) )
+    {
+        Write-Error -Message ('You''ve got an old version of Whiskey loaded. Please open a new PowerShell session.') -ErrorAction Stop
+    }
 }
 
 Get-ChildItem -Path (Join-Path -Path $PSScriptRoot -ChildPath 'Functions'),(Join-Path -Path $PSScriptRoot -ChildPath 'Tasks') -Filter '*.ps1' |

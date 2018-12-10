@@ -15,7 +15,12 @@ function Get-MSBuild
             $Key
         )
 
-        $toolsPath = Get-ItemProperty -Path $Key.PSPath -Name 'MSBuildToolsPath' | Select -ExpandProperty 'MSBuildToolsPath'
+        $toolsPath = Get-ItemProperty -Path $Key.PSPath -Name 'MSBuildToolsPath' -ErrorAction Ignore | Select-Object -ExpandProperty 'MSBuildToolsPath' -ErrorAction Ignore
+        if( -not $toolsPath )
+        {
+            return ''
+        }
+
         $path = Join-Path -Path $toolsPath -ChildPath 'MSBuild.exe'
         if( (Test-Path -Path $path -PathType Leaf) )
         {

@@ -6,7 +6,7 @@ function Invoke-WhiskeyDotNetPack
     [Whiskey.RequiresTool('DotNet','DotNetPath',VersionParameterName='SdkVersion')]
     param(
         [Parameter(Mandatory=$true)]
-        [object]
+        [Whiskey.Context]
         $TaskContext,
 
         [Parameter(Mandatory=$true)]
@@ -16,6 +16,8 @@ function Invoke-WhiskeyDotNetPack
 
     Set-StrictMode -Version 'Latest'
     Use-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState
+
+    Write-Warning -Message ('The "DotNetTest" task is obsolete and will be removed in a future version of Whiskey. Please use the "DotNet" task instead.')
 
     $dotnetExe = $TaskParameter['DotNetPath']
 
@@ -28,9 +30,9 @@ function Invoke-WhiskeyDotNetPack
     $symbols = $TaskParameter['Symbols'] | ConvertFrom-WhiskeyYamlScalar
 
     $verbosity = $TaskParameter['Verbosity']
-    if (-not $verbosity -and $TaskContext.ByBuildServer)
+    if (-not $verbosity)
     {
-        $verbosity = 'detailed'
+        $verbosity = 'minimal'
     }
 
     $dotnetArgs = & {
@@ -61,19 +63,6 @@ function Invoke-WhiskeyDotNetPack
 
     foreach($project in $projectPaths)
     {
-        $fullArgumentList = & {
-            'pack'
-            $dotnetArgs
-            $project
-        }
-
-        Write-WhiskeyCommand -Context $TaskContext -Path $dotnetExe -ArgumentList $fullArgumentList
-
-        & $dotnetExe pack $dotnetArgs $project
-
-        if ($LASTEXITCODE -ne 0)
-        {
-            Stop-WhiskeyTask -TaskContext $TaskContext -Message ('dotnet.exe failed with exit code ''{0}''' -f $LASTEXITCODE)
-        }
+        Invoke-WhiskeyDotNetCommand -TaskContext $TaskContext -DotNetPath $dotnetExe -Name 'pack' -ArgumentList $dotnetArgs -ProjectPath $project
     }
 }

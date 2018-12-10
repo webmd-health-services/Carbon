@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Assert-AdminPrivilege
+function Assert-CAdminPrivilege
 {
     <#
     .SYNOPSIS
@@ -20,10 +20,10 @@ function Assert-AdminPrivilege
     Many scripts and functions require the user to be running as an administrator.  This function checks if the user is running as an administrator or with administrator privileges and writes an error if the user doesn't.  
 
     .LINK
-    Test-AdminPrivilege
+    Test-CAdminPrivilege
 
     .EXAMPLE
-    Assert-AdminPrivilege
+    Assert-CAdminPrivilege
 
     Writes an error that the user doesn't have administrator privileges.
     #>
@@ -35,7 +35,7 @@ function Assert-AdminPrivilege
 
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
-    if( -not (Test-AdminPrivilege) )
+    if( -not (Test-CAdminPrivilege) )
     {
         Write-Error "You are not currently running with administrative privileges.  Please re-start PowerShell as an administrator (right-click the PowerShell application, and choose ""Run as Administrator"")."
         return $false
@@ -43,5 +43,5 @@ function Assert-AdminPrivilege
     return $true
 }
 
-Set-Alias -Name 'Assert-AdminPrivileges' -Value 'Assert-AdminPrivilege'
+Set-Alias -Name 'Assert-AdminPrivileges' -Value 'Assert-CAdminPrivilege'
 

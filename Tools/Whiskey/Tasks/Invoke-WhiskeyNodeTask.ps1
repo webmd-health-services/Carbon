@@ -1,13 +1,6 @@
 
 function Invoke-WhiskeyNodeTask
 {
-    <#
-    .SYNOPSIS
-    ** OBSOLETE ** Use the `NpmInstall`, `NpmRunScript`, `NodeNspCheck`, and `NodeLicenseChecker` tasks instead.
-    
-    .DESCRIPTION
-    ** OBSOLETE ** Use the `NpmInstall`, `NpmRunScript`, `NodeNspCheck`, and `NodeLicenseChecker` tasks instead.
-    #>
     [Whiskey.Task('Node',SupportsClean=$true,SupportsInitialize=$true)]
     [Whiskey.RequiresTool('Node','NodePath')]
     [Whiskey.RequiresTool('NodeModule::license-checker','LicenseCheckerPath',VersionParameterName='LicenseCheckerVersion')]
@@ -31,7 +24,7 @@ function Invoke-WhiskeyNodeTask
     Set-StrictMode -Version 'Latest'
     Use-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState
 
-    Write-Warning -Message ('The ''Node'' task has been deprecated and will be removed in a future version of Whiskey. It''s functionality has been broken up into individual smaller tasks, ''NpmInstall'', ''NpmRunScript'', ''NodeNspCheck'', and ''NodeLicenseChecker''. Update the build configuration in ''{0}'' to use the new tasks.' -f $TaskContext.ConfigurationPath)
+    Write-Warning -Message ('The "Node" task is obsolete and will be removed in a future version of Whiskey. It''s functionality has been broken up into the "Npm" and "NodeLicenseChecker" tasks. Update the build configuration in "{0}" to use the new tasks.' -f $TaskContext.ConfigurationPath)
 
     if( $TaskContext.ShouldClean )
     {

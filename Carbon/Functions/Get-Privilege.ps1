@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Get-Privilege
+function Get-CPrivilege
 {
     <#
     .SYNOPSIS
@@ -28,16 +28,16 @@ function Get-Privilege
     Carbon_Privilege
 
     .LINK
-    Grant-Privilege
+    Grant-CPrivilege
     
     .LINK
     Revoke-Prvileges
     
     .LINK
-    Test-Privilege
+    Test-CPrivilege
     
     .EXAMPLE
-    Get-Privilege -Identity TheBeast
+    Get-CPrivilege -Identity TheBeast
     
     Gets `TheBeast`'s privileges as an array of strings.
     #>
@@ -56,5 +56,5 @@ function Get-Privilege
     [Carbon.Security.Privilege]::GetPrivileges( $Identity )
 }
 
-Set-Alias -Name 'Get-Privileges' -Value 'Get-Privilege'
+Set-Alias -Name 'Get-Privileges' -Value 'Get-CPrivilege'
 

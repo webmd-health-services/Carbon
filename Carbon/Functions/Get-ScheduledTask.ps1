@@ -10,41 +10,41 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Get-ScheduledTask
+function Get-CScheduledTask
 {
     <#
     .SYNOPSIS
     Gets the scheduled tasks for the current computer.
 
     .DESCRIPTION
-    The `Get-ScheduledTask` function gets the scheduled tasks on the current computer. It returns `Carbon.TaskScheduler.TaskInfo` objects for each one.
+    The `Get-CScheduledTask` function gets the scheduled tasks on the current computer. It returns `Carbon.TaskScheduler.TaskInfo` objects for each one.
 
-    With no parameters, `Get-ScheduledTask` returns all scheduled tasks. To get a specific scheduled task, use the `Name` parameter, which must be the full name of the task, i.e. path plus name. The name parameter accepts wildcards. If a scheduled task with the given name isn't found, an error is written.
+    With no parameters, `Get-CScheduledTask` returns all scheduled tasks. To get a specific scheduled task, use the `Name` parameter, which must be the full name of the task, i.e. path plus name. The name parameter accepts wildcards. If a scheduled task with the given name isn't found, an error is written.
 
-    This function has the same name as the built-in `Get-ScheduledTask` function that comes on Windows 2012/8 and later. It returns objects with the same properties, but if you want to use the built-in function, use the `ScheduledTasks` qualifier, e.g. `ScheduledTasks\Get-ScheduledTask`.
+    This function has the same name as the built-in `Get-CScheduledTask` function that comes on Windows 2012/8 and later. It returns objects with the same properties, but if you want to use the built-in function, use the `ScheduledTasks` qualifier, e.g. `ScheduledTasks\Get-CScheduledTask`.
 
     .LINK
-    Test-ScheduledTask
+    Test-CScheduledTask
 
     .EXAMPLE
-    Get-ScheduledTask
+    Get-CScheduledTask
 
     Demonstrates how to get all scheduled tasks.
 
     .EXAMPLE
-    Get-ScheduledTask -Name 'AutoUpdateMyApp'
+    Get-CScheduledTask -Name 'AutoUpdateMyApp'
 
     Demonstrates how to get a specific task.
 
     .EXAMPLE
-    Get-ScheduledTask -Name '*Microsoft*'
+    Get-CScheduledTask -Name '*Microsoft*'
 
     Demonstrates how to get all tasks that match a wildcard pattern.
 
     .EXAMPLE
-    ScheduledTasks\Get-ScheduledTask
+    ScheduledTasks\Get-CScheduledTask
 
-    Demonstrates how to call the `Get-ScheduledTask` function in the `ScheduledTasks` module which ships on Windows 2012/8 and later.
+    Demonstrates how to call the `Get-CScheduledTask` function in the `ScheduledTasks` module which ships on Windows 2012/8 and later.
     #>
     [CmdletBinding()]
     [OutputType([Carbon.TaskScheduler.TaskInfo])]
@@ -158,7 +158,7 @@ function Get-ScheduledTask
 
     $originalErrPreference = $ErrorActionPreference
     $ErrorActionPreference = 'Continue'
-    $errFile = Join-Path -Path $env:TEMP -ChildPath ('Carbon+Get-ScheduledTask+{0}' -f [IO.Path]::GetRandomFileName())
+    $errFile = Join-Path -Path $env:TEMP -ChildPath ('Carbon+Get-CScheduledTask+{0}' -f [IO.Path]::GetRandomFileName())
     [object[]]$output = schtasks /query /v /fo csv $optionalArgs 2> $errFile | ConvertFrom-Csv | Where-Object { $_.HostName -ne 'HostName' } 
     $ErrorActionPreference = $originalErrPreference
 
@@ -200,7 +200,7 @@ function Get-ScheduledTask
         $xmlDoc = [xml]$xml
 
         $taskPath = Split-Path -Parent -Path $csvTask.TaskName
-        # Get-ScheduledTask on Win2012/8 has a trailing slash so we include it here.
+        # Get-CScheduledTask on Win2012/8 has a trailing slash so we include it here.
         if( $taskPath -ne '\' )
         {
             $taskPath = '{0}\' -f $taskPath

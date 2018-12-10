@@ -10,24 +10,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Uninstall-Directory
+function Uninstall-CDirectory
 {
     <#
     .SYNOPSIS
     Removes a directory, if it exists.
 
     .DESCRIPTION
-    The `Uninstall-Directory` function removes a directory. If the directory doesn't exist, it does nothing. If the directory has any files or sub-directories, you will be prompted to confirm the deletion of the directory and all its contents. To avoid the prompt, use the `-Recurse` switch.
+    The `Uninstall-CDirectory` function removes a directory. If the directory doesn't exist, it does nothing. If the directory has any files or sub-directories, you will be prompted to confirm the deletion of the directory and all its contents. To avoid the prompt, use the `-Recurse` switch.
 
-    `Uninstall-Directory` was added in Carbon 2.1.0.
+    `Uninstall-CDirectory` was added in Carbon 2.1.0.
 
     .EXAMPLE
-    Uninstall-Directory -Path 'C:\Projects\Carbon'
+    Uninstall-CDirectory -Path 'C:\Projects\Carbon'
 
     Demonstrates how to remove/delete a directory. In this case, the directory `C:\Projects\Carbon` will be deleted, if it exists.
 
     .EXAMPLE
-    Uninstall-Directory -Path 'C:\Projects\Carbon' -Recurse
+    Uninstall-CDirectory -Path 'C:\Projects\Carbon' -Recurse
 
     Demonstrates how to remove/delete a directory that has items in it. In this case, the directory `C:\Projects\Carbon` *and all of its files and sub-directories* will be deleted, if the directory exists.
     #>

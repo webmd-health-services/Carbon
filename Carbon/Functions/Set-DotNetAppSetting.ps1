@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Set-DotNetAppSetting
+function Set-CDotNetAppSetting
 {
     <#
     .SYNOPSIS
@@ -27,7 +27,7 @@ function Set-DotNetAppSetting
     Any combination of Framework and Clr switch can be used, but you MUST supply one of each.
     
     .EXAMPLE
-    > Set-DotNetAppSetting -Name ExampleUrl -Value example.com -Framework -Framework64 -Clr2 -Clr4
+    > Set-CDotNetAppSetting -Name ExampleUrl -Value example.com -Framework -Framework64 -Clr2 -Clr4
     
     Sets the ExampleUrl app setting in the following machine.config files:
     
@@ -37,13 +37,13 @@ function Set-DotNetAppSetting
      * `%SYSTEMROOT%\Microsoft.NET\Framework64\v4.0.30319\CONFIG\machine.config`
 
     .LINK
-    Remove-DotNetAppSetting
+    Remove-CDotNetAppSetting
 
     .LINK
-    Set-DotNetConnectionString
+    Set-CDotNetConnectionString
 
     .EXAMPLE
-    > Set-DotNetAppSetting -Name ExampleUrl -Value example.com -Framework64 -Clr4
+    > Set-CDotNetAppSetting -Name ExampleUrl -Value example.com -Framework64 -Clr4
     
     Sets the ExampleUrl app setting in the following machine.config file:
     
@@ -108,8 +108,8 @@ function Set-DotNetAppSetting
         $params = @{
             FilePath = (Join-Path $CarbonBinDir 'Set-DotNetAppSetting.ps1' -Resolve);
             ArgumentList = @( 
-                                (ConvertTo-Base64 -Value $Name),
-                                (ConvertTo-Base64 -Value $Value)
+                                (ConvertTo-CBase64 -Value $Name),
+                                (ConvertTo-CBase64 -Value $Value)
                             );
             Runtime = $_;
             ExecutionPolicy = [Microsoft.PowerShell.ExecutionPolicy]::RemoteSigned;
@@ -117,12 +117,12 @@ function Set-DotNetAppSetting
         
         if( $Framework )
         {    
-            Invoke-PowerShell @params -x86
+            Invoke-CPowerShell @params -x86
         }
         
         if( $Framework64 )
         {
-            Invoke-PowerShell @params
+            Invoke-CPowerShell @params
         }
     }
 }

@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Clear-DscLocalResourceCache
+function Clear-CDscLocalResourceCache
 {
     <#
     .SYNOPSIS
@@ -19,10 +19,10 @@ function Clear-DscLocalResourceCache
     .DESCRIPTION
     DSC caches resources. This is painful when developing, since you're constantly updating your resources. This function allows you to clear the DSC resource cache on the local computer. What this function really does, is kill the DSC host process running DSC.
 
-    `Clear-DscLocalResourceCache` is new in Carbon 2.0.
+    `Clear-CDscLocalResourceCache` is new in Carbon 2.0.
 
     .EXAMPLE
-    Clear-DscLocalResourceCache
+    Clear-CDscLocalResourceCache
     #>
     [CmdletBinding()]
     param(
