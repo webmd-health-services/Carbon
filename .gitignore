@@ -24,3 +24,4 @@ Source/CarbonTestInstaller/Release
 Source/CarbonTestInstaller/Debug
 Carbon/LICENSE.txt
 Carbon/NOTICE.txt
+*.orig
