@@ -66,36 +66,33 @@ Build:
         - Test\Test-ImportCarbon.ps1
         - Test\Test-UsesUseCallerPreference.ps1
         - Test\Test-ParentProcessID.ps1
-- Pester4:
+- Parallel:
     OnlyBy: BuildServer
-    Path:
-    - Test\Install-Certificate.Tests.ps1
-    - Test\Uninstall-Certificate.Tests.ps1
-    - Test\Get-ScheduledTask.Tests.ps1
-    - Test\*Iis*.ps1
-#- Parallel:
-#    OnlyBy: BuildServer
-#    Queues:
-#    - Tasks:
-- Pester4:
-    Path: Test\*.Tests.ps1
-    Exclude:
-    - "*\\Install-Certificate.Tests.ps1"
-    - "*\\Uninstall-Certificate.Tests.ps1"
-    - "*\\Get-ScheduledTask.Tests.ps1"
-    - "*\\*Iis*.ps1"
-    DescribeDurationReportCount: 20
-#    - Tasks:
+    Queues:
+    - Tasks:
+        - Pester4:
+            Path: 
+            - Test\Carbon_ScheduledTask.Tests.ps1
+            - Test\Get-Scheduledtask.Tests.ps1
+            - Test\Install-ScheduledTask.Tests.ps1
+    - Tasks:
+        - Pester4:
+            Path: Test\*.Tests.ps1
+            Exclude:
+            - "*\\*ScheduledTask.Tests.ps1"
+        - PowerShell:
+            Path: Invoke-CarbonBladeTest.ps1
+            Argument:
+                Recurse: true
+                Path: Test
 - PowerShell:
-    OnlyDuring: Build
-    Path: Invoke-CarbonBladeTest.ps1
-    Argument:
-        Recurse: true
-        Path: Test
-- PowerShell:
-    OnlyDuring: Build
     OnlyBy: Developer
     Path: Complete-CarbonTest.ps1
+- PowerShell:
+    OnlyBy: BuildServer
+    Path: Format-TestResult.ps1
+    Argument:
+        OutputPath: $(WHISKEY_OUTPUT_DIRECTORY)
 - CopyFile:
     Path:
     - LICENSE.txt

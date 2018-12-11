@@ -61,7 +61,7 @@ describe Test-GroupMember {
     }
 
     It 'should write an error if group does not exist' {
-        $result = Test-GroupMember -GroupName 'fubarsnafu' -Member 'snafufubar' -ErrorAction SilentlyContinue
+        $result = Test-GroupMember -GroupName 'oiuewldsanfds' -Member 'snafufubar' -ErrorAction SilentlyContinue
         $result | Should BeNullOrEmpty
         $Global:Error[0] | Should Match 'group.*not found'
     }

@@ -64,11 +64,12 @@ Describe "Install-Certificate" {
     }
 
     It 'should install certificate to local machine with relative path' {
+        $DebugPreference = 'Continue'
         Push-Location -Path $PSScriptRoot
         try
         {
             $path = '.\Certificates\{0}' -f (Split-Path -Leaf -Path $TestCertPath)
-            $cert = Install-Certificate -Path $path -StoreLocation CurrentUser -StoreName My
+            $cert = Install-Certificate -Path $path -StoreLocation CurrentUser -StoreName My -Verbose
             $cert.Thumbprint | Should Be $TestCert.Thumbprint
             $cert = Assert-CertificateInstalled -StoreLocation CurrentUser -StoreName My 
         }
