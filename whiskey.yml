@@ -19,30 +19,26 @@ Build:
     Path: Source\Carbon.sln
     Property:
     - SignAssembly=$(SignAssembly)
-    - DefineConstants=$(Constants)
 - NUnit2:
     Path: Source\Test\bin\$(WHISKEY_MSBUILD_CONFIGURATION)\Carbon.Test.dll
-- Exec:
-    OnlyDuring: Build
-    Path: robocopy
-    Argument:
-        - Source\bin\$(WHISKEY_MSBUILD_CONFIGURATION)
-        - Carbon\bin
-    SuccessExitCode: <8
-- Exec:
-    OnlyDuring: Build
-    Path: robocopy
-    Argument:
-        - Source\Iis\bin\$(WHISKEY_MSBUILD_CONFIGURATION)
-        - Carbon\bin
-    SuccessExitCode: <8
-- Exec:
-    OnlyDuring: Build
-    Path: robocopy
-    Argument:
-        - Source\Xdt\bin\$(WHISKEY_MSBUILD_CONFIGURATION)
-        - Carbon\bin
-    SuccessExitCode: <8
+- MSBuild:
+    Path: 
+    - Source\Carbon.csproj
+    - Source\Iis\*.csproj
+    - Source\Xdt\*.csproj
+    Target: publish
+    Property:
+    - TargetFramework=net452
+    - OutDir=$(WHISKEY_BUILD_ROOT)\Carbon\bin\fullclr
+- MSBuild:
+    Path: 
+    - Source\Carbon.csproj
+    - Source\Iis\*.csproj
+    - Source\Xdt\*.csproj
+    Target: publish
+    Property:
+    - TargetFramework=netstandard2.0
+    - OutDir=$(WHISKEY_BUILD_ROOT)\Carbon\bin\coreclr
 - Delete:
     OnlyDuring: Build
     OnlyBy: BuildServer

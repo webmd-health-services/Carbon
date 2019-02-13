@@ -12,6 +12,7 @@
 
 using Carbon.Service;
 using NUnit.Framework;
+using System;
 using System.DirectoryServices.AccountManagement;
 using System.ServiceProcess;
 
@@ -20,12 +21,19 @@ namespace Carbon.Test.Service
     [TestFixture]
     public sealed class AdvApi32Tests
     {
+#if NET452
         [Test]
         public void ShouldGetPermissions()
         {
             var service = ServiceController.GetServices()[0];
             ServiceSecurity.GetServiceSecurityDescriptor(service.ServiceName);
         }
+#else
+        [Test]
+        public void ShouldFailToGetPermissions()
+        {
+            Assert.Throws<PlatformNotSupportedException>(() => ServiceSecurity.GetServiceSecurityDescriptor("Fubar"));
+        }
+#endif
     }
 }
-

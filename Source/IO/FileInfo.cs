@@ -19,7 +19,8 @@ using IOFile = System.IO.File;
 
 namespace Carbon.IO
 {
-	[StructLayout(LayoutKind.Sequential)]
+#if NET452
+    [StructLayout(LayoutKind.Sequential)]
 	// ReSharper disable once InconsistentNaming
 	internal struct BY_HANDLE_FILE_INFORMATION
 	{
@@ -40,15 +41,20 @@ namespace Carbon.IO
 		// ReSharper restore FieldCanBeMadeReadOnly.Local
 		// ReSharper restore MemberCanBePrivate.Local
 	}
+#endif
 	
 	public sealed class FileInfo
 	{
-		[DllImport("kernel32.dll", SetLastError = true)]
+#if NET452
+        [DllImport("kernel32.dll", SetLastError = true)]
 		internal static extern bool GetFileInformationByHandle(SafeFileHandle hFile, out BY_HANDLE_FILE_INFORMATION lpFileInformation);
-
+#endif
 		public FileInfo(string path)
 		{
-			BY_HANDLE_FILE_INFORMATION kernelFileInfo;
+#if CORECLR
+            throw new PlatformNotSupportedException("Getting extended file system metadata isn't supported under .NET Core. The System.Runtime.InteropServices.FILETIME structure is not defined.");
+#else
+            BY_HANDLE_FILE_INFORMATION kernelFileInfo;
 			bool result;
 			using (var file = IOFile.Open(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
 			{
@@ -72,6 +78,7 @@ namespace Carbon.IO
 			FileIndex = kernelFileInfo.FileIndexHigh;
 			FileIndex = FileIndex << 32;
 			FileIndex |= kernelFileInfo.FileIndexLow;
+#endif
 		}
 
 		public UInt64 FileIndex { get; private set; }

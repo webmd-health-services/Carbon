@@ -1,6 +1,5 @@
-Carbon/bin/*.pdb
-Carbon/bin/Carbon*.dll
-Carbon/bin/Microsoft.Web.XmlTransform.dll
+Carbon/bin/coreclr
+Carbon/bin/fullclr
 **/obj/**
 **/.vs/**
 Source/**/bin/**

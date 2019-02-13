@@ -35,10 +35,9 @@ namespace Carbon.Test.Service
 		}
 
 		[Test]
-		[ExpectedException(typeof(Win32Exception))]
 		public void ShouldNotGetInvalidService()
 		{
-			new ServiceInfo(Guid.NewGuid().ToString(), "");
+            Assert.Throws<Win32Exception>(() => { new ServiceInfo(Guid.NewGuid().ToString(), ""); });
 		}
 
 		[Test]

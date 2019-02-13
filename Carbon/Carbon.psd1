@@ -25,7 +25,7 @@
     RootModule = 'Carbon.psm1'
 
     # Version number of this module.
-    ModuleVersion = '2.7.0'
+    ModuleVersion = '2.8.0'
 
     # ID used to uniquely identify this module
     GUID = '075d9444-c01b-48c3-889a-0b3490716fa2'
@@ -83,7 +83,7 @@ All functions are idempotent: when run multiple times with the same arguments, y
     RequiredModules = @()
 
     # Assemblies that must be loaded prior to importing this module
-    RequiredAssemblies = @( 'bin\Carbon.dll' )
+    RequiredAssemblies = @()
 
     # Script files (.ps1) that are run in the caller's environment prior to importing this module
     ScriptsToProcess = @()
@@ -342,13 +342,7 @@ All functions are idempotent: when run multiple times with the same arguments, y
 
             # ReleaseNotes of this module
             ReleaseNotes = @'
-* Uninstall-CService now kills a service's process when that service stops but is actually still running. This should decrease the frequency of needing to reboot a computer when uninstalling a service.
-* Added `C` prefix to all Carbon commands, with aliases from old command names to new ones to maintain backwards compatability. 
-* Added `bin\Use-CarbonPrefix.ps1` script to Carbon that will update files to use the new Carbon function names.
-* `Get-CCertificate`: Added `Path` note property to returned objects.
-* Fixed: Chocolatey uninstaller fails if the `PSModulePath` environment variable contains trailing or sequential semicolons.
-* `Grant-CPermission` can now grant multiple permissions to an identity on files, directories, and registry items. Use the `Append` switch.
-* `Carbon_Permission` DSC resource can now grant multiple permissions to an identity on files, directories, and registry items. Use the `Append` property.
+* Carbon is now importable on PowerShell Core on all platforms. Many functions will not work on Linux/MacOS since they are Windows-specific.
 '@
         } # End of PSData hashtable
     

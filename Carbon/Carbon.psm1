@@ -24,8 +24,25 @@ function Write-Timing
     Write-Debug -Message ('[{0}]  [{1}]  {2}' -f $now,($now - $startedAt),$Message)
 }
 
+if( -not (Test-Path 'variable:IsWindows') )
+{
+    $IsWindows = $true
+    $IsLinux = $IsMacOS = $false
+}
+
 Write-Timing ('BEGIN')
 $CarbonBinDir = Join-Path -Path $PSScriptRoot -ChildPath 'bin' -Resolve
+$carbonAssemblyDir = Join-Path -Path $CarbonBinDir -ChildPath 'fullclr' -Resolve
+
+$IsPSCore = $PSVersionTable['PSEdition'] -eq 'Core'
+if( $IsPSCore )
+{
+    $carbonAssemblyDir = Join-Path -Path $CarbonBinDir -ChildPath 'coreclr' -Resolve
+}
+
+Write-Timing ('Loading Carbon assemblies from "{0}".' -f $carbonAssemblyDir)
+Get-ChildItem -Path (Join-Path -Path $carbonAssemblyDir -ChildPath '*') -Filter '*.dll' -Exclude 'Carbon.Iis.dll' |
+    ForEach-Object { Add-Type -Path $_.FullName }
 
 Write-Timing ('Dot-sourcing Test-TypeDataMember.')
 . (Join-Path -Path $PSScriptRoot -ChildPath 'Functions\Test-TypeDataMember.ps1' -Resolve)
@@ -35,7 +52,7 @@ Write-Timing ('Dot-sourcing Use-CallerPreference.')
 
 $doNotImport = @{ }
 
-if( [Environment]::Is64BitOperatingSystem -and -not [Environment]::Is64BitProcess ) 
+if( -not $IsWindows -or ([Environment]::Is64BitOperatingSystem -and -not [Environment]::Is64BitProcess) ) 
 {
     $doNotImport['Initialize-Lcm.ps1'] = $true
 }
@@ -53,43 +70,49 @@ Add-Type -AssemblyName 'System.Security'
 
 # FileSystem
 Write-Timing ('Adding Ionic.Zip assembly.')
-Add-Type -Path (Join-Path -Path $PSScriptRoot -ChildPath 'bin\Ionic.Zip.dll' -Resolve)
+Add-Type -Path (Join-Path -Path $CarbonBinDir -ChildPath 'Ionic.Zip.dll' -Resolve)
 
 
 # IIS
-Write-Timing ('Adding System.Web assembly.')
-Add-Type -AssemblyName "System.Web"
-$microsoftWebAdministrationPath = Join-Path -Path $env:SystemRoot -ChildPath 'system32\inetsrv\Microsoft.Web.Administration.dll'
-if( (Test-Path -Path $microsoftWebAdministrationPath -PathType Leaf) )
+$exportIisFunctions = $false
+if( (Test-Path -Path 'env:SystemRoot') )
 {
-    Write-Timing ('Adding Microsoft.Web.Administration assembly.')
-    Add-Type -Path $microsoftWebAdministrationPath
-    Write-Timing ('Adding Carbon.Iis assembly.')
-    Add-Type -Path (Join-Path -Path $CarbonBinDir -ChildPath 'Carbon.Iis.dll' -Resolve)
-
-    if( -not (Test-CTypeDataMember -TypeName 'Microsoft.Web.Administration.Site' -MemberName 'PhysicalPath') )
+    Write-Timing ('Adding System.Web assembly.')
+    Add-Type -AssemblyName "System.Web"
+    $microsoftWebAdministrationPath = Join-Path -Path $env:SystemRoot -ChildPath 'system32\inetsrv\Microsoft.Web.Administration.dll'
+    if( (Test-Path -Path $microsoftWebAdministrationPath -PathType Leaf) )
     {
-        Write-Timing ('Updating Microsoft.Web.Administration.Site type data.')
-        Update-TypeData -TypeName 'Microsoft.Web.Administration.Site' -MemberType ScriptProperty -MemberName 'PhysicalPath' -Value { 
-                $this.Applications |
-                    Where-Object { $_.Path -eq '/' } |
-                    Select-Object -ExpandProperty VirtualDirectories |
-                    Where-Object { $_.Path -eq '/' } |
-                    Select-Object -ExpandProperty PhysicalPath
-            }
-    }
+        $exportIisFunctions = $true
+        Write-Timing ('Adding Microsoft.Web.Administration assembly.')
+        Add-Type -Path $microsoftWebAdministrationPath
+        Write-Timing ('Adding Carbon.Iis assembly.')
+        Add-Type -Path (Join-Path -Path $carbonAssemblyDir -ChildPath 'Carbon.Iis.dll' -Resolve)
 
-    if( -not (Test-CTypeDataMember -TypeName 'Microsoft.Web.Administration.Application' -MemberName 'PhysicalPath') )
-    {
-        Write-Timing ('Updating Microsoft.Web.Administration.Application type data.')
-        Update-TypeData -TypeName 'Microsoft.Web.Administration.Application' -MemberType ScriptProperty -MemberName 'PhysicalPath' -Value { 
-                $this.VirtualDirectories |
-                    Where-Object { $_.Path -eq '/' } |
-                    Select-Object -ExpandProperty PhysicalPath
-            }
+        if( -not (Test-CTypeDataMember -TypeName 'Microsoft.Web.Administration.Site' -MemberName 'PhysicalPath') )
+        {
+            Write-Timing ('Updating Microsoft.Web.Administration.Site type data.')
+            Update-TypeData -TypeName 'Microsoft.Web.Administration.Site' -MemberType ScriptProperty -MemberName 'PhysicalPath' -Value { 
+                    $this.Applications |
+                        Where-Object { $_.Path -eq '/' } |
+                        Select-Object -ExpandProperty VirtualDirectories |
+                        Where-Object { $_.Path -eq '/' } |
+                        Select-Object -ExpandProperty PhysicalPath
+                }
+        }
+
+        if( -not (Test-CTypeDataMember -TypeName 'Microsoft.Web.Administration.Application' -MemberName 'PhysicalPath') )
+        {
+            Write-Timing ('Updating Microsoft.Web.Administration.Application type data.')
+            Update-TypeData -TypeName 'Microsoft.Web.Administration.Application' -MemberType ScriptProperty -MemberName 'PhysicalPath' -Value { 
+                    $this.VirtualDirectories |
+                        Where-Object { $_.Path -eq '/' } |
+                        Select-Object -ExpandProperty PhysicalPath
+                }
+        }
     }
 }
-else
+
+if( -not $exportIisFunctions )
 {
     Write-Timing ('Filtering out IIS functions.')
     Get-ChildItem -Path $functionRoot -Filter '*-Iis*.ps1' |
@@ -97,10 +120,13 @@ else
 }
 
 # MSMQ
-Write-Timing ('Adding System.ServiceProcess assembly.')
-Add-Type -AssemblyName 'System.ServiceProcess'
-Write-Timing ('Adding System.Messaging assembly.')
-Add-Type -AssemblyName 'System.Messaging'
+if( $IsWindows )
+{
+    Write-Timing ('Adding System.ServiceProcess assembly.')
+    Add-Type -AssemblyName 'System.ServiceProcess'
+    Write-Timing ('Adding System.Messaging assembly.')
+    Add-Type -AssemblyName 'System.Messaging'
+}
 
 #PowerShell
 $TrustedHostsPath = 'WSMan:\localhost\Client\TrustedHosts'
@@ -121,11 +147,12 @@ $useOCSetup = $false
 if( -not $useServerManager )
 {
     Write-Timing ('Checking if Win32_OptionalFeature WMI class is available.')
+    $win32OptionalFeatureClass = $null
     if( (Get-Command -Name 'Get-CimClass' -ErrorAction Ignore) )
     {
         $win32OptionalFeatureClass = Get-CimClass -ClassName 'Win32_OptionalFeature'
     }
-    else
+    elseif( Get-Command -Name 'Get-WmiObject' -ErrorAction Ignore )
     {
         $win32OptionalFeatureClass = Get-WmiObject -List | Where-Object { $_.Name -eq 'Win32_OptionalFeature' }
     }
