@@ -40,6 +40,8 @@ Build:
     - --no-build
     - --framework=netcoreapp2.1
     - --configuration=$(WHISKEY_MSBUILD_CONFIGURATION)
+    - --results-directory=$(WHISKEY_OUTPUT_DIRECTORY)
+    - --logger=trx
 - MSBuild:
     Path:
     - Source\Carbon.csproj
