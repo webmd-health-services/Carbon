@@ -28,7 +28,10 @@ param(
     $Initialize,
     
     [string]
-    $PipelineName
+    $PipelineName,
+
+    [string]
+    $Configuration
 )
 
 #Requires -Version 4
@@ -54,6 +57,11 @@ if( $Initialize )
 
 $whiskeyYmlPath = Join-Path -Path $PSScriptRoot -ChildPath 'whiskey.yml'
 $context = New-WhiskeyContext -Environment 'Dev' -ConfigurationPath $whiskeyYmlPath
+
+if( $Configuration )
+{
+    $context.MSBuildConfiguration = $Configuration
+}
 
 $apiKeys = @{
                 'powershellgallery.com' = 'POWERSHELL_GALLERY_API_KEY';
