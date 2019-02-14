@@ -7,6 +7,7 @@ param(
     $Configuration
 )
 
+$ErrorActionPreference = 'Stop'
 Set-StrictMode -Version 'Latest'
 #Requires -Version 5.1
 
@@ -29,5 +30,5 @@ Write-Verbose ('devenv "{0}" /build "{1}"' -f $installerSlnPath,$Configuration)
 devenv $installerSlnPath /build $Configuration
 if( $LASTEXITCODE )
 {
-    Write-Error -Message ('Failed to build Carbon test installers. Check the output above for details. If the build failed because of this error: "ERROR: An error occurred while validating. HRESULT = ''8000000A''", open a command prompt, move into the "{0}" directory, and run ".\Common7\IDE\CommonExtensions\Microsoft\VSI\DisableOutOfProcBuild\DisableOutOfProcBuild.exe".' -f $instance.InstallationPath) -ErrorAction Stop
+    Write-Error -Message ('Failed to build Carbon test installers. Check the output above for details. If the build failed because of this error: "ERROR: An error occurred while validating. HRESULT = ''8000000A''", open a command prompt, move into the "{0}" directory, and run ".\Common7\IDE\CommonExtensions\Microsoft\VSI\DisableOutOfProcBuild\DisableOutOfProcBuild.exe".' -f $instance.InstallationPath)
 }
