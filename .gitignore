@@ -19,8 +19,10 @@ Website/**
 Test/Xml/*.dll
 Test/MSI/*.tmp
 Test/MSI/setup.exe
-Source/CarbonTestInstaller/Release
-Source/CarbonTestInstaller/Debug
+/Source/CarbonTestInstaller/Debug
+/Source/CarbonTestInstaller/Release
+/Source/CarbonTestInstallerWithCustomActions/Debug
+/Source/CarbonTestInstallerWithCustomActions/Release
 Carbon/LICENSE.txt
 Carbon/NOTICE.txt
 /Test/MSI/*.msi
