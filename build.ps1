@@ -82,7 +82,8 @@ foreach( $apiKeyID in $apiKeys.Keys )
     Add-WhiskeyApiKey -Context $context -ID $apiKeyID -Value (Get-Item -Path $envVarPath).Value
 }
 
-$envVarsToSkip = $apiKeys.Values
+$envVarsToSkip = & { 'SNK' ; $apiKeys.Values }
+
 Get-ChildItem -Path 'env:' |
     Where-Object { $_.Name -notin $envVarsToSkip } |
     Format-Table
