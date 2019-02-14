@@ -86,6 +86,8 @@ $envVarsToSkip = & { 'SNK' ; $apiKeys.Values }
 
 Get-ChildItem -Path 'env:' |
     Where-Object { $_.Name -notin $envVarsToSkip } |
-    Format-Table
+    Format-Table |
+    Out-String |
+    Write-Verbose
 
 Invoke-WhiskeyBuild -Context $context @optionalParams
