@@ -12,9 +12,12 @@ Set-StrictMode -Version 'Latest'
 
 Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath '..\PSModules\VSSetup' -Resolve)
 
-$instances = Get-VSSetupInstance
+$instances = Get-VSSetupInstance 
 $instances | Format-List | Out-String | Write-Verbose
-$instance = $instances | Sort-Object -Descending -Property InstallationVersion
+$instance = $instances | 
+                Where-Object { $_.DisplayName -notlike '* Test Agent *' } |
+                Sort-Object -Descending -Property InstallationVersion | 
+                Select-Object -First 1
 
 $idePath = Join-Path -Path $instance.InstallationPath -ChildPath 'Common7\IDE' -Resolve
 Write-Verbose -Message ('Using {0} {1} found at "{2}".' -f $instance.DisplayName,$instance.InstallationVersion,$idePath)
