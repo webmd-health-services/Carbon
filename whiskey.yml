@@ -26,8 +26,18 @@ Build:
         Configuration: $(WHISKEY_MSBUILD_CONFIGURATION)
 - NUnit3:
     Path: Source\Test\bin\$(WHISKEY_MSBUILD_CONFIGURATION)\net452\Carbon.Test.dll
-- NUnit3:
-    Path: Source\Test\bin\$(WHISKEY_MSBUILD_CONFIGURATION)\netstandard2.0\Carbon.Test.dll
+- DotNet:
+    Command: publish
+    Path: Source\Test\Carbon.Test.csproj
+    Argument:
+    - --no-build
+    - --framework=netcoreapp2.1
+- DotNet:
+    Command: test
+    Path: Source\Test\Carbon.Test.csproj
+    Argument:
+    - --no-build
+    - --framework=netcoreapp2.1
 - MSBuild:
     Path:
     - Source\Carbon.csproj
