@@ -19,10 +19,13 @@ Build:
     Path: Source\Carbon.sln
     Property:
     - SignAssembly=$(SignAssembly)
-- NUnit2:
-    Path: Source\Test\bin\$(WHISKEY_MSBUILD_CONFIGURATION)\Carbon.Test.dll
+- Exec: devenv Source\Carbon.Installer.sln /build Release
+- NUnit3:
+    Path: Source\Test\bin\$(WHISKEY_MSBUILD_CONFIGURATION)\net452\Carbon.Test.dll
+- NUnit3:
+    Path: Source\Test\bin\$(WHISKEY_MSBUILD_CONFIGURATION)\netstandard2.0\Carbon.Test.dll
 - MSBuild:
-    Path: 
+    Path:
     - Source\Carbon.csproj
     - Source\Iis\*.csproj
     - Source\Xdt\*.csproj
@@ -31,7 +34,7 @@ Build:
     - TargetFramework=net452
     - OutDir=$(WHISKEY_BUILD_ROOT)\Carbon\bin\fullclr
 - MSBuild:
-    Path: 
+    Path:
     - Source\Carbon.csproj
     - Source\Iis\*.csproj
     - Source\Xdt\*.csproj

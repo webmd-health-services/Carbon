@@ -1,5 +1,5 @@
-Carbon/bin/coreclr
-Carbon/bin/fullclr
+/Carbon/bin/coreclr
+/Carbon/bin/fullclr
 **/obj/**
 **/.vs/**
 Source/**/bin/**
@@ -23,3 +23,4 @@ Source/CarbonTestInstaller/Release
 Source/CarbonTestInstaller/Debug
 Carbon/LICENSE.txt
 Carbon/NOTICE.txt
+/Test/MSI/*.msi
