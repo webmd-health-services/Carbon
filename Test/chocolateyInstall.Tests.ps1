@@ -69,11 +69,13 @@ Describe 'chocolateyInstall' {
         New-Item -Path $markerFile -ItemType 'file'
         $markerFile | Should -Exist
     
-        $carbonDllPath = Join-Path -Path $destinationDir -ChildPath 'bin\Carbon.dll' -Resolve
+        $carbonFullClrDllPath = Join-Path -Path $destinationDir -ChildPath 'bin\fullclr\Carbon.dll' -Resolve
+        $carbonCoreClrDllPath = Join-Path -Path $destinationDir -ChildPath 'bin\coreclr\Carbon.dll' -Resolve
     
         $preCount = Get-ChildItem -Path $destinationDir -Recurse | Measure-Object | Select-Object -ExpandProperty 'Count'
     
-        $file = [IO.File]::Open($carbonDllPath, 'Open', 'Read', 'Read')
+        $fullClrFile = [IO.File]::Open($carbonFullClrDllPath, 'Open', 'Read', 'Read')
+        $coreClrFile = [IO.File]::Open($carbonCoreClrDllPath, 'Open', 'Read', 'Read')
         try
         {
             & $chocolateyInstall
@@ -83,7 +85,8 @@ Describe 'chocolateyInstall' {
         }
         finally
         {
-            $file.Close()
+            $fullClrFile.Close()
+            $coreClrFile.Close()
         }
         $Global:Error.Count | Should -BeGreaterThan 0
         $Global:Error[0] | Should -Match 'Access to the path .* denied'
