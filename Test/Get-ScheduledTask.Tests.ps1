@@ -77,8 +77,8 @@ Describe 'Get-ScheduledTask' {
                 {
                     $path = '{0}\' -f $path
                 }
-                $Actual.TaskName | Should Be $name
-                $Actual.TaskPath | Should Be $path
+                $Actual.TaskName | Should -Be $name -Because ('{0}  TaskName' -f $task.FullName) 
+                $Actual.TaskPath | Should -Be $path -Because ('{0}  TaskPath' -f $task.FullName)
             }
             elseif( $propertyName -eq 'NextRunTime' -and $randomNextRunTimeTasks.ContainsKey($task.FullName) )
             {
@@ -87,7 +87,8 @@ Describe 'Get-ScheduledTask' {
             }
             else
             {
-                ($Actual | Get-Member -Name $propertyName) | Should Not BeNullOrEmpty
+                $because = '{0}  {1}' -f $task.FullName,$propertyName)
+                ($Actual | Get-Member -Name $propertyName) | Should -Not -BeNullOrEmpty -Because $because
                 $expectedValue = $Expected.$columnName
                 if( $propertyName -eq 'TaskToRun' )
                 {
@@ -111,7 +112,7 @@ Describe 'Get-ScheduledTask' {
                     }
                 }
                 Write-Debug ('    {0} <=> {1}' -f $Actual.$propertyName,$expectedValue)
-                ($Actual.$propertyName) | Should Be $expectedValue
+                ($Actual.$propertyName) | Should -Be $expectedValue -Because $because
             }
         }
     
