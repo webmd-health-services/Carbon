@@ -139,10 +139,14 @@ function Get-TargetResource
         $resource.DisplayName = $service.DisplayName
         $resource.Description = $service.Description
         $resource.UserName = $service.UserName
-        $actualUserName = Resolve-CIdentity -Name $service.UserName -ErrorAction Ignore
-        if( $actualUserName )
+        $actualUserName = ''
+        if( $service.UserName )
         {
-            $resource.UserName = $actualUserName.FullName
+            $actualUserName = Resolve-CIdentity -Name $service.UserName -ErrorAction Ignore
+            if( $actualUserName )
+            {
+                $resource.UserName = $actualUserName.FullName
+            }
         }
         [string[]]$resource.Dependency = $service.ServicesDependedOn | Select-Object -ExpandProperty Name
         $resource.Ensure = 'Present'
