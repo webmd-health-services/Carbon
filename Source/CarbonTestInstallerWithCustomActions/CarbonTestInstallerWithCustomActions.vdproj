@@ -65,7 +65,7 @@
         "DisplayName" = "8:Release"
         "IsDebugOnly" = "11:FALSE"
         "IsReleaseOnly" = "11:TRUE"
-        "OutputFilename" = "8:Release\\Setup1.msi"
+        "OutputFilename" = "8:..\\..\\Test\\MSI\\CarbonTestInstallerWithCustomActions.msi"
         "PackageFilesAs" = "3:2"
         "PackageFileSize" = "3:-2147483648"
         "CabType" = "3:1"
@@ -740,7 +740,7 @@
         {
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_B8F0BD8399864520B77B80351C914B4C"
             {
-            "SourcePath" = "8:..\\Test\\Installer\\obj\\Debug\\Carbon.Test.Installer.dll"
+            "SourcePath" = "8:..\\Test\\Installer\\obj\\Release\\Carbon.Test.Installer.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_E89DD5DD809849A6A340ED3E5E715E13"
