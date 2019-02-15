@@ -41,7 +41,7 @@ Describe 'Get-ScheduledTask' {
                                         '\Microsoft\Windows\Customer Experience Improvement Program\Server\ServerRoleUsageCollector' = $true;
                                         '\Microsoft\Windows\WS\WSRefreshBannedAppsListTask' = $true;
                                         '\Microsoft\Windows\Device Information\Device' = $true;
-                                        '\Microsoft\Windows\UpdateOrchestrator\Refresh Setting' = $true;
+                                        '\Microsoft\Windows\UpdateOrchestrator\Refresh Settings' = $true;
                                     }
         $scheduleProps = @(
                                'Last Result',
