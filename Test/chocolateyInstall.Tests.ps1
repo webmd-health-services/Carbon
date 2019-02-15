@@ -14,26 +14,9 @@ $chocolateyInstall = Join-Path -Path $PSScriptRoot -ChildPath '..\tools\chocolat
 & (Join-Path -Path $PSScriptRoot -ChildPath 'Import-CarbonForTest.ps1' -Resolve)
 $destinationDir = Join-Path -Path (Get-PowerShellModuleInstallPath) -ChildPath 'Carbon'
 $installCarbonJunction = $false
+$installCarbonJunction = (Test-PathIsJunction -Path $destinationDir)
 
-function Start-TestFixture
-{
-    $installCarbonJunction = (Test-PathIsJunction -Path $destinationDir)
-}
-
-function Stop-TestFixture
-{
-    if( $installCarbonJunction )
-    {
-        Install-Junction -Link $destinationDir -Target (Join-Path -Path $PSScriptRoot -ChildPath '..\Carbon' -Resolve)
-    }
-}
-
-function Start-Test
-{
-    Stop-Test
-}
-
-function Stop-Test
+function Init
 {
     if( (Test-PathIsJunction -Path $destinationDir) )
     {
@@ -45,61 +28,75 @@ function Stop-Test
     }
 }
 
-function Test-ShouldCopyIntoModuleInstallDirectory
-{
-    Assert-DirectoryDoesNotExist $destinationDir
-    & $chocolateyInstall
-    Assert-DirectoryExists $destinationDir 
-    $sourceCount = (Get-ChildItem $destinationDir -Recurse | Measure-Object).Count
-    $destinationCount = (Get-ChildItem -Path (Join-Path -Path $PSScriptRoot -ChildPath '..\Carbon') -Recurse | Measure-Object).Count
-    Assert-Equal  $sourceCount $destinationCount
-}
+Describe 'chocolateyInstall' {
+    BeforeEach {
+        Init
+    }
 
-function Test-ShouldRemoveWhatIsThere
-{
-    New-Item -Path $destinationDir -ItemType 'Directory'
-    $deletedRecurseFilePath = Join-Path -Path $destinationDir -ChildPath 'should\deleteme.txt'
-    $deletedRootFilePath = Join-Path -Path $destinationDir -ChildPath 'deleteme.txt'
-    New-Item -Path $deletedRecurseFilePath -ItemType 'File' -Force
-    New-Item -Path $deletedRootFilePath -ItemType 'File' -Force
-
-    Assert-FileExists $deletedRootFilePath
-    Assert-FileExists $deletedRecurseFilePath
-
-    & $chocolateyInstall
-
-    Assert-FileDoesNotExist $deletedRootFilePath
-    Assert-FileDoesNotExist $deletedRecurseFilePath
-}
-
-function Test-ShouldHandleModuleInUse
-{
-    & $chocolateyInstall
-
-    $markerFile = Join-Path -Path $destinationDir -ChildPath 'shouldnotgetdeleted'
-    New-Item -Path $markerFile -ItemType 'file'
-    Assert-FileExists $markerFile
-
-    $carbonDllPath = Join-Path -Path $destinationDir -ChildPath 'bin\Carbon.dll' -Resolve
-
-    $preCount = Get-ChildItem -Path $destinationDir -Recurse | Measure-Object | Select-Object -ExpandProperty 'Count'
-
-    $file = [IO.File]::Open($carbonDllPath, 'Open', 'Read', 'Read')
-    try
-    {
+    AfterEach {
+        Init
+    }
+    
+    It 'should copy into module install directory' {
+        $destinationDir | Should -Not -Exist 
         & $chocolateyInstall
+        $destinationDir | Should -Exist
+        $sourceCount = (Get-ChildItem $destinationDir -Recurse | Measure-Object).Count
+        $destinationCount = (Get-ChildItem -Path (Join-Path -Path $PSScriptRoot -ChildPath '..\Carbon') -Recurse | Measure-Object).Count
+        $destinationCount | Should -Be $sourceCount
     }
-    catch
-    {
+    
+    It 'should remove what is there' {
+        New-Item -Path $destinationDir -ItemType 'Directory'
+        $deletedRecurseFilePath = Join-Path -Path $destinationDir -ChildPath 'should\deleteme.txt'
+        $deletedRootFilePath = Join-Path -Path $destinationDir -ChildPath 'deleteme.txt'
+        New-Item -Path $deletedRecurseFilePath -ItemType 'File' -Force
+        New-Item -Path $deletedRootFilePath -ItemType 'File' -Force
+    
+        $deletedRootFilePath | Should -Exist
+        $deletedRecurseFilePath | Should -Exist
+    
+        & $chocolateyInstall
+    
+        $deletedRootFilePath | Should -Not -Exist
+        $deletedRecurseFilePath | Should -Not -Exist
     }
-    finally
-    {
-        $file.Close()
+    
+    It 'should handle module in use' {
+        & $chocolateyInstall
+    
+        $markerFile = Join-Path -Path $destinationDir -ChildPath 'shouldnotgetdeleted'
+        New-Item -Path $markerFile -ItemType 'file'
+        $markerFile | Should -Exist
+    
+        $carbonDllPath = Join-Path -Path $destinationDir -ChildPath 'bin\Carbon.dll' -Resolve
+    
+        $preCount = Get-ChildItem -Path $destinationDir -Recurse | Measure-Object | Select-Object -ExpandProperty 'Count'
+    
+        $file = [IO.File]::Open($carbonDllPath, 'Open', 'Read', 'Read')
+        try
+        {
+            & $chocolateyInstall
+        }
+        catch
+        {
+        }
+        finally
+        {
+            $file.Close()
+        }
+        $Global:Error.Count | Should -BeGreaterThan 0
+        $Global:Error[0] | Should -Match 'Access to the path .* denied'
+        $markerFile | Should -Exist
+    
+        $postCount = Get-ChildItem -Path $destinationDir -Recurse | Measure-Object | Select-Object -ExpandProperty 'Count'
+        $postCount | Should -Be $preCount
     }
-    Assert-Error -Last -Regex 'Access to the path .* denied'
-    Assert-FileExists $markerFile
-
-    $postCount = Get-ChildItem -Path $destinationDir -Recurse | Measure-Object | Select-Object -ExpandProperty 'Count'
-    Assert-Equal $preCount $postCount 'some files were deleted during upgrade'
+    
 }
 
+Init
+if( $installCarbonJunction )
+{
+    Install-Junction -Link $destinationDir -Target (Join-Path -Path $PSScriptRoot -ChildPath '..\Carbon' -Resolve)
+}
