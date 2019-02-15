@@ -12,26 +12,33 @@
 
 Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'CarbonDscTest' -Resolve) -Force
 
-Describe 'Carbon_ScheduledTask' {
+$credential = New-Credential -User 'CarbonDscTestUser' -Password ([Guid]::NewGuid().ToString())
+$sid = Resolve-CIdentity -Name $credential.UserName | Select-Object -ExpandProperty 'Sid'
+$tempDir = $null
+$taskForUser = Get-Content -Path (Join-Path -Path $PSScriptRoot -ChildPath 'ScheduledTasks\task.xml' -Resolve) -Raw
+$taskForUser = $taskForUser -replace '<UserId>[^<]+</UserId>',('<UserId>{0}</UserId>' -f $sid)
+$taskForSystem = Get-Content -Path (Join-Path -Path $PSScriptRoot -ChildPath 'ScheduledTasks\task_with_principal.xml' -Resolve) -Raw
+$taskName = 'CarbonDscScheduledTask'
 
-    $credential = New-Credential -User 'CarbonDscTestUser' -Password ([Guid]::NewGuid().ToString())
-    $tempDir = $null
-    $taskForUser = Get-Content -Path (Join-Path -Path $PSScriptRoot -ChildPath 'ScheduledTasks\task.xml' -Resolve) -Raw
-    $taskForUser = $taskForUser -replace '<UserId>[^<]+</UserId>',('<UserId>{0}</UserId>' -f $credential.UserName)
-    $taskForSystem = Get-Content -Path (Join-Path -Path $PSScriptRoot -ChildPath 'ScheduledTasks\task_with_principal.xml' -Resolve) -Raw
-    $taskName = 'CarbonDscScheduledTask'
+Start-CarbonDscTestFixture 'ScheduledTask'
+Install-CUser -Credential $credential
 
-    Start-CarbonDscTestFixture 'ScheduledTask'
-    Install-User -UserName $credential.UserName -Password $credential.GetNetworkCredential().Password
+try
+{    
+    function Init
+    {
+        Uninstall-CScheduledTask -Name $taskName
+        $Global:Error.Clear()
+    }
 
-    try
-    {    
+    Describe 'Carbon_ScheduledTask' {
+
         BeforeEach {
-            $Global:Error.Clear()
+            Init
         }
     
         AfterEach {
-            Uninstall-ScheduledTask -Name $taskName
+            Init
         }
     
         It 'should get existing tasks' {
@@ -62,17 +69,6 @@ Describe 'Carbon_ScheduledTask' {
             Assert-DscResourceAbsent $resource
         }
         
-        It 'should install task for user' {
-            Set-TargetResource -Name $taskName -TaskXml $taskForUser -TaskCredential $credential
-            $Global:Error.Count | Should Be 0
-            $resource = Get-TargetResource -Name $taskName
-            $resource | Should Not BeNullOrEmpty
-            $resource.Name | Should Be $taskName
-            $resource.TaskXml | Should Be $taskForUser
-            $resource.TaskCredential | Should Be $credential.UserName
-            Assert-DscResourcePresent $resource
-        }
-    
         It 'should install task for system principal' {
             Set-TargetResource -Name $taskName -TaskXml $taskForSystem
             $Global:Error.Count | Should Be 0
@@ -129,10 +125,13 @@ Describe 'Carbon_ScheduledTask' {
     
         It 'should test task credential canonical versus short username' {
             Set-TargetResource -Name $taskName -TaskXml $taskForUser -TaskCredential $credential
-            $credWithFullUserName = New-Credential -UserName ('{0}\{1}' -f $env:COMPUTERNAME,$credential.UserName) -Password 'snafu'
+            $credWithFullUserName = New-Credential -UserName ('{0}\{1}' -f [Environment]::MachineName,$credential.UserName) -Password 'snafu'
             Test-TargetResource -Name $taskName -TaskXml $taskForUser -TaskCredential $credWithFullUserName | Should Be $true            
         }
-    
+    }
+
+    Describe 'Carbon_ScheduledTask.when run through DSC' {
+
         configuration DscConfiguration
         {
             param(
@@ -154,10 +153,11 @@ Describe 'Carbon_ScheduledTask' {
             }
         }
     
+        Init
+        & DscConfiguration -Ensure 'Present' -OutputPath $CarbonDscOutputRoot
+        Start-DscConfiguration -Wait -ComputerName 'localhost' -Path $CarbonDscOutputRoot -Force
+
         It 'should run through dsc' {
-            & DscConfiguration -Ensure 'Present' -OutputPath $CarbonDscOutputRoot
-            
-            Start-DscConfiguration -Wait -ComputerName 'localhost' -Path $CarbonDscOutputRoot -Force
             $Global:Error.Count | Should Be 0
             (Test-TargetResource -Name $taskName -TaskXml $taskForSystem -Ensure 'Present') | Should Be $true
             (Test-TargetResource -Name $taskName -Ensure 'Absent') | Should Be $false
@@ -173,10 +173,25 @@ Describe 'Carbon_ScheduledTask' {
             $result | Should BeOfType ([Microsoft.Management.Infrastructure.CimInstance])
             $result.PsTypeNames | Where-Object { $_ -like '*Carbon_ScheduledTask' } | Should Not BeNullOrEmpty
         }
+    }
+
+    Describe 'Carbon_ScheduledTask.when installing task for user' {
+        Init
+        Set-TargetResource -Name $taskName -TaskXml $taskForUser -TaskCredential $credential
+        It 'should install task for user' {
+            $Global:Error.Count | Should -Be 0
+            $resource = Get-TargetResource -Name $taskName
+            $resource | Should -Not -BeNullOrEmpty
+            $resource.Name | Should -Be $taskName
+            $resource.TaskXml | Should -Be $taskForUser
+            $resource.TaskCredential | Should -Be $credential.UserName
+            Assert-DscResourcePresent $resource
+        }
     
     }
-    finally
-    {
-        Stop-CarbonDscTestFixture
-    }
+}
+finally
+{
+    Stop-CarbonDscTestFixture
+    Uninstall-CScheduledTask -Name $taskName
 }
