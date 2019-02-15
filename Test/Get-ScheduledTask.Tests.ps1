@@ -23,25 +23,7 @@ Describe 'Get-ScheduledTask' {
         
         Write-Debug ('{0} <=> {1}' -f $Expected.TaskName,$Actual.TaskName)
         $randomNextRunTimeTasks = @{
-                                        '\Microsoft\Windows\Application Experience\Microsoft Compatibility Appraiser' = $true;
-                                        '\Microsoft\Windows\Application Experience\ProgramDataUpdater' = $true;
-                                        '\Microsoft\Windows\Defrag\ScheduledDefrag' = $true;
-                                        '\Microsoft\Windows\Desired State Configuration\Consistency' = $true;
-                                        '\Microsoft\Windows\Power Efficiency Diagnostics\AnalyzeSystem' = $true;
-                                        '\Microsoft\Windows\Registry\RegIdleBackup' = $true;
-                                        '\Microsoft\Windows\RAC\RacTask' = $true;
-                                        '\Microsoft\Windows\Customer Experience Improvement Program\Server\ServerCeipAssistant' = $true;
-                                        '\Microsoft\Windows\Data Integrity Scan\Data Integrity Scan' = $true;
-                                        '\Microsoft\Windows\TaskScheduler\Regular Maintenance' = $true;
-                                        '\Microsoft\Windows\WindowsUpdate\Scheduled Start' = $true;
-                                        '\Microsoft\Windows\WindowsUpdate\Scheduled Start With Network' = $true;
                                         '\Microsoft\Office\Office 15 Subscription Heartbeat' = $true;
-                                        '\Microsoft\Windows\Windows Activation Technologies\ValidationTaskDeadline' = $true;
-                                        '\Microsoft\Windows\Customer Experience Improvement Program\Server\ServerRoleCollector' = $true;
-                                        '\Microsoft\Windows\Customer Experience Improvement Program\Server\ServerRoleUsageCollector' = $true;
-                                        '\Microsoft\Windows\WS\WSRefreshBannedAppsListTask' = $true;
-                                        '\Microsoft\Windows\Device Information\Device' = $true;
-                                        '\Microsoft\Windows\UpdateOrchestrator\Refresh Settings' = $true;
                                     }
         $scheduleProps = @(
                                'Last Result',
@@ -82,7 +64,7 @@ Describe 'Get-ScheduledTask' {
                 $Actual.TaskName | Should -Be $name -Because ('{0}  TaskName' -f $task.FullName) 
                 $Actual.TaskPath | Should -Be $path -Because ('{0}  TaskPath' -f $task.FullName)
             }
-            elseif( $propertyName -eq 'NextRunTime' -and $randomNextRunTimeTasks.ContainsKey($task.FullName) )
+            elseif( $propertyName -in @( 'NextRunTime', 'LastRuntime' ) -and ($task.FullName -like '\Microsoft\Windows\*' -or $randomNextRunTimeTasks.ContainsKey($task.FullName)) )
             {
                 # This task's next run time changes every time you retrieve it.
                 continue
