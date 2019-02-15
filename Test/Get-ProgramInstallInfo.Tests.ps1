@@ -16,20 +16,26 @@ Set-StrictMode -Version 'Latest'
 & (Join-Path -Path $PSScriptRoot -ChildPath 'Import-CarbonForTest.ps1' -Resolve)
 
 Describe 'Get-ProgramInstallInfo.when getting all programs' {
-    $programs = Get-ProgramInstallInfo
+    $programs = Get-ProgramInstallInfo # 'iCloud'
     It 'should get all installed programs' {
-        $programs | Should Not BeNullOrEmpty
+        $programs | Should -Not -BeNullOrEmpty
     }
 
-    foreach( $program in $programs )
-    {
-        It ('should get information about {0}' -f $program.DisplayName) {
+    It ('should get information about each program') {
+        foreach( $program in $programs )
+        {
+            Write-Verbose -Message $program.DisplayName
             $program | Should Not BeNullOrEmpty
             [Microsoft.Win32.RegistryKey]$key = $program.Key
             $valueNames = $key.GetValueNames()
             foreach( $property in (Get-Member -InputObject $program -MemberType Property) )
             {
                 $propertyName = $property.Name
+                Write-Verbose -Message ('  {0}' -f $propertyName)
+                if( $propertyName -eq 'Version' )
+                {
+                    Write-Verbose 'BREAK'
+                }
     
                 if( $propertyName -eq 'Key' )
                 {
@@ -106,6 +112,12 @@ Describe 'Get-ProgramInstallInfo.when getting all programs' {
                     }
                     elseif( $typeName -eq 'Version' )
                     {
+                        [int]$intValue = 0
+                        if( $keyValue -isnot [int32] -and [int]::TryParse($keyValue,[ref]$intValue) )
+                        {
+                            $keyValue = $intValue
+                        }
+
                         if( $keyValue -is [int32] )
                         {
                             $major = $keyValue -shr 24   # First 8 bits
