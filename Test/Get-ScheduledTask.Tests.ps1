@@ -87,7 +87,7 @@ Describe 'Get-ScheduledTask' {
             }
             else
             {
-                $because = '{0}  {1}' -f $task.FullName,$propertyName)
+                $because = '{0}  {1}' -f $task.FullName,$propertyName
                 ($Actual | Get-Member -Name $propertyName) | Should -Not -BeNullOrEmpty -Because $because
                 $expectedValue = $Expected.$columnName
                 if( $propertyName -eq 'TaskToRun' )
