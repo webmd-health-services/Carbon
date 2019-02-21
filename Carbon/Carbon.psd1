@@ -351,6 +351,7 @@ All functions are idempotent: when run multiple times with the same arguments, y
 * Carbon now supports PowerShell Core on Windows.
 * `Get-CScheduledTask` can now return `RegisteredTask` objects from the Scheduler.Service COM API. Use the new `AsComObject` switch. Getting COM objects is an order of magnitude faster than the old way.
 * Fixed: `Get-CScheduledTask` isn't able to parse some task information returned on Windows 10.
+* Deprecated `Test-CWindowsFeature`.
 '@
         } # End of PSData hashtable
     

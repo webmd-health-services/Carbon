@@ -53,9 +53,10 @@ function Test-CWindowsFeature
     )
     
     Set-StrictMode -Version 'Latest'
-
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
     
+    Write-Warning -Message ('Test-CWindowsFeature is obsolete and will be removed in a future major version of Carbon.')
+
     if( -not (Get-Module -Name 'ServerManager') -and -not (Assert-WindowsFeatureFunctionsSupported) )
     {
         return
