@@ -38,12 +38,11 @@ function Test-CScheduledTask
     )
 
     Set-StrictMode -Version 'Latest'
-
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
     $Name = Join-Path -Path '\' -ChildPath $Name
 
-    $task = schtasks /query /fo csv 2> $null | ConvertFrom-Csv | Where-Object { $_.TaskName -eq $Name }
+    $task = Get-CScheduledTask -Name $Name -AsComObject -ErrorAction Ignore
     if( $task )
     {
         return $true

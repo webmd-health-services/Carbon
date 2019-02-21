@@ -180,16 +180,22 @@ function Get-CScheduledTask
             }
         }
 
-        Get-Tasks -Folder $taskScheduler.GetFolder("\") |
-            Where-Object { 
-                if( -not $Name )
-                {
-                    return $true
-                }
+        $tasks = Get-Tasks -Folder $taskScheduler.GetFolder("\") |
+                    Where-Object { 
+                        if( -not $Name )
+                        {
+                            return $true
+                        }
                     
-                return $_.Path -like $Name
-            }
-        return
+                        return $_.Path -like $Name
+                    }
+        if( -not [Management.Automation.WildcardPattern]::ContainsWildcardCharacters($Name) -and -not $tasks )
+        {
+            Write-Error -Message ('Scheduled task "{0}" not found.' -f $Name) -ErrorAction $ErrorActionPreference
+            return
+        }
+
+        return $tasks
     }
 
     $optionalArgs = @()
@@ -208,10 +214,23 @@ function Get-CScheduledTask
     }
 
     $originalErrPreference = $ErrorActionPreference
+    $originalEncoding = [Console]::OutputEncoding
+    # Some tasks from Intel have special characters in them.
+    $OutputEncoding = [Console]::OutputEncoding = [Text.Encoding]::GetEncoding(1252)
     $ErrorActionPreference = 'Continue'
+    [object[]]$output = $null
     $errFile = Join-Path -Path $env:TEMP -ChildPath ('Carbon+Get-CScheduledTask+{0}' -f [IO.Path]::GetRandomFileName())
-    [object[]]$output = schtasks /query /v /fo csv $optionalArgs 2> $errFile | ConvertFrom-Csv | Where-Object { $_.HostName -ne 'HostName' } 
-    $ErrorActionPreference = $originalErrPreference
+    try
+    {
+        $output = schtasks /query /v /fo csv $optionalArgs 2> $errFile | 
+                    ConvertFrom-Csv | 
+                    Where-Object { $_.HostName -ne 'HostName' } 
+    }
+    finally
+    {
+        $ErrorActionPreference = $originalErrPreference
+        $OutputEncoding = [Console]::OutputEncoding = $originalEncoding
+    }
 
     if( $LASTEXITCODE )
     {
@@ -222,11 +241,11 @@ function Get-CScheduledTask
             {
                 if( $error -match 'The\ system\ cannot\ find\ the\ (file|path)\ specified\.' )
                 {
-                    Write-Error ('Scheduled task ''{0}'' not found.' -f $Name)
+                    Write-Error ('Scheduled task ''{0}'' not found.' -f $Name) -ErrorAction $ErrorActionPreference
                 }
                 else
                 {
-                    Write-Error ($error)
+                    Write-Error ($error) -ErrorAction $ErrorActionPreference
                 }
             }
             finally
@@ -242,13 +261,23 @@ function Get-CScheduledTask
         return
     }
 
+    $comTasks = Get-CScheduledTask -AsComObject
+
     for( $idx = 0; $idx -lt $output.Count; ++$idx )
     {
         $csvTask = $output[$idx]
 
-        $xml = schtasks /query /tn $csvTask.TaskName /xml | Where-Object { $_ }
-        $xml = $xml -join ([Environment]::NewLine)
-        $xmlDoc = [xml]$xml
+        $comTask = $comTasks | Where-Object { $_.Path -eq $csvTask.TaskName }
+        if( $comTask )
+        {
+            $xmlDoc = [xml]$comTask.Xml
+        }
+        else
+        {
+            $xml = schtasks /query /tn $csvTask.TaskName /xml | Where-Object { $_ }
+            $xml = $xml -join ([Environment]::NewLine)
+            $xmlDoc = [xml]$xml            
+        }
 
         $taskPath = Split-Path -Parent -Path $csvTask.TaskName
         # Get-CScheduledTask on Win2012/8 has a trailing slash so we include it here.
@@ -260,7 +289,7 @@ function Get-CScheduledTask
 
         if( -not ($xmlDoc | Get-Member -Name 'Task') )
         {
-            Write-Error -Message ('Unable to get information for scheduled task "{0}": XML task information is missing the "Task" element.' -f $csvTask.TaskName)
+            Write-Error -Message ('Unable to get information for scheduled task "{0}": XML task information is missing the "Task" element.' -f $csvTask.TaskName) -ErrorAction $ErrorActionPreference
             continue
         }
 

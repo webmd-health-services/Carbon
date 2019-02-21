@@ -114,7 +114,7 @@ Describe 'Get-ScheduledTask' {
         $Global:Error.Clear()
     }
 
-    It 'should get scheduled tasks' {
+    It 'should get each scheduled task' {
         schtasks /query /v /fo csv | 
             ConvertFrom-Csv | 
             Where-Object { $_.TaskName -and $_.HostName -ne 'HostName' } | 
