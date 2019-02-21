@@ -42,17 +42,19 @@ try
         }
     
         It 'should get existing tasks' {
-            Get-ScheduledTask |
+            Get-ScheduledTask -AsComObject |
                 Select-Object -First 5 |
                  ForEach-Object {
-                    $comTask = $expectedXml = Get-CScheduledTask -Name $_.FullName -AsComObject
+                    $comTask = $expectedXml = Get-CScheduledTask -Name $_.Path -AsComObject
                     $expectedXml = $comTask.Xml
+
+                    [string]$expectedCredential = & { $_.Definition.Principal.UserId ; $_.Definition.Principal.GroupId } | Where-Object { $_ } | Select-Object -First 1
     
-                    $resource = Get-TargetResource -Name $_.FullName
+                    $resource = Get-TargetResource -Name $_.Path
                     $Global:Error.Count | Should Be 0
                     $resource | Should Not BeNullOrEmpty
-                    $resource.Name | Should Be $_.FullName
-                    $resource.TaskCredential | Should Be $_.RunAsUser
+                    $resource.Name | Should Be $_.Path
+                    $resource.TaskCredential | Should Be $expectedCredential
                     $resource.TaskXml | Should Be $expectedXml
                     Assert-DscResourcePresent $resource
                 }

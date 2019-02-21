@@ -53,16 +53,16 @@ function Assert-TaskScheduledFromXml
         # Now, make sure task doesn't get re-created if it already exists.
         (Install-ScheduledTask -Name $taskName @installParams) | Should -BeNullOrEmpty
         $Global:Error.Count | Should -Be 0
-        $task = Get-ScheduledTask -Name $taskName
+        $task = Get-ScheduledTask -Name $taskName -AsComObject
         $task | Should -Not -BeNullOrEmpty
-        $task.TaskName | Should -Be $taskName
+        $task.Path | Should -Be (Join-Path -Path '\' -ChildPath $taskName)
         if( $TaskCredential )
         {
-            $task.RunAsUser | Should -Be $TaskCredential.Username
+            $task.Definition.Principal.UserId | Should -Be $TaskCredential.Username
         }
         else
         {
-            $task.RunAsUser | Should -Be 'System'
+            $task.Definition.Principal.UserId | Should -Be 'System'
         }
     
         if( $Path )
@@ -74,7 +74,7 @@ function Assert-TaskScheduledFromXml
             $Xml = [xml]$Xml
         }
     
-        $task = Get-CScheduledTask -Name $task.FullName -AsComObject
+        $task = Get-CScheduledTask -Name $task.Path -AsComObject
         $actualXml = [xml]$task.Xml
         # Different versions of Windows puts different values in these elements.
         ($actualXml.OuterXml -replace '<(Uri|UserId)>[^<]*</(Uri|UserId)>','') | Should -Be ($Xml.OuterXml -replace '<(Uri|UserId)>[^<]*</(Uri|UserId)>','')
@@ -115,11 +115,11 @@ function Assert-TaskScheduled
     $task | Should -BeOfType ([Carbon.TaskScheduler.TaskInfo])
     Assert-ScheduledTask -Principal 'System' @AssertArguments
     
-    $preTask = Get-ScheduledTask -Name $taskName
+    $preTask = Get-ScheduledTask -Name $taskName -AsComObject
     (Install-ScheduledTask -Principal System @InstallArguments) | Should -BeNullOrEmpty
     $Global:Error.Count | Should -Be 0
-    $postTask = Get-ScheduledTask -Name $taskName
-    $postTask.CreateDate | Should -Be $preTask.CreateDate
+    $postTask = Get-ScheduledTask -Name $taskName -AsComObject
+    $postTask.Definition.RegistrationInfo.Date | Should -Be $preTask.Definition.RegistrationInfo.Date
     
     $InstallArguments['TaskCredential'] = $credential
     $InstallArguments['Force'] = $true
@@ -691,6 +691,5 @@ Describe 'Install-ScheduledTask.when installed from XML file' {
     
 }
 
-
-Get-ScheduledTask -Name '*CarbonInstallScheduledTask*' |
-    ForEach-Object { Uninstall-ScheduledTask -Name $_.TaskName }
+Get-ScheduledTask -Name '*CarbonInstallScheduledTask*' -AsComObject |
+    ForEach-Object { Uninstall-ScheduledTask -Name $_.Path }

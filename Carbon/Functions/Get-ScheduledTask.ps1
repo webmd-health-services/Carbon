@@ -158,6 +158,21 @@ function Get-CScheduledTask
         return $scheduleType,$modifier,$duration,$stopAtEnd,$delay
     }
 
+    $optionalArgs = @()
+    $wildcardSearch = $false
+    if( $Name )
+    {
+        if( [Management.Automation.WildcardPattern]::ContainsWildcardCharacters($Name) )
+        {
+            $wildcardSearch = $true
+        }
+        else
+        {
+            $Name = Join-Path -Path '\' -ChildPath $Name
+            $optionalArgs = @( '/tn', $Name )
+        }
+    }
+
     if( $AsComObject )
     {
         $taskScheduler = New-Object -ComObject 'Schedule.Service'
@@ -189,28 +204,14 @@ function Get-CScheduledTask
                     
                         return $_.Path -like $Name
                     }
-        if( -not [Management.Automation.WildcardPattern]::ContainsWildcardCharacters($Name) -and -not $tasks )
+
+        if( -not $wildcardSearch -and -not $tasks )
         {
             Write-Error -Message ('Scheduled task "{0}" not found.' -f $Name) -ErrorAction $ErrorActionPreference
             return
         }
 
         return $tasks
-    }
-
-    $optionalArgs = @()
-    $wildcardSearch = $false
-    if( $Name )
-    {
-        if( [Management.Automation.WildcardPattern]::ContainsWildcardCharacters($Name) )
-        {
-            $wildcardSearch = $true
-        }
-        else
-        {
-            $Name = Join-Path -Path '\' -ChildPath $Name
-            $optionalArgs = @( '/tn', $Name )
-        }
     }
 
     $originalErrPreference = $ErrorActionPreference
