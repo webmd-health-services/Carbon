@@ -10,42 +10,55 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Start-TestFixture
+& (Join-Path -Path $PSScriptRoot -ChildPath 'Import-CarbonForTest.ps1' -Resolve)
+
+$svcName = 'Windows Firewall'
+if( -not (Get-Service -Name $svcName -ErrorAction Ignore) )
 {
-    & (Join-Path -Path $PSScriptRoot '..\Import-CarbonForTest.ps1' -Resolve)
+    $svcName = 'Windows Defender Firewall'
 }
 
-function Test-ShouldDetectWhenSerivceIsConfigurable
+if( -not (Get-Service -Name $svcName -ErrorAction Ignore) )
 {
-    $firewallSvc = Get-Service -Name 'Windows Firewall'
-    Assert-NotNull $firewallSvc
-    $error.Clear()
-    if( $firewallSvc.Status -eq 'Running' )
-    {
-        $result = Assert-FirewallConfigurable
-        Assert-True $result
-        Assert-Equal 0 $error.Count
+    Describe 'Assert-FirewallConfigurable' {
+        It 'should have a firewall service' {
+            $false | Should -BeTrue -Because ('unable to find the firewall service')
+        }
     }
-    else
-    {
-        Write-Warning "Unable to test if Assert-FirewallConfigurable handles when the firewall is configurable: the firewall service is running."
-    }
+    return
 }
 
-function Test-ShouldDetectWhenSerivceIsNotConfigurable
-{
-    $firewallSvc = Get-Service -Name 'Windows Firewall'
-    Assert-NotNull $firewallSvc
-    $error.Clear()
-    if( $firewallSvc.Status -eq 'Running' )
-    {
-        Write-Warning "Unable to test if Assert-FirewallConfigurable handles when the firewall is not configurable: the firewall service is not running."
+Describe 'Assert-FirewallConfigurable' {
+    It 'should detect when serivce is configurable' {
+        $firewallSvc = Get-Service -Name $svcName
+        $firewallSvc | Should -Not -BeNullOrEmpty
+        $error.Clear()
+        if( $firewallSvc.Status -eq 'Running' )
+        {
+            $result = Assert-FirewallConfigurable
+            $result | Should -Be $true
+            $error.Count | Should -Be 0
+        }
+        else
+        {
+            Write-Warning "Unable to test if Assert-FirewallConfigurable handles when the firewall is configurable: the firewall service is running."
+        }
     }
-    else
-    {
-        $result = Assert-FirewallConfigurable -ErrorAction SilentlyContinue
-        Assert-False $result
-        Assert-Equal 1 $error.Count
+    
+    It 'should detect when serivce is not configurable' {
+        $firewallSvc = Get-Service -Name $svcName
+        $firewallSvc | Should -Not -BeNullOrEmpty
+        $error.Clear()
+        if( $firewallSvc.Status -eq 'Running' )
+        {
+            Write-Warning "Unable to test if Assert-FirewallConfigurable handles when the firewall is not configurable: the firewall service is not running."
+        }
+        else
+        {
+            $result = Assert-FirewallConfigurable -ErrorAction SilentlyContinue
+            $result | Should -Be $false
+            $error.Count | Should -Be 1
+        }
     }
+    
 }
-
