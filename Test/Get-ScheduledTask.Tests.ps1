@@ -24,6 +24,7 @@ Describe 'Get-ScheduledTask' {
         Write-Debug ('{0} <=> {1}' -f $Expected.TaskName,$Actual.TaskName)
         $randomNextRunTimeTasks = @{
                                         '\Microsoft\Office\Office 15 Subscription Heartbeat' = $true;
+                                        '\OneDrive Standalone Update Task-S-1-5-21-1225507754-3068891322-2807220505-500' = $true;
                                     }
         $scheduleProps = @(
                                'Last Result',
@@ -83,7 +84,7 @@ Describe 'Get-ScheduledTask' {
                         $actualTask = Get-CScheduledTask -Name $Expected.TaskName -AsComObject
                         if( -not $actualTask.Xml )
                         {
-                            Write-Error -Message ('COM object for task "{0}" doesn''t have an XML property or the property doesn''t have a value.')
+                            Write-Error -Message ('COM object for task "{0}" doesn''t have an XML property or the property doesn''t have a value.' -f $Expected.TaskName)
                         }
                         else
                         {
@@ -169,11 +170,13 @@ Describe 'Get-ScheduledTask' {
         $task | Should -BeOfType ([Carbon.TaskScheduler.TaskInfo])
         Join-Path -Path $task.TaskPath -ChildPath $task.TaskName | Should Be $expectedTask.Path
     }
-    
+}
+
+Describe 'Get-ScheduledTask.when getting all tasks' {
     It 'should get all scheduled tasks' {
-        $expectedTasks = schtasks /query | Where-Object { $_ -like 'TaskName *' } | Measure-Object
+        $expectedTasks = Get-CScheduledTask -AsComObject | Measure-Object
         $actualTasks = Get-ScheduledTask
-        $actualTasks.Count | Should Be $expectedTasks.Count
+        $actualTasks.Count | Should -Be $expectedTasks.Count
     }
     
 }

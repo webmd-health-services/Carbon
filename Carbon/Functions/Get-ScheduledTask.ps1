@@ -163,15 +163,18 @@ function Get-CScheduledTask
         $taskScheduler = New-Object -ComObject 'Schedule.Service'
         $taskScheduler.Connect()
 
+
         function Get-Tasks
         {
             param(
                 $Folder
             )
     
-            $Folder.GetTasks(0) | ForEach-Object { $_ }
+            $getHiddenTasks = 1
     
-            foreach( $subFolder in $Folder.GetFolders(0) )
+            $Folder.GetTasks($getHiddenTasks) | ForEach-Object { $_ }
+    
+            foreach( $subFolder in $Folder.GetFolders($getHiddenTasks) )
             {
                 Get-Tasks -Folder $subFolder
             }
