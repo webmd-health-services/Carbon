@@ -10,25 +10,27 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Start-TestFixture
+& (Join-Path -Path $PSScriptRoot -ChildPath 'Import-CarbonForTest.ps1' -Resolve)
+
+function Init
 {
-    & (Join-Path -Path $PSScriptRoot -ChildPath '..\Import-CarbonForTest.ps1' -Resolve)
+    $Global:Error.Clear()
 }
 
-function Start-Test
-{
-}
+Describe 'Test-ScheduledTask' {
+    BeforeEach {
+        Init
+    }
 
-function Test-ShouldFindExistingTask
-{
-    $task = Get-ScheduledTask | Select-Object -First 1
-    Assert-NotNull $task
-    Assert-True (Test-ScheduledTask -Name $task.FullName)
-    Assert-NoError
-}
-
-function Test-ShouldNotFindNonExistentTask
-{
-    Assert-False (Test-ScheduledTask -Name 'fubar')
-    Assert-NoError
+    It 'should find existing task' {
+        $task = Get-ScheduledTask | Select-Object -First 1
+        $task | Should -Not -BeNullOrEmpty
+        (Test-ScheduledTask -Name $task.FullName) | Should Be $true
+        $Global:Error.Count | Should Be 0
+    }
+    
+    It 'should not find non existent task' {
+        (Test-ScheduledTask -Name 'fubar') | Should Be $false
+        $Global:Error.Count | Should -Be 0
+    }
 }
