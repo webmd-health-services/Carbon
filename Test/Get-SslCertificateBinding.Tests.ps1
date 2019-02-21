@@ -10,175 +10,171 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Start-TestFixture
-{
-    & (Join-Path -Path $PSScriptRoot '..\Import-CarbonForTest.ps1' -Resolve)
-}
+& (Join-Path -Path $PSScriptRoot -ChildPath 'Import-CarbonForTest.ps1' -Resolve)
 
-function Test-ShouldConvertNetshOutputToSslCertificateBindingObjects
-{
-    $output = netsh http show sslcert 
-    $output | 
-        ForEach-Object {
-        
-            if( $_ -notmatch '^    (.*)\s+: (.*)$' )
-            {
-                return
-            }
+Describe 'Get-SslCertificateBinding.when getting all bindings' {
+    It 'should match netsh output' {
+        $output = netsh http show sslcert 
+        $output | 
+            ForEach-Object {
             
-            Write-Debug -Message $_
-            $name = $matches[1].Trim()
-            $value = $matches[2].Trim()
-            
-            if( $value -eq '(null)' )
-            {
-                $value = ''
-            }
-            elseif( $value -eq 'Enabled' )
-            {
-                $value = $true
-            }
-            elseif( $value -eq 'Disabled' )
-            {
-                $value = $false
-            }
-            
-            if( $name -eq 'IP:port' )
-            {
-                if( $value -notmatch '^(.*):(\d+)$' )
+                if( $_ -notmatch '^    (.*)\s+: (.*)$' )
                 {
-                    Write-Error ('Invalid IP address/port: {0}' -f $value)
+                    return
                 }
-                else
+                
+                Write-Debug -Message $_
+                $name = $matches[1].Trim()
+                $value = $matches[2].Trim()
+                
+                if( $value -eq '(null)' )
                 {
-                    $ipAddress = $matches[1]
-                    $port = $matches[2]
-                    $binding = Get-SslCertificateBinding -IPAddress $ipAddress -Port $port
-                    Assert-Equal ([IPAddress]$ipAddress) $binding.IPAddress
-                    Assert-Equal $port $binding.Port
+                    $value = ''
                 }
-            }
-            elseif( $name -eq 'Certificate Hash' )
-            {
-                Assert-Equal $value $binding.CertificateHash 
-            }
-            elseif( $name -eq 'Application ID' )
-            {
-                Assert-Equal ([Guid]$value) $binding.ApplicationID
-            }
-            elseif( $name -eq 'Certificate Store Name' )
-            {
-                if( $value -eq '' )
+                elseif( $value -eq 'Enabled' )
                 {
-                    $value = $null
+                    $value = $true
                 }
-                Assert-Equal $value $binding.CertificateStoreName
-            }
-            elseif( $name -eq 'Verify Client Certificate Revocation' )
-            {
-                Assert-Equal $value $binding.VerifyClientCertificateRevocation
-            }
-            elseif( $name -eq 'Verify Revocation Using Cached Client Certificate Only' )
-            {
-                Assert-Equal $value $binding.VerifyRevocationUsingCachedClientCertificatesOnly
-            }
-            elseif( $name -eq 'Usage Check' )
-            {
-                Assert-Equal $value $binding.UsageCheckEnabled
-            }
-            elseif( $name -eq 'Revocation Freshness Time' )
-            {
-                Assert-Equal $value $binding.RevocationFreshnessTime
-            }
-            elseif( $name -eq 'URL Retrieval Timeout' )
-            {
-                Assert-Equal $value $binding.UrlRetrievalTimeout
-            }
-            elseif( $name -eq 'Ctl Identifier' )
-            {
-                Assert-Equal $value $binding.CtlIdentifier 
-            }
-            elseif( $name -eq 'Ctl Store Name' )
-            {
-                Assert-Equal $value $binding.CtlStoreName
-            }
-            elseif( $name -eq 'DS Mapper Usage' )
-            {
-                Assert-Equal $value $binding.DSMapperUsageEnabled
-            }
-            elseif( $name -eq 'Negotiate Client Certificate' )
-            {
-                Assert-Equal $value $binding.NegotiateClientCertificate
-            }
-            else
-            {
-                Fail ('Unknown field {0}.' -f $name)
-            }
-        }
-}
-
-function Test-ShouldGetAllBindings
-{
-    $numBindings = netsh http show sslcert |
-         Where-Object { $_ -match '^[ \t]+IP:port[ \t]+: (.*)$' } |
-         Measure-Object |
-         Select-Object -ExpandProperty Count
-
-    $bindings = @( Get-SslCertificateBinding )
-    Assert-Equal $numBindings $bindings.Length
-}
-
-function Test-ShouldFilterByIPAddressAndPort
-{
-    $output = netsh http show sslcert 
-    $output |
-        Where-Object {  $_ -match '^    IP:port\s+: (.*)$' } |
-        ForEach-Object {
-
-            $ipPort = $matches[1].Trim()
-            if( $ipPort -notmatch '^(.*):(\d+)$' )
-            {
-                Write-Error ('Invalid IP address/port in netsh output: ''{0}''' -f $ipPort )
-                return
-            }        
-            $ipAddress = $matches[1]
-            $port = $matches[2]
-            
-            $foundOne = $false
-            Get-SslCertificateBinding -IPAddress $ipAddress | 
-                ForEach-Object {
-                    Assert-NotNull $_
-                    Assert-Equal ([IPAddress]$ipAddress) $_.IPAddress
-                    $foundOne = $true
+                elseif( $value -eq 'Disabled' )
+                {
+                    $value = $false
                 }
-            Assert-True $foundOne
-
-            $foundOne = $false                        
-            Get-SslCertificateBinding -Port $port |
-                ForEach-Object {
-                    Assert-NotNull $_
-                    Assert-Equal $port.Trim() $_.Port
-                    $foundOne = $true
+                
+                if( $name -eq 'IP:port' )
+                {
+                    if( $value -notmatch '^(.*):(\d+)$' )
+                    {
+                        Write-Error ('Invalid IP address/port: {0}' -f $value)
+                    }
+                    else
+                    {
+                        $ipAddress = $matches[1]
+                        $port = $matches[2]
+                        $binding = Get-SslCertificateBinding -IPAddress $ipAddress -Port $port
+                        $binding.IPAddress | Should -Be ([IPAddress]$ipAddress)
+                        $binding.Port | Should -Be $port
+                    }
                 }
-            Assert-True $foundOne
-            
-        }
-}
-
-function Test-ShouldGetIPv6Binding
-{
-    $cert = Install-Certificate (Join-Path $TestDir CarbonTestCertificate.cer -Resolve) -StoreLocation LocalMachine -StoreName My
-    $appID = '12ec3276-0689-42b0-ad39-c1fe23d25721'
-    Set-SslCertificateBinding -IPAddress '[::]' -Port 443 -ApplicationID $appID -Thumbprint $cert.Thumbprint
-
-    try
-    {
-        $binding = Get-SslCertificateBinding -IPAddress '[::]' | Where-Object { $_.ApplicationID -eq $appID }
-        Assert-NotNull $binding
-    }
-    finally
-    {
-        Remove-SslCertificateBinding -IPAddress '[::]' -Port 443
+                elseif( $name -eq 'Certificate Hash' )
+                {
+                    $binding.CertificateHash | Should -Be $value
+                }
+                elseif( $name -eq 'Application ID' )
+                {
+                    $binding.ApplicationID | Should -Be ([Guid]$value)
+                }
+                elseif( $name -eq 'Certificate Store Name' )
+                {
+                    if( $value -eq '' )
+                    {
+                        $value = $null
+                    }
+                    $binding.CertificateStoreName | Should -Be $value
+                }
+                elseif( $name -eq 'Verify Client Certificate Revocation' )
+                {
+                    $binding.VerifyClientCertificateRevocation | Should -Be $value
+                }
+                elseif( $name -eq 'Verify Revocation Using Cached Client Certificate Only' )
+                {
+                    $binding.VerifyRevocationUsingCachedClientCertificatesOnly | Should -Be $value
+                }
+                elseif( $name -eq 'Revocation Freshness Time' )
+                {
+                    $binding.RevocationFreshnessTime | Should -Be $value
+                }
+                elseif( $name -eq 'URL Retrieval Timeout' )
+                {
+                    $binding.UrlRetrievalTimeout | Should -Be $value
+                }
+                elseif( $name -eq 'Ctl Identifier' )
+                {
+                    $binding.CtlIdentifier | Should -Be $value
+                }
+                elseif( $name -eq 'Ctl Store Name' )
+                {
+                    $binding.CtlStoreName | Should -Be $value
+                }
+                elseif( $name -eq 'DS Mapper Usage' )
+                {
+                    $binding.DSMapperUsageEnabled | Should -Be $value
+                }
+                elseif( $name -eq 'Negotiate Client Certificate' )
+                {
+                    $binding.NegotiateClientCertificate | Should -Be $value
+                }
+            }
     }
 }
 
+Describe 'Get-SslCertificateBinding' {
+    
+    It 'should get all bindings' {
+        $numBindings = netsh http show sslcert |
+             Where-Object { $_ -match '^[ \t]+IP:port[ \t]+: (.*)$' } |
+             Measure-Object |
+             Select-Object -ExpandProperty Count
+    
+        $bindings = @( Get-SslCertificateBinding )
+        $bindings.Length | Should -Be $numBindings
+    }
+    
+    It 'should filter by IP address and port' {
+        $foundOne = $false
+        $output = netsh http show sslcert 
+        $output |
+            Where-Object {  $_ -match '^    IP:port\s+: (.*)$' } |
+            ForEach-Object {
+
+                if( $foundOne )
+                {
+                    return
+                }
+    
+                $ipPort = $matches[1].Trim()
+                if( $ipPort -notmatch '^(.*):(\d+)$' )
+                {
+                    Write-Error ('Invalid IP address/port in netsh output: ''{0}''' -f $ipPort )
+                    return
+                }        
+                $ipAddress = $matches[1]
+                $port = $matches[2]
+                
+                $foundOne = $false
+                Get-SslCertificateBinding -IPAddress $ipAddress | 
+                    ForEach-Object {
+                        $_ | Should -Not -BeNullOrEmpty
+                        $_.IPAddress | Should -Be ([IPAddress]$ipAddress)
+                        $foundOne = $true
+                    }
+                $foundOne | Should -Be $true
+    
+                $foundOne = $false                        
+                Get-SslCertificateBinding -Port $port |
+                    ForEach-Object {
+                        $_ | Should -Not -BeNullOrEmpty
+                        $_.Port | Should -Be $port.Trim()
+                        $foundOne = $true
+                    }
+                $foundOne | Should -Be $true
+            }
+    }
+    
+    It 'should get IPv6 binding' {
+        $certPath = Join-Path -Path $PSScriptRoot -ChildPath 'Certificates\CarbonTestCertificate.cer' -Resolve
+        $cert = Install-Certificate $certPath -StoreLocation LocalMachine -StoreName My
+        $appID = '12ec3276-0689-42b0-ad39-c1fe23d25721'
+        Set-SslCertificateBinding -IPAddress '[::]' -Port 443 -ApplicationID $appID -Thumbprint $cert.Thumbprint
+    
+        try
+        {
+            $binding = Get-SslCertificateBinding -IPAddress '[::]' | Where-Object { $_.ApplicationID -eq $appID }
+            $binding | Should -Not -BeNullOrEmpty
+        }
+        finally
+        {
+            Remove-SslCertificateBinding -IPAddress '[::]' -Port 443
+        }
+    }
+    
+}
