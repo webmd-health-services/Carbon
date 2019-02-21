@@ -118,6 +118,7 @@ Describe 'Get-ScheduledTask' {
         schtasks /query /v /fo csv | 
             ConvertFrom-Csv | 
             Where-Object { $_.TaskName -and $_.HostName -ne 'HostName' } | 
+            Where-Object { $_.TaskName -notlike '*Intel*' -and $_.TaskName -notlike '\Microsoft\*' } |  # Some Intel scheduled tasks have characters in their names that don't play well.
             ForEach-Object {
                 $expectedTask = $_
                 $task = Get-ScheduledTask -Name $expectedTask.TaskName

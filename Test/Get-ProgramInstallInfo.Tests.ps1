@@ -59,7 +59,14 @@ Describe 'Get-ProgramInstallInfo.when getting all programs' {
                     {
                         $sddl = $Matches[1]
                         $sid = New-Object 'Security.Principal.SecurityIdentifier' $sddl
-                        $propertyValue = $sid.Translate([Security.Principal.NTAccount]).Value
+                        try
+                        {
+                            $propertyValue = $sid.Translate([Security.Principal.NTAccount]).Value
+                        }
+                        catch
+                        {
+                            $propertyValue = $sid.ToString()
+                        }
                         $keyValue = $propertyValue
                     }
                 }
