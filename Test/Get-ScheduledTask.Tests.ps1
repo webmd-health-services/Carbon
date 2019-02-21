@@ -81,15 +81,22 @@ Describe 'Get-ScheduledTask' {
                     if( $expectedValue -like '*"*' )
                     {
                         $actualTask = Get-CScheduledTask -Name $Expected.TaskName -AsComObject
-                        Write-Debug -Message $actualTask.Xml
-                        $taskxml = [xml]$actualTAsk.Xml
-                        $task = $taskxml.Task
-                        if( ($task | Get-Member -Name 'Actions') -and ($task.Actions | Get-Member -Name 'Exec') )
+                        if( -not $actualTask.Xml )
                         {
-                            $expectedValue = $taskXml.Task.Actions.Exec.Command
-                            if( ($taskxml.Task.Actions.Exec | Get-Member 'Arguments') -and  $taskXml.Task.Actions.Exec.Arguments )
+                            Write-Error -Message ('COM object for task "{0}" doesn''t have an XML property or the property doesn''t have a value.')
+                        }
+                        else
+                        {
+                            Write-Debug -Message $actualTask.Xml
+                            $taskxml = [xml]$actualTAsk.Xml
+                            $task = $taskxml.Task
+                            if( ($task | Get-Member -Name 'Actions') -and ($task.Actions | Get-Member -Name 'Exec') )
                             {
-                                $expectedValue = '{0} {1}' -f $expectedValue,$taskxml.Task.Actions.Exec.Arguments
+                                $expectedValue = $taskXml.Task.Actions.Exec.Command
+                                if( ($taskxml.Task.Actions.Exec | Get-Member 'Arguments') -and  $taskXml.Task.Actions.Exec.Arguments )
+                                {
+                                    $expectedValue = '{0} {1}' -f $expectedValue,$taskxml.Task.Actions.Exec.Arguments
+                                }
                             }
                         }
                     }
@@ -160,11 +167,11 @@ Describe 'Get-ScheduledTask' {
         $task = Get-ScheduledTask -Name $wildcard
         $task | Should -Not -BeNullOrEmpty
         $task | Should -BeOfType ([Carbon.TaskScheduler.TaskInfo])
-        Join-Path -Path $task.TaskPath -ChildPath $task.TaskName | Should Be $expectedTask
+        Join-Path -Path $task.TaskPath -ChildPath $task.TaskName | Should Be $expectedTask.Path
     }
     
     It 'should get all scheduled tasks' {
-        $expectedTasks = Get-CScheduledTask -AsComObject
+        $expectedTasks = schtasks /query | Where-Object { $_ -like 'TaskName *' } | Measure-Object
         $actualTasks = Get-ScheduledTask
         $actualTasks.Count | Should Be $expectedTasks.Count
     }
