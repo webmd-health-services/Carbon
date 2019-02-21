@@ -16,317 +16,122 @@ $AllMonths = @( 'January','February','March','April','May','June','July','August
 $today = Get-Date
 $today = New-Object 'DateTime' $today.Year,$today.Month,$today.Day
 
-function Start-TestFixture
-{
-    & (Join-Path -Path $PSScriptRoot -ChildPath '..\Import-CarbonForTest.ps1' -Resolve)
-    $credential = New-Credential -User 'CarbonInstallSchedul' -Password 'a1b2c34d!'
-    Install-User -Credential $credential -Description 'Test user for running scheduled tasks.'
-}
-
-function Start-Test
-{
-    $script:taskName = 'CarbonInstallScheduledTask{0}' -f [Guid]::NewGuid()
-    Uninstall-ScheduledTask -Name $taskName
-    Assert-NoError
-}
-
-function Stop-Test
-{
-    $Global:Error.Clear()
-    Get-ScheduledTask -Name '*CarbonInstallScheduledTask*' |
-        ForEach-Object { Uninstall-ScheduledTask -Name $_.TaskName }
-    Assert-NoError
-}
-
-function Test-ShouldCreateScheduledTaskWithPath
-{
-    $fullName = 'PARENT\{0}' -f $taskName
-    $result = Install-ScheduledTask -Name $fullName -TaskToRun 'notepad' -Monthly -Force
-    try
-    {
-        Assert-NotNull $result
-        Assert-Equal '\PARENT\' $result.TaskPath
-        Assert-Equal $taskName $result.TaskName
-        Assert-Equal ('\{0}' -f $fullName) $result.FullName
-    }
-    finally
-    {
-        Uninstall-ScheduledTask -Name $fullName
-    }
-}
-
-function Test-ShouldSchedulePerMinuteTasks
-{
-    Assert-TaskScheduled -InstallArguments @{ Minute = 5 } -AssertArguments @{ ScheduleType = 'Minute'; Modifier = 5 }
-}
-
-function Test-ShouldScheduleHourlyTasks
-{
-    Assert-TaskScheduled -InstallArguments @{ Hourly = 23 } -AssertArguments @{ ScheduleType = 'Hourly'; Modifier = 23 }
-}
-
-function Test-ShouldScheduleDailyTasks
-{
-    Assert-TaskScheduled -InstallArguments @{ Daily = 29 } -AssertArguments @{ ScheduleType = 'Daily'; Modifier = 29;  }
-}
-
-function Test-ShouldScheduleWeeklyTasks
-{
-    Assert-TaskScheduled -InstallArguments @{ Weekly = 39 } -AssertArguments @{ ScheduleType = 'Weekly'; Modifier = 39; DayOfWeek = $today.DayOfWeek; }
-}
-
-function Test-ShouldScheduleWeeklyTasksOnSpecificDay
-{
-    Assert-TaskScheduled -InstallArguments @{ Weekly = 39; DayOfWeek = 'Sunday'; } -AssertArguments @{ ScheduleType = 'Weekly'; Modifier = 39; DayOfWeek = 'Sunday'; }
-}
-
-function Test-ShouldScheduleWeeklyTasksOnMultipleDays
-{
-    Assert-TaskScheduled -InstallArguments @{ Weekly = 39; DayOfWeek = @('Monday','Tuesday','Wednesday'); } -AssertArguments @{ ScheduleType = 'Weekly'; Modifier = 39; DayOfWeek = @('Monday','Tuesday','Wednesday'); }
-}
-
-function Test-ShouldScheduleMonthlyTasks
-{
-    Assert-TaskScheduled -InstallArguments @{ Monthly = $true; } -AssertArguments @{ ScheduleType = 'Monthly'; Modifier = 1; DayOfMonth = 1; Month = $AllMonths }
-}
-
-function Test-ShouldScheduleMonthlyTasksOnSpecificDay
-{
-    Assert-TaskScheduled -InstallArguments @{ Monthly = $true; DayOfMonth = 13; } -AssertArguments @{ ScheduleType = 'Monthly'; Modifier = 1; DayOfMonth = 13; Month = $AllMonths }
-}
-
-function Test-ShouldScheduleLastDayOfTheMonthTask
-{
-    Assert-TaskScheduled -InstallArguments @{ LastDayOfMonth = $true; } -AssertArguments @{ ScheduleType = 'Monthly'; Modifier = 'LastDay'; Month = $AllMonths; }
-}
-
-function Test-ShouldScheduleLastDayOfTheMonthTaskInSpecificMonth
-{
-    Assert-TaskScheduled -InstallArguments @{ LastDayOfMonth = $true; Month = @( 'January' ); } -AssertArguments @{ ScheduleType = 'Monthly'; Modifier = 'LastDay'; Month = @( 'January' ); }
-}
-
-function Test-ShouldScheduleLastDayOfTheMonthTaskInSpecificMonths
-{
-    Assert-TaskScheduled -InstallArguments @{ LastDayOfMonth = $true; Month = @( 'January','June' ); } -AssertArguments @{ ScheduleType = 'Monthly'; Modifier = 'LastDay'; Month = @( 'January','June' ); }
-}
-
-function Test-ShouldScheduleForSpecificMonth
-{
-    Assert-TaskScheduled -InstallArguments @{ Month = @( 'January' ); DayOfMonth = 1; } -AssertArguments @{ ScheduleType = 'Monthly'; Month = @( 'January' ); DayOfMonth = 1; }
-}
-
-function Test-ShouldScheduleForSpecificMonthWithInteger
-{
-    Assert-TaskScheduled -InstallArguments @{ Month = @( 1 ); DayOfMonth = 19; } -AssertArguments @{ ScheduleType = 'Monthly'; Month = @( 'January' ); DayOfMonth = 19; }
-}
-
-function Test-ShouldScheduleForSpecificMonths
-{
-    Assert-TaskScheduled -InstallArguments @{ Month = @( 'January','April','July','October' ); DayOfMonth = 23; } -AssertArguments @{ ScheduleType = 'Monthly'; Month = @( 'January','April','July','October' ); DayOfMonth = 23; }
-}
-
-function Test-ShouldNotScheduleMonthlyTaskWithMonthParameter
-{
-    $result = Install-ScheduledTask -Name $taskName -Principal LocalService -TaskToRun 'notepad' -Month $AllMonths -DayOfMonth 17 -ErrorAction SilentlyContinue
-    Assert-Error -Last -Regex 'to schedule a monthly task'
-    Assert-Null $result
-    Assert-False (Test-ScheduledTask -Name $taskName)
-}
-
-function Test-ShouldScheduleForSpecificMonthsOnSpecificDay
-{
-    Assert-TaskScheduled -InstallArguments @{ Month = @( 'January','April','July','October' ); DayOfMonth = 5;  } -AssertArguments @{ ScheduleType = 'Monthly'; Month = @( 'January','April','July','October' ); DayOfMonth = 5; }
-}
-
-function Test-ShouldScheduleWeekOfMonthTasks
-{
-    Assert-TaskScheduled -InstallArguments @{ WeekOfMonth = 'First'; DayOfWeek = $today.DayOfWeek } -AssertArguments @{ ScheduleType = 'Monthly'; Modifier = 'First'; Month = $AllMonths; DayOfWeek = $today.DayOfWeek; }
-}
-
-function Test-ShouldNotScheduleWeekOfMonthOnMultipleWeekDays
-{
-    $result = Install-ScheduledTask -Name $taskName -Principal LocalService -TaskToRun 'notepad' -WeekOfMonth First -DayOfWeek Friday,Monday -ErrorAction SilentlyContinue
-    Assert-Error -Last -Regex 'single weekday'
-    Assert-Null $result
-    Assert-False (Test-ScheduledTask -Name $taskName)
-}
-
-function Test-ShouldScheduleWeekOfMonthTasksOnEachWeek
-{
-    foreach( $week in @( 'First', 'Second', 'Third', 'Fourth', 'Last' ) )
-    {
-        $result = Install-ScheduledTask -Name $taskName -Principal LocalService -TaskToRun 'notepad' -WeekOfMonth $week -DayOfWeek $today.DayOfWeek -Force
-        Assert-NoError
-        Assert-NotNull $result
-        Assert-ScheduledTask -Name $taskName -Principal 'Local Service' -TaskToRun 'notepad' -ScheduleType 'Monthly' -Modifier $week -DayOfWeek $today.DayOfWeek -Months $AllMonths
-    }
-}
-
-function Test-ShouldScheduleTaskToRunOnce
-{
-    Assert-TaskScheduled -InstallArguments @{ Once = $true; StartTime = '3:03' } -AssertArguments @{ ScheduleType = 'Once'; StartTime = '3:03'; }
-}
-
-function Test-ShouldScheduleTaskToRunAtLogon
-{
-    Assert-TaskScheduled -InstallArguments @{ OnLogon = $true; } -AssertArguments @{ ScheduleType = 'OnLogon'; }
-}
-
-function Test-ShouldScheduleTaskToRunAtStart
-{
-    Assert-TaskScheduled -InstallArguments @{ OnStart = $true; } -AssertArguments @{ ScheduleType = 'OnStart'; }
-}
-
-function Test-ShouldScheduleTaskToRunOnIdle
-{
-    Assert-TaskScheduled -InstallArguments @{ OnIdle = 999; } -AssertArguments @{ ScheduleType = 'OnIdle'; IdleTime = 999; }
-}
-
-function Test-ShouldScheduleTaskToRunOnEvent
-{
-    Assert-TaskScheduled -InstallArguments @{ OnEvent = $true ; EventChannelName = 'System' ; EventXPathQuery = '*[System/EventID=101]'; } -AssertArguments @{ ScheduleType = 'OnEvent'; Modifier = '*[System/EventID=101]'; EventChannelName = 'System'; }
-}
+& (Join-Path -Path $PSScriptRoot -ChildPath 'Import-CarbonForTest.ps1' -Resolve)
+$credential = New-Credential -User 'CarbonInstallSchedul' -Password 'a1b2c34d!'
+Install-User -Credential $credential -Description 'Test user for running scheduled tasks.'
 
 function Assert-TaskScheduledFromXml
 {
-    [CmdletBinding()]
-    param(
-        $Path,
-        $Xml,
-        $TaskCredential
-    )
-
-    Set-StrictMode -Version 'Latest'
-
-    $installParams = @{ }
-    if( $TaskCredential )
-    {
-        $installParams['TaskCredential'] = $TaskCredential
+        [CmdletBinding()]
+        param(
+            $Path,
+            $Xml,
+            $TaskCredential
+        )
+    
+        Set-StrictMode -Version 'Latest'
+    
+        $installParams = @{ }
+        if( $TaskCredential )
+        {
+            $installParams['TaskCredential'] = $TaskCredential
+        }
+    
+        if( $Path )
+        {
+            $installParams['TaskXmlFilePath'] = $Path
+        }
+    
+        if( $Xml )
+        {
+            $installParams['TaskXml'] = $Xml
+        }
+    
+        $task = Install-ScheduledTask -Name $taskName @installParams
+        $task | Should -Not -BeNullOrEmpty
+        $Global:Error.Count | Should -Be 0
+        # Now, make sure task doesn't get re-created if it already exists.
+        (Install-ScheduledTask -Name $taskName @installParams) | Should -BeNullOrEmpty
+        $Global:Error.Count | Should -Be 0
+        $task = Get-ScheduledTask -Name $taskName
+        $task | Should -Not -BeNullOrEmpty
+        $task.TaskName | Should -Be $taskName
+        if( $TaskCredential )
+        {
+            $task.RunAsUser | Should -Be $TaskCredential.Username
+        }
+        else
+        {
+            $task.RunAsUser | Should -Be 'System'
+        }
+    
+        if( $Path )
+        {
+            $Xml = [xml]((Get-Content -Path $Path) -join ([Environment]::NewLine))
+        }
+        else
+        {
+            $Xml = [xml]$Xml
+        }
+    
+        $actualXml = schtasks /query /tn $taskName /xml | Where-Object { $_ }
+        $actualXml = $actualXml -join ([Environment]::NewLine)
+        $actualXml = [xml]$actualXml
+        # Different versions of Windows puts different values in these elements.
+        ($actualXml.OuterXml -replace '<(Uri|UserId)>[^<]*</(Uri|UserId)>','') | Should -Be ($Xml.OuterXml -replace '<(Uri|UserId)>[^<]*</(Uri|UserId)>','')
+    
+        if( $Path )
+        {
+            $Path | Should -Exist
+        }
+        else
+        {
+            (Get-ChildItem -Path $env:TEMP 'Carbon+Install-ScheduledTask+*') | Should -BeNullOrEmpty
+        }
     }
-
-    if( $Path )
-    {
-        $installParams['TaskXmlFilePath'] = $Path
-    }
-
-    if( $Xml )
-    {
-        $installParams['TaskXml'] = $Xml
-    }
-
-    $task = Install-ScheduledTask -Name $taskName @installParams
-    Assert-NotNull $task
-    Assert-NoError 
-    # Now, make sure task doesn't get re-created if it already exists.
-    Assert-Null (Install-ScheduledTask -Name $taskName @installParams)
-    Assert-NoError
-    $task = Get-ScheduledTask -Name $taskName
-    Assert-NotNull $task
-    Assert-Equal $taskName $task.TaskName
-    if( $TaskCredential )
-    {
-        Assert-Equal $TaskCredential.Username $task.RunAsUser
-    }
-    else
-    {
-        Assert-Equal 'System' $task.RunAsUser
-    }
-
-    if( $Path )
-    {
-        $Xml = [xml]((Get-Content -Path $Path) -join ([Environment]::NewLine))
-    }
-    else
-    {
-        $Xml = [xml]$Xml
-    }
-
-    $actualXml = schtasks /query /tn $taskName /xml | Where-Object { $_ }
-    $actualXml = $actualXml -join ([Environment]::NewLine)
-    $actualXml = [xml]$actualXml
-    Assert-Equal $Xml.OuterXml $actualXml.OuterXml
-
-    if( $Path )
-    {
-        Assert-FileExists $Path
-    }
-    else
-    {
-        Assert-Null (Get-ChildItem -Path $env:TEMP 'Carbon+Install-ScheduledTask+*')
-    }
-}
-
-function Test-ShouldInstallFromXmlFileWithRelativePath
-{
-    Push-Location -Path $PSScriptRoot
-    try
-    {
-        Assert-TaskScheduledFromXml -Path '.\task.xml' -TaskCredential $credential
-    }
-    finally
-    {
-        Pop-Location
-    }
-}
-
-function Test-ShouldInstallFromXmlFileWithAbsolutePath
-{
-    Assert-TaskScheduledFromXml -Path (Join-Path -Path $PSScriptRoot -ChildPath 'task.xml') -TaskCredential $credential
-}
-
-function Test-ShouldInstallFromXmlFileForSystemUser
-{
-    Assert-TaskScheduledFromXml -Path (Join-Path -Path $PSScriptRoot -ChildPath 'task_with_principal.xml')
-}
-
-function Test-ShouldInstallFromXml
-{
-    Assert-TaskScheduledFromXml -Xml ((Get-Content -Path (Join-Path -Path $PSScriptRoot -ChildPath 'task_with_principal.xml')) -join ([Environment]::NewLine))
-}
-
-
+    
 function Assert-TaskScheduled
 {
     [CmdletBinding()]
     param(
         [hashtable]
         $InstallArguments,
-
+    
         [hashtable]
         $AssertArguments
     )
-
+    
     Set-StrictMode -Version Latest
-
+    
     $InstallArguments['Name'] = $taskName
     $InstallArguments['TaskToRun'] = 'notepad'
-
+    
     $AssertArguments['Name'] = $taskName
     $AssertArguments['TaskToRun'] = 'notepad'
-
+    
     # Install to run as SYSTEM
     $task = Install-ScheduledTask -Principal System @InstallArguments
-    Assert-NoError
-    Assert-NotNull $task
-    Assert-Is $task ([Carbon.TaskScheduler.TaskInfo])
+    $Global:Error.Count | Should -Be 0
+    $task | Should -Not -BeNullOrEmpty
+    $task | Should -BeOfType ([Carbon.TaskScheduler.TaskInfo])
     Assert-ScheduledTask -Principal 'System' @AssertArguments
-
+    
     $preTask = Get-ScheduledTask -Name $taskName
-    Assert-Null (Install-ScheduledTask -Principal System @InstallArguments)
-    Assert-NoError
+    (Install-ScheduledTask -Principal System @InstallArguments) | Should -BeNullOrEmpty
+    $Global:Error.Count | Should -Be 0
     $postTask = Get-ScheduledTask -Name $taskName
-    Assert-Equal $preTask.CreateDate $postTask.CreateDate
-
+    $postTask.CreateDate | Should -Be $preTask.CreateDate
+    
     $InstallArguments['TaskCredential'] = $credential
     $InstallArguments['Force'] = $true
     $AssertArguments['TaskCredential'] = $credential
-
+    
     $task = Install-ScheduledTask @InstallArguments
-    Assert-NoError
-    Assert-NotNull $task
-    Assert-Is $task ([Carbon.TaskScheduler.TaskInfo])
+    $Global:Error.Count | Should -Be 0
+    $task | Should -Not -BeNullOrEmpty
+    $task | Should -BeOfType ([Carbon.TaskScheduler.TaskInfo])
     Assert-ScheduledTask @AssertArguments 
-
+    
     # Install to start tomorrow
     # Check interval parameter
     $intervalSchedules = @( 'Daily', 'Weekly', 'Monthly', 'Month', 'LastDayOfMonth', 'WeekOfMonth' )
@@ -335,13 +140,13 @@ function Assert-TaskScheduled
         if( $InstallArguments.ContainsKey( $intervalSchedule ) )
         {
             $task = Install-ScheduledTask @InstallArguments -Interval 37 
-            Assert-NotNull $task
-            Assert-Is $task ([Carbon.TaskScheduler.TaskInfo])
+            $task | Should -Not -BeNullOrEmpty
+            $task | Should -BeOfType ([Carbon.TaskScheduler.TaskInfo])
             Assert-ScheduledTask @AssertArguments -Interval 37 
             break
         }
     }
-
+    
     if( -not $InstallArguments.ContainsKey('StartTime') )
     {
         $startTimeSchedules = @( 'Daily', 'Weekly', 'Monthly', 'Month', 'LastDayOfMonth', 'WeekOfMonth', 'Once' )
@@ -350,56 +155,56 @@ function Assert-TaskScheduled
             if( $InstallArguments.ContainsKey( $startTimeSchedule ) )
             {
                 $task = Install-ScheduledTask @InstallArguments -StartTime '23:06'
-                Assert-NoError
-                Assert-NotNull $task
-                Assert-Is $task ([Carbon.TaskScheduler.TaskInfo])
+                $Global:Error.Count | Should -Be 0
+                $task | Should -Not -BeNullOrEmpty
+                $task | Should -BeOfType ([Carbon.TaskScheduler.TaskInfo])
                 Assert-ScheduledTask @AssertArguments -StartTime '23:06'
                 break
             }
         }
     }
-
+    
     $startDateSchedules =  @( 'Minute','Daily', 'Weekly', 'Monthly', 'Month', 'LastDayOfMonth', 'WeekOfMonth', 'Once' )
     foreach( $startDateSchedule in $startDateSchedules )
     {
         if( $InstallArguments.ContainsKey( $startDateSchedule ) )
         {
             $task = Install-ScheduledTask @InstallArguments -StartDate $today.AddDays(1)
-            Assert-NoError
-            Assert-NotNull $task
-            Assert-Is $task ([Carbon.TaskScheduler.TaskInfo])
+            $Global:Error.Count | Should -Be 0
+            $task | Should -Not -BeNullOrEmpty
+            $task | Should -BeOfType ([Carbon.TaskScheduler.TaskInfo])
             Assert-ScheduledTask @AssertArguments -StartDate $today.AddDays(1)
         }
     }
-
+    
     $durationSchedules = @( 'Minute', 'Daily', 'Weekly', 'Monthly', 'LastDayOfMonth', 'WeekOfMonth' )
     foreach( $durationSchedule in $durationSchedules )
     {
         if( $InstallArguments.ContainsKey( $durationSchedule ) )
         {
             $task = Install-ScheduledTask @InstallArguments -Duration '5:30'  # Using fractional hours to ensure it gets converted properly.
-            Assert-NoError
-            Assert-NotNull $task
-            Assert-Is $task ([Carbon.TaskScheduler.TaskInfo])
+            $Global:Error.Count | Should -Be 0
+            $task | Should -Not -BeNullOrEmpty
+            $task | Should -BeOfType ([Carbon.TaskScheduler.TaskInfo])
             Assert-ScheduledTask @AssertArguments -Duration '5:30' 
             break
         }
     }
-
+    
     $endDateSchedules = @( 'Daily', 'Weekly', 'Monthly', 'LastDayOfMonth', 'WeekOfMonth' )
     foreach( $endDateSchedule in $endDateSchedules )
     {
         if( $InstallArguments.ContainsKey( $endDateSchedule ) )
         {
             $task = Install-ScheduledTask @InstallArguments -EndDate $today.AddYears(1)
-            Assert-NoError
-            Assert-NotNull $task
-            Assert-Is $task ([Carbon.TaskScheduler.TaskInfo])
+            $Global:Error.Count | Should -Be 0
+            $task | Should -Not -BeNullOrEmpty
+            $task | Should -BeOfType ([Carbon.TaskScheduler.TaskInfo])
             Assert-ScheduledTask @AssertArguments -EndDate $today.AddYears(1)
             break
         }
     }
-
+    
     $endTimeSchedules = @( 'Minute', 'Hourly', 'Daily', 'Weekly', 'Monthly', 'LastDayOfMonth', 'WeekOfMonth' )
     $endTime = (Get-Date).AddHours(7)
     foreach( $endTimeSchedule in $endTimeSchedules )
@@ -409,54 +214,54 @@ function Assert-TaskScheduled
             $endTimeParams = @{
                                     EndDate = $endTime.ToString('MM/dd/yyyy')
                                     EndTime = $endTime.ToString('HH:mm');
-                              }
+                                }
             $task = Install-ScheduledTask @InstallArguments @endTimeParams
-            Assert-NoError
-            Assert-NotNull $task
-            Assert-Is $task ([Carbon.TaskScheduler.TaskInfo])
+            $Global:Error.Count | Should -Be 0
+            $task | Should -Not -BeNullOrEmpty
+            $task | Should -BeOfType ([Carbon.TaskScheduler.TaskInfo])
             Assert-ScheduledTask @AssertArguments @endTimeParams
             break
         }
     }
-
+    
     # Install as interactive
     $task = Install-ScheduledTask @InstallArguments -Interactive
-    Assert-NoError
-    Assert-NotNull $task
-    Assert-Is $task ([Carbon.TaskScheduler.TaskInfo])
+    $Global:Error | Should -BeNullOrEmpty
+    $task | Should -Not -BeNullOrEmpty
+    $task | Should -BeOfType ([Carbon.TaskScheduler.TaskInfo])
     Assert-ScheduledTask @AssertArguments -Interactive
-
+    
     # Install as no password
     $task = Install-ScheduledTask @InstallArguments -NoPassword
-    Assert-NoError
-    Assert-NotNull $task
-    Assert-Is $task ([Carbon.TaskScheduler.TaskInfo])
+    $Global:Error | Should -BeNullOrEmpty
+    $task | Should -Not -BeNullOrEmpty
+    $task | Should -BeOfType ([Carbon.TaskScheduler.TaskInfo])
     Assert-ScheduledTask @AssertArguments -NoPassword
-
+    
     # Install as highest run level
     $task = Install-ScheduledTask @InstallArguments -HighestAvailableRunLevel
-    Assert-NoError
-    Assert-NotNull $task
-    Assert-Is $task ([Carbon.TaskScheduler.TaskInfo])
+    $Global:Error.Count | Should -Be 0
+    $task | Should -Not -BeNullOrEmpty
+    $task | Should -BeOfType ([Carbon.TaskScheduler.TaskInfo])
     Assert-ScheduledTask @AssertArguments -HighestAvailableRunLevel
-
+    
     $delaySchedules = @( 'OnStart', 'OnLogon', 'OnEvent' )
     foreach( $delaySchedule in $delaySchedules )
     {
         if( $InstallArguments.ContainsKey( $delaySchedule ) )
         {
             $task = Install-ScheduledTask @InstallArguments -Delay '6.22:39:59'
-            Assert-NoError
-            Assert-NotNull $task
-            Assert-Is $task ([Carbon.TaskScheduler.TaskInfo])
+            $Global:Error.Count | Should -Be 0
+            $task | Should -Not -BeNullOrEmpty
+            $task | Should -BeOfType ([Carbon.TaskScheduler.TaskInfo])
             Assert-ScheduledTask @AssertArguments -Delay '6.22:39:59'
             break
         }
     }
-
-
+    
+    
 }
-
+    
 function Assert-ScheduledTask
 {
     [CmdletBinding()]
@@ -499,206 +304,394 @@ function Assert-ScheduledTask
         [timespan]
         $Delay
     )
-
+    
     Set-StrictMode -Version 'Latest'
-
-    Assert-True (Test-ScheduledTask -Name $Name)
-
+    
+    (Test-ScheduledTask -Name $Name) | Should -BeTrue
+    
     $task = Get-ScheduledTask -Name $Name
     $task | Format-List | Out-String | Write-Verbose
     $schedule = $task.Schedules[0]
     $schedule | Format-List | Out-String | Write-Verbose
-
-    Assert-NotNull $task
-    schtasks /query /fo list /v /tn $task.FullName | Write-Verbose
-    schtasks /query /xml /tn $task.FullName | Where-Object { $_ } | Write-Verbose
-    Assert-Equal $TaskToRun $task.TaskToRun.Trim()
-
+    
+    $task | Should -Not -BeNullOrEmpty
+    # schtasks /query /fo list /v /tn $task.FullName | Write-Verbose
+    # schtasks /query /xml /tn $task.FullName | Where-Object { $_ } | Write-Verbose
+    $task.TaskToRun.Trim() | Should -Be $TaskToRun
+    
     if( $PSBoundParameters.ContainsKey('TaskCredential') )
     {
-        Assert-Equal $TaskCredential.Username $task.RunAsUser 'RunAsUser'
+        $task.RunAsUser | Should -Be $TaskCredential.Username
     }
     elseif( $PSBoundParameters.ContainsKey('Principal') )
     {
-        Assert-Equal $Principal $task.RunAsUser 'RunAsUser'
+        $task.RunAsUser | Should -Be $Principal
     }
     else
     {
-        Assert-Equal 'SYSTEM' $task.RunAsUser 'RunAsUser'
+        $task.RunAsUser | Should -Be 'SYSTEM'
     }
-
+    
     if( $HighestAvailableRunLevel )
     {
-        Assert-True $task.HighestAvailableRunLevel
+        $task.HighestAvailableRunLevel | Should -Be $true
     }
     else
     {
-        Assert-False $task.HighestAvailableRunLevel
+        $task.HighestAvailableRunLevel | Should -Be $false
     }
-
+    
     if( $Interactive )
     {
-        Assert-True $task.Interactive
+        $task.Interactive | Should -Be $true
     }
     else
     {
-        Assert-False $task.Interactive
+        $task.Interactive | Should -Be $false
     }
-
+    
     if( $NoPassword )
     {
-        Assert-True $task.NoPassword
+        $task.NoPassword | Should -Be $true
     }
     else
     {
-        Assert-False $task.NoPassword
+        $task.NoPassword | Should -Be $false
     }
-
+    
     if( $PSBoundParameters.ContainsKey('ScheduleType') )
     {
-        Assert-Equal $ScheduleType $schedule.ScheduleType 'ScheduleType'
+        $schedule.ScheduleType | Should -Be $ScheduleType
     }
-
+    
     if( $PSBoundParameters.ContainsKey( 'Modifier' ) )
     {
-        Assert-Equal $Modifier $schedule.Modifier 'Modifier'
+        $schedule.Modifier | Should -Be $Modifier
     }
     else
     {
-        Assert-Equal '' $schedule.Modifier 'Modifier'
+        $schedule.Modifier | Should -Be ''
     }
-
+    
     if( $PSBoundParameters.ContainsKey('DayOfMonth') )
     {
-        Assert-Equal ($DayOfMonth -join ',') ($schedule.Days -join ',') 'Days'
+        ($schedule.Days -join ',') | Should -Be ($DayOfMonth -join ',')
     }
     else
     {
-        Assert-Empty $schedule.Days ('Days: {0}' -f ($schedule.Days -join ','))
+        $schedule.Days | Should -BeNullOrEmpty
     }
-
+    
     if( $PSBoundParameters.ContainsKey('DayOfWeek') )
     {
-        Assert-Equal ($DayOfWeek -join ',') ($schedule.DaysOfWeek -join ',') 'DaysOfWeek'
+        ($schedule.DaysOfWeek -join ',') | Should -Be ($DayOfWeek -join ',')
     }
     else
     {
-        Assert-Empty $schedule.DaysOfWeek ('DaysOfWeek: {0}' -f ($schedule.DaysOfWeek -join ','))
+        $schedule.DaysOfWeek | Should -BeNullOrEmpty
     }
-
+    
     if( $PSBoundParameters.ContainsKey('Months') )
     {
-        Assert-Equal ($Months -join ', ') ($schedule.Months -join ', ')'Months'
+        ($schedule.Months -join ', ') | Should -Be ($Months -join ', ')
     }
     else
     {
-        Assert-Empty $schedule.Months ('Months: {0}' -f ($schedule.Months -join ','))
+        $schedule.Months | Should -BeNullOrEmpty
     }
-
+    
     if( $PSBoundParameters.ContainsKey('StartDate') )
     {
-        Assert-Equal $StartDate $schedule.StartDate 'StartDate'
+        $schedule.StartDate | Should -Be $StartDate
     }
     else
     {
         if( @('OnLogon', 'OnStart', 'OnIdle', 'OnEvent') -contains $ScheduleType )
         {
-            Assert-Equal ([DateTime]::MinValue) $schedule.StartDate
+            $schedule.StartDate | Should -Be ([DateTime]::MinValue)
         }
         else
         {
-            Assert-Equal (New-Object 'DateTime' $today.Year,$today.Month,$today.Day) $Schedule.StartDate 'StartDate'
+            $Schedule.StartDate | Should -Be (New-Object 'DateTime' $today.Year,$today.Month,$today.Day)
         }
     }
-
+    
     if( $PSBoundParameters.ContainsKey('Duration') )
     {
-        Assert-Equal $Duration $schedule.RepeatUntilDuration 'Duration'
+        $schedule.RepeatUntilDuration | Should -Be $Duration
     }
-
+    
     if( $StopAtEnd )
     {
-        Assert-True $schedule.StopAtEnd
+        $schedule.StopAtEnd | Should -Be $true
     }
     else
     {
-        Assert-False $schedule.StopAtEnd
+        $schedule.StopAtEnd | Should -Be $false
     }
-
+    
     if( $PSBoundParameters.ContainsKey('Interval') )
     {
-        Assert-Equal $Interval $schedule.Interval 'Interval'
+        $schedule.Interval | Should -Be $Interval
     }
     else
     {
         if( (@('Daily','Weekly','Monthly','Once') -contains $schedule.ScheduleType) -and ($PSBoundParameters.ContainsKey('EndTime') -or $PSBoundParameters.ContainsKey('Duration')) )
         {
-            Assert-Equal 10 $schedule.Interval 'Interval'
+            $schedule.Interval | Should -Be 10
         }
         else
         {
-            Assert-Equal 0 $schedule.Interval 'Interval'
+            $schedule.Interval | Should -Be 0
         }
     }
-
+    
     if( $PSBoundParameters.ContainsKey('StartTime') )
     {
-        Assert-Equal $StartTime $schedule.StartTime 'StartTime'
+        $schedule.StartTime | Should -Be $StartTime
     }
     else
     {
         if( @('OnLogon', 'OnStart', 'OnIdle', 'OnEvent') -contains $ScheduleType )
         {
-            Assert-Equal ([TimeSpan]::Zero) $schedule.StartTime
+            $schedule.StartTime | Should -Be ([TimeSpan]::Zero)
         }
         else
         {
-            Assert-Equal (New-Object 'TimeSpan' $task.CreateDate.Hour,$task.CreateDate.Minute,0) $schedule.StartTime 'StartTime'
+            $schedule.StartTime | Should -Be (New-Object 'TimeSpan' $task.CreateDate.Hour,$task.CreateDate.Minute,0)
         }
     }
-
+    
     if( $PSBoundParameters.ContainsKey('EndTime') )
     {
-        Assert-Equal $EndTime $schedule.EndTime
+        $schedule.EndTime | Should -Be $EndTime
     }
     else
     {
-        Assert-Equal ([TimeSpan]::Zero) $schedule.EndTime
+        $schedule.EndTime | Should -Be ([TimeSpan]::Zero)
     }
-
+    
     if( $PSBoundParameters.ContainsKey('EndDate') )
     {
-        Assert-Equal $EndDate $schedule.EndDate
+        $schedule.EndDate | Should -Be $EndDate
     }
     else
     {
-        Assert-Equal ([datetime]::MaxValue) $schedule.EndDate
+        $schedule.EndDate | Should -Be ([datetime]::MaxValue)
     }
-
+    
     if( $PSBoundParameters.ContainsKey('Delay') )
     {
-        Assert-Equal $Delay $schedule.Delay 'Delay'
+        $schedule.Delay | Should -Be $Delay
     }
     else
     {
-        Assert-Equal ([TimeSpan]::Zero) $schedule.Delay 'Delay'
+        $schedule.Delay | Should -Be ([TimeSpan]::Zero)
     }
-
+    
     if( $PSBoundParameters.ContainsKey('IdleTime') )
     {
-        Assert-Equal $IdleTime $schedule.IdleTime 'IdleTime'
+        $schedule.IdleTime | Should -Be $IdleTime
     }
     else
     {
-        Assert-Equal 0 $schedule.IdleTime 'IdleTime'
+        $schedule.IdleTime | Should -Be 0
     }
-
+    
     if( $PSBoundParameters.ContainsKey('EventChannelName') )
     {
-        Assert-Equal $EventChannelName $schedule.EventChannelName
+        $schedule.EventChannelName | Should -Be $EventChannelName
     }
     else
     {
-        Assert-Empty $schedule.EventChannelName
+        $schedule.EventChannelName | Should -BeNullOrEmpty
     }
 }
+
+function Init
+{
+    $Global:Error.Clear()
+    $script:taskName = 'CarbonInstallScheduledTask{0}' -f [Guid]::NewGuid()
+    Uninstall-ScheduledTask -Name $taskName
+}
+
+Describe 'Install-ScheduledTask' {
+    
+    BeforeEach {
+        Init
+    }
+    
+    It 'should create scheduled task with path' {
+        $fullName = 'PARENT\{0}' -f $taskName
+        $result = Install-ScheduledTask -Name $fullName -TaskToRun 'notepad' -Monthly -Force
+        try
+        {
+            $result | Should -Not -BeNullOrEmpty
+            $result.TaskPath | Should -Be '\PARENT\'
+            $result.TaskName | Should -Be $taskName
+            $result.FullName | Should -Be ('\{0}' -f $fullName)
+        }
+        finally
+        {
+            Uninstall-ScheduledTask -Name $fullName
+        }
+    }
+    
+    It 'should schedule per minute tasks' {
+        Assert-TaskScheduled -InstallArguments @{ Minute = 5 } -AssertArguments @{ ScheduleType = 'Minute'; Modifier = 5 }
+    }
+    
+    It 'should schedule hourly tasks' {
+        Assert-TaskScheduled -InstallArguments @{ Hourly = 23 } -AssertArguments @{ ScheduleType = 'Hourly'; Modifier = 23 }
+    }
+    
+    It 'should schedule daily tasks' {
+        Assert-TaskScheduled -InstallArguments @{ Daily = 29 } -AssertArguments @{ ScheduleType = 'Daily'; Modifier = 29;  }
+    }
+    
+    It 'should schedule weekly tasks' {
+        Assert-TaskScheduled -InstallArguments @{ Weekly = 39 } -AssertArguments @{ ScheduleType = 'Weekly'; Modifier = 39; DayOfWeek = $today.DayOfWeek; }
+    }
+    
+    It 'should schedule weekly tasks on specific day' {
+        Assert-TaskScheduled -InstallArguments @{ Weekly = 39; DayOfWeek = 'Sunday'; } -AssertArguments @{ ScheduleType = 'Weekly'; Modifier = 39; DayOfWeek = 'Sunday'; }
+    }
+    
+    It 'should schedule weekly tasks on multiple days' {
+        Assert-TaskScheduled -InstallArguments @{ Weekly = 39; DayOfWeek = @('Monday','Tuesday','Wednesday'); } -AssertArguments @{ ScheduleType = 'Weekly'; Modifier = 39; DayOfWeek = @('Monday','Tuesday','Wednesday'); }
+    }
+    
+    It 'should schedule monthly tasks' {
+        Assert-TaskScheduled -InstallArguments @{ Monthly = $true; } -AssertArguments @{ ScheduleType = 'Monthly'; Modifier = 1; DayOfMonth = 1; Month = $AllMonths }
+    }
+    
+    It 'should schedule monthly tasks on specific day' {
+        Assert-TaskScheduled -InstallArguments @{ Monthly = $true; DayOfMonth = 13; } -AssertArguments @{ ScheduleType = 'Monthly'; Modifier = 1; DayOfMonth = 13; Month = $AllMonths }
+    }
+    
+    It 'should schedule last day of the month task' {
+        Assert-TaskScheduled -InstallArguments @{ LastDayOfMonth = $true; } -AssertArguments @{ ScheduleType = 'Monthly'; Modifier = 'LastDay'; Month = $AllMonths; }
+    }
+    
+    It 'should schedule last day of the month task in specific month' {
+        Assert-TaskScheduled -InstallArguments @{ LastDayOfMonth = $true; Month = @( 'January' ); } -AssertArguments @{ ScheduleType = 'Monthly'; Modifier = 'LastDay'; Month = @( 'January' ); }
+    }
+    
+    It 'should schedule last day of the month task in specific months' {
+        Assert-TaskScheduled -InstallArguments @{ LastDayOfMonth = $true; Month = @( 'January','June' ); } -AssertArguments @{ ScheduleType = 'Monthly'; Modifier = 'LastDay'; Month = @( 'January','June' ); }
+    }
+    
+    It 'should schedule for specific month' {
+        Assert-TaskScheduled -InstallArguments @{ Month = @( 'January' ); DayOfMonth = 1; } -AssertArguments @{ ScheduleType = 'Monthly'; Month = @( 'January' ); DayOfMonth = 1; }
+    }
+    
+    It 'should schedule for specific month with integer' {
+        Assert-TaskScheduled -InstallArguments @{ Month = @( 1 ); DayOfMonth = 19; } -AssertArguments @{ ScheduleType = 'Monthly'; Month = @( 'January' ); DayOfMonth = 19; }
+    }
+    
+    It 'should schedule for specific months' {
+        Assert-TaskScheduled -InstallArguments @{ Month = @( 'January','April','July','October' ); DayOfMonth = 23; } -AssertArguments @{ ScheduleType = 'Monthly'; Month = @( 'January','April','July','October' ); DayOfMonth = 23; }
+    }
+    
+    It 'should not schedule monthly task with month parameter' {
+        $result = Install-ScheduledTask -Name $taskName -Principal LocalService -TaskToRun 'notepad' -Month $AllMonths -DayOfMonth 17 -ErrorAction SilentlyContinue
+        $Global:Error.Count | Should -BeGreaterThan 0
+        $Global:Error[0] | Should -Match 'to schedule a monthly task'
+        $result | Should -BeNullOrEmpty
+        (Test-ScheduledTask -Name $taskName) | Should -Be $false
+    }
+    
+    It 'should schedule for specific months on specific day' {
+        Assert-TaskScheduled -InstallArguments @{ Month = @( 'January','April','July','October' ); DayOfMonth = 5;  } -AssertArguments @{ ScheduleType = 'Monthly'; Month = @( 'January','April','July','October' ); DayOfMonth = 5; }
+    }
+    
+    It 'should schedule week of month tasks' {
+        Assert-TaskScheduled -InstallArguments @{ WeekOfMonth = 'First'; DayOfWeek = $today.DayOfWeek } -AssertArguments @{ ScheduleType = 'Monthly'; Modifier = 'First'; Month = $AllMonths; DayOfWeek = $today.DayOfWeek; }
+    }
+    
+    It 'should not schedule week of month on multiple week days' {
+        $result = Install-ScheduledTask -Name $taskName -Principal LocalService -TaskToRun 'notepad' -WeekOfMonth First -DayOfWeek Friday,Monday -ErrorAction SilentlyContinue
+        $Global:Error.Count | Should -BeGreaterThan 0
+        $Global:Error[0] | Should -Match 'single weekday'
+        $result | Should -BeNullOrEmpty
+        (Test-ScheduledTask -Name $taskName) | Should -Be $false
+    }
+    
+    It 'should schedule week of month tasks on each week' {
+        foreach( $week in @( 'First', 'Second', 'Third', 'Fourth', 'Last' ) )
+        {
+            $result = Install-ScheduledTask -Name $taskName -Principal LocalService -TaskToRun 'notepad' -WeekOfMonth $week -DayOfWeek $today.DayOfWeek -Force
+            $Global:Error.Count | Should -Be 0
+            $result | Should -Not -BeNullOrEmpty
+            Assert-ScheduledTask -Name $taskName -Principal 'Local Service' -TaskToRun 'notepad' -ScheduleType 'Monthly' -Modifier $week -DayOfWeek $today.DayOfWeek -Months $AllMonths
+        }
+    }
+    
+    It 'should schedule task to run once' {
+        Assert-TaskScheduled -InstallArguments @{ Once = $true; StartTime = '3:03' } -AssertArguments @{ ScheduleType = 'Once'; StartTime = '3:03'; }
+    }
+}
+
+Describe 'Install-ScheduledTask.when runs at logon' {
+    Init
+    It 'should schedule task to run at logon' {
+        Assert-TaskScheduled -InstallArguments @{ OnLogon = $true; } -AssertArguments @{ ScheduleType = 'OnLogon'; }
+    }
+}
+
+Describe 'Install-ScheduledTask.when task runs at start' {
+    Init
+    It 'should schedule task to run at start' {
+        Assert-TaskScheduled -InstallArguments @{ OnStart = $true; } -AssertArguments @{ ScheduleType = 'OnStart'; }
+    }
+}
+
+Describe 'Install-ScheduledTask.when task runs on idle' {
+    Init
+    It 'should schedule task to run on idle' {
+        Assert-TaskScheduled -InstallArguments @{ OnIdle = 999; } -AssertArguments @{ ScheduleType = 'OnIdle'; IdleTime = 999; }
+    }
+}
+
+Describe 'Install-ScheduledTask.when task runs on event' {
+    Init
+    It 'should schedule task to run on event' {
+        Assert-TaskScheduled -InstallArguments @{ OnEvent = $true ; EventChannelName = 'System' ; EventXPathQuery = '*[System/EventID=101]'; } -AssertArguments @{ ScheduleType = 'OnEvent'; Modifier = '*[System/EventID=101]'; EventChannelName = 'System'; }
+    }
+}
+
+Describe 'Install-ScheduledTask.when installed from XML file' {
+
+    BeforeEach {
+        Init
+    }
+    
+    It 'should install from xml file with relative path' {
+        Push-Location -Path $PSScriptRoot
+        try
+        {
+            Assert-TaskScheduledFromXml -Path '.\ScheduledTasks\task.xml' -TaskCredential $credential
+        }
+        finally
+        {
+            Pop-Location
+        }
+    }
+    
+    It 'should install from xml file with absolute path' {
+        Assert-TaskScheduledFromXml -Path (Join-Path -Path $PSScriptRoot -ChildPath 'ScheduledTasks\task.xml') -TaskCredential $credential
+    }
+    
+    It 'should install from xml file for system user' {
+        Assert-TaskScheduledFromXml -Path (Join-Path -Path $PSScriptRoot -ChildPath 'ScheduledTasks\task_with_principal.xml')
+    }
+    
+    It 'should install from xml' {
+        Assert-TaskScheduledFromXml -Xml ((Get-Content -Path (Join-Path -Path $PSScriptRoot -ChildPath 'ScheduledTasks\task_with_principal.xml')) -join ([Environment]::NewLine))
+    }
+    
+}
+
+
+Get-ScheduledTask -Name '*CarbonInstallScheduledTask*' |
+    ForEach-Object { Uninstall-ScheduledTask -Name $_.TaskName }
