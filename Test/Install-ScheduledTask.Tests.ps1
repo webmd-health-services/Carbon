@@ -74,9 +74,8 @@ function Assert-TaskScheduledFromXml
             $Xml = [xml]$Xml
         }
     
-        $actualXml = schtasks /query /tn $taskName /xml | Where-Object { $_ }
-        $actualXml = $actualXml -join ([Environment]::NewLine)
-        $actualXml = [xml]$actualXml
+        $task = Get-CScheduledTask -Name $task.FullName -AsComObject
+        $actualXml = [xml]$task.Xml
         # Different versions of Windows puts different values in these elements.
         ($actualXml.OuterXml -replace '<(Uri|UserId)>[^<]*</(Uri|UserId)>','') | Should -Be ($Xml.OuterXml -replace '<(Uri|UserId)>[^<]*</(Uri|UserId)>','')
     

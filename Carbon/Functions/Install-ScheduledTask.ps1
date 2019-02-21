@@ -720,11 +720,13 @@ function Install-CScheduledTask
         # Warnings get written by schtasks to the error stream. Fortunately, errors and warnings 
         # are prefixed with ERRROR and WARNING, so we can combine output/error streams and parse 
         # it later. We just have to make sure we remove any errors added to the $Error variable.
-        $errorCount = $Global:Error.Count
+        $preErrorCount = $Global:Error.Count
         $output = schtasks /create /TN $Name $parameters 2>&1
-        if( $Global:Error.Count -gt $errorCount )
+        $postErrorCount = $Global:Error.Count
+        if( $postErrorCount -gt $preErrorCount )
         {
-            for( $idx = 0; $idx -lt ($Global:Error.Count - $errorCount); ++$idx )
+            $numToDelete = $postErrorCount - $preErrorCount
+            for( $idx = 0; $idx -lt $numToDelete; ++$idx )
             {
                 $Global:Error.RemoveAt(0)
             }

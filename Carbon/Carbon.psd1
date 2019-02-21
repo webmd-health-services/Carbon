@@ -91,13 +91,18 @@ All functions are idempotent: when run multiple times with the same arguments, y
     # Type files (.ps1xml) to be loaded when importing this module
     TypesToProcess = @(
                         'Carbon.types.ps1xml',
+                        'Types\Scheduled.Service.RegisteredTask.types.ps1xml',
                         'Types\System.IO.DirectoryInfo.types.ps1xml'
                         'Types\System.IO.FileInfo.types.ps1xml'
                         'Types\System.ServiceProcess.ServiceController.types.ps1xml'
                       )
 
     # Format files (.ps1xml) to be loaded when importing this module
-    FormatsToProcess = @( 'Carbon.format.ps1xml', 'Formats\Carbon.Security.HttpUrlAcl.format.ps1xml' )
+    FormatsToProcess = @( 
+                            'Carbon.format.ps1xml', 
+                            'Formats\Carbon.Security.HttpUrlAcl.format.ps1xml',
+                            'Formats\Schedule.Service.RegisteredTask.format.ps1xml'
+                        )
 
     # Modules to import as nested modules of the module specified in ModuleToProcess
     NestedModules = @()
@@ -343,6 +348,9 @@ All functions are idempotent: when run multiple times with the same arguments, y
             # ReleaseNotes of this module
             ReleaseNotes = @'
 * Carbon is now importable on PowerShell Core on all platforms. Many functions will not work on Linux/MacOS since they are Windows-specific.
+* Carbon now supports PowerShell Core on Windows.
+* `Get-CScheduledTask` can now return `RegisteredTask` objects from the Scheduler.Service COM API. Use the new `AsComObject` switch. Getting COM objects is an order of magnitude faster than the old way.
+* Fixed: `Get-CScheduledTask` isn't able to parse some task information returned on Windows 10.
 '@
         } # End of PSData hashtable
     

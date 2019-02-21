@@ -80,10 +80,9 @@ Describe 'Get-ScheduledTask' {
 
                     if( $expectedValue -like '*"*' )
                     {
-                        $rawXml = schtasks /query /xml /tn $Expected.TaskName | Where-Object { $_ }
-                        $rawXml = $rawXml -join [Environment]::NewLine
-                        Write-Debug -Message $rawXml
-                        $taskxml = [xml]$rawXml
+                        $actualTask = Get-CScheduledTask -Name $Expected.TaskName -AsComObject
+                        Write-Debug -Message $actualTask.Xml
+                        $taskxml = [xml]$actualTAsk.Xml
                         $task = $taskxml.Task
                         if( ($task | Get-Member -Name 'Actions') -and ($task.Actions | Get-Member -Name 'Exec') )
                         {
@@ -155,20 +154,17 @@ Describe 'Get-ScheduledTask' {
     }
 
     It 'should support wildcards' {
-        $expectedTask = schtasks /query /fo list | 
-                            Where-Object { $_ -match '^TaskName: +(.*)$' } | 
-                            ForEach-Object { $Matches[1] } |
-                            Select-Object -First 1
-        $expectedTask | Should Not BeNullOrEmpty
-        $wildcard = ('*{0}*' -f $expectedTask.Substring(1,$expectedTask.Length - 2))
+        $expectedTask = Get-CScheduledTask -AsComObject | Select-Object -First 1
+        $expectedTask | Should -Not -BeNullOrEmpty
+        $wildcard = ('*{0}*' -f $expectedTask.Path.Substring(1,$expectedTask.Path.Length - 2))
         $task = Get-ScheduledTask -Name $wildcard
-        $task | Should Not BeNullOrEmpty
-        $task | Should BeOfType ([Carbon.TaskScheduler.TaskInfo])
+        $task | Should -Not -BeNullOrEmpty
+        $task | Should -BeOfType ([Carbon.TaskScheduler.TaskInfo])
         Join-Path -Path $task.TaskPath -ChildPath $task.TaskName | Should Be $expectedTask
     }
     
     It 'should get all scheduled tasks' {
-        $expectedTasks = schtasks /query /v /fo csv | ConvertFrom-Csv | Where-Object { $_.TaskName -and $_.HostName -ne 'HostName' } | Select-Object -Unique -Property 'TaskName'
+        $expectedTasks = Get-CScheduledTask -AsComObject
         $actualTasks = Get-ScheduledTask
         $actualTasks.Count | Should Be $expectedTasks.Count
     }

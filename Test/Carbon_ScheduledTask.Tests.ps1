@@ -45,8 +45,8 @@ try
             Get-ScheduledTask |
                 Select-Object -First 5 |
                  ForEach-Object {
-                    $expectedXml = schtasks /query /xml /tn $_.FullName | Where-Object { $_ }
-                    $expectedXml = $expectedXml -join ([Environment]::NewLine) 
+                    $comTask = $expectedXml = Get-CScheduledTask -Name $_.FullName -AsComObject
+                    $expectedXml = $comTask.Xml
     
                     $resource = Get-TargetResource -Name $_.FullName
                     $Global:Error.Count | Should Be 0
