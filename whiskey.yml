@@ -1,7 +1,7 @@
 
 PublishOn:
  - master
- 
+
 Build:
 - Version:
     Path: Carbon\Carbon.psd1
@@ -64,55 +64,8 @@ Build:
     OnlyDuring: Build
     OnlyBy: BuildServer
     Path: Carbon\bin\*.pdb
-- PowerShell:
-    OnlyDuring: Build
-    Path: Start-CarbonTest.ps1
-- Pester4:
-    OnlyBy: Developer
-    Path: 
-    - Test\LicenseNotices.Tests.ps1
-    - Test\*.ps1xml.Tests.ps1
-    - Test\Website.Tests.ps1
-- PowerShell:
-    OnlyDuring: Build
-    OnlyBy: Developer
-    Path: Tools\Blade\blade.ps1
-    Argument:
-        Path: 
-        - Test\Test-Documentation.ps1
-        - Test\Test-ImportCarbon.ps1
-        - Test\Test-UsesUseCallerPreference.ps1
-        - Test\Test-ParentProcessID.ps1
-- Pester4:
-    OnlyBy: BuildServer
-    Path:
-    - Test\Install-Certificate.Tests.ps1
-    - Test\Uninstall-Certificate.Tests.ps1
-    - Test\Get-ScheduledTask.Tests.ps1
-    - Test\*Iis*.ps1
-#- Parallel:
-#    OnlyBy: BuildServer
-#    Queues:
-#    - Tasks:
-- Pester4:
-    Path: Test\*.Tests.ps1
-    Exclude:
-    - "*\\Install-Certificate.Tests.ps1"
-    - "*\\Uninstall-Certificate.Tests.ps1"
-    - "*\\Get-ScheduledTask.Tests.ps1"
-    - "*\\*Iis*.ps1"
-    DescribeDurationReportCount: 20
-#    - Tasks:
-- PowerShell:
-    OnlyDuring: Build
-    Path: Invoke-CarbonBladeTest.ps1
-    Argument:
-        Recurse: true
-        Path: Test
-- PowerShell:
-    OnlyDuring: Build
-    OnlyBy: Developer
-    Path: Complete-CarbonTest.ps1
+- Pipeline:
+    Name: Tests
 - CopyFile:
     Path:
     - LICENSE.txt
@@ -131,6 +84,70 @@ Build:
         ReleaseNotes: $(RELEASE_NOTES)
         Tags: $(TAGS)
 - Exec: Tools\Whiskey\bin\7-Zip\7z.exe a $(WHISKEY_OUTPUT_DIRECTORY)\Carbon.zip .\Carbon .\examples .\LICENSE.txt .\NOTICE.txt '-xr!*.pdb' '-xr!*.orig
+
+
+Tests:
+- TaskDefaults:
+    Pester4:
+        DescribeDurationReportCount: 20
+- PowerShell:
+    OnlyDuring: Build
+    Path: Start-CarbonTest.ps1
+- Pester4:
+    OnlyBy: Developer
+    Path: 
+    - Test\LicenseNotices.Tests.ps1
+    - Test\*.ps1xml.Tests.ps1
+    - Test\Website.Tests.ps1
+    - Test\System.Diagnostics.Process.types.Tests.ps1
+- PowerShell:
+    OnlyDuring: Build
+    OnlyBy: Developer
+    Path: Tools\Blade\blade.ps1
+    Argument:
+        Path: 
+        - Test\Test-Documentation.ps1
+        - Test\Test-ImportCarbon.ps1
+        - Test\Test-UsesUseCallerPreference.ps1
+# These tests fail when run in parallel so they get run first.
+- Pester4:
+    OnlyBy: BuildServer
+    Path:
+    - Test\Install-Certificate.Tests.ps1
+    - Test\Uninstall-Certificate.Tests.ps1
+    - Test\Invoke-PowerShell.Tests.ps1
+    - Test\*Iis*.ps1
+    - Test\Carbon_*.Tests.ps1
+- Parallel:
+#    OnlyBy: BuildServer
+    Queues:
+    - Tasks:
+        - Pester4:
+            Path: 
+            - Test\*-ScheduledTask.Tests.ps1
+    - Tasks:
+        - Pester4:
+            Path: 
+            - Test\*.Tests.ps1
+            Exclude:
+            - "*\\Test\\Install-Certificate.Tests.ps1"
+            - "*\\Test\\Uninstall-Certificate.Tests.ps1"
+            - "*\\Test\\*Iis*.ps1"
+            - "*\\Test\\Carbon_*.Tests.ps1"
+            - "*\\Test\\*-ScheduledTask.Tests.ps1"
+            - "*\\Test\\Invoke-PowerShell.Tests.ps1"
+    - Tasks:
+        - PowerShell:
+            OnlyDuring: Build
+            Path: Invoke-CarbonBladeTest.ps1
+            Argument:
+                Recurse: true
+                Path: Test
+- PowerShell:
+    OnlyDuring: Build
+    OnlyBy: Developer
+    Path: Complete-CarbonTest.ps1
+
 
 Publish:
 - PublishPowerShellModule:
