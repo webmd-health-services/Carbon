@@ -58,7 +58,7 @@ $testsFailed = $false
 $xmlLogPath = Join-Path -Path $PSScriptRoot -ChildPath '.output\Carbon.blade.xml'
 $bladePath = Join-Path -Path $PSScriptRoot -ChildPath '.\Tools\Blade\blade.ps1' -Resolve
 & $bladePath -Path $Path -XmlLogPath $xmlLogPath @bladeTestParam -Recurse:$Recurse -PassThru:$PassThru |
-    Format-Table
+    Format-Table -Property Duration,FixtureName,Name
 if( $PassThru )
 {
     $LastBladeResult
