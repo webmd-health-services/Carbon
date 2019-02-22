@@ -46,24 +46,16 @@ function Test-CUser
     )
 
     Set-StrictMode -Version 'Latest'
-
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
     
-    $ctx = New-Object 'DirectoryServices.AccountManagement.PrincipalContext' ([DirectoryServices.AccountManagement.ContextType]::Machine)
-    $user = [DirectoryServices.AccountManagement.UserPrincipal]::FindByIdentity( $ctx, $Username )
+    $user = Get-CUser -UserName $Username -ErrorAction Ignore
     if( $user )
     {
+        $user.Dispose()
         return $true
     }
     else
     {
-        try
-        {
-            return $false
-        }
-        finally
-        {
-            $ctx.Dispose()
-        }
+        return $false
     }
 }

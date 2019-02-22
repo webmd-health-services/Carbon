@@ -353,6 +353,7 @@ All functions are idempotent: when run multiple times with the same arguments, y
 * Fixed: `Get-CScheduledTask` isn't able to parse some task information returned on Windows 10.
 * Deprecated `Test-CWindowsFeature`.
 * Fixed: Get-CComPermission failed when there are permission to a non-existent identity.
+* Fixed: looking up local users/groups is extremely slow on some servers.
 '@
         } # End of PSData hashtable
     

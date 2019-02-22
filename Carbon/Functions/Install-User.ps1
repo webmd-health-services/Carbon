@@ -92,7 +92,6 @@ function Install-CUser
     )
 
     Set-StrictMode -Version 'Latest'
-
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
     
     if( $PSCmdlet.ParameterSetName -eq 'WithCredential' )
@@ -100,8 +99,17 @@ function Install-CUser
         $UserName = $Credential.UserName
     }
 
-    $ctx = New-Object 'DirectoryServices.AccountManagement.PrincipalContext' ([DirectoryServices.AccountManagement.ContextType]::Machine)
-    $user = [DirectoryServices.AccountManagement.UserPrincipal]::FindByIdentity( $ctx, $UserName )
+    $user = Get-CUser -userName $UserName -ErrorAction Ignore
+    
+    if( $user )
+    {
+        $ctx = $user.Context
+    }
+    else
+    {
+        $ctx = New-Object 'DirectoryServices.AccountManagement.PrincipalContext' ([DirectoryServices.AccountManagement.ContextType]::Machine)
+    }
+
     try
     {
         $operation = 'update'
