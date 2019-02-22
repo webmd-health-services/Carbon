@@ -28,35 +28,32 @@ function Assert-XmlTransformed
     
 Describe 'Convert-XmlFile' {
     BeforeEach {
-        $tempDir = New-TempDirectory -Prefix 'Carbon-Test-ConvertXmlFile'
-    	# create a valid base file
-    	# create test files
-    	
         $xmlFilePath = Join-Path -Path $TestDrive.FullName -ChildPath 'in.xml'
         $xdtFilePath = Join-Path -Path $TestDrive.FullName -ChildPath 'xdt.xml'
         $resultFilePath = Join-Path -Path $TestDrive.FullName -ChildPath 'out.xml'
+        Get-ChildItem -Path $TestDrive.FullName | Remove-Item 
     }
     
     function Set-XmlFile
     {
     	@'
-    <?xml version="1.0"?>
-    <configuration>
-    	<connectionStrings>
-    	</connectionStrings>
-    </configuration>
+<?xml version="1.0"?>
+<configuration>
+    <connectionStrings>
+    </connectionStrings>
+</configuration>
 '@ > $xmlFilePath
     }
     
     function Set-XdtFile
     {
     	@'
-    <?xml version="1.0"?>
-    <configuration xmlns:xdt="http://schemas.microsoft.com/XML-Document-Transform">
-    	<connectionStrings>
-    		<add name="MyDB" connectionString="some value" xdt:Transform="Insert" />
-    	</connectionStrings>
-    </configuration>
+<?xml version="1.0"?>
+<configuration xmlns:xdt="http://schemas.microsoft.com/XML-Document-Transform">
+    <connectionStrings>
+    	<add name="MyDB" connectionString="some value" xdt:Transform="Insert" />
+    </connectionStrings>
+</configuration>
 '@ > $xdtFilePath
     }
     
@@ -71,39 +68,48 @@ Describe 'Convert-XmlFile' {
     }
     
     It 'should allow users to load custom transforms' {
-        $carbonTestAssemblyPath = Join-Path $TestDir Carbon.Test.Xdt.dll -Resolve
+        $carbonTestXdtBinPath = Join-Path -Path $PSScriptRoot -ChildPath '..\Source\Test\Xdt\bin' -Resolve
+        $carbonTestAssemblyPath = Join-Path -Path $carbonTestXdtBinPath -ChildPath 'net452' -Resolve
+
+        $IsPSCore = $PSVersionTable['PSEdition'] -eq 'Core'
+        if( $IsPSCore )
+        {
+            $carbonTestAssemblyPath = Join-Path -Path $carbonTestXdtBinPath -ChildPath 'netstandard2.0' -Resolve
+        }
+
+        $carbonTestAssemblyPath = Join-Path -Path $carbonTestAssemblyPath -ChildPath 'Carbon.Test.Xdt.dll' -Resolve
     
     	@'
-    <?xml version="1.0"?>
-    <configuration>
-        <connectionStrings>
-            <add name="PreexistingDB" />
-        </connectionStrings>
+<?xml version="1.0"?>
+<configuration>
+    <connectionStrings>
+        <add name="PreexistingDB" />
+    </connectionStrings>
     
-        <one>
-            <two>
-                <two.two />
-            </two>
-            <three />
-        </one>
-    </configuration>
+    <one>
+        <two>
+            <two.two />
+        </two>
+        <three />
+    </one>
+</configuration>
 '@ > $xmlFilePath
     	
     	@'
-    <?xml version="1.0"?>
-    <configuration xmlns:xdt="http://schemas.microsoft.com/XML-Document-Transform">
-        <xdt:Import path="{0}" namespace="Carbon.Test.Xdt"/>
+<?xml version="1.0"?>
+<configuration xmlns:xdt="http://schemas.microsoft.com/XML-Document-Transform">
+    <xdt:Import path="{0}" namespace="Carbon.Test.Xdt"/>
     	
-    	<connectionStrings xdt:Transform="Merge" >
-    		<add name="MyDB" connectionString="some value" xdt:Transform="Insert" />
-    	</connectionStrings>
+    <connectionStrings xdt:Transform="Merge" >
+    	<add name="MyDB" connectionString="some value" xdt:Transform="Insert" />
+    </connectionStrings>
     	
-    	<one xdt:Transform="Merge">
-    		<two xdt:Transform="Merge">
-    		</two>
-    	</one>
+    <one xdt:Transform="Merge">
+    	<two xdt:Transform="Merge">
+    	</two>
+    </one>
     	
-    </configuration>
+</configuration>
 '@ -f $carbonTestAssemblyPath > $xdtFilePath
     	
     	# act
@@ -114,20 +120,20 @@ Describe 'Convert-XmlFile' {
     	
     	($newContext -match '<add name="MyDB" connectionString="some value"/>') | Should -Be $true
     	($newContext -match '<add name="PreexistingDB" />') | Should -Be $true
-    	($newContext -match '<two\.two/>') | Should -Be $true
-    	($newContext -match '<three/>') | Should -Be $true
+    	($newContext -match '<two\.two ?/>') | Should -Be $true
+    	($newContext -match '<three ?/>') | Should -Be $true
     }
     
     It 'should allow raw xdt xml' {
         Set-XmlFile
     	
     	$xdt = @'
-    <?xml version="1.0"?>
-    <configuration xmlns:xdt="http://schemas.microsoft.com/XML-Document-Transform">
-    	<connectionStrings>
-    		<add name="MyDB" connectionString="some value" xdt:Transform="Insert" />
-    	</connectionStrings>
-    </configuration>
+<?xml version="1.0"?>
+<configuration xmlns:xdt="http://schemas.microsoft.com/XML-Document-Transform">
+    <connectionStrings>
+    	<add name="MyDB" connectionString="some value" xdt:Transform="Insert" />
+    </connectionStrings>
+</configuration>
 '@ 
     	
     	# act
@@ -142,11 +148,11 @@ Describe 'Convert-XmlFile' {
     It 'should give an error if transforming in place' {
         $error.Clear()
         $null = New-Item -Path $xmlFilePath,$xdtFilePath -ItemType File
-        Assert-FileDoesNotExist $resultFilePath
+        $resultFilePath | Should -Not -Exist
         Convert-XmlFile -Path $xmlFilePath -XdtPath $xdtFilePath -Destination $xmlFilePath -ErrorAction SilentlyContinue
         $error.Count | Should -Be 1
         ($error[0].ErrorDetails.Message -like '*Path is the same as Destination*') | Should -BeTrue
-        Assert-FileDoesNotExist $resultFilePath
+        $resultFilePath | Should -Not -Exist
     }
     
     It 'should not lock files' {
@@ -176,7 +182,7 @@ Describe 'Convert-XmlFile' {
     
         Convert-XmlFile -Path $xmlFilePath -XdtPath $xdtFilePath -Destination $resultFilePath -WhatIf
     
-        Assert-FileDoesNotExist $resultFilePath
+        $resultFilePath | Should -Not -Exist
     }
     
     It 'should fail if destination exists' {
@@ -210,9 +216,9 @@ Describe 'Convert-XmlFile' {
         
         $error.Clear()
         Convert-XmlFile -Path $xmlFilePath -XdtPath $xdtFilePath -Destination $resultFilePath -TransformAssemblyPath 'C:\I\Do\Not\Exist' -ErrorAction SilentlyContinue
-        Assert-FileDoesNotExist $resultFilePath
+        $resultFilePath | Should -Not -Exist
         $error.Count | Should -Be 1
-        Assert-Like $error[0].Exception.Message '*not found*'
+        $error[0].Exception.Message | Should -BeLike '*not found*'
     }
     
 }

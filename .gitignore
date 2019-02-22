@@ -16,7 +16,6 @@ Test\MSI\setup.exe
 PSModules/**
 packages/**
 Website/**
-Test/Xml/*.dll
 Test/MSI/*.tmp
 Test/MSI/setup.exe
 /Source/CarbonTestInstaller/Debug
