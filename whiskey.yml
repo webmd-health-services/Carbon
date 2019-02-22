@@ -93,6 +93,13 @@ Tests:
 - PowerShell:
     OnlyDuring: Build
     Path: Start-CarbonTest.ps1
+- PowerShell:
+    OnlyDuring: Build
+    Path: Invoke-CarbonBladeTest.ps1
+    Argument:
+        Recurse: true
+        Path: Test
+        PassThru: true
 - Pester4:
     OnlyBy: Developer
     Path: 
@@ -136,13 +143,7 @@ Tests:
             - "*\\Test\\Carbon_*.Tests.ps1"
             - "*\\Test\\*-ScheduledTask.Tests.ps1"
             - "*\\Test\\Invoke-PowerShell.Tests.ps1"
-    - Tasks:
-        - PowerShell:
-            OnlyDuring: Build
-            Path: Invoke-CarbonBladeTest.ps1
-            Argument:
-                Recurse: true
-                Path: Test
+#    - Tasks:
 - PowerShell:
     OnlyDuring: Build
     OnlyBy: Developer
