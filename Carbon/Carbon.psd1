@@ -352,6 +352,7 @@ All functions are idempotent: when run multiple times with the same arguments, y
 * `Get-CScheduledTask` can now return `RegisteredTask` objects from the Scheduler.Service COM API. Use the new `AsComObject` switch. Getting COM objects is an order of magnitude faster than the old way.
 * Fixed: `Get-CScheduledTask` isn't able to parse some task information returned on Windows 10.
 * Deprecated `Test-CWindowsFeature`.
+* Fixed: Get-CComPermission failed when there are permission to a non-existent identity.
 '@
         } # End of PSData hashtable
     

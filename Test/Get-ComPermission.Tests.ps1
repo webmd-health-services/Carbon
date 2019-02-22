@@ -34,7 +34,9 @@ Describe 'Get-ComPermission' {
         $rule | Should -Not -BeNullOrEmpty
         $rules[0].IdentityReference | Should -Be $rule.IdentityReference
     }
-    
+}
+
+Describe 'Get-ComPermission.when getting security limits' {
     It 'should get security limits' {
         $defaultRules = Get-ComPermission -Access -Default
         $defaultRules | Should -Not -BeNullOrEmpty
@@ -50,6 +52,9 @@ Describe 'Get-ComPermission' {
             }
         }    
     }
+}
+
+Describe 'Get-ComPermission.2' {
     
     It 'should get com launch and activation permissions' {
         $rules = Get-ComPermission -LaunchAndActivation -Default

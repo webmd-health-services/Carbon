@@ -112,6 +112,12 @@ function Get-CComSecurityDescriptor
         $sd.Descriptor.DACL | 
             ForEach-Object {
                 
+                if( -not $_.Trustee.Domain -and -not $_.Trustee.Name )
+                {
+                    Write-Debug ('Unresolved trustee: Domain: {0}; Name: {1}; SID: {2}' -f $_.Trustee.Domain,$_.Trustee.Name,$_.Trustee.SidString)
+                    return
+                }
+                
                 $identity = New-Object Security.Principal.NTAccount $_.Trustee.Domain,$_.Trustee.Name
                 $rights = [Carbon.Security.ComAccessRights]$_.AccessMask
                 $controlType = [Security.AccessControl.AccessControlType]$_.AceType
