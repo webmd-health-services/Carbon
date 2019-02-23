@@ -53,7 +53,8 @@ Describe 'License Notices' {
                             'Publish-Carbon.ps1',
                             '*.pdn',
                             '.gitignore',
-                            'whiskey.yml'
+                            'whiskey.yml',
+                            'CODEOWNERS'
                         )
     
         [object[]]$filesMissingLicense = Get-ChildItem -Path $projectRoot -Exclude 'Tools','Website','.git','pshdo.com','.output','PSModules','packages' |
