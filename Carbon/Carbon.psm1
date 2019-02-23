@@ -41,7 +41,7 @@ if( $IsPSCore )
 }
 
 Write-Timing ('Loading Carbon assemblies from "{0}".' -f $carbonAssemblyDir)
-Get-ChildItem -Path (Join-Path -Path $carbonAssemblyDir -ChildPath '*') -Filter '*.dll' -Exclude 'Carbon.Iis.dll' |
+Get-ChildItem -Path (Join-Path -Path $carbonAssemblyDir -ChildPath '*') -Filter 'Carbon*.dll' -Exclude 'Carbon.Iis.dll' |
     ForEach-Object { Add-Type -Path $_.FullName }
 
 Write-Timing ('Dot-sourcing Test-TypeDataMember.')
