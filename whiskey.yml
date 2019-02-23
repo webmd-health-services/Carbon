@@ -42,28 +42,8 @@ Build:
     - --configuration=$(WHISKEY_MSBUILD_CONFIGURATION)
     - --results-directory=$(WHISKEY_OUTPUT_DIRECTORY)
     - --logger=trx
-- MSBuild:
-    Path:
-    - Source\Carbon.csproj
-    - Source\Iis\*.csproj
-    - Source\Xdt\*.csproj
-    Target: publish
-    Property:
-    - TargetFramework=net452
-    - OutDir=$(WHISKEY_BUILD_ROOT)\Carbon\bin\fullclr
-- MSBuild:
-    Path:
-    - Source\Carbon.csproj
-    - Source\Iis\*.csproj
-    - Source\Xdt\*.csproj
-    Target: publish
-    Property:
-    - TargetFramework=netstandard2.0
-    - OutDir=$(WHISKEY_BUILD_ROOT)\Carbon\bin\coreclr
-- Delete:
-    OnlyDuring: Build
-    OnlyBy: BuildServer
-    Path: Carbon\bin\*.pdb
+- Pipeline:
+    Name: PublishBin
 - Pipeline:
     Name: Tests
 - CopyFile:
@@ -85,6 +65,33 @@ Build:
         Tags: $(TAGS)
 - Exec: Tools\Whiskey\bin\7-Zip\7z.exe a $(WHISKEY_OUTPUT_DIRECTORY)\Carbon.zip .\Carbon .\examples .\LICENSE.txt .\NOTICE.txt '-xr!*.pdb' '-xr!*.orig
 
+PublishBin:
+- MSBuild:
+    Path:
+    - Source\Carbon.csproj
+    - Source\Iis\*.csproj
+    - Source\Xdt\*.csproj
+    Target: publish
+    Property:
+    - TargetFramework=net452
+    - PublishDir=$(WHISKEY_BUILD_ROOT)\Carbon\bin\fullclr
+- MSBuild:
+    Path:
+    - Source\Carbon.csproj
+    - Source\Iis\*.csproj
+    - Source\Xdt\*.csproj
+    Target: publish
+    Property:
+    - TargetFramework=netstandard2.0
+    - PublishDir=$(WHISKEY_BUILD_ROOT)\Carbon\bin\coreclr
+    - SelfContained=false
+- Delete:
+    OnlyDuring: Build
+    OnlyBy: BuildServer
+    Path: Carbon\bin\*.pdb
+- Delete:
+    OnlyDuring: Build
+    Path: Carbon\bin\coreclr\runtimes
 
 Tests:
 - TaskDefaults:

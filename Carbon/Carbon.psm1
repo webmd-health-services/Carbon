@@ -83,10 +83,13 @@ if( (Test-Path -Path 'env:SystemRoot') )
     if( (Test-Path -Path $microsoftWebAdministrationPath -PathType Leaf) )
     {
         $exportIisFunctions = $true
-        Write-Timing ('Adding Microsoft.Web.Administration assembly.')
-        Add-Type -Path $microsoftWebAdministrationPath
-        Write-Timing ('Adding Carbon.Iis assembly.')
-        Add-Type -Path (Join-Path -Path $carbonAssemblyDir -ChildPath 'Carbon.Iis.dll' -Resolve)
+        if( -not $IsPSCore )
+        {
+            Write-Timing ('Adding Microsoft.Web.Administration assembly.')
+            Add-Type -Path $microsoftWebAdministrationPath
+            Write-Timing ('Adding Carbon.Iis assembly.')
+            Add-Type -Path (Join-Path -Path $carbonAssemblyDir -ChildPath 'Carbon.Iis.dll' -Resolve)
+        }
 
         if( -not (Test-CTypeDataMember -TypeName 'Microsoft.Web.Administration.Site' -MemberName 'PhysicalPath') )
         {
