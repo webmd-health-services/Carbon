@@ -511,7 +511,6 @@ function Init
 {
     $Global:Error.Clear()
     $script:taskName = 'CarbonInstallScheduledTask{0}' -f [Guid]::NewGuid()
-    Uninstall-ScheduledTask -Name $taskName
 }
 
 Describe 'Install-ScheduledTask' {
