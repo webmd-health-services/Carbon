@@ -41,7 +41,7 @@ Describe 'Assert-FirewallConfigurable' {
         }
         else
         {
-            Write-Warning "Unable to test if Assert-FirewallConfigurable handles when the firewall is configurable: the firewall service is running."
+            Write-Warning "Unable to test if Assert-FirewallConfigurable handles when the firewall is configurable: the firewall service is not running."
         }
     }
     
@@ -51,7 +51,7 @@ Describe 'Assert-FirewallConfigurable' {
         $error.Clear()
         if( $firewallSvc.Status -eq 'Running' )
         {
-            Write-Warning "Unable to test if Assert-FirewallConfigurable handles when the firewall is not configurable: the firewall service is not running."
+            Write-Warning "Unable to test if Assert-FirewallConfigurable handles when the firewall is not configurable: the firewall service is running."
         }
         else
         {
