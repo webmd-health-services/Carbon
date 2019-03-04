@@ -16,7 +16,7 @@ Set-StrictMode -Version 'Latest'
 & (Join-Path -Path $PSScriptRoot -ChildPath 'Import-CarbonForTest.ps1' -Resolve)
 
 Describe 'Get-ProgramInstallInfo.when getting all programs' {
-    $programs = Get-ProgramInstallInfo # 'iCloud'
+    $programs = Get-ProgramInstallInfo
     It 'should get all installed programs' {
         $programs | Should -Not -BeNullOrEmpty
     }
