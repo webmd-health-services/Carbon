@@ -114,7 +114,7 @@ function Get-CComSecurityDescriptor
                 
                 if( -not $_.Trustee.Domain -and -not $_.Trustee.Name )
                 {
-                    Write-Debug ('Unresolved trustee: Domain: {0}; Name: {1}; SID: {2}' -f $_.Trustee.Domain,$_.Trustee.Name,$_.Trustee.SidString)
+                    Write-Debug ('Unresolved trustee: SID: {0}' -f $_.Trustee.SidString)
                     return
                 }
                 
