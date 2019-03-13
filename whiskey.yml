@@ -19,7 +19,6 @@ Build:
     Path: Source\Carbon.sln
     Property:
     - SignAssembly=$(SignAssembly)
-    - DefineConstants=$(Constants)
 - PowerShell:
     OnlyDuring: Build
     OnlyBy: BuildServer
