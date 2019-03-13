@@ -81,8 +81,10 @@ Describe 'chocolateyUninstall.ps1 when module is installed and in use' {
 
     $preCount = $carbonRoot | Get-ChildItem  -Recurse | Measure-Object | Select-Object -ExpandProperty 'Count'
     
-    $file = $carbonRoot | 
-                Join-Path -ChildPath 'bin\Carbon.dll' -Resolve |
+    $file = & {
+                    Join-Path -Path $carbonRoot -ChildPath 'bin\fullclr\Carbon.dll' -Resolve 
+                    Join-Path -Path $carbonRoot -ChildPath 'bin\coreclr\Carbon.dll' -Resolve 
+                } |
                 ForEach-Object { [IO.File]::Open($_, 'Open', 'Read', 'Read') }
     try
     {

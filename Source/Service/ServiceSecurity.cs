@@ -10,6 +10,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
@@ -22,8 +23,8 @@ namespace Carbon.Service
     public sealed class ServiceSecurity
     {
 
-		// ReSharper disable InconsistentNaming
-		[DllImport("advapi32.dll", SetLastError = true)]
+        // ReSharper disable InconsistentNaming
+        [DllImport("advapi32.dll", SetLastError = true)]
         private static extern bool QueryServiceObjectSecurity(SafeHandle serviceHandle, SecurityInfos secInfo,
                                                               byte[] lpSecDesrBuf, uint bufSize, out uint bufSizeNeeded);
 

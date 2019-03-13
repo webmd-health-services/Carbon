@@ -45,26 +45,17 @@ function Test-CGroup
     )
 
     Set-StrictMode -Version 'Latest'
-
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
     
-    $ctx = New-Object 'DirectoryServices.AccountManagement.PrincipalContext' ([DirectoryServices.AccountManagement.ContextType]::Machine)
-    $group = [DirectoryServices.AccountManagement.GroupPrincipal]::FindByIdentity( $ctx, $Name )
-    try
+    $group = Get-CGroup -Name $Name -ErrorAction Ignore
+    if( $group )
     {
-        if( $group )
-        {
-            $group.Dispose()
-            return $true
-        }
-        else
-        {
-            return $false
-        }
+        $group.Dispose()
+        return $true
     }
-    finally
+    else
     {
-        $ctx.Dispose()
+        return $false
     }
 }
 

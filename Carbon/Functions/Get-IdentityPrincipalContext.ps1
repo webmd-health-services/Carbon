@@ -30,7 +30,6 @@ function Get-IdentityPrincipalContext
     )
 
     Set-StrictMode -Version 'Latest'
-
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
     # First, check for a local match

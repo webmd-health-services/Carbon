@@ -29,7 +29,7 @@ Set-StrictMode -Version 'Latest'
 
 $installRoot = Get-PowerShellModuleInstallPath
 $carbonModuleRoot = Join-Path -Path $installRoot -ChildPath 'Carbon'
-Install-Junction -Link $carbonModuleRoot -Target (Join-Path -Path $PSScriptRoot -ChildPath 'Carbon' -Resolve) | Format-Table | Out-String | Write-Verbose
+Install-Junction -Link $carbonModuleRoot -Target (Join-Path -Path $PSScriptRoot -ChildPath 'Carbon' -Resolve) #| Format-Table | Out-String | Write-Verbose
 
 if( (Test-Path -Path 'env:APPVEYOR') )
 {
@@ -37,9 +37,9 @@ if( (Test-Path -Path 'env:APPVEYOR') )
     Grant-Permission -Path ('C:\Users\appveyor\Documents') -Identity 'Everyone' -Permission 'FullControl'
 
     $wmiprvse = Get-Process -Name 'wmiprvse'
-    $wmiprvse | Format-Table
+    #$wmiprvse | Format-Table
     $wmiprvse | Stop-Process -Force
-    Get-Process -Name 'wmiprvse' | Format-Table
+    #Get-Process -Name 'wmiprvse' | Format-Table
 }
 
 configuration Yolo
@@ -68,17 +68,17 @@ configuration Yolo
     }
 }
 
-$dscOutputRoot = Join-Path -Path $PSScriptRoot -ChildPath '.output\Yolo'
-& Yolo -OutputPath $dscOutputRoot
-Start-DscConfiguration -Wait -Verbose -Path $dscOutputRoot -ComputerName 'localhost'
+#$dscOutputRoot = Join-Path -Path $PSScriptRoot -ChildPath '.output\Yolo'
+#& Yolo -OutputPath $dscOutputRoot
+#Start-DscConfiguration -Wait -Verbose -Path $dscOutputRoot -ComputerName 'localhost'
 
-Get-Module -ListAvailable | Format-Table
+#Get-Module -ListAvailable | Format-Table
 
-$modulePaths = $env:PSModulePath -split ';'
-$modulePaths
+#$modulePaths = $env:PSModulePath -split ';'
+#$modulePaths
 
-Get-ChildItem $modulePaths | Format-Table
+#Get-ChildItem $modulePaths | Format-Table
 
-Get-DscResource | Format-Table
+#Get-DscResource | Format-Table
 
 Clear-DscLocalResourceCache

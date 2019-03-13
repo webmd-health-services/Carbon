@@ -40,6 +40,12 @@ function Get-TargetResource
 
     Set-StrictMode -Version 'Latest'
 
+    $canonicalName = $Name
+    if( -not $canonicalName.StartsWith('\') )
+    {
+        $canonicalName = '\{0}' -f $canonicalName
+    }
+
     $resource = @{
                     Name = $Name;
                     TaskXml = '';
@@ -47,12 +53,18 @@ function Get-TargetResource
                     Ensure = 'Absent';
                 }
 
-    if( (Test-CScheduledTask -Name $Name) )
+    if( (Test-CScheduledTask -Name $canonicalName) )
     {
-        $task = Get-CScheduledTask -Name $Name
-        $resource.TaskCredential = $task.RunAsUser
-        $resource.TaskXml = schtasks.exe /query /xml /tn $Name | Where-Object { $_ }
-        $resource.TaskXml = $resource.TaskXml -join ([Environment]::NewLine)
+        $task = Get-CScheduledTask -Name $canonicalName -AsComObject
+        $principal = $task.Definition.Principal
+        $principalName = $principal.UserId
+        if( -not $principalName )
+        {
+            $principalName = $principal.GroupId
+        }
+
+        $resource.TaskCredential = $principalname
+        $resource.TaskXml = $task.Xml
         $resource.Ensure = 'Present'
     }
 

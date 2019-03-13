@@ -25,25 +25,20 @@ namespace Carbon.Test.IO
 	public sealed class FileInfoTestFixture
 	{
 		[Test]
-		[ExpectedException(typeof(DirectoryNotFoundException))]
 		public void ShouldIgnoreFileInDirectoryThatDoesNotExist()
 		{
-			var fileInfo = new CFileInfo("C:\\I\\do\\not\\exist.txt");
-			Assert.That(fileInfo.FileIndex, Is.EqualTo(0));
-			Assert.That(fileInfo.LinkCount, Is.EqualTo(0));
-			Assert.That(fileInfo.VolumeSerialNumber, Is.EqualTo(0));
+            Assert.Throws<DirectoryNotFoundException>(() => { new CFileInfo("C:\\I\\do\\not\\exist.txt"); });
 		}
 
 		[Test]
-		[ExpectedException(typeof(FileNotFoundException))]
 		public void ShouldIgnoreFileThatDoesNotExist()
 		{
-			var path = IOPath.GetTempPath();
-			path = IOPath.Combine(path, IOPath.GetRandomFileName());
-			var fileInfo = new CFileInfo(path);
-			Assert.That(fileInfo.FileIndex, Is.EqualTo(0));
-			Assert.That(fileInfo.LinkCount, Is.EqualTo(0));
-			Assert.That(fileInfo.VolumeSerialNumber, Is.EqualTo(0));
+            Assert.Throws<FileNotFoundException>(() =>
+            {
+                var path = IOPath.GetTempPath();
+                path = IOPath.Combine(path, IOPath.GetRandomFileName());
+                new CFileInfo(path);
+            });
 		}
 
 		[Test]
@@ -118,4 +113,3 @@ namespace Carbon.Test.IO
 		}
 	}
 }
-

@@ -12,6 +12,7 @@
 
 using Carbon.Service;
 using NUnit.Framework;
+using System;
 using System.DirectoryServices.AccountManagement;
 using System.ServiceProcess;
 
@@ -28,4 +29,3 @@ namespace Carbon.Test.Service
         }
     }
 }
-

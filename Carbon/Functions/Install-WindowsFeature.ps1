@@ -83,7 +83,6 @@ if( -not (Get-Command -Name 'Get-CWindowsFeature*' | Where-Object { $_.ModuleNam
         )
         
         Set-StrictMode -Version 'Latest'
-
         Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
     
         Write-Warning -Message ('Install-CWindowsFeature is obsolete and will be removed in a future major version of Carbon.')

@@ -1,7 +1,7 @@
 
 PublishOn:
  - master
- 
+
 Build:
 - Version:
     Path: Carbon\Carbon.psd1
@@ -19,83 +19,34 @@ Build:
     Path: Source\Carbon.sln
     Property:
     - SignAssembly=$(SignAssembly)
-    - DefineConstants=$(Constants)
-- NUnit2:
-    Path: Source\Test\bin\$(WHISKEY_MSBUILD_CONFIGURATION)\Carbon.Test.dll
-- Exec:
-    OnlyDuring: Build
-    Path: robocopy
-    Argument:
-        - Source\bin\$(WHISKEY_MSBUILD_CONFIGURATION)
-        - Carbon\bin
-    SuccessExitCode: <8
-- Exec:
-    OnlyDuring: Build
-    Path: robocopy
-    Argument:
-        - Source\Iis\bin\$(WHISKEY_MSBUILD_CONFIGURATION)
-        - Carbon\bin
-    SuccessExitCode: <8
-- Exec:
-    OnlyDuring: Build
-    Path: robocopy
-    Argument:
-        - Source\Xdt\bin\$(WHISKEY_MSBUILD_CONFIGURATION)
-        - Carbon\bin
-    SuccessExitCode: <8
-- Delete:
+- PowerShell:
     OnlyDuring: Build
     OnlyBy: BuildServer
-    Path: Carbon\bin\*.pdb
-- PowerShell:
-    OnlyDuring: Build
-    Path: Start-CarbonTest.ps1
-- Pester4:
-    OnlyBy: Developer
-    Path: 
-    - Test\LicenseNotices.Tests.ps1
-    - Test\*.ps1xml.Tests.ps1
-    - Test\Website.Tests.ps1
-- PowerShell:
-    OnlyDuring: Build
-    OnlyBy: Developer
-    Path: Tools\Blade\blade.ps1
+    Path: Source\Compile-CarbonTestInstaller.ps1
     Argument:
-        Path: 
-        - Test\Test-Documentation.ps1
-        - Test\Test-ImportCarbon.ps1
-        - Test\Test-UsesUseCallerPreference.ps1
-        - Test\Test-ParentProcessID.ps1
-- Pester4:
-    OnlyBy: BuildServer
-    Path:
-    - Test\Install-Certificate.Tests.ps1
-    - Test\Uninstall-Certificate.Tests.ps1
-    - Test\Get-ScheduledTask.Tests.ps1
-    - Test\*Iis*.ps1
-#- Parallel:
-#    OnlyBy: BuildServer
-#    Queues:
-#    - Tasks:
-- Pester4:
-    Path: Test\*.Tests.ps1
-    Exclude:
-    - "*\\Install-Certificate.Tests.ps1"
-    - "*\\Uninstall-Certificate.Tests.ps1"
-    - "*\\Get-ScheduledTask.Tests.ps1"
-    - "*\\*Iis*.ps1"
-    DescribeDurationReportCount: 20
-#    - Tasks:
-- PowerShell:
-    OnlyDuring: Build
-    Path: Invoke-CarbonBladeTest.ps1
+        Configuration: $(WHISKEY_MSBUILD_CONFIGURATION)
+- DotNet:
+    Command: publish
+    Path: Source\Test\Carbon.Test.csproj
     Argument:
-        Recurse: true
-        Path: Test
-- PowerShell:
-    OnlyDuring: Build
-    OnlyBy: Developer
-    Path: Complete-CarbonTest.ps1
+    - --no-build
+    - --framework=netcoreapp2.1
+    - --configuration=$(WHISKEY_MSBUILD_CONFIGURATION)
+- DotNet:
+    Command: test
+    Path: Source\Test\Carbon.Test.csproj
+    Argument:
+    - --no-build
+    - --framework=netcoreapp2.1
+    - --configuration=$(WHISKEY_MSBUILD_CONFIGURATION)
+    - --results-directory=$(WHISKEY_OUTPUT_DIRECTORY)
+    - --logger=trx
+- NUnit3:
+    Path: Source\Test\bin\$(WHISKEY_MSBUILD_CONFIGURATION)\net452\Carbon.Test.dll
+- Pipeline:
+    Name: PublishBin
+- Pipeline:
+    Name: Tests
 - CopyFile:
     Path:
     - LICENSE.txt
@@ -115,21 +66,114 @@ Build:
         Tags: $(TAGS)
 - Exec: Tools\Whiskey\bin\7-Zip\7z.exe a $(WHISKEY_OUTPUT_DIRECTORY)\Carbon.zip .\Carbon .\examples .\LICENSE.txt .\NOTICE.txt '-xr!*.pdb' '-xr!*.orig
 
+PublishBin:
+- MSBuild:
+    Path:
+    - Source\Carbon.csproj
+    - Source\Iis\*.csproj
+    - Source\Xdt\*.csproj
+    Target: publish
+    Property:
+    - TargetFramework=net452
+    - PublishDir=$(WHISKEY_BUILD_ROOT)\Carbon\bin\fullclr
+- MSBuild:
+    Path:
+    - Source\Carbon.csproj
+    - Source\Iis\*.csproj
+    - Source\Xdt\*.csproj
+    Target: publish
+    Property:
+    - TargetFramework=netstandard2.0
+    - PublishDir=$(WHISKEY_BUILD_ROOT)\Carbon\bin\coreclr
+    - SelfContained=false
+- Delete:
+    OnlyDuring: Build
+    OnlyBy: BuildServer
+    Path: Carbon\bin\*.pdb
+
+Tests:
+- TaskDefaults:
+    Pester4:
+        DescribeDurationReportCount: 20
+- PowerShell:
+    OnlyDuring: Build
+    Path: Start-CarbonTest.ps1
+- Pester4:
+    OnlyBy: Developer
+    Path: 
+    - Test\LicenseNotices.Tests.ps1
+    - Test\*.ps1xml.Tests.ps1
+    - Test\Website.Tests.ps1
+    - Test\System.Diagnostics.Process.types.Tests.ps1
+- PowerShell:
+    OnlyDuring: Build
+    OnlyBy: Developer
+    Path: Tools\Blade\blade.ps1
+    Argument:
+        Path: 
+        - Test\Test-Documentation.ps1
+        - Test\Test-ImportCarbon.ps1
+        - Test\Test-UsesUseCallerPreference.ps1
+# These tests fail when run in parallel so they get run first.
+- Pester4:
+    OnlyBy: BuildServer
+    Path:
+    - Test\Install-Certificate.Tests.ps1
+    - Test\Uninstall-Certificate.Tests.ps1
+    - Test\Invoke-PowerShell.Tests.ps1
+    - Test\*Iis*.ps1
+    - Test\Carbon_*.Tests.ps1
+- Parallel:
+    OnlyBy: BuildServer
+    Queues:
+    - Tasks:
+        - Pester4:
+            Path: 
+            - Test\*-ScheduledTask.Tests.ps1
+    - Tasks:
+        - Pester4:
+            Path: 
+            - Test\*.Tests.ps1
+            Exclude:
+            - "*\\Test\\Install-Certificate.Tests.ps1"
+            - "*\\Test\\Uninstall-Certificate.Tests.ps1"
+            - "*\\Test\\*Iis*.ps1"
+            - "*\\Test\\Carbon_*.Tests.ps1"
+            - "*\\Test\\*-ScheduledTask.Tests.ps1"
+            - "*\\Test\\Invoke-PowerShell.Tests.ps1"
+    - Tasks:
+        - PowerShell:
+            OnlyDuring: Build
+            Path: Invoke-CarbonBladeTest.ps1
+            Argument:
+                Recurse: true
+                Path: Test
+                PassThru: true
+- PowerShell:
+    OnlyDuring: Build
+    OnlyBy: Developer
+    Path: Complete-CarbonTest.ps1
+
+
 Publish:
 - PublishPowerShellModule:
+    UnlessExists: env:APPVEYOR_PULL_REQUEST_NUMBER
     Path: Carbon
     RepositoryName: PSGallery
     RepositoryUri: https://www.powershellgallery.com/api/v2/
     ApiKeyID: powershellgallery.com
 - NuGetPush:
+    UnlessExists: env:APPVEYOR_PULL_REQUEST_NUMBER
     Uri: https://nuget.org/api/v2/package
     ApiKeyID: nuget.org
     SkipUploadedCheck: true
 - NuGetPush:
+    UnlessExists: env:APPVEYOR_PULL_REQUEST_NUMBER
     Uri: https://chocolatey.org/api/v2/package
     ApiKeyID: chocolatey.org
     SkipUploadedCheck: true
 - GitHubRelease:
+    UnlessExists: env:APPVEYOR_PULL_REQUEST_NUMBER
     RepositoryName: pshdo/Carbon
     ApiKeyID: github.com
     Tag: $(WHISKEY_SEMVER2_NO_BUILD_METADATA)

@@ -18,6 +18,11 @@ $ps3Installed = $false
 $PSVersion,$CLRVersion = powershell -NoProfile -NonInteractive -Command { $PSVersionTable.PSVersion ; $PSVersionTable.CLRVersion }
 $getPsVersionTablePath = Join-Path -Path $PSScriptRoot -ChildPath 'PowerShell\Get-PSVersionTable.ps1' -Resolve
 
+# Make sure the execution policy gets set in the different architectures of PowerShell
+$setExecPolicyScriptBlock = { Set-ExecutionPolicy -ExecutionPolicy RemoteSigned }
+Invoke-CPowerShell -ScriptBlock $setExecPolicyScriptBlock
+Invoke-CPowerShell -ScriptBlock $setExecPolicyScriptBlock -x86
+
 function Assert-EnvVarCleanedUp
 {
     It 'should clean up environment' {

@@ -13,7 +13,8 @@
 & (Join-Path -Path $PSScriptRoot -ChildPath 'Import-CarbonForTest.ps1' -Resolve)
 
 $servicePath = Join-Path -Path $PSScriptRoot -ChildPath 'Service\NoOpService.exe' -Resolve
-$serviceName = 'CarbonTestService4'
+$serviceNamePrefix = 'CarbonTestService'
+$serviceName = $null
 $serviceAcct = 'CrbnInstllSvcTstAcct'
 $servicePassword = "a1""'~!@#$%^&*("  # sc.exe needs to have certain characters escaped.
 $installServiceParams = @{ 
@@ -23,6 +24,17 @@ $startedAt = Get-Date
 $serviceCredential = New-Credential -UserName $serviceAcct -Password $servicePassword
 Install-User -Credential $serviceCredential -Description "Account for testing the Carbon Install-Service function."
 $defaultServiceAccountName = Resolve-IdentityName -Name 'NT AUTHORITY\NetworkService'
+
+function Init
+{
+    $numCarbonServices = Get-Service -Name ('{0}*' -f $serviceNamePrefix) | 
+                            Measure-Object | 
+                            Select-Object -ExpandProperty 'Count'
+    $script:serviceName = '{0}{1}' -f ($serviceNamePrefix,$numCarbonServices + 1)
+    $Global:Error.Clear()
+    $script:startedAt = Get-Date
+    $script:startedAt = $startedAt.AddSeconds(-1)
+}
 
 function Assert-ServiceInstalled
 {
@@ -44,7 +56,7 @@ function Uninstall-TestService
 }
 
 Describe 'Install-Service when using the -WhatIf switch' {
-    Uninstall-TestService
+    Init
     Install-Service -Name $serviceName -Path $servicePath -WhatIf @installServiceParams
 
     It 'should not install the service ' {
@@ -54,7 +66,7 @@ Describe 'Install-Service when using the -WhatIf switch' {
  }
 
  Describe 'Install-Service when a service depends on a device driver' {
-    Uninstall-TestService
+    Init
     $driver = [ServiceProcess.ServiceController]::GetDevices() | Select-Object -First 1
     Install-Service -Name $serviceName -Path $servicePath -Dependency 'AppID' -StartupType Disabled -ErrorVariable 'errors' 
     It 'should not write any errors' {
@@ -74,6 +86,7 @@ Describe 'Install-Service when using the -WhatIf switch' {
 }
 
 Describe 'Install-Service when startup type is automatic delayed' {
+    Init
     Install-Service -Name $serviceName -Path $servicePath -StartupType Automatic -Delayed
     $svc = Get-Service -Name $serviceName
     It 'startup type should be automatic' {
@@ -85,6 +98,7 @@ Describe 'Install-Service when startup type is automatic delayed' {
 }
 
 Describe 'Install-Service when startup type is changed to automatic delayed' {
+    Init
     Install-Service -Name $serviceName -Path $servicePath -StartupType Automatic
     $svc = Get-Service -Name $serviceName
     It 'delayed auto start should be false' {
@@ -103,6 +117,7 @@ Describe 'Install-Service when startup type is changed to automatic delayed' {
 
 
 Describe 'Install-Service when startup type is changed' {
+    Init
     Install-Service -Name $serviceName -Path $servicePath -StartupType Automatic -Delayed 
 
     $Global:Error.Clear()
@@ -125,6 +140,7 @@ Describe 'Install-Service when startup type is changed' {
 }
 
 Describe 'Install-Service when service is stopped and service should be started' {
+    Init
     Install-Service -Name $serviceName -Path $servicePath -StartupType Automatic
     Stop-Service -Name $serviceName
     $Global:Error.Clear()
@@ -135,6 +151,7 @@ Describe 'Install-Service when service is stopped and service should be started'
 }
 
 Describe 'Install-Service when service changing from custom account to default account' {
+    Init
     Install-Service -Name $serviceName -Path $servicePath -StartupType Automatic -Credential $serviceCredential
     Mock -CommandName 'Write-Debug' -ModuleName 'Carbon' -Verifiable
     Install-Service -Name $serviceName -Path $servicePath -StartupType Automatic
@@ -145,6 +162,7 @@ Describe 'Install-Service when service changing from custom account to default a
 }
 
 Describe 'Install-Service when service is a local account and installed multiple times' {
+    Init
     Install-Service -Name $serviceName -Path $servicePath -StartupType Automatic -Credential $serviceCredential
     Mock -CommandName 'Write-Debug' -ModuleName 'Carbon' -Verifiable
     Install-Service -Name $serviceName -Path $servicePath -StartupType Automatic -Credential $serviceCredential
@@ -156,10 +174,7 @@ Describe 'Install-Service when service is a local account and installed multiple
 Describe 'Install-Service' {
 
     BeforeEach {
-        $Global:Error.Clear()
-        $startedAt = Get-Date
-        $startedAt = $startedAt.AddSeconds(-1)
-        Uninstall-TestService
+        Init
     }
     
     It 'should install service' {
@@ -670,4 +685,5 @@ Describe 'Install-Service' {
 
 }
 
-Uninstall-TestService
+Get-Service -Name 'CarbonTestService*' |
+    ForEach-Object { Uninstall-Service -Name $_.Name -Verbose }

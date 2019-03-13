@@ -13,7 +13,9 @@
 using System;
 using System.Collections;
 using System.Runtime.InteropServices;
+#if NET452
 using WindowsInstaller;
+#endif
 
 namespace Carbon.Msi
 {
@@ -21,7 +23,10 @@ namespace Carbon.Msi
 	{
 		public MsiInfo(string path)
 		{
-			if (String.IsNullOrEmpty(path))
+#if CORECLR
+            throw new PlatformNotSupportedException("Reading MSI information is not supported under .NET Core. The WindowsInstaller COM component doesn't support .NET Core.");
+#else
+            if (String.IsNullOrEmpty(path))
 			{
 				throw new ArgumentException("Path must not be null or empty.", "path");
 			}
@@ -89,7 +94,8 @@ namespace Carbon.Msi
 					Marshal.FinalReleaseComObject(installer);
 				}
 			}
-		}
+#endif
+        }
 
 		private void Initialize(string path)
 		{
