@@ -10,6 +10,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+#Requires -Version 4
+Set-StrictMode -Version 'Latest'
+
 $taskName = $null
 $credential = $null
 $AllMonths = @( 'January','February','March','April','May','June','July','August','September','October','November','December' )
@@ -333,29 +336,29 @@ function Assert-ScheduledTask
     
     if( $HighestAvailableRunLevel )
     {
-        $task.HighestAvailableRunLevel | Should -Be $true
+        $task.HighestAvailableRunLevel | Should -BeTrue
     }
     else
     {
-        $task.HighestAvailableRunLevel | Should -Be $false
+        $task.HighestAvailableRunLevel | Should -BeFalse
     }
     
     if( $Interactive )
     {
-        $task.Interactive | Should -Be $true
+        $task.Interactive | Should -BeTrue
     }
     else
     {
-        $task.Interactive | Should -Be $false
+        $task.Interactive | Should -BeFalse
     }
     
     if( $NoPassword )
     {
-        $task.NoPassword | Should -Be $true
+        $task.NoPassword | Should -BeTrue
     }
     else
     {
-        $task.NoPassword | Should -Be $false
+        $task.NoPassword | Should -BeFalse
     }
     
     if( $PSBoundParameters.ContainsKey('ScheduleType') )
@@ -422,11 +425,11 @@ function Assert-ScheduledTask
     
     if( $StopAtEnd )
     {
-        $schedule.StopAtEnd | Should -Be $true
+        $schedule.StopAtEnd | Should -BeTrue
     }
     else
     {
-        $schedule.StopAtEnd | Should -Be $false
+        $schedule.StopAtEnd | Should -BeFalse
     }
     
     if( $PSBoundParameters.ContainsKey('Interval') )
@@ -596,7 +599,7 @@ Describe 'Install-ScheduledTask' {
         $Global:Error.Count | Should -BeGreaterThan 0
         $Global:Error[0] | Should -Match 'to schedule a monthly task'
         $result | Should -BeNullOrEmpty
-        (Test-ScheduledTask -Name $taskName) | Should -Be $false
+        (Test-ScheduledTask -Name $taskName) | Should -BeFalse
     }
     
     It 'should schedule for specific months on specific day' {
@@ -612,7 +615,7 @@ Describe 'Install-ScheduledTask' {
         $Global:Error.Count | Should -BeGreaterThan 0
         $Global:Error[0] | Should -Match 'single weekday'
         $result | Should -BeNullOrEmpty
-        (Test-ScheduledTask -Name $taskName) | Should -Be $false
+        (Test-ScheduledTask -Name $taskName) | Should -BeFalse
     }
     
     It 'should schedule week of month tasks on each week' {

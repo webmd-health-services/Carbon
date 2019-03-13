@@ -19,6 +19,7 @@ Build:
     Path: Source\Carbon.sln
     Property:
     - SignAssembly=$(SignAssembly)
+    - DefineConstants=$(Constants)
 - PowerShell:
     OnlyDuring: Build
     OnlyBy: BuildServer
@@ -40,9 +41,13 @@ Build:
     - --framework=netcoreapp2.1
     - --configuration=$(WHISKEY_MSBUILD_CONFIGURATION)
     - --results-directory=$(WHISKEY_OUTPUT_DIRECTORY)
-    - --logger=trx
+- Pester4:
+    Queues:
+    - Tasks:
+        - Pester4:
 - NUnit3:
-    Path: Source\Test\bin\$(WHISKEY_MSBUILD_CONFIGURATION)\net452\Carbon.Test.dll
+    - Test\Install-Certificate.Tests.ps1
+    - Test\*Iis*.ps1
 - Pipeline:
     Name: PublishBin
 - Pipeline:
@@ -153,7 +158,11 @@ Tests:
     OnlyDuring: Build
     OnlyBy: Developer
     Path: Complete-CarbonTest.ps1
-
+- PowerShell:
+    OnlyBy: BuildServer
+    Path: Format-TestResult.ps1
+    Argument:
+        OutputPath: $(WHISKEY_OUTPUT_DIRECTORY)
 
 Publish:
 - PublishPowerShellModule:

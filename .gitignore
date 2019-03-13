@@ -16,12 +16,13 @@ Test\MSI\setup.exe
 PSModules/**
 packages/**
 Website/**
-Test/MSI/*.tmp
-Test/MSI/setup.exe
+/Test/MSI/*.tmp
+/Test/MSI/setup.exe
+/Test/MSI/*.msi
 /Source/CarbonTestInstaller/Debug
 /Source/CarbonTestInstaller/Release
 /Source/CarbonTestInstallerWithCustomActions/Debug
 /Source/CarbonTestInstallerWithCustomActions/Release
 Carbon/LICENSE.txt
 Carbon/NOTICE.txt
-/Test/MSI/*.msi
+*.orig
