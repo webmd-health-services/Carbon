@@ -153,7 +153,11 @@ Tests:
     OnlyDuring: Build
     OnlyBy: Developer
     Path: Complete-CarbonTest.ps1
-
+- PowerShell:
+    OnlyBy: BuildServer
+    Path: Format-TestResult.ps1
+    Argument:
+        OutputPath: $(WHISKEY_OUTPUT_DIRECTORY)
 
 Publish:
 - PublishPowerShellModule:

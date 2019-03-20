@@ -56,7 +56,22 @@ function Get-CGroup
         $groupToFind = New-Object 'DirectoryServices.AccountManagement.GroupPrincipal' $ctx
         $groupToFind.Name = $Name
         $searcher = New-Object 'DirectoryServices.AccountManagement.PrincipalSearcher' $groupToFind
-        $group = $searcher.FindOne()
+        $group = $null
+        $numErrors = $Global:Error.Count
+        try
+        {
+            $group = $searcher.FindOne()
+        }
+        catch
+        {
+            $numErrorsNow = $Global:Error.Count
+            $numErrorsToDelete = $numErrorsNow - $numErrors
+            for( $idx = 0; $idx -lt $numErrorsToDelete; ++$idx )
+            {
+                $Global:Error.RemoveAt(0)
+            }
+        }
+
         if( -not $group )
         {
             # Fall back. PrincipalSearch can't find some identities
