@@ -28,7 +28,10 @@ param(
     $Initialize,
     
     [string]
-    $PipelineName
+    $PipelineName,
+
+    [string]
+    $Configuration
 )
 
 #Requires -Version 4
@@ -55,6 +58,11 @@ if( $Initialize )
 $whiskeyYmlPath = Join-Path -Path $PSScriptRoot -ChildPath 'whiskey.yml'
 $context = New-WhiskeyContext -Environment 'Dev' -ConfigurationPath $whiskeyYmlPath
 
+if( $Configuration )
+{
+    $context.MSBuildConfiguration = $Configuration
+}
+
 $apiKeys = @{
                 'powershellgallery.com' = 'POWERSHELL_GALLERY_API_KEY';
                 'nuget.org' = 'NUGET_ORG_API_KEY';
@@ -73,4 +81,13 @@ foreach( $apiKeyID in $apiKeys.Keys )
     Write-Verbose ('Adding API key "{0}" from environment variable "{1}".' -f $apiKeyID,$envVarName)
     Add-WhiskeyApiKey -Context $context -ID $apiKeyID -Value (Get-Item -Path $envVarPath).Value
 }
+
+$envVarsToSkip = & { 'SNK' ; $apiKeys.Values }
+
+Get-ChildItem -Path 'env:' |
+    Where-Object { $_.Name -notin $envVarsToSkip } |
+    Format-Table |
+    Out-String |
+    Write-Verbose
+
 Invoke-WhiskeyBuild -Context $context @optionalParams

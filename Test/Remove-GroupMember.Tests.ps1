@@ -156,7 +156,7 @@ Describe 'Remove-GroupMember.when removing user that does not exist' {
 Describe 'Remove-GroupMember.when group does not exist' {
     Init
     WhenRemoving 'fdfsadfdsf' -FromGroup 'jkfdsjfldsf' -ErrorAction SilentlyContinue
-    ThenError -Matches 'Local\ group\ ''jkfdsjfldsf'' not found\.'
+    ThenError -Matches 'Local\ group\ "jkfdsjfldsf" not found\.'
 }
 
 Describe 'Remove-GroupMember.when using -WhatIf switch' {

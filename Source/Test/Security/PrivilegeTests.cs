@@ -63,10 +63,11 @@ namespace Carbon.Test.Security
         }
 
         [Test]
-        [ExpectedException(typeof(Win32Exception),ExpectedMessage = "No such privilege. Indicates a specified privilege does not exist.")]
         public void ShouldRejectUnknownPrivilege()
         {
-            Privilege.GrantPrivileges(_identityName, new[] { "UnknownPrivilege" });
+            Assert.Throws(Is.TypeOf<Win32Exception>()
+                .And.Message.EqualTo("No such privilege. Indicates a specified privilege does not exist."),
+                () => { Privilege.GrantPrivileges(_identityName, new[] { "UnknownPrivilege" }); });
         }
 
     }

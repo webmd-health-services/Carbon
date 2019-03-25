@@ -48,23 +48,40 @@ function Get-CGroup
     )
 
     Set-StrictMode -Version 'Latest'
-
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
     
     $ctx = New-Object 'DirectoryServices.AccountManagement.PrincipalContext' ([DirectoryServices.AccountManagement.ContextType]::Machine)
     if( $Name )
     {
-        $group = [DirectoryServices.AccountManagement.GroupPrincipal]::FindByIdentity( $ctx, $Name )
+        $groupToFind = New-Object 'DirectoryServices.AccountManagement.GroupPrincipal' $ctx
+        $groupToFind.Name = $Name
+        $searcher = New-Object 'DirectoryServices.AccountManagement.PrincipalSearcher' $groupToFind
+        $group = $null
+        $numErrors = $Global:Error.Count
+        try
+        {
+            $group = $searcher.FindOne()
+        }
+        catch
+        {
+            $numErrorsNow = $Global:Error.Count
+            $numErrorsToDelete = $numErrorsNow - $numErrors
+            for( $idx = 0; $idx -lt $numErrorsToDelete; ++$idx )
+            {
+                $Global:Error.RemoveAt(0)
+            }
+        }
+
         if( -not $group )
         {
-            try
+            # Fall back. PrincipalSearch can't find some identities
+            $ctx.Dispose()
+            $ctx = New-Object 'DirectoryServices.AccountManagement.PrincipalContext' ([DirectoryServices.AccountManagement.ContextType]::Machine)
+            $group = [DirectoryServices.AccountManagement.GroupPrincipal]::FindByIdentity( $ctx, $Name )
+            if( -not $group )
             {
-                Write-Error ('Local group ''{0}'' not found.' -f $Name) -ErrorAction:$ErrorActionPreference
+                Write-Error ('Local group "{0}" not found.' -f $Name) -ErrorAction:$ErrorActionPreference
                 return
-            }
-            finally
-            {
-                $ctx.Dispose()
             }
         }
         return $group
@@ -84,4 +101,3 @@ function Get-CGroup
         }
     }
 }
-

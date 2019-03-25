@@ -53,12 +53,13 @@ Describe 'License Notices' {
                             'Publish-Carbon.ps1',
                             '*.pdn',
                             '.gitignore',
-                            'whiskey.yml'
+                            'whiskey.yml',
+                            'CODEOWNERS'
                         )
     
-        [object[]]$filesMissingLicense = Get-ChildItem -Path $projectRoot -Exclude 'Tools','Website','.git','pshdo.com','.output','PSModules','packages' |
+        [object[]]$filesMissingLicense = Get-ChildItem -Path $projectRoot -Exclude 'Tools','Website','.git','pshdo.com','.output','PSModules','packages','.dotnet' |
             Get-ChildItem -Recurse -File -Exclude $filesToSkip |
-            Where-Object { $_.FullName -notlike '*\obj\*' } |
+            Where-Object { $_.FullName -notmatch '\\(obj|(bin\\(Debug|Release)))\\' } |
             Where-Object { $name = $_.Name; -not ($filesToSkip | Where-Object { $name -like $_ }) } |
             ForEach-Object {
                 $fileInfo = $_

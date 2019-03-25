@@ -21,7 +21,9 @@ function Get-CScheduledTask
 
     With no parameters, `Get-CScheduledTask` returns all scheduled tasks. To get a specific scheduled task, use the `Name` parameter, which must be the full name of the task, i.e. path plus name. The name parameter accepts wildcards. If a scheduled task with the given name isn't found, an error is written.
 
-    This function has the same name as the built-in `Get-CScheduledTask` function that comes on Windows 2012/8 and later. It returns objects with the same properties, but if you want to use the built-in function, use the `ScheduledTasks` qualifier, e.g. `ScheduledTasks\Get-CScheduledTask`.
+    By default, `Get-CScheduledTask` uses the `schtasks.exe` application to get scheduled task information. Beginning in Carbon 2.8.0, you can return `RegisteredTask` objects from the `Schedule.Service` COM API with the `AsComObject` switch. Using this switch is an order of magnitude faster. In the next major version of Carbon, this will become the default behavior.
+
+    Before Carbon 2.7.0, this function has the same name as the built-in `Get-ScheduledTask` function that comes on Windows 2012/8 and later. It returns objects with the same properties, but if you want to use the built-in function, use the `ScheduledTasks` qualifier, e.g. `ScheduledTasks\Get-ScheduledTask`.
 
     .LINK
     Test-CScheduledTask
@@ -53,12 +55,29 @@ function Get-CScheduledTask
         [Alias('TaskName')]
         [string]
         # The name of the scheduled task to return. Wildcards supported. This must be the *full task name*, i.e. the task's path/location and its name.
-        $Name
+        $Name,
+
+        [Switch]
+        # Return the scheduled task as a [RegisteredTask Windows COM object](https://docs.microsoft.com/en-us/windows/desktop/taskschd/registeredtask), using the `Schedule.Service` COM API. This is faster and more reliable. See [Task Scheduler Reference](https://docs.microsoft.com/en-us/windows/desktop/taskschd/task-scheduler-reference) for more information.
+        #
+        # This parameter was introduced in Carbon 2.8.0.
+        $AsComObject
     )
 
     Set-StrictMode -Version 'Latest'
-
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
+    function ConvertFrom-DurationSpec
+    {
+        param(
+            $Duration
+        )
+
+        if( $Duration -match '^P((\d+)D)?T((\d+)H)?((\d+)M)?((\d+)S)?$' )
+        {
+            return New-Object 'TimeSpan' $Matches[2],$Matches[4],$Matches[6],$Matches[8]
+        }
+    }
 
     function ConvertFrom-RepetitionElement
     {
@@ -114,12 +133,10 @@ function Get-CScheduledTask
             if( $repetition | Get-Member -Name 'Duration' )
             {
                 $duration = $repetition.Duration
-                if( $duration -match 'PT((\d+)H)?((\d+)M)?((\d+)S)?$' )
+                $durationAsTimeSpan = ConvertFrom-DurationSpec -Duration $repetition.Duration
+                if( $durationAsTimeSpan -ne $null )
                 {
-                    $hours = $Matches[2]
-                    $minutes = $Matches[4]
-                    $seconds = $Matches[6]
-                    $duration = New-Object -TypeName 'TimeSpan' -ArgumentList $hours,$minutes,$seconds
+                    $duration = $durationAsTimeSpan
                 }
             }
 
@@ -131,10 +148,10 @@ function Get-CScheduledTask
 
         if( $TriggerElement | Get-Member -Name 'Delay' )
         {
-            $delayExpression = $TriggerElement.Delay
-            if( $delayExpression -match '^PT(\d+)M(\d+)S$' )
+            $delayAsTimeSpan = ConvertFrom-DurationSpec -Duration $TriggerElement.Delay
+            if( $delayAsTimeSpan -ne $null )
             {
-                $delay = New-Object 'TimeSpan' 0,$Matches[1],$Matches[2]
+                $delay = $delayAsTimeSpan
             }
         }
 
@@ -156,11 +173,65 @@ function Get-CScheduledTask
         }
     }
 
+    if( $AsComObject )
+    {
+        $taskScheduler = New-Object -ComObject 'Schedule.Service'
+        $taskScheduler.Connect()
+
+
+        function Get-Tasks
+        {
+            param(
+                $Folder
+            )
+    
+            $getHiddenTasks = 1
+    
+            $Folder.GetTasks($getHiddenTasks) | ForEach-Object { $_ }
+    
+            foreach( $subFolder in $Folder.GetFolders($getHiddenTasks) )
+            {
+                Get-Tasks -Folder $subFolder
+            }
+        }
+
+        $tasks = Get-Tasks -Folder $taskScheduler.GetFolder("\") |
+                    Where-Object { 
+                        if( -not $Name )
+                        {
+                            return $true
+                        }
+                    
+                        return $_.Path -like $Name
+                    }
+
+        if( -not $wildcardSearch -and -not $tasks )
+        {
+            Write-Error -Message ('Scheduled task "{0}" not found.' -f $Name) -ErrorAction $ErrorActionPreference
+            return
+        }
+
+        return $tasks
+    }
+
     $originalErrPreference = $ErrorActionPreference
+    $originalEncoding = [Console]::OutputEncoding
+    # Some tasks from Intel have special characters in them.
+    $OutputEncoding = [Console]::OutputEncoding = [Text.Encoding]::GetEncoding(1252)
     $ErrorActionPreference = 'Continue'
+    [object[]]$output = $null
     $errFile = Join-Path -Path $env:TEMP -ChildPath ('Carbon+Get-CScheduledTask+{0}' -f [IO.Path]::GetRandomFileName())
-    [object[]]$output = schtasks /query /v /fo csv $optionalArgs 2> $errFile | ConvertFrom-Csv | Where-Object { $_.HostName -ne 'HostName' } 
-    $ErrorActionPreference = $originalErrPreference
+    try
+    {
+        $output = schtasks /query /v /fo csv $optionalArgs 2> $errFile | 
+                    ConvertFrom-Csv | 
+                    Where-Object { $_.HostName -ne 'HostName' } 
+    }
+    finally
+    {
+        $ErrorActionPreference = $originalErrPreference
+        $OutputEncoding = [Console]::OutputEncoding = $originalEncoding
+    }
 
     if( $LASTEXITCODE )
     {
@@ -171,11 +242,11 @@ function Get-CScheduledTask
             {
                 if( $error -match 'The\ system\ cannot\ find\ the\ (file|path)\ specified\.' )
                 {
-                    Write-Error ('Scheduled task ''{0}'' not found.' -f $Name)
+                    Write-Error ('Scheduled task ''{0}'' not found.' -f $Name) -ErrorAction $ErrorActionPreference
                 }
                 else
                 {
-                    Write-Error ($error)
+                    Write-Error ($error) -ErrorAction $ErrorActionPreference
                 }
             }
             finally
@@ -191,13 +262,23 @@ function Get-CScheduledTask
         return
     }
 
+    $comTasks = Get-CScheduledTask -AsComObject
+
     for( $idx = 0; $idx -lt $output.Count; ++$idx )
     {
         $csvTask = $output[$idx]
 
-        $xml = schtasks /query /tn $csvTask.TaskName /xml | Where-Object { $_ }
-        $xml = $xml -join ([Environment]::NewLine)
-        $xmlDoc = [xml]$xml
+        $comTask = $comTasks | Where-Object { $_.Path -eq $csvTask.TaskName }
+        if( $comTask )
+        {
+            $xmlDoc = [xml]$comTask.Xml
+        }
+        else
+        {
+            $xml = schtasks /query /tn $csvTask.TaskName /xml | Where-Object { $_ }
+            $xml = $xml -join ([Environment]::NewLine)
+            $xmlDoc = [xml]$xml            
+        }
 
         $taskPath = Split-Path -Parent -Path $csvTask.TaskName
         # Get-CScheduledTask on Win2012/8 has a trailing slash so we include it here.
@@ -206,6 +287,12 @@ function Get-CScheduledTask
             $taskPath = '{0}\' -f $taskPath
         }
         $taskName = Split-Path -Leaf -Path $csvTask.TaskName
+
+        if( -not ($xmlDoc | Get-Member -Name 'Task') )
+        {
+            Write-Error -Message ('Unable to get information for scheduled task "{0}": XML task information is missing the "Task" element.' -f $csvTask.TaskName) -ErrorAction $ErrorActionPreference
+            continue
+        }
 
         $xmlTask = $xmlDoc.Task
         $principal = $xmlTask.Principals.Principal
@@ -350,10 +437,10 @@ function Get-CScheduledTask
                         $idleSettingsNode = $settingsNode.IdleSettings
                         if( $idleSettingsNode | Get-Member 'Duration' )
                         {
-                            $idleExpression = $xmlTask.Settings.IdleSettings.Duration
-                            if( $idleExpression -match '^PT(\d+)M$' )
+                            $idleTimeAsTimeSpan = ConvertFrom-DurationSpec -Duration $xmlTask.Settings.IdleSettings.Duration
+                            if( $idleTimeAsTimeSpan -ne $null )
                             {
-                                $idleTime = $Matches[1]
+                                $idleTime = $idleTimeAsTimeSpan.TotalMinutes
                             }
                         }
                     }

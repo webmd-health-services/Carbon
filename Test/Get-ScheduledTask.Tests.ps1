@@ -23,23 +23,8 @@ Describe 'Get-ScheduledTask' {
         
         Write-Debug ('{0} <=> {1}' -f $Expected.TaskName,$Actual.TaskName)
         $randomNextRunTimeTasks = @{
-                                        '\Microsoft\Windows\Application Experience\Microsoft Compatibility Appraiser' = $true;
-                                        '\Microsoft\Windows\Application Experience\ProgramDataUpdater' = $true;
-                                        '\Microsoft\Windows\Defrag\ScheduledDefrag' = $true;
-                                        '\Microsoft\Windows\Desired State Configuration\Consistency' = $true;
-                                        '\Microsoft\Windows\Power Efficiency Diagnostics\AnalyzeSystem' = $true;
-                                        '\Microsoft\Windows\Registry\RegIdleBackup' = $true;
-                                        '\Microsoft\Windows\RAC\RacTask' = $true;
-                                        '\Microsoft\Windows\Customer Experience Improvement Program\Server\ServerCeipAssistant' = $true;
-                                        '\Microsoft\Windows\Data Integrity Scan\Data Integrity Scan' = $true;
-                                        '\Microsoft\Windows\TaskScheduler\Regular Maintenance' = $true;
-                                        '\Microsoft\Windows\WindowsUpdate\Scheduled Start' = $true;
-                                        '\Microsoft\Windows\WindowsUpdate\Scheduled Start With Network' = $true;
                                         '\Microsoft\Office\Office 15 Subscription Heartbeat' = $true;
-                                        '\Microsoft\Windows\Windows Activation Technologies\ValidationTaskDeadline' = $true;
-                                        '\Microsoft\Windows\Customer Experience Improvement Program\Server\ServerRoleCollector' = $true;
-                                        '\Microsoft\Windows\Customer Experience Improvement Program\Server\ServerRoleUsageCollector' = $true;
-                                        '\Microsoft\Windows\WS\WSRefreshBannedAppsListTask' = $true;
+                                        '\OneDrive Standalone Update Task-S-1-5-21-1225507754-3068891322-2807220505-500' = $true;
                                     }
         $scheduleProps = @(
                                'Last Result',
@@ -77,17 +62,18 @@ Describe 'Get-ScheduledTask' {
                 {
                     $path = '{0}\' -f $path
                 }
-                $Actual.TaskName | Should Be $name
-                $Actual.TaskPath | Should Be $path
+                $Actual.TaskName | Should -Be $name -Because ('{0}  TaskName' -f $task.FullName) 
+                $Actual.TaskPath | Should -Be $path -Because ('{0}  TaskPath' -f $task.FullName)
             }
-            elseif( $propertyName -eq 'NextRunTime' -and $randomNextRunTimeTasks.ContainsKey($task.FullName) )
+            elseif( $propertyName -in @( 'NextRunTime', 'LastRuntime' ) -and ($task.FullName -like '\Microsoft\Windows\*' -or $randomNextRunTimeTasks.ContainsKey($task.FullName)) )
             {
                 # This task's next run time changes every time you retrieve it.
                 continue
             }
             else
             {
-                ($Actual | Get-Member -Name $propertyName) | Should Not BeNullOrEmpty
+                $because = '{0}  {1}' -f $task.FullName,$propertyName
+                ($Actual | Get-Member -Name $propertyName) | Should -Not -BeNullOrEmpty -Because $because
                 $expectedValue = $Expected.$columnName
                 if( $propertyName -eq 'TaskToRun' )
                 {
@@ -95,23 +81,29 @@ Describe 'Get-ScheduledTask' {
 
                     if( $expectedValue -like '*"*' )
                     {
-                        $rawXml = schtasks /query /xml /tn $Expected.TaskName | Where-Object { $_ }
-                        $rawXml = $rawXml -join [Environment]::NewLine
-                        Write-Debug -Message $rawXml
-                        $taskxml = [xml]$rawXml
-                        $task = $taskxml.Task
-                        if( ($task | Get-Member -Name 'Actions') -and ($task.Actions | Get-Member -Name 'Exec') )
+                        $actualTask = Get-CScheduledTask -Name $Expected.TaskName -AsComObject
+                        if( -not $actualTask.Xml )
                         {
-                            $expectedValue = $taskXml.Task.Actions.Exec.Command
-                            if( ($taskxml.Task.Actions.Exec | Get-Member 'Arguments') -and  $taskXml.Task.Actions.Exec.Arguments )
+                            Write-Error -Message ('COM object for task "{0}" doesn''t have an XML property or the property doesn''t have a value.' -f $Expected.TaskName)
+                        }
+                        else
+                        {
+                            Write-Debug -Message $actualTask.Xml
+                            $taskxml = [xml]$actualTAsk.Xml
+                            $task = $taskxml.Task
+                            if( ($task | Get-Member -Name 'Actions') -and ($task.Actions | Get-Member -Name 'Exec') )
                             {
-                                $expectedValue = '{0} {1}' -f $expectedValue,$taskxml.Task.Actions.Exec.Arguments
+                                $expectedValue = $taskXml.Task.Actions.Exec.Command
+                                if( ($taskxml.Task.Actions.Exec | Get-Member 'Arguments') -and  $taskXml.Task.Actions.Exec.Arguments )
+                                {
+                                    $expectedValue = '{0} {1}' -f $expectedValue,$taskxml.Task.Actions.Exec.Arguments
+                                }
                             }
                         }
                     }
                 }
                 Write-Debug ('    {0} <=> {1}' -f $Actual.$propertyName,$expectedValue)
-                ($Actual.$propertyName) | Should Be $expectedValue
+                ($Actual.$propertyName) | Should -Be $expectedValue -Because $because
             }
         }
     
@@ -122,10 +114,11 @@ Describe 'Get-ScheduledTask' {
         $Global:Error.Clear()
     }
 
-    It 'should get scheduled tasks' {
+    It 'should get each scheduled task' {
         schtasks /query /v /fo csv | 
             ConvertFrom-Csv | 
             Where-Object { $_.TaskName -and $_.HostName -ne 'HostName' } | 
+            Where-Object { $_.TaskName -notlike '*Intel*' -and $_.TaskName -notlike '\Microsoft\*' } |  # Some Intel scheduled tasks have characters in their names that don't play well.
             ForEach-Object {
                 $expectedTask = $_
                 $task = Get-ScheduledTask -Name $expectedTask.TaskName
@@ -170,22 +163,21 @@ Describe 'Get-ScheduledTask' {
     }
 
     It 'should support wildcards' {
-        $expectedTask = schtasks /query /fo list | 
-                            Where-Object { $_ -match '^TaskName: +(.*)$' } | 
-                            ForEach-Object { $Matches[1] } |
-                            Select-Object -First 1
-        $expectedTask | Should Not BeNullOrEmpty
-        $wildcard = ('*{0}*' -f $expectedTask.Substring(1,$expectedTask.Length - 2))
+        $expectedTask = Get-CScheduledTask -AsComObject | Select-Object -First 1
+        $expectedTask | Should -Not -BeNullOrEmpty
+        $wildcard = ('*{0}*' -f $expectedTask.Path.Substring(1,$expectedTask.Path.Length - 2))
         $task = Get-ScheduledTask -Name $wildcard
-        $task | Should Not BeNullOrEmpty
-        $task | Should BeOfType ([Carbon.TaskScheduler.TaskInfo])
-        Join-Path -Path $task.TaskPath -ChildPath $task.TaskName | Should Be $expectedTask
+        $task | Should -Not -BeNullOrEmpty
+        $task | Should -BeOfType ([Carbon.TaskScheduler.TaskInfo])
+        Join-Path -Path $task.TaskPath -ChildPath $task.TaskName | Should Be $expectedTask.Path
     }
-    
+}
+
+Describe 'Get-ScheduledTask.when getting all tasks' {
     It 'should get all scheduled tasks' {
-        $expectedTasks = schtasks /query /v /fo csv | ConvertFrom-Csv | Where-Object { $_.TaskName -and $_.HostName -ne 'HostName' } | Select-Object -Unique -Property 'TaskName'
+        $expectedTasks = Get-CScheduledTask -AsComObject | Measure-Object
         $actualTasks = Get-ScheduledTask
-        $actualTasks.Count | Should Be $expectedTasks.Count
+        $actualTasks.Count | Should -Be $expectedTasks.Count
     }
     
 }

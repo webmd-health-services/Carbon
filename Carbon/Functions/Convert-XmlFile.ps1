@@ -104,7 +104,6 @@ function Convert-CXmlFile
     )
     
     Set-StrictMode -Version 'Latest'
-
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
     
 	if( -not (Test-Path -Path $Path -PathType Leaf))
@@ -186,8 +185,8 @@ function Convert-CXmlFile
             $TransformAssemblyPath
         )
         
-        Add-Type -Path (Join-Path $CarbonBinDir "Microsoft.Web.XmlTransform.dll")
-        Add-Type -Path (Join-Path $CarbonBinDir "Carbon.Xdt.dll")
+        Add-Type -Path (Join-Path -Path $CarbonBinDir -ChildPath "Microsoft.Web.XmlTransform.dll")
+        Add-Type -Path (Join-Path -Path $CarbonBinDir -ChildPath "Carbon.Xdt.dll")
         if( $TransformAssemblyPath )
         {
             $TransformAssemblyPath | ForEach-Object { Add-Type -Path $_ }
@@ -207,6 +206,8 @@ function Convert-CXmlFile
                 $Destination
             )
 
+            [Microsoft.Web.XmlTransform.XmlTransformation]$xmlTransform = $null
+            [Microsoft.Web.XmlTransform.XmlTransformableDocument]$document = $null
             try
             {
                 $document = New-Object Microsoft.Web.XmlTransform.XmlTransformableDocument
@@ -245,7 +246,7 @@ function Convert-CXmlFile
     {
         if( $PSCmdlet.ShouldProcess( $Path, ('transform with {0} -> {1}' -f $xdtPathForShouldProcess,$Destination) ) )
         {
-            $argumentList = $CarbonBinDir,$Path,$XdtPath,$Destination,$TransformAssemblyPath
+            $argumentList = $carbonAssemblyDir,$Path,$XdtPath,$Destination,$TransformAssemblyPath
             if( $PSVersionTable.CLRVersion.Major -ge 4 )
             {
                 Invoke-Command -ScriptBlock $scriptBlock -ArgumentList $argumentList

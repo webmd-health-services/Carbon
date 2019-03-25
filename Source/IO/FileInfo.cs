@@ -14,12 +14,15 @@ using System;
 using System.ComponentModel;
 using System.IO;
 using System.Runtime.InteropServices;
+#if CORECLR
+using System.Runtime.InteropServices.ComTypes;
+#endif
 using Microsoft.Win32.SafeHandles;
 using IOFile = System.IO.File;
 
 namespace Carbon.IO
 {
-	[StructLayout(LayoutKind.Sequential)]
+    [StructLayout(LayoutKind.Sequential)]
 	// ReSharper disable once InconsistentNaming
 	internal struct BY_HANDLE_FILE_INFORMATION
 	{
@@ -43,12 +46,12 @@ namespace Carbon.IO
 	
 	public sealed class FileInfo
 	{
-		[DllImport("kernel32.dll", SetLastError = true)]
+        [DllImport("kernel32.dll", SetLastError = true)]
 		internal static extern bool GetFileInformationByHandle(SafeFileHandle hFile, out BY_HANDLE_FILE_INFORMATION lpFileInformation);
 
-		public FileInfo(string path)
+        public FileInfo(string path)
 		{
-			BY_HANDLE_FILE_INFORMATION kernelFileInfo;
+            BY_HANDLE_FILE_INFORMATION kernelFileInfo;
 			bool result;
 			using (var file = IOFile.Open(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
 			{

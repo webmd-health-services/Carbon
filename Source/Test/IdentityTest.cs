@@ -38,7 +38,7 @@ namespace Carbon.Test
         }
 
         [Test]
-        [Ignore]
+        [Ignore("Reason lost to the sands of time.")]
         public void ShouldResolveAdministrator()
         {
             GivenIdentityName("Administrator");
@@ -170,4 +170,3 @@ namespace Carbon.Test
         }
     }
 }
-

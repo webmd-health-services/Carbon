@@ -12,38 +12,24 @@
 
 Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'CarbonDscTest' -Resolve) -Force
 
-Describe 'Carbon_Service' {
-    $credential = New-Credential -User 'CarbonDscTestUser' -Password ([Guid]::NewGuid().ToString())
-    $tempDir = $null
-    $servicePath = $null
-    $serviceName = 'CarbonDscTestService'
-    Install-User -Credential $credential
+$credential = New-Credential -User 'CarbonDscTestUser' -Password ([Guid]::NewGuid().ToString())
+$tempDir = $null
+$servicePath = $null
+$serviceName = 'CarbonDscTestService'
+Install-CUser -Credential $credential
 
-    BeforeAll {
-        Start-CarbonDscTestFixture 'Service'
-    }
-    
-    BeforeEach {
-        $Global:Error.Clear()
-        $tempDir = 'Carbon+{0}+{1}' -f ((Split-Path -Leaf -Path $PSCommandPath),([IO.Path]::GetRandomFileName()))
-        $tempDir = Join-Path -Path $env:TEMP -ChildPath $tempDir
-        New-Item -Path $tempDir -ItemType 'Directory' | Out-Null
-        Copy-Item -Path (Join-Path -Path $PSScriptRoot -ChildPath 'Service\NoOpService.exe') -Destination $tempDir
-        $servicePath = Join-Path -Path $tempDir -ChildPath 'NoOpService.exe'
-    }
-    
-    AfterEach {
-        Uninstall-Service -Name $serviceName
-        if( (Test-Path -Path $tempDir -PathType Container) )
-        {
-            Remove-Item -Path $tempDir -Recurse -ErrorAction Ignore
-        }
-    }
-    
-    AfterAll {
-        Stop-CarbonDscTestFixture
-    }
-    
+Start-CarbonDscTestFixture 'Service'
+
+function Init
+{
+    Uninstall-CService -Name $serviceName
+    $Global:Error.Clear()
+    Copy-Item -Path (Join-Path -Path $PSScriptRoot -ChildPath 'Service\NoOpService.exe') -Destination $TestDrive.FullName
+    $script:servicePath = Join-Path -Path $TestDrive.FullName -ChildPath 'NoOpService.exe'
+}
+
+Describe 'Carbon_Service.when getting resource' {
+    Init
     It 'should get existing services' {
         Get-Service |
             # Some services can't be retrieved di-rectly.
@@ -71,7 +57,7 @@ Describe 'Carbon_Service' {
                 $resource.DisplayName | Should Be $_.DisplayName
                 $resource.Description | Should Be $_.Description
                 ($resource.Dependency -join ',') | Should Be (($_.ServicesDependedOn | Select-Object -ExpandProperty 'Name') -join ',')
-                if( (Test-Identity -Name $_.UserName) )
+                if( $_.UserName -and (Test-Identity -Name $_.UserName) )
                 {
                     $resource.UserName | Should Be (Resolve-IdentityName -Name $_.UserName)
                 }
@@ -83,7 +69,13 @@ Describe 'Carbon_Service' {
                 Assert-DscResourcePresent $resource
             }
     }
-    
+}
+
+Describe 'Carbon_Service' {
+    BeforeEach {
+        Init
+    }
+
     It 'should get non existent service' {
         $name = [Guid]::NewGuid().ToString()
         $resource = Get-TargetResource -Name $name
@@ -360,3 +352,6 @@ Describe 'Carbon_Service' {
     }
     
 }
+
+Uninstall-CService -Name $serviceName
+Stop-CarbonDscTestFixture

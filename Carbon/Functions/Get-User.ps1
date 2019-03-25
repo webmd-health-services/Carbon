@@ -55,23 +55,25 @@ function Get-CUser
     )
 
     Set-StrictMode -Version 'Latest'
-
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
     
     $ctx = New-Object 'DirectoryServices.AccountManagement.PrincipalContext' ([DirectoryServices.AccountManagement.ContextType]::Machine)
     if( $Username )
     {
-        $user = [DirectoryServices.AccountManagement.UserPrincipal]::FindByIdentity( $ctx, $Username )
+        $userToFind = New-Object 'DirectoryServices.AccountManagement.UserPrincipal' $ctx
+        $userToFind.SamAccountName = $UserName
+        $searcher = New-Object 'DirectoryServices.AccountManagement.PrincipalSearcher' $userToFind
+        $user = $searcher.FindOne()
         if( -not $user )
         {
-            try
+            # Fallback. PrincipalSearch can't find some users.
+            $ctx.Dispose()
+            $ctx = New-Object 'DirectoryServices.AccountManagement.PrincipalContext' ([DirectoryServices.AccountManagement.ContextType]::Machine)
+            $user = [DirectoryServices.AccountManagement.UserPrincipal]::FindByIdentity( $ctx, $Username )
+            if( -not $user )
             {
-                Write-Error ('Local user ''{0}'' not found.' -f $Username) -ErrorAction:$ErrorActionPreference
+                Write-Error ('Local user "{0}" not found.' -f $Username) -ErrorAction:$ErrorActionPreference
                 return
-            }
-            finally
-            {
-                $ctx.Dispose()
             }
         }
         return $user
@@ -91,4 +93,3 @@ function Get-CUser
         }
     }
 }
-

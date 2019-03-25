@@ -25,7 +25,7 @@
     RootModule = 'Carbon.psm1'
 
     # Version number of this module.
-    ModuleVersion = '2.7.0'
+    ModuleVersion = '2.8.0'
 
     # ID used to uniquely identify this module
     GUID = '075d9444-c01b-48c3-889a-0b3490716fa2'
@@ -83,7 +83,7 @@ All functions are idempotent: when run multiple times with the same arguments, y
     RequiredModules = @()
 
     # Assemblies that must be loaded prior to importing this module
-    RequiredAssemblies = @( 'bin\Carbon.dll' )
+    RequiredAssemblies = @()
 
     # Script files (.ps1) that are run in the caller's environment prior to importing this module
     ScriptsToProcess = @()
@@ -91,13 +91,18 @@ All functions are idempotent: when run multiple times with the same arguments, y
     # Type files (.ps1xml) to be loaded when importing this module
     TypesToProcess = @(
                         'Carbon.types.ps1xml',
+                        'Types\Scheduled.Service.RegisteredTask.types.ps1xml',
                         'Types\System.IO.DirectoryInfo.types.ps1xml'
                         'Types\System.IO.FileInfo.types.ps1xml'
                         'Types\System.ServiceProcess.ServiceController.types.ps1xml'
                       )
 
     # Format files (.ps1xml) to be loaded when importing this module
-    FormatsToProcess = @( 'Carbon.format.ps1xml', 'Formats\Carbon.Security.HttpUrlAcl.format.ps1xml' )
+    FormatsToProcess = @( 
+                            'Carbon.format.ps1xml', 
+                            'Formats\Carbon.Security.HttpUrlAcl.format.ps1xml',
+                            'Formats\Schedule.Service.RegisteredTask.format.ps1xml'
+                        )
 
     # Modules to import as nested modules of the module specified in ModuleToProcess
     NestedModules = @()
@@ -342,13 +347,12 @@ All functions are idempotent: when run multiple times with the same arguments, y
 
             # ReleaseNotes of this module
             ReleaseNotes = @'
-* Uninstall-CService now kills a service's process when that service stops but is actually still running. This should decrease the frequency of needing to reboot a computer when uninstalling a service.
-* Added `C` prefix to all Carbon commands, with aliases from old command names to new ones to maintain backwards compatability. 
-* Added `bin\Use-CarbonPrefix.ps1` script to Carbon that will update files to use the new Carbon function names.
-* `Get-CCertificate`: Added `Path` note property to returned objects.
-* Fixed: Chocolatey uninstaller fails if the `PSModulePath` environment variable contains trailing or sequential semicolons.
-* `Grant-CPermission` can now grant multiple permissions to an identity on files, directories, and registry items. Use the `Append` switch.
-* `Carbon_Permission` DSC resource can now grant multiple permissions to an identity on files, directories, and registry items. Use the `Append` property.
+* Carbon is now *importable* on PowerShell Core on all platforms. Most functions will not work on Linux/MacOS since they are Windows-specific. Many functions will also not work on PowerShell Core. The next major version of Carbon, 3, should fully support PowerShell Core on Windows.
+* `Get-CScheduledTask` can now return `RegisteredTask` objects from the Scheduler.Service COM API. Use the new `AsComObject` switch. Getting COM objects is an order of magnitude faster than the old way.
+* Fixed: `Get-CScheduledTask` isn't able to parse some task information returned on Windows 10.
+* Deprecated `Test-CWindowsFeature`.
+* Fixed: `Get-CComPermission` fails when there are permission to a non-existent identity.
+* Fixed: looking up local users/groups is extremely slow on some machines.
 '@
         } # End of PSData hashtable
     

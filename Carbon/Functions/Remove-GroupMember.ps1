@@ -50,7 +50,6 @@ function Remove-CGroupMember
     )
 
     Set-StrictMode -Version 'Latest'
-
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
     
     [DirectoryServices.AccountManagement.GroupPrincipal]$group = Get-CGroup -Name $Name
@@ -75,7 +74,7 @@ function Remove-CGroupMember
             }
 
             Write-Verbose -Message ('[{0}] Members      {1} ->' -f $Name,$identity.FullName)
-            if( -not $PSCmdlet.ShouldProcess(('removing ''{0}'' from local group ''{1}''' -f $identity.FullName, $group.Name), $null, $null) )
+            if( -not $PSCmdlet.ShouldProcess(('removing "{0}" from local group "{1}"' -f $identity.FullName, $group.Name), $null, $null) )
             {
                 continue
             }
@@ -86,7 +85,7 @@ function Remove-CGroupMember
             }
             catch
             {
-                Write-Error ('Failed to remove ''{0}'' from local group ''{1}'': {2}.' -f $identity,$group.Name,$_)
+                Write-Error ('Failed to remove "{0}" from local group "{1}": {2}.' -f $identity,$group.Name,$_)
             }
         }
     }
