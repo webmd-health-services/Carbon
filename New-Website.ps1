@@ -86,7 +86,7 @@ function Out-HtmlPage
     {1}
 
 	<div class="Footer">
-		Copyright 2012 - {2} <a href="http://pshdo.com">Aaron Jensen</a>.
+		Copyright <a href="http://pshdo.com">Aaron Jensen</a> and WebMD Health Services.
 	</div>
 
 </body>

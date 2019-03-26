@@ -178,7 +178,7 @@ Publish:
     SkipUploadedCheck: true
 - GitHubRelease:
     UnlessExists: env:APPVEYOR_PULL_REQUEST_NUMBER
-    RepositoryName: pshdo/Carbon
+    RepositoryName: webmd-health-services/Carbon
     ApiKeyID: github.com
     Tag: $(WHISKEY_SEMVER2_NO_BUILD_METADATA)
     Commitish: $(WHISKEY_SCM_COMMIT_ID)

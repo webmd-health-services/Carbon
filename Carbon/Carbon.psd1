@@ -25,7 +25,7 @@
     RootModule = 'Carbon.psm1'
 
     # Version number of this module.
-    ModuleVersion = '2.8.0'
+    ModuleVersion = '2.8.1'
 
     # ID used to uniquely identify this module
     GUID = '075d9444-c01b-48c3-889a-0b3490716fa2'
@@ -37,7 +37,7 @@
     CompanyName = ''
 
     # Copyright statement for this module
-    Copyright = 'Copyright 2011 - 2016 Aaron Jensen.'
+    Copyright = 'Aaron Jensen and WebMD Health Services'
     
     # Description of the functionality provided by this module
     Description = @'
@@ -347,12 +347,8 @@ All functions are idempotent: when run multiple times with the same arguments, y
 
             # ReleaseNotes of this module
             ReleaseNotes = @'
-* Carbon is now *importable* on PowerShell Core on all platforms. Most functions will not work on Linux/MacOS since they are Windows-specific. Many functions will also not work on PowerShell Core. The next major version of Carbon, 3, should fully support PowerShell Core on Windows.
-* `Get-CScheduledTask` can now return `RegisteredTask` objects from the Scheduler.Service COM API. Use the new `AsComObject` switch. Getting COM objects is an order of magnitude faster than the old way.
-* Fixed: `Get-CScheduledTask` isn't able to parse some task information returned on Windows 10.
-* Deprecated `Test-CWindowsFeature`.
-* Fixed: `Get-CComPermission` fails when there are permission to a non-existent identity.
-* Fixed: looking up local users/groups is extremely slow on some machines.
+* Added verification information to Chocolatey package.
+* Updated copyright.
 '@
         } # End of PSData hashtable
     
