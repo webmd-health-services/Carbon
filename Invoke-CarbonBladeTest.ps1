@@ -47,7 +47,8 @@ if( $Test )
 
 $uploadTestResults = $false 
 $uploadUri = ''
-if( Test-Path -Path 'env:APPVEYOR' )
+$isAppVeyor = Test-Path -Path 'env:APPVEYOR'
+if( $isAppVeyor )
 {
     $uploadTestResults = $true
     $uploadUri = 'https://ci.appveyor.com/api/testresults/nunit/{0}' -f $env:APPVEYOR_JOB_ID 
@@ -62,6 +63,14 @@ $bladePath = Join-Path -Path $PSScriptRoot -ChildPath '.\Tools\Blade\blade.ps1' 
 if( $PassThru )
 {
     $LastBladeResult
+}
+
+if( $isAppVeyor )
+{
+    & { 
+            $LastBladeResult.Failures
+            $LastBladeResult.Errors
+    } | Format-List
 }
 
 if( $LastBladeResult.Errors -or $LastBladeResult.Failures )
