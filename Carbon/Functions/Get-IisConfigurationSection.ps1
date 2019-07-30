@@ -34,7 +34,7 @@ function Get-CIisConfigurationSection
     param(
         [Parameter(Mandatory=$true,ParameterSetName='ForSite')]
         [string]
-        # The site where anonymous authentication should be set.
+        # The site whose configuration should be returned.
         $SiteName,
         
         [Parameter(ParameterSetName='ForSite')]
