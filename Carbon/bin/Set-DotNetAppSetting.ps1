@@ -32,8 +32,7 @@ Set-StrictMode -Version 'Latest'
 # Keep cause this script is used by PowerShell 2.
 $PSScriptRoot = Split-Path -Parent -Path $MyInvocation.MyCommand.Definition
 
-. (Join-Path -Path $PSScriptRoot -ChildPath '..\Functions\Use-CallerPreference.ps1' -Resolve)
-. (Join-Path -Path $PSScriptRoot -ChildPath '..\Functions\ConvertFrom-Base64.ps1' -Resolve)
+Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath '..\Carbon.psd1' -Resolve)
 
 $Name = $Name | ConvertFrom-CBase64
 $Value = $Value | ConvertFrom-CBase64

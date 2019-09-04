@@ -34,6 +34,12 @@ Write-Timing ('BEGIN')
 $CarbonBinDir = Join-Path -Path $PSScriptRoot -ChildPath 'bin' -Resolve
 $carbonAssemblyDir = Join-Path -Path $CarbonBinDir -ChildPath 'fullclr' -Resolve
 
+# Used to detect how to manager windows features. Determined at run time to improve import speed.
+$windowsFeaturesNotSupported = $null
+$useServerManager = $null
+$useOCSetup = $false
+$supportNotFoundErrorMessage = 'Unable to find support for managing Windows features.  Couldn''t find servermanagercmd.exe, ocsetup.exe, or WMI support.'
+
 $IsPSCore = $PSVersionTable['PSEdition'] -eq 'Core'
 if( $IsPSCore )
 {
@@ -43,21 +49,6 @@ if( $IsPSCore )
 Write-Timing ('Loading Carbon assemblies from "{0}".' -f $carbonAssemblyDir)
 Get-ChildItem -Path (Join-Path -Path $carbonAssemblyDir -ChildPath '*') -Filter 'Carbon*.dll' -Exclude 'Carbon.Iis.dll' |
     ForEach-Object { Add-Type -Path $_.FullName }
-
-Write-Timing ('Dot-sourcing Test-TypeDataMember.')
-. (Join-Path -Path $PSScriptRoot -ChildPath 'Functions\Test-TypeDataMember.ps1' -Resolve)
-Write-Timing ('Dot-sourcing Use-CallerPreference.')
-. (Join-Path -Path $PSScriptRoot -ChildPath 'Functions\Use-CallerPreference.ps1' -Resolve)
-
-
-$doNotImport = @{ }
-
-if( -not $IsWindows -or ([Environment]::Is64BitOperatingSystem -and -not [Environment]::Is64BitProcess) ) 
-{
-    $doNotImport['Initialize-Lcm.ps1'] = $true
-}
-
-$functionRoot = Join-Path -Path $PSScriptRoot -ChildPath 'Functions' -Resolve
 
 # Active Directory
 
@@ -71,7 +62,6 @@ Add-Type -AssemblyName 'System.Security'
 # FileSystem
 Write-Timing ('Adding Ionic.Zip assembly.')
 Add-Type -Path (Join-Path -Path $CarbonBinDir -ChildPath 'Ionic.Zip.dll' -Resolve)
-
 
 # IIS
 $exportIisFunctions = $false
@@ -90,36 +80,49 @@ if( (Test-Path -Path 'env:SystemRoot') )
             Write-Timing ('Adding Carbon.Iis assembly.')
             Add-Type -Path (Join-Path -Path $carbonAssemblyDir -ChildPath 'Carbon.Iis.dll' -Resolve)
         }
-
-        if( -not (Test-CTypeDataMember -TypeName 'Microsoft.Web.Administration.Site' -MemberName 'PhysicalPath') )
-        {
-            Write-Timing ('Updating Microsoft.Web.Administration.Site type data.')
-            Update-TypeData -TypeName 'Microsoft.Web.Administration.Site' -MemberType ScriptProperty -MemberName 'PhysicalPath' -Value { 
-                    $this.Applications |
-                        Where-Object { $_.Path -eq '/' } |
-                        Select-Object -ExpandProperty VirtualDirectories |
-                        Where-Object { $_.Path -eq '/' } |
-                        Select-Object -ExpandProperty PhysicalPath
-                }
-        }
-
-        if( -not (Test-CTypeDataMember -TypeName 'Microsoft.Web.Administration.Application' -MemberName 'PhysicalPath') )
-        {
-            Write-Timing ('Updating Microsoft.Web.Administration.Application type data.')
-            Update-TypeData -TypeName 'Microsoft.Web.Administration.Application' -MemberType ScriptProperty -MemberName 'PhysicalPath' -Value { 
-                    $this.VirtualDirectories |
-                        Where-Object { $_.Path -eq '/' } |
-                        Select-Object -ExpandProperty PhysicalPath
-                }
-        }
     }
 }
 
-if( -not $exportIisFunctions )
+Write-Timing ('Dot-sourcing functions.')
+$functionRoot = Join-Path -Path $PSScriptRoot -ChildPath 'Functions' -Resolve
+
+Get-ChildItem -Path (Join-Path -Path $functionRoot -ChildPath '*') -Filter '*.ps1' -Exclude '*Iis*','Initialize-Lcm.ps1' | 
+    ForEach-Object { 
+        . $_.FullName 
+    }
+
+if( $IsWindows -and [Environment]::Is64BitOperatingSystem -and [Environment]::Is64BitProcess ) 
 {
-    Write-Timing ('Filtering out IIS functions.')
-    Get-ChildItem -Path $functionRoot -Filter '*-Iis*.ps1' |
-        ForEach-Object { $doNotImport[$_.Name] = $true }
+    . (Join-Path -Path $functionRoot -ChildPath 'Initialize-Lcm.ps1')
+}
+
+if( $exportIisFunctions )
+{
+    Write-Timing ('Dot-sourcing IIS functions.')
+    Get-ChildItem -Path $functionRoot -Filter '*Iis*.ps1' |
+        ForEach-Object { . $_.FullName }
+        
+    if( -not (Test-CTypeDataMember -TypeName 'Microsoft.Web.Administration.Site' -MemberName 'PhysicalPath') )
+    {
+        Write-Timing ('Updating Microsoft.Web.Administration.Site type data.')
+        Update-TypeData -TypeName 'Microsoft.Web.Administration.Site' -MemberType ScriptProperty -MemberName 'PhysicalPath' -Value { 
+                $this.Applications |
+                    Where-Object { $_.Path -eq '/' } |
+                    Select-Object -ExpandProperty VirtualDirectories |
+                    Where-Object { $_.Path -eq '/' } |
+                    Select-Object -ExpandProperty PhysicalPath
+            }
+    }
+
+    if( -not (Test-CTypeDataMember -TypeName 'Microsoft.Web.Administration.Application' -MemberName 'PhysicalPath') )
+    {
+        Write-Timing ('Updating Microsoft.Web.Administration.Application type data.')
+        Update-TypeData -TypeName 'Microsoft.Web.Administration.Application' -MemberType ScriptProperty -MemberName 'PhysicalPath' -Value { 
+                $this.VirtualDirectories |
+                    Where-Object { $_.Path -eq '/' } |
+                    Select-Object -ExpandProperty PhysicalPath
+            }
+    }
 }
 
 # MSMQ
@@ -141,33 +144,6 @@ Add-Type -AssemblyName 'System.ServiceProcess'
 # Users and Groups
 Write-Timing ('Adding System.DirectoryServices.AccountManagement assembly.')
 Add-Type -AssemblyName 'System.DirectoryServices.AccountManagement'
-
-# Windows Features
-Write-Timing ('Checking if servermanagercmd.exe exists.')
-$useServerManager = (Get-Command -Name 'servermanagercmd.exe' -ErrorAction Ignore) -ne $null
-$useWmi = $false
-$useOCSetup = $false
-if( -not $useServerManager )
-{
-    Write-Timing ('Checking if Win32_OptionalFeature WMI class is available.')
-    $win32OptionalFeatureClass = $null
-    if( (Get-Command -Name 'Get-CimClass' -ErrorAction Ignore) )
-    {
-        $win32OptionalFeatureClass = Get-CimClass -ClassName 'Win32_OptionalFeature'
-    }
-    elseif( Get-Command -Name 'Get-WmiObject' -ErrorAction Ignore )
-    {
-        $win32OptionalFeatureClass = Get-WmiObject -List | Where-Object { $_.Name -eq 'Win32_OptionalFeature' }
-    }
-        
-    $useWmi = $win32OptionalFeatureClass -ne $null
-    Write-Timing ('Checking if ocsetup.exe exists.')
-    $useOCSetup = (Get-Command -Name 'ocsetup.exe' -ErrorAction Ignore ) -ne $null
-}
-
-$windowsFeaturesNotSupported = (-not ($useServerManager -or ($useWmi -and $useOCSetup) ))
-$supportNotFoundErrorMessage = 'Unable to find support for managing Windows features.  Couldn''t find servermanagercmd.exe, ocsetup.exe, or WMI support.'
-
 
 # Extended Type
 if( -not (Test-CTypeDataMember -TypeName 'System.IO.FileInfo' -MemberName 'GetCarbonFileInfo') )
@@ -226,14 +202,6 @@ if( -not (Test-CTypeDataMember -TypeName 'System.IO.FileInfo' -MemberName 'Volum
         return $this.GetCarbonFileInfo( 'VolumeSerialNumber' )
     }
 }
-
-Write-Timing ('Dot-sourcing functions.')
-Get-ChildItem -Path $functionRoot -Filter '*.ps1' | 
-                    Where-Object { -not $doNotImport.Contains($_.Name) } |
-                    ForEach-Object {
-                        Write-Verbose ("Importing function {0}." -f $_.FullName)
-                        . $_.FullName | Out-Null
-                    }
 
 Write-Timing ('Testing the module manifest.')
 try
