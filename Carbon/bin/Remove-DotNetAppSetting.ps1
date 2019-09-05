@@ -18,12 +18,7 @@ param(
 
 Set-StrictMode -Version 'Latest'
 
-# Keep cause this script is used by PowerShell 2.
-$PSScriptRoot = Split-Path -Parent -Path $MyInvocation.MyCommand.Definition
-
-Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath '..\Carbon.psd1' -Resolve)
-
-$Name = $Name | ConvertFrom-CBase64
+$Name = [Text.Encoding]::Unicode.GetString( [Convert]::FromBase64String($Name) )
 
 Add-Type -AssemblyName System.Configuration
 
