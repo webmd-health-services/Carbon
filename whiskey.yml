@@ -134,7 +134,6 @@ Tests:
         Path: 
         - Test\Test-Documentation.ps1
         - Test\Test-ImportCarbon.ps1
-        - Test\Test-UsesUseCallerPreference.ps1
 # These tests fail when run in parallel so they get run first.
 - Pester4:
     OnlyBy: BuildServer
