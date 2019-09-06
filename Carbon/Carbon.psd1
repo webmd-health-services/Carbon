@@ -347,7 +347,7 @@ All functions are idempotent: when run multiple times with the same arguments, y
 
             # ReleaseNotes of this module
             ReleaseNotes = @'
-* Carbon should now import in less than a second.
+* Carbon should now imports in a few seconds.
 '@
         } # End of PSData hashtable
     
