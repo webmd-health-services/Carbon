@@ -349,6 +349,7 @@ All functions are idempotent: when run multiple times with the same arguments, y
             ReleaseNotes = @'
 * Carbon should now imports in a few seconds.
 * Fixed: `Enable-CNtfsCompression` always enables compression even if compression is already enabled.
+* Fixed: `Disable-CNtfsCompression` always disables compression even if compression is already disabled.
 '@
         } # End of PSData hashtable
     

@@ -139,4 +139,13 @@ Describe 'Disable-NtfsCompression' {
         Assert-Compressed $childFile
     }
     
+    It 'should not decompress if already decompressed' {
+        Disable-CNtfsCompression -Path $rootDir  
+        Assert-NotCompressed $rootDir
+        Mock -CommandName 'Invoke-ConsoleCommand' -ModuleName 'Carbon'
+        Disable-CNtfsCompression -Path $rootDir
+        Assert-MockCalled 'Invoke-ConsoleCommand' -ModuleName 'Carbon' -Times 0
+        Disable-CNtfsCompression -Path $rootDir -Force
+        Assert-MockCalled 'Invoke-ConsoleCommand' -ModuleName 'Carbon' -Times 1
+    }
 }
