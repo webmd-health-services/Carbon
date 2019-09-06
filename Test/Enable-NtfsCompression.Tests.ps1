@@ -144,4 +144,13 @@ Describe 'Enable-NtfsCompression' {
         Assert-NotCompressed $childFile
     }
     
+    It 'should not compress if already compressed' {
+        Enable-CNtfsCompression -Path $rootDir  
+        Assert-Compressed $rootDir
+        Mock -CommandName 'Invoke-ConsoleCommand' -ModuleName 'Carbon'
+        Enable-CNtfsCompression -Path $rootDir
+        Assert-MockCalled 'Invoke-ConsoleCommand' -ModuleName 'Carbon' -Times 0
+        Enable-CNtfsCompression -Path $rootDir -Force
+        Assert-MockCalled 'Invoke-ConsoleCommand' -ModuleName 'Carbon' -Times 1
+    }
 }
