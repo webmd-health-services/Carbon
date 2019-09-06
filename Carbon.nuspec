@@ -44,7 +44,7 @@
 All functions are idempotent: when run multiple times with the same arguments, your system will be in the same state without failing or producing errors.</description>
     <language>en-us</language>
     <releaseNotes>$ReleaseNotes$</releaseNotes>
-    <copyright>Copyright 2011 - 2016 Aaron Jensen.</copyright>
+    <copyright>Aaron Jensen and WebMD Health Services</copyright>
     <tags>$Tags$</tags>
   </metadata>
   <files>
@@ -52,6 +52,7 @@ All functions are idempotent: when run multiple times with the same arguments, y
     <file src=".\examples\**\*" target="Examples" />
     <file src=".\Tools\chocolateyInstall.ps1" target="Tools" />
     <file src=".\Tools\chocolateyUninstall.ps1" target="Tools" />
+    <file src=".\Tools\VERIFICATION.md" target="Tools" />
     <file src=".\LICENSE.txt" target="" />
     <file src=".\NOTICE.txt" target="" />
     <file src=".\RELEASE NOTES.txt" target="" />

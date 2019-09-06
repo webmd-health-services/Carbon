@@ -26,9 +26,7 @@ $PSScriptRoot = Split-Path -Parent -Path $MyInvocation.MyCommand.Definition
 
 Add-Type -AssemblyName 'System.Security'
 
-. (Join-Path -Path $PSScriptRoot -ChildPath '..\Functions\Use-CallerPreference.ps1' -Resolve)
-. (Join-Path -Path $PSScriptRoot -ChildPath '..\Functions\Protect-String.ps1' -Resolve)
-. (Join-Path -Path $PSScriptRoot -ChildPath '..\Functions\Unprotect-String.ps1' -Resolve)
+Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath '..\Carbon.psd1' -Resolve)
 
 $string = Unprotect-CString -ProtectedString $ProtectedString
 Protect-CString -String $string -ForUser
