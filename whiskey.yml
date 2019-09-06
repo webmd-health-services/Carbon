@@ -71,6 +71,11 @@ Build:
             PSData:
                 ReleaseNotes: RELEASE_NOTES
                 Tags: TAGS
+- CopyFile:
+    Path:
+    - LICENSE.txt
+    - NOTICE.txt
+    DestinationDirectory: Carbon
 - NuGetPack:
     Path: Carbon.nuspec
     Properties:
@@ -81,8 +86,6 @@ Build:
     Path:
     - Carbon
     - examples
-    - LICENSE.txt: Carbon\LICENSE.txt
-    - NOTICE.txt: Carbon\NOTICE.txt
     Exclude:
     - "*.pdb"
     - "*.orig"
