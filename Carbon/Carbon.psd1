@@ -348,6 +348,7 @@ All functions are idempotent: when run multiple times with the same arguments, y
             # ReleaseNotes of this module
             ReleaseNotes = @'
 * Carbon should now import in less than a second.
+* Fixed: `Grant-CHttpUrlPermission` documentation uses command named `Grant-CHttpUrlAclPermission`. (Fixes [issue 66](https://github.com/webmd-health-services/Carbon/issues/66).)
 '@
         } # End of PSData hashtable
     
