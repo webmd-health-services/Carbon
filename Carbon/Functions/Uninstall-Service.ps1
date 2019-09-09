@@ -89,11 +89,28 @@ function Uninstall-CService
 
             if( $killService )
             {
-                Write-Verbose -Message ('[Uninstall-CService]  [{0}]  Killing service process "{1}".' -f $Name,$process.Id)
-                Stop-Process -Id $process.Id -Force
+                $attemptNum = 0
+                $maxAttempts = 100
+                $killed = $false
+                while( $attemptNum++ -lt $maxAttempts )
+                {
+                    Write-Verbose -Message ('[Uninstall-CService]  [{0}]  [Attempt {1,3} of {2}]  Killing service process "{3}".' -f $Name,$attemptNum,$maxAttempts,$process.Id)
+                    Stop-Process -Id $process.Id -Force -ErrorAction Ignore
+                    if( -not (Get-Process -Id $process.Id -ErrorAction Ignore) )
+                    {
+                        $killed = $true
+                        break
+                    }
+                    Start-Sleep -Milliseconds 100
+                }
+                if( -not $killed )
+                {
+                    Write-Error -Message ('Failed to kill "{0}" service process "{1}".' -f $Name,$process.Id) -ErrorAction $ErrorActionPreference
+                }
             }
         }
     }
+
 
     Write-Verbose -Message ('[Uninstall-CService]  [{0}]  {1} delete {0}' -f $Name,$sc)
     $output = & $sc delete $Name

@@ -351,6 +351,7 @@ All functions are idempotent: when run multiple times with the same arguments, y
 * Fixed: `Grant-CHttpUrlPermission` documentation uses command named `Grant-CHttpUrlAclPermission`. (Fixes [issue 66](https://github.com/webmd-health-services/Carbon/issues/66).)
 * Fixed: `Enable-CNtfsCompression` always enables compression even if compression is already enabled.
 * Fixed: `Disable-CNtfsCompression` always disables compression even if compression is already disabled.
+* Fixed: `Uninstall-CService` can write an error when a service's process exits at unexpected times.
 '@
         } # End of PSData hashtable
     
