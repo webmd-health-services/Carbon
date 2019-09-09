@@ -17,7 +17,7 @@ function Grant-CHttpUrlPermission
     Grant a principal permission to bind to an HTTP URL.
 
     .DESCRIPTION
-    The `Grant-HttpUrlAclPermission` functions uses the HTTP Server API to grant a user permission to bind to an HTTP URL.
+    The `Grant-CHttpUrlPermission` functions uses the HTTP Server API to grant a user permission to bind to an HTTP URL.
 
     [The HTTP Server API](https://msdn.microsoft.com/en-us/library/aa364510.aspx)
 
@@ -32,7 +32,7 @@ function Grant-CHttpUrlPermission
 
     This command replaces the `netsh http (add|delete) urlacl` command.
 
-    `Grant-HttpUrlAclPermission` was introduced in Carbon 2.1.0.
+    `Grant-CHttpUrlPermission` was introduced in Carbon 2.1.0.
 
     .LINK
     https://msdn.microsoft.com/en-us/library/aa364653.aspx
@@ -44,17 +44,17 @@ function Grant-CHttpUrlPermission
     Revoke-CHttpUrlPermission
 
     .EXAMPLE
-    Grant-HttpUrlAclPermission -Url 'http://+:4833' -Principal 'FALCON\HSolo' -Permission [Carbon.Security.HttpUrlAccessRights]::Listen
+    Grant-CHttpUrlPermission -Url 'http://+:4833' -Principal 'FALCON\HSolo' -Permission [Carbon.Security.HttpUrlAccessRights]::Listen
 
     Demonstrates how to grant a user permission to listen to (i.e. "bind" or "register") an HTTP URL. In this case user `FALCON\HSolo` can listen to `http://+:4833`.
 
     .EXAMPLE
-    Grant-HttpUrlAclPermission -Url 'http://+:4833' -Principal 'FALCON\HSolo' -Permission [Carbon.Security.HttpUrlAccessRights]::Delegate
+    Grant-CHttpUrlPermission -Url 'http://+:4833' -Principal 'FALCON\HSolo' -Permission [Carbon.Security.HttpUrlAccessRights]::Delegate
 
     Demonstrates how to grant a user permission to delegate an HTTP URL, but not the ability to bind to that URL. In this case user `FALCON\HSolo` can delegate `http://+:4833`, but can't bind to it.
 
     .EXAMPLE
-    Grant-HttpUrlAclPermission -Url 'http://+:4833' -Principal 'FALCON\HSolo' -Permission [Carbon.Security.HttpUrlAccessRights]::ListenAndDelegate
+    Grant-CHttpUrlPermission -Url 'http://+:4833' -Principal 'FALCON\HSolo' -Permission [Carbon.Security.HttpUrlAccessRights]::ListenAndDelegate
 
     Demonstrates how to grant a user permission to listen (i.e "bind" or "register") to *and* delegate an HTTP URL. In this case user `FALCON\HSolo` can listen to and delegate `http://+:4833`.
     #>
