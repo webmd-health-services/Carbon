@@ -77,17 +77,20 @@ Describe 'Add-GroupMember' {
     
     function Remove-Group
     {
-        $group = Get-Group
+        $group = Get-Group -Name $GroupName
         try
         {
-            if( $group -ne $null )
+            if( $group )
             {
                 net localgroup `"$GroupName`" /delete
             }
         }
         finally
         {
-            $group.Dispose()
+            if( $group )
+            {
+                $group.Dispose()
+            }
         }
     }
     
