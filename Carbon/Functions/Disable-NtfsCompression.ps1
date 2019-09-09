@@ -32,7 +32,7 @@ function Disable-CNtfsCompression
     .EXAMPLE
     Disable-CNtfsCompression -Path C:\Projects\Carbon
 
-    Turns off NTFS compression and decompresses the `C:\Projects\Carbon` directory (if compression is enabled), but not its sub-directories/files.  New files/directories will get compressed.
+    Turns off NTFS compression and decompresses the `C:\Projects\Carbon` directory (if compression is enabled), but not its sub-directories/files.
 
     .EXAMPLE
     Disable-CNtfsCompression -Path C:\Projects\Carbon -Recurse
@@ -42,7 +42,7 @@ function Disable-CNtfsCompression
     .EXAMPLE
     Disable-CNtfsCompression -Path C:\Projects\Carbon -Recurse -Force
 
-    Turns off NTFS compression and decompresses the `C:\Projects\Carbon` directory (even if compression is enabled) and all its sub-directories/sub-files.
+    Turns off NTFS compression and decompresses the `C:\Projects\Carbon` directory (even if compression is disabled) and all its sub-directories/sub-files.
 
     .EXAMPLE
     Get-ChildItem * | Where-Object { $_.PsIsContainer } | Disable-CNtfsCompression
