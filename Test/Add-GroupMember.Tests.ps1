@@ -10,181 +10,37 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+#Requires -Version 4.0
+#Requires -RunAsAdministrator
+Set-StrictMode -Version 'Latest'
+
 $GroupName = 'AddMemberToGroup'
 $user1 = $null
 $user2 = $null
 
-function Start-TestFixture
+& (Join-Path -Path $PSScriptRoot -ChildPath 'Import-CarbonForTest.ps1' -Resolve)
+$user1 = Install-User -Credential (New-Credential -UserName 'CarbonTestUser1' -Password 'P@ssw0rd!') -PassThru
+$user2 = Install-User -Credential (New-Credential -UserName 'CarbonTestUser2' -Password 'P@ssw0rd!') -PassThru
+
+function Assert-ContainsLike
 {
-    & (Join-Path -Path $PSScriptRoot -ChildPath '..\Import-CarbonForTest.ps1' -Resolve)
-    $user1 = Install-User -Credential (New-Credential -UserName 'CarbonTestUser1' -Password 'P@ssw0rd!') -PassThru
-    $user2 = Install-User -Credential (New-Credential -UserName 'CarbonTestUser2' -Password 'P@ssw0rd!') -PassThru
+    param(
+        [string]$Haystack,
+        [string]$Needle
+    )
+
+    $pattern = '*{0}*' -f $Needle
+    $Haystack |
+        Where-Object { $_ -like $pattern } |
+        Should -Not -BeNullOrEmpty
 }
 
-function Start-Test
+function Assert-MembersInGroup
 {
-    Install-Group -Name $GroupName -Description "Group for testing the Add-MemberToGroup Carbon function."
-}
+    param(
+        [string[]]$Member
+    )
 
-function Stop-Test
-{
-    Remove-Group
-}
-
-function Remove-Group
-{
-    $group = Get-Group
-    try
-    {
-        if( $group -ne $null )
-        {
-            net localgroup `"$GroupName`" /delete
-        }
-    }
-    finally
-    {
-        $group.Dispose()
-    }
-}
-
-function Get-LocalUsers
-{
-    return Get-WmiObject Win32_UserAccount -Filter "LocalAccount=True" |
-                Where-Object { $_.Name -ne $env:COMPUTERNAME }
-}
-
-function Invoke-AddMembersToGroup($Members = @())
-{
-    Add-GroupMember -Name $GroupName -Member $Members
-    Assert-MembersInGroup -Member $Members
-}
-
-if( (Get-WmiObject -Class 'Win32_ComputerSystem').Domain -eq 'WBMD' )
-{
-    function Test-ShouldAddMemberFromDomain
-    {
-        Invoke-AddMembersToGroup -Members 'WBMD\WHS - Lifecycle Services' 
-    }
-}
-
-function Test-ShouldAddLocalUser
-{
-    $users = Get-LocalUsers
-    if( -not $users )
-    {
-        Fail "This computer has no local user accounts."
-    }
-    $addedAUser = $false
-    foreach( $user in $users )
-    {
-        Invoke-AddMembersToGroup -Members $user.Name
-        $addedAUser = $true
-        break
-    }
-    Assert-True $addedAuser
-}
-
-function Test-ShouldAddMultipleMembers
-{
-    $members = @( $user1.SamAccountName, $user2.SamAccountName )
-    Invoke-AddMembersToGroup -Members $members
-}
-
-function Test-ShouldSupportShouldProcess
-{
-    Add-GroupMember -Name $GroupName -Member $user1.SamAccountName -WhatIf
-    $details = net localgroup $GroupName
-    foreach( $line in $details )
-    {
-        Assert-False ($details -like ('*{0}*' -f $user1.SamAccountName))
-    }
-}
-
-function Test-ShouldAddNetworkService
-{
-    Add-GroupMember -Name $GroupName -Member 'NetworkService'
-    $details = net localgroup $GroupName
-    Assert-ContainsLike $details 'NT AUTHORITY\Network Service'
-}
-
-function Test-ShouldDetectIfNetworkServiceAlreadyMemberOfGroup
-{
-    Add-GroupMember -Name $GroupName -Member 'NetworkService'
-    Add-GroupMember -Name $GroupName -Member 'NetworkService'
-    Assert-Equal 0 $Error.Count
-}
-
-function Test-ShouldAddAdministrators
-{
-    Add-GroupMember -Name $GroupName -Member 'Administrators'
-    $details = net localgroup $GroupName
-    Assert-ContainsLike $details 'Administrators'
-}
-
-function Test-ShouldDetectIfAdministratorsAlreadyMemberOfGroup
-{
-    Add-GroupMember -Name $GroupName -Member 'Administrators'
-    Add-GroupMember -Name $GroupName -Member 'Administrators'
-    Assert-Equal 0 $Error.Count
-}
-
-function Test-ShouldAddAnonymousLogon
-{
-    Add-GroupMember -Name $GroupName -Member 'ANONYMOUS LOGON'
-    $details = net localgroup $GroupName
-    Assert-ContainsLike $details 'NT AUTHORITY\ANONYMOUS LOGON'
-}
-
-function Test-ShouldDetectIfAnonymousLogonAlreadyMemberOfGroup
-{
-    Add-GroupMember -Name $GroupName -Member 'ANONYMOUS LOGON'
-    Add-GroupMember -Name $GroupName -Member 'ANONYMOUS LOGON'
-    Assert-Equal 0 $Error.Count
-}
-
-function Test-ShouldAddEveryone
-{
-    Add-GroupMember -Name $GroupName -Member 'Everyone'
-    Assert-Equal 0 $Error.Count
-    Assert-MembersInGroup 'Everyone'
-}
-
-function Test-ShouldAddNTServiceAccounts
-{
-    if( (Test-Identity -Name 'NT Service\Fax') )
-    {
-        Add-GroupMember -Name $GroupName -Member 'NT SERVICE\Fax'
-        Assert-Equal 0 $Error.Count
-        Assert-MembersInGroup 'NT SERVICE\Fax'
-    }
-}
-
-function Test-ShouldRefuseToAddLocalGroupToLocalGroup
-{
-    Add-GroupMember -Name $GroupName -Member $GroupName -ErrorAction SilentlyContinue
-    Assert-Equal 2 $Error.Count
-    Assert-Like $Error[0].Exception.Message '*Failed to add*'
-}
-
-function Test-ShouldNotAddNonExistentMember
-{
-    $Error.Clear()
-    $groupBefore = Get-Group -Name $GroupName
-    try
-    {
-        Add-GroupMember -Name $GroupName -Member 'FJFDAFJ' -ErrorAction SilentlyContinue
-        Assert-Equal 1 $Error.Count
-        $groupAfter = Get-Group -Name $GroupName
-        Assert-Equal $groupBefore.Members.Count $groupAfter.Members.Count
-    }
-    finally
-    {
-        $groupBefore.Dispose()
-    }
-}
-
-function Assert-MembersInGroup($Members)
-{
     $group = Get-Group -Name $GroupName
     if( -not $group )
     {
@@ -193,13 +49,13 @@ function Assert-MembersInGroup($Members)
 
     try
     {
-        Assert-NotNull $group 'Group not created.'
-        $Members | 
+        $group | Should -Not -BeNullOrEmpty
+        $Member | 
             ForEach-Object { Resolve-Identity -Name $_ } |
             ForEach-Object { 
                 $identity = $_
-                $member = $group.Members | Where-Object { $_.Sid -eq $identity.Sid }
-                Assert-NotNull $member ('Member ''{0}'' not a member of group ''{1}''' -f $identity.FullName,$group.Name)
+                $members = $group.Members | Where-Object { $_.Sid -eq $identity.Sid }
+                $members | Should -Not -BeNullOrEmpty
             }
     }
     finally
@@ -208,3 +64,153 @@ function Assert-MembersInGroup($Members)
     }
 }
 
+Describe 'Add-GroupMember' {
+    
+    BeforeEach {
+        $Global:Error.Clear()
+        Install-Group -Name $GroupName -Description "Group for testing the Add-MemberToGroup Carbon function."
+    }
+    
+    AfterEach {
+        Remove-Group
+    }
+    
+    function Remove-Group
+    {
+        $group = Get-Group
+        try
+        {
+            if( $group -ne $null )
+            {
+                net localgroup `"$GroupName`" /delete
+            }
+        }
+        finally
+        {
+            $group.Dispose()
+        }
+    }
+    
+    function Get-LocalUsers
+    {
+        return Get-WmiObject Win32_UserAccount -Filter "LocalAccount=True" |
+                    Where-Object { $_.Name -ne $env:COMPUTERNAME }
+    }
+    
+    function Invoke-AddMembersToGroup($Members = @())
+    {
+        Add-GroupMember -Name $GroupName -Member $Members
+        Assert-MembersInGroup -Member $Members
+    }
+    
+    if( (Get-WmiObject -Class 'Win32_ComputerSystem').Domain -eq 'WBMD' )
+    {
+        It 'should add member from domain' {
+            Invoke-AddMembersToGroup -Members 'WBMD\WHS - Lifecycle Services' 
+        }
+    }
+    
+    It 'should add local user' {
+        $users = Get-LocalUsers
+        if( -not $users )
+        {
+            Fail "This computer has no local user accounts."
+        }
+        $addedAUser = $false
+        foreach( $user in $users )
+        {
+            Invoke-AddMembersToGroup -Members $user.Name
+            $addedAUser = $true
+            break
+        }
+        $addedAuser | Should -BeTrue
+    }
+    
+    It 'should add multiple members' {
+        $members = @( $user1.SamAccountName, $user2.SamAccountName )
+        Invoke-AddMembersToGroup -Members $members
+    }
+    
+    It 'should support should process' {
+        Add-GroupMember -Name $GroupName -Member $user1.SamAccountName -WhatIf
+        $details = net localgroup $GroupName
+        foreach( $line in $details )
+        {
+            ($details -like ('*{0}*' -f $user1.SamAccountName)) | Should -BeFalse
+        }
+    }
+    
+    It 'should add network service' {
+        Add-GroupMember -Name $GroupName -Member 'NetworkService'
+        $details = net localgroup $GroupName
+        Assert-ContainsLike $details 'NT AUTHORITY\Network Service'
+    }
+    
+    It 'should detect if network service already member of group' {
+        Add-GroupMember -Name $GroupName -Member 'NetworkService'
+        Add-GroupMember -Name $GroupName -Member 'NetworkService'
+        $Error.Count | Should -Be 0
+    }
+    
+    It 'should add administrators' {
+        Add-GroupMember -Name $GroupName -Member 'Administrators'
+        $details = net localgroup $GroupName
+        Assert-ContainsLike $details 'Administrators'
+    }
+    
+    It 'should detect if administrators already member of group' {
+        Add-GroupMember -Name $GroupName -Member 'Administrators'
+        Add-GroupMember -Name $GroupName -Member 'Administrators'
+        $Error.Count | Should -Be 0
+    }
+    
+    It 'should add anonymous logon' {
+        Add-GroupMember -Name $GroupName -Member 'ANONYMOUS LOGON'
+        $details = net localgroup $GroupName
+        Assert-ContainsLike $details 'NT AUTHORITY\ANONYMOUS LOGON'
+    }
+    
+    It 'should detect if anonymous logon already member of group' {
+        Add-GroupMember -Name $GroupName -Member 'ANONYMOUS LOGON'
+        Add-GroupMember -Name $GroupName -Member 'ANONYMOUS LOGON'
+        $Error.Count | Should -Be 0
+    }
+    
+    It 'should add everyone' {
+        Add-GroupMember -Name $GroupName -Member 'Everyone'
+        $Error.Count | Should -Be 0
+        Assert-MembersInGroup 'Everyone'
+    }
+    
+    It 'should add NT service accounts' {
+        if( (Test-Identity -Name 'NT Service\Fax') )
+        {
+            Add-GroupMember -Name $GroupName -Member 'NT SERVICE\Fax'
+            $Error.Count | Should -Be 0
+            Assert-MembersInGroup 'NT SERVICE\Fax'
+        }
+    }
+    
+    It 'should refuse to add local group to local group' {
+        Add-GroupMember -Name $GroupName -Member $GroupName -ErrorAction SilentlyContinue
+        $Error.Count | Should -Be 2
+        $Error[0].Exception.Message | Should -BeLike '*Failed to add*'
+    }
+    
+    It 'should not add non existent member' {
+        $Error.Clear()
+        $groupBefore = Get-Group -Name $GroupName
+        try
+        {
+            Add-GroupMember -Name $GroupName -Member 'FJFDAFJ' -ErrorAction SilentlyContinue
+            $Error.Count | Should -Be 1
+            $groupAfter = Get-Group -Name $GroupName
+            $groupAfter.Members.Count | Should -Be $groupBefore.Members.Count
+        }
+        finally
+        {
+            $groupBefore.Dispose()
+        }
+    }
+    
+}
