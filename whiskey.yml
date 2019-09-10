@@ -48,11 +48,14 @@ Build:
     OnlyBy: BuildServer
     Path: 
     - Carbon\Functions\*.ps1
+    - Carbon\Carbon.psm1.Import.Iis.ps1
+    - Carbon\Carbon.psm1.Import.Lcm.ps1
+    - Carbon\Carbon.psm1.Import.Post.ps1
     Exclude:
     - "*\\*-Iis*"
     - "*\\Initialize-Lcm.ps1"
     - "*\\Use-CallerPreference.ps1"
-    DestinationPath: Carbon\Functions\Functions.ps1
+    DestinationPath: Carbon\Carbon.psm1
     TextSeparator: "$(NewLine)$(NewLine)"
     DeleteSourceFiles: true
 - MergeFile:
