@@ -55,14 +55,6 @@ Get-ChildItem -Path (Join-Path -Path $carbonAssemblyDir -ChildPath '*') -Filter 
 # COM
 $ComRegKeyPath = 'hklm:\software\microsoft\ole'
 
-# Cryptography
-Write-Timing ('Adding System.Security assembly.')
-Add-Type -AssemblyName 'System.Security'
-
-# FileSystem
-Write-Timing ('Adding Ionic.Zip assembly.')
-Add-Type -Path (Join-Path -Path $CarbonBinDir -ChildPath 'Ionic.Zip.dll' -Resolve)
-
 # IIS
 $exportIisFunctions = $false
 if( (Test-Path -Path 'env:SystemRoot') )
@@ -83,21 +75,11 @@ if( (Test-Path -Path 'env:SystemRoot') )
     }
 }
 
-# MSMQ
-if( $IsWindows )
-{
-    Write-Timing ('Adding System.ServiceProcess assembly.')
-    Add-Type -AssemblyName 'System.ServiceProcess'
-    Write-Timing ('Adding System.Messaging assembly.')
-    Add-Type -AssemblyName 'System.Messaging'
-}
+Write-Timing ('Adding System.ServiceProcess assembly.')
+Add-Type -AssemblyName 'System.ServiceProcess'
 
 #PowerShell
 $TrustedHostsPath = 'WSMan:\localhost\Client\TrustedHosts'
-
-# Services
-Write-Timing ('Adding System.ServiceProcess assembly.')
-Add-Type -AssemblyName 'System.ServiceProcess'
 
 # Users and Groups
 Write-Timing ('Adding System.DirectoryServices.AccountManagement assembly.')

@@ -172,8 +172,9 @@ filter Protect-CString
     )
     
     Set-StrictMode -Version 'Latest'
-
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
+    Add-Type -AssemblyName 'System.Security'
 
     if( $String -is [System.Security.SecureString] )
     {

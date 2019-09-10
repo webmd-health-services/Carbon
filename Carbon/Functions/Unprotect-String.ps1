@@ -145,9 +145,10 @@ filter Unprotect-CString
     )
 
     Set-StrictMode -Version 'Latest'
-
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
-        
+    
+    Add-Type -AssemblyName 'System.Security'
+    
     [byte[]]$encryptedBytes = [Convert]::FromBase64String($ProtectedString)
     if( $PSCmdlet.ParameterSetName -eq 'DPAPI' )
     {

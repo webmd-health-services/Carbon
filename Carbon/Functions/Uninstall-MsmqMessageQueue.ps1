@@ -42,8 +42,9 @@ function Uninstall-CMsmqMessageQueue
     )
     
     Set-StrictMode -Version 'Latest'
-
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
+    Add-Type -AssemblyName 'System.Messaging'
 
     $commonArgs = @{ 'Name' = $Name ; 'Private' = $Private }
     

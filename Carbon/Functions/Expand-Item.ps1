@@ -65,8 +65,9 @@ function Expand-CItem
     )
 
     Set-StrictMode -Version 'Latest'
-
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
+    Add-Type -Path (Join-Path -Path $CarbonBinDir -ChildPath 'Ionic.Zip.dll' -Resolve)
 
     $Path = Resolve-Path -Path $Path | Select-Object -ExpandProperty 'ProviderPath'
     if( -not $Path )

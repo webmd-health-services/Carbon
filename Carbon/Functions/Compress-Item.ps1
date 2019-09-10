@@ -76,8 +76,9 @@ function Compress-CItem
     begin
     {
         Set-StrictMode -Version 'Latest'
-
         Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
+        Add-Type -Path (Join-Path -Path $CarbonBinDir -ChildPath 'Ionic.Zip.dll' -Resolve)
 
         $zipFile = $null
         $fullPaths = New-Object -TypeName 'Collections.Generic.List[string]'

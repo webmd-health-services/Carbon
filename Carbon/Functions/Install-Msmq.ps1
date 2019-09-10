@@ -49,7 +49,6 @@ function Install-CMsmq
     )
     
     Set-StrictMode -Version 'Latest'
-
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
     Write-Warning -Message ('Install-CMsmq is obsolete and will be removed in a future major version of Carbon.')

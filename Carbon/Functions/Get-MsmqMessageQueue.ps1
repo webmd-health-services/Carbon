@@ -47,8 +47,9 @@ function Get-CMsmqMessageQueue
     )
    
     Set-StrictMode -Version 'Latest'
-
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
+    Add-Type -AssemblyName 'System.Messaging'
 
     $privateArg = @{ Private = $Private }
     
