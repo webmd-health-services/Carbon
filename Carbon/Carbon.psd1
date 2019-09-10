@@ -352,7 +352,8 @@ All functions are idempotent: when run multiple times with the same arguments, y
 * Fixed: `Enable-CNtfsCompression` always enables compression even if compression is already enabled.
 * Fixed: `Disable-CNtfsCompression` always disables compression even if compression is already disabled.
 * Fixed: `Uninstall-CService` can write an error when a service's process exits at unexpected times.
-* Fixed: `Get-CUser` can sometimes take 60 to 90 seconds to lookup single users.
+* Fixed: `Get-CUser` can sometimes take 60 to 90 seconds to lookup a specific user.
+* Fixed: `Get-CGroup` can sometimes take 60 to 90 seconds to lookup a specific group.
 '@
         } # End of PSData hashtable
     
