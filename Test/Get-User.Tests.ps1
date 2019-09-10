@@ -58,6 +58,16 @@ Describe 'Get-User' {
         $user = Get-User -Username 'fjksdjfkldj' -ErrorAction SilentlyContinue
         $user | Should -BeNullOrEmpty
         $Error.Count | Should -Be 1
-        Assert-Like $Error[0].Exception.Message '*not found*'
+        $Error[0].Exception.Message | Should -BeLike '*not found*'
+    }
+
+    It 'should get users if WhatIfPreference is true' {
+        $WhatIfPreference = $true
+        $users = Get-CUser 
+        $users | Should -Not -BeNullOrEmpty
+        $users | 
+            Select-Object -First 1 | 
+            ForEach-Object { Get-CUser -UserName $_.SamAccountName } | 
+            Should -Not -BeNullOrEmpty
     }
 }

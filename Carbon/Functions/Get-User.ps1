@@ -49,13 +49,15 @@ function Get-CUser
     [OutputType([System.DirectoryServices.AccountManagement.UserPrincipal])]
     param(
         [ValidateLength(1,20)]
-        [string]
         # The username for the user.
-        $UserName 
+        [string]$UserName 
     )
 
     Set-StrictMode -Version 'Latest'
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
+    # Tee-Object won't set its variable if WhatIfPreference is $true.
+    $WhatIfPreference = $false
 
     Write-Timing 'Get-CUser  Start'
     

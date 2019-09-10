@@ -48,6 +48,9 @@ function Get-CGroup
 
     Set-StrictMode -Version 'Latest'
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
+    # Tee-Object won't set its variable if WhatIfPreference is $true.
+    $WhatIfPreference = $false
     
     $ctx = New-Object 'DirectoryServices.AccountManagement.PrincipalContext' ([DirectoryServices.AccountManagement.ContextType]::Machine)
     $query = New-Object 'DirectoryServices.AccountManagement.GroupPrincipal' $ctx
