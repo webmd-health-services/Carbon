@@ -32,13 +32,15 @@ if( -not (Test-CUser -Username $CarbonTestUser.UserName) )
     Install-CUser -Credential $CarbonTestUser -Description 'User used during Carbon tests.'
 
     $usedCredential = $false
-    while( -not $usedCredential )
+    while( $usedCredential -ne $CarbonTestUser.UserName )
     {
         try
         {
             Write-Verbose -Message ('Attempting to launch process as "CarbonTestUser".') -Verbose
-            Start-Process 'whoami' -Credential $CarbonTestUser -NoNewWindow -Wait
-            $usedCredential = $true
+            $usedCredential = 
+                Start-Job -ScriptBlock { [Environment]::UserName } -Credential $CarbonTestUser  | 
+                Wait-Job |
+                Receive-Job
         }
         catch 
         {
