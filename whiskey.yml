@@ -119,7 +119,6 @@ Tests:
 - TaskDefaults:
     Pester4:
         DescribeDurationReportCount: 20
-        Version: 4.8.*
 - PowerShell:
     OnlyDuring: Build
     Path: Start-CarbonTest.ps1
