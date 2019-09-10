@@ -12,13 +12,27 @@
 
 Set-StrictMode -Version 'Latest'
 
-Describe "Install-Certificate" {
-
-    $TestCertPath = Join-Path -Path $PSScriptRoot -ChildPath 'Certificates\CarbonTestCertificate.cer' -Resolve
-    $TestCert = New-Object 'Security.Cryptography.X509Certificates.X509Certificate2' $TestCertPath
-    $TestCertProtectedPath = Join-Path -Path $PSScriptRoot -ChildPath 'Certificates\CarbonTestCertificateWithPassword.cer' -Resolve
-    $TestCertProtected = New-Object 'Security.Cryptography.X509Certificates.X509Certificate2' $TestCertProtectedPath,'password'
+$TestCertPath = Join-Path -Path $PSScriptRoot -ChildPath 'Certificates\CarbonTestCertificate.cer' -Resolve
+$TestCert = New-Object 'Security.Cryptography.X509Certificates.X509Certificate2' $TestCertPath
+$TestCertProtectedPath = Join-Path -Path $PSScriptRoot -ChildPath 'Certificates\CarbonTestCertificateWithPassword.cer' -Resolve
+$TestCertProtected = New-Object 'Security.Cryptography.X509Certificates.X509Certificate2' $TestCertProtectedPath,'password'
+Write-Verbose -Message ('BEGIN!') -Verbose
+try
+{
     & (Join-Path -Path $PSScriptRoot -ChildPath 'Import-CarbonForTest.ps1' -Resolve)
+    Write-Verbose -Message ('SUCCESS!') -Verbose
+}
+catch
+{
+    $Global:Error | Format-List * -Force | Out-String | Write-Verbose -Verbose
+}
+finally
+{
+    Write-Verbose 'FINALLY!' -Verbose
+}
+Write-Verbose 'END!' -Verbose
+
+Describe "Install-Certificate" {
 
     function Assert-CertificateInstalled
     {
