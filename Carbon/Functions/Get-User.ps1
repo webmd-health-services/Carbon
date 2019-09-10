@@ -17,7 +17,7 @@ function Get-CUser
     Gets *local* users.
 
     .DESCRIPTION
-    `Get-CUser` gets all *local* users. Use the `UserName` parameter to get  a specific user by its username.
+    `Get-CUser` gets all *local* users. Use the `UserName` parameter to get a specific user by its username.
 
     The objects returned by `Get-CUser` are instances of `System.DirectoryServices.AccountManagement.UserPrincipal`. These objects use external resources, which, if they are disposed of correctly, will cause memory leaks. When you're done using the objects returne by `Get-CUser`, call `Dispose()` on each one to clean up its external resources.
 
@@ -56,40 +56,47 @@ function Get-CUser
 
     Set-StrictMode -Version 'Latest'
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
+    Write-Timing 'Get-CUser  Start'
     
+    Write-Timing ('           Creating searcher')
     $ctx = New-Object 'DirectoryServices.AccountManagement.PrincipalContext' ([DirectoryServices.AccountManagement.ContextType]::Machine)
-    if( $Username )
+    $query = New-Object 'DirectoryServices.AccountManagement.UserPrincipal' $ctx
+    $searcher = New-Object 'DirectoryServices.AccountManagement.PrincipalSearcher' $query
+    try
     {
-        $userToFind = New-Object 'DirectoryServices.AccountManagement.UserPrincipal' $ctx
-        $userToFind.SamAccountName = $UserName
-        $searcher = New-Object 'DirectoryServices.AccountManagement.PrincipalSearcher' $userToFind
-        $user = $searcher.FindOne()
-        if( -not $user )
+        $users = @()
+
+        Write-Timing ('           FindAll()  Start')
+        $searcher.FindAll() |
+            Where-Object {
+                if( $UserName )
+                {
+                    return $_.SamAccountName -eq $UserName
+                }
+                return $true
+            } |
+            Tee-Object -Variable 'users'
+        Write-Timing ('           FindAll()  Done')
+
+        if( $UserName )
         {
-            # Fallback. PrincipalSearch can't find some users.
-            $ctx.Dispose()
-            $ctx = New-Object 'DirectoryServices.AccountManagement.PrincipalContext' ([DirectoryServices.AccountManagement.ContextType]::Machine)
-            $user = [DirectoryServices.AccountManagement.UserPrincipal]::FindByIdentity( $ctx, $Username )
-            if( -not $user )
+            $usersCount = $users | Measure-Object | Select-Object -ExpandProperty 'Count'
+            if( $usersCount -gt 1 )
             {
-                Write-Error ('Local user "{0}" not found.' -f $Username) -ErrorAction:$ErrorActionPreference
-                return
+                Write-Error -Message ('Found {0} users with username "{1}".' -f $userCount,$UserName) -ErrorAction $ErrorActionPreference
+            }
+            if( $usersCount -eq 0 )
+            {
+                Write-Error -Message ('Local user "{0}" not found.' -f $Username) -ErrorAction:$ErrorActionPreference
             }
         }
-        return $user
     }
-    else
+    finally
     {
-        $query = New-Object 'DirectoryServices.AccountManagement.UserPrincipal' $ctx
-        $searcher = New-Object 'DirectoryServices.AccountManagement.PrincipalSearcher' $query
-        try
-        {
-            $searcher.FindAll() 
-        }
-        finally
-        {
-            $searcher.Dispose()
-            $query.Dispose()
-        }
+        Write-Timing ('           Finally')
+        $searcher.Dispose()
+        $query.Dispose()
     }
+    Write-Timing ('Get-CUser  Done')
 }
