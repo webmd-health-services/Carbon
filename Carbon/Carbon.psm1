@@ -78,6 +78,11 @@ if( (Test-Path -Path 'env:SystemRoot') )
 Write-Timing ('Adding System.ServiceProcess assembly.')
 Add-Type -AssemblyName 'System.ServiceProcess'
 
+if( $IsWindows )
+{
+    Add-Type -AssemblyName 'System.Messaging'
+}
+
 #PowerShell
 $TrustedHostsPath = 'WSMan:\localhost\Client\TrustedHosts'
 

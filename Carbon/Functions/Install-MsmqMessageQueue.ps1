@@ -39,8 +39,6 @@ function Install-CMsmqMessageQueue
     Set-StrictMode -Version 'Latest'
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
-    Add-Type -AssemblyName 'System.Messaging'
-
     $queueArgs = @{ Name = $Name ; Private = $Private }
     $path = Get-CMsmqMessageQueuePath @queueArgs 
     
