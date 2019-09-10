@@ -23,3 +23,27 @@ if( $env:COMPUTERNAME -eq $env:USERNAME )
 
 $carbonRoot = Join-Path -Path $PSScriptRoot -ChildPath '..\Carbon' -Resolve
 & (Join-Path -Path $carbonRoot -ChildPath 'Import-Carbon.ps1' -Resolve)
+
+$password = 'Tt6QML1lmDrFSf'
+[pscredential]$global:CarbonTestUser = New-Credential 'CarbonTestUser' -Password $password
+
+if( -not (Test-CUser -Username $CarbonTestUser.UserName) )
+{
+    Install-CUser -Credential $CarbonTestUser -Description 'User used during Carbon tests.'
+
+    $usedCredential = $false
+    while( -not $usedCredential )
+    {
+        try
+        {
+            Write-Verbose -Message ('Attempting to launch process as "CarbonTestUser".') -Verbose
+            Start-Process 'whoami' -Credential $CarbonTestUser -NoNewWindow -Wait
+            $usedCredential = $true
+        }
+        catch 
+        {
+            Start-Sleep -Milliseconds 100
+        }
+    }
+
+}

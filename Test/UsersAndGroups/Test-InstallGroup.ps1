@@ -10,15 +10,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+& (Join-Path -Path $PSScriptRoot -ChildPath '..\Import-CarbonForTest.ps1' -Resolve)
+
 $GroupName = 'Setup Group'
-$userName = 'CarbonTestUser'
+$userName = $CarbonTestUser.UserName
 $password = '1M33tRequirement$'
 $description = 'Carbon user for use in Carbon tests.'
-
-function Start-TestFixture
-{
-    & (Join-Path -Path $PSScriptRoot -ChildPath '..\Import-CarbonForTest.ps1' -Resolve)
-}
 
 function Start-Test
 {

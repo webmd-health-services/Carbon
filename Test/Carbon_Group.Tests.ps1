@@ -16,7 +16,7 @@ Describe 'Carbon_Group' {
     & (Join-Path -Path $PSScriptRoot -ChildPath '..\Carbon\Import-Carbon.ps1' -Resolve)
 
     $groupName = 'CarbonGroupTest'
-    $username1 = 'CarbonTestUser'
+    $username1 = $CarbonTestUser.UserName
     $username2 = 'CarbonTestUser2'
     $username3 = 'CarbonTestUser3'
     $user1 = $null
@@ -25,7 +25,7 @@ Describe 'Carbon_Group' {
     $description = 'Group for testing Carbon''s Group DSC resource.'
 
     Start-CarbonDscTestFixture 'Group'
-    $user1 = Install-User -Credential (New-Credential -UserName $username1 -Password 'P@ssw0rd1') -Description 'Carbon test user' -PassThru
+    $user1 = Resolve-CIdentity -UserName $CarbonTestUser.UserName
     $user2 = Install-User -Credential (New-Credential -UserName $username2 -Password 'P@ssw0rd1') -Description 'Carbon test user' -PassThru
     $user3 = Install-User -Credential (New-Credential -UserName $username3 -Password 'P@ssw0rd1') -Description 'Carbon test user' -PassThru
     Install-Group -Name $groupName -Description $description -Member $username1,$username2

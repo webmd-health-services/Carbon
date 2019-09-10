@@ -11,7 +11,7 @@
 # limitations under the License.
 
 $tempDir = $null
-$identity = 'CarbonTestUser'
+$identity = $null
 $dirPath = $null
 $filePath = $null
 $tempKeyPath = $null
@@ -23,7 +23,7 @@ function Start-TestFixture
 {
     & (Join-Path -Path $TestDir -ChildPath '..\Import-CarbonForTest.ps1' -Resolve)
 
-    Install-User -Username $identity -Password 'Password1' -Description 'Carbon test user.'
+    $script:identity = $CarbonTestUser.UserName
     $tempDir = New-TempDirectoryTree -Prefix 'Carbon-Test-TestPermission' @'
 + Directory
   * File

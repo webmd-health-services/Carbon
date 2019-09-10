@@ -15,11 +15,10 @@
 Set-StrictMode -Version 'Latest'
 
 $GroupName = 'AddMemberToGroup'
-$user1 = $null
 $user2 = $null
 
 & (Join-Path -Path $PSScriptRoot -ChildPath 'Import-CarbonForTest.ps1' -Resolve)
-$user1 = Install-User -Credential (New-Credential -UserName 'CarbonTestUser1' -Password 'P@ssw0rd!') -PassThru
+$user1 = $CarbonTestUser
 $user2 = Install-User -Credential (New-Credential -UserName 'CarbonTestUser2' -Password 'P@ssw0rd!') -PassThru
 
 function Assert-ContainsLike
@@ -130,16 +129,16 @@ Describe 'Add-GroupMember' {
     }
     
     It 'should add multiple members' {
-        $members = @( $user1.SamAccountName, $user2.SamAccountName )
+        $members = @( $user1.UserName, $user2.SamAccountName )
         Invoke-AddMembersToGroup -Members $members
     }
     
     It 'should support should process' {
-        Add-GroupMember -Name $GroupName -Member $user1.SamAccountName -WhatIf
+        Add-GroupMember -Name $GroupName -Member $user1.UserName -WhatIf
         $details = net localgroup $GroupName
         foreach( $line in $details )
         {
-            ($details -like ('*{0}*' -f $user1.SamAccountName)) | Should -BeFalse
+            ($details -like ('*{0}*' -f $user1.UserName)) | Should -BeFalse
         }
     }
     

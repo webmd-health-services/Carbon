@@ -17,8 +17,7 @@ $url = 'http://test-revokehttpurlpermission:10383/'
 
 function Start-Test
 {
-    Install-User -Credential (New-Credential -UserName 'CarbonTestUser' -Password 'Password1')
-    $user = Resolve-Identity -Name 'CarbonTestUser'
+    $user = Resolve-Identity -Name $CarbonTestUser.UserName
     Grant-HttpUrlPermission -Url $url -Principal $user.FullName -Permission Listen
 }
 

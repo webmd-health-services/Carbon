@@ -16,15 +16,8 @@ $publicKeyFilePath = Join-Path -Path $PSScriptRoot -ChildPath 'Cryptography\Carb
 $privateKeyFilePath = Join-Path -Path $PSScriptRoot -ChildPath 'Cryptography\CarbonTestPrivateKey.pfx' -Resolve
 $dsaKeyPath = Join-Path -Path $PSScriptRoot -ChildPath 'Cryptography\CarbonTestDsaKey.cer' -Resolve
 & (Join-Path -Path $PSScriptRoot -ChildPath 'Import-CarbonForTest.ps1' -Resolve)
-$credential = $null
 
 Describe 'Protect-String' {
-
-    BeforeAll {
-        $password = 'Tt6QML1lmDrFSf'
-        $credential = New-Credential 'CarbonTestUser' -Password $password
-        Install-User -Credential $credential -Description 'Carbon test user.'    
-    }
 
     BeforeEach {
         $Global:Error.Clear()
@@ -61,12 +54,12 @@ Describe 'Protect-String' {
         It 'should protect string for credential' {
             # special chars to make sure they get handled correctly
             $string = ' f u b a r '' " > ~!@#$%^&*()_+`-={}|:"<>?[]\;,./'
-            $protectedString = Protect-String -String $string -Credential $credential
-            $protectedString | Should Not BeNullOrEmpty ('Failed to protect a string as user {0}.' -f $credential.UserName)
+            $protectedString = Protect-String -String $string -Credential $CarbonTestUser
+            $protectedString | Should Not BeNullOrEmpty ('Failed to protect a string as user {0}.' -f $CarbonTestUser.UserName)
     
             $decrypedString = Invoke-PowerShell -FilePath (Join-Path -Path $PSScriptRoot -ChildPath 'Cryptography\Unprotect-String.ps1') `
                                                 -ArgumentList '-ProtectedString',$protectedString `
-                                                -Credential $credential
+                                                -Credential $CarbonTestUser
             $decrypedString | Should Be $string
         }
 
@@ -82,7 +75,7 @@ Describe 'Protect-String' {
                     Import-Module $junctionPath
                     try
                     {
-                        $ciphertext = Protect-String -String 'fubar' -Credential $credential
+                        $ciphertext = Protect-String -String 'fubar' -Credential $CarbonTestUser
                         $Global:Error.Count | Should Be 0
                         Assert-IsBase64EncodedString $ciphertext
                     }
