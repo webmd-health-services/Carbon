@@ -80,6 +80,7 @@ Add-Type -AssemblyName 'System.ServiceProcess'
 
 if( $IsWindows )
 {
+    Write-Timing ('Adding System.ServiceProcess assembly.')
     Add-Type -AssemblyName 'System.Messaging'
 }
 
@@ -110,5 +111,6 @@ foreach( $developerImport in $developerImports )
         continue
     }
 
+    Write-Timing ('Dot-sourcing "{0}".' -f $developerImport)
     . $developerImport
 }
