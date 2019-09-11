@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-& (Join-Path $TestDir ..\Import-CarbonForTest.ps1 -Resolve)
+& (Join-Path $TestDir ..\Initialize-CarbonTest.ps1 -Resolve)
 
 # Only administratos can update trusted hosts.
 if( Test-AdminPrivilege )

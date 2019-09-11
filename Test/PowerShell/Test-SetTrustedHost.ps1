@@ -17,7 +17,7 @@ if( Test-AdminPrivilege )
 
     function Start-TestFixture
     {
-        & (Join-Path -Path $PSScriptRoot -ChildPath '..\Import-CarbonForTest.ps1' -Resolve)
+        & (Join-Path -Path $PSScriptRoot -ChildPath '..\Initialize-CarbonTest.ps1' -Resolve)
     }
 
     function Start-Test

@@ -20,7 +20,7 @@ $dsaKeyPath = Join-Path -Path $PSScriptRoot -ChildPath 'CarbonTestDsaKey.cer' -R
 
 function Start-TestFixture
 {
-    & (Join-Path -Path $PSScriptRoot '..\Import-CarbonForTest.ps1' -Resolve)
+    & (Join-Path -Path $PSScriptRoot '..\Initialize-CarbonTest.ps1' -Resolve)
 
     $rsaCipherText = Protect-String -String $secret -PublicKeyPath $privateKeyPath
 }

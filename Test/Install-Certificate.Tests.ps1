@@ -18,7 +18,7 @@ Describe "Install-Certificate" {
     $TestCert = New-Object 'Security.Cryptography.X509Certificates.X509Certificate2' $TestCertPath
     $TestCertProtectedPath = Join-Path -Path $PSScriptRoot -ChildPath 'Certificates\CarbonTestCertificateWithPassword.cer' -Resolve
     $TestCertProtected = New-Object 'Security.Cryptography.X509Certificates.X509Certificate2' $TestCertProtectedPath,'password'
-    & (Join-Path -Path $PSScriptRoot -ChildPath 'Import-CarbonForTest.ps1' -Resolve)
+    & (Join-Path -Path $PSScriptRoot -ChildPath 'Initialize-CarbonTest.ps1' -Resolve)
 
     function Assert-CertificateInstalled
     {
