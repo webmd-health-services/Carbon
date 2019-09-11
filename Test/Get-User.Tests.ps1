@@ -10,62 +10,57 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Start-Test
-{
-    & (Join-Path -Path $PSScriptRoot -ChildPath '..\..\Carbon\Import-Carbon.ps1' -Resolve)
-}
+Set-StrictMode -Version 'Latest'
 
-function Stop-Test
-{
-}
+& (Join-Path -Path $PSScriptRoot -ChildPath 'Initialize-CarbonTest.ps1' -Resolve)
 
-function Test-ShouldGetAllUsers
-{
-    $users = Get-User
-    try
-    {
-        Assert-NotNull $users
-        Assert-GreaterThan $users.Length 0
-        $users | ForEach-Object { Assert-is $_ ([DirectoryServices.AccountManagement.UserPrincipal]) }
+Describe 'Get-User' {
+    It 'should get all users' {
+        $users = Get-User
+        try
+        {
+            $users | Should -Not -BeNullOrEmpty
+            $users.Length | Should -BeGreaterThan 0
+            
+        }
+        finally
+        {
+            $users | ForEach-Object { $_.Dispose() }
+        }
     }
-    finally
-    {
-        $users | ForEach-Object { $_.Dispose() }
-    }
-}
-
-function Test-ShouldGetOneUser
-{
-    Get-User |
-        ForEach-Object { 
-            $expectedUser = $_
-            try
-            {
-                $user = Get-User -Username $expectedUser.SamAccountName
+    
+    It 'should get one user' {
+        Get-User |
+            ForEach-Object { 
+                $expectedUser = $_
                 try
                 {
-                    Assert-Equal $expectedUser.Sid $user.Sid
+                    $user = Get-User -Username $expectedUser.SamAccountName
+                    try
+                    {
+                        $user | Should -HaveCount 1
+                        $user.Sid | Should -Be $expectedUser.Sid
+                    }
+                    finally
+                    {
+                        if( $user )
+                        {
+                            $user.Dispose()
+                        }
+                    }
                 }
                 finally
                 {
-                    if( $user )
-                    {
-                        $user.Dispose()
-                    }
+                    $expectedUser.Dispose()
                 }
             }
-            finally
-            {
-                $expectedUser.Dispose()
-            }
-        }
-}
-
-function Test-ShouldErrorIfUserNotFound
-{
-    $Error.Clear()
-    $user = Get-User -Username 'fjksdjfkldj' -ErrorAction SilentlyContinue
-    Assert-Null $user
-    Assert-Equal 1 $Error.Count
-    Assert-Like $Error[0].Exception.Message '*not found*'
+    }
+    
+    It 'should error if user not found' {
+        $Error.Clear()
+        $user = Get-User -Username 'fjksdjfkldj' -ErrorAction SilentlyContinue
+        $user | Should -BeNullOrEmpty
+        $Error.Count | Should -Be 1
+        $Error[0].Exception.Message | Should -BeLike '*not found*'
+    }
 }

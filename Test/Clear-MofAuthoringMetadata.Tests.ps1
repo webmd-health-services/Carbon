@@ -10,6 +10,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+Set-StrictMode -Version 'Latest'
+
+& (Join-Path -Path $PSScriptRoot -ChildPath 'Initialize-CarbonTest.ps1' -Resolve)
+
 $mof1Path = $null
 $mof2Path = $null
 $notAMofPath = $null
@@ -30,20 +34,17 @@ instance of OMI_ConfigurationDocument
 };
 '@
 
-function Start-TestFixture
-{
-    & (Join-Path -Path $PSScriptRoot -ChildPath '..\..\Carbon\Import-Carbon.ps1' -Resolve)
-}
-
-function Start-Test
-{
-    $tempDir = New-TempDirectory -Prefix $PSCommandPath
-    $mof1Path = Join-Path -Path $tempDir -ChildPath 'computer1.mof'
-    $mof2Path = Join-Path -Path $tempDir -ChildPath 'computer2.mof'
-    $mof3Path = Join-Path -Path $tempDir -ChildPath 'computer3.txt'
-    $notAMofPath = Join-Path -Path $tempDir -ChildPath 'computer2.txt'
-
-    $mof = @'
+Describe 'Clear-MofAuthoringMetadata' {
+    BeforeEach {
+        $Global:Error.Clear()
+        $script:tempDir = Join-Path -Path $TestDrive.FullName -ChildPath ([IO.Path]::GetRandomFileName())
+        New-Item -Path $tempDir -ItemType 'Directory'
+        $script:mof1Path = Join-Path -Path $tempDir -ChildPath 'computer1.mof'
+        $script:mof2Path = Join-Path -Path $tempDir -ChildPath 'computer2.mof'
+        $script:mof3Path = Join-Path -Path $tempDir -ChildPath 'computer3.txt'
+        $script:notAMofPath = Join-Path -Path $tempDir -ChildPath 'computer2.txt'
+    
+        $script:mof = @'
 /*
 @TargetNode='********'
 @GeneratedBy=********
@@ -62,54 +63,46 @@ instance of OMI_ConfigurationDocument
     GenerationHost="********";
 };
 '@ 
-
-    $mof | Set-Content -Path $mof1Path
-    $mof | Set-Content -Path $mof2Path
-    $mof | Set-Content -Path $mof3Path
-    $mof | Set-Content -Path $notAMofPath
-}
-
-function Stop-Test
-{
-    Remove-Item -Path $tempDir -Recurse
-}
-
-function Test-ShouldClearAuthoringMetadataFromFile
-{
-    Clear-MofAuthoringMetadata -Path $mof1Path
-    Assert-Equal $clearedMof (Get-Content -Raw $mof1Path).Trim()
-    Assert-Equal $mof (Get-Content -Raw $mof2Path).Trim()
-    Assert-Equal $mof (Get-Content -Raw $mof3Path).Trim()
-    Assert-Equal $mof (Get-Content -Raw $notAMofPath).Trim()
-}
-
-function Test-ShouldClearAuthoringMetadataFromFileWithoutMofExtension
-{
-    Clear-MofAuthoringMetadata -Path $mof3Path
-    Assert-Equal $clearedMof (Get-Content -Raw $mof3Path).Trim()
-    Assert-Equal $mof (Get-Content -Raw $mof2Path).Trim()
-    Assert-Equal $mof (Get-Content -Raw $mof1Path).Trim()
-    Assert-Equal $mof (Get-Content -Raw $notAMofPath).Trim()
-}
-
-function Test-ShouldClearAuthoringMetadataFromDirectory
-{
-    Clear-MofAuthoringMetadata -Path $tempDir.FullName
-    Assert-Equal $clearedMof (Get-Content -Raw $mof1Path).Trim() $mof1Path
-    Assert-Equal $clearedMof (Get-Content -Raw $mof2Path).Trim() $mof2Path
-    Assert-Equal $mof (Get-Content -Raw $mof3Path).Trim() $mof3Path
-    Assert-Equal $mof (Get-Content -Raw $notAMofPath).Trim() $notAMofPath
-}
-
-function Test-ShouldCheckIfPathExists
-{
-    Clear-MofAuthoringMetadata -Path ('C:\{0}' -f ([IO.Path]::GetRandomFileName())) -ErrorAction SilentlyContinue
-    Assert-Error -Last -Regex 'does not exist'
-    Assert-Equal 1 $Error.Count
-}
-
-function Test-ShouldSupportWhatIf
-{
-    Clear-MofAuthoringMetadata -Path $mof1Path -WhatIf
-    Assert-Equal $mof (Get-Content -Raw $mof1Path).Trim() $mof1Path
+    
+        $mof | Set-Content -Path $mof1Path
+        $mof | Set-Content -Path $mof2Path
+        $mof | Set-Content -Path $mof3Path
+        $mof | Set-Content -Path $notAMofPath
+    }
+    
+    It 'should clear authoring metadata from file' {
+        Clear-MofAuthoringMetadata -Path $mof1Path
+        (Get-Content -Raw $mof1Path).Trim() | Should Be $clearedMof
+        (Get-Content -Raw $mof2Path).Trim() | Should Be $mof
+        (Get-Content -Raw $mof3Path).Trim() | Should Be $mof
+        (Get-Content -Raw $notAMofPath).Trim() | Should Be $mof
+    }
+    
+    It 'should clear authoring metadata from file without mof extension' {
+        Clear-MofAuthoringMetadata -Path $mof3Path
+        (Get-Content -Raw $mof3Path).Trim() | Should Be $clearedMof
+        (Get-Content -Raw $mof2Path).Trim() | Should Be $mof
+        (Get-Content -Raw $mof1Path).Trim() | Should Be $mof
+        (Get-Content -Raw $notAMofPath).Trim() | Should Be $mof
+    }
+    
+    It 'should clear authoring metadata from directory' {
+        Clear-MofAuthoringMetadata -Path $tempDir
+        (Get-Content -Raw $mof1Path).Trim() | Should Be $clearedMof
+        (Get-Content -Raw $mof2Path).Trim() | Should Be $clearedMof
+        (Get-Content -Raw $mof3Path).Trim() | Should Be $mof
+        (Get-Content -Raw $notAMofPath).Trim() | Should Be $mof
+    }
+    
+    It 'should check if path exists' {
+        Clear-MofAuthoringMetadata -Path ('C:\{0}' -f ([IO.Path]::GetRandomFileName())) -ErrorAction SilentlyContinue
+        $Global:Error.Count | Should BeGreaterThan 0
+        $Global:Error[0] | Should Match 'does not exist'
+        $Error.Count | Should Be 1
+    }
+    
+    It 'should support what if' {
+        Clear-MofAuthoringMetadata -Path $mof1Path -WhatIf
+        (Get-Content -Raw $mof1Path).Trim() | Should Be $mof
+    }
 }

@@ -10,33 +10,28 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Start-Test
-{
-    & (Join-Path -Path $PSScriptRoot -ChildPath '..\..\Carbon\Import-Carbon.ps1' -Resolve)
-}
+Set-StrictMode -Version 'Latest'
 
-function Stop-Test
-{
-}
+& (Join-Path -Path $PSScriptRoot -ChildPath 'Initialize-CarbonTest.ps1' -Resolve)
 
-function Test-ShouldCheckIfLocalGroupExists
-{
-    $groups = Get-Group
-    try
-    {
-        Assert-NotNull $groups
-        $groups | ForEach-Object { Assert-True (Test-Group -Name $_.Name) }
+Describe 'Test-Group' {
+    It 'should check if local group exists' {
+        $groups = Get-Group
+        try
+        {
+            $groups | Should -Not -BeNullOrEmpty
+            $groups | ForEach-Object { Test-Group -Name $_.Name } | Should -BeTrue
+        }
+        finally
+        {
+            $groups | ForEach-Object { $_.Dispose() }
+        }
     }
-    finally
-    {
-        $groups | ForEach-Object { $_.Dispose() }
+    
+    It 'should not find non existent account' {
+        $error.Clear()
+        (Test-Group -Name ([Guid]::NewGuid().ToString().Substring(0,20))) | Should -BeFalse
+        $error | Should -BeNullOrEmpty
     }
+    
 }
-
-function Test-ShouldNotFindNonExistentAccount
-{
-    $error.Clear()
-    Assert-False (Test-Group -Name ([Guid]::NewGuid().ToString().Substring(0,20)))
-    Assert-False $error
-}
-

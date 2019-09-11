@@ -10,113 +10,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+Set-StrictMode -Version 'Latest'
+
+& (Join-Path -Path $PSScriptRoot -ChildPath 'Initialize-CarbonTest.ps1' -Resolve)
+
 $sourceRoot = $null;
 $destinationRoot = $null
-
-function Start-TestFixture
-{
-    & (Join-Path -Path $PSScriptRoot -ChildPath '..\..\Carbon\Import-Carbon.ps1' -Resolve)
-    $sourceRoot = New-TempDirectoryTree -Prefix $PSCommandPath -Tree @'
-+ Dir1
-  + Dir3
-    * zip.zip
-  * zip.zip
-+ Dir2
-* zip.zip
-* mov.mof
-* msi.msi
-'@
-}
-
-function Stop-TestFixture
-{
-    Uninstall-Directory -Path $sourceRoot -Recurse
-}
-
-function Start-Test
-{
-    $destinationRoot = New-TempDir -Prefix $PSCommandPath
-}
-
-function Stop-Test
-{
-    Uninstall-Directory -Path $destinationRoot -Recurse
-}
-
-function Test-ShouldCopyFiles
-{
-    $result = Copy-DscResource -Path $sourceRoot -Destination $destinationRoot
-    Assert-Null $result
-    Assert-Copy $sourceRoot $destinationRoot
-}
-
-function Test-ShouldPassThruCopiedFiles
-{
-    $result = Copy-DscResource -Path $sourceRoot -Destination $destinationRoot -PassThru -Recurse
-    Assert-NotNull $result
-    Assert-Copy $sourceRoot $destinationRoot -Recurse
-    Assert-Equal 10 $result.Count
-    foreach( $item in $result )
-    {
-        Assert-Like $item.FullName ('{0}*' -f $destinationRoot)
-    }
-}
-
-function Test-ShouldOnlyCopyChangedFiles
-{
-    $result = Copy-DscResource -Path $sourceRoot -Destination $destinationRoot -PassThru
-    Assert-NotNull $result
-    $result = Copy-DscResource -Path $sourceRoot -Destination $destinationRoot -PassThru
-    Assert-Null $result
-    [IO.File]::WriteAllText((Join-path -Path $sourceRoot -ChildPath 'mov.mof'), ([Guid]::NewGuid().ToString()))
-    $result = Copy-DscResource -Path $sourceRoot -Destination $destinationRoot -PassThru
-    Assert-NotNull $result
-    Assert-Equal 2 $result.Count
-    Assert-Equal 'mov.mof' $result[0].Name
-    Assert-Equal 'mov.mof.checksum' $result[1].Name
-}
-
-function Test-ShouldAlwaysRegenerateChecksums
-{
-    $result = Copy-DscResource -Path $sourceRoot -Destination $destinationRoot -PassThru
-    Assert-NotNull $result
-    [IO.File]::WriteAllText((Join-Path -Path $sourceRoot -ChildPath 'zip.zip.checksum'), 'E4F0D22EE1A26200BA320E18023A56B36FF29AA1D64913C60B46CE7D71E940C6')
-    try
-    {
-        $result = Copy-DscResource -Path $sourceRoot -Destination $destinationRoot -PassThru
-        Assert-Null $result
-        [IO.File]::WriteAllText((Join-Path -Path $sourceRoot -ChildPath 'zip.zip'), ([Guid]::NewGuid().ToString()))
-
-        $result = Copy-DscResource -Path $sourceRoot -Destination $destinationRoot -PassThru
-        Assert-NotNull $result
-        Assert-Equal 'zip.zip' $result[0].Name
-        Assert-Equal 'zip.zip.checksum' $result[1].Name
-    }
-    finally
-    {
-        Get-ChildItem -Path $sourceRoot -Filter '*.checksum' | Remove-Item
-        Clear-Content -Path (Join-Path -Path $sourceRoot -ChildPath 'zip.zip')
-    }
-}
-
-function Test-ShouldCopyRecursively
-{
-    $result = Copy-DscResource -Path $sourceRoot -Destination $destinationRoot -Recurse
-    Assert-Null $result
-    Assert-Copy -SourceRoot $sourceRoot -Destination $destinationRoot -Recurse
-}
-
-function Test-ShouldForceCopy
-{
-    $result = Copy-DscResource -Path $sourceRoot -Destination $destinationRoot -PassThru -Recurse
-    Assert-NotNull $result
-    Assert-Copy $sourceRoot $destinationRoot -Recurse
-    $result = Copy-DscResource -Path $sourceRoot -Destination $destinationRoot -PassThru -Recurse
-    Assert-Null $result
-    $result = Copy-DscResource -Path $sourceRoot -Destination $destinationRoot -PassThru -Force -Recurse
-    Assert-NotNull $result
-    Assert-Copy $sourceRoot $destinationRoot -Recurse
-}
 
 function Assert-Copy
 {
@@ -137,26 +36,110 @@ function Assert-Copy
         {
             if( $Recurse )
             {
-                Assert-DirectoryExists -Path $destinationPath
+                Test-Path -PathType Container -Path $destinationPath | Should -BeTrue
                 Assert-Copy -SourceRoot $_.FullName -DestinationRoot $destinationPath -Recurse
             }
             else
             {
-                Assert-DirectoryDoesNotExist -Path $destinationPath
+                $destinationPath | Should -Not -Exist
             }
             return
         }
         else
         {
-            Assert-FileExists $destinationPath
+            Test-Path -Path $destinationPath -PathType Leaf | Should -BeTrue -Because ($_.FullName)
         }
 
         $sourceHash = Get-FileHash -Path $_.FullName | Select-Object -ExpandProperty 'Hash'
         $destinationHashPath = '{0}.checksum' -f $destinationPath
-        Assert-FileExists $destinationHashPath
+        Test-Path -Path $destinationHashPath -PathType Leaf | Should -BeTrue
         # hash files can't have newlines, so we can't use Get-Content.
         $destinationHash = [IO.File]::ReadAllText($destinationHashPath)
-        Assert-Equal $sourceHash $destinationHash
+        $destinationHash | Should -Be $sourceHash
     }
 }
 
+Describe 'Copy-DscResource' {
+    
+    BeforeEach {
+        $Global:Error.Clear()
+        $script:destinationRoot = Join-Path -Path $TestDrive.FullName -ChildPath ('D.{0}' -f [IO.Path]::GetRandomFileName())
+        New-Item -Path $destinationRoot -ItemType 'Directory'
+        $script:sourceRoot = Join-Path -Path $TestDrive.FullName -ChildPath ('S.{0}' -f [IO.Path]::GetRandomFileName())
+        New-Item -Path (Join-Path -Path $sourceRoot -ChildPath 'Dir1\Dir3\zip.zip') -Force
+        New-Item -Path (Join-Path -Path $sourceRoot -ChildPath 'Dir1\zip.zip') 
+        New-Item -Path (Join-Path -Path $sourceRoot -ChildPath 'Dir2') -ItemType 'Directory'
+        New-Item -Path (Join-Path -Path $sourceRoot -ChildPath 'zip.zip')
+        New-Item -Path (Join-Path -Path $sourceRoot -ChildPath 'mov.mof')
+        New-Item -Path (Join-Path -Path $sourceRoot -ChildPath 'msi.msi')
+    }
+    
+    It 'should copy files' {
+        $result = Copy-DscResource -Path $sourceRoot -Destination $destinationRoot
+        $result | Should -BeNullOrEmpty
+        Assert-Copy $sourceRoot $destinationRoot
+    }
+    
+    It 'should pass thru copied files' {
+        $result = Copy-DscResource -Path $sourceRoot -Destination $destinationRoot -PassThru -Recurse
+        $result | Should -Not -BeNullOrEmpty
+        Assert-Copy $sourceRoot $destinationRoot -Recurse
+        $result.Count | Should -Be 10
+        foreach( $item in $result )
+        {
+            $item.FullName | Should -BeLike ('{0}*' -f $destinationRoot)
+        }
+    }
+    
+    It 'should only copy changed files' {
+        $result = Copy-DscResource -Path $sourceRoot -Destination $destinationRoot -PassThru
+        $result | Should -Not -BeNullOrEmpty
+        $result = Copy-DscResource -Path $sourceRoot -Destination $destinationRoot -PassThru
+        $result | Should -BeNullOrEmpty
+        [IO.File]::WriteAllText((Join-path -Path $sourceRoot -ChildPath 'mov.mof'), ([Guid]::NewGuid().ToString()))
+        $result = Copy-DscResource -Path $sourceRoot -Destination $destinationRoot -PassThru
+        $result | Should -Not -BeNullOrEmpty
+        $result.Count | Should -Be 2
+        $result[0].Name | Should -Be 'mov.mof'
+        $result[1].Name | Should -Be 'mov.mof.checksum'
+    }
+    
+    It 'should always regenerate checksums' {
+        $result = Copy-DscResource -Path $sourceRoot -Destination $destinationRoot -PassThru
+        $result | Should -Not -BeNullOrEmpty
+        [IO.File]::WriteAllText((Join-Path -Path $sourceRoot -ChildPath 'zip.zip.checksum'), 'E4F0D22EE1A26200BA320E18023A56B36FF29AA1D64913C60B46CE7D71E940C6')
+        try
+        {
+            $result = Copy-DscResource -Path $sourceRoot -Destination $destinationRoot -PassThru
+            $result | Should -BeNullOrEmpty
+            [IO.File]::WriteAllText((Join-Path -Path $sourceRoot -ChildPath 'zip.zip'), ([Guid]::NewGuid().ToString()))
+    
+            $result = Copy-DscResource -Path $sourceRoot -Destination $destinationRoot -PassThru
+            $result | Should -Not -BeNullOrEmpty
+            $result[0].Name | Should -Be 'zip.zip'
+            $result[1].Name | Should -Be 'zip.zip.checksum'
+        }
+        finally
+        {
+            Get-ChildItem -Path $sourceRoot -Filter '*.checksum' | Remove-Item
+            Clear-Content -Path (Join-Path -Path $sourceRoot -ChildPath 'zip.zip')
+        }
+    }
+    
+    It 'should copy recursively' {
+        $result = Copy-DscResource -Path $sourceRoot -Destination $destinationRoot -Recurse
+        $result | Should -BeNullOrEmpty
+        Assert-Copy -SourceRoot $sourceRoot -Destination $destinationRoot -Recurse
+    }
+    
+    It 'should force copy' {
+        $result = Copy-DscResource -Path $sourceRoot -Destination $destinationRoot -PassThru -Recurse
+        $result | Should -Not -BeNullOrEmpty
+        Assert-Copy $sourceRoot $destinationRoot -Recurse
+        $result = Copy-DscResource -Path $sourceRoot -Destination $destinationRoot -PassThru -Recurse
+        $result | Should -BeNullOrEmpty
+        $result = Copy-DscResource -Path $sourceRoot -Destination $destinationRoot -PassThru -Force -Recurse
+        $result | Should -Not -BeNullOrEmpty
+        Assert-Copy $sourceRoot $destinationRoot -Recurse
+    }
+}

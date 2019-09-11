@@ -10,45 +10,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Start-TestFixture
-{
-    & (Join-Path -Path $PSScriptRoot -ChildPath '..\Carbon\Import-Carbon.ps1' -Resolve)
-}
+Set-StrictMode -Version 'Latest'
 
-function Test-AllFunctionsShouldHaveDocumentation
-{
-	$commandsMissingDocumentation = Get-Command -Module Carbon | 
-                                        Where-HelpIncomplete |  
-                                        Select-Object -ExpandProperty Name | 
-                                        Sort-Object
-    Assert-NoDocumentationMissing $commandsMissingDocumentation
-}
-
-function Test-AllDscResourcesShouldHaveDocumentation
-{
-    $dscRoot = Join-Path -Path $PSScriptRoot -ChildPath '..\Carbon\DscResources' -Resolve
-    $resourcesMissingDocs = @()
-    
-    foreach( $resourceRoot in (Get-ChildItem -Path $dscRoot -Directory -Filter 'Carbon_*') )
-    {
-        Import-Module -Name $resourceRoot.FullName
-        $moduleName = $resourceRoot.Name
-        try
-        {
-            $resourcesMissingDocs += Get-Command -Name 'Set-TargetResource' -Module $moduleName | 
-                                        Where-HelpIncomplete | 
-                                        Select-Object -ExpandProperty Module | 
-                                        Select-Object -ExpandProperty Name | 
-                                        Sort-Object
-        }
-        finally
-        {
-            Remove-Module $moduleName
-        }
-    }
-
-    Assert-NoDocumentationMissing $resourcesMissingDocs
-}
+& (Join-Path -Path $PSScriptRoot -ChildPath 'Initialize-CarbonTest.ps1' -Resolve)
 
 function Assert-NoDocumentationMissing
 {
@@ -59,11 +23,7 @@ function Assert-NoDocumentationMissing
 
     Set-StrictMode -Version 'Latest'
 
-    if( $CommandName )
-    {
-        $errorMsg = "The following commands are missing all or part of their documentation:`n`t{0}" -f ($CommandName  -join "`n`t")
-        Fail $errorMsg
-    }
+    $CommandName | Should -BeNullOrEmpty -Because ("The following commands are missing all or part of their documentation:`n`t{0}" -f ($CommandName  -join "`n`t"))
 }
 
 filter Where-HelpIncomplete
@@ -79,7 +39,7 @@ filter Where-HelpIncomplete
     $_ | 
         #Where-Object { $_.Name -ne 'New-TempDir' } |
         Where-Object { 
-    		$help = $_ | Get-Help 
+            $help = $_ | Get-Help 
             if( $help -is [String] )
             {
                 return $true
@@ -92,4 +52,40 @@ filter Where-HelpIncomplete
 
             return -not ($help.synopsis -and $help.description -and $help.examples)
         } 
+}
+
+Describe 'Documentation' {
+    It 'all functions should have documentation' {
+    	$commandsMissingDocumentation = Get-Command -Module Carbon | 
+                                            Where-HelpIncomplete |  
+                                            Select-Object -ExpandProperty Name | 
+                                            Sort-Object
+        Assert-NoDocumentationMissing $commandsMissingDocumentation
+    }
+    
+    It 'all dsc resources should have documentation' {
+        $dscRoot = Join-Path -Path $PSScriptRoot -ChildPath '..\Carbon\DscResources' -Resolve
+        $resourcesMissingDocs = @()
+        
+        foreach( $resourceRoot in (Get-ChildItem -Path $dscRoot -Directory -Filter 'Carbon_*') )
+        {
+            Import-Module -Name $resourceRoot.FullName
+            $moduleName = $resourceRoot.Name
+            try
+            {
+                $resourcesMissingDocs += Get-Command -Name 'Set-TargetResource' -Module $moduleName | 
+                                            Where-HelpIncomplete | 
+                                            Select-Object -ExpandProperty Module | 
+                                            Select-Object -ExpandProperty Name | 
+                                            Sort-Object
+            }
+            finally
+            {
+                Remove-Module $moduleName
+            }
+        }
+    
+        Assert-NoDocumentationMissing $resourcesMissingDocs
+    }
+    
 }

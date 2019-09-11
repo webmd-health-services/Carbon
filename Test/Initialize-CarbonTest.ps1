@@ -42,11 +42,14 @@ else
         $Global:CarbonLastImportedAt = [DateTime]::MinValue
     }
 
+    $startedAt = Get-Date
     $mostRecentModificationAt = 
         Get-ChildItem -Path (Join-Path -Path $PSScriptRoot -ChildPath '..\Carbon') -File -Recurse |
         Sort-Object -Property 'LastWriteTime' -Descending |
         Select-Object -First 1 |
         Select-Object -ExpandProperty 'LastWriteTime'
+    $checkDuration = (Get-Date) - $startedAt
+    Write-Debug -Message ('It took "{0}" seconds to check if any of Carbon''s files changed.' -f $checkDuration.TotalSeconds)
 
     $moduleImported = $null -ne (Get-Module -Name 'Carbon')
     $moduleUpdated = $mostRecentModificationAt -gt $CarbonLastImportedAt
