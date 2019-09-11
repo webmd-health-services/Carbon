@@ -12,64 +12,63 @@
 
 $importCarbonPath = Join-Path -Path $PSScriptRoot -ChildPath '..\Carbon\Import-Carbon.ps1' -Resolve
 
-function Start-Test
-{
-    if( (Get-Module 'Carbon') )
-    {
-        Remove-Module 'Carbon'
-    }
-}
+Describe 'Import-Carbon' {
 
-function Stop-Test
-{
-    if( (Get-Module 'Carbon') )
-    {
-        Remove-Module 'Carbon'
-    }
-}
-
-function Test-ShouldImport
-{
-    & $importCarbonPath
-    Assert-NotNull (Get-Command -Module 'Carbon')
-}
-
-function Test-ShouldImportWithPrefix
-{
-    & $importCarbonPath -Prefix 'C'
-    $carbonCmds = Get-Command -Module 'Carbon'
-    Assert-NotNull $carbonCmds
-    foreach( $cmd in $carbonCmds )
-    {
-        Assert-Match $cmd.Name '^.+-C.+$'
-    }
-}
-
-function Test-ShouldHandleDrivesinEnvPathThatDoNotExist
-{
-    $drive = $null
-    for( $idx = [byte][char]'Z'; $idx -ge [byte][char]'A'; --$idx )
-    {
-        $driveLetter = [char][byte]$idx
-        $drive = '{0}:\' -f $driveLetter
-        if( -not (Test-Path -Path $drive) )
+    BeforeEach {
+        $Global:Error.Clear()
+        if( (Get-Module 'Carbon') )
         {
-            break
+            Remove-Module 'Carbon' -Force
         }
     }
-
-    $badPath = '{0}fubar' -f $drive
-    $originalPath = $env:Path
-    $env:Path = '{0};{1}' -f $env:Path,$badPath
-    try
-    {
+    
+    AfterEach {
+        if( (Get-Module 'Carbon') )
+        {
+            Remove-Module 'Carbon' -Force
+        }
+    }
+    
+    It 'should import' {
         & $importCarbonPath
-        Assert-NoError
+        (Get-Command -Module 'Carbon') | Should Not BeNullOrEmpty
     }
-    finally
-    {
-        $env:Path = $originalPath
+    
+    It 'should import with prefix' {
+        & $importCarbonPath -Prefix 'C'
+        $carbonCmds = Get-Command -Module 'Carbon'
+        $carbonCmds | Should Not BeNullOrEmpty
+        foreach( $cmd in $carbonCmds )
+        {
+            $cmd.Name | Should -Match '^.+-C.+$'
+        }
     }
-
+    
+    It 'should handle drives in env path that do not exist' {
+        $drive = $null
+        for( $idx = [byte][char]'Z'; $idx -ge [byte][char]'A'; --$idx )
+        {
+            $driveLetter = [char][byte]$idx
+            $drive = '{0}:\' -f $driveLetter
+            if( -not (Test-Path -Path $drive) )
+            {
+                break
+            }
+        }
+    
+        $badPath = '{0}fubar' -f $drive
+        $originalPath = $env:Path
+        $env:Path = '{0};{1}' -f $env:Path,$badPath
+        try
+        {
+            & $importCarbonPath
+            $Global:Error.Count | Should Be 0
+        }
+        finally
+        {
+            $env:Path = $originalPath
+        }
+    
+    }
+    
 }
-
