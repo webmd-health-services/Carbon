@@ -29,14 +29,11 @@ Imports the Carbon module, re-loading it if its already loaded.
 
 [CmdletBinding(SupportsShouldProcess=$true)]
 param(
-    [Parameter()]
-    [string]
     # The prefix to use on all the module's functions, cmdlets, etc.
-    $Prefix,
+    [string]$Prefix,
 
-    [Switch]
     # Reload the module no matter what.
-    $Force
+    [Switch]$Force
 )
 
 #Requires -Version 4
@@ -44,76 +41,31 @@ Set-StrictMode -Version 'Latest'
 
 $carbonPsd1Path = Join-Path -Path $PSScriptRoot -ChildPath 'Carbon.psd1' -Resolve
 
-$startedAt = Get-Date
-$loadedModule = Get-Module -Name 'Carbon'
-if( $loadedModule )
-{
-    $importedAt = $loadedModule | Select-Object -ExpandProperty 'ImportedAt' -ErrorAction Ignore
-    if( -not $Force -and $importedAt )
-    {
-        $newFiles = Get-ChildItem -Path $PSScriptRoot -File -Recurse |
-                        Where-Object { $_.LastWriteTime -gt $importedAt }
-        if( $newFiles )
-        {
-            Write-Verbose -Message ('Reloading Carbon module. The following files were modified since {0}:{1} * {2}' -f $importedAt,([Environment]::NewLine),($newFiles -join ('{0} * ' -f ([Environment]::NewLine))))
-            $Force = $true
-        }
-    }
-
-    $thisModuleManifest = Test-ModuleManifest -Path $carbonPsd1Path
-    if( $thisModuleManifest )
-    {
-        if( -not $Force -and $thisModuleManifest.Version -ne $loadedModule.Version )
-        {
-            Write-Verbose -Message ('Reloading Carbon module. Module from {0} at version {1} not equal to module from {2} at version {3}.' -f $loadedModule.ModuleBase,$loadedModule.Version,(Split-Path -Parent -Path $thisModuleManifest.Path),$thisModuleManifest.Version)
-            $Force = $true
-        }
-    }
-}
-else
-{
-    $Force = $true
-}
-
-if( -not $Force )
-{
-    return
-}
-
-$importModuleParams = @{ }
-if( $Prefix )
-{
-    $importModuleParams.Prefix = $Prefix
-}
-
-Write-Verbose -Message ('Importing Carbon ({0}).' -f $carbonPsd1Path)
 & {
-    $originalVerbosePreference = $Global:VerbosePreference
-    $Global:VerbosePreference = [Management.Automation.ActionPreference]::SilentlyContinue
-    try 
+    $originalVerbosePref = $Global:VerbosePreference
+    $originalWhatIfPref = $Global:WhatIfPreference
+
+    $Global:VerbosePreference = $VerbosePreference = 'SilentlyContinue'
+    $Global:WhatIfPreference = $WhatIfPreference = $false
+
+    try
     {
-        if( $Force -and $loadedModule )
+        if( $Force -and (Get-Module -Name 'Carbon') )
         {
-            # Remove so we don't get errors about conflicting type data.
-            Remove-Module -Name 'Carbon' -WhatIf:$false
+            Remove-Module -Name 'Carbon' -Force
         }
 
-        Import-Module $carbonPsd1Path -ErrorAction Stop @importModuleParams
+        $optionalParams = @{ }
+        if( $Prefix )
+        {
+            $optionalParams['Prefix'] = $Prefix
+        }
+
+        Import-Module -Name $carbonPsd1Path @optionalParams
     }
     finally
     {
-        $Global:VerbosePreference = $originalVerbosePreference
+        $Global:VerbosePreference = $originalVerbosePref
+        $Global:WhatIfPreference = $originalWhatIfPref
     }
 }
-
-if( -not (Get-Module -Name 'Carbon' | Get-Member -Name 'ImportedAt') )
-{
-    Get-Module -Name 'Carbon' | Add-Member -MemberType NoteProperty -Name 'ImportedAt' -Value (Get-Date)
-}
-
-if( $Force )
-{
-    $loadedModule = Get-Module -Name 'Carbon'
-    $loadedModule.ImportedAt = Get-Date
-}
-
