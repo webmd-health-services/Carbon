@@ -58,10 +58,16 @@ function Invoke-NewWebsite($Bindings = $null, $SiteID)
 
 function Remove-TestSite
 {
-    if( Test-IisWebsite -Name $SiteName )
+    while( $true )
     {
         Uninstall-IisWebsite -Name $SiteName
-        $LASTEXITCODE | Should -Be 0
+        if( -not (Test-IisWebsite -Name $SiteName) )
+        {
+            break
+        }
+
+        Write-Warning -Message ('Waiting for website to get uninstalled.')
+        Start-Sleep -Milliseconds 100
     }
 }
 
