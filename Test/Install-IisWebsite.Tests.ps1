@@ -67,9 +67,6 @@ function Remove-TestSite
 
 function Wait-ForWebsiteToBeRunning
 {
-    $website = Get-IisWebsite -Name $SiteName
-    $website.Start()
-    $state = ''
     $tryNum = 0
     do
     {
@@ -80,6 +77,15 @@ function Wait-ForWebsiteToBeRunning
             break
         }
         
+        try
+        {
+            $website.Start()
+        }
+        catch
+        {
+            Write-Warning -Message ('Exception trying to start website "{0}": {1}' -f $SiteName,$_)
+            $Global:Error.RemoveAt(0)
+        }
         Start-Sleep -Milliseconds 100
         
     } while( $tryNum -lt 100 )
