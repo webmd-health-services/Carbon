@@ -13,7 +13,7 @@
 $serviceBaseName = 'CarbonUninstallServiceTest'
 $serviceName = $serviceBaseName
 $servicePath = Join-Path -Path $PSScriptRoot -ChildPath 'Service\NoOpService.exe' -Resolve
-& (Join-Path -Path $PSScriptRoot -ChildPath 'Import-CarbonForTest.ps1' -Resolve)
+& (Join-Path -Path $PSScriptRoot -ChildPath 'Initialize-CarbonTest.ps1' -Resolve)
 
 function Uninstall-TestService
 {

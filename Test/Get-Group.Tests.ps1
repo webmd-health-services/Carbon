@@ -10,7 +10,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-& (Join-Path -Path $PSScriptRoot -ChildPath 'Import-CarbonForTest.ps1' -Resolve)
+Set-StrictMode -Version 'Latest'
+
+& (Join-Path -Path $PSScriptRoot -ChildPath 'Initialize-CarbonTest.ps1' -Resolve)
 
 Describe 'Get-Group' {
     It 'should get all groups' {
@@ -36,6 +38,7 @@ Describe 'Get-Group' {
                     $group = Get-Group -Name $expectedGroup.Name
                     try
                     {
+                        $group | Should -HaveCount 1
                         $group.Sid | Should -Be $expectedGroup.Sid
                     }
                     finally

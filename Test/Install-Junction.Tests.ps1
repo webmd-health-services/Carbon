@@ -12,7 +12,7 @@
 
 # To convert C:\Users\schedu~1 to C:\Users\scheduleuser
 
-& (Join-Path -Path $PSScriptRoot -ChildPath 'Import-CarbonForTest.ps1' -Resolve)
+& (Join-Path -Path $PSScriptRoot -ChildPath 'Initialize-CarbonTest.ps1' -Resolve)
 
 Describe 'Install-Junction' {
 

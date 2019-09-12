@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-& (Join-Path -Path $PSScriptRoot 'Import-CarbonForTest.ps1' -Resolve)
+& (Join-Path -Path $PSScriptRoot 'Initialize-CarbonTest.ps1' -Resolve)
 
 Describe 'Uninstall-Junction' {
     $JunctionPath = $null

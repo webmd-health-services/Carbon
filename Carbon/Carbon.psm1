@@ -31,6 +31,7 @@ if( -not (Test-Path 'variable:IsWindows') )
 }
 
 Write-Timing ('BEGIN')
+$carbonRoot = $PSScriptRoot
 $CarbonBinDir = Join-Path -Path $PSScriptRoot -ChildPath 'bin' -Resolve
 $carbonAssemblyDir = Join-Path -Path $CarbonBinDir -ChildPath 'fullclr' -Resolve
 
@@ -55,14 +56,6 @@ Get-ChildItem -Path (Join-Path -Path $carbonAssemblyDir -ChildPath '*') -Filter 
 # COM
 $ComRegKeyPath = 'hklm:\software\microsoft\ole'
 
-# Cryptography
-Write-Timing ('Adding System.Security assembly.')
-Add-Type -AssemblyName 'System.Security'
-
-# FileSystem
-Write-Timing ('Adding Ionic.Zip assembly.')
-Add-Type -Path (Join-Path -Path $CarbonBinDir -ChildPath 'Ionic.Zip.dll' -Resolve)
-
 # IIS
 $exportIisFunctions = $false
 if( (Test-Path -Path 'env:SystemRoot') )
@@ -83,6 +76,22 @@ if( (Test-Path -Path 'env:SystemRoot') )
     }
 }
 
+Write-Timing ('Adding System.ServiceProcess assembly.')
+Add-Type -AssemblyName 'System.ServiceProcess'
+
+if( $IsWindows )
+{
+    Write-Timing ('Adding System.ServiceProcess assembly.')
+    Add-Type -AssemblyName 'System.Messaging'
+}
+
+#PowerShell
+$TrustedHostsPath = 'WSMan:\localhost\Client\TrustedHosts'
+
+# Users and Groups
+Write-Timing ('Adding System.DirectoryServices.AccountManagement assembly.')
+Add-Type -AssemblyName 'System.DirectoryServices.AccountManagement'
+
 Write-Timing ('Dot-sourcing functions.')
 $functionRoot = Join-Path -Path $PSScriptRoot -ChildPath 'Functions' -Resolve
 
@@ -91,139 +100,18 @@ Get-ChildItem -Path (Join-Path -Path $functionRoot -ChildPath '*') -Filter '*.ps
         . $_.FullName 
     }
 
-if( $IsWindows -and [Environment]::Is64BitOperatingSystem -and [Environment]::Is64BitProcess ) 
-{
-    . (Join-Path -Path $functionRoot -ChildPath 'Initialize-Lcm.ps1')
+$developerImports = & {
+    Join-Path -Path $PSScriptRoot -ChildPath 'Carbon.psm1.Import.Iis.ps1' 
+    Join-Path -Path $PSScriptRoot -ChildPath 'Carbon.psm1.Import.Lcm.ps1' 
+    Join-Path -Path $PSScriptRoot -ChildPath 'Carbon.psm1.Import.Post.ps1' 
 }
-
-if( $exportIisFunctions )
+foreach( $developerImport in $developerImports )
 {
-    Write-Timing ('Dot-sourcing IIS functions.')
-    Get-ChildItem -Path $functionRoot -Filter '*Iis*.ps1' |
-        ForEach-Object { . $_.FullName }
-        
-    if( -not (Test-CTypeDataMember -TypeName 'Microsoft.Web.Administration.Site' -MemberName 'PhysicalPath') )
+    if( -not (Test-Path -Path $developerImport -PathType Leaf) )
     {
-        Write-Timing ('Updating Microsoft.Web.Administration.Site type data.')
-        Update-TypeData -TypeName 'Microsoft.Web.Administration.Site' -MemberType ScriptProperty -MemberName 'PhysicalPath' -Value { 
-                $this.Applications |
-                    Where-Object { $_.Path -eq '/' } |
-                    Select-Object -ExpandProperty VirtualDirectories |
-                    Where-Object { $_.Path -eq '/' } |
-                    Select-Object -ExpandProperty PhysicalPath
-            }
+        continue
     }
 
-    if( -not (Test-CTypeDataMember -TypeName 'Microsoft.Web.Administration.Application' -MemberName 'PhysicalPath') )
-    {
-        Write-Timing ('Updating Microsoft.Web.Administration.Application type data.')
-        Update-TypeData -TypeName 'Microsoft.Web.Administration.Application' -MemberType ScriptProperty -MemberName 'PhysicalPath' -Value { 
-                $this.VirtualDirectories |
-                    Where-Object { $_.Path -eq '/' } |
-                    Select-Object -ExpandProperty PhysicalPath
-            }
-    }
-}
-
-# MSMQ
-if( $IsWindows )
-{
-    Write-Timing ('Adding System.ServiceProcess assembly.')
-    Add-Type -AssemblyName 'System.ServiceProcess'
-    Write-Timing ('Adding System.Messaging assembly.')
-    Add-Type -AssemblyName 'System.Messaging'
-}
-
-#PowerShell
-$TrustedHostsPath = 'WSMan:\localhost\Client\TrustedHosts'
-
-# Services
-Write-Timing ('Adding System.ServiceProcess assembly.')
-Add-Type -AssemblyName 'System.ServiceProcess'
-
-# Users and Groups
-Write-Timing ('Adding System.DirectoryServices.AccountManagement assembly.')
-Add-Type -AssemblyName 'System.DirectoryServices.AccountManagement'
-
-# Extended Type
-if( -not (Test-CTypeDataMember -TypeName 'System.IO.FileInfo' -MemberName 'GetCarbonFileInfo') )
-{
-    Write-Timing ('Updating System.IO.FileInfo type data (GetCarbonFileInfo).')
-    Update-TypeData -TypeName 'System.IO.FileInfo' -MemberType ScriptMethod -MemberName 'GetCarbonFileInfo' -Value {
-        param(
-            [Parameter(Mandatory=$true)]
-            [string]
-            # The name of the Carbon file info property to get.
-            $Name
-        )
-
-        Set-StrictMode -Version 'Latest'
-
-        if( -not $this.Exists )
-        {
-            return
-        }
-
-        if( -not ($this | Get-Member -Name 'CarbonFileInfo') )
-        {
-            $this | Add-Member -MemberType NoteProperty -Name 'CarbonFileInfo' -Value (New-Object 'Carbon.IO.FileInfo' $this.FullName)
-        }
-
-        if( $this.CarbonFileInfo | Get-Member -Name $Name )
-        {
-            return $this.CarbonFileInfo.$Name
-        }
-    }
-}
-
-if( -not (Test-CTypeDataMember -TypeName 'System.IO.FileInfo' -MemberName 'FileIndex') )
-{
-    Write-Timing ('Updating System.IO.FileInfo type data (FileIndex).')
-    Update-TypeData -TypeName 'System.IO.FileInfo' -MemberType ScriptProperty -MemberName 'FileIndex' -Value {
-        Set-StrictMode -Version 'Latest'
-        return $this.GetCarbonFileInfo( 'FileIndex' )
-    }
-}
-
-if( -not (Test-CTypeDataMember -TypeName 'System.IO.FileInfo' -MemberName 'LinkCount') )
-{
-    Write-Timing ('Updating System.IO.FileInfo type data (LinkCount).')
-    Update-TypeData -TypeName 'System.IO.FileInfo' -MemberType ScriptProperty -MemberName 'LinkCount' -Value {
-        Set-StrictMode -Version 'Latest'
-        return $this.GetCarbonFileInfo( 'LinkCount' )
-    }
-}
-
-if( -not (Test-CTypeDataMember -TypeName 'System.IO.FileInfo' -MemberName 'VolumeSerialNumber') )
-{
-    Write-Timing ('Updating System.IO.FileInfo type data (ColumeSerialNumber).')
-    Update-TypeData -TypeName 'System.IO.FileInfo' -MemberType ScriptProperty -MemberName 'VolumeSerialNumber' -Value {
-        Set-StrictMode -Version 'Latest'
-        return $this.GetCarbonFileInfo( 'VolumeSerialNumber' )
-    }
-}
-
-Write-Timing ('Testing the module manifest.')
-try
-{
-    $module = Test-ModuleManifest -Path (Join-Path -Path $PSScriptRoot -ChildPath 'Carbon.psd1' -Resolve)
-    if( -not $module )
-    {
-        return
-    }
-
-    Write-Timing ('Creating aliases.')
-    [string[]]$functionNames = $module.ExportedFunctions.Keys
-    foreach( $functionName in $functionNames )
-    {
-        $oldFunctionName = $functionName -replace '-C','-'
-        Set-Alias -Name $oldFunctionName -Value $functionName
-    }
-
-    Write-Timing ('Exporting module members.')
-    Export-ModuleMember -Alias '*' -Function $functionNames
-}
-finally
-{
-    Write-Timing ('DONE')
+    Write-Timing ('Dot-sourcing "{0}".' -f $developerImport)
+    . $developerImport
 }

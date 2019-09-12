@@ -14,7 +14,7 @@ $iniPath = $null
 
 Describe 'Test-RemoveIniEntry' {
     BeforeAll {
-        & (Join-Path -Path $PSScriptRoot -ChildPath 'Import-CarbonForTest.ps1' -Resolve)
+        & (Join-Path -Path $PSScriptRoot -ChildPath 'Initialize-CarbonTest.ps1' -Resolve)
     }
     
     BeforeEach {
@@ -26,7 +26,7 @@ section1value1 = duplicate
 
 [section1]
 section1value1 = value2
-unicodevalue = двыкйиащзд
+unicodevalue = пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 
 '@ | Set-Content -Path $iniPath
         $Global:Error.Clear()
@@ -85,7 +85,7 @@ sectionless = value
 
 [section1]
 section1value1 = value2
-unicodevalue = двыкйиащзд
+unicodevalue = пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 
 '@
     }
@@ -98,7 +98,7 @@ sectionless = value
 section1value1 = duplicate
 
 [section1]
-unicodevalue = двыкйиащзд
+unicodevalue = пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 
 '@
     }

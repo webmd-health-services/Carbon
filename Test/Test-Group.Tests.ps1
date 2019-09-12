@@ -10,7 +10,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-& (Join-Path -Path $PSScriptRoot -ChildPath 'Import-CarbonForTest.ps1' -Resolve)
+Set-StrictMode -Version 'Latest'
+
+& (Join-Path -Path $PSScriptRoot -ChildPath 'Initialize-CarbonTest.ps1' -Resolve)
 
 Describe 'Test-Group' {
     It 'should check if local group exists' {
@@ -33,7 +35,7 @@ Describe 'Test-Group' {
     It 'should not find non existent account' {
         $error.Clear()
         (Test-Group -Name ([Guid]::NewGuid().ToString().Substring(0,20))) | Should -BeFalse
-        $error | Should -BeFalse
+        $error | Should -BeNullOrEmpty
     }
     
 }

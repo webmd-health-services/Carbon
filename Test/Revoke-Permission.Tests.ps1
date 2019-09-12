@@ -14,7 +14,7 @@ $Path = $null
 $user = 'CarbonGrantPerms'
 $containerPath = $null
 $privateKeyPath = Join-Path -Path $PSScriptRoot -ChildPath 'Cryptography\CarbonTestPrivateKey.pfx' -Resolve
-& (Join-Path -Path $PSScriptRoot -ChildPath 'Import-CarbonForTest.ps1' -Resolve)
+& (Join-Path -Path $PSScriptRoot -ChildPath 'Initialize-CarbonTest.ps1' -Resolve)
 
 $credential = New-Credential -UserName $user -Password 'a1b2c3d4!'
 Install-User -Credential $credential -Description 'User for Carbon Grant-Permission tests.'

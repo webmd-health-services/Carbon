@@ -10,7 +10,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-& (Join-Path -Path $PSScriptRoot -ChildPath 'Import-CarbonForTest.ps1' -Resolve)
+Set-StrictMode -Version 'Latest'
+
+& (Join-Path -Path $PSScriptRoot -ChildPath 'Initialize-CarbonTest.ps1' -Resolve)
 
 Describe 'Get-User' {
     It 'should get all users' {
@@ -36,6 +38,7 @@ Describe 'Get-User' {
                     $user = Get-User -Username $expectedUser.SamAccountName
                     try
                     {
+                        $user | Should -HaveCount 1
                         $user.Sid | Should -Be $expectedUser.Sid
                     }
                     finally

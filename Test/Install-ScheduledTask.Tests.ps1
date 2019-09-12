@@ -19,7 +19,7 @@ $AllMonths = @( 'January','February','March','April','May','June','July','August
 $today = Get-Date
 $today = New-Object 'DateTime' $today.Year,$today.Month,$today.Day
 
-& (Join-Path -Path $PSScriptRoot -ChildPath 'Import-CarbonForTest.ps1' -Resolve)
+& (Join-Path -Path $PSScriptRoot -ChildPath 'Initialize-CarbonTest.ps1' -Resolve)
 $credential = New-Credential -User 'CarbonInstallSchedul' -Password 'a1b2c34d!'
 Install-User -Credential $credential -Description 'Test user for running scheduled tasks.'
 
