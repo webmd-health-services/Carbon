@@ -31,6 +31,7 @@ if( -not (Test-Path 'variable:IsWindows') )
 }
 
 Write-Timing ('BEGIN')
+$carbonRoot = $PSScriptRoot
 $CarbonBinDir = Join-Path -Path $PSScriptRoot -ChildPath 'bin' -Resolve
 $carbonAssemblyDir = Join-Path -Path $CarbonBinDir -ChildPath 'fullclr' -Resolve
 

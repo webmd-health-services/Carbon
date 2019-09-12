@@ -38,50 +38,50 @@ function Remove-CEnvironmentVariable
     [CmdletBinding(SupportsShouldProcess=$true)]
     param(
         [Parameter(Mandatory=$true)]
-        [string]
         # The environment variable to remove.
-        $Name,
+        [string]$Name,
         
         [Parameter(ParameterSetName='ForCurrentUser')]
-        [Switch]
         # Removes the environment variable for the current computer.
-        $ForComputer,
+        [Switch]$ForComputer,
 
         [Parameter(ParameterSetName='ForCurrentUser')]
         [Parameter(Mandatory=$true,ParameterSetName='ForSpecificUser')]
-        [Switch]
         # Removes the environment variable for the current user.
-        $ForUser,
+        [Switch]$ForUser,
         
         [Parameter(ParameterSetName='ForCurrentUser')]
-        [Switch]
         # Removes the environment variable for the current process.
-        $ForProcess,
+        [Switch]$ForProcess,
 
         [Parameter(ParameterSetName='ForCurrentUser')]
-        [Switch]
         # Remove the variable from the current PowerShell session's `env:` drive, too. Normally, you have to restart your session to no longer see the variable in the `env:` drive.
         #
         # This parameter was added in Carbon 2.3.0.
-        $Force,
+        [Switch]$Force,
 
         [Parameter(Mandatory=$true,ParameterSetName='ForSpecificUser')]
-        [pscredential]
         # Remove an environment variable for a specific user.
-        $Credential
+        [pscredential]$Credential
     )
     
     Set-StrictMode -Version 'Latest'
-
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
     if( $PSCmdlet.ParameterSetName -eq 'ForSpecificUser' )
     {
-        Invoke-CPowerShell -FilePath (Join-Path -Path $CarbonBinDir -ChildPath 'Remove-EnvironmentVariable.ps1' -Resolve) `
-                           -Credential $credential `
-                           -ArgumentList ('-Name {0}' -f (ConvertTo-CBase64 $Name)) `
-                           -NonInteractive `
-                           -OutputFormat 'text'
+        $parameters = $PSBoundParameters
+        $parameters.Remove('Credential')
+        $job = Start-Job -ScriptBlock {
+            Import-Module -Name (Join-Path -Path $using:carbonRoot -ChildPath 'Carbon.psd1')
+            $VerbosePreference = $using:VerbosePreference
+            $ErrorActionPreference = $using:ErrorActionPreference
+            $DebugPreference = $using:DebugPreference
+            $WhatIfPreference = $using:WhatIfPreference
+            Remove-CEnvironmentVariable @using:parameters
+        } -Credential $Credential
+        $job | Wait-Job | Receive-Job
+        $job | Remove-Job -Force -ErrorAction Ignore
         return
     }
 
