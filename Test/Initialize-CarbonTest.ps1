@@ -76,3 +76,28 @@ else
         Remove-Module -Name 'CarbonDscTest' -Force
     }
 }
+
+$password = 'Tt6QML1lmDrFSf'
+[pscredential]$global:CarbonTestUser = New-Credential 'CarbonTestUser' -Password $password
+
+if( -not (Test-CUser -Username $CarbonTestUser.UserName) )
+{
+    Install-CUser -Credential $CarbonTestUser -Description 'User used during Carbon tests.'
+
+    $usedCredential = $false
+    while( $usedCredential -ne $CarbonTestUser.UserName )
+    {
+        try
+        {
+            Write-Verbose -Message ('Attempting to launch process as "CarbonTestUser".') -Verbose
+            $usedCredential = 
+                Start-Job -ScriptBlock { [Environment]::UserName } -Credential $CarbonTestUser  | 
+                Wait-Job |
+                Receive-Job
+        }
+        catch 
+        {
+            Start-Sleep -Milliseconds 100
+        }
+    }
+}
