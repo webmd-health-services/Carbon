@@ -111,5 +111,5 @@ if( -not (Get-Command -Name 'Get-WindowsFeature*' | Where-Object { $_.ModuleName
         }        
     }
 
-    Set-Alias -Name 'Get-WindowsFeature' -Verbose 'Get-CWindowsFeature'
+    Set-Alias -Name 'Get-WindowsFeature' -Value 'Get-CWindowsFeature'
 }
