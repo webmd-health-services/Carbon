@@ -61,81 +61,81 @@ function Write-CFile
         Set-StrictMode -Version 'Latest'
         Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
+        Write-Timing ('Write-CFile  BEGIN')
+
         $Path = Resolve-Path -Path $Path
         if( -not $Path )
         {
             return
         }
 
-        $content = New-Object -TypeName 'Collections.Generic.List[object]'
-    }
+        $tryNum = 0
+        $wroteSomething = $false
+        $newLineBytes = [Text.Encoding]::UTF8.GetBytes([Environment]::NewLine)
 
-    process
-    {
-        if( -not $Path )
+        [IO.FileStream]$fileWriter = $null
+
+        if( -not $PSCmdlet.ShouldProcess($Path,'write') )
         {
             return
         }
 
-        $InputObject | ForEach-Object { $content.Add( $_ ) } | Out-Null
-    }
-
-    end
-    {
-        if( -not $Path )
+        while( $tryNum++ -lt $MaximumTries )
         {
-            return
-        }
-
-        $cmdErrors = @()
-        $tryNum = 1
-        $errorAction = @{ 'ErrorAction' = 'SilentlyContinue' }
-        do
-        {
-            $exception = $false
             $lastTry = $tryNum -eq $MaximumTries
-            if( $lastTry )
-            {
-                $errorAction = @{}
-            }
 
-            $numErrorsAtStart = $Global:Error.Count
+            $numErrorsBefore = $Global:Error.Count
             try
             {
-                Set-Content -Path $Path -Value $content @errorAction -ErrorVariable 'cmdErrors'
+                $fileWriter = New-Object 'IO.FileStream' ($Path,[IO.FileMode]::Create,[IO.FileAccess]::Write,[IO.FileShare]::None,4096,$false)
+                break
             }
-            catch
+            catch 
             {
+                $numErrorsAfter = $Global:Error.Count
+                $numErrors = $numErrorsAfter - $numErrorsBefore
+                for( $idx = 0; $idx -lt $numErrors; ++$idx )
+                {
+                    $Global:Error.RemoveAt(0)
+                }
+
                 if( $lastTry )
                 {
                     Write-Error -ErrorRecord $_
                 }
-            }
-
-            $numErrors = $Global:Error.Count - $numErrorsAtStart
-            if( $numErrors -and -not $lastTry )
-            {
-                for( $idx = 0; $idx -lt $numErrors; ++$idx )
+                else
                 {
-                    $Global:Error[0] | Out-String | Write-Debug
-                    $Global:Error.RemoveAt(0)
-                }
-            }
-
-            # If $Global:Error is full, $numErrors will be 0
-            if( $cmdErrors -or $numErrors )
-            {
-                if( -not $lastTry )
-                {
-                    Write-Debug -Message ('Failed to write file ''{0}'' (attempt #{1}). Retrying in {2} milliseconds.' -f $Path,$tryNum,$RetryDelayMilliseconds)
+                    Write-Timing ('Attempt {0,4} to open file "{1}" failed. Sleeping {2} milliseconds.' -f $tryNum,$Path,$RetryDelayMilliseconds)
                     Start-Sleep -Milliseconds $RetryDelayMilliseconds
                 }
             }
-            else
-            {
-                break
-            }
         }
-        while( $tryNum++ -le $MaximumTries )
+    }
+
+    process
+    {
+        Write-Timing ('Write-CFile  PROCESS')
+        if( -not $fileWriter )
+        {
+            return
+        }
+
+        foreach( $item in $InputObject )
+        {
+            [byte[]]$bytes = [Text.Encoding]::UTF8.GetBytes($item)
+            $fileWriter.Write($bytes,0,$bytes.Length)
+            $fileWriter.Write($newLineBytes,0,$newLineBytes.Length)
+            $wroteSomething = $true
+        }
+    }
+
+    end
+    {
+        if( $fileWriter )
+        {
+            $fileWriter.Close()
+            $fileWriter.Dispose()
+        }
+        Write-Timing ('Write-CFile  END')
     }
 }
