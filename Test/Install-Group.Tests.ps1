@@ -16,7 +16,6 @@ Set-StrictMode -Version 'Latest'
 
 $GroupName = 'Setup Group'
 $userName = $CarbonTestUser.UserName
-$password = '1M33tRequirement$'
 $description = 'Carbon user for use in Carbon tests.'
 
 function Assert-GroupExists
@@ -36,7 +35,6 @@ function Assert-GroupExists
 
 Describe 'Install-Group' {
     BeforeEach {
-        Install-User -Credential (New-Credential -Username $userName -Password $password) -Description $description
         Remove-Group
     }
     
@@ -49,9 +47,8 @@ Describe 'Install-Group' {
         $groups = Get-Group 
         try
         {
-            $group = $groups |
-                        Where-Object { $_.Name -eq $GroupName }
-            if( $group -ne $null )
+            $group = $groups | Where-Object { $_.Name -eq $GroupName }
+            if( $null -ne $group )
             {
                 net localgroup `"$GroupName`" /delete
             }
