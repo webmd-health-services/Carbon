@@ -22,7 +22,7 @@ Describe 'Set-IisWebsiteID' {
         $testDir = Join-Path -Path $TestDrive.FullName -ChildPath ([IO.Path]::GetRandomFileName())
         New-Item -Path $testDir -ItemType 'Directory'
         Install-IisAppPool -Name $appPoolName
-        Install-IisWebsite -Name $siteName -Binding 'http/*:80:carbon-test-set-iiswebsiteid.com' -Path $TestDir -AppPoolName $appPoolName
+        Install-IisWebsite -Name $siteName -Binding 'http/*:61664:carbon-test-set-iiswebsiteid.com' -Path $TestDir -AppPoolName $appPoolName
     }
     
     AfterEach {
@@ -32,6 +32,8 @@ Describe 'Set-IisWebsiteID' {
     It 'should change ID' {
         $currentSite = Get-IisWebsite -SiteName $siteName
         $currentSite | Should Not BeNullOrEmpty
+        # Make sure the website is already started.
+        $currentSite.Start()
     
         $newID = [int32](Get-Random -Maximum ([int32]::MaxValue) -Minimum 1)
         Set-IisWebsiteID -SiteName $siteName -ID $newID -ErrorAction SilentlyContinue
@@ -85,6 +87,7 @@ Describe 'Set-IisWebsiteID' {
     It 'should set same ID on same website' {
         $Error.Clear()
         $currentSite = Get-IisWebsite -SiteName $siteName
+        $currentSite.Start()
         Set-IisWebsiteID -SiteName $siteName -ID $currentSite.ID -ErrorAction SilentlyContinue
         $Error.Count | Should Be 0
         $updatedSite = Get-IisWebsite -SiteName $siteName
