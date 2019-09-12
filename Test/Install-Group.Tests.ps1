@@ -12,202 +12,12 @@
 
 Set-StrictMode -Version 'Latest'
 
-& (Join-Path -Path $PSScriptRoot -ChildPath '..\Initialize-CarbonTest.ps1' -Resolve)
-
+& (Join-Path -Path $PSScriptRoot -ChildPath 'Initialize-CarbonTest.ps1' -Resolve)
 
 $GroupName = 'Setup Group'
 $userName = $CarbonTestUser.UserName
 $password = '1M33tRequirement$'
 $description = 'Carbon user for use in Carbon tests.'
-
-function Start-Test
-{
-    Install-User -Credential (New-Credential -Username $userName -Password $password) -Description $description
-    Remove-Group
-}
-
-function Stop-Test
-{
-    Remove-Group
-}
-
-function Remove-Group
-{
-    $groups = Get-Group 
-    try
-    {
-        $group = $groups |
-                    Where-Object { $_.Name -eq $GroupName }
-        if( $group -ne $null )
-        {
-            net localgroup `"$GroupName`" /delete
-        }
-    }
-    finally
-    {
-        $groups | ForEach-Object { $_.Dispose() }
-    }
-}
-
-function Invoke-NewGroup($Description = '', $Members = @())
-{
-    $group = Install-Group -Name $GroupName -Description $Description -Members $Members -PassThru
-    try
-    {
-        Assert-NotNull $group 'Install-Group didn''t return the created/updated group.'
-        Assert-GroupExists
-        $expectedGroup = Get-Group -Name $GroupName
-        try
-        {
-            Assert-Equal $group.Sid $expectedGroup.Sid
-        }
-        finally
-        {
-            $expectedGroup.Dispose()
-        }
-    }
-    finally
-    {
-        if( $group )
-        {
-            $group.Dispose()
-        }
-    }
-}
-
-function Test-ShouldCreateGroup
-{
-    $expectedDescription = 'Hello, wordl!'
-    Invoke-NewGroup -Description $expectedDescription
-    $group = Get-Group -Name $GroupName
-    try
-    {
-        Assert-NotNull $group
-        Assert-Equal $GroupName $group.Name
-        Assert-Equal $expectedDescription $group.Description 'Group not created with a description.'
-    }
-    finally
-    {
-        $group.Dispose()
-    }
-}
-
-function Test-ShouldPassThruGroup
-{
-    $group = Install-Group -Name $GroupName 
-    try
-    {
-        Assert-Null $group
-    }
-    finally
-    {
-        if( $group )
-        {
-            $group.Dispose()
-        }
-    }
-
-    $group = Install-Group -Name $GroupName -PassThru
-    try
-    {
-        Assert-NotNull $group
-        Assert-Is $group ([DirectoryServices.AccountManagement.GroupPrincipal])
-    }
-    finally
-    {
-        $group.Dispose()
-    }
-}
-
-function Test-ShouldAddMembers
-{
-    Invoke-NewGroup -Members $userName
-    
-    $details = net localgroup `"$GroupName`"
-    Assert-ContainsLike $details $userName ('{0} not added to group.' -f $userName)
-}
-
-function Test-ShouldNotRecreateIfGroupAlreadyExists
-{
-    Invoke-NewGroup -Description 'Description 1'
-    $group1 = Get-Group -Name $GroupName
-    try
-    {
-    
-        Invoke-NewGroup -Description 'Description 2'
-        $group2 = Get-Group -Name $GroupName
-        
-        try
-        {
-            Assert-Equal 'Description 2' $group2.Description 'Description not changed/updated.'
-            Assert-Equal $group1.SID $group2.SID 'A new group was created!'
-        }
-        finally
-        {
-            $group2.Dispose()
-        }
-    }
-    finally
-    {
-        $group1.Dispose()
-    }    
-}
-
-function Test-ShouldNotAddMemberMultipleTimes
-{
-    Invoke-NewGroup -Members $userName
-    
-    $Error.Clear()
-    Invoke-NewGroup -Members $userName
-    Assert-Equal 0 $Error.Count
-}
-
-function Test-ShouldAddMemberWithLongName
-{
-    $longUsername = 'abcdefghijklmnopqrst' 
-    Install-User -Credential (New-Credential -Username $longUsername -Password 'a1b2c34d!')
-    try
-    {
-        Invoke-NewGroup -Members ('{0}\{1}' -f $env:COMPUTERNAME,$longUsername)
-        $details = net localgroup `"$GroupName`"
-        Assert-ContainsLike $details $longUsername ('{0} not added to group.' -f $longUsername)
-    }
-    finally
-    {
-        Uninstall-User -Username $userName
-    }
-}
-
-function Test-ShouldSupportWhatIf
-{
-    $Error.Clear()
-    $group = Install-Group -Name $GroupName -WhatIf -Member 'Administrator'
-    try
-    {
-        Assert-NoError
-        Assert-Null $group
-    }
-    finally
-    {
-        if( $group )
-        {
-            $group.Dispose()
-        }
-    }
-
-    $group = Get-Group -Name $GroupName -ErrorAction SilentlyContinue
-    try
-    {
-        Assert-Null $group
-    }
-    finally
-    {
-        if( $group )
-        {
-            $group.Dispose()
-        }
-    }
-}
 
 function Assert-GroupExists
 {
@@ -216,7 +26,7 @@ function Assert-GroupExists
     {
         $group = $groups |
                     Where-Object { $_.Name -eq $GroupName }
-        Assert-NotNull $group 'Group not created.'
+        $group | Should -Not -BeNullOrEmpty
     }
     finally
     {
@@ -224,3 +34,184 @@ function Assert-GroupExists
     }
 }
 
+Describe 'Install-Group' {
+    BeforeEach {
+        Install-User -Credential (New-Credential -Username $userName -Password $password) -Description $description
+        Remove-Group
+    }
+    
+    AfterEach {
+        Remove-Group
+    }
+    
+    function Remove-Group
+    {
+        $groups = Get-Group 
+        try
+        {
+            $group = $groups |
+                        Where-Object { $_.Name -eq $GroupName }
+            if( $group -ne $null )
+            {
+                net localgroup `"$GroupName`" /delete
+            }
+        }
+        finally
+        {
+            $groups | ForEach-Object { $_.Dispose() }
+        }
+    }
+    
+    function Invoke-NewGroup($Description = '', $Members = @())
+    {
+        $group = Install-Group -Name $GroupName -Description $Description -Members $Members -PassThru
+        try
+        {
+            $group | Should -Not -BeNullOrEmpty
+            Assert-GroupExists
+            $expectedGroup = Get-Group -Name $GroupName
+            try
+            {
+                $expectedGroup.Sid | Should -Be $group.Sid
+            }
+            finally
+            {
+                $expectedGroup.Dispose()
+            }
+        }
+        finally
+        {
+            if( $group )
+            {
+                $group.Dispose()
+            }
+        }
+    }
+    
+    It 'should create group' {
+        $expectedDescription = 'Hello, wordl!'
+        Invoke-NewGroup -Description $expectedDescription
+        $group = Get-Group -Name $GroupName
+        try
+        {
+            $group | Should -Not -BeNullOrEmpty
+            $group.Name | Should -Be $GroupName
+            $group.Description | Should -Be $expectedDescription
+        }
+        finally
+        {
+            $group.Dispose()
+        }
+    }
+    
+    It 'should pass thru group' {
+        $group = Install-Group -Name $GroupName 
+        try
+        {
+            $group | Should -BeNullOrEmpty
+        }
+        finally
+        {
+            if( $group )
+            {
+                $group.Dispose()
+            }
+        }
+    
+        $group = Install-Group -Name $GroupName -PassThru
+        try
+        {
+            $group | Should -Not -BeNullOrEmpty
+            $group | Should -BeOfType ([DirectoryServices.AccountManagement.GroupPrincipal])
+        }
+        finally
+        {
+            $group.Dispose()
+        }
+    }
+    
+    It 'should add members' {
+        Invoke-NewGroup -Members $userName
+        
+        $details = net localgroup `"$GroupName`"
+        $details | Where-Object { $_ -like ('*{0}*' -f $userName) } | Should -Not -BeNullOrEmpty
+    }
+    
+    It 'Should -Not recreate if group already exists' {
+        Invoke-NewGroup -Description 'Description 1'
+        $group1 = Get-Group -Name $GroupName
+        try
+        {
+        
+            Invoke-NewGroup -Description 'Description 2'
+            $group2 = Get-Group -Name $GroupName
+            
+            try
+            {
+                $group2.Description | Should -Be 'Description 2'
+                $group2.SID | Should -Be $group1.SID
+            }
+            finally
+            {
+                $group2.Dispose()
+            }
+        }
+        finally
+        {
+            $group1.Dispose()
+        }    
+    }
+    
+    It 'Should -Not add member multiple times' {
+        Invoke-NewGroup -Members $userName
+        
+        $Error.Clear()
+        Invoke-NewGroup -Members $userName
+        $Error.Count | Should -Be 0
+    }
+    
+    It 'should add member with long name' {
+        $longUsername = 'abcdefghijklmnopqrst' 
+        Install-User -Credential (New-Credential -Username $longUsername -Password 'a1b2c34d!')
+        try
+        {
+            Invoke-NewGroup -Members ('{0}\{1}' -f $env:COMPUTERNAME,$longUsername)
+            $details = net localgroup `"$GroupName`"
+            $details | Where-Object { $_ -like ('*{0}*' -f $longUsername) }| Should -Not -BeNullOrEmpty
+        }
+        finally
+        {
+            Uninstall-User -Username $userName
+        }
+    }
+    
+    It 'should support what if' {
+        $Error.Clear()
+        $group = Install-Group -Name $GroupName -WhatIf -Member 'Administrator'
+        try
+        {
+            $Global:Error.Count | Should -Be 0
+            $group | Should -BeNullOrEmpty
+        }
+        finally
+        {
+            if( $group )
+            {
+                $group.Dispose()
+            }
+        }
+    
+        $group = Get-Group -Name $GroupName -ErrorAction SilentlyContinue
+        try
+        {
+            $group | Should -BeNullOrEmpty
+        }
+        finally
+        {
+            if( $group )
+            {
+                $group.Dispose()
+            }
+        }
+    }
+}
