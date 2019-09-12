@@ -10,31 +10,31 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-$SiteName = 'TestNewWebsite'
+Set-StrictMode -Version 'Latest'
 
-function Start-TestFixture
-{
-    & (Join-Path -Path $PSScriptRoot '..\Initialize-CarbonTest.ps1' -Resolve)
-}
+& (Join-Path -Path $PSScriptRoot -ChildPath 'Initialize-CarbonTest.ps1' -Resolve)
 
-function Start-Test
+function Assert-WebsiteBinding
 {
-    Remove-TestSite
-    Grant-Permission -Identity Everyone -Permission ReadAndExecute -Path $TestDir
-}
+    param(
+        [string[]]
+        $Binding
+    )
 
-function Stop-Test
-{
-    Remove-TestSite
-}
-
-function Remove-TestSite
-{
-    if( Test-IisWebsite -Name $SiteName )
+    $website = Get-IisWebsite -Name $SiteName
+    [string[]]$actualBindings = $website.Bindings | ForEach-Object { $_.ToString() }
+    $actualBindings.Count | Should -Be $Binding.Count
+    foreach( $item in $Binding )
     {
-        Uninstall-IisWebsite -Name $SiteName
-        Assert-LastProcessSucceeded 'Unable to delete test site.'
+        ($actualBindings -contains $item) | Should -BeTrue
     }
+}
+
+function Assert-WebsiteRunning($port)
+{
+    $browser = New-Object Net.WebClient
+    $html = $browser.downloadString( "http://localhost:$port/NewWebsite.html" )
+    $html | Should -BeLike '*NewWebsite Test Page*' 
 }
 
 function Invoke-NewWebsite($Bindings = $null, $SiteID)
@@ -50,239 +50,19 @@ function Invoke-NewWebsite($Bindings = $null, $SiteID)
         $optionalParams['Bindings'] = $Bindings
     }
 
+    'NewWebsite Test Page' | Set-Content -Path (Join-Path -Path $TestDir -ChildPath 'NewWebsite.html')
     $site = Install-IisWebsite -Name $SiteName -Path $TestDir @optionalParams
-    Assert-Null $site
-    Assert-NoError
+    $site | Should -BeNullOrEmpty
+    $Global:Error.Count | Should -Be 0
 }
 
-function Test-ShouldCreateWebsite
+function Remove-TestSite
 {
-    Invoke-NewWebsite -SiteID 5478
-    
-    $details = Get-IisWebsite -Name $SiteName
-    Assert-NotNull $details "Site '$siteName' not created."
-    Assert-Like $details $SiteName 'Didn''t create site with given site name.'
-    Assert-Equal 'http' $details.Bindings[0].Protocol
-    Assert-Equal '*:80:' $details.Bindings[0].BindingInformation
-    
-    Assert-Equal $PSScriptRoot $details.PhysicalPath "Site not created with expected physical path."
-    
-    $anonymousAuthInfo = Get-IisSecurityAuthentication -Anonymous -SiteName $SiteName
-    Assert-Empty $anonymousAuthInfo['userName'] "Anonymous authentication username not set to application pool's identity."
-
-    $website = Get-IisWebsite -Name $SiteName
-    Assert-NotNull $website
-    Assert-Equal 5478 $website.Id
-}
-
-function Test-ShouldResolveRelativePath
-{
-    Install-IisWebsite -Name $SiteName -Path "$TestDir\..\..\Test\IIS"
-    $site = Get-IisWebsite -SiteName $SiteName
-    Assert-NotNull $site
-    Assert-Equal $TestDir $site.PhysicalPath
-}
-
-function Test-ShouldCreateWebsiteWithCustomBinding
-{
-    Invoke-NewWebsite -Bindings 'http/*:9876:'
-    Wait-ForWebsiteToBeRunning
-    Assert-WebsiteRunning 9876
-}
-
-function Test-ShouldCreateWebsiteWithMultipleBindings
-{
-    Invoke-NewWebsite -Bindings 'http/*:9876:','http/*:9877:'
-    Wait-ForWebsiteToBeRunning
-    Assert-WebsiteRunning 9876
-    Assert-WebsiteRunning 9877
-}
-
-function Test-ShouldAddSiteToCustomAppPool
-{
-    Install-IisAppPool -Name $SiteName
-    
-    try
+    if( Test-IisWebsite -Name $SiteName )
     {
-        Install-IisWebsite -Name $SiteName -Path $TestDir -AppPoolName $SiteName
-        $appPool = Get-IisWebsite -Name $SiteName
-        $appPool = $appPool.Applications[0].ApplicationPoolName
+        Uninstall-IisWebsite -Name $SiteName
+        $LASTEXITCODE | Should -Be 0
     }
-    finally
-    {
-        Uninstall-IisAppPool $SiteName
-    }
-    
-    Assert-Equal $SiteName $appPool "Site not assigned to correct app pool."
-}
-
-function Test-ShouldUpdateExistingSite
-{
-    Invoke-NewWebsite -Bindings 'http/*:9876:'
-    Assert-NoError
-    Assert-True (Test-IisWebsite -Name $SiteName)
-    Install-IisVirtualDirectory -SiteName $SiteName -VirtualPath '/ShouldStillHangAround' -PhysicalPath $PSScriptRoot
-    
-    Invoke-NewWebsite
-    Assert-NoError
-    Assert-True (Test-IisWebsite -Name $SiteName)
-
-    $website = Get-IisWebsite -Name $SiteName
-    Assert-NotNull ($website.Applications[0].VirtualDirectories | Where-Object { $_.Path -eq '/ShouldStillHangAround' } ) 'Site deleted.'
-}
-
-function Test-ShouldCreateSiteDirectory
-{
-    $websitePath = Join-Path $TestDir ShouldCreateSiteDirectory
-    if( Test-Path $websitePath -PathType Container )
-    {
-        $null = Remove-Item $websitePath -Force
-    }
-    
-    try
-    {
-        Install-IisWebsite -Name $SiteName -Path $websitePath -Bindings 'http/*:9876:'
-        Assert-DirectoryExists $websitePath 
-    }
-    finally
-    {
-        if( Test-Path $websitePath -PathType Container )
-        {
-            $null = Remove-Item $websitePath -Force
-        }
-    }
-}
-
-function Test-ShouldValidateBindings
-{
-    $error.Clear()
-    Install-IisWebsite -Name $SiteName -Path $TestDir -Bindings 'http/*' -ErrorAction SilentlyContinue
-    Assert-True ($error.Count -ge 1)
-    Assert-False (Test-IisWebsite -Name $SiteName)
-    Assert-Error -Last 'bindings are invalid'
-}
-
-function Test-ShouldAllowUrlBindings
-{
-    Install-IisWebsite -Name $SiteName -Path $TestDir -Bindings 'http://*:9876'
-    Assert-True (Test-IisWebsite -Name $SiteName)
-    Wait-ForWebsiteToBeRunning
-    Assert-WebsiteRunning 9876
-}
-
-function Test-ShouldAllowHttpsBindings
-{
-    Install-IisWebsite -Name $SiteName -Path $TestDir -Bindings 'https/*:9876:','https://*:9443'
-    Assert-True (Test-IisWebsite -Name $SiteName)
-    $bindings = Get-IisWebsite -SiteName $SiteName | Select-Object -ExpandProperty Bindings
-    Assert-Equal 'https' $bindings[0].Protocol
-    Assert-Equal 'https' $bindings[1].Protocol
-}
-
-function Test-ShouldNotRecreateExistingWebsite
-{
-    Install-IisWebsite -Name $SiteName -PhysicalPath $TestDir -Bindings 'http/*:9876:'
-    $website = Get-IisWebsite -Name $SiteName
-    Assert-NotNull $website
-
-    Install-IisWebsite -Name $SiteName -PhysicalPath $TestDir -Bindings 'http/*:9876:'
-    Assert-NoError
-    $newWebsite = Get-IisWebsite -Name $SiteName
-    Assert-NotNull $newWebsite
-    Assert-Equal $website.Id $newWebsite.Id
-}
-
-function Test-ShouldChangeWebsiteSettings
-{
-    $appPool = Install-IisAppPool -Name 'CarbonShouldChangeWebsiteSettings' -PassThru
-    $tempDir = New-TempDirectory -Prefix $PSCommandPath
-    
-    try
-    {
-        Install-IisWebsite -Name $SiteName -PhysicalPath $PSScriptRoot
-        Assert-NoError
-        $website = Get-IisWebsite -Name $SiteName
-        Assert-NotNull $website
-        Assert-Equal $SiteName $website.Name
-        Assert-Equal $PSScriptRoot $website.PhysicalPath
-
-        Install-IisWebsite -Name $SiteName -PhysicalPath $tempDir -Bindings 'http/*:9986:' -SiteID 9986 -AppPoolName $appPool.Name
-        Assert-NoError
-        $website = Get-IisWebsite -Name $SiteName
-        Assert-NotNull $website
-        Assert-Equal $SiteName $website.Name
-        Assert-Equal $tempDir.FullName $website.PhysicalPath
-        Assert-Equal 9986 $website.Id
-        Assert-Equal $appPool.Name $website.Applications[0].ApplicationPoolName
-        Assert-WebsiteBinding '[http] *:9986:' 
-    }
-    finally
-    {
-        Uninstall-IisAppPool -Name $appPool.Name
-        Remove-Item -Path $tempDir -Recurse
-    }
-}
-
-function Test-ShouldUpdateBindings
-{
-    $output = Install-IisWebsite -Name $SiteName -PhysicalPath $PSScriptRoot
-    Assert-Null $output
-
-    Install-IisWebsite -Name $SiteName -Bindings 'http/*:8001:' -PhysicalPath $PSScriptRoot
-    Assert-WebsiteBinding '[http] *:8001:'
-    Install-IisWebsite -Name $SiteName -Bindings 'http/*:8001:','http/*:8002:' -PhysicalPath $PSScriptRoot
-    Assert-WebsiteBinding '[http] *:8001:', '[http] *:8002:'
-    Install-IisWebsite -Name $SiteName -Bindings 'http/*:8002:' -PhysicalPath $PSScriptRoot
-    Assert-WebsiteBinding '[http] *:8002:'
-    Install-IisWebsite -Name $SiteName -Bindings 'http/*:8003:' -PhysicalPath $PSScriptRoot
-    Assert-WebsiteBinding '[http] *:8003:'
-}
-
-function Test-ShouldReturnSiteObject
-{
-    $site = Install-IisWebsite -Name $SiteName -PhysicalPath $PSScriptRoot -PassThru
-    Assert-NotNull $site
-    Assert-Is $site ([Microsoft.Web.Administration.Site])
-    Assert-Equal $SiteName $site.Name
-    Assert-Equal $PSScriptRoot $site.PhysicalPath
-
-    $site = Install-IisWebsite -Name $SiteName -PhysicalPath $PSScriptRoot 
-    Assert-Null $site
-}
-
-function Test-ShouldForceDeleteAndRecreate
-{
-    $output = Install-IisWebsite -Name $SiteName -PhysicalPath $PSScriptRoot -Binding 'http/*:9891:'
-    Assert-Null $output
-
-    Set-IisHttpHeader -SiteName $SiteName -Name 'X-Carbon-Test' -Value 'Test-ShouldFoceDeleteAndRecreate'
-
-    $output = Install-IisWebsite -Name $SiteName -PhysicalPath $PSScriptRoot -Binding 'http/*:9891:' -Force
-    Assert-Null $output
-    Assert-Null (Get-IisHttpHeader -SiteName $SiteName -Name 'X-Carbon-Test')
-}
-
-function Assert-WebsiteBinding
-{
-    param(
-        [string[]]
-        $Binding
-    )
-
-    $website = Get-IisWebsite -Name $SiteName
-    [string[]]$actualBindings = $website.Bindings | ForEach-Object { $_.ToString() }
-    Assert-Equal $Binding.Count $actualBindings.Count
-    foreach( $item in $Binding )
-    {
-        Assert-True ($actualBindings -contains $item) ('{0} not in @( "{1}" )' -f $item,($actualBindings -join '", "'))
-    }
-}
-
-function Assert-WebsiteRunning($port)
-{
-    $browser = New-Object Net.WebClient
-    $html = $browser.downloadString( "http://localhost:$port/NewWebsite.html" )
-    Assert-Like $html 'NewWebsite Test Page' 'Unable to download from new website.'   
 }
 
 function Wait-ForWebsiteToBeRunning
@@ -304,6 +84,218 @@ function Wait-ForWebsiteToBeRunning
         
     } while( $tryNum -lt 100 )
     
-    Assert-Equal 'Started' $website.State "Website $SiteName never started running."
+    $website.State | Should -Be 'Started'
 }
 
+$SiteName = 'TestNewWebsite'
+$testDir = $null
+
+Describe 'Install-IisWebsite' {
+    BeforeEach {
+        $Global:Error.Clear()
+        $script:testDir = Join-Path -Path $TestDrive.FullName -ChildPath ([IO.Path]::GetRandomFileName())
+        New-Item -Path $testDir -ItemType 'Directory'
+        Remove-TestSite
+        Grant-Permission -Identity Everyone -Permission ReadAndExecute -Path $TestDir
+    }
+    
+    AfterEach {
+        Remove-TestSite
+    }
+    
+    It 'should create website' {
+        Invoke-NewWebsite -SiteID 5478
+        
+        $details = Get-IisWebsite -Name $SiteName
+        $details | Should -Not -BeNullOrEmpty
+        $details | Should -BeLike $SiteName
+        $details.Bindings[0].Protocol | Should -Be 'http'
+        $details.Bindings[0].BindingInformation | Should -Be '*:80:'
+        
+        $details.PhysicalPath | Should -Be $testDir
+        
+        $anonymousAuthInfo = Get-IisSecurityAuthentication -Anonymous -SiteName $SiteName
+        $anonymousAuthInfo['userName'] | Should -BeNullOrEmpty
+    
+        $website = Get-IisWebsite -Name $SiteName
+        $website | Should -Not -BeNullOrEmpty
+        $website.Id | Should -Be 5478
+    }
+    
+    It 'should resolve relative path' {
+        $newDirName = [IO.Path]::GetRandomFileName()
+        $newDir = Join-Path -Path $testDir -ChildPath ('..\{0}' -f $newDirName)
+        New-Item -Path $newDir -ItemType 'Directory'
+        Install-IisWebsite -Name $SiteName -Path ('{0}\..\{1}' -f $testDir,$newDirName)
+        $site = Get-IisWebsite -SiteName $SiteName
+        $site | Should -Not -BeNullOrEmpty
+        $site.PhysicalPath | Should -Be ([IO.Path]::GetFullPath($newDir))
+    }
+    
+    It 'should create website with custom binding' {
+        Invoke-NewWebsite -Bindings 'http/*:9876:'
+        Wait-ForWebsiteToBeRunning
+        Assert-WebsiteRunning 9876
+    }
+    
+    It 'should create website with multiple bindings' {
+        Invoke-NewWebsite -Bindings 'http/*:9876:','http/*:9877:'
+        Wait-ForWebsiteToBeRunning
+        Assert-WebsiteRunning 9876
+        Assert-WebsiteRunning 9877
+    }
+    
+    It 'should add site to custom app pool' {
+        Install-IisAppPool -Name $SiteName
+        
+        try
+        {
+            Install-IisWebsite -Name $SiteName -Path $TestDir -AppPoolName $SiteName
+            $appPool = Get-IisWebsite -Name $SiteName
+            $appPool = $appPool.Applications[0].ApplicationPoolName
+        }
+        finally
+        {
+            Uninstall-IisAppPool $SiteName
+        }
+        
+        $appPool | Should -Be $SiteName
+    }
+    
+    It 'should update existing site' {
+        Invoke-NewWebsite -Bindings 'http/*:9876:'
+        $Global:Error.Count | Should -Be 0
+        (Test-IisWebsite -Name $SiteName) | Should -BeTrue
+        Install-IisVirtualDirectory -SiteName $SiteName -VirtualPath '/ShouldStillHangAround' -PhysicalPath $PSScriptRoot
+        
+        Invoke-NewWebsite
+        $Global:Error.Count | Should -Be 0
+        (Test-IisWebsite -Name $SiteName) | Should -BeTrue
+    
+        $website = Get-IisWebsite -Name $SiteName
+        ($website.Applications[0].VirtualDirectories | Where-Object { $_.Path -eq '/ShouldStillHangAround' } ) | Should -Not -BeNullOrEmpty
+    }
+    
+    It 'should create site directory' {
+        $websitePath = Join-Path $TestDir ShouldCreateSiteDirectory
+        if( Test-Path $websitePath -PathType Container )
+        {
+            $null = Remove-Item $websitePath -Force
+        }
+        
+        try
+        {
+            Install-IisWebsite -Name $SiteName -Path $websitePath -Bindings 'http/*:9876:'
+            Test-Path -Path $websitePath -PathType Container | Should -BeTrue
+        }
+        finally
+        {
+            if( Test-Path $websitePath -PathType Container )
+            {
+                $null = Remove-Item $websitePath -Force
+            }
+        }
+    }
+    
+    It 'should validate bindings' {
+        $error.Clear()
+        Install-IisWebsite -Name $SiteName -Path $TestDir -Bindings 'http/*' -ErrorAction SilentlyContinue
+        ($error.Count -ge 1) | Should -BeTrue
+        (Test-IisWebsite -Name $SiteName) | Should -Be $false
+        $Global:Error.Count | Should -BeGreaterThan 0
+        $Global:Error[0] | Should Match 'bindings are invalid'
+    }
+    
+    It 'should allow url bindings' {
+        Invoke-NewWebsite -Bindings 'http://*:9876'
+        (Test-IisWebsite -Name $SiteName) | Should -BeTrue
+        Wait-ForWebsiteToBeRunning
+        Assert-WebsiteRunning 9876
+    }
+    
+    It 'should allow https bindings' {
+        Install-IisWebsite -Name $SiteName -Path $TestDir -Bindings 'https/*:9876:','https://*:9443'
+        (Test-IisWebsite -Name $SiteName) | Should -BeTrue
+        $bindings = Get-IisWebsite -SiteName $SiteName | Select-Object -ExpandProperty Bindings
+        $bindings[0].Protocol | Should -Be 'https'
+        $bindings[1].Protocol | Should -Be 'https'
+    }
+    
+    It 'should not recreate existing website' {
+        Install-IisWebsite -Name $SiteName -PhysicalPath $TestDir -Bindings 'http/*:9876:'
+        $website = Get-IisWebsite -Name $SiteName
+        $website | Should -Not -BeNullOrEmpty
+    
+        Install-IisWebsite -Name $SiteName -PhysicalPath $TestDir -Bindings 'http/*:9876:'
+        $Global:Error.Count | Should -Be 0
+        $newWebsite = Get-IisWebsite -Name $SiteName
+        $newWebsite | Should -Not -BeNullOrEmpty
+        $newWebsite.Id | Should -Be $website.Id
+    }
+    
+    It 'should change website settings' {
+        $appPool = Install-IisAppPool -Name 'CarbonShouldChangeWebsiteSettings' -PassThru
+        $tempDir = New-TempDirectory -Prefix $PSCommandPath
+        
+        try
+        {
+            Install-IisWebsite -Name $SiteName -PhysicalPath $PSScriptRoot
+            $Global:Error.Count | Should -Be 0
+            $website = Get-IisWebsite -Name $SiteName
+            $website | Should -Not -BeNullOrEmpty
+            $website.Name | Should -Be $SiteName
+            $website.PhysicalPath | Should -Be $PSScriptRoot
+    
+            Install-IisWebsite -Name $SiteName -PhysicalPath $tempDir -Bindings 'http/*:9986:' -SiteID 9986 -AppPoolName $appPool.Name
+            $Global:Error.Count | Should -Be 0
+            $website = Get-IisWebsite -Name $SiteName
+            $website | Should -Not -BeNullOrEmpty
+            $website.Name | Should -Be $SiteName
+            $website.PhysicalPath | Should -Be $tempDir.FullName
+            $website.Id | Should -Be 9986
+            $website.Applications[0].ApplicationPoolName | Should -Be $appPool.Name
+            Assert-WebsiteBinding '[http] *:9986:' 
+        }
+        finally
+        {
+            Uninstall-IisAppPool -Name $appPool.Name
+            Remove-Item -Path $tempDir -Recurse
+        }
+    }
+    
+    It 'should update bindings' {
+        $output = Install-IisWebsite -Name $SiteName -PhysicalPath $PSScriptRoot
+        $output | Should -BeNullOrEmpty
+    
+        Install-IisWebsite -Name $SiteName -Bindings 'http/*:8001:' -PhysicalPath $PSScriptRoot
+        Assert-WebsiteBinding '[http] *:8001:'
+        Install-IisWebsite -Name $SiteName -Bindings 'http/*:8001:','http/*:8002:' -PhysicalPath $PSScriptRoot
+        Assert-WebsiteBinding '[http] *:8001:', '[http] *:8002:'
+        Install-IisWebsite -Name $SiteName -Bindings 'http/*:8002:' -PhysicalPath $PSScriptRoot
+        Assert-WebsiteBinding '[http] *:8002:'
+        Install-IisWebsite -Name $SiteName -Bindings 'http/*:8003:' -PhysicalPath $PSScriptRoot
+        Assert-WebsiteBinding '[http] *:8003:'
+    }
+    
+    It 'should return site object' {
+        $site = Install-IisWebsite -Name $SiteName -PhysicalPath $PSScriptRoot -PassThru
+        $site | Should -Not -BeNullOrEmpty
+        $site | Should -BeOfType ([Microsoft.Web.Administration.Site])
+        $site.Name | Should -Be $SiteName
+        $site.PhysicalPath | Should -Be $PSScriptRoot
+    
+        $site = Install-IisWebsite -Name $SiteName -PhysicalPath $PSScriptRoot 
+        $site | Should -BeNullOrEmpty
+    }
+    
+    It 'should force delete and recreate' {
+        $output = Install-IisWebsite -Name $SiteName -PhysicalPath $PSScriptRoot -Binding 'http/*:9891:'
+        $output | Should -BeNullOrEmpty
+    
+        Set-IisHttpHeader -SiteName $SiteName -Name 'X-Carbon-Test' -Value 'Test-ShouldFoceDeleteAndRecreate'
+    
+        $output = Install-IisWebsite -Name $SiteName -PhysicalPath $PSScriptRoot -Binding 'http/*:9891:' -Force
+        $output | Should -BeNullOrEmpty
+        (Get-IisHttpHeader -SiteName $SiteName -Name 'X-Carbon-Test') | Should -BeNullOrEmpty
+    }
+}
