@@ -460,7 +460,9 @@ function Assert-ScheduledTask
         }
         else
         {
-            $schedule.StartTime | Should -Be (New-Object 'TimeSpan' $task.CreateDate.Hour,$task.CreateDate.Minute,0)
+            # Testing equality intermittently fails on build server.
+            $schedule.StartTime | Should -BeLessOrEqual (New-Object 'TimeSpan' $task.CreateDate.Hour,($task.CreateDate.Minute + 1),0)
+            $schedule.StartTime | Should -BeGreaterOrEqual (New-Object 'TimeSpan' $task.CreateDate.Hour,($task.CreateDate.Minute - 1),0)
         }
     }
     

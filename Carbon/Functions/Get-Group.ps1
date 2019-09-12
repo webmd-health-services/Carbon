@@ -42,62 +42,51 @@ function Get-CGroup
     [CmdletBinding()]
     [OutputType([DirectoryServices.AccountManagement.GroupPrincipal])]
     param(
-        [string]
         # The name of the group to return.
-        $Name 
+        [string]$Name 
     )
 
     Set-StrictMode -Version 'Latest'
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
+    # Tee-Object won't set its variable if WhatIfPreference is $true.
+    $WhatIfPreference = $false
     
     $ctx = New-Object 'DirectoryServices.AccountManagement.PrincipalContext' ([DirectoryServices.AccountManagement.ContextType]::Machine)
-    if( $Name )
+    $query = New-Object 'DirectoryServices.AccountManagement.GroupPrincipal' $ctx
+    $searcher = New-Object 'DirectoryServices.AccountManagement.PrincipalSearcher' $query
+    try
     {
-        $groupToFind = New-Object 'DirectoryServices.AccountManagement.GroupPrincipal' $ctx
-        $groupToFind.Name = $Name
-        $searcher = New-Object 'DirectoryServices.AccountManagement.PrincipalSearcher' $groupToFind
-        $group = $null
-        $numErrors = $Global:Error.Count
-        try
-        {
-            $group = $searcher.FindOne()
-        }
-        catch
-        {
-            $numErrorsNow = $Global:Error.Count
-            $numErrorsToDelete = $numErrorsNow - $numErrors
-            for( $idx = 0; $idx -lt $numErrorsToDelete; ++$idx )
-            {
-                $Global:Error.RemoveAt(0)
-            }
-        }
+        $groups = @()
+        $searcher.FindAll()  |
+            Where-Object { 
+                if( $Name )
+                {
+                    return $_.Name -eq $Name
+                }
+                return $true
+            } |
+            Tee-Object -Variable 'groups'
 
-        if( -not $group )
+        if( $Name )
         {
-            # Fall back. PrincipalSearch can't find some identities
-            $ctx.Dispose()
-            $ctx = New-Object 'DirectoryServices.AccountManagement.PrincipalContext' ([DirectoryServices.AccountManagement.ContextType]::Machine)
-            $group = [DirectoryServices.AccountManagement.GroupPrincipal]::FindByIdentity( $ctx, $Name )
-            if( -not $group )
+            $groupCount = $groups | Measure-Object | Select-Object -ExpandProperty 'Count'
+            if( $groupCount -gt 1 )
+            {
+                Write-Error -Message ('Found {0} groups named "{1}".' -f $groupCount,$Name) -ErrorAction:$ErrorActionPreference
+                return
+            }
+
+            if( $groupCount -eq 0 )
             {
                 Write-Error ('Local group "{0}" not found.' -f $Name) -ErrorAction:$ErrorActionPreference
                 return
             }
         }
-        return $group
     }
-    else
+    finally
     {
-        $query = New-Object 'DirectoryServices.AccountManagement.GroupPrincipal' $ctx
-        $searcher = New-Object 'DirectoryServices.AccountManagement.PrincipalSearcher' $query
-        try
-        {
-            $searcher.FindAll() 
-        }
-        finally
-        {
-            $searcher.Dispose()
-            $query.Dispose()
-        }
+        $searcher.Dispose()
+        $query.Dispose()
     }
 }

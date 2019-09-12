@@ -93,14 +93,19 @@ function Install-CUser
 
     Set-StrictMode -Version 'Latest'
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
+    Write-Timing 'Install-CUser Start'
     
     if( $PSCmdlet.ParameterSetName -eq 'WithCredential' )
     {
         $UserName = $Credential.UserName
     }
 
+
+    Write-Timing '              Getting user'
     $user = Get-CUser -userName $UserName -ErrorAction Ignore
     
+    Write-Timing '              Creating PrincipalContext'
     if( $user )
     {
         $ctx = $user.Context
@@ -115,6 +120,7 @@ function Install-CUser
         $operation = 'update'
         if( -not $user )
         {
+            Write-Timing '              Creating UserPrincipal'
             $operation = 'create'
             $user = New-Object 'DirectoryServices.AccountManagement.UserPrincipal' $ctx
             $creating = $true
@@ -126,6 +132,7 @@ function Install-CUser
         $user.UserCannotChangePassword = $UserCannotChangePassword
         $user.PasswordNeverExpires = -not $PasswordExpires
 
+        Write-Timing '              Setting password'
         if( $PSCmdlet.ParameterSetName -eq 'WithUserNameAndPassword' )
         {
             Write-Warning ('Install-CUser function''s `UserName` and `Password` parameters are obsolete and will be removed in a future version of Carbon. Please use the `Credential` parameter instead.')
@@ -139,6 +146,7 @@ function Install-CUser
 
         if( $PSCmdlet.ShouldProcess( $Username, "$operation local user" ) )
         {
+            Write-Timing '              Saving'
             $user.Save()
         }
 
@@ -149,11 +157,13 @@ function Install-CUser
     }
     finally
     {
+        Write-Timing '              Finally'
         if( -not $PassThru )
         {
             $user.Dispose()
             $ctx.Dispose()
         }
+        Write-Timing 'Install-CUser Done'
     }
 }
 

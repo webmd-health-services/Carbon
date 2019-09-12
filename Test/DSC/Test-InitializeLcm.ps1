@@ -22,14 +22,13 @@ $privateKeyPath = Join-Path -Path $PSScriptRoot -ChildPath '..\Cryptography\Carb
 $publicKeyPath = Join-Path -Path $PSScriptRoot -ChildPath '..\Cryptography\CarbonTestPublicKey.cer' -Resolve
 $publicKey = $null
 $certPath = $null
-$userName = 'CarbonTestUser'
+$userName = $CarbonTestUser.UserName
 $password = 'Aa1Bb2Cc3Dd4'
 
 function Start-TestFixture
 {
     & (Join-Path -Path $PSScriptRoot -ChildPath '..\Import-CarbonForTest.ps1' -Resolve)
     $tempDir = New-TempDirectory -Prefix $PSCommandPath
-    Install-User -Credential (New-Credential -Username $userName -Password $password)
 }
 
 function Stop-TestFixture
@@ -224,7 +223,7 @@ function Test-ShouldConfigureFileDownloadManager
                           -RebootIfNeeded `
                           -RefreshIntervalMinutes 35 `
                           -ConfigurationFrequency 3 `
-                          -LcmCredential (New-Credential -User $username -Password $password) `
+                          -LcmCredential $CarbonTestUser `
                           -ErrorAction SilentlyContinue
 
     if( [Environment]::OSVersion.Version.Major -ge 10 )
@@ -281,7 +280,7 @@ function Test-ShouldConfigureWebDownloadManager
                           -RebootIfNeeded `
                           -RefreshIntervalMinutes 40 `
                           -ConfigurationFrequency 3 `
-                          -LcmCredential (New-Credential -User $username -Password $password) `
+                          -LcmCredential $CarbonTestUser `
                           -ErrorAction SilentlyContinue
 
     if( [Environment]::OSVersion.Version.Major -ge 10 )
@@ -338,7 +337,7 @@ if( [Environment]::OSVersion.Version.Major -lt 10 )
                               -RebootIfNeeded `
                               -RefreshIntervalMinutes 45 `
                               -ConfigurationFrequency 3 `
-                              -LcmCredential (New-Credential -User $username -Password $password)
+                              -LcmCredential $CarbonTestUser
         Assert-NoError    
         Assert-NotNull $lcm
 
