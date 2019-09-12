@@ -10,91 +10,86 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+Set-StrictMode -Version 'Latest'
+
+& (Join-Path -Path $PSScriptRoot 'Initialize-CarbonTest.ps1' -Resolve)
+
 $appPoolName = 'Carbon-Set-IisWebsiteID'
 $siteName = 'Carbon-Set-IisWebsiteID'
 
-function Start-TestFixture
-{
-    & (Join-Path -Path $PSScriptRoot '..\Initialize-CarbonTest.ps1' -Resolve)
-}
-
-function Start-Test
-{
-    Install-IisAppPool -Name $appPoolName
-    Install-IisWebsite -Name $siteName -Binding 'http/*:80:carbon-test-set-iiswebsiteid.com' -Path $TestDir -AppPoolName $appPoolName
-
-}
-
-function Stop-Test
-{
-    Remove-IisWebsite $siteName
-}
-
-function Test-ShouldChangeID
-{
-    $currentSite = Get-IisWebsite -SiteName $siteName
-    Assert-NotNull $currentSite
-
-    $newID = [int32](Get-Random -Maximum ([int32]::MaxValue) -Minimum 1)
-    Set-IisWebsiteID -SiteName $siteName -ID $newID -ErrorAction SilentlyContinue
-
-    $updatedSite = Get-IisWebsite -SiteName $siteName
-    Assert-Equal $newID $updatedSite.ID
-    Assert-Equal 'Started' $updatedSite.State
-}
-
-function Test-ShouldDetectDuplicateIDs
-{
-    $alreadyTakenSiteName = 'AlreadyGotIt'
-    $alreadyTakenSiteID = 4571
-    $alreadyTakenSite = Install-IisWebsite -Name $alreadyTakenSiteName `
-                                           -PhysicalPath $PSScriptRoot `
-                                           -Binding 'http/*:9983:' `
-                                           -SiteID $alreadyTakenSiteID `
-                                           -PassThru
-    try
-    {
+Describe 'Set-IisWebsiteID' {
+    BeforeEach {
+        $testDir = Join-Path -Path $TestDrive.FullName -ChildPath ([IO.Path]::GetRandomFileName())
+        New-Item -Path $testDir -ItemType 'Directory'
+        Install-IisAppPool -Name $appPoolName
+        Install-IisWebsite -Name $siteName -Binding 'http/*:80:carbon-test-set-iiswebsiteid.com' -Path $TestDir -AppPoolName $appPoolName
+    }
+    
+    AfterEach {
+        Remove-IisWebsite $siteName
+    }
+    
+    It 'should change ID' {
         $currentSite = Get-IisWebsite -SiteName $siteName
-        Assert-NotNull $siteName
-
-        Assert-NotEqual $currentSite.ID $alreadyTakenSite.ID
-
+        $currentSite | Should Not BeNullOrEmpty
+    
+        $newID = [int32](Get-Random -Maximum ([int32]::MaxValue) -Minimum 1)
+        Set-IisWebsiteID -SiteName $siteName -ID $newID -ErrorAction SilentlyContinue
+    
+        $updatedSite = Get-IisWebsite -SiteName $siteName
+        $updatedSite.ID | Should Be $newID
+        $updatedSite.State | Should Be 'Started'
+    }
+    
+    It 'should detect duplicate IDs' {
+        $alreadyTakenSiteName = 'AlreadyGotIt'
+        $alreadyTakenSiteID = 4571
+        $alreadyTakenSite = Install-IisWebsite -Name $alreadyTakenSiteName `
+                                               -PhysicalPath $PSScriptRoot `
+                                               -Binding 'http/*:9983:' `
+                                               -SiteID $alreadyTakenSiteID `
+                                               -PassThru
+        try
+        {
+            $currentSite = Get-IisWebsite -SiteName $siteName
+            $siteName | Should Not BeNullOrEmpty
+    
+            $alreadyTakenSite.ID | Should Not Be $currentSite.ID
+    
+            $Error.Clear()
+            Set-IisWebsiteID -SiteName $siteName -ID $alreadyTakenSiteID -ErrorAction SilentlyContinue
+            $Error.Count | Should Be 1
+            $Error[0].Exception.Message | Should -BeLike '*ID * already in use*'
+        }
+        finally
+        {
+            Uninstall-IisWebsite -Name $alreadyTakenSiteName
+        }
+    }
+    
+    It 'should handle non existent website' {
         $Error.Clear()
-        Set-IisWebsiteID -SiteName $siteName -ID $alreadyTakenSiteID -ErrorAction SilentlyContinue
-        Assert-Equal 1 $Error.Count
-        Assert-Like $Error[0].Exception.Message '*ID * already in use*'
+        Set-IisWebsiteID -SiteName 'HopefullyIDoNotExist' -ID 453879 -ErrorAction SilentlyContinue
+        $Error.Count | Should Be 1
+        $Error[0].Exception.Message | Should -BeLike '*Website * not found*'
     }
-    finally
-    {
-        Uninstall-IisWebsite -Name $alreadyTakenSiteName
+    
+    It 'should support what if' {
+        $currentSite = Get-IisWebsite -SiteName $siteName
+        $newID = [int32](Get-Random -Maximum ([int32]::MaxValue) -Minimum 1)
+        Set-IisWebsiteID -SiteName $siteName -ID $newID -WhatIf -ErrorAction SilentlyContinue
+        $updatedsite = Get-IisWebsite -SiteName $siteName
+        $updatedsite.ID | Should Be $currentSite.ID
     }
+    
+    It 'should set same ID on same website' {
+        $Error.Clear()
+        $currentSite = Get-IisWebsite -SiteName $siteName
+        Set-IisWebsiteID -SiteName $siteName -ID $currentSite.ID -ErrorAction SilentlyContinue
+        $Error.Count | Should Be 0
+        $updatedSite = Get-IisWebsite -SiteName $siteName
+        $updatedSite.ID | Should Be $currentSite.ID
+        $updatedSite.State | Should Be 'Started'
+    }
+    
 }
-
-function Test-ShouldHandleNonExistentWebsite
-{
-    $Error.Clear()
-    Set-IisWebsiteID -SiteName 'HopefullyIDoNotExist' -ID 453879 -ErrorAction SilentlyContinue
-    Assert-Equal 1 $Error.Count
-    Assert-Like $Error[0].Exception.Message '*Website * not found*'
-}
-
-function Test-ShouldSupportWhatIf
-{
-    $currentSite = Get-IisWebsite -SiteName $siteName
-    $newID = [int32](Get-Random -Maximum ([int32]::MaxValue) -Minimum 1)
-    Set-IisWebsiteID -SiteName $siteName -ID $newID -WhatIf -ErrorAction SilentlyContinue
-    $updatedsite = Get-IisWebsite -SiteName $siteName
-    Assert-Equal $currentSite.ID $updatedsite.ID
-}
-
-function Test-ShouldSetSameIDOnSameWebsite
-{
-    $Error.Clear()
-    $currentSite = Get-IisWebsite -SiteName $siteName
-    Set-IisWebsiteID -SiteName $siteName -ID $currentSite.ID -ErrorAction SilentlyContinue
-    Assert-Equal 0 $Error.Count
-    $updatedSite = Get-IisWebsite -SiteName $siteName
-    Assert-Equal $currentSite.ID $updatedSite.ID
-    Assert-Equal 'Started' $updatedSite.State
-}
-
