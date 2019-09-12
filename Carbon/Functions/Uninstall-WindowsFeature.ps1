@@ -1,6 +1,6 @@
 
 # This function should only be available if the Windows PowerShell v3.0 Server Manager cmdlets aren't already installed.
-if( -not (Get-Command -Name 'Get-CWindowsFeature*' | Where-Object { $_.ModuleName -ne 'Carbon' }) )
+if( -not (Get-Command -Name 'Get-WindowsFeature*' | Where-Object { $_.ModuleName -ne 'Carbon' }) )
 {
     function Uninstall-CWindowsFeature
     {
@@ -123,4 +123,5 @@ if( -not (Get-Command -Name 'Get-CWindowsFeature*' | Where-Object { $_.ModuleNam
     }
 
     Set-Alias -Name 'Uninstall-WindowsFeatures' -Value 'Uninstall-CWindowsFeature'
+    Set-Alias -Name 'Uninstall-WindowsFeature' -Value 'Uninstall-CWindowsFeature'
 }

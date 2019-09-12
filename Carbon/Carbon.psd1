@@ -355,6 +355,7 @@ All functions are idempotent: when run multiple times with the same arguments, y
 * Fixed: `Get-CUser` can sometimes take 60 to 90 seconds to lookup a specific user.
 * Fixed: `Get-CGroup` can sometimes take 60 to 90 seconds to lookup a specific group.
 * Improved `Set-EnvironmentVariable` and `Remove-EnvironmentVariable` functions' reliability when setting and removing variables for a specific user (they now use `Start-Job` instead of Carbon's `Invoke-CPowerShell`).
+* Fixed: Carbon was hiding the ServerManager module's `Get-WindowsFeature`, `Install-WindowsFeature`, and `Uninstall-WindowsFeature` cmdlets.
 '@
         } # End of PSData hashtable
     
