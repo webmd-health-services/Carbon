@@ -20,7 +20,11 @@ Describe 'Test-Group' {
         try
         {
             $groups | Should -Not -BeNullOrEmpty
-            $groups | ForEach-Object { Test-Group -Name $_.Name } | Should -BeTrue
+            $groups |
+                # Sometimes on the build server, groups come back without a name.
+                Where-Object { $_.Name } | 
+                ForEach-Object { Test-Group -Name $_.Name } |
+                Should -BeTrue
         }
         finally
         {

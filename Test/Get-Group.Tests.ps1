@@ -63,4 +63,14 @@ Describe 'Get-Group' {
         $Error.Count | Should -Be 1
         $Error[0].Exception.Message | Should -BeLike '*not found*'
     }
+
+    It 'should get groups if WhatIfPreference is true' {
+        $WhatIfPreference = $true
+        $groups = Get-CGroup 
+        $groups | Should -Not -BeNullOrEmpty
+        $groups | 
+            Select-Object -First 1 | 
+            ForEach-Object { Get-CGroup -Name $_.Name } | 
+            Should -Not -BeNullOrEmpty
+    }
 }

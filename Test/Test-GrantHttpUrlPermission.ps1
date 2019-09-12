@@ -17,8 +17,7 @@ $url = 'http://test-granthttpurlpermission:10383/'
 
 function Start-Test
 {
-    Install-User -Credential (New-Credential -UserName 'CarbonTestUser' -Password 'Password1')
-    $user = Resolve-Identity -Name 'CarbonTestUser'
+    $user = Resolve-Identity -Name $CarbonTestUser.UserName
 }
 
 function Stop-Test
