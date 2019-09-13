@@ -16,11 +16,26 @@ Set-StrictMode -Version 'Latest'
 
 $groupName = 'CarbonCOM'
 
-Install-CGroup -Name $groupName -Description 'Group used by the Carbon PowerShell module tests for COM grant/revoke methods.'
+$maxTries = 100
+$tryNum = 0
+while( $tryNum++ -lt $maxTries )
+{
+    try
+    {
+        Install-CGroup -Name $groupName -Description 'Group used by the Carbon PowerShell module tests for COM grant/revoke methods.'
+        break
+    }
+    catch
+    {
+        Write-Warning -Message ('[Grant-ComPermission.Tests]  Attempt {0,3} of {1} to create group "{0}" failed.' -f $tryNum,$maxTries,$groupName)
+        Start-Sleep -Milliseconds 100
+    }
+}
 
 Describe 'Grant-ComPermission' {
     
     BeforeEach {
+        $Global:Error.Clear()
         Revoke-TestComPermissions
     }
     
