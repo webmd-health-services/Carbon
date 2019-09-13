@@ -64,7 +64,7 @@ function Get-CPrincipal
                 $lastTry = $tryNum -ge $maxTries
                 if( $lastTry )
                 {
-                    Write-Error -Message ('We tried {0} times to read {1} information, but kept getting exceptions. We''ve given up. Here''s the last error we got: {2}.' -f $maxTries,$principalTypeName,$_)
+                    Write-Error -Message ('We tried {0} times to read {1} information, but kept getting exceptions. We''ve given up. Here''s the last error we got: {2}.' -f $maxTries,$principalTypeName,$_) -ErrorAction $ErrorActionPreference
                     return
                 }
 

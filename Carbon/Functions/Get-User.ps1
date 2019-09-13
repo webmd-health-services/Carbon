@@ -69,7 +69,7 @@ function Get-CUser
             }
             if( $usersCount -eq 0 )
             {
-                Write-Error -Message ('Local user "{0}" not found.' -f $Username) -ErrorAction:$ErrorActionPreference
+                Write-Error -Message ('Local user "{0}" not found.' -f $Username) -ErrorAction $ErrorActionPreference
             }
         }
 
