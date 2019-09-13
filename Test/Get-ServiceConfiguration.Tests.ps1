@@ -10,26 +10,30 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Start-TestFixture
-{
-    & (Join-Path -Path $PSScriptRoot -ChildPath '..\Initialize-CarbonTest.ps1' -Resolve)
-}
+Set-StrictMode -Version 'Latest'
 
-function Test-ShouldLoadAllServiceConfiguration
-{
-    Get-Service | Get-ServiceConfiguration | Format-List -Property *
-    Assert-NoError
-}
+& (Join-Path -Path $PSScriptRoot -ChildPath 'Initialize-CarbonTest.ps1' -Resolve)
 
-function Test-ShouldLoadExtendedTypeData
-{
-    Get-Service | ForEach-Object {
-        $service = $_
-        $info = Get-ServiceConfiguration -Name $service.Name
-        $info | Get-Member -MemberType Property | ForEach-Object { Assert-Equal $info.($_.Name) $service.($_.Name) $_.Name }
+Describe 'Get-ServiceConfiguration' {
+    BeforeEach {
+        $Global:Error.Clear()
     }
-    Assert-NoError
 
+    It 'should load all service configuration' {
+        Get-Service | 
+            Get-ServiceConfiguration | 
+            Format-List -Property *
+        $Global:Error.Count | Should -Be 0
+    }
+    
+    It 'should load extended type data' {
+        Get-Service | ForEach-Object {
+            $service = $_
+            $info = Get-ServiceConfiguration -Name $service.Name
+            $info | 
+                Get-Member -MemberType Property | 
+                ForEach-Object { $info.($_.Name) | Should -Be $service.($_.Name) }
+        }
+        $Global:Error.Count | Should -Be 0
+    }
 }
-
-
