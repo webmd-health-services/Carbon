@@ -27,6 +27,18 @@ Describe 'Get-ServiceConfiguration' {
             Format-List -Property *
         $Global:Error.Count | Should -Be 0
     }
+
+    It 'should write an error if the service doesn''t exist' {
+        $info = Get-CServiceConfiguration -Name 'YOLOyolo' -ErrorAction SilentlyContinue
+        $info | Should -BeNullOrEmpty
+        $Global:Error | Should -Match 'Cannot\ find\ any\ service'
+    }
+
+    It 'should ignore missing service' {
+        $info = Get-CServiceConfiguration -Name 'FUBARsnafu' -ErrorAction Ignore
+        $info | Should -BeNullOrEmpty
+        $Global:Error | Should -BeNullOrEmpty
+    }
     
     It 'should load extended type data' {
         $services = Get-Service | Where-Object { $_.Name -notlike 'Carbon*' }
