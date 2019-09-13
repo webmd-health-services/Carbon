@@ -31,7 +31,7 @@ Describe 'Set-IisWebsiteID' {
     
     It 'should change ID' {
         $currentSite = Get-IisWebsite -SiteName $siteName
-        $currentSite | Should Not BeNullOrEmpty
+        $currentSite | Should -Not -BeNullOrEmpty
         # Make sure the website is already started.
         $currentSite.Start()
     
@@ -39,8 +39,8 @@ Describe 'Set-IisWebsiteID' {
         Set-IisWebsiteID -SiteName $siteName -ID $newID -ErrorAction SilentlyContinue
     
         $updatedSite = Get-IisWebsite -SiteName $siteName
-        $updatedSite.ID | Should Be $newID
-        $updatedSite.State | Should Be 'Started'
+        $updatedSite.ID | Should -Be $newID
+        $updatedSite.State | Should -Be 'Started'
     }
     
     It 'should detect duplicate IDs' {
@@ -54,13 +54,13 @@ Describe 'Set-IisWebsiteID' {
         try
         {
             $currentSite = Get-IisWebsite -SiteName $siteName
-            $siteName | Should Not BeNullOrEmpty
+            $siteName | Should -Not -BeNullOrEmpty
     
-            $alreadyTakenSite.ID | Should Not Be $currentSite.ID
+            $alreadyTakenSite.ID | Should -Not -Be $currentSite.ID
     
             $Error.Clear()
             Set-IisWebsiteID -SiteName $siteName -ID $alreadyTakenSiteID -ErrorAction SilentlyContinue
-            $Error.Count | Should Be 1
+            $Error.Count | Should -Be 1
             $Error[0].Exception.Message | Should -BeLike '*ID * already in use*'
         }
         finally
@@ -72,7 +72,7 @@ Describe 'Set-IisWebsiteID' {
     It 'should handle non existent website' {
         $Error.Clear()
         Set-IisWebsiteID -SiteName 'HopefullyIDoNotExist' -ID 453879 -ErrorAction SilentlyContinue
-        $Error.Count | Should Be 1
+        $Error.Count | Should -Be 1
         $Error[0].Exception.Message | Should -BeLike '*Website * not found*'
     }
     
@@ -81,7 +81,7 @@ Describe 'Set-IisWebsiteID' {
         $newID = [int32](Get-Random -Maximum ([int32]::MaxValue) -Minimum 1)
         Set-IisWebsiteID -SiteName $siteName -ID $newID -WhatIf -ErrorAction SilentlyContinue
         $updatedsite = Get-IisWebsite -SiteName $siteName
-        $updatedsite.ID | Should Be $currentSite.ID
+        $updatedsite.ID | Should -Be $currentSite.ID
     }
     
     It 'should set same ID on same website' {
@@ -89,10 +89,10 @@ Describe 'Set-IisWebsiteID' {
         $currentSite = Get-IisWebsite -SiteName $siteName
         $currentSite.Start()
         Set-IisWebsiteID -SiteName $siteName -ID $currentSite.ID -ErrorAction SilentlyContinue
-        $Error.Count | Should Be 0
+        $Error.Count | Should -Be 0
         $updatedSite = Get-IisWebsite -SiteName $siteName
-        $updatedSite.ID | Should Be $currentSite.ID
-        $updatedSite.State | Should Be 'Started'
+        $updatedSite.ID | Should -Be $currentSite.ID
+        $updatedSite.State | Should -Be 'Started'
     }
     
 }
