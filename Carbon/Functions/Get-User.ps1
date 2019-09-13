@@ -50,51 +50,14 @@ function Get-CUser
     Write-Timing ('           Creating searcher')
     $ctx = New-Object 'DirectoryServices.AccountManagement.PrincipalContext' ([DirectoryServices.AccountManagement.ContextType]::Machine)
     $query = New-Object 'DirectoryServices.AccountManagement.UserPrincipal' $ctx
-    $searcher = New-Object 'DirectoryServices.AccountManagement.PrincipalSearcher' $query
     try
     {
-        $users = @()
-
-        $maxTries = 100
-        $tryNum = 0
-        while( $tryNum++ -lt $maxTries )
-        {
-            $numErrorsBefore = $Global:Error.Count
-            $lastTry = $tryNum -ge $maxTries
-            try
+        $users = Get-CPrincipal -Principal $query -Filter { 
+            if( $UserName )
             {
-                Write-Timing ('           [{0,3} of {1}]  FindAll()  Begin' -f $tryNum,$maxTries)
-                $users = 
-                    $searcher.FindAll() |
-                    Where-Object {
-                        if( $UserName )
-                        {
-                            return $_.SamAccountName -eq $UserName
-                        }
-                        return $true
-                    }
-                Write-Timing ('                         FindAll()  End')
-                break
+                return $_.SamAccountName -eq $UserName
             }
-            catch
-            {
-                Write-Timing ('                         FindAll()  Failed')
-                $_ | Out-String | Write-Debug 
-
-                if( $lastTry )
-                {
-                    Write-Error -Message ('We tried {0} times to read user information, but kept getting exceptions. We''ve given up. Here''s the last error we got: {1}.' -f $maxTries,$_)
-                    return
-                }
-
-                $numErrors = $Global:Error.Count - $numErrorsBefore
-                for( $idx = 0; $idx -lt $numErrors; ++$idx )
-                {
-                    $Global:Error.RemoveAt(0)
-                }
-
-                Start-Sleep -Milliseconds 100
-            }
+            return $true
         }
 
         if( $UserName )
@@ -114,7 +77,6 @@ function Get-CUser
     }
     finally
     {
-        $searcher.Dispose()
         $query.Dispose()
         Write-Timing ('Get-CUser')
     }
