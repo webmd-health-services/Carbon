@@ -108,7 +108,7 @@ function Revoke-CComPermission
     $sdBytes = $converter.Win32SDToBinarySD( $newSd )
 
     $regValueName = $pscmdlet.ParameterSetName
-    Set-CRegistryKeyValue -Path $ComRegKeyPath -Name $regValueName -Binary $sdBytes.BinarySD -Quiet
+    Set-CRegistryKeyValue -Path $ComRegKeyPath -Name $regValueName -Binary $sdBytes.BinarySD
 }
 
 Set-Alias -Name 'Revoke-ComPermissions' -Value 'Revoke-CComPermission'

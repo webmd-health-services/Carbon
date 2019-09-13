@@ -214,7 +214,7 @@ function Grant-CComPermission
     $sdBytes = $converter.Win32SDToBinarySD( $newSd )
 
     $regValueName = $pscmdlet.ParameterSetName -replace '(Allow|Deny)$',''
-    Set-CRegistryKeyValue -Path $ComRegKeyPath -Name $regValueName -Binary $sdBytes.BinarySD -Quiet -ErrorAction:$ErrorActionPreference
+    Set-CRegistryKeyValue -Path $ComRegKeyPath -Name $regValueName -Binary $sdBytes.BinarySD -ErrorAction:$ErrorActionPreference
     
     if( $PassThru )
     {
