@@ -38,24 +38,19 @@ function Get-CGroup
     Set-StrictMode -Version 'Latest'
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
-    # Tee-Object won't set its variable if WhatIfPreference is $true.
-    $WhatIfPreference = $false
-    
+    Write-Timing ('Get-CGroup')
+
     $ctx = New-Object 'DirectoryServices.AccountManagement.PrincipalContext' ([DirectoryServices.AccountManagement.ContextType]::Machine)
     $query = New-Object 'DirectoryServices.AccountManagement.GroupPrincipal' $ctx
-    $searcher = New-Object 'DirectoryServices.AccountManagement.PrincipalSearcher' $query
     try
     {
-        $groups = @()
-        $searcher.FindAll()  |
-            Where-Object { 
-                if( $Name )
-                {
-                    return $_.Name -eq $Name
-                }
-                return $true
-            } |
-            Tee-Object -Variable 'groups'
+        $groups = Get-CPrincipal -Principal $query -Filter {
+            if( $Name )
+            {
+                return $_.Name -eq $Name
+            }
+            return $true
+        }
 
         if( $Name )
         {
@@ -72,10 +67,12 @@ function Get-CGroup
                 return
             }
         }
+
+        return $groups
     }
     finally
     {
-        $searcher.Dispose()
         $query.Dispose()
+        Write-Timing ('Get-CGroup')
     }
 }
