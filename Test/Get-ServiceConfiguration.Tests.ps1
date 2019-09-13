@@ -21,18 +21,32 @@ Describe 'Get-ServiceConfiguration' {
 
     It 'should load all service configuration' {
         Get-Service | 
+            # Skip Carbon services. They could get uninstalled at any moment.
+            Where-Object { $_.Name -notlike 'Carbon*' } |
             Get-ServiceConfiguration | 
             Format-List -Property *
         $Global:Error.Count | Should -Be 0
     }
     
     It 'should load extended type data' {
-        Get-Service | ForEach-Object {
-            $service = $_
-            $info = Get-ServiceConfiguration -Name $service.Name
-            $info | 
-                Get-Member -MemberType Property | 
-                ForEach-Object { $info.($_.Name) | Should -Be $service.($_.Name) }
+        $services = Get-Service | Where-Object { $_.Name -notlike 'Carbon*' }
+        $memberNames = $null
+            
+        foreach( $service in $services )
+        {
+            $info = Get-CServiceConfiguration -Name $service.Name
+            if( -not $memberNames )
+            {
+                $memberNames = 
+                    $info | 
+                    Get-Member -MemberType 'Property' | 
+                    Select-Object -ExpandProperty 'Name'
+            }
+
+            foreach( $memberName in $memberNames )
+            {
+                $info.$memberName | Should -Be $service.$memberName
+            }
         }
         $Global:Error.Count | Should -Be 0
     }
