@@ -38,24 +38,54 @@ function Get-CGroup
     Set-StrictMode -Version 'Latest'
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
-    # Tee-Object won't set its variable if WhatIfPreference is $true.
-    $WhatIfPreference = $false
-    
+    Write-Timing ('Get-CGroup')
+
     $ctx = New-Object 'DirectoryServices.AccountManagement.PrincipalContext' ([DirectoryServices.AccountManagement.ContextType]::Machine)
     $query = New-Object 'DirectoryServices.AccountManagement.GroupPrincipal' $ctx
     $searcher = New-Object 'DirectoryServices.AccountManagement.PrincipalSearcher' $query
     try
     {
         $groups = @()
-        $searcher.FindAll()  |
-            Where-Object { 
-                if( $Name )
+
+        $maxTries = 100
+        $tryNum = 0
+        while( $tryNum++ -lt $maxTries )
+        {
+            try
+            {
+                Write-Timing ('             [{0,3} of {1}]  FindAll()  Begin' -f $tryNum,$maxTries)
+                $groups = 
+                    $searcher.FindAll()  |
+                    Where-Object { 
+                        if( $Name )
+                        {
+                            return $_.Name -eq $Name
+                        }
+                        return $true
+                    }
+                Write-Timing ('                           FindAll()  End')
+                break
+            }
+            catch
+            {
+                Write-Timing ('                           FindAll()  Failed')
+                $_ | Out-String | Write-Debug 
+                
+                if( $lastTry )
                 {
-                    return $_.Name -eq $Name
+                    Write-Error ('We''ve tried {0} times to read groups, but keep getting exceptions. We''re giving up. Here''s the last exception we got: {1}' -f $maxTries,$_) -ErrorAction $ErrorActionPreference
+                    return
                 }
-                return $true
-            } |
-            Tee-Object -Variable 'groups'
+
+                $numErrors = $Global:Error.Count - $numErrorsBefore
+                for( $idx = 0; $idx -lt $numErrors; ++$idx )
+                {
+                    $Global:Error.RemoveAt(0)
+                }
+
+                Start-Sleep -Milliseconds 100
+            }
+        }
 
         if( $Name )
         {
@@ -72,10 +102,13 @@ function Get-CGroup
                 return
             }
         }
+
+        return $groups
     }
     finally
     {
         $searcher.Dispose()
         $query.Dispose()
+        Write-Timing ('Get-CGroup')
     }
 }

@@ -45,10 +45,7 @@ function Get-CUser
     Set-StrictMode -Version 'Latest'
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
-    # Tee-Object won't set its variable if WhatIfPreference is $true.
-    $WhatIfPreference = $false
-
-    Write-Timing 'Get-CUser  Start'
+    Write-Timing 'Get-CUser'
     
     Write-Timing ('           Creating searcher')
     $ctx = New-Object 'DirectoryServices.AccountManagement.PrincipalContext' ([DirectoryServices.AccountManagement.ContextType]::Machine)
@@ -58,17 +55,47 @@ function Get-CUser
     {
         $users = @()
 
-        Write-Timing ('           FindAll()  Start')
-        $searcher.FindAll() |
-            Where-Object {
-                if( $UserName )
+        $maxTries = 100
+        $tryNum = 0
+        while( $tryNum++ -lt $maxTries )
+        {
+            $numErrorsBefore = $Global:Error.Count
+            $lastTry = $tryNum -ge $maxTries
+            try
+            {
+                Write-Timing ('           [{0,3} of {1}]  FindAll()  Begin' -f $tryNum,$maxTries)
+                $users = 
+                    $searcher.FindAll() |
+                    Where-Object {
+                        if( $UserName )
+                        {
+                            return $_.SamAccountName -eq $UserName
+                        }
+                        return $true
+                    }
+                Write-Timing ('                         FindAll()  End')
+                break
+            }
+            catch
+            {
+                Write-Timing ('                         FindAll()  Failed')
+                $_ | Out-String | Write-Debug 
+
+                if( $lastTry )
                 {
-                    return $_.SamAccountName -eq $UserName
+                    Write-Error -Message ('We tried {0} times to read user information, but kept getting exceptions. We''ve given up. Here''s the last error we got: {1}.' -f $maxTries,$_)
+                    return
                 }
-                return $true
-            } |
-            Tee-Object -Variable 'users'
-        Write-Timing ('           FindAll()  Done')
+
+                $numErrors = $Global:Error.Count - $numErrorsBefore
+                for( $idx = 0; $idx -lt $numErrors; ++$idx )
+                {
+                    $Global:Error.RemoveAt(0)
+                }
+
+                Start-Sleep -Milliseconds 100
+            }
+        }
 
         if( $UserName )
         {
@@ -82,12 +109,13 @@ function Get-CUser
                 Write-Error -Message ('Local user "{0}" not found.' -f $Username) -ErrorAction:$ErrorActionPreference
             }
         }
+
+        return $users
     }
     finally
     {
-        Write-Timing ('           Finally')
         $searcher.Dispose()
         $query.Dispose()
+        Write-Timing ('Get-CUser')
     }
-    Write-Timing ('Get-CUser  Done')
 }
