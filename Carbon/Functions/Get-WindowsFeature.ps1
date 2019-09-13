@@ -1,6 +1,6 @@
 
 # This function should only be available if the Windows PowerShell v3.0 Server Manager cmdlets aren't already installed.
-if( -not (Get-Command -Name 'Get-CWindowsFeature*' | Where-Object { $_.ModuleName -ne 'Carbon' }) )
+if( -not (Get-Command -Name 'Get-WindowsFeature*' | Where-Object { $_.ModuleName -ne 'Carbon' }) )
 {
     function Get-CWindowsFeature
     {
@@ -110,4 +110,6 @@ if( -not (Get-Command -Name 'Get-CWindowsFeature*' | Where-Object { $_.ModuleNam
             Write-Error $supportNotFoundErrorMessage
         }        
     }
+
+    Set-Alias -Name 'Get-WindowsFeature' -Value 'Get-CWindowsFeature'
 }

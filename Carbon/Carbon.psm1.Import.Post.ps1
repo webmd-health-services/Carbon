@@ -70,6 +70,11 @@ try
     [string[]]$functionNames = $module.ExportedFunctions.Keys
     foreach( $functionName in $functionNames )
     {
+        if( $functionName -match '(Get|Install|Uninstall)-CWindowsFeature' )
+        {
+            continue
+        }
+
         $oldFunctionName = $functionName -replace '-C','-'
         Set-Alias -Name $oldFunctionName -Value $functionName
     }

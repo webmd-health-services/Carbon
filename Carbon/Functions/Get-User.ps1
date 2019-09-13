@@ -45,30 +45,20 @@ function Get-CUser
     Set-StrictMode -Version 'Latest'
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
-    # Tee-Object won't set its variable if WhatIfPreference is $true.
-    $WhatIfPreference = $false
-
-    Write-Timing 'Get-CUser  Start'
+    Write-Timing 'Get-CUser'
     
     Write-Timing ('           Creating searcher')
     $ctx = New-Object 'DirectoryServices.AccountManagement.PrincipalContext' ([DirectoryServices.AccountManagement.ContextType]::Machine)
     $query = New-Object 'DirectoryServices.AccountManagement.UserPrincipal' $ctx
-    $searcher = New-Object 'DirectoryServices.AccountManagement.PrincipalSearcher' $query
     try
     {
-        $users = @()
-
-        Write-Timing ('           FindAll()  Start')
-        $searcher.FindAll() |
-            Where-Object {
-                if( $UserName )
-                {
-                    return $_.SamAccountName -eq $UserName
-                }
-                return $true
-            } |
-            Tee-Object -Variable 'users'
-        Write-Timing ('           FindAll()  Done')
+        $users = Get-CPrincipal -Principal $query -Filter { 
+            if( $UserName )
+            {
+                return $_.SamAccountName -eq $UserName
+            }
+            return $true
+        }
 
         if( $UserName )
         {
@@ -79,15 +69,15 @@ function Get-CUser
             }
             if( $usersCount -eq 0 )
             {
-                Write-Error -Message ('Local user "{0}" not found.' -f $Username) -ErrorAction:$ErrorActionPreference
+                Write-Error -Message ('Local user "{0}" not found.' -f $Username) -ErrorAction $ErrorActionPreference
             }
         }
+
+        return $users
     }
     finally
     {
-        Write-Timing ('           Finally')
-        $searcher.Dispose()
         $query.Dispose()
+        Write-Timing ('Get-CUser')
     }
-    Write-Timing ('Get-CUser  Done')
 }
