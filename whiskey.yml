@@ -1,9 +1,12 @@
 PublishOn:
  - master
+ - prerelease
 
 Build:
 - Version:
     Path: Carbon\Carbon.psd1
+    Prerelease:
+    - prerelease: rc$(WHISKEY_BUILD_NUMBER)
 - PowerShell:
     OnlyBy: BuildServer
     Path: Save-CarbonSigningKey.ps1
@@ -193,11 +196,15 @@ Publish:
     RepositoryUri: https://www.powershellgallery.com/api/v2/
     ApiKeyID: powershellgallery.com
 - NuGetPush:
+    OnlyOnBranch:
+    - master
     UnlessExists: env:APPVEYOR_PULL_REQUEST_NUMBER
     Uri: https://nuget.org/api/v2/package
     ApiKeyID: nuget.org
     SkipUploadedCheck: true
 - NuGetPush:
+    OnlyOnBranch:
+    - master
     UnlessExists: env:APPVEYOR_PULL_REQUEST_NUMBER
     Uri: https://chocolatey.org/api/v2/package
     ApiKeyID: chocolatey.org
