@@ -53,12 +53,12 @@ function Get-CPrincipal
                 $principals = 
                     $searcher.FindAll() |
                     Where-Object -FilterScript $Filter
-                Write-Timing ('                                FindAll()  End')
+                Write-Timing ('                              FindAll()  End')
                 break
             }
             catch
             {
-                Write-Timing ('                                FindAll()  Failed')
+                Write-Timing ('                              FindAll()  Failed')
                 $_ | Out-String | Write-Debug 
 
                 $lastTry = $tryNum -ge $maxTries

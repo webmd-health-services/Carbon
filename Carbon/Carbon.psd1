@@ -354,8 +354,10 @@ All functions are idempotent: when run multiple times with the same arguments, y
 * Fixed: `Uninstall-CService` can write an error when a service's process exits at unexpected times.
 * Fixed: `Get-CUser` can sometimes take 60 to 90 seconds to lookup a specific user.
 * Fixed: `Get-CGroup` can sometimes take 60 to 90 seconds to lookup a specific group.
-* Improved `Set-EnvironmentVariable` and `Remove-EnvironmentVariable` functions' reliability when setting and removing variables for a specific user (they now use `Start-Job` instead of Carbon's `Invoke-CPowerShell`).
-* Fixed: Carbon was hiding the ServerManager module's `Get-WindowsFeature`, `Install-WindowsFeature`, and `Uninstall-WindowsFeature` cmdlets.
+* Improved `Set-CEnvironmentVariable` and `Remove-CEnvironmentVariable` functions' reliability when setting and removing variables for a specific user (they now use `Start-Job` instead of Carbon's `Invoke-CPowerShell`).
+* Fixed: Carbon was hiding the ServerManager module's `Get-WindowsFeature`, `Install-WindowsFeature`, and `Uninstall-WindowsFeature` cmdlets (fixes issue #55).
+* Fixed: `Set-CHostsEntry` can sometimes clear the hosts file (fixes issue #39).
+* Fixed: `Get-CServiceConfiguration` fails with a terminating exception if a service doesn't exist.
 '@
         } # End of PSData hashtable
     
