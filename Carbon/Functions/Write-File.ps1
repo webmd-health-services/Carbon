@@ -43,17 +43,14 @@ function Write-CFile
         [Parameter(Mandatory=$true,ValueFromPipeline=$true)]
         [AllowEmptyCollection()]
         [AllowEmptyString()]
-        [string[]]
         # The contents of the file
-        $InputObject,
+        [string[]]$InputObject,
 
-        [int]
         # The number of tries before giving up reading the file. The default is 100.
-        $MaximumTries = 30,
+        [int]$MaximumTries = 100,
 
-        [int]
         # The number of milliseconds to wait between tries. Default is 100 milliseconds.
-        $RetryDelayMilliseconds = 100
+        [int]$RetryDelayMilliseconds = 100
     )
 
     begin
@@ -70,7 +67,6 @@ function Write-CFile
         }
 
         $tryNum = 0
-        $wroteSomething = $false
         $newLineBytes = [Text.Encoding]::UTF8.GetBytes([Environment]::NewLine)
 
         [IO.FileStream]$fileWriter = $null
@@ -125,7 +121,6 @@ function Write-CFile
             [byte[]]$bytes = [Text.Encoding]::UTF8.GetBytes($item)
             $fileWriter.Write($bytes,0,$bytes.Length)
             $fileWriter.Write($newLineBytes,0,$newLineBytes.Length)
-            $wroteSomething = $true
         }
     }
 
