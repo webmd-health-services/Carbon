@@ -140,6 +140,7 @@ Tests:
     OnlyBy: Developer
     Path: 
     - Test\Bin.Tests.ps1
+    - Test\Import-Carbon.Tests.ps1
     - Test\LicenseNotices.Tests.ps1
     - Test\*.ps1xml.Tests.ps1
     - Test\Website.Tests.ps1

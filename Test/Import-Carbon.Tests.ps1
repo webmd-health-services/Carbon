@@ -68,7 +68,42 @@ Describe 'Import-Carbon' {
         {
             $env:Path = $originalPath
         }
-    
     }
-    
+
+    It 'should import fast' {
+        # September 2019: average unmerged modules takes about 8.1 seconds to import.
+        $maxAvgDuration = 9.0
+        if( (Test-Path -Path 'env:APPVEYOR') )
+        {
+            # September 2019: average merged module takes about .75 seconds to import.
+            $maxAvgDuration = 0.8
+        }
+        $carbonPath = Join-Path -Path $PSScriptRoot -ChildPath '..\Carbon' -Resolve
+        & {
+                for( $idx = 0; $idx -lt 7; ++$idx )
+                {
+                    $job = Start-Job -ScriptBlock {
+                        $started = Get-Date
+                        Import-Module -Name $using:carbonPath
+                        return (Get-Date) - $started
+                    }
+                    $job | Wait-Job | Receive-Job 
+                    $job | Remove-Job -Force
+                }
+            } |
+            Select-Object -ExpandProperty 'TotalSeconds' |
+            Sort-Object |
+            # Don't use best/worst times
+            Select-Object -Skip 1 |
+            Select-Object -SkipLast 1 |
+            Measure-Object -Average -Maximum -Minimum |
+            ForEach-Object { 
+                Write-Verbose -Message ('Import-Module Statistics') -Verbose
+                Write-Verbose -Message ('========================') -Verbose
+                $_ | Format-List | Out-String | Write-Verbose -Verbose
+                $_
+            } |
+            Select-Object -ExpandProperty 'Average' |
+            Should -BeLessOrEqual $maxAvgDuration
+    }
 }
