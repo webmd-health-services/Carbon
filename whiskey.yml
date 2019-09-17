@@ -120,6 +120,14 @@ PublishBin:
     OnlyDuring: Build
     OnlyBy: BuildServer
     Path: Carbon\bin\*.pdb
+# We don't need to include any assemblies that ship with PowerShell
+- Delete:
+    OnlyDuring: Build
+    Path:
+    - Carbon\bin\coreclr\runtimes
+    - Carbon\bin\coreclr\*.json
+    - Carbon\bin\coreclr\System.*.dll
+    - Carbon\bin\coreclr\Microsoft.Win32.Registry.dll
 
 Tests:
 - TaskDefaults:
@@ -131,6 +139,7 @@ Tests:
 - Pester4:
     OnlyBy: Developer
     Path: 
+    - Test\Bin.Tests.ps1
     - Test\LicenseNotices.Tests.ps1
     - Test\*.ps1xml.Tests.ps1
     - Test\Website.Tests.ps1
