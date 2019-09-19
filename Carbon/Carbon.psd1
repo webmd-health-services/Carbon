@@ -25,7 +25,7 @@
     RootModule = 'Carbon.psm1'
 
     # Version number of this module.
-    ModuleVersion = '2.8.1'
+    ModuleVersion = '2.9.0'
 
     # ID used to uniquely identify this module
     GUID = '075d9444-c01b-48c3-889a-0b3490716fa2'
@@ -345,10 +345,21 @@ All functions are idempotent: when run multiple times with the same arguments, y
             # A URL to the main website for this project.
             ProjectUri = 'http://get-carbon.org/'
 
+            Prerelease = ''
+
             # ReleaseNotes of this module
             ReleaseNotes = @'
-* Added verification information to Chocolatey package.
-* Updated copyright.
+* Carbon should now import in less than a second.
+* Fixed: `Grant-CHttpUrlPermission` documentation uses command named `Grant-CHttpUrlAclPermission`. (Fixes [issue 66](https://github.com/webmd-health-services/Carbon/issues/66).)
+* Fixed: `Enable-CNtfsCompression` always enables compression even if compression is already enabled.
+* Fixed: `Disable-CNtfsCompression` always disables compression even if compression is already disabled.
+* Fixed: `Uninstall-CService` can write an error when a service's process exits at unexpected times.
+* Fixed: `Get-CUser` can sometimes take 60 to 90 seconds to lookup a specific user.
+* Fixed: `Get-CGroup` can sometimes take 60 to 90 seconds to lookup a specific group.
+* Improved `Set-CEnvironmentVariable` and `Remove-CEnvironmentVariable` functions' reliability when setting and removing variables for a specific user (they now use `Start-Job` instead of Carbon's `Invoke-CPowerShell`).
+* Fixed: Carbon was hiding the ServerManager module's `Get-WindowsFeature`, `Install-WindowsFeature`, and `Uninstall-WindowsFeature` cmdlets (fixes issue #55).
+* Fixed: `Set-CHostsEntry` can sometimes clear the hosts file (fixes issue #39).
+* Fixed: `Get-CServiceConfiguration` fails with a terminating exception if a service doesn't exist.
 '@
         } # End of PSData hashtable
     

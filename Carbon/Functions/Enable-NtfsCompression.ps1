@@ -1,14 +1,3 @@
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-# 
-#     http://www.apache.org/licenses/LICENSE-2.0
-# 
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
 
 function Enable-CNtfsCompression
 {
@@ -17,9 +6,11 @@ function Enable-CNtfsCompression
     Turns on NTFS compression on a file/directory.
 
     .DESCRIPTION
-    By default, when enabling compression on a directory, only new files/directories created *after* enabling compression will be compressed.  To compress everything, use the `-Recurse` switch.
+    The `Enable-CNtfsCompression` function uses the `compact.exe` command to enable compression on a directory. By default, when enabling compression on a directory, only new files/directories created *after* enabling compression will be compressed.  To compress everything, use the `-Recurse` switch.
 
     Uses Windows' `compact.exe` command line utility to compress the file/directory.  To see the output from `compact.exe`, set the `Verbose` switch.
+
+    Beginning in Carbon 2.9.0, `Enable-CNtfsCompression` only sets compression if it isn't already set. To *always* compress, use the `-Force` switch.
 
     .LINK
     Disable-CNtfsCompression
@@ -30,12 +21,17 @@ function Enable-CNtfsCompression
     .EXAMPLE
     Enable-CNtfsCompression -Path C:\Projects\Carbon
 
-    Turns on NTFS compression on and compresses the `C:\Projects\Carbon` directory, but not its sub-directories.
+    Turns on NTFS compression (if it isn't already turned on) and compresses the `C:\Projects\Carbon` directory, but not its sub-directories.
 
     .EXAMPLE
     Enable-CNtfsCompression -Path C:\Projects\Carbon -Recurse
 
-    Turns on NTFS compression on and compresses the `C:\Projects\Carbon` directory and all its sub-directories.
+    Turns on NTFS compression (if it isn't already turned on) and compresses the `C:\Projects\Carbon` directory and all its sub-directories.
+
+    .EXAMPLE
+    Enable-CNtfsCompression -Path C:\Projects\Carbon -Recurse -Force
+
+    Turns on NTFS compression even if it is already on and and compresses the `C:\Projects\Carbon` directory and all its sub-directories.
 
     .EXAMPLE
     Get-ChildItem * | Where-Object { $_.PsIsContainer } | Enable-CNtfsCompression
@@ -45,21 +41,20 @@ function Enable-CNtfsCompression
     [CmdletBinding(SupportsShouldProcess=$true)]
     param(
         [Parameter(Mandatory=$true,ValueFromPipeline=$true,ValueFromPipelineByPropertyName=$true)]
-        [string[]]
         [Alias('FullName')]
         # The path where compression should be enabled.
-        $Path,
+        [string[]]$Path,
 
-        [Switch]
         # Enables compression on all sub-directories.
-        $Recurse
-    )
+        [Switch]$Recurse,
 
+        # Enable compression even if it is already enabled.
+        [Switch]$Force
+    )
 
     begin
     {
         Set-StrictMode -Version 'Latest'
-
         Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
         $compactPath = Join-Path $env:SystemRoot 'system32\compact.exe'
@@ -98,6 +93,11 @@ function Enable-CNtfsCompression
                 }
             }
         
+            if( -not $Force -and (Test-CNtfsCompression -Path $item) )
+            {
+                continue
+            }
+
             Invoke-ConsoleCommand -Target $item -Action 'enable NTFS compression' -ScriptBlock { 
                 & $compactPath /C $recurseArg $pathArg
             }

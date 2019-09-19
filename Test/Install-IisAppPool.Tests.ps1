@@ -14,7 +14,7 @@ $appPoolName = 'CarbonInstallIisAppPool'
 $username = 'CarbonInstallIisAppP'
 $password = '!QAZ2wsx8fk3'
 
-& (Join-Path -Path $PSScriptRoot 'Import-CarbonForTest.ps1' -Resolve)
+& (Join-Path -Path $PSScriptRoot 'Initialize-CarbonTest.ps1' -Resolve)
 
 Install-User -Credential (New-Credential -Username $username -Password $password) -Description 'User for testing Carbon''s Install-IisAppPool function.'
 

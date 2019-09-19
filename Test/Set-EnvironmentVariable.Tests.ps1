@@ -11,7 +11,7 @@
 # limitations under the License.
 
 Set-StrictMode -Version 'Latest'
-& (Join-Path -Path $PSScriptRoot -ChildPath 'Import-CarbonForTest.ps1' -Resolve)
+& (Join-Path -Path $PSScriptRoot -ChildPath 'Initialize-CarbonTest.ps1' -Resolve)
 
 $EnvVarName = 'CarbonTestSetEnvironmentVariable'
 
@@ -130,15 +130,17 @@ Describe 'Set-EnvironmentVariable when using -WhatIf switch' {
 }
 
 Describe 'Set-EnvironmentVariable when setting variable for another user' {
-    #$DebugPreference = 'Continue'
-    $value = New-TestValue
-    $credential = New-Credential -UserName 'CarbonTestUser' -Password 'abcd1234!'
-    Install-User -Credential $credential
-    Set-EnvironmentVariable -Name $EnvVarName -Value $value -ForUser -Credential $credential | Write-Debug
-    $actualValue = Invoke-PowerShell -Command ('$env:{0} ; [Environment]::SetEnvironmentVariable("{0}",$null,''User'')' -f $EnvVarName) -Encode -Credential $credential -OutputFormat 'text'
-    Write-Debug -Message ($actualValue -join "`n")
+    $name = [Guid]::NewGuid().ToString()
+    $expectedValue = New-TestValue
+    Set-EnvironmentVariable -Name $name -Value $expectedValue -ForUser -Credential $CarbonTestUser 
+    $job = Start-Job -ScriptBlock {
+        Get-Item -Path ('env:{0}' -f $using:name) | Select-Object -ExpandProperty 'Value'
+    } -Credential $CarbonTestUser
+    $actualValue = $job | Wait-Job | Receive-Job
+    $job | Remove-Job -Force -ErrorAction Ignore
+
     It 'should set that user''s environment variable' {
-        $actualValue | Should Be $value
+        $actualValue | Should -Be $expectedValue
     }
 }
 

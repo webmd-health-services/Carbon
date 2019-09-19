@@ -1,14 +1,3 @@
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-# 
-#     http://www.apache.org/licenses/LICENSE-2.0
-# 
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
 
 function Get-CUser
 {
@@ -17,7 +6,7 @@ function Get-CUser
     Gets *local* users.
 
     .DESCRIPTION
-    `Get-CUser` gets all *local* users. Use the `UserName` parameter to get  a specific user by its username.
+    `Get-CUser` gets all *local* users. Use the `UserName` parameter to get a specific user by its username.
 
     The objects returned by `Get-CUser` are instances of `System.DirectoryServices.AccountManagement.UserPrincipal`. These objects use external resources, which, if they are disposed of correctly, will cause memory leaks. When you're done using the objects returne by `Get-CUser`, call `Dispose()` on each one to clean up its external resources.
 
@@ -49,47 +38,46 @@ function Get-CUser
     [OutputType([System.DirectoryServices.AccountManagement.UserPrincipal])]
     param(
         [ValidateLength(1,20)]
-        [string]
         # The username for the user.
-        $UserName 
+        [string]$UserName 
     )
 
     Set-StrictMode -Version 'Latest'
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
+    Write-Timing 'Get-CUser'
     
+    Write-Timing ('           Creating searcher')
     $ctx = New-Object 'DirectoryServices.AccountManagement.PrincipalContext' ([DirectoryServices.AccountManagement.ContextType]::Machine)
-    if( $Username )
+    $query = New-Object 'DirectoryServices.AccountManagement.UserPrincipal' $ctx
+    try
     {
-        $userToFind = New-Object 'DirectoryServices.AccountManagement.UserPrincipal' $ctx
-        $userToFind.SamAccountName = $UserName
-        $searcher = New-Object 'DirectoryServices.AccountManagement.PrincipalSearcher' $userToFind
-        $user = $searcher.FindOne()
-        if( -not $user )
-        {
-            # Fallback. PrincipalSearch can't find some users.
-            $ctx.Dispose()
-            $ctx = New-Object 'DirectoryServices.AccountManagement.PrincipalContext' ([DirectoryServices.AccountManagement.ContextType]::Machine)
-            $user = [DirectoryServices.AccountManagement.UserPrincipal]::FindByIdentity( $ctx, $Username )
-            if( -not $user )
+        $users = Get-CPrincipal -Principal $query -Filter { 
+            if( $UserName )
             {
-                Write-Error ('Local user "{0}" not found.' -f $Username) -ErrorAction:$ErrorActionPreference
-                return
+                return $_.SamAccountName -eq $UserName
+            }
+            return $true
+        }
+
+        if( $UserName )
+        {
+            $usersCount = $users | Measure-Object | Select-Object -ExpandProperty 'Count'
+            if( $usersCount -gt 1 )
+            {
+                Write-Error -Message ('Found {0} users with username "{1}".' -f $userCount,$UserName) -ErrorAction $ErrorActionPreference
+            }
+            if( $usersCount -eq 0 )
+            {
+                Write-Error -Message ('Local user "{0}" not found.' -f $Username) -ErrorAction $ErrorActionPreference
             }
         }
-        return $user
+
+        return $users
     }
-    else
+    finally
     {
-        $query = New-Object 'DirectoryServices.AccountManagement.UserPrincipal' $ctx
-        $searcher = New-Object 'DirectoryServices.AccountManagement.PrincipalSearcher' $query
-        try
-        {
-            $searcher.FindAll() 
-        }
-        finally
-        {
-            $searcher.Dispose()
-            $query.Dispose()
-        }
+        $query.Dispose()
+        Write-Timing ('Get-CUser')
     }
 }

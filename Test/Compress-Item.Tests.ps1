@@ -13,7 +13,7 @@
 $tempDir = $null
 $zipPath = $null
 
-& (Join-Path -Path $PSScriptRoot -ChildPath 'Import-CarbonForTest.ps1' -Resolve)
+& (Join-Path -Path $PSScriptRoot -ChildPath 'Initialize-CarbonTest.ps1' -Resolve)
 
 function Assert-ZipFileExpands
 {

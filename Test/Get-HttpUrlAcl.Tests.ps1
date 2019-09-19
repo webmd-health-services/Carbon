@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-& (Join-Path -Path $PSScriptRoot -ChildPath 'Import-CarbonForTest.ps1' -Resolve)
+& (Join-Path -Path $PSScriptRoot -ChildPath 'Initialize-CarbonTest.ps1' -Resolve)
 $user = $null
 $url = 'http://test-gethttpurlacl:10939/'
     
@@ -29,14 +29,13 @@ function Assert-TestUrl
     $acl = $Acls[0]
     $acl.Access.Count | Should -Be 1
     $rule = $acl.Access[0]
-    $rule.IdentityReference | Should -Be ('{0}\{1}' -f $env:COMPUTERNAME,$user.SamAccountName)
+    $rule.IdentityReference | Should -Be ('{0}\{1}' -f $env:COMPUTERNAME,$CarbonTestUser.UserName)
 }
 
 Describe 'Get-HttpUrlAcl' {
     BeforeEach {
         $Global:Error.Clear()
-        $user = Install-User -Credential (New-Credential -UserName 'CarbonTestUser' -Password 'Password1') -PassThru
-        netsh http add urlacl ('url={0}' -f $url)('user={0}\{1}' -f $env:COMPUTERNAME,$user.SamAccountName) | Write-Debug
+        netsh http add urlacl ('url={0}' -f $url)('user={0}\{1}' -f $env:COMPUTERNAME,$CarbonTestUser.UserName) | Write-Debug
     }
     
     AfterEach {

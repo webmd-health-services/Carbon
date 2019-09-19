@@ -12,7 +12,7 @@
 
 Set-StrictMode -Version 'Latest'
 
-& (Join-Path -Path $PSScriptRoot -ChildPath 'Import-CarbonForTest.ps1')
+& (Join-Path -Path $PSScriptRoot -ChildPath 'Initialize-CarbonTest.ps1')
 
 # I know, these should be inside the describe block, but when inside the describe block
 #     the variables are unable to be resolved

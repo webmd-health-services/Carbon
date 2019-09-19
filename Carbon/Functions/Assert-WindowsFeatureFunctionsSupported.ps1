@@ -1,14 +1,3 @@
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-# 
-#     http://www.apache.org/licenses/LICENSE-2.0
-# 
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
 
 function Assert-WindowsFeatureFunctionsSupported
 {
@@ -29,9 +18,31 @@ function Assert-WindowsFeatureFunctionsSupported
     )
     
     Set-StrictMode -Version 'Latest'
-
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
     
+    if( $null -eq $windowsFeaturesNotSupported )
+    {
+        $script:useServerManager = $null -ne (Get-Command -Name 'servermanagercmd.exe' -ErrorAction Ignore)
+        $useWmi = $false
+        if( -not $useServerManager )
+        {
+            $win32OptionalFeatureClass = $null
+            if( (Get-Command -Name 'Get-CimClass' -ErrorAction Ignore) )
+            {
+                $win32OptionalFeatureClass = Get-CimClass -ClassName 'Win32_OptionalFeature'
+            }
+            elseif( Get-Command -Name 'Get-WmiObject' -ErrorAction Ignore )
+            {
+                $win32OptionalFeatureClass = Get-WmiObject -List | Where-Object { $_.Name -eq 'Win32_OptionalFeature' }
+            }
+                
+            $useWmi = $null -ne $win32OptionalFeatureClass
+            $script:useOCSetup = $null -ne (Get-Command -Name 'ocsetup.exe' -ErrorAction Ignore )
+        }
+
+        $script:windowsFeaturesNotSupported = (-not ($useServerManager -or ($useWmi -and $useOCSetup) ))
+    }
+
     if( $windowsFeaturesNotSupported )
     {
         Write-Warning $supportNotFoundErrorMessage

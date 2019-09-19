@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-& (Join-Path -Path $PSScriptRoot -ChildPath 'Import-CarbonForTest.ps1' -Resolve)
+& (Join-Path -Path $PSScriptRoot -ChildPath 'Initialize-CarbonTest.ps1' -Resolve)
 $carbonTestInstaller = Join-Path -Path $PSScriptRoot -ChildPath 'MSI\CarbonTestInstaller.msi' -Resolve
 $carbonTestInstallerActions = Join-Path -Path $PSScriptRoot -ChildPath 'MSI\CarbonTestInstallerWithCustomActions.msi' -Resolve
 

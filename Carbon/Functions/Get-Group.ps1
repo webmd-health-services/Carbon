@@ -1,14 +1,3 @@
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-# 
-#     http://www.apache.org/licenses/LICENSE-2.0
-# 
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
 
 function Get-CGroup
 {
@@ -42,62 +31,48 @@ function Get-CGroup
     [CmdletBinding()]
     [OutputType([DirectoryServices.AccountManagement.GroupPrincipal])]
     param(
-        [string]
         # The name of the group to return.
-        $Name 
+        [string]$Name 
     )
 
     Set-StrictMode -Version 'Latest'
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
-    
+
+    Write-Timing ('Get-CGroup')
+
     $ctx = New-Object 'DirectoryServices.AccountManagement.PrincipalContext' ([DirectoryServices.AccountManagement.ContextType]::Machine)
-    if( $Name )
+    $query = New-Object 'DirectoryServices.AccountManagement.GroupPrincipal' $ctx
+    try
     {
-        $groupToFind = New-Object 'DirectoryServices.AccountManagement.GroupPrincipal' $ctx
-        $groupToFind.Name = $Name
-        $searcher = New-Object 'DirectoryServices.AccountManagement.PrincipalSearcher' $groupToFind
-        $group = $null
-        $numErrors = $Global:Error.Count
-        try
-        {
-            $group = $searcher.FindOne()
-        }
-        catch
-        {
-            $numErrorsNow = $Global:Error.Count
-            $numErrorsToDelete = $numErrorsNow - $numErrors
-            for( $idx = 0; $idx -lt $numErrorsToDelete; ++$idx )
+        $groups = Get-CPrincipal -Principal $query -Filter {
+            if( $Name )
             {
-                $Global:Error.RemoveAt(0)
+                return $_.Name -eq $Name
             }
+            return $true
         }
 
-        if( -not $group )
+        if( $Name )
         {
-            # Fall back. PrincipalSearch can't find some identities
-            $ctx.Dispose()
-            $ctx = New-Object 'DirectoryServices.AccountManagement.PrincipalContext' ([DirectoryServices.AccountManagement.ContextType]::Machine)
-            $group = [DirectoryServices.AccountManagement.GroupPrincipal]::FindByIdentity( $ctx, $Name )
-            if( -not $group )
+            $groupCount = $groups | Measure-Object | Select-Object -ExpandProperty 'Count'
+            if( $groupCount -gt 1 )
+            {
+                Write-Error -Message ('Found {0} groups named "{1}".' -f $groupCount,$Name) -ErrorAction:$ErrorActionPreference
+                return
+            }
+
+            if( $groupCount -eq 0 )
             {
                 Write-Error ('Local group "{0}" not found.' -f $Name) -ErrorAction:$ErrorActionPreference
                 return
             }
         }
-        return $group
+
+        return $groups
     }
-    else
+    finally
     {
-        $query = New-Object 'DirectoryServices.AccountManagement.GroupPrincipal' $ctx
-        $searcher = New-Object 'DirectoryServices.AccountManagement.PrincipalSearcher' $query
-        try
-        {
-            $searcher.FindAll() 
-        }
-        finally
-        {
-            $searcher.Dispose()
-            $query.Dispose()
-        }
+        $query.Dispose()
+        Write-Timing ('Get-CGroup')
     }
 }

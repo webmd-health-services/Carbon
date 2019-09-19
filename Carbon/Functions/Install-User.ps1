@@ -1,14 +1,3 @@
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-# 
-#     http://www.apache.org/licenses/LICENSE-2.0
-# 
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
 
 function Install-CUser
 {
@@ -93,14 +82,19 @@ function Install-CUser
 
     Set-StrictMode -Version 'Latest'
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
+    Write-Timing 'Install-CUser Start'
     
     if( $PSCmdlet.ParameterSetName -eq 'WithCredential' )
     {
         $UserName = $Credential.UserName
     }
 
+
+    Write-Timing '              Getting user'
     $user = Get-CUser -userName $UserName -ErrorAction Ignore
     
+    Write-Timing '              Creating PrincipalContext'
     if( $user )
     {
         $ctx = $user.Context
@@ -115,6 +109,7 @@ function Install-CUser
         $operation = 'update'
         if( -not $user )
         {
+            Write-Timing '              Creating UserPrincipal'
             $operation = 'create'
             $user = New-Object 'DirectoryServices.AccountManagement.UserPrincipal' $ctx
             $creating = $true
@@ -126,6 +121,7 @@ function Install-CUser
         $user.UserCannotChangePassword = $UserCannotChangePassword
         $user.PasswordNeverExpires = -not $PasswordExpires
 
+        Write-Timing '              Setting password'
         if( $PSCmdlet.ParameterSetName -eq 'WithUserNameAndPassword' )
         {
             Write-Warning ('Install-CUser function''s `UserName` and `Password` parameters are obsolete and will be removed in a future version of Carbon. Please use the `Credential` parameter instead.')
@@ -139,6 +135,7 @@ function Install-CUser
 
         if( $PSCmdlet.ShouldProcess( $Username, "$operation local user" ) )
         {
+            Write-Timing '              Saving'
             $user.Save()
         }
 
@@ -149,11 +146,13 @@ function Install-CUser
     }
     finally
     {
+        Write-Timing '              Finally'
         if( -not $PassThru )
         {
             $user.Dispose()
             $ctx.Dispose()
         }
+        Write-Timing 'Install-CUser Done'
     }
 }
 

@@ -1,10 +1,12 @@
-
 PublishOn:
  - master
+ - prerelease
 
 Build:
 - Version:
     Path: Carbon\Carbon.psd1
+    Prerelease:
+    - prerelease: rc$(WHISKEY_BUILD_NUMBER)
 - PowerShell:
     OnlyBy: BuildServer
     Path: Save-CarbonSigningKey.ps1
@@ -45,13 +47,29 @@ Build:
     Path: Source\Test\bin\$(WHISKEY_MSBUILD_CONFIGURATION)\net452\Carbon.Test.dll
 - Pipeline:
     Name: PublishBin
+- MergeFile:
+    OnlyBy: BuildServer
+    Path: 
+    - Carbon\Functions\*.ps1
+    - Carbon\Carbon.psm1.Import.Iis.ps1
+    - Carbon\Carbon.psm1.Import.Lcm.ps1
+    - Carbon\Carbon.psm1.Import.Post.ps1
+    Exclude:
+    - "*\\*-Iis*"
+    - "*\\Initialize-Lcm.ps1"
+    - "*\\Use-CallerPreference.ps1"
+    DestinationPath: Carbon\Carbon.psm1
+    TextSeparator: "$(NewLine)$(NewLine)"
+    DeleteSourceFiles: true
+- MergeFile:
+    OnlyBy: BuildServer
+    Path: 
+    - "Carbon\\Functions\\*-Iis*.ps1"
+    DestinationPath: Carbon\Functions\Iis.ps1
+    TextSeparator: "$(NewLine)$(NewLine)"
+    DeleteSourceFiles: true
 - Pipeline:
     Name: Tests
-- CopyFile:
-    Path:
-    - LICENSE.txt
-    - NOTICE.txt
-    DestinationDirectory: Carbon
 - SetVariableFromPowerShellDataFile:
     Path: Carbon\Carbon.psd1
     Variables:
@@ -59,12 +77,24 @@ Build:
             PSData:
                 ReleaseNotes: RELEASE_NOTES
                 Tags: TAGS
+- CopyFile:
+    Path:
+    - LICENSE.txt
+    - NOTICE.txt
+    DestinationDirectory: Carbon
 - NuGetPack:
     Path: Carbon.nuspec
     Properties:
         ReleaseNotes: $(RELEASE_NOTES)
         Tags: $(TAGS)
-- Exec: Tools\Whiskey\bin\7-Zip\7z.exe a $(WHISKEY_OUTPUT_DIRECTORY)\Carbon.zip .\Carbon .\examples .\LICENSE.txt .\NOTICE.txt '-xr!*.pdb' '-xr!*.orig
+- Zip:
+    ArchivePath: .output\Carbon.zip
+    Path:
+    - Carbon
+    - examples
+    Exclude:
+    - "*.pdb"
+    - "*.orig"
 
 PublishBin:
 - MSBuild:
@@ -90,6 +120,14 @@ PublishBin:
     OnlyDuring: Build
     OnlyBy: BuildServer
     Path: Carbon\bin\*.pdb
+# We don't need to include any assemblies that ship with PowerShell
+- Delete:
+    OnlyDuring: Build
+    Path:
+    - Carbon\bin\coreclr\runtimes
+    - Carbon\bin\coreclr\*.json
+    - Carbon\bin\coreclr\System.*.dll
+    - Carbon\bin\coreclr\Microsoft.Win32.Registry.dll
 
 Tests:
 - TaskDefaults:
@@ -101,6 +139,8 @@ Tests:
 - Pester4:
     OnlyBy: Developer
     Path: 
+    - Test\Bin.Tests.ps1
+    - Test\Import-Carbon.Tests.ps1
     - Test\LicenseNotices.Tests.ps1
     - Test\*.ps1xml.Tests.ps1
     - Test\Website.Tests.ps1
@@ -113,7 +153,6 @@ Tests:
         Path: 
         - Test\Test-Documentation.ps1
         - Test\Test-ImportCarbon.ps1
-        - Test\Test-UsesUseCallerPreference.ps1
 # These tests fail when run in parallel so they get run first.
 - Pester4:
     OnlyBy: BuildServer
@@ -167,11 +206,15 @@ Publish:
     RepositoryUri: https://www.powershellgallery.com/api/v2/
     ApiKeyID: powershellgallery.com
 - NuGetPush:
+    OnlyOnBranch:
+    - master
     UnlessExists: env:APPVEYOR_PULL_REQUEST_NUMBER
     Uri: https://nuget.org/api/v2/package
     ApiKeyID: nuget.org
     SkipUploadedCheck: true
 - NuGetPush:
+    OnlyOnBranch:
+    - master
     UnlessExists: env:APPVEYOR_PULL_REQUEST_NUMBER
     Uri: https://chocolatey.org/api/v2/package
     ApiKeyID: chocolatey.org

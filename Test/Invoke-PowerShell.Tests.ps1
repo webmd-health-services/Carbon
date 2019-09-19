@@ -12,7 +12,7 @@
 
 Set-StrictMode -Version 'Latest'
 
-& (Join-Path -Path $PSScriptRoot -ChildPath 'Import-CarbonForTest.ps1' -Resolve)
+& (Join-Path -Path $PSScriptRoot -ChildPath 'Initialize-CarbonTest.ps1' -Resolve)
 
 $ps3Installed = $false
 $PSVersion,$CLRVersion = powershell -NoProfile -NonInteractive -Command { $PSVersionTable.PSVersion ; $PSVersionTable.CLRVersion }
@@ -268,24 +268,23 @@ Describe 'Invoke-PowerShell.when setting execution policy when running a script'
 }
 
 $getUsernamePath = Join-Path -Path $PSScriptRoot -ChildPath 'PowerShell\Get-Username.ps1' -Resolve
-$credential = New-Credential -UserName 'CarbonTestUser' -Password 'abcd1234!'
-Install-User -Credential $credential
+
 Describe 'Invoke-PowerShell.when running a script as another user' {
     $Global:Error.Clear()
     $return = 'fubar'
     $result = Invoke-PowerShell -FilePath $getUsernamePath `
                                 -ArgumentList '-InputObject',$return `
-                                -Credential $credential
+                                -Credential $CarbonTestUser
     It 'should run the script' {
         $result.Count | Should Be 2
         $result[0] | Should Be $return
-        $result[1] | Should Be $credential.UserName
+        $result[1] | Should Be $CarbonTestUser.UserName
     }
 
     $result = Invoke-PowerShell -FilePath $getUsernamePath `
                                 -ArgumentList '-InputObject',$return `
                                 -ExecutionPolicy Restricted `
-                                -Credential $credential `
+                                -Credential $CarbonTestUser `
                                 -ErrorAction SilentlyContinue
     It 'should use PowerShell parameters' {
         $result | Should BeNullOrEmpty
@@ -295,12 +294,12 @@ Describe 'Invoke-PowerShell.when running a script as another user' {
 
 Describe 'Invoke-PowerShell.when running a command as another user' {
     $Global:Error.Clear()
-    $result = Invoke-PowerShell -Command '$env:Username' -Credential $credential
+    $result = Invoke-PowerShell -Command '$env:Username' -Credential $CarbonTestUser
     It 'should run the command as the user' {
-        $result | Should Be $credential.UserName
+        $result | Should Be $CarbonTestUser.UserName
     }
 
-    $result = Invoke-PowerShell -Command $getUsernamePath -ExecutionPolicy Restricted -Credential $credential -ErrorAction SilentlyContinue
+    $result = Invoke-PowerShell -Command $getUsernamePath -ExecutionPolicy Restricted -Credential $CarbonTestUser -ErrorAction SilentlyContinue
     It 'should set powershell.exe parameters' {
         $result | Should BeNullOrEmpty
         ($Global:Error -join [Environment]::NewLine) |  Should Match 'disabled'
@@ -309,7 +308,7 @@ Describe 'Invoke-PowerShell.when running a command as another user' {
 
 Describe 'Invoke-PowerShell.when running a script block as another user' {
     $Global:Error.Clear()
-    $result = Invoke-PowerShell -Command { 'fubar' } -Credential $credential -ErrorAction SilentlyContinue
+    $result = Invoke-PowerShell -Command { 'fubar' } -Credential $CarbonTestUser -ErrorAction SilentlyContinue
     It 'should write an error' {
         $Global:Error | Should Match 'script block as another user'
     }

@@ -15,7 +15,7 @@ $junctionPath = $null
 
 function Start-TestFixture
 {
-    & (Join-Path -Path $PSScriptRoot '..\Import-CarbonForTest.ps1' -Resolve)
+    & (Join-Path -Path $PSScriptRoot '..\Initialize-CarbonTest.ps1' -Resolve)
 }
 
 function Start-Test

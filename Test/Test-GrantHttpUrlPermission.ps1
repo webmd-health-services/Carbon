@@ -10,15 +10,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-& (Join-Path -Path $PSScriptRoot -ChildPath 'Import-CarbonForTest.ps1' -Resolve)
+& (Join-Path -Path $PSScriptRoot -ChildPath 'Initialize-CarbonTest.ps1' -Resolve)
 
 $user = $null
 $url = 'http://test-granthttpurlpermission:10383/'
 
 function Start-Test
 {
-    Install-User -Credential (New-Credential -UserName 'CarbonTestUser' -Password 'Password1')
-    $user = Resolve-Identity -Name 'CarbonTestUser'
+    $user = Resolve-Identity -Name $CarbonTestUser.UserName
 }
 
 function Stop-Test

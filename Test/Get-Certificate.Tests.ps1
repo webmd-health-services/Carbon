@@ -16,7 +16,7 @@ $testCertificateThumbprint = '7D5CE4A8A5EC059B829ED135E9AD8607977691CC'
 $testCertFriendlyName = 'Pup Test Certificate'
 $testCertCertProviderPath = 'cert:\CurrentUser\My\{0}' -f $testCertificateThumbprint
 
-& (Join-Path -Path $PSScriptRoot -ChildPath 'Import-CarbonForTest.ps1' -Resolve)
+& (Join-Path -Path $PSScriptRoot -ChildPath 'Initialize-CarbonTest.ps1' -Resolve)
 
 function Assert-TestCert
 {
