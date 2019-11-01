@@ -12,32 +12,37 @@
 
 $importCarbonPath = Join-Path -Path $PSScriptRoot -ChildPath '..\Carbon\Import-Carbon.ps1' -Resolve
 
+function Init
+{
+    $Global:Error.Clear()
+    if( (Get-Module 'Carbon') )
+    {
+        Remove-Module 'Carbon' -Force
+    }
+}
+
+function Reset
+{
+    if( (Get-Module 'Carbon') )
+    {
+        Remove-Module 'Carbon' -Force
+    }
+}
+
 Describe 'Import-Carbon' {
 
-    BeforeEach {
-        $Global:Error.Clear()
-        if( (Get-Module 'Carbon') )
-        {
-            Remove-Module 'Carbon' -Force
-        }
-    }
-    
-    AfterEach {
-        if( (Get-Module 'Carbon') )
-        {
-            Remove-Module 'Carbon' -Force
-        }
-    }
+    BeforeEach { Init }
+    AfterEach { Reset }
     
     It 'should import' {
         & $importCarbonPath
-        (Get-Command -Module 'Carbon') | Should Not BeNullOrEmpty
+        (Get-Command -Module 'Carbon') | Should -Not -BeNullOrEmpty
     }
     
     It 'should import with prefix' {
         & $importCarbonPath -Prefix 'C'
         $carbonCmds = Get-Command -Module 'Carbon'
-        $carbonCmds | Should Not BeNullOrEmpty
+        $carbonCmds | Should -Not -BeNullOrEmpty
         foreach( $cmd in $carbonCmds )
         {
             $cmd.Name | Should -Match '^.+-C.+$'
@@ -62,7 +67,7 @@ Describe 'Import-Carbon' {
         try
         {
             & $importCarbonPath
-            $Global:Error.Count | Should Be 0
+            $Global:Error.Count | Should -Be 0
         }
         finally
         {
@@ -105,5 +110,37 @@ Describe 'Import-Carbon' {
             } |
             Select-Object -ExpandProperty 'Average' |
             Should -BeLessOrEqual $maxAvgDuration
+    }
+}
+
+Describe 'Import-CarbonPs1.when importing multiple times from different locations' {
+    AfterEach { Reset }
+    It 'should import without errors' {
+        Init
+        $Global:Error.Clear()
+        $otherCarbonModulesRoot = Join-Path -Path $TestDrive.FullName -ChildPath ([IO.Path]::GetRandomFileName())
+        New-Item -Path $otherCarbonModulesRoot -ItemType 'Directory'
+        Copy-Item -Path ($importCarbonPath | Split-Path -Parent) -Destination $otherCarbonModulesRoot -Recurse
+
+        $otherCarbonRoot = Join-Path -Path $otherCarbonModulesRoot -ChildPath 'Carbon'
+        $otherCarbonRoot | Should -Exist
+        Import-Module -Name $otherCarbonRoot
+        & $importCarbonPath
+        (Get-Command -Module 'Carbon') | Should -Not -BeNullOrEmpty
+        $Global:Error | Should -BeNullOrEmpty
+    }
+}
+
+Describe 'Import-CarbonPs1.when importing multiple times from same location' {
+    AfterEach { Reset }
+    It 'should not remove or import' {
+        Init
+        $Global:Error.Clear()
+        & $importCarbonPath
+        Mock -CommandName 'Import-Module'
+        Mock -CommandName 'Remove-Module'
+        & $importCarbonPath
+        Assert-MockCalled -CommandName 'Remove-Module' -Times 0
+        Assert-MockCalled -CommandName 'Import-Module' -Times 1
     }
 }
