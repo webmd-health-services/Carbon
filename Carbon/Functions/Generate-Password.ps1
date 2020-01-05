@@ -6,7 +6,7 @@ function Generate-Password
     Creates hard password.
 
     .DESCRIPTION
-    Removes a *local* user account.  If the account doesn't exist, nothing happens.
+    Creates hard to guess password from randomized chars. The chars are based on Ascii table and contains numbers,letters,mathematical chars and others.
 
     .EXAMPLE
     Generate-Password -maxValue 9
@@ -16,17 +16,14 @@ function Generate-Password
     (
         [parameter(Mandatory=$true)]
         [ValidateRange(8,99)]
-        [Int]
-        $maxValue
+        [Int]$maxValue
     ) 
-        $newPass = '' 
+    $newPass = '' 
 
     1..$maxValue | ForEach-Object { 
         $newPass += [char](Get-Random -Minimum 48 -Maximum 122) 
     }  
-    $txt = "Za!" 
-    $passnew = $newPass+$txt 
-    return $passnew 
+    return $newPass+"Za!" #returning password with template(which is must have to fulfill domain policies if they occur
 }
 Generate-Password -maxValue 9
 
