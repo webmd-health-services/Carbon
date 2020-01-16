@@ -160,37 +160,37 @@ filter Unprotect-CString
         }
         elseif( $PSCmdlet.ParameterSetName -like '*ByThumbprint' )
         {
-            $certificates = Get-ChildItem -Path ('cert:\*\*\{0}' -f $Thumbprint) -Recurse 
+            $certificates = Get-Item -Path ('cert:\*\*\{0}' -f $Thumbprint)
             if( -not $certificates )
             {
-                Write-Error ('Certificate ''{0}'' not found.' -f $Thumbprint)
+                Write-Error ('Certificate "{0}" not found.' -f $Thumbprint)
                 return
             }
 
             $Certificate = $certificates | Where-Object { $_.HasPrivateKey } | Select-Object -First 1
             if( -not $Certificate )
             {
-                Write-Error ('Certificate ''{0}'' ({1}) doesn''t have a private key.' -f $certificates[0].Subject, $Thumbprint)
+                Write-Error ('Certificate "{0}" ({1}) doesn''t have a private key.' -f $certificates[0].Subject, $Thumbprint)
                 return
             }
         }
 
         if( -not $Certificate.HasPrivateKey )
         {
-            Write-Error ('Certificate ''{0}'' ({1}) doesn''t have a private key. When decrypting with RSA, secrets are encrypted with the public key, and decrypted with a private key.' -f $Certificate.Subject,$Certificate.Thumbprint)
+            Write-Error ('Certificate "{0}" ({1}) doesn''t have a private key. When decrypting with RSA, secrets are encrypted with the public key, and decrypted with a private key.' -f $Certificate.Subject,$Certificate.Thumbprint)
             return
         }
 
         if( -not $Certificate.PrivateKey )
         {
-            Write-Error ('Certificate ''{0}'' ({1}) has a private key, but it is currently null or not set. This usually means your certificate was imported or generated incorrectly. Make sure you''ve generated an RSA public/private key pair and are using the private key. If the private key is in the Windows certificate stores, make sure it was imported correctly (`Get-ChildItem $pathToCert | Select-Object -Expand PrivateKey` isn''t null).' -f $Certificate.Subject,$Certificate.Thumbprint)
+            Write-Error ('Certificate "{0}" ({1}) has a private key, but it is currently null or not set. This usually means your certificate was imported or generated incorrectly. Make sure you''ve generated an RSA public/private key pair and are using the private key. If the private key is in the Windows certificate stores, make sure it was imported correctly (`Get-ChildItem $pathToCert | Select-Object -Expand PrivateKey` isn''t null).' -f $Certificate.Subject,$Certificate.Thumbprint)
             return
         }
 
         [Security.Cryptography.RSACryptoServiceProvider]$privateKey = $null
         if( $Certificate.PrivateKey -isnot [Security.Cryptography.RSACryptoServiceProvider] )
         {
-            Write-Error ('Certificate ''{0}'' (''{1}'') is not an RSA key. Found a private key of type ''{2}'', but expected type ''{3}''.' -f $Certificate.Subject,$Certificate.Thumbprint,$Certificate.PrivateKey.GetType().FullName,[Security.Cryptography.RSACryptoServiceProvider].FullName)
+            Write-Error ('Certificate "{0}" ("{1}") is not an RSA key. Found a private key of type "{2}", but expected type "{3}".' -f $Certificate.Subject,$Certificate.Thumbprint,$Certificate.PrivateKey.GetType().FullName,[Security.Cryptography.RSACryptoServiceProvider].FullName)
             return
         }
 
