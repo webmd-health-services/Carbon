@@ -203,7 +203,7 @@ filter Protect-CString
         {
             if( $PSCmdlet.ParameterSetName -eq 'RSAByThumbprint' )
             {
-                $Certificate = Get-ChildItem -Path ('cert:\*\*\{0}' -f $Thumbprint) -Recurse | Select-Object -First 1
+                $Certificate = Get-Item -Path ('cert:\*\*\{0}' -f $Thumbprint) | Select-Object -First 1
                 if( -not $Certificate )
                 {
                     Write-Error ('Certificate with thumbprint ''{0}'' not found.' -f $Thumbprint)
