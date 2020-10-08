@@ -152,7 +152,7 @@ Describe 'Unprotect-String' {
     
     It 'should handle thumbprint to cert with no private key' {
         $cert = Get-ChildItem -Path 'cert:\*\*' -Recurse | 
-                    Where-Object { $_.PublicKey.Key -is [Security.Cryptography.RSACryptoServiceProvider] } |
+                    Where-Object { $_.PublicKey.Key -is [Security.Cryptography.RSA] } |
                     Where-Object { -not $_.HasPrivateKey } |
                     Select-Object -First 1
         $cert | Should -Not -BeNullOrEmpty

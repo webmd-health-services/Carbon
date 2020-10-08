@@ -111,53 +111,44 @@ filter Protect-CString
     [CmdletBinding()]
     param(
         [Parameter(Mandatory = $true, Position=0, ValueFromPipeline = $true)]
-        [object]
         # The string to encrypt. Any non-string object you pass will be converted to a string before encrypting by calling the object's `ToString` method.
         #
         # Beginning in Carbon 2.4.0, this can also be a `SecureString` object. The `SecureString` is converted to an array of bytes, the bytes are encrypted, then the plaintext bytes are cleared from memory (i.e. the plaintext password is in memory for the amount of time it takes to encrypt it).
-        $String,
+        [Object]$String,
         
-        [Parameter(Mandatory=$true,ParameterSetName='DPAPICurrentUser')]
+        [Parameter(Mandatory, ParameterSetName='DPAPICurrentUser')]
         # Encrypts for the current user so that only he can decrypt.
-        [Switch]
-        $ForUser,
+        [switch]$ForUser,
         
-        [Parameter(Mandatory=$true,ParameterSetName='DPAPILocalMachine')]
+        [Parameter(Mandatory, ParameterSetName='DPAPILocalMachine')]
         # Encrypts for the current computer so that any user logged into the computer can decrypt.
-        [Switch]
-        $ForComputer,
+        [switch]$ForComputer,
 
-        [Parameter(Mandatory=$true,ParameterSetName='DPAPIForUser')]
-        [Management.Automation.PSCredential]
+        [Parameter(Mandatory, ParameterSetName='DPAPIForUser')]
         # Encrypts for a specific user.
-        $Credential,
+        [pscredential]$Credential,
 
-        [Parameter(Mandatory=$true,ParameterSetName='RSAByCertificate')]
-        [Security.Cryptography.X509Certificates.X509Certificate2]
+        [Parameter(Mandatory, ParameterSetName='RSAByCertificate')]
         # The public key to use for encrypting.
-        $Certificate,
+        [Security.Cryptography.X509Certificates.X509Certificate2]$Certificate,
 
-        [Parameter(Mandatory=$true,ParameterSetName='RSAByThumbprint')]
-        [string]
+        [Parameter(Mandatory, ParameterSetName='RSAByThumbprint')]
         # The thumbprint of the certificate, found in one of the Windows certificate stores, to use when encrypting. All certificate stores are searched.
-        $Thumbprint,
+        [String]$Thumbprint,
 
-        [Parameter(Mandatory=$true,ParameterSetName='RSAByPath')]
-        [string]
+        [Parameter(Mandatory, ParameterSetName='RSAByPath')]
         # The path to the public key to use for encrypting. Must be to an `X509Certificate2` object.
-        $PublicKeyPath,
+        [String]$PublicKeyPath,
 
         [Parameter(ParameterSetName='RSAByCertificate')]
         [Parameter(ParameterSetName='RSAByThumbprint')]
         [Parameter(ParameterSetName='RSAByPath')]
-        [Switch]
         # If true, uses Direct Encryption (PKCS#1 v1.5) padding. Otherwise (the default), uses OAEP (PKCS#1 v2) padding. See [Encrypt](http://msdn.microsoft.com/en-us/library/system.security.cryptography.rsacryptoserviceprovider.encrypt(v=vs.110).aspx) for information.
-        $UseDirectEncryptionPadding,
+        [switch]$UseDirectEncryptionPadding,
 
-        [Parameter(Mandatory=$true,ParameterSetName='Symmetric')]
+        [Parameter(Mandatory, ParameterSetName='Symmetric')]
         # The key to use to encrypt the secret. Can be a `SecureString`, a `String`, or an array of bytes. Must be 16, 24, or 32 characters/bytes in length.
-        [object]
-        $Key
+        [Object]$Key
     )
     
     Set-StrictMode -Version 'Latest'
@@ -167,7 +158,7 @@ filter Protect-CString
 
     if( $String -is [System.Security.SecureString] )
     {
-        $stringBytes = [Carbon.Security.SecureStringConverter]::ToBytes($String)   
+        $stringBytes = [Carbon.Security.SecureStringConverter]::ToBytes($String)
     }
     else
     {
@@ -220,15 +211,20 @@ filter Protect-CString
             }
 
             $rsaKey = $Certificate.PublicKey.Key
-            if( $rsaKey -isnot ([Security.Cryptography.RSACryptoServiceProvider]) )
+            if( -not $rsaKey.GetType().IsSubclassOf([Security.Cryptography.RSA]) )
             {
                 Write-Error ('Certificate ''{0}'' (''{1}'') is not an RSA key. Found a public key of type ''{2}'', but expected type ''{3}''.' -f $Certificate.Subject,$Certificate.Thumbprint,$rsaKey.GetType().FullName,[Security.Cryptography.RSACryptoServiceProvider].FullName)
                 return
             }
 
+            $padding = [Security.Cryptography.RSAEncryptionPadding]::OaepSHA1
+            if( $UseDirectEncryptionPadding )
+            {
+                $padding = [Security.Cryptography.RSAEncryptionPadding]::Pkcs1
+            }
             try
             {
-                $encryptedBytes = $rsaKey.Encrypt( $stringBytes, (-not $UseDirectEncryptionPadding) )
+                $encryptedBytes = $rsaKey.Encrypt($stringBytes, $padding)
             }
             catch
             {
@@ -253,7 +249,7 @@ filter Protect-CString
                 return
             }
                 
-            $aes = New-Object 'Security.Cryptography.AesCryptoServiceProvider'
+            $aes = [Security.Cryptography.Aes]::Create()
             try
             {
                 $aes.Padding = [Security.Cryptography.PaddingMode]::PKCS7
