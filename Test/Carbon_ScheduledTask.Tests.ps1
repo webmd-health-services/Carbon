@@ -51,11 +51,11 @@ try
                     [string]$expectedCredential = & { $_.Definition.Principal.UserId ; $_.Definition.Principal.GroupId } | Where-Object { $_ } | Select-Object -First 1
     
                     $resource = Get-TargetResource -Name $_.Path
-                    $Global:Error.Count | Should Be 0
-                    $resource | Should Not BeNullOrEmpty
-                    $resource.Name | Should Be $_.Path
-                    $resource.TaskCredential | Should Be $expectedCredential
-                    $resource.TaskXml | Should Be $expectedXml
+                    $Global:Error.Count | Should -Be 0
+                    $resource | Should -Not -BeNullOrEmpty
+                    $resource.Name | Should -Be $_.Path
+                    $resource.TaskCredential | Should -Be $expectedCredential
+                    $resource.TaskXml | Should -Be $expectedXml
                     Assert-DscResourcePresent $resource
                 }
         }
@@ -63,22 +63,22 @@ try
         It 'should get non existent task' {
             $name = [Guid]::NewGuid().ToString()
             $resource = Get-TargetResource -Name $name
-            $Global:Error.Count | Should Be 0
-            $resource | Should Not BeNullOrEmpty
-            $resource.Name | Should Be $name
-            $resource.TaskXml | Should BeNullOrEmpty
-            $resource.TaskCredential | Should BeNullOrEmpty
+            $Global:Error.Count | Should -Be 0
+            $resource | Should -Not -BeNullOrEmpty
+            $resource.Name | Should -Be $name
+            $resource.TaskXml | Should -BeNullOrEmpty
+            $resource.TaskCredential | Should -BeNullOrEmpty
             Assert-DscResourceAbsent $resource
         }
         
         It 'should install task for system principal' {
             Set-TargetResource -Name $taskName -TaskXml $taskForSystem
-            $Global:Error.Count | Should Be 0
+            $Global:Error.Count | Should -Be 0
             $resource = Get-TargetResource -Name $taskName
-            $resource | Should Not BeNullOrEmpty
-            $resource.Name | Should Be $taskName
-            $resource.TaskXml | Should Be $taskForSystem
-            $resource.TaskCredential | Should Be 'System'
+            $resource | Should -Not -BeNullOrEmpty
+            $resource.Name | Should -Be $taskName
+            $resource.TaskXml | Should -Be $taskForSystem
+            $resource.TaskCredential | Should -Match '\bSystem$'
             Assert-DscResourcePresent $resource
         }
     
@@ -87,13 +87,13 @@ try
             Set-TargetResource -Name $taskName -TaskXml $taskForSystem
             $resource = Get-TargetResource -Name $taskName
             Assert-DscResourcePresent $resource
-            $resource.TaskCredential | Should Be 'System'
+            $resource.TaskCredential | Should -Match '\bSystem$'
         }
     
         It 'should uninstall task' {
             Set-TargetResource -Name $taskName -TaskXml $taskForSystem
             $resource = Get-TargetResource -Name $taskName
-            $resource | Should Not BeNullOrEmpty
+            $resource | Should -Not -BeNullOrEmpty
             Assert-DscResourcePresent $resource
         
             Set-TargetResource -Name $taskName -Ensure Absent
@@ -102,33 +102,33 @@ try
         }
     
         It 'should test present' {
-            (Test-TargetResource -Name $taskName -TaskXml $taskForSystem) | Should Be $false
+            (Test-TargetResource -Name $taskName -TaskXml $taskForSystem) | Should -Be $false
             Set-TargetResource -Name $taskName -TaskXml $taskForSystem
-            (Test-TargetResource -Name $taskName -TaskXml $taskForSystem) | Should Be $true
-            (Test-TargetResource -Name $taskName -TaskXml $taskForUser) | Should Be $false
-            (Test-TargetResource -Name $taskName -TaskXml $taskForUser -TaskCredential $credential) | Should Be $false
+            (Test-TargetResource -Name $taskName -TaskXml $taskForSystem) | Should -Be $true
+            (Test-TargetResource -Name $taskName -TaskXml $taskForUser) | Should -Be $false
+            (Test-TargetResource -Name $taskName -TaskXml $taskForUser -TaskCredential $credential) | Should -Be $false
         }
     
         It 'should write verbose message correctly' {
             Set-TargetResource -Name $taskName -TaskXml $taskForSystem
-            (Test-TargetResource -Name $taskName -TaskXml '<Task />') | Should Be $false
+            (Test-TargetResource -Name $taskName -TaskXml '<Task />') | Should -Be $false
         }
     
         It 'should test absent' {
-            (Test-TargetResource -Name $taskName -TaskXml $taskForSystem -Ensure Absent) | Should Be $true
+            (Test-TargetResource -Name $taskName -TaskXml $taskForSystem -Ensure Absent) | Should -Be $true
             Set-TargetResource -Name $taskName -TaskXml $taskForSystem
-            (Test-TargetResource -Name $taskName -Ensure Absent) | Should Be $false
+            (Test-TargetResource -Name $taskName -Ensure Absent) | Should -Be $false
         }
     
         It 'should test task credential changes' {
             Set-TargetResource -Name $taskName -TaskXml $taskForSystem
-            Test-TargetResource -Name $taskName -TaskXml $taskForSystem -TaskCredential $credential | Should Be $false            
+            Test-TargetResource -Name $taskName -TaskXml $taskForSystem -TaskCredential $credential | Should -Be $false            
         }
     
         It 'should test task credential canonical versus short username' {
             Set-TargetResource -Name $taskName -TaskXml $taskForUser -TaskCredential $credential
             $credWithFullUserName = New-Credential -UserName ('{0}\{1}' -f [Environment]::MachineName,$credential.UserName) -Password 'snafu'
-            Test-TargetResource -Name $taskName -TaskXml $taskForUser -TaskCredential $credWithFullUserName | Should Be $true            
+            Test-TargetResource -Name $taskName -TaskXml $taskForUser -TaskCredential $credWithFullUserName | Should -Be $true            
         }
     }
 
@@ -160,20 +160,20 @@ try
         Start-DscConfiguration -Wait -ComputerName 'localhost' -Path $CarbonDscOutputRoot -Force
 
         It 'should run through dsc' {
-            $Global:Error.Count | Should Be 0
-            (Test-TargetResource -Name $taskName -TaskXml $taskForSystem -Ensure 'Present') | Should Be $true
-            (Test-TargetResource -Name $taskName -Ensure 'Absent') | Should Be $false
+            $Global:Error.Count | Should -Be 0
+            (Test-TargetResource -Name $taskName -TaskXml $taskForSystem -Ensure 'Present') | Should -Be $true
+            (Test-TargetResource -Name $taskName -Ensure 'Absent') | Should -Be $false
     
             & DscConfiguration -Ensure 'Absent' -OutputPath $CarbonDscOutputRoot 
             Start-DscConfiguration -Wait -ComputerName 'localhost' -Path $CarbonDscOutputRoot -Force
-            $Global:Error.Count | Should Be 0
-            (Test-TargetResource -Name $taskName -TaskXml $taskForSystem -Ensure 'Present') | Should Be $false
-            (Test-TargetResource -Name $taskName -Ensure 'Absent') | Should Be $true
+            $Global:Error.Count | Should -Be 0
+            (Test-TargetResource -Name $taskName -TaskXml $taskForSystem -Ensure 'Present') | Should -Be $false
+            (Test-TargetResource -Name $taskName -Ensure 'Absent') | Should -Be $true
             
             $result = Get-DscConfiguration
-            $Global:Error.Count | Should Be 0
-            $result | Should BeOfType ([Microsoft.Management.Infrastructure.CimInstance])
-            $result.PsTypeNames | Where-Object { $_ -like '*Carbon_ScheduledTask' } | Should Not BeNullOrEmpty
+            $Global:Error.Count | Should -Be 0
+            $result | Should -BeOfType ([Microsoft.Management.Infrastructure.CimInstance])
+            $result.PsTypeNames | Where-Object { $_ -like '*Carbon_ScheduledTask' } | Should -Not -BeNullOrEmpty
         }
     }
 
@@ -186,7 +186,7 @@ try
             $resource | Should -Not -BeNullOrEmpty
             $resource.Name | Should -Be $taskName
             $resource.TaskXml | Should -Be $taskForUser
-            $resource.TaskCredential | Should -Be $credential.UserName
+            $resource.TaskCredential | Should -Match "\b$([regex]::escape($credential.UserName))$"
             Assert-DscResourcePresent $resource
         }
     

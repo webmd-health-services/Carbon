@@ -12,32 +12,37 @@
 
 $importCarbonPath = Join-Path -Path $PSScriptRoot -ChildPath '..\Carbon\Import-Carbon.ps1' -Resolve
 
+function Init
+{
+    $Global:Error.Clear()
+    if( (Get-Module 'Carbon') )
+    {
+        Remove-Module 'Carbon' -Force
+    }
+}
+
+function Reset
+{
+    if( (Get-Module 'Carbon') )
+    {
+        Remove-Module 'Carbon' -Force
+    }
+}
+
 Describe 'Import-Carbon' {
 
-    BeforeEach {
-        $Global:Error.Clear()
-        if( (Get-Module 'Carbon') )
-        {
-            Remove-Module 'Carbon' -Force
-        }
-    }
-    
-    AfterEach {
-        if( (Get-Module 'Carbon') )
-        {
-            Remove-Module 'Carbon' -Force
-        }
-    }
+    BeforeEach { Init }
+    AfterEach { Reset }
     
     It 'should import' {
         & $importCarbonPath
-        (Get-Command -Module 'Carbon') | Should Not BeNullOrEmpty
+        (Get-Command -Module 'Carbon') | Should -Not -BeNullOrEmpty
     }
     
     It 'should import with prefix' {
         & $importCarbonPath -Prefix 'C'
         $carbonCmds = Get-Command -Module 'Carbon'
-        $carbonCmds | Should Not BeNullOrEmpty
+        $carbonCmds | Should -Not -BeNullOrEmpty
         foreach( $cmd in $carbonCmds )
         {
             $cmd.Name | Should -Match '^.+-C.+$'
@@ -62,13 +67,84 @@ Describe 'Import-Carbon' {
         try
         {
             & $importCarbonPath
-            $Global:Error.Count | Should Be 0
+            $Global:Error.Count | Should -Be 0
         }
         finally
         {
             $env:Path = $originalPath
         }
-    
     }
-    
+
+    # This test turned out to be too unreliable in its timings. Too bad.
+    It 'should import fast' -Skip {
+        # September 2019: average unmerged modules takes about 8.1 seconds to import.
+        $maxAvgDuration = 9.0
+        if( (Test-Path -Path 'env:APPVEYOR') )
+        {
+            # September 2019: average merged module takes about .75 seconds to import.
+            $maxAvgDuration = 0.8
+            # January 2020: Looks like things are slower now. No changes that would affect import speed, yet it's 
+            # now taking up to 1.4 seconds to import.
+            $maxAvgDuration = 1.5
+        }
+        $carbonPath = Join-Path -Path $PSScriptRoot -ChildPath '..\Carbon' -Resolve
+        & {
+                for( $idx = 0; $idx -lt 7; ++$idx )
+                {
+                    $job = Start-Job -ScriptBlock {
+                        $started = Get-Date
+                        Import-Module -Name $using:carbonPath
+                        return (Get-Date) - $started
+                    }
+                    $job | Wait-Job | Receive-Job 
+                    $job | Remove-Job -Force
+                }
+            } |
+            Select-Object -ExpandProperty 'TotalSeconds' |
+            Sort-Object |
+            # Don't use best/worst times
+            Select-Object -Skip 1 |
+            Select-Object -SkipLast 1 |
+            Measure-Object -Average -Maximum -Minimum |
+            ForEach-Object { 
+                Write-Verbose -Message ('Import-Module Statistics') -Verbose
+                Write-Verbose -Message ('========================') -Verbose
+                $_ | Format-List | Out-String | Write-Verbose -Verbose
+                $_
+            } |
+            Select-Object -ExpandProperty 'Average' |
+            Should -BeLessOrEqual $maxAvgDuration
+    }
+}
+
+Describe 'Import-CarbonPs1.when importing multiple times from different locations' {
+    AfterEach { Reset }
+    It 'should import without errors' {
+        Init
+        $Global:Error.Clear()
+        $otherCarbonModulesRoot = Join-Path -Path $TestDrive.FullName -ChildPath ([IO.Path]::GetRandomFileName())
+        New-Item -Path $otherCarbonModulesRoot -ItemType 'Directory'
+        Copy-Item -Path ($importCarbonPath | Split-Path -Parent) -Destination $otherCarbonModulesRoot -Recurse
+
+        $otherCarbonRoot = Join-Path -Path $otherCarbonModulesRoot -ChildPath 'Carbon'
+        $otherCarbonRoot | Should -Exist
+        Import-Module -Name $otherCarbonRoot
+        & $importCarbonPath
+        (Get-Command -Module 'Carbon') | Should -Not -BeNullOrEmpty
+        $Global:Error | Should -BeNullOrEmpty
+    }
+}
+
+Describe 'Import-CarbonPs1.when importing multiple times from same location' {
+    AfterEach { Reset }
+    It 'should not remove or import' {
+        Init
+        $Global:Error.Clear()
+        & $importCarbonPath
+        Mock -CommandName 'Import-Module'
+        Mock -CommandName 'Remove-Module'
+        & $importCarbonPath
+        Assert-MockCalled -CommandName 'Remove-Module' -Times 0
+        Assert-MockCalled -CommandName 'Import-Module' -Times 1
+    }
 }

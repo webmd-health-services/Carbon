@@ -177,8 +177,7 @@ function Install-CCertificate
             $certFilePath = Join-Path -Path $tempDir -ChildPath ([IO.Path]::GetRandomFileName())
             [IO.File]::WriteAllBytes( $certFilePath, $certBytes )
 
-            $cert = New-Object 'Security.Cryptography.X509Certificates.X509Certificate2'
-            $cert.Import( $certFilePath, $Password, $KeyStorageFlags )
+            $cert = New-Object 'Security.Cryptography.X509Certificates.X509Certificate2' ($certFilePath, $Password, $KeyStorageFlags)
 
             if( $CustomStoreName )
             {
