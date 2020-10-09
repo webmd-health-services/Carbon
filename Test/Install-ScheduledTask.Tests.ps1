@@ -61,11 +61,11 @@ function Assert-TaskScheduledFromXml
         $task.Path | Should -Be (Join-Path -Path '\' -ChildPath $taskName)
         if( $TaskCredential )
         {
-            $task.Definition.Principal.UserId | Should -Be $TaskCredential.Username
+            $task.Definition.Principal.UserId | Should -Match "\b$([regex]::Escape($TaskCredential.Username))$"
         }
         else
         {
-            $task.Definition.Principal.UserId | Should -Be 'System'
+            $task.Definition.Principal.UserId | Should -Match '\bSystem$'
         }
     
         if( $Path )
@@ -323,15 +323,15 @@ function Assert-ScheduledTask
     
     if( $PSBoundParameters.ContainsKey('TaskCredential') )
     {
-        $task.RunAsUser | Should -Be $TaskCredential.Username
+        $task.RunAsUser | Should -Match "\b$([regex]::Escape($TaskCredential.Username))$"
     }
     elseif( $PSBoundParameters.ContainsKey('Principal') )
     {
-        $task.RunAsUser | Should -Be $Principal
+        $task.RunAsUser | Should -Match "\b$([regex]::Escape($Principal))$"
     }
     else
     {
-        $task.RunAsUser | Should -Be 'SYSTEM'
+        $task.RunAsUser | Should -Match '\bSYSTEM$'
     }
     
     if( $HighestAvailableRunLevel )

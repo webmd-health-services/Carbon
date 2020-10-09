@@ -151,7 +151,7 @@ function Invoke-CPowerShell
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
     $powerShellv3Installed = Test-Path -Path HKLM:\SOFTWARE\Microsoft\PowerShell\3
-    $currentRuntime = 'v{0}.0' -f $PSVersionTable.CLRVersion.Major
+    $currentRuntime = 'v{0}.0' -f [Environment]::Version.Major
     if( $powerShellv3Installed )
     {
         $currentRuntime = 'v4.0'

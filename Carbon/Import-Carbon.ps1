@@ -50,9 +50,14 @@ $carbonPsd1Path = Join-Path -Path $PSScriptRoot -ChildPath 'Carbon.psd1' -Resolv
 
     try
     {
-        if( $Force -and (Get-Module -Name 'Carbon') )
+        $module = Get-Module -Name 'Carbon'
+        if( $module )
         {
-            Remove-Module -Name 'Carbon' -Force
+            $expectedPath = Join-Path -Path $PSScriptRoot -ChildPath 'Carbon.psm1'
+            if( $Force -or $module.Path -ne $expectedPath )
+            {
+                Remove-Module -Name 'Carbon' -Force
+            } 
         }
 
         $optionalParams = @{ }

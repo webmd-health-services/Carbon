@@ -141,7 +141,7 @@ Describe 'Protect-String' {
     It 'should encrypt from cert store by thumbprint' {
         $cert = Get-ChildItem -Path cert:\* -Recurse |
                     Where-Object { $_ | Get-Member 'PublicKey' } |
-                    Where-Object { $_.PublicKey.Key -is [Security.Cryptography.RSACryptoServiceProvider] } |
+                    Where-Object { $_.PublicKey.Key -is [Security.Cryptography.RSA] } |
                     Select-Object -First 1
         $cert | Should Not BeNullOrEmpty
         $secret = [Guid]::NewGuid().ToString().Substring(0,20)
@@ -159,7 +159,7 @@ Describe 'Protect-String' {
     It 'should encrypt from cert store by cert path' {
         $cert = Get-ChildItem -Path cert:\* -Recurse |
                     Where-Object { $_ | Get-Member 'PublicKey' } |
-                    Where-Object { $_.PublicKey.Key -is [Security.Cryptography.RSACryptoServiceProvider] } |
+                    Where-Object { $_.PublicKey.Key -is [Security.Cryptography.RSA] } |
                     Select-Object -First 1
         $cert | Should Not BeNullOrEmpty
         $secret = [Guid]::NewGuid().ToString().Substring(0,20)

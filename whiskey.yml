@@ -138,7 +138,7 @@ Tests:
     Path: Start-CarbonTest.ps1
 - Pester4:
     OnlyBy: Developer
-    Path: 
+    Script: 
     - Test\Bin.Tests.ps1
     - Test\Import-Carbon.Tests.ps1
     - Test\LicenseNotices.Tests.ps1
@@ -156,7 +156,7 @@ Tests:
 # These tests fail when run in parallel so they get run first.
 - Pester4:
     OnlyBy: BuildServer
-    Path:
+    Script:
     - Test\Install-Certificate.Tests.ps1
     - Test\Uninstall-Certificate.Tests.ps1
     - Test\Invoke-PowerShell.Tests.ps1
@@ -167,11 +167,11 @@ Tests:
     Queues:
     - Tasks:
         - Pester4:
-            Path: 
+            Script: 
             - Test\*-ScheduledTask.Tests.ps1
     - Tasks:
         - Pester4:
-            Path: 
+            Script: 
             - Test\*.Tests.ps1
             Exclude:
             - "*\\Test\\Install-Certificate.Tests.ps1"
