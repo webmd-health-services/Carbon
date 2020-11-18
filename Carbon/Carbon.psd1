@@ -352,6 +352,7 @@ All functions are idempotent: when run multiple times with the same arguments, y
 * Fixed: Protect-CString and Unprotect-CString failed under PowerShell Core.
 * Fixed: Invoke-CPowerShell failed under PowerShell Core.
 * Fixed: Install-CCertificate fails under PowerShell Core.
+* Fixed: Unprotect-CString adds extra null bytes to the end of a decrypted string when using AES (`-Key`) encryption.
 '@
         } # End of PSData hashtable
     

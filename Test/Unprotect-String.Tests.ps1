@@ -23,7 +23,7 @@ $dsaKeyPath = Join-Path -Path $PSScriptRoot -ChildPath 'Cryptography\CarbonTestD
 
 $rsaCipherText = Protect-String -String $secret -PublicKeyPath $privateKeyPath
 
-Describe 'Unprotect-String' {
+Describe 'Unprotect-String.RSA' {
     BeforeEach {
         $Global:Error.Clear()
     }
@@ -190,5 +190,25 @@ Describe 'Unprotect-String' {
         $secureSecret | Should -BeOfType ([securestring])
         (Convert-SecureStringToString -SecureString $secureSecret) | Should -Be $originalText
         $secureSecret.IsReadOnly() | Should -Be $true
+    }
+}
+
+Describe 'Unprotect-String.AES' {
+    It 'should fail on invalid key length' {
+        $key = 'a' * 8 
+        { Protect-CString -String 'text' -Key $key -ErrorAction Stop } |
+            Should -Throw 'requires a 128-bit, 192-bit, or 256-bit key (16, 24, or 32 bytes, respectively).'
+    }
+
+    foreach ($keyLength in @(16, 24, 32))
+    {
+        It "should succeed with key length: $($keyLength)" {
+            $key = 'a' * $keyLength
+            $originalText = [Guid]::NewGuid().ToString()
+            $protectedText = Protect-CString -String $originalText -Key $key
+            $actualText = Unprotect-CString -ProtectedString $protectedText -Key $key
+            $actualText | Should -Be $originalText -Because 'the decrypted string should be unchanged'
+            $actualText.Length | Should -Be $originalText.Length -Because 'the decrypted string should not contain any extra bytes'
+        }
     }
 }

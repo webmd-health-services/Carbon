@@ -242,8 +242,15 @@ Failed to decrypt string using certificate "{0}" ({1}). This can happen when:
                     $cryptoStream = New-Object 'Security.Cryptography.CryptoStream' $encryptedStream,$decryptor,([Security.Cryptography.CryptoStreamMode]::Read)
                     try
                     {
-                        $decryptedBytes = New-Object 'byte[]' ($encryptedBytes.Length)
-                        [void]$cryptoStream.Read($decryptedBytes, 0, $decryptedBytes.Length)
+                        $streamReader = New-Object 'IO.StreamReader' $cryptoStream
+                        try
+                        {
+                            [byte[]]$decryptedBytes = [Text.Encoding]::UTF8.GetBytes($streamReader.ReadToEnd())
+                        }
+                        finally
+                        {
+                            $streamReader.Dispose()
+                        }
                     }
                     finally
                     {
@@ -254,7 +261,6 @@ Failed to decrypt string using certificate "{0}" ({1}). This can happen when:
                 {
                     $decryptor.Dispose()
                 }
-
             }
             finally
             {
