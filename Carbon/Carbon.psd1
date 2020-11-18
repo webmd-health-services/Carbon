@@ -25,7 +25,7 @@
     RootModule = 'Carbon.psm1'
 
     # Version number of this module.
-    ModuleVersion = '2.9.2'
+    ModuleVersion = '2.9.3'
 
     # ID used to uniquely identify this module
     GUID = '075d9444-c01b-48c3-889a-0b3490716fa2'
@@ -349,7 +349,10 @@ All functions are idempotent: when run multiple times with the same arguments, y
 
             # ReleaseNotes of this module
             ReleaseNotes = @'
-* Fixed: when encryptiong/decrypting with a thumbprint, `Protect-String` and `Unprotect-String` take more time the more certificates you have in your stores.
+* Fixed: Protect-CString and Unprotect-CString failed under PowerShell Core.
+* Fixed: Invoke-CPowerShell failed under PowerShell Core.
+* Fixed: Install-CCertificate fails under PowerShell Core.
+* Fixed: Unprotect-CString adds extra null bytes to the end of a decrypted string when using AES (`-Key`) encryption.
 '@
         } # End of PSData hashtable
     
