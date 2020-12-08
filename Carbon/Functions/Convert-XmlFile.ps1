@@ -236,7 +236,8 @@ function Convert-CXmlFile
         if( $PSCmdlet.ShouldProcess( $Path, ('transform with {0} -> {1}' -f $xdtPathForShouldProcess,$Destination) ) )
         {
             $argumentList = $carbonAssemblyDir,$Path,$XdtPath,$Destination,$TransformAssemblyPath
-            if( $PSVersionTable.CLRVersion.Major -ge 4 )
+
+            if( [Environment]::Version.Major -ge 4 )
             {
                 Invoke-Command -ScriptBlock $scriptBlock -ArgumentList $argumentList
             }
