@@ -134,6 +134,7 @@ if( (Test-OSIs64Bit) )
         {
             $command = @"
 & "$(Join-Path -Path $PSScriptRoot -ChildPath '..\Carbon\Import-Carbon.ps1' -Resolve)"
+`$WarningPreference = 'SilentlyContinue'
 
 if( -not (Test-PowerShellIs32Bit) )
 {

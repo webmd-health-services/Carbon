@@ -313,7 +313,8 @@ All functions are idempotent: when run multiple times with the same arguments, y
                             'Unlock-CIisConfigurationSection',
                             'Unprotect-CString',
                             'Write-CDscError',
-                            'Write-CFile'
+                            'Write-CFile',
+                            '*'
                         )
 
     # Cmdlets to export from this module

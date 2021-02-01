@@ -134,3 +134,49 @@ function Write-CFile
         Write-Timing ('Write-CFile  END')
     }
 }
+
+function Write-File
+{
+     [CmdletBinding(SupportsShouldProcess=$true)]
+    param(
+        [Parameter(Mandatory=$true)]
+        # The path to the file to read.
+        $Path,
+
+        [Parameter(Mandatory=$true,ValueFromPipeline=$true)]
+        [AllowEmptyCollection()]
+        [AllowEmptyString()]
+        # The contents of the file
+        [string[]]$InputObject,
+
+        # The number of tries before giving up reading the file. The default is 100.
+        [int]$MaximumTries = 100,
+
+        # The number of milliseconds to wait between tries. Default is 100 milliseconds.
+        [int]$RetryDelayMilliseconds = 100
+    )
+
+    begin
+    {
+        Set-StrictMode -Version 'Latest'
+        Use-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState
+
+        $msg = "The Carbon module's ""Write-File"" function was renamed to ""Write-CFile"". Please update " +
+                "your code to use the new ""Write-CFile"" name. The old ""Write-File"" function will be " +
+                'removed in the next major version of Carbon.'
+        Write-Warning -Message $msg
+
+        $stuffToPipe = New-Object 'Collections.ArrayList'
+    }
+
+    process
+    {
+        $stuffToPipe.AddRange( $InputObject )
+    }
+
+    end
+    {
+        [void]$PSBoundParameters.Remove('InputObject')
+        $stuffToPipe | Write-CFile @PSBoundParameters
+    }
+}

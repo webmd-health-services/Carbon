@@ -256,7 +256,7 @@ Describe 'Install-Service' {
         Stop-Service -Name $serviceName
     
         $warnings = @()
-        $output = Install-Service -Name $serviceName -Path $servicePath -Description 'something new' @installServiceParams -WarningVariable 'warnings'
+        $output = Install-CService -Name $serviceName -Path $servicePath -Description 'something new' @installServiceParams -WarningVariable 'warnings'
         $output | Should BeNullOrEmpty
         (Get-Service -Name $serviceName).Status | Should Be 'Running'
         $warnings.Count | Should Be 0
@@ -435,7 +435,7 @@ Describe 'Install-Service' {
     
     It 'should set custom account' {
         $warnings = @()
-        Install-Service -Name $serviceName -Path $servicePath -UserName $serviceAcct -Password $servicePassword @installServiceParams -WarningVariable 'warnings'
+        Install-CService -Name $serviceName -Path $servicePath -UserName $serviceAcct -Password $servicePassword @installServiceParams -WarningVariable 'warnings'
         $service = Assert-ServiceInstalled
         $service.UserName | Should Be ".\$($serviceAcct)"
         $service = Get-Service $serviceName

@@ -184,7 +184,7 @@ Describe 'Install-IisAppPool' {
     
     It 'should set identity as specific user' {
         $warnings = @()
-        $result = Install-IisAppPool -Name $appPoolName -UserName $username -Password $password -WarningVariable 'warnings'
+        $result = Install-CIisAppPool -Name $appPoolName -UserName $username -Password $password -WarningVariable 'warnings'
         $result | Should BeNullOrEmpty
         Assert-AppPoolExists
         Assert-Identity $username $password

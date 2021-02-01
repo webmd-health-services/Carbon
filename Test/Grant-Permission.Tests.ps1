@@ -342,7 +342,7 @@ Describe 'Grant-Permission.when setting inheritance flags' {
 Describe 'Grant-Permission.when setting inheritance flags on a file' {
     $path = New-TestFile
     $warnings = @()
-    $result = Grant-Permission -Identity $user -Permission Read -Path $path -ApplyTo Container -WarningAction SilentlyContinue -WarningVariable 'warnings'
+    $result = Grant-CPermission -Identity $user -Permission Read -Path $path -ApplyTo Container -WarningAction SilentlyContinue -WarningVariable 'warnings'
     It 'should warn that you can''t do that' {
         $warnings | Should Not BeNullOrEmpty
         ($warnings[0] -like '*Can''t apply inheritance/propagation rules to a leaf*') | Should Be $true

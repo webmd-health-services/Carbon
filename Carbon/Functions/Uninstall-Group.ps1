@@ -34,8 +34,7 @@ function Uninstall-CGroup
     Demonstrates how to uninstall a group. In this case, the `TestGroup1` group is removed.
     #>
     [CmdletBinding(SupportsShouldProcess=$true)]
-    param
-    (
+    param(
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
         [String]

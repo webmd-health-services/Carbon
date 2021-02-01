@@ -35,7 +35,7 @@ function Get-CMsi
     #>
     [CmdletBinding()]
     [OutputType('Carbon.Msi.MsiInfo')]
-    param (
+    param(
         [Parameter(Mandatory=$True,ValueFromPipeline=$True,ValueFromPipelineByPropertyName=$True)]
         [Alias('FullName')]
         [string[]]

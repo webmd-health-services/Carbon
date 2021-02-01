@@ -22,7 +22,8 @@ function Test-CFirewallStatefulFtp
     Returns `True` if the firewall's `StatefulFtp` setting is enabled, `False` otherwise.
     #>
     [CmdletBinding()]
-    param()
+    param(
+    )
     
     Set-StrictMode -Version 'Latest'
 
