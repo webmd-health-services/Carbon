@@ -243,7 +243,7 @@ function Convert-CXmlFile
             }
             else
             {
-                Invoke-CPowerShell -Command $scriptBlock -Args $argumentList -Runtime 'v4.0'
+                Invoke-CPowerShell -Command $scriptBlock -Args $argumentList -Runtime 'v4.0' -NoWarn
             }
         }
     }

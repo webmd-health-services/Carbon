@@ -18,6 +18,6 @@ function Start-TestFixture
 function Test-ShouldDetectIfOSIs64Bit
 {
     $is64Bit = (Test-Path env:"ProgramFiles(x86)")
-    Assert-Equal $is64Bit (Test-OSIs64Bit)
+    Assert-Equal $is64Bit (Test-OSIs64Bit -NoWarn)
 }
 

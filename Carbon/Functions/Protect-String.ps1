@@ -175,7 +175,12 @@ filter Protect-CString
                 $protectStringPath = Join-Path -Path $CarbonBinDir -ChildPath 'Protect-String.ps1' -Resolve
                 $encodedString = Protect-CString -String $String -ForComputer
                 $argumentList = '-ProtectedString {0}' -f $encodedString
-                Invoke-CPowerShell -ExecutionPolicy 'ByPass' -NonInteractive -FilePath $protectStringPath -ArgumentList $argumentList -Credential $Credential |
+                Invoke-CPowerShell -ExecutionPolicy 'ByPass' `
+                                   -NonInteractive `
+                                   -FilePath $protectStringPath `
+                                   -ArgumentList $argumentList `
+                                   -Credential $Credential `
+                                   -NoWarn |
                     Select-Object -First 1
                 return
             }

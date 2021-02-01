@@ -45,7 +45,7 @@ function Test-ShouldAllowDifferentEncoding
 {
     $value = 'Value1'
     $result = $value | 
-                    ConvertTo-Base64 -Encoding ([Text.Encoding]::ASCII) | 
+                    ConvertTo-Base64 -Encoding ([Text.Encoding]::ASCII) -NoWarn |
                     ConvertFrom-Base64 -Encoding ([Text.Encoding]::ASCII)
     Assert-Equal $value $result
 }

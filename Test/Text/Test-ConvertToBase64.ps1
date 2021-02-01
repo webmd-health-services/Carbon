@@ -29,43 +29,43 @@ function Test-ShouldAcceptPipelineInput
 {
     $result = ('Value1','Value2') | ConvertTo-Base64
     Assert-Equal 2 $result.Length
-    Assert-Equal (ConvertTo-Base64 -Value 'Value1') $result[0]
-    Assert-Equal (ConvertTo-Base64 -Value 'Value2') $result[1]
+    Assert-Equal (ConvertTo-Base64 -Value 'Value1' -NoWarn) $result[0]
+    Assert-Equal (ConvertTo-Base64 -Value 'Value2' -NoWarn) $result[1]
 }
 
 function Test-ShouldAcceptArrayInput
 {
     $result = ConvertTo-Base64 -Value @('Value1','Value2')
     Assert-Equal 2 $result.Length
-    Assert-Equal (ConvertTo-Base64 -Value 'Value1') $result[0]
-    Assert-Equal (ConvertTo-Base64 -Value 'Value2') $result[1]
+    Assert-Equal (ConvertTo-Base64 -Value 'Value1' -NoWarn) $result[0]
+    Assert-Equal (ConvertTo-Base64 -Value 'Value2' -NoWarn) $result[1]
 }
 
 function Test-ShouldAllowDifferentEncoding
 {
     $value = 'Value1'
     $result = $value | 
-                    ConvertTo-Base64 -Encoding ([Text.Encoding]::ASCII) | 
+                    ConvertTo-Base64 -Encoding ([Text.Encoding]::ASCII) -NoWarn | 
                     ConvertFrom-Base64 -Encoding ([Text.Encoding]::ASCII)
     Assert-Equal $value $result
 }
 
 function Test-ShouldAllowEmptyString
 {
-    $result = ConvertTo-Base64 ''
+    $result = ConvertTo-Base64 '' -NoWarn
     Assert-Equal '' $result
 }
 
 function Test-ShouldAllowNull
 {
-    $result = ConvertTo-Base64 $null
+    $result = ConvertTo-Base64 $null -NoWarn
     Assert-Null $null
 }
 
 function Test-ShouldAllowNullFromPipeline
 {
     $values = @('1', $null, '3')
-    $result = $values | ConvertTo-Base64 
+    $result = $values | ConvertTo-Base64 -NoWarn
     Assert-NotNull $result
     Assert-Equal 3 $result.Count
     Assert-Null $result[1]
@@ -73,7 +73,7 @@ function Test-ShouldAllowNullFromPipeline
 
 function Test-ShouldAllowNullInArray
 {
-    $result = ConvertTo-Base64 -Value @( $null, $null )
+    $result = ConvertTo-Base64 -Value @( $null, $null ) -NoWarn
     Assert-NotNull $result
     Assert-Equal 2 $result.Count
     Assert-Empty $result[0]

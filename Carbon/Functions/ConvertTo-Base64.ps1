@@ -39,15 +39,22 @@ function ConvertTo-CBase64
 
         [Text.Encoding]
         # The encoding to use.  Default is Unicode.
-        $Encoding = ([Text.Encoding]::Unicode)
+        $Encoding = ([Text.Encoding]::Unicode),
+
+        [switch]$NoWarn
     )
 
     begin
     {
         Set-StrictMode -Version 'Latest'
         Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
-        $msg = 'Carbon''s "ConvertTo-CBase64" function is OBSOLETE. It moved to the new Carbon.Core module.'
-        Write-Warning -Message $msg
+
+        if( -not $NoWarn )
+        {
+            $msg = 'Carbon''s "ConvertTo-CBase64" function is OBSOLETE and will be removed in the next major version ' +
+                   'of Carbon. Use the "ConvertTo-CBase64" function in the new Carbon.Core module.'
+            Write-Warning -Message $msg
+        }
     }
 
     process

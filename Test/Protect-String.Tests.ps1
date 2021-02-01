@@ -60,7 +60,8 @@ Describe 'Protect-String' {
     
             $decrypedString = Invoke-PowerShell -FilePath (Join-Path -Path $PSScriptRoot -ChildPath 'Cryptography\Unprotect-String.ps1') `
                                                 -ArgumentList '-ProtectedString',$protectedString `
-                                                -Credential $CarbonTestUser
+                                                -Credential $CarbonTestUser `
+                                                -NoWarn
             $decrypedString | Should Be $string
         }
 
