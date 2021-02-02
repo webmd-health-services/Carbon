@@ -25,7 +25,7 @@
     RootModule = 'Carbon.psm1'
 
     # Version number of this module.
-    ModuleVersion = '2.9.4'
+    ModuleVersion = '2.10.0'
 
     # ID used to uniquely identify this module
     GUID = '075d9444-c01b-48c3-889a-0b3490716fa2'
@@ -338,7 +338,16 @@ All functions are idempotent: when run multiple times with the same arguments, y
         PSData = @{
 
             # Tags applied to this module. These help with module discovery in online galleries.
-            Tags = @('.net','acl','active-directory','certificates','com','compression','computer','credential','cryptography','directory','dsc','dsc-resources','encryption','environment','file-system','firewall','groups','hosts-file','http','identity','iis','ini','installers','internet-explorer','ip','junctions','msi','msmq','netsh','networking','ntfs','operating-system','os','path','performance-counters','powershell','principal','privileges','programs','registry','rsa','scheduled-tasks','security','service','shares','sid','smb','ssl','text','trusted-host','users','wcf','windows','windows-features','xml','zip','PSModule','DscResources','setup','automation','admin')
+            Tags = @(
+                '.net', 'acl', 'active-directory', 'certificates', 'com', 'compression', 'computer', 'credential',
+                'cryptography', 'directory', 'dsc', 'dsc-resources', 'encryption', 'environment', 'file-system',
+                'firewall', 'groups', 'hosts-file', 'http', 'identity', 'iis', 'ini', 'installers', 'internet-explorer',
+                'ip', 'junctions', 'msi', 'msmq', 'netsh', 'networking', 'ntfs', 'operating-system', 'os', 'path',
+                'performance-counters', 'powershell', 'principal', 'privileges', 'programs', 'registry', 'rsa',
+                'scheduled-tasks', 'security', 'service', 'shares', 'sid', 'smb', 'ssl', 'text', 'trusted-host',
+                'users', 'wcf', 'windows', 'windows-features', 'xml', 'zip', 'PSModule', 'DscResources', 'setup',
+                'automation', 'admin'
+            )
 
             # A URL to the license for this module.
             LicenseUri = 'http://www.apache.org/licenses/LICENSE-2.0'
@@ -350,7 +359,73 @@ All functions are idempotent: when run multiple times with the same arguments, y
 
             # ReleaseNotes of this module
             ReleaseNotes = @'
-* Fixed: Convert-XmlFile fails in PowerShell Core (thanks to (Joseph Block)[https://github.com/JosephBlock] for the fix).
+# Naming Collisions Solved (Again)
+
+Fixed: In Carbon 2.7.0, we added a `C` prefix to all the Carbon functions, with aliases that used the old function
+names to preserve backwards-compatability. We didn't realize at the time that aliases have the highest precedence of
+commands, so Carbon's aliases hid any other commands on your system that may have been named the same. Bad idea. With
+this release, Carbon no longer uses aliases for backwards-compatability. Instead, it dynamically creates shim functions
+named after the old functions. These shim functions write a warning that the function with the old name is deprecated
+then calls the function using its new name. Hopefully, this will finally fix the name collisions problems. The function
+names with out the `C` prefix will be removed in Carbon 3, so update your code to make upgrading easier.
+
+Because Carbon creates these backwards-compatible function shims dynamically, Carbon *won't* create a shim if a
+function with the old name exists. If there is a name conflict between Carbon and another module, if you import that
+module first, Carbon won't export its shim function.
+
+# Carbon on PowerShell Core
+
+We need parts of Carbon to work on PowerShell Core. The current size of Carbon makes that hard (over 200 functions and
+automated tests that take a long time). So, we're breaking Carbon into smaller modules. The new modules will all require
+PowerShell 5.1+. If you use Carbon 2 and the new modules together, you'll get naming conflicts during installation and
+when importing.
+
+The first two modules are already out: Carbon.Core and Carbon.Cryptography. 
+
+# Carbon.Core
+
+Carbon.Core will contain all the functions that are foundational to all or most other future Carbon modules, or generic
+functions we feel are core to Carbon and/or PowerShell. It has no dependencies. The following functions were migrated to
+it:
+
+* `ConvertTo-CBase64` (with some added functionality)
+* `Get-CPowerShellPath`
+* `Invoke-CPowerShell`
+* `Test-COperatingSystem`: Replaces `Test-OSIs32Bit` and `Test-OSIs64Bit`. Tests operating system type, too, so you
+can use this function instead of the `$IsWindows`, `$IsLinux`, or `$IsMacOS` variables. Works on versions of PowerShell
+that don't define those variables.
+* `Test-CPowerShell`: Replaces `Test-PowerShellIs32Bit` and `Test-PowerShellIs64Bit`. Tests edition, too. Use this
+function instead of `$PSVersionTable.PSEdition`. Handles when $PSVersionTable doesn't have the PSEdition property.
+
+# Carbon.Cryptography
+
+Carbon.Crytography contains functions that are used when encrypting and decrypting strings. This is where certificate
+management funtions live. These function were migrated from Carbon:
+
+* `Convert-CSecureStringToString`
+* `Get-CCertificate`: works on Linux and macOS when opening certificate files.
+* `Install-CCertificate`
+* `Uninstall-CCertificate`
+* `Protect-CString`: works on Linux and macOS.
+* `Unprotect-CString`: works on Linux and macOS.
+
+# TL;DR Changes
+
+* Fixed: Carbon's backward compatible aliases replaced with shim functions. Carbon no longer aggressively loads its
+functions.
+* New: Carbon now warns when you're using a function shim with a deprecated name. Update your code so that all Carbon
+functions have a `C` prefix. Carbon has a `Use-CarbonPrefix.ps1` script in its bin directory that will update files to
+use the new prefix.
+* Migrated the following functions to new Carbon.Core and Carbon.Cryptography modules. These functions still exist in
+Carbon 2, so if you use all these modules together, you'll probably run into naming collisions and errors depending on
+how you install, import, and use Carbon. You'll get a warning if you use any of the functions that migrated.
+    * `ConvertTo-CBase64`, `Get-CPowerShellPath`, and `Invoke-CPowerShell` are now in the Carbon.Core module.
+    * The `Test-COSIs32Bit` and `Test-COSIs64Bit` functions merged into a `Test-COperatingSystem` function in the
+    Carbon.Core module.
+    * The `Test-CPowerShellIs32Bit` and `Test-CPowerShellIs64Bit` functions merged into a `Test-CPowerShell` function in
+    the Carbon.Core module.
+    * New: `Convert-CSecureStringToString`, `Get-CCertificate`, `Install-CCertificate`, `Uninstall-CCertificate`,
+    `Protect-CString`, and `Unprotect-CString` migrated to the Carbon.Cryptography module.
 '@
         } # End of PSData hashtable
     
