@@ -13,7 +13,7 @@ function ConvertTo-Key
     {
         if( $InputObject -is [SecureString] )
         {
-            $InputObject = Convert-CSecureStringToString -SecureString $InputObject
+            $InputObject = Convert-CSecureStringToString -SecureString $InputObject -NoWarn
         }
         elseif( $InputObject -isnot [string] )
         {

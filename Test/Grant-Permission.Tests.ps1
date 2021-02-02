@@ -491,7 +491,7 @@ Describe 'Grant-Permission.when clearing permissions on a registry key and verbo
 foreach( $location in @( 'LocalMachine','CurrentUser' ) )
 {
     Describe ('Grant-Permission.when setting permissions on a private key in the {0} location' -f $location) {
-        $cert = Install-Certificate -Path $privateKeyPath -StoreLocation $location -StoreName My
+        $cert = Install-Certificate -Path $privateKeyPath -StoreLocation $location -StoreName My -NoWarn
         try
         {
             It 'should install the certificate' {
@@ -553,7 +553,7 @@ foreach( $location in @( 'LocalMachine','CurrentUser' ) )
         }
         finally
         {
-            Uninstall-Certificate -Thumbprint $cert.Thumbprint -StoreLocation $location -StoreName My
+            Uninstall-Certificate -Thumbprint $cert.Thumbprint -StoreLocation $location -StoreName My -NoWarn
         }
     }
 }

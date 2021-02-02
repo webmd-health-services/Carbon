@@ -112,7 +112,7 @@ Describe 'Revoke-Permission' {
     }
     
     It 'should revoke local machine private key permissions' {
-        $cert = Install-Certificate -Path $privateKeyPath -StoreLocation LocalMachine -StoreName My
+        $cert = Install-Certificate -Path $privateKeyPath -StoreLocation LocalMachine -StoreName My -NoWarn
         try
         {
             $certPath = Join-Path -Path 'cert:\LocalMachine\My' -ChildPath $cert.Thumbprint
@@ -124,12 +124,12 @@ Describe 'Revoke-Permission' {
         }
         finally
         {
-            Uninstall-Certificate -Thumbprint $cert.Thumbprint -StoreLocation LocalMachine -StoreName My
+            Uninstall-Certificate -Thumbprint $cert.Thumbprint -StoreLocation LocalMachine -StoreName My -NoWarn
         }
     }
     
     It 'should revoke current user private key permissions' {
-        $cert = Install-Certificate -Path $privateKeyPath -StoreLocation CurrentUser -StoreName My
+        $cert = Install-Certificate -Path $privateKeyPath -StoreLocation CurrentUser -StoreName My -NoWarn
         try
         {
             $certPath = Join-Path -Path 'cert:\CurrentUser\My' -ChildPath $cert.Thumbprint
@@ -139,12 +139,12 @@ Describe 'Revoke-Permission' {
         }
         finally
         {
-            Uninstall-Certificate -Thumbprint $cert.Thumbprint -StoreLocation CurrentUser -StoreName My
+            Uninstall-Certificate -Thumbprint $cert.Thumbprint -StoreLocation CurrentUser -StoreName My -NoWarn
         }
     }
     
     It 'should support what if when revoking private key permissions' {
-        $cert = Install-Certificate -Path $privateKeyPath -StoreLocation LocalMachine -StoreName My
+        $cert = Install-Certificate -Path $privateKeyPath -StoreLocation LocalMachine -StoreName My -NoWarn
         try
         {
             $certPath = Join-Path -Path 'cert:\LocalMachine\My' -ChildPath $cert.Thumbprint
@@ -156,7 +156,7 @@ Describe 'Revoke-Permission' {
         }
         finally
         {
-            Uninstall-Certificate -Thumbprint $cert.Thumbprint -StoreLocation LocalMachine -StoreName My
+            Uninstall-Certificate -Thumbprint $cert.Thumbprint -StoreLocation LocalMachine -StoreName My -NoWarn
         }
     }
     

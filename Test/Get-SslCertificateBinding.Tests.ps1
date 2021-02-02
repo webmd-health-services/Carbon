@@ -162,7 +162,7 @@ Describe 'Get-SslCertificateBinding' {
     
     It 'should get IPv6 binding' {
         $certPath = Join-Path -Path $PSScriptRoot -ChildPath 'Certificates\CarbonTestCertificate.cer' -Resolve
-        $cert = Install-Certificate $certPath -StoreLocation LocalMachine -StoreName My
+        $cert = Install-Certificate $certPath -StoreLocation LocalMachine -StoreName My -NoWarn
         $appID = '12ec3276-0689-42b0-ad39-c1fe23d25721'
         Set-SslCertificateBinding -IPAddress '[::]' -Port 443 -ApplicationID $appID -Thumbprint $cert.Thumbprint
     

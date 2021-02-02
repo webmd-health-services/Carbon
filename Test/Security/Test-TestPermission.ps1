@@ -145,7 +145,7 @@ function Test-ShouldCheckExactGrantedInheritanceFlags
 
 function Test-ShouldCheckPermissionOnPrivateKey
 {
-    $cert = Install-Certificate -Path $privateKeyPath -StoreLocation LocalMachine -StoreName My
+    $cert = Install-Certificate -Path $privateKeyPath -StoreLocation LocalMachine -StoreName My -NoWarn
     try
     {
         $certPath = Join-Path -Path 'cert:\LocalMachine\My' -ChildPath $cert.Thumbprint
@@ -156,7 +156,7 @@ function Test-ShouldCheckPermissionOnPrivateKey
     }
     finally
     {
-        Uninstall-Certificate -Thumbprint $cert.Thumbprint -StoreLocation LocalMachine -StoreName My
+        Uninstall-Certificate -Thumbprint $cert.Thumbprint -StoreLocation LocalMachine -StoreName My -NoWarn
     }
 }
 

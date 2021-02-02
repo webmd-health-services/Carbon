@@ -212,7 +212,7 @@ function Initialize-CLcm
             return
         }
 
-        $privateKey = Get-CCertificate -Path $CertFile -Password $CertPassword
+        $privateKey = Get-CCertificate -Path $CertFile -Password $CertPassword -NoWarn
         if( -not $privateKey )
         {
             return
