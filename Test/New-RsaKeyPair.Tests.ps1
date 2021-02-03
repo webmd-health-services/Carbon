@@ -38,7 +38,7 @@ Describe 'New-RsaKeyPair' {
             $ValidTo = (Get-Date).AddDays( [Math]::Floor(([DateTime]::MaxValue - [DateTime]::UtcNow).TotalDays) )
         }
 
-        $cert = Get-Certificate -Path $publicKeyPath
+        $cert = Get-Certificate -Path $publicKeyPath -NoWarn
         # Weird date/time stamps in generated certificate that I can't figure out/replicate. So we'll just check that the expected/actual dates are within a day of each other.
         [timespan]$span = $ValidTo - $cert.NotAfter
         $span.TotalDays | Should BeGreaterThan (-2)
@@ -96,7 +96,7 @@ Describe 'New-RsaKeyPair' {
         $decryptedSecret = Unprotect-String -ProtectedString $protectedSecret -PrivateKeyPath $privateKeyPath -Password $privateKeyPassword
         $decryptedSecret | Should Be $secret
 
-        $publicKey = Get-Certificate -Path $publicKeyPath
+        $publicKey = Get-Certificate -Path $publicKeyPath -NoWarn
         $publicKey | Should Not BeNullOrEmpty
 
         # Make sure it works with DSC
@@ -149,7 +149,7 @@ Describe 'New-RsaKeyPair' {
         It 'should generate key pairs that can be used by CMS cmdlets' {
             $output = New-RsaKeyPair -Subject 'CN=to@example.com' -PublicKeyFile $publicKeyPath -PrivateKeyFile $privateKeyPath -Password $privateKeyPassword
 
-            $cert = Install-Certificate -Path $privateKeyPath -StoreLocation CurrentUser -StoreName My -Password $privateKeyPassword
+            $cert = Install-Certificate -Path $privateKeyPath -StoreLocation CurrentUser -StoreName My -Password $privateKeyPassword -NoWarn
 
             try
             {
@@ -159,7 +159,7 @@ Describe 'New-RsaKeyPair' {
             }
             finally
             {
-                Uninstall-Certificate -Thumbprint $cert.Thumbprint -StoreLocation CurrentUser -StoreName My
+                Uninstall-Certificate -Thumbprint $cert.Thumbprint -StoreLocation CurrentUser -StoreName My -NoWarn
             }
         }
     }
@@ -190,7 +190,7 @@ Describe 'New-RsaKeyPair' {
         $output = New-RsaKeyPair -Subject $subject -PublicKeyFile $publicKeyPath -PrivateKeyFile $privateKeyPath -Password $null
         $output.Count | Should Be 2
 
-        $privateKey = Get-Certificate -Path $privateKeyPath
+        $privateKey = Get-Certificate -Path $privateKeyPath -NoWarn
         $privateKey | Should Not BeNullOrEmpty
 
         $secret = [IO.Path]::GetRandomFileName()

@@ -19,12 +19,12 @@ function Start-TestFixture
 
 function Start-Test
 {
-    $cert = Install-Certificate (Join-Path $TestDir CarbonTestCertificate.cer -Resolve) -StoreLocation LocalMachine -StoreName My
+    $cert = Install-Certificate (Join-Path $TestDir CarbonTestCertificate.cer -Resolve) -StoreLocation LocalMachine -StoreName My -NoWarn
 }
 
 function Stop-Test
 {
-    Uninstall-Certificate -Certificate $cert -StoreLocation LocalMachine -StoreName My
+    Uninstall-Certificate -Certificate $cert -StoreLocation LocalMachine -StoreName My -NoWarn
 }
 
 function Test-ShouldCreateNewSslCertificateBinding

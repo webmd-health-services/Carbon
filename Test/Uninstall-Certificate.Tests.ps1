@@ -21,13 +21,13 @@ Describe 'Uninstall-Certificate' {
     BeforeEach {
         if( -not (Test-Path Cert:\CurrentUser\My\$TestCert.Thumbprint -PathType Leaf) )
         {
-            Install-Certificate -Path $TestCertPath -StoreLocation CurrentUser -StoreName My
+            Install-Certificate -Path $TestCertPath -StoreLocation CurrentUser -StoreName My -NoWarn
         }
     }
 
     It 'should remove certificate by certificate' {
         Uninstall-Certificate -Certificate $TestCert -StoreLocation CurrentUser -StoreName My
-        $cert = Get-Certificate -Thumbprint $TestCert.Thumbprint -StoreLocation CurrentUser -StoreName My
+        $cert = Get-Certificate -Thumbprint $TestCert.Thumbprint -StoreLocation CurrentUser -StoreName My -NoWarn
         $cert | Should BeNullOrEmpty
     }
 
@@ -37,7 +37,7 @@ Describe 'Uninstall-Certificate' {
         $tryNum = 0
         do
         {
-            $cert = Get-Certificate -Thumbprint $TestCert.Thumbprint -StoreLocation CurrentUser -StoreName My
+            $cert = Get-Certificate -Thumbprint $TestCert.Thumbprint -StoreLocation CurrentUser -StoreName My -NoWarn
             if( -not $cert )
             {
                 break
@@ -50,7 +50,7 @@ Describe 'Uninstall-Certificate' {
 
     It 'should support WhatIf' {
         Uninstall-Certificate -Thumbprint $TestCert.Thumbprint -StoreLocation CurrentUser -StoreName My -WhatIf
-        $cert = Get-Certificate -Thumbprint $TestCert.Thumbprint -StoreLocation CurrentUser -StoreName My
+        $cert = Get-Certificate -Thumbprint $TestCert.Thumbprint -StoreLocation CurrentUser -StoreName My -NoWarn
         $cert | Should Not BeNullOrEmpty
     }
 
@@ -80,7 +80,7 @@ Describe 'Uninstall-Certificate' {
                                   -Session $session
             $Global:Error.Count | Should Be 0
 
-            $cert = Get-Certificate -Thumbprint $TestCert.Thumbprint -StoreLocation CurrentUser -StoreName My
+            $cert = Get-Certificate -Thumbprint $TestCert.Thumbprint -StoreLocation CurrentUser -StoreName My -NoWarn
             $cert | Should BeNullOrEmpty
         }
         finally
@@ -113,7 +113,7 @@ function WhenUninstallingViaRemoting
 {
     try
     {
-        $TestCert | Uninstall-Certificate -Session $session
+        $TestCert | Uninstall-Certificate -Session $session -NoWarn
     }
     finally
     {
@@ -128,12 +128,12 @@ function WhenUninstallPipedCertificate
 
 function WhenUninstallingByThumbprint
 {
-    Uninstall-Certificate -Thumbprint $TestCert.Thumbprint
+    Uninstall-Certificate -Thumbprint $TestCert.Thumbprint -NoWarn
 }
 
 function WhenUninstallPipedThumbprint
 {
-    $TestCert.Thumbprint | Uninstall-Certificate
+    $TestCert.Thumbprint | Uninstall-Certificate -NoWarn
 }
 
 function ThenCertificateUninstalled

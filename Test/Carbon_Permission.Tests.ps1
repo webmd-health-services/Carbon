@@ -178,7 +178,7 @@ Describe 'Carbon_Permission' {
     }
     
     It 'should grant permission on private key' {
-        $cert = Install-Certificate -Path (Join-Path -Path $PSScriptRoot -ChildPath 'Cryptography\CarbonTestPrivateKey.pfx' -Resolve) -StoreLocation LocalMachine -StoreName My
+        $cert = Install-Certificate -Path (Join-Path -Path $PSScriptRoot -ChildPath 'Cryptography\CarbonTestPrivateKey.pfx' -Resolve) -StoreLocation LocalMachine -StoreName My -NoWarn
         try
         {
             $certPath = Join-Path -Path 'cert:\LocalMachine\My' -ChildPath $cert.Thumbprint -Resolve
@@ -195,7 +195,7 @@ Describe 'Carbon_Permission' {
         }
         finally
         {
-            Uninstall-Certificate -Certificate $cert -StoreLocation LocalMachine -StoreName My
+            Uninstall-Certificate -Certificate $cert -StoreLocation LocalMachine -StoreName My -NoWarn
         }
     }
     

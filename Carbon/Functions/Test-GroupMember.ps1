@@ -33,7 +33,7 @@ function Test-CGroupMember
     Demonstrates how to test if a user is a member of a group. In this case, it tests if `REBELS\LSkywalker` is in the local `SithLords`, *which obviously he isn't*, so `$false` is returned.
     #>
     [CmdletBinding()]
-    Param(
+    param(
         [Parameter(Mandatory=$true)]
         [string]
         # The name of the group whose membership is being tested.

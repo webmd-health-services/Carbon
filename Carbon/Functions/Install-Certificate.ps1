@@ -76,12 +76,20 @@ function Install-CCertificate
         # Use the `Session` parameter to install a certificate on remote computer(s) using PowerShell remoting. Use `New-PSSession` to create a session.
         #
         # This parameter was added in Carbon 2.1.0.
-        $Session
+        $Session,
+
+        [switch]$NoWarn
     )
     
     Set-StrictMode -Version 'Latest'
-
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
+    if( -not $NoWarn )
+    {
+        $msg = 'Carbon''s "Install-CCertificate" function is OBSOLETE and will be removed in the next major version ' +
+               'of Carbon. Use the "Install-CCertificate" function in the new "Carbon.Cryptography" module.'
+        Write-Warning -Message $msg
+    }
 
     if( $Password -and $Password -isnot [securestring] )
     {
@@ -114,7 +122,7 @@ function Install-CCertificate
             $keyFlags = $keyFlags -bor [Security.Cryptography.X509Certificates.X509KeyStorageFlags]::Exportable
         }
 
-        $Certificate = Get-CCertificate -Path $Path -Password $Password -KeyStorageFlags $keyFlags
+        $Certificate = Get-CCertificate -Path $Path -Password $Password -KeyStorageFlags $keyFlags -NoWarn
         $fromFile = $true
     }
     else

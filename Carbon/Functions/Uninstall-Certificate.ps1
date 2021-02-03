@@ -97,14 +97,23 @@ function Uninstall-CCertificate
         # Due to a bug in PowerShell, you can't remove a certificate by just its thumbprint over remoting. Using just a thumbprint requires us to enumerate through all installed certificates. When you do this over remoting, PowerShell throws a terminating `The system cannot open the device or file specified` error.
         #
         # This parameter was added in Carbon 2.1.0.
-        $Session
+        $Session,
+
+        [switch]$NoWarn
     )
     
     process
     {
         Set-StrictMode -Version 'Latest'
-
         Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
+        if( -not $NoWarn )
+        {
+            $msg = 'Carbon''s "Uninstall-CCertificate" function is OBSOLETE and will be removed in the next major ' +
+                   'version of Carbon. Use the "Uninstall-CCertificate" function in the new "Carbon.Cryptography" ' +
+                   'module.'
+            Write-Warning -Message $msg
+        }
 
         if( $PSCmdlet.ParameterSetName -like 'ByCertificate*' )
         {

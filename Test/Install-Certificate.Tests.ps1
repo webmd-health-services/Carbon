@@ -28,7 +28,7 @@ Describe "Install-Certificate" {
             $StoreName = 'My',
             $ExpectedCertificate = $TestCert
         )
-        $cert = Get-Certificate -Thumbprint $ExpectedCertificate.Thumbprint -StoreLocation $StoreLocation -StoreName $StoreName
+        $cert = Get-Certificate -Thumbprint $ExpectedCertificate.Thumbprint -StoreLocation $StoreLocation -StoreName $StoreName -NoWarn
         $cert | Should Not BeNullOrEmpty | Out-Null
         $cert.Thumbprint | Should Be $ExpectedCertificate.Thumbprint | Out-Null
         return $cert
@@ -37,22 +37,22 @@ Describe "Install-Certificate" {
     BeforeEach {
         $Global:Error.Clear()
 
-        if( (Get-Certificate -Thumbprint $TestCert.Thumbprint -StoreLocation CurrentUser -StoreName My) )
+        if( (Get-Certificate -Thumbprint $TestCert.Thumbprint -StoreLocation CurrentUser -StoreName My -NoWarn) )
         {
-            Uninstall-Certificate -Certificate $TestCert -StoreLocation CurrentUser -StoreName My
+            Uninstall-Certificate -Certificate $TestCert -StoreLocation CurrentUser -StoreName My -NoWarn
         }
 
-        if( (Get-Certificate -Thumbprint $TestCertProtected.Thumbprint -StoreLocation CurrentUser -StoreName My) )
+        if( (Get-Certificate -Thumbprint $TestCertProtected.Thumbprint -StoreLocation CurrentUser -StoreName My -NoWarn) )
         {
-            Uninstall-Certificate -Certificate $TestCertProtected -StoreLocation CurrentUser -StoreName My
+            Uninstall-Certificate -Certificate $TestCertProtected -StoreLocation CurrentUser -StoreName My -NoWarn
         }
     }
 
     AfterEach {
-        Uninstall-Certificate -Certificate $TestCert -StoreLocation CurrentUser -StoreName My
-        Uninstall-Certificate -Certificate $TestCert -StoreLocation LocalMachine -StoreName My
-        Uninstall-Certificate -Certificate $TestCertProtected -StoreLocation CurrentUser -StoreName My
-        Uninstall-Certificate -Certificate $TestCertProtected -StoreLocation LocalMachine -StoreName My
+        Uninstall-Certificate -Certificate $TestCert -StoreLocation CurrentUser -StoreName My -NoWarn
+        Uninstall-Certificate -Certificate $TestCert -StoreLocation LocalMachine -StoreName My -NoWarn
+        Uninstall-Certificate -Certificate $TestCertProtected -StoreLocation CurrentUser -StoreName My -NoWarn
+        Uninstall-Certificate -Certificate $TestCertProtected -StoreLocation LocalMachine -StoreName My -NoWarn
     }
 
     It 'should install certificate to local machine' {
@@ -70,7 +70,7 @@ Describe "Install-Certificate" {
         try
         {
             $path = '.\Certificates\{0}' -f (Split-Path -Leaf -Path $TestCertPath)
-            $cert = Install-Certificate -Path $path -StoreLocation CurrentUser -StoreName My -Verbose
+            $cert = Install-Certificate -Path $path -StoreLocation CurrentUser -StoreName My -Verbose -NoWarn
             $cert.Thumbprint | Should Be $TestCert.Thumbprint
             $cert = Assert-CertificateInstalled -StoreLocation CurrentUser -StoreName My 
         }
@@ -81,7 +81,7 @@ Describe "Install-Certificate" {
     }
 
     It 'should install certificate to local machine as exportable' {
-        $cert = Install-Certificate -Path $TestCertPath -StoreLocation CurrentUser -StoreName My -Exportable
+        $cert = Install-Certificate -Path $TestCertPath -StoreLocation CurrentUser -StoreName My -Exportable -NoWarn
         $cert.Thumbprint | Should Be $TestCert.Thumbprint
         $cert = Assert-CertificateInstalled -StoreLocation CurrentUser -StoreName My 
         $bytes = $cert.Export( [Security.Cryptography.X509Certificates.X509ContentType]::Pfx )
@@ -89,28 +89,28 @@ Describe "Install-Certificate" {
     }
 
     It 'should install certificate in custom store' {
-        $cert = Install-Certificate -Path $TestCertPath -StoreLocation CurrentUser -CustomStoreName 'SharePoint' 
+        $cert = Install-Certificate -Path $TestCertPath -StoreLocation CurrentUser -CustomStoreName 'SharePoint'  -NoWarn
         $cert | Should Not BeNullOrEmpty
         'cert:\CurrentUser\SharePoint' | Should Exist
         ('cert:\CurrentUser\SharePoint\{0}' -f $cert.Thumbprint) | Should Exist
     }
 
     It 'should install certificate idempotently' {
-        Install-Certificate -Certificate $TestCert -StoreLocation CurrentUser -StoreName My
+        Install-Certificate -Certificate $TestCert -StoreLocation CurrentUser -StoreName My -NoWarn
         $Global:Error | Should BeNullOrEmpty
-        Install-Certificate -Certificate $TestCert -StoreLocation CurrentUser -StoreName My
+        Install-Certificate -Certificate $TestCert -StoreLocation CurrentUser -StoreName My -NoWarn
         $Global:Error | Should BeNullOrEmpty
         Assert-CertificateInstalled CurrentUser My
     }
 
     It 'should install certificate' {
-        $cert = Install-Certificate -Certificate $TestCert -StoreLocation CurrentUser -StoreName My
+        $cert = Install-Certificate -Certificate $TestCert -StoreLocation CurrentUser -StoreName My -NoWarn
         $cert | Should Not BeNullOrEmpty
         Assert-CertificateInstalled CurrentUser My
     }
 
     It 'should install password protected certificate' {
-        $cert = Install-Certificate -Certificate $TestCertProtected -StoreLocation CurrentUser -StoreName My
+        $cert = Install-Certificate -Certificate $TestCertProtected -StoreLocation CurrentUser -StoreName My -NoWarn
         $cert | Should Not BeNullOrEmpty
         Assert-CertificateInstalled CurrentUser My $TestCertProtected
     }
@@ -119,7 +119,7 @@ Describe "Install-Certificate" {
         $session = New-PSSession -ComputerName $env:COMPUTERNAME
         try
         {
-            $cert = Install-Certificate -Certificate $TestCert -StoreLocation LocalMachine -StoreName My -Session $session
+            $cert = Install-Certificate -Certificate $TestCert -StoreLocation LocalMachine -StoreName My -Session $session -NoWarn
             $cert | Should Not BeNullOrEmpty
             Assert-CertificateInstalled LocalMachine My
         }
@@ -130,7 +130,7 @@ Describe "Install-Certificate" {
     }
         
     It 'should support ShouldProcess' {
-        $cert = Install-Certificate -Path $TestCertPath -StoreLocation CurrentUser -StoreName My -WhatIf
+        $cert = Install-Certificate -Path $TestCertPath -StoreLocation CurrentUser -StoreName My -WhatIf -NoWarn
         $cert.Thumbprint | Should Be $TestCert.Thumbprint
         Join-Path -Path 'cert:\CurrentUser\My' -ChildPath $TestCert.Thumbprint |
             Should Not Exist

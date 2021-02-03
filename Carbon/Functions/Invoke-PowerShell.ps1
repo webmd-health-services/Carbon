@@ -144,11 +144,20 @@ function Invoke-CPowerShell
         # Run `powershell.exe` as a specific user. Pass that user's credentials with this parameter.
         #
         # This parameter is new in Carbon 2.3.0.
-        $Credential
+        $Credential,
+
+        [switch]$NoWarn
     )
     
     Set-StrictMode -Version 'Latest'
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
+    if( -not $NoWarn )
+    {
+        $msg = 'Carbon''s "Invoke-CPowerShell" function is OBSOLETE and will be removed in the next major version of ' +
+               'Carbon. Use the "Invoke-CPowerShell" function in the new Carbon.Core module.'
+        Write-Warning -Message $msg
+    }
 
     $powerShellv3Installed = Test-Path -Path HKLM:\SOFTWARE\Microsoft\PowerShell\3
     $currentRuntime = 'v{0}.0' -f [Environment]::Version.Major
@@ -216,7 +225,7 @@ function Invoke-CPowerShell
     
     try
     {
-        $psPath = Get-CPowerShellPath @params
+        $psPath = Get-CPowerShellPath @params -NoWarn
         if( $ArgumentList -eq $null )
         {
             $ArgumentList = @()
@@ -293,7 +302,7 @@ function Invoke-CPowerShell
             $argName = '-Command'
             if( $Encode )
             {
-                $Command = ConvertTo-CBase64 -Value $Command
+                $Command = ConvertTo-CBase64 -Value $Command -NoWarn
                 $argName = '-EncodedCommand'
             }
             if( $Credential )

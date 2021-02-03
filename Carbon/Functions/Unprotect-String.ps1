@@ -124,12 +124,21 @@ filter Unprotect-CString
         [Object]$Key,
 
         # Returns the unprotected string as a secure string. The original decrypted bytes are zeroed out to limit the memory exposure of the decrypted secret, i.e. the decrypted secret will never be in a `string` object.
-        [switch]$AsSecureString
+        [switch]$AsSecureString,
+
+        [switch]$NoWarn
     )
 
     Set-StrictMode -Version 'Latest'
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
     
+    if( -not $NoWarn )
+    {
+        $msg = 'Carbon''s "Unprotect-CString" function is OBSOLETE and will be removed in the next major version of ' +
+               'Carbon. Use the "Unprotect-CString" function in the new "Carbon.Cryptography" module.'
+        Write-Warning -Message $msg
+    }
+
     Add-Type -AssemblyName 'System.Security'
     
     [byte[]]$encryptedBytes = [Convert]::FromBase64String($ProtectedString)
@@ -146,7 +155,7 @@ filter Unprotect-CString
             {
                 $passwordParam = @{ Password = $Password }
             }
-            $Certificate = Get-CCertificate -Path $PrivateKeyPath @passwordParam
+            $Certificate = Get-CCertificate -Path $PrivateKeyPath @passwordParam -NoWarn
             if( -not $Certificate )
             {
                 return
@@ -242,8 +251,15 @@ Failed to decrypt string using certificate "{0}" ({1}). This can happen when:
                     $cryptoStream = New-Object 'Security.Cryptography.CryptoStream' $encryptedStream,$decryptor,([Security.Cryptography.CryptoStreamMode]::Read)
                     try
                     {
-                        $decryptedBytes = New-Object 'byte[]' ($encryptedBytes.Length)
-                        [void]$cryptoStream.Read($decryptedBytes, 0, $decryptedBytes.Length)
+                        $streamReader = New-Object 'IO.StreamReader' $cryptoStream
+                        try
+                        {
+                            [byte[]]$decryptedBytes = [Text.Encoding]::UTF8.GetBytes($streamReader.ReadToEnd())
+                        }
+                        finally
+                        {
+                            $streamReader.Dispose()
+                        }
                     }
                     finally
                     {
@@ -254,7 +270,6 @@ Failed to decrypt string using certificate "{0}" ({1}). This can happen when:
                 {
                     $decryptor.Dispose()
                 }
-
             }
             finally
             {

@@ -4,28 +4,28 @@ function ConvertTo-CBase64
     <#
     .SYNOPSIS
     Converts a value to base-64 encoding.
-    
+
     .DESCRIPTION
     For some reason. .NET makes encoding a string a two-step process. This function makes it a one-step process.
-    
+
     You're actually allowed to pass in `$null` and an empty string.  If you do, you'll get `$null` and an empty string back.
 
     .LINK
     ConvertFrom-CBase64
-    
+
     .EXAMPLE
     ConvertTo-CBase64 -Value 'Encode me, please!'
-    
+
     Encodes `Encode me, please!` into a base-64 string.
-    
+
     .EXAMPLE
     ConvertTo-CBase64 -Value 'Encode me, please!' -Encoding ([Text.Encoding]::ASCII)
-    
+
     Shows how to specify a custom encoding in case your string isn't in Unicode text encoding.
-    
+
     .EXAMPLE
     'Encode me!' | ConvertTo-CBase64
-    
+
     Converts `Encode me!` into a base-64 string.
     #>
     [CmdletBinding()]
@@ -36,17 +36,25 @@ function ConvertTo-CBase64
         [string[]]
         # The value to base-64 encoding.
         $Value,
-        
+
         [Text.Encoding]
         # The encoding to use.  Default is Unicode.
-        $Encoding = ([Text.Encoding]::Unicode)
+        $Encoding = ([Text.Encoding]::Unicode),
+
+        [switch]$NoWarn
     )
-    
+
     begin
     {
         Set-StrictMode -Version 'Latest'
+        Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
-        Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState    
+        if( -not $NoWarn )
+        {
+            $msg = 'Carbon''s "ConvertTo-CBase64" function is OBSOLETE and will be removed in the next major version ' +
+                   'of Carbon. Use the "ConvertTo-CBase64" function in the new Carbon.Core module.'
+            Write-Warning -Message $msg
+        }
     }
 
     process
@@ -56,7 +64,7 @@ function ConvertTo-CBase64
             {
                 return $null
             }
-            
+
             $bytes = $Encoding.GetBytes($_)
             [Convert]::ToBase64String($bytes)
         }

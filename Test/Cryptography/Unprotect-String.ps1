@@ -26,5 +26,5 @@ Add-Type -AssemblyName 'System.Security'
 
 Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath '..\..\Carbon\Carbon.psd1' -Resolve)
 
-Unprotect-CString -ProtectedString $ProtectedString
+Unprotect-CString -ProtectedString $ProtectedString -NoWarn
 
