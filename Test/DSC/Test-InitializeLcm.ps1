@@ -80,12 +80,12 @@ function Stop-Test
 
 function Uninstall-TestLcmCertificate
 {
-    $script:publicKey = Get-Certificate -Path $publicKeyPath
+    $script:publicKey = Get-Certificate -Path $publicKeyPath -NoWarn
     Assert-NotNull $publicKey
     $script:certPath = Join-Path -Path 'cert:\LocalMachine\My' -ChildPath $publicKey.Thumbprint
     if( (Test-Path -Path $certPath -PathType Leaf) )
     {
-        Uninstall-Certificate -Thumbprint $publicKey.Thumbprint -StoreLocation LocalMachine -StoreName My
+        Uninstall-Certificate -Thumbprint $publicKey.Thumbprint -StoreLocation LocalMachine -StoreName My -NoWarn
     }
 }
 
@@ -179,10 +179,10 @@ function Test-ShouldUploadCertificateWithSecureStringAndPlaintextPasswords
     $securePrivateKeyPath = Join-Path -Path $PSScriptRoot -ChildPath '..\Cryptography\CarbonTestPrivateKey2.pfx'
     $securePrivateKeyPasswod = 'fubar'
     $securePrivateKeySecurePassword = ConvertTo-SecureString -String $securePrivateKeyPasswod -AsPlainText -Force
-    $securePrivateKey = Get-Certificate -Path $securePrivateKeyPath -Password $securePrivateKeyPasswod
+    $securePrivateKey = Get-Certificate -Path $securePrivateKeyPath -Password $securePrivateKeyPasswod -NoWarn
     Assert-NotNull $securePrivateKey
 
-    Uninstall-Certificate -Thumbprint $securePrivateKey.Thumbprint -StoreLocation LocalMachine -StoreName My
+    Uninstall-Certificate -Thumbprint $securePrivateKey.Thumbprint -StoreLocation LocalMachine -StoreName My -NoWarn
 
     $lcm = Initialize-Lcm -Push -ComputerName 'localhost' -CertFile $securePrivateKeyPath -CertPassword $securePrivateKeyPasswod
     Assert-NoError $lcm
@@ -190,7 +190,7 @@ function Test-ShouldUploadCertificateWithSecureStringAndPlaintextPasswords
     Assert-True (Test-Path -Path $secureCertPath -PathType Leaf)
     Assert-Equal $securePrivateKey.Thumbprint $lcm.CertificateID
 
-    Uninstall-Certificate -Thumbprint $securePrivateKey.Thumbprint -StoreLocation LocalMachine -StoreName My
+    Uninstall-Certificate -Thumbprint $securePrivateKey.Thumbprint -StoreLocation LocalMachine -StoreName My -NoWarn
 
     $lcm = Initialize-Lcm -Push -ComputerName 'localhost' -CertFile $securePrivateKeyPath -CertPassword $securePrivateKeySecurePassword
     Assert-NoError $lcm

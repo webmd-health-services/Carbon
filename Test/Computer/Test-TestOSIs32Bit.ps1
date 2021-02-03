@@ -18,6 +18,6 @@ function Start-TestFixture
 function Test-ShouldDetectIfOSIs32Bit
 {
     $is32Bit = -not (Test-Path env:"ProgramFiles(x86)")
-    Assert-Equal $is32Bit (Test-OSIs32Bit)
+    Assert-Equal $is32Bit (Test-OSIs32Bit -NoWarn)
 }
 

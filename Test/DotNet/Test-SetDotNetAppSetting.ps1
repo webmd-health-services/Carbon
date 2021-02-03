@@ -45,14 +45,14 @@ if( `$appSettings['$appSettingName'] )
     
     if( (Test-DotNet -V2) )
     {
-        Invoke-PowerShell -Command $command -x86 -Runtime 'v2.0'
-        Invoke-PowerShell -Command $command -Runtime 'v2.0'
+        Invoke-PowerShell -Command $command -x86 -Runtime 'v2.0' -NoWarn
+        Invoke-PowerShell -Command $command -Runtime 'v2.0' -NoWarn
     }
 
     if( (Test-DotNet -V4 -Full) )
     {
-        Invoke-PowerShell -Command $command -x86 -Runtime 'v4.0'
-        Invoke-PowerShell -Command $command -Runtime 'v4.0'
+        Invoke-PowerShell -Command $command -x86 -Runtime 'v4.0' -NoWarn
+        Invoke-PowerShell -Command $command -Runtime 'v4.0' -NoWarn
     }
 }
 
@@ -185,13 +185,13 @@ function Assert-AppSetting($Name, $value, [Switch]$Framework, [Switch]$Framework
         
         if( $Framework64 )
         {
-            $actualValue = Invoke-PowerShell @params
+            $actualValue = Invoke-PowerShell @params -NoWarn
             Assert-Equal $Value $actualValue ".NET $_ x64"
         }
         
         if( $Framework )
         {
-            $actualValue = Invoke-PowerShell @params -x86
+            $actualValue = Invoke-PowerShell @params -x86 -NoWarn
             Assert-Equal $Value $actualValue ".NET $_ x86"
         }
     }

@@ -61,13 +61,13 @@ Describe 'Remove-DotNetAppSetting' {
             
             if( $Framework64 )
             {
-                $actualValue = Invoke-PowerShell @params
+                $actualValue = Invoke-PowerShell @params -NoWarn
                 $actualValue | Should Be $Value
             }
             
             if( $Framework )
             {
-                $actualValue = Invoke-PowerShell @params -x86
+                $actualValue = Invoke-PowerShell @params -x86 -NoWarn
                 $actualValue | Should Be $Value
             }
         }
@@ -92,14 +92,14 @@ Describe 'Remove-DotNetAppSetting' {
         
         if( (Test-DotNet -V2) )
         {
-            Invoke-PowerShell -Command $command -Encode -x86 -Runtime 'v2.0'
-            Invoke-PowerShell -Command $command -Encode -Runtime 'v2.0'
+            Invoke-PowerShell -Command $command -Encode -x86 -Runtime 'v2.0' -NoWarn
+            Invoke-PowerShell -Command $command -Encode -Runtime 'v2.0' -NoWarn
         }
     
         if( (Test-DotNet -V4 -Full) )
         {
-            Invoke-PowerShell -Command $command -Encode -x86 -Runtime 'v4.0'
-            Invoke-PowerShell -Command $command -Encode -Runtime 'v4.0'
+            Invoke-PowerShell -Command $command -Encode -x86 -Runtime 'v4.0' -NoWarn
+            Invoke-PowerShell -Command $command -Encode -Runtime 'v4.0' -NoWarn
         }
     }
     

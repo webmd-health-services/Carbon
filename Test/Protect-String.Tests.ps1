@@ -60,7 +60,8 @@ Describe 'Protect-String' {
     
             $decrypedString = Invoke-PowerShell -FilePath (Join-Path -Path $PSScriptRoot -ChildPath 'Cryptography\Unprotect-String.ps1') `
                                                 -ArgumentList '-ProtectedString',$protectedString `
-                                                -Credential $CarbonTestUser
+                                                -Credential $CarbonTestUser `
+                                                -NoWarn
             $decrypedString | Should Be $string
         }
 
@@ -103,18 +104,18 @@ Describe 'Protect-String' {
     }
     
     It 'should encrypt with certificate' {
-        $cert = Get-Certificate -Path $publicKeyFilePath
+        $cert = Get-Certificate -Path $publicKeyFilePath -NoWarn
         $cert | Should Not BeNullOrEmpty
         $secret = [Guid]::NewGuid().ToString()
         $ciphertext = Protect-String -String $secret -Certificate $cert
         $ciphertext | Should Not BeNullOrEmpty
         $ciphertext | Should Not Be $secret
-        $privateKey = Get-Certificate -Path $privateKeyFilePath
+        $privateKey = Get-Certificate -Path $privateKeyFilePath -NoWarn
         (Unprotect-String -ProtectedString $ciphertext -Certificate $privateKey) | Should Be $secret
     }
     
     It 'should handle not getting an rsa certificate' {
-        $cert = Get-Certificate -Path $dsaKeyPath
+        $cert = Get-Certificate -Path $dsaKeyPath -NoWarn
         $cert | Should Not BeNullOrEmpty
         $secret = [Guid]::NewGuid().ToString()
         $ciphertext = Protect-String -String $secret -Certificate $cert -ErrorAction SilentlyContinue
@@ -124,7 +125,7 @@ Describe 'Protect-String' {
     }
     
     It 'should reject strings that are too long for rsa key' {
-        $cert = Get-Certificate -Path $privateKeyFilePath
+        $cert = Get-Certificate -Path $privateKeyFilePath -NoWarn
         $secret = 'f' * 470
         $ciphertext = Protect-String -String $secret -Certificate $cert
         $Global:Error.Count | Should Be 0
@@ -176,18 +177,18 @@ Describe 'Protect-String' {
     }
     
     It 'should encrypt from certificate file' {
-        $cert = Get-Certificate -Path $publicKeyFilePath
+        $cert = Get-Certificate -Path $publicKeyFilePath -NoWarn
         $cert | Should Not BeNullOrEmpty
         $secret = [Guid]::NewGuid().ToString()
         $ciphertext = Protect-String -String $secret -PublicKeyPath $publicKeyFilePath
         $ciphertext | Should Not BeNullOrEmpty
         $ciphertext | Should Not Be $secret
-        $privateKey = Get-Certificate -Path $privateKeyFilePath 
+        $privateKey = Get-Certificate -Path $privateKeyFilePath  -NoWarn
         (Unprotect-String -ProtectedString $ciphertext -Certificate $privateKey) | Should Be $secret
     }
     
     It 'should encrypt a secure string' {
-        $cert = Get-Certificate -Path $publicKeyFilePath
+        $cert = Get-Certificate -Path $publicKeyFilePath -NoWarn
         $cert | Should Not BeNullOrEmpty
         $password = 'waffles'
         $secret = New-Object -TypeName System.Security.SecureString
@@ -196,7 +197,7 @@ Describe 'Protect-String' {
         $ciphertext = Protect-String -String $secret -PublicKeyPath $publicKeyFilePath
         $ciphertext | Should Not BeNullOrEmpty
         $ciphertext | Should Not Be $secret
-        $privateKey = Get-Certificate -Path $privateKeyFilePath 
+        $privateKey = Get-Certificate -Path $privateKeyFilePath  -NoWarn
         $decryptedPassword = Unprotect-String -ProtectedString $ciphertext -Certificate $privateKey
         $decryptedPassword | Should Be $password
         $passwordBytes = [Text.Encoding]::UTF8.GetBytes($password)
@@ -209,25 +210,25 @@ Describe 'Protect-String' {
     }
 
     It 'should convert passed objects to string' {
-        $cert = Get-Certificate -Path $publicKeyFilePath
+        $cert = Get-Certificate -Path $publicKeyFilePath -NoWarn
         $cert | Should Not BeNullOrEmpty
         $input = New-Object -TypeName Carbon.Security.SecureStringConverter
         $cipherText = Protect-String -String $input -PublicKeyPath $publicKeyFilePath
         $cipherText | Should Not BeNullOrEmpty
         $cipherText | Should Not Be $input
-        $privateKey = Get-Certificate -Path $privateKeyFilePath
+        $privateKey = Get-Certificate -Path $privateKeyFilePath -NoWarn
         Assert-IsBase64EncodedString( $cipherText )
         (Unprotect-String -ProtectedString $cipherText -Certificate $privateKey) | Should Be $input.ToString()
     }
 
     It 'should encrypt from certificate file with relative path' {
-        $cert = Get-Certificate -Path $publicKeyFilePath
+        $cert = Get-Certificate -Path $publicKeyFilePath -NoWarn
         $cert | Should Not BeNullOrEmpty
         $secret = [Guid]::NewGuid().ToString()
         $ciphertext = Protect-String -String $secret -PublicKeyPath (Resolve-Path -Path $publicKeyFilePath -Relative)
         $ciphertext | Should Not BeNullOrEmpty
         $ciphertext | Should Not Be $secret
-        $privateKey = Get-Certificate -Path $privateKeyFilePath
+        $privateKey = Get-Certificate -Path $privateKeyFilePath -NoWarn
         (Unprotect-String -ProtectedString $ciphertext -Certificate $privateKey) | Should Be $secret
     }
     

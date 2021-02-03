@@ -38,8 +38,7 @@ function Remove-CIniEntry
     Demonstrates how to remove an INI entry in an INI file that is case-sensitive.
     #>
     [CmdletBinding(SupportsShouldProcess=$true)]
-    param
-    (
+    param(
         [Parameter(Mandatory=$true)]
         [string]
         # The path to the INI file.

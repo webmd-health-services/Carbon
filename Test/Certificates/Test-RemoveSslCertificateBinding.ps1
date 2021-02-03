@@ -26,7 +26,7 @@ function Start-TestFixture
 
 function Start-Test
 {
-    $cert = Install-Certificate (Join-Path $TestDir CarbonTestCertificate.cer -Resolve) -StoreLocation LocalMachine -StoreName My
+    $cert = Install-Certificate (Join-Path $TestDir CarbonTestCertificate.cer -Resolve) -StoreLocation LocalMachine -StoreName My -NoWarn
     netsh http add sslcert ipport=$ipPort "certhash=$($cert.Thumbprint)" "appid={$appID}"
     netsh http add sslcert ipport=$ipV6Port "certhash=$($cert.Thumbprint)" "appid={$ipV6AppID}"
 }
@@ -36,7 +36,7 @@ function Stop-Test
     netsh http delete sslcert ipport=$ipPort
     netsh http delete sslcerrt ipport=$ipV6Port
 
-    Uninstall-Certificate -Certificate $cert -StoreLocation LocalMachine -StoreName My
+    Uninstall-Certificate -Certificate $cert -StoreLocation LocalMachine -StoreName My -NoWarn
 }
 
 function Test-ShouldRemoveNonExistentBinding

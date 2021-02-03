@@ -248,7 +248,7 @@ ValidityPeriodUnits = {3}
             $output | Write-Debug
         }
 
-        $publicKey = Get-CCertificate -Path $PublicKeyFile
+        $publicKey = Get-CCertificate -Path $PublicKeyFile -NoWarn
         if( -not $publicKey )
         {
             Write-Error ('Failed to load public key ''{0}'':{1}{2}' -f $PublicKeyFile,([Environment]::NewLine),($output -join ([Environment]::NewLine)))

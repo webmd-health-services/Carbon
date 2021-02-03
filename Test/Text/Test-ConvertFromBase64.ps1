@@ -27,7 +27,7 @@ function Test-ShouldConvertToBase64
 
 function Test-ShouldAcceptPipelineInput
 {
-    $result = ('VgBhAGwAdQBlADEA','VgBhAGwAdQBlADIA') | ConvertFrom-Base64
+    [String[]]$result = ('VgBhAGwAdQBlADEA','VgBhAGwAdQBlADIA') | ConvertFrom-Base64
     Assert-Equal 2 $result.Length
     Assert-Equal (ConvertFrom-Base64 -Value 'VgBhAGwAdQBlADEA') $result[0]
     Assert-Equal (ConvertFrom-Base64 -Value 'VgBhAGwAdQBlADIA') $result[1]
@@ -45,7 +45,7 @@ function Test-ShouldAllowDifferentEncoding
 {
     $value = 'Value1'
     $result = $value | 
-                    ConvertTo-Base64 -Encoding ([Text.Encoding]::ASCII) | 
+                    ConvertTo-Base64 -Encoding ([Text.Encoding]::ASCII) -NoWarn |
                     ConvertFrom-Base64 -Encoding ([Text.Encoding]::ASCII)
     Assert-Equal $value $result
 }

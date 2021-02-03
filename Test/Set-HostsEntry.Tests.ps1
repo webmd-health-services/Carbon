@@ -84,12 +84,12 @@ Describe 'Set-HostsEntry.when updating an existing IPv6 address' {
 }
 
 Describe 'Set-HostsEntry.when no path parameter provided' {
-    Mock -CommandName 'Write-File' -Verifiable -ModuleName 'Carbon'
+    Mock -CommandName 'Write-CFile' -Verifiable -ModuleName 'Carbon'
 
     Set-HostsEntry -IPAddress '5.6.7.8' -HostName 'example.com' -Description 'Customizing example.com'
 
     It 'should operate on system hosts file by default' {
-        Assert-MockCalled -CommandName 'Write-File' -ModuleName 'Carbon'  -ParameterFilter {
+        Assert-MockCalled -CommandName 'Write-CFile' -ModuleName 'Carbon'  -ParameterFilter {
             #$DebugPreference = 'Continue'
             Write-Debug $Path 
             Write-Debug (Get-PathToHostsFile)

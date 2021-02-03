@@ -46,14 +46,14 @@ function Remove-ConnectionStrings
     
     if( (Test-DotNet -V2) )
     {
-        Invoke-PowerShell -Command $command -Encode -x86 -Runtime v2.0
-        Invoke-PowerShell -Command $command -Encode -Runtime v2.0
+        Invoke-PowerShell -Command $command -Encode -x86 -Runtime v2.0 -NoWarn
+        Invoke-PowerShell -Command $command -Encode -Runtime v2.0 -NoWarn
     }
 
     if( (Test-DotNet -V4 -Full) )
     {
-        Invoke-PowerShell -Command $command -Encode -x86 -Runtime v4.0
-        Invoke-PowerShell -Command $command -Encode -Runtime v4.0
+        Invoke-PowerShell -Command $command -Encode -x86 -Runtime v4.0 -NoWarn
+        Invoke-PowerShell -Command $command -Encode -Runtime v4.0 -NoWarn
     }
 }
 
@@ -243,12 +243,12 @@ function Assert-ConnectionString
 
             if( $Framework )
             {
-                Invoke-PowerShell @params -x86
+                Invoke-PowerShell @params -x86 -NoWarn
             }
 
             if( $Framework64 )
             {
-                Invoke-PowerShell @params
+                Invoke-PowerShell @params -NoWarn
             }
         } | 
         ForEach-Object {

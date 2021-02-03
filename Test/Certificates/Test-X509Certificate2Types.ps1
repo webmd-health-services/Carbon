@@ -17,7 +17,7 @@ function Start-TestFixture
 
 function Test-ShouldCreateIssuedPropertiesOnX509Certificate2
 {
-    $cert = Get-Certificate -Path (Join-Path $TEstDir CarbonTestCertificate.cer -Resolve)
+    $cert = Get-Certificate -Path (Join-Path $TEstDir CarbonTestCertificate.cer -Resolve) -NoWarn
     Assert-NotNull $cert.IssuedTo ('IssuedTo on {0}' -f $cert.Subject)
     Assert-NotNull $cert.IssuedBy ('IssuedBy on {0}' -f $cert.Subject)
     

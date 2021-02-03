@@ -110,9 +110,9 @@ function Set-CDotNetConnectionString
         $params = @{
             FilePath = (Join-Path $CarbonBinDir 'Set-DotNetConnectionString.ps1' -Resolve);
             ArgumentList = @(
-                                (ConvertTo-CBase64 -Value $Name),
-                                (ConvertTo-CBase64 -Value $Value),
-                                (ConvertTo-CBase64 -Value $ProviderName) 
+                                (ConvertTo-CBase64 -Value $Name -NoWarn),
+                                (ConvertTo-CBase64 -Value $Value -NoWarn),
+                                (ConvertTo-CBase64 -Value $ProviderName -NoWarn)
                             );
             Runtime = $_;
             ExecutionPolicy = [Microsoft.PowerShell.ExecutionPolicy]::RemoteSigned;
@@ -120,12 +120,12 @@ function Set-CDotNetConnectionString
 
         if( $Framework )
         {    
-            Invoke-CPowerShell @params -x86
+            Invoke-CPowerShell @params -x86 -NoWarn
         }
         
         if( $Framework64 )
         {
-            Invoke-CPowerShell @params
+            Invoke-CPowerShell @params -NoWarn
         }
     }
 }

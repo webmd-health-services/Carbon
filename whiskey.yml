@@ -133,6 +133,7 @@ Tests:
 - TaskDefaults:
     Pester4:
         DescribeDurationReportCount: 20
+        WarningAction: SilentlyContinue
 - PowerShell:
     OnlyDuring: Build
     Path: Start-CarbonTest.ps1
@@ -182,6 +183,7 @@ Tests:
             - "*\\Test\\Invoke-PowerShell.Tests.ps1"
     - Tasks:
         - PowerShell:
+            WarningAction: SilentlyContinue
             OnlyDuring: Build
             Path: Invoke-CarbonBladeTest.ps1
             Argument:

@@ -38,7 +38,7 @@ function Test-ShouldCreateNewUser
     $warnings = @()
     $fullName = 'Carbon Install User'
     $description = "Test user for testing the Carbon Install-User function."
-    $user = Install-User -UserName $username -Password $password -Description $description -FullName $fullName -PassThru -WarningVariable 'warnings'
+    $user = Install-CUser -UserName $username -Password $password -Description $description -FullName $fullName -PassThru -WarningVariable 'warnings'
     Assert-NotNull $user
     try
     {

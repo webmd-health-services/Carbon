@@ -96,7 +96,7 @@ function Remove-CDotNetAppSetting
         $params = @{
             FilePath = (Join-Path $CarbonBinDir 'Remove-DotNetAppSetting.ps1' -Resolve);
             ArgumentList = @( 
-                                (ConvertTo-CBase64 -Value $Name)
+                                (ConvertTo-CBase64 -Value $Name -NoWarn)
                             );
             Runtime = $_;
             ExecutionPolicy = [Microsoft.PowerShell.ExecutionPolicy]::RemoteSigned;
@@ -104,12 +104,12 @@ function Remove-CDotNetAppSetting
         
         if( $Framework )
         {    
-            Invoke-CPowerShell @params -x86
+            Invoke-CPowerShell @params -x86 -NoWarn
         }
         
         if( $Framework64 )
         {
-            Invoke-CPowerShell @params
+            Invoke-CPowerShell @params -NoWarn
         }
     }
 }

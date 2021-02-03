@@ -33,19 +33,26 @@ function Get-CPowershellPath
     #>
     [CmdletBinding()]
     param(
-        [Switch]
         # Gets the path to 32-bit PowerShell.
-        $x86
+        [switch]$x86,
+
+        [switch]$NoWarn
     )
     
     Set-StrictMode -Version 'Latest'
-
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
-    $psPath = $PSHOME
-    if( Test-COSIs64Bit )
+    if( -not $NoWarn )
     {
-        if( Test-CPowerShellIs64Bit )
+        $msg = 'Carbon''s "Get-CPowershellPath" function is OBSOLETE and will be removed in the next major version ' +
+               'of Carbon. Use the "Get-CPowerShellPath" function in the new Carbon.Core module.'
+        Write-Warning -Message $msg
+    }
+
+    $psPath = $PSHOME
+    if( (Test-COSIs64Bit -NoWarn) )
+    {
+        if( (Test-CPowerShellIs64Bit -NoWarn) )
         {
             if( $x86 )
             {
