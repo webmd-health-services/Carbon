@@ -47,11 +47,14 @@ Describe 'Install-CUser' {
         Uninstall-CUser -Username $username
     }
     
-    It 'should create new user' {
-        $warnings = @()
+    It 'should create new user using obsolete function name and parameters' {
         $fullName = 'Carbon Install User'
         $description = "Test user for testing the Carbon Install-CUser function."
-        $user = Install-CUser -UserName $username -Password $password -Description $description -FullName $fullName -PassThru -WarningVariable 'warnings'
+        $user = Install-User -UserName $username `
+                              -Password $password `
+                              -Description $description `
+                              -FullName $fullName `
+                              -PassThru
         $user | Should -Not -BeNullOrEmpty
         try
         {
@@ -74,8 +77,6 @@ Describe 'Install-CUser' {
             $user.UserCannotChangePassword | Should -BeFalse
             $user.DisplayName | Should -Be $fullName
             Assert-Credential -Password $password
-            $warnings.Count | Should -Be 1
-            $warnings[0] | Should -BeLike '*obsolete*'
         }
         finally
         {

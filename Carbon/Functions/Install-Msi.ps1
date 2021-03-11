@@ -46,7 +46,7 @@ function Install-CMsi
 
     if( $PSBoundParameters.ContainsKey( 'Quiet' ) )
     {
-        Write-Warning ('Install-CMsi''s `Quiet` switch is obsolete and will be removed in a future major version of Carbon. Installers are run in quiet mode by default. Please remove usages of the `Quiet` switch.')
+        Write-CWarningOnce ('Install-CMsi''s `Quiet` switch is obsolete and will be removed in a future major version of Carbon. Installers are run in quiet mode by default. Please remove usages of the `Quiet` switch.')
     }
 
     Get-CMsi -Path $Path |

@@ -46,7 +46,7 @@ function Get-CPowershellPath
     {
         $msg = 'Carbon''s "Get-CPowershellPath" function is OBSOLETE and will be removed in the next major version ' +
                'of Carbon. Use the "Get-CPowerShellPath" function in the new Carbon.Core module.'
-        Write-Warning -Message $msg
+        Write-CWarningOnce -Message $msg
     }
 
     $psPath = $PSHOME

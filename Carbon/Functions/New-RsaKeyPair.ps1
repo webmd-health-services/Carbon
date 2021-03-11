@@ -127,12 +127,12 @@ function New-CRsaKeyPair
 
     if( $PSBoundParameters.ContainsKey('ValidFrom') )
     {
-        Write-Warning -Message ('New-CRsaKeyPair: The -ValidFrom parameter is obsolete and will be removed in a future version of Carbon. Please remove usages of this parameter.')
+        Write-CWarningOnce -Message ('New-CRsaKeyPair: The -ValidFrom parameter is obsolete and will be removed in a future version of Carbon. Please remove usages of this parameter.')
     }
 
     if( $PSBoundParameters.ContainsKey('Authority') )
     {
-        Write-Warning -Message ('New-CRsaKeyPair: The -Authority parameter is obsolete and will be removed in a future version of Carbon. Please remove usages of this parameter.')
+        Write-CWarningOnce -Message ('New-CRsaKeyPair: The -Authority parameter is obsolete and will be removed in a future version of Carbon. Please remove usages of this parameter.')
     }
 
     function Resolve-KeyPath

@@ -34,6 +34,7 @@ Write-Timing ('BEGIN')
 $carbonRoot = $PSScriptRoot
 $CarbonBinDir = Join-Path -Path $PSScriptRoot -ChildPath 'bin' -Resolve
 $carbonAssemblyDir = Join-Path -Path $CarbonBinDir -ChildPath 'fullclr' -Resolve
+$warnings = @{}
 
 # Used to detect how to manager windows features. Determined at run time to improve import speed.
 $windowsFeaturesNotSupported = $null
@@ -99,6 +100,26 @@ Get-ChildItem -Path (Join-Path -Path $functionRoot -ChildPath '*') -Filter '*.ps
     ForEach-Object { 
         . $_.FullName 
     }
+
+function Write-CWarningOnce
+{
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory,Position=0)]
+        [String]$Message
+    )
+
+    Set-StrictMode -Version 'Latest'
+    Use-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState
+    
+    if( $script:warnings[$Message] )
+    {
+        return
+    }
+
+    Write-Warning -Message $Message
+    $script:warnings[$Message] = $true
+}
 
 $developerImports = & {
     Join-Path -Path $PSScriptRoot -ChildPath 'Carbon.psm1.Import.Iis.ps1' 

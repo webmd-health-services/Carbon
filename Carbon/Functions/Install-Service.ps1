@@ -213,7 +213,7 @@ function Install-CService
         }
         elseif( $Password )
         {
-            Write-Warning ('`Install-CService` function''s `Password` parameter is obsolete and will be removed in a future major version of Carbon. Please use the `Credential` parameter instead.')
+            Write-CWarningOnce ('`Install-CService` function''s `Password` parameter is obsolete and will be removed in a future major version of Carbon. Please use the `Credential` parameter instead.')
             $Credential = New-CCredential -UserName $UserName -Password $Password
         }
         else

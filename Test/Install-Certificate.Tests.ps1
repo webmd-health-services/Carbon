@@ -69,7 +69,7 @@ Describe "Install-Certificate" {
                         break
                     }
 
-                    Write-Verbose "Couldn't find $($StoreLocation)\$($SToreName)\$($ExpectedCertificate.Thumbprint). Trying again in 100ms." -Verbose
+                    Write-Verbose "Couldn't find $($StoreLocation)\$($StoreName)\$($ExpectedCertificate.Thumbprint). Trying again in 100ms." -Verbose
                     Start-Sleep -Milliseconds 100
                 }
                 while( $duration.Elapsed -lt $timeout )
