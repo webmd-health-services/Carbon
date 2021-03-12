@@ -386,6 +386,7 @@ Depending on your environment, this could put many, many extra very small files 
 the `-Force` switch to always install a certificate even if it already exists in the destination store.
 * Added a `-Force` switch to the `Install-CCertificate` function to force certificates to be installed if they already
 exist in the destination store.
+* Fixed: `Install-Service` always writes a verbose message when installing a service.
 
 
 # Naming Collisions Solved (Again)
