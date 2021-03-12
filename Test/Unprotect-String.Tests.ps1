@@ -212,18 +212,3 @@ Describe 'Unprotect-String.AES' {
         }
     }
 }
-
-Describe 'Unprotect-CString.when user does not have access to private key' {
-    It 'should fail' {
-        Mock -CommandName 'Get-CCertificate' -ModuleName 'Carbon.Cryptography' -MockWith {
-            [pscustomobject]@{
-                'Subject' = 'Mock Subject';
-                'Thumbprint' = 'Mock Thumbprint';
-                'HasPrivateKey' = $true;
-                'PrivateKey' = $null;
-            }
-        }
-        { Unprotect-CString -ProtectedString 'doesn''t matter' -Key 'doesn''t matter' -ErrorAction Stop } |
-            Should -Throw 'has a private key, but it is null'
-    }
-}
