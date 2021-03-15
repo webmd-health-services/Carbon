@@ -100,12 +100,12 @@ function Install-CCertificate
     {
         $msg = 'Carbon''s "Install-CCertificate" function is OBSOLETE and will be removed in the next major version ' +
                'of Carbon. Use the "Install-CCertificate" function in the new "Carbon.Cryptography" module.'
-        Write-Warning -Message $msg
+        Write-CWarningOnce -Message $msg
     }
 
     if( $Password -and $Password -isnot [securestring] )
     {
-        Write-Warning -Message ('You passed a plain text password to `Install-CCertificate`. A future version of Carbon will remove support for plain-text passwords. Please pass a `SecureString` instead.')
+        Write-CWarningOnce -Message ('You passed a plain text password to `Install-CCertificate`. A future version of Carbon will remove support for plain-text passwords. Please pass a `SecureString` instead.')
         $Password = ConvertTo-SecureString -String $Password -AsPlainText -Force
     }
     

@@ -154,54 +154,45 @@ function Grant-CPermission
 
     Demonstrates how to grant multiple access rules to a single identity with the `Append` switch. In this case, `ENTERPRISE\Wesley` will be able to read everything in `C:\Bridge` and write only in the `C:\Bridge` directory, not to any sub-directory.
     #>
-    [CmdletBinding(SupportsShouldProcess=$true)]
+    [CmdletBinding(SupportsShouldProcess)]
     [OutputType([Security.AccessControl.AccessRule])]
     param(
-        [Parameter(Mandatory=$true)]
-        [string]
+        [Parameter(Mandatory)]
         # The path on which the permissions should be granted.  Can be a file system, registry, or certificate path.
-        $Path,
+        [String]$Path,
         
-        [Parameter(Mandatory=$true)]
-        [string]
+        [Parameter(Mandatory)]
         # The user or group getting the permissions.
-        $Identity,
+        [String]$Identity,
         
-        [Parameter(Mandatory=$true)]
-        [string[]]
-        # The permission: e.g. FullControl, Read, etc.  For file system items, use values from [System.Security.AccessControl.FileSystemRights](http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.filesystemrights.aspx).  For registry items, use values from [System.Security.AccessControl.RegistryRights](http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.registryrights.aspx).
+        [Parameter(Mandatory)]
 		[Alias('Permissions')]
-        $Permission,
+        # The permission: e.g. FullControl, Read, etc.  For file system items, use values from [System.Security.AccessControl.FileSystemRights](http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.filesystemrights.aspx).  For registry items, use values from [System.Security.AccessControl.RegistryRights](http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.registryrights.aspx).
+        [String[]]$Permission,
         
-        [Carbon.Security.ContainerInheritanceFlags]
         # How to apply container permissions.  This controls the inheritance and propagation flags.  Default is full inheritance, e.g. `ContainersAndSubContainersAndLeaves`. This parameter is ignored if `Path` is to a leaf item.
-        $ApplyTo = ([Carbon.Security.ContainerInheritanceFlags]::ContainerAndSubContainersAndLeaves),
+        [Carbon.Security.ContainerInheritanceFlags]$ApplyTo = ([Carbon.Security.ContainerInheritanceFlags]::ContainerAndSubContainersAndLeaves),
 
-        [Security.AccessControl.AccessControlType]
         # The type of rule to apply, either `Allow` or `Deny`. The default is `Allow`, which will allow access to the item. The other option is `Deny`, which will deny access to the item.
         #
         # This parameter was added in Carbon 2.3.0.
-        $Type = [Security.AccessControl.AccessControlType]::Allow,
+        [Security.AccessControl.AccessControlType]$Type = [Security.AccessControl.AccessControlType]::Allow,
         
-        [Switch]
         # Removes all non-inherited permissions on the item.
-        $Clear,
+        [switch]$Clear,
 
-        [Switch]
         # Returns an object representing the permission created or set on the `Path`. The returned object will have a `Path` propery added to it so it can be piped to any cmdlet that uses a path. 
         #
         # The `PassThru` switch is new in Carbon 2.0.
-        $PassThru,
+        [switch]$PassThru,
 
-        [Switch]
         # Grants permissions, even if they are already present.
-        $Force,
+        [switch]$Force,
 
-        [Switch]
         # When granting permissions on files, directories, or registry items, add the permissions as a new access rule instead of replacing any existing access rules. This switch is ignored when setting permissions on certificates.
         #
         # This switch was added in Carbon 2.7.
-        $Append
+        [switch]$Append
     )
 
     Set-StrictMode -Version 'Latest'

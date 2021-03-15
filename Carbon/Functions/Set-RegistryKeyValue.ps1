@@ -155,7 +155,7 @@ function Set-CRegistryKeyValue
 
     if( $PSBoundParameters.ContainsKey('Quiet') )
     {
-        Write-Warning ('Set-CRegistryKeyValue''s -Quiet switch is obsolete and will be removed in a future version of Carbon. Please remove usages.')
+        Write-CWarningOnce ('Set-CRegistryKeyValue''s -Quiet switch is obsolete and will be removed in a future version of Carbon. Please remove usages.')
     }
 
     $value = $null

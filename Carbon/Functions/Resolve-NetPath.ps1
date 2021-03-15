@@ -21,7 +21,7 @@ function Resolve-CNetPath
 
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
-    Write-Warning ('Resolve-CNetPath is obsolete and will be removed in a future major version of Carbon. Do not use.')
+    Write-CWarningOnce ('Resolve-CNetPath is obsolete and will be removed in a future major version of Carbon. Do not use.')
     
     $netCmd = Get-Command -CommandType Application -Name net.exe* |
                 Where-Object { $_.Name -eq 'net.exe' }

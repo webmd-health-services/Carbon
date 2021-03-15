@@ -192,7 +192,7 @@ function Initialize-CLcm
 
     if( $CertPassword -and $CertPassword -isnot [securestring] )
     {
-        Write-Warning -Message ('You passed a plain text password to `Initialize-CLcm`. A future version of Carbon will remove support for plain-text passwords. Please pass a `SecureString` instead.')
+        Write-CWarningOnce -Message ('You passed a plain text password to `Initialize-CLcm`. A future version of Carbon will remove support for plain-text passwords. Please pass a `SecureString` instead.')
         $CertPassword = ConvertTo-SecureString -String $CertPassword -AsPlainText -Force
     }
     

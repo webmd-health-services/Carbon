@@ -164,7 +164,7 @@ function Write-File
         $msg = "The Carbon module's ""Write-File"" function was renamed to ""Write-CFile"". Please update " +
                 "your code to use the new ""Write-CFile"" name. The old ""Write-File"" function will be " +
                 'removed in the next major version of Carbon.'
-        Write-Warning -Message $msg
+        Write-CWarningOnce -Message $msg
 
         $stuffToPipe = New-Object 'Collections.ArrayList'
     }

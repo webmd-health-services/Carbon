@@ -136,7 +136,7 @@ filter Unprotect-CString
     {
         $msg = 'Carbon''s "Unprotect-CString" function is OBSOLETE and will be removed in the next major version of ' +
                'Carbon. Use the "Unprotect-CString" function in the new "Carbon.Cryptography" module.'
-        Write-Warning -Message $msg
+        Write-CWarningOnce -Message $msg
     }
 
     Add-Type -AssemblyName 'System.Security'
