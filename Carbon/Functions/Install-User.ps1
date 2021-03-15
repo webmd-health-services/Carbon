@@ -124,7 +124,7 @@ function Install-CUser
         Write-Timing '              Setting password'
         if( $PSCmdlet.ParameterSetName -eq 'WithUserNameAndPassword' )
         {
-            Write-Warning ('Install-CUser function''s `UserName` and `Password` parameters are obsolete and will be removed in a future version of Carbon. Please use the `Credential` parameter instead.')
+            Write-CWarningOnce ('Install-CUser function''s `UserName` and `Password` parameters are obsolete and will be removed in a future version of Carbon. Please use the `Credential` parameter instead.')
             $user.SetPassword( $Password )
         }
         else

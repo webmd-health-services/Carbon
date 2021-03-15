@@ -148,11 +148,20 @@ filter Protect-CString
 
         [Parameter(Mandatory, ParameterSetName='Symmetric')]
         # The key to use to encrypt the secret. Can be a `SecureString`, a `String`, or an array of bytes. Must be 16, 24, or 32 characters/bytes in length.
-        [Object]$Key
+        [Object]$Key,
+
+        [switch]$NoWarn
     )
     
     Set-StrictMode -Version 'Latest'
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
+    if( -not $NoWarn )
+    {
+        $msg = 'Carbon''s "Protect-CString" function is OBSOLETE and will be removed in the next major version of ' +
+               'Carbon. Use the "Protect-CString" function in the new "Carbon.Cryptography" module.'
+        Write-CWarningOnce -Message $msg
+    }
 
     Add-Type -AssemblyName 'System.Security'
 
@@ -173,9 +182,14 @@ filter Protect-CString
             if( $PSCmdlet.ParameterSetName -eq 'DPAPIForUser' ) 
             {
                 $protectStringPath = Join-Path -Path $CarbonBinDir -ChildPath 'Protect-String.ps1' -Resolve
-                $encodedString = Protect-CString -String $String -ForComputer
+                $encodedString = Protect-CString -String $String -ForComputer -NoWarn
                 $argumentList = '-ProtectedString {0}' -f $encodedString
-                Invoke-CPowerShell -ExecutionPolicy 'ByPass' -NonInteractive -FilePath $protectStringPath -ArgumentList $argumentList -Credential $Credential |
+                Invoke-CPowerShell -ExecutionPolicy 'ByPass' `
+                                   -NonInteractive `
+                                   -FilePath $protectStringPath `
+                                   -ArgumentList $argumentList `
+                                   -Credential $Credential `
+                                   -NoWarn |
                     Select-Object -First 1
                 return
             }
@@ -203,7 +217,7 @@ filter Protect-CString
             }
             elseif( $PSCmdlet.ParameterSetName -eq 'RSAByPath' )
             {
-                $Certificate = Get-CCertificate -Path $PublicKeyPath
+                $Certificate = Get-CCertificate -Path $PublicKeyPath -NoWarn
                 if( -not $Certificate )
                 {
                     return

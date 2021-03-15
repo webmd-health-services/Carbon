@@ -96,7 +96,7 @@ function Test-ShouldIncludeInheritedExactPermission
 function Test-ShouldIgnoreInheritanceAndPropagationFlagsOnFile
 {
     $warning = @()
-    Assert-True (Test-Permission -Path $filePath -Identity $identity -Permission 'ReadAndExecute' -ApplyTo SubContainers -Inherited -WarningVariable 'warning' -WarningAction SilentlyContinue)
+    Assert-True (Test-CPermission -Path $filePath -Identity $identity -Permission 'ReadAndExecute' -ApplyTo SubContainers -Inherited -WarningVariable 'warning' -WarningAction SilentlyContinue)
     Assert-NotNull $warning
     Assert-Like $warning[0] 'Can''t test inheritance/propagation rules on a leaf.*'
 }
@@ -145,7 +145,7 @@ function Test-ShouldCheckExactGrantedInheritanceFlags
 
 function Test-ShouldCheckPermissionOnPrivateKey
 {
-    $cert = Install-Certificate -Path $privateKeyPath -StoreLocation LocalMachine -StoreName My
+    $cert = Install-Certificate -Path $privateKeyPath -StoreLocation LocalMachine -StoreName My -NoWarn
     try
     {
         $certPath = Join-Path -Path 'cert:\LocalMachine\My' -ChildPath $cert.Thumbprint
@@ -156,7 +156,7 @@ function Test-ShouldCheckPermissionOnPrivateKey
     }
     finally
     {
-        Uninstall-Certificate -Thumbprint $cert.Thumbprint -StoreLocation LocalMachine -StoreName My
+        Uninstall-Certificate -Thumbprint $cert.Thumbprint -StoreLocation LocalMachine -StoreName My -NoWarn
     }
 }
 

@@ -88,11 +88,20 @@ function Get-CCertificate
         [Parameter(Mandatory=$true,ParameterSetName='ByThumbprintCustomStoreName')]
         [string]
         # The name of the non-standard, custom store.
-        $CustomStoreName
+        $CustomStoreName,
+
+        [switch]$NoWarn
     )
 
     Set-StrictMode -Version 'Latest'
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
+    if( -not $NoWarn )
+    {
+        $msg = 'Carbon''s "Get-CCertificate" function is OBSOLETE and will be removed in the next major version of ' +
+               'Carbon. Use the "Get-CCertificate" function in the new "Carbon.Cryptography" module.'
+        Write-CWarningOnce -Message $msg
+    }
 
     function Add-PathMember
     {

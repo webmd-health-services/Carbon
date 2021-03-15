@@ -21,11 +21,18 @@ function Test-COSIs64Bit
     #>
     [CmdletBinding()]
     param(
+        [switch]$NoWarn
     )
     
     Set-StrictMode -Version 'Latest'
-
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
+    if( -not $NoWarn )
+    {
+        $msg = 'Carbon''s "Test-COSIs64Bit" function is OBSOLETE and will be removed in the next major version of ' +
+               'Carbon. Use the new "Test-COperatingSystem" function in the new Carbon.Core module instead.'
+        Write-CWarningOnce -Message $msg
+    }
 
     return ([Environment]::Is64BitOperatingSystem)
 }

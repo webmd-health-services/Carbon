@@ -105,7 +105,7 @@ Describe 'Install-Msi' {
     
     It 'should warn quiet switch is obsolete' {
         $warnings = @()
-        Install-Msi -Path $carbonTestInstaller -Quiet -WarningVariable 'warnings'
+        Install-CMsi -Path $carbonTestInstaller -Quiet -WarningVariable 'warnings'
         $warnings.Count | Should Be 1
         ($warnings[0] -like '*obsolete*') | Should Be $true
     }

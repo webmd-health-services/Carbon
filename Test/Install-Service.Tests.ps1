@@ -256,7 +256,7 @@ Describe 'Install-Service' {
         Stop-Service -Name $serviceName
     
         $warnings = @()
-        $output = Install-Service -Name $serviceName -Path $servicePath -Description 'something new' @installServiceParams -WarningVariable 'warnings'
+        $output = Install-CService -Name $serviceName -Path $servicePath -Description 'something new' @installServiceParams -WarningVariable 'warnings'
         $output | Should BeNullOrEmpty
         (Get-Service -Name $serviceName).Status | Should Be 'Running'
         $warnings.Count | Should Be 0
@@ -432,18 +432,21 @@ Describe 'Install-Service' {
         $service = Assert-ServiceInstalled
         $service.StartMode | Should Be 'Manual'
     }
-    
-    It 'should set custom account' {
-        $warnings = @()
-        Install-Service -Name $serviceName -Path $servicePath -UserName $serviceAcct -Password $servicePassword @installServiceParams -WarningVariable 'warnings'
+}
+
+Describe 'Install-Service.when passed a custom account' {
+    It 'should run service with that account' {
+        Init
+        Install-CService -Name $serviceName -Path $servicePath -UserName $serviceAcct -Password $servicePassword @installServiceParams
         $service = Assert-ServiceInstalled
         $service.UserName | Should Be ".\$($serviceAcct)"
         $service = Get-Service $serviceName
         $service.Status | Should Be 'Running'
-        $warnings.Count | Should Be 1
-        $warnings[0] -like '*obsolete*' | Should Be $true
     }
-    
+}
+
+Describe 'Install-Service' {
+    BeforeEach { Init }
     It 'should set custom account with no password' {
         $Error.Clear()
         Install-Service -Name $serviceName -Path $servicePath -UserName $serviceAcct -ErrorAction SilentlyContinue @installServiceParams

@@ -56,10 +56,12 @@ filter Where-HelpIncomplete
 
 Describe 'Documentation' {
     It 'all functions should have documentation' {
-    	$commandsMissingDocumentation = Get-Command -Module Carbon | 
-                                            Where-HelpIncomplete |  
-                                            Select-Object -ExpandProperty Name | 
-                                            Sort-Object
+        $commandsMissingDocumentation = 
+            Get-Command -Module Carbon -Name '*-C*' |
+            Where-Object { ($_ | Get-Member -Name 'Noun') -and $_.Noun -notin @('ContainerInheritanceFlags', 'CertificateStore', 'ComPermission', 'ComSecurityDescriptor', 'Certificate', 'Credential' ) } |
+            Where-HelpIncomplete |  
+            Select-Object -ExpandProperty Name | 
+            Sort-Object
         Assert-NoDocumentationMissing $commandsMissingDocumentation
     }
     

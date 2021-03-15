@@ -22,6 +22,7 @@ Describe "Carbon Website" {
 
         $missingCommandNames = Get-Command -Module 'Carbon' | 
                                     Where-Object { $_.CommandType -ne [Management.Automation.CommandTypes]::Alias } |
+                                    Where-Object { $_.Noun -like 'C' } |
                                     Select-Object -ExpandProperty 'Name' | 
                                     Where-Object { -not $taggedCommands.ContainsKey($_) }
 

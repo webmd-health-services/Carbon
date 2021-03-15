@@ -21,12 +21,21 @@ function Convert-CSecureStringToString
         [Parameter(Mandatory=$true)]
         [Security.SecureString]
         # The secure string to convert.
-        $SecureString
+        $SecureString,
+
+        [switch]$NoWarn
     )
     
     Set-StrictMode -Version 'Latest'
-
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
+    if( -not $NoWarn )
+    {
+        $msg = 'Carbon''s "Convert-CSecureStringToString" function is OBSOLETE and will be removed in the next major ' +
+               'version of Carbon. Use the "Convert-CSecureStringToString" function in the new "Carbon.Cryptography"' +
+               'module.'
+        Write-CWarningOnce -Message $msg
+    }
 
     $stringPtr = [Runtime.InteropServices.Marshal]::SecureStringToBSTR($SecureString)
     return [Runtime.InteropServices.Marshal]::PtrToStringAuto($stringPtr)

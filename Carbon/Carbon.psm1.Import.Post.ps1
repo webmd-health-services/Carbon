@@ -1,4 +1,6 @@
 
+$ErrorActionPreference = 'Stop'
+
 # Extended Type
 if( -not (Test-CTypeDataMember -TypeName 'System.IO.FileInfo' -MemberName 'GetCarbonFileInfo') )
 {
@@ -67,20 +69,103 @@ try
     }
 
     Write-Timing ('Creating aliases.')
-    [string[]]$functionNames = $module.ExportedFunctions.Keys
-    foreach( $functionName in $functionNames )
+    [Collections.Generic.List[String]]$functionNames = [Collections.Generic.List[String]]::New()
+    foreach( $functionName in $module.ExportedFunctions.Keys )
     {
+        [void]$functionNames.Add($functionName)
+
         if( $functionName -match '(Get|Install|Uninstall)-CWindowsFeature' )
         {
             continue
         }
 
         $oldFunctionName = $functionName -replace '-C','-'
-        Set-Alias -Name $oldFunctionName -Value $functionName
+        $oldFunctionPath = "function:\$($oldFunctionName)" 
+        if( (Test-Path -Path $oldFunctionPath) )
+        {
+            $functionInfo = Get-Item -Path $oldFunctionPath
+            if( $functionInfo.Source -eq 'Carbon' )
+            {
+                # For some reason, we had to implement a non-dynamic version of this function.
+                [void]$functionNames.Add($oldFunctionName)
+                continue
+            }
+
+            $functionSource = ''
+            if( $functionInfo.Source )
+            {
+                $functionSource = " in module ""$($functionInfo.Source)"""
+            }
+            $msg = "Skipping export of Carbon function ""$($oldFunctionName)"": that function already " +
+                   "exists$($functionSource)."
+            Write-Warning -Message $msg
+
+            continue
+        }
+
+        $functionPath = "function:$($functionName)"
+        if( -not (Test-Path -Path $functionPath) )
+        {
+            # Some functions don't exist in 32-bit PowerShell.
+            if( $functionName -in @('Initialize-CLcm') )
+            {
+                continue
+            }
+
+            $msg = "Something unexpected happened. The ""$($functionName)"" function doesn't exist even though it " +
+                   "should. Here are all functions we know about:$([Environment]::NewLine * 2)" +
+                   "$(Get-Command -CommandType 'Function' | Format-Table | Out-String)"
+            Write-Error -Message $msg
+            continue
+        }
+
+        $cFunctionInfo = Get-Item -Path "function:$($functionName)"
+        $preambleStart = $cFunctionInfo.definition.IndexOf('    [CmdletBinding(')
+        if( $preambleStart -lt 0 )
+        {
+            $msg = "Unable to extract ""$($functionName)"" function's parameters: can't find ""[CmdletBinding()]"" " +
+                   'attribute.'
+            Write-Error -Message $msg
+            continue
+        }
+        $preamble = $cFunctionInfo.definition.Substring($preambleStart)
+        $preambleEnd = $preamble.IndexOf('    )')
+        if( $preambleEnd -lt 0 )
+        {
+            $msg = "Unable to extract ""$($functionName)"" function's parameters: can't find "")"" that closes the " +
+                   'parameter block.'
+            Write-Error -Message $msg
+            continue
+        }
+        $preamble = $preamble.Substring(0, $preambleEnd + 5)
+        New-Item -Path 'function:' -Name $oldFunctionName -Value @"
+$($preamble)
+
+begin
+{
+    Set-StrictMode -Version 'Latest'
+    Use-CallerPreference -Cmdlet `$PSCmdlet -SessionState `$ExecutionContext.SessionState
+
+    if( -not `$script:warnings['$($oldFunctionName)'] )
+    {
+        `$msg = "The Carbon module's ""$($oldFunctionName)"" function was renamed to ""$($functionName)"". Please update " +
+                "your code to use the new ""$($functionName)"" name. The old ""$($oldFunctionName)"" function will be " +
+                'removed in the next major version of Carbon.'
+        Write-CWarningOnce -Message `$msg
+        `$script:warnings['$($oldFunctionName)'] = `$true
+    }
+}
+
+process
+{
+    $($functionName) @PSBoundParameters
+}
+"@ | Out-Null
+        [void]$functionNames.Add($oldFunctionName)
     }
 
     Write-Timing ('Exporting module members.')
-    Export-ModuleMember -Alias '*' -Function $functionNames
+    Export-ModuleMember -Alias '*' -Function $functionNames.ToArray()
 }
 finally
 {

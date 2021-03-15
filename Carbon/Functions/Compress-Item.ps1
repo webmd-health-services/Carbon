@@ -40,8 +40,8 @@ function Compress-CItem
 
     Demonstrates how to create a ZIP file with the Windows shell COM APIs instead of the `DotNetZip` library.
     #>
-    [OutputType([IO.FileInfo])]
     [CmdletBinding(SupportsShouldProcess=$true)]
+    [OutputType([IO.FileInfo])]
     param(
         [Parameter(Mandatory=$true,ValueFromPipelineByPropertyName=$true)]
         [Alias('FullName')]
@@ -212,5 +212,54 @@ function Compress-CItem
         {
             Get-Item -Path $OutFile
         }
+    }
+}
+
+function Compress-Item
+{
+    [CmdletBinding(SupportsShouldProcess=$true)]
+    param(
+        [Parameter(Mandatory=$true,ValueFromPipelineByPropertyName=$true)]
+        [Alias('FullName')]
+        [string[]]
+        # The path to the files/directories to compress.
+        $Path,
+
+        [string]
+        # Path to destination ZIP file. If not provided, a ZIP file will be created in the current user's TEMP directory.
+        $OutFile,
+
+        [Switch]
+        # Uses the Windows COM shell API to create the zip file instead of the `DotNetZip` library. Microsoft's DSC
+        # Local Configuration Manager can't unzip files zipped with `DotNetZip` (or even the .NET 4.5 `ZipFile` class).
+        $UseShell,
+
+        [Switch]
+        # Overwrites an existing ZIP file.
+        $Force
+    )
+
+    begin
+    {
+        Set-StrictMode -Version 'Latest'
+        Use-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState
+
+        $msg = "The Carbon module's ""Compress-Item"" function was renamed to ""Compress-CItem"". Please update " +
+                "your code to use the new ""Compress-CItem"" name. The old ""Compress-Item"" function will be " +
+                'removed in the next major version of Carbon.'
+        Write-CWarningOnce -Message $msg
+
+        $paths = New-Object 'Collections.ArrayList'
+    }
+
+    process
+    {
+        [void]$paths.AddRange($Path)
+    }
+
+    end
+    {
+        [void]$PSBoundParameters.Remove('Path')
+         Compress-CItem @PSBoundParameters -Path $paths
     }
 }

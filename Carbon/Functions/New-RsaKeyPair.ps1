@@ -127,12 +127,12 @@ function New-CRsaKeyPair
 
     if( $PSBoundParameters.ContainsKey('ValidFrom') )
     {
-        Write-Warning -Message ('New-CRsaKeyPair: The -ValidFrom parameter is obsolete and will be removed in a future version of Carbon. Please remove usages of this parameter.')
+        Write-CWarningOnce -Message ('New-CRsaKeyPair: The -ValidFrom parameter is obsolete and will be removed in a future version of Carbon. Please remove usages of this parameter.')
     }
 
     if( $PSBoundParameters.ContainsKey('Authority') )
     {
-        Write-Warning -Message ('New-CRsaKeyPair: The -Authority parameter is obsolete and will be removed in a future version of Carbon. Please remove usages of this parameter.')
+        Write-CWarningOnce -Message ('New-CRsaKeyPair: The -Authority parameter is obsolete and will be removed in a future version of Carbon. Please remove usages of this parameter.')
     }
 
     function Resolve-KeyPath
@@ -248,7 +248,7 @@ ValidityPeriodUnits = {3}
             $output | Write-Debug
         }
 
-        $publicKey = Get-CCertificate -Path $PublicKeyFile
+        $publicKey = Get-CCertificate -Path $PublicKeyFile -NoWarn
         if( -not $publicKey )
         {
             Write-Error ('Failed to load public key ''{0}'':{1}{2}' -f $PublicKeyFile,([Environment]::NewLine),($output -join ([Environment]::NewLine)))

@@ -50,7 +50,7 @@ Describe 'Invoke-PowerShell.when running a 32-bit PowerShell' {
         $env:PROCESSOR_ARCHITECTURE
     }
         
-    $result = Invoke-PowerShell -ScriptBlock $command -x86
+    $result = Invoke-PowerShell -ScriptBlock $command -x86 -NoWarn
     It 'should run under x86' {
         $result | Should Be 'x86'
     }
@@ -66,7 +66,7 @@ if( Test-Path -Path HKLM:\SOFTWARE\Microsoft\PowerShell\3 )
             }
         
             $error.Clear()
-            $result = Invoke-PowerShell -ScriptBlock $command -Runtime v2.0 -ErrorAction SilentlyContinue
+            $result = Invoke-PowerShell -ScriptBlock $command -Runtime v2.0 -ErrorAction SilentlyContinue -NoWarn
             It 'should write an error' {
                 $error.Count | Should Be 1
             }
@@ -94,7 +94,7 @@ if( Test-Path -Path HKLM:\SOFTWARE\Microsoft\PowerShell\3 )
             }
         
             $error.Clear()
-            $result = Invoke-PowerShell -ScriptBlock $command -Runtime v2.0 
+            $result = Invoke-PowerShell -ScriptBlock $command -Runtime v2.0  -NoWarn
             It 'should not write an error' {
                 $error.Count | Should Be 0
             }
@@ -114,7 +114,7 @@ Describe 'Invoke-PowerShell.when running a command under PowerShell 4' {
         $PSVersionTable.CLRVersion
     }
         
-    $result = Invoke-PowerShell -Command $command -Runtime v4.0
+    $result = Invoke-PowerShell -Command $command -Runtime v4.0 -NoWarn
     It 'should run the command' {
         $result.Major | Should Be 4
     }
@@ -128,12 +128,13 @@ if( (Test-OSIs64Bit) )
         $error.Clear()
         if( (Test-PowerShellIs32Bit) )
         {
-            $result = Invoke-PowerShell -ScriptBlock { $env:PROCESSOR_ARCHITECTURE }
+            $result = Invoke-PowerShell -ScriptBlock { $env:PROCESSOR_ARCHITECTURE } -NoWarn
         }
         else
         {
             $command = @"
 & "$(Join-Path -Path $PSScriptRoot -ChildPath '..\Carbon\Import-Carbon.ps1' -Resolve)"
+`$WarningPreference = 'SilentlyContinue'
 
 if( -not (Test-PowerShellIs32Bit) )
 {
@@ -141,7 +142,7 @@ if( -not (Test-PowerShellIs32Bit) )
 }
 Invoke-PowerShell -ScriptBlock { `$env:PROCESSOR_ARCHITECTURE }
 "@
-            $result = Invoke-PowerShell -Command $command -Encode -x86
+            $result = Invoke-PowerShell -Command $command -Encode -x86 -NoWarn
         }
 
         It 'should not write an error' {
@@ -158,7 +159,7 @@ Describe 'Invoke-PowerShell.when running 32-bit script block from 32-bit PowerSh
     $error.Clear()
     if( (Test-PowerShellIs32Bit) )
     {
-        $result = Invoke-PowerShell -ScriptBlock { $env:ProgramFiles } -x86
+        $result = Invoke-PowerShell -ScriptBlock { $env:ProgramFiles } -x86 -NoWarn
     }
     else
     {
@@ -171,7 +172,7 @@ if( -not (Test-PowerShellIs32Bit) )
 }
 Invoke-PowerShell -ScriptBlock { `$env:ProgramFiles } -x86
 "@
-        $result = Invoke-PowerShell -Command $command -Encode -x86
+        $result = Invoke-PowerShell -Command $command -Encode -x86 -NoWarn
     }
 
     It 'should not write an error' {
@@ -186,7 +187,8 @@ Invoke-PowerShell -ScriptBlock { `$env:ProgramFiles } -x86
 Describe 'Invoke-PowerShell.when running a script' {
     $result = Invoke-PowerShell -FilePath $getPsVersionTablePath `
                                 -OutputFormat XML `
-                                -ExecutionPolicy RemoteSigned 
+                                -ExecutionPolicy RemoteSigned `
+                                -NoWarn
     It 'should run the script' {
         $result.Length | Should Be 3
         $result[0] | Should Be ''
@@ -207,7 +209,8 @@ Describe 'Invoke-PowerShell.when running a script with arguments' {
     $result = Invoke-PowerShell -FilePath $getPsVersionTablePath `
                                 -OutputFormat XML `
                                 -ArgumentList '-Message',"'Hello World'" `
-                                -ExecutionPolicy RemoteSigned
+                                -ExecutionPolicy RemoteSigned `
+                                -NoWarn
     It 'should pass arguments to the script' {
         $result.Length | Should Be 3
         $result[0] | Should Be "'Hello World'"
@@ -221,7 +224,8 @@ Describe 'Invoke-PowerShell.when running script with -x86 switch' {
     $result = Invoke-PowerShell -FilePath $getPsVersionTablePath `
                                 -OutputFormat XML `
                                 -x86 `
-                                -ExecutionPolicy RemoteSigned 
+                                -ExecutionPolicy RemoteSigned `
+                                -NoWarn
     It 'should run under 32-bit PowerShell' {
         $result[2] | Should Be 'x86'
     }
@@ -231,7 +235,8 @@ Describe 'Invoke-PowerShell.when running script with v4.0 runtime' {
     $result = Invoke-PowerShell -FilePath $getPsVersionTablePath `
                                 -OutputFormat XML `
                                 -Runtime 'v4.0' `
-                                -ExecutionPolicy RemoteSigned 
+                                -ExecutionPolicy RemoteSigned `
+                                -NoWarn
 
     It 'should run under 4.0 CLR' {
         ($result[1].CLRVersion -like '4.0.*') | Should Be $true
@@ -246,7 +251,8 @@ Describe 'Invoke-PowerShell.when running script under v2.0 runtime' {
     $result = Invoke-PowerShell -FilePath $getPsVersionTablePath `
                                 -OutputFormat XML `
                                 -Runtime 'v2.0' `
-                                -ExecutionPolicy RemoteSigned 
+                                -ExecutionPolicy RemoteSigned `
+                                -NoWarn
     
     $result | Write-Debug
     It 'should run under .NET 2.0 CLR' {
@@ -274,7 +280,8 @@ Describe 'Invoke-PowerShell.when running a script as another user' {
     $return = 'fubar'
     $result = Invoke-PowerShell -FilePath $getUsernamePath `
                                 -ArgumentList '-InputObject',$return `
-                                -Credential $CarbonTestUser
+                                -Credential $CarbonTestUser `
+                                -NoWarn
     It 'should run the script' {
         $result.Count | Should Be 2
         $result[0] | Should Be $return
@@ -285,7 +292,8 @@ Describe 'Invoke-PowerShell.when running a script as another user' {
                                 -ArgumentList '-InputObject',$return `
                                 -ExecutionPolicy Restricted `
                                 -Credential $CarbonTestUser `
-                                -ErrorAction SilentlyContinue
+                                -ErrorAction SilentlyContinue `
+                                -NoWarn
     It 'should use PowerShell parameters' {
         $result | Should BeNullOrEmpty
         ($Global:Error -join [Environment]::NewLine) |  Should Match 'disabled'
@@ -294,12 +302,12 @@ Describe 'Invoke-PowerShell.when running a script as another user' {
 
 Describe 'Invoke-PowerShell.when running a command as another user' {
     $Global:Error.Clear()
-    $result = Invoke-PowerShell -Command '$env:Username' -Credential $CarbonTestUser
+    $result = Invoke-PowerShell -Command '$env:Username' -Credential $CarbonTestUser -NoWarn
     It 'should run the command as the user' {
         $result | Should Be $CarbonTestUser.UserName
     }
 
-    $result = Invoke-PowerShell -Command $getUsernamePath -ExecutionPolicy Restricted -Credential $CarbonTestUser -ErrorAction SilentlyContinue
+    $result = Invoke-PowerShell -Command $getUsernamePath -ExecutionPolicy Restricted -Credential $CarbonTestUser -ErrorAction SilentlyContinue -NoWarn
     It 'should set powershell.exe parameters' {
         $result | Should BeNullOrEmpty
         ($Global:Error -join [Environment]::NewLine) |  Should Match 'disabled'
@@ -308,7 +316,7 @@ Describe 'Invoke-PowerShell.when running a command as another user' {
 
 Describe 'Invoke-PowerShell.when running a script block as another user' {
     $Global:Error.Clear()
-    $result = Invoke-PowerShell -Command { 'fubar' } -Credential $CarbonTestUser -ErrorAction SilentlyContinue
+    $result = Invoke-PowerShell -Command { 'fubar' } -Credential $CarbonTestUser -ErrorAction SilentlyContinue -NoWarn
     It 'should write an error' {
         $Global:Error | Should Match 'script block as another user'
     }
@@ -319,7 +327,7 @@ Describe 'Invoke-PowerShell.when running a script block as another user' {
 
 Describe 'Invoke-PowerShell.when running a command with an argument list' {
     $Global:Error.Clear()
-    $result = Invoke-PowerShell -Command 'write-host fubar' -ArgumentList 'snafu' -ErrorAction SilentlyContinue
+    $result = Invoke-PowerShell -Command 'write-host fubar' -ArgumentList 'snafu' -ErrorAction SilentlyContinue -NoWarn
     It 'should write an error' {
         $Global:Error | Should Match 'doesn''t support'
     }
@@ -331,7 +339,7 @@ Describe 'Invoke-PowerShell.when running a command with an argument list' {
 
 Describe 'Invoke-PowerShell.when running non-interactively' {
     $Global:Error.Clear()
-    $result = Invoke-PowerShell -Command 'Read-Host ''prompt''' -NonInteractive -ErrorAction SilentlyContinue
+    $result = Invoke-PowerShell -Command 'Read-Host ''prompt''' -NonInteractive -ErrorAction SilentlyContinue -NoWarn
     It 'should write an error' {
         Invoke-Command -ScriptBlock {
                                         # The message can be in different places depending on host

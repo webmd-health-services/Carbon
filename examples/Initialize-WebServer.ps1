@@ -49,7 +49,7 @@ Install-Share -Name $deployShareName `
 
 
 $sslCertPath = 'Path\to\SSL\certificate.cer'
-$cert = Install-Certificate -Path $sslCertPath -StoreLocation LocalMachine -StoreName My
+$cert = Install-CCertificate -Path $sslCertPath -StoreLocation LocalMachine -StoreName My -NoWarn
 Set-SslCertificateBinding -ApplicationID ([Guid]::NewGuid()) -Thumbprint $cert.Thumbprint
 
 $appPoolName = 'ExampleAppPool'

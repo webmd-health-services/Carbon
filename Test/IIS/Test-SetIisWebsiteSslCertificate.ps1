@@ -25,12 +25,12 @@ function Start-TestFixture
 function Start-Test
 {
     Install-IisWebsite -Name $siteName -Path $TestDir -Bindings @( "https/$ipAddress`:$port`:", "https/*:$allPort`:" )
-    $cert = Install-Certificate -Path (Join-Path $TestDir ..\Certificates\CarbonTestCertificate.cer -Resolve) -StoreLocation LocalMachine -StoreName My
+    $cert = Install-Certificate -Path (Join-Path $TestDir ..\Certificates\CarbonTestCertificate.cer -Resolve) -StoreLocation LocalMachine -StoreName My -NoWarn
 }
 
 function Stop-Test
 {
-    Uninstall-Certificate -Certificate $cert -StoreLocation LocalMachine -StoreName My
+    Uninstall-Certificate -Certificate $cert -StoreLocation LocalMachine -StoreName My -NoWarn
     Uninstall-IisWebsite -Name $siteName
 }
 
