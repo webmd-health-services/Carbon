@@ -69,7 +69,7 @@ try
     }
 
     Write-Timing ('Creating aliases.')
-    [Collections.Generic.List[String]]$functionNames = [Collections.Generic.List[String]]::New()
+    [Collections.Generic.List[String]]$functionNames = New-Object 'Collections.Generic.List[String]'
     foreach( $functionName in $module.ExportedFunctions.Keys )
     {
         [void]$functionNames.Add($functionName)

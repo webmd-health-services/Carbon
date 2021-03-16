@@ -25,7 +25,7 @@
     RootModule = 'Carbon.psm1'
 
     # Version number of this module.
-    ModuleVersion = '2.10.0'
+    ModuleVersion = '2.10.1'
 
     # ID used to uniquely identify this module
     GUID = '075d9444-c01b-48c3-889a-0b3490716fa2'
@@ -359,7 +359,13 @@ All functions are idempotent: when run multiple times with the same arguments, y
 
             # ReleaseNotes of this module
             ReleaseNotes = @'
-# TL;DR Changes
+# 2.10.1
+
+* Fixed: Carbon fails to import on PowerShell 4.
+
+# 2.10.0
+
+## TL;DR Changes
 
 * Fixed: Carbon's backward compatible aliases replaced with shim functions. Carbon no longer aggressively loads its
 functions.
@@ -389,7 +395,7 @@ exist in the destination store.
 * Fixed: `Install-Service` always writes a verbose message when installing a service.
 
 
-# Naming Collisions Solved (Again)
+## Naming Collisions Solved (Again)
 
 Fixed: In Carbon 2.7.0, we added a `C` prefix to all the Carbon functions, with aliases that used the old function
 names to preserve backwards-compatability. We didn't realize at the time that aliases have the highest precedence of
@@ -403,7 +409,7 @@ Because Carbon creates these backwards-compatible function shims dynamically, Ca
 function with the old name exists. If there is a name conflict between Carbon and another module, if you import that
 module first, Carbon won't export its shim function.
 
-# Carbon on PowerShell Core
+## Carbon on PowerShell Core
 
 We need parts of Carbon to work on PowerShell Core. The current size of Carbon makes that hard (over 200 functions and
 automated tests that take a long time). So, we're breaking Carbon into smaller modules. The new modules will all require
@@ -412,7 +418,7 @@ when importing.
 
 The first two modules are already out: Carbon.Core and Carbon.Cryptography. 
 
-# Carbon.Core
+## Carbon.Core
 
 Carbon.Core will contain all the functions that are foundational to all or most other future Carbon modules, or generic
 functions we feel are core to Carbon and/or PowerShell. It has no dependencies. The following functions were migrated to
@@ -427,7 +433,7 @@ that don't define those variables.
 * `Test-CPowerShell`: Replaces `Test-PowerShellIs32Bit` and `Test-PowerShellIs64Bit`. Tests edition, too. Use this
 function instead of `$PSVersionTable.PSEdition`. Handles when $PSVersionTable doesn't have the PSEdition property.
 
-# Carbon.Cryptography
+## Carbon.Cryptography
 
 Carbon.Crytography contains functions that are used when encrypting and decrypting strings. This is where certificate
 management funtions live. These function were migrated from Carbon:
