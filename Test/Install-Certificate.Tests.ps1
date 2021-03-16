@@ -57,7 +57,7 @@ Describe "Install-Certificate" {
                 )
 
                 $duration = [Diagnostics.Stopwatch]::StartNew()
-                $timeout = [TimeSpan]::New(0, 0, 10)
+                $timeout = New-Object 'TimeSpan' (0, 0, 10)
                 do
                 {
                     $cert = Get-CCertificate -Thumbprint $ExpectedCertificate.Thumbprint `
