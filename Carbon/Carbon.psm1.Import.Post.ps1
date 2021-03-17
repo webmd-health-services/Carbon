@@ -112,9 +112,14 @@ try
                 continue
             }
 
+            if( -not $exportIisFunctions -and $functionName -like '*-CIis*' )
+            {
+                Write-Debug "Skipping ""$($functionName)"": IIS isn't installed or not loaded."
+                continue
+            }
+
             $msg = "Something unexpected happened. The ""$($functionName)"" function doesn't exist even though it " +
-                   "should. Here are all functions we know about:$([Environment]::NewLine * 2)" +
-                   "$(Get-Command -CommandType 'Function' | Format-Table | Out-String)"
+                   'should.'
             Write-Error -Message $msg
             continue
         }
