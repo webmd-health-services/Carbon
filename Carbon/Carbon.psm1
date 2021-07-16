@@ -64,7 +64,8 @@ if( (Test-Path -Path 'env:SystemRoot') )
     Write-Timing ('Adding System.Web assembly.')
     Add-Type -AssemblyName "System.Web"
     $microsoftWebAdministrationPath = Join-Path -Path $env:SystemRoot -ChildPath 'system32\inetsrv\Microsoft.Web.Administration.dll'
-    if( (Test-Path -Path $microsoftWebAdministrationPath -PathType Leaf) )
+    if( -not (Test-Path -Path 'env:CARBON_SKIP_IIS_IMPORT') -and `
+        (Test-Path -Path $microsoftWebAdministrationPath -PathType Leaf) )
     {
         $exportIisFunctions = $true
         if( -not $IsPSCore )
