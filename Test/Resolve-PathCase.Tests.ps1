@@ -10,91 +10,76 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function Start-TestFixture
-{
-    & (Join-Path -Path $PSScriptRoot -ChildPath '..\Initialize-CarbonTest.ps1' -Resolve)
-}
+& (Join-Path -Path $PSScriptRoot -ChildPath 'Initialize-CarbonTest.ps1' -Resolve)
 
-function Test-ShouldGetCanonicalCaseForDirectory
-{
-    $currentDir = (Resolve-Path '.').Path
-    foreach( $badPath in ($currentDir.ToUpper(),$currentDir.ToLower()) )
-    {
-        $canonicalCase = Resolve-PathCase -Path $badPath
-        Assert-True ($currentDir -ceq $canonicalCase) ('{0} != {1}' -f $currentDir,$canonicalCase)
-    }
-}
-
-function Test-ShouldGetCanonicalCaseForFile
-{
-    $currentFile = Join-Path $TestDir 'Test-ResolvePathCase.ps1' -Resolve
-    $canonicalCase = Resolve-PathCase -Path ($currentFile.ToUpper())
-    Assert-True ($currentFile -ceq $canonicalCase) ('{0} != {1}' -f $currentFile,$canonicalCase)
-}
-
-function Test-ShouldNotGetCaseForFileThatDoesNotExist
-{
-    $error.Clear()
-    $result = Resolve-PathCase 'C:\I\Do\Not\Exist' -ErrorAction SilentlyContinue
-    Assert-False $result
-    Assert-Equal 1 $error.Count
-}
-
-function Test-ShouldAcceptPipelineInput
-{
-    $gotSomething = $false
-    Get-ChildItem 'C:\WINDOWS' | 
-        ForEach-Object { 
-            Assert-True ($_.FullName.StartsWith( 'C:\WINDOWS' ) )
-            $_
-        } |
-        Resolve-PathCase | 
-        ForEach-Object { 
-            $gotSomething = $true
-            Assert-True ( $_.StartsWith( 'C:\Windows' ) ) ('{0} doesn''t start with C:\Windows' -f $_)
+Describe 'Resolve-PathCase' {
+    It 'should get canonical case for directory' {
+        $currentDir = (Resolve-Path '.').Path
+        foreach( $badPath in ($currentDir.ToUpper(),$currentDir.ToLower()) )
+        {
+            $canonicalCase = Resolve-CPathCase -Path $badPath
+            ($currentDir -ceq $canonicalCase) | Should -BeTrue
         }
-    Assert-True $gotSomething
+    }
     
-}
-
-function Test-ShouldGetRelativePath
-{
-    Push-Location -Path $PSScriptRoot
-    try
-    {
-        $path = '..\..\Carbon\Import-Carbon.ps1'
-        $canonicalCase = Resolve-PathCase ($path.ToUpper())
-        Assert-Equal (Resolve-Path -Path $path).Path $canonicalCase -CaseSensitive
-
+    It 'should get canonical case for file' {
+        $canonicalCase = Resolve-CPathCase -Path ($PSCommandPath.ToUpper())
+        ($PSCommandPath -ceq $canonicalCase) | Should -BeTrue
     }
-    finally
-    {
-        Pop-Location
+    
+    It 'should not get case for file that does not exist' {
+        $error.Clear()
+        $result = Resolve-CPathCase 'C:\I\Do\Not\Exist' -ErrorAction SilentlyContinue
+        $result | Should -BeNullOrEmpty
+        $error.Count | Should -Be 1
     }
-}
-
-function Test-ShouldGetPathToShare
-{
-    $tempDir = New-TempDirectory -Prefix $PSCommandPath 
-    $shareName = Split-Path -Leaf -Path $tempDir
-    try
-    {
-        Install-FileShare -Name $shareName -Path $tempDir.FullName -ReadAccess 'Everyone'
+    
+    It 'should accept pipeline input' {
+        Get-ChildItem 'C:\WINDOWS' |
+            Resolve-CPathCase |
+            Where-Object { $_ -CLike 'C:\Windows\*' } |
+            Should -Not -BeNullOrEmpty
+    }
+    
+    It 'should get relative path' {
+        Push-Location -Path $PSScriptRoot
         try
         {
-            $path = '\\{0}\{1}' -f $env:COMPUTERNAME,$shareName
-            $canonicalCase = Resolve-PathCase ($path.ToUpper()) -ErrorAction SilentlyContinue
-            Assert-Error -Last -Regex 'UNC .* not supported'
-            Assert-Null $canonicalCase
+            $path = '..\Carbon\Import-Carbon.ps1'
+            $canonicalCase = Resolve-CPathCase ($path.ToUpper())
+            $canonicalCase | Should -Be (Resolve-Path -Path $path).Path
+    
         }
         finally
         {
-            Uninstall-FileShare -Name $shareName
+            Pop-Location
         }
     }
-    finally
-    {
-        Remove-Item -Path $tempDir -Recurse -Force
+    
+    # Only on Windows PowerShell (until we update to use Get-CimInstance).
+    $skip = -not (Get-Command -Name 'Get-WmiObject' -ErrorAction Ignore) -or -not (Test-CAdminPrivilege)
+    It 'should get path to share' -Skip:$skip {
+        $tempDir = New-CTempDirectory -Prefix $PSCommandPath 
+        $shareName = Split-Path -Leaf -Path $tempDir
+        try
+        {
+            Install-CFileShare -Name $shareName -Path $tempDir.FullName -ReadAccess 'Everyone'
+            try
+            {
+                $path = '\\{0}\{1}' -f $env:COMPUTERNAME,$shareName
+                $canonicalCase = Resolve-CPathCase ($path.ToUpper()) -ErrorAction SilentlyContinue
+                $Global:Error.Count | Should -BeGreaterThan 0
+                $Global:Error[0] | Should -Match 'UNC .* not supported'
+                $canonicalCase | Should -BeNullOrEmpty
+            }
+            finally
+            {
+                Uninstall-CFileShare -Name $shareName
+            }
+        }
+        finally
+        {
+            Remove-Item -Path $tempDir -Recurse -Force
+        }
     }
 }
-
