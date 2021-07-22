@@ -25,7 +25,7 @@
     RootModule = 'Carbon.psm1'
 
     # Version number of this module.
-    ModuleVersion = '2.10.3'
+    ModuleVersion = '2.11.0'
 
     # ID used to uniquely identify this module
     GUID = '075d9444-c01b-48c3-889a-0b3490716fa2'
@@ -360,20 +360,10 @@ All functions are idempotent: when run multiple times with the same arguments, y
             # ReleaseNotes of this module
             ReleaseNotes = @'
 
-# 2.10.3
+# 2.11.0
 
-* Fixed: Updated the 'Grant-Permission', 'Get-Permission', and 'Revoke-Permission' scripts to execute correctly on
+* New: 'Grant-Permission', 'Get-Permission', and 'Revoke-Permission' scripts now execute correctly on
 * non-Windows platforms.
-
-# 2.10.2
-
-* Fixed: Carbon fails to import if IIS isn't installed.
-
-# 2.10.1
-
-* Fixed: Carbon fails to import on PowerShell 4.
-
-# 2.10.0
 
 ## TL;DR Changes
 
