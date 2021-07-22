@@ -267,11 +267,11 @@ function Grant-CPermission
                         $msg = "Failed to find the private key file for certificate ""$($Path)"" (subject: $($certificate.Subject); " +
                                 "thumbprint: $($certificate.Thumbprint); expected file name: $($privateKeyFileName)). This is most " +
                                 "likely because you don't have permission to read private keys, or we''re not looking in the right " +
-                                "places. According to <a href='https://docs.microsoft.com/en-us/windows/win32/seccng/key-storage-and-retrieval' target='_blank' rel='noreferrer'>Microsoft docs</a>, " +
+                                "places. According to [Microsoft docs](https://docs.microsoft.com/en-us/windows/win32/seccng/key-storage-and-retrieval), " +
                                 "private keys are stored under one of these directories:" + [Environment]::NewLine +
                                 " * $($keyStoragePaths -join "$([Environment]::NewLine) * ")" + [Environment]::NewLine +
                                 "If there are other locations we should be looking, please " +
-                                "<a href='https://github.com/webmd-health-services/Carbon/issues' target='_blank' rel='noreferrer'>submit an issue/bug report</a>."
+                                "[submit an issue/bug report](https://github.com/webmd-health-services/Carbon/issues)."
                         Write-Error -Message $msg
                         return
                     }
@@ -341,14 +341,7 @@ function Grant-CPermission
         # When passed to Set-Acl, this causes intermittent errors.  So, we just grab the ACL portion of the security descriptor.
         # See http://www.bilalaslam.com/2010/12/14/powershell-workaround-for-the-security-identifier-is-not-allowed-to-be-the-owner-of-this-object-with-set-acl/
         $item = Get-Item -Path $Path -Force
-        if( ($item | Get-Member 'GetAccessControl') )
-        {
-            $currentAcl = $item.GetAccessControl("Access")
-        }
-        else
-        {
-            $currentAcl = [IO.FileSystemAclExtensions]::GetAccessControl($item, 'Access')
-        }
+        $currentAcl = $item.GetAccessControl('Access')
     
         $inheritanceFlags = [Security.AccessControl.InheritanceFlags]::None
         $propagationFlags = [Security.AccessControl.PropagationFlags]::None

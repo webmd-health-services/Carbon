@@ -137,3 +137,28 @@ foreach( $developerImport in $developerImports )
     Write-Timing ('Dot-sourcing "{0}".' -f $developerImport)
     . $developerImport
 }
+
+# Allows us to be platform agnostic in our calls of 'GetAccessControl'.
+if( -not ([IO.DirectoryInfo]::New([Environment]::CurrentDirectory) | Get-Member -Name 'GetAccessControl') )
+{
+    Update-TypeData -MemberName 'GetAccessControl' -MemberType 'ScriptMethod' -TypeName 'IO.DirectoryInfo' -Value {
+        [CmdletBinding()]
+        param(
+            [Security.AccessControl.AccessControlSections]$IncludeSections = [Security.AccessControl.AccessControlSections]::All
+        )
+        
+        return [IO.FileSystemAclExtensions]::GetAccessControl($this, $IncludeSections)
+    }
+}
+
+if( -not ([IO.FileInfo]::New($PSCommandPath) | Get-Member -Name 'GetAccessControl') )
+{
+    Update-TypeData -MemberName 'GetAccessControl' -MemberType 'ScriptMethod' -TypeName 'IO.FileInfo' -Value {
+        [CmdletBinding()]
+        param(
+            [Security.AccessControl.AccessControlSections]$IncludeSections = [Security.AccessControl.AccessControlSections]::All
+        )
+        
+        return [IO.FileSystemAclExtensions]::GetAccessControl($this, $IncludeSections)
+    }
+}
