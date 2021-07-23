@@ -363,7 +363,7 @@ All functions are idempotent: when run multiple times with the same arguments, y
 # 2.11.0
 
 * New: 'Grant-Permission', 'Get-Permission', and 'Revoke-Permission' scripts now execute correctly on
-* non-Windows platforms.
+non-Windows platforms.
 
 '@
         } # End of PSData hashtable
