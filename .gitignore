@@ -27,3 +27,4 @@ Carbon/LICENSE.txt
 Carbon/NOTICE.txt
 *.orig
 /.vscode/**
+/.dotnet*
