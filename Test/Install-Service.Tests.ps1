@@ -45,7 +45,7 @@ function Assert-ServiceInstalled
     
 function Assert-HasPermissionsOnServiceExecutable($Identity, $Path)
 {
-    $access = Get-Permission -Path $Path -Identity $Identity
+    $access = Get-CPermission -Path $Path -Identity $Identity
     $access | Should Not BeNullOrEmpty
     ([Security.AccessControl.FileSystemRights]::ReadAndExecute) | Should Be ($access.FileSystemRights -band [Security.AccessControl.FileSystemRights]::ReadAndExecute)
 }
@@ -263,7 +263,7 @@ Describe 'Install-Service' {
     }
     
     It 'should not install service with space in its path' {
-        $tempDir = New-TempDirectory -Prefix 'Carbon Test Install Service'
+        $tempDir = New-CTempDirectory -Prefix 'Carbon Test Install Service'
         Copy-Item -Path $servicePath -Destination $tempDir
         try
         {
@@ -276,7 +276,7 @@ Describe 'Install-Service' {
         }
         finally
         {
-            Uninstall-Service -Name $serviceName
+            Uninstall-CService -Name $serviceName
             Remove-Item -Path $tempDir -Recurse -Force -ErrorAction Ignore
         }
     }
@@ -288,7 +288,7 @@ Describe 'Install-Service' {
     
         Install-Service -Name $serviceName -Path $servicePath @installServiceParams
         Install-Service -Name $serviceName -Path $changedServicePath @installServiceParams
-        (Get-ServiceConfiguration -Name $serviceName).Path | Should Be $changedServicePath
+        (Get-CServiceConfiguration -Name $serviceName).Path | Should Be $changedServicePath
     }
     
     It 'should install service with argument list' {
@@ -529,7 +529,7 @@ Describe 'Install-Service' {
         $error.Clear()
         Install-Service -Name $serviceName -Path $servicePath -Dependencies IAmAServiceThatDoesNotExist -ErrorAction SilentlyContinue @installServiceParams
         $error.Count | Should Be 1
-        (Test-Service -Name $serviceName) | Should Be $false
+        (Test-CService -Name $serviceName) | Should Be $false
     }
     
     It 'should install service with relative path' {
