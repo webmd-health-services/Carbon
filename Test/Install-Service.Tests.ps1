@@ -39,33 +39,33 @@ function Init
 function Assert-ServiceInstalled
 {
     $service = Get-Service $serviceName
-    $service | Should Not BeNullOrEmpty | Out-Null
+    $service | Should -Not -BeNullOrEmpty | Out-Null
     return $service
 }
     
 function Assert-HasPermissionsOnServiceExecutable($Identity, $Path)
 {
     $access = Get-CPermission -Path $Path -Identity $Identity
-    $access | Should Not BeNullOrEmpty
-    ([Security.AccessControl.FileSystemRights]::ReadAndExecute) | Should Be ($access.FileSystemRights -band [Security.AccessControl.FileSystemRights]::ReadAndExecute)
+    $access | Should -Not -BeNullOrEmpty
+    ([Security.AccessControl.FileSystemRights]::ReadAndExecute) | Should -Be ($access.FileSystemRights -band [Security.AccessControl.FileSystemRights]::ReadAndExecute)
 }
 
 function Assert-HasNoPermissionsOnServiceExecutable($Identity, $Path)
 {
     $access = Get-CPermission -Path $Path -Identity $Identity
-    $access | Should BeNullOrEmpty
+    $access | Should -BeNullOrEmpty
 }
 
 function Assert-HasPrivilegesOnServiceExecutable($Identity)
 {
     $privilege = Get-CPrivilege -Identity $Identity
-    $privilege | Should Not BeNullOrEmpty
+    $privilege | Should -Not -BeNullOrEmpty
 }
 
 function Assert-HasPrivilegesRemovedOnServiceExecutable($Identity)
 {
     $privilege = Get-CPrivilege -Identity $Identity
-    $privilege | Should BeNullOrEmpty
+    $privilege | Should -BeNullOrEmpty
 }
 
 function Uninstall-TestService
@@ -79,7 +79,7 @@ Describe 'Install-Service when using the -WhatIf switch' {
 
     It 'should not install the service ' {
         $service = Get-Service $serviceName -ErrorAction SilentlyContinue
-        $service | Should BeNullOrEmpty
+        $service | Should -BeNullOrEmpty
     }
  }
 
@@ -88,18 +88,18 @@ Describe 'Install-Service when using the -WhatIf switch' {
     $driver = [ServiceProcess.ServiceController]::GetDevices() | Select-Object -First 1
     Install-Service -Name $serviceName -Path $servicePath -Dependency 'AppID' -StartupType Disabled -ErrorVariable 'errors' 
     It 'should not write any errors' {
-        $errors | Should BeNullOrEmpty
+        $errors | Should -BeNullOrEmpty
     }
 
     $service = Get-Service -Name $serviceName
     It 'should install the service' {
-        $service | Should Not BeNullOrEmpty
+        $service | Should -Not -BeNullOrEmpty
     }
 
     # Can't do this with sc.exe. Maybe it works with the services Win32 APIs?
     It 'should set the service''s dependency' -Skip {
-        $service.DependentServices.Count | Should Be 1
-        $service.DependentServices[0].ServiceName | Should Be $driver.ServiceName
+        $service.DependentServices.Count | Should -Be 1
+        $service.DependentServices[0].ServiceName | Should -Be $driver.ServiceName
     }
 }
 
@@ -108,10 +108,10 @@ Describe 'Install-Service when startup type is automatic delayed' {
     Install-Service -Name $serviceName -Path $servicePath -StartupType Automatic -Delayed
     $svc = Get-Service -Name $serviceName
     It 'startup type should be automatic' {
-        $svc.StartMode | Should Be 'Automatic'
+        $svc.StartMode | Should -Be 'Automatic'
     }
     It 'delayed auto start should be true' {
-        $svc.DelayedAutoStart | Should Be $true
+        $svc.DelayedAutoStart | Should -Be $true
     }
 }
 
@@ -120,16 +120,16 @@ Describe 'Install-Service when startup type is changed to automatic delayed' {
     Install-Service -Name $serviceName -Path $servicePath -StartupType Automatic
     $svc = Get-Service -Name $serviceName
     It 'delayed auto start should be false' {
-        $svc.DelayedAutoStart | Should Be $false
+        $svc.DelayedAutoStart | Should -Be $false
     }
 
     Install-Service -Name $serviceName -Path $servicePath -StartupType Automatic -Delayed
     $svc = Get-Service -Name $serviceName
     It 'startup type should be automatic' {
-        $svc.StartMode | Should Be 'Automatic'
+        $svc.StartMode | Should -Be 'Automatic'
     }
     It 'delayed auto start should be true' {
-        $svc.DelayedAutoStart | Should Be $true
+        $svc.DelayedAutoStart | Should -Be $true
     }
 }
 
@@ -144,16 +144,16 @@ Describe 'Install-Service when startup type is changed' {
     $svc = Get-Service -Name $serviceName
     # Regression. When switching from automatic delayed to disabled, error starting the service.
     It 'should not write any errors' {
-        $Global:Error.Count | Should Be 0
+        $Global:Error.Count | Should -Be 0
     }
     It 'startup type should be disabled' {
-        $svc.StartMode | Should Be 'Disabled'
+        $svc.StartMode | Should -Be 'Disabled'
     }
     It 'delayed auto start should be false' {
-        $svc.DelayedAutoStart | Should Be $false
+        $svc.DelayedAutoStart | Should -Be $false
     }
     It 'should leave service stopped' {
-        $svc.Status | Should Be ([ServiceProcess.ServiceControllerStatus]::Stopped)
+        $svc.Status | Should -Be ([ServiceProcess.ServiceControllerStatus]::Stopped)
     }
 }
 
@@ -164,7 +164,7 @@ Describe 'Install-Service when service is stopped and service should be started'
     $Global:Error.Clear()
     Install-Service -Name $serviceName -Path $servicePath -StartupType Automatic -EnsureRunning
     It 'should start the service' {
-        Get-Service -Name $serviceName | Select-Object -ExpandProperty 'Status' | Should Be 'Running'
+        Get-Service -Name $serviceName | Select-Object -ExpandProperty 'Status' | Should -Be 'Running'
     }
 }
 
@@ -175,7 +175,7 @@ Describe 'Install-Service when service changing from custom account to default a
     Install-Service -Name $serviceName -Path $servicePath -StartupType Automatic
     $svc = Get-Service -Name $serviceName
     It 'should be running as NetworkService' {
-        $svc.UserName | Should Be (Resolve-IdentityName 'NetworkService')
+        $svc.UserName | Should -Be (Resolve-IdentityName 'NetworkService')
     }
 }
 
@@ -197,13 +197,13 @@ Describe 'Install-Service' {
     
     It 'should install service' {
         $result = Install-Service -Name $serviceName -Path $servicePath @installServiceParams
-        $result | Should BeNullOrEmpty
+        $result | Should -BeNullOrEmpty
         $service = Assert-ServiceInstalled 
-        $service.Status | Should Be 'Running'
-        $service.Name | Should Be $serviceName
-        $service.DisplayName | Should Be $serviceName
-        $service.StartMode | Should Be 'Automatic'
-        $service.UserName | Should Be $defaultServiceAccountName
+        $service.Status | Should -Be 'Running'
+        $service.Name | Should -Be $serviceName
+        $service.DisplayName | Should -Be $serviceName
+        $service.StartMode | Should -Be 'Automatic'
+        $service.UserName | Should -Be $defaultServiceAccountName
     }
     
     It 'should reinstall unchanged service with force parameter' -Skip {
@@ -252,7 +252,7 @@ Describe 'Install-Service' {
         }
         while( $tryNum++ -lt $maxTries )
                                        
-        $serviceReinstalled | Should Be $true
+        $serviceReinstalled | Should -Be $true
     }
     
     It 'should not install service twice' {
@@ -262,22 +262,22 @@ Describe 'Install-Service' {
     
         Stop-Service -Name $serviceName
         $result = Install-Service -Name $serviceName -Path $servicePath @installServiceParams
-        $result | Should BeNullOrEmpty
+        $result | Should -BeNullOrEmpty
         # This could break if Install-Service is ever updated to not start a stopped service
-        (Get-Service -Name $serviceName).Status | Should Be 'Stopped'
+        (Get-Service -Name $serviceName).Status | Should -Be 'Stopped'
     }
     
     It 'should start stopped automatic service' {
         $output = Install-Service -Name $serviceName -Path $servicePath @installServiceParams
-        $output | Should BeNullOrEmpty
+        $output | Should -BeNullOrEmpty
     
         Stop-Service -Name $serviceName
     
         $warnings = @()
         $output = Install-CService -Name $serviceName -Path $servicePath -Description 'something new' @installServiceParams -WarningVariable 'warnings'
-        $output | Should BeNullOrEmpty
-        (Get-Service -Name $serviceName).Status | Should Be 'Running'
-        $warnings.Count | Should Be 0
+        $output | Should -BeNullOrEmpty
+        (Get-Service -Name $serviceName).Status | Should -Be 'Running'
+        $warnings.Count | Should -Be 0
     }
     
     It 'should not install service with space in its path' {
@@ -288,9 +288,9 @@ Describe 'Install-Service' {
             $servicePath = Join-Path -Path $tempDir -ChildPath (Split-Path -Leaf -Path $servicePath)
     
             $svc = Install-Service -Name $serviceName -Path $servicePath @installServiceParams
-            $svc | Should BeNullOrEmpty
+            $svc | Should -BeNullOrEmpty
             $svc = Install-Service -Name $serviceName -Path $servicePath @installServiceParams
-            $svc | Should BeNullOrEmpty
+            $svc | Should -BeNullOrEmpty
         }
         finally
         {
@@ -306,7 +306,7 @@ Describe 'Install-Service' {
     
         Install-Service -Name $serviceName -Path $servicePath @installServiceParams
         Install-Service -Name $serviceName -Path $changedServicePath @installServiceParams
-        (Get-CServiceConfiguration -Name $serviceName).Path | Should Be $changedServicePath
+        (Get-CServiceConfiguration -Name $serviceName).Path | Should -Be $changedServicePath
     }
     
     It 'should install service with argument list' {
@@ -317,10 +317,10 @@ Describe 'Install-Service' {
             $servicePath = Join-Path -Path $tempDir -ChildPath (Split-Path -Leaf -Path $servicePath)
     
             $svc = Install-Service -Name $serviceName -Path $servicePath -ArgumentList "-k","Fu bar","-w",'"Surrounded By Quotes"' @installServiceParams
-            $svc | Should BeNullOrEmpty
-            $Global:Error.Count | Should Be 0
+            $svc | Should -BeNullOrEmpty
+            $Global:Error.Count | Should -Be 0
             $svcConfig = Get-ServiceConfiguration -Name $serviceName
-            $svcConfig.Path | Should Be ('"{0}" -k "Fu bar" -w "Surrounded By Quotes"' -f $servicePath)
+            $svcConfig.Path | Should -Be ('"{0}" -k "Fu bar" -w "Surrounded By Quotes"' -f $servicePath)
         }
         finally
         {
@@ -331,67 +331,67 @@ Describe 'Install-Service' {
     
     It 'should reinstall service if argument list changes' {
         $svc = Install-Service -Name $serviceName -Path $servicePath -ArgumentList "-k","Fu bar" @installServiceParams
-        $svc | Should BeNullOrEmpty
-        $Global:Error.Count | Should Be 0
+        $svc | Should -BeNullOrEmpty
+        $Global:Error.Count | Should -Be 0
         $svc = Install-Service -Name $serviceName -Path $servicePath -ArgumentList "-k","Fubar" @installServiceParams
-        $Global:Error.Count | Should Be 0
-        $svc | Should BeNullOrEmpty
+        $Global:Error.Count | Should -Be 0
+        $svc | Should -BeNullOrEmpty
         $svc = Install-Service -Name $serviceName -Path $servicePath -ArgumentList "-k","Fubar" @installServiceParams
-        $svc | Should BeNullOrEmpty
+        $svc | Should -BeNullOrEmpty
     }
     
     It 'should reinstall service if startup type changes' {
         Install-Service -Name $serviceName -Path $servicePath @installServiceParams
         Install-Service -Name $serviceName -Path $servicePath -StartupType Manual @installServiceParams
-        (Get-Service -Name $serviceName).StartMode | Should Be 'Manual'
+        (Get-Service -Name $serviceName).StartMode | Should -Be 'Manual'
     }
     
     It 'should reinstall service if reset failure count changes' {
         Install-Service -Name $serviceName -Path $servicePath @installServiceParams
         Install-Service -Name $serviceName -Path $servicePath -ResetFailureCount 60 @installServiceParams
-        (Get-ServiceConfiguration -Name $serviceName).ResetPeriod | Should Be 60
+        (Get-ServiceConfiguration -Name $serviceName).ResetPeriod | Should -Be 60
     }
     
     It 'should reinstall service if first failure changes' {
         Install-Service -Name $serviceName -Path $servicePath @installServiceParams
         Install-Service -Name $serviceName -Path $servicePath -OnFirstFailure 'Restart' @installServiceParams
-        (Get-ServiceConfiguration -Name $serviceName).FirstFailure | Should Be 'Restart'
+        (Get-ServiceConfiguration -Name $serviceName).FirstFailure | Should -Be 'Restart'
     }
     
     It 'should reinstall service if second failure changes' {
         Install-Service -Name $serviceName -Path $servicePath @installServiceParams
         Install-Service -Name $serviceName -Path $servicePath -OnSecondFailure 'Restart' @installServiceParams
-        (Get-ServiceConfiguration -Name $serviceName).SecondFailure | Should Be 'Restart'
+        (Get-ServiceConfiguration -Name $serviceName).SecondFailure | Should -Be 'Restart'
     }
     
     It 'should reinstall service if third failure changes' {
         Install-Service -Name $serviceName -Path $servicePath @installServiceParams
         Install-Service -Name $serviceName -Path $servicePath -OnThirdFailure 'Restart' @installServiceParams
-        (Get-ServiceConfiguration -Name $serviceName).ThirdFailure | Should Be 'Restart'
+        (Get-ServiceConfiguration -Name $serviceName).ThirdFailure | Should -Be 'Restart'
     }
     
     It 'should reinstall service if restart delay changes' {
         Install-Service -Name $serviceName -Path $servicePath -OnFirstFailure 'Restart' @installServiceParams
         Install-Service -Name $serviceName -Path $servicePath -OnFirstFailure 'Restart' -RestartDelay (1000*60*5) @installServiceParams
-        (Get-ServiceConfiguration -Name $serviceName).RestartDelayMinutes | Should Be 5
+        (Get-ServiceConfiguration -Name $serviceName).RestartDelayMinutes | Should -Be 5
     }
     
     It 'should reinstall service if reboot delay changes' {
         Install-Service -Name $serviceName -Path $servicePath -OnFirstFailure 'Reboot' @installServiceParams
         Install-Service -Name $serviceName -Path $servicePath -OnFirstFailure 'Reboot' -RebootDelay (1000*60*5) @installServiceParams
-        (Get-ServiceConfiguration -Name $serviceName).RebootDelayMinutes | Should Be 5
+        (Get-ServiceConfiguration -Name $serviceName).RebootDelayMinutes | Should -Be 5
     }
     
     It 'should reinstall service if command changes' {
         Install-Service -Name $serviceName -Path $servicePath -OnFirstFailure RunCommand -Command 'fubar' @installServiceParams
         Install-Service -Name $serviceName -Path $servicePath -OnFirstFailure RunCommand -command 'fubar2' @installServiceParams
-        (Get-ServiceConfiguration -Name $serviceName).FailureProgram | Should Be 'fubar2'
+        (Get-ServiceConfiguration -Name $serviceName).FailureProgram | Should -Be 'fubar2'
     }
     
     It 'should reinstall service if run delay changes' {
         Install-Service -Name $serviceName -Path $servicePath -OnFirstFailure RunCommand -Command 'fubar' -RunCommandDelay 60000 @installServiceParams
         Install-Service -Name $serviceName -Path $servicePath -OnFirstFailure RunCommand -command 'fubar' -RunCommandDelay 30000 @installServiceParams
-        (Get-ServiceConfiguration -Name $serviceName).RunCommandDelay | Should Be 30000
+        (Get-ServiceConfiguration -Name $serviceName).RunCommandDelay | Should -Be 30000
     }
     
     It 'should reinstall service if dependencies change' {
@@ -407,10 +407,10 @@ Describe 'Install-Service' {
             {
                 Install-Service -Name $serviceName -Path $servicePath  @installServiceParams
                 Install-Service -Name $serviceName -Path $servicePath -Dependency $service2Name @installServiceParams
-                (Get-Service -Name $serviceName).ServicesDependedOn[0].Name | Should Be $service2Name
+                (Get-Service -Name $serviceName).ServicesDependedOn[0].Name | Should -Be $service2Name
     
                 Install-Service -Name $serviceName -Path $servicePath -Dependency $service3Name @installServiceParams
-                (Get-Service -Name $serviceName).ServicesDependedOn[0].Name | Should Be $service3Name
+                (Get-Service -Name $serviceName).ServicesDependedOn[0].Name | Should -Be $service3Name
             }
             finally
             {
@@ -427,7 +427,7 @@ Describe 'Install-Service' {
     It 'should reinstall service if username changes' {
         Install-Service -Name $serviceName -Path $servicePath @installServiceParams
         Install-Service -Name $serviceName -Path $servicePath -Username 'SYSTEM' @installServiceParams
-        (Get-ServiceConfiguration -Name $serviceName).UserName | Should Be 'NT AUTHORITY\SYSTEM'
+        (Get-ServiceConfiguration -Name $serviceName).UserName | Should -Be 'NT AUTHORITY\SYSTEM'
     }
     
     It 'should update service properties' {
@@ -439,16 +439,16 @@ Describe 'Install-Service' {
         Copy-Item $servicePath $newServicePath
         Install-Service -Name $serviceName -Path $newServicePath -StartupType 'Manual' -Username $serviceAcct -Password $servicePassword @installServiceParams
         $service = Assert-ServiceInstalled
-        $service.StartMode | Should Be 'Manual'
-        $service.UserName | Should Be ".\$serviceAcct"
-        $service.Status | Should Be 'Running'
+        $service.StartMode | Should -Be 'Manual'
+        $service.UserName | Should -Be ".\$serviceAcct"
+        $service.Status | Should -Be 'Running'
         Assert-HasPermissionsOnServiceExecutable $serviceAcct $newServicePath
     }
     
     It 'should set startup type' {
         Install-Service -Name $serviceName -Path $servicePath -StartupType 'Manual' @installServiceParams
         $service = Assert-ServiceInstalled
-        $service.StartMode | Should Be 'Manual'
+        $service.StartMode | Should -Be 'Manual'
     }
 }
 
@@ -457,9 +457,9 @@ Describe 'Install-Service.when passed a custom account' {
         Init
         Install-CService -Name $serviceName -Path $servicePath -UserName $serviceAcct -Password $servicePassword @installServiceParams
         $service = Assert-ServiceInstalled
-        $service.UserName | Should Be ".\$($serviceAcct)"
+        $service.UserName | Should -Be ".\$($serviceAcct)"
         $service = Get-Service $serviceName
-        $service.Status | Should Be 'Running'
+        $service.Status | Should -Be 'Running'
     }
 }
 
@@ -480,7 +480,7 @@ Describe 'Re-Install-Service when service account''s privileges and file system 
         Assert-HasPermissionsOnServiceExecutable $serviceAcct $servicePath
         Revoke-CPermission -Path $servicePath -Identity $serviceAcct
         $currentPermissions = Get-CPermission -Identity $serviceAcct -Path $servicePath
-        $currentPermissions | Should BeNullOrEmpty
+        $currentPermissions | Should -BeNullOrEmpty
         Install-CService -Name $serviceName -Path $servicePath -Credential $serviceCredential
         $currentPermissions = Get-CPermission -Identity $serviceAcct -Path $servicePath
         Assert-HasPermissionsOnServiceExecutable $serviceAcct $servicePath
@@ -492,32 +492,32 @@ Describe 'Install-Service' {
     It 'should set custom account with no password' {
         $Error.Clear()
         Install-Service -Name $serviceName -Path $servicePath -UserName $serviceAcct -ErrorAction SilentlyContinue @installServiceParams
-        $Error.Count | Should BeGreaterThan 0
+        $Error.Count | Should -BeGreaterThan 0
         $service = Assert-ServiceInstalled
-        $service.UserName | Should Be ".\$($serviceAcct)"
+        $service.UserName | Should -Be ".\$($serviceAcct)"
         $service = Get-Service $serviceName
-        $service.Status | Should Be 'Stopped'
+        $service.Status | Should -Be 'Stopped'
     }
     
     It 'should set custom account with credential' {
         $credential = New-Credential -UserName $serviceAcct -Password $servicePassword
         Install-Service -Name $serviceName -Path $servicePath -Credential $credential @installServiceParams
         $service = Assert-ServiceInstalled
-        $service.UserName | Should Be ".\$($serviceAcct)"
+        $service.UserName | Should -Be ".\$($serviceAcct)"
         $service = Get-Service $serviceName
-        $service.Status | Should Be 'Running'
+        $service.Status | Should -Be 'Running'
     }
     
     It 'should set failure actions' {
         Install-Service -Name $serviceName -Path $servicePath @installServiceParams
         $service = Assert-ServiceInstalled
         $config = Get-Serviceconfiguration -Name $serviceName
-        $config.FirstFailure | Should Be 'TakeNoAction'
-        $config.SecondFailure | Should Be 'TakeNoAction'
-        $config.ThirdFailure | Should Be 'TakeNoAction'
-        $config.RebootDelay | Should Be 0
-        $config.ResetPeriod | Should Be 0
-        $config.RestartDelay | Should Be 0
+        $config.FirstFailure | Should -Be 'TakeNoAction'
+        $config.SecondFailure | Should -Be 'TakeNoAction'
+        $config.ThirdFailure | Should -Be 'TakeNoAction'
+        $config.RebootDelay | Should -Be 0
+        $config.ResetPeriod | Should -Be 0
+        $config.RestartDelay | Should -Be 0
     
         Install-Service -Name $serviceName `
                         -Path $servicePath `
@@ -532,29 +532,29 @@ Describe 'Install-Service' {
                         @installServiceParams
     
         $config = Get-ServiceConfiguration -Name $serviceName
-        $config.FirstFailure | Should Be 'RunCommand'
-        $config.FailureProgram | Should Be 'echo Fubar!'
-        $config.SecondFailure | Should Be 'Restart'
-        $config.ThirdFailure | Should Be 'Reboot'
-        $config.RebootDelay | Should Be 30000
-        $config.RebootDelayMinutes | Should Be 0
-        $config.ResetPeriod | Should Be 1
-        $config.ResetPeriodDays | Should Be 0
-        $config.RestartDelay | Should Be 18000
-        $config.RestartDelayMinutes | Should Be 0
-        $config.RunCommandDelay | Should Be 6000
-        $config.RunCommandDelayMinutes | Should Be 0
+        $config.FirstFailure | Should -Be 'RunCommand'
+        $config.FailureProgram | Should -Be 'echo Fubar!'
+        $config.SecondFailure | Should -Be 'Restart'
+        $config.ThirdFailure | Should -Be 'Reboot'
+        $config.RebootDelay | Should -Be 30000
+        $config.RebootDelayMinutes | Should -Be 0
+        $config.ResetPeriod | Should -Be 1
+        $config.ResetPeriodDays | Should -Be 0
+        $config.RestartDelay | Should -Be 18000
+        $config.RestartDelayMinutes | Should -Be 0
+        $config.RunCommandDelay | Should -Be 6000
+        $config.RunCommandDelayMinutes | Should -Be 0
     }
     
     It 'should clear command' {
         Install-Service -Name $serviceName -Path $servicePath -OnFirstFailure RunCommand -Command 'fubar' @installServiceParams
         $config = Get-ServiceConfiguration -Name $serviceName
-        $config.FailureProgram | Should Be 'fubar'
-        $config.RunCommandDelay | Should Be 0
+        $config.FailureProgram | Should -Be 'fubar'
+        $config.RunCommandDelay | Should -Be 0
     
         Install-Service -Name $serviceName -Path $servicePath
         $config = Get-ServiceConfiguration -Name $serviceName
-        $config.FailureProgram | Should BeNullOrEmpty
+        $config.FailureProgram | Should -BeNullOrEmpty
     }
     
     It 'should set dependencies' {
@@ -562,16 +562,16 @@ Describe 'Install-Service' {
         $secondService = (Get-Service)[1]
         Install-Service -Name $serviceName -Path $servicePath -Dependencies $firstService.Name,$secondService.Name @installServiceParams
         $dependencies = & (Join-Path $env:SystemRoot system32\sc.exe) enumdepend $firstService.Name
-        $dependencies | Where-Object { $_ -eq "SERVICE_NAME: $serviceName" } | Should Not BeNullOrEmpty
+        $dependencies | Where-Object { $_ -eq "SERVICE_NAME: $serviceName" } | Should -Not -BeNullOrEmpty
         $dependencies = & (Join-Path $env:SystemRoot system32\sc.exe) enumdepend $secondService.Name
-        $dependencies | Where-Object { $_ -eq "SERVICE_NAME: $serviceName" } | Should Not BeNullOrEmpty
+        $dependencies | Where-Object { $_ -eq "SERVICE_NAME: $serviceName" } | Should -Not -BeNullOrEmpty
     }
     
     It 'should test dependencies exist' {
         $error.Clear()
         Install-Service -Name $serviceName -Path $servicePath -Dependencies IAmAServiceThatDoesNotExist -ErrorAction SilentlyContinue @installServiceParams
-        $error.Count | Should Be 1
-        (Test-CService -Name $serviceName) | Should Be $false
+        $error.Count | Should -Be 1
+        (Test-CService -Name $serviceName) | Should -Be $false
     }
     
     It 'should install service with relative path' {
@@ -586,7 +586,7 @@ Describe 'Install-Service' {
             Install-Service -Name $serviceName -Path $path @installServiceParams
             $service = Assert-ServiceInstalled 
             $svc = Get-WmiObject -Class 'Win32_Service' -Filter ('Name = "{0}"' -f $serviceName)
-            $svc.PathName | Should Be $servicePath
+            $svc.PathName | Should -Be $servicePath
         }
         finally
         {
@@ -602,12 +602,12 @@ Describe 'Install-Service' {
             Install-Service -Name $serviceName -Path $servicePath -Dependency $service2Name @installServiceParams
     
             $service = Get-Service -Name $serviceName
-            $service.ServicesDependedOn.Length | Should Be 1
-            $service.ServicesDependedOn[0].Name | Should Be $service2Name
+            $service.ServicesDependedOn.Length | Should -Be 1
+            $service.ServicesDependedOn[0].Name | Should -Be $service2Name
     
             Install-Service -Name $serviceName -Path $servicePath
             $service = Get-Service -Name $serviceName
-            $service.ServicesDependedOn.Length | Should Be 0
+            $service.ServicesDependedOn.Length | Should -Be 0
         }
         finally
         {
@@ -618,114 +618,114 @@ Describe 'Install-Service' {
     It 'should not start manual service' {
         Install-Service -Name $serviceName -Path $servicePath -StartupType Manual @installServiceParams
         $service = Get-Service -Name $serviceName
-        $service | Should Not BeNullOrEmpty
-        $service.Status | Should Be 'Stopped'
+        $service | Should -Not -BeNullOrEmpty
+        $service.Status | Should -Be 'Stopped'
     
         Install-Service -Name $serviceName -Path $servicePath -StartupType Manual -Force @installServiceParams
         $service = Get-Service -Name $serviceName
-        $service.Status | Should Be 'Stopped'
+        $service.Status | Should -Be 'Stopped'
     
         Start-Service -Name $serviceName
         Install-Service -Name $serviceName -Path $servicePath -StartupType Manual -Force @installServiceParams
         $service = Get-Service -Name $serviceName
-        $service.Status | Should Be 'Running'
+        $service.Status | Should -Be 'Running'
     }
     
     It 'should not start disabled service' {
         Install-Service -Name $serviceName -Path $servicePath -StartupType Disabled @installServiceParams
         $service = Get-Service -Name $serviceName
-        $service | Should Not BeNullOrEmpty
-        $service.Status | Should Be 'Stopped'
+        $service | Should -Not -BeNullOrEmpty
+        $service.Status | Should -Be 'Stopped'
     
         Install-Service -Name $serviceName -Path $servicePath -StartupType Disabled -Force @installServiceParams
         $service = Get-Service -Name $serviceName
-        $service.Status | Should Be 'Stopped'
+        $service.Status | Should -Be 'Stopped'
     }
     
     It 'should start a stopped automatic service' {
         Install-Service -Name $serviceName -Path $servicePath -StartupType Automatic @installServiceParams
         $service = Get-Service -Name $serviceName
-        $service | Should Not BeNullOrEmpty
-        $service.Status | Should Be 'Running'
+        $service | Should -Not -BeNullOrEmpty
+        $service.Status | Should -Be 'Running'
     
         Stop-Service -Name $serviceName
         Install-Service -Name $serviceName -Path $servicePath -StartupType Automatic -Force @installServiceParams
         $service = Get-Service -Name $serviceName
-        $service.Status | Should Be 'Running'
+        $service.Status | Should -Be 'Running'
     }
     
     It 'should return service object' {
         $svc = Install-Service -Name $serviceName -Path $servicePath -StartupType Automatic -PassThru @installServiceParams
-        $svc | Should Not BeNullOrEmpty
-        $svc.Name | Should Be $serviceName
+        $svc | Should -Not -BeNullOrEmpty
+        $svc.Name | Should -Be $serviceName
     
         # Change service, make sure  object reeturned
         $svc = Install-Service -Name $serviceName -Path $servicePath -StartupType Manual -PassThru @installServiceParams
-        $svc | Should Not BeNullOrEmpty
-        $svc.Name | Should Be $serviceName
+        $svc | Should -Not -BeNullOrEmpty
+        $svc.Name | Should -Be $serviceName
     
         # No changes, service still returned
         $svc = Install-Service -Name $serviceName -Path $servicePath -StartupType Manual -PassThru @installServiceParams
-        $svc | Should Not BeNullOrEmpty
-        $svc.Name | Should Be $serviceName
+        $svc | Should -Not -BeNullOrEmpty
+        $svc.Name | Should -Be $serviceName
     }
     
     It 'should set description' {
         $description = [Guid]::NewGuid()
         $output = Install-Service -Name $serviceName -Path $servicePath -Description $description @installServiceParams
-        $output | Should BeNullOrEmpty
+        $output | Should -BeNullOrEmpty
     
         $svc = Get-Service -Name $serviceName
-        $svc | Should Not BeNullOrEmpty
-        $svc.Description | Should Be $description
+        $svc | Should -Not -BeNullOrEmpty
+        $svc.Description | Should -Be $description
     
         $description = [Guid]::NewGuid().ToString()
         $output = Install-Service -Name $serviceName -Path $servicePath -Description $description @installServiceParams
-        $output | Should BeNullOrEmpty
+        $output | Should -BeNullOrEmpty
     
         $svc = Get-Service -Name $serviceName
-        $svc | Should Not BeNullOrEmpty
-        $svc.Description | Should Be $description
+        $svc | Should -Not -BeNullOrEmpty
+        $svc.Description | Should -Be $description
     
         # Should preserve the description
         $output = Install-Service -Name $serviceName -Path $servicePath @installServiceParams
-        $output | Should BeNullOrEmpty
-        $svc.Description | Should Be $description
+        $output | Should -BeNullOrEmpty
+        $svc.Description | Should -Be $description
     }
     
     It 'should set display name' {
         $displayName = [Guid]::NewGuid().ToString()
         $output = Install-Service -Name $serviceName -Path $servicePath -DisplayName $displayName @installServiceParams
-        $output | Should BeNullOrEmpty
+        $output | Should -BeNullOrEmpty
     
         $svc = Get-Service -Name $serviceName
-        $svc | Should Not BeNullOrEmpty
-        $svc.DisplayName | Should Be $displayName
+        $svc | Should -Not -BeNullOrEmpty
+        $svc.DisplayName | Should -Be $displayName
     
         $displayName = [Guid]::NewGuid().ToString()
         $output = Install-Service -Name $serviceName -Path $servicePath -DisplayName $displayName @installServiceParams
-        $output | Should BeNullOrEmpty
+        $output | Should -BeNullOrEmpty
     
         $svc = Get-Service -Name $serviceName
-        $svc | Should Not BeNullOrEmpty
-        $svc.DisplayName | Should Be $displayName
+        $svc | Should -Not -BeNullOrEmpty
+        $svc.DisplayName | Should -Be $displayName
     
         $output = Install-Service -Name $serviceName -Path $servicePath @installServiceParams
-        $output | Should BeNullOrEmpty
+        $output | Should -BeNullOrEmpty
     
         $svc = Get-Service -Name $serviceName
-        $svc | Should Not BeNullOrEmpty
-        $svc.DisplayName | Should Be $serviceName
+        $svc | Should -Not -BeNullOrEmpty
+        $svc.DisplayName | Should -Be $serviceName
     
     }
     
     It 'should switch from built-in account to custom acount with credential' {
         Install-Service -Name $serviceName -Path $servicePath @installServiceParams
         $service = Assert-ServiceInstalled
-        $service.UserName | Should Be $defaultServiceAccountName
+        $service.UserName | Should -Be $defaultServiceAccountName
         Install-Service -Name $serviceName -Path $servicePath -Credential $serviceCredential
         $service = Assert-ServiceInstalled
-        (Resolve-IdentityName $service.UserName) | Should Be (Resolve-IdentityName $serviceCredential.UserName)
+        (Resolve-IdentityName $service.UserName) | Should -Be (Resolve-IdentityName $serviceCredential.UserName)
     }
 
 }
