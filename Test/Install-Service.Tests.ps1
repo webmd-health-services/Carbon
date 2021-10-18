@@ -50,6 +50,24 @@ function Assert-HasPermissionsOnServiceExecutable($Identity, $Path)
     ([Security.AccessControl.FileSystemRights]::ReadAndExecute) | Should Be ($access.FileSystemRights -band [Security.AccessControl.FileSystemRights]::ReadAndExecute)
 }
 
+function Assert-HasNoPermissionsOnServiceExecutable($Identity, $Path)
+{
+    $access = Get-CPermission -Path $Path -Identity $Identity
+    $access | Should BeNullOrEmpty
+}
+
+function Assert-HasPrivilegesOnServiceExecutable($Identity)
+{
+    $privilege = Get-CPrivilege -Identity $Identity
+    $privilege | Should Not BeNullOrEmpty
+}
+
+function Assert-HasPrivilegesRemovedOnServiceExecutable($Identity)
+{
+    $privilege = Get-CPrivilege -Identity $Identity
+    $privilege | Should BeNullOrEmpty
+}
+
 function Uninstall-TestService
 {
     Uninstall-Service $serviceName
@@ -65,7 +83,7 @@ Describe 'Install-Service when using the -WhatIf switch' {
     }
  }
 
- Describe 'Install-Service when a service depends on a device driver' {
+  Describe 'Install-Service when a service depends on a device driver' {
     Init
     $driver = [ServiceProcess.ServiceController]::GetDevices() | Select-Object -First 1
     Install-Service -Name $serviceName -Path $servicePath -Dependency 'AppID' -StartupType Disabled -ErrorVariable 'errors' 
@@ -442,6 +460,30 @@ Describe 'Install-Service.when passed a custom account' {
         $service.UserName | Should Be ".\$($serviceAcct)"
         $service = Get-Service $serviceName
         $service.Status | Should Be 'Running'
+    }
+}
+
+Describe 'Re-Install-Service when service account''s privileges and file system permissions have changed'{
+    Init
+    Install-CService -Name $serviceName -Path $servicePath -Credential $serviceCredential @installServiceParams
+
+    It 'should re-install the service with previously removed privileges' {
+        Assert-HasPrivilegesOnServiceExecutable $serviceAcct
+        $currentPrivileges = Get-CPrivilege -Identity $serviceAcct
+        Revoke-CPrivilege -Identity $serviceAcct -Privilege $currentPrivileges
+        Assert-HasPrivilegesRemovedOnServiceExecutable $serviceAcct
+        Install-CService -Name $serviceName -Path $servicePath -Credential $serviceCredential
+        Assert-HasPrivilegesOnServiceExecutable $serviceAcct
+    }
+
+    It 'should re-install the service with previously removed permissions'{
+        Assert-HasPermissionsOnServiceExecutable $serviceAcct $servicePath
+        Revoke-CPermission -Path $servicePath -Identity $serviceAcct
+        $currentPermissions = Get-CPermission -Identity $serviceAcct -Path $servicePath
+        $currentPermissions | Should BeNullOrEmpty
+        Install-CService -Name $serviceName -Path $servicePath -Credential $serviceCredential
+        $currentPermissions = Get-CPermission -Identity $serviceAcct -Path $servicePath
+        Assert-HasPermissionsOnServiceExecutable $serviceAcct $servicePath
     }
 }
 
