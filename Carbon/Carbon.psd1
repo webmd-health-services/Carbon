@@ -359,11 +359,13 @@ All functions are idempotent: when run multiple times with the same arguments, y
 
             # ReleaseNotes of this module
             ReleaseNotes = @'
+
 # 2.11.0
 
 * Fixed: Resolve-CPathCase fails on PowerShell Core.
 * New: 'Grant-Permission', 'Get-Permission', and 'Revoke-Permission' scripts now execute correctly on
 non-Windows platforms.
+* Fixed: Install-CService now will update services when file permissions or user account privileges have changed.
 '@
         } # End of PSData hashtable
     
