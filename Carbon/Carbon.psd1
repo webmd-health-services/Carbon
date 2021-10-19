@@ -1,9 +1,9 @@
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# 
+#
 #     http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -38,7 +38,7 @@
 
     # Copyright statement for this module
     Copyright = 'Aaron Jensen and WebMD Health Services'
-    
+
     # Description of the functionality provided by this module
     Description = @'
 Carbon is a PowerShell module for automating the configuration Windows 7, 8, 2008, and 2012 and automation the installation and configuration of Windows applications, websites, and services. It can configure and manage:
@@ -98,8 +98,8 @@ All functions are idempotent: when run multiple times with the same arguments, y
                       )
 
     # Format files (.ps1xml) to be loaded when importing this module
-    FormatsToProcess = @( 
-                            'Carbon.format.ps1xml', 
+    FormatsToProcess = @(
+                            'Carbon.format.ps1xml',
                             'Formats\Carbon.Security.HttpUrlAcl.format.ps1xml',
                             'Formats\Schedule.Service.RegisteredTask.format.ps1xml'
                         )
@@ -359,13 +359,15 @@ All functions are idempotent: when run multiple times with the same arguments, y
 
             # ReleaseNotes of this module
             ReleaseNotes = @'
+
 # 2.11.0
 
 * Fixed: Resolve-CPathCase fails on PowerShell Core.
 * New: 'Grant-Permission', 'Get-Permission', and 'Revoke-Permission' scripts now execute correctly on
 non-Windows platforms.
+* Fixed: Install-CService now will update services when file permissions or user account privileges have changed.
 '@
         } # End of PSData hashtable
-    
+
     } # End of PrivateData hashtable
 }

@@ -54,8 +54,8 @@ Describe 'License Notices' {
                 {
                     '^\.ps(m|d)*1$'
                     {
-                        $expectedNotice = $noticeLines -join ('{0}# ' -f ([Environment]::NewLine))
-                        $expectedNotice = '# {0}' -f $expectedNotice
+                        $expectedNotice = $noticeLines | ForEach-Object { if ($_.length -gt 0) {"# $_"} else {"#"} }
+                        $expectedNotice = $expectedNotice -join [Environment]::NewLine
                         if( $file.StartsWith('<#') )
                         {
                             $file.Contains( $expectedNotice )
@@ -103,7 +103,7 @@ Describe 'License Notices' {
     
         if( $filesMissingLicense )
         {
-                ,$filesMissingLicense | Should BeNullOrEmpty
+                ,$filesMissingLicense | Should -BeNullOrEmpty
         }
     }
 }
