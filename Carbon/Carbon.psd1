@@ -1,9 +1,9 @@
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# 
+#
 #     http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -25,7 +25,7 @@
     RootModule = 'Carbon.psm1'
 
     # Version number of this module.
-    ModuleVersion = '2.10.1'
+    ModuleVersion = '2.11.0'
 
     # ID used to uniquely identify this module
     GUID = '075d9444-c01b-48c3-889a-0b3490716fa2'
@@ -38,7 +38,7 @@
 
     # Copyright statement for this module
     Copyright = 'Aaron Jensen and WebMD Health Services'
-    
+
     # Description of the functionality provided by this module
     Description = @'
 Carbon is a PowerShell module for automating the configuration Windows 7, 8, 2008, and 2012 and automation the installation and configuration of Windows applications, websites, and services. It can configure and manage:
@@ -98,8 +98,8 @@ All functions are idempotent: when run multiple times with the same arguments, y
                       )
 
     # Format files (.ps1xml) to be loaded when importing this module
-    FormatsToProcess = @( 
-                            'Carbon.format.ps1xml', 
+    FormatsToProcess = @(
+                            'Carbon.format.ps1xml',
                             'Formats\Carbon.Security.HttpUrlAcl.format.ps1xml',
                             'Formats\Schedule.Service.RegisteredTask.format.ps1xml'
                         )
@@ -359,20 +359,15 @@ All functions are idempotent: when run multiple times with the same arguments, y
 
             # ReleaseNotes of this module
             ReleaseNotes = @'
-**Please read 2.10.0 release notes for upgrade notes if you're upgrading from Carbon 2.9.x or earlier.***
 
-* Fixed: the `Install-CCertificate` function causes an extra file to be written to the Windows directory where private
-keys are saved. Depending on your environment, this could put many, many extra very small files on the file system or a
-full disk.
-* Fixed: the `Install-CCertificate` function could fail to install a certificate with a private key in a remote
-computer's LocalMachine store if you passed in a certificate object to install.
-* Fixed: the `Install-CCertificate` function always installs a certificate even if it exists in the destination store.
-Depending on your environment, this could put many, many extra very small files on the file system or a full disk. Use
-the `-Force` switch to always install a certificate even if it already exists in the destination store.
-* Added a `-Force` switch to the `Install-CCertificate` function to force certificates to be installed if they already
-exist in the destination store.
+# 2.11.0
+
+* Fixed: Resolve-CPathCase fails on PowerShell Core.
+* New: 'Grant-Permission', 'Get-Permission', and 'Revoke-Permission' scripts now execute correctly on
+non-Windows platforms.
+* Fixed: Install-CService now will update services when file permissions or user account privileges have changed.
 '@
         } # End of PSData hashtable
-    
+
     } # End of PrivateData hashtable
 }

@@ -213,7 +213,7 @@ function Install-CService
         }
         elseif( $Password )
         {
-            Write-Warning ('`Install-CService` function''s `Password` parameter is obsolete and will be removed in a future major version of Carbon. Please use the `Credential` parameter instead.')
+            Write-CWarningOnce ('`Install-CService` function''s `Password` parameter is obsolete and will be removed in a future major version of Carbon. Please use the `Credential` parameter instead.')
             $Credential = New-CCredential -UserName $UserName -Password $Password
         }
         else
@@ -245,24 +245,45 @@ function Install-CService
     }
 
 
-    if( $ArgumentList )	
-    {	
-        $binPathArg = Invoke-Command -ScriptBlock {	
-                            $Path	
-                            $ArgumentList 	
-                        } |	
-                        ForEach-Object { 	
-                            if( $_.Contains(' ') )	
-                            {	
-                                return '"{0}"' -f $_.Trim('"')	
-                            }	
-                            return $_	
-                        }	
-        $binPathArg = $binPathArg -join ' '	
-    }	
-    else	
-    {	
-        $binPathArg = $Path	
+    if( $ArgumentList )
+    {
+        $binPathArg = Invoke-Command -ScriptBlock {
+                            $Path
+                            $ArgumentList
+                        } |
+                        ForEach-Object {
+                            if( $_.Contains(' ') )
+                            {
+                                return '"{0}"' -f $_.Trim('"')
+                            }
+                            return $_
+                        }
+        $binPathArg = $binPathArg -join ' '
+    }
+    else
+    {
+        $binPathArg = $Path
+    }
+
+    $passwordArgName = ''
+    $passwordArgValue = ''
+    if( $PSCmdlet.ParameterSetName -like 'CustomAccount*' )
+    {
+        if( $Credential )
+        {
+            $passwordArgName = 'password='
+            $passwordArgValue = $Credential.GetNetworkCredential().Password -replace '"', '\"'
+        }
+
+        if( $PSCmdlet.ShouldProcess( $identity.FullName, "grant the log on as a service right" ) )
+        {
+            Grant-CPrivilege -Identity $identity.FullName -Privilege SeServiceLogonRight
+        }
+    }
+
+    if( $PSCmdlet.ShouldProcess( $Path, ('grant {0} ReadAndExecute permissions' -f $identity.FullName) ) )
+    {
+        Grant-CPermission -Identity $identity.FullName -Permission ReadAndExecute -Path $Path
     }
 
     $doInstall = $false
@@ -425,30 +446,9 @@ function Install-CService
         {
             $startArg = 'disabled'
         }
-    
-        $passwordArgName = ''
-        $passwordArgValue = ''
-        if( $PSCmdlet.ParameterSetName -like 'CustomAccount*' )
-        {
-            if( $Credential )
-            {
-                $passwordArgName = 'password='
-                $passwordArgValue = $Credential.GetNetworkCredential().Password -replace '"', '\"'
-            }
-        
-            if( $PSCmdlet.ShouldProcess( $identity.FullName, "grant the log on as a service right" ) )
-            {
-                Grant-CPrivilege -Identity $identity.FullName -Privilege SeServiceLogonRight
-            }
-        }
-    
-        if( $PSCmdlet.ShouldProcess( $Path, ('grant {0} ReadAndExecute permissions' -f $identity.FullName) ) )
-        {
-            Grant-CPermission -Identity $identity.FullName -Permission ReadAndExecute -Path $Path
-        }
-    
+
         $service = Get-Service -Name $Name -ErrorAction Ignore
-    
+
         $operation = 'create'
         $serviceIsRunningStatus = @(
                                       [ServiceProcess.ServiceControllerStatus]::Running,
@@ -500,7 +500,7 @@ function Install-CService
         $binPathArg = $binPathArg -replace '"','\"'
         if( $PSCmdlet.ShouldProcess( "$Name [$Path]", "$operation service" ) )
         {
-            Write-Verbose "$sc $operation $Name binPath= $binPathArg start= $startArg obj= $($identity.FullName) $passwordArgName $('*' * $passwordArgValue.Length) depend= $dependencyArgValue $displayNameArgName $displayNameArgValue" -Verbose
+            Write-Verbose "$sc $operation $Name binPath= $binPathArg start= $startArg obj= $($identity.FullName) $passwordArgName $('*' * $passwordArgValue.Length) depend= $dependencyArgValue $displayNameArgName $displayNameArgValue"
             & $sc $operation $Name binPath= $binPathArg start= $startArg obj= $identity.FullName $passwordArgName $passwordArgValue depend= $dependencyArgValue $displayNameArgName $displayNameArgValue |
                 Write-Verbose
             $scExitCode = $LastExitCode

@@ -247,7 +247,7 @@ function Compress-Item
         $msg = "The Carbon module's ""Compress-Item"" function was renamed to ""Compress-CItem"". Please update " +
                 "your code to use the new ""Compress-CItem"" name. The old ""Compress-Item"" function will be " +
                 'removed in the next major version of Carbon.'
-        Write-Warning -Message $msg
+        Write-CWarningOnce -Message $msg
 
         $paths = New-Object 'Collections.ArrayList'
     }

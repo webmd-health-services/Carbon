@@ -53,7 +53,7 @@ function ConvertTo-CBase64
         {
             $msg = 'Carbon''s "ConvertTo-CBase64" function is OBSOLETE and will be removed in the next major version ' +
                    'of Carbon. Use the "ConvertTo-CBase64" function in the new Carbon.Core module.'
-            Write-Warning -Message $msg
+            Write-CWarningOnce -Message $msg
         }
     }
 

@@ -27,9 +27,9 @@ Set-StrictMode -Version 'Latest'
 
 & (Join-Path -Path $PSScriptRoot -ChildPath 'Carbon\Import-Carbon.ps1' -Resolve)
 
-$installRoot = Get-PowerShellModuleInstallPath
+$installRoot = Get-CPowerShellModuleInstallPath
 $carbonModuleRoot = Join-Path -Path $installRoot -ChildPath 'Carbon'
-Install-Junction -Link $carbonModuleRoot -Target (Join-Path -Path $PSScriptRoot -ChildPath 'Carbon' -Resolve) #| Format-Table | Out-String | Write-Verbose
+Install-CJunction -Link $carbonModuleRoot -Target (Join-Path -Path $PSScriptRoot -ChildPath 'Carbon' -Resolve) #| Format-Table | Out-String | Write-Verbose
 
 if( (Test-Path -Path 'env:APPVEYOR') )
 {
@@ -81,4 +81,4 @@ configuration Yolo
 
 #Get-DscResource | Format-Table
 
-Clear-DscLocalResourceCache
+Clear-CDscLocalResourceCache

@@ -14,11 +14,11 @@ $importCarbonPath = Join-Path -Path $PSScriptRoot -ChildPath '..\Carbon\Import-C
 
 function Init
 {
-    $Global:Error.Clear()
     if( (Get-Module 'Carbon') )
     {
         Remove-Module 'Carbon' -Force
     }
+    $Global:Error.Clear()
 }
 
 function Reset
@@ -121,7 +121,6 @@ Describe 'Import-CarbonPs1.when importing multiple times from different location
     AfterEach { Reset }
     It 'should import without errors' {
         Init
-        $Global:Error.Clear()
         $otherCarbonModulesRoot = Join-Path -Path $TestDrive.FullName -ChildPath ([IO.Path]::GetRandomFileName())
         New-Item -Path $otherCarbonModulesRoot -ItemType 'Directory'
         Copy-Item -Path ($importCarbonPath | Split-Path -Parent) -Destination $otherCarbonModulesRoot -Recurse
@@ -139,12 +138,30 @@ Describe 'Import-CarbonPs1.when importing multiple times from same location' {
     AfterEach { Reset }
     It 'should not remove or import' {
         Init
-        $Global:Error.Clear()
         & $importCarbonPath
         Mock -CommandName 'Import-Module'
         Mock -CommandName 'Remove-Module'
         & $importCarbonPath
         Assert-MockCalled -CommandName 'Remove-Module' -Times 0
         Assert-MockCalled -CommandName 'Import-Module' -Times 1
+    }
+}
+
+if( (Test-Path -Path 'env:SystemRoot') )
+{
+    Describe 'Import-CarbonPs1.when IIS isn''t installed' {
+        AfterEach { 
+            Reset 
+            Remove-Item -Path 'env:CARBON_SKIP_IIS_IMPORT'
+        }
+        It 'should import successfully' {
+            Init
+            $env:CARBON_SKIP_IIS_IMPORT = 'True'
+            & $importCarbonPath
+            $Global:Error | Should -BeNullOrEmpty
+            (Get-Command -Module 'Carbon') | Should -Not -BeNullOrEmpty
+            (Get-Command -Module 'Carbon' -Name '*-Iis*') | Should -BeNullOrEmpty
+            (Get-Command -Module 'Carbon' -Name '*-CIis*') | Should -BeNullOrEmpty
+        }
     }
 }

@@ -31,7 +31,7 @@ function Test-CPowerShellIs32Bit
     {
         $msg = 'Carbon''s "Test-CPowerShellIs32Bit" function is OBSOLETE and will be removed in the next major ' +
                'version of Carbon. Use the new "Test-CPowerShell" function in the new Carbon.Core module instead.'
-        Write-Warning -Message $msg
+        Write-CWarningOnce -Message $msg
     }
 
     return -not (Test-CPowerShellIs64Bit -NoWarn)

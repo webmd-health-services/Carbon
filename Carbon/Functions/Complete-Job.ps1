@@ -29,7 +29,7 @@ function Complete-CJob
 
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
-    Write-Warning ('Complete-CJob is obsolete and will be removed in a future major version of Carbon. Use PowerShell''s `Wait-Job` cmdlet instead.')
+    Write-CWarningOnce ('Complete-CJob is obsolete and will be removed in a future major version of Carbon. Use PowerShell''s `Wait-Job` cmdlet instead.')
     
     $errorAction = 'Continue'
     $params = $PSBoundParameters

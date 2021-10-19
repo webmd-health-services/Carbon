@@ -69,7 +69,7 @@ try
     }
 
     Write-Timing ('Creating aliases.')
-    [Collections.Generic.List[String]]$functionNames = [Collections.Generic.List[String]]::New()
+    [Collections.Generic.List[String]]$functionNames = New-Object 'Collections.Generic.List[String]'
     foreach( $functionName in $module.ExportedFunctions.Keys )
     {
         [void]$functionNames.Add($functionName)
@@ -112,9 +112,14 @@ try
                 continue
             }
 
+            if( -not $exportIisFunctions -and $functionName -like '*-CIis*' )
+            {
+                Write-Debug "Skipping ""$($functionName)"": IIS isn't installed or not loaded."
+                continue
+            }
+
             $msg = "Something unexpected happened. The ""$($functionName)"" function doesn't exist even though it " +
-                   "should. Here are all functions we know about:$([Environment]::NewLine * 2)" +
-                   "$(Get-Command -CommandType 'Function' | Format-Table | Out-String)"
+                   'should.'
             Write-Error -Message $msg
             continue
         }
@@ -146,10 +151,14 @@ begin
     Set-StrictMode -Version 'Latest'
     Use-CallerPreference -Cmdlet `$PSCmdlet -SessionState `$ExecutionContext.SessionState
 
-    `$msg = "The Carbon module's ""$($oldFunctionName)"" function was renamed to ""$($functionName)"". Please update " +
-            "your code to use the new ""$($functionName)"" name. The old ""$($oldFunctionName)"" function will be " +
-            'removed in the next major version of Carbon.'
-    Write-Warning -Message `$msg
+    if( -not `$script:warnings['$($oldFunctionName)'] )
+    {
+        `$msg = "The Carbon module's ""$($oldFunctionName)"" function was renamed to ""$($functionName)"". Please update " +
+                "your code to use the new ""$($functionName)"" name. The old ""$($oldFunctionName)"" function will be " +
+                'removed in the next major version of Carbon.'
+        Write-CWarningOnce -Message `$msg
+        `$script:warnings['$($oldFunctionName)'] = `$true
+    }
 }
 
 process

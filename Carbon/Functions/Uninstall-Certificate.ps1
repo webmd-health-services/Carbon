@@ -112,7 +112,7 @@ function Uninstall-CCertificate
             $msg = 'Carbon''s "Uninstall-CCertificate" function is OBSOLETE and will be removed in the next major ' +
                    'version of Carbon. Use the "Uninstall-CCertificate" function in the new "Carbon.Cryptography" ' +
                    'module.'
-            Write-Warning -Message $msg
+            Write-CWarningOnce -Message $msg
         }
 
         if( $PSCmdlet.ParameterSetName -like 'ByCertificate*' )

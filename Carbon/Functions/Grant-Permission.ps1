@@ -1,4 +1,3 @@
-
 function Grant-CPermission
 {
     <#
@@ -154,54 +153,45 @@ function Grant-CPermission
 
     Demonstrates how to grant multiple access rules to a single identity with the `Append` switch. In this case, `ENTERPRISE\Wesley` will be able to read everything in `C:\Bridge` and write only in the `C:\Bridge` directory, not to any sub-directory.
     #>
-    [CmdletBinding(SupportsShouldProcess=$true)]
+    [CmdletBinding(SupportsShouldProcess)]
     [OutputType([Security.AccessControl.AccessRule])]
     param(
-        [Parameter(Mandatory=$true)]
-        [string]
+        [Parameter(Mandatory)]
         # The path on which the permissions should be granted.  Can be a file system, registry, or certificate path.
-        $Path,
+        [String]$Path,
         
-        [Parameter(Mandatory=$true)]
-        [string]
+        [Parameter(Mandatory)]
         # The user or group getting the permissions.
-        $Identity,
+        [String]$Identity,
         
-        [Parameter(Mandatory=$true)]
-        [string[]]
-        # The permission: e.g. FullControl, Read, etc.  For file system items, use values from [System.Security.AccessControl.FileSystemRights](http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.filesystemrights.aspx).  For registry items, use values from [System.Security.AccessControl.RegistryRights](http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.registryrights.aspx).
+        [Parameter(Mandatory)]
 		[Alias('Permissions')]
-        $Permission,
+        # The permission: e.g. FullControl, Read, etc.  For file system items, use values from [System.Security.AccessControl.FileSystemRights](http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.filesystemrights.aspx).  For registry items, use values from [System.Security.AccessControl.RegistryRights](http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.registryrights.aspx).
+        [String[]]$Permission,
         
-        [Carbon.Security.ContainerInheritanceFlags]
         # How to apply container permissions.  This controls the inheritance and propagation flags.  Default is full inheritance, e.g. `ContainersAndSubContainersAndLeaves`. This parameter is ignored if `Path` is to a leaf item.
-        $ApplyTo = ([Carbon.Security.ContainerInheritanceFlags]::ContainerAndSubContainersAndLeaves),
+        [Carbon.Security.ContainerInheritanceFlags]$ApplyTo = ([Carbon.Security.ContainerInheritanceFlags]::ContainerAndSubContainersAndLeaves),
 
-        [Security.AccessControl.AccessControlType]
         # The type of rule to apply, either `Allow` or `Deny`. The default is `Allow`, which will allow access to the item. The other option is `Deny`, which will deny access to the item.
         #
         # This parameter was added in Carbon 2.3.0.
-        $Type = [Security.AccessControl.AccessControlType]::Allow,
+        [Security.AccessControl.AccessControlType]$Type = [Security.AccessControl.AccessControlType]::Allow,
         
-        [Switch]
         # Removes all non-inherited permissions on the item.
-        $Clear,
+        [switch]$Clear,
 
-        [Switch]
         # Returns an object representing the permission created or set on the `Path`. The returned object will have a `Path` propery added to it so it can be piped to any cmdlet that uses a path. 
         #
         # The `PassThru` switch is new in Carbon 2.0.
-        $PassThru,
+        [switch]$PassThru,
 
-        [Switch]
         # Grants permissions, even if they are already present.
-        $Force,
+        [switch]$Force,
 
-        [Switch]
         # When granting permissions on files, directories, or registry items, add the permissions as a new access rule instead of replacing any existing access rules. This switch is ignored when setting permissions on certificates.
         #
         # This switch was added in Carbon 2.7.
-        $Append
+        [switch]$Append
     )
 
     Set-StrictMode -Version 'Latest'
@@ -255,6 +245,44 @@ function Grant-CPermission
                 if( -not $certificate.PrivateKey )
                 {
                     Write-Error ('Access is denied to private key of certificate {0} ({1}; {2}).' -f $certificate.Thumbprint,$certificate.Subject,$Path)
+                    return
+                }
+
+                if( -not ($certificate.PrivateKey | Get-Member 'CspKeyContainerInfo') )
+                {
+                    $privateKeyFileName = $certificate.PrivateKey.Key.UniqueName
+                    # See https://docs.microsoft.com/en-us/windows/win32/seccng/key-storage-and-retrieval
+                    $keyStoragePaths =         @(
+                        "$($env:AppDATA)\Microsoft\Crypto", 
+                        "$($env:ALLUSERSPROFILE)\Application Data\Microsoft\Crypto\SystemKeys", 
+                        "$($env:WINDIR)\ServiceProfiles\LocalService\AppData\Roaming\Microsoft\Crypto\Keys", 
+                        "$($env:WINDIR)\ServiceProfiles\NetworkService\AppData\Roaming\Microsoft\Crypto\Keys", 
+                        "$($env:ALLUSERSPROFILE)\Application Data\Microsoft\Crypto",
+                        "$($env:ALLUSERSPROFILE)\Microsoft\Crypto"
+                    )
+
+                    $privateKeyFiles = $keyStoragePaths | Get-ChildItem -Recurse -Force -ErrorAction Ignore -Filter $privateKeyFileName
+                    if( -not $privateKeyFiles )
+                    {
+                        $msg = "Failed to find the private key file for certificate ""$($Path)"" (subject: $($certificate.Subject); " +
+                                "thumbprint: $($certificate.Thumbprint); expected file name: $($privateKeyFileName)). This is most " +
+                                "likely because you don't have permission to read private keys, or we''re not looking in the right " +
+                                "places. According to [Microsoft docs](https://docs.microsoft.com/en-us/windows/win32/seccng/key-storage-and-retrieval), " +
+                                "private keys are stored under one of these directories:" + [Environment]::NewLine +
+                                " * $($keyStoragePaths -join "$([Environment]::NewLine) * ")" + [Environment]::NewLine +
+                                "If there are other locations we should be looking, please " +
+                                "[submit an issue/bug report](https://github.com/webmd-health-services/Carbon/issues)."
+                        Write-Error -Message $msg
+                        return
+                    }
+                
+                    $grantPermissionParams = [Collections.Generic.Dictionary[[string], [object]]]::New($PSBoundParameters)
+                    $grantPermissionParams.Remove('Path')
+
+                    foreach( $privateKeyFile in $privateKeyFiles )
+                    {
+                        Grant-CPermission -Path $privateKeyFile.FullName @grantPermissionParams
+                    }
                     return
                 }
 
@@ -312,7 +340,7 @@ function Grant-CPermission
         # We don't use Get-Acl because it returns the whole security descriptor, which includes owner information.
         # When passed to Set-Acl, this causes intermittent errors.  So, we just grab the ACL portion of the security descriptor.
         # See http://www.bilalaslam.com/2010/12/14/powershell-workaround-for-the-security-identifier-is-not-allowed-to-be-the-owner-of-this-object-with-set-acl/
-        $currentAcl = (Get-Item $Path -Force).GetAccessControl("Access")
+        $currentAcl = (Get-Item -Path $Path -Force).GetAccessControl([Security.AccessControl.AccessControlSections]::Access)
     
         $inheritanceFlags = [Security.AccessControl.InheritanceFlags]::None
         $propagationFlags = [Security.AccessControl.PropagationFlags]::None

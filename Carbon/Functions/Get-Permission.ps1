@@ -105,7 +105,7 @@ function Get-CPermission
                 }
                 else
                 {
-                    $_.GetAccessControl([Security.AccessControl.AccessControlSections]::Access)
+                    $_.GetAccessControl([Security.AccessControl.AccessControlSections]::Access) 
                 }
             }
         } |

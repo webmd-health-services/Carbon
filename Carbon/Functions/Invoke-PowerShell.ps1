@@ -156,7 +156,7 @@ function Invoke-CPowerShell
     {
         $msg = 'Carbon''s "Invoke-CPowerShell" function is OBSOLETE and will be removed in the next major version of ' +
                'Carbon. Use the "Invoke-CPowerShell" function in the new Carbon.Core module.'
-        Write-Warning -Message $msg
+        Write-CWarningOnce -Message $msg
     }
 
     $powerShellv3Installed = Test-Path -Path HKLM:\SOFTWARE\Microsoft\PowerShell\3
@@ -234,7 +234,7 @@ function Invoke-CPowerShell
         $runningAScriptBlock = $PSCmdlet.ParameterSetName -eq 'ScriptBlock' 
         if( $PSCmdlet.ParameterSetName -eq 'Command' -and $Command -is [scriptblock] )
         {
-            Write-Warning -Message ('Passing a script block to the Command parameter is OBSOLETE and will be removed in a future major version of Carbon. Use the `ScriptBlock` parameter instead.')
+            Write-CWarningOnce -Message ('Passing a script block to the Command parameter is OBSOLETE and will be removed in a future major version of Carbon. Use the `ScriptBlock` parameter instead.')
             $ScriptBlock = $Command
             $runningAScriptBlock = $true
             if( $Credential )

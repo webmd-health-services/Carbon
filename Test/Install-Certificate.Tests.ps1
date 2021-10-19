@@ -57,7 +57,7 @@ Describe "Install-Certificate" {
                 )
 
                 $duration = [Diagnostics.Stopwatch]::StartNew()
-                $timeout = [TimeSpan]::New(0, 0, 10)
+                $timeout = New-Object 'TimeSpan' (0, 0, 10)
                 do
                 {
                     $cert = Get-CCertificate -Thumbprint $ExpectedCertificate.Thumbprint `
@@ -69,7 +69,7 @@ Describe "Install-Certificate" {
                         break
                     }
 
-                    Write-Verbose "Couldn't find $($StoreLocation)\$($SToreName)\$($ExpectedCertificate.Thumbprint). Trying again in 100ms." -Verbose
+                    Write-Verbose "Couldn't find $($StoreLocation)\$($StoreName)\$($ExpectedCertificate.Thumbprint). Trying again in 100ms." -Verbose
                     Start-Sleep -Milliseconds 100
                 }
                 while( $duration.Elapsed -lt $timeout )

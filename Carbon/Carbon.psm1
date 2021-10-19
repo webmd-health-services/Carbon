@@ -1,9 +1,9 @@
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# 
+#
 #     http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -34,6 +34,7 @@ Write-Timing ('BEGIN')
 $carbonRoot = $PSScriptRoot
 $CarbonBinDir = Join-Path -Path $PSScriptRoot -ChildPath 'bin' -Resolve
 $carbonAssemblyDir = Join-Path -Path $CarbonBinDir -ChildPath 'fullclr' -Resolve
+$warnings = @{}
 
 # Used to detect how to manager windows features. Determined at run time to improve import speed.
 $windowsFeaturesNotSupported = $null
@@ -63,7 +64,8 @@ if( (Test-Path -Path 'env:SystemRoot') )
     Write-Timing ('Adding System.Web assembly.')
     Add-Type -AssemblyName "System.Web"
     $microsoftWebAdministrationPath = Join-Path -Path $env:SystemRoot -ChildPath 'system32\inetsrv\Microsoft.Web.Administration.dll'
-    if( (Test-Path -Path $microsoftWebAdministrationPath -PathType Leaf) )
+    if( -not (Test-Path -Path 'env:CARBON_SKIP_IIS_IMPORT') -and `
+        (Test-Path -Path $microsoftWebAdministrationPath -PathType Leaf) )
     {
         $exportIisFunctions = $true
         if( -not $IsPSCore )
@@ -100,6 +102,26 @@ Get-ChildItem -Path (Join-Path -Path $functionRoot -ChildPath '*') -Filter '*.ps
         . $_.FullName 
     }
 
+function Write-CWarningOnce
+{
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory,Position=0)]
+        [String]$Message
+    )
+
+    Set-StrictMode -Version 'Latest'
+    Use-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState
+    
+    if( $script:warnings[$Message] )
+    {
+        return
+    }
+
+    Write-Warning -Message $Message
+    $script:warnings[$Message] = $true
+}
+
 $developerImports = & {
     Join-Path -Path $PSScriptRoot -ChildPath 'Carbon.psm1.Import.Iis.ps1' 
     Join-Path -Path $PSScriptRoot -ChildPath 'Carbon.psm1.Import.Lcm.ps1' 
@@ -114,4 +136,29 @@ foreach( $developerImport in $developerImports )
 
     Write-Timing ('Dot-sourcing "{0}".' -f $developerImport)
     . $developerImport
+}
+
+# Allows us to be platform agnostic in our calls of 'GetAccessControl'.
+if( -not ([IO.DirectoryInfo]::New([Environment]::CurrentDirectory) | Get-Member -Name 'GetAccessControl') )
+{
+    Update-TypeData -MemberName 'GetAccessControl' -MemberType 'ScriptMethod' -TypeName 'IO.DirectoryInfo' -Value {
+        [CmdletBinding()]
+        param(
+            [Security.AccessControl.AccessControlSections]$IncludeSections = [Security.AccessControl.AccessControlSections]::All
+        )
+        
+        return [IO.FileSystemAclExtensions]::GetAccessControl($this, $IncludeSections)
+    }
+}
+
+if( -not ([IO.FileInfo]::New($PSCommandPath) | Get-Member -Name 'GetAccessControl') )
+{
+    Update-TypeData -MemberName 'GetAccessControl' -MemberType 'ScriptMethod' -TypeName 'IO.FileInfo' -Value {
+        [CmdletBinding()]
+        param(
+            [Security.AccessControl.AccessControlSections]$IncludeSections = [Security.AccessControl.AccessControlSections]::All
+        )
+        
+        return [IO.FileSystemAclExtensions]::GetAccessControl($this, $IncludeSections)
+    }
 }
