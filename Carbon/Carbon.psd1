@@ -1,9 +1,9 @@
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# 
+#
 #     http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -25,7 +25,7 @@
     RootModule = 'Carbon.psm1'
 
     # Version number of this module.
-    ModuleVersion = '2.10.2'
+    ModuleVersion = '2.11.0'
 
     # ID used to uniquely identify this module
     GUID = '075d9444-c01b-48c3-889a-0b3490716fa2'
@@ -38,7 +38,7 @@
 
     # Copyright statement for this module
     Copyright = 'Aaron Jensen and WebMD Health Services'
-    
+
     # Description of the functionality provided by this module
     Description = @'
 Carbon is a PowerShell module for automating the configuration Windows 7, 8, 2008, and 2012 and automation the installation and configuration of Windows applications, websites, and services. It can configure and manage:
@@ -98,8 +98,8 @@ All functions are idempotent: when run multiple times with the same arguments, y
                       )
 
     # Format files (.ps1xml) to be loaded when importing this module
-    FormatsToProcess = @( 
-                            'Carbon.format.ps1xml', 
+    FormatsToProcess = @(
+                            'Carbon.format.ps1xml',
                             'Formats\Carbon.Security.HttpUrlAcl.format.ps1xml',
                             'Formats\Schedule.Service.RegisteredTask.format.ps1xml'
                         )
@@ -359,98 +359,15 @@ All functions are idempotent: when run multiple times with the same arguments, y
 
             # ReleaseNotes of this module
             ReleaseNotes = @'
-# 2.10.2
 
-* Fixed: Carbon fails to import if IIS isn't installed.
+# 2.11.0
 
-# 2.10.1
-
-* Fixed: Carbon fails to import on PowerShell 4.
-
-# 2.10.0
-
-## TL;DR Changes
-
-* Fixed: Carbon's backward compatible aliases replaced with shim functions. Carbon no longer aggressively loads its
-functions.
-* New: Carbon now warns when you're using a function shim with a deprecated name. Update your code so that all Carbon
-functions have a `C` prefix. Carbon has a `Use-CarbonPrefix.ps1` script in its bin directory that will update files to
-use the new prefix.
-* Migrated the following functions to new Carbon.Core and Carbon.Cryptography modules. These functions still exist in
-Carbon 2, so if you use all these modules together, you'll probably run into naming collisions and errors depending on
-how you install, import, and use Carbon. You'll get a warning if you use any of the functions that migrated.
-    * `ConvertTo-CBase64`, `Get-CPowerShellPath`, and `Invoke-CPowerShell` are now in the Carbon.Core module.
-    * The `Test-COSIs32Bit` and `Test-COSIs64Bit` functions merged into a `Test-COperatingSystem` function in the
-    Carbon.Core module.
-    * The `Test-CPowerShellIs32Bit` and `Test-CPowerShellIs64Bit` functions merged into a `Test-CPowerShell` function in
-    the Carbon.Core module.
-    * New: `Convert-CSecureStringToString`, `Get-CCertificate`, `Install-CCertificate`, `Uninstall-CCertificate`,
-    `Protect-CString`, and `Unprotect-CString` migrated to the Carbon.Cryptography module.
-* Fixed: the `Install-CCertificate` function causes an extra file to be written to the Windows directory where private
-keys are saved. Depending on your environment, this could put many, many extra very small files on the file system or a
-full disk.
-* Fixed: the `Install-CCertificate` function could fail to install a certificate with a private key in a remote
-computer's LocalMachine store if you passed in a certificate object to install.
-* Fixed: the `Install-CCertificate` function always installs a certificate even if it exists in the destination store.
-Depending on your environment, this could put many, many extra very small files on the file system or a full disk. Use
-the `-Force` switch to always install a certificate even if it already exists in the destination store.
-* Added a `-Force` switch to the `Install-CCertificate` function to force certificates to be installed if they already
-exist in the destination store.
-* Fixed: `Install-Service` always writes a verbose message when installing a service.
-
-
-## Naming Collisions Solved (Again)
-
-Fixed: In Carbon 2.7.0, we added a `C` prefix to all the Carbon functions, with aliases that used the old function
-names to preserve backwards-compatability. We didn't realize at the time that aliases have the highest precedence of
-commands, so Carbon's aliases hid any other commands on your system that may have been named the same. Bad idea. With
-this release, Carbon no longer uses aliases for backwards-compatability. Instead, it dynamically creates shim functions
-named after the old functions. These shim functions write a warning that the function with the old name is deprecated
-then calls the function using its new name. Hopefully, this will finally fix the name collisions problems. The function
-names with out the `C` prefix will be removed in Carbon 3, so update your code to make upgrading easier.
-
-Because Carbon creates these backwards-compatible function shims dynamically, Carbon *won't* create a shim if a
-function with the old name exists. If there is a name conflict between Carbon and another module, if you import that
-module first, Carbon won't export its shim function.
-
-## Carbon on PowerShell Core
-
-We need parts of Carbon to work on PowerShell Core. The current size of Carbon makes that hard (over 200 functions and
-automated tests that take a long time). So, we're breaking Carbon into smaller modules. The new modules will all require
-PowerShell 5.1+. If you use Carbon 2 and the new modules together, you'll get naming conflicts during installation and
-when importing.
-
-The first two modules are already out: Carbon.Core and Carbon.Cryptography. 
-
-## Carbon.Core
-
-Carbon.Core will contain all the functions that are foundational to all or most other future Carbon modules, or generic
-functions we feel are core to Carbon and/or PowerShell. It has no dependencies. The following functions were migrated to
-it:
-
-* `ConvertTo-CBase64` (with some added functionality)
-* `Get-CPowerShellPath`
-* `Invoke-CPowerShell`
-* `Test-COperatingSystem`: Replaces `Test-OSIs32Bit` and `Test-OSIs64Bit`. Tests operating system type, too, so you
-can use this function instead of the `$IsWindows`, `$IsLinux`, or `$IsMacOS` variables. Works on versions of PowerShell
-that don't define those variables.
-* `Test-CPowerShell`: Replaces `Test-PowerShellIs32Bit` and `Test-PowerShellIs64Bit`. Tests edition, too. Use this
-function instead of `$PSVersionTable.PSEdition`. Handles when $PSVersionTable doesn't have the PSEdition property.
-
-## Carbon.Cryptography
-
-Carbon.Crytography contains functions that are used when encrypting and decrypting strings. This is where certificate
-management funtions live. These function were migrated from Carbon:
-
-* `Convert-CSecureStringToString`
-* `Get-CCertificate`: works on Linux and macOS when opening certificate files.
-* `Install-CCertificate`
-* `Uninstall-CCertificate`
-* `Protect-CString`: works on Linux and macOS.
-* `Unprotect-CString`: works on Linux and macOS.
-
+* Fixed: Resolve-CPathCase fails on PowerShell Core.
+* New: 'Grant-Permission', 'Get-Permission', and 'Revoke-Permission' scripts now execute correctly on
+non-Windows platforms.
+* Fixed: Install-CService now will update services when file permissions or user account privileges have changed.
 '@
         } # End of PSData hashtable
-    
+
     } # End of PrivateData hashtable
 }

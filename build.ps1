@@ -147,10 +147,10 @@ if( $Configuration )
 }
 
 $apiKeys = @{
-                'powershellgallery.com' = 'POWERSHELL_GALLERY_API_KEY';
-                'nuget.org' = 'NUGET_ORG_API_KEY';
+                'powershellgallery.com' = 'WHS_POWERSHELL_GALLERY_API_KEY';
+                'nuget.org' = 'WHS_NUGET_ORG_API_KEY';
                 'chocolatey.org' = 'CHOCOLATEY_ORG_API_KEY';
-                'github.com' = 'GITHUB_ACCESS_TOKEN'
+                'github.com' = 'WHS_GITHUB_ACCESS_TOKEN'
             }
 foreach( $apiKeyID in $apiKeys.Keys )
 {

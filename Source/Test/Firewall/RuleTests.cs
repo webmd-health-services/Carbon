@@ -12,6 +12,8 @@
 
 using Carbon.Firewall;
 using NUnit.Framework;
+using System;
+using System.Text;
 
 namespace Carbon.Test.Firewall
 {
@@ -42,8 +44,11 @@ namespace Carbon.Test.Firewall
         [Test]
         public void ShouldConvertToCorrectEncoding()
         {
-            var result = Rule.LoadIndirectString("@FirewallAPI.dll,-25257");
-            Assert.That(result, Is.EqualTo("Destination Unreachable Fragmentation Needed error messages are sent from any node that a packet traverses which is unable to forward the packet because fragmentation was needed and the don’t fragment bit was set."));
+			var resourceSource = "@FirewallAPI.dll,-25257";
+			var expectedString  = new StringBuilder(256);
+			Rule.SHLoadIndirectString(resourceSource, expectedString, expectedString.Capacity, IntPtr.Zero);
+            var result = Rule.LoadIndirectString(resourceSource);
+            Assert.That(result, Is.EqualTo(expectedString.ToString()));
         }
     }
 }

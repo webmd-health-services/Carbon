@@ -1,9 +1,9 @@
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# 
+#
 #     http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -136,4 +136,29 @@ foreach( $developerImport in $developerImports )
 
     Write-Timing ('Dot-sourcing "{0}".' -f $developerImport)
     . $developerImport
+}
+
+# Allows us to be platform agnostic in our calls of 'GetAccessControl'.
+if( -not ([IO.DirectoryInfo]::New([Environment]::CurrentDirectory) | Get-Member -Name 'GetAccessControl') )
+{
+    Update-TypeData -MemberName 'GetAccessControl' -MemberType 'ScriptMethod' -TypeName 'IO.DirectoryInfo' -Value {
+        [CmdletBinding()]
+        param(
+            [Security.AccessControl.AccessControlSections]$IncludeSections = [Security.AccessControl.AccessControlSections]::All
+        )
+        
+        return [IO.FileSystemAclExtensions]::GetAccessControl($this, $IncludeSections)
+    }
+}
+
+if( -not ([IO.FileInfo]::New($PSCommandPath) | Get-Member -Name 'GetAccessControl') )
+{
+    Update-TypeData -MemberName 'GetAccessControl' -MemberType 'ScriptMethod' -TypeName 'IO.FileInfo' -Value {
+        [CmdletBinding()]
+        param(
+            [Security.AccessControl.AccessControlSections]$IncludeSections = [Security.AccessControl.AccessControlSections]::All
+        )
+        
+        return [IO.FileSystemAclExtensions]::GetAccessControl($this, $IncludeSections)
+    }
 }

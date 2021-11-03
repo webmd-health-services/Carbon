@@ -245,24 +245,45 @@ function Install-CService
     }
 
 
-    if( $ArgumentList )	
-    {	
-        $binPathArg = Invoke-Command -ScriptBlock {	
-                            $Path	
-                            $ArgumentList 	
-                        } |	
-                        ForEach-Object { 	
-                            if( $_.Contains(' ') )	
-                            {	
-                                return '"{0}"' -f $_.Trim('"')	
-                            }	
-                            return $_	
-                        }	
-        $binPathArg = $binPathArg -join ' '	
-    }	
-    else	
-    {	
-        $binPathArg = $Path	
+    if( $ArgumentList )
+    {
+        $binPathArg = Invoke-Command -ScriptBlock {
+                            $Path
+                            $ArgumentList
+                        } |
+                        ForEach-Object {
+                            if( $_.Contains(' ') )
+                            {
+                                return '"{0}"' -f $_.Trim('"')
+                            }
+                            return $_
+                        }
+        $binPathArg = $binPathArg -join ' '
+    }
+    else
+    {
+        $binPathArg = $Path
+    }
+
+    $passwordArgName = ''
+    $passwordArgValue = ''
+    if( $PSCmdlet.ParameterSetName -like 'CustomAccount*' )
+    {
+        if( $Credential )
+        {
+            $passwordArgName = 'password='
+            $passwordArgValue = $Credential.GetNetworkCredential().Password -replace '"', '\"'
+        }
+
+        if( $PSCmdlet.ShouldProcess( $identity.FullName, "grant the log on as a service right" ) )
+        {
+            Grant-CPrivilege -Identity $identity.FullName -Privilege SeServiceLogonRight
+        }
+    }
+
+    if( $PSCmdlet.ShouldProcess( $Path, ('grant {0} ReadAndExecute permissions' -f $identity.FullName) ) )
+    {
+        Grant-CPermission -Identity $identity.FullName -Permission ReadAndExecute -Path $Path
     }
 
     $doInstall = $false
@@ -425,30 +446,9 @@ function Install-CService
         {
             $startArg = 'disabled'
         }
-    
-        $passwordArgName = ''
-        $passwordArgValue = ''
-        if( $PSCmdlet.ParameterSetName -like 'CustomAccount*' )
-        {
-            if( $Credential )
-            {
-                $passwordArgName = 'password='
-                $passwordArgValue = $Credential.GetNetworkCredential().Password -replace '"', '\"'
-            }
-        
-            if( $PSCmdlet.ShouldProcess( $identity.FullName, "grant the log on as a service right" ) )
-            {
-                Grant-CPrivilege -Identity $identity.FullName -Privilege SeServiceLogonRight
-            }
-        }
-    
-        if( $PSCmdlet.ShouldProcess( $Path, ('grant {0} ReadAndExecute permissions' -f $identity.FullName) ) )
-        {
-            Grant-CPermission -Identity $identity.FullName -Permission ReadAndExecute -Path $Path
-        }
-    
+
         $service = Get-Service -Name $Name -ErrorAction Ignore
-    
+
         $operation = 'create'
         $serviceIsRunningStatus = @(
                                       [ServiceProcess.ServiceControllerStatus]::Running,
