@@ -139,7 +139,8 @@ foreach( $developerImport in $developerImports )
 }
 
 # Allows us to be platform agnostic in our calls of 'GetAccessControl'.
-if( -not ([IO.DirectoryInfo]::New([Environment]::CurrentDirectory) | Get-Member -Name 'GetAccessControl') )
+$currentDirInfo = New-Object -TypeName 'IO.DirectoryInfo' -ArgumentList ([Environment]::CurrentDirectory)
+if( -not ($currentDirInfo | Get-Member -Name 'GetAccessControl') )
 {
     Update-TypeData -MemberName 'GetAccessControl' -MemberType 'ScriptMethod' -TypeName 'IO.DirectoryInfo' -Value {
         [CmdletBinding()]
@@ -151,7 +152,8 @@ if( -not ([IO.DirectoryInfo]::New([Environment]::CurrentDirectory) | Get-Member 
     }
 }
 
-if( -not ([IO.FileInfo]::New($PSCommandPath) | Get-Member -Name 'GetAccessControl') )
+$currentCmdInfo = New-Object -TypeName 'IO.FileInfo' -ArgumentList $PSCommandPath
+if( -not ($currentCmdInfo | Get-Member -Name 'GetAccessControl') )
 {
     Update-TypeData -MemberName 'GetAccessControl' -MemberType 'ScriptMethod' -TypeName 'IO.FileInfo' -Value {
         [CmdletBinding()]
