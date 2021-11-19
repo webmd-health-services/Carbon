@@ -154,7 +154,6 @@ Tests:
 - Pester4:
     OnlyBy: BuildServer
     Script:
-    - Test\Invoke-PowerShell.Tests.ps1
     - Test\*Iis*.ps1
     - Test\Carbon_*.Tests.ps1
 - Parallel:
@@ -172,7 +171,6 @@ Tests:
             - "*\\Test\\*Iis*.ps1"
             - "*\\Test\\Carbon_*.Tests.ps1"
             - "*\\Test\\*-ScheduledTask.Tests.ps1"
-            - "*\\Test\\Invoke-PowerShell.Tests.ps1"
     - Tasks:
         - PowerShell:
             WarningAction: SilentlyContinue
