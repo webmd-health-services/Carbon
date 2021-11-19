@@ -81,6 +81,8 @@ Build:
     Path:
     - LICENSE.txt
     - NOTICE.txt
+    - README.md
+    - CHANGELOG.md
     DestinationDirectory: Carbon
 - NuGetPack:
     Path: Carbon.nuspec

@@ -143,10 +143,10 @@ Get-Item -Path (Join-Path -Path $PSScriptRoot -ChildPath 'Carbon\en-US\about_Car
     } |
     Out-HtmlPage -Title $carbonTitle -VirtualPath '/index.html'
 
-Get-Content -Path (Join-Path -Path $PSScriptRoot -ChildPath 'RELEASE NOTES.txt') -Raw | 
+Get-Content -Path (Join-Path -Path $PSScriptRoot -ChildPath 'CHANGLOG.md') -Raw | 
     Edit-HelpText -ModuleName 'Carbon' |
     Convert-MarkdownToHtml | 
-    Out-HtmlPage -Title ('Release Notes - {0}' -f $carbonTitle) -VirtualPath '/releasenotes.html'
+    Out-HtmlPage -Title ('CHANGELOG - {0}' -f $carbonTitle) -VirtualPath '/changelog.html'
 
 Copy-Item -Path (Join-Path -Path $PSScriptRoot -ChildPath 'Tools\Silk\Resources\silk.css' -Resolve) `
           -Destination $WebRoot -Verbose
