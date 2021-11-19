@@ -154,8 +154,6 @@ Tests:
 - Pester4:
     OnlyBy: BuildServer
     Script:
-    - Test\Install-Certificate.Tests.ps1
-    - Test\Uninstall-Certificate.Tests.ps1
     - Test\Invoke-PowerShell.Tests.ps1
     - Test\*Iis*.ps1
     - Test\Carbon_*.Tests.ps1
@@ -171,8 +169,6 @@ Tests:
             Script: 
             - Test\*.Tests.ps1
             Exclude:
-            - "*\\Test\\Install-Certificate.Tests.ps1"
-            - "*\\Test\\Uninstall-Certificate.Tests.ps1"
             - "*\\Test\\*Iis*.ps1"
             - "*\\Test\\Carbon_*.Tests.ps1"
             - "*\\Test\\*-ScheduledTask.Tests.ps1"
