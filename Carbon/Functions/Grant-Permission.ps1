@@ -276,7 +276,8 @@ function Grant-CPermission
                         return
                     }
                 
-                    $grantPermissionParams = [Collections.Generic.Dictionary[[string], [object]]]::New($PSBoundParameters)
+                    $grantPermissionParams = New-Object -TypeName 'Collections.Generic.Dictionary[[string], [object]]' `
+                                                        -ArgumentList $PSBoundParameters
                     $grantPermissionParams.Remove('Path')
 
                     foreach( $privateKeyFile in $privateKeyFiles )
