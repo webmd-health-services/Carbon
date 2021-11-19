@@ -161,10 +161,7 @@ function Write-File
         Set-StrictMode -Version 'Latest'
         Use-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState
 
-        $msg = "The Carbon module's ""Write-File"" function was renamed to ""Write-CFile"". Please update " +
-                "your code to use the new ""Write-CFile"" name. The old ""Write-File"" function will be " +
-                'removed in the next major version of Carbon.'
-        Write-CWarningOnce -Message $msg
+        Write-CRenamedCommandWarning -CommandName $MyInvocation.MyCommand.Name -NewCommandName 'Write-CFile'
 
         $stuffToPipe = New-Object 'Collections.ArrayList'
     }

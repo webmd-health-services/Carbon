@@ -36,18 +36,18 @@ function Get-CMsi
     [CmdletBinding()]
     [OutputType('Carbon.Msi.MsiInfo')]
     param(
-        [Parameter(Mandatory=$True,ValueFromPipeline=$True,ValueFromPipelineByPropertyName=$True)]
-        [Alias('FullName')]
-        [string[]]
         # Path to the MSI file whose information to retrieve. Wildcards supported.
-        $Path
+        [Parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)]
+        [Alias('FullName')]
+        [string[]] $Path
     )
     
     begin 
     {
         Set-StrictMode -Version 'Latest'
-
         Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
+        Write-CRefactoredCommandWarning -CommandName $MyInvocation.MyCommand.Name -ModuleName 'Carbon.Windows.Installer'
     }
 
     process 

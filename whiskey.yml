@@ -21,12 +21,6 @@ Build:
     Path: Source\Carbon.sln
     Property:
     - SignAssembly=$(SignAssembly)
-- PowerShell:
-    OnlyDuring: Build
-    OnlyBy: BuildServer
-    Path: Source\Compile-CarbonTestInstaller.ps1
-    Argument:
-        Configuration: $(WHISKEY_MSBUILD_CONFIGURATION)
 - DotNet:
     Command: publish
     Path: Source\Test\Carbon.Test.csproj

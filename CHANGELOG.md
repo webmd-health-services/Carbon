@@ -1,6 +1,11 @@
 # 2.12.0
 
 * Fixed: Importing Carbon fails under PowerShell 4.
+* The `Install-CMsi`, `Get-CMsi`, and `Get-CProgramInstallInfo` functions have moved to a new `Carbon.Windows.Installer`
+module, now available on the PowerShell Gallery. Please switch to the new module and update usages. If you use these
+functions from Carbon, a warning message will be written. These function will be removed in the next major version of
+Carbon.
+
 
 # 2.11.0
 

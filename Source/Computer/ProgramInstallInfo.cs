@@ -18,6 +18,7 @@ using Microsoft.Win32;
 
 namespace Carbon.Computer
 {
+	[Obsolete("Functionality moved to Carbon.Windows.Installer module.")]
 	public sealed class ProgramInstallInfo
 	{
 		public ProgramInstallInfo(RegistryKey key)

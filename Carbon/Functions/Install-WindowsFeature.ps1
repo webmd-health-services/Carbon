@@ -74,7 +74,9 @@ if( -not (Get-Command -Name 'Get-WindowsFeature*' | Where-Object { $_.ModuleName
         Set-StrictMode -Version 'Latest'
         Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
     
-        Write-CWarningOnce -Message ('Install-CWindowsFeature is obsolete and will be removed in a future major version of Carbon.')
+        Write-CObsoleteCommandWarning -CommandName $MyInvocation.MyCommand.Name `
+                                      -NewCommandName 'Install-WindowsFeature' `
+                                      -NewModuleName 'ServerManager'
 
         if( -not (Assert-WindowsFeatureFunctionsSupported) )
         {

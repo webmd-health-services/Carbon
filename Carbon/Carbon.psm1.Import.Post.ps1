@@ -151,14 +151,7 @@ begin
     Set-StrictMode -Version 'Latest'
     Use-CallerPreference -Cmdlet `$PSCmdlet -SessionState `$ExecutionContext.SessionState
 
-    if( -not `$script:warnings['$($oldFunctionName)'] )
-    {
-        `$msg = "The Carbon module's ""$($oldFunctionName)"" function was renamed to ""$($functionName)"". Please update " +
-                "your code to use the new ""$($functionName)"" name. The old ""$($oldFunctionName)"" function will be " +
-                'removed in the next major version of Carbon.'
-        Write-CWarningOnce -Message `$msg
-        `$script:warnings['$($oldFunctionName)'] = `$true
-    }
+    Write-CRenamedCommandWarning -CommandName `$MyInvocation.MyCommand.Name -NewCommandName '$($functionName)'
 }
 
 process
