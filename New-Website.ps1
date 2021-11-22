@@ -143,7 +143,7 @@ Get-Item -Path (Join-Path -Path $PSScriptRoot -ChildPath 'Carbon\en-US\about_Car
     } |
     Out-HtmlPage -Title $carbonTitle -VirtualPath '/index.html'
 
-Get-Content -Path (Join-Path -Path $PSScriptRoot -ChildPath 'CHANGLOG.md') -Raw | 
+Get-Content -Path (Join-Path -Path $PSScriptRoot -ChildPath 'CHANGELOG.md') -Raw | 
     Edit-HelpText -ModuleName 'Carbon' |
     Convert-MarkdownToHtml | 
     Out-HtmlPage -Title ('CHANGELOG - {0}' -f $carbonTitle) -VirtualPath '/changelog.html'
