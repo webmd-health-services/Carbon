@@ -98,9 +98,7 @@ function Get-CCertificate
 
     if( -not $NoWarn )
     {
-        $msg = 'Carbon''s "Get-CCertificate" function is OBSOLETE and will be removed in the next major version of ' +
-               'Carbon. Use the "Get-CCertificate" function in the new "Carbon.Cryptography" module.'
-        Write-CWarningOnce -Message $msg
+        Write-CRefactoredCommandWarning -CommandName $MyInvocation.MyCommand.Name -ModuleName 'Carbon.Cryptography'
     }
 
     function Add-PathMember

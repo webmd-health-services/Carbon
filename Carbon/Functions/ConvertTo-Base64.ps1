@@ -51,9 +51,7 @@ function ConvertTo-CBase64
 
         if( -not $NoWarn )
         {
-            $msg = 'Carbon''s "ConvertTo-CBase64" function is OBSOLETE and will be removed in the next major version ' +
-                   'of Carbon. Use the "ConvertTo-CBase64" function in the new Carbon.Core module.'
-            Write-CWarningOnce -Message $msg
+            Write-CRefactoredCommandWarning -CommandName $MyInvocation.MyCommand.Name -NewModuleName 'Carbon.Core'
         }
     }
 

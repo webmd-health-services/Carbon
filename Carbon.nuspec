@@ -55,6 +55,7 @@ All functions are idempotent: when run multiple times with the same arguments, y
     <file src=".\Tools\VERIFICATION.md" target="Tools" />
     <file src=".\LICENSE.txt" target="" />
     <file src=".\NOTICE.txt" target="" />
-    <file src=".\RELEASE NOTES.txt" target="" />
+    <file src=".\CHANGELOG.md" target="" />
+    <file src=".\README.md" target="" />
   </files>
 </package>

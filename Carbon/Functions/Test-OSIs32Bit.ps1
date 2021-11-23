@@ -29,9 +29,9 @@ function Test-COSIs32Bit
 
     if( -not $NoWarn )
     {
-        $msg = 'Carbon''s "Test-COSIs32Bit" function is OBSOLETE and will be removed in the next major version of ' +
-               'Carbon. Use the new "Test-COperatingSystem" function in the new Carbon.Core module instead.'
-        Write-CWarningOnce -Message $msg
+        Write-CRefactoredCommandWarning -CommandName $MyInvocation.MyCommand.Name `
+                                        -ModuleName 'Carbon.Core' `
+                                        -NewCommandName 'Test-COperatingSystem'
     }
 
     return -not (Test-COSIs64Bit -NoWarn)

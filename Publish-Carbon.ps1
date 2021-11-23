@@ -25,7 +25,7 @@ Set-StrictMode -Version Latest
 
 $licenseFileName = 'LICENSE.txt'
 $noticeFileName = 'NOTICE.txt'
-$releaseNotesFileName = 'RELEASE NOTES.txt'
+$releaseNotesFileName = 'CHANGELOG.md'
 $releaseNotesPath = Join-Path -Path $PSScriptRoot -ChildPath $releaseNotesFileName -Resolve
 
 $manifestPath = Join-Path -Path $PSScriptRoot -ChildPath 'Carbon\Carbon.psd1'

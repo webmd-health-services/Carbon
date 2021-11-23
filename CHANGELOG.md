@@ -1,3 +1,169 @@
+# 2.12.0
+
+* Fixed: Importing Carbon fails under PowerShell 4.
+* The `Install-CMsi`, `Get-CMsi`, and `Get-CProgramInstallInfo` functions have moved to a new `Carbon.Windows.Installer`
+module, now available on the PowerShell Gallery. Please switch to the new module and update usages. If you use these
+functions from Carbon, a warning message will be written. These function will be removed in the next major version of
+Carbon.
+
+
+# 2.11.0
+
+* Fixed: Resolve-CPathCase fails on PowerShell Core.
+* New: 'Grant-Permission', 'Get-Permission', and 'Revoke-Permission' scripts now execute correctly on
+non-Windows platforms.
+* Fixed: Install-CService now will update services when file permissions or user account privileges have changed.
+
+
+# 2.10.2
+
+* Fixed: Carbon fails to import if IIS isn't installed.
+
+
+# 2.10.1
+
+* Fixed: Carbon fails to import on PowerShell 4.
+
+
+# 2.10.0
+
+## TL;DR Changes
+
+* Fixed: Carbon's backward compatible aliases replaced with shim functions. Carbon no longer aggressively loads its
+functions.
+* New: Carbon now warns when you're using a function shim with a deprecated name. Update your code so that all Carbon
+functions have a `C` prefix. Carbon has a `Use-CarbonPrefix.ps1` script in its bin directory that will update files to
+use the new prefix.
+* Migrated the following functions to new Carbon.Core and Carbon.Cryptography modules. These functions still exist in
+Carbon 2, so if you use all these modules together, you'll probably run into naming collisions and errors depending on
+how you install, import, and use Carbon. You'll get a warning if you use any of the functions that migrated.
+    * `ConvertTo-CBase64`, `Get-CPowerShellPath`, and `Invoke-CPowerShell` are now in the Carbon.Core module.
+    * The `Test-COSIs32Bit` and `Test-COSIs64Bit` functions merged into a `Test-COperatingSystem` function in the
+    Carbon.Core module.
+    * The `Test-CPowerShellIs32Bit` and `Test-CPowerShellIs64Bit` functions merged into a `Test-CPowerShell` function in
+    the Carbon.Core module.
+    * New: `Convert-CSecureStringToString`, `Get-CCertificate`, `Install-CCertificate`, `Uninstall-CCertificate`,
+    `Protect-CString`, and `Unprotect-CString` migrated to the Carbon.Cryptography module.
+* Fixed: the `Install-CCertificate` function causes an extra file to be written to the Windows directory where private
+keys are saved. Depending on your environment, this could put many, many extra very small files on the file system or a
+full disk.
+* Fixed: the `Install-CCertificate` function could fail to install a certificate with a private key in a remote
+computer's LocalMachine store if you passed in a certificate object to install.
+* Fixed: the `Install-CCertificate` function always installs a certificate even if it exists in the destination store.
+Depending on your environment, this could put many, many extra very small files on the file system or a full disk. Use
+the `-Force` switch to always install a certificate even if it already exists in the destination store.
+* Added a `-Force` switch to the `Install-CCertificate` function to force certificates to be installed if they already
+exist in the destination store.
+* Fixed: `Install-Service` always writes a verbose message when installing a service.
+
+## Naming Collisions Solved (Again)
+
+Fixed: In Carbon 2.7.0, we added a `C` prefix to all the Carbon functions, with aliases that used the old function
+names to preserve backwards-compatability. We didn't realize at the time that aliases have the highest precedence of
+commands, so Carbon's aliases hid any other commands on your system that may have been named the same. Bad idea. With
+this release, Carbon no longer uses aliases for backwards-compatability. Instead, it dynamically creates shim functions
+named after the old functions. These shim functions write a warning that the function with the old name is deprecated
+then calls the function using its new name. Hopefully, this will finally fix the name collisions problems. The function
+names with out the `C` prefix will be removed in Carbon 3, so update your code to make upgrading easier.
+Because Carbon creates these backwards-compatible function shims dynamically, Carbon *won't* create a shim if a
+function with the old name exists. If there is a name conflict between Carbon and another module, if you import that
+module first, Carbon won't export its shim function.
+
+## Carbon on PowerShell Core
+
+We need parts of Carbon to work on PowerShell Core. The current size of Carbon makes that hard (over 200 functions and
+automated tests that take a long time). So, we're breaking Carbon into smaller modules. The new modules will all require
+PowerShell 5.1+. If you use Carbon 2 and the new modules together, you'll get naming conflicts during installation and
+when importing.
+The first two modules are already out: Carbon.Core and Carbon.Cryptography. 
+
+## Carbon.Core
+Carbon.Core will contain all the functions that are foundational to all or most other future Carbon modules, or generic
+functions we feel are core to Carbon and/or PowerShell. It has no dependencies. The following functions were migrated to
+it:
+* `ConvertTo-CBase64` (with some added functionality)
+* `Get-CPowerShellPath`
+* `Invoke-CPowerShell`
+* `Test-COperatingSystem`: Replaces `Test-OSIs32Bit` and `Test-OSIs64Bit`. Tests operating system type, too, so you
+can use this function instead of the `$IsWindows`, `$IsLinux`, or `$IsMacOS` variables. Works on versions of PowerShell
+that don't define those variables.
+* `Test-CPowerShell`: Replaces `Test-PowerShellIs32Bit` and `Test-PowerShellIs64Bit`. Tests edition, too. Use this
+function instead of `$PSVersionTable.PSEdition`. Handles when $PSVersionTable doesn't have the PSEdition property.
+
+## Carbon.Cryptography
+Carbon.Crytography contains functions that are used when encrypting and decrypting strings. This is where certificate
+management funtions live. These function were migrated from Carbon:
+* `Convert-CSecureStringToString`
+* `Get-CCertificate`: works on Linux and macOS when opening certificate files.
+* `Install-CCertificate`
+* `Uninstall-CCertificate`
+* `Protect-CString`: works on Linux and macOS.
+* `Unprotect-CString`: works on Linux and macOS.
+
+
+# 2.9.4
+
+* Fixed: Convert-XmlFile fails in PowerShell Core (thanks to
+(Joseph Block)[https://github.com/JosephBlock] for the fix).
+
+
+# 2.9.3
+
+* Fixed: Protect-CString and Unprotect-CString failed under PowerShell Core.
+* Fixed: Invoke-CPowerShell failed under PowerShell Core.
+* Fixed: Install-CCertificate fails under PowerShell Core.
+* Fixed: Unprotect-CString adds extra null bytes to the end of a decrypted string when using AES (`-Key`) encryption.
+
+
+# 2.9.2
+
+* Fixed: when encryptiong/decrypting with a thumbprint, `Protect-String` and `Unprotect-String` take more time the more
+certificates you have in your stores.
+
+
+# 2.9.1
+
+* Fixed: `Import-Carbon.ps1` fails if Carbon is already imported from a different location than the location from which
+it will import Carbon.
+
+
+# 2.9.0
+
+* Carbon should now import in less than a second.
+* Fixed: `Grant-CHttpUrlPermission` documentation uses command named `Grant-CHttpUrlAclPermission`. (Fixes
+[issue 66](https://github.com/webmd-health-services/Carbon/issues/66).)
+* Fixed: `Enable-CNtfsCompression` always enables compression even if compression is already enabled.
+* Fixed: `Disable-CNtfsCompression` always disables compression even if compression is already disabled.
+* Fixed: `Uninstall-CService` can write an error when a service's process exits at unexpected times.
+* Fixed: `Get-CUser` can sometimes take 60 to 90 seconds to lookup a specific user.
+* Fixed: `Get-CGroup` can sometimes take 60 to 90 seconds to lookup a specific group.
+* Improved `Set-CEnvironmentVariable` and `Remove-CEnvironmentVariable` functions' reliability when setting and removing
+variables for a specific user (they now use `Start-Job` instead of Carbon's `Invoke-CPowerShell`).
+* Fixed: Carbon was hiding the ServerManager module's `Get-WindowsFeature`, `Install-WindowsFeature`, and
+`Uninstall-WindowsFeature` cmdlets (fixes issue #55).
+* Fixed: `Set-CHostsEntry` can sometimes clear the hosts file (fixes issue #39).
+* Fixed: `Get-CServiceConfiguration` fails with a terminating exception if a service doesn't exist.
+
+
+# 2.8.1
+
+* Added verification information to Chocolatey package.
+* Updated copyright.
+
+
+# 2.8.0
+
+* Carbon is now *importable* on PowerShell Core on all platforms. Most functions will not work on Linux/MacOS since they
+are Windows-specific. Many functions will also not work on PowerShell Core. The next major version of Carbon, 3, should
+fully support PowerShell Core on Windows.
+* `Get-CScheduledTask` can now return `RegisteredTask` objects from the Scheduler.Service COM API. Use the new
+`AsComObject` switch. Getting COM objects is an order of magnitude faster than the old way.
+* Fixed: `Get-CScheduledTask` isn't able to parse some task information returned on Windows 10.
+* Deprecated `Test-CWindowsFeature`.
+* Fixed: `Get-CComPermission` fails when there are permission to a non-existent identity.
+* Fixed: looking up local users/groups is extremely slow on some machines.
+
+
 # 2.7.0
 
 * Uninstall-Service now kills a service's process when that service stops but is actually still running. This should decrease the frequency of needing to reboot a computer when uninstalling a service.
@@ -6,12 +172,14 @@
 * `Get-CCertificate`: Added `Path` note property to returned objects.
 * Fixed: Chocolatey uninstaller fails if the `PSModulePath` environment variable contains trailing or sequential semicolons.
 
+
 # 2.6.0
 
 * `Enable-IisSecurityAuthentication` and `Disable-IisSecurityAuthentication` sometimes hang. We don't know why, but we're working around the problem. These functions no longer always apply a configuration change. Instead, they only enable/disable security authentication if its not already enabled/disabled. 
 * `Install-Service` now outputs a verbose message showing the command line arguments used when calling `sc.exe` to install/update a service. 
 * Added `ArgumentList` property/parameter to `Carbon_Service` DSC resource. Thanks to [Luigi Grilli](https://github.com/gigi81) for the contribution. 
 * Fixed: `Get-HttpUrlAcl` returns no ACLs if any ACLs exist whose identities no longer exist.
+
 
 # 2.5.1, 2.5.2, 2.5.3, and 2.5.4 (3 June 2018)
 
@@ -22,6 +190,7 @@
  * Fixed: Carbon takes 10 to 20 seconds to load. In trying to detect if the Win32_OptionalFeature class is available on the current operating system, it was actually loading all the Win32_OptionalFeature instances. Oops. Now, it just checks for the existence of the Win32_OptionalFeature class. Load times should now be about two to three seconds. ([Fixes issue #35.](https://github.com/pshdo/Carbon/issues/35))
  * Import-Carbon.ps1 now hides verbose messages typically shown by Import-Module and Remove-Module cmdlets.
  * Fixed: `Assert-FirewallConfigurable` fails on Windows 10 due to firewall service display name change.
+
 
 # 2.5.0 (18 June 2017)
 
@@ -44,7 +213,7 @@
  * Fixed: Importing Carbon in 32-bit PowerShell fails on a 64-bit operating system. DSC isn't available so the `Initialize-Lcm` function can't be exported. Thanks to [Anders Andersson](https://bitbucket.org/McAndersDK/) for contribuging the fix.
  * Fixed: `Install-Service` and `Carbon_Service` DSC resource fail to change the identity a service runs as if switching from a custom account to the default `NetworkService` account.
  * Fixed: `Get-PowerShellModuleInstallPath` returns nothing when run under 32-bit (x86) PowerShell on 64-bit Windows.Fixed: `Get-PowerShellModuleInstallPath` returns nothing when run under 32-bit (x86) PowerShell on 64-bit Windows.
- 
+
 
 # 2.4.1 (21 February 2017)
 
@@ -220,8 +389,7 @@
  * Fixed: errors importing Carbon when IIS not installed on Windows 2012 R2 and Windows 10 (fixes [issue 168: Cannot import Carbon 2.0 module due to issues with IIS related functionality](https://bitbucket.org/splatteredbits/carbon/issues/168)).
  * Fixed Carbon copyright statements.
  * Improved Carbon's module description.
- 
- 
+
 
 # 2.0.0 (10 October 2015)
 
@@ -547,7 +715,8 @@ The following functions were re-written to use the `System.DirectoryServices.Acc
     * Deprecated `Quiet` switch.
     * Only sets value if the value is changed. Use the `Force` parameter to preserve previous behavior.
  * `Uninstall-Service` no longer returns sc.exe stdout.
- 
+
+
 # 1.9.0 (8 November 2014)
 
 This is the last minor release for version 1.0. Future 1.0-compatible releases will *only* contain bug fixes, no new features. It takes too much time to maintain two versions, and I'd rather spend my time getting 2.0 out the door.  Carbon 2.0 will require PowerShell 4.0, so start planning.
@@ -604,7 +773,7 @@ This is the last minor release for version 1.0. Future 1.0-compatible releases w
  * `Install-Service` wasn't restarting a manual service if it was running when configuration began.
  * `Uninstall-Service` hard codes the path to the Windows directory (fixes issue [#143](https://bitbucket.org/splatteredbits/carbon/issue/143/uninstall-service-script-has-hard-coded)). Thanks to [Travis Mathison](https://bitbucket.org/tdmathison) for the fix.
 
- 
+
 # 1.8.0 (7 September 2014)
 
 ## Enhancements
@@ -776,7 +945,7 @@ This is the last minor release for version 1.0. Future 1.0-compatible releases w
  * The `Carbon.Identity.FindByName` method and the `Resolve-IdentityName` and `Test-Identity` functions now handle identity names with `.` for the domain/machine name, e.g. `.\Administrator`.
  * The `Carbon.Identity.FullName` property returns the wrong value when domain is empty/null, e.g. `Resolve-IdentityName -Name 'Everyone'` returns `\Everyone`, when it should return `Everyone`.
  * The `Carbon.Identity.FindByName` method and the `Resolve-IdentityName` and `Test-Identity` functions unable to resolve `LocalSystem` account (which is actually `NT AUTHORITY\SYSTEM`).
- 
+
 
 # 1.7.0 (30 April 2014)
 
@@ -818,6 +987,7 @@ There is now [a Carbon support mailing list](https://groups.google.com/forum/#!f
  * `Grant-Permission` fails when item is hidden.
  * `Grant-Permission` doesn't handle non-existent paths, causing cascading errors.
  * `Test-Permission` always returns `$false` when testing leaf-level permissions and the `ApplyTo` parameter is provided, i.e. it doesn't ignore inheritance/propagation flags on leaves.
+
 
 # 1.6.0 (1 February 2014)
 
@@ -1269,6 +1439,7 @@ There is now [a Carbon support mailing list](https://groups.google.com/forum/#!f
  * Added `Uninstall-WindowsFeatures` alias for `Uninstall-WindowsFeature`, for backwards-compatibility with earlier releases.
  * Added `Features` alias for  `Uninstall-WindowsFeature's` `Name` parameter, for backwards-compatibility with earlier releases.
 
+
 # 0.5.0.0 (7 January 2013)
 
 ## Upgrade Instructions
@@ -1488,6 +1659,7 @@ Replace usages of:
 ## Bug fixes
  * `Enable-IisSsl` not setting SSL flags correctly when requiring client certificates.
 
+
 # 0.4.0.0 (17 November 2012)
 
 ## Upgrade Instructions
@@ -1542,6 +1714,7 @@ Replace usages of:
  * Added a `Quiet` parameter to `Set-RegistryKeyValue` so that `Write-Host` output is muffled.
  * Created `Reset-MsmqQueueManagerID` function, which resets MSMQ's Queue Manager ID.
 
+
 # 0.3.0 (28 September 2012)
 
 ## Upgrade Instructions
@@ -1592,6 +1765,7 @@ If you call `Invoke-PowerShell` without the `x86` switch and PowerShell is 32-bi
  * `Unprotect-AclAccessRules`: Turns off inherited access rules on an item in the file system or registry.
  * Added a `Clear` parameter to the `Grant-Permissions` function for clearing any non-inherited permissions on a file system/registry item.
 
+
 # 0.2.6 (30 June 2012)
 
 ## Enhancements
@@ -1628,6 +1802,7 @@ If you call `Invoke-PowerShell` without the `x86` switch and PowerShell is 32-bi
 
 ## Bug fixes
  * `Install-IisWebsite` now validates website bindings
+
 
 # 0.2.5 (29 June 2012)
 
@@ -1700,6 +1875,7 @@ If you call `Invoke-PowerShell` without the `x86` switch and PowerShell is 32-bi
   * Set-IisWebsiteSslCertifiate
   * Set-IisWindowsAuthentication
 
+
 # 0.2.3 (27 June 2012)
 
 ## Enhancements
@@ -1721,6 +1897,7 @@ If you call `Invoke-PowerShell` without the `x86` switch and PowerShell is 32-bi
  * Invoke-WindowsInstaller doesn't validate that installer path ends in '.msi'.
  * Invoke-WindowsInstaller not showing correct exit code when installation fails.
 
+
 # 0.2.2 (19 June 2012)
 
 ## Enhancements
@@ -1731,11 +1908,13 @@ If you call `Invoke-PowerShell` without the `x86` switch and PowerShell is 32-bi
  * Add-GroupMembers fails when adding built-in accounts multiple times.
  * Add-GroupMembers fails to add domain user to a local group.
 
+
 # 0.2.1 (28 April 2012)
  * Added IsJunction property to DirectoryInfo objects.  Returns true if a directory is a junction/reparse point.
  * Created a Carbon assembly for compiled code.  Moved P/Invoke functions from FileSystem.ps1 into assembly.  This is a backwards compatible change.
  * Created a Carbon.IO.JunctionPoint helper class for creating/removing/getting junction/reparse points.  Updated New-Junction and Remove-Junction to use the new helper class.
  * Added TargetPath property to DirectoryInfo objects.  If the directory is a junction/reparse points, returns the path to the junction's target.  Otherwise, $null.
+
 
 # 0.2.0 (4 April 2012)
 

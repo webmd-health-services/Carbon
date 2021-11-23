@@ -154,9 +154,7 @@ function Invoke-CPowerShell
 
     if( -not $NoWarn )
     {
-        $msg = 'Carbon''s "Invoke-CPowerShell" function is OBSOLETE and will be removed in the next major version of ' +
-               'Carbon. Use the "Invoke-CPowerShell" function in the new Carbon.Core module.'
-        Write-CWarningOnce -Message $msg
+        Write-CRefactoredCommandWarning -CommandName $MyInvocation.MyCommand.Name -ModuleName 'Carbon.Core'
     }
 
     $powerShellv3Installed = Test-Path -Path HKLM:\SOFTWARE\Microsoft\PowerShell\3

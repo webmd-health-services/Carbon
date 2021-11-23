@@ -102,24 +102,120 @@ Get-ChildItem -Path (Join-Path -Path $functionRoot -ChildPath '*') -Filter '*.ps
         . $_.FullName 
     }
 
-function Write-CWarningOnce
+function Write-CObsoleteCommandWarning
 {
     [CmdletBinding()]
     param(
-        [Parameter(Mandatory,Position=0)]
-        [String]$Message
+        [Parameter(Mandatory)]
+        [String] $CommandName,
+
+        [String] $NewCommandName,
+
+        [String] $NewModuleName,
+
+        [switch] $NewCommandBuiltin
     )
 
     Set-StrictMode -Version 'Latest'
     Use-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState
-    
-    if( $script:warnings[$Message] )
+
+    $msg = "Carbon's ""$($CommandName)"" function is OBSOLETE and will be removed in the next major version of Carbon."
+
+    if( $NewModuleName -and $NewCommandName )
     {
-        return
+        $msg = "$($msg) Use the ""$($NewCommandName)"" command in the ""$($ModuleName)"" module instead."
+    }
+    elseif( $NewModuleName )
+    {
+        $msg = "$($msg) Use commands in the ""$($ModuleName)"" module instead."
+    }
+    elseif( $NewCommandName )
+    {
+        $builtinMsg = 'the '
+        if( $NewCommandBuiltin )
+        {
+            $builtinMsg = 'PowerShell''s '
+        }
+    
+        $msg = "$($msg) Use $($builtinMsg)""$($NewCommandName)"" command instead."
+    }
+    else
+    {
+        $msg = "$($msg) Remove usages."
     }
 
-    Write-Warning -Message $Message
-    $script:warnings[$Message] = $true
+    Write-CWarningOnce -Message $msg
+}
+
+function Write-CRefactoredCommandWarning
+{
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory)]
+        [String] $CommandName,
+
+        [Parameter(Mandatory)]
+        [String] $ModuleName,
+
+        [String] $NewCommandName
+    )
+
+    Set-StrictMode -Version 'Latest'
+    Use-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState
+
+    $msg = "Carbon's ""$($CommandName)"" function MOVED to new ""$($ModuleName)"" module"
+    if( $NewCommandName )
+    {
+        $msg = "$($msg) and renamed ""$($NewCommandName)"""
+    }
+
+    $msg = "$($msg). ""$($CommandName)"" will be removed from the next major version of Carbon. Switch to the new " +
+           """$($ModuleName)"" module, available on the PowerShell Gallery."
+
+    Write-CWarningOnce -Message $msg
+}
+
+function Write-CRenamedCommandWarning
+{
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory)]
+        [String] $CommandName,
+
+        [Parameter(Mandatory)]
+        [String] $NewCommandName
+    )
+
+    Set-StrictMode -Version 'Latest'
+    Use-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState
+
+    $msg = "Carbon's ""$($CommandName)"" function RENAMED to ""$($NewCommandName)"". The old ""$($CommandName)"" " +
+           "function will be removed from the next major version of Carbon. Update usages."
+    Write-CWarningOnce -Message $msg
+}
+
+
+function Write-CWarningOnce
+{
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory, Position=0, ParameterSetName='Message', ValueFromPipeline)]
+        [String] $Message
+    )
+
+    process
+    {
+        Set-StrictMode -Version 'Latest'
+        Use-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState
+
+        if( $script:warnings[$Message] )
+        {
+            return
+        }
+
+        Write-Warning -Message $Message
+        $script:warnings[$Message] = $true
+    }
 }
 
 $developerImports = & {
@@ -139,7 +235,8 @@ foreach( $developerImport in $developerImports )
 }
 
 # Allows us to be platform agnostic in our calls of 'GetAccessControl'.
-if( -not ([IO.DirectoryInfo]::New([Environment]::CurrentDirectory) | Get-Member -Name 'GetAccessControl') )
+$currentDirInfo = New-Object -TypeName 'IO.DirectoryInfo' -ArgumentList ([Environment]::CurrentDirectory)
+if( -not ($currentDirInfo | Get-Member -Name 'GetAccessControl') )
 {
     Update-TypeData -MemberName 'GetAccessControl' -MemberType 'ScriptMethod' -TypeName 'IO.DirectoryInfo' -Value {
         [CmdletBinding()]
@@ -151,7 +248,8 @@ if( -not ([IO.DirectoryInfo]::New([Environment]::CurrentDirectory) | Get-Member 
     }
 }
 
-if( -not ([IO.FileInfo]::New($PSCommandPath) | Get-Member -Name 'GetAccessControl') )
+$currentCmdInfo = New-Object -TypeName 'IO.FileInfo' -ArgumentList $PSCommandPath
+if( -not ($currentCmdInfo | Get-Member -Name 'GetAccessControl') )
 {
     Update-TypeData -MemberName 'GetAccessControl' -MemberType 'ScriptMethod' -TypeName 'IO.FileInfo' -Value {
         [CmdletBinding()]

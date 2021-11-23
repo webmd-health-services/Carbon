@@ -26,7 +26,7 @@ function Resolve-WindowsFeatureName
     Set-StrictMode -Version 'Latest'
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
     
-    Write-CWarningOnce -Message ('Resolve-WindowsFeatureName is obsolete and will be removed in a future major version of Carbon.')
+    Write-CObsoleteCommandWarning -CommandName $MyInvocation.MyCommand.Name
 
     Assert-WindowsFeatureFunctionsSupported -WarningAction SilentlyContinue | Out-Null
 

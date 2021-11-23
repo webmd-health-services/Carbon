@@ -25,7 +25,7 @@
     RootModule = 'Carbon.psm1'
 
     # Version number of this module.
-    ModuleVersion = '2.11.0'
+    ModuleVersion = '2.12.0'
 
     # ID used to uniquely identify this module
     GUID = '075d9444-c01b-48c3-889a-0b3490716fa2'
@@ -358,15 +358,7 @@ All functions are idempotent: when run multiple times with the same arguments, y
             Prerelease = ''
 
             # ReleaseNotes of this module
-            ReleaseNotes = @'
-
-# 2.11.0
-
-* Fixed: Resolve-CPathCase fails on PowerShell Core.
-* New: 'Grant-Permission', 'Get-Permission', and 'Revoke-Permission' scripts now execute correctly on
-non-Windows platforms.
-* Fixed: Install-CService now will update services when file permissions or user account privileges have changed.
-'@
+            ReleaseNotes = 'https://github.com/webmd-health-services/Carbon/blob/master/CHANGELOG.md'
         } # End of PSData hashtable
 
     } # End of PrivateData hashtable

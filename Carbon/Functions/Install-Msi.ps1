@@ -22,31 +22,31 @@ function Install-CMsi
 
     Demonstrates how to pipe MSI files into `Install-CMsi` for installation.
     #>
-    [CmdletBinding(SupportsShouldProcess=$true)]
+    [CmdletBinding(SupportsShouldProcess)]
     param(
-        [Parameter(Mandatory=$true,ValueFromPipeline=$true,ValueFromPipelineByPropertyName=$true)]
-        [Alias('FullName')]
-        [string[]]
         # The path to the installer to run. Wildcards supported.
-        $Path,
+        [Parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)]
+        [Alias('FullName')]
+        [String[]] $Path,
         
-        [Parameter(DontShow=$true)]
-        [Switch]
         # OBSOLETE. Installers are run in quiet mode by default. This switch will be removed in a future major version of Carbon. 
-        $Quiet,
+        [Parameter(DontShow)]
+        [switch] $Quiet,
 
-        [Switch]
         # Install the MSI even if it has already been installed. Will cause a repair/reinstall to run.
-        $Force
+        [switch] $Force
     )
 
     Set-StrictMode -Version 'Latest'
-
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
-    if( $PSBoundParameters.ContainsKey( 'Quiet' ) )
+    Write-CRefactoredCommandWarning -CommandName $MyInvocation.MyCommand.Name -ModuleName 'Carbon.Windows.Installer'
+
+    if( $PSBoundParameters.ContainsKey('Quiet') )
     {
-        Write-CWarningOnce ('Install-CMsi''s `Quiet` switch is obsolete and will be removed in a future major version of Carbon. Installers are run in quiet mode by default. Please remove usages of the `Quiet` switch.')
+        $msg = 'Install-CMsi''s `Quiet` switch is obsolete and will be removed in the next major version of Carbon. ' +
+               'Installers are now run in quiet mode by default. Remove usages of the `Quiet` switch.'
+        Write-CWarningOnce -Message $msg
     }
 
     Get-CMsi -Path $Path |

@@ -98,9 +98,7 @@ function Install-CCertificate
 
     if( -not $NoWarn )
     {
-        $msg = 'Carbon''s "Install-CCertificate" function is OBSOLETE and will be removed in the next major version ' +
-               'of Carbon. Use the "Install-CCertificate" function in the new "Carbon.Cryptography" module.'
-        Write-CWarningOnce -Message $msg
+        Write-CRefactoredCommandWarning -CommandName $MyInvocation.MyCommand.Name -ModuleName 'Carbon.Cryptography'
     }
 
     if( $Password -and $Password -isnot [securestring] )

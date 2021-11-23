@@ -21,12 +21,6 @@ Build:
     Path: Source\Carbon.sln
     Property:
     - SignAssembly=$(SignAssembly)
-- PowerShell:
-    OnlyDuring: Build
-    OnlyBy: BuildServer
-    Path: Source\Compile-CarbonTestInstaller.ps1
-    Argument:
-        Configuration: $(WHISKEY_MSBUILD_CONFIGURATION)
 - DotNet:
     Command: publish
     Path: Source\Test\Carbon.Test.csproj
@@ -81,6 +75,8 @@ Build:
     Path:
     - LICENSE.txt
     - NOTICE.txt
+    - README.md
+    - CHANGELOG.md
     DestinationDirectory: Carbon
 - NuGetPack:
     Path: Carbon.nuspec
@@ -158,9 +154,6 @@ Tests:
 - Pester4:
     OnlyBy: BuildServer
     Script:
-    - Test\Install-Certificate.Tests.ps1
-    - Test\Uninstall-Certificate.Tests.ps1
-    - Test\Invoke-PowerShell.Tests.ps1
     - Test\*Iis*.ps1
     - Test\Carbon_*.Tests.ps1
 - Parallel:
@@ -175,12 +168,9 @@ Tests:
             Script: 
             - Test\*.Tests.ps1
             Exclude:
-            - "*\\Test\\Install-Certificate.Tests.ps1"
-            - "*\\Test\\Uninstall-Certificate.Tests.ps1"
             - "*\\Test\\*Iis*.ps1"
             - "*\\Test\\Carbon_*.Tests.ps1"
             - "*\\Test\\*-ScheduledTask.Tests.ps1"
-            - "*\\Test\\Invoke-PowerShell.Tests.ps1"
     - Tasks:
         - PowerShell:
             WarningAction: SilentlyContinue

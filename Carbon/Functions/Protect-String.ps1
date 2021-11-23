@@ -158,9 +158,7 @@ filter Protect-CString
 
     if( -not $NoWarn )
     {
-        $msg = 'Carbon''s "Protect-CString" function is OBSOLETE and will be removed in the next major version of ' +
-               'Carbon. Use the "Protect-CString" function in the new "Carbon.Cryptography" module.'
-        Write-CWarningOnce -Message $msg
+        Write-CRefactoredCommandWarning -CommandName $MyInvocation.MyCommand.Name -ModuleName 'Carbon.Cryptography'
     }
 
     Add-Type -AssemblyName 'System.Security'

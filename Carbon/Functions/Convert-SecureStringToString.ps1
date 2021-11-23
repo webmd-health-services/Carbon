@@ -31,10 +31,7 @@ function Convert-CSecureStringToString
 
     if( -not $NoWarn )
     {
-        $msg = 'Carbon''s "Convert-CSecureStringToString" function is OBSOLETE and will be removed in the next major ' +
-               'version of Carbon. Use the "Convert-CSecureStringToString" function in the new "Carbon.Cryptography"' +
-               'module.'
-        Write-CWarningOnce -Message $msg
+        Write-CRefactoredCommandWarning -CommandName $MyInvocation.MyCommand.Name -ModuleName 'Carbon.Cryptography'
     }
 
     $stringPtr = [Runtime.InteropServices.Marshal]::SecureStringToBSTR($SecureString)
