@@ -1,4 +1,31 @@
 
+# Leave these here so that if/when Install-CJunction moves to its own module, these go with it.
+Add-CTypeData -Type IO.DirectoryInfo `
+              -MemberName 'IsJunction' `
+              -MemberType ScriptProperty `
+              -Value { (($this.Attributes -band [IO.FileAttributes]::ReparsePoint) -eq [IO.FileAttributes]::ReparsePoint) }
+
+Add-CTypeData -Type IO.DirectoryInfo `
+              -MemberName 'IsSymbolicLink' `
+              -MemberType ScriptProperty `
+              -Value { [Carbon.IO.SymbolicLink]::IsSymbolicLink( $this.FullName ) }
+
+Add-CTypeData -Type IO.DirectoryInfo `
+              -MemberName 'TargetPath' `
+              -MemberType ScriptProperty `
+              -Value { [Carbon.IO.ReparsePoint]::GetTarget( $this.FullName ) }
+
+Add-CTypeData -Type IO.FileInfo `
+              -MemberName 'IsSymbolicLink' `
+              -MemberType ScriptProperty `
+              -Value { [Carbon.IO.SymbolicLink]::IsSymbolicLink( $this.FullName ) }
+
+Add-CTypeData -Type IO.FileInfo `
+              -MemberName 'TargetPath' `
+              -MemberType ScriptProperty `
+              -Value { [Carbon.IO.ReparsePoint]::GetTarget( $this.FullName ) }
+
+
 function Install-CJunction
 {
     <#

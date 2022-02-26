@@ -1,4 +1,9 @@
 
+# Leave this here so that when Get-CFirewallRule gets moved to its own module, these go with it.
+Add-CTypeData -Type Carbon.Firewall.Rule -MemberName 'LocalIPAddress' -MemberType AliasProperty -Value 'LocalIP'
+Add-CTypeData -Type Carbon.Firewall.Rule -MemberName 'RemoteIPAddress' -MemberType AliasProperty -Value 'RemoteIP'
+
+
 function Get-CFirewallRule
 {
     <#

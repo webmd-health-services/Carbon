@@ -1,4 +1,54 @@
 
+# Leave these here so that when Get-CCertificate moves to its own module, these go with it.
+Add-CTypeData -Type Security.Cryptography.X509Certificates.X509Certificate2 `
+              -MemberName 'IssuedTo' `
+              -MemberType ScriptProperty `
+              -Value { $this.GetNameInfo( 'SimpleName', $false ) }
+
+Add-CTypeData -Type Security.Cryptography.X509Certificates.X509Certificate2 `
+              -MemberName 'IssuedBy' `
+              -MemberType ScriptProperty `
+              -Value { $this.GetNameInfo( 'SimpleName', $true ) }
+
+Add-CTypeData -Type Security.Cryptography.X509Certificates.X509Store `
+              -MemberName 'DisplayName' `
+              -MemberType ScriptProperty `
+              -Value {
+                    switch( $this.Name )
+                    {
+                        'AddressBook' { return 'Other People' }
+                        'AuthRoot' { return 'Third-Party Root Certification Authorities' }
+                        'CA' { return 'Intermediate Certification Authorities' }
+                        'CertificateAuthority' { return 'Intermediate Certification Authorities' }
+                        'Disallowed' { return 'Untrusted Certificates' }
+                        'My' { return 'Personal' }
+                        'Root' { return 'Trusted Root Certification Authorities' }
+                        'TrustedPeople' { return 'Trusted People' }
+                        'TrustedPublisher' { return 'Trusted Publishers' }
+                        default { return '' }
+                    }
+                }
+
+Add-CTypeData -Type Security.Cryptography.X509Certificates.X509Store `
+              -MemberName 'StoreName' `
+              -MemberType ScriptProperty `
+              -Value {
+                    if( $this.Name -eq 'CA' )
+                    {
+                        return [Security.Cryptography.X509Certificates.StoreName]::CertificateAuthority
+                    }
+                
+                    foreach( $value in ([Enum]::GetValues([Security.Cryptography.X509Certificates.StoreName])) )
+                    {
+                        if( $this.Name -eq $value.ToString() )
+                        {
+                            return $value
+                        }
+                    }
+
+                    return ''
+                }
+
 function Get-CCertificate
 {
     <#
