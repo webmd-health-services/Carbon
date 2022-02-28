@@ -6,7 +6,12 @@ Build:
 - Version:
     Path: Carbon\Carbon.psd1
     Prerelease:
-    - prerelease: rc$(WHISKEY_BUILD_NUMBER)
+    - "*/*": alpha$(WHISKEY_BUILD_NUMBER)
+    - develop: rc$(WHISKEY_BUILD_NUMBER)
+- Exec:
+    OnlyBy: BuildServer
+    Path: appveyor
+    Argument: [ UpdateBuild, -Version, $(WHISKEY_SEMVER2) ]
 - PowerShell:
     OnlyBy: BuildServer
     Path: Save-CarbonSigningKey.ps1
@@ -21,12 +26,6 @@ Build:
     Path: Source\Carbon.sln
     Property:
     - SignAssembly=$(SignAssembly)
-- PowerShell:
-    OnlyDuring: Build
-    OnlyBy: BuildServer
-    Path: Source\Compile-CarbonTestInstaller.ps1
-    Argument:
-        Configuration: $(WHISKEY_MSBUILD_CONFIGURATION)
 - DotNet:
     Command: publish
     Path: Source\Test\Carbon.Test.csproj
@@ -51,6 +50,7 @@ Build:
     OnlyBy: BuildServer
     Path: 
     - Carbon\Functions\*.ps1
+    - Carbon\Carbon.psm1.Import.Obsolete.ps1
     - Carbon\Carbon.psm1.Import.Iis.ps1
     - Carbon\Carbon.psm1.Import.Lcm.ps1
     - Carbon\Carbon.psm1.Import.Post.ps1
@@ -68,33 +68,40 @@ Build:
     DestinationPath: Carbon\Functions\Iis.ps1
     TextSeparator: "$(NewLine)$(NewLine)"
     DeleteSourceFiles: true
-- Pipeline:
-    Name: Tests
-- SetVariableFromPowerShellDataFile:
-    Path: Carbon\Carbon.psd1
-    Variables:
-        PrivateData:
-            PSData:
-                ReleaseNotes: RELEASE_NOTES
-                Tags: TAGS
 - CopyFile:
     Path:
     - LICENSE.txt
     - NOTICE.txt
+    - README.md
+    - CHANGELOG.md
     DestinationDirectory: Carbon
 - NuGetPack:
     Path: Carbon.nuspec
-    Properties:
-        ReleaseNotes: $(RELEASE_NOTES)
-        Tags: $(TAGS)
 - Zip:
-    ArchivePath: .output\Carbon.zip
+    ArchivePath: .output\Carbon-$(WHISKEY_SEMVER2).zip
     Path:
     - Carbon
     - examples
     Exclude:
     - "*.pdb"
     - "*.orig"
+- Exec:
+    OnlyBy: BuildServer
+    Path: appveyor
+    Argument: [ 'PushArtifact', '.output/Carbon-$(WHISKEY_SEMVER2).zip', '-DeploymentName', 'GitHub' ]
+- PublishPowerShellModule:
+    Path: Carbon
+- Exec:
+    OnlyBy: BuildServer
+    Path: appveyor
+    Argument: [
+        'PushArtifact',
+        '.output/Carbon.$(WHISKEY_SEMVER2_NO_BUILD_METADATA).nupkg',
+        '-DeploymentName',
+        'PowerShellGallery'
+    ]
+- Pipeline:
+    Name: Tests
 
 PublishBin:
 - MSBuild:
@@ -158,9 +165,6 @@ Tests:
 - Pester4:
     OnlyBy: BuildServer
     Script:
-    - Test\Install-Certificate.Tests.ps1
-    - Test\Uninstall-Certificate.Tests.ps1
-    - Test\Invoke-PowerShell.Tests.ps1
     - Test\*Iis*.ps1
     - Test\Carbon_*.Tests.ps1
 - Parallel:
@@ -175,12 +179,9 @@ Tests:
             Script: 
             - Test\*.Tests.ps1
             Exclude:
-            - "*\\Test\\Install-Certificate.Tests.ps1"
-            - "*\\Test\\Uninstall-Certificate.Tests.ps1"
             - "*\\Test\\*Iis*.ps1"
             - "*\\Test\\Carbon_*.Tests.ps1"
             - "*\\Test\\*-ScheduledTask.Tests.ps1"
-            - "*\\Test\\Invoke-PowerShell.Tests.ps1"
     - Tasks:
         - PowerShell:
             WarningAction: SilentlyContinue
@@ -199,38 +200,3 @@ Tests:
     Path: Format-TestResult.ps1
     Argument:
         OutputPath: $(WHISKEY_OUTPUT_DIRECTORY)
-
-Publish:
-- PublishPowerShellModule:
-    UnlessExists: env:APPVEYOR_PULL_REQUEST_NUMBER
-    Path: Carbon
-    RepositoryName: PSGallery
-    RepositoryUri: https://www.powershellgallery.com/api/v2/
-    ApiKeyID: powershellgallery.com
-- NuGetPush:
-    OnlyOnBranch:
-    - master
-    UnlessExists: env:APPVEYOR_PULL_REQUEST_NUMBER
-    Uri: https://nuget.org/api/v2/package
-    ApiKeyID: nuget.org
-    SkipUploadedCheck: true
-- NuGetPush:
-    OnlyOnBranch:
-    - master
-    UnlessExists: env:APPVEYOR_PULL_REQUEST_NUMBER
-    Uri: https://chocolatey.org/api/v2/package
-    ApiKeyID: chocolatey.org
-    SkipUploadedCheck: true
-- GitHubRelease:
-    UnlessExists: env:APPVEYOR_PULL_REQUEST_NUMBER
-    RepositoryName: webmd-health-services/Carbon
-    ApiKeyID: github.com
-    Tag: $(WHISKEY_SEMVER2_NO_BUILD_METADATA)
-    Commitish: $(WHISKEY_SCM_COMMIT_ID)
-    Name: $(WHISKEY_SEMVER2_NO_BUILD_METADATA)
-    Description: $(RELEASE_NOTES)
-    Assets:
-    - Path: .output\Carbon.zip
-      ContentType: application/zip
-      Name: Carbon-$(WHISKEY_SEMVER2_NO_BUILD_METADATA).zip
-    

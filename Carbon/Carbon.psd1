@@ -25,7 +25,7 @@
     RootModule = 'Carbon.psm1'
 
     # Version number of this module.
-    ModuleVersion = '2.11.0'
+    ModuleVersion = '2.11.1'
 
     # ID used to uniquely identify this module
     GUID = '075d9444-c01b-48c3-889a-0b3490716fa2'
@@ -89,13 +89,9 @@ All functions are idempotent: when run multiple times with the same arguments, y
     ScriptsToProcess = @()
 
     # Type files (.ps1xml) to be loaded when importing this module
-    TypesToProcess = @(
-                        'Carbon.types.ps1xml',
-                        'Types\Scheduled.Service.RegisteredTask.types.ps1xml',
-                        'Types\System.IO.DirectoryInfo.types.ps1xml'
-                        'Types\System.IO.FileInfo.types.ps1xml'
-                        'Types\System.ServiceProcess.ServiceController.types.ps1xml'
-                      )
+    # DO NOT USE! If you import a module twice that has the same type data, you get errors. :( Use Update-TypeData to
+    # dynamically add extended type data.
+    # TypesToProcess = @( )
 
     # Format files (.ps1xml) to be loaded when importing this module
     FormatsToProcess = @(
@@ -358,15 +354,7 @@ All functions are idempotent: when run multiple times with the same arguments, y
             Prerelease = ''
 
             # ReleaseNotes of this module
-            ReleaseNotes = @'
-
-# 2.11.0
-
-* Fixed: Resolve-CPathCase fails on PowerShell Core.
-* New: 'Grant-Permission', 'Get-Permission', and 'Revoke-Permission' scripts now execute correctly on
-non-Windows platforms.
-* Fixed: Install-CService now will update services when file permissions or user account privileges have changed.
-'@
+            ReleaseNotes = 'https://github.com/webmd-health-services/Carbon/blob/master/CHANGELOG.md'
         } # End of PSData hashtable
 
     } # End of PrivateData hashtable

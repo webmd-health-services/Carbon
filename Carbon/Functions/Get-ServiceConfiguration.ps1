@@ -1,4 +1,100 @@
 
+# This extended type data should move to the Carbon.Service module if/when it gets created.
+Add-CTypeData -Type ServiceProcess.ServiceController `
+              -MemberName 'GetServiceConfigProperty' `
+              -MemberType ScriptMethod `
+              -Value {
+                    param(
+                        [Parameter(Mandatory)]
+                        # The name of the property to retrieve.
+                        [String] $Name
+                    )
+
+                    Set-StrictMode -Version 'Latest'
+
+                    $svcName = $this.ServiceName
+                    $svcMachineName = $this.MachineName
+
+                    if( -not ($this | Get-Member -Name 'Configuration') )
+                    {
+                        $value = $null
+                        try
+                        {
+                            $value = New-Object 'Carbon.Service.ServiceInfo' $svcName,$svcMachineName
+                        }
+                        catch
+                        {
+                            $ex = $_.Exception
+                            while( $ex.InnerException )
+                            {
+                                $ex = $ex.InnerException
+                            }
+                            if( $Global:Error.Count -gt 0 )
+                            {
+                                $Global:Error.RemoveAt(0)
+                            }
+                            $msg = "Failed to load extended service information for service ""$($svcName)"" on " +
+                                   """$($svcMachineName)"": $($ex.Message)"
+                            Write-Error $msg
+                        }
+                        Add-Member -InputObject $this -MemberType NoteProperty -Name 'Configuration' -Value $value
+                    }
+
+                    if( -not $this.Configuration )
+                    {
+                        return
+                    }
+
+                    if( -not ($this.Configuration | Get-Member -Name $Name) )
+                    {
+                        return
+                    }
+
+                    return $this.Configuration.$Name
+                }
+
+$svcControllerPropertyNames = @(
+    'DelayedAutoStart',
+    'Description',
+    'ErrorControl',
+    'FailureProgram',
+    'FirstFailure',
+    'LoadOrderGroup',
+    'Path',
+    'RebootDelay',
+    'RebootDelayMinutes',
+    'RebootMessage',
+    'ResetPeriod',
+    'ResetPeriodDays',
+    'RestartDelay',
+    'RestartDelayMinutes',
+    'RunCommandDelay',
+    'RunCommandDelayMinutes',
+    'SecondFailure',
+    'StartType',
+    'TagID',
+    'ThirdFailure',
+    'UserName'
+)
+foreach( $propertyName in $svcControllerPropertyNames )
+{
+    Add-CTypeData -Type ServiceProcess.ServiceController `
+                  -MemberName $propertyName `
+                  -MemberType ScriptProperty `
+                  -Value ([scriptblock]::Create("`$this.GetServiceConfigProperty('$($propertyName)')"))
+}
+
+Add-CTypeData -Type ServiceProcess.ServiceController `
+              -MemberName 'StartMode' `
+              -MemberType ScriptProperty `
+              -Value {
+                    $startType = $this.GetServiceConfigProperty( 'StartType' )
+                    if( $startType -ne $null )
+                    {
+                        [ServiceProcess.ServiceStartMode][int]$startType
+                    }
+                }
+
 function Get-CServiceConfiguration
 {
     <#

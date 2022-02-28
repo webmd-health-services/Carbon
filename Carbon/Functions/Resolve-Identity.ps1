@@ -1,4 +1,9 @@
 
+# When Resolve-CIdentity gets moved to a new module, this should go with it.
+Add-CTypeData -TypeName 'System.DirectoryServices.AccountManagement.Principal' `
+              -MemberName 'ConnectedServer' `
+              -MemberType ScriptProperty `
+              -Value { $this.Context.ConnectedServer }
 
 function Resolve-CIdentity
 {
