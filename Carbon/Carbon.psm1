@@ -117,8 +117,6 @@ $TrustedHostsPath = 'WSMan:\localhost\Client\TrustedHosts'
 Write-Timing ('Adding System.DirectoryServices.AccountManagement assembly.')
 Add-Type -AssemblyName 'System.DirectoryServices.AccountManagement'
 
-$MyInvocation.MyCommand.ScriptBlock.Module.OnRemove = { Write-Host 'I am being removed!' }
-
 function Add-CTypeData
 {
     [CmdletBinding()]

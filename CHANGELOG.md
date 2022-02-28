@@ -1,12 +1,8 @@
 
-# 2.12.1
+# 2.11.1
 
 * Fixed: Carbon fails to import multiple times in the same session.
 * Fixed: Carbon fails when used as a nested module and Carbon is loaded globally or by nested in another module.
-
-
-# 2.12.0
-
 * Fixed: Importing Carbon fails under PowerShell 4.
 
 
