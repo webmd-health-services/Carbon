@@ -77,6 +77,17 @@ Build:
     DestinationDirectory: Carbon
 - NuGetPack:
     Path: Carbon.nuspec
+- Exec:
+    OnlyBy: BuildServer
+    Path: appveyor
+    Argument: [
+        'PushArtifact',
+        '.output/Carbon.$(WHISKEY_SEMVER2_NO_BUILD_METADATA).nupkg',
+        '-DeploymentName',
+        'Chocolatey'
+    ]
+- Delete:
+    Path: .output\*.nupkg
 - Zip:
     ArchivePath: .output\Carbon-$(WHISKEY_SEMVER2).zip
     Path:

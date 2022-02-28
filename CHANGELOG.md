@@ -1,4 +1,9 @@
 
+# 2.11.2
+
+* Fixed: can't publish Carbon package to Chocolatey.
+
+
 # 2.11.1
 
 * Fixed: Carbon fails to import multiple times in the same session.
