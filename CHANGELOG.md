@@ -1,4 +1,9 @@
 
+# 2.11.2
+
+* Fixed: `Carbon.Firewall.Rule` type missing the `LocalIP` and `RemoteIP` properties (which are aliases for the
+  `LocalIpAddress` and `RemoteIPAddress` properties, respectively).
+
 # 2.11.1
 
 * Fixed: Carbon fails to import multiple times in the same session.
