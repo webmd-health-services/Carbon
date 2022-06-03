@@ -47,9 +47,9 @@ environment:
     appveyor_build_worker_image: Visual Studio 2017
     
   # TODO: Get-WmiObject doesn't exist. Does Get-CimInstance? Can Carbon support PowerShell 6?
-  # - job_name: Windows Server 2016, PowerShell 6
-  #   job_group: pwsh
-  #   appveyor_build_worker_image: Visual Studio 2017
+  - job_name: Windows Server 2016, PowerShell 6
+    job_group: pwsh
+    appveyor_build_worker_image: Visual Studio 2017
 
   # TODO: Get build working on a new version of the .NET SDK.
   # - job_name: Windows Server 2019, Windows PowerShell 5.1
@@ -57,9 +57,9 @@ environment:
   #   appveyor_build_worker_image: Visual Studio 2022
 
   # TODO: Get build working on a new version of the .NET SDK
-  # - job_name: Windows Server 2019, PowerShell 7
-  #   job_group: pwsh
-  #   appveyor_build_worker_image: Visual Studio 2022
+  - job_name: Windows Server 2019, PowerShell 7
+    job_group: pwsh
+    appveyor_build_worker_image: Visual Studio 2022
 
 
 artifacts:
@@ -72,11 +72,28 @@ for:
     only:
     - job_group: ps
   build_script:
-  - ps: .\build.ps1
-
+  - ps: |
+      try
+      {
+          ./init.ps1
+          ./build.ps1
+      }
+      finally
+      {
+          $Global:Error | Format-List * -Force
+      }
 # Build in PowerShell
 - matrix:
     only:
     - job_group: pwsh
   build_script:
-  - pwsh: ./build.ps1
+  - pwsh: |
+      try
+      {
+          ./init.ps1
+          ./build.ps1
+      }
+      finally
+      {
+          $Global:Error | Format-List * -Force
+      }
