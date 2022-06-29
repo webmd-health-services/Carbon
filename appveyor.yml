@@ -56,7 +56,7 @@ environment:
   #   job_group: ps
   #   appveyor_build_worker_image: Visual Studio 2022
 
-  # TODO: Get build working on a new version of the .NET SDK
+  # TODO: Get build working on a new version of the .NET SDK.
   # - job_name: Windows Server 2019, PowerShell 7
   #   job_group: pwsh
   #   appveyor_build_worker_image: Visual Studio 2022
@@ -72,11 +72,51 @@ for:
     only:
     - job_group: ps
   build_script:
-  - ps: .\build.ps1
+  - ps: |
+      if( -not (Get-Module -Name 'PowerShellGet' -ListAvailable | Where-Object Version -eq ([Version]'2.2.5')) )
+      {
+          $job = Start-Job {
+              Install-Module -Name 'PowerShellGet' -RequiredVersion '2.2.5' -AllowClobber -Force -Scope CurrentUser
+          }
+          $job | Wait-Job
+          $job | Receive-Job
+          $job | Remove-Job
+      }
+      if( -not (Get-Module -Name 'PackageManagement' -ListAvailable | Where-Object Version -eq ([Version]'1.4.7')) )
+      {
+          $job = Start-Job {
+              Install-Module -Name 'PackageManagement' -RequiredVersion '1.4.7' -AllowClobber -Force -Scope CurrentUser
+          }
+          $job | Wait-Job
+          $job | Receive-Job
+          $job | Remove-Job
+      }
+      Get-Module 'PowerShellGet', 'PackageManagement' -ListAvailable | Format-Table -Auto
+      .\build.ps1
 
 # Build in PowerShell
 - matrix:
     only:
     - job_group: pwsh
   build_script:
-  - pwsh: ./build.ps1
+  - pwsh: |
+      if( -not (Get-Module -Name 'PowerShellGet' -ListAvailable | Where-Object Version -eq ([Version]'2.2.5')) )
+      {
+          $job = Start-Job {
+              Install-Module -Name 'PowerShellGet' -RequiredVersion '2.2.5' -AllowClobber -Force -Scope CurrentUser
+          }
+          $job | Wait-Job
+          $job | Receive-Job
+          $job | Remove-Job
+      }
+      if( -not (Get-Module -Name 'PackageManagement' -ListAvailable | Where-Object Version -eq ([Version]'1.4.7')) )
+      {
+          $job = Start-Job {
+              Install-Module -Name 'PackageManagement' -RequiredVersion '1.4.7' -AllowClobber -Force -Scope CurrentUser
+          }
+          $job | Wait-Job
+          $job | Receive-Job
+          $job | Remove-Job
+      }
+      Get-Module 'PowerShellGet', 'PackageManagement' -ListAvailable | Format-Table -Auto
+      ./build.ps1
