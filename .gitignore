@@ -28,3 +28,4 @@ Carbon/NOTICE.txt
 *.orig
 /.vscode/**
 /.dotnet*
+/global.json

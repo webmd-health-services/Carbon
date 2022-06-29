@@ -104,6 +104,8 @@ Build:
     Name: Tests
 
 PublishBin:
+- Delete:
+    Path: global.json
 - MSBuild:
     Path:
     - Source\Carbon.csproj
