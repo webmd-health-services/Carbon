@@ -1,4 +1,12 @@
 
+# 2.12.0 
+
+## Added suport for PowerShell Core
+
+* Added: `Get-Cim` function that determines which method to call when accessing a computer's Common Information Model.
+   `Get-Cim` will call `Get-CimInstance` when PowerShell Core is being used and `Get-WmiObject` when Windows PowerShell
+   is being used.
+
 # 2.11.2
 
 * Fixed: `Carbon.Firewall.Rule` type missing the `LocalIP` and `RemoteIP` properties (which are aliases for the

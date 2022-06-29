@@ -749,7 +749,7 @@ if( -not (Get-Command -Name 'Get-WindowsFeature*' | Where-Object { $_.ModuleName
         
         if( $useOCSetup )
         {
-            Get-WmiObject -Class Win32_OptionalFeature |
+            Get-Cim -Class 'Win32_OptionalFeature' |
                 Where-Object {
                     if( $Name )
                     {

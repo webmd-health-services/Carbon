@@ -175,9 +175,9 @@ function Install-CFileShare
             New-Item -Path $Path -ItemType Directory -Force | Out-String | Write-Verbose
         }
     
-        $shareClass = Get-WmiObject -Class 'Win32_Share' -List
         Write-Verbose -Message ('[SHARE] [{0}]              Sharing {1}' -f $Name,$Path)
-        $result = $shareClass.Create( $Path, $Name, 0, $null, $Description, $null, $shareSecurityDescriptor )
+        $result = ([wmiclass]"root\cimv2:Win32_Share").Create( $Path, $Name, 0, $null, $Description, $null, $shareSecurityDescriptor )
+
         if( $result.ReturnValue )
         {
             Write-Error ('Failed to create share ''{0}'' (Path: {1}). WMI returned error code {2} which means: {3}.' -f $Name,$Path,$result.ReturnValue,$errors[$result.ReturnValue])

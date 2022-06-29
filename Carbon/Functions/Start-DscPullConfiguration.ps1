@@ -123,7 +123,7 @@ function Start-CDscPullConfiguration
                 $ModuleName
             )
 
-            $dscProcessID = Get-WmiObject msft_providers | 
+            $dscProcessID = Get-Cim -Class 'msft_providers' | 
                                 Where-Object {$_.provider -like 'dsccore'} | 
                                 Select-Object -ExpandProperty HostProcessIdentifier 
             Stop-Process -Id $dscProcessID -Force

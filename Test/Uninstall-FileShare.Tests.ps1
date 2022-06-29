@@ -27,7 +27,16 @@ Describe 'Uninstall-FileShare' {
     }
     
     AfterEach {
-        Get-FileShare -Name $shareName -ErrorAction Ignore | ForEach-Object { $_.Delete() }
+        Get-FileShare -Name $shareName -ErrorAction Ignore | 
+            ForEach-Object { 
+                if( $PSVersionTable.PSEdition -eq 'Core' )
+                {
+                    Invoke-CimMethod -InputObject $_ -MethodName 'Delete'
+                }
+                {
+                    $_.Delete()
+                }
+            }
     }
     
     It 'should delete share' {

@@ -55,7 +55,7 @@ Describe 'New-RsaKeyPair' {
         $enhancedKeyUsage | Should Not BeNullOrEmpty
 
         # I don't think Windows 2008 supports Enhanced Key Usages.
-        $osVersion = (Get-WmiObject -Class 'Win32_OperatingSystem').Version
+        $osVersion = (Get-Cim -Class 'Win32_OperatingSystem').Version
         if( $osVersion -notmatch '6.1\b' )
         {
             $usage = $enhancedKeyUsage.EnhancedKeyUsages | Where-Object { $_.FriendlyName -eq 'Document Encryption' }

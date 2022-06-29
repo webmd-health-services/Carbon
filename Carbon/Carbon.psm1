@@ -91,13 +91,10 @@ if( (Test-Path -Path 'env:SystemRoot') )
         (Test-Path -Path $microsoftWebAdministrationPath -PathType Leaf) )
     {
         $exportIisFunctions = $true
-        if( -not $IsPSCore )
-        {
-            Write-Timing ('Adding Microsoft.Web.Administration assembly.')
-            Add-CAssembly -Path $microsoftWebAdministrationPath
-            Write-Timing ('Adding Carbon.Iis assembly.')
-            Add-CAssembly -Path (Join-Path -Path $carbonAssemblyDir -ChildPath 'Carbon.Iis.dll' -Resolve)
-        }
+        Write-Timing ('Adding Microsoft.Web.Administration assembly.')
+        Add-CAssembly -Path $microsoftWebAdministrationPath
+        Write-Timing ('Adding Carbon.Iis assembly.')
+        Add-CAssembly -Path (Join-Path -Path $carbonAssemblyDir -ChildPath 'Carbon.Iis.dll' -Resolve)
     }
 }
 
@@ -184,14 +181,7 @@ Add-CTypeData -Type Diagnostics.Process `
               -MemberType ScriptProperty `
               -Value {
                     $filter = "ProcessID='{0}'" -f $this.Id
-                    if( (Get-Command -Name 'Get-CimInstance' -ErrorAction Ignore) )
-                    {
-                        $process = Get-CimInstance -ClassName 'Win32_Process' -Filter $filter
-                    }
-                    else
-                    {
-                        $process = Get-WmiObject -Class 'Win32_Process' -Filter $filter
-                    }
+                    $process = Get-Cim -Class 'Win32_Process' -Filter $filter
                     return $process.ParentProcessID
                 }
 

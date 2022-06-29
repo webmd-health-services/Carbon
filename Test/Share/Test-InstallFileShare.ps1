@@ -55,7 +55,7 @@ function Invoke-NewShare($Path = $TestDir, $FullAccess = @(), $ChangeAccess = @(
 
 function Get-Share
 {
-    return Get-WmiObject Win32_Share -Filter "Name='$ShareName'"
+    return Get-Cim -Class 'Win32_Share' -Filter "Name='$ShareName'"
 }
 
 

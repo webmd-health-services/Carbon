@@ -23,7 +23,7 @@ Describe 'Test-Identity' {
         (Test-Identity -Name $user1.SamAccountName) | Should Be $true
     }
     
-    if( (Get-WmiObject -Class 'Win32_ComputerSystem').Domain -ne 'WORKGROUP' )
+    if( (Get-Cim -Class 'Win32_ComputerSystem').Domain -ne 'WORKGROUP' )
     {
         It 'should find domain user' {
             (Test-Identity -Name ('{0}\Administrator' -f $env:USERDOMAIN)) | Should Be $true

@@ -15,17 +15,7 @@
 Describe 'System.Diagnostics.Process' {
     It 'processes have ParentProcessID' {
         $parents = @{}
-        if( $PSVersionTable['PSEdition'] -eq 'Core' )
-        {
-            Get-CimInstance Win32_Process |
-                ForEach-Object { $parents[$_.ProcessID] = $_.ParentProcessID }
-        }
-        else
-        {
-            Get-WmiObject Win32_Process |
-                ForEach-Object { $parents[$_.ProcessID] = $_.ParentProcessID }         
-        }
-    
+        Get-Cim -Class 'Win32_Process' | ForEach-Object { $parents[$_.ProcessID] = $_.ParentProcessID }         
         $foundSome = $false
         Get-Process | 
             Where-Object { $parents.ContainsKey( [UInt32]$_.Id ) -and $_.ParentProcessID } |

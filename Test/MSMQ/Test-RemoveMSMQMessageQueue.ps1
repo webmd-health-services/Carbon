@@ -11,7 +11,7 @@
 # limitations under the License.
 
 $userDomain = $env:USERDNSDOMAIN
-$computerDomain = Get-WmiObject 'Win32_ComputerSystem' | Select-Object -ExpandProperty Domain
+$computerDomain = Get-Cim -Class 'Win32_ComputerSystem' | Select-Object -ExpandProperty Domain
 if( (Get-Service -Name MSMQ -ErrorAction SilentlyContinue) -and $userDomain -eq $computerDomain )
 {
 

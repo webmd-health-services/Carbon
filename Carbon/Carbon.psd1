@@ -161,6 +161,7 @@ All functions are idempotent: when run multiple times with the same arguments, y
                             'Get-CIisSecurityAuthentication',
                             'Get-CIisVersion',
                             'Get-CIisWebsite',
+                            'Get-Cim',
                             'Get-CIPAddress',
                             'Get-CMsi',
                             'Get-CMsmqMessageQueue',

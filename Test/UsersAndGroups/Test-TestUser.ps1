@@ -17,7 +17,7 @@ function Start-TestFixture
 
 function Test-ShouldCheckIfLocalAccountExists
 {
-    $localUserAccounts = @(Get-WmiObject -Query "select * from win32_useraccount where Domain='$($env:ComputerName)'" -Computer .)
+    $localUserAccounts = @(Get-Cim -Query "select * from win32_useraccount where Domain='$($env:ComputerName)'" -Computer .)
     Assert-True (0 -lt $localUserAccounts.Length)
     foreach( $localUserAccount in $localUserAccounts )
     {

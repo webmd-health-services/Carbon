@@ -143,7 +143,7 @@ function Invoke-GrantPermissions
         $assertOptionalParams['Type'] = $Type
     }
 
-    $ExpectedRuleType = [Type]('Security.AccessControl.{0}AccessRule' -f $ExpectedRuleType)
+    $ExpectedRuleType = ('Security.AccessControl.{0}AccessRule' -f $ExpectedRuleType) -as [Type]
     $result = Grant-Permission -Identity $Identity -Permission $Permissions -Path $path -PassThru @optionalParams
     It ('should return a {0}' -f $ExpectedRuleType.Name) {
         $result | Should Not BeNullOrEmpty
