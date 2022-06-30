@@ -73,27 +73,50 @@ for:
     - job_group: ps
   build_script:
   - ps: |
-      try
+      if( -not (Get-Module -Name 'PowerShellGet' -ListAvailable | Where-Object Version -eq ([Version]'2.2.5')) )
       {
-          ./init.ps1
-          ./build.ps1
+          $job = Start-Job {
+              Install-Module -Name 'PowerShellGet' -RequiredVersion '2.2.5' -AllowClobber -Force -Scope CurrentUser
+          }
+          $job | Wait-Job
+          $job | Receive-Job
+          $job | Remove-Job
       }
-      finally
+      if( -not (Get-Module -Name 'PackageManagement' -ListAvailable | Where-Object Version -eq ([Version]'1.4.7')) )
       {
-          $Global:Error | Format-List * -Force
+          $job = Start-Job {
+              Install-Module -Name 'PackageManagement' -RequiredVersion '1.4.7' -AllowClobber -Force -Scope CurrentUser
+          }
+          $job | Wait-Job
+          $job | Receive-Job
+          $job | Remove-Job
       }
+      Get-Module 'PowerShellGet', 'PackageManagement' -ListAvailable | Format-Table -Auto
+      .\build.ps1
+
 # Build in PowerShell
 - matrix:
     only:
     - job_group: pwsh
   build_script:
   - pwsh: |
-      try
+      if( -not (Get-Module -Name 'PowerShellGet' -ListAvailable | Where-Object Version -eq ([Version]'2.2.5')) )
       {
-          ./init.ps1
-          ./build.ps1
+          $job = Start-Job {
+              Install-Module -Name 'PowerShellGet' -RequiredVersion '2.2.5' -AllowClobber -Force -Scope CurrentUser
+          }
+          $job | Wait-Job
+          $job | Receive-Job
+          $job | Remove-Job
       }
-      finally
+      if( -not (Get-Module -Name 'PackageManagement' -ListAvailable | Where-Object Version -eq ([Version]'1.4.7')) )
       {
-          $Global:Error | Format-List * -Force
+          $job = Start-Job {
+              Install-Module -Name 'PackageManagement' -RequiredVersion '1.4.7' -AllowClobber -Force -Scope CurrentUser
+          }
+          $job | Wait-Job
+          $job | Receive-Job
+          $job | Remove-Job
       }
+      Get-Module 'PowerShellGet', 'PackageManagement' -ListAvailable | Format-Table -Auto
+      ./build.ps1

@@ -53,13 +53,19 @@ function Add-CAssembly
     [CmdletBinding()]
     param(
         [Parameter(Mandatory)]
-        [String] $Path
+        [String] $Path,
+
+        [switch] $PassThru
     )
 
     $numErrors = $Global:Error.Count
     try
     {
         Add-Type -Path $Path
+        if( $PassThru )
+        {
+            return $true
+        }
     }
     catch
     {
@@ -68,11 +74,16 @@ function Add-CAssembly
         {
             $Global:Error.RemoveAt(0)
         }
+        if( $PassThru )
+        {
+            return $false
+        }
     }
 }
 
 Write-Timing ('Loading Carbon assemblies from "{0}".' -f $carbonAssemblyDir)
-Get-ChildItem -Path (Join-Path -Path $carbonAssemblyDir -ChildPath '*') -Filter 'Carbon*.dll' -Exclude 'Carbon.Iis.dll' |
+$carbonAssembliesPath = Join-Path -Path $carbonAssemblyDir -ChildPath '*'
+Get-ChildItem -Path $carbonAssembliesPath -Filter 'Carbon*.dll' -Exclude 'Carbon.Iis.dll' |
     ForEach-Object { Add-CAssembly -Path $_.FullName }
 
 # Active Directory
@@ -90,11 +101,12 @@ if( (Test-Path -Path 'env:SystemRoot') )
     if( -not (Test-Path -Path 'env:CARBON_SKIP_IIS_IMPORT') -and `
         (Test-Path -Path $microsoftWebAdministrationPath -PathType Leaf) )
     {
-        $exportIisFunctions = $true
         Write-Timing ('Adding Microsoft.Web.Administration assembly.')
-        Add-CAssembly -Path $microsoftWebAdministrationPath
+        $webAdministrationLoaded = Add-CAssembly -Path $microsoftWebAdministrationPath -PassThru
         Write-Timing ('Adding Carbon.Iis assembly.')
-        Add-CAssembly -Path (Join-Path -Path $carbonAssemblyDir -ChildPath 'Carbon.Iis.dll' -Resolve)
+        $carbonIisAssemblyPath = Join-Path -Path $carbonAssemblyDir -ChildPath 'Carbon.Iis.dll' -Resolve
+        $carbonIisLoaded = Add-CAssembly -Path $carbonIisAssemblyPath -PassThru
+        $exportIisFunctions = ($webAdministrationLoaded -and $carbonIisLoaded)
     }
 }
 

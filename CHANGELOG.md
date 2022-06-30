@@ -7,6 +7,12 @@
    `Get-Cim` will call `Get-CimInstance` when PowerShell Core is being used and `Get-WmiObject` when Windows PowerShell
    is being used.
 
+   
+# 2.11.3
+
+* Fixed: Carbon doesn't load Microsoft.Web.Administration assembly on PowerShell 7+.
+
+
 # 2.11.2
 
 * Fixed: `Carbon.Firewall.Rule` type missing the `LocalIP` and `RemoteIP` properties (which are aliases for the

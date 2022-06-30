@@ -1,5 +1,6 @@
 /Carbon/bin/coreclr
 /Carbon/bin/fullclr
+/Carbon/*.md
 **/obj/**
 **/.vs/**
 Source/**/bin/**
@@ -28,3 +29,4 @@ Carbon/NOTICE.txt
 *.orig
 /.vscode/**
 /.dotnet*
+/global.json
