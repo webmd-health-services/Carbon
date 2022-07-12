@@ -70,6 +70,10 @@ function Revoke-CPermission
     if( $providerName -eq 'Certificate' )
     {
         $providerName = 'CryptoKey'
+        if( $PSVersionTable.PSEdition -eq 'Core' )
+        {
+            $providerName = 'FileSystem'
+        }
     }
 
     $rulesToRemove = Get-CPermission -Path $Path -Identity $Identity
@@ -82,6 +86,43 @@ function Revoke-CPermission
             ForEach-Object {
                 if( $_.PSProvider.Name -eq 'Certificate' )
                 {
+                    if( -not ($_.PrivateKey | Get-Member 'CspKeyContainerInfo') )
+                    {
+                        $privateKeyFileName = $_.PrivateKey.Key.UniqueName
+                        # See https://docs.microsoft.com/en-us/windows/win32/seccng/key-storage-and-retrieval
+                        $keyStoragePaths =         @(
+                            "$($env:AppDATA)\Microsoft\Crypto", 
+                            "$($env:ALLUSERSPROFILE)\Application Data\Microsoft\Crypto\SystemKeys", 
+                            "$($env:WINDIR)\ServiceProfiles\LocalService\AppData\Roaming\Microsoft\Crypto\Keys", 
+                            "$($env:WINDIR)\ServiceProfiles\NetworkService\AppData\Roaming\Microsoft\Crypto\Keys", 
+                            "$($env:ALLUSERSPROFILE)\Application Data\Microsoft\Crypto",
+                            "$($env:ALLUSERSPROFILE)\Microsoft\Crypto"
+                        )
+                        $privateKeyFiles = $keyStoragePaths | Get-ChildItem -Recurse -Force -ErrorAction Ignore -Filter $privateKeyFileName
+                        if( -not $privateKeyFiles )
+                        {
+                            $msg = "Failed to find the private key file for certificate ""$($Path)"" (subject: $($_.Subject); " +
+                                    "thumbprint: $($_.Thumbprint); expected file name: $($privateKeyFileName)). This is most " +
+                                    "likely because you don't have permission to read private keys, or we''re not looking in the right " +
+                                    "places. According to [Microsoft docs](https://docs.microsoft.com/en-us/windows/win32/seccng/key-storage-and-retrieval), " +
+                                    "private keys are stored under one of these directories:" + [Environment]::NewLine +
+                                    " * $($keyStoragePaths -join "$([Environment]::NewLine) * ")" + [Environment]::NewLine +
+                                    "If there are other locations we should be looking, please " +
+                                    "[submit an issue/bug report](https://github.com/webmd-health-services/Carbon/issues)."
+                            Write-Error -Message $msg
+                            return
+                        }
+                    
+                        $revokePermissionParams = New-Object -TypeName 'Collections.Generic.Dictionary[[string], [object]]' `
+                                                            -ArgumentList $PSBoundParameters
+                        $revokePermissionParams.Remove('Path')
+                        foreach( $privateKeyFile in $privateKeyFiles )
+                        {
+                            Revoke-CPermission -Path $privateKeyFile.FullName @revokePermissionParams
+                        }
+                        return
+                    }
+
                     [Security.Cryptography.X509Certificates.X509Certificate2]$certificate = $_
 
                     [Security.AccessControl.CryptoKeySecurity]$keySecurity = $certificate.PrivateKey.CspKeyContainerInfo.CryptoKeySecurity

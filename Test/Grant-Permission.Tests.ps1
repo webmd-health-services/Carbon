@@ -66,6 +66,11 @@ function Assert-Permissions
     if( $providerName -eq 'Certificate' )
     {
         $providerName = 'CryptoKey'
+        # CryptoKey does not exist in .NET standard/core so we will have to use FileSystem instead
+        if( $PSVersionTable.PSEdition -eq 'Core' )
+        {
+            $providerName = 'FileSystem'
+        }
     }
         
     $rights = 0
@@ -145,6 +150,7 @@ function Invoke-GrantPermissions
 
     $ExpectedRuleType = ('Security.AccessControl.{0}AccessRule' -f $ExpectedRuleType) -as [Type]
     $result = Grant-Permission -Identity $Identity -Permission $Permissions -Path $path -PassThru @optionalParams
+    $result = $result | Select-Object -Last 1
     It ('should return a {0}' -f $ExpectedRuleType.Name) {
         $result | Should Not BeNullOrEmpty
         $result.IdentityReference | Should Be (Resolve-IdentityName $Identity)
@@ -494,60 +500,77 @@ foreach( $location in @( 'LocalMachine','CurrentUser' ) )
         $cert = Install-Certificate -Path $privateKeyPath -StoreLocation $location -StoreName My -NoWarn
         try
         {
+            $certPath = Join-Path -Path ('cert:\{0}\My' -f $location) -ChildPath $cert.Thumbprint
+            $expectedRuleType = 'CryptoKey'
+            $readPermission = 'GenericRead'
+            $writePermission = 'GenericWrite'
+
+            # CryptoKey does not exist in .NET standard/core so we will have to use FileSystem instead
+            if( $PSVersionTable.PSEdition -eq 'Core')
+            {
+                $expectedRuleType = 'FileSystem'
+                $readPermission = 'Read'
+                $writePermission = 'Write'
+            }
+            
             It 'should install the certificate' {
                 $cert | Should Not BeNullOrEmpty
             }
 
-            $certPath = Join-Path -Path ('cert:\{0}\My' -f $location) -ChildPath $cert.Thumbprint
             Context 'adds permissions' {
-                Invoke-GrantPermissions -Path $certPath -Identity $user -Permission 'GenericWrite' -ExpectedRuleType 'CryptoKey' -ExpectedPermission 'GenericRead','GenericAll'
+                Invoke-GrantPermissions -Path $certPath -Identity $user -Permission $writePermission -ExpectedRuleType $expectedRuleType -ExpectedPermission 'GenericRead','GenericAll'
             }
 
             Context 'changes permissions' {
-                Invoke-GrantPermissions -Path $certPath -Identity $user -Permission 'GenericRead' -ExpectedRuleType 'CryptoKey' 
+                Invoke-GrantPermissions -Path $certPath -Identity $user -Permission $readPermission -ExpectedRuleType $expectedRuleType 
             }
         
             Context 'clearing others'' permissions' {
-                Invoke-GrantPermissions -Path $certPath -Identity $user2 -Permission 'GenericRead' -ExpectedRuleType 'CryptoKey' -Clear
+                Invoke-GrantPermissions -Path $certPath -Identity $user2 -Permission $readPermission -ExpectedRuleType $expectedRuleType -Clear
                 It 'should remove the other user''s permissions' {
-                    (Test-Permission -Path $certPath -Identity $user -Permission 'GenericRead') | Should Be $false
+                    (Test-Permission -Path $certPath -Identity $user -Permission $readPermission) | Should Be $false
                 }
             }
 
             Context 'clearing others'' permissions when permissions getting set haven''t changed' {
-                Invoke-GrantPermissions -Path $certPath -Identity $user -Permission 'GenericRead' -ExpectedRuleType 'CryptoKey' 
-                Invoke-GrantPermissions -Path $certPath -Identity $user2 -Permission 'GenericRead' -ExpectedRuleType 'CryptoKey' -Clear
+                Invoke-GrantPermissions -Path $certPath -Identity $user -Permission $readPermission -ExpectedRuleType $expectedRuleType
+                Invoke-GrantPermissions -Path $certPath -Identity $user2 -Permission $readPermission -ExpectedRuleType $expectedRuleType -Clear
                 It 'should remove the other user''s permissions' {
-                    (Test-Permission -Path $certPath -Identity $user -Permission 'GenericRead') | Should Be $false
+                    (Test-Permission -Path $certPath -Identity $user -Permission $readPermission) | Should Be $false
                 }
             }
 
             Context 'running with -WhatIf switch' {
-                Grant-Permission -Path $certPath -Identity $user2 -Permission 'GenericWrite' -WhatIf
+                Grant-Permission -Path $certPath -Identity $user2 -Permission $writePermission -WhatIf
                 It 'should not change the user''s permissions' {
-                    Test-Permission -Path $certPath -Identity $user2 -Permission 'GenericRead' -Exact | Should Be $true
-                    Test-Permission -Path $certPath -Identity $user2 -Permission 'GenericWrite' -Exact | Should Be $false
+                    Test-Permission -Path $certPath -Identity $user2 -Permission $readPermission -Exact | Should Be $true
+                    Test-Permission -Path $certPath -Identity $user2 -Permission $writePermission -Exact | Should Be $false
                 }
             }
 
             Context 'creating a deny rule' {
-                Invoke-GrantPermissions -Path $certPath -Identity $user -Permission 'GenericRead' -Type 'Deny' -ExpectedRuleType 'CryptoKey'
+                Invoke-GrantPermissions -Path $certPath -Identity $user -Permission $readPermission -Type 'Deny' -ExpectedRuleType $expectedRuleType
             }
 
-            Mock -CommandName 'Set-CryptoKeySecurity' -Verifiable -ModuleName 'Carbon' 
 
-            Context 'permissions exist' {
-            # Now, check that permissions don't get re-applied.
-                Grant-Permission -Path $certPath -Identity $user2 -Permission 'GenericRead'
-                It 'should not set the permissions' {
-                    Assert-MockCalled -CommandName 'Set-CryptoKeySecurity' -ModuleName 'Carbon' -Times 0
+            # CryptoKey does not exist in .NET standard/core so we will have to use FileSystem instead
+            if( $PSVersionTable.PSEdition -ne 'Core' )
+            {
+                Mock -CommandName 'Set-CryptoKeySecurity' -Verifiable -ModuleName 'Carbon' 
+
+                Context 'permissions exist' {
+                # Now, check that permissions don't get re-applied.
+                    Grant-Permission -Path $certPath -Identity $user2 -Permission $readPermission
+                    It 'should not set the permissions' {
+                        Assert-MockCalled -CommandName 'Set-CryptoKeySecurity' -ModuleName 'Carbon' -Times 0
+                    }
                 }
-            }
 
-            Context 'permissions exist but forcing the change' {
-                Grant-Permission -Path $certPath -Identity $user2 -Permission 'GenericRead' -Force 
-                It 'should set the permissions' {
-                    Assert-MockCalled -CommandName 'Set-CryptoKeySecurity' -ModuleName 'Carbon' -Times 1 -Exactly
+                Context 'permissions exist but forcing the change' {
+                    Grant-Permission -Path $certPath -Identity $user2 -Permission $readPermission -Force 
+                    It 'should set the permissions' {
+                        Assert-MockCalled -CommandName 'Set-CryptoKeySecurity' -ModuleName 'Carbon' -Times 1 -Exactly
+                    }
                 }
             }
         }
