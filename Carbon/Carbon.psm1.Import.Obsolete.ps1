@@ -682,7 +682,12 @@ function Get-CPowershellPath
         $psPath = $PSHOME
     }
     
-    Join-Path $psPath powershell.exe
+    $powershellExe = 'powershell.exe'
+    if( $PSVersionTable.PSEdition -eq 'Core' )
+    {
+        $powershellExe = 'pwsh.exe'
+    }
+    Join-Path $psPath $powershellExe
 }
 
 
