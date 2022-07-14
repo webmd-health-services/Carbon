@@ -178,8 +178,9 @@ function Get-CServiceConfiguration
     process
     {
         $optionalParams = @{ }
-        if( $ComputerName )
+        if( $ComputerName -and $PSVersionTable.PSEdition -ne 'Core')
         {
+            # ComputerName parameter does not exists under PowerShell Core.
             $optionalParams['ComputerName'] = $ComputerName
         }
 

@@ -38,6 +38,12 @@ Describe 'New-RsaKeyPair' {
             $ValidTo = (Get-Date).AddDays( [Math]::Floor(([DateTime]::MaxValue - [DateTime]::UtcNow).TotalDays) )
         }
 
+        $keyExchangeAlgorithm = 'RSA-PKCS1-KeyEx'
+        if( $PSVersionTable.PSEdition -eq 'Core' )
+        {
+            $keyExchangeAlgorithm = 'RSA'
+        }
+
         $cert = Get-Certificate -Path $publicKeyPath -NoWarn
         # Weird date/time stamps in generated certificate that I can't figure out/replicate. So we'll just check that the expected/actual dates are within a day of each other.
         [timespan]$span = $ValidTo - $cert.NotAfter
@@ -45,7 +51,7 @@ Describe 'New-RsaKeyPair' {
         $span.TotalDays | Should BeLessThan 2
         $cert.Subject | Should Be $subject
         $cert.PublicKey.Key.KeySize | Should Be $Length
-        $cert.PublicKey.Key.KeyExchangeAlgorithm | Should Be 'RSA-PKCS1-KeyEx'
+        $cert.PublicKey.Key.KeyExchangeAlgorithm | Should Be $keyExchangeAlgorithm
         $cert.SignatureAlgorithm.FriendlyName | Should Be $Algorithm
         $keyUsage = $cert.Extensions | Where-Object { $_ -is [Security.Cryptography.X509Certificates.X509KeyUsageExtension] }
         $keyUsage | Should Not BeNullOrEmpty

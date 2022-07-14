@@ -510,6 +510,7 @@ function Get-CCertificate
     }
 }
 
+Set-Alias -Name 'Get-Certificate' -Value 'Get-CCertificate'
 
 
 function Get-CMsi
