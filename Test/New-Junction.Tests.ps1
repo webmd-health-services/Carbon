@@ -30,7 +30,7 @@ Describe 'New-Junction' {
     
     function Invoke-NewJunction($link, $target)
     {
-        return New-Junction $link $target
+        return New-Junction $link $target -ErrorAction SilentlyContinue
     }
     
     It 'should create junction' {
