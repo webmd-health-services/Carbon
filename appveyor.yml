@@ -73,25 +73,6 @@ for:
     - job_group: ps
   build_script:
   - ps: |
-      if( -not (Get-Module -Name 'PowerShellGet' -ListAvailable | Where-Object Version -eq ([Version]'2.2.5')) )
-      {
-          $job = Start-Job {
-              Install-Module -Name 'PowerShellGet' -RequiredVersion '2.2.5' -AllowClobber -Force -Scope CurrentUser
-          }
-          $job | Wait-Job
-          $job | Receive-Job
-          $job | Remove-Job
-      }
-      if( -not (Get-Module -Name 'PackageManagement' -ListAvailable | Where-Object Version -eq ([Version]'1.4.7')) )
-      {
-          $job = Start-Job {
-              Install-Module -Name 'PackageManagement' -RequiredVersion '1.4.7' -AllowClobber -Force -Scope CurrentUser
-          }
-          $job | Wait-Job
-          $job | Receive-Job
-          $job | Remove-Job
-      }
-      Get-Module 'PowerShellGet', 'PackageManagement' -ListAvailable | Format-Table -Auto
       .\build.ps1
 
 # Build in PowerShell
@@ -100,23 +81,4 @@ for:
     - job_group: pwsh
   build_script:
   - pwsh: |
-      if( -not (Get-Module -Name 'PowerShellGet' -ListAvailable | Where-Object Version -eq ([Version]'2.2.5')) )
-      {
-          $job = Start-Job {
-              Install-Module -Name 'PowerShellGet' -RequiredVersion '2.2.5' -AllowClobber -Force -Scope CurrentUser
-          }
-          $job | Wait-Job
-          $job | Receive-Job
-          $job | Remove-Job
-      }
-      if( -not (Get-Module -Name 'PackageManagement' -ListAvailable | Where-Object Version -eq ([Version]'1.4.7')) )
-      {
-          $job = Start-Job {
-              Install-Module -Name 'PackageManagement' -RequiredVersion '1.4.7' -AllowClobber -Force -Scope CurrentUser
-          }
-          $job | Wait-Job
-          $job | Receive-Job
-          $job | Remove-Job
-      }
-      Get-Module 'PowerShellGet', 'PackageManagement' -ListAvailable | Format-Table -Auto
       ./build.ps1
