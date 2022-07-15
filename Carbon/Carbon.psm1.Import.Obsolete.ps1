@@ -658,6 +658,10 @@ function Get-CPowershellPath
     }
 
     $psPath = $PSHOME
+    if( $PSVersionTable.PSEdition -eq 'Core' )
+    {
+        $psPath = 'C:\Windows\System32\WindowsPowerShell\v1.0'
+    }
     if( (Test-COSIs64Bit -NoWarn) )
     {
         if( (Test-CPowerShellIs64Bit -NoWarn) )
@@ -665,7 +669,7 @@ function Get-CPowershellPath
             if( $x86 )
             {
                 # x64 OS, x64 PS, want x86 path
-                $psPath = $PSHOME -replace 'System32','SysWOW64'
+                $psPath = $psPath -replace 'System32','SysWOW64'
             }
         }
         else
@@ -673,7 +677,7 @@ function Get-CPowershellPath
             if( -not $x86 )
             {
                 # x64 OS, x32 PS, want x64 path
-                $psPath = $PSHome -replace 'SysWOW64','sysnative'
+                $psPath = $psPath -replace 'SysWOW64','sysnative'
             }
         }
     }
@@ -683,12 +687,7 @@ function Get-CPowershellPath
         $psPath = $PSHOME
     }
     
-    $powershellExe = 'powershell.exe'
-    if( $PSVersionTable.PSEdition -eq 'Core' )
-    {
-        $powershellExe = 'pwsh.exe'
-    }
-    Join-Path $psPath $powershellExe
+    Join-Path $psPath powershell.exe
 }
 
 
