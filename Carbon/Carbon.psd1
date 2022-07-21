@@ -89,13 +89,9 @@ All functions are idempotent: when run multiple times with the same arguments, y
     ScriptsToProcess = @()
 
     # Type files (.ps1xml) to be loaded when importing this module
-    TypesToProcess = @(
-                        'Carbon.types.ps1xml',
-                        'Types\Scheduled.Service.RegisteredTask.types.ps1xml',
-                        'Types\System.IO.DirectoryInfo.types.ps1xml'
-                        'Types\System.IO.FileInfo.types.ps1xml'
-                        'Types\System.ServiceProcess.ServiceController.types.ps1xml'
-                      )
+    # DO NOT USE! If you import a module twice that has the same type data, you get errors. :( Use Update-TypeData to
+    # dynamically add extended type data.
+    # TypesToProcess = @( )
 
     # Format files (.ps1xml) to be loaded when importing this module
     FormatsToProcess = @(
