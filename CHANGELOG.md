@@ -1,10 +1,27 @@
 # 2.12.0
 
-* Fixed: Importing Carbon fails under PowerShell 4.
 * The `Install-CMsi`, `Get-CMsi`, and `Get-CProgramInstallInfo` functions have moved to a new `Carbon.Windows.Installer`
 module, now available on the PowerShell Gallery. Please switch to the new module and update usages. If you use these
 functions from Carbon, a warning message will be written. These function will be removed in the next major version of
 Carbon.
+
+
+# 2.11.3
+
+* Fixed: Carbon doesn't load Microsoft.Web.Administration assembly on PowerShell 7+.
+
+
+# 2.11.2
+
+* Fixed: `Carbon.Firewall.Rule` type missing the `LocalIP` and `RemoteIP` properties (which are aliases for the
+  `LocalIpAddress` and `RemoteIPAddress` properties, respectively).
+
+
+# 2.11.1
+
+* Fixed: Carbon fails to import multiple times in the same session.
+* Fixed: Carbon fails when used as a nested module and Carbon is loaded globally or by nested in another module.
+* Fixed: Importing Carbon fails under PowerShell 4.
 
 
 # 2.11.0

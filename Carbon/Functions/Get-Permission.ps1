@@ -1,4 +1,31 @@
 
+# Leave these here so that when Get-CPermission moves to its own module, these go with it.
+Add-CTypeData -Type IO.DirectoryInfo `
+              -MemberName 'GetAccessControl' `
+              -MemberType ScriptMethod `
+              -Value {
+                    [CmdletBinding()]
+                    param(
+                        [Security.AccessControl.AccessControlSections] $IncludeSections = 
+                            [Security.AccessControl.AccessControlSections]::All
+                    )
+                    
+                    return [IO.FileSystemAclExtensions]::GetAccessControl($this, $IncludeSections)
+                }
+
+Add-CTypeData -Type IO.FileInfo `
+              -MemberName 'GetAccessControl' `
+              -MemberType ScriptMethod `
+              -Value {
+                    [CmdletBinding()]
+                    param(
+                        [Security.AccessControl.AccessControlSections]$IncludeSections = 
+                            [Security.AccessControl.AccessControlSections]::All
+                    )
+                    
+                    return [IO.FileSystemAclExtensions]::GetAccessControl($this, $IncludeSections)
+                }
+
 function Get-CPermission
 {
     <#

@@ -1,0 +1,122 @@
+version: 0.0.0+{build}
+
+skip_tags: true
+
+skip_branch_with_pr: true
+
+build:
+  verbosity: minimal
+
+test: off
+
+services:
+- iis
+- msmq
+
+environment:
+  WHISKEY_DISABLE_ERROR_FORMAT: True
+  SNK:
+    secure: 981Cjkus43eXr0w4KCIY36A95S2SNzOU3feH3UHsOPp21bLP+erjERHCjm1EZLZm754kKhEhP1KCTg/dgepGlsSTcZMbc3gvKrTkzgllDFcj03eHUn2viW7mMHoA2qjCa5oTKYkcVzzkMK7NFIv2aIaoeQyDgRw+7Jde88+ku6RX5aHDXvn3gd2keWggML9OO/gTxhaTLDkTx/e+oNHBhjfjhp2g18slz0psm1PpV1749jjnv+e/SvePAdddgyTyQ4k0Y1UDaEHWXbpNZTDVKBj/0/P2xZn/cSf0WkoxUwtF1BpYOfIpjx2Cqs8tq6LHeQ66Br48U+VC8Nu4gBtt/gIjtClxUhf+NrelfLauiaQNKTHEg18ng0+3/lgQq066NLN/UlJY89E8pd635uHMnqTkl7E9MXWvXWQ56JvZltcsssuEcGmSmgkY8dqbmkrUpmORIuINsvFVXPVeNKC+yL5NUBC2kdNRIxM6PjXV4AFXB8/8Q4gOPr7C3OpJqOc29t/wOlsyPeSqGP09NS+VvMZps6LpfOajgf4csI+1HdZsoWWmbG+45nbGkryPm79EBvRBD59DuXejCZt5JLkqKwfLhsrn50DP21oHopoLWXImc6mTkSFPu5yUjuIwDZvBPsa8vGvgJwebgjjP3f19WDHKpRpUN8EwkS4LchXg5JRtqzx4acAIl/dtY+t62/loznfZIsp1aIL1q8jSfgTGDjkZwjdGZgOd6VgQcQXMlwbslLYmlJ2fB1uh/Mjk0wX5g/PJLqrIYFVWZ7w9ICGsYfWVjVz75bVhjqVIhXs7IbX1m+GqLnv8dMCToAzSZ/lqpVfjdGXMNbO9cmKGSAdxfzYDIZ5hvYg1VgaGT22nygLfomUHoDF98wnrPUGHX1sWSmijuGnUmi+R+cYr0heHPZrn+VCggJ7Mp0g+WZDJ+k/8YMp83ysdwnu4NfcTKbNLJqnDfys5XVtsQ0meijC7uNccHCau604C53ZMz0l+zroN3zSKjE9i1+ZgI73uUM2WGQMWeiLJt5KubwtaZ8HKF5wWoIO6JW0JZVel1gwJB64=
+  matrix:
+  # TODO: Get working.
+  # - job_name: PowerShell 7.1 on macOS
+  #   job_group: pwsh
+  #   appveyor_build_worker_image: macOS
+
+  # TODO: Get working.
+  # - job_name: PowerShell 7.2 on Ubuntu
+  #   job_group: pwsh
+  #   appveyor_build_worker_image: Ubuntu
+
+  # TODO: Fix
+  #       > error NETSDK1004: Assets file 'C:\projects\carbon\Source\Test\obj\project.assets.json' not found. Run a
+  #       > NuGet package restore to generate this file.
+  # - job_name: Windows 2012R2, Windows PowerShell 5.1/.NET 4.6.2
+  #   job_group: ps
+  #   appveyor_build_worker_image: Visual Studio 2013
+
+  # TODO: Fix
+  #       > error NETSDK1004: Assets file 'C:\projects\carbon\Source\Test\obj\project.assets.json' not found. Run a
+  #       > NuGet package restore to generate this file.
+  # - job_name: Windows Server 2012R2, PowerShell 6
+  #   job_group: pwsh
+  #   appveyor_build_worker_image: Visual Studio 2015
+
+  - job_name: Windows Server 2016, Windows PowerShell 5.1
+    job_group: ps
+    appveyor_build_worker_image: Visual Studio 2017
+    
+  # TODO: Get-WmiObject doesn't exist. Does Get-CimInstance? Can Carbon support PowerShell 6?
+  # - job_name: Windows Server 2016, PowerShell 6
+  #   job_group: pwsh
+  #   appveyor_build_worker_image: Visual Studio 2017
+
+  # TODO: Get build working on a new version of the .NET SDK.
+  # - job_name: Windows Server 2019, Windows PowerShell 5.1
+  #   job_group: ps
+  #   appveyor_build_worker_image: Visual Studio 2022
+
+  # TODO: Get build working on a new version of the .NET SDK.
+  # - job_name: Windows Server 2019, PowerShell 7
+  #   job_group: pwsh
+  #   appveyor_build_worker_image: Visual Studio 2022
+
+
+artifacts:
+- path: .output\*
+
+
+for:
+# Build in Windows PowerShell
+- matrix:
+    only:
+    - job_group: ps
+  build_script:
+  - ps: |
+      if( -not (Get-Module -Name 'PowerShellGet' -ListAvailable | Where-Object Version -eq ([Version]'2.2.5')) )
+      {
+          $job = Start-Job {
+              Install-Module -Name 'PowerShellGet' -RequiredVersion '2.2.5' -AllowClobber -Force -Scope CurrentUser
+          }
+          $job | Wait-Job
+          $job | Receive-Job
+          $job | Remove-Job
+      }
+      if( -not (Get-Module -Name 'PackageManagement' -ListAvailable | Where-Object Version -eq ([Version]'1.4.7')) )
+      {
+          $job = Start-Job {
+              Install-Module -Name 'PackageManagement' -RequiredVersion '1.4.7' -AllowClobber -Force -Scope CurrentUser
+          }
+          $job | Wait-Job
+          $job | Receive-Job
+          $job | Remove-Job
+      }
+      Get-Module 'PowerShellGet', 'PackageManagement' -ListAvailable | Format-Table -Auto
+      .\build.ps1
+
+# Build in PowerShell
+- matrix:
+    only:
+    - job_group: pwsh
+  build_script:
+  - pwsh: |
+      if( -not (Get-Module -Name 'PowerShellGet' -ListAvailable | Where-Object Version -eq ([Version]'2.2.5')) )
+      {
+          $job = Start-Job {
+              Install-Module -Name 'PowerShellGet' -RequiredVersion '2.2.5' -AllowClobber -Force -Scope CurrentUser
+          }
+          $job | Wait-Job
+          $job | Receive-Job
+          $job | Remove-Job
+      }
+      if( -not (Get-Module -Name 'PackageManagement' -ListAvailable | Where-Object Version -eq ([Version]'1.4.7')) )
+      {
+          $job = Start-Job {
+              Install-Module -Name 'PackageManagement' -RequiredVersion '1.4.7' -AllowClobber -Force -Scope CurrentUser
+          }
+          $job | Wait-Job
+          $job | Receive-Job
+          $job | Remove-Job
+      }
+      Get-Module 'PowerShellGet', 'PackageManagement' -ListAvailable | Format-Table -Auto
+      ./build.ps1

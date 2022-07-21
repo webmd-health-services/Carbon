@@ -39,7 +39,7 @@ Describe 'License Notices' {
                 }
 
             } |
-            Where-Object { $_.Name -notmatch '\.(deps\.json|dll|pdb|orig|txt)$' } |
+            Where-Object { $_.Name -notmatch '\.(deps\.json|dll|pdb|orig|txt|md)$' } |
             ForEach-Object {
                 Write-Debug -Message $_.FullName
                 $fileInfo = $_

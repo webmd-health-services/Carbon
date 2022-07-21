@@ -1,4 +1,20 @@
 
+# Leave this here so when Get-CScheduledTask moves to a Carbon.ScheduledTask module, this goes with it.
+# COM object Schedule.Service
+Add-CTypeData -TypeName 'System.__ComObject#{9c86f320-dee3-4dd1-b972-a303f26b061e}' `
+              -MemberName 'Status' `
+              -MemberType ScriptProperty `
+              -Value {
+                    switch( $this.State )
+                    { 
+                        1 { return "Disabled" }
+                        2 { return "Queued" }
+                        3 { return "Ready" } 
+                        4 { return "Running" }
+                        default { return "Unknown" } 
+                    }
+                }
+
 function Get-CScheduledTask
 {
     <#

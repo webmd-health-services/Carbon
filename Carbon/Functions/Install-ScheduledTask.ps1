@@ -1,4 +1,11 @@
 
+# Leave this here so that when we move this function to its own module, these go with it.
+Add-CTypeData -Type Carbon.TaskScheduler.TaskInfo -MemberType AliasProperty -MemberName 'State' -Value 'Status'
+Add-CTypeData -Type Carbon.TaskScheduler.TaskInfo `
+              -MemberType ScriptProperty `
+              -MemberName 'FullName' `
+              -Value { return Join-Path -Path $this.TaskPath -ChildPath $this.TaskName }
+
 function Install-CScheduledTask
 {
     <#

@@ -48,9 +48,43 @@ if( $IsPSCore )
     $carbonAssemblyDir = Join-Path -Path $CarbonBinDir -ChildPath 'coreclr' -Resolve
 }
 
+function Add-CAssembly
+{
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory)]
+        [String] $Path,
+
+        [switch] $PassThru
+    )
+
+    $numErrors = $Global:Error.Count
+    try
+    {
+        Add-Type -Path $Path
+        if( $PassThru )
+        {
+            return $true
+        }
+    }
+    catch
+    {
+        $numErrorsToRemove = $Global:Error.Count - $numErrors
+        for( $idx = 0; $idx -lt $numErrorsToRemove; ++$idx )
+        {
+            $Global:Error.RemoveAt(0)
+        }
+        if( $PassThru )
+        {
+            return $false
+        }
+    }
+}
+
 Write-Timing ('Loading Carbon assemblies from "{0}".' -f $carbonAssemblyDir)
-Get-ChildItem -Path (Join-Path -Path $carbonAssemblyDir -ChildPath '*') -Filter 'Carbon*.dll' -Exclude 'Carbon.Iis.dll' |
-    ForEach-Object { Add-Type -Path $_.FullName }
+$carbonAssembliesPath = Join-Path -Path $carbonAssemblyDir -ChildPath '*'
+Get-ChildItem -Path $carbonAssembliesPath -Filter 'Carbon*.dll' -Exclude 'Carbon.Iis.dll' |
+    ForEach-Object { Add-CAssembly -Path $_.FullName }
 
 # Active Directory
 
@@ -67,14 +101,12 @@ if( (Test-Path -Path 'env:SystemRoot') )
     if( -not (Test-Path -Path 'env:CARBON_SKIP_IIS_IMPORT') -and `
         (Test-Path -Path $microsoftWebAdministrationPath -PathType Leaf) )
     {
-        $exportIisFunctions = $true
-        if( -not $IsPSCore )
-        {
-            Write-Timing ('Adding Microsoft.Web.Administration assembly.')
-            Add-Type -Path $microsoftWebAdministrationPath
-            Write-Timing ('Adding Carbon.Iis assembly.')
-            Add-Type -Path (Join-Path -Path $carbonAssemblyDir -ChildPath 'Carbon.Iis.dll' -Resolve)
-        }
+        Write-Timing ('Adding Microsoft.Web.Administration assembly.')
+        $webAdministrationLoaded = Add-CAssembly -Path $microsoftWebAdministrationPath -PassThru
+        Write-Timing ('Adding Carbon.Iis assembly.')
+        $carbonIisAssemblyPath = Join-Path -Path $carbonAssemblyDir -ChildPath 'Carbon.Iis.dll' -Resolve
+        $carbonIisLoaded = Add-CAssembly -Path $carbonIisAssemblyPath -PassThru
+        $exportIisFunctions = ($webAdministrationLoaded -and $carbonIisLoaded)
     }
 }
 
@@ -93,6 +125,84 @@ $TrustedHostsPath = 'WSMan:\localhost\Client\TrustedHosts'
 # Users and Groups
 Write-Timing ('Adding System.DirectoryServices.AccountManagement assembly.')
 Add-Type -AssemblyName 'System.DirectoryServices.AccountManagement'
+
+function Add-CTypeData
+{
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory, ParameterSetName='ByType')]
+        [Type] $Type,
+
+        [Parameter(Mandatory, ParameterSetName='ByTypeName')]
+        [String] $TypeName,
+
+        [Parameter(Mandatory)]
+        [ValidateSet('AliasProperty', 'NoteProperty', 'ScriptProperty', 'ScriptMethod')]
+        [Management.Automation.PSMemberTypes] $MemberType,
+
+        [Parameter(Mandatory)]
+        [String] $MemberName,
+
+        [Parameter(Mandatory)]
+        [Object] $Value
+    )
+
+    Set-StrictMode -Version 'Latest'
+
+    $memberTypeMsg = '{0,-14}' -f $MemberType
+
+    if( -not $TypeName )
+    {
+        $TypeName = $Type.FullName
+    }
+
+    if( $Type )
+    {
+        if( $MemberType -like '*Property' )
+        {
+            if( ($Type.GetProperties() | Where-Object Name -EQ $MemberName) )
+            {
+                Write-Debug ("Type        $($memberTypeMsg)  [$($TypeName)]  $($MemberName)")
+                return
+            }
+        }
+        elseif( $MemberType -like '*Method')
+        {
+            if( ($Type.GetMethods() | Where-Object Name -EQ $MemberName) )
+            {
+                Write-Debug ("Type        $($memberTypeMsg)  [$($TypeName)]  $($MemberName)")
+                return
+            }
+        }
+    }
+
+    $typeData = Get-TypeData -TypeName $TypeName
+    if( $typeData -and $typeData.Members.ContainsKey($MemberName) )
+    {
+        Write-Debug ("TypeData    $($memberTypeMsg)  [$($TypeName)]  $($MemberName)")
+        return
+    }
+
+    Write-Debug ("TypeData  + $($memberTypeMsg)  [$($TypeName)]  $($MemberName)")
+    Update-TypeData -TypeName $TypeName -MemberType $MemberType -MemberName $MemberName -Value $Value
+}
+
+# Move to Carbon.Core?
+Add-CTypeData -Type Diagnostics.Process `
+              -MemberName 'ParentProcessID' `
+              -MemberType ScriptProperty `
+              -Value {
+                    $filter = "ProcessID='{0}'" -f $this.Id
+                    if( (Get-Command -Name 'Get-CimInstance' -ErrorAction Ignore) )
+                    {
+                        $process = Get-CimInstance -ClassName 'Win32_Process' -Filter $filter
+                    }
+                    else
+                    {
+                        $process = Get-WmiObject -Class 'Win32_Process' -Filter $filter
+                    }
+                    return $process.ParentProcessID
+                }
 
 Write-Timing ('Dot-sourcing functions.')
 $functionRoot = Join-Path -Path $PSScriptRoot -ChildPath 'Functions' -Resolve
