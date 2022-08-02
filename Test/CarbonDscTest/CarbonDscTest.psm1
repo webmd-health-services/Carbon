@@ -38,7 +38,9 @@ function Start-CarbonDscTestFixture
         {
             if( -not (Get-Module -Name 'PSDesiredStateConfiguration' -ListAvailable | Where-Object Version -ge ([Version]'2.0.0')) )
             {
-                Install-Module -Name PSDesiredStateConfiguration -Repository PSGallery -MaximumVersion 2.99 -Force
+                Find-Module -Name 'PSDesiredStateConfiguration' -MinimumVersion '2.0' -MaximumVersion '2.99' |
+                    Select-Object -First 1 |
+                    Install-Module -Force
             }
             Import-Module -Name 'PSDesiredStateConfiguration' -Global
         }

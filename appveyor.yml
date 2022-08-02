@@ -73,13 +73,11 @@ for:
     only:
     - job_group: ps
   build_script:
-  - ps: |
-      .\build.ps1
+  - ps: .\build.ps1
 
 # Build in PowerShell
 - matrix:
     only:
     - job_group: pwsh
   build_script:
-  - pwsh: |
-      ./build.ps1
+  - pwsh: ./build.ps1

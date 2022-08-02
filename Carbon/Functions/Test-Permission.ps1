@@ -120,7 +120,7 @@ function Test-CPermission
     {
         $providerName = 'CryptoKey'
         # CryptoKey does not exist in .NET standard/core so we will have to use FileSystem instead
-        if( $PSVersionTable.PSEdition -eq 'Core' )
+        if( -not (Test-CCryptoKeyAvailable) )
         {
             $providerName = 'FileSystem'
         }

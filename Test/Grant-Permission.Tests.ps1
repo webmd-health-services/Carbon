@@ -67,7 +67,7 @@ function Assert-Permissions
     {
         $providerName = 'CryptoKey'
         # CryptoKey does not exist in .NET standard/core so we will have to use FileSystem instead
-        if( $PSVersionTable.PSEdition -eq 'Core' )
+        if( -not (Invoke-CPrivateCommand -Name 'Test-CCryptoKeyAvailable') )
         {
             $providerName = 'FileSystem'
         }
@@ -506,7 +506,7 @@ foreach( $location in @( 'LocalMachine','CurrentUser' ) )
             $writePermission = 'GenericWrite'
 
             # CryptoKey does not exist in .NET standard/core so we will have to use FileSystem instead
-            if( $PSVersionTable.PSEdition -eq 'Core')
+            if( -not (Invoke-CPrivateCommand -Name 'Test-CCryptoKeyAvailable') )
             {
                 $expectedRuleType = 'FileSystem'
                 $readPermission = 'Read'
@@ -553,8 +553,8 @@ foreach( $location in @( 'LocalMachine','CurrentUser' ) )
             }
 
 
-            # CryptoKey does not exist in .NET standard/core so we will have to use FileSystem instead
-            if( $PSVersionTable.PSEdition -ne 'Core' )
+            # CryptoKey does not exist in .NET standard/core
+            if( (Invoke-CPrivateCommand -Name 'Test-CCryptoKeyAvailable') )
             {
                 Mock -CommandName 'Set-CryptoKeySecurity' -Verifiable -ModuleName 'Carbon' 
 

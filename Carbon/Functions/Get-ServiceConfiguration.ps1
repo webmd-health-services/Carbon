@@ -178,9 +178,16 @@ function Get-CServiceConfiguration
     process
     {
         $optionalParams = @{ }
-        if( $ComputerName -and $PSVersionTable.PSEdition -ne 'Core')
+        if( $ComputerName )
         {
             # ComputerName parameter does not exists under PowerShell Core.
+            if( -not (Get-Command -Name 'Get-Service' -ParameterName 'ComputerName' -ErrorAction Ignore) )
+            {
+                $msg = "Unable to get service ""$($Name)"" on computer ""$($ComputerName)"": this version " +
+                       'of PowerShell doesn''t support services on remote computers.'
+                Write-Error $msg -ErrorAction $ErrorActionPreference
+                return
+            }
             $optionalParams['ComputerName'] = $ComputerName
         }
 

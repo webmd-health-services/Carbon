@@ -37,7 +37,7 @@ function ConvertTo-ProviderAccessControlRights
         $rightTypeName = 'Security.AccessControl.{0}Rights' -f $ProviderName
 
         # CryptoKey does not exist in .NET standard/core so we will have to use FileSystem instead
-        if( $PSVersionTable.PSEdition -eq 'Core' -and $ProviderName -eq 'CryptoKey')
+        if( $ProviderName -eq 'CryptoKey' -and -not (Test-CCryptoKeyAvailable))
         {
             $rightTypeName = 'Security.AccessControl.FileSystemRights'
         }

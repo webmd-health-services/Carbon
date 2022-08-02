@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-if( (Get-Cim -Class 'Win32_ComputerSystem').Domain -eq 'WORKGROUP' )
+if( (Invoke-CPrivateCommand -Name 'Get-CCimInstance' -Parameter @{Class = 'Win32_ComputerSystem'}).Domain -eq 'WORKGROUP' )
 {
     Write-Warning -Message ('Get-ADDomainController tests can''t run because this computer is not part of a domain.')
 }

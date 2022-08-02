@@ -585,7 +585,7 @@ Describe 'Install-Service' {
         {
             Install-Service -Name $serviceName -Path $path @installServiceParams
             $service = Assert-ServiceInstalled 
-            $svc = Get-Cim -Class 'Win32_Service' -Filter ('Name = "{0}"' -f $serviceName)
+            $svc = Invoke-CPrivateCommand -Name 'Get-CCimInstance' -Parameter @{Class = 'Win32_Service'; Filter = ('Name = "{0}"' -f $serviceName)}
             $svc.PathName | Should -Be $servicePath
         }
         finally

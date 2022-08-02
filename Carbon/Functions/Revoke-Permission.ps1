@@ -70,7 +70,7 @@ function Revoke-CPermission
     if( $providerName -eq 'Certificate' )
     {
         $providerName = 'CryptoKey'
-        if( $PSVersionTable.PSEdition -eq 'Core' )
+        if( -not (Test-CCryptoKeyAvailable) )
         {
             $providerName = 'FileSystem'
         }
@@ -98,7 +98,7 @@ function Revoke-CPermission
                             "$($env:ALLUSERSPROFILE)\Application Data\Microsoft\Crypto",
                             "$($env:ALLUSERSPROFILE)\Microsoft\Crypto"
                         )
-                        $privateKeyFiles = $keyStoragePaths | Get-ChildItem -Recurse -Force -ErrorAction Ignore -Filter $privateKeyFileName
+                        $privateKeyFiles = $keyStoragePaths | Get-ChildItem -Recurse -Force -Filter $privateKeyFileName -ErrorAction Ignore
                         if( -not $privateKeyFiles )
                         {
                             $msg = "Failed to find the private key file for certificate ""$($Path)"" (subject: $($_.Subject); " +

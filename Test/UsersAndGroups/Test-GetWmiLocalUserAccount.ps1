@@ -17,7 +17,7 @@ function Start-TestFixture
 
 function Test-ShouldGetUser
 {
-    Get-Cim -Class 'Win32_UserAccount' -Filter "Domain='$($env:ComputerName)'" | ForEach-Object {
+    Invoke-CPrivateCommand -Name 'Get-CCimInstance' -Parameter @{Class = 'Win32_UserAccount'; Filter = "Domain='$($env:ComputerName)'"} | ForEach-Object {
         $user = Get-WmiLocalUserAccount -Username $_.Name
         Assert-NotNull $user
         Assert-Equal $_.Name $user.Name

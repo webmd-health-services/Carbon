@@ -510,8 +510,6 @@ function Get-CCertificate
     }
 }
 
-Set-Alias -Name 'Get-Certificate' -Value 'Get-CCertificate'
-
 
 function Get-CMsi
 {
@@ -662,32 +660,58 @@ function Get-CPowershellPath
     {
         $psPath = 'C:\Windows\System32\WindowsPowerShell\v1.0'
     }
-    if( (Test-COSIs64Bit -NoWarn) )
+
+    # x86 OS/x86 PowerShell. There's no 64-bit anything, so just return $PSHOME.
+    if( Test-COSIs32Bit )
     {
-        if( (Test-CPowerShellIs64Bit -NoWarn) )
+        if( $x86 )
         {
-            if( $x86 )
-            {
-                # x64 OS, x64 PS, want x86 path
-                $psPath = $psPath -replace 'System32','SysWOW64'
-            }
+            return Join-Path -Path $psPath -ChildPath 'powershell.exe'
         }
-        else
-        {
-            if( -not $x86 )
-            {
-                # x64 OS, x32 PS, want x64 path
-                $psPath = $psPath -replace 'SysWOW64','sysnative'
-            }
-        }
+        
+        $msg = 'Unable to get the path to 64-bit PowerShell: this is a 32-bit operating system and ' +
+            '64-bit PowerShell does not exist.'
+        Write-Error -Message $msg -ErrorAction Ignore
+        return
     }
-    else
+
+    # Make sure the paths end in '\' so we don't replace/change 
+    # paths that start with the directory name and have extra characters.
+    $programFilesPath = Join-Path -Path ([Environment]::GetFolderPath('ProgramFiles')) -ChildPath '\'
+    $systemPath = Join-Path -Path ([Environment]::GetFolderPath('System')) -ChildPath '\'
+
+    if( (Test-CPowerShellIs64Bit -NoWarn) )
     {
-        # x86 OS, no SysWOW64, everything is in $PSHOME
-        $psPath = $PSHOME
+        $programFilesx86Path =
+            Join-Path -Path ([Environment]::GetFolderPath('ProgramFilesx86')) -ChildPath '\'
+        $system32Path = Join-Path -Path ([Environment]::GetFolderPath('Systemx86')) -ChildPath '\'
+
+        if( $x86 )
+        {
+            # x64 OS/x64 PS wanting x86 paths.
+            # C:\Program Files\ -> C:\Program Files (x86)\
+            # C:\WINDOWS\system32\ -> C:\WINDOWS\SysWOW64\
+            return Join-Path -Path (($psPath -replace ([regex]::Escape($programFilesPath)), $programFilesx86Path)  `
+                            -replace ([regex]::Escape($systemPath)), $system32Path) -ChildPath 'powershell.exe'
+        }
+
+        # x64 OS/PS, wanting x64 Path, which is the same as this process's PSHOME variable.
+        return Join-Path $psPath -ChildPath 'powershell.exe'
     }
-    
-    Join-Path $psPath powershell.exe
+
+    if( $x86 )
+    {
+        # x64 OS/x86 PowerShell, wanting x86 path, which is the same as this process.
+        return Join-Path $psPath -ChildPath 'powershell.exe'
+    }
+
+    # x64 OS, x86 PowerShell, wanting x64 path
+    # C:\Program Files (x86)\ -> C:\Program Files\
+    # C:\WINDOWS\system32\ -> C:\WINDOWS\sysnative\
+    $programFiles64Path = Join-Path -Path $env:ProgramFilesW6432 -ChildPath '\'
+    $system64Path = Join-Path -Path ([Environment]::GetFolderPath('Windows')) -ChildPath 'sysnative\'
+    return Join-Path -Path (($psPath -replace ([regex]::Escape($programFilesPath)), $programFiles64Path) `
+                    -replace ([regex]::Escape($systemPath)), $system64Path) -ChildPath 'powershell.exe'
 }
 
 
@@ -754,7 +778,7 @@ if( -not (Get-Command -Name 'Get-WindowsFeature*' | Where-Object { $_.ModuleName
         
         if( $useOCSetup )
         {
-            Get-Cim -Class 'Win32_OptionalFeature' |
+            Get-CCimInstance -Class 'Win32_OptionalFeature' |
                 Where-Object {
                     if( $Name )
                     {

@@ -23,7 +23,7 @@ Set-StrictMode -Version 'Latest'
 $PSCommandPath = $MyInvocation.MyCommand.Definition
 $PSScriptRoot = Split-Path -Parent -Path $PSCommandPath
 
-$os = Get-Cim -Class 'Win32_OperatingSystem'
+$os = Get-CCimInstance -Class 'Win32_OperatingSystem'
 
 # Windows 2008
 $osVersion = [version]$os.Version

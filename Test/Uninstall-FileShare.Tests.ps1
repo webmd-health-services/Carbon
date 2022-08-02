@@ -29,7 +29,7 @@ Describe 'Uninstall-FileShare' {
     AfterEach {
         Get-FileShare -Name $shareName -ErrorAction Ignore | 
             ForEach-Object { 
-                if( $PSVersionTable.PSEdition -eq 'Core' )
+                if( Invoke-CPrivateCommand -Name 'Test-CCimAvailable' )
                 {
                     Invoke-CimMethod -InputObject $_ -MethodName 'Delete'
                 }

@@ -13,7 +13,7 @@
 
 # These tests should only run if MSMQ is not installed
 $userDomain = $env:USERDNSDOMAIN
-$computerDomain = Get-Cim -Class 'Win32_ComputerSystem' | Select-Object -ExpandProperty Domain
+$computerDomain = Invoke-CPrivateCommand -Name 'Get-CCimInstance' -Parameter @{Class = 'Win32_ComputerSystem'} | Select-Object -ExpandProperty Domain
 if( (Get-Service -Name MSMQ -ErrorAction SilentlyContinue) -and $userDomain -eq $computerDomain )
 {
 

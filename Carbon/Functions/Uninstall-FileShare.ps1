@@ -70,7 +70,7 @@ function Uninstall-CFileShare
             {
                 Write-Verbose ('Deleting file share ''{0}'' (Path: {1}).' -f $share.Name,$share.Path)
 
-                if( $PSVersionTable.PSEdition -eq 'Core' )
+                if( Test-CCimAvailable )
                 {
                     $result = Invoke-CimMethod -InputObject $share -MethodName 'Delete'
                 }

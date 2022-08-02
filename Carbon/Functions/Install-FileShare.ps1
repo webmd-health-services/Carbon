@@ -175,8 +175,17 @@ function Install-CFileShare
             New-Item -Path $Path -ItemType Directory -Force | Out-String | Write-Verbose
         }
     
+        $shareClass = Get-CCimClass -Class 'Win32_Share'
         Write-Verbose -Message ('[SHARE] [{0}]              Sharing {1}' -f $Name,$Path)
-        $result = ([wmiclass]"root\cimv2:Win32_Share").Create( $Path, $Name, 0, $null, $Description, $null, $shareSecurityDescriptor )
+
+        if( Test-CCimAvailable )
+        {
+            $result = ([wmiclass]"root\cimv2:Win32_Share").Create( $Path, $Name, 0, $null, $Description, $null, $shareSecurityDescriptor )
+        }
+        else
+        {
+            $result = $shareClass.Create( $Path, $Name, 0, $null, $Description, $null, $shareSecurityDescriptor )
+        }
 
         if( $result.ReturnValue )
         {
