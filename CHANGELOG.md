@@ -3,9 +3,9 @@
 
 ## Added suport for PowerShell Core
 
-* Added: `Get-CCimInstance` function that determines which method to call when accessing a computer's Common Information Model based on the version of PowerShell being used. `Get-CCimInstance` will call `Get-CimInstance` under PowerShell Core and `Get-WmiObject` under Windows PowerShell. `Get-WmiObject` has been deprecated under PowerShell Core.
-* Fixed: Carbon will now use version 2 of the `PSDesiredStateConfiguration` module when running under PowerShell Core as verion 1 was incompatible.
-* Fixed: Granting permissions on a certificate will use type `Security.AccessControl.FileSystemRights` as `Security.AccessControl.CryptoKeyRights` has been deprecated under PowerShell Core.
+* Carbon now works under PowerShell 7.
+* Fixed: Get-CPermission fails to grant permissions on certificates in PowerShell 6+ and on certificates that .NET Framework load as RSA cryptographic next generation keys, which don't have an API for setting private key permissions.
+
    
 # 2.11.3
 

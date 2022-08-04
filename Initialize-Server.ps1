@@ -23,20 +23,7 @@ Set-StrictMode -Version 'Latest'
 $PSCommandPath = $MyInvocation.MyCommand.Definition
 $PSScriptRoot = Split-Path -Parent -Path $PSCommandPath
 
-$os = Get-CCimInstance -Class 'Win32_OperatingSystem'
-
-# Windows 2008
-$osVersion = [version]$os.Version
-if( $osVersion.Major -eq 6 -and $osVersion.Minor -eq 1 )
-{
-    Import-Module -Name 'ServerManager'
-    Add-WindowsFeature -Name 'PowerShell-ISE','MSMQ-Server','Net-Framework-Core','Web-Server'
-}
-# Windows 2012 R2
-elseif( $osVersion.Major -eq 6 -and $osVersion.Minor -eq 3 )
-{
-    Install-WindowsFeature -Name 'Web-Server','MSMQ-Server','Web-Scripting-Tools'
-}
+Install-WindowsFeature -Name 'Web-Server','MSMQ-Server','Web-Scripting-Tools'
 
 choco install 'sysinternals' -y
 choco install 'conemu' -y
