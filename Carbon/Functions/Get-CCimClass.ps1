@@ -19,6 +19,9 @@ function Get-CCimClass
         [String] $Class
     )
 
+    Set-StrictMode -Version 'Latest'
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
     $useCim = Test-CCimAvailable
 
     if( $useCim )

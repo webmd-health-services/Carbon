@@ -23,6 +23,10 @@ function Get-CCimInstance
 
         [String] $Query
     )
+
+    Set-StrictMode -Version 'Latest'
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
     $useCim = Test-CCimAvailable
     $optionalArgs = @{ }
 
