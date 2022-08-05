@@ -193,14 +193,7 @@ Add-CTypeData -Type Diagnostics.Process `
               -MemberType ScriptProperty `
               -Value {
                     $filter = "ProcessID='{0}'" -f $this.Id
-                    if( (Get-Command -Name 'Get-CimInstance' -ErrorAction Ignore) )
-                    {
-                        $process = Get-CimInstance -ClassName 'Win32_Process' -Filter $filter
-                    }
-                    else
-                    {
-                        $process = Get-WmiObject -Class 'Win32_Process' -Filter $filter
-                    }
+                    $process = Invoke-CPrivateCommand -Name 'Get-CCimInstance' -Parameter @{Class = 'Win32_Process'; Filter = $filter}
                     return $process.ParentProcessID
                 }
 

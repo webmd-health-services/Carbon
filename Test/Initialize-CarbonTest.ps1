@@ -65,6 +65,12 @@ else
     }
 }
 
+if( -not (Get-Module -Name 'CarbonTest') )
+{
+    Write-Verbose -Message ('Importing CarbonTest.') -Verbose
+    Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'CarbonTest.psm1') -Force
+}
+
 if( $ForDsc )
 {
     Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'CarbonDscTest' -Resolve) -Force

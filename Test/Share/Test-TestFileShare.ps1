@@ -23,7 +23,7 @@ function Start-TestFixture
 
 function Stop-TestFixture
 {
-    $share = Get-WmiObject 'Win32_Share' -Filter "Name='$shareName'"
+    $share = Invoke-CPrivateCommand -Name 'Get-CCimInstance' -Parameter @{Class = 'Win32_Share'; Filter = "Name='$shareName'"}
     if( $share -ne $null )
     {
         [void] $share.Delete()

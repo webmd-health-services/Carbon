@@ -165,11 +165,13 @@ Tests:
         - Test\Test-ImportCarbon.ps1
 # These tests fail when run in parallel so they get run first.
 - Pester4:
+    UnlessExists: variable:IsWindows
     OnlyBy: BuildServer
     Script:
     - Test\*Iis*.ps1
     - Test\Carbon_*.Tests.ps1
 - Parallel:
+    UnlessExists: variable:IsWindows
     OnlyBy: BuildServer
     Queues:
     - Tasks:
@@ -193,6 +195,9 @@ Tests:
                 Recurse: true
                 Path: Test
                 PassThru: true
+- Pester4:
+    IfExists: variable:IsWindows
+    Script: Test\*.Tests.ps1
 - PowerShell:
     OnlyDuring: Build
     OnlyBy: Developer

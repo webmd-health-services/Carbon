@@ -69,7 +69,16 @@ function Uninstall-CFileShare
             if( $PSCmdlet.ShouldProcess( ('{0} ({1})' -f $share.Name,$share.Path), 'delete' ) )
             {
                 Write-Verbose ('Deleting file share ''{0}'' (Path: {1}).' -f $share.Name,$share.Path)
-                $result = $share.Delete() 
+
+                if( Test-CCimAvailable )
+                {
+                    $result = Invoke-CimMethod -InputObject $share -MethodName 'Delete'
+                }
+                else
+                {
+                    $result = $share.Delete()
+                }
+
                 if( $result.ReturnValue )
                 {
                     Write-Error ('Failed to delete share ''{0}'' (Path: {1}). Win32_Share.Delete() method returned error code {2} which means: {3}.' -f $Name,$share.Path,$result.ReturnValue,$errors[$result.ReturnValue])

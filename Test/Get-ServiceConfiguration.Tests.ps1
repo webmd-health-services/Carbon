@@ -23,9 +23,18 @@ Describe 'Get-ServiceConfiguration' {
         Get-Service | 
             # Skip Carbon services. They could get uninstalled at any moment.
             Where-Object { $_.Name -notlike 'Carbon*' } |
-            Get-ServiceConfiguration | 
+            Get-CServiceConfiguration -ErrorAction 'SilentlyContinue' | 
             Format-List -Property *
-        $Global:Error.Count | Should -Be 0
+        
+        # ComputerName parameter does not exists under PowerShell Core.
+        if( Get-Command -Name 'Get-Service' -ParameterName 'ComputerName' -ErrorAction Ignore )
+        {
+            $Global:Error.Count | Should -Be 0
+        }
+        else
+        {
+            $Global:Error[0] | Should -Match 'this version of PowerShell doesn''t support services on remote computers.'
+        }
     }
 
     It 'should write an error if the service doesn''t exist' {

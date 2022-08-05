@@ -23,7 +23,7 @@ function Start-TestFixture
 
 function Stop-TestFixture
 {
-    $share = Get-WmiObject 'Win32_Share' -Filter "Name='$shareName'"
+    $share = Invoke-CPrivateCommand -Name 'Get-CCimInstance' -Parameter @{Class = 'Win32_Share'; Filter = "Name='$shareName'"}
     if( $share -ne $null )
     {
         [void] $share.Delete()
@@ -47,7 +47,9 @@ function Test-ShouldGetSpecificShare
 
 function Test-ShouldGetOnlyFileShares
 {
-    $nonFileShares = Get-WmiObject -Class 'Win32_Share' | Where-Object { $_.Type -ne 0 -and $_.Type -ne 2147483648 }
+    $nonFileShares = Invoke-CPrivateCommand -Name 'Get-CCimInstance' -Parameter @{Class = 'Win32_Share'} |
+    Where-Object 'Type' -NE 0 |
+    Where-Object 'Type' -NE 2147483648
     if( $nonFileShares )
     {
         foreach( $nonFileShare in $nonFileShares )

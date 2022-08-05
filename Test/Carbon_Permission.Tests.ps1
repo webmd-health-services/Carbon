@@ -181,17 +181,22 @@ Describe 'Carbon_Permission' {
         $cert = Install-Certificate -Path (Join-Path -Path $PSScriptRoot -ChildPath 'Cryptography\CarbonTestPrivateKey.pfx' -Resolve) -StoreLocation LocalMachine -StoreName My -NoWarn
         try
         {
+            $readPermission = 'GenericRead'
+            if( $PSVersionTable.PSEdition -eq 'Core' )
+            {
+                $readPermission = 'Read'
+            }
             $certPath = Join-Path -Path 'cert:\LocalMachine\My' -ChildPath $cert.Thumbprint -Resolve
             (Get-Permission -Path $certPath -Identity $UserName) | Should BeNullOrEmpty
-            (Test-TargetResource -Path $certPath -Identity $UserName -Permission 'GenericRead') | Should Be $false
+            (Test-TargetResource -Path $certPath -Identity $UserName -Permission $readPermission) | Should Be $false
     
-            Set-TargetResource -Identity $UserName -Path $certPath -Permission GenericRead -Ensure Present
+            Set-TargetResource -Identity $UserName -Path $certPath -Permission $readPermission -Ensure Present
             (Get-Permission -Path $certPath -Identity $UserName) | Should Not BeNullOrEmpty
-            (Test-TargetResource -Path $certPath -Identity $UserName -Permission 'GenericRead') | Should Be $true
+            (Test-TargetResource -Path $certPath -Identity $UserName -Permission $readPermission) | Should Be $true
     
-            Set-TargetResource -Identity $UserName -Path $certPath -Permission GenericRead -Ensure Absent
+            Set-TargetResource -Identity $UserName -Path $certPath -Permission $readPermission -Ensure Absent
             (Get-Permission -Path $certPath -Identity $UserName) | Should BeNullOrEmpty
-            (Test-TargetResource -Path $certPath -Identity $UserName -Permission 'GenericRead' -Ensure Absent) | Should Be $true
+            (Test-TargetResource -Path $certPath -Identity $UserName -Permission $readPermission -Ensure Absent) | Should Be $true
         }
         finally
         {

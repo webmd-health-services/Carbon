@@ -127,7 +127,28 @@ function Get-CPermission
                 {
                     if( $_.HasPrivateKey -and $_.PrivateKey )
                     {
-                        $_.PrivateKey.CspKeyContainerInfo.CryptoKeySecurity
+                        if( -not ($_.PrivateKey | Get-Member 'CspKeyContainerInfo') )
+                        {
+                            $root = "C:\programdata\microsoft\crypto\rsa\machinekeys\"
+                            $aclPath = Join-Path -Path $root -ChildPath $_.PrivateKey.Key.UniqueName
+                            if( Test-Path -Path $aclPath )
+                            {
+                                Get-Acl -Path $aclPath
+                            }
+                            else
+                            {
+                                $root = "C:\Users\$env:UserName\AppData\Roaming\Microsoft\Crypto\RSA\*\"
+                                $aclPath = Join-Path -Path $root -ChildPath $_.PrivateKey.Key.UniqueName
+                                if( Test-Path $aclPath )
+                                {
+                                    Get-Acl -Path $aclPath
+                                }
+                            }
+                        }
+                        else
+                        {
+                            $_.PrivateKey.CspKeyContainerInfo.CryptoKeySecurity
+                        }
                     }
                 }
                 else

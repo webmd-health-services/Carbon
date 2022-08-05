@@ -78,13 +78,21 @@ function Get-CFileSharePermission
     }
         
     $acl = $null  
-    $lsss = Get-WmiObject -Class 'Win32_LogicalShareSecuritySetting' -Filter "name='$Name'"
+    $lsss = Get-CCimInstance -Class 'Win32_LogicalShareSecuritySetting' -Filter "name='$Name'"
     if( -not $lsss )
     {
         return
     }
 
-    $result = $lsss.GetSecurityDescriptor()
+    if( Test-CCimAvailable )
+    {
+        $result = Invoke-CimMethod -InputObject $lsss -MethodName 'GetSecurityDescriptor'
+    }
+    else
+    {
+        $result = $lsss.GetSecurityDescriptor()
+    }
+
     if( -not $result )
     {
         return

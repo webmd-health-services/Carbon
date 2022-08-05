@@ -38,14 +38,14 @@ Describe 'New-RsaKeyPair' {
             $ValidTo = (Get-Date).AddDays( [Math]::Floor(([DateTime]::MaxValue - [DateTime]::UtcNow).TotalDays) )
         }
 
-        $cert = Get-Certificate -Path $publicKeyPath -NoWarn
+        $cert = Get-CCertificate -Path $publicKeyPath -NoWarn
         # Weird date/time stamps in generated certificate that I can't figure out/replicate. So we'll just check that the expected/actual dates are within a day of each other.
         [timespan]$span = $ValidTo - $cert.NotAfter
         $span.TotalDays | Should BeGreaterThan (-2)
         $span.TotalDays | Should BeLessThan 2
         $cert.Subject | Should Be $subject
         $cert.PublicKey.Key.KeySize | Should Be $Length
-        $cert.PublicKey.Key.KeyExchangeAlgorithm | Should Be 'RSA-PKCS1-KeyEx'
+        $cert.PublicKey.Key.KeyExchangeAlgorithm | Should -BeLike 'RSA*'
         $cert.SignatureAlgorithm.FriendlyName | Should Be $Algorithm
         $keyUsage = $cert.Extensions | Where-Object { $_ -is [Security.Cryptography.X509Certificates.X509KeyUsageExtension] }
         $keyUsage | Should Not BeNullOrEmpty
@@ -55,7 +55,7 @@ Describe 'New-RsaKeyPair' {
         $enhancedKeyUsage | Should Not BeNullOrEmpty
 
         # I don't think Windows 2008 supports Enhanced Key Usages.
-        $osVersion = (Get-WmiObject -Class 'Win32_OperatingSystem').Version
+        $osVersion = (Invoke-CPrivateCommand -Name 'Get-CCimInstance' -Parameter @{Class = 'Win32_OperatingSystem'}).Version
         if( $osVersion -notmatch '6.1\b' )
         {
             $usage = $enhancedKeyUsage.EnhancedKeyUsages | Where-Object { $_.FriendlyName -eq 'Document Encryption' }
@@ -96,7 +96,7 @@ Describe 'New-RsaKeyPair' {
         $decryptedSecret = Unprotect-String -ProtectedString $protectedSecret -PrivateKeyPath $privateKeyPath -Password $privateKeyPassword
         $decryptedSecret | Should Be $secret
 
-        $publicKey = Get-Certificate -Path $publicKeyPath -NoWarn
+        $publicKey = Get-CCertificate -Path $publicKeyPath -NoWarn
         $publicKey | Should Not BeNullOrEmpty
 
         # Make sure it works with DSC
@@ -190,7 +190,7 @@ Describe 'New-RsaKeyPair' {
         $output = New-RsaKeyPair -Subject $subject -PublicKeyFile $publicKeyPath -PrivateKeyFile $privateKeyPath -Password $null
         $output.Count | Should Be 2
 
-        $privateKey = Get-Certificate -Path $privateKeyPath -NoWarn
+        $privateKey = Get-CCertificate -Path $privateKeyPath -NoWarn
         $privateKey | Should Not BeNullOrEmpty
 
         $secret = [IO.Path]::GetRandomFileName()

@@ -62,7 +62,7 @@ function Get-CFileShare
         $filter = '{0} and Name = ''{1}''' -f $filter,$Name
     }
 
-    $shares = Get-WmiObject -Class 'Win32_Share' -Filter $filter |
+    $shares = Get-CCimInstance -Class 'Win32_Share' -Filter $filter |
                     Where-Object { 
                         if( -not $wildcardSearch )
                         {

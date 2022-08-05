@@ -6,6 +6,14 @@ functions from Carbon, a warning message will be written. These function will be
 Carbon.
 
 
+# 2.12.0 
+
+## Added suport for PowerShell Core
+
+* Carbon now works under PowerShell 7.
+* Fixed: Get-CPermission fails to grant permissions on certificates in PowerShell 6+ and on certificates that .NET Framework load as RSA cryptographic next generation keys, which don't have an API for setting private key permissions.
+
+   
 # 2.11.3
 
 * Fixed: Carbon doesn't load Microsoft.Web.Administration assembly on PowerShell 7+.
