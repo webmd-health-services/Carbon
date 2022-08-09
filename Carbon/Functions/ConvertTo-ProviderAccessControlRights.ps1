@@ -35,6 +35,13 @@ function ConvertTo-ProviderAccessControlRights
 
         $rights = 0
         $rightTypeName = 'Security.AccessControl.{0}Rights' -f $ProviderName
+
+        # CryptoKey does not exist in .NET standard/core so we will have to use FileSystem instead
+        if( $ProviderName -eq 'CryptoKey' -and -not (Test-CCryptoKeyAvailable))
+        {
+            $rightTypeName = 'Security.AccessControl.FileSystemRights'
+        }
+
         $foundInvalidRight = $false
     }
 

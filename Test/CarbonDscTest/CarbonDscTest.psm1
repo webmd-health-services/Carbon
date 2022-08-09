@@ -27,6 +27,26 @@ function Start-CarbonDscTestFixture
     $script:currentDscResource = $DscResourceName
     Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath ('..\..\Carbon\DscResources\Carbon_{0}' -f $DscResourceName) -Resolve) -Force -Global
 
+    if( $PSVersionTable.PSEdition -eq 'Core' )
+    {
+        if( Get-Module -Name 'PSDesiredStateConfiguration' | Where-Object Version -lt ([Version]'2.0.0') )
+        {
+            Remove-Module -Name 'PSDesiredStateConfiguration'
+        }
+
+        if( -not (Get-Module -Name 'PSDesiredStateConfiguration' | Where-Object Version -ge ([Version]'2.0.0')) )
+        {
+            if( -not (Get-Module -Name 'PSDesiredStateConfiguration' -ListAvailable | Where-Object Version -ge ([Version]'2.0.0')) )
+            {
+                Find-Module -Name 'PSDesiredStateConfiguration' -MinimumVersion '2.0' -MaximumVersion '2.99' |
+                    Select-Object -First 1 |
+                    Install-Module -Force
+            }
+            Import-Module -Name 'PSDesiredStateConfiguration' -Global
+        }
+    }
+    Enable-PSRemoting -SkipNetworkProfileCheck -Force
+
     $tempDir = [IO.Path]::GetRandomFileName()
     $tempDir = 'CarbonDscTest-{0}-{1}' -f $DscResourceName,$tempDir
     $script:CarbonDscOutputRoot = Join-Path -Path $env:TEMP -ChildPath $tempDir

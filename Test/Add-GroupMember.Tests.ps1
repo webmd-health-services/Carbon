@@ -96,7 +96,7 @@ Describe 'Add-GroupMember' {
     
     function Get-LocalUsers
     {
-        return Get-WmiObject Win32_UserAccount -Filter "LocalAccount=True" |
+        return Invoke-CPrivateCommand -Name 'Get-CCimInstance' -Parameter @{Class = 'Win32_UserAccount'; Filter = "LocalAccount=True"} |
                     Where-Object { $_.Name -ne $env:COMPUTERNAME }
     }
     
@@ -106,7 +106,7 @@ Describe 'Add-GroupMember' {
         Assert-MembersInGroup -Member $Members
     }
     
-    if( (Get-WmiObject -Class 'Win32_ComputerSystem').Domain -eq 'WBMD' )
+    if( (Invoke-CPrivateCommand -Name 'Get-CCimInstance' -Parameter @{Class = 'Win32_ComputerSystem'}).Domain -eq 'WBMD' )
     {
         It 'should add member from domain' {
             Invoke-AddMembersToGroup -Members 'WBMD\WHS - Lifecycle Services' 

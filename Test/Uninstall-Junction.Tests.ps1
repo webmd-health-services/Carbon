@@ -31,7 +31,7 @@ Describe 'Uninstall-Junction' {
     
     function Invoke-UninstallJunction($junction)
     {
-        Uninstall-Junction $junction
+        Uninstall-Junction $junction -ErrorAction SilentlyContinue
     }
     
     It 'should uninstall junction' {

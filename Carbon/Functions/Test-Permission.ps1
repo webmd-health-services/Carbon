@@ -119,6 +119,11 @@ function Test-CPermission
     if( $providerName -eq 'Certificate' )
     {
         $providerName = 'CryptoKey'
+        # CryptoKey does not exist in .NET standard/core so we will have to use FileSystem instead
+        if( -not (Test-CCryptoKeyAvailable) )
+        {
+            $providerName = 'FileSystem'
+        }
     }
 
     if( ($providerName -eq 'FileSystem' -or $providerName -eq 'CryptoKey') -and $Exact )

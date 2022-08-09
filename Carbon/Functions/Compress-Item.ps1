@@ -244,10 +244,7 @@ function Compress-Item
         Set-StrictMode -Version 'Latest'
         Use-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState
 
-        $msg = "The Carbon module's ""Compress-Item"" function was renamed to ""Compress-CItem"". Please update " +
-                "your code to use the new ""Compress-CItem"" name. The old ""Compress-Item"" function will be " +
-                'removed in the next major version of Carbon.'
-        Write-CWarningOnce -Message $msg
+        Write-CRenamedCommandWarning -CommandName $MyInvocation.MyCommand.Name -NewCommandName 'Compress-CItem'
 
         $paths = New-Object 'Collections.ArrayList'
     }

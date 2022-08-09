@@ -29,8 +29,8 @@ function Complete-CJob
 
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
-    Write-CWarningOnce ('Complete-CJob is obsolete and will be removed in a future major version of Carbon. Use PowerShell''s `Wait-Job` cmdlet instead.')
-    
+    Write-CObsoleteCommandWarning -CommandName $MyInvocation.MyCommand.Name -NewCommandName 'Wait-Job'
+
     $errorAction = 'Continue'
     $params = $PSBoundParameters
     if( $PSBoundParameters.ContainsKey( 'ErrorAction' ) )
@@ -143,10 +143,7 @@ function Convert-CSecureStringToString
 
     if( -not $NoWarn )
     {
-        $msg = 'Carbon''s "Convert-CSecureStringToString" function is OBSOLETE and will be removed in the next major ' +
-               'version of Carbon. Use the "Convert-CSecureStringToString" function in the new "Carbon.Cryptography"' +
-               'module.'
-        Write-CWarningOnce -Message $msg
+        Write-CRefactoredCommandWarning -CommandName $MyInvocation.MyCommand.Name -ModuleName 'Carbon.Cryptography'
     }
 
     $stringPtr = [Runtime.InteropServices.Marshal]::SecureStringToBSTR($SecureString)
@@ -206,9 +203,7 @@ function ConvertTo-CBase64
 
         if( -not $NoWarn )
         {
-            $msg = 'Carbon''s "ConvertTo-CBase64" function is OBSOLETE and will be removed in the next major version ' +
-                   'of Carbon. Use the "ConvertTo-CBase64" function in the new Carbon.Core module.'
-            Write-CWarningOnce -Message $msg
+            Write-CRefactoredCommandWarning -CommandName $MyInvocation.MyCommand.Name -NewModuleName 'Carbon.Core'
         }
     }
 
@@ -369,7 +364,7 @@ function Get-CCertificate
         # The name of the non-standard, custom store.
         $CustomStoreName,
 
-        [switch]$NoWarn
+        [switch] $NoWarn
     )
 
     Set-StrictMode -Version 'Latest'
@@ -377,9 +372,7 @@ function Get-CCertificate
 
     if( -not $NoWarn )
     {
-        $msg = 'Carbon''s "Get-CCertificate" function is OBSOLETE and will be removed in the next major version of ' +
-               'Carbon. Use the "Get-CCertificate" function in the new "Carbon.Cryptography" module.'
-        Write-CWarningOnce -Message $msg
+        Write-CRefactoredCommandWarning -CommandName $MyInvocation.MyCommand.Name -ModuleName 'Carbon.Cryptography'
     }
 
     function Add-PathMember
@@ -511,7 +504,6 @@ function Get-CCertificate
 }
 
 
-
 function Get-CMsi
 {
     <#
@@ -549,11 +541,10 @@ function Get-CMsi
     [CmdletBinding()]
     [OutputType('Carbon.Msi.MsiInfo')]
     param(
-        [Parameter(Mandatory=$True,ValueFromPipeline=$True,ValueFromPipelineByPropertyName=$True)]
-        [Alias('FullName')]
-        [string[]]
         # Path to the MSI file whose information to retrieve. Wildcards supported.
-        $Path
+        [Parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)]
+        [Alias('FullName')]
+        [string[]] $Path
     )
     
     begin 
@@ -561,9 +552,7 @@ function Get-CMsi
         Set-StrictMode -Version 'Latest'
         Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
-        $msg = 'Carbon''s "Get-Msi" function is OBSOLETE and will be removed in the next major version of ' +
-               'Carbon. Use the "Get-Msi" function in the new "Carbon.Windows.Installer" module.'
-        Write-CWarningOnce -Message $msg
+        Write-CRefactoredCommandWarning -CommandName $MyInvocation.MyCommand.Name -ModuleName 'Carbon.Windows.Installer'
     }
 
     process 
@@ -651,38 +640,160 @@ function Get-CPowershellPath
 
     if( -not $NoWarn )
     {
-        $msg = 'Carbon''s "Get-CPowershellPath" function is OBSOLETE and will be removed in the next major version ' +
-               'of Carbon. Use the "Get-CPowerShellPath" function in the new Carbon.Core module.'
-        Write-CWarningOnce -Message $msg
+        Write-CRefactoredCommandWarning -CommandName $MyInvocation.MyCommand.Name -ModuleName 'Carbon.Core'
     }
 
     $psPath = $PSHOME
-    if( (Test-COSIs64Bit -NoWarn) )
+    if( $PSVersionTable.PSEdition -eq 'Core' )
     {
-        if( (Test-CPowerShellIs64Bit -NoWarn) )
-        {
-            if( $x86 )
-            {
-                # x64 OS, x64 PS, want x86 path
-                $psPath = $PSHOME -replace 'System32','SysWOW64'
-            }
-        }
-        else
-        {
-            if( -not $x86 )
-            {
-                # x64 OS, x32 PS, want x64 path
-                $psPath = $PSHome -replace 'SysWOW64','sysnative'
-            }
-        }
+        $psPath = 'C:\Windows\System32\WindowsPowerShell\v1.0'
     }
-    else
+
+    # x86 OS/x86 PowerShell. There's no 64-bit anything, so just return $PSHOME.
+    if( Test-COSIs32Bit )
     {
-        # x86 OS, no SysWOW64, everything is in $PSHOME
-        $psPath = $PSHOME
+        if( $x86 )
+        {
+            return Join-Path -Path $psPath -ChildPath 'powershell.exe'
+        }
+        
+        $msg = 'Unable to get the path to 64-bit PowerShell: this is a 32-bit operating system and ' +
+            '64-bit PowerShell does not exist.'
+        Write-Error -Message $msg -ErrorAction Ignore
+        return
     }
+
+    # Make sure the paths end in '\' so we don't replace/change 
+    # paths that start with the directory name and have extra characters.
+    $programFilesPath = Join-Path -Path ([Environment]::GetFolderPath('ProgramFiles')) -ChildPath '\'
+    $systemPath = Join-Path -Path ([Environment]::GetFolderPath('System')) -ChildPath '\'
+
+    if( (Test-CPowerShellIs64Bit -NoWarn) )
+    {
+        $programFilesx86Path =
+            Join-Path -Path ([Environment]::GetFolderPath('ProgramFilesx86')) -ChildPath '\'
+        $system32Path = Join-Path -Path ([Environment]::GetFolderPath('Systemx86')) -ChildPath '\'
+
+        if( $x86 )
+        {
+            # x64 OS/x64 PS wanting x86 paths.
+            # C:\Program Files\ -> C:\Program Files (x86)\
+            # C:\WINDOWS\system32\ -> C:\WINDOWS\SysWOW64\
+            return Join-Path -Path (($psPath -replace ([regex]::Escape($programFilesPath)), $programFilesx86Path)  `
+                            -replace ([regex]::Escape($systemPath)), $system32Path) -ChildPath 'powershell.exe'
+        }
+
+        # x64 OS/PS, wanting x64 Path, which is the same as this process's PSHOME variable.
+        return Join-Path $psPath -ChildPath 'powershell.exe'
+    }
+
+    if( $x86 )
+    {
+        # x64 OS/x86 PowerShell, wanting x86 path, which is the same as this process.
+        return Join-Path $psPath -ChildPath 'powershell.exe'
+    }
+
+    # x64 OS, x86 PowerShell, wanting x64 path
+    # C:\Program Files (x86)\ -> C:\Program Files\
+    # C:\WINDOWS\system32\ -> C:\WINDOWS\sysnative\
+    $programFiles64Path = Join-Path -Path $env:ProgramFilesW6432 -ChildPath '\'
+    $system64Path = Join-Path -Path ([Environment]::GetFolderPath('Windows')) -ChildPath 'sysnative\'
+    return Join-Path -Path (($psPath -replace ([regex]::Escape($programFilesPath)), $programFiles64Path) `
+                    -replace ([regex]::Escape($systemPath)), $system64Path) -ChildPath 'powershell.exe'
+}
+
+
+function Get-CProgramInstallInfo
+{
+    <#
+    .SYNOPSIS
+    Gets information about the programs installed on the computer.
     
-    Join-Path $psPath powershell.exe
+    .DESCRIPTION
+    The `Get-CProgramInstallInfo` function is the PowerShell equivalent of the Programs and Features UI in the Control Panel. It inspects the registry to determine what programs are installed. It will return programs installed for *all* users, not just the current user. 
+    
+    `Get-CProgramInstallInfo` tries its best to get accurate data. The following properties either isn't stored consistently, is in strange formats, can't be parsed, etc.
+
+     * The `ProductCode` property is set to `[Guid]::Empty` if the software doesn't have a product code.
+     * The `User` property will only be set for software installed for specific users. For global software, the `User` property will be `[String]::Empty`.
+     * The `InstallDate` property is set to `[DateTime]::MinValue` if the install date can't be determined.
+     * The `Version` property is `$null` if the version can't be parsed
+
+    .OUTPUTS
+    Carbon.Computer.ProgramInstallInfo.
+
+    .EXAMPLE
+    Get-CProgramInstallInfo
+
+    Demonstrates how to get a list of all the installed programs, similar to what the Programs and Features UI shows.
+
+    .EXAMPLE
+    Get-CProgramInstallInfo -Name 'Google Chrome'
+
+    Demonstrates how to get a specific program. If the specific program isn't found, `$null` is returned.
+
+    .EXAMPLE
+    Get-CProgramInstallInfo -Name 'Microsoft*'
+
+    Demonstrates how to use wildcards to search for multiple programs.
+    #>
+    [CmdletBinding()]
+    [OutputType([Carbon.Computer.ProgramInstallInfo])]
+    param(
+        # The name of a specific program to get. Wildcards supported.
+        [string] $Name
+    )
+
+    Set-StrictMode -Version 'Latest'
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
+    Write-CRefactoredCommandWarning -CommandName $MyInvocation.MyCommand.Name `
+                                    -ModuleName 'Carbon.Windows.Installer' `
+                                    -NewCommandName 'Get-CInstalledProgram'
+
+    if( -not (Test-Path -Path 'hku:\') )
+    {
+        $null = New-PSDrive -Name 'HKU' -PSProvider Registry -Root 'HKEY_USERS'
+    }
+
+    ('HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall','HKLM:\Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall','hku:\*\Software\Microsoft\Windows\CurrentVersion\Uninstall\*') |
+        Where-Object { Test-Path -Path $_ -PathType Container } | 
+        Get-ChildItem | 
+        Where-Object { 
+            $valueNames = $_.GetValueNames()
+
+            [Microsoft.Win32.RegistryKey]$key = $_
+
+            if( $valueNames -notcontains 'DisplayName' )
+            {
+                Write-Debug ('Skipping {0}: DisplayName not found.' -f $_.Name)
+                return $false
+            }
+
+            $displayName = $_.GetValue( 'DisplayName' )
+
+            if( $valueNames -contains 'ParentKeyName' )
+            {
+                Write-Debug ('Skipping {0} ({1}): found ParentKeyName property.' -f $displayName,$_.Name)
+                return $false
+            }
+
+            if( $valueNames -contains 'SystemComponent' -and $_.GetValue( 'SystemComponent' ) -eq 1 )
+            {
+                Write-Debug ('Skipping {0} ({1}): SystemComponent property is 1.' -f $displayName,$_.Name)
+                return $false
+            }
+
+            return $true
+        } |
+        Where-Object { 
+                if( $Name ) 
+                { 
+                    return $_.GetValue('DisplayName') -like $Name 
+                } 
+                return $true
+            } | 
+        ForEach-Object { New-Object 'Carbon.Computer.ProgramInstallInfo' $_ }
 }
 
 
@@ -740,7 +851,9 @@ if( -not (Get-Command -Name 'Get-WindowsFeature*' | Where-Object { $_.ModuleName
         Set-StrictMode -Version 'Latest'
         Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
     
-        Write-CWarningOnce -Message ('Get-CWindowsFeature is obsolete and will be removed in a future major version of Carbon.')
+        Write-CObsoleteCommandWarning -CommandName $MyInvocation.MyCommand.Name `
+                                      -NewCommandName 'Get-WindowsFeature' `
+                                      -NewModuleName 'ServerManager'
 
         if( -not (Assert-WindowsFeatureFunctionsSupported) )
         {
@@ -749,7 +862,7 @@ if( -not (Get-Command -Name 'Get-WindowsFeature*' | Where-Object { $_.ModuleName
         
         if( $useOCSetup )
         {
-            Get-WmiObject -Class Win32_OptionalFeature |
+            Get-CCimInstance -Class 'Win32_OptionalFeature' |
                 Where-Object {
                     if( $Name )
                     {
@@ -902,9 +1015,7 @@ function Install-CCertificate
 
     if( -not $NoWarn )
     {
-        $msg = 'Carbon''s "Install-CCertificate" function is OBSOLETE and will be removed in the next major version ' +
-               'of Carbon. Use the "Install-CCertificate" function in the new "Carbon.Cryptography" module.'
-        Write-CWarningOnce -Message $msg
+        Write-CRefactoredCommandWarning -CommandName $MyInvocation.MyCommand.Name -ModuleName 'Carbon.Cryptography'
     }
 
     if( $Password -and $Password -isnot [securestring] )
@@ -1090,31 +1201,29 @@ function Install-CMsi
 
     Demonstrates how to pipe MSI files into `Install-CMsi` for installation.
     #>
-    [CmdletBinding(SupportsShouldProcess=$true)]
+    [CmdletBinding(SupportsShouldProcess)]
     param(
-        [Parameter(Mandatory=$true,ValueFromPipeline=$true,ValueFromPipelineByPropertyName=$true)]
-        [Alias('FullName')]
-        [string[]]
         # The path to the installer to run. Wildcards supported.
-        $Path,
+        [Parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)]
+        [Alias('FullName')]
+        [String[]] $Path,
         
-        [Parameter(DontShow=$true)]
-        [Switch]
         # OBSOLETE. Installers are run in quiet mode by default. This switch will be removed in a future major version of Carbon. 
-        $Quiet,
+        [Parameter(DontShow)]
+        [switch] $Quiet,
 
-        [Switch]
         # Install the MSI even if it has already been installed. Will cause a repair/reinstall to run.
-        $Force
+        [switch] $Force
     )
 
     Set-StrictMode -Version 'Latest'
-
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
-    if( $PSBoundParameters.ContainsKey( 'Quiet' ) )
+    if( $PSBoundParameters.ContainsKey('Quiet') )
     {
-        Write-CWarningOnce ('Install-CMsi''s `Quiet` switch is obsolete and will be removed in a future major version of Carbon. Installers are run in quiet mode by default. Please remove usages of the `Quiet` switch.')
+        $msg = 'Install-CMsi''s `Quiet` switch is obsolete and will be removed in the next major version of Carbon. ' +
+               'Installers are now run in quiet mode by default. Remove usages of the `Quiet` switch.'
+        Write-CWarningOnce -Message $msg
     }
 
     Get-CMsi -Path $Path |
@@ -1197,7 +1306,7 @@ function Install-CMsmq
     Set-StrictMode -Version 'Latest'
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
-    Write-CWarningOnce -Message ('Install-CMsmq is obsolete and will be removed in a future major version of Carbon.')
+    Write-CObsoleteCommandWarning -CommandName $MyInvocation.MyCommand.Name
 
     $optionalArgs = @{ }
     if( $HttpSupport )
@@ -1296,8 +1405,10 @@ if( -not (Get-Command -Name 'Get-WindowsFeature*' | Where-Object { $_.ModuleName
         
         Set-StrictMode -Version 'Latest'
         Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
-    
-        Write-CWarningOnce -Message ('Install-CWindowsFeature is obsolete and will be removed in a future major version of Carbon.')
+
+        Write-CObsoleteCommandWarning -CommandName $MyInvocation.MyCommand.Name `
+                                      -NewCommandName 'Install-WindowsFeature' `
+                                      -NewModuleName 'ServerManager'
 
         if( -not (Assert-WindowsFeatureFunctionsSupported) )
         {
@@ -1545,9 +1656,7 @@ function Invoke-CPowerShell
 
     if( -not $NoWarn )
     {
-        $msg = 'Carbon''s "Invoke-CPowerShell" function is OBSOLETE and will be removed in the next major version of ' +
-               'Carbon. Use the "Invoke-CPowerShell" function in the new Carbon.Core module.'
-        Write-CWarningOnce -Message $msg
+        Write-CRefactoredCommandWarning -CommandName $MyInvocation.MyCommand.Name -ModuleName 'Carbon.Core'
     }
 
     $powerShellv3Installed = Test-Path -Path HKLM:\SOFTWARE\Microsoft\PowerShell\3
@@ -1889,9 +1998,7 @@ filter Protect-CString
 
     if( -not $NoWarn )
     {
-        $msg = 'Carbon''s "Protect-CString" function is OBSOLETE and will be removed in the next major version of ' +
-               'Carbon. Use the "Protect-CString" function in the new "Carbon.Cryptography" module.'
-        Write-CWarningOnce -Message $msg
+        Write-CRefactoredCommandWarning -CommandName $MyInvocation.MyCommand.Name -ModuleName 'Carbon.Cryptography'
     }
 
     Add-Type -AssemblyName 'System.Security'
@@ -2058,10 +2165,9 @@ function Resolve-CNetPath
     )
 
     Set-StrictMode -Version 'Latest'
-
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
-    Write-CWarningOnce ('Resolve-CNetPath is obsolete and will be removed in a future major version of Carbon. Do not use.')
+    Write-CObsoleteCommandWarning -CommandName $MyInvocation.MyCommand.Name
     
     $netCmd = Get-Command -CommandType Application -Name net.exe* |
                 Where-Object { $_.Name -eq 'net.exe' }
@@ -2109,7 +2215,7 @@ function Resolve-WindowsFeatureName
     Set-StrictMode -Version 'Latest'
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
     
-    Write-CWarningOnce -Message ('Resolve-WindowsFeatureName is obsolete and will be removed in a future major version of Carbon.')
+    Write-CObsoleteCommandWarning -CommandName $MyInvocation.MyCommand.Name
 
     Assert-WindowsFeatureFunctionsSupported -WarningAction SilentlyContinue | Out-Null
 
@@ -2170,9 +2276,9 @@ function Test-COSIs32Bit
 
     if( -not $NoWarn )
     {
-        $msg = 'Carbon''s "Test-COSIs32Bit" function is OBSOLETE and will be removed in the next major version of ' +
-               'Carbon. Use the new "Test-COperatingSystem" function in the new Carbon.Core module instead.'
-        Write-CWarningOnce -Message $msg
+        Write-CRefactoredCommandWarning -CommandName $MyInvocation.MyCommand.Name `
+                                        -ModuleName 'Carbon.Core' `
+                                        -NewCommandName 'Test-COperatingSystem'
     }
 
     return -not (Test-COSIs64Bit -NoWarn)
@@ -2210,9 +2316,9 @@ function Test-COSIs64Bit
 
     if( -not $NoWarn )
     {
-        $msg = 'Carbon''s "Test-COSIs64Bit" function is OBSOLETE and will be removed in the next major version of ' +
-               'Carbon. Use the new "Test-COperatingSystem" function in the new Carbon.Core module instead.'
-        Write-CWarningOnce -Message $msg
+        Write-CRefactoredCommandWarning -CommandName $MyInvocation.MyCommand.Name `
+                                        -ModuleName 'Carbon.Core' `
+                                        -NewCommandName 'Test-COperatingSystem'
     }
 
     return ([Environment]::Is64BitOperatingSystem)
@@ -2250,9 +2356,9 @@ function Test-CPowerShellIs32Bit
 
     if( -not $NoWarn )
     {
-        $msg = 'Carbon''s "Test-CPowerShellIs32Bit" function is OBSOLETE and will be removed in the next major ' +
-               'version of Carbon. Use the new "Test-CPowerShell" function in the new Carbon.Core module instead.'
-        Write-CWarningOnce -Message $msg
+        Write-CRefactoredCommandWarning -CommandName $MyInvocation.MyCommand.Name `
+                                        -ModuleName 'Carbon.Core' `
+                                        -NewCommandName 'Test-CPowerShell'
     }
 
     return -not (Test-CPowerShellIs64Bit -NoWarn)
@@ -2291,9 +2397,9 @@ function Test-CPowerShellIs64Bit
 
     if( -not $NoWarn )
     {
-        $msg = 'Carbon''s "Test-CPowerShellIs64Bit" function is OBSOLETE and will be removed in the next major ' +
-               'version of Carbon. Use the new "Test-CPowerShell" function in the new Carbon.Core module instead.'
-        Write-CWarningOnce -Message $msg
+        Write-CRefactoredCommandWarning -CommandName $MyInvocation.MyCommand.Name `
+                                        -ModuleName 'Carbon.Core' `
+                                        -NewCommandName 'Test-CPowerShell'
     }
 
     return ([Environment]::Is64BitProcess)
@@ -2345,8 +2451,8 @@ function Test-CWindowsFeature
     
     Set-StrictMode -Version 'Latest'
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
-    
-    Write-CWarningOnce -Message ('Test-CWindowsFeature is obsolete and will be removed in a future major version of Carbon.')
+
+    Write-CObsoleteCommandWarning -CommandName $MyInvocation.MyCommand.Name
 
     if( -not (Get-Module -Name 'ServerManager') -and -not (Assert-WindowsFeatureFunctionsSupported) )
     {
@@ -2481,10 +2587,7 @@ function Uninstall-CCertificate
 
         if( -not $NoWarn )
         {
-            $msg = 'Carbon''s "Uninstall-CCertificate" function is OBSOLETE and will be removed in the next major ' +
-                   'version of Carbon. Use the "Uninstall-CCertificate" function in the new "Carbon.Cryptography" ' +
-                   'module.'
-            Write-CWarningOnce -Message $msg
+            Write-CRefactoredCommandWarning -CommandName $MyInvocation.MyCommand.Name -ModuleName 'Carbon.Cryptography'
         }
 
         if( $PSCmdlet.ParameterSetName -like 'ByCertificate*' )
@@ -2674,12 +2777,14 @@ if( -not (Get-Command -Name 'Get-WindowsFeature*' | Where-Object { $_.ModuleName
             # Uninstalls MSMQ Active Directory Integration.
             $MsmqActiveDirectoryIntegration
         )
-        
+
         Set-StrictMode -Version 'Latest'
         Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
-        Write-CWarningOnce -Message ('Uninstall-CWindowsFeature is obsolete and will be removed in a future major version of Carbon.')
-    
+        Write-CObsoleteCommandWarning -CommandName $MyInvocation.MyCommand.Name `
+                                      -NewCommandName 'Uninstall-WindowsFeature' `
+                                      -NewModuleName 'ServerManager'
+
         if( -not (Assert-WindowsFeatureFunctionsSupported) )
         {
             return
@@ -2870,9 +2975,7 @@ filter Unprotect-CString
     
     if( -not $NoWarn )
     {
-        $msg = 'Carbon''s "Unprotect-CString" function is OBSOLETE and will be removed in the next major version of ' +
-               'Carbon. Use the "Unprotect-CString" function in the new "Carbon.Cryptography" module.'
-        Write-CWarningOnce -Message $msg
+        Write-CRefactoredCommandWarning -CommandName $MyInvocation.MyCommand.Name -ModuleName 'Carbon.Cryptography'
     }
 
     Add-Type -AssemblyName 'System.Security'
@@ -3043,4 +3146,3 @@ Failed to decrypt string using certificate "{0}" ({1}). This can happen when:
         [Array]::Clear( $decryptedBytes, 0, $decryptedBytes.Length )
     }
 }
-

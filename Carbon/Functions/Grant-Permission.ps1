@@ -366,6 +366,8 @@ function Grant-CPermission
         {
             $rulesToRemove = $currentAcl.Access |
                                 Where-Object { $_.IdentityReference.Value -ne $Identity } |
+                                # Don't remove Administrators access.
+                                Where-Object { $_.IdentityReference.Value -ne 'BUILTIN\Administrators' } |
                                 Where-Object { -not $_.IsInherited }
         
             if( $rulesToRemove )

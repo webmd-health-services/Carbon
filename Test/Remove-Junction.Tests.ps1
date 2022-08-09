@@ -20,7 +20,7 @@ Describe 'Remove-Junction' {
     
     function Invoke-RemoveJunction($junction)
     {
-        Remove-Junction $junction
+        Remove-Junction $junction -ErrorAction SilentlyContinue
     }
     
     BeforeEach {

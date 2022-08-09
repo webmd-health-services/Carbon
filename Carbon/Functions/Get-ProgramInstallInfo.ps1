@@ -36,14 +36,16 @@ function Get-CProgramInstallInfo
     [CmdletBinding()]
     [OutputType([Carbon.Computer.ProgramInstallInfo])]
     param(
-        [string]
         # The name of a specific program to get. Wildcards supported.
-        $Name
+        [string] $Name
     )
 
     Set-StrictMode -Version 'Latest'
-
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
+    Write-CRefactoredCommandWarning -CommandName $MyInvocation.MyCommand.Name `
+                                    -ModuleName 'Carbon.Windows.Installer' `
+                                    -NewCommandName 'Get-CInstalledProgram'
 
     if( -not (Test-Path -Path 'hku:\') )
     {

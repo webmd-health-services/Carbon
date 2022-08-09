@@ -19,6 +19,7 @@ using WindowsInstaller;
 
 namespace Carbon.Msi
 {
+	[Obsolete("Functionality moved to Carbon.Windows.Installer module.")]
 	public sealed class MsiInfo
 	{
 		public MsiInfo(string path)

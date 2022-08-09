@@ -1,3 +1,13 @@
+# 2.12.0
+
+* The `Install-CMsi`, `Get-CMsi`, and `Get-CProgramInstallInfo` functions have moved to a new `Carbon.Windows.Installer`
+module, now available on the PowerShell Gallery. Please switch to the new module and update usages. If you use these
+functions from Carbon, a warning message will be written. These function will be removed in the next major version of
+Carbon.
+* Carbon now works under PowerShell 7.
+* Fixed: Get-CPermission fails to grant permissions on certificates in PowerShell 6+ and on certificates that .NET
+Framework load as RSA cryptographic next generation keys, which don't have an API for setting private key permissions.
+
 
 # 2.11.3
 
@@ -8,6 +18,7 @@
 
 * Fixed: `Carbon.Firewall.Rule` type missing the `LocalIP` and `RemoteIP` properties (which are aliases for the
   `LocalIpAddress` and `RemoteIPAddress` properties, respectively).
+
 
 # 2.11.1
 

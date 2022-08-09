@@ -15,9 +15,7 @@
 Describe 'System.Diagnostics.Process' {
     It 'processes have ParentProcessID' {
         $parents = @{}
-        Get-WmiObject Win32_Process |
-            ForEach-Object { $parents[$_.ProcessID] = $_.ParentProcessID }
-    
+        Invoke-CPrivateCommand -Name 'Get-CCimInstance' -Parameter @{Class = 'Win32_Process'} | ForEach-Object { $parents[$_.ProcessID] = $_.ParentProcessID }         
         $foundSome = $false
         Get-Process | 
             Where-Object { $parents.ContainsKey( [UInt32]$_.Id ) -and $_.ParentProcessID } |
