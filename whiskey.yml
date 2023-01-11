@@ -61,13 +61,6 @@ Build:
     DestinationPath: Carbon\Carbon.psm1
     TextSeparator: "$(NewLine)$(NewLine)"
     DeleteSourceFiles: true
-- MergeFile:
-    OnlyBy: BuildServer
-    Path:
-    - "Carbon\\Functions\\*-Iis*.ps1"
-    DestinationPath: Carbon\Functions\Iis.ps1
-    TextSeparator: "$(NewLine)$(NewLine)"
-    DeleteSourceFiles: true
 - CopyFile:
     Path:
     - LICENSE.txt
