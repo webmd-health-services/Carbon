@@ -45,7 +45,7 @@ environment:
   - job_name: Windows Server 2016, Windows PowerShell 5.1
     job_group: ps
     appveyor_build_worker_image: Visual Studio 2017
-    
+
   # TODO: Get-WmiObject doesn't exist. Does Get-CimInstance? Can Carbon support PowerShell 6?
   # Currently appveyor vm for PS6 has PowerShell Get 2.1.3 installed which causes issue when publishing modules.
   # - job_name: Windows Server 2016, PowerShell 6
@@ -73,11 +73,17 @@ for:
     only:
     - job_group: ps
   build_script:
-  - ps: .\build.ps1
+  - ps: |
+        $ProgressPreference = 'SilentlyContinue'
+        iwr https://raw.githubusercontent.com/webmd-health-services/Prism/main/Scripts/init.ps1 | iex | Format-Table
+        .\build.ps1
 
 # Build in PowerShell
 - matrix:
     only:
     - job_group: pwsh
   build_script:
-  - pwsh: ./build.ps1
+  - pwsh: |
+        $ProgressPreference = 'SilentlyContinue'
+        iwr https://raw.githubusercontent.com/webmd-health-services/Prism/main/Scripts/init.ps1 | iex | Format-Table
+        .\build.ps1
