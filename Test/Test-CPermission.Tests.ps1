@@ -154,11 +154,19 @@ Describe 'Test-CPermission' {
         try
         {
             $certPath = Join-Path -Path 'cert:\LocalMachine\My' -ChildPath $cert.Thumbprint
-            Grant-CPermission -Path $certPath -Identity $script:identity -Permission 'GenericAll'
-            Test-CPermission -Path $certPath -Identity $script:identity -Permission 'GenericRead' | Should -BeTrue
-            Test-CPermission -Path $certPath -Identity $script:identity -Permission 'GenericRead' -Exact |
+            # PowerShell (Core) uses file system rights on private keys, not crypto key rights.
+            $allPerm = 'FullControl'
+            $readPerm = 'Read'
+            if ([Type]::GetType('System.Security.AccessControl.CryptoKeyAccessRule'))
+            {
+                $allPerm = 'GenericAll'
+                $readPerm = 'GenericRead'
+            }
+            Grant-CPermission -Path $certPath -Identity $script:identity -Permission $allPerm
+            Test-CPermission -Path $certPath -Identity $script:identity -Permission $readPerm | Should -BeTrue
+            Test-CPermission -Path $certPath -Identity $script:identity -Permission $readPerm -Exact |
                 Should -BeFalse
-            Test-CPermission -Path $certPath -Identity $script:identity -Permission 'GenericAll','GenericRead' -Exact |
+            Test-CPermission -Path $certPath -Identity $script:identity -Permission $allPerm, $readPerm -Exact |
                 Should -BeTrue
         }
         finally
@@ -167,7 +175,9 @@ Describe 'Test-CPermission' {
         }
     }
 
-    It 'should check permission on public key' {
+    $script:usesFileSystemPermsOnPrivateKeys =
+        $null -eq [Type]::GetType('System.Security.AccessControl.CryptoKeyAccessRule')
+    It 'should check permission on public key' -Skip:$script:usesFileSystemPermsOnPrivateKeys {
         $cert =
             Get-Item -Path 'Cert:\*\*' |
             Where-Object 'Name' -NE 'UserDS' | # This store causes problems on PowerShell 7.
@@ -176,6 +186,7 @@ Describe 'Test-CPermission' {
             Select-Object -First 1
         $cert | Should -Not -BeNullOrEmpty
         $certPath = Join-Path -Path 'cert:\' -ChildPath (Split-Path -NoQualifier -Path $cert.PSPath)
+        Get-CPermission -path $certPath -Identity $script:identity | Out-String | Write-Host
         Test-CPermission -Path $certPath -Identity $script:identity -Permission 'FullControl' | Should -BeTrue
         Test-CPermission -Path $certPath -Identity $script:identity -Permission 'FullControl' -Exact | Should -BeTrue
     }

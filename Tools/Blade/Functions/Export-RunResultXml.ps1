@@ -1,11 +1,11 @@
 # Copyright 2012 - 2015 Aaron Jensen
-# 
+#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# 
+#
 #     http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -44,8 +44,12 @@ function Export-RunResultXml
         $cwd = (Get-Location).Path
         $osVersion = [Environment]::OSVersion.VersionString
         $platform = [Environment]::OSVersion.Platform
-        $clrVersion = $PSVersionTable.CLRVersion
-        $psVersion = $PSVersionTable.PSVersion
+        $clrVersion = ''
+        if ($PSVersionTable.ContainsKey('CLRVersion'))
+        {
+            $clrVersion = $PSVersionTable['CLRVersion']
+        }
+        $psVersion = $PSVersionTable['PSVersion']
         $resultXml = [xml](@'
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
 <test-results name="" total="" errors="" failures="" not-run="0" inconclusive="0" ignored="" skipped="0" invalid="0" date="{0:yyyy-MM-dd}" time="{0:HH:mm:ss}">
@@ -80,7 +84,7 @@ function Export-RunResultXml
         Invoke-Command -ScriptBlock {
                 $RunResult.Failures
                 $RunResult.Errors
-                $RunResult.Passed                                        
+                $RunResult.Passed
             } |
             Group-Object -Property 'FixtureName' |
             ForEach-Object {
@@ -127,7 +131,7 @@ function Export-RunResultXml
 
                         $message = $resultXml.CreateElement( 'message' )
                         [void]$failure.AppendChild( $message )
-                        
+
                         $stackTrace = $resultXml.CreateElement( 'stack-trace' )
                         [void]$failure.AppendChild( $stackTrace )
 

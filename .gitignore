@@ -20,6 +20,7 @@ Website/**
 /Test/MSI/*.tmp
 /Test/MSI/setup.exe
 /Test/MSI/*.msi
+/Test/bin
 /Source/CarbonTestInstaller/Debug
 /Source/CarbonTestInstaller/Release
 /Source/CarbonTestInstallerWithCustomActions/Debug
@@ -29,4 +30,3 @@ Carbon/NOTICE.txt
 *.orig
 /.vscode/**
 /.dotnet*
-/global.json

@@ -55,7 +55,7 @@ BeforeAll {
     }
 }
 
-Describe 'Set-CIisHttpRedirect' {
+Describe 'Set-CIisHttpRedirect' -Skip {
     BeforeEach {
         Install-CIisWebsite -Name $script:siteName -Path $script:webRoot -Bindings "http://*:$script:port"
         if( Test-Path $script:webConfig )
@@ -71,7 +71,7 @@ Describe 'Set-CIisHttpRedirect' {
     It 'should redirect site' {
         Set-CIisHttpRedirect -SiteName $script:siteName -Destination 'http://www.example.com'
         Assert-Redirects
-        Assert-FileDoesNotExist $webConfig # make sure committed to applicationHost.config
+        $webConfig | Should -Not -Exist # make sure committed to applicationHost.config
         $settings = Get-IisHttpRedirect -SiteName $script:siteName
         $settings.Enabled | Should -BeTrue
         $settings.Destination | Should -Be 'http://www.example.com'

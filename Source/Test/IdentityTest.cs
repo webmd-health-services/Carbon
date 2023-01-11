@@ -11,56 +11,57 @@
 // limitations under the License.
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.DirectoryServices.AccountManagement;
 using System.Security.Principal;
 using NUnit.Framework;
 
 namespace Carbon.Test
 {
-    [TestFixture]
-    public sealed class IdentityTest
-    {
-        private Identity _identity;
-        private string _name;
+	[SuppressMessage("Interoperability", "CA1416:Validate platform compatibility")]
+	[TestFixture]
+	public sealed class IdentityTest
+	{
+		private Identity _identity;
+		private string _name;
 
-        [SetUp]
-        public void Setup()
-        {
-            
-        }
+		[SetUp]
+		public void Setup()
+		{
+		}
 
-        [Test]
-        public void ShouldResolveEveryone()
-        {
-            GivenIdentityName("EVERYONE");
-            WhenResolvingIdentityName();
-            ThenIdentityShouldBe(null, "Everyone");
-        }
+		[Test]
+		public void ShouldResolveEveryone()
+		{
+			GivenIdentityName("EVERYONE");
+			WhenResolvingIdentityName();
+			ThenIdentityShouldBe(null, "Everyone");
+		}
 
-        [Test]
-        [Ignore("Reason lost to the sands of time.")]
-        public void ShouldResolveAdministrator()
-        {
-            GivenIdentityName("Administrator");
-            WhenResolvingIdentityName();
-            ThenIdentityShouldBe(Environment.GetEnvironmentVariable("COMPUTERNAME"), "Administrator");
-        }
+		[Test]
+		[Ignore("Reason lost to the sands of time.")]
+		public void ShouldResolveAdministrator()
+		{
+			GivenIdentityName("Administrator");
+			WhenResolvingIdentityName();
+			ThenIdentityShouldBe(Environment.GetEnvironmentVariable("COMPUTERNAME"), "Administrator");
+		}
 
-        [Test]
-        public void ShouldResolveAdministrators()
-        {
-            GivenIdentityName("Administrators");
-            WhenResolvingIdentityName();
-            ThenIdentityShouldBe("BUILTIN", "Administrators");
-        }
+		[Test]
+		public void ShouldResolveAdministrators()
+		{
+			GivenIdentityName("Administrators");
+			WhenResolvingIdentityName();
+			ThenIdentityShouldBe("BUILTIN", "Administrators");
+		}
 
-        [Test]
-        public void ShouldResolve()
-        {
-            GivenIdentityName("NetworkService");
-            WhenResolvingIdentityName();
-            ThenIdentityShouldBe("NT AUTHORITY", "NETWORK SERVICE");
-        }
+		[Test]
+		public void ShouldResolve()
+		{
+			GivenIdentityName("NetworkService");
+			WhenResolvingIdentityName();
+			ThenIdentityShouldBe("NT AUTHORITY", "NETWORK SERVICE");
+		}
 
 		[Test]
 		public void ShouldResolveDotDomain()
@@ -81,92 +82,93 @@ namespace Carbon.Test
 			Assert.That(foundAUser, Is.True);
 		}
 
-	    [Test]
-	    public void ShouldResolveLocalSystem()
-	    {
-		    GivenIdentityName("localSYSTEM");
+		[Test]
+		public void ShouldResolveLocalSystem()
+		{
+			GivenIdentityName("localSYSTEM");
 			WhenResolvingIdentityName();
 			ThenIdentityShouldBe("NT AUTHORITY", "SYSTEM");
-	    }
+		}
 
-	    [Test]
-	    public void ShouldResolveBySid()
-	    {
-		    var id = Identity.FindByName("BUILTIN\\Administrators");
-		    var idBySid = Identity.FindBySid(id.Sid);
-		    Assert.That(id, Is.EqualTo(idBySid));
-	    }
+		[Test]
+		public void ShouldResolveBySid()
+		{
+			var id = Identity.FindByName("BUILTIN\\Administrators");
+			var idBySid = Identity.FindBySid(id.Sid);
+			Assert.That(id, Is.EqualTo(idBySid));
+		}
 
-	    [Test]
-	    public void ShouldResolveUnknownSid()
-	    {
-		    var id = Identity.FindBySid(new SecurityIdentifier("S-1-5-21-2678556459-1010642102-471947008-1017"));
-		    Assert.That(id, Is.Null);
-	    }
+		[Test]
+		public void ShouldResolveUnknownSid()
+		{
+			var id = Identity.FindBySid(new SecurityIdentifier("S-1-5-21-2678556459-1010642102-471947008-1017"));
+			Assert.That(id, Is.Null);
+		}
 
-	    [Test]
-	    public void ShouldAddUserToGroup()
-        {
-            var groupName = "CIdentityTest";
-            using (var ctx = new PrincipalContext(ContextType.Machine))
-            {
-                using (var group = GroupPrincipal.FindByIdentity(ctx, groupName))
-                {
-                    if (group == null)
-                    {
-                        using (var newGroup = new GroupPrincipal(ctx, groupName))
-                        {
-                            newGroup.Description = string.Format("Group created by {0} test fixture.", typeof(IdentityTest).FullName);
-                            newGroup.Save();
-                        }
-                    }
-                }
+		[Test]
+		public void ShouldAddUserToGroup()
+		{
+			var groupName = "CIdentityTest";
+			using (var ctx = new PrincipalContext(ContextType.Machine))
+			{
+				using (var group = GroupPrincipal.FindByIdentity(ctx, groupName))
+				{
+					if (group == null)
+					{
+						using (var newGroup = new GroupPrincipal(ctx, groupName))
+						{
+							newGroup.Description = string.Format("Group created by {0} test fixture.", typeof(IdentityTest).FullName);
+							newGroup.Save();
+						}
+					}
+				}
 
-                try
-                {
-                    var id = Identity.FindByName(string.Format("{0}\\{1}", Environment.UserDomainName, Environment.UserName));
-                    id.AddToLocalGroup(groupName);
-                }
-                finally
-                {
-                    using (var group = GroupPrincipal.FindByIdentity(ctx, "CIdentityTest"))
-                        if( group != null )
-                            group.Delete();
-                }
-            }
-        }
+				try
+				{
+					var id = Identity.FindByName(string.Format("{0}\\{1}", Environment.UserDomainName, Environment.UserName));
+					id.AddToLocalGroup(groupName);
+				}
+				finally
+				{
+					using (var group = GroupPrincipal.FindByIdentity(ctx, "CIdentityTest"))
+						if( group != null )
+							group.Delete();
+				}
+			}
+		}
 
-        [Test]
-	    public void ShouldFindUserInGroup()
-	    {
+		[Test]
+		public void ShouldFindUserInGroup()
+		{
 			var id = Identity.FindByName(string.Format("{0}\\{1}", Environment.UserDomainName, Environment.UserName));
-		    Assert.That(id.IsMemberOfLocalGroup("Administrators"), Is.True);
-	    }
+			Assert.That(id.IsMemberOfLocalGroup("Administrators"), Is.True);
+		}
 
-        private void ThenIdentityShouldBe(string domain, string name)
-        {
+		private void ThenIdentityShouldBe(string domain, string name)
+		{
 			Assert.That(_identity, Is.Not.Null);
-            Assert.That(_identity.Name, Is.EqualTo(name));
-            if (string.IsNullOrEmpty(domain))
-            {
-                Assert.That(_identity.Domain, Is.Empty);
-                Assert.That(_identity.FullName, Is.EqualTo(name));
-            }
-            else
-            {
-                Assert.That(_identity.FullName, Is.EqualTo(string.Format("{0}\\{1}", domain, name)));
-            }
-            Assert.That(_identity.Sid, Is.Not.Null);
-        }
+			Assert.That(_identity.Name, Is.EqualTo(name));
+			if (string.IsNullOrEmpty(domain))
+			{
+				Assert.That(_identity.Domain, Is.Empty);
+				Assert.That(_identity.FullName, Is.EqualTo(name));
+			}
+			else
+			{
+				Assert.That(_identity.FullName, Is.EqualTo(string.Format("{0}\\{1}", domain, name)));
+			}
+	
+			Assert.That(_identity.Sid, Is.Not.Null);
+		}
 
-        private void WhenResolvingIdentityName()
-        {
-            _identity = Identity.FindByName(_name);
-        }
+		private void WhenResolvingIdentityName()
+		{
+			_identity = Identity.FindByName(_name);
+		}
 
-        private void GivenIdentityName(string name)
-        {
-            _name = name;
-        }
-    }
+		private void GivenIdentityName(string name)
+		{
+			_name = name;
+		}
+	}
 }

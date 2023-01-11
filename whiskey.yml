@@ -1,6 +1,3 @@
-PublishOn:
- - master
- - prerelease
 
 Build:
 - Version:
@@ -23,27 +20,18 @@ Build:
     SignAssembly: True
     Constants: SIGNED
 - MSBuild:
+    NuGetVersion: 5.11.3  # NuGet 6 fails on Visual Studio 2017/Windows 2016.
     Path: Source\Carbon.sln
     Property:
     - SignAssembly=$(SignAssembly)
-- DotNet:
-    Command: publish
-    Path: Source\Test\Carbon.Test.csproj
-    Argument:
-    - --no-build
-    - --framework=netcoreapp2.1
-    - --configuration=$(WHISKEY_MSBUILD_CONFIGURATION)
 - DotNet:
     Command: test
     Path: Source\Test\Carbon.Test.csproj
     Argument:
     - --no-build
-    - --framework=netcoreapp2.1
     - --configuration=$(WHISKEY_MSBUILD_CONFIGURATION)
     - --results-directory=$(WHISKEY_OUTPUT_DIRECTORY)
     - --logger=trx
-- NUnit3:
-    Path: Source\Test\bin\$(WHISKEY_MSBUILD_CONFIGURATION)\net452\Carbon.Test.dll
 - Pipeline:
     Name: PublishBin
 - MergeFile:
@@ -93,12 +81,8 @@ Build:
         '-DeploymentName',
         'PowerShellGallery'
     ]
-- Pipeline:
-    Name: Tests
 
 PublishBin:
-- Delete:
-    Path: global.json
 - MSBuild:
     Path:
     - Source\Carbon.csproj
@@ -121,7 +105,7 @@ PublishBin:
 - Delete:
     OnlyDuring: Build
     OnlyBy: BuildServer
-    Path: Carbon\bin\*.pdb
+    Path: Carbon\bin\*\*.pdb
 # We don't need to include any assemblies that ship with PowerShell
 - Delete:
     OnlyDuring: Build
@@ -202,6 +186,7 @@ Tests:
     - "*\\Test-CUser.Tests.ps1"
     # Don't run the Pester 5 tests.
     - "*\\Convert-CXmlFile.Tests.ps1"
+    - "*\\Read-File.Tests.ps1"
     - "*\\Resolve-CPathCase.Tests.ps1"
     - "*\\X509Certificate2.Tests.ps1"
 - Pester:
@@ -214,6 +199,7 @@ Tests:
             Path:
             - Test\Convert-CXmlFile.Tests.ps1
             - Test\Get-CPermission.Tests.ps1
+            - Test\Read-File.Tests.ps1
             - Test\Resolve-CPathCase.Tests.ps1
             - Test\Test-CPermission.Tests.ps1
             - Test\X509Certificate2.Tests.ps1

@@ -92,18 +92,27 @@ Describe 'Get-CPermission' {
 
     It 'should get private cert permission' {
         $perms =
-            Get-ChildItem -Path 'Cert:\*\*' -Recurse |
+            Get-Item -Path 'Cert:\*\*' |
+            Where-Object 'Name' -NE 'UserDS' | # This store causes problems on PowerShell 7.
+            Get-ChildItem |
             Where-Object { -not $_.PsIsContainer } |
             Where-Object { $_.HasPrivateKey } |
             Where-Object { $_.PrivateKey } |
             ForEach-Object { Join-Path -Path 'cert:' -ChildPath (Split-Path -NoQualifier -Path $_.PSPath) } |
             ForEach-Object { Get-CPermission -Path $_ }
         $perms | Should -Not -BeNullOrEmpty
-        $perms | Should -BeOfType [Security.AccessControl.CryptoKeyAccessRule]
+        $expectedType = [Security.AccessControl.FileSystemAccessRule]
+        if ([Type]::GetType('System.Security.AccessControl.CryptoKeyAccessRule'))
+        {
+            $expectedType = [Security.AccessControl.CryptoKeyAccessRule]
+        }
+        $perms | Should -BeOfType $expectedType
     }
 
     It 'should get specific identity cert permission' {
-        Get-ChildItem -Path 'Cert:\*\*' -Recurse |
+        Get-Item -Path 'Cert:\*\*' |
+            Where-Object 'Name' -NE 'UserDS' | # This store causes problems on PowerShell 7.
+            Get-ChildItem |
             Where-Object { -not $_.PsIsContainer } |
             Where-Object { $_.HasPrivateKey } |
             Where-Object { $_.PrivateKey } |
