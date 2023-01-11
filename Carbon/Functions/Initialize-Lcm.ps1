@@ -26,7 +26,7 @@ function Initialize-CLcm
     ## Pull Mode
 
     ***NOTE: You can't use `Initialize-CLcm` to put the local configuration manager in pull mode on Windows 2016 or later.***
-    
+
     In order to get a computer to pulls its configuration automatically, you need to configure its LCM so it knows where and how to find its DSC pull server. The pull server holds all the resources and modules needed by the computer's configuration.
 
     The LCM can pull from two sources: a DSC website (the web download manager) or an SMB files hare (the file download manager). To use the web download manager, specify the URL to the website with the `ServerUrl` parameter. To use the file download manager, specify the path to the resources with the `SourcePath` parameter. This path can be an SMB share path or a local (on the LCM's computer) file system path. No matter where the LCM pulls its configuration from, you're responsible for putting all modules, resources, and .mof files at that location.
@@ -59,7 +59,7 @@ function Initialize-CLcm
 
     .LINK
     Install-CCertificate
-    
+
     .LINK
     http://technet.microsoft.com/en-us/library/dn249922.aspx
 
@@ -195,7 +195,7 @@ function Initialize-CLcm
         Write-CWarningOnce -Message ('You passed a plain text password to `Initialize-CLcm`. A future version of Carbon will remove support for plain-text passwords. Please pass a `SecureString` instead.')
         $CertPassword = ConvertTo-SecureString -String $CertPassword -AsPlainText -Force
     }
-    
+
     $thumbprint = $null
     if( $CertificateID )
     {
@@ -205,7 +205,7 @@ function Initialize-CLcm
     $privateKey = $null
     if( $CertFile )
     {
-        $CertFile = Resolve-CFullPath -Path $CertFile
+        $CertFile = Resolve-CFullPath -Path $CertFile -NoWarn
         if( -not (Test-Path -Path $CertFile -PathType Leaf) )
         {
             Write-Error ('Certificate file ''{0}'' not found.' -f $CertFile)
@@ -225,20 +225,20 @@ function Initialize-CLcm
         }
         $thumbprint = $privateKey.Thumbprint
     }
-    
+
     $credentialParam = @{ }
     if( $Credential )
     {
         $credentialParam.Credential = $Credential
     }
 
-    $ComputerName = $ComputerName | 
-                        Where-Object { 
-                            if( Test-Connection -ComputerName $_ -Quiet ) 
+    $ComputerName = $ComputerName |
+                        Where-Object {
+                            if( Test-Connection -ComputerName $_ -Quiet )
                             {
                                 return $true
                             }
-                            
+
                             Write-Error ('Computer ''{0}'' not found or is unreachable.' -f $_)
                             return $false
                         }
@@ -262,7 +262,7 @@ function Initialize-CLcm
                                 -Path $CertFile `
                                 -Password $CertPassword `
                                 -StoreLocation ([Security.Cryptography.X509Certificates.StoreLocation]::LocalMachine) `
-                                -StoreName ([Security.Cryptography.X509Certificates.StoreName]::My) | 
+                                -StoreName ([Security.Cryptography.X509Certificates.StoreName]::My) |
                 Out-Null
         }
         finally
@@ -277,7 +277,7 @@ function Initialize-CLcm
     {
         $originalWhatIf = $WhatIfPreference
         $WhatIfPreference = $false
-        configuration Lcm 
+        configuration Lcm
         {
             Set-StrictMode -Off
 

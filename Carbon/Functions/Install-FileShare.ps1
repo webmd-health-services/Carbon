@@ -8,7 +8,7 @@ function Install-CFileShare
     .DESCRIPTION
     The `Install-CFileShare` function installs a new file/SMB share. If the share doesn't exist, it is created. In Carbon 2.0, if a share does exist, its properties and permissions are updated in place, unless the share's path needs to change. Changing a share's path requires deleting and re-creating. Before Carbon 2.0, shares were always deleted and re-created.
 
-    Use the `FullAccess`, `ChangeAccess`, and `ReadAccess` parameters to grant full, change, and read sharing permissions on the share. Each parameter takes a list of user/group names. If you don't supply any permissions, `Everyone` will get `Read` access. Permissions on existing shares are cleared before permissions are granted. Permissions don't apply to the file system, only to the share. Use `Grant-CPermission` to grant file system permissions. 
+    Use the `FullAccess`, `ChangeAccess`, and `ReadAccess` parameters to grant full, change, and read sharing permissions on the share. Each parameter takes a list of user/group names. If you don't supply any permissions, `Everyone` will get `Read` access. Permissions on existing shares are cleared before permissions are granted. Permissions don't apply to the file system, only to the share. Use `Grant-CPermission` to grant file system permissions.
 
     Before Carbon 2.0, this function was called `Install-SmbShare`.
 
@@ -30,7 +30,7 @@ function Install-CFileShare
     .EXAMPLE
     Install-Share -Name TopSecretDocuments -Path C:\TopSecret -Description 'Share for our top secret documents.' -ReadAccess "Everyone" -FullAccess "Analysts"
 
-    Shares the C:\TopSecret directory as `TopSecretDocuments` and grants `Everyone` read access and `Analysts` full control.  
+    Shares the C:\TopSecret directory as `TopSecretDocuments` and grants `Everyone` read access and `Analysts` full control.
     #>
     [CmdletBinding()]
     param(
@@ -38,24 +38,24 @@ function Install-CFileShare
         [string]
         # The share's name.
         $Name,
-        
+
         [Parameter(Mandatory=$true)]
         [string]
         # The path to the share.
         $Path,
-            
+
         [string]
         # A description of the share
         $Description = '',
-        
+
         [string[]]
         # The identities who have full access to the share.
         $FullAccess = @(),
-        
+
         [string[]]
         # The identities who have change access to the share.
         $ChangeAccess = @(),
-        
+
         [string[]]
         # The identities who have read access to the share
         $ReadAccess = @(),
@@ -77,7 +77,7 @@ function Install-CFileShare
             [Parameter(Mandatory=$true)]
             [AllowEmptyCollection()]
             [string[]]
-            # The identity 
+            # The identity
             $Identity,
 
             [Carbon.Security.ShareRights]
@@ -123,7 +123,7 @@ function Install-CFileShare
                 [uint32]25 = 'Net Name Not Found';
             }
 
-    $Path = Resolve-CFullPath -Path $Path
+    $Path = Resolve-CFullPath -Path $Path -NoWarn
     $Path = $Path.Trim('\\')
     # When sharing drives, path must end with \. Otherwise, it shouldn't.
     if( $Path -eq (Split-Path -Qualifier -Path $Path ) )
@@ -135,7 +135,7 @@ function Install-CFileShare
     {
         $share = Get-CFileShare -Name $Name
         [bool]$delete = $false
-        
+
         if( $Force )
         {
             $delete = $true
@@ -164,7 +164,7 @@ function Install-CFileShare
     }
 
     # if we don't pass a $null security descriptor, default Everyone permissions aren't setup correctly, and extra admin rights are slapped on.
-    $shareSecurityDescriptor = ([wmiclass] "Win32_SecurityDescriptor").CreateInstance() 
+    $shareSecurityDescriptor = ([wmiclass] "Win32_SecurityDescriptor").CreateInstance()
     $shareSecurityDescriptor.DACL = $shareAces
     $shareSecurityDescriptor.ControlFlags = "0x4"
 
@@ -174,7 +174,7 @@ function Install-CFileShare
         {
             New-Item -Path $Path -ItemType Directory -Force | Out-String | Write-Verbose
         }
-    
+
         $shareClass = Get-CCimClass -Class 'Win32_Share'
         Write-Verbose -Message ('[SHARE] [{0}]              Sharing {1}' -f $Name,$Path)
 
@@ -230,7 +230,7 @@ function Install-CFileShare
             $existingAce = $ace
             if( $shareAces )
             {
-                $existingAce = $shareAces | Where-Object { 
+                $existingAce = $shareAces | Where-Object {
                                                         $newIdentityName = Resolve-CIdentityName -SID $_.Trustee.SID
                                                         return ( $newIdentityName -eq $ace.IdentityReference.Value )
                                                     }

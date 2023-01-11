@@ -31,17 +31,17 @@ function Install-CJunction
     <#
     .SYNOPSIS
     Creates a junction, or updates an existing junction if its target is different.
-    
+
     .DESCRIPTION
     Creates a junction given by `-Link` which points to the path given by `-Target`.  If `Link` exists, deletes it and re-creates it if it doesn't point to `Target`.
-    
+
     Both `-Link` and `-Target` parameters accept relative paths for values.  Any non-rooted paths are converted to full paths using the current location, i.e. the path returned by `Get-Location`.
 
     Beginning with Carbon 2.0, returns a `System.IO.DirectoryInfo` object for the target path, if one is created.  Returns a `System.IO.DirectoryInfo` object for the junction, if it is created and/or updated.
 
     .OUTPUTS
     System.IO.DirectoryInfo. To return a `DirectoryInfo` object for installed junction, use the `PassThru` switch.
-    
+
     .LINK
     New-CJunction
 
@@ -50,7 +50,7 @@ function Install-CJunction
 
     .EXAMPLE
     Install-CJunction -Link 'C:\Windows\system32Link' -Target 'C:\Windows\system32'
-    
+
     Creates the `C:\Windows\system32Link` directory, which points to `C:\Windows\system32`.
 
     .EXAMPLE
@@ -66,7 +66,7 @@ function Install-CJunction
         [string]
         # The junction to create/update. Relative paths are converted to absolute paths using the current location.
         $Link,
-        
+
         [Parameter(Mandatory=$true)]
         [string]
         # The target of the junction, i.e. where the junction will point to.  Relative paths are converted to absolute paths using the curent location.
@@ -85,8 +85,8 @@ function Install-CJunction
 
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
-    $Link = Resolve-CFullPath -Path $Link
-    $Target = Resolve-CFullPath -Path $Target
+    $Link = Resolve-CFullPath -Path $Link -NoWarn
+    $Target = Resolve-CFullPath -Path $Target -NoWarn
 
     if( Test-Path -LiteralPath $Target -PathType Leaf )
     {

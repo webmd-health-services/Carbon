@@ -4,24 +4,24 @@ function Install-CIisApplication
     <#
     .SYNOPSIS
     Creates a new application under a website.
-    
+
     .DESCRIPTION
     Creates a new application at `VirtualPath` under website `SiteName` running the code found on the file system under `PhysicalPath`, i.e. if SiteName is is `example.com`, the application is accessible at `example.com/VirtualPath`.  If an application already exists at that path, it is removed first.  The application can run under a custom application pool using the optional `AppPoolName` parameter.  If no app pool is specified, the application runs under the same app pool as the website it runs under.
 
     Beginning with Carbon 2.0, returns a `Microsoft.Web.Administration.Application` object for the new application if one is created or modified.
 
     Beginning with Carbon 2.0, if no app pool name is given, existing application's are updated to use `DefaultAppPool`.
-    
+
     Beginning with Carbon 2.0.1, this function is available only if IIS is installed.
 
     .EXAMPLE
     Install-CIisApplication -SiteName Peanuts -VirtualPath CharlieBrown -PhysicalPath C:\Path\To\CharlieBrown -AppPoolName CharlieBrownPool
-    
+
     Creates an application at `Peanuts/CharlieBrown` which runs from `Path/To/CharlieBrown`.  The application runs under the `CharlieBrownPool`.
-    
+
     .EXAMPLE
     Install-CIisApplication -SiteName Peanuts -VirtualPath Snoopy -PhysicalPath C:\Path\To\Snoopy
-    
+
     Create an application at Peanuts/Snoopy, which runs from C:\Path\To\Snoopy.  It uses the same application as the Peanuts website.
     #>
     [CmdletBinding()]
@@ -31,19 +31,19 @@ function Install-CIisApplication
         [string]
         # The site where the application should be created.
         $SiteName,
-        
+
         [Parameter(Mandatory=$true)]
         [Alias('Name')]
         [string]
         # The name of the application.
         $VirtualPath,
-        
+
         [Parameter(Mandatory=$true)]
         [Alias('Path')]
         [string]
         # The path to the application.
         $PhysicalPath,
-        
+
         [string]
         # The app pool for the application. Default is `DefaultAppPool`.
         $AppPoolName,
@@ -52,7 +52,7 @@ function Install-CIisApplication
         # Returns IIS application object. This switch is new in Carbon 2.0.
         $PassThru
     )
-    
+
     Set-StrictMode -Version 'Latest'
 
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
@@ -66,7 +66,7 @@ function Install-CIisApplication
 
     $iisAppPath = Join-CIisVirtualPath $SiteName $VirtualPath
 
-    $PhysicalPath = Resolve-CFullPath -Path $PhysicalPath
+    $PhysicalPath = Resolve-CFullPath -Path $PhysicalPath -NoWarn
     if( -not (Test-Path $PhysicalPath -PathType Container) )
     {
         Write-Verbose ('IIS://{0}: creating physical path {1}' -f $iisAppPath,$PhysicalPath)
@@ -78,7 +78,7 @@ function Install-CIisApplication
     {
         $appPoolDesc = '; appPool: {0}' -f $AppPoolName
     }
-    
+
     $apps = $site.GetCollection()
 
     $appPath = "/{0}" -f $VirtualPath
@@ -99,7 +99,7 @@ function Install-CIisApplication
         $app['path'] = $appPath
         $modified = $true
     }
-        
+
     if( $AppPoolName -and $app['applicationPool'] -ne $AppPoolName)
     {
         $app['applicationPool'] = $AppPoolName

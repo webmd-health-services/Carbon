@@ -26,13 +26,13 @@ function Install-CIisVirtualDirectory
         [string]
         # The site where the virtual directory should be created.
         $SiteName,
-        
+
         [Parameter(Mandatory=$true)]
         [Alias('Name')]
         [string]
         # The name of the virtual directory.  This can contain multiple directory segments for virtual directories not at the root of the website, e.g. First/Second/VirtualDirectory.
         $VirtualPath,
-        
+
         [Parameter(Mandatory=$true)]
         [Alias('Path')]
         [string]
@@ -41,13 +41,13 @@ function Install-CIisVirtualDirectory
 
         [Switch]
         # Deletes the virttual directory before installation, if it exists. Preserves default beheaviro in Carbon before 2.0.
-        # 
+        #
         # *Does not* delete custom configuration for the virtual directory, just the virtual directory. If you've customized the location of the virtual directory, those customizations will remain in place.
         #
         # The `Force` switch is new in Carbon 2.0.
         $Force
     )
-    
+
     Set-StrictMode -Version 'Latest'
 
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
@@ -60,7 +60,7 @@ function Install-CIisVirtualDirectory
         return
     }
 
-    $PhysicalPath = Resolve-CFullPath -Path $PhysicalPath
+    $PhysicalPath = Resolve-CFullPath -Path $PhysicalPath -NoWarn
 
     $VirtualPath = $VirtualPath.Trim('/')
     $VirtualPath = '/{0}' -f $VirtualPath

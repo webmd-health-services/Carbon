@@ -74,7 +74,7 @@ function Compress-CItem
 
         if( $OutFile )
         {
-            $OutFile = Resolve-CFullPath -Path $OutFile
+            $OutFile = Resolve-CFullPath -Path $OutFile -NoWarn
             if( (Test-Path -Path $OutFile -PathType Leaf) )
             {
                 if( -not $Force )
@@ -104,7 +104,7 @@ function Compress-CItem
                                 # 0x4   = No dialog
                                 # 0x10  = Responde "Yes to All" to any prompts
                                 # 0x400 = Do not display a user interface if an error occurs
-                                0x4 -bor 0x10 -bor 0x400        
+                                0x4 -bor 0x10 -bor 0x400
                             )
             $zipFile = $shellApp.NameSpace($OutFile)
             $zipItemCount = 0
@@ -137,8 +137,8 @@ function Compress-CItem
         $maxPathLength = $fullPaths | Select-Object -ExpandProperty 'Length' | Measure-Object -Maximum
         $maxPathLength = $maxPathLength.Maximum
         $shouldProcessFormat = 'compressing {{0,-{0}}} to {{1}}@{{2}}' -f $maxPathLength
-        
-        $fullPaths | ForEach-Object { 
+
+        $fullPaths | ForEach-Object {
             $zipEntryName = Split-Path -Leaf -Path $_
             $operation = $shouldProcessFormat -f $_,$OutFile,$zipEntryName
             if( $PSCmdlet.ShouldProcess($operation,$operation,$shouldProcessCaption) )
@@ -190,7 +190,7 @@ function Compress-CItem
                 }
                 catch
                 {
-                    Write-Verbose ('Encountered an exception checking if the COM Shell API has finished creating ZIP file ''{0}'': {1}' -f $OutFile,$_.Exception.Message) 
+                    Write-Verbose ('Encountered an exception checking if the COM Shell API has finished creating ZIP file ''{0}'': {1}' -f $OutFile,$_.Exception.Message)
                     $Global:Error.RemoveAt(0)
                 }
                 Start-Sleep -Milliseconds 100
