@@ -5,16 +5,55 @@
 
 ## Deprecated
 
-These functions are obsolete because they've moved to the `Carbon.Windows.HttpServer` module. Update usages to use the
-`Carbon.Windows.HttpServer` module instead of `Carbon`.
+These functions moved to the `Carbon.Windows.HttpServer` module. Update usages to use the `Carbon.Windows.HttpServer`
+module instead of `Carbon`.
 
 * `Get-CSslCertificateBinding`
 * `Remove-CSslCertificateBinding`
 * `Set-CSslCertificateBinding`
 * `Test-CSslCertificateBinding`
 
-The `Resolve-CFullPath` function is obsolete because its moved to the `Carbon.Core` module. Update usages to use the
-`Carbon.Core` module instead of `Carbon`.
+The `Resolve-CFullPath` function moved to the `Carbon.Core` module. Update usages to use the `Carbon.Core` module
+instead of `Carbon`.
+
+All IIS functions moved to the `Carbon.IIS` module. Updates usages to use the `Carbon.IIS` module instead of `Carbon`.
+
+* `Add-CIisDefaultDocument`
+* `Add-CIisServerManagerMember`
+* `Disable-CIisSecurityAuthentication`
+* `Enable-CIisDirectoryBrowsing`
+* `Enable-CIisSecurityAuthentication`
+* `Enable-CIisSsl`
+* `Get-CIisApplication`
+* `Get-CIisAppPool`
+* `Get-CIisConfigurationSection`
+* `Get-CIisHttpHeader`
+* `Get-CIisHttpRedirect`
+* `Get-CIisMimeMap`
+* `Get-CIisSecurityAuthentication`
+* `Get-CIisVersion`
+* `Get-CIisWebsite`
+* `Install-CIisApplication`
+* `Install-CIisAppPool`
+* `Install-CIisVirtualDirectory`
+* `Install-CIisWebsite`
+* `Join-CIisVirtualPath`
+* `Lock-CIisConfigurationSection`
+* `Remove-CIisMimeMap`
+* `Set-CIisHttpHeader`
+* `Set-CIisHttpRedirect`
+* `Set-CIisMimeMap`
+* `Set-CIisWebsiteID`
+* `Set-CIisWebsiteSslCertificate`
+* `Set-CIisWindowsAuthentication`
+* `Test-CIisAppPool`
+* `Test-CIisConfigurationSection`
+* `Test-CIisSecurityAuthentication`
+* `Test-CIisWebsite`
+* `Uninstall-CIisAppPool`
+* `Uninstall-CIisWebsite`
+* `Unlock-CIisConfigurationSection`
+* `Write-CIisVerbose`
 
 
 # 2.12.0
