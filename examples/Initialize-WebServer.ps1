@@ -6,9 +6,9 @@ Example script showing how to setup a simple web server.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# 
+#
 #     http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -50,7 +50,7 @@ Install-Share -Name $deployShareName `
 
 $sslCertPath = 'Path\to\SSL\certificate.cer'
 $cert = Install-CCertificate -Path $sslCertPath -StoreLocation LocalMachine -StoreName My -NoWarn
-Set-SslCertificateBinding -ApplicationID ([Guid]::NewGuid()) -Thumbprint $cert.Thumbprint
+Set-SslCertificateBinding -ApplicationID ([Guid]::NewGuid()) -Thumbprint $cert.Thumbprint -NoWarn
 
 $appPoolName = 'ExampleAppPool'
 Install-IisAppPool -Name $appPoolName -ServiceAccount NetworkService

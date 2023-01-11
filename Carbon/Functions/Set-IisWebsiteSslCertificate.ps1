@@ -21,29 +21,29 @@ function Set-CIisWebsiteSslCertificate
         [string]
         # The name of the website whose SSL certificate is being set.
         $SiteName,
-        
+
         [Parameter(Mandatory=$true)]
         [string]
         # The thumbprint of the SSL certificate to use.
         $Thumbprint,
 
-        [Parameter(Mandatory=$true)]        
+        [Parameter(Mandatory=$true)]
         [Guid]
         # A GUID that uniquely identifies this website.  Create your own.
         $ApplicationID
     )
-    
+
     Set-StrictMode -Version 'Latest'
 
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
     $site = Get-CIisWebsite -SiteName $SiteName
-    if( -not $site ) 
+    if( -not $site )
     {
         Write-Error "Unable to find website '$SiteName'."
         return
     }
-    
+
     $site.Bindings | Where-Object { $_.Protocol -eq 'https' } | ForEach-Object {
         $installArgs = @{ }
         if( $_.Endpoint.Address -ne '0.0.0.0' )
@@ -54,7 +54,7 @@ function Set-CIisWebsiteSslCertificate
         {
             $installArgs.Port = $_.Endpoint.Port
         }
-        Set-CSslCertificateBinding @installArgs -ApplicationID $ApplicationID -Thumbprint $Thumbprint
+        Set-CSslCertificateBinding @installArgs -ApplicationID $ApplicationID -Thumbprint $Thumbprint -NoWarn
     }
 }
 
