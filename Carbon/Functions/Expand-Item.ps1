@@ -7,7 +7,7 @@ function Expand-CItem
 
     .DESCRIPTION
     The contents of the ZIP file are extracted to a temporary directory, and that directory is returned as a `System.IO.DirectoryInfo` object. You are responsible for deleting that directory when you're finished.
-    
+
     You can extract to a specific directory with the `OutDirectory` parameter. If the directory doesn't exist, it is created. If the directory exists, and is empty, the file is decompressed into that directory. If the directory isn't empty, use the `-Force` parameter to overwrite any files/directories which may be present.
 
     The directory where the files were decompressed is returned.
@@ -22,7 +22,7 @@ function Expand-CItem
     Test-CZipFile
 
     .EXAMPLE
-    $unzipRoot = Expand-CItem -Path 'C:\Carbon.zip' 
+    $unzipRoot = Expand-CItem -Path 'C:\Carbon.zip'
 
     Demonstrates how to unzip a file into a temporary directory. You are responsible for deleting that directory.
 
@@ -72,7 +72,7 @@ function Expand-CItem
 
     if( $OutDirectory )
     {
-        $OutDirectory = Resolve-CFullPath -Path $OutDirectory
+        $OutDirectory = Resolve-CFullPath -Path $OutDirectory -NoWarn
         if( (Test-Path -Path $OutDirectory -PathType Container) )
         {
             if( -not $Force -and (Get-ChildItem -LiteralPath $OutDirectory | Measure-Object | Select-Object -ExpandProperty Count) )

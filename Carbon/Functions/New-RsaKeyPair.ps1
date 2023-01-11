@@ -25,7 +25,7 @@ function New-CRsaKeyPair
         RequestType = Cert
         KeyUsage = "CERT_KEY_ENCIPHERMENT_KEY_USAGE | CERT_DATA_ENCIPHERMENT_KEY_USAGE"
         ValidityPeriod = Days
-        ValidityPeriodUnits = 
+        ValidityPeriodUnits =
 
         [Extensions]
         %szOID_ENHANCED_KEY_USAGE% = "{{text}}%szOID_DOCUMENT_ENCRYPTION%"
@@ -36,7 +36,7 @@ function New-CRsaKeyPair
 
     The public key is saved as an X509Certificate. The private key is saved as a PFX file. Both can be loaded by .NET's `X509Certificate` class. Returns `System.IO.FileInfo` objects for the public and private key, in that order.
 
-    Before Carbon 2.1, this function used the `makecert.exe` and `pvk2pfx.exe` programs, from the Windows SDK. These programs prompt multiple times for the private key password, so if you're using a version before 2.1, you can't run this function non-interactively. 
+    Before Carbon 2.1, this function used the `makecert.exe` and `pvk2pfx.exe` programs, from the Windows SDK. These programs prompt multiple times for the private key password, so if you're using a version before 2.1, you can't run this function non-interactively.
 
     .OUTPUTS
     System.IO.FileInfo
@@ -79,7 +79,7 @@ function New-CRsaKeyPair
 
         [Parameter(DontShow=$true)]
         [DateTime]
-        # The date/time the keys will become valid. Default is now. 
+        # The date/time the keys will become valid. Default is now.
         #
         # This parameter was made obsolete in Carbon 2.1.
         $ValidFrom = (Get-Date),
@@ -145,7 +145,7 @@ function New-CRsaKeyPair
 
         Set-StrictMode -Version 'Latest'
 
-        $Path = Resolve-CFullPath -Path $Path
+        $Path = Resolve-CFullPath -Path $Path -NoWarn
 
         if( (Test-Path -Path $Path -PathType Leaf) )
         {
@@ -237,7 +237,7 @@ ValidityPeriodUnits = {3}
 
         Get-Content -Raw -Path $tempInfFile | Write-Debug
 
-        $output = & $certReqPath -q -new $tempInfFile $PublicKeyFile 
+        $output = & $certReqPath -q -new $tempInfFile $PublicKeyFile
         if( $LASTEXITCODE -or -not (Test-Path -Path $PublicKeyFile -PathType Leaf) )
         {
             Write-Error ('Failed to create public/private key pair:{0}{1}' -f ([Environment]::NewLine),($output -join ([Environment]::NewLine)))

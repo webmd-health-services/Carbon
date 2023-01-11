@@ -15,14 +15,14 @@ function Test-CZipFile
 
     .LINK
     Compress-CItem
-    
+
     .LINK
     Expand-CItem
-    
+
     .EXAMPLE
     Test-CZipFile -Path 'MyCoolZip.zip'
-    
-    Demonstrates how to check the current directory if MyCoolZip.zip is really a ZIP file.  
+
+    Demonstrates how to check the current directory if MyCoolZip.zip is really a ZIP file.
     #>
     [OutputType([bool])]
     [CmdletBinding()]
@@ -39,7 +39,7 @@ function Test-CZipFile
 
     Add-Type -Path (Join-Path -Path $CarbonBinDir -ChildPath 'Ionic.Zip.dll' -Resolve)
 
-    $Path = Resolve-CFullPath -Path $Path
+    $Path = Resolve-CFullPath -Path $Path -NoWarn
     if( -not (Test-Path -Path $Path -PathType Leaf) )
     {
         Write-Error ('File ''{0}'' not found.' -f $Path)

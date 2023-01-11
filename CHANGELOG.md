@@ -5,13 +5,16 @@
 
 ## Deprecated
 
-These functions are now in the `Carbon.Windows.HttpServer` module and are obsolete. Please update usages to use the
-`Carbon.Windows.HttpServer` module.
+These functions are obsolete because they've moved to the `Carbon.Windows.HttpServer` module. Update usages to use the
+`Carbon.Windows.HttpServer` module instead of `Carbon`.
 
 * `Get-CSslCertificateBinding`
 * `Remove-CSslCertificateBinding`
 * `Set-CSslCertificateBinding`
 * `Test-CSslCertificateBinding`
+
+The `Resolve-CFullPath` function is obsolete because its moved to the `Carbon.Core` module. Update usages to use the
+`Carbon.Core` module instead of `Carbon`.
 
 
 # 2.12.0
