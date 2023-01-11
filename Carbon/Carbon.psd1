@@ -25,7 +25,7 @@
     RootModule = 'Carbon.psm1'
 
     # Version number of this module.
-    ModuleVersion = '2.12.0'
+    ModuleVersion = '2.13.0'
 
     # ID used to uniquely identify this module
     GUID = '075d9444-c01b-48c3-889a-0b3490716fa2'

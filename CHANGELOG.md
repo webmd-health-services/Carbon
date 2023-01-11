@@ -1,6 +1,19 @@
 <!-- markdownlint-disable MD012 no-multiple-blanks-->
 <!-- markdownlint-disable MD024 no-duplicate-heading/no-duplicate-header -->
 
+# 2.13.0
+
+## Deprecated
+
+These functions are now in the `Carbon.Windows.HttpServer` module and are obsolete. Please update usages to use the
+`Carbon.Windows.HttpServer` module.
+
+* `Get-CSslCertificateBinding`
+* `Remove-CSslCertificateBinding`
+* `Set-CSslCertificateBinding`
+* `Test-CSslCertificateBinding`
+
+
 # 2.12.0
 
 * The `Install-CMsi`, `Get-CMsi`, and `Get-CProgramInstallInfo` functions have moved to a new `Carbon.Windows.Installer`

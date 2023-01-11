@@ -20,7 +20,7 @@ function Complete-CJob
         # The jobs to complete.
         [Alias('Jobs')]
         $Job,
-        
+
         [Parameter()]
         [int]
         # The number of seconds to sleep between job status checks.  Default is 1 second.
@@ -43,7 +43,7 @@ function Complete-CJob
     do
     {
         Start-Sleep -Seconds $IntervalSeconds
-        
+
         $jobsStillRunning = $false
         foreach( $pendingJob in $Job )
         {
@@ -53,11 +53,11 @@ function Complete-CJob
                 Write-Verbose "Job with ID $($pendingJob.Id) doesn't exist."
                 continue
             }
-            
+
             try
             {
                 Write-Verbose "Job $($currentJob.Name) is in the $($currentJob.State) state."
-                
+
                 $jobHeader = "# $($currentJob.Name): $($currentJob.State)"
                 if( $currentJob.State -eq 'Blocked' -or $currentJob.State -eq 'Stopped')
                 {
@@ -102,9 +102,9 @@ function Complete-CJob
                 Write-Warning $_
             }
         }
-        
+
      } while( $jobsStillRunning )
-     
+
      return $numFailed
 }
 
@@ -137,7 +137,7 @@ function Convert-CSecureStringToString
 
         [switch]$NoWarn
     )
-    
+
     Set-StrictMode -Version 'Latest'
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
@@ -261,7 +261,7 @@ Add-CTypeData -Type Security.Cryptography.X509Certificates.X509Store `
                     {
                         return [Security.Cryptography.X509Certificates.StoreName]::CertificateAuthority
                     }
-                
+
                     foreach( $value in ([Enum]::GetValues([Security.Cryptography.X509Certificates.StoreName])) )
                     {
                         if( $this.Name -eq $value.ToString() )
@@ -283,27 +283,27 @@ function Get-CCertificate
 
     .DESCRIPTION
     Certificates can be files or they can be in a Windows certificate store.  This function returns an `X509Certificate2` object for a script that's a file on the file system or a cert stored in Microsoft's certificate store.  You can get a certificate from a certificate store with its unique thumbprint or its friendly name.  Friendly names are *not* required to be unique, so you may get multiple certificates when using that search method.
-    
+
     Certificates loaded from a file are imported with default key storage values, which means if you try to add the certifiate returned by this function to a certificate store it will get persisted in the user's key store and *not* persisted.
-    
+
     .OUTPUTS
     System.Security.Cryptography.x509Certificates.X509Certificate2. The X509Certificate2 certificates that were found, or `$null`.
 
     .EXAMPLE
     Get-CCertificate -Path C:\Certificates\certificate.cer -Password MySuperSecurePassword
-    
+
     Gets an X509Certificate2 object representing the certificate.cer file. Wildcards *not* supported when using a file system path.
-    
+
     .EXAMPLE
     Get-CCertificate -Thumbprint a909502dd82ae41433e6f83886b00d4277a32a7b -StoreName My -StoreLocation LocalMachine
-    
+
     Gets an X509Certificate2 object for the certificate in the Personal store with a specific thumbprint under the Local Machine.
-    
+
     .EXAMPLE
     Get-CCertificate -FriendlyName 'Development Certificate' -StoreLocation CurrentUser -StoreName TrustedPeople
-    
+
     Gets the X509Certificate2 whose friendly name is Development Certificate from the Current User's Trusted People certificate store.
-    
+
     .EXAMPLE
     Get-CCertificate -Thumbprint a909502dd82ae41433e6f83886b00d4277a32a7b -CustomStoreName 'SharePoint' -StoreLocation LocalMachine
 
@@ -321,7 +321,7 @@ function Get-CCertificate
         [string]
         # The path to the certificate. Can be a file system path or a certificate path, e.g. `cert:\`. Wildcards supported.
         $Path,
-        
+
         [Parameter(ParameterSetName='ByPath')]
         # The password to the certificate.  Can be plaintext or a [SecureString](http://msdn.microsoft.com/en-us/library/system.securestring.aspx).
         $Password,
@@ -331,19 +331,19 @@ function Get-CCertificate
         # The storage flags to use when loading a certificate file. This controls where/how you can store the certificate in the certificate stores later. Use the `-bor` operator to combine flags.
         $KeyStorageFlags,
 
-        
+
         [Parameter(Mandatory=$true,ParameterSetName='ByThumbprint')]
         [Parameter(Mandatory=$true,ParameterSetName='ByThumbprintCustomStoreName')]
         [string]
         # The certificate's thumbprint.
         $Thumbprint,
-        
+
         [Parameter(Mandatory=$true,ParameterSetName='ByFriendlyName')]
         [Parameter(Mandatory=$true,ParameterSetName='ByFriendlyNameCustomStoreName')]
         [string]
         # The friendly name of the certificate.
         $FriendlyName,
-        
+
         [Parameter(Mandatory=$true,ParameterSetName='ByFriendlyName')]
         [Parameter(Mandatory=$true,ParameterSetName='ByFriendlyNameCustomStoreName')]
         [Parameter(Mandatory=$true,ParameterSetName='ByThumbprint')]
@@ -351,7 +351,7 @@ function Get-CCertificate
         [Security.Cryptography.X509Certificates.StoreLocation]
         # The location of the certificate's store.
         $StoreLocation,
-        
+
         [Parameter(Mandatory=$true,ParameterSetName='ByFriendlyName')]
         [Parameter(Mandatory=$true,ParameterSetName='ByThumbprint')]
         [Security.Cryptography.X509Certificates.StoreName]
@@ -412,7 +412,7 @@ function Get-CCertificate
             Join-Path -Path $qualifier -ChildPath $path
         }
     }
-    
+
     if( $PSCmdlet.ParameterSetName -eq 'ByPath' )
     {
         if( -not (Test-Path -Path $Path -PathType Leaf) )
@@ -421,7 +421,7 @@ function Get-CCertificate
             return
         }
 
-        Get-Item -Path $Path | 
+        Get-Item -Path $Path |
             ForEach-Object {
                 $item = $_
                 if( $item -is [Security.Cryptography.X509Certificates.X509Certificate2] )
@@ -459,7 +459,7 @@ function Get-CCertificate
         {
             $storeLocationPath = $StoreLocation
         }
-        
+
         $storeNamePath = '*'
         if( $PSCmdlet.ParameterSetName -like '*CustomStoreName' )
         {
@@ -473,7 +473,7 @@ function Get-CCertificate
                 $storeNamePath = 'CA'
             }
         }
-        
+
         if( $pscmdlet.ParameterSetName -like 'ByThumbprint*' )
         {
             $certPath = 'cert:\{0}\{1}\{2}' -f $storeLocationPath,$storeNamePath,$Thumbprint
@@ -492,7 +492,7 @@ function Get-CCertificate
             $certPath = Join-Path -Path 'cert:' -ChildPath $storeLocationPath
             $certPath = Join-Path -Path $certPath -ChildPath $storeNamePath
             $certPath = Join-Path -Path $certPath -ChildPath '*'
-            return Get-ChildItem -Path $certPath | 
+            return Get-ChildItem -Path $certPath |
                         Where-Object { $_.FriendlyName -eq $FriendlyName } |
                         ForEach-Object {
                             $friendlyPath = $_ | Resolve-CertificateProviderFriendlyPath
@@ -546,8 +546,8 @@ function Get-CMsi
         [Alias('FullName')]
         [string[]] $Path
     )
-    
-    begin 
+
+    begin
     {
         Set-StrictMode -Version 'Latest'
         Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
@@ -555,7 +555,7 @@ function Get-CMsi
         Write-CRefactoredCommandWarning -CommandName $MyInvocation.MyCommand.Name -ModuleName 'Carbon.Windows.Installer'
     }
 
-    process 
+    process
     {
         $Path |
             Resolve-Path |
@@ -589,7 +589,7 @@ function Get-CMsi
             }
     }
 
-    end 
+    end
     {
     }
 }
@@ -603,9 +603,9 @@ function Get-CPowershellPath
 
     .DESCRIPTION
     Returns the path to the powershell.exe binary for the machine's default architecture (i.e. x86 or x64).  If you're on a x64 machine and want to get the path to x86 PowerShell, set the `x86` switch.
-    
+
     Here are the possible combinations of operating system, PowerShell, and desired path architectures, and the path they map to.
-    
+
         +-----+-----+------+--------------------------------------------------------------+
         | OS  | PS  | Path | Result                                                       |
         +-----+-----+------+--------------------------------------------------------------+
@@ -616,7 +616,7 @@ function Get-CPowershellPath
         | x86 | x86 | x64  | $env:windir\System32\Windows PowerShell\v1.0\powershell.exe  |
         | x86 | x86 | x86  | $env:windir\System32\Windows PowerShell\v1.0\powershell.exe  |
         +-----+-----+------+--------------------------------------------------------------+
-    
+
     .EXAMPLE
     Get-CPowerShellPath
 
@@ -634,7 +634,7 @@ function Get-CPowershellPath
 
         [switch]$NoWarn
     )
-    
+
     Set-StrictMode -Version 'Latest'
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
@@ -656,14 +656,14 @@ function Get-CPowershellPath
         {
             return Join-Path -Path $psPath -ChildPath 'powershell.exe'
         }
-        
+
         $msg = 'Unable to get the path to 64-bit PowerShell: this is a 32-bit operating system and ' +
             '64-bit PowerShell does not exist.'
         Write-Error -Message $msg -ErrorAction Ignore
         return
     }
 
-    # Make sure the paths end in '\' so we don't replace/change 
+    # Make sure the paths end in '\' so we don't replace/change
     # paths that start with the directory name and have extra characters.
     $programFilesPath = Join-Path -Path ([Environment]::GetFolderPath('ProgramFiles')) -ChildPath '\'
     $systemPath = Join-Path -Path ([Environment]::GetFolderPath('System')) -ChildPath '\'
@@ -708,10 +708,10 @@ function Get-CProgramInstallInfo
     <#
     .SYNOPSIS
     Gets information about the programs installed on the computer.
-    
+
     .DESCRIPTION
-    The `Get-CProgramInstallInfo` function is the PowerShell equivalent of the Programs and Features UI in the Control Panel. It inspects the registry to determine what programs are installed. It will return programs installed for *all* users, not just the current user. 
-    
+    The `Get-CProgramInstallInfo` function is the PowerShell equivalent of the Programs and Features UI in the Control Panel. It inspects the registry to determine what programs are installed. It will return programs installed for *all* users, not just the current user.
+
     `Get-CProgramInstallInfo` tries its best to get accurate data. The following properties either isn't stored consistently, is in strange formats, can't be parsed, etc.
 
      * The `ProductCode` property is set to `[Guid]::Empty` if the software doesn't have a product code.
@@ -757,9 +757,9 @@ function Get-CProgramInstallInfo
     }
 
     ('HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall','HKLM:\Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall','hku:\*\Software\Microsoft\Windows\CurrentVersion\Uninstall\*') |
-        Where-Object { Test-Path -Path $_ -PathType Container } | 
-        Get-ChildItem | 
-        Where-Object { 
+        Where-Object { Test-Path -Path $_ -PathType Container } |
+        Get-ChildItem |
+        Where-Object {
             $valueNames = $_.GetValueNames()
 
             [Microsoft.Win32.RegistryKey]$key = $_
@@ -786,15 +786,94 @@ function Get-CProgramInstallInfo
 
             return $true
         } |
-        Where-Object { 
-                if( $Name ) 
-                { 
-                    return $_.GetValue('DisplayName') -like $Name 
-                } 
+        Where-Object {
+                if( $Name )
+                {
+                    return $_.GetValue('DisplayName') -like $Name
+                }
                 return $true
-            } | 
+            } |
         ForEach-Object { New-Object 'Carbon.Computer.ProgramInstallInfo' $_ }
 }
+
+
+
+function Get-CSslCertificateBinding
+{
+    <#
+    .SYNOPSIS
+    Gets the SSL certificate bindings on this computer.
+
+    .DESCRIPTION
+    Windows binds SSL certificates to an IP addresses/port combination.  This function gets all the SSL bindings on this computer, or a binding for a specific IP/port, or $null if one doesn't exist.  The bindings are returned as `Carbon.Certificates.SslCertificateBinding` objects.
+
+    .OUTPUTS
+    Carbon.Certificates.SslCertificateBinding.
+
+    .EXAMPLE
+    > Get-CSslCertificateBinding
+
+    Gets all the SSL certificate bindings on the local computer.
+
+    .EXAMPLE
+    > Get-CSslCertificateBinding -IPAddress 42.37.80.47 -Port 443
+
+    Gets the SSL certificate bound to 42.37.80.47, port 443.
+
+    .EXAMPLE
+    > Get-CSslCertificateBinding -Port 443
+
+    Gets the default SSL certificate bound to ALL the computer's IP addresses on port 443.
+    #>
+    [CmdletBinding()]
+    [OutputType([Carbon.Certificates.SslCertificateBinding])]
+    param(
+        [IPAddress]
+        # The IP address whose certificate(s) to get.  Should be in the form IP:port. Optional.
+        $IPAddress,
+
+        [UInt16]
+        # The port whose certificate(s) to get. Optional.
+        $Port,
+
+        # Don't show the warning message that this command was moved to a new module.
+        [switch] $NoWarn
+    )
+
+    Set-StrictMode -Version 'Latest'
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
+    if (-not $NoWarn)
+    {
+        Write-CRefactoredCommandWarning -CommandName $MyInvocation.MyCommand.Name `
+                                        -ModuleName 'Carbon.Windows.HttpServer'
+    }
+
+    [Carbon.Certificates.SslCertificateBinding]::GetSslCertificateBindings() |
+        Where-Object {
+            if( $IPAddress )
+            {
+                $_.IPAddress -eq $IPAddress
+            }
+            else
+            {
+                return $true
+            }
+        } |
+        Where-Object {
+            if( $Port )
+            {
+                $_.Port -eq $Port
+            }
+            else
+            {
+                return $true
+            }
+        }
+
+}
+
+Set-Alias -Name 'Get-SslCertificateBindings' -Value 'Get-CSslCertificateBinding'
 
 
 # This function should only be available if the Windows PowerShell v3.0 Server Manager cmdlets aren't already installed.
@@ -805,39 +884,39 @@ if( -not (Get-Command -Name 'Get-WindowsFeature*' | Where-Object { $_.ModuleName
         <#
         .SYNOPSIS
         Gets a list of available Windows features, or details on a specific windows feature.
-        
+
         .DESCRIPTION
         Different versions of Windows use different names for installing Windows features.  Use this function to get the list of functions for your operating system.
-        
+
         With no arguments, will return a list of all Windows features.  You can use the `Name` parameter to return a specific feature or a list of features that match a wildcard.
-        
+
         **This function is not available on Windows 8/2012.**
-        
+
         .OUTPUTS
         PsObject.  A generic PsObject with properties DisplayName, Name, and Installed.
-        
+
         .LINK
         Install-CWindowsFeature
-        
+
         .LINK
         Test-CWindowsFeature
-        
+
         .LINK
         Uninstall-CWindowsFeature
-        
+
         .EXAMPLE
         Get-CWindowsFeature
-        
+
         Returns a list of all available Windows features.
-        
+
         .EXAMPLE
         Get-CWindowsFeature -Name MSMQ
-        
+
         Returns the MSMQ feature.
-        
+
         .EXAMPLE
         Get-CWindowsFeature -Name *msmq*
-        
+
         Returns any Windows feature whose name matches the wildcard `*msmq*`.
         #>
         [CmdletBinding()]
@@ -847,10 +926,10 @@ if( -not (Get-Command -Name 'Get-WindowsFeature*' | Where-Object { $_.ModuleName
             # The feature name to return.  Can be a wildcard.
             $Name
         )
-        
+
         Set-StrictMode -Version 'Latest'
         Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
-    
+
         Write-CObsoleteCommandWarning -CommandName $MyInvocation.MyCommand.Name `
                                       -NewCommandName 'Get-WindowsFeature' `
                                       -NewModuleName 'ServerManager'
@@ -859,7 +938,7 @@ if( -not (Get-Command -Name 'Get-WindowsFeature*' | Where-Object { $_.ModuleName
         {
             return
         }
-        
+
         if( $useOCSetup )
         {
             Get-CCimInstance -Class 'Win32_OptionalFeature' |
@@ -884,8 +963,8 @@ if( -not (Get-Command -Name 'Get-WindowsFeature*' | Where-Object { $_.ModuleName
         }
         elseif( $useServerManager )
         {
-            servermanagercmd.exe -query | 
-                Where-Object { 
+            servermanagercmd.exe -query |
+                Where-Object {
                     if( $Name )
                     {
                         return ($_ -match ('\[{0}\]$' -f [Text.RegularExpressions.Regex]::Escape($Name)))
@@ -895,12 +974,12 @@ if( -not (Get-Command -Name 'Get-WindowsFeature*' | Where-Object { $_.ModuleName
                         return $true
                     }
                 } |
-                Where-Object { $_ -match '\[(X| )\] ([^[]+) \[(.+)\]' } | 
-                ForEach-Object { 
-                    $properties = @{ 
-                        Installed = ($matches[1] -eq 'X'); 
+                Where-Object { $_ -match '\[(X| )\] ([^[]+) \[(.+)\]' } |
+                ForEach-Object {
+                    $properties = @{
+                        Installed = ($matches[1] -eq 'X');
                         Name = $matches[3]
-                        DisplayName = $matches[2]; 
+                        DisplayName = $matches[2];
                     }
                     New-Object PsObject -Property $properties
                }
@@ -908,7 +987,7 @@ if( -not (Get-Command -Name 'Get-WindowsFeature*' | Where-Object { $_.ModuleName
         else
         {
             Write-Error $supportNotFoundErrorMessage
-        }        
+        }
     }
 
     Set-Alias -Name 'Get-WindowsFeature' -Value 'Get-CWindowsFeature'
@@ -921,7 +1000,7 @@ function Install-CCertificate
     <#
     .SYNOPSIS
     Installs a certificate in a given store.
-    
+
     .DESCRIPTION
     Uses the .NET certificates API to add a certificate to a store for the machine or current user.  The user performing
     the action must have permission to modify the store or the installation will fail.
@@ -933,20 +1012,20 @@ function Install-CCertificate
     remote computer, saved as a temporary file, installed, and the temporary file is removed.
 
     The ability to install a certificate on a remote computer was added in Carbon 2.1.0.
-    
+
     .OUTPUTS
     System.Security.Cryptography.X509Certificates.X509Certificate2. An X509Certificate2 object representing the newly
     installed certificate.
-    
+
     .EXAMPLE
     > Install-CCertificate -Path C:\Users\me\certificate.cer -StoreLocation LocalMachine -StoreName My -Exportable -Password My5up3r53cur3P@55w0rd
-    
+
     Installs the certificate (which is protected by a password) at C:\Users\me\certificate.cer into the local machine's
     Personal store.  The certificate is marked exportable.
-    
+
     .EXAMPLE
     Install-CCertificate -Path C:\Users\me\certificate.cer -StoreLocation LocalMachine -StoreName My -ComputerName remote1,remote2
-    
+
     Demonstrates how to install a certificate from a file on the local computer into the local machine's personal store
     on two remote cmoputers, remote1 and remote2. Use the `Credential` parameter to connect as a specific principal.
     #>
@@ -958,20 +1037,20 @@ function Install-CCertificate
         [string]
         # The path to the certificate file.
         $Path,
-        
+
         [Parameter(Mandatory=$true,Position=0,ParameterSetName='FromCertificateInWindowsStore')]
         [Parameter(Mandatory=$true,Position=0,ParameterSetName='FromCertificateInCustomStore')]
         [Security.Cryptography.X509Certificates.X509Certificate2]
         # The certificate to install.
         $Certificate,
-        
+
         [Parameter(Mandatory=$true)]
         [Security.Cryptography.X509Certificates.StoreLocation]
         # The location of the certificate's store.  To see a list of acceptable values, run:
         #
         #   > [Enum]::GetValues([Security.Cryptography.X509Certificates.StoreLocation])
         $StoreLocation,
-        
+
         [Parameter(Mandatory=$true,ParameterSetName='FromFileInWindowsStore')]
         [Parameter(Mandatory=$true,ParameterSetName='FromCertificateInWindowsStore')]
         [Security.Cryptography.X509Certificates.StoreName]
@@ -991,7 +1070,7 @@ function Install-CCertificate
         [Switch]
         # Mark the private key as exportable. Only valid if loading the certificate from a file.
         $Exportable,
-        
+
         [Parameter(ParameterSetName='FromFileInWindowsStore')]
         [Parameter(ParameterSetName='FromFileInCustomStore')]
         # The password for the certificate.  Should be a `System.Security.SecureString`.
@@ -1009,7 +1088,7 @@ function Install-CCertificate
 
         [switch]$NoWarn
     )
-    
+
     Set-StrictMode -Version 'Latest'
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
@@ -1023,9 +1102,9 @@ function Install-CCertificate
         Write-CWarningOnce -Message ('You passed a plain text password to `Install-CCertificate`. A future version of Carbon will remove support for plain-text passwords. Please pass a `SecureString` instead.')
         $Password = ConvertTo-SecureString -String $Password -AsPlainText -Force
     }
-    
+
     if( $PSCmdlet.ParameterSetName -like 'FromFile*' )
-    {   
+    {
         $resolvedPath = Resolve-Path -Path $Path
         if( -not $resolvedPath )
         {
@@ -1033,7 +1112,7 @@ function Install-CCertificate
         }
 
         $Path = $resolvedPath.ProviderPath
-        
+
         $fileBytes = [IO.File]::ReadAllBytes($Path)
         $encodedCert = [Convert]::ToBase64String( $fileBytes )
 
@@ -1042,7 +1121,7 @@ function Install-CCertificate
         $keyStorageFlags = @{}
         if( $StoreLocation -eq [Security.Cryptography.X509Certificates.StoreLocation]::CurrentUser )
         {
-            $keyStorageFlags['KeyStorageFlags'] = 
+            $keyStorageFlags['KeyStorageFlags'] =
                 [Security.Cryptography.X509Certificates.X509KeyStorageFlags]::EphemeralKeySet
         }
         $Certificate = Get-CCertificate -Path $Path -Password $Password -NoWarn @keyStorageFlags
@@ -1083,7 +1162,7 @@ function Install-CCertificate
 
             [Parameter(Mandatory,Position=2)]
             [Security.Cryptography.X509Certificates.StoreLocation]$StoreLocation,
-        
+
             [Parameter(Position=3)]
             $StoreName,
 
@@ -1190,10 +1269,10 @@ function Install-CMsi
     In Carbon 1.9 and earlier, this function was called `Invoke-WindowsInstaller`.
 
     Beginning with Carbon 2.0, `Install-CMsi` only runs the MSI if the software isn't installed. Use the `-Force` switch to always run the installer.
-    
+
     .EXAMPLE
     Install-CMsi -Path Path\to\installer.msi
-    
+
     Runs installer.msi, and waits untils for the installer to finish.  If the installer has a UI, it is shown to the user.
 
     .EXAMPLE
@@ -1207,8 +1286,8 @@ function Install-CMsi
         [Parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)]
         [Alias('FullName')]
         [String[]] $Path,
-        
-        # OBSOLETE. Installers are run in quiet mode by default. This switch will be removed in a future major version of Carbon. 
+
+        # OBSOLETE. Installers are run in quiet mode by default. This switch will be removed in a future major version of Carbon.
         [Parameter(DontShow)]
         [switch] $Quiet,
 
@@ -1293,16 +1372,16 @@ function Install-CMsmq
         [Switch]
         # Enable HTTP Support
         $HttpSupport,
-        
+
         [Switch]
         # Enable Active Directory Integrations
         $ActiveDirectoryIntegration,
-        
+
         [Switch]
         # Will MSMQ be participating in external, distributed transactions? I.e. will it be sending messages to queues on other machines?
         $Dtc
     )
-    
+
     Set-StrictMode -Version 'Latest'
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
@@ -1313,14 +1392,14 @@ function Install-CMsmq
     {
         $optionalArgs.MsmqHttpSupport = $true
     }
-    
+
     if( $ActiveDirectoryIntegration )
     {
         $optionalArgs.MsmqActiveDirectoryIntegration = $true
     }
-    
+
     Install-CWindowsFeature -Msmq @optionalArgs
-    
+
     if( $Dtc )
     {
         Set-Service -Name MSDTC -StartupType Automatic
@@ -1344,16 +1423,16 @@ if( -not (Get-Command -Name 'Get-WindowsFeature*' | Where-Object { $_.ModuleName
         This function will install Windows features.  Note that the name of these features can differ between different versions of Windows. Use `Get-CWindowsFeature` to get the list of features on your operating system.
 
         **This function is not available on Windows 8/2012.**
-        
+
         .LINK
         Get-CWindowsFeature
-        
+
         .LINK
         Test-CWindowsFeature
-        
+
         .LINK
         Uninstall-CWindowsFeature
-        
+
         .EXAMPLE
         Install-CWindowsFeature -Name TelnetClient
 
@@ -1376,33 +1455,33 @@ if( -not (Get-Command -Name 'Get-WindowsFeature*' | Where-Object { $_.ModuleName
             # The components to enable/install.  Feature names are case-sensitive.
             [Alias('Features')]
             $Name,
-            
+
             [Parameter(ParameterSetName='ByFlag')]
             [Switch]
             # Installs IIS.
             $Iis,
-            
+
             [Parameter(ParameterSetName='ByFlag')]
             [Switch]
             # Installs IIS's HTTP redirection feature.
             $IisHttpRedirection,
-            
+
             [Parameter(ParameterSetName='ByFlag')]
             [Switch]
             # Installs MSMQ.
             $Msmq,
-            
+
             [Parameter(ParameterSetName='ByFlag')]
             [Switch]
             # Installs MSMQ HTTP support.
             $MsmqHttpSupport,
-            
+
             [Parameter(ParameterSetName='ByFlag')]
             [Switch]
             # Installs MSMQ Active Directory Integration.
             $MsmqActiveDirectoryIntegration
         )
-        
+
         Set-StrictMode -Version 'Latest'
         Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
@@ -1414,13 +1493,13 @@ if( -not (Get-Command -Name 'Get-WindowsFeature*' | Where-Object { $_.ModuleName
         {
             return
         }
-        
+
         if( $pscmdlet.ParameterSetName -eq 'ByFlag' )
         {
             $Name = Resolve-WindowsFeatureName -Name $PSBoundParameters.Keys
         }
-        
-        $componentsToInstall = $Name | 
+
+        $componentsToInstall = $Name |
                                     ForEach-Object {
                                         if( (Test-CWindowsFeature -Name $_) )
                                         {
@@ -1429,15 +1508,15 @@ if( -not (Get-Command -Name 'Get-WindowsFeature*' | Where-Object { $_.ModuleName
                                         else
                                         {
                                             Write-Error ('Windows feature {0} not found.' -f $_)
-                                        } 
+                                        }
                                     } |
                                     Where-Object { -not (Test-CWindowsFeature -Name $_ -Installed) }
-       
+
         if( -not $componentsToInstall -or $componentsToInstall.Length -eq 0 )
         {
             return
         }
-        
+
         if( $pscmdlet.ShouldProcess( "Windows feature(s) '$componentsToInstall'", "install" ) )
         {
             if( $useServerManager )
@@ -1458,7 +1537,7 @@ if( -not (Get-Command -Name 'Get-WindowsFeature*' | Where-Object { $_.ModuleName
             }
         }
     }
-    
+
     Set-Alias -Name 'Install-WindowsFeatures' -Value 'Install-CWindowsFeature'
     Set-Alias -Name 'Install-WindowsFeature' -Value 'Install-CWindowsFeature'
 }
@@ -1485,7 +1564,7 @@ function Invoke-CAppCmd
         # The arguments to pass to appcmd.
         $AppCmdArgs
     )
-    
+
     Set-StrictMode -Version 'Latest'
 
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
@@ -1506,47 +1585,47 @@ function Invoke-CPowerShell
     <#
     .SYNOPSIS
     Invokes a script block, script, command, or encoded command under a new `powershell.exe` process.
-    
+
     .DESCRIPTION
 
     The `Invoke-CPowerShell` scripts executes `powershell.exe`. All processes are started with powershell.exe's `-NoProfile` paramter. You can specify values for powershell.exe's `OutputFormat`, `ExecutionPolicy`, and `NonInteractive` paramters via parameters of the same name on the `Invoke-CPowerShell` function. Use the `Runtime` parameter to run `powershell.exe` version 2.
-    
+
     To run a script, pass the path to the script with the `-FilePath` paramter. Pass any script arguments with the `ArgumentList` parameter. You must escape any parameters. They are passed to `powershell.exe` as-is.
-    
+
     To run a script block, pass the script block with the `-ScriptBlock` parameter. Pass any script block arguments with the `ArgumentList` parameter. You must escape any parameters. They are passed to `powershell.exe` as-is.
-    
+
     To run a command (Carbon 2.3.0 and later only), pass the command (i.e. string of PowerShell code) with the `Command` parameter. Any arguments to your command must be in the command itself. You must do any escaping.
-    
+
     To run an encoded command (Carbon 2.3.0 and later only), pass the command (i.e. string of PowerShell code) with the `Command` parameter and the `-Encode` switch. `Invoke-CPowerShell` will base-64 encode your command for you and pass it to `powershell.exe` with its `-EncodedCommand` parameter.
-    
+
     Beginning in Carbon 2.3.0, you can run scripts, commands, and encoded commands as another user. Pass that user's credentials with the `Credential` parameter.
-    
+
     On 64-bit operating systems, use the `-x86` switch to run the new `powershell.exe` process under 32-bit PowerShell. If this switch is ommitted, `powershell.exe` will be run under a 64-bit PowerShell process (even if called from a 32-bit process). On 32-bit operating systems, this switch is ignored.
-    
+
     The `Runtime` paramter controls what version of the .NET framework `powershell.exe` should use. Pass `v2.0` and `v4.0` to run under .NET versions 2.0 or 4.0, respectivey. Those frameworks must be installed. When running under PowerShell 2, `Invoke-CPowerShell` uses a temporary [activation configuration file](https://msdn.microsoft.com/en-us/library/ff361644(v=vs.100).aspx) to force PowerShell 2 to use .NET 4. When run under PowerShell 3 and later, `powershell.exe` is run with the `-Version` switch set to `2.0` to run `powershell.exe` under .NET 2.
 
     If using PowerShell v3.0 or later with a version of Carbon before 2.0, you can *only* run script blocks under a `v4.0` CLR.  PowerShell converts script blocks to an encoded command, and when running encoded commands, PowerShell doesn't allow the `-Version` parameter for running PowerShell under a different version.  To run code under a .NET 2.0 CLR from PowerShell 3, use the `FilePath` parameter to run a specfic script.
-    
+
     .EXAMPLE
     Invoke-CPowerShell -ScriptBlock { $PSVersionTable }
-    
+
     Runs a separate PowerShell process which matches the architecture of the operating system, returning the $PSVersionTable from that process.  This will fail under 32-bit PowerShell on a 64-bit operating system.
-    
+
     .EXAMPLE
     Invoke-CPowerShell -ScriptBlock { $PSVersionTable } -x86
-    
+
     Runs a 32-bit PowerShell process, return the $PSVersionTable from that process.
-    
+
     .EXAMPLE
     Invoke-CPowerShell -ScriptBlock { $PSVersionTable } -Runtime v4.0
-    
+
     Runs a separate PowerShell process under the v4.0 .NET CLR, returning the $PSVersionTable from that process.  Should return a CLRVersion of `4.0`.
-    
+
     .EXAMPLE
     Invoke-CPowerShell -FilePath C:\Projects\Carbon\bin\Set-CDotNetConnectionString.ps1 -ArgumentList '-Name','myConn','-Value',"'data source=.\DevDB;Integrated Security=SSPI;'"
-    
+
     Runs the `Set-CDotNetConnectionString.ps1` script with `ArgumentList` as arguments/parameters.
-    
+
     Note that you have to double-quote any arguments with spaces.  Otherwise, the argument gets interpreted as multiple arguments.
 
     .EXAMPLE
@@ -1564,9 +1643,9 @@ function Invoke-CPowerShell
 
     Demonstrates that you can run PowerShell scripts as a specific user with the `Credential` parameter.
 
-    .EXAMPLE 
+    .EXAMPLE
     Invoke-CPowerShell -Command '$PSVersionTable'
-    
+
     Demonstrates how to run a PowerShell command contained in a string. You are responsible for quoting things correctly.
 
     .EXAMPLE
@@ -1577,7 +1656,7 @@ function Invoke-CPowerShell
     .EXAMPLE
     Invoke-CPowerShell -Command '$env:USERNAME' -Credential $credential
 
-    Demonstrates how to run a PowerShell command as another user. Uses `Start-Process` to launch `powershell.exe` as the user. 
+    Demonstrates how to run a PowerShell command as another user. Uses `Start-Process` to launch `powershell.exe` as the user.
     #>
     [CmdletBinding(DefaultParameterSetName='ScriptBlock')]
     param(
@@ -1585,10 +1664,10 @@ function Invoke-CPowerShell
         [ScriptBlock]
         # The script block to pass to `powershell.exe`.
         $ScriptBlock,
-        
+
         [Parameter(Mandatory=$true,ParameterSetName='Command')]
         [object]
-        # The command to run, as a string. Passed to PowerShell.exe as the value to the `-Command` parameter. 
+        # The command to run, as a string. Passed to PowerShell.exe as the value to the `-Command` parameter.
         #
         # Use the `-Encode` switch to avoid complicated quoting, and have `Invoke-CPowerShell` encode this command for you and pass it to powershell.exe's `-EncodedCommand parameter.
         #
@@ -1614,7 +1693,7 @@ function Invoke-CPowerShell
         #
         # This parameter was added in Carbon 2.3.0.
         $Encode,
-        
+
         [string]
         # Determines how output from the PowerShel command is formatted. The value of this parameter is passed as-is to `powershell.exe` with its `-OutputFormat` paramter.
         $OutputFormat,
@@ -1630,12 +1709,12 @@ function Invoke-CPowerShell
         [Switch]
         # Run the x86 (32-bit) version of PowerShell. if not provided, the version which matches the OS architecture is used, *regardless of the architecture of the currently running process*. I.e. this command is run under a 32-bit PowerShell on a 64-bit operating system, without this switch, `Invoke-Command` will start a 64-bit `powershell.exe`.
         $x86,
-        
+
         [string]
         [ValidateSet('v2.0','v4.0')]
         # The CLR to use.  Must be one of `v2.0` or `v4.0`.  Default is the current PowerShell runtime.
         #
-        # Beginning with Carbon 2.3.0, this parameter is ignored, since Carbon 2.0 and later only supports PowerShell 4 and you can't run PowerShell 4 under .NET 2.0. 
+        # Beginning with Carbon 2.3.0, this parameter is ignored, since Carbon 2.0 and later only supports PowerShell 4 and you can't run PowerShell 4 under .NET 2.0.
         #
         # This parameter is OBSOLETE and will be removed in a future major version of Carbon.
         $Runtime,
@@ -1650,7 +1729,7 @@ function Invoke-CPowerShell
 
         [switch]$NoWarn
     )
-    
+
     Set-StrictMode -Version 'Latest'
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
@@ -1716,13 +1795,13 @@ function Invoke-CPowerShell
 "@ -f $Runtime | Out-File -FilePath $activationConfigPath -Encoding OEM
         Set-CEnvironmentVariable -Name $comPlusAppConfigEnvVarName -Value $activationConfigDir -ForProcess
     }
-    
+
     $params = @{ }
     if( $x86 )
     {
         $params.x86 = $true
     }
-    
+
     try
     {
         $psPath = Get-CPowerShellPath @params -NoWarn
@@ -1731,7 +1810,7 @@ function Invoke-CPowerShell
             $ArgumentList = @()
         }
 
-        $runningAScriptBlock = $PSCmdlet.ParameterSetName -eq 'ScriptBlock' 
+        $runningAScriptBlock = $PSCmdlet.ParameterSetName -eq 'ScriptBlock'
         if( $PSCmdlet.ParameterSetName -eq 'Command' -and $Command -is [scriptblock] )
         {
             Write-CWarningOnce -Message ('Passing a script block to the Command parameter is OBSOLETE and will be removed in a future major version of Carbon. Use the `ScriptBlock` parameter instead.')
@@ -1844,11 +1923,11 @@ filter Protect-CString
     <#
     .SYNOPSIS
     Encrypts a string.
-    
+
     .DESCRIPTION
     The `Protect-CString` function encrypts a string using the Data Protection API (DPAPI), RSA, or AES. In Carbon 2.3.0 or earlier, the plaintext string to encrypt is passed to the `String` parameter. Beginning in Carbon 2.4.0, you can also pass a `SecureString`. When encrypting a `SecureString`, it is converted to an array of bytes, encrypted, then the array of bytes is cleared from memory (i.e. the plaintext version of the `SecureString` is only in memory long enough to encrypt it).
-    
-    ##  DPAPI 
+
+    ##  DPAPI
 
     The DPAPI hides the encryptiong/decryption keys from you. As such, anything encrpted with via DPAPI can only be decrypted on the same computer it was encrypted on. Use the `ForUser` switch so that only the user who encrypted can decrypt. Use the `ForComputer` switch so that any user who can log into the computer can decrypt. To encrypt as a specific user on the local computer, pass that user's credentials with the `Credential` parameter. (Note this method doesn't work over PowerShell remoting.)
 
@@ -1856,8 +1935,8 @@ filter Protect-CString
 
     RSA is an assymetric encryption/decryption algorithm, which requires a public/private key pair. The secret is encrypted with the public key, and can only be decrypted with the corresponding private key. The secret being encrypted can't be larger than the RSA key pair's size/length, usually 1024, 2048, or 4096 bits (128, 256, and 512 bytes, respectively). `Protect-CString` encrypts with .NET's `System.Security.Cryptography.RSACryptoServiceProvider` class.
 
-    You can specify the public key in three ways: 
-    
+    You can specify the public key in three ways:
+
      * with a `System.Security.Cryptography.X509Certificates.X509Certificate2` object, via the `Certificate` parameter
      * with a certificate in one of the Windows certificate stores, passing its unique thumbprint via the `Thumbprint` parameter, or via the `PublicKeyPath` parameter cn be certificat provider path, e.g. it starts with `cert:\`.
      * with a X509 certificate file, via the `PublicKeyPath` parameter
@@ -1883,29 +1962,29 @@ filter Protect-CString
         Protect-CString -String 'the secret sauce' -Key ([Convert]::FromBase64String($base64EncodedKey))
 
     The ability to encrypt with AES was added in Carbon 2.3.0.
-   
+
     .LINK
     New-CRsaKeyPair
 
     .LINK
     Unprotect-CString
-    
+
     .LINK
     http://msdn.microsoft.com/en-us/library/system.security.cryptography.protecteddata.aspx
 
     .EXAMPLE
     Protect-CString -String 'TheStringIWantToEncrypt' -ForUser | Out-File MySecret.txt
-    
+
     Encrypts the given string and saves the encrypted string into MySecret.txt.  Only the user who encrypts the string can unencrypt it.
 
     .EXAMPLE
     Protect-CString -String $credential.Password -ForUser | Out-File MySecret.txt
 
-    Demonstrates that `Protect-CString` can encrypt a `SecureString`. This functionality was added in Carbon 2.4.0. 
-    
+    Demonstrates that `Protect-CString` can encrypt a `SecureString`. This functionality was added in Carbon 2.4.0.
+
     .EXAMPLE
     $cipherText = Protect-CString -String "MySuperSecretIdentity" -ForComputer
-    
+
     Encrypts the given string and stores the value in $cipherText.  Because the encryption scope is set to LocalMachine, any user logged onto the local computer can decrypt `$cipherText`.
 
     .EXAMPLE
@@ -1955,11 +2034,11 @@ filter Protect-CString
         #
         # Beginning in Carbon 2.4.0, this can also be a `SecureString` object. The `SecureString` is converted to an array of bytes, the bytes are encrypted, then the plaintext bytes are cleared from memory (i.e. the plaintext password is in memory for the amount of time it takes to encrypt it).
         [Object]$String,
-        
+
         [Parameter(Mandatory, ParameterSetName='DPAPICurrentUser')]
         # Encrypts for the current user so that only he can decrypt.
         [switch]$ForUser,
-        
+
         [Parameter(Mandatory, ParameterSetName='DPAPILocalMachine')]
         # Encrypts for the current computer so that any user logged into the computer can decrypt.
         [switch]$ForComputer,
@@ -1992,7 +2071,7 @@ filter Protect-CString
 
         [switch]$NoWarn
     )
-    
+
     Set-StrictMode -Version 'Latest'
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
@@ -2011,13 +2090,13 @@ filter Protect-CString
     {
         $stringBytes = [Text.Encoding]::UTF8.GetBytes( $String.ToString() )
     }
-    
+
     try
-    {    
+    {
 
         if( $PSCmdlet.ParameterSetName -like 'DPAPI*' )
         {
-            if( $PSCmdlet.ParameterSetName -eq 'DPAPIForUser' ) 
+            if( $PSCmdlet.ParameterSetName -eq 'DPAPIForUser' )
             {
                 $protectStringPath = Join-Path -Path $CarbonBinDir -ChildPath 'Protect-String.ps1' -Resolve
                 $encodedString = Protect-CString -String $String -ForComputer -NoWarn
@@ -2100,7 +2179,7 @@ filter Protect-CString
             {
                 return
             }
-                
+
             $aes = [Security.Cryptography.Aes]::Create()
             try
             {
@@ -2146,18 +2225,80 @@ filter Protect-CString
 }
 
 
+function Remove-CSslCertificateBinding
+{
+    <#
+    .SYNOPSIS
+    Removes an SSL certificate binding.
+
+    .DESCRIPTION
+    Uses the netsh command line application to remove an SSL certificate binding for an IP/port combination.  If the binding doesn't exist, nothing is changed.
+
+    .EXAMPLE
+    > Remove-CSslCertificateBinding -IPAddress '45.72.89.57' -Port 443
+
+    Removes the SSL certificate bound to IP 45.72.89.57 on port 443.
+
+    .EXAMPLE
+    > Remove-CSslCertificateBinding
+
+    Removes the default SSL certificate from port 443.  The default certificate is bound to all IP addresses.
+    #>
+    [CmdletBinding(SupportsShouldProcess=$true)]
+    param(
+        [IPAddress]
+        # The IP address whose binding to remove.  Default is all IP addresses.
+        $IPAddress = '0.0.0.0',
+
+        [UInt16]
+        # The port of the binding to remove.  Default is port 443.
+        $Port = 443,
+
+        # Don't show the warning message that this command was moved to a new module.
+        [switch] $NoWarn
+    )
+
+    Set-StrictMode -Version 'Latest'
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
+    if (-not $NoWarn)
+    {
+        Write-CRefactoredCommandWarning -CommandName $MyInvocation.MyCommand.Name `
+                                        -ModuleName 'Carbon.Windows.HttpServer'
+    }
+
+    if( -not (Test-CSslCertificateBinding -IPAddress $IPAddress -Port $Port -NoWarn) )
+    {
+        return
+    }
+
+    if( $IPAddress.AddressFamily -eq [Net.Sockets.AddressFamily]::InterNetworkV6 )
+    {
+        $ipPort = '[{0}]:{1}' -f $IPAddress,$Port
+    }
+    else
+    {
+        $ipPort = '{0}:{1}' -f $IPAddress,$Port
+    }
+
+    Invoke-ConsoleCommand -Target $ipPort `
+                          -Action "removing SSL certificate binding" `
+                          -ScriptBlock { netsh http delete sslcert ipPort=$ipPort }
+}
+
+
 function Resolve-CNetPath
 {
     <#
     .SYNOPSIS
     OBSOLETE. Will be removed in a future major version of Carbon.
-    
+
     .DESCRIPTION
     OBSOLETE. Will be removed in a future major version of Carbon.
-    
+
     .EXAMPLE
     Write-Error 'OBSOLETE. Will be removed in a future major version of Carbon.'
-    
+
     Demonstates that `Resolve-CNetPath` is obsolete and you shouldn't use it.
     #>
     [CmdletBinding()]
@@ -2168,20 +2309,20 @@ function Resolve-CNetPath
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
     Write-CObsoleteCommandWarning -CommandName $MyInvocation.MyCommand.Name
-    
+
     $netCmd = Get-Command -CommandType Application -Name net.exe* |
                 Where-Object { $_.Name -eq 'net.exe' }
     if( $netCmd )
     {
         return $netCmd.Definition
     }
-    
+
     $netPath = Join-Path $env:WINDIR system32\net.exe
     if( (Test-Path -Path $netPath -PathType Leaf) )
     {
         return $netPath
     }
-    
+
     Write-Error 'net.exe command not found.'
     return $null
 }
@@ -2193,15 +2334,15 @@ function Resolve-WindowsFeatureName
     <#
     .SYNOPSIS
     INTERNAL.  DO NOT USE.  Converts a Carbon-specific, common Windows feature name, into the feature name used on the current computer.
-    
+
     .DESCRIPTION
     Windows feature names change between versions.  This function converts a Carbon-specific name into feature names used on the current computer's version of Windows.
-    
+
     **This function is not available on Windows 8/2012.**
-    
+
     .EXAMPLE
     Resolve-WindowsFeatureNames -Name 'Iis','Msmq'
-    
+
     Returns `'IIS-WebServer','MSMQ-Server'` if running Windows 7/Windows 2008 R2, or `'Web-WebServer','MSMQ-Server'` if on Windows 2008.
     #>
     [CmdletBinding()]
@@ -2211,10 +2352,10 @@ function Resolve-WindowsFeatureName
         # The Carbon feature names to convert to Windows-specific feature names.
         $Name
     )
-    
+
     Set-StrictMode -Version 'Latest'
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
-    
+
     Write-CObsoleteCommandWarning -CommandName $MyInvocation.MyCommand.Name
 
     Assert-WindowsFeatureFunctionsSupported -WarningAction SilentlyContinue | Out-Null
@@ -2237,8 +2378,8 @@ function Resolve-WindowsFeatureName
                             MsmqActiveDirectoryIntegration = 'MSMQ-ADIntegration';
                        }
     }
-    
-    $Name | 
+
+    $Name |
         Where-Object { $featureMap.ContainsKey( $_ ) } |
         ForEach-Object { $featureMap[$_] }
 
@@ -2246,31 +2387,121 @@ function Resolve-WindowsFeatureName
 
 
 
+function Set-CSslCertificateBinding
+{
+    <#
+    .SYNOPSIS
+    Sets an SSL certificate binding for a given IP/port.
+
+    .DESCRIPTION
+    Uses the netsh command line application to set the certificate for an IP address and port.  If a binding already exists for the IP/port, it is removed, and the new binding is created.
+
+    Beginning with Carbon 2.0, returns a `Carbon.Certificates.SslCertificateBinding` object for the binding that was set.
+
+    .OUTPUTS
+    Carbon.Certificates.SslCertificateBinding.
+
+    .EXAMPLE
+    Set-CSslCertificateBinding -IPAddress 43.27.89.54 -Port 443 -ApplicationID 88d1f8da-aeb5-40a2-a5e5-0e6107825df7 -Thumbprint 4789073458907345907434789073458907345907
+
+    Configures the computer to use the 478907345890734590743 certificate on IP 43.27.89.54, port 443.
+
+    .EXAMPLE
+    Set-CSslCertificateBinding -ApplicationID 88d1f8da-aeb5-40a2-a5e5-0e6107825df7 -Thumbprint 4789073458907345907434789073458907345907
+
+    Configures the compute to use the 478907345890734590743 certificate as the default certificate on all IP addresses, port 443.
+    #>
+    [CmdletBinding(SupportsShouldProcess=$true)]
+    [OutputType([Carbon.Certificates.SslCertificateBinding])]
+    param(
+        [IPAddress]
+        # The IP address for the binding.  Defaults to all IP addresses.
+        $IPAddress = '0.0.0.0',
+
+        [UInt16]
+        # The port for the binding.  Defaults to 443.
+        $Port = 443,
+
+        [Parameter(Mandatory=$true)]
+        [Guid]
+        # A unique ID representing the application using the binding.  Create your own.
+        $ApplicationID,
+
+        [Parameter(Mandatory=$true)]
+        [ValidatePattern("^[0-9a-f]{40}$")]
+        [string]
+        # The thumbprint of the certificate to use.  The certificate must be installed.
+        $Thumbprint,
+
+        [Switch]
+        # Return a `Carbon.Certificates.SslCertificateBinding` for the configured binding.
+        $PassThru,
+
+        # Don't show the warning message that this command was moved to a new module.
+        [switch] $NoWarn
+    )
+
+    Set-StrictMode -Version 'Latest'
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
+    if (-not $NoWarn)
+    {
+        Write-CRefactoredCommandWarning -CommandName $MyInvocation.MyCommand.Name `
+                                        -ModuleName 'Carbon.Windows.HttpServer'
+    }
+
+    if( $IPAddress.AddressFamily -eq [Net.Sockets.AddressFamily]::InterNetworkV6 )
+    {
+        $ipPort = '[{0}]:{1}' -f $IPAddress,$Port
+    }
+    else
+    {
+        $ipPort = '{0}:{1}' -f $IPAddress,$Port
+    }
+
+    Remove-CSslCertificateBinding -IPAddress $IPAddress -Port $Port -NoWarn
+
+    $action = 'creating SSL certificate binding'
+    if( $pscmdlet.ShouldProcess( $IPPort, $action ) )
+    {
+        $appID = $ApplicationID.ToString('B')
+        Invoke-ConsoleCommand -Target $ipPort -Action $action -ScriptBlock {
+            netsh http add sslcert ipport=$ipPort certhash=$Thumbprint appid=$appID
+        }
+
+        if( $PassThru )
+        {
+            Get-CSslCertificateBinding -IPAddress $IPAddress -Port $Port -NoWarn
+        }
+    }
+}
+
+
 function Test-COSIs32Bit
 {
     <#
     .SYNOPSIS
     Tests if the current operating system is 32-bit.
-    
+
     .DESCRIPTION
     Regardless of the bitness of the currently running process, returns `True` if the current OS is a 32-bit OS.
-    
+
     .OUTPUTS
     System.Boolean.
 
     .LINK
     http://msdn.microsoft.com/en-us/library/system.environment.is64bitoperatingsystem.aspx
-    
+
     .EXAMPLE
     Test-COSIs32Bit
-    
+
     Returns `True` if the current operating system is 32-bit, and `False` otherwise.
     #>
     [CmdletBinding()]
     param(
         [switch]$NoWarn
     )
-    
+
     Set-StrictMode -Version 'Latest'
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
@@ -2300,17 +2531,17 @@ function Test-COSIs64Bit
 
     .LINK
     http://msdn.microsoft.com/en-us/library/system.environment.is64bitoperatingsystem.aspx
-    
+
     .EXAMPLE
     Test-COSIs64Bit
-    
+
     Returns `True` if the current operating system is 64-bit, and `False` otherwise.
     #>
     [CmdletBinding()]
     param(
         [switch]$NoWarn
     )
-    
+
     Set-StrictMode -Version 'Latest'
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
@@ -2350,7 +2581,7 @@ function Test-CPowerShellIs32Bit
     param(
         [switch]$NoWarn
     )
-    
+
     Set-StrictMode -Version 'Latest'
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
@@ -2391,7 +2622,7 @@ function Test-CPowerShellIs64Bit
     param(
         [switch]$NoWarn
     )
-    
+
     Set-StrictMode -Version 'Latest'
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
@@ -2407,6 +2638,76 @@ function Test-CPowerShellIs64Bit
 
 
 
+function Test-CSslCertificateBinding
+{
+    <#
+    .SYNOPSIS
+    Tests if an SSL certificate binding exists.
+
+	.DESCRIPTION
+	SSL certificates are bound to IP addresses and ports.  This function tests if one exists on a given IP address/port.
+
+	.EXAMPLE
+	Test-CSslCertificateBinding -Port 443
+
+	Tests if there is a default SSL certificate bound to all a machine's IP addresses on port 443.
+
+	.EXAMPLE
+	Test-CSslCertificateBinding -IPAddress 10.0.1.1 -Port 443
+
+	Tests if there is an SSL certificate bound to IP address 10.0.1.1 on port 443.
+
+	.EXAMPLE
+	Test-CSslCertificateBinding
+
+	Tests if there are any SSL certificates bound to any IP address/port on the machine.
+    #>
+    [CmdletBinding()]
+    param(
+        [IPAddress]
+        # The IP address to test for an SSL certificate.
+        $IPAddress,
+
+        [Uint16]
+        # The port to test for an SSL certificate.
+        $Port,
+
+        # Don't show the warning message that this command was moved to a new module.
+        [switch] $NoWarn
+    )
+
+    Set-StrictMode -Version 'Latest'
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
+    if (-not $NoWarn)
+    {
+        Write-CRefactoredCommandWarning -CommandName $MyInvocation.MyCommand.Name `
+                                        -ModuleName 'Carbon.Windows.HttpServer'
+    }
+
+    $getArgs = @{ }
+    if( $IPAddress )
+    {
+        $getArgs.IPAddress = $IPAddress
+    }
+
+    if( $Port )
+    {
+        $getArgs.Port = $Port
+    }
+
+    $binding = Get-CSslCertificateBinding @getArgs -NoWarn
+    if( $binding )
+    {
+        return $True
+    }
+    else
+    {
+        return $False
+    }
+}
+
+
 function Test-CWindowsFeature
 {
     <#
@@ -2420,13 +2721,13 @@ function Test-CWindowsFeature
 
     .LINK
     Get-CWindowsFeature
-    
+
     .LINK
     Install-CWindowsFeature
-    
+
     .LINK
     Uninstall-CWindowsFeature
-    
+
     .EXAMPLE
     Test-CWindowsFeature -Name MSMQ-Server
 
@@ -2443,12 +2744,12 @@ function Test-CWindowsFeature
         [string]
         # The name of the feature to test.  Feature names are case-sensitive and are different between different versions of Windows.  For a list, on Windows 2008, run `serveramanagercmd.exe -q`; on Windows 7, run `Get-WmiObject -Class Win32_OptionalFeature | Select-Object Name`.  On Windows 8/2012, use `Get-CWindowsFeature`.
         $Name,
-        
+
         [Switch]
         # Test if the service is installed in addition to if it exists.
         $Installed
     )
-    
+
     Set-StrictMode -Version 'Latest'
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
@@ -2458,9 +2759,9 @@ function Test-CWindowsFeature
     {
         return
     }
-    
-    $feature = Get-CWindowsFeature -Name $Name 
-    
+
+    $feature = Get-CWindowsFeature -Name $Name
+
     if( $feature )
     {
         if( $Installed )
@@ -2482,7 +2783,7 @@ function Uninstall-CCertificate
     <#
     .SYNOPSIS
     Removes a certificate from a store for the user or machine account.
-    
+
     .DESCRIPTION
     The `Uninstall-CCertificate` function uses .NET's certificates API to remove a certificate from a given store for the machine or current user. Use the thumbprint to identify which certificate to remove. The thumbprint is unique to each certificate. The user performing the removal must have read and write permission on the store where the certificate is located.
 
@@ -2509,13 +2810,13 @@ function Uninstall-CCertificate
 
     .EXAMPLE
     > Uninstall-CCertificate -Thumbprint 570895470234023dsaaefdbcgbefa -StoreLocation CurrentUser -StoreName My
-    
+
     Removes the 570895470234023dsaaefdbcgbefa certificate from the current user's Personal certificate store.
-    
+
     .EXAMPLE
     > $cert = Get-CCertificate -FriendlyName 'Carbon Testing Certificate' -StoreLocation LocalMachine -StoreName Root
     > Uninstall-CCertificate -Certificate $cert -StoreLocation LocalMachine -StoreName Root
-    
+
     Removes the certificate with friendly name 'Carbon Testing Certificate' from the local machine's Trusted Root Certification Authorities store.
 
     .EXAMPLE
@@ -2525,7 +2826,7 @@ function Uninstall-CCertificate
 
     .EXAMPLE
     > Uninstall-CCertificate -Thumbprint 570895470234023dsaaefdbcgbefa -StoreLocation CurrentUser -StoreName My -Session (New-PSSession -ComputerName remote1,remote2)
-    
+
     Demonstrates how to uninstall a certificate from a remote computer.
     #>
     [CmdletBinding(SupportsShouldProcess=$true,DefaultParameterSetName='ByThumbprint')]
@@ -2538,13 +2839,13 @@ function Uninstall-CCertificate
         #
         # If you want to uninstall the certificate from all stores it is installed in, you can pipe the thumbprint to this parameter or you can pipe a certificate object. (This functionality was added in Carbon 2.5.0.)
         $Thumbprint,
-        
+
         [Parameter(Mandatory=$true,ParameterSetName='ByCertificateAndStoreName')]
         [Parameter(Mandatory=$true,ParameterSetName='ByCertificateAndCustomStoreName')]
         [Security.Cryptography.X509Certificates.X509Certificate2]
         # The certificate to remove
         $Certificate,
-        
+
         [Parameter(Mandatory=$true,ParameterSetName='ByThumbprintAndStoreName')]
         [Parameter(Mandatory=$true,ParameterSetName='ByThumbprintAndCustomStoreName')]
         [Parameter(Mandatory=$true,ParameterSetName='ByCertificateAndStoreName')]
@@ -2552,7 +2853,7 @@ function Uninstall-CCertificate
         [Security.Cryptography.X509Certificates.StoreLocation]
         # The location of the certificate's store.
         $StoreLocation,
-        
+
         [Parameter(Mandatory=$true,ParameterSetName='ByThumbprintAndStoreName')]
         [Parameter(Mandatory=$true,ParameterSetName='ByCertificateAndStoreName')]
         [Security.Cryptography.X509Certificates.StoreName]
@@ -2579,7 +2880,7 @@ function Uninstall-CCertificate
 
         [switch]$NoWarn
     )
-    
+
     process
     {
         Set-StrictMode -Version 'Latest'
@@ -2594,7 +2895,7 @@ function Uninstall-CCertificate
         {
             $Thumbprint = $Certificate.Thumbprint
         }
-    
+
         $invokeCommandParameters = @{}
         if( $Session )
         {
@@ -2604,7 +2905,7 @@ function Uninstall-CCertificate
         if( $PSCmdlet.ParameterSetName -eq 'ByThumbprint' )
         {
             # Must be in this order. Delete LocalMachine certs *first* so they don't show
-            # up in CurrentUser stores. If you delete a certificate that "cascades" into 
+            # up in CurrentUser stores. If you delete a certificate that "cascades" into
             # the CurrentUser store first, you'll get errors when running non-
             # interactively as SYSTEM.
             Get-ChildItem -Path 'Cert:\LocalMachine','Cert:\CurrentUser' -Recurse |
@@ -2632,11 +2933,11 @@ function Uninstall-CCertificate
                 [string]
                 # The thumbprint of the certificate to remove.
                 $Thumbprint,
-        
+
                 [Security.Cryptography.X509Certificates.StoreLocation]
                 # The location of the certificate's store.
                 $StoreLocation,
-        
+
                 # The name of the certificate's store.
                 $StoreName,
 
@@ -2722,15 +3023,15 @@ if( -not (Get-Command -Name 'Get-WindowsFeature*' | Where-Object { $_.ModuleName
         The names of the features are different on different versions of Windows.  For a list, run `Get-WindowsService`.
 
         Feature names are case-sensitive.  If a feature is already uninstalled, nothing happens.
-        
+
         **This function is not available on Windows 8/2012.**
-        
+
         .LINK
         Get-CWindowsFeature
-        
+
         .LINK
         Install-WindowsService
-        
+
         .LINK
         Test-WindowsService
 
@@ -2751,27 +3052,27 @@ if( -not (Get-Command -Name 'Get-WindowsFeature*' | Where-Object { $_.ModuleName
             # The names of the components to uninstall/disable.  Feature names are case-sensitive.  To get a list, run `Get-CWindowsFeature`.
             [Alias('Features')]
             $Name,
-            
+
             [Parameter(ParameterSetName='ByFlag')]
             [Switch]
             # Uninstalls IIS.
             $Iis,
-            
+
             [Parameter(ParameterSetName='ByFlag')]
             [Switch]
             # Uninstalls IIS's HTTP redirection feature.
             $IisHttpRedirection,
-            
+
             [Parameter(ParameterSetName='ByFlag')]
             [Switch]
             # Uninstalls MSMQ.
             $Msmq,
-            
+
             [Parameter(ParameterSetName='ByFlag')]
             [Switch]
             # Uninstalls MSMQ HTTP support.
             $MsmqHttpSupport,
-            
+
             [Parameter(ParameterSetName='ByFlag')]
             [Switch]
             # Uninstalls MSMQ Active Directory Integration.
@@ -2789,13 +3090,13 @@ if( -not (Get-Command -Name 'Get-WindowsFeature*' | Where-Object { $_.ModuleName
         {
             return
         }
-        
+
         if( $pscmdlet.ParameterSetName -eq 'ByFlag' )
         {
             $Name = Resolve-WindowsFeatureName -Name $PSBoundParameters.Keys
         }
-        
-        $featuresToUninstall = $Name | 
+
+        $featuresToUninstall = $Name |
                                     ForEach-Object {
                                         if( (Test-CWindowsFeature -Name $_) )
                                         {
@@ -2807,12 +3108,12 @@ if( -not (Get-Command -Name 'Get-WindowsFeature*' | Where-Object { $_.ModuleName
                                         }
                                     } |
                                     Where-Object { Test-CWindowsFeature -Name $_ -Installed }
-        
+
         if( -not $featuresToUninstall -or $featuresToUninstall.Length -eq 0 )
         {
             return
         }
-            
+
         if( $pscmdlet.ShouldProcess( "Windows feature(s) '$featuresToUninstall'", "uninstall" ) )
         {
             if( $useServerManager )
@@ -2845,7 +3146,7 @@ filter Unprotect-CString
     <#
     .SYNOPSIS
     Decrypts a string.
-    
+
     .DESCRIPTION
     `Unprotect-CString` decrypts a string encrypted via the Data Protection API (DPAPI), RSA, or AES. It uses the DP/RSA APIs to decrypted the secret into an array of bytes, which is then converted to a UTF8 string. Beginning with Carbon 2.0, after conversion, the decrypted array of bytes is cleared in memory.
 
@@ -2861,12 +3162,12 @@ filter Unprotect-CString
 
     RSA is an assymetric encryption/decryption algorithm, which requires a public/private key pair. It uses a private key to decrypt a secret encrypted with the public key. Only the private key can decrypt secrets. `Protect-CString` decrypts with .NET's `System.Security.Cryptography.RSACryptoServiceProvider` class.
 
-    You can specify the private key in three ways: 
-    
+    You can specify the private key in three ways:
+
      * with a `System.Security.Cryptography.X509Certificates.X509Certificate2` object, via the `Certificate` parameter
      * with a certificate in one of the Windows certificate stores, passing its unique thumbprint via the `Thumbprint` parameter, or via the `PrivateKeyPath` parameter, which can be a certificat provider path, e.g. it starts with `cert:\`.
      * with an X509 certificate file, via the `PrivateKeyPath` parameter
-   
+
     ## AES
 
     AES is a symmetric encryption/decryption algorithm. You supply a 16-, 24-, or 32-byte key, password, or passphrase with the `Key` parameter, and that key is used to decrypt. You must decrypt with the same key you used to encrypt. `Unprotect-CString` decrypts with .NET's `System.Security.Cryptography.AesCryptoServiceProvider` class.
@@ -2876,10 +3177,10 @@ filter Unprotect-CString
     The help topic for `Protect-CString` demonstrates how to generate an AES key and how to encode it as a base-64 string.
 
     The ability to decrypt with AES was added in Carbon 2.3.0.
-    
+
     .LINK
     New-CRsaKeyPair
-        
+
     .LINK
     Protect-CString
 
@@ -2888,12 +3189,12 @@ filter Unprotect-CString
 
     .EXAMPLE
     PS> $password = Unprotect-CString -ProtectedString  $encryptedPassword
-    
+
     Decrypts a protected string which was encrypted at the current user or default scopes using the DPAPI. The secret must have been encrypted at the current user's scope or at the local computer's scope.
-    
+
     .EXAMPLE
     Protect-CString -String 'NotSoSecretSecret' -ForUser | Unprotect-CString
-    
+
     Demonstrates how Unprotect-CString takes input from the pipeline.  Adds 'NotSoSecretSecret' to the pipeline.
 
     .EXAMPLE
@@ -2950,7 +3251,7 @@ filter Unprotect-CString
         # The path to the private key to use for encrypting. Must be to an `X509Certificate2` file or a certificate in a certificate store.
         [String]$PrivateKeyPath,
 
-        [Parameter(ParameterSetName='RSAByPath')] 
+        [Parameter(ParameterSetName='RSAByPath')]
         # The password for the private key, if it has one. It really should. Can be a `[string]` or a `[securestring]`.
         $Password,
 
@@ -2972,14 +3273,14 @@ filter Unprotect-CString
 
     Set-StrictMode -Version 'Latest'
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
-    
+
     if( -not $NoWarn )
     {
         Write-CRefactoredCommandWarning -CommandName $MyInvocation.MyCommand.Name -ModuleName 'Carbon.Cryptography'
     }
 
     Add-Type -AssemblyName 'System.Security'
-    
+
     [byte[]]$encryptedBytes = [Convert]::FromBase64String($ProtectedString)
     if( $PSCmdlet.ParameterSetName -eq 'DPAPI' )
     {
@@ -3031,7 +3332,7 @@ filter Unprotect-CString
 
         [Security.Cryptography.RSA]$privateKey = $null
         $privateKeyType = $Certificate.PrivateKey.GetType()
-        $isRsa = $privateKeyType.IsSubclassOf([Security.Cryptography.RSA]) 
+        $isRsa = $privateKeyType.IsSubclassOf([Security.Cryptography.RSA])
         if( -not $isRsa )
         {
             Write-Error ('Certificate "{0}" ("{1}") is not an RSA key. Found a private key of type "{2}", but expected type "{3}".' -f $Certificate.Subject,$Certificate.Thumbprint,$privateKeyType.FullName,[Security.Cryptography.RSA].FullName)
@@ -3070,7 +3371,7 @@ Failed to decrypt string using certificate "{0}" ({1}). This can happen when:
         {
             return
         }
- 
+
         $aes = [Security.Cryptography.Aes]::Create()
         try
         {
