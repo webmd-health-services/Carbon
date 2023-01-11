@@ -5,9 +5,9 @@ Runs Carbon tests.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# 
+#
 #     http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -45,13 +45,13 @@ if( $Test )
     $bladeTestParam['Test'] = $Test
 }
 
-$uploadTestResults = $false 
+$uploadTestResults = $false
 $uploadUri = ''
 $isAppVeyor = Test-Path -Path 'env:APPVEYOR'
 if( $isAppVeyor )
 {
     $uploadTestResults = $true
-    $uploadUri = 'https://ci.appveyor.com/api/testresults/nunit/{0}' -f $env:APPVEYOR_JOB_ID 
+    $uploadUri = 'https://ci.appveyor.com/api/testresults/nunit/{0}' -f $env:APPVEYOR_JOB_ID
 }
 
 $testsFailed = $false
@@ -59,7 +59,7 @@ $testsFailed = $false
 $xmlLogPath = Join-Path -Path $PSScriptRoot -ChildPath '.output\Carbon.blade.xml'
 $bladePath = Join-Path -Path $PSScriptRoot -ChildPath '.\Tools\Blade\blade.ps1' -Resolve
 & $bladePath -Path $Path -XmlLogPath $xmlLogPath @bladeTestParam -Recurse:$Recurse -PassThru:$PassThru |
-    Format-Table -Property Duration,FixtureName,Name
+    Format-Table -Property Passed,FixtureName,Name
 if( $PassThru )
 {
     $LastBladeResult
@@ -67,7 +67,7 @@ if( $PassThru )
 
 if( $isAppVeyor )
 {
-    & { 
+    & {
             $LastBladeResult.Failures
             $LastBladeResult.Errors
     } | Format-List

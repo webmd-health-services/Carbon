@@ -25,7 +25,7 @@ Describe 'Test-Cuser' {
     }
 
     It 'should check if local account exists' {
-        $localUserAccounts = @(Invoke-CPrivateCommand -Name 'Get-CCimInstance' -Parameter @{Query = "select * from win32_useraccount where Domain='$($env:ComputerName)'"; Computer = '.'})
+        $localUserAccounts = Get-CUser
         $localUserAccounts | Should -Not -BeNullOrEmpty
         foreach( $localUserAccount in $localUserAccounts )
         {
