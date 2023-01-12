@@ -200,9 +200,9 @@ Add-CTypeData -Type Diagnostics.Process `
 Write-Timing ('Dot-sourcing functions.')
 $functionRoot = Join-Path -Path $PSScriptRoot -ChildPath 'Functions' -Resolve
 
-Get-ChildItem -Path (Join-Path -Path $functionRoot -ChildPath '*') -Filter '*.ps1' -Exclude '*Iis*','Initialize-Lcm.ps1' | 
-    ForEach-Object { 
-        . $_.FullName 
+Get-ChildItem -Path (Join-Path -Path $functionRoot -ChildPath '*') -Filter '*.ps1' -Exclude '*Iis*','Initialize-Lcm.ps1' |
+    ForEach-Object {
+        . $_.FullName
     }
 
 function Write-CObsoleteCommandWarning
@@ -239,7 +239,7 @@ function Write-CObsoleteCommandWarning
         {
             $builtinMsg = 'PowerShell''s '
         }
-    
+
         $msg = "$($msg) Use $($builtinMsg)""$($NewCommandName)"" command instead."
     }
     else
@@ -322,9 +322,10 @@ function Write-CWarningOnce
 }
 
 $developerImports = & {
-    Join-Path -Path $PSScriptRoot -ChildPath 'Carbon.psm1.Import.Iis.ps1' 
-    Join-Path -Path $PSScriptRoot -ChildPath 'Carbon.psm1.Import.Lcm.ps1' 
-    Join-Path -Path $PSScriptRoot -ChildPath 'Carbon.psm1.Import.Post.ps1' 
+    Join-Path -Path $PSScriptRoot -ChildPath 'Carbon.psm1.Import.Iis.ps1'
+    Join-Path -Path $PSScriptRoot -ChildPath 'Carbon.psm1.Import.Lcm.ps1'
+    Join-Path -Path $PSScriptRoot -ChildPath 'Carbon.psm1.Import.Obsolete.ps1'
+    Join-Path -Path $PSScriptRoot -ChildPath 'Carbon.psm1.Import.Post.ps1'
 }
 foreach( $developerImport in $developerImports )
 {
@@ -346,7 +347,7 @@ if( -not ($currentDirInfo | Get-Member -Name 'GetAccessControl') )
         param(
             [Security.AccessControl.AccessControlSections]$IncludeSections = [Security.AccessControl.AccessControlSections]::All
         )
-        
+
         return [IO.FileSystemAclExtensions]::GetAccessControl($this, $IncludeSections)
     }
 }
@@ -359,7 +360,7 @@ if( -not ($currentCmdInfo | Get-Member -Name 'GetAccessControl') )
         param(
             [Security.AccessControl.AccessControlSections]$IncludeSections = [Security.AccessControl.AccessControlSections]::All
         )
-        
+
         return [IO.FileSystemAclExtensions]::GetAccessControl($this, $IncludeSections)
     }
 }
