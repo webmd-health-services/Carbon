@@ -1,9 +1,9 @@
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# 
+#
 #     http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -12,17 +12,35 @@
 
 $CarbonDscOutputRoot = $null
 $currentDscResource = $null
+# $script:carbonModulePath = $null
 
 function Start-CarbonDscTestFixture
 {
     [CmdletBinding()]
     param(
-        [Parameter(Mandatory=$true,Position=0)]
-        [string]
-        $DscResourceName
+        [Parameter(Mandatory, Position=0)]
+        [string] $DscResourceName
     )
 
     Set-StrictMode -Version 'Latest'
+
+    # $modulePath = Join-Path -Path ([Environment]::GetFolderPath('ProgramFiles')) -ChildPath 'PowerShell\Modules'
+    # $script:carbonModulePath = Join-Path -Path $modulePath -ChildPath 'Carbon'
+    # $carbonTargetPath = Join-path -Path $PSScriptRoot -ChildPath '..\..\Carbon' -Resolve
+    # if ((Test-Path -Path $script:carbonModulePath))
+    # {
+    #     if (-not ((Get-Item -Path $script:carbonModulePath).Target))
+    #     {
+    #         $msg = "Carbon is already installed globally on this machine at ""$($script:carbonModulePath)"". Please " +
+    #                'uninstall the global version of Carbon and re-run this test.'
+    #         Write-Error -Message $msg -ErrorAction Stop
+    #         return
+    #     }
+
+    #     Remove-Item -Path $script:carbonModulePath
+    # }
+
+    # New-Item -Path $script:carbonModulePath -ItemType Junction -Value $carbonTargetPath
 
     $script:currentDscResource = $DscResourceName
     Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath ('..\..\Carbon\DscResources\Carbon_{0}' -f $DscResourceName) -Resolve) -Force -Global
@@ -51,18 +69,22 @@ function Start-CarbonDscTestFixture
     $tempDir = 'CarbonDscTest-{0}-{1}' -f $DscResourceName,$tempDir
     $script:CarbonDscOutputRoot = Join-Path -Path $env:TEMP -ChildPath $tempDir
 
-    New-Item -Path $CarbonDscOutputRoot -ItemType 'directory'
+    New-Item -Path $script:CarbonDscOutputRoot -ItemType 'directory'
 
     Clear-DscLocalResourceCache
 }
 
 function Stop-CarbonDscTestFixture
 {
-
-    if( (Test-Path -Path $CarbonDscOutputRoot -PathType Container) )
+    if( (Test-Path -Path $script:CarbonDscOutputRoot -PathType Container) )
     {
-        Remove-Item -Path $CarbonDscOutputRoot -Recurse
+        Remove-Item -Path $script:CarbonDscOutputRoot -Recurse
     }
+
+    # if ((Get-Item -Path $script:carbonModulePath).Target)
+    # {
+    #     Remove-Item -Path $script:carbonModulePath
+    # }
 }
 
 function Invoke-CarbonTestDscConfiguration
@@ -75,7 +97,6 @@ function Invoke-CarbonTestDscConfiguration
     )
 
     Set-StrictMode -Off
-
 
     & $Name -OutputPath $tempDir
 
@@ -98,7 +119,7 @@ function Assert-DscResourcePresent
     }
     else
     {
-        $Resource.Ensure | Should Be 'Present'
+        $Resource.Ensure | Should -Be 'Present'
     }
 }
 
@@ -118,7 +139,7 @@ function Assert-DscResourceAbsent
     }
     else
     {
-        $Resource.Ensure | Should Be 'Absent'
+        $Resource.Ensure | Should -Be 'Absent'
     }
 }
 

@@ -71,7 +71,7 @@ Build:
 - NuGetPack:
     Path: Carbon.nuspec
 - Zip:
-    ArchivePath: .output\Carbon-$(WHISKEY_SEMVER2).zip
+    ArchivePath: $(WHISKEY_OUTPUT_DIRECTORY)\Carbon-$(WHISKEY_SEMVER2).zip
     Path:
     - Carbon
     - examples
@@ -81,7 +81,7 @@ Build:
 - Exec:
     OnlyBy: BuildServer
     Path: appveyor
-    Argument: [ 'PushArtifact', '.output/Carbon-$(WHISKEY_SEMVER2).zip', '-DeploymentName', 'GitHub' ]
+    Argument: [ 'PushArtifact', '$(WHISKEY_OUTPUT_DIRECTORY)/Carbon-$(WHISKEY_SEMVER2).zip', '-DeploymentName', 'GitHub' ]
 - PublishPowerShellModule:
     Path: Carbon
 - Exec:
@@ -89,7 +89,7 @@ Build:
     Path: appveyor
     Argument: [
         'PushArtifact',
-        '.output/Carbon.$(WHISKEY_SEMVER2_NO_BUILD_METADATA).nupkg',
+        '$(WHISKEY_OUTPUT_DIRECTORY)/Carbon.$(WHISKEY_SEMVER2_NO_BUILD_METADATA).nupkg',
         '-DeploymentName',
         'PowerShellGallery'
     ]
@@ -139,6 +139,7 @@ Tests:
 - PowerShell:
     OnlyDuring: Build
     Path: Start-CarbonTest.ps1
+# Quick Developer tests.
 - Pester4:
     OnlyBy: Developer
     Script:
@@ -163,14 +164,61 @@ Tests:
     Script:
     - Test\*Iis*.ps1
     - Test\Carbon_*.Tests.ps1
+    Exclude:
+    - "*\\Carbon_ScheduledTask.Tests.ps1"
+    - "*\\Set-CIisHttpRedirect.Tests.ps1"
+- Pester:
+    IfExists: variable:IsWindows
+    Configuration:
+        TestResult:
+            Enabled: true
+            OutputPath: $(WHISKEY_OUTPUT_DIRECTORY)\pester5-windows.xml
+            TestSuiteName: Carbon
+        Run:
+            Path:
+            - Test\*-CFileShare.Tests.ps1
+            - Test\Carbon_ScheduledTask.Tests.ps1
+            - Test\Get-CFileSharePermission.Tests.ps1
+            - Test\Get-CFirewallRule.Tests.ps1
+            - Test\Install-CScheduledTask.Tests.ps1
+            - Test\Set-CIisHttpRedirect.Tests.ps1
+            - Test\Test-CUser.Tests.ps1
+        Output:
+            Verbosity: detailed
 # Cross-platform tests (eventually).
 - Pester4:
     OnlyBy: BuildServer
     Script: Test\*.Tests.ps1
     Exclude:
-    # Windows-only tests.
-    - "*\\Test\\*Iis*.ps1"
-    - "*\\Test\\Carbon_*.Tests.ps1"
+    # Don't run the Windows-only tests.
+    - "*\\*-CFileShare.Tests.ps1"
+    - "*\\*Iis*.ps1"
+    - "*\\Carbon_*.Tests.ps1"
+    - "*\\Get-CFileSharePermission.Tests.ps1"
+    - "*\\Get-CFirewallRule.Tests.ps1"
+    - "*\\Get-CPermission.Tests.ps1"
+    - "*\\Install-CScheduledTask.Tests.ps1"
+    - "*\\Test-CPermission.Tests.ps1"
+    - "*\\Test-CUser.Tests.ps1"
+    # Don't run the Pester 5 tests.
+    - "*\\Convert-CXmlFile.Tests.ps1"
+    - "*\\Resolve-CPathCase.Tests.ps1"
+    - "*\\X509Certificate2.Tests.ps1"
+- Pester:
+    Configuration:
+        TestResult:
+            Enabled: true
+            OutputPath: $(WHISKEY_OUTPUT_DIRECTORY)\pester5.xml
+            TestSuiteName: Carbon
+        Run:
+            Path:
+            - Test\Convert-CXmlFile.Tests.ps1
+            - Test\Get-CPermission.Tests.ps1
+            - Test\Resolve-CPathCase.Tests.ps1
+            - Test\Test-CPermission.Tests.ps1
+            - Test\X509Certificate2.Tests.ps1
+        Output:
+            Verbosity: detailed
 - PowerShell:
     WarningAction: SilentlyContinue
     OnlyDuring: Build
