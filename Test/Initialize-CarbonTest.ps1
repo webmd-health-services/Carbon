@@ -1,9 +1,9 @@
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# 
+#
 #     http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -34,7 +34,7 @@ if( (Test-Path -Path 'env:APPVEYOR') )
         & $importCarbonPath -Force
     }
 }
-else 
+else
 {
     # On developer computers, only import Carbon if it has changed since the last import.
     if( -not (Test-Path -Path 'variable:CarbonLastImportedAt') )
@@ -43,7 +43,7 @@ else
     }
 
     $startedAt = Get-Date
-    $mostRecentModificationAt = 
+    $mostRecentModificationAt =
         Get-ChildItem -Path (Join-Path -Path $PSScriptRoot -ChildPath '..\Carbon') -File -Recurse |
         Sort-Object -Property 'LastWriteTime' -Descending |
         Select-Object -First 1 |
@@ -84,7 +84,7 @@ else
 }
 
 $password = 'Tt6QML1lmDrFSf'
-[pscredential]$global:CarbonTestUser = New-Credential 'CarbonTestUser' -Password $password
+[pscredential]$global:CarbonTestUser = New-CCredential 'CarbonTestUser' -Password $password
 
 if( -not (Test-CUser -Username $CarbonTestUser.UserName) )
 {
@@ -96,12 +96,12 @@ if( -not (Test-CUser -Username $CarbonTestUser.UserName) )
         try
         {
             Write-Verbose -Message ('Attempting to launch process as "CarbonTestUser".') -Verbose
-            $usedCredential = 
-                Start-Job -ScriptBlock { [Environment]::UserName } -Credential $CarbonTestUser  | 
+            $usedCredential =
+                Start-Job -ScriptBlock { [Environment]::UserName } -Credential $CarbonTestUser  |
                 Wait-Job |
                 Receive-Job
         }
-        catch 
+        catch
         {
             Start-Sleep -Milliseconds 100
         }

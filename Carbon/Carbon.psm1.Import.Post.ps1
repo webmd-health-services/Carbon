@@ -80,7 +80,7 @@ try
         }
 
         $oldFunctionName = $functionName -replace '-C','-'
-        $oldFunctionPath = "function:\$($oldFunctionName)" 
+        $oldFunctionPath = "function:\$($oldFunctionName)"
         if( (Test-Path -Path $oldFunctionPath) )
         {
             $functionInfo = Get-Item -Path $oldFunctionPath
@@ -118,12 +118,12 @@ try
                 continue
             }
 
-            $msg = "Something unexpected happened. The ""$($functionName)"" function doesn't exist even though it " +
-                   'should.'
+            $msg = "Failed to create $($oldFunctionName) shim because target function $($functionName) does not exist."
             Write-Error -Message $msg
             continue
         }
 
+        Write-Timing "  $($oldFunctionName) -> $($functionName)"
         $cFunctionInfo = Get-Item -Path "function:$($functionName)"
         $preambleStart = $cFunctionInfo.definition.IndexOf('    [CmdletBinding(')
         if( $preambleStart -lt 0 )
