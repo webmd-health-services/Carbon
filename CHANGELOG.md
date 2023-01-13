@@ -55,6 +55,10 @@ All IIS functions moved to the `Carbon.IIS` module. Updates usages to use the `C
 * `Unlock-CIisConfigurationSection`
 * `Write-CIisVerbose`
 
+## Fixes
+
+* Carbon no longer generates backwards-compatible shims for new functions.
+
 
 # 2.12.0
 
