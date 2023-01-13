@@ -48,7 +48,7 @@ Build:
     Name: PublishBin
 - MergeFile:
     OnlyBy: BuildServer
-    Path: 
+    Path:
     - Carbon\Functions\*.ps1
     - Carbon\Carbon.psm1.Import.Obsolete.ps1
     - Carbon\Carbon.psm1.Import.Iis.ps1
@@ -63,7 +63,7 @@ Build:
     DeleteSourceFiles: true
 - MergeFile:
     OnlyBy: BuildServer
-    Path: 
+    Path:
     - "Carbon\\Functions\\*-Iis*.ps1"
     DestinationPath: Carbon\Functions\Iis.ps1
     TextSeparator: "$(NewLine)$(NewLine)"
@@ -148,7 +148,7 @@ Tests:
     Path: Start-CarbonTest.ps1
 - Pester4:
     OnlyBy: Developer
-    Script: 
+    Script:
     - Test\Bin.Tests.ps1
     - Test\Import-Carbon.Tests.ps1
     - Test\LicenseNotices.Tests.ps1
@@ -160,44 +160,32 @@ Tests:
     OnlyBy: Developer
     Path: Tools\Blade\blade.ps1
     Argument:
-        Path: 
+        Path:
         - Test\Test-Documentation.ps1
         - Test\Test-ImportCarbon.ps1
-# These tests fail when run in parallel so they get run first.
+#  Windows-only tests (eventually).
 - Pester4:
-    UnlessExists: variable:IsWindows
+    IfExists: variable:IsWindows
     OnlyBy: BuildServer
     Script:
     - Test\*Iis*.ps1
     - Test\Carbon_*.Tests.ps1
-- Parallel:
-    UnlessExists: variable:IsWindows
-    OnlyBy: BuildServer
-    Queues:
-    - Tasks:
-        - Pester4:
-            Script: 
-            - Test\*-ScheduledTask.Tests.ps1
-    - Tasks:
-        - Pester4:
-            Script: 
-            - Test\*.Tests.ps1
-            Exclude:
-            - "*\\Test\\*Iis*.ps1"
-            - "*\\Test\\Carbon_*.Tests.ps1"
-            - "*\\Test\\*-ScheduledTask.Tests.ps1"
-    - Tasks:
-        - PowerShell:
-            WarningAction: SilentlyContinue
-            OnlyDuring: Build
-            Path: Invoke-CarbonBladeTest.ps1
-            Argument:
-                Recurse: true
-                Path: Test
-                PassThru: true
+# Cross-platform tests (eventually).
 - Pester4:
-    IfExists: variable:IsWindows
+    OnlyBy: BuildServer
     Script: Test\*.Tests.ps1
+    Exclude:
+    # Windows-only tests.
+    - "*\\Test\\*Iis*.ps1"
+    - "*\\Test\\Carbon_*.Tests.ps1"
+- PowerShell:
+    WarningAction: SilentlyContinue
+    OnlyDuring: Build
+    Path: Invoke-CarbonBladeTest.ps1
+    Argument:
+        Recurse: true
+        Path: Test
+        PassThru: true
 - PowerShell:
     OnlyDuring: Build
     OnlyBy: Developer
