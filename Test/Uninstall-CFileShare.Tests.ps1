@@ -13,6 +13,14 @@
 #Requires -Version 5.1
 Set-StrictMode -Version 'Latest'
 
+if (-not (Get-Command -Name 'Get-WmiObject' -ErrorAction Ignore))
+{
+    $msgs = 'Get-CFileShare tests will not be run because because the Get-WmiObject command does not exist, which is ' +
+            'needed to install a test share.'
+    Write-Warning $msgs
+    return
+}
+
 BeforeAll {
     Set-StrictMode -Version 'Latest'
 
