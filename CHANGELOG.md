@@ -64,6 +64,7 @@ All IIS functions moved to the `Carbon.IIS` module. Updates usages to use the `C
 ## Fixes
 
 * Carbon no longer generates backwards-compatible shims for new functions.
+* `Install-CFileShare` wasn't preserving the file share's SACL, group, or owner on its security descriptor.
 
 
 # 2.12.0

@@ -254,11 +254,14 @@ function Install-CFileShare
 
     if ($updateShare)
     {
-        # if we don't pass a $null security descriptor, default Everyone permissions aren't setup correctly, and extra admin rights are slapped on.
-        $shareSecurityDescriptor = ([wmiclass] "Win32_SecurityDescriptor").CreateInstance()
-        $shareSecurityDescriptor.DACL = $shareAces
-        $shareSecurityDescriptor.ControlFlags = "0x4"
-    
+        $currentSD = Get-CFileShareSecurityDescriptor -Name $Name
+        $newSD = ([wmiclass]'Win32_SecurityDescriptor').CreateInstance()
+        $newSD.DACL = $shareAces
+        $newSD.ControlFlags = "0x4"
+        $newSD.Group = $currentSD.Group
+        $newSD.Owner = $currentSD.Owner
+        $newSD.SACL = $currentSD.SACL
+
         if (-not $createdShare)
         {
             Write-Information -Message "Updating SMB file share ""$($Name)""."
@@ -268,7 +271,7 @@ function Install-CFileShare
             Write-Information $msg
         }
 
-        $result = $share.SetShareInfo( $share.MaximumAllowed, $Description, $shareSecurityDescriptor )
+        $result = $share.SetShareInfo( $share.MaximumAllowed, $Description, $newSD )
         if ($result.ReturnValue)
         {
             $msg = "Failed to create share ""$($Name)"": WMI error code $($result.ReturnValue): " +
