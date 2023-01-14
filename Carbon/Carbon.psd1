@@ -211,6 +211,7 @@ All functions are idempotent: when run multiple times with the same arguments, y
                             'Install-CUser',
                             'Install-CWindowsFeature',
                             'Invoke-CAppCmd',
+                            'Invoke-CCimMethod',
                             'Invoke-CPowerShell',
                             'Join-CIisVirtualPath',
                             'Lock-CIisConfigurationSection',
@@ -308,6 +309,7 @@ All functions are idempotent: when run multiple times with the same arguments, y
                             'Uninstall-CWindowsFeature',
                             'Unlock-CIisConfigurationSection',
                             'Unprotect-CString',
+                            'Write-CCimError',
                             'Write-CDscError',
                             'Write-CFile',
                             '*'

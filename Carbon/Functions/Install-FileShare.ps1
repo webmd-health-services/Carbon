@@ -111,18 +111,6 @@ function Install-CFileShare
         }
     }
 
-    $errors = @{
-                [uint32]2 = 'Access Denied';
-                [uint32]8 = 'Unknown Failure';
-                [uint32]9 = 'Invalid Name';
-                [uint32]10 = 'Invalid Level';
-                [uint32]21 = 'Invalid Parameter';
-                [uint32]22 = 'Duplicate Share';
-                [uint32]23 = 'Restricted Path';
-                [uint32]24 = 'Unknown Device or Directory';
-                [uint32]25 = 'Net Name Not Found';
-            }
-
     $Path = Resolve-CFullPath -Path $Path -NoWarn
     $Path = $Path.Trim('\\')
     # When sharing drives, path must end with \. Otherwise, it shouldn't.
@@ -176,16 +164,14 @@ function Install-CFileShare
             WRite-Information "$($changeMsgPrefix)Path         $($share.Path) -> $($Path)"
         }
 
-        $shareClass = [wmiclass]'root\cimv2:Win32_Share'
-        $result = $shareClass.Create($Path, $Name, 0, $null, $Description, $null, $null)
-
-        if ($result.ReturnValue)
-        {
-            $msg = "Failed to create share ""$($Name)"": WMI error code $($result.ReturnValue): " +
-                   "$($errors[$result.ReturnValue])."
-            Write-Error -Message $msg -ErrorAction $ErrorActionPreference
-            return
+        $createArgs = [ordered]@{
+            Path = [String]$Path;
+            Name = [String]$Name;
+            Type = [UInt32]0;
+            MaximumAllowed = $null;
+            Description = $Description;
         }
+        Invoke-CCimMethod -ClassName 'Win32_Share' -Name 'Create' -Arguments $createArgs
         $createdShare = $true
     }
 
@@ -271,14 +257,8 @@ function Install-CFileShare
             Write-Information $msg
         }
 
-        $result = $share.SetShareInfo( $share.MaximumAllowed, $Description, $newSD )
-        if ($result.ReturnValue)
-        {
-            $msg = "Failed to create share ""$($Name)"": WMI error code $($result.ReturnValue): " +
-                   "$($errors[$result.ReturnValue])."
-            Write-Error -Message $msg -ErrorAction $ErrorActionPreference
-            return
-        }
+        $result = $share.SetShareInfo($share.MaximumAllowed, $Description, $newSD)
+        Write-CCimError -Message "Failed to update ""$($Name)"" SMB file share" -Result $result
     }
 }
 

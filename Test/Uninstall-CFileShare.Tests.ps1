@@ -43,7 +43,7 @@ Describe 'Uninstall-CFileShare' {
     }
 
     AfterEach {
-        Get-FileShare -Name $script:shareName -ErrorAction Ignore |
+        Get-CFileShare -Name $script:shareName -ErrorAction Ignore |
             ForEach-Object {
                 if( Invoke-CPrivateCommand -Name 'Test-CCimAvailable' )
                 {
