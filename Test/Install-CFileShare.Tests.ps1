@@ -94,11 +94,7 @@ BeforeAll {
 
     function Remove-Share
     {
-        $share = Get-Share -ErrorAction Ignore
-        if ($null -ne $share)
-        {
-            $share.Delete()
-        }
+        Get-Share -ErrorAction Ignore | Uninstall-CFileShare
     }
 
     function Invoke-NewShare
@@ -131,7 +127,7 @@ BeforeAll {
 }
 
 AfterAll {
-    Get-CFileShare -Name "$($script:baseShareName)*" -AsWmiObject | ForEach-Object { $_.Delete() }
+    Get-CFileShare -Name "$($script:baseShareName)*" | Uninstall-CFileShare
 }
 
 Describe 'Install-CFileShare' {

@@ -44,12 +44,7 @@ BeforeAll {
 }
 
 AfterAll {
-    $share = Invoke-CPrivateCommand -Name 'Get-CCimInstance' -Parameter @{Class = 'Win32_Share'; Filter = "Name='$script:shareName'"}
-    if ($null -ne $share)
-    {
-        [void] $share.Delete()
-    }
-
+    Get-CFileShare -Name $script:shareName | Uninstall-CFileShare
     Remove-Item -Path $script:sharePath
 }
 
