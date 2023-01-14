@@ -45,22 +45,19 @@ function Get-CFileSharePermission
     [CmdletBinding()]
     [OutputType([Carbon.Security.ShareAccessRule])]
     param(
-        [Parameter(Mandatory=$true)]
-        [string]
         # The share's name.
-        $Name,
+        [Parameter(Mandatory)]
+        [String] $Name,
 
-        [string]
         # Get permissions for a specific identity. Wildcards supported.
-        $Identity
+        [String] $Identity
     )
 
     Set-StrictMode -Version 'Latest'
-
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
-    $share = Get-CFileShare -Name $Name
-    if( -not $share )
+    $sd = Get-CFileShareSecurityDescriptor -Name $Name
+    if( -not $sd -or -not $sd.DACL )
     {
         return
     }
@@ -76,48 +73,9 @@ function Get-CFileSharePermission
             }
         }
     }
-        
-    $acl = $null  
-    $lsss = Get-CCimInstance -Class 'Win32_LogicalShareSecuritySetting' -Filter "name='$Name'"
-    if( -not $lsss )
-    {
-        return
-    }
-
-    if( Test-CCimAvailable )
-    {
-        $result = Invoke-CimMethod -InputObject $lsss -MethodName 'GetSecurityDescriptor'
-    }
-    else
-    {
-        $result = $lsss.GetSecurityDescriptor()
-    }
-
-    if( -not $result )
-    {
-        return
-    }
-
-    if( $result.ReturnValue )
-    {
-        $win32lsssErrors = @{
-                                [uint32]2 = 'Access Denied';
-                                [uint32]8 = 'Unknown Failure';
-                                [uint32]9 = 'Privilege Missing';
-                                [uint32]21 = 'Invalid Parameter';
-                            }
-        Write-Error ('Failed to get ''{0}'' share''s security descriptor. WMI returned error code {1} which means: {2}' -f $Name,$result.ReturnValue,$win32lsssErrors[$result.ReturnValue])
-        return
-    }
-
-    $sd = $result.Descriptor
-    if( -not $sd -or -not $sd.DACL )
-    {
-        return
-    }
 
     foreach($ace in $SD.DACL)
-    {   
+    {
         if( -not $ace -or -not $ace.Trustee )
         {
             continue
@@ -139,6 +97,6 @@ function Get-CFileSharePermission
         }
 
         New-Object 'Carbon.Security.ShareAccessRule' $aceId, $ace.AccessMask, $ace.AceType
-    } 
+    }
 }
 
