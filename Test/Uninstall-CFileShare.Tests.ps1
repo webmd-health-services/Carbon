@@ -43,17 +43,9 @@ Describe 'Uninstall-CFileShare' {
     }
 
     AfterEach {
-        Get-CFileShare -Name $script:shareName -ErrorAction Ignore |
-            ForEach-Object {
-                if( Invoke-CPrivateCommand -Name 'Test-CCimAvailable' )
-                {
-                    Invoke-CimMethod -InputObject $_ -MethodName 'Delete'
+        Get-CFileShare -Name $script:shareName -ErrorAction Ignore | Uninstall-CFileShare
     }
-                {
-                    $_.Delete()
-                }
-            }
-    }
+
     It 'should delete share' {
         $output = Uninstall-CFileShare -Name $script:shareName
         $output | Should -BeNullOrEmpty

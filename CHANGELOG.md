@@ -6,6 +6,7 @@
 ## Additions
 
 * The `Invoke-CCimMethod` function for calling a method on an object that could be a WMI or CIM object.
+* The `Uninstall-CFileShare` function now accepts piped-in share objects (or any object with a `Name` property, really).
 * The `Write-CCimError` function for writing an error message based on the result object returned from a method call.
 
 ## Changes
