@@ -13,6 +13,13 @@
 #Requires -Version 5.1
 Set-StrictMode -Version 'Latest'
 
+if (-not (Get-Command -Name 'Get-WmiObject' -ErrorAction Ignore))
+{
+    $msgs = 'Install-CFileShare tests will not be run because because the Get-WmiObject command does not exist.'
+    Write-Warning $msgs
+    return
+}
+
 BeforeAll {
     Set-StrictMode -Version 'Latest'
 
@@ -118,13 +125,13 @@ BeforeAll {
         param(
         )
 
-        Get-CFileShare -Name $script:ShareName -ErrorAction $ErrorActionPreference
+        Get-CFileShare -Name $script:ShareName -AsWmiObject -ErrorAction $ErrorActionPreference
     }
 
 }
 
 AfterAll {
-    Get-CFileShare -Name "$($script:baseShareName)*" | ForEach-Object { $_.Delete() }
+    Get-CFileShare -Name "$($script:baseShareName)*" -AsWmiObject | ForEach-Object { $_.Delete() }
 }
 
 Describe 'Install-CFileShare' {
@@ -266,7 +273,7 @@ Describe 'Install-CFileShare' {
         $output = Install-CFileShare -Name $script:ShareName -Path $script:SharePath
         $output | Should -BeNullOrEmpty
 
-        $share = Get-CFileShare -Name $script:ShareName
+        $share = Get-CFileShare -Name $script:ShareName -AsWmiObject
         $share.SetShareInfo(1, $share.Description, $null)
 
         $output = Install-CFileShare -Name $script:ShareName -Path $script:SharePath -Force

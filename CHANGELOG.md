@@ -3,6 +3,12 @@
 
 # 2.13.0
 
+## Changes
+
+* The `Install-CFileShare` now writes a more friendly message on PowerShell (Core) instead of "[Microsoft.Management.Infrastructure.CimInstance] does not contain a method named 'Delete'". We're unable to get `Install-CFileShare` to
+work under PowerShell (Core).
+* The `Install-CFileShare` function now writes changes its making to the information stream.
+
 ## Deprecated
 
 These functions moved to the `Carbon.Windows.HttpServer` module. Update usages to use the `Carbon.Windows.HttpServer`

@@ -9,7 +9,7 @@ function Get-CFileShare
     The `Get-CFileShare` function uses WMI to get the file/SMB shares on the current/local computer. The returned objects are `Win32_Share` WMI objects.
 
     Use the `Name` paramter to get a specific file share by its name. If a share with the given name doesn't exist, an error is written and nothing is returned.
-    
+
     The `Name` parameter supports wildcards. If you're using wildcards to find a share, and no shares are found, no error is written and nothing is returned.
 
     `Get-CFileShare` was added in Carbon 2.0.
@@ -46,13 +46,15 @@ function Get-CFileShare
     #>
     [CmdletBinding()]
     param(
-        [string]
-        # The name of a specific share to retrieve. Wildcards accepted. If the string contains WMI sensitive characters, you'll need to escape them.
-        $Name
+        # The name of a specific share to retrieve. Wildcards accepted. If the string contains WMI sensitive characters,
+        # you'll need to escape them.
+        [String] $Name,
+
+        # Force the returned object to be a WMI object, not a CIM object.
+        [switch] $AsWmiObject
     )
 
     Set-StrictMode -Version 'Latest'
-
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
     $filter = '(Type = 0 or Type = 2147483648)'
@@ -62,8 +64,8 @@ function Get-CFileShare
         $filter = '{0} and Name = ''{1}''' -f $filter,$Name
     }
 
-    $shares = Get-CCimInstance -Class 'Win32_Share' -Filter $filter |
-                    Where-Object { 
+    $shares = Get-CCimInstance -Class 'Win32_Share' -Filter $filter -AsWmiObject:$AsWmiObject |
+                    Where-Object {
                         if( -not $wildcardSearch )
                         {
                             return $true
@@ -71,7 +73,7 @@ function Get-CFileShare
 
                         return $_.Name -like $Name
                     }
-    
+
     if( $Name -and -not $shares -and -not $wildcardSearch )
     {
         Write-Error ('Share ''{0}'' not found.' -f $Name) -ErrorAction $ErrorActionPreference
