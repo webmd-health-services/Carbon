@@ -3,6 +3,11 @@
 
 # 2.13.0
 
+## Additions
+
+* The `Invoke-CCimMethod` function for calling a method on an object that could be a WMI or CIM object.
+* The `Write-CCimError` function for writing an error message based on the result object returned from a method call.
+
 ## Changes
 
 * The `Install-CFileShare` now writes a more friendly message on PowerShell (Core) instead of "[Microsoft.Management.Infrastructure.CimInstance] does not contain a method named 'Delete'". We're unable to get `Install-CFileShare` to

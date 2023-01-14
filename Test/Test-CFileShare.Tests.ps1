@@ -46,7 +46,7 @@ Describe 'Test-FileShare' {
     It 'should test share' {
         $shares = Get-CFileShare
         $shares | Should -Not -BeNullOrEmpty
-        $sharesNotFound = $shares | Where-Object { -not (Test-FileShare -Name $_.Name) }
+        $sharesNotFound = $shares | Where-Object { -not (Test-CFileShare -Name $_.Name) }
         $sharesNotFound | Should -BeNullOrEmpty
         $Global:Error | Should -BeNullOrEmpty
     }
