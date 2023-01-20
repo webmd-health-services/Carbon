@@ -650,7 +650,7 @@ function Get-CPowershellPath
     }
 
     # x86 OS/x86 PowerShell. There's no 64-bit anything, so just return $PSHOME.
-    if( Test-COSIs32Bit )
+    if (Test-COSIs32Bit -NoWarn)
     {
         if( $x86 )
         {
@@ -2555,7 +2555,7 @@ function Test-COSIs32Bit
     #>
     [CmdletBinding()]
     param(
-        [switch]$NoWarn
+        [switch] $NoWarn
     )
 
     Set-StrictMode -Version 'Latest'
