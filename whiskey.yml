@@ -3,8 +3,8 @@ Build:
 - Version:
     Path: Carbon\Carbon.psd1
     Prerelease:
-    - "*/*": alpha$(WHISKEY_BUILD_NUMBER)
-    - develop: rc$(WHISKEY_BUILD_NUMBER)
+    - master: ""
+    - "*": rc1
 - Exec:
     OnlyBy: BuildServer
     Path: appveyor
