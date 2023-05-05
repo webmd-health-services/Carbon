@@ -1,19 +1,19 @@
 
+#Requires -Version 5.1
 Set-StrictMode -Version 'Latest'
 
-Describe 'License Notices' {
-
-    It 'all published files should have a license notice' {
+Describe 'Carbon' {
+    It 'has a license notice in all published files' {
         $projectRoot = Join-Path -Path $PSScriptRoot -ChildPath '..' -Resolve
         $carbonRoot = Join-Path -Path $projectRoot -ChildPath 'Carbon' -Resolve
         $licenseFilePath = Join-Path $projectRoot LICENSE.txt -Resolve
-    
+
         $noticeLines = Get-Content -Path $licenseFilePath -Tail 11 |
                             ForEach-Object { $_ -replace '^   ','' } |
                             Select-Object -First 13
         $noticeLines | Write-Verbose
-    
-        [object[]]$filesMissingLicense = 
+
+        [object[]]$filesMissingLicense =
             & {
                 Get-ChildItem -Path (Join-Path -Path $projectRoot -ChildPath 'Tools\*.ps1')
 
@@ -23,7 +23,7 @@ Describe 'License Notices' {
                 {
                     Get-ChildItem -Path $carbonRoot -Recurse -File
                 }
-                else 
+                else
                 {
                     $searchRoot = Join-Path -Path $carbonRoot -ChildPath '*'
                     Get-ChildItem -Path $searchRoot -File -Exclude 'Carbon.psm1.*'
@@ -100,7 +100,7 @@ Describe 'License Notices' {
                     $fileInfo.FullName
                 }
             }
-    
+
         if( $filesMissingLicense )
         {
                 ,$filesMissingLicense | Should -BeNullOrEmpty

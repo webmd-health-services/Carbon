@@ -1,56 +1,39 @@
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-# 
-#     http://www.apache.org/licenses/LICENSE-2.0
-# 
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
 
+#Requires -Version 5.1
 Set-StrictMode -Version 'Latest'
 
-& (Join-Path -Path $PSScriptRoot -ChildPath 'Initialize-CarbonTest.ps1' -Resolve)
+BeforeAll {
+    Set-StrictMode -Version 'Latest'
 
-$GroupName = 'Setup Group'
-$userName = $CarbonTestUser.UserName
-$description = 'Carbon user for use in Carbon tests.'
+    & (Join-Path -Path $PSScriptRoot -ChildPath 'Initialize-CarbonTest.ps1' -Resolve)
 
-function Assert-GroupExists
-{
-    $groups = Get-Group
-    try
-    {
-        $group = $groups |
-                    Where-Object { $_.Name -eq $GroupName }
-        $group | Should -Not -BeNullOrEmpty
-    }
-    finally
-    {
-        $groups | ForEach-Object { $_.Dispose() }
-    }
-}
+    $script:GroupName = 'Setup Group'
+    $script:userName = $CarbonTestUser.UserName
+    $script:description = 'Carbon user for use in Carbon tests.'
 
-Describe 'Install-Group' {
-    BeforeEach {
-        Remove-Group
-    }
-    
-    AfterEach {
-        Remove-Group
-    }
-    
-    function Remove-Group
+    function Assert-GroupExists
     {
-        $groups = Get-Group 
+        $groups = Get-CGroup
         try
         {
-            $group = $groups | Where-Object { $_.Name -eq $GroupName }
+            $group = $groups | Where-Object { $_.Name -eq $script:GroupName }
+            $group | Should -Not -BeNullOrEmpty
+        }
+        finally
+        {
+            $groups | ForEach-Object { $_.Dispose() }
+        }
+    }
+
+    function Remove-Group
+    {
+        $groups = Get-CGroup
+        try
+        {
+            $group = $groups | Where-Object { $_.Name -eq $script:GroupName }
             if( $null -ne $group )
             {
-                net localgroup `"$GroupName`" /delete
+                net localgroup `"$script:GroupName`" /delete
             }
         }
         finally
@@ -58,15 +41,20 @@ Describe 'Install-Group' {
             $groups | ForEach-Object { $_.Dispose() }
         }
     }
-    
-    function Invoke-NewGroup($Description = '', $Members = @())
+
+    function Invoke-NewGroup
     {
-        $group = Install-Group -Name $GroupName -Description $Description -Members $Members -PassThru
+        param(
+            $Description = '',
+            $Members = @()
+        )
+
+        $group = Install-CGroup -Name $script:GroupName -Description $Description -Members $Members -PassThru
         try
         {
             $group | Should -Not -BeNullOrEmpty
             Assert-GroupExists
-            $expectedGroup = Get-Group -Name $GroupName
+            $expectedGroup = Get-CGroup -Name $script:GroupName
             try
             {
                 $expectedGroup.Sid | Should -Be $group.Sid
@@ -84,15 +72,26 @@ Describe 'Install-Group' {
             }
         }
     }
-    
+
+}
+
+Describe 'Install-CGroup' {
+    BeforeEach {
+        Remove-Group
+    }
+
+    AfterEach {
+        Remove-Group
+    }
+
     It 'should create group' {
         $expectedDescription = 'Hello, wordl!'
         Invoke-NewGroup -Description $expectedDescription
-        $group = Get-Group -Name $GroupName
+        $group = Get-CGroup -Name $script:GroupName
         try
         {
             $group | Should -Not -BeNullOrEmpty
-            $group.Name | Should -Be $GroupName
+            $group.Name | Should -Be $script:GroupName
             $group.Description | Should -Be $expectedDescription
         }
         finally
@@ -100,9 +99,9 @@ Describe 'Install-Group' {
             $group.Dispose()
         }
     }
-    
+
     It 'should pass thru group' {
-        $group = Install-Group -Name $GroupName 
+        $group = Install-CGroup -Name $script:GroupName
         try
         {
             $group | Should -BeNullOrEmpty
@@ -114,8 +113,8 @@ Describe 'Install-Group' {
                 $group.Dispose()
             }
         }
-    
-        $group = Install-Group -Name $GroupName -PassThru
+
+        $group = Install-CGroup -Name $script:GroupName -PassThru
         try
         {
             $group | Should -Not -BeNullOrEmpty
@@ -126,23 +125,23 @@ Describe 'Install-Group' {
             $group.Dispose()
         }
     }
-    
+
     It 'should add members' {
-        Invoke-NewGroup -Members $userName
-        
-        $details = net localgroup `"$GroupName`"
-        $details | Where-Object { $_ -like ('*{0}*' -f $userName) } | Should -Not -BeNullOrEmpty
+        Invoke-NewGroup -Members $script:userName
+
+        $details = net localgroup `"$script:GroupName`"
+        $details | Where-Object { $_ -like ('*{0}*' -f $script:userName) } | Should -Not -BeNullOrEmpty
     }
-    
-    It 'Should -Not recreate if group already exists' {
+
+    It 'should not recreate if group already exists' {
         Invoke-NewGroup -Description 'Description 1'
-        $group1 = Get-Group -Name $GroupName
+        $group1 = Get-CGroup -Name $script:GroupName
         try
         {
-        
+
             Invoke-NewGroup -Description 'Description 2'
-            $group2 = Get-Group -Name $GroupName
-            
+            $group2 = Get-CGroup -Name $script:GroupName
+
             try
             {
                 $group2.Description | Should -Be 'Description 2'
@@ -156,35 +155,35 @@ Describe 'Install-Group' {
         finally
         {
             $group1.Dispose()
-        }    
+        }
     }
-    
-    It 'Should -Not add member multiple times' {
-        Invoke-NewGroup -Members $userName
-        
+
+    It 'should not add member multiple times' {
+        Invoke-NewGroup -Members $script:userName
+
         $Error.Clear()
-        Invoke-NewGroup -Members $userName
+        Invoke-NewGroup -Members $script:userName
         $Error.Count | Should -Be 0
     }
-    
+
     It 'should add member with long name' {
-        $longUsername = 'abcdefghijklmnopqrst' 
-        Install-User -Credential (New-Credential -Username $longUsername -Password 'a1b2c34d!')
+        $longUsername = 'abcdefghijklmnopqrst'
+        Install-CUser -Credential (New-CCredential -Username $longUsername -Password 'a1b2c34d!')
         try
         {
             Invoke-NewGroup -Members ('{0}\{1}' -f $env:COMPUTERNAME,$longUsername)
-            $details = net localgroup `"$GroupName`"
+            $details = net localgroup `"$script:GroupName`"
             $details | Where-Object { $_ -like ('*{0}*' -f $longUsername) }| Should -Not -BeNullOrEmpty
         }
         finally
         {
-            Uninstall-User -Username $userName
+            Uninstall-CUser -Username $script:userName
         }
     }
-    
+
     It 'should support what if' {
         $Error.Clear()
-        $group = Install-Group -Name $GroupName -WhatIf -Member 'Administrator'
+        $group = Install-CGroup -Name $script:GroupName -WhatIf -Member 'Administrator'
         try
         {
             $Global:Error.Count | Should -Be 0
@@ -197,8 +196,8 @@ Describe 'Install-Group' {
                 $group.Dispose()
             }
         }
-    
-        $group = Get-Group -Name $GroupName -ErrorAction SilentlyContinue
+
+        $group = Get-CGroup -Name $script:GroupName -ErrorAction SilentlyContinue
         try
         {
             $group | Should -BeNullOrEmpty
