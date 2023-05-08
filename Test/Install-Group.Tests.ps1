@@ -33,7 +33,7 @@ BeforeAll {
             $group = $groups | Where-Object { $_.Name -eq $script:GroupName }
             if( $null -ne $group )
             {
-                net localgroup `"$script:GroupName`" /delete
+                net localgroup $script:GroupName /delete
             }
         }
         finally
@@ -129,7 +129,7 @@ Describe 'Install-CGroup' {
     It 'should add members' {
         Invoke-NewGroup -Members $script:userName
 
-        $details = net localgroup `"$script:GroupName`"
+        $details = net localgroup $script:GroupName
         $details | Where-Object { $_ -like ('*{0}*' -f $script:userName) } | Should -Not -BeNullOrEmpty
     }
 
@@ -172,7 +172,7 @@ Describe 'Install-CGroup' {
         try
         {
             Invoke-NewGroup -Members ('{0}\{1}' -f $env:COMPUTERNAME,$longUsername)
-            $details = net localgroup `"$script:GroupName`"
+            $details = net localgroup $script:GroupName
             $details | Where-Object { $_ -like ('*{0}*' -f $longUsername) }| Should -Not -BeNullOrEmpty
         }
         finally

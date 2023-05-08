@@ -14,7 +14,7 @@ BeforeAll {
     $script:serviceNamePrefix = 'CarbonTestService'
     $script:serviceName = $null
     $script:serviceAcct = "CISvc${script:serviceNameSuffix}"
-    $script:servicePassword = "a1""'~!@#$%^&*("  # sc.exe needs to have certain characters escaped.
+    $script:servicePassword = """a1""'~!@# $%^&*("""  # sc.exe needs to have certain characters escaped.
     $script:installServiceParams = @{ }
     $script:startedAt = Get-Date
     $script:serviceCredential = New-CCredential -UserName $script:serviceAcct -Password $script:servicePassword
@@ -283,7 +283,8 @@ Describe 'Install-CService' {
         $svc | Should -BeNullOrEmpty
         $Global:Error | Should -HaveCount 0
         $svcConfig = Get-CServiceConfiguration -Name $script:serviceName
-        $svcConfig.Path | Should -Be "${script:servicePath} -k ""Fu bar"" -w ""Surrounded By Quotes"""
+        $expectedPath = "${script:servicePath} -k ""Fu bar"" -w ""Surrounded By Quotes"""
+        $svcConfig.Path | Should -Be $expectedPath
     }
 
     It 'should reinstall service if argument list changes' {
@@ -505,8 +506,8 @@ Describe 'Install-CService' {
     }
 
     It 'should set dependencies' {
-        $firstService = (Get-Service)[0]
-        $secondService = (Get-Service)[1]
+        $firstService = (Get-Service -ErrorAction Ignore)[0]
+        $secondService = (Get-Service -ErrorAction Ignore)[1]
         Install-CService -Name $script:serviceName -Path $script:servicePath -Dependencies $firstService.Name,$secondService.Name @installServiceParams
         $dependencies = & (Join-Path $env:SystemRoot system32\sc.exe) enumdepend $firstService.Name
         $dependencies | Where-Object { $_ -eq "SERVICE_NAME: $script:serviceName" } | Should -Not -BeNullOrEmpty

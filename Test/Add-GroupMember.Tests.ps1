@@ -63,7 +63,7 @@ BeforeAll {
         {
             if( $group )
             {
-                net localgroup `"$GroupName`" /delete
+                net localgroup $GroupName /delete
             }
         }
         finally

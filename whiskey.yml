@@ -12,6 +12,23 @@ Build:
 - PowerShell:
     OnlyBy: BuildServer
     Path: Save-CarbonSigningKey.ps1
+- PowerShell:
+    ScriptBlock: |
+        $typeDef = @'
+            using System;
+
+            public static class Args
+            {
+                public static void Main(string[] args)
+                {
+                    foreach (var arg in args)
+                    {
+                        Console.WriteLine(arg);
+                    }
+                }
+            }
+        '@
+        Add-Type -TypeDefinition $typeDef -OutputType ConsoleApplication -OutputAssembly .\Carbon\bin\args.exe
 - SetVariable:
     SignAssembly: False
     Constants: ""

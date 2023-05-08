@@ -39,7 +39,7 @@ Describe 'Carbon' {
                 }
 
             } |
-            Where-Object { $_.Name -notmatch '\.(deps\.json|dll|pdb|orig|txt|md)$' } |
+            Where-Object { $_.Name -notmatch '\.(deps\.json|dll|pdb|orig|txt|md|exe)$' } |
             ForEach-Object {
                 Write-Debug -Message $_.FullName
                 $fileInfo = $_

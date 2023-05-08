@@ -11,10 +11,19 @@
 * `Grant-CPermission` can now grant permissions on private keys stored using a CNG provider.
 * `Revoke-CPermission` can now grant permissions on private keys stored using a CNG provider.
 
+### Changes
+
+* `Install-CService` now writes commands it runs to the information stream instead of the verbose stream.
+
 ### Fixed
 
 * `Uninstall-CService` writes an error if any service on the current computer can't be queried.
 * `Get-CPowerShellModuleInstallPath` returns a Windows PowerShell path when run under PowerShell 7.
+* `Disable-CNtfsCompression`, `Enable-CNtfsCompression`, `Get-CFirewallRule`, and `Install-CService` fail under
+PowerShell 7.3.0+.
+* `Install-CService` fails if creating a service whose account password begins/ends with double-quotation marks or
+contains both a quote and space character.
+
 
 ## 2.13.0
 
