@@ -3,6 +3,15 @@
 
 # Carbon Changelog
 
+## 2.14.0
+
+### Additions
+
+* `Get-CPermission` can now get permission son private keys stored using a CNG (Cryptographic Next Generation) provider.
+* `Grant-CPermission` can now grant permissions on private keys stored using a CNG provider.
+* `Revoke-CPermission` can now grant permissions on private keys stored using a CNG provider.
+
+
 ## 2.13.0
 
 ### Additions

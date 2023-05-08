@@ -3,7 +3,8 @@ function ConvertTo-ProviderAccessControlRights
 {
     <#
     .SYNOPSIS
-    Converts strings into the appropriate access control rights for a PowerShell provider (e.g. FileSystemRights or RegistryRights).
+    Converts strings into the appropriate access control rights for a PowerShell provider (e.g. FileSystemRights or
+    RegistryRights).
 
     .DESCRIPTION
     This is an internal Carbon function, so you're not getting anything more than the synopsis.
@@ -15,47 +16,63 @@ function ConvertTo-ProviderAccessControlRights
     #>
     [CmdletBinding()]
     param(
-        [Parameter(Mandatory=$true)]
-        [ValidateSet('FileSystem','Registry','CryptoKey')]
-        [string]
         # The provider name.
-        $ProviderName,
+        [Parameter(Mandatory)]
+        [ValidateSet('FileSystem', 'Registry', 'CryptoKey')]
+        [String] $ProviderName,
 
-        [Parameter(Mandatory=$true,ValueFromPipeline=$true)]
-        [string[]]
         # The values to convert.
-        $InputObject
+        [Parameter(Mandatory, ValueFromPipeline)]
+        [String[]] $InputObject
     )
 
     begin
     {
         Set-StrictMode -Version 'Latest'
-
         Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
-        $rights = 0
+        $toFS = $ProviderName -eq 'FileSystem'
         $rightTypeName = 'Security.AccessControl.{0}Rights' -f $ProviderName
 
         # CryptoKey does not exist in .NET standard/core so we will have to use FileSystem instead
-        if( $ProviderName -eq 'CryptoKey' -and -not (Test-CCryptoKeyAvailable))
+        if ($ProviderName -eq 'CryptoKey' -and -not (Test-CCryptoKeyAvailable))
         {
+            $toFS = $true
             $rightTypeName = 'Security.AccessControl.FileSystemRights'
         }
 
+        $rights = 0 -as $rightTypeName
+
         $foundInvalidRight = $false
+
+        $genericToFSMap = @{
+            GenericAll = 'FullControl';
+            GenericExecute = 'ExecuteFile';
+            GenericWrite = 'Write';
+            GenericRead = 'Read';
+        }
+        Write-Debug "[ConvertTo-ProviderAccessControlRights]"
     }
 
     process
     {
-        $InputObject | ForEach-Object { 
-            $right = ($_ -as $rightTypeName)
-            if( -not $right )
+        Write-Debug "  ${InputObject}"
+        foreach ($value in $InputObject)
+        {
+            if ($toFS -and $genericToFSMap.ContainsKey($value))
+            {
+                $value = $genericToFSMap[$value]
+            }
+
+            $right = $value -as $rightTypeName
+            if (-not $right)
             {
                 $allowedValues = [Enum]::GetNames($rightTypeName)
                 Write-Error ("System.Security.AccessControl.{0}Rights value '{1}' not found.  Must be one of: {2}." -f $providerName,$_,($allowedValues -join ' '))
                 $foundInvalidRight = $true
                 return
             }
+            Write-Debug "    ${value} → ${right}/0x$($right.ToString('x'))"
             $rights = $rights -bor $right
         }
     }
@@ -64,11 +81,14 @@ function ConvertTo-ProviderAccessControlRights
     {
         if( $foundInvalidRight )
         {
+            Write-Debug "  null"
             return $null
         }
         else
         {
+            Write-Debug "  ${rights}/0x$($rights.ToString('x'))"
             $rights
         }
+        Write-Debug "[ConvertTo-ProviderAccessControlRights]"
     }
 }

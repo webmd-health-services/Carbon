@@ -3,21 +3,17 @@ function Set-CryptoKeySecurity
 {
     [CmdletBinding()]
     param(
-        [Parameter(Mandatory=$true)]
-        [Security.Cryptography.X509Certificates.X509Certificate2]
-        $Certificate,
+        [Parameter(Mandatory)]
+        [Security.Cryptography.X509Certificates.X509Certificate2] $Certificate,
 
-        [Parameter(Mandatory=$true)]
-        [Security.AccessControl.CryptoKeySecurity]
-        $CryptoKeySecurity,
+        [Parameter(Mandatory)]
+        [Security.AccessControl.CryptoKeySecurity] $CryptoKeySecurity,
 
-        [Parameter(Mandatory=$true)]
-        [string]
-        $Action
+        [Parameter(Mandatory)]
+        [String] $Action
     )
 
     Set-StrictMode -Version 'Latest'
-
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
     $keyContainerInfo = $Certificate.PrivateKey.CspKeyContainerInfo
@@ -29,9 +25,9 @@ function Set-CryptoKeySecurity
         $cspParams.Flags = $cspParams.Flags -bor [Security.Cryptography.CspProviderFlags]::UseMachineKeyStore
     }
     $cspParams.CryptoKeySecurity = $CryptoKeySecurity
-                        
+
     try
-    {                    
+    {
         # persist the rule change
         if( $PSCmdlet.ShouldProcess( ('{0} ({1})' -f $Certificate.Subject,$Certificate.Thumbprint), $Action ) )
         {

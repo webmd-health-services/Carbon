@@ -147,4 +147,22 @@ Describe 'Revoke-Permission' {
         }
     }
 
+    It 'revokes permission on cng certificate' {
+        $cngCertPath = Join-Path -Path $PSScriptRoot -ChildPath 'Certificates\CarbonRsaCng.pfx' -Resolve
+        $cert = Install-Certificate -Path $cngCertPath -StoreLocation LocalMachine -StoreName My -NoWarn
+        try
+        {
+            $certPath = Join-Path -Path 'cert:\LocalMachine\My' -ChildPath $cert.Thumbprint
+            Grant-Permission -Path $certPath -Identity $user -Permission 'FullControl'
+            Get-Permission -Path $certPath -Identity $user | Should -Not -BeNullOrEmpty
+            Revoke-Permission -Path $certPath -Identity $user
+            $Global:Error.Count | Should -Be 0
+            Get-Permission -Path $certPath -Identity $user | Should -BeNullOrEmpty
+        }
+        finally
+        {
+            Uninstall-Certificate -Thumbprint $cert.Thumbprint -StoreLocation LocalMachine -StoreName My -NoWarn
+        }
+    }
+
 }
