@@ -356,7 +356,7 @@ All functions are idempotent: when run multiple times with the same arguments, y
             Prerelease = ''
 
             # ReleaseNotes of this module
-            ReleaseNotes = 'https://github.com/webmd-health-services/Carbon/blob/master/CHANGELOG.md'
+            ReleaseNotes = 'https://github.com/webmd-health-services/Carbon/blob/main/CHANGELOG.md'
         } # End of PSData hashtable
 
     } # End of PrivateData hashtable
