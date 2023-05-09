@@ -11,6 +11,9 @@
 * `Grant-CPermission` can now grant permissions on private keys stored using a CNG provider.
 * `Revoke-CPermission` can now grant permissions on private keys stored using a CNG provider.
 
+### Fixed
+
+* `Uninstall-CService` writes an error if any service on the current computer can't be queried.
 
 ## 2.13.0
 
