@@ -9,9 +9,9 @@ In order for DSC tests to run, Carbon must be in a known PSModulePath. On develo
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# 
+#
 #     http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -26,6 +26,6 @@ Set-StrictMode -Version 'Latest'
 
 & (Join-Path -Path $PSScriptRoot -ChildPath 'Carbon\Import-Carbon.ps1' -Resolve)
 
-$installRoot = Get-PowerShellModuleInstallPath
+$installRoot = Get-CPowerShellModuleInstallPath
 $carbonModuleRoot = Join-Path -Path $installRoot -ChildPath 'Carbon'
-Uninstall-Junction -Path $carbonModuleRoot
+Uninstall-CJunction -Path $carbonModuleRoot
