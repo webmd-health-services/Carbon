@@ -8,12 +8,11 @@ BeforeAll {
     & (Join-Path -Path $PSScriptRoot -ChildPath 'Initialize-CarbonTest.ps1')
 
     $script:programFilesModulePath = Join-Path -Path $env:ProgramFiles -ChildPath 'WindowsPowerShell\Modules'
-    if( (Test-Path -Path 'Env:\ProgramW6432') )
+    if ($PSVersionTable['PSEdition'] -eq 'Core')
     {
-        $script:programFilesModulePath = Join-Path -Path $env:ProgramW6432 -ChildPath 'WindowsPowerShell\Modules'
+        $script:programFilesModulePath = Join-Path -Path $env:ProgramFiles -ChildPath 'PowerShell\Modules'
     }
-    $script:psHomeModulePath = Join-Path -Path $env:SystemRoot -ChildPath 'system32\WindowsPowerShell\v1.0\Modules'
-
+    $script:psHomeModulePath = Join-Path -Path $PSHOME -ChildPath 'Modules'
 }
 
 Describe 'Get-PowerShellModuleInstallPath' {
@@ -21,7 +20,7 @@ Describe 'Get-PowerShellModuleInstallPath' {
         $Global:Error.Clear()
     }
 
-    It "should get preferred module install path" {
+    It 'should get preferred module install path' {
         if( (Test-Path -Path $script:programFilesModulePath -PathType Container) )
         {
             Get-PowerShellModuleInstallPath | Should -Be $script:programFilesModulePath

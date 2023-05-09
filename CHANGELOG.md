@@ -14,6 +14,7 @@
 ### Fixed
 
 * `Uninstall-CService` writes an error if any service on the current computer can't be queried.
+* `Get-CPowerShellModuleInstallPath` returns a Windows PowerShell path when run under PowerShell 7.
 
 ## 2.13.0
 
