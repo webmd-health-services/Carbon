@@ -1,55 +1,39 @@
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-# 
-#     http://www.apache.org/licenses/LICENSE-2.0
-# 
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
 
-& (Join-Path $TestDir ..\Initialize-CarbonTest.ps1 -Resolve)
+#Requires -Version 5.1
+#Requires -RunAsAdministrator
+Set-StrictMode -Version 'Latest'
 
-# Only administratos can update trusted hosts.
-if( Test-AdminPrivilege )
-{
-    $originalTrustedHosts = $null
+BeforeAll {
+    Set-StrictMode -Version 'Latest'
 
-    function Start-Test
-    {
-        $originalTrustedHosts = @( Get-TrustedHost )
+    & (Join-Path -Path $PSScriptRoot -ChildPath 'Initialize-CarbonTest.ps1' -Resolve)
+
+    $script:originalTrustedHosts = $null
+}
+
+Describe 'Clear-CTrustedHost' {
+    BeforeEach {
+        $script:originalTrustedHosts = @( Get-CTrustedHost )
     }
 
-    function Stop-Test
-    {
-        if( $originalTrustedHosts )
+    AfterEach {
+        if( $script:originalTrustedHosts )
         {
-            Set-TrustedHost -Entry $originalTrustedHosts
+            Set-CTrustedHost -Entry $script:originalTrustedHosts
         }
     }
 
-    function Test-ShouldRemoveTrustedHosts
-    {
-        Set-TrustedHost 'example.com'
-        Assert-Equal 'example.com' (Get-TrustedHost)
-        Clear-TrustedHost
-        Assert-Null (Get-TrustedHost)
+    It 'should remove trusted hosts' {
+        Set-CTrustedHost 'example.com'
+        (Get-CTrustedHost) | Should -Be 'example.com'
+        Clear-CTrustedHost
+        (Get-CTrustedHost) | Should -BeNullOrEmpty
     }
-    
-    function Test-ShouldSupportWhatIf
-    {
-        Set-TrustedHost 'example.com'
-        Assert-Equal 'example.com' (Get-TrustedHost)
-        Clear-TrustedHost -WhatIf
-        Assert-Equal 'example.com' (Get-TrustedHost)
-    }
-    
-        
-}
-else
-{
-    Write-Warning "Only Administrators can modify the trusted hosts list."
-}
 
+    It 'should support what if' {
+        Set-CTrustedHost 'example.com'
+        (Get-CTrustedHost) | Should -Be 'example.com'
+        Clear-CTrustedHost -WhatIf
+        (Get-CTrustedHost) | Should -Be 'example.com'
+    }
+}

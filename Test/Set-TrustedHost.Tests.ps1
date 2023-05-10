@@ -1,55 +1,42 @@
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-# 
-#     http://www.apache.org/licenses/LICENSE-2.0
-# 
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
 
-# Only administratos can update trusted hosts.
-if( Test-AdminPrivilege )
-{
-    $originalTrustedHosts = $null
+#Requires -Version 5.1
+#Requires -RunAsAdministrator
+Set-StrictMode -Version 'Latest'
 
-    function Start-TestFixture
-    {
-        & (Join-Path -Path $PSScriptRoot -ChildPath '..\Initialize-CarbonTest.ps1' -Resolve)
+BeforeAll {
+    Set-StrictMode -Version 'Latest'
+
+    & (Join-Path -Path $PSScriptRoot -ChildPath 'Initialize-CarbonTest.ps1' -Resolve)
+
+    $script:originalTrustedHosts = $null
+}
+
+Describe 'Set-CTrustedHost' {
+    BeforeEach {
+        $script:originalTrustedHosts = @( Get-CTrustedHost )
+        Clear-CTrustedHost
     }
 
-    function Start-Test
-    {
-        $originalTrustedHosts = @( Get-TrustedHost )
-        Clear-TrustedHost
-    }
-
-    function Stop-Test
-    {
-        if( $originalTrustedHosts )
+    AfterEach {
+        if( $script:originalTrustedHosts )
         {
-            Set-TrustedHost -Entry $originalTrustedHosts
+            Set-CTrustedHost -Entry $script:originalTrustedHosts
         }
     }
 
-    function Test-ShouldSetTrustedHosts
-    {
-        Set-TrustedHost 'example.com'
-        Assert-Equal 'example.com' (Get-TrustedHost)
-        Set-TrustedHost 'example.com','sub.example.com'
-        $hosts = @( Get-TrustedHost )
-        Assert-Equal 'example.com' $hosts[0]
-        Assert-Equal 'sub.example.com' $hosts[1]
+    It 'should set trusted hosts' {
+        Set-CTrustedHost 'example.com'
+        (Get-CTrustedHost) | Should -Be 'example.com'
+        Set-CTrustedHost 'example.com','sub.example.com'
+        $hosts = @( Get-CTrustedHost )
+        $hosts[0] | Should -Be 'example.com'
+        $hosts[1] | Should -Be 'sub.example.com'
     }
 
-    function Test-ShouldSupportWhatIf
-    {
-        Set-TrustedHost 'example.com'
-        Assert-Equal 'example.com' (Get-TrustedHost)
-        Set-TrustedHost 'badexample.com' -WhatIf
-        Assert-Equal 'example.com' (Get-TrustedHost)
+    It 'should support what if' {
+        Set-CTrustedHost 'example.com'
+        (Get-CTrustedHost) | Should -Be 'example.com'
+        Set-CTrustedHost 'badexample.com' -WhatIf
+        (Get-CTrustedHost) | Should -Be 'example.com'
     }
 }
-

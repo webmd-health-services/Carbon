@@ -1,70 +1,59 @@
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-# 
-#     http://www.apache.org/licenses/LICENSE-2.0
-# 
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
 
-& (Join-Path -Path $PSScriptRoot -ChildPath '..\Initialize-CarbonTest.ps1' -Resolve)
+#Requires -Version 5.1
+#Requires -RunAsAdministrator
+Set-StrictMode -Version 'Latest'
 
-# Only administratos can update trusted hosts.
-if( Test-AdminPrivilege )
-{
-    $originalTrustedHosts = $null
+BeforeAll {
+    Set-StrictMode -Version 'Latest'
 
-    function Start-Test
-    {
-        $originalTrustedHosts = @( Get-TrustedHost )
-        Clear-TrustedHost
+    & (Join-Path -Path $PSScriptRoot -ChildPath 'Initialize-CarbonTest.ps1' -Resolve)
+
+    $script:originalTrustedHosts = $null
+}
+
+
+Describe 'Add-CTrustedHost' {
+    BeforeEach {
+        $script:originalTrustedHosts = @( Get-CTrustedHost )
+        Clear-CTrustedHost
     }
 
-    function Stop-Test
-    {
-        if( $originalTrustedHosts )
+    AfterEach {
+        if( $script:originalTrustedHosts )
         {
-            Set-TrustedHost -Entry $originalTrustedHosts
+            Set-CTrustedHost -Entry $script:originalTrustedHosts
         }
     }
 
-    function Test-ShouldAddNewHost
-    {
-        Add-TrustedHost -Entries example.com 
-        $trustedHosts = @( Get-TrustedHost )
-        Assert-True ($trustedHosts -contains 'example.com')
-        Assert-Equal 1 $trustedHosts.Count
+    It 'should add new host' {
+        Add-CTrustedHost -Entries example.com
+        $trustedHosts = @( Get-CTrustedHost )
+        ($trustedHosts -contains 'example.com') | Should -Be $true
+        $trustedHosts.Count | Should -Be 1
     }
 
-    function Test-ShouldAddMultipleHosts
-    {
-        Add-TrustedHost -Entry example.com,webmd.com
-        $trustedHosts = @( Get-TrustedHost )
-        Assert-True ($trustedHosts -contains 'example.com')
-        Assert-True ($trustedHosts -contains 'webmd.com')
-        Assert-Equal 2 $trustedHosts.Count
+    It 'should add multiple hosts' {
+        Add-CTrustedHost -Entry example.com,webmd.com
+        $trustedHosts = @( Get-CTrustedHost )
+        ($trustedHosts -contains 'example.com') | Should -Be $true
+        ($trustedHosts -contains 'webmd.com') | Should -Be $true
+        $trustedHosts.Count | Should -Be 2
     }
 
-    function Test-ShouldNotDuplicateEntries
-    {
-        Add-TrustedHost -Entry example.com
-        Add-TrustedHost -Entry example.com
-        $trustedHosts = @( Get-TrustedHost )
-        Assert-True ($trustedHosts -contains 'example.com')
-        Assert-Equal 1 $trustedHosts.Count
+    It 'should not duplicate entries' {
+        Add-CTrustedHost -Entry example.com
+        Add-CTrustedHost -Entry example.com
+        $trustedHosts = @( Get-CTrustedHost )
+        ($trustedHosts -contains 'example.com') | Should -Be $true
+        $trustedHosts.Count | Should -Be 1
     }
-    
-    function Test-ShouldSupportWhatIf
-    {
-        $preTrustedHosts = @( Get-TrustedHost )
-        Add-TrustedHost -Entry example.com -WhatIf
-        $trustedHosts = @( Get-TrustedHost )
-        Assert-True ($trustedHosts -notcontains 'example.com')
-        Assert-Equal $preTrustedHosts.Count $trustedHosts.Count
-        
+
+    It 'should support what if' {
+        $preTrustedHosts = @( Get-CTrustedHost )
+        Add-CTrustedHost -Entry example.com -WhatIf
+        $trustedHosts = @( Get-CTrustedHost )
+        ($trustedHosts -notcontains 'example.com') | Should -Be $true
+        $trustedHosts.Count | Should -Be $preTrustedHosts.Count
+
     }
 }
-
