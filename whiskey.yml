@@ -185,7 +185,6 @@ Tests:
     - Test\Import-Carbon.Tests.ps1
     - Test\Install-Junction.Tests.ps1
     - Test\New-Junction.Tests.ps1
-    - Test\New-RsaKeyPair.Tests.ps1
     - Test\Remove-DotNetAppSetting.Tests.ps1
     - Test\Remove-EnvironmentVariable.Tests.ps1
     - Test\Remove-GroupMember.Tests.ps1
@@ -243,7 +242,6 @@ Tests:
             - "*\\Import-Carbon.Tests.ps1"
             - "*\\Install-Junction.Tests.ps1"
             - "*\\New-Junction.Tests.ps1"
-            - "*\\New-RsaKeyPair.Tests.ps1"
             - "*\\Remove-DotNetAppSetting.Tests.ps1"
             - "*\\Remove-EnvironmentVariable.Tests.ps1"
             - "*\\Remove-GroupMember.Tests.ps1"

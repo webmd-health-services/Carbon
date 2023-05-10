@@ -15,6 +15,10 @@
 
 * `Install-CService` now writes commands it runs to the information stream instead of the verbose stream.
 
+### Deprecated
+
+* `New-CRsaKeyPair`: use `New-CRsaKeyPair` in the Carbon.Cryptography module instead.
+
 ### Fixed
 
 * `Uninstall-CService` writes an error if any service on the current computer can't be queried.
