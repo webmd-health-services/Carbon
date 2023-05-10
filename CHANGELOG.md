@@ -7,7 +7,7 @@
 
 ### Additions
 
-* `Get-CPermission` can now get permission son private keys stored using a CNG (Cryptographic Next Generation) provider.
+* `Get-CPermission` can now get permissions on private keys stored using a CNG (Cryptographic Next Generation) provider.
 * `Grant-CPermission` can now grant permissions on private keys stored using a CNG provider.
 * `Revoke-CPermission` can now grant permissions on private keys stored using a CNG provider.
 
@@ -17,7 +17,8 @@
 
 ### Deprecated
 
-* `New-CRsaKeyPair`: use `New-CRsaKeyPair` in the Carbon.Cryptography module instead.
+* `New-CRsaKeyPair`: use `New-CRsaKeyPair` in the
+  [Carbon.Cryptography](https://github.com/webmd-health-services/Carbon.Cryptography) module instead.
 
 ### Fixed
 
