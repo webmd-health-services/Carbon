@@ -11,8 +11,9 @@ BeforeAll {
     $script:originalTrustedHosts = $null
 }
 
+$skip = -not (Test-Path -Path 'WSMan:\localhost\Client\TrustedHosts')
 
-Describe 'Add-CTrustedHost' {
+Describe 'Add-CTrustedHost' -Skip:$skip {
     BeforeEach {
         $script:originalTrustedHosts = @( Get-CTrustedHost )
         Clear-CTrustedHost
@@ -25,7 +26,7 @@ Describe 'Add-CTrustedHost' {
         }
     }
 
-    It 'should add new host' {
+    It 'should add new host' -Skip:$skip {
         Add-CTrustedHost -Entries example.com
         $trustedHosts = @( Get-CTrustedHost )
         ($trustedHosts -contains 'example.com') | Should -Be $true

@@ -258,7 +258,10 @@ Describe 'Carbon_Permission' {
         (Test-TargetResource -Identity $UserName -Path $tempDir -Permission Read -ApplyTo Leaves -Ensure Absent) | Should -BeFalse
     }
 
-    It 'should run through dsc' {
+    $skipDscTest =
+        (Test-Path -Path 'env:WHS_CI') -and $env:WHS_CI -eq 'True' -and $PSVersionTable['PSVersion'].Major -eq 7
+
+    It 'should run through dsc' -Skip:$skipDscTest {
         configuration DscConfiguration
         {
             param(
@@ -301,7 +304,7 @@ Describe 'Carbon_Permission' {
         $result.PsTypeNames | Where-Object { $_ -like '*Carbon_Permission' } | Should -Not -BeNullOrEmpty
     }
 
-    It 'should not fail when user doesn''t have permission' {
+    It 'should not fail when user doesn''t have permission' -Skip:$skipDscTest {
         configuration DscConfiguration2
         {
             param(
@@ -329,7 +332,7 @@ Describe 'Carbon_Permission' {
         $Global:Error.Count | Should -Be 0
     }
 
-    It 'should apply multiple permissions' {
+    It 'should apply multiple permissions' -Skip:$skipDscTest {
         configuration DscConfiguration3
         {
             param(

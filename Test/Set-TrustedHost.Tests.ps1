@@ -11,7 +11,9 @@ BeforeAll {
     $script:originalTrustedHosts = $null
 }
 
-Describe 'Set-CTrustedHost' {
+$skip = -not (Test-Path -Path 'WSMan:\localhost\Client\TrustedHosts')
+
+Describe 'Set-CTrustedHost' -Skip:$skip {
     BeforeEach {
         $script:originalTrustedHosts = @( Get-CTrustedHost )
         Clear-CTrustedHost

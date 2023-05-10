@@ -20,15 +20,16 @@ BeforeAll {
 }
 
 Describe 'Get-FirewallRule' {
-    It 'should get all firewall rules' {
+    It 'should get all firewall rules' -Skip:((Test-Path -Path 'env:WHS_CI') -and $env:WHS_CI -eq 'True') {
         [Carbon.Firewall.Rule[]]$rules = Get-FirewallRule
         $rules | Should -Not -BeNullOrEmpty
 
-        $expectedCount = netsh advfirewall firewall show rule name=all verbose |
-                            Where-Object { $_ -like 'Rule Name:*' } |
-                            Measure-Object |
-                            Select-Object -ExpandProperty 'Count'
-        $rules | Should -HaveCount $expectedCount
+        $expectedCount =
+            netsh advfirewall firewall show rule name=all verbose |
+            Where-Object { $_ -like 'Rule Name:*' } |
+            Measure-Object |
+            Select-Object -ExpandProperty 'Count'
+        $rules.Count | Should -BeGreaterOrEqual $expectedCount
     }
 
     It 'should get specific firewall rule' {

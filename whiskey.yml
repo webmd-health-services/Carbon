@@ -137,9 +137,6 @@ Tests:
     Pester4:
         DescribeDurationReportCount: 20
         WarningAction: SilentlyContinue
-- PowerShell:
-    OnlyDuring: Build
-    Path: Start-CarbonTest.ps1
 # Quick Developer tests.
 - Pester4:
     OnlyBy: Developer
@@ -218,6 +215,9 @@ Tests:
         Run:
             Path: Test\*.Tests.ps1
             ExcludePath:
+            # DSC resource tests run in a different task.
+            - "*\\Carbon_*.Tests.ps1"
+            # Pester 4 tests.
             - "*\\Assert-FirewallConfigurable.Tests.ps1"
             - "*\\Bin.Tests.ps1"
             - "*\\Carbon.Shell.Command.Tests.ps1"
@@ -274,7 +274,20 @@ Tests:
         PassThru: true
 - PowerShell:
     OnlyDuring: Build
-    OnlyBy: Developer
+    Path: Start-CarbonTest.ps1
+# Run DSC tests *last* because they depend on a globally installed version of Carbon.
+- Pester:
+    Configuration:
+        TestResult:
+            Enabled: true
+            OutputPath: $(WHISKEY_OUTPUT_DIRECTORY)\pester5_dsc.xml
+            TestSuiteName: Carbon
+        Output:
+            Verbosity: detailed
+        Run:
+            Path: Test\Carbon_*.Tests.ps1
+- PowerShell:
+    OnlyDuring: Build
     Path: Complete-CarbonTest.ps1
 - PowerShell:
     OnlyBy: BuildServer

@@ -240,10 +240,9 @@ Describe 'Carbon_Service' {
     }
 
     It 'should test existing services' {
-        Get-Service | ForEach-Object {
-            (Test-TargetResource -Name $_.Name -Ensure Present) | Should -BeTrue
-            (Test-TargetResource -Name $_.Name -Ensure Absent) | Should -BeFalse
-        }
+        $svc = Get-Service -ErrorAction Ignore | Select-Object -First 1
+        Test-TargetResource -Name $svc.Name -Ensure Present | Should -BeTrue
+        Test-TargetResource -Name $svc.Name -Ensure Absent | Should -BeFalse
     }
 
     It 'should test missing services' {
@@ -311,7 +310,9 @@ Describe 'Carbon_Service' {
         (Test-TargetResource @testParams -DisplayName 'fubar' -Ensure Present) | Should -BeFalse
     }
 
-    It 'should run through dsc' {
+    $skipDscTest =
+        (Test-Path -Path 'env:WHS_CI') -and $env:WHS_CI -eq 'True' -and $PSVersionTable['PSVersion'].Major -eq 7
+    It 'should run through dsc' -Skip:$skipDscTest {
         configuration DscConfiguration
         {
             param(

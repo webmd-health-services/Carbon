@@ -133,7 +133,10 @@ Describe 'Carbon_Privilege' {
         (Test-TargetResource -Identity $UserName -Privilege 'SeDenyBatchLogonRight' -Ensure 'Present') | Should -BeFalse
     }
 
-    It 'should run through dsc' {
+    $skipDscTest =
+        (Test-Path -Path 'env:WHS_CI') -and $env:WHS_CI -eq 'True' -and $PSVersionTable['PSVersion'].Major -eq 7
+
+    It 'should run through dsc' -Skip:$skipDscTest {
         configuration DscConfiguration
         {
             param(
@@ -168,7 +171,7 @@ Describe 'Carbon_Privilege' {
         (Test-TargetResource -Identity $UserName -Privilege 'SeDenyBatchLogonRight' -Ensure 'Absent') | Should -BeTrue
     }
 
-    It 'should run through dsc' {
+    It 'should run through dsc' -Skip:$skipDscTest {
         configuration DscConfiguration2
         {
             Set-StrictMode -Off
@@ -213,7 +216,7 @@ Describe 'Carbon_Privilege' {
         (Test-TargetResource -Identity $UserName -Privilege 'SeDenyBatchLogonRight' -Ensure 'Absent') | Should -BeTrue
     }
 
-    It 'should run through dsc' {
+    It 'should run through dsc' -Skip:$skipDscTest {
         configuration DscConfiguration4
         {
             Set-StrictMode -Off

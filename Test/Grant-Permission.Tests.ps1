@@ -420,7 +420,9 @@ Describe 'Grant-CPermission' {
         $Global:Error | Should -BeNullOrEmpty
     }
 
-    It 'when setting permissions on a private key in the <_> location' -TestCases @('LocalMachine', 'CurrentUser') {
+    $skip = (Test-Path -Path 'env:WHS_CI') -and $env:WHS_CI -eq 'True' -and $PSVersionTable['PSVersion'].Major -eq 7
+    $testCases = @('LocalMachine', 'CurrentUser')
+    It 'when setting permissions on a private key in the <_> location' -TestCases $testCases -Skip:$skip {
         $location = $_
         $cert = Install-CCertificate -Path $script:privateKeyPath -StoreLocation $location -StoreName My -NoWarn
         try

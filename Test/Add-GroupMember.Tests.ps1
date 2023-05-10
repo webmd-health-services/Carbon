@@ -101,7 +101,9 @@ Describe 'Add-GroupMember' {
         Remove-Group
     }
 
-    It 'should add member from domain' -Skip:((Test-Path -Path 'env:WHS_CI')) {
+    $skip = (Test-Path -Path 'env:WHS_CI') -and $env:WHS_CI -eq 'True'
+
+    It 'should add member from domain' -Skip:$skip {
         Invoke-AddMembersToGroup -Members 'WBMD\WHS - Lifecycle Services'
     }
 

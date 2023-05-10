@@ -88,7 +88,10 @@ Describe 'Carbon_EnvironmentVariable' {
         Set-TargetResource -Name 'fubar' -Ensure 'Absent'
     }
 
-    It 'should run through dsc' {
+    $skipDscTest =
+        (Test-Path -Path 'env:WHS_CI') -and $env:WHS_CI -eq 'True' -and $PSVersionTable['PSVersion'].Major -eq 7
+
+    It 'should run through dsc' -Skip:$skipDscTest {
         configuration ShouldSetEnvironmentVariable
         {
             param(

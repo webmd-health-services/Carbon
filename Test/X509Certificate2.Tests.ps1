@@ -22,8 +22,8 @@ BeforeAll {
 
 Describe 'X509Certificate2' {
     It 'should create issued properties on x509 certificate2' {
-        $certPath = Join-Path $PSScriptRoot 'Certificates\CarbonTestCertificate.cer' -Resolve
-        $cert = Get-Certificate -Path $certPath -NoWarn
+        $certPath = Join-Path -Path $PSScriptRoot -ChildPath 'Certificates\CarbonTestCertificate.cer' -Resolve
+        $cert = Get-CCertificate -Path $certPath -NoWarn
         $cert.IssuedTo | Should -Not -BeNullOrEmpty
         $cert.IssuedBy | Should -Not -BeNullOrEmpty
 

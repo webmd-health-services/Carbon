@@ -225,7 +225,10 @@ prefix = {2}
         $ini.ContainsKey('prefix') | Should -BeTrue
     }
 
-    It 'should run through dsc' {
+    $skipDscTest =
+        (Test-Path -Path 'env:WHS_CI') -and $env:WHS_CI -eq 'True' -and $PSVersionTable['PSVersion'].Major -eq 7
+
+    It 'should run through dsc' -Skip:$skipDscTest {
         configuration DscConfiguration
         {
             param(

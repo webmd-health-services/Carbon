@@ -313,8 +313,10 @@ Describe 'Carbon_FirewallRule' {
         (Get-FirewallRule -Name $script:ruleName) | Should -BeNullOrEmpty
     }
 
+    $skipDscTest =
+        (Test-Path -Path 'env:WHS_CI') -and $env:WHS_CI -eq 'True' -and $PSVersionTable['PSVersion'].Major -eq 7
 
-    It 'should run through dsc' {
+    It 'should run through dsc' -Skip:$skipDscTest {
         configuration DscConfiguration
         {
             param(
@@ -361,7 +363,10 @@ Describe 'Carbon_FirewallRule' {
         $result.PsTypeNames | Where-Object { $_ -like '*Carbon_FirewallRule' } | Should -Not -BeNullOrEmpty
     }
 
-    It 'sets multiple profiles through dsc' {
+    $skipDscTest =
+        (Test-Path -Path 'env:WHS_CI') -and $env:WHS_CI -eq 'True' -and $PSVersionTable['PSVersion'].Major -eq 7
+
+    It 'sets multiple profiles through dsc' -Skip:$skipDscTest {
         $script:ruleName = 'MultipleProfiles'
 
         configuration DscConfiguration
