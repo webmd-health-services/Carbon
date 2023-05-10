@@ -1,21 +1,50 @@
 <!-- markdownlint-disable MD012 no-multiple-blanks-->
 <!-- markdownlint-disable MD024 no-duplicate-heading/no-duplicate-header -->
 
-# 2.13.0
+# Carbon Changelog
 
-## Additions
+## 2.14.0
+
+### Additions
+
+* `Get-CPermission` can now get permissions on private keys stored using a CNG (Cryptographic Next Generation) provider.
+* `Grant-CPermission` can now grant permissions on private keys stored using a CNG provider.
+* `Revoke-CPermission` can now grant permissions on private keys stored using a CNG provider.
+
+### Changes
+
+* `Install-CService` now writes commands it runs to the information stream instead of the verbose stream.
+
+### Deprecated
+
+* `New-CRsaKeyPair`: use `New-CRsaKeyPair` in the
+  [Carbon.Cryptography](https://github.com/webmd-health-services/Carbon.Cryptography) module instead.
+
+### Fixed
+
+* `Uninstall-CService` writes an error if any service on the current computer can't be queried.
+* `Get-CPowerShellModuleInstallPath` returns a Windows PowerShell path when run under PowerShell 7.
+* `Disable-CNtfsCompression`, `Enable-CNtfsCompression`, `Get-CFirewallRule`, and `Install-CService` fail under
+PowerShell 7.3.0+.
+* `Install-CService` fails if creating a service whose account password begins/ends with double-quotation marks or
+contains both a quote and space character.
+
+
+## 2.13.0
+
+### Additions
 
 * The `Invoke-CCimMethod` function for calling a method on an object that could be a WMI or CIM object.
 * The `Uninstall-CFileShare` function now accepts piped-in share objects (or any object with a `Name` property, really).
 * The `Write-CCimError` function for writing an error message based on the result object returned from a method call.
 
-## Changes
+### Changes
 
 * The `Install-CFileShare` now writes a more friendly message on PowerShell (Core) instead of "[Microsoft.Management.Infrastructure.CimInstance] does not contain a method named 'Delete'". We're unable to get `Install-CFileShare` to
 work under PowerShell (Core).
 * The `Install-CFileShare` function now writes changes its making to the information stream.
 
-## Deprecated
+### Deprecated
 
 These functions moved to the `Carbon.Windows.HttpServer` module. Update usages to use the `Carbon.Windows.HttpServer`
 module instead of `Carbon`.
@@ -67,13 +96,13 @@ All IIS functions moved to the `Carbon.IIS` module. Updates usages to use the `C
 * `Unlock-CIisConfigurationSection`
 * `Write-CIisVerbose`
 
-## Fixes
+### Fixes
 
 * Carbon no longer generates backwards-compatible shims for new functions.
 * `Install-CFileShare` wasn't preserving the file share's SACL, group, or owner on its security descriptor.
 
 
-# 2.12.0
+## 2.12.0
 
 * The `Install-CMsi`, `Get-CMsi`, and `Get-CProgramInstallInfo` functions have moved to a new `Carbon.Windows.Installer`
 module, now available on the PowerShell Gallery. Please switch to the new module and update usages. If you use these
@@ -84,25 +113,25 @@ Carbon.
 Framework load as RSA cryptographic next generation keys, which don't have an API for setting private key permissions.
 
 
-# 2.11.3
+## 2.11.3
 
 * Fixed: Carbon doesn't load Microsoft.Web.Administration assembly on PowerShell 7+.
 
 
-# 2.11.2
+## 2.11.2
 
 * Fixed: `Carbon.Firewall.Rule` type missing the `LocalIP` and `RemoteIP` properties (which are aliases for the
   `LocalIpAddress` and `RemoteIPAddress` properties, respectively).
 
 
-# 2.11.1
+## 2.11.1
 
 * Fixed: Carbon fails to import multiple times in the same session.
 * Fixed: Carbon fails when used as a nested module and Carbon is loaded globally or by nested in another module.
 * Fixed: Importing Carbon fails under PowerShell 4.
 
 
-# 2.11.0
+## 2.11.0
 
 * Fixed: Resolve-CPathCase fails on PowerShell Core.
 * New: 'Grant-Permission', 'Get-Permission', and 'Revoke-Permission' scripts now execute correctly on
@@ -110,19 +139,19 @@ non-Windows platforms.
 * Fixed: Install-CService now will update services when file permissions or user account privileges have changed.
 
 
-# 2.10.2
+## 2.10.2
 
 * Fixed: Carbon fails to import if IIS isn't installed.
 
 
-# 2.10.1
+## 2.10.1
 
 * Fixed: Carbon fails to import on PowerShell 4.
 
 
-# 2.10.0
+## 2.10.0
 
-## TL;DR Changes
+### TL;DR Changes
 
 * Fixed: Carbon's backward compatible aliases replaced with shim functions. Carbon no longer aggressively loads its
 functions.
@@ -151,7 +180,7 @@ the `-Force` switch to always install a certificate even if it already exists in
 exist in the destination store.
 * Fixed: `Install-Service` always writes a verbose message when installing a service.
 
-## Naming Collisions Solved (Again)
+### Naming Collisions Solved (Again)
 
 Fixed: In Carbon 2.7.0, we added a `C` prefix to all the Carbon functions, with aliases that used the old function
 names to preserve backwards-compatability. We didn't realize at the time that aliases have the highest precedence of
@@ -164,7 +193,7 @@ Because Carbon creates these backwards-compatible function shims dynamically, Ca
 function with the old name exists. If there is a name conflict between Carbon and another module, if you import that
 module first, Carbon won't export its shim function.
 
-## Carbon on PowerShell Core
+### Carbon on PowerShell Core
 
 We need parts of Carbon to work on PowerShell Core. The current size of Carbon makes that hard (over 200 functions and
 automated tests that take a long time). So, we're breaking Carbon into smaller modules. The new modules will all require
@@ -172,7 +201,7 @@ PowerShell 5.1+. If you use Carbon 2 and the new modules together, you'll get na
 when importing.
 The first two modules are already out: Carbon.Core and Carbon.Cryptography.
 
-## Carbon.Core
+### Carbon.Core
 
 Carbon.Core will contain all the functions that are foundational to all or most other future Carbon modules, or generic
 functions we feel are core to Carbon and/or PowerShell. It has no dependencies. The following functions were migrated to
@@ -187,7 +216,7 @@ that don't define those variables.
 * `Test-CPowerShell`: Replaces `Test-PowerShellIs32Bit` and `Test-PowerShellIs64Bit`. Tests edition, too. Use this
 function instead of `$PSVersionTable.PSEdition`. Handles when $PSVersionTable doesn't have the PSEdition property.
 
-## Carbon.Cryptography
+### Carbon.Cryptography
 
 Carbon.Crytography contains functions that are used when encrypting and decrypting strings. This is where certificate
 management funtions live. These function were migrated from Carbon:
@@ -200,13 +229,13 @@ management funtions live. These function were migrated from Carbon:
 * `Unprotect-CString`: works on Linux and macOS.
 
 
-# 2.9.4
+## 2.9.4
 
 * Fixed: Convert-XmlFile fails in PowerShell Core (thanks to
 [Joseph Block](https://github.com/JosephBlock) for the fix).
 
 
-# 2.9.3
+## 2.9.3
 
 * Fixed: Protect-CString and Unprotect-CString failed under PowerShell Core.
 * Fixed: Invoke-CPowerShell failed under PowerShell Core.
@@ -214,19 +243,19 @@ management funtions live. These function were migrated from Carbon:
 * Fixed: Unprotect-CString adds extra null bytes to the end of a decrypted string when using AES (`-Key`) encryption.
 
 
-# 2.9.2
+## 2.9.2
 
 * Fixed: when encryptiong/decrypting with a thumbprint, `Protect-String` and `Unprotect-String` take more time the more
 certificates you have in your stores.
 
 
-# 2.9.1
+## 2.9.1
 
 * Fixed: `Import-Carbon.ps1` fails if Carbon is already imported from a different location than the location from which
 it will import Carbon.
 
 
-# 2.9.0
+## 2.9.0
 
 * Carbon should now import in less than a second.
 * Fixed: `Grant-CHttpUrlPermission` documentation uses command named `Grant-CHttpUrlAclPermission`. (Fixes
@@ -244,13 +273,13 @@ variables for a specific user (they now use `Start-Job` instead of Carbon's `Inv
 * Fixed: `Get-CServiceConfiguration` fails with a terminating exception if a service doesn't exist.
 
 
-# 2.8.1
+## 2.8.1
 
 * Added verification information to Chocolatey package.
 * Updated copyright.
 
 
-# 2.8.0
+## 2.8.0
 
 * Carbon is now *importable* on PowerShell Core on all platforms. Most functions will not work on Linux/MacOS since they
 are Windows-specific. Many functions will also not work on PowerShell Core. The next major version of Carbon, 3, should
@@ -263,7 +292,7 @@ fully support PowerShell Core on Windows.
 * Fixed: looking up local users/groups is extremely slow on some machines.
 
 
-# 2.7.0
+## 2.7.0
 
 * Uninstall-Service now kills a service's process when that service stops but is actually still running. This should decrease the frequency of needing to reboot a computer when uninstalling a service.
 * Added `C` prefix to all Carbon commands, with aliases from old command names to new ones to maintain backwards compatability.
@@ -272,7 +301,7 @@ fully support PowerShell Core on Windows.
 * Fixed: Chocolatey uninstaller fails if the `PSModulePath` environment variable contains trailing or sequential semicolons.
 
 
-# 2.6.0
+## 2.6.0
 
 * `Enable-IisSecurityAuthentication` and `Disable-IisSecurityAuthentication` sometimes hang. We don't know why, but we're working around the problem. These functions no longer always apply a configuration change. Instead, they only enable/disable security authentication if its not already enabled/disabled.
 * `Install-Service` now outputs a verbose message showing the command line arguments used when calling `sc.exe` to install/update a service.
@@ -280,20 +309,20 @@ fully support PowerShell Core on Windows.
 * Fixed: `Get-HttpUrlAcl` returns no ACLs if any ACLs exist whose identities no longer exist.
 
 
-# 2.5.1, 2.5.2, 2.5.3, and 2.5.4 (3 June 2018)
+## 2.5.1, 2.5.2, 2.5.3, and 2.5.4 (3 June 2018)
 
 *Note*: 2.5.1 through 2.5.4 contain the same code and changes. We created new build and deployment automation that, due to bugs, required us to publish multiple versions.
 
-## Bug Fixes
+### Bug Fixes
 
 * Fixed: Carbon takes 10 to 20 seconds to load. In trying to detect if the Win32_OptionalFeature class is available on the current operating system, it was actually loading all the Win32_OptionalFeature instances. Oops. Now, it just checks for the existence of the Win32_OptionalFeature class. Load times should now be about two to three seconds. ([Fixes issue #35.](https://github.com/pshdo/Carbon/issues/35))
 * Import-Carbon.ps1 now hides verbose messages typically shown by Import-Module and Remove-Module cmdlets.
 * Fixed: `Assert-FirewallConfigurable` fails on Windows 10 due to firewall service display name change.
 
 
-# 2.5.0 (18 June 2017)
+## 2.5.0 (18 June 2017)
 
-## Enhancements
+### Enhancements
 
 * Added `DelayedAutoStart` boolean property to objects returned by `Get-ServiceConfiguration`. This flag is `true` when a service is set to start automatically, delayed. `False` otherwise. Added extended
 * The `Install-Service` function and the `Carbon_Service` DSC resource can now set a service's startup type to `Automatic (Delayed)`. Pass `Automatic` to the `StartupType` parameter and use the new `Delayed` switch. The `Delayed` switch is ignored unless `StartupType` is `Automatic`. Fixes [issue #216](https://bitbucket.org/splatteredbits/carbon/issues/216/community-add-automaticdelayed-in).
@@ -304,7 +333,7 @@ fully support PowerShell Core on Windows.
 * The `TargetPath` extended type property on directory (i.e. `System.IO.DirectoryInfo) objects now returns target paths when a directory is a symbolic link.
 * `Initiazlie-Lcm` can't be used on Windows Server 2016 and later to put the DSC local configuration manager into pull mode. `Initialize-Lcm` now writes an error when you try.
 
-## Bug Fixes
+### Bug Fixes
 
 * `Install-Service` and the `Carbon_Service` DSC resource write errors when a service is running and its startup type is changed to `Disabled`.
 * The `Carbon_ScheduledTask` DSC resource writes incorrect information to verbose log when the current and desired credential for the scheduled task are different.
@@ -314,9 +343,9 @@ fully support PowerShell Core on Windows.
 * Fixed: `Get-PowerShellModuleInstallPath` returns nothing when run under 32-bit (x86) PowerShell on 64-bit Windows.Fixed: `Get-PowerShellModuleInstallPath` returns nothing when run under 32-bit (x86) PowerShell on 64-bit Windows.
 
 
-# 2.4.1 (21 February 2017)
+## 2.4.1 (21 February 2017)
 
-## Bug Fixes
+### Bug Fixes
 
 * Fixed: `Carbon_Permission` fails when revoking permissions and the `Permissions` property doesn''t have a value.
 * Fixed: `Protect-String` doesn't convert secure strings properly so they get encrypted with extra bytes in them.
@@ -332,16 +361,16 @@ fully support PowerShell Core on Windows.
 * Fixed: `Get-ScheduledTask` doesn't handle when a scheduled task doesn't exist on Windows 2008.
 
 
-# 2.4.0 (9 November 2016)
+## 2.4.0 (9 November 2016)
 
-## Enhancements
+### Enhancements
 
 * `Protect-String` can now encrypt a `SecureString`. The `String` parameter's type was changed to `[object]`. When you pass in a `SecureString`, it is converted to an array of bytes, encrypted, and the array of bytes are cleared from memory.
 * Renamed `Protect-Acl` to `Disable-AclInheritance` to make it clearer what the function does. Created a `Protect-Acl` alias in place to preserve backwards-compatability.
 * `Disable-AclInheritance` only disables inheritance if it is currently enabled.
 * Created `Enable-AclInheritance` to re-enable access rule inheritance on file system and registry ACLs. This function is paired with `Disable-AclInheritance`.
 
-## Bug Fixes
+### Bug Fixes
 
 * Fixed: `Get-ProgramInstallInfo` fails when a program's `Version` registry key value can't be converted into a `Version` object.
 * Fixed: `Test-Service` failed to detect if a device driver service is installed.
@@ -350,9 +379,9 @@ fully support PowerShell Core on Windows.
 * Fixed: `Get-PathProvider` fails when passed a fully-qualified registry key PowerShell path, e.g. `Microsoft.PowerShell.Core\Registry::HKEY_CURRENT_USER\Software`.
 
 
-# 2.3.0 (29 September 2016)
+## 2.3.0 (29 September 2016)
 
-## Enhancements
+### Enhancements
 
 * `Protect-String` can now encrypt with a key, password, or passphrase (i.e. it can now encrypt with symmetric encryption).
 * `Unprotect-String` can now decrypt with a key, password, or passphrase (i.e. it can now decrypt using symmetric encryption).
@@ -370,7 +399,7 @@ fully support PowerShell Core on Windows.
   * It now runs encoded PowerShell commands. Pass the string of PowerShell code with the `Command` parameter and use the `-Encode` switch.
   * It now runs scripts and commands as another user. Use the `Credential` parameter to pass the user's credentials along with the `FilePath` and `Command` parameters to run scripts and commands, respectively.
 
-## Bug Fixes
+### Bug Fixes
 
 * Fixed: `Set-RegistryKeyValue` fails when `-String` parameter's value is `$null` or empty ([fixes issue #211](https://bitbucket.org/splatteredbits/carbon/issues/211/set-registrykeyvalue-null-string-invalid)).
 * Fixed: Can't import Carbon in a 32-bit PowerShell 4 session on a 64-bit operating system ([fixes issue #199](https://bitbucket.org/splatteredbits/carbon/issues/199/community-issue-importing-carbon-on-x64)).
@@ -381,9 +410,9 @@ fully support PowerShell Core on Windows.
 * Fixed: `Install-ScheduledTask` fails when creating a task that runs during a specific week of the month on Sundays. (You're going to love this: the underlying int value for `[DayOfWeek]::Sunday` is `0`, so when testing if a `DayOfWeek` typed variable set to `Sunday` has a value, it returns `$false`. This made `Install-ScheduledTask` add the `/D` parameter without a value.
 
 
-# 2.2.0 (11 May 2016)
+## 2.2.0 (11 May 2016)
 
-## Enhancements
+### Enhancements
 
 * Aded a `LiteralPath` parameter to `Test-PathIsJunction` for testing paths that contain wildcard characters (e.g. `[`, `]`, etc.).
 * `Remove-Junction` now supports removing multiple junctions with wildcards.
@@ -399,7 +428,7 @@ fully support PowerShell Core on Windows.
   * `Resolve-WindowsFeatureName`
   * `Uninstall-WindowsFeature`
 
-## Bug Fixes
+### Bug Fixes
 
 * Fixed: `Add-GroupMember`, over PowerShell remoting, fails to add a member to groups that have non-local users/groups (fixes [issue #187: Add-GroupMember fails when using PowerShell Remoting](https://bitbucket.org/splatteredbits/carbon/issues/187/add-groupmember-fails-when-using))
 * Fixed: `Remove-GroupMember`, over PowerShell remoting, fails to remove a member from groups that have non-local users/groups.
@@ -418,9 +447,9 @@ fully support PowerShell Core on Windows.
 * Fixed: `Set-HostsEntry` fails to stop when the hosts file is in use and can't be read.
 
 
-# 2.1.1 (25 February 2016)
+## 2.1.1 (25 February 2016)
 
-## Bug Fixes
+### Bug Fixes
 
 * Fixed: unable to publish module to PowerShell Gallery because `RequiredAssemblies` module manifest data used an absolute path generated with `Join-Path` and `$PSScriptRoot`, which aren't allowed in module manifests.
 * Fixed: missing PowerShell Gallery tags, license URI, project URI, and release notes metadata.
@@ -431,9 +460,9 @@ fully support PowerShell Core on Windows.
 * Fixed: `Remove-IniEntry` fails to remove last INI entry in a file ([issue #179](https://bitbucket.org/splatteredbits/carbon/issues/179)).
 
 
-# 2.1.0 (8 February 2016)
+## 2.1.0 (8 February 2016)
 
-## New Functions
+### New Functions
 
 * `Get-HttpUrlAcl`: uses Windows API to return HTTP URL ACLs; replaces the `netsh http show urlacl` command.
 * `Grant-HttpUrlPermission`: uses Windows API to grant listen/delegate permissions on HTTP URLs; replaces the `netsh http add urlacl` command.
@@ -443,11 +472,11 @@ fully support PowerShell Core on Windows.
 * `Uninstall-Group`: uses the `DirectoryServices.AccountManagement` .NET API to remove a group, if it exists.
 * `Test-GroupMember`: uses the `DirectoryServices.AccountManagemetn` .NET API to test if a principal is a member of a group.
 
-## New DSC Resource
+### New DSC Resource
 
 * `Carbon_Group`: resource for configuring local groups.
 
-## Bug Fixes
+### Bug Fixes
 
 * Fixed: `Install-FileShare` always re-configures existing shares; it doesn't properly detect permissions that need to be removed.
 * Fixed: `Set-IniEntry` fails to preserve unicode characters with diacritics in INI entry names and values.
@@ -460,7 +489,7 @@ fully support PowerShell Core on Windows.
 * Fixed: `Add-GroupMember` and `Remove-GroupMember` fail when adding `Everyone` or `NT Service\*` accounts to a group ([fixes issue #177](https://bitbucket.org/splatteredbits/carbon/issues/177/add-groupmembers-201-doesnt-like-vsa-names)).
 * Fixed: `Get-SheduledTask` writes an error if a scheduled task's XML definition is for an executable and doesn't contain an arguments element.
 
-## Other Improvements
+### Other Improvements
 
 * Obsolete function parameters will no longer show in Intellisense (added the `DontShow` parameter property).
 * `Test-AdminPrivilege`: changed its verbose message to a debug message.
@@ -483,22 +512,22 @@ fully support PowerShell Core on Windows.
 * `Install-Group` only saves changes to a group if changes were made.
 
 
-# 2.0.1 (19 October 2015)
+## 2.0.1 (19 October 2015)
 
 * Fixed: errors importing Carbon when IIS not installed on Windows 2012 R2 and Windows 10 (fixes [issue 168: Cannot import Carbon 2.0 module due to issues with IIS related functionality](https://bitbucket.org/splatteredbits/carbon/issues/168)).
 * Fixed Carbon copyright statements.
 * Improved Carbon's module description.
 
 
-# 2.0.0 (10 October 2015)
+## 2.0.0 (10 October 2015)
 
-## Overview
+### Overview
 
 Carbon version 2.0 is a *huge* release, with lots of new enhancements and bug fixes. We hope you like them. Carbon 2.0 now requires PowerShell 4, so it is not backwards-compatabile with Carbon 1.x. Because of this, we made some additional backwards-incompatible changes. See the `Upgrade Instructions` section for things to look out for.
 
 If you're upgrading from a previous 2.0 alpha release, you'll want to review the changes since your alpha version (found after the *Upgrade Instructions* section). We improved backwards-compatability with Carbon 1.x since the last alpha release, but that broke compatability with the alphas.
 
-## Upgrade Instructions
+### Upgrade Instructions
 
 Make sure you're running PowerShell 4.
 
@@ -549,7 +578,7 @@ We've added parameter validation to some functions. This shouldn't impact anybod
 
 All Carbon functions now respect each caller's common parameters (e.g. `-Verbose`, `-ErrorAction`, etc.). This means if you pass a common parameter to a script that calls a Carbon function, that Carbon function will use that common parameter. This may or may not impact you.
 
-## Bug Fixes
+### Bug Fixes
 
 * Carbon's `System.ServiceProcess.ServiceController` extended type data causes errors when PowerShell formats `System.ServiceProcess.ServiceController` objects that represent services on remote computers.
 * `Compress-Item` doesn't remove handled errors from global error array.
@@ -564,9 +593,9 @@ All Carbon functions now respect each caller's common parameters (e.g. `-Verbose
 * `Set-HostsEntry` fails to preserve whitespace if existing lines end with a comment/description. Thanks to [Konstantin Ushenin](https://vk.com/kostanew) for the fix.
 
 
-## Enhancements
+### Enhancements
 
-### General
+#### General
 
 * Carbon now requires PowerShell 4.
 * `Import-Carbon.ps1` is more intelligent about when it tries to re-load Carbon. It will force a re-import of Carbon if any of Carbon's files have changed or the version has changed.
@@ -585,7 +614,7 @@ All Carbon functions now respect each caller's common parameters (e.g. `-Verbose
 * Created default, table-based display formats for `System.DirectoryServices.AccountManagement.UserPrincipal`, `System.DirectoryServices.AccountManagement.GroupPrincipal`, `Microsoft.Web.Administration.ApplicationPool`, `Microsoft.Web.Administration.Site`, and `Microsoft.Web.Administration.Application` objects.
 * Re-organized Carbon's internal directory structure. You shouldn't be reaching into Carbon's internals, so this shouldn't matter, but wanted to let everyone know just in case.
 
-### New Functions
+#### New Functions
 
 * `Clear-DscLocalResourceCache` clears the local LCM's DSC resource. This makes developing resources easier.
 * `Clear-MofAuthoringMetadata` removes authoring metadata from .mof files.
@@ -610,7 +639,7 @@ All Carbon functions now respect each caller's common parameters (e.g. `-Verbose
 * `Uninstall-FileShare` uninstalls/removes a file share, if it exists.
 * `Write-DscError` writes DSC `ErrorLogRecord` objects as errors.
 
-### New DSC Resources
+#### New DSC Resources
 
 * `Carbon_EnvironmentVariable` creates/removes machine-level environment variables.
 * `Carbon_FirewallRule` configures firewall rules.
@@ -620,7 +649,7 @@ All Carbon functions now respect each caller's common parameters (e.g. `-Verbose
 * `Carbon_ScheduledTask` configures scheduled tasks with `schtasks.exe`.
 * `Carbon_Service` configures Windows services.
 
-### Added `PassThru` Switches
+#### Added `PassThru` Switches
 
 Added a `PassThru` switch to the following functions, which will return objects of the given type:
 
@@ -634,7 +663,7 @@ Added a `PassThru` switch to the following functions, which will return objects 
 * `Install-User`: `System.DirectoryServices.AccountManagement.UserPrincipal`, representing the user.
 * `Set-SslCertificateBinding`: `Carbon.Certificates.SslCertificateBinding`, representing the configured binding.
 
-### No More Console Output
+#### No More Console Output
 
 The following functions no longer return the console output of the program each one runs. Instead, the output is written to the verbose stream (i.e. use the `-Verbose` switch to see it).
 
@@ -645,7 +674,7 @@ The following functions no longer return the console output of the program each 
 * `Set-SslCertificateBinding`
 * `Uninstall-Service`
 
-### Obsolete Functions and Parameters
+#### Obsolete Functions and Parameters
 
 The following functions are now obsolete. Please don't use them and stop using them if you are. They will be removed from a future major version of Carbon. You'll get warnings if you use them.
 
@@ -661,14 +690,14 @@ The following functions now have obsolete parameters, which will be removed from
 * `Install-User's` `UserName` and `Password` parameters. Use the new `Credential` parameter instead.
 * `Set-RegistryKeyValue`'s `Quiet` parameter. Please remove usages.
 
-### Renamed Functions
+#### Renamed Functions
 
 The following functions were renamed, but with backwards-compatible aliases in place, so you shouldn't have to change any code.
 
 * `Invoke-WindowsInstaller` -> `Install-Msi`
 * `Install-SmbShare` -> `Install-FileShare`
 
-### Switch to System.DirectoryServices.AccountManagement API for User/Group Management
+#### Switch to System.DirectoryServices.AccountManagement API for User/Group Management
 
 The following functions were re-written to use the `System.DirectoryServices.AccountManagement` API, introduced in .NET 3.5.
 
@@ -678,7 +707,7 @@ The following functions were re-written to use the `System.DirectoryServices.Acc
 * `Test-User`
 * `Uninstall-User`
 
-### Miscellaneous Changes
+#### Miscellaneous Changes
 
 * `Get-IisAppPool`
   * Now return all application pools installed on the local computer when called with no parameters.
@@ -729,9 +758,9 @@ The following functions were re-written to use the `System.DirectoryServices.Acc
 * `Initialize-Lcm`
   * Added support for PowerShell 5: `RefreshIntervalMinutes` default value changed to from 15 to 30; `RefreshIntervalMinutes` minimum value is now 30; `ConfigurationFrequency`'s minimum value is now 1 (from 2).
 
-## Changes Since `alpha.26`
+### Changes Since `alpha.26`
 
-### Enhancements
+#### Enhancements
 
 * Includes all changes made in version 1.9.0.
 * PowerShell 4 is now required. Carbon won't even import under PowerShell 3.
@@ -739,14 +768,14 @@ The following functions were re-written to use the `System.DirectoryServices.Acc
 * Created a new `Carbon_ScheduledTask` DSC resource for managing scheduled tasks.
 * The `Version` property on the objects returned by `Get-ProgramInstallInfo` is now a proper .NET `Version` object instead of an integer.
 
-### Bug Fixes
+#### Bug Fixes
 
 * `Carbon_Permission` DSC resource fails when assigning multiple permissions
 * Grant-Permission fails when clearing multiple existing, non-inherited permission on an item.
 
-## Changes Since `alpha.31`
+### Changes Since `alpha.31`
 
-### Bug Fixes
+#### Bug Fixes
 
 * `Set-HostsEntry` fails to preserve whitespace if existing lines end with a comment/description. Thanks to [Konstantin Ushenin](https://vk.com/kostanew) for the fix.
 * Carbon's `System.ServiceProcess.ServiceController` extended type data causes errors when PowerShell formats `System.ServiceProcess.ServiceController` objects that represent services on remote computers.
@@ -755,7 +784,7 @@ The following functions were re-written to use the `System.DirectoryServices.Acc
 * `Compress-Item` doesn't remove handled errors from global error array.
 * `Grant-Permission` fails with an unhelpful error message if it is unable to get the ACL on a private key.
 
-### Enhancements
+#### Enhancements
 
 * `Import-Carbon.ps1` is more intelligent about when it tries to re-load Carbon. It will force a re-import of Carbon if any of Carbon's files have changed or the version has changed.
 * Created `Uninstall-Junction` for uninstalling a junction in an idempotent way (i.e. without errors). Thanks to [Konstantin Ushenin](https://vk.com/kostanew) for the contribution.
@@ -816,56 +845,56 @@ The following functions were re-written to use the `System.DirectoryServices.Acc
 * `Uninstall-Service` no longer returns sc.exe stdout.
 
 
-# 1.9.0 (8 November 2014)
+## 1.9.0 (8 November 2014)
 
 This is the last minor release for version 1.0. Future 1.0-compatible releases will *only* contain bug fixes, no new features. It takes too much time to maintain two versions, and I'd rather spend my time getting 2.0 out the door.  Carbon 2.0 will require PowerShell 4.0, so start planning.
 
-## Enhancements
+### Enhancements
 
-### Certificates
+#### Certificates
 
 * Added `KeyStorageFlags` parameter to `Get-Certificate` when loading a certificate from a file for better control when storing the certificate.
 
-### Hosts File
+#### Hosts File
 
 * `Set-HostsEntry` now handles writing to an in-use/locked hosts file, retrying up to 10 times before writing an error, waiting a random amount of time (from 0 to 1000 milliseconds) between each retry attempt.
 
-### IIS
+#### IIS
 
 * `Get-IisMimeMap`, `Remove-IisMimeMap`, and `Set-IisMimeMap` now support managing MIME types for websites, virtual directories, and applications.
 
-### Scheduled Tasks
+#### Scheduled Tasks
 
 * Created `Get-ScheduledTask` function for getting the scheduled tasks on the local computer using `schtasks.exe`.
 * Created `Install-ScheduledTask` function for installing a scheduled task using `schtasks.exe`.
 * Created `Test-ScheduledTask` function for testing if a scheduled tasks on the local computer exists using `schtasks.exe`.
 * Created `Uninstall-ScheduledTask` function for deleting a scheduled task using `schtasks.exe`.
 
-### Services
+#### Services
 
 * `Install-Service` now supports setting a command to run when a service fails.
 
-## Bug Fixes
+### Bug Fixes
 
-### General
+#### General
 
 * `Import-Carbon` fails when `-WhatIf` switch is used.
 * Importing Carbon no longer writes an error if the `PATH` environment variable contains a path to a non-existent drive (issue [#134](https://bitbucket.org/splatteredbits/carbon/issue/134/import-carbon-fails-with-path-environment)).
 
-### INI
+#### INI
 
 * `Set-IniEntry` fails when adding the first section-less setting to a file.
 
-### Internet Explorer
+#### Internet Explorer
 
 * `Enable-IEActivationPermission` no longer returns the `hkcr:` drive.
 
-### Security
+#### Security
 
 * Fixed an error that occurs when setting permissions on a private key fails: the error message is created using an invalid format string (issue [#133](https://bitbucket.org/splatteredbits/carbon/issue/133/set-cryptokeysecurity-invalid-parameters)).
 * Fixed an exception that gets thrown when setting a private key's permissions and the only certificate key is AT_SIGNATURE (issue [#132](https://bitbucket.org/splatteredbits/carbon/issue/132/set-cryptokeysecurity-throws-exception)).
 
-### Services
+#### Services
 
 * `Install-Service` stops Windows service even when no settings/configuration has changed (fixes issue [#131](https://bitbucket.org/splatteredbits/carbon/issue/131/install-service-always-restarts-service)).
 * `Install-Service` didn't clear services depended on during a re-install.
@@ -873,11 +902,11 @@ This is the last minor release for version 1.0. Future 1.0-compatible releases w
 * `Uninstall-Service` hard codes the path to the Windows directory (fixes issue [#143](https://bitbucket.org/splatteredbits/carbon/issue/143/uninstall-service-script-has-hard-coded)). Thanks to [Travis Mathison](https://bitbucket.org/tdmathison) for the fix.
 
 
-# 1.8.0 (7 September 2014)
+## 1.8.0 (7 September 2014)
 
-## Enhancements
+### Enhancements
 
-### General
+#### General
 
 * The following functions now write messages with `Write-Verbose` instead of `Write-Host`. See [Write-Host Considered Harmful](http://www.jsnover.com/blog/2013/12/07/write-host-considered-harmful/).
   * `Add-GroupMember`
@@ -932,7 +961,7 @@ This is the last minor release for version 1.0. Future 1.0-compatible releases w
   * Assert-WindowsFeatureFunctionsSupported
   * Resolve-WindowsFeatureName
 
-### Certificates
+#### Certificates
 
 * Improving error handling when `Get-Certificate` fails to load a certificate from a file.
 * `Install-Certificate` now supports installing with an `X509Certificate2` object instead of just a path to a certificate.
@@ -944,18 +973,18 @@ This is the last minor release for version 1.0. Future 1.0-compatible releases w
 * `Get-Certificate`'s `Path` parameter now supports wildcards and certificate provider paths, e.g. `cert:\`.
 * `Get-Certificate` now writes an error if a certificate isn't found when getting a certificate by its path.
 
-### Computer
+#### Computer
 
 * Created `Get-ProgramInstallInfo` function to get the information displayed by the `Programs and Features` UI.
 
-### Cryptography
+#### Cryptography
 
 * `Protect-String` can now encrypt strings as a specific user. Use the `Credential` parameter.
 * Created `New-RsaKeyPair` for creating public/private RSA key pair using `makecert.exe` and `pkv2pfx.exe`. Requires that you've installed a Windows SDK.
 * `Protect-String` can now encrypt strings using an RSA public key.
 * `Unprotect-String` can now decrypt strings using an RSA private key.
 
-### File System
+#### File System
 
 * `Disable-NtfsCompression`: improved error handling.
 * `Enable-NtfsCompression`: improved error handling.
@@ -964,7 +993,7 @@ This is the last minor release for version 1.0. Future 1.0-compatible releases w
 * Created `Expand-Item` function for decompressing a ZIP file.
 * `New-TempDirectory` now supports adding a prefix to the temporary directory's name, so you can more easily track down those scripts/processes that don't clean up after themselves.
 
-### Firewall
+#### Firewall
 
 * `Disable-FirewallStatefulFtp`: improved error handling.
 * Added `Name` and `LiteralName` parameters to `Get-FirewallRule` to return specific rules instead of all of them.
@@ -972,17 +1001,17 @@ This is the last minor release for version 1.0. Future 1.0-compatible releases w
 * Added default table format for `Get-FirewallRule` output.
 * `Get-FirewallRule` now returns additional rule information: interface type, security, source, description, program, and service. Who knew `netsh advfirewall firewall rule show` had a `verbose` switch? RTFM.
 
-### INI
+#### INI
 
 * `Remove-IniEntry` now handles case-sensitive INI files.
 * `Set-IniEntry` now handles case-sensitive INI files.
 * `Split-Ini` now handles case-sensitive INI files.
 
-### MSI
+#### MSI
 
 * `Invoke-WindowsInstaller`: improved error message if installation fails.
 
-### Security
+#### Security
 
 * Creating `Revoke-Permission` function for revoking a user's permission to a file, directory, registry key, or certificate's private key/key container.
 * Creating `ConvertTo-ContainerInheritanceFlags` function for converting  `System.Security.AccessControl.InheritanceFlags` and `System.Security.AccessControl.PropagationFlag` values into a `Carbon.Security.ContainerInheritanceFlags` value.
@@ -990,7 +1019,7 @@ This is the last minor release for version 1.0. Future 1.0-compatible releases w
 * `Grant-Permission` now supports granting permissions on private keys//key containers.
 * `Test-Permission` now supports testing permissions on certificate private keys/key containers.
 
-### Services
+#### Services
 
 * Created `Get-ServiceConfiguration` function for loading a service's configuration: description, account name/username, failure actions, etc.
 * Added the following extended type data to `System.ServiceController.Service`:
@@ -1015,9 +1044,9 @@ This is the last minor release for version 1.0. Future 1.0-compatible releases w
   * UserName
 
 
-## Bug Fixes
+### Bug Fixes
 
-### General
+#### General
 
 * Importing Carbon gives an error if `PATH` environment variable contains an empty path.
 * Improved the error handling in the following functions so they properly catch exceptions and write friendlier errors:
@@ -1025,97 +1054,97 @@ This is the last minor release for version 1.0. Future 1.0-compatible releases w
   * `Grant-Privilege`
   * `Revoke-Privilege`
 
-### Certificates
+#### Certificates
 
 * `Get-Certificate` couldn't open CA/CertificateAuthority store (fixes issue [#130](https://bitbucket.org/splatteredbits/carbon/issue/130/get-certificate-doesnt-find-any)).
 * Extended script property `DisplayName` on `X509Store` objects returning wrong store name for custom stores, now returns an empty string.
 
-### File System
+#### File System
 
 * `Disable-NtfsCompression` now *really* supports multiple paths.
 * `Enable-NtfsCompression` now *really* supports multiple paths.
 
-### Path
+#### Path
 
 * `Resolve-PathCase` didn't work under Windows 2012 R2.
 
-### Users and Groups
+#### Users and Groups
 
 * The `Carbon.Identity.FindByName` method and the `Resolve-IdentityName` and `Test-Identity` functions now handle identity names with `.` for the domain/machine name, e.g. `.\Administrator`.
 * The `Carbon.Identity.FullName` property returns the wrong value when domain is empty/null, e.g. `Resolve-IdentityName -Name 'Everyone'` returns `\Everyone`, when it should return `Everyone`.
 * The `Carbon.Identity.FindByName` method and the `Resolve-IdentityName` and `Test-Identity` functions unable to resolve `LocalSystem` account (which is actually `NT AUTHORITY\SYSTEM`).
 
 
-# 1.7.0 (30 April 2014)
+## 1.7.0 (30 April 2014)
 
 There is now [a Carbon support mailing list](https://groups.google.com/forum/#!forum/carbonps).
 
-## Enhancements
+### Enhancements
 
-### General
+#### General
 
 * Import-Carbon.ps1 now supports the `-WhatIf` switch.
 * Import-Carbon.ps1 now hides verbose log messages when removing/importing Carbon even when supplying the `-Verbose` switch because I think the verbose output is too verbose and not helpful at all.
 * Import-Carbon.ps1 now supports adding a prefix when importing the Carbon module (with the `Prefix` parameter) to avoid name collisions and [follow best practices](http://blogs.msdn.com/b/powershell/archive/2014/04/07/what-s-in-a-name-using-the-ps-prefix.aspx).
 
-### Certificates
+#### Certificates
 
 * `Get-CertificateStore` now supports non-standard, custom certificate stores.
 * `Get-Certificate` now supports non-standard, custom certificate stores.
 * `Install-Certificate` now supports non-standard, custom certificate stores.
 * `Uninstall-Certificate` now supports non-standard, custom certificate stores.
 
-## Bug Fixes
+### Bug Fixes
 
-### General
+#### General
 
 * No more silent errors when importing Carbon on Windows 2012 R2.
 
-### Certificates
+#### Certificates
 
 * `Get-Certificate` no longer writes a silent error when a certificate does not exist. Instead, no error is written.
 
-### File System
+#### File System
 
 * `Install-Junction` fails when target path is hidden.
 * `Test-NtfsCompression` fails when file/directory is hidden.
 * `Test-PathIsJunction` fails when tested directory is hidden.
 
-### Security
+#### Security
 
 * `Grant-Permission` fails when item is hidden.
 * `Grant-Permission` doesn't handle non-existent paths, causing cascading errors.
 * `Test-Permission` always returns `$false` when testing leaf-level permissions and the `ApplyTo` parameter is provided, i.e. it doesn't ignore inheritance/propagation flags on leaves.
 
 
-# 1.6.0 (1 February 2014)
+## 1.6.0 (1 February 2014)
 
-## Bug Fixes
+### Bug Fixes
 
-### Certificates
+#### Certificates
 
 * `Get-Certificate` fails when passed a relative path.
 * `Install-Certificate` fails when passed a relative path.
 
-### File System
+#### File System
 
 * `Remove-Junction` doesn't delete a junction when given a relative path to the junction.
 
-### Services
+#### Services
 
 * `Install-Service` doesn't properly resolve a service's path.
 
-### Shares
+#### Shares
 
 * Fixed `Install-SmbShare` example to use correct syntax. [#111.](https://bitbucket.org/splatteredbits/carbon/issue/111)
 
-## Enhancements
+### Enhancements
 
-### Hosts File
+#### Hosts File
 
 * Created `Remove-HostsEntry` function for removing hostnames from a hosts file.
 
-### IIS
+#### IIS
 
 * Created `Join-IisVirtualPath` for joining paths used by the IIS APIs.
 * Renamed all IIS `Path` parameters which represented virtual paths to `VirtualPath` (with backwards-compatible aliases):
@@ -1143,32 +1172,32 @@ There is now [a Carbon support mailing list](https://groups.google.com/forum/#!f
   * `Install-IisVirtualDirectory`
   * `Install-IisWebsite`
 
-### .NET
+#### .NET
 
 * Created `Test-DotNet` for testing if v2 or v4 of the .NET framework is installed.
 
-### Path
+#### Path
 
 * Created `Get-PathProvider` function for getting a path's PowerShell provider.
 
-### PowerShell
+#### PowerShell
 
 * Updated `Invoke-PowerShell` to test if the appropriate .NET framework is installed if the user chooses an explicit runtime to use.
 
-### Security
+#### Security
 
 * Created `Test-Permission` function for checking if a user/group has a set of permissions and, optionally, a set of inheritance and propagation flags on a file, directory, or registry key.
 * `Test-Permission` now automatically includes the `Synchronize` permission when checking for exact permissions, since this permission is always on and can never be removed from a file/directory.
 
-### Services
+#### Services
 
 * `Install-Service` no longer requires a password, in order to support [managed service accounts and virtual accounts](http://technet.microsoft.com/en-us/library/dd548356.aspx).  We have no idea if this works, since we can't test locally.  Please let us know if this fix works for you. [#114](https://bitbucket.org/splatteredbits/carbon/issue/114)
 
-### Users and Groups
+#### Users and Groups
 
 * Updated `Install-User` to support passwords longer than 14 characters.  Thanks to [James Crowley](http://www.jamescrowley.co.uk/) for the fix.
 
-### Windows Features
+#### Windows Features
 
 * Marked Assert-WindowsFeatureFunctionsSupported as an internal function.  Please don't use.  It will be removed from future versions of PowerShell.
 * Updated `Test-WindowsFeature` to work on Windows 8/2012.
@@ -1177,90 +1206,90 @@ There is now [a Carbon support mailing list](https://groups.google.com/forum/#!f
 * Updated `Resolve-IdentityName` to use `[Carbon.Identity]::FindByName` to find identities so it no longer throws exceptions when an identity can't be found.
 
 
-# 1.5.1 (3 October 2013)
+## 1.5.1 (3 October 2013)
 
-## Bug Fixes
+### Bug Fixes
 
-### IIS
+#### IIS
 
 * `Set-IisWebsiteID` wasn't consistently starting a website after changing its ID.
 
-### Shares
+#### Shares
 
 * `Install-SmbShare` has an unused variable which uses an undefined variable to create its value.  When running in strict mode, PowerShell writes an error about using the undefined variable.  Removed the unused variable.
 
 
-# 1.5.0 (6 September 2013)
+## 1.5.0 (6 September 2013)
 
-## Enhancements
+### Enhancements
 
-### IIS
+#### IIS
 
 * `Set-IisWebsiteID` now attempts to start a website whose ID has changed, since IIS stops a website whenever its ID changes.
 
-### Network
+#### Network
 
 * Added `Get-IPAddress` function for getting the IPv4/IPv6 addresses currently in use on the local computer's network interfaces.
 * Added `Test-IPAddress` function for testing if an IP address is in use on one the local computer's network interfaces.
 
-### Path
+#### Path
 
 * Added `Test-UncPath` function for testing if a path is a UNC or not.
 
-### PowerShell
+#### PowerShell
 
 * `Invoke-PowerShell` now runs script blocks in PowerShell 3 under a v2.0 CLR.
 
-### Shares
+#### Shares
 
 * `Install-SmbShare` now creates the share's directory if it doesn't exist.
 
-## Bug Fixes
+### Bug Fixes
 
-### Certificates
+#### Certificates
 
 * `Get-Certificate` throws an exception and halts script execution when loading a certificate file with a private key and the user doesn't have permission to write to Windows' MachineKeys directory.  It now writes an error instead.
 
-### PowerShell
+#### PowerShell
 
 * `Invoke-PowerShell` doesn't run under a v2.0 CLR when using parameters `-Runtime 'v2.0'`.
 
 
-# 1.4.0 (10 August 2013)
+## 1.4.0 (10 August 2013)
 
-## Enhancements
+### Enhancements
 
-### File System
+#### File System
 
 * Created `Install-Junction` function for creating new and/or updating existing junctions. This is a more idempotent way of creating junctions, as opposed to `New-Junction` and `Remove-Junction` which report errors if a junction already exists or doesn't exist, respectively.
 
-### IIS
+#### IIS
 
 * Objects returned by `Get-IisWebsite` now have a dynamic `PhysicalPath` script property, so you don't have to traverse down into the default application's default virtual directory object to get it.
 * `Install-IisApplication`, `Install-IisWebsite`, and `Install-IisVirtualDirectory` now canonicalize physical paths, i.e. they convert any path with a relative part (e.g. '..') to a full path.  It turns out IIS doesn't like paths with relative parts.
 * Created `Get-IisApplication` function to get `Microsoft.Web.Administration.Application` objects for all or specific applications under a website.
 * `Install-IisApplication` now uses the `Microsoft.Web.Administration` API instead of `appcmd.exe`.
 
-### PowerShell
+#### PowerShell
 
 * Added `ExecutionPolicy` parameter to `Invoke-PowerShell` to allow setting a custom exeuction policy when using `Invoke-PowerShell` to run a script.
 
-## Bug Fixes
+### Bug Fixes
 
-### IIS
+#### IIS
 
 * `Install-IisApplication` not updating/changing physical path on existing application.
 
-### .NET
+#### .NET
 
 * `Set-DotNetAppSetting` and `Set-DotNetConnectionString` failed if setting .NET configuration under an architecture where the PowerShell execution policy doesn't allow running scripts.
 
 
-# 1.3.0 (8 July 2013)
+## 1.3.0 (8 July 2013)
 
-## Enhancements
+### Enhancements
 
-### PowerShell
+#### PowerShell
 
 * `Invoke-PowerShell` now supports running an external script.
 * Added `OutputFormat` argument to `Invoke-PowerShell` so your scripts/script blocks can return XML results instead of plain text.
@@ -1269,110 +1298,110 @@ There is now [a Carbon support mailing list](https://groups.google.com/forum/#!f
 * `Invoke-PowerShell` now runs 64-bit PowerShell from 32-bit PowerShell.
 * `Get-PowerShellPath` now returns path for 64-bit PowerShell when running 32-bit PowerShell.
 
-### Text
+#### Text
 
 * Created new `ConvertTo-Base64` function for encoding strings in base-64.
 * Created new `ConvertFrom-Base64` function for decoding base-64 strings.
 
 
-## Bug Fixes
+### Bug Fixes
 
-### .NET
+#### .NET
 
 * `Set-DotNetAppSetting` and `Set-DotNetConnectionString` weren't able to set .NET 2.0 app settings and connections string when running under PowerShell 3.
 
 
-# 1.2.0 (25 June 2013)
+## 1.2.0 (25 June 2013)
 
-## Enhancements
+### Enhancements
 
-### General
+#### General
 
 * Carbon should now work under PowerShell v3.0!
 
-### Certificates
+#### Certificates
 
 * Added support for IPv6 addresses to `Get-SslCertificateBinding`, `Remove-SslCertificateBinding`, and `Set-SslCertificateBinding`.
 
-### .NET
+#### .NET
 
 * Added `ProviderName` parameter to `Set-DotNetConnectionString` for setting a connection string's `providerName` attribute/value.
 
-### File System
+#### File System
 
 * Created `Disable-NtfsCompression` function for disabling NTFS compression on files/directories.
 * Created `Enable-NtfsCompression` function for enabling NTFS compression on files/directories.
 * Created `Test-NtfsCompression` function for testing if NTFS compression is enabled on a file/directory.
 
-### IIS
+#### IIS
 
 * The [site object](http://msdn.microsoft.com/en-us/library/microsoft.web.administration.site.aspx) returned by `Get-IisWebsite` now as a `CommitChanges` method so you can persist modifications you make to the site.
 * `Get-IisWebsite` now returns all websites if no `SiteName` is given.
 * Created `Set-IisWebsiteID` function for explicitly setting a website's ID.
 
-### INI
+#### INI
 
 * Created `Remove-IniEntry` function for removing entries/settings from an INI file.
 
-### Performance Counters
+#### Performance Counters
 
 * `Install-PerformanceCounter` now supports installing a base performance counter.  Thanks to Philip Teilmeier for the contribution.
 * `Install-PerformanceCounter`'s `Description` parameter is now optional.
 
-### PowerShell
+#### PowerShell
 
 * `Invoke-PowerShell` now defaults to running under the current CLR, instead of defaulting to a v2.0 CLR.  This makes upgrading to PowerShell v3.0 easier.
 * `Invoke-PowerShell` now writes an error and returns if running PowerShell v3.0 and you want to run under a v2.0 CLR.  Unfortunately, PowerShell v3.0 requires .NET 4.0, so you can't run anything on an earlier CLR.
 
-### Privileges
+#### Privileges
 
 * `Revoke-Privilege` now supports case-insensitive privilege names.
 * Updated `Grant-Privilege` to better handle when passing a privilege name with the wrong case.
 * Updated `Grant-Privilege` documentation to make it clear privilege names are case-sensitive.
 
-### XML
+#### XML
 
 * New `Convert-XmlFile`, for transforming an XML file with Microsoft's XDT (XML Data Transformation) technology.  Thanks to Mark Sargent for the contribution.
 
 
-## Bug Fixes
+### Bug Fixes
 
-### General
+#### General
 
 * Deleted the obsolete variable `$CarbonImported`.  Carbon no longer exports any of its variables.
 
-### Certificates
+#### Certificates
 
 * `Get-SslCertificateBinding` can't parse bindings to IPv6 addresses.
 
-### Performance Counters
+#### Performance Counters
 
 * `Install-PerformanceCounter` couldn't be used to create counters that used/required a base counter. Thanks to Philip Teilmeier for the contribution.
 
 
-# 1.1.0 (1 April 2013)
+## 1.1.0 (1 April 2013)
 
-## Upgrade Instructions
+### Upgrade Instructions
 
 * On Windows 2008 R2, custom identies that run IIS app pools need the `SeBatchLogonRight`.  `Install-IisAppPool` now grants this privilege on all operating systems.  If this won't work in your environment, you can remove these privileges with `Revoke-Privilege`.
 
-## Enhancements
+### Enhancements
 
-### General
+#### General
 
 * Fixed some typos and ommissions in the v0.5.0.1 and v0.5.0.0 sections of the release notes.
 * Updated `Import-Carbon.ps1` script to import Carbon regardless of the name of the directory Carbon is installed in.
 
-### Certificates
+#### Certificates
 
 * Added `IssuedTo` and `IssuedBy` properties to [X509Certificate2](http://msdn.microsoft.com/en-us/library/ms148409(v=vs.90).aspx) objects.  The values match what the Certificates MMC snap-in displays.
 * Added `DisplayName` property to [X509Store](http://msdn.microsoft.com/en-us/library/d228271e(v=vs.90).aspx) objects, to show the names of the stores as they are displayed in the Certificates MMC snap-in.
 
-### Computer
+#### Computer
 
 * Created `Resolve-NetPath` for getting the path to the Windows `net.exe` command/application.  Updated all functions that call `net.exe` to use this function to resolve its path.  Thanks to Paul Aage Aasheim for discovering that when running login scripts, `net.exe` isn't in the path.
 
-### IIS
+#### IIS
 
 * Created `Get-IisHttpHeader` for getting the custom HTTP headers for a website or one of its sub-directories.
 * Created `Set-IisHttpHeader` for creating/setting a custom HTTP header for a website or one of its sub-directories.
@@ -1382,123 +1411,123 @@ There is now [a Carbon support mailing list](https://groups.google.com/forum/#!f
 * When creating an app pool that runs under a custom, non-service account, `Install-IisAppPool` grants that user the `SeBatchLogonRight`.
 * `Install-IisAppPool` writes an error if its user account doesn't exist (i.e. if the value of the `Username` parameter doesn't exist).
 
-### Privileges
+#### Privileges
 
 * Improved exception handling in `Grant-Privilege` and `Revoke-Privilege`.
 * `Grant-Privilege` and `Revoke-Privilege` now write an error message if an identity doesn't exist.
 
 
-## Bug Fixes
+### Bug Fixes
 
-### Computer
+#### Computer
 
 * `Install-SmbShare` can't find `net.exe` when running as part of a Windows logon script.  Thanks to Paul Aage Aasheim for identifying and reporting this bug.  All usages of the `net.exe` application were updated to use the new `Resolve-NetPath` function, which get the path to `net.exe` without assuming it is in the user's `PATH` environment variable.
 
 
-### Users and Groups
+#### Users and Groups
 
 * `Test-Identity` no longer writes an error if it can't find a fully-qualified local user, e.g. `$env:COMPUTERNAME\Username`.
 
 
-# 1.0.0 (6 March 2013)
+## 1.0.0 (6 March 2013)
 
-## Upgrade Instructions
+### Upgrade Instructions
 
 * Remove the `Quiet` parameter from calls to the `Import-Carbon.ps1` script.
 * If you're nesting Carbon as a sub-module of another module, ***STOP***.  This causes havoc.  Create an `Import-*.ps1` script for your module which imports Carbon before importing your own module.  Update your scripts to import your module with your fancy new `Import-*.ps1` script.  See [Best Practices for Importing PowerShell Modules](http://pshdo.com/archive/2012/6/4/best-practices-for-importing-powershell-modules.html) for details.
 
-## Enhancements
+### Enhancements
 
-### General
+#### General
 
 * The `Import-Carbon.ps1` script no longer checks if Carbon is a sub-module of another module, so the `Quiet` parameter was removed.  ***Please don't nest Carbon in your modules!***  It will cause havoc.
 * `Import-Carbon.ps1` will no longer stop execution if an error occurs during an import (i.e. the `$ErrorActionPreference = 'Stop'` line was removed).
 
-### IIS
+#### IIS
 
 * Added `Test-IisWebsiteExists` alias for `Test-IisWebsite`, for backwards-compatibility with earlier releases.
 
-### Security
+#### Security
 
 * Added `Unprotect-AclAccessRules` alias for `Protect-Acl`, for backwards-compatibility with earlier releases.
 * Added rename of `Unprotect-AclAccessRules` to `Protect-Acl` to v0.5.0.0 section of release notes.
 
-### Services
+#### Services
 
 * Renamed `Install-Service`'s `Dependencies` parameter to `Dependency` (with backwards-compatible alias), to follow PowerShell naming standards.
 
-### Users and Groups
+#### Users and Groups
 
 * `Install-User`: you can now set a user's full name with the optional `FullName` parameter.
 
-## Bug Fixes
+### Bug Fixes
 
-### Security
+#### Security
 
 * `Grant-Permission` returns boolean values to the pipeline when clearing access rules.
 
-### Service
+#### Service
 
 * `Install-Service` fails if `Dependency` parameter doesn't have a value.  Sometimes.
 
-### Shares
+#### Shares
 
 * `Install-SmbShare` fails if a principal name contains a space.
 
-### Users and Groups
+#### Users and Groups
 
 * `Add-GroupMember` doesn't handle when the .NET Active Directory throws an exception when adding members to a group, causing script termination.
 
 
-# 0.5.0.1 (9 January 2013)
+## 0.5.0.1 (9 January 2013)
 
-## Enhancements
+### Enhancements
 
-### Active Directory
+#### Active Directory
 
 * Renamed `Format-ADSpecialCharacters` to `Format-ADSearchFilterValue`, with backwards-compatible alias.
 
-### Certificates
+#### Certificates
 
 * Renamed `Get-SslCertificateBindings` to `Get-SslCertificateBinding`, with backwards-compatible alias.
 * Added `Remove-Certificate` alias for `Uninstall-Certificate`, for backwards-compatibility with earlier releases.
 
-### COM
+#### COM
 
 * Renamed `Get-ComPermissions` to `Get-ComPermission`, with backwards-compatible alias.
 * Renamed `Grant-ComPermissions` to `Grant-ComPermission`, with backwards-compatible alias.
 * Renamed `Revoke-ComPermissions` to `Revoke-ComPermission`, with backwards-compatible alias.
 
-### Firewall
+#### Firewall
 
 * Renamed `Get-FirewallRules` to `Get-FirewallRule`, with backwards-compatible alias.
 
-### IIS
+#### IIS
 
 * Renamed `Add-IisServerManagerMembers` to `Add-IisServerManagerMembers`, with backwards-compatible alias.
 * Added `StatusCode` alias for `Set-IisHttpRedirect's` `HttpResponseStatus` parameter, for backwards-compatibility with earlier releases.
 * Added `Test-IisAppPoolExists` alias for `Test-IisAppPool`, for backwards-compatibility with earlier releases.
 * Added `Remove-IisWebsite` alias for `Uninstall-IisWebsite`, for backwards-compatibility with earlier releases.
 
-### Internet Explorer
+#### Internet Explorer
 
 * Renamed `Enable-IEActivationPermissions` to `Enable-IEActivationPermission`, with backwards-compatible alias.
 
-### MSMQ
+#### MSMQ
 
 * Renamed `Grant-MsmqMessageQueuePermissions` to `Grant-MsmqMessageQueuePermission`, with backwards-compatible alias.
 * Added `Remove-MsmqMessageQueue` alias for `Uninstall-MsmqMessageQueue`, for backwards-compatibility with earlier releases.
 
-### Path
+#### Path
 
 * Added `ConvertTo-FullPath` alias for `Resolve-FullPath`, for backwards-compatibility with earlier releases.
 * Added `Get-PathCanonicalCase` alias for `Resolve-PathCase`, for backwards-compatibility with earlier releases.
 
-### Performance Counters
+#### Performance Counters
 
 * Renamed `Get-PerformanceCounters` to `Get-PerformanceCounter`, with backwards-compatible alias.
 
-### PowerShell
+#### PowerShell
 
 * Renamed `Add-TrustedHosts` to `Add-TrustedHost`, with backwards-compatible alias.
 * Renamed `Add-TrustedHost`'s `Entries` parameter to `Entry`, with backwards-compatible alias.
@@ -1509,7 +1538,7 @@ There is now [a Carbon support mailing list](https://groups.google.com/forum/#!f
 * Renamed `Set-TrustedHosts` to `Set-TrustedHost`, with backwards-compatible alias.
 * Renamed `Set-TrustedHost`'s `Entries` parameter to `Entry`, with backwards-compatible alias.
 
-### Security
+#### Security
 
 * Renamed `Assert-AdminPrivileges` to `Assert-AdminPrivilege`, with backwards-compatible alias.
 * Renamed `ConvertTo-InheritanceFlags` to `ConvertTo-InheritanceFlag`, with backwards-compatible alias.
@@ -1521,18 +1550,18 @@ There is now [a Carbon support mailing list](https://groups.google.com/forum/#!f
 * Renamed `Grant-Permission`'s `Permissions` parameter to `Permission`, with backwards-compatible alias.
 * Renamed `Test-AdminPrivileges` to `Test-AdminPrivilege`, with backwards-compatible alias.
 
-### Service
+#### Service
 
 * Renamed `Get-ServicePermissions` to `Get-ServicePermission`, with backwards-compatible alias.
 * Added `Remove-Service` alias for `Uninstall-Service`, for backwards-compatibility with earlier releases.
 
-### Users and Groups
+#### Users and Groups
 
 * Renamed `Add-GroupMembers` to `Add-GroupMember`, with backwards-compatible alias.
 * Renamed `Add-GroupMember`'s `Members` parameter to `Member`.
 * Added `Remove-User` alias for `Uninstall-User`, for backwards-compatibility with earlier releases.
 
-### Windows Features
+#### Windows Features
 
 * Added `Install-WindowsFeatures` alias for `Install-WindowsFeature`, for backwards-compatibility with earlier releases.
 * Added `Features` alias for  `Install-WindowsFeature's` `Name` parameter, for backwards-compatibility with earlier releases.
@@ -1540,15 +1569,15 @@ There is now [a Carbon support mailing list](https://groups.google.com/forum/#!f
 * Added `Features` alias for  `Uninstall-WindowsFeature's` `Name` parameter, for backwards-compatibility with earlier releases.
 
 
-# 0.5.0.0 (7 January 2013)
+## 0.5.0.0 (7 January 2013)
 
-## Upgrade Instructions
+### Upgrade Instructions
 
 This release contains many backwards incompatible changes.  We apologize for this inconvenience.  We are making these changes so we can get ready for the v1.0 release.  One of our goals for v1.0 is to get the functions and their interfaces internally consistent and consistent with PowerShell naming schemes.  Once v1.0 is out the door, backwards-incompatible changes will be phased in as much as possible.
 
 Take the following steps to get your scripts to work with this release.
 
-### Certificates
+#### Certificates
 
 Replaces usages of:
 
@@ -1562,7 +1591,7 @@ Replaces usages of:
 * `Remove-SslCertificateBinding -IPPort '0.0.0.0:443` with `Remove-SslCertificateBinding`
 * `Remove-SslCertificateBinding -IPPort '10.1.1.1:8001` with `Remove-SslCertificateBinding -IPAddress '10.1.1.1' -Port 8001`
 
-### Computer
+#### Computer
 
 Replace usages of
 
@@ -1573,12 +1602,12 @@ Replace usages of
 * `Remove-EnvironmentVariable -Scope 'User'` with `Remove-EnvironmentVariable -ForUser`
 * `Remove-EnvironmentVariable -Scope 'ForComputer'` with `Remove-EnvironmentVariable -ForComputer`
 
-### Cryptography
+#### Cryptography
 
 * `Protect-String -Scope CurrentUser` with `Protect-String -ForUser`
 * `Protect-String -Scope LocalMachine` with `Protect-String -ForComputer`
 
-### IIS
+#### IIS
 
 * Renamed the `StatusCode` property on the object returned by `Get-IisHttpRedirect` to `HttpResponseStatus`.  Update usages accordingly.
 * The `Bindings` property returned by `Get-IisWebsite` is now a collection of `Microsoft.Web.Administration.Binding` objects.  Update usages of `$site.Bindings[$idx].IPAddress` and `$site.Bindings[$idx].Port` to `$site.Bindings[$idx].Endpoint.Address` and `$site.Bindings[$idx].Endpoint.Port`, respectively.
@@ -1598,7 +1627,7 @@ Replace usages of:
 * `Unlock-IisWindowsAuthentication` with `Unlock-IisConfigurationSection -SectionPath 'system.webServer/security/authentication/windowsAuthentication'`
 
 
-### INI
+#### INI
 
 Replace usages of:
 
@@ -1606,32 +1635,32 @@ Replace usages of:
 * `Split-Ini -Path <string> -PassThru` with `Split-Ini -Path <string>` (per-line objects are now returned by default)
 
 
-### Path
+#### Path
 
 Replace usages of
 
 * `Get-PathRelativeTo -To <string> -From <string>'` with `Resolve-RelativePath -Path <string> -FromDirectory <string>`
 * `Get-PathRelativeTo -To <string> -From <string> -FromType 'File'` with `Resolve-RelativePath -Path <string> -FromFile <string>`
 
-### Performance Counters
+#### Performance Counters
 
 * `Get-PerformanceCounters` no longer returns an empty list if there are zero counters or a single element list if there is one counter.  It now returns `null` and a single object, respectively.  Update usages accordingly.
 
-### PowerShell
+#### PowerShell
 
 * `Get-TrustedHosts` no longer returns an empty list if there are no trusted hosts.  It now return nothing/`null`.  Update usages accordingly.
 
-### Security
+#### Security
 
 * `Assert-AdminPrivileges` now returns `True` or `False` if the user doesn't have admin privileges. It also no longer throws an exception, but writes an error.  If you want to preserve current behavior where it stops script execution, replace usages with `Assert-AdminPrivileges -ErrorAction Stop`.
 
-### Shares
+#### Shares
 
 Replace usages of:
 
 * `Install-Share -Permissions '"ShareAdmins,FULL"','"ShareWriters,CHANGE"','"ShareReaders,READ"'` with `Install-SmbShare -FullAccess ShareAdmins -ChangeAccess ShareWriters -ReadAccess ShareReaders`.
 
-### Windows Features
+#### Windows Features
 
 Replace usages of:
 
@@ -1642,9 +1671,9 @@ Replace usages of:
 * `Install-WindowsFeatureMsmq -HttpSupport` with `Install-WindowsFeature -Msmq -MsmqHttpSupport`
 * `Install-WindowsFeatureMsmq -ActiveDirectoryIntegration` with `Install-WindowsFeature -MsmqActiveDirectoryIntegration`
 
-## New Features
+### New Features
 
-### IIS
+#### IIS
 
 * Created `Get-IisConfigurationSection` function for getting a site's (and optional sub-directory's) [Microsoft.Web.Administration.ConfigurationSection](http://msdn.microsoft.com/en-us/library/microsoft.web.administration.configurationsection(v=vs.90).aspx) objects for an arbitrary IIS configuration section.
 * Created `Get-IisSecurityAuthentication` function for getting a site's (and optional sub-directory's)  [anonymous, basic, digest, or Windows authentication configuration section](http://msdn.microsoft.com/en-us/library/microsoft.web.administration.configurationsection(v=vs.90).aspx).
@@ -1655,20 +1684,20 @@ Replace usages of:
 * Created function `Get-IisAppPool` for getting a `Microsoft.Web.Administration.AppPool` object for an application pool.
 * Created function `Uninstall-IisAppPool` for removing an IIS application pool.
 
-### Windows Features
+#### Windows Features
 
 * Created new `Get-WindowsFeature` function for getting a list of available Windows features.
 
-## Bug Fixes
+### Bug Fixes
 
-### Service
+#### Service
 
 * `Install-Service` not granting default service identity, Network Service, the correct permissions.
 * `Install-Service` not correctly resolving local identity account names.
 
-## Enhancements
+### Enhancements
 
-### Certificates
+#### Certificates
 
 * Moved functionality of `Get-SslCertificateBinding` into `Get-SslCertificateBindings`.  Can now filter by `IPAddress` and/or `Port`.
 * `Get-SslCertificateBindings` now returns `Carbon.Certificates.SslCertificateBinding` objects.  All information displayed by the `netsh http show sslcert` command is returned as part of those objects.
@@ -1678,25 +1707,25 @@ Replace usages of:
 * Replaced `IPPort` parameter on `Remove-SslCertificateBinding` with separate `IPAddress` and `Port` parameters.  Set `IPAddress` only if you want to remove a binding for a specific IP address (i.e. *not* 0.0.0.0).  Set `Port` if the binding is *not* on port 443.
 * Renamed `Remove-Certificate` to `Uninstall-Certificate` (added backwards-compatible alias in v0.5.0.1).
 
-### Computer
+#### Computer
 
 * Replaced the `Scope` parameter on `Set-EnvironmentVariable` and `Remove-EnvironmentVariable` with scope-specific `ForProcess`, `ForUser`, and `ForComputer` switches.
 
-### Cryptography
+#### Cryptography
 
 * Replaced `Protect-String`'s `Scope` parameteter with the `ForUser` or `ForComputer` scope-specific switches.
 
-### Hosts File
+#### Hosts File
 
 * `Set-HostsEntry` no longer throws an exception if the hosts file contains an invalid line.  Instead, a warning is written and the line is commented out.
 
-### INI
+#### INI
 
 * `Split-Ini` now returns strongly-typed `Carbon.Ini.IniNode` objects instead of hashtables.
 * The line numbers returned by `Split-Ini` start at 1 instead of 0.
 * `Split-Ini` now returns name/value objects by default (the `PassThru` switch is no longer needed for this behaviro).  This makes it more PowerShell-y.  The old behavior of returning a `Hashtable` is available be using the new `AsHashtable` switch.
 
-### IIS
+#### IIS
 
 * Replaced `Set-IisAnonymousAuthentication` with `Enable-IisSecurityAuthentication` and `Disable-IisSecurityAuthentication`.
 * Replaced `Set-IisBasicAuthentication` with `Enable-IisSecurityAuthentication` and `Disable-IisSecurityAuthentication`.
@@ -1719,39 +1748,39 @@ Replace usages of:
 * Renamed the `StatusCode` parameter on `Set-IisHttpRedirect` to `HttpResponseStatus` (added backwards-compatible alias in v0.5.0.1).
 * `Get-IisWebsite` now returns a `Microsoft.Web.Administration.Site` object.
 
-### MSMQ
+#### MSMQ
 
 * Renamed `Remove-MsmqMessageQueue` to `Uninstall-MsmqMessageQueue` (added backwards compatible alias in v0.5.0.1).
 
-### Path
+#### Path
 
 * Renamed `Get-PathRelativeTo` to `Resolve-RelativePath`.  Renamed its `To` parameter to `Path`, and moved it to position 0.  Replaced/combined the `From` and `FromType` parameters with `FromDirectory` and `FromFile` parameters.
 * Renamed `ConvertTo-FullPath` to `Resolve-FullPath` (added backwards-compatible alias in v0.5.0.1).  Added support for converting unrooted paths using the current location.
 * Renamed `Get-PathCanonicalCase` with `Resolve-PathCase` (added backwards-compatible alias in v0.5.0.1).  Added support for piping in `Get-Item` and `Get-ChildItem` output, e.g. `Get-Item C:\WINDOWS | Resolve-PathCase` returns C:\Windows.
 
-### Performance Counters
+#### Performance Counters
 
 * `Get-PerformanceCounters` now returns nothing/`null` or a single object instead of an empty/single element array when there are no or one performance counters.
 * `Install-PerformanceCounter` no longer re-installs a counter if a counter with its name, description, and type already exist.
 
-### PowerShell
+#### PowerShell
 
 * `Get-TrustedHosts` now returns nothing/`null` if there are no trusted hosts.  (It used to return an empty array.)
 
-### Security
+#### Security
 
 * `Assert-AdminPrivileges` no longer throws an exception if the user doesn't have administrative privileges.  Instead, it writes an error and returns `False`.  It returns `True` if the user has privileges.
 * Renamed `Unprotect-AclAccessRules` to `Protect-Acl` (added backwards-compatible alias in v1.0.0).
 
-### Shares
+#### Shares
 
 * Replaced the `Permissions` parameter on `Install-SmbShare` with `FullAccess`, `ChangeAccess`, and `ReadAccess` parameters. Previously, to set share permissions, you passed in specially-formatted values to the `Permission` parameter, e.g. `"MyGroup,FULL","MyOtherGroup,READ"`.  Now, just pass a list of identity name(s) to the `FullAccess`, `ChangeAccess`, or `ReadAccess` parameters to grant those identies full, change, or read access, e.g. `-FullAccess MyGroup -ReadAccess MyOtherGroup`.
 
-### Users and Groups
+#### Users and Groups
 
 * Renamed `Remove-User` to `Uninstall-User` (added backwards-compatible alias in v0.5.0.1).
 
-### Windows Features
+#### Windows Features
 
 * `Test-WindowsFeature` now tests if a Windows feature exists, instead of if it is installed.  Added an `Installed` switch to detect if a feature exists *and* if it is installed.
 * Renamed `Install-WindowsFeatures` to `Install-WindowsFeature` (added backwards-compatible alias in v0.5.0.1).
@@ -1764,22 +1793,22 @@ Replace usages of:
 * `Install-WindowsFeature`, `Test-WindowsFeature`, and `Uninstall-WindowsFeature` are now available even if the current operating system doesn't support managing Windows features.  They don't do anything in those situations, but they exist.
 * `Install-WindowsFeature`, `Test-WindowsFeature`, and `Uninstall-WindowsFeature` are not available if the PowerShell v3.0 server manager cmdlets exists (on Windows 8/2012).
 
-### Miscellaneous
+#### Miscellaneous
 
 * Replaced all instances where functions were throwing exceptions with `Write-Error`.
 * The Carbon assembly is now versioned and signed.
 
 
-# 0.4.0.1 (18 December 2012)
+## 0.4.0.1 (18 December 2012)
 
-## Bug fixes
+### Bug fixes
 
 * `Enable-IisSsl` not setting SSL flags correctly when requiring client certificates.
 
 
-# 0.4.0.0 (17 November 2012)
+## 0.4.0.0 (17 November 2012)
 
-## Upgrade Instructions
+### Upgrade Instructions
 
 * If you install a manual or disabled Windows service with `Install-Service`, you now have to call `Start-Service` yourself.  `Install-Service` only starts services whose startup type is set to `Automatic` (which is the default).
 * We've stopped distributing Microsoft's `subinacl.exe` program. We didn't have permission to distribute.  Plus its no longer supported. If any of your scripts used `Invoke-SubInAcl`, you'll want to [download `subinacl.exe` yourself](http://www.microsoft.com/en-us/download/details.aspx?id=23510) and copy `Invoke-SubInAcl` before upgrading (you can find it in the Carbon directory in the `Services.ps1` file.
@@ -1788,7 +1817,7 @@ Replace usages of:
 * Replace usages of `Set-HgrcDefaultPushUrl` with `Set-IniEntry` instead, e.g. `Set-IniEntry -Path 'Path\to\repo\.hg\hgrc' -Section paths -Name 'default.push' -Value 'DefaultPushUrl'`
 * Rename usages of `Get-FullPath` with `ConvertTo-FullPath`.
 
-## Enhancements
+### Enhancements
 
 * Created `Get-Privileges`, `Grant-Privilege`, `Revoke-Privilege`, and `Test-Privilege` for managing an identity's security operation privileges.
 * `Install-Service` now uses `Grant-Privilege` to grant custom service identities the `SeServiceLogonRight` privilege. This replaces usage of Microsoft's legacy [ntrights.exe](http://support.microsoft.com/kb/315276), which we probably didn't have permission to distribute.
@@ -1810,16 +1839,16 @@ Replace usages of:
 * Renamed `Test-IisWebsiteExists` to `Test-IisWebsite` to adhere to PowerShell naming conventions (added backwards-compatible alias in v1.0.0).
 * Renamed `Get-FullPath` to `ConvertTo-FullPath` to adhere to PowerShell naming conventions.
 
-## Bug fixes
+### Bug fixes
 
 * `Install-Service` no longer tries to start a service if its `StartupType` is set to `Manual` or `Disabled`.
 * `Path` is now the first parameter to `Grant-Permissions` (it was the third) to match PowerShell standards/patterns.
 * `Find-ADUser` writes an error and returns null instead of throwing an exception.
 
 
-# 0.3.1.0 (29 October 2012)
+## 0.3.1.0 (29 October 2012)
 
-## Enhancements
+### Enhancements
 
 * Improved `Disable-IEEnhancedSecurityConfiguration` and `Enable-IEActivationPermissions` for enabling Internet Explorer to run headless by non-priveleged users.
 * Changed the way `Invoke-WindowsInstaller` waits for MSI to finish installing: instead of searching for any MSI process, it now searches for an MSI process that is a child of the current PowerShell process.
@@ -1835,9 +1864,9 @@ Replace usages of:
 * Created `Reset-MsmqQueueManagerID` function, which resets MSMQ's Queue Manager ID.
 
 
-# 0.3.0 (28 September 2012)
+## 0.3.0 (28 September 2012)
 
-## Upgrade Instructions
+### Upgrade Instructions
 
 This release contains backwards-**incompatible** changes to the following functions:
 
@@ -1845,27 +1874,27 @@ This release contains backwards-**incompatible** changes to the following functi
 * `Set-TrustedHosts`
 * `Invoke-PowerShell`
 
-### Set-IisSslFlags
+#### Set-IisSslFlags
 
 This function was renamed to `Enable-IisSsl`.  Its `Enable128BitSsl` parameter was renamed to `Require128BitSsl`.
 
 Configuring client certificates is now a little stricter/clearer.  You can no longer specify both `AcceptClientCertificates` and `RequireClientCertificates`.  Also, if you specify `RequireClientCertificates`, you must now also supply the `RequireSsl` switch (before, setting the `RequireClientCertificates` switch implicitly set the `RequireSsl` switch).
 
-### Set-TrustedHosts
+#### Set-TrustedHosts
 
 Make sure you're not calling `Set-TrustedHosts` with an empty array/value for the `Entries` parameter.  The function now throw an error in that situation.  If you need to clear the list of trusted hosts, use `Clear-TrustedHosts`.
 
-### Invoke-PowerShell
+#### Invoke-PowerShell
 
 If you call `Invoke-PowerShell` without the `x86` switch and PowerShell is 32-bit, you'll get an error.  Under Windows x64, 32-bit PowerShell can't start the 64-bit instance because Windows redirects all access from C:\Windows\system32 to C:\Windows\SysWOW64.  If anyone knows how to get around this, let me know!
 
-## Enhancements
+### Enhancements
 
 * Renamed `Set-IisSslFlags` to `Enable-IisSsl` to better reflect what it does.  Also, created parameter sets around client certificate settings so you can't configure them incorrectly.  ([Fixes #25: Set-IisSslFlags: Create parameter sets to accurately reflect what flags are allowed to be set simultaneously.](https://bitbucket.org/splatteredbits/carbon/issue/25/set-iissslflags-create-parameter-sets-to))
 * Added `WhatIf` support to `Install-MsmqMessageQueue`.
 * Created new `Clear-TrustedHosts` for clearing PowerShell's trusted hosts list.
 
-## Bug Fixes
+### Bug Fixes
 
 * Rename `Enable-IisSsl/Set-IisSslFlags's` `Enable128BitSsl` parameter to `Require128BitSsl`] ([Fix #24 Set-IisSslFlags: Rename the Enable128BitSsl parameter to Require128BitSsl](https://bitbucket.org/splatteredbits/carbon/issue/24/set-iissslflags-rename-the-enable128bitssl)).
 * [Fix issue #19](https://bitbucket.org/splatteredbits/carbon/issue/19/install-iisapppool-doesnt-change-an): `Install-IisAppPool` doesn't change an existing 32-bit app pool to be a 64-bit app pool.
@@ -1875,9 +1904,9 @@ If you call `Invoke-PowerShell` without the `x86` switch and PowerShell is 32-bi
 * [Fix issue #38](https://bitbucket.org/splatteredbits/carbon/issue/38/set-trustedhosts-passing-an-empty-value): `Set-TrustedHosts`: passing an empty value for the Entries parameter clears the hosts list.  The `Entries` parameter is now required.  To clear the trusted hosts list, use `Clear-TrustedHosts`.
 
 
-# 0.2.7 (3 September 2012)
+## 0.2.7 (3 September 2012)
 
-## Enhancements
+### Enhancements
 
 * New functions for working with the registry:
   * `Get-RegistryKeyValue`: Get a value from a registry key.
@@ -1889,9 +1918,9 @@ If you call `Invoke-PowerShell` without the `x86` switch and PowerShell is 32-bi
 * Added a `Clear` parameter to the `Grant-Permissions` function for clearing any non-inherited permissions on a file system/registry item.
 
 
-# 0.2.6 (30 June 2012)
+## 0.2.6 (30 June 2012)
 
-## Enhancements
+### Enhancements
 
 * Improved documentation for:
   * `Grant-ServiceControlPermission`
@@ -1924,14 +1953,14 @@ If you call `Invoke-PowerShell` without the `x86` switch and PowerShell is 32-bi
 * Help files and example scripts now included in Carbon download package.
 * Added test to help ensure all functions have proper documentation.
 
-## Bug fixes
+### Bug fixes
 
 * `Install-IisWebsite` now validates website bindings
 
 
-# 0.2.5 (29 June 2012)
+## 0.2.5 (29 June 2012)
 
-## Enhancements
+### Enhancements
 
 * Improved documentation for:
   * `Test-IisAppPool`
@@ -1971,9 +2000,9 @@ If you call `Invoke-PowerShell` without the `x86` switch and PowerShell is 32-bi
 * Improved whitespace in HTML documentation code samples.
 
 
-# 0.2.4 (28 June 2012)
+## 0.2.4 (28 June 2012)
 
-## Enhancements
+### Enhancements
 
 * Improved documentation for:
   * Get-PathCanonicalCase
@@ -2003,9 +2032,9 @@ If you call `Invoke-PowerShell` without the `x86` switch and PowerShell is 32-bi
   * Set-IisWindowsAuthentication
 
 
-# 0.2.3 (27 June 2012)
+## 0.2.3 (27 June 2012)
 
-## Enhancements
+### Enhancements
 
 * Improved documentation for:
   * Disable-IEEnhancedSecurityConfiguration
@@ -2021,26 +2050,26 @@ If you call `Invoke-PowerShell` without the `x86` switch and PowerShell is 32-bi
   * Test-OSIs64Bit
   * Unprotect-String
 
-## Bug fixes
+### Bug fixes
 
 * Invoke-WindowsInstaller doesn't validate that installer path ends in '.msi'.
 * Invoke-WindowsInstaller not showing correct exit code when installation fails.
 
 
-# 0.2.2 (19 June 2012)
+## 0.2.2 (19 June 2012)
 
-## Enhancements
+### Enhancements
 
 * Created Import-Carbon script to help users properly import Carbon.
 
-## Bug fixes
+### Bug fixes
 
 * Add-GroupMembers fails to add Administrators and ANONYMOUS LOGON built-in accounts.
 * Add-GroupMembers fails when adding built-in accounts multiple times.
 * Add-GroupMembers fails to add domain user to a local group.
 
 
-# 0.2.1 (28 April 2012)
+## 0.2.1 (28 April 2012)
 
 * Added IsJunction property to DirectoryInfo objects.  Returns true if a directory is a junction/reparse point.
 * Created a Carbon assembly for compiled code.  Moved P/Invoke functions from FileSystem.ps1 into assembly.  This is a backwards compatible change.
@@ -2048,19 +2077,19 @@ If you call `Invoke-PowerShell` without the `x86` switch and PowerShell is 32-bi
 * Added TargetPath property to DirectoryInfo objects.  If the directory is a junction/reparse points, returns the path to the junction's target.  Otherwise, $null.
 
 
-# 0.2.0 (4 April 2012)
+## 0.2.0 (4 April 2012)
 
-## Enhancements
+### Enhancements
 
 * fix issue #3: Added -Runtime switch to Invoke-PowerShell function for running PowerShell under .NET 2.0 or 4.0.  Valid values are 'v2.0' (for .NET 2) and 'v4.0' (for .NET 4).
 * **BREAKING CHANGE:** Added -Clr2 and -Clr4 switches to Set-DotNetAppSetting and Set-DotNetConnectionString functions for modifying the .NET 2 and/or 4 machine.config files.  One or both of these parameters is required.
 
-## Bug fixes
+### Bug fixes
 
 * Improved documentation for Get-ADDomainController, Get-ADUser, Format-ADSpecialCharacters, Get-Certificate, Invoke-PowerShell, Set-DotNetAppSetting, and Set-DotNetConnectionString functions.
 * fix issue #2: Get-PowerShellPath Returns Wrong Value on x86 Systems
 
 
-# 0.1.0 (2 April 2012)
+## 0.1.0 (2 April 2012)
 
 * First packaged release.

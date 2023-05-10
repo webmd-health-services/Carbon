@@ -1,153 +1,153 @@
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-# 
-#     http://www.apache.org/licenses/LICENSE-2.0
-# 
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
 
+#Requires -Version 5.1
 Set-StrictMode -Version 'Latest'
 
-& (Join-Path -Path $PSScriptRoot -ChildPath 'Initialize-CarbonTest.ps1' -Resolve)
+BeforeAll {
+    Set-StrictMode -Version 'Latest'
 
-$rootDir = $null
-$childDir = $null
-$grandchildFile = $null
-$childFile = $null
+    & (Join-Path -Path $PSScriptRoot -ChildPath 'Initialize-CarbonTest.ps1' -Resolve)
 
-function Assert-EverythingCompressed
-{
-    Assert-Compressed -Path $rootDir
-    Assert-Compressed -Path $childDir
-    Assert-Compressed -Path $grandchildFile
-    Assert-Compressed -Path $childFile
+    $script:testNum = 0
+    $script:rootDir = $null
+    $script:childDir = $null
+    $script:grandchildFile = $null
+    $script:childFile = $null
+
+    function Assert-EverythingCompressed
+    {
+        Assert-Compressed -Path $script:rootDir
+        Assert-Compressed -Path $script:childDir
+        Assert-Compressed -Path $script:grandchildFile
+        Assert-Compressed -Path $script:childFile
+    }
+
+    function Assert-NothingCompressed
+    {
+        Assert-NotCompressed -Path $script:rootDir
+        Assert-NotCompressed -Path $script:childDir
+        Assert-NotCompressed -Path $script:grandchildFile
+        Assert-NotCompressed -Path $script:childFile
+    }
+
+    function Assert-Compressed
+    {
+        param(
+            $Path
+        )
+
+        Test-CNtfsCompression -Path $Path | Should -BeTrue
+    }
+
+    function Assert-NotCompressed
+    {
+        param(
+            $Path
+        )
+
+        Test-CNtfsCompression -Path $Path | Should -BeFalse
+    }
 }
 
-function Assert-NothingCompressed
-{
-    Assert-NotCompressed -Path $rootDir
-    Assert-NotCompressed -Path $childDir
-    Assert-NotCompressed -Path $grandchildFile
-    Assert-NotCompressed -Path $childFile
-}
-
-function Assert-Compressed
-{
-    param(
-        $Path
-    )
-
-    (Test-NtfsCompression -Path $Path) | Should Be $true
-}
-
-function Assert-NotCompressed
-{
-    param(
-        $Path
-    )
-    (Test-NtfsCompression -Path $Path) | Should Be $false
-}
-
-Describe 'Disable-NtfsCompression' {
+Describe 'Disable-CNtfsCompression' {
     BeforeEach {
-        $script:rootDir = Join-Path -Path $TestDrive.FullName -ChildPath ([IO.Path]::GetRandomFileName())
-        $script:childDir = Join-Path $rootDir 'ChildDir' 
-        $script:grandchildFile = Join-Path $rootDir 'ChildDir\GrandchildFile'
-        $script:childFile = Join-Path $rootDir 'ChildFile'
+        $script:rootDir = Join-Path -Path $TestDrive -ChildPath $script:testNum
+        $script:childDir = Join-Path $script:rootDir 'ChildDir'
+        $script:grandchildFile = Join-Path $script:rootDir 'ChildDir\GrandchildFile'
+        $script:childFile = Join-Path $script:rootDir 'ChildFile'
 
-        New-Item -Path $grandchildFile -ItemType 'File' -Force
-        New-Item -Path $childFile -ItemType 'File' -Force
-    
-        Enable-NtfsCompression $rootDir -Recurse
-    
+        New-Item -Path $script:grandchildFile -ItemType 'File' -Force
+        New-Item -Path $script:childFile -ItemType 'File' -Force
+
+        Enable-CNtfsCompression $script:rootDir -Recurse
+
         Assert-EverythingCompressed
     }
-    
+
+    AfterEach {
+        $script:testNum += 1
+    }
+
     It 'should disable compression on directory only' {
-        Disable-NtfsCompression -Path $rootDir
-    
-        Assert-NotCompressed -Path $rootDir
-        Assert-Compressed -Path $childDir
-        Assert-Compressed -path $grandchildFile
-        Assert-Compressed -Path $childFile
-    
-        $newFile = Join-Path $rootDir 'newfile'
+        Disable-CNtfsCompression -Path $script:rootDir
+
+        Assert-NotCompressed -Path $script:rootDir
+        Assert-Compressed -Path $script:childDir
+        Assert-Compressed -path $script:grandchildFile
+        Assert-Compressed -Path $script:childFile
+
+        $newFile = Join-Path $script:rootDir 'newfile'
         '' > $newFile
         Assert-NotCompressed -Path $newFile
-    
-        $newDir = Join-Path $rootDir 'newDir'
+
+        $newDir = Join-Path $script:rootDir 'newDir'
         $null = New-Item -Path $newDir -ItemType Directory
         Assert-NotCompressed -Path $newDir
     }
-    
+
     It 'should fail if path does not exist' {
         $Error.Clear()
-    
-        Disable-NtfsCompression -Path 'C:\I\Do\Not\Exist' -ErrorAction SilentlyContinue
-    
-        $Error.Count | Should Be 1
-        ($Error[0].Exception.Message -like '*not found*') | Should Be $true
-    
+
+        Disable-CNtfsCompression -Path 'C:\I\Do\Not\Exist' -ErrorAction SilentlyContinue
+
+        $Error.Count | Should -Be 1
+        ($Error[0].Exception.Message -like '*not found*') | Should -BeTrue
+
         Assert-EverythingCompressed
     }
-    
+
     It 'should disable compression recursively' {
-        Disable-NtfsCompression -Path $rootDir -Recurse
-    
+        Disable-CNtfsCompression -Path $script:rootDir -Recurse
+
         Assert-NothingCompressed
     }
-    
+
     It 'should support piping items' {
-        Get-ChildItem $rootDir | Disable-NtfsCompression
-    
-        Assert-Compressed $rootDir
-        Assert-NotCompressed $childDir
-        Assert-Compressed $grandchildFile
-        Assert-NotCompressed $childFile
+        Get-ChildItem $script:rootDir | Disable-CNtfsCompression
+
+        Assert-Compressed $script:rootDir
+        Assert-NotCompressed $script:childDir
+        Assert-Compressed $script:grandchildFile
+        Assert-NotCompressed $script:childFile
     }
-    
+
     It 'should support piping strings' {
-        ($childFile,$grandchildFile) | Disable-NtfsCompression
-    
-        Assert-Compressed $rootDir
-        Assert-Compressed $childDir
-        Assert-NotCompressed $grandchildFile
-        Assert-NotCompressed $childFile
+        ($script:childFile,$script:grandchildFile) | Disable-CNtfsCompression
+
+        Assert-Compressed $script:rootDir
+        Assert-Compressed $script:childDir
+        Assert-NotCompressed $script:grandchildFile
+        Assert-NotCompressed $script:childFile
     }
-    
+
     It 'should decompress array of items' {
-        Disable-NtfsCompression -Path $childFile,$grandchildFile
-        Assert-Compressed $rootDir
-        Assert-Compressed $childDir
-        Assert-NotCompressed $grandchildFile
-        Assert-NotCompressed $childFile
+        Disable-CNtfsCompression -Path $script:childFile,$script:grandchildFile
+        Assert-Compressed $script:rootDir
+        Assert-Compressed $script:childDir
+        Assert-NotCompressed $script:grandchildFile
+        Assert-NotCompressed $script:childFile
     }
-    
+
     It 'should decompress already decompressed item' {
-        Disable-NtfsCompression $rootDir -Recurse
+        Disable-CNtfsCompression $script:rootDir -Recurse
         Assert-NothingCompressed
-    
-        Disable-NtfsCompression $rootDir -Recurse
+
+        Disable-CNtfsCompression $script:rootDir -Recurse
         $LASTEXITCODE | Should -Be 0
         Assert-NothingCompressed
     }
-    
+
     It 'should support what if' {
-        Disable-NtfsCompression -Path $childFile -WhatIf
-        Assert-Compressed $childFile
+        Disable-CNtfsCompression -Path $script:childFile -WhatIf
+        Assert-Compressed $script:childFile
     }
-    
+
     It 'should not decompress if already decompressed' {
-        Disable-CNtfsCompression -Path $rootDir  
-        Assert-NotCompressed $rootDir
+        Disable-CNtfsCompression -Path $script:rootDir
+        Assert-NotCompressed $script:rootDir
         Mock -CommandName 'Invoke-ConsoleCommand' -ModuleName 'Carbon'
-        Disable-CNtfsCompression -Path $rootDir
+        Disable-CNtfsCompression -Path $script:rootDir
         Assert-MockCalled 'Invoke-ConsoleCommand' -ModuleName 'Carbon' -Times 0
-        Disable-CNtfsCompression -Path $rootDir -Force
+        Disable-CNtfsCompression -Path $script:rootDir -Force
         Assert-MockCalled 'Invoke-ConsoleCommand' -ModuleName 'Carbon' -Times 1
     }
 }

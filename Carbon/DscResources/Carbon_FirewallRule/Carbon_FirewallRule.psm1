@@ -85,8 +85,8 @@ function Get-TargetResource
         Write-Error ('Found {0} firewall rules named ''{1}''.' -f $rule.Count,$Name)
         return
     }
-    
-    $resource = @{ 
+
+    $resource = @{
                     'Action' = $Action;
                     'Description' = $Description;
                     'Direction' = $Direction;
@@ -109,9 +109,9 @@ function Get-TargetResource
     if( $rule )
     {
         $propNames = $resource.Keys | ForEach-Object { $_ }
-        $propNames | 
+        $propNames |
             Where-Object { $_ -ne 'Ensure' } |
-            ForEach-Object { 
+            ForEach-Object {
                 $propName = $_
                 switch( $propName )
                 {
@@ -130,7 +130,7 @@ function Get-TargetResource
 
     return $resource
 }
- 
+
 function Set-TargetResource
 {
     <#
@@ -284,7 +284,7 @@ function Set-TargetResource
 
     $cmd = 'add'
     $cmdDisplayName = 'Adding'
-    $newArg = ''
+    $newArg = $null
     if( $Ensure -eq 'Present' -and $resource.Ensure -eq 'Present' )
     {
         $cmd = 'set'
@@ -341,10 +341,10 @@ function Set-TargetResource
             [void]$netshArgs.Add( ('{0}=' -f $argName) )
             [void]$netshArgs.Add( $argValue )
         }
-    
+
     Write-Verbose ('{0} firewall rule ''{1}'': cmd= {2}; name= {3}; newArg: {4}; netshargs= {5}' -f $cmdDisplayName,$Name,$cmd,$Name,$newArg,($netshArgs -join ' '))
     Write-Debug -Message ('cmd= {0}; name= {1}; newArg: {2}; netshargs= {3}' -f $cmd,$Name,$newArg,($netshArgs -join ' '))
-    $output = netsh advfirewall firewall $cmd rule name= $Name $newArg $netshArgs 
+    $output = netsh advfirewall firewall $cmd rule name= $Name $newArg $netshArgs
     if( $LASTEXITCODE )
     {
         Write-Error ($output -join ([Environment]::NewLine))

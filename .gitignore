@@ -1,5 +1,6 @@
 /Carbon/bin/coreclr
 /Carbon/bin/fullclr
+/Carbon/bin/args.exe
 /Carbon/*.md
 **/obj/**
 **/.vs/**

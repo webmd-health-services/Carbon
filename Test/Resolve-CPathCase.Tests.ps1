@@ -74,7 +74,7 @@ Describe 'Resolve-PathCase' {
             Install-CFileShare -Name $shareName -Path $tempDir.FullName -ReadAccess 'Everyone'
             try
             {
-                $path = '\\{0}\{1}' -f $env:COMPUTERNAME,$shareName
+                $path = '\\localhost\{1}' -f $env:COMPUTERNAME,$shareName
                 $canonicalCase = Resolve-CPathCase ($path.ToUpper()) -ErrorAction SilentlyContinue
                 $Global:Error | Should -Not -BeNullOrEmpty
                 $Global:Error[0] | Should -Match 'UNC .* not supported'

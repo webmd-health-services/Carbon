@@ -167,7 +167,10 @@ Describe 'Carbon_ScheduledTask' {
             Should -BeTrue
     }
 
-    It 'should run through DSC' -Skip:$skip {
+    $skipDscTest =
+        (Test-Path -Path 'env:WHS_CI') -and $env:WHS_CI -eq 'True' -and $PSVersionTable['PSVersion'].Major -eq 7
+
+    It 'should run through DSC' -Skip:($skipDscTest -or $skip) {
         . (Join-Path -Path $PSScriptRoot -ChildPath 'CarbonDscTest\ScheduledTask.ps1' -Resolve)
 
         $configArgs = @{

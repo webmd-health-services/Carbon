@@ -6,11 +6,15 @@ function Disable-CNtfsCompression
     Turns off NTFS compression on a file/directory.
 
     .DESCRIPTION
-    The `Disable-CNtfsCompression` function uses `compact.exe` to disable compression on a file or directory. When decompressing a directory, any compressed files/directories in that directory will remain compressed. To decompress everything under a directory, use the `-Recurse` switch.  This could take awhile.
+    The `Disable-CNtfsCompression` function uses `compact.exe` to disable compression on a file or directory. When
+    decompressing a directory, any compressed files/directories in that directory will remain compressed. To decompress
+    everything under a directory, use the `-Recurse` switch.  This could take awhile.
 
-    Beginning in Carbon 2.9.0, if compression is already disabled, nothing happens. To always disable compression, use the `-Force` switch.
+    Beginning in Carbon 2.9.0, if compression is already disabled, nothing happens. To always disable compression, use
+    the `-Force` switch.
 
-    Uses Windows' `compact.exe` command line utility to compress the file/directory.  To see the output from `compact.exe`, set the `Verbose` switch.
+    Uses Windows' `compact.exe` command line utility to compress the file/directory.  To see the output from
+    `compact.exe`, set the `Verbose` switch.
 
     .LINK
     Enable-CNtfsCompression
@@ -21,35 +25,38 @@ function Disable-CNtfsCompression
     .EXAMPLE
     Disable-CNtfsCompression -Path C:\Projects\Carbon
 
-    Turns off NTFS compression and decompresses the `C:\Projects\Carbon` directory (if compression is enabled), but not its sub-directories/files.
+    Turns off NTFS compression and decompresses the `C:\Projects\Carbon` directory (if compression is enabled), but not
+    its sub-directories/files.
 
     .EXAMPLE
     Disable-CNtfsCompression -Path C:\Projects\Carbon -Recurse
 
-    Turns off NTFS compression and decompresses the `C:\Projects\Carbon` directory (if compression is enabled) and all its sub-directories/sub-files.
+    Turns off NTFS compression and decompresses the `C:\Projects\Carbon` directory (if compression is enabled) and all
+    its sub-directories/sub-files.
 
     .EXAMPLE
     Disable-CNtfsCompression -Path C:\Projects\Carbon -Recurse -Force
 
-    Turns off NTFS compression and decompresses the `C:\Projects\Carbon` directory (even if compression is disabled) and all its sub-directories/sub-files.
+    Turns off NTFS compression and decompresses the `C:\Projects\Carbon` directory (even if compression is disabled) and
+    all its sub-directories/sub-files.
 
     .EXAMPLE
     Get-ChildItem * | Where-Object { $_.PsIsContainer } | Disable-CNtfsCompression
 
     Demonstrates that you can pipe the path to compress into `Disable-CNtfsCompression`.
     #>
-    [CmdletBinding(SupportsShouldProcess=$true)]
+    [CmdletBinding(SupportsShouldProcess)]
     param(
-        [Parameter(Mandatory=$true,ValueFromPipeline=$true,ValueFromPipelineByPropertyName=$true)]
-        [Alias('FullName')]
         # The path where compression should be disabled.
-        [string[]]$Path,
+        [Parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)]
+        [Alias('FullName')]
+        [String[]]$Path,
 
         # Disables compression on all sub-directories.
-        [Switch]$Recurse,
+        [Switch] $Recurse,
 
         # Disable compression even it it's already disabled.
-        [switch]$Force
+        [switch] $Force
     )
 
     begin
@@ -82,14 +89,14 @@ function Disable-CNtfsCompression
                 return
             }
 
-            $recurseArg = ''
+            $recurseArg = $null
             $pathArg = $item
             if( (Test-Path -Path $item -PathType Container) )
             {
                 if( $Recurse )
                 {
                     $recurseArg = ('/S:{0}' -f $item)
-                    $pathArg = ''
+                    $pathArg = $null
                 }
             }
 

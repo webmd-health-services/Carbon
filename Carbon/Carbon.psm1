@@ -36,6 +36,8 @@ $CarbonBinDir = Join-Path -Path $PSScriptRoot -ChildPath 'bin' -Resolve
 $carbonAssemblyDir = Join-Path -Path $CarbonBinDir -ChildPath 'fullclr' -Resolve
 $warnings = @{}
 
+$script:argsExePath = Join-Path -Path $CarbonBinDir -ChildPath 'args'
+
 # Used to detect how to manager windows features. Determined at run time to improve import speed.
 $windowsFeaturesNotSupported = $null
 $useServerManager = $null

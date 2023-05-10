@@ -12,6 +12,23 @@ Build:
 - PowerShell:
     OnlyBy: BuildServer
     Path: Save-CarbonSigningKey.ps1
+- PowerShell:
+    ScriptBlock: |
+        $typeDef = @'
+            using System;
+
+            public static class Args
+            {
+                public static void Main(string[] args)
+                {
+                    foreach (var arg in args)
+                    {
+                        Console.WriteLine(arg);
+                    }
+                }
+            }
+        '@
+        Add-Type -TypeDefinition $typeDef -OutputType ConsoleApplication -OutputAssembly .\Carbon\bin\args.exe
 - SetVariable:
     SignAssembly: False
     Constants: ""
@@ -120,9 +137,6 @@ Tests:
     Pester4:
         DescribeDurationReportCount: 20
         WarningAction: SilentlyContinue
-- PowerShell:
-    OnlyDuring: Build
-    Path: Start-CarbonTest.ps1
 # Quick Developer tests.
 - Pester4:
     OnlyBy: Developer
@@ -141,70 +155,115 @@ Tests:
         Path:
         - Test\Test-Documentation.ps1
         - Test\Test-ImportCarbon.ps1
-#  Windows-only tests (eventually).
 - Pester4:
-    IfExists: variable:IsWindows
     OnlyBy: BuildServer
     Script:
-    - Test\*Iis*.ps1
-    - Test\Carbon_*.Tests.ps1
-    Exclude:
-    - "*\\Carbon_ScheduledTask.Tests.ps1"
-    - "*\\Set-CIisHttpRedirect.Tests.ps1"
-- Pester:
-    IfExists: variable:IsWindows
-    Configuration:
-        TestResult:
-            Enabled: true
-            OutputPath: $(WHISKEY_OUTPUT_DIRECTORY)\pester5-windows.xml
-            TestSuiteName: Carbon
-        Run:
-            Path:
-            - Test\*-CFileShare.Tests.ps1
-            - Test\Carbon_ScheduledTask.Tests.ps1
-            - Test\Get-CFileSharePermission.Tests.ps1
-            - Test\Get-CFirewallRule.Tests.ps1
-            - Test\Install-CScheduledTask.Tests.ps1
-            - Test\Set-CIisHttpRedirect.Tests.ps1
-            - Test\Test-CUser.Tests.ps1
-        Output:
-            Verbosity: detailed
-# Cross-platform tests (eventually).
-- Pester4:
-    OnlyBy: BuildServer
-    Script: Test\*.Tests.ps1
-    Exclude:
-    # Don't run the Windows-only tests.
-    - "*\\*-CFileShare.Tests.ps1"
-    - "*\\*Iis*.ps1"
-    - "*\\Carbon_*.Tests.ps1"
-    - "*\\Get-CFileSharePermission.Tests.ps1"
-    - "*\\Get-CFirewallRule.Tests.ps1"
-    - "*\\Get-CPermission.Tests.ps1"
-    - "*\\Install-CScheduledTask.Tests.ps1"
-    - "*\\Test-CPermission.Tests.ps1"
-    - "*\\Test-CUser.Tests.ps1"
-    # Don't run the Pester 5 tests.
-    - "*\\Convert-CXmlFile.Tests.ps1"
-    - "*\\Read-File.Tests.ps1"
-    - "*\\Resolve-CPathCase.Tests.ps1"
-    - "*\\X509Certificate2.Tests.ps1"
+    - Test\Assert-FirewallConfigurable.Tests.ps1
+    - Test\Bin.Tests.ps1
+    - Test\Carbon.Shell.Command.Tests.ps1
+    - Test\CarbonVersion.Tests.ps1
+    - Test\chocolateyInstall.Tests.ps1
+    - Test\chocolateyUninstall.Tests.ps1
+    - Test\Clear-MofAuthoringMetadata.Tests.ps1
+    - Test\Compress-Item.Tests.ps1
+    - Test\Copy-DscResource.Tests.ps1
+    - Test\Disable-AclInheritance.Tests.ps1
+    - Test\Documentation.Tests.ps1
+    - Test\Enable-AclInheritance.Tests.ps1
+    - Test\Get-ComPermission.Tests.ps1
+    - Test\Get-Group.Tests.ps1
+    - Test\Get-HttpUrlAcl.Tests.ps1
+    - Test\Get-PathProvider.Tests.ps1
+    - Test\Get-ScheduledTask.Tests.ps1
+    - Test\Get-ServiceConfiguration.Tests.ps1
+    - Test\Get-SslCertificateBinding.Tests.ps1
+    - Test\Get-User.Tests.ps1
+    - Test\Grant-ComPermission.Tests.ps1
+    - Test\Import-Carbon.Tests.ps1
+    - Test\Install-Junction.Tests.ps1
+    - Test\New-Junction.Tests.ps1
+    - Test\Remove-DotNetAppSetting.Tests.ps1
+    - Test\Remove-EnvironmentVariable.Tests.ps1
+    - Test\Remove-GroupMember.Tests.ps1
+    - Test\Remove-HostsEntry.Tests.ps1
+    - Test\Remove-Junction.Tests.ps1
+    - Test\Reset-HostsFile.Tests.ps1
+    - Test\Set-EnvironmentVariable.Tests.ps1
+    - Test\Set-HostsEntry.Tests.ps1
+    - Test\Set-RegistryKeyValue.Tests.ps1
+    - Test\System.Diagnostics.Process.types.Tests.ps1
+    - Test\System.IO.DirectoryInfo.types.ps1xml.Tests.ps1
+    - Test\System.IO.FileInfo.types.ps1xml.Tests.ps1
+    - Test\Test-Group.Tests.ps1
+    - Test\Test-GroupMember.Tests.ps1
+    - Test\Test-Identity.Tests.ps1
+    - Test\Test-PathIsJunction.Tests.ps1
+    - Test\Test-ScheduledTask.Tests.ps1
+    - Test\Test-Service.Tests.ps1
+    - Test\Uninstall-Group.Tests.ps1
+    - Test\Uninstall-Junction.Tests.ps1
+    - Test\Website.Tests.ps1
+    - Test\Write-File.Tests.ps1
 - Pester:
     Configuration:
         TestResult:
             Enabled: true
             OutputPath: $(WHISKEY_OUTPUT_DIRECTORY)\pester5.xml
             TestSuiteName: Carbon
-        Run:
-            Path:
-            - Test\Convert-CXmlFile.Tests.ps1
-            - Test\Get-CPermission.Tests.ps1
-            - Test\Read-File.Tests.ps1
-            - Test\Resolve-CPathCase.Tests.ps1
-            - Test\Test-CPermission.Tests.ps1
-            - Test\X509Certificate2.Tests.ps1
         Output:
             Verbosity: detailed
+        Run:
+            Path: Test\*.Tests.ps1
+            ExcludePath:
+            # DSC resource tests run in a different task.
+            - "*\\Carbon_*.Tests.ps1"
+            # Pester 4 tests.
+            - "*\\Assert-FirewallConfigurable.Tests.ps1"
+            - "*\\Bin.Tests.ps1"
+            - "*\\Carbon.Shell.Command.Tests.ps1"
+            - "*\\CarbonVersion.Tests.ps1"
+            - "*\\chocolateyInstall.Tests.ps1"
+            - "*\\chocolateyUninstall.Tests.ps1"
+            - "*\\Clear-MofAuthoringMetadata.Tests.ps1"
+            - "*\\Compress-Item.Tests.ps1"
+            - "*\\Copy-DscResource.Tests.ps1"
+            - "*\\Disable-AclInheritance.Tests.ps1"
+            - "*\\Documentation.Tests.ps1"
+            - "*\\Enable-AclInheritance.Tests.ps1"
+            - "*\\Get-ComPermission.Tests.ps1"
+            - "*\\Get-Group.Tests.ps1"
+            - "*\\Get-HttpUrlAcl.Tests.ps1"
+            - "*\\Get-PathProvider.Tests.ps1"
+            - "*\\Get-ScheduledTask.Tests.ps1"
+            - "*\\Get-ServiceConfiguration.Tests.ps1"
+            - "*\\Get-SslCertificateBinding.Tests.ps1"
+            - "*\\Get-User.Tests.ps1"
+            - "*\\Grant-ComPermission.Tests.ps1"
+            - "*\\Import-Carbon.Tests.ps1"
+            - "*\\Install-Junction.Tests.ps1"
+            - "*\\New-Junction.Tests.ps1"
+            - "*\\Remove-DotNetAppSetting.Tests.ps1"
+            - "*\\Remove-EnvironmentVariable.Tests.ps1"
+            - "*\\Remove-GroupMember.Tests.ps1"
+            - "*\\Remove-HostsEntry.Tests.ps1"
+            - "*\\Remove-Junction.Tests.ps1"
+            - "*\\Reset-HostsFile.Tests.ps1"
+            - "*\\Set-EnvironmentVariable.Tests.ps1"
+            - "*\\Set-HostsEntry.Tests.ps1"
+            - "*\\Set-RegistryKeyValue.Tests.ps1"
+            - "*\\System.Diagnostics.Process.types.Tests.ps1"
+            - "*\\System.IO.DirectoryInfo.types.ps1xml.Tests.ps1"
+            - "*\\System.IO.FileInfo.types.ps1xml.Tests.ps1"
+            - "*\\Test-Group.Tests.ps1"
+            - "*\\Test-GroupMember.Tests.ps1"
+            - "*\\Test-Identity.Tests.ps1"
+            - "*\\Test-PathIsJunction.Tests.ps1"
+            - "*\\Test-ScheduledTask.Tests.ps1"
+            - "*\\Test-Service.Tests.ps1"
+            - "*\\Uninstall-Group.Tests.ps1"
+            - "*\\Uninstall-Junction.Tests.ps1"
+            - "*\\Website.Tests.ps1"
+            - "*\\Write-File.Tests.ps1"
 - PowerShell:
     WarningAction: SilentlyContinue
     OnlyDuring: Build
@@ -215,7 +274,20 @@ Tests:
         PassThru: true
 - PowerShell:
     OnlyDuring: Build
-    OnlyBy: Developer
+    Path: Start-CarbonTest.ps1
+# Run DSC tests *last* because they depend on a globally installed version of Carbon.
+- Pester:
+    Configuration:
+        TestResult:
+            Enabled: true
+            OutputPath: $(WHISKEY_OUTPUT_DIRECTORY)\pester5_dsc.xml
+            TestSuiteName: Carbon
+        Output:
+            Verbosity: detailed
+        Run:
+            Path: Test\Carbon_*.Tests.ps1
+- PowerShell:
+    OnlyDuring: Build
     Path: Complete-CarbonTest.ps1
 - PowerShell:
     OnlyBy: BuildServer

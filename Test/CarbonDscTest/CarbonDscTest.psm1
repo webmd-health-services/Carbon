@@ -71,7 +71,7 @@ function Start-CarbonDscTestFixture
 
     New-Item -Path $script:CarbonDscOutputRoot -ItemType 'directory'
 
-    Clear-DscLocalResourceCache
+    Clear-CDscLocalResourceCache
 }
 
 function Stop-CarbonDscTestFixture

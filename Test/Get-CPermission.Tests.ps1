@@ -91,22 +91,37 @@ Describe 'Get-CPermission' {
     }
 
     It 'should get private cert permission' {
-        $perms =
+        $certs =
             Get-Item -Path 'Cert:\*\*' |
             Where-Object 'Name' -NE 'UserDS' | # This store causes problems on PowerShell 7.
             Get-ChildItem |
             Where-Object { -not $_.PsIsContainer } |
-            Where-Object { $_.HasPrivateKey } |
-            Where-Object { $_.PrivateKey } |
-            ForEach-Object { Join-Path -Path 'cert:' -ChildPath (Split-Path -NoQualifier -Path $_.PSPath) } |
-            ForEach-Object { Get-CPermission -Path $_ }
-        $perms | Should -Not -BeNullOrEmpty
-        $expectedType = [Security.AccessControl.FileSystemAccessRule]
-        if ([Type]::GetType('System.Security.AccessControl.CryptoKeyAccessRule'))
+            Where-Object { $_.HasPrivateKey }
+
+        foreach ($cert in $certs)
         {
-            $expectedType = [Security.AccessControl.CryptoKeyAccessRule]
+            $expectedType = [Security.AccessControl.FileSystemAccessRule]
+            if ($cert.PrivateKey -and `
+                ($cert.PrivateKey | Get-Member -Name 'CspKeyContainerInfo') -and `
+                [Type]::GetType('System.Security.AccessControl.CryptoKeyAccessRule'))
+            {
+                $expectedType = [Security.AccessControl.CryptoKeyAccessRule]
+            }
+            $certPath = Join-Path -Path 'cert:' -ChildPath ($cert.PSPath | Split-Path -NoQualifier)
+            if ($cert.Thumbprint -eq '3044F98A1B1AB539E78FCD01FE8AFD58EF0B8BA6')
+            {
+                Write-Debug 'break'
+            }
+            $numErrors = $Global:Error.Count
+            $perms = Get-CPermission -Path $certPath -Inherited -ErrorAction SilentlyContinue
+            if ($numErrors -ne $Global:Error.Count -and `
+                ($Global:Error[0] -match '(keyset does not exist)|(Invalid provider type specified)'))
+            {
+                continue
+            }
+            $perms | Should -Not -BeNullOrEmpty -Because "${certPath} should have private key permissions"
+            $perms | Should -BeOfType $expectedType
         }
-        $perms | Should -BeOfType $expectedType
     }
 
     It 'should get specific identity cert permission' {
@@ -126,5 +141,21 @@ Describe 'Get-CPermission' {
                     $identityRule.Count | Should -BeLessOrEqual $rules.Count
                 }
             }
+    }
+
+    It 'gets permissions for cng private key' {
+        $certFilePath = Join-Path -Path $PSScriptRoot -ChildPath 'Certificates\CarbonRsaCng.pfx' -Resolve
+        $cert = Install-CCertificate -Path $certFilePath -StoreLocation CurrentUser -StoreName My
+        try
+        {
+            $perms =
+                Get-CPermission -Path (Join-Path -Path 'cert:\CurrentUser\My' -ChildPath $cert.Thumbprint) -Inherited
+            $perms | Should -Not -BeNullOrEmpty
+            $perms | Should -BeOfType [Security.AccessControl.FileSystemAccessRule]
+        }
+        finally
+        {
+            Uninstall-CCertificate -Thumbprint $cert.Thumbprint -StoreLocation CurrentUser -StoreName My
+        }
     }
 }

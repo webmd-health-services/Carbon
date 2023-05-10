@@ -25,7 +25,7 @@
     RootModule = 'Carbon.psm1'
 
     # Version number of this module.
-    ModuleVersion = '2.13.0'
+    ModuleVersion = '2.14.0'
 
     # ID used to uniquely identify this module
     GUID = '075d9444-c01b-48c3-889a-0b3490716fa2'
@@ -356,7 +356,7 @@ All functions are idempotent: when run multiple times with the same arguments, y
             Prerelease = ''
 
             # ReleaseNotes of this module
-            ReleaseNotes = 'https://github.com/webmd-health-services/Carbon/blob/master/CHANGELOG.md'
+            ReleaseNotes = 'https://github.com/webmd-health-services/Carbon/blob/main/CHANGELOG.md'
         } # End of PSData hashtable
 
     } # End of PrivateData hashtable
