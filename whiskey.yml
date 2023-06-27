@@ -4,7 +4,6 @@ Build:
     Path: Carbon\Carbon.psd1
     Prerelease:
     - main: ""
-    - master: ""
     - "*": rc1
 - Exec:
     OnlyBy: BuildServer
