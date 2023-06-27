@@ -3,7 +3,7 @@ Build:
 - Version:
     Path: Carbon\Carbon.psd1
     Prerelease:
-    - master: ""
+    - main: ""
     - "*": rc1
 - Exec:
     OnlyBy: BuildServer
