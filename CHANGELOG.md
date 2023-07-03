@@ -3,6 +3,12 @@
 
 # Carbon Changelog
 
+## 2.14.1
+
+> Released 3 Jul 2023
+
+* Fixed: `ConvertTo-CBase64` throws a "parameter cannot be found" error.
+
 ## 2.14.0
 
 ### Additions
