@@ -203,7 +203,7 @@ function ConvertTo-CBase64
 
         if( -not $NoWarn )
         {
-            Write-CRefactoredCommandWarning -CommandName $MyInvocation.MyCommand.Name -NewModuleName 'Carbon.Core'
+            Write-CRefactoredCommandWarning -CommandName $MyInvocation.MyCommand.Name -ModuleName 'Carbon.Core'
         }
     }
 
