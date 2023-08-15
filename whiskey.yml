@@ -190,7 +190,6 @@ Tests:
     - Test\Reset-HostsFile.Tests.ps1
     - Test\Set-EnvironmentVariable.Tests.ps1
     - Test\Set-HostsEntry.Tests.ps1
-    - Test\Set-RegistryKeyValue.Tests.ps1
     - Test\System.Diagnostics.Process.types.Tests.ps1
     - Test\System.IO.DirectoryInfo.types.ps1xml.Tests.ps1
     - Test\System.IO.FileInfo.types.ps1xml.Tests.ps1
@@ -250,7 +249,6 @@ Tests:
             - "*\\Reset-HostsFile.Tests.ps1"
             - "*\\Set-EnvironmentVariable.Tests.ps1"
             - "*\\Set-HostsEntry.Tests.ps1"
-            - "*\\Set-RegistryKeyValue.Tests.ps1"
             - "*\\System.Diagnostics.Process.types.Tests.ps1"
             - "*\\System.IO.DirectoryInfo.types.ps1xml.Tests.ps1"
             - "*\\System.IO.FileInfo.types.ps1xml.Tests.ps1"
