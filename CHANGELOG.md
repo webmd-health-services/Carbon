@@ -3,6 +3,22 @@
 
 # Carbon Changelog
 
+## 2.15.0
+
+> Released 16 Aug 2023
+
+### Deprecated
+
+Moved the following functions to a new `Carbon.Registry` module. They will be removed from `Carbon` in a future major
+version.
+
+* `Get-CRegistryKeyValue`
+* `Install-CRegistryKey`
+* `Remove-CRegistryKeyValue`
+* `Set-CRegistryKeyValue`
+* `Test-CRegistryKeyValue`
+
+
 ## 2.14.1
 
 > Released 3 Jul 2023
