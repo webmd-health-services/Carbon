@@ -5,7 +5,7 @@
 
 ## 2.15.0
 
-> Released 15 Aug 2023
+> Released 16 Aug 2023
 
 ### Deprecated
 
