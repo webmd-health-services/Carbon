@@ -62,11 +62,11 @@ function Test-CDotNet
         return
     }
 
-    if( -not (Test-CRegistryKeyValue -Path $runtimeSetupRegPath -Name 'Install') )
+    if( -not (Test-CRegistryKeyValue -Path $runtimeSetupRegPath -Name 'Install' -NoWarn) )
     {
         return $false
     }
 
-    $value = Get-CRegistryKeyValue -Path $runtimeSetupRegPath -Name 'Install'
+    $value = Get-CRegistryKeyValue -Path $runtimeSetupRegPath -Name 'Install' -NoWarn
     return ($value -eq 1)
 }
