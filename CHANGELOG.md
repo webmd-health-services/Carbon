@@ -3,6 +3,14 @@
 
 # Carbon Changelog
 
+## 2.15.1
+
+> Released 17 Aug 2023
+
+Fixed: warnings written about registry functions moving to new module that users can't do anything to remove (from
+internal usages).
+
+
 ## 2.15.0
 
 > Released 16 Aug 2023

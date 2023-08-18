@@ -32,7 +32,7 @@ BeforeAll {
 
     $script:tempKeyPath = 'hkcu:\Software\Carbon\Test'
     $script:keyPath = Join-Path -Path $script:tempKeyPath -ChildPath 'Test-CPermission'
-    Install-CRegistryKey -Path $script:keyPath
+    Install-CRegistryKey -Path $script:keyPath -NoWarn
     $script:childKeyPath = Join-Path -Path $script:keyPath -ChildPath 'ChildKey'
     Grant-CPermission -Identity $script:identity `
                       -Permission 'ReadKey','WriteKey' `

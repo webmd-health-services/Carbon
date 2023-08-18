@@ -837,7 +837,7 @@ function Get-CRegistryKeyValue
                                         -ModuleName 'Carbon.Registry'
     }
 
-    if( -not (Test-CRegistryKeyValue -Path $Path -Name $Name) )
+    if( -not (Test-CRegistryKeyValue -Path $Path -Name $Name -NoWarn) )
     {
         return $null
     }
@@ -2680,7 +2680,7 @@ function Remove-CRegistryKeyValue
                                         -ModuleName 'Carbon.Registry'
     }
 
-    if( (Test-CRegistryKeyValue -Path $Path -Name $Name) )
+    if( (Test-CRegistryKeyValue -Path $Path -Name $Name -NoWarn) )
     {
         if( $pscmdlet.ShouldProcess( ('Item: {0} Property: {1}' -f $Path,$Name), 'Remove Property' ) )
         {
@@ -3103,16 +3103,16 @@ function Set-CRegistryKeyValue
         'MultiString' { $value = $Strings }
     }
 
-    Install-CRegistryKey -Path $Path
+    Install-CRegistryKey -Path $Path -NoWarn
 
     if( $Force )
     {
-        Remove-CRegistryKeyValue -Path $Path -Name $Name
+        Remove-CRegistryKeyValue -Path $Path -Name $Name -NoWarn
     }
 
-    if( Test-CRegistryKeyValue -Path $Path -Name $Name )
+    if( Test-CRegistryKeyValue -Path $Path -Name $Name -NoWarn )
     {
-        $currentValue = Get-CRegistryKeyValue -Path $Path -Name $Name
+        $currentValue = Get-CRegistryKeyValue -Path $Path -Name $Name -NoWarn
         if( $currentValue -ne $value )
         {
             Write-Verbose -Message ("[{0}@{1}] {2} -> {3}'" -f $Path,$Name,$currentValue,$value)
