@@ -1168,6 +1168,72 @@ function Get-CMsi
 
 
 
+function Get-CPathProvider
+{
+    <#
+    .SYNOPSIS
+    Returns a path's PowerShell provider.
+
+    .DESCRIPTION
+    When you want to do something with a path that depends on its provider, use this function.  The path doesn't have to exist.
+
+    If you pass in a relative path, it is resolved relative to the current directory.  So make sure you're in the right place.
+
+    .OUTPUTS
+    System.Management.Automation.ProviderInfo.
+
+    .EXAMPLE
+    Get-CPathProvider -Path 'C:\Windows'
+
+    Demonstrates how to get the path provider for an NTFS path.
+    #>
+    [CmdletBinding()]
+    param(
+        # The path whose provider to get.
+        [Parameter(Mandatory)]
+        [String] $Path,
+
+        [switch] $NoWarn
+    )
+
+    Set-StrictMode -Version 'Latest'
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
+    Write-CRefactoredCommandWarning -CommandName $MyInvocation.MyCommand.Name -ModuleName 'Carbon.Core' -NoWarn:$NoWarn
+
+    $pathQualifier = Split-Path -Qualifier $Path -ErrorAction SilentlyContinue
+    if( -not $pathQualifier )
+    {
+        $Path = Join-Path -Path (Get-Location) -ChildPath $Path
+        $pathQualifier = Split-Path -Qualifier $Path -ErrorAction SilentlyContinue
+        if( -not $pathQualifier )
+        {
+            Write-Error "Qualifier for path '$Path' not found."
+            return
+        }
+    }
+
+    $pathQualifier = $pathQualifier.Trim(':')
+    $drive = Get-PSDrive -Name $pathQualifier -ErrorAction Ignore
+    if( -not $drive )
+    {
+        $drive = Get-PSDrive -PSProvider $pathQualifier -ErrorAction Ignore
+    }
+
+    if( -not $drive )
+    {
+        Write-Error -Message ('Unable to determine the provider for path {0}.' -f $Path)
+        return
+    }
+
+    $drive  |
+        Select-Object -First 1 |
+        Select-Object -ExpandProperty 'Provider'
+
+}
+
+
+
 # Leave these here so that when Get-CPermission moves to its own module, these go with it.
 Add-CTypeData -Type IO.DirectoryInfo `
               -MemberName 'GetAccessControl' `
@@ -2705,7 +2771,7 @@ function Grant-CPermission
         return
     }
 
-    $providerName = Get-CPathProvider -Path $Path | Select-Object -ExpandProperty 'Name'
+    $providerName = Get-CPathProvider -Path $Path -NoWarn | Select-Object -ExpandProperty 'Name'
     if( $providerName -eq 'Certificate' )
     {
         $providerName = 'CryptoKey'
@@ -6240,7 +6306,7 @@ function Revoke-CPermission
         return
     }
 
-    $providerName = Get-CPathProvider -Path $Path | Select-Object -ExpandProperty 'Name'
+    $providerName = Get-CPathProvider -Path $Path -NoWarn | Select-Object -ExpandProperty 'Name'
     if( $providerName -eq 'Certificate' )
     {
         $providerName = 'CryptoKey'
@@ -7117,7 +7183,7 @@ function Test-CPermission
         return
     }
 
-    $providerName = Get-CPathProvider -Path $Path | Select-Object -ExpandProperty 'Name'
+    $providerName = Get-CPathProvider -Path $Path -NoWarn | Select-Object -ExpandProperty 'Name'
     if( $providerName -eq 'Certificate' )
     {
         $providerName = 'CryptoKey'

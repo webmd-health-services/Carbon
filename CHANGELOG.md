@@ -32,6 +32,7 @@ the Carbon.Accounts module.
 moved to new `Carbon.ScheduledTasks` module.
 * `Get-CPrivilege`, `Grant-CPrivilege`, `Revoke-CPrivilege`, and `Test-CPrivilege` functions. They moved to
   the `Carbon.Security` module.
+* Function `Get-CPathProvider`. Migrated to `Carbon.Core` module.
 
 
 ## 2.15.1
