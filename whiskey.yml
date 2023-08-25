@@ -173,7 +173,6 @@ Tests:
     - Test\Get-ComPermission.Tests.ps1
     - Test\Get-Group.Tests.ps1
     - Test\Get-HttpUrlAcl.Tests.ps1
-    - Test\Get-PathProvider.Tests.ps1
     - Test\Get-ServiceConfiguration.Tests.ps1
     - Test\Get-SslCertificateBinding.Tests.ps1
     - Test\Get-User.Tests.ps1
@@ -229,7 +228,6 @@ Tests:
             - "*\\Get-ComPermission.Tests.ps1"
             - "*\\Get-Group.Tests.ps1"
             - "*\\Get-HttpUrlAcl.Tests.ps1"
-            - "*\\Get-PathProvider.Tests.ps1"
             - "*\\Get-ServiceConfiguration.Tests.ps1"
             - "*\\Get-SslCertificateBinding.Tests.ps1"
             - "*\\Get-User.Tests.ps1"
