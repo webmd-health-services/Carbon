@@ -62,7 +62,7 @@ function Resolve-CIdentityName
     }
     elseif( $PSCmdlet.ParameterSetName -eq 'BySid' )
     {
-        $SID = ConvertTo-CSecurityIdentifier -SID $SID
+        $SID = ConvertTo-CSecurityIdentifier -SID $SID -NoWarn
         if( -not $SID )
         {
             return

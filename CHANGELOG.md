@@ -8,6 +8,7 @@
 ### Deprecated
 
 * Function `Resolve-CIdentity`. Migrated to the `Carbon.Accounts` module.
+* Function `ConvertTo-CSecurityIdentifier`. Migrated to the `Carbon.Accounts` module.
 
 
 ## 2.15.1
