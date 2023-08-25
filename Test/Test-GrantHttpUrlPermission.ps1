@@ -17,7 +17,7 @@ $url = 'http://test-granthttpurlpermission:10383/'
 
 function Start-Test
 {
-    $user = Resolve-Identity -Name $CarbonTestUser.UserName -NoWarn
+    $user = Resolve-CIdentity -Name $CarbonTestUser.UserName -NoWarn
 }
 
 function Stop-Test
@@ -36,7 +36,7 @@ function Test-ShouldRegisterUrlWithoutTrailingForwardSlash
 {
     Grant-HttpUrlPermission -Url $url.TrimEnd("/") -Principal $user -Permission ListenAndDelegate
     Install-User -Credential (New-Credential -UserName 'CarbonTestUser2' -Password 'Password1') -PassThru
-    $user2 = Resolve-Identity -Name 'CarbonTestUser2' -NoWarn
+    $user2 = Resolve-CIdentity -Name 'CarbonTestUser2' -NoWarn
     Grant-HttpUrlPermission -Url $url.TrimEnd("/") -Principal $user2.FullName -Permission ListenAndDelegate
     Assert-NoError
     Assert-Permission -ExpectedPermission ([Carbon.Security.HttpUrlAccessRights]::ListenAndDelegate)
@@ -74,7 +74,7 @@ function Test-ShouldGrantMultipleUsersPermission
     Assert-NoError
 
     Install-User -Credential (New-Credential -UserName 'CarbonTestUser2' -Password 'Password1') -PassThru
-    $user2 = Resolve-Identity -Name 'CarbonTestUser2' -NoWarn
+    $user2 = Resolve-CIdentity -Name 'CarbonTestUser2' -NoWarn
 
     Grant-HttpUrlPermission -Url $url -Principal $user2.FullName -Permission Listen
     Assert-NoError

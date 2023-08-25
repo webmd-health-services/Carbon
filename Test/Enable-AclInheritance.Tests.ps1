@@ -1,9 +1,9 @@
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# 
+#
 #     http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -61,7 +61,7 @@ function New-TestContainer
     }
 
     It 'should have explicit access rules' {
-        Get-Permission -Path $path | Should Not BeNullOrEmpty
+        Get-Permission -Path $path -NoWarn | Should Not BeNullOrEmpty
     }
 
     return $path
@@ -72,11 +72,11 @@ foreach( $provider in @( "FileSystem", 'Registry' ) )
     Describe ('Enable-AclInheritance when ACL inheritance is disabled on the {0}' -f $provider) {
         $path = New-TestContainer -Provider $provider
         Enable-AclInheritance -Path $path
-        
+
         Assert-InheritanceEnabled -Path $path
 
         It 'should remove explicit access rules' {
-            Get-Permission -Path $path | Should BeNullOrEmpty
+            Get-Permission -Path $path -NoWarn | Should BeNullOrEmpty
         }
     }
 
@@ -106,7 +106,7 @@ foreach( $provider in @( "FileSystem", 'Registry' ) )
         Assert-InheritanceEnabled -Path $path
 
         It 'should preservice explicit access rules' {
-            Get-Permission -Path $path | Should Not BeNullOrEmpty
+            Get-Permission -Path $path -NoWarn | Should Not BeNullOrEmpty
         }
     }
 

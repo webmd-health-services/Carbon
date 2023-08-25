@@ -504,17 +504,17 @@ function ConvertTo-CSecurityIdentifier
     Resolve-CIdentityName
 
     .EXAMPLE
-    Resolve-CIdentity -SID 'S-1-5-21-2678556459-1010642102-471947008-1017'
+    ConvertTo-CSecurityIdentifier -SID 'S-1-5-21-2678556459-1010642102-471947008-1017'
 
     Demonstrates how to convert a a SID in SDDL into a `System.Security.Principal.SecurityIdentifier` object.
 
     .EXAMPLE
-    Resolve-CIdentity -SID (New-Object 'Security.Principal.SecurityIdentifier' 'S-1-5-21-2678556459-1010642102-471947008-1017')
+    ConvertTo-CSecurityIdentifier -SID (New-Object 'Security.Principal.SecurityIdentifier' 'S-1-5-21-2678556459-1010642102-471947008-1017')
 
     Demonstrates that you can pass a `SecurityIdentifier` object as the value of the SID parameter. The SID you passed in will be returned to you unchanged.
 
     .EXAMPLE
-    Resolve-CIdentity -SID $sidBytes
+    ConvertTo-CSecurityIdentifier -SID $sidBytes
 
     Demonstrates that you can use a byte array that represents a SID as the value of the `SID` parameter.
     #>
@@ -530,10 +530,9 @@ function ConvertTo-CSecurityIdentifier
     Set-StrictMode -Version 'Latest'
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
-    if (-not $NoWarn)
-    {
-        Write-CRefactoredCommandWarning -CommandName $MyInvocation.MyCommand.Name -ModuleName 'Carbon.Accounts'
-    }
+    Write-CRefactoredCommandWarning -CommandName $MyInvocation.MyCommand.Name `
+                                    -ModuleName 'Carbon.Accounts' `
+                                    -NoWarn:$NoWarn
 
     try
     {
@@ -5738,7 +5737,7 @@ function Resolve-CIdentity
 
     if( $PSCmdlet.ParameterSetName -eq 'BySid' )
     {
-        $SID = ConvertTo-CSecurityIdentifier -SID $SID
+        $SID = ConvertTo-CSecurityIdentifier -SID $SID -NoWarn
         if( -not $SID )
         {
             return
