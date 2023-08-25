@@ -195,7 +195,6 @@ Tests:
     - Test\System.IO.FileInfo.types.ps1xml.Tests.ps1
     - Test\Test-Group.Tests.ps1
     - Test\Test-GroupMember.Tests.ps1
-    - Test\Test-Identity.Tests.ps1
     - Test\Test-PathIsJunction.Tests.ps1
     - Test\Test-ScheduledTask.Tests.ps1
     - Test\Test-Service.Tests.ps1
@@ -254,7 +253,6 @@ Tests:
             - "*\\System.IO.FileInfo.types.ps1xml.Tests.ps1"
             - "*\\Test-Group.Tests.ps1"
             - "*\\Test-GroupMember.Tests.ps1"
-            - "*\\Test-Identity.Tests.ps1"
             - "*\\Test-PathIsJunction.Tests.ps1"
             - "*\\Test-ScheduledTask.Tests.ps1"
             - "*\\Test-Service.Tests.ps1"

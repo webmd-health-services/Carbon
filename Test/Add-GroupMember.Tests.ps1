@@ -180,7 +180,7 @@ Describe 'Add-GroupMember' {
     }
 
     It 'should add NT service accounts' {
-        if( (Test-Identity -Name 'NT Service\Fax') )
+        if( (Test-CIdentity -Name 'NT Service\Fax' -NoWarn) )
         {
             Add-GroupMember -Name $GroupName -Member 'NT SERVICE\Fax'
             $Error.Count | Should -Be 0

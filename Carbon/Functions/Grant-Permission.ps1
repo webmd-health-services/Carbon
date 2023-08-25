@@ -225,7 +225,7 @@ function Grant-CPermission
         return
     }
 
-    if( -not (Test-CIdentity -Name $Identity ) )
+    if( -not (Test-CIdentity -Name $Identity -NoWarn) )
     {
         Write-Error ('Identity ''{0}'' not found.' -f $Identity)
         return

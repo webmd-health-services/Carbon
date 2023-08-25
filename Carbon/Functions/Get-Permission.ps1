@@ -114,7 +114,7 @@ function Get-CPermission
     $account = $null
     if( $Identity )
     {
-        $account = Test-CIdentity -Name $Identity -PassThru
+        $account = Test-CIdentity -Name $Identity -NoWarn -PassThru
         if( $account )
         {
             $Identity = $account.FullName
