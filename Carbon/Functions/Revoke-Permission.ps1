@@ -68,7 +68,7 @@ function Revoke-CPermission
         return
     }
 
-    $providerName = Get-CPathProvider -Path $Path | Select-Object -ExpandProperty 'Name'
+    $providerName = Get-CPathProvider -Path $Path -NoWarn | Select-Object -ExpandProperty 'Name'
     if( $providerName -eq 'Certificate' )
     {
         $providerName = 'CryptoKey'
