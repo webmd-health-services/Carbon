@@ -85,7 +85,7 @@ function Revoke-CComPermission
         $comArgs.LaunchAndActivation = $true
     }
 
-    $account = Resolve-CIdentity -Name $Identity
+    $account = Resolve-CIdentity -Name $Identity -NoWarn
     if( -not $account )
     {
         return

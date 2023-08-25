@@ -4,30 +4,30 @@ function Get-CServicePermission
     <#
     .SYNOPSIS
     Gets the permissions for a service.
-    
+
     .DESCRIPTION
     Uses the Win32 advapi32 API to query the permissions for a service.  Returns `Carbon.ServiceAccessRule` objects for each.  The two relavant properties on this object are
-    
+
      * IdentityReference - The identity of the permission.
      * ServiceAccessRights - The permissions the user has.
-     
+
     .OUTPUTS
     Carbon.Security.ServiceAccessRule.
-    
+
     .LINK
     Grant-ServicePermissions
-    
+
     .LINK
     Revoke-ServicePermissions
-    
+
     .EXAMPLE
     Get-CServicePermission -Name 'Hyperdrive'
-    
+
     Gets the access rules for the `Hyperdrive` service.
-    
+
     .EXAMPLE
     Get-CServicePermission -Name 'Hyperdrive' -Identity FALCON\HSolo
-    
+
     Gets just Han's permissions to control the `Hyperdrive` service.
     #>
     [CmdletBinding()]
@@ -36,22 +36,22 @@ function Get-CServicePermission
         [string]
         # The name of the service whose permissions to return.
         $Name,
-        
+
         [string]
         # The specific identity whose permissions to get.
         $Identity
     )
-    
+
     Set-StrictMode -Version 'Latest'
 
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
     $dacl = Get-CServiceAcl -Name $Name
-    
+
     $account = $null
     if( $Identity )
     {
-        $account = Resolve-CIdentity -Name $Identity
+        $account = Resolve-CIdentity -Name $Identity -NoWarn
         if( -not $account )
         {
             return
@@ -61,7 +61,7 @@ function Get-CServicePermission
     $dacl |
         ForEach-Object {
             $ace = $_
-            
+
             $aceSid = $ace.SecurityIdentifier;
             if( $aceSid.IsValidTargetType([Security.Principal.NTAccount]) )
             {
@@ -88,9 +88,9 @@ function Get-CServicePermission
                 Write-Error ("Unsupported aceType {0}." -f $ace.AceType)
                 return
             }
-            New-Object Carbon.Security.ServiceAccessRule $aceSid,$ace.AccessMask,$ruleType            
+            New-Object Carbon.Security.ServiceAccessRule $aceSid,$ace.AccessMask,$ruleType
         } |
-        Where-Object { 
+        Where-Object {
             if( $account )
             {
                 return ($_.IdentityReference.Value -eq $account.FullName)

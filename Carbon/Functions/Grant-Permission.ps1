@@ -373,7 +373,7 @@ function Grant-CPermission
     }
 
     $rulesToRemove = $null
-    $Identity = Resolve-CIdentity -Name $Identity
+    $Identity = Resolve-CIdentity -Name $Identity -NoWarn
     if( $Clear )
     {
         $rulesToRemove = $currentAcl.Access |

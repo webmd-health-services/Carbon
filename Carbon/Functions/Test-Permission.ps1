@@ -42,17 +42,17 @@ function Test-CPermission
 
     .LINK
     http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.filesystemrights.aspx
-    
+
     .LINK
     http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.registryrights.aspx
-    
+
     .LINK
     http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.cryptokeyrights.aspx
-    
+
     .EXAMPLE
     Test-CPermission -Identity 'STARFLEET\JLPicard' -Permission 'FullControl' -Path 'C:\Enterprise\Bridge'
 
-    Demonstrates how to check that Jean-Luc Picard has `FullControl` permission on the `C:\Enterprise\Bridge`.  
+    Demonstrates how to check that Jean-Luc Picard has `FullControl` permission on the `C:\Enterprise\Bridge`.
 
     .EXAMPLE
     Test-CPermission -Identity 'STARFLEET\GLaForge' -Permission 'WriteKey' -Path 'HKLM:\Software\Enterprise\Engineering'
@@ -75,17 +75,17 @@ function Test-CPermission
         [string]
         # The path on which the permissions should be checked.  Can be a file system or registry path.
         $Path,
-        
+
         [Parameter(Mandatory=$true)]
         [string]
         # The user or group whose permissions to check.
         $Identity,
-        
+
         [Parameter(Mandatory=$true)]
         [string[]]
         # The permission to test for: e.g. FullControl, Read, etc.  For file system items, use values from [System.Security.AccessControl.FileSystemRights](http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.filesystemrights.aspx).  For registry items, use values from [System.Security.AccessControl.RegistryRights](http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.registryrights.aspx).
         $Permission,
-        
+
         [Carbon.Security.ContainerInheritanceFlags]
         # The container and inheritance flags to check. Ignored if `Path` is a file. These are ignored if not supplied. See `Grant-CPermission` for detailed explanation of this parameter. This controls the inheritance and propagation flags.  Default is full inheritance, e.g. `ContainersAndSubContainersAndLeaves`. This parameter is ignored if `Path` is to a leaf item.
         $ApplyTo,
@@ -138,7 +138,7 @@ function Test-CPermission
         return
     }
 
-    $account = Resolve-CIdentity -Name $Identity
+    $account = Resolve-CIdentity -Name $Identity -NoWarn
     if( -not $account)
     {
         return
@@ -171,10 +171,10 @@ function Test-CPermission
         }
     }
 
-    $acl = Get-CPermission -Path $Path -Identity $Identity -Inherited:$Inherited | 
+    $acl = Get-CPermission -Path $Path -Identity $Identity -Inherited:$Inherited |
                 Where-Object { $_.AccessControlType -eq 'Allow' } |
                 Where-Object { $_.IsInherited -eq $Inherited } |
-                Where-Object { 
+                Where-Object {
                     if( $Exact )
                     {
                         return ($_.$rightsPropertyName -eq $rights)

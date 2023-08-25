@@ -43,7 +43,7 @@ BeforeAll {
         {
             $group | Should -Not -BeNullOrEmpty
             $Member |
-                ForEach-Object { Resolve-Identity -Name $_ } |
+                ForEach-Object { Resolve-CIdentity -Name $_ -NoWarn } |
                 ForEach-Object {
                     $identity = $_
                     $members = $group.Members | Where-Object { $_.Sid -eq $identity.Sid }

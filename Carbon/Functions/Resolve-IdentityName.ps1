@@ -4,7 +4,7 @@ function Resolve-CIdentityName
     <#
     .SYNOPSIS
     Determines the full, NT identity name for a user or group.
-    
+
     .DESCRIPTION
     `Resolve-CIdentityName` resolves a user/group name into its full, canonical name, used by the operating system. For example, the local Administrators group is actually called BUILTIN\Administrators. With a canonical username, you can unambiguously compare principals on objects that contain user/group information.
 
@@ -28,13 +28,13 @@ function Resolve-CIdentityName
 
     .LINK
     http://msdn.microsoft.com/en-us/library/windows/desktop/aa379601.aspx
-    
+
     .OUTPUTS
     string
-    
+
     .EXAMPLE
     Resolve-CIdentityName -Name 'Administrators'
-    
+
     Returns `BUILTIN\Administrators`, the canonical name for the local Administrators group.
     #>
     [CmdletBinding(DefaultParameterSetName='ByName')]
@@ -55,10 +55,10 @@ function Resolve-CIdentityName
     Set-StrictMode -Version 'Latest'
 
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
-    
+
     if( $PSCmdlet.ParameterSetName -eq 'ByName' )
     {
-        return Resolve-CIdentity -Name $Name -ErrorAction Ignore | Select-Object -ExpandProperty 'FullName'
+        return Resolve-CIdentity -Name $Name -NoWarn -ErrorAction Ignore | Select-Object -ExpandProperty 'FullName'
     }
     elseif( $PSCmdlet.ParameterSetName -eq 'BySid' )
     {
@@ -78,6 +78,6 @@ function Resolve-CIdentityName
             return $SID.ToString()
         }
     }
-    
+
 }
 

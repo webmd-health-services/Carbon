@@ -90,7 +90,7 @@ function Install-CFileShare
         {
             $trustee = ([wmiclass]'Win32_Trustee').CreateInstance()
             [Security.Principal.SecurityIdentifier]$sid =
-                Resolve-CIdentity -Name $identityName | Select-Object -ExpandProperty 'Sid'
+                Resolve-CIdentity -Name $identityName -NoWarn | Select-Object -ExpandProperty 'Sid'
             if( -not $sid )
             {
                 continue

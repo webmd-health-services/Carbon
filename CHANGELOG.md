@@ -3,6 +3,13 @@
 
 # Carbon Changelog
 
+## 2.16.0
+
+### Deprecated
+
+* Function `Resolve-CIdentity`. Migrated to the `Carbon.Accounts` module.
+
+
 ## 2.15.1
 
 > Released 17 Aug 2023

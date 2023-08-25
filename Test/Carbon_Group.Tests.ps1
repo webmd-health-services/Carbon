@@ -17,7 +17,7 @@ BeforeAll {
     $script:description = 'Group for testing Carbon''s Group DSC resource.'
 
     Start-CarbonDscTestFixture 'Group'
-    $script:user1 = Resolve-CIdentity -Name $CarbonTestUser.UserName
+    $script:user1 = Resolve-CIdentity -Name $CarbonTestUser.UserName -NoWarn
     $script:user2 = Install-CUser -Credential (New-CCredential -UserName $script:username2 -Password 'P@ssw0rd1') -Description 'Carbon test user' -PassThru
     $script:user3 = Install-CUser -Credential (New-CCredential -UserName $script:username3 -Password 'P@ssw0rd1') -Description 'Carbon test user' -PassThru
     Install-CGroup -Name $script:groupName -Description $script:description -Member $script:username1,$script:username2

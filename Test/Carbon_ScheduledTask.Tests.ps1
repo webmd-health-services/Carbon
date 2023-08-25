@@ -28,7 +28,7 @@ BeforeAll {
 
     $script:credential = New-CCredential -User 'CarbonDscTestUser' -Password ([Guid]::NewGuid().ToString())
     Install-CUser -Credential $script:credential
-    $script:sid = Resolve-CIdentity -Name $script:credential.UserName | Select-Object -ExpandProperty 'Sid'
+    $script:sid = Resolve-CIdentity -Name $script:credential.UserName -NoWarn | Select-Object -ExpandProperty 'Sid'
     $script:tempDir = $null
     $taskXmlPath = Join-Path -Path $PSScriptRoot -ChildPath 'ScheduledTasks\task.xml' -Resolve
     $script:taskForUser = Get-Content -Path $taskXmlPath -Raw

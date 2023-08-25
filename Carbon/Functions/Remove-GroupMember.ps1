@@ -30,7 +30,7 @@ function Remove-CGroupMember
         [string]
         # The group name.
         $Name,
-        
+
         [Parameter(Mandatory=$true)]
         [string[]]
         # The users/groups to remove from a group.
@@ -40,18 +40,18 @@ function Remove-CGroupMember
 
     Set-StrictMode -Version 'Latest'
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
-    
+
     [DirectoryServices.AccountManagement.GroupPrincipal]$group = Get-CGroup -Name $Name
     if( -not $group )
     {
         return
     }
-    
+
     try
     {
         foreach( $_member in $Member )
         {
-            $identity = Resolve-CIdentity -Name $_member
+            $identity = Resolve-CIdentity -Name $_member -NoWarn
             if( -not $identity )
             {
                 continue

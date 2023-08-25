@@ -262,11 +262,18 @@ function Write-CRefactoredCommandWarning
         [Parameter(Mandatory)]
         [String] $ModuleName,
 
-        [String] $NewCommandName
+        [String] $NewCommandName,
+
+        [switch] $NoWarn
     )
 
     Set-StrictMode -Version 'Latest'
     Use-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState
+
+    if ($NoWarn)
+    {
+        return
+    }
 
     $msg = "Carbon's ""$($CommandName)"" function MOVED to new ""$($ModuleName)"" module"
     if( $NewCommandName )

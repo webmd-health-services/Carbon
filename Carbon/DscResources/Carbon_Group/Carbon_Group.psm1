@@ -54,8 +54,8 @@ function Set-TargetResource
     DSC resource for configuring local Windows groups.
 
     .DESCRIPTION
-    The `Carbon_Group` resource installs and uninstalls groups. It also adds members to existing groups. 
-    
+    The `Carbon_Group` resource installs and uninstalls groups. It also adds members to existing groups.
+
     The group is installed when `Ensure` is set to `Present`. Members of the group are updated to match the `Members` property (i.e. members not listed in the `Members` property are removed from the group). If `Members` has no value, all members are removed. Because DSC resources run under the LCM which runs as `System`, local system accounts must have access to the directories where both new and existing member accounts can be found.
 
     The group is removed when `Ensure` is set to `Absent`. When removing a group, the `Members` property is ignored.
@@ -277,7 +277,7 @@ function Resolve-PrincipalName
 
     process
     {
-        Resolve-CIdentity -SID $Principal.Sid.Value | Select-Object -ExpandProperty 'FullName'
+        Resolve-CIdentity -SID $Principal.Sid.Value -NoWarn | Select-Object -ExpandProperty 'FullName'
     }
 }
 

@@ -165,7 +165,7 @@ Describe 'Carbon_Service' {
         $resource.RunCommandDelay | Should -Be (60*1000)
         $resource.DisplayName | Should -Be 'Display Name'
         $resource.Description | Should -Be 'Description description description'
-        $resource.UserName | Should -Be (Resolve-CIdentity -Name $script:credential.UserName).FullName
+        $resource.UserName | Should -Be (Resolve-CIdentity -Name $script:credential.UserName -NoWarn).FullName
         $resource.Credential | Should -BeNullOrEmpty
         $resource.ArgumentList | Should -Be $null
         Assert-DscResourcePresent $resource

@@ -229,7 +229,7 @@ function Install-CService
         }
 
 
-        $identity = Resolve-CIdentity -Name $UserName
+        $identity = Resolve-CIdentity -Name $UserName -NoWarn
 
         if( -not $identity )
         {
@@ -239,7 +239,7 @@ function Install-CService
     }
     else
     {
-        $identity = Resolve-CIdentity "NetworkService"
+        $identity = Resolve-CIdentity "NetworkService" -NoWarn
     }
 
     if( -not (Test-Path -Path $Path -PathType Leaf) )
@@ -405,7 +405,7 @@ function Install-CService
             $doInstall = $true
         }
 
-        $currentIdentity = Resolve-CIdentity $serviceConfig.UserName
+        $currentIdentity = Resolve-CIdentity $serviceConfig.UserName -NoWarn
         if( $currentIdentity.FullName -ne $identity.FullName )
         {
             Write-Verbose ('[{0}] UserName          {1} -> {2}' -f $Name,$currentIdentity.FullName,$identity.FullName)
