@@ -21,7 +21,7 @@ Describe 'Revoke-Permission' {
         $Global:Error.Clear()
         $script:testDirPath = Join-Path -Path $TestDrive -ChildPath $script:testNum
         New-Item -Path $script:testDirPath -ItemType 'Directory'
-        Grant-Permission -Path $script:testDirPath -Identity $user -Permission 'FullControl'
+        Grant-Permission -Path $script:testDirPath -Identity $user -Permission 'FullControl' -NoWarn
     }
 
     AfterEach {
@@ -29,46 +29,48 @@ Describe 'Revoke-Permission' {
     }
 
     It 'when user has multiple access control entries on an item' {
-        Grant-Permission -Path $script:testDirPath -Identity $credential.UserName -Permission 'Read'
-        $perm = Get-Permission -Path $script:testDirPath -Identity $credential.UserName
+        Grant-Permission -Path $script:testDirPath -Identity $credential.UserName -Permission 'Read' -NoWarn
+        $perm = Get-Permission -Path $script:testDirPath -Identity $credential.UserName -NoWarn
         Mock -CommandName 'Get-Permission' -ModuleName 'Carbon' -MockWith { $perm ; $perm }.GetNewClosure()
         $Global:Error.Clear()
-        Revoke-Permission -Path $script:testDirPath -Identity $credential.UserName
+        Revoke-Permission -Path $script:testDirPath -Identity $credential.UserName -NoWarn
         $Global:Error | Should -BeNullOrEmpty
-        Carbon\Get-Permission -Path $script:testDirPath -Identity $credential.UserName | Should -BeNullOrEmpty
+        Carbon\Get-Permission -Path $script:testDirPath -Identity $credential.UserName -NoWarn | Should -BeNullOrEmpty
     }
 
     It 'should revoke permission' {
-        Revoke-Permission -Path $script:testDirPath -Identity $user
+        Revoke-Permission -Path $script:testDirPath -Identity $user -NoWarn
         $Global:Error.Count | Should -Be 0
-        (Test-Permission -Path $script:testDirPath -Identity $user -Permission 'FullControl') | Should -BeFalse
+        (Test-Permission -Path $script:testDirPath -Identity $user -Permission 'FullControl' -NoWarn) | Should -BeFalse
     }
 
     It 'should not revoke inherited permissions' {
-        Get-Permission -Path $script:testDirPath -Inherited |
+        Get-Permission -Path $script:testDirPath -Inherited -NoWarn |
             Where-Object { $_.IdentityReference -notlike ('*{0}*' -f $user) } |
             ForEach-Object {
-                $result = Revoke-Permission -Path $script:testDirPath -Identity $_.IdentityReference
+                $result = Revoke-Permission -Path $script:testDirPath -Identity $_.IdentityReference -NoWarn
                 $Global:Error.Count | Should -Be 0
                 $result | Should -BeNullOrEmpty
-                (Test-Permission -Identity $_.IdentityReference -Path $script:testDirPath -Inherited -Permission $_.FileSystemRights) | Should -BeTrue
+                Test-Permission -Identity $_.IdentityReference -Path $script:testDirPath -Inherited -Permission $_.FileSystemRights -NoWarn |
+                    Should -BeTrue
             }
     }
 
     It 'should handle revoking non existent permission' {
-        Revoke-Permission -Path $script:testDirPath -Identity $user
-        (Test-Permission -Path $script:testDirPath -Identity $user -Permission 'FullControl') | Should -BeFalse
+        Revoke-Permission -Path $script:testDirPath -Identity $user -NoWarn
+        (Test-Permission -Path $script:testDirPath -Identity $user -Permission 'FullControl' -NoWarn) | Should -BeFalse
         Revoke-Permission -Path $script:testDirPath -Identity $user
         $Global:Error.Count | Should -Be 0
-        (Test-Permission -Path $script:testDirPath -Identity $user -Permission 'FullControl') | Should -BeFalse
+        (Test-Permission -Path $script:testDirPath -Identity $user -Permission 'FullControl' -NoWarn) | Should -BeFalse
     }
 
     It 'should resolve relative path' {
         Push-Location -Path (Split-Path -Parent -Path $script:testDirPath)
         try
         {
-            Revoke-Permission -Path ('.\{0}' -f (Split-Path -Leaf -Path $script:testDirPath)) -Identity $user
-            (Test-Permission -Path $script:testDirPath -Identity $user -Permission 'FullControl') | Should -BeFalse
+            Revoke-Permission -Path ('.\{0}' -f (Split-Path -Leaf -Path $script:testDirPath)) -Identity $user -NoWarn
+            Test-Permission -Path $script:testDirPath -Identity $user -Permission 'FullControl' -NoWarn |
+                Should -BeFalse
         }
         finally
         {
@@ -77,8 +79,8 @@ Describe 'Revoke-Permission' {
     }
 
     It 'should support what if' {
-        Revoke-Permission -Path $script:testDirPath -Identity $user -WhatIf
-        (Test-Permission -Path $script:testDirPath -Identity $user -Permission 'FullControl') | Should -BeTrue
+        Revoke-Permission -Path $script:testDirPath -Identity $user -NoWarn -WhatIf
+        Test-Permission -Path $script:testDirPath -Identity $user -Permission 'FullControl' -NoWarn | Should -BeTrue
     }
 
     It 'should revoke permission on registry' {
@@ -87,10 +89,10 @@ Describe 'Revoke-Permission' {
 
         try
         {
-            Grant-Permission -Identity $user -Permission 'ReadKey' -Path $regKey
-            $result = Revoke-Permission -Path $regKey -Identity $user
+            Grant-Permission -Identity $user -Permission 'ReadKey' -Path $regKey -NoWarn
+            $result = Revoke-Permission -Path $regKey -Identity $user -NoWarn
             $result | Should -BeNullOrEmpty
-            (Test-Permission -Path $regKey -Identity $user -Permission 'ReadKey') | Should -BeFalse
+            Test-Permission -Path $regKey -Identity $user -Permission 'ReadKey' -NoWarn | Should -BeFalse
         }
         finally
         {
@@ -103,11 +105,11 @@ Describe 'Revoke-Permission' {
         try
         {
             $certPath = Join-Path -Path 'cert:\LocalMachine\My' -ChildPath $cert.Thumbprint
-            Grant-Permission -Path $certPath -Identity $user -Permission 'FullControl'
-            (Get-Permission -Path $certPath -Identity $user) | Should -Not -BeNullOrEmpty
+            Grant-Permission -Path $certPath -Identity $user -Permission 'FullControl' -NoWarn
+            (Get-Permission -Path $certPath -Identity $user -NoWarn) | Should -Not -BeNullOrEmpty
             Revoke-Permission -Path $certPath -Identity $user
             $Global:Error.Count | Should -Be 0
-            (Get-Permission -Path $certPath -Identity $user) | Should -BeNullOrEmpty
+            (Get-Permission -Path $certPath -Identity $user -NoWarn) | Should -BeNullOrEmpty
         }
         finally
         {
@@ -120,9 +122,9 @@ Describe 'Revoke-Permission' {
         try
         {
             $certPath = Join-Path -Path 'cert:\CurrentUser\My' -ChildPath $cert.Thumbprint
-            Grant-Permission -Path $certPath -Identity $user -Permission 'FullControl' -WhatIf
+            Grant-Permission -Path $certPath -Identity $user -Permission 'FullControl' -NoWarn -WhatIf
             $Global:Error.Count | Should -Be 0
-            (Get-Permission -Path $certPath -Identity $user) | Should -BeNullOrEmpty
+            (Get-Permission -Path $certPath -Identity $user -NoWarn) | Should -BeNullOrEmpty
         }
         finally
         {
@@ -135,11 +137,11 @@ Describe 'Revoke-Permission' {
         try
         {
             $certPath = Join-Path -Path 'cert:\LocalMachine\My' -ChildPath $cert.Thumbprint
-            Grant-Permission -Path $certPath -Identity $user -Permission 'FullControl'
-            (Get-Permission -Path $certPath -Identity $user) | Should -Not -BeNullOrEmpty
-            Revoke-Permission -Path $certPath -Identity $user -WhatIf
+            Grant-Permission -Path $certPath -Identity $user -Permission 'FullControl' -NoWarn
+            (Get-Permission -Path $certPath -Identity $user -NoWarn) | Should -Not -BeNullOrEmpty
+            Revoke-Permission -Path $certPath -Identity $user -NoWarn -WhatIf
             $Global:Error.Count | Should -Be 0
-            (Get-Permission -Path $certPath -Identity $user) | Should -Not -BeNullOrEmpty
+            (Get-Permission -Path $certPath -Identity $user -NoWarn) | Should -Not -BeNullOrEmpty
         }
         finally
         {
@@ -153,11 +155,11 @@ Describe 'Revoke-Permission' {
         try
         {
             $certPath = Join-Path -Path 'cert:\LocalMachine\My' -ChildPath $cert.Thumbprint
-            Grant-Permission -Path $certPath -Identity $user -Permission 'FullControl'
-            Get-Permission -Path $certPath -Identity $user | Should -Not -BeNullOrEmpty
-            Revoke-Permission -Path $certPath -Identity $user
+            Grant-Permission -Path $certPath -Identity $user -Permission 'FullControl' -NoWarn
+            Get-Permission -Path $certPath -Identity $user -NoWarn | Should -Not -BeNullOrEmpty
+            Revoke-Permission -Path $certPath -Identity $user -NoWarn
             $Global:Error.Count | Should -Be 0
-            Get-Permission -Path $certPath -Identity $user | Should -BeNullOrEmpty
+            Get-Permission -Path $certPath -Identity $user -NoWarn | Should -BeNullOrEmpty
         }
         finally
         {

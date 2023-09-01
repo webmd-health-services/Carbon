@@ -218,11 +218,18 @@ function Write-CObsoleteCommandWarning
 
         [String] $NewModuleName,
 
-        [switch] $NewCommandBuiltin
+        [switch] $NewCommandBuiltin,
+
+        [switch] $NoWarn
     )
 
     Set-StrictMode -Version 'Latest'
     Use-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState
+
+    if ($NoWarn)
+    {
+        return
+    }
 
     $msg = "Carbon's ""$($CommandName)"" function is OBSOLETE and will be removed in the next major version of Carbon."
 

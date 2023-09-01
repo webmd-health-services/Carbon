@@ -293,7 +293,7 @@ function Install-CService
 
     if( $PSCmdlet.ShouldProcess( $Path, ('grant {0} ReadAndExecute permissions' -f $identity.FullName) ) )
     {
-        Grant-CPermission -Identity $identity.FullName -Permission ReadAndExecute -Path $Path
+        Grant-CPermission -Identity $identity.FullName -Permission ReadAndExecute -Path $Path -NoWarn
     }
 
     $doInstall = $false

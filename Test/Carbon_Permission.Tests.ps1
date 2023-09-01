@@ -32,7 +32,7 @@ Describe 'Carbon_Permission' {
 
         $tempDir = New-MockDir
 
-        Get-Permission -Path $tempDir -Identity $UserName -Inherited | Should -BeNullOrEmpty
+        Get-Permission -Path $tempDir -Identity $UserName -Inherited -NoWarn | Should -BeNullOrEmpty
         Test-TargetResource -Identity $UserName -Path $tempDir -Ensure Absent -ErrorVariable 'errors'
         $errors | Should -BeNullOrEmpty
     }
@@ -42,9 +42,9 @@ Describe 'Carbon_Permission' {
         Start-CarbonDscTestFixture 'Permission'
 
         $tempDir = New-MockDir
-        Grant-Permission -Path $tempDir -Identity $UserName -Permission FullControl
+        Grant-Permission -Path $tempDir -Identity $UserName -Permission FullControl -NoWarn
 
-        Get-Permission -Path $tempDir -Identity $UserName -Inherited | Should -Not -BeNullOrEmpty
+        Get-Permission -Path $tempDir -Identity $UserName -Inherited -NoWarn | Should -Not -BeNullOrEmpty
         Test-TargetResource -Identity $UserName -Path $tempDir -Ensure Present -ErrorVariable 'errors' -ErrorAction SilentlyContinue
         $errors | Should -Not -BeNullOrEmpty
         $errors | Should -Match 'is mandatory'
@@ -93,7 +93,7 @@ Describe 'Carbon_Permission' {
         $result = Test-TargetResource @rule2
         $result | Should -BeTrue
 
-        $perm = Get-Permission -Path $tempDir -Identity $UserName #-Inherited
+        $perm = Get-Permission -Path $tempDir -Identity $UserName -NoWarn #-Inherited
         $perm | Should -HaveCount 2
     }
 
@@ -105,18 +105,24 @@ Describe 'Carbon_Permission' {
         New-Item -Path $keyPath
         try
         {
-            (Test-Permission -Identity $UserName -Path $keyPath -Permission ReadKey -ApplyTo Container -Exact) | Should -BeFalse
-            (Test-TargetResource -Identity $UserName -Path $keyPath -Permission ReadKey -Ensure Present) | Should -BeFalse
+            (Test-Permission -Identity $UserName -Path $keyPath -Permission ReadKey -ApplyTo Container -Exact -NoWarn) |
+                Should -BeFalse
+            (Test-TargetResource -Identity $UserName -Path $keyPath -Permission ReadKey -Ensure Present) |
+                Should -BeFalse
 
             Set-TargetResource -Identity $UserName -Path $keyPath -Permission ReadKey -ApplyTo Container -Ensure Present
             $Global:Error.Count | Should -Be 0
-            (Test-Permission -Identity $UserName -Path $keyPath -Permission ReadKey -ApplyTo Container -Exact) | Should -BeTrue
-            (Test-TargetResource -Identity $UserName -Path $keyPath -Permission ReadKey -Ensure Present) | Should -BeTrue
+            (Test-Permission -Identity $UserName -Path $keyPath -Permission ReadKey -ApplyTo Container -Exact -NoWarn) |
+                Should -BeTrue
+            (Test-TargetResource -Identity $UserName -Path $keyPath -Permission ReadKey -Ensure Present) |
+                Should -BeTrue
 
             Set-TargetResource -Identity $UserName -Path $keyPath -Permission ReadKey -ApplyTo Container -Ensure Absent
             $Global:Error.Count | Should -Be 0
-            (Test-Permission -Identity $UserName -Path $keyPath -Permission ReadKey -ApplyTo Container -Exact) | Should -BeFalse
-            (Test-TargetResource -Identity $UserName -Path $keyPath -Permission ReadKey -Ensure Absent) | Should -BeTrue
+            (Test-Permission -Identity $UserName -Path $keyPath -Permission ReadKey -ApplyTo Container -Exact -NoWarn) |
+                Should -BeFalse
+            (Test-TargetResource -Identity $UserName -Path $keyPath -Permission ReadKey -Ensure Absent) |
+                Should -BeTrue
         }
         finally
         {
@@ -146,13 +152,15 @@ Describe 'Carbon_Permission' {
     It 'should grant permission on file system' {
         Set-TargetResource -Identity $UserName -Path $tempDir -Permission FullControl -Ensure Present
         $Global:Error.Count | Should -Be 0
-        (Test-Permission -Identity $UserName -Path $tempDir -Permission FullControl -ApplyTo ContainerAndSubContainersAndLeaves -Exact) | Should -BeTrue
+        (Test-Permission -Identity $UserName -Path $tempDir -Permission FullControl -ApplyTo ContainerAndSubContainersAndLeaves -Exact -NoWarn) |
+            Should -BeTrue
     }
 
     It 'should grant permission with inheritence on file system' {
         Set-TargetResource -Identity $UserName -Path $tempDir -Permission FullControl -ApplyTo Container -Ensure Present
         $Global:Error.Count | Should -Be 0
-        (Test-Permission -Identity $UserName -Path $tempDir -Permission FullControl -ApplyTo Container -Exact) | Should -BeTrue
+        (Test-Permission -Identity $UserName -Path $tempDir -Permission FullControl -ApplyTo Container -Exact -NoWarn) |
+            Should -BeTrue
     }
 
     It 'should grant permission on private key' {
@@ -165,15 +173,15 @@ Describe 'Carbon_Permission' {
                 $readPermission = 'Read'
             }
             $certPath = Join-Path -Path 'cert:\LocalMachine\My' -ChildPath $cert.Thumbprint -Resolve
-            (Get-Permission -Path $certPath -Identity $UserName) | Should -BeNullOrEmpty
+            (Get-Permission -Path $certPath -Identity $UserName -NoWarn) | Should -BeNullOrEmpty
             (Test-TargetResource -Path $certPath -Identity $UserName -Permission $readPermission) | Should -BeFalse
 
             Set-TargetResource -Identity $UserName -Path $certPath -Permission $readPermission -Ensure Present
-            (Get-Permission -Path $certPath -Identity $UserName) | Should -Not -BeNullOrEmpty
+            (Get-Permission -Path $certPath -Identity $UserName -NoWarn) | Should -Not -BeNullOrEmpty
             (Test-TargetResource -Path $certPath -Identity $UserName -Permission $readPermission) | Should -BeTrue
 
             Set-TargetResource -Identity $UserName -Path $certPath -Permission $readPermission -Ensure Absent
-            (Get-Permission -Path $certPath -Identity $UserName) | Should -BeNullOrEmpty
+            (Get-Permission -Path $certPath -Identity $UserName -NoWarn) | Should -BeNullOrEmpty
             (Test-TargetResource -Path $certPath -Identity $UserName -Permission $readPermission -Ensure Absent) | Should -BeTrue
         }
         finally
@@ -185,20 +193,22 @@ Describe 'Carbon_Permission' {
     It 'should change permission' {
         Set-TargetResource -Identity $UserName -Path $tempDir -Permission FullControl -Ensure Present
         Set-TargetResource -Identity $UserName -Path $tempDir -Permission Read -ApplyTo Container -Ensure Present
-        (Test-Permission -Identity $UserName -Path $tempDir -Permission Read -ApplyTo Container -Exact) | Should -BeTrue
+        (Test-Permission -Identity $UserName -Path $tempDir -Permission Read -ApplyTo Container -Exact -NoWarn) |
+            Should -BeTrue
     }
 
     It 'should revoke permission' {
         Set-TargetResource -Identity $UserName -Path $tempDir -Permission FullControl -Ensure Present
         Set-TargetResource -Identity $UserName -Path $tempDir -Ensure Absent
-        (Test-Permission -Identity $UserName -Path $tempDir -Permission FullControl -Exact) | Should -BeFalse
+        (Test-Permission -Identity $UserName -Path $tempDir -Permission FullControl -Exact -NoWarn) |
+            Should -BeFalse
     }
 
     It 'should require permission when granting' {
         Set-TargetResource -Identity $UserName -Path $tempDir -Ensure Present -ErrorAction SilentlyContinue
         $Global:Error.Count | Should -BeGreaterThan 0
         $Global:Error[0] | Should -Match 'mandatory'
-        (Get-Permission -Path $tempDir -Identity $UserName) | Should -BeNullOrEmpty
+        (Get-Permission -Path $tempDir -Identity $UserName -NoWarn) | Should -BeNullOrEmpty
     }
 
     It 'should get no permission' {
@@ -326,7 +336,7 @@ Describe 'Carbon_Permission' {
             }
         }
 
-        Revoke-Permission -Path $tempDir -Identity $UserName
+        Revoke-Permission -Path $tempDir -Identity $UserName -NoWarn
         & DscConfiguration2 -Ensure 'Present' -OutputPath $CarbonDscOutputRoot
         Start-DscConfiguration -Wait -ComputerName 'localhost' -Path $CarbonDscOutputRoot -Force
         $Global:Error.Count | Should -Be 0
@@ -366,11 +376,11 @@ Describe 'Carbon_Permission' {
             }
         }
 
-        Revoke-Permission -Path $tempDir -Identity $UserName
+        Revoke-Permission -Path $tempDir -Identity $UserName -NoWarn
         & DscConfiguration3 -Ensure 'Present' -OutputPath $CarbonDscOutputRoot
         Start-DscConfiguration -Wait -ComputerName 'localhost' -Path $CarbonDscOutputRoot -Force
         $Global:Error.Count | Should -Be 0
-        Get-CPermission -Path $tempDir -Identity $UserName | Should -HaveCount 2
+        Get-CPermission -Path $tempDir -Identity $UserName -NoWarn | Should -HaveCount 2
     }
 
 }

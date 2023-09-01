@@ -11,6 +11,15 @@
 * Function `ConvertTo-CSecurityIdentifier`. Migrated to the `Carbon.Accounts` module.
 * Function `Get-CPathProvider`. Migrated to `Carbon.Core` module.
 * Function `Resolve-CIdentityName`. Migrated to the `Carbon.Accounts` module.
+* Alias `Get-Permissions`. Use `Get-CPermission` instead.
+* Function `Get-CPermission`. Migrated to the `Carbon.Permissions` module.
+* Alias `Grant-Permissions`. Use `Grant-CPermission` instead.
+* Function `Grant-CPermission`. Migrated to the `Carbon.Permissions` module.
+* Function `Revoke-CPermission`. Migrated to the `Carbon.Permissions` module.
+* Function `Test-CPermission`. Migrated to the `Carbon.Permissions` module.
+* Function `ConvertTo-CContainerInheritanceFlags`.
+* Function `ConvertTo-CInheritanceFlag`.
+* Function `ConvertTo-CPropagationFlag`.
 
 
 ## 2.15.1

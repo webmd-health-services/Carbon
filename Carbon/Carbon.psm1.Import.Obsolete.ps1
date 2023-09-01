@@ -223,6 +223,359 @@ function ConvertTo-CBase64
 
 
 
+function ConvertTo-CContainerInheritanceFlags
+{
+    <#
+    .SYNOPSIS
+    Converts a combination of InheritanceFlags Propagation Flags into a Carbon.Security.ContainerInheritanceFlags enumeration value.
+
+    .DESCRIPTION
+    `Grant-CPermission`, `Test-CPermission`, and `Get-CPermission` all take an `ApplyTo` parameter, which is a `Carbon.Security.ContainerInheritanceFlags` enumeration value. This enumeration is then converted to the appropriate `System.Security.AccessControl.InheritanceFlags` and `System.Security.AccessControl.PropagationFlags` values for getting/granting/testing permissions. If you prefer to speak in terms of `InheritanceFlags` and `PropagationFlags`, use this function to convert them to a `ContainerInheritanceFlags` value.
+
+    If your combination doesn't result in a valid combination, `$null` is returned.
+
+    For detailed description of inheritance and propagation flags, see the help for `Grant-CPermission`.
+
+    .OUTPUTS
+    Carbon.Security.ContainerInheritanceFlags.
+
+    .LINK
+    Grant-CPermission
+
+    .LINK
+    Test-CPermission
+
+    .EXAMPLE
+    ConvertTo-CContainerInheritanceFlags -InheritanceFlags 'ContainerInherit' -PropagationFlags 'None'
+
+    Demonstrates how to convert `InheritanceFlags` and `PropagationFlags` enumeration values into a `ContainerInheritanceFlags`. In this case, `[Carbon.Security.ContainerInheritanceFlags]::ContainerAndSubContainers` is returned.
+    #>
+    [CmdletBinding()]
+    [OutputType([Carbon.Security.ContainerInheritanceFlags])]
+    param(
+        [Parameter(Mandatory=$true,Position=0)]
+        [Security.AccessControl.InheritanceFlags]
+        # The inheritance flags to convert.
+        $InheritanceFlags,
+
+        [Parameter(Mandatory=$true,Position=1)]
+        [Security.AccessControl.PropagationFlags]
+        # The propagation flags to convert.
+        $PropagationFlags,
+
+        [switch] $NoWarn
+    )
+
+    Set-StrictMode -Version 'Latest'
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
+    Write-CObsoleteCommandWarning -CommandName 'ConvertTo-CContainerInheritanceFlags'
+
+    $propFlagsNone = $PropagationFlags -eq [Security.AccessControl.PropagationFlags]::None
+    $propFlagsInheritOnly = $PropagationFlags -eq [Security.AccessControl.PropagationFlags]::InheritOnly
+    $propFlagsInheritOnlyNoPropagate = $PropagationFlags -eq ([Security.AccessControl.PropagationFlags]::InheritOnly -bor [Security.AccessControl.PropagationFlags]::NoPropagateInherit)
+    $propFlagsNoPropagate = $PropagationFlags -eq [Security.AccessControl.PropagationFlags]::NoPropagateInherit
+
+    if( $InheritanceFlags -eq [Security.AccessControl.InheritanceFlags]::None )
+    {
+        return [Carbon.Security.ContainerInheritanceFlags]::Container
+    }
+    elseif( $InheritanceFlags -eq [Security.AccessControl.InheritanceFlags]::ContainerInherit )
+    {
+        if( $propFlagsInheritOnly )
+        {
+            return [Carbon.Security.ContainerInheritanceFlags]::SubContainers
+        }
+        elseif( $propFlagsInheritOnlyNoPropagate )
+        {
+            return [Carbon.Security.ContainerInheritanceFlags]::ChildContainers
+        }
+        elseif( $propFlagsNone )
+        {
+            return [Carbon.Security.ContainerInheritanceFlags]::ContainerAndSubContainers
+        }
+        elseif( $propFlagsNoPropagate )
+        {
+            return [Carbon.Security.ContainerInheritanceFlags]::ContainerAndChildContainers
+        }
+    }
+    elseif( $InheritanceFlags -eq [Security.AccessControl.InheritanceFlags]::ObjectInherit )
+    {
+        if( $propFlagsInheritOnly )
+        {
+            return [Carbon.Security.ContainerInheritanceFlags]::Leaves
+        }
+        elseif( $propFlagsInheritOnlyNoPropagate )
+        {
+            return [Carbon.Security.ContainerInheritanceFlags]::ChildLeaves
+        }
+        elseif( $propFlagsNone )
+        {
+            return [Carbon.Security.ContainerInheritanceFlags]::ContainerAndLeaves
+        }
+        elseif( $propFlagsNoPropagate )
+        {
+            return [Carbon.Security.ContainerInheritanceFlags]::ContainerAndChildLeaves
+        }
+    }
+    elseif( $InheritanceFlags -eq ([Security.AccessControl.InheritanceFlags]::ContainerInherit -bor [Security.AccessControl.InheritanceFlags]::ObjectInherit ) )
+    {
+        if( $propFlagsInheritOnly )
+        {
+            return [Carbon.Security.ContainerInheritanceFlags]::SubContainersAndLeaves
+        }
+        elseif( $propFlagsInheritOnlyNoPropagate )
+        {
+            return [Carbon.Security.ContainerInheritanceFlags]::ChildContainersAndChildLeaves
+        }
+        elseif( $propFlagsNone )
+        {
+            return [Carbon.Security.ContainerInheritanceFlags]::ContainerAndSubContainersAndLeaves
+        }
+        elseif( $propFlagsNoPropagate )
+        {
+            return [Carbon.Security.ContainerInheritanceFlags]::ContainerAndChildContainersAndChildLeaves
+        }
+    }
+}
+
+
+
+function ConvertTo-CInheritanceFlag
+{
+    <#
+    .SYNOPSIS
+    Converts a `Carbon.Security.ContainerInheritanceFlags` value to a `System.Security.AccessControl.InheritanceFlags` value.
+
+    .DESCRIPTION
+    The `Carbon.Security.ContainerInheritanceFlags` enumeration encapsulates oth `System.Security.AccessControl.InheritanceFlags` and `System.Security.AccessControl.PropagationFlags`.  Make sure you also call `ConvertTo-CPropagationFlag` to get the propagation value.
+
+    .OUTPUTS
+    System.Security.AccessControl.InheritanceFlags.
+
+    .LINK
+    ConvertTo-CPropagationFlag
+
+    .LINK
+    Grant-CPermission
+
+    .EXAMPLE
+    ConvertTo-CInheritanceFlag -ContainerInheritanceFlag ContainerAndSubContainersAndLeaves
+
+    Returns `InheritanceFlags.ContainerInherit|InheritanceFlags.ObjectInherit`.
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory=$true)]
+        [Carbon.Security.ContainerInheritanceFlags]
+        # The value to convert to an `InheritanceFlags` value.
+		[Alias('ContainerInheritanceFlags')]
+        $ContainerInheritanceFlag,
+
+        [switch] $NoWarn
+    )
+
+    Set-StrictMode -Version 'Latest'
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
+    Write-CObsoleteCommandWarning -CommandName 'ConvertTo-CInheritanceFlag'
+
+    $Flags = [Security.AccessControl.InheritanceFlags]
+    $map = @{
+        'Container' =                                  $Flags::None;
+        'SubContainers' =                              $Flags::ContainerInherit;
+        'Leaves' =                                     $Flags::ObjectInherit;
+        'ChildContainers' =                            $Flags::ContainerInherit;
+        'ChildLeaves' =                                $Flags::ObjectInherit;
+        'ContainerAndSubContainers' =                  $Flags::ContainerInherit;
+        'ContainerAndLeaves' =                         $Flags::ObjectInherit;
+        'SubContainersAndLeaves' =                    ($Flags::ContainerInherit -bor $Flags::ObjectInherit);
+        'ContainerAndChildContainers' =                $Flags::ContainerInherit;
+        'ContainerAndChildLeaves' =                    $Flags::ObjectInherit;
+        'ContainerAndChildContainersAndChildLeaves' = ($Flags::ContainerInherit -bor $Flags::ObjectInherit);
+        'ContainerAndSubContainersAndLeaves' =        ($Flags::ContainerInherit -bor $Flags::ObjectInherit);
+        'ChildContainersAndChildLeaves' =             ($Flags::ContainerInherit -bor $Flags::ObjectInherit);
+    }
+    $key = $ContainerInheritanceFlag.ToString()
+    if( $map.ContainsKey( $key) )
+    {
+        return $map[$key]
+    }
+
+    Write-Error ('Unknown Carbon.Security.ContainerInheritanceFlags enumeration value {0}.' -f $ContainerInheritanceFlag)
+}
+
+Set-Alias -Name 'ConvertTo-InheritanceFlags' -Value 'ConvertTo-CInheritanceFlag'
+
+
+
+function ConvertTo-CPropagationFlag
+{
+    <#
+    .SYNOPSIS
+    Converts a `Carbon.Security.ContainerInheritanceFlags` value to a `System.Security.AccessControl.PropagationFlags` value.
+
+    .DESCRIPTION
+    The `Carbon.Security.ContainerInheritanceFlags` enumeration encapsulates oth `System.Security.AccessControl.PropagationFlags` and `System.Security.AccessControl.InheritanceFlags`.  Make sure you also call `ConvertTo-InheritancewFlags` to get the inheritance value.
+
+    .OUTPUTS
+    System.Security.AccessControl.PropagationFlags.
+
+    .LINK
+    ConvertTo-CInheritanceFlag
+
+    .LINK
+    Grant-CPermission
+
+    .EXAMPLE
+    ConvertTo-CPropagationFlag -ContainerInheritanceFlag ContainerAndSubContainersAndLeaves
+
+    Returns `PropagationFlags.None`.
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory=$true)]
+        [Carbon.Security.ContainerInheritanceFlags]
+        # The value to convert to an `PropagationFlags` value.
+		[Alias('ContainerInheritanceFlags')]
+        $ContainerInheritanceFlag,
+
+        [switch] $NoWarn
+    )
+
+    Set-StrictMode -Version 'Latest'
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
+    Write-CObsoleteCommandWarning -CommandName 'ConvertTo-CPropagationFlag'
+
+    $Flags = [Security.AccessControl.PropagationFlags]
+    $map = @{
+        'Container' =                                  $Flags::None;
+        'SubContainers' =                              $Flags::InheritOnly;
+        'Leaves' =                                     $Flags::InheritOnly;
+        'ChildContainers' =                           ($Flags::InheritOnly -bor $Flags::NoPropagateInherit);
+        'ChildLeaves' =                               ($Flags::InheritOnly -bor $Flags::NoPropagateInherit);
+        'ContainerAndSubContainers' =                  $Flags::None;
+        'ContainerAndLeaves' =                         $Flags::None;
+        'SubContainersAndLeaves' =                     $Flags::InheritOnly;
+        'ContainerAndChildContainers' =                $Flags::NoPropagateInherit;
+        'ContainerAndChildLeaves' =                    $Flags::NoPropagateInherit;
+        'ContainerAndChildContainersAndChildLeaves' =  $Flags::NoPropagateInherit;
+        'ContainerAndSubContainersAndLeaves' =         $Flags::None;
+        'ChildContainersAndChildLeaves' =             ($Flags::InheritOnly -bor $Flags::NoPropagateInherit);
+    }
+    $key = $ContainerInheritanceFlag.ToString()
+    if( $map.ContainsKey( $key ) )
+    {
+        return $map[$key]
+    }
+
+    Write-Error ('Unknown Carbon.Security.ContainerInheritanceFlags enumeration value {0}.' -f $ContainerInheritanceFlag)
+}
+
+Set-Alias -Name 'ConvertTo-PropagationFlags' -Value 'ConvertTo-CPropagationFlag'
+
+
+
+function ConvertTo-ProviderAccessControlRights
+{
+    <#
+    .SYNOPSIS
+    Converts strings into the appropriate access control rights for a PowerShell provider (e.g. FileSystemRights or
+    RegistryRights).
+
+    .DESCRIPTION
+    This is an internal Carbon function, so you're not getting anything more than the synopsis.
+
+    .EXAMPLE
+    ConvertTo-ProviderAccessControlRights -ProviderName 'FileSystem' -InputObject 'Read','Write'
+
+    Demonstrates how to convert `Read` and `Write` into a `System.Security.AccessControl.FileSystemRights` value.
+    #>
+    [CmdletBinding()]
+    param(
+        # The provider name.
+        [Parameter(Mandatory)]
+        [ValidateSet('FileSystem', 'Registry', 'CryptoKey')]
+        [String] $ProviderName,
+
+        # The values to convert.
+        [Parameter(Mandatory, ValueFromPipeline)]
+        [String[]] $InputObject,
+
+        [switch] $NoWarn
+    )
+
+    begin
+    {
+        Set-StrictMode -Version 'Latest'
+        Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
+        Write-CObsoleteCommandWarning -CommandName 'ConvertTo-ProviderAccessControlRights' -NoWarn:$NoWarn
+
+        $toFS = $ProviderName -eq 'FileSystem'
+        $rightTypeName = 'Security.AccessControl.{0}Rights' -f $ProviderName
+
+        # CryptoKey does not exist in .NET standard/core so we will have to use FileSystem instead
+        if ($ProviderName -eq 'CryptoKey' -and -not (Test-CCryptoKeyAvailable))
+        {
+            $toFS = $true
+            $rightTypeName = 'Security.AccessControl.FileSystemRights'
+        }
+
+        $rights = 0 -as $rightTypeName
+
+        $foundInvalidRight = $false
+
+        $genericToFSMap = @{
+            GenericAll = 'FullControl';
+            GenericExecute = 'ExecuteFile';
+            GenericWrite = 'Write';
+            GenericRead = 'Read';
+        }
+        Write-Debug "[ConvertTo-ProviderAccessControlRights]"
+    }
+
+    process
+    {
+        Write-Debug "  ${InputObject}"
+        foreach ($value in $InputObject)
+        {
+            if ($toFS -and $genericToFSMap.ContainsKey($value))
+            {
+                $value = $genericToFSMap[$value]
+            }
+
+            $right = $value -as $rightTypeName
+            if (-not $right)
+            {
+                $allowedValues = [Enum]::GetNames($rightTypeName)
+                Write-Error ("System.Security.AccessControl.{0}Rights value '{1}' not found.  Must be one of: {2}." -f $providerName,$_,($allowedValues -join ' '))
+                $foundInvalidRight = $true
+                return
+            }
+            Write-Debug "    ${value} → ${right}/0x$($right.ToString('x'))"
+            $rights = $rights -bor $right
+        }
+    }
+
+    end
+    {
+        if( $foundInvalidRight )
+        {
+            Write-Debug "  null"
+            return $null
+        }
+        else
+        {
+            Write-Debug "  ${rights}/0x$($rights.ToString('x'))"
+            $rights
+        }
+        Write-Debug "[ConvertTo-ProviderAccessControlRights]"
+    }
+}
+
+
 function ConvertTo-CSecurityIdentifier
 {
     <#
@@ -742,6 +1095,183 @@ function Get-CPathProvider
 }
 
 
+
+# Leave these here so that when Get-CPermission moves to its own module, these go with it.
+Add-CTypeData -Type IO.DirectoryInfo `
+              -MemberName 'GetAccessControl' `
+              -MemberType ScriptMethod `
+              -Value {
+                    [CmdletBinding()]
+                    param(
+                        [Security.AccessControl.AccessControlSections] $IncludeSections =
+                            [Security.AccessControl.AccessControlSections]::All
+                    )
+
+                    return [IO.FileSystemAclExtensions]::GetAccessControl($this, $IncludeSections)
+                }
+
+Add-CTypeData -Type IO.FileInfo `
+              -MemberName 'GetAccessControl' `
+              -MemberType ScriptMethod `
+              -Value {
+                    [CmdletBinding()]
+                    param(
+                        [Security.AccessControl.AccessControlSections]$IncludeSections =
+                            [Security.AccessControl.AccessControlSections]::All
+                    )
+
+                    return [IO.FileSystemAclExtensions]::GetAccessControl($this, $IncludeSections)
+                }
+
+
+function Get-CPermission
+{
+    <#
+    .SYNOPSIS
+    Gets the permissions (access control rules) for a file, directory, registry key, or certificate's private key/key
+    container.
+
+    .DESCRIPTION
+    Permissions for a specific identity can also be returned.  Access control entries are for a path's discretionary
+    access control list.
+
+    To return inherited permissions, use the `Inherited` switch.  Otherwise, only non-inherited (i.e. explicit)
+    permissions are returned.
+
+    Certificate permissions are only returned if a certificate has a private key/key container. If a certificate doesn't
+    have a private key, `$null` is returned.
+
+    .OUTPUTS
+    System.Security.AccessControl.AccessRule.
+
+    .LINK
+    Carbon_Permission
+
+    .LINK
+    Disable-CAclInheritance
+
+    .LINK
+    Enable-CAclInheritance
+
+    .LINK
+    Get-CPermission
+
+    .LINK
+    Grant-CPermission
+
+    .LINK
+    Revoke-CPermission
+
+    .LINK
+    Test-CPermission
+
+    .EXAMPLE
+    Get-CPermission -Path 'C:\Windows'
+
+    Returns `System.Security.AccessControl.FileSystemAccessRule` objects for all the non-inherited rules on
+    `C:\windows`.
+
+    .EXAMPLE
+    Get-CPermission -Path 'hklm:\Software' -Inherited
+
+    Returns `System.Security.AccessControl.RegistryAccessRule` objects for all the inherited and non-inherited rules on
+    `hklm:\software`.
+
+    .EXAMPLE
+    Get-CPermission -Path 'C:\Windows' -Idenity Administrators
+
+    Returns `System.Security.AccessControl.FileSystemAccessRule` objects for all the `Administrators'` rules on
+    `C:\windows`.
+
+    .EXAMPLE
+    Get-CPermission -Path 'Cert:\LocalMachine\1234567890ABCDEF1234567890ABCDEF12345678'
+
+    Returns `System.Security.AccessControl.CryptoKeyAccesRule` objects for certificate's
+    `Cert:\LocalMachine\1234567890ABCDEF1234567890ABCDEF12345678` private key/key container. If it doesn't have a
+    private key, `$null` is returned.
+    #>
+    [CmdletBinding()]
+    [OutputType([System.Security.AccessControl.AccessRule])]
+    param(
+        # The path whose permissions (i.e. access control rules) to return. File system, registry, or certificate paths
+        # supported. Wildcards supported.
+        [Parameter(Mandatory)]
+        [String] $Path,
+
+        # The identity whose permissiosn (i.e. access control rules) to return.
+        [String] $Identity,
+
+        # Return inherited permissions in addition to explicit permissions.
+        [switch] $Inherited,
+
+        [switch] $NoWarn
+    )
+
+    Set-StrictMode -Version 'Latest'
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
+    Write-CRefactoredCommandWarning -CommandName 'Get-CPermission' -ModuleName 'Carbon.Permissions' -NoWarn:$NoWarn
+
+    $account = $null
+    if( $Identity )
+    {
+        $account = Test-CIdentity -Name $Identity -NoWarn -PassThru
+        if( $account )
+        {
+            $Identity = $account.FullName
+        }
+    }
+
+    if( -not (Test-Path -Path $Path) )
+    {
+        Write-Error ('Path ''{0}'' not found.' -f $Path)
+        return
+    }
+
+    & {
+            foreach ($item in (Get-Item -Path $Path -Force))
+            {
+                if( $item.PSProvider.Name -ne 'Certificate' )
+                {
+                    $item.GetAccessControl([Security.AccessControl.AccessControlSections]::Access) | Write-Output
+                    continue
+                }
+
+                if (-not $item.HasPrivateKey)
+                {
+                    continue
+                }
+
+                if ($item.PrivateKey -and ($item.PrivateKey | Get-Member 'CspKeyContainerInfo'))
+                {
+                    $item.PrivateKey.CspKeyContainerInfo.CryptoKeySecurity | Write-Output
+                    continue
+                }
+
+                $item | Resolve-CPrivateKeyPath | Get-Acl | Write-Output
+            }
+        } |
+        Select-Object -ExpandProperty 'Access' |
+        Where-Object {
+            if( $Inherited )
+            {
+                return $true
+            }
+            return (-not $_.IsInherited)
+        } |
+        Where-Object {
+            if( $Identity )
+            {
+                return ($_.IdentityReference.Value -eq $Identity)
+            }
+
+            return $true
+        }
+}
+
+Set-Alias -Name 'Get-Permissions' -Value 'Get-CPermission'
+
+
 function Get-CPowershellPath
 {
     <#
@@ -1191,6 +1721,471 @@ if( -not (Get-Command -Name 'Get-WindowsFeature*' | Where-Object { $_.ModuleName
 
     Set-Alias -Name 'Get-WindowsFeature' -Value 'Get-CWindowsFeature'
 }
+
+
+function Grant-CPermission
+{
+    <#
+    .SYNOPSIS
+    Grants permission on a file, directory, registry key, or certificate's private key/key container.
+
+    .DESCRIPTION
+    The `Grant-CPermission` functions grants permissions to files, directories, registry keys, and certificate private key/key containers. It detects what you are setting permissions on by inspecting the path of the item. If the path is relative, it uses the current location to determine if file system, registry, or private keys permissions should be set.
+
+    The `Permissions` attribute should be a list of [FileSystemRights](http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.filesystemrights.aspx), [RegistryRights](http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.registryrights.aspx), or [CryptoKeyRights](http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.cryptokeyrights.aspx), for files/directories, registry keys, and certificate private keys, respectively. These commands will show you the values for the appropriate permissions for your object:
+
+        [Enum]::GetValues([Security.AccessControl.FileSystemRights])
+        [Enum]::GetValues([Security.AccessControl.RegistryRights])
+        [Enum]::GetValues([Security.AccessControl.CryptoKeyRights])
+
+    Beginning with Carbon 2.0, permissions are only granted if they don't exist on an item (inherited permissions are ignored).  If you always want to grant permissions, use the `Force` switch.
+
+    Before Carbon 2.0, this function returned any new/updated access rules set on `Path`. In Carbon 2.0 and later, use the `PassThru` switch to get an access rule object back (you'll always get one regardless if the permissions changed or not).
+
+    By default, permissions allowing access are granted. Beginning in Carbon 2.3.0, you can grant permissions denying access by passing `Deny` as the value of the `Type` parameter.
+
+    Beginning in Carbon 2.7, you can append/add rules instead or replacing existing rules on files, directories, or registry items with the `Append` switch.
+
+    ## Directories and Registry Keys
+
+    When setting permissions on a container (directory/registry key) you can control inheritance and propagation flags using the `ApplyTo` parameter. This parameter is designed to hide the complexities of the Windows' inheritance and propagation flags. There are 13 possible combinations.
+
+    Given this tree
+
+            C
+           / \
+          CC CL
+         /  \
+        GC  GL
+
+    where
+
+     * C is the **C**ontainer permissions are getting set on
+     * CC is a **C**hild **C**ontainer
+     * CL is a **C**hild **L**eaf
+     * GC is a **G**randchild **C**ontainer and includes all sub-containers below it
+     * GL is a **G**randchild **L**eaf
+
+    The `ApplyTo` parameter takes one of the following 13 values and applies permissions to:
+
+     * **Container** - The container itself and nothing below it.
+     * **SubContainers** - All sub-containers under the container, e.g. CC and GC.
+     * **Leaves** - All leaves under the container, e.g. CL and GL.
+     * **ChildContainers** - Just the container's child containers, e.g. CC.
+     * **ChildLeaves** - Just the container's child leaves, e.g. CL.
+     * **ContainerAndSubContainers** - The container and all its sub-containers, e.g. C, CC, and GC.
+     * **ContainerAndLeaves** - The container and all leaves under it, e.g. C and CL.
+     * **SubContainerAndLeaves** - All sub-containers and leaves, but not the container itself, e.g. CC, CL, GC, and GL.
+     * **ContainerAndChildContainers** - The container and all just its child containers, e.g. C and CC.
+     * **ContainerAndChildLeaves** - The container and just its child leaves, e.g. C and CL.
+     * **ContainerAndChildContainersAndChildLeaves** - The container and just its child containers/leaves, e.g. C, CC, and CL.
+     * **ContainerAndSubContainersAndLeaves** - Everything, full inheritance/propogation, e.g. C, CC, GC, GL.  **This is the default.**
+     * **ChildContainersAndChildLeaves**  - Just the container's child containers/leaves, e.g. CC and CL.
+
+    The following table maps `ContainerInheritanceFlags` values to the actual `InheritanceFlags` and `PropagationFlags` values used:
+
+        ContainerInheritanceFlags                   InheritanceFlags                 PropagationFlags
+        -------------------------                   ----------------                 ----------------
+        Container                                   None                             None
+        SubContainers                               ContainerInherit                 InheritOnly
+        Leaves                                      ObjectInherit                    InheritOnly
+        ChildContainers                             ContainerInherit                 InheritOnly,
+                                                                                     NoPropagateInherit
+        ChildLeaves                                 ObjectInherit                    InheritOnly
+        ContainerAndSubContainers                   ContainerInherit                 None
+        ContainerAndLeaves                          ObjectInherit                    None
+        SubContainerAndLeaves                       ContainerInherit,ObjectInherit   InheritOnly
+        ContainerAndChildContainers                 ContainerInherit                 None
+        ContainerAndChildLeaves                     ObjectInherit                    None
+        ContainerAndChildContainersAndChildLeaves   ContainerInherit,ObjectInherit   NoPropagateInherit
+        ContainerAndSubContainersAndLeaves          ContainerInherit,ObjectInherit   None
+        ChildContainersAndChildLeaves               ContainerInherit,ObjectInherit   InheritOnly
+
+    The above information adapated from [Manage Access to Windows Objects with ACLs and the .NET Framework](http://msdn.microsoft.com/en-us/magazine/cc163885.aspx#S3), published in the November 2004 copy of *MSDN Magazine*.
+
+    If you prefer to speak in `InheritanceFlags` or `PropagationFlags`, you can use the `ConvertTo-ContainerInheritaceFlags` function to convert your flags into Carbon's flags.
+
+    ## Certificate Private Keys/Key Containers
+
+    When setting permissions on a certificate's private key/key container, if a certificate doesn't have a private key, it is ignored and no permissions are set. Since certificate's are always leaves, the `ApplyTo` parameter is ignored.
+
+    When using the `-Clear` switch, note that the local `Administrators` account will always remain. In testing on Windows 2012 R2, we noticed that when `Administrators` access was removed, you couldn't read the key anymore.
+
+    .OUTPUTS
+    System.Security.AccessControl.AccessRule. When setting permissions on a file or directory, a `System.Security.AccessControl.FileSystemAccessRule` is returned. When setting permissions on a registry key, a `System.Security.AccessControl.RegistryAccessRule` returned. When setting permissions on a private key, a `System.Security.AccessControl.CryptoKeyAccessRule` object is returned.
+
+    .LINK
+    Carbon_Permission
+
+    .LINK
+    ConvertTo-CContainerInheritanceFlags
+
+    .LINK
+    Disable-CAclInheritance
+
+    .LINK
+    Enable-CAclInheritance
+
+    .LINK
+    Get-CPermission
+
+    .LINK
+    Revoke-CPermission
+
+    .LINK
+    Test-CPermission
+
+    .LINK
+    http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.filesystemrights.aspx
+
+    .LINK
+    http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.registryrights.aspx
+
+    .LINK
+    http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.cryptokeyrights.aspx
+
+    .LINK
+    http://msdn.microsoft.com/en-us/magazine/cc163885.aspx#S3
+
+    .EXAMPLE
+    Grant-CPermission -Identity ENTERPRISE\Engineers -Permission FullControl -Path C:\EngineRoom
+
+    Grants the Enterprise's engineering group full control on the engine room.  Very important if you want to get anywhere.
+
+    .EXAMPLE
+    Grant-CPermission -Identity ENTERPRISE\Interns -Permission ReadKey,QueryValues,EnumerateSubKeys -Path rklm:\system\WarpDrive
+
+    Grants the Enterprise's interns access to read about the warp drive.  They need to learn someday, but at least they can't change anything.
+
+    .EXAMPLE
+    Grant-CPermission -Identity ENTERPRISE\Engineers -Permission FullControl -Path C:\EngineRoom -Clear
+
+    Grants the Enterprise's engineering group full control on the engine room.  Any non-inherited, existing access rules are removed from `C:\EngineRoom`.
+
+    .EXAMPLE
+    Grant-CPermission -Identity ENTERPRISE\Engineers -Permission FullControl -Path 'cert:\LocalMachine\My\1234567890ABCDEF1234567890ABCDEF12345678'
+
+    Grants the Enterprise's engineering group full control on the `1234567890ABCDEF1234567890ABCDEF12345678` certificate's private key/key container.
+
+    .EXAMPLE
+    Grant-CPermission -Identity BORG\Locutus -Permission FullControl -Path 'C:\EngineRoom' -Type Deny
+
+    Demonstrates how to grant deny permissions on an objecy with the `Type` parameter.
+
+    .EXAMPLE
+    Grant-CPermission -Path C:\Bridge -Identity ENTERPRISE\Wesley -Permission 'Read' -ApplyTo ContainerAndSubContainersAndLeaves -Append
+    Grant-CPermission -Path C:\Bridge -Identity ENTERPRISE\Wesley -Permission 'Write' -ApplyTo ContainerAndLeaves -Append
+
+    Demonstrates how to grant multiple access rules to a single identity with the `Append` switch. In this case, `ENTERPRISE\Wesley` will be able to read everything in `C:\Bridge` and write only in the `C:\Bridge` directory, not to any sub-directory.
+    #>
+    [CmdletBinding(SupportsShouldProcess)]
+    [OutputType([Security.AccessControl.AccessRule])]
+    param(
+        [Parameter(Mandatory)]
+        # The path on which the permissions should be granted.  Can be a file system, registry, or certificate path.
+        [String]$Path,
+
+        [Parameter(Mandatory)]
+        # The user or group getting the permissions.
+        [String]$Identity,
+
+        [Parameter(Mandatory)]
+		[Alias('Permissions')]
+        # The permission: e.g. FullControl, Read, etc.  For file system items, use values from [System.Security.AccessControl.FileSystemRights](http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.filesystemrights.aspx).  For registry items, use values from [System.Security.AccessControl.RegistryRights](http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.registryrights.aspx).
+        [String[]]$Permission,
+
+        # How to apply container permissions.  This controls the inheritance and propagation flags.  Default is full inheritance, e.g. `ContainersAndSubContainersAndLeaves`. This parameter is ignored if `Path` is to a leaf item.
+        [Carbon.Security.ContainerInheritanceFlags]$ApplyTo = ([Carbon.Security.ContainerInheritanceFlags]::ContainerAndSubContainersAndLeaves),
+
+        # The type of rule to apply, either `Allow` or `Deny`. The default is `Allow`, which will allow access to the item. The other option is `Deny`, which will deny access to the item.
+        #
+        # This parameter was added in Carbon 2.3.0.
+        [Security.AccessControl.AccessControlType]$Type = [Security.AccessControl.AccessControlType]::Allow,
+
+        # Removes all non-inherited permissions on the item.
+        [switch]$Clear,
+
+        # Returns an object representing the permission created or set on the `Path`. The returned object will have a `Path` propery added to it so it can be piped to any cmdlet that uses a path.
+        #
+        # The `PassThru` switch is new in Carbon 2.0.
+        [switch]$PassThru,
+
+        # Grants permissions, even if they are already present.
+        [switch]$Force,
+
+        # When granting permissions on files, directories, or registry items, add the permissions as a new access rule instead of replacing any existing access rules. This switch is ignored when setting permissions on certificates.
+        #
+        # This switch was added in Carbon 2.7.
+        [switch]$Append,
+
+        # ***Internal.*** Do not use.
+        [String] $Description,
+
+        [switch] $NoWarn
+    )
+
+    Set-StrictMode -Version 'Latest'
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
+    Write-CRefactoredCommandWarning -CommandName 'Grant-CPermission' -ModuleName 'Carbon.Permissions' -NoWarn:$NoWarn
+
+    $Path = Resolve-Path -Path $Path
+    if( -not $Path )
+    {
+        return
+    }
+
+    $providerName = Get-CPathProvider -Path $Path -NoWarn | Select-Object -ExpandProperty 'Name'
+    if( $providerName -eq 'Certificate' )
+    {
+        $providerName = 'CryptoKey'
+    }
+
+    if( $providerName -ne 'Registry' -and $providerName -ne 'FileSystem' -and $providerName -ne 'CryptoKey' )
+    {
+        Write-Error "Unsupported path: '$Path' belongs to the '$providerName' provider.  Only file system, registry, and certificate paths are supported."
+        return
+    }
+
+    $rights = $Permission | ConvertTo-ProviderAccessControlRights -ProviderName $providerName
+    if (-not $rights)
+    {
+        Write-Error ('Unable to grant {0} {1} permissions on {2}: received an unknown permission.' -f $Identity,($Permission -join ','),$Path)
+        return
+    }
+
+    if( -not (Test-CIdentity -Name $Identity -NoWarn) )
+    {
+        Write-Error ('Identity ''{0}'' not found.' -f $Identity)
+        return
+    }
+
+    $Identity = Resolve-CIdentityName -Name $Identity -NoWarn
+
+    if ($providerName -eq 'CryptoKey')
+    {
+        foreach ($certificate in (Get-Item -Path $Path))
+        {
+            $certPath = Join-Path -Path 'cert:' -ChildPath ($certificate.PSPath | Split-Path -NoQualifier)
+            $subject = $certificate.Subject
+            $thumbprint = $certificate.Thumbprint
+            if( -not $certificate.HasPrivateKey )
+            {
+                $msg = "Unable to grant permission to ${subject} (thumbprint: ${thumbprint}; path ${certPath}) " +
+                       'certificate''s private key because that certificate doesn''t have a private key.'
+                Write-Warning $msg
+                return
+            }
+
+            if (-not $Description)
+            {
+                $Description = "${certPath} ${subject}"
+            }
+
+            if (-not $certificate.PrivateKey -or `
+                -not ($certificate.PrivateKey | Get-Member -Name 'CspKeyContainerInfo'))
+            {
+                $privateKeyFilePaths = $certificate | Resolve-CPrivateKeyPath
+                if( -not $privateKeyFilePaths )
+                {
+                    # Resolve-CPrivateKeyPath writes an appropriately detailed error message.
+                    continue
+                }
+
+                $grantPermArgs = New-Object -TypeName 'Collections.Generic.Dictionary[[String], [Object]]' `
+                                            -ArgumentList $PSBoundParameters
+                [void]$grantPermArgs.Remove('Path')
+                [void]$grantPermArgs.Remove('Permission')
+
+                foreach ($privateKeyFile in $privateKeyFilePaths)
+                {
+                    Grant-CPermission -Path $privateKeyFile `
+                                      -Permission $rights `
+                                      @grantPermArgs `
+                                      -Description $Description `
+                                      -NoWarn
+                }
+                continue
+            }
+
+            [Security.AccessControl.CryptoKeySecurity]$keySecurity =
+                $certificate.PrivateKey.CspKeyContainerInfo.CryptoKeySecurity
+            if (-not $keySecurity)
+            {
+                $msg = "Failed to grant permission to ${subject} (thumbprint: ${thumbprint}; path: ${certPath}) " +
+                       'certificate''s private key because the private key has no security information.'
+                Write-Error -Message $msg -ErrorAction $ErrorActionPreference
+                continue
+            }
+
+            $rulesToRemove = @()
+            if ($Clear)
+            {
+                $rulesToRemove =
+                    $keySecurity.Access |
+                    Where-Object { $_.IdentityReference.Value -ne $Identity } |
+                    # Don't remove Administrators access.
+                    Where-Object { $_.IdentityReference.Value -ne 'BUILTIN\Administrators' }
+                if ($rulesToRemove)
+                {
+                    foreach ($ruleToRemove in $rulesToRemove)
+                    {
+                        $rmIdentity = $ruleToRemove.IdentityReference.ToString()
+                        $rmType = $ruleToRemove.AccessControlType.ToString().ToLowerInvariant()
+                        $rmRights = $ruleToRemove.CryptoKeyRights
+                        Write-Information "${Description}  ${rmIdentity}  - ${rmType} ${rmRights}"
+                        if (-not $keySecurity.RemoveAccessRule($ruleToRemove))
+                        {
+                            $msg = "Failed to remove ""${rmIdentity}"" identity's ${rmType} ""${rmRights}"" " +
+                                   "permissions to ${subject} (thumbprint: ${thumbprint}; path: ${certPath}) " +
+                                   'certificates''s private key.'
+                            Write-Error -Message $msg -ErrorAction $ErrorActionPreference
+                            continue
+                        }
+                    }
+                }
+            }
+
+            $accessRule =
+                New-Object -TypeName 'Security.AccessControl.CryptoKeyAccessRule' `
+                           -ArgumentList $Identity, $rights, $Type |
+                Add-Member -MemberType NoteProperty -Name 'Path' -Value $certPath -PassThru
+
+            if ($Force -or `
+                $rulesToRemove -or `
+                -not (Test-CPermission -Path $certPath -Identity $Identity -Permission $Permission -Exact -NoWarn))
+            {
+                $currentPerm = Get-CPermission -Path $certPath -Identity $Identity -NoWarn
+                if ($currentPerm)
+                {
+                    $curType = $currentPerm.AccessControlType.ToString().ToLowerInvariant()
+                    $curRights = $currentPerm."$($providerName)Rights"
+                    Write-Information "${Description}  ${Identity}  - ${curType} ${curRights}"
+                }
+                $newType = $Type.ToString().ToLowerInvariant()
+                Write-Information "${Description}  ${Identity}  + ${newType} ${rights}"
+                $keySecurity.SetAccessRule($accessRule)
+                $action = "grant ""${Identity} ${newType} ${rights} permission(s)"
+                Set-CryptoKeySecurity -Certificate $certificate -CryptoKeySecurity $keySecurity -Action $action
+            }
+
+            if( $PassThru )
+            {
+                return $accessRule
+            }
+        }
+        return
+    }
+
+    # We don't use Get-Acl because it returns the whole security descriptor, which includes owner information. When
+    # passed to Set-Acl, this causes intermittent errors.  So, we just grab the ACL portion of the security
+    # descriptor. See
+    # http://www.bilalaslam.com/2010/12/14/powershell-workaround-for-the-security-identifier-is-not-allowed-to-be-the-owner-of-this-object-with-set-acl/
+    $currentAcl = (Get-Item -Path $Path -Force).GetAccessControl([Security.AccessControl.AccessControlSections]::Access)
+
+    $inheritanceFlags = [Security.AccessControl.InheritanceFlags]::None
+    $propagationFlags = [Security.AccessControl.PropagationFlags]::None
+    $testPermissionParams = @{ }
+    if( Test-Path $Path -PathType Container )
+    {
+        $inheritanceFlags = ConvertTo-CInheritanceFlag -ContainerInheritanceFlag $ApplyTo -NoWarn
+        $propagationFlags = ConvertTo-CPropagationFlag -ContainerInheritanceFlag $ApplyTo -NoWarn
+        $testPermissionParams.ApplyTo = $ApplyTo
+    }
+    else
+    {
+        if( $PSBoundParameters.ContainsKey( 'ApplyTo' ) )
+        {
+            Write-Warning "Can't apply inheritance/propagation rules to a leaf. Please omit `ApplyTo` parameter when `Path` is a leaf."
+        }
+    }
+
+    if (-not $Description)
+    {
+        $Description = $Path
+    }
+
+    $rulesToRemove = $null
+    $Identity = Resolve-CIdentity -Name $Identity -NoWarn
+    if( $Clear )
+    {
+        $rulesToRemove = $currentAcl.Access |
+                            Where-Object { $_.IdentityReference.Value -ne $Identity } |
+                            # Don't remove Administrators access.
+                            Where-Object { $_.IdentityReference.Value -ne 'BUILTIN\Administrators' } |
+                            Where-Object { -not $_.IsInherited }
+
+        if( $rulesToRemove )
+        {
+            foreach( $ruleToRemove in $rulesToRemove )
+            {
+                $rmType = $ruleToRemove.AccessControlType.ToString().ToLowerInvariant()
+                $rmRights = $ruleToRemove."${providerName}Rights"
+                Write-Information "${Description}  ${Identity}  - ${rmType} ${rmRights}"
+                [void]$currentAcl.RemoveAccessRule( $ruleToRemove )
+            }
+        }
+    }
+
+    $accessRule =
+        New-Object -TypeName "Security.AccessControl.$($providerName)AccessRule" `
+                   -ArgumentList $Identity,$rights,$inheritanceFlags,$propagationFlags,$Type |
+        Add-Member -MemberType NoteProperty -Name 'Path' -Value $Path -PassThru
+
+    $missingPermission =
+        -not (Test-CPermission -Path $Path -Identity $Identity -Permission $Permission @testPermissionParams -Exact -NoWarn)
+
+    $setAccessRule = ($Force -or $missingPermission)
+    if( $setAccessRule )
+    {
+        if( $Append )
+        {
+            $currentAcl.AddAccessRule( $accessRule )
+        }
+        else
+        {
+            $currentAcl.SetAccessRule( $accessRule )
+        }
+    }
+
+    if ($rulesToRemove -or $setAccessRule)
+    {
+        $currentPerm = Get-CPermission -Path $Path -Identity $Identity -NoWarn
+        $curRights = 0
+        $curType = ''
+        $curIdentity = $Identity
+        if ($currentPerm)
+        {
+            $curType = $currentPerm.AccessControlType.ToString().ToLowerInvariant()
+            $curRights = $currentPerm."$($providerName)Rights"
+            $curIdentity = $currentPerm.IdentityReference
+        }
+        $newType = $accessRule.AccessControlType.ToString().ToLowerInvariant()
+        $newRights = $accessRule."${providerName}Rights"
+        $newIdentity = $accessRule.IdentityReference
+        if ($Append)
+        {
+            Write-Information "${Description}  ${newIdentity}  + ${newType} ${newRights}"
+        }
+        else
+        {
+            if ($currentPerm)
+            {
+                Write-Information "${Description}  ${curIdentity}  - ${curType} ${curRights}"
+            }
+            Write-Information "${Description}  ${newIdentity}  + ${newType} ${newRights}"
+        }
+        Set-Acl -Path $Path -AclObject $currentAcl
+    }
+
+    if( $PassThru )
+    {
+        return $accessRule
+    }
+}
+
+Set-Alias -Name 'Grant-Permissions' -Value 'Grant-CPermission'
+
 
 
 
@@ -3203,6 +4198,212 @@ function Resolve-CNetPath
 
 
 
+function Resolve-CPrivateKeyPath
+{
+    <#
+    .SYNOPSIS
+    Finds the path to a certificate's private key.
+
+    .DESCRIPTION
+    The `Resolve-CPrivateKeyPath` function finds the path to a certificate's private key. Pipe the certificate object to
+    the function (or pass one or more to the `Certificate` parameter). The function searches all the directories where
+    keys are stored, [which are documented by
+    Microsoft](https://learn.microsoft.com/en-us/windows/win32/seccng/key-storage-and-retrieval).
+
+    If the certificate doesn't have a private key, have access to the private key, or no private key file exists, the
+    function writes an error and returns nothing for that certificate.
+
+    Returns the path to the private key as a string.
+
+    .LINK
+    https://learn.microsoft.com/en-us/windows/win32/seccng/key-storage-and-retrieval
+
+    .EXAMPLE
+    $cert | Resolve-CPrivateKeyPath
+
+    Demonstrates that you can pipe X509Certificate2 objects to this function.
+
+    .EXAMPLE
+    Resolve-CPrivateKeyPath -Certificate $cert
+
+    Demonstrates that you pass an X509Certificate2 object to the `Certificate` parameter.
+    #>
+    [CmdletBinding()]
+    [OutputType([String])]
+    param(
+        # The certificate whose private key path to get. Must have a private key and that private key must be accessible
+        # by the current user.
+        [Parameter(Mandatory, ValueFromPipeline)]
+        [Security.Cryptography.X509Certificates.X509Certificate2[]] $Certificate
+    )
+
+    begin
+    {
+        Set-StrictMode -Version 'Latest'
+        Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
+        $searchPaths =
+            & {
+                $appData = [Environment]::GetFolderPath('ApplicationData')
+                if ($appData)
+                {
+                    if ($IsWindows)
+                    {
+                        $sid = [Security.Principal.WindowsIdentity]::GetCurrent().User
+                        $sidString = $sid.ToString()
+
+                        # CSP user private
+                        Join-Path -Path $appData -ChildPath "Microsoft\Crypto\RSA\${sidString}"
+                        Join-Path -Path $appData -ChildPath "Microsoft\Crypto\DSS\${sidString}"
+                    }
+
+                    # CNG user private
+                    Join-Path -Path $appData -ChildPath "Microsoft\Crypto\Keys"
+                }
+
+                $commonAppDataPath = [Environment]::GetFolderPath('CommonApplicationData')
+                if ($commonAppDataPath)
+                {
+                    # CSP local system private
+                    Join-Path -Path $commonAppDataPath -ChildPath 'Application Data\Microsoft\Crypto\RSA\S-1-5-18'
+                    Join-Path -Path $commonAppDataPath -ChildPath 'Application Data\Microsoft\Crypto\DSS\S-1-5-18'
+
+                    # CNG local system private
+                    Join-Path -Path $commonAppDataPath -ChildPath 'Application Data\Microsoft\Crypto\SystemKeys'
+
+                    # CSP local service private
+                    Join-Path -Path $commonAppDataPath -ChildPath 'Application Data\Microsoft\Crypto\RSA\S-1-5-19'
+                    Join-Path -Path $commonAppDataPath -ChildPath 'Application Data\Microsoft\Crypto\DSS\S-1-5-19'
+
+                    # CSP network service private
+                    Join-Path -Path $commonAppDataPath -ChildPath 'Application Data\Microsoft\Crypto\RSA\S-1-5-20'
+                    Join-Path -Path $commonAppDataPath -ChildPath 'Application Data\Microsoft\Crypto\DSS\S-1-5-20'
+
+                    # CSP shared private
+                    Join-Path -Path $commonAppDataPath -ChildPath 'Application Data\Microsoft\Crypto\RSA\MachineKeys'
+                    Join-Path -Path $commonAppDataPath -ChildPath 'Application Data\Microsoft\Crypto\DSS\MachineKeys'
+
+                    # CNG shared private
+                    Join-Path -Path $commonAppDataPath -ChildPath 'Application Data\Microsoft\Crypto\Keys'
+                }
+
+                $windowsPath = [Environment]::GetFolderPath('Windows')
+                if ($windowsPath)
+                {
+                    # CNG local service private
+                    Join-Path -Path $windowsPath -ChildPath 'ServiceProfiles\LocalService\AppData\Roaming\Microsoft\Crypto\Keys'
+
+                    # CNG network service private
+                    Join-Path -Path $windowsPath -ChildPath 'ServiceProfiles\NetworkService\AppData\Roaming\Microsoft\Crypto\Keys'
+                }
+            } |
+            Where-Object { $_ }
+
+        $accessibleSearchPaths = $searchPaths | Where-Object { Test-Path -Path $_ -ErrorAction Ignore }
+    }
+
+    process
+    {
+        $foundOne = $false
+        foreach ($cert in $Certificate)
+        {
+            $certErrMsg = "Failed to find the path to the ""$($certificate.Subject)"" ($($certificate.Thumbprint)) " +
+                          'certificate''s private key because '
+            if (-not $cert.HasPrivateKey)
+            {
+                $msg = "${certErrMsg}it does not have a private key."
+                Write-Error -Message $msg -ErrorAction $ErrorActionPreference
+                continue
+            }
+
+            $privateKey = $cert.PrivateKey
+            if (-not $privateKey)
+            {
+                try
+                {
+                    $privateKey =
+                        [Security.Cryptography.X509Certificates.RSACertificateExtensions]::GetRSAPrivateKey($cert)
+                }
+                catch
+                {
+                    $msg = "$($certErrMsg -replace ' because ', ': ') ${_}."
+                    Write-Error -Message $msg -ErrorAction $ErrorActionPreference
+                    continue
+                }
+
+                if (-not $privateKey)
+                {
+                    $msg = "${certErrMsg}the current user doesn't have permission to the private key."
+                    Write-Error -Message $msg -ErrorAction $ErrorActionPreference
+                    continue
+                }
+            }
+
+            $fileName = ''
+            if ($privateKey | Get-Member -Name 'CspKeyContainerInfo')
+            {
+                $fileName = $privateKey.CspKeyContainerInfo.UniqueKeyContainerName
+            }
+            elseif ($privateKey | Get-Member -Name 'Key')
+            {
+                $fileName = $privateKey.Key.UniqueName
+            }
+
+            if (-not $fileName)
+            {
+                $msg = "${certErrMsg}is of type [$($privateKey.GetType().FullName)], which is not currently " +
+                       'supported by Carbon. [Please request support by submitting an issue on the project''s ' +
+                       'GitHub issues page.](https://github.com/webmd-health-services/Carbon.Cryptography/issues/new)'
+                Write-Error -Message $msg -ErrorAction $ErrorActionPreference
+                continue
+            }
+
+            $foundOne = $false
+            $uniqueNameIsPath = $false
+            if ($fileName | Split-Path)
+            {
+                $uniqueNameIsPath = $true
+                if ((Test-Path -Path $fileName -PathType Leaf -ErrorAction Ignore))
+                {
+                    $foundOne = $true
+                    $fileName | Write-Output
+                }
+            }
+            else
+            {
+                foreach ($path in $accessibleSearchPaths)
+                {
+                    $fullPath = Join-Path -Path $path -ChildPath $fileName
+                    if (-not (Test-Path -Path $fullPath -PathType Leaf -ErrorAction Ignore))
+                    {
+                        continue
+                    }
+                    $foundOne = $true
+                    $fullPath | Write-Output
+                }
+            }
+
+            if (-not $foundOne)
+            {
+                if ($uniqueNameIsPath)
+                {
+                    $msg = "${certErrMsg} its file, ""${fileName}"", doesn't exist."
+                }
+                else
+                {
+                    $msg = "${certErrMsg}its file, ""${fileName}"", doesn't exist in any of these " +
+                           "directories:" + [Environment]::NewLine +
+                           " " + [Environment]::NewLine +
+                           "* $($searchPaths -join "$([Environment]::NewLine)* ")"
+                }
+                Write-Error -Message $msg -ErrorAction $ErrorActionPreference
+                continue
+            }
+        }
+    }
+}
+
+
 function Resolve-WindowsFeatureName
 {
     <#
@@ -3257,6 +4458,229 @@ function Resolve-WindowsFeatureName
         Where-Object { $featureMap.ContainsKey( $_ ) } |
         ForEach-Object { $featureMap[$_] }
 
+}
+
+
+
+function Revoke-CPermission
+{
+    <#
+    .SYNOPSIS
+    Revokes *explicit* permissions on a file, directory, registry key, or certificate's private key/key container.
+
+    .DESCRIPTION
+    Revokes all of an identity's *explicit* permissions on a file, directory, registry key, or certificate's private
+    key/key container. Only explicit permissions are considered; inherited permissions are ignored.
+
+    If the identity doesn't have permission, nothing happens, not even errors written out.
+
+    .LINK
+    Carbon_Permission
+
+    .LINK
+    Disable-CAclInheritance
+
+    .LINK
+    Enable-CAclInheritance
+
+    .LINK
+    Get-CPermission
+
+    .LINK
+    Grant-CPermission
+
+    .LINK
+    Test-CPermission
+
+    .EXAMPLE
+    Revoke-CPermission -Identity ENTERPRISE\Engineers -Path 'C:\EngineRoom'
+
+    Demonstrates how to revoke all of the 'Engineers' permissions on the `C:\EngineRoom` directory.
+
+    .EXAMPLE
+    Revoke-CPermission -Identity ENTERPRISE\Interns -Path 'hklm:\system\WarpDrive'
+
+    Demonstrates how to revoke permission on a registry key.
+
+    .EXAMPLE
+    Revoke-CPermission -Identity ENTERPRISE\Officers -Path 'cert:\LocalMachine\My\1234567890ABCDEF1234567890ABCDEF12345678'
+
+    Demonstrates how to revoke the Officers' permission to the
+    `cert:\LocalMachine\My\1234567890ABCDEF1234567890ABCDEF12345678` certificate's private key/key container.
+    #>
+    [CmdletBinding(SupportsShouldProcess)]
+    param(
+        # The path on which the permissions should be revoked.  Can be a file system, registry, or certificate path.
+        [Parameter(Mandatory)]
+        [String] $Path,
+
+        # The identity losing permissions.
+        [Parameter(Mandatory)]
+        [String] $Identity,
+
+        # ***Internal.*** Do not use.
+        [String] $Description,
+
+        [switch] $NoWarn
+    )
+
+    Set-StrictMode -Version 'Latest'
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
+    Write-CRefactoredCommandWarning -CommandName 'Revoke-CPermission' -ModuleName 'Carbon.Permissions' -NoWarn:$NoWarn
+
+    $Path = Resolve-Path -Path $Path
+    if( -not $Path )
+    {
+        return
+    }
+
+    $providerName = Get-CPathProvider -Path $Path -NoWarn | Select-Object -ExpandProperty 'Name'
+    if( $providerName -eq 'Certificate' )
+    {
+        $providerName = 'CryptoKey'
+        if( -not (Test-CCryptoKeyAvailable) )
+        {
+            $providerName = 'FileSystem'
+        }
+    }
+
+    $rulesToRemove = Get-CPermission -Path $Path -Identity $Identity -NoWarn
+    if (-not $rulesToRemove)
+    {
+        return
+    }
+
+    $Identity = Resolve-CIdentityName -Name $Identity -NoWarn
+
+    foreach ($item in (Get-Item $Path -Force))
+    {
+        if( $item.PSProvider.Name -ne 'Certificate' )
+        {
+            if (-not $Description)
+            {
+                $Description = $item.ToString()
+            }
+
+            # We don't use Get-Acl because it returns the whole security descriptor, which includes owner information.
+            # When passed to Set-Acl, this causes intermittent errors.  So, we just grab the ACL portion of the security
+            # descriptor. See
+            # http://www.bilalaslam.com/2010/12/14/powershell-workaround-for-the-security-identifier-is-not-allowed-to-be-the-owner-of-this-object-with-set-acl/
+            $currentAcl = $item.GetAccessControl('Access')
+
+            foreach ($ruleToRemove in $rulesToRemove)
+            {
+                $rmIdentity = $ruleToRemove.IdentityReference
+                $rmType = $ruleToRemove.AccessControlType.ToString().ToLowerInvariant()
+                $rmRights = $ruleToRemove."${providerName}Rights"
+                Write-Information "${Description}  ${rmIdentity}  - ${rmType} ${rmRights}"
+                [void]$currentAcl.RemoveAccessRule($ruleToRemove)
+            }
+            if( $PSCmdlet.ShouldProcess( $Path, ('revoke {0}''s permissions' -f $Identity)) )
+            {
+                Set-Acl -Path $Path -AclObject $currentAcl
+            }
+            continue
+        }
+
+        $certMsg = """$($item.Subject)"" (thumbprint: $($item.Thumbprint); path: " +
+                   "cert:\$($item.PSPath | Split-Path -NoQualifier)) "
+        if (-not $item.HasPrivateKey)
+        {
+            Write-Verbose -Message "Skipping certificate ${certMsg}because it doesn't have a private key."
+            continue
+        }
+
+        if (-not $Description)
+        {
+            $Description = "cert:\$($item.PSPath | Split-Path -NoQualifier) ($($item.Thumbprint))"
+        }
+
+        $privateKey = $item.PrivateKey
+        if ($privateKey -and ($item.PrivateKey | Get-Member 'CspKeyContainerInfo'))
+        {
+            [Security.Cryptography.X509Certificates.X509Certificate2]$certificate = $item
+
+            [Security.AccessControl.CryptoKeySecurity]$keySecurity =
+                $certificate.PrivateKey.CspKeyContainerInfo.CryptoKeySecurity
+
+            foreach ($ruleToRemove in $rulesToRemove)
+            {
+                $rmIdentity = $ruleToRemove.IdentityReference
+                $rmType = $ruleToRemove.AccessControlType.ToString().ToLowerInvariant()
+                $rmRights = $ruleToRemove."${providerName}Rights"
+                Write-Information "${Description}  ${rmIdentity}  - ${rmType} ${rmRights}"
+                [void] $keySecurity.RemoveAccessRule($ruleToRemove)
+            }
+
+            $action = "revoke ${Identity}'s permissions"
+            Set-CryptoKeySecurity -Certificate $certificate -CryptoKeySecurity $keySecurity -Action $action
+            return
+        }
+
+        $privateKeyFilesPaths = $item | Resolve-CPrivateKeyPath
+        if (-not $privateKeyFilesPaths)
+        {
+            # Resolve-CPrivateKeyPath writes an appropriately detailed error message.
+            continue
+        }
+
+        $revokePermissionParams = New-Object -TypeName 'Collections.Generic.Dictionary[[string], [object]]' `
+                                             -ArgumentList $PSBoundParameters
+        [void]$revokePermissionParams.Remove('Path')
+        foreach( $privateKeyFilePath in $privateKeyFilesPaths )
+        {
+            Revoke-CPermission -Path $privateKeyFilePath @revokePermissionParams -Description $Description -NoWarn
+        }
+    }
+}
+
+
+
+function Set-CryptoKeySecurity
+{
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory)]
+        [Security.Cryptography.X509Certificates.X509Certificate2] $Certificate,
+
+        [Parameter(Mandatory)]
+        [Security.AccessControl.CryptoKeySecurity] $CryptoKeySecurity,
+
+        [Parameter(Mandatory)]
+        [String] $Action
+    )
+
+    Set-StrictMode -Version 'Latest'
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
+    $keyContainerInfo = $Certificate.PrivateKey.CspKeyContainerInfo
+    $cspParams = New-Object 'Security.Cryptography.CspParameters' ($keyContainerInfo.ProviderType, $keyContainerInfo.ProviderName, $keyContainerInfo.KeyContainerName)
+    $cspParams.Flags = [Security.Cryptography.CspProviderFlags]::UseExistingKey
+    $cspParams.KeyNumber = $keyContainerInfo.KeyNumber
+    if( (Split-Path -NoQualifier -Path $Certificate.PSPath) -like 'LocalMachine\*' )
+    {
+        $cspParams.Flags = $cspParams.Flags -bor [Security.Cryptography.CspProviderFlags]::UseMachineKeyStore
+    }
+    $cspParams.CryptoKeySecurity = $CryptoKeySecurity
+
+    try
+    {
+        # persist the rule change
+        if( $PSCmdlet.ShouldProcess( ('{0} ({1})' -f $Certificate.Subject,$Certificate.Thumbprint), $Action ) )
+        {
+            $null = New-Object 'Security.Cryptography.RSACryptoServiceProvider' ($cspParams)
+        }
+    }
+    catch
+    {
+        $actualException = $_.Exception
+        while( $actualException.InnerException )
+        {
+            $actualException = $actualException.InnerException
+        }
+        Write-Error ('Failed to {0} to ''{1}'' ({2}) certificate''s private key: {3}: {4}' -f $Action,$Certificate.Subject,$Certificate.Thumbprint,$actualException.GetType().FullName,$actualException.Message)
+    }
 }
 
 
@@ -3570,6 +4994,11 @@ function Set-CSslCertificateBinding
 }
 
 
+function Test-CCryptoKeyAvailable
+{
+    return $null -ne [Type]::GetType('System.Security.AccessControl.CryptoKeyRights')
+}
+
 
 function Test-CIdentity
 {
@@ -3714,6 +5143,223 @@ function Test-COSIs64Bit
 
     return ([Environment]::Is64BitOperatingSystem)
 }
+
+
+
+function Test-CPermission
+{
+    <#
+    .SYNOPSIS
+    Tests if permissions are set on a file, directory, registry key, or certificate's private key/key container.
+
+    .DESCRIPTION
+    Sometimes, you don't want to use `Grant-CPermission` on a big tree.  In these situations, use `Test-CPermission` to see if permissions are set on a given path.
+
+    This function supports file system, registry, and certificate private key/key container permissions.  You can also test the inheritance and propogation flags on containers, in addition to the permissions, with the `ApplyTo` parameter.  See [Grant-CPermission](Grant-CPermission.html) documentation for an explanation of the `ApplyTo` parameter.
+
+    Inherited permissions on *not* checked by default.  To check inherited permission, use the `-Inherited` switch.
+
+    By default, the permission check is not exact, i.e. the user may have additional permissions to what you're checking.  If you want to make sure the user has *exactly* the permission you want, use the `-Exact` switch.  Please note that by default, NTFS will automatically add/grant `Synchronize` permission on an item, which is handled by this function.
+
+    When checking for permissions on certificate private keys/key containers, if a certificate doesn't have a private key, `$true` is returned.
+
+    .OUTPUTS
+    System.Boolean.
+
+    .LINK
+    Carbon_Permission
+
+    .LINK
+    ConvertTo-CContainerInheritanceFlags
+
+    .LINK
+    Disable-CAclInheritance
+
+    .LINK
+    Enable-CAclInheritance
+
+    .LINK
+    Get-CPermission
+
+    .LINK
+    Grant-CPermission
+
+    .LINK
+    Revoke-CPermission
+
+    .LINK
+    http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.filesystemrights.aspx
+
+    .LINK
+    http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.registryrights.aspx
+
+    .LINK
+    http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.cryptokeyrights.aspx
+
+    .EXAMPLE
+    Test-CPermission -Identity 'STARFLEET\JLPicard' -Permission 'FullControl' -Path 'C:\Enterprise\Bridge'
+
+    Demonstrates how to check that Jean-Luc Picard has `FullControl` permission on the `C:\Enterprise\Bridge`.
+
+    .EXAMPLE
+    Test-CPermission -Identity 'STARFLEET\GLaForge' -Permission 'WriteKey' -Path 'HKLM:\Software\Enterprise\Engineering'
+
+    Demonstrates how to check that Geordi LaForge can write registry keys at `HKLM:\Software\Enterprise\Engineering`.
+
+    .EXAMPLE
+    Test-CPermission -Identity 'STARFLEET\Worf' -Permission 'Write' -ApplyTo 'Container' -Path 'C:\Enterprise\Brig'
+
+    Demonstrates how to test for inheritance/propogation flags, in addition to permissions.
+
+    .EXAMPLE
+    Test-CPermission -Identity 'STARFLEET\Data' -Permission 'GenericWrite' -Path 'cert:\LocalMachine\My\1234567890ABCDEF1234567890ABCDEF12345678'
+
+    Demonstrates how to test for permissions on a certificate's private key/key container. If the certificate doesn't have a private key, returns `$true`.
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]
+        # The path on which the permissions should be checked.  Can be a file system or registry path.
+        $Path,
+
+        [Parameter(Mandatory=$true)]
+        [string]
+        # The user or group whose permissions to check.
+        $Identity,
+
+        [Parameter(Mandatory=$true)]
+        [string[]]
+        # The permission to test for: e.g. FullControl, Read, etc.  For file system items, use values from [System.Security.AccessControl.FileSystemRights](http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.filesystemrights.aspx).  For registry items, use values from [System.Security.AccessControl.RegistryRights](http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.registryrights.aspx).
+        $Permission,
+
+        [Carbon.Security.ContainerInheritanceFlags]
+        # The container and inheritance flags to check. Ignored if `Path` is a file. These are ignored if not supplied. See `Grant-CPermission` for detailed explanation of this parameter. This controls the inheritance and propagation flags.  Default is full inheritance, e.g. `ContainersAndSubContainersAndLeaves`. This parameter is ignored if `Path` is to a leaf item.
+        $ApplyTo,
+
+        [Switch]
+        # Include inherited permissions in the check.
+        $Inherited,
+
+        [Switch]
+        # Check for the exact permissions, inheritance flags, and propagation flags, i.e. make sure the identity has *only* the permissions you specify.
+        $Exact,
+
+        [switch] $NoWarn
+    )
+
+    Set-StrictMode -Version 'Latest'
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
+    Write-CRefactoredCommandWarning -CommandName 'Test-CPermission' -ModuleName 'Carbon.Permissions' -NoWarn
+
+    $originalPath = $Path
+    $Path = Resolve-Path -Path $Path -ErrorAction 'SilentlyContinue'
+    if( -not $Path -or -not (Test-Path -Path $Path) )
+    {
+        if( -not $Path )
+        {
+            $Path = $originalPath
+        }
+        Write-Error ('Unable to test {0}''s {1} permissions: path ''{2}'' not found.' -f $Identity,($Permission -join ','),$Path)
+        return
+    }
+
+    $providerName = Get-CPathProvider -Path $Path -NoWarn | Select-Object -ExpandProperty 'Name'
+    if( $providerName -eq 'Certificate' )
+    {
+        $providerName = 'CryptoKey'
+        # CryptoKey does not exist in .NET standard/core so we will have to use FileSystem instead
+        if( -not (Test-CCryptoKeyAvailable) )
+        {
+            $providerName = 'FileSystem'
+        }
+    }
+
+    if( ($providerName -eq 'FileSystem' -or $providerName -eq 'CryptoKey') -and $Exact )
+    {
+        # Synchronize is always on and can't be turned off.
+        $Permission += 'Synchronize'
+    }
+    $rights = $Permission | ConvertTo-ProviderAccessControlRights -ProviderName $providerName
+    if( -not $rights )
+    {
+        Write-Error ('Unable to test {0}''s {1} permissions on {2}: received an unknown permission.' -f $Identity,$Permission,$Path)
+        return
+    }
+
+    $account = Resolve-CIdentity -Name $Identity -NoWarn
+    if( -not $account)
+    {
+        return
+    }
+
+    $rightsPropertyName = '{0}Rights' -f $providerName
+    $inheritanceFlags = [Security.AccessControl.InheritanceFlags]::None
+    $propagationFlags = [Security.AccessControl.PropagationFlags]::None
+    $testApplyTo = $false
+    if( $PSBoundParameters.ContainsKey('ApplyTo') )
+    {
+        if( (Test-Path -Path $Path -PathType Leaf ) )
+        {
+            Write-Warning "Can't test inheritance/propagation rules on a leaf. Please omit `ApplyTo` parameter when `Path` is a leaf."
+        }
+        else
+        {
+            $testApplyTo = $true
+            $inheritanceFlags = ConvertTo-CInheritanceFlag -ContainerInheritanceFlag $ApplyTo -NoWarn
+            $propagationFlags = ConvertTo-CPropagationFlag -ContainerInheritanceFlag $ApplyTo -NoWarn
+        }
+    }
+
+    if( $providerName -eq 'CryptoKey' )
+    {
+        # If the certificate doesn't have a private key, return $true.
+        if( (Get-Item -Path $Path | Where-Object { -not $_.HasPrivateKey } ) )
+        {
+            return $true
+        }
+    }
+
+    $acl = Get-CPermission -Path $Path -Identity $Identity -Inherited:$Inherited -NoWarn |
+                Where-Object { $_.AccessControlType -eq 'Allow' } |
+                Where-Object { $_.IsInherited -eq $Inherited } |
+                Where-Object {
+                    if( $Exact )
+                    {
+                        return ($_.$rightsPropertyName -eq $rights)
+                    }
+                    else
+                    {
+                        return ($_.$rightsPropertyName -band $rights) -eq $rights
+                    }
+                } |
+                Where-Object {
+                    if( -not $testApplyTo )
+                    {
+                        return $true
+                    }
+
+                    if( $Exact )
+                    {
+                        return ($_.InheritanceFlags -eq $inheritanceFlags) -and ($_.PropagationFlags -eq $propagationFlags)
+                    }
+                    else
+                    {
+                        return (($_.InheritanceFlags -band $inheritanceFlags) -eq $inheritanceFlags) -and `
+                               (($_.PropagationFlags -and $propagationFlags) -eq $propagationFlags)
+                    }
+                }
+    if( $acl )
+    {
+        return $true
+    }
+    else
+    {
+        return $false
+    }
+}
+
 
 
 

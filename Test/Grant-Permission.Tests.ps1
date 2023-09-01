@@ -33,7 +33,7 @@ BeforeAll {
             $PropagationFlags
         )
 
-        $ace = Get-CPermission $containerPath -Identity $user
+        $ace = Get-CPermission $containerPath -Identity $user -NoWarn
 
         $ace | Should -Not -BeNullOrEmpty
         $expectedRights = [Security.AccessControl.FileSystemRights]::Read -bor [Security.AccessControl.FileSystemRights]::Synchronize
@@ -56,16 +56,17 @@ BeforeAll {
         $rights = Invoke-CPrivateCommand -Name 'ConvertTo-ProviderAccessControlRights' `
                                          -Parameter @{
                                             ProviderName = $ProviderName;
-                                            InputObject = $permissions
+                                            InputObject = $permissions;
+                                            NoWarn = $true;
                                          }
 
-        $ace = Get-CPermission -Path $path -Identity $identity
+        $ace = Get-CPermission -Path $path -Identity $identity -NoWarn
         $ace | Should -Not -BeNullOrEmpty
 
         if( $ApplyTo )
         {
-            $expectedInheritanceFlags = ConvertTo-CInheritanceFlag -ContainerInheritanceFlag $ApplyTo
-            $expectedPropagationFlags = ConvertTo-CPropagationFlag -ContainerInheritanceFlag $ApplyTo
+            $expectedInheritanceFlags = ConvertTo-CInheritanceFlag -ContainerInheritanceFlag $ApplyTo -NoWarn
+            $expectedPropagationFlags = ConvertTo-CPropagationFlag -ContainerInheritanceFlag $ApplyTo -NoWarn
         }
         else
         {
@@ -118,7 +119,8 @@ BeforeAll {
         }
 
         $expectedRuleType = ('Security.AccessControl.{0}AccessRule' -f $ProviderName) -as [Type]
-        $result = Grant-CPermission -Identity $Identity -Permission $Permissions -Path $path -PassThru @optionalParams
+        $result =
+            Grant-CPermission -Identity $Identity -Permission $Permissions -Path $path -NoWarn -PassThru @optionalParams
         $result = $result | Select-Object -Last 1
         $result | Should -Not -BeNullOrEmpty
         $result.IdentityReference | Should -Be (Resolve-CIdentityName $Identity -NoWarn)
@@ -208,7 +210,12 @@ Describe 'Grant-CPermission' {
         $path = New-TestFile
         $failed = $false
         $error.Clear()
-        $result = Grant-CPermission -Identity 'BUILTIN\Administrators' -Permission 'BlahBlahBlah' -Path $path -PassThru -ErrorAction SilentlyContinue
+        $result = Grant-CPermission -Identity 'BUILTIN\Administrators' `
+                                    -Permission 'BlahBlahBlah' `
+                                    -Path $path `
+                                    -PassThru `
+                                    -NoWarn `
+                                    -ErrorAction SilentlyContinue
         $result | Should -BeNullOrEmpty
         $error.Count | Should -Be 2
     }
@@ -218,7 +225,7 @@ Describe 'Grant-CPermission' {
         Invoke-GrantPermissions $user 'FullControl' -Path $path
         Invoke-GrantPermissions $user2 'FullControl' -Path $path
 
-        $result = Grant-CPermission -Identity 'Everyone' -Permission 'Read','Write' -Path $path -Clear -PassThru
+        $result = Grant-CPermission -Identity 'Everyone' -Permission 'Read','Write' -Path $path -Clear -PassThru -NoWarn
         $result | Should -Not -BeNullOrEmpty
         $result.Path | Should -Be $Path
 
@@ -244,7 +251,13 @@ Describe 'Grant-CPermission' {
         }
 
         $error.Clear()
-        $result = Grant-CPermission -Identity 'Everyone' -Permission 'Read','Write' -Path $path -Clear -PassThru -ErrorAction SilentlyContinue
+        $result = Grant-CPermission -Identity 'Everyone' `
+                                    -Permission 'Read','Write' `
+                                    -Path $path `
+                                    -Clear `
+                                    -NoWarn `
+                                    -PassThru `
+                                    -ErrorAction SilentlyContinue
         $result | Should -Not -BeNullOrEmpty
         $result.IdentityReference | Should -Be 'Everyone'
 
@@ -328,7 +341,13 @@ Describe 'Grant-CPermission' {
     It 'when setting inheritance flags on a file' {
         $path = New-TestFile
         $warnings = @()
-        $result = Grant-CPermission -Identity $user -Permission Read -Path $path -ApplyTo Container -WarningAction SilentlyContinue -WarningVariable 'warnings'
+        $result = Grant-CPermission -Identity $user `
+                                    -Permission Read `
+                                    -Path $path `
+                                    -ApplyTo Container `
+                                    -NoWarn `
+                                    -WarningAction SilentlyContinue `
+                                    -WarningVariable 'warnings'
         $warnings | Should -Not -BeNullOrEmpty
         ($warnings[0] -like '*Can''t apply inheritance/propagation rules to a leaf*') | Should -BeTrue
     }
@@ -363,7 +382,12 @@ Describe 'Grant-CPermission' {
 
         Mock -CommandName 'Set-Acl' -Verifiable -ModuleName 'Carbon'
 
-        Grant-CPermission -Identity $user -Permission FullControl -Path $containerPath -Apply ContainerAndLeaves -Force
+        Grant-CPermission -Identity $user `
+                          -Permission FullControl `
+                          -Path $containerPath `
+                          -Apply ContainerAndLeaves `
+                          -NoWarn `
+                          -Force
 
         Assert-MockCalled -CommandName 'Set-Acl' -Times 1 -Exactly -ModuleName 'Carbon'
     }
@@ -382,7 +406,12 @@ Describe 'Grant-CPermission' {
     It 'when the path does not exist' {
         $Global:Error.Clear()
 
-        $result = Grant-CPermission -Identity $user -Permission Read -Path 'C:\I\Do\Not\Exist' -PassThru -ErrorAction SilentlyContinue
+        $result = Grant-CPermission -Identity $user `
+                                    -Permission Read `
+                                    -Path 'C:\I\Do\Not\Exist' `
+                                    -PassThru `
+                                    -NoWarn `
+                                    -ErrorAction SilentlyContinue
         $result | Should -BeNullOrEmpty
         $Global:Error.Count | Should -BeGreaterThan 0
         $Global:Error[0] | Should -Match 'Cannot find path'
@@ -463,7 +492,7 @@ Describe 'Grant-CPermission' {
                                     -Permission $readPermission `
                                     -ProviderName $expectedProviderName `
                                     -Clear
-            Test-CPermission -Path $certPath -Identity $user -Permission $readPermission | Should -BeFalse
+            Test-CPermission -Path $certPath -Identity $user -Permission $readPermission -NoWarn | Should -BeFalse
 
             # Context 'clearing others'' permissions when permissions getting set haven''t changed' {
             Invoke-GrantPermissions -Path $certPath `
@@ -475,12 +504,14 @@ Describe 'Grant-CPermission' {
                                     -Permission $readPermission `
                                     -ProviderName $expectedProviderName `
                                     -Clear
-            Test-CPermission -Path $certPath -Identity $user -Permission $readPermission | Should -BeFalse
+            Test-CPermission -Path $certPath -Identity $user -Permission $readPermission -NoWarn | Should -BeFalse
 
             # Context 'running with -WhatIf switch' {
-            Grant-CPermission -Path $certPath -Identity $user2 -Permission $writePermission -WhatIf
-            Test-CPermission -Path $certPath -Identity $user2 -Permission $readPermission -Exact | Should -BeTrue
-            Test-CPermission -Path $certPath -Identity $user2 -Permission $writePermission -Exact | Should -BeFalse
+            Grant-CPermission -Path $certPath -Identity $user2 -Permission $writePermission -NoWarn -WhatIf
+            Test-CPermission -Path $certPath -Identity $user2 -Permission $readPermission -Exact -NoWarn |
+                Should -BeTrue
+            Test-CPermission -Path $certPath -Identity $user2 -Permission $writePermission -Exact -NoWarn |
+                Should -BeFalse
 
             # Context 'creating a deny rule' {
             Invoke-GrantPermissions -Path $certPath `
@@ -496,11 +527,11 @@ Describe 'Grant-CPermission' {
 
                 # Context 'permissions exist' {
                 # Now, check that permissions don't get re-applied.
-                Grant-CPermission -Path $certPath -Identity $user2 -Permission $readPermission
+                Grant-CPermission -Path $certPath -Identity $user2 -Permission $readPermission -NoWarn
                 Assert-MockCalled -CommandName 'Set-CryptoKeySecurity' -ModuleName 'Carbon' -Times 0
 
                 # Context 'permissions exist but forcing the change' {
-                Grant-CPermission -Path $certPath -Identity $user2 -Permission $readPermission -Force
+                Grant-CPermission -Path $certPath -Identity $user2 -Permission $readPermission -Force -NoWarn
                 Assert-MockCalled -CommandName 'Set-CryptoKeySecurity' -ModuleName 'Carbon' -Times 1 -Exactly
             }
         }
@@ -543,9 +574,14 @@ Describe 'Grant-CPermission' {
 
     It 'when granting multiple different rules to a user on the file system' {
         $dirPath = New-TestContainer -FileSystem
-        Grant-CPermission -Path $dirPath -Identity $user -Permission 'Read' -ApplyTo ContainerAndSubContainersAndLeaves -Append
-        Grant-CPermission -Path $dirPath -Identity $user -Permission 'Write' -ApplyTo ContainerAndLeaves -Append
-        $perm = Get-CPermission -Path $dirPath -Identity $user
-            $perm | Should -HaveCount 2
+        Grant-CPermission -Path $dirPath `
+                          -Identity $user `
+                          -Permission 'Read' `
+                          -ApplyTo ContainerAndSubContainersAndLeaves `
+                          -Append `
+                          -NoWarn
+        Grant-CPermission -Path $dirPath -Identity $user -Permission 'Write' -ApplyTo ContainerAndLeaves -Append -NoWarn
+        $perm = Get-CPermission -Path $dirPath -Identity $user -NoWarn
+        $perm | Should -HaveCount 2
     }
 }

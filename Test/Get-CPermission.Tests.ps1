@@ -35,17 +35,17 @@ Describe 'Get-CPermission' {
         $script:containerPath = Join-Path $env:Temp $script:containerPath
 
         Install-CDirectory $script:containerPath
-        Grant-CPermission -Path $script:containerPath -Identity $script:group1 -Permission Read
+        Grant-CPermission -Path $script:containerPath -Identity $script:group1 -Permission Read -NoWarn
 
         $script:childPath = Join-Path $script:containerPath 'Child1'
         $null = New-Item $script:childPath -ItemType File
-        Grant-CPermission -Path $script:childPath -Identity $script:user -Permission Read
+        Grant-CPermission -Path $script:childPath -Identity $script:user -Permission Read -NoWarn
 
         $Global:Error.Clear()
     }
 
     It 'should get permissions' {
-        $perms = Get-CPermission -Path $script:childPath
+        $perms = Get-CPermission -Path $script:childPath -NoWarn
         $perms | Should -Not -BeNullOrEmpty
         $group1Perms = $perms | Where-Object { $_.IdentityReference.Value -like "*\$script:group1" }
         $group1Perms | Should -BeNullOrEmpty
@@ -56,7 +56,7 @@ Describe 'Get-CPermission' {
     }
 
     It 'should get inherited permissions' {
-        $perms = Get-CPermission -Path $script:childPath -Inherited
+        $perms = Get-CPermission -Path $script:childPath -Inherited -NoWarn
         $perms | Should -Not -BeNullOrEmpty
         $group1Perms = $perms | Where-Object { $_.IdentityReference.Value -like "*\$script:group1" }
         $group1Perms | Should -Not -BeNullOrEmpty
@@ -68,10 +68,10 @@ Describe 'Get-CPermission' {
     }
 
     It 'should get specific script:user permissions' {
-        $perms = Get-CPermission -Path $script:childPath -Identity $script:group1
+        $perms = Get-CPermission -Path $script:childPath -Identity $script:group1 -NoWarn
         $perms | Should -BeNullOrEmpty
 
-        $perms = @( Get-CPermission -Path $script:childPath -Identity $script:user )
+        $perms = @( Get-CPermission -Path $script:childPath -Identity $script:user -NoWarn )
         $perms | Should -Not -BeNullOrEmpty
         $perms | Should -HaveCount 1
         $perms[0] | Should -Not -BeNullOrEmpty
@@ -79,13 +79,13 @@ Describe 'Get-CPermission' {
     }
 
     It 'should get specific users inherited permissions' {
-        $perms = Get-CPermission -Path $script:childPath -Identity $script:group1 -Inherited
+        $perms = Get-CPermission -Path $script:childPath -Identity $script:group1 -Inherited -NoWarn
         $perms | Should -Not -BeNullOrEmpty
         $perms | Should -BeOfType [Security.AccessControl.FileSystemAccessRule]
     }
 
     It 'should get permissions on registry key' {
-        $perms = Get-CPermission -Path 'hkcu:\'
+        $perms = Get-CPermission -Path 'hkcu:\' -NoWarn
         $perms | Should -Not -BeNullOrEmpty
         $perms | Should -BeOfType [Security.AccessControl.RegistryAccessRule]
     }
@@ -113,7 +113,7 @@ Describe 'Get-CPermission' {
                 Write-Debug 'break'
             }
             $numErrors = $Global:Error.Count
-            $perms = Get-CPermission -Path $certPath -Inherited -ErrorAction SilentlyContinue
+            $perms = Get-CPermission -Path $certPath -Inherited -NoWarn -ErrorAction SilentlyContinue
             if ($numErrors -ne $Global:Error.Count -and `
                 ($Global:Error[0] -match '(keyset does not exist)|(Invalid provider type specified)'))
             {
@@ -133,10 +133,10 @@ Describe 'Get-CPermission' {
             Where-Object { $_.PrivateKey } |
             ForEach-Object { Join-Path -Path 'cert:' -ChildPath (Split-Path -NoQualifier -Path $_.PSPath) } |
             ForEach-Object {
-                [Object[]]$rules = Get-CPermission -Path $_
+                [Object[]]$rules = Get-CPermission -Path $_ -NoWarn
                 foreach( $rule in $rules )
                 {
-                    [Object[]]$identityRule = Get-CPermission -Path $_ -Identity $rule.IdentityReference.Value
+                    [Object[]]$identityRule = Get-CPermission -Path $_ -Identity $rule.IdentityReference.Value -NoWarn
                     $identityRule | Should -Not -BeNullOrEmpty
                     $identityRule.Count | Should -BeLessOrEqual $rules.Count
                 }
@@ -148,8 +148,9 @@ Describe 'Get-CPermission' {
         $cert = Install-CCertificate -Path $certFilePath -StoreLocation CurrentUser -StoreName My
         try
         {
-            $perms =
-                Get-CPermission -Path (Join-Path -Path 'cert:\CurrentUser\My' -ChildPath $cert.Thumbprint) -Inherited
+            $perms = Get-CPermission -Path (Join-Path -Path 'cert:\CurrentUser\My' -ChildPath $cert.Thumbprint) `
+                                     -Inherited `
+                                     -NoWarn
             $perms | Should -Not -BeNullOrEmpty
             $perms | Should -BeOfType [Security.AccessControl.FileSystemAccessRule]
         }

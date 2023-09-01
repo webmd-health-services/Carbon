@@ -54,7 +54,7 @@ function New-TestContainer
         throw $Provider
     }
 
-    Grant-Permission -Path $path -Identity $env:USERNAME -Permission FullControl
+    Grant-Permission -Path $path -Identity $env:USERNAME -Permission FullControl -NoWarn
 
     It 'should have inheritance enabled' {
         $acl = Get-Acl -Path $path
@@ -63,7 +63,7 @@ function New-TestContainer
     }
 
     It 'should have inherited access rules' {
-        Get-Permission -Path $path -Inherited | Should Not BeNullOrEmpty
+        Get-Permission -Path $path -Inherited -NoWarn | Should Not BeNullOrEmpty
     }
 
     return $path
@@ -77,7 +77,7 @@ foreach( $provider in @( 'FileSystem', 'Registry' ) )
         Protect-Acl -Path $path
         Assert-AclInheritanceDisabled -Path $path
         It 'should not preserve inherited access rules' {
-            [object[]]$perm = Get-Permission -Path $path -Inherited
+            [object[]]$perm = Get-Permission -Path $path -Inherited -NoWarn
             $perm.Count | Should Be 1
             $perm[0].IdentityReference | Should Be (Resolve-CIdentityName -Name $env:USERNAME -NoWarn)
         }
@@ -85,11 +85,12 @@ foreach( $provider in @( 'FileSystem', 'Registry' ) )
 
     Describe ('Disable-AclInheritance on {0} when preserving inherited rules' -f $provider) {
         $path = New-TestContainer -Provider $provider
-        [Security.AccessControl.AccessRule[]]$inheritedPermissions = Get-Permission -Path $path -Inherited | Where-Object { $_.IsInherited }
+        [Security.AccessControl.AccessRule[]]$inheritedPermissions =
+            Get-Permission -Path $path -Inherited -NoWarn | Where-Object { $_.IsInherited }
         Protect-Acl -Path $path -Preserve
         Assert-AclInheritanceDisabled -Path $path
         It 'should preserve inherited access rules' {
-            [object[]]$currentPermissions = Get-Permission -Path $path -Inherited
+            [object[]]$currentPermissions = Get-Permission -Path $path -Inherited -NoWarn
             $currentPermissions.Count | Should Be $inheritedPermissions.Count
             for( $idx = 0; $idx -lt $currentPermissions.Count; ++$idx )
             {
