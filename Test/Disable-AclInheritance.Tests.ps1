@@ -1,9 +1,9 @@
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# 
+#
 #     http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -13,7 +13,7 @@
 #Requires -Version 4
 Set-StrictMode -Version 'Latest'
 
-$parentFSPath = $null 
+$parentFSPath = $null
 $childFSPath = $null
 $originalAcl = $null
 
@@ -71,25 +71,25 @@ function New-TestContainer
 
 foreach( $provider in @( 'FileSystem', 'Registry' ) )
 {
-    
+
     Describe ('Disable-AclInheritance on {0}' -f $provider) {
         $path = New-TestContainer -Provider $provider
         Protect-Acl -Path $path
         Assert-AclInheritanceDisabled -Path $path
         It 'should not preserve inherited access rules' {
-            [object[]]$perm = Get-Permission -Path $path -Inherited 
+            [object[]]$perm = Get-Permission -Path $path -Inherited
             $perm.Count | Should Be 1
-            $perm[0].IdentityReference | Should Be (Resolve-IdentityName -Name $env:USERNAME)
+            $perm[0].IdentityReference | Should Be (Resolve-CIdentityName -Name $env:USERNAME -NoWarn)
         }
     }
-    
+
     Describe ('Disable-AclInheritance on {0} when preserving inherited rules' -f $provider) {
         $path = New-TestContainer -Provider $provider
         [Security.AccessControl.AccessRule[]]$inheritedPermissions = Get-Permission -Path $path -Inherited | Where-Object { $_.IsInherited }
         Protect-Acl -Path $path -Preserve
         Assert-AclInheritanceDisabled -Path $path
         It 'should preserve inherited access rules' {
-            [object[]]$currentPermissions = Get-Permission -Path $path -Inherited 
+            [object[]]$currentPermissions = Get-Permission -Path $path -Inherited
             $currentPermissions.Count | Should Be $inheritedPermissions.Count
             for( $idx = 0; $idx -lt $currentPermissions.Count; ++$idx )
             {
@@ -100,10 +100,10 @@ foreach( $provider in @( 'FileSystem', 'Registry' ) )
             }
         }
     }
-    
+
     Describe ('Disable-AclInheritance on {0} when part of a pipeline' -f $provider) {
         $path = New-TestContainer -Provider $provider
-        Get-Item -Path $path | Disable-AclInheritance 
+        Get-Item -Path $path | Disable-AclInheritance
         Assert-AclInheritanceDisabled -Path $path
 
         $path = New-TestContainer -Provider $provider

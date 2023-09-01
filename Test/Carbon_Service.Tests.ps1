@@ -66,7 +66,7 @@ Describe 'Carbon_Service' {
                 ($resource.Dependency -join ',') | Should -Be (($_.ServicesDependedOn | Select-Object -ExpandProperty 'Name') -join ',')
                 if( $_.UserName -and (Test-CIdentity -Name $_.UserName -NoWarn) )
                 {
-                    $resource.UserName | Should -Be (Resolve-CIdentityName -Name $_.UserName)
+                    $resource.UserName | Should -Be (Resolve-CIdentityName -Name $_.UserName -NoWarn)
                 }
                 else
                 {

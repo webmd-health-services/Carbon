@@ -99,7 +99,7 @@ function Set-TargetResource
 
     .LINK
     http://technet.microsoft.com/en-us/library/cc725744.aspx#BKMK_create
-    
+
     .LINK
     http://msdn.microsoft.com/en-us/library/windows/desktop/aa383609.aspx
 
@@ -115,7 +115,7 @@ function Set-TargetResource
 
     .EXAMPLE
     >
-    Demonstrates how to install a new or update an existing scheduled task that runs as a custom user. 
+    Demonstrates how to install a new or update an existing scheduled task that runs as a custom user.
 
         Carbon_ScheduledTask InstallScheduledTask
         {
@@ -244,11 +244,11 @@ function Test-TargetResource
                     break
                 }
             }
-  
+
             $nameLength = $Name.Length
             $linePrefix = ' ' * ($nameLength + 2)
             $msgFormat = @'
-'@        
+'@
             Write-Verbose ('[{0}] Task XML differs:' -f $Name)
             $startIdx = $differsAt - 35
             if( $startIdx -lt 0 )
@@ -283,8 +283,8 @@ function Test-TargetResource
 
         if( $TaskCredential )
         {
-            $resourceUserName = $resource.TaskCredential | ForEach-Object { Resolve-CIdentityName -Name $_ }
-            $desiredUserName = $TaskCredential.UserName | ForEach-Object { Resolve-CIdentityName -Name $_ }
+            $resourceUserName = $resource.TaskCredential | ForEach-Object { Resolve-CIdentityName -Name $_ -NoWarn }
+            $desiredUserName = $TaskCredential.UserName | ForEach-Object { Resolve-CIdentityName -Name $_ -NoWarn }
             if( $resourceUserName -ne $desiredUserName )
             {
                 Write-Verbose ('[{0}] [TaskCredential] {1} != {2}' -f $Name,$resourceUserName,$desiredUserName) -Verbose

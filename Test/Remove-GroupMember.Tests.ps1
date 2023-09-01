@@ -25,7 +25,7 @@ function GivenGroup
 
     GivenUser -UserName $WithMember
 
-    $WithMember = $WithMember | ForEach-Object { Resolve-IdentityName -Name $_ }
+    $WithMember = $WithMember | ForEach-Object { Resolve-CIdentityName -Name $_ -NoWarn }
 
     Install-Group -Name $Name -Description ('Carbon.{0} test group.' -f ($PSCommandPath | Split-Path -Leaf))
     $group = Get-Group -Name $Name
@@ -87,7 +87,7 @@ function ThenGroup
         $HasMember
     )
 
-    $HasMember = $HasMember | ForEach-Object { Resolve-IdentityName -Name $_ }
+    $HasMember = $HasMember | ForEach-Object { Resolve-CIdentityName -Name $_ -NoWarn }
 
     $group = Get-Group -Name $Name
     It ('should remove members') {
@@ -95,7 +95,7 @@ function ThenGroup
         $group.Members.Count | Should Be $HasMember.Count
         foreach( $currentMember in $group.Members )
         {
-            $currentMemberName = Resolve-IdentityName -SID $currentMember.Sid
+            $currentMemberName = Resolve-CIdentityName -SID $currentMember.Sid -NoWarn
             $currentMemberName -in $HasMember | Should Be $true
         }
         $group.Save()

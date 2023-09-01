@@ -231,7 +231,7 @@ function Grant-CPermission
         return
     }
 
-    $Identity = Resolve-CIdentityName -Name $Identity
+    $Identity = Resolve-CIdentityName -Name $Identity -NoWarn
 
     if ($providerName -eq 'CryptoKey')
     {

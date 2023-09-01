@@ -264,7 +264,7 @@ function Resolve-MemberName
 
     process
     {
-        Resolve-CIdentityName -Name $Name
+        Resolve-CIdentityName -Name $Name -NoWarn
     }
 }
 

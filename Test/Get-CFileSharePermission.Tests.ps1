@@ -60,7 +60,7 @@ BeforeAll {
 
         Set-StrictMode -Version 'Latest'
 
-        $Identity = Resolve-CIdentityName -Name $Identity
+        $Identity = Resolve-CIdentityName -Name $Identity -NoWarn
         $Identity | Should -Not -BeNullOrEmpty
 
         $identityPerms = $Permission | Where-Object { $_.IdentityReference -eq $Identity }

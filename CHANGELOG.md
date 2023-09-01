@@ -10,6 +10,7 @@
 * Function `Resolve-CIdentity`. Migrated to the `Carbon.Accounts` module.
 * Function `ConvertTo-CSecurityIdentifier`. Migrated to the `Carbon.Accounts` module.
 * Function `Get-CPathProvider`. Migrated to `Carbon.Core` module.
+* Function `Resolve-CIdentityName`. Migrated to the `Carbon.Accounts` module.
 
 
 ## 2.15.1

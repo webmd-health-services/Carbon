@@ -198,7 +198,7 @@ function Install-CFileShare
     # Check if the share is missing any of the new ACEs.
     foreach ($ace in $shareAces)
     {
-        $identityName = Resolve-CIdentityName -SID $ace.Trustee.SID
+        $identityName = Resolve-CIdentityName -SID $ace.Trustee.SID -NoWarn
         $accessMsgPrefix = "$($changeMsgPrefix)Access       $($identityName)  "
         $permission = Get-CFileSharePermission -Name $Name -Identity $identityName
 
@@ -226,7 +226,7 @@ function Install-CFileShare
             $existingAce =
                 $shareAces |
                 Where-Object {
-                        $newIdentityName = Resolve-CIdentityName -SID $_.Trustee.SID
+                        $newIdentityName = Resolve-CIdentityName -SID $_.Trustee.SID -NoWarn
                         return ( $newIdentityName -eq $ace.IdentityReference.Value )
                     }
         }

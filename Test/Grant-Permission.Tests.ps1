@@ -121,7 +121,7 @@ BeforeAll {
         $result = Grant-CPermission -Identity $Identity -Permission $Permissions -Path $path -PassThru @optionalParams
         $result = $result | Select-Object -Last 1
         $result | Should -Not -BeNullOrEmpty
-        $result.IdentityReference | Should -Be (Resolve-CIdentityName $Identity)
+        $result.IdentityReference | Should -Be (Resolve-CIdentityName $Identity -NoWarn)
         $result | Should -BeOfType $expectedRuleType
         if( -not $ExpectedPermission )
         {
