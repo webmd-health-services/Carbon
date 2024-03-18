@@ -276,10 +276,6 @@
         "Tags":  [ "Performance Counters" ]
     },
     {
-        "Name":  "Get-CPermission",
-        "Tags":  [ "Security", "File System", "NTFS", "Registry", "Certificates", "ACL" ]
-    },
-    {
         "Name":  "Get-CPowerShellModuleInstallPath",
         "Tags":  [ "PowerShell" ]
     },
@@ -350,10 +346,6 @@
     {
         "Name": "Grant-CHttpUrlPermission",
         "Tags": [ "Security", "HTTP", "WCF", "netsh", "ACL" ]
-    },
-    {
-        "Name":  "Grant-CPermission",
-        "Tags":  [ "Security", "File System", "NTFS", "Registry", "Certificates", "ACL" ]
     },
     {
         "Name":  "Grant-CPrivilege",
@@ -572,10 +564,6 @@
         "Tags": [ "Security", "HTTP", "WCF", "netsh", "ACL" ]
     },
     {
-        "Name":  "Revoke-CPermission",
-        "Tags":  [ "Security", "NTFS", "File System", "Registry", "Certificates", "ACL" ]
-    },
-    {
         "Name":  "Revoke-CPrivilege",
         "Tags":  [ "Privileges", "Security" ]
     },
@@ -730,10 +718,6 @@
     {
         "Name":  "Test-CPerformanceCounterCategory",
         "Tags":  [ "Performance Counters" ]
-    },
-    {
-        "Name":  "Test-CPermission",
-        "Tags":  [ "Security", "File System", "NTFS", "Registry", "Certificates", "ACL" ]
     },
     {
         "Name":  "Test-CPowerShellIs32Bit",

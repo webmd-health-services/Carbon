@@ -6,9 +6,16 @@ function Install-CFileShare
     Installs a file/SMB share.
 
     .DESCRIPTION
-    The `Install-CFileShare` function installs a new file/SMB share. If the share doesn't exist, it is created. In Carbon 2.0, if a share does exist, its properties and permissions are updated in place, unless the share's path needs to change. Changing a share's path requires deleting and re-creating. Before Carbon 2.0, shares were always deleted and re-created.
+    The `Install-CFileShare` function installs a new file/SMB share. If the share doesn't exist, it is created. In
+    Carbon 2.0, if a share does exist, its properties and permissions are updated in place, unless the share's path
+    needs to change. Changing a share's path requires deleting and re-creating. Before Carbon 2.0, shares were always
+    deleted and re-created.
 
-    Use the `FullAccess`, `ChangeAccess`, and `ReadAccess` parameters to grant full, change, and read sharing permissions on the share. Each parameter takes a list of user/group names. If you don't supply any permissions, `Everyone` will get `Read` access. Permissions on existing shares are cleared before permissions are granted. Permissions don't apply to the file system, only to the share. Use `Grant-CPermission` to grant file system permissions.
+    Use the `FullAccess`, `ChangeAccess`, and `ReadAccess` parameters to grant full, change, and read sharing
+    permissions on the share. Each parameter takes a list of user/group names. If you don't supply any permissions,
+    `Everyone` will get `Read` access. Permissions on existing shares are cleared before permissions are granted.
+    Permissions don't apply to the file system, only to the share. Use the Carbon.FileSystem module's
+    `Grant-CNtfsPermission` function to grant file system permissions.
 
     Before Carbon 2.0, this function was called `Install-SmbShare`.
 
@@ -19,9 +26,6 @@ function Install-CFileShare
     Get-CFileSharePermission
 
     .LINK
-    Grant-CPermission
-
-    .LINK
     Test-CFileShare
 
     .LINK
@@ -30,7 +34,8 @@ function Install-CFileShare
     .EXAMPLE
     Install-Share -Name TopSecretDocuments -Path C:\TopSecret -Description 'Share for our top secret documents.' -ReadAccess "Everyone" -FullAccess "Analysts"
 
-    Shares the C:\TopSecret directory as `TopSecretDocuments` and grants `Everyone` read access and `Analysts` full control.
+    Shares the C:\TopSecret directory as `TopSecretDocuments` and grants `Everyone` read access and `Analysts` full
+    control.
     #>
     [CmdletBinding()]
     param(

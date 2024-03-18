@@ -107,11 +107,11 @@ $zipRoot = Join-Path -Path $env:TEMP -ChildPath $zipRoot
 $zipContents = @(
                     'Carbon',
                     'examples',
-                    'Website', 
-                    $licenseFileName, 
-                    $releaseNotesFileName, 
+                    'Website',
+                    $licenseFileName,
+                    $releaseNotesFileName,
                     $noticeFileName
-                ) 
+                )
 
 foreach( $item in $zipContents )
 {
