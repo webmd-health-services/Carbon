@@ -52,7 +52,7 @@ function Revoke-CHttpUrlPermission
 
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
-    $id = Resolve-CIdentity -Name $Principal
+    $id = Resolve-CIdentity -Name $Principal -NoWarn
     if( -not $id )
     {
         return

@@ -66,7 +66,7 @@ function Get-CFileSharePermission
     {
         if( -not [System.Management.Automation.WildcardPattern]::ContainsWildcardCharacters( $Identity ) )
         {
-            $Identity = Resolve-CIdentityName -Name $Identity -ErrorAction $ErrorActionPreference
+            $Identity = Resolve-CIdentityName -Name $Identity -NoWarn -ErrorAction $ErrorActionPreference
             if( -not $Identity )
             {
                 return

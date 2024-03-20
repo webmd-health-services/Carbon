@@ -1295,7 +1295,7 @@ function Get-CPermission
     $account = $null
     if( $Identity )
     {
-        $account = Test-CIdentity -Name $Identity -PassThru
+        $account = Test-CIdentity -Name $Identity -PassThru -NoWarn
         if( $account )
         {
             $Identity = $account.FullName
@@ -2043,13 +2043,13 @@ function Grant-CPermission
         return
     }
 
-    if( -not (Test-CIdentity -Name $Identity ) )
+    if( -not (Test-CIdentity -Name $Identity -NoWarn) )
     {
         Write-Error ('Identity ''{0}'' not found.' -f $Identity)
         return
     }
 
-    $Identity = Resolve-CIdentityName -Name $Identity
+    $Identity = Resolve-CIdentityName -Name $Identity -NoWarn
 
     if ($providerName -eq 'CryptoKey')
     {
@@ -2195,7 +2195,7 @@ function Grant-CPermission
     }
 
     $rulesToRemove = $null
-    $Identity = Resolve-CIdentity -Name $Identity
+    $Identity = Resolve-CIdentity -Name $Identity -NoWarn
     if( $Clear )
     {
         $rulesToRemove = $currentAcl.Access |
@@ -4154,7 +4154,7 @@ function Resolve-CIdentity
         return $id
     }
 
-    if( -not (Test-CIdentity -Name $Name) )
+    if( -not (Test-CIdentity -Name $Name -NoWarn) )
     {
         Write-Error ('Identity ''{0}'' not found.' -f $Name) -ErrorAction $ErrorActionPreference
         return
@@ -4230,7 +4230,7 @@ function Resolve-CIdentityName
 
     if( $PSCmdlet.ParameterSetName -eq 'ByName' )
     {
-        return Resolve-CIdentity -Name $Name -ErrorAction Ignore | Select-Object -ExpandProperty 'FullName'
+        return Resolve-CIdentity -Name $Name -NoWarn -ErrorAction Ignore | Select-Object -ExpandProperty 'FullName'
     }
     elseif( $PSCmdlet.ParameterSetName -eq 'BySid' )
     {
@@ -4659,7 +4659,7 @@ function Revoke-CPermission
         return
     }
 
-    $Identity = Resolve-CIdentityName -Name $Identity
+    $Identity = Resolve-CIdentityName -Name $Identity -NoWarn
 
     foreach ($item in (Get-Item $Path -Force))
     {
@@ -5409,7 +5409,7 @@ function Test-CPermission
         return
     }
 
-    $account = Resolve-CIdentity -Name $Identity
+    $account = Resolve-CIdentity -Name $Identity -NoWarn
     if( -not $account)
     {
         return

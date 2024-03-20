@@ -21,11 +21,11 @@ function Get-TargetResource
         [string]
         # The name of the service.
         $Name,
-        
+
         [string]
         # The path to the service.
         $Path,
-        
+
         [ValidateSet('Automatic','Manual','Disabled')]
         [string]
         # The startup type: automatic, manual, or disabled.  Default is automatic.
@@ -33,39 +33,39 @@ function Get-TargetResource
 
         [Switch]
         $Delayed,
-        
+
         [Carbon.Service.FailureAction]
         # What to do on the service's first failure.  Default is to take no action.
         $OnFirstFailure,
-        
+
         [Carbon.Service.FailureAction]
         # What to do on the service's second failure. Default is to take no action.
         $OnSecondFailure,
-        
+
         [Carbon.Service.FailureAction]
         # What to do on the service' third failure.  Default is to take no action.
         $OnThirdFailure,
-        
+
         [int]
         # How many seconds after which the failure count is reset to 0.
         $ResetFailureCount,
-        
+
         [int]
         # How many milliseconds to wait before restarting the service.  Default is 60,0000, or 1 minute.
         $RestartDelay,
-        
+
         [int]
         # How many milliseconds to wait before handling the second failure.  Default is 60,000 or 1 minute.
         $RebootDelay,
-        
+
         [string[]]
         # What other services does this service depend on?
         $Dependency,
-        
+
         [string]
         # The command to run when a service fails, including path to the command and arguments.
         $Command,
-        
+
         [int]
         # How many milliseconds to wait before running the failure command. Default is 0, or immediately.
         $RunCommandDelay,
@@ -73,20 +73,20 @@ function Get-TargetResource
         [string]
         # The service's display names.
         $DisplayName,
-        
+
         [string]
         # The service's description.
         $Description,
-        
+
         [ValidateSet("LocalSystem", "LocalService", "NetworkService")]
         [string]
         # The system account the service should run as.
         $UserName,
-        
+
         [pscredential]
         # The credentials of the custom account the service should run as.
         $Credential,
-        
+
         [string[]]
         # The arguments/startup parameters for the service
         $ArgumentList,
@@ -94,7 +94,7 @@ function Get-TargetResource
         [ValidateSet('Present','Absent')]
         [string]
         # If `Present`, the service is installed/updated. If `Absent`, the service is removed.
-        $Ensure = 'Present'        
+        $Ensure = 'Present'
     )
 
     Set-StrictMode -Version 'Latest'
@@ -124,7 +124,7 @@ function Get-TargetResource
     if( Test-CService -Name $Name )
     {
         $service = Get-Service -Name $Name
-        
+
         $resource.Path,$resource.ArgumentList = [Carbon.Shell.Command]::Split($service.Path)
         $resource.StartupType = $service.StartMode
         $resource.Delayed = $service.DelayedAutoStart
@@ -142,7 +142,7 @@ function Get-TargetResource
         $actualUserName = ''
         if( $service.UserName )
         {
-            $actualUserName = Resolve-CIdentity -Name $service.UserName -ErrorAction Ignore
+            $actualUserName = Resolve-CIdentity -Name $service.UserName -NoWarn -ErrorAction Ignore
             if( $actualUserName )
             {
                 $resource.UserName = $actualUserName.FullName
@@ -239,11 +239,11 @@ function Set-TargetResource
         [string]
         # The name of the service.
         $Name,
-        
+
         [string]
         # The path to the service.
         $Path,
-        
+
         [ValidateSet('Automatic','Manual','Disabled')]
         [string]
         # The startup type: automatic, manual, or disabled.  Default is automatic.
@@ -252,7 +252,7 @@ function Set-TargetResource
         [Switch]
         # Used in combination with the `StartupType` parameter to set a service's startup type to `Automatic (Delayed)`.
         #
-        # If `Delayed` is true true, and `StartupType` is `Automatic` sets the service's startup type to `Automatic (Delayed)`. 
+        # If `Delayed` is true true, and `StartupType` is `Automatic` sets the service's startup type to `Automatic (Delayed)`.
         #
         # If `Delayed` is false and `StartupType` is `Automatic, sets the service's startup type to `Automatic`.
         #
@@ -260,60 +260,60 @@ function Set-TargetResource
         #
         # This parameter was added in Carbon 2.5.
         $Delayed,
-        
+
         [Carbon.Service.FailureAction]
         # What to do on the service's first failure.  Default is to take no action.
         $OnFirstFailure,
-        
+
         [Carbon.Service.FailureAction]
         # What to do on the service's second failure. Default is to take no action.
         $OnSecondFailure,
-        
+
         [Carbon.Service.FailureAction]
         # What to do on the service' third failure.  Default is to take no action.
         $OnThirdFailure,
-        
+
         [int]
         # How many seconds after which the failure count is reset to 0.
         $ResetFailureCount,
-        
+
         [int]
         # How many milliseconds to wait before restarting the service.  Default is 60,0000, or 1 minute.
         $RestartDelay,
-        
+
         [int]
         # How many milliseconds to wait before handling the second failure.  Default is 60,000 or 1 minute.
         $RebootDelay,
-        
+
         [string[]]
         # What other services does this service depend on?
         $Dependency,
-        
+
         [string]
         # The command to run when a service fails, including path to the command and arguments.
         $Command,
-        
+
         [int]
         # How many milliseconds to wait before running the failure command. Default is 0, or immediately.
         $RunCommandDelay,
-        
+
         [string]
         # The service's display names.
         $DisplayName,
-        
+
         [string]
         # The service's description.
         $Description,
-        
+
         [ValidateSet("LocalSystem", "LocalService", "NetworkService")]
         [string]
         # The system account the service should run as.
         $UserName,
-        
+
         [pscredential]
         # The credentials of the custom account the service should run as.
         $Credential,
-        
+
         [string[]]
         # The arguments/startup parameters for the service
         $ArgumentList,
@@ -372,11 +372,11 @@ function Test-TargetResource
         [string]
         # The name of the service.
         $Name,
-        
+
         [string]
         # The path to the service.
         $Path,
-        
+
         [ValidateSet('Automatic','Manual','Disabled')]
         [string]
         # The startup type: automatic, manual, or disabled.  Default is automatic.
@@ -384,60 +384,60 @@ function Test-TargetResource
 
         [Switch]
         $Delayed,
-        
+
         [Carbon.Service.FailureAction]
         # What to do on the service's first failure.  Default is to take no action.
         $OnFirstFailure,
-        
+
         [Carbon.Service.FailureAction]
         # What to do on the service's second failure. Default is to take no action.
         $OnSecondFailure,
-        
+
         [Carbon.Service.FailureAction]
         # What to do on the service' third failure.  Default is to take no action.
         $OnThirdFailure,
-        
+
         [int]
         # How many seconds after which the failure count is reset to 0.
         $ResetFailureCount,
-        
+
         [int]
         # How many milliseconds to wait before restarting the service.  Default is 60,0000, or 1 minute.
         $RestartDelay,
-        
+
         [int]
         # How many milliseconds to wait before handling the second failure.  Default is 60,000 or 1 minute.
         $RebootDelay,
-        
+
         [string[]]
         # What other services does this service depend on?
         $Dependency,
-        
+
         [string]
         # The command to run when a service fails, including path to the command and arguments.
         $Command,
-        
+
         [int]
         # How many milliseconds to wait before running the failure command. Default is 0, or immediately.
         $RunCommandDelay,
-        
+
         [string]
         # The service's display names.
         $DisplayName,
-        
+
         [string]
         # The service's description.
         $Description,
-        
+
         [ValidateSet("LocalSystem", "LocalService", "NetworkService")]
         [string]
         # The system account the service should run as.
         $UserName,
-        
+
         [pscredential]
         # The custom account the service should run as.
         $Credential,
-        
+
         [string[]]
         # The arguments/startup parameters for the service
         $ArgumentList,
@@ -471,7 +471,7 @@ function Test-TargetResource
 
     if( $PSBoundParameters.ContainsKey( 'UserName' ) )
     {
-        $identity = Resolve-CIdentity -Name $UserName
+        $identity = Resolve-CIdentity -Name $UserName -NoWarn
         if( $identity )
         {
             $PSBoundParameters['UserName'] = $identity.FullName
@@ -486,7 +486,7 @@ function Test-TargetResource
     if( $PSBoundParameters.ContainsKey('Credential') )
     {
         [void]$PSBoundParameters.Remove('Credential')
-        $identity = Resolve-CIdentity -Name $Credential.UserName -ErrorAction Ignore
+        $identity = Resolve-CIdentity -Name $Credential.UserName -NoWarn -ErrorAction Ignore
         if( $identity )
         {
             $PSBoundParameters.UserName = $identity.FullName

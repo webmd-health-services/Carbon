@@ -30,7 +30,7 @@ function Install-CScheduledTask
 
     .LINK
     http://technet.microsoft.com/en-us/library/cc725744.aspx#BKMK_create
-    
+
     .LINK
     http://msdn.microsoft.com/en-us/library/windows/desktop/aa383609.aspx
 
@@ -50,7 +50,7 @@ function Install-CScheduledTask
     Demonstrates how to run a task every minute as a built-in principal, in this case `Local Service`.
 
     .EXAMPLE
-    Install-CScheduledTask -Name 'CarbonSample' -TaskToRun 'calc.exe' -Minute 5 -StartTime '12:00' -EndTime '14:00' -StartDate '6/6/2006' -EndDate '6/6/2006' 
+    Install-CScheduledTask -Name 'CarbonSample' -TaskToRun 'calc.exe' -Minute 5 -StartTime '12:00' -EndTime '14:00' -StartDate '6/6/2006' -EndDate '6/6/2006'
 
     Demonstrates how to run a task every 5 minutes between the given start date/time and end date/time. In this case, the task will run between noon and 2 pm on `6/6/2006`.
 
@@ -426,7 +426,7 @@ function Install-CScheduledTask
         [Parameter(ParameterSetName='OnIdle')]
         [Parameter(ParameterSetName='OnEvent')]
         [Switch]
-        # If the user is an administrator, runs the task with full administrator rights. The default is to run with limited administrative privileges. 
+        # If the user is an administrator, runs the task with full administrator rights. The default is to run with limited administrative privileges.
         #
         # If UAC is enabled, an administrator has two security tokens: a filtered token that gets used by default and grants standard user rights and a full token that grants administrative rights that is only used when a program is "Run as administrator". Using this switch runs the scheduled task with the adminisrators full token. (Information taken from [How does "Run with the highest privileges" really work in Task Scheduler ?](https://social.technet.microsoft.com/Forums/windows/en-US/7167bb31-f375-4f77-b430-0339092e16b9/how-does-run-with-the-highest-privileges-really-work-in-task-scheduler-).)
         $HighestAvailableRunLevel,
@@ -496,7 +496,7 @@ function Install-CScheduledTask
     elseif( $PSCmdlet.ParameterSetName -notlike 'Xml*' )
     {
         [void]$parameters.Add( '/RU' )
-        [void]$parameters.Add( (Resolve-CIdentityName -Name $Principal) )
+        [void]$parameters.Add( (Resolve-CIdentityName -Name $Principal -NoWarn) )
     }
 
     function ConvertTo-SchtasksCalendarNameList
@@ -713,8 +713,8 @@ function Install-CScheduledTask
             $paramLogString = $paramLogString -replace ([Text.RegularExpressions.Regex]::Escape($TaskCredential.GetNetworkCredential().Password)),'********'
         }
         Write-Verbose ('/TN {0} {1}' -f $Name,$paramLogString)
-        # Warnings get written by schtasks to the error stream. Fortunately, errors and warnings 
-        # are prefixed with ERRROR and WARNING, so we can combine output/error streams and parse 
+        # Warnings get written by schtasks to the error stream. Fortunately, errors and warnings
+        # are prefixed with ERRROR and WARNING, so we can combine output/error streams and parse
         # it later. We just have to make sure we remove any errors added to the $Error variable.
         $preErrorCount = $Global:Error.Count
         $output = schtasks /create /TN $Name $parameters 2>&1
@@ -735,7 +735,7 @@ function Install-CScheduledTask
             $createFailed = $true
         }
 
-        $output | ForEach-Object { 
+        $output | ForEach-Object {
             if( $_ -match '\bERROR\b' )
             {
                 Write-Error $_

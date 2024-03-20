@@ -43,7 +43,7 @@ BeforeAll {
         {
             $group | Should -Not -BeNullOrEmpty
             $Member |
-                ForEach-Object { Resolve-Identity -Name $_ } |
+                ForEach-Object { Resolve-Identity -Name $_ -NoWarn } |
                 ForEach-Object {
                     $identity = $_
                     $members = $group.Members | Where-Object { $_.Sid -eq $identity.Sid }
@@ -180,7 +180,7 @@ Describe 'Add-GroupMember' {
     }
 
     It 'should add NT service accounts' {
-        if( (Test-Identity -Name 'NT Service\Fax') )
+        if( (Test-Identity -Name 'NT Service\Fax' -NoWarn) )
         {
             Add-GroupMember -Name $GroupName -Member 'NT SERVICE\Fax'
             $Error.Count | Should -Be 0

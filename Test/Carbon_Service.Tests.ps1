@@ -64,9 +64,9 @@ Describe 'Carbon_Service' {
                 $resource.DisplayName | Should -Be $_.DisplayName
                 $resource.Description | Should -Be $_.Description
                 ($resource.Dependency -join ',') | Should -Be (($_.ServicesDependedOn | Select-Object -ExpandProperty 'Name') -join ',')
-                if( $_.UserName -and (Test-CIdentity -Name $_.UserName) )
+                if( $_.UserName -and (Test-CIdentity -Name $_.UserName -NoWarn) )
                 {
-                    $resource.UserName | Should -Be (Resolve-CIdentityName -Name $_.UserName)
+                    $resource.UserName | Should -Be (Resolve-CIdentityName -Name $_.UserName -NoWarn)
                 }
                 else
                 {
@@ -165,7 +165,7 @@ Describe 'Carbon_Service' {
         $resource.RunCommandDelay | Should -Be (60*1000)
         $resource.DisplayName | Should -Be 'Display Name'
         $resource.Description | Should -Be 'Description description description'
-        $resource.UserName | Should -Be (Resolve-CIdentity -Name $script:credential.UserName).FullName
+        $resource.UserName | Should -Be (Resolve-CIdentity -Name $script:credential.UserName -NoWarn).FullName
         $resource.Credential | Should -BeNullOrEmpty
         $resource.ArgumentList | Should -Be $null
         Assert-DscResourcePresent $resource

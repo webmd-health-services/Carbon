@@ -19,7 +19,7 @@ BeforeAll {
     $script:startedAt = Get-Date
     $script:serviceCredential = New-CCredential -UserName $script:serviceAcct -Password $script:servicePassword
     Install-CUser -Credential $script:serviceCredential -Description "Account for testing the Carbon Install-CService function."
-    $script:defaultServiceAccountName = Resolve-CIdentityName -Name 'NT AUTHORITY\NetworkService'
+    $script:defaultServiceAccountName = Resolve-CIdentityName -Name 'NT AUTHORITY\NetworkService' -NoWarn
 
     function Assert-ServiceInstalled
     {
@@ -164,7 +164,7 @@ Describe 'Install-CService' {
         Mock -CommandName 'Write-Debug' -ModuleName 'Carbon' -Verifiable
         Install-CService -Name $script:serviceName -Path $script:servicePath -StartupType Automatic
         $svc = Get-Service -Name $script:serviceName
-        $svc.UserName | Should -Be (Resolve-IdentityName 'NetworkService')
+        $svc.UserName | Should -Be (Resolve-IdentityName 'NetworkService' -NoWarn)
     }
 
     It 'when service is a local account and installed multiple times' {
@@ -677,6 +677,7 @@ Describe 'Install-CService' {
         $service.UserName | Should -Be $script:defaultServiceAccountName
         Install-CService -Name $script:serviceName -Path $script:servicePath -Credential $script:serviceCredential
         $service = Assert-ServiceInstalled
-        (Resolve-IdentityName $service.UserName) | Should -Be (Resolve-IdentityName $script:serviceCredential.UserName)
+        (Resolve-IdentityName $service.UserName -NoWarn) |
+            Should -Be (Resolve-IdentityName $script:serviceCredential.UserName -NoWarn)
     }
 }

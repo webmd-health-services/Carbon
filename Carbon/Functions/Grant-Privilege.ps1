@@ -4,7 +4,7 @@ function Grant-CPrivilege
     <#
     .SYNOPSIS
     Grants an identity priveleges to perform system operations.
-    
+
     .DESCRIPTION
     *Privilege names are **case-sensitive**.* Valid privileges are documented on Microsoft's website: [Privilege Constants](http://msdn.microsoft.com/en-us/library/windows/desktop/bb530716.aspx) and [Account Right Constants](http://msdn.microsoft.com/en-us/library/windows/desktop/bb545671.aspx). Here is the most current list, as of August 2014:
 
@@ -56,22 +56,22 @@ function Grant-CPrivilege
 
     .LINK
     Get-CPrivilege
-    
+
     .LINK
     Revoke-CPrivilege
-    
+
     .LINK
     Test-CPrivilege
-    
+
     .LINK
     http://msdn.microsoft.com/en-us/library/windows/desktop/bb530716.aspx
-    
+
     .LINK
     http://msdn.microsoft.com/en-us/library/windows/desktop/bb545671.aspx
-    
+
     .EXAMPLE
     Grant-CPrivilege -Identity Batcomputer -Privilege SeServiceLogonRight
-    
+
     Grants the Batcomputer account the ability to logon as a service. *Privilege names are **case-sensitive**.*
     #>
     [CmdletBinding()]
@@ -80,7 +80,7 @@ function Grant-CPrivilege
         [string]
         # The identity to grant a privilege.
         $Identity,
-        
+
         [Parameter(Mandatory=$true)]
         [string[]]
         # The privileges to grant. *Privilege names are **case-sensitive**.*
@@ -90,13 +90,13 @@ function Grant-CPrivilege
     Set-StrictMode -Version 'Latest'
 
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
-    
-    $account = Resolve-CIdentity -Name $Identity
+
+    $account = Resolve-CIdentity -Name $Identity -NoWarn
     if( -not $account )
     {
         return
     }
-    
+
     try
     {
         [Carbon.Security.Privilege]::GrantPrivileges( $account.FullName, $Privilege )
@@ -120,9 +120,9 @@ function Grant-CPrivilege
         }
         while( $ex )
 
-        $ex = $_.Exception        
+        $ex = $_.Exception
         Write-Error -Message ('Failed to grant {0} {1} privilege(s): {2}' -f $account.FullName,($Privilege -join ', '),$ex.Message)
-        
+
         while( $ex.InnerException )
         {
             $ex = $ex.InnerException
