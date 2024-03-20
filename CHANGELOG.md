@@ -3,6 +3,31 @@
 
 # Carbon Changelog
 
+## 2.16.0
+
+## Deprecated
+
+* `Get-CPermission`, `Grant-CPermission`, `Revoke-CPermission`, and `Test-CPermission` functions. They moved to
+provider-specific functions in the following modules:
+  * Carbon.Cryptography
+    * `Get-CPrivateKeyPermission`
+    * `Grant-CPrivateKeyPermission`
+    * `Revoke-CPrivateKeyPermission`
+    * `Test-CPrivateKeyPermission`
+  * Carbon.FileSystem
+    * `Get-CNtfsPermission`
+    * `Grant-CNtfsPermission`
+    * `Revoke-CNtfsPermission`
+    * `Test-CNtfsPermission`
+  * Carbon.Registry
+    * `Get-CRegistryPermission`
+    * `Grant-CRegistryPermission`
+    * `Revoke-CRegistryPermission`
+    * `Test-CRegistryPermission`
+* `ConvertTo-CContainerInheritanceFlags`, `ConvertTo-InheritanceFlag`, and `ConvertTo-PropagationFlag`. If you switch
+to the new provider-specific functions above, you won't need to use these functions anymore.
+
+
 ## 2.15.1
 
 > Released 17 Aug 2023

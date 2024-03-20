@@ -75,8 +75,9 @@ Describe 'Carbon' {
                     }
                     '^\.nuspec$'
                     {
-                        $expectedNotice = $noticeLines -join ('{0}   ' -f ([Environment]::NewLine))
-                        $expectedNotice = '<?xml version="1.0"?>{0}<!--{0}   {1}{0}-->{0}' -f ([Environment]::NewLine),$expectedNotice
+                        $expectedNotice =
+                            ($noticeLines | ForEach-Object { "   ${_}".TrimEnd() }) -join [Environment]::NewLine
+                        $expectedNotice = '<?xml version="1.0"?>{0}<!--{0}{1}{0}-->{0}' -f ([Environment]::NewLine),$expectedNotice
                         $file.StartsWith( $expectedNotice )
                         break
                     }

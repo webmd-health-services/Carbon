@@ -21,17 +21,17 @@ function Get-TargetResource
         [string]
         # The path on which the permissions should be granted.  Can be a file system or registry path.
         $Path,
-        
+
         [Parameter(Mandatory=$true)]
         [string]
         # The user or group getting the permissions.
         $Identity,
-        
+
         [ValidateSet("CreateFiles","AppendData","CreateSubKey","EnumerateSubKeys","CreateLink","Delete","ChangePermissions","ExecuteFile","DeleteSubdirectoriesAndFiles","FullControl","GenericRead","GenericAll","GenericExecute","QueryValues","ReadAttributes","ReadData","ReadExtendedAttributes","GenericWrite","Notify","ReadPermissions","Read","ReadAndExecute","Modify","SetValue","ReadKey","TakeOwnership","WriteAttributes","Write","Synchronize","WriteData","WriteExtendedAttributes","WriteKey")]
         [string[]]
         # The permission: e.g. FullControl, Read, etc.  For file system items, use values from [System.Security.AccessControl.FileSystemRights](http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.filesystemrights.aspx).  For registry items, use values from [System.Security.AccessControl.RegistryRights](http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.registryrights.aspx).
         $Permission,
-        
+
         [ValidateSet('Container','SubContainers','ContainerAndSubContainers','Leaves','ContainerAndLeaves','SubContainersAndLeaves','ContainerAndSubContainersAndLeaves','ChildContainers','ContainerAndChildContainers','ChildLeaves','ContainerAndChildLeaves','ChildContainersAndChildLeaves','ContainerAndChildContainersAndChildLeaves')]
         [string]
         # How to apply container permissions.  This controls the inheritance and propagation flags.  Default is full inheritance, e.g. `ContainersAndSubContainersAndLeaves`. This parameter is ignored if `Path` is to a leaf item.
@@ -39,7 +39,7 @@ function Get-TargetResource
 
         [bool]
         $Append,
-        
+
         [ValidateSet('Present','Absent')]
         [string]
         # Should the user exist or not exist?
@@ -56,7 +56,7 @@ function Get-TargetResource
                         Ensure = 'Absent';
                     }
 
-    $perms = Get-CPermission -Path $Path -Identity $Identity
+    $perms = Get-CPermission -Path $Path -Identity $Identity -NoWarn
     if( -not $perms )
     {
         return $defaultState
@@ -65,13 +65,15 @@ function Get-TargetResource
     foreach( $perm in $perms )
     {
         $resource = $defaultState.Clone()
-        [string[]]$resource.Permission = $perm | 
-                                            Get-Member -Name '*Rights' -MemberType Property | 
+        [string[]]$resource.Permission = $perm |
+                                            Get-Member -Name '*Rights' -MemberType Property |
                                             ForEach-Object { ($perm.($_.Name)).ToString() -split ',' } |
-                                            ForEach-Object { $_.Trim() } | 
+                                            ForEach-Object { $_.Trim() } |
                                             Where-Object { $_ -ne 'Synchronize' }
 
-        $resource.ApplyTo = ConvertTo-CContainerInheritanceFlags -InheritanceFlags $perm.InheritanceFlags -PropagationFlags $perm.PropagationFlags
+        $resource.ApplyTo = ConvertTo-CContainerInheritanceFlags -InheritanceFlags $perm.InheritanceFlags `
+                                                                 -PropagationFlags $perm.PropagationFlags `
+                                                                 -NoWarn
         $resource.Ensure = 'Present'
         $resource
     }
@@ -90,7 +92,7 @@ function Set-TargetResource
     ### Granting Permission
 
     Permissions are granted when the `Ensure` property is set to `Present`.
-    
+
     When granting permissions, you *must* supply a value for the `Permission` property. Valid values are:
 
      * CreateFiles
@@ -125,7 +127,7 @@ function Set-TargetResource
      * WriteData
      * WriteExtendedAttributes
      * WriteKey
-    
+
     The `ApplyTo` property is only used when setting permissions on a directory or a registry key. Valid values are:
 
      * Container
@@ -145,7 +147,7 @@ function Set-TargetResource
     Beginning in Carbon 2.7, you can add multiple permissions to an identity with the `Append` property. When set to true, it will add the permission instead of replacing an identity's current permissions. Note that DSC won't let you have two `Carbon_Permission` resources in your configuration where the identity and path properties are the same. Every `Carbon_Permission` resource must have unique identity and path properties. You may be able to work around this by using different values for the `Identity` property that resolve to the same identity, e.g. `Administrators` vs. `.\Administrators`.
 
     ### Revoking Permission
-        
+
     Permissions are revoked when the `Ensure` property is set to `Absent`. *All* a user or group's permissions are revoked. You can't revoke part of a principal's access. If you want to revoke part of a principal's access, set the `Ensure` property to `Present` and the `Permissions` property to the list of properties you want the principal to have.
 
     `Carbon_Permission` is new in Carbon 2.0.
@@ -164,16 +166,16 @@ function Set-TargetResource
 
     .LINK
     http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.filesystemrights.aspx
-    
+
     .LINK
     http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.registryrights.aspx
-    
+
     .LINK
     http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.cryptokeyrights.aspx
-    
+
     .LINK
-    http://msdn.microsoft.com/en-us/magazine/cc163885.aspx#S3    
-    
+    http://msdn.microsoft.com/en-us/magazine/cc163885.aspx#S3
+
     .EXAMPLE
     >
     Demonstrates how to grant permissions to an item on the file system.
@@ -259,17 +261,17 @@ function Set-TargetResource
         [string]
         # The path on which the permissions should be granted.  Can be a file system, registry path, or certificate path.
         $Path,
-        
+
         [Parameter(Mandatory=$true)]
         [string]
         # The user or group getting the permissions.
         $Identity,
-        
+
         [ValidateSet("CreateFiles","AppendData","CreateSubKey","EnumerateSubKeys","CreateLink","Delete","ChangePermissions","ExecuteFile","DeleteSubdirectoriesAndFiles","FullControl","GenericRead","GenericAll","GenericExecute","QueryValues","ReadAttributes","ReadData","ReadExtendedAttributes","GenericWrite","Notify","ReadPermissions","Read","ReadAndExecute","Modify","SetValue","ReadKey","TakeOwnership","WriteAttributes","Write","Synchronize","WriteData","WriteExtendedAttributes","WriteKey")]
         [string[]]
         # The permission: e.g. FullControl, Read, etc. Mandatory when granting permission. Valid values are `CreateFiles`, `AppendData`, `CreateSubKey`, `EnumerateSubKeys`, `CreateLink`, `Delete`, `ChangePermissions`, `ExecuteFile`, `DeleteSubdirectoriesAndFiles`, `FullControl`, `GenericRead`, `GenericAll`, `GenericExecute`, `QueryValues`, `ReadAttributes`, `ReadData`, `ReadExtendedAttributes`, `GenericWrite`, `Notify`, `ReadPermissions`, `Read`, `ReadAndExecute`, `Modify`, `SetValue`, `ReadKey`, `TakeOwnership`, `WriteAttributes`, `Write`, `Synchronize`, `WriteData`, `WriteExtendedAttributes`, `WriteKey`.
         $Permission,
-        
+
         [ValidateSet('Container','SubContainers','ContainerAndSubContainers','Leaves','ContainerAndLeaves','SubContainersAndLeaves','ContainerAndSubContainersAndLeaves','ChildContainers','ContainerAndChildContainers','ChildLeaves','ContainerAndChildLeaves','ChildContainersAndChildLeaves','ContainerAndChildContainersAndChildLeaves')]
         [string]
         # How to apply container permissions.  This controls the inheritance and propagation flags.  Default is full inheritance, e.g. `ContainersAndSubContainersAndLeaves`. This parameter is only used when `Path` is a directory or registry key. Valid values are `Container`, `SubContainers`, `ContainerAndSubContainers`, `Leaves`, `ContainerAndLeaves`, `SubContainersAndLeaves`, `ContainerAndSubContainersAndLeaves`, `ChildContainers`, `ContainerAndChildContainers`, `ChildLeaves`, `ContainerAndChildLeaves`, `ChildContainersAndChildLeaves`, `ContainerAndChildContainersAndChildLeaves`.
@@ -280,7 +282,7 @@ function Set-TargetResource
         #
         # This parameter was added in Carbon 2.7.
         $Append,
-        
+
         [ValidateSet('Present','Absent')]
         [string]
         # If set to `Present`, permissions are set. If `Absent`, all permissions to `$Path` removed.
@@ -294,11 +296,11 @@ function Set-TargetResource
     {
         $PSBoundParameters.Remove('Ensure')
     }
-    
+
     if( $Ensure -eq 'Absent' )
     {
         Write-Verbose ('Revoking permission for "{0}" to "{1}"' -f $Identity,$Path)
-        Revoke-CPermission -Path $Path -Identity $Identity
+        Revoke-CPermission -Path $Path -Identity $Identity -NoWarn
     }
     else
     {
@@ -309,7 +311,7 @@ function Set-TargetResource
         }
 
         Write-Verbose ('Granting permission for "{0}" to "{1}": {2}' -f $Identity,$Path,($Permission -join ','))
-        Grant-CPermission @PSBoundParameters
+        Grant-CPermission @PSBoundParameters -NoWarn
     }
 }
 
@@ -323,17 +325,17 @@ function Test-TargetResource
         [string]
         # The path on which the permissions should be granted.  Can be a file system or registry path.
         $Path,
-        
+
         [Parameter(Mandatory=$true)]
         [string]
         # The user or group getting the permissions.
         $Identity,
-        
+
         [ValidateSet("CreateFiles","AppendData","CreateSubKey","EnumerateSubKeys","CreateLink","Delete","ChangePermissions","ExecuteFile","DeleteSubdirectoriesAndFiles","FullControl","GenericRead","GenericAll","GenericExecute","QueryValues","ReadAttributes","ReadData","ReadExtendedAttributes","GenericWrite","Notify","ReadPermissions","Read","ReadAndExecute","Modify","SetValue","ReadKey","TakeOwnership","WriteAttributes","Write","Synchronize","WriteData","WriteExtendedAttributes","WriteKey")]
         [string[]]
         # The permission: e.g. FullControl, Read, etc.  For file system items, use values from [System.Security.AccessControl.FileSystemRights](http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.filesystemrights.aspx).  For registry items, use values from [System.Security.AccessControl.RegistryRights](http://msdn.microsoft.com/en-us/library/system.security.accesscontrol.registryrights.aspx).
         $Permission,
-        
+
         [ValidateSet('Container','SubContainers','ContainerAndSubContainers','Leaves','ContainerAndLeaves','SubContainersAndLeaves','ContainerAndSubContainersAndLeaves','ChildContainers','ContainerAndChildContainers','ChildLeaves','ContainerAndChildLeaves','ChildContainersAndChildLeaves','ContainerAndChildContainersAndChildLeaves')]
         [string]
         # How to apply container permissions.  This controls the inheritance and propagation flags.  Default is full inheritance, e.g. `ContainersAndSubContainersAndLeaves`. This parameter is ignored if `Path` is to a leaf item.
@@ -341,7 +343,7 @@ function Test-TargetResource
 
         [bool]
         $Append,
-        
+
         [ValidateSet('Present','Absent')]
         [string]
         # Should the user exist or not exist?
@@ -352,7 +354,7 @@ function Test-TargetResource
 
     $resources = Get-TargetResource -Identity $Identity -Path $Path
     $desiredRights = ($Permission | Sort-Object) -join ','
-    
+
     if( $Ensure -eq 'Absent' )
     {
         if( -not ($resources | Where-Object { $_.Ensure -eq 'Present' }) )
@@ -360,7 +362,7 @@ function Test-TargetResource
             Write-Verbose ('[{0}]  [{1}]  No Permissions' -f $Path,$Identity)
             return $true
         }
-        
+
         foreach( $resource in $resources )
         {
             $currentRights = ($resource.Permission | Sort-Object) -join ','
