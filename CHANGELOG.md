@@ -26,6 +26,8 @@ provider-specific functions in the following modules:
     * `Test-CRegistryPermission`
 * `ConvertTo-CContainerInheritanceFlags`, `ConvertTo-InheritanceFlag`, and `ConvertTo-PropagationFlag`. If you switch
 to the new provider-specific functions above, you won't need to use these functions anymore.
+* `ConvertTo-CSecurityIdentifier`, `Resolve-CIdentity`, `Resolve-CIdentityName`, and `Test-CIdentity`. They moved to
+the Carbon.Accounts module.
 
 
 ## 2.15.1
