@@ -40,11 +40,11 @@ function Test-CGroupMember
         $GroupName,
 
         [Parameter(Mandatory=$true)]
-        [string] 
+        [string]
         # The name of the member to check.
         $Member
     )
-    
+
     Set-StrictMode -Version 'Latest'
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
@@ -59,8 +59,8 @@ function Test-CGroupMember
     {
         return
     }
-    
-    $principal = Resolve-CIdentity -Name $Member
+
+    $principal = Resolve-CIdentity -Name $Member -NoWarn
     if( -not $principal )
     {
         return

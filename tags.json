@@ -100,10 +100,6 @@
         "Tags":  [ "Security", "ACL" ]
     },
     {
-        "Name":  "ConvertTo-CSecurityIdentifier",
-        "Tags":  [ "Users", "Groups", "SID", "Identity", "Principal" ]
-    },
-    {
         "Name":  "Convert-CXmlFile",
         "Tags":  [ "Xml", "Text" ]
     },
@@ -532,14 +528,6 @@
         "Tags":  [ "Path" ]
     },
     {
-        "Name":  "Resolve-CIdentity",
-        "Tags":  [ "Users", "Groups", "SID", "Security", "Identity", "Principal" ]
-    },
-    {
-        "Name":  "Resolve-CIdentityName",
-        "Tags":  [ "Users", "Groups", "SID", "Security", "Identity", "Principal" ]
-    },
-    {
         "Name":  "Resolve-CNetPath",
         "Tags":  [ "Computer" ]
     },
@@ -666,10 +654,6 @@
     {
         "Name":  "Test-CGroupMember",
         "Tags":  [ "Groups", "Identity", "Principal" ]
-    },
-    {
-        "Name":  "Test-CIdentity",
-        "Tags":  [ "Users", "Groups", "Security", "Identity", "Principal", "SID" ]
     },
     {
         "Name":  "Test-CIisAppPool",

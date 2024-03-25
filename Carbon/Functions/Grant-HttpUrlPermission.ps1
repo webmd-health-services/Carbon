@@ -12,8 +12,8 @@ function Grant-CHttpUrlPermission
 
     > enables applications to communicate over HTTP without using Microsoft Internet Information Server (IIS). Applications can register to receive HTTP requests for particular URLs, receive HTTP requests, and send HTTP responses.
 
-    An application that uses the HTTP Server API must register all URLs it listens (i.e. binds, registers) to. A user can have three permissions: 
-    
+    An application that uses the HTTP Server API must register all URLs it listens (i.e. binds, registers) to. A user can have three permissions:
+
      * `Listen`, which allows the user to bind to the `$Url` url
      * `Delegate`, which allows the user to "reserve (delegate) a subtree of this URL for another user" (whatever that means)
 
@@ -85,7 +85,7 @@ function Grant-CHttpUrlPermission
         $acl = New-Object 'Carbon.Security.HttpUrlSecurity' $Url
     }
 
-    $id = Resolve-CIdentity -Name $Principal
+    $id = Resolve-CIdentity -Name $Principal -NoWarn
     if( -not $id )
     {
         return

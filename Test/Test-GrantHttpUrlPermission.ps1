@@ -1,9 +1,9 @@
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# 
+#
 #     http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,7 +17,7 @@ $url = 'http://test-granthttpurlpermission:10383/'
 
 function Start-Test
 {
-    $user = Resolve-Identity -Name $CarbonTestUser.UserName
+    $user = Resolve-Identity -Name $CarbonTestUser.UserName -NoWarn
 }
 
 function Stop-Test
@@ -36,7 +36,7 @@ function Test-ShouldRegisterUrlWithoutTrailingForwardSlash
 {
     Grant-HttpUrlPermission -Url $url.TrimEnd("/") -Principal $user -Permission ListenAndDelegate
     Install-User -Credential (New-Credential -UserName 'CarbonTestUser2' -Password 'Password1') -PassThru
-    $user2 = Resolve-Identity -Name 'CarbonTestUser2'
+    $user2 = Resolve-Identity -Name 'CarbonTestUser2' -NoWarn
     Grant-HttpUrlPermission -Url $url.TrimEnd("/") -Principal $user2.FullName -Permission ListenAndDelegate
     Assert-NoError
     Assert-Permission -ExpectedPermission ([Carbon.Security.HttpUrlAccessRights]::ListenAndDelegate)
@@ -74,7 +74,7 @@ function Test-ShouldGrantMultipleUsersPermission
     Assert-NoError
 
     Install-User -Credential (New-Credential -UserName 'CarbonTestUser2' -Password 'Password1') -PassThru
-    $user2 = Resolve-Identity -Name 'CarbonTestUser2'
+    $user2 = Resolve-Identity -Name 'CarbonTestUser2' -NoWarn
 
     Grant-HttpUrlPermission -Url $url -Principal $user2.FullName -Permission Listen
     Assert-NoError

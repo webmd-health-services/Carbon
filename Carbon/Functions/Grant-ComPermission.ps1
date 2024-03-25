@@ -140,7 +140,7 @@ function Grant-CComPermission
 
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
-    $account = Resolve-CIdentity -Name $Identity -ErrorAction:$ErrorActionPreference
+    $account = Resolve-CIdentity -Name $Identity -NoWarn -ErrorAction:$ErrorActionPreference
     if( -not $account )
     {
         return

@@ -486,6 +486,84 @@ Set-Alias -Name 'ConvertTo-PropagationFlags' -Value 'ConvertTo-CPropagationFlag'
 
 
 
+function ConvertTo-CSecurityIdentifier
+{
+    <#
+    .SYNOPSIS
+    Converts a string or byte array security identifier into a `System.Security.Principal.SecurityIdentifier` object.
+
+    .DESCRIPTION
+    `ConvertTo-CSecurityIdentifier` converts a SID in SDDL form (as a string), in binary form (as a byte array) into a `System.Security.Principal.SecurityIdentifier` object. It also accepts `System.Security.Principal.SecurityIdentifier` objects, and returns them back to you.
+
+    If the string or byte array don't represent a SID, an error is written and nothing is returned.
+
+    .LINK
+    Resolve-CIdentity
+
+    .LINK
+    Resolve-CIdentityName
+
+    .EXAMPLE
+    Resolve-CIdentity -SID 'S-1-5-21-2678556459-1010642102-471947008-1017'
+
+    Demonstrates how to convert a a SID in SDDL into a `System.Security.Principal.SecurityIdentifier` object.
+
+    .EXAMPLE
+    Resolve-CIdentity -SID (New-Object 'Security.Principal.SecurityIdentifier' 'S-1-5-21-2678556459-1010642102-471947008-1017')
+
+    Demonstrates that you can pass a `SecurityIdentifier` object as the value of the SID parameter. The SID you passed in will be returned to you unchanged.
+
+    .EXAMPLE
+    Resolve-CIdentity -SID $sidBytes
+
+    Demonstrates that you can use a byte array that represents a SID as the value of the `SID` parameter.
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory=$true)]
+        # The SID to convert to a `System.Security.Principal.SecurityIdentifier`. Accepts a SID in SDDL form as a `string`, a `System.Security.Principal.SecurityIdentifier` object, or a SID in binary form as an array of bytes.
+        $SID,
+
+        [switch] $NoWarn
+    )
+
+    Set-StrictMode -Version 'Latest'
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
+    if (-not $NoWarn)
+    {
+        Write-CRefactoredCommandWarning -CommandName $MyInvocation.MyCommand.Name -ModuleName 'Carbon.Accounts'
+    }
+
+    try
+    {
+        if( $SID -is [string] )
+        {
+            New-Object 'Security.Principal.SecurityIdentifier' $SID
+        }
+        elseif( $SID -is [byte[]] )
+        {
+            New-Object 'Security.Principal.SecurityIdentifier' $SID,0
+        }
+        elseif( $SID -is [Security.Principal.SecurityIdentifier] )
+        {
+            $SID
+        }
+        else
+        {
+            Write-Error ('Invalid SID. The `SID` parameter accepts a `System.Security.Principal.SecurityIdentifier` object, a SID in SDDL form as a `string`, or a SID in binary form as byte array. You passed a ''{0}''.' -f $SID.GetType())
+            return
+        }
+    }
+    catch
+    {
+        Write-Error ('Exception converting SID parameter to a `SecurityIdentifier` object. This usually means you passed an invalid SID in SDDL form (as a string) or an invalid SID in binary form (as a byte array): {0}' -f $_.Exception.Message)
+        return
+    }
+}
+
+
+
 function ConvertTo-ProviderAccessControlRights
 {
     <#
@@ -1217,7 +1295,7 @@ function Get-CPermission
     $account = $null
     if( $Identity )
     {
-        $account = Test-CIdentity -Name $Identity -PassThru
+        $account = Test-CIdentity -Name $Identity -PassThru -NoWarn
         if( $account )
         {
             $Identity = $account.FullName
@@ -1965,13 +2043,13 @@ function Grant-CPermission
         return
     }
 
-    if( -not (Test-CIdentity -Name $Identity ) )
+    if( -not (Test-CIdentity -Name $Identity -NoWarn) )
     {
         Write-Error ('Identity ''{0}'' not found.' -f $Identity)
         return
     }
 
-    $Identity = Resolve-CIdentityName -Name $Identity
+    $Identity = Resolve-CIdentityName -Name $Identity -NoWarn
 
     if ($providerName -eq 'CryptoKey')
     {
@@ -2117,7 +2195,7 @@ function Grant-CPermission
     }
 
     $rulesToRemove = $null
-    $Identity = Resolve-CIdentity -Name $Identity
+    $Identity = Resolve-CIdentity -Name $Identity -NoWarn
     if( $Clear )
     {
         $rulesToRemove = $currentAcl.Access |
@@ -3965,6 +4043,218 @@ function Resolve-CFullPath
 Set-Alias -Name 'ConvertTo-FullPath' -Value 'Resolve-CFullPath'
 
 
+
+# When Resolve-CIdentity gets moved to a new module, this should go with it.
+Add-CTypeData -TypeName 'System.DirectoryServices.AccountManagement.Principal' `
+              -MemberName 'ConnectedServer' `
+              -MemberType ScriptProperty `
+              -Value { $this.Context.ConnectedServer }
+
+function Resolve-CIdentity
+{
+    <#
+    .SYNOPSIS
+    Gets domain, name, type, and SID information about a user or group.
+
+    .DESCRIPTION
+    The `Resolve-CIdentity` function takes an identity name or security identifier (SID) and gets its canonical representation. It returns a `Carbon.Identity` object, which contains the following information about the identity:
+
+     * Domain - the domain the user was found in
+     * FullName - the users full name, e.g. Domain\Name
+     * Name - the user's username or the group's name
+     * Type - the Sid type.
+     * Sid - the account's security identifier as a `System.Security.Principal.SecurityIdentifier` object.
+
+    The common name for an account is not always the canonical name used by the operating system.  For example, the local Administrators group is actually called BUILTIN\Administrators.  This function uses the `LookupAccountName` and `LookupAccountSid` Windows functions to resolve an account name or security identifier into its domain, name, full name, SID, and SID type.
+
+    You may pass a `System.Security.Principal.SecurityIdentifer`, a SID in SDDL form (as a string), or a SID in binary form (a byte array) as the value to the `SID` parameter. You'll get an error and nothing returned if the SDDL or byte array SID are invalid.
+
+    If the name or security identifier doesn't represent an actual user or group, an error is written and nothing is returned.
+
+    .LINK
+    Test-CIdentity
+
+    .LINK
+    Resolve-CIdentityName
+
+    .LINK
+    http://msdn.microsoft.com/en-us/library/system.security.principal.securityidentifier.aspx
+
+    .LINK
+    http://msdn.microsoft.com/en-us/library/windows/desktop/aa379601.aspx
+
+    .LINK
+    ConvertTo-CSecurityIdentifier
+
+    .LINK
+    Resolve-CIdentityName
+
+    .LINK
+    Test-CIdentity
+
+    .OUTPUTS
+    Carbon.Identity.
+
+    .EXAMPLE
+    Resolve-CIdentity -Name 'Administrators'
+
+    Returns an object representing the `Administrators` group.
+
+    .EXAMPLE
+    Resolve-CIdentity -SID 'S-1-5-21-2678556459-1010642102-471947008-1017'
+
+    Demonstrates how to use a SID in SDDL form to convert a SID into an identity.
+
+    .EXAMPLE
+    Resolve-CIdentity -SID (New-Object 'Security.Principal.SecurityIdentifier' 'S-1-5-21-2678556459-1010642102-471947008-1017')
+
+    Demonstrates that you can pass a `SecurityIdentifier` object as the value of the SID parameter.
+
+    .EXAMPLE
+    Resolve-CIdentity -SID $sidBytes
+
+    Demonstrates that you can use a byte array that represents a SID as the value of the `SID` parameter.
+    #>
+    [CmdletBinding(DefaultParameterSetName='ByName')]
+    [OutputType([Carbon.Identity])]
+    param(
+        [Parameter(Mandatory=$true,ParameterSetName='ByName',Position=0)]
+        [string]
+        # The name of the identity to return.
+        $Name,
+
+        [Parameter(Mandatory=$true,ParameterSetName='BySid')]
+        # The SID of the identity to return. Accepts a SID in SDDL form as a `string`, a `System.Security.Principal.SecurityIdentifier` object, or a SID in binary form as an array of bytes.
+        $SID,
+
+        [switch] $NoWarn
+    )
+
+    Set-StrictMode -Version 'Latest'
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
+    if (-not $NoWarn)
+    {
+        Write-CRefactoredCommandWarning -CommandName $MyInvocation.MyCommand.Name -ModuleName 'Carbon.Accounts'
+    }
+
+    if( $PSCmdlet.ParameterSetName -eq 'BySid' )
+    {
+        $SID = ConvertTo-CSecurityIdentifier -SID $SID
+        if( -not $SID )
+        {
+            return
+        }
+
+        $id = [Carbon.Identity]::FindBySid( $SID )
+        if( -not $id )
+        {
+            Write-Error ('Identity ''{0}'' not found.' -f $SID) -ErrorAction $ErrorActionPreference
+        }
+        return $id
+    }
+
+    if( -not (Test-CIdentity -Name $Name -NoWarn) )
+    {
+        Write-Error ('Identity ''{0}'' not found.' -f $Name) -ErrorAction $ErrorActionPreference
+        return
+    }
+
+    return [Carbon.Identity]::FindByName( $Name )
+}
+
+
+
+function Resolve-CIdentityName
+{
+    <#
+    .SYNOPSIS
+    Determines the full, NT identity name for a user or group.
+
+    .DESCRIPTION
+    `Resolve-CIdentityName` resolves a user/group name into its full, canonical name, used by the operating system. For example, the local Administrators group is actually called BUILTIN\Administrators. With a canonical username, you can unambiguously compare principals on objects that contain user/group information.
+
+    If unable to resolve a name into an identity, `Resolve-CIdentityName` returns nothing.
+
+    If you want to get full identity information (domain, type, sid, etc.), use `Resolve-CIdentity`.
+
+    In Carbon 2.0, you can also resolve a SID into its identity name. The `SID` parameter accepts a SID in SDDL form as a `string`, a `System.Security.Principal.SecurityIdentifier` object, or a SID in binary form as an array of bytes. If the SID no longer maps to an active account, you'll get the original SID in SDDL form (as a string) returned to you.
+
+    .LINK
+    ConvertTo-CSecurityIdentifier
+
+    .LINK
+    Resolve-CIdentity
+
+    .LINK
+    Test-CIdentity
+
+    .LINK
+    http://msdn.microsoft.com/en-us/library/system.security.principal.securityidentifier.aspx
+
+    .LINK
+    http://msdn.microsoft.com/en-us/library/windows/desktop/aa379601.aspx
+
+    .OUTPUTS
+    string
+
+    .EXAMPLE
+    Resolve-CIdentityName -Name 'Administrators'
+
+    Returns `BUILTIN\Administrators`, the canonical name for the local Administrators group.
+    #>
+    [CmdletBinding(DefaultParameterSetName='ByName')]
+    [OutputType([string])]
+    param(
+        [Parameter(Mandatory=$true,ParameterSetName='ByName',Position=0)]
+        [string]
+        # The name of the identity to return.
+        $Name,
+
+        [Parameter(Mandatory=$true,ParameterSetName='BySid')]
+        # Get an identity's name from its SID. Accepts a SID in SDDL form as a `string`, a `System.Security.Principal.SecurityIdentifier` object, or a SID in binary form as an array of bytes.
+        #
+        # This parameter is new in Carbon 2.0.
+        $SID,
+
+        [switch] $NoWarn
+    )
+
+    Set-StrictMode -Version 'Latest'
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
+    if (-not $NoWarn)
+    {
+        Write-CRefactoredCommandWarning -CommandName $MyInvocation.MyCommand.Name -Module 'Carbon.Accounts'
+    }
+
+    if( $PSCmdlet.ParameterSetName -eq 'ByName' )
+    {
+        return Resolve-CIdentity -Name $Name -NoWarn -ErrorAction Ignore | Select-Object -ExpandProperty 'FullName'
+    }
+    elseif( $PSCmdlet.ParameterSetName -eq 'BySid' )
+    {
+        $SID = ConvertTo-CSecurityIdentifier -SID $SID
+        if( -not $SID )
+        {
+            return
+        }
+
+        $id = [Carbon.Identity]::FindBySid( $SID )
+        if( $id )
+        {
+            return $id.FullName
+        }
+        else
+        {
+            return $SID.ToString()
+        }
+    }
+
+}
+
+
+
 function Resolve-CNetPath
 {
     <#
@@ -4369,7 +4659,7 @@ function Revoke-CPermission
         return
     }
 
-    $Identity = Resolve-CIdentityName -Name $Identity
+    $Identity = Resolve-CIdentityName -Name $Identity -NoWarn
 
     foreach ($item in (Get-Item $Path -Force))
     {
@@ -4900,6 +5190,75 @@ function Test-CCryptoKeyAvailable
 
 
 
+function Test-CIdentity
+{
+    <#
+    .SYNOPSIS
+    Tests that a name is a valid Windows local or domain user/group.
+
+    .DESCRIPTION
+    Uses the Windows `LookupAccountName` function to find an identity.  If it can't be found, returns `$false`.  Otherwise, it returns `$true`.
+
+    Use the `PassThru` switch to return a `Carbon.Identity` object (instead of `$true` if the identity exists.
+
+    .LINK
+    Resolve-CIdentity
+
+    .LINK
+    Resolve-CIdentityName
+
+    .EXAMPLE
+    Test-CIdentity -Name 'Administrators
+
+    Tests that a user or group called `Administrators` exists on the local computer.
+
+    .EXAMPLE
+    Test-CIdentity -Name 'CARBON\Testers'
+
+    Tests that a group called `Testers` exists in the `CARBON` domain.
+
+    .EXAMPLE
+    Test-CIdentity -Name 'Tester' -PassThru
+
+    Tests that a user or group named `Tester` exists and returns a `System.Security.Principal.SecurityIdentifier` object if it does.
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]
+        # The name of the identity to test.
+        $Name,
+
+        [Switch]
+        # Returns a `Carbon.Identity` object if the identity exists.
+        $PassThru,
+
+        [switch] $NoWarn
+    )
+
+    Set-StrictMode -Version 'Latest'
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
+    if (-not $NoWarn)
+    {
+        Write-CRefactoredCommandWarning -CommandName $MyInvocation.MyCommand.Name -ModuleName 'Carbon.Accounts'
+    }
+
+    $identity = [Carbon.Identity]::FindByName( $Name )
+    if( -not $identity )
+    {
+        return $false
+    }
+
+    if( $PassThru )
+    {
+        return $identity
+    }
+    return $true
+}
+
+
+
 function Test-CPermission
 {
     <#
@@ -5050,7 +5409,7 @@ function Test-CPermission
         return
     }
 
-    $account = Resolve-CIdentity -Name $Identity
+    $account = Resolve-CIdentity -Name $Identity -NoWarn
     if( -not $account)
     {
         return
