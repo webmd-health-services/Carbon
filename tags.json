@@ -280,10 +280,6 @@
         "Tags":  [ "PowerShell" ]
     },
     {
-        "Name":  "Get-CPrivilege",
-        "Tags":  [ "Privileges" ]
-    },
-    {
         "Name":  "Get-CProgramInstallInfo",
         "Tags":  [ "Computer", "Programs", "Installers", "MSI" ]
     },
@@ -338,10 +334,6 @@
     {
         "Name": "Grant-CHttpUrlPermission",
         "Tags": [ "Security", "HTTP", "WCF", "netsh", "ACL" ]
-    },
-    {
-        "Name":  "Grant-CPrivilege",
-        "Tags":  [ "Privileges", "Security" ]
     },
     {
         "Name":  "Grant-CServiceControlPermission",
@@ -544,10 +536,6 @@
         "Tags": [ "Security", "HTTP", "WCF", "netsh", "ACL" ]
     },
     {
-        "Name":  "Revoke-CPrivilege",
-        "Tags":  [ "Privileges", "Security" ]
-    },
-    {
         "Name":  "Revoke-CServicePermission",
         "Tags":  [ "Service", "Security", "ACL" ]
     },
@@ -702,10 +690,6 @@
     {
         "Name":  "Test-CPowerShellIs64Bit",
         "Tags":  [ "PowerShell" ]
-    },
-    {
-        "Name":  "Test-CPrivilege",
-        "Tags":  [ "Privileges", "Security" ]
     },
     {
         "Name":  "Test-CRegistryKeyValue",

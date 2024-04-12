@@ -287,7 +287,7 @@ function Install-CService
 
         if( $PSCmdlet.ShouldProcess( $identity.FullName, "grant the log on as a service right" ) )
         {
-            Grant-CPrivilege -Identity $identity.FullName -Privilege SeServiceLogonRight
+            Grant-CPrivilege -Identity $identity.FullName -Privilege SeServiceLogonRight -NoWarn
         }
     }
 

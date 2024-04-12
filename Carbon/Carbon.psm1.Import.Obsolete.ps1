@@ -4020,7 +4020,7 @@ function Install-CScheduledTask
         [void]$parameters.Add( $TaskCredential.UserName )
         [void]$parameters.Add( '/RP' )
         [void]$parameters.Add( $TaskCredential.GetNetworkCredential().Password )
-        Grant-CPrivilege -Identity $TaskCredential.UserName -Privilege 'SeBatchLogonRight'
+        Grant-CPrivilege -Identity $TaskCredential.UserName -Privilege 'SeBatchLogonRight' -NoWarn
     }
     elseif( $PSCmdlet.ParameterSetName -notlike 'Xml*' )
     {
@@ -6451,7 +6451,7 @@ function Revoke-CPrivilege
     }
 
     # Convert the privileges from the user into their canonical names.
-    $cPrivileges = Get-CPrivilege -Identity $account.FullName |
+    $cPrivileges = Get-CPrivilege -Identity $account.FullName -NoWarn |
                         Where-Object { $Privilege -contains $_ }
     if( -not $cPrivileges )
     {
@@ -7345,7 +7345,7 @@ function Test-CPrivilege
         Write-CRefactoredCommandWarning -CommandName $MyInvocation.MyCommand.Name -ModuleName 'Carbon.Security'
     }
 
-    $matchingPrivilege = Get-CPrivilege -Identity $Identity |
+    $matchingPrivilege = Get-CPrivilege -Identity $Identity -NoWarn |
                             Where-Object { $_ -eq $Privilege }
     return ($matchingPrivilege -ne $null)
 }

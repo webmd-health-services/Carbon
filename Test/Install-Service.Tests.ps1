@@ -43,13 +43,13 @@ BeforeAll {
 
     function Assert-HasPrivilegesOnServiceExecutable($Identity)
     {
-        $privilege = Get-CPrivilege -Identity $Identity
+        $privilege = Get-CPrivilege -Identity $Identity -NoWarn
         $privilege | Should -Not -BeNullOrEmpty
     }
 
     function Assert-HasPrivilegesRemovedOnServiceExecutable($Identity)
     {
-        $privilege = Get-CPrivilege -Identity $Identity
+        $privilege = Get-CPrivilege -Identity $Identity -NoWarn
         $privilege | Should -BeNullOrEmpty
     }
 
@@ -419,8 +419,8 @@ Describe 'Install-CService' {
     It 'should re-install the service with previously removed privileges' {
         Install-CService -Name $script:serviceName -Path $script:servicePath -Credential $script:serviceCredential @installServiceParams
         Assert-HasPrivilegesOnServiceExecutable $script:serviceAcct
-        $currentPrivileges = Get-CPrivilege -Identity $script:serviceAcct
-        Revoke-CPrivilege -Identity $script:serviceAcct -Privilege $currentPrivileges
+        $currentPrivileges = Get-CPrivilege -Identity $script:serviceAcct -NoWarn
+        Revoke-CPrivilege -Identity $script:serviceAcct -Privilege $currentPrivileges -NoWarn
         Assert-HasPrivilegesRemovedOnServiceExecutable $script:serviceAcct
         Install-CService -Name $script:serviceName -Path $script:servicePath -Credential $script:serviceCredential
         Assert-HasPrivilegesOnServiceExecutable $script:serviceAcct

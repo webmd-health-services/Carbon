@@ -1490,7 +1490,10 @@ if( $exportIisFunctions )
                 $appPool.ProcessModel.Password = $Credential.GetNetworkCredential().Password
 
                 # On Windows Server 2008 R2, custom app pool users need this privilege.
-                Grant-CPrivilege -Identity $Credential.UserName -Privilege SeBatchLogonRight -Verbose:$VerbosePreference
+                Grant-CPrivilege -Identity $Credential.UserName `
+                                 -Privilege SeBatchLogonRight `
+                                 -Verbose:$VerbosePreference `
+                                 -NoWarn
                 $updated = $true
             }
         }
