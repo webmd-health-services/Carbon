@@ -1460,6 +1460,64 @@ function Get-CPowershellPath
 }
 
 
+
+function Get-CPrivilege
+{
+    <#
+    .SYNOPSIS
+    Gets an identity's privileges.
+
+    .DESCRIPTION
+    These privileges are usually managed by Group Policy and control the system operations and types of logons a user/group can perform.
+
+    Note: if a computer is not on a domain, this function won't work.
+
+    .OUTPUTS
+    System.String
+
+    .LINK
+    Carbon_Privilege
+
+    .LINK
+    Grant-CPrivilege
+
+    .LINK
+    Revoke-Prvileges
+
+    .LINK
+    Test-CPrivilege
+
+    .EXAMPLE
+    Get-CPrivilege -Identity TheBeast
+
+    Gets `TheBeast`'s privileges as an array of strings.
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]
+        # The identity whose privileges to return.
+        $Identity,
+
+        [switch] $NoWarn
+    )
+
+    Set-StrictMode -Version 'Latest'
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
+    if (-not $NoWarn)
+    {
+        Write-CRefactoredCommandWarning -CommandName $MyInvocation.MyCommand.Name -ModuleName 'Carbon.Security'
+    }
+
+    [Carbon.Security.Privilege]::GetPrivileges( $Identity )
+}
+
+Set-Alias -Name 'Get-Privileges' -Value 'Get-CPrivilege'
+
+
+
+
 function Get-CProgramInstallInfo
 {
     <#
@@ -2903,6 +2961,147 @@ function Grant-CPermission
 }
 
 Set-Alias -Name 'Grant-Permissions' -Value 'Grant-CPermission'
+
+
+
+
+function Grant-CPrivilege
+{
+    <#
+    .SYNOPSIS
+    Grants an identity priveleges to perform system operations.
+
+    .DESCRIPTION
+    *Privilege names are **case-sensitive**.* Valid privileges are documented on Microsoft's website: [Privilege Constants](http://msdn.microsoft.com/en-us/library/windows/desktop/bb530716.aspx) and [Account Right Constants](http://msdn.microsoft.com/en-us/library/windows/desktop/bb545671.aspx). Here is the most current list, as of August 2014:
+
+     * SeAssignPrimaryTokenPrivilege
+     * SeAuditPrivilege
+     * SeBackupPrivilege
+     * SeBatchLogonRight
+     * SeChangeNotifyPrivilege
+     * SeCreateGlobalPrivilege
+     * SeCreatePagefilePrivilege
+     * SeCreatePermanentPrivilege
+     * SeCreateSymbolicLinkPrivilege
+     * SeCreateTokenPrivilege
+     * SeDebugPrivilege
+     * SeDenyBatchLogonRight
+     * SeDenyInteractiveLogonRight
+     * SeDenyNetworkLogonRight
+     * SeDenyRemoteInteractiveLogonRight
+     * SeDenyServiceLogonRight
+     * SeEnableDelegationPrivilege
+     * SeImpersonatePrivilege
+     * SeIncreaseBasePriorityPrivilege
+     * SeIncreaseQuotaPrivilege
+     * SeIncreaseWorkingSetPrivilege
+     * SeInteractiveLogonRight
+     * SeLoadDriverPrivilege
+     * SeLockMemoryPrivilege
+     * SeMachineAccountPrivilege
+     * SeManageVolumePrivilege
+     * SeNetworkLogonRight
+     * SeProfileSingleProcessPrivilege
+     * SeRelabelPrivilege
+     * SeRemoteInteractiveLogonRight
+     * SeRemoteShutdownPrivilege
+     * SeRestorePrivilege
+     * SeSecurityPrivilege
+     * SeServiceLogonRight
+     * SeShutdownPrivilege
+     * SeSyncAgentPrivilege
+     * SeSystemEnvironmentPrivilege
+     * SeSystemProfilePrivilege
+     * SeSystemtimePrivilege
+     * SeTakeOwnershipPrivilege
+     * SeTcbPrivilege
+     * SeTimeZonePrivilege
+     * SeTrustedCredManAccessPrivilege
+     * SeUndockPrivilege
+     * SeUnsolicitedInputPrivilege
+
+    .LINK
+    Get-CPrivilege
+
+    .LINK
+    Revoke-CPrivilege
+
+    .LINK
+    Test-CPrivilege
+
+    .LINK
+    http://msdn.microsoft.com/en-us/library/windows/desktop/bb530716.aspx
+
+    .LINK
+    http://msdn.microsoft.com/en-us/library/windows/desktop/bb545671.aspx
+
+    .EXAMPLE
+    Grant-CPrivilege -Identity Batcomputer -Privilege SeServiceLogonRight
+
+    Grants the Batcomputer account the ability to logon as a service. *Privilege names are **case-sensitive**.*
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]
+        # The identity to grant a privilege.
+        $Identity,
+
+        [Parameter(Mandatory=$true)]
+        [string[]]
+        # The privileges to grant. *Privilege names are **case-sensitive**.*
+        $Privilege,
+
+        [switch] $NoWarn
+    )
+
+    Set-StrictMode -Version 'Latest'
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
+    if( -not $NoWarn )
+    {
+        Write-CRefactoredCommandWarning -CommandName $MyInvocation.MyCommand.Name -ModuleName 'Carbon.Security'
+    }
+
+    $account = Resolve-CIdentity -Name $Identity -NoWarn
+    if( -not $account )
+    {
+        return
+    }
+
+    try
+    {
+        [Carbon.Security.Privilege]::GrantPrivileges( $account.FullName, $Privilege )
+    }
+    catch
+    {
+        $ex = $_.Exception
+        do
+        {
+            if( $ex -is [ComponentModel.Win32Exception] -and $ex.Message -eq 'No such privilege. Indicates a specified privilege does not exist.' )
+            {
+                $msg = 'Failed to grant {0} {1} privilege(s): {2}  *Privilege names are **case-sensitive**.*' -f `
+                        $account.FullName,($Privilege -join ','),$ex.Message
+                Write-Error -Message $msg
+                return
+            }
+            else
+            {
+                $ex = $ex.InnerException
+            }
+        }
+        while( $ex )
+
+        $ex = $_.Exception
+        Write-Error -Message ('Failed to grant {0} {1} privilege(s): {2}' -f $account.FullName,($Privilege -join ', '),$ex.Message)
+
+        while( $ex.InnerException )
+        {
+            $ex = $ex.InnerException
+            Write-Error -Exception $ex
+        }
+    }
+}
 
 
 
@@ -6144,6 +6343,140 @@ function Revoke-CPermission
 
 
 
+function Revoke-CPrivilege
+{
+    <#
+    .SYNOPSIS
+    Revokes an identity's privileges to perform system operations and certain types of logons.
+
+    .DESCRIPTION
+    Valid privileges are documented on Microsoft's website: [Privilege Constants](http://msdn.microsoft.com/en-us/library/windows/desktop/bb530716.aspx) and [Account Right Constants](http://msdn.microsoft.com/en-us/library/windows/desktop/bb545671.aspx). Known values as of August 2014 are:
+
+     * SeAssignPrimaryTokenPrivilege
+     * SeAuditPrivilege
+     * SeBackupPrivilege
+     * SeBatchLogonRight
+     * SeChangeNotifyPrivilege
+     * SeCreateGlobalPrivilege
+     * SeCreatePagefilePrivilege
+     * SeCreatePermanentPrivilege
+     * SeCreateSymbolicLinkPrivilege
+     * SeCreateTokenPrivilege
+     * SeDebugPrivilege
+     * SeDenyBatchLogonRight
+     * SeDenyInteractiveLogonRight
+     * SeDenyNetworkLogonRight
+     * SeDenyRemoteInteractiveLogonRight
+     * SeDenyServiceLogonRight
+     * SeEnableDelegationPrivilege
+     * SeImpersonatePrivilege
+     * SeIncreaseBasePriorityPrivilege
+     * SeIncreaseQuotaPrivilege
+     * SeIncreaseWorkingSetPrivilege
+     * SeInteractiveLogonRight
+     * SeLoadDriverPrivilege
+     * SeLockMemoryPrivilege
+     * SeMachineAccountPrivilege
+     * SeManageVolumePrivilege
+     * SeNetworkLogonRight
+     * SeProfileSingleProcessPrivilege
+     * SeRelabelPrivilege
+     * SeRemoteInteractiveLogonRight
+     * SeRemoteShutdownPrivilege
+     * SeRestorePrivilege
+     * SeSecurityPrivilege
+     * SeServiceLogonRight
+     * SeShutdownPrivilege
+     * SeSyncAgentPrivilege
+     * SeSystemEnvironmentPrivilege
+     * SeSystemProfilePrivilege
+     * SeSystemtimePrivilege
+     * SeTakeOwnershipPrivilege
+     * SeTcbPrivilege
+     * SeTimeZonePrivilege
+     * SeTrustedCredManAccessPrivilege
+     * SeUndockPrivilege
+     * SeUnsolicitedInputPrivilege
+
+    .LINK
+    Carbon_Privilege
+
+    .LINK
+    Get-CPrivilege
+
+    .LINK
+    Grant-CPrivilege
+
+    .LINK
+    Test-CPrivilege
+
+    .LINK
+    http://msdn.microsoft.com/en-us/library/windows/desktop/bb530716.aspx
+
+    .LINK
+    http://msdn.microsoft.com/en-us/library/windows/desktop/bb545671.aspx
+
+    .EXAMPLE
+    Revoke-CPrivilege -Identity Batcomputer -Privilege SeServiceLogonRight
+
+    Revokes the Batcomputer account's ability to logon as a service.  Don't restart that thing!
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]
+        # The identity to grant a privilege.
+        $Identity,
+
+        [Parameter(Mandatory=$true)]
+        [string[]]
+        # The privileges to revoke.
+        $Privilege,
+
+        [switch] $NoWarn
+    )
+
+    Set-StrictMode -Version 'Latest'
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
+    if( -not $NoWarn )
+    {
+        Write-CRefactoredCommandWarning -CommandName $MyInvocation.MyCommand.Name -ModuleName 'Carbon.Security'
+    }
+
+    $account = Resolve-CIdentity -Name $Identity -NoWarn
+    if( -not $account )
+    {
+        return
+    }
+
+    # Convert the privileges from the user into their canonical names.
+    $cPrivileges = Get-CPrivilege -Identity $account.FullName |
+                        Where-Object { $Privilege -contains $_ }
+    if( -not $cPrivileges )
+    {
+        return
+    }
+
+    try
+    {
+        [Carbon.Security.Privilege]::RevokePrivileges($account.FullName,$cPrivileges)
+    }
+    catch
+    {
+        Write-Error -Message ('Failed to revoke {0}''s {1} privilege(s).' -f $account.FullName,($cPrivileges -join ', '))
+
+        $ex = $_.Exception
+        while( $ex.InnerException )
+        {
+            $ex = $ex.InnerException
+            Write-Error -Exception $ex
+        }
+    }
+}
+
+
+
 function Set-CRegistryKeyValue
 {
     <#
@@ -6959,6 +7292,62 @@ function Test-CPowerShellIs64Bit
     }
 
     return ([Environment]::Is64BitProcess)
+}
+
+
+
+function Test-CPrivilege
+{
+    <#
+    .SYNOPSIS
+    Tests if an identity has a given privilege.
+
+    .DESCRIPTION
+    Returns `true` if an identity has a privilege.  `False` otherwise.
+
+    .LINK
+    Carbon_Privilege
+
+    .LINK
+    Get-CPrivilege
+
+    .LINK
+    Grant-CPrivilege
+
+    .LINK
+    Revoke-CPrivilege
+
+    .EXAMPLE
+    Test-CPrivilege -Identity Forrester -Privilege SeServiceLogonRight
+
+    Tests if `Forrester` has the `SeServiceLogonRight` privilege.
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]
+        # The identity whose privileges to check.
+        $Identity,
+
+        [Parameter(Mandatory=$true)]
+        [string]
+        # The privilege to check.
+        $Privilege,
+
+        [switch] $NoWarn
+    )
+
+    Set-StrictMode -Version 'Latest'
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
+    if( -not $NoWarn )
+    {
+        Write-CRefactoredCommandWarning -CommandName $MyInvocation.MyCommand.Name -ModuleName 'Carbon.Security'
+    }
+
+    $matchingPrivilege = Get-CPrivilege -Identity $Identity |
+                            Where-Object { $_ -eq $Privilege }
+    return ($matchingPrivilege -ne $null)
 }
 
 

@@ -30,6 +30,8 @@ to the new provider-specific functions above, you won't need to use these functi
 the Carbon.Accounts module.
 * `Get-CScheduledTask`, `Install-CScheduledTask`, `Test-CScheduledTask`, and `Uninstall-CScheduledTask` functions. They
 moved to new `Carbon.ScheduledTasks` module.
+* `Get-CPrivilege`, `Grant-CPrivilege`, `Revoke-CPrivilege`, and `Test-CPrivilege` functions. They moved to
+  the `Carbon.Security` module.
 
 
 ## 2.15.1
