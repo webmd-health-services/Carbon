@@ -292,10 +292,6 @@
         "Tags":  [ "Registry" ]
     },
     {
-        "Name":  "Get-CScheduledTask",
-        "Tags":  [ "Scheduled Tasks" ]
-    },
-    {
         "Name":  "Get-CServiceAcl",
         "Tags":  [ "Service" ]
     },
@@ -414,10 +410,6 @@
     {
         "Name":  "Install-CRegistryKey",
         "Tags":  [ "Registry" ]
-    },
-    {
-        "Name":  "Install-CScheduledTask",
-        "Tags":  [ "Scheduled Tasks" ]
     },
     {
         "Name":  "Install-CService",
@@ -720,10 +712,6 @@
         "Tags":  [ "Registry" ]
     },
     {
-        "Name":  "Test-CScheduledTask",
-        "Tags":  [ "Scheduled Tasks" ]
-    },
-    {
         "Name":  "Test-CService",
         "Tags":  [ "Service" ]
     },
@@ -786,10 +774,6 @@
     {
         "Name":  "Uninstall-CPerformanceCounterCategory",
         "Tags":  [ "Performance Counters" ]
-    },
-    {
-        "Name":  "Uninstall-CScheduledTask",
-        "Tags":  [ "Scheduled Tasks" ]
     },
     {
         "Name":  "Uninstall-CService",

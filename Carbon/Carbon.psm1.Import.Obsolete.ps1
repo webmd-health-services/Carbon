@@ -1941,7 +1941,7 @@ function Get-CScheduledTask
         return
     }
 
-    $comTasks = Get-CScheduledTask -AsComObject
+    $comTasks = Get-CScheduledTask -AsComObject -NoWarn
 
     for( $idx = 0; $idx -lt $output.Count; ++$idx )
     {
@@ -3999,11 +3999,11 @@ function Install-CScheduledTask
                                         -ModuleName 'Carbon.ScheduledTasks'
     }
 
-    if( (Test-CScheduledTask -Name $Name) )
+    if( (Test-CScheduledTask -Name $Name -NoWarn) )
     {
         if( $Force )
         {
-            Uninstall-CScheduledTask -Name $Name
+            Uninstall-CScheduledTask -Name $Name -NoWarn
         }
         else
         {
@@ -4281,7 +4281,7 @@ function Install-CScheduledTask
 
         if( -not $createFailed )
         {
-            Get-CScheduledTask -Name $Name
+            Get-CScheduledTask -Name $Name -NoWarn
         }
     }
     finally
@@ -7455,7 +7455,7 @@ function Test-CScheduledTask
 
     $Name = Join-Path -Path '\' -ChildPath $Name
 
-    $task = Get-CScheduledTask -Name $Name -AsComObject -ErrorAction Ignore
+    $task = Get-CScheduledTask -Name $Name -AsComObject -NoWarn -ErrorAction Ignore
     if( $task )
     {
         return $true
@@ -7894,7 +7894,7 @@ function Uninstall-CScheduledTask
     $tryNum = 0
     do
     {
-        if( -not (Test-CScheduledTask -Name $Name) )
+        if( -not (Test-CScheduledTask -Name $Name -NoWarn) )
         {
             Write-Verbose ('Scheduled task ''{0}'' not found.' -f $Name)
             return
