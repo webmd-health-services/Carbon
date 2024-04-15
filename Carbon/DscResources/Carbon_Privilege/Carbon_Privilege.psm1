@@ -21,12 +21,12 @@ function Get-TargetResource
         [string]
         # The identity of the principal whose privileges to get.
         $Identity,
-        
+
         [AllowEmptyCollection()]
         [string[]]
         # The user's expected/desired privileges.
         $Privilege = @(),
-        
+
         [ValidateSet('Present','Absent')]
         [string]
         # Should the user exist or not exist?
@@ -35,7 +35,7 @@ function Get-TargetResource
 
     Set-StrictMode -Version 'Latest'
 
-    [string[]]$currentPrivileges = Get-CPrivilege -Identity $Identity
+    [string[]]$currentPrivileges = Get-CPrivilege -Identity $Identity -NoWarn
     $Ensure = 'Present'
     if( -not $currentPrivileges )
     {
@@ -66,7 +66,7 @@ function Get-TargetResource
                     Ensure = $Ensure;
                 }
 
-    
+
     return $resource
 }
 
@@ -81,7 +81,7 @@ function Set-TargetResource
     The `Carbon_Privilege` resource manages privileges, i.e. the system operations and logons a user or group can perform.
 
     Privileges are granted by default. The user/group is granted only the privileges specified by the `Privilege` property. All other privileges are revoked.
-    
+
     To revoke *all* a user's privileges, set the `Ensure` property to `Absent`. To revoke specific privileges, grant the user just the desired privileges. All others are revoked.
 
     *Privilege names are **case-sensitive**.* Valid privileges are documented on Microsoft's website: [Privilege Constants](http://msdn.microsoft.com/en-us/library/windows/desktop/bb530716.aspx) and [Account Right Constants](http://msdn.microsoft.com/en-us/library/windows/desktop/bb545671.aspx). Here is the most current list, as of August 2014:
@@ -178,12 +178,12 @@ function Set-TargetResource
         [string]
         # The identity of the principal whose privileges to set.
         $Identity,
-        
+
         [AllowEmptyCollection()]
         [string[]]
         # The user's expected/desired privileges. *Privilege names are **case-sensitive**.* Ignored when `Ensure` is set to `Absent`.
         $Privilege = @(),
-        
+
         [ValidateSet('Present','Absent')]
         [string]
         # Should the user exist or not exist?
@@ -192,17 +192,17 @@ function Set-TargetResource
 
     Set-StrictMode -Version 'Latest'
 
-    $currentPrivileges = Get-CPrivilege -Identity $Identity
+    $currentPrivileges = Get-CPrivilege -Identity $Identity -NoWarn
     if( $currentPrivileges )
     {
         Write-Verbose ('Revoking ''{0}'' privileges: {1}' -f $Identity,($currentPrivileges -join ','))
-        Revoke-CPrivilege -Identity $Identity -Privilege $currentPrivileges
+        Revoke-CPrivilege -Identity $Identity -Privilege $currentPrivileges -NoWarn
     }
 
     if( $Ensure -eq 'Present' -and $Privilege )
     {
         Write-Verbose ('Granting ''{0}'' privileges: {1}' -f $Identity,($Privilege -join ','))
-        Grant-CPrivilege -Identity $Identity -Privilege $Privilege
+        Grant-CPrivilege -Identity $Identity -Privilege $Privilege -NoWarn
     }
 }
 
@@ -216,12 +216,12 @@ function Test-TargetResource
         [string]
         # The identity of the principal whose privileges to test.
         $Identity,
-        
+
         [AllowEmptyCollection()]
         [string[]]
         # The user's expected/desired privileges.
         $Privilege = @(),
-        
+
         [ValidateSet('Present','Absent')]
         [string]
         # Should the user exist or not exist?
@@ -241,7 +241,7 @@ function Test-TargetResource
             Write-Verbose ('Identity ''{0}'' has no privileges' -f $Identity)
             return $true
         }
-        
+
         Write-Verbose ('Identity ''{0}'' has privilege(s) {1}' -f $Identity,($resource.Privilege -join ','))
         return $false
     }

@@ -1460,6 +1460,64 @@ function Get-CPowershellPath
 }
 
 
+
+function Get-CPrivilege
+{
+    <#
+    .SYNOPSIS
+    Gets an identity's privileges.
+
+    .DESCRIPTION
+    These privileges are usually managed by Group Policy and control the system operations and types of logons a user/group can perform.
+
+    Note: if a computer is not on a domain, this function won't work.
+
+    .OUTPUTS
+    System.String
+
+    .LINK
+    Carbon_Privilege
+
+    .LINK
+    Grant-CPrivilege
+
+    .LINK
+    Revoke-Prvileges
+
+    .LINK
+    Test-CPrivilege
+
+    .EXAMPLE
+    Get-CPrivilege -Identity TheBeast
+
+    Gets `TheBeast`'s privileges as an array of strings.
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]
+        # The identity whose privileges to return.
+        $Identity,
+
+        [switch] $NoWarn
+    )
+
+    Set-StrictMode -Version 'Latest'
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
+    if (-not $NoWarn)
+    {
+        Write-CRefactoredCommandWarning -CommandName $MyInvocation.MyCommand.Name -ModuleName 'Carbon.Security'
+    }
+
+    [Carbon.Security.Privilege]::GetPrivileges( $Identity )
+}
+
+Set-Alias -Name 'Get-Privileges' -Value 'Get-CPrivilege'
+
+
+
+
 function Get-CProgramInstallInfo
 {
     <#
@@ -1603,6 +1661,630 @@ function Get-CRegistryKeyValue
     $value = $itemProperties.$Name
     Write-Debug -Message ('[{0}@{1}: {2} -is {3}' -f $Path,$Name,$value,$value.GetType())
     return $value
+}
+
+
+
+# Leave this here so when Get-CScheduledTask moves to a Carbon.ScheduledTask module, this goes with it.
+# COM object Schedule.Service
+Add-CTypeData -TypeName 'System.__ComObject#{9c86f320-dee3-4dd1-b972-a303f26b061e}' `
+              -MemberName 'Status' `
+              -MemberType ScriptProperty `
+              -Value {
+                    switch( $this.State )
+                    {
+                        1 { return "Disabled" }
+                        2 { return "Queued" }
+                        3 { return "Ready" }
+                        4 { return "Running" }
+                        default { return "Unknown" }
+                    }
+                }
+
+function Get-CScheduledTask
+{
+    <#
+    .SYNOPSIS
+    Gets the scheduled tasks for the current computer.
+
+    .DESCRIPTION
+    The `Get-CScheduledTask` function gets the scheduled tasks on the current computer. It returns `Carbon.TaskScheduler.TaskInfo` objects for each one.
+
+    With no parameters, `Get-CScheduledTask` returns all scheduled tasks. To get a specific scheduled task, use the `Name` parameter, which must be the full name of the task, i.e. path plus name. The name parameter accepts wildcards. If a scheduled task with the given name isn't found, an error is written.
+
+    By default, `Get-CScheduledTask` uses the `schtasks.exe` application to get scheduled task information. Beginning in Carbon 2.8.0, you can return `RegisteredTask` objects from the `Schedule.Service` COM API with the `AsComObject` switch. Using this switch is an order of magnitude faster. In the next major version of Carbon, this will become the default behavior.
+
+    Before Carbon 2.7.0, this function has the same name as the built-in `Get-ScheduledTask` function that comes on Windows 2012/8 and later. It returns objects with the same properties, but if you want to use the built-in function, use the `ScheduledTasks` qualifier, e.g. `ScheduledTasks\Get-ScheduledTask`.
+
+    .LINK
+    Test-CScheduledTask
+
+    .EXAMPLE
+    Get-CScheduledTask
+
+    Demonstrates how to get all scheduled tasks.
+
+    .EXAMPLE
+    Get-CScheduledTask -Name 'AutoUpdateMyApp'
+
+    Demonstrates how to get a specific task.
+
+    .EXAMPLE
+    Get-CScheduledTask -Name '*Microsoft*'
+
+    Demonstrates how to get all tasks that match a wildcard pattern.
+
+    .EXAMPLE
+    ScheduledTasks\Get-CScheduledTask
+
+    Demonstrates how to call the `Get-CScheduledTask` function in the `ScheduledTasks` module which ships on Windows 2012/8 and later.
+    #>
+    [CmdletBinding()]
+    [OutputType([Carbon.TaskScheduler.TaskInfo])]
+    param(
+        [Parameter()]
+        [Alias('TaskName')]
+        [string]
+        # The name of the scheduled task to return. Wildcards supported. This must be the *full task name*, i.e. the task's path/location and its name.
+        $Name,
+
+        [Switch]
+        # Return the scheduled task as a [RegisteredTask Windows COM object](https://docs.microsoft.com/en-us/windows/desktop/taskschd/registeredtask), using the `Schedule.Service` COM API. This is faster and more reliable. See [Task Scheduler Reference](https://docs.microsoft.com/en-us/windows/desktop/taskschd/task-scheduler-reference) for more information.
+        #
+        # This parameter was introduced in Carbon 2.8.0.
+        $AsComObject,
+
+        [switch] $NoWarn
+    )
+
+    Set-StrictMode -Version 'Latest'
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
+    if (-not $NoWarn)
+    {
+        Write-CRefactoredCommandWarning -CommandName $MyInvocation.MyCommand.Name `
+                                        -ModuleName 'Carbon.ScheduledTasks'
+    }
+
+    function ConvertFrom-DurationSpec
+    {
+        param(
+            $Duration
+        )
+
+        if( $Duration -match '^P((\d+)D)?T((\d+)H)?((\d+)M)?((\d+)S)?$' )
+        {
+            return New-Object 'TimeSpan' $Matches[2],$Matches[4],$Matches[6],$Matches[8]
+        }
+    }
+
+    function ConvertFrom-RepetitionElement
+    {
+        param(
+            [Xml.XmlElement]
+            $TriggerElement
+        )
+
+        Set-StrictMode -Version 'Latest'
+
+        [Carbon.TaskScheduler.ScheduleType]$scheduleType = [Carbon.TaskScheduler.ScheduleType]::Unknown
+        $interval = $null
+        $modifier = $null
+        $duration = $null
+        $stopAtEnd = $false
+        [TimeSpan]$delay = [TimeSpan]::Zero
+
+        if( $TriggerElement.GetElementsByTagName('Repetition').Count -gt 0 )
+        {
+            $repetition = $TriggerElement.Repetition
+
+            $interval = $repetition.Interval
+            if( $interval -match 'PT(\d+)(.*)$' )
+            {
+                $modifier = $Matches[1]
+                $unit = $Matches[2]
+
+                $hour = 0
+                $minute = 0
+                $second = 0
+                switch( $unit )
+                {
+                    'H' { $hour = $modifier }
+                    'M' { $minute = $modifier }
+                }
+
+                $scheduleTypes = @{
+                                        'H' = 'Hourly';
+                                        'M' = 'Minute';
+                                  }
+                if( $scheduleTypes.ContainsKey( $unit ) )
+                {
+                    $scheduleType = $scheduleTypes[$unit]
+                }
+                $timespan = New-Object 'TimeSpan' $hour,$minute,$second
+                switch( $scheduleType )
+                {
+                    'Hourly' { $modifier = $timespan.TotalHours }
+                    'Minute' { $modifier = $timespan.TotalMinutes }
+                }
+            }
+
+            if( $repetition | Get-Member -Name 'Duration' )
+            {
+                $duration = $repetition.Duration
+                $durationAsTimeSpan = ConvertFrom-DurationSpec -Duration $repetition.Duration
+                if( $durationAsTimeSpan -ne $null )
+                {
+                    $duration = $durationAsTimeSpan
+                }
+            }
+
+            if( $repetition | Get-Member -Name 'StopAtDurationEnd' )
+            {
+                $stopAtEnd = ($repetition.StopAtDurationEnd -eq 'true')
+            }
+        }
+
+        if( $TriggerElement | Get-Member -Name 'Delay' )
+        {
+            $delayAsTimeSpan = ConvertFrom-DurationSpec -Duration $TriggerElement.Delay
+            if( $delayAsTimeSpan -ne $null )
+            {
+                $delay = $delayAsTimeSpan
+            }
+        }
+
+        return $scheduleType,$modifier,$duration,$stopAtEnd,$delay
+    }
+
+    $optionalArgs = @()
+    $wildcardSearch = $false
+    if( $Name )
+    {
+        if( [Management.Automation.WildcardPattern]::ContainsWildcardCharacters($Name) )
+        {
+            $wildcardSearch = $true
+        }
+        else
+        {
+            $Name = Join-Path -Path '\' -ChildPath $Name
+            $optionalArgs = @( '/tn', $Name )
+        }
+    }
+
+    if( $AsComObject )
+    {
+        $taskScheduler = New-Object -ComObject 'Schedule.Service'
+        $taskScheduler.Connect()
+
+
+        function Get-Tasks
+        {
+            param(
+                $Folder
+            )
+
+            $getHiddenTasks = 1
+
+            $Folder.GetTasks($getHiddenTasks) | ForEach-Object { $_ }
+
+            foreach( $subFolder in $Folder.GetFolders($getHiddenTasks) )
+            {
+                Get-Tasks -Folder $subFolder
+            }
+        }
+
+        $tasks = Get-Tasks -Folder $taskScheduler.GetFolder("\") |
+                    Where-Object {
+                        if( -not $Name )
+                        {
+                            return $true
+                        }
+
+                        return $_.Path -like $Name
+                    }
+
+        if( -not $wildcardSearch -and -not $tasks )
+        {
+            Write-Error -Message ('Scheduled task "{0}" not found.' -f $Name) -ErrorAction $ErrorActionPreference
+            return
+        }
+
+        return $tasks
+    }
+
+    $originalErrPreference = $ErrorActionPreference
+    $originalEncoding = [Console]::OutputEncoding
+    # Some tasks from Intel have special characters in them.
+    $OutputEncoding = [Console]::OutputEncoding = [Text.Encoding]::GetEncoding(1252)
+    $ErrorActionPreference = 'Continue'
+    [object[]]$output = $null
+    $errFile = Join-Path -Path $env:TEMP -ChildPath ('Carbon+Get-CScheduledTask+{0}' -f [IO.Path]::GetRandomFileName())
+    try
+    {
+        $output = schtasks /query /v /fo csv $optionalArgs 2> $errFile |
+                    ConvertFrom-Csv |
+                    Where-Object { $_.HostName -ne 'HostName' }
+    }
+    finally
+    {
+        $ErrorActionPreference = $originalErrPreference
+        $OutputEncoding = [Console]::OutputEncoding = $originalEncoding
+    }
+
+    if( $LASTEXITCODE )
+    {
+        if( (Test-Path -Path $errFile -PathType Leaf) )
+        {
+            $error = (Get-Content -Path $errFile) -join ([Environment]::NewLine)
+            try
+            {
+                if( $error -match 'The\ system\ cannot\ find\ the\ (file|path)\ specified\.' )
+                {
+                    Write-Error ('Scheduled task ''{0}'' not found.' -f $Name) -ErrorAction $ErrorActionPreference
+                }
+                else
+                {
+                    Write-Error ($error) -ErrorAction $ErrorActionPreference
+                }
+            }
+            finally
+            {
+                Remove-Item -Path $errFile
+            }
+        }
+        return
+    }
+
+    if( -not $output )
+    {
+        return
+    }
+
+    $comTasks = Get-CScheduledTask -AsComObject -NoWarn
+
+    for( $idx = 0; $idx -lt $output.Count; ++$idx )
+    {
+        $csvTask = $output[$idx]
+
+        $comTask = $comTasks | Where-Object { $_.Path -eq $csvTask.TaskName }
+        if( $comTask )
+        {
+            $xmlDoc = [xml]$comTask.Xml
+        }
+        else
+        {
+            $xml = schtasks /query /tn $csvTask.TaskName /xml | Where-Object { $_ }
+            $xml = $xml -join ([Environment]::NewLine)
+            $xmlDoc = [xml]$xml
+        }
+
+        $taskPath = Split-Path -Parent -Path $csvTask.TaskName
+        # Get-CScheduledTask on Win2012/8 has a trailing slash so we include it here.
+        if( $taskPath -ne '\' )
+        {
+            $taskPath = '{0}\' -f $taskPath
+        }
+        $taskName = Split-Path -Leaf -Path $csvTask.TaskName
+
+        if( -not ($xmlDoc | Get-Member -Name 'Task') )
+        {
+            Write-Error -Message ('Unable to get information for scheduled task "{0}": XML task information is missing the "Task" element.' -f $csvTask.TaskName) -ErrorAction $ErrorActionPreference
+            continue
+        }
+
+        $xmlTask = $xmlDoc.Task
+        $principal = $xmlTask.Principals.Principal
+        $isInteractive = $false
+        $noPassword = $false
+        if( $principal | Get-Member 'LogonType' )
+        {
+            $isInteractive = $principal.LogonType -eq 'InteractiveTokenOrPassword'
+            $noPassword = $principal.LogonType -eq 'S4U'
+        }
+
+        $highestRunLevel = $false
+        if( $principal | Get-Member 'RunLevel' )
+        {
+            $highestRunLevel = ($principal.RunLevel -eq 'HighestAvailable')
+        }
+
+        $createDate = [DateTime]::MinValue
+        if( $xmlTask | Get-Member -Name 'RegistrationInfo' )
+        {
+            $regInfo = $xmlTask.RegistrationInfo
+            if( $regInfo | Get-Member -Name 'Date' )
+            {
+                $createDate = [datetime]$regInfo.Date
+            }
+        }
+
+        $taskToRun = $csvTask.'Task To Run'
+        if( ($xmlTask | Get-Member -Name 'Actions') -and $xmlTask.Actions.ChildNodes.Count -eq 1 )
+        {
+            $actions = $xmlTask.Actions
+            if( ($actions | Get-Member -Name 'Exec') -and ($actions.Exec | Measure-Object | Select-Object -ExpandProperty 'Count') -eq 1)
+            {
+                $exec = $actions.Exec
+
+                if( $exec | Get-Member -Name 'Command' )
+                {
+                    $taskToRun = $exec.Command
+                }
+
+                if( $exec | Get-Member -Name 'Arguments' )
+                {
+                    $taskToRun = '{0} {1}' -f $taskToRun,$exec.Arguments
+                }
+            }
+        }
+
+        $ctorArgs = @(
+                        $csvTask.HostName,
+                        $taskPath,
+                        $taskName,
+                        $csvTask.'Next Run Time',
+                        $csvTask.Status,
+                        $csvTask.'Logon Mode',
+                        $csvTask.'Last Run Time',
+                        $csvTask.Author,
+                        $createDate,
+                        $taskToRun,
+                        $csvTask.'Start In',
+                        $csvTask.Comment,
+                        $csvTask.'Scheduled Task State',
+                        $csvTask.'Idle Time',
+                        $csvTask.'Power Management',
+                        $csvTask.'Run As User',
+                        $isInteractive,
+                        $noPassword,
+                        $highestRunLevel,
+                        $csvTask.'Delete Task If Not Rescheduled'
+                    )
+
+        $task = New-Object -TypeName 'Carbon.TaskScheduler.TaskInfo' -ArgumentList $ctorArgs
+
+        $scheduleIdx = 0
+        while( $idx -lt $output.Count -and $output[$idx].TaskName -eq $csvTask.TaskName )
+        {
+            $csvTask = $output[$idx++]
+            [Carbon.TaskScheduler.ScheduleType]$scheduleType = [Carbon.TaskScheduler.ScheduleType]::Unknown
+
+            [int[]]$days = @()
+            [int]$csvDay = 0
+            if( [int]::TryParse($csvTask.Days, [ref]$csvDay) )
+            {
+                $days = @( $csvDay )
+            }
+
+            $duration = $csvTask.'Repeat: Until: Duration'
+            [Carbon.TaskScheduler.Month[]]$months = @()
+            $modifier = $null
+            $stopAtEnd = $false
+            [int]$interval = 0
+            [TimeSpan]$endTime = [TimeSpan]::Zero
+            [DayOfWeek[]]$daysOfWeek = @()
+            [TimeSpan]$delay = [TimeSpan]::Zero
+            [int]$idleTime = 0
+            $eventChannelName = $null
+
+            $triggers = $xmlTask.GetElementsByTagName('Triggers') | Select-Object -First 1
+            if( -not $triggers -or $triggers.ChildNodes.Count -eq 0 )
+            {
+                $scheduleType = [Carbon.TaskScheduler.ScheduleType]::OnDemand
+            }
+            elseif( $triggers.ChildNodes.Count -gt 0 )
+            {
+                [Xml.XmlElement]$trigger = $triggers.ChildNodes.Item($scheduleIdx++)
+                if( $trigger | Get-Member -Name 'EndBoundary' )
+                {
+                    $endDateTime = [datetime]$trigger.EndBoundary
+                    $endTime = New-TimeSpan -Hours $endDateTime.Hour -Minutes $endDateTime.Minute -Seconds $endDateTime.Second
+                }
+
+                $scheduleType,$modifier,$duration,$stopAtEnd,$delay = ConvertFrom-RepetitionElement $trigger
+                if( $trigger.Name -eq 'TimeTrigger' )
+                {
+                    $days = @( )
+                    if( $csvTask.'Schedule Type' -eq 'One Time Only' )
+                    {
+                        $scheduleType = 'Once'
+                        $interval = $modifier
+                        $modifier = $null
+                    }
+                }
+                elseif( $trigger.Name -eq 'LogonTrigger' )
+                {
+                    $scheduleType = 'OnLogon'
+                    $interval = 0
+                    $modifier = $null
+                }
+                elseif( $trigger.Name -eq 'BootTrigger' )
+                {
+                    $scheduleType = 'OnStart'
+                    $interval = 0
+                    $modifier = $null
+                }
+                elseif( $trigger.Name -eq 'IdleTrigger' )
+                {
+                    $scheduleType = 'OnIdle'
+                    $interval = 0
+                    $modifier = $null
+                    $settingsNode = $xmlTask.Settings
+                    if( $settingsNode | Get-Member 'IdleSettings' )
+                    {
+                        $idleSettingsNode = $settingsNode.IdleSettings
+                        if( $idleSettingsNode | Get-Member 'Duration' )
+                        {
+                            $idleTimeAsTimeSpan = ConvertFrom-DurationSpec -Duration $xmlTask.Settings.IdleSettings.Duration
+                            if( $idleTimeAsTimeSpan -ne $null )
+                            {
+                                $idleTime = $idleTimeAsTimeSpan.TotalMinutes
+                            }
+                        }
+                    }
+                }
+                elseif( $trigger.Name -eq 'EventTrigger' )
+                {
+                    $scheduleType = 'OnEvent'
+                    $subscription = [xml]$trigger.Subscription
+                    $selectNode = $subscription.QueryList.Query.Select
+                    $modifier = $selectNode.InnerText
+                    $eventChannelName = $selectNode.GetAttribute('Path')
+                }
+                elseif( $trigger.Name -eq 'SessionStateChangeTrigger' )
+                {
+                    $scheduleType = [Carbon.TaskScheduler.ScheduleType]::SessionStateChange
+                }
+                elseif( $trigger.Name -eq 'RegistrationTrigger' )
+                {
+                    $scheduleType = [Carbon.TaskScheduler.ScheduleType]::Registration
+                }
+                elseif( $trigger.Name -eq 'CalendarTrigger' )
+                {
+                    if( $trigger.GetElementsByTagName('ScheduleByDay').Count -eq 1 )
+                    {
+                        $scheduleType = 'Daily'
+                        $modifier = $trigger.ScheduleByDay.DaysInterval
+                        $null,$interval,$null,$null = ConvertFrom-RepetitionElement $trigger
+                    }
+                    elseif( $trigger.GetElementsByTagName('ScheduleByWeek').Count -eq 1 )
+                    {
+                        $scheduleType = 'Weekly'
+                        $interval = $modifier
+                        $modifier = $trigger.ScheduleByWeek.WeeksInterval
+                        $days = @( )
+                        $daysOfWeek = $trigger.ScheduleByWeek.DaysOfWeek.ChildNodes | ForEach-Object { [DayOfWeek]$_.Name }
+                    }
+                    elseif( $trigger.GetElementsByTagName('ScheduleByMonth').Count -eq 1 )
+                    {
+                        $scheduleType = 'Monthly'
+                        $monthsNode = $trigger.ScheduleByMonth.Months
+                        $daysOfMonth = $trigger.ScheduleByMonth.DaysOfMonth.ChildNodes | ForEach-Object { $_.InnerText }
+                        if( $daysOfMonth -eq 'Last' )
+                        {
+                            $interval = $modifier
+                            $modifier = 'LastDay'
+                            $days = @()
+                        }
+                        else
+                        {
+                            $days = $daysOfMonth | ForEach-Object { [int]$_ }
+                            $interval = $modifier
+                            # Monthly tasks.
+                            if( $monthsNode.ChildNodes.Count -eq 12 )
+                            {
+                                $modifier = 1
+                            }
+                            else
+                            {
+                                # Non-monthly tasks.
+                                $modifier = $null
+                            }
+                        }
+
+                        [Carbon.TaskScheduler.Month[]]$months = $monthsNode.ChildNodes | ForEach-Object { ([Carbon.TaskScheduler.Month]$_.Name) }
+                    }
+                    elseif( $triggers.GetElementsByTagName('ScheduleByMonthDayOfWeek').Count -eq 1 )
+                    {
+                        $scheduleType = 'Monthly'
+                        $interval = $modifier
+                        $scheduleNode = $trigger.ScheduleByMonthDayOfWeek
+                        $daysOfWeek = $scheduleNode.DaysOfWeek.ChildNodes | ForEach-Object { [DayOfWeek]$_.Name }
+                        $months = $scheduleNode.Months.ChildNodes | ForEach-Object { ([Carbon.TaskScheduler.Month]$_.Name) }
+                        switch( $scheduleNode.Weeks.Week )
+                        {
+                            1 { $modifier = 'First' }
+                            2 { $modifier = 'Second' }
+                            3 { $modifier = 'Third' }
+                            4 { $modifier = 'Fourth' }
+                            'Last' { $modifier = 'Last' }
+                        }
+                    }
+                }
+            }
+
+            function ConvertFrom-SchtasksDate
+            {
+                param(
+                    [Parameter(Mandatory=$true)]
+                    [string]
+                    $SchtasksDate,
+
+                    [Parameter(Mandatory=$true)]
+                    [DateTime]
+                    $DefaultValue
+                )
+
+                Set-StrictMode -Version 'Latest'
+
+                [DateTime]$dateTime = $DefaultValue
+                if( -not [DateTime]::TryParse( $SchtasksDate, [ref] $dateTime ) )
+                {
+                    return $DefaultValue
+                }
+                return New-Object 'DateTime' $dateTime.Year,$dateTime.Month,$dateTime.Day
+            }
+
+            function ConvertFrom-SchtasksTime
+            {
+                param(
+                    [Parameter(Mandatory=$true)]
+                    [string]
+                    $SchtasksTime
+                )
+
+                Set-StrictMode -Version 'Latest'
+
+                [TimeSpan]$timespan = [TimeSpan]::Zero
+                [DateTime]$dateTime = New-Object 'DateTime' 2015,11,6
+                $schtasksTime = '{0} {1}' -f (Get-Date).ToString('d'),$SchtasksTime
+                if( -not [DateTime]::TryParse( $SchtasksTime, [ref] $dateTime ) )
+                {
+                    return $timespan
+                }
+
+                return New-Object 'TimeSpan' $dateTime.Hour,$dateTime.Minute,$dateTime.Second
+            }
+
+            $startDate = ConvertFrom-SchtasksDate $csvTask.'Start Date' -DefaultValue ([DateTime]::MinValue)
+            $startTime = ConvertFrom-SchtasksTime $csvTask.'Start Time'
+            $endDate = ConvertFrom-SchtasksDate $csvTask.'End Date' -DefaultValue ([DateTime]::MaxValue)
+
+            $scheduleCtorArgs = @(
+                                    $csvTask.'Last Result',
+                                    $csvTask.'Stop Task If Runs X Hours And X Mins',
+                                    $scheduleType,
+                                    $modifier,
+                                    $interval,
+                                    $startTime,
+                                    $startDate,
+                                    $endTime,
+                                    $endDate,
+                                    $daysOfWeek,
+                                    $days,
+                                    $months,
+                                    $csvTask.'Repeat: Every',
+                                    $csvTask.'Repeat: Until: Time',
+                                    $duration,
+                                    $csvTask.'Repeat: Stop If Still Running',
+                                    $stopAtEnd,
+                                    $delay,
+                                    $idleTime,
+                                    $eventChannelName
+                                )
+
+            $schedule = New-Object -TypeName 'Carbon.TaskScheduler.ScheduleInfo' -ArgumentList $scheduleCtorArgs
+            $task.Schedules.Add( $schedule )
+        }
+        --$idx;
+
+        if( -not $wildcardSearch -or $task.FullName -like $Name )
+        {
+            $task
+        }
+    }
+
 }
 
 
@@ -2282,6 +2964,147 @@ Set-Alias -Name 'Grant-Permissions' -Value 'Grant-CPermission'
 
 
 
+
+function Grant-CPrivilege
+{
+    <#
+    .SYNOPSIS
+    Grants an identity priveleges to perform system operations.
+
+    .DESCRIPTION
+    *Privilege names are **case-sensitive**.* Valid privileges are documented on Microsoft's website: [Privilege Constants](http://msdn.microsoft.com/en-us/library/windows/desktop/bb530716.aspx) and [Account Right Constants](http://msdn.microsoft.com/en-us/library/windows/desktop/bb545671.aspx). Here is the most current list, as of August 2014:
+
+     * SeAssignPrimaryTokenPrivilege
+     * SeAuditPrivilege
+     * SeBackupPrivilege
+     * SeBatchLogonRight
+     * SeChangeNotifyPrivilege
+     * SeCreateGlobalPrivilege
+     * SeCreatePagefilePrivilege
+     * SeCreatePermanentPrivilege
+     * SeCreateSymbolicLinkPrivilege
+     * SeCreateTokenPrivilege
+     * SeDebugPrivilege
+     * SeDenyBatchLogonRight
+     * SeDenyInteractiveLogonRight
+     * SeDenyNetworkLogonRight
+     * SeDenyRemoteInteractiveLogonRight
+     * SeDenyServiceLogonRight
+     * SeEnableDelegationPrivilege
+     * SeImpersonatePrivilege
+     * SeIncreaseBasePriorityPrivilege
+     * SeIncreaseQuotaPrivilege
+     * SeIncreaseWorkingSetPrivilege
+     * SeInteractiveLogonRight
+     * SeLoadDriverPrivilege
+     * SeLockMemoryPrivilege
+     * SeMachineAccountPrivilege
+     * SeManageVolumePrivilege
+     * SeNetworkLogonRight
+     * SeProfileSingleProcessPrivilege
+     * SeRelabelPrivilege
+     * SeRemoteInteractiveLogonRight
+     * SeRemoteShutdownPrivilege
+     * SeRestorePrivilege
+     * SeSecurityPrivilege
+     * SeServiceLogonRight
+     * SeShutdownPrivilege
+     * SeSyncAgentPrivilege
+     * SeSystemEnvironmentPrivilege
+     * SeSystemProfilePrivilege
+     * SeSystemtimePrivilege
+     * SeTakeOwnershipPrivilege
+     * SeTcbPrivilege
+     * SeTimeZonePrivilege
+     * SeTrustedCredManAccessPrivilege
+     * SeUndockPrivilege
+     * SeUnsolicitedInputPrivilege
+
+    .LINK
+    Get-CPrivilege
+
+    .LINK
+    Revoke-CPrivilege
+
+    .LINK
+    Test-CPrivilege
+
+    .LINK
+    http://msdn.microsoft.com/en-us/library/windows/desktop/bb530716.aspx
+
+    .LINK
+    http://msdn.microsoft.com/en-us/library/windows/desktop/bb545671.aspx
+
+    .EXAMPLE
+    Grant-CPrivilege -Identity Batcomputer -Privilege SeServiceLogonRight
+
+    Grants the Batcomputer account the ability to logon as a service. *Privilege names are **case-sensitive**.*
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]
+        # The identity to grant a privilege.
+        $Identity,
+
+        [Parameter(Mandatory=$true)]
+        [string[]]
+        # The privileges to grant. *Privilege names are **case-sensitive**.*
+        $Privilege,
+
+        [switch] $NoWarn
+    )
+
+    Set-StrictMode -Version 'Latest'
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
+    if( -not $NoWarn )
+    {
+        Write-CRefactoredCommandWarning -CommandName $MyInvocation.MyCommand.Name -ModuleName 'Carbon.Security'
+    }
+
+    $account = Resolve-CIdentity -Name $Identity -NoWarn
+    if( -not $account )
+    {
+        return
+    }
+
+    try
+    {
+        [Carbon.Security.Privilege]::GrantPrivileges( $account.FullName, $Privilege )
+    }
+    catch
+    {
+        $ex = $_.Exception
+        do
+        {
+            if( $ex -is [ComponentModel.Win32Exception] -and $ex.Message -eq 'No such privilege. Indicates a specified privilege does not exist.' )
+            {
+                $msg = 'Failed to grant {0} {1} privilege(s): {2}  *Privilege names are **case-sensitive**.*' -f `
+                        $account.FullName,($Privilege -join ','),$ex.Message
+                Write-Error -Message $msg
+                return
+            }
+            else
+            {
+                $ex = $ex.InnerException
+            }
+        }
+        while( $ex )
+
+        $ex = $_.Exception
+        Write-Error -Message ('Failed to grant {0} {1} privilege(s): {2}' -f $account.FullName,($Privilege -join ', '),$ex.Message)
+
+        while( $ex.InnerException )
+        {
+            $ex = $ex.InnerException
+            Write-Error -Exception $ex
+        }
+    }
+}
+
+
+
 function Install-CCertificate
 {
     <#
@@ -2695,6 +3518,781 @@ function Install-CMsmq
         $svc.WaitForStatus( [ServiceProcess.ServiceControllerStatus]::Running )
     }
 }
+
+
+
+# Leave this here so that when we move this function to its own module, these go with it.
+Add-CTypeData -Type Carbon.TaskScheduler.TaskInfo -MemberType AliasProperty -MemberName 'State' -Value 'Status'
+Add-CTypeData -Type Carbon.TaskScheduler.TaskInfo `
+              -MemberType ScriptProperty `
+              -MemberName 'FullName' `
+              -Value { return Join-Path -Path $this.TaskPath -ChildPath $this.TaskName }
+
+function Install-CScheduledTask
+{
+    <#
+    .SYNOPSIS
+    Installs a scheduled task on the current computer.
+
+    .DESCRIPTION
+    The `Install-CScheduledTask` function uses `schtasks.exe` to install a scheduled task on the current computer. If a task with the same name already exists, the existing task is left in place. Use the `-Force` switch to force `Install-CScheduledTask` to delete any existing tasks before installation.
+
+    If a new task is created, a `Carbon.TaskScheduler.TaskInfo` object is returned.
+
+    The `schtasks.exe` command line application is pretty limited in the kind of tasks it will create. If you need a scheduled task created with options not supported by `Install-CScheduledTask`, you can create an XML file using the [Task Scheduler Schema](http://msdn.microsoft.com/en-us/library/windows/desktop/aa383609.aspx) or create a task with the Task Scheduler MMC then export that task as XML with the `schtasks.exe /query /xml /tn <TaskName>`. Pass the XML file (or the raw XML) with the `TaskXmlFilePath` or `TaskXml` parameters, respectively.
+
+    .LINK
+    Get-CScheduledTask
+
+    .LINK
+    Test-CScheduledTask
+
+    .LINK
+    Uninstall-CScheduledTask
+
+    .LINK
+    http://technet.microsoft.com/en-us/library/cc725744.aspx#BKMK_create
+
+    .LINK
+    http://msdn.microsoft.com/en-us/library/windows/desktop/aa383609.aspx
+
+    .EXAMPLE
+    Install-CScheduledTask -Name 'CarbonSample' -TaskToRun 'C:\Windows\system32\notepad.exe' -Minute 5
+
+    Creates a scheduled task "CarbonSample" to run notepad.exe every five minutes. No credential or principal is provided, so the task will run as `System`.
+
+    .EXAMPLE
+    Install-CScheduledTask -Name 'CarbonSample' -TaskToRun 'C:\Windows\system32\notepad.exe' -Minute 1 -TaskCredential (Get-Credential 'runasuser')
+
+    Demonstrates how to run a task every minute as a specific user with the `TaskCredential` parameter.
+
+    .EXAMPLE
+    Install-CScheduledTask -Name 'CarbonSample' -TaskToRun 'C:\Windows\system32\notepad.exe' -Minute 1 -Principal LocalService
+
+    Demonstrates how to run a task every minute as a built-in principal, in this case `Local Service`.
+
+    .EXAMPLE
+    Install-CScheduledTask -Name 'CarbonSample' -TaskToRun 'calc.exe' -Minute 5 -StartTime '12:00' -EndTime '14:00' -StartDate '6/6/2006' -EndDate '6/6/2006'
+
+    Demonstrates how to run a task every 5 minutes between the given start date/time and end date/time. In this case, the task will run between noon and 2 pm on `6/6/2006`.
+
+    .EXAMPLE
+    Install-CScheduledTask -Name 'CarbonSample' -TaskToRun 'notepad' -Hourly 1
+
+    Creates a scheduled task `CarbonSample` which runs `notepad.exe` every hour as the `LocalService` user.
+
+    .EXAMPLE
+    Install-CScheduledTask -Name 'CarbonSample' -TaskToRun 'notepad.exe' -Weekly 1
+
+    Demonstrates how to run a task ever *N* weeks, in this case every week.
+
+    .EXAMPLE
+    Install-CScheduledTask -Name 'CarbonSample' -TaskToRun 'notepad.exe' -Monthly
+
+    Demonstrates how to run a task the 1st of every month.
+
+    .EXAMPLE
+    Install-CScheduledTask -Name 'CarbonSample' -TaskToRun 'notepad.exe' -Monthly -DayOfMonth 15
+
+    Demonstrates how to run a monthly task on a specific day of the month.
+
+    .EXAMPLE
+    Install-CScheduledTask -Name 'CarbonSample' -TaskToRun 'notepad.exe' -Month 1,4,7,10 -DayOfMonth 5
+
+    Demonstrates how to run a task on specific months of the year on a specific day of the month.
+
+    .EXAMPLE
+    Install-CScheduledTask -Name 'CarbonSample' -TaskToRun 'notepad.exe' -WeekOfMonth First -DayOfWeek Sunday
+
+    Demonstrates how to run a task on a specific week of each month. In this case, the task will run the first Sunday of every month.
+
+    .EXAMPLE
+    Install-CScheduledTask -Name 'CarbonSample' -TaskToRun 'notepad.exe' -Month 1,5,9 -WeekOfMonth First -DayOfWeek Sunday
+
+    Demonstrates how to run a task on a specific week of specific months. In this case, the task will run the first Sunday of January, May, and September.
+
+    .EXAMPLE
+    Install-CScheduledTask -Name 'CarbonSample' -TaskToRun 'notepad.exe' -LastDayOfMonth
+
+    Demonstrates how to run a task the last day of every month.
+
+    .EXAMPLE
+    Install-CScheduledTask -Name 'CarbonSample' -TaskToRun 'notepad.exe' -LastDayOfMonth -Month 1,6
+
+    Demonstrates how to run a task the last day of specific months. In this case, the task will run the last day of January and June.
+
+    .EXAMPLE
+    Install-CScheduledTask -Name 'CarbonSample' -TaskToRun 'notepad.exe' -Once -StartTime '0:00'
+
+    Demonstrates how to run a task once. In this case, the task will run at midnight of today (which means it probably won't run since it is always past midnight).
+
+    .EXAMPLE
+    Install-CScheduledTask -Name 'CarbonSample' -TaskToRun 'notepad.exe' -OnStart
+
+    Demonstrates how to run a task when the computer starts up.
+
+    .EXAMPLE
+    Install-CScheduledTask -Name 'CarbonSample' -TaskToRun 'notepad.exe' -OnStart -Delay '0:30'
+
+    Demonstrates how to run a task when the computer starts up after a certain amount of time passes. In this case, the task will run 30 minutes after the computer starts.
+
+    .EXAMPLE
+    Install-CScheduledTask -Name 'CarbonSample' -TaskToRun 'notepad.exe' -OnLogon -TaskCredential (Get-Credential 'runasuser')
+
+    Demonstrates how to run a task when the user running the task logs on. Usually you want to pass a credential when setting up a logon task, since the built-in users never log in.
+
+    .EXAMPLE
+    Install-CScheduledTask -Name 'CarbonSample' -TaskToRun 'notepad.exe' -OnLogon -Delay '1:45' -TaskCredential (Get-Credential 'runasuser')
+
+    Demonstrates how to run a task after a certain amount of time passes after a user logs in. In this case, the task will run after 1 hour and 45 minutes after `runasuser` logs in.
+
+    .EXAMPLE
+    Install-CScheduledTask -Name 'CarbonSample' -TaskToRun 'notepad.exe' -OnIdle
+
+    Demonstrates how to run a task when the computer is idle.
+
+    .EXAMPLE
+    Install-CScheduledTask -Name 'CarbonSample' -TaskToRun 'notepad.exe' -OnIdle -Delay '0:05'
+
+    Demonstrates how to run a task when the computer has been idle for a desired amount of time. In this case, the task will run after the computer has been idle for 5 minutes.
+
+    .EXAMPLE
+    Install-CScheduledTask -Name 'CarbonSample' -TaskToRun 'wevtvwr.msc' -OnEvent -EventChannelName System -EventXPathQuery '*[Sytem/EventID=101]'
+
+    Demonstrates how to run an event when certain events are written to the event log. In this case, wevtvwr.msc will run whenever an event with ID `101` is published in the System event channel.
+
+    .EXAMPLE
+    Install-CScheduledTask -Name 'CarbonSample' -TaskToRun 'notepad.exe' -TaskXmlFilePath $taskXmlPath
+
+    Demonstrates how to create a task using the [Task Scheduler XML schema](http://msdn.microsoft.com/en-us/library/windows/desktop/aa383609.aspx) for a task that runs as a built-in principal. You can export task XML with the `schtasks /query /xml /tn <Name>` command.
+
+    .EXAMPLE
+    Install-CScheduledTask -Name 'CarbonSample' -TaskToRun 'notepad.exe' -TaskXmlFilePath $taskXmlPath -TaskCredential (Get-Credential 'runasuser')
+
+    Demonstrates how to create a task using the [Task Scheduler XML schema](http://msdn.microsoft.com/en-us/library/windows/desktop/aa383609.aspx) for a task that will run as a specific user. The username in the XML file should match the username in the credential.
+
+    .EXAMPLE
+    Install-CScheduledTask -Name 'CarbonSample' -TaskToRun 'notepad.exe' -TaskXml $taskXml
+
+    Demonstrates how to create a task using raw XML that conforms to the [Task Scheduler XML schema](http://msdn.microsoft.com/en-us/library/windows/desktop/aa383609.aspx) for a task that will run as a built-in principal. In this case, `$taskXml` should be an XML document.
+
+    .EXAMPLE
+    Install-CScheduledTask -Name 'CarbonSample' -TaskToRun 'notepad.exe' -TaskXml $taskXml -TaskCredential (Get-Credential 'runasuser')
+
+    Demonstrates how to create a task using raw XML that conforms to the [Task Scheduler XML schema](http://msdn.microsoft.com/en-us/library/windows/desktop/aa383609.aspx) for a task that will run as a specific user. In this case, `$taskXml` should be an XML document.  The username in the XML document should match the username in the credential.
+
+    .EXAMPLE
+    Install-CScheduledTask -Name 'CarbonTasks\CarbonSample' -TaskToRun 'notepad.exe' -Monthly
+
+    Demonstrates how to create tasks under a folder/directory: use a path for the `Name` parameter.
+    #>
+    [CmdletBinding()]
+    [OutputType([Carbon.TaskScheduler.TaskInfo])]
+    param(
+        [Parameter(Mandatory=$true)]
+        [ValidateLength(1,238)]
+        [Alias('TaskName')]
+        [string]
+        # The name of the scheduled task to create. Paths are allowed to create tasks under folders.
+        $Name,
+
+        [Parameter(Mandatory=$true,ParameterSetName='Minute')]
+        [Parameter(Mandatory=$true,ParameterSetName='Hourly')]
+        [Parameter(Mandatory=$true,ParameterSetName='Daily')]
+        [Parameter(Mandatory=$true,ParameterSetName='Weekly')]
+        [Parameter(Mandatory=$true,ParameterSetName='Monthly')]
+        [Parameter(Mandatory=$true,ParameterSetName='Month')]
+        [Parameter(Mandatory=$true,ParameterSetName='LastDayOfMonth')]
+        [Parameter(Mandatory=$true,ParameterSetName='WeekOfMonth')]
+        [Parameter(Mandatory=$true,ParameterSetName='Once')]
+        [Parameter(Mandatory=$true,ParameterSetName='OnStart')]
+        [Parameter(Mandatory=$true,ParameterSetName='OnLogon')]
+        [Parameter(Mandatory=$true,ParameterSetName='OnIdle')]
+        [Parameter(Mandatory=$true,ParameterSetName='OnEvent')]
+        [ValidateLength(1,262)]
+        [string]
+        # The task/program to execute, including arguments/parameters.
+        $TaskToRun,
+
+        [Parameter(ParameterSetName='Minute',Mandatory=$true)]
+        [ValidateRange(1,1439)]
+        [int]
+        # Create a scheduled task that runs every N minutes.
+        $Minute,
+
+        [Parameter(ParameterSetName='Hourly',Mandatory=$true)]
+        [ValidateRange(1,23)]
+        [int]
+        # Create a scheduled task that runs every N hours.
+        $Hourly,
+
+        [Parameter(ParameterSetName='Minute')]
+        [Parameter(ParameterSetName='Hourly')]
+        [Switch]
+        # Stops the task at the `EndTime` or `Duration` if it is still running.
+        $StopAtEnd,
+
+        [Parameter(ParameterSetName='Daily',Mandatory=$true)]
+        [ValidateRange(1,365)]
+        [int]
+        # Creates a scheduled task that runs every N days.
+        $Daily,
+
+        [Parameter(ParameterSetName='Weekly',Mandatory=$true)]
+        [ValidateRange(1,52)]
+        [int]
+        # Creates a scheduled task that runs every N weeks.
+        $Weekly,
+
+        [Parameter(ParameterSetName='Monthly',Mandatory=$true)]
+        [Switch]
+        # Create a scheduled task that runs every month.
+        $Monthly,
+
+        [Parameter(ParameterSetName='LastDayOfMonth',Mandatory=$true)]
+        [Switch]
+        # Create a scheduled task that runs on the last day of every month. To run on specific months, specify the `Month` parameter.
+        $LastDayOfMonth,
+
+        [Parameter(ParameterSetName='Month',Mandatory=$true)]
+        [Parameter(ParameterSetName='LastDayOfMonth')]
+        [Parameter(ParameterSetName='WeekOfMonth')]
+        [Carbon.TaskScheduler.Month[]]
+        # Create a scheduled task that runs on specific months. To create a monthly task, use the `Monthly` switch.
+        $Month,
+
+        [Parameter(ParameterSetName='Monthly')]
+        [Parameter(ParameterSetName='Month',Mandatory=$true)]
+        [ValidateRange(1,31)]
+        [int]
+        # The day of the month to run a monthly task.
+        $DayOfMonth,
+
+        [Parameter(ParameterSetName='WeekOfMonth',Mandatory=$true)]
+        [Carbon.TaskScheduler.WeekOfMonth]
+        # Create a scheduled task that runs a particular week of the month.
+        $WeekOfMonth,
+
+        [Parameter(ParameterSetName='WeekOfMonth',Mandatory=$true)]
+        [Parameter(ParameterSetName='Weekly')]
+        [DayOfWeek[]]
+        # The day of the week to run the task. Default is today.
+        $DayOfWeek,
+
+        [Parameter(ParameterSetName='Once',Mandatory=$true)]
+        [Switch]
+        # Create a scheduled task that runs once.
+        $Once,
+
+        [Parameter(ParameterSetName='OnStart',Mandatory=$true)]
+        [Switch]
+        # Create a scheduled task that runs at startup.
+        $OnStart,
+
+        [Parameter(ParameterSetName='OnLogon',Mandatory=$true)]
+        [Switch]
+        # Create a scheduled task that runs when the user running the task logs on.  Requires the `TaskCredential` parameter.
+        $OnLogon,
+
+        [Parameter(ParameterSetName='OnIdle',Mandatory=$true)]
+        [ValidateRange(1,999)]
+        [int]
+        # Create a scheduled task that runs when the computer is idle for N minutes.
+        $OnIdle,
+
+        [Parameter(ParameterSetName='OnEvent',Mandatory=$true)]
+        [Switch]
+        # Create a scheduled task that runs when events appear in the Windows event log.
+        $OnEvent,
+
+        [Parameter(ParameterSetName='OnEvent',Mandatory=$true)]
+        [string]
+        # The name of the event channel to look at.
+        $EventChannelName,
+
+        [Parameter(ParameterSetName='OnEvent',Mandatory=$true)]
+        [string]
+        # The XPath event query to use to determine when to fire `OnEvent` tasks.
+        $EventXPathQuery,
+
+        [Parameter(Mandatory=$true,ParameterSetName='XmlFile')]
+        [string]
+        # Install the task from this XML path.
+        $TaskXmlFilePath,
+
+        [Parameter(Mandatory=$true,ParameterSetName='Xml')]
+        [xml]
+        # Install the task from this XML.
+        $TaskXml,
+
+        [Parameter(ParameterSetName='Daily')]
+        [Parameter(ParameterSetName='Weekly')]
+        [Parameter(ParameterSetName='Monthly')]
+        [Parameter(ParameterSetName='Month')]
+        [Parameter(ParameterSetName='LastDayOfMonth')]
+        [Parameter(ParameterSetName='WeekOfMonth')]
+        [ValidateRange(1,599940)]
+        [int]
+        # Re-run the task every N minutes.
+        $Interval,
+
+        [Parameter(ParameterSetName='Minute')]
+        [Parameter(ParameterSetName='Hourly')]
+        [Parameter(ParameterSetName='Daily')]
+        [Parameter(ParameterSetName='Weekly')]
+        [Parameter(ParameterSetName='Monthly')]
+        [Parameter(ParameterSetName='Month')]
+        [Parameter(ParameterSetName='LastDayOfMonth')]
+        [Parameter(ParameterSetName='WeekOfMonth')]
+        [Parameter(ParameterSetName='Once')]
+        [DateTime]
+        # The date the task can start running.
+        $StartDate,
+
+        [Parameter(ParameterSetName='Minute')]
+        [Parameter(ParameterSetName='Hourly')]
+        [Parameter(ParameterSetName='Daily')]
+        [Parameter(ParameterSetName='Weekly')]
+        [Parameter(ParameterSetName='Monthly')]
+        [Parameter(ParameterSetName='Month')]
+        [Parameter(ParameterSetName='LastDayOfMonth')]
+        [Parameter(ParameterSetName='WeekOfMonth')]
+        [Parameter(ParameterSetName='Once',Mandatory=$true)]
+        [ValidateScript({ $_ -lt [timespan]'1' })]
+        [TimeSpan]
+        # The start time to run the task. Must be less than `24:00`.
+        $StartTime,
+
+        [Parameter(ParameterSetName='Minute')]
+        [Parameter(ParameterSetName='Hourly')]
+        [Parameter(ParameterSetName='Daily')]
+        [Parameter(ParameterSetName='Weekly')]
+        [Parameter(ParameterSetName='Monthly')]
+        [Parameter(ParameterSetName='Month')]
+        [Parameter(ParameterSetName='LastDayOfMonth')]
+        [Parameter(ParameterSetName='WeekOfMonth')]
+        [TimeSpan]
+        # The duration to run the task. Usually used with `Interval` to repeatedly run a task over a given time span. By default, re-runs for an hour. Can't be used with `EndTime`.
+        $Duration,
+
+        [Parameter(ParameterSetName='Minute')]
+        [Parameter(ParameterSetName='Hourly')]
+        [Parameter(ParameterSetName='Daily')]
+        [Parameter(ParameterSetName='Weekly')]
+        [Parameter(ParameterSetName='Monthly')]
+        [Parameter(ParameterSetName='Month')]
+        [Parameter(ParameterSetName='LastDayOfMonth')]
+        [Parameter(ParameterSetName='WeekOfMonth')]
+        [DateTime]
+        # The last date the task should run.
+        $EndDate,
+
+        [Parameter(ParameterSetName='Minute')]
+        [Parameter(ParameterSetName='Hourly')]
+        [Parameter(ParameterSetName='Daily')]
+        [Parameter(ParameterSetName='Weekly')]
+        [Parameter(ParameterSetName='Monthly')]
+        [Parameter(ParameterSetName='Month')]
+        [Parameter(ParameterSetName='LastDayOfMonth')]
+        [Parameter(ParameterSetName='WeekOfMonth')]
+        [ValidateScript({ $_ -lt [timespan]'1' })]
+        [TimeSpan]
+        # The end time to run the task. Must be less than `24:00`. Can't be used with `Duration`.
+        $EndTime,
+
+        [Parameter(ParameterSetName='Minute')]
+        [Parameter(ParameterSetName='Hourly')]
+        [Parameter(ParameterSetName='Daily')]
+        [Parameter(ParameterSetName='Weekly')]
+        [Parameter(ParameterSetName='Monthly')]
+        [Parameter(ParameterSetName='Month')]
+        [Parameter(ParameterSetName='LastDayOfMonth')]
+        [Parameter(ParameterSetName='WeekOfMonth')]
+        [Parameter(ParameterSetName='Once')]
+        [Parameter(ParameterSetName='OnStart')]
+        [Parameter(ParameterSetName='OnLogon')]
+        [Parameter(ParameterSetName='OnIdle')]
+        [Parameter(ParameterSetName='OnEvent')]
+        [Switch]
+        # Enables the task to run interactively only if the user is currently logged on at the time the job runs. The task will only run if the user is logged on. Must be used with `TaskCredential` parameter.
+        $Interactive,
+
+        [Parameter(ParameterSetName='Minute')]
+        [Parameter(ParameterSetName='Hourly')]
+        [Parameter(ParameterSetName='Daily')]
+        [Parameter(ParameterSetName='Weekly')]
+        [Parameter(ParameterSetName='Monthly')]
+        [Parameter(ParameterSetName='Month')]
+        [Parameter(ParameterSetName='LastDayOfMonth')]
+        [Parameter(ParameterSetName='WeekOfMonth')]
+        [Parameter(ParameterSetName='Once')]
+        [Parameter(ParameterSetName='OnStart')]
+        [Parameter(ParameterSetName='OnLogon')]
+        [Parameter(ParameterSetName='OnIdle')]
+        [Parameter(ParameterSetName='OnEvent')]
+        [Switch]
+        # No password is stored. The task runs non-interactively as the given user, who must be logged in. Only local resources are available. Must be used with `TaskCredential` parameter.
+        $NoPassword,
+
+        [Parameter(ParameterSetName='Minute')]
+        [Parameter(ParameterSetName='Hourly')]
+        [Parameter(ParameterSetName='Daily')]
+        [Parameter(ParameterSetName='Weekly')]
+        [Parameter(ParameterSetName='Monthly')]
+        [Parameter(ParameterSetName='Month')]
+        [Parameter(ParameterSetName='LastDayOfMonth')]
+        [Parameter(ParameterSetName='WeekOfMonth')]
+        [Parameter(ParameterSetName='Once')]
+        [Parameter(ParameterSetName='OnStart')]
+        [Parameter(ParameterSetName='OnLogon')]
+        [Parameter(ParameterSetName='OnIdle')]
+        [Parameter(ParameterSetName='OnEvent')]
+        [Switch]
+        # If the user is an administrator, runs the task with full administrator rights. The default is to run with limited administrative privileges.
+        #
+        # If UAC is enabled, an administrator has two security tokens: a filtered token that gets used by default and grants standard user rights and a full token that grants administrative rights that is only used when a program is "Run as administrator". Using this switch runs the scheduled task with the adminisrators full token. (Information taken from [How does "Run with the highest privileges" really work in Task Scheduler ?](https://social.technet.microsoft.com/Forums/windows/en-US/7167bb31-f375-4f77-b430-0339092e16b9/how-does-run-with-the-highest-privileges-really-work-in-task-scheduler-).)
+        $HighestAvailableRunLevel,
+
+        [Parameter(ParameterSetName='OnStart')]
+        [Parameter(ParameterSetName='OnLogon')]
+        [Parameter(ParameterSetName='OnEvent')]
+        [ValidateScript({ $_ -lt '6.22:40:00'})]
+        [timespan]
+        # The wait time to delay the running of the task after the trigger is fired.  Must be less than 10,000 minutes (6 days, 22 hours, and 40 minutes).
+        $Delay,
+
+        [Management.Automation.PSCredential]
+        # The principal the task should run as. Use `Principal` parameter to run as a built-in security principal. Required if `Interactive` or `NoPassword` switches are used.
+        $TaskCredential,
+
+        [Parameter(ParameterSetName='Minute')]
+        [Parameter(ParameterSetName='Hourly')]
+        [Parameter(ParameterSetName='Daily')]
+        [Parameter(ParameterSetName='Weekly')]
+        [Parameter(ParameterSetName='Monthly')]
+        [Parameter(ParameterSetName='Month')]
+        [Parameter(ParameterSetName='LastDayOfMonth')]
+        [Parameter(ParameterSetName='WeekOfMonth')]
+        [Parameter(ParameterSetName='Once')]
+        [Parameter(ParameterSetName='OnStart')]
+        [Parameter(ParameterSetName='OnLogon')]
+        [Parameter(ParameterSetName='OnIdle')]
+        [Parameter(ParameterSetName='OnEvent')]
+        [ValidateSet('System','LocalService','NetworkService')]
+        [string]
+        # The built-in identity to use. The default is `System`. Use the `TaskCredential` parameter to run as non-built-in security principal.
+        $Principal = 'System',
+
+        [Switch]
+        # Create the task even if a task with the same name already exists (i.e. delete any task with the same name before installation).
+        $Force,
+
+        [switch] $NoWarn
+    )
+
+    Set-StrictMode -Version 'Latest'
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
+    if (-not $NoWarn)
+    {
+        Write-CRefactoredCommandWarning -CommandName $MyInvocation.MyCommand.Name `
+                                        -ModuleName 'Carbon.ScheduledTasks'
+    }
+
+    if( (Test-CScheduledTask -Name $Name -NoWarn) )
+    {
+        if( $Force )
+        {
+            Uninstall-CScheduledTask -Name $Name -NoWarn
+        }
+        else
+        {
+            Write-Verbose ('Scheduled task ''{0}'' already exists. Use -Force switch to re-create it.' -f $Name)
+            return
+        }
+    }
+
+    $parameters = New-Object 'Collections.ArrayList'
+
+    if( $TaskCredential )
+    {
+        [void]$parameters.Add( '/RU' )
+        [void]$parameters.Add( $TaskCredential.UserName )
+        [void]$parameters.Add( '/RP' )
+        [void]$parameters.Add( $TaskCredential.GetNetworkCredential().Password )
+        Grant-CPrivilege -Identity $TaskCredential.UserName -Privilege 'SeBatchLogonRight' -NoWarn
+    }
+    elseif( $PSCmdlet.ParameterSetName -notlike 'Xml*' )
+    {
+        [void]$parameters.Add( '/RU' )
+        [void]$parameters.Add( (Resolve-CIdentityName -Name $Principal -NoWarn) )
+    }
+
+    function ConvertTo-SchtasksCalendarNameList
+    {
+        param(
+            [Parameter(Mandatory=$true)]
+            [object[]]
+            $InputObject
+        )
+
+        Set-StrictMode -Version 'Latest'
+
+        $list = $InputObject | ForEach-Object { $_.ToString().Substring(0,3).ToUpperInvariant() }
+        return $list -join ','
+    }
+
+    $scheduleType = $PSCmdlet.ParameterSetName.ToUpperInvariant()
+    $modifier = $null
+    switch -Wildcard ( $PSCmdlet.ParameterSetName )
+    {
+        'Minute'
+        {
+            $modifier = $Minute
+        }
+        'Hourly'
+        {
+            $modifier = $Hourly
+        }
+        'Daily'
+        {
+            $modifier = $Daily
+        }
+        'Weekly'
+        {
+            $modifier = $Weekly
+            if( $PSBoundParameters.ContainsKey('DayOfWeek') )
+            {
+                [void]$parameters.Add( '/D' )
+                [void]$parameters.Add( (ConvertTo-SchtasksCalendarNameList $DayOfWeek) )
+            }
+        }
+        'Monthly'
+        {
+            $modifier = 1
+            if( $DayOfMonth )
+            {
+                [void]$parameters.Add( '/D' )
+                [void]$parameters.Add( ($DayOfMonth -join ',') )
+            }
+        }
+        'Month'
+        {
+            $scheduleType = 'MONTHLY'
+            [void]$parameters.Add( '/M' )
+            [void]$parameters.Add( (ConvertTo-SchtasksCalendarNameList $Month) )
+            if( ($Month | Select-Object -Unique | Measure-Object).Count -eq 12 )
+            {
+                Write-Error ('It looks like you''re trying to schedule a monthly task, since you passed all 12 months as the `Month` parameter. Please use the `-Monthly` switch to schedule a monthly task.')
+                return
+            }
+
+            if( $DayOfMonth )
+            {
+                [void]$parameters.Add( '/D' )
+                [void]$parameters.Add( ($DayOfMonth -join ',') )
+            }
+        }
+        'LastDayOfMonth'
+        {
+            $modifier = 'LASTDAY'
+            $scheduleType = 'MONTHLY'
+            [void]$parameters.Add( '/M' )
+            if( $Month )
+            {
+                [void]$parameters.Add( (ConvertTo-SchtasksCalendarNameList $Month) )
+            }
+            else
+            {
+                [void]$parameters.Add( '*' )
+            }
+        }
+        'WeekOfMonth'
+        {
+            $scheduleType = 'MONTHLY'
+            $modifier = $WeekOfMonth
+            [void]$parameters.Add( '/D' )
+            if( $DayOfWeek.Count -eq 1 -and [Enum]::IsDefined([DayOfWeek],$DayOfWeek[0]) )
+            {
+                [void]$parameters.Add( (ConvertTo-SchtasksCalendarNameList $DayOfWeek[0]) )
+            }
+            else
+            {
+                Write-Error ('Tasks that run during a specific week of the month can only occur on a single weekday (received {0} days: {1}). Please pass one weekday with the `-DayOfWeek` parameter.' -f $DayOfWeek.Length,($DayOfWeek -join ','))
+                return
+            }
+        }
+        'OnIdle'
+        {
+            $scheduleType = 'ONIDLE'
+            [void]$parameters.Add( '/I' )
+            [void]$parameters.Add( $OnIdle )
+        }
+        'OnEvent'
+        {
+            $modifier = $EventXPathQuery
+        }
+        'Xml*'
+        {
+            if( $PSCmdlet.ParameterSetName -eq 'Xml' )
+            {
+                $TaskXmlFilePath = 'Carbon+Install-CScheduledTask+{0}.xml' -f [IO.Path]::GetRandomFileName()
+                $TaskXmlFilePath = Join-Path -Path $env:TEMP -ChildPath $TaskXmlFilePath
+                $TaskXml.Save($TaskXmlFilePath)
+            }
+
+            $scheduleType = $null
+            $TaskXmlFilePath = Resolve-Path -Path $TaskXmlFilePath
+            if( -not $TaskXmlFilePath )
+            {
+                return
+            }
+
+            [void]$parameters.Add( '/XML' )
+            [void]$parameters.Add( $TaskXmlFilePath )
+        }
+    }
+
+    try
+    {
+        if( $modifier )
+        {
+            [void]$parameters.Add( '/MO' )
+            [void]$parameters.Add( $modifier )
+        }
+
+        if( $PSBoundParameters.ContainsKey('TaskToRun') )
+        {
+            [void]$parameters.Add( '/TR' )
+            [void]$parameters.Add( $TaskToRun )
+        }
+
+        if( $scheduleType )
+        {
+            [void]$parameters.Add( '/SC' )
+            [void]$parameters.Add( $scheduleType )
+        }
+
+
+        $parameterNameToSchtasksMap = @{
+                                            'StartTime' = '/ST';
+                                            'Interval' = '/RI';
+                                            'EndTime' = '/ET';
+                                            'Duration' = '/DU';
+                                            'StopAtEnd' = '/K';
+                                            'StartDate' = '/SD';
+                                            'EndDate' = '/ED';
+                                            'EventChannelName' = '/EC';
+                                            'Interactive' = '/IT';
+                                            'NoPassword' = '/NP';
+                                            'Force' = '/F';
+                                            'Delay' = '/DELAY';
+                                      }
+
+        foreach( $parameterName in $parameterNameToSchtasksMap.Keys )
+        {
+            if( -not $PSBoundParameters.ContainsKey( $parameterName ) )
+            {
+                continue
+            }
+
+            $schtasksParamName = $parameterNameToSchtasksMap[$parameterName]
+            $value = $PSBoundParameters[$parameterName]
+            if( $value -is [timespan] )
+            {
+                if( $parameterName -eq 'Duration' )
+                {
+                    $totalHours = ($value.Days * 24) + $value.Hours
+                    $value = '{0:0000}:{1:00}' -f $totalHours,$value.Minutes
+                }
+                elseif( $parameterName -eq 'Delay' )
+                {
+                    $totalMinutes = ($value.Days * 24 * 60) + ($value.Hours * 60) + $value.Minutes
+                    $value = '{0:0000}:{1:00}' -f $totalMinutes,$value.Seconds
+                }
+                else
+                {
+                    $value = '{0:00}:{1:00}' -f $value.Hours,$value.Minutes
+                }
+            }
+            elseif( $value -is [datetime] )
+            {
+                $value = $value.ToString('MM/dd/yyyy')
+            }
+
+            [void]$parameters.Add( $schtasksParamName )
+
+            if( $value -isnot [switch] )
+            {
+                [void]$parameters.Add( $value )
+            }
+        }
+
+        if( $PSBoundParameters.ContainsKey('HighestAvailableRunLevel') -and $HighestAvailableRunLevel )
+        {
+            [void]$parameters.Add( '/RL' )
+            [void]$parameters.Add( 'HIGHEST' )
+        }
+
+        $originalEap = $ErrorActionPreference
+        $ErrorActionPreference = 'Continue'
+        $paramLogString = $parameters -join ' '
+        if( $TaskCredential )
+        {
+            $paramLogString = $paramLogString -replace ([Text.RegularExpressions.Regex]::Escape($TaskCredential.GetNetworkCredential().Password)),'********'
+        }
+        Write-Verbose ('/TN {0} {1}' -f $Name,$paramLogString)
+        # Warnings get written by schtasks to the error stream. Fortunately, errors and warnings
+        # are prefixed with ERRROR and WARNING, so we can combine output/error streams and parse
+        # it later. We just have to make sure we remove any errors added to the $Error variable.
+        $preErrorCount = $Global:Error.Count
+        $output = schtasks /create /TN $Name $parameters 2>&1
+        $postErrorCount = $Global:Error.Count
+        if( $postErrorCount -gt $preErrorCount )
+        {
+            $numToDelete = $postErrorCount - $preErrorCount
+            for( $idx = 0; $idx -lt $numToDelete; ++$idx )
+            {
+                $Global:Error.RemoveAt(0)
+            }
+        }
+        $ErrorActionPreference = $originalEap
+
+        $createFailed = $false
+        if( $LASTEXITCODE )
+        {
+            $createFailed = $true
+        }
+
+        $output | ForEach-Object {
+            if( $_ -match '\bERROR\b' )
+            {
+                Write-Error $_
+            }
+            elseif( $_ -match '\bWARNING\b' )
+            {
+                Write-Warning ($_ -replace '^WARNING: ','')
+            }
+            else
+            {
+                Write-Verbose $_
+            }
+        }
+
+        if( -not $createFailed )
+        {
+            Get-CScheduledTask -Name $Name -NoWarn
+        }
+    }
+    finally
+    {
+        if( $PSCmdlet.ParameterSetName -eq 'Xml' -and (Test-Path -Path $TaskXmlFilePath -PathType Leaf) )
+        {
+            Remove-Item -Path $TaskXmlFilePath -ErrorAction SilentlyContinue
+        }
+    }
+}
+
 
 
 # This function should only be available if the Windows PowerShell v3.0 Server Manager cmdlets aren't already installed.
@@ -4745,6 +6343,140 @@ function Revoke-CPermission
 
 
 
+function Revoke-CPrivilege
+{
+    <#
+    .SYNOPSIS
+    Revokes an identity's privileges to perform system operations and certain types of logons.
+
+    .DESCRIPTION
+    Valid privileges are documented on Microsoft's website: [Privilege Constants](http://msdn.microsoft.com/en-us/library/windows/desktop/bb530716.aspx) and [Account Right Constants](http://msdn.microsoft.com/en-us/library/windows/desktop/bb545671.aspx). Known values as of August 2014 are:
+
+     * SeAssignPrimaryTokenPrivilege
+     * SeAuditPrivilege
+     * SeBackupPrivilege
+     * SeBatchLogonRight
+     * SeChangeNotifyPrivilege
+     * SeCreateGlobalPrivilege
+     * SeCreatePagefilePrivilege
+     * SeCreatePermanentPrivilege
+     * SeCreateSymbolicLinkPrivilege
+     * SeCreateTokenPrivilege
+     * SeDebugPrivilege
+     * SeDenyBatchLogonRight
+     * SeDenyInteractiveLogonRight
+     * SeDenyNetworkLogonRight
+     * SeDenyRemoteInteractiveLogonRight
+     * SeDenyServiceLogonRight
+     * SeEnableDelegationPrivilege
+     * SeImpersonatePrivilege
+     * SeIncreaseBasePriorityPrivilege
+     * SeIncreaseQuotaPrivilege
+     * SeIncreaseWorkingSetPrivilege
+     * SeInteractiveLogonRight
+     * SeLoadDriverPrivilege
+     * SeLockMemoryPrivilege
+     * SeMachineAccountPrivilege
+     * SeManageVolumePrivilege
+     * SeNetworkLogonRight
+     * SeProfileSingleProcessPrivilege
+     * SeRelabelPrivilege
+     * SeRemoteInteractiveLogonRight
+     * SeRemoteShutdownPrivilege
+     * SeRestorePrivilege
+     * SeSecurityPrivilege
+     * SeServiceLogonRight
+     * SeShutdownPrivilege
+     * SeSyncAgentPrivilege
+     * SeSystemEnvironmentPrivilege
+     * SeSystemProfilePrivilege
+     * SeSystemtimePrivilege
+     * SeTakeOwnershipPrivilege
+     * SeTcbPrivilege
+     * SeTimeZonePrivilege
+     * SeTrustedCredManAccessPrivilege
+     * SeUndockPrivilege
+     * SeUnsolicitedInputPrivilege
+
+    .LINK
+    Carbon_Privilege
+
+    .LINK
+    Get-CPrivilege
+
+    .LINK
+    Grant-CPrivilege
+
+    .LINK
+    Test-CPrivilege
+
+    .LINK
+    http://msdn.microsoft.com/en-us/library/windows/desktop/bb530716.aspx
+
+    .LINK
+    http://msdn.microsoft.com/en-us/library/windows/desktop/bb545671.aspx
+
+    .EXAMPLE
+    Revoke-CPrivilege -Identity Batcomputer -Privilege SeServiceLogonRight
+
+    Revokes the Batcomputer account's ability to logon as a service.  Don't restart that thing!
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]
+        # The identity to grant a privilege.
+        $Identity,
+
+        [Parameter(Mandatory=$true)]
+        [string[]]
+        # The privileges to revoke.
+        $Privilege,
+
+        [switch] $NoWarn
+    )
+
+    Set-StrictMode -Version 'Latest'
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
+    if( -not $NoWarn )
+    {
+        Write-CRefactoredCommandWarning -CommandName $MyInvocation.MyCommand.Name -ModuleName 'Carbon.Security'
+    }
+
+    $account = Resolve-CIdentity -Name $Identity -NoWarn
+    if( -not $account )
+    {
+        return
+    }
+
+    # Convert the privileges from the user into their canonical names.
+    $cPrivileges = Get-CPrivilege -Identity $account.FullName -NoWarn |
+                        Where-Object { $Privilege -contains $_ }
+    if( -not $cPrivileges )
+    {
+        return
+    }
+
+    try
+    {
+        [Carbon.Security.Privilege]::RevokePrivileges($account.FullName,$cPrivileges)
+    }
+    catch
+    {
+        Write-Error -Message ('Failed to revoke {0}''s {1} privilege(s).' -f $account.FullName,($cPrivileges -join ', '))
+
+        $ex = $_.Exception
+        while( $ex.InnerException )
+        {
+            $ex = $ex.InnerException
+            Write-Error -Exception $ex
+        }
+    }
+}
+
+
+
 function Set-CRegistryKeyValue
 {
     <#
@@ -5564,6 +7296,62 @@ function Test-CPowerShellIs64Bit
 
 
 
+function Test-CPrivilege
+{
+    <#
+    .SYNOPSIS
+    Tests if an identity has a given privilege.
+
+    .DESCRIPTION
+    Returns `true` if an identity has a privilege.  `False` otherwise.
+
+    .LINK
+    Carbon_Privilege
+
+    .LINK
+    Get-CPrivilege
+
+    .LINK
+    Grant-CPrivilege
+
+    .LINK
+    Revoke-CPrivilege
+
+    .EXAMPLE
+    Test-CPrivilege -Identity Forrester -Privilege SeServiceLogonRight
+
+    Tests if `Forrester` has the `SeServiceLogonRight` privilege.
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]
+        # The identity whose privileges to check.
+        $Identity,
+
+        [Parameter(Mandatory=$true)]
+        [string]
+        # The privilege to check.
+        $Privilege,
+
+        [switch] $NoWarn
+    )
+
+    Set-StrictMode -Version 'Latest'
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
+    if( -not $NoWarn )
+    {
+        Write-CRefactoredCommandWarning -CommandName $MyInvocation.MyCommand.Name -ModuleName 'Carbon.Security'
+    }
+
+    $matchingPrivilege = Get-CPrivilege -Identity $Identity -NoWarn |
+                            Where-Object { $_ -eq $Privilege }
+    return ($matchingPrivilege -ne $null)
+}
+
+
+
 function Test-CRegistryKeyValue
 {
     <#
@@ -5616,6 +7404,59 @@ function Test-CRegistryKeyValue
 
     $member = Get-Member -InputObject $properties -Name $Name
     if( $member )
+    {
+        return $true
+    }
+    else
+    {
+        return $false
+    }
+}
+
+
+
+function Test-CScheduledTask
+{
+    <#
+    .SYNOPSIS
+    Tests if a scheduled task exists on the current computer.
+
+    .DESCRIPTION
+    The `Test-CScheduledTask` function uses `schtasks.exe` to tests if a task with a given name exists on the current computer. If it does, `$true` is returned. Otherwise, `$false` is returned. This name must be the *full task name*, i.e. the task's path/location and its name.
+
+    .LINK
+    Get-CScheduledTask
+
+    .EXAMPLE
+    Test-CScheduledTask -Name 'AutoUpdateMyApp'
+
+    Demonstrates how to test if a scheduled tasks exists.
+    #>
+    [CmdletBinding()]
+    [OutputType([bool])]
+    param(
+        [Parameter()]
+        [Alias('TaskName')]
+        [string]
+        # The name of the scheduled task to check. This must be the *full task name*, i.e. the task's path/location and its name.
+        $Name,
+
+        [switch] $NoWarn
+    )
+
+    Set-StrictMode -Version 'Latest'
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
+    if (-not $NoWarn)
+    {
+        Write-CRefactoredCommandWarning -CommandName $MyInvocation.MyCommand.Name `
+                                        -ModuleName 'Carbon.ScheduledTasks'
+    }
+
+    $Name = Join-Path -Path '\' -ChildPath $Name
+
+    $task = Get-CScheduledTask -Name $Name -AsComObject -NoWarn -ErrorAction Ignore
+    if( $task )
     {
         return $true
     }
@@ -5996,6 +7837,114 @@ function Uninstall-CCertificate
 }
 
 Set-Alias -Name 'Remove-Certificate' -Value 'Uninstall-CCertificate'
+
+
+
+function Uninstall-CScheduledTask
+{
+    <#
+    .SYNOPSIS
+    Uninstalls a scheduled task on the current computer.
+
+    .DESCRIPTION
+    The `Uninstall-CScheduledTask` function uses `schtasks.exe` to uninstall a scheduled task on the current computer. If the task doesn't exist, nothing happens.
+
+    .LINK
+    Get-CScheduledTask
+
+    .LINK
+    Test-CScheduledTask
+
+    .LINK
+    Install-CScheduledTask
+
+    .EXAMPLE
+    Uninstall-CScheduledTask -Name 'doc'
+
+    Demonstrates how to delete a scheduled task named `doc`.
+
+    .EXAMPLE
+    Uninstall-CScheduledTask -Name 'doc' -Force
+
+    Demonstrates how to delete a scheduled task that is currently running.
+    #>
+    [CmdletBinding(DefaultParameterSetName='AsBuiltinPrincipal')]
+    param(
+        [Parameter(Mandatory=$true)]
+        [Alias('TaskName')]
+        [string]
+        # The name of the scheduled task to uninstall.
+        $Name,
+
+        [switch] $NoWarn
+    )
+
+    Set-StrictMode -Version 'Latest'
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
+    if (-not $NoWarn)
+    {
+        Write-CRefactoredCommandWarning -CommandName $MyInvocation.MyCommand.Name `
+                                        -ModuleName 'Carbon.ScheduledTasks'
+    }
+
+    $Name = Join-Path -Path '\' -ChildPath $Name
+
+    $MAX_TRIES = 5
+    $tryNum = 0
+    do
+    {
+        if( -not (Test-CScheduledTask -Name $Name -NoWarn) )
+        {
+            Write-Verbose ('Scheduled task ''{0}'' not found.' -f $Name)
+            return
+        }
+
+        $lastTry = (++$tryNum -ge $MAX_TRIES)
+        Write-Verbose ('Deleting scheduled task ''{0}''.' -f $Name)
+        $errFile = Join-Path -Path $env:TEMP -ChildPath ('Carbon+Uninstall-CScheduledTask+{0}' -f ([IO.Path]::GetRandomFileName()))
+        schtasks.exe /delete /tn $Name '/F' 2> $errFile | ForEach-Object {
+            if( $_ -match '\bERROR\b' )
+            {
+                if( $lastTry -or $err -notmatch 'The function attempted to use a name that is reserved for use by another transaction' )
+                {
+                    Write-Error $_
+                }
+            }
+            elseif( $_ -match '\bWARNING\b' )
+            {
+                Write-Warning $_
+            }
+            else
+            {
+                Write-Verbose $_
+            }
+        }
+
+        if( $LASTEXITCODE )
+        {
+            $err = (Get-Content -Path $errFile) -join ([Environment]::NewLine)
+            if( -not $lastTry -and $err -match 'The function attempted to use a name that is reserved for use by another transaction' )
+            {
+                if( $Global:Error.Count -gt 0 )
+                {
+                    $Global:Error.RemoveAt(0)
+                }
+                if( $Global:Error.Count -gt 0 )
+                {
+                    $Global:Error.RemoveAt(0)
+                }
+                Write-Verbose ('Failed to delete scheduled task ''{0}'' (found ''The function attempted to use a name that is reserved for use by another transaction.'' error). Retrying (attempt #{1}).' -f $Name,$tryNum)
+                Start-Sleep -Milliseconds 100
+                continue
+            }
+
+            Write-Error $err
+            break
+        }
+    }
+    while( $true -and -not $lastTry)
+}
 
 
 

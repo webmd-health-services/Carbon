@@ -43,7 +43,7 @@ BeforeAll {
 
 AfterAll {
     Stop-CarbonDscTestFixture
-    Uninstall-CScheduledTask -Name $script:taskName
+    Uninstall-CScheduledTask -Name $script:taskName -NoWarn
     $env:PSModulePath = $script:psModulePath
 }
 
@@ -58,14 +58,14 @@ Describe 'Carbon_ScheduledTask' {
     }
 
     AfterEach {
-        Uninstall-CScheduledTask -Name $script:taskName
+        Uninstall-CScheduledTask -Name $script:taskName -NoWarn
     }
 
     It 'should get existing tasks' {
-        Get-CScheduledTask -AsComObject |
+        Get-CScheduledTask -AsComObject -NoWarn |
             Select-Object -First 5 |
             ForEach-Object {
-                $comTask = $expectedXml = Get-CScheduledTask -Name $_.Path -AsComObject
+                $comTask = $expectedXml = Get-CScheduledTask -Name $_.Path -AsComObject -NoWarn
                 $expectedXml = $comTask.Xml
 
                 [string]$expectedCredential =

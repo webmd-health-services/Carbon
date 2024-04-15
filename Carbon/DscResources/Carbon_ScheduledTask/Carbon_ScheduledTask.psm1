@@ -53,9 +53,9 @@ function Get-TargetResource
                     Ensure = 'Absent';
                 }
 
-    if( (Test-CScheduledTask -Name $canonicalName) )
+    if( (Test-CScheduledTask -Name $canonicalName -NoWarn) )
     {
-        $task = Get-CScheduledTask -Name $canonicalName -AsComObject
+        $task = Get-CScheduledTask -Name $canonicalName -AsComObject -NoWarn
         $principal = $task.Definition.Principal
         $principalName = $principal.UserId
         if( -not $principalName )
@@ -164,7 +164,7 @@ function Set-TargetResource
     if( $Ensure -eq 'Present' )
     {
         $installParams = @{ }
-        if( (Test-CScheduledTask -Name $Name ) )
+        if( (Test-CScheduledTask -Name $Name -NoWarn ) )
         {
             Write-Verbose ('[{0}] Re-installing' -f $Name)
             $installParams['Force'] = $true
@@ -173,12 +173,12 @@ function Set-TargetResource
         {
             Write-Verbose ('[{0}] Installing' -f $Name)
         }
-        Install-CScheduledTask @PSBoundParameters @installParams
+        Install-CScheduledTask @PSBoundParameters @installParams -NoWarn
     }
     else
     {
         Write-Verbose ('[{0}] Uninstalling' -f $Name)
-        Uninstall-CScheduledTask -Name $Name
+        Uninstall-CScheduledTask -Name $Name -NoWarn
     }
 
 }

@@ -280,20 +280,12 @@
         "Tags":  [ "PowerShell" ]
     },
     {
-        "Name":  "Get-CPrivilege",
-        "Tags":  [ "Privileges" ]
-    },
-    {
         "Name":  "Get-CProgramInstallInfo",
         "Tags":  [ "Computer", "Programs", "Installers", "MSI" ]
     },
     {
         "Name":  "Get-CRegistryKeyValue",
         "Tags":  [ "Registry" ]
-    },
-    {
-        "Name":  "Get-CScheduledTask",
-        "Tags":  [ "Scheduled Tasks" ]
     },
     {
         "Name":  "Get-CServiceAcl",
@@ -342,10 +334,6 @@
     {
         "Name": "Grant-CHttpUrlPermission",
         "Tags": [ "Security", "HTTP", "WCF", "netsh", "ACL" ]
-    },
-    {
-        "Name":  "Grant-CPrivilege",
-        "Tags":  [ "Privileges", "Security" ]
     },
     {
         "Name":  "Grant-CServiceControlPermission",
@@ -414,10 +402,6 @@
     {
         "Name":  "Install-CRegistryKey",
         "Tags":  [ "Registry" ]
-    },
-    {
-        "Name":  "Install-CScheduledTask",
-        "Tags":  [ "Scheduled Tasks" ]
     },
     {
         "Name":  "Install-CService",
@@ -550,10 +534,6 @@
     {
         "Name": "Revoke-CHttpUrlPermission",
         "Tags": [ "Security", "HTTP", "WCF", "netsh", "ACL" ]
-    },
-    {
-        "Name":  "Revoke-CPrivilege",
-        "Tags":  [ "Privileges", "Security" ]
     },
     {
         "Name":  "Revoke-CServicePermission",
@@ -712,16 +692,8 @@
         "Tags":  [ "PowerShell" ]
     },
     {
-        "Name":  "Test-CPrivilege",
-        "Tags":  [ "Privileges", "Security" ]
-    },
-    {
         "Name":  "Test-CRegistryKeyValue",
         "Tags":  [ "Registry" ]
-    },
-    {
-        "Name":  "Test-CScheduledTask",
-        "Tags":  [ "Scheduled Tasks" ]
     },
     {
         "Name":  "Test-CService",
@@ -786,10 +758,6 @@
     {
         "Name":  "Uninstall-CPerformanceCounterCategory",
         "Tags":  [ "Performance Counters" ]
-    },
-    {
-        "Name":  "Uninstall-CScheduledTask",
-        "Tags":  [ "Scheduled Tasks" ]
     },
     {
         "Name":  "Uninstall-CService",

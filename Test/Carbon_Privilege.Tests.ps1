@@ -15,9 +15,9 @@ BeforeAll {
 
     function Revoke-TestUserPrivilege
     {
-        if( (Get-CPrivilege -Identity $UserName) )
+        if( (Get-CPrivilege -Identity $UserName -NoWarn) )
         {
-            Revoke-CPrivilege -Identity $UserName -Privilege (Get-CPrivilege -Identity $UserName)
+            Revoke-CPrivilege -Identity $UserName -Privilege (Get-CPrivilege -Identity $UserName -NoWarn) -NoWarn
         }
     }
 }
@@ -38,46 +38,46 @@ Describe 'Carbon_Privilege' {
 
     It 'should grant privilege' {
         Set-TargetResource -Identity $UserName -Privilege 'SeDenyBatchLogonRight','SeDenyNetworkLogonRight' -Ensure 'Present'
-        (Test-CPrivilege -Identity $UserName -Privilege 'SeDenyBatchLogonRight') | Should -BeTrue
-        (Test-CPrivilege -Identity $UserName -Privilege 'SeDenyNetworkLogonRight') | Should -BeTrue
+        (Test-CPrivilege -Identity $UserName -Privilege 'SeDenyBatchLogonRight' -NoWarn) | Should -BeTrue
+        (Test-CPrivilege -Identity $UserName -Privilege 'SeDenyNetworkLogonRight' -NoWarn) | Should -BeTrue
     }
 
     It 'should revoke privilege' {
         Set-TargetResource -Identity $UserName -Privilege 'SeDenyBatchLogonRight','SeDenyNetworkLogonRight' -Ensure 'Present'
-        (Test-CPrivilege -Identity $UserName -Privilege 'SeDenyBatchLogonRight') | Should -BeTrue
-        (Test-CPrivilege -Identity $UserName -Privilege 'SeDenyNetworkLogonRight') | Should -BeTrue
+        (Test-CPrivilege -Identity $UserName -Privilege 'SeDenyBatchLogonRight' -NoWarn) | Should -BeTrue
+        (Test-CPrivilege -Identity $UserName -Privilege 'SeDenyNetworkLogonRight' -NoWarn) | Should -BeTrue
         Set-TargetResource -Identity $UserName -Privilege 'SeDenyBatchLogonRight','SeDenyNetworkLogonRight' -Ensure 'Absent'
-        (Test-CPrivilege -Identity $UserName -Privilege 'SeDenyBatchLogonRight') | Should -BeFalse
-        (Test-CPrivilege -Identity $UserName -Privilege 'SeDenyNetworkLogonRight') | Should -BeFalse
+        (Test-CPrivilege -Identity $UserName -Privilege 'SeDenyBatchLogonRight' -NoWarn) | Should -BeFalse
+        (Test-CPrivilege -Identity $UserName -Privilege 'SeDenyNetworkLogonRight' -NoWarn) | Should -BeFalse
     }
 
     It 'should revoke all other privileges' {
         Set-TargetResource -Identity $UserName -Privilege 'SeDenyBatchLogonRight','SeDenyNetworkLogonRight' -Ensure 'Present'
         Set-TargetResource -Identity $UserName -Privilege 'SeDenyInteractiveLogonRight' -Ensure 'Present'
-        (Test-CPrivilege -Identity $UserName -Privilege 'SeDenyBatchLogonRight') | Should -BeFalse
-        (Test-CPrivilege -Identity $UserName -Privilege 'SeDenyNetworkLogonRight') | Should -BeFalse
-        (Test-CPrivilege -Identity $UserName -Privilege 'SeDenyInteractiveLogonRight') | Should -BeTrue
+        (Test-CPrivilege -Identity $UserName -Privilege 'SeDenyBatchLogonRight' -NoWarn) | Should -BeFalse
+        (Test-CPrivilege -Identity $UserName -Privilege 'SeDenyNetworkLogonRight' -NoWarn) | Should -BeFalse
+        (Test-CPrivilege -Identity $UserName -Privilege 'SeDenyInteractiveLogonRight' -NoWarn) | Should -BeTrue
     }
 
     It 'should revoke all privileges if ensure absent' {
         Set-TargetResource -Identity $UserName -Privilege 'SeDenyBatchLogonRight','SeDenyNetworkLogonRight' -Ensure 'Present'
         Set-TargetResource -Identity $UserName -Ensure 'Absent'
-        (Test-CPrivilege -Identity $UserName -Privilege 'SeDenyBatchLogonRight') | Should -BeFalse
-        (Test-CPrivilege -Identity $UserName -Privilege 'SeDenyNetworkLogonRight') | Should -BeFalse
+        (Test-CPrivilege -Identity $UserName -Privilege 'SeDenyBatchLogonRight' -NoWarn) | Should -BeFalse
+        (Test-CPrivilege -Identity $UserName -Privilege 'SeDenyNetworkLogonRight' -NoWarn) | Should -BeFalse
     }
 
     It 'should revoke all privileges if privilege null' {
         Set-TargetResource -Identity $UserName -Privilege 'SeDenyBatchLogonRight','SeDenyNetworkLogonRight' -Ensure 'Present'
         Set-TargetResource -Identity $UserName -Privilege $null -Ensure 'Present'
-        (Test-CPrivilege -Identity $UserName -Privilege 'SeDenyBatchLogonRight') | Should -BeFalse
-        (Test-CPrivilege -Identity $UserName -Privilege 'SeDenyNetworkLogonRight') | Should -BeFalse
+        (Test-CPrivilege -Identity $UserName -Privilege 'SeDenyBatchLogonRight' -NoWarn) | Should -BeFalse
+        (Test-CPrivilege -Identity $UserName -Privilege 'SeDenyNetworkLogonRight' -NoWarn) | Should -BeFalse
     }
 
     It 'should revoke all privileges if privilege empty' {
         Set-TargetResource -Identity $UserName -Privilege 'SeDenyBatchLogonRight','SeDenyNetworkLogonRight' -Ensure 'Present'
         Set-TargetResource -Identity $UserName -Privilege @() -Ensure 'Present'
-        (Test-CPrivilege -Identity $UserName -Privilege 'SeDenyBatchLogonRight') | Should -BeFalse
-        (Test-CPrivilege -Identity $UserName -Privilege 'SeDenyNetworkLogonRight') | Should -BeFalse
+        (Test-CPrivilege -Identity $UserName -Privilege 'SeDenyBatchLogonRight' -NoWarn) | Should -BeFalse
+        (Test-CPrivilege -Identity $UserName -Privilege 'SeDenyNetworkLogonRight' -NoWarn) | Should -BeFalse
     }
 
     It 'gets no privileges' {
