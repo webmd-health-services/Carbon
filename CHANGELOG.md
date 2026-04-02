@@ -34,6 +34,11 @@
 * `Get-CPrivilege`, `Grant-CPrivilege`, `Revoke-CPrivilege`, and `Test-CPrivilege` functions. They moved to the
   `Carbon.Security` module.
 * Function `Get-CPathProvider`. Migrated to `Carbon.Core` module.
+* `Get-CFileShare`, `Get-CFileSharePermission`, `Install-CFileShare` (and its `Install-SmbShare` alias),
+  `Test-CFileShare`, and `Uninstall-CFileShare`. The `Install-CFileShare`, `Test-CFileShare`, and `Uninstall-CFileShare`
+  functions moved to new `Carbon.SmbShare` module as `Install-CSmbShare`, `Test-CSmbShare`, and `Uninstall-CSmbShare`,
+  respectively, where they were also updated to support PowerShell 7. Replace usages of `Get-CFileShare` with
+  `Get-SmbShare`, `Get-CFileSharePermission` with `Get-SmbShareAccess` from PowerShell's built-in SmbShare module.
 
 
 ## 2.15.1

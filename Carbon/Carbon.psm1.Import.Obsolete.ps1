@@ -1076,6 +1076,277 @@ function Get-CCertificate
 }
 
 
+function Get-CFileShare
+{
+    <#
+    .SYNOPSIS
+    Gets the file/SMB shares on the local computer.
+
+    .DESCRIPTION
+    The `Get-CFileShare` function uses WMI to get the file/SMB shares on the current/local computer. The returned objects are `Win32_Share` WMI objects.
+
+    Use the `Name` paramter to get a specific file share by its name. If a share with the given name doesn't exist, an error is written and nothing is returned.
+
+    The `Name` parameter supports wildcards. If you're using wildcards to find a share, and no shares are found, no error is written and nothing is returned.
+
+    `Get-CFileShare` was added in Carbon 2.0.
+
+    .LINK
+    https://msdn.microsoft.com/en-us/library/aa394435.aspx
+
+    .LINK
+    Get-CFileSharePermission
+
+    .LINK
+    Install-CFileShare
+
+    .LINK
+    Test-CFileShare
+
+    .LINK
+    Uninstall-CFileShare
+
+    .EXAMPLE
+    Get-CFileShare
+
+    Demonstrates how to get all the file shares on the local computer.
+
+    .EXAMPLE
+    Get-CFileShare -Name 'Build'
+
+    Demonstrates how to get a specific file share.
+
+    .EXAMPLE
+    Get-CFileShare -Name 'Carbon*'
+
+    Demonstrates that you can use wildcards to find all shares that match a wildcard pattern.
+    #>
+    [CmdletBinding()]
+    param(
+        # The name of a specific share to retrieve. Wildcards accepted. If the string contains WMI sensitive characters,
+        # you'll need to escape them.
+        [String] $Name,
+
+        # Force the returned object to be a WMI object, not a CIM object.
+        [switch] $AsWmiObject,
+
+        # Hide the warning that this command is obsolete.
+        [switch] $NoWarn
+    )
+
+    Set-StrictMode -Version 'Latest'
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
+    Write-CObsoleteCommandWarning -CommandName $MyInvocation.MyCommand.Name `
+                                  -NewCommandName 'Get-SmbShare' `
+                                  -NewModuleName 'SmbShare' `
+                                  -NewCommandBuiltin `
+                                  -NoWarn:$NoWarn
+
+    $filter = '(Type = 0 or Type = 2147483648)'
+    $wildcardSearch = [Management.Automation.WildcardPattern]::ContainsWildcardCharacters($Name)
+    if( $Name -and -not $wildcardSearch)
+    {
+        $filter = '{0} and Name = ''{1}''' -f $filter,$Name
+    }
+
+    $shares = Get-CCimInstance -Class 'Win32_Share' -Filter $filter -AsWmiObject:$AsWmiObject |
+                    Where-Object {
+                        if( -not $wildcardSearch )
+                        {
+                            return $true
+                        }
+
+                        return $_.Name -like $Name
+                    }
+
+    if( $Name -and -not $shares -and -not $wildcardSearch )
+    {
+        Write-Error ('Share ''{0}'' not found.' -f $Name) -ErrorAction $ErrorActionPreference
+    }
+
+    $shares
+}
+
+
+function Get-CFileSharePermission
+{
+    <#
+    .SYNOPSIS
+    Gets the sharing permissions on a file/SMB share.
+
+    .DESCRIPTION
+    The `Get-CFileSharePermission` function uses WMI to get the sharing permission on a file/SMB share. It returns the permissions as a `Carbon.Security.ShareAccessRule` object, which has the following properties:
+
+     * ShareRights: the rights the user/group has on the share.
+     * IdentityReference: an `Security.Principal.NTAccount` for the user/group who has permission.
+     * AccessControlType: the type of access control being granted: Allow or Deny.
+
+    The `ShareRights` are values from the `Carbon.Security.ShareRights` enumeration. There are four values:
+
+     * Read
+     * Change
+     * FullControl
+     * Synchronize
+
+    If the share doesn't exist, nothing is returned and an error is written.
+
+    Use the `Identity` parameter to get a specific user/group's permissions. Wildcards are supported.
+
+    `Get-CFileSharePermission` was added in Carbon 2.0.
+
+    .LINK
+    Get-CFileShare
+
+    .LINK
+    Install-CFileShare
+
+    .LINK
+    Test-CFileShare
+
+    .LINK
+    Uninstall-CFileShare
+
+    .EXAMPLE
+    Get-CFileSharePermission -Name 'Build'
+
+    Demonstrates how to get all the permissions on the `Build` share.
+    #>
+    [CmdletBinding()]
+    [OutputType([Carbon.Security.ShareAccessRule])]
+    param(
+        # The share's name.
+        [Parameter(Mandatory)]
+        [String] $Name,
+
+        # Get permissions for a specific identity. Wildcards supported.
+        [String] $Identity,
+
+        # Hide the warning that this command is obsolete.
+        [switch] $NoWarn
+    )
+
+    Set-StrictMode -Version 'Latest'
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
+    Write-CObsoleteCommandWarning -CommandName $MyInvocation.MyCommand.Name `
+                                  -NewCommandName 'Get-SmbShareAccess' `
+                                  -NewModuleName 'SmbShare' `
+                                  -NewCommandBuiltin `
+                                  -NoWarn:$NoWarn
+
+    $sd = Get-CFileShareSecurityDescriptor -Name $Name
+    if( -not $sd -or -not $sd.DACL )
+    {
+        return
+    }
+
+    if( $Identity )
+    {
+        if( -not [System.Management.Automation.WildcardPattern]::ContainsWildcardCharacters( $Identity ) )
+        {
+            $Identity = Resolve-CIdentityName -Name $Identity -NoWarn -ErrorAction $ErrorActionPreference
+            if( -not $Identity )
+            {
+                return
+            }
+        }
+    }
+
+    foreach($ace in $SD.DACL)
+    {
+        if( -not $ace -or -not $ace.Trustee )
+        {
+            continue
+        }
+
+        [Carbon.Identity]$rId = [Carbon.Identity]::FindBySid( $ace.Trustee.SIDString )
+        if( $Identity -and  (-not $rId -or $rId.FullName -notlike $Identity) )
+        {
+            continue
+        }
+
+        if( $rId )
+        {
+            $aceId = New-Object 'Security.Principal.NTAccount' $rId.FullName
+        }
+        else
+        {
+            $aceId = New-Object 'Security.Principal.SecurityIdentifier' $ace.Trustee.SIDString
+        }
+
+        New-Object 'Carbon.Security.ShareAccessRule' $aceId, $ace.AccessMask, $ace.AceType
+    }
+}
+
+
+function Get-CFileShareSecurityDescriptor
+{
+    <#
+    .SYNOPSIS
+    INTERNAL
+
+    .DESCRIPTION
+    INTERNAL
+
+    .EXAMPLE
+    INTERNAL
+    #>
+    [CmdletBinding()]
+    param(
+        # The share's name.
+        [Parameter(Mandatory=$true)]
+        [String] $Name
+    )
+
+    Set-StrictMode -Version 'Latest'
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
+    $share = Get-CFileShare -Name $Name -NoWarn
+    if( -not $share )
+    {
+        return
+    }
+
+    $lsss = Get-CCimInstance -Class 'Win32_LogicalShareSecuritySetting' -Filter "name='$($Name)'"
+    if( -not $lsss )
+    {
+        return
+    }
+
+    if( Test-CCimAvailable )
+    {
+        $result = Invoke-CimMethod -InputObject $lsss -MethodName 'GetSecurityDescriptor'
+    }
+    else
+    {
+        $result = $lsss.GetSecurityDescriptor()
+    }
+
+    if( -not $result )
+    {
+        return
+    }
+
+    if( $result.ReturnValue )
+    {
+        $win32lsssErrors = @{
+            [uint32]2 = 'Access Denied';
+            [uint32]8 = 'Unknown Failure';
+            [uint32]9 = 'Privilege Missing';
+            [uint32]21 = 'Invalid Parameter';
+        }
+
+        $msg = "Failed to get ""$($Name)"" share''s security descriptor: WMI error code $($result.ReturnValue): " +
+               "$($win32lsssErrors[$result.ReturnValue])."
+        Write-Error -Message $msg -ErrorAction $ErrorActionPreference
+        return
+    }
+
+    return $result.Descriptor
+}
+
+
 function Get-CMsi
 {
     <#
@@ -3430,6 +3701,285 @@ function Install-CCertificate
 
     return $Certificate
 }
+
+
+function Install-CFileShare
+{
+    <#
+    .SYNOPSIS
+    Installs a file/SMB share.
+
+    .DESCRIPTION
+    The `Install-CFileShare` function installs a new file/SMB share. If the share doesn't exist, it is created. In
+    Carbon 2.0, if a share does exist, its properties and permissions are updated in place, unless the share's path
+    needs to change. Changing a share's path requires deleting and re-creating. Before Carbon 2.0, shares were always
+    deleted and re-created.
+
+    Use the `FullAccess`, `ChangeAccess`, and `ReadAccess` parameters to grant full, change, and read sharing
+    permissions on the share. Each parameter takes a list of user/group names. If you don't supply any permissions,
+    `Everyone` will get `Read` access. Permissions on existing shares are cleared before permissions are granted.
+    Permissions don't apply to the file system, only to the share. Use the Carbon.FileSystem module's
+    `Grant-CNtfsPermission` function to grant file system permissions.
+
+    Before Carbon 2.0, this function was called `Install-SmbShare`.
+
+    .LINK
+    Get-CFileShare
+
+    .LINK
+    Get-CFileSharePermission
+
+    .LINK
+    Test-CFileShare
+
+    .LINK
+    Uninstall-CFileShare
+
+    .EXAMPLE
+    Install-Share -Name TopSecretDocuments -Path C:\TopSecret -Description 'Share for our top secret documents.' -ReadAccess "Everyone" -FullAccess "Analysts"
+
+    Shares the C:\TopSecret directory as `TopSecretDocuments` and grants `Everyone` read access and `Analysts` full
+    control.
+    #>
+    [CmdletBinding()]
+    param(
+        # The share's name.
+        [Parameter(Mandatory)]
+        [String] $Name,
+
+        # The path to the share.
+        [Parameter(Mandatory)]
+        [String] $Path,
+
+        # A description of the share
+        [String] $Description = '',
+
+        # The identities who have full access to the share.
+        [String[]] $FullAccess = @(),
+
+        # The identities who have change access to the share.
+        [String[]] $ChangeAccess = @(),
+
+        # The identities who have read access to the share
+        [String[]] $ReadAccess = @(),
+
+        # Deletes the share and re-creates it, if it exists. Preserves default beheavior in Carbon before 2.0.
+        #
+        # The `Force` switch is new in Carbon 2.0.
+        [switch] $Force,
+
+        # Hide the warning that this function is obsolete.
+        [switch] $NoWarn
+    )
+
+    Set-StrictMode -Version 'Latest'
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
+    Write-CRefactoredCommandWarning -CommandName $MyInvocation.MyCommand.Name `
+                                    -ModuleName 'Carbon.SmbShare' `
+                                    -NewCommandName 'Install-CSmbShare' `
+                                    -NoWarn:$NoWarn
+
+    if (-not (Get-Command -Name 'Get-WmiObject' -ErrorAction Ignore))
+    {
+        # No. Seriously. The CIM cmdlets have no way of creating Win32_SecurityDescriptor
+        $msg = "$($PSCmdlet.MyInvocation.MyCommand.Name) is not supported because the Get-WmiObject cmdlet does not " +
+               'exist.'
+        Write-Error -Message $msg -ErrorAction $ErrorActionPreference
+        return
+    }
+
+    function New-ShareAce
+    {
+        param(
+            # The identity
+            [Parameter(Mandatory)]
+            [AllowEmptyCollection()]
+            [String[]] $Identity,
+
+            # The rights to grant to Identity.
+            [Carbon.Security.ShareRights] $ShareRight
+        )
+
+        Set-StrictMode -Version 'Latest'
+
+        foreach( $identityName in $Identity )
+        {
+            $trustee = ([wmiclass]'Win32_Trustee').CreateInstance()
+            [Security.Principal.SecurityIdentifier]$sid =
+                Resolve-CIdentity -Name $identityName -NoWarn | Select-Object -ExpandProperty 'Sid'
+            if( -not $sid )
+            {
+                continue
+            }
+
+            $sidBytes = New-Object 'byte[]' $sid.BinaryLength
+            $sid.GetBinaryForm( $sidBytes, 0)
+
+            $trustee.Sid = $sidBytes
+
+            $ace = ([wmiclass]'Win32_Ace').CreateInstance()
+            $ace.AccessMask = $ShareRight
+            $ace.AceFlags = 0
+            $ace.AceType = 0
+            $ace.Trustee = $trustee
+
+            $ace
+        }
+    }
+
+    $Path = Resolve-CFullPath -Path $Path -NoWarn
+    $Path = $Path.Trim('\\')
+    # When sharing drives, path must end with \. Otherwise, it shouldn't.
+    if( $Path -eq (Split-Path -Qualifier -Path $Path ) )
+    {
+        $Path = Join-Path -Path $Path -ChildPath '\'
+    }
+
+    $changeMsgPrefix = "  "
+    $changeMsgs = [Collections.Generic.List[String]]::New()
+    $action = 'Creating'
+
+    if( (Test-CFileShare -Name $Name -NoWarn) )
+    {
+        $share = Get-CFileShare -Name $Name -NoWarn
+        [bool]$delete = $false
+
+        if( $Force )
+        {
+            $delete = $true
+        }
+
+        if ($share.Path -ne $Path)
+        {
+            $action = 'Updating'
+            $delete = $true
+        }
+
+        if( $delete )
+        {
+            Uninstall-CFileShare -Name $Name -InformationAction SilentlyContinue -NoWarn
+        }
+    }
+
+    $createdShare = $false
+    if (-not (Test-CFileShare -Name $Name -NoWarn))
+    {
+        Install-CDirectory -Path $Path
+
+        Write-Information -Message "$($action) SMB file share ""$($Name)""."
+        if ($action -eq 'Creating')
+        {
+            Write-Information "$($changeMsgPrefix)Path         $($Path)"
+            if ($Description)
+            {
+                Write-Information "$($changeMsgPrefix)Description  $($Description)"
+            }
+        }
+        elseif ($action -eq 'Updating' -and $share.Path -ne $Path)
+        {
+            WRite-Information "$($changeMsgPrefix)Path         $($share.Path) -> $($Path)"
+        }
+
+        $createArgs = [ordered]@{
+            Path = [String]$Path;
+            Name = [String]$Name;
+            Type = [UInt32]0;
+            MaximumAllowed = $null;
+            Description = $Description;
+        }
+        Invoke-CCimMethod -ClassName 'Win32_Share' -Name 'Create' -Arguments $createArgs
+        $createdShare = $true
+    }
+
+    $share = Get-CFileShare -Name $Name -AsWmiObject -NoWarn
+    $updateShare = $false
+
+    if ($share.Description -ne $Description)
+    {
+        $changeMsgs.Add("$($changeMsgPrefix)Description  $($share.Description) -> $($Description)")
+        $updateShare = $true
+    }
+
+    $shareAces = Invoke-Command -ScriptBlock {
+            if (-not $FullAccess -and -not $ChangeAccess -and -not $ReadAccess)
+            {
+                return New-ShareAce -Identity 'Everyone' -ShareRight Read
+            }
+
+            New-ShareAce -Identity $FullAccess -ShareRight FullControl
+            New-ShareAce -Identity $ChangeAccess -ShareRight Change
+            New-ShareAce -Identity $ReadAccess -ShareRight Read
+        }
+
+    # Check if the share is missing any of the new ACEs.
+    foreach ($ace in $shareAces)
+    {
+        $identityName = Resolve-CIdentityName -SID $ace.Trustee.SID -NoWarn
+        $accessMsgPrefix = "$($changeMsgPrefix)Access       $($identityName)  "
+        $permission = Get-CFileSharePermission -Name $Name -Identity $identityName -NoWarn
+
+        $newPerm = [Carbon.Security.ShareRights]$ace.AccessMask
+        if (-not $permission)
+        {
+            $changeMsgs.Add("$($accessMsgPrefix)+ $($newPerm)")
+            $updateShare = $true
+        }
+        elseif ([int]$permission.ShareRights -ne $ace.AccessMask)
+        {
+            $changeMsgs.Add("$($accessMsgPrefix)  $($permission.ShareRights) -> $($newPerm)")
+            $updateShare = $true
+        }
+    }
+
+    $existingAces = Get-CFileSharePermission -Name $Name -NoWarn
+    foreach ($ace in $existingAces)
+    {
+        $identityName = $ace.IdentityReference.Value
+
+        $existingAce = $ace
+        if ($shareAces)
+        {
+            $existingAce =
+                $shareAces |
+                Where-Object {
+                        $newIdentityName = Resolve-CIdentityName -SID $_.Trustee.SID -NoWarn
+                        return ( $newIdentityName -eq $ace.IdentityReference.Value )
+                    }
+        }
+
+        if (-not $existingAce)
+        {
+            $changeMsgs.Add("$($changeMsgPrefix)Access       $($identityName)  - $($ace.ShareRights)")
+            $updateShare = $true
+        }
+    }
+
+    if ($updateShare)
+    {
+        $currentSD = Get-CFileShareSecurityDescriptor -Name $Name
+        $newSD = ([wmiclass]'Win32_SecurityDescriptor').CreateInstance()
+        $newSD.DACL = $shareAces
+        $newSD.ControlFlags = "0x4"
+        $newSD.Group = $currentSD.Group
+        $newSD.Owner = $currentSD.Owner
+        $newSD.SACL = $currentSD.SACL
+
+        if (-not $createdShare)
+        {
+            Write-Information -Message "Updating SMB file share ""$($Name)""."
+        }
+        foreach ($msg in $changeMsgs)
+        {
+            Write-Information $msg
+        }
+
+        $result = $share.SetShareInfo($share.MaximumAllowed, $Description, $newSD)
+        Write-CCimError -Message "Failed to update ""$($Name)"" SMB file share" -Result $result
+    }
+}
+
+Set-Alias -Name 'Install-SmbShare' -Value 'Install-CFileShare'
 
 
 function Install-CMsi
@@ -6986,6 +7536,60 @@ function Test-CCryptoKeyAvailable
 }
 
 
+function Test-CFileShare
+{
+    <#
+    .SYNOPSIS
+    Tests if a file/SMB share exists on the local computer.
+
+    .DESCRIPTION
+    The `Test-CFileShare` function uses WMI to check if a file share exists on the local computer. If the share exists, `Test-CFileShare` returns `$true`. Otherwise, it returns `$false`.
+
+    `Test-CFileShare` was added in Carbon 2.0.
+
+    .LINK
+    Get-CFileShare
+
+    .LINK
+    Get-CFileSharePermission
+
+    .LINK
+    Install-CFileShare
+
+    .LINK
+    Uninstall-CFileShare
+
+    .EXAMPLE
+    Test-CFileShare -Name 'CarbonShare'
+
+    Demonstrates how to test of a file share exists.
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]
+        # The name of a specific share to check.
+        $Name,
+
+        # Hide the warning that this command is obsolete.
+        [switch] $NoWarn
+    )
+
+    Set-StrictMode -Version 'Latest'
+
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
+    Write-CRefactoredCommandWarning -CommandName $MyInvocation.MyCommand.Name `
+                                    -ModuleName 'Carbon.SmbShare' `
+                                    -NewCommandName 'Test-CSmbShare' `
+                                    -NoWarn:$NoWarn
+
+    $share = Get-CFileShare -Name ('{0}*' -f $Name) -NoWarn |
+                Where-Object { $_.Name -eq $Name }
+
+    return ($share -ne $null)
+}
+
 
 function Test-CIdentity
 {
@@ -7903,6 +8507,87 @@ function Uninstall-CCertificate
 
 Set-Alias -Name 'Remove-Certificate' -Value 'Uninstall-CCertificate'
 
+
+
+function Uninstall-CFileShare
+{
+    <#
+    .SYNOPSIS
+    Uninstalls/removes a file share from the local computer.
+
+    .DESCRIPTION
+    The `Uninstall-CFileShare` function uses WMI to uninstall/remove a file share from the local computer, if it exists.
+    Pass the name of the share to delete to the `Name` parameter (or pipe the name or share objects to the function). If
+    the file share exists, it is deleted. If it doesn't exist, nothing hapens.
+
+    `Uninstall-CFileShare` was added in Carbon 2.0.
+
+    .LINK
+    Get-CFileShare
+
+    .LINK
+    Get-CFileSharePermission
+
+    .LINK
+    Install-CFileShare
+
+    .LINK
+    Test-CFileShare
+
+    .EXAMPLE
+    Uninstall-CFileShare -Name 'CarbonShare'
+
+    Demonstrates how to uninstall/remove a share from the local computer. If the share does not exist,
+    `Uninstall-CFileShare` silently does nothing (i.e. it doesn't write an error).
+    #>
+    [CmdletBinding(SupportsShouldProcess)]
+    param(
+        # The name of a specific share to uninstall/delete. Wildcards accepted. If the string contains WMI sensitive
+        # characters, you'll need to escape them.
+        [Parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)]
+        [String] $Name,
+
+        # Hide the warning that this function is obsolete.
+        [switch] $NoWarn
+    )
+
+    process
+    {
+        Set-StrictMode -Version 'Latest'
+        Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
+        Write-CRefactoredCommandWarning -CommandName $MyInvocation.MyCommand.Name `
+                                        -ModuleName 'Carbon.SmbShare' `
+                                        -NewCommandName 'Uninstall-CSmbShare' `
+                                        -NoWarn:$NoWarn
+
+        if( -not (Test-CFileShare -Name $Name -NoWarn) )
+        {
+            return
+        }
+
+        foreach ($share in (Get-CFileShare -Name $Name -NoWarn))
+        {
+            $deletePhysicalPath = $false
+            if (-not (Test-Path -Path $share.Path -PathType Container))
+            {
+                Install-CDirectory -Path $share.Path -InformationAction SilentlyContinue
+                $deletePhysicalPath = $true
+            }
+
+            if( $PSCmdlet.ShouldProcess( "$($share.Name) ($($share.Path))", 'delete SMB file share' ) )
+            {
+                Write-Information "Deleting SMB file share ""$($share.Name)"" ($($share.Path))."
+                $share | Invoke-CCimMethod -Name 'Delete'
+            }
+
+            if ($deletePhysicalPath -and (Test-Path -Path $share.Path))
+            {
+                Uninstall-CDirectory -Path $share.Path -Recurse -InformationAction SilentlyContinue
+            }
+        }
+    }
+}
 
 
 function Uninstall-CScheduledTask
