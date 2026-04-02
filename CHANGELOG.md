@@ -5,10 +5,11 @@
 
 ## 2.16.0
 
-## Deprecated
+### Deprecated
 
-* `Get-CPermission`, `Grant-CPermission`, `Revoke-CPermission`, and `Test-CPermission` functions. They moved to
-provider-specific functions in the following modules:
+* `Get-CPermission` (and its `Get-CPermissions` alias), `Grant-CPermission` (and its `Grant-CPermissions` alias),
+  `Revoke-CPermission`, and `Test-CPermission` functions. The functions moved to provider-specific to the following
+  provider-specific modules:
   * Carbon.Cryptography
     * `Get-CPrivateKeyPermission`
     * `Grant-CPrivateKeyPermission`
@@ -24,14 +25,14 @@ provider-specific functions in the following modules:
     * `Grant-CRegistryPermission`
     * `Revoke-CRegistryPermission`
     * `Test-CRegistryPermission`
-* `ConvertTo-CContainerInheritanceFlags`, `ConvertTo-InheritanceFlag`, and `ConvertTo-PropagationFlag`. If you switch
-to the new provider-specific functions above, you won't need to use these functions anymore.
-* `ConvertTo-CSecurityIdentifier`, `Resolve-CIdentity`, `Resolve-CIdentityName`, and `Test-CIdentity`. They moved to
-the Carbon.Accounts module.
+* `ConvertTo-CContainerInheritanceFlags`, `ConvertTo-InheritanceFlag`, and `ConvertTo-PropagationFlag`. If you switch to
+  the new provider-specific functions above, you won't need to use these functions anymore.
+* `ConvertTo-CSecurityIdentifier`, `Resolve-CIdentity`, `Resolve-CIdentityName`, and `Test-CIdentity`. They moved to the
+  Carbon.Accounts module.
 * `Get-CScheduledTask`, `Install-CScheduledTask`, `Test-CScheduledTask`, and `Uninstall-CScheduledTask` functions. They
-moved to new `Carbon.ScheduledTasks` module.
-* `Get-CPrivilege`, `Grant-CPrivilege`, `Revoke-CPrivilege`, and `Test-CPrivilege` functions. They moved to
-  the `Carbon.Security` module.
+  moved to new `Carbon.ScheduledTasks` module.
+* `Get-CPrivilege`, `Grant-CPrivilege`, `Revoke-CPrivilege`, and `Test-CPrivilege` functions. They moved to the
+  `Carbon.Security` module.
 * Function `Get-CPathProvider`. Migrated to `Carbon.Core` module.
 
 
