@@ -5,35 +5,31 @@ Build:
     Prerelease:
     - main: ""
     - "*": rc1
-- Exec:
-    OnlyBy: BuildServer
-    Path: appveyor
-    Argument: [ UpdateBuild, -Version, "$(WHISKEY_SEMVER2)+$(WHISKEY_BUILD_NUMBER)" ]
-- PowerShell:
-    OnlyBy: BuildServer
-    Path: Save-CarbonSigningKey.ps1
-- PowerShell:
-    ScriptBlock: |
-        $typeDef = @'
-            using System;
+- Exec: appveyor UpdateBuild -Version "$(WHISKEY_SEMVER2)+$(WHISKEY_BUILD_NUMBER)"
+  .OnlyBy: BuildServer
+- PowerShell: .\Save-CarbonSigningKey.ps1
+  .OnlyBy: BuildServer
+- PowerShell: |
+    $typeDef = @'
+        using System;
 
-            public static class Args
+        public static class Args
+        {
+            public static void Main(string[] args)
             {
-                public static void Main(string[] args)
+                foreach (var arg in args)
                 {
-                    foreach (var arg in args)
-                    {
-                        Console.WriteLine(arg);
-                    }
+                    Console.WriteLine(arg);
                 }
             }
-        '@
-        Add-Type -TypeDefinition $typeDef -OutputType ConsoleApplication -OutputAssembly .\Carbon\bin\args.exe
+        }
+    '@
+    Add-Type -TypeDefinition $typeDef -OutputType ConsoleApplication -OutputAssembly .\Carbon\bin\args.exe
 - SetVariable:
     SignAssembly: False
     Constants: ""
 - SetVariable:
-    IfExists: Source\Carbon.snk
+    .IfExists: Source\Carbon.snk
     SignAssembly: True
     Constants: SIGNED
 - MSBuild:
@@ -52,7 +48,7 @@ Build:
 - Pipeline:
     Name: PublishBin
 - MergeFile:
-    OnlyBy: BuildServer
+    .OnlyBy: BuildServer
     Path:
     - Carbon\Functions\*.ps1
     - Carbon\Carbon.psm1.Import.Obsolete.ps1
@@ -83,21 +79,12 @@ Build:
     Exclude:
     - "*.pdb"
     - "*.orig"
-- Exec:
-    OnlyBy: BuildServer
-    Path: appveyor
-    Argument: [ 'PushArtifact', '$(WHISKEY_OUTPUT_DIRECTORY)/Carbon-$(WHISKEY_SEMVER2).zip', '-DeploymentName', 'GitHub' ]
+- Exec: appveyor PushArtifact '$(WHISKEY_OUTPUT_DIRECTORY)/Carbon-$(WHISKEY_SEMVER2).zip' -DeploymentName 'GitHub'
+  .OnlyBy: BuildServer
 - PublishPowerShellModule:
     Path: Carbon
-- Exec:
-    OnlyBy: BuildServer
-    Path: appveyor
-    Argument: [
-        'PushArtifact',
-        '$(WHISKEY_OUTPUT_DIRECTORY)/Carbon.$(WHISKEY_SEMVER2_NO_BUILD_METADATA).nupkg',
-        '-DeploymentName',
-        'PowerShellGallery'
-    ]
+- Exec: appveyor PushArtifact '$(WHISKEY_OUTPUT_DIRECTORY)/Carbon.$(WHISKEY_SEMVER2_NO_BUILD_METADATA).nupkg' -DeploymentName 'PowerShellGallery'
+  .OnlyBy: BuildServer
 
 PublishBin:
 - MSBuild:
@@ -120,12 +107,12 @@ PublishBin:
     - PublishDir=$(WHISKEY_BUILD_ROOT)\Carbon\bin\coreclr
     - SelfContained=false
 - Delete:
-    OnlyDuring: Build
-    OnlyBy: BuildServer
+    .OnlyDuring: Build
+    .OnlyBy: BuildServer
     Path: Carbon\bin\*\*.pdb
 # We don't need to include any assemblies that ship with PowerShell
 - Delete:
-    OnlyDuring: Build
+    .OnlyDuring: Build
     Path:
     - Carbon\bin\coreclr\runtimes
     - Carbon\bin\coreclr\*.json
@@ -136,10 +123,10 @@ Tests:
 - TaskDefaults:
     Pester4:
         DescribeDurationReportCount: 20
-        WarningAction: SilentlyContinue
+        .WarningAction: SilentlyContinue
 # Quick Developer tests.
 - Pester4:
-    OnlyBy: Developer
+    .OnlyBy: Developer
     Script:
     - Test\Bin.Tests.ps1
     - Test\Import-Carbon.Tests.ps1
@@ -148,15 +135,15 @@ Tests:
     - Test\Website.Tests.ps1
     - Test\System.Diagnostics.Process.types.Tests.ps1
 - PowerShell:
-    OnlyDuring: Build
-    OnlyBy: Developer
+    .OnlyDuring: Build
+    .OnlyBy: Developer
     Path: Tools\Blade\blade.ps1
     Argument:
         Path:
         - Test\Test-Documentation.ps1
         - Test\Test-ImportCarbon.ps1
 - Pester4:
-    OnlyBy: BuildServer
+    .OnlyBy: BuildServer
     Script:
     - Test\Assert-FirewallConfigurable.Tests.ps1
     - Test\Bin.Tests.ps1
@@ -254,17 +241,11 @@ Tests:
             - "*\\Uninstall-Junction.Tests.ps1"
             - "*\\Website.Tests.ps1"
             - "*\\Write-File.Tests.ps1"
-- PowerShell:
-    WarningAction: SilentlyContinue
-    OnlyDuring: Build
-    Path: Invoke-CarbonBladeTest.ps1
-    Argument:
-        Recurse: true
-        Path: Test
-        PassThru: true
-- PowerShell:
-    OnlyDuring: Build
-    Path: Start-CarbonTest.ps1
+- PowerShell: .\Invoke-CarbonBladeTest.ps1 -Recurse -Path .\Test -PassThru
+  .WarningAction: SilentlyContinue
+  .OnlyDuring: Build
+- PowerShell: .\Start-CarbonTest.ps1
+  .OnlyDuring: Build
 # Run DSC tests *last* because they depend on a globally installed version of Carbon.
 - Pester:
     Configuration:
@@ -276,11 +257,7 @@ Tests:
             Verbosity: detailed
         Run:
             Path: Test\Carbon_*.Tests.ps1
-- PowerShell:
-    OnlyDuring: Build
-    Path: Complete-CarbonTest.ps1
-- PowerShell:
-    OnlyBy: BuildServer
-    Path: Format-TestResult.ps1
-    Argument:
-        OutputPath: $(WHISKEY_OUTPUT_DIRECTORY)
+- PowerShell: .\Complete-CarbonTest.ps1
+  .OnlyDuring: Build
+- PowerShell: .\Format-TestResult.ps1 -OutputPath '$(WHISKEY_OUTPUT_DIRECTORY)'
+  .OnlyBy: BuildServer
