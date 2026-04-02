@@ -40,7 +40,7 @@ function New-TestContainer
     {
         $testRoot = (Get-Item -Path 'TestDrive:').FullName
         $path = Join-Path -Path $testRoot -ChildPath ([IO.Path]::GetRandomFileName())
-        Install-Directory -Path $path
+        Install-Directory -Path $path -NoWarn
     }
     elseif( $Provider -eq 'Registry' )
     {

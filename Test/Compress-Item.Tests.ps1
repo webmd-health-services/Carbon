@@ -1,9 +1,9 @@
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# 
+#
 #     http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -21,13 +21,13 @@ function Assert-ZipFileExpands
         $file,
         $sourceRoot
     )
-    
+
     try
     {
         $outRoot = Expand-Item -Path $file
         $outRoot | Should Not BeNullOrEmpty
         $outRoot | Should Exist
-    
+
         try
         {
             [object[]]$sourceItems = Get-ChildItem -Path $sourceRoot -Recurse
@@ -44,7 +44,7 @@ function Assert-ZipFileExpands
     finally
     {
         Remove-Item -Path $file -ErrorAction Ignore
-    }    
+    }
 }
 
 function Assert-ZipFileExists
@@ -52,9 +52,9 @@ function Assert-ZipFileExists
     param(
         $Path
     )
-    
+
     $Global:Error.Count | Should Be 0
-    
+
     foreach( $item in $Path )
     {
         $item | Should Not BeNullOrEmpty
@@ -73,30 +73,30 @@ Describe 'Compress-Item.when using WhatIf switch' {
         $Global:Error | Should BeNullorEmpty
     }
 }
-    
+
 Describe 'Compress-Item' {
-    
+
     BeforeEach {
         $Global:Error.Clear()
         $PSCommandName = Split-Path -Leaf -Path $PSCommandPath
-        $tempDir = New-TempDir -Prefix $PSCommandName
+        $tempDir = New-CTempDirectory -Prefix $PSCommandName -NoWarn
         $zipPath = Join-Path -Path $tempDir -ChildPath ('{0}.zip' -f $PSCommandName)
     }
-    
+
     AfterEach {
         Remove-Item -Path $tempDir -Recurse
     }
-    
+
     It 'should compress file' {
         $file = Compress-Item -Path $PSCommandPath
-    
+
         try
         {
             $outRoot = Expand-Item -Path $file
             $outRoot | Should Not BeNullOrEmpty
             $expandedFilePath = Join-Path -Path $outRoot -ChildPath (Split-Path -Leaf -Path $PSCommandPath)
             $expandedFilePath | Should Exist
-    
+
             try
             {
                 $originalFile = Get-Content -Raw -Path $PSCommandPath
@@ -113,25 +113,25 @@ Describe 'Compress-Item' {
             Remove-Item $file -Recurse
         }
     }
-    
+
     It 'should compress directory' {
         $file = Compress-Item -Path $PSScriptRoot
         Assert-ZipFileExists $file
         Assert-ZipFileExpands $file $PSScriptRoot
     }
-    
+
     It 'should compress with COM shell API' {
         $file = Compress-Item -Path $PSScriptRoot -UseShell
         Assert-ZipFileExists $file
         Assert-ZipFileExpands $file $PSScriptRoot
     }
-    
+
     It 'should compress large directory synchronously with COM shell API' {
         $file = Compress-Item -Path $PSScriptRoot -UseShell
         Assert-ZipFileExists $file
         Assert-ZipFileExpands $file $PSScriptRoot
     }
-    
+
     It 'should compress with relative path' {
         Push-Location -Path $PSScriptRoot
         try
@@ -144,7 +144,7 @@ Describe 'Compress-Item' {
             Pop-Location
         }
     }
-    
+
     It 'should create custom zip file' {
         Push-Location -Path $tempDir
         try
@@ -158,11 +158,11 @@ Describe 'Compress-Item' {
             Pop-Location
         }
     }
-    
+
     It 'should accept pipeline input' {
         $file = Get-ChildItem -Path $PSScriptRoot | Compress-Item -OutFile $zipPath
         Assert-ZipFileExists $file
-    
+
         $extractRoot = Expand-Item -Path $file
         try
         {
@@ -175,7 +175,7 @@ Describe 'Compress-Item' {
             Remove-Item -Path $extractRoot -Recurse
         }
     }
-    
+
     It 'should not overwrite file' {
         $file = Compress-Item -OutFile $zipPath -Path $PSCommandPath
         Assert-ZipFileExists $file
@@ -183,19 +183,19 @@ Describe 'Compress-Item' {
         $Global:Error.Count | Should BeGreaterThan 0
         $Global:Error[0] | Should Match 'exists'
     }
-    
+
     It 'should overwrite file' {
         $file = Compress-Item -OutFile $zipPath -Path $PSCommandPath
         Assert-ZipFileExists $file
         $file = Compress-Item -OutFile $zipPath -Path $PSCommandPath -Force
         Assert-ZipFileExists $file
     }
-    
+
     It 'should handle zipping zip file' {
         $file = Compress-Item -OutFile $zipPath -Path $tempDir
         Assert-ZipFileExists $file
         $file = Compress-Item -OutFile $zipPath -Path $tempDir -Force
         Assert-ZipFileExists $file
     }
-    
+
 }

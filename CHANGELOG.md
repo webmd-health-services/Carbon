@@ -39,6 +39,8 @@
   functions moved to new `Carbon.SmbShare` module as `Install-CSmbShare`, `Test-CSmbShare`, and `Uninstall-CSmbShare`,
   respectively, where they were also updated to support PowerShell 7. Replace usages of `Get-CFileShare` with
   `Get-SmbShare`, `Get-CFileSharePermission` with `Get-SmbShareAccess` from PowerShell's built-in SmbShare module.
+* `Install-CDirectory`, `New-CTempDirectory` (and its `New-TempDir` alias), and `Uninstall-CDirectory`. The functions
+  (not the alias) moved to the `Carbon.FileSystem` module, where they were also updated to support PowerShell 7.
 
 
 ## 2.15.1

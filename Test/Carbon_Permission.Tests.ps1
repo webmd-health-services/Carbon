@@ -14,7 +14,7 @@ BeforeAll {
     function New-MockDir
     {
         $path = (Join-Path -Path (Get-Item -Path 'TestDrive:').FullName -ChildPath ([Guid]::NewGuid().ToString()))
-        Install-Directory -Path $path
+        Install-Directory -Path $path -NoWarn
         return $path
     }
 }

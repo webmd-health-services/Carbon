@@ -1,9 +1,9 @@
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# 
+#
 #     http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -29,7 +29,7 @@ function Assert-CarbonRemoved
     }
 }
 
-function Assert-CarbonNotInstalled 
+function Assert-CarbonNotInstalled
 {
     It 'should uninstall Carbon from all module paths' {
         Get-Item -Path 'env:PSModulePath' |
@@ -46,7 +46,7 @@ function MockCarbonInstalled
     $testDriveRoot =  Microsoft.PowerShell.Management\Get-Item -Path 'TestDrive:'
     $modulesRoot = Join-Path -Path $testDriveRoot.FullName -ChildPath 'Modules'
     $modulesRoot2 = Join-Path -Path $testDriveRoot.FullName -ChildPath 'Modules2'
-    $modulesRoot,$modulesRoot2 | ForEach-Object { Install-Directory -Path $_ }
+    $modulesRoot,$modulesRoot2 | ForEach-Object { Install-Directory -Path $_ -NoWarn }
     $carbonRoot = Join-Path -Path $modulesRoot -ChildPath 'Carbon'
     $carbonRoot2 = Join-Path -Path $modulesRoot2 -ChildPath 'Carbon'
 
@@ -61,7 +61,7 @@ function MockCarbonInstalled
     } -ParameterFilter {
         $Path -eq 'env:PSModulePath'
     }
-    
+
     return $carbonRoot,$carbonRoot2
 }
 
@@ -80,10 +80,10 @@ Describe 'chocolateyUninstall.ps1 when module is installed and in use' {
     $carbonRoot = MockCarbonInstalled
 
     $preCount = $carbonRoot | Get-ChildItem  -Recurse | Measure-Object | Select-Object -ExpandProperty 'Count'
-    
+
     $file = & {
-                    Join-Path -Path $carbonRoot -ChildPath 'bin\fullclr\Carbon.dll' -Resolve 
-                    Join-Path -Path $carbonRoot -ChildPath 'bin\coreclr\Carbon.dll' -Resolve 
+                    Join-Path -Path $carbonRoot -ChildPath 'bin\fullclr\Carbon.dll' -Resolve
+                    Join-Path -Path $carbonRoot -ChildPath 'bin\coreclr\Carbon.dll' -Resolve
                 } |
                 ForEach-Object { [IO.File]::Open($_, 'Open', 'Read', 'Read') }
     try
@@ -104,7 +104,7 @@ Describe 'chocolateyUninstall.ps1 when module is installed and in use' {
     }
 
     $carbonRoot | Should Exist
-    
+
     # Make sure no files were deleted during a failed uninstall
     $postCount = $carbonRoot | Get-ChildItem -Recurse | Measure-Object | Select-Object -ExpandProperty 'Count'
     It 'should not delete any files' {
@@ -121,7 +121,7 @@ Describe 'chocolateyUninstall.ps1 when the module isn''t installed' {
     Assert-CarbonRemoved $carbonRoot
     Assert-CarbonNotInstalled
     & $chocolateyUninstall
-        
+
     & $chocolateyUninstall
     It 'should not write an error' {
         $Global:Error | Should BeNullOrEmpty
