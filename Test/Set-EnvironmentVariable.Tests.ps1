@@ -7,30 +7,50 @@ BeforeAll {
 
     & (Join-Path -Path $PSScriptRoot -ChildPath 'Initialize-CarbonTest.ps1' -Resolve)
 
-    $EnvVarName = 'CarbonTestSetEnvironmentVariable'
+    $script:varName = ''
+    $script:testNum = 0
 
-    function Assert-TestEnvironmentVariableIs($ExpectedValue, $Scope, $ExpectedName = $EnvVarName, [switch]$Force)
+    function Assert-TestEnvironmentVariableIs
     {
-        if( $Scope -eq 'Computer' )
+        param(
+            [Object] $ExpectedValue,
+
+            $Scope,
+
+            $ExpectedName = $script:varName,
+
+            [switch]$Force
+        )
+
+        if ($Scope -eq 'Computer')
         {
             $Scope = 'Machine'
         }
+
         $actualValue = [Environment]::GetEnvironmentVariable($ExpectedName, $Scope)
 
-        $qualifer = ''
-        if( -not $ExpectedValue )
+        if ($null -eq $ExpectedValue)
         {
-            $qualifer = 'not '
+            $actualValue | Should -BeNullOrEmpty
+        }
+        else
+        {
+            $actualValue | Should -Be $ExpectedValue
         }
 
-        $actualValue | Should -Be $ExpectedValue
-
-        if( $Scope -eq 'Process' )
+        if ($Scope -eq 'Process')
         {
-            if( -not $Force )
+            if (-not $Force)
             {
-                $envPath = 'env:{0}' -f $EnvVarName
-                Test-Path -Path $envPath | Should -BeFalse
+                $envPath = 'env:{0}' -f $ExpectedName
+                if ($null -eq $ExpectedValue)
+                {
+                    Test-Path -Path $envPath | Should -BeFalse
+                }
+                else
+                {
+                    Test-Path -Path $envPath | Should -BeTrue
+                }
             }
         }
     }
@@ -38,7 +58,7 @@ BeforeAll {
     function Assert-TestEnvironmentVariableSetInEnvDrive
     {
         param(
-            $ExpectedName = $EnvVarName,
+            $ExpectedName = $script:varName,
             $ExpectedValue
         )
 
@@ -47,13 +67,16 @@ BeforeAll {
         (Get-Item -Path $envPath).Value | Should -Be $ExpectedValue
     }
 
-    function Set-TestEnvironmentVariable($Scope, $Value)
+    function Set-TestEnvironmentVariable
     {
+        param(
+            $Scope,
+            $Value
+        )
+
         $setArgs = @{ "For$Scope" = $true }
 
-        Remove-CEnvironmentVariable -Name $EnvVarName -ForProcess -ForUser -ForComputer
-
-        Set-CEnvironmentVariable -Name $EnvVarName -Value $value @setArgs
+        Set-CEnvironmentVariable -Name $script:varName -Value $value @setArgs
         Assert-TestEnvironmentVariableIs -ExpectedValue $value -Scope $Scope
         return $value
     }
@@ -65,10 +88,34 @@ BeforeAll {
 }
 
 AfterAll {
-    Remove-CEnvironmentVariable -Name $EnvVarName -ForProcess -ForUser -ForComputer
+    & {
+            [Environment]::GetEnvironmentVariables('Process').Keys
+            [Environment]::GetEnvironmentVariables('User').Keys
+            [Environment]::GetEnvironmentVariables('Machine').Keys
+        } |
+        Where-Object { $_ -like 'CARBON_SETENVVAR_TEST_*' } |
+        Select-Object -Unique |
+        ForEach-Object {
+            Remove-CEnvironmentVariable -Name $_ -ForProcess -ForUser -ForComputer
+        }
 }
 
 Describe 'Set-CEnvironmentVariable' {
+    BeforeEach {
+        while ($true)
+        {
+            $script:testNum += 1
+            $script:varName = "CARBON_SETENVVAR_TEST_${script:testNum}"
+            if (-not [Environment]::GetEnvironmentVariable($script:varName, 'Process') -and
+                -not [Environment]::GetEnvironmentVariable($script:varName, 'User') -and
+                -not [Environment]::GetEnvironmentVariable($script:varName, 'Machine') -and
+                -not (Test-Path -Path "env:${script:varName}"))
+            {
+                break
+            }
+        }
+    }
+
     It 'sets machine-level variable' {
         $value = New-TestValue
         Set-TestEnvironmentVariable -Scope Computer -Value $value
@@ -110,15 +157,15 @@ Describe 'Set-CEnvironmentVariable' {
             $scopeParam = @{
                                 ('For{0}' -f $scope) = $true
                         }
-            Set-CEnvironmentVariable -Name $EnvVarName -Value $value -Force @scopeParam
+            Set-CEnvironmentVariable -Name $script:varName -Value $value -Force @scopeParam
             Assert-TestEnvironmentVariableIs -ExpectedValue $value -Scope $scope -Force
             Assert-TestEnvironmentVariableSetInEnvDrive -ExpectedValue $value
         }
     }
 
     It 'supports WhatIf' {
-        Remove-CEnvironmentVariable -Name $EnvVarName -ForProcess -ForUser -ForComputer
-        Set-CEnvironmentVariable -Name $EnvVarName -Value 'Doesn''t matter.' -ForProcess -WhatIf
+        Remove-CEnvironmentVariable -Name $script:varName -ForProcess -ForUser -ForComputer
+        Set-CEnvironmentVariable -Name $script:varName -Value 'Doesn''t matter.' -ForProcess -WhatIf
         Assert-TestEnvironmentVariableIs -ExpectedValue $null -Scope 'Computer'
         Assert-TestEnvironmentVariableIs -ExpectedValue $null -Scope 'User'
         Assert-TestEnvironmentVariableIs -ExpectedValue $null -Scope 'Process'

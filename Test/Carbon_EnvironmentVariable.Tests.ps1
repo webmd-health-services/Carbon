@@ -26,7 +26,7 @@ BeforeAll {
             $stdErr | Should -BeNullOrEmpty
             $stdout = Get-Content -Path $stdOutPath -Raw
             $stdout = $stdout.Trim()
-            if( $value -eq $null )
+            if ($null -eq $value)
             {
                 $stdout | Should -Be ('%{0}%' -f $Name)
             }
@@ -42,14 +42,14 @@ BeforeAll {
     }
 
     Start-CarbonDscTestFixture 'EnvironmentVariable'
-    [Environment]::SetEnvironmentVariable('fubar',$null,'Machine')
-    [Environment]::SetEnvironmentVariable('fubar',$null,'Process')
+    [Environment]::SetEnvironmentVariable('fubar', [NullString]::Value, 'Machine')
+    [Environment]::SetEnvironmentVariable('fubar', [NullString]::Value, 'Process')
 }
 
 AfterAll {
     Stop-CarbonDscTestFixture
-    [Environment]::SetEnvironmentVariable('fubar',$null,'Machine')
-    [Environment]::SetEnvironmentVariable('fubar',$null,'Process')
+    [Environment]::SetEnvironmentVariable('fubar', [NullString]::Value, 'Machine')
+    [Environment]::SetEnvironmentVariable('fubar', [NullString]::Value, 'Process')
 }
 
 Describe 'Carbon_EnvironmentVariable' {

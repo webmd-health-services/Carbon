@@ -5,6 +5,11 @@
 
 ## 2.16.0
 
+### Fixed
+
+* `Remove-CEnvironmentVariable` fails to remove environment variables in PowerShell 7.
+* `Carbon_EnvironmentVariable` DSC resource fails to remove environment variables in PowerShell 7.
+
 ### Deprecated
 
 * `Get-CPermission` (and its `Get-CPermissions` alias), `Grant-CPermission` (and its `Grant-CPermissions` alias),

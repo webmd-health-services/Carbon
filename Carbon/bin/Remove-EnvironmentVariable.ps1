@@ -19,5 +19,5 @@ param(
 
 Set-StrictMode -Version 'Latest'
 
-$Name = [Text.Encoding]::Unicode.GetString( [Convert]::FromBase64String($Name) ) 
-[Environment]::SetEnvironmentVariable( $Name, $null, [EnvironmentVariableTarget]::User )
+$Name = [Text.Encoding]::Unicode.GetString( [Convert]::FromBase64String($Name) )
+[Environment]::SetEnvironmentVariable( $Name, [NullString]::Value, [EnvironmentVariableTarget]::User )
