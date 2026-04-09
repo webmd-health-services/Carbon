@@ -87,7 +87,7 @@ Describe 'Convert-XmlFile' {
 
     It 'should allow users to load custom transforms' -Skip:$skip {
         $testBinPath = Join-Path -Path $PSScriptRoot -ChildPath 'bin'
-        Install-CDirectory $testBinPath
+        Install-CDirectory $testBinPath -NoWarn
 
         $carbonTestAssemblyPath = Join-Path -Path $testBinPath `
                                             -ChildPath "Carbon.Test.Xdt.$($PSVersionTable['PSEdition']).dll"

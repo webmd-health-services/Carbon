@@ -72,7 +72,7 @@ Describe 'Resolve-PathCase' {
         $shareName = Split-Path -Leaf -Path $tempDir
         try
         {
-            Install-CFileShare -Name $shareName -Path $tempDir.FullName -ReadAccess 'Everyone'
+            Install-CFileShare -Name $shareName -Path $tempDir.FullName -ReadAccess 'Everyone' -NoWarn
             try
             {
                 $path = '\\localhost\{1}' -f $env:COMPUTERNAME,$shareName
@@ -83,7 +83,7 @@ Describe 'Resolve-PathCase' {
             }
             finally
             {
-                Uninstall-CFileShare -Name $shareName
+                Uninstall-CFileShare -Name $shareName -NoWarn
             }
         }
         finally

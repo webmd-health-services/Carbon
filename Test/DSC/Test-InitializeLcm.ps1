@@ -1,9 +1,9 @@
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# 
+#
 #     http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -28,12 +28,12 @@ $password = 'Aa1Bb2Cc3Dd4'
 function Start-TestFixture
 {
     & (Join-Path -Path $PSScriptRoot -ChildPath '..\Initialize-CarbonTest.ps1' -Resolve)
-    $tempDir = New-TempDirectory -Prefix $PSCommandPath
+    $tempDir = New-TempDirectory -Prefix $PSCommandPath -NoWarn
 }
 
 function Stop-TestFixture
 {
-    Uninstall-Directory -Path $tempDir -Recurse
+    Uninstall-Directory -Path $tempDir -Recurse -NoWarn
 }
 
 function Start-Test
@@ -159,7 +159,7 @@ function Test-ShouldValidateCertHasPrivateKey
 function Test-ShouldClearUnprovidedPushValues
 {
     # Make sure if no cert file specified, the original is left alone.
-    $originalLcm = Initialize-Lcm -Push -ComputerName 'localhost' -CertFile $privateKeyPath -RebootIfNeeded 
+    $originalLcm = Initialize-Lcm -Push -ComputerName 'localhost' -CertFile $privateKeyPath -RebootIfNeeded
     $lcm = Initialize-Lcm -Push -ComputerName 'localhost'
     Assert-NoError
     Assert-NotNull $lcm
@@ -232,7 +232,7 @@ function Test-ShouldConfigureFileDownloadManager
         return
     }
 
-    Assert-NoError 
+    Assert-NoError
     Assert-NotNull $lcm
     Assert-Equal $configID $lcm.ConfigurationID
     Assert-True $lcm.AllowModuleOverwrite
@@ -249,7 +249,7 @@ function Test-ShouldConfigureFileDownloadManager
     $configID = [Guid]::NewGuid().ToString()
     $lcm = Initialize-Lcm -SourcePath $env:TEMP -ConfigurationID $configID -ConfigurationMode ApplyAndMonitor -ComputerName 'localhost'
 
-    Assert-NoError 
+    Assert-NoError
     Assert-NotNull $lcm
     Assert-Equal $configID $lcm.ConfigurationID
     Assert-False $lcm.AllowModuleOverwrite
@@ -289,7 +289,7 @@ function Test-ShouldConfigureWebDownloadManager
         return
     }
 
-    Assert-NoError 
+    Assert-NoError
     Assert-NotNull $lcm
     Assert-Equal $configID $lcm.ConfigurationID
     Assert-True $lcm.AllowModuleOverwrite
@@ -307,7 +307,7 @@ function Test-ShouldConfigureWebDownloadManager
     $configID = [Guid]::NewGuid().ToString()
     $lcm = Initialize-Lcm -ServerUrl 'https://localhost:6798' -ConfigurationID $configID -ConfigurationMode ApplyAndMonitor -ComputerName 'localhost'
 
-    Assert-NoError 
+    Assert-NoError
     Assert-NotNull $lcm
     Assert-Equal $configID $lcm.ConfigurationID
     Assert-False $lcm.AllowModuleOverwrite
@@ -338,11 +338,11 @@ if( [Environment]::OSVersion.Version.Major -lt 10 )
                               -RefreshIntervalMinutes 45 `
                               -ConfigurationFrequency 3 `
                               -LcmCredential $CarbonTestUser
-        Assert-NoError    
+        Assert-NoError
         Assert-NotNull $lcm
 
         $lcm = Initialize-Lcm -Push -ComputerName 'localhost'
-        Assert-NoError 
+        Assert-NoError
         Assert-NotNull $lcm
         Assert-Null $lcm.ConfigurationID
         Assert-Equal 'False' $lcm.AllowModuleOverwrite

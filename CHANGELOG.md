@@ -5,10 +5,16 @@
 
 ## 2.16.0
 
-## Deprecated
+### Fixed
 
-* `Get-CPermission`, `Grant-CPermission`, `Revoke-CPermission`, and `Test-CPermission` functions. They moved to
-provider-specific functions in the following modules:
+* `Remove-CEnvironmentVariable` fails to remove environment variables in PowerShell 7.
+* `Carbon_EnvironmentVariable` DSC resource fails to remove environment variables in PowerShell 7.
+
+### Deprecated
+
+* `Get-CPermission` (and its `Get-CPermissions` alias), `Grant-CPermission` (and its `Grant-CPermissions` alias),
+  `Revoke-CPermission`, and `Test-CPermission` functions. The functions moved to provider-specific to the following
+  provider-specific modules:
   * Carbon.Cryptography
     * `Get-CPrivateKeyPermission`
     * `Grant-CPrivateKeyPermission`
@@ -24,14 +30,22 @@ provider-specific functions in the following modules:
     * `Grant-CRegistryPermission`
     * `Revoke-CRegistryPermission`
     * `Test-CRegistryPermission`
-* `ConvertTo-CContainerInheritanceFlags`, `ConvertTo-InheritanceFlag`, and `ConvertTo-PropagationFlag`. If you switch
-to the new provider-specific functions above, you won't need to use these functions anymore.
-* `ConvertTo-CSecurityIdentifier`, `Resolve-CIdentity`, `Resolve-CIdentityName`, and `Test-CIdentity`. They moved to
-the Carbon.Accounts module.
+* `ConvertTo-CContainerInheritanceFlags`, `ConvertTo-InheritanceFlag`, and `ConvertTo-PropagationFlag`. If you switch to
+  the new provider-specific functions above, you won't need to use these functions anymore.
+* `ConvertTo-CSecurityIdentifier`, `Resolve-CIdentity`, `Resolve-CIdentityName`, and `Test-CIdentity`. They moved to the
+  Carbon.Accounts module.
 * `Get-CScheduledTask`, `Install-CScheduledTask`, `Test-CScheduledTask`, and `Uninstall-CScheduledTask` functions. They
-moved to new `Carbon.ScheduledTasks` module.
-* `Get-CPrivilege`, `Grant-CPrivilege`, `Revoke-CPrivilege`, and `Test-CPrivilege` functions. They moved to
-  the `Carbon.Security` module.
+  moved to new `Carbon.ScheduledTasks` module.
+* `Get-CPrivilege`, `Grant-CPrivilege`, `Revoke-CPrivilege`, and `Test-CPrivilege` functions. They moved to the
+  `Carbon.Security` module.
+* Function `Get-CPathProvider`. Migrated to `Carbon.Core` module.
+* `Get-CFileShare`, `Get-CFileSharePermission`, `Install-CFileShare` (and its `Install-SmbShare` alias),
+  `Test-CFileShare`, and `Uninstall-CFileShare`. The `Install-CFileShare`, `Test-CFileShare`, and `Uninstall-CFileShare`
+  functions moved to new `Carbon.SmbShare` module as `Install-CSmbShare`, `Test-CSmbShare`, and `Uninstall-CSmbShare`,
+  respectively, where they were also updated to support PowerShell 7. Replace usages of `Get-CFileShare` with
+  `Get-SmbShare`, `Get-CFileSharePermission` with `Get-SmbShareAccess` from PowerShell's built-in SmbShare module.
+* `Install-CDirectory`, `New-CTempDirectory` (and its `New-TempDir` alias), and `Uninstall-CDirectory`. The functions
+  (not the alias) moved to the `Carbon.FileSystem` module, where they were also updated to support PowerShell 7.
 
 
 ## 2.15.1

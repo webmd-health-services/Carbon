@@ -60,7 +60,7 @@ Describe 'Carbon_IniFile' {
     BeforeEach {
         $Global:Error.Clear()
 
-        $script:tempDir = New-TempDir -Prefix $PSCommandPath
+        $script:tempDir = New-TempDir -Prefix $PSCommandPath -NoWarn
         $script:iniPath = Join-Path -Path $script:tempDir -ChildPath 'ini'
         $script:defaultValue = [Guid]::NewGuid().ToString()
         $script:defaultValue2 = [Guid]::NewGuid().ToString()

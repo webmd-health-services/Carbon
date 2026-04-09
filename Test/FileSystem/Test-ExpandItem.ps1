@@ -1,9 +1,9 @@
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# 
+#
 #     http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -22,7 +22,7 @@ function Start-TestFixture
 
 function Start-Test
 {
-    $tempDir = New-TempDir -Prefix ('{0}-{1}' -f $PSCommandName,([IO.Path]::GetRandomFileName()))
+    $tempDir = Carbon\New-CTempDirectory -Prefix ('{0}-{1}' -f $PSCommandName,([IO.Path]::GetRandomFileName())) -NoWarn
     $zipPath = Join-Path -Path $tempDir -ChildPath ('{0}.zip' -f $PSCommandName)
     Compress-Item -Path $PSCommandPath -OutFile $zipPath
 
@@ -31,7 +31,7 @@ function Start-Test
 
 function Stop-Test
 {
-    Uninstall-Directory -Path $tempDir -Recurse
+    Uninstall-Directory -Path $tempDir -Recurse -NoWarn
 }
 
 function Test-ShouldFailIfFileNotAZipFile
@@ -43,7 +43,7 @@ function Test-ShouldFailIfFileNotAZipFile
 
 function Test-ShouldExpandWithRelativePathToZip
 {
-    $tempDir2 = New-TempDirectory -Prefix $PSCommandPath
+    $tempDir2 = Carbon\New-CTempDirectory -Prefix $PSCommandPath -NoWarn
     Push-Location $tempDir2
     try
     {
@@ -56,13 +56,13 @@ function Test-ShouldExpandWithRelativePathToZip
     finally
     {
         Pop-Location
-        Uninstall-Directory -Path $tempDir2 -Recurse
+        Uninstall-Directory -Path $tempDir2 -Recurse -NoWarn
     }
 }
 
 function Test-ShouldExpandWithRelativePathToOutput
 {
-    $tempDir2 = New-TempDirectory -Prefix $PSCommandPath
+    $tempDir2 = Carbon\New-CTempDirectory -Prefix $PSCommandPath -NoWarn
     Push-Location -Path $tempDir2
     try
     {
@@ -76,7 +76,7 @@ function Test-ShouldExpandWithRelativePathToOutput
     finally
     {
         Pop-Location
-        Uninstall-Directory -Path $tempDir2 -Recurse
+        Uninstall-Directory -Path $tempDir2 -Recurse -NoWarn
     }
 }
 
@@ -92,7 +92,7 @@ function Test-ShouldCarryOnIfOutputDirectoryIsEmpty
     New-Item -Path $outputRoot -ItemType 'Directory'
     $result = Expand-Item -Path $zipPath -OutDirectory $outputRoot
     Assert-Equal $outputRoot $result.FullName
-    Assert-NoError 
+    Assert-NoError
     Assert-Equal 1 @(Get-ChildItem $outputRoot).Count
 }
 

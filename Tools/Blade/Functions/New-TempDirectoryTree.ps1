@@ -1,11 +1,11 @@
 # Copyright 2012 - 2015 Aaron Jensen
-# 
+#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# 
+#
 #     http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -71,7 +71,7 @@ function New-TempDirectoryTree
         [string]
         # The directory tree to create.
         $Tree,
-        
+
         [Parameter(ParameterSetName='TempPath')]
         [string]
         # An optional prefix for the temporary directory's name.
@@ -82,9 +82,9 @@ function New-TempDirectoryTree
         # The path where the directory tree should be created.  Defaults to a new directory in the `$env:TEMP` directory.
         $Path
     )
-    
+
     $stackName = 'New-TempDirectoryTree'
-    
+
     if( $PSCmdlet.ParameterSetName -eq 'TempPath' )
     {
         $optionalParams = @{ }
@@ -92,7 +92,7 @@ function New-TempDirectoryTree
         {
             $optionalParams.Prefix = $Prefix
         }
-    
+
         $tempDir = New-TempDirectory @optionalParams
     }
     else
@@ -108,13 +108,13 @@ function New-TempDirectoryTree
     }
     $startLocation = Get-Location
     Push-Location -Path $tempDir -StackName $stackName
-    
+
     try
     {
         $parent = $tempDir
         $lastDir = $tempDir
         $lastIndent = ''
-        
+
         ($Tree -split "`r?`n") |
             Where-Object { $_ } |
             ForEach-Object {
@@ -128,10 +128,10 @@ function New-TempDirectoryTree
                 {
                     $indent = ''
                 }
-                
+
                 $itemType = $matches[3]
                 $name = $matches[4]
-                
+
                 if( $lastIndent.Length -lt $indent.Length )
                 {
                     Push-Location -Path (Join-Path (Get-Location) $lastDir) -StackName $stackName
@@ -145,7 +145,7 @@ function New-TempDirectoryTree
                 {
                     # Same level.  Do nothing.
                 }
-                
+
                 if( $itemType -eq '*' )
                 {
                     $itemType = 'File'
@@ -157,15 +157,15 @@ function New-TempDirectoryTree
                     $pathType = 'Container'
                     $lastDir = $name
                 }
-                
+
                 if( -not (Test-Path -Path $name -PathType $pathType) )
                 {
                     $null = New-Item -Path $name -ItemType $itemType
                 }
-                
+
                 $lastIndent = $indent
             }
-            
+
         $tempDir
     }
     finally

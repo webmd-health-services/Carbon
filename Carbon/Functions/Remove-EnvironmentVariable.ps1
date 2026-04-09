@@ -4,71 +4,79 @@ function Remove-CEnvironmentVariable
     <#
     .SYNOPSIS
     Removes an environment variable.
-    
+
     .DESCRIPTION
-    Uses the .NET [Environment class](http://msdn.microsoft.com/en-us/library/z8te35sa) to remove an environment variable from the Process, User, or Computer scopes.
-    
-    Changes to environment variables in the User and Machine scope are not picked up by running processes.  Any running processes that use this environment variable should be restarted.
+    Uses the .NET [Environment class](http://msdn.microsoft.com/en-us/library/z8te35sa) to remove an environment
+    variable from the Process, User, or Computer scopes.
 
-    Normally, you have to restart your PowerShell session/process to no longer see the variable in the `env:` drive. Use the `-Force` switch to also remove the variable from the `env:` drive. This functionality was added in Carbon 2.3.0.
+    Changes to environment variables in the User and Machine scope are not picked up by running processes.  Any running
+    processes that use this environment variable should be restarted.
 
-    Beginning with Carbon 2.3.0, you can set an environment variable for a specific user by specifying the `-ForUser` switch and passing the user's credentials with the `-Credential` parameter. This runs a separate PowerShell process as that user to remove the variable.
+    Normally, you have to restart your PowerShell session/process to no longer see the variable in the `env:` drive. Use
+    the `-Force` switch to also remove the variable from the `env:` drive. This functionality was added in Carbon 2.3.0.
 
-    Beginning in Carbon 2.3.0, you can specify multiple scopes from which to remove an environment variable. In previous versions, you could only remove from one scope.
-    
+    Beginning with Carbon 2.3.0, you can set an environment variable for a specific user by specifying the `-ForUser`
+    switch and passing the user's credentials with the `-Credential` parameter. This runs a separate PowerShell process
+    as that user to remove the variable.
+
+    Beginning in Carbon 2.3.0, you can specify multiple scopes from which to remove an environment variable. In previous
+    versions, you could only remove from one scope.
+
     .LINK
     Carbon_EnvironmentVariable
 
     .LINK
     Set-CEnvironmentVariable
-    
+
     .LINK
     http://msdn.microsoft.com/en-us/library/z8te35sa
 
     .EXAMPLE
     Remove-CEnvironmentVariable -Name 'MyEnvironmentVariable' -ForProcess
-    
+
     Removes the `MyEnvironmentVariable` from the process scope.
 
     .EXAMPLE
     Remove-CEnvironmentVariable -Name 'SomeUsersVariable' -ForUser -Credential $credential
 
-    Demonstrates that you can remove another user's user-level environment variable by passing its credentials to the `Credential` parameter. This runs a separate PowerShell process as that user to remove the variable.
+    Demonstrates that you can remove another user's user-level environment variable by passing its credentials to the
+    `Credential` parameter. This runs a separate PowerShell process as that user to remove the variable.
     #>
-    [CmdletBinding(SupportsShouldProcess=$true)]
+    [CmdletBinding(SupportsShouldProcess)]
     param(
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory)]
         # The environment variable to remove.
-        [string]$Name,
-        
+        [String] $Name,
+
         [Parameter(ParameterSetName='ForCurrentUser')]
         # Removes the environment variable for the current computer.
-        [Switch]$ForComputer,
+        [switch] $ForComputer,
 
         [Parameter(ParameterSetName='ForCurrentUser')]
-        [Parameter(Mandatory=$true,ParameterSetName='ForSpecificUser')]
+        [Parameter(Mandatory, ParameterSetName='ForSpecificUser')]
         # Removes the environment variable for the current user.
-        [Switch]$ForUser,
-        
+        [switch] $ForUser,
+
         [Parameter(ParameterSetName='ForCurrentUser')]
         # Removes the environment variable for the current process.
-        [Switch]$ForProcess,
+        [switch] $ForProcess,
 
         [Parameter(ParameterSetName='ForCurrentUser')]
-        # Remove the variable from the current PowerShell session's `env:` drive, too. Normally, you have to restart your session to no longer see the variable in the `env:` drive.
+        # Remove the variable from the current PowerShell session's `env:` drive, too. Normally, you have to restart
+        # your session to no longer see the variable in the `env:` drive.
         #
         # This parameter was added in Carbon 2.3.0.
-        [Switch]$Force,
+        [switch] $Force,
 
-        [Parameter(Mandatory=$true,ParameterSetName='ForSpecificUser')]
+        [Parameter(Mandatory, ParameterSetName='ForSpecificUser')]
         # Remove an environment variable for a specific user.
-        [pscredential]$Credential
+        [pscredential] $Credential
     )
-    
+
     Set-StrictMode -Version 'Latest'
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
-    if( $PSCmdlet.ParameterSetName -eq 'ForSpecificUser' )
+    if ($PSCmdlet.ParameterSetName -eq 'ForSpecificUser')
     {
         $parameters = $PSBoundParameters
         $parameters.Remove('Credential')
@@ -85,36 +93,38 @@ function Remove-CEnvironmentVariable
         return
     }
 
-    if( -not $ForProcess -and -not $ForUser -and -not $ForComputer )
+    if (-not $ForProcess -and -not $ForUser -and -not $ForComputer)
     {
-        Write-Error -Message ('Environment variable target not specified. You must supply one of the ForComputer, ForUser, or ForProcess switches.')
+        $msg = 'Environment variable target not specified. You must supply one of the ForComputer, ForUser, or ' +
+               'ForProcess switches.'
+        Write-Error -Message $msg -ErrorAction $ErrorActionPreference
         return
     }
 
     Invoke-Command -ScriptBlock {
-                                    if( $ForComputer )
-                                    {
-                                        [EnvironmentVariableTarget]::Machine
-                                    }
+            if( $ForComputer )
+            {
+                [EnvironmentVariableTarget]::Machine
+            }
 
-                                    if( $ForUser )
-                                    {
-                                        [EnvironmentVariableTarget]::User
-                                    }
+            if( $ForUser )
+            {
+                [EnvironmentVariableTarget]::User
+            }
 
-                                    if( $ForProcess )
-                                    {
-                                        [EnvironmentVariableTarget]::Process
-                                    }
-                                } |
-        Where-Object { $PSCmdlet.ShouldProcess( "$_-level environment variable '$Name'", "remove" ) } |
-        ForEach-Object { 
-                            $scope = $_
-                            [Environment]::SetEnvironmentVariable( $Name, $null, $scope )
-                            if( $Force -and $scope -ne [EnvironmentVariableTarget]::Process )
-                            {
-                                [Environment]::SetEnvironmentVariable($Name, $null, 'Process')
-                            }
+            if( $ForProcess )
+            {
+                [EnvironmentVariableTarget]::Process
+            }
+        } |
+        Where-Object { $PSCmdlet.ShouldProcess( "${_}-level environment variable ""${Name}""", "remove" ) } |
+        ForEach-Object {
+                $scope = $_
+                [Environment]::SetEnvironmentVariable( $Name, [NullString]::Value, $scope )
+                if ($Force -and $scope -ne [EnvironmentVariableTarget]::Process)
+                {
+                    [Environment]::SetEnvironmentVariable($Name, [NullString]::Value, 'Process')
+                }
             }
 }
 

@@ -1,4 +1,5 @@
 
+#Requires -RunAsAdministrator
 #Requires -Version 5.1
 Set-StrictMode -Version 'Latest'
 
@@ -9,9 +10,13 @@ BeforeAll {
 
     $script:username = 'CarbonInstallUser'
     $script:password = 'IM33tRequ!rem$'
+    $passwordChars = $script:password.ToCharArray()
+    [Array]::Reverse($passwordChars)
+    $script:newPassword = [String]::New($passwordChars)
 
     function Assert-Credential
     {
+        [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidUsingPlainTextForPassword', '')]
         param(
             $Password
         )
@@ -127,13 +132,12 @@ Describe 'Install-CUser' {
 
             $newFullName = 'New {0}' -f $fullName
             $newDescription = "New description"
-            $newPassword = 'IM33tRequ!re$2'
             $result = Install-CUser -Username $script:username `
-                                   -Password $newPassword `
-                                   -Description $newDescription `
-                                   -FullName $newFullName `
-                                   -UserCannotChangePassword `
-                                   -PasswordExpires
+                                    -Password $script:newPassword `
+                                    -Description $newDescription `
+                                    -FullName $newFullName `
+                                    -UserCannotChangePassword `
+                                    -PasswordExpires
             try
             {
                 $result | Should -BeNullOrEmpty
@@ -191,8 +195,7 @@ Describe 'Install-CUser' {
 
             $newFullName = 'New {0}' -f $fullName
             $newDescription = "New description"
-            $newPassword = [Guid]::NewGuid().ToString().Substring(0,14)
-            $credential = New-Credential -UserName $script:username -Password $newPassword
+            $credential = New-Credential -UserName $script:username -Password $script:newPassword
 
             $result = Install-CUser -Credential $credential `
                                    -Description $newDescription `

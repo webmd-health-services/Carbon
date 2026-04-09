@@ -30,14 +30,14 @@ BeforeAll {
 
     function Assert-HasPermissionsOnServiceExecutable($Identity, $Path)
     {
-        $access = Get-CPermission -Path $Path -Identity $Identity
+        $access = Get-CPermission -Path $Path -Identity $Identity -NoWarn
         $access | Should -Not -BeNullOrEmpty
         ([Security.AccessControl.FileSystemRights]::ReadAndExecute) | Should -Be ($access.FileSystemRights -band [Security.AccessControl.FileSystemRights]::ReadAndExecute)
     }
 
     function Assert-HasNoPermissionsOnServiceExecutable($Identity, $Path)
     {
-        $access = Get-CPermission -Path $Path -Identity $Identity
+        $access = Get-CPermission -Path $Path -Identity $Identity -NoWarn
         $access | Should -BeNullOrEmpty
     }
 
@@ -164,7 +164,7 @@ Describe 'Install-CService' {
         Mock -CommandName 'Write-Debug' -ModuleName 'Carbon' -Verifiable
         Install-CService -Name $script:serviceName -Path $script:servicePath -StartupType Automatic
         $svc = Get-Service -Name $script:serviceName
-        $svc.UserName | Should -Be (Resolve-IdentityName 'NetworkService' -NoWarn)
+        $svc.UserName | Should -Be (Resolve-CIdentityName 'NetworkService' -NoWarn)
     }
 
     It 'when service is a local account and installed multiple times' {
@@ -429,11 +429,11 @@ Describe 'Install-CService' {
     It 'should re-install the service with previously removed permissions'{
         Install-CService -Name $script:serviceName -Path $script:servicePath -Credential $script:serviceCredential @installServiceParams
         Assert-HasPermissionsOnServiceExecutable $script:serviceAcct $script:servicePath
-        Revoke-CPermission -Path $script:servicePath -Identity $script:serviceAcct
-        $currentPermissions = Get-CPermission -Identity $script:serviceAcct -Path $script:servicePath
+        Revoke-CPermission -Path $script:servicePath -Identity $script:serviceAcct -NoWarn
+        $currentPermissions = Get-CPermission -Identity $script:serviceAcct -Path $script:servicePath -NoWarn
         $currentPermissions | Should -BeNullOrEmpty
         Install-CService -Name $script:serviceName -Path $script:servicePath -Credential $script:serviceCredential
-        $currentPermissions = Get-CPermission -Identity $script:serviceAcct -Path $script:servicePath
+        $currentPermissions = Get-CPermission -Identity $script:serviceAcct -Path $script:servicePath -NoWarn
         Assert-HasPermissionsOnServiceExecutable $script:serviceAcct $script:servicePath
     }
 
@@ -677,7 +677,6 @@ Describe 'Install-CService' {
         $service.UserName | Should -Be $script:defaultServiceAccountName
         Install-CService -Name $script:serviceName -Path $script:servicePath -Credential $script:serviceCredential
         $service = Assert-ServiceInstalled
-        (Resolve-IdentityName $service.UserName -NoWarn) |
-            Should -Be (Resolve-IdentityName $script:serviceCredential.UserName -NoWarn)
+        (Resolve-IdentityName $service.UserName) | Should -Be (Resolve-IdentityName $script:serviceCredential.UserName)
     }
 }
