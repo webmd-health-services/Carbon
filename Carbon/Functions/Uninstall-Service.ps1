@@ -11,9 +11,6 @@ function Uninstall-CService
     Beginning in Carbon 2.7, if the service's process is still running after the service is stopped (some services don't behave nicely) and the service is only running one process, `Uninstall-CService` will kill the service's process. This helps prevent requiring a reboot. If you want to give the service time to
 
     .LINK
-    Carbon_Service
-
-    .LINK
     Install-CService
 
     .EXAMPLE

@@ -4,18 +4,15 @@ function Set-CEnvironmentVariable
     <#
     .SYNOPSIS
     Creates or sets an environment variable.
-    
+
     .DESCRIPTION
     Uses the .NET [Environment class](http://msdn.microsoft.com/en-us/library/z8te35sa) to create or set an environment variable in the Process, User, or Machine scopes.
-    
+
     Changes to environment variables in the User and Machine scope are not picked up by running processes.  Any running processes that use this environment variable should be restarted.
 
     Beginning with Carbon 2.3.0, you can set an environment variable for a specific user by specifying the `-ForUser` switch and passing the user's credentials with the `-Credential` parameter. This will run a PowerShell process as that user in order to set the environment variable.
 
     Normally, you have to restart your PowerShell session/process to see the variable in the `env:` drive. Use the `-Force` switch to also add the variable to the `env:` drive. This functionality was added in Carbon 2.3.0.
-    
-    .LINK
-    Carbon_EnvironmentVariable
 
     .LINK
     Remove-CEnvironmentVariable
@@ -25,14 +22,14 @@ function Set-CEnvironmentVariable
 
     .EXAMPLE
     Set-CEnvironmentVariable -Name 'MyEnvironmentVariable' -Value 'Value1' -ForProcess
-    
+
     Creates the `MyEnvironmentVariable` with an initial value of `Value1` in the process scope, i.e. the variable is only accessible in the current process.
-    
+
     .EXAMPLE
     Set-CEnvironmentVariable -Name 'MyEnvironmentVariable' -Value 'Value1' -ForComputer
-    
+
     Creates the `MyEnvironmentVariable` with an initial value of `Value1` in the machine scope, i.e. the variable is accessible in all newly launched processes.
-    
+
     .EXAMPLE
     Set-CEnvironmentVariable -Name 'SomeUsersEnvironmentVariable' -Value 'SomeValue' -ForUser -Credential $userCreds
 
@@ -43,11 +40,11 @@ function Set-CEnvironmentVariable
         [Parameter(Mandatory=$true)]
         # The name of environment variable to add/set.
         [string]$Name,
-        
+
         [Parameter(Mandatory=$true)]
         # The environment variable's value.
         [string]$Value,
-        
+
         [Parameter(ParameterSetName='ForCurrentUser')]
         # Sets the environment variable for the current computer.
         [Switch]$ForComputer,
@@ -56,7 +53,7 @@ function Set-CEnvironmentVariable
         [Parameter(Mandatory=$true,ParameterSetName='ForSpecificUser')]
         # Sets the environment variable for the current user.
         [Switch]$ForUser,
-        
+
         [Parameter(ParameterSetName='ForCurrentUser')]
         # Sets the environment variable for the current process.
         [Switch]$ForProcess,
@@ -108,13 +105,13 @@ function Set-CEnvironmentVariable
             {
                 [EnvironmentVariableTarget]::User
             }
-            
+
             if( $Force -or $ForProcess )
             {
                 [EnvironmentVariableTarget]::Process
             }
-        } | 
+        } |
         Where-Object { $PSCmdlet.ShouldProcess( "$_-level environment variable '$Name'", "set") } |
-        ForEach-Object { [Environment]::SetEnvironmentVariable( $Name, $Value, $_ ) }    
+        ForEach-Object { [Environment]::SetEnvironmentVariable( $Name, $Value, $_ ) }
 }
 

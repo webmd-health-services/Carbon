@@ -441,7 +441,7 @@ function Test-TargetResource
         return $false
     }
 
-    return Test-CDscTargetResource -TargetResource $resource -DesiredResource $PSBoundParameters -Target ('Firewall rule ''{0}''' -f $Name)
+    return Test-CDscTargetResource -TargetResource $resource -DesiredResource $PSBoundParameters -Target ('Firewall rule ''{0}''' -f $Name) -NoWarn
 }
 
 

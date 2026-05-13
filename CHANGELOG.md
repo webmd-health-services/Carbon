@@ -46,7 +46,24 @@
   `Get-SmbShare`, `Get-CFileSharePermission` with `Get-SmbShareAccess` from PowerShell's built-in SmbShare module.
 * `Install-CDirectory`, `New-CTempDirectory` (and its `New-TempDir` alias), and `Uninstall-CDirectory`. The functions
   (not the alias) moved to the `Carbon.FileSystem` module, where they were also updated to support PowerShell 7.
-
+* All DSC resources and DSC-related functions, which have migrated to new Carbon.DSC module.
+  * `Carbon_EnvironmentVariable`
+  * `Carbon_FirewallRule`
+  * `Carbon_Group`
+  * `Carbon_IniFile`
+  * `Carbon_Permission`
+  * `Carbon_Privilege`
+  * `Carbon_ScheduledTask`
+  * `Carbon_Service`
+  * `Clear-CDscLocalResourceCache`
+  * `Clear-CMofAuthoringMetadata`
+  * `Copy-CDscResource`
+  * `Get-CDscError`
+  * `Get-CDscWinEven`
+  * `Initialize-CLcm`
+  * `Start-CDscPullConfiguration`
+  * `Test-CDscTargetResource`
+  * `Write-CDscError`
 
 ## 2.15.1
 
