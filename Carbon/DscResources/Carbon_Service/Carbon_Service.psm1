@@ -121,7 +121,7 @@ function Get-TargetResource
                     ArgumentList = $null;
                 }
 
-    if( Test-CService -Name $Name )
+    if( Test-CService -Name $Name -NoWarn )
     {
         $service = Get-Service -Name $Name
 
@@ -326,13 +326,13 @@ function Set-TargetResource
 
     Set-StrictMode -Version 'Latest'
 
-    $serviceExists = Test-CService -Name $Name
+    $serviceExists = Test-CService -Name $Name -NoWarn
     if( $Ensure -eq 'Absent' )
     {
         if( $serviceExists )
         {
             Write-Verbose ('Removing service ''{0}''' -f $Name)
-            Uninstall-CService -Name $Name
+            Uninstall-CService -Name $Name -NoWarn
         }
         return
     }
@@ -359,7 +359,7 @@ function Set-TargetResource
         Write-Verbose ('Installing service ''{0}''' -f $Name)
     }
 
-    Install-CService @PSBoundParameters
+    Install-CService @PSBoundParameters -NoWarn
 }
 
 

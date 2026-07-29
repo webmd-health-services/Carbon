@@ -20,10 +20,6 @@
         "Tags":  [ "Firewall" ]
     },
     {
-        "Name":  "Assert-CService",
-        "Tags":  [ "Service" ]
-    },
-    {
         "Name":  "Clear-CTrustedHost",
         "Tags":  [ "PowerShell", "Trusted Host" ]
     },
@@ -236,22 +232,6 @@
         "Tags":  [ "Registry" ]
     },
     {
-        "Name":  "Get-CServiceAcl",
-        "Tags":  [ "Service" ]
-    },
-    {
-        "Name":  "Get-CServiceConfiguration",
-        "Tags":  [ "Service" ]
-    },
-    {
-        "Name":  "Get-CServicePermission",
-        "Tags":  [ "Service", "Security", "ACL" ]
-    },
-    {
-        "Name":  "Get-CServiceSecurityDescriptor",
-        "Tags":  [ "Service" ]
-    },
-    {
         "Name":  "Get-CSslCertificateBinding",
         "Tags":  [ "Certificates" ]
     },
@@ -282,14 +262,6 @@
     {
         "Name": "Grant-CHttpUrlPermission",
         "Tags": [ "Security", "HTTP", "WCF", "netsh", "ACL" ]
-    },
-    {
-        "Name":  "Grant-CServiceControlPermission",
-        "Tags":  [ "Service", "Security", "ACL" ]
-    },
-    {
-        "Name":  "Grant-CServicePermission",
-        "Tags":  [ "Service", "Security", "ACL" ]
     },
     {
         "Name":  "Install-CCertificate",
@@ -346,10 +318,6 @@
     {
         "Name":  "Install-CRegistryKey",
         "Tags":  [ "Registry" ]
-    },
-    {
-        "Name":  "Install-CService",
-        "Tags":  [ "Service" ]
     },
     {
         "Name":  "Install-CUser",
@@ -464,20 +432,12 @@
         "Tags":  [ "Path" ]
     },
     {
-        "Name":  "Restart-CRemoteService",
-        "Tags":  [ "Service" ]
-    },
-    {
         "Name":  "Revoke-CComPermission",
         "Tags":  [ "COM", "Security" ]
     },
     {
         "Name": "Revoke-CHttpUrlPermission",
         "Tags": [ "Security", "HTTP", "WCF", "netsh", "ACL" ]
-    },
-    {
-        "Name":  "Revoke-CServicePermission",
-        "Tags":  [ "Service", "Security", "ACL" ]
     },
     {
         "Name":  "Set-CDotNetAppSetting",
@@ -522,10 +482,6 @@
     {
         "Name":  "Set-CRegistryKeyValue",
         "Tags":  [ "Registry" ]
-    },
-    {
-        "Name":  "Set-CServiceAcl",
-        "Tags":  [ "Service", "ACL", "Security" ]
     },
     {
         "Name":  "Set-CSslCertificateBinding",
@@ -624,10 +580,6 @@
         "Tags":  [ "Registry" ]
     },
     {
-        "Name":  "Test-CService",
-        "Tags":  [ "Service" ]
-    },
-    {
         "Name":  "Test-CSslCertificateBinding",
         "Tags":  [ "Certificates", "SSL", "IIS" ]
     },
@@ -686,10 +638,6 @@
     {
         "Name":  "Uninstall-CPerformanceCounterCategory",
         "Tags":  [ "Performance Counters" ]
-    },
-    {
-        "Name":  "Uninstall-CService",
-        "Tags":  [ "Service" ]
     },
     {
         "Name":  "Uninstall-CUser",
