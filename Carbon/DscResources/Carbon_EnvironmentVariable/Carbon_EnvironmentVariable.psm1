@@ -118,7 +118,7 @@ function Set-TargetResource
     if( $Ensure -eq 'Present' )
     {
         Write-Verbose ('{0}: setting' -f $Name)
-        Set-CEnvironmentVariable -Name $Name -Value $Value -ForComputer -ForProcess
+        Set-CEnvironmentVariable -Name $Name -Value $Value -ForComputer -ForProcess -NoWarn
     }
 
 }

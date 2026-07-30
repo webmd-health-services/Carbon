@@ -64,6 +64,8 @@
   * `Start-CDscPullConfiguration`
   * `Test-CDscTargetResource`
   * `Write-CDscError`
+* `Remove-CEnvironmentVariable`, moved to Carbon.Environment module.
+* `Set-CEnvironmentVariable`, moved to Carbon.Environment module.
 
 ## 2.15.1
 

@@ -412,10 +412,6 @@
         "Tags":  [ ".NET" ]
     },
     {
-        "Name":  "Remove-CEnvironmentVariable",
-        "Tags":  [ "Computer", "Environment" ]
-    },
-    {
         "Name":  "Remove-CGroupMember",
         "Tags":  [ "Groups", "Identity", "Principal" ]
     },
@@ -490,10 +486,6 @@
     {
         "Name":  "Set-CDotNetConnectionString",
         "Tags":  [ ".NET" ]
-    },
-    {
-        "Name":  "Set-CEnvironmentVariable",
-        "Tags":  [ "Computer" ]
     },
     {
         "Name":  "Set-CHostsEntry",
