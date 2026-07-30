@@ -11,6 +11,13 @@ BeforeDiscovery {
 Describe 'Carbon' {
     Context 'Obsolete Functions' {
         $testCases = @(
+            # Carbon.Windows.Installer
+            @{
+                Name = 'Get-CProgramInstallInfo'
+                MigratedTo = 'Carbon.Windows.Installer'
+                MigratedAs = 'Get-CInstalledProgram'
+            },
+            # Carbon.Windows.Service
             @{
                 Name = 'Assert-CService'
                 CmdArgs = @{ Name = 'W32Time' }
@@ -85,6 +92,11 @@ Describe 'Carbon' {
 
         Context '<Name>' -ForEach $testCases {
             It 'can hide its obsolete warning' {
+                if (-not (Test-Path -Path 'variable:CmdArgs'))
+                {
+                    $CmdArgs = @{}
+                }
+
                 $warnings = @('should be replaced')
                 try
                 {
@@ -98,6 +110,11 @@ Describe 'Carbon' {
             }
 
             It 'warns it is obsolete' {
+                if (-not (Test-Path -Path 'variable:CmdArgs'))
+                {
+                    $CmdArgs = @{}
+                }
+
                 $warnings = @()
                 try
                 {
@@ -112,6 +129,11 @@ Describe 'Carbon' {
                 if ($MigratedTo)
                 {
                     $warnings | Should -BeLIke "*MOVED to new ""${MigratedTo}"" module*"
+                }
+
+                if ((Test-Path -Path 'variable:MigratedAs'))
+                {
+                    $warnings | Should -BeLike "*${MigratedAs}*"
                 }
             }
         }

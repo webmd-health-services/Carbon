@@ -2591,7 +2591,9 @@ function Get-CProgramInstallInfo
     [OutputType([Carbon.Computer.ProgramInstallInfo])]
     param(
         # The name of a specific program to get. Wildcards supported.
-        [string] $Name
+        [string] $Name,
+
+        [switch] $NoWarn
     )
 
     Set-StrictMode -Version 'Latest'
@@ -2599,7 +2601,8 @@ function Get-CProgramInstallInfo
 
     Write-CRefactoredCommandWarning -CommandName $MyInvocation.MyCommand.Name `
                                     -ModuleName 'Carbon.Windows.Installer' `
-                                    -NewCommandName 'Get-CInstalledProgram'
+                                    -NewCommandName 'Get-CInstalledProgram' `
+                                    -NoWarn:$NoWarn
 
     if( -not (Test-Path -Path 'hku:\') )
     {
