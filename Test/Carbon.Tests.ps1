@@ -1,5 +1,6 @@
 
 #Requires -Version 5.1
+#Requires -RunAsAdministrator
 Set-StrictMode -Version 'Latest'
 
 BeforeDiscovery {
@@ -11,6 +12,57 @@ BeforeDiscovery {
 Describe 'Carbon' {
     Context 'Obsolete Functions' {
         $testCases = @(
+            # Carbon.Accounts
+            @{
+                Name = 'Add-CGroupMember'
+                CmdArgs = @{ Name = 'IDoNotExist' ; Member = 'IDoNotExist' }
+                MigratedTo = 'Carbon.Accounts'
+                MigratedAs = 'Install-CLocalGroupMember'
+            },
+            @{
+                Name = 'Assert-CAdminPrivilege'
+                MigratedTo = 'Carbon.Accounts'
+                MigratedAs = 'Assert-CRunAsElevated'
+            },
+            @{
+                Name = 'Get-CGroup'
+                MigratedTo = 'Carbon.Accounts'
+                MigratedAs = 'Get-CLocalGroup'
+            },
+            @{
+                Name = 'Install-CGroup'
+                CmdArgs = @{ Name = ('!' * 800) }
+                MigratedTo = 'Carbon.Accounts'
+            },
+            @{
+                Name = 'Remove-CGroupMember'
+                CmdArgs = @{ Name = 'IDoNotExist' ; Member = 'IDoNotExist' }
+                MigratedTo = 'Carbon.Accounts'
+                MigratedAs = 'Uninstall-CLocalGroupMember'
+            },
+            @{
+                Name = 'Test-CAdminPrivilege'
+                MigratedTo = 'Carbon.Accounts'
+                MigratedAs = 'Test-CRunAsElevated'
+            },
+            @{
+                Name = 'Test-CGroup'
+                CmdArgs = @{ Name = 'IDoNotExist' }
+                MigratedTo = 'Carbon.Accounts'
+                MigratedAs = 'Test-CLocalGroup'
+            },
+            @{
+                Name = 'Test-CGroupMember'
+                CmdArgs = @{ GroupName = 'IDoNotExist' ; Member = 'IDoNotExist' }
+                MigratedTo = 'Carbon.Accounts'
+                MigratedAs = 'Test-CLocalGroupMember'
+            },
+            @{
+                Name = 'Uninstall-CGroup'
+                CmdArgs = @{ Name = 'IDoNotExist' }
+                MigratedTo = 'Carbon.Accounts'
+                MigratedAs = 'Uninstall-CLocalGroup'
+            },
             # Carbon.Windows.Installer
             @{
                 Name = 'Get-CProgramInstallInfo'
@@ -100,11 +152,11 @@ Describe 'Carbon' {
                 $warnings = @('should be replaced')
                 try
                 {
-                    & $Name @CmdArgs -WarningVariable 'warnings' -Nowarn -ErrorAction SilentlyContinue
+                    & $Name @CmdArgs -WarningVariable 'warnings' -NoWarn -ErrorAction SilentlyContinue
                 }
                 catch
                 {
-
+                    Write-Warning $_ -Verbose
                 }
                 $warnings | Should -BeNullOrEmpty
             }
@@ -122,6 +174,7 @@ Describe 'Carbon' {
                 }
                 catch
                 {
+                    Write-Warning $_ -Verbose
                 }
 
                 $warnings | Should -Not -BeNullOrEmpty

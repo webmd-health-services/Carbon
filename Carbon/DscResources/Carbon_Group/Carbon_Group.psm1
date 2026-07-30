@@ -27,7 +27,7 @@ function Get-TargetResource
     Set-StrictMode -Version 'Latest'
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
-    $group = Get-CGroup -Name $Name -ErrorAction Ignore
+    $group = Get-CGroup -Name $Name -NoWarn -ErrorAction Ignore
 
     $ensure = 'Absent'
     $description = $null
@@ -129,11 +129,11 @@ function Set-TargetResource
 
     if( $Ensure -eq 'Absent' )
     {
-        Uninstall-CGroup -Name $Name
+        Uninstall-CGroup -Name $Name -NoWarn
         return
     }
 
-    $group = Install-CGroup -Name $Name -Description $Description -Member $Members -PassThru
+    $group = Install-CGroup -Name $Name -Description $Description -Member $Members -PassThru -NoWarn
     if( -not $group )
     {
         return
