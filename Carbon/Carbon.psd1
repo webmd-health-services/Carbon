@@ -353,7 +353,7 @@ All functions are idempotent: when run multiple times with the same arguments, y
             # A URL to the main website for this project.
             ProjectUri = 'http://get-carbon.org/'
 
-            Prerelease = 'rc1'
+            Prerelease = ''
 
             # ReleaseNotes of this module
             ReleaseNotes = 'https://github.com/webmd-health-services/Carbon/blob/main/CHANGELOG.md'

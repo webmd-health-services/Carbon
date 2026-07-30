@@ -24,46 +24,6 @@
         "Tags":  [ "Service" ]
     },
     {
-        "Name":  "Carbon_EnvironmentVariable",
-        "Tags": [ "DSC", "DSC Resources", "Computer", "Environment" ]
-    },
-    {
-        "Name":  "Carbon_FirewallRule",
-        "Tags": [ "DSC", "DSC Resources", "Firewall", "Networking" ]
-    },
-    {
-        "Name":  "Carbon_Group",
-        "Tags": [ "DSC", "DSC Resources", "Groups", "Identity", "Principal" ]
-    },
-    {
-        "Name":  "Carbon_IniFile",
-        "Tags": [ "DSC", "DSC Resources", "INI", "Text" ]
-    },
-    {
-        "Name":  "Carbon_Permission",
-        "Tags": [ "DSC", "DSC Resources", "Security", "File System", "NTFS", "Registry", "Certificates", "ACL" ]
-    },
-    {
-        "Name":  "Carbon_Privilege",
-        "Tags": [ "DSC", "DSC Resources", "Security", "Privileges", "Users", "Groups", "Identity", "Principal" ]
-    },
-    {
-        "Name":  "Carbon_ScheduledTask",
-        "Tags": [ "DSC", "DSC Resources", "Scheduled Tasks" ]
-    },
-    {
-        "Name":  "Carbon_Service",
-        "Tags": [ "DSC", "DSC Resources", "Service" ]
-    },
-    {
-        "Name":  "Clear-CDscLocalResourceCache",
-        "Tags":  [ "DSC" ]
-    },
-    {
-        "Name":  "Clear-CMofAuthoringMetadata",
-        "Tags":  [ "DSC" ]
-    },
-    {
         "Name":  "Clear-CTrustedHost",
         "Tags":  [ "PowerShell", "Trusted Host" ]
     },
@@ -102,10 +62,6 @@
     {
         "Name":  "Convert-CXmlFile",
         "Tags":  [ "Xml", "Text" ]
-    },
-    {
-        "Name":  "Copy-CDscResource",
-        "Tags":  [ "DSC" ]
     },
     {
         "Name":  "Disable-CFirewallStatefulFtp",
@@ -178,14 +134,6 @@
     {
         "Name":  "Get-CComSecurityDescriptor",
         "Tags":  [ "COM", "Security", "ACL" ]
-    },
-    {
-        "Name":  "Get-CDscError",
-        "Tags":  [ "DSC" ]
-    },
-    {
-        "Name":  "Get-CDscWinEvent",
-        "Tags":  [ "DSC" ]
     },
     {
         "Name":  "Get-CFileShare",
@@ -342,10 +290,6 @@
     {
         "Name":  "Grant-CServicePermission",
         "Tags":  [ "Service", "Security", "ACL" ]
-    },
-    {
-        "Name":  "Initialize-CLcm",
-        "Tags":  [ "DSC" ]
     },
     {
         "Name":  "Install-CCertificate",
@@ -604,20 +548,12 @@
         "Tags":  [ "INI", "Text" ]
     },
     {
-        "Name":  "Start-CDscPullConfiguration",
-        "Tags":  [ "DSC" ]
-    },
-    {
         "Name":  "Test-CAdminPrivilege",
         "Tags":  [ "Security" ]
     },
     {
         "Name":  "Test-CDotNet",
         "Tags":  [ ".NET" ]
-    },
-    {
-        "Name":  "Test-CDscTargetResource",
-        "Tags":  [ "DSC" ]
     },
     {
         "Name":  "Test-CFileShare",
@@ -778,10 +714,6 @@
     {
         "Name":  "Unprotect-CString",
         "Tags":  [ "Cryptography", "Security", "Encryption" ]
-    },
-    {
-        "Name":  "Write-CDscError",
-        "Tags":  [ "DSC" ]
     },
     {
         "Name":  "Write-CFile",

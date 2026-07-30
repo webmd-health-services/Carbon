@@ -202,7 +202,7 @@ Add-CTypeData -Type Diagnostics.Process `
 Write-Timing ('Dot-sourcing functions.')
 $functionRoot = Join-Path -Path $PSScriptRoot -ChildPath 'Functions' -Resolve
 
-Get-ChildItem -Path (Join-Path -Path $functionRoot -ChildPath '*') -Filter '*.ps1' -Exclude '*Iis*','Initialize-Lcm.ps1' |
+Get-ChildItem -Path (Join-Path -Path $functionRoot -ChildPath '*') -Filter '*.ps1' -Exclude '*Iis*' |
     ForEach-Object {
         . $_.FullName
     }

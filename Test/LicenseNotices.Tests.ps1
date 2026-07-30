@@ -32,7 +32,7 @@ Describe 'Carbon' {
                         Get-ChildItem -Recurse -File
 
                     $functionsRoot = Join-Path -Path $carbonRoot -ChildPath 'Functions\*'
-                    Get-ChildItem -Path $functionsRoot -Include 'Initialize-Lcm.ps1','Use-CallerPreference.ps1'
+                    Get-ChildItem -Path $functionsRoot -Include 'Use-CallerPreference.ps1'
 
                     Get-ChildItem -Path $functionsRoot -Include '*-Iis*.ps1' |
                         Select-Object -First 1

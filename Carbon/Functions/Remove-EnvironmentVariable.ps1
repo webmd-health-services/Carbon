@@ -23,9 +23,6 @@ function Remove-CEnvironmentVariable
     versions, you could only remove from one scope.
 
     .LINK
-    Carbon_EnvironmentVariable
-
-    .LINK
     Set-CEnvironmentVariable
 
     .LINK

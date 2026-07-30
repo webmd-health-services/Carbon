@@ -32,9 +32,6 @@ function Install-CService
     The ability to provide service arguments/parameters via the `ArgumentList` parameter was added in Carbon 2.0.
 
     .LINK
-    Carbon_Service
-
-    .LINK
     New-CCredential
 
     .LINK

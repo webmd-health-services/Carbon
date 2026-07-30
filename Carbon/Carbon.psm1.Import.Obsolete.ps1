@@ -1,4 +1,187 @@
 
+
+function Clear-CDscLocalResourceCache
+{
+    <#
+    .SYNOPSIS
+    Clears the local DSC resource cache.
+
+    .DESCRIPTION
+    DSC caches resources. This is painful when developing, since you're constantly updating your resources. This function allows you to clear the DSC resource cache on the local computer. What this function really does, is kill the DSC host process running DSC.
+
+    `Clear-CDscLocalResourceCache` is new in Carbon 2.0.
+
+    .EXAMPLE
+    Clear-CDscLocalResourceCache
+    #>
+    [CmdletBinding()]
+    param(
+        [switch] $NoWarn
+    )
+
+    Set-StrictMode -Version 'Latest'
+
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
+    if (-not $NoWarn)
+    {
+        Write-CRefactoredCommandWarning -CommandName $MyInvocation.MyCommand.Name -ModuleName 'Carbon.DSC'
+    }
+
+    Get-CCimInstance -Class 'msft_providers' |
+        Where-Object {$_.provider -like 'dsccore'} |
+        Select-Object -ExpandProperty HostProcessIdentifier |
+        ForEach-Object { Get-Process -ID $_ } |
+        Stop-Process -Force
+}
+
+
+function Clear-CMofAuthoringMetadata
+{
+    <#
+    .SYNOPSIS
+    Removes authoring metadata from .mof files.
+
+    .DESCRIPTION
+    Everytime PowerShell generates a .mof file, it includes authoring metadata: who created the file, on what computer, and at what date/time. This means a .mof file's checksum will change everytime a new one is generated, even if the configuration in that file didn't change. This makes it hard to know when a configuration in a .mof file has truly changed, and makes its change history noisy. This function strips/removes all authoring metadata from a .mof file.
+
+    When given a path to a file, all authoring metadata is removed from that file. When given the path to a directory, removes authoring metadata from all `*.mof` files in that directory.
+
+    Essentially, these blocks from each .mof file:
+
+        /*
+        @TargetNode='********'
+        @GeneratedBy=********
+        @GenerationDate=08/19/2014 13:29:15
+        @GenerationHost=********
+        */
+
+        /* ...snip... */
+
+
+        instance of OMI_ConfigurationDocument
+        {
+         Version="1.0.0";
+         Author="********;
+         GenerationDate="08/19/2014 13:29:15";
+         GenerationHost="********";
+        };
+
+    Would be changed to:
+
+        /*
+        @TargetNode='JSWEB01L-WHS-08'
+        */
+
+        /* ...snip... */
+
+        instance of OMI_ConfigurationDocument
+        {
+         Version="1.0.0";
+        };
+
+
+    `Clear-CMofAuthoringMetadata` is new in Carbon 2.0.
+
+    .EXAMPLE
+    Clear-CMofAuthoringMetadata -Path 'C:\Projects\DSC\localhost.mof'
+
+    Demonstrates how to clear the authoring data from a specific file.
+
+    .EXAMPLE
+    Clear-CMofAuthoringMetadata -Path 'C:\Projects\DSC'
+
+    Demonstrates how to clear the authoring data from all .mof files in a specific directory.
+    #>
+    [CmdletBinding(SupportsShouldProcess=$true)]
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]
+        # The path to the file/directory whose .mof files should be operated on.
+        $Path,
+
+        [switch] $NoWarn
+    )
+
+    Set-StrictMode -Version 'Latest'
+
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
+    if (-not $NoWarn)
+    {
+        Write-CRefactoredCommandWarning -CommandName $MyInvocation.MyCommand.Name -ModuleName 'Carbon.DSC'
+    }
+
+    $tempDir = New-CTempDirectory -Prefix ('Carbon+ClearMofAuthoringMetadata+') -WhatIf:$false
+
+    foreach( $item in (Get-ChildItem -Path $Path -Filter '*.mof') )
+    {
+        Write-Verbose ('Clearing authoring metadata from ''{0}''.' -f $item.FullName)
+        $tempItem = Copy-Item -Path $item.FullName -Destination $tempDir -PassThru -WhatIf:$false
+        $inComment = $false
+        $inAuthoringComment = $false
+        $inConfigBlock = $false;
+        Get-Content -Path $tempItem |
+            Where-Object {
+                $line = $_
+
+                if( $line -like '/`**' )
+                {
+                    if( $line -like '*`*/' )
+                    {
+                        return $true
+                    }
+                    $inComment = $true
+                    return $true
+                }
+
+                if( $inComment )
+                {
+                    if( $line -like '*`*/' )
+                    {
+                        $inComment = $false
+                        $inAuthoringComment = $false
+                        return $true
+                    }
+
+                    if( $line -like '@TargetNode=*' )
+                    {
+                        $inAuthoringComment = $true
+                        return $true
+                    }
+
+                    if( $inAuthoringComment )
+                    {
+                        return ( $line -notmatch '^@(GeneratedBy|Generation(Host|Date))' )
+                    }
+
+                    return $true
+                }
+
+                if( $line -eq 'instance of OMI_ConfigurationDocument' )
+                {
+                    $inConfigBlock = $true
+                    return $true
+                }
+
+                if( $inConfigBlock )
+                {
+                    if( $line -like '};' )
+                    {
+                        $inConfigBlock = $false;
+                        return $true
+                    }
+
+                    return ($line -notmatch '(Author|(Generation(Date|Host)))=');
+                }
+
+                return $true
+
+            } |
+            Set-Content -Path $item.FullName
+    }
+}
+
 function Complete-CJob
 {
     <#
@@ -794,6 +977,134 @@ function ConvertTo-ProviderAccessControlRights
 }
 
 
+function Copy-CDscResource
+{
+    <#
+    .SYNOPSIS
+    Copies DSC resources.
+
+    .DESCRIPTION
+    This function copies a DSC resource or a directory of DSC resources to a DSC pull server share/website. All files under `$Path` are copied.
+
+    DSC requires all files have a checksum file (e.g. `localhost.mof.checksum`), which this function generates for you (in a temporary location).
+
+    Only new files, or files whose checksums have changed, are copied. You can force all files to be copied with the `Force` switch.
+
+    `Copy-CDscResource` is new in Carbon 2.0.
+
+    .EXAMPLE
+    Copy-CDscResource -Path 'localhost.mof' -Destination '\\dscserver\DscResources'
+
+    Demonstrates how to copy a single resource to a resources SMB share. `localhost.mof` will only be copied if its checksum is different than what is in `\\dscserver\DscResources`.
+
+    .EXAMPLE
+    Copy-CDscResource -Path 'C:\Projects\DscResources' -Destination '\\dscserver\DscResources'
+
+    Demonstrates how to copy a directory of resources. Only files in the directory are copied. Every file in the source must have a `.checksum` file. Only files whose checksums are different between source and destination will be copied.
+
+    .EXAMPLE
+    Copy-CDscResource -Path 'C:\Projects\DscResources' -Destination '\\dscserver\DscResources' -Recurse
+
+    Demonstrates how to recursively copy files.
+
+    .EXAMPLE
+    Copy-CDscResource -Path 'C:\Projects\DscResources' -Destination '\\dscserver\DscResources' -Force
+
+    Demonstrates how to copy all files, even if their `.checksum` files are the  same.
+
+    .EXAMPLE
+    Copy-CDscResource -Path 'C:\Projects\DscResources' -Destination '\\dscserver\DscResources' -PassThru
+
+    Demonstrates how to get `System.IO.FileInfo` objects for all resources copied to the destination. If all files are up-to-date, nothing is copied, and no objects are returned.
+    #>
+    [CmdletBinding()]
+    [OutputType([IO.FileInfo])]
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]
+        # The path to the DSC resource to copy. If a directory is given, all files in that directory are copied. Wildcards supported.
+        $Path,
+
+        [Parameter(Mandatory=$true)]
+        [string]
+        # The directory where the resources should be copied.
+        $Destination,
+
+        [Switch]
+        # Recursively copy files from the source directory.
+        $Recurse,
+
+        [Switch]
+        # Returns `IO.FileInfo` objects for each item copied to `Destination`.
+        $PassThru,
+
+        [Switch]
+        # Copy resources, even if they are the same on the destination server.
+        $Force,
+
+        [switch] $NoWarn
+    )
+
+    Set-StrictMode -Version 'Latest'
+
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
+    if (-not $NoWarn)
+    {
+        Write-CRefactoredCommandWarning -CommandName $MyInvocation.MyCommand.Name -ModuleName 'Carbon.DSC'
+    }
+
+    $tempDir = New-CTempDirectory -Prefix 'Carbon+Copy-CDscResource+'
+
+    try
+    {
+        foreach( $item in (Get-ChildItem -Path $Path -Exclude '*.checksum') )
+        {
+            $destinationPath = Join-Path -Path $Destination -ChildPath $item.Name
+            if( $item.PSIsContainer )
+            {
+                if( $Recurse )
+                {
+                    if( -not (Test-Path -Path $destinationPath -PathType Container) )
+                    {
+                        New-Item -Path $destinationPath -ItemType 'Directory' | Out-Null
+                    }
+                    Copy-CDscResource -Path $item.FullName -Destination $destinationPath -Recurse -Force:$Force -PassThru:$PassThru
+                }
+                continue
+            }
+
+            $sourceChecksumPath = '{0}.checksum' -f $item.Name
+            $sourceChecksumPath = Join-Path -Path $tempDir -ChildPath $sourceChecksumPath
+            $sourceChecksum = Get-FileHash -Path $item.FullName | Select-Object -ExpandProperty 'Hash'
+            # hash files can't have any newline characters, so we can't use Set-Content
+            [IO.File]::WriteAllText($sourceChecksumPath, $sourceChecksum)
+
+            $destinationChecksum = ''
+
+            $destinationChecksumPath = '{0}.checksum' -f $destinationPath
+            if( (Test-Path -Path $destinationChecksumPath -PathType Leaf) )
+            {
+                $destinationChecksum = Get-Content -TotalCount 1 -Path $destinationChecksumPath
+            }
+
+            if( $Force -or -not (Test-Path -Path $destinationPath -PathType Leaf) -or ($sourceChecksum -ne $destinationChecksum) )
+            {
+                Copy-Item -Path $item -Destination $Destination -PassThru:$PassThru
+                Copy-Item -Path $sourceChecksumPath -Destination $Destination -PassThru:$PassThru
+            }
+            else
+            {
+                Write-Verbose ('File ''{0}'' already up-to-date.' -f $destinationPath)
+            }
+        }
+    }
+    finally
+    {
+        Remove-Item -Path $tempDir -Recurse -Force -ErrorAction Ignore
+    }
+}
+
 
 # Leave these here so that when Get-CCertificate moves to its own module, these go with it.
 Add-CTypeData -Type Security.Cryptography.X509Certificates.X509Certificate2 `
@@ -1075,6 +1386,316 @@ function Get-CCertificate
     }
 }
 
+
+
+function Get-CDscError
+{
+    <#
+    .SYNOPSIS
+    Gets DSC errors from a computer's event log.
+
+    .DESCRIPTION
+    The DSC Local Configuration Manager (LCM) writes any errors it encounters to the `Microsoft-Windows-DSC/Operational` event log, in addition to some error messages that report that encountered an error. This function gets just the important error log messages, skipping the superflous ones that won't help you track down where the problem is.
+
+    By default, errors on the local computer are returned. You can return errors from another computer via the `ComputerName` parameter.
+
+    You can filter the results further with the `StartTime` and `EndTime` parameters. `StartTime` will return entries after the given time. `EndTime` will return entries before the given time.
+
+    If no items are found, nothing is returned.
+
+    It can take several seconds for event log entries to get written to the log, so you might not get results back. If you want to wait for entries to come back, use the `-Wait` switch. You can control how long to wait (in seconds) via the `WaitTimeoutSeconds` parameter. The default is 10 seconds.
+
+    When getting errors on a remote computer, that computer must have Remote Event Log Management firewall rules enabled. To enable them, run
+
+        Get-CFirewallRule -Name '*Remove Event Log Management*' |
+            ForEach-Object { netsh advfirewall firewall set rule name= $_.Name new enable=yes }
+
+    `Get-CDscError` is new in Carbon 2.0.
+
+    .OUTPUTS
+    System.Diagnostics.Eventing.Reader.EventLogRecord
+
+    .LINK
+    Write-CDscError
+
+    .EXAMPLE
+    Get-CDscWinEvent
+
+    Demonstrates how to get all the DSC errors from the local computer.
+
+    .EXAMPLE
+    Get-CDscError -ComputerName 10.1.2.3
+
+    Demonstrates how to get all the DSC errors from a specific computer.
+
+    .EXAMPLE
+    Get-CDscError -StartTime '8/1/2014 0:00'
+
+    Demonstrates how to get errors that occurred *after* a given time.
+
+    .EXAMPLE
+    Get-CDscError -EndTime '8/30/2014 11:59:59'
+
+    Demonstrates how to get errors that occurred *before* a given time.
+
+    .EXAMPLE
+    Get-CDscError -StartTime '8/1/2014 2:58 PM' -Wait -WaitTimeoutSeconds 5
+
+    Demonstrates how to wait for entries that match the specified criteria to appear in the event log. It can take several seconds between the time a log entry is written to when you can read it.
+    #>
+    [CmdletBinding(DefaultParameterSetName='NoWait')]
+    [OutputType([Diagnostics.Eventing.Reader.EventLogRecord])]
+    param(
+        [string[]]
+        # The computer whose DSC errors to return.
+        $ComputerName,
+
+        [DateTime]
+        # Get errors that occurred after this date/time.
+        $StartTime,
+
+        [DateTime]
+        # Get errors that occurred before this date/time.
+        $EndTime,
+
+        [Parameter(Mandatory=$true,ParameterSetName='Wait')]
+        [Switch]
+        # Wait for entries to appear, as it can sometimes take several seconds for entries to get written to the event log.
+        $Wait,
+
+        [Parameter(ParameterSetName='Wait')]
+        [uint32]
+        # The time to wait for entries to appear before giving up. Default is 10 seconds. There is no way to wait an infinite amount of time.
+        $WaitTimeoutSeconds = 10,
+
+        [switch] $NoWarn
+    )
+
+    Set-StrictMode -Version 'Latest'
+
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
+    if (-not $NoWarn)
+    {
+        Write-CRefactoredCommandWarning -CommandName $MyInvocation.MyCommand.Name -ModuleName 'Carbon.DSC'
+    }
+
+    Get-CDscWinEvent @PSBoundParameters -ID 4103 -Level ([Diagnostics.Eventing.Reader.StandardEventLevel]::Error)
+}
+
+
+function Get-CDscWinEvent
+{
+    <#
+    .SYNOPSIS
+    Gets events from the DSC Windows event log.
+
+    .DESCRIPTION
+    Thie `Get-CDscWinEvent` function gets log entries from the `Microsoft-Windows-DSC/Operational` event log, where the Local Configuration Manager writes events. By default, entries on the local computer are returned. You can return entries from another computer via the `ComputerName` parameter.
+
+    You can filter the results further with the `ID`, `Level`, `StartTime` and `EndTime` parameters. `ID` will get events with the specific ID. `Level` will get events at the specified level. `StartTime` will return entries after the given time. `EndTime` will return entries before the given time.
+
+    If no items are found, nothing is returned.
+
+    It can take several seconds for event log entries to get written to the log, so you might not get results back. If you want to wait for entries to come back, use the `-Wait` switch. You can control how long to wait (in seconds) via the `WaitTimeoutSeconds` parameter. The default is 10 seconds.
+
+    When getting errors on a remote computer, that computer must have Remote Event Log Management firewall rules enabled. To enable them, run
+
+        Get-CFirewallRule -Name '*Remove Event Log Management*' |
+            ForEach-Object { netsh advfirewall firewall set rule name= $_.Name new enable=yes }
+
+    `Get-CDscWinEvent` is new in Carbon 2.0.
+
+    .OUTPUTS
+    System.Diagnostics.Eventing.Reader.EventLogRecord
+
+    .LINK
+    Write-CDscError
+
+    .LINK
+    Get-CDscWinEvent
+
+    .EXAMPLE
+    Get-CDscWinEvent
+
+    Demonstrates how to get all the DSC errors from the local computer.
+
+    .EXAMPLE
+    Get-CDscWinEvent -ComputerName 10.1.2.3
+
+    Demonstrates how to get all the DSC errors from a specific computer.
+
+    .EXAMPLE
+    Get-CDscWinEvent -StartTime '8/1/2014 0:00'
+
+    Demonstrates how to get errors that occurred *after* a given time.
+
+    .EXAMPLE
+    Get-CDscWinEvent -EndTime '8/30/2014 11:59:59'
+
+    Demonstrates how to get errors that occurred *before* a given time.
+
+    .EXAMPLE
+    Get-CDscWinEvent -StartTime '8/1/2014 2:58 PM' -Wait -WaitTimeoutSeconds 5
+
+    Demonstrates how to wait for entries that match the specified criteria to appear in the event log. It can take several seconds between the time a log entry is written to when you can read it.
+
+    .EXAMPLE
+    Get-CDscWinEvent -Level ([Diagnostics.Eventing.Reader.StandardEventLevel]::Error)
+
+    Demonstrates how to get events at a specific level, in this case, only error level entries will be returned.
+
+    .EXAMPLE
+    Get-CDscWinEvent -ID 4103
+
+    Demonstrates how to get events with a specific ID, in this case `4103`.
+    #>
+    [CmdletBinding(DefaultParameterSetName='NoWait')]
+    [OutputType([Diagnostics.Eventing.Reader.EventLogRecord])]
+    param(
+        [string[]]
+        # The computer whose DSC errors to return.
+        $ComputerName,
+
+        [int]
+        # The event ID. Only events with this ID will be returned.
+        $ID,
+
+        [int]
+        # The level. Only events at this level will be returned.
+        $Level,
+
+        [DateTime]
+        # Get errors that occurred after this date/time.
+        $StartTime,
+
+        [DateTime]
+        # Get errors that occurred before this date/time.
+        $EndTime,
+
+        [Parameter(Mandatory=$true,ParameterSetName='Wait')]
+        [Switch]
+        # Wait for entries to appear, as it can sometimes take several seconds for entries to get written to the event log.
+        $Wait,
+
+        [Parameter(ParameterSetName='Wait')]
+        [uint32]
+        # The time to wait for entries to appear before giving up. Default is 10 seconds. There is no way to wait an infinite amount of time.
+        $WaitTimeoutSeconds = 10,
+
+        [switch] $NoWarn
+    )
+
+    Set-StrictMode -Version 'Latest'
+
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
+    if (-not $NoWarn)
+    {
+        Write-CRefactoredCommandWarning -CommandName $MyInvocation.MyCommand.Name -ModuleName 'Carbon.DSC'
+    }
+
+    $filter = @{
+                    LogName = 'Microsoft-Windows-DSC/Operational';
+              }
+
+    if( $ID )
+    {
+        $filter['ID'] = $ID
+    }
+
+    if( $Level )
+    {
+        $filter['Level'] = $Level
+    }
+
+    if( $StartTime )
+    {
+        $filter['StartTime'] = $StartTime
+    }
+
+    if( $EndTime )
+    {
+        $filter['EndTime'] = $EndTime
+    }
+
+    function Invoke-GetWinEvent
+    {
+        param(
+            [string]
+            $ComputerName
+        )
+
+        Set-StrictMode -Version 'Latest'
+
+        $startedAt = Get-Date
+        $computerNameParam = @{ }
+        if( $ComputerName )
+        {
+            $computerNameParam['ComputerName'] = $ComputerName
+        }
+
+        try
+        {
+            $events = @()
+            while( -not ($events = Get-WinEvent @computerNameParam -FilterHashtable $filter -ErrorAction Ignore -Verbose:$false) )
+            {
+                if( $PSCmdlet.ParameterSetName -ne 'Wait' )
+                {
+                    break
+                }
+
+                Start-Sleep -Milliseconds 100
+
+                [timespan]$duration = (Get-Date) - $startedAt
+                if( $duration.TotalSeconds -gt $WaitTimeoutSeconds )
+                {
+                    break
+                }
+            }
+            return $events
+        }
+        catch
+        {
+            if( $_.Exception.Message -eq 'The RPC server is unavailable' )
+            {
+                Write-Error -Message ("Unable to connect to '{0}': it looks like Remote Event Log Management isn't running or is blocked by the computer's firewall. To allow this traffic through the firewall, run the following command on '{0}':`n`tGet-FirewallRule -Name '*Remove Event Log Management*' |`n`t`t ForEach-Object {{ netsh advfirewall firewall set rule name= `$_.Name new enable=yes }}." -f $ComputerName)
+            }
+            else
+            {
+                Write-Error -Exception $_.Exception
+            }
+        }
+    }
+
+    if( $ComputerName )
+    {
+        $ComputerName = $ComputerName |
+                            Where-Object {
+                                # Get just the computers that exist.
+                                if( (Test-Connection -ComputerName $ComputerName -Quiet) )
+                                {
+                                    return $true
+                                }
+                                else
+                                {
+                                    Write-Error -Message ('Computer ''{0}'' not found.' -f $ComputerName)
+                                    return $false
+                                }
+                            }
+
+        if( -not $ComputerName )
+        {
+            return
+        }
+
+        $ComputerName | ForEach-Object { Invoke-GetWinEvent -ComputerName $_ }
+    }
+    else
+    {
+        Invoke-GetWinEvent
+    }
+}
 
 function Get-CFileShare
 {
@@ -1553,9 +2174,6 @@ function Get-CPermission
     System.Security.AccessControl.AccessRule.
 
     .LINK
-    Carbon_Permission
-
-    .LINK
     Disable-CAclInheritance
 
     .LINK
@@ -1810,9 +2428,6 @@ function Get-CPrivilege
 
     .OUTPUTS
     System.String
-
-    .LINK
-    Carbon_Privilege
 
     .LINK
     Grant-CPrivilege
@@ -2914,9 +3529,6 @@ function Grant-CPermission
     System.Security.AccessControl.AccessRule. When setting permissions on a file or directory, a `System.Security.AccessControl.FileSystemAccessRule` is returned. When setting permissions on a registry key, a `System.Security.AccessControl.RegistryAccessRule` returned. When setting permissions on a private key, a `System.Security.AccessControl.CryptoKeyAccessRule` object is returned.
 
     .LINK
-    Carbon_Permission
-
-    .LINK
     ConvertTo-CContainerInheritanceFlags
 
     .LINK
@@ -3438,7 +4050,6 @@ function Grant-CPrivilege
         }
     }
 }
-
 
 
 function Install-CCertificate
@@ -6899,9 +7510,6 @@ function Revoke-CPermission
     If the identity doesn't have permission, nothing happens, not even errors written out.
 
     .LINK
-    Carbon_Permission
-
-    .LINK
     Disable-CAclInheritance
 
     .LINK
@@ -7123,9 +7731,6 @@ function Revoke-CPrivilege
      * SeTrustedCredManAccessPrivilege
      * SeUndockPrivilege
      * SeUnsolicitedInputPrivilege
-
-    .LINK
-    Carbon_Privilege
 
     .LINK
     Get-CPrivilege
@@ -7561,6 +8166,173 @@ function Set-CSslCertificateBinding
 }
 
 
+
+function Start-CDscPullConfiguration
+{
+    <#
+    .SYNOPSIS
+    Performs a configuration check on a computer that is using DSC's Pull refresh mode.
+
+    .DESCRIPTION
+    The most frequently a computer's LCM will download new configuration is every 15 minutes; the most frequently it will apply it is every 30 minutes. This function contacts a computer's LCM and tells it to apply and download its configuration immediately.
+
+    If a computer's LCM isn't configured to pull its configuration, an error is written, and nothing happens.
+
+    If a configuration check fails, the errors are retrieved from the computer's event log and written out as errors. The `Remote Event Log Management` firewall rules must be enabled on the computer for this to work. If they aren't, you'll see an error explaining this. The `Get-CDscError` help topic shows how to enable these firewall rules.
+
+    Sometimes, the LCM does a really crappy job of updating to the latest version of a module. `Start-CDscPullConfiguration` will delete modules on the target computers. Specify the names of the modules to delete with the `ModuleName` parameter. Make sure you only delete modules that will get installed by the LCM. Only modules installed in the `$env:ProgramFiles\WindowsPowerShell\Modules` directory are removed.
+
+    `Start-CDscPullConfiguration` is new in Carbon 2.0.
+
+    .LINK
+    Get-CDscError
+
+    .LINK
+    Initialize-CLcm
+
+    .LINK
+    Get-CDscWinEvent
+
+    .EXAMPLE
+    Start-CDscPullConfiguration -ComputerName '10.1.2.3','10.4.5.6'
+
+    Demonstrates how to immedately download and apply a computer from its pull server.
+
+    .EXAMPLE
+    Start-CDscPullConfiguration -ComputerName '10.1.2.3' -Credential (Get-Credential domain\username)
+
+    Demonstrates how to use custom credentials to contact the remote server.
+
+    .EXAMPLE
+    Start-CDscPullConfiguration -CimSession $session
+
+    Demonstrates how to use one or more CIM sessions to invoke a configuration check.
+
+    .EXAMPLE
+    Start-CDscPullConfiguration -ComputerName 'example.com' -ModuleName 'Carbon'
+
+    Demonstrates how to delete modules on the target computers, because sometimes the LCM does a really crappy job of it.
+    #>
+    [CmdletBinding(DefaultParameterSetName='WithCredentials')]
+    param(
+        [Parameter(Mandatory=$true,ParameterSetName='WithCredentials')]
+        [string[]]
+        # The credential to use when connecting to the target computer.
+        $ComputerName,
+
+        [Parameter(ParameterSetName='WithCredentials')]
+        [PSCredential]
+        # The credentials to use when connecting to the computers.
+        $Credential,
+
+        [Parameter(ParameterSetName='WithCimSession')]
+        [Microsoft.Management.Infrastructure.CimSession[]]
+        $CimSession,
+
+        [string[]]
+        # Any modules that should be removed from the target computer's PSModulePath (since the LCM does a *really* crappy job of removing them).
+        $ModuleName,
+
+        [switch] $NoWarn
+    )
+
+    Set-StrictMode -Version 'Latest'
+
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
+    if (-not $NoWarn)
+    {
+        Write-CRefactoredCommandWarning -CommandName $MyInvocation.MyCommand.Name -ModuleName 'Carbon.DSC'
+    }
+
+    $credentialParam = @{ }
+    if( $PSCmdlet.ParameterSetName -eq 'WithCredentials' )
+    {
+        if( $Credential )
+        {
+            $credentialParam.Credential = $Credential
+        }
+
+        $CimSession = New-CimSession -ComputerName $ComputerName @credentialParam
+        if( -not $CimSession )
+        {
+            return
+        }
+    }
+
+    $CimSession = Get-DscLocalConfigurationManager -CimSession $CimSession |
+                    ForEach-Object {
+                        if( $_.RefreshMode -ne 'Pull' )
+                        {
+                            Write-Error ('The Local Configuration Manager on ''{0}'' is not in Pull mode (current RefreshMode is ''{1}'').' -f $_.PSComputerName,$_.RefreshMode)
+                            return
+                        }
+
+                        foreach( $session in $CimSession )
+                        {
+                            if( $session.ComputerName -eq $_.PSComputerName )
+                            {
+                                return $session
+                            }
+                        }
+                    }
+
+    if( -not $CimSession )
+    {
+        return
+    }
+
+    # Get rid of any _tmp directories you might find out there.
+    Invoke-Command -ComputerName $CimSession.ComputerName @credentialParam -ScriptBlock {
+        $modulesRoot = Join-Path -Path $env:ProgramFiles -ChildPath 'WindowsPowerShell\Modules'
+        Get-ChildItem -Path $modulesRoot -Filter '*_tmp' -Directory |
+            Remove-Item -Recurse
+    }
+
+    if( $ModuleName )
+    {
+        # Now, get rid of any modules we know will need to get updated
+        Invoke-Command -ComputerName $CimSession.ComputerName @credentialParam -ScriptBlock {
+            param(
+                [string[]]
+                $ModuleName
+            )
+
+            $dscProcessID = Get-CCimInstance -Class 'msft_providers' |
+                                Where-Object {$_.provider -like 'dsccore'} |
+                                Select-Object -ExpandProperty HostProcessIdentifier
+            Stop-Process -Id $dscProcessID -Force
+
+            $modulesRoot = Join-Path -Path $env:ProgramFiles -ChildPath 'WindowsPowerShell\Modules'
+            Get-ChildItem -Path $modulesRoot -Directory |
+                Where-Object { $ModuleName -contains $_.Name } |
+                Remove-Item -Recurse
+
+        } -ArgumentList (,$ModuleName)
+    }
+
+    # Getting the date/time on the remote computers so we can get errors later.
+    $win32OS = Get-CimInstance -CimSession $CimSession -ClassName 'Win32_OperatingSystem'
+
+    $results = Invoke-CimMethod -CimSession $CimSession `
+                                -Namespace 'root/microsoft/windows/desiredstateconfiguration' `
+                                -Class 'MSFT_DscLocalConfigurationManager' `
+                                -MethodName 'PerformRequiredConfigurationChecks' `
+                                -Arguments @{ 'Flags' = [uint32]1 }
+
+    $successfulComputers = $results | Where-Object { $_ -and $_.ReturnValue -eq 0 } | Select-Object -ExpandProperty 'PSComputerName'
+
+    $CimSession |
+        Where-Object { $successfulComputers -notcontains $_.ComputerName } |
+        ForEach-Object {
+            $session = $_
+            $startedAt= $win32OS | Where-Object { $_.PSComputerName -eq $session.ComputerName } | Select-Object -ExpandProperty 'LocalDateTime'
+            Get-CDscError -ComputerName $session.ComputerName -StartTime $startedAt -Wait -NoWarn
+        } |
+        Write-CDscError -NoWarn
+}
+
+
 function Test-COSIs32Bit
 {
     <#
@@ -7640,6 +8412,102 @@ function Test-COSIs64Bit
 }
 
 
+
+
+function Test-CDscTargetResource
+{
+    <#
+    .SYNOPSIS
+    Tests that all the properties on a resource and object are the same.
+
+    .DESCRIPTION
+    DSC expects a resource's `Test-TargetResource` function to return `$false` if an object needs to be updated. Usually, you compare the current state of a resource with the desired state, and return `$false` if anything doesn't match.
+
+    This function takes in a hashtable of the current resource's state (what's returned by `Get-TargetResource`) and compares it to the desired state (the values passed to `Test-TargetResource`). If any property in the target resource is different than the desired resource, a list of stale resources is written to the verbose stream and `$false` is returned.
+
+    Here's a quick example:
+
+        return Test-TargetResource -TargetResource (Get-TargetResource -Name 'fubar') -DesiredResource $PSBoundParameters -Target ('my resource ''fubar''')
+
+    If you want to exclude properties from the evaluation, just remove them from the hashtable returned by `Get-TargetResource`:
+
+        $resource = Get-TargetResource -Name 'fubar'
+        $resource.Remove( 'PropertyThatDoesNotMatter' )
+        return Test-TargetResource -TargetResource $resource -DesiredResource $PSBoundParameters -Target ('my resource ''fubar''')
+
+    `Test-CDscTargetResource` is new in Carbon 2.0.
+
+    .OUTPUTS
+    System.Boolean.
+
+    .EXAMPLE
+    Test-TargetResource -TargetResource (Get-TargetResource -Name 'fubar') -DesiredResource $PSBoundParameters -Target ('my resource ''fubar''')
+
+    Demonstrates how to test that all the properties on a DSC resource are the same was what's desired.
+    #>
+    [CmdletBinding()]
+    [OutputType([bool])]
+    param(
+        [Parameter(Mandatory=$true)]
+        [hashtable]
+        # The current state of the resource.
+        $TargetResource,
+
+        [Parameter(Mandatory=$true)]
+        [hashtable]
+        # The desired state of the resource. Properties not in this hashtable are skipped. Usually you'll pass `PSBoundParameters` from your `Test-TargetResource` function.
+        $DesiredResource,
+
+        [Parameter(Mandatory=$true)]
+        [string]
+        # The a description of the target object being tested. Output in verbose messages.
+        $Target,
+
+        [switch] $NoWarn
+    )
+
+    Set-StrictMode -Version 'Latest'
+
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
+    if (-not $NoWarn)
+    {
+        Write-CRefactoredCommandWarning -CommandName $MyInvocation.MyCommand.Name -ModuleName 'Carbon.DSC'
+    }
+
+    $notEqualProperties = $TargetResource.Keys |
+                            Where-Object { $_ -ne 'Ensure' } |
+                            Where-Object { $DesiredResource.ContainsKey( $_ ) } |
+                            Where-Object {
+                                $desiredObj = $DesiredResource[$_]
+                                $targetObj = $TargetResource[$_]
+
+                                if( $desiredobj -eq $null -or $targetObj -eq $null )
+                                {
+                                    return ($desiredObj -ne $targetObj)
+                                }
+
+                                if( -not $desiredObj.GetType().IsArray -or -not $targetObj.GetType().IsArray )
+                                {
+                                    return ($desiredObj -ne $targetObj)
+                                }
+
+                                if( $desiredObj.Length -ne $targetObj.Length )
+                                {
+                                    return $true
+                                }
+
+                                $desiredObj | Where-Object { $targetObj -notcontains $_ }
+                            }
+
+    if( $notEqualProperties )
+    {
+        Write-Verbose ('{0} has stale properties: ''{1}''' -f $Target,($notEqualProperties -join ''','''))
+        return $false
+    }
+
+    return $true
+}
 
 function Test-CCryptoKeyAvailable
 {
@@ -7790,9 +8658,6 @@ function Test-CPermission
 
     .OUTPUTS
     System.Boolean.
-
-    .LINK
-    Carbon_Permission
 
     .LINK
     ConvertTo-CContainerInheritanceFlags
@@ -8084,9 +8949,6 @@ function Test-CPrivilege
 
     .DESCRIPTION
     Returns `true` if an identity has a privilege.  `False` otherwise.
-
-    .LINK
-    Carbon_Privilege
 
     .LINK
     Get-CPrivilege
@@ -9294,5 +10156,70 @@ Failed to decrypt string using certificate "{0}" ({1}). This can happen when:
     finally
     {
         [Array]::Clear( $decryptedBytes, 0, $decryptedBytes.Length )
+    }
+}
+
+
+function Write-CDscError
+{
+    <#
+    .SYNOPSIS
+    Writes DSC errors out as errors.
+
+    .DESCRIPTION
+    The Local Configuration Manager (LCM) applies configuration in a separate process space as a background service which writes its errors to the `Microsoft-Windows-DSC/Operational` event log. This function is intended to be used with `Get-CDscError`, and will write errors returned by that function as PowerShell errors.
+
+    `Write-CDscError` is new in Carbon 2.0.
+
+    .OUTPUTS
+    System.Diagnostics.Eventing.Reader.EventLogRecord
+
+    .LINK
+    Get-CDscError
+
+    .EXAMPLE
+    Get-CDscError | Write-CDscError
+
+    Demonstrates how `Write-CDscError` is intended to be used. `Get-CDscError` gets the appropriate event objects that `Write-CDscError` writes out.
+    #>
+    [CmdletBinding()]
+    [OutputType([Diagnostics.Eventing.Reader.EventLogRecord])]
+    param(
+        [Parameter(Mandatory=$true,ValueFromPipeline=$true)]
+        [Diagnostics.Eventing.Reader.EventLogRecord[]]
+        # The error record to write out as an error.
+        $EventLogRecord,
+
+        [Switch]
+        # Return the event log record after writing an error.
+        $PassThru,
+
+        [switch] $NoWarn
+    )
+
+    process
+    {
+        Set-StrictMode -Version 'Latest'
+
+        Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
+        if (-not $NoWarn)
+        {
+            Write-CRefactoredCommandWarning -CommandName $MyInvocation.MyCommand.Name -ModuleName 'Carbon.DSC'
+        }
+
+        foreach( $record in $EventLogRecord )
+        {
+            [string[]]$property = $record.Properties | Select-Object -ExpandProperty Value
+
+            $message = $property[-1]
+
+            Write-Error -Message ('[{0}] [{1}] [{2}] {3}' -f $record.TimeCreated,$record.MachineName,($property[0..($property.Count - 2)] -join '] ['),$message)
+
+            if( $PassThru )
+            {
+                return $record
+            }
+        }
     }
 }

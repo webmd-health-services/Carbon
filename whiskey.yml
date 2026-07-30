@@ -57,7 +57,6 @@ Build:
     - Carbon\Carbon.psm1.Import.Post.ps1
     Exclude:
     - "*\\*-Iis*"
-    - "*\\Initialize-Lcm.ps1"
     - "*\\Use-CallerPreference.ps1"
     DestinationPath: Carbon\Carbon.psm1
     TextSeparator: "$(NewLine)$(NewLine)"
@@ -132,7 +131,6 @@ Tests:
     - Test\Import-Carbon.Tests.ps1
     - Test\LicenseNotices.Tests.ps1
     - Test\*.ps1xml.Tests.ps1
-    - Test\Website.Tests.ps1
     - Test\System.Diagnostics.Process.types.Tests.ps1
 - PowerShell:
     .OnlyDuring: Build
@@ -151,9 +149,7 @@ Tests:
     - Test\CarbonVersion.Tests.ps1
     - Test\chocolateyInstall.Tests.ps1
     - Test\chocolateyUninstall.Tests.ps1
-    - Test\Clear-MofAuthoringMetadata.Tests.ps1
     - Test\Compress-Item.Tests.ps1
-    - Test\Copy-DscResource.Tests.ps1
     - Test\Disable-AclInheritance.Tests.ps1
     - Test\Documentation.Tests.ps1
     - Test\Enable-AclInheritance.Tests.ps1
@@ -182,7 +178,6 @@ Tests:
     - Test\Test-Service.Tests.ps1
     - Test\Uninstall-Group.Tests.ps1
     - Test\Uninstall-Junction.Tests.ps1
-    - Test\Website.Tests.ps1
     - Test\Write-File.Tests.ps1
 - Pester:
     Configuration:
@@ -195,8 +190,6 @@ Tests:
         Run:
             Path: Test\*.Tests.ps1
             ExcludePath:
-            # DSC resource tests run in a different task.
-            - "*\\Carbon_*.Tests.ps1"
             # Pester 4 tests.
             - "*\\Assert-FirewallConfigurable.Tests.ps1"
             - "*\\Bin.Tests.ps1"
@@ -204,9 +197,7 @@ Tests:
             - "*\\CarbonVersion.Tests.ps1"
             - "*\\chocolateyInstall.Tests.ps1"
             - "*\\chocolateyUninstall.Tests.ps1"
-            - "*\\Clear-MofAuthoringMetadata.Tests.ps1"
             - "*\\Compress-Item.Tests.ps1"
-            - "*\\Copy-DscResource.Tests.ps1"
             - "*\\Disable-AclInheritance.Tests.ps1"
             - "*\\Documentation.Tests.ps1"
             - "*\\Enable-AclInheritance.Tests.ps1"
@@ -235,25 +226,9 @@ Tests:
             - "*\\Test-Service.Tests.ps1"
             - "*\\Uninstall-Group.Tests.ps1"
             - "*\\Uninstall-Junction.Tests.ps1"
-            - "*\\Website.Tests.ps1"
             - "*\\Write-File.Tests.ps1"
 - PowerShell: .\Invoke-CarbonBladeTest.ps1 -Recurse -Path .\Test -PassThru
   .WarningAction: SilentlyContinue
-  .OnlyDuring: Build
-- PowerShell: .\Start-CarbonTest.ps1
-  .OnlyDuring: Build
-# Run DSC tests *last* because they depend on a globally installed version of Carbon.
-- Pester:
-    Configuration:
-        TestResult:
-            Enabled: true
-            OutputPath: $(WHISKEY_OUTPUT_DIRECTORY)\pester5_dsc.xml
-            TestSuiteName: Carbon
-        Output:
-            Verbosity: detailed
-        Run:
-            Path: Test\Carbon_*.Tests.ps1
-- PowerShell: .\Complete-CarbonTest.ps1
   .OnlyDuring: Build
 - PowerShell: .\Format-TestResult.ps1 -OutputPath '$(WHISKEY_OUTPUT_DIRECTORY)'
   .OnlyBy: BuildServer

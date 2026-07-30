@@ -493,5 +493,5 @@ function Test-TargetResource
         }
     }
 
-    return Test-CDscTargetResource -TargetResource $resource -DesiredResource $PSBoundParameters -Target ('Service ''{0}''' -f $Name)
+    return Test-CDscTargetResource -TargetResource $resource -DesiredResource $PSBoundParameters -Target ('Service ''{0}''' -f $Name) -NoWarn
 }
