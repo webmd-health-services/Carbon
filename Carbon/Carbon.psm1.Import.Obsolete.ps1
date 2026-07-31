@@ -1,5 +1,54 @@
 
 
+function Assert-CService
+{
+    <#
+    .SYNOPSIS
+    Checks if a service exists, and writes an error if it doesn't.
+
+    .DESCRIPTION
+    Also returns `True` if the service exists, `False` if it doesn't.
+
+    .OUTPUTS
+    System.Boolean.
+
+    .LINK
+    Test-CService
+
+    .EXAMPLE
+    Assert-CService -Name 'Drivetrain'
+
+    Writes an error if the `Drivetrain` service doesn't exist.
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]
+        # The name of the service.
+        $Name,
+
+        [switch] $NoWarn
+    )
+
+    Set-StrictMode -Version 'Latest'
+
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
+    if (-not $NoWarn)
+    {
+        Write-CRefactoredCommandWarning -CommandName $MyInvocation.MyCommand.Name -ModuleName 'Carbon.Windows.Service'
+    }
+
+    if( -not (Test-CService $Name -NoWarn) )
+    {
+        Write-Error ('Service {0} not found.' -f $Name)
+        return $false
+    }
+
+    return $true
+}
+
+
 function Clear-CDscLocalResourceCache
 {
     <#
@@ -333,6 +382,41 @@ function Convert-CSecureStringToString
     return [Runtime.InteropServices.Marshal]::PtrToStringAuto($stringPtr)
 }
 
+function ConvertTo-CArgValue
+{
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory, ValueFromPipeline)]
+        [AllowNull()]
+        [AllowEmptyString()]
+        [String] $InputObject
+    )
+
+    process
+    {
+        Set-StrictMode -Version 'Latest'
+        Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
+        if (-not $InputObject)
+        {
+            # args.exe returns what you pass it. If it returns nothing, PowerShell isn't passing an empty string as
+            # an argument, so force it to by using double-quotes.
+            if (-not (& $script:argsExePath $InputObject | Measure-Object).Count)
+            {
+                return '""'
+            }
+
+            return $InputObject
+        }
+
+        if ($InputObject -eq (& $script:argsExePath $InputObject))
+        {
+            return $InputObject
+        }
+
+        return $InputObject -replace '"', '\"'
+    }
+}
 
 function ConvertTo-CBase64
 {
@@ -3238,7 +3322,421 @@ function Get-CScheduledTask
 
 }
 
+function Get-CServiceAcl
+{
+    <#
+    .SYNOPSIS
+    Gets the discretionary access control list (i.e. DACL) for a service.
 
+    .DESCRIPTION
+    You wanted it, you got it!  You probably want to use `Get-CServicePermission` instead.  If you want to chagne a service's permissions, use `Grant-CServicePermission` or `Revoke-ServicePermissions`.
+
+    .LINK
+    Get-CServicePermission
+
+    .LINK
+    Grant-CServicePermission
+
+    .LINK
+    Revoke-CServicePermission
+
+    .EXAMPLE
+    Get-CServiceAcl -Name Hyperdrive
+
+    Gets the `Hyperdrive` service's DACL.
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]
+        # The service whose DACL to return.
+        $Name,
+
+        [switch] $NoWarn
+    )
+
+    Set-StrictMode -Version 'Latest'
+
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
+    if (-not $NoWarn)
+    {
+        Write-CRefactoredCommandWarning -CommandName $MyInvocation.MyCommand.Name -ModuleName 'Carbon.Windows.Service'
+    }
+
+    $rawSD = Get-CServiceSecurityDescriptor -Name $Name -NoWarn
+    $rawDacl = $rawSD.DiscretionaryAcl
+    New-Object Security.AccessControl.DiscretionaryAcl $false,$false,$rawDacl
+}
+
+
+# This extended type data should move to the Carbon.Service module if/when it gets created.
+Add-CTypeData -Type ServiceProcess.ServiceController `
+              -MemberName 'GetServiceConfigProperty' `
+              -MemberType ScriptMethod `
+              -Value {
+                    param(
+                        [Parameter(Mandatory)]
+                        # The name of the property to retrieve.
+                        [String] $Name
+                    )
+
+                    Set-StrictMode -Version 'Latest'
+
+                    $svcName = $this.ServiceName
+                    $svcMachineName = $this.MachineName
+
+                    if( -not ($this | Get-Member -Name 'Configuration') )
+                    {
+                        $value = $null
+                        try
+                        {
+                            $value = New-Object 'Carbon.Service.ServiceInfo' $svcName,$svcMachineName
+                        }
+                        catch
+                        {
+                            $ex = $_.Exception
+                            while( $ex.InnerException )
+                            {
+                                $ex = $ex.InnerException
+                            }
+                            if( $Global:Error.Count -gt 0 )
+                            {
+                                $Global:Error.RemoveAt(0)
+                            }
+                            $msg = "Failed to load extended service information for service ""$($svcName)"" on " +
+                                   """$($svcMachineName)"": $($ex.Message)"
+                            Write-Error $msg
+                        }
+                        Add-Member -InputObject $this -MemberType NoteProperty -Name 'Configuration' -Value $value
+                    }
+
+                    if( -not $this.Configuration )
+                    {
+                        return
+                    }
+
+                    if( -not ($this.Configuration | Get-Member -Name $Name) )
+                    {
+                        return
+                    }
+
+                    return $this.Configuration.$Name
+                }
+
+$svcControllerPropertyNames = @(
+    'DelayedAutoStart',
+    'Description',
+    'ErrorControl',
+    'FailureProgram',
+    'FirstFailure',
+    'LoadOrderGroup',
+    'Path',
+    'RebootDelay',
+    'RebootDelayMinutes',
+    'RebootMessage',
+    'ResetPeriod',
+    'ResetPeriodDays',
+    'RestartDelay',
+    'RestartDelayMinutes',
+    'RunCommandDelay',
+    'RunCommandDelayMinutes',
+    'SecondFailure',
+    'StartType',
+    'TagID',
+    'ThirdFailure',
+    'UserName'
+)
+foreach( $propertyName in $svcControllerPropertyNames )
+{
+    Add-CTypeData -Type ServiceProcess.ServiceController `
+                  -MemberName $propertyName `
+                  -MemberType ScriptProperty `
+                  -Value ([scriptblock]::Create("`$this.GetServiceConfigProperty('$($propertyName)')"))
+}
+
+Add-CTypeData -Type ServiceProcess.ServiceController `
+              -MemberName 'StartMode' `
+              -MemberType ScriptProperty `
+              -Value {
+                    $startType = $this.GetServiceConfigProperty( 'StartType' )
+                    if( $startType -ne $null )
+                    {
+                        [ServiceProcess.ServiceStartMode][int]$startType
+                    }
+                }
+
+function Get-CServiceConfiguration
+{
+    <#
+    .SYNOPSIS
+    Gets a service's full configuration, e.g. username, path, failure actions, etc.
+
+    .DESCRIPTION
+    The .NET `ServiceController` object only returns basic information about a service. This function returns all the other service configuration as a `Carbon.Service.ServiceInfo` object, which has the following properties:
+
+    * `DelayedAutoStart`: A boolean value indicating if the service starts automically delayed. This property was added in Carbon 2.5.
+    * `Description`: The service's description.
+    * `ErrorControl`: A `Carbon.Service.ErrorControl` value that indicates the severity of the error when the service fails to start.
+    * `FailureProgram`: The program to run when the service fails.
+    * `FirstFailure`: A `Carbon.Service.FailureAction` value indicating what will happen after the service's first failure.
+    * `LoadOrderGroup`: The name of the load order group this service loads in.
+    * `Name`: The name of the service.
+    * `Path`: The path to the service executable (with arguments).
+    * `RebootDelay`: The number of milliseconds after boot to wait before the service starts.
+    * `RebootDelayMinutes`: `RebootDelay` expressed in minutes.
+    * `ResetPeriod`: How often, in seconds, to reset the service's failure count to 0.
+    * `ResetPeriodDays`: `ResetPeriod` expressed in number of days.
+    * `RestartDelay`: The number of milliseconds to wait before restarting the service after it fails.
+    * `RestartDelayMinutes`: `RestartDelay` expressed in minutes.
+    * `RunCommandDelay`: The number of milliseconds to wait after a service fails before running the failure program.
+    * `RunCommandDelayMinutes`: `RunCommandDelay` as expressed/converted in minutes.
+    * `SecondFailure`: A `Carbon.Service.FailureAction` value indicating what will happen after the service's second failure.
+    * `StartType`: A `Carbon.Service.StartType` value indicating how and when the service should be started.
+    * `TagID`: The service's tag ID. This is the order the service will start in its load group.
+    * `ThirdFailure`: A `Carbon.Service.FailureAction` value indicating what will happen after the service's third failure.
+    * `UserName`: The name of the identity the service runs as.
+
+    You can load a specific service using its name, or pipe in `ServiceController` objects.
+
+    In addition to this function, Carbon also adds this information as extended type data properties onto the `ServiceController` class. To see it,
+
+        Get-Service | Get-Member
+
+    The user running this function must have `QueryConfig`, `QueryStatus`, and `EnumerateDependents` permissions on the service. Use `Grant-CServicePermission` to grant these permissions.
+
+    This function is new in Carbon 1.8.
+
+    .LINK
+    Grant-CServicePermission
+
+    .EXAMPLE
+    Get-Service | Get-CServiceConfiguration
+
+    Demonstrates how you can pipe in a `ServiceController` object to load the service. This works for services on remote computers as well.
+
+    .EXAMPLE
+    Get-CServiceConfiguration -Name  'w3svc'
+
+    Demonstrates how you can get a specific service's configuration.
+
+    .EXAMPLE
+    Get-CServiceConfiguration -Name 'w3svc' -ComputerName 'enterprise'
+
+    Demonstrates how to get service configuration for a service on a remote computer.
+    #>
+    [CmdletBinding()]
+    [OutputType([Carbon.Service.ServiceInfo])]
+    param(
+        [Parameter(Mandatory=$true,ValueFromPipelineByPropertyName=$true,Position=0)]
+        [string]
+        # The name of the service.
+        $Name,
+
+        [Parameter(ValueFromPipelineByPropertyName=$true)]
+        [Alias('MachineName')]
+        [string]
+        # The name of the computer where the service lives.
+        $ComputerName,
+
+        [switch] $NoWarn
+    )
+
+    begin
+    {
+        Set-StrictMode -Version 'Latest'
+        Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
+        if (-not $NoWarn)
+        {
+            Write-CRefactoredCommandWarning -CommandName $MyInvocation.MyCommand.Name `
+                                            -ModuleName 'Carbon.Windows.Service'
+        }
+    }
+
+    process
+    {
+        $optionalParams = @{ }
+        if( $ComputerName )
+        {
+            # ComputerName parameter does not exists under PowerShell Core.
+            if( -not (Get-Command -Name 'Get-Service' -ParameterName 'ComputerName' -ErrorAction Ignore) )
+            {
+                $msg = "Unable to get service ""$($Name)"" on computer ""$($ComputerName)"": this version " +
+                       'of PowerShell doesn''t support services on remote computers.'
+                Write-Error $msg -ErrorAction $ErrorActionPreference
+                return
+            }
+            $optionalParams['ComputerName'] = $ComputerName
+        }
+
+        if( -not (Get-Service -Name $Name @optionalParams -ErrorAction $ErrorActionPreference) )
+        {
+            return
+        }
+
+        New-Object 'Carbon.Service.ServiceInfo' $Name,$ComputerName
+    }
+}
+
+
+function Get-CServicePermission
+{
+    <#
+    .SYNOPSIS
+    Gets the permissions for a service.
+
+    .DESCRIPTION
+    Uses the Win32 advapi32 API to query the permissions for a service.  Returns `Carbon.ServiceAccessRule` objects for each.  The two relavant properties on this object are
+
+     * IdentityReference - The identity of the permission.
+     * ServiceAccessRights - The permissions the user has.
+
+    .OUTPUTS
+    Carbon.Security.ServiceAccessRule.
+
+    .LINK
+    Grant-ServicePermissions
+
+    .LINK
+    Revoke-ServicePermissions
+
+    .EXAMPLE
+    Get-CServicePermission -Name 'Hyperdrive'
+
+    Gets the access rules for the `Hyperdrive` service.
+
+    .EXAMPLE
+    Get-CServicePermission -Name 'Hyperdrive' -Identity FALCON\HSolo
+
+    Gets just Han's permissions to control the `Hyperdrive` service.
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]
+        # The name of the service whose permissions to return.
+        $Name,
+
+        [string]
+        # The specific identity whose permissions to get.
+        $Identity,
+
+        [switch] $NoWarn
+    )
+
+    Set-StrictMode -Version 'Latest'
+
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
+    if (-not $NoWarn)
+    {
+        Write-CRefactoredCommandWarning -CommandName $MyInvocation.MyCommand.Name -ModuleName 'Carbon.Windows.Service'
+    }
+
+    $dacl = Get-CServiceAcl -Name $Name -NoWarn
+
+    $account = $null
+    if( $Identity )
+    {
+        $account = Resolve-CIdentity -Name $Identity -NoWarn
+        if( -not $account )
+        {
+            return
+        }
+    }
+
+    $dacl |
+        ForEach-Object {
+            $ace = $_
+
+            $aceSid = $ace.SecurityIdentifier;
+            if( $aceSid.IsValidTargetType([Security.Principal.NTAccount]) )
+            {
+                try
+                {
+                    $aceSid = $aceSid.Translate([Security.Principal.NTAccount])
+                }
+                catch [Security.Principal.IdentityNotMappedException]
+                {
+                    # user doesn't exist anymore.  So sad.
+                }
+            }
+
+            if ($ace.AceType -eq [Security.AccessControl.AceType]::AccessAllowed)
+            {
+                $ruleType = [Security.AccessControl.AccessControlType]::Allow
+            }
+            elseif ($ace.AceType -eq [Security.AccessControl.AceType]::AccessDenied)
+            {
+                $ruleType = [Security.AccessControl.AccessControlType]::Deny
+            }
+            else
+            {
+                Write-Error ("Unsupported aceType {0}." -f $ace.AceType)
+                return
+            }
+            New-Object Carbon.Security.ServiceAccessRule $aceSid,$ace.AccessMask,$ruleType
+        } |
+        Where-Object {
+            if( $account )
+            {
+                return ($_.IdentityReference.Value -eq $account.FullName)
+            }
+            return $_
+        }
+}
+
+Set-Alias -Name 'Get-ServicePermissions' -Value 'Get-CServicePermission'
+
+function Get-CServiceSecurityDescriptor
+{
+    <#
+    .SYNOPSIS
+    Gets the raw security descriptor for a service.
+
+    .DESCRIPTION
+    You probably don't want to mess with the raw security descriptor.  Try `Get-CServicePermission` instead.  Much more useful.
+
+    .OUTPUTS
+    System.Security.AccessControl.RawSecurityDescriptor.
+
+    .LINK
+    Get-CServicePermission
+
+    .LINK
+    Grant-ServicePermissions
+
+    .LINK
+    Revoke-ServicePermissions
+
+    .EXAMPLE
+    Get-CServiceSecurityDescriptor -Name 'Hyperdrive'
+
+    Gets the hyperdrive service's raw security descriptor.
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]
+        # The name of the service whose permissions to return.
+        $Name,
+
+        [switch] $NoWarn
+    )
+
+    Set-StrictMode -Version 'Latest'
+
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
+    if (-not $NoWarn)
+    {
+        Write-CRefactoredCommandWarning -CommandName $MyInvocation.MyCommand.Name -ModuleName 'Carbon.Windows.Service'
+    }
+
+    $sdBytes = [Carbon.Service.ServiceSecurity]::GetServiceSecurityDescriptor($Name)
+    New-Object Security.AccessControl.RawSecurityDescriptor $sdBytes,0
+}
 
 function Get-CSslCertificateBinding
 {
@@ -4049,6 +4547,204 @@ function Grant-CPrivilege
             Write-Error -Exception $ex
         }
     }
+}
+
+function Grant-CServiceControlPermission
+{
+    <#
+    .SYNOPSIS
+    Grants a user/group permission to start/stop (i.e. use PowerShell's `*-Service` cmdlets) a service.
+
+    .DESCRIPTION
+    By default, only Administrators are allowed to control a service. You may notice that when running the `Stop-Service`, `Start-Service`, or `Restart-Service` cmdlets as a non-Administrator, you get permissions errors. That's because you need to correct permissions.  This function grants just the permissions needed to use PowerShell's `Stop-Service`, `Start-Service`, and `Restart-Service` cmdlets to control a service.
+
+    .LINK
+    Get-CServicePermission
+
+    .LINK
+    Grant-CServicePermission
+
+    .LINK
+    Revoke-CServicePermission
+
+    .EXAMPLE
+    Grant-CServiceControlPermission -ServiceName CCService -Identity INITRODE\Builders
+
+    Grants the INITRODE\Builders group permission to control the CruiseControl.NET service.
+    #>
+    [CmdletBinding(SupportsShouldProcess=$true)]
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]
+        # The name of the service.
+        $ServiceName,
+
+        [Parameter(Mandatory=$true)]
+        [string]
+        # The user/group name being given access.
+        $Identity,
+
+        [switch] $NoWarn
+    )
+
+    Set-StrictMode -Version 'Latest'
+
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
+    if( -not $NoWarn )
+    {
+        Write-CRefactoredCommandWarning -CommandName $MyInvocation.MyCommand.Name -ModuleName 'Carbon.Windows.Service'
+    }
+
+    if( $pscmdlet.ShouldProcess( $ServiceName, "grant control service permissions to '$Identity'" ) )
+    {
+        Grant-CServicePermission -Name $ServiceName -Identity $Identity -QueryStatus -EnumerateDependents -Start -Stop -NoWarn
+    }
+}
+
+
+function Grant-CServicePermission
+{
+    <#
+    .SYNOPSIS
+    Grants permissions for an identity against a service.
+
+    .DESCRIPTION
+    By default, only Administators are allowed to manage a service.  Use this function to grant specific identities permissions to manage a specific service.
+
+    If you just want to grant a user the ability to start/stop/restart a service using PowerShell's `Start-Service`, `Stop-Service`, or `Restart-Service` cmdlets, use the `Grant-ServiceControlPermissions` function instead.
+
+    Any previous permissions are replaced.
+
+    .LINK
+    Get-CServicePermission
+
+    .LINK
+    Grant-ServiceControlPermissions
+
+    .EXAMPLE
+    Grant-CServicePermission -Identity FALCON\Chewbacca -Name Hyperdrive -QueryStatus -EnumerateDependents -Start -Stop
+
+    Grants Chewbacca the permissions to query, enumerate dependents, start, and stop the `Hyperdrive` service.  Coincedentally, these are the permissions that Chewbacca nees to run `Start-Service`, `Stop-Service`, `Restart-Service`, and `Get-Service` cmdlets against the `Hyperdrive` service.
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]
+        # The name of the service to grant permissions to.
+        $Name,
+
+        [Parameter(Mandatory=$true)]
+        [string]
+        # The identity to grant permissions for.
+        $Identity,
+
+        [Parameter(Mandatory=$true,ParameterSetName='FullControl')]
+        [Switch]
+        # Grant full control on the service
+        $FullControl,
+
+        [Parameter(ParameterSetName='PartialControl')]
+        [Switch]
+        # Grants permission to query the service's configuration.
+        $QueryConfig,
+
+        [Parameter(ParameterSetName='PartialControl')]
+        [Switch]
+        # Grants permission to change the service's permission.
+        $ChangeConfig,
+
+        [Parameter(ParameterSetName='PartialControl')]
+        [Switch]
+        # Grants permission to query the service's status.
+        $QueryStatus,
+
+        [Parameter(ParameterSetName='PartialControl')]
+        [Switch]
+        # Grants permissionto enumerate the service's dependent services.
+        $EnumerateDependents,
+
+        [Parameter(ParameterSetName='PartialControl')]
+        [Switch]
+        # Grants permission to start the service.
+        $Start,
+
+        [Parameter(ParameterSetName='PartialControl')]
+        [Switch]
+        # Grants permission to stop the service.
+        $Stop,
+
+        [Parameter(ParameterSetName='PartialControl')]
+        [Switch]
+        # Grants permission to pause/continue the service.
+        $PauseContinue,
+
+        [Parameter(ParameterSetName='PartialControl')]
+        [Switch]
+        # Grants permission to interrogate the service (i.e. ask it to report its status immediately).
+        $Interrogate,
+
+        [Parameter(ParameterSetName='PartialControl')]
+        [Switch]
+        # Grants permission to run the service's user-defined control.
+        $UserDefinedControl,
+
+        [Parameter(ParameterSetName='PartialControl')]
+        [Switch]
+        # Grants permission to delete the service.
+        $Delete,
+
+        [Parameter(ParameterSetName='PartialControl')]
+        [Switch]
+        # Grants permission to query the service's security descriptor.
+        $ReadControl,
+
+        [Parameter(ParameterSetName='PartialControl')]
+        [Switch]
+        # Grants permission to set the service's discretionary access list.
+        $WriteDac,
+
+        [Parameter(ParameterSetName='PartialControl')]
+        [Switch]
+        # Grants permission to modify the group and owner of a service.
+        $WriteOwner,
+
+        [switch] $NoWarn
+    )
+
+    Set-StrictMode -Version 'Latest'
+
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
+    if( -not $NoWarn )
+    {
+        Write-CRefactoredCommandWarning -CommandName $MyInvocation.MyCommand.Name -ModuleName 'Carbon.Windows.Service'
+    }
+
+    $account = Resolve-CIdentity -Name $Identity -NoWarn
+    if( -not $account )
+    {
+        return
+    }
+
+    if( -not (Assert-CService -Name $Name -NoWarn) )
+    {
+        return
+    }
+
+    $accessRights = [Carbon.Security.ServiceAccessRights]::FullControl
+    if( $pscmdlet.ParameterSetName -eq 'PartialControl' )
+    {
+        $accessRights = 0
+        [Enum]::GetValues( [Carbon.Security.ServiceAccessRights] ) |
+            Where-Object { $PSBoundParameters.ContainsKey( $_ ) } |
+            ForEach-Object { $accessRights = $accessRights -bor [Carbon.Security.ServiceAccessRights]::$_ }
+    }
+
+    $dacl = Get-CServiceAcl -Name $Name -NoWarn
+    $dacl.SetAccess( [Security.AccessControl.AccessControlType]::Allow, $account.Sid, $accessRights, 'None', 'None' )
+
+    Set-CServiceAcl -Name $Name -DACL $dacl -NoWarn
 }
 
 
@@ -5561,7 +6257,620 @@ function Install-CScheduledTask
     }
 }
 
+function Install-CService
+{
+    <#
+    .SYNOPSIS
+    Installs a Windows service.
 
+    .DESCRIPTION
+    `Install-CService` uses `sc.exe` to install a Windows service. If a service with the given name already exists, it
+    is stopped, its configuration is updated to match the parameters passed in, and then re-started. Settings whose
+    parameters are omitted are reset to their default values.
+
+    Beginning in Carbon 2.0, use the `PassThru` switch to return a `ServiceController` object for the new/updated
+    service.
+
+    By default, the service is installed to run as `NetworkService`. Use the `Credential` parameter to run as a
+    different account (if you don't have a `Credential` parameter, upgrade to Carbon 2.0 or use the `UserName` and
+    `Password` parameters). This user will be granted the logon as a service right. To run as a system account other
+    than `NetworkService`, provide just the account's name as the `UserName` parameter.
+
+    The minimum required information to install a service is its name and path.
+
+    [Managed service accounts and virtual accounts](http://technet.microsoft.com/en-us/library/dd548356.aspx) should be
+    supported (we don't know how to test, so can't be sure).  Simply omit the `-Password` parameter when providing a
+    custom account name with the `-Username` parameter.
+
+    `Manual` services are not started. `Automatic` services are started after installation. If an existing manual
+    service is running when configuration begins, it is re-started after re-configured. If a service is stopped when
+    configuration begins, it remains stopped when configuration ends. To start the service if it is stopped, use the
+    `-EnsureRunning` switch (which was added in version 2.5.0).
+
+    The ability to provide service arguments/parameters via the `ArgumentList` parameter was added in Carbon 2.0.
+
+    .LINK
+    New-CCredential
+
+    .LINK
+    Uninstall-CService
+
+    .LINK
+    http://technet.microsoft.com/en-us/library/dd548356.aspx
+
+    .EXAMPLE
+    Install-CService -Name DeathStar -Path C:\ALongTimeAgo\InAGalaxyFarFarAway\DeathStar.exe
+
+    Installs the Death Star service, which runs the service executable at
+    `C:\ALongTimeAgo\InAGalaxyFarFarAway\DeathStar.exe`.  The service runs as `NetworkService` and will start
+    automatically.
+
+    .EXAMPLE
+    Install-CService -Name DeathStar -Path C:\ALongTimeAgo\InAGalaxyFarFarAway\DeathStar.exe -StartupType Manual
+
+    Install the Death Star service to startup manually.  You certainly don't want the thing roaming the galaxy,
+    destroying thing willy-nilly, do you?
+
+    .EXAMPLE
+    Install-CService -Name DeathStar -Path C:\ALongTimeAgo\InAGalaxyFarFarAway\DeathStar.exe -StartupType Automatic -Delayed
+
+    Demonstrates how to set a service startup typemode to automatic delayed. Set the `StartupType` parameter to
+    `Automatic` and provide the `Delayed` switch. This behavior was added in Carbon 2.5.
+
+    .EXAMPLE
+    Install-CService -Name DeathStar -Path C:\ALongTimeAgo\InAGalaxyFarFarAway\DeathStar.exe -Credential $tarkinCredentials
+
+    Installs the Death Star service to run as Grand Moff Tarkin, who is given the log on as a service right.
+
+    .EXAMPLE
+    Install-CService -Name DeathStar -Path C:\ALongTimeAgo\InAGalaxyFarFarAway\DeathStar.exe -Username SYSTEM
+
+    Demonstrates how to install a service to run as a system account other than `NetworkService`. Installs the
+    DeathStart service to run as the local `System` account.
+
+    .EXAMPLE
+    Install-CService -Name DeathStar -Path C:\ALongTimeAgo\InAGalaxyFarFarAway\DeathStar.exe -OnFirstFailure RunCommand -RunCommandDelay 5000 -Command 'engage_hyperdrive.exe "Corruscant"' -OnSecondFailure Restart -RestartDelay 30000 -OnThirdFailure Reboot -RebootDelay 120000 -ResetFailureCount (60*60*24)
+
+    Demonstrates how to control the service's failure actions. On the first failure, Windows will run the
+    `engage-hyperdrive.exe "Corruscant"` command after 5 seconds (`5,000` milliseconds). On the second failure, Windows
+    will restart the service after 30 seconds (`30,000` milliseconds). On the third failure, Windows will reboot after
+    two minutes (`120,000` milliseconds). The failure count gets reset once a day (`60*60*24` seconds).
+
+    .EXAMPLE
+    Install-CService -Name DeathStar -Path C:\ALongTimeAgo\InAGalaxyFarFarAway\DeathStar.exe -EnsureRunning
+
+    Demonstrates how to ensure a service gets started after installation/configuration. Normally, `Install-CService`
+    leaves the service in whatever state the service was in. The `EnsureRunnnig` switch will attempt to start the
+    service even if it was stopped to begin with.
+    #>
+    [CmdletBinding(SupportsShouldProcess, DefaultParameterSetName='NetworkServiceAccount')]
+    [OutputType([ServiceProcess.ServiceController])]
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidUsingUserNameAndPassWordParams', '')]
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidUsingPlainTextForPassword', '')]
+    param(
+        # The name of the service.
+        [Parameter(Mandatory)]
+        [String] $Name,
+
+        # The path to the service.
+        [Parameter(Mandatory)]
+        [String] $Path,
+
+        # The arguments/startup parameters for the service. Added in Carbon 2.0.
+        [String[]] $ArgumentList,
+
+        # The startup type: automatic, manual, or disabled.  Default is automatic.
+        #
+        # To start the service as automatic delayed, use the `-Delayed` switch and set this parameter to `Automatic`.
+        # The ability to set a service's startup type to automatic delayed was added in Carbon 2.5.
+        [ServiceProcess.ServiceStartMode] $StartupType = [ServiceProcess.ServiceStartMode]::Automatic,
+
+        # When the startup type is automatic, further configure the service start type to be automatic delayed. This
+        # parameter is ignored unless `StartupType` is `Automatic`.
+        #
+        # This switch was added in Carbon 2.5.
+        [switch] $Delayed,
+
+        # What to do on the service's first failure.  Default is to take no action.
+        [Carbon.Service.FailureAction] $OnFirstFailure = [Carbon.Service.FailureAction]::TakeNoAction,
+
+        # What to do on the service's second failure. Default is to take no action.
+        [Carbon.Service.FailureAction] $OnSecondFailure = [Carbon.Service.FailureAction]::TakeNoAction,
+
+        # What to do on the service' third failure.  Default is to take no action.
+        [Carbon.Service.FailureAction] $OnThirdFailure = [Carbon.Service.FailureAction]::TakeNoAction,
+
+        # How many seconds after which the failure count is reset to 0.
+        [int] $ResetFailureCount = 0,
+
+        # How many milliseconds to wait before restarting the service.  Default is 60,0000, or 1 minute.
+        [int] $RestartDelay = 60000,
+
+        # How many milliseconds to wait before handling the second failure.  Default is 60,000 or 1 minute.
+        [int] $RebootDelay = 60000,
+
+        # What other services does this service depend on?
+        [Alias('Dependencies')]
+        [String[]] $Dependency,
+
+        # The command to run when a service fails, including path to the command and arguments.
+        [String] $Command,
+
+        # How many milliseconds to wait before running the failure command. Default is 0, or immediately.
+        [int] $RunCommandDelay = 0,
+
+        # The service's description. If you don't supply a value, the service's existing description is preserved.
+        #
+        # The `Description` parameter was added in Carbon 2.0.
+        [String] $Description,
+
+        # The service's display name. If you don't supply a value, the display name will set to Name.
+        #
+        # The `DisplayName` parameter was added in Carbon 2.0.
+        [String] $DisplayName,
+
+        [Parameter(ParameterSetName='CustomAccount', Mandatory)]
+        [string]
+        # The user the service should run as. Default is `NetworkService`.
+        $UserName,
+
+        [Parameter(ParameterSetName='CustomAccount', DontShow)]
+        [string]
+        # OBSOLETE. The `Password` parameter will be removed in a future major version of Carbon. Use the `Credential` parameter instead.
+        $Password,
+
+        [Parameter(ParameterSetName='CustomAccountWithCredential',Mandatory)]
+        [pscredential]
+        # The credential of the account the service should run as.
+        #
+        # The `Credential` parameter was added in Carbon 2.0.
+        $Credential,
+
+        [Switch]
+        # Update the service even if there are no changes.
+        $Force,
+
+        [Switch]
+        # Return a `System.ServiceProcess.ServiceController` object for the configured service.
+        $PassThru,
+
+        [Switch]
+        # Start the service after install/configuration if it is not running. This parameter was added in Carbon 2.5.0.
+        $EnsureRunning,
+
+        [switch] $NoWarn
+    )
+
+    Set-StrictMode -Version 'Latest'
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
+    if (-not $NoWarn)
+    {
+        Write-CRefactoredCommandWarning -CommandName $MyInvocation.MyCommand.Name -ModuleName 'Carbon.Windows.Service'
+    }
+
+    function ConvertTo-FailureActionArg($action)
+    {
+        if( $action -eq 'Reboot' )
+        {
+            return "reboot/{0}" -f $RebootDelay
+        }
+        elseif( $action -eq 'Restart' )
+        {
+            return "restart/{0}" -f $RestartDelay
+        }
+        elseif( $action -eq 'RunCommand' )
+        {
+            return 'run/{0}' -f $RunCommandDelay
+        }
+        elseif( $action -eq 'TakeNoAction' )
+        {
+            return '""/0'
+        }
+        else
+        {
+            Write-Error "Service failure action '$action' not found/recognized."
+            return ''
+        }
+    }
+
+    if( $PSCmdlet.ParameterSetName -like 'CustomAccount*' )
+    {
+        if( $PSCmdlet.ParameterSetName -like '*WithCredential' )
+        {
+            $UserName = $Credential.UserName
+        }
+        elseif( $Password )
+        {
+            Write-CWarningOnce ('`Install-CService` function''s `Password` parameter is obsolete and will be removed in a future major version of Carbon. Please use the `Credential` parameter instead.')
+            $Credential = New-CCredential -UserName $UserName -Password $Password
+        }
+        else
+        {
+            $Credential = $null
+        }
+
+
+        $identity = Resolve-CIdentity -Name $UserName -NoWarn
+
+        if( -not $identity )
+        {
+            Write-Error ("Identity '{0}' not found." -f $UserName)
+            return
+        }
+    }
+    else
+    {
+        $identity = Resolve-CIdentity "NetworkService" -NoWarn
+    }
+
+    if( -not (Test-Path -Path $Path -PathType Leaf) )
+    {
+        Write-Warning ('Service ''{0}'' executable ''{1}'' not found.' -f $Name,$Path)
+    }
+    else
+    {
+        $Path = Resolve-Path -Path $Path | Select-Object -ExpandProperty ProviderPath
+    }
+
+
+    if( $ArgumentList )
+    {
+        $binPathArg = Invoke-Command -ScriptBlock {
+                            $Path
+                            $ArgumentList
+                        } |
+                        ForEach-Object {
+                            if( $_.Contains(' ') )
+                            {
+                                return '"{0}"' -f $_.Trim('"')
+                            }
+                            return $_
+                        }
+        $binPathArg = $binPathArg -join ' '
+    }
+    else
+    {
+        $binPathArg = $Path
+    }
+
+    $passwordArgMsg = ''
+    $passwordArgName = $null
+    $passwordArgValue = $null
+    if( $PSCmdlet.ParameterSetName -like 'CustomAccount*' )
+    {
+        if( $Credential )
+        {
+            $passwordArgName = 'password='
+            $password = $Credential.GetNetworkCredential().Password
+            $passwordArgValue = $password | ConvertTo-CArgValue
+            $passwordArgMsg = " ${passwordArgName} $('*' * $password.Length)"
+        }
+
+        if( $PSCmdlet.ShouldProcess( $identity.FullName, "grant the log on as a service right" ) )
+        {
+            Grant-CPrivilege -Identity $identity.FullName -Privilege SeServiceLogonRight -NoWarn
+        }
+    }
+
+    if( $PSCmdlet.ShouldProcess( $Path, ('grant {0} ReadAndExecute permissions' -f $identity.FullName) ) )
+    {
+        Grant-CPermission -Identity $identity.FullName -Permission ReadAndExecute -Path $Path -NoWarn
+    }
+
+    $doInstall = $false
+    if( -not $Force -and (Test-CService -Name $Name -NoWarn) )
+    {
+        Write-Debug -Message ('Service {0} exists. Checking if configuration has changed.' -f $Name)
+        $service = Get-Service -Name $Name
+        $serviceConfig = Get-CServiceConfiguration -Name $Name -NoWarn
+        $dependedOnServiceNames =
+            $service.ServicesDependedOn | Where-Object 'Name' -NE $Name | Select-Object -ExpandProperty 'Name'
+
+        if( $service.Path -ne $binPathArg )
+        {
+            Write-Verbose ('[{0}] Path              {1} -> {2}' -f $Name,$serviceConfig.Path,$binPathArg)
+            $doInstall = $true
+        }
+
+        # DisplayName, if not set, defaults to the service name. This makes it a little bit tricky to update.
+        # If provided, make sure display name matches.
+        # If not provided, reset it to an empty/default value.
+        if( $PSBoundParameters.ContainsKey('DisplayName') )
+        {
+            if( $service.DisplayName -ne $DisplayName )
+            {
+                Write-Verbose ('[{0}] DisplayName       {1} -> {2}' -f $Name,$service.DisplayName,$DisplayName)
+                $doInstall = $true
+            }
+        }
+        elseif( $service.DisplayName -ne $service.Name )
+        {
+            Write-Verbose ('[{0}] DisplayName       {1} -> ' -f $Name,$service.DisplayName)
+            $doInstall = $true
+        }
+
+        if( $serviceConfig.FirstFailure -ne $OnFirstFailure )
+        {
+            Write-Verbose ('[{0}] OnFirstFailure    {1} -> {2}' -f $Name,$serviceConfig.FirstFailure,$OnFirstFailure)
+            $doInstall = $true
+        }
+
+        if( $serviceConfig.SecondFailure -ne $OnSecondFailure )
+        {
+            Write-Verbose ('[{0}] OnSecondFailure   {1} -> {2}' -f $Name,$serviceConfig.SecondFailure,$OnSecondFailure)
+            $doInstall = $true
+        }
+
+        if( $serviceConfig.ThirdFailure -ne $OnThirdFailure )
+        {
+            Write-Verbose ('[{0}] OnThirdFailure    {1} -> {2}' -f $Name,$serviceConfig.ThirdFailure,$OnThirdFailure)
+            $doInstall = $true
+        }
+
+        if( $serviceConfig.ResetPeriod -ne $ResetFailureCount )
+        {
+            Write-Verbose ('[{0}] ResetFailureCount {1} -> {2}' -f $Name,$serviceConfig.ResetPeriod,$ResetFailureCount)
+            $doInstall = $true
+        }
+
+        $failureActions = $OnFirstFailure,$OnSecondFailure,$OnThirdFailure
+        if( ($failureActions | Where-Object { $_ -eq [Carbon.Service.FailureAction]::Reboot }) -and $serviceConfig.RebootDelay -ne $RebootDelay )
+        {
+            Write-Verbose ('[{0}] RebootDelay       {1} -> {2}' -f $Name,$serviceConfig.RebootDelay,$RebootDelay)
+            $doInstall = $true
+        }
+
+        if( ($failureActions | Where-Object { $_ -eq [Carbon.Service.FailureAction]::Restart }) -and $serviceConfig.RestartDelay -ne $RestartDelay)
+        {
+            Write-Verbose ('[{0}] RestartDelay      {1} -> {2}' -f $Name,$serviceConfig.RestartDelay,$RestartDelay)
+            $doInstall = $true
+        }
+
+        if( $failureActions | Where-Object { $_ -eq [Carbon.Service.FailureAction]::RunCommand } )
+        {
+            if( $serviceConfig.FailureProgram -ne $Command )
+            {
+                Write-Verbose ('[{0}] Command           {1} -> {2}' -f $Name,$serviceConfig.FailureProgram,$Command)
+                $doInstall = $true
+            }
+
+            if( $serviceConfig.RunCommandDelay -ne $RunCommandDelay )
+            {
+                Write-Verbose ('[{0}] RunCommandDelay   {1} -> {2}' -f $Name,$serviceConfig.RunCommandDelay,$RunCommandDelay)
+                $doInstall = $true
+            }
+        }
+
+        if( $service.StartMode -ne $StartupType )
+        {
+            Write-Verbose ('[{0}] StartupType       {1} -> {2}' -f $Name,$serviceConfig.StartType,$StartupType)
+            $doInstall = $true
+        }
+
+        if( $StartupType -eq [ServiceProcess.ServiceStartMode]::Automatic -and $Delayed -ne $serviceConfig.DelayedAutoStart )
+        {
+            Write-Verbose ('[{0}] DelayedAutoStart  {1} -> {2}' -f $Name,$service.DelayedAutoStart,$Delayed)
+            $doInstall = $true
+        }
+
+        if( ($Dependency | Where-Object { $dependedOnServiceNames -notcontains $_ }) -or `
+            ($dependedOnServiceNames | Where-Object { $Dependency -notcontains $_ })  )
+        {
+            Write-Verbose ('[{0}] Dependency        {1} -> {2}' -f $Name,($dependedOnServiceNames -join ','),($Dependency -join ','))
+            $doInstall = $true
+        }
+
+        if( $Description -and $serviceConfig.Description -ne $Description )
+        {
+            Write-Verbose ('[{0}] Description       {1} -> {2}' -f $Name,$serviceConfig.Description,$Description)
+            $doInstall = $true
+        }
+
+        $currentIdentity = Resolve-CIdentity $serviceConfig.UserName -NoWarn
+        if( $currentIdentity.FullName -ne $identity.FullName )
+        {
+            Write-Verbose ('[{0}] UserName          {1} -> {2}' -f $Name,$currentIdentity.FullName,$identity.FullName)
+            $doinstall = $true
+        }
+    }
+    else
+    {
+        $doInstall = $true
+    }
+
+    try
+    {
+        if( -not $doInstall )
+        {
+            Write-Debug -Message ('Skipping {0} service configuration: settings unchanged.' -f $Name)
+            return
+        }
+
+        if( $Dependency )
+        {
+            $missingDependencies = $false
+            foreach ($dependencyName in $Dependency)
+            {
+                if (-not (Test-CService -Name $dependencyName -NoWarn))
+                {
+                    $msg = "Dependent service ""${dependencyName}"" not found."
+                    Write-Error -Message $msg -ErrorAction $ErrorActionPreference
+                    $missingDependencies = $true
+                }
+            }
+            if( $missingDependencies )
+            {
+                return
+            }
+        }
+
+        $sc = Join-Path -Path ([Environment]::GetFolderPath('System')) -ChildPath 'sc.exe' -Resolve
+
+        $startArg = 'auto'
+        if( $StartupType -eq [ServiceProcess.ServiceStartMode]::Automatic -and $Delayed )
+        {
+            $startArg = 'delayed-auto'
+        }
+        elseif( $StartupType -eq [ServiceProcess.ServiceStartMode]::Manual )
+        {
+            $startArg = 'demand'
+        }
+        elseif( $StartupType -eq [ServiceProcess.ServiceStartMode]::Disabled )
+        {
+            $startArg = 'disabled'
+        }
+
+        $service = Get-Service -Name $Name -ErrorAction Ignore
+
+        $operation = 'create'
+        $serviceIsRunningStatus = @(
+                                      [ServiceProcess.ServiceControllerStatus]::Running,
+                                      [ServiceProcess.ServiceControllerStatus]::StartPending
+                                   )
+
+        if( -not $EnsureRunning )
+        {
+            $EnsureRunning = ($StartupType -eq [ServiceProcess.ServiceStartMode]::Automatic)
+        }
+
+        if( $service )
+        {
+            $EnsureRunning = ( $EnsureRunning -or ($serviceIsRunningStatus -contains $service.Status) )
+            if( $StartupType -eq [ServiceProcess.ServiceStartMode]::Disabled )
+            {
+                $EnsureRunning = $false
+            }
+
+            if( $service.CanStop )
+            {
+                Stop-Service -Name $Name -Force -ErrorAction Ignore
+                if( $? )
+                {
+                    $service.WaitForStatus( 'Stopped' )
+                }
+            }
+
+            if( -not ($service.Status -eq [ServiceProcess.ServiceControllerStatus]::Stopped) )
+            {
+                Write-Warning "Unable to stop service '$Name' before applying config changes.  You may need to restart this service manually for any changes to take affect."
+            }
+            $operation = 'config'
+        }
+
+        $dependencyArgMsg = ''
+        $dependencyArgName = $null
+        $dependencyArgValue = $null
+        if ($Dependency -or $doInstall)
+        {
+            $dependencyArgName = 'depend='
+            $dependencyArgValue = $Dependency -join '/' | ConvertTo-CArgValue
+            $dependencyArgMsg = " ${dependencyArgName} ${dependencyArgValue}"
+        }
+
+        $displayNameArgMsg = ''
+        $displayNameArgName = $null
+        $displayNameArgValue = $null
+        if ($DisplayName -or $doInstall)
+        {
+            $displayNameArgName ='DisplayName='
+            $displayNameArgValue = $DisplayName | ConvertTo-CArgValue
+            $displayNameArgMsg = " ${displayNameArgName} ${displayNameArgValue}"
+        }
+
+        $binPathArg = $binPathArg | ConvertTo-CArgValue
+        if ($PSCmdlet.ShouldProcess( "$Name [$Path]", "$operation service" ))
+        {
+            $msg = "${sc} ${operation} ${Name} binPath= ${binPathArg} start= ${startArg} obj= $($identity.FullName)" +
+                   "${passwordArgMsg}${dependencyArgMsg}${displayNameArgMsg}"
+            Write-Information $msg
+            & $sc $operation `
+                  $Name `
+                  binPath= $binPathArg `
+                  start= $startArg `
+                  obj= $identity.FullName `
+                  $passwordArgName $passwordArgValue `
+                  $dependencyArgName $dependencyArgValue `
+                  $displayNameArgName $displayNameArgValue |
+                Write-Verbose
+            $scExitCode = $LASTEXITCODE
+            if( $scExitCode -ne 0 )
+            {
+                $reason = net helpmsg $scExitCode 2>$null | Where-Object { $_ }
+                Write-Error ("Failed to {0} service '{1}'. {2} returned exit code {3}: {4}" -f $operation,$Name,$sc,$scExitCode,$reason)
+                return
+            }
+
+            if( $Description )
+            {
+                Write-Information "${sc} description ${Name} ${Description}"
+                & $sc 'description' $Name ($Description | ConvertTo-CArgValue) | Write-Verbose
+                $scExitCode = $LASTEXITCODE
+                if( $scExitCode -ne 0 )
+                {
+                    $reason = net helpmsg $scExitCode 2>$null | Where-Object { $_ }
+                    Write-Error ("Failed to set {0} service's description. {1} returned exit code {2}: {3}" -f $Name,$sc,$scExitCode,$reason)
+                    return
+                }
+            }
+        }
+
+        $firstAction = ConvertTo-FailureActionArg $OnFirstFailure
+        $secondAction = ConvertTo-FailureActionArg $OnSecondFailure
+        $thirdAction = ConvertTo-FailureActionArg $OnThirdFailure
+
+        $commandArgValue = $Command | ConvertTo-CArgValue
+        if ($PSCmdlet.ShouldProcess($Name, 'setting service failure actions'))
+        {
+            $msg = "${sc} failure ${Name} reset= ${ResetFailureCount} " +
+                   "${firstAction}/${secondAction}/${thirdAction} command= ${commandArgValue}"
+            Write-Information $msg
+            & $sc failure `
+                  $Name `
+                  reset= $ResetFailureCount `
+                  actions= $firstAction/$secondAction/$thirdAction `
+                  command= $commandArgValue |
+                Write-Verbose
+            $scExitCode = $LASTEXITCODE
+            if( $scExitCode -ne 0 )
+            {
+                $reason = net helpmsg $scExitCode 2>$null | Where-Object { $_ }
+                Write-Error ("Failed to set {0} service's failure actions. {1} returned exit code {2}: {3}" -f $Name,$sc,$scExitCode,$reason)
+                return
+            }
+        }
+    }
+    finally
+    {
+        if( $EnsureRunning )
+        {
+            if( $PSCmdlet.ShouldProcess( $Name, 'start service' ) )
+            {
+                Start-Service -Name $Name -ErrorAction $ErrorActionPreference -WarningAction SilentlyContinue
+                if( (Get-Service -Name $Name).Status -ne [ServiceProcess.ServiceControllerStatus]::Running )
+                {
+                    if( $PSCmdlet.ParameterSetName -like 'CustomAccount*' -and -not $Credential )
+                    {
+                        Write-Warning ('Service ''{0}'' didn''t start and you didn''t supply a password to Install-CService.  Is ''{1}'' a managed service account or virtual account? (See http://technet.microsoft.com/en-us/library/dd548356.aspx.)  If not, please use the `Credential` parameter to pass the account''s credentials.' -f $Name,$UserName)
+                    }
+                    else
+                    {
+                        Write-Warning ('Failed to re-start service ''{0}''.' -f $Name)
+                    }
+                }
+            }
+        }
+        else
+        {
+            Write-Verbose ('Not re-starting {0} service. Its startup type is {1} and it wasn''t running when configuration began. To always start a service after configuring it, use the -EnsureRunning switch.' -f $Name,$StartupType)
+        }
+
+        if( $PassThru )
+        {
+            Get-Service -Name $Name -ErrorAction Ignore
+        }
+    }
+}
 
 # This function should only be available if the Windows PowerShell v3.0 Server Manager cmdlets aren't already installed.
 if( -not (Get-Command -Name 'Get-WindowsFeature*' | Where-Object { $_.ModuleName -ne 'Carbon' }) )
@@ -7629,7 +8938,70 @@ function Resolve-WindowsFeatureName
 
 }
 
+function Restart-CRemoteService
+{
+    <#
+    .SYNOPSIS
+    Restarts a service on a remote machine.
 
+    .DESCRIPTION
+    One of the annoying features of PowerShell is that the `Stop-Service`, `Start-Service` and `Restart-Service` cmdlets don't have `ComputerName` parameters to start/stop/restart a service on a remote computer.  You have to use `Get-Service` to get the remote service:
+
+        $service = Get-Service -Name DeathStar -ComputerName Yavin
+        $service.Stop()
+        $service.Start()
+
+        # or (and no, you can't pipe the service directly to `Restart-Service`)
+        Get-Service -Name DeathStar -ComputerName Yavin |
+            ForEach-Object { Restart-Service -InputObject $_ }
+
+    This function does all this unnecessary work for you.
+
+    You'll get an error if you attempt to restart a non-existent service.
+
+    .EXAMPLE
+    Restart-CRemoteService -Name DeathStar -ComputerName Yavin
+
+    Restarts the `DeathStar` service on Yavin.  If the DeathStar service doesn't exist, you'll get an error.
+    #>
+    [CmdletBinding(SupportsShouldProcess=$true)]
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]
+        # The service name to restart.
+        $Name,
+
+        [Parameter(Mandatory=$true)]
+        [string]
+        # The name of the computer where the service lives.
+        $ComputerName,
+
+        [switch] $NoWarn
+    )
+
+    Set-StrictMode -Version 'Latest'
+
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
+    if( -not $NoWarn )
+    {
+        Write-CRefactoredCommandWarning -CommandName $MyInvocation.MyCommand.Name -ModuleName 'Carbon.Windows.Service'
+    }
+
+    $service = Get-Service -Name $name -ComputerName $computerName
+    if($service)
+    {
+        if($pscmdlet.ShouldProcess( "$name on $computerName", "restart"))
+        {
+            $service.Stop()
+            $service.Start()
+        }
+    }
+    else
+    {
+        Write-Error "Unable to restart remote service because I could not get a reference to service $name on machine: $computerName"
+    }
+}
 
 function Revoke-CPermission
 {
@@ -7940,8 +9312,71 @@ function Revoke-CPrivilege
     }
 }
 
+function Revoke-CServicePermission
+{
+    <#
+    .SYNOPSIS
+    Removes all permissions an identity has to manage a service.
 
+    .DESCRIPTION
+    No permissions are left behind.  This is an all or nothing operation, baby!
 
+    .LINK
+    Get-CServicePermission
+
+    .LINK
+    Grant-CServicePermission
+
+    .EXAMPLE
+    Revoke-CServicePermission -Name 'Hyperdrive` -Identity 'CLOUDCITY\LCalrissian'
+
+    Removes all of Lando's permissions to control the `Hyperdrive` service.
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]
+        # The service.
+        $Name,
+
+        [Parameter(Mandatory=$true)]
+        [string]
+        # The identity whose permissions are being revoked.
+        $Identity,
+
+        [switch] $NoWarn
+    )
+
+    Set-StrictMode -Version 'Latest'
+
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
+    if (-not $NoWarn)
+    {
+        Write-CRefactoredCommandWarning -CommandName $MyInvocation.MyCommand.Name -ModuleName 'Carbon.Windows.Service'
+    }
+
+    $account = Resolve-CIdentity -Name $Identity -NoWarn
+    if( -not $account )
+    {
+        return
+    }
+
+    if( -not (Assert-CService -Name $Name -NoWarn) )
+    {
+        return
+    }
+
+    if( (Get-CServicePermission -Name $Name -Identity $account.FullName -NoWarn) )
+    {
+        Write-Verbose ("Revoking {0}'s {1} service permissions." -f $account.FullName,$Name)
+
+        $dacl = Get-CServiceAcl -Name $Name -NoWarn
+        $dacl.Purge( $account.Sid )
+
+        Set-CServiceAcl -Name $Name -Dacl $dacl -NoWarn
+    }
+}
 
 function Set-CEnvironmentVariable
 {
@@ -8332,7 +9767,67 @@ function Set-CryptoKeySecurity
     }
 }
 
+function Set-CServiceAcl
+{
+    <#
+    .SYNOPSIS
+    Sets a service's discretionary access control list (i.e. DACL).
 
+    .DESCRIPTION
+    The existing DACL is replaced with the new DACL.  No previous permissions are preserved.  That's your job.  You're warned!
+
+    You probably want `Grant-CServicePermission` or `Revoke-CServicePermission` instead.
+
+    .LINK
+    Get-CServicePermission
+
+    .LINK
+    Grant-CServicePermission
+
+    .LINK
+    Revoke-CServicePermission
+
+    .EXAMPLE
+    Set-ServiceDacl -Name 'Hyperdrive' -Dacl $dacl
+
+    Replaces the DACL on the `Hyperdrive` service.  Yikes!  Sounds like something the Empire would do, though.
+    #>
+    [CmdletBinding(SupportsShouldProcess=$true)]
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]
+        # The service whose DACL to replace.
+        $Name,
+
+        [Parameter(Mandatory=$true)]
+        [Security.AccessControl.DiscretionaryAcl]
+        # The service's new DACL.
+        $Dacl,
+
+        [switch] $NoWarn
+    )
+
+    Set-StrictMode -Version 'Latest'
+
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
+    if (-not $NoWarn)
+    {
+        Write-CRefactoredCommandWarning -CommandName $MyInvocation.MyCommand.Name -ModuleName 'Carbon.Windows.Service'
+    }
+
+    $rawSD = Get-CServiceSecurityDescriptor -Name $Name -NoWarn
+    $daclBytes = New-Object byte[] $Dacl.BinaryLength
+    $Dacl.GetBinaryForm($daclBytes, 0);
+    $rawSD.DiscretionaryAcl = New-Object Security.AccessControl.RawAcl $daclBytes,0
+    $sdBytes = New-Object byte[] $rawSD.BinaryLength
+    $rawSD.GetBinaryForm($sdBytes, 0);
+
+    if( $pscmdlet.ShouldProcess( ("{0} service DACL" -f $Name), "set" ) )
+    {
+        [Carbon.Service.ServiceSecurity]::SetServiceSecurityDescriptor( $Name, $sdBytes )
+    }
+}
 
 function Set-CSslCertificateBinding
 {
@@ -9366,7 +10861,58 @@ function Test-CScheduledTask
     }
 }
 
+function Test-CService
+{
+    <#
+    .SYNOPSIS
+    Tests if a service exists, without writing anything out to the error stream.
 
+    .DESCRIPTION
+    `Get-Service` writes an error when a service doesn't exist.  This function tests if a service exists without writing anyting to the output stream.
+
+    .OUTPUTS
+    System.Boolean.
+
+    .LINK
+    Install-CService
+
+    .LINK
+    Uninstall-CService
+
+    .EXAMPLE
+    Test-CService -Name 'Drive'
+
+    Returns `true` if the `Drive` service exists.  `False` otherwise.
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]
+        # The name of the service to test.
+        $Name,
+
+        [switch] $NoWarn
+    )
+
+    Set-StrictMode -Version 'Latest'
+
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
+    if (-not $NoWarn)
+    {
+        Write-CRefactoredCommandWarning -CommandName $MyInvocation.MyCommand.Name -ModuleName 'Carbon.Windows.Service'
+    }
+
+    $service = Get-Service -Name $Name -ErrorAction Ignore
+    if( $service )
+    {
+        return $true
+    }
+    else
+    {
+        return $false
+    }
+}
 
 function Test-CSslCertificateBinding
 {
@@ -9977,7 +11523,132 @@ function Uninstall-CScheduledTask
     while( $true -and -not $lastTry)
 }
 
+function Uninstall-CService
+{
+    <#
+    .SYNOPSIS
+    Removes/deletes a service.
 
+    .DESCRIPTION
+    Removes an existing Windows service.  If the service doesn't exist, nothing happens.  The service is stopped before being deleted, so that the computer doesn't need to be restarted for the removal to complete.
+
+    Beginning in Carbon 2.7, if the service's process is still running after the service is stopped (some services don't behave nicely) and the service is only running one process, `Uninstall-CService` will kill the service's process. This helps prevent requiring a reboot. If you want to give the service time to
+
+    .LINK
+    Install-CService
+
+    .EXAMPLE
+    Uninstall-CService -Name DeathStar
+
+    Removes the Death Star Windows service.  It is destro..., er, stopped first, then destro..., er, deleted.  If only the rebels weren't using Linux!
+    #>
+    [CmdletBinding(SupportsShouldProcess=$true)]
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]
+        # The service name to delete.
+        $Name,
+
+        [timespan]
+        # The amount of time to wait for the service to stop before attempting to kill it. The default is not to wait.
+        #
+        # This parameter was added in Carbon 2.7.
+        $StopTimeout,
+
+        [switch] $NoWarn
+    )
+
+    Set-StrictMode -Version 'Latest'
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
+    if (-not $NoWarn)
+    {
+        Write-CRefactoredCommandWarning -CommandName $MyInvocation.MyCommand.Name -ModuleName 'Carbon.Windows.Service'
+    }
+
+    $service = Get-Service -ErrorAction Ignore | Where-Object 'Name' -EQ $Name
+    $sc = Join-Path -Path $env:WinDir -ChildPath 'system32\sc.exe' -Resolve
+
+    if( -not $service )
+    {
+        return
+    }
+
+    $origVerbosePref = $VerbosePreference
+    $VerbosePreference = 'SilentlyContinue'
+    $cimService = Get-CimInstance 'Win32_Service' -Filter ('Name = ''{0}''' -f $service.Name)
+    $cimServiceProcessCount = 0
+    if( $cimService )
+    {
+        $cimServiceProcessCount = Get-CimInstance 'Win32_Service' -Filter ('ProcessId = ''{0}''' -f $cimService.ProcessId) |
+                                            Measure-Object |
+                                            Select-Object -ExpandProperty 'Count'
+    }
+    $VerbosePreference = $origVerbosePref
+
+    if( -not $pscmdlet.ShouldProcess( "service '$Name'", "remove" ) )
+    {
+        return
+    }
+
+    Stop-Service $Name
+    if( $cimService -and $cimServiceProcessCount -eq 1 )
+    {
+        $process = Get-Process -Id $cimService.ProcessId -ErrorAction Ignore
+        if( $process )
+        {
+            $killService = $true
+            if( $StopTimeout )
+            {
+                Write-Verbose -Message ('[Uninstall-CService]  [{0}]  Waiting "{1}" second(s) for service process "{2}" to exit.' -f $Name,$StopTimeout.TotalSeconds,$process.Id)
+                $killService = -not $process.WaitForExit($StopTimeout.TotalMilliseconds)
+            }
+
+            if( $killService )
+            {
+                $attemptNum = 0
+                $maxAttempts = 100
+                $killed = $false
+                while( $attemptNum++ -lt $maxAttempts )
+                {
+                    Write-Verbose -Message ('[Uninstall-CService]  [{0}]  [Attempt {1,3} of {2}]  Killing service process "{3}".' -f $Name,$attemptNum,$maxAttempts,$process.Id)
+                    Stop-Process -Id $process.Id -Force -ErrorAction Ignore
+                    if( -not (Get-Process -Id $process.Id -ErrorAction Ignore) )
+                    {
+                        $killed = $true
+                        break
+                    }
+                    Start-Sleep -Milliseconds 100
+                }
+                if( -not $killed )
+                {
+                    Write-Error -Message ('Failed to kill "{0}" service process "{1}".' -f $Name,$process.Id) -ErrorAction $ErrorActionPreference
+                }
+            }
+        }
+    }
+
+
+    Write-Verbose -Message ('[Uninstall-CService]  [{0}]  {1} delete {0}' -f $Name,$sc)
+    $output = & $sc delete $Name
+    if( $LASTEXITCODE )
+    {
+        if( $LASTEXITCODE -eq 1072 )
+        {
+            Write-Warning -Message ('The {0} service is marked for deletion and will be removed during the next reboot.{1}{2}' -f $Name,([Environment]::NewLine),($output -join ([Environment]::NewLine)))
+        }
+        else
+        {
+            Write-Error -Message ('Failed to uninstall {0} service (returned non-zero exit code {1}):{2}{3}' -f $Name,$LASTEXITCODE,([Environment]::NewLine),($output -join ([Environment]::NewLine)))
+        }
+    }
+    else
+    {
+        $output | Write-Verbose
+    }
+}
+
+Set-Alias -Name 'Remove-Service' -Value 'Uninstall-CService'
 
 # This function should only be available if the Windows PowerShell v3.0 Server Manager cmdlets aren't already installed.
 if( -not (Get-Command -Name 'Get-WindowsFeature*' | Where-Object { $_.ModuleName -ne 'Carbon' }) )

@@ -66,6 +66,45 @@
   * `Write-CDscError`
 * `Remove-CEnvironmentVariable`, moved to Carbon.Environment module.
 * `Set-CEnvironmentVariable`, moved to Carbon.Environment module.
+* The following extended type properties on `[ServiceProcess.ServiceController]` objects (returned by `Get-Service`).
+  Switch to `Get-CServiceConfiguration` in the `Carbon.Windows.Service` PowerShell module.
+  * `DelayedAutoStart`
+  * `Description`
+  * `ErrorControl`
+  * `FailureProgram`
+  * `FirstFailure`
+  * `LoadOrderGroup`
+  * `Path`
+  * `RebootDelay`
+  * `RebootDelayMinutes`
+  * `RebootMessage`
+  * `ResetPeriod`
+  * `ResetPeriodDays`
+  * `RestartDelay`
+  * `RestartDelayMinutes`
+  * `RunCommandDelay`
+  * `RunCommandDelayMinutes`
+  * `SecondFailure`
+  * `StartMode`
+  * `StartType`
+  * `TagID`
+  * `ThirdFailure`
+  * `UserName`
+* The following Windows service functions. They've moved to the `Carbon.Windows.Service` PowerShell module where they
+  also now support PowerShell (pwsh.exe).
+  * `Assert-CService`
+  * `Get-CServiceAcl`
+  * `Get-CServiceConfiguration`
+  * `Get-CServicePermission`
+  * `Get-CServiceSecurityDescriptor`
+  * `Grant-CServiceControlPermission`
+  * `Grant-CServicePermission`
+  * `Install-CService`
+  * `Restart-CRemoteService`
+  * `Revoke-CServicePermission`
+  * `Set-CServiceAcl`
+  * `Test-CService`
+  * `Uninstall-CService`
 
 ## 2.15.1
 

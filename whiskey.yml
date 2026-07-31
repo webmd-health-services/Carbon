@@ -156,7 +156,6 @@ Tests:
     - Test\Get-ComPermission.Tests.ps1
     - Test\Get-Group.Tests.ps1
     - Test\Get-HttpUrlAcl.Tests.ps1
-    - Test\Get-ServiceConfiguration.Tests.ps1
     - Test\Get-SslCertificateBinding.Tests.ps1
     - Test\Get-User.Tests.ps1
     - Test\Grant-ComPermission.Tests.ps1
@@ -175,7 +174,6 @@ Tests:
     - Test\Test-Group.Tests.ps1
     - Test\Test-GroupMember.Tests.ps1
     - Test\Test-PathIsJunction.Tests.ps1
-    - Test\Test-Service.Tests.ps1
     - Test\Uninstall-Group.Tests.ps1
     - Test\Uninstall-Junction.Tests.ps1
     - Test\Write-File.Tests.ps1
@@ -204,7 +202,6 @@ Tests:
             - "*\\Get-ComPermission.Tests.ps1"
             - "*\\Get-Group.Tests.ps1"
             - "*\\Get-HttpUrlAcl.Tests.ps1"
-            - "*\\Get-ServiceConfiguration.Tests.ps1"
             - "*\\Get-SslCertificateBinding.Tests.ps1"
             - "*\\Get-User.Tests.ps1"
             - "*\\Grant-ComPermission.Tests.ps1"
@@ -223,7 +220,6 @@ Tests:
             - "*\\Test-Group.Tests.ps1"
             - "*\\Test-GroupMember.Tests.ps1"
             - "*\\Test-PathIsJunction.Tests.ps1"
-            - "*\\Test-Service.Tests.ps1"
             - "*\\Uninstall-Group.Tests.ps1"
             - "*\\Uninstall-Junction.Tests.ps1"
             - "*\\Write-File.Tests.ps1"
