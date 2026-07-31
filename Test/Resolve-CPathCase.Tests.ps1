@@ -66,7 +66,7 @@ Describe 'Resolve-PathCase' {
     }
 
     & (Join-Path -Path $PSScriptRoot -ChildPath 'Initialize-CarbonTest.ps1' -Resolve)
-    $skip = -not (Get-Command -Name 'Get-WmiObject' -ErrorAction Ignore) -or -not (Test-CAdminPrivilege)
+    $skip = -not (Get-Command -Name 'Get-WmiObject' -ErrorAction Ignore) -or -not (Test-CAdminPrivilege -NoWarn)
     It 'should get path to share' -Skip:$skip {
         $tempDir = New-CTempDirectory -Prefix $PSCommandPath
         $shareName = Split-Path -Leaf -Path $tempDir

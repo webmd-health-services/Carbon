@@ -1,5 +1,143 @@
 
 
+
+function Add-CGroupMember
+{
+    <#
+    .SYNOPSIS
+    Adds a users or groups to a *local* group.
+
+    .DESCRIPTION
+    You would think it's pretty easy and straight-forward to add users/groups to a local group, but you would be wrong.  The quick solution is to use `net localgroup`, but that won't accept user/group names longer than 24 characters.  This means you have to use the .NET Directory Services APIs.  How do you reliably add both users *and* groups?  What if those users are in a domain?  What if they're in another domain?  What about built-in users?  Fortunately, you're brain hasn't exploded.
+
+    So, this function adds users and groups to a *local* group.
+
+    If the members are already part of the group, nothing happens.
+
+    The user running this function must have access to the directory where each principal in the `Member` parameter and the directory where each of the group's current members are located.
+
+    .EXAMPLE
+    Add-CGroupMember -Name Administrators -Member EMPIRE\DarthVader,EMPIRE\EmperorPalpatine,REBELS\LSkywalker
+
+    Adds Darth Vader, Emperor Palpatine and Luke Skywalker to the local administrators group.
+
+    .EXAMPLE
+    Add-CGroupMember -Name TieFighters -Member NetworkService
+
+    Adds the local NetworkService account to the local TieFighters group.
+    #>
+    [CmdletBinding(SupportsShouldProcess=$true)]
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]
+        # The group name.
+        $Name,
+
+        [Parameter(Mandatory=$true)]
+        [string[]]
+        # The users/groups to add to a group.
+		[Alias('Members')]
+        $Member,
+
+        [switch] $NoWarn
+    )
+
+    Set-StrictMode -Version 'Latest'
+
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
+    Write-CRefactoredCommandWarning -CommandName $MyInvocation.MyCommand.Name `
+                                    -ModuleName 'Carbon.Accounts' `
+                                    -NewCommandName 'Install-CLocalGroupMember' `
+                                    -NoWarn:$NoWarn
+
+    [DirectoryServices.AccountManagement.GroupPrincipal]$group = Get-CGroup -Name $Name -NoWarn
+    if( -not $group )
+    {
+        return
+    }
+
+    try
+    {
+        foreach( $_member in $Member )
+        {
+            $identity = Resolve-CIdentity -Name $_member -NoWarn
+            if( -not $identity )
+            {
+                continue
+            }
+
+            if( (Test-CGroupMember -GroupName $group.Name -Member $_member) )
+            {
+                continue
+            }
+
+            Write-Verbose -Message ('[{0}] Members       -> {1}' -f $Name,$identity.FullName)
+            if( -not $PSCmdlet.ShouldProcess(('adding ''{0}'' to local group ''{1}''' -f $identity.FullName, $group.Name), $null, $null) )
+            {
+                continue
+            }
+
+            try
+            {
+                $identity.AddToLocalGroup( $group.Name )
+            }
+            catch
+            {
+                Write-Error ('Failed to add ''{0}'' to group ''{1}'': {2}.' -f $identity,$group.Name,$_)
+            }
+        }
+    }
+    finally
+    {
+        $group.Dispose()
+    }
+}
+
+Set-Alias -Name 'Add-GroupMembers' -Value 'Add-CGroupMember'
+
+
+function Assert-CAdminPrivilege
+{
+    <#
+    .SYNOPSIS
+    Writes an error and returns false if the user doesn't have administrator privileges.
+
+    .DESCRIPTION
+    Many scripts and functions require the user to be running as an administrator.  This function checks if the user is running as an administrator or with administrator privileges and writes an error if the user doesn't.
+
+    .LINK
+    Test-CAdminPrivilege
+
+    .EXAMPLE
+    Assert-CAdminPrivilege
+
+    Writes an error that the user doesn't have administrator privileges.
+    #>
+    [CmdletBinding()]
+    param(
+        [switch] $NoWarn
+    )
+
+    Set-StrictMode -Version 'Latest'
+
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
+    Write-CRefactoredCommandWarning -CommandName $MyInvocation.MyCommand.Name `
+                                    -ModuleName 'Carbon.Accounts' `
+                                    -NewCommandName 'Assert-CRunAsElevated' `
+                                    -NoWarn:$NoWarn
+
+    if( -not (Test-CAdminPrivilege -NoWarn) )
+    {
+        Write-Error "You are not currently running with administrative privileges.  Please re-start PowerShell as an administrator (right-click the PowerShell application, and choose ""Run as Administrator"")."
+        return $false
+    }
+    return $true
+}
+
+Set-Alias -Name 'Assert-AdminPrivileges' -Value 'Assert-CAdminPrivilege'
+
 function Assert-CService
 {
     <#
@@ -2052,6 +2190,91 @@ function Get-CFileShareSecurityDescriptor
 }
 
 
+function Get-CGroup
+{
+    <#
+    .SYNOPSIS
+    Gets *local* groups.
+
+    .DESCRIPTION
+    `Get-CGroup` gets all *local* groups or a specific group by its name.
+
+    The objects returned, `DirectoryServices.AccountManagement.GroupPrincipal`, use external resources, which means they don't clean up propertly when garbage collected, resulting in memory leaks. You should call `Dispose()` on the objects you receieve from this function when you're done using them so these external resources can be cleaned up correctly.
+
+    `Get-CGroup` is new in Carbon 2.0.
+
+    .OUTPUTS
+    System.DirectoryServices.AccountManagement.GroupPrincipal.
+
+    .LINK
+    Get-CUser
+
+    .EXAMPLE
+    Get-CGroup
+
+    Demonstrates how to get all local groups.
+
+    .EXAMPLE
+    Get-CGroup -Name RebelAlliance
+
+    Demonstrates how to get a specific group.
+    #>
+    [CmdletBinding()]
+    [OutputType([DirectoryServices.AccountManagement.GroupPrincipal])]
+    param(
+        # The name of the group to return.
+        [string]$Name,
+
+        [switch] $NoWarn
+    )
+
+    Set-StrictMode -Version 'Latest'
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
+    Write-CRefactoredCommandWarning -CommandName $MyInvocation.MyCommand.Name `
+                                    -ModuleName 'Carbon.Accounts' `
+                                    -NewCommandName 'Get-CLocalGroup' `
+                                    -NoWarn:$NoWarn
+
+    Write-Timing ('Get-CGroup')
+
+    $ctx = New-Object 'DirectoryServices.AccountManagement.PrincipalContext' ([DirectoryServices.AccountManagement.ContextType]::Machine)
+    $query = New-Object 'DirectoryServices.AccountManagement.GroupPrincipal' $ctx
+    try
+    {
+        $groups = Get-CPrincipal -Principal $query -Filter {
+            if( $Name )
+            {
+                return $_.Name -eq $Name
+            }
+            return $true
+        }
+
+        if( $Name )
+        {
+            $groupCount = $groups | Measure-Object | Select-Object -ExpandProperty 'Count'
+            if( $groupCount -gt 1 )
+            {
+                Write-Error -Message ('Found {0} groups named "{1}".' -f $groupCount,$Name) -ErrorAction:$ErrorActionPreference
+                return
+            }
+
+            if( $groupCount -eq 0 )
+            {
+                Write-Error ('Local group "{0}" not found.' -f $Name) -ErrorAction:$ErrorActionPreference
+                return
+            }
+        }
+
+        return $groups
+    }
+    finally
+    {
+        $query.Dispose()
+        Write-Timing ('Get-CGroup')
+    }
+}
+
 function Get-CMsi
 {
     <#
@@ -2591,7 +2814,9 @@ function Get-CProgramInstallInfo
     [OutputType([Carbon.Computer.ProgramInstallInfo])]
     param(
         # The name of a specific program to get. Wildcards supported.
-        [string] $Name
+        [string] $Name,
+
+        [switch] $NoWarn
     )
 
     Set-StrictMode -Version 'Latest'
@@ -2599,7 +2824,8 @@ function Get-CProgramInstallInfo
 
     Write-CRefactoredCommandWarning -CommandName $MyInvocation.MyCommand.Name `
                                     -ModuleName 'Carbon.Windows.Installer' `
-                                    -NewCommandName 'Get-CInstalledProgram'
+                                    -NewCommandName 'Get-CInstalledProgram' `
+                                    -NoWarn:$NoWarn
 
     if( -not (Test-Path -Path 'hku:\') )
     {
@@ -5330,6 +5556,124 @@ function Install-CFileShare
 
 Set-Alias -Name 'Install-SmbShare' -Value 'Install-CFileShare'
 
+
+
+function Install-CGroup
+{
+    <#
+    .SYNOPSIS
+    Creates a new local group, or updates the settings for an existing group.
+
+    .DESCRIPTION
+    `Install-CGroup` creates a local group, or, updates a group that already exists.
+
+    YOu can get a `System.DirectoryServices.AccountManagement.GroupPrincipal` object representing the group returned to you by using the `PassThru` switch. This object implements the `IDisposable` interface, which means it uses external resources that don't get garbage collected. When you're done using the object, make sure you call `Dispose()` to free those resources, otherwise you'll leak memory. All over the place.
+
+    .EXAMPLE
+    Install-CGroup -Name TIEFighters -Description 'Users allowed to be TIE fighter pilots.' -Members EMPIRE\Pilots,EMPIRE\DarthVader
+
+    If the TIE fighters group doesn't exist, it is created with the given description and default members.  If it already exists, its description is updated and the given members are added to it.
+    #>
+    [CmdletBinding(SupportsShouldProcess=$true)]
+    [OutputType([DirectoryServices.AccountManagement.GroupPrincipal])]
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]
+        # The name of the group.
+        $Name,
+
+        [string]
+        # A description of the group.
+        $Description = '',
+
+        [Alias('Members')]
+        [string[]]
+        # Members of the group.
+        $Member = @(),
+
+        [Switch]
+        # Return the group as a `System.DirectoryServices.AccountManagement.GroupPrincipal`.
+        #
+        # This object uses external resources that don't get cleaned up by .NET's garbage collector. In order to avoid memory leaks, make sure you call its `Dispose()` method when you're done with it.
+        $PassThru,
+
+        [switch] $NoWarn
+    )
+
+    Set-StrictMode -Version 'Latest'
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
+    Write-CRefactoredCommandWarning -CommandName $MyInvocation.MyCommand.Name `
+                                    -ModuleName 'Carbon.Accounts' `
+                                    -NewCommandName 'Get-CLocalGroup' `
+                                    -NoWarn:$NoWarn
+
+    $group = Get-CGroup -Name $Name -NoWarn -ErrorAction Ignore
+
+    if( $group )
+    {
+        $ctx = $group.Context
+    }
+    else
+    {
+        $ctx = New-Object 'DirectoryServices.AccountManagement.PrincipalContext' ([DirectoryServices.AccountManagement.ContextType]::Machine)
+    }
+
+    $operation = 'update'
+    $save = $false
+    $new = $false
+    if( -not $group )
+    {
+        $operation = 'create'
+        $new = $true
+        $group = New-Object 'DirectoryServices.AccountManagement.GroupPrincipal' $ctx
+        $group.Name = $Name
+        $group.Description = $Description
+        $save = $true
+    }
+    else
+    {
+        # We only update the description if one or the other has a value. This guards against setting description to $null from empty string and vice-versa.
+        if( $group.Description -ne $Description -and ($group.Description -or $Description) )
+        {
+            Write-Verbose -Message ('[{0}] Description  {1} -> {2}' -f $Name,$group.Description,$Description)
+            $group.Description = $Description
+            $save = $true
+        }
+    }
+
+    try
+    {
+
+        if( $save -and $PSCmdlet.ShouldProcess( ('local group {0}' -f $Name), $operation ) )
+        {
+            if( $new )
+            {
+                Write-Verbose -Message ('[{0}]              +' -f $Name)
+            }
+            $group.Save()
+        }
+
+        if( $Member -and $PSCmdlet.ShouldProcess( ('local group {0}' -f $Name), 'adding members' ) )
+        {
+            Add-CGroupMember -Name $Name -Member $Member -NoWarn
+        }
+
+        if( $PassThru )
+        {
+            return $group
+        }
+    }
+    finally
+    {
+        if( -not $PassThru )
+        {
+            $group.Dispose()
+            $ctx.Dispose()
+        }
+
+    }
+}
 
 function Install-CMsi
 {
@@ -8254,6 +8598,98 @@ function Remove-CEnvironmentVariable
             }
 }
 
+function Remove-CGroupMember
+{
+    <#
+    .SYNOPSIS
+    Removes users or groups from a *local* group.
+
+    .DESCRIPTION
+    You would think it's pretty easy and straight-forward to remove users/groups from a local group, but you would be wrong.  The quick solution is to use `net localgroup`, but that won't accept user/group names longer than 24 characters.  This means you have to use the .NET Directory Services APIs.  How do you reliably remove both users *and* groups?  What if those users are in a domain?  What if they're in another domain?  What about built-in users?  Fortunately, your brain hasn't exploded.
+
+    So, this function removes users or groups from a *local* group.
+
+    If the user or group is not a member, nothing happens.
+
+    `Remove-CGroupMember` is new in Carbon 2.0.
+
+    .EXAMPLE
+    Remove-CGroupMember -Name Administrators -Member EMPIRE\DarthVader,EMPIRE\EmperorPalpatine,REBELS\LSkywalker
+
+    Removes Darth Vader, Emperor Palpatine and Luke Skywalker from the local administrators group.
+
+    .EXAMPLE
+    Remove-CGroupMember -Name TieFighters -Member NetworkService
+
+    Removes the local NetworkService account from the local TieFighters group.
+    #>
+    [CmdletBinding(SupportsShouldProcess=$true)]
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]
+        # The group name.
+        $Name,
+
+        [Parameter(Mandatory=$true)]
+        [string[]]
+        # The users/groups to remove from a group.
+		[Alias('Members')]
+        $Member,
+
+        [switch] $NoWarn
+    )
+
+    Set-StrictMode -Version 'Latest'
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
+    Write-CRefactoredCommandWarning -CommandName $MyInvocation.MyCommand.Name `
+                                    -ModuleName 'Carbon.Accounts' `
+                                    -NewCommandName 'Uninstall-CLocalGroupMember' `
+                                    -NoWarn:$NoWarn
+
+    [DirectoryServices.AccountManagement.GroupPrincipal]$group = Get-CGroup -Name $Name -NoWarn
+    if( -not $group )
+    {
+        return
+    }
+
+    try
+    {
+        foreach( $_member in $Member )
+        {
+            $identity = Resolve-CIdentity -Name $_member -NoWarn
+            if( -not $identity )
+            {
+                continue
+            }
+
+            if( -not (Test-CGroupMember -GroupName $group.Name -Member $_member) )
+            {
+                continue
+            }
+
+            Write-Verbose -Message ('[{0}] Members      {1} ->' -f $Name,$identity.FullName)
+            if( -not $PSCmdlet.ShouldProcess(('removing "{0}" from local group "{1}"' -f $identity.FullName, $group.Name), $null, $null) )
+            {
+                continue
+            }
+
+            try
+            {
+                $identity.RemoveFromLocalGroup( $group.Name )
+            }
+            catch
+            {
+                Write-Error ('Failed to remove "{0}" from local group "{1}": {2}.' -f $identity,$group.Name,$_)
+            }
+        }
+    }
+    finally
+    {
+        $group.Dispose()
+    }
+}
+
 function Remove-CRegistryKeyValue
 {
     <#
@@ -10085,6 +10521,196 @@ function Start-CDscPullConfiguration
         Write-CDscError -NoWarn
 }
 
+function Test-CAdminPrivilege
+{
+    <#
+    .SYNOPSIS
+    Checks if the current user is an administrator or has administrative privileges.
+
+    .DESCRIPTION
+    Many tools, cmdlets, and APIs require administative privileges.  Use this function to check.  Returns `True` if the current user has administrative privileges, or `False` if he doesn't.  Or she.  Or it.
+
+    This function handles UAC and computers where UAC is disabled.
+
+    .EXAMPLE
+    Test-CAdminPrivilege
+
+    Returns `True` if the current user has administrative privileges, or `False` if the user doesn't.
+    #>
+    [CmdletBinding()]
+    param(
+        [switch] $NoWarn
+    )
+
+    Set-StrictMode -Version 'Latest'
+
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
+    Write-CRefactoredCommandWarning -CommandName $MyInvocation.MyCommand.Name `
+                                    -ModuleName 'Carbon.Accounts' `
+                                    -NewCommandName 'Test-CRunAsElevated' `
+                                    -NoWarn:$NoWarn
+
+    $identity = [Security.Principal.WindowsIdentity]::GetCurrent()
+    Write-Debug -Message "Checking if current user '$($identity.Name)' has administrative privileges."
+
+    $hasElevatedPermissions = $false
+    foreach ( $group in $identity.Groups )
+    {
+        if ( $group.IsValidTargetType([Security.Principal.SecurityIdentifier]) )
+        {
+            $groupSid = $group.Translate([Security.Principal.SecurityIdentifier])
+            if ( $groupSid.IsWellKnown("AccountAdministratorSid") -or $groupSid.IsWellKnown("BuiltinAdministratorsSid"))
+            {
+                return $true
+            }
+        }
+    }
+
+    return $false
+}
+
+Set-Alias -Name 'Test-AdminPrivileges' -Value 'Test-CAdminPrivilege'
+
+function Test-CGroup
+{
+    <#
+    .SYNOPSIS
+    Checks if a *local* group exists.
+
+    .DESCRIPTION
+    Uses .NET's AccountManagement API to check if a *local* group exists.  Returns `True` if the *local* account exists, or `False` if it doesn't.
+
+    .OUTPUTS
+    System.Boolean
+
+    .LINK
+    Get-CGroup
+
+    .LINK
+    Install-CGroup
+
+    .LINK
+    Uninstall-CGroup
+
+    .EXAMPLE
+    Test-CGroup -Name RebelAlliance
+
+    Checks if the `RebelAlliance` *local* group exists.  Returns `True` if it does, `False` if it doesn't.
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]
+        # The name of the *local* group to check.
+        $Name,
+
+        [switch] $NoWarn
+    )
+
+    Set-StrictMode -Version 'Latest'
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
+    Write-CRefactoredCommandWarning -CommandName $MyInvocation.MyCommand.Name `
+                                    -ModuleName 'Carbon.Accounts' `
+                                    -NewCommandName 'Test-CLocalGroup' `
+                                    -NoWarn:$NoWarn
+
+    $group = Get-CGroup -Name $Name -NoWarn -ErrorAction Ignore
+    if( $group )
+    {
+        $group.Dispose()
+        return $true
+    }
+    else
+    {
+        return $false
+    }
+}
+
+function Test-CGroupMember
+{
+    <#
+    .SYNOPSIS
+    Tests if a user or group is a member of a *local* group.
+
+    .DESCRIPTION
+    The `Test-CGroupMember` function tests if a user or group is a member of a *local* group using [.NET's DirectoryServices.AccountManagement APIs](https://msdn.microsoft.com/en-us/library/system.directoryservices.accountmanagement.aspx). If the group or member you want to check don't exist, you'll get errors and `$null` will be returned. If `Member` is in the group, `$true` is returned. If `Member` is not in the group, `$false` is returned.
+
+    The user running this function must have permission to access whatever directory the `Member` is in and whatever directory current members of the group are in.
+
+    This function was added in Carbon 2.1.0.
+
+    .LINK
+    Add-CGroupMember
+
+    .LINK
+    Install-CGroup
+
+    .LINK
+    Remove-CGroupMember
+
+    .LINK
+    Test-CGroup
+
+    .LINK
+    Uninstall-CGroup
+
+    .EXAMPLE
+    Test-CGroupMember -GroupName 'SithLords' -Member 'REBELS\LSkywalker'
+
+    Demonstrates how to test if a user is a member of a group. In this case, it tests if `REBELS\LSkywalker` is in the local `SithLords`, *which obviously he isn't*, so `$false` is returned.
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]
+        # The name of the group whose membership is being tested.
+        $GroupName,
+
+        [Parameter(Mandatory=$true)]
+        [string]
+        # The name of the member to check.
+        $Member,
+
+        [switch] $NoWarn
+    )
+
+    Set-StrictMode -Version 'Latest'
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
+    Write-CRefactoredCommandWarning -CommandName $MyInvocation.MyCommand.Name `
+                                    -ModuleName 'Carbon.Accounts' `
+                                    -NewCommandName 'Test-CLocalGroupMember' `
+                                    -NoWarn:$NoWarn
+
+    if( -not (Test-CGroup -Name $GroupName -NoWarn) )
+    {
+        Write-Error -Message ('Group ''{0}'' not found.' -f $GroupName)
+        return
+    }
+
+    $group = Get-CGroup -Name $GroupName -NoWarn
+    if( -not $group )
+    {
+        return
+    }
+
+    $principal = Resolve-CIdentity -Name $Member -NoWarn
+    if( -not $principal )
+    {
+        return
+    }
+
+    try
+    {
+        return $principal.IsMemberOfLocalGroup($group.Name)
+    }
+    catch
+    {
+        Write-Error -Message ('Checking if "{0}" is a member of local group "{1}" failed: {2}' -f $principal.FullName,$group.Name,$_)
+    }
+}
 
 function Test-COSIs32Bit
 {
@@ -11416,6 +12042,77 @@ function Uninstall-CFileShare
     }
 }
 
+function Uninstall-CGroup
+{
+    <#
+    .SYNOPSIS
+    Removes a *local* group.
+
+    .DESCRIPTION
+    The `Uninstall-CGroup` function removes a *local* group using .NET's [DirectoryServices.AccountManagement API](https://msdn.microsoft.com/en-us/library/system.directoryservices.accountmanagement.aspx). If the group doesn't exist, returns without doing any work or writing any errors.
+
+    This function was added in Carbon 2.1.0.
+
+    .LINK
+    Add-CGroupMember
+
+    .LINK
+    Install-CGroup
+
+    .LINK
+    Remove-CGroupMember
+
+    .LINK
+    Test-CGroup
+
+    .LINK
+    Test-CGroupMember
+
+    .INPUTS
+    System.String
+
+    .EXAMPLE
+    Uninstall-WhsGroup -Name 'TestGroup1'
+
+    Demonstrates how to uninstall a group. In this case, the `TestGroup1` group is removed.
+    #>
+    [CmdletBinding(SupportsShouldProcess=$true)]
+    param(
+        [Parameter(Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [String]
+        # The name of the group to remove/uninstall.
+        $Name,
+
+        [switch] $NoWarn
+    )
+
+	Set-StrictMode -Version 'Latest'
+    Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
+
+    Write-CRefactoredCommandWarning -CommandName $MyInvocation.MyCommand.Name `
+                                    -ModuleName 'Carbon.Accounts' `
+                                    -NewCommandName 'Uninstall-CLocalGroup' `
+                                    -NoWarn:$NoWarn
+
+    if( -not (Test-CGroup -Name $Name -NoWarn) )
+    {
+        return
+    }
+
+    $group = Get-CGroup -Name $Name -NoWarn
+    if( -not $group )
+    {
+        return
+    }
+
+    if( $PSCmdlet.ShouldProcess(('local group {0}' -f $Name), 'remove') )
+    {
+        Write-Verbose -Message ('[{0}]              -' -f $Name)
+        $group.Delete()
+    }
+
+}
 
 function Uninstall-CScheduledTask
 {

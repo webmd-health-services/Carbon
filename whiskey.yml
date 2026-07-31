@@ -154,7 +154,6 @@ Tests:
     - Test\Documentation.Tests.ps1
     - Test\Enable-AclInheritance.Tests.ps1
     - Test\Get-ComPermission.Tests.ps1
-    - Test\Get-Group.Tests.ps1
     - Test\Get-HttpUrlAcl.Tests.ps1
     - Test\Get-SslCertificateBinding.Tests.ps1
     - Test\Get-User.Tests.ps1
@@ -163,7 +162,6 @@ Tests:
     - Test\Install-Junction.Tests.ps1
     - Test\New-Junction.Tests.ps1
     - Test\Remove-DotNetAppSetting.Tests.ps1
-    - Test\Remove-GroupMember.Tests.ps1
     - Test\Remove-HostsEntry.Tests.ps1
     - Test\Remove-Junction.Tests.ps1
     - Test\Reset-HostsFile.Tests.ps1
@@ -171,10 +169,7 @@ Tests:
     - Test\System.Diagnostics.Process.types.Tests.ps1
     - Test\System.IO.DirectoryInfo.types.ps1xml.Tests.ps1
     - Test\System.IO.FileInfo.types.ps1xml.Tests.ps1
-    - Test\Test-Group.Tests.ps1
-    - Test\Test-GroupMember.Tests.ps1
     - Test\Test-PathIsJunction.Tests.ps1
-    - Test\Uninstall-Group.Tests.ps1
     - Test\Uninstall-Junction.Tests.ps1
     - Test\Write-File.Tests.ps1
 - Pester:
@@ -200,7 +195,6 @@ Tests:
             - "*\\Documentation.Tests.ps1"
             - "*\\Enable-AclInheritance.Tests.ps1"
             - "*\\Get-ComPermission.Tests.ps1"
-            - "*\\Get-Group.Tests.ps1"
             - "*\\Get-HttpUrlAcl.Tests.ps1"
             - "*\\Get-SslCertificateBinding.Tests.ps1"
             - "*\\Get-User.Tests.ps1"
@@ -209,7 +203,6 @@ Tests:
             - "*\\Install-Junction.Tests.ps1"
             - "*\\New-Junction.Tests.ps1"
             - "*\\Remove-DotNetAppSetting.Tests.ps1"
-            - "*\\Remove-GroupMember.Tests.ps1"
             - "*\\Remove-HostsEntry.Tests.ps1"
             - "*\\Remove-Junction.Tests.ps1"
             - "*\\Reset-HostsFile.Tests.ps1"
@@ -217,10 +210,7 @@ Tests:
             - "*\\System.Diagnostics.Process.types.Tests.ps1"
             - "*\\System.IO.DirectoryInfo.types.ps1xml.Tests.ps1"
             - "*\\System.IO.FileInfo.types.ps1xml.Tests.ps1"
-            - "*\\Test-Group.Tests.ps1"
-            - "*\\Test-GroupMember.Tests.ps1"
             - "*\\Test-PathIsJunction.Tests.ps1"
-            - "*\\Uninstall-Group.Tests.ps1"
             - "*\\Uninstall-Junction.Tests.ps1"
             - "*\\Write-File.Tests.ps1"
 - PowerShell: .\Invoke-CarbonBladeTest.ps1 -Recurse -Path .\Test -PassThru

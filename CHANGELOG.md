@@ -105,6 +105,19 @@
   * `Set-CServiceAcl`
   * `Test-CService`
   * `Uninstall-CService`
+* `Assert-CAdminPrivilege`. It moved to the `Carbon.Accounts` PowerShell module as `Assert-CRunAsElevated` where it
+  now supports PowerShell (pwsh) and Linux/macOS.
+* `Test-CAdminPrivilege`. It moved to the `Carbon.Accounts` PowerShell module as `Test-CAdminPrivilege` where it
+  now supports PowerShell (pwsh) and Linux/macOS.
+* Local group management functions. They moved to the `Carbon.Accounts` PowerShell module where they now support
+  PowerShell (pwsh.exe).
+  * `Add-CGroupMember` (as `Install-CLocalGroupMember`)
+  * `Get-CGroup` (as `Get-CLocalGroup`)
+  * `Install-CGroup` (as `Install-CLocalGroup`)
+  * `Remove-CGroupMember` (as `Uninstall-CLocalGroupMember`)
+  * `Test-CGroup` (as `Test-CLocalGroup`)
+  * `Test-CGroupMember` (as `Test-CLocalGroupMember`)
+  * `Uninstall-CGroup` (as `Uninstall-CLocalGroupMember`)
 
 ## 2.15.1
 
