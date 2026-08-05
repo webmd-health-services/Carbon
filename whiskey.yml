@@ -2,6 +2,7 @@
 Build:
 - Version:
     Path: Carbon\Carbon.psd1
+    IncrementPrereleaseVersion: true
     Prerelease:
     - main: ""
     - "*": rc1
