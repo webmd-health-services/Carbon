@@ -9,6 +9,8 @@
 
 * `Remove-CEnvironmentVariable` fails to remove environment variables in PowerShell 7.
 * `Carbon_EnvironmentVariable` DSC resource fails to remove environment variables in PowerShell 7.
+* Objects returned by `Get-CHttpUrlAcl` missing built-in extended type properties (e.g. `Access`, `AccessToString`,
+  etc.) in PowerShell 7.
 
 ### Deprecated
 

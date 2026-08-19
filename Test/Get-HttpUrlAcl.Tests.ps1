@@ -1,11 +1,22 @@
 
 #Requires -Version 5.1
-Set-StrictMode -VErsion 'Latest'
+Set-StrictMode -Version 'Latest'
 
 BeforeAll {
-    Set-StrictMode -VErsion 'Latest'
+    Set-StrictMode -Version 'Latest'
+
 
     & (Join-Path -Path $PSScriptRoot -ChildPath 'Initialize-CarbonTest.ps1' -Resolve)
+
+    # The `Access` property on CommonObjectSecurity objects (parent class for HttpUrlSecurity) is a PowerShell code
+    # property. In Windows PowerShell 5.1, that code property always exists. In PowerShell 7, the property only exists
+    # if the `Microsoft.PowerShell.Security` module is loaded. Removing the module and re-importing Carbon tests that
+    # Carbon properly imports Microsoft.PowerShell.Security.
+    Remove-Module 'Microsoft.PowerShell.Security'
+    Remove-Module 'Carbon'
+
+    Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath '..\Carbon' -Resolve) -Verbose:$false
+
     $script:user = $null
     $script:url = 'http://test-gethttpurlacl:10939/'
 
