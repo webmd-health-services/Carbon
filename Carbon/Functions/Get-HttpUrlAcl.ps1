@@ -6,13 +6,24 @@ function Get-CHttpUrlAcl
     Gets HTTP URL security information.
 
     .DESCRIPTION
-    The `Get-CHttpUrlAcl` functions uses the HTTP Server API to get HTTP URL ACL information. With no parameters, it returns `Carbon.Security.HttpUrlSecurity` objects for all the HTTP URL ACLs. To get a specific HTTP URL ACL, use the `Name` parameter (wildcards supported).
+    The `Get-CHttpUrlAcl` functions uses the HTTP Server API to get HTTP URL ACL information. With no parameters, it
+    returns `Carbon.Security.HttpUrlSecurity` objects for all the HTTP URL ACLs. To get a specific HTTP URL ACL, use the
+    `Name` parameter (wildcards supported).
 
     [The HTTP Server API](https://msdn.microsoft.com/en-us/library/aa364510.aspx)
 
-    > enables applications to communicate over HTTP without using Microsoft Internet Information Server (IIS). Applications can register to receive HTTP requests for particular URLs, receive HTTP requests, and send HTTP responses.
+    > enables applications to communicate over HTTP without using Microsoft Internet Information Server (IIS).
+    > Applications can register to receive HTTP requests for particular URLs, receive HTTP requests, and send HTTP
+    > responses.
 
-    An application that uses the HTTP Server API must register all URLs it listens (i.e. binds, registers) to. When registering, the user who will listen to the URL must also be provided. Typically, this is done with the `netsh http (show|add|remove) urlacl` command(s). This function replaces the `netsh http show urlacl` command.
+    An application that uses the HTTP Server API must register all URLs it listens (i.e. binds, registers) to. When
+    registering, the user who will listen to the URL must also be provided. Typically, this is done with the `netsh http
+    (show|add|remove) urlacl` command(s). This function replaces the `netsh http show urlacl` command.
+
+    PowerShell has built-in extended type properties on the objects returned by `Get-CHttpUrlAcl` (e.g. `Access`,
+    `AccessToString`, etc.). In PowerShell 7, the Microsoft.PowerShell.Security module needs to be imported for those
+    properties to be available. `Get-CHttpUrlAcl` will load Microsoft.PowerShell.Security globally if it detects
+    extended type properties are missing.
 
     `Get-CHttpUrlAcl` was introduced in Carbon 2.1.0.
 
@@ -41,14 +52,17 @@ function Get-CHttpUrlAcl
     .EXAMPLE
     Get-CHttpUrlAcl -Url 'htt://*:8599/'
 
-    Demonstrates how to use wildcards to find security information. In this case, all URLs that use port 8599 will be returned.
-    
-    When using wildcards, it is important that your URL end with a slash! The HTTP Server API adds a forward slash to the end of all its URLs.
+    Demonstrates how to use wildcards to find security information. In this case, all URLs that use port 8599 will be
+    returned.
+
+    When using wildcards, it is important that your URL end with a slash! The HTTP Server API adds a forward slash to
+    the end of all its URLs.
 
     .EXAMPLE
     Get-CHttpUrlAcl -LiteralUrl 'http://*:8599/'
 
-    Demonstrates how to use a literal URL to find security information. Will only return the ACL for the URL `http://*:8599/`.
+    Demonstrates how to use a literal URL to find security information. Will only return the ACL for the URL
+    `http://*:8599/`.
     #>
     [CmdletBinding(DefaultParameterSetName='AllUrls')]
     [OutputType([Carbon.Security.HttpUrlSecurity])]
@@ -69,7 +83,6 @@ function Get-CHttpUrlAcl
     )
 
     Set-StrictMode -Version 'Latest'
-
     Use-CallerPreference -Cmdlet $PSCmdlet -Session $ExecutionContext.SessionState
 
     $errorActionParam = @{ 'ErrorAction' = $ErrorActionPreference }
@@ -81,6 +94,11 @@ function Get-CHttpUrlAcl
     $acls = @()
     [Carbon.Security.HttpUrlSecurity]::GetHttpUrlSecurity() |
         Where-Object {
+            if ($_ -and -not ($_ | Get-Member 'Access'))
+            {
+                Import-Module -Name 'Microsoft.PowerShell.Security' -Global
+            }
+
             if( $PSCmdlet.ParameterSetName -eq 'AllUrls' )
             {
                 return $true
@@ -107,5 +125,6 @@ function Get-CHttpUrlAcl
         {
             Write-Error ('HTTP ACL for URL {0} not found. The HTTP API adds a trailing forward slash (/) to the end of all URLs. Make sure your URL ends with a trailing slash.' -f $Url) @errorActionParam
         }
+        return
     }
 }

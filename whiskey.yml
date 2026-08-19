@@ -2,6 +2,7 @@
 Build:
 - Version:
     Path: Carbon\Carbon.psd1
+    IncrementPrereleaseVersion: true
     Prerelease:
     - main: ""
     - "*": rc1
@@ -154,7 +155,6 @@ Tests:
     - Test\Documentation.Tests.ps1
     - Test\Enable-AclInheritance.Tests.ps1
     - Test\Get-ComPermission.Tests.ps1
-    - Test\Get-HttpUrlAcl.Tests.ps1
     - Test\Get-User.Tests.ps1
     - Test\Grant-ComPermission.Tests.ps1
     - Test\Import-Carbon.Tests.ps1
@@ -194,7 +194,6 @@ Tests:
             - "*\\Documentation.Tests.ps1"
             - "*\\Enable-AclInheritance.Tests.ps1"
             - "*\\Get-ComPermission.Tests.ps1"
-            - "*\\Get-HttpUrlAcl.Tests.ps1"
             - "*\\Get-User.Tests.ps1"
             - "*\\Grant-ComPermission.Tests.ps1"
             - "*\\Import-Carbon.Tests.ps1"
